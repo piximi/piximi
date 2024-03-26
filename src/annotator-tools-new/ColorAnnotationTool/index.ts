@@ -1,0 +1,1 @@
+export { ColorAnnotationTool } from "./ColorAnnotationTool";

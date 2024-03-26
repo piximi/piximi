@@ -1,5 +1,4 @@
 import { GraphModel, History, LayersModel } from "@tensorflow/tfjs";
-import { v4 as uuid } from "uuid";
 
 import { ModelTask } from "types/ModelType";
 import { Category, FitOptions, ImageType } from "types";
@@ -8,6 +7,7 @@ import { loadStardist } from "./loadStardist";
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
+import { generateUUID } from "utils/common/helpers";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
@@ -96,7 +96,7 @@ export class StardistVHE extends Segmenter {
       this._fgCategory = {
         name: "Nucleus",
         visible: true,
-        id: uuid(),
+        id: generateUUID(),
         color: CATEGORY_COLORS.darkcyan,
       };
     }
@@ -149,6 +149,9 @@ export class StardistVHE extends Segmenter {
 
     return annotations;
   }
+  public async predictNew() {
+    return [];
+  }
 
   public inferenceCategoriesById(catIds: Array<string>) {
     if (!this._fgCategory) {
@@ -156,6 +159,9 @@ export class StardistVHE extends Segmenter {
     }
 
     return catIds.includes(this._fgCategory.id) ? [this._fgCategory] : [];
+  }
+  public inferenceKindsById(kind: string[]) {
+    return [];
   }
 
   public override dispose() {

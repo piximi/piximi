@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useCallback,
-  useState,
-  createContext,
-  useRef,
-} from "react";
+import React, { useEffect, useCallback, useState, useRef } from "react";
 import Konva from "konva";
 import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
@@ -30,10 +24,7 @@ import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ImageShapeInfo, ImageShapeEnum } from "utils/common/image";
 
 import { AlertType, HotkeyView } from "types";
-
-export const StageContext = createContext<React.RefObject<Konva.Stage> | null>(
-  null
-);
+import { StageContext } from "contexts";
 
 export const ImageViewer = () => {
   const dispatch = useDispatch();

@@ -1,7 +1,11 @@
 import { Project } from "types";
 
 import { createSelector } from "@reduxjs/toolkit";
-import { ImageSortKey, sortTypeByKey } from "types/ImageSortType";
+import {
+  ImageSortKey,
+  ThingSortKey_new,
+  sortTypeByKey,
+} from "types/ImageSortType";
 
 export const selectImageSortKey = ({
   project,
@@ -9,6 +13,18 @@ export const selectImageSortKey = ({
   project: Project;
 }): ImageSortKey => {
   return project.imageSortKey;
+};
+
+export const selectSortTypeNew = ({
+  project,
+}: {
+  project: Project;
+}): ThingSortKey_new => {
+  return project.sortType_new;
+};
+
+export const selectActiveKindId = ({ project }: { project: Project }) => {
+  return project.activeKind;
 };
 
 export const selectImageSortType = createSelector(
@@ -32,6 +48,15 @@ export const selectSelectedImageIds = ({
 }): Array<string> => {
   return project.selectedImageIds;
 };
+
+export const selectSelectedThingIds = ({
+  project,
+}: {
+  project: Project;
+}): Array<string> => {
+  return project.selectedThingIds;
+};
+
 export const selectProject = ({ project }: { project: Project }): Project => {
   return project;
 };
@@ -45,6 +70,21 @@ export const selectImageFilters = ({ project }: { project: Project }) => {
 
 export const selectAnnotationFilters = ({ project }: { project: Project }) => {
   return project.annotationFilters;
+};
+
+export const selectActiveFilteredStateHasFilters = ({
+  project,
+}: {
+  project: Project;
+}) => {
+  const activeKind = project.activeKind;
+  const thingFilters = project.thingFilters[activeKind];
+  if (!thingFilters) return false;
+  const hasFilters = Object.values(thingFilters).some((filters) => {
+    return filters.length > 0;
+  });
+
+  return hasFilters;
 };
 
 export const selectImageFilteredState = createSelector(
@@ -75,3 +115,12 @@ export const selectFilteredState = createSelector(
     return { hasImageFilters, hasAnnotationFilters };
   }
 );
+
+export const selectThingFilters = ({ project }: { project: Project }) => {
+  return project.thingFilters;
+};
+
+export const selectActiveThingFilters = ({ project }: { project: Project }) => {
+  const activeKind = project.activeKind;
+  return project.thingFilters[activeKind] ?? {};
+};

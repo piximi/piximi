@@ -77,7 +77,6 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
         dispatch(
           imageViewerSlice.actions.setSelectedCategoryId({
             selectedCategoryId: category.id,
-            execSaga: true,
           })
         );
 
@@ -248,7 +247,6 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
           dispatch(
             imageViewerSlice.actions.setSelectedCategoryId({
               selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY.id,
-              execSaga: true,
             })
           );
           dispatch(

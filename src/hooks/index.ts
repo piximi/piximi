@@ -9,7 +9,7 @@ export { useMenu } from "./useMenu";
 export { useStageHandlers } from "./useStageHandlers";
 export { usePreferredMuiTheme, usePreferredNivoTheme } from "./useTheme";
 export { useTranslation } from "./useTranslation";
-export { useUpload } from "./useUpload";
+export { useUpload, useUploadNew } from "./useUpload";
 export { useZoom } from "./useZoom";
 export { useLocalGlobalState } from "./useLocalGlobalState";
 export { useHotkeys } from "./useHotkeys";

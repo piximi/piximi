@@ -8,14 +8,23 @@ import {
 import { ModelTask } from "types/ModelType";
 import { Category, FitOptions, ImageType } from "types";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
-import { predictCoco } from "./predictCoco";
+import { predictCoco, predictCocoNew } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
-import { constructCocoCategories } from "./constructCocoCategories";
+import {
+  constructCocoCategories,
+  constructCocoKinds,
+} from "./constructCocoCategories";
+import { Kind } from "types/Category";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
   // if cat undefined, created from default classes
   categories?: Array<Category>;
+};
+type LoadInferenceDataArgsNew = {
+  fitOptions: FitOptions;
+  // if cat undefined, created from default classes
+  kinds?: Array<Kind>;
 };
 
 /*
@@ -118,6 +127,9 @@ export class CocoSSD extends Segmenter {
 
     return annotations;
   }
+  public async predictNew() {
+    return [];
+  }
 
   public inferenceCategoriesById(catIds: Array<string>) {
     if (!this._inferenceCategories) {
@@ -125,6 +137,108 @@ export class CocoSSD extends Segmenter {
     }
 
     return this._inferenceCategories.filter((cat) => catIds.includes(cat.id));
+  }
+  public inferenceKindsById(kind: string[]) {
+    return [];
+  }
+
+  public override dispose() {
+    super.dispose();
+  }
+}
+
+export class CocoSSDNew extends Segmenter {
+  protected _inferenceKinds?: Array<Kind>;
+
+  constructor() {
+    super({
+      name: "COCO-SSD-New",
+      task: ModelTask.Segmentation,
+      graph: true,
+      pretrained: true,
+      trainable: false,
+      src: "https://tfhub.dev/tensorflow/tfjs-model/ssd_mobilenet_v2/1/default/1",
+      requiredChannels: 3,
+    });
+  }
+
+  public async loadModel() {
+    if (!this.src) return;
+    if (this._model) return;
+
+    const isTFHub = CocoSSD.verifyTFHubUrl(this.src);
+
+    this._model = await loadGraphModel(this.src, { fromTFHub: isTFHub });
+  }
+
+  public loadTraining(images: ImageType[], preprocessingArgs: any): void {}
+  public loadValidation(images: ImageType[], preprocessingArgs: any): void {}
+
+  public loadInference(
+    images: ImageType[],
+    preprocessingArgs: LoadInferenceDataArgsNew
+  ) {
+    this._inferenceDataset = preprocessInference(
+      images,
+      preprocessingArgs.fitOptions
+    );
+
+    if (preprocessingArgs.kinds) {
+      this._inferenceKinds = preprocessingArgs.kinds;
+    } else if (!this._inferenceKinds) {
+      this._inferenceKinds = constructCocoKinds();
+    }
+  }
+
+  public async train(options: any, callbacks: any): Promise<History> {
+    if (!this.trainable) {
+      throw new Error(`Training not supported for Model ${this.name}`);
+    } else {
+      throw new Error(`Training not yet implemented for Model ${this.name}`);
+    }
+  }
+
+  public async predict() {
+    return [];
+  }
+  public async predictNew() {
+    if (!this._model) {
+      throw Error(`"${this.name}" Model not loaded`);
+    }
+
+    if (this._model instanceof LayersModel) {
+      throw Error(`"${this.name}" Model must a Graph, not Layers`);
+    }
+
+    if (!this._inferenceDataset) {
+      throw Error(`"${this.name}" Model's inference data not loaded`);
+    }
+
+    if (!this._inferenceKinds) {
+      throw Error(`"${this.name}" Model's inference kinds are not loaded`);
+    }
+
+    const graphModel = this._model as GraphModel;
+
+    const infT = await this._inferenceDataset.toArray();
+    // imTensor disposed in `predictCoco`
+    const annotationsPromises = infT.map((imTensor) => {
+      return predictCocoNew(graphModel, imTensor, this._inferenceKinds!);
+    });
+    const annotations = await Promise.all(annotationsPromises);
+
+    return annotations;
+  }
+
+  public inferenceCategoriesById(catIds: Array<string>) {
+    return [];
+  }
+  public inferenceKindsById(kinds: string[]) {
+    if (!this._inferenceKinds) {
+      throw Error(`"${this.name}" Model has no inference kinds loaded`);
+    }
+
+    return this._inferenceKinds.filter((kind) => kinds.includes(kind.id));
   }
 
   public override dispose() {

@@ -141,6 +141,7 @@ const deserializeImageGroup = async (
 
   const colorsGroup = await getGroup(imageGroup, "colors");
   const colors = await deserializeColorsGroup(colorsGroup);
+
   const imageDataset = await getDataset(imageGroup, name);
   const imageRawArray = (await imageDataset.getRaw()) as RawArray;
   const imageData = imageRawArray.data as Float32Array;
@@ -178,7 +179,6 @@ const deserializeImageGroup = async (
       channels,
     },
     src,
-    visible: true,
   };
 };
 
@@ -197,8 +197,10 @@ const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
     );
 
     const imageGroup = await getGroup(imagesGroup, name);
+    //const tensorsBefore = memory().numTensors;
     const image = await deserializeImageGroup(name, imageGroup);
-
+    //const tensorsAfter = memory().numTensors;
+    //console.log("New tensors per image: ", tensorsAfter - tensorsBefore);
     images.push(image);
   }
 

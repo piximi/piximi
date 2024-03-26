@@ -13,6 +13,8 @@ import {
   Point,
   ImageType,
 } from "types";
+import { NewDecodedAnnotationType } from "types/AnnotationType";
+import { logger } from "utils/common/logger";
 
 export const generatePoints = (buffer: Array<number> | undefined) => {
   if (!buffer) return undefined;
@@ -190,6 +192,20 @@ export const getAnnotationsInBox = (
     );
   });
 };
+export const getAnnotationsInBoxNew = (
+  minimum: { x: number; y: number },
+  maximum: { x: number; y: number },
+  annotations: Array<NewDecodedAnnotationType>
+) => {
+  return annotations.filter((annotation: NewDecodedAnnotationType) => {
+    return (
+      minimum.x <= annotation.boundingBox[0] &&
+      minimum.y <= annotation.boundingBox[1] &&
+      maximum.x >= annotation.boundingBox[2] &&
+      maximum.y >= annotation.boundingBox[3]
+    );
+  });
+};
 
 /*
  * From encoded mask data, get the decoded data and return results as an HTMLImageElement to be used by Konva.Image
@@ -233,14 +249,14 @@ export const colorOverlayROI = (
     }).resize({ factor: scalingFactor });
   } catch (err) {
     if (process.env.NODE_ENV !== "production") {
-      console.error("could not create crop");
-      console.log(`boundingbox: ${boundingBox}`);
-      console.log(`boxWidth: ${boxWidth}`);
-      console.log(`boxHeight: ${boxHeight}`);
-      console.log(`bwxbh: ${boxHeight * boxWidth}`);
-      console.log(`decodedMask length: ${decodedMask.length}`);
-      console.log(`diff: ${boxHeight * boxWidth - decodedMask.length}`);
-      console.error(err);
+      logger("could not create crop", "error");
+      logger(`boundingbox: ${boundingBox}`);
+      logger(`boxWidth: ${boxWidth}`);
+      logger(`boxHeight: ${boxHeight}`);
+      logger(`bwxbh: ${boxHeight * boxWidth}`);
+      logger(`decodedMask length: ${decodedMask.length}`);
+      logger(`diff: ${boxHeight * boxWidth - decodedMask.length}`);
+      logger(err, "error");
     }
   }
 

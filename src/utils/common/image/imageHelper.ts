@@ -10,8 +10,9 @@ import {
   Tensor4D,
   tidy,
   fill,
+  dispose,
+  image as tfImage,
 } from "@tensorflow/tfjs";
-import { v4 as uuidv4 } from "uuid";
 
 import {
   DEFAULT_COLORS,
@@ -20,6 +21,8 @@ import {
   UNKNOWN_IMAGE_CATEGORY_ID,
 } from "types";
 import { Colors } from "types/tensorflow";
+import { generateUUID } from "../helpers";
+import { NewImageType } from "types/ImageType";
 
 /*
  ======================================
@@ -27,6 +30,7 @@ import { Colors } from "types/tensorflow";
  ======================================
  */
 
+//QUESTION: Is there a reason why these are in this file and not in types?
 export enum ImageShapeEnum {
   DicomImage,
   GreyScale,
@@ -588,9 +592,12 @@ const getImageTensorData = async (
   bitDepth: BitDepth,
   opts: { disposeImageTensor: boolean } = { disposeImageTensor: true }
 ) => {
-  const imageData = await denormalizeTensor(imageTensor, bitDepth, {
+  //NOTE: Split the following into two steps. Previously created a tensor and called data() in one step, but the tensor was never disposed of
+  const denormalizedImageTensor = denormalizeTensor(imageTensor, bitDepth, {
     disposeNormalTensor: opts.disposeImageTensor,
-  }).data();
+  });
+  const imageData = await denormalizedImageTensor.data();
+  denormalizedImageTensor.dispose();
 
   // DO NOT USE "imageData instanceof Float32Array" here
   // tensorflow sublcasses typed arrays, so it will always return false
@@ -769,36 +776,46 @@ export async function createRenderedTensor(
   bitDepth: BitDepth,
   plane: number | undefined
 ) {
-  let operandTensor: Tensor4D | Tensor3D;
-  let disposeOperandTensor: boolean;
+  const compositeImage = tidy(() => {
+    let operandTensor: Tensor4D | Tensor3D;
+    let disposeOperandTensor: boolean;
 
-  if (plane === undefined) {
-    operandTensor = imageTensor;
-    disposeOperandTensor = false;
-  } else {
-    // image slice := get z idx 0 of image with dims: [H, W, C]
-    operandTensor = getImageSlice(imageTensor, plane);
-    disposeOperandTensor = true;
-  }
+    if (plane === undefined) {
+      operandTensor = imageTensor;
+      disposeOperandTensor = false;
+    } else {
+      // image slice := get z idx 0 of image with dims: [H, W, C]
+      operandTensor = getImageSlice(imageTensor, plane);
+      disposeOperandTensor = true;
+    }
 
-  // scale each channel by its range
-  const scaledImageSlice = scaleImageTensor(operandTensor, colors, {
-    disposeImageTensor: disposeOperandTensor,
+    // scale each channel by its range
+    const scaledImageSlice = scaleImageTensor(operandTensor, colors, {
+      disposeImageTensor: disposeOperandTensor,
+    });
+
+    // get indices of visible channels, VC
+    const visibleChannels = filterVisibleChannels(colors);
+
+    // image slice filtered by visible channels: [H, W, VC] or [Z, H, W, VC]
+    const filteredSlice = sliceVisibleChannels(
+      scaledImageSlice,
+      visibleChannels
+    );
+
+    // color matrix filtered by visible channels: [VC, 3]
+    const filteredColors = sliceVisibleColors(colors, visibleChannels);
+
+    // composite image slice: [H, W, 3] or [Z, H, W, 3]
+    const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+
+    return compositeImage;
   });
+  const src = await renderTensor(compositeImage, bitDepth);
 
-  // get indices of visible channels, VC
-  const visibleChannels = filterVisibleChannels(colors);
+  dispose(compositeImage);
 
-  // image slice filtered by visible channels: [H, W, VC] or [Z, H, W, VC]
-  const filteredSlice = sliceVisibleChannels(scaledImageSlice, visibleChannels);
-
-  // color matrix filtered by visible channels: [VC, 3]
-  const filteredColors = sliceVisibleColors(colors, visibleChannels);
-
-  // composite image slice: [H, W, 3] or [Z, H, W, 3]
-  const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
-
-  return await renderTensor(compositeImage, bitDepth);
+  return src;
 }
 
 export const convertToImage = async (
@@ -833,11 +850,12 @@ export const convertToImage = async (
   const [planes, height, width, channels] = imageTensor.shape;
 
   return {
+    kind: "Image",
     activePlane: activePlane,
     colors: colors,
     bitDepth,
     categoryId: UNKNOWN_IMAGE_CATEGORY_ID,
-    id: uuidv4(),
+    id: generateUUID(),
     name: filename,
     shape: { planes, height, width, channels },
     data: imageTensor,
@@ -980,6 +998,26 @@ export const replaceDuplicateName = (
   return currentName;
 };
 
+//HACK: new
+export const newReplaceDuplicateName = (
+  newName: string,
+  existingNames: Array<string>
+) => {
+  let currentName = newName;
+  let count = 0;
+  // eslint-disable-next-line
+  const nameRe = new RegExp(`${newName}(_\d+)?`, "g");
+  existingNames.forEach((name) => {
+    if (!!nameRe.exec(name)) {
+      const suffix = +name.split("_")[1];
+      if (suffix > count) {
+        count = suffix;
+      }
+    }
+  });
+  return !count ? currentName : `${currentName}_${count + 1}`;
+};
+
 export const scaleUpRange = (
   range: [number, number],
   bitDepth: BitDepth
@@ -1059,4 +1097,36 @@ export const convertToDataArray = (
     default:
       throw Error("Unrecognized bit depth");
   }
+};
+
+export const getPropertiesFromImage = async (
+  image: NewImageType,
+  annotation: { boundingBox: number[] }
+) => {
+  const renderedIm = await ImageJS.Image.load(image.src);
+  const normalizingWidth = image.shape.width - 1;
+  const normalizingHeight = image.shape.height - 1;
+  const bbox = annotation.boundingBox;
+  const x1 = bbox[0] / normalizingWidth;
+  const x2 = bbox[2] / normalizingWidth;
+  const y1 = bbox[1] / normalizingHeight;
+  const y2 = bbox[3] / normalizingHeight;
+  const box = tensor2d([[y1, x1, y2, x2]]);
+  const width = bbox[2] - bbox[0];
+  const height = bbox[3] - bbox[1];
+  const objectImage = renderedIm.crop({
+    x: Math.abs(bbox[0]),
+    y: Math.abs(bbox[1]),
+    width: Math.abs(Math.min(image.shape.width, bbox[2]) - bbox[0]),
+    height: Math.abs(Math.min(image.shape.height, bbox[3]) - bbox[1]),
+  });
+  const objSrc = objectImage.getCanvas().toDataURL();
+  const data = tfImage.cropAndResize(image.data, box, [0], [height, width]);
+
+  return {
+    data: data,
+    src: objSrc,
+    imageId: image.id,
+    boundingBox: bbox,
+  };
 };

@@ -9,8 +9,14 @@ import {
   tidy,
   zeros,
 } from "@tensorflow/tfjs";
+import { Kind } from "types/Category";
+import { NewAnnotationType } from "types/AnnotationType";
 
 export type OrphanedAnnotationType = Omit<AnnotationType, "imageId">;
+export type NewOrphanedAnnotationType = Omit<
+  NewAnnotationType,
+  "imageId" | "data" | "src" | "bitDepth" | "name" | "shape"
+>;
 
 export abstract class Segmenter extends Model {
   protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
@@ -27,6 +33,9 @@ export abstract class Segmenter extends Model {
   public abstract predict():
     | OrphanedAnnotationType[][]
     | Promise<OrphanedAnnotationType[][]>;
+  public abstract predictNew():
+    | NewOrphanedAnnotationType[][]
+    | Promise<NewOrphanedAnnotationType[][]>;
 
   /*
    * Concrete classes must keep track of their inference categories somehow,
@@ -39,6 +48,7 @@ export abstract class Segmenter extends Model {
    * returns the corresponding `Category` objects.
    */
   public abstract inferenceCategoriesById(catIds: Array<string>): Category[];
+  public abstract inferenceKindsById(kind: Array<string>): Kind[];
 
   public evaluate() {
     throw Error(`"${this.name}" Model evaluation not supported`);

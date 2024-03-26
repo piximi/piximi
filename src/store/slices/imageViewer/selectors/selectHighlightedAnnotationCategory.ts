@@ -7,3 +7,11 @@ export const selectHighligtedAnnotationCatogory = ({
 }) => {
   return imageViewer.highlightedCategory;
 };
+
+export const selectHighligtedIVCatogory = ({
+  imageViewer,
+}: {
+  imageViewer: ImageViewer;
+}) => {
+  return imageViewer.highlightedCategory;
+};

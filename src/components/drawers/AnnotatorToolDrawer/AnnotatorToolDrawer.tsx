@@ -122,6 +122,7 @@ export const AnnotatorToolDrawer = ({
     HotkeyView.Annotator
   );
   const t = useTranslation();
+
   return (
     <>
       <ToolOptionsDrawer optionsVisibility={optionsVisibility} />

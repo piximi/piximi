@@ -55,11 +55,14 @@ export const CollapsibleListItem = ({
       <ListItemButton
         onClick={handleCollapse}
         disabled={disabled}
-        sx={{ height: enforceHeight ? heights[enforceHeight] : undefined }}
+        sx={{
+          height: enforceHeight ? heights[enforceHeight] : undefined,
+          px: 1,
+        }}
         dense={dense}
       >
         {carotPosition === "start" ? (
-          <ListItemIcon>
+          <ListItemIcon sx={{ minWidth: 0 }}>
             {!collapsed ? (
               <KeyboardArrowDownIcon />
             ) : (

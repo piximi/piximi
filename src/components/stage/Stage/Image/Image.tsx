@@ -1,6 +1,5 @@
-import React, { forwardRef, memo, useState } from "react";
+import React, { forwardRef, useState } from "react";
 import { useSelector } from "react-redux";
-import * as ReactKonva from "react-konva";
 import Konva from "konva";
 
 import { selectImageOrigin } from "store/slices/imageViewer";
@@ -10,34 +9,7 @@ import {
   selectActiveImageHeight,
 } from "store/slices/data";
 
-import { Point } from "types";
-
-interface KonvaImageProps {
-  image: HTMLImageElement;
-  height: number;
-  width: number;
-  imagePosition: Point;
-  activePlane: number;
-  filters: any[];
-  idx: number;
-}
-
-const MemoizedKonvaImage = memo(
-  forwardRef<Konva.Image, KonvaImageProps>((props, ref) => {
-    return (
-      <ReactKonva.Image
-        height={props.height}
-        image={props.image}
-        ref={ref}
-        width={props.width}
-        filters={props.filters}
-        visible={props.idx === props.activePlane}
-        position={props.imagePosition}
-        key={props.idx}
-      />
-    );
-  })
-);
+import { MemoizedKonvaImage } from "./MemoizedKonvaImage";
 
 export const Image = forwardRef<
   Konva.Image,

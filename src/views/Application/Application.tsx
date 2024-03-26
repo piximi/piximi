@@ -5,7 +5,9 @@ import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 
 import { usePreferredMuiTheme } from "hooks";
 
-import { ImageViewer } from "../ImageViewer";
+import { ProjectViewerNew } from "views/ProjectViewer/ProjectViewerNew";
+
+import { ImageViewer, ImageViewerNew } from "../ImageViewer";
 import { ProjectViewer } from "../ProjectViewer";
 
 export const Application = () => {
@@ -18,6 +20,8 @@ export const Application = () => {
           <Routes>
             <Route path="/" element={<ProjectViewer />} />
             <Route path="annotator" element={<ImageViewer />} />
+            <Route path="beta" element={<ProjectViewerNew />} />
+            <Route path="beta/imageviewer" element={<ImageViewerNew />} />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>

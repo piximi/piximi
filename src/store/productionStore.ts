@@ -1,6 +1,8 @@
 import createSagaMiddleware from "redux-saga";
 import {
+  AnyAction,
   configureStore,
+  Dispatch,
   EnhancedStore,
   Middleware,
   StoreEnhancer,
@@ -8,12 +10,23 @@ import {
 import logger from "redux-logger";
 import createSagaMonitor from "@clarketm/saga-monitor";
 
-import { rootReducer } from "./rootReducer";
+import { rootReducer, RootState } from "./rootReducer";
 import { rootSaga } from "./rootSaga";
 import { dataMiddleware } from "store/slices/data/dataListeners";
 import { annotatorMiddleware } from "store/slices/annotator/annotatorListeners";
 import { imageViewerMiddleware } from "./slices/imageViewer/imageViewerListeners";
 import { projectMiddleware } from "./slices/project/projectListeners";
+import { newDataMiddleware } from "./slices/newData/dataListenersNew";
+import { classifierSlice } from "./slices/classifier";
+import { annotatorSlice } from "./slices/annotator";
+import { applicationSettingsSlice } from "./slices/applicationSettings";
+import { imageViewerSlice } from "./slices/imageViewer";
+import { dataSlice } from "./slices/data";
+import { newDataSlice } from "./slices/newData/newDataSlice";
+import { projectSlice } from "./slices/project";
+import { segmenterSlice } from "./slices/segmenter";
+import { classifierMiddleware } from "./slices/classifier/listeners/classiferListener";
+import { segmenterMiddleware } from "./slices/segmenter/listeners/segmenterListeners";
 
 const sagaMonitorConfig = {
   level: "debug", // logging level
@@ -58,9 +71,21 @@ let listenerMiddlewares: Middleware[] = [
   annotatorMiddleware.middleware,
   imageViewerMiddleware.middleware,
   projectMiddleware.middleware,
+  newDataMiddleware.middleware,
+  classifierMiddleware.middleware,
+  segmenterMiddleware.middleware,
 ];
 
-const preloadedState = {};
+const preloadedState: RootState = {
+  classifier: classifierSlice.getInitialState(),
+  annotator: annotatorSlice.getInitialState(),
+  applicationSettings: applicationSettingsSlice.getInitialState(),
+  imageViewer: imageViewerSlice.getInitialState(),
+  data: dataSlice.getInitialState(),
+  newData: newDataSlice.getInitialState(),
+  project: projectSlice.getInitialState(),
+  segmenter: segmenterSlice.getInitialState(),
+};
 
 const options = {
   devTools: true,
@@ -71,6 +96,19 @@ const options = {
 };
 
 export const productionStore: EnhancedStore = configureStore(options);
-export type AppDispatch = typeof productionStore.dispatch;
 
-saga.run(rootSaga);
+export const initStore = (loadedData: RootState | undefined) => {
+  const options = {
+    devTools: true,
+    enhancers: enhancers,
+    middleware: [...listenerMiddlewares, ...loggingMiddleware],
+    preloadedState: loadedData ?? {},
+    reducer: rootReducer,
+  };
+  const store = configureStore(options) as EnhancedStore;
+  saga.run(rootSaga);
+
+  return store;
+};
+
+export type AppDispatch = Dispatch<AnyAction>;

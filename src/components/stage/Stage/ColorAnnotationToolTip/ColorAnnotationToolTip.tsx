@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { StageContext } from "views/ImageViewer/ImageViewer";
+import { StageContext } from "contexts";
 import {
   selectAnnotationState,
   selectToolType,

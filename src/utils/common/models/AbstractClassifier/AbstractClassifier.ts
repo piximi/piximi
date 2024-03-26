@@ -49,21 +49,30 @@ export abstract class SequentialClassifier extends Model {
     super.dispose();
   }
 
-  public loadTraining(images: ImageType[], preprocessingArgs: LoadDataArgs) {
+  public loadTraining<T extends Omit<ImageType, "colors">>(
+    images: T[],
+    preprocessingArgs: LoadDataArgs
+  ) {
     this._trainingDataset = preprocessClassifier({
       images,
       ...preprocessingArgs,
     });
   }
 
-  public loadValidation(images: ImageType[], preprocessingArgs: LoadDataArgs) {
+  public loadValidation<T extends Omit<ImageType, "colors">>(
+    images: T[],
+    preprocessingArgs: LoadDataArgs
+  ) {
     this._validationDataset = preprocessClassifier({
       images,
       ...preprocessingArgs,
     });
   }
 
-  public loadInference(images: ImageType[], preprocessingArgs: LoadDataArgs) {
+  public loadInference<T extends Omit<ImageType, "colors">>(
+    images: T[],
+    preprocessingArgs: LoadDataArgs
+  ) {
     this._inferenceDataset = preprocessClassifier({
       images,
       ...preprocessingArgs,

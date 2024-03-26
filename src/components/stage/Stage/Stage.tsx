@@ -14,7 +14,6 @@ import {
 } from "hooks";
 import { useAnnotationState } from "hooks/useAnnotationState";
 import { Cursor } from "components/styled-components";
-import { StageContext } from "../../../views/ImageViewer/ImageViewer";
 
 import { Image } from "./Image";
 import { Layer } from "./Layer";
@@ -40,6 +39,7 @@ import {
 
 import { AnnotationStateType, HotkeyView, ToolType } from "types";
 import { dimensions } from "utils/common";
+import { StageContext } from "contexts";
 
 const normalizeFont = 1300;
 

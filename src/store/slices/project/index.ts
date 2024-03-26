@@ -10,10 +10,7 @@ export {
 // Selectors
 
 export { selectHighlightedImageCategory } from "./selectors/selectHighlightedImageCategory";
-export {
-  selectImageSortKey,
-  selectImageSortType,
-} from "./selectors/selectImageSortKey";
+export { selectImageSortType } from "./selectors/selectImageSortKey";
 export { selectProject } from "./selectors/selectProject";
 export { selectProjectName } from "./selectors/selectProjectName";
 export { selectLoadPercent } from "./selectors/selectLoadPercent";

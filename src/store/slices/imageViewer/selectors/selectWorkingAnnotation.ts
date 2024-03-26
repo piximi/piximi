@@ -7,3 +7,11 @@ export const selectWorkingAnnotation = ({
 }) => {
   return imageViewer.workingAnnotation;
 };
+
+export const selectWorkingAnnotationNew = ({
+  imageViewer,
+}: {
+  imageViewer: ImageViewer;
+}) => {
+  return imageViewer.workingAnnotationNew;
+};

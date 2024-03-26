@@ -9,13 +9,16 @@ import {
   setBackend,
   getBackend,
 } from "@tensorflow/tfjs";
-import { v4 as uuid4 } from "uuid";
 
-import { Point } from "types";
+import { Partition, Point } from "types";
 
 import { encode, scanline, simplifyPolygon } from "utils/annotator";
 import { connectPoints } from "utils/annotator";
-import { OrphanedAnnotationType } from "../AbstractSegmenter/AbstractSegmenter";
+import {
+  NewOrphanedAnnotationType,
+  OrphanedAnnotationType,
+} from "../AbstractSegmenter/AbstractSegmenter";
+import { generateUUID } from "utils/common/helpers";
 
 export const computeAnnotationMaskFromPoints = (
   cropDims: { x: number; y: number; width: number; height: number },
@@ -146,7 +149,7 @@ export function generateAnnotations(
           encodedMask: encode(decodedMask),
           boundingBox: bbox,
           categoryId: categoryId,
-          id: uuid4(),
+          id: generateUUID(),
           plane: 0,
         };
 
@@ -213,6 +216,129 @@ export const predictStardist = async (
   dispose(indexTensor);
 
   const selectedAnnotations: Array<OrphanedAnnotationType> = [];
+
+  indices.forEach((index) => {
+    selectedAnnotations.push(generatedAnnotations[index]);
+  });
+
+  if (prevBackend !== getBackend()) {
+    setBackend(prevBackend);
+  }
+
+  return selectedAnnotations;
+};
+
+export function generateAnnotationsNew(
+  preds: number[][][],
+  kindId: string,
+  unknownCategoryId: string,
+  height: number,
+  width: number,
+  inputImDims: {
+    width: number;
+    height: number;
+    padX: number;
+    padY: number;
+  },
+  scoreThresh: number
+) {
+  const generatedAnnotations: Array<NewOrphanedAnnotationType> = [];
+  const scores: Array<number> = [];
+  const generatedBboxes: Array<[number, number, number, number]> = [];
+
+  preds.forEach((row: Array<Array<number>>, i) => {
+    row.forEach((output: Array<number>, j) => {
+      if (output[0] >= scoreThresh) {
+        const polygon = buildPolygon(
+          output.slice(1), // radial distances
+          i,
+          j,
+          height,
+          width,
+          inputImDims
+        );
+
+        if (!polygon) return;
+
+        scores.push(output[0]);
+
+        const { decodedMask, bbox } = polygon;
+
+        const annotation = {
+          encodedMask: encode(decodedMask),
+          boundingBox: bbox,
+          kind: kindId,
+          categoryId: unknownCategoryId,
+          partition: Partition.Unassigned,
+          id: generateUUID(),
+          activePlane: 0,
+        };
+
+        generatedAnnotations.push(annotation);
+        generatedBboxes.push(bbox);
+      }
+    });
+  });
+  return { generatedAnnotations, generatedBboxes, scores };
+}
+export const predictStardistNew = async (
+  model: GraphModel,
+  imTensor: Tensor4D, // expects 1 for batchSize dim (axis 0)
+  kindId: string, // foreground (nucleus kind)
+  unknownCategoryId: string,
+  inputImDims: {
+    width: number;
+    height: number;
+    padX: number;
+    padY: number;
+  },
+  NMS_IoUThresh: number = 0.1,
+  NMS_scoreThresh: number = 0.3,
+  NMS_maxOutputSize: number = 500,
+  NMS_softNmsSigma: number = 0.0
+) => {
+  // [batchSize, H, W, 33]
+  const res = model.execute(imTensor) as Tensor4D;
+  const preds = (await res.array())[0];
+
+  dispose(imTensor);
+  dispose(res);
+
+  const prevBackend = getBackend();
+
+  if (prevBackend === "webgl") {
+    setBackend("cpu");
+  }
+
+  const { generatedAnnotations, generatedBboxes, scores } =
+    generateAnnotationsNew(
+      preds,
+      kindId,
+      unknownCategoryId,
+      res.shape[1], // H
+      res.shape[2], // W
+      inputImDims,
+      NMS_scoreThresh
+    );
+
+  const indexTensor = tidy(() => {
+    const bboxTensor = tensor2d(generatedBboxes);
+    const scoresTensor = tensor1d(scores);
+
+    return TFImage.nonMaxSuppressionWithScore(
+      bboxTensor,
+      scoresTensor,
+      NMS_maxOutputSize,
+      NMS_IoUThresh,
+      NMS_scoreThresh,
+      NMS_softNmsSigma
+    ).selectedIndices;
+  });
+
+  const indices = (await indexTensor.data()) as Float32Array;
+  dispose(indexTensor);
+
+  const selectedAnnotations: Array<NewOrphanedAnnotationType> = [];
 
   indices.forEach((index) => {
     selectedAnnotations.push(generatedAnnotations[index]);

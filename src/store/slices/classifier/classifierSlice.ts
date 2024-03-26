@@ -84,6 +84,16 @@ export const classifierSlice = createSlice({
     ) {
       state.modelStatus = action.payload.modelStatus;
     },
+    updateModelStatusNew(
+      state,
+      action: PayloadAction<{
+        modelStatus: ModelStatus;
+        onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
+      }>
+    ) {
+      state.modelStatus = action.payload.modelStatus;
+    },
+
     updateBatchSize(state, action: PayloadAction<{ batchSize: number }>) {
       const { batchSize } = action.payload;
 

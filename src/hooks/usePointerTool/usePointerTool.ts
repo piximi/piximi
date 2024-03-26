@@ -208,7 +208,6 @@ export const usePointerTool = (
         dispatch(
           setSelectedCategoryId({
             selectedCategoryId: currentAnnotation!.categoryId,
-            execSaga: false,
           })
         );
       });

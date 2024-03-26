@@ -9,10 +9,10 @@ import {
 } from "@tensorflow/tfjs";
 import { ColorModel, Image as ImageJS } from "image-js";
 import { hyphaWebsocketClient } from "imjoy-rpc";
-import { v4 as uuid } from "uuid";
 
 import { encode } from "utils/annotator";
 import { OrphanedAnnotationType } from "../AbstractSegmenter/AbstractSegmenter";
+import { generateUUID } from "utils/common/helpers";
 
 const labelToAnnotation = async (
   labelMask: Tensor1D,
@@ -85,7 +85,7 @@ const labelToAnnotation = async (
     boundingBox: bbox as [number, number, number, number],
     encodedMask: encode(annotationData, true),
     plane: 0,
-    id: uuid(),
+    id: generateUUID(),
   };
 };
 

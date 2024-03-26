@@ -7,3 +7,11 @@ export const selectSelectedAnnotationCategoryId = ({
 }) => {
   return imageViewer.selectedCategoryId;
 };
+
+export const selectSelectedIVCategoryId = ({
+  imageViewer,
+}: {
+  imageViewer: ImageViewer;
+}) => {
+  return imageViewer.selectedCategoryId;
+};

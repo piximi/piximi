@@ -1,5 +1,6 @@
 import { Category } from "./Category";
 import { ImageGridTab } from "./ImageGridTab";
+import { ThingType } from "./ThingType";
 
 export enum ImageSortKey {
   None,
@@ -7,6 +8,14 @@ export enum ImageSortKey {
   Category,
   Random,
   Image,
+}
+
+export enum ThingSortKey_new {
+  None = "None",
+  FileName = "File Name",
+  Category = "Category",
+  Random = "Random",
+  Name = "Name",
 }
 
 export type ImageSortKeyType = {
@@ -17,6 +26,12 @@ export type ImageSortKeyType = {
     b: { name: string; category: Category }
   ) => number;
   objectType: ImageGridTab | "All";
+};
+
+export type ThingSortType_new = {
+  sortKeyName: string;
+  sortKey: ThingSortKey_new;
+  comparerFunction: (a: ThingType, b: ThingType) => number;
 };
 
 export const defaultImageSortKey: ImageSortKeyType = {
@@ -53,17 +68,6 @@ export const availableImageSortKeys: ImageSortKeyType[] = [
   },
 ];
 
-export const sortKeyByName = (name: string): ImageSortKeyType => {
-  const sortKeyIdx = availableImageSortKeys
-    .map((e) => e.imageSortKeyName)
-    .indexOf(name);
-
-  if (sortKeyIdx >= 0) {
-    return availableImageSortKeys[sortKeyIdx];
-  } else {
-    return defaultImageSortKey;
-  }
-};
 export const sortTypeByKey = (key: ImageSortKey): ImageSortKeyType => {
   const sortKeyIdx = availableImageSortKeys
     .map((e) => e.imageSortKey)

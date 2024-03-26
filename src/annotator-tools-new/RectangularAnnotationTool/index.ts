@@ -1,0 +1,1 @@
+export { RectangularAnnotationTool } from "./RectangularAnnotationTool";

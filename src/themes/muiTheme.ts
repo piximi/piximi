@@ -1,6 +1,9 @@
 import { createTheme } from "@mui/material/styles";
 
 export const lightTheme = createTheme({
+  palette: {
+    contrastThreshold: 4.5, // contrast ration needs to be 4.5:1 for accessibility
+  },
   components: {
     MuiButtonBase: {
       defaultProps: {
@@ -75,6 +78,7 @@ export const darkTheme = createTheme({
     },
   },
   palette: {
+    contrastThreshold: 4.5, // contrast ration needs to be 4.5:1 for accessibility
     background: {
       paper: "rgba(40, 40, 40)",
       default: "rgba(50, 50, 50)",

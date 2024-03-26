@@ -9,7 +9,10 @@ export { SettingsDialog } from "./SettingsDialog/SettingsDialog";
 export { UpsertCategoriesDialog } from "./UpsertCategoriesDialog";
 export { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";
 export { ExampleImageDialog } from "./ExampleImageDialog";
-export { ExitAnnotatorDialog } from "./ExitAnnotatorDialog";
+export {
+  ExitAnnotatorDialog,
+  ExitAnnotatorDialogNew,
+} from "./ExitAnnotatorDialog";
 export { FitClassifierDialog } from "./FitClassifierDialog";
 export { FitSegmenterDialog } from "./FitSegmenterDialog";
 export { NewProjectDialog } from "./NewProjectDialog";
@@ -17,3 +20,4 @@ export { ExampleProjectDialog } from "./ExampleProjectDialog";
 export { SaveFittedModelDialog } from "./SaveFittedModelDialog";
 export { SaveProjectDialog } from "./SaveProjectDialog";
 export { ExportAnnotationsDialog } from "./ExportAnnotationsDialog";
+export { CreateKindDialog } from "./CreateKindDialog";

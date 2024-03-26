@@ -1,5 +1,4 @@
 import * as ImageJS from "image-js";
-import { v4 as uuidv4 } from "uuid";
 
 import { Tool } from "../Tool";
 
@@ -16,6 +15,7 @@ import {
   computeBoundingBoxFromContours as _computeBoundingBoxFromContours,
   maskFromPoints,
 } from "utils/annotator";
+import { generateUUID } from "utils/common/helpers";
 
 export abstract class AnnotationTool extends Tool {
   /**
@@ -160,7 +160,7 @@ export abstract class AnnotationTool extends Tool {
     this.annotation = {
       boundingBox: this.boundingBox,
       categoryId: category.id,
-      id: this.annotation ? this.annotation.id : uuidv4(),
+      id: this.annotation ? this.annotation.id : generateUUID(),
       imageId,
       decodedMask: this.decodedMask,
       plane: plane,
