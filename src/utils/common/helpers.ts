@@ -1,5 +1,7 @@
 import { FilterType } from "types";
+import { NewCategory, UNKNOWN_CATEGORY_NAME } from "types/Category";
 import { v4 as uuidv4 } from "uuid";
+import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "./colorPalette";
 
 export const mutatingFilter = <T>(
   array: Array<T>,
@@ -76,4 +78,17 @@ export const generateUUID = (options?: { definesUnknown: boolean }) => {
 
 export const isUnknownCategory = (categoryId: string) => {
   return categoryId[0] === "0";
+};
+
+export const generateUnknownCategory = (kind: string) => {
+  const unknownCategoryId = generateUUID({ definesUnknown: true });
+  const unknownCategory: NewCategory = {
+    id: unknownCategoryId,
+    name: UNKNOWN_CATEGORY_NAME,
+    color: UNKNOWN_IMAGE_CATEGORY_COLOR,
+    containing: [],
+    kind: kind,
+    visible: true,
+  };
+  return unknownCategory;
 };

@@ -11,12 +11,20 @@ import { NewCategory } from "types/Category";
 import { selectActiveKindId } from "store/slices/project/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { imageViewerSlice } from "store/slices/imageViewer";
 
+type MenuFunctions = {
+  Edit?: { permanent: boolean };
+  "Edit Color"?: { permanent: boolean };
+  Delete?: { permanent: boolean };
+  "Clear Objects": { permanent: boolean; imageViewer?: boolean };
+};
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;
   category: NewCategory;
   handleCloseCategoryMenu: () => void;
   openCategoryMenu: boolean;
+  menuFunctions?: MenuFunctions;
 };
 
 export const CategoryItemMenuNew = ({
@@ -24,6 +32,7 @@ export const CategoryItemMenuNew = ({
   category,
   handleCloseCategoryMenu,
   openCategoryMenu,
+  menuFunctions,
 }: CategoryItemMenuProps) => {
   const activeKind = useSelector(selectActiveKindId);
   const dispatch = useDispatch();
@@ -49,16 +58,25 @@ export const CategoryItemMenuNew = ({
       newDataSlice.actions.removeCategoriesFromKind({
         categoryIds: [category.id],
         kind: activeKind,
-        isPermanent: true,
+        isPermanent: menuFunctions ? menuFunctions.Delete?.permanent : true,
       })
     );
   };
   const handleDeleteObjects = () => {
+    if (menuFunctions && menuFunctions["Clear Objects"].imageViewer) {
+      dispatch(
+        imageViewerSlice.actions.removeActiveAnnotationIds({
+          annotationIds: category.containing,
+        })
+      );
+    }
     dispatch(
       newDataSlice.actions.deleteThings({
         ofCategories: [category.id],
         activeKind: activeKind,
-        isPermanent: true,
+        isPermanent: menuFunctions
+          ? menuFunctions["Clear Objects"].permanent
+          : true,
         disposeColorTensors: true,
       })
     );
