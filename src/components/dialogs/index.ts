@@ -17,3 +17,4 @@ export { ExampleProjectDialog } from "./ExampleProjectDialog";
 export { SaveFittedModelDialog } from "./SaveFittedModelDialog";
 export { SaveProjectDialog } from "./SaveProjectDialog";
 export { ExportAnnotationsDialog } from "./ExportAnnotationsDialog";
+export { CreateKindDialog } from "./CreateKindDialog";

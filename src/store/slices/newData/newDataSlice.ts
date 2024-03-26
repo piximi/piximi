@@ -156,12 +156,11 @@ export const newDataSlice = createSlice({
       const { changes, isPermanent } = action.payload;
 
       for (const { kindId, categories, updateType } of changes) {
+        if (!state.kinds.entities[kindId]) continue;
         const previousCategories = getDeferredProperty(
           state.kinds.entities[kindId],
           "categories"
         );
-
-        if (!state.kinds.entities[kindId]) continue;
 
         const newCategories = updateContents(
           previousCategories,
@@ -495,7 +494,7 @@ export const newDataSlice = createSlice({
             state.kinds.entities[thing.kind].saved.unknownCategoryId;
           thing.categoryId = unknownCategoryId;
         } else {
-          const unknownCategoryId = `U-${generateUUID()}`;
+          const unknownCategoryId = generateUUID({ definesUnknown: true });
           const unknownCategory: NewCategory = {
             id: unknownCategoryId,
             name: UNKNOWN_CATEGORY_NAME,

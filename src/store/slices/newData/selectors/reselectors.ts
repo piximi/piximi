@@ -388,22 +388,17 @@ export const selectImageViewerActiveKinds = createSelector(
 );
 
 export const selectImageViewerActiveKindsWithFullCat = createSelector(
-  selectActiveImage,
   selectAllKinds,
   selectCategoriesDictionary,
-  (activeImage, allKinds, catDict) => {
-    if (!activeImage) return [];
+  (allKinds, catDict) => {
     const activeKinds: Array<KindWithCategories> = [];
-    const activeAnnotationIds = activeImage.containing;
 
     allKinds.forEach((kind) => {
-      const intersect = intersection(activeAnnotationIds, kind.containing);
-      if (intersect.length > 0) {
-        activeKinds.push({
-          ...kind,
-          categories: kind.categories.map((id) => catDict[id]),
-        });
-      }
+      if (kind.id === "Image") return;
+      activeKinds.push({
+        ...kind,
+        categories: kind.categories.map((id) => catDict[id]),
+      });
     });
 
     return activeKinds;
