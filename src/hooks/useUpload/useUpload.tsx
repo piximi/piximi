@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { applicationSettingsSlice } from "store/slices/applicationSettings";
 
 import { dataSlice } from "store/slices/data";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
 import { uploadImages } from "utils/common/image/upload";
 
 import { getImageFileInformation, ImageShapeEnum } from "utils/common/image";
@@ -37,13 +36,6 @@ export const useUpload = (
           dispatch(
             applicationSettingsSlice.actions.updateAlertState({
               alertState: res.errors[0],
-            })
-          );
-        } else {
-          dispatch(
-            newDataSlice.actions.addThings({
-              things: res.imagesToUpload,
-              isPermanent: true,
             })
           );
         }
