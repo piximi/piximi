@@ -12,7 +12,7 @@ import {
 
 import { useDialog } from "hooks";
 
-import { ExitAnnotatorDialog } from "components/dialogs";
+import { ExitAnnotatorDialogNew } from "components/dialogs";
 
 import { LogoLoader } from "components/styled-components";
 
@@ -57,7 +57,7 @@ export const ImageViewerAppBarNew = () => {
         </Toolbar>
       </AppBar>
 
-      <ExitAnnotatorDialog
+      <ExitAnnotatorDialogNew
         onReturnToProject={onReturnToMainProject}
         onClose={onCloseExitAnnotatorDialog}
         open={openExitAnnotatorDialog}

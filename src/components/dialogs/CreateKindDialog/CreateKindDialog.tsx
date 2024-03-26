@@ -41,7 +41,11 @@ export const CreateKindDialog = ({
       if (categoryName === "") {
         helperText = "Please type a kind name.";
         validInput = false;
-      } else if (existingKinds.includes(categoryName)) {
+      } else if (
+        existingKinds
+          .map((kind) => kind.toString().toUpperCase())
+          .includes(categoryName.toUpperCase())
+      ) {
         helperText =
           "Kind names must be unique. A kind with this name already exits.";
         validInput = false;

@@ -107,7 +107,7 @@ export const StageNew = ({
   }, [draggable, stageRef, dispatch, stageHeight, stageWidth]);
 
   useEffect(() => {
-    if (!activeImage) return;
+    if (!activeImage?.shape) return;
     dispatch(
       setImageOrigin({
         origin: {
@@ -116,7 +116,7 @@ export const StageNew = ({
         },
       })
     );
-  }, [stageWidth, stageHeight, activeImage, dispatch]);
+  }, [stageWidth, stageHeight, activeImage?.shape, dispatch]);
 
   useEffect(() => {
     setHtmlImages(
