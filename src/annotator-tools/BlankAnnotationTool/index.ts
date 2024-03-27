@@ -1,1 +1,0 @@
-export { BlankAnnotationTool } from "./BlankAnnotationTool";

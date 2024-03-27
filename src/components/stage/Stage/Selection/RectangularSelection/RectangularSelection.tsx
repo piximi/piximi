@@ -6,7 +6,7 @@ import { useMarchingAnts } from "hooks";
 
 import { StageContext } from "contexts";
 import { selectImageOrigin } from "store/slices/imageViewer";
-import { RectangularAnnotationTool, SelectionTool } from "annotator-tools";
+import { RectangularAnnotationTool, SelectionTool } from "annotator-tools-new";
 
 type RectangularSelectionProps = {
   operator: RectangularAnnotationTool | SelectionTool;

@@ -1,19 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
 
-import { selectAllAnnotationCategories } from "store/slices/data";
 import {
   imageViewerSlice,
-  setSelectedCategoryId,
   selectActiveImageId,
 } from "store/slices/imageViewer";
 
 import { annotatorSlice } from "store/slices/annotator";
 
-import {
-  selectSelectedImages,
-  selectSelectedAnnotations,
-} from "store/slices/data";
 import { selectSoundEnabled } from "store/slices/applicationSettings";
 
 import {
@@ -23,9 +17,13 @@ import {
   HotkeyView,
   ToolType,
 } from "types";
-import { AnnotationTool } from "annotator-tools";
-import { selectActiveAnnotationsNew } from "store/slices/newData/selectors/reselectors";
+import { AnnotationTool } from "annotator-tools-new";
+import {
+  selectActiveAnnotationsNew,
+  selectSelectedActiveAnnotations,
+} from "store/slices/newData/selectors/reselectors";
 import { NewDecodedAnnotationType } from "types/AnnotationType";
+import { selectImageViewerImages } from "store/slices/imageViewer/reselectors";
 
 type useAnnotatorHotkeysProps = {
   annotationTool: AnnotationTool;
@@ -58,10 +56,9 @@ export const useAnnotatorKeyboardShortcutsNew = ({
 }: useAnnotatorHotkeysProps) => {
   const dispatch = useDispatch();
 
-  const annotationCategories = useSelector(selectAllAnnotationCategories);
-  const images = useSelector(selectSelectedImages);
+  const images = useSelector(selectImageViewerImages);
   const activeImageId = useSelector(selectActiveImageId);
-  const selectedAnnotations = useSelector(selectSelectedAnnotations);
+  const selectedAnnotations = useSelector(selectSelectedActiveAnnotations);
   const activeAnnotations = useSelector(selectActiveAnnotationsNew);
 
   const confirmAnnotations = () => {
@@ -90,23 +87,23 @@ export const useAnnotatorKeyboardShortcutsNew = ({
   /*
    * Select category (1-9)
    */
-  useHotkeys(
-    "shift+1,shift+2,shit+3,shift+4,shift+5,shift+6,shift+7,shift+8,shift+9",
-    (event: KeyboardEvent, handler) => {
-      const index = parseInt(handler.key.slice(-1));
+  // useHotkeys(
+  //   "shift+1,shift+2,shit+3,shift+4,shift+5,shift+6,shift+7,shift+8,shift+9",
+  //   (event: KeyboardEvent, handler) => {
+  //     const index = parseInt(handler.key.slice(-1));
 
-      const selectedCategory = annotationCategories[index];
+  //     const selectedCategory = annotationCategories[index];
 
-      if (!selectedCategory) return;
+  //     if (!selectedCategory) return;
 
-      dispatch(
-        setSelectedCategoryId({
-          selectedCategoryId: selectedCategory.id,
-        })
-      );
-    },
-    HotkeyView.Annotator
-  );
+  //     dispatch(
+  //       setSelectedCategoryId({
+  //         selectedCategoryId: selectedCategory.id,
+  //       })
+  //     );
+  //   },
+  //   HotkeyView.Annotator
+  // );
   /*
    * Select color tool (C)
    */

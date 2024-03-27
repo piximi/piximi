@@ -1,4 +1,4 @@
 export { BaseHorizCard } from "./BaseHorizCard";
-export { ExampleProjectCard } from "./ExampleProjectCard";
+export { ExampleProjectCardNew } from "./ExampleProjectCard";
 export { BaseVertCard } from "./BaseVertCard";
-export { ExampleImageCard } from "./ExampleImageCard";
+export { ExampleImageCardNew } from "./ExampleImageCard";

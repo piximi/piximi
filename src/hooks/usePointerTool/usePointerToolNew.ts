@@ -7,7 +7,7 @@ import {
   setSelectedAnnotationIds,
   setSelectedCategoryId,
 } from "store/slices/imageViewer";
-import { DecodedAnnotationType, HotkeyView, Point, ToolType } from "types";
+import { HotkeyView, Point, ToolType } from "types";
 import { getOverlappingAnnotations } from "utils/annotator";
 import { selectActiveAnnotationsNew } from "store/slices/newData/selectors/reselectors";
 import { getAnnotationsInBoxNew } from "utils/annotator/imageHelper";
@@ -154,7 +154,7 @@ export const usePointerToolNew = (
 
     const overlappingAnnotationIds = getOverlappingAnnotations(
       absolutePosition,
-      activeAnnotations as DecodedAnnotationType[]
+      activeAnnotations as NewDecodedAnnotationType[]
     );
 
     if (overlappingAnnotationIds.length === 0) {

@@ -28,12 +28,3 @@ export { selectClassifierHistory } from "./selectors/selectClassifierSelectedMod
 export { selectClassifierSelectedModelIdx } from "./selectors/selectClassifierSelectedModelIdx";
 export { selectClassifierTrainingPercentage } from "./selectors/selectClassifierTrainingPercentage";
 export { selectClassifierModelStatus } from "./selectors/selectClassifierModelStatus";
-
-// Sagas
-
-export { evaluateClassifierSaga } from "./sagas/evaluateClassifierSaga";
-export { fitClassifierSaga } from "./sagas/fitClassifierSaga";
-export { predictClassifierSaga } from "./sagas/predictClassifierSaga";
-export { watchEvaluateClassifierSaga } from "./sagas/watchEvaluateClassifierSaga";
-export { watchFitClassifierSaga } from "./sagas/watchFitClassifierSaga";
-export { watchPredictClassifierSaga } from "./sagas/watchPredictClassifierSaga";

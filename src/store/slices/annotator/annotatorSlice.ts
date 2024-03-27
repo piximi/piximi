@@ -7,7 +7,7 @@ import {
   Annotator,
 } from "types";
 
-import { AnnotationTool } from "annotator-tools";
+import { AnnotationTool } from "annotator-tools-new";
 import { AnnotationToolNew } from "annotator-tools-new/AnnotationTool/AnnotationTool";
 
 const initialState: Annotator = {

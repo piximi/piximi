@@ -1,2 +1,1 @@
-export { ImageGrid } from "./ImageGrid";
-export { AnnotationImageGrid } from "./AnnotationImageGrid";
+export { ImageGridNew } from "./ImageGrid";

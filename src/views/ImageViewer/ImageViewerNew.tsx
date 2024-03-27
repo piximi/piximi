@@ -6,7 +6,7 @@ import { AppBar, Box, CssBaseline } from "@mui/material";
 
 import { useUploadNew } from "hooks";
 
-import { FallBackDialog, ImageShapeDialog } from "components/dialogs";
+import { FallBackDialog, ImageShapeDialogNew } from "components/dialogs";
 import { ImageViewerDrawerNew } from "components/drawers";
 import { AlertBar } from "components/app-bars";
 
@@ -147,11 +147,10 @@ export const ImageViewerNew = () => {
           />
 
           {files?.length && (
-            <ImageShapeDialog
+            <ImageShapeDialogNew
               files={files}
               open={openDimensionsDialogBox}
               onClose={handleClose}
-              isUploadedFromAnnotator={true}
               referenceImageShape={imageShape}
             />
           )}

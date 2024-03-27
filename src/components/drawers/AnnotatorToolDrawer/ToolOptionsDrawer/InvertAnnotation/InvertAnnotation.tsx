@@ -3,24 +3,24 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { List, SvgIcon } from "@mui/material";
 
-import { useAnnotationTool, useTranslation } from "hooks";
+import { useAnnotationToolNew, useTranslation } from "hooks";
 
 import {
   imageViewerSlice,
   selectWorkingAnnotation,
 } from "store/slices/imageViewer";
-import { dataSlice } from "store/slices/data";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 import { encode } from "utils/annotator";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { newDataSlice } from "store/slices/newData/newDataSlice";
 
 //TODO: change to listItem
 
 export const InvertAnnotation = () => {
   const dispatch = useDispatch();
 
-  const { annotationTool } = useAnnotationTool();
+  const { annotationTool } = useAnnotationToolNew();
   const workingAnnotationEntity = useSelector(selectWorkingAnnotation);
 
   const handleInvertClick = () => {
@@ -39,7 +39,7 @@ export const InvertAnnotation = () => {
     const encodedMask = encode(invertedMask);
 
     dispatch(
-      dataSlice.actions.updateAnnotations({
+      newDataSlice.actions.updateThings({
         updates: [
           {
             id: workingAnnotation.id,

@@ -7,12 +7,6 @@ import {
   imageViewerSlice,
   selectActiveImageId,
 } from "store/slices/imageViewer";
-import {
-  dataSlice,
-  selectAllImageCategories,
-  selectUnusedImageCategoryColors,
-  selectAllImages,
-} from "store/slices/data";
 
 import { deserializeCOCOFile, deserializeProjectFile } from "utils/annotator";
 
@@ -34,80 +28,73 @@ export const ImportAnnotationsFileMenuItem = ({
 
   const activeImageId = useSelector(selectActiveImageId);
 
-  const existingAnnotationCategories = useSelector(selectAllImageCategories);
+  // const existingAnnotationCategories = useSelector(selectAllImageCategories);
 
-  const existingImages = useSelector(selectAllImages);
-  const availableColors = useSelector(selectUnusedImageCategoryColors);
+  // const existingImages = useSelector(selectSelectedImages);
+  // const availableColors = useSelector(selectUnusedImageCategoryColors);
 
   const onImportProjectFile = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, onClose: () => void) => {
       onClose();
 
-      event.persist();
+      // event.persist();
 
-      if (!event.currentTarget.files) return;
+      // if (!event.currentTarget.files) return;
 
-      const file = event.currentTarget.files[0];
+      // const file = event.currentTarget.files[0];
 
-      const reader = new FileReader();
+      // const reader = new FileReader();
 
-      reader.onload = async (event: ProgressEvent<FileReader>) => {
-        if (event.target && event.target.result) {
-          const serializedProject: SerializedCOCOFileType | SerializedFileType =
-            validateFileType(event.target.result as string, projectType);
+      // reader.onload = async (event: ProgressEvent<FileReader>) => {
+      //   if (event.target && event.target.result) {
+      //     const serializedProject: SerializedCOCOFileType | SerializedFileType =
+      //       validateFileType(event.target.result as string, projectType);
 
-          const { annotations, newCategories } =
-            projectType === ProjectFileType.PIXIMI
-              ? deserializeProjectFile(
-                  serializedProject as SerializedFileType,
-                  existingImages,
-                  existingAnnotationCategories
-                )
-              : deserializeCOCOFile(
-                  serializedProject as SerializedCOCOFileType,
-                  existingImages,
-                  existingAnnotationCategories,
-                  availableColors
-                );
+      //     const { annotations, newCategories } =
+      //       projectType === ProjectFileType.PIXIMI
+      //         ? deserializeProjectFile(
+      //             serializedProject as SerializedFileType,
+      //             existingImages,
+      //             existingAnnotationCategories
+      //           )
+      //         : deserializeCOCOFile(
+      //             serializedProject as SerializedCOCOFileType,
+      //             existingImages,
+      //             existingAnnotationCategories,
+      //             availableColors
+      //           );
 
-          batch(() => {
-            dispatch(
-              dataSlice.actions.addAnnotationCategories({
-                categories: newCategories,
-                isPermanent: true,
-              })
-            );
-            dispatch(
-              dataSlice.actions.addAnnotations({
-                annotations,
-                isPermanent: true,
-              })
-            );
-          });
+      //     batch(() => {
+      //       dispatch(
+      //         dataSlice.actions.addAnnotationCategories({
+      //           categories: newCategories,
+      //         })
+      //       );
+      //       dispatch(dataSlice.actions.addAnnotations({ annotations }));
+      //     });
 
-          // when a deserialized annotation is associated with the active image
-          // this needs to invoke the decoding process for the in-view image
-          // annotations; prevImageId undefined to avoid encoding step
-          dispatch(
-            imageViewerSlice.actions.setActiveImageId({
-              imageId: activeImageId,
-              prevImageId: undefined,
-              execSaga: true,
-            })
-          );
-          dispatch(dataSlice.actions.reconcile({ keepChanges: true }));
-        }
-      };
+      //     // when a deserialized annotation is associated with the active image
+      //     // this needs to invoke the decoding process for the in-view image
+      //     // annotations; prevImageId undefined to avoid encoding step
+      //     dispatch(
+      //       imageViewerSlice.actions.setActiveImageId({
+      //         imageId: activeImageId,
+      //         prevImageId: undefined,
+      //         execSaga: true,
+      //       })
+      //     );
+      //   }
+      // };
 
-      reader.readAsText(file);
+      //   reader.readAsText(file);
     },
     [
-      dispatch,
-      activeImageId,
-      existingAnnotationCategories,
-      availableColors,
-      existingImages,
-      projectType,
+      //     dispatch,
+      //     activeImageId,
+      //     existingAnnotationCategories,
+      //     availableColors,
+      //     existingImages,
+      //     projectType,
     ]
   );
 
