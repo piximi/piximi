@@ -6,7 +6,6 @@ import { classifierSlice } from "./slices/classifier";
 import { annotatorSlice } from "./slices/annotator";
 import { applicationSettingsSlice } from "./slices/applicationSettings";
 import { imageViewerSlice } from "./slices/imageViewer";
-import { dataSlice } from "./slices/data";
 import { newDataSlice } from "./slices/newData/newDataSlice";
 import { projectSlice } from "./slices/project";
 import { segmenterSlice } from "./slices/segmenter";
@@ -33,7 +32,6 @@ const loadState = async () => {
     annotator: annotatorSlice.getInitialState(),
     applicationSettings: applicationSettingsSlice.getInitialState(),
     imageViewer: imageViewerSlice.getInitialState(),
-    data: dataSlice.getInitialState(),
     newData: newDataSlice.getInitialState(),
     project: projectSlice.getInitialState(),
     segmenter: segmenterSlice.getInitialState(),

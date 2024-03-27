@@ -23,7 +23,6 @@ import {
   selectHighlightedImageCategory,
   selectSelectedImageIds,
 } from "store/slices/project";
-import { dataSlice } from "store/slices/data";
 import { selectActiveKindId } from "store/slices/project/selectors";
 import { CreateCategoryDialogNew } from "components/dialogs/CreateCategoryDialogNew/CreateCategoryDialogNew";
 import { selectClassifierModelStatus } from "store/slices/classifier";
@@ -125,7 +124,7 @@ export const CategoriesListNew = () => {
     () => {
       if (selectedImageIds.length > 0) {
         dispatch(
-          dataSlice.actions.updateImages({
+          newDataSlice.actions.updateThings({
             updates: selectedImageIds.map((imageId) => ({
               id: imageId,
               categoryId: highlightedCategory,

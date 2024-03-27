@@ -1,1 +1,1 @@
-export { GridItemActionBar } from "./GridItemActionBar";
+export { GridItemActionBarNew } from "./GridItemActionBarNew";

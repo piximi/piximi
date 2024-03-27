@@ -1,1 +1,1 @@
-export { AnnotatorToolDrawer } from "./AnnotatorToolDrawer";
+export { AnnotatorToolDrawerNew } from "./AnnotatorToolDrawerNew";

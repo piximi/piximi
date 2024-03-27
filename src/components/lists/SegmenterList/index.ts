@@ -1,1 +1,1 @@
-export { SegmenterList } from "./SegmenterList";
+export { SegmenterListNew } from "./SegmenterListNew";

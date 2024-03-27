@@ -1,1 +1,1 @@
-export { ColorIcon } from "./ColorIcon";
+export { ColorIconNew } from "./ColorIconNew";

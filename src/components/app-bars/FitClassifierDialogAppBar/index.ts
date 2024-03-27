@@ -1,1 +1,1 @@
-export { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
+export { FitClassifierDialogAppBarNew } from "./FitClassifierDialogAppBarNew";

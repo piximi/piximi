@@ -17,12 +17,3 @@ export {
 export { selectSegmenterModelIdx } from "./selectors/selectSegmenterModelIdx";
 export { selectSegmenterModelStatus } from "./selectors/selectSegmenterModelStatus";
 export { selectSegmenterShuffleOptions } from "./selectors/selectSegmenterShuffleOptions";
-
-// Sagas
-
-export { evaluateSegmenterSaga } from "./sagas/evaluateSegmenterSaga";
-export { fitSegmenterSaga } from "./sagas/fitSegmenterSaga";
-export { predictSegmenterSaga } from "./sagas/predictSegmenterSaga";
-export { watchEvaluateSegmenterSaga } from "./sagas/watchEvaluateSegmenterSaga";
-export { watchFitSegmenterSaga } from "./sagas/watchFitSegmenterSaga";
-export { watchPredictSegmenterSaga } from "./sagas/watchPredictSegmenterSaga";

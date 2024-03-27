@@ -15,12 +15,6 @@ import {
 } from "utils/annotator/imageHelper";
 
 import { selectProjectName } from "store/slices/project";
-import {
-  selectAllImageCategories,
-  selectAllAnnotationCategories,
-  selectSelectedImages,
-  selectAllAnnotations,
-} from "store/slices/data";
 
 import { ExportAnnotationsDialog } from "components/dialogs";
 
@@ -71,10 +65,10 @@ export const ExportAnnotationsMenu = ({
   onClose,
   open,
 }: ExportAnnotationsMenuProps) => {
-  const images = useSelector(selectSelectedImages);
-  const annotations = useSelector(selectAllAnnotations);
-  const annotationCategories = useSelector(selectAllAnnotationCategories);
-  const categories = useSelector(selectAllImageCategories);
+  // const images = useSelector(selectSelectedImages);
+  // const annotations = useSelector(selectAllAnnotations);
+  // const annotationCategories = useSelector(selectAllAnnotationCategories);
+  // const categories = useSelector(selectAllImageCategories);
   const projectName = useSelector(selectProjectName);
 
   const {
@@ -114,97 +108,97 @@ export const ExportAnnotationsMenu = ({
 
         switch (exportType) {
           case AnnotationExportType.PIXIMI:
-            const piximiSerializedProject = serializeProject(
-              images,
-              annotations,
-              categories
-            );
+            // const piximiSerializedProject = serializeProject(
+            //   images,
+            //   annotations,
+            //   categories
+            // );
 
-            const data = new Blob([JSON.stringify(piximiSerializedProject)], {
-              type: "application/json;charset=utf-8",
-            });
+            // const data = new Blob([JSON.stringify(piximiSerializedProject)], {
+            //   type: "application/json;charset=utf-8",
+            // });
 
-            saveAs(data, `${userProjectName}.json`);
+            // saveAs(data, `${userProjectName}.json`);
 
             break;
 
           case AnnotationExportType.COCO:
-            const cocoSerializedProject = serializeCOCOFile(
-              images,
-              annotations,
-              categories
-            );
+            // const cocoSerializedProject = serializeCOCOFile(
+            //   images,
+            //   annotations,
+            //   categories
+            // );
 
-            const blob = new Blob([JSON.stringify(cocoSerializedProject)], {
-              type: "application/json;charset=utf-8",
-            });
+            // const blob = new Blob([JSON.stringify(cocoSerializedProject)], {
+            //   type: "application/json;charset=utf-8",
+            // });
 
-            saveAs(blob, `${userProjectName}.json`);
+            // saveAs(blob, `${userProjectName}.json`);
 
             break;
 
           case AnnotationExportType.Matrix:
-            saveAnnotationsAsLabelMatrix(
-              images,
-              annotations,
-              annotationCategories,
-              zip
-            ).then(() => {
-              zip.generateAsync({ type: "blob" }).then((blob) => {
-                saveAs(blob, `${userProjectName}.zip`);
-              });
-            });
+            // saveAnnotationsAsLabelMatrix(
+            //   images,
+            //   annotations,
+            //   annotationCategories,
+            //   zip
+            // ).then(() => {
+            //   zip.generateAsync({ type: "blob" }).then((blob) => {
+            //     saveAs(blob, `${userProjectName}.zip`);
+            //   });
+            // });
 
             break;
 
           case AnnotationExportType.BinaryInstances:
-            saveAnnotationsAsBinaryInstanceSegmentationMasks(
-              images,
-              annotations,
-              annotationCategories,
-              zip,
-              userProjectName
-            );
+            // saveAnnotationsAsBinaryInstanceSegmentationMasks(
+            //   images,
+            //   annotations,
+            //   annotationCategories,
+            //   zip,
+            //   userProjectName
+            // );
 
             break;
 
           case AnnotationExportType.LabeledInstances:
-            saveAnnotationsAsLabelMatrix(
-              images,
-              annotations,
-              annotationCategories,
-              zip,
-              true
-            ).then(() => {
-              zip.generateAsync({ type: "blob" }).then((blob) => {
-                saveAs(blob, `${userProjectName}.zip`);
-              });
-            });
+            // saveAnnotationsAsLabelMatrix(
+            //   images,
+            //   annotations,
+            //   annotationCategories,
+            //   zip,
+            //   true
+            // ).then(() => {
+            //   zip.generateAsync({ type: "blob" }).then((blob) => {
+            //     saveAs(blob, `${userProjectName}.zip`);
+            //   });
+            // });
             break;
 
           case AnnotationExportType.BinarySemanticMasks:
-            saveAnnotationsAsLabelMatrix(
-              images,
-              annotations,
-              annotationCategories,
-              zip,
-              false,
-              true
-            ).then(() => {
-              zip.generateAsync({ type: "blob" }).then((blob) => {
-                saveAs(blob, `${userProjectName}.zip`);
-              });
-            });
+            // saveAnnotationsAsLabelMatrix(
+            //   images,
+            //   annotations,
+            //   annotationCategories,
+            //   zip,
+            //   false,
+            //   true
+            // ).then(() => {
+            //   zip.generateAsync({ type: "blob" }).then((blob) => {
+            //     saveAs(blob, `${userProjectName}.zip`);
+            //   });
+            // });
             break;
 
           case AnnotationExportType.LabeledSemanticMasks:
-            saveAnnotationsAsLabeledSemanticSegmentationMasks(
-              images,
-              annotations,
-              annotationCategories,
-              zip,
-              userProjectName
-            );
+            // saveAnnotationsAsLabeledSemanticSegmentationMasks(
+            //   images,
+            //   annotations,
+            //   annotationCategories,
+            //   zip,
+            //   userProjectName
+            // );
             break;
         }
 
@@ -216,10 +210,10 @@ export const ExportAnnotationsMenu = ({
       setOnProjectName,
       onOpenSaveAnnotatorDialog,
       onMenusClose,
-      annotationCategories,
-      categories,
-      images,
-      annotations,
+      // annotationCategories,
+      // categories,
+      // images,
+      // annotations,
     ]
   );
 

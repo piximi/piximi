@@ -1,1 +1,1 @@
-export { CategoriesList } from "./CategoriesList";
+export { CategoriesListNew } from "./CategoriesListNew";

@@ -11,7 +11,6 @@ import {
   Annotator,
   ApplicationSettings,
   Classifier,
-  Data,
   ImageViewer,
   Partition,
   Project,
@@ -46,7 +45,6 @@ type StoreListemerAPI = ListenerEffectAPI<
     imageViewer: ImageViewer;
     project: Project;
     applicationSettings: ApplicationSettings;
-    data: Data;
     annotator: Annotator;
     newData: NewDataState;
   }>,

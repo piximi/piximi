@@ -1,1 +1,0 @@
-export { QuickAnnotationTool } from "./QuickAnnotationTool";

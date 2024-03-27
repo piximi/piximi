@@ -7,12 +7,9 @@ import {
   selectPenSelectionBrushSize,
   selectToolType,
 } from "store/slices/annotator/selectors";
-import {
-  selectActiveImageHeight,
-  selectActiveImageWidth,
-} from "store/slices/data";
 
 import { ToolType } from "types";
+import { selectActiveImage } from "store/slices/imageViewer/reselectors";
 
 type PenAnnotationToolTipProps = {
   currentPosition?: { x: number; y: number };
@@ -30,8 +27,7 @@ export const PenAnnotationToolTip = ({
 
   const penSelectionBrushSize = useSelector(selectPenSelectionBrushSize);
 
-  const imageWidth = useSelector(selectActiveImageWidth);
-  const imageHeight = useSelector(selectActiveImageHeight);
+  const activeImage = useSelector(selectActiveImage);
   const stageScale = useContext(StageContext)?.current?.scaleX() ?? 1;
 
   if (
@@ -39,8 +35,7 @@ export const PenAnnotationToolTip = ({
     annotating ||
     !currentPosition ||
     !absolutePosition ||
-    !imageWidth ||
-    !imageHeight
+    !activeImage
   )
     return <></>;
 

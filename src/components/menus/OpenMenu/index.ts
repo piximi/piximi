@@ -1,1 +1,1 @@
-export { OpenMenu } from "./OpenMenu";
+export { OpenMenuNew } from "./OpenMenuNew";
