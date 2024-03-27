@@ -1,9 +1,8 @@
-export { OpenImageMenu } from "./OpenImageMenu";
 export { SaveProjectMenu } from "./SaveProjectMenu";
-export { OpenProjectMenu } from "./OpenProjectMenu";
+
 export { ImageMenu } from "./ImageMenu";
 export { ExportAnnotationsMenu } from "./ExportAnnotationsMenu";
-export { CategoryItemMenu } from "./CategoryItemMenu";
+export { OpenImageMenuNew } from "./OpenImageMenu";
+
 export { UploadMenu } from "./UploadMenu";
 export { ImageCategoryMenu } from "./ImageCategoryMenu";
-export { OpenMenu } from "./OpenMenu";

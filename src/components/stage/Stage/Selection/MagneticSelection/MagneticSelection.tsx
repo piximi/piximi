@@ -6,7 +6,7 @@ import { useMarchingAnts } from "hooks";
 
 import { StageContext } from "contexts";
 import { selectImageOrigin } from "store/slices/imageViewer";
-import { MagneticAnnotationTool } from "annotator-tools";
+import { MagneticAnnotationTool } from "annotator-tools-new";
 
 type MagneticSelectionProps = {
   operator: MagneticAnnotationTool;

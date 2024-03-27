@@ -1,1 +1,1 @@
-export { ProjectGridItem } from "./ProjectGridItem";
+export { ProjectGridItemNew } from "./ProjectGridItemNew";

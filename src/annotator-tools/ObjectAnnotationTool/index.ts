@@ -1,1 +1,0 @@
-export { ObjectAnnotationTool } from "./ObjectAnnotationTool";

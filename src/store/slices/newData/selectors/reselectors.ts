@@ -20,7 +20,10 @@ import { NewImageType } from "types/ImageType";
 import { Partition, Shape } from "types";
 import { ThingType } from "types/ThingType";
 import { selectActiveImage } from "store/slices/imageViewer/reselectors";
-import { selectActiveAnnotationIds } from "store/slices/imageViewer";
+import {
+  selectActiveAnnotationIds,
+  selectSelectedAnnotationIds,
+} from "store/slices/imageViewer";
 import { decodeAnnotationNew } from "utils/annotator/rle/rle";
 import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/selectWorkingAnnotation";
 import { getCompleteEntity } from "store/entities/utils";
@@ -355,6 +358,21 @@ export const selectWorkingAnnotationObjectNew = createSelector(
 
 export const selectActiveAnnotationsNew = createSelector(
   [selectActiveAnnotationIds, selectThingsDictionary],
+  (annotationIds, thingsDict): Array<NewDecodedAnnotationType> => {
+    if (!annotationIds.length) return [];
+
+    return annotationIds.map((annotationId) => {
+      const annotation = thingsDict[annotationId] as NewAnnotationType;
+      const decodedAnnotation = !annotation.decodedMask
+        ? decodeAnnotationNew(annotation)
+        : (annotation as NewDecodedAnnotationType);
+      return decodedAnnotation;
+    });
+  }
+);
+
+export const selectSelectedActiveAnnotations = createSelector(
+  [selectSelectedAnnotationIds, selectThingsDictionary],
   (annotationIds, thingsDict): Array<NewDecodedAnnotationType> => {
     if (!annotationIds.length) return [];
 

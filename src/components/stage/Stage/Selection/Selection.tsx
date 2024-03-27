@@ -25,7 +25,7 @@ import {
   QuickAnnotationTool,
   RectangularAnnotationTool,
   SelectionTool,
-} from "annotator-tools";
+} from "annotator-tools-new";
 
 type SelectionProps = {
   tool: Tool;

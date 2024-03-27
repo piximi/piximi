@@ -1,11 +1,11 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { TypedAppStartListening } from "types";
 import { projectSlice } from "./projectSlice";
-import { dataSlice } from "store/slices/data";
 import { annotatorSlice } from "store/slices/annotator";
 import { classifierSlice } from "store/slices/classifier";
 import { segmenterSlice } from "store/slices/segmenter";
 import { imageViewerSlice } from "store/slices/imageViewer";
+import { newDataSlice } from "store/slices/newData";
 
 export const projectMiddleware = createListenerMiddleware();
 const startAppListening =
@@ -14,7 +14,7 @@ const startAppListening =
 startAppListening({
   actionCreator: projectSlice.actions.resetProject,
   effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(dataSlice.actions.resetData());
+    listenerAPI.dispatch(newDataSlice.actions.resetData());
     listenerAPI.dispatch(annotatorSlice.actions.resetAnnotator());
     listenerAPI.dispatch(classifierSlice.actions.resetClassifier());
     listenerAPI.dispatch(segmenterSlice.actions.resetSegmenter());

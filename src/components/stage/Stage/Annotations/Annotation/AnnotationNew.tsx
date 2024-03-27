@@ -9,7 +9,7 @@ import { selectImageOrigin } from "store/slices/imageViewer";
 import { Shape } from "types";
 
 import { hexToRGBA, colorOverlayROI, encode } from "utils/annotator";
-import { dataSlice } from "store/slices/data";
+import { newDataSlice } from "store/slices/newData/newDataSlice";
 import { NewDecodedAnnotationType } from "types/AnnotationType";
 
 type AnnotationProps = {
@@ -110,7 +110,7 @@ export const AnnotationNew = ({
     };
 
     dispatch(
-      dataSlice.actions.updateAnnotations({
+      newDataSlice.actions.updateThings({
         updates: [tempUpdated],
       })
     );

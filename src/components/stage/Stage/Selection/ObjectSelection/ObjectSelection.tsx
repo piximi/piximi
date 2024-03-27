@@ -4,7 +4,7 @@ import * as ReactKonva from "react-konva";
 import { useMarchingAnts } from "hooks";
 
 import { StageContext } from "contexts";
-import { ObjectAnnotationTool } from "annotator-tools";
+import { ObjectAnnotationTool } from "annotator-tools-new";
 
 type ObjectSelectionProps = {
   operator: ObjectAnnotationTool;

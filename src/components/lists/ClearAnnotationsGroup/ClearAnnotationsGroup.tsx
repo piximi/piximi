@@ -12,8 +12,8 @@ import {
   selectActiveAnnotationIds,
   selectSelectedAnnotationIds,
 } from "store/slices/imageViewer";
-import { dataSlice } from "store/slices/data";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { newDataSlice } from "store/slices/newData";
 
 type DeleteType = "ALL" | "SELECTED";
 export const ClearAnnotationsGroup = () => {
@@ -47,8 +47,9 @@ export const ClearAnnotationsGroup = () => {
           })
         );
         dispatch(
-          dataSlice.actions.deleteAnnotations({
-            annotationIds: activeAnnotationsIds,
+          newDataSlice.actions.deleteThings({
+            thingIds: activeAnnotationsIds,
+            disposeColorTensors: true,
           })
         );
       } else {
@@ -63,8 +64,9 @@ export const ClearAnnotationsGroup = () => {
           })
         );
         dispatch(
-          dataSlice.actions.deleteAnnotations({
-            annotationIds: selectedAnnotationIds,
+          newDataSlice.actions.deleteThings({
+            thingIds: selectedAnnotationIds,
+            disposeColorTensors: true,
           })
         );
       }

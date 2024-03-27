@@ -11,8 +11,6 @@ import logger from "redux-logger";
 import createSagaMonitor from "@clarketm/saga-monitor";
 
 import { rootReducer, RootState } from "./rootReducer";
-import { rootSaga } from "./rootSaga";
-import { dataMiddleware } from "store/slices/data/dataListeners";
 import { annotatorMiddleware } from "store/slices/annotator/annotatorListeners";
 import { imageViewerMiddleware } from "./slices/imageViewer/imageViewerListeners";
 import { projectMiddleware } from "./slices/project/projectListeners";
@@ -21,7 +19,6 @@ import { classifierSlice } from "./slices/classifier";
 import { annotatorSlice } from "./slices/annotator";
 import { applicationSettingsSlice } from "./slices/applicationSettings";
 import { imageViewerSlice } from "./slices/imageViewer";
-import { dataSlice } from "./slices/data";
 import { newDataSlice } from "./slices/newData/newDataSlice";
 import { projectSlice } from "./slices/project";
 import { segmenterSlice } from "./slices/segmenter";
@@ -67,7 +64,6 @@ let loggingMiddleware: Middleware[] =
     : [saga];
 
 let listenerMiddlewares: Middleware[] = [
-  dataMiddleware.middleware,
   annotatorMiddleware.middleware,
   imageViewerMiddleware.middleware,
   projectMiddleware.middleware,
@@ -81,7 +77,6 @@ const preloadedState: RootState = {
   annotator: annotatorSlice.getInitialState(),
   applicationSettings: applicationSettingsSlice.getInitialState(),
   imageViewer: imageViewerSlice.getInitialState(),
-  data: dataSlice.getInitialState(),
   newData: newDataSlice.getInitialState(),
   project: projectSlice.getInitialState(),
   segmenter: segmenterSlice.getInitialState(),
@@ -106,7 +101,6 @@ export const initStore = (loadedData: RootState | undefined) => {
     reducer: rootReducer,
   };
   const store = configureStore(options) as EnhancedStore;
-  saga.run(rootSaga);
 
   return store;
 };

@@ -1,1 +1,1 @@
-export { ImageToolDrawer } from "./ImageToolDrawer";
+export { ImageToolDrawerNew } from "./ImageToolDrawerNew";

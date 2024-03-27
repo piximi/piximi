@@ -9,9 +9,8 @@ import {
 import { annotatorSlice } from "./annotatorSlice";
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { encodeAnnotation } from "utils/annotator";
-//import { dataSlice } from "store/data";
 import { imageViewerSlice } from "store/slices/imageViewer";
-import { BlankAnnotationTool } from "annotator-tools/BlankAnnotationTool";
+import { BlankAnnotationTool } from "annotator-tools-new/BlankAnnotationTool";
 import { getPropertiesFromImage } from "utils/common/image/imageHelper";
 import { NewImageType } from "types/ImageType";
 import { intersection } from "lodash";
@@ -22,112 +21,6 @@ export const annotatorMiddleware = createListenerMiddleware();
 const startAppListening =
   annotatorMiddleware.startListening as TypedAppStartListening;
 
-startAppListening({
-  actionCreator: annotatorSlice.actions.setAnnotationState,
-  effect: async (action, listenerAPI) => {
-    const { imageViewer, data, annotator } = listenerAPI.getState();
-    const { annotationState, annotationTool } = action.payload;
-
-    if (
-      annotationTool instanceof BlankAnnotationTool ||
-      annotationState !== AnnotationStateType.Annotated
-    )
-      return;
-    const selectionMode = annotator.selectionMode;
-    const activeImageId = imageViewer.activeImageId;
-    if (!activeImageId) return;
-    const activeImagePlane = getDeferredProperty(
-      data.images.entities[activeImageId],
-      "activePlane"
-    );
-    const selectedAnnotationCategoryId = imageViewer.selectedCategoryId;
-    const selectedCategory = getCompleteEntity(
-      data.annotationCategories.entities[selectedAnnotationCategoryId]
-    )!;
-
-    if (
-      selectionMode === AnnotationModeType.New &&
-      annotationTool.annotationState === AnnotationStateType.Annotated
-    ) {
-      annotationTool.annotate(
-        selectedCategory,
-        activeImagePlane,
-        activeImageId
-      );
-      if (!annotationTool.annotation) return;
-
-      listenerAPI.dispatch(
-        imageViewerSlice.actions.setWorkingAnnotation({
-          annotation: annotationTool.annotation,
-        })
-      );
-    } else {
-      const toolType = annotator.toolType;
-
-      if (toolType === ToolType.Zoom) return;
-      const savedWorkingAnnotation = imageViewer.workingAnnotation.saved;
-      const workingAnnotationChanges = imageViewer.workingAnnotation.changes;
-      if (
-        !savedWorkingAnnotation ||
-        annotationTool.annotationState !== AnnotationStateType.Annotated
-      )
-        return;
-      const workingAnnotation = {
-        ...savedWorkingAnnotation,
-        ...workingAnnotationChanges,
-      };
-      let combinedMask, combinedBoundingBox;
-
-      if (selectionMode === AnnotationModeType.Add) {
-        [combinedMask, combinedBoundingBox] = annotationTool.add(
-          workingAnnotation.decodedMask!,
-          workingAnnotation.boundingBox
-        );
-      } else if (selectionMode === AnnotationModeType.Subtract) {
-        [combinedMask, combinedBoundingBox] = annotationTool.subtract(
-          workingAnnotation.decodedMask!,
-          workingAnnotation.boundingBox
-        );
-      } else if (selectionMode === AnnotationModeType.Intersect) {
-        [combinedMask, combinedBoundingBox] = annotationTool.intersect(
-          workingAnnotation.decodedMask!,
-          workingAnnotation.boundingBox
-        );
-      } else {
-        return;
-      }
-
-      annotationTool.decodedMask = combinedMask;
-      annotationTool.boundingBox = combinedBoundingBox;
-
-      const combinedSelectedAnnotation = annotationTool.decodedMask.length
-        ? {
-            ...workingAnnotation,
-            boundingBox: annotationTool.boundingBox,
-            decodedMask: annotationTool.decodedMask,
-          }
-        : undefined;
-
-      if (!combinedSelectedAnnotation) return;
-
-      const annotation = encodeAnnotation(combinedSelectedAnnotation);
-
-      listenerAPI.dispatch(
-        imageViewerSlice.actions.updateWorkingAnnotation({
-          changes: annotation!,
-        })
-      );
-
-      if (annotationTool.decodedMask.length) {
-        annotationTool.annotate(
-          selectedCategory,
-          activeImagePlane!,
-          activeImageId
-        );
-      }
-    }
-  },
-});
 startAppListening({
   actionCreator: annotatorSlice.actions.setAnnotationStateNew,
   effect: async (action, listenerAPI) => {

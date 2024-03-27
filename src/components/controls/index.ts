@@ -1,4 +1,4 @@
-export { ColorIcon } from "./ColorIcon";
+export { ColorIconNew } from "./ColorIcon";
 export { MaterialUISwitch } from "./MaterialUISwitch";
 export { UploadButton } from "./UploadButton";
 export { CustomIconButton } from "./CustomIconButton";

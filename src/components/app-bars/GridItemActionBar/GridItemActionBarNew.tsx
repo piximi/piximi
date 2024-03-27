@@ -90,7 +90,7 @@ export const GridItemActionBarNew = ({
     dispatch(
       unregisterHotkeyView({ hotkeyView: HotkeyView.MainImageGridAppBar })
     );
-    navigate("/beta/imageviewer");
+    navigate("/imageviewer");
   };
 
   return (

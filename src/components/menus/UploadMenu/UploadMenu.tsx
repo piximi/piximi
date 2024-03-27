@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import { Fade, ListItemIcon, ListItemText, Menu } from "@mui/material";
 import ComputerIcon from "@mui/icons-material/Computer";
 
-import { useUpload } from "hooks";
+import { useUploadNew } from "hooks";
 
-import { ImageShapeDialog } from "components/dialogs";
+import { ImageShapeDialogNew } from "components/dialogs";
 import { StyledMenuItem } from "./StyledMenuItem";
 
 import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
@@ -25,7 +25,7 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
   });
   const [files, setFiles] = useState<FileList>();
 
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox, false);
+  const uploadFiles = useUploadNew(setOpenDimensionsDialogBox);
 
   const handleClose = () => {
     setOpenDimensionsDialogBox(false);
@@ -72,11 +72,10 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
         {/* <DropboxMenuItem onClose={onClose} /> */}
       </Menu>
       {files && (
-        <ImageShapeDialog
+        <ImageShapeDialogNew
           files={files}
           open={openDimensionsDialogBox}
           onClose={handleClose}
-          isUploadedFromAnnotator={false}
           referenceImageShape={imageShape}
         />
       )}

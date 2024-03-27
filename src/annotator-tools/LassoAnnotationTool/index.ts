@@ -1,1 +1,0 @@
-export { LassoAnnotationTool } from "./LassoAnnotationTool";

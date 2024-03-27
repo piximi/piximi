@@ -1,1 +1,1 @@
-export { useStageHandlers } from "./useStageHandlers";
+export { useStageHandlersNew } from "./useStageHandlersNew";

@@ -4,10 +4,7 @@ import { useSelector } from "react-redux";
 import { Box, Divider, IconButton, List, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 
-import {
-  ClearAnnotationsGroup,
-  //AnnotationCategoryList,
-} from "components/lists";
+import { ClearAnnotationsGroup } from "components/lists";
 import { AppBarOffset, DividerHeader } from "components/styled-components";
 
 import {
