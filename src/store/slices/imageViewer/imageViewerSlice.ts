@@ -8,6 +8,7 @@ import {
   ZoomToolOptionsType,
   DecodedAnnotationType,
 } from "types";
+import { NewDecodedAnnotationType } from "types/AnnotationType";
 
 import { distinctFilter, mutatingFilter } from "utils/common/helpers";
 
@@ -31,8 +32,11 @@ const initialState: ImageViewer = {
   activeImageRenderedSrcs: [],
   imageOrigin: { x: 0, y: 0 },
   annotationFilters: { categoryId: [] },
+  filters: { categoryId: [] },
   workingAnnotationId: undefined,
+
   workingAnnotation: { saved: undefined, changes: {} },
+  workingAnnotationNew: { saved: undefined, changes: {} },
   selectedAnnotationIds: [],
   selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
   stageHeight: 1000,
@@ -62,6 +66,10 @@ export const imageViewerSlice = createSlice({
   name: "image-viewer",
   reducers: {
     resetImageViewer: () => initialState,
+    prepareImageViewer: (
+      state,
+      action: PayloadAction<{ selectedThingIds: string[] }>
+    ) => {},
     setImageStack(state, action: PayloadAction<{ imageIds: string[] }>) {
       state.imageStack = action.payload.imageIds;
     },
@@ -214,9 +222,32 @@ export const imageViewerSlice = createSlice({
         state.workingAnnotation.changes = action.payload.changes;
       }
     },
+    setWorkingAnnotationNew(
+      state,
+      action: PayloadAction<{
+        annotation: NewDecodedAnnotationType | string | undefined;
+        preparedByListener?: boolean;
+      }>
+    ) {
+      const { annotation, preparedByListener } = action.payload;
+      if (!preparedByListener) return;
+
+      state.workingAnnotationNew.saved = annotation as
+        | NewDecodedAnnotationType
+        | undefined;
+      state.workingAnnotationNew.changes = {};
+    },
+    updateWorkingAnnotationNew(
+      state,
+      action: PayloadAction<{ changes: Partial<NewDecodedAnnotationType> }>
+    ) {
+      if (state.workingAnnotationNew.saved) {
+        state.workingAnnotationNew.changes = action.payload.changes;
+      }
+    },
     setSelectedCategoryId(
       state,
-      action: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>
+      action: PayloadAction<{ selectedCategoryId: string }>
     ) {
       state.selectedCategoryId = action.payload.selectedCategoryId;
     },
@@ -232,6 +263,16 @@ export const imageViewerSlice = createSlice({
       // reset selected annotations
       state.selectedAnnotationIds = [];
       state.workingAnnotationId = undefined;
+    },
+    setActiveImageIdNew(
+      state,
+      action: PayloadAction<{
+        imageId: string | undefined;
+        prevImageId: string | undefined;
+      }>
+    ) {
+      state.activeImageId = action.payload.imageId;
+      // reset selected annotations
     },
     setActiveImageRenderedSrcs(
       state,
@@ -333,6 +374,18 @@ export const imageViewerSlice = createSlice({
       ].filter(distinctFilter);
       state.annotationFilters["categoryId"] = newFilters;
     },
+    addFilters(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[];
+      }>
+    ) {
+      const newFilters = [
+        ...state.filters["categoryId"],
+        ...action.payload.categoryIds,
+      ].filter(distinctFilter);
+      state.filters["categoryId"] = newFilters;
+    },
     removeAnnotationCategoryFilters(
       state,
       action: PayloadAction<{
@@ -347,6 +400,24 @@ export const imageViewerSlice = createSlice({
       if (action.payload.categoryIds) {
         mutatingFilter(
           state.annotationFilters["categoryId"],
+          (id) => !action.payload.categoryIds!.includes(id)
+        );
+      }
+    },
+    removeFilters(
+      state,
+      action: PayloadAction<{
+        categoryIds?: string[];
+        all?: boolean;
+      }>
+    ) {
+      if (action.payload.all) {
+        state.filters["categoryId"] = [];
+        return;
+      }
+      if (action.payload.categoryIds) {
+        mutatingFilter(
+          state.filters["categoryId"],
           (id) => !action.payload.categoryIds!.includes(id)
         );
       }

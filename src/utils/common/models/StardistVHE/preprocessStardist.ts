@@ -2,6 +2,7 @@ import { Tensor3D, Tensor4D, data as tfdata, tidy } from "@tensorflow/tfjs";
 import { ImageType } from "types";
 import { getImageSlice } from "utils/common/image";
 import { padToMatch } from "../utils/crop";
+import { NewImageType } from "types/ImageType";
 
 const sampleGenerator = (
   images: Array<ImageType>,
@@ -58,6 +59,17 @@ const padImage = (image: {
 
 export const preprocessStardist = (
   images: Array<ImageType>,
+  batchSize: number,
+  dataDims: Array<{ padX: number; padY: number }>
+) => {
+  return tfdata
+    .generator(sampleGenerator(images, dataDims))
+    .map((im) => padImage(im))
+    .batch(batchSize) as tfdata.Dataset<Tensor4D>;
+};
+
+export const preprocessStardistNew = (
+  images: Array<NewImageType>,
   batchSize: number,
   dataDims: Array<{ padX: number; padY: number }>
 ) => {

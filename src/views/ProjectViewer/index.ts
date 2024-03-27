@@ -1,1 +1,1 @@
-export { ProjectViewer } from "./ProjectViewer";
+export { ProjectViewerNew } from "./ProjectViewerNew";

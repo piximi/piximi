@@ -29,7 +29,6 @@ import {
   setThemeMode,
   selectSoundEnabled,
 } from "store/slices/applicationSettings";
-import { selectUnusedImageCategoryColors } from "store/slices/data";
 
 import { ThemeMode } from "types";
 
@@ -37,6 +36,7 @@ import Sun from "icons/Sun.svg";
 import Moon from "icons/Moon.svg";
 import VolumeUp from "icons/VolumeUp.svg";
 import VolumeOff from "icons/VolumeOff.svg";
+import { selectActiveCategoryColors } from "store/slices/newData/selectors/reselectors";
 
 const SettingsItem = ({
   title,
@@ -80,7 +80,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
   const [selectionColor, setSelectionColor] = useState<string>(
     initialSelectionColor
   );
-  const availableColors = useSelector(selectUnusedImageCategoryColors);
+  const availableColors = useSelector(selectActiveCategoryColors);
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
     React.useState<null | HTMLButtonElement>(null);
   const colorPopupOpen = Boolean(colorMenuAnchorEl);

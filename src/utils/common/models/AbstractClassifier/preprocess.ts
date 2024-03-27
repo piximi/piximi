@@ -31,15 +31,20 @@ import {
   UNKNOWN_IMAGE_CATEGORY_ID,
   CropSchema,
 } from "types";
+import { ThingType } from "types/ThingType";
+import { NewImageType } from "types/ImageType";
 
-const createClassificationIdxs = (
-  images: ImageType[],
-  categories: Category[]
+const createClassificationIdxs = <
+  T extends { id: string; categoryId: string; name: string },
+  K extends { id: string }
+>(
+  images: T[],
+  categories: K[]
 ) => {
   const categoryIdxs: number[] = [];
 
   for (const im of images) {
-    const idx = categories.findIndex((cat: Category) => {
+    const idx = categories.findIndex((cat: K) => {
       if (cat.id !== UNKNOWN_IMAGE_CATEGORY_ID) {
         return cat.id === im.categoryId;
       } else {
@@ -55,9 +60,12 @@ const createClassificationIdxs = (
   return categoryIdxs;
 };
 
-export const sampleGenerator = (
-  images: Array<ImageType>,
-  categories: Array<Category>
+export const sampleGenerator = <
+  T extends Omit<ThingType, "kind">,
+  K extends Category
+>(
+  images: Array<T>,
+  categories: Array<K>
 ) => {
   const count = images.length;
   const categoryIdxs = createClassificationIdxs(images, categories);
@@ -67,7 +75,12 @@ export const sampleGenerator = (
 
     while (index < count) {
       const image = images[index];
-      const dataPlane = getImageSlice(image.data, image.activePlane);
+      let activePlane = 0;
+
+      if ("activePlane" in image) {
+        activePlane = image.activePlane as NewImageType["activePlane"];
+      }
+      const dataPlane = getImageSlice(image.data, activePlane);
 
       const label = categoryIdxs[index];
       const oneHotLabel = oneHot(label, categories.length) as Tensor1D;
@@ -302,7 +315,7 @@ const doShow = (
 //#endregion Debug stuff
 
 type PreprocessArgs = {
-  images: Array<ImageType>;
+  images: Array<Omit<ImageType, "colors">>;
   categories: Array<Category>;
   inputShape: Shape;
   preprocessOptions: PreprocessOptions;

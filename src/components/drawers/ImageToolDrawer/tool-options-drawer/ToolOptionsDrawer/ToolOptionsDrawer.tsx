@@ -4,7 +4,7 @@ import { Box, Drawer, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 import { AppBarOffset } from "components/styled-components";
-import { OperationType } from "../../ImageToolDrawer";
+import { OperationType } from "../../ImageToolDrawerNew";
 
 export const ToolOptionsDrawer = ({
   optionsVisibility,

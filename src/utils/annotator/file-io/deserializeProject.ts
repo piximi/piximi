@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-
 import {
   AnnotationType,
   Category,
@@ -8,6 +6,8 @@ import {
   SerializedAnnotatorImageType,
   ImageType,
 } from "types";
+import { generateUUID } from "utils/common/helpers";
+import { logger } from "utils/common/logger";
 
 export const deserializeAnnotations = (
   serializedAnnotations: Array<SerializedAnnotationType>,
@@ -17,7 +17,7 @@ export const deserializeAnnotations = (
 
   for (const annotation of serializedAnnotations) {
     annotations.push({
-      id: uuidv4(),
+      id: generateUUID(),
       encodedMask: annotation.mask.split(" ").map((e) => Number(e)),
       plane: annotation.plane,
       boundingBox: annotation.boundingBox as [number, number, number, number],
@@ -73,8 +73,8 @@ const reconcileCategories = (
     const numExisting = existingCategories.length;
 
     numMatched > 0 &&
-      console.log(`Matched ${numMatched} / ${numExisting} categories`);
-    numNew > 0 && console.log(`Created ${numNew} / ${numExisting} categories`);
+      logger(`Matched ${numMatched} / ${numExisting} categories`);
+    numNew > 0 && logger(`Created ${numNew} / ${numExisting} categories`);
   }
 
   return { newCats, catModdedAnnotations };
@@ -133,13 +133,12 @@ const reconcileImages = (
     const numExisting = existingImages.length;
 
     numImsDiscarded > 0 &&
-      console.log(
+      logger([
         `Discarded ${numImsDiscarded} / ${numExisting} images`,
         `and ${numAnnsDiscarded} associated annotations.`,
-        `Image names: ${discardedIms.map((im) => im.name)}`
-      );
-    numMatched > 0 &&
-      console.log(`Matched ${numMatched} / ${numExisting} images`);
+        `Image names: ${discardedIms.map((im) => im.name)}`,
+      ]);
+    numMatched > 0 && logger(`Matched ${numMatched} / ${numExisting} images`);
   }
 
   return { matchedIms, imModdedAnnotations };

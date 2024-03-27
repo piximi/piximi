@@ -1,1 +1,1 @@
-export { CustomTabSwitcher, TabContext } from "./CustomTabSwitcher";
+export { NewCustomTabSwitcher } from "./NewCustomTabSwitcher";

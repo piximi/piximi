@@ -19,7 +19,6 @@ import {
 
 import { useTranslation, useZoom } from "hooks";
 
-import { StageContext } from "views/ImageViewer/ImageViewer";
 import {
   setStagePosition,
   selectStageHeight,
@@ -29,7 +28,6 @@ import {
   setZoomToolOptions,
   selectStageScale,
 } from "store/slices/imageViewer";
-import { selectActiveImage } from "store/slices/data";
 
 import { ZoomModeType } from "types";
 
@@ -42,6 +40,8 @@ import {
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 import { CustomListItem } from "components/list-items/CustomListItem";
 import { DividerHeader } from "components/styled-components";
+import { StageContext } from "contexts";
+import { selectActiveImage } from "store/slices/imageViewer/reselectors";
 
 //TODO: Slider
 

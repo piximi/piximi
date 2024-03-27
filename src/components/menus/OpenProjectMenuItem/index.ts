@@ -1,1 +1,1 @@
-export { OpenProjectMenuItem } from "./OpenProjectMenuItem";
+export { OpenProjectMenuItemNew } from "./OpenProjectMenuItemNew";

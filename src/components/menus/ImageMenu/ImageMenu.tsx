@@ -1,13 +1,11 @@
 import React from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
-import { saveAs } from "file-saver";
+import { batch, useDispatch } from "react-redux";
 import JSZip from "jszip";
 
 import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { dataSlice, selectAllAnnotationCategories } from "store/slices/data";
 import { imageViewerSlice } from "store/slices/imageViewer";
 
 import { ImageType } from "types";
@@ -18,11 +16,12 @@ import {
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
 } from "utils/annotator/imageHelper";
 import { projectSlice } from "store/slices/project";
-import { selectAnnotationsByImage } from "store/slices/data/selectors/annotation/annotationSelectors";
+import { NewImageType } from "types/ImageType";
+import { newDataSlice } from "store/slices/newData/newDataSlice";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
-  selectedImage: ImageType;
+  selectedImage: NewImageType;
   previousImageId: string | undefined;
   onCloseImageMenu: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   openImageMenu: boolean;
@@ -37,16 +36,14 @@ export const ImageMenu = ({
 }: ImageMenuProps) => {
   const dispatch = useDispatch();
 
-  const annotationCategories = useSelector(selectAllAnnotationCategories);
-  const annotations = useSelector(selectAnnotationsByImage)(selectedImage?.id);
-
   const handleClearAnnotations = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     if (!selectedImage) return;
     dispatch(
-      dataSlice.actions.deleteAllAnnotationsByImage({
-        imageId: selectedImage.id,
+      newDataSlice.actions.deleteThings({
+        thingIds: selectedImage.containing,
+        disposeColorTensors: true,
       })
     );
 
@@ -70,8 +67,8 @@ export const ImageMenu = ({
         projectSlice.actions.deselectImages({ ids: [selectedImage.id] })
       );
       dispatch(
-        dataSlice.actions.deleteImages({
-          imageIds: [selectedImage.id],
+        newDataSlice.actions.deleteThings({
+          thingIds: [selectedImage.id],
           disposeColorTensors: true,
         })
       );
@@ -89,17 +86,17 @@ export const ImageMenu = ({
     let zip = new JSZip();
 
     if (!selectedImage.id) return;
-    saveAnnotationsAsLabelMatrix(
-      [selectedImage],
-      annotations,
-      annotationCategories,
-      zip,
-      true
-    ).then(() => {
-      zip.generateAsync({ type: "blob" }).then((blob) => {
-        saveAs(blob, "labeled_instances.zip");
-      });
-    });
+    // saveAnnotationsAsLabelMatrix(
+    //   [selectedImage],
+    //   annotations,
+    //   annotationCategories,
+    //   zip,
+    //   true
+    // ).then(() => {
+    //   zip.generateAsync({ type: "blob" }).then((blob) => {
+    //     saveAs(blob, "labeled_instances.zip");
+    //   });
+    // });
   };
 
   const handleExportBinaryInstanceMasks = (
@@ -112,13 +109,13 @@ export const ImageMenu = ({
 
     if (!selectedImage) return;
 
-    saveAnnotationsAsBinaryInstanceSegmentationMasks(
-      [selectedImage],
-      annotations,
-      annotationCategories,
-      zip,
-      "binary_instances"
-    );
+    // saveAnnotationsAsBinaryInstanceSegmentationMasks(
+    //   [selectedImage],
+    //   annotations,
+    //   annotationCategories,
+    //   zip,
+    //   "binary_instances"
+    // );
   };
 
   const handleExportLabels = (
@@ -131,16 +128,16 @@ export const ImageMenu = ({
 
     if (!selectedImage) return;
 
-    saveAnnotationsAsLabelMatrix(
-      [selectedImage],
-      annotations,
-      annotationCategories,
-      zip
-    ).then(() => {
-      zip.generateAsync({ type: "blob" }).then((blob) => {
-        saveAs(blob, "labels.zip");
-      });
-    });
+    // saveAnnotationsAsLabelMatrix(
+    //   [selectedImage],
+    //   annotations,
+    //   annotationCategories,
+    //   zip
+    // ).then(() => {
+    //   zip.generateAsync({ type: "blob" }).then((blob) => {
+    //     saveAs(blob, "labels.zip");
+    //   });
+    // });
   };
 
   const handleExportLabeledSemanticMasks = (
@@ -153,13 +150,13 @@ export const ImageMenu = ({
 
     if (!selectedImage) return;
 
-    saveAnnotationsAsLabeledSemanticSegmentationMasks(
-      [selectedImage],
-      annotations,
-      annotationCategories,
-      zip,
-      "labeled_semantic"
-    );
+    // saveAnnotationsAsLabeledSemanticSegmentationMasks(
+    //   [selectedImage],
+    //   annotations,
+    //   annotationCategories,
+    //   zip,
+    //   "labeled_semantic"
+    // );
   };
 
   const handleExportBinarySemanticMasks = (
@@ -172,18 +169,18 @@ export const ImageMenu = ({
 
     if (!selectedImage) return;
 
-    saveAnnotationsAsLabelMatrix(
-      [selectedImage],
-      annotations,
-      annotationCategories,
-      zip,
-      false,
-      true
-    ).then(() => {
-      zip.generateAsync({ type: "blob" }).then((blob) => {
-        saveAs(blob, "binary_semantic.zip");
-      });
-    });
+    // saveAnnotationsAsLabelMatrix(
+    //   [selectedImage],
+    //   annotations,
+    //   annotationCategories,
+    //   zip,
+    //   false,
+    //   true
+    // ).then(() => {
+    //   zip.generateAsync({ type: "blob" }).then((blob) => {
+    //     saveAs(blob, "binary_semantic.zip");
+    //   });
+    // });
   };
 
   const t = useTranslation();

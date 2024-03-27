@@ -1,21 +1,29 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { Project } from "types/Project";
-import { defaultImageSortKey, ImageSortKey } from "types/ImageSortType";
-import { distinctFilter, mutatingFilter } from "utils/common/helpers";
+import {
+  defaultImageSortKey,
+  ImageSortKey,
+  ThingSortKey_new,
+} from "types/ImageSortType";
+import { distinctFilter, mutatingFilter, toUnique } from "utils/common/helpers";
 import { ImageGridTab, Partition } from "types";
 
 export const initialState: Project = {
   selectedImageIds: [],
+  selectedThingIds: [],
   name: "Untitled project",
   imageSortKey: defaultImageSortKey.imageSortKey,
+  sortType_new: ThingSortKey_new.None,
   highlightedCategory: undefined,
   selectedAnnotationIds: [],
   imageGridTab: "Images",
   loadPercent: 1,
   loadMessage: "",
   imageFilters: { categoryId: [], partition: [] },
+  thingFilters: {},
   annotationFilters: { categoryId: [] },
+  activeKind: "Image",
 };
 
 export const projectSlice = createSlice({
@@ -36,6 +44,9 @@ export const projectSlice = createSlice({
     setImageGridTab(state, action: PayloadAction<{ view: ImageGridTab }>) {
       state.imageGridTab = action.payload.view;
     },
+    setActiveKind(state, action: PayloadAction<{ kind: string }>) {
+      state.activeKind = action.payload.kind;
+    },
     selectImages(
       state,
       action: PayloadAction<{ ids: Array<string> | string }>
@@ -44,9 +55,36 @@ export const projectSlice = createSlice({
         typeof action.payload.ids === "string"
           ? [action.payload.ids]
           : action.payload.ids;
+
       for (const imageId of ids) {
         state.selectedImageIds.push(imageId);
       }
+    },
+    selectThings(
+      state,
+      action: PayloadAction<{ ids: Array<string> | string }>
+    ) {
+      const ids =
+        typeof action.payload.ids === "string"
+          ? [action.payload.ids]
+          : action.payload.ids;
+      const allSelectedThings = [
+        ...new Set([...state.selectedThingIds, ...ids]),
+      ];
+
+      state.selectedThingIds = allSelectedThings;
+    },
+    deselectThings(
+      state,
+      action: PayloadAction<{ ids: Array<string> | string }>
+    ) {
+      const ids =
+        typeof action.payload.ids === "string"
+          ? [action.payload.ids]
+          : action.payload.ids;
+      state.selectedThingIds = state.selectedThingIds.filter(
+        (id: string) => !ids.includes(id)
+      );
     },
     deselectImages(
       state,
@@ -114,6 +152,13 @@ export const projectSlice = createSlice({
 
       //(state.images as OldImageType[]).sort(selectedSortKey.comparerFunction);
     },
+    setSortType_new(
+      state,
+      action: PayloadAction<{ sortType: ThingSortKey_new }>
+    ) {
+      console.log(action.payload.sortType);
+      state.sortType_new = action.payload.sortType;
+    },
     setProjectName(state, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;
     },
@@ -150,6 +195,99 @@ export const projectSlice = createSlice({
     ) {
       state.highlightedCategory = action.payload.categoryId;
     },
+    addThingCategoryFilters(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[];
+        kinds?: string[];
+      }>
+    ) {
+      const { categoryIds, kinds } = {
+        kinds: [state.activeKind],
+        ...action.payload,
+      };
+
+      for (const kind of kinds) {
+        if (kind in state.thingFilters) {
+          const existingFilters = state.thingFilters[kind].categoryId ?? [];
+          const newFilters = toUnique([...categoryIds, ...existingFilters]);
+          state.thingFilters[kind].categoryId = newFilters;
+        } else {
+          state.thingFilters[kind] = { categoryId: categoryIds, partition: [] };
+        }
+      }
+    },
+    removeThingCategoryFilters(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[] | "all";
+        kinds?: string[];
+      }>
+    ) {
+      const { categoryIds, kinds } = {
+        kinds: [state.activeKind],
+        ...action.payload,
+      };
+
+      for (const kind of kinds) {
+        if (!(kind in state.thingFilters)) continue;
+        if (categoryIds === "all") {
+          state.thingFilters[kind].categoryId = [];
+          return;
+        } else {
+          mutatingFilter(
+            state.thingFilters[kind].categoryId,
+            (id) => !categoryIds!.includes(id)
+          );
+        }
+      }
+    },
+    addThingPartitionFilters(
+      state,
+      action: PayloadAction<{
+        partitions: Partition[];
+        kinds?: string[];
+      }>
+    ) {
+      const { partitions, kinds } = {
+        kinds: [state.activeKind],
+        ...action.payload,
+      };
+
+      for (const kind of kinds) {
+        if (kind in state.thingFilters) {
+          const existingFilters = state.thingFilters[kind].partition ?? [];
+          const newFilters = toUnique([...partitions, ...existingFilters]);
+          state.thingFilters[kind].partition = newFilters;
+        } else {
+          state.thingFilters[kind] = { categoryId: [], partition: partitions };
+        }
+      }
+    },
+    removeThingPartitionFilters(
+      state,
+      action: PayloadAction<{
+        partitions: string[] | "all";
+        kinds?: string[];
+      }>
+    ) {
+      const { partitions, kinds } = {
+        kinds: [state.activeKind],
+        ...action.payload,
+      };
+      for (const kind of kinds) {
+        if (!(kind in state.thingFilters)) continue;
+        if (partitions === "all") {
+          state.thingFilters[kind].partition = [];
+          return;
+        } else {
+          mutatingFilter(
+            state.thingFilters[kind].partition,
+            (id) => !partitions.includes(id)
+          );
+        }
+      }
+    },
     addImageCategoryFilters(
       state,
       action: PayloadAction<{
@@ -179,14 +317,6 @@ export const projectSlice = createSlice({
           (id) => !action.payload.categoryIds!.includes(id)
         );
       }
-    },
-    setImagePartitionFilters(
-      state,
-      action: PayloadAction<{
-        partitions: Partition[];
-      }>
-    ) {
-      state.imageFilters["partition"] = action.payload.partitions;
     },
     addImagePartitionFilters(
       state,

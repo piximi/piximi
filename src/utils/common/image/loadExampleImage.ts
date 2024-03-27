@@ -45,6 +45,7 @@ export const loadExampleImage = async (
     colorModel: "RGB" as ColorModel,
     alpha: 0,
   });
+
   deserializedAnnotations.forEach((annotation) => {
     let bbox = annotation.boundingBox;
 
@@ -63,6 +64,7 @@ export const loadExampleImage = async (
     ]);
     annotations.push({
       ...annotation,
+
       data: data,
       src: objSrc,
       imageId: image.id,

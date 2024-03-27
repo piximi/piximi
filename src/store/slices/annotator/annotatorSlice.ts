@@ -7,7 +7,8 @@ import {
   Annotator,
 } from "types";
 
-import { AnnotationTool } from "annotator-tools";
+import { AnnotationTool } from "annotator-tools-new";
+import { AnnotationToolNew } from "annotator-tools-new/AnnotationTool/AnnotationTool";
 
 const initialState: Annotator = {
   annotationState: AnnotationStateType.Blank,
@@ -29,6 +30,16 @@ export const annotatorSlice = createSlice({
       action: PayloadAction<{
         annotationState: AnnotationStateType;
         annotationTool: AnnotationTool;
+      }>
+    ) {
+      state.annotationState = action.payload.annotationState;
+    },
+    setAnnotationStateNew(
+      state,
+      action: PayloadAction<{
+        annotationState: AnnotationStateType;
+        kind?: string;
+        annotationTool: AnnotationToolNew;
       }>
     ) {
       state.annotationState = action.payload.annotationState;

@@ -1,1 +1,1 @@
-export { OpenImageMenu } from "./OpenImageMenu";
+export { OpenImageMenuNew } from "./OpenImageMenuNew";

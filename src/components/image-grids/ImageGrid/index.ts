@@ -1,1 +1,1 @@
-export { ImageGrid } from "./ImageGrid";
+export { ImageGridNew } from "./ImageGridNew";

@@ -6,13 +6,9 @@ import { DataArray } from "../common/image/imageHelper";
 import { decode } from "./rle/rle";
 import { pointsAreEqual } from "./point-operations/point-operations";
 
-import {
-  AnnotationType,
-  DecodedAnnotationType,
-  Category,
-  Point,
-  ImageType,
-} from "types";
+import { AnnotationType, Category, Point, ImageType } from "types";
+import { NewDecodedAnnotationType } from "types/AnnotationType";
+import { logger } from "utils/common/logger";
 
 export const generatePoints = (buffer: Array<number> | undefined) => {
   if (!buffer) return undefined;
@@ -143,10 +139,10 @@ Given a click at a position, return all overlapping annotations ids
  */
 export const getOverlappingAnnotations = (
   position: { x: number; y: number },
-  annotations: Array<DecodedAnnotationType>
+  annotations: Array<NewDecodedAnnotationType>
 ) => {
   const overlappingAnnotations = annotations.filter(
-    (annotation: DecodedAnnotationType) => {
+    (annotation: NewDecodedAnnotationType) => {
       const boundingBox = annotation.boundingBox;
       if (pointInBox(position, boundingBox)) {
         const boundingBoxWidth = boundingBox[2] - boundingBox[0];
@@ -171,7 +167,7 @@ export const getOverlappingAnnotations = (
       return false;
     }
   );
-  return overlappingAnnotations.map((annotation: DecodedAnnotationType) => {
+  return overlappingAnnotations.map((annotation: NewDecodedAnnotationType) => {
     return annotation.id;
   });
 };
@@ -179,9 +175,23 @@ export const getOverlappingAnnotations = (
 export const getAnnotationsInBox = (
   minimum: { x: number; y: number },
   maximum: { x: number; y: number },
-  annotations: Array<DecodedAnnotationType>
+  annotations: Array<NewDecodedAnnotationType>
 ) => {
-  return annotations.filter((annotation: DecodedAnnotationType) => {
+  return annotations.filter((annotation: NewDecodedAnnotationType) => {
+    return (
+      minimum.x <= annotation.boundingBox[0] &&
+      minimum.y <= annotation.boundingBox[1] &&
+      maximum.x >= annotation.boundingBox[2] &&
+      maximum.y >= annotation.boundingBox[3]
+    );
+  });
+};
+export const getAnnotationsInBoxNew = (
+  minimum: { x: number; y: number },
+  maximum: { x: number; y: number },
+  annotations: Array<NewDecodedAnnotationType>
+) => {
+  return annotations.filter((annotation: NewDecodedAnnotationType) => {
     return (
       minimum.x <= annotation.boundingBox[0] &&
       minimum.y <= annotation.boundingBox[1] &&
@@ -233,14 +243,14 @@ export const colorOverlayROI = (
     }).resize({ factor: scalingFactor });
   } catch (err) {
     if (process.env.NODE_ENV !== "production") {
-      console.error("could not create crop");
-      console.log(`boundingbox: ${boundingBox}`);
-      console.log(`boxWidth: ${boxWidth}`);
-      console.log(`boxHeight: ${boxHeight}`);
-      console.log(`bwxbh: ${boxHeight * boxWidth}`);
-      console.log(`decodedMask length: ${decodedMask.length}`);
-      console.log(`diff: ${boxHeight * boxWidth - decodedMask.length}`);
-      console.error(err);
+      logger("could not create crop", "error");
+      logger(`boundingbox: ${boundingBox}`);
+      logger(`boxWidth: ${boxWidth}`);
+      logger(`boxHeight: ${boxHeight}`);
+      logger(`bwxbh: ${boxHeight * boxWidth}`);
+      logger(`decodedMask length: ${decodedMask.length}`);
+      logger(`diff: ${boxHeight * boxWidth - decodedMask.length}`);
+      logger(err, "error");
     }
   }
 

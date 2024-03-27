@@ -5,7 +5,6 @@ import { Grid, TextField } from "@mui/material";
 
 import { selectClassifier } from "store/slices/classifier";
 import { selectProject, projectSlice } from "store/slices/project";
-import { selectDataProject } from "store/slices/data";
 // TODO: implement segmenter serialization
 // import { selectSegmenter } from "store/segmenter";
 
@@ -32,7 +31,7 @@ export const SaveProjectDialog = ({
   const segmenter = useSelector(selectSegmenter);
 
   const project = useSelector(selectProject);
-  const data = useSelector(selectDataProject);
+  //const data = useSelector(selectDataProject);
 
   const [projectName, setProjectName] = useState<string>(project.name);
 
@@ -42,7 +41,7 @@ export const SaveProjectDialog = ({
     );
   };
 
-  const onSaveProjectClick = async () => {
+  const onSaveProjectClick = () => {}; /*async () => {
     serialize(projectName, project, data, classifier, segmenter, onLoadProgress)
       .then((zip) => {
         return zip.generateAsync(
@@ -89,7 +88,7 @@ export const SaveProjectDialog = ({
       });
 
     onClose();
-  };
+  };*/
 
   const onCancel = () => {
     onClose();

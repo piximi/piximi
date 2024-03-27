@@ -1,7 +1,7 @@
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 
 import { useMenu } from "hooks";
-import { OpenImageMenu } from "components/menus";
+import { OpenImageMenuNew } from "components/menus";
 import { CustomListItemButton } from "../CustomListItemButton";
 
 export const ImportAnnotationListItem = () => {
@@ -15,7 +15,7 @@ export const ImportAnnotationListItem = () => {
         icon={<FolderOpenIcon />}
       />
 
-      <OpenImageMenu anchorEl={anchorEl} onCloseMenu={onClose} open={open} />
+      <OpenImageMenuNew anchorEl={anchorEl} onCloseMenu={onClose} open={open} />
     </>
   );
 };
