@@ -1,6 +1,6 @@
 import React from "react";
 import { batch, useDispatch } from "react-redux";
-import JSZip from "jszip";
+// import JSZip from "jszip";
 
 import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
@@ -8,13 +8,13 @@ import { useTranslation } from "hooks";
 
 import { imageViewerSlice } from "store/slices/imageViewer";
 
-import { ImageType } from "types";
+// import { ImageType } from "types";
 
-import {
-  saveAnnotationsAsLabelMatrix,
-  saveAnnotationsAsLabeledSemanticSegmentationMasks,
-  saveAnnotationsAsBinaryInstanceSegmentationMasks,
-} from "utils/annotator/imageHelper";
+// import {
+//   saveAnnotationsAsLabelMatrix,
+//   saveAnnotationsAsLabeledSemanticSegmentationMasks,
+//   saveAnnotationsAsBinaryInstanceSegmentationMasks,
+// } from "utils/annotator/imageHelper";
 import { projectSlice } from "store/slices/project";
 import { NewImageType } from "types/ImageType";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
@@ -83,7 +83,7 @@ export const ImageMenu = ({
     setAnchorEl(null);
     onCloseImageMenu(event);
 
-    let zip = new JSZip();
+    //let zip = new JSZip();
 
     if (!selectedImage.id) return;
     // saveAnnotationsAsLabelMatrix(
@@ -105,7 +105,7 @@ export const ImageMenu = ({
     setAnchorEl(null);
     onCloseImageMenu(event);
 
-    let zip = new JSZip();
+    //let zip = new JSZip();
 
     if (!selectedImage) return;
 
@@ -124,7 +124,7 @@ export const ImageMenu = ({
     setAnchorEl(null);
     onCloseImageMenu(event);
 
-    let zip = new JSZip();
+    //let zip = new JSZip();
 
     if (!selectedImage) return;
 
@@ -146,7 +146,7 @@ export const ImageMenu = ({
     setAnchorEl(null);
     onCloseImageMenu(event);
 
-    let zip = new JSZip();
+    //let zip = new JSZip();
 
     if (!selectedImage) return;
 
@@ -165,7 +165,7 @@ export const ImageMenu = ({
     setAnchorEl(null);
     onCloseImageMenu(event);
 
-    let zip = new JSZip();
+    //let zip = new JSZip();
 
     if (!selectedImage) return;
 

@@ -1,19 +1,19 @@
 import { ChangeEvent, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { /*useDispatch,*/ useSelector } from "react-redux";
 
 import { Grid, TextField } from "@mui/material";
 
-import { selectClassifier } from "store/slices/classifier";
-import { selectProject, projectSlice } from "store/slices/project";
+// import { selectClassifier } from "store/slices/classifier";
+import { selectProject /*projectSlice */ } from "store/slices/project";
 // TODO: implement segmenter serialization
 // import { selectSegmenter } from "store/segmenter";
 
-import { AlertStateType, AlertType, HotkeyView } from "types";
+import { /*AlertStateType, AlertType,*/ HotkeyView } from "types";
 import { useHotkeys } from "hooks";
-import { serialize } from "utils/common/image/serialize";
-import { selectSegmenter } from "store/slices/segmenter";
-import { saveAs } from "file-saver";
-import { applicationSettingsSlice } from "store/slices/applicationSettings";
+// import { serialize } from "utils/common/image/serialize";
+// import { selectSegmenter } from "store/slices/segmenter";
+// import { saveAs } from "file-saver";
+// import { applicationSettingsSlice } from "store/slices/applicationSettings";
 import { DialogWithAction } from "../DialogWithAction";
 
 type SaveProjectDialogProps = {
@@ -25,21 +25,21 @@ export const SaveProjectDialog = ({
   onClose,
   open,
 }: SaveProjectDialogProps) => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  const classifier = useSelector(selectClassifier);
-  const segmenter = useSelector(selectSegmenter);
+  // const classifier = useSelector(selectClassifier);
+  // const segmenter = useSelector(selectSegmenter);
 
   const project = useSelector(selectProject);
   //const data = useSelector(selectDataProject);
 
   const [projectName, setProjectName] = useState<string>(project.name);
 
-  const onLoadProgress = (loadPercent: number, loadMessage: string) => {
-    dispatch(
-      projectSlice.actions.sendLoadPercent({ loadPercent, loadMessage })
-    );
-  };
+  // const onLoadProgress = (loadPercent: number, loadMessage: string) => {
+  //   dispatch(
+  //     projectSlice.actions.sendLoadPercent({ loadPercent, loadMessage })
+  //   );
+  // };
 
   const onSaveProjectClick = () => {}; /*async () => {
     serialize(projectName, project, data, classifier, segmenter, onLoadProgress)
@@ -57,7 +57,7 @@ export const SaveProjectDialog = ({
               `compressing ${meta.percent.toFixed(2)}%`
             );
             // process.env.REACT_APP_LOG_LEVEL === "1" &&
-            //   console.log(`zipping %${Math.floor(meta.percent)}`);
+            //   logger(`zipping %${Math.floor(meta.percent)}`);
           }
         );
       })
