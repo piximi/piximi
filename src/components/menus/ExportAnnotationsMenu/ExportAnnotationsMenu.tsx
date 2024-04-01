@@ -2,17 +2,17 @@ import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { ListItemText, Menu, MenuItem } from "@mui/material";
-import { saveAs } from "file-saver";
-import JSZip from "jszip";
+// import { saveAs } from "file-saver";
+// import JSZip from "jszip";
 
 import { useDialogHotkey, useMenu } from "hooks";
 
-import { serializeCOCOFile, serializeProject } from "utils/annotator";
-import {
-  saveAnnotationsAsBinaryInstanceSegmentationMasks,
-  saveAnnotationsAsLabelMatrix,
-  saveAnnotationsAsLabeledSemanticSegmentationMasks,
-} from "utils/annotator/imageHelper";
+// import { serializeCOCOFile, serializeProject } from "utils/annotator";
+// import {
+//   saveAnnotationsAsBinaryInstanceSegmentationMasks,
+//   saveAnnotationsAsLabelMatrix,
+//   saveAnnotationsAsLabeledSemanticSegmentationMasks,
+// } from "utils/annotator/imageHelper";
 
 import { selectProjectName } from "store/slices/project";
 
@@ -104,7 +104,7 @@ export const ExportAnnotationsMenu = ({
   const handleMenuItemClick = useCallback(
     (exportType: AnnotationExportType) => {
       setOnProjectName(() => (userProjectName: string) => {
-        let zip = new JSZip();
+        //let zip = new JSZip();
 
         switch (exportType) {
           case AnnotationExportType.PIXIMI:
