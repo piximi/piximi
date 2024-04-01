@@ -27,7 +27,7 @@ export const ImageViewerAppBarNew = () => {
 
   const onReturnToMainProject = () => {
     onCloseExitAnnotatorDialog();
-    navigate("/beta");
+    navigate("/");
   };
 
   return (
