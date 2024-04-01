@@ -205,7 +205,7 @@ test("select", async () => {
   expect(operator.annotation).toMatchObject({
     boundingBox: [2, 0, 300, 324],
     categoryId: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
-    plane: 1,
+    activePlane: 1,
     imageId: "",
   });
 });
