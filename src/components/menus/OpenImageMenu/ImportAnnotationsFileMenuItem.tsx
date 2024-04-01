@@ -1,17 +1,17 @@
 import React, { useCallback } from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
+// import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import {
-  imageViewerSlice,
-  selectActiveImageId,
-} from "store/slices/imageViewer";
+// import {
+//   imageViewerSlice,
+//   selectActiveImageId,
+// } from "store/slices/imageViewer";
 
-import { deserializeCOCOFile, deserializeProjectFile } from "utils/annotator";
+// import { deserializeCOCOFile, deserializeProjectFile } from "utils/annotator";
 
-import { validateFileType, ProjectFileType } from "types/runtime";
-import { SerializedCOCOFileType, SerializedFileType } from "types";
+import { /*validateFileType,*/ ProjectFileType } from "types/runtime";
+// import { SerializedCOCOFileType, SerializedFileType } from "types";
 
 //TODO: MenuItem??
 
@@ -24,9 +24,9 @@ export const ImportAnnotationsFileMenuItem = ({
   onCloseMenu,
   projectType,
 }: ImportAnnotationsMenuItemProps) => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  const activeImageId = useSelector(selectActiveImageId);
+  // const activeImageId = useSelector(selectActiveImageId);
 
   // const existingAnnotationCategories = useSelector(selectAllImageCategories);
 
