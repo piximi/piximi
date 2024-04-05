@@ -1,4 +1,4 @@
-import { FilterType } from "types";
+import { FilterType, Shape, ShapeArray } from "types";
 import { NewCategory, UNKNOWN_CATEGORY_NAME } from "types/Category";
 import { v4 as uuidv4 } from "uuid";
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "./colorPalette";
@@ -91,4 +91,17 @@ export const generateUnknownCategory = (kind: string) => {
     visible: true,
   };
   return unknownCategory;
+};
+
+export const convertShapeToArray = (shape: Shape): ShapeArray => {
+  return Object.values(shape) as ShapeArray;
+};
+
+export const convertArrayToShape = (array: ShapeArray): Shape => {
+  return {
+    planes: array[0],
+    height: array[1],
+    width: array[2],
+    channels: array[3],
+  };
 };

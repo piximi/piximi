@@ -1,6 +1,8 @@
 import { createSelector } from "@reduxjs/toolkit";
 import {
+  selectAllCategories,
   selectAllKinds,
+  selectAllThings,
   selectCategoriesDictionary,
   selectKindDictionary,
   selectThingsDictionary,
@@ -29,6 +31,28 @@ import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/s
 import { getCompleteEntity } from "store/entities/utils";
 import { isUnknownCategory } from "utils/common/helpers";
 
+export const selectSplitThingDict = createSelector(
+  selectAllThings,
+  (things) => {
+    return things.reduce(
+      (
+        splitDict: {
+          images: Record<string, NewImageType>;
+          objects: Record<string, NewAnnotationType>;
+        },
+        thing
+      ) => {
+        if (thing.kind === "Image") {
+          splitDict.images[thing.id] = thing as NewImageType;
+        } else {
+          splitDict.objects[thing.id] = thing as NewAnnotationType;
+        }
+        return splitDict;
+      },
+      { images: {}, objects: {} }
+    );
+  }
+);
 export const selectActiveKindObject = createSelector(
   selectActiveKindId,
   selectKindDictionary,
@@ -77,6 +101,50 @@ export const selectCategoriesByKind = createSelector(
       const categoriesOfKind = kindDict[kind].categories;
       return categoriesOfKind.map((catId) => categoriesDict[catId]);
     };
+  }
+);
+
+export const selectAllObjectKinds = createSelector(selectAllKinds, (kinds) => {
+  return kinds.filter((kind) => kind.id !== "Image");
+});
+export const selectObjectKindDict = createSelector(
+  selectAllObjectKinds,
+  (kinds) => {
+    return kinds.reduce((kindDict: Record<string, Kind>, kind) => {
+      kindDict[kind.id] = kind;
+      return kindDict;
+    }, {});
+  }
+);
+
+export const selectAllImages = createSelector(selectAllThings, (things) => {
+  return things.filter((thing) => thing.kind === "Image") as NewImageType[];
+});
+
+export const selectAllObjects = createSelector(selectAllThings, (things) => {
+  return things.filter(
+    (thing) => thing.kind !== "Image"
+  ) as NewAnnotationType[];
+});
+export const selectAllImageCategories = createSelector(
+  selectAllCategories,
+  (categories) => {
+    return categories.filter((category) => category.kind !== "Image");
+  }
+);
+export const selectAllObjectCategories = createSelector(
+  selectAllCategories,
+  (categories) => {
+    return categories.filter((category) => category.kind !== "Image");
+  }
+);
+export const selectObjectCategoryDict = createSelector(
+  selectAllObjectCategories,
+  (categories) => {
+    return categories.reduce((catDict: Record<string, NewCategory>, c) => {
+      catDict[c.id] = c;
+      return catDict;
+    }, {});
   }
 );
 
@@ -454,5 +522,14 @@ export const selectFirstUnknownCategory = createSelector(
     if (kinds.length < 2) return;
     const unknownCatId = kinds[1].unknownCategoryId;
     return catDict[unknownCatId];
+  }
+);
+
+export const selectDataProject = createSelector(
+  selectAllKinds,
+  selectAllCategories,
+  selectAllThings,
+  (kinds, categories, things) => {
+    return { kinds, categories, things };
   }
 );

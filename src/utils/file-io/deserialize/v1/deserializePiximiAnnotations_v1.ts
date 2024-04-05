@@ -9,7 +9,7 @@ import {
 import { generateUUID } from "utils/common/helpers";
 import { logger } from "utils/common/logger";
 
-export const deserializeAnnotations = (
+export const deserializeAnnotations_v1 = (
   serializedAnnotations: Array<SerializedAnnotationType>,
   imageId: string
 ) => {
@@ -144,7 +144,7 @@ const reconcileImages = (
   return { matchedIms, imModdedAnnotations };
 };
 
-export const deserializeProjectFile = (
+export const deserializePiximiAnnotations_v1 = (
   serializedProject: SerializedFileType,
   existingImages: Array<ImageType>,
   existingCategories: Array<Category>
@@ -173,7 +173,7 @@ export const deserializeProjectFile = (
   }, {} as { [imageId: string]: Array<SerializedAnnotationType> });
 
   const encodedAnnotations = matchedIms.flatMap((im) => {
-    return deserializeAnnotations(annMap[im.id], im.id);
+    return deserializeAnnotations_v1(annMap[im.id], im.id);
   });
 
   return {
