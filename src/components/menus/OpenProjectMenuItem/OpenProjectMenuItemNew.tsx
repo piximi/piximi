@@ -8,13 +8,11 @@ import { classifierSlice } from "store/slices/classifier";
 import { projectSlice } from "store/slices/project";
 import { segmenterSlice } from "store/slices/segmenter";
 
-import { deserialize } from "utils/common/image/deserialize";
-
 import { AlertStateType, AlertType } from "types";
 import { imageViewerSlice } from "store/slices/imageViewer";
 import { fListToStore } from "utils";
-import { dataConverter } from "utils/temp/dataConverter";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { deserializeProject } from "utils/file-io/deserialize";
 
 //TODO: MenuItem??
 
@@ -53,8 +51,9 @@ export const OpenProjectMenuItemNew = ({
 
     const zarrStore = await fListToStore(files, zip);
 
-    deserialize(zarrStore, onLoadProgress)
+    deserializeProject(zarrStore, onLoadProgress)
       .then((res) => {
+        if (!res) return;
         batch(() => {
           // indefinite load until dispatches complete
           dispatch(projectSlice.actions.setLoadPercent({ loadPercent: -1 }));
@@ -63,14 +62,7 @@ export const OpenProjectMenuItemNew = ({
           dispatch(imageViewerSlice.actions.resetImageViewer());
           dispatch(projectSlice.actions.resetProject());
 
-          const newData = dataConverter({
-            images: res.data.images,
-            oldCategories: res.data.categories,
-            annotationCategories: res.data.annotationCategories,
-            annotations: res.data.annotations,
-          });
-
-          dispatch(newDataSlice.actions.initializeState({ data: newData }));
+          dispatch(newDataSlice.actions.initializeState({ data: res.data }));
           // loadPerecnt set to 1 here
           dispatch(
             projectSlice.actions.setProject({

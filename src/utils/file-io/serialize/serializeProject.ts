@@ -2,12 +2,9 @@ import { Group, NestedArray, group } from "zarr";
 //import { Blosc } from "numcodecs";
 
 import {
-  AnnotationType,
   Classifier,
   PreprocessOptions,
   Project,
-  Category,
-  ImageType,
   Segmenter,
   LoadCB,
 } from "types";
@@ -18,53 +15,15 @@ import {
 } from "types/ModelType";
 import { ZipStore } from "utils";
 import { Tensor } from "@tensorflow/tfjs";
+import { Kind, NewCategory } from "types/Category";
+import { NewImageType } from "types/ImageType";
+import { NewAnnotationType } from "types/AnnotationType";
 
 /* 
    =====================
    Project Serialization
    =====================
  */
-
-const serializeImageAnnotations = async (
-  annotationsGroup: Group,
-  annotations: Array<AnnotationType>
-) => {
-  const imageIds = annotations.map((an) => an.imageId);
-  // Uint16 means images with a width and/or height > 65536 would cause trouble
-  const bboxes = new Uint16Array(annotations.length * 4);
-  const categories = annotations.map((an) => an.categoryId);
-  const ids = annotations.map((an) => an.id);
-  // might be able to scale down to Uint16 but better safe in this case
-  const maskLengths = new Uint32Array(annotations.length);
-  // needs to be Uint32, Uint16Array would potentially start causing
-  // trouble on image sizes > 256 x 256 since we're counting pixels
-  // and sqrt(2^16) = 256, wheras sqrt(2^32) = 65536 gives us support
-  // for decently large images
-  const masks = new Uint32Array(
-    annotations.reduce((prev, curr) => prev + curr.encodedMask.length, 0)
-  );
-  // Uint16 because they may have more than 256 planes but more than
-  // 65536 is crazy
-  const planes = Uint16Array.from(annotations.map((an) => an.plane));
-
-  let maskStartIdx = 0;
-  for (let i = 0; i < annotations.length; i++) {
-    let annotation = annotations[i];
-    bboxes.set(annotation.boundingBox, i * 4);
-    maskLengths[i] = annotation.encodedMask.length;
-    masks.set(annotation.encodedMask, maskStartIdx);
-    maskStartIdx += annotation.encodedMask.length;
-  }
-
-  await annotationsGroup.attrs.setItem("image_id", imageIds);
-  await annotationsGroup.attrs.setItem("annotation_category_id", categories);
-  await annotationsGroup.attrs.setItem("annotation_id", ids);
-
-  await writeArray(annotationsGroup, "bounding_box", bboxes);
-  await writeArray(annotationsGroup, "mask_length", maskLengths);
-  await writeArray(annotationsGroup, "mask", masks);
-  await writeArray(annotationsGroup, "plane", planes);
-};
 
 const serializeImageColors = async (colorsGroup: Group, colors: Colors) => {
   const numChannels = colors.color.shape[0];
@@ -88,53 +47,64 @@ const serializeImageColors = async (colorsGroup: Group, colors: Colors) => {
   ]);
 };
 
-const serializeImages = async (
-  imagesGroup: Group,
-  images: Array<ImageType>,
+const serializeThings = async (
+  thingsGroup: Group,
+  things: Array<NewAnnotationType | NewImageType>,
   loadCb: LoadCB
 ) => {
-  const imageNames = images.map((image) => image.name);
-  // zarr decoder needs to know the name of each subgroup, so put it as attr
-  imagesGroup.attrs.setItem("image_names", imageNames);
+  const thingNames = things.map((thing) => thing.name);
 
-  loadCb(0, `serializing ${images.length} images`);
-  for (let i = 0; i < images.length; i++) {
-    // process.env.REACT_APP_LOG_LEVEL === "1" &&
-    //   console.log(`serializing image ${+i + 1}/${imageNames.length}`);
+  thingsGroup.attrs.setItem("thing_names", thingNames);
+  loadCb(0, `serializing ${things.length} images`);
 
-    let im = images[i];
-    let imGroup = await imagesGroup.createGroup(imageNames[i]);
-
-    let im_data = await writeTensor(imGroup, imageNames[i], im.data, [
-      im.shape.planes,
-      im.shape.height,
-      im.shape.width,
-      im.shape.channels,
+  for (let i = 0; i < things.length; i++) {
+    let thing = things[i];
+    let thingGroup = await thingsGroup.createGroup(thingNames[i]);
+    let data = await writeTensor(thingGroup, thingNames[i], thing.data, [
+      thing.shape.planes,
+      thing.shape.height,
+      thing.shape.width,
+      thing.shape.channels,
     ]);
+    await data.attrs.setItem("bit_depth", thing.bitDepth);
+    await thingGroup.attrs.setItem("thing_id", thing.id);
+    await thingGroup.attrs.setItem("active_plane", thing.activePlane);
+    await thingGroup.attrs.setItem("class_category_id", thing.categoryId);
+    await thingGroup.attrs.setItem("classifier_partition", thing.partition);
+    await thingGroup.attrs.setItem("kind", thing.kind);
 
-    await im_data.attrs.setItem("bit_depth", im.bitDepth);
+    if (thing.kind === "Image") {
+      await thingGroup.attrs.setItem(
+        "contents",
+        (thing as NewImageType).containing
+      );
 
-    await imGroup.attrs.setItem("image_id", im.id);
-    await imGroup.attrs.setItem("active_plane", im.activePlane);
-    await imGroup.attrs.setItem("class_category_id", im.categoryId);
-    await imGroup.attrs.setItem("classifier_partition", im.partition);
-    // imGroup.attrs.setItem("segmenter_partition", im.segmentationPartition)
-
-    let colorGroup = await imGroup.createGroup("colors");
-    await serializeImageColors(colorGroup, im.colors);
-
+      let colorGroup = await thingGroup.createGroup("colors");
+      await serializeImageColors(colorGroup, (thing as NewImageType).colors);
+    } else {
+      await thingGroup.attrs.setItem(
+        "bbox",
+        (thing as NewAnnotationType).boundingBox
+      );
+      await thingGroup.attrs.setItem(
+        "mask",
+        (thing as NewAnnotationType).encodedMask
+      );
+      await thingGroup.attrs.setItem(
+        "image_id",
+        (thing as NewAnnotationType).imageId
+      );
+    }
     loadCb(
-      (i + 1) / imageNames.length,
-      `serialized image ${i + 1}/${imageNames.length}`
+      (i + 1) / thingNames.length,
+      `serialized image ${i + 1}/${thingNames.length}`
     );
   }
-  // set back to indeterminate for remaining serialization
-  loadCb(-1, "finishing serialization...");
 };
 
 const serializeCategories = async (
   categoryGroup: Group,
-  categories: Category[]
+  categories: NewCategory[]
 ) => {
   await categoryGroup.attrs.setItem(
     "category_id",
@@ -148,37 +118,55 @@ const serializeCategories = async (
     "name",
     categories.map((cat) => cat.name)
   );
+  await categoryGroup.attrs.setItem(
+    "kind",
+    categories.map((cat) => cat.kind)
+  );
+  await categoryGroup.attrs.setItem(
+    "contents",
+    categories.map((cat) => cat.containing)
+  );
+};
+const serializeKinds = async (kindGroup: Group, kinds: Kind[]) => {
+  await kindGroup.attrs.setItem(
+    "kind_id",
+    kinds.map((k) => k.id)
+  );
+  await kindGroup.attrs.setItem(
+    "contents",
+    kinds.map((k) => k.containing)
+  );
+  await kindGroup.attrs.setItem(
+    "categories",
+    kinds.map((k) => k.categories)
+  );
+  await kindGroup.attrs.setItem(
+    "unknown_category_id",
+    kinds.map((k) => k.unknownCategoryId)
+  );
 };
 
-const serializeProject = async (
+const _serializeProject = async (
   projectGroup: Group,
   project: Project,
   data: {
-    images: Array<ImageType>;
-    annotations: Array<AnnotationType>;
-    categories: Array<Category>;
-    annotationCategories: Array<Category>;
+    kinds: Array<Kind>;
+    categories: Array<NewCategory>;
+    things: Array<NewImageType | NewAnnotationType>;
   },
   loadCb: LoadCB
 ) => {
   await projectGroup.attrs.setItem("name", project.name);
 
-  const imagesGroup = await projectGroup.createGroup("images");
+  const thingsGroup = await projectGroup.createGroup("things");
 
-  await serializeImages(imagesGroup, data.images, loadCb);
-
-  let annotationsGroup = await projectGroup.createGroup("annotations");
-  await serializeImageAnnotations(annotationsGroup, data.annotations);
+  await serializeThings(thingsGroup, data.things, loadCb);
 
   const categoriesGroup = await projectGroup.createGroup("categories");
   await serializeCategories(categoriesGroup, data.categories);
-  const annotationCategoriesGroup = await projectGroup.createGroup(
-    "annotationCategories"
-  );
-  await serializeCategories(
-    annotationCategoriesGroup,
-    data.annotationCategories
-  );
+
+  const kindsGroup = await projectGroup.createGroup("kinds");
+  await serializeKinds(kindsGroup, data.kinds);
 };
 
 /*
@@ -296,14 +284,13 @@ const serializeSegmenter = async (
   ===========
  */
 
-export const serialize = async (
+export const serializeProject = async (
   name: string,
   projectSlice: Project,
   data: {
-    images: Array<ImageType>;
-    annotations: Array<AnnotationType>;
-    categories: Array<Category>;
-    annotationCategories: Array<Category>;
+    kinds: Array<Kind>;
+    categories: Array<NewCategory>;
+    things: Array<NewImageType | NewAnnotationType>;
   },
   classifierSlice: Classifier,
   segmenterSlice: Segmenter,
@@ -322,7 +309,7 @@ export const serialize = async (
   root.attrs.setItem("version", piximiVersion);
 
   const projectGroup = await root.createGroup("project");
-  await serializeProject(projectGroup, projectSlice, data, loadCb);
+  await _serializeProject(projectGroup, projectSlice, data, loadCb);
 
   const classifierGroup = await root.createGroup("classifier");
   await serializeClassifier(classifierGroup, classifierSlice);

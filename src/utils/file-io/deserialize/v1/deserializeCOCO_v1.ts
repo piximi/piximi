@@ -156,7 +156,7 @@ const reconcileImages = (
   return { matchedIms, imModdedAnnotations };
 };
 
-export const deserializeCOCOFile = (
+export const deserializeCOCOFile_v1 = (
   cocoFile: SerializedCOCOFileType,
   existingImages: Array<ImageType>,
   existingCategories: Array<Category>,

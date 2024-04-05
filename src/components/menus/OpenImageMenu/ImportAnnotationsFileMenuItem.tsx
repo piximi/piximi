@@ -1,17 +1,26 @@
 import React, { useCallback } from "react";
-// import { batch, useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-// import {
-//   imageViewerSlice,
-//   selectActiveImageId,
-// } from "store/slices/imageViewer";
+import {
+  imageViewerSlice,
+  selectActiveImageId,
+} from "store/slices/imageViewer";
 
-// import { deserializeCOCOFile, deserializeProjectFile } from "utils/annotator";
+import { deserializeCOCOFile } from "utils/file-io/deserialize";
+import { deserializePiximiAnnotations } from "utils/file-io/deserialize";
 
-import { /*validateFileType,*/ ProjectFileType } from "types/runtime";
-// import { SerializedCOCOFileType, SerializedFileType } from "types";
+import { validateFileType, ProjectFileType } from "types/runtime";
+import { SerializedCOCOFileType, SerializedFileType } from "types";
+import {
+  selectObjectCategoryDict,
+  selectObjectKindDict,
+  selectSplitThingDict,
+} from "store/slices/newData/selectors/reselectors";
+
+import { CATEGORY_COLORS } from "utils/common/colorPalette";
+import { newDataSlice } from "store/slices/newData";
 
 //TODO: MenuItem??
 
@@ -24,77 +33,80 @@ export const ImportAnnotationsFileMenuItem = ({
   onCloseMenu,
   projectType,
 }: ImportAnnotationsMenuItemProps) => {
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-  // const activeImageId = useSelector(selectActiveImageId);
+  const activeImageId = useSelector(selectActiveImageId);
 
-  // const existingAnnotationCategories = useSelector(selectAllImageCategories);
+  const existingObjectCategories = useSelector(selectObjectCategoryDict);
 
-  // const existingImages = useSelector(selectSelectedImages);
-  // const availableColors = useSelector(selectUnusedImageCategoryColors);
+  const existingThings = useSelector(selectSplitThingDict);
+  const existingObjectKinds = useSelector(selectObjectKindDict);
 
   const onImportProjectFile = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, onClose: () => void) => {
       onClose();
 
-      // event.persist();
+      event.persist();
 
-      // if (!event.currentTarget.files) return;
+      if (!event.currentTarget.files) return;
 
-      // const file = event.currentTarget.files[0];
+      const file = event.currentTarget.files[0];
 
-      // const reader = new FileReader();
+      const reader = new FileReader();
 
-      // reader.onload = async (event: ProgressEvent<FileReader>) => {
-      //   if (event.target && event.target.result) {
-      //     const serializedProject: SerializedCOCOFileType | SerializedFileType =
-      //       validateFileType(event.target.result as string, projectType);
+      reader.onload = async (event: ProgressEvent<FileReader>) => {
+        if (event.target && event.target.result) {
+          const serializedProject: SerializedCOCOFileType | SerializedFileType =
+            validateFileType(event.target.result as string, projectType);
 
-      //     const { annotations, newCategories } =
-      //       projectType === ProjectFileType.PIXIMI
-      //         ? deserializeProjectFile(
-      //             serializedProject as SerializedFileType,
-      //             existingImages,
-      //             existingAnnotationCategories
-      //           )
-      //         : deserializeCOCOFile(
-      //             serializedProject as SerializedCOCOFileType,
-      //             existingImages,
-      //             existingAnnotationCategories,
-      //             availableColors
-      //           );
+          const { newAnnotations, newCategories, newKinds } =
+            projectType === ProjectFileType.PIXIMI
+              ? await deserializePiximiAnnotations(
+                  serializedProject as SerializedFileType,
+                  existingThings.images,
+                  existingObjectCategories,
+                  existingObjectKinds
+                )
+              : await deserializeCOCOFile(
+                  serializedProject as SerializedCOCOFileType,
+                  Object.values(existingThings.images),
+                  Object.values(existingObjectCategories),
+                  Object.values(existingObjectKinds),
+                  Object.values(CATEGORY_COLORS)
+                );
 
-      //     batch(() => {
-      //       dispatch(
-      //         dataSlice.actions.addAnnotationCategories({
-      //           categories: newCategories,
-      //         })
-      //       );
-      //       dispatch(dataSlice.actions.addAnnotations({ annotations }));
-      //     });
+          batch(() => {
+            dispatch(newDataSlice.actions.addKinds({ kinds: newKinds }));
+            dispatch(
+              newDataSlice.actions.addCategories({ categories: newCategories })
+            );
+            dispatch(
+              newDataSlice.actions.addThings({ things: newAnnotations })
+            );
+          });
 
-      //     // when a deserialized annotation is associated with the active image
-      //     // this needs to invoke the decoding process for the in-view image
-      //     // annotations; prevImageId undefined to avoid encoding step
-      //     dispatch(
-      //       imageViewerSlice.actions.setActiveImageId({
-      //         imageId: activeImageId,
-      //         prevImageId: undefined,
-      //         execSaga: true,
-      //       })
-      //     );
-      //   }
-      // };
+          // when a deserialized annotation is associated with the active image
+          // this needs to invoke the decoding process for the in-view image
+          // annotations; prevImageId undefined to avoid encoding step
+          dispatch(
+            imageViewerSlice.actions.setActiveImageId({
+              imageId: activeImageId,
+              prevImageId: undefined,
+              execSaga: true,
+            })
+          );
+        }
+      };
 
-      //   reader.readAsText(file);
+      reader.readAsText(file);
     },
     [
-      //     dispatch,
-      //     activeImageId,
-      //     existingAnnotationCategories,
-      //     availableColors,
-      //     existingImages,
-      //     projectType,
+      dispatch,
+      activeImageId,
+      existingObjectCategories,
+      existingThings.images,
+      existingObjectKinds,
+      projectType,
     ]
   );
 

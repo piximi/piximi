@@ -2,7 +2,7 @@ import { DataArray } from "utils/common/image";
 import * as T from "io-ts";
 import { SerializedAnnotationRType } from "./runtime";
 import { ThingType } from "./ThingType";
-import { NewSerializedAnnotationRType } from "./runtime/SerializedFileType";
+import { SerializedAnnotationRTypeV2 } from "./runtime/SerializedFileType";
 import { Tensor4D } from "@tensorflow/tfjs";
 import { PartialBy } from "./utility/PartialBy";
 
@@ -49,5 +49,5 @@ export type SerializedAnnotationType = T.TypeOf<
   typeof SerializedAnnotationRType
 >;
 export type NewSerializedAnnotationType = T.TypeOf<
-  typeof NewSerializedAnnotationRType
+  typeof SerializedAnnotationRTypeV2
 >;

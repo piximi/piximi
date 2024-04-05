@@ -83,7 +83,11 @@ export const uploadImages = async (
   channels: number,
   slices: number,
   referenceShape: ImageShapeInfo
-) => {
+): Promise<{
+  imagesToUpload: NewImageType[];
+  warning: any;
+  errors: AlertStateType[];
+}> => {
   const invalidImageFiles: Array<ImageFileError> = [];
   const imagesToUpload: Array<NewImageType> = [];
   const errors: Array<AlertStateType> = [];

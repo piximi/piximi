@@ -2,23 +2,29 @@ import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { ListItemText, Menu, MenuItem } from "@mui/material";
-// import { saveAs } from "file-saver";
-// import JSZip from "jszip";
+import { saveAs } from "file-saver";
+import JSZip from "jszip";
 
 import { useDialogHotkey, useMenu } from "hooks";
 
-// import { serializeCOCOFile, serializeProject } from "utils/annotator";
-// import {
-//   saveAnnotationsAsBinaryInstanceSegmentationMasks,
-//   saveAnnotationsAsLabelMatrix,
-//   saveAnnotationsAsLabeledSemanticSegmentationMasks,
-// } from "utils/annotator/imageHelper";
+import { serializeCOCOFile, serializeProject } from "utils/annotator";
+import {
+  saveAnnotationsAsBinaryInstanceSegmentationMasks,
+  saveAnnotationsAsLabelMatrix,
+  saveAnnotationsAsLabeledSemanticSegmentationMasks,
+} from "utils/annotator/imageHelper";
 
 import { selectProjectName } from "store/slices/project";
 
 import { ExportAnnotationsDialog } from "components/dialogs";
 
 import { AnnotationExportType, HotkeyView } from "types";
+import { selectImageViewerImages } from "store/slices/imageViewer/reselectors";
+import {
+  selectAllObjectCategories,
+  selectAllObjectKinds,
+  selectAllObjects,
+} from "store/slices/newData/selectors/reselectors";
 
 //TODO: MenuItem??
 
@@ -65,11 +71,11 @@ export const ExportAnnotationsMenu = ({
   onClose,
   open,
 }: ExportAnnotationsMenuProps) => {
-  // const images = useSelector(selectSelectedImages);
-  // const annotations = useSelector(selectAllAnnotations);
-  // const annotationCategories = useSelector(selectAllAnnotationCategories);
-  // const categories = useSelector(selectAllImageCategories);
+  const images = useSelector(selectImageViewerImages);
+  const annotations = useSelector(selectAllObjects);
+  const annotationCategories = useSelector(selectAllObjectCategories);
   const projectName = useSelector(selectProjectName);
+  const objectKinds = useSelector(selectAllObjectKinds);
 
   const {
     anchorEl: subMenuAnchorEl,
@@ -104,101 +110,102 @@ export const ExportAnnotationsMenu = ({
   const handleMenuItemClick = useCallback(
     (exportType: AnnotationExportType) => {
       setOnProjectName(() => (userProjectName: string) => {
-        //let zip = new JSZip();
+        let zip = new JSZip();
 
         switch (exportType) {
           case AnnotationExportType.PIXIMI:
-            // const piximiSerializedProject = serializeProject(
-            //   images,
-            //   annotations,
-            //   categories
-            // );
+            const piximiSerializedProject = serializeProject(
+              images,
+              annotations,
+              annotationCategories,
+              objectKinds
+            );
 
-            // const data = new Blob([JSON.stringify(piximiSerializedProject)], {
-            //   type: "application/json;charset=utf-8",
-            // });
+            const data = new Blob([JSON.stringify(piximiSerializedProject)], {
+              type: "application/json;charset=utf-8",
+            });
 
-            // saveAs(data, `${userProjectName}.json`);
+            saveAs(data, `${userProjectName}.json`);
 
             break;
 
           case AnnotationExportType.COCO:
-            // const cocoSerializedProject = serializeCOCOFile(
-            //   images,
-            //   annotations,
-            //   categories
-            // );
+            const cocoSerializedProject = serializeCOCOFile(
+              images,
+              annotations,
+              annotationCategories
+            );
 
-            // const blob = new Blob([JSON.stringify(cocoSerializedProject)], {
-            //   type: "application/json;charset=utf-8",
-            // });
+            const blob = new Blob([JSON.stringify(cocoSerializedProject)], {
+              type: "application/json;charset=utf-8",
+            });
 
-            // saveAs(blob, `${userProjectName}.json`);
+            saveAs(blob, `${userProjectName}.json`);
 
             break;
 
           case AnnotationExportType.Matrix:
-            // saveAnnotationsAsLabelMatrix(
-            //   images,
-            //   annotations,
-            //   annotationCategories,
-            //   zip
-            // ).then(() => {
-            //   zip.generateAsync({ type: "blob" }).then((blob) => {
-            //     saveAs(blob, `${userProjectName}.zip`);
-            //   });
-            // });
+            saveAnnotationsAsLabelMatrix(
+              images,
+              annotations,
+              annotationCategories,
+              zip
+            ).then(() => {
+              zip.generateAsync({ type: "blob" }).then((blob) => {
+                saveAs(blob, `${userProjectName}.zip`);
+              });
+            });
 
             break;
 
           case AnnotationExportType.BinaryInstances:
-            // saveAnnotationsAsBinaryInstanceSegmentationMasks(
-            //   images,
-            //   annotations,
-            //   annotationCategories,
-            //   zip,
-            //   userProjectName
-            // );
+            saveAnnotationsAsBinaryInstanceSegmentationMasks(
+              images,
+              annotations,
+              annotationCategories,
+              zip,
+              userProjectName
+            );
 
             break;
 
           case AnnotationExportType.LabeledInstances:
-            // saveAnnotationsAsLabelMatrix(
-            //   images,
-            //   annotations,
-            //   annotationCategories,
-            //   zip,
-            //   true
-            // ).then(() => {
-            //   zip.generateAsync({ type: "blob" }).then((blob) => {
-            //     saveAs(blob, `${userProjectName}.zip`);
-            //   });
-            // });
+            saveAnnotationsAsLabelMatrix(
+              images,
+              annotations,
+              annotationCategories,
+              zip,
+              true
+            ).then(() => {
+              zip.generateAsync({ type: "blob" }).then((blob) => {
+                saveAs(blob, `${userProjectName}.zip`);
+              });
+            });
             break;
 
           case AnnotationExportType.BinarySemanticMasks:
-            // saveAnnotationsAsLabelMatrix(
-            //   images,
-            //   annotations,
-            //   annotationCategories,
-            //   zip,
-            //   false,
-            //   true
-            // ).then(() => {
-            //   zip.generateAsync({ type: "blob" }).then((blob) => {
-            //     saveAs(blob, `${userProjectName}.zip`);
-            //   });
-            // });
+            saveAnnotationsAsLabelMatrix(
+              images,
+              annotations,
+              annotationCategories,
+              zip,
+              false,
+              true
+            ).then(() => {
+              zip.generateAsync({ type: "blob" }).then((blob) => {
+                saveAs(blob, `${userProjectName}.zip`);
+              });
+            });
             break;
 
           case AnnotationExportType.LabeledSemanticMasks:
-            // saveAnnotationsAsLabeledSemanticSegmentationMasks(
-            //   images,
-            //   annotations,
-            //   annotationCategories,
-            //   zip,
-            //   userProjectName
-            // );
+            saveAnnotationsAsLabeledSemanticSegmentationMasks(
+              images,
+              annotations,
+              annotationCategories,
+              zip,
+              userProjectName
+            );
             break;
         }
 
@@ -210,10 +217,10 @@ export const ExportAnnotationsMenu = ({
       setOnProjectName,
       onOpenSaveAnnotatorDialog,
       onMenusClose,
-      // annotationCategories,
-      // categories,
-      // images,
-      // annotations,
+      annotationCategories,
+      images,
+      objectKinds,
+      annotations,
     ]
   );
 

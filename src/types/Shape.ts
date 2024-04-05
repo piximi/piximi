@@ -4,3 +4,5 @@ export type Shape = {
   width: number;
   channels: number;
 };
+
+export type ShapeArray = [number, number, number, number];

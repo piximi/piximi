@@ -5,11 +5,10 @@ import { classifierSlice } from "store/slices/classifier";
 import { projectSlice } from "store/slices/project";
 import { AlertStateType, AlertType } from "types";
 import { PseudoFileList, fListToStore } from "utils";
-import { deserialize } from "utils/common/image/deserialize";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import { BaseHorizCard } from "../BaseHorizCard";
-import { dataConverter } from "utils/temp/dataConverter";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { deserializeProject } from "utils/file-io/deserialize";
 
 type ExampleProjectType = {
   name: string;
@@ -119,23 +118,20 @@ export const ExampleProjectCardNew = ({
     const fileStore = await fListToStore(exampleProjectFileList, true);
 
     try {
-      const deserializedProject = await deserialize(fileStore, onLoadProgress);
+      const deserializedProject = await deserializeProject(
+        fileStore,
+        onLoadProgress
+      );
+      if (!deserializedProject) return;
 
       const project = deserializedProject.project;
       const data = deserializedProject.data;
 
       const classifier = deserializedProject.classifier;
 
-      const newData = dataConverter({
-        images: data.images,
-        oldCategories: data.categories,
-        annotationCategories: data.annotationCategories,
-        annotations: data.annotations,
-      });
-
       batch(() => {
         // loadPercent will be set to 1 here
-        dispatch(newDataSlice.actions.initializeState({ data: newData }));
+        dispatch(newDataSlice.actions.initializeState({ data }));
         dispatch(projectSlice.actions.setProject({ project }));
 
         dispatch(
