@@ -1,14 +1,14 @@
-import * as tf from "@tensorflow/tfjs";
 import { ColorModel, Image as ImageJS } from "image-js";
 
-import { deserializeAnnotations } from "utils/annotator";
+import { deserializeAnnotations_v1 } from "utils/file-io/deserialize/v1/deserializePiximiAnnotations_v1";
 
-import { Category, AnnotationType, SerializedFileType } from "types";
+import { AnnotationType, Category, SerializedFileType } from "types";
 
 import {
   fileFromPath,
   loadImageFileAsStack,
   convertToImage,
+  getPropertiesFromImageSync,
 } from "./imageHelper";
 
 export const loadExampleImage = async (
@@ -28,7 +28,7 @@ export const loadExampleImage = async (
     3
   );
 
-  const deserializedAnnotations = deserializeAnnotations(
+  const deserializedAnnotations = deserializeAnnotations_v1(
     serializedAnnotations.annotations,
     image.id
   );
@@ -46,31 +46,18 @@ export const loadExampleImage = async (
     alpha: 0,
   });
 
-  deserializedAnnotations.forEach((annotation) => {
-    let bbox = annotation.boundingBox;
+  for (const annotation of deserializedAnnotations) {
+    const annImProps = await getPropertiesFromImageSync(
+      renderedIm,
+      image,
+      annotation
+    );
 
-    const objectImage = renderedIm.crop({
-      x: Math.abs(bbox[0]),
-      y: Math.abs(bbox[1]),
-      width: Math.abs(Math.min(image.shape.width, bbox[2]) - bbox[0]),
-      height: Math.abs(Math.min(image.shape.height, bbox[3]) - bbox[1]),
-    });
-    const objSrc = objectImage.toDataURL();
-    const data = tf.tensor4d(Float32Array.from(objectImage.data), [
-      1,
-      objectImage.height,
-      objectImage.width,
-      3,
-    ]);
     annotations.push({
       ...annotation,
-
-      data: data,
-      src: objSrc,
-      imageId: image.id,
-      boundingBox: bbox,
-    });
-  });
+      ...annImProps,
+    } as AnnotationType);
+  }
 
   const annotationCategories = serializedAnnotations.categories as Category[];
 

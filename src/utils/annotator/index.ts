@@ -41,13 +41,8 @@ export {
 } from "./point-operations/point-operations";
 export { findContours, padMask } from "./point-operations/find-contours";
 
-export { deserializeCOCOFile } from "./file-io/deserializeCOCO";
-export { serializeCOCOFile } from "./file-io/serializeCOCO";
-export { serializeProject } from "./file-io/serializeProject";
-export {
-  deserializeAnnotations,
-  deserializeProjectFile,
-} from "./file-io/deserializeProject";
+export { serializeCOCOFile } from "../file-io/serialize/serializeCOCO";
+export { serializePiximiAnnotations as serializeProject } from "../file-io/serialize/serializePiximiAnnotations";
 
 export {
   getIdx,

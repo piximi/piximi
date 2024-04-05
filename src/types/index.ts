@@ -103,14 +103,17 @@ export type { RescaleOptions } from "./RescaleOptions";
 
 export type { Segmenter } from "./Segmenter";
 
-export type { SerializedFileType } from "./SerializedFileType";
+export type {
+  SerializedFileType,
+  SerializedFileTypeV2,
+} from "./SerializedFileType";
 
 export type { SerializedAnnotatorImageType } from "./SerializedImageType";
 
 export type { ApplicationSettings } from "./ApplicationSettings";
 export { HotkeyView } from "./ApplicationSettings";
 
-export type { Shape } from "./Shape";
+export type { Shape, ShapeArray } from "./Shape";
 
 export type { State } from "./State";
 

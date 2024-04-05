@@ -5,7 +5,7 @@ import { SerializedFileType } from "types";
 
 import { BaseHorizCard } from "../BaseHorizCard";
 import { loadExampleImage } from "utils/common/image";
-import { dataConverter } from "utils/temp/dataConverter";
+import { dataConverter_v1v2 } from "utils/converters/dataConverter_v1v2";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
 
 type ExampleImageType = {
@@ -43,7 +43,7 @@ export const ExampleImageCardNew = ({
       exampleImage.name
     );
 
-    const data = dataConverter({
+    const data = dataConverter_v1v2({
       images: [image],
       oldCategories: [],
       annotations,

@@ -5,19 +5,19 @@ import {
   simplifyPolygon,
 } from "utils/annotator";
 import {
-  AnnotationType,
-  Category,
-  ImageType,
   SerializedCOCOAnnotationType,
   SerializedCOCOCategoryType,
   SerializedCOCOFileType,
   SerializedCOCOImageType,
 } from "types";
+import { NewAnnotationType, NewImageType } from "types/ThingType";
+import { NewCategory } from "types/Category";
+import { logger } from "utils/common/logger";
 
 export const serializeCOCOFile = (
-  images: Array<ImageType>,
-  annotations: Array<AnnotationType>,
-  categories: Array<Category>
+  images: Array<NewImageType>,
+  annotations: Array<NewAnnotationType>,
+  categories: Array<NewCategory>
 ): SerializedCOCOFileType => {
   let imCount = 0;
   let catCount = 0;
@@ -41,7 +41,7 @@ export const serializeCOCOFile = (
     idMap[cat.id] = {
       id: catCount++,
       name: cat.name,
-      supercategory: cat.name,
+      supercategory: cat.kind,
     };
     return idMap;
   }, {} as { [internalCategoryId: string]: SerializedCOCOCategoryType });
@@ -59,7 +59,7 @@ export const serializeCOCOFile = (
 
     if (!outerBorder) {
       process.env.NODE_ENV !== "production" &&
-        console.log(`Could not find outer border of annotation ${ann.id}`);
+        logger(`Could not find outer border of annotation ${ann.id}`);
       throw new Error(
         `Could not determine contours of annotation belonging to image ${
           imIdMap[ann.imageId].file_name

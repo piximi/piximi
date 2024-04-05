@@ -1,6 +1,7 @@
 import * as T from "io-ts";
 import { getOrElseW } from "fp-ts/Either";
 import { failure } from "io-ts/PathReporter";
+import { logger } from "utils/common/logger";
 
 //#region COCO Serialization Type
 
@@ -73,6 +74,14 @@ const SerializedCategoryRType = T.type({
   color: T.string, // 3 byte hex, eg "#a08cd2"
   name: T.string,
   visible: T.boolean,
+  containing: T.array(T.string),
+  kind: T.string,
+});
+export const SerializedKindRType = T.type({
+  id: T.string,
+  categories: T.array(T.string), // 3 byte hex, eg "#a08cd2"
+  unknownCategoryId: T.string,
+  containing: T.array(T.string),
 });
 
 export const SerializedImageRType = T.type({
@@ -96,16 +105,37 @@ export const SerializedAnnotationRType = T.type({
   boundingBox: T.array(T.number), // [x1, y1, x2, y2]
 });
 
+export const SerializedAnnotationRTypeV2 = T.type({
+  categoryId: T.string, // category id, matching id of a SerializedCategory
+  imageId: T.string, // image id, matching id of SerializedImage
+  name: T.string,
+  id: T.string,
+  mask: T.string, // e.g. "114 1 66 1 66 2 ..."
+  activePlane: T.number,
+  boundingBox: T.array(T.number), // [x1, y1, x2, y2]
+  kind: T.string,
+  partition: T.string,
+  shape: T.array(T.number),
+});
+
 export const SerializedFileRType = T.type({
   categories: T.array(SerializedCategoryRType),
   annotations: T.array(SerializedAnnotationRType),
   images: T.array(SerializedImageRType),
+  version: T.string,
+});
+export const SerializedFileRTypeV2 = T.type({
+  categories: T.array(SerializedCategoryRType),
+  annotations: T.array(SerializedAnnotationRTypeV2),
+  images: T.array(SerializedImageRType),
+  kinds: T.array(SerializedKindRType),
+  version: T.string,
 });
 
 //#endregion Basic Serialization Type
 
 const toError = (errors: any) => {
-  process.env.NODE_ENV !== "production" && console.log(errors);
+  process.env.NODE_ENV !== "production" && logger(errors);
   throw new Error(failure(errors).join("\n"));
 };
 

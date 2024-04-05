@@ -1,5 +1,14 @@
+import Image from "image-js";
+import { intersection } from "lodash";
 import { DeferredEntityState } from "store/entities";
-import { AnnotationType, Category, ImageType, Partition, Shape } from "types";
+import {
+  AnnotationType,
+  Category,
+  ImageType,
+  Partition,
+  Shape,
+  ShapeArray,
+} from "types";
 import { NewAnnotationType } from "types/AnnotationType";
 import {
   Kind,
@@ -10,9 +19,15 @@ import {
 } from "types/Category";
 import { NewImageType } from "types/ImageType";
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/colorPalette";
-import { generateUUID } from "utils/common/helpers";
+import {
+  convertArrayToShape,
+  generateUnknownCategory,
+  generateUUID,
+} from "utils/common/helpers";
+import { getPropertiesFromImageSync } from "utils/common/image/imageHelper";
+import { logger } from "utils/common/logger";
 
-export const dataConverter = (data: {
+export const dataConverter_v1v2 = (data: {
   images: ImageType[];
   oldCategories: Category[];
   annotationCategories: Category[];
@@ -188,4 +203,77 @@ export const dataConverter = (data: {
   }
 
   return { kinds, categories, things };
+};
+
+export const convertAnnotationsWithExistingProject_v1_2 = async (
+  existingImages: Record<string, NewImageType>,
+  existingKinds: Record<string, Kind>,
+  oldAnnotations: AnnotationType[],
+  oldAnnotationCategories: Category[]
+) => {
+  const catId2Name: Record<string, string> = {};
+  const newKinds: Record<string, Kind> = {};
+  const newCategories: Record<string, NewCategory> = {};
+  const newAnnotations: NewAnnotationType[] = [];
+  const imageMap: Record<string, Image> = {};
+
+  oldAnnotationCategories.forEach((anCat) => {
+    catId2Name[anCat.id] = anCat.name;
+    if (!(anCat.name in existingKinds) && !(anCat.name in newKinds)) {
+      const newUnknownCategory = generateUnknownCategory(anCat.name);
+      newCategories[newUnknownCategory.id] = newUnknownCategory;
+      const kind: Kind = {
+        id: anCat.name,
+        containing: [],
+        categories: [newUnknownCategory.id],
+        unknownCategoryId: newUnknownCategory.id,
+      };
+      newKinds[anCat.name] = kind;
+    }
+  });
+  for await (const ann of oldAnnotations) {
+    const newAnn: Partial<NewAnnotationType> = { ...ann };
+    const existingImage = existingImages[ann.imageId];
+    if (!existingImage) {
+      logger(`No image found for annotation: ${ann.id}\nskipping`);
+      continue;
+    }
+    const newKindName = catId2Name[ann.categoryId];
+    if (!newKindName) {
+      logger(`No category found for annotation: ${ann.id}\nskipping`);
+      continue;
+    }
+    const kind = existingKinds[newKindName] ?? newKinds[newKindName];
+    if (!kind) {
+      logger(`No kind found for annotation: ${ann.id}\nskipping`);
+      continue;
+    }
+    newAnn.kind = kind.id;
+    newAnn.categoryId = kind.unknownCategoryId;
+    const numAnns = intersection(
+      existingImage.containing,
+      kind.containing
+    ).length;
+    newAnn.name = `${existingImage.name}-${kind.id}_${numAnns}`;
+    let renderedIm: Image;
+    if (imageMap[existingImage.id]) {
+      renderedIm = imageMap[existingImage.id];
+    } else {
+      renderedIm = await Image.load(existingImage.src);
+      imageMap[existingImage.id] = renderedIm;
+    }
+    const imageProperties = getPropertiesFromImageSync(
+      renderedIm,
+      existingImage,
+      ann
+    );
+    Object.assign(newAnn, imageProperties);
+    newAnn.shape = convertArrayToShape(newAnn.data!.shape as ShapeArray);
+    newAnnotations.push(newAnn as NewAnnotationType);
+  }
+  return {
+    newAnnotations,
+    newCategories: Object.values(newCategories),
+    newKinds: Object.values(newKinds),
+  };
 };

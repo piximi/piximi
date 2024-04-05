@@ -2,9 +2,9 @@ import * as fs from "fs";
 import { MIMEType } from "./imageHelper";
 
 /*
- Receives a file path to an image file, retrieved via path, eg:
+ Receives a file path to an image file relative to "src", retrieved via path, eg:
 
- "path/to/myImage.png"
+ "src/path/to/myImage.png"
 
  or url path, eg:
 
