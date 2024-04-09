@@ -4,14 +4,7 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 
 import { StageContext } from "contexts";
-import { selectSoundEnabled } from "store/applicationSettings";
-import {
-  selectActiveImageId,
-  selectCursor,
-  selectImageOrigin,
-  selectActiveAnnotationIds,
-  imageViewerSlice,
-} from "store/imageViewer";
+import { imageViewerSlice } from "store/imageViewer";
 
 import { annotatorSlice } from "store/annotator";
 
@@ -20,12 +13,21 @@ import useSound from "use-sound";
 import { AnnotationTool } from "utils/annotator/tools";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
-import { selectWorkingAnnotationNew } from "store/imageViewer/selectors/selectWorkingAnnotation";
 import { dataSlice } from "store/data/dataSlice";
 import { getCompleteEntity } from "store/entities/utils";
-import { selectActiveImage } from "store/imageViewer/reselectors";
-import { selectSelectedAnnotations } from "store/imageViewer/selectors/selectSelectedAnnotationIds";
+import {
+  selectActiveImage,
+  selectSelectedAnnotations,
+} from "store/imageViewer/reselectors";
 import { AnnotationModeType } from "utils/annotator/enums";
+import {
+  selectActiveAnnotationIds,
+  selectActiveImageId,
+  selectCursor,
+  selectImageOrigin,
+  selectWorkingAnnotation,
+} from "store/imageViewer/selectors";
+import { selectSoundEnabled } from "store/applicationSettings/selectors";
 
 const buttonWidth = 65;
 const buttonHeight = 26;
@@ -51,7 +53,7 @@ export const AnnotationTransformerNew = ({
   const [yPos, setYPos] = useState<number>(0);
 
   const activeAnnotationIds = useSelector(selectActiveAnnotationIds);
-  const workingAnnotation = useSelector(selectWorkingAnnotationNew);
+  const workingAnnotation = useSelector(selectWorkingAnnotation);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
   const activeImageId = useSelector(selectActiveImageId);
   const cursor = useSelector(selectCursor);
@@ -77,7 +79,7 @@ export const AnnotationTransformerNew = ({
     annotationTool.deselect();
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.setWorkingAnnotationNew({
+        imageViewerSlice.actions.setWorkingAnnotation({
           annotation: undefined,
         })
       );

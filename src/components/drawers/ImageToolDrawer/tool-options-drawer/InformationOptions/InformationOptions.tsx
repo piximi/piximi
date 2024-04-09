@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Box, Typography } from "@mui/material";
 import { ThingInformationTable } from "./ThingInformationTable";
-import { selectActiveSelectedThings } from "store/data/selectors/reselectors";
+import { selectActiveSelectedThings } from "store/project/reselectors";
 
 export const InformationOptions = () => {
   const selectedThings = useSelector(selectActiveSelectedThings);

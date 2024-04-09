@@ -1,12 +1,12 @@
 import { ArchitectureSettings } from "components/forms";
 import { CollapsibleListItem } from "../CollapsibleListItem";
 import { useDispatch, useSelector } from "react-redux";
+import { classifierSlice } from "store/classifier";
+import { availableClassifierModels } from "utils/models/availableClassificationModels";
 import {
-  classifierSlice,
   selectClassifierInputShape,
   selectClassifierSelectedModelIdx,
-} from "store/classifier";
-import { availableClassifierModels } from "utils/models/availableClassificationModels";
+} from "store/classifier/selectors";
 
 const modelOptions = availableClassifierModels
   .map((m, i) => ({

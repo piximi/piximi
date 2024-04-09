@@ -89,7 +89,7 @@ startAppListening({
       }
 
       listenerAPI.dispatch(
-        imageViewerSlice.actions.setWorkingAnnotationNew({
+        imageViewerSlice.actions.setWorkingAnnotation({
           annotation: {
             ...annotationTool.annotation,
             ...imageProperties,
@@ -104,8 +104,8 @@ startAppListening({
       const toolType = annotatorState.toolType;
 
       if (toolType === ToolType.Zoom) return;
-      const savedWorkingAnnotation = IVState.workingAnnotationNew.saved;
-      const workingAnnotationChanges = IVState.workingAnnotationNew.changes;
+      const savedWorkingAnnotation = IVState.workingAnnotation.saved;
+      const workingAnnotationChanges = IVState.workingAnnotation.changes;
       if (
         !savedWorkingAnnotation ||
         annotationTool.annotationState !== AnnotationStateType.Annotated
@@ -152,7 +152,7 @@ startAppListening({
       const annotation = encodeAnnotationNew(combinedSelectedAnnotation);
 
       listenerAPI.dispatch(
-        imageViewerSlice.actions.updateWorkingAnnotationNew({
+        imageViewerSlice.actions.updateWorkingAnnotation({
           changes: annotation!,
         })
       );

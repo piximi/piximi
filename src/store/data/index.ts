@@ -1,2 +1,2 @@
-export { selectThingsByKind as selectThingsOfKind } from "./selectors/reselectors";
+export { selectThingsOfKind } from "./selectors";
 export { dataSlice as newDataSlice } from "./dataSlice";

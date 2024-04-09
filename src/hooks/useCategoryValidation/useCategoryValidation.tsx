@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import {
   selectActiveCategoryColors,
   selectActiveCategoryNames,
-} from "store/data/selectors/reselectors";
+} from "store/project/reselectors";
 
 export function useCategoryValidation({
   initName,

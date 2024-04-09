@@ -11,7 +11,7 @@ import { ChannelsList } from "../ChannelsList";
 
 import { CustomListItemButton } from "components/list-items";
 import { CustomListItem } from "components/list-items/CustomListItem";
-import { selectLoadMessage } from "store/project";
+import { selectLoadMessage } from "store/project/selectors";
 import { selectActiveImage } from "store/imageViewer/reselectors";
 import { dataSlice } from "store/data/dataSlice";
 import { generateDefaultColors } from "utils/common/tensorHelpers";

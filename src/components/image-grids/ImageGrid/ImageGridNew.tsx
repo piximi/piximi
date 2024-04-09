@@ -21,7 +21,7 @@ import {
 } from "store/project/selectors";
 import { isFiltered } from "utils/common/helpers";
 import { dataSlice } from "store/data/dataSlice";
-import { selectActiveSelectedThingIds } from "store/project/selectors/selectActiveSelectedThings";
+import { selectActiveSelectedThingIds } from "store/project/reselectors";
 import { AnnotationObject, ImageObject } from "store/data/types";
 
 const max_images = 1000; //number of images from the project that we'll show
@@ -117,7 +117,7 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
           <div
             onClick={() => {
               dispatch(
-                projectSlice.actions.deselectImages({ ids: selectedThingIds })
+                projectSlice.actions.deselectThings({ ids: selectedThingIds })
               );
             }}
           >

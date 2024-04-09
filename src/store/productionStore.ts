@@ -19,7 +19,7 @@ import { dataSlice } from "./data/dataSlice";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
 import { classifierMiddleware } from "./classifier/listeners/classiferListener";
-import { segmenterMiddleware } from "./segmenter/listeners/segmenterListeners";
+import { segmenterMiddleware } from "./segmenter/segmenterListeners";
 
 const enhancers: StoreEnhancer[] = [];
 

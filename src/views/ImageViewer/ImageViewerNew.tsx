@@ -12,10 +12,7 @@ import { AlertBar } from "components/app-bars";
 
 import { StageWrapperNew } from "components/stage/StageWrapper";
 
-import {
-  selectAlertState,
-  applicationSettingsSlice,
-} from "store/applicationSettings";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { StageContext } from "contexts";
 import { AnnotatorToolDrawerNew } from "components/drawers";
@@ -24,6 +21,7 @@ import { ImageShapeEnum } from "utils/file-io/enums";
 import { APPLICATION_COLORS } from "utils/common/constants";
 import { getStackTraceFromError } from "utils/common/helpers";
 import { AlertType, HotkeyView } from "utils/common/enums";
+import { selectAlertState } from "store/applicationSettings/selectors";
 
 export const ImageViewerNew = () => {
   const dispatch = useDispatch();

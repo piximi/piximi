@@ -7,13 +7,13 @@ import { Delete as DeleteIcon } from "@mui/icons-material";
 import { useDialog, useTranslation } from "hooks";
 
 import { DialogWithAction } from "components/dialogs";
-import {
-  imageViewerSlice,
-  selectActiveAnnotationIds,
-  selectSelectedAnnotationIds,
-} from "store/imageViewer";
+import { imageViewerSlice } from "store/imageViewer";
 import { CustomListItemButton } from "components/list-items";
 import { newDataSlice } from "store/data";
+import {
+  selectActiveAnnotationIds,
+  selectSelectedAnnotationIds,
+} from "store/imageViewer/selectors";
 
 type DeleteType = "ALL" | "SELECTED";
 export const ClearAnnotationsGroup = () => {
@@ -71,7 +71,7 @@ export const ClearAnnotationsGroup = () => {
         );
       }
       dispatch(
-        imageViewerSlice.actions.setWorkingAnnotationNew({
+        imageViewerSlice.actions.setWorkingAnnotation({
           annotation: undefined,
         })
       );

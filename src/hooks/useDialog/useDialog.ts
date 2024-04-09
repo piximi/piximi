@@ -1,10 +1,8 @@
 import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  selectAlertState,
-  applicationSettingsSlice,
-} from "store/applicationSettings";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { selectAlertState } from "store/applicationSettings/selectors";
 import { AlertType, HotkeyView } from "utils/common/enums";
 
 export const useDialog = (closeOnError: boolean = true) => {

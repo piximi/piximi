@@ -7,7 +7,7 @@ import {
 
 import { CustomListItemButton } from "../CustomListItemButton";
 import { useSelector } from "react-redux";
-import { selectNumThingsByCatAndKind } from "store/data/selectors/reselectors";
+import { selectNumThingsByCatAndKind } from "store/data/selectors";
 import { selectActiveKindId } from "store/project/selectors";
 import { CountChip } from "components/styled-components";
 import { APPLICATION_COLORS } from "utils/common/constants";

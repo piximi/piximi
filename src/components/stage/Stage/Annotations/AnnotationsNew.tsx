@@ -3,23 +3,24 @@ import { useSelector } from "react-redux";
 
 import { AnnotationNew } from "./Annotation";
 
-import { selectSelectedAnnotationIds } from "store/imageViewer";
-
 import { AnnotationTool } from "utils/annotator/tools";
-import {
-  selectActiveAnnotationObjectsNew,
-  selectWorkingAnnotationObjectNew,
-} from "store/data/selectors/reselectors";
 import { AnnotationTransformerNew } from "./AnnotationTransformer";
-import { selectImageViewerFilters } from "store/imageViewer/selectors/selectImageViewerFilters";
+import {
+  selectImageViewerFilters,
+  selectSelectedAnnotationIds,
+} from "store/imageViewer/selectors";
+import {
+  selectActiveAnnotationsViews,
+  selectWorkingAnnotationView,
+} from "store/imageViewer/reselectors";
 
 type AnnotationsProps = {
   annotationTool: AnnotationTool;
 };
 export const AnnotationsNew = ({ annotationTool }: AnnotationsProps) => {
   const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
-  const annotationObjects = useSelector(selectActiveAnnotationObjectsNew);
-  const workingAnnotationObject = useSelector(selectWorkingAnnotationObjectNew);
+  const annotationObjects = useSelector(selectActiveAnnotationsViews);
+  const workingAnnotationObject = useSelector(selectWorkingAnnotationView);
   const imageViewerFilters = useSelector(selectImageViewerFilters);
 
   return (

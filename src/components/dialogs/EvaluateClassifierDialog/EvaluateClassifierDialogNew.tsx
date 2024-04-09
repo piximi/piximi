@@ -2,11 +2,11 @@ import { Dialog, DialogContent, Stack, Typography, Grid } from "@mui/material";
 import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
 import { ConfusionMatrixNew } from "./ConfusionMatrixNew";
 import { useSelector } from "react-redux";
-import { selectClassifierEvaluationResult } from "store/classifier";
-import { selectActiveKnownCategories } from "store/data/selectors/reselectors";
 import { DialogTransitionSlide } from "components/dialogs";
 import { EvaluateClassifierDialogAppBarNew } from "./EvaluateClassifierAppBar";
 import { OldCategory } from "store/data/types";
+import { selectActiveKnownCategories } from "store/project/reselectors";
+import { selectClassifierEvaluationResult } from "store/classifier/selectors";
 
 type EvaluateClassifierDialogNewProps = {
   closeDialog: () => void;

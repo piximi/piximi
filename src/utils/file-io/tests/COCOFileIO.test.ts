@@ -8,7 +8,7 @@ import {
   selectObjectCategoryDict,
   selectObjectKindDict,
   selectSplitThingDict,
-} from "store/data/selectors/reselectors";
+} from "store/data/selectors";
 
 import initialState from "data/test-data/COCO/labels_internal.json";
 

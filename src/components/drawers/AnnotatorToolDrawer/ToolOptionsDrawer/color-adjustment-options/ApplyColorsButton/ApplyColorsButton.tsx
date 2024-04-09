@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { CustomListItemButton } from "components/list-items";
 
-import { selectImageStackImageIds } from "store/imageViewer";
 import { tensor2d } from "@tensorflow/tfjs";
 import { dataSlice } from "store/data/dataSlice";
 import { selectActiveImageRawColor } from "store/imageViewer/reselectors";
+import { selectImageStackImageIds } from "store/imageViewer/selectors";
 
 export const ApplyColorsButton = () => {
   const activeImageColors = useSelector(selectActiveImageRawColor);

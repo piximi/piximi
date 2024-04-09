@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { classifierSlice } from "store/classifier";
 import {
-  classifierSlice,
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
-} from "store/classifier";
+} from "store/classifier/selectors";
 import { Shape } from "store/data/types";
 import { SequentialClassifier } from "utils/models/AbstractClassifier";
 import { ModelStatus, ModelTask } from "utils/models/enums";

@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Shape } from "store/data/types";
+import { segmenterSlice } from "store/segmenter";
 import {
-  segmenterSlice,
   selectSegmenterModel,
   selectSegmenterModelStatus,
-} from "store/segmenter";
+} from "store/segmenter/selectors";
 import { Segmenter } from "utils/models/AbstractSegmenter/AbstractSegmenter";
 import { ModelStatus, ModelTask } from "utils/models/enums";
 import { Model } from "utils/models/Model/Model";
