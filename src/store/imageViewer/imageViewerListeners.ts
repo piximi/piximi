@@ -101,7 +101,7 @@ startAppListening({
 });
 
 startAppListening({
-  actionCreator: imageViewerSlice.actions.setWorkingAnnotationNew,
+  actionCreator: imageViewerSlice.actions.setWorkingAnnotation,
   effect: async (action, listenerAPI) => {
     const dataState = listenerAPI.getState().newData;
     let annotationValue = action.payload.annotation;
@@ -116,7 +116,7 @@ startAppListening({
     }
     listenerAPI.unsubscribe();
     listenerAPI.dispatch(
-      imageViewerSlice.actions.setWorkingAnnotationNew({
+      imageViewerSlice.actions.setWorkingAnnotation({
         annotation: annotationValue,
         preparedByListener: true,
       })

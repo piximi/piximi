@@ -1,13 +1,13 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  classifierSlice,
-  selectClassifierCropOptions,
-  selectClassifierRescaleOptions,
-} from "store/classifier";
+import { classifierSlice } from "store/classifier";
 import { CollapsibleListItem } from "../CollapsibleListItem";
 import { PreprocessingSettings } from "components/forms";
 import { CropOptions, RescaleOptions } from "utils/models/types";
+import {
+  selectClassifierCropOptions,
+  selectClassifierRescaleOptions,
+} from "store/classifier/selectors";
 
 export const ClassifierPreprocessingListItem = () => {
   const cropOptions = useSelector(selectClassifierCropOptions);

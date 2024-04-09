@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectAlertState } from "store/applicationSettings";
+import { selectAlertState } from "store/applicationSettings/selectors";
+import { classifierSlice } from "store/classifier";
 import {
-  classifierSlice,
   selectClassifierFitOptions,
   selectClassifierHistory,
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
   selectClassifierTrainingPercentage,
-} from "store/classifier";
-import { selectActiveLabeledThingsCount } from "store/data/selectors/reselectors";
+} from "store/classifier/selectors";
+import { selectActiveLabeledThingsCount } from "store/project/reselectors";
 import { AlertType } from "utils/common/enums";
 import { logger } from "utils/common/helpers";
 import { AlertState } from "utils/common/types";

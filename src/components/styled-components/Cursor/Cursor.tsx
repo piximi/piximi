@@ -4,9 +4,9 @@ import { useSelector } from "react-redux";
 import { StageContext } from "contexts";
 import { PenAnnotationToolTip } from "components/stage/Stage/PenAnnotationToolTip";
 
-import { selectCursor } from "store/imageViewer";
 import { Point } from "utils/annotator/types";
 import { AnnotationStateType, ToolType } from "utils/annotator/enums";
+import { selectCursor } from "store/imageViewer/selectors";
 
 type CursorProps = {
   positionByStage: Point | undefined;

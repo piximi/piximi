@@ -16,13 +16,13 @@ import {
 
 import { FitSegmenterProgressBar } from "./FitSegmenterProgressBar";
 
+import { segmenterSlice } from "store/segmenter";
+import { ModelStatus } from "utils/models/enums";
+import { APPLICATION_COLORS } from "utils/common/constants";
 import {
   selectSegmenterModel,
   selectSegmenterModelStatus,
-  segmenterSlice,
-} from "store/segmenter";
-import { ModelStatus } from "utils/models/enums";
-import { APPLICATION_COLORS } from "utils/common/constants";
+} from "store/segmenter/selectors";
 
 type FitSegmenterDialogAppBarProps = {
   closeDialog: any;

@@ -28,9 +28,9 @@ import { TooltipTitle } from "components/tooltips";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { HotkeyView } from "utils/common/enums";
-import { selectActiveCategories } from "store/data/selectors/reselectors";
 import { dataSlice } from "store/data/dataSlice";
 import { Partition } from "utils/models/enums";
+import { selectActiveCategories } from "store/project/reselectors";
 
 type GridItemActionBarProps = {
   allSelected: boolean;

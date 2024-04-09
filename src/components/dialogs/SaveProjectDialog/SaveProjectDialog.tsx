@@ -3,21 +3,22 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Grid, TextField } from "@mui/material";
 
-import { selectClassifier } from "store/classifier";
-import { selectProject, projectSlice } from "store/project";
+import { projectSlice } from "store/project";
 // TODO: implement segmenter serialization
 
 import { HotkeyView } from "utils/common/enums";
 import { useHotkeys } from "hooks";
-import { selectSegmenter } from "store/segmenter";
 import { saveAs } from "file-saver";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { DialogWithAction } from "../DialogWithAction";
-import { selectDataProject } from "store/data/selectors/reselectors";
+import { selectDataProject } from "store/data/selectors";
 import { logger } from "utils/common/helpers";
 import { serializeProject } from "utils/file-io/serialize";
 import { AlertState } from "utils/common/types";
 import { AlertType } from "utils/common/enums";
+import { selectProject } from "store/project/selectors";
+import { selectClassifier } from "store/classifier/selectors";
+import { selectSegmenter } from "store/segmenter/selectors";
 
 type SaveProjectDialogProps = {
   onClose: () => void;

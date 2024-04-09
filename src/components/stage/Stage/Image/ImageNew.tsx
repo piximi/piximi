@@ -2,7 +2,7 @@ import React, { forwardRef, useState } from "react";
 import { useSelector } from "react-redux";
 import Konva from "konva";
 
-import { selectImageOrigin } from "store/imageViewer";
+import { selectImageOrigin } from "store/imageViewer/selectors";
 
 import { selectActiveImage } from "store/imageViewer/reselectors";
 import { MemoizedKonvaImage } from "./MemoizedKonvaImage";

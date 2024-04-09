@@ -11,12 +11,7 @@ import {
 } from "utils/annotator/types";
 
 import { AlertState, FilterType } from "utils/common/types";
-import {
-  HotkeyView,
-  ImageSortKey,
-  Languages,
-  ThingSortKey_new,
-} from "utils/common/enums";
+import { HotkeyView, Languages, ThingSortKey } from "utils/common/enums";
 import { ThemeMode } from "themes/enums";
 
 import {
@@ -36,15 +31,13 @@ import {
 import { DeferredEntityState } from "./entities";
 import { AnyAction, Dispatch, TypedStartListening } from "@reduxjs/toolkit";
 import {
-  OldAnnotationType,
-  OldDecodedAnnotationType,
-  OldImageType,
   Kind,
   AnnotationObject,
   Category,
   DecodedAnnotationObject,
   ImageObject,
   Shape,
+  Thing,
 } from "./data/types";
 
 export type SegmenterState = {
@@ -65,22 +58,13 @@ export type SegmenterState = {
 
 export type ProjectState = {
   name: string;
-  selectedImageIds: Array<string>;
   selectedThingIds: Array<string>;
-  imageSortKey: ImageSortKey;
-  sortType_new: ThingSortKey_new;
-  imageFilters: Required<
-    Pick<FilterType<OldImageType>, "categoryId" | "partition">
-  >;
+  sortType: ThingSortKey;
   thingFilters: Record<
     string,
-    Required<Pick<FilterType<OldImageType>, "categoryId" | "partition">>
-  >;
-  annotationFilters: Required<
-    Pick<FilterType<OldAnnotationType>, "categoryId">
+    Required<Pick<FilterType<Thing>, "categoryId" | "partition">>
   >;
   highlightedCategory: string | undefined;
-  selectedAnnotationIds: string[];
   activeKind: string;
   loadPercent: number;
   loadMessage: string;
@@ -93,18 +77,11 @@ export type ImageViewerState = {
   activeImageId?: string;
   activeAnnotationIds: Array<string>;
   previousImageId?: string;
-  annotationFilters: Required<
-    Pick<FilterType<OldAnnotationType>, "categoryId">
-  >;
   filters: Required<Pick<FilterType<AnnotationObject>, "categoryId">>;
   activeImageRenderedSrcs: Array<string>;
   imageOrigin: { x: number; y: number };
   workingAnnotationId: string | undefined;
   workingAnnotation: {
-    saved: OldDecodedAnnotationType | undefined;
-    changes: Partial<OldDecodedAnnotationType>;
-  };
-  workingAnnotationNew: {
     saved: DecodedAnnotationObject | undefined;
     changes: Partial<DecodedAnnotationObject>;
   };

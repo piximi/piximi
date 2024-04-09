@@ -10,26 +10,24 @@ import { DialogWithAction } from "components/dialogs";
 
 import { CustomListItemButton } from "components/list-items";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectActiveCategories,
-  selectActiveUnknownCategory,
-} from "store/data/selectors/reselectors";
 import { CategoryItemNew } from "components/list-items";
 import { CategoryItemMenuNew } from "components/menus";
-import {
-  projectSlice,
-  selectHighlightedImageCategory,
-  selectSelectedImageIds,
-} from "store/project";
+import { projectSlice } from "store/project";
+import { selectHighlightedCategory } from "store/project/selectors";
 import { selectActiveKindId } from "store/project/selectors";
 import { CreateCategoryDialogNew } from "components/dialogs/CreateCategoryDialogNew/CreateCategoryDialogNew";
-import { selectClassifierModelStatus } from "store/classifier";
 import { dataSlice } from "store/data/dataSlice";
 import { PredictionListItemsNew } from "components/list-items";
 import { isUnknownCategory } from "utils/common/helpers";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { HotkeyView } from "utils/common/enums";
 import { Category } from "store/data/types";
+import {
+  selectActiveCategories,
+  selectActiveSelectedThingIds,
+  selectActiveUnknownCategory,
+} from "store/project/reselectors";
+import { selectClassifierModelStatus } from "store/classifier/selectors";
 
 export const CategoriesListNew = () => {
   const dispatch = useDispatch();
@@ -39,9 +37,9 @@ export const CategoriesListNew = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category>();
   const [categoryIndex, setCategoryIndex] = useState("");
 
-  const highlightedCategory = useSelector(selectHighlightedImageCategory);
+  const highlightedCategory = useSelector(selectHighlightedCategory);
   const modelStatus = useSelector(selectClassifierModelStatus);
-  const selectedImageIds = useSelector(selectSelectedImageIds);
+  const selectedImageIds = useSelector(selectActiveSelectedThingIds);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -63,7 +61,7 @@ export const CategoriesListNew = () => {
       setSelectedCategory(category);
 
       dispatch(
-        projectSlice.actions.updateHighlightedImageCategory({
+        projectSlice.actions.updateHighlightedCategory({
           categoryId: category.id,
         })
       );
@@ -146,13 +144,13 @@ export const CategoriesListNew = () => {
     const allCategories = categories;
     if (categoryIndex.length === 0) {
       dispatch(
-        projectSlice.actions.updateHighlightedImageCategory({
+        projectSlice.actions.updateHighlightedCategory({
           categoryId: undefined,
         })
       );
     } else if (!Number.isNaN(+categoryIndex) && allCategories[+categoryIndex]) {
       dispatch(
-        projectSlice.actions.updateHighlightedImageCategory({
+        projectSlice.actions.updateHighlightedCategory({
           categoryId: allCategories[+categoryIndex].id,
         })
       );

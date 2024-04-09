@@ -13,7 +13,7 @@ import { ProjectDrawerNew, ImageToolDrawerNew } from "components/drawers";
 import { FallBackDialog } from "components/dialogs";
 import { dimensions } from "utils/common/constants";
 import { NewCustomTabSwitcher } from "components/styled-components";
-import { selectAllKindIds } from "store/data/selectors/selectors";
+import { selectAllKindIds } from "store/data/selectors";
 import { ImageGridNew } from "components/image-grids";
 import { ProjectAppBarNew } from "components/app-bars/";
 import { HotkeyView } from "utils/common/enums";

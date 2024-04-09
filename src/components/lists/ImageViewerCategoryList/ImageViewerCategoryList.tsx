@@ -5,12 +5,12 @@ import { ImageViewerCategoryItem } from "components/list-items/CategoryItem/Imag
 import { CollapsibleListItem } from "components/list-items/CollapsibleListItem";
 import { useDispatch, useSelector } from "react-redux";
 import { imageViewerSlice } from "store/imageViewer";
-import { selectImageViewerActiveKindsWithFullCat } from "store/data/selectors/reselectors";
-import { selectFilteredImageViewerCategoryIds } from "store/imageViewer/selectors/selectFilteredAnnotationCategoryIds";
 import { CreateCategoryDialogNew } from "components/dialogs/CreateCategoryDialogNew/CreateCategoryDialogNew";
 import { useDialogHotkey } from "hooks";
 import { HotkeyView } from "utils/common/enums";
 import { KindWithCategories } from "store/data/types";
+import { selectFilteredImageViewerCategoryIds } from "store/imageViewer/selectors";
+import { selectImageViewerActiveKindsWithFullCat } from "store/imageViewer/reselectors";
 
 export const ImageViewerCategoryList = () => {
   const dispatch = useDispatch();

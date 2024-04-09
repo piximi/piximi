@@ -19,14 +19,7 @@ import {
 
 import { useTranslation, useZoom } from "hooks";
 
-import {
-  imageViewerSlice,
-  selectStageHeight,
-  selectStageWidth,
-  selectZoomSelection,
-  selectZoomToolOptions,
-  selectStageScale,
-} from "store/imageViewer";
+import { imageViewerSlice } from "store/imageViewer";
 
 import {
   CheckboxCheckedIcon,
@@ -40,6 +33,13 @@ import { DividerHeader } from "components/styled-components";
 import { StageContext } from "contexts";
 import { selectActiveImage } from "store/imageViewer/reselectors";
 import { ZoomModeType } from "utils/annotator/enums";
+import {
+  selectStageHeight,
+  selectStageScale,
+  selectStageWidth,
+  selectZoomSelection,
+  selectZoomToolOptions,
+} from "store/imageViewer/selectors";
 
 //TODO: Slider
 

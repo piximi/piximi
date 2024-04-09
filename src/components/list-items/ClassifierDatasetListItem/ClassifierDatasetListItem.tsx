@@ -1,11 +1,9 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CollapsibleListItem } from "../CollapsibleListItem";
-import {
-  classifierSlice,
-  selectClassifierShuffleOptions,
-} from "store/classifier";
+import { classifierSlice } from "store/classifier";
 import { DatasetSettings } from "components/forms/DatasetSettings";
+import { selectClassifierShuffleOptions } from "store/classifier/selectors";
 
 export const ClassifierDatasetListItem = ({
   trainingPercentage,

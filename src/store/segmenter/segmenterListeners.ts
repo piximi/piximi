@@ -15,7 +15,7 @@ import {
   TypedAppStartListening,
 } from "store/types";
 import { DataState } from "store/types";
-import { segmenterSlice } from "../segmenterSlice";
+import { segmenterSlice } from "./segmenterSlice";
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data/dataSlice";

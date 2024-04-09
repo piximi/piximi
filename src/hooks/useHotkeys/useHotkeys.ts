@@ -2,13 +2,14 @@
 import hotkeys from "utils/common/hotkeys"; //{ HotkeysEvent, KeyHandler }
 import { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { selectHotkeyView } from "store/applicationSettings";
 import {
   HotkeyAvailableTags,
   HotkeyOptions,
   HotkeysEvent,
   HotkeyKeyHandler,
 } from "utils/common/types";
+import { selectHotkeyView } from "store/applicationSettings/selectors";
+import { HotkeyView } from "utils/common/enums";
 
 // We implement our own custom filter system.
 
@@ -89,8 +90,8 @@ export function useHotkeys(
       }
 
       if (
-        (hotkeyView.length && hotkeyView.includes(currentHotkeyView)) ||
-        (!hotkeyView.length && hotkeyView === currentHotkeyView)
+        (Array.isArray(hotkeyView) && hotkeyView.includes(currentHotkeyView)) ||
+        (!Array.isArray(hotkeyView) && hotkeyView === currentHotkeyView)
       ) {
         callback(keyboardEvent, hotkeysEvent);
         return true;

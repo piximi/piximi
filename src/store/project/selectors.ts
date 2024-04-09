@@ -1,50 +1,29 @@
+import { createSelector } from "@reduxjs/toolkit";
+import { difference } from "lodash";
 import { ProjectState } from "store/types";
 
-import { createSelector } from "@reduxjs/toolkit";
-import { ImageSortKey, ThingSortKey_new } from "utils/common/enums";
-import { sortTypeByKey } from "utils/common/helpers";
+import { ThingSortKey } from "utils/common/enums";
+import { Partition } from "utils/models/enums";
 
-export const selectImageSortKey = ({
+export const selectProject = ({
   project,
 }: {
   project: ProjectState;
-}): ImageSortKey => {
-  return project.imageSortKey;
+}): ProjectState => {
+  return project;
 };
 
-export const selectSortTypeNew = ({
-  project,
-}: {
-  project: ProjectState;
-}): ThingSortKey_new => {
-  return project.sortType_new;
+/*
+NAME
+*/
+
+export const selectProjectName = ({ project }: { project: ProjectState }) => {
+  return project.name;
 };
 
-export const selectActiveKindId = ({ project }: { project: ProjectState }) => {
-  return project.activeKind;
-};
-
-export const selectImageSortType = createSelector(
-  selectImageSortKey,
-  (sortKey) => {
-    return sortTypeByKey(sortKey);
-  }
-);
-export const selectHighlightedCategories = ({
-  project,
-}: {
-  project: ProjectState;
-}) => {
-  return project.highlightedCategory;
-};
-
-export const selectSelectedImageIds = ({
-  project,
-}: {
-  project: ProjectState;
-}): Array<string> => {
-  return project.selectedImageIds;
-};
+/*
+SELECTED THINGS
+*/
 
 export const selectSelectedThingIds = ({
   project,
@@ -54,29 +33,62 @@ export const selectSelectedThingIds = ({
   return project.selectedThingIds;
 };
 
-export const selectProject = ({
-  project,
-}: {
-  project: ProjectState;
-}): ProjectState => {
-  return project;
-};
-export const selectProjectName = ({ project }: { project: ProjectState }) => {
-  return project.name;
-};
-
-export const selectImageFilters = ({ project }: { project: ProjectState }) => {
-  return project.imageFilters;
-};
-
-export const selectAnnotationFilters = ({
+export const selectSelectedThingIdsLength = ({
   project,
 }: {
   project: ProjectState;
 }) => {
-  return project.annotationFilters;
+  return project.selectedThingIds.length;
 };
 
+/*
+SORT TYPE
+*/
+
+export const selectSortTypeNew = ({
+  project,
+}: {
+  project: ProjectState;
+}): ThingSortKey => {
+  return project.sortType;
+};
+
+/*
+ACTIVE KIND
+*/
+
+export const selectActiveKindId = ({ project }: { project: ProjectState }) => {
+  return project.activeKind;
+};
+
+/*
+HIGHLIGHTED CATEGORY
+*/
+
+export const selectHighlightedCategory = ({
+  project,
+}: {
+  project: ProjectState;
+}) => {
+  return project.highlightedCategory;
+};
+
+/*
+THING FILTERS
+*/
+
+export const selectThingFilters = ({ project }: { project: ProjectState }) => {
+  return project.thingFilters;
+};
+
+export const selectActiveThingFilters = ({
+  project,
+}: {
+  project: ProjectState;
+}) => {
+  const activeKind = project.activeKind;
+  return project.thingFilters[activeKind] ?? {};
+};
 export const selectActiveFilteredStateHasFilters = ({
   project,
 }: {
@@ -92,44 +104,28 @@ export const selectActiveFilteredStateHasFilters = ({
   return hasFilters;
 };
 
-export const selectImageFilteredState = createSelector(
-  selectImageFilters,
-  (imageFilters) => {
-    const hasImageFilters = Object.values(imageFilters).some((filters) => {
-      return filters.length > 0;
-    });
-    return hasImageFilters;
+export const selectUnfilteredActivePartitions = createSelector(
+  selectActiveThingFilters,
+  (thingFilters) => {
+    const filteredPartitions = thingFilters.partition;
+    const allPartitions = Object.values(Partition);
+    const unfilteredPartitions = difference(allPartitions, filteredPartitions);
+    return unfilteredPartitions;
   }
 );
 
-export const selectAnnotationFilteredState = createSelector(
-  selectAnnotationFilters,
-  (annotationFilters) => {
-    const hasAnnotationFilters = Object.values(annotationFilters).some(
-      (filters) => {
-        return filters.length > 0;
-      }
-    );
-    return hasAnnotationFilters;
-  }
-);
+/*
+LOAD PERCENT
+*/
 
-export const selectFilteredState = createSelector(
-  [selectImageFilteredState, selectAnnotationFilteredState],
-  (hasImageFilters, hasAnnotationFilters) => {
-    return { hasImageFilters, hasAnnotationFilters };
-  }
-);
-
-export const selectThingFilters = ({ project }: { project: ProjectState }) => {
-  return project.thingFilters;
+export const selectLoadPercent = ({ project }: { project: ProjectState }) => {
+  return project.loadPercent;
 };
 
-export const selectActiveThingFilters = ({
-  project,
-}: {
-  project: ProjectState;
-}) => {
-  const activeKind = project.activeKind;
-  return project.thingFilters[activeKind] ?? {};
+/*
+LOAD MESSAGE
+*/
+
+export const selectLoadMessage = ({ project }: { project: ProjectState }) => {
+  return project.loadMessage;
 };

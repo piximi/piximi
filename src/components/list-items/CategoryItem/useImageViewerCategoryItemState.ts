@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { imageViewerSlice } from "store/imageViewer";
-import { selectFilteredImageViewerCategoryIds } from "store/imageViewer/selectors/selectFilteredAnnotationCategoryIds";
-import { selectHighligtedIVCatogory } from "store/imageViewer/selectors/selectHighlightedAnnotationCategory";
-import { selectSelectedIVCategoryId } from "store/imageViewer/selectors/selectSelectedAnnotationCategoryId";
-import { selectActiveImageCategoryObjectCount } from "store/data/selectors/reselectors";
 import { isUnknownCategory } from "utils/common/helpers";
 import { Category } from "store/data/types";
+import {
+  selectFilteredImageViewerCategoryIds,
+  selectHighligtedIVCatogory,
+  selectSelectedIVCategoryId,
+} from "store/imageViewer/selectors";
+import { selectActiveImageCategoryObjectCount } from "store/imageViewer/reselectors";
 
 export const useImageViewerCategoryItemState = (
   category: Category,

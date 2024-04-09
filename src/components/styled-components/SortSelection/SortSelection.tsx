@@ -6,20 +6,19 @@ import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { projectSlice } from "store/project";
 
 import { selectSortTypeNew } from "store/project/selectors";
-import { ThingSortKey_new } from "utils/common/enums";
+import { ThingSortKey } from "utils/common/enums";
 
 export const SortSelection = () => {
   const dispatch = useDispatch();
 
   const selectedSortKey = useSelector(selectSortTypeNew);
-  const [selectedKey, setSelectedKey] =
-    useState<ThingSortKey_new>(selectedSortKey);
+  const [selectedKey, setSelectedKey] = useState<ThingSortKey>(selectedSortKey);
 
   const onSortKeyChange = (event: SelectChangeEvent<unknown>) => {
-    setSelectedKey(event.target.value as ThingSortKey_new);
+    setSelectedKey(event.target.value as ThingSortKey);
     dispatch(
       projectSlice.actions.setSortType_new({
-        sortType: event.target.value as ThingSortKey_new,
+        sortType: event.target.value as ThingSortKey,
       })
     );
   };
@@ -50,7 +49,7 @@ export const SortSelection = () => {
         label="Order by:"
         onChange={onSortKeyChange}
       >
-        {Object.values(ThingSortKey_new).map((sortType) => (
+        {Object.values(ThingSortKey).map((sortType) => (
           <MenuItem key={sortType} value={sortType} dense>
             {sortType}
           </MenuItem>

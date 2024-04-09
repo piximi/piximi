@@ -1,12 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
 import { ArchitectureSettings } from "components/forms";
 import { CollapsibleListItem } from "../CollapsibleListItem";
+import { segmenterSlice } from "store/segmenter";
+import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import {
-  segmenterSlice,
   selectSegmenterInputShape,
   selectSegmenterModelIdx,
-} from "store/segmenter";
-import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
+} from "store/segmenter/selectors";
 
 const modelOptions = availableSegmenterModels
   .map((m, i) => ({
