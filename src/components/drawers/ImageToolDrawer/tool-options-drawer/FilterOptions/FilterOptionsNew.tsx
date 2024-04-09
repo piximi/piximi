@@ -2,10 +2,10 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Stack } from "@mui/material";
 import { CategoryFilterListNew } from "./CategoryFilterListNew";
-import { projectSlice } from "store/slices/project";
-import { Partition } from "types";
-import { selectActiveThingFilters } from "store/slices/project/selectors";
+import { projectSlice } from "store/project";
+import { selectActiveThingFilters } from "store/project/selectors";
 import { PartitionFilterListNew } from "./PartitionFilterListNew";
+import { Partition } from "utils/models/enums";
 
 export const FilterOptionsNew = () => {
   const thingFilters = useSelector(selectActiveThingFilters);

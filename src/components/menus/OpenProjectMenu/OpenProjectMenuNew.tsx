@@ -4,9 +4,9 @@ import { Menu, MenuItem } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { HotkeyView } from "types";
-import { ExampleProjectDialogNew } from "components/dialogs/ExampleProjectDialog/ExampleProjectDialogNew";
-import { OpenProjectMenuItemNew } from "../OpenProjectMenuItem/OpenProjectMenuItemNew";
+import { HotkeyView } from "utils/common/enums";
+import { ExampleProjectDialogNew } from "components/dialogs";
+import { OpenProjectMenuItemNew } from "../OpenProjectMenuItem";
 
 type OpenProjectMenuProps = {
   anchorEl: HTMLElement | null;

@@ -1,18 +1,15 @@
-import { AnnotationTool } from "annotator-tools-new";
+import { AnnotationTool } from "utils/annotator/tools";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { annotatorSlice } from "store/slices/annotator";
-import { selectAnnotationSelectionMode } from "store/slices/annotator/selectors";
-import {
-  imageViewerSlice,
-  selectActiveImageId,
-} from "store/slices/imageViewer";
+import { annotatorSlice } from "store/annotator";
+import { selectAnnotationSelectionMode } from "store/annotator/selectors";
+import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
 import { RootState } from "store/rootReducer";
-import { AnnotationModeType, AnnotationStateType } from "types";
-import { selectCategoryById } from "store/slices/newData/selectors/selectors";
-import { selectActiveImage } from "store/slices/imageViewer/reselectors";
-import { selectSelectedIVCategoryId } from "store/slices/imageViewer/selectors/selectSelectedAnnotationCategoryId";
-import { selectFirstUnknownCategory } from "store/slices/newData/selectors/reselectors";
+import { selectCategoryById } from "store/data/selectors/selectors";
+import { selectActiveImage } from "store/imageViewer/reselectors";
+import { selectSelectedIVCategoryId } from "store/imageViewer/selectors/selectSelectedAnnotationCategoryId";
+import { selectFirstUnknownCategory } from "store/data/selectors/reselectors";
+import { AnnotationModeType, AnnotationStateType } from "utils/annotator/enums";
 
 export const useAnnotationStateNew = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();

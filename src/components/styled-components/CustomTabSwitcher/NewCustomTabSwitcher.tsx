@@ -1,7 +1,7 @@
 import React, { ReactElement, createContext, useState } from "react";
 import { Box, Tab, Tabs } from "@mui/material";
 
-export const TabContext = createContext<number>(0);
+const TabContext = createContext<number>(0);
 interface TabPanelProps {
   children?: ReactElement;
   index: number;

@@ -1,28 +1,27 @@
 //@ts-nocheck
-import hotkeys from "./hotkeys"; //{ HotkeysEvent, KeyHandler }
+import hotkeys from "utils/common/hotkeys"; //{ HotkeysEvent, KeyHandler }
 import { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { selectHotkeyView } from "store/slices/applicationSettings";
+import { selectHotkeyView } from "store/applicationSettings";
 import {
-  AvailableTags,
+  HotkeyAvailableTags,
+  HotkeyOptions,
   HotkeysEvent,
-  HotkeyView,
-  KeyHandler,
-  Options,
-} from "types";
+  HotkeyKeyHandler,
+} from "utils/common/types";
 
 // We implement our own custom filter system.
 
 const tagFilter = (
   { target }: KeyboardEvent,
-  enableOnTags?: AvailableTags[]
+  enableOnTags?: HotkeyAvailableTags[]
 ) => {
   const targetTagName = target && (target as HTMLElement).tagName;
 
   return Boolean(
     targetTagName &&
       enableOnTags &&
-      enableOnTags.includes(targetTagName as AvailableTags)
+      enableOnTags.includes(targetTagName as HotkeyAvailableTags)
   );
 };
 
@@ -32,28 +31,28 @@ const isKeyboardEventTriggeredByInput = (ev: KeyboardEvent) => {
 
 export function useHotkeys(
   keys: string,
-  callback: KeyHandler,
+  callback: HotkeyKeyHandler,
   hotkeyView: HotkeyView | Array<HotkeyView>,
-  options?: Options
+  options?: HotkeyOptions
 ): void;
 export function useHotkeys(
   keys: string,
-  callback: KeyHandler,
+  callback: HotkeyKeyHandler,
   hotkeyView: HotkeyView | Array<HotkeyView>,
   deps?: any[]
 ): void;
 export function useHotkeys(
   keys: string,
-  callback: KeyHandler,
+  callback: HotkeyKeyHandler,
   hotkeyView: HotkeyView | Array<HotkeyView>,
-  options?: Options,
+  options?: HotkeyOptions,
   deps?: any[]
 ): void;
 export function useHotkeys(
   keys: string,
   callback: () => void,
   hotkeyView: HotkeyView | Array<HotkeyView>,
-  options?: any[] | Options,
+  options?: any[] | HotkeyOptions,
   deps?: any[]
 ): void {
   if (options instanceof Array) {
@@ -69,7 +68,7 @@ export function useHotkeys(
     filterPreventDefault = true,
     enabled = true,
     enableOnContentEditable = false,
-  } = (options as Options) || {};
+  } = (options as HotkeyOptions) || {};
   const currentHotkeyView = useSelector(selectHotkeyView);
   // The return value of this callback determines if the browsers default behavior is prevented.
 
@@ -114,10 +113,10 @@ export function useHotkeys(
     // In this case keydown is likely undefined, so we set it to false,
     // since hotkeys sets `keydown` to true in absense of explicit setting.
     if (keyup && keydown !== true) {
-      (options as Options).keydown = false;
+      (options as HotkeyOptions).keydown = false;
     }
 
-    hotkeys(keys, (options as Options) || {}, memoisedCallback);
+    hotkeys(keys, (options as HotkeyOptions) || {}, memoisedCallback);
 
     return () => hotkeys.unbind(keys, memoisedCallback);
   }, [keyup, keydown, options, memoisedCallback, keys, enabled]);

@@ -19,13 +19,8 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 import { ImageMenu } from "components/menus";
 
-import {
-  imageViewerSlice,
-  selectActiveImageId,
-} from "store/slices/imageViewer";
-
-import { ImageType } from "types";
-import { NewImageType } from "types/ImageType";
+import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
+import { NewImageType } from "store/data/types";
 
 const NUM_BUFFERED_IMS = 20;
 const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 4);
@@ -33,7 +28,7 @@ const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 4);
 interface ImageListItemPropsNew {
   image: NewImageType;
   isActive: boolean;
-  onItemClick: (image: ImageType) => void;
+  onItemClick: (image: NewImageType) => void;
   onSecondaryClick: (target: HTMLElement) => void;
 }
 
@@ -53,7 +48,7 @@ export const ImageListNew = ({ images }: { images: Array<NewImageType> }) => {
   const activeImageId = useSelector(selectActiveImageId);
 
   const handleImageItemClick = React.useCallback(
-    (image: ImageType) => {
+    (image: NewImageType) => {
       if (image.id !== activeImageId!) {
         dispatch(
           imageViewerSlice.actions.setActiveImageIdNew({

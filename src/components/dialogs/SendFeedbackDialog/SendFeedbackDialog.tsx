@@ -4,10 +4,9 @@ import { DialogContentText, TextField } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { AlertType } from "types";
-
-import { createGitHubIssue } from "utils";
 import { DialogWithAction } from "../DialogWithAction";
+import { createGitHubIssue } from "utils/common/helpers";
+import { AlertType } from "utils/common/enums";
 
 type SendFeedbackDialogProps = {
   onClose: () => void;

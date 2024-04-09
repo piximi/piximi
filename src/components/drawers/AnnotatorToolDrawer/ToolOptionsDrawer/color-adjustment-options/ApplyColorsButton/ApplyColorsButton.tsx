@@ -1,12 +1,12 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { CustomListItemButton } from "components/list-items";
 
-import { selectImageStackImageIds } from "store/slices/imageViewer";
+import { selectImageStackImageIds } from "store/imageViewer";
 import { tensor2d } from "@tensorflow/tfjs";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
-import { selectActiveImageRawColor } from "store/slices/imageViewer/reselectors";
+import { dataSlice } from "store/data/dataSlice";
+import { selectActiveImageRawColor } from "store/imageViewer/reselectors";
 
 export const ApplyColorsButton = () => {
   const activeImageColors = useSelector(selectActiveImageRawColor);
@@ -24,7 +24,7 @@ export const ApplyColorsButton = () => {
       };
     });
 
-    dispatch(newDataSlice.actions.updateThings({ updates }));
+    dispatch(dataSlice.actions.updateThings({ updates }));
   };
 
   return (

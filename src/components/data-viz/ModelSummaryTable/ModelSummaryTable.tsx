@@ -8,7 +8,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { Model } from "utils/common/models/Model";
+import { Model } from "utils/models/Model/Model";
 
 interface Column {
   id: "layerName" | "outputShape" | "parameters" | "trainable";

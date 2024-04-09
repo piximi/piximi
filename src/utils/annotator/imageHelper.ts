@@ -2,15 +2,19 @@ import * as ImageJS from "image-js";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 
-import { DataArray } from "../common/image/imageHelper";
-import { decode } from "./rle/rle";
-import { pointsAreEqual } from "./point-operations/point-operations";
+import { decode } from "./rle";
+import { pointsAreEqual } from "./point-operations";
 
-import { Category, Point } from "types";
-import { NewDecodedAnnotationType } from "types/AnnotationType";
-import { logger } from "utils/common/logger";
-import { NewAnnotationType, NewImageType } from "types/ThingType";
-import { NewCategory } from "types/Category";
+import { logger } from "utils/common/helpers";
+import { Point } from "./types";
+import { DataArray } from "utils/file-io/types";
+import {
+  Category,
+  NewAnnotationType,
+  NewCategory,
+  NewDecodedAnnotationType,
+  NewImageType,
+} from "store/data/types";
 
 export const generatePoints = (buffer: Array<number> | undefined) => {
   if (!buffer) return undefined;
@@ -51,7 +55,7 @@ export const connectPoints = (coordinates: Array<Point>) => {
   return connectedPoints;
 };
 
-export const drawLine = (p1: Point, p2: Point) => {
+const drawLine = (p1: Point, p2: Point) => {
   const coords: Array<Point> = [];
 
   let x: number,

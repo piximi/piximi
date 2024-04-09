@@ -1,12 +1,11 @@
 import React from "react";
 import { batch, useDispatch } from "react-redux";
 
-import { SerializedFileType } from "types";
-
 import { BaseHorizCard } from "../BaseHorizCard";
-import { loadExampleImage } from "utils/common/image";
-import { dataConverter_v1v2 } from "utils/converters/dataConverter_v1v2";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { dataConverter_v1v2 } from "utils/file-io/converters/dataConverter_v1v2";
+import { dataSlice } from "store/data/dataSlice";
+import { SerializedFileType } from "utils/file-io/types";
+import { loadExampleImage } from "utils/file-io/loadExampleImage";
 
 type ExampleImageType = {
   name: string;
@@ -52,7 +51,7 @@ export const ExampleImageCardNew = ({
 
     batch(() => {
       dispatch(
-        newDataSlice.actions.initializeState({
+        dataSlice.actions.initializeState({
           data,
         })
       );

@@ -3,16 +3,17 @@ import { batch, useDispatch } from "react-redux";
 
 import { ListItemText, MenuItem } from "@mui/material";
 
-import { applicationSettingsSlice } from "store/slices/applicationSettings";
-import { classifierSlice } from "store/slices/classifier";
-import { projectSlice } from "store/slices/project";
-import { segmenterSlice } from "store/slices/segmenter";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { classifierSlice } from "store/classifier";
+import { projectSlice } from "store/project";
+import { segmenterSlice } from "store/segmenter";
 
-import { AlertStateType, AlertType } from "types";
-import { imageViewerSlice } from "store/slices/imageViewer";
-import { fListToStore } from "utils";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { imageViewerSlice } from "store/imageViewer";
+import { dataSlice } from "store/data/dataSlice";
 import { deserializeProject } from "utils/file-io/deserialize";
+import { fListToStore } from "utils/file-io/zarrStores";
+import { AlertState } from "utils/common/types";
+import { AlertType } from "utils/common/enums";
 
 //TODO: MenuItem??
 
@@ -62,7 +63,7 @@ export const OpenProjectMenuItemNew = ({
           dispatch(imageViewerSlice.actions.resetImageViewer());
           dispatch(projectSlice.actions.resetProject());
 
-          dispatch(newDataSlice.actions.initializeState({ data: res.data }));
+          dispatch(dataSlice.actions.initializeState({ data: res.data }));
           // loadPerecnt set to 1 here
           dispatch(
             projectSlice.actions.setProject({
@@ -88,7 +89,7 @@ export const OpenProjectMenuItemNew = ({
           process.env.REACT_APP_LOG_LEVEL === "1" &&
           console.error(err);
 
-        const warning: AlertStateType = {
+        const warning: AlertState = {
           alertType: AlertType.Warning,
           name: "Could not parse project file",
           description: `Error while parsing the project file: ${err.name}\n${err.message}`,

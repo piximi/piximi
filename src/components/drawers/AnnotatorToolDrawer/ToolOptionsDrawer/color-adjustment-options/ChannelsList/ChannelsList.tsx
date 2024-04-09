@@ -15,20 +15,17 @@ import {
 import { useLocalGlobalState } from "hooks";
 
 import { CollapsibleList } from "components/lists";
-import {
-  rgbToHex,
-  scaleUpRange,
-  scaleDownRange,
-  BitDepth,
-} from "utils/common/image";
 import { Palette } from "../Palette";
 
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
 import {
   selectActiveImage,
   selectActiveImageRawColor,
-} from "store/slices/imageViewer/reselectors";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+} from "store/imageViewer/reselectors";
+import { dataSlice } from "store/data/dataSlice";
+import { scaleDownRange, scaleUpRange } from "utils/common/helpers";
+import { BitDepth } from "utils/file-io/types";
+import { rgbToHex } from "utils/common/helpers";
 
 //TODO: Slider Components
 
@@ -42,7 +39,7 @@ export const ChannelsList = () => {
     dispatchState: dispatchActiveImageColors,
   } = useLocalGlobalState(
     selectActiveImageRawColor,
-    newDataSlice.actions.updateThings,
+    dataSlice.actions.updateThings,
     {
       range: {},
       visible: {},
@@ -88,7 +85,7 @@ export const ChannelsList = () => {
     newColors.visible[index] = enabled;
 
     dispatch(
-      newDataSlice.actions.updateThings({
+      dataSlice.actions.updateThings({
         updates: [{ id: activeImage!.id, colors: newColors }],
       })
     );

@@ -9,12 +9,12 @@ import { ZStackSlider } from "../ZStackSlider";
 import { ApplyColorsButton } from "../ApplyColorsButton";
 import { ChannelsList } from "../ChannelsList";
 
-import { generateDefaultColors } from "utils/common/image";
-import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { CustomListItemButton } from "components/list-items";
 import { CustomListItem } from "components/list-items/CustomListItem";
-import { selectLoadMessage } from "store/slices/project";
-import { selectActiveImage } from "store/slices/imageViewer/reselectors";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { selectLoadMessage } from "store/project";
+import { selectActiveImage } from "store/imageViewer/reselectors";
+import { dataSlice } from "store/data/dataSlice";
+import { generateDefaultColors } from "utils/common/tensorHelpers";
 
 //TODO: Check
 
@@ -31,7 +31,7 @@ export const ColorAdjustmentOptions = () => {
     const defaultColors = await generateDefaultColors(activeImage.data);
 
     dispatch(
-      newDataSlice.actions.updateThings({
+      dataSlice.actions.updateThings({
         updates: [{ id: activeImage.id!, colors: defaultColors }],
       })
     );

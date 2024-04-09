@@ -4,13 +4,12 @@ import { useSelector, useDispatch } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import {
-  setThemeMode,
+  applicationSettingsSlice,
   selectThemeMode,
-} from "store/slices/applicationSettings";
-
-import { ThemeMode } from "types";
+} from "store/applicationSettings";
 
 import { lightTheme, darkTheme } from "themes/muiTheme";
+import { ThemeMode } from "themes/enums";
 
 export const usePreferredMuiTheme = () => {
   const dispatch = useDispatch();
@@ -22,7 +21,7 @@ export const usePreferredMuiTheme = () => {
 
   useLayoutEffect(() => {
     dispatch(
-      setThemeMode({
+      applicationSettingsSlice.actions.setThemeMode({
         mode: prefersDarkMode ? ThemeMode.Dark : ThemeMode.Light,
       })
     );

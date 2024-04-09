@@ -15,7 +15,7 @@ import { CustomNumberTextField } from "..";
 
 import { DialogWithAction } from "components/dialogs";
 import { useDialog } from "hooks";
-import { Shape } from "types";
+import { Shape } from "store/data/types";
 
 enum ClearOptions {
   cancel,
@@ -23,7 +23,7 @@ enum ClearOptions {
   discard,
 }
 
-export type SelectedModelType = {
+type SelectedModelType = {
   name: string;
   trainable: boolean;
   requiredChannels?: number;

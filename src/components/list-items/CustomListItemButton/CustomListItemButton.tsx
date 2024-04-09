@@ -14,7 +14,7 @@ import {
 
 type TooltipType = Omit<TooltipProps, "children" | "title">;
 
-export type CustomListItemButtonProps = Pick<
+type CustomListItemButtonProps = Pick<
   ListItemButtonProps,
   | "alignItems"
   | "disabled"

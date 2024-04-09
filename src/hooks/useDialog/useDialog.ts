@@ -3,10 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 import {
   selectAlertState,
-  registerHotkeyView,
-  unregisterHotkeyView,
-} from "store/slices/applicationSettings";
-import { AlertType, HotkeyView } from "types";
+  applicationSettingsSlice,
+} from "store/applicationSettings";
+import { AlertType, HotkeyView } from "utils/common/enums";
 
 export const useDialog = (closeOnError: boolean = true) => {
   const [open, setOpen] = useState(false);
@@ -46,12 +45,17 @@ export const useDialogHotkey = (
   } = useDialog(closeOnError);
 
   const onOpen = () => {
-    view && dispatch(registerHotkeyView({ hotkeyView: view }));
+    view &&
+      dispatch(
+        applicationSettingsSlice.actions.registerHotkeyView({
+          hotkeyView: view,
+        })
+      );
     onDialogOpen();
   };
 
   const onClose = () => {
-    view && dispatch(unregisterHotkeyView({}));
+    view && dispatch(applicationSettingsSlice.actions.unregisterHotkeyView({}));
     onDialogClose();
   };
 

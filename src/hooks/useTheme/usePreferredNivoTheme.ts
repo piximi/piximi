@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Theme } from "@nivo/core";
 
-import { selectThemeMode } from "store/slices/applicationSettings";
+import { selectThemeMode } from "store/applicationSettings";
 
 import { getNivoTheme } from "themes/nivoTheme";
 

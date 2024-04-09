@@ -2,8 +2,7 @@ import React from "react";
 
 import { Menu, MenuItem, MenuList, PopoverReference } from "@mui/material";
 import LabelIcon from "@mui/icons-material/Label";
-
-import { Category } from "types";
+import { NewCategory } from "store/data/types";
 
 type ImageCategoryMenuProps = {
   anchorEl?: HTMLElement;
@@ -13,7 +12,7 @@ type ImageCategoryMenuProps = {
   anchorPosition?: { top: number; left: number };
   open: boolean;
   container?: Element | null;
-  categories: Category[];
+  categories: NewCategory[];
   onUpdateCategories: (categoryId: string) => void;
 };
 
@@ -51,7 +50,7 @@ export const ImageCategoryMenu = ({
       container={container}
     >
       <MenuList dense variant="menu">
-        {categories.map((category: Category) => (
+        {categories.map((category: NewCategory) => (
           <MenuItem
             key={category.id}
             onClick={() => handleUpdateCategoriesAndClose(category.id)}

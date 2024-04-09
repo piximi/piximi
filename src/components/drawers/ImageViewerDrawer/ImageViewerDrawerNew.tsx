@@ -16,11 +16,11 @@ import { ImageViewerAppBarNew } from "components/app-bars";
 //import { selectCreatedAnnotationCategories } from "store/slices/data";
 
 import { BaseAppDrawer } from "../BaseAppDrawer";
-import { selectImageViewerImages } from "store/slices/imageViewer/reselectors";
+import { selectImageViewerImages } from "store/imageViewer/reselectors";
 import { ImageListNew } from "components/lists/ImageList";
 import { ImageViewerCategoryList } from "components/lists/ImageViewerCategoryList";
 import { useDialogHotkey } from "hooks";
-import { HotkeyView } from "types";
+import { HotkeyView } from "utils/common/enums";
 import { CreateKindDialog } from "components/dialogs";
 
 export const ImageViewerDrawerNew = () => {

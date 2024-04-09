@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { selectCategoriesDictionary } from "store/slices/newData/selectors/selectors";
-import { selectSortTypeNew } from "store/slices/project/selectors";
-import { ThingSortKey_new } from "types/ImageSortType";
-import { ThingType } from "types/ThingType";
+import { selectCategoriesDictionary } from "store/data/selectors/selectors";
+import { ThingType } from "store/data/types";
+import { selectSortTypeNew } from "store/project/selectors";
+import { ThingSortKey_new } from "utils/common/enums";
 
 export const useSortFunctionNew = () => {
   const sortType = useSelector(selectSortTypeNew);

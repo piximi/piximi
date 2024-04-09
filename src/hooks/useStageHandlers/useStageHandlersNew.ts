@@ -11,28 +11,27 @@ import {
 } from "hooks";
 
 import {
-  setSelectedAnnotationIds,
+  imageViewerSlice,
   selectSelectedAnnotationIds,
   //selectWorkingAnnotation,
-} from "store/slices/imageViewer";
+} from "store/imageViewer";
 
 import {
   selectAnnotationSelectionMode,
   selectToolType,
-} from "store/slices/annotator/selectors";
+} from "store/annotator/selectors";
 
-import { annotatorSlice } from "store/slices/annotator";
+import { annotatorSlice } from "store/annotator";
 
-import {
-  Point,
-  ToolType,
-  AnnotationStateType,
-  AnnotationModeType,
-} from "types";
-
-import { AnnotationTool, ObjectAnnotationTool } from "annotator-tools-new";
 import { usePointerToolNew } from "hooks/usePointerTool";
-import { logger } from "utils/common/logger";
+import { logger } from "utils/common/helpers";
+import { Point } from "utils/annotator/types";
+import {
+  AnnotationModeType,
+  AnnotationStateType,
+  ToolType,
+} from "utils/annotator/enums";
+import { AnnotationTool, ObjectAnnotationTool } from "utils/annotator/tools";
 //import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/selectWorkingAnnotation";
 
 const transformerClassName = "Transformer";
@@ -74,7 +73,7 @@ export const useStageHandlersNew = (
 
   const deselectAllAnnotations = useCallback(() => {
     dispatch(
-      setSelectedAnnotationIds({
+      imageViewerSlice.actions.setSelectedAnnotationIds({
         annotationIds: [],
         workingAnnotationId: undefined,
       })

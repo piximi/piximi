@@ -2,7 +2,7 @@ import { TextField, Box } from "@mui/material";
 
 import { DialogWithAction } from "../DialogWithAction";
 import { useCategoryValidation } from "hooks/useCategoryValidation/useCategoryValidation";
-import { ColorIconNew } from "components/controls/ColorIcon/ColorIconNew";
+import { ColorIconNew } from "components/controls";
 
 type CategoryDialogProps = {
   onClose: () => void;

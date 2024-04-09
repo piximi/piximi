@@ -2,29 +2,32 @@ import React, { ReactElement, useEffect, useState } from "react";
 import { cellPaintingAnnotations } from "data/exampleImages";
 import colorImage from "images/cell-painting.png";
 import { RootState } from "./rootReducer";
-import { classifierSlice } from "./slices/classifier";
-import { annotatorSlice } from "./slices/annotator";
-import { applicationSettingsSlice } from "./slices/applicationSettings";
-import { imageViewerSlice } from "./slices/imageViewer";
-import { newDataSlice } from "./slices/newData/newDataSlice";
-import { projectSlice } from "./slices/project";
-import { segmenterSlice } from "./slices/segmenter";
-import { loadExampleImage } from "utils/common/image";
-import { Partition, SerializedFileType } from "types";
-import {
-  Category,
-  Kind,
-  NewCategory,
-  UNKNOWN_CATEGORY_NAME,
-} from "types/Category";
-import { NewAnnotationType } from "types/AnnotationType";
-import { ImageType, NewImageType } from "types/ImageType";
+import { classifierSlice } from "./classifier";
+import { annotatorSlice } from "./annotator";
+import { applicationSettingsSlice } from "./applicationSettings";
+import { imageViewerSlice } from "./imageViewer";
+import { dataSlice } from "./data/dataSlice";
+import { projectSlice } from "./project";
+import { segmenterSlice } from "./segmenter";
+
 import { DeferredEntityState } from "./entities";
 import { initStore } from "./productionStore";
 import { Provider } from "react-redux";
-import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/colorPalette";
 import { generateUUID } from "utils/common/helpers";
-import { logger } from "utils/common/logger";
+import { logger } from "utils/common/helpers";
+import { Partition } from "utils/models/enums";
+import { SerializedFileType } from "utils/file-io/types";
+import { loadExampleImage } from "utils/file-io/loadExampleImage";
+import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
+import {
+  Category,
+  ImageType,
+  Kind,
+  NewAnnotationType,
+  NewCategory,
+  NewImageType,
+} from "./data/types";
+import { UNKNOWN_CATEGORY_NAME } from "./data/constants";
 
 const loadState = async () => {
   const preloadedState: RootState = {
@@ -32,7 +35,7 @@ const loadState = async () => {
     annotator: annotatorSlice.getInitialState(),
     applicationSettings: applicationSettingsSlice.getInitialState(),
     imageViewer: imageViewerSlice.getInitialState(),
-    newData: newDataSlice.getInitialState(),
+    newData: dataSlice.getInitialState(),
     project: projectSlice.getInitialState(),
     segmenter: segmenterSlice.getInitialState(),
   };

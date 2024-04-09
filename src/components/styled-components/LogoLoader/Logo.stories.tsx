@@ -4,11 +4,8 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { LogoLoader } from "./LogoLoader";
 import { Box, Button, Slider } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectClassifierModelStatus,
-  classifierSlice,
-} from "store/slices/classifier";
-import { ModelStatus } from "types/ModelType";
+import { selectClassifierModelStatus, classifierSlice } from "store/classifier";
+import { ModelStatus } from "utils/models/enums";
 
 const Controller = ({
   width,

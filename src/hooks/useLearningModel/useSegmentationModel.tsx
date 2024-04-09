@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Shape } from "store/data/types";
 import {
   segmenterSlice,
   selectSegmenterModel,
   selectSegmenterModelStatus,
-} from "store/slices/segmenter";
-import { Shape } from "types";
-import { ModelStatus, ModelTask } from "types/ModelType";
-import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
-import { Model } from "utils/common/models/Model";
+} from "store/segmenter";
+import { Segmenter } from "utils/models/AbstractSegmenter/AbstractSegmenter";
+import { ModelStatus, ModelTask } from "utils/models/enums";
+import { Model } from "utils/models/Model/Model";
 
 export const useSegmentationModel = () => {
   const dispatch = useDispatch();

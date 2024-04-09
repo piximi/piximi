@@ -6,9 +6,9 @@ import {
 } from "components/styled-components/inputs";
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
-import { Partition } from "types";
-import { ThingType } from "types/ThingType";
+import { dataSlice } from "store/data/dataSlice";
+import { ThingType } from "store/data/types";
+import { Partition } from "utils/models/enums";
 
 export const ThingInformationTable = ({
   thing,
@@ -25,7 +25,7 @@ export const ThingInformationTable = ({
   const handleImageNameChange = useCallback(
     (name: string) => {
       dispatch(
-        newDataSlice.actions.updateThingName({
+        dataSlice.actions.updateThingName({
           id: thing.id,
           name,
           isPermanent: true,
@@ -38,7 +38,7 @@ export const ThingInformationTable = ({
   const handleCategorySelect = useCallback(
     (categoryId: string) => {
       dispatch(
-        newDataSlice.actions.updateThings({
+        dataSlice.actions.updateThings({
           updates: [
             {
               id: thing.id,
@@ -56,7 +56,7 @@ export const ThingInformationTable = ({
   const handlePartitionSelect = useCallback(
     (partition: Partition) => {
       dispatch(
-        newDataSlice.actions.updateThings({
+        dataSlice.actions.updateThings({
           updates: [{ id: thing.id, partition }],
           isPermanent: true,
         })

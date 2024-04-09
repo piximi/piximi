@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectAlertState } from "store/slices/applicationSettings";
+import { selectAlertState } from "store/applicationSettings";
 import {
   classifierSlice,
   selectClassifierFitOptions,
@@ -8,11 +8,13 @@ import {
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
   selectClassifierTrainingPercentage,
-} from "store/slices/classifier";
-import { selectActiveLabeledThingsCount } from "store/slices/newData/selectors/reselectors";
-import { AlertStateType, AlertType } from "types";
-import { ModelStatus } from "types/ModelType";
-import { TrainingCallbacks } from "utils/common/models/Model";
+} from "store/classifier";
+import { selectActiveLabeledThingsCount } from "store/data/selectors/reselectors";
+import { AlertType } from "utils/common/enums";
+import { logger } from "utils/common/helpers";
+import { AlertState } from "utils/common/types";
+import { ModelStatus } from "utils/models/enums";
+import { TrainingCallbacks } from "utils/models/types";
 
 const historyItems = [
   "loss",
@@ -49,7 +51,7 @@ export const useClassificationModelAgain = () => {
   const modelHistory = useSelector((state) => {
     return selectClassifierHistory(state, historyItems);
   });
-  const noLabeledThingsAlert: AlertStateType = {
+  const noLabeledThingsAlert: AlertState = {
     alertType: AlertType.Info,
     name: "No labeled images",
     description: "Please label images to train a model.",
@@ -148,26 +150,26 @@ export const useClassificationModelAgain = () => {
       const trainingSize = Math.round(labeledThingsCount * trainingPercentage);
       const validationSize = labeledThingsCount - trainingSize;
 
-      console.log(
-        `Set training size to Round[${labeledThingsCount} * ${trainingPercentage}] = ${trainingSize}`,
-        `; val size to ${labeledThingsCount} - ${trainingSize} = ${validationSize}`
+      logger(
+        `Set training size to Round[${labeledThingsCount} * ${trainingPercentage}] = ${trainingSize}
+        ; val size to ${labeledThingsCount} - ${trainingSize} = ${validationSize}`
       );
 
-      console.log(
+      logger(
         `Set training batches per epoch to RoundUp[${trainingSize} / ${
           fitOptions.batchSize
         }] = ${Math.ceil(trainingSize / fitOptions.batchSize)}`
       );
 
-      console.log(
+      logger(
         `Set validation batches per epoch to RoundUp[${validationSize} / ${
           fitOptions.batchSize
         }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`
       );
 
-      console.log(
-        `Training last batch size is ${trainingSize % fitOptions.batchSize}`,
-        `; validation is ${validationSize % fitOptions.batchSize}`
+      logger(
+        `Training last batch size is ${trainingSize % fitOptions.batchSize}
+        ; validation is ${validationSize % fitOptions.batchSize}`
       );
     }
   }, [fitOptions.batchSize, trainingPercentage, labeledThingsCount]);

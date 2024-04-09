@@ -8,12 +8,11 @@ import {
   selectImageSelectionColor,
   selectSelectedImageBorderWidth,
   selectTileSize,
-} from "store/slices/applicationSettings";
-import { selectCategoryProperty } from "store/slices/newData/selectors/reselectors";
-import { NewAnnotationType } from "types/AnnotationType";
-import { NewImageType } from "types/ImageType";
-import { Partition } from "types";
+} from "store/applicationSettings";
+import { selectCategoryProperty } from "store/data/selectors/reselectors";
 import { isUnknownCategory } from "utils/common/helpers";
+import { Partition } from "utils/models/enums";
+import { NewAnnotationType, NewImageType } from "store/data/types";
 
 type ProjectGridItemProps = {
   selected: boolean;

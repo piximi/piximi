@@ -22,14 +22,15 @@ import {
   SelectAll as SelectAllIcon,
 } from "@mui/icons-material";
 
-import { ImageCategoryMenu } from "../../menus/ImageCategoryMenu";
+import { ImageCategoryMenu } from "components/menus";
 import { TooltipTitle } from "components/tooltips";
 
-import { unregisterHotkeyView } from "store/slices/applicationSettings";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { HotkeyView, Partition } from "types";
-import { selectActiveCategories } from "store/slices/newData/selectors/reselectors";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { HotkeyView } from "utils/common/enums";
+import { selectActiveCategories } from "store/data/selectors/reselectors";
+import { dataSlice } from "store/data/dataSlice";
+import { Partition } from "utils/models/enums";
 
 type GridItemActionBarProps = {
   allSelected: boolean;
@@ -78,7 +79,7 @@ export const GridItemActionBarNew = ({
       partition: Partition.Unassigned,
     }));
     dispatch(
-      newDataSlice.actions.updateThings({
+      dataSlice.actions.updateThings({
         updates,
         isPermanent: true,
       })
@@ -88,7 +89,9 @@ export const GridItemActionBarNew = ({
   const handleNavigateImageViewer = () => {
     handleOpenImageViewer();
     dispatch(
-      unregisterHotkeyView({ hotkeyView: HotkeyView.MainImageGridAppBar })
+      applicationSettingsSlice.actions.unregisterHotkeyView({
+        hotkeyView: HotkeyView.MainImageGridAppBar,
+      })
     );
     navigate("/imageviewer");
   };

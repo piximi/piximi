@@ -4,13 +4,11 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import Image from "image-js";
 
-import { selectImageOrigin } from "store/slices/imageViewer";
-
-import { Shape } from "types";
+import { selectImageOrigin } from "store/imageViewer";
 
 import { hexToRGBA, colorOverlayROI, encode } from "utils/annotator";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
-import { NewDecodedAnnotationType } from "types/AnnotationType";
+import { dataSlice } from "store/data/dataSlice";
+import { NewDecodedAnnotationType, Shape } from "store/data/types";
 
 type AnnotationProps = {
   annotation: NewDecodedAnnotationType;
@@ -110,7 +108,7 @@ export const AnnotationNew = ({
     };
 
     dispatch(
-      newDataSlice.actions.updateThings({
+      dataSlice.actions.updateThings({
         updates: [tempUpdated],
       })
     );

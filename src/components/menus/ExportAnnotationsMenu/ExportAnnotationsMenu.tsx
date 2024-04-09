@@ -14,17 +14,18 @@ import {
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
 } from "utils/annotator/imageHelper";
 
-import { selectProjectName } from "store/slices/project";
+import { selectProjectName } from "store/project";
 
 import { ExportAnnotationsDialog } from "components/dialogs";
 
-import { AnnotationExportType, HotkeyView } from "types";
-import { selectImageViewerImages } from "store/slices/imageViewer/reselectors";
+import { HotkeyView } from "utils/common/enums";
+import { selectImageViewerImages } from "store/imageViewer/reselectors";
 import {
   selectAllObjectCategories,
   selectAllObjectKinds,
   selectAllObjects,
-} from "store/slices/newData/selectors/reselectors";
+} from "store/data/selectors/reselectors";
+import { AnnotationExportType } from "utils/file-io/enums";
 
 //TODO: MenuItem??
 

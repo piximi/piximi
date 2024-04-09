@@ -1,17 +1,18 @@
 import React from "react";
 
-import { Checkbox, Chip } from "@mui/material";
+import { Checkbox } from "@mui/material";
 import {
   Label as LabelIcon,
   LabelOutlined as LabelOutlinedIcon,
   MoreHoriz as MoreHorizIcon,
 } from "@mui/icons-material";
 
-import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { CustomListItemButton } from "../CustomListItemButton";
-import { NewCategory } from "types/Category";
 import { useImageViewerCategoryItemState } from "./useImageViewerCategoryItemState";
-import { CategoryItemMenuNew } from "components/menus/CategoryItemMenu/CategoryItemMenuNew";
+import { CategoryItemMenuNew } from "components/menus";
+import { CountChip } from "components/styled-components";
+import { APPLICATION_COLORS } from "utils/common/constants";
+import { NewCategory } from "store/data/types";
 
 type ImageViewerCategoryItemProps = {
   category: NewCategory;
@@ -72,19 +73,9 @@ export const ImageViewerCategoryItem = ({
         secondaryIcon={<MoreHorizIcon />} //TODO: Fix Display -- on load buttons offset, then move after interaction
         onSecondary={handleOpenMenu}
         additionalComponent={
-          <Chip
-            label={objectCount}
-            size="small"
-            sx={(theme) => {
-              return {
-                height: "1.5em",
-                minWidth: "2.5em",
-                borderWidth: "2px",
-                fontSize: "0.875rem",
-                color: theme.palette.text.primary,
-                backgroundColor: APPLICATION_COLORS.highlightColor,
-              };
-            }}
+          <CountChip
+            count={objectCount}
+            backgroundColor={APPLICATION_COLORS.highlightColor}
           />
         }
         dense

@@ -1,9 +1,8 @@
-import { NewCategory } from "types/Category";
-import { NewAnnotationType, NewImageType } from "types/ThingType";
 import * as ImageJS from "image-js";
 import { decode, hexToRGBA } from "utils/annotator";
 import saveAs from "file-saver";
 import JSZip from "jszip";
+import { NewAnnotationType, NewCategory, NewImageType } from "store/data/types";
 
 export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
   images: Array<NewImageType>,

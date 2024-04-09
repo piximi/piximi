@@ -8,8 +8,8 @@ import {
 import { TwoDataPlot, ModelSummaryTable } from "components/data-viz";
 import { DialogTransitionSlide } from "components/dialogs";
 import { FitSegmenterDialogAppBar, AlertBar } from "components/app-bars";
-import { ModelStatus } from "types/ModelType";
 import { useSegmentationModelAgain } from "hooks/useLearningModel/useSegmentationModelAgain";
+import { ModelStatus } from "utils/models/enums";
 
 type FitSegmenterDialogProps = {
   closeDialog: () => void;

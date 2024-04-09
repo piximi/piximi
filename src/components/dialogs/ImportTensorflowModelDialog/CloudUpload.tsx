@@ -14,10 +14,10 @@ import {
 import LanguageIcon from "@mui/icons-material/Language";
 
 import { useDebounce } from "hooks";
-import { Shape } from "types";
-import { ModelTask } from "types/ModelType";
-import { Model } from "utils/common/models/Model";
-import { UploadedClassifier } from "utils/common/models/UploadedClassifier/UploadedClassifier";
+import { Model } from "utils/models/Model";
+import { UploadedClassifier } from "utils/models/UploadedClassifier/UploadedClassifier";
+import { ModelTask } from "utils/models/enums";
+import { Shape } from "store/data/types";
 
 export const CloudUpload = ({
   modelTask,

@@ -4,7 +4,7 @@ import { MenuItem, ListItemText } from "@mui/material";
 
 import { useDialog } from "hooks";
 
-import { ExampleImageDialogNew } from "components/dialogs/ExampleImageDialog/ExampleImageDialogNew";
+import { ExampleImageDialogNew } from "components/dialogs";
 
 //TODO: MenuItem??
 

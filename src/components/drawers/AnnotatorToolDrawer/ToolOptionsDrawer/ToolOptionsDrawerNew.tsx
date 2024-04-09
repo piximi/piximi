@@ -13,9 +13,7 @@ import { ThresholdAnnotationOptions } from "./ThresholdAnnotationOptions";
 import { InformationBox } from "./InformationBox";
 import { BaseOptions } from "./BaseOptions";
 
-import { selectToolType } from "store/slices/annotator/selectors";
-
-import { ToolType } from "types";
+import { selectToolType } from "store/annotator/selectors";
 
 import {
   ColorAdjustmentIcon,
@@ -32,6 +30,7 @@ import {
 } from "icons";
 import { PointerSelectionOptionsNew } from "./PointerSelectionOptions";
 import { ColorAdjustmentOptions } from "./color-adjustment-options";
+import { ToolType } from "utils/annotator/enums";
 
 type OperationType = {
   icon: ReactElement;

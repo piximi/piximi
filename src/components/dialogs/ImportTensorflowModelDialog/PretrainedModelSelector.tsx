@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { Model } from "utils/common/models/Model";
+import { Model } from "utils/models/Model/Model";
 import { range } from "lodash";
 
 export const PretrainedModelSelector = ({

@@ -1,21 +1,25 @@
 import { encode, maskFromPoints } from "utils/annotator";
-import { generateUUID } from "utils/common/helpers";
-import { logger } from "utils/common/logger";
-import { getPropertiesFromImage } from "utils/common/image/imageHelper";
-import { UNKNOWN_ANNOTATION_CATEGORY_COLOR } from "utils/common/colorPalette";
+import { generateUUID, getPropertiesFromImage } from "utils/common/helpers";
+import { logger } from "utils/common/helpers";
 
-import { RequireOnly } from "types/utility/PartialBy";
+import { Partition } from "utils/models/enums";
 import {
-  SerializedCOCOFileType,
   SerializedCOCOAnnotationType,
   SerializedCOCOCategoryType,
+  SerializedCOCOFileType,
   SerializedCOCOImageType,
-  Point,
-  Partition,
+} from "../../types";
+import { Point } from "utils/annotator/types";
+import { UNKNOWN_ANNOTATION_CATEGORY_COLOR } from "utils/common/constants";
+import { RequireOnly } from "utils/common/types";
+import {
+  Kind,
+  NewAnnotationType,
+  NewCategory,
+  NewImageType,
   Shape,
-} from "types";
-import { Kind, NewCategory, UNKNOWN_CATEGORY_NAME } from "types/Category";
-import { NewImageType, NewAnnotationType } from "types/ThingType";
+} from "store/data/types";
+import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 
 type KindMap = Record<
   string,

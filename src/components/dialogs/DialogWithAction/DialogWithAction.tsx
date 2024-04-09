@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useHotkeys } from "hooks";
-import { HotkeyView } from "types";
+import { HotkeyView } from "utils/common/enums";
 import { ReactElement } from "react";
 
 type DialogWithActionProps = Omit<

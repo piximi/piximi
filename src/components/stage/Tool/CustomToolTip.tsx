@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { ReactElement, useState } from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardActionArea,
@@ -9,30 +9,6 @@ import {
 } from "@mui/material";
 
 import { ToolBarToolTitle } from "./ToolBarToolTitle";
-
-type TooltipCardProps = {
-  name: string;
-  description: string | ReactElement;
-  onClose: () => void;
-};
-
-export const TooltipCard = ({
-  name,
-  description,
-  onClose,
-}: TooltipCardProps) => {
-  return (
-    <Card sx={{ width: 210 }} variant="outlined">
-      <CardActionArea>
-        <CardContent>
-          <Typography variant="body2" color="textSecondary" component="span">
-            {description}
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
-};
 
 export const CustomToolTip = ({
   children,

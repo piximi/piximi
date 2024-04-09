@@ -1,7 +1,7 @@
 import React from "react";
 
 import { BaseMenu } from "../BaseMenu";
-import { OpenImageMenuItem } from "./OpenImageMenuItem";
+import { OpenImageMenuItemNew } from "./OpenImageMenuItemNew";
 import { OpenExampleImageMenuItemNew } from "./OpenExampleImageMenuItemNew";
 
 type OpenImageMenuProps = {
@@ -29,7 +29,7 @@ export const OpenImageMenuNew = ({
         horizontal: "left",
       }}
     >
-      <OpenImageMenuItem onCloseMenu={onCloseMenu} />
+      <OpenImageMenuItemNew onCloseMenu={onCloseMenu} />
 
       <OpenExampleImageMenuItemNew onCloseMenu={onCloseMenu} />
     </BaseMenu>

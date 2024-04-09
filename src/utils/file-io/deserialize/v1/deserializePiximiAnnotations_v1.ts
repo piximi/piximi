@@ -1,13 +1,11 @@
-import {
-  AnnotationType,
-  Category,
-  SerializedAnnotationType,
-  SerializedFileType,
-  SerializedAnnotatorImageType,
-  ImageType,
-} from "types";
 import { generateUUID } from "utils/common/helpers";
-import { logger } from "utils/common/logger";
+import { logger } from "utils/common/helpers";
+import {
+  SerializedAnnotationType,
+  SerializedAnnotatorImageType,
+  SerializedFileType,
+} from "../../types";
+import { AnnotationType, Category, ImageType } from "store/data/types";
 
 export const deserializeAnnotations_v1 = (
   serializedAnnotations: Array<SerializedAnnotationType>,

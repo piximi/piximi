@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { dataSlice } from "store/data/dataSlice";
 import { CategoryDialog } from "../CategoryDialog";
 
 type CreateCategoriesDialogProps = {
@@ -19,7 +19,7 @@ export const CreateCategoryDialogNew = ({
 
   const handleConfirm = (name: string, color: string, kind: string) => {
     dispatch(
-      newDataSlice.actions.createCategory({
+      dataSlice.actions.createCategory({
         name,
         color,
         kind: kind,

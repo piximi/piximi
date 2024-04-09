@@ -2,8 +2,8 @@ import React from "react";
 
 import { AppBarOffset, DividerHeader } from "components/styled-components";
 import { BaseAppDrawer } from "../BaseAppDrawer";
-import { FileListNew } from "components/lists/FileList/FileListNew";
-import { CategoriesListNew } from "components/lists/CategoriesList/CategoriesListNew";
+import { FileListNew } from "components/lists";
+import { CategoriesListNew } from "components/lists";
 import { ModelTaskSection } from "./ModelTaskSection";
 
 export const ProjectDrawerNew = () => {

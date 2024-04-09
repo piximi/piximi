@@ -4,7 +4,7 @@ import { Grid, TextField } from "@mui/material";
 
 import { useHotkeys } from "hooks";
 
-import { HotkeyView } from "types";
+import { HotkeyView } from "utils/common/enums";
 import { DialogWithAction } from "../DialogWithAction";
 
 type ExportAnnotationsDialogProps = {
