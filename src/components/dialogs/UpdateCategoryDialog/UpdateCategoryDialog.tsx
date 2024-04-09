@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { dataSlice } from "store/data/dataSlice";
 import { CategoryDialog } from "../CategoryDialog";
-import { NewCategory } from "types/Category";
+import { NewCategory } from "store/data/types";
 
 type UpdateCategoriesDialogProps = {
   onClose: () => void;
@@ -20,7 +20,7 @@ export const UpdateCategoryDialogNew = ({
 
   const handleConfirm = (name: string, color: string, kind: string) => {
     dispatch(
-      newDataSlice.actions.updateCategory({
+      dataSlice.actions.updateCategory({
         updates: {
           id: category.id,
           changes: {

@@ -1,20 +1,22 @@
-import {
-  Classifier,
-  Colors,
-  CropOptions,
-  CropSchema,
-  FitOptions,
-  LossFunction,
-  Metric,
-  OptimizationAlgorithm,
-  PreprocessOptions,
-  RescaleOptions,
-} from "types";
 import { Group } from "zarr";
 import { getAttr, getDatasetSelection, getGroup } from "../helpers";
 import { tensor2d } from "@tensorflow/tfjs";
-import { initialState as initialClassifierState } from "store/slices/classifier/classifierSlice";
-import { initialState as initialSegmenterState } from "store/slices/segmenter/segmenterSlice";
+import { initialState as initialClassifierState } from "store/classifier/classifierSlice";
+import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
+import {
+  CropOptions,
+  FitOptions,
+  PreprocessOptions,
+  RescaleOptions,
+} from "utils/models/types";
+import {
+  CropSchema,
+  LossFunction,
+  Metric,
+  OptimizationAlgorithm,
+} from "utils/models/enums";
+import { ClassifierState } from "store/types";
+import { Colors } from "utils/common/types";
 
 export const deserializeColorsGroup = async (
   colorsGroup: Group
@@ -56,7 +58,7 @@ export const deserializeColorsGroup = async (
   };
 };
 
-export const deserializeFitOptionsGroup = async (
+const deserializeFitOptionsGroup = async (
   fitOptionsGroup: Group
 ): Promise<FitOptions> => {
   const epochs = (await getAttr(fitOptionsGroup, "epochs")) as number;
@@ -74,7 +76,7 @@ type OptSettings = {
   lossFunction: LossFunction;
   fitOptions: FitOptions;
 };
-export const deserializeOptimizerSettingsGroup = async (
+const deserializeOptimizerSettingsGroup = async (
   optSettingsGroup: Group
 ): Promise<OptSettings> => {
   const fitOptions = await deserializeFitOptionsGroup(optSettingsGroup);
@@ -103,7 +105,7 @@ export const deserializeOptimizerSettingsGroup = async (
   };
 };
 
-export const deserializeCropOptionsGroup = async (
+const deserializeCropOptionsGroup = async (
   cropOptionsGroup: Group
 ): Promise<CropOptions> => {
   const cropSchema = (await getAttr(
@@ -158,7 +160,7 @@ const deserializePreprocessOptionsGroup = async (
 
 export const deserializeClassifierGroup = async (
   classifierGroup: Group
-): Promise<Classifier> => {
+): Promise<ClassifierState> => {
   // present, but not used currently
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const modelName = await getAttr(classifierGroup, "name");

@@ -3,24 +3,23 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import {
-  imageViewerSlice,
-  selectActiveImageId,
-} from "store/slices/imageViewer";
+import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
 
 import { deserializeCOCOFile } from "utils/file-io/deserialize";
 import { deserializePiximiAnnotations } from "utils/file-io/deserialize";
-
-import { validateFileType, ProjectFileType } from "types/runtime";
-import { SerializedCOCOFileType, SerializedFileType } from "types";
 import {
   selectObjectCategoryDict,
   selectObjectKindDict,
   selectSplitThingDict,
-} from "store/slices/newData/selectors/reselectors";
+} from "store/data/selectors/reselectors";
 
-import { CATEGORY_COLORS } from "utils/common/colorPalette";
-import { newDataSlice } from "store/slices/newData";
+import { newDataSlice } from "store/data";
+import {
+  SerializedCOCOFileType,
+  SerializedFileType,
+} from "utils/file-io/types";
+import { ProjectFileType, validateFileType } from "utils/file-io/runtimeTypes";
+import { CATEGORY_COLORS } from "utils/common/constants";
 
 //TODO: MenuItem??
 

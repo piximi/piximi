@@ -11,8 +11,6 @@ import { QuickSelection } from "./QuickSelection/QuickSelection";
 import { PenSelection } from "./PenSelection";
 import { ZoomSelection } from "./ZoomSelection";
 
-import { ToolType } from "types";
-
 import {
   Tool,
   ColorAnnotationTool,
@@ -25,7 +23,8 @@ import {
   QuickAnnotationTool,
   RectangularAnnotationTool,
   SelectionTool,
-} from "annotator-tools-new";
+} from "utils/annotator/tools";
+import { ToolType } from "utils/annotator/enums";
 
 type SelectionProps = {
   tool: Tool;

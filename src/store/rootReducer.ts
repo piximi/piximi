@@ -1,11 +1,11 @@
 import { combineReducers } from "redux";
-import { applicationSettingsSlice } from "store/slices/applicationSettings";
-import { classifierSlice } from "store/slices/classifier";
-import { imageViewerSlice } from "store/slices/imageViewer";
-import { projectSlice } from "store/slices/project";
-import { segmenterSlice } from "store/slices/segmenter";
-import { annotatorSlice } from "store/slices/annotator";
-import { newDataSlice } from "./slices/newData/newDataSlice";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { classifierSlice } from "store/classifier";
+import { imageViewerSlice } from "store/imageViewer";
+import { projectSlice } from "store/project";
+import { segmenterSlice } from "store/segmenter";
+import { annotatorSlice } from "store/annotator";
+import { dataSlice } from "./data/dataSlice";
 
 const reducers = {
   classifier: classifierSlice.reducer,
@@ -14,7 +14,7 @@ const reducers = {
   project: projectSlice.reducer,
   applicationSettings: applicationSettingsSlice.reducer,
   annotator: annotatorSlice.reducer,
-  newData: newDataSlice.reducer,
+  newData: dataSlice.reducer,
 };
 
 export const rootReducer = combineReducers(reducers);

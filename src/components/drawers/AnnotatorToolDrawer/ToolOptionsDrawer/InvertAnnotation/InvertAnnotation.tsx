@@ -5,15 +5,12 @@ import { List, SvgIcon } from "@mui/material";
 
 import { useAnnotationToolNew, useTranslation } from "hooks";
 
-import {
-  imageViewerSlice,
-  selectWorkingAnnotation,
-} from "store/slices/imageViewer";
+import { imageViewerSlice, selectWorkingAnnotation } from "store/imageViewer";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 import { encode } from "utils/annotator";
-import { CustomListItemButton } from "components/list-items/CustomListItemButton";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { CustomListItemButton } from "components/list-items";
+import { dataSlice } from "store/data/dataSlice";
 
 //TODO: change to listItem
 
@@ -39,7 +36,7 @@ export const InvertAnnotation = () => {
     const encodedMask = encode(invertedMask);
 
     dispatch(
-      newDataSlice.actions.updateThings({
+      dataSlice.actions.updateThings({
         updates: [
           {
             id: workingAnnotation.id,

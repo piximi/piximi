@@ -9,12 +9,12 @@ import {
   SaveFittedModelDialog,
 } from "components/dialogs";
 
-import { HotkeyView } from "types";
-import { ModelStatus, ModelTask } from "types/ModelType";
+import { HotkeyView } from "utils/common/enums";
 import { ModelIOButtonGroup } from "components/list-items/ModelIOButtonGroup/ModelIOButtonGroup";
 import { ModelExecButtonGroup } from "components/list-items/ClassifierExecListItem/ModelExecButtonGroup";
 import { useSegmentationModel } from "hooks/useLearningModel/useSegmentationModel";
-import { FitSegmenterDialogNew } from "components/dialogs/FitSegmenterDialog/FitSegmentationDialogNew";
+import { FitSegmenterDialogNew } from "components/dialogs";
+import { ModelStatus, ModelTask } from "utils/models/enums";
 
 export const SegmenterListNew = () => {
   const {

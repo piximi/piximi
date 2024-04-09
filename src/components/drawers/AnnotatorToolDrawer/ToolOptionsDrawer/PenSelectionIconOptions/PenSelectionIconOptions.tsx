@@ -2,8 +2,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
-import { annotatorSlice } from "store/slices/annotator";
-import { selectPenSelectionBrushSize } from "store/slices/annotator/selectors";
+import { annotatorSlice } from "store/annotator";
+import { selectPenSelectionBrushSize } from "store/annotator/selectors";
 import { BaseOptions } from "../BaseOptions";
 
 //TODO: Slider

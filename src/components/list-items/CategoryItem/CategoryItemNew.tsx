@@ -1,17 +1,17 @@
 import React from "react";
 
-import { Chip } from "@mui/material";
 import {
   Label as LabelIcon,
   MoreHoriz as MoreHorizIcon,
 } from "@mui/icons-material";
 
-import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { CustomListItemButton } from "../CustomListItemButton";
-import { NewCategory } from "types/Category";
 import { useSelector } from "react-redux";
-import { selectNumThingsByCatAndKind } from "store/slices/newData/selectors/reselectors";
-import { selectActiveKindId } from "store/slices/project/selectors";
+import { selectNumThingsByCatAndKind } from "store/data/selectors/reselectors";
+import { selectActiveKindId } from "store/project/selectors";
+import { CountChip } from "components/styled-components";
+import { APPLICATION_COLORS } from "utils/common/constants";
+import { NewCategory } from "store/data/types";
 
 type CategoryItemProps = {
   category: NewCategory;
@@ -53,19 +53,9 @@ export const CategoryItemNew = ({
       secondaryIcon={<MoreHorizIcon />}
       onSecondary={handleOpenMenu}
       additionalComponent={
-        <Chip
-          label={numThings(category.id, activeKind)}
-          size="small"
-          sx={(theme) => {
-            return {
-              height: "1.5em",
-              minWidth: "2.5em",
-              borderWidth: "2px",
-              fontSize: "0.875rem",
-              color: theme.palette.text.primary,
-              backgroundColor: APPLICATION_COLORS.highlightColor,
-            };
-          }}
+        <CountChip
+          count={numThings(category.id, activeKind)}
+          backgroundColor={APPLICATION_COLORS.highlightColor}
         />
       }
       dense

@@ -6,8 +6,8 @@ import { KeyboardArrowRight as KeyboardArrowRightIcon } from "@mui/icons-materia
 import { useMenu } from "hooks";
 
 import { BaseMenu } from "../BaseMenu";
-import { OpenProjectMenuNew } from "../OpenProjectMenu/OpenProjectMenuNew";
-import { OpenImageMenuNew } from "../OpenImageMenu/OpenImageMenuNew";
+import { OpenProjectMenuNew } from "../OpenProjectMenu";
+import { OpenImageMenuNew } from "../OpenImageMenu";
 
 type OpenMenuProps = {
   anchorEl: HTMLElement | null;

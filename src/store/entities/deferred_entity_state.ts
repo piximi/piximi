@@ -1,6 +1,6 @@
 import type { DeferredEntityState } from "./models";
 
-export function getInitialEntityState<V>(): DeferredEntityState<V> {
+function getInitialEntityState<V>(): DeferredEntityState<V> {
   return {
     ids: [],
     entities: {},

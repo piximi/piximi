@@ -1,17 +1,15 @@
 import { encode, maskFromPoints } from "utils/annotator";
 
+import { generateUUID } from "utils/common/helpers";
+import { logger } from "utils/common/helpers";
 import {
-  Category,
-  SerializedCOCOFileType,
   SerializedCOCOAnnotationType,
   SerializedCOCOCategoryType,
+  SerializedCOCOFileType,
   SerializedCOCOImageType,
-  Point,
-  AnnotationType,
-  ImageType,
-} from "types";
-import { generateUUID } from "utils/common/helpers";
-import { logger } from "utils/common/logger";
+} from "../../types";
+import { Point } from "utils/annotator/types";
+import { AnnotationType, Category, ImageType } from "store/data/types";
 
 /*
 We want to match incoming categories to existing categories, if their names are the same,

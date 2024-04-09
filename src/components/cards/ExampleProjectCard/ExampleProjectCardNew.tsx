@@ -1,14 +1,15 @@
 import React from "react";
 import { batch, useDispatch } from "react-redux";
-import { applicationSettingsSlice } from "store/slices/applicationSettings";
-import { classifierSlice } from "store/slices/classifier";
-import { projectSlice } from "store/slices/project";
-import { AlertStateType, AlertType } from "types";
-import { PseudoFileList, fListToStore } from "utils";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { classifierSlice } from "store/classifier";
+import { projectSlice } from "store/project";
+import { PseudoFileList, fListToStore } from "utils/file-io/zarrStores";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import { BaseHorizCard } from "../BaseHorizCard";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { dataSlice } from "store/data/dataSlice";
 import { deserializeProject } from "utils/file-io/deserialize";
+import { AlertState } from "utils/common/types";
+import { AlertType } from "utils/common/enums";
 
 type ExampleProjectType = {
   name: string;
@@ -131,7 +132,7 @@ export const ExampleProjectCardNew = ({
 
       batch(() => {
         // loadPercent will be set to 1 here
-        dispatch(newDataSlice.actions.initializeState({ data }));
+        dispatch(dataSlice.actions.initializeState({ data }));
         dispatch(projectSlice.actions.setProject({ project }));
 
         dispatch(
@@ -149,7 +150,7 @@ export const ExampleProjectCardNew = ({
         process.env.REACT_APP_LOG_LEVEL === "1" &&
         console.error(err);
 
-      const warning: AlertStateType = {
+      const warning: AlertState = {
         alertType: AlertType.Warning,
         name: "Could not parse project file",
         description: `Error while parsing the project file: ${error.name}\n${error.message}`,

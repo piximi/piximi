@@ -1,21 +1,27 @@
-import { LoadCB, Partition, Project } from "types";
-import { CustomStore } from "utils/common/zarrStores";
 import { Group, openGroup } from "zarr";
 
-import { logger } from "utils/common/logger";
-import { initialState as initialProjectState } from "store/slices/project/projectSlice";
+import { logger } from "utils/common/helpers";
+import { initialState as initialProjectState } from "store/project/projectSlice";
 import {
   deserializeClassifierGroup,
   deserializeColorsGroup,
   deserializeSegmenterGroup,
 } from "../common/groupDeserializers";
 import { getAttr, getDataset, getGroup } from "../helpers";
-import { NewAnnotationType, NewImageType } from "types/ThingType";
-import { Kind, NewCategory } from "types/Category";
 import { RawArray } from "zarr/types/rawArray";
-import { BitDepth, createRenderedTensor } from "utils/common/image/imageHelper";
 import { tensor4d } from "@tensorflow/tfjs";
 import { DeferredEntityState } from "store/entities";
+import { Partition } from "utils/models/enums";
+import { createRenderedTensor } from "utils/common/tensorHelpers";
+import { BitDepth, LoadCB } from "utils/file-io/types";
+import { CustomStore } from "utils/file-io/zarrStores";
+import { ProjectState } from "store/types";
+import {
+  Kind,
+  NewAnnotationType,
+  NewCategory,
+  NewImageType,
+} from "store/data/types";
 
 const deserializeThingGroup = async (
   name: string,
@@ -200,7 +206,7 @@ const deserializeProjectGroup = async (
   projectGroup: Group,
   loadCb: LoadCB
 ): Promise<{
-  project: Project;
+  project: ProjectState;
   data: {
     things: DeferredEntityState<NewImageType | NewAnnotationType>;
     categories: DeferredEntityState<NewCategory>;

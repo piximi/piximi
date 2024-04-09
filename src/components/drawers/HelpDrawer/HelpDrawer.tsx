@@ -9,11 +9,11 @@ import { Help as HelpIcon, Close as CloseIcon } from "@mui/icons-material";
 import { AppBarOffset } from "../../styled-components/AppBarOffset/AppBarOffset";
 import { HelpContent, HelpContentType } from "./HelpContent/HelpContent";
 
-import { applicationSettingsSlice } from "store/slices/applicationSettings";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { AlertType } from "types";
-import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { CustomListItemButton } from "components/list-items";
 import { CustomListItem } from "components/list-items/CustomListItem";
+import { AlertType } from "utils/common/enums";
 
 export const HelpDrawer = () => {
   const dispatch = useDispatch();
@@ -98,6 +98,6 @@ export const HelpDrawer = () => {
   );
 };
 
-export const FallBackHelpDrawer = () => {
+const FallBackHelpDrawer = () => {
   return <CustomListItem primaryText="Help" icon={<HelpIcon />} />;
 };

@@ -10,15 +10,14 @@ import {
 
 import { useTranslation } from "hooks";
 
-import { classifierSlice } from "store/slices/classifier";
-import { Partition } from "types";
+import { classifierSlice } from "store/classifier";
 
-import { ModelStatus } from "types/ModelType";
 import { CustomListItemButton } from "../CustomListItemButton";
-import { projectSlice } from "store/slices/project";
+import { projectSlice } from "store/project";
 import { ListItemHoldButton } from "../ListItemHoldButton";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
-import { selectActiveKindId } from "store/slices/project/selectors";
+import { dataSlice } from "store/data/dataSlice";
+import { selectActiveKindId } from "store/project/selectors";
+import { ModelStatus, Partition } from "utils/models/enums";
 
 export const PredictionListItemsNew = () => {
   const dispatch = useDispatch();
@@ -51,7 +50,7 @@ export const PredictionListItemsNew = () => {
 
   const clearPredictions = () => {
     dispatch(
-      newDataSlice.actions.clearPredictions({
+      dataSlice.actions.clearPredictions({
         kind: activeKind,
         isPermanent: true,
       })
@@ -76,7 +75,7 @@ export const PredictionListItemsNew = () => {
   };
   const acceptPredictions = () => {
     dispatch(
-      newDataSlice.actions.acceptPredictions({
+      dataSlice.actions.acceptPredictions({
         kind: activeKind,
         isPermanent: true,
       })

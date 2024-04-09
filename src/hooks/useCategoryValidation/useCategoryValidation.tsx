@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import {
   selectActiveCategoryColors,
   selectActiveCategoryNames,
-} from "store/slices/newData/selectors/reselectors";
+} from "store/data/selectors/reselectors";
 
 export function useCategoryValidation({
   initName,
@@ -38,7 +38,6 @@ export function useCategoryValidation({
     (categoryName: string) => {
       let validInput = true;
       let helperText = " ";
-      //console.log(unavailableNames);
 
       if (categoryName === "") {
         helperText = "Please type a category name.";

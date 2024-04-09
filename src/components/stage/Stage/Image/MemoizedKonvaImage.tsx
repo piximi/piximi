@@ -1,8 +1,7 @@
 import React, { forwardRef, memo } from "react";
 import * as ReactKonva from "react-konva";
 import Konva from "konva";
-
-import { Point } from "types";
+import { Point } from "utils/annotator/types";
 
 interface KonvaImageProps {
   image: HTMLImageElement;

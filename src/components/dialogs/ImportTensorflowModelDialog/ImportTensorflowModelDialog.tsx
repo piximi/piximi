@@ -24,15 +24,14 @@ import { LocalFileUpload } from "./LocalFileUpload";
 import { PretrainedModelSelector } from "./PretrainedModelSelector";
 import { CloudUpload } from "./CloudUpload";
 
-import { HotkeyView, Shape } from "types";
-import {
-  ModelTask,
-  availableClassifierModels,
-  availableSegmenterModels,
-} from "types/ModelType";
-import { Model } from "utils/common/models/Model";
+import { Model } from "utils/models/Model/Model";
 import { ModelFormatSelection } from "./ModelFormatSelection";
-import { Cellpose } from "utils/common/models/Cellpose/Cellpose";
+import { CellposeNew } from "utils/models/Cellpose";
+import { ModelTask } from "utils/models/enums";
+import { availableClassifierModels } from "utils/models/availableClassificationModels";
+import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
+import { HotkeyView } from "utils/common/enums";
+import { Shape } from "store/data/types";
 
 const ToolTipTab = (
   props: TabProps & {
@@ -101,7 +100,7 @@ export const ImportTensorflowModelDialog = ({
   const onModelChange = useCallback((model: Model | undefined) => {
     setSelectedModel(model);
     // TODO - segmenter: generalize to model.cloud
-    if (model instanceof Cellpose) {
+    if (model instanceof CellposeNew) {
       setCloudWarning(true);
     } else {
       setCloudWarning(false);

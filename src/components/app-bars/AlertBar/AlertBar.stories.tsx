@@ -1,7 +1,8 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { AlertBar } from "./AlertBar";
-import { AlertStateType, AlertType } from "types";
+import { AlertState } from "utils/common/types";
+import { AlertType } from "utils/common/enums";
 
 const meta: Meta<typeof AlertBar> = {
   title: "Common/AlertBar",
@@ -12,7 +13,7 @@ const meta: Meta<typeof AlertBar> = {
 export default meta;
 type Story = StoryObj<typeof AlertBar>;
 
-const errorAlert: AlertStateType = {
+const errorAlert: AlertState = {
   alertType: AlertType.Error,
   name: "Test Error Alert",
   description: "This is just a test.",
@@ -21,7 +22,7 @@ const errorAlert: AlertStateType = {
   visible: true,
 };
 
-const warningAlert: AlertStateType = {
+const warningAlert: AlertState = {
   alertType: AlertType.Warning,
   name: "Test Warning Alert",
   description: "This is just a test.",
@@ -30,7 +31,7 @@ const warningAlert: AlertStateType = {
   visible: true,
 };
 
-const infoAlert: AlertStateType = {
+const infoAlert: AlertState = {
   alertType: AlertType.Info,
   name: "Test Info Alert",
   description: "This is just a test.",

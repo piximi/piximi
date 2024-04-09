@@ -2,7 +2,8 @@ import { Box } from "@mui/material";
 import { ImageShapeDialogNew } from "components/dialogs";
 import { useDndFileDrop, useUploadNew } from "hooks";
 import React, { ReactElement, useCallback, useState } from "react";
-import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
+import { ImageShapeEnum } from "utils/file-io/enums";
+import { ImageShapeInfo } from "utils/file-io/types";
 
 export const DropBox = ({ children }: { children: ReactElement }) => {
   const [imageShape, setImageShape] = useState<ImageShapeInfo>({

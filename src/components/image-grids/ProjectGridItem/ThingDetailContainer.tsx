@@ -6,7 +6,7 @@ import {
 } from "@mui/icons-material";
 import { NewItemDetailTooltip } from "./NewItemDetailTooltip";
 import { ThingDetailList } from "./ThingDetailList";
-import { ThingType } from "types/ThingType";
+import { ThingType } from "store/data/types";
 
 export const ThingDetailContainer = ({
   position,

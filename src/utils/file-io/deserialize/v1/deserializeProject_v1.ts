@@ -1,31 +1,23 @@
 import { tensor4d } from "@tensorflow/tfjs";
 import { openGroup, Group } from "zarr";
 
-import {
-  createRenderedTensor,
-  BitDepth,
-} from "../../../common/image/imageHelper";
-import {
-  Project,
-  AnnotationType,
-  Partition,
-  Category,
-  ImageType,
-  LoadCB,
-  UNKNOWN_IMAGE_CATEGORY_ID,
-} from "types";
+import { initialState as initialProjectState } from "store/project/projectSlice";
 
-import { initialState as initialProjectState } from "store/slices/project/projectSlice";
-
-import { CustomStore } from "utils/common/zarrStores";
 import { RawArray } from "zarr/types/rawArray";
-import { logger } from "utils/common/logger";
+import { logger } from "utils/common/helpers";
 import { getAttr, getDataset, getDatasetSelection, getGroup } from "../helpers";
 import {
   deserializeClassifierGroup,
   deserializeColorsGroup,
   deserializeSegmenterGroup,
 } from "../common/groupDeserializers";
+import { Partition } from "utils/models/enums";
+import { createRenderedTensor } from "utils/common/tensorHelpers";
+import { BitDepth, LoadCB } from "utils/file-io/types";
+import { CustomStore } from "utils/file-io/zarrStores";
+import { ProjectState } from "store/types";
+import { AnnotationType, Category, ImageType } from "store/data/types";
+import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 /*
   ====================
@@ -198,7 +190,7 @@ const deserializeProjectGroup = async (
   projectGroup: Group,
   loadCb: LoadCB
 ): Promise<{
-  project: Project;
+  project: ProjectState;
   data: {
     images: Array<ImageType>;
     annotations: Array<AnnotationType>;

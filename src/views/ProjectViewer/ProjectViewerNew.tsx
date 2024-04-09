@@ -6,21 +6,17 @@ import { Box, CssBaseline } from "@mui/material";
 
 import { useErrorHandler, useUnloadConfirmation } from "hooks";
 
-import {
-  registerHotkeyView,
-  unregisterHotkeyView,
-} from "store/slices/applicationSettings";
-import { projectSlice } from "store/slices/project";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { projectSlice } from "store/project";
 
-import { HotkeyView } from "types";
-import { ImageToolDrawerNew } from "components/drawers/ImageToolDrawer/ImageToolDrawerNew";
+import { ProjectDrawerNew, ImageToolDrawerNew } from "components/drawers";
 import { FallBackDialog } from "components/dialogs";
-import { dimensions } from "utils/common";
-import { NewCustomTabSwitcher } from "components/styled-components/CustomTabSwitcher/NewCustomTabSwitcher";
-import { selectAllKindIds } from "store/slices/newData/selectors/selectors";
-import { ImageGridNew } from "components/image-grids/ImageGrid/ImageGridNew";
-import { ProjectDrawerNew } from "components/drawers/ProjectDrawer/ProjectDrawerNew";
-import { ProjectAppBarNew } from "components/app-bars/ProjectAppBar/ProjectAppBarNew";
+import { dimensions } from "utils/common/constants";
+import { NewCustomTabSwitcher } from "components/styled-components";
+import { selectAllKindIds } from "store/data/selectors/selectors";
+import { ImageGridNew } from "components/image-grids";
+import { ProjectAppBarNew } from "components/app-bars/";
+import { HotkeyView } from "utils/common/enums";
 
 export const ProjectViewerNew = () => {
   const dispatch = useDispatch();
@@ -35,9 +31,17 @@ export const ProjectViewerNew = () => {
   };
 
   useEffect(() => {
-    dispatch(registerHotkeyView({ hotkeyView: HotkeyView.ProjectView }));
+    dispatch(
+      applicationSettingsSlice.actions.registerHotkeyView({
+        hotkeyView: HotkeyView.ProjectView,
+      })
+    );
     return () => {
-      dispatch(unregisterHotkeyView({ hotkeyView: HotkeyView.ProjectView }));
+      dispatch(
+        applicationSettingsSlice.actions.unregisterHotkeyView({
+          hotkeyView: HotkeyView.ProjectView,
+        })
+      );
     };
   }, [dispatch]);
 

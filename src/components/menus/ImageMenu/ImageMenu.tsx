@@ -6,7 +6,7 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { imageViewerSlice } from "store/slices/imageViewer";
+import { imageViewerSlice } from "store/imageViewer";
 
 // import { ImageType } from "types";
 
@@ -15,9 +15,9 @@ import { imageViewerSlice } from "store/slices/imageViewer";
 //   saveAnnotationsAsLabeledSemanticSegmentationMasks,
 //   saveAnnotationsAsBinaryInstanceSegmentationMasks,
 // } from "utils/annotator/imageHelper";
-import { projectSlice } from "store/slices/project";
-import { NewImageType } from "types/ImageType";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { projectSlice } from "store/project";
+import { dataSlice } from "store/data/dataSlice";
+import { NewImageType } from "store/data/types";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
@@ -41,7 +41,7 @@ export const ImageMenu = ({
   ) => {
     if (!selectedImage) return;
     dispatch(
-      newDataSlice.actions.deleteThings({
+      dataSlice.actions.deleteThings({
         thingIds: selectedImage.containing,
         disposeColorTensors: true,
       })
@@ -67,7 +67,7 @@ export const ImageMenu = ({
         projectSlice.actions.deselectImages({ ids: [selectedImage.id] })
       );
       dispatch(
-        newDataSlice.actions.deleteThings({
+        dataSlice.actions.deleteThings({
           thingIds: [selectedImage.id],
           disposeColorTensors: true,
         })

@@ -1,9 +1,10 @@
-import { Kind, NewCategory } from "types/Category";
 import {
+  Kind,
   NewAnnotationType,
+  NewCategory,
   NewImageType,
-  NewSerializedAnnotationType,
-} from "types/ThingType";
+} from "store/data/types";
+import { NewSerializedAnnotationType } from "../types";
 
 export const serializePiximiAnnotations = (
   images: Array<NewImageType>,

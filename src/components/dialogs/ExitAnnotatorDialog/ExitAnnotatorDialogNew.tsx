@@ -1,10 +1,7 @@
 import { batch, useDispatch, useSelector } from "react-redux";
 import { DialogWithAction } from "../DialogWithAction";
-import {
-  imageViewerSlice,
-  selectActiveImageId,
-} from "store/slices/imageViewer";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
+import { dataSlice } from "store/data/dataSlice";
 
 type ExitAnnotatorDialogProps = {
   onReturnToProject: () => void;
@@ -30,7 +27,7 @@ export const ExitAnnotatorDialogNew = ({
           execSaga: true,
         })
       );
-      dispatch(newDataSlice.actions.reconcile({ keepChanges: true }));
+      dispatch(dataSlice.actions.reconcile({ keepChanges: true }));
       dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
     });
 
@@ -46,7 +43,7 @@ export const ExitAnnotatorDialogNew = ({
           execSaga: true,
         })
       );
-      dispatch(newDataSlice.actions.reconcile({ keepChanges: false }));
+      dispatch(dataSlice.actions.reconcile({ keepChanges: false }));
     });
 
     onReturnToProject();

@@ -1,11 +1,10 @@
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { applicationSettingsSlice } from "store/slices/applicationSettings";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { newDataSlice } from "store/slices/newData/newDataSlice";
-import { uploadImages } from "utils/common/image/upload";
-
-import { getImageFileInformation, ImageShapeEnum } from "utils/common/image";
+import { dataSlice } from "store/data/dataSlice";
+import { ImageShapeEnum } from "utils/file-io/enums";
+import { getImageFileInformation, uploadImages } from "utils/file-io/helpers";
 
 export const useUploadNew = (
   setOpenDimensionsDialogBox: (flag: boolean) => void
@@ -37,7 +36,7 @@ export const useUploadNew = (
             );
           } else {
             dispatch(
-              newDataSlice.actions.addThings({
+              dataSlice.actions.addThings({
                 things: res.imagesToUpload,
                 isPermanent: true,
               })
@@ -62,7 +61,7 @@ export const useUploadNew = (
             );
           } else {
             dispatch(
-              newDataSlice.actions.addThings({
+              dataSlice.actions.addThings({
                 things: res.imagesToUpload,
                 isPermanent: true,
               })

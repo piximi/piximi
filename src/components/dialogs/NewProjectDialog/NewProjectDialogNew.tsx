@@ -4,11 +4,11 @@ import { useHotkeys } from "hooks";
 
 import { TextField } from "@mui/material";
 
-import { classifierSlice } from "store/slices/classifier";
-import { projectSlice } from "store/slices/project";
-import { HotkeyView } from "types";
+import { classifierSlice } from "store/classifier";
+import { projectSlice } from "store/project";
+import { HotkeyView } from "utils/common/enums";
 import { DialogWithAction } from "../DialogWithAction";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { dataSlice } from "store/data/dataSlice";
 
 type NewProjectDialogProps = {
   onClose: () => void;
@@ -37,7 +37,7 @@ export const NewProjectDialogNew = ({
         name: projectName,
       })
     );
-    dispatch(newDataSlice.actions.resetData());
+    dispatch(dataSlice.actions.resetData());
 
     dispatch(classifierSlice.actions.resetClassifier());
 

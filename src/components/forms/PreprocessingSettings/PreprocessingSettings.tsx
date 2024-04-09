@@ -8,7 +8,8 @@ import {
 } from "@mui/material";
 import { CustomNumberTextField } from "../CustomNumberTextField";
 import { CustomFormSelectField } from "../CustomFormSelectField";
-import { CropOptions, CropSchema, RescaleOptions } from "types";
+import { CropOptions, RescaleOptions } from "utils/models/types";
+import { CropSchema } from "utils/models/enums";
 
 type PreprocessingSettingsProps = {
   cropOptions: CropOptions;

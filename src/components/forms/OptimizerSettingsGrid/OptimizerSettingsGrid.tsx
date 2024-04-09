@@ -1,13 +1,8 @@
 import { Grid, SelectChangeEvent } from "@mui/material";
 
 import { CustomNumberTextField, CustomFormSelectField } from "components/forms";
-
-import {
-  CompileOptions,
-  FitOptions,
-  LossFunction,
-  OptimizationAlgorithm,
-} from "types";
+import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
+import { CompileOptions, FitOptions } from "utils/models/types";
 
 type OptimizerSettingsGridProps = {
   compileOptions: CompileOptions;

@@ -1,10 +1,9 @@
-import { SerializedFileType, SerializedFileTypeV2 } from "types";
-import { Kind, NewCategory } from "types/Category";
-import { NewImageType } from "types/ThingType";
 import { deserializePiximiAnnotations_v1 } from "./v1/deserializePiximiAnnotations_v1";
 import { deserializePiximiAnnotations_v2 } from "./v2/deserializePiximiAnnotations_v2";
-import { convertAnnotationsWithExistingProject_v1_2 } from "utils/converters/dataConverter_v1v2";
-import { logger } from "utils/common/logger";
+import { convertAnnotationsWithExistingProject_v1_2 } from "utils/file-io/converters/dataConverter_v1v2";
+import { logger } from "utils/common/helpers";
+import { SerializedFileType, SerializedFileTypeV2 } from "../types";
+import { Kind, NewCategory, NewImageType } from "store/data/types";
 
 export const deserializePiximiAnnotations = async (
   serializedAnnotations: SerializedFileTypeV2 | SerializedFileType,

@@ -1,0 +1,1 @@
+export { SequentialClassifier } from "./AbstractClassifier";

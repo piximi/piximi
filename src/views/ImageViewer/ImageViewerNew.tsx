@@ -15,17 +15,15 @@ import { StageWrapperNew } from "components/stage/StageWrapper";
 import {
   selectAlertState,
   applicationSettingsSlice,
-  registerHotkeyView,
-  unregisterHotkeyView,
-} from "store/slices/applicationSettings";
+} from "store/applicationSettings";
 
-import { getStackTraceFromError } from "utils";
-import { APPLICATION_COLORS } from "utils/common/colorPalette";
-import { ImageShapeInfo, ImageShapeEnum } from "utils/common/image";
-
-import { AlertType, HotkeyView } from "types";
 import { StageContext } from "contexts";
-import { AnnotatorToolDrawerNew } from "components/drawers/AnnotatorToolDrawer/AnnotatorToolDrawerNew";
+import { AnnotatorToolDrawerNew } from "components/drawers";
+import { ImageShapeInfo } from "utils/file-io/types";
+import { ImageShapeEnum } from "utils/file-io/enums";
+import { APPLICATION_COLORS } from "utils/common/constants";
+import { getStackTraceFromError } from "utils/common/helpers";
+import { AlertType, HotkeyView } from "utils/common/enums";
 
 export const ImageViewerNew = () => {
   const dispatch = useDispatch();
@@ -103,9 +101,13 @@ export const ImageViewerNew = () => {
     };
   }, []);
   useEffect(() => {
-    dispatch(registerHotkeyView({ hotkeyView: HotkeyView.Annotator }));
+    dispatch(
+      applicationSettingsSlice.actions.registerHotkeyView({
+        hotkeyView: HotkeyView.Annotator,
+      })
+    );
     return () => {
-      dispatch(unregisterHotkeyView({}));
+      dispatch(applicationSettingsSlice.actions.unregisterHotkeyView({}));
     };
   }, [dispatch]);
 

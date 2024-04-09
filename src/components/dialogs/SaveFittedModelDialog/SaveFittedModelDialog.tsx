@@ -3,10 +3,10 @@ import { useHotkeys } from "hooks";
 
 import { Grid, TextField } from "@mui/material";
 
-import { HotkeyView } from "types";
-import { ModelStatus } from "types/ModelType";
-import { Model } from "utils/common/models/Model";
+import { HotkeyView } from "utils/common/enums";
+import { Model } from "utils/models/Model/Model";
 import { DialogWithAction } from "../DialogWithAction";
+import { ModelStatus } from "utils/models/enums";
 
 type SaveFittedModelDialogProps = {
   model: Model;

@@ -1,9 +1,9 @@
 import { Box, useTheme } from "@mui/material";
 import { DividerHeader } from "components/styled-components";
 import { useSelector } from "react-redux";
-import { selectUnfilteredActiveCategoryIds } from "store/slices/project/selectors/selectUnfilteredCategoryIds";
+import { selectUnfilteredActiveCategoryIds } from "store/project/selectors/selectUnfilteredCategoryIds";
 import { FilterChipNew } from "./FilterChipNew";
-import { selectCategoriesDictionary } from "store/slices/newData/selectors/selectors";
+import { selectCategoriesDictionary } from "store/data/selectors/selectors";
 
 export const CategoryFilterListNew = ({
   header,

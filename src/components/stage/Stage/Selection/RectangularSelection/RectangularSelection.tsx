@@ -5,8 +5,11 @@ import * as ReactKonva from "react-konva";
 import { useMarchingAnts } from "hooks";
 
 import { StageContext } from "contexts";
-import { selectImageOrigin } from "store/slices/imageViewer";
-import { RectangularAnnotationTool, SelectionTool } from "annotator-tools-new";
+import { selectImageOrigin } from "store/imageViewer";
+import {
+  RectangularAnnotationTool,
+  SelectionTool,
+} from "utils/annotator/tools";
 
 type RectangularSelectionProps = {
   operator: RectangularAnnotationTool | SelectionTool;

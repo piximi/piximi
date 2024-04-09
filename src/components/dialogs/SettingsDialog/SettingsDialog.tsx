@@ -26,17 +26,15 @@ import {
   selectImageSelectionColor,
   applicationSettingsSlice,
   selectThemeMode,
-  setThemeMode,
   selectSoundEnabled,
-} from "store/slices/applicationSettings";
-
-import { ThemeMode } from "types";
+} from "store/applicationSettings";
 
 import Sun from "icons/Sun.svg";
 import Moon from "icons/Moon.svg";
 import VolumeUp from "icons/VolumeUp.svg";
 import VolumeOff from "icons/VolumeOff.svg";
-import { selectActiveCategoryColors } from "store/slices/newData/selectors/reselectors";
+import { selectActiveCategoryColors } from "store/data/selectors/reselectors";
+import { ThemeMode } from "themes/enums";
 
 const SettingsItem = ({
   title,
@@ -105,7 +103,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
   };
 
   const onToggleTheme = (mode: ThemeMode) => {
-    dispatch(setThemeMode({ mode }));
+    dispatch(applicationSettingsSlice.actions.setThemeMode({ mode }));
   };
 
   const onChangeImageSelectionWidth = (

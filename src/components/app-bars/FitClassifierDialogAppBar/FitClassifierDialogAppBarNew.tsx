@@ -17,10 +17,10 @@ import {
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
   classifierSlice,
-} from "store/slices/classifier";
+} from "store/classifier";
 
-import { APPLICATION_COLORS } from "utils/common/colorPalette";
-import { ModelStatus } from "types/ModelType";
+import { ModelStatus } from "utils/models/enums";
+import { APPLICATION_COLORS } from "utils/common/constants";
 
 type FitClassifierDialogAppBarNewProps = {
   closeDialog: any;

@@ -3,19 +3,21 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Grid, TextField } from "@mui/material";
 
-import { selectClassifier } from "store/slices/classifier";
-import { selectProject, projectSlice } from "store/slices/project";
+import { selectClassifier } from "store/classifier";
+import { selectProject, projectSlice } from "store/project";
 // TODO: implement segmenter serialization
 
-import { AlertStateType, AlertType, HotkeyView } from "types";
+import { HotkeyView } from "utils/common/enums";
 import { useHotkeys } from "hooks";
-import { selectSegmenter } from "store/slices/segmenter";
+import { selectSegmenter } from "store/segmenter";
 import { saveAs } from "file-saver";
-import { applicationSettingsSlice } from "store/slices/applicationSettings";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { DialogWithAction } from "../DialogWithAction";
-import { selectDataProject } from "store/slices/newData/selectors/reselectors";
-import { logger } from "utils/common/logger";
+import { selectDataProject } from "store/data/selectors/reselectors";
+import { logger } from "utils/common/helpers";
 import { serializeProject } from "utils/file-io/serialize";
+import { AlertState } from "utils/common/types";
+import { AlertType } from "utils/common/enums";
 
 type SaveProjectDialogProps = {
   onClose: () => void;
@@ -82,7 +84,7 @@ export const SaveProjectDialog = ({
         process.env.NODE_ENV !== "production" &&
           process.env.REACT_APP_LOG_LEVEL === "1" &&
           console.error(err);
-        const warning: AlertStateType = {
+        const warning: AlertState = {
           alertType: AlertType.Warning,
           name: "Could not parse project file",
           description: `Error while parsing the project file: ${err.name}\n${err.message}`,

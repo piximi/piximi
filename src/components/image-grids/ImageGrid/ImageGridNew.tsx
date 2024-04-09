@@ -5,25 +5,24 @@ import { Container, Grid } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { projectSlice } from "store/slices/project";
+import { projectSlice } from "store/project";
 
-import { HotkeyView } from "types";
-import { imageViewerSlice } from "store/slices/imageViewer";
+import { HotkeyView } from "utils/common/enums";
+import { imageViewerSlice } from "store/imageViewer";
 import { DialogWithAction } from "components/dialogs";
-import { selectThingsOfKind } from "store/slices/newData/";
-import { NewAnnotationType } from "types/AnnotationType";
-import { NewImageType } from "types/ImageType";
-import { ProjectGridItemNew } from "../ProjectGridItem/ProjectGridItemNew";
+import { selectThingsOfKind } from "store/data";
+import { ProjectGridItemNew } from "../ProjectGridItem";
 import { useSortFunctionNew } from "hooks/useSortFunctionNew/useSortFunctionNew";
-import { GridItemActionBarNew } from "components/app-bars/GridItemActionBar/GridItemActionBarNew";
+import { GridItemActionBarNew } from "components/app-bars";
 import { DropBox } from "components/styled-components/DropBox/DropBox";
 import {
   selectActiveKindId,
   selectThingFilters,
-} from "store/slices/project/selectors";
+} from "store/project/selectors";
 import { isFiltered } from "utils/common/helpers";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
-import { selectActiveSelectedThingIds } from "store/slices/project/selectors/selectActiveSelectedThings";
+import { dataSlice } from "store/data/dataSlice";
+import { selectActiveSelectedThingIds } from "store/project/selectors/selectActiveSelectedThings";
+import { NewAnnotationType, NewImageType } from "store/data/types";
 
 const max_images = 1000; //number of images from the project that we'll show
 
@@ -64,7 +63,7 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
 
   const handleDelete = () => {
     dispatch(
-      newDataSlice.actions.deleteThings({
+      dataSlice.actions.deleteThings({
         thingIds: selectedThingIds,
         disposeColorTensors: true,
         isPermanent: true,

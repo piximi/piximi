@@ -6,15 +6,14 @@ import { Label as LabelIcon } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
 
-import { imageViewerSlice } from "store/slices/imageViewer";
-
-import { Category } from "types";
+import { imageViewerSlice } from "store/imageViewer";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
-import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { CustomListItemButton } from "components/list-items";
 import { CollapsibleListItem } from "components/list-items/CollapsibleListItem";
-import { selectActiveAnnotationsNew } from "store/slices/newData/selectors/reselectors";
-import { selectAllCategories } from "store/slices/newData/selectors/selectors";
+import { selectActiveAnnotationsNew } from "store/data/selectors/reselectors";
+import { selectAllCategories } from "store/data/selectors/selectors";
+import { Category } from "store/data/types";
 
 export const PointerSelectionOptionsNew = () => {
   const t = useTranslation();

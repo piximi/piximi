@@ -8,10 +8,10 @@ import { FilterOptionsNew, InformationOptions } from "./tool-options-drawer";
 import { useTranslation } from "hooks";
 import { ToolOptionsDrawer } from "./tool-options-drawer/ToolOptionsDrawer/ToolOptionsDrawer";
 import { AppBarOffset } from "components/styled-components";
-import { dimensions } from "utils/common";
+import { dimensions } from "utils/common/constants";
 import { useSelector } from "react-redux";
 import { ToolHotkeyTitle, TooltipCard } from "components/tooltips";
-import { selectActiveFilteredStateHasFilters } from "store/slices/project/selectors";
+import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
 
 export type OperationType = {
   icon: (color: string) => ReactElement;

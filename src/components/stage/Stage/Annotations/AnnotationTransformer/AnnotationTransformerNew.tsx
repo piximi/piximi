@@ -4,30 +4,28 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 
 import { StageContext } from "contexts";
-import { selectSoundEnabled } from "store/slices/applicationSettings";
+import { selectSoundEnabled } from "store/applicationSettings";
 import {
   selectActiveImageId,
   selectCursor,
-  setSelectedAnnotationIds,
   selectImageOrigin,
   selectActiveAnnotationIds,
   imageViewerSlice,
-} from "store/slices/imageViewer";
+} from "store/imageViewer";
 
-import { annotatorSlice } from "store/slices/annotator";
+import { annotatorSlice } from "store/annotator";
 
 import useSound from "use-sound";
 
-import { AnnotationModeType } from "types";
-
-import { AnnotationTool } from "annotator-tools-new";
+import { AnnotationTool } from "utils/annotator/tools";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
-import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/selectWorkingAnnotation";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { selectWorkingAnnotationNew } from "store/imageViewer/selectors/selectWorkingAnnotation";
+import { dataSlice } from "store/data/dataSlice";
 import { getCompleteEntity } from "store/entities/utils";
-import { selectActiveImage } from "store/slices/imageViewer/reselectors";
-import { selectSelectedAnnotations } from "store/slices/imageViewer/selectors/selectSelectedAnnotationIds";
+import { selectActiveImage } from "store/imageViewer/reselectors";
+import { selectSelectedAnnotations } from "store/imageViewer/selectors/selectSelectedAnnotationIds";
+import { AnnotationModeType } from "utils/annotator/enums";
 
 const buttonWidth = 65;
 const buttonHeight = 26;
@@ -90,7 +88,7 @@ export const AnnotationTransformerNew = ({
       );
 
       dispatch(
-        setSelectedAnnotationIds({
+        imageViewerSlice.actions.setSelectedAnnotationIds({
           annotationIds: [],
           workingAnnotationId: undefined,
         })
@@ -116,14 +114,14 @@ export const AnnotationTransformerNew = ({
           })
         );
         dispatch(
-          newDataSlice.actions.deleteThings({
+          dataSlice.actions.deleteThings({
             thingIds: [annotationId],
             disposeColorTensors: false,
           })
         );
       } else {
         dispatch(
-          newDataSlice.actions.updateThings({
+          dataSlice.actions.updateThings({
             updates: [{ id: annotationId, ...workingAnnotation.changes }],
           })
         );
@@ -132,7 +130,7 @@ export const AnnotationTransformerNew = ({
     } else {
       const completeWorkingAnnotation = getCompleteEntity(workingAnnotation)!;
       dispatch(
-        newDataSlice.actions.addAnnotations({
+        dataSlice.actions.addAnnotations({
           annotations: [completeWorkingAnnotation],
         })
       );

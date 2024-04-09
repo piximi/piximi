@@ -1,8 +1,8 @@
 import { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { applicationSettingsSlice } from "store/slices/applicationSettings";
-import { AlertType } from "types";
-import { getStackTraceFromError } from "utils";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { AlertType } from "utils/common/enums";
+import { getStackTraceFromError } from "utils/common/helpers";
 
 export const useErrorHandler = () => {
   const dispatch = useDispatch();

@@ -1,11 +1,11 @@
 import { batch, useDispatch, useSelector } from "react-redux";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { dataSlice } from "store/data/dataSlice";
 import { DialogWithAction } from "../DialogWithAction";
 import { Box, TextField } from "@mui/material";
-import { selectAllKindIds } from "store/slices/newData/selectors/selectors";
+import { selectAllKindIds } from "store/data/selectors/selectors";
 import { ChangeEvent, useCallback, useState } from "react";
 import { generateUnknownCategory } from "utils/common/helpers";
-import { Kind } from "types/Category";
+import { Kind } from "store/data/types";
 
 type CreateCategoriesDialogProps = {
   onClose: () => void;
@@ -68,14 +68,14 @@ export const CreateKindDialog = ({
 
     batch(() => {
       dispatch(
-        newDataSlice.actions.addCategories({
+        dataSlice.actions.addCategories({
           categories: [newUnknownCategory],
           isPermanent: changesPermanent,
         })
       );
 
       dispatch(
-        newDataSlice.actions.addKinds({
+        dataSlice.actions.addKinds({
           kinds: [kind],
           isPermanent: changesPermanent,
         })

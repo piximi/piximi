@@ -4,8 +4,8 @@ import { ResponsiveLine } from "@nivo/line";
 import { Container, Typography } from "@mui/material";
 
 import { usePreferredNivoTheme } from "hooks";
-import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { useEffect, useState } from "react";
+import { APPLICATION_COLORS } from "utils/common/constants";
 
 type TwoDataPlotProps = {
   title: string;
