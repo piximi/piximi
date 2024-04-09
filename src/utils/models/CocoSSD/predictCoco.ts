@@ -20,12 +20,12 @@ import {
 } from "../AbstractSegmenter/AbstractSegmenter";
 import { generateUUID } from "utils/common/helpers";
 import { Partition } from "../enums";
-import { Category, Kind } from "store/data/types";
+import { OldCategory, Kind } from "store/data/types";
 
 export const predictCoco = async (
   model: GraphModel,
   imTensor: Tensor4D,
-  categories: Array<Category>,
+  categories: Array<OldCategory>,
   maxNumBoxes = 20,
   minScore = 0.5,
   overlapThreshold = 0.5
@@ -232,7 +232,7 @@ const buildDetectedObjects = (
   boxes: Float32Array,
   indices: Float32Array,
   classes: Array<number>,
-  categories: Array<Category>
+  categories: Array<OldCategory>
 ) => {
   const annotations: Array<OrphanedAnnotationType> = [];
   const count = indices.length;

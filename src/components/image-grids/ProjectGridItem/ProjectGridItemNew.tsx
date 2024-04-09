@@ -12,12 +12,12 @@ import {
 import { selectCategoryProperty } from "store/data/selectors/reselectors";
 import { isUnknownCategory } from "utils/common/helpers";
 import { Partition } from "utils/models/enums";
-import { NewAnnotationType, NewImageType } from "store/data/types";
+import { AnnotationObject, ImageObject } from "store/data/types";
 
 type ProjectGridItemProps = {
   selected: boolean;
   handleClick: (id: string, selected: boolean) => void;
-  thing: NewImageType | NewAnnotationType;
+  thing: ImageObject | AnnotationObject;
   filtered: boolean;
 };
 

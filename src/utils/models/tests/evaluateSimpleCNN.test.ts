@@ -17,11 +17,11 @@ import {
 import { CropSchema, ModelTask, Partition } from "../enums";
 import { loadDataUrlAsStack } from "utils/file-io/helpers";
 import { convertToImage } from "utils/common/tensorHelpers";
-import { NewCategory, NewImageType, Shape } from "store/data/types";
+import { Category, ImageObject, Shape } from "store/data/types";
 
 jest.setTimeout(100000);
 
-const categories: Array<NewCategory> = [
+const categories: Array<Category> = [
   // {
   //   color: "#AAAAAA",
   //   id: "00000000-0000-0000-0000-000000000010",
@@ -164,7 +164,7 @@ const validationImagesUnloaded = [
 it("evaluateClassifier", async () => {
   // await setBackend("tensorflow");
 
-  const validationImages: NewImageType[] = [];
+  const validationImages: ImageObject[] = [];
 
   for (const im of validationImagesUnloaded) {
     const imStack = await loadDataUrlAsStack(im.src);

@@ -17,11 +17,11 @@ import { imageViewerSlice } from "store/imageViewer";
 // } from "utils/annotator/imageHelper";
 import { projectSlice } from "store/project";
 import { dataSlice } from "store/data/dataSlice";
-import { NewImageType } from "store/data/types";
+import { ImageObject } from "store/data/types";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
-  selectedImage: NewImageType;
+  selectedImage: ImageObject;
   previousImageId: string | undefined;
   onCloseImageMenu: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   openImageMenu: boolean;

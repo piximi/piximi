@@ -1,6 +1,6 @@
 import { Tensor2D } from "@tensorflow/tfjs";
 import { AlertType, ImageSortKey } from "./enums";
-import { Category } from "store/data/types";
+import { OldCategory } from "store/data/types";
 
 /*
 TENSORFLOW
@@ -107,8 +107,8 @@ export type ImageSortKeyType = {
   imageSortKeyName: string;
   imageSortKey: ImageSortKey;
   comparerFunction: (
-    a: { name: string; category: Category },
-    b: { name: string; category: Category }
+    a: { name: string; category: OldCategory },
+    b: { name: string; category: OldCategory }
   ) => number;
   objectType: string;
 };

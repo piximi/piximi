@@ -6,7 +6,7 @@ import { selectClassifierEvaluationResult } from "store/classifier";
 import { selectActiveKnownCategories } from "store/data/selectors/reselectors";
 import { DialogTransitionSlide } from "components/dialogs";
 import { EvaluateClassifierDialogAppBarNew } from "./EvaluateClassifierAppBar";
-import { Category } from "store/data/types";
+import { OldCategory } from "store/data/types";
 
 type EvaluateClassifierDialogNewProps = {
   closeDialog: () => void;
@@ -39,7 +39,7 @@ export const EvaluateClassifierDialogNew = ({
           alignItems="flex-start"
         >
           <ConfusionMatrixNew
-            classNames={categories.map((c: Category) => c.name)}
+            classNames={categories.map((c: OldCategory) => c.name)}
             confusionMatrix={evaluationResults.confusionMatrix}
           />
 

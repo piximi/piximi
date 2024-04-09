@@ -12,7 +12,7 @@ import { CropSchema, ModelTask } from "../enums";
 import { loadImageFileAsStack } from "utils/file-io/helpers";
 import { convertToImage } from "utils/common/tensorHelpers";
 import { MIMEType } from "utils/file-io/types";
-import { NewCategory, NewImageType, Shape } from "store/data/types";
+import { Category, ImageObject, Shape } from "store/data/types";
 
 jest.setTimeout(50000);
 
@@ -67,7 +67,7 @@ const fitOptions: FitOptions = {
   batchSize: 32,
 };
 
-const categories: Array<NewCategory> = [
+const categories: Array<Category> = [
   {
     color: "",
     id: "00000000-0000-0000-0000-00000000001",
@@ -105,7 +105,7 @@ const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
 };
 
 it("preprocessClassifier", async () => {
-  const images: Array<NewImageType> = [];
+  const images: Array<ImageObject> = [];
 
   for (const preIm of preloadedImages) {
     const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);

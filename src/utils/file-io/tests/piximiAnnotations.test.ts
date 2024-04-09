@@ -22,9 +22,9 @@ import { SerializedFileTypeV2 } from "../types";
 import { CATEGORY_COLORS } from "utils/common/constants";
 import {
   Kind,
-  NewAnnotationType,
-  NewCategory,
-  NewImageType,
+  AnnotationObject,
+  Category,
+  ImageObject,
 } from "store/data/types";
 tf.setBackend("cpu");
 
@@ -32,13 +32,13 @@ tf.setBackend("cpu");
 const dummyImFields = {
   bitDepth: 8,
   activePlane: 0,
-  colors: undefined as unknown as NewImageType["colors"],
+  colors: undefined as unknown as ImageObject["colors"],
   src: data.image,
   kind: "Image",
-  data: undefined as unknown as NewImageType["data"],
+  data: undefined as unknown as ImageObject["data"],
   // full image props, also not needed so fake it
   categoryId: "",
-  partition: undefined as unknown as NewImageType["partition"],
+  partition: undefined as unknown as ImageObject["partition"],
   visible: true,
   containing: [],
 };
@@ -46,7 +46,7 @@ const dummyImFields = {
 // Time 1 (T1) is pre-serialization state of piximi
 
 // image exists T1 and T2
-const im1T1: NewImageType = {
+const im1T1: ImageObject = {
   ...dummyImFields,
   id: generateUUID(),
   name: "im1.png",
@@ -59,7 +59,7 @@ const im1T1: NewImageType = {
 };
 
 // image exists T1 only
-const im2T1: NewImageType = {
+const im2T1: ImageObject = {
   ...dummyImFields,
   id: generateUUID(),
   name: "im2.png",
@@ -79,7 +79,7 @@ const k1T1: Kind = {
 };
 
 // eixsts only in T1
-const uC1T1: NewCategory = {
+const uC1T1: Category = {
   color: CATEGORY_COLORS.columbiablue,
   id: generateUUID({ definesUnknown: true }),
   name: "unknown",
@@ -88,7 +88,7 @@ const uC1T1: NewCategory = {
   visible: false,
 };
 
-const c1T1: NewCategory = {
+const c1T1: Category = {
   color: CATEGORY_COLORS.darkcyan,
   id: generateUUID(),
   name: "cat 1",
@@ -100,12 +100,12 @@ const c1T1: NewCategory = {
 k1T1.categories = [uC1T1.id, c1T1.id];
 k1T1.unknownCategoryId = uC1T1.id;
 
-const im1AnnotationsT1: Array<NewAnnotationType> = [
+const im1AnnotationsT1: Array<AnnotationObject> = [
   {
     imageId: im1T1.id,
     name: `${im1T1.name}-${k1T1.id}_0`,
     src: "",
-    data: undefined as unknown as NewAnnotationType["data"],
+    data: undefined as unknown as AnnotationObject["data"],
     bitDepth: im1T1.bitDepth,
     kind: "kT1",
     categoryId: uC1T1.id, //unknown
@@ -122,14 +122,14 @@ const im1AnnotationsT1: Array<NewAnnotationType> = [
       channels: im1T1.shape.channels,
       planes: 1,
     },
-    partition: undefined as unknown as NewAnnotationType["partition"],
+    partition: undefined as unknown as AnnotationObject["partition"],
   },
   {
     imageId: im1T1.id,
     name: `${im1T1.name}-${k1T1.id}_1`,
     src: "",
     kind: "kT1",
-    data: undefined as unknown as NewAnnotationType["data"],
+    data: undefined as unknown as AnnotationObject["data"],
     bitDepth: im1T1.bitDepth,
     categoryId: c1T1.id, // cat 1
     id: generateUUID(),
@@ -145,7 +145,7 @@ const im1AnnotationsT1: Array<NewAnnotationType> = [
       channels: im1T1.shape.channels,
       planes: 1,
     },
-    partition: undefined as unknown as NewAnnotationType["partition"],
+    partition: undefined as unknown as AnnotationObject["partition"],
   },
 ];
 im1T1.containing = im1AnnotationsT1.map((ann) => ann.id);
@@ -206,9 +206,9 @@ describe("serializes piximi project", () => {
 });
 
 describe("deserialize into empty project (no matching images)", () => {
-  let newAnnotations: NewAnnotationType[];
+  let newAnnotations: AnnotationObject[];
   let newKinds: Kind[];
-  let newCategories: NewCategory[];
+  let newCategories: Category[];
 
   beforeAll(async () => {
     const serializedPiximi = serializePiximiAnnotations(
@@ -246,9 +246,9 @@ describe("deserialize into empty project (no matching images)", () => {
 });
 
 describe("deserialize into project with matching image, no matching kinds or categories", () => {
-  let newAnnotations: NewAnnotationType[];
+  let newAnnotations: AnnotationObject[];
   let newKinds: Kind[];
-  let newCategories: NewCategory[];
+  let newCategories: Category[];
 
   beforeAll(async () => {
     const serializedPiximi = serializePiximiAnnotations(
@@ -263,7 +263,7 @@ describe("deserialize into project with matching image, no matching kinds or cat
     im1T1.data = imData;
     const thingsT2 = [...t1Ims].reduce(
       (
-        entities: DeferredEntityState<NewAnnotationType | NewImageType>,
+        entities: DeferredEntityState<AnnotationObject | ImageObject>,
         thing
       ) => {
         entities.ids.push(thing.id);
@@ -323,9 +323,9 @@ describe("deserialize into project with matching image, no matching kinds or cat
 });
 
 describe("deserialize into project with matching image, matching kind", () => {
-  let newAnnotations: NewAnnotationType[];
+  let newAnnotations: AnnotationObject[];
   let newKinds: Kind[];
-  let newCategories: NewCategory[];
+  let newCategories: Category[];
   let t2Kinds: Kind[];
 
   beforeAll(async () => {
@@ -345,7 +345,7 @@ describe("deserialize into project with matching image, matching kind", () => {
     };
 
     // eixsts only in T1
-    const uC1T2: NewCategory = {
+    const uC1T2: Category = {
       color: CATEGORY_COLORS.columbiablue,
       id: generateUUID({ definesUnknown: true }),
       name: "unknown",
@@ -357,10 +357,10 @@ describe("deserialize into project with matching image, matching kind", () => {
     k1T2.unknownCategoryId = uC1T2.id;
     const image = await Image.load(im1T1.src);
     const imData = tf.browser.fromPixels(image).expandDims(0) as tf.Tensor4D;
-    const im1T2: NewImageType = { ...im1T1, containing: [], data: imData };
+    const im1T2: ImageObject = { ...im1T1, containing: [], data: imData };
     const thingsT2 = [im1T2].reduce(
       (
-        entities: DeferredEntityState<NewAnnotationType | NewImageType>,
+        entities: DeferredEntityState<AnnotationObject | ImageObject>,
         thing
       ) => {
         entities.ids.push(thing.id);
@@ -379,7 +379,7 @@ describe("deserialize into project with matching image, matching kind", () => {
     );
 
     const categoriesT2 = [uC1T2].reduce(
-      (entities: DeferredEntityState<NewCategory>, category) => {
+      (entities: DeferredEntityState<Category>, category) => {
         entities.ids.push(category.id);
         entities.entities[category.id] = { saved: category, changes: {} };
         return entities;
@@ -433,10 +433,10 @@ describe("deserialize into project with matching image, matching kind", () => {
 });
 
 describe("deserialize into project with matching image, matching kind, and matching category", () => {
-  let newAnnotations: NewAnnotationType[];
+  let newAnnotations: AnnotationObject[];
   let newKinds: Kind[];
-  let newCategories: NewCategory[];
-  let t2categories: NewCategory[];
+  let newCategories: Category[];
+  let t2categories: Category[];
 
   beforeAll(async () => {
     const serializedPiximi = serializePiximiAnnotations(
@@ -455,7 +455,7 @@ describe("deserialize into project with matching image, matching kind, and match
     };
 
     // eixsts only in T1
-    const uC1T2: NewCategory = {
+    const uC1T2: Category = {
       color: CATEGORY_COLORS.columbiablue,
       id: generateUUID({ definesUnknown: true }),
       name: "unknown",
@@ -463,7 +463,7 @@ describe("deserialize into project with matching image, matching kind, and match
       containing: [],
       visible: false,
     };
-    const c1T2: NewCategory = {
+    const c1T2: Category = {
       color: CATEGORY_COLORS.columbiablue,
       id: generateUUID({ definesUnknown: true }),
       name: "cat 1",
@@ -475,10 +475,10 @@ describe("deserialize into project with matching image, matching kind, and match
     k1T2.unknownCategoryId = uC1T2.id;
     const image = await Image.load(im1T1.src);
     const imData = tf.browser.fromPixels(image).expandDims(0) as tf.Tensor4D;
-    const im1T2: NewImageType = { ...im1T1, containing: [], data: imData };
+    const im1T2: ImageObject = { ...im1T1, containing: [], data: imData };
     const thingsT2 = [im1T2].reduce(
       (
-        entities: DeferredEntityState<NewAnnotationType | NewImageType>,
+        entities: DeferredEntityState<AnnotationObject | ImageObject>,
         thing
       ) => {
         entities.ids.push(thing.id);
@@ -497,7 +497,7 @@ describe("deserialize into project with matching image, matching kind, and match
     );
 
     const categoriesT2 = [uC1T2, c1T2].reduce(
-      (entities: DeferredEntityState<NewCategory>, category) => {
+      (entities: DeferredEntityState<Category>, category) => {
         entities.ids.push(category.id);
         entities.entities[category.id] = { saved: category, changes: {} };
         return entities;

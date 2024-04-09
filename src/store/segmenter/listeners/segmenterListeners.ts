@@ -30,9 +30,9 @@ import { AlertType } from "utils/common/enums";
 import { AlertState } from "utils/common/types";
 import {
   Kind,
-  NewAnnotationType,
-  NewCategory,
-  NewImageType,
+  AnnotationObject,
+  Category,
+  ImageObject,
   Shape,
 } from "store/data/types";
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
@@ -117,7 +117,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     dataState.kinds.entities["Image"],
     "containing"
   );
-  const inferenceImages = imageIds.reduce((infIms: NewImageType[], id) => {
+  const inferenceImages = imageIds.reduce((infIms: ImageObject[], id) => {
     const image = getCompleteEntity(dataState.things.entities[id]);
 
     if (image && "containing" in image) {
@@ -209,7 +209,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
           containing: [],
           kind: kind.id,
           visible: true,
-        } as NewCategory;
+        } as Category;
       });
       listenerAPI.dispatch(
         dataSlice.actions.addCategories({
@@ -218,13 +218,13 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
         })
       );
     }
-    const annotations: NewAnnotationType[] = [];
+    const annotations: AnnotationObject[] = [];
     for await (const [i, _annotations] of predictedAnnotations.entries()) {
       const image = inferenceImages[i];
       const imageJsImage = await Image.load(image.src);
 
       for (let j = 0; j < _annotations.length; j++) {
-        const ann = _annotations[j] as Partial<NewAnnotationType>;
+        const ann = _annotations[j] as Partial<AnnotationObject>;
         const bbox = ann.boundingBox!;
         const width = bbox[2] - bbox[0];
         const height = bbox[3] - bbox[1];
@@ -250,7 +250,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
         ann.name = `${image.name}-${ann.kind}_${j}`;
         ann.imageId = image.id;
         ann.bitDepth = image.bitDepth;
-        annotations.push(ann as NewAnnotationType);
+        annotations.push(ann as AnnotationObject);
       }
     }
     listenerAPI.dispatch(

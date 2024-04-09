@@ -11,9 +11,9 @@ import { ClassifierState, ProjectState, SegmenterState } from "store/types";
 import { Colors } from "utils/common/types";
 import {
   Kind,
-  NewAnnotationType,
-  NewCategory,
-  NewImageType,
+  AnnotationObject,
+  Category,
+  ImageObject,
 } from "store/data/types";
 
 /* 
@@ -46,7 +46,7 @@ const serializeImageColors = async (colorsGroup: Group, colors: Colors) => {
 
 const serializeThings = async (
   thingsGroup: Group,
-  things: Array<NewAnnotationType | NewImageType>,
+  things: Array<AnnotationObject | ImageObject>,
   loadCb: LoadCB
 ) => {
   const thingNames = things.map((thing) => thing.name);
@@ -73,23 +73,23 @@ const serializeThings = async (
     if (thing.kind === "Image") {
       await thingGroup.attrs.setItem(
         "contents",
-        (thing as NewImageType).containing
+        (thing as ImageObject).containing
       );
 
       let colorGroup = await thingGroup.createGroup("colors");
-      await serializeImageColors(colorGroup, (thing as NewImageType).colors);
+      await serializeImageColors(colorGroup, (thing as ImageObject).colors);
     } else {
       await thingGroup.attrs.setItem(
         "bbox",
-        (thing as NewAnnotationType).boundingBox
+        (thing as AnnotationObject).boundingBox
       );
       await thingGroup.attrs.setItem(
         "mask",
-        (thing as NewAnnotationType).encodedMask
+        (thing as AnnotationObject).encodedMask
       );
       await thingGroup.attrs.setItem(
         "image_id",
-        (thing as NewAnnotationType).imageId
+        (thing as AnnotationObject).imageId
       );
     }
     loadCb(
@@ -101,7 +101,7 @@ const serializeThings = async (
 
 const serializeCategories = async (
   categoryGroup: Group,
-  categories: NewCategory[]
+  categories: Category[]
 ) => {
   await categoryGroup.attrs.setItem(
     "category_id",
@@ -148,8 +148,8 @@ const _serializeProject = async (
   project: ProjectState,
   data: {
     kinds: Array<Kind>;
-    categories: Array<NewCategory>;
-    things: Array<NewImageType | NewAnnotationType>;
+    categories: Array<Category>;
+    things: Array<ImageObject | AnnotationObject>;
   },
   loadCb: LoadCB
 ) => {
@@ -286,8 +286,8 @@ export const serializeProject = async (
   projectSlice: ProjectState,
   data: {
     kinds: Array<Kind>;
-    categories: Array<NewCategory>;
-    things: Array<NewImageType | NewAnnotationType>;
+    categories: Array<Category>;
+    things: Array<ImageObject | AnnotationObject>;
   },
   classifierSlice: ClassifierState,
   segmenterSlice: SegmenterState,

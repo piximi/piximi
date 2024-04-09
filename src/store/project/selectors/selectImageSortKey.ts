@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { selectImageSortKey, selectSortTypeNew } from "../selectors";
 import { selectCategoriesDictionary } from "store/data/selectors/selectors";
-import { ThingType } from "store/data/types";
+import { Thing } from "store/data/types";
 import { sortTypeByKey } from "utils/common/helpers";
 import { ThingSortKey_new } from "utils/common/enums";
 
@@ -21,7 +21,7 @@ export const selectThingSortType_new = createSelector(
         return {
           imageSortKeyName: "File name",
           imageSortKey: ThingSortKey_new.FileName,
-          comparerFunction: (a: ThingType, b: ThingType) =>
+          comparerFunction: (a: Thing, b: Thing) =>
             a.name.localeCompare(b.name),
           objectType: "Images",
         };
@@ -29,7 +29,7 @@ export const selectThingSortType_new = createSelector(
         return {
           imageSortKeyName: "Category",
           imageSortKey: ThingSortKey_new.Category,
-          comparerFunction: (a: ThingType, b: ThingType) =>
+          comparerFunction: (a: Thing, b: Thing) =>
             categoryDict[a.categoryId].name.localeCompare(
               categoryDict[b.categoryId].name
             ),
@@ -39,7 +39,7 @@ export const selectThingSortType_new = createSelector(
         return {
           imageSortKeyName: "Random",
           imageSortKey: ThingSortKey_new.Random,
-          comparerFunction: (a: ThingType, b: ThingType) =>
+          comparerFunction: (a: Thing, b: Thing) =>
             Math.round(Math.random() * 10) >= 5 ? 1 : -1,
           objectType: "All",
         };
@@ -47,7 +47,7 @@ export const selectThingSortType_new = createSelector(
         return {
           imageSortKeyName: "Name",
           imageSortKey: ThingSortKey_new.Name,
-          comparerFunction: (a: ThingType, b: ThingType) =>
+          comparerFunction: (a: Thing, b: Thing) =>
             a.name.localeCompare(b.name),
           objectType: "Annotations",
         };
@@ -56,7 +56,7 @@ export const selectThingSortType_new = createSelector(
         return {
           imageSortKeyName: "None",
           imageSortKey: ThingSortKey_new.None,
-          comparerFunction: (a: ThingType, b: ThingType) => 0,
+          comparerFunction: (a: Thing, b: Thing) => 0,
           objectType: "All",
         };
     }

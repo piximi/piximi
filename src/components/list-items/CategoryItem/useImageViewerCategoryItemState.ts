@@ -6,10 +6,10 @@ import { selectHighligtedIVCatogory } from "store/imageViewer/selectors/selectHi
 import { selectSelectedIVCategoryId } from "store/imageViewer/selectors/selectSelectedAnnotationCategoryId";
 import { selectActiveImageCategoryObjectCount } from "store/data/selectors/reselectors";
 import { isUnknownCategory } from "utils/common/helpers";
-import { NewCategory } from "store/data/types";
+import { Category } from "store/data/types";
 
 export const useImageViewerCategoryItemState = (
-  category: NewCategory,
+  category: Category,
   kind: string
 ) => {
   const [isSelected, setIsSelected] = useState<boolean>(false);

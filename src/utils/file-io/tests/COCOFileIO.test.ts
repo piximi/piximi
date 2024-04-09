@@ -28,9 +28,9 @@ import { SerializedCOCOFileType } from "../types";
 import { CATEGORY_COLORS } from "utils/common/constants";
 import {
   Kind,
-  NewAnnotationType,
-  NewCategory,
-  NewImageType,
+  AnnotationObject,
+  Category,
+  ImageObject,
 } from "store/data/types";
 
 tf.setBackend("cpu");
@@ -40,11 +40,11 @@ const imDataMap: Record<string, string> = {
   "3twoSheep.jpg": "src/data/test-data/COCO/3twoSheep.jpg",
 };
 
-const imagesT1: NewImageType[] = [];
+const imagesT1: ImageObject[] = [];
 const initialImages = initialState.annotator.images;
-const annotationsT1: NewAnnotationType[] = [];
+const annotationsT1: AnnotationObject[] = [];
 const kindsT1: Kind[] = initialState.project.kinds;
-const categoriesT1: NewCategory[] = initialState.project.categories;
+const categoriesT1: Category[] = initialState.project.categories;
 
 beforeAll(async () => {
   for await (const image of initialImages) {
@@ -61,8 +61,8 @@ beforeAll(async () => {
       data: imData,
       containing: image.annotations.map((a) => a.id),
       partition: Partition.Unassigned,
-      colors: undefined as unknown as NewImageType["colors"],
-    } as NewImageType;
+      colors: undefined as unknown as ImageObject["colors"],
+    } as ImageObject;
     imagesT1.push(finalImage);
     for (const annotation of image.annotations) {
       const { plane, mask, boundingBox, ...buildAnn } = annotation;
@@ -149,9 +149,9 @@ describe("serializes to coco format", () => {
 });
 
 describe("deserialize into empty project (no matching images)", () => {
-  let newAnnotations: NewAnnotationType[];
+  let newAnnotations: AnnotationObject[];
   let newKinds: Kind[];
-  let newCategories: NewCategory[];
+  let newCategories: Category[];
   beforeAll(async () => {
     const serializedCOCO = serializeCOCOFile(
       imagesT1,
@@ -186,9 +186,9 @@ describe("deserialize into empty project (no matching images)", () => {
 });
 
 describe("deserialize into project with matching image, no matching kinds or categories", () => {
-  let newAnnotations: NewAnnotationType[];
+  let newAnnotations: AnnotationObject[];
   let newKinds: Kind[];
-  let newCategories: NewCategory[];
+  let newCategories: Category[];
   beforeAll(async () => {
     const serializedCOCO = serializeCOCOFile(
       imagesT1,
@@ -198,7 +198,7 @@ describe("deserialize into project with matching image, no matching kinds or cat
 
     const thingsT2 = imagesT1.reduce(
       (
-        entities: DeferredEntityState<NewAnnotationType | NewImageType>,
+        entities: DeferredEntityState<AnnotationObject | ImageObject>,
         thing
       ) => {
         entities.ids.push(thing.id);
@@ -254,9 +254,9 @@ describe("deserialize into project with matching image, no matching kinds or cat
 });
 
 describe("deserialize into project with matching image, matching kinds", () => {
-  let newAnnotations: NewAnnotationType[];
+  let newAnnotations: AnnotationObject[];
   let newKinds: Kind[];
-  let newCategories: NewCategory[];
+  let newCategories: Category[];
   beforeAll(async () => {
     const serializedCOCO = serializeCOCOFile(
       imagesT1,
@@ -266,7 +266,7 @@ describe("deserialize into project with matching image, matching kinds", () => {
 
     const thingsT2 = imagesT1.reduce(
       (
-        entities: DeferredEntityState<NewAnnotationType | NewImageType>,
+        entities: DeferredEntityState<AnnotationObject | ImageObject>,
         thing
       ) => {
         entities.ids.push(thing.id);
@@ -294,7 +294,7 @@ describe("deserialize into project with matching image, matching kinds", () => {
       unknownCategoryId: "",
     };
 
-    const uC1T2: NewCategory = {
+    const uC1T2: Category = {
       color: CATEGORY_COLORS.columbiablue,
       id: generateUUID({ definesUnknown: true }),
       name: "unknown",
@@ -304,7 +304,7 @@ describe("deserialize into project with matching image, matching kinds", () => {
     };
     k1T2.categories = [uC1T2.id];
     k1T2.unknownCategoryId = uC1T2.id;
-    const uC2T2: NewCategory = {
+    const uC2T2: Category = {
       color: CATEGORY_COLORS.columbiablue,
       id: generateUUID({ definesUnknown: true }),
       name: "unknown",
@@ -314,7 +314,7 @@ describe("deserialize into project with matching image, matching kinds", () => {
     };
     k2T2.categories = [uC2T2.id];
     k2T2.unknownCategoryId = uC2T2.id;
-    const uC3T2: NewCategory = {
+    const uC3T2: Category = {
       color: CATEGORY_COLORS.columbiablue,
       id: generateUUID({ definesUnknown: true }),
       name: "unknown",
@@ -334,7 +334,7 @@ describe("deserialize into project with matching image, matching kinds", () => {
     );
 
     const categoriesT2 = [uC1T2, uC2T2, uC3T2].reduce(
-      (entities: DeferredEntityState<NewCategory>, category) => {
+      (entities: DeferredEntityState<Category>, category) => {
         entities.ids.push(category.id);
         entities.entities[category.id] = { saved: category, changes: {} };
         return entities;
@@ -385,10 +385,10 @@ describe("deserialize into project with matching image, matching kinds", () => {
 });
 
 describe("deserialize into project with matching image, matching kinds and category", () => {
-  let newAnnotations: NewAnnotationType[];
+  let newAnnotations: AnnotationObject[];
   let newKinds: Kind[];
-  let newCategories: NewCategory[];
-  let t2categories: NewCategory[];
+  let newCategories: Category[];
+  let t2categories: Category[];
   beforeAll(async () => {
     const serializedCOCO = serializeCOCOFile(
       imagesT1,
@@ -398,7 +398,7 @@ describe("deserialize into project with matching image, matching kinds and categ
 
     const thingsT2 = imagesT1.reduce(
       (
-        entities: DeferredEntityState<NewAnnotationType | NewImageType>,
+        entities: DeferredEntityState<AnnotationObject | ImageObject>,
         thing
       ) => {
         entities.ids.push(thing.id);
@@ -426,7 +426,7 @@ describe("deserialize into project with matching image, matching kinds and categ
       unknownCategoryId: "",
     };
 
-    const uC1T2: NewCategory = {
+    const uC1T2: Category = {
       color: CATEGORY_COLORS.columbiablue,
       id: generateUUID({ definesUnknown: true }),
       name: "unknown",
@@ -436,7 +436,7 @@ describe("deserialize into project with matching image, matching kinds and categ
     };
     k1T2.categories = [uC1T2.id];
     k1T2.unknownCategoryId = uC1T2.id;
-    const uC2T2: NewCategory = {
+    const uC2T2: Category = {
       color: CATEGORY_COLORS.columbiablue,
       id: generateUUID({ definesUnknown: true }),
       name: "unknown",
@@ -446,7 +446,7 @@ describe("deserialize into project with matching image, matching kinds and categ
     };
     k2T2.categories = [uC2T2.id];
     k2T2.unknownCategoryId = uC2T2.id;
-    const uC3T2: NewCategory = {
+    const uC3T2: Category = {
       color: CATEGORY_COLORS.columbiablue,
       id: generateUUID({ definesUnknown: true }),
       name: "unknown",
@@ -456,7 +456,7 @@ describe("deserialize into project with matching image, matching kinds and categ
     };
     k3T2.categories = [uC3T2.id];
     k3T2.unknownCategoryId = uC3T2.id;
-    const c1T2: NewCategory = {
+    const c1T2: Category = {
       color: CATEGORY_COLORS.columbiablue,
       id: generateUUID({ definesUnknown: true }),
       name: "big",
@@ -476,7 +476,7 @@ describe("deserialize into project with matching image, matching kinds and categ
     );
     t2categories = [uC1T2, uC2T2, uC3T2, c1T2];
     const categoriesT2 = t2categories.reduce(
-      (entities: DeferredEntityState<NewCategory>, category) => {
+      (entities: DeferredEntityState<Category>, category) => {
         entities.ids.push(category.id);
         entities.entities[category.id] = { saved: category, changes: {} };
         return entities;

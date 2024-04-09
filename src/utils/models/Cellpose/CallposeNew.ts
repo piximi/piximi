@@ -11,7 +11,7 @@ import { generateUUID } from "utils/common/helpers";
 import { FitOptions } from "../types";
 import { ModelTask } from "../enums";
 import { getImageSlice } from "utils/common/tensorHelpers";
-import { Kind, NewImageType } from "store/data/types";
+import { Kind, ImageObject } from "store/data/types";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
@@ -55,11 +55,11 @@ export class CellposeNew extends Segmenter {
     this._model = { dispose: () => {} } as GraphModel;
   }
 
-  public loadTraining(images: NewImageType[], preprocessingArgs: any): void {}
+  public loadTraining(images: ImageObject[], preprocessingArgs: any): void {}
 
-  public loadValidation(images: NewImageType[], preprocessingArgs: any): void {}
+  public loadValidation(images: ImageObject[], preprocessingArgs: any): void {}
 
-  private _sampleGenerator(images: Array<NewImageType>) {
+  private _sampleGenerator(images: Array<ImageObject>) {
     const count = images.length;
 
     return function* () {
@@ -77,7 +77,7 @@ export class CellposeNew extends Segmenter {
   }
 
   public loadInference(
-    images: NewImageType[],
+    images: ImageObject[],
     preprocessingArgs: LoadInferenceDataArgs
   ): void {
     this._inferenceDataset = tfdata

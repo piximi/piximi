@@ -7,7 +7,7 @@ import { DeferredEntity } from "store/entities/models";
 import { projectSlice } from "../project";
 import { imageViewerSlice } from "../imageViewer";
 import { createRenderedTensor } from "utils/common/tensorHelpers";
-import { NewImageType } from "./types";
+import { ImageObject } from "./types";
 
 export const newDataMiddleware = createListenerMiddleware();
 
@@ -73,7 +73,7 @@ startAppListening({
       if (!thing) continue;
       if (getDeferredProperty(thing, "kind") === "Image") {
         const containedThingIds = getDeferredProperty(
-          thing as DeferredEntity<NewImageType>,
+          thing as DeferredEntity<ImageObject>,
           "containing"
         );
         implicitThingIds.push(...containedThingIds);
@@ -129,7 +129,7 @@ startAppListening({
     const { newData: dataState, imageViewer: imageViewerState } =
       listenerAPI.getState();
 
-    const srcUpdates: Array<{ id: string } & Partial<NewImageType>> = [];
+    const srcUpdates: Array<{ id: string } & Partial<ImageObject>> = [];
     let renderedSrcs: string[] = [];
     const numImages = updates.length;
     let imageNumber = 1;
@@ -139,7 +139,7 @@ startAppListening({
         const colors = changes.colors;
         const image = getCompleteEntity(
           dataState.things.entities[imageId]
-        )! as NewImageType;
+        )! as ImageObject;
 
         const colorsEditable = {
           range: { ...colors.range },

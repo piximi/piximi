@@ -11,7 +11,7 @@ import { Partition } from "utils/models/enums";
 import { Point } from "../types";
 import { AnnotationStateType } from "../enums";
 import { DataArray } from "utils/file-io/types";
-import { NewCategory, PartialDecodedAnnotationType } from "store/data/types";
+import { Category, PartialDecodedAnnotationObject } from "store/data/types";
 
 export abstract class AnnotationTool extends Tool {
   /**
@@ -38,7 +38,7 @@ export abstract class AnnotationTool extends Tool {
   /**
    * Annotation object of the Tool.
    */
-  annotation?: PartialDecodedAnnotationType;
+  annotation?: PartialDecodedAnnotationObject;
   anchor?: Point = undefined;
   origin?: Point = undefined;
   buffer?: Array<Point> = [];
@@ -150,7 +150,7 @@ export abstract class AnnotationTool extends Tool {
    * @param plane Index of the image plane that corresponds to the annotation.
    * @returns
    */
-  public annotate(category: NewCategory, plane: number, imageId: string): void {
+  public annotate(category: Category, plane: number, imageId: string): void {
     if (!this.boundingBox || !this.decodedMask) return;
 
     this.annotation = {

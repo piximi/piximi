@@ -2,7 +2,7 @@ import { GraphModel, History, LayersModel, Tensor } from "@tensorflow/tfjs";
 
 import { ModelArgs, ModelHistory, ModelLayerData } from "../types";
 import { ModelTask } from "../enums";
-import { NewImageType } from "store/data/types";
+import { ImageObject } from "store/data/types";
 
 export abstract class Model {
   readonly name: string;
@@ -82,15 +82,15 @@ export abstract class Model {
 
   public abstract loadModel(loadModelArgs?: any): void | Promise<void>;
   public abstract loadTraining(
-    images: NewImageType[],
+    images: ImageObject[],
     preprocessingArgs: any
   ): void;
   public abstract loadValidation(
-    images: NewImageType[],
+    images: ImageObject[],
     preprocessingArgs: any
   ): void;
   public abstract loadInference(
-    images: NewImageType[],
+    images: ImageObject[],
     preprocessingArgs: any
   ): void;
 

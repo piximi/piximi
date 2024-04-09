@@ -1,10 +1,10 @@
 import COCO_CLASSES from "data/model-data/cocossd-classes";
-import { Category, Kind } from "store/data/types";
+import { OldCategory, Kind } from "store/data/types";
 import { CATEGORY_COLORS } from "utils/common/constants";
 import { generateUUID } from "utils/common/helpers";
 
 export const constructCocoCategories = () => {
-  const categories: Array<Category> = [];
+  const categories: Array<OldCategory> = [];
   const cocoClasses = Object.values(COCO_CLASSES).map((cl) => cl.displayName);
   const availableColors = Object.values(CATEGORY_COLORS);
 

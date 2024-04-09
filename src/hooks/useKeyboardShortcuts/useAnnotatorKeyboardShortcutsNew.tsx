@@ -20,22 +20,22 @@ import {
 import { AnnotationTool } from "utils/annotator/tools";
 import { HotkeyView } from "utils/common/enums";
 import {
-  DecodedAnnotationType,
-  NewDecodedAnnotationType,
+  OldDecodedAnnotationType,
+  DecodedAnnotationObject,
 } from "store/data/types";
 
 type useAnnotatorHotkeysProps = {
   annotationTool: AnnotationTool;
   deleteAnnotations: (
     annotationIds: Array<string>,
-    activeAnnotations: Array<NewDecodedAnnotationType>
+    activeAnnotations: Array<DecodedAnnotationObject>
   ) => void;
   deselectAllAnnotations: () => void;
   deselectAnnotation: () => void;
   resetZoomSelection: () => void;
   workingAnnotationEntity: {
-    saved: DecodedAnnotationType | undefined;
-    changes: Partial<DecodedAnnotationType>;
+    saved: OldDecodedAnnotationType | undefined;
+    changes: Partial<OldDecodedAnnotationType>;
   };
   selectedAnnotationsIds: string[];
   selectionMode: AnnotationModeType;

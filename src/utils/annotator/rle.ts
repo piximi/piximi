@@ -1,4 +1,4 @@
-import { NewAnnotationType, NewDecodedAnnotationType } from "store/data/types";
+import { AnnotationObject, DecodedAnnotationObject } from "store/data/types";
 
 /**
  * Decode a Run-length encoded input array.
@@ -22,8 +22,8 @@ export const decode = (encoded: Array<number>): Uint8ClampedArray => {
 };
 
 export const decodeAnnotationNew = (
-  encodedAnnotation: NewAnnotationType
-): NewDecodedAnnotationType => {
+  encodedAnnotation: AnnotationObject
+): DecodedAnnotationObject => {
   // TODO - serializtion: temporary measure, remove when done
   if (!encodedAnnotation.encodedMask)
     throw Error(`Annotation ${encodedAnnotation.id} has no encoded mask`);
@@ -94,8 +94,8 @@ export const encode = (
 };
 
 export const encodeAnnotationNew = (
-  decodedAnnotation: NewDecodedAnnotationType
-): NewAnnotationType => {
+  decodedAnnotation: DecodedAnnotationObject
+): AnnotationObject => {
   // TODO - serializtion: temporary measure, remove when done
   if (!decodedAnnotation.decodedMask)
     throw Error(`Annotation ${decodedAnnotation.id} has no decoded mask`);

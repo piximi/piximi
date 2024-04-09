@@ -8,10 +8,10 @@ import { selectImageOrigin } from "store/imageViewer";
 
 import { hexToRGBA, colorOverlayROI, encode } from "utils/annotator";
 import { dataSlice } from "store/data/dataSlice";
-import { NewDecodedAnnotationType, Shape } from "store/data/types";
+import { DecodedAnnotationObject, Shape } from "store/data/types";
 
 type AnnotationProps = {
-  annotation: NewDecodedAnnotationType;
+  annotation: DecodedAnnotationObject;
   imageShape: Shape;
   fillColor: string;
   selected?: boolean;

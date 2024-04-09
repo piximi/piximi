@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { selectThingsDictionary } from "store/data/selectors/selectors";
-import { NewAnnotationType, NewDecodedAnnotationType } from "store/data/types";
+import { AnnotationObject, DecodedAnnotationObject } from "store/data/types";
 import { ImageViewerState } from "store/types";
 import { decodeAnnotationNew } from "utils/annotator/rle";
 
@@ -24,13 +24,13 @@ export const selectSelectedAnnotations = createSelector(
   selectThingsDictionary,
   (selectedAnnotationIds, thingsDict) => {
     return selectedAnnotationIds.reduce(
-      (anns: NewDecodedAnnotationType[], id) => {
-        const ann = thingsDict[id] as NewAnnotationType;
+      (anns: DecodedAnnotationObject[], id) => {
+        const ann = thingsDict[id] as AnnotationObject;
         if (ann) {
           const decodedAnn =
             ann.decodedMask === undefined
               ? decodeAnnotationNew(ann)
-              : (ann as NewDecodedAnnotationType);
+              : (ann as DecodedAnnotationObject);
           anns.push(decodedAnn);
         }
         return anns;

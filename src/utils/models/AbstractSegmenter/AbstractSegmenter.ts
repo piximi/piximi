@@ -10,16 +10,16 @@ import {
 } from "@tensorflow/tfjs";
 import { TrainingCallbacks } from "../types";
 import {
-  AnnotationType,
-  Category,
+  OldAnnotationType,
+  OldCategory,
   Kind,
-  NewAnnotationType,
+  AnnotationObject,
 } from "store/data/types";
 import { logger } from "utils/common/helpers";
 
-export type OrphanedAnnotationType = Omit<AnnotationType, "imageId">;
+export type OrphanedAnnotationType = Omit<OldAnnotationType, "imageId">;
 export type NewOrphanedAnnotationType = Omit<
-  NewAnnotationType,
+  AnnotationObject,
   "imageId" | "data" | "src" | "bitDepth" | "name" | "shape"
 >;
 
@@ -52,7 +52,7 @@ export abstract class Segmenter extends Model {
    * associated with categoryIds in the annotations returned by `predict`), and
    * returns the corresponding `Category` objects.
    */
-  public abstract inferenceCategoriesById(catIds: Array<string>): Category[];
+  public abstract inferenceCategoriesById(catIds: Array<string>): OldCategory[];
   public abstract inferenceKindsById(kind: Array<string>): Kind[];
 
   public evaluate() {

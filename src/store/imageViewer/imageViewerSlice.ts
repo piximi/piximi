@@ -1,9 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
-import {
-  DecodedAnnotationType,
-  NewDecodedAnnotationType,
-} from "store/data/types";
+import { DecodedAnnotationObject } from "store/data/types";
 import { ImageViewerState } from "store/types";
 
 import { ZoomModeType } from "utils/annotator/enums";
@@ -199,35 +196,10 @@ export const imageViewerSlice = createSlice({
         });
       }
     },
-    setWorkingAnnotation(
-      state,
-      action: PayloadAction<{
-        annotation: DecodedAnnotationType | string | undefined;
-      }>
-    ) {
-      const { annotation } = action.payload;
-      if (typeof annotation === "string") {
-        //managed in listener
-        return;
-      } else {
-        state.workingAnnotation.saved = action.payload.annotation as
-          | DecodedAnnotationType
-          | undefined;
-        state.workingAnnotation.changes = {};
-      }
-    },
-    updateWorkingAnnotation(
-      state,
-      action: PayloadAction<{ changes: Partial<DecodedAnnotationType> }>
-    ) {
-      if (state.workingAnnotation.saved) {
-        state.workingAnnotation.changes = action.payload.changes;
-      }
-    },
     setWorkingAnnotationNew(
       state,
       action: PayloadAction<{
-        annotation: NewDecodedAnnotationType | string | undefined;
+        annotation: DecodedAnnotationObject | string | undefined;
         preparedByListener?: boolean;
       }>
     ) {
@@ -235,13 +207,13 @@ export const imageViewerSlice = createSlice({
       if (!preparedByListener) return;
 
       state.workingAnnotationNew.saved = annotation as
-        | NewDecodedAnnotationType
+        | DecodedAnnotationObject
         | undefined;
       state.workingAnnotationNew.changes = {};
     },
     updateWorkingAnnotationNew(
       state,
-      action: PayloadAction<{ changes: Partial<NewDecodedAnnotationType> }>
+      action: PayloadAction<{ changes: Partial<DecodedAnnotationObject> }>
     ) {
       if (state.workingAnnotationNew.saved) {
         state.workingAnnotationNew.changes = action.payload.changes;

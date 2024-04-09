@@ -14,12 +14,12 @@ import {
 } from "./constructCocoCategories";
 import { FitOptions } from "../types";
 import { ModelTask } from "../enums";
-import { Category, ImageType, Kind, NewImageType } from "store/data/types";
+import { OldCategory, OldImageType, Kind, ImageObject } from "store/data/types";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
   // if cat undefined, created from default classes
-  categories?: Array<Category>;
+  categories?: Array<OldCategory>;
 };
 type LoadInferenceDataArgsNew = {
   fitOptions: FitOptions;
@@ -49,7 +49,7 @@ type LoadInferenceDataArgsNew = {
   https://github.com/tensorflow/tfjs-models/blob/master/coco-ssd/src/classes.ts
  */
 export class CocoSSD extends Segmenter {
-  protected _inferenceCategories?: Array<Category>;
+  protected _inferenceCategories?: Array<OldCategory>;
 
   constructor() {
     super({
@@ -72,11 +72,11 @@ export class CocoSSD extends Segmenter {
     this._model = await loadGraphModel(this.src, { fromTFHub: isTFHub });
   }
 
-  public loadTraining(images: ImageType[], preprocessingArgs: any): void {}
-  public loadValidation(images: ImageType[], preprocessingArgs: any): void {}
+  public loadTraining(images: OldImageType[], preprocessingArgs: any): void {}
+  public loadValidation(images: OldImageType[], preprocessingArgs: any): void {}
 
   public loadInference(
-    images: NewImageType[],
+    images: ImageObject[],
     preprocessingArgs: LoadInferenceDataArgs
   ) {
     this._inferenceDataset = preprocessInference(
@@ -171,11 +171,11 @@ export class CocoSSDNew extends Segmenter {
     this._model = await loadGraphModel(this.src, { fromTFHub: isTFHub });
   }
 
-  public loadTraining(images: ImageType[], preprocessingArgs: any): void {}
-  public loadValidation(images: ImageType[], preprocessingArgs: any): void {}
+  public loadTraining(images: OldImageType[], preprocessingArgs: any): void {}
+  public loadValidation(images: OldImageType[], preprocessingArgs: any): void {}
 
   public loadInference(
-    images: NewImageType[],
+    images: ImageObject[],
     preprocessingArgs: LoadInferenceDataArgsNew
   ) {
     this._inferenceDataset = preprocessInference(

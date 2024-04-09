@@ -6,7 +6,7 @@ import {
   ModelTask,
   OptimizationAlgorithm,
 } from "./enums";
-import { Kind, NewCategory, Shape } from "store/data/types";
+import { Kind, Category, Shape } from "store/data/types";
 
 export interface ModelLayerData {
   layerName: string;
@@ -48,7 +48,7 @@ export type PreprocessOptions = {
 };
 
 export type LoadDataArgs = {
-  categories: Array<NewCategory>;
+  categories: Array<Category>;
   inputShape: Shape;
   preprocessOptions: PreprocessOptions;
   fitOptions: FitOptions;
