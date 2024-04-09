@@ -2,12 +2,12 @@ import * as ImageJS from "image-js";
 import { decode, hexToRGBA } from "utils/annotator";
 import saveAs from "file-saver";
 import JSZip from "jszip";
-import { NewAnnotationType, NewCategory, NewImageType } from "store/data/types";
+import { AnnotationObject, Category, ImageObject } from "store/data/types";
 
 export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
-  images: Array<NewImageType>,
-  annotations: Array<NewAnnotationType>,
-  categories: Array<NewCategory>,
+  images: Array<ImageObject>,
+  annotations: Array<AnnotationObject>,
+  categories: Array<Category>,
   zip: any,
   projectName: string
 ): any => {
@@ -19,7 +19,7 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
       idMap[ann.imageId] = [ann];
     }
     return idMap;
-  }, {} as { [imageId: string]: NewAnnotationType[] });
+  }, {} as { [imageId: string]: AnnotationObject[] });
 
   images.forEach((current) => {
     annsByImId[current.id].forEach((ann) => {
@@ -65,7 +65,7 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
         }
       }
       const blob = fullLabelImage.toBlob("image/png");
-      const category = categories.find((category: NewCategory) => {
+      const category = categories.find((category: Category) => {
         return category.id === ann.categoryId;
       });
       if (category) {
@@ -82,9 +82,9 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
 };
 
 export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
-  images: Array<NewImageType>,
-  annotations: Array<NewAnnotationType>,
-  categories: Array<NewCategory>,
+  images: Array<ImageObject>,
+  annotations: Array<AnnotationObject>,
+  categories: Array<Category>,
   zip: any,
   projectName: string
 ): any => {
@@ -96,7 +96,7 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
       idMap[ann.imageId] = [ann];
     }
     return idMap;
-  }, {} as { [imageId: string]: NewAnnotationType[] });
+  }, {} as { [imageId: string]: AnnotationObject[] });
 
   images.forEach((current) => {
     const height = current.shape.height;
@@ -111,7 +111,7 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
         alpha: 0,
       }
     );
-    categories.forEach((category: NewCategory) => {
+    categories.forEach((category: Category) => {
       const categoryColor = hexToRGBA(category.color);
       if (!categoryColor) return;
 
@@ -159,9 +159,9 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
 };
 
 export const saveAnnotationsAsLabelMatrix = async (
-  images: Array<NewImageType>,
-  annotations: Array<NewAnnotationType>,
-  categories: Array<NewCategory>,
+  images: Array<ImageObject>,
+  annotations: Array<AnnotationObject>,
+  categories: Array<Category>,
   zip: JSZip,
   random: boolean = false,
   binary: boolean = false
@@ -169,7 +169,7 @@ export const saveAnnotationsAsLabelMatrix = async (
   // image id -> image
   const imIdMap = images.reduce(
     (idMap, im) => ({ ...idMap, [im.id]: im }),
-    {} as { [internalImageId: string]: NewImageType }
+    {} as { [internalImageId: string]: ImageObject }
   );
 
   // cat id -> cat name
@@ -180,7 +180,7 @@ export const saveAnnotationsAsLabelMatrix = async (
 
   // image name -> cat name -> annotations
   const annIdMap = {} as {
-    [imName: string]: { [catName: string]: NewAnnotationType[] };
+    [imName: string]: { [catName: string]: AnnotationObject[] };
   };
 
   for (const ann of annotations) {

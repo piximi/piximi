@@ -5,9 +5,9 @@ import { getCompleteEntity } from "store/entities/utils";
 import { decodeAnnotationNew } from "utils/annotator/rle";
 import { createRenderedTensor } from "utils/common/tensorHelpers";
 import {
-  NewAnnotationType,
-  NewDecodedAnnotationType,
-  NewImageType,
+  AnnotationObject,
+  DecodedAnnotationObject,
+  ImageObject,
 } from "store/data/types";
 
 export const imageViewerMiddleware = createListenerMiddleware();
@@ -34,7 +34,7 @@ startAppListening({
           }
         } else {
           annotationIds.push(thingId);
-          imageIds.push((thing as NewAnnotationType).imageId);
+          imageIds.push((thing as AnnotationObject).imageId);
         }
       }
     });
@@ -77,7 +77,7 @@ startAppListening({
     }
     const activeImage = getCompleteEntity(
       dataState.things.entities[newActiveImageId]
-    )! as NewImageType;
+    )! as ImageObject;
 
     listenerAPI.dispatch(
       imageViewerSlice.actions.setActiveAnnotationIds({
@@ -108,11 +108,11 @@ startAppListening({
     if (typeof annotationValue === "string") {
       const annotation = getCompleteEntity(
         dataState.things.entities[annotationValue]
-      ) as NewAnnotationType;
+      ) as AnnotationObject;
       if (!annotation) return undefined;
       annotationValue = !annotation.decodedMask
         ? decodeAnnotationNew(annotation)
-        : (annotation as NewDecodedAnnotationType);
+        : (annotation as DecodedAnnotationObject);
     }
     listenerAPI.unsubscribe();
     listenerAPI.dispatch(

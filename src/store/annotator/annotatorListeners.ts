@@ -13,7 +13,7 @@ import {
 } from "utils/annotator/enums";
 import { getPropertiesFromImage } from "utils/common/helpers";
 import { BlankAnnotationTool } from "utils/annotator/tools";
-import { NewDecodedAnnotationType, NewImageType } from "store/data/types";
+import { DecodedAnnotationObject, ImageObject } from "store/data/types";
 
 export const annotatorMiddleware = createListenerMiddleware();
 
@@ -43,7 +43,7 @@ startAppListening({
     if (!activeImageId) return;
     const activeImage = getCompleteEntity(
       dataState.things.entities[activeImageId]
-    ) as NewImageType;
+    ) as ImageObject;
     if (!activeImage) return;
     const selectedAnnotationCategoryId = IVState.selectedCategoryId;
     const selectedCategory = getCompleteEntity(
@@ -97,7 +97,7 @@ startAppListening({
             shape,
             name: annotationName,
             kind,
-          } as NewDecodedAnnotationType,
+          } as DecodedAnnotationObject,
         })
       );
     } else {
@@ -152,7 +152,7 @@ startAppListening({
       const annotation = encodeAnnotationNew(combinedSelectedAnnotation);
 
       listenerAPI.dispatch(
-        imageViewerSlice.actions.updateWorkingAnnotation({
+        imageViewerSlice.actions.updateWorkingAnnotationNew({
           changes: annotation!,
         })
       );

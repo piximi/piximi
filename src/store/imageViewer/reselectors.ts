@@ -4,14 +4,14 @@ import { selectActiveImageId } from "./selectors/selectActiveImageId";
 import { selectImageStackImageIds } from "./selectors/selectImageStackImageIds";
 import { generateBlankColors } from "utils/common/tensorHelpers";
 import { Colors, ColorsRaw } from "utils/common/types";
-import { NewImageType } from "store/data/types";
+import { ImageObject } from "store/data/types";
 
 export const selectActiveImage = createSelector(
   selectActiveImageId,
   selectThingsDictionary,
   (activeImageId, thingDict) => {
     if (!activeImageId) return undefined;
-    return thingDict[activeImageId] as NewImageType | undefined;
+    return thingDict[activeImageId] as ImageObject | undefined;
   }
 );
 
@@ -20,10 +20,10 @@ export const selectImageViewerImages = createSelector(
   selectThingsDictionary,
   (imageStackIds, thingDict) => {
     const imageViewerImages = imageStackIds.reduce(
-      (images: NewImageType[], id) => {
+      (images: ImageObject[], id) => {
         const image = thingDict[id];
         if (image) {
-          images.push(image as NewImageType);
+          images.push(image as ImageObject);
         }
         return images;
       },

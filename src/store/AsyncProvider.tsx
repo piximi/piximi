@@ -20,12 +20,12 @@ import { SerializedFileType } from "utils/file-io/types";
 import { loadExampleImage } from "utils/file-io/loadExampleImage";
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
 import {
-  Category,
-  ImageType,
+  OldCategory,
+  OldImageType,
   Kind,
-  NewAnnotationType,
-  NewCategory,
-  NewImageType,
+  AnnotationObject,
+  Category,
+  ImageObject,
 } from "./data/types";
 import { UNKNOWN_CATEGORY_NAME } from "./data/constants";
 
@@ -47,16 +47,16 @@ const loadState = async () => {
     // "/static/media/cell-painting.f118ef087853056f08e6.png"
     "cell-painting.png"
   )) as {
-    image: ImageType;
-    annotationCategories: Category[];
-    annotations: NewAnnotationType[];
+    image: OldImageType;
+    annotationCategories: OldCategory[];
+    annotations: AnnotationObject[];
   };
 
-  const categories: DeferredEntityState<NewCategory> = {
+  const categories: DeferredEntityState<Category> = {
     ids: [],
     entities: {},
   };
-  const things: DeferredEntityState<NewImageType | NewAnnotationType> = {
+  const things: DeferredEntityState<ImageObject | AnnotationObject> = {
     ids: [],
     entities: {},
   };
@@ -64,7 +64,7 @@ const loadState = async () => {
 
   kinds.ids.push("Image");
   const unknownCategoryId = generateUUID({ definesUnknown: true });
-  const unknownCategory: NewCategory = {
+  const unknownCategory: Category = {
     id: unknownCategoryId,
     name: UNKNOWN_CATEGORY_NAME,
     color: UNKNOWN_IMAGE_CATEGORY_COLOR,
@@ -89,7 +89,7 @@ const loadState = async () => {
 
   things.ids.push(image.id);
 
-  things.entities[image.id] = { saved: image as NewImageType, changes: {} };
+  things.entities[image.id] = { saved: image as ImageObject, changes: {} };
 
   categories.ids.push(unknownCategoryId);
   categories.entities[unknownCategoryId] = {
@@ -103,7 +103,7 @@ const loadState = async () => {
   for (const anCat of annotationCategories) {
     kinds.ids.push(anCat.name);
     const unknownCategoryId = generateUUID({ definesUnknown: true });
-    const unknownCategory: NewCategory = {
+    const unknownCategory: Category = {
       id: unknownCategoryId,
       name: UNKNOWN_CATEGORY_NAME,
       color: UNKNOWN_IMAGE_CATEGORY_COLOR,
@@ -158,7 +158,7 @@ const loadState = async () => {
     things.ids.push(annotation.id);
 
     things.entities[annotation.id] = {
-      saved: annotation as NewAnnotationType,
+      saved: annotation as AnnotationObject,
       changes: {},
     };
 

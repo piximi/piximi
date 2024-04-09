@@ -22,7 +22,7 @@ import {
 import { isFiltered } from "utils/common/helpers";
 import { dataSlice } from "store/data/dataSlice";
 import { selectActiveSelectedThingIds } from "store/project/selectors/selectActiveSelectedThings";
-import { NewAnnotationType, NewImageType } from "store/data/types";
+import { AnnotationObject, ImageObject } from "store/data/types";
 
 const max_images = 1000; //number of images from the project that we'll show
 
@@ -133,7 +133,7 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
               {things
                 .slice(0, max_images)
                 .sort(sortFunction)
-                .map((thing: NewImageType | NewAnnotationType) => (
+                .map((thing: ImageObject | AnnotationObject) => (
                   <ProjectGridItemNew
                     key={thing.id}
                     thing={thing}

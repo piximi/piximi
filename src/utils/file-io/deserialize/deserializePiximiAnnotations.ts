@@ -3,12 +3,12 @@ import { deserializePiximiAnnotations_v2 } from "./v2/deserializePiximiAnnotatio
 import { convertAnnotationsWithExistingProject_v1_2 } from "utils/file-io/converters/dataConverter_v1v2";
 import { logger } from "utils/common/helpers";
 import { SerializedFileType, SerializedFileTypeV2 } from "../types";
-import { Kind, NewCategory, NewImageType } from "store/data/types";
+import { Kind, Category, ImageObject } from "store/data/types";
 
 export const deserializePiximiAnnotations = async (
   serializedAnnotations: SerializedFileTypeV2 | SerializedFileType,
-  existingImages: Record<string, NewImageType>,
-  existingCategories: Record<string, NewCategory>,
+  existingImages: Record<string, ImageObject>,
+  existingCategories: Record<string, Category>,
   existingKinds: Record<string, Kind>
 ) => {
   switch (serializedAnnotations.version) {

@@ -23,11 +23,11 @@ import { CropSchema, Partition } from "../enums";
 import { denormalizeTensor, getImageSlice } from "utils/common/tensorHelpers";
 import { BitDepth } from "utils/file-io/types";
 import {
-  Category,
-  ImageType,
-  NewImageType,
+  OldCategory,
+  OldImageType,
+  ImageObject,
   Shape,
-  ThingType,
+  Thing,
 } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 import { logger } from "utils/common/helpers";
@@ -58,7 +58,7 @@ const createClassificationIdxs = <
   return categoryIdxs;
 };
 
-const sampleGenerator = <T extends Omit<ThingType, "kind">, K extends Category>(
+const sampleGenerator = <T extends Omit<Thing, "kind">, K extends OldCategory>(
   images: Array<T>,
   categories: Array<K>
 ) => {
@@ -73,7 +73,7 @@ const sampleGenerator = <T extends Omit<ThingType, "kind">, K extends Category>(
       let activePlane = 0;
 
       if ("activePlane" in image) {
-        activePlane = image.activePlane as NewImageType["activePlane"];
+        activePlane = image.activePlane as ImageObject["activePlane"];
       }
       const dataPlane = getImageSlice(image.data, activePlane);
 
@@ -310,8 +310,8 @@ const doShow = (
 //#endregion Debug stuff
 
 type PreprocessArgs = {
-  images: Array<Omit<ImageType, "colors">>;
-  categories: Array<Category>;
+  images: Array<Omit<OldImageType, "colors">>;
+  categories: Array<OldCategory>;
   inputShape: Shape;
   preprocessOptions: PreprocessOptions;
   fitOptions: FitOptions;

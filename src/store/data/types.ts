@@ -4,7 +4,7 @@ import { BitDepth } from "image-js";
 import { Partition } from "utils/models/enums";
 import { Colors, PartialBy, RequireField } from "utils/common/types";
 
-export type ThingType = {
+export type Thing = {
   id: string;
   name: string;
   src: string;
@@ -17,30 +17,54 @@ export type ThingType = {
   activePlane: number;
 };
 
-export type NewImageType = ThingType & {
+export type ImageObject = Thing & {
   colors: Colors;
   containing: string[];
 };
 
-export type NewAnnotationType = ThingType & {
+export type AnnotationObject = Thing & {
   boundingBox: [number, number, number, number];
   encodedMask: Array<number>;
   decodedMask?: DataArray;
   plane?: number;
   imageId: string;
 };
-export type NewDecodedAnnotationType = Omit<
-  NewAnnotationType & {
+export type DecodedAnnotationObject = Omit<
+  AnnotationObject & {
     decodedMask: DataArray;
   },
   "encodedMask"
 >;
-export type PartialDecodedAnnotationType = PartialBy<
-  NewDecodedAnnotationType,
+export type PartialDecodedAnnotationObject = PartialBy<
+  DecodedAnnotationObject,
   "src" | "data" | "name" | "kind" | "bitDepth" | "shape"
 >;
 
-export type ImageType = {
+export type Category = RequireField<OldCategory, "containing" | "kind">;
+
+export type Kind = {
+  id: string;
+  containing: string[];
+  categories: string[];
+  unknownCategoryId: string;
+};
+export type KindWithCategories = Omit<Kind, "categories"> & {
+  categories: Category[];
+};
+
+export type Shape = {
+  planes: number;
+  height: number;
+  width: number;
+  channels: number;
+};
+
+export type ShapeArray = [number, number, number, number];
+
+/*
+OLD TYPES
+*/
+export type OldImageType = {
   activePlane: number;
   categoryId: string;
   colors: Colors;
@@ -55,7 +79,7 @@ export type ImageType = {
   containing?: string[]; // The URI to be displayed on the canvas
 };
 
-export type Category = {
+export type OldCategory = {
   color: string; // 3 byte hex, eg. "#a08cd2"
   id: string;
   name: string;
@@ -64,9 +88,7 @@ export type Category = {
   kind?: string;
 };
 
-export type NewCategory = RequireField<Category, "containing" | "kind">;
-
-export type AnnotationType = {
+export type OldAnnotationType = {
   id: string;
   src?: string;
   data?: Tensor4D;
@@ -79,28 +101,9 @@ export type AnnotationType = {
   // TODO serialize: these should not be undefineable
 };
 
-export type DecodedAnnotationType = Omit<
-  AnnotationType & {
+export type OldDecodedAnnotationType = Omit<
+  OldAnnotationType & {
     decodedMask: DataArray;
   },
   "encodedMask"
 >;
-
-export type Kind = {
-  id: string;
-  containing: string[];
-  categories: string[];
-  unknownCategoryId: string;
-};
-export type KindWithCategories = Omit<Kind, "categories"> & {
-  categories: NewCategory[];
-};
-
-export type Shape = {
-  planes: number;
-  height: number;
-  width: number;
-  channels: number;
-};
-
-export type ShapeArray = [number, number, number, number];

@@ -18,15 +18,15 @@ import { CustomStore } from "utils/file-io/zarrStores";
 import { ProjectState } from "store/types";
 import {
   Kind,
-  NewAnnotationType,
-  NewCategory,
-  NewImageType,
+  AnnotationObject,
+  Category,
+  ImageObject,
 } from "store/data/types";
 
 const deserializeThingGroup = async (
   name: string,
   thingGroup: Group
-): Promise<NewImageType | NewAnnotationType> => {
+): Promise<ImageObject | AnnotationObject> => {
   const id = (await getAttr(thingGroup, "image_id")) as string;
   const activePlane = (await getAttr(thingGroup, "active_plane")) as number;
   const categoryId = (await getAttr(thingGroup, "class_category_id")) as string;
@@ -84,7 +84,7 @@ const deserializeThingGroup = async (
     const colorsGroup = await getGroup(thingGroup, "colors");
     const colors = await deserializeColorsGroup(colorsGroup);
     const contents = (await getAttr(thingGroup, "contents")) as string[];
-    return { ...thing, colors, containing: contents } as NewImageType;
+    return { ...thing, colors, containing: contents } as ImageObject;
   } else {
     const boundingBox = (await getAttr(thingGroup, "bbox")) as [
       number,
@@ -95,14 +95,14 @@ const deserializeThingGroup = async (
     const encodedMask = (await getAttr(thingGroup, "mask")) as number[];
     const imageId = (await getAttr(thingGroup, "image_id")) as string;
 
-    return { ...thing, boundingBox, encodedMask, imageId } as NewAnnotationType;
+    return { ...thing, boundingBox, encodedMask, imageId } as AnnotationObject;
   }
 };
 
 const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
   const thingNames = (await getAttr(thingsGroup, "image_names")) as string[];
 
-  const things: DeferredEntityState<NewImageType | NewAnnotationType> = {
+  const things: DeferredEntityState<ImageObject | AnnotationObject> = {
     ids: [],
     entities: {},
   };
@@ -130,7 +130,7 @@ const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
 };
 const deserializeCategoriesGroup = async (
   categoriesGroup: Group
-): Promise<DeferredEntityState<NewCategory>> => {
+): Promise<DeferredEntityState<Category>> => {
   const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
   const colors = (await getAttr(categoriesGroup, "color")) as string[];
   const names = (await getAttr(categoriesGroup, "name")) as string[];
@@ -143,7 +143,7 @@ const deserializeCategoriesGroup = async (
     );
   }
 
-  const categories: DeferredEntityState<NewCategory> = {
+  const categories: DeferredEntityState<Category> = {
     ids: [],
     entities: {},
   };
@@ -157,7 +157,7 @@ const deserializeCategoriesGroup = async (
         kind: kinds[i],
         containing: contents[i],
         visible: true,
-      } as NewCategory,
+      } as Category,
       changes: {},
     };
   }
@@ -208,8 +208,8 @@ const deserializeProjectGroup = async (
 ): Promise<{
   project: ProjectState;
   data: {
-    things: DeferredEntityState<NewImageType | NewAnnotationType>;
-    categories: DeferredEntityState<NewCategory>;
+    things: DeferredEntityState<ImageObject | AnnotationObject>;
+    categories: DeferredEntityState<Category>;
     kinds: DeferredEntityState<Kind>;
   };
 }> => {

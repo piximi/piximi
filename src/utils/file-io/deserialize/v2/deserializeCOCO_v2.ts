@@ -14,9 +14,9 @@ import { UNKNOWN_ANNOTATION_CATEGORY_COLOR } from "utils/common/constants";
 import { RequireOnly } from "utils/common/types";
 import {
   Kind,
-  NewAnnotationType,
-  NewCategory,
-  NewImageType,
+  AnnotationObject,
+  Category,
+  ImageObject,
   Shape,
 } from "store/data/types";
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
@@ -27,22 +27,22 @@ type KindMap = Record<
 >;
 type CategoryMap = Record<
   string,
-  | { new: NewCategory; existing?: NewCategory }
-  | { new?: NewCategory; existing: NewCategory }
+  | { new: Category; existing?: Category }
+  | { new?: Category; existing: Category }
 >;
 type ImageMap = Record<
   string,
-  { new: SerializedCOCOImageType; existing?: NewImageType }
+  { new: SerializedCOCOImageType; existing?: ImageObject }
 >;
 
 const reconcileCOCOCategories = (
-  existingCategories: Array<NewCategory>,
+  existingCategories: Array<Category>,
   existingKinds: Array<Kind>,
   serializedCategories: Array<SerializedCOCOCategoryType>,
   availableColors: Array<string> = []
 ) => {
   const categoryMap: CategoryMap = {};
-  const isolatedUnknownCats: Record<string, NewCategory> = {};
+  const isolatedUnknownCats: Record<string, Category> = {};
   const kindMap: KindMap = {};
   if (availableColors.length === 0) {
     availableColors = ["#000000"];
@@ -79,7 +79,7 @@ const reconcileCOCOCategories = (
           doesnt, it cannot be an "unknown" category
         */
         const newId = generateUUID();
-        const newCat: NewCategory = {
+        const newCat: Category = {
           id: newId,
           kind: cocoCat.supercategory,
           name: cocoCat.name,
@@ -105,7 +105,7 @@ const reconcileCOCOCategories = (
           containing: [],
           kind: cocoCat.supercategory,
           visible: true,
-        } as NewCategory;
+        } as Category;
 
         let kind: Kind;
         if (cocoCat.supercategory in kindMap) {
@@ -146,7 +146,7 @@ const reconcileCOCOCategories = (
              We also need to make sure the new unknown category gets added to the project, event though it will have no associated annotations.
            */
           const newId = generateUUID();
-          const newCategory: NewCategory = {
+          const newCategory: Category = {
             id: newId,
             name: cocoCat.name,
             color: newColor,
@@ -171,7 +171,7 @@ const reconcileCOCOCategories = (
 };
 
 const reconcileCOCOImages = (
-  existingImages: Array<NewImageType>,
+  existingImages: Array<ImageObject>,
   serializedImages: Array<SerializedCOCOImageType>
 ) => {
   const imageMap: ImageMap = {};
@@ -245,15 +245,15 @@ const deserializeCOCOAnnotation = (
 
 export const deserializeCOCOFile_v2 = async (
   cocoFile: SerializedCOCOFileType,
-  existingImages: Array<NewImageType>,
-  existingCategories: Array<NewCategory>,
+  existingImages: Array<ImageObject>,
+  existingCategories: Array<Category>,
   existingKinds: Array<Kind>,
   availableColors: Array<string> = []
 ) => {
-  const reconciledAnnotations: NewAnnotationType[] = [];
+  const reconciledAnnotations: AnnotationObject[] = [];
   const annotationNames: Record<string, number> = {};
   const kindsToReconcile: Record<string, Kind> = {};
-  const categoriesToReconcile: Record<string, NewCategory> = {};
+  const categoriesToReconcile: Record<string, Category> = {};
   const crowded: Array<number> = [];
   const multipart: Array<number> = [];
   const malformed: Array<number> = [];
@@ -268,7 +268,7 @@ export const deserializeCOCOFile_v2 = async (
   const imageMap = reconcileCOCOImages(existingImages, cocoFile.images);
 
   for await (const cocoAnn of cocoFile.annotations) {
-    const reconciledAnnotation: Partial<NewAnnotationType> = {
+    const reconciledAnnotation: Partial<AnnotationObject> = {
       id: generateUUID(),
       partition: Partition.Unassigned,
       activePlane: 0,
@@ -304,7 +304,7 @@ export const deserializeCOCOFile_v2 = async (
 
     const annPropsFromIm = await getPropertiesFromImage(
       image,
-      reconciledAnnotation as RequireOnly<NewAnnotationType, "boundingBox">
+      reconciledAnnotation as RequireOnly<AnnotationObject, "boundingBox">
     );
     Object.assign(reconciledAnnotation, annPropsFromIm);
 
@@ -345,7 +345,7 @@ export const deserializeCOCOFile_v2 = async (
 
     reconciledAnnotation.name = name + "_" + annotationNames[name];
 
-    reconciledAnnotations.push(reconciledAnnotation as NewAnnotationType);
+    reconciledAnnotations.push(reconciledAnnotation as AnnotationObject);
   }
 
   if (

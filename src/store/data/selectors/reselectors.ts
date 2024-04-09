@@ -26,12 +26,12 @@ import { CATEGORY_COLORS } from "utils/common/constants";
 import {
   Kind,
   KindWithCategories,
-  NewAnnotationType,
-  NewCategory,
-  NewDecodedAnnotationType,
-  NewImageType,
+  AnnotationObject,
+  Category,
+  DecodedAnnotationObject,
+  ImageObject,
   Shape,
-  ThingType,
+  Thing,
 } from "../types";
 
 export const selectSplitThingDict = createSelector(
@@ -40,15 +40,15 @@ export const selectSplitThingDict = createSelector(
     return things.reduce(
       (
         splitDict: {
-          images: Record<string, NewImageType>;
-          objects: Record<string, NewAnnotationType>;
+          images: Record<string, ImageObject>;
+          objects: Record<string, AnnotationObject>;
         },
         thing
       ) => {
         if (thing.kind === "Image") {
-          splitDict.images[thing.id] = thing as NewImageType;
+          splitDict.images[thing.id] = thing as ImageObject;
         } else {
-          splitDict.objects[thing.id] = thing as NewAnnotationType;
+          splitDict.objects[thing.id] = thing as AnnotationObject;
         }
         return splitDict;
       },
@@ -121,13 +121,11 @@ export const selectObjectKindDict = createSelector(
 );
 
 export const selectAllImages = createSelector(selectAllThings, (things) => {
-  return things.filter((thing) => thing.kind === "Image") as NewImageType[];
+  return things.filter((thing) => thing.kind === "Image") as ImageObject[];
 });
 
 export const selectAllObjects = createSelector(selectAllThings, (things) => {
-  return things.filter(
-    (thing) => thing.kind !== "Image"
-  ) as NewAnnotationType[];
+  return things.filter((thing) => thing.kind !== "Image") as AnnotationObject[];
 });
 export const selectAllImageCategories = createSelector(
   selectAllCategories,
@@ -144,7 +142,7 @@ export const selectAllObjectCategories = createSelector(
 export const selectObjectCategoryDict = createSelector(
   selectAllObjectCategories,
   (categories) => {
-    return categories.reduce((catDict: Record<string, NewCategory>, c) => {
+    return categories.reduce((catDict: Record<string, Category>, c) => {
       catDict[c.id] = c;
       return catDict;
     }, {});
@@ -154,7 +152,7 @@ export const selectObjectCategoryDict = createSelector(
 export const selectCategoryProperty = createSelector(
   selectCategoriesDictionary,
   (entities) =>
-    <S extends keyof NewCategory>(id: string, property: S) => {
+    <S extends keyof Category>(id: string, property: S) => {
       const category = entities[id];
       if (!category) return;
       return category[property];
@@ -258,7 +256,7 @@ export const selectActiveLabeledThings = createSelector(
   selectActiveLabeledThingsIds,
   selectThingsDictionary,
   (activeLabeledThingIds, thingDict) => {
-    const activeLabeledThings: Array<NewAnnotationType | NewImageType> = [];
+    const activeLabeledThings: Array<AnnotationObject | ImageObject> = [];
     for (const thingId of activeLabeledThingIds) {
       const thing = thingDict[thingId];
       thing && activeLabeledThings.push(thing);
@@ -271,7 +269,7 @@ export const selectActiveUnlabeledThings = createSelector(
   selectActiveUnlabeledThingsIds,
   selectThingsDictionary,
   (activeUnlabeledThingIds, thingDict) => {
-    const activeLabeledThings: Array<NewAnnotationType | NewImageType> = [];
+    const activeLabeledThings: Array<AnnotationObject | ImageObject> = [];
     for (const thingId of activeUnlabeledThingIds) {
       const thing = thingDict[thingId];
       thing && activeLabeledThings.push(thing);
@@ -293,7 +291,7 @@ export const selectActiveThingsByPartition = createSelector(
   (activeThings) => {
     const thingsByPartition = activeThings.reduce(
       (
-        byPartition: Record<string, Array<NewImageType | NewImageType>>,
+        byPartition: Record<string, Array<ImageObject | ImageObject>>,
         thing
       ) => {
         switch (thing.partition) {
@@ -339,7 +337,7 @@ export const selectAnnotatedImages = createSelector(
         return image.containing.length > 0;
       }
       return false;
-    }) as NewImageType[];
+    }) as ImageObject[];
   }
 );
 
@@ -354,7 +352,7 @@ export const selectActiveSelectedThings = createSelector(
       activeKind.containing
     );
     const activeSelectedThings = activeSelectedThingIds.reduce(
-      (things: ThingType[], thingId) => {
+      (things: Thing[], thingId) => {
         const thing = thingDict[thingId];
         if (thing) {
           things.push(thing);
@@ -378,17 +376,17 @@ export const selectActiveAnnotationObjectsNew = createSelector(
     const imageShape = activeImage.shape;
     const activePlane = activeImage.activePlane;
     const annotationObjects: Array<{
-      annotation: NewDecodedAnnotationType;
+      annotation: DecodedAnnotationObject;
       fillColor: string;
       imageShape: Shape;
     }> = [];
 
     for (const annotationId of activeAnnotationIds) {
-      const annotation = thingDict[annotationId] as NewAnnotationType;
+      const annotation = thingDict[annotationId] as AnnotationObject;
 
       const decodedAnnotation = !annotation.decodedMask
         ? decodeAnnotationNew(annotation)
-        : (annotation as NewDecodedAnnotationType);
+        : (annotation as DecodedAnnotationObject);
 
       if (
         annotation.plane === activePlane ||
@@ -414,10 +412,10 @@ export const selectWorkingAnnotationObjectNew = createSelector(
     if (!workingAnnotationEntity.saved || !activeImage) return;
     const workingAnnotation = getCompleteEntity(
       workingAnnotationEntity
-    ) as NewAnnotationType;
+    ) as AnnotationObject;
     const annotation = !workingAnnotation.decodedMask
       ? decodeAnnotationNew(workingAnnotation)
-      : (workingAnnotation as NewDecodedAnnotationType);
+      : (workingAnnotation as DecodedAnnotationObject);
     const fillColor = catDict[workingAnnotation.categoryId].color;
     return {
       annotation: annotation,
@@ -429,14 +427,14 @@ export const selectWorkingAnnotationObjectNew = createSelector(
 
 export const selectActiveAnnotationsNew = createSelector(
   [selectActiveAnnotationIds, selectThingsDictionary],
-  (annotationIds, thingsDict): Array<NewDecodedAnnotationType> => {
+  (annotationIds, thingsDict): Array<DecodedAnnotationObject> => {
     if (!annotationIds.length) return [];
 
     return annotationIds.map((annotationId) => {
-      const annotation = thingsDict[annotationId] as NewAnnotationType;
+      const annotation = thingsDict[annotationId] as AnnotationObject;
       const decodedAnnotation = !annotation.decodedMask
         ? decodeAnnotationNew(annotation)
-        : (annotation as NewDecodedAnnotationType);
+        : (annotation as DecodedAnnotationObject);
       return decodedAnnotation;
     });
   }
@@ -444,14 +442,14 @@ export const selectActiveAnnotationsNew = createSelector(
 
 export const selectSelectedActiveAnnotations = createSelector(
   [selectSelectedAnnotationIds, selectThingsDictionary],
-  (annotationIds, thingsDict): Array<NewDecodedAnnotationType> => {
+  (annotationIds, thingsDict): Array<DecodedAnnotationObject> => {
     if (!annotationIds.length) return [];
 
     return annotationIds.map((annotationId) => {
-      const annotation = thingsDict[annotationId] as NewAnnotationType;
+      const annotation = thingsDict[annotationId] as AnnotationObject;
       const decodedAnnotation = !annotation.decodedMask
         ? decodeAnnotationNew(annotation)
-        : (annotation as NewDecodedAnnotationType);
+        : (annotation as DecodedAnnotationObject);
       return decodedAnnotation;
     });
   }
@@ -497,25 +495,24 @@ export const selectImageViewerActiveKindsWithFullCat = createSelector(
 export const selectActiveImageCategoryObjectCount = createSelector(
   selectActiveImage,
   selectKindDictionary,
-  (activeImage, kindDict) =>
-    (category: NewCategory, kindIfUnknown?: string) => {
-      if (!activeImage) return 0;
+  (activeImage, kindDict) => (category: Category, kindIfUnknown?: string) => {
+    if (!activeImage) return 0;
 
-      const objectsInImage = activeImage.containing;
-      let objectsInCategory;
-      if (kindIfUnknown) {
-        const kind = kindDict[kindIfUnknown];
-        if (!kind) return 0;
-        const objectsInKind = kind.containing;
-        const unknownObjects = category.containing;
-        objectsInCategory = intersection(objectsInKind, unknownObjects);
-      } else {
-        objectsInCategory = category.containing;
-      }
-
-      const objectsInBoth = intersection(objectsInCategory, objectsInImage);
-      return objectsInBoth.length;
+    const objectsInImage = activeImage.containing;
+    let objectsInCategory;
+    if (kindIfUnknown) {
+      const kind = kindDict[kindIfUnknown];
+      if (!kind) return 0;
+      const objectsInKind = kind.containing;
+      const unknownObjects = category.containing;
+      objectsInCategory = intersection(objectsInKind, unknownObjects);
+    } else {
+      objectsInCategory = category.containing;
     }
+
+    const objectsInBoth = intersection(objectsInCategory, objectsInImage);
+    return objectsInBoth.length;
+  }
 );
 
 export const selectFirstUnknownCategory = createSelector(

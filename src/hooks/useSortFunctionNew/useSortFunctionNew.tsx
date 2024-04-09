@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectCategoriesDictionary } from "store/data/selectors/selectors";
-import { ThingType } from "store/data/types";
+import { Thing } from "store/data/types";
 import { selectSortTypeNew } from "store/project/selectors";
 import { ThingSortKey_new } from "utils/common/enums";
 
@@ -11,11 +11,11 @@ export const useSortFunctionNew = () => {
     ThingSortKey_new.None
   );
   const categories = useSelector(selectCategoriesDictionary);
-  const theSortFunction = function (a: ThingType, b: ThingType) {
+  const theSortFunction = function (a: Thing, b: Thing) {
     return 0;
   };
   const [sortFunction, setSortFunction] = useState<
-    (a: ThingType, b: ThingType) => number
+    (a: Thing, b: Thing) => number
   >(() => theSortFunction);
 
   useEffect(() => {
@@ -27,24 +27,24 @@ export const useSortFunctionNew = () => {
       switch (sortType) {
         case ThingSortKey_new.FileName:
           setSortFunction(
-            () => (a: ThingType, b: ThingType) => a.name.localeCompare(b.name)
+            () => (a: Thing, b: Thing) => a.name.localeCompare(b.name)
           );
           break;
 
         case ThingSortKey_new.Random:
           setSortFunction(
-            () => (a: ThingType, b: ThingType) =>
+            () => (a: Thing, b: Thing) =>
               Math.round(Math.random() * 10) >= 5 ? 1 : -1
           );
           break;
         case ThingSortKey_new.Name:
           setSortFunction(
-            () => (a: ThingType, b: ThingType) => a.name.localeCompare(b.name)
+            () => (a: Thing, b: Thing) => a.name.localeCompare(b.name)
           );
           break;
         case ThingSortKey_new.None:
         default:
-          setSortFunction(() => (a: ThingType, b: ThingType) => 0);
+          setSortFunction(() => (a: Thing, b: Thing) => 0);
       }
     }
   }, [sortType, categories, previousSortType]);
@@ -53,7 +53,7 @@ export const useSortFunctionNew = () => {
     if (sortType === ThingSortKey_new.Category) {
       setPreviousSortType(sortType);
       setSortFunction(
-        () => (a: ThingType, b: ThingType) =>
+        () => (a: Thing, b: Thing) =>
           categories[a.categoryId].name.localeCompare(
             categories[b.categoryId].name
           )

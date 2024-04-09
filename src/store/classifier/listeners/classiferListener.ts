@@ -31,7 +31,7 @@ import { ModelStatus, Partition } from "utils/models/enums";
 import { availableClassifierModels } from "utils/models/availableClassificationModels";
 import { AlertState } from "utils/common/types";
 import { AlertType } from "utils/common/enums";
-import { NewCategory, ThingType } from "store/data/types";
+import { Category, Thing } from "store/data/types";
 
 export const classifierMiddleware = createListenerMiddleware();
 
@@ -157,7 +157,7 @@ const fitListener = async (
     ? shuffle(labeledThingIds)
     : labeledThingIds;
   const unlabeledThingIds = intersection(activeThingIds, unknownThingIds);
-  const categories: Array<NewCategory> = [];
+  const categories: Array<Category> = [];
   const numClasses = activeKind.categories.reduce((count, id) => {
     const category = getCompleteEntity(dataState.categories.entities[id]);
     if (isUnknownCategory(id) || !category) return count;
@@ -179,16 +179,16 @@ const fitListener = async (
   const validationThingsLength = labeledThingIds.length - trainingThingsLength;
   const trainingThingIds = take(labeledThingIds, trainingThingsLength);
   const validationThingIds = takeRight(labeledThingIds, validationThingsLength);
-  const trainingThings: Array<ThingType> = trainingThingIds.reduce(
-    (things: Array<ThingType>, id) => {
+  const trainingThings: Array<Thing> = trainingThingIds.reduce(
+    (things: Array<Thing>, id) => {
       const thing = getCompleteEntity(dataState.things.entities[id]);
       if (thing) things.push(thing);
       return things;
     },
     []
   );
-  const validationThings: Array<ThingType> = validationThingIds.reduce(
-    (things: Array<ThingType>, id) => {
+  const validationThings: Array<Thing> = validationThingIds.reduce(
+    (things: Array<Thing>, id) => {
       const thing = getCompleteEntity(dataState.things.entities[id]);
       if (thing) things.push(thing);
       return things;
@@ -323,17 +323,14 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   const activeCategories = activeCategoryIds.map(
     (id) => getCompleteEntity(dataState.categories.entities[id])!
   );
-  const inferenceThings = activeThingIds.reduce(
-    (things: Array<ThingType>, id) => {
-      const thing = getCompleteEntity(dataState.things.entities[id]);
+  const inferenceThings = activeThingIds.reduce((things: Array<Thing>, id) => {
+    const thing = getCompleteEntity(dataState.things.entities[id]);
 
-      if (thing && thing.partition === Partition.Inference) {
-        things.push(thing);
-      }
-      return things;
-    },
-    []
-  );
+    if (thing && thing.partition === Partition.Inference) {
+      things.push(thing);
+    }
+    return things;
+  }, []);
 
   /* CLASSIFIER */
 

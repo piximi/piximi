@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { dataSlice } from "store/data/dataSlice";
 import { imageViewerSlice } from "store/imageViewer";
 import { HotkeyView } from "utils/common/enums";
-import { NewCategory } from "store/data/types";
+import { Category } from "store/data/types";
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 
 type MenuFunctions = {
@@ -22,7 +22,7 @@ type MenuFunctions = {
 };
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;
-  category: NewCategory;
+  category: Category;
   handleCloseCategoryMenu: () => void;
   openCategoryMenu: boolean;
   menuFunctions?: MenuFunctions;

@@ -36,14 +36,14 @@ import {
 import { DeferredEntityState } from "./entities";
 import { AnyAction, Dispatch, TypedStartListening } from "@reduxjs/toolkit";
 import {
-  AnnotationType,
-  DecodedAnnotationType,
-  ImageType,
+  OldAnnotationType,
+  OldDecodedAnnotationType,
+  OldImageType,
   Kind,
-  NewAnnotationType,
-  NewCategory,
-  NewDecodedAnnotationType,
-  NewImageType,
+  AnnotationObject,
+  Category,
+  DecodedAnnotationObject,
+  ImageObject,
   Shape,
 } from "./data/types";
 
@@ -70,13 +70,15 @@ export type ProjectState = {
   imageSortKey: ImageSortKey;
   sortType_new: ThingSortKey_new;
   imageFilters: Required<
-    Pick<FilterType<ImageType>, "categoryId" | "partition">
+    Pick<FilterType<OldImageType>, "categoryId" | "partition">
   >;
   thingFilters: Record<
     string,
-    Required<Pick<FilterType<ImageType>, "categoryId" | "partition">>
+    Required<Pick<FilterType<OldImageType>, "categoryId" | "partition">>
   >;
-  annotationFilters: Required<Pick<FilterType<AnnotationType>, "categoryId">>;
+  annotationFilters: Required<
+    Pick<FilterType<OldAnnotationType>, "categoryId">
+  >;
   highlightedCategory: string | undefined;
   selectedAnnotationIds: string[];
   activeKind: string;
@@ -91,18 +93,20 @@ export type ImageViewerState = {
   activeImageId?: string;
   activeAnnotationIds: Array<string>;
   previousImageId?: string;
-  annotationFilters: Required<Pick<FilterType<AnnotationType>, "categoryId">>;
-  filters: Required<Pick<FilterType<NewAnnotationType>, "categoryId">>;
+  annotationFilters: Required<
+    Pick<FilterType<OldAnnotationType>, "categoryId">
+  >;
+  filters: Required<Pick<FilterType<AnnotationObject>, "categoryId">>;
   activeImageRenderedSrcs: Array<string>;
   imageOrigin: { x: number; y: number };
   workingAnnotationId: string | undefined;
   workingAnnotation: {
-    saved: DecodedAnnotationType | undefined;
-    changes: Partial<DecodedAnnotationType>;
+    saved: OldDecodedAnnotationType | undefined;
+    changes: Partial<OldDecodedAnnotationType>;
   };
   workingAnnotationNew: {
-    saved: NewDecodedAnnotationType | undefined;
-    changes: Partial<NewDecodedAnnotationType>;
+    saved: DecodedAnnotationObject | undefined;
+    changes: Partial<DecodedAnnotationObject>;
   };
   selectedAnnotationIds: Array<string>;
   selectedCategoryId: string;
@@ -124,8 +128,8 @@ export type ImageViewerState = {
 
 export type DataState = {
   kinds: DeferredEntityState<Kind>;
-  categories: DeferredEntityState<NewCategory>;
-  things: DeferredEntityState<NewAnnotationType | NewImageType>;
+  categories: DeferredEntityState<Category>;
+  things: DeferredEntityState<AnnotationObject | ImageObject>;
 };
 
 export type ClassifierState = {

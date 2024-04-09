@@ -16,7 +16,7 @@ import { createRenderedTensor } from "utils/common/tensorHelpers";
 import { BitDepth, LoadCB } from "utils/file-io/types";
 import { CustomStore } from "utils/file-io/zarrStores";
 import { ProjectState } from "store/types";
-import { AnnotationType, Category, ImageType } from "store/data/types";
+import { OldAnnotationType, OldCategory, OldImageType } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 /*
@@ -27,7 +27,7 @@ import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 const deserializeAnnotationsGroup = async (
   annotationsGroup: Group
-): Promise<Array<AnnotationType>> => {
+): Promise<Array<OldAnnotationType>> => {
   const imageIds = (await getAttr(annotationsGroup, "image_id")) as string[];
 
   const categories = (await getAttr(
@@ -55,7 +55,7 @@ const deserializeAnnotationsGroup = async (
     null,
   ]).then((ra) => ra.data as Uint8Array);
 
-  let annotations: Array<AnnotationType> = [];
+  let annotations: Array<OldAnnotationType> = [];
   let bboxIdx = 0;
   let maskIdx = 0;
   for (let i = 0; i < ids.length; i++) {
@@ -83,7 +83,7 @@ const deserializeAnnotationsGroup = async (
 const deserializeImageGroup = async (
   name: string,
   imageGroup: Group
-): Promise<ImageType> => {
+): Promise<OldImageType> => {
   const id = (await getAttr(imageGroup, "image_id")) as string;
   const activePlane = (await getAttr(imageGroup, "active_plane")) as number;
   const categoryId = (await getAttr(imageGroup, "class_category_id")) as string;
@@ -138,7 +138,7 @@ const deserializeImageGroup = async (
 const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
   const imageNames = (await getAttr(imagesGroup, "image_names")) as string[];
 
-  const images: Array<ImageType> = [];
+  const images: Array<OldImageType> = [];
 
   for (const [i, name] of Object.entries(imageNames)) {
     // process.env.REACT_APP_LOG_LEVEL === "1" &&
@@ -162,7 +162,7 @@ const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
 
 const deserializeCategoriesGroup = async (
   categoriesGroup: Group
-): Promise<Array<Category>> => {
+): Promise<Array<OldCategory>> => {
   const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
   const colors = (await getAttr(categoriesGroup, "color")) as string[];
   const names = (await getAttr(categoriesGroup, "name")) as string[];
@@ -173,7 +173,7 @@ const deserializeCategoriesGroup = async (
     );
   }
 
-  const categories: Array<Category> = [];
+  const categories: Array<OldCategory> = [];
   for (let i = 0; i < ids.length; i++) {
     categories.push({
       id: ids[i],
@@ -192,10 +192,10 @@ const deserializeProjectGroup = async (
 ): Promise<{
   project: ProjectState;
   data: {
-    images: Array<ImageType>;
-    annotations: Array<AnnotationType>;
-    categories: Array<Category>;
-    annotationCategories: Array<Category>;
+    images: Array<OldImageType>;
+    annotations: Array<OldAnnotationType>;
+    categories: Array<OldCategory>;
+    annotationCategories: Array<OldCategory>;
   };
 }> => {
   const name = (await getAttr(projectGroup, "name")) as string;

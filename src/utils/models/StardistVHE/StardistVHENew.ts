@@ -7,7 +7,7 @@ import { predictStardistNew } from "./predictStardist";
 import { generateUUID } from "utils/common/helpers";
 import { LoadInferenceDataArgs } from "../types";
 import { ModelTask } from "../enums";
-import { Kind, NewImageType } from "store/data/types";
+import { Kind, ImageObject } from "store/data/types";
 
 /*
  * Stardist (Versatile) H&E Nuclei Segmentation
@@ -46,9 +46,9 @@ export class StardistVHENew extends Segmenter {
     this._model = await loadStardist();
   }
 
-  public loadTraining(images: NewImageType[], preprocessingArgs: any): void {}
+  public loadTraining(images: ImageObject[], preprocessingArgs: any): void {}
 
-  public loadValidation(images: NewImageType[], preprocessingArgs: any): void {}
+  public loadValidation(images: ImageObject[], preprocessingArgs: any): void {}
 
   // This Stardist model requires image dimensions to be a multiple of 16
   // (for VHE in particular), see:
@@ -64,7 +64,7 @@ export class StardistVHENew extends Segmenter {
   }
 
   public loadInference(
-    images: NewImageType[],
+    images: ImageObject[],
     preprocessingArgs: LoadInferenceDataArgs
   ): void {
     this._inferenceDataDims = images.map((im) => {

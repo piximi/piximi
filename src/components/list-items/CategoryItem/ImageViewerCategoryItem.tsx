@@ -12,10 +12,10 @@ import { useImageViewerCategoryItemState } from "./useImageViewerCategoryItemSta
 import { CategoryItemMenuNew } from "components/menus";
 import { CountChip } from "components/styled-components";
 import { APPLICATION_COLORS } from "utils/common/constants";
-import { NewCategory } from "store/data/types";
+import { Category } from "store/data/types";
 
 type ImageViewerCategoryItemProps = {
-  category: NewCategory;
+  category: Category;
   kind: string;
 };
 
