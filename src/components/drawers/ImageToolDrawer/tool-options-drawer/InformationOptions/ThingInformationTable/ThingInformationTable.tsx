@@ -7,14 +7,14 @@ import {
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { dataSlice } from "store/data/dataSlice";
-import { ThingType } from "store/data/types";
+import { Thing } from "store/data/types";
 import { Partition } from "utils/models/enums";
 
 export const ThingInformationTable = ({
   thing,
   collapsible,
 }: {
-  thing: ThingType;
+  thing: Thing;
   collapsible: boolean;
 }) => {
   const dispatch = useDispatch();

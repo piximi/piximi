@@ -20,17 +20,17 @@ import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
 import { PartialBy } from "utils/common/types";
 import {
   Kind,
-  NewAnnotationType,
-  NewCategory,
-  NewDecodedAnnotationType,
-  NewImageType,
+  AnnotationObject,
+  Category,
+  DecodedAnnotationObject,
+  ImageObject,
 } from "./types";
 import { UNKNOWN_CATEGORY_NAME } from "./constants";
 
 export const kindsAdapter = createDeferredEntityAdapter<Kind>();
-export const categoriesAdapter = createDeferredEntityAdapter<NewCategory>();
+export const categoriesAdapter = createDeferredEntityAdapter<Category>();
 export const thingsAdapter = createDeferredEntityAdapter<
-  NewImageType | NewAnnotationType
+  ImageObject | AnnotationObject
 >();
 
 export const initialState = (): DataState => {
@@ -71,8 +71,8 @@ export const dataSlice = createSlice({
       action: PayloadAction<{
         data: {
           kinds: DeferredEntityState<Kind>;
-          categories: DeferredEntityState<NewCategory>;
-          things: DeferredEntityState<NewAnnotationType | NewImageType>;
+          categories: DeferredEntityState<Category>;
+          things: DeferredEntityState<AnnotationObject | ImageObject>;
         };
       }>
     ) {
@@ -179,7 +179,7 @@ export const dataSlice = createSlice({
     addCategories(
       state,
       action: PayloadAction<{
-        categories: Array<NewCategory>;
+        categories: Array<Category>;
         isPermanent?: boolean;
       }>
     ) {
@@ -242,7 +242,7 @@ export const dataSlice = createSlice({
             visible: true,
             containing: [],
             kind: kind,
-          } as NewCategory,
+          } as Category,
           changes: {},
         };
       } else {
@@ -253,7 +253,7 @@ export const dataSlice = createSlice({
           visible: true,
           containing: [],
           kind: kind,
-        } as NewCategory);
+        } as Category);
       }
 
       kindsToUpdate.forEach((kind) =>
@@ -333,7 +333,7 @@ export const dataSlice = createSlice({
     setCategories(
       state,
       action: PayloadAction<{
-        categories: Array<NewCategory>;
+        categories: Array<Category>;
         isPermanent?: boolean;
       }>
     ) {
@@ -450,7 +450,7 @@ export const dataSlice = createSlice({
     addThings(
       state,
       action: PayloadAction<{
-        things: Array<NewImageType | NewAnnotationType>;
+        things: Array<ImageObject | AnnotationObject>;
         isPermanent?: boolean;
       }>
     ) {
@@ -465,7 +465,7 @@ export const dataSlice = createSlice({
           (id) =>
             (
               getDeferredProperty(
-                state.things.entities[id] as DeferredEntity<NewImageType>,
+                state.things.entities[id] as DeferredEntity<ImageObject>,
                 "name"
               ) as string
             ).split(".")[0]
@@ -490,7 +490,7 @@ export const dataSlice = createSlice({
           });
         } else {
           const unknownCategoryId = generateUUID({ definesUnknown: true });
-          const unknownCategory: NewCategory = {
+          const unknownCategory: Category = {
             id: unknownCategoryId,
             name: UNKNOWN_CATEGORY_NAME,
             color: UNKNOWN_IMAGE_CATEGORY_COLOR,
@@ -556,22 +556,22 @@ export const dataSlice = createSlice({
     addAnnotations(
       state,
       action: PayloadAction<{
-        annotations: Array<NewAnnotationType | NewDecodedAnnotationType>;
+        annotations: Array<AnnotationObject | DecodedAnnotationObject>;
         isPermanent?: boolean;
       }>
     ) {
       const { annotations, isPermanent } = action.payload;
-      const encodedAnnotations: NewAnnotationType[] = [];
+      const encodedAnnotations: AnnotationObject[] = [];
       for (const annotation of annotations) {
         if (state.things.ids.includes(annotation.id)) continue;
 
         if (annotation.decodedMask) {
-          (annotation as NewAnnotationType).encodedMask = encode(
+          (annotation as AnnotationObject).encodedMask = encode(
             annotation.decodedMask
           );
           delete annotation.decodedMask;
         }
-        encodedAnnotations.push(annotation as NewAnnotationType);
+        encodedAnnotations.push(annotation as AnnotationObject);
       }
       dataSlice.caseReducers.addThings(state, {
         type: "addThings",
@@ -587,7 +587,7 @@ export const dataSlice = createSlice({
       if (!(kind in state.kinds.entities)) return;
 
       const updates: Array<
-        { id: string } & (Partial<NewImageType> | Partial<NewAnnotationType>)
+        { id: string } & (Partial<ImageObject> | Partial<AnnotationObject>)
       > = [];
 
       const thingIds = getDeferredProperty(
@@ -625,7 +625,7 @@ export const dataSlice = createSlice({
         "containing"
       );
       const updates: Array<
-        { id: string } & (Partial<NewImageType> | Partial<NewAnnotationType>)
+        { id: string } & (Partial<ImageObject> | Partial<AnnotationObject>)
       > = [];
       thingIds.forEach((id) => {
         const thing = getCompleteEntity(state.things.entities[id]);
@@ -655,7 +655,7 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         updates: Array<
-          { id: string } & (Partial<NewImageType> | Partial<NewAnnotationType>)
+          { id: string } & (Partial<ImageObject> | Partial<AnnotationObject>)
         >;
         isPermanent?: boolean;
       }>
@@ -753,7 +753,7 @@ export const dataSlice = createSlice({
       for (const { thingId, contents, updateType } of changes) {
         const thing = state.things.entities[
           thingId
-        ] as DeferredEntity<NewImageType>;
+        ] as DeferredEntity<ImageObject>;
         if (!("containing" in state.things.entities[thingId].saved)) continue;
         const previousContents = getDeferredProperty(thing, "containing");
 
@@ -825,7 +825,7 @@ export const dataSlice = createSlice({
 
         if (getDeferredProperty(thing, "kind") === "Image") {
           const thingContents = getDeferredProperty(
-            thing as DeferredEntity<NewImageType>,
+            thing as DeferredEntity<ImageObject>,
             "containing"
           );
 
@@ -892,7 +892,7 @@ export const dataSlice = createSlice({
           }
         } else {
           const imageId = getDeferredProperty(
-            thing as DeferredEntity<NewAnnotationType>,
+            thing as DeferredEntity<AnnotationObject>,
             "imageId"
           );
 

@@ -18,7 +18,7 @@ import { Partition } from "utils/models/enums";
 import { generateUUID } from "./helpers";
 import { DEFAULT_COLORS } from "./constants";
 import { Colors } from "./types";
-import { NewImageType } from "store/data/types";
+import { ImageObject } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 export const getImageInformation = (
@@ -617,7 +617,7 @@ export const convertToImage = async (
   currentColors: Colors | undefined,
   numSlices: number,
   numChannels: number
-): Promise<NewImageType> => {
+): Promise<ImageObject> => {
   if (!imageStack.length) {
     throw Error("Expected image stack");
   }
@@ -656,7 +656,7 @@ export const convertToImage = async (
     partition: Partition.Inference,
     src: coloredSliceURL,
     visible: true,
-  } as NewImageType;
+  } as ImageObject;
 };
 
 /*

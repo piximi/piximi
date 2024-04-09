@@ -6,13 +6,13 @@ import {
   UNKNOWN_IMAGE_CATEGORY_ID,
 } from "store/data/constants";
 import {
-  AnnotationType,
-  Category,
-  ImageType,
+  OldAnnotationType,
+  OldCategory,
+  OldImageType,
   Kind,
-  NewAnnotationType,
-  NewCategory,
-  NewImageType,
+  AnnotationObject,
+  Category,
+  ImageObject,
   Shape,
   ShapeArray,
 } from "store/data/types";
@@ -28,17 +28,17 @@ import { logger } from "utils/common/helpers";
 import { Partition } from "utils/models/enums";
 
 export const dataConverter_v1v2 = (data: {
-  images: ImageType[];
-  oldCategories: Category[];
-  annotationCategories: Category[];
-  annotations: AnnotationType[];
+  images: OldImageType[];
+  oldCategories: OldCategory[];
+  annotationCategories: OldCategory[];
+  annotations: OldAnnotationType[];
 }) => {
   const { images, oldCategories, annotationCategories, annotations } = data;
-  const categories: DeferredEntityState<NewCategory> = {
+  const categories: DeferredEntityState<Category> = {
     ids: [],
     entities: {},
   };
-  const things: DeferredEntityState<NewImageType | NewAnnotationType> = {
+  const things: DeferredEntityState<ImageObject | AnnotationObject> = {
     ids: [],
     entities: {},
   };
@@ -46,7 +46,7 @@ export const dataConverter_v1v2 = (data: {
 
   kinds.ids.push("Image");
   const unknownCategoryId = generateUUID({ definesUnknown: true });
-  const unknownCategory: NewCategory = {
+  const unknownCategory: Category = {
     id: unknownCategoryId,
     name: UNKNOWN_CATEGORY_NAME,
     color: UNKNOWN_IMAGE_CATEGORY_COLOR,
@@ -80,7 +80,7 @@ export const dataConverter_v1v2 = (data: {
         saved: {
           ...category,
           containing: [],
-        } as NewCategory,
+        } as Category,
         changes: {},
       };
       kinds.entities["Image"].saved.categories.push(category.id);
@@ -99,7 +99,7 @@ export const dataConverter_v1v2 = (data: {
 
     things.ids.push(image.id);
 
-    things.entities[image.id] = { saved: image as NewImageType, changes: {} };
+    things.entities[image.id] = { saved: image as ImageObject, changes: {} };
     if (cat in categories.entities) {
       categories.entities[cat].saved.containing.push(image.id);
     }
@@ -110,7 +110,7 @@ export const dataConverter_v1v2 = (data: {
     if (anCat.id === UNKNOWN_ANNOTATION_CATEGORY_ID) continue;
     kinds.ids.push(anCat.name);
     const unknownCategoryId = generateUUID({ definesUnknown: true });
-    const unknownCategory: NewCategory = {
+    const unknownCategory: Category = {
       id: unknownCategoryId,
       name: UNKNOWN_CATEGORY_NAME,
       color: UNKNOWN_IMAGE_CATEGORY_COLOR,
@@ -140,7 +140,7 @@ export const dataConverter_v1v2 = (data: {
 
   const numAnnotationsOfKindPerImage: Record<string, number> = {};
 
-  for (const annotation of annotations as NewAnnotationType[]) {
+  for (const annotation of annotations as AnnotationObject[]) {
     const { plane, ..._annotation } = {
       ...annotation,
       activePlane: annotation.plane,
@@ -154,7 +154,7 @@ export const dataConverter_v1v2 = (data: {
         _annotation.kind
       }`;
       (
-        things.entities[_annotation.imageId].saved as NewImageType
+        things.entities[_annotation.imageId].saved as ImageObject
       ).containing.push(_annotation.id);
     } else {
       annotationName = `${_annotation.kind}`;
@@ -193,7 +193,7 @@ export const dataConverter_v1v2 = (data: {
     things.ids.push(_annotation.id);
 
     things.entities[_annotation.id] = {
-      saved: _annotation as NewAnnotationType,
+      saved: _annotation as AnnotationObject,
       changes: {},
     };
 
@@ -206,15 +206,15 @@ export const dataConverter_v1v2 = (data: {
 };
 
 export const convertAnnotationsWithExistingProject_v1_2 = async (
-  existingImages: Record<string, NewImageType>,
+  existingImages: Record<string, ImageObject>,
   existingKinds: Record<string, Kind>,
-  oldAnnotations: AnnotationType[],
-  oldAnnotationCategories: Category[]
+  oldAnnotations: OldAnnotationType[],
+  oldAnnotationCategories: OldCategory[]
 ) => {
   const catId2Name: Record<string, string> = {};
   const newKinds: Record<string, Kind> = {};
-  const newCategories: Record<string, NewCategory> = {};
-  const newAnnotations: NewAnnotationType[] = [];
+  const newCategories: Record<string, Category> = {};
+  const newAnnotations: AnnotationObject[] = [];
   const imageMap: Record<string, Image> = {};
 
   oldAnnotationCategories.forEach((anCat) => {
@@ -232,7 +232,7 @@ export const convertAnnotationsWithExistingProject_v1_2 = async (
     }
   });
   for await (const ann of oldAnnotations) {
-    const newAnn: Partial<NewAnnotationType> = { ...ann };
+    const newAnn: Partial<AnnotationObject> = { ...ann };
     const existingImage = existingImages[ann.imageId];
     if (!existingImage) {
       logger(`No image found for annotation: ${ann.id}\nskipping`);
@@ -269,7 +269,7 @@ export const convertAnnotationsWithExistingProject_v1_2 = async (
     );
     Object.assign(newAnn, imageProperties);
     newAnn.shape = convertArrayToShape(newAnn.data!.shape as ShapeArray);
-    newAnnotations.push(newAnn as NewAnnotationType);
+    newAnnotations.push(newAnn as AnnotationObject);
   }
   return {
     newAnnotations,

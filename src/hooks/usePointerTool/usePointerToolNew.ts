@@ -9,7 +9,7 @@ import { getAnnotationsInBoxNew } from "utils/annotator/imageHelper";
 import { Point } from "utils/annotator/types";
 import { ToolType } from "utils/annotator/enums";
 import { HotkeyView } from "utils/common/enums";
-import { NewDecodedAnnotationType } from "store/data/types";
+import { DecodedAnnotationObject } from "store/data/types";
 
 const delta = 10;
 
@@ -148,17 +148,17 @@ export const usePointerToolNew = (
       !activeImageId
     )
       return;
-    let currentAnnotation: NewDecodedAnnotationType | undefined;
+    let currentAnnotation: DecodedAnnotationObject | undefined;
 
     const overlappingAnnotationIds = getOverlappingAnnotations(
       absolutePosition,
-      activeAnnotations as NewDecodedAnnotationType[]
+      activeAnnotations as DecodedAnnotationObject[]
     );
 
     if (overlappingAnnotationIds.length === 0) {
       deselectAllAnnotations();
       dispatch(
-        imageViewerSlice.actions.setWorkingAnnotation({
+        imageViewerSlice.actions.setWorkingAnnotationNew({
           annotation: undefined,
         })
       );
@@ -172,13 +172,13 @@ export const usePointerToolNew = (
       const nextAnnotationId = overlappingAnnotationIds[currentIndex];
 
       currentAnnotation = activeAnnotations.find(
-        (annotation: NewDecodedAnnotationType) => {
+        (annotation: DecodedAnnotationObject) => {
           return annotation.id === nextAnnotationId;
         }
       );
     } else {
       currentAnnotation = activeAnnotations.find(
-        (annotation: NewDecodedAnnotationType) => {
+        (annotation: DecodedAnnotationObject) => {
           return annotation.id === overlappingAnnotationIds[0];
         }
       );

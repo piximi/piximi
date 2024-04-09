@@ -12,7 +12,7 @@ import {
 } from "./constants";
 import { AlertType, ImageSortKey } from "./enums";
 import { FilterType, ImageSortKeyType } from "./types";
-import { NewCategory, NewImageType, Shape, ShapeArray } from "store/data/types";
+import { Category, ImageObject, Shape, ShapeArray } from "store/data/types";
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 
 /* 
@@ -176,7 +176,7 @@ export const isUnknownCategory = (categoryId: string) => {
 
 export const generateUnknownCategory = (kind: string) => {
   const unknownCategoryId = generateUUID({ definesUnknown: true });
-  const unknownCategory: NewCategory = {
+  const unknownCategory: Category = {
     id: unknownCategoryId,
     name: UNKNOWN_CATEGORY_NAME,
     color: UNKNOWN_IMAGE_CATEGORY_COLOR,
@@ -348,7 +348,7 @@ export const convertToDataArray = (
 };
 
 export const getPropertiesFromImage = async (
-  image: NewImageType,
+  image: ImageObject,
   annotation: { boundingBox: number[] }
 ) => {
   const renderedIm = await ImageJS.Image.load(image.src);
@@ -381,7 +381,7 @@ export const getPropertiesFromImage = async (
 
 export const getPropertiesFromImageSync = (
   renderedIm: ImageJS.Image,
-  image: NewImageType,
+  image: ImageObject,
   annotation: { boundingBox: number[] }
 ) => {
   const normalizingWidth = image.shape.width - 1;

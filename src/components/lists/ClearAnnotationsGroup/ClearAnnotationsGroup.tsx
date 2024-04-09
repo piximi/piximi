@@ -71,7 +71,9 @@ export const ClearAnnotationsGroup = () => {
         );
       }
       dispatch(
-        imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })
+        imageViewerSlice.actions.setWorkingAnnotationNew({
+          annotation: undefined,
+        })
       );
     });
   };

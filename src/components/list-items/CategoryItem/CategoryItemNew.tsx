@@ -11,16 +11,16 @@ import { selectNumThingsByCatAndKind } from "store/data/selectors/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 import { CountChip } from "components/styled-components";
 import { APPLICATION_COLORS } from "utils/common/constants";
-import { NewCategory } from "store/data/types";
+import { Category } from "store/data/types";
 
 type CategoryItemProps = {
-  category: NewCategory;
+  category: Category;
   isSelected: boolean;
   isHighlighted: boolean;
-  selectCategory: (category: NewCategory) => void;
+  selectCategory: (category: Category) => void;
   handleOpenCategoryMenu: (
     event: React.MouseEvent<HTMLButtonElement>,
-    category: NewCategory
+    category: Category
   ) => void;
 };
 

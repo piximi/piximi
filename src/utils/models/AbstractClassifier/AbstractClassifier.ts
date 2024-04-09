@@ -24,7 +24,7 @@ import {
   TrainingCallbacks,
 } from "../types";
 import { evaluateConfusionMatrix, getLayersModelSummary } from "../helpers";
-import { Category, ThingType } from "store/data/types";
+import { OldCategory, Thing } from "store/data/types";
 
 export abstract class SequentialClassifier extends Model {
   protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
@@ -40,7 +40,7 @@ export abstract class SequentialClassifier extends Model {
     super.dispose();
   }
 
-  public loadTraining<T extends ThingType>(
+  public loadTraining<T extends Thing>(
     images: T[],
     preprocessingArgs: LoadDataArgs
   ) {
@@ -50,7 +50,7 @@ export abstract class SequentialClassifier extends Model {
     });
   }
 
-  public loadValidation<T extends ThingType>(
+  public loadValidation<T extends Thing>(
     images: T[],
     preprocessingArgs: LoadDataArgs
   ) {
@@ -60,7 +60,7 @@ export abstract class SequentialClassifier extends Model {
     });
   }
 
-  public loadInference<T extends ThingType>(
+  public loadInference<T extends Thing>(
     images: T[],
     preprocessingArgs: LoadDataArgs
   ) {
@@ -110,7 +110,7 @@ export abstract class SequentialClassifier extends Model {
     }
   }
 
-  public async predict(categories: Array<Category>): Promise<string[]> {
+  public async predict(categories: Array<OldCategory>): Promise<string[]> {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }

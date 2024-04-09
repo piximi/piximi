@@ -15,11 +15,11 @@ import {
 import { CropSchema, ModelTask, Partition } from "../enums";
 import { loadDataUrlAsStack } from "utils/file-io/helpers";
 import { convertToImage } from "utils/common/tensorHelpers";
-import { NewCategory, NewImageType, Shape } from "store/data/types";
+import { Category, ImageObject, Shape } from "store/data/types";
 
 jest.setTimeout(100000);
 
-const categories: Array<NewCategory> = [
+const categories: Array<Category> = [
   // {
   //   color: "#AAAAAA",
   //   id: "00000000-0000-0000-0000-000000000000",
@@ -171,7 +171,7 @@ const inferrenceImagesUnloaded = [
 it("predict", async () => {
   // await setBackend("tensorflow");
 
-  const inferrenceImages: Array<NewImageType> = [];
+  const inferrenceImages: Array<ImageObject> = [];
   const imageIds: Array<string> = [];
 
   for (const im of inferrenceImagesUnloaded) {

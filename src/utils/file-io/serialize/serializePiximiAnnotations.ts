@@ -1,15 +1,15 @@
 import {
   Kind,
-  NewAnnotationType,
-  NewCategory,
-  NewImageType,
+  AnnotationObject,
+  Category,
+  ImageObject,
 } from "store/data/types";
 import { NewSerializedAnnotationType } from "../types";
 
 export const serializePiximiAnnotations = (
-  images: Array<NewImageType>,
-  annotations: Array<NewAnnotationType>,
-  categories: Array<NewCategory>,
+  images: Array<ImageObject>,
+  annotations: Array<AnnotationObject>,
+  categories: Array<Category>,
   kinds: Array<Kind>
 ) => {
   const piximiVersion = process.env.REACT_APP_VERSION;

@@ -29,14 +29,14 @@ import { PredictionListItemsNew } from "components/list-items";
 import { isUnknownCategory } from "utils/common/helpers";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { HotkeyView } from "utils/common/enums";
-import { NewCategory } from "store/data/types";
+import { Category } from "store/data/types";
 
 export const CategoriesListNew = () => {
   const dispatch = useDispatch();
   const categories = useSelector(selectActiveCategories);
   const activeUnknownCategory = useSelector(selectActiveUnknownCategory);
   const activeKind = useSelector(selectActiveKindId);
-  const [selectedCategory, setSelectedCategory] = useState<NewCategory>();
+  const [selectedCategory, setSelectedCategory] = useState<Category>();
   const [categoryIndex, setCategoryIndex] = useState("");
 
   const highlightedCategory = useSelector(selectHighlightedImageCategory);
@@ -59,7 +59,7 @@ export const CategoriesListNew = () => {
   } = useDialogHotkey(HotkeyView.DialogWithAction);
 
   const selectCategory = useCallback(
-    (category: NewCategory) => {
+    (category: Category) => {
       setSelectedCategory(category);
 
       dispatch(
@@ -73,7 +73,7 @@ export const CategoriesListNew = () => {
 
   const onOpenCategoryMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
-    category: NewCategory
+    category: Category
   ) => {
     selectCategory(category);
     setCategoryMenuAnchorEl(event.currentTarget);
@@ -163,7 +163,7 @@ export const CategoriesListNew = () => {
     <>
       <List dense>
         <List dense sx={{ maxHeight: "20rem", overflowY: "scroll" }}>
-          {categories.map((category: NewCategory) => {
+          {categories.map((category: Category) => {
             return (
               <CategoryItemNew
                 category={category}

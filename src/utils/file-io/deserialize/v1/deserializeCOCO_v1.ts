@@ -9,7 +9,7 @@ import {
   SerializedCOCOImageType,
 } from "../../types";
 import { Point } from "utils/annotator/types";
-import { AnnotationType, Category, ImageType } from "store/data/types";
+import { OldAnnotationType, OldCategory, OldImageType } from "store/data/types";
 
 /*
 We want to match incoming categories to existing categories, if their names are the same,
@@ -18,7 +18,7 @@ refer to them. Instead we have to ensure incoming categories are given the prope
 change the incoming annotations to refer to the updated incoming category id
 */
 const reconcileCOCOCategories = (
-  existingCategories: Array<Category>,
+  existingCategories: Array<OldCategory>,
   serializedCategories: Array<SerializedCOCOCategoryType>,
   serializedAnnotations: Array<SerializedCOCOAnnotationType>,
   availableColors: Array<string> = []
@@ -88,7 +88,7 @@ change the incoming annotations to refer to the updated incoming image id.
 If the image doesn't exist, then there's nothing to assign the annotation to, and it is discarded.
 */
 const reconcileImages = (
-  existingImages: Array<ImageType>,
+  existingImages: Array<OldImageType>,
   serializedImages: Array<SerializedCOCOImageType>,
   // reconcileCOCOCategories changes 'category_id' type
   serializedAnnotations: Array<
@@ -156,8 +156,8 @@ const reconcileImages = (
 
 export const deserializeCOCOFile_v1 = (
   cocoFile: SerializedCOCOFileType,
-  existingImages: Array<ImageType>,
-  existingCategories: Array<Category>,
+  existingImages: Array<OldImageType>,
+  existingCategories: Array<OldCategory>,
   availableColors: Array<string> = []
 ) => {
   // this must come first
@@ -179,7 +179,7 @@ export const deserializeCOCOFile_v1 = (
   const multipart: Array<number> = [];
   const malformed: Array<number> = [];
 
-  const encodedAnnotations: Array<AnnotationType> = [];
+  const encodedAnnotations: Array<OldAnnotationType> = [];
 
   for (const cocoAnn of imModdedAnnotations) {
     const parentIm = matchedIms.find((im) => im.id === cocoAnn.image_id);

@@ -6,7 +6,7 @@ import {
 } from "@mui/icons-material";
 import { NewItemDetailTooltip } from "./NewItemDetailTooltip";
 import { ThingDetailList } from "./ThingDetailList";
-import { ThingType } from "store/data/types";
+import { Thing } from "store/data/types";
 
 export const ThingDetailContainer = ({
   position,
@@ -18,7 +18,7 @@ export const ThingDetailContainer = ({
   position: { top: number; left: number };
   backgroundColor: string;
   categoryName: string;
-  thing: ThingType;
+  thing: Thing;
   usePredictedStyle: boolean;
 }) => {
   const theme = useTheme();

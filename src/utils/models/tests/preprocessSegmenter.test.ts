@@ -13,7 +13,12 @@ import { CropSchema, Partition } from "../enums";
 import { MIMEType } from "utils/file-io/types";
 import { loadImageFileAsStack } from "utils/file-io/helpers";
 import { convertToImage } from "utils/common/tensorHelpers";
-import { AnnotationType, Category, ImageType, Shape } from "store/data/types";
+import {
+  OldAnnotationType,
+  OldCategory,
+  OldImageType,
+  Shape,
+} from "store/data/types";
 
 //jest.setTimeout(50000);
 
@@ -45,7 +50,7 @@ const fitOptions: FitOptions = {
   batchSize: 32,
 };
 
-const annotationCategories: Array<Category> = [
+const annotationCategories: Array<OldCategory> = [
   {
     color: "#920000",
     id: "00000000-0000-1111-0000-000000000000",
@@ -65,7 +70,7 @@ const preloadedImages: Array<{
   src: string;
   name: string;
   mimetype: MIMEType;
-  annotations: Array<AnnotationType>;
+  annotations: Array<OldAnnotationType>;
 }> = [generateUUID()].map((imId) => ({
   id: imId,
   src: "/static/media/cell-painting.f118ef087853056f08e6.png",
@@ -90,7 +95,7 @@ const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
 };
 
 it.skip("preprocessSegmenter", async () => {
-  const images: Array<ImageType> = [];
+  const images: Array<OldImageType> = [];
 
   for (const preIm of preloadedImages) {
     const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);

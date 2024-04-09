@@ -12,17 +12,17 @@ import {
 import { PartialBy } from "utils/common/types";
 import {
   Kind,
-  NewAnnotationType,
-  NewCategory,
-  NewImageType,
+  AnnotationObject,
+  Category,
+  ImageObject,
   ShapeArray,
 } from "store/data/types";
 
 type KindMap = Record<string, { new: Kind; existing?: Kind }>;
-type CategoryMap = Record<string, { new: NewCategory; existing?: NewCategory }>;
+type CategoryMap = Record<string, { new: Category; existing?: Category }>;
 type ImageMap = Record<
   string,
-  { new: SerializedAnnotatorImageType; existing?: NewImageType }
+  { new: SerializedAnnotatorImageType; existing?: ImageObject }
 >;
 
 export const deserializeAnnotations = (
@@ -30,7 +30,7 @@ export const deserializeAnnotations = (
   imageId: string
 ) => {
   const annotations: Array<
-    PartialBy<NewAnnotationType, "bitDepth" | "data" | "src">
+    PartialBy<AnnotationObject, "bitDepth" | "data" | "src">
   > = [];
 
   for (const annotation of serializedAnnotations) {
@@ -69,8 +69,8 @@ const reconcileKinds = (
 };
 
 const reconcileCategories = (
-  existingCategories: Array<NewCategory>,
-  serializedCategories: Array<NewCategory>
+  existingCategories: Array<Category>,
+  serializedCategories: Array<Category>
 ) => {
   const categoryMap: CategoryMap = {};
   serializedCategories.forEach((category) => {
@@ -86,7 +86,7 @@ const reconcileCategories = (
 };
 
 const reconcileImages = (
-  existingImages: Array<NewImageType>,
+  existingImages: Array<ImageObject>,
   serializedImages: Array<SerializedAnnotatorImageType>
 ) => {
   const imageMap: ImageMap = {};
@@ -102,8 +102,8 @@ const reconcileImages = (
 
 export const deserializePiximiAnnotations_v2 = async (
   serializedProject: SerializedFileTypeV2,
-  existingImages: Array<NewImageType>,
-  existingCategories: Array<NewCategory>,
+  existingImages: Array<ImageObject>,
+  existingCategories: Array<Category>,
   existingKinds: Array<Kind>
 ) => {
   // this must come first
@@ -116,9 +116,9 @@ export const deserializePiximiAnnotations_v2 = async (
     serializedProject.categories
   );
 
-  const reconciledAnnotations: NewAnnotationType[] = [];
+  const reconciledAnnotations: AnnotationObject[] = [];
   const kindsToReconcile: Record<string, Kind> = {};
-  const categoriesToReconcile: Record<string, NewCategory> = {};
+  const categoriesToReconcile: Record<string, Category> = {};
 
   for await (let annotation of serializedProject.annotations) {
     const annImage = imageMap[annotation.imageId];
@@ -173,7 +173,7 @@ export const deserializePiximiAnnotations_v2 = async (
       shape: annotationShape,
       encodedMask: annotationEncoding,
     };
-    reconciledAnnotations.push(deserializedAnnotation as NewAnnotationType);
+    reconciledAnnotations.push(deserializedAnnotation as AnnotationObject);
   }
 
   return {

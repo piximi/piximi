@@ -17,7 +17,7 @@ import { ImageShapeEnum } from "./enums";
 import { getStackTraceFromError } from "utils/common/helpers";
 import { AlertState } from "utils/common/types";
 import { AlertType } from "utils/common/enums";
-import { NewImageType } from "store/data/types";
+import { ImageObject } from "store/data/types";
 
 async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   let imageStack: ImageJS.Stack;
@@ -86,12 +86,12 @@ export const uploadImages = async (
   slices: number,
   referenceShape: ImageShapeInfo
 ): Promise<{
-  imagesToUpload: NewImageType[];
+  imagesToUpload: ImageObject[];
   warning: any;
   errors: AlertState[];
 }> => {
   const invalidImageFiles: Array<ImageFileError> = [];
-  const imagesToUpload: Array<NewImageType> = [];
+  const imagesToUpload: Array<ImageObject> = [];
   const errors: Array<AlertState> = [];
   let warning: AlertState | undefined;
 
@@ -127,7 +127,7 @@ export const uploadImages = async (
           imageToUpload.kind = "Image";
           imageToUpload.containing = [];
 
-          imagesToUpload.push(imageToUpload as NewImageType);
+          imagesToUpload.push(imageToUpload as ImageObject);
         } catch (err) {
           const error = err as Error;
           const stackTrace = await getStackTraceFromError(error);

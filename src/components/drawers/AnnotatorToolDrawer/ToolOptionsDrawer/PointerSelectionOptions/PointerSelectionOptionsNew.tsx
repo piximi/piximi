@@ -13,7 +13,7 @@ import { CustomListItemButton } from "components/list-items";
 import { CollapsibleListItem } from "components/list-items/CollapsibleListItem";
 import { selectActiveAnnotationsNew } from "store/data/selectors/reselectors";
 import { selectAllCategories } from "store/data/selectors/selectors";
-import { Category } from "store/data/types";
+import { OldCategory } from "store/data/types";
 
 export const PointerSelectionOptionsNew = () => {
   const t = useTranslation();
@@ -90,7 +90,7 @@ export const PointerSelectionOptionsNew = () => {
           dense
         >
           <List>
-            {annotationCategories.map((category: Category, idx: number) => {
+            {annotationCategories.map((category: OldCategory, idx: number) => {
               return (
                 <CustomListItemButton
                   key={idx}

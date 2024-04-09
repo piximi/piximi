@@ -9,11 +9,11 @@ import { logger } from "utils/common/helpers";
 import { Point } from "./types";
 import { DataArray } from "utils/file-io/types";
 import {
+  OldCategory,
+  AnnotationObject,
   Category,
-  NewAnnotationType,
-  NewCategory,
-  NewDecodedAnnotationType,
-  NewImageType,
+  DecodedAnnotationObject,
+  ImageObject,
 } from "store/data/types";
 
 export const generatePoints = (buffer: Array<number> | undefined) => {
@@ -145,10 +145,10 @@ Given a click at a position, return all overlapping annotations ids
  */
 export const getOverlappingAnnotations = (
   position: { x: number; y: number },
-  annotations: Array<NewDecodedAnnotationType>
+  annotations: Array<DecodedAnnotationObject>
 ) => {
   const overlappingAnnotations = annotations.filter(
-    (annotation: NewDecodedAnnotationType) => {
+    (annotation: DecodedAnnotationObject) => {
       const boundingBox = annotation.boundingBox;
       if (pointInBox(position, boundingBox)) {
         const boundingBoxWidth = boundingBox[2] - boundingBox[0];
@@ -173,7 +173,7 @@ export const getOverlappingAnnotations = (
       return false;
     }
   );
-  return overlappingAnnotations.map((annotation: NewDecodedAnnotationType) => {
+  return overlappingAnnotations.map((annotation: DecodedAnnotationObject) => {
     return annotation.id;
   });
 };
@@ -181,9 +181,9 @@ export const getOverlappingAnnotations = (
 export const getAnnotationsInBox = (
   minimum: { x: number; y: number },
   maximum: { x: number; y: number },
-  annotations: Array<NewDecodedAnnotationType>
+  annotations: Array<DecodedAnnotationObject>
 ) => {
-  return annotations.filter((annotation: NewDecodedAnnotationType) => {
+  return annotations.filter((annotation: DecodedAnnotationObject) => {
     return (
       minimum.x <= annotation.boundingBox[0] &&
       minimum.y <= annotation.boundingBox[1] &&
@@ -195,9 +195,9 @@ export const getAnnotationsInBox = (
 export const getAnnotationsInBoxNew = (
   minimum: { x: number; y: number },
   maximum: { x: number; y: number },
-  annotations: Array<NewDecodedAnnotationType>
+  annotations: Array<DecodedAnnotationObject>
 ) => {
-  return annotations.filter((annotation: NewDecodedAnnotationType) => {
+  return annotations.filter((annotation: DecodedAnnotationObject) => {
     return (
       minimum.x <= annotation.boundingBox[0] &&
       minimum.y <= annotation.boundingBox[1] &&
@@ -323,9 +323,9 @@ export const hexToRGBA = (color: string, alpha?: number) => {
 };
 
 export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
-  images: Array<NewImageType>,
-  annotations: Array<NewAnnotationType>,
-  categories: Array<NewCategory>,
+  images: Array<ImageObject>,
+  annotations: Array<AnnotationObject>,
+  categories: Array<Category>,
   zip: any,
   projectName: string
 ): any => {
@@ -337,7 +337,7 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
       idMap[ann.imageId] = [ann];
     }
     return idMap;
-  }, {} as { [imageId: string]: NewAnnotationType[] });
+  }, {} as { [imageId: string]: AnnotationObject[] });
 
   images.forEach((current) => {
     annsByImId[current.id].forEach((ann) => {
@@ -383,7 +383,7 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
         }
       }
       const blob = fullLabelImage.toBlob("image/png");
-      const category = categories.find((category: Category) => {
+      const category = categories.find((category: OldCategory) => {
         return category.id === ann.categoryId;
       });
       if (category) {
@@ -400,9 +400,9 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
 };
 
 export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
-  images: Array<NewImageType>,
-  annotations: Array<NewAnnotationType>,
-  categories: Array<NewCategory>,
+  images: Array<ImageObject>,
+  annotations: Array<AnnotationObject>,
+  categories: Array<Category>,
   zip: any,
   projectName: string
 ): any => {
@@ -414,7 +414,7 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
       idMap[ann.imageId] = [ann];
     }
     return idMap;
-  }, {} as { [imageId: string]: NewAnnotationType[] });
+  }, {} as { [imageId: string]: AnnotationObject[] });
 
   images.forEach((current) => {
     const height = current.shape.height;
@@ -429,7 +429,7 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
         alpha: 0,
       }
     );
-    categories.forEach((category: Category) => {
+    categories.forEach((category: OldCategory) => {
       const categoryColor = hexToRGBA(category.color);
       if (!categoryColor) return;
 
@@ -477,9 +477,9 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
 };
 
 export const saveAnnotationsAsLabelMatrix = async (
-  images: Array<NewImageType>,
-  annotations: Array<NewAnnotationType>,
-  categories: Array<NewCategory>,
+  images: Array<ImageObject>,
+  annotations: Array<AnnotationObject>,
+  categories: Array<Category>,
   zip: JSZip,
   random: boolean = false,
   binary: boolean = false
@@ -487,7 +487,7 @@ export const saveAnnotationsAsLabelMatrix = async (
   // image id -> image
   const imIdMap = images.reduce(
     (idMap, im) => ({ ...idMap, [im.id]: im }),
-    {} as { [internalImageId: string]: NewImageType }
+    {} as { [internalImageId: string]: ImageObject }
   );
 
   // cat id -> cat name
@@ -498,7 +498,7 @@ export const saveAnnotationsAsLabelMatrix = async (
 
   // image name -> cat name -> annotations
   const annIdMap = {} as {
-    [imName: string]: { [catName: string]: NewAnnotationType[] };
+    [imName: string]: { [catName: string]: AnnotationObject[] };
   };
 
   for (const ann of annotations) {
