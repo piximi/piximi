@@ -11,9 +11,9 @@ import {
   imageViewerSlice,
   selectActiveAnnotationIds,
   selectSelectedAnnotationIds,
-} from "store/slices/imageViewer";
-import { CustomListItemButton } from "components/list-items/CustomListItemButton";
-import { newDataSlice } from "store/slices/newData";
+} from "store/imageViewer";
+import { CustomListItemButton } from "components/list-items";
+import { newDataSlice } from "store/data";
 
 type DeleteType = "ALL" | "SELECTED";
 export const ClearAnnotationsGroup = () => {

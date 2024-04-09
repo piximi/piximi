@@ -2,14 +2,13 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   classifierSlice,
-  loadUserSelectedModel,
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
-} from "store/slices/classifier";
-import { Shape } from "types";
-import { ModelStatus, ModelTask } from "types/ModelType";
-import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
-import { Model } from "utils/common/models/Model";
+} from "store/classifier";
+import { Shape } from "store/data/types";
+import { SequentialClassifier } from "utils/models/AbstractClassifier";
+import { ModelStatus, ModelTask } from "utils/models/enums";
+import { Model } from "utils/models/Model";
 
 export const useClassificationModel = () => {
   const dispatch = useDispatch();
@@ -40,7 +39,7 @@ export const useClassificationModel = () => {
   const handleImportModel = (model: Model, inputShape: Shape) => {
     if (model instanceof SequentialClassifier) {
       dispatch(
-        loadUserSelectedModel({
+        classifierSlice.actions.loadUserSelectedModel({
           inputShape: inputShape,
           model,
         })

@@ -3,15 +3,15 @@ import { useSelector } from "react-redux";
 
 import { AnnotationNew } from "./Annotation";
 
-import { selectSelectedAnnotationIds } from "store/slices/imageViewer";
+import { selectSelectedAnnotationIds } from "store/imageViewer";
 
-import { AnnotationTool } from "annotator-tools-new";
+import { AnnotationTool } from "utils/annotator/tools";
 import {
   selectActiveAnnotationObjectsNew,
   selectWorkingAnnotationObjectNew,
-} from "store/slices/newData/selectors/reselectors";
-import { AnnotationTransformerNew } from "./AnnotationTransformer/AnnotationTransformerNew";
-import { selectImageViewerFilters } from "store/slices/imageViewer/selectors/selectImageViewerFilters";
+} from "store/data/selectors/reselectors";
+import { AnnotationTransformerNew } from "./AnnotationTransformer";
+import { selectImageViewerFilters } from "store/imageViewer/selectors/selectImageViewerFilters";
 
 type AnnotationsProps = {
   annotationTool: AnnotationTool;

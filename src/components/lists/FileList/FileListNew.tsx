@@ -3,8 +3,10 @@ import React from "react";
 import { List } from "@mui/material";
 
 import { SaveProjectListItem } from "components/list-items";
-import { OpenProjectListItemNew } from "components/list-items/OpenProjectListItem/OpenProjectListItemNew";
-import { NewProjectListItemNew } from "components/list-items/NewProjectListItem/NewProjectListItemNew";
+import {
+  NewProjectListItemNew,
+  OpenProjectListItemNew,
+} from "components/list-items";
 
 export const FileListNew = () => {
   return (

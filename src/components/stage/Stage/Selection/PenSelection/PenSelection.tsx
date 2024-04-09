@@ -2,8 +2,8 @@ import React from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { PenAnnotationTool } from "annotator-tools-new";
-import { selectImageOrigin } from "store/slices/imageViewer";
+import { PenAnnotationTool } from "utils/annotator/tools";
+import { selectImageOrigin } from "store/imageViewer";
 
 type PenSelectionProps = {
   operator: PenAnnotationTool;

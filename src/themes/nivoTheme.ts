@@ -1,6 +1,6 @@
 import { Theme } from "@nivo/core";
-import { ThemeMode } from "types/ThemeMode";
 import { lightTheme, darkTheme } from "./muiTheme";
+import { ThemeMode } from "./enums";
 
 export const getNivoTheme = (themeMode: ThemeMode) => {
   const theme = themeMode === ThemeMode.Light ? lightTheme : darkTheme;

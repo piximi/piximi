@@ -3,7 +3,7 @@ import React, { useLayoutEffect, useState } from "react";
 import { Box } from "@mui/material";
 import { useDndFileDrop } from "hooks";
 import { StageNew } from "../Stage";
-import { dimensions } from "utils/common";
+import { dimensions } from "utils/common/constants";
 
 type StageWrapperProps = {
   onDrop: (files: FileList) => void;

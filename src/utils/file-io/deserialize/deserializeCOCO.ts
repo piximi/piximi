@@ -1,7 +1,6 @@
-import { SerializedCOCOFileType } from "types";
-import { Kind, NewCategory } from "types/Category";
-import { NewImageType } from "types/ThingType";
 import { deserializeCOCOFile_v2 } from "./v2/deserializeCOCO_v2";
+import { SerializedCOCOFileType } from "../types";
+import { Kind, NewCategory, NewImageType } from "store/data/types";
 
 export const deserializeCOCOFile = async (
   cocoFile: SerializedCOCOFileType,

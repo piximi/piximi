@@ -5,9 +5,9 @@ import { AppBar, Box } from "@mui/material";
 
 import { AlertBar } from "components/app-bars";
 
-import { selectAlertState } from "store/slices/applicationSettings";
-import { APPLICATION_COLORS } from "utils/common/colorPalette";
-import { ProjectToolbarNew } from "../ProjectToolbar/ProjectToolbarNew";
+import { selectAlertState } from "store/applicationSettings";
+import { ProjectToolbarNew } from "../ProjectToolbar";
+import { APPLICATION_COLORS } from "utils/common/constants";
 
 export const ProjectAppBarNew = () => {
   const alertState = useSelector(selectAlertState);

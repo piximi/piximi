@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, List } from "@mui/material";
 
 import { useClassificationModelAgain } from "hooks/useLearningModel/useClassifierModelAgain";
-import { AlertBar } from "components/app-bars";
+import { AlertBar, FitClassifierDialogAppBarNew } from "components/app-bars";
 
 import { ModelSummaryTable, TwoDataPlot } from "components/data-viz";
 import {
@@ -11,8 +11,7 @@ import {
   ClassifierDatasetListItem,
 } from "components/list-items";
 import { DialogTransitionSlide } from "components/dialogs";
-import { ModelStatus } from "types/ModelType";
-import { FitClassifierDialogAppBarNew } from "components/app-bars/FitClassifierDialogAppBar/FitClassifierDialogAppBarNew";
+import { ModelStatus } from "utils/models/enums";
 
 type FitClassifierDialogNewProps = {
   closeDialog: () => void;

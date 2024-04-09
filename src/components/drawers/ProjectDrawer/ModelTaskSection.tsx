@@ -1,6 +1,6 @@
 import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
-import { ClassifierListNew } from "components/lists/ClassifierList/ClassifierListNew";
-import { SegmenterListNew } from "components/lists/SegmenterList/SegmenterListNew";
+import { ClassifierListNew } from "components/lists";
+import { SegmenterListNew } from "components/lists";
 import React, { useState } from "react";
 
 export const ModelTaskSection = () => {

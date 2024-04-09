@@ -6,10 +6,9 @@ import { StageContext } from "contexts";
 import {
   selectPenSelectionBrushSize,
   selectToolType,
-} from "store/slices/annotator/selectors";
-
-import { ToolType } from "types";
-import { selectActiveImage } from "store/slices/imageViewer/reselectors";
+} from "store/annotator/selectors";
+import { selectActiveImage } from "store/imageViewer/reselectors";
+import { ToolType } from "utils/annotator/enums";
 
 type PenAnnotationToolTipProps = {
   currentPosition?: { x: number; y: number };

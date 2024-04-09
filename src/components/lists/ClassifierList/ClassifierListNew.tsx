@@ -5,16 +5,18 @@ import { Box } from "@mui/material";
 import { useDialog, useDialogHotkey } from "hooks";
 
 import { ImportTensorflowModelDialog } from "components/dialogs";
-import { SaveFittedModelDialog } from "components/dialogs";
+import {
+  SaveFittedModelDialog,
+  EvaluateClassifierDialogNew,
+  FitClassifierDialogNew,
+} from "components/dialogs";
 
-import { ModelStatus, ModelTask } from "types/ModelType";
 import { ModelExecButtonGroup } from "components/list-items/ClassifierExecListItem/ModelExecButtonGroup";
 
 import { ModelIOButtonGroup } from "components/list-items/ModelIOButtonGroup/ModelIOButtonGroup";
 import { useClassificationModel } from "hooks/useLearningModel/useClassifierModel";
-import { EvaluateClassifierDialogNew } from "components/dialogs/EvaluateClassifierDialog/EvaluateClassifierDialogNew";
-import { HotkeyView } from "types";
-import { FitClassifierDialogNew } from "components/dialogs/FitClassifierDialog/FitClassifierDialogNew";
+import { HotkeyView } from "utils/common/enums";
+import { ModelStatus, ModelTask } from "utils/models/enums";
 
 export const ClassifierListNew = () => {
   const {

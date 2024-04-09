@@ -4,18 +4,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { KonvaEventObject } from "konva/lib/Node";
 
 import {
+  imageViewerSlice,
   selectZoomSelection,
-  setZoomSelection,
   selectStageWidth,
   selectActiveImageId,
-  setZoomToolOptions,
-} from "store/slices/imageViewer";
+} from "store/imageViewer";
 
-import { selectToolType } from "store/slices/annotator/selectors";
-import { selectZoomToolOptions } from "store/slices/imageViewer";
+import { selectToolType } from "store/annotator/selectors";
+import { selectZoomToolOptions } from "store/imageViewer";
 
-import { Point, ToolType, ZoomModeType } from "types";
 import { useDebounce } from "hooks/useDebounce";
+import { Point } from "utils/annotator/types";
+import { ToolType, ZoomModeType } from "utils/annotator/enums";
 
 export const useZoom = (stage?: Konva.Stage | null) => {
   const delta = 10;
@@ -28,7 +28,9 @@ export const useZoom = (stage?: Konva.Stage | null) => {
   const zoomSelection = useSelector(selectZoomSelection);
   const activeImageId = useSelector(selectActiveImageId);
   const updateZoomScale = useDebounce((scale: number) => {
-    dispatch(setZoomToolOptions({ options: { scale } }));
+    dispatch(
+      imageViewerSlice.actions.setZoomToolOptions({ options: { scale } })
+    );
   }, 300);
 
   const zoomAndOffset = (newScale: number, center: Point) => {
@@ -54,7 +56,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
 
   const resetZoomSelection = () => {
     dispatch(
-      setZoomSelection({
+      imageViewerSlice.actions.setZoomSelection({
         zoomSelection: {
           maximum: undefined,
           minimum: undefined,
@@ -74,7 +76,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
     const stage = event.target.getStage()!;
     setSelectStart(stage.getPointerPosition()!);
     dispatch(
-      setZoomSelection({
+      imageViewerSlice.actions.setZoomSelection({
         zoomSelection: {
           ...zoomSelection,
           dragging: false,
@@ -101,7 +103,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
       return;
 
     dispatch(
-      setZoomSelection({
+      imageViewerSlice.actions.setZoomSelection({
         zoomSelection: {
           ...zoomSelection,
           dragging: Math.abs(_position.x - selectStart.x) >= delta,
@@ -122,7 +124,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
       if (!_position || !position || !selectStart) return;
 
       dispatch(
-        setZoomSelection({
+        imageViewerSlice.actions.setZoomSelection({
           zoomSelection: { ...zoomSelection, maximum: position },
         })
       );
@@ -155,7 +157,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
     }
 
     dispatch(
-      setZoomSelection({
+      imageViewerSlice.actions.setZoomSelection({
         zoomSelection: { ...zoomSelection, dragging: false, selecting: false },
       })
     );

@@ -4,13 +4,13 @@ import { Visibility, VisibilityOff, Add } from "@mui/icons-material";
 import { ImageViewerCategoryItem } from "components/list-items/CategoryItem/ImageViewerCategoryItem";
 import { CollapsibleListItem } from "components/list-items/CollapsibleListItem";
 import { useDispatch, useSelector } from "react-redux";
-import { imageViewerSlice } from "store/slices/imageViewer";
-import { selectImageViewerActiveKindsWithFullCat } from "store/slices/newData/selectors/reselectors";
-import { KindWithCategories } from "types/Category";
-import { selectFilteredImageViewerCategoryIds } from "store/slices/imageViewer/selectors/selectFilteredAnnotationCategoryIds";
+import { imageViewerSlice } from "store/imageViewer";
+import { selectImageViewerActiveKindsWithFullCat } from "store/data/selectors/reselectors";
+import { selectFilteredImageViewerCategoryIds } from "store/imageViewer/selectors/selectFilteredAnnotationCategoryIds";
 import { CreateCategoryDialogNew } from "components/dialogs/CreateCategoryDialogNew/CreateCategoryDialogNew";
 import { useDialogHotkey } from "hooks";
-import { HotkeyView } from "types";
+import { HotkeyView } from "utils/common/enums";
+import { KindWithCategories } from "store/data/types";
 
 export const ImageViewerCategoryList = () => {
   const dispatch = useDispatch();

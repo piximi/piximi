@@ -4,8 +4,8 @@ import { LabelImportant as LabelImportantIcon } from "@mui/icons-material";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import { Box, CircularProgress } from "@mui/material";
 
-import { ModelStatus } from "types/ModelType";
 import { TooltipButton } from "components/styled-components/TooltipButton/TooltipButton";
+import { ModelStatus } from "utils/models/enums";
 
 export const ModelExecButtonGroup = ({
   handlePredict,

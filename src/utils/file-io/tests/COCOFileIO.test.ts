@@ -3,27 +3,35 @@ import Image from "image-js";
 import * as tf from "@tensorflow/tfjs";
 
 import { productionStore } from "store/";
-import { newDataSlice } from "store/slices/newData";
+import { newDataSlice } from "store/data";
 import {
   selectObjectCategoryDict,
   selectObjectKindDict,
   selectSplitThingDict,
-} from "store/slices/newData/selectors/reselectors";
+} from "store/data/selectors/reselectors";
 
 import initialState from "data/test-data/COCO/labels_internal.json";
 
-import { CATEGORY_COLORS } from "utils/common/colorPalette";
-import { fileFromPath } from "utils/common/image/nodeImageHelper";
-import { convertArrayToShape, generateUUID } from "utils/common/helpers";
-import { getPropertiesFromImageSync } from "utils/common/image/imageHelper";
+import { fileFromPath } from "utils/file-io/nodeImageHelper";
+import {
+  convertArrayToShape,
+  generateUUID,
+  getPropertiesFromImageSync,
+} from "utils/common/helpers";
 
 import { serializeCOCOFile } from "../serialize/serializeCOCO";
 import { deserializeCOCOFile } from "../deserialize/deserializeCOCO";
 
-import { NewAnnotationType, NewImageType } from "types/ThingType";
-import { Kind, NewCategory } from "types/Category";
-import { Partition, SerializedCOCOFileType } from "types";
 import { DeferredEntityState } from "store/entities";
+import { Partition } from "utils/models/enums";
+import { SerializedCOCOFileType } from "../types";
+import { CATEGORY_COLORS } from "utils/common/constants";
+import {
+  Kind,
+  NewAnnotationType,
+  NewCategory,
+  NewImageType,
+} from "store/data/types";
 
 tf.setBackend("cpu");
 const imDataMap: Record<string, string> = {

@@ -18,10 +18,11 @@ import { useHotkeys, useTranslation } from "hooks";
 
 import { Tool } from "../../stage/Tool";
 
-import { annotatorSlice } from "store/slices/annotator";
-import { selectToolType } from "store/slices/annotator/selectors";
+import { annotatorSlice } from "store/annotator";
+import { selectToolType } from "store/annotator/selectors";
 
-import { HotkeyView, ToolType as OperationType } from "types";
+import { HotkeyView } from "utils/common/enums";
+import { ToolType as OperationType } from "utils/annotator/enums";
 
 import {
   ColorAdjustment,
@@ -37,7 +38,7 @@ import {
   Zoom,
 } from "icons";
 import { CustomToolTip } from "../../stage/Tool/CustomToolTip";
-import { dimensions } from "utils/common";
+import { dimensions } from "utils/common/constants";
 import { ToolOptionsDrawerNew } from "./ToolOptionsDrawer";
 
 type AnnotatorToolDrawerProps = {

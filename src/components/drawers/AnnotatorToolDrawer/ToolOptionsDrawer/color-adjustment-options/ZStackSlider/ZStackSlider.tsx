@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { List, ListItem, Slider } from "@mui/material";
 
-import { selectActiveImageRenderedSrcs } from "store/slices/imageViewer";
+import { selectActiveImageRenderedSrcs } from "store/imageViewer";
 
 import { CustomListItem } from "components/list-items/CustomListItem";
-import { selectActiveImage } from "store/slices/imageViewer/reselectors";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { selectActiveImage } from "store/imageViewer/reselectors";
+import { dataSlice } from "store/data/dataSlice";
 
 //TODO: change slider style
 
@@ -19,7 +19,7 @@ export const ZStackSlider = () => {
   const handleChange = async (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
       dispatch(
-        newDataSlice.actions.updateThings({
+        dataSlice.actions.updateThings({
           updates: [
             {
               id: activeImage!.id,

@@ -23,14 +23,14 @@ import {
   GitHub as GitHubIcon,
 } from "@mui/icons-material";
 
-import { applicationSettingsSlice } from "store/slices/applicationSettings";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { AlertStateType, AlertType } from "types";
-
-import { createGitHubIssue } from "utils";
+import { createGitHubIssue } from "utils/common/helpers";
+import { AlertState } from "utils/common/types";
+import { AlertType } from "utils/common/enums";
 
 type AlertBarProps = {
-  alertState: AlertStateType;
+  alertState: AlertState;
   setShowAlertBar?: (show: boolean) => void;
 };
 

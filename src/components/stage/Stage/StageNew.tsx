@@ -16,24 +16,23 @@ import { AnnotationsNew } from "./Annotations";
 
 import {
   selectStagePosition,
-  setImageOrigin,
   selectActiveImageRenderedSrcs,
   imageViewerSlice,
   selectImageIsloading,
   selectActiveImageId,
-} from "store/slices/imageViewer";
+} from "store/imageViewer";
 import {
   selectAnnotationState,
   selectToolType,
-} from "store/slices/annotator/selectors";
+} from "store/annotator/selectors";
 
-import { AnnotationStateType, HotkeyView, ToolType } from "types";
-import { dimensions } from "utils/common";
+import { dimensions } from "utils/common/constants";
 import { ImageNew } from "./Image";
-import { selectActiveImage } from "store/slices/imageViewer/reselectors";
-import { useAnnotationToolNew } from "hooks/useAnnotationTool/useAnnotationToolNew";
-import { useStageHandlersNew } from "hooks/useStageHandlers/useStageHandlersNew";
+import { selectActiveImage } from "store/imageViewer/reselectors";
+import { useStageHandlersNew, useAnnotationToolNew } from "hooks";
 import { StageContext } from "contexts";
+import { AnnotationStateType, ToolType } from "utils/annotator/enums";
+import { HotkeyView } from "utils/common/enums";
 
 const normalizeFont = 1300;
 
@@ -109,7 +108,7 @@ export const StageNew = ({
   useEffect(() => {
     if (!activeImage?.shape) return;
     dispatch(
-      setImageOrigin({
+      imageViewerSlice.actions.setImageOrigin({
         origin: {
           x: (stageWidth - activeImage.shape.width) / 2,
           y: (stageHeight - activeImage.shape.height) / 2,

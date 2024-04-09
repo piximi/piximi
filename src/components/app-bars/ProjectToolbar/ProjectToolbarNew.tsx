@@ -17,14 +17,14 @@ import {
 
 import { LogoLoader } from "components/styled-components";
 
-import { applicationSettingsSlice } from "store/slices/applicationSettings";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import {
   selectLoadMessage,
   selectLoadPercent,
   selectProjectName,
   projectSlice,
-} from "store/slices/project";
-import { SortSelection } from "components/styled-components/ImageSortSelection/SortSelection";
+} from "store/project";
+import { SortSelection } from "components/styled-components";
 
 const minZoom = 0.6;
 const maxZoom = 4;

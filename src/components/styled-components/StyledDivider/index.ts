@@ -1,1 +1,0 @@
-export { StyledDivider } from "./StyledDivider";

@@ -8,9 +8,8 @@ import {
   selectQuickSelectionRegionSize,
   selectToolType,
   selectThresholdAnnotationValue,
-} from "store/slices/annotator/selectors";
+} from "store/annotator/selectors";
 
-import { ToolType } from "types";
 import {
   AnnotationTool,
   ColorAnnotationTool,
@@ -25,8 +24,9 @@ import {
   ThresholdAnnotationTool,
   SelectionTool,
   BlankAnnotationTool,
-} from "annotator-tools-new";
-import { selectActiveImage } from "store/slices/imageViewer/selectors/selectActiveImageId";
+} from "utils/annotator/tools";
+import { selectActiveImage } from "store/imageViewer/selectors/selectActiveImageId";
+import { ToolType } from "utils/annotator/enums";
 
 export const useAnnotationToolNew = () => {
   const [image, setImage] = useState<ImageJS.Image>();

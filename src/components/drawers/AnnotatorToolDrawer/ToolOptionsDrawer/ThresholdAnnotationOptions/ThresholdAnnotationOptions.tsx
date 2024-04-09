@@ -3,8 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
-import { annotatorSlice } from "store/slices/annotator";
-import { selectThresholdAnnotationValue } from "store/slices/annotator/selectors";
+import { annotatorSlice } from "store/annotator";
+import { selectThresholdAnnotationValue } from "store/annotator/selectors";
 import { BaseOptions } from "../BaseOptions";
 
 //TODO: Slider

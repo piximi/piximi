@@ -1,9 +1,9 @@
 import { Box, useTheme } from "@mui/material";
 import { DividerHeader } from "components/styled-components";
-import { Partition } from "types";
-import { selectUnfilteredActivePartitions } from "store/slices/project/selectors/selectUnfilteredPartitionIds";
+import { selectUnfilteredActivePartitions } from "store/project/selectors/selectUnfilteredPartitionIds";
 import { useSelector } from "react-redux";
 import { FilterChipNew } from "./FilterChipNew";
+import { Partition } from "utils/models/enums";
 
 export const PartitionFilterListNew = ({
   header,

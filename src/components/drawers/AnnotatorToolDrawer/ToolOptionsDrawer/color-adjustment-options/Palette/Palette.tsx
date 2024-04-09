@@ -8,13 +8,12 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
-import { selectActiveImageId } from "store/slices/imageViewer";
+import { selectActiveImageId } from "store/imageViewer";
 
-import { DEFAULT_COLORS } from "types";
-
-import { rgbToHex } from "utils/common/image";
-import { selectActiveImageRawColor } from "store/slices/imageViewer/reselectors";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { selectActiveImageRawColor } from "store/imageViewer/reselectors";
+import { dataSlice } from "store/data/dataSlice";
+import { rgbToHex } from "utils/common/helpers";
+import { DEFAULT_COLORS } from "utils/common/constants";
 
 type PaletteProps = {
   channelIdx: number;
@@ -49,7 +48,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
     });
 
     dispatch(
-      newDataSlice.actions.updateThings({
+      dataSlice.actions.updateThings({
         updates: [
           {
             id: activeImageId!,

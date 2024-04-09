@@ -20,16 +20,13 @@ import {
 import { useTranslation, useZoom } from "hooks";
 
 import {
-  setStagePosition,
+  imageViewerSlice,
   selectStageHeight,
   selectStageWidth,
   selectZoomSelection,
   selectZoomToolOptions,
-  setZoomToolOptions,
   selectStageScale,
-} from "store/slices/imageViewer";
-
-import { ZoomModeType } from "types";
+} from "store/imageViewer";
 
 import {
   CheckboxCheckedIcon,
@@ -37,11 +34,12 @@ import {
   RadioCheckedIcon,
   RadioUncheckedIcon,
 } from "icons";
-import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { CustomListItemButton } from "components/list-items";
 import { CustomListItem } from "components/list-items/CustomListItem";
 import { DividerHeader } from "components/styled-components";
 import { StageContext } from "contexts";
-import { selectActiveImage } from "store/slices/imageViewer/reselectors";
+import { selectActiveImage } from "store/imageViewer/reselectors";
+import { ZoomModeType } from "utils/annotator/enums";
 
 //TODO: Slider
 
@@ -71,7 +69,7 @@ export const ZoomOptions = () => {
       },
     };
     batch(() => {
-      dispatch(setZoomToolOptions(payload));
+      dispatch(imageViewerSlice.actions.setZoomToolOptions(payload));
     });
   };
 
@@ -83,7 +81,7 @@ export const ZoomOptions = () => {
       },
     };
 
-    dispatch(setZoomToolOptions(payload));
+    dispatch(imageViewerSlice.actions.setZoomToolOptions(payload));
     zoomAndOffset(1, { x: stageWidth / 2, y: stageHeight / 2 });
   };
 
@@ -104,7 +102,7 @@ export const ZoomOptions = () => {
       stageWidth / imageWidth
     );
 
-    dispatch(setZoomToolOptions(payload));
+    dispatch(imageViewerSlice.actions.setZoomToolOptions(payload));
     zoomAndOffset(newScale, { x: stageWidth / 2, y: stageHeight / 2 });
   };
 
@@ -118,7 +116,7 @@ export const ZoomOptions = () => {
       },
     };
 
-    dispatch(setZoomToolOptions(payload));
+    dispatch(imageViewerSlice.actions.setZoomToolOptions(payload));
   };
 
   const onModeClick = (event: any, mode: ZoomModeType) => {
@@ -129,7 +127,7 @@ export const ZoomOptions = () => {
       },
     };
 
-    dispatch(setZoomToolOptions(payload));
+    dispatch(imageViewerSlice.actions.setZoomToolOptions(payload));
   };
 
   const onSliderChange = (value: number) => {
@@ -142,7 +140,7 @@ export const ZoomOptions = () => {
       y: ((1 - stageRef?.current?.scaleX()!) * stageHeight) / 2,
     });
     dispatch(
-      setStagePosition({
+      imageViewerSlice.actions.setStagePosition({
         stagePosition: {
           x: ((1 - stageRef?.current?.scaleX()!) * stageWidth) / 2,
           y: ((1 - stageRef?.current?.scaleX()!) * stageHeight) / 2,

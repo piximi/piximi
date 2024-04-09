@@ -8,28 +8,28 @@ import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { DialogWithAction } from "components/dialogs";
 
-import { HotkeyView, Partition } from "types";
-import { NewCategory } from "types/Category";
-import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { CustomListItemButton } from "components/list-items";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectActiveCategories,
   selectActiveUnknownCategory,
-} from "store/slices/newData/selectors/reselectors";
-import { CategoryItemNew } from "components/list-items/CategoryItem/CategoryItemNew";
-import { CategoryItemMenuNew } from "components/menus/CategoryItemMenu/CategoryItemMenuNew";
+} from "store/data/selectors/reselectors";
+import { CategoryItemNew } from "components/list-items";
+import { CategoryItemMenuNew } from "components/menus";
 import {
   projectSlice,
   selectHighlightedImageCategory,
   selectSelectedImageIds,
-} from "store/slices/project";
-import { selectActiveKindId } from "store/slices/project/selectors";
+} from "store/project";
+import { selectActiveKindId } from "store/project/selectors";
 import { CreateCategoryDialogNew } from "components/dialogs/CreateCategoryDialogNew/CreateCategoryDialogNew";
-import { selectClassifierModelStatus } from "store/slices/classifier";
-import { ModelStatus } from "types/ModelType";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
-import { PredictionListItemsNew } from "components/list-items/PredictionListItems/PredictionListItemsNew";
+import { selectClassifierModelStatus } from "store/classifier";
+import { dataSlice } from "store/data/dataSlice";
+import { PredictionListItemsNew } from "components/list-items";
 import { isUnknownCategory } from "utils/common/helpers";
+import { ModelStatus, Partition } from "utils/models/enums";
+import { HotkeyView } from "utils/common/enums";
+import { NewCategory } from "store/data/types";
 
 export const CategoriesListNew = () => {
   const dispatch = useDispatch();
@@ -84,7 +84,7 @@ export const CategoriesListNew = () => {
   };
   const handleRemoveAllCategories = () => {
     dispatch(
-      newDataSlice.actions.removeCategoriesFromKind({
+      dataSlice.actions.removeCategoriesFromKind({
         categoryIds: "all",
         kind: activeKind,
         isPermanent: true,
@@ -124,7 +124,7 @@ export const CategoriesListNew = () => {
     () => {
       if (selectedImageIds.length > 0) {
         dispatch(
-          newDataSlice.actions.updateThings({
+          dataSlice.actions.updateThings({
             updates: selectedImageIds.map((imageId) => ({
               id: imageId,
               categoryId: highlightedCategory,

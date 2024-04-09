@@ -4,8 +4,9 @@ import { ListItemText, MenuItem } from "@mui/material";
 
 import { useUploadNew } from "hooks";
 
-import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
 import { ImageShapeDialogNew } from "components/dialogs/ImageShapeDialog/ImageShapeDialogNew";
+import { ImageShapeInfo } from "utils/file-io/types";
+import { ImageShapeEnum } from "utils/file-io/enums";
 
 //TODO: MenuItem??
 

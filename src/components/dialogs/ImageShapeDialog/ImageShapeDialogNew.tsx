@@ -6,13 +6,13 @@ import { Alert, Box } from "@mui/material";
 
 import { CustomNumberTextField } from "components/forms/CustomNumberTextField";
 
-import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
-
-import { HotkeyView } from "types";
+import { HotkeyView } from "utils/common/enums";
 import { DialogWithAction } from "../DialogWithAction";
-import { uploadImages } from "utils/common/image/upload";
-import { applicationSettingsSlice } from "store/slices/applicationSettings";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { dataSlice } from "store/data/dataSlice";
+import { uploadImages } from "utils/file-io/helpers";
+import { ImageShapeInfo } from "utils/file-io/types";
+import { ImageShapeEnum } from "utils/file-io/enums";
 
 type ImageShapeDialogProps = {
   files: FileList;
@@ -82,7 +82,7 @@ export const ImageShapeDialogNew = ({
       );
     } else {
       dispatch(
-        newDataSlice.actions.addThings({
+        dataSlice.actions.addThings({
           things: res.imagesToUpload,
           isPermanent: true,
         })

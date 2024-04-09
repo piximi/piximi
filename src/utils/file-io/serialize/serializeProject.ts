@@ -1,23 +1,20 @@
 import { Group, NestedArray, group } from "zarr";
 //import { Blosc } from "numcodecs";
 
-import {
-  Classifier,
-  PreprocessOptions,
-  Project,
-  Segmenter,
-  LoadCB,
-} from "types";
-import { Colors } from "types/tensorflow";
-import {
-  availableClassifierModels,
-  availableSegmenterModels,
-} from "types/ModelType";
-import { ZipStore } from "utils";
 import { Tensor } from "@tensorflow/tfjs";
-import { Kind, NewCategory } from "types/Category";
-import { NewImageType } from "types/ImageType";
-import { NewAnnotationType } from "types/AnnotationType";
+import { PreprocessOptions } from "utils/models/types";
+import { availableClassifierModels } from "utils/models/availableClassificationModels";
+import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
+import { ZipStore } from "../zarrStores";
+import { LoadCB } from "../types";
+import { ClassifierState, ProjectState, SegmenterState } from "store/types";
+import { Colors } from "utils/common/types";
+import {
+  Kind,
+  NewAnnotationType,
+  NewCategory,
+  NewImageType,
+} from "store/data/types";
 
 /* 
    =====================
@@ -148,7 +145,7 @@ const serializeKinds = async (kindGroup: Group, kinds: Kind[]) => {
 
 const _serializeProject = async (
   projectGroup: Group,
-  project: Project,
+  project: ProjectState,
   data: {
     kinds: Array<Kind>;
     categories: Array<NewCategory>;
@@ -213,7 +210,7 @@ const serializePreprocessOptions = async (
 
 const serializeClassifier = async (
   classifierGroup: Group,
-  classifier: Classifier
+  classifier: ClassifierState
 ) => {
   const classifierModel =
     availableClassifierModels[classifier.selectedModelIdx];
@@ -271,7 +268,7 @@ const serializeClassifier = async (
 
 const serializeSegmenter = async (
   segmenterGroup: Group,
-  segmenter: Segmenter
+  segmenter: SegmenterState
 ) => {
   const segmenterModel = availableSegmenterModels[segmenter.selectedModelIdx];
 
@@ -286,14 +283,14 @@ const serializeSegmenter = async (
 
 export const serializeProject = async (
   name: string,
-  projectSlice: Project,
+  projectSlice: ProjectState,
   data: {
     kinds: Array<Kind>;
     categories: Array<NewCategory>;
     things: Array<NewImageType | NewAnnotationType>;
   },
-  classifierSlice: Classifier,
-  segmenterSlice: Segmenter,
+  classifierSlice: ClassifierState,
+  segmenterSlice: SegmenterState,
   loadCb: LoadCB
 ) => {
   const zipStore = new ZipStore(name);

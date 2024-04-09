@@ -7,8 +7,8 @@ import {
   cellPaintingAnnotations,
 } from "data/exampleImages";
 
-import { SerializedFileType } from "types";
-import { ExampleImageCardNew } from "components/cards/ExampleImageCard/ExampleImageCardNew";
+import { ExampleImageCardNew } from "components/cards";
+import { SerializedFileType } from "utils/file-io/types";
 const exampleImages = [
   {
     name: "Malaria infected human blood smears",

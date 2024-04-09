@@ -1,5 +1,2 @@
-export { FilterOptionsNew } from "./FilterOptions/FilterOptionsNew";
-export {
-  ThingInformationTable,
-  InformationOptions,
-} from "./InformationOptions";
+export { FilterOptionsNew } from "./FilterOptions";
+export { InformationOptions } from "./InformationOptions";

@@ -30,17 +30,19 @@ import { SaveFittedModelDialog, SaveProjectDialog } from "components/dialogs";
 import {
   selectClassifierSelectedModel,
   selectClassifierModelStatus,
-} from "store/slices/classifier";
+} from "store/classifier";
 import {
   selectSegmenterModel,
   selectSegmenterModelStatus,
-} from "store/slices/segmenter";
+} from "store/segmenter";
 
-import { AlertStateType, AlertType, HotkeyView } from "types";
+import { HotkeyView } from "utils/common/enums";
 
-import { createGitHubIssue } from "utils";
-import { APPLICATION_COLORS } from "utils/common/colorPalette";
-import { ModelStatus } from "types/ModelType";
+import { ModelStatus } from "utils/models/enums";
+import { APPLICATION_COLORS } from "utils/common/constants";
+import { createGitHubIssue } from "utils/common/helpers";
+import { AlertState } from "utils/common/types";
+import { AlertType } from "utils/common/enums";
 
 export const FallBackDialog = (props: any) => {
   const error = props.error as Error;
@@ -96,7 +98,7 @@ export const FallBackDialog = (props: any) => {
   const selectedSegmenterModel = useSelector(selectSegmenterModel);
   const segmenterModelStatus = useSelector(selectSegmenterModelStatus);
 
-  const errorState: AlertStateType = {
+  const errorState: AlertState = {
     alertType: AlertType.Error,
     name: "Uncaught run-time error",
     description: error.name + ": " + error.message,

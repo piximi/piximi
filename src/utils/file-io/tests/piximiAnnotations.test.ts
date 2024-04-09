@@ -3,25 +3,29 @@ import Image from "image-js";
 import * as tf from "@tensorflow/tfjs";
 
 import { productionStore } from "store";
-import { newDataSlice } from "store/slices/newData";
+import { newDataSlice } from "store/data";
 import { DeferredEntityState } from "store/entities";
 import {
   selectObjectCategoryDict,
   selectObjectKindDict,
   selectSplitThingDict,
-} from "store/slices/newData/selectors/reselectors";
+} from "store/data/selectors/reselectors";
 
 import { data } from "data/test-data/annotatorToolsTestData.json";
 
 import { generateUUID, isUnknownCategory } from "utils/common/helpers";
-import { CATEGORY_COLORS } from "utils/common/colorPalette";
 
 import { serializePiximiAnnotations } from "../serialize/serializePiximiAnnotations";
 import { deserializePiximiAnnotations } from "../deserialize";
 
-import { NewAnnotationType, NewImageType } from "types/ThingType";
-import { SerializedFileTypeV2 } from "types";
-import { Kind, NewCategory } from "types/Category";
+import { SerializedFileTypeV2 } from "../types";
+import { CATEGORY_COLORS } from "utils/common/constants";
+import {
+  Kind,
+  NewAnnotationType,
+  NewCategory,
+  NewImageType,
+} from "store/data/types";
 tf.setBackend("cpu");
 
 //below image fields not needed for serializing annotations file so fake it

@@ -1,17 +1,15 @@
 import { useCallback, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks/useHotkeys";
-import {
-  selectActiveImageId,
-  imageViewerSlice,
-  setSelectedAnnotationIds,
-  setSelectedCategoryId,
-} from "store/slices/imageViewer";
-import { HotkeyView, Point, ToolType } from "types";
+import { selectActiveImageId, imageViewerSlice } from "store/imageViewer";
+
 import { getOverlappingAnnotations } from "utils/annotator";
-import { selectActiveAnnotationsNew } from "store/slices/newData/selectors/reselectors";
+import { selectActiveAnnotationsNew } from "store/data/selectors/reselectors";
 import { getAnnotationsInBoxNew } from "utils/annotator/imageHelper";
-import { NewDecodedAnnotationType } from "types/AnnotationType";
+import { Point } from "utils/annotator/types";
+import { ToolType } from "utils/annotator/enums";
+import { HotkeyView } from "utils/common/enums";
+import { NewDecodedAnnotationType } from "store/data/types";
 
 const delta = 10;
 
@@ -115,7 +113,7 @@ export const usePointerToolNew = (
         }
         batch(() => {
           dispatch(
-            setSelectedAnnotationIds({
+            imageViewerSlice.actions.setSelectedAnnotationIds({
               annotationIds: newSelectedAnnotations,
               workingAnnotationId: newSelectedAnnotations[0],
             })
@@ -192,7 +190,7 @@ export const usePointerToolNew = (
     if (!shift) {
       batch(() => {
         dispatch(
-          setSelectedAnnotationIds({
+          imageViewerSlice.actions.setSelectedAnnotationIds({
             annotationIds: [currentAnnotation!.id],
             workingAnnotationId: currentAnnotation?.id,
           })
@@ -203,7 +201,7 @@ export const usePointerToolNew = (
           })
         );
         dispatch(
-          setSelectedCategoryId({
+          imageViewerSlice.actions.setSelectedCategoryId({
             selectedCategoryId: currentAnnotation!.categoryId,
           })
         );
@@ -213,7 +211,7 @@ export const usePointerToolNew = (
     if (shift && !selectedAnnotationsIds.includes(currentAnnotation.id)) {
       //include newly selected annotation if not already selected
       dispatch(
-        setSelectedAnnotationIds({
+        imageViewerSlice.actions.setSelectedAnnotationIds({
           annotationIds: [...selectedAnnotationsIds, currentAnnotation.id],
           workingAnnotationId: currentAnnotation.id,
         })

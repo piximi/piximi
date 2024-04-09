@@ -1,12 +1,12 @@
-import { LoadCB } from "types";
-import { logger } from "utils/common/logger";
-import { CustomStore } from "utils/common/zarrStores";
+import { logger } from "utils/common/helpers";
+import { CustomStore } from "../zarrStores";
 import { openGroup } from "zarr";
 import { getAttr } from "./helpers";
 import semver from "semver";
 import { deserializeProject_v1 } from "./v1/deserializeProject_v1";
-import { dataConverter_v1v2 } from "utils/converters/dataConverter_v1v2";
+import { dataConverter_v1v2 } from "utils/file-io/converters/dataConverter_v1v2";
 import { deserializeProject_v2 } from "./v2/deserializeProject_v2";
+import { LoadCB } from "../types";
 
 export const deserializeProject = async (
   fileStore: CustomStore,

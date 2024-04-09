@@ -5,7 +5,7 @@ import humanU2OSCellsExampleIcon from "data/exampleProjects/humanU2OSCellsExampl
 import BBBC013ExampleIcon from "data/exampleProjects/BBBC013ExampleProjectIcon.png";
 import PLP1ExampleIcon from "data/exampleProjects/PLP1ExampleProjectIcon.png";
 import { BaseExampleDialog } from "../BaseExampleDialog";
-import { ExampleProjectCardNew } from "components/cards/ExampleProjectCard/ExampleProjectCardNew";
+import { ExampleProjectCardNew } from "components/cards/";
 
 const exampleProjects = [
   {

@@ -1,29 +1,28 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
 
-import {
-  imageViewerSlice,
-  selectActiveImageId,
-} from "store/slices/imageViewer";
+import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
 
-import { annotatorSlice } from "store/slices/annotator";
+import { annotatorSlice } from "store/annotator";
 
-import { selectSoundEnabled } from "store/slices/applicationSettings";
+import { selectSoundEnabled } from "store/applicationSettings";
 
-import {
-  AnnotationModeType,
-  AnnotationStateType,
-  DecodedAnnotationType,
-  HotkeyView,
-  ToolType,
-} from "types";
-import { AnnotationTool } from "annotator-tools-new";
 import {
   selectActiveAnnotationsNew,
   selectSelectedActiveAnnotations,
-} from "store/slices/newData/selectors/reselectors";
-import { NewDecodedAnnotationType } from "types/AnnotationType";
-import { selectImageViewerImages } from "store/slices/imageViewer/reselectors";
+} from "store/data/selectors/reselectors";
+import { selectImageViewerImages } from "store/imageViewer/reselectors";
+import {
+  AnnotationModeType,
+  AnnotationStateType,
+  ToolType,
+} from "utils/annotator/enums";
+import { AnnotationTool } from "utils/annotator/tools";
+import { HotkeyView } from "utils/common/enums";
+import {
+  DecodedAnnotationType,
+  NewDecodedAnnotationType,
+} from "store/data/types";
 
 type useAnnotatorHotkeysProps = {
   annotationTool: AnnotationTool;

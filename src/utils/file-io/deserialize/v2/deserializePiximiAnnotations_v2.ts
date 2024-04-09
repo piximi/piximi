@@ -1,19 +1,22 @@
-import { convertArrayToShape, generateUUID } from "utils/common/helpers";
-import { getPropertiesFromImage } from "utils/common/image/imageHelper";
-
 import {
-  SerializedFileTypeV2,
-  SerializedAnnotatorImageType,
-  ShapeArray,
-  PartialBy,
-  Partition,
-} from "types";
-import { Kind, NewCategory } from "types/Category";
+  convertArrayToShape,
+  generateUUID,
+  getPropertiesFromImage,
+} from "utils/common/helpers";
+import { Partition } from "utils/models/enums";
 import {
-  NewAnnotationType,
-  NewImageType,
   NewSerializedAnnotationType,
-} from "types/ThingType";
+  SerializedAnnotatorImageType,
+  SerializedFileTypeV2,
+} from "../../types";
+import { PartialBy } from "utils/common/types";
+import {
+  Kind,
+  NewAnnotationType,
+  NewCategory,
+  NewImageType,
+  ShapeArray,
+} from "store/data/types";
 
 type KindMap = Record<string, { new: Kind; existing?: Kind }>;
 type CategoryMap = Record<string, { new: NewCategory; existing?: NewCategory }>;

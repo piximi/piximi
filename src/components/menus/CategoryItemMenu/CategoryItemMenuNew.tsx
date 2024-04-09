@@ -5,13 +5,14 @@ import { Box, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 import { useDialogHotkey } from "hooks";
 import { DialogWithAction } from "components/dialogs";
 
-import { UNKNOWN_CATEGORY_NAME, HotkeyView } from "types";
 import { UpdateCategoryDialogNew } from "components/dialogs/UpdateCategoryDialog";
-import { NewCategory } from "types/Category";
-import { selectActiveKindId } from "store/slices/project/selectors";
+import { selectActiveKindId } from "store/project/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
-import { imageViewerSlice } from "store/slices/imageViewer";
+import { dataSlice } from "store/data/dataSlice";
+import { imageViewerSlice } from "store/imageViewer";
+import { HotkeyView } from "utils/common/enums";
+import { NewCategory } from "store/data/types";
+import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 
 type MenuFunctions = {
   Edit?: { permanent: boolean };
@@ -55,7 +56,7 @@ export const CategoryItemMenuNew = ({
 
   const handleRemoveCategory = () => {
     dispatch(
-      newDataSlice.actions.removeCategoriesFromKind({
+      dataSlice.actions.removeCategoriesFromKind({
         categoryIds: [category.id],
         kind: activeKind,
         isPermanent: menuFunctions ? menuFunctions.Delete?.permanent : true,
@@ -71,7 +72,7 @@ export const CategoryItemMenuNew = ({
       );
     }
     dispatch(
-      newDataSlice.actions.deleteThings({
+      dataSlice.actions.deleteThings({
         ofCategories: [category.id],
         activeKind: activeKind,
         isPermanent: menuFunctions

@@ -4,15 +4,15 @@ import {
   findContours,
   simplifyPolygon,
 } from "utils/annotator";
+
+import { logger } from "utils/common/helpers";
 import {
   SerializedCOCOAnnotationType,
   SerializedCOCOCategoryType,
   SerializedCOCOFileType,
   SerializedCOCOImageType,
-} from "types";
-import { NewAnnotationType, NewImageType } from "types/ThingType";
-import { NewCategory } from "types/Category";
-import { logger } from "utils/common/logger";
+} from "../types";
+import { NewAnnotationType, NewCategory, NewImageType } from "store/data/types";
 
 export const serializeCOCOFile = (
   images: Array<NewImageType>,

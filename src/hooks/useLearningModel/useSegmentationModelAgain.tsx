@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectAlertState } from "store/slices/applicationSettings";
-import { selectAnnotatedImages } from "store/slices/newData/selectors/reselectors";
+import { selectAlertState } from "store/applicationSettings";
+import { selectAnnotatedImages } from "store/data/selectors/reselectors";
 import {
   segmenterSlice,
   selectSegmenterFitOptions,
@@ -9,10 +9,12 @@ import {
   selectSegmenterModel,
   selectSegmenterModelStatus,
   selectSegmenterTrainingPercentage,
-} from "store/slices/segmenter";
-import { AlertStateType, AlertType } from "types";
-import { ModelStatus } from "types/ModelType";
-import { TrainingCallbacks } from "utils/common/models/Model";
+} from "store/segmenter";
+import { AlertType } from "utils/common/enums";
+import { logger } from "utils/common/helpers";
+import { AlertState } from "utils/common/types";
+import { ModelStatus } from "utils/models/enums";
+import { TrainingCallbacks } from "utils/models/types";
 
 const items = [
   "loss",
@@ -22,7 +24,7 @@ const items = [
   "epochs",
 ];
 
-const noLabeledImageAlert: AlertStateType = {
+const noLabeledImageAlert: AlertState = {
   alertType: AlertType.Info,
   name: "No annotated images",
   description: "Please annotate images to train a model.",
@@ -168,26 +170,26 @@ export const useSegmentationModelAgain = () => {
       );
       const validationSize = annotatedImages.length - trainingSize;
 
-      console.log(
-        `Set training size to Round[${annotatedImages.length} * ${trainingPercentage}] = ${trainingSize}`,
-        `; val size to ${annotatedImages.length} - ${trainingSize} = ${validationSize}`
+      logger(
+        `Set training size to Round[${annotatedImages.length} * ${trainingPercentage}] = ${trainingSize}
+        ; val size to ${annotatedImages.length} - ${trainingSize} = ${validationSize}`
       );
 
-      console.log(
+      logger(
         `Set training batches per epoch to RoundUp[${trainingSize} / ${
           fitOptions.batchSize
         }] = ${Math.ceil(trainingSize / fitOptions.batchSize)}`
       );
 
-      console.log(
+      logger(
         `Set validation batches per epoch to RoundUp[${validationSize} / ${
           fitOptions.batchSize
         }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`
       );
 
-      console.log(
-        `Training last batch size is ${trainingSize % fitOptions.batchSize}`,
-        `; validation is ${validationSize % fitOptions.batchSize}`
+      logger(
+        `Training last batch size is ${trainingSize % fitOptions.batchSize}
+        ; validation is ${validationSize % fitOptions.batchSize}`
       );
     }
   }, [fitOptions.batchSize, trainingPercentage, annotatedImages.length]);

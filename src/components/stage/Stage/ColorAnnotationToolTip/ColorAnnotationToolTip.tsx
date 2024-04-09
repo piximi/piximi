@@ -6,9 +6,8 @@ import { StageContext } from "contexts";
 import {
   selectAnnotationState,
   selectToolType,
-} from "store/slices/annotator/selectors";
-
-import { AnnotationStateType, ToolType } from "types";
+} from "store/annotator/selectors";
+import { AnnotationStateType, ToolType } from "utils/annotator/enums";
 
 type ColorAnnotationToolTipProps = {
   toolTipPosition?: { x: number; y: number };
