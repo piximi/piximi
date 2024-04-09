@@ -13,14 +13,14 @@ import { Close, PlayCircleOutline, Stop } from "@mui/icons-material";
 
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
-import {
-  selectClassifierModelStatus,
-  selectClassifierSelectedModel,
-  classifierSlice,
-} from "store/classifier";
+import { classifierSlice } from "store/classifier";
 
 import { ModelStatus } from "utils/models/enums";
 import { APPLICATION_COLORS } from "utils/common/constants";
+import {
+  selectClassifierModelStatus,
+  selectClassifierSelectedModel,
+} from "store/classifier/selectors";
 
 type FitClassifierDialogAppBarNewProps = {
   closeDialog: any;

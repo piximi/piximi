@@ -11,16 +11,16 @@ import { imageViewerSlice } from "store/imageViewer";
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 import { CustomListItemButton } from "components/list-items";
 import { CollapsibleListItem } from "components/list-items/CollapsibleListItem";
-import { selectActiveAnnotationsNew } from "store/data/selectors/reselectors";
-import { selectAllCategories } from "store/data/selectors/selectors";
+import { selectAllCategories } from "store/data/selectors";
 import { OldCategory } from "store/data/types";
+import { selectActiveAnnotations } from "store/imageViewer/reselectors";
 
 export const PointerSelectionOptionsNew = () => {
   const t = useTranslation();
 
   const dispatch = useDispatch();
 
-  const activeAnnotations = useSelector(selectActiveAnnotationsNew);
+  const activeAnnotations = useSelector(selectActiveAnnotations);
   const annotationCategories = useSelector(selectAllCategories);
 
   const handleSelectAll = () => {

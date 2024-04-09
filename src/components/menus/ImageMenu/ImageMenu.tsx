@@ -64,7 +64,7 @@ export const ImageMenu = ({
         })
       );
       dispatch(
-        projectSlice.actions.deselectImages({ ids: [selectedImage.id] })
+        projectSlice.actions.deselectThings({ ids: [selectedImage.id] })
       );
       dispatch(
         dataSlice.actions.deleteThings({

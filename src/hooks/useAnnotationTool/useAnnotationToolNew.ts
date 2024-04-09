@@ -25,8 +25,8 @@ import {
   SelectionTool,
   BlankAnnotationTool,
 } from "utils/annotator/tools";
-import { selectActiveImage } from "store/imageViewer/selectors/selectActiveImageId";
 import { ToolType } from "utils/annotator/enums";
+import { selectActiveImage } from "store/imageViewer/reselectors";
 
 export const useAnnotationToolNew = () => {
   const [image, setImage] = useState<ImageJS.Image>();

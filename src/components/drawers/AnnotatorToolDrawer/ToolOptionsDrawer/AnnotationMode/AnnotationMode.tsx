@@ -11,10 +11,10 @@ import {
   selectAnnotationState,
   selectAnnotationSelectionMode,
 } from "store/annotator/selectors";
-import { selectWorkingAnnotation } from "store/imageViewer";
 
 import { RadioCheckedIcon, RadioUncheckedIcon } from "icons";
 import { AnnotationModeType, AnnotationStateType } from "utils/annotator/enums";
+import { selectWorkingAnnotation } from "store/imageViewer/selectors";
 
 export const AnnotationMode = () => {
   const dispatch = useDispatch();

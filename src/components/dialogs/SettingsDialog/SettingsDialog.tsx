@@ -21,20 +21,20 @@ import {
 } from "@mui/icons-material";
 
 import { MaterialUISwitch } from "components/controls";
-import {
-  selectSelectedImageBorderWidth,
-  selectImageSelectionColor,
-  applicationSettingsSlice,
-  selectThemeMode,
-  selectSoundEnabled,
-} from "store/applicationSettings";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
 import Sun from "icons/Sun.svg";
 import Moon from "icons/Moon.svg";
 import VolumeUp from "icons/VolumeUp.svg";
 import VolumeOff from "icons/VolumeOff.svg";
-import { selectActiveCategoryColors } from "store/data/selectors/reselectors";
 import { ThemeMode } from "themes/enums";
+import { selectActiveCategoryColors } from "store/project/reselectors";
+import {
+  selectImageSelectionColor,
+  selectSelectedImageBorderWidth,
+  selectSoundEnabled,
+  selectThemeMode,
+} from "store/applicationSettings/selectors";
 
 const SettingsItem = ({
   title,

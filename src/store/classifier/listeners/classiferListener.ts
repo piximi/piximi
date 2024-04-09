@@ -35,7 +35,7 @@ import { Category, Thing } from "store/data/types";
 
 export const classifierMiddleware = createListenerMiddleware();
 
-export const startAppListening =
+const startAppListening =
   classifierMiddleware.startListening as TypedAppStartListening;
 
 type StoreListemerAPI = ListenerEffectAPI<

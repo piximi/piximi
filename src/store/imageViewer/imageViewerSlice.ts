@@ -30,12 +30,10 @@ const initialState: ImageViewerState = {
   activeAnnotationIds: [],
   activeImageRenderedSrcs: [],
   imageOrigin: { x: 0, y: 0 },
-  annotationFilters: { categoryId: [] },
   filters: { categoryId: [] },
   workingAnnotationId: undefined,
 
   workingAnnotation: { saved: undefined, changes: {} },
-  workingAnnotationNew: { saved: undefined, changes: {} },
   selectedAnnotationIds: [],
   selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
   stageHeight: 1000,
@@ -196,7 +194,7 @@ export const imageViewerSlice = createSlice({
         });
       }
     },
-    setWorkingAnnotationNew(
+    setWorkingAnnotation(
       state,
       action: PayloadAction<{
         annotation: DecodedAnnotationObject | string | undefined;
@@ -206,17 +204,17 @@ export const imageViewerSlice = createSlice({
       const { annotation, preparedByListener } = action.payload;
       if (!preparedByListener) return;
 
-      state.workingAnnotationNew.saved = annotation as
+      state.workingAnnotation.saved = annotation as
         | DecodedAnnotationObject
         | undefined;
-      state.workingAnnotationNew.changes = {};
+      state.workingAnnotation.changes = {};
     },
-    updateWorkingAnnotationNew(
+    updateWorkingAnnotation(
       state,
       action: PayloadAction<{ changes: Partial<DecodedAnnotationObject> }>
     ) {
-      if (state.workingAnnotationNew.saved) {
-        state.workingAnnotationNew.changes = action.payload.changes;
+      if (state.workingAnnotation.saved) {
+        state.workingAnnotation.changes = action.payload.changes;
       }
     },
     setSelectedCategoryId(
@@ -336,18 +334,6 @@ export const imageViewerSlice = createSlice({
     ) {
       state.highlightedCategory = action.payload.categoryId;
     },
-    addAnnotationCategoryFilters(
-      state,
-      action: PayloadAction<{
-        categoryIds: string[];
-      }>
-    ) {
-      const newFilters = [
-        ...state.annotationFilters["categoryId"],
-        ...action.payload.categoryIds,
-      ].filter(distinctFilter);
-      state.annotationFilters["categoryId"] = newFilters;
-    },
     addFilters(
       state,
       action: PayloadAction<{
@@ -359,24 +345,6 @@ export const imageViewerSlice = createSlice({
         ...action.payload.categoryIds,
       ].filter(distinctFilter);
       state.filters["categoryId"] = newFilters;
-    },
-    removeAnnotationCategoryFilters(
-      state,
-      action: PayloadAction<{
-        categoryIds?: string[];
-        all?: boolean;
-      }>
-    ) {
-      if (action.payload.all) {
-        state.annotationFilters["categoryId"] = [];
-        return;
-      }
-      if (action.payload.categoryIds) {
-        mutatingFilter(
-          state.annotationFilters["categoryId"],
-          (id) => !action.payload.categoryIds!.includes(id)
-        );
-      }
     },
     removeFilters(
       state,

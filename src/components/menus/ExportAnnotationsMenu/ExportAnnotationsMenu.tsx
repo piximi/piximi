@@ -14,7 +14,7 @@ import {
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
 } from "utils/annotator/imageHelper";
 
-import { selectProjectName } from "store/project";
+import { selectProjectName } from "store/project/selectors";
 
 import { ExportAnnotationsDialog } from "components/dialogs";
 
@@ -24,7 +24,7 @@ import {
   selectAllObjectCategories,
   selectAllObjectKinds,
   selectAllObjects,
-} from "store/data/selectors/reselectors";
+} from "store/data/selectors";
 import { AnnotationExportType } from "utils/file-io/enums";
 
 //TODO: MenuItem??

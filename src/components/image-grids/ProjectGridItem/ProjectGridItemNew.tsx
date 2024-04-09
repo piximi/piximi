@@ -4,15 +4,15 @@ import { useSelector } from "react-redux";
 import { Box, Grid } from "@mui/material";
 
 import { ThingDetailContainer } from "./ThingDetailContainer";
+import { selectCategoryProperty } from "store/data/selectors";
+import { isUnknownCategory } from "utils/common/helpers";
+import { Partition } from "utils/models/enums";
+import { AnnotationObject, ImageObject } from "store/data/types";
 import {
   selectImageSelectionColor,
   selectSelectedImageBorderWidth,
   selectTileSize,
-} from "store/applicationSettings";
-import { selectCategoryProperty } from "store/data/selectors/reselectors";
-import { isUnknownCategory } from "utils/common/helpers";
-import { Partition } from "utils/models/enums";
-import { AnnotationObject, ImageObject } from "store/data/types";
+} from "store/applicationSettings/selectors";
 
 type ProjectGridItemProps = {
   selected: boolean;

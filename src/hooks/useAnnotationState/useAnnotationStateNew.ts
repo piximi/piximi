@@ -3,13 +3,16 @@ import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { annotatorSlice } from "store/annotator";
 import { selectAnnotationSelectionMode } from "store/annotator/selectors";
-import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
+import { imageViewerSlice } from "store/imageViewer";
 import { RootState } from "store/rootReducer";
-import { selectCategoryById } from "store/data/selectors/selectors";
+import { selectCategoryById } from "store/data/selectors";
 import { selectActiveImage } from "store/imageViewer/reselectors";
-import { selectSelectedIVCategoryId } from "store/imageViewer/selectors/selectSelectedAnnotationCategoryId";
-import { selectFirstUnknownCategory } from "store/data/selectors/reselectors";
+import { selectFirstUnknownCategory } from "store/data/selectors";
 import { AnnotationModeType, AnnotationStateType } from "utils/annotator/enums";
+import {
+  selectActiveImageId,
+  selectSelectedIVCategoryId,
+} from "store/imageViewer/selectors";
 
 export const useAnnotationStateNew = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();

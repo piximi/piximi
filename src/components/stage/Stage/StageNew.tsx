@@ -14,13 +14,7 @@ import { Layer } from "./Layer";
 import { Selection } from "./Selection";
 import { AnnotationsNew } from "./Annotations";
 
-import {
-  selectStagePosition,
-  selectActiveImageRenderedSrcs,
-  imageViewerSlice,
-  selectImageIsloading,
-  selectActiveImageId,
-} from "store/imageViewer";
+import { imageViewerSlice } from "store/imageViewer";
 import {
   selectAnnotationState,
   selectToolType,
@@ -33,6 +27,12 @@ import { useStageHandlersNew, useAnnotationToolNew } from "hooks";
 import { StageContext } from "contexts";
 import { AnnotationStateType, ToolType } from "utils/annotator/enums";
 import { HotkeyView } from "utils/common/enums";
+import {
+  selectActiveImageId,
+  selectActiveImageRenderedSrcs,
+  selectImageIsloading,
+  selectStagePosition,
+} from "store/imageViewer/selectors";
 
 const normalizeFont = 1300;
 

@@ -2,9 +2,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { OptimizerSettingsGrid } from "components/forms";
 
 import { CollapsibleListItem } from "../CollapsibleListItem";
-import { segmenterSlice, selectSegmenterCompileOptions } from "store/segmenter";
+import { segmenterSlice } from "store/segmenter";
 import { FitOptions } from "utils/models/types";
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
+import { selectSegmenterCompileOptions } from "store/segmenter/selectors";
 
 export const SegmenterOptimizerListItem = ({
   fitOptions,

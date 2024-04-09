@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { selectCategoriesDictionary } from "store/data/selectors/selectors";
+import { selectCategoriesDictionary } from "store/data/selectors";
 import { Thing } from "store/data/types";
 import { selectSortTypeNew } from "store/project/selectors";
-import { ThingSortKey_new } from "utils/common/enums";
+import { ThingSortKey } from "utils/common/enums";
 
 export const useSortFunctionNew = () => {
   const sortType = useSelector(selectSortTypeNew);
-  const [previousSortType, setPreviousSortType] = useState<ThingSortKey_new>(
-    ThingSortKey_new.None
+  const [previousSortType, setPreviousSortType] = useState<ThingSortKey>(
+    ThingSortKey.None
   );
   const categories = useSelector(selectCategoriesDictionary);
   const theSortFunction = function (a: Thing, b: Thing) {
@@ -19,30 +19,27 @@ export const useSortFunctionNew = () => {
   >(() => theSortFunction);
 
   useEffect(() => {
-    if (
-      sortType !== previousSortType &&
-      sortType !== ThingSortKey_new.Category
-    ) {
+    if (sortType !== previousSortType && sortType !== ThingSortKey.Category) {
       setPreviousSortType(sortType);
       switch (sortType) {
-        case ThingSortKey_new.FileName:
+        case ThingSortKey.FileName:
           setSortFunction(
             () => (a: Thing, b: Thing) => a.name.localeCompare(b.name)
           );
           break;
 
-        case ThingSortKey_new.Random:
+        case ThingSortKey.Random:
           setSortFunction(
             () => (a: Thing, b: Thing) =>
               Math.round(Math.random() * 10) >= 5 ? 1 : -1
           );
           break;
-        case ThingSortKey_new.Name:
+        case ThingSortKey.Name:
           setSortFunction(
             () => (a: Thing, b: Thing) => a.name.localeCompare(b.name)
           );
           break;
-        case ThingSortKey_new.None:
+        case ThingSortKey.None:
         default:
           setSortFunction(() => (a: Thing, b: Thing) => 0);
       }
@@ -50,7 +47,7 @@ export const useSortFunctionNew = () => {
   }, [sortType, categories, previousSortType]);
 
   useEffect(() => {
-    if (sortType === ThingSortKey_new.Category) {
+    if (sortType === ThingSortKey.Category) {
       setPreviousSortType(sortType);
       setSortFunction(
         () => (a: Thing, b: Thing) =>

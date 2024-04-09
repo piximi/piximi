@@ -1,17 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
 
-import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
+import { imageViewerSlice } from "store/imageViewer";
 
 import { annotatorSlice } from "store/annotator";
 
-import { selectSoundEnabled } from "store/applicationSettings";
-
 import {
-  selectActiveAnnotationsNew,
+  selectActiveAnnotations,
+  selectImageViewerImages,
   selectSelectedActiveAnnotations,
-} from "store/data/selectors/reselectors";
-import { selectImageViewerImages } from "store/imageViewer/reselectors";
+} from "store/imageViewer/reselectors";
 import {
   AnnotationModeType,
   AnnotationStateType,
@@ -23,6 +21,8 @@ import {
   OldDecodedAnnotationType,
   DecodedAnnotationObject,
 } from "store/data/types";
+import { selectActiveImageId } from "store/imageViewer/selectors";
+import { selectSoundEnabled } from "store/applicationSettings/selectors";
 
 type useAnnotatorHotkeysProps = {
   annotationTool: AnnotationTool;
@@ -58,7 +58,7 @@ export const useAnnotatorKeyboardShortcutsNew = ({
   const images = useSelector(selectImageViewerImages);
   const activeImageId = useSelector(selectActiveImageId);
   const selectedAnnotations = useSelector(selectSelectedActiveAnnotations);
-  const activeAnnotations = useSelector(selectActiveAnnotationsNew);
+  const activeAnnotations = useSelector(selectActiveAnnotations);
 
   const confirmAnnotations = () => {
     if (

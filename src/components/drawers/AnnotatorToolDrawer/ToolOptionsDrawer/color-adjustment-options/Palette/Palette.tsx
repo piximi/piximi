@@ -8,12 +8,11 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
-import { selectActiveImageId } from "store/imageViewer";
-
 import { selectActiveImageRawColor } from "store/imageViewer/reselectors";
 import { dataSlice } from "store/data/dataSlice";
 import { rgbToHex } from "utils/common/helpers";
 import { DEFAULT_COLORS } from "utils/common/constants";
+import { selectActiveImageId } from "store/imageViewer/selectors";
 
 type PaletteProps = {
   channelIdx: number;

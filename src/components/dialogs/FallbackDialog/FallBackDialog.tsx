@@ -27,15 +27,6 @@ import { useDialogHotkey } from "hooks";
 
 import { SaveFittedModelDialog, SaveProjectDialog } from "components/dialogs";
 
-import {
-  selectClassifierSelectedModel,
-  selectClassifierModelStatus,
-} from "store/classifier";
-import {
-  selectSegmenterModel,
-  selectSegmenterModelStatus,
-} from "store/segmenter";
-
 import { HotkeyView } from "utils/common/enums";
 
 import { ModelStatus } from "utils/models/enums";
@@ -43,6 +34,14 @@ import { APPLICATION_COLORS } from "utils/common/constants";
 import { createGitHubIssue } from "utils/common/helpers";
 import { AlertState } from "utils/common/types";
 import { AlertType } from "utils/common/enums";
+import {
+  selectClassifierModelStatus,
+  selectClassifierSelectedModel,
+} from "store/classifier/selectors";
+import {
+  selectSegmenterModel,
+  selectSegmenterModelStatus,
+} from "store/segmenter/selectors";
 
 export const FallBackDialog = (props: any) => {
   const error = props.error as Error;

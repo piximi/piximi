@@ -3,11 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { List, ListItem, Slider } from "@mui/material";
 
-import { selectActiveImageRenderedSrcs } from "store/imageViewer";
-
 import { CustomListItem } from "components/list-items/CustomListItem";
 import { selectActiveImage } from "store/imageViewer/reselectors";
 import { dataSlice } from "store/data/dataSlice";
+import { selectActiveImageRenderedSrcs } from "store/imageViewer/selectors";
 
 //TODO: change slider style
 

@@ -435,3 +435,15 @@ export const sortTypeByKey = (key: ImageSortKey): ImageSortKeyType => {
     return defaultImageSortKey;
   }
 };
+
+export const updateRecord = <T extends string | number | symbol, K>(
+  record: Record<T, K[]>,
+  key: T,
+  value: K
+) => {
+  if (key in record) {
+    record[key].push(value);
+  } else {
+    record[key] = [value];
+  }
+};

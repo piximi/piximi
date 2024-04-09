@@ -12,7 +12,6 @@ import {
 
 import {
   imageViewerSlice,
-  selectSelectedAnnotationIds,
   //selectWorkingAnnotation,
 } from "store/imageViewer";
 
@@ -32,6 +31,7 @@ import {
   ToolType,
 } from "utils/annotator/enums";
 import { AnnotationTool, ObjectAnnotationTool } from "utils/annotator/tools";
+import { selectSelectedAnnotationIds } from "store/imageViewer/selectors";
 //import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/selectWorkingAnnotation";
 
 const transformerClassName = "Transformer";
