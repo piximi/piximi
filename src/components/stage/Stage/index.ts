@@ -1,1 +1,1 @@
-export { StageNew } from "./StageNew";
+export { Stage } from "./Stage";

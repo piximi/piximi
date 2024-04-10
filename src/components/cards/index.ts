@@ -1,2 +1,2 @@
-export { ExampleProjectCardNew } from "./ExampleProjectCard";
-export { ExampleImageCardNew } from "./ExampleImageCard";
+export { ExampleProjectCard } from "./ExampleProjectCard";
+export { ExampleImageCard } from "./ExampleImageCard";

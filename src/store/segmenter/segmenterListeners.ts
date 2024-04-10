@@ -20,7 +20,7 @@ import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data/dataSlice";
 import Image from "image-js";
-import { NewOrphanedAnnotationType } from "utils/models/AbstractSegmenter/AbstractSegmenter";
+import { OrphanedAnnotationObject } from "utils/models/AbstractSegmenter/AbstractSegmenter";
 import { TrainingCallbacks } from "utils/models/types";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
@@ -57,7 +57,7 @@ type StoreListemerAPI = ListenerEffectAPI<
 >;
 
 startAppListening({
-  actionCreator: segmenterSlice.actions.updateModelStatusNew,
+  actionCreator: segmenterSlice.actions.updateModelStatus,
   effect: async (action, listenerAPI) => {
     listenerAPI.unsubscribe();
 
@@ -96,7 +96,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   const imageKind = getCompleteEntity(dataState.kinds.entities["Image"]);
   if (!imageKind) {
     listenerAPI.dispatch(
-      segmenterSlice.actions.updateModelStatusNew({
+      segmenterSlice.actions.updateModelStatus({
         modelStatus: previousModelStatus,
       })
     );
@@ -168,9 +168,9 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     return;
   }
 
-  let predictedAnnotations: NewOrphanedAnnotationType[][];
+  let predictedAnnotations: OrphanedAnnotationObject[][];
   try {
-    predictedAnnotations = await model.predictNew();
+    predictedAnnotations = await model.predict();
   } catch (error) {
     await handleError(
       "Error in running predictions",
@@ -267,7 +267,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   }
 
   listenerAPI.dispatch(
-    segmenterSlice.actions.updateModelStatusNew({
+    segmenterSlice.actions.updateModelStatus({
       modelStatus: ModelStatus.Trained,
     })
   );
@@ -316,7 +316,7 @@ async function handleError(
     })
   );
   listenerAPI.dispatch(
-    segmenterSlice.actions.updateModelStatusNew({
+    segmenterSlice.actions.updateModelStatus({
       modelStatus: previousModelStatus,
     })
   );

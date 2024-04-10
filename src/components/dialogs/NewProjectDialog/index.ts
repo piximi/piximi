@@ -1,1 +1,1 @@
-export { NewProjectDialogNew } from "./NewProjectDialogNew";
+export { NewProjectDialog } from "./NewProjectDialog";

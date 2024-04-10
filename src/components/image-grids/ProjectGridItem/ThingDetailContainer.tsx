@@ -4,7 +4,7 @@ import {
   Label as LabelIcon,
   LabelImportant as LabelImportantIcon,
 } from "@mui/icons-material";
-import { NewItemDetailTooltip } from "./NewItemDetailTooltip";
+import { ItemDetailTooltip } from "./ItemDetailTooltip";
 import { ThingDetailList } from "./ThingDetailList";
 import { Thing } from "store/data/types";
 
@@ -30,7 +30,7 @@ export const ThingDetailContainer = ({
       left={position.left + "px"}
       color={theme.palette.getContrastText(backgroundColor)}
     >
-      <NewItemDetailTooltip
+      <ItemDetailTooltip
         contents={
           <Typography
             variant="body2"
@@ -48,11 +48,11 @@ export const ThingDetailContainer = ({
         ) : (
           <LabelIcon sx={{ mt: "8px", ml: "8px", color: backgroundColor }} />
         )}
-      </NewItemDetailTooltip>
+      </ItemDetailTooltip>
 
       <Box sx={{ flexGrow: 1 }} />
 
-      <NewItemDetailTooltip
+      <ItemDetailTooltip
         contents={
           <ThingDetailList
             thing={thing}
@@ -64,7 +64,7 @@ export const ThingDetailContainer = ({
         <InfoOutlinedIcon
           sx={{ mt: "8px", ml: "8px", color: backgroundColor }}
         />
-      </NewItemDetailTooltip>
+      </ItemDetailTooltip>
     </Box>
   );
 };

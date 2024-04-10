@@ -1,1 +1,1 @@
-export { ImageViewerAppBarNew } from "./ImageViewerAppBarNew";
+export { ImageViewerAppBar } from "./ImageViewerAppBar";

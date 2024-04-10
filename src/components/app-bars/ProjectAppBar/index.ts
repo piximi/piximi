@@ -1,1 +1,1 @@
-export { ProjectAppBarNew } from "./ProjectAppBarNew";
+export { ProjectAppBar } from "./ProjectAppBar";

@@ -1,1 +1,1 @@
-export { UpdateCategoryDialogNew } from "./UpdateCategoryDialog";
+export { UpdateCategoryDialog } from "./UpdateCategoryDialog";

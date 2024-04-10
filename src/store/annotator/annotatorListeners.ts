@@ -5,7 +5,7 @@ import { annotatorSlice } from "./annotatorSlice";
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { imageViewerSlice } from "store/imageViewer";
 import { intersection } from "lodash";
-import { encodeAnnotationNew } from "utils/annotator/rle";
+import { encodeAnnotation } from "utils/annotator/rle";
 import {
   AnnotationModeType,
   AnnotationStateType,
@@ -21,7 +21,7 @@ const startAppListening =
   annotatorMiddleware.startListening as TypedAppStartListening;
 
 startAppListening({
-  actionCreator: annotatorSlice.actions.setAnnotationStateNew,
+  actionCreator: annotatorSlice.actions.setAnnotationState,
   effect: async (action, listenerAPI) => {
     const {
       imageViewer: IVState,
@@ -149,7 +149,7 @@ startAppListening({
 
       if (!combinedSelectedAnnotation) return;
 
-      const annotation = encodeAnnotationNew(combinedSelectedAnnotation);
+      const annotation = encodeAnnotation(combinedSelectedAnnotation);
 
       listenerAPI.dispatch(
         imageViewerSlice.actions.updateWorkingAnnotation({

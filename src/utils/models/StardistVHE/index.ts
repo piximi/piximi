@@ -1,1 +1,1 @@
-export { StardistVHENew } from "./StardistVHENew";
+export { StardistVHE } from "./StardistVHE";

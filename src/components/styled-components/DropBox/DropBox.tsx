@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
-import { ImageShapeDialogNew } from "components/dialogs";
-import { useDndFileDrop, useUploadNew } from "hooks";
+import { ImageShapeDialog } from "components/dialogs";
+import { useDndFileDrop, useUpload } from "hooks";
 import React, { ReactElement, useCallback, useState } from "react";
 import { ImageShapeEnum } from "utils/file-io/enums";
 import { ImageShapeInfo } from "utils/file-io/types";
@@ -12,7 +12,7 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
   const [files, setFiles] = useState<FileList>();
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 
-  const uploadFiles = useUploadNew(setOpenDimensionsDialogBox);
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
 
   const handleCloseDimensionsDialog = () => {
     setOpenDimensionsDialogBox(false);
@@ -44,7 +44,7 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
         {children}
       </Box>
       {files?.length && (
-        <ImageShapeDialogNew
+        <ImageShapeDialog
           files={files}
           open={openDimensionsDialogBox}
           onClose={handleCloseDimensionsDialog}

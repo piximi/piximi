@@ -12,7 +12,7 @@ import {
 
 import { encode, scanline, simplifyPolygon } from "utils/annotator";
 import { connectPoints } from "utils/annotator";
-import { NewOrphanedAnnotationType } from "../AbstractSegmenter/AbstractSegmenter";
+import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
 import { generateUUID } from "utils/common/helpers";
 import { Partition } from "../enums";
 import { Point } from "utils/annotator/types";
@@ -107,7 +107,7 @@ function buildPolygon(
   return { decodedMask: poly.data, bbox: bbox };
 }
 
-function generateAnnotationsNew(
+function generateAnnotations(
   preds: number[][][],
   kindId: string,
   unknownCategoryId: string,
@@ -121,7 +121,7 @@ function generateAnnotationsNew(
   },
   scoreThresh: number
 ) {
-  const generatedAnnotations: Array<NewOrphanedAnnotationType> = [];
+  const generatedAnnotations: Array<OrphanedAnnotationObject> = [];
   const scores: Array<number> = [];
   const generatedBboxes: Array<[number, number, number, number]> = [];
 
@@ -160,7 +160,7 @@ function generateAnnotationsNew(
   });
   return { generatedAnnotations, generatedBboxes, scores };
 }
-export const predictStardistNew = async (
+export const predictStardist = async (
   model: GraphModel,
   imTensor: Tensor4D, // expects 1 for batchSize dim (axis 0)
   kindId: string, // foreground (nucleus kind)
@@ -189,16 +189,15 @@ export const predictStardistNew = async (
     setBackend("cpu");
   }
 
-  const { generatedAnnotations, generatedBboxes, scores } =
-    generateAnnotationsNew(
-      preds,
-      kindId,
-      unknownCategoryId,
-      res.shape[1], // H
-      res.shape[2], // W
-      inputImDims,
-      NMS_scoreThresh
-    );
+  const { generatedAnnotations, generatedBboxes, scores } = generateAnnotations(
+    preds,
+    kindId,
+    unknownCategoryId,
+    res.shape[1], // H
+    res.shape[2], // W
+    inputImDims,
+    NMS_scoreThresh
+  );
 
   const indexTensor = tidy(() => {
     const bboxTensor = tensor2d(generatedBboxes);
@@ -217,7 +216,7 @@ export const predictStardistNew = async (
   const indices = (await indexTensor.data()) as Float32Array;
   dispose(indexTensor);
 
-  const selectedAnnotations: Array<NewOrphanedAnnotationType> = [];
+  const selectedAnnotations: Array<OrphanedAnnotationObject> = [];
 
   indices.forEach((index) => {
     selectedAnnotations.push(generatedAnnotations[index]);

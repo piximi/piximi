@@ -45,7 +45,7 @@ export const selectSelectedThingIdsLength = ({
 SORT TYPE
 */
 
-export const selectSortTypeNew = ({
+export const selectSortType = ({
   project,
 }: {
   project: ProjectState;

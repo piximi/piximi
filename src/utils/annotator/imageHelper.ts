@@ -192,20 +192,6 @@ export const getAnnotationsInBox = (
     );
   });
 };
-export const getAnnotationsInBoxNew = (
-  minimum: { x: number; y: number },
-  maximum: { x: number; y: number },
-  annotations: Array<DecodedAnnotationObject>
-) => {
-  return annotations.filter((annotation: DecodedAnnotationObject) => {
-    return (
-      minimum.x <= annotation.boundingBox[0] &&
-      minimum.y <= annotation.boundingBox[1] &&
-      maximum.x >= annotation.boundingBox[2] &&
-      maximum.y >= annotation.boundingBox[3]
-    );
-  });
-};
 
 /*
  * From encoded mask data, get the decoded data and return results as an HTMLImageElement to be used by Konva.Image

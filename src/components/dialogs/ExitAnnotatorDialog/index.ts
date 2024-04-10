@@ -1,1 +1,1 @@
-export { ExitAnnotatorDialogNew } from "./ExitAnnotatorDialogNew";
+export { ExitAnnotatorDialog } from "./ExitAnnotatorDialog";

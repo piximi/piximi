@@ -9,7 +9,7 @@ import {
 
 import { CustomListItemButton } from "../CustomListItemButton";
 import { useImageViewerCategoryItemState } from "./useImageViewerCategoryItemState";
-import { CategoryItemMenuNew } from "components/menus";
+import { CategoryItemMenu } from "components/menus";
 import { CountChip } from "components/styled-components";
 import { APPLICATION_COLORS } from "utils/common/constants";
 import { Category } from "store/data/types";
@@ -80,7 +80,7 @@ export const ImageViewerCategoryItem = ({
         }
         dense
       />
-      <CategoryItemMenuNew
+      <CategoryItemMenu
         anchorElCategoryMenu={categoryMenuAnchorEl}
         category={category}
         handleCloseCategoryMenu={handleCloseMenu}

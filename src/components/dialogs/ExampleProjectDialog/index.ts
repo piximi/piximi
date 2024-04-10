@@ -1,1 +1,1 @@
-export { ExampleProjectDialogNew } from "./ExampleProjectDialogNew";
+export { ExampleProjectDialog } from "./ExampleProjectDialog";

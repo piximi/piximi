@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { List, SvgIcon } from "@mui/material";
 
-import { useAnnotationToolNew, useTranslation } from "hooks";
+import { useAnnotationTool, useTranslation } from "hooks";
 
 import { imageViewerSlice } from "store/imageViewer";
 
@@ -18,7 +18,7 @@ import { selectWorkingAnnotation } from "store/imageViewer/selectors";
 export const InvertAnnotation = () => {
   const dispatch = useDispatch();
 
-  const { annotationTool } = useAnnotationToolNew();
+  const { annotationTool } = useAnnotationTool();
   const workingAnnotationEntity = useSelector(selectWorkingAnnotation);
 
   const handleInvertClick = () => {

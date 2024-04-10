@@ -1,1 +1,1 @@
-export { PointerSelectionOptionsNew } from "./PointerSelectionOptionsNew";
+export { PointerSelectionOptions } from "./PointerSelectionOptions";
