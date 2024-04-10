@@ -92,7 +92,6 @@ export const ImportAnnotationsFileMenuItem = ({
             imageViewerSlice.actions.setActiveImageId({
               imageId: activeImageId,
               prevImageId: undefined,
-              execSaga: true,
             })
           );
         }

@@ -1,1 +1,1 @@
-export { CategoryItemNew } from "./CategoryItemNew";
+export { CategoryItem } from "./CategoryItem";

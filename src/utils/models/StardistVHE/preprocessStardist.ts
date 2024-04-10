@@ -56,7 +56,7 @@ const padImage = (image: {
   return imageTensor as Tensor3D;
 };
 
-export const preprocessStardistNew = (
+export const preprocessStardist = (
   images: Array<ImageObject>,
   batchSize: number,
   dataDims: Array<{ padX: number; padY: number }>

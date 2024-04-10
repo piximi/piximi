@@ -1,1 +1,1 @@
-export { CellposeNew } from "./CallposeNew";
+export { Cellpose } from "./Callpose";

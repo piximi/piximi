@@ -1,1 +1,1 @@
-export { usePointerToolNew } from "./usePointerToolNew";
+export { usePointerTool } from "./usePointerTool";

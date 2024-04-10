@@ -26,7 +26,7 @@ import { CloudUpload } from "./CloudUpload";
 
 import { Model } from "utils/models/Model/Model";
 import { ModelFormatSelection } from "./ModelFormatSelection";
-import { CellposeNew } from "utils/models/Cellpose";
+import { Cellpose } from "utils/models/Cellpose";
 import { ModelTask } from "utils/models/enums";
 import { availableClassifierModels } from "utils/models/availableClassificationModels";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
@@ -100,7 +100,7 @@ export const ImportTensorflowModelDialog = ({
   const onModelChange = useCallback((model: Model | undefined) => {
     setSelectedModel(model);
     // TODO - segmenter: generalize to model.cloud
-    if (model instanceof CellposeNew) {
+    if (model instanceof Cellpose) {
       setCloudWarning(true);
     } else {
       setCloudWarning(false);

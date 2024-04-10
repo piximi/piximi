@@ -1,1 +1,1 @@
-export { CocoSSDNew } from "./CocoSSD";
+export { CocoSSD } from "./CocoSSD";

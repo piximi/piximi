@@ -1,1 +1,1 @@
-export { ImageNew } from "./ImageNew";
+export { Image } from "./Image";

@@ -34,9 +34,6 @@ export class FullyConvolutionalSegmenter extends Segmenter {
   }
 
   public predict() {
-    return [[]];
-  }
-  public predictNew() {
     return [];
   }
 

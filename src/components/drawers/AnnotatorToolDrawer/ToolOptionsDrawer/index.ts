@@ -1,1 +1,1 @@
-export { ToolOptionsDrawerNew } from "./ToolOptionsDrawerNew";
+export { ToolOptionsDrawer } from "./ToolOptionsDrawer";

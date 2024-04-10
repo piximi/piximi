@@ -1,1 +1,1 @@
-export { EvaluateClassifierDialogNew } from "./EvaluateClassifierDialogNew";
+export { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";

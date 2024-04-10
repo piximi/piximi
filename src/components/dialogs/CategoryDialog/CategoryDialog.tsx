@@ -2,7 +2,7 @@ import { TextField, Box } from "@mui/material";
 
 import { DialogWithAction } from "../DialogWithAction";
 import { useCategoryValidation } from "hooks/useCategoryValidation/useCategoryValidation";
-import { ColorIconNew } from "components/controls";
+import { ColorIcon } from "components/controls";
 
 type CategoryDialogProps = {
   onClose: () => void;
@@ -58,7 +58,7 @@ export const CategoryDialog = ({
           alignItems={"center"}
           gap={2}
         >
-          <ColorIconNew
+          <ColorIcon
             color={color}
             unusedColors={availableColors}
             onColorChange={handleColorChange}

@@ -10,7 +10,7 @@ import { rootReducer, RootState } from "./rootReducer";
 import { annotatorMiddleware } from "store/annotator/annotatorListeners";
 import { imageViewerMiddleware } from "./imageViewer/imageViewerListeners";
 import { projectMiddleware } from "./project/projectListeners";
-import { newDataMiddleware } from "./data/dataListenersNew";
+import { newDataMiddleware } from "./data/dataListeners";
 import { classifierSlice } from "./classifier";
 import { annotatorSlice } from "./annotator";
 import { applicationSettingsSlice } from "./applicationSettings";
@@ -18,7 +18,7 @@ import { imageViewerSlice } from "./imageViewer";
 import { dataSlice } from "./data/dataSlice";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
-import { classifierMiddleware } from "./classifier/listeners/classiferListener";
+import { classifierMiddleware } from "./classifier/classiferListener";
 import { segmenterMiddleware } from "./segmenter/segmenterListeners";
 
 const enhancers: StoreEnhancer[] = [];

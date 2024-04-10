@@ -1,1 +1,1 @@
-export { AnnotationsNew } from "./AnnotationsNew";
+export { Annotations } from "./Annotations";

@@ -228,19 +228,6 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{
         imageId: string | undefined;
         prevImageId: string | undefined;
-        execSaga: boolean;
-      }>
-    ) {
-      state.activeImageId = action.payload.imageId;
-      // reset selected annotations
-      state.selectedAnnotationIds = [];
-      state.workingAnnotationId = undefined;
-    },
-    setActiveImageIdNew(
-      state,
-      action: PayloadAction<{
-        imageId: string | undefined;
-        prevImageId: string | undefined;
       }>
     ) {
       state.activeImageId = action.payload.imageId;

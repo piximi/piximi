@@ -1,1 +1,1 @@
-export { PredictionListItemsNew } from "./PredictionListItemsNew";
+export { PredictionListItems } from "./PredictionListItems";

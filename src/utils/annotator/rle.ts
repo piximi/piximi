@@ -21,7 +21,7 @@ export const decode = (encoded: Array<number>): Uint8ClampedArray => {
   return new Uint8ClampedArray(decoded);
 };
 
-export const decodeAnnotationNew = (
+export const decodeAnnotation = (
   encodedAnnotation: AnnotationObject
 ): DecodedAnnotationObject => {
   // TODO - serializtion: temporary measure, remove when done
@@ -93,7 +93,7 @@ export const encode = (
   return encoded;
 };
 
-export const encodeAnnotationNew = (
+export const encodeAnnotation = (
   decodedAnnotation: DecodedAnnotationObject
 ): AnnotationObject => {
   // TODO - serializtion: temporary measure, remove when done

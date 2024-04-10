@@ -1,1 +1,1 @@
-export { AnnotationTransformerNew } from "./AnnotationTransformerNew";
+export { AnnotationTransformer } from "./AnnotationTransformer";
