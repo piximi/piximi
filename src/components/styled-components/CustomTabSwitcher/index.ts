@@ -1,1 +1,1 @@
-export { NewCustomTabSwitcher } from "./NewCustomTabSwitcher";
+export { CustomTabSwitcher } from "./CustomTabSwitcher";

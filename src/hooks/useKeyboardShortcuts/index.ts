@@ -1,1 +1,1 @@
-export { useAnnotatorKeyboardShortcutsNew } from "./useAnnotatorKeyboardShortcutsNew";
+export { useAnnotatorKeyboardShortcuts } from "./useAnnotatorKeyboardShortcuts";

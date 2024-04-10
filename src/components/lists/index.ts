@@ -1,7 +1,7 @@
 export { ApplicationOptionsList } from "./ApplicationOptionsList";
 export { CollapsibleList } from "./CollapsibleList";
 export { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
-export { CategoriesListNew } from "./CategoriesList";
-export { ClassifierListNew } from "./ClassifierList";
-export { FileListNew } from "./FileList";
-export { SegmenterListNew } from "./SegmenterList";
+export { CategoriesList } from "./CategoriesList";
+export { ClassifierList } from "./ClassifierList";
+export { FileList } from "./FileList";
+export { SegmenterList } from "./SegmenterList";

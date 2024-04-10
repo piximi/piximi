@@ -60,7 +60,6 @@ export const ImageMenu = ({
         imageViewerSlice.actions.setActiveImageId({
           imageId: previousImageId,
           prevImageId: undefined,
-          execSaga: true,
         })
       );
       dispatch(

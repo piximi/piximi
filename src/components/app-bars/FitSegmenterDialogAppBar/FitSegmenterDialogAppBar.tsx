@@ -53,7 +53,6 @@ export const FitSegmenterDialogAppBar = ({
 
     dispatch(
       segmenterSlice.actions.updateModelStatus({
-        execSaga: true,
         modelStatus: ModelStatus.Trained,
       })
     );

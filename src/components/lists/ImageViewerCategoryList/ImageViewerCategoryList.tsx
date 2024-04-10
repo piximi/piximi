@@ -5,7 +5,7 @@ import { ImageViewerCategoryItem } from "components/list-items/CategoryItem/Imag
 import { CollapsibleListItem } from "components/list-items/CollapsibleListItem";
 import { useDispatch, useSelector } from "react-redux";
 import { imageViewerSlice } from "store/imageViewer";
-import { CreateCategoryDialogNew } from "components/dialogs/CreateCategoryDialogNew/CreateCategoryDialogNew";
+import { CreateCategoryDialog } from "components/dialogs/CreateCategoryDialog/CreateCategoryDialog";
 import { useDialogHotkey } from "hooks";
 import { HotkeyView } from "utils/common/enums";
 import { KindWithCategories } from "store/data/types";
@@ -123,7 +123,7 @@ export const ImageViewerCategoryList = () => {
         })}
       </List>
       {selectedKind && (
-        <CreateCategoryDialogNew
+        <CreateCategoryDialog
           kind={selectedKind}
           onClose={handleCloseCreateCategoryDialog}
           open={isCreateCategoryDialogOpen}

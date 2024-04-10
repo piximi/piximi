@@ -21,7 +21,7 @@ export const useClassificationModel = () => {
 
   const handlePredict = () => {
     dispatch(
-      classifierSlice.actions.updateModelStatusNew({
+      classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Predicting,
       })
     );
@@ -31,7 +31,7 @@ export const useClassificationModel = () => {
     setWaitingForResults(true);
 
     dispatch(
-      classifierSlice.actions.updateModelStatusNew({
+      classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Evaluating,
       })
     );

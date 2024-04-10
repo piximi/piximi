@@ -1,5 +1,5 @@
-export { ImageViewerDrawerNew } from "./ImageViewerDrawer";
+export { ImageViewerDrawer } from "./ImageViewerDrawer";
 export { HelpDrawer } from "./HelpDrawer/HelpDrawer";
-export { AnnotatorToolDrawerNew } from "./AnnotatorToolDrawer";
-export { ImageToolDrawerNew } from "./ImageToolDrawer";
-export { ProjectDrawerNew } from "./ProjectDrawer";
+export { AnnotatorToolDrawer } from "./AnnotatorToolDrawer";
+export { ImageToolDrawer } from "./ImageToolDrawer";
+export { ProjectDrawer } from "./ProjectDrawer";

@@ -2,7 +2,7 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { TypedAppStartListening } from "store/types";
 import { imageViewerSlice } from "./imageViewerSlice";
 import { getCompleteEntity } from "store/entities/utils";
-import { decodeAnnotationNew } from "utils/annotator/rle";
+import { decodeAnnotation } from "utils/annotator/rle";
 import { createRenderedTensor } from "utils/common/tensorHelpers";
 import {
   AnnotationObject,
@@ -49,7 +49,7 @@ startAppListening({
     //   imageViewerSlice.actions.setSelectedAnnotationIds({ annotationIds })
     // );
     listenerAPI.dispatch(
-      imageViewerSlice.actions.setActiveImageIdNew({
+      imageViewerSlice.actions.setActiveImageId({
         imageId: activeImageId,
         prevImageId: undefined,
       })
@@ -57,7 +57,7 @@ startAppListening({
   },
 });
 startAppListening({
-  actionCreator: imageViewerSlice.actions.setActiveImageIdNew,
+  actionCreator: imageViewerSlice.actions.setActiveImageId,
   effect: async (action, listenerAPI) => {
     listenerAPI.dispatch(
       imageViewerSlice.actions.setImageIsLoading({ isLoading: true })
@@ -111,7 +111,7 @@ startAppListening({
       ) as AnnotationObject;
       if (!annotation) return undefined;
       annotationValue = !annotation.decodedMask
-        ? decodeAnnotationNew(annotation)
+        ? decodeAnnotation(annotation)
         : (annotation as DecodedAnnotationObject);
     }
     listenerAPI.unsubscribe();

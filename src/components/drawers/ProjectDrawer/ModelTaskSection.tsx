@@ -1,6 +1,6 @@
 import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
-import { ClassifierListNew } from "components/lists";
-import { SegmenterListNew } from "components/lists";
+import { ClassifierList } from "components/lists";
+import { SegmenterList } from "components/lists";
 import React, { useState } from "react";
 
 export const ModelTaskSection = () => {
@@ -40,9 +40,9 @@ export const ModelTaskSection = () => {
         </ToggleButton>
       </ToggleButtonGroup>
       {learningTask === "Classification" ? (
-        <ClassifierListNew />
+        <ClassifierList />
       ) : (
-        <SegmenterListNew />
+        <SegmenterList />
       )}
     </Box>
   );

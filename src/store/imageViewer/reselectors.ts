@@ -23,7 +23,7 @@ import {
   selectSelectedAnnotationIds,
   selectWorkingAnnotation,
 } from "./selectors";
-import { decodeAnnotationNew } from "utils/annotator/rle";
+import { decodeAnnotation } from "utils/annotator/rle";
 import { getCompleteEntity } from "store/entities/utils";
 import { intersection } from "lodash";
 
@@ -83,7 +83,7 @@ export const selectSelectedAnnotations = createSelector(
         if (ann) {
           const decodedAnn =
             ann.decodedMask === undefined
-              ? decodeAnnotationNew(ann)
+              ? decodeAnnotation(ann)
               : (ann as DecodedAnnotationObject);
           anns.push(decodedAnn);
         }
@@ -102,7 +102,7 @@ export const selectActiveAnnotations = createSelector(
     return annotationIds.map((annotationId) => {
       const annotation = thingsDict[annotationId] as AnnotationObject;
       const decodedAnnotation = !annotation.decodedMask
-        ? decodeAnnotationNew(annotation)
+        ? decodeAnnotation(annotation)
         : (annotation as DecodedAnnotationObject);
       return decodedAnnotation;
     });
@@ -128,7 +128,7 @@ export const selectActiveAnnotationsViews = createSelector(
       const annotation = thingDict[annotationId] as AnnotationObject;
 
       const decodedAnnotation = !annotation.decodedMask
-        ? decodeAnnotationNew(annotation)
+        ? decodeAnnotation(annotation)
         : (annotation as DecodedAnnotationObject);
 
       if (
@@ -157,7 +157,7 @@ export const selectWorkingAnnotationView = createSelector(
       workingAnnotationEntity
     ) as AnnotationObject;
     const annotation = !workingAnnotation.decodedMask
-      ? decodeAnnotationNew(workingAnnotation)
+      ? decodeAnnotation(workingAnnotation)
       : (workingAnnotation as DecodedAnnotationObject);
     const fillColor = catDict[workingAnnotation.categoryId].color;
     return {
@@ -175,7 +175,7 @@ export const selectSelectedActiveAnnotations = createSelector(
     return annotationIds.map((annotationId) => {
       const annotation = thingsDict[annotationId] as AnnotationObject;
       const decodedAnnotation = !annotation.decodedMask
-        ? decodeAnnotationNew(annotation)
+        ? decodeAnnotation(annotation)
         : (annotation as DecodedAnnotationObject);
       return decodedAnnotation;
     });

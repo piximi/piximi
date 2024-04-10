@@ -1,1 +1,1 @@
-export { ProjectDrawerNew } from "./ProjectDrawerNew";
+export { ProjectDrawer } from "./ProjectDrawer";

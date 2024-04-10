@@ -1,1 +1,1 @@
-export { ImageListNew } from "./ImageListNew";
+export { ImageList } from "./ImageList";

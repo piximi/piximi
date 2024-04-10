@@ -1,6 +1,6 @@
-export { ImageViewerAppBarNew } from "./ImageViewerAppBar";
-export { ProjectAppBarNew } from "./ProjectAppBar";
+export { ImageViewerAppBar } from "./ImageViewerAppBar";
+export { ProjectAppBar } from "./ProjectAppBar";
 export { FitSegmenterDialogAppBar } from "./FitSegmenterDialogAppBar";
-export { FitClassifierDialogAppBarNew } from "./FitClassifierDialogAppBar";
-export { GridItemActionBarNew } from "./GridItemActionBar";
+export { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
+export { GridItemActionBar } from "./GridItemActionBar";
 export { AlertBar } from "./AlertBar";

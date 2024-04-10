@@ -1,1 +1,1 @@
-export { FilterOptionsNew } from "./FilterOptionsNew";
+export { FilterOptions } from "./FilterOptions";

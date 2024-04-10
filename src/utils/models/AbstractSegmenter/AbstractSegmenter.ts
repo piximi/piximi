@@ -9,16 +9,10 @@ import {
   zeros,
 } from "@tensorflow/tfjs";
 import { TrainingCallbacks } from "../types";
-import {
-  OldAnnotationType,
-  OldCategory,
-  Kind,
-  AnnotationObject,
-} from "store/data/types";
+import { OldCategory, Kind, AnnotationObject } from "store/data/types";
 import { logger } from "utils/common/helpers";
 
-export type OrphanedAnnotationType = Omit<OldAnnotationType, "imageId">;
-export type NewOrphanedAnnotationType = Omit<
+export type OrphanedAnnotationObject = Omit<
   AnnotationObject,
   "imageId" | "data" | "src" | "bitDepth" | "name" | "shape"
 >;
@@ -36,11 +30,8 @@ export abstract class Segmenter extends Model {
   }
 
   public abstract predict():
-    | OrphanedAnnotationType[][]
-    | Promise<OrphanedAnnotationType[][]>;
-  public abstract predictNew():
-    | NewOrphanedAnnotationType[][]
-    | Promise<NewOrphanedAnnotationType[][]>;
+    | OrphanedAnnotationObject[][]
+    | Promise<OrphanedAnnotationObject[][]>;
 
   /*
    * Concrete classes must keep track of their inference categories somehow,

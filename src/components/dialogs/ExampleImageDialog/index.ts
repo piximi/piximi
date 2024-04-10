@@ -1,1 +1,1 @@
-export { ExampleImageDialogNew } from "./ExampleImageDialogNew";
+export { ExampleImageDialog } from "./ExampleImageDialog";

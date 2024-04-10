@@ -10,7 +10,7 @@ type UpdateCategoriesDialogProps = {
   open: boolean;
 };
 
-export const UpdateCategoryDialogNew = ({
+export const UpdateCategoryDialog = ({
   onClose,
   category,
   kind,

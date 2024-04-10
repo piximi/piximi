@@ -28,15 +28,6 @@ export const annotatorSlice = createSlice({
       state,
       action: PayloadAction<{
         annotationState: AnnotationStateType;
-        annotationTool: AnnotationTool;
-      }>
-    ) {
-      state.annotationState = action.payload.annotationState;
-    },
-    setAnnotationStateNew(
-      state,
-      action: PayloadAction<{
-        annotationState: AnnotationStateType;
         kind?: string;
         annotationTool: AnnotationTool;
       }>

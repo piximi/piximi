@@ -3,13 +3,13 @@ import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { APPLICATION_COLORS } from "utils/common/constants";
 
-type FitClassifierDialogAppBarNewProps = {
+type FitClassifierDialogAppBarProps = {
   closeDialog: any;
 };
 
-export const EvaluateClassifierDialogAppBarNew = ({
+export const EvaluateClassifierDialogAppBar = ({
   closeDialog,
-}: FitClassifierDialogAppBarNewProps) => {
+}: FitClassifierDialogAppBarProps) => {
   return (
     <AppBar
       sx={{

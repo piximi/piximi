@@ -25,7 +25,6 @@ const Controller = ({
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: newStatus,
-        execSaga: false,
       })
     );
   };

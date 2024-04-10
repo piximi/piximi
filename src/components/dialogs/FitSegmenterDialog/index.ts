@@ -1,1 +1,1 @@
-export { FitSegmenterDialogNew } from "./FitSegmentationDialogNew";
+export { FitSegmenterDialog } from "./FitSegmentationDialog";

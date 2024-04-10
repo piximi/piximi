@@ -6,22 +6,14 @@ import {
 } from "@tensorflow/tfjs";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
-import { predictCoco, predictCocoNew } from "./predictCoco";
+import { predictCoco } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
-import {
-  constructCocoCategories,
-  constructCocoKinds,
-} from "./constructCocoCategories";
+import { constructCocoKinds } from "./constructCocoCategories";
 import { FitOptions } from "../types";
 import { ModelTask } from "../enums";
-import { OldCategory, OldImageType, Kind, ImageObject } from "store/data/types";
+import { Kind, ImageObject } from "store/data/types";
 
 type LoadInferenceDataArgs = {
-  fitOptions: FitOptions;
-  // if cat undefined, created from default classes
-  categories?: Array<OldCategory>;
-};
-type LoadInferenceDataArgsNew = {
   fitOptions: FitOptions;
   // if cat undefined, created from default classes
   kinds?: Array<Kind>;
@@ -48,8 +40,9 @@ type LoadInferenceDataArgsNew = {
   with the 80 outputclasses listed here:
   https://github.com/tensorflow/tfjs-models/blob/master/coco-ssd/src/classes.ts
  */
+
 export class CocoSSD extends Segmenter {
-  protected _inferenceCategories?: Array<OldCategory>;
+  protected _inferenceKinds?: Array<Kind>;
 
   constructor() {
     super({
@@ -72,111 +65,12 @@ export class CocoSSD extends Segmenter {
     this._model = await loadGraphModel(this.src, { fromTFHub: isTFHub });
   }
 
-  public loadTraining(images: OldImageType[], preprocessingArgs: any): void {}
-  public loadValidation(images: OldImageType[], preprocessingArgs: any): void {}
+  public loadTraining(images: ImageObject[], preprocessingArgs: any): void {}
+  public loadValidation(images: ImageObject[], preprocessingArgs: any): void {}
 
   public loadInference(
     images: ImageObject[],
     preprocessingArgs: LoadInferenceDataArgs
-  ) {
-    this._inferenceDataset = preprocessInference(
-      images,
-      preprocessingArgs.fitOptions
-    );
-
-    if (preprocessingArgs.categories) {
-      this._inferenceCategories = preprocessingArgs.categories;
-    } else if (!this._inferenceCategories) {
-      this._inferenceCategories = constructCocoCategories();
-    }
-  }
-
-  public async train(options: any, callbacks: any): Promise<History> {
-    if (!this.trainable) {
-      throw new Error(`Training not supported for Model ${this.name}`);
-    } else {
-      throw new Error(`Training not yet implemented for Model ${this.name}`);
-    }
-  }
-
-  public async predict() {
-    if (!this._model) {
-      throw Error(`"${this.name}" Model not loaded`);
-    }
-
-    if (this._model instanceof LayersModel) {
-      throw Error(`"${this.name}" Model must a Graph, not Layers`);
-    }
-
-    if (!this._inferenceDataset) {
-      throw Error(`"${this.name}" Model's inference data not loaded`);
-    }
-
-    if (!this._inferenceCategories) {
-      throw Error(`"${this.name}" Model's inference categories are not loaded`);
-    }
-
-    const graphModel = this._model as GraphModel;
-
-    const infT = await this._inferenceDataset.toArray();
-    // imTensor disposed in `predictCoco`
-    const annotationsPromises = infT.map((imTensor) => {
-      return predictCoco(graphModel, imTensor, this._inferenceCategories!);
-    });
-    const annotations = await Promise.all(annotationsPromises);
-
-    return annotations;
-  }
-  public async predictNew() {
-    return [];
-  }
-
-  public inferenceCategoriesById(catIds: Array<string>) {
-    if (!this._inferenceCategories) {
-      throw Error(`"${this.name}" Model has no inference categories loaded`);
-    }
-
-    return this._inferenceCategories.filter((cat) => catIds.includes(cat.id));
-  }
-  public inferenceKindsById(kind: string[]) {
-    return [];
-  }
-
-  public override dispose() {
-    super.dispose();
-  }
-}
-
-export class CocoSSDNew extends Segmenter {
-  protected _inferenceKinds?: Array<Kind>;
-
-  constructor() {
-    super({
-      name: "COCO-SSD-New",
-      task: ModelTask.Segmentation,
-      graph: true,
-      pretrained: true,
-      trainable: false,
-      src: "https://tfhub.dev/tensorflow/tfjs-model/ssd_mobilenet_v2/1/default/1",
-      requiredChannels: 3,
-    });
-  }
-
-  public async loadModel() {
-    if (!this.src) return;
-    if (this._model) return;
-
-    const isTFHub = CocoSSDNew.verifyTFHubUrl(this.src);
-
-    this._model = await loadGraphModel(this.src, { fromTFHub: isTFHub });
-  }
-
-  public loadTraining(images: OldImageType[], preprocessingArgs: any): void {}
-  public loadValidation(images: OldImageType[], preprocessingArgs: any): void {}
-
-  public loadInference(
-    images: ImageObject[],
-    preprocessingArgs: LoadInferenceDataArgsNew
   ) {
     this._inferenceDataset = preprocessInference(
       images,
@@ -199,9 +93,6 @@ export class CocoSSDNew extends Segmenter {
   }
 
   public async predict() {
-    return [];
-  }
-  public async predictNew() {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -223,7 +114,7 @@ export class CocoSSDNew extends Segmenter {
     const infT = await this._inferenceDataset.toArray();
     // imTensor disposed in `predictCoco`
     const annotationsPromises = infT.map((imTensor) => {
-      return predictCocoNew(graphModel, imTensor, this._inferenceKinds!);
+      return predictCoco(graphModel, imTensor, this._inferenceKinds!);
     });
     const annotations = await Promise.all(annotationsPromises);
 

@@ -5,13 +5,13 @@ import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 
 import { projectSlice } from "store/project";
 
-import { selectSortTypeNew } from "store/project/selectors";
+import { selectSortType } from "store/project/selectors";
 import { ThingSortKey } from "utils/common/enums";
 
 export const SortSelection = () => {
   const dispatch = useDispatch();
 
-  const selectedSortKey = useSelector(selectSortTypeNew);
+  const selectedSortKey = useSelector(selectSortType);
   const [selectedKey, setSelectedKey] = useState<ThingSortKey>(selectedSortKey);
 
   const onSortKeyChange = (event: SelectChangeEvent<unknown>) => {
