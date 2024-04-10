@@ -16,21 +16,23 @@ import {
   tidy,
 } from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
+import {
+  Category,
+  DecodedAnnotationObject,
+  ImageObject,
+  OldImageType,
+  Shape,
+} from "store/data/types";
+import { FitOptions, PreprocessOptions, RescaleOptions } from "../types";
+import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 
-import { Category, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
-import { ImageType } from "types/ImageType";
-import { Shape } from "types/Shape";
-import { FitOptions } from "types/FitOptions";
-import { PreprocessOptions } from "types/PreprocessOptions";
-import { RescaleOptions } from "types/RescaleOptions";
-import { DecodedAnnotationType } from "types/ThingType";
 //import { encodeAnnotationToSegmentationMask } from "./segmentationMasks";
 
 const drawSegmentationMask = async (
   createdCategoriesIDs: Array<string>,
   item: {
     xs: Tensor3D;
-    annotations: DecodedAnnotationType[];
+    annotations: DecodedAnnotationObject[];
     id: string;
     shape: Shape;
   }
@@ -58,13 +60,13 @@ const decodeFromOriginalSrc = async (
   rescaleOptions: RescaleOptions,
   item: {
     srcs: Array<string>; // [#channels]: dataURL (from activePlane)
-    annotations: DecodedAnnotationType[];
+    annotations: DecodedAnnotationObject[];
     id: string;
     shape: Shape;
   }
 ): Promise<{
   xs: Tensor3D;
-  annotations: DecodedAnnotationType[];
+  annotations: DecodedAnnotationObject[];
   id: string;
   shape: Shape;
 }> => {
@@ -119,13 +121,13 @@ const decodeImage = async (
   rescaleOptions: RescaleOptions,
   item: {
     srcs: string | string[];
-    annotations: DecodedAnnotationType[];
+    annotations: DecodedAnnotationObject[];
     id: string;
     shape: Shape;
   }
 ): Promise<{
   xs: Tensor3D;
-  annotations: DecodedAnnotationType[];
+  annotations: DecodedAnnotationObject[];
   id: string;
   shape: Shape;
 }> => {
@@ -135,7 +137,7 @@ const decodeImage = async (
         rescaleOptions,
         item as {
           srcs: string;
-          annotations: DecodedAnnotationType[];
+          annotations: DecodedAnnotationObject[];
           id: string;
           shape: Shape;
         }
@@ -144,7 +146,7 @@ const decodeImage = async (
         rescaleOptions,
         item as {
           srcs: string[];
-          annotations: DecodedAnnotationType[];
+          annotations: DecodedAnnotationObject[];
           id: string;
           shape: Shape;
         }
@@ -211,7 +213,7 @@ const resize = async (
 };
 
 export const preprocessSegmentationImages = async (
-  images: Array<ImageType>,
+  images: Array<ImageObject>,
   categories: Array<Category>,
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
@@ -249,7 +251,7 @@ export const preprocessSegmentationImages = async (
     .mapAsync(drawSegmentationMask.bind(null, createdCategoriesIDs))
     .mapAsync(resize.bind(null, inputShape));
 
-  if (!operation | (operation !== "inference")) {
+  if (!operation || operation !== "inference") {
     const imageDataBatched = imageData.batch(fitOptions.batchSize);
 
     return imageDataBatched as tfdata.Dataset<{

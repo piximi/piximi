@@ -14,9 +14,9 @@ import { MIMEType } from "utils/file-io/types";
 import { loadImageFileAsStack } from "utils/file-io/helpers";
 import { convertToImage } from "utils/common/tensorHelpers";
 import {
+  Category,
+  ImageObject,
   OldAnnotationType,
-  OldCategory,
-  OldImageType,
   Shape,
 } from "store/data/types";
 
@@ -50,17 +50,21 @@ const fitOptions: FitOptions = {
   batchSize: 32,
 };
 
-const annotationCategories: Array<OldCategory> = [
+const annotationCategories: Array<Category> = [
   {
     color: "#920000",
     id: "00000000-0000-1111-0000-000000000000",
     name: "Unknown",
+    kind: "",
+    containing: [],
     visible: true,
   },
   {
     color: "#006ddb",
     id: "1dca6ba0-c53b-435d-a43f-d4a2bb4042a5",
     name: "Test",
+    kind: "",
+    containing: [],
     visible: true,
   },
 ];
@@ -95,7 +99,7 @@ const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
 };
 
 it.skip("preprocessSegmenter", async () => {
-  const images: Array<OldImageType> = [];
+  const images: Array<ImageObject> = [];
 
   for (const preIm of preloadedImages) {
     const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);
