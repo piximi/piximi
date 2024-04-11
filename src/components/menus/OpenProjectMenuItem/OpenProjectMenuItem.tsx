@@ -14,6 +14,8 @@ import { AlertStateType, AlertType } from "types";
 import { imageViewerSlice } from "store/slices/imageViewer";
 import { dataSlice } from "store/slices/data";
 import { fListToStore } from "utils";
+import { ImportAnnotationsFileMenuItem } from "../OpenImageMenu/ImportAnnotationsFileMenuItem";
+import { ProjectFileType } from "types/runtime";
 
 //TODO: MenuItem??
 
@@ -127,6 +129,10 @@ export const OpenProjectMenuItem = ({
 
   return (
     <>
+      <ImportAnnotationsFileMenuItem
+        projectType={ProjectFileType.PIXIMI}
+        onCloseMenu={onMenuClose}
+      />
       <MenuItem component="label" dense>
         <ListItemText primary="Project from Zarr" />
         <input
