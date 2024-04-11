@@ -1,8 +1,9 @@
 import { useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { dataSlice } from "store/data/dataSlice";
+import { selectUnknownImageCategory } from "store/data/selectors";
 import { ImageShapeEnum } from "utils/file-io/enums";
 import { getImageFileInformation, uploadImages } from "utils/file-io/helpers";
 
@@ -10,6 +11,7 @@ export const useUpload = (
   setOpenDimensionsDialogBox: (flag: boolean) => void
 ) => {
   const dispatch = useDispatch();
+  const unknownImageCategory = useSelector(selectUnknownImageCategory);
 
   return useCallback(
     async (files: FileList) => {
@@ -20,7 +22,13 @@ export const useUpload = (
         case ImageShapeEnum.GreyScale: {
           const channels =
             imageShapeInfo.shape === ImageShapeEnum.GreyScale ? 1 : 3;
-          const res = await uploadImages(files, channels, 1, imageShapeInfo);
+          const res = await uploadImages(
+            files,
+            channels,
+            1,
+            imageShapeInfo,
+            unknownImageCategory
+          );
           //HACK: Future plans to re-work error messages
           if (res.warning) {
             dispatch(
@@ -45,7 +53,13 @@ export const useUpload = (
           break;
         }
         case ImageShapeEnum.DicomImage: {
-          const res = await uploadImages(files, 1, 1, imageShapeInfo);
+          const res = await uploadImages(
+            files,
+            1,
+            1,
+            imageShapeInfo,
+            unknownImageCategory
+          );
           //HACK: Future plans to re-work error messages
           if (res.warning) {
             dispatch(
@@ -85,6 +99,6 @@ export const useUpload = (
 
       return imageShapeInfo;
     },
-    [dispatch, setOpenDimensionsDialogBox]
+    [dispatch, setOpenDimensionsDialogBox, unknownImageCategory]
   );
 };
