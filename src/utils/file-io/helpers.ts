@@ -84,7 +84,8 @@ export const uploadImages = async (
   files: FileList,
   channels: number,
   slices: number,
-  referenceShape: ImageShapeInfo
+  referenceShape: ImageShapeInfo,
+  categoryId: string
 ): Promise<{
   imagesToUpload: ImageObject[];
   warning: any;
@@ -125,6 +126,7 @@ export const uploadImages = async (
             channels
           );
           imageToUpload.kind = "Image";
+          imageToUpload.categoryId = categoryId;
           imageToUpload.containing = [];
 
           imagesToUpload.push(imageToUpload as ImageObject);

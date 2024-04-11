@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
 
 import { Alert, Box } from "@mui/material";
@@ -13,6 +13,7 @@ import { dataSlice } from "store/data/dataSlice";
 import { uploadImages } from "utils/file-io/helpers";
 import { ImageShapeInfo } from "utils/file-io/types";
 import { ImageShapeEnum } from "utils/file-io/enums";
+import { selectUnknownImageCategory } from "store/data/selectors";
 
 type ImageShapeDialogProps = {
   files: FileList;
@@ -37,6 +38,8 @@ export const ImageShapeDialog = ({
 
   const [frames, setFrames] = useState<number>(-1);
   const [invalidImageShape, setInvalidImageShape] = useState<boolean>(false);
+
+  const unknownImageCategory = useSelector(selectUnknownImageCategory);
 
   const handleChannelsChange = async (channels: number) => {
     setChannels(channels);
@@ -65,7 +68,8 @@ export const ImageShapeDialog = ({
       files,
       channels,
       slices,
-      referenceImageShape
+      referenceImageShape,
+      unknownImageCategory
     );
     //HACK: Future plans to re-work error messages
     if (res.warning) {
