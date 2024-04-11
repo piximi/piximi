@@ -19,7 +19,7 @@ import {
   selectActiveImage,
   selectSelectedAnnotations,
 } from "store/imageViewer/reselectors";
-import { AnnotationModeType } from "utils/annotator/enums";
+import { AnnotationMode } from "utils/annotator/enums";
 import {
   selectActiveAnnotationIds,
   selectActiveImageId,
@@ -85,7 +85,7 @@ export const AnnotationTransformer = ({
       );
       dispatch(
         annotatorSlice.actions.setSelectionMode({
-          selectionMode: AnnotationModeType.New,
+          selectionMode: AnnotationMode.New,
         })
       );
 

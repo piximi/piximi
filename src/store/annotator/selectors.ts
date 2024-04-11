@@ -1,7 +1,7 @@
 import { AnnotatorState } from "store/types";
 import {
-  AnnotationModeType,
-  AnnotationStateType,
+  AnnotationMode,
+  AnnotationState,
   ToolType,
 } from "utils/annotator/enums";
 
@@ -9,7 +9,7 @@ export const selectAnnotationState = ({
   annotator,
 }: {
   annotator: AnnotatorState;
-}): AnnotationStateType => {
+}): AnnotationState => {
   return annotator.annotationState;
 };
 
@@ -17,7 +17,7 @@ export const selectAnnotationSelectionMode = ({
   annotator,
 }: {
   annotator: AnnotatorState;
-}): AnnotationModeType => {
+}): AnnotationMode => {
   return annotator.selectionMode;
 };
 export const selectPenSelectionBrushSize = ({

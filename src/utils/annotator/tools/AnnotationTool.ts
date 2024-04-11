@@ -9,7 +9,7 @@ import {
 import { convertToDataArray, generateUUID } from "utils/common/helpers";
 import { Partition } from "utils/models/enums";
 import { Point } from "../types";
-import { AnnotationStateType } from "../enums";
+import { AnnotationState } from "../enums";
 import { DataArray } from "utils/file-io/types";
 import { Category, PartialDecodedAnnotationObject } from "store/data/types";
 
@@ -34,7 +34,7 @@ export abstract class AnnotationTool extends Tool {
   /**
    * State of the annotation: Blank (not yet annotating), Annotating or Annotated
    */
-  annotationState = AnnotationStateType.Blank;
+  annotationState = AnnotationState.Blank;
   /**
    * Annotation object of the Tool.
    */
@@ -107,7 +107,7 @@ export abstract class AnnotationTool extends Tool {
   }
 
   protected setAnnotating() {
-    this.annotationState = AnnotationStateType.Annotating;
+    this.annotationState = AnnotationState.Annotating;
     if (this.onAnnotating) {
       this.onAnnotating();
     }
@@ -117,7 +117,7 @@ export abstract class AnnotationTool extends Tool {
   }
 
   protected setAnnotated() {
-    this.annotationState = AnnotationStateType.Annotated;
+    this.annotationState = AnnotationState.Annotated;
     if (this.onAnnotated) {
       this.onAnnotated();
     }
@@ -127,7 +127,7 @@ export abstract class AnnotationTool extends Tool {
   }
 
   protected setBlank() {
-    this.annotationState = AnnotationStateType.Blank;
+    this.annotationState = AnnotationState.Blank;
     if (this.onDeselect) {
       this.onDeselect();
     }

@@ -11,8 +11,8 @@ import {
   selectSelectedActiveAnnotations,
 } from "store/imageViewer/reselectors";
 import {
-  AnnotationModeType,
-  AnnotationStateType,
+  AnnotationMode,
+  AnnotationState,
   ToolType,
 } from "utils/annotator/enums";
 import { AnnotationTool } from "utils/annotator/tools";
@@ -38,7 +38,7 @@ type useAnnotatorHotkeysProps = {
     changes: Partial<OldDecodedAnnotationType>;
   };
   selectedAnnotationsIds: string[];
-  selectionMode: AnnotationModeType;
+  selectionMode: AnnotationMode;
   toolType: ToolType;
 };
 
@@ -63,17 +63,17 @@ export const useAnnotatorKeyboardShortcuts = ({
   const confirmAnnotations = () => {
     if (
       !workingAnnotationEntity.saved ||
-      annotationTool.annotationState === AnnotationStateType.Annotating ||
+      annotationTool.annotationState === AnnotationState.Annotating ||
       !activeImageId
     )
       return;
 
     deselectAnnotation();
 
-    if (selectionMode !== AnnotationModeType.New)
+    if (selectionMode !== AnnotationMode.New)
       dispatch(
         annotatorSlice.actions.setSelectionMode({
-          selectionMode: AnnotationModeType.New,
+          selectionMode: AnnotationMode.New,
         })
       );
 

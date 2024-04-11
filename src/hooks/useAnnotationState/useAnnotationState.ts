@@ -8,7 +8,7 @@ import { RootState } from "store/rootReducer";
 import { selectCategoryById } from "store/data/selectors";
 import { selectActiveImage } from "store/imageViewer/reselectors";
 import { selectFirstUnknownCategory } from "store/data/selectors";
-import { AnnotationModeType, AnnotationStateType } from "utils/annotator/enums";
+import { AnnotationMode, AnnotationState } from "utils/annotator/enums";
 import {
   selectActiveImageId,
   selectSelectedIVCategoryId,
@@ -29,7 +29,7 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
     const func = () => {
       dispatch(
         annotatorSlice.actions.setAnnotationState({
-          annotationState: AnnotationStateType.Annotating,
+          annotationState: AnnotationState.Annotating,
           annotationTool,
         })
       );
@@ -41,12 +41,12 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
     const func = () => {
       dispatch(
         annotatorSlice.actions.setAnnotationState({
-          annotationState: AnnotationStateType.Annotated,
+          annotationState: AnnotationState.Annotated,
           kind: selectedCategory?.kind,
           annotationTool,
         })
       );
-      if (selectionMode !== AnnotationModeType.New) return;
+      if (selectionMode !== AnnotationMode.New) return;
       if (!selectedCategory) {
         if (!defaultSelectedCategory) return;
         dispatch(
@@ -82,7 +82,7 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
     const func = () => {
       dispatch(
         annotatorSlice.actions.setAnnotationState({
-          annotationState: AnnotationStateType.Blank,
+          annotationState: AnnotationState.Blank,
           kind: selectedCategory?.kind,
           annotationTool,
         })

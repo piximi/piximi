@@ -9,7 +9,7 @@ import { selectToolType } from "store/annotator/selectors";
 
 import { useDebounce } from "hooks/useDebounce";
 import { Point } from "utils/annotator/types";
-import { ToolType, ZoomModeType } from "utils/annotator/enums";
+import { ToolType, ZoomMode } from "utils/annotator/enums";
 import {
   selectActiveImageId,
   selectStageWidth,
@@ -94,7 +94,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
     const stage = event.target.getStage()!;
     const _position = stage.getPointerPosition()!;
     if (
-      mode === ZoomModeType.Out ||
+      mode === ZoomMode.Out ||
       !zoomSelection.selecting ||
       !position ||
       !zoomSelection.minimum ||
@@ -222,7 +222,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
     const oldScale = stage.scaleX();
 
     const newScale =
-      mode === ZoomModeType.In
+      mode === ZoomMode.In
         ? Math.min(5, oldScale * scaleBy)
         : Math.max(0.25, oldScale / scaleBy);
 

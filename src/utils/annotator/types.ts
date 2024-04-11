@@ -1,4 +1,4 @@
-import { ZoomModeType } from "./enums";
+import { ZoomMode } from "./enums";
 
 export type Point = {
   x: number;
@@ -22,7 +22,7 @@ export type ColorAdjustmentOptionsType = {
 
 export type ZoomToolOptionsType = {
   automaticCentering: boolean;
-  mode: ZoomModeType;
+  mode: ZoomMode;
   scale: number;
   toActualSize: boolean;
   toFit: boolean;

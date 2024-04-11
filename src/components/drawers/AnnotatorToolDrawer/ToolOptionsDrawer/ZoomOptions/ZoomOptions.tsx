@@ -32,7 +32,7 @@ import { CustomListItem } from "components/list-items/CustomListItem";
 import { DividerHeader } from "components/styled-components";
 import { StageContext } from "contexts";
 import { selectActiveImage } from "store/imageViewer/reselectors";
-import { ZoomModeType } from "utils/annotator/enums";
+import { ZoomMode } from "utils/annotator/enums";
 import {
   selectStageHeight,
   selectStageScale,
@@ -112,14 +112,14 @@ export const ZoomOptions = () => {
     const payload = {
       options: {
         ...options,
-        mode: value as ZoomModeType,
+        mode: value as ZoomMode,
       },
     };
 
     dispatch(imageViewerSlice.actions.setZoomToolOptions(payload));
   };
 
-  const onModeClick = (event: any, mode: ZoomModeType) => {
+  const onModeClick = (event: any, mode: ZoomMode) => {
     const payload = {
       options: {
         ...options,
@@ -204,7 +204,7 @@ export const ZoomOptions = () => {
       </DividerHeader>
 
       <RadioGroup
-        defaultValue={ZoomModeType.In}
+        defaultValue={ZoomMode.In}
         aria-label="annotation mode"
         name="annotation-mode"
         onChange={onModeChange}
@@ -220,8 +220,8 @@ export const ZoomOptions = () => {
                 icon={<RadioUncheckedIcon />}
                 checkedIcon={<RadioCheckedIcon />}
                 tabIndex={-1}
-                value={ZoomModeType.In}
-                onClick={(event) => onModeClick(event, ZoomModeType.In)}
+                value={ZoomMode.In}
+                onClick={(event) => onModeClick(event, ZoomMode.In)}
               />
             }
           />
@@ -235,8 +235,8 @@ export const ZoomOptions = () => {
                 icon={<RadioUncheckedIcon />}
                 checkedIcon={<RadioCheckedIcon />}
                 tabIndex={-1}
-                value={ZoomModeType.Out}
-                onClick={(event) => onModeClick(event, ZoomModeType.Out)}
+                value={ZoomMode.Out}
+                onClick={(event) => onModeClick(event, ZoomMode.Out)}
               />
             }
           />

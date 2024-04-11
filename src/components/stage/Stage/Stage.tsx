@@ -25,7 +25,7 @@ import { Image } from "./Image";
 import { selectActiveImage } from "store/imageViewer/reselectors";
 import { useStageHandlers, useAnnotationTool } from "hooks";
 import { StageContext } from "contexts";
-import { AnnotationStateType, ToolType } from "utils/annotator/enums";
+import { AnnotationState, ToolType } from "utils/annotator/enums";
 import { HotkeyView } from "utils/common/enums";
 import {
   selectActiveImageId,
@@ -188,7 +188,7 @@ export const Stage = ({
                 ) : (
                   <></>
                 )}
-                {(annotationState === AnnotationStateType.Annotating ||
+                {(annotationState === AnnotationState.Annotating ||
                   toolType === ToolType.QuickAnnotation) && ( //TODO: remind myself why quick annotation special
                   <Selection tool={annotationTool} toolType={toolType} />
                 )}
