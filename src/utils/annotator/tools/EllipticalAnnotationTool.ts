@@ -1,4 +1,4 @@
-import { AnnotationStateType } from "../enums";
+import { AnnotationState } from "../enums";
 import { Point } from "../types";
 import { AnnotationTool } from "./AnnotationTool";
 
@@ -15,7 +15,7 @@ export class EllipticalAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotationState === AnnotationStateType.Annotated) return;
+    if (this.annotationState === AnnotationState.Annotated) return;
 
     if (!this.radius) {
       this.origin = position;
@@ -25,13 +25,13 @@ export class EllipticalAnnotationTool extends AnnotationTool {
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotationState === AnnotationStateType.Annotated) return;
+    if (this.annotationState === AnnotationState.Annotated) return;
 
     this.resize(position);
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating || !this.radius)
+    if (this.annotationState !== AnnotationState.Annotating || !this.radius)
       return;
     this.points = this.convertToPoints();
 

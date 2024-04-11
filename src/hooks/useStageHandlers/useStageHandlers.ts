@@ -26,8 +26,8 @@ import { usePointerTool } from "hooks/usePointerTool";
 import { logger } from "utils/common/helpers";
 import { Point } from "utils/annotator/types";
 import {
-  AnnotationModeType,
-  AnnotationStateType,
+  AnnotationMode,
+  AnnotationState,
   ToolType,
 } from "utils/annotator/enums";
 import { AnnotationTool, ObjectAnnotationTool } from "utils/annotator/tools";
@@ -43,7 +43,7 @@ export const useStageHandlers = (
   positionByStage: Point | undefined,
   absolutePosition: Point | undefined,
   draggable: boolean,
-  annotationState: AnnotationStateType,
+  annotationState: AnnotationState,
   outOfBounds: boolean,
   setCurrentMousePosition: () => void
 ) => {
@@ -80,7 +80,7 @@ export const useStageHandlers = (
     );
     dispatch(
       annotatorSlice.actions.setAnnotationState({
-        annotationState: AnnotationStateType.Blank,
+        annotationState: AnnotationState.Blank,
         annotationTool,
       })
     );
@@ -133,9 +133,9 @@ export const useStageHandlers = (
         if (toolType === ToolType.Pointer) {
           onPointerMouseDown(absolutePosition!);
         }
-        if (annotationState === AnnotationStateType.Annotated) {
+        if (annotationState === AnnotationState.Annotated) {
           deselectAnnotation();
-          if (selectionMode === AnnotationModeType.New) {
+          if (selectionMode === AnnotationMode.New) {
             deselectAllAnnotations();
             return;
           }

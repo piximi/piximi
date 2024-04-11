@@ -7,7 +7,7 @@ import {
   selectAnnotationState,
   selectToolType,
 } from "store/annotator/selectors";
-import { AnnotationStateType, ToolType } from "utils/annotator/enums";
+import { AnnotationState, ToolType } from "utils/annotator/enums";
 
 type ColorAnnotationToolTipProps = {
   toolTipPosition?: { x: number; y: number };
@@ -35,7 +35,7 @@ export const ColorAnnotationToolTip = ({
   if (toolType !== ToolType.ColorAnnotation) return <></>;
 
   if (
-    annotationState !== AnnotationStateType.Annotating ||
+    annotationState !== AnnotationState.Annotating ||
     !toolTipPosition ||
     !initialPosition
   ) {

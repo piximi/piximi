@@ -1,4 +1,4 @@
-import { AnnotationStateType } from "../enums";
+import { AnnotationState } from "../enums";
 import { AnnotationTool } from "./AnnotationTool";
 import { drawRectangle } from "utils/annotator";
 
@@ -17,7 +17,7 @@ export class RectangularAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotationState === AnnotationStateType.Annotated) return;
+    if (this.annotationState === AnnotationState.Annotated) return;
     if (!this.width) {
       this.origin = position;
       this.setAnnotating();
@@ -25,13 +25,13 @@ export class RectangularAnnotationTool extends AnnotationTool {
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
     this.resize(position);
   }
 
   onMouseUp(position: { x: number; y: number }) {
     if (
-      this.annotationState !== AnnotationStateType.Annotating ||
+      this.annotationState !== AnnotationState.Annotating ||
       !(this.width && this.height)
     )
       return;

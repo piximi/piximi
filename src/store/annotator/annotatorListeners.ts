@@ -7,8 +7,8 @@ import { imageViewerSlice } from "store/imageViewer";
 import { intersection } from "lodash";
 import { encodeAnnotation } from "utils/annotator/rle";
 import {
-  AnnotationModeType,
-  AnnotationStateType,
+  AnnotationMode,
+  AnnotationState,
   ToolType,
 } from "utils/annotator/enums";
 import { getPropertiesFromImage } from "utils/common/helpers";
@@ -32,7 +32,7 @@ startAppListening({
 
     if (
       annotationTool instanceof BlankAnnotationTool ||
-      annotationState !== AnnotationStateType.Annotated ||
+      annotationState !== AnnotationState.Annotated ||
       !kind
     )
       return;
@@ -51,8 +51,8 @@ startAppListening({
     )!;
 
     if (
-      selectionMode === AnnotationModeType.New &&
-      annotationTool.annotationState === AnnotationStateType.Annotated
+      selectionMode === AnnotationMode.New &&
+      annotationTool.annotationState === AnnotationState.Annotated
     ) {
       annotationTool.annotate(
         selectedCategory,
@@ -108,7 +108,7 @@ startAppListening({
       const workingAnnotationChanges = IVState.workingAnnotation.changes;
       if (
         !savedWorkingAnnotation ||
-        annotationTool.annotationState !== AnnotationStateType.Annotated
+        annotationTool.annotationState !== AnnotationState.Annotated
       )
         return;
       const workingAnnotation = {
@@ -117,17 +117,17 @@ startAppListening({
       };
       let combinedMask, combinedBoundingBox;
 
-      if (selectionMode === AnnotationModeType.Add) {
+      if (selectionMode === AnnotationMode.Add) {
         [combinedMask, combinedBoundingBox] = annotationTool.add(
           workingAnnotation.decodedMask!,
           workingAnnotation.boundingBox
         );
-      } else if (selectionMode === AnnotationModeType.Subtract) {
+      } else if (selectionMode === AnnotationMode.Subtract) {
         [combinedMask, combinedBoundingBox] = annotationTool.subtract(
           workingAnnotation.decodedMask!,
           workingAnnotation.boundingBox
         );
-      } else if (selectionMode === AnnotationModeType.Intersect) {
+      } else if (selectionMode === AnnotationMode.Intersect) {
         [combinedMask, combinedBoundingBox] = annotationTool.intersect(
           workingAnnotation.decodedMask!,
           workingAnnotation.boundingBox

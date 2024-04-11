@@ -1,4 +1,4 @@
-import { AnnotationStateType } from "../enums";
+import { AnnotationState } from "../enums";
 import { AnnotationTool } from "./AnnotationTool";
 import { drawRectangle } from "utils/annotator";
 
@@ -36,7 +36,7 @@ export class ThresholdAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotationState === AnnotationStateType.Annotated) return;
+    if (this.annotationState === AnnotationState.Annotated) return;
 
     if (!this.width) {
       this.origin = position;
@@ -50,13 +50,13 @@ export class ThresholdAnnotationTool extends AnnotationTool {
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
 
     this.resize(position);
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
 
     this.computeMask();
     this.setAnnotated();

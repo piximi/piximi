@@ -1,15 +1,15 @@
-export enum AnnotationModeType {
+export enum AnnotationMode {
   Add,
   Intersect,
   New,
   Subtract,
 }
-export enum AnnotationStateType {
+export enum AnnotationState {
   Blank, // not yet annotating
   Annotating,
   Annotated,
 }
-export enum ZoomModeType {
+export enum ZoomMode {
   In,
   Out,
 }

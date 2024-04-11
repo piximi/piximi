@@ -5,13 +5,13 @@ import { StageContext } from "contexts";
 import { PenAnnotationToolTip } from "components/stage/Stage/PenAnnotationToolTip";
 
 import { Point } from "utils/annotator/types";
-import { AnnotationStateType, ToolType } from "utils/annotator/enums";
+import { AnnotationState, ToolType } from "utils/annotator/enums";
 import { selectCursor } from "store/imageViewer/selectors";
 
 type CursorProps = {
   positionByStage: Point | undefined;
   absolutePosition: Point | undefined;
-  annotationState: AnnotationStateType;
+  annotationState: AnnotationState;
   outOfBounds: boolean;
   draggable: boolean;
   toolType: ToolType;
@@ -44,7 +44,7 @@ export const Cursor = ({
     <PenAnnotationToolTip
       currentPosition={positionByStage}
       absolutePosition={absolutePosition}
-      annotating={annotationState === AnnotationStateType.Annotating}
+      annotating={annotationState === AnnotationState.Annotating}
       outOfBounds={outOfBounds}
     />
   ) : (

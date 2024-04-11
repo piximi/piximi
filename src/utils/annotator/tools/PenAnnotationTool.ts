@@ -4,7 +4,7 @@ import { AnnotationTool } from "./AnnotationTool";
 
 import { connectPoints, computeBoundingBoxFromContours } from "utils/annotator";
 import { Point } from "../types";
-import { AnnotationStateType } from "../enums";
+import { AnnotationState } from "../enums";
 
 export class PenAnnotationTool extends AnnotationTool {
   brushSize: number = 8;
@@ -20,7 +20,7 @@ export class PenAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotationState === AnnotationStateType.Annotated) return;
+    if (this.annotationState === AnnotationState.Annotated) return;
 
     this.buffer = [...this.buffer, position];
 
@@ -28,13 +28,13 @@ export class PenAnnotationTool extends AnnotationTool {
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
 
     this.buffer = [...this.buffer, position];
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
 
     this.points = this.buffer;
 

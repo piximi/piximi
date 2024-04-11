@@ -13,10 +13,10 @@ import {
 } from "store/annotator/selectors";
 
 import { RadioCheckedIcon, RadioUncheckedIcon } from "icons";
-import { AnnotationModeType, AnnotationStateType } from "utils/annotator/enums";
+import { AnnotationMode, AnnotationState } from "utils/annotator/enums";
 import { selectWorkingAnnotation } from "store/imageViewer/selectors";
 
-export const AnnotationMode = () => {
+export const AnnotationModeOptions = () => {
   const dispatch = useDispatch();
 
   const annotationMode = useSelector(selectAnnotationSelectionMode);
@@ -31,7 +31,7 @@ export const AnnotationMode = () => {
   React.useEffect(() => {
     if (
       workingAnnotation.saved ||
-      annotationState === AnnotationStateType.Annotated
+      annotationState === AnnotationState.Annotated
     ) {
       setDisabledAnnotationEdit(false);
     } else {
@@ -39,7 +39,7 @@ export const AnnotationMode = () => {
     }
   }, [workingAnnotation, annotationState, dispatch]);
 
-  const onClickLabel = (event: any, mode: AnnotationModeType) => {
+  const onClickLabel = (event: any, mode: AnnotationMode) => {
     const payload = {
       selectionMode: mode,
     };
@@ -69,11 +69,11 @@ export const AnnotationMode = () => {
               icon={<RadioUncheckedIcon />}
               checkedIcon={<RadioCheckedIcon />}
               tabIndex={-1}
-              value={AnnotationModeType.New}
+              value={AnnotationMode.New}
               sx={{ py: 0 }}
             />
           }
-          onClick={(event) => onClickLabel(event, AnnotationModeType.New)}
+          onClick={(event) => onClickLabel(event, AnnotationMode.New)}
           tooltipText={"Create a new annotation."}
           disabled={disableAnnotationEdits}
           sx={{
@@ -93,11 +93,11 @@ export const AnnotationMode = () => {
               icon={<RadioUncheckedIcon />}
               checkedIcon={<RadioCheckedIcon />}
               tabIndex={-1}
-              value={AnnotationModeType.Add}
+              value={AnnotationMode.Add}
               sx={{ py: 0 }}
             />
           }
-          onClick={(event) => onClickLabel(event, AnnotationModeType.Add)}
+          onClick={(event) => onClickLabel(event, AnnotationMode.Add)}
           tooltipText="Adds new areas to an existing annotation."
           disabled={disableAnnotationEdits}
           dense
@@ -112,11 +112,11 @@ export const AnnotationMode = () => {
               icon={<RadioUncheckedIcon />}
               checkedIcon={<RadioCheckedIcon />}
               tabIndex={-1}
-              value={AnnotationModeType.Subtract}
+              value={AnnotationMode.Subtract}
               sx={{ py: 0 }}
             />
           }
-          onClick={(event) => onClickLabel(event, AnnotationModeType.Subtract)}
+          onClick={(event) => onClickLabel(event, AnnotationMode.Subtract)}
           tooltipText="Remove area from an existing annotation."
           disabled={disableAnnotationEdits}
           dense
@@ -131,11 +131,11 @@ export const AnnotationMode = () => {
               icon={<RadioUncheckedIcon />}
               checkedIcon={<RadioCheckedIcon />}
               tabIndex={-1}
-              value={AnnotationModeType.Intersect}
+              value={AnnotationMode.Intersect}
               sx={{ py: 0 }}
             />
           }
-          onClick={(event) => onClickLabel(event, AnnotationModeType.Intersect)}
+          onClick={(event) => onClickLabel(event, AnnotationMode.Intersect)}
           tooltipText="Constrain the boundary of the new annotation to the selected annotation."
           disabled={disableAnnotationEdits}
           dense

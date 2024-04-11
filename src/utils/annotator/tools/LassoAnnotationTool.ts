@@ -1,4 +1,4 @@
-import { AnnotationStateType } from "../enums";
+import { AnnotationState } from "../enums";
 import { Point } from "../types";
 import { AnnotationTool } from "./AnnotationTool";
 
@@ -18,9 +18,9 @@ export class LassoAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotationState === AnnotationStateType.Annotated) return;
+    if (this.annotationState === AnnotationState.Annotated) return;
 
-    if (this.annotationState === AnnotationStateType.Blank) {
+    if (this.annotationState === AnnotationState.Blank) {
       this.origin = position;
       this.buffer = [position, this.origin];
 
@@ -29,7 +29,7 @@ export class LassoAnnotationTool extends AnnotationTool {
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
     if (
       Math.abs(this.buffer[this.buffer.length - 2].x - position.x) >= 1 ||
       Math.abs(this.buffer[this.buffer.length - 2].y - position.y) >= 1
@@ -43,10 +43,7 @@ export class LassoAnnotationTool extends AnnotationTool {
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (
-      this.annotationState !== AnnotationStateType.Annotating ||
-      !this.origin
-    ) {
+    if (this.annotationState !== AnnotationState.Annotating || !this.origin) {
       return;
     }
     if (this.buffer.length < 6) {

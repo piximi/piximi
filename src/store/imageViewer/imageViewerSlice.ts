@@ -3,7 +3,7 @@ import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 import { DecodedAnnotationObject } from "store/data/types";
 import { ImageViewerState } from "store/types";
 
-import { ZoomModeType } from "utils/annotator/enums";
+import { ZoomMode } from "utils/annotator/enums";
 import {
   ColorAdjustmentOptionsType,
   ZoomToolOptionsType,
@@ -49,7 +49,7 @@ const initialState: ImageViewerState = {
   },
   zoomOptions: {
     automaticCentering: true,
-    mode: ZoomModeType.In,
+    mode: ZoomMode.In,
     scale: 1.0,
     toActualSize: false,
     toFit: false,
