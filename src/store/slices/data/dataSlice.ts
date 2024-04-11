@@ -708,7 +708,7 @@ export const dataSlice = createSlice({
         }
         dataSlice.caseReducers.deleteAnnotations(state, {
           type: "deleteAnnotations",
-          payload: { annotationIds: annotationsToDelete },
+          payload: { annotationIds: annotationsToDelete, isPermanent: true },
         });
       }
     },

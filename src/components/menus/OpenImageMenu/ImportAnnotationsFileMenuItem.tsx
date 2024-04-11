@@ -11,7 +11,7 @@ import {
   dataSlice,
   selectAllImageCategories,
   selectUnusedImageCategoryColors,
-  selectSelectedImages,
+  selectAllImages,
 } from "store/slices/data";
 
 import { deserializeCOCOFile, deserializeProjectFile } from "utils/annotator";
@@ -36,7 +36,7 @@ export const ImportAnnotationsFileMenuItem = ({
 
   const existingAnnotationCategories = useSelector(selectAllImageCategories);
 
-  const existingImages = useSelector(selectSelectedImages);
+  const existingImages = useSelector(selectAllImages);
   const availableColors = useSelector(selectUnusedImageCategoryColors);
 
   const onImportProjectFile = useCallback(
@@ -74,9 +74,15 @@ export const ImportAnnotationsFileMenuItem = ({
             dispatch(
               dataSlice.actions.addAnnotationCategories({
                 categories: newCategories,
+                isPermanent: true,
               })
             );
-            dispatch(dataSlice.actions.addAnnotations({ annotations }));
+            dispatch(
+              dataSlice.actions.addAnnotations({
+                annotations,
+                isPermanent: true,
+              })
+            );
           });
 
           // when a deserialized annotation is associated with the active image
@@ -89,6 +95,7 @@ export const ImportAnnotationsFileMenuItem = ({
               execSaga: true,
             })
           );
+          dispatch(dataSlice.actions.reconcile({ keepChanges: true }));
         }
       };
 
@@ -109,8 +116,8 @@ export const ImportAnnotationsFileMenuItem = ({
       <ListItemText
         primary={
           projectType === ProjectFileType.PIXIMI
-            ? "Import Piximi annotations file"
-            : "Import COCO annotations file"
+            ? "Import Piximi Annotations File"
+            : "Import COCO Annotations File"
         }
       />
       <input

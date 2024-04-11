@@ -86,7 +86,7 @@ export const SerializedAnnotationRType = T.type({
   id: T.string,
   mask: T.string, // e.g. "114 1 66 1 66 2 ..."
   plane: T.number,
-  boundingBox: T.array(T.number), // [x1, y1, width, height]
+  boundingBox: T.array(T.number), // [x1, y1, x2, y2]
 });
 
 export const SerializedFileRType = T.type({
