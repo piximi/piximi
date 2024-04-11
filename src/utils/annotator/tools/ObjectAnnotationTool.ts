@@ -14,7 +14,7 @@ import * as ImageJS from "image-js";
 
 import { RectangularAnnotationTool } from "./RectangularAnnotationTool";
 import { Point } from "../types";
-import { AnnotationStateType } from "../enums";
+import { AnnotationState } from "../enums";
 
 export class ObjectAnnotationTool extends RectangularAnnotationTool {
   graph?: LayersModel;
@@ -40,7 +40,7 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
   }
 
   async onMouseUp(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
 
     await this.predict();
   }

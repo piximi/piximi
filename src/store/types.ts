@@ -1,7 +1,7 @@
 import { History } from "@tensorflow/tfjs";
 import {
-  AnnotationModeType,
-  AnnotationStateType,
+  AnnotationMode,
+  AnnotationState,
   ToolType,
 } from "utils/annotator/enums";
 
@@ -144,11 +144,11 @@ export type AppSettingsState = {
 };
 
 export type AnnotatorState = {
-  annotationState: AnnotationStateType;
+  annotationState: AnnotationState;
   penSelectionBrushSize: number;
   quickSelectionRegionSize: number;
   thresholdAnnotationValue: number;
-  selectionMode: AnnotationModeType;
+  selectionMode: AnnotationMode;
   toolType: ToolType;
 };
 

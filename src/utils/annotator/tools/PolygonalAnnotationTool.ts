@@ -1,4 +1,4 @@
-import { AnnotationStateType } from "../enums";
+import { AnnotationState } from "../enums";
 import { Point } from "../types";
 import { AnnotationTool } from "./AnnotationTool";
 import { getDistance, pointsAreEqual } from "utils/annotator";
@@ -37,7 +37,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotationState === AnnotationStateType.Annotated) return;
+    if (this.annotationState === AnnotationState.Annotated) return;
 
     if (!this.origin) {
       this.origin = position;
@@ -48,14 +48,14 @@ export class PolygonalAnnotationTool extends AnnotationTool {
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
     if (this.anchor && pointsAreEqual(this.anchor, position)) return;
 
     this.terminal = position;
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
 
     if (
       this.connected(position) &&

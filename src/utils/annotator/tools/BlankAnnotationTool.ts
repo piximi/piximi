@@ -1,6 +1,6 @@
 import { Image } from "image-js";
 import { AnnotationTool } from "./AnnotationTool";
-import { AnnotationStateType } from "../enums";
+import { AnnotationState } from "../enums";
 
 /*
  * Rather than having operator possibly undefined,
@@ -24,17 +24,17 @@ export class BlankAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotationState === AnnotationStateType.Annotated) return;
+    if (this.annotationState === AnnotationState.Annotated) return;
 
     this.setAnnotating();
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
 
     this.setAnnotated();
   }

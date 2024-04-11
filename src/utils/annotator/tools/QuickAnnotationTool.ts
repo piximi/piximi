@@ -3,7 +3,7 @@ import * as ImageJS from "image-js";
 import { AnnotationTool } from "./AnnotationTool";
 
 import { slic } from "utils/annotator";
-import { AnnotationStateType } from "../enums";
+import { AnnotationState } from "../enums";
 
 export class QuickAnnotationTool extends AnnotationTool {
   regionSize?: number;
@@ -73,7 +73,7 @@ export class QuickAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotationState === AnnotationStateType.Annotated) return;
+    if (this.annotationState === AnnotationState.Annotated) return;
 
     if (!this.currentMask) {
       this.currentMask = new ImageJS.Image(
@@ -91,7 +91,7 @@ export class QuickAnnotationTool extends AnnotationTool {
 
   onMouseMove(position: { x: number; y: number }) {
     if (
-      this.annotationState === AnnotationStateType.Annotated ||
+      this.annotationState === AnnotationState.Annotated ||
       !this.superpixels ||
       !this.superpixelsMap
     )
@@ -107,7 +107,7 @@ export class QuickAnnotationTool extends AnnotationTool {
 
     this.lastSuperpixel = superpixel;
 
-    if (this.annotationState !== AnnotationStateType.Annotating) {
+    if (this.annotationState !== AnnotationState.Annotating) {
       this.currentSuperpixels.clear();
 
       this.currentMask = new ImageJS.Image(
@@ -126,7 +126,7 @@ export class QuickAnnotationTool extends AnnotationTool {
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
 
     if (!this.currentMask) return;
 

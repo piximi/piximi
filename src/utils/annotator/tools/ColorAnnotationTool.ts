@@ -3,7 +3,7 @@ import PriorityQueue from "ts-priority-queue";
 
 import { AnnotationTool } from "./AnnotationTool";
 import { Point } from "../types";
-import { AnnotationStateType } from "../enums";
+import { AnnotationState } from "../enums";
 
 export class ColorAnnotationTool extends AnnotationTool {
   roiContour?: ImageJS.Image;
@@ -82,7 +82,7 @@ export class ColorAnnotationTool extends AnnotationTool {
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotationState === AnnotationStateType.Annotating) {
+    if (this.annotationState === AnnotationState.Annotating) {
       const diff = Math.ceil(
         Math.hypot(position.x - this.origin!.x, position.y - this.origin!.y)
       );
@@ -95,7 +95,7 @@ export class ColorAnnotationTool extends AnnotationTool {
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
     if (!this.roiManager || !this.roiMask) return;
 
     // @ts-ignore

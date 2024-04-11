@@ -3,18 +3,18 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AnnotatorState } from "store/types";
 
 import {
-  AnnotationModeType,
-  AnnotationStateType,
+  AnnotationMode,
+  AnnotationState,
   ToolType,
 } from "utils/annotator/enums";
 import { AnnotationTool } from "utils/annotator/tools/AnnotationTool";
 
 const initialState: AnnotatorState = {
-  annotationState: AnnotationStateType.Blank,
+  annotationState: AnnotationState.Blank,
   penSelectionBrushSize: 10,
   quickSelectionRegionSize: 40,
   thresholdAnnotationValue: 150,
-  selectionMode: AnnotationModeType.New,
+  selectionMode: AnnotationMode.New,
   toolType: ToolType.RectangularAnnotation,
 };
 
@@ -27,7 +27,7 @@ export const annotatorSlice = createSlice({
     setAnnotationState(
       state,
       action: PayloadAction<{
-        annotationState: AnnotationStateType;
+        annotationState: AnnotationState;
         kind?: string;
         annotationTool: AnnotationTool;
       }>
@@ -53,7 +53,7 @@ export const annotatorSlice = createSlice({
 
     setSelectionMode(
       state,
-      action: PayloadAction<{ selectionMode: AnnotationModeType }>
+      action: PayloadAction<{ selectionMode: AnnotationMode }>
     ) {
       state.selectionMode = action.payload.selectionMode;
     },

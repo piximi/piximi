@@ -9,7 +9,7 @@ import {
   getIdx,
 } from "utils/annotator";
 import { Point } from "../types";
-import { AnnotationStateType } from "../enums";
+import { AnnotationState } from "../enums";
 
 export class MagneticAnnotationTool extends AnnotationTool {
   buffer: Array<Point> = [];
@@ -57,7 +57,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotationState === AnnotationStateType.Annotated) return;
+    if (this.annotationState === AnnotationState.Annotated) return;
 
     if (this.buffer && this.buffer.length === 0) {
       if (!this.origin) {
@@ -72,7 +72,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
     if (
       !this.image ||
       !this.pathfinder ||
-      this.annotationState !== AnnotationStateType.Annotating
+      this.annotationState !== AnnotationState.Annotating
     )
       return;
     if (this.anchor) {
@@ -130,7 +130,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationState.Annotating) return;
 
     if (
       this.connected(position) &&
