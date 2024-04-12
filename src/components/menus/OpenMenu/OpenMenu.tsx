@@ -8,6 +8,7 @@ import { useMenu } from "hooks";
 import { BaseMenu } from "../BaseMenu";
 import { OpenProjectMenu } from "../OpenProjectMenu";
 import { OpenImageMenu } from "../OpenImageMenu";
+import { ImportAnnotationsMenu } from "../ImportAnnotationsMenu";
 
 type OpenMenuProps = {
   anchorEl: HTMLElement | null;
@@ -16,7 +17,9 @@ type OpenMenuProps = {
 };
 
 export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
-  const [selectedMenu, setSelectedMenu] = useState<"project" | "image">();
+  const [selectedMenu, setSelectedMenu] = useState<
+    "project" | "image" | "annotation"
+  >();
   const {
     anchorEl: projectMenuAnchorEl,
     onClose: handleCloseProjectMenu,
@@ -40,6 +43,13 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
     onClose: handleCloseImageMenu,
     open: imageMenuOpen,
     onOpen: handleOpenImageMenu,
+  } = useMenu();
+
+  const {
+    anchorEl: annotationsMenuAnchorEl,
+    onClose: handleCloseAnnotationMenu,
+    open: annotationMenuOpen,
+    onOpen: handleOpenAnnotationMenu,
   } = useMenu();
 
   const handleSelectImageMenu = (
@@ -80,6 +90,18 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
         <Typography variant="body2">Image</Typography>
         <KeyboardArrowRightIcon />
       </MenuItem>
+      <MenuItem
+        onClick={handleOpenAnnotationMenu}
+        sx={(theme) => ({
+          display: "flex",
+          justifyContent: "space-between",
+          pr: theme.spacing(1),
+        })}
+        selected={selectedMenu === "annotation"}
+      >
+        <Typography variant="body2">Annotation</Typography>
+        <KeyboardArrowRightIcon />
+      </MenuItem>
 
       <OpenProjectMenu
         anchorEl={projectMenuAnchorEl}
@@ -90,6 +112,11 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
         anchorEl={imageMenuAnchorEl}
         onCloseMenu={handleCloseAndDeselectImageMenu}
         open={imageMenuOpen}
+      />
+      <ImportAnnotationsMenu
+        anchorEl={annotationsMenuAnchorEl}
+        onClose={handleCloseAnnotationMenu}
+        open={annotationMenuOpen}
       />
     </BaseMenu>
   );
