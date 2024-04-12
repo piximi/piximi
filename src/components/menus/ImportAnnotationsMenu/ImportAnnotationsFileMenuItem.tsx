@@ -58,7 +58,6 @@ export const ImportAnnotationsFileMenuItem = ({
         if (event.target && event.target.result) {
           const serializedProject: SerializedCOCOFileType | SerializedFileType =
             validateFileType(event.target.result as string, projectType);
-
           const { newAnnotations, newCategories, newKinds } =
             projectType === ProjectFileType.PIXIMI
               ? await deserializePiximiAnnotations(
@@ -76,12 +75,23 @@ export const ImportAnnotationsFileMenuItem = ({
                 );
 
           batch(() => {
-            dispatch(newDataSlice.actions.addKinds({ kinds: newKinds }));
             dispatch(
-              newDataSlice.actions.addCategories({ categories: newCategories })
+              newDataSlice.actions.addKinds({
+                kinds: newKinds,
+                isPermanent: true,
+              })
             );
             dispatch(
-              newDataSlice.actions.addThings({ things: newAnnotations })
+              newDataSlice.actions.addCategories({
+                categories: newCategories,
+                isPermanent: true,
+              })
+            );
+            dispatch(
+              newDataSlice.actions.addThings({
+                things: newAnnotations,
+                isPermanent: true,
+              })
             );
           });
 
@@ -110,12 +120,12 @@ export const ImportAnnotationsFileMenuItem = ({
   );
 
   return (
-    <MenuItem component="label">
+    <MenuItem component="label" dense>
       <ListItemText
         primary={
           projectType === ProjectFileType.PIXIMI
-            ? "Import Piximi annotations file"
-            : "Import COCO annotations file"
+            ? "Import Piximi"
+            : "Import COCO"
         }
       />
       <input
