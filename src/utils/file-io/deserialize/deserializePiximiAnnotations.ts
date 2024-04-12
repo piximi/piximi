@@ -11,21 +11,21 @@ export const deserializePiximiAnnotations = async (
   existingCategories: Record<string, Category>,
   existingKinds: Record<string, Kind>
 ) => {
+  if (!("version" in serializedAnnotations)) {
+    const { annotations, newCategories } = deserializePiximiAnnotations_v1(
+      serializedAnnotations as SerializedFileType,
+      Object.values(existingImages),
+      Object.values(existingCategories)
+    );
+    const convertedData = await convertAnnotationsWithExistingProject_v1_2(
+      existingImages,
+      existingKinds,
+      annotations,
+      newCategories
+    );
+    return convertedData;
+  }
   switch (serializedAnnotations.version) {
-    case "0.1.0": {
-      const { annotations, newCategories } = deserializePiximiAnnotations_v1(
-        serializedAnnotations as SerializedFileType,
-        Object.values(existingImages),
-        Object.values(existingCategories)
-      );
-      const convertedData = convertAnnotationsWithExistingProject_v1_2(
-        existingImages,
-        existingKinds,
-        annotations,
-        newCategories
-      );
-      return convertedData;
-    }
     case "0.2.0": {
       const { annotations, newCategories, newKinds } =
         await deserializePiximiAnnotations_v2(

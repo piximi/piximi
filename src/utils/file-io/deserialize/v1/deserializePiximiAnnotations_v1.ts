@@ -99,7 +99,9 @@ const reconcileImages = (
   const matchedIms: Array<SerializedAnnotatorImageType> = [];
 
   for (const im of serializedImages) {
-    const existingIm = existingImages.find((i) => i.name === im.name);
+    const existingIm = existingImages.find((i) => {
+      return i.name.split(".")[0] === im.name.split(".")[0];
+    });
     if (existingIm) {
       // save id mapping
       imIdMap[im.id] = existingIm.id;

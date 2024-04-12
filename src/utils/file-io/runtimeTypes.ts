@@ -74,6 +74,12 @@ const SerializedCategoryRType = T.type({
   color: T.string, // 3 byte hex, eg "#a08cd2"
   name: T.string,
   visible: T.boolean,
+});
+const SerializedCategoryRTypeV2 = T.type({
+  id: T.string,
+  color: T.string, // 3 byte hex, eg "#a08cd2"
+  name: T.string,
+  visible: T.boolean,
   containing: T.array(T.string),
   kind: T.string,
 });
@@ -115,10 +121,9 @@ export const SerializedFileRType = T.type({
   categories: T.array(SerializedCategoryRType),
   annotations: T.array(SerializedAnnotationRType),
   images: T.array(SerializedImageRType),
-  version: T.string,
 });
 export const SerializedFileRTypeV2 = T.type({
-  categories: T.array(SerializedCategoryRType),
+  categories: T.array(SerializedCategoryRTypeV2),
   annotations: T.array(SerializedAnnotationRTypeV2),
   images: T.array(SerializedImageRType),
   kinds: T.array(SerializedKindRType),
