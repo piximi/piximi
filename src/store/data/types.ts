@@ -2,7 +2,12 @@ import { Tensor4D } from "@tensorflow/tfjs";
 import { DataArray } from "utils/file-io/types";
 import { BitDepth } from "image-js";
 import { Partition } from "utils/models/enums";
-import { Colors, PartialBy, RequireField } from "utils/common/types";
+import {
+  Colors,
+  PartialBy,
+  RequireField,
+  RequireOnly,
+} from "utils/common/types";
 
 export type Thing = {
   id: string;
@@ -106,4 +111,14 @@ export type OldDecodedAnnotationType = Omit<
     decodedMask: DataArray;
   },
   "encodedMask"
+>;
+
+export type CategoryUpdates = {
+  id: string;
+  changes: Partial<Omit<Category, "id" | "containing">>;
+};
+
+export type ThingsUpdates = Array<
+  | RequireOnly<Partial<ImageObject>, "id">
+  | RequireOnly<Partial<AnnotationObject>, "id">
 >;
