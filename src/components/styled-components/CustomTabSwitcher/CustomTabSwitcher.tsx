@@ -1,5 +1,6 @@
 import React, { ReactElement, createContext, useState } from "react";
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs, Typography } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 const TabContext = createContext<number>(0);
 interface TabPanelProps {
@@ -34,12 +35,14 @@ export const CustomTabSwitcher = ({
   labels,
   disabledTabs,
   secondaryEffect,
+  onTabClose,
 }: {
   children: JSX.Element[];
   childClassName: string;
   labels: string[];
   disabledTabs?: number[];
   secondaryEffect?: (tab: string) => void;
+  onTabClose: (item: string, newItem?: string) => void;
 }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const handleTabChange = (
@@ -48,6 +51,30 @@ export const CustomTabSwitcher = ({
   ) => {
     setTabIndex(newValue);
     secondaryEffect && secondaryEffect(labels[newValue]);
+  };
+
+  const handleTabDeletion = (event: React.MouseEvent, label: string) => {
+    event.stopPropagation();
+    if (labels.length <= 1) {
+      return;
+    }
+
+    const labelIndex = labels.findIndex((el) => el === label);
+
+    if (labelIndex === tabIndex) {
+      if (labelIndex === labels.length - 1) {
+        setTabIndex(labelIndex - 1);
+        onTabClose(label, labels[labelIndex - 1]);
+      } else {
+        onTabClose(label, labels[labelIndex + 1]);
+      }
+    } else {
+      if (labelIndex < tabIndex) {
+        setTabIndex(tabIndex - 1);
+      } else {
+      }
+      onTabClose(label);
+    }
   };
 
   const addClass = (children: JSX.Element[]) => {
@@ -82,7 +109,32 @@ export const CustomTabSwitcher = ({
               return typeof label === "string" ? (
                 <Tab
                   key={`Tab-${childClassName}-tab-${idx}`}
-                  label={label}
+                  label={
+                    <Box
+                      width={"100%"}
+                      display="flex"
+                      flexDirection="row"
+                      justifyContent="center"
+                      sx={{
+                        "& .MuiSvgIcon-root": {
+                          visibility: "hidden",
+                        },
+                        ":hover": {
+                          "& .MuiSvgIcon-root": {
+                            visibility: "visible",
+                          },
+                        },
+                      }}
+                    >
+                      <Typography variant="body2">{label}</Typography>
+
+                      <CloseIcon
+                        fontSize="small"
+                        sx={{ position: "absolute", right: "10px", p: 0 }}
+                        onClick={(event) => handleTabDeletion(event, label)}
+                      />
+                    </Box>
+                  }
                   disabled={disabledTabs && disabledTabs.includes(idx)}
                 />
               ) : (

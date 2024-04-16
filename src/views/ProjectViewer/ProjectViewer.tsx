@@ -17,6 +17,7 @@ import { selectAllKindIds } from "store/data/selectors";
 import { ImageGrid } from "components/image-grids";
 import { ProjectAppBar } from "components/app-bars/";
 import { HotkeyView } from "utils/common/enums";
+import { dataSlice } from "store/data/dataSlice";
 
 export const ProjectViewer = () => {
   const dispatch = useDispatch();
@@ -25,6 +26,13 @@ export const ProjectViewer = () => {
 
   useErrorHandler();
   useUnloadConfirmation();
+
+  const handleTabClose = (item: string, newItem?: string) => {
+    if (newItem) {
+      dispatch(projectSlice.actions.setActiveKind({ kind: newItem }));
+    }
+    dispatch(dataSlice.actions.deleteKind({ deletedKindId: item }));
+  };
 
   const handleTabChange = (tab: string) => {
     dispatch(projectSlice.actions.setActiveKind({ kind: tab }));
@@ -69,6 +77,7 @@ export const ProjectViewer = () => {
                 childClassName="grid-tabs"
                 labels={kinds}
                 secondaryEffect={handleTabChange}
+                onTabClose={handleTabClose}
               >
                 {kinds.map((kind) => (
                   <ImageGrid key={`${kind}-imageGrid`} kind={kind} />
