@@ -137,12 +137,17 @@ export const projectSlice = createSlice({
         if (!(kind in state.thingFilters)) continue;
         if (categoryIds === "all") {
           state.thingFilters[kind].categoryId = [];
-          return;
         } else {
           mutatingFilter(
             state.thingFilters[kind].categoryId,
             (id) => !categoryIds!.includes(id)
           );
+        }
+        if (
+          state.thingFilters[kind].categoryId.length === 0 &&
+          state.thingFilters[kind].partition.length === 0
+        ) {
+          delete state.thingFilters[kind];
         }
       }
     },
@@ -183,12 +188,17 @@ export const projectSlice = createSlice({
         if (!(kind in state.thingFilters)) continue;
         if (partitions === "all") {
           state.thingFilters[kind].partition = [];
-          return;
         } else {
           mutatingFilter(
             state.thingFilters[kind].partition,
             (id) => !partitions.includes(id)
           );
+        }
+        if (
+          state.thingFilters[kind].partition.length === 0 &&
+          state.thingFilters[kind].categoryId.length === 0
+        ) {
+          delete state.thingFilters[kind];
         }
       }
     },

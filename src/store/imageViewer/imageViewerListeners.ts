@@ -9,6 +9,7 @@ import {
   DecodedAnnotationObject,
   ImageObject,
 } from "store/data/types";
+import { difference, intersection } from "lodash";
 
 export const imageViewerMiddleware = createListenerMiddleware();
 const startAppListening =
@@ -122,5 +123,31 @@ startAppListening({
       })
     );
     listenerAPI.subscribe();
+  },
+});
+
+startAppListening({
+  predicate: (action, currentState, previousState) => {
+    return (
+      currentState.newData.categories.ids.length <
+      previousState.newData.categories.ids.length
+    );
+  },
+  effect: async (action, listenerApi) => {
+    const { imageViewer, newData } = listenerApi.getState();
+    const { newData: oldData } = listenerApi.getOriginalState();
+    const deletedCategories = difference(
+      oldData.categories.ids,
+      newData.categories.ids
+    ) as string[];
+    const filteredCats = imageViewer.filters.categoryId;
+    const deletedFilters = intersection(filteredCats, deletedCategories);
+    if (deletedFilters.length > 0) {
+      listenerApi.dispatch(
+        imageViewerSlice.actions.removeFilters({
+          categoryIds: deletedFilters,
+        })
+      );
+    }
   },
 });
