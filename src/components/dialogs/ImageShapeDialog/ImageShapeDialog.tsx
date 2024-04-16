@@ -14,6 +14,7 @@ import { uploadImages } from "utils/file-io/helpers";
 import { ImageShapeInfo } from "utils/file-io/types";
 import { ImageShapeEnum } from "utils/file-io/enums";
 import { selectUnknownImageCategory } from "store/data/selectors";
+import { generateNewKind } from "store/data/helpers";
 
 type ImageShapeDialogProps = {
   files: FileList;
@@ -54,7 +55,7 @@ export const ImageShapeDialog = ({
           : 1;
       setFrames(imageFrames);
     }
-
+    let imageCategory = unknownImageCategory;
     const slices = imageFrames / channels;
 
     // check if user-supplied channels cleanly divides known num frames
@@ -63,13 +64,21 @@ export const ImageShapeDialog = ({
       return;
     }
     setInvalidImageShape(false);
+    if (!imageCategory) {
+      const { newKind, unknownCategory } = generateNewKind("Image");
+      imageCategory = unknownCategory.id;
+      dispatch(dataSlice.actions.addKinds({ kinds: [newKind] }));
+      dispatch(
+        dataSlice.actions.addCategories({ categories: [unknownCategory] })
+      );
+    }
 
     const res = await uploadImages(
       files,
       channels,
       slices,
       referenceImageShape,
-      unknownImageCategory
+      imageCategory
     );
     //HACK: Future plans to re-work error messages
     if (res.warning) {
