@@ -2,7 +2,7 @@
   "name": "piximi",
   "license": "BSD-style license",
   "version": "0.2.0",
-  "homepage": "https:beta.piximi.app",
+  "homepage": "https://www.beta.piximi.app",
   "dependencies": {
     "@clarketm/saga-monitor": "^2.0.1",
     "@emotion/react": "^11.6.0",
