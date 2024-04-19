@@ -114,6 +114,14 @@ export const selectUnfilteredActivePartitions = createSelector(
   }
 );
 
+export const selectKindTabFilters = ({
+  project,
+}: {
+  project: ProjectState;
+}) => {
+  return project.kindTabFilters;
+};
+
 /*
 LOAD PERCENT
 */

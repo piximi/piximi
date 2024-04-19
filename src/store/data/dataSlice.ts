@@ -8,7 +8,6 @@ import { intersection, union } from "lodash";
 import {
   generateUUID,
   isUnknownCategory,
-  logger,
   mutatingFilter,
   newReplaceDuplicateName,
 } from "utils/common/helpers";
@@ -183,137 +182,39 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         deletedKindId: string;
+        isPermanent?: boolean;
       }>
     ) {
-      const { deletedKindId } = action.payload;
-      const unknownKindId = "Unknown";
+      const { deletedKindId, isPermanent } = action.payload;
       const deletedKind = getCompleteEntity(
         state.kinds.entities[deletedKindId]
-      )!;
-      if (deletedKind.id === unknownKindId) {
-        if (
-          deletedKind.containing.length === 0 &&
-          deletedKind.categories.length === 1
-        ) {
-          mutatingFilter(
-            state.categories.ids,
-            (id) => id !== deletedKind.unknownCategoryId
-          );
-          delete state.categories.entities[deletedKind.unknownCategoryId];
-          mutatingFilter(state.kinds.ids, (id) => id !== deletedKind.id);
-          delete state.kinds.entities[deletedKind.id];
-        } else {
-          logger("Cannot delete unknown kind if it has members.");
-        }
+      );
+      if (!deletedKind) return;
+      const kindThings = deletedKind.containing;
+      const kindCats = deletedKind.categories;
+
+      dataSlice.caseReducers.deleteThings(state, {
+        type: "deleteThings",
+        payload: {
+          thingIds: kindThings,
+          isPermanent,
+          disposeColorTensors: true,
+          preparedByListener: true,
+        },
+      });
+      dataSlice.caseReducers.deleteCategories(state, {
+        type: "deleteCategories",
+        payload: {
+          categoryIds: kindCats,
+          isPermanent,
+        },
+      });
+
+      if (isPermanent) {
+        mutatingFilter(state.kinds.ids, (id) => id !== deletedKindId);
+        delete state.kinds.entities[deletedKindId];
       } else {
-        if (
-          deletedKind.containing.length > 0 ||
-          deletedKind.categories.length > 1
-        ) {
-          if (!state.kinds.ids.includes(unknownKindId)) {
-            /*
-            No unknown kind. One is created.
-            We can repurpose the unknown category associated
-            with the deleted kind
-          */
-            const newUnknownKind: Kind = {
-              id: unknownKindId,
-              categories: [...deletedKind.categories],
-              unknownCategoryId: deletedKind.unknownCategoryId,
-              containing: [...deletedKind.containing],
-            };
-
-            // Add kind to store
-            state.kinds.ids.push(unknownKindId);
-            state.kinds.entities[unknownKindId] = {
-              saved: newUnknownKind,
-              changes: {},
-            };
-
-            // Point categories belonging to deleted kind to unknown kind
-            newUnknownKind.categories.forEach((id) => {
-              if (state.categories.entities[id]) {
-                state.categories.entities[id].saved.kind = unknownKindId;
-              }
-            });
-            // Point contents belonging to deleted kind to unknown kind
-            newUnknownKind.containing.forEach((id) => {
-              if (state.things.entities[id]) {
-                state.things.entities[id].saved.kind = unknownKindId;
-              }
-            });
-          } else {
-            /* 
-            An unknown kind already exists. Get the existing
-            unknown kind and associated unknown category
-          */
-            const existingUnknownKind = state.kinds.entities[unknownKindId]!;
-            const existingUnknownCatId =
-              existingUnknownKind.changes.unknownCategoryId ??
-              existingUnknownKind.saved.unknownCategoryId;
-
-            // Get the unknown category associated with the deleted kind
-            const deletedUnknownCatId = deletedKind.unknownCategoryId;
-            const deletedUnknownCat = getCompleteEntity(
-              state.categories.entities[deletedUnknownCatId]
-            )!;
-
-            // We update only the known categories, since the unknown will be deleted
-            const catIdsToUpdate = deletedKind.categories.filter(
-              (id) => id !== deletedUnknownCatId
-            );
-            const thingIdsToUpdate = deletedKind.containing;
-
-            // Add deleted kind's categories to unknown kind
-            state.kinds.entities[unknownKindId].saved.categories.push(
-              ...catIdsToUpdate
-            );
-
-            // Add deleted kind's contents to unknown kind
-            state.kinds.entities[unknownKindId].saved.containing.push(
-              ...thingIdsToUpdate
-            );
-
-            // Add contents of deleted unknown category to existing unknown kind unknown category
-            state.categories.entities[
-              existingUnknownCatId
-            ].saved.containing.push(...deletedUnknownCat.containing);
-
-            // Point categories belonging to deleted kind to unknown kind
-            catIdsToUpdate.forEach((id) => {
-              if (state.categories.entities[id]) {
-                state.categories.entities[id].saved.kind = unknownKindId;
-              }
-            });
-
-            /* 
-            Point things belonging to deleted kind to unknown kind
-            If thing belonged to deleted unknown category, point category id to unknown kind unknown category
-          */
-            thingIdsToUpdate.forEach((id) => {
-              const thing = getCompleteEntity(state.things.entities[id]);
-              if (thing) {
-                if (thing.categoryId === deletedUnknownCatId) {
-                  state.things.entities[id].saved.kind = unknownKindId;
-                  state.things.entities[id].saved.categoryId =
-                    existingUnknownCatId;
-                } else {
-                  state.things.entities[id].saved.kind = unknownKindId;
-                }
-              }
-            });
-
-            // Delete deleted kind unknown category
-            mutatingFilter(
-              state.categories.ids,
-              (id) => id !== deletedUnknownCatId
-            );
-            delete state.categories.entities[deletedUnknownCatId];
-          }
-        }
-        // Delete Kind
-        mutatingFilter(state.kinds.ids, (id) => id !== deletedKind.id);
-        delete state.kinds.entities[deletedKind.id];
+        kindsAdapter.removeOne(state.kinds, deletedKindId);
       }
     },
     addCategories(
@@ -956,16 +857,14 @@ export const dataSlice = createSlice({
         updateType: "add" | "remove" | "replace";
         contents: string[];
       }> = [];
+      for (const thingId of [...thingIds]) {
+        const thingEntity = state.things.entities[thingId];
+        const thing = getCompleteEntity(state.things.entities[thingId]);
 
-      for (const thingId of thingIds) {
-        const thing = state.things.entities[thingId];
         if (!thing) continue;
 
-        if (getDeferredProperty(thing, "kind") === "Image") {
-          const thingContents = getDeferredProperty(
-            thing as DeferredEntity<ImageObject>,
-            "containing"
-          );
+        if ("containing" in thing) {
+          const thingContents = thing.containing;
 
           if (thingContents) {
             for (const containedThingId of thingContents) {
@@ -1029,10 +928,7 @@ export const dataSlice = createSlice({
             }
           }
         } else {
-          const imageId = getDeferredProperty(
-            thing as DeferredEntity<AnnotationObject>,
-            "imageId"
-          );
+          const imageId = thing.imageId;
 
           if (imageId in imageChanges) {
             imageChanges[imageId].contents.push(thingId);
@@ -1044,15 +940,15 @@ export const dataSlice = createSlice({
             };
           }
         }
-        const thingKind = getDeferredProperty(thing, "kind");
-        const thingCategoryId = getDeferredProperty(thing, "categoryId");
+        const thingKind = thing.kind;
+        const thingCategoryId = thing.categoryId;
 
         const kind = state.kinds.entities[thingKind];
         const category = state.categories.entities[thingCategoryId];
         if (isPermanent) {
           if (disposeColorTensors) {
-            dispose(thing.saved.data as TensorContainer);
-            dispose(thing.changes as TensorContainer);
+            dispose(thingEntity.saved.data as TensorContainer);
+            dispose(thingEntity.changes as TensorContainer);
           }
 
           /* UPDATE KIND'S CONTAINING LIST */
@@ -1101,7 +997,6 @@ export const dataSlice = createSlice({
           imageChangesArray.push(changes);
         }
       }
-
       dataSlice.caseReducers.updateThingContents(state, {
         type: "updateThingContents",
         payload: { changes: imageChangesArray, isPermanent },

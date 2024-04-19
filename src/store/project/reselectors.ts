@@ -1,4 +1,5 @@
 import {
+  selectAllKindIds,
   selectCategoriesDictionary,
   selectKindDictionary,
   selectThingsDictionary,
@@ -6,6 +7,7 @@ import {
 import {
   selectActiveKindId,
   selectActiveThingFilters,
+  selectKindTabFilters,
   selectSelectedThingIds,
 } from "./selectors";
 import { createSelector } from "@reduxjs/toolkit";
@@ -14,6 +16,14 @@ import { isUnknownCategory, updateRecord } from "utils/common/helpers";
 import { CATEGORY_COLORS } from "utils/common/constants";
 import { AnnotationObject, ImageObject, Thing } from "store/data/types";
 import { Partition } from "utils/models/enums";
+
+export const selectVisibleKinds = createSelector(
+  selectKindTabFilters,
+  selectAllKindIds,
+  (filteredKinds, allKinds) => {
+    return difference(allKinds, filteredKinds);
+  }
+);
 
 export const selectActiveKindObject = createSelector(
   selectActiveKindId,

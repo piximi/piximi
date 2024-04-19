@@ -4,7 +4,7 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import { Box, CssBaseline } from "@mui/material";
 
-import { useErrorHandler, useUnloadConfirmation } from "hooks";
+import { useErrorHandler, useMenu, useUnloadConfirmation } from "hooks";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { projectSlice } from "store/project";
@@ -13,25 +13,45 @@ import { ProjectDrawer, ImageToolDrawer } from "components/drawers";
 import { FallBackDialog } from "components/dialogs";
 import { dimensions } from "utils/common/constants";
 import { CustomTabSwitcher } from "components/styled-components";
-import { selectAllKindIds } from "store/data/selectors";
 import { ImageGrid } from "components/image-grids";
 import { ProjectAppBar } from "components/app-bars/";
 import { HotkeyView } from "utils/common/enums";
 import { dataSlice } from "store/data/dataSlice";
+import { selectVisibleKinds } from "store/project/reselectors";
+import { selectKindTabFilters } from "store/project/selectors";
+import { AddKindMenu } from "components/menus";
 
 export const ProjectViewer = () => {
   const dispatch = useDispatch();
 
-  const kinds = useSelector(selectAllKindIds) as string[];
+  const visibleKinds = useSelector(selectVisibleKinds) as string[];
+  const filteredKinds = useSelector(selectKindTabFilters) as string[];
+
+  const {
+    onOpen: handleOpenAddKindMenu,
+    onClose: handleCloseAddKindMenu,
+    open: isAddKindMenuOpen,
+    anchorEl: addKindMenuAnchor,
+  } = useMenu();
 
   useErrorHandler();
   useUnloadConfirmation();
 
-  const handleTabClose = (item: string, newItem?: string) => {
+  const handleTabClose = (
+    action: "delete" | "hide",
+    item: string,
+    newItem?: string
+  ) => {
     if (newItem) {
       dispatch(projectSlice.actions.setActiveKind({ kind: newItem }));
     }
-    dispatch(dataSlice.actions.deleteKind({ deletedKindId: item }));
+    if (action === "delete") {
+      dispatch(
+        dataSlice.actions.deleteKind({ deletedKindId: item, isPermanent: true })
+      );
+    } else {
+      dispatch(projectSlice.actions.addKindTabFilter({ kindId: item }));
+    }
   };
 
   const handleTabChange = (tab: string) => {
@@ -75,11 +95,12 @@ export const ProjectViewer = () => {
             >
               <CustomTabSwitcher
                 childClassName="grid-tabs"
-                labels={kinds}
+                labels={visibleKinds}
                 secondaryEffect={handleTabChange}
                 onTabClose={handleTabClose}
+                onNew={handleOpenAddKindMenu}
               >
-                {kinds.map((kind) => (
+                {visibleKinds.map((kind) => (
                   <ImageGrid key={`${kind}-imageGrid`} kind={kind} />
                 ))}
               </CustomTabSwitcher>
@@ -87,6 +108,13 @@ export const ProjectViewer = () => {
             {process.env.NODE_ENV === "development" && <ImageToolDrawer />}
           </Box>
         </div>
+
+        <AddKindMenu
+          anchor={addKindMenuAnchor}
+          isOpen={isAddKindMenuOpen}
+          onClose={handleCloseAddKindMenu}
+          filteredKinds={filteredKinds}
+        />
       </ErrorBoundary>
     </div>
   );
