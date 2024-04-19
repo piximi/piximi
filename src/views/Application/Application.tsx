@@ -14,7 +14,7 @@ export const Application = () => {
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
-        <BrowserRouter basename={"/piximi-beta"}>
+        <BrowserRouter basename={"/"}>
           <Routes>
             <Route path="/" element={<ProjectViewer />} />
             <Route path="imageviewer" element={<ImageViewer />} />
