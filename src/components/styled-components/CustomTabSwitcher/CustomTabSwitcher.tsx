@@ -1,6 +1,8 @@
-import React, { ReactElement, createContext, useState } from "react";
-import { Box, Tab, Tabs, Typography } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import React, { ReactElement, createContext, useEffect, useState } from "react";
+import { Box, Divider, IconButton, Tab, Tabs, Typography } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import MinimizeIcon from "@mui/icons-material/Minimize";
+import AddIcon from "@mui/icons-material/Add";
 
 const TabContext = createContext<number>(0);
 interface TabPanelProps {
@@ -36,13 +38,21 @@ export const CustomTabSwitcher = ({
   disabledTabs,
   secondaryEffect,
   onTabClose,
+  onNew,
+  activeLabel,
 }: {
   children: JSX.Element[];
   childClassName: string;
   labels: string[];
   disabledTabs?: number[];
   secondaryEffect?: (tab: string) => void;
-  onTabClose: (item: string, newItem?: string) => void;
+  onTabClose: (
+    action: "delete" | "hide",
+    item: string,
+    newItem?: string
+  ) => void;
+  onNew: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+  activeLabel?: string;
 }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const handleTabChange = (
@@ -53,7 +63,11 @@ export const CustomTabSwitcher = ({
     secondaryEffect && secondaryEffect(labels[newValue]);
   };
 
-  const handleTabDeletion = (event: React.MouseEvent, label: string) => {
+  const handleTabDeletion = (
+    event: React.MouseEvent,
+    label: string,
+    action: "delete" | "hide"
+  ) => {
     event.stopPropagation();
     if (labels.length <= 1) {
       return;
@@ -64,16 +78,16 @@ export const CustomTabSwitcher = ({
     if (labelIndex === tabIndex) {
       if (labelIndex === labels.length - 1) {
         setTabIndex(labelIndex - 1);
-        onTabClose(label, labels[labelIndex - 1]);
+        onTabClose(action, label, labels[labelIndex - 1]);
       } else {
-        onTabClose(label, labels[labelIndex + 1]);
+        onTabClose(action, label, labels[labelIndex + 1]);
       }
     } else {
       if (labelIndex < tabIndex) {
         setTabIndex(tabIndex - 1);
       } else {
       }
-      onTabClose(label);
+      onTabClose(action, label);
     }
   };
 
@@ -90,6 +104,12 @@ export const CustomTabSwitcher = ({
     return <>{StyledChildren}</>;
   };
 
+  useEffect(() => {
+    if (activeLabel) {
+      setTabIndex(labels.findIndex((label) => label === activeLabel));
+    }
+  }, [labels, activeLabel]);
+
   return (
     <TabContext.Provider value={tabIndex}>
       <Box
@@ -98,12 +118,17 @@ export const CustomTabSwitcher = ({
           flexGrow: 1,
         })}
       >
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Box
+          display="flex"
+          flexDirection="row"
+          sx={{ borderBottom: 1, borderColor: "divider" }}
+        >
           <Tabs
             value={tabIndex}
             onChange={handleTabChange}
             aria-label="tabbed-view"
             variant="fullWidth"
+            sx={{ flexGrow: 1 }}
           >
             {labels?.map((label, idx) => {
               return typeof label === "string" ? (
@@ -127,12 +152,28 @@ export const CustomTabSwitcher = ({
                       }}
                     >
                       <Typography variant="body2">{label}</Typography>
-
-                      <CloseIcon
-                        fontSize="small"
-                        sx={{ position: "absolute", right: "10px", p: 0 }}
-                        onClick={(event) => handleTabDeletion(event, label)}
-                      />
+                      <Box
+                        display="flex"
+                        flexDirection="row"
+                        flexShrink={1}
+                        position="absolute"
+                        right="10px"
+                      >
+                        <MinimizeIcon
+                          fontSize="small"
+                          sx={{ p: 0 }}
+                          onClick={(event) =>
+                            handleTabDeletion(event, label, "hide")
+                          }
+                        />
+                        <DeleteIcon
+                          fontSize="small"
+                          sx={{ p: 0 }}
+                          onClick={(event) =>
+                            handleTabDeletion(event, label, "delete")
+                          }
+                        />
+                      </Box>
                     </Box>
                   }
                   disabled={disabledTabs && disabledTabs.includes(idx)}
@@ -142,6 +183,12 @@ export const CustomTabSwitcher = ({
               );
             })}
           </Tabs>
+          <Divider orientation="vertical" />
+          <Box display="flex" flexShrink={1} justifySelf="flex-end">
+            <IconButton onClick={onNew} disableRipple>
+              <AddIcon />
+            </IconButton>
+          </Box>
         </Box>
         <TabPanel value={tabIndex} index={0}>
           <Box

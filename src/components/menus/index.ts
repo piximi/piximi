@@ -4,3 +4,4 @@ export { OpenImageMenu } from "./OpenImageMenu";
 export { CategoryItemMenu } from "./CategoryItemMenu";
 export { ImageCategoryMenu } from "./ImageCategoryMenu";
 export { OpenMenu } from "./OpenMenu";
+export { AddKindMenu } from "./AddKindMenu";

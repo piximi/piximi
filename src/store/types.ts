@@ -68,6 +68,7 @@ export type ProjectState = {
   activeKind: string;
   loadPercent: number;
   loadMessage: string;
+  kindTabFilters: string[];
 };
 
 export type ImageViewerState = {
