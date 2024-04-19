@@ -11,9 +11,11 @@ export const initialState: ProjectState = {
   sortType: ThingSortKey.None,
   activeKind: "Image",
   thingFilters: {},
+
   highlightedCategory: undefined,
   loadPercent: 1,
   loadMessage: "",
+  kindTabFilters: [],
 };
 
 export const projectSlice = createSlice({
@@ -201,6 +203,15 @@ export const projectSlice = createSlice({
           delete state.thingFilters[kind];
         }
       }
+    },
+    addKindTabFilter(state, action: PayloadAction<{ kindId: string }>) {
+      state.kindTabFilters.push(action.payload.kindId);
+    },
+    removeKindTabFilter(state, action: PayloadAction<{ kindId: string }>) {
+      mutatingFilter(
+        state.kindTabFilters,
+        (id) => id !== action.payload.kindId
+      );
     },
   },
 });
