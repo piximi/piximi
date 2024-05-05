@@ -5,13 +5,13 @@ import { AnnotationObject, Category, ImageObject, Kind } from "./types";
 import { intersection } from "lodash";
 
 const kindsSelectors = kindsAdapter.getSelectors(
-  (state: RootState) => state.newData.kinds
+  (state: RootState) => state.data.kinds
 );
 const categorySelectors = categoriesAdapter.getSelectors(
-  (state: RootState) => state.newData.categories
+  (state: RootState) => state.data.categories
 );
 const thingsSelectors = thingsAdapter.getSelectors(
-  (state: RootState) => state.newData.things
+  (state: RootState) => state.data.things
 );
 
 export const selectKindDictionary = kindsSelectors.selectEntities; // returns kinds dict

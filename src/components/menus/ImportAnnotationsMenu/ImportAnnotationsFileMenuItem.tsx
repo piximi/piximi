@@ -13,7 +13,7 @@ import {
   selectSplitThingDict,
 } from "store/data/selectors";
 
-import { newDataSlice } from "store/data";
+import { dataSlice } from "store/data";
 import {
   SerializedCOCOFileType,
   SerializedFileType,
@@ -76,19 +76,19 @@ export const ImportAnnotationsFileMenuItem = ({
 
           batch(() => {
             dispatch(
-              newDataSlice.actions.addKinds({
+              dataSlice.actions.addKinds({
                 kinds: newKinds,
                 isPermanent: true,
               })
             );
             dispatch(
-              newDataSlice.actions.addCategories({
+              dataSlice.actions.addCategories({
                 categories: newCategories,
                 isPermanent: true,
               })
             );
             dispatch(
-              newDataSlice.actions.addThings({
+              dataSlice.actions.addThings({
                 things: newAnnotations,
                 isPermanent: true,
               })

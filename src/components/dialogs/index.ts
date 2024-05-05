@@ -16,3 +16,4 @@ export { ExampleImageDialog } from "./ExampleImageDialog";
 export { ExampleProjectDialog } from "./ExampleProjectDialog";
 export { FitSegmenterDialog } from "./FitSegmenterDialog";
 export { NewProjectDialog } from "./NewProjectDialog";
+export { SelectDialog } from "./SelectDialog";

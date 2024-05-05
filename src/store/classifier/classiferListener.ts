@@ -46,7 +46,7 @@ type StoreListemerAPI = ListenerEffectAPI<
     project: ProjectState;
     applicationSettings: AppSettingsState;
     annotator: AnnotatorState;
-    newData: DataState;
+    data: DataState;
   }>,
   AppDispatch,
   unknown
@@ -124,7 +124,7 @@ const fitListener = async (
   const {
     classifier: classifierState,
     project: projectState,
-    newData: dataState,
+    data: dataState,
   } = listenerAPI.getState();
 
   /* ACTIVE KIND */
@@ -305,7 +305,7 @@ const fitListener = async (
 
 const predictListener = async (listenerAPI: StoreListemerAPI) => {
   const {
-    newData: dataState,
+    data: dataState,
     classifier: classifierState,
     project: projectData,
   } = listenerAPI.getState();
@@ -410,7 +410,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
 
 const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
   const {
-    newData: dataState,
+    data: dataState,
     classifier: classifierState,
     project: projectState,
   } = listenerAPI.getState();

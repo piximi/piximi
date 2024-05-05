@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Category, Kind } from "./types";
 import { UNKNOWN_CATEGORY_NAME } from "./constants";
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
+import { union } from "lodash";
 
 export const generateUUID = (options?: { definesUnknown: boolean }) => {
   let id = uuidv4();
@@ -40,4 +41,24 @@ export const generateNewKind = (id: string) => {
     containing: [],
   };
   return { newKind, unknownCategory };
+};
+
+export const updateContents = (
+  previousContents: string[],
+  contents: string[],
+  updateType: "add" | "remove" | "replace"
+) => {
+  var newContents: string[];
+
+  switch (updateType) {
+    case "add":
+      newContents = union(previousContents, contents);
+      break;
+    case "remove":
+      newContents = previousContents.filter((a) => !contents.includes(a));
+      break;
+    case "replace":
+      newContents = contents;
+  }
+  return newContents;
 };

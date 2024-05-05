@@ -16,6 +16,7 @@ export const initialState: ProjectState = {
   loadPercent: 1,
   loadMessage: "",
   kindTabFilters: [],
+  imageChannels: 3,
 };
 
 export const projectSlice = createSlice({

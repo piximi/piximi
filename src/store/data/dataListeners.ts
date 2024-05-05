@@ -9,57 +9,51 @@ import { imageViewerSlice } from "../imageViewer";
 import { createRenderedTensor } from "utils/common/tensorHelpers";
 import { ImageObject } from "./types";
 
-export const newDataMiddleware = createListenerMiddleware();
+export const dataMiddleware = createListenerMiddleware();
 
 export const startAppListening =
-  newDataMiddleware.startListening as TypedAppStartListening;
+  dataMiddleware.startListening as TypedAppStartListening;
 
 startAppListening({
   actionCreator: dataSlice.actions.deleteThings,
   effect: (action, listenerAPI) => {
     const state = listenerAPI.getState();
-    const newData = state.newData;
+    const data = state.data;
     const project = state.project;
     let explicitThingIds: string[] = [];
     let implicitThingIds: string[] = [];
 
     if ("thingIds" in action.payload) {
       if (action.payload.thingIds === "all") {
-        explicitThingIds = newData.things.ids as string[];
+        explicitThingIds = data.things.ids as string[];
       } else if (action.payload.thingIds === "annotations") {
-        explicitThingIds = newData.kinds.ids.reduce(
-          (tIds: string[], kindId) => {
-            if (kindId !== "Image") {
-              tIds.push(
-                ...getDeferredProperty(
-                  newData.kinds.entities[kindId],
-                  "containing"
-                )
-              );
-            }
-            return tIds;
-          },
-          []
-        );
+        explicitThingIds = data.kinds.ids.reduce((tIds: string[], kindId) => {
+          if (kindId !== "Image") {
+            tIds.push(
+              ...getDeferredProperty(data.kinds.entities[kindId], "containing")
+            );
+          }
+          return tIds;
+        }, []);
       } else {
         explicitThingIds = action.payload.thingIds;
       }
     } else if ("ofKinds" in action.payload) {
       action.payload.ofKinds.forEach((kindId) => {
-        if (kindId in newData.kinds.entities) {
+        if (kindId in data.kinds.entities) {
           explicitThingIds.push(
-            ...getDeferredProperty(newData.kinds.entities[kindId], "containing")
+            ...getDeferredProperty(data.kinds.entities[kindId], "containing")
           );
         }
       });
     } else {
       //"ofCategories" in action.payload
       action.payload.ofCategories.forEach((categoryId) => {
-        if (categoryId in newData.categories.entities) {
+        if (categoryId in data.categories.entities) {
           let containedThings: string[];
 
           containedThings = getDeferredProperty(
-            newData.categories.entities[categoryId],
+            data.categories.entities[categoryId],
             "containing"
           );
 
@@ -69,7 +63,7 @@ startAppListening({
     }
 
     for (const thingId of explicitThingIds) {
-      const thing = newData.things.entities[thingId];
+      const thing = data.things.entities[thingId];
       if (!thing) continue;
       if (getDeferredProperty(thing, "kind") === "Image") {
         const containedThingIds = getDeferredProperty(
@@ -126,7 +120,7 @@ startAppListening({
   actionCreator: dataSlice.actions.updateThings,
   effect: async (action, listenerAPI) => {
     const { updates } = action.payload;
-    const { newData: dataState, imageViewer: imageViewerState } =
+    const { data: dataState, imageViewer: imageViewerState } =
       listenerAPI.getState();
 
     const srcUpdates: Array<{ id: string } & Partial<ImageObject>> = [];

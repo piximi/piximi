@@ -39,6 +39,7 @@ import {
   Shape,
   Thing,
 } from "./data/types";
+import { MeasurementsState } from "./measurements/types";
 
 export type SegmenterState = {
   // pre-fit state
@@ -69,6 +70,7 @@ export type ProjectState = {
   loadPercent: number;
   loadMessage: string;
   kindTabFilters: string[];
+  imageChannels: number;
 };
 
 export type ImageViewerState = {
@@ -160,7 +162,8 @@ export type AppState = {
   annotator: AnnotatorState;
   project: ProjectState;
   applicationSettings: AppSettingsState;
-  newData: DataState;
+  data: DataState;
+  measurements: MeasurementsState;
 };
 
 export type AppDispatch = Dispatch<AnyAction>;

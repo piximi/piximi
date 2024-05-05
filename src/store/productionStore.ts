@@ -10,7 +10,7 @@ import { rootReducer, RootState } from "./rootReducer";
 import { annotatorMiddleware } from "store/annotator/annotatorListeners";
 import { imageViewerMiddleware } from "./imageViewer/imageViewerListeners";
 import { projectMiddleware } from "./project/projectListeners";
-import { newDataMiddleware } from "./data/dataListeners";
+import { dataMiddleware } from "./data/dataListeners";
 import { classifierSlice } from "./classifier";
 import { annotatorSlice } from "./annotator";
 import { applicationSettingsSlice } from "./applicationSettings";
@@ -20,6 +20,8 @@ import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
 import { classifierMiddleware } from "./classifier/classiferListener";
 import { segmenterMiddleware } from "./segmenter/segmenterListeners";
+import { measurementsSlice } from "./measurements/measurementsSlice";
+import { measurementsMiddleware } from "./measurements/measurementListeners";
 
 const enhancers: StoreEnhancer[] = [];
 
@@ -39,9 +41,10 @@ let listenerMiddlewares: Middleware[] = [
   annotatorMiddleware.middleware,
   imageViewerMiddleware.middleware,
   projectMiddleware.middleware,
-  newDataMiddleware.middleware,
+  dataMiddleware.middleware,
   classifierMiddleware.middleware,
   segmenterMiddleware.middleware,
+  measurementsMiddleware.middleware,
 ];
 
 const preloadedState: RootState = {
@@ -49,9 +52,10 @@ const preloadedState: RootState = {
   annotator: annotatorSlice.getInitialState(),
   applicationSettings: applicationSettingsSlice.getInitialState(),
   imageViewer: imageViewerSlice.getInitialState(),
-  newData: dataSlice.getInitialState(),
+  data: dataSlice.getInitialState(),
   project: projectSlice.getInitialState(),
   segmenter: segmenterSlice.getInitialState(),
+  measurements: measurementsSlice.getInitialState(),
 };
 
 const options = {

@@ -5,4 +5,5 @@ export { KeyboardKey } from "./KeyboardKey";
 export { LogoLoader } from "./LogoLoader";
 export { DividerHeader } from "./DividerHeader";
 export { CountChip } from "./CountChip";
-export { CustomTabSwitcher } from "./CustomTabSwitcher";
+export { InteractiveTabbedView, TabbedView } from "./CustomTabSwitcher";
+export { SelectionTree } from "./SelectionTree";

@@ -137,3 +137,11 @@ LOAD MESSAGE
 export const selectLoadMessage = ({ project }: { project: ProjectState }) => {
   return project.loadMessage;
 };
+
+export const selectProjectImageChannels = ({
+  project,
+}: {
+  project: ProjectState;
+}) => {
+  return project.imageChannels;
+};
