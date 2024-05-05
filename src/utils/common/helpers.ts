@@ -11,9 +11,10 @@ import {
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "./constants";
 import { AlertType, ImageSortKey } from "./enums";
-import { FilterType, ImageSortKeyType } from "./types";
+import { FilterType, ImageSortKeyType, RecursivePartial } from "./types";
 import { Category, ImageObject, Shape, ShapeArray } from "store/data/types";
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
+import { SelectionTreeItems } from "store/measurements/types";
 
 /* 
   ERROR HANDLING / LOGGING
@@ -129,6 +130,25 @@ export const filterObjects = <T extends object>(
   });
 };
 
+export const recursiveAssign = <T extends object>(
+  existingObject: T,
+  updates: RecursivePartial<T>
+) => {
+  Object.entries(updates).forEach(([key, value]) => {
+    if (typeof existingObject[key as keyof T] === "object") {
+      recursiveAssign(
+        existingObject[key as keyof T] as object,
+        updates[key as keyof T]!
+      );
+    } else {
+      Object.assign(
+        existingObject[key as keyof T] as object,
+        updates[key as keyof T]!
+      );
+    }
+  });
+};
+
 export const distinctFilter = <T>(value: T, index: number, self: T[]) => {
   return self.indexOf(value) === index;
 };
@@ -153,6 +173,17 @@ export const convertArrayToShape = (array: ShapeArray): Shape => {
     width: array[2],
     channels: array[3],
   };
+};
+
+export const capitalize = (input: string) => {
+  const capitalized: string[] = [];
+
+  const words = input.split(" ");
+
+  words.forEach((word) => {
+    capitalized.push(word.charAt(0).toUpperCase() + word.slice(1));
+  });
+  return capitalized.join(" ");
 };
 
 /*
@@ -446,4 +477,33 @@ export const updateRecord = <T extends string | number | symbol, K>(
   } else {
     record[key] = [value];
   }
+};
+
+/*
+  Given a selection tree item, updates the selection status of all of its children
+*/
+export const selectTreeItemChildren = (
+  updates: RecursivePartial<SelectionTreeItems>,
+  itemId: string,
+  items: SelectionTreeItems,
+  selectionStatus: "on" | "off"
+) => {
+  const dataItem = items[itemId];
+  if (dataItem) {
+    // data item exists
+    if (dataItem.children) {
+      // data item has children, select or deselect all children
+      dataItem.children.forEach((child) => {
+        selectTreeItemChildren(updates, child, items, selectionStatus);
+      });
+    } else {
+      updates[dataItem.id as keyof SelectionTreeItems] = {
+        state: selectionStatus,
+      };
+    }
+  }
+};
+
+export const isObjectEmpty = <T extends Object>(obj: T) => {
+  return Object.keys(obj).length === 0;
 };

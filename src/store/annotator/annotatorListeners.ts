@@ -25,7 +25,7 @@ startAppListening({
   effect: async (action, listenerAPI) => {
     const {
       imageViewer: IVState,
-      newData: dataState,
+      data: dataState,
       annotator: annotatorState,
     } = listenerAPI.getState();
     const { annotationState, annotationTool, kind } = action.payload;

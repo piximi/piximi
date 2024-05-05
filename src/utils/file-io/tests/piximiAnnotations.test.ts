@@ -3,7 +3,7 @@ import Image from "image-js";
 import * as tf from "@tensorflow/tfjs";
 
 import { productionStore } from "store";
-import { newDataSlice } from "store/data";
+import { dataSlice } from "store/data";
 import { DeferredEntityState } from "store/entities";
 import {
   selectObjectCategoryDict,
@@ -218,7 +218,7 @@ describe("deserialize into empty project (no matching images)", () => {
       [k1T1]
     );
     serializedPiximi.version = "0.2.0";
-    productionStore.dispatch(newDataSlice.actions.resetData());
+    productionStore.dispatch(dataSlice.actions.resetData());
     const rootState = productionStore.getState();
     const { images } = selectSplitThingDict(rootState);
     const kinds = selectObjectKindDict(rootState);
@@ -276,9 +276,9 @@ describe("deserialize into project with matching image, no matching kinds or cat
 
     const categoriesT2 = { ids: [], entities: {} };
 
-    productionStore.dispatch(newDataSlice.actions.resetData());
+    productionStore.dispatch(dataSlice.actions.resetData());
     productionStore.dispatch(
-      newDataSlice.actions.initializeState({
+      dataSlice.actions.initializeState({
         data: { things: thingsT2, categories: categoriesT2, kinds: kindsT2 },
       })
     );
@@ -387,9 +387,9 @@ describe("deserialize into project with matching image, matching kind", () => {
       { ids: [], entities: {} }
     );
 
-    productionStore.dispatch(newDataSlice.actions.resetData());
+    productionStore.dispatch(dataSlice.actions.resetData());
     productionStore.dispatch(
-      newDataSlice.actions.initializeState({
+      dataSlice.actions.initializeState({
         data: { things: thingsT2, categories: categoriesT2, kinds: kindsT2 },
       })
     );
@@ -505,9 +505,9 @@ describe("deserialize into project with matching image, matching kind, and match
       { ids: [], entities: {} }
     );
 
-    productionStore.dispatch(newDataSlice.actions.resetData());
+    productionStore.dispatch(dataSlice.actions.resetData());
     productionStore.dispatch(
-      newDataSlice.actions.initializeState({
+      dataSlice.actions.initializeState({
         data: { things: thingsT2, categories: categoriesT2, kinds: kindsT2 },
       })
     );

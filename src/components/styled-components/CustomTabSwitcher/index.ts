@@ -1,1 +1,2 @@
-export { CustomTabSwitcher } from "./CustomTabSwitcher";
+export { InteractiveTabbedView } from "./InteractiveTabbedView";
+export { TabbedView } from "./TabbedView";

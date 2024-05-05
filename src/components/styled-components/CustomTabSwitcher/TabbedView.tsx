@@ -1,8 +1,5 @@
 import React, { ReactElement, createContext, useEffect, useState } from "react";
-import { Box, Divider, IconButton, Tab, Tabs, Typography } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import MinimizeIcon from "@mui/icons-material/Minimize";
-import AddIcon from "@mui/icons-material/Add";
+import { Box, Tab, Tabs, Typography } from "@mui/material";
 
 const TabContext = createContext<number>(0);
 interface TabPanelProps {
@@ -31,14 +28,12 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-export const CustomTabSwitcher = ({
+export const TabbedView = ({
   children,
   childClassName,
   labels,
   disabledTabs,
   secondaryEffect,
-  onTabClose,
-  onNew,
   activeLabel,
 }: {
   children: JSX.Element[];
@@ -46,12 +41,6 @@ export const CustomTabSwitcher = ({
   labels: string[];
   disabledTabs?: number[];
   secondaryEffect?: (tab: string) => void;
-  onTabClose: (
-    action: "delete" | "hide",
-    item: string,
-    newItem?: string
-  ) => void;
-  onNew: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   activeLabel?: string;
 }) => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -61,34 +50,6 @@ export const CustomTabSwitcher = ({
   ) => {
     setTabIndex(newValue);
     secondaryEffect && secondaryEffect(labels[newValue]);
-  };
-
-  const handleTabDeletion = (
-    event: React.MouseEvent,
-    label: string,
-    action: "delete" | "hide"
-  ) => {
-    event.stopPropagation();
-    if (labels.length <= 1) {
-      return;
-    }
-
-    const labelIndex = labels.findIndex((el) => el === label);
-
-    if (labelIndex === tabIndex) {
-      if (labelIndex === labels.length - 1) {
-        setTabIndex(labelIndex - 1);
-        onTabClose(action, label, labels[labelIndex - 1]);
-      } else {
-        onTabClose(action, label, labels[labelIndex + 1]);
-      }
-    } else {
-      if (labelIndex < tabIndex) {
-        setTabIndex(tabIndex - 1);
-      } else {
-      }
-      onTabClose(action, label);
-    }
   };
 
   const addClass = (children: JSX.Element[]) => {
@@ -140,40 +101,8 @@ export const CustomTabSwitcher = ({
                       display="flex"
                       flexDirection="row"
                       justifyContent="center"
-                      sx={{
-                        "& .MuiSvgIcon-root": {
-                          visibility: "hidden",
-                        },
-                        ":hover": {
-                          "& .MuiSvgIcon-root": {
-                            visibility: "visible",
-                          },
-                        },
-                      }}
                     >
                       <Typography variant="body2">{label}</Typography>
-                      <Box
-                        display="flex"
-                        flexDirection="row"
-                        flexShrink={1}
-                        position="absolute"
-                        right="10px"
-                      >
-                        <MinimizeIcon
-                          fontSize="small"
-                          sx={{ p: 0 }}
-                          onClick={(event) =>
-                            handleTabDeletion(event, label, "hide")
-                          }
-                        />
-                        <DeleteIcon
-                          fontSize="small"
-                          sx={{ p: 0 }}
-                          onClick={(event) =>
-                            handleTabDeletion(event, label, "delete")
-                          }
-                        />
-                      </Box>
                     </Box>
                   }
                   disabled={disabledTabs && disabledTabs.includes(idx)}
@@ -183,12 +112,6 @@ export const CustomTabSwitcher = ({
               );
             })}
           </Tabs>
-          <Divider orientation="vertical" />
-          <Box display="flex" flexShrink={1} justifySelf="flex-end">
-            <IconButton onClick={onNew} disableRipple>
-              <AddIcon />
-            </IconButton>
-          </Box>
         </Box>
         <TabPanel value={tabIndex} index={0}>
           <Box

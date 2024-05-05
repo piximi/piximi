@@ -19,7 +19,7 @@ startAppListening({
   actionCreator: imageViewerSlice.actions.prepareImageViewer,
   effect: (action, listenerAPI) => {
     const selectedThingIds = action.payload.selectedThingIds;
-    const dataState = listenerAPI.getState().newData;
+    const dataState = listenerAPI.getState().data;
 
     let imageIds: string[] = [];
     const annotationIds: string[] = [];
@@ -64,7 +64,7 @@ startAppListening({
       imageViewerSlice.actions.setImageIsLoading({ isLoading: true })
     );
     const newActiveImageId = action.payload.imageId;
-    const dataState = listenerAPI.getState().newData;
+    const dataState = listenerAPI.getState().data;
     if (!newActiveImageId) {
       listenerAPI.dispatch(
         imageViewerSlice.actions.setActiveImageRenderedSrcs({
@@ -104,7 +104,7 @@ startAppListening({
 startAppListening({
   actionCreator: imageViewerSlice.actions.setWorkingAnnotation,
   effect: async (action, listenerAPI) => {
-    const dataState = listenerAPI.getState().newData;
+    const dataState = listenerAPI.getState().data;
     let annotationValue = action.payload.annotation;
     if (typeof annotationValue === "string") {
       const annotation = getCompleteEntity(
@@ -129,16 +129,16 @@ startAppListening({
 startAppListening({
   predicate: (action, currentState, previousState) => {
     return (
-      currentState.newData.categories.ids.length <
-      previousState.newData.categories.ids.length
+      currentState.data.categories.ids.length <
+      previousState.data.categories.ids.length
     );
   },
   effect: async (action, listenerApi) => {
-    const { imageViewer, newData } = listenerApi.getState();
-    const { newData: oldData } = listenerApi.getOriginalState();
+    const { imageViewer, data } = listenerApi.getState();
+    const { data: oldData } = listenerApi.getOriginalState();
     const deletedCategories = difference(
       oldData.categories.ids,
-      newData.categories.ids
+      data.categories.ids
     ) as string[];
     const filteredCats = imageViewer.filters.categoryId;
     const deletedFilters = intersection(filteredCats, deletedCategories);

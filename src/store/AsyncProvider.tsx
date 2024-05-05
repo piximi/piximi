@@ -28,6 +28,7 @@ import {
   ImageObject,
 } from "./data/types";
 import { UNKNOWN_CATEGORY_NAME } from "./data/constants";
+import { measurementsSlice } from "./measurements/measurementsSlice";
 
 const loadState = async () => {
   const preloadedState: RootState = {
@@ -35,9 +36,10 @@ const loadState = async () => {
     annotator: annotatorSlice.getInitialState(),
     applicationSettings: applicationSettingsSlice.getInitialState(),
     imageViewer: imageViewerSlice.getInitialState(),
-    newData: dataSlice.getInitialState(),
+    data: dataSlice.getInitialState(),
     project: projectSlice.getInitialState(),
     segmenter: segmenterSlice.getInitialState(),
+    measurements: measurementsSlice.getInitialState(),
   };
 
   const { image, annotationCategories, annotations } = (await loadExampleImage(
@@ -167,7 +169,7 @@ const loadState = async () => {
       annotation.id
     );
   }
-  preloadedState.newData = { kinds, categories, things };
+  preloadedState.data = { kinds, categories, things };
   return preloadedState;
 };
 

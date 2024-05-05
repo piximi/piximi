@@ -5,9 +5,8 @@ import { annotatorSlice } from "store/annotator";
 import { classifierSlice } from "store/classifier";
 import { segmenterSlice } from "store/segmenter";
 import { imageViewerSlice } from "store/imageViewer";
-import { newDataSlice } from "store/data";
+import { dataSlice } from "store/data";
 import { difference, intersection } from "lodash";
-import { dataSlice } from "store/data/dataSlice";
 
 export const projectMiddleware = createListenerMiddleware();
 const startAppListening =
@@ -16,7 +15,7 @@ const startAppListening =
 startAppListening({
   actionCreator: projectSlice.actions.resetProject,
   effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(newDataSlice.actions.resetData());
+    listenerAPI.dispatch(dataSlice.actions.resetData());
     listenerAPI.dispatch(annotatorSlice.actions.resetAnnotator());
     listenerAPI.dispatch(classifierSlice.actions.resetClassifier());
     listenerAPI.dispatch(segmenterSlice.actions.resetSegmenter());
@@ -49,7 +48,7 @@ startAppListening({
 startAppListening({
   actionCreator: projectSlice.actions.resetProject,
   effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(newDataSlice.actions.resetData());
+    listenerAPI.dispatch(dataSlice.actions.resetData());
     listenerAPI.dispatch(annotatorSlice.actions.resetAnnotator());
     listenerAPI.dispatch(classifierSlice.actions.resetClassifier());
     listenerAPI.dispatch(segmenterSlice.actions.resetSegmenter());
@@ -60,16 +59,16 @@ startAppListening({
 startAppListening({
   predicate: (action, currentState, previousState) => {
     return (
-      currentState.newData.categories.ids.length <
-      previousState.newData.categories.ids.length
+      currentState.data.categories.ids.length <
+      previousState.data.categories.ids.length
     );
   },
   effect: async (action, listenerApi) => {
-    const { project, newData } = listenerApi.getState();
-    const { newData: oldData } = listenerApi.getOriginalState();
+    const { project, data } = listenerApi.getState();
+    const { data: oldData } = listenerApi.getOriginalState();
     const deletedCategories = difference(
       oldData.categories.ids,
-      newData.categories.ids
+      data.categories.ids
     ) as string[];
     const filters = project.thingFilters;
     for (let kind in filters) {
@@ -90,11 +89,11 @@ startAppListening({
 startAppListening({
   actionCreator: dataSlice.actions.deleteKind,
   effect: async (action, listenerApi) => {
-    const { newData } = listenerApi.getState();
-    const { newData: oldData } = listenerApi.getOriginalState();
+    const { data } = listenerApi.getState();
+    const { data: oldData } = listenerApi.getOriginalState();
     const deletedKinds = difference(
       oldData.kinds.ids,
-      newData.kinds.ids
+      data.kinds.ids
     ) as string[];
 
     listenerApi.dispatch(

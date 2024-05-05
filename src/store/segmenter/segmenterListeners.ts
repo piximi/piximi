@@ -50,7 +50,7 @@ type StoreListemerAPI = ListenerEffectAPI<
     project: ProjectState;
     applicationSettings: AppSettingsState;
     annotator: AnnotatorState;
-    newData: DataState;
+    data: DataState;
   }>,
   AppDispatch,
   unknown
@@ -82,8 +82,7 @@ const fitListener = async (
 ) => {};
 
 const predictListener = async (listenerAPI: StoreListemerAPI) => {
-  const { newData: dataState, segmenter: segmenterState } =
-    listenerAPI.getState();
+  const { data: dataState, segmenter: segmenterState } = listenerAPI.getState();
 
   /* SEGMENTER */
   const previousModelStatus =

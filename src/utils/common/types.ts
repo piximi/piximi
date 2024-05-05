@@ -99,6 +99,10 @@ export type RequireField<T, K extends keyof T> = Omit<T, K> &
 export type RequireOnly<T, K extends keyof T> = Partial<Omit<T, K>> &
   Required<Pick<T, K>>;
 
+export type RecursivePartial<T> = {
+  [K in keyof T]?: RecursivePartial<T[K]>;
+};
+
 /*
 SORTING
 */

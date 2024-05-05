@@ -9,7 +9,7 @@ import { useDialog, useTranslation } from "hooks";
 import { DialogWithAction } from "components/dialogs";
 import { imageViewerSlice } from "store/imageViewer";
 import { CustomListItemButton } from "components/list-items";
-import { newDataSlice } from "store/data";
+import { dataSlice } from "store/data";
 import {
   selectActiveAnnotationIds,
   selectSelectedAnnotationIds,
@@ -47,7 +47,7 @@ export const ClearAnnotationsGroup = () => {
           })
         );
         dispatch(
-          newDataSlice.actions.deleteThings({
+          dataSlice.actions.deleteThings({
             thingIds: activeAnnotationsIds,
             disposeColorTensors: true,
           })
@@ -64,7 +64,7 @@ export const ClearAnnotationsGroup = () => {
           })
         );
         dispatch(
-          newDataSlice.actions.deleteThings({
+          dataSlice.actions.deleteThings({
             thingIds: selectedAnnotationIds,
             disposeColorTensors: true,
           })

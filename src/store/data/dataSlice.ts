@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
 
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
-import { intersection, union } from "lodash";
+import { intersection } from "lodash";
 
 import {
   generateUUID,
@@ -28,6 +28,7 @@ import {
   CategoryUpdates,
 } from "./types";
 import { UNKNOWN_CATEGORY_NAME } from "./constants";
+import { updateContents } from "./helpers";
 
 export const kindsAdapter = createDeferredEntityAdapter<Kind>();
 export const categoriesAdapter = createDeferredEntityAdapter<Category>();
@@ -43,28 +44,8 @@ export const initialState = (): DataState => {
   };
 };
 
-const updateContents = (
-  previousContents: string[],
-  contents: string[],
-  updateType: "add" | "remove" | "replace"
-) => {
-  var newContents: string[];
-
-  switch (updateType) {
-    case "add":
-      newContents = union(previousContents, contents);
-      break;
-    case "remove":
-      newContents = previousContents.filter((a) => !contents.includes(a));
-      break;
-    case "replace":
-      newContents = contents;
-  }
-  return newContents;
-};
-
 export const dataSlice = createSlice({
-  name: "new-data",
+  name: "data",
   initialState: initialState,
   reducers: {
     resetData: (state) => initialState(),
