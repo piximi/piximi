@@ -1,7 +1,7 @@
 import range from "lodash/range";
 import { ResponsiveLine } from "@nivo/line";
 
-import { Container, Typography } from "@mui/material";
+import { Container, Typography, useMediaQuery, useTheme } from "@mui/material";
 
 import { usePreferredNivoTheme } from "hooks";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
@@ -29,6 +29,8 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
     id2,
     dynamicYRange = false,
   } = props;
+  const theme = useTheme();
+  const matchesBP = useMediaQuery(theme.breakpoints.down("md"));
 
   const [data, setData] = useState<
     {
@@ -72,7 +74,7 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
         data={data}
         theme={nivoTheme}
         lineWidth={3}
-        margin={{ top: 10, right: 170, bottom: 80, left: 70 }}
+        margin={{ top: 10, right: matchesBP ? 10 : 170, bottom: 80, left: 70 }}
         xScale={{ type: "linear" }}
         yScale={{
           type: "linear",
@@ -133,12 +135,12 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
         useMesh={true}
         legends={[
           {
-            anchor: "right",
-            direction: "column",
+            anchor: matchesBP ? "bottom" : "right",
+            direction: matchesBP ? "row" : "column",
             justify: false,
-            translateX: 100,
-            translateY: 0,
-            itemsSpacing: 0,
+            translateX: matchesBP ? 0 : 100,
+            translateY: matchesBP ? 70 : 0,
+            itemsSpacing: matchesBP ? 70 : 0,
             itemDirection: "left-to-right",
             itemWidth: 80,
             itemHeight: 20,

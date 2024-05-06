@@ -9,10 +9,16 @@ import {
   Typography,
   TextField,
   FormControl,
+  Menu,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   ZoomOut as ZoomOutIcon,
   ZoomIn as ZoomInIcon,
+  Search as SearchIcon,
+  Add as AddIcon,
+  Remove as RemoveIcon,
 } from "@mui/icons-material";
 
 import { ImageSortSelection } from "components/styled-components";
@@ -26,6 +32,7 @@ import {
   selectProjectName,
   projectSlice,
 } from "store/slices/project";
+import { useMenu } from "hooks";
 
 const minZoom = 0.6;
 const maxZoom = 4;
@@ -38,7 +45,10 @@ export const ProjectToolbar = () => {
   const [value, setValue] = useState<number>(1);
   const [newProjectName, setNewProjectName] = useState<string>(projectName);
   const inputRef = useRef<HTMLInputElement>(null);
+  const theme = useTheme();
+  const matchesBP = useMediaQuery(theme.breakpoints.down("md"));
 
+  const { onOpen, onClose, open, anchorEl } = useMenu();
   const handleSizeChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number);
     dispatch(
@@ -112,30 +122,55 @@ export const ProjectToolbar = () => {
 
       <Box sx={{ flexGrow: 1 }} />
 
-      <ImageSortSelection />
-      <Button onClick={onZoomOut}>
-        <ZoomOutIcon
-          sx={(theme) => ({
-            marginLeft: theme.spacing(1),
-          })}
-        />
-      </Button>
+      {matchesBP ? (
+        <>
+          <Button onClick={onOpen}>
+            <SearchIcon />
+          </Button>
+          <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
+            <Box display="flex" flexDirection="column" alignItems="center">
+              <AddIcon />
+              <Slider
+                orientation="vertical"
+                value={value}
+                min={minZoom}
+                max={maxZoom}
+                step={0.1}
+                onChange={handleSizeChange}
+                sx={{ height: (maxZoom - minZoom) * 20 + "px", my: 1, mr: 0 }}
+              />
+              <RemoveIcon />
+            </Box>
+          </Menu>
+        </>
+      ) : (
+        <>
+          <ImageSortSelection />
+          <Button onClick={onZoomOut}>
+            <ZoomOutIcon
+              sx={(theme) => ({
+                marginLeft: theme.spacing(1),
+              })}
+            />
+          </Button>
 
-      <Slider
-        value={value}
-        min={minZoom}
-        max={maxZoom}
-        step={0.1}
-        onChange={handleSizeChange}
-        sx={{ width: "10%" }}
-      />
-      <Button onClick={onZoomIn}>
-        <ZoomInIcon
-          sx={(theme) => ({
-            marginRight: theme.spacing(1),
-          })}
-        />
-      </Button>
+          <Slider
+            value={value}
+            min={minZoom}
+            max={maxZoom}
+            step={0.1}
+            onChange={handleSizeChange}
+            sx={{ width: "10%" }}
+          />
+          <Button onClick={onZoomIn}>
+            <ZoomInIcon
+              sx={(theme) => ({
+                marginRight: theme.spacing(1),
+              })}
+            />
+          </Button>
+        </>
+      )}
     </Toolbar>
   );
 };
