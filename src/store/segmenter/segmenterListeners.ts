@@ -171,6 +171,26 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   let predictedAnnotations: OrphanedAnnotationObject[][];
   try {
     predictedAnnotations = await model.predict();
+    for (let i = 0; i < predictedAnnotations.length; i++) {
+      for (let j = 0; j < predictedAnnotations[i].length; j++) {
+        const bbox = predictedAnnotations[i][j].boundingBox;
+        let xDiff = 0;
+        let yDiff = 0;
+
+        if (bbox[0] < 0) {
+          xDiff = Math.abs(bbox[0]);
+        }
+        if (bbox[1] < 0) {
+          yDiff = Math.abs(bbox[1]);
+        }
+        predictedAnnotations[i][j].boundingBox = [
+          bbox[0] + xDiff,
+          bbox[1] + yDiff,
+          bbox[2] + xDiff,
+          bbox[3] + yDiff,
+        ];
+      }
+    }
   } catch (error) {
     await handleError(
       "Error in running predictions",
