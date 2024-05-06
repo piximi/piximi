@@ -55,7 +55,6 @@ export function* predictSegmenterSaga({
 
     return;
   }
-
   yield put(
     dataSlice.actions.updateImages({
       updates: inferenceImages.map((image) => ({
@@ -118,6 +117,29 @@ function* runPrediction(
   try {
     let predictedAnnotations: Awaited<ReturnType<typeof model.predict>> =
       yield model.predict();
+
+    //HACK: During prediction, output values for bbox can be, for example, -0.0036. After rescaling these become out of bounds
+    // For now this will fix this issue
+    for (let i = 0; i < predictedAnnotations.length; i++) {
+      for (let j = 0; j < predictedAnnotations[i].length; j++) {
+        const bbox = predictedAnnotations[i][j].boundingBox;
+        let xDiff = 0;
+        let yDiff = 0;
+
+        if (bbox[0] < 0) {
+          xDiff = Math.abs(bbox[0]);
+        }
+        if (bbox[1] < 0) {
+          yDiff = Math.abs(bbox[1]);
+        }
+        predictedAnnotations[i][j].boundingBox = [
+          bbox[0] + xDiff,
+          bbox[1] + yDiff,
+          bbox[2] + xDiff,
+          bbox[3] + yDiff,
+        ];
+      }
+    }
 
     if (generateCategories) {
       const uniquePredictedIds = [
