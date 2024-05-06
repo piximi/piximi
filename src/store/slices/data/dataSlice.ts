@@ -694,6 +694,7 @@ export const dataSlice = createSlice({
           (id) => id !== imageId
         );
         const annotationsToDelete = state.annotationsByImage[imageId];
+        delete state.annotationsByImage[imageId];
         if (isPermanent) {
           if (disposeColorTensor) {
             dispose(
@@ -702,6 +703,7 @@ export const dataSlice = createSlice({
             dispose(state.images.entities[imageId].changes as TensorContainer);
           }
           delete state.images.entities[imageId];
+
           mutatingFilter(state.images.ids, (_imageId) => _imageId !== imageId);
         } else {
           imagesAdapter.removeOne(state.images, imageId);
@@ -915,10 +917,12 @@ export const dataSlice = createSlice({
             state.annotationsByCategory[categoryId],
             (_annotationId) => _annotationId !== annotationId
           );
-          mutatingFilter(
-            state.annotationsByImage[imageId],
-            (_annotationId) => _annotationId !== annotationId
-          );
+          if (imageId in state.annotationsByImage) {
+            mutatingFilter(
+              state.annotationsByImage[imageId],
+              (_annotationId) => _annotationId !== annotationId
+            );
+          }
           if (isPermanent) {
             delete state.annotations.entities[annotationId];
             state.annotations.ids = Object.keys(state.annotations.entities);
