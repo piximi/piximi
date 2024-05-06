@@ -1,14 +1,18 @@
 import React from "react";
 
-import { Divider } from "@mui/material";
+import { Divider, useMediaQuery, useTheme } from "@mui/material";
 
 import { FileList, ClassifierList, SegmenterList } from "components/lists";
 import { AppBarOffset, CustomTabSwitcher } from "components/styled-components";
 import { BaseAppDrawer } from "../BaseAppDrawer";
 
 export const ProjectDrawer = () => {
-  return (
-    <BaseAppDrawer>
+  const theme = useTheme();
+  const matchesBP = useMediaQuery(theme.breakpoints.down("md"));
+  return matchesBP ? (
+    <></>
+  ) : (
+    <BaseAppDrawer mobile={matchesBP}>
       <AppBarOffset />
 
       <FileList />

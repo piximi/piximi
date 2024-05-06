@@ -84,7 +84,7 @@ export const OptimizerSettingsGrid = ({
         </Grid>
       </Grid>
       <Grid container direction={"row"} spacing={2}>
-        <Grid item xs={2}>
+        <Grid item xs={12} md={4} lg={4}>
           <CustomNumberTextField
             id="batch-size"
             label="Batch size"
@@ -95,7 +95,7 @@ export const OptimizerSettingsGrid = ({
           />
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid item xs={12} md={4} lg={4}>
           <CustomNumberTextField
             id="epochs"
             label="Epochs"

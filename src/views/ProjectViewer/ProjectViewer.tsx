@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 
-import { Box, CssBaseline } from "@mui/material";
+import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";
 
 import { useErrorHandler, useUnloadConfirmation } from "hooks";
 import { useDefaultImage, DispatchLocation } from "hooks/useDefaultImage";
@@ -26,7 +26,8 @@ const tabs: Array<ImageGridTab> = ["Images", "Annotations"];
 
 export const ProjectViewer = () => {
   const dispatch = useDispatch();
-
+  const theme = useTheme();
+  const matchesBP = useMediaQuery(theme.breakpoints.down("md"));
   const annotationCount = useSelector(selectTotalAnnotationCount);
 
   useDefaultImage(DispatchLocation.Project);
@@ -57,12 +58,14 @@ export const ProjectViewer = () => {
 
             <Box
               sx={(theme) => ({
-                maxWidth: `calc(100% - ${dimensions.leftDrawerWidth}px - ${dimensions.toolDrawerWidth}px)`, // magic number draw width
+                maxWidth: `calc(100% ${
+                  matchesBP ? "" : "- " + dimensions.leftDrawerWidth + "px"
+                } - ${dimensions.toolDrawerWidth}px)`, // magic number draw width
                 overflow: "hidden",
                 flexGrow: 1,
                 height: "100%",
                 paddingTop: theme.spacing(8),
-                marginLeft: theme.spacing(32),
+                marginLeft: matchesBP ? 0 : theme.spacing(32),
               })}
             >
               <CustomTabSwitcher

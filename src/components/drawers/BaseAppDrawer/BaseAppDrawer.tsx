@@ -2,11 +2,18 @@ import React from "react";
 import { Box, Divider, Drawer } from "@mui/material";
 import { ApplicationOptionsList } from "components/lists";
 
-export const BaseAppDrawer = ({ children }: { children: React.ReactNode }) => {
+export const BaseAppDrawer = ({
+  children,
+  mobile,
+}: {
+  children: React.ReactNode;
+  mobile?: boolean;
+}) => {
   return (
     <Drawer
       anchor="left"
       sx={{
+        display: mobile ? "none" : "block",
         flexShrink: 0,
         width: (theme) => theme.spacing(32),
         overflow: "hidden",

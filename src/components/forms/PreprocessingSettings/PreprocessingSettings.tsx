@@ -58,7 +58,7 @@ export const PreprocessingSettings = ({
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12} md={4} lg={4}>
+      <Grid item xs={4} md={4} lg={4}>
         <CustomFormSelectField
           keySource={CropSchema}
           value={cropOptions.cropSchema}
@@ -73,8 +73,7 @@ export const PreprocessingSettings = ({
           dispatchCallBack={dispatchNumCrops}
           min={1}
         />
-      </Grid>
-      <Grid item xs={12} md={4} lg={4}>
+
         <FormControl size="small">
           <FormControlLabel
             control={
