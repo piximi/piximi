@@ -13,6 +13,7 @@ type CreateCategoriesDialogProps = {
   withContainedCategories?: string[];
   open: boolean;
   changesPermanent?: boolean;
+  secondaryAction?: () => void;
 };
 
 export const CreateKindDialog = ({
@@ -21,6 +22,7 @@ export const CreateKindDialog = ({
   withContainedCategories = [],
   open,
   changesPermanent,
+  secondaryAction,
 }: CreateCategoriesDialogProps) => {
   const dispatch = useDispatch();
   const existingKinds = useSelector(selectAllKindIds);
@@ -81,6 +83,8 @@ export const CreateKindDialog = ({
         })
       );
     });
+    secondaryAction && secondaryAction();
+    onClose();
   };
 
   return (

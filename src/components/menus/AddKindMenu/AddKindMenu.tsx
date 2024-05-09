@@ -2,9 +2,10 @@ import React from "react";
 import { BaseMenu } from "../BaseMenu";
 import { MenuItem, Typography } from "@mui/material";
 import { CreateKindDialog } from "components/dialogs";
-import { useDialog } from "hooks";
-import { useDispatch } from "react-redux";
+import { useDialog, useMobileView } from "hooks";
+import { useDispatch, useSelector } from "react-redux";
 import { projectSlice } from "store/project";
+import { selectActiveKindId } from "store/project/selectors";
 
 export const AddKindMenu = ({
   anchor,
@@ -18,6 +19,8 @@ export const AddKindMenu = ({
   filteredKinds: string[];
 }) => {
   const dispatch = useDispatch();
+  const activeKind = useSelector(selectActiveKindId);
+  const isMobile = useMobileView();
   const {
     onOpen: handleOpenCreateKindDialog,
     onClose: handleCloseCreateKindDialog,
@@ -27,7 +30,17 @@ export const AddKindMenu = ({
   const handleUnfilterKind = (kindId: string) => {
     dispatch(projectSlice.actions.removeKindTabFilter({ kindId }));
     dispatch(projectSlice.actions.setActiveKind({ kind: kindId }));
+    if (isMobile) {
+      dispatch(projectSlice.actions.addKindTabFilter({ kindId: activeKind }));
+    }
+    onClose();
+  };
+  const closeActiveKind = () => {
+    dispatch(projectSlice.actions.addKindTabFilter({ kindId: activeKind }));
+  };
+  const handleCloseCreateKindDialogAndMenu = () => {
     handleCloseCreateKindDialog();
+    onClose();
   };
   return (
     <>
@@ -57,8 +70,9 @@ export const AddKindMenu = ({
         ))}
       </BaseMenu>
       <CreateKindDialog
-        onClose={handleCloseCreateKindDialog}
+        onClose={handleCloseCreateKindDialogAndMenu}
         open={isCreateKindDialogOpen}
+        secondaryAction={isMobile ? closeActiveKind : undefined}
       />
     </>
   );

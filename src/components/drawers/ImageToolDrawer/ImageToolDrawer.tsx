@@ -3,15 +3,22 @@ import React, { ReactElement, useState } from "react";
 import { Badge, Drawer, ListItem, ListItemIcon, useTheme } from "@mui/material";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import FolderOpenIcon from "@mui/icons-material/FolderOpen";
+import SortIcon from "@mui/icons-material/Sort";
+import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
+import LabelIcon from "@mui/icons-material/Label";
+import { FileList } from "components/lists";
+import { CategoriesList } from "components/lists";
 
 import { FilterOptions, InformationOptions } from "./tool-options-drawer";
-import { useTranslation } from "hooks";
+import { useMobileView, useTranslation } from "hooks";
 import { ToolOptionsDrawer } from "./tool-options-drawer/ToolOptionsDrawer/ToolOptionsDrawer";
-import { AppBarOffset } from "components/styled-components";
+import { AppBarOffset, SortSelection } from "components/styled-components";
 import { dimensions } from "utils/common/constants";
 import { useSelector } from "react-redux";
 import { ToolHotkeyTitle, TooltipCard } from "components/tooltips";
 import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
+import { ModelTaskSection } from "../ProjectDrawer/ModelTaskSection";
 
 export type OperationType = {
   icon: (color: string) => ReactElement;
@@ -19,9 +26,26 @@ export type OperationType = {
   description: string;
   options: ReactElement;
   hotkey: string;
+  mobile?: boolean;
 };
 
 const imageTools: Record<string, OperationType> = {
+  fileIO: {
+    icon: (color) => <FolderOpenIcon sx={{ color }} />,
+    name: "fileIO",
+    description: "-",
+    options: <FileList />,
+    hotkey: "O",
+    mobile: true,
+  },
+  sort: {
+    icon: (color) => <SortIcon sx={{ color }} />,
+    name: "sort",
+    description: "-",
+    options: <SortSelection />,
+    hotkey: "S",
+    mobile: true,
+  },
   filters: {
     icon: (color) => <FilterAltOutlinedIcon sx={{ color: color }} />,
     name: "filters",
@@ -36,6 +60,22 @@ const imageTools: Record<string, OperationType> = {
     options: <InformationOptions />,
     hotkey: "I",
   },
+  learning: {
+    icon: (color) => <ScatterPlotIcon sx={{ color }} />,
+    name: "learning",
+    description: "-",
+    options: <ModelTaskSection />,
+    hotkey: "L",
+    mobile: true,
+  },
+  categories: {
+    icon: (color) => <LabelIcon sx={{ color }} />,
+    name: "categories",
+    description: "-",
+    options: <CategoriesList />,
+    hotkey: "C",
+    mobile: true,
+  },
 };
 
 //TODO: Icon button
@@ -45,6 +85,7 @@ export const ImageToolDrawer = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const filtersExist = useSelector(selectActiveFilteredStateHasFilters);
   const t = useTranslation();
+  const isMobile = useMobileView();
 
   const handleSelectTool = (toolName: string) => {
     if (activeTool === undefined) {
@@ -62,7 +103,7 @@ export const ImageToolDrawer = () => {
 
   return (
     <>
-      {activeTool && (
+      {activeTool && (!imageTools[activeTool].mobile || isMobile) && (
         <ToolOptionsDrawer
           optionsVisibility={isOpen}
           toolType={imageTools[activeTool]}
@@ -85,7 +126,7 @@ export const ImageToolDrawer = () => {
       >
         <AppBarOffset />
         {Object.values(imageTools).map((tool) => {
-          return (
+          return !tool.mobile || isMobile ? (
             <TooltipCard
               key={`tool-drawer-${tool.name}`}
               description={
@@ -121,6 +162,8 @@ export const ImageToolDrawer = () => {
                 </ListItemIcon>
               </ListItem>
             </TooltipCard>
+          ) : (
+            <React.Fragment key={`tool-drawer-${tool.name}`}></React.Fragment>
           );
         })}
       </Drawer>
