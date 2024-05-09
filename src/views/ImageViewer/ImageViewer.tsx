@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 import { AppBar, Box, CssBaseline } from "@mui/material";
 
-import { useUpload } from "hooks";
+import { useMobileView, useUpload } from "hooks";
 
 import { FallBackDialog, ImageShapeDialog } from "components/dialogs";
 import { ImageViewerDrawer } from "components/drawers";
@@ -29,7 +29,7 @@ export const ImageViewer = () => {
   const [files, setFiles] = useState<FileList>();
   const [optionsVisible, setOptionsVisibile] = useState<boolean>(true);
   const [persistOptions, setPersistOptions] = useState<boolean>(false);
-
+  const isMobile = useMobileView();
   const [imageShape, setImageShape] = useState<ImageShapeInfo>({
     shape: ImageShapeEnum.InvalidImage,
   });
@@ -137,8 +137,7 @@ export const ImageViewer = () => {
           )}
 
           <CssBaseline />
-
-          <ImageViewerDrawer />
+          {isMobile ? <></> : <ImageViewerDrawer />}
 
           <StageWrapper
             onDrop={onDrop}
@@ -155,12 +154,16 @@ export const ImageViewer = () => {
             />
           )}
 
-          <AnnotatorToolDrawer
-            optionsVisibility={optionsVisible}
-            setOptionsVisibility={setOptionsVisibile}
-            persistOptions={persistOptions}
-            setPersistOptions={setPersistOptions}
-          />
+          {isMobile ? (
+            <></>
+          ) : (
+            <AnnotatorToolDrawer
+              optionsVisibility={optionsVisible}
+              setOptionsVisibility={setOptionsVisibile}
+              persistOptions={persistOptions}
+              setPersistOptions={setPersistOptions}
+            />
+          )}
         </Box>
       </ErrorBoundary>
     </StageContext.Provider>

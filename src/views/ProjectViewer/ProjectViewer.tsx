@@ -1,10 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { Box, CssBaseline } from "@mui/material";
 
-import { useErrorHandler, useMenu, useUnloadConfirmation } from "hooks";
+import {
+  useErrorHandler,
+  useMenu,
+  useMobileView,
+  useUnloadConfirmation,
+} from "hooks";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { projectSlice } from "store/project";
@@ -18,14 +23,18 @@ import { ProjectAppBar } from "components/app-bars/";
 import { HotkeyView } from "utils/common/enums";
 import { dataSlice } from "store/data/dataSlice";
 import { selectVisibleKinds } from "store/project/reselectors";
-import { selectKindTabFilters } from "store/project/selectors";
+import {
+  selectActiveKindId,
+  selectKindTabFilters,
+} from "store/project/selectors";
 import { AddKindMenu } from "components/menus";
 
 export const ProjectViewer = () => {
   const dispatch = useDispatch();
-
+  const activeKind = useSelector(selectActiveKindId);
   const visibleKinds = useSelector(selectVisibleKinds) as string[];
   const filteredKinds = useSelector(selectKindTabFilters) as string[];
+  const isMobile = useMobileView();
 
   const {
     onOpen: handleOpenAddKindMenu,
@@ -37,22 +46,24 @@ export const ProjectViewer = () => {
   useErrorHandler();
   useUnloadConfirmation();
 
-  const handleTabClose = (
-    action: "delete" | "hide",
-    item: string,
-    newItem?: string
-  ) => {
-    if (newItem) {
-      dispatch(projectSlice.actions.setActiveKind({ kind: newItem }));
-    }
-    if (action === "delete") {
-      dispatch(
-        dataSlice.actions.deleteKind({ deletedKindId: item, isPermanent: true })
-      );
-    } else {
-      dispatch(projectSlice.actions.addKindTabFilter({ kindId: item }));
-    }
-  };
+  const handleTabClose = useCallback(
+    (action: "delete" | "hide", item: string, newItem?: string) => {
+      if (newItem) {
+        dispatch(projectSlice.actions.setActiveKind({ kind: newItem }));
+      }
+      if (action === "delete") {
+        dispatch(
+          dataSlice.actions.deleteKind({
+            deletedKindId: item,
+            isPermanent: true,
+          })
+        );
+      } else {
+        dispatch(projectSlice.actions.addKindTabFilter({ kindId: item }));
+      }
+    },
+    [dispatch]
+  );
 
   const handleTabChange = (tab: string) => {
     dispatch(projectSlice.actions.setActiveKind({ kind: tab }));
@@ -72,6 +83,14 @@ export const ProjectViewer = () => {
       );
     };
   }, [dispatch]);
+  useEffect(() => {
+    if (isMobile) {
+      const minimizeOnResize = visibleKinds.filter(
+        (kind) => kind !== activeKind
+      );
+      minimizeOnResize.forEach((kind) => handleTabClose("hide", kind));
+    }
+  }, [isMobile, activeKind, handleTabClose, visibleKinds]);
 
   return (
     <div>
@@ -85,12 +104,14 @@ export const ProjectViewer = () => {
 
             <Box
               sx={(theme) => ({
-                maxWidth: `calc(100% - ${dimensions.leftDrawerWidth}px - ${dimensions.toolDrawerWidth}px)`, // magic number draw width
+                maxWidth: `calc(100%  ${
+                  isMobile ? "" : "- " + dimensions.leftDrawerWidth + "px"
+                } - ${dimensions.toolDrawerWidth}px)`, // magic number draw width
                 overflow: "hidden",
                 flexGrow: 1,
                 height: "100%",
                 paddingTop: theme.spacing(8),
-                marginLeft: theme.spacing(32),
+                marginLeft: isMobile ? 0 : theme.spacing(32),
               })}
             >
               <CustomTabSwitcher
