@@ -126,7 +126,7 @@ export const ProjectViewer = () => {
                 ))}
               </CustomTabSwitcher>
             </Box>
-            {process.env.NODE_ENV === "development" && <ImageToolDrawer />}
+            <ImageToolDrawer />
           </Box>
         </div>
 
