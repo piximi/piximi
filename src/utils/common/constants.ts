@@ -89,3 +89,5 @@ export const availableImageSortKeys: ImageSortKeyType[] = [
     objectType: "Annotations",
   },
 ];
+
+export const mobileBreakpoints = ["xs", "sm"];

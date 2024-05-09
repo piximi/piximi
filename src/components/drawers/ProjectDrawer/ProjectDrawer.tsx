@@ -5,9 +5,13 @@ import { BaseAppDrawer } from "../BaseAppDrawer";
 import { FileList } from "components/lists";
 import { CategoriesList } from "components/lists";
 import { ModelTaskSection } from "./ModelTaskSection";
+import { useMobileView } from "hooks";
 
 export const ProjectDrawer = () => {
-  return (
+  const isMobile = useMobileView();
+  return isMobile ? (
+    <></>
+  ) : (
     <BaseAppDrawer>
       <AppBarOffset />
 
