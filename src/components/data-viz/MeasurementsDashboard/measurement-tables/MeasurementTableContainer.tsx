@@ -10,7 +10,7 @@ export const MeasurementTableContainer = ({
   table: GroupedMeasurementDisplayTable;
 }) => {
   return (
-    <Box width="50%" p={2}>
+    <Box p={2}>
       <Paper
         sx={(theme) => ({
           minWidth: "100%",
