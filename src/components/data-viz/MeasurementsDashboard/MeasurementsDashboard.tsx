@@ -1,12 +1,23 @@
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
-import Masonry from "@mui/lab/Masonry";
 
 import { selectTablesMeasurementTableData } from "store/measurements/reselectors";
 import { MeasurementTableContainer } from "./measurement-tables/MeasurementTableContainer";
+import { useBreakpointObserver } from "hooks";
+import { GroupedMeasurementDisplayTable } from "store/measurements/types";
+import { DashboardGrid } from "./DashboardGrid";
 
 export const MeasurementsDashboard = () => {
   const measurementTables = useSelector(selectTablesMeasurementTableData);
+  const breakpoint = useBreakpointObserver();
+  const generateNodes = (tables: GroupedMeasurementDisplayTable[]) => {
+    return tables.map((table) => (
+      <MeasurementTableContainer
+        key={`measurement-table-${table.id}`}
+        table={table}
+      />
+    ));
+  };
 
   return (
     <Box
@@ -21,16 +32,11 @@ export const MeasurementsDashboard = () => {
         overflowY: "scroll",
       })}
     >
-      <Masonry columns={2} spacing={0} sx={{ mx: "auto", width: "90%" }}>
-        {measurementTables.map((table) => {
-          return (
-            <MeasurementTableContainer
-              key={`measurement-table-${table.id}`}
-              table={table}
-            />
-          );
-        })}
-      </Masonry>
+      <DashboardGrid
+        numColumns={["md", "sm", "xs"].includes(breakpoint) ? 1 : 2}
+      >
+        {generateNodes(measurementTables)}
+      </DashboardGrid>
     </Box>
   );
 };
