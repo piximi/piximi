@@ -1,0 +1,3091 @@
+{
+  "format": "graph-model",
+  "generatedBy": "2.16.1",
+  "convertedBy": "TensorFlow.js Converter v4.19.0",
+  "signature": {
+    "inputs": {
+      "input_19": {
+        "name": "input_19:0",
+        "dtype": "DT_FLOAT",
+        "tensorShape": {
+          "dim": [
+            { "size": "-1" },
+            { "size": "768" },
+            { "size": "768" },
+            { "size": "3" }
+          ]
+        }
+      }
+    },
+    "outputs": {
+      "conv2d_307": {
+        "name": "Identity:0",
+        "dtype": "DT_FLOAT",
+        "tensorShape": {
+          "dim": [
+            { "size": "-1" },
+            { "size": "768" },
+            { "size": "768" },
+            { "size": "1" }
+          ]
+        }
+      }
+    }
+  },
+  "modelTopology": {
+    "node": [
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_282/Conv2D/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "256" },
+                  { "size": "256" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_282/BiasAdd/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "256" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_287/Conv2D/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "256" },
+                  { "size": "1024" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_287/BiasAdd/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "1024" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_278/Conv2D/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "128" },
+                  { "size": "128" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_278/BiasAdd/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "128" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_55/concat/axis",
+        "op": "Const",
+        "attr": {
+          "value": { "tensor": { "dtype": "DT_INT32", "tensorShape": {} } },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_291/Conv2D/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "256" },
+                  { "size": "512" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_291/BiasAdd/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "512" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_274/Conv2D/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "64" },
+                  { "size": "64" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_274/BiasAdd/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "64" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_56/concat/axis",
+        "op": "Const",
+        "attr": {
+          "value": { "tensor": { "dtype": "DT_INT32", "tensorShape": {} } },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_295/Conv2D/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "128" },
+                  { "size": "256" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_295/BiasAdd/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "256" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_270/Conv2D/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "32" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_270/BiasAdd/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_57/concat/axis",
+        "op": "Const",
+        "attr": {
+          "value": { "tensor": { "dtype": "DT_INT32", "tensorShape": {} } },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_299/Conv2D/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "64" },
+                  { "size": "128" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_299/BiasAdd/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "128" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_266/Conv2D/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "16" },
+                  { "size": "16" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_266/BiasAdd/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "16" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_58/concat/axis",
+        "op": "Const",
+        "attr": {
+          "value": { "tensor": { "dtype": "DT_INT32", "tensorShape": {} } },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_303/Conv2D/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "32" },
+                  { "size": "64" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_303/BiasAdd/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "64" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_59/concat/axis",
+        "op": "Const",
+        "attr": {
+          "value": { "tensor": { "dtype": "DT_INT32", "tensorShape": {} } },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_307/Conv2D/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "16" },
+                  { "size": "1" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_307/BiasAdd/ReadVariableOp",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "input_19",
+        "op": "Placeholder",
+        "attr": {
+          "shape": {
+            "shape": {
+              "dim": [
+                { "size": "-1" },
+                { "size": "768" },
+                { "size": "768" },
+                { "size": "3" }
+              ]
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_263/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "16" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_294/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "128" },
+                  { "size": "128" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_263/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "16" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_264/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "16" },
+                  { "size": "16" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_294/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "128" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_264/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "16" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_265/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "16" },
+                  { "size": "16" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_265/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "16" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_267/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "16" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_267/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_268/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "32" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_296/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "128" },
+                  { "size": "64" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_268/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_269/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "32" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_296/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "64" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_269/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_304/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "32" },
+                  { "size": "16" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_271/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "32" },
+                  { "size": "64" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_271/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "64" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_297/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "64" },
+                  { "size": "64" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_272/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "64" },
+                  { "size": "64" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_272/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "64" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_297/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "64" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_273/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "64" },
+                  { "size": "64" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_304/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "16" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_273/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "64" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_275/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "64" },
+                  { "size": "128" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_298/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "64" },
+                  { "size": "64" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_275/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "128" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_306/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "16" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_276/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "128" },
+                  { "size": "128" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_298/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "64" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_276/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "128" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_277/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "128" },
+                  { "size": "128" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_277/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "128" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_279/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "128" },
+                  { "size": "256" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_279/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "256" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_280/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "256" },
+                  { "size": "256" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_300/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "64" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_280/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "256" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_305/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "16" },
+                  { "size": "16" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_281/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "256" },
+                  { "size": "256" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_300/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_281/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "256" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_288/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "512" },
+                  { "size": "256" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_301/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "32" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_288/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "256" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_305/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "16" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_289/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "256" },
+                  { "size": "256" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_301/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_289/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "256" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_290/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "256" },
+                  { "size": "256" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_290/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "256" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_302/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "32" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_292/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "256" },
+                  { "size": "128" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_292/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "128" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_302/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_293/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "128" },
+                  { "size": "128" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_293/Conv2D_bn_offset",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "128" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_306/Conv2D_weights",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "16" },
+                  { "size": "16" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_158/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "input_19",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_263/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_263/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_159/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_158/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_264/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_264/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_227/FusedBatchNormV3",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_159/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_265/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_265/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_266/BiasAdd",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_227/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_266/Conv2D/ReadVariableOp",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_266/BiasAdd/ReadVariableOp"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "2", "2", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_160/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_266/BiasAdd",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_267/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_267/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_161/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_160/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_268/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_268/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_230/FusedBatchNormV3",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_161/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_269/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_269/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_270/BiasAdd",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_230/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_270/Conv2D/ReadVariableOp",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_270/BiasAdd/ReadVariableOp"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "2", "2", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_162/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_270/BiasAdd",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_271/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_271/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_163/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_162/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_272/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_272/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_233/FusedBatchNormV3",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_163/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_273/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_273/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_274/BiasAdd",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_233/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_274/Conv2D/ReadVariableOp",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_274/BiasAdd/ReadVariableOp"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "2", "2", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_164/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_274/BiasAdd",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_275/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_275/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_165/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_164/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_276/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_276/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_236/FusedBatchNormV3",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_165/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_277/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_277/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_278/BiasAdd",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_236/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_278/Conv2D/ReadVariableOp",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_278/BiasAdd/ReadVariableOp"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "2", "2", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_166/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_278/BiasAdd",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_279/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_279/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_167/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_166/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_280/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_280/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_239/FusedBatchNormV3",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_167/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_281/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_281/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_282/BiasAdd",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_239/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_282/Conv2D/ReadVariableOp",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_282/BiasAdd/ReadVariableOp"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "2", "2", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_287/BiasAdd",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_282/BiasAdd",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_287/Conv2D/ReadVariableOp",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_287/BiasAdd/ReadVariableOp"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/tf.nn.depth_to_space_21/DepthToSpace",
+        "op": "DepthToSpace",
+        "input": ["StatefulPartitionedCall/Enhanced-U-Net/conv2d_287/BiasAdd"],
+        "attr": {
+          "block_size": { "i": "2" },
+          "data_format": { "s": "TkhXQw==" },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_55/concat",
+        "op": "ConcatV2",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/tf.nn.depth_to_space_21/DepthToSpace",
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_239/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/concatenate_55/concat/axis"
+        ],
+        "attr": {
+          "N": { "i": "2" },
+          "Tidx": { "type": "DT_INT32" },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_172/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/concatenate_55/concat",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_288/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_288/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_173/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_172/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_289/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_289/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_246/FusedBatchNormV3",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_173/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_290/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_290/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_291/BiasAdd",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_246/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_291/Conv2D/ReadVariableOp",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_291/BiasAdd/ReadVariableOp"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/tf.nn.depth_to_space_22/DepthToSpace",
+        "op": "DepthToSpace",
+        "input": ["StatefulPartitionedCall/Enhanced-U-Net/conv2d_291/BiasAdd"],
+        "attr": {
+          "block_size": { "i": "2" },
+          "data_format": { "s": "TkhXQw==" },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_56/concat",
+        "op": "ConcatV2",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/tf.nn.depth_to_space_22/DepthToSpace",
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_236/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/concatenate_56/concat/axis"
+        ],
+        "attr": {
+          "N": { "i": "2" },
+          "T": { "type": "DT_FLOAT" },
+          "Tidx": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_174/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/concatenate_56/concat",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_292/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_292/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_175/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_174/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_293/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_293/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_249/FusedBatchNormV3",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_175/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_294/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_294/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_295/BiasAdd",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_249/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_295/Conv2D/ReadVariableOp",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_295/BiasAdd/ReadVariableOp"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/tf.nn.depth_to_space_23/DepthToSpace",
+        "op": "DepthToSpace",
+        "input": ["StatefulPartitionedCall/Enhanced-U-Net/conv2d_295/BiasAdd"],
+        "attr": {
+          "block_size": { "i": "2" },
+          "data_format": { "s": "TkhXQw==" },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_57/concat",
+        "op": "ConcatV2",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/tf.nn.depth_to_space_23/DepthToSpace",
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_233/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/concatenate_57/concat/axis"
+        ],
+        "attr": {
+          "N": { "i": "2" },
+          "Tidx": { "type": "DT_INT32" },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_176/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/concatenate_57/concat",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_296/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_296/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_177/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_176/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_297/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_297/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_252/FusedBatchNormV3",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_177/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_298/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_298/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_299/BiasAdd",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_252/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_299/Conv2D/ReadVariableOp",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_299/BiasAdd/ReadVariableOp"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/tf.nn.depth_to_space_24/DepthToSpace",
+        "op": "DepthToSpace",
+        "input": ["StatefulPartitionedCall/Enhanced-U-Net/conv2d_299/BiasAdd"],
+        "attr": {
+          "block_size": { "i": "2" },
+          "data_format": { "s": "TkhXQw==" },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_58/concat",
+        "op": "ConcatV2",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/tf.nn.depth_to_space_24/DepthToSpace",
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_230/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/concatenate_58/concat/axis"
+        ],
+        "attr": {
+          "N": { "i": "2" },
+          "T": { "type": "DT_FLOAT" },
+          "Tidx": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_178/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/concatenate_58/concat",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_300/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_300/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_179/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_178/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_301/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_301/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_255/FusedBatchNormV3",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_179/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_302/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_302/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_303/BiasAdd",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_255/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_303/Conv2D/ReadVariableOp",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_303/BiasAdd/ReadVariableOp"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/tf.nn.depth_to_space_25/DepthToSpace",
+        "op": "DepthToSpace",
+        "input": ["StatefulPartitionedCall/Enhanced-U-Net/conv2d_303/BiasAdd"],
+        "attr": {
+          "block_size": { "i": "2" },
+          "data_format": { "s": "TkhXQw==" },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_59/concat",
+        "op": "ConcatV2",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/tf.nn.depth_to_space_25/DepthToSpace",
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_227/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/concatenate_59/concat/axis"
+        ],
+        "attr": {
+          "N": { "i": "2" },
+          "T": { "type": "DT_FLOAT" },
+          "Tidx": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_180/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/concatenate_59/concat",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_304/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_304/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_181/LeakyRelu",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_180/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_305/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_305/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "TGVha3lSZWx1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.3 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_258/FusedBatchNormV3",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/leaky_re_lu_181/LeakyRelu",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_306/Conv2D_weights",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_306/Conv2D_bn_offset"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_307/BiasAdd",
+        "op": "_FusedConv2D",
+        "input": [
+          "StatefulPartitionedCall/Enhanced-U-Net/batch_normalization_258/FusedBatchNormV3",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_307/Conv2D/ReadVariableOp",
+          "StatefulPartitionedCall/Enhanced-U-Net/conv2d_307/BiasAdd/ReadVariableOp"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_host_args": { "i": "0" },
+          "data_format": { "s": "TkhXQw==" },
+          "filter_format": { "s": "SFdJTw==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "TArgs": { "list": { "type": ["DT_FLOAT"] } },
+          "padding": { "s": "VkFMSUQ=" },
+          "use_cudnn_on_gpu": { "b": true },
+          "leakyrelu_alpha": { "f": 0.2 },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "Identity",
+        "op": "Identity",
+        "input": ["StatefulPartitionedCall/Enhanced-U-Net/conv2d_307/BiasAdd"],
+        "attr": { "T": { "type": "DT_FLOAT" } }
+      }
+    ],
+    "library": {},
+    "versions": { "producer": 1766 }
+  },
+  "weightsManifest": [
+    {
+      "paths": [
+        "group1-shard1of5.bin",
+        "group1-shard2of5.bin",
+        "group1-shard3of5.bin",
+        "group1-shard4of5.bin",
+        "group1-shard5of5.bin"
+      ],
+      "weights": [
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_282/Conv2D/ReadVariableOp",
+          "shape": [3, 3, 256, 256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_282/BiasAdd/ReadVariableOp",
+          "shape": [256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_287/Conv2D/ReadVariableOp",
+          "shape": [1, 1, 256, 1024],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_287/BiasAdd/ReadVariableOp",
+          "shape": [1024],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_278/Conv2D/ReadVariableOp",
+          "shape": [3, 3, 128, 128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_278/BiasAdd/ReadVariableOp",
+          "shape": [128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_55/concat/axis",
+          "shape": [],
+          "dtype": "int32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_291/Conv2D/ReadVariableOp",
+          "shape": [1, 1, 256, 512],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_291/BiasAdd/ReadVariableOp",
+          "shape": [512],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_274/Conv2D/ReadVariableOp",
+          "shape": [3, 3, 64, 64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_274/BiasAdd/ReadVariableOp",
+          "shape": [64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_56/concat/axis",
+          "shape": [],
+          "dtype": "int32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_295/Conv2D/ReadVariableOp",
+          "shape": [1, 1, 128, 256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_295/BiasAdd/ReadVariableOp",
+          "shape": [256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_270/Conv2D/ReadVariableOp",
+          "shape": [3, 3, 32, 32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_270/BiasAdd/ReadVariableOp",
+          "shape": [32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_57/concat/axis",
+          "shape": [],
+          "dtype": "int32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_299/Conv2D/ReadVariableOp",
+          "shape": [1, 1, 64, 128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_299/BiasAdd/ReadVariableOp",
+          "shape": [128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_266/Conv2D/ReadVariableOp",
+          "shape": [3, 3, 16, 16],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_266/BiasAdd/ReadVariableOp",
+          "shape": [16],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_58/concat/axis",
+          "shape": [],
+          "dtype": "int32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_303/Conv2D/ReadVariableOp",
+          "shape": [1, 1, 32, 64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_303/BiasAdd/ReadVariableOp",
+          "shape": [64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/concatenate_59/concat/axis",
+          "shape": [],
+          "dtype": "int32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_307/Conv2D/ReadVariableOp",
+          "shape": [1, 1, 16, 1],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_307/BiasAdd/ReadVariableOp",
+          "shape": [1],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_263/Conv2D_weights",
+          "shape": [3, 3, 3, 16],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_294/Conv2D_weights",
+          "shape": [1, 1, 128, 128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_263/Conv2D_bn_offset",
+          "shape": [16],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_264/Conv2D_weights",
+          "shape": [3, 3, 16, 16],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_294/Conv2D_bn_offset",
+          "shape": [128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_264/Conv2D_bn_offset",
+          "shape": [16],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_265/Conv2D_weights",
+          "shape": [1, 1, 16, 16],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_265/Conv2D_bn_offset",
+          "shape": [16],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_267/Conv2D_weights",
+          "shape": [3, 3, 16, 32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_267/Conv2D_bn_offset",
+          "shape": [32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_268/Conv2D_weights",
+          "shape": [3, 3, 32, 32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_296/Conv2D_weights",
+          "shape": [3, 3, 128, 64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_268/Conv2D_bn_offset",
+          "shape": [32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_269/Conv2D_weights",
+          "shape": [1, 1, 32, 32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_296/Conv2D_bn_offset",
+          "shape": [64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_269/Conv2D_bn_offset",
+          "shape": [32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_304/Conv2D_weights",
+          "shape": [3, 3, 32, 16],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_271/Conv2D_weights",
+          "shape": [3, 3, 32, 64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_271/Conv2D_bn_offset",
+          "shape": [64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_297/Conv2D_weights",
+          "shape": [3, 3, 64, 64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_272/Conv2D_weights",
+          "shape": [3, 3, 64, 64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_272/Conv2D_bn_offset",
+          "shape": [64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_297/Conv2D_bn_offset",
+          "shape": [64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_273/Conv2D_weights",
+          "shape": [1, 1, 64, 64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_304/Conv2D_bn_offset",
+          "shape": [16],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_273/Conv2D_bn_offset",
+          "shape": [64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_275/Conv2D_weights",
+          "shape": [3, 3, 64, 128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_298/Conv2D_weights",
+          "shape": [1, 1, 64, 64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_275/Conv2D_bn_offset",
+          "shape": [128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_306/Conv2D_bn_offset",
+          "shape": [16],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_276/Conv2D_weights",
+          "shape": [3, 3, 128, 128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_298/Conv2D_bn_offset",
+          "shape": [64],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_276/Conv2D_bn_offset",
+          "shape": [128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_277/Conv2D_weights",
+          "shape": [1, 1, 128, 128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_277/Conv2D_bn_offset",
+          "shape": [128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_279/Conv2D_weights",
+          "shape": [3, 3, 128, 256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_279/Conv2D_bn_offset",
+          "shape": [256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_280/Conv2D_weights",
+          "shape": [3, 3, 256, 256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_300/Conv2D_weights",
+          "shape": [3, 3, 64, 32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_280/Conv2D_bn_offset",
+          "shape": [256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_305/Conv2D_weights",
+          "shape": [3, 3, 16, 16],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_281/Conv2D_weights",
+          "shape": [1, 1, 256, 256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_300/Conv2D_bn_offset",
+          "shape": [32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_281/Conv2D_bn_offset",
+          "shape": [256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_288/Conv2D_weights",
+          "shape": [3, 3, 512, 256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_301/Conv2D_weights",
+          "shape": [3, 3, 32, 32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_288/Conv2D_bn_offset",
+          "shape": [256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_305/Conv2D_bn_offset",
+          "shape": [16],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_289/Conv2D_weights",
+          "shape": [3, 3, 256, 256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_301/Conv2D_bn_offset",
+          "shape": [32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_289/Conv2D_bn_offset",
+          "shape": [256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_290/Conv2D_weights",
+          "shape": [1, 1, 256, 256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_290/Conv2D_bn_offset",
+          "shape": [256],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_302/Conv2D_weights",
+          "shape": [1, 1, 32, 32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_292/Conv2D_weights",
+          "shape": [3, 3, 256, 128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_292/Conv2D_bn_offset",
+          "shape": [128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_302/Conv2D_bn_offset",
+          "shape": [32],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_293/Conv2D_weights",
+          "shape": [3, 3, 128, 128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_293/Conv2D_bn_offset",
+          "shape": [128],
+          "dtype": "float32"
+        },
+        {
+          "name": "StatefulPartitionedCall/Enhanced-U-Net/conv2d_306/Conv2D_weights",
+          "shape": [1, 1, 16, 16],
+          "dtype": "float32"
+        }
+      ]
+    }
+  ]
+}
