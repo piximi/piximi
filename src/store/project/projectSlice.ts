@@ -213,5 +213,8 @@ export const projectSlice = createSlice({
         (id) => id !== action.payload.kindId
       );
     },
+    removeAllKindTabFilters(state) {
+      state.kindTabFilters = [];
+    },
   },
 });
