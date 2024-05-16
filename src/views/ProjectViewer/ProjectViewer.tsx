@@ -92,6 +92,12 @@ export const ProjectViewer = () => {
     }
   }, [isMobile, activeKind, handleTabClose, visibleKinds]);
 
+  useEffect(() => {
+    if (!isMobile) {
+      dispatch(projectSlice.actions.removeAllKindTabFilters());
+    }
+  }, [isMobile, dispatch]);
+
   return (
     <div>
       <ErrorBoundary FallbackComponent={FallBackDialog}>
