@@ -200,6 +200,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     );
     return;
   }
+
   try {
     if (!hasOwnKinds) {
       const uniquePredictedKinds = [
@@ -241,6 +242,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     const annotations: AnnotationObject[] = [];
     for await (const [i, _annotations] of predictedAnnotations.entries()) {
       const image = inferenceImages[i];
+
       const imageJsImage = await Image.load(image.src);
 
       for (let j = 0; j < _annotations.length; j++) {
@@ -249,6 +251,9 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
         const width = bbox[2] - bbox[0];
         const height = bbox[3] - bbox[1];
 
+        if (bbox[1] + height > imageJsImage.height) {
+          continue;
+        }
         const annObj = imageJsImage.crop({
           x: bbox[0],
           y: bbox[1],
@@ -262,7 +267,9 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
           width,
           height,
         };
-        const data = tf.browser.fromPixels(annObj).expandDims(1) as tf.Tensor4D;
+        const data = tf.tidy(() =>
+          tf.browser.fromPixels(annObj).expandDims(1)
+        ) as tf.Tensor4D;
 
         ann.src = src;
         ann.data = data;

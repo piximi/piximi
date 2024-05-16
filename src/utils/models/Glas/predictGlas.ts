@@ -8,6 +8,7 @@ import {
   whereAsync,
   GraphModel,
   Tensor3D,
+  tensor3d,
 } from "@tensorflow/tfjs";
 import { ColorModel, Image as ImageJS, ImageKind } from "image-js";
 
@@ -23,7 +24,7 @@ const labelToAnnotation = async (
   maskW: number,
   kindId: string,
   unknownCategoryId: string
-): Promise<OrphanedAnnotationObject> => {
+): Promise<OrphanedAnnotationObject | undefined> => {
   const labelFilter = tidy(() => onesLike(labelMask).mul(label));
 
   // bool
@@ -54,8 +55,8 @@ const labelToAnnotation = async (
   let maxY = 0;
 
   idxsArr.forEach((idx) => {
-    const Y = getY(idx);
-    const X = getX(idx);
+    let Y = getY(idx);
+    let X = getX(idx);
 
     minY = Y < minY ? Y : minY;
     minX = X < minX ? X : minX;
@@ -64,8 +65,13 @@ const labelToAnnotation = async (
   });
 
   const bbox = [minX, minY, maxX, maxY];
+
   const boxW = maxX - minX;
   const boxH = maxY - minY;
+
+  if (boxH === 0 || boxW === 0) {
+    return;
+  }
 
   const maskImage = new ImageJS({
     width: maskW,
@@ -120,7 +126,9 @@ const labelMaskToAnnotation = async (
         kindId,
         unknownCategoryId
       );
-      annotations.push(annotation);
+      if (annotation) {
+        annotations.push(annotation);
+      }
     }
   }
 
@@ -134,12 +142,15 @@ export const predictGlas = async (
   model: GraphModel,
   imTensor: Tensor4D,
   fgKindId: string,
-  unknownCategoryId: string
+  unknownCategoryId: string,
+  inputImDims: {
+    width: number;
+    height: number;
+  }
 ) => {
-  const X = imTensor.resizeBilinear([768, 768]) as Tensor4D;
-  const yHat = model.execute(X) as Tensor4D;
-  model.dispose();
-  X.dispose();
+  const yHat = model.execute(imTensor) as Tensor4D;
+
+  imTensor.dispose();
 
   const output = yHat.reshape([
     yHat.shape[1],
@@ -152,6 +163,8 @@ export const predictGlas = async (
     // probably should be astype("bool")
     output.sigmoid().greater(0.5).mul(255).round().asType("int32")
   ) as Tensor3D;
+
+  output.dispose();
 
   const height = outputImageTensor.shape[0];
   const width = outputImageTensor.shape[1];
@@ -167,6 +180,7 @@ export const predictGlas = async (
     colorModel: "GREY" as ColorModel,
   });
 
+  outputImageTensor.dispose();
   const erodedImage = image.erode({
     kernel: [
       [0, 0, 0, 0, 1, 0, 0, 0, 0],
@@ -193,18 +207,41 @@ export const predictGlas = async (
     iterations: 1,
   });
 
+  const labelMaskTensor = tidy(() =>
+    tensor3d(dilatedImage.data as Uint8Array, [
+      dilatedImage.height,
+      dilatedImage.width,
+      1,
+    ])
+      .resizeBilinear([inputImDims.height, inputImDims.width])
+      .asType("float32")
+  ) as Tensor3D;
+
+  const resizedImage = new ImageJS({
+    width: inputImDims.height,
+    height: inputImDims.width,
+    data: labelMaskTensor.dataSync(),
+    kind: "GREY" as ImageKind,
+    bitDepth: 8,
+    components: 1,
+    alpha: 0,
+    colorModel: "GREY" as ColorModel,
+  });
+
+  labelMaskTensor.dispose();
+
   const labelMask = labelConnectedComponents(
-    dilatedImage.data as Uint8Array,
-    dilatedImage.width,
-    dilatedImage.height
+    resizedImage.data as Uint8Array,
+    resizedImage.width,
+    resizedImage.height
   );
 
   const maskTensor = tensor1d(labelMask);
 
   const annotations = await labelMaskToAnnotation(
     maskTensor,
-    imTensor.shape[1],
-    imTensor.shape[2],
+    inputImDims.height,
+    inputImDims.width,
     fgKindId,
     unknownCategoryId
   );
