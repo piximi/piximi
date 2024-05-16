@@ -1,5 +1,4 @@
 import { GraphModel, History, LayersModel } from "@tensorflow/tfjs";
-
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessGlas } from "./preprocessGlas";
 import { predictGlas } from "./predictGlas";
@@ -9,23 +8,12 @@ import { ModelTask } from "../enums";
 import { Kind, ImageObject } from "store/data/types";
 import { loadGlas } from "./loadGlas";
 
-/*
- * Stardist (Versatile) H&E Nuclei Segmentation
- * https://zenodo.org/record/6338615
- * https://bioimage.io/#/?tags=stardist&id=10.5281%2Fzenodo.6338614&type=model
- * https://github.com/stardist/stardist/blob/master/README.md#pretrained-models-for-2d
- * Stardist: model for object detection / instance segmentation with star-convex shapes
- * This pretrained model: meant to segment individual cell nuclei from brightfield images with H&E staining
- */
 export class Glas extends Segmenter {
   protected _fgKind?: Kind;
   protected _inferenceDataDims?: Array<{
     width: number;
     height: number;
-    padX: number;
-    padY: number;
   }>;
-
   constructor() {
     super({
       name: "Glas",
@@ -39,10 +27,6 @@ export class Glas extends Segmenter {
 
   public async loadModel() {
     if (this._model) return;
-    // inputs: [ {name: 'input', shape: [-1,-1,-1,3], dtype: 'float32'} ]
-    // outputs: [ {name: 'concatenate_4/concat', shape: [-1, -1, -1, 33], dtype: 'float32'} ]
-    // where each -1 matches on input and output of corresponding dim/axis
-    // 33 -> 1 probability score, followed by 32 radial equiangular distances of rays
     this._model = await loadGlas();
   }
 
@@ -50,30 +34,15 @@ export class Glas extends Segmenter {
 
   public loadValidation(images: ImageObject[], preprocessingArgs: any): void {}
 
-  // This Stardist model requires image dimensions to be a multiple of 16
-  // (for VHE in particular), see:
-  // https://github.com/stardist/stardist/blob/468c60552c8c93403969078e51bddc9c2c702035/stardist/models/model2d.py#L543
-  // https://github.com/stardist/stardist/blob/master/stardist/models/model2d.py#L201C30-L201C30
-  // and config here (under source -> grid): https://bioimage.io/#/?tags=stardist&id=10.5281%2Fzenodo.6338614
-  // basically, in the case of VHE: 2^3 * 2 = 16
-  protected _getPaddings(height: number, width: number) {
-    const padY = height % 16 === 0 ? 0 : 16 - (height % 16);
-    const padX = width % 16 === 0 ? 0 : 16 - (width % 16);
-
-    return { padY, padX };
-  }
-
   public loadInference(
     images: ImageObject[],
     preprocessingArgs: LoadInferenceDataArgs
   ): void {
     this._inferenceDataDims = images.map((im) => {
       const { height, width } = im.shape;
-      const { padX, padY } = this._getPaddings(height, width);
-      return { height, width, padY, padX };
+      return { height, width };
     });
-
-    this._inferenceDataset = preprocessGlas(images, 1, this._inferenceDataDims);
+    this._inferenceDataset = preprocessGlas(images, 1);
 
     if (preprocessingArgs.kinds) {
       if (preprocessingArgs.kinds.length !== 1)
@@ -84,7 +53,7 @@ export class Glas extends Segmenter {
     } else if (!this._fgKind) {
       const unknownCategoryId = generateUUID({ definesUnknown: true });
       this._fgKind = {
-        id: "Nucleus",
+        id: "Glands",
         categories: [unknownCategoryId],
         containing: [],
         unknownCategoryId,
@@ -117,22 +86,18 @@ export class Glas extends Segmenter {
       throw Error(`"${this.name}" Model's foreground kind is not loaded`);
     }
 
-    if (!this._inferenceDataDims) {
-      throw Error(
-        `"${this.name}" Model's inference data dimensions and padding information not loaded`
-      );
-    }
-
     const graphModel = this._model as GraphModel;
 
     const infT = await this._inferenceDataset.toArray();
-    // imTensor disposed in `predictStardist`
+    // imTensor disposed in `predictGlas`
+
     const annotationsPromises = infT.map((imTensor, idx) => {
       return predictGlas(
         graphModel,
         imTensor,
         this._fgKind!.id,
-        this._fgKind!.unknownCategoryId
+        this._fgKind!.unknownCategoryId,
+        this._inferenceDataDims![idx]
       );
     });
     const annotations = await Promise.all(annotationsPromises);
@@ -152,7 +117,6 @@ export class Glas extends Segmenter {
   }
 
   public override dispose() {
-    this._inferenceDataDims = undefined;
     this._fgKind = undefined;
     super.dispose();
   }
