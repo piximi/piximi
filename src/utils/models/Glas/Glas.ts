@@ -16,7 +16,7 @@ export class Glas extends Segmenter {
   }>;
   constructor() {
     super({
-      name: "Glas",
+      name: "GlandSegmentation",
       task: ModelTask.Segmentation,
       graph: true,
       pretrained: true,
