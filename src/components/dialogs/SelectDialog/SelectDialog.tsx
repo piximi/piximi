@@ -36,10 +36,6 @@ export const SelectDialog = ({
     setCurrentOption(event.target.value as string);
   };
 
-  const closeDialog = () => {
-    onClose();
-  };
-
   useHotkeys(
     "enter",
     () => onConfirm(currentOption),
@@ -50,7 +46,7 @@ export const SelectDialog = ({
 
   return (
     <DialogWithAction
-      onClose={closeDialog}
+      onClose={onClose}
       isOpen={open}
       title={title}
       content={

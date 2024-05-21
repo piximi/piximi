@@ -1,4 +1,3 @@
-import { Tensor2D } from "@tensorflow/tfjs";
 export interface SelectionTreeItem {
   id: string;
   name: string;
@@ -15,11 +14,12 @@ export type MeasurementTable = {
   name: string;
   measurementsStatus: SelectionTreeItems;
   splitStatus: SelectionTreeItems;
+  thingIds: string[];
 };
 
 export type MeasurementsData = Record<
   string,
-  { channelData: Tensor2D; measurements: Record<string, number> }
+  { channelData: number[][]; measurements: Record<string, number> }
 >;
 
 export type MeasurementsState = {
