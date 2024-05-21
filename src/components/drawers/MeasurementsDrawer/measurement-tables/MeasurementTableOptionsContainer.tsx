@@ -1,28 +1,64 @@
 import { Box, IconButton, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { MeasurementTableOptions } from "./MeasurementTableOptions";
 import { SelectDialog } from "components/dialogs";
 import { Add } from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { selectMeasurementTables } from "store/measurements/selectors";
-import { selectAllKindIds, selectCategoriesByKind } from "store/data/selectors";
+import {
+  selectCategoriesByKind,
+  selectKindDictionary,
+  selectThingsDictionary,
+} from "store/data/selectors";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
 import { useDialog } from "hooks";
+import { DataArray } from "utils/file-io/types";
 
 export const MeasurementTableOptionsContainer = () => {
   const tables = useSelector(selectMeasurementTables);
   const categoriesByKind = useSelector(selectCategoriesByKind);
-  const kinds = useSelector(selectAllKindIds);
+  const kinds = useSelector(selectKindDictionary);
+  const [kindOptions, setKindOptions] = useState<string[]>(Object.keys(kinds));
+  const thingData = useSelector(selectThingsDictionary);
   const dispatch = useDispatch();
   const [expandedTable, setExpandedTable] = useState<string | undefined>();
+  const worker: Worker = useMemo(
+    () => new Worker(new URL("./worker.ts", import.meta.url)),
+    []
+  );
+
+  const {
+    onClose: handleCloseTableDialog,
+    onOpen: handleOpenTableDialog,
+    open: isTableDialogOpen,
+  } = useDialog();
 
   const handleCreateTable = (kind: string) => {
-    dispatch(
-      measurementsSlice.actions.createTable({
-        kind,
-        categories: categoriesByKind(kind),
-      })
-    );
+    const thingIds = kinds[kind].containing;
+    const convertedThingData: {
+      id: string;
+      kind: string;
+      data: number[][][][];
+      encodedMask?: number[];
+      decodedMask?: DataArray;
+    }[] = thingIds.map((thingId) => {
+      const thing = thingData[thingId];
+      if ("encodedMask" in thing) {
+        return {
+          id: thing.id,
+          kind: kind,
+          data: thing.data.arraySync(),
+          encodedMask: thing.encodedMask,
+          decodedMask: thing.decodedMask,
+        };
+      } else {
+        return { id: thing.id, kind: kind, data: thing.data.arraySync() };
+      }
+    });
+
+    if (window.Worker) {
+      worker.postMessage({ kind: kind, things: convertedThingData });
+    }
   };
   const handleTableTreeExpand = (tableId: string) => {
     setExpandedTable((currentId) => {
@@ -30,11 +66,32 @@ export const MeasurementTableOptionsContainer = () => {
     });
   };
 
-  const {
-    onClose: handleCloseTableDialog,
-    onOpen: handleOpenTableDialog,
-    open: isTableDialogOpen,
-  } = useDialog();
+  useEffect(() => {
+    setKindOptions(Object.keys(kinds));
+  }, [kinds]);
+
+  useEffect(() => {
+    if (window.Worker) {
+      worker.onmessage = (
+        e: MessageEvent<{ kind: string; channels: Record<string, number[][]> }>
+      ) => {
+        batch(() => {
+          dispatch(
+            measurementsSlice.actions.createTable({
+              kind: e.data.kind,
+              categories: categoriesByKind(e.data.kind),
+              thingIds: Object.keys(e.data.channels),
+            })
+          );
+          dispatch(
+            measurementsSlice.actions.updateMeasurements({
+              channelDataDict: e.data.channels,
+            })
+          );
+        });
+      };
+    }
+  }, [worker, dispatch, categoriesByKind]);
 
   return (
     <>
@@ -100,7 +157,7 @@ export const MeasurementTableOptionsContainer = () => {
       <SelectDialog
         open={isTableDialogOpen}
         onClose={handleCloseTableDialog}
-        options={kinds as string[]}
+        options={kindOptions as string[]}
         selectLabel="Kind"
         title="Create Measurement Table"
         onConfirm={handleCreateTable}

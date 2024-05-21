@@ -10,7 +10,6 @@ import { merge } from "lodash";
 import { baseMeasurementOptions } from "./constants";
 import { Category } from "store/data/types";
 import { Partition } from "utils/models/enums";
-import { Tensor2D } from "@tensorflow/tfjs";
 
 const initialState: MeasurementsState = {
   measurementData: {},
@@ -58,7 +57,11 @@ export const measurementsSlice = createSlice({
     },
     createTable(
       state,
-      action: PayloadAction<{ kind: string; categories: Category[] }>
+      action: PayloadAction<{
+        kind: string;
+        categories: Category[];
+        thingIds: string[];
+      }>
     ) {
       const tableId = generateUUID();
 
@@ -108,7 +111,7 @@ export const measurementsSlice = createSlice({
         kind: action.payload.kind,
         measurementsStatus: state.measurementsStatus,
         splitStatus: tableSplitStatus,
-        measuredThings: [],
+        thingIds: [],
       } as MeasurementTable;
     },
     removeTable(state, action: PayloadAction<{ tableId: string }>) {
@@ -150,7 +153,7 @@ export const measurementsSlice = createSlice({
     updateMeasurements(
       state,
       action: PayloadAction<{
-        channelDataDict?: Record<string, Tensor2D>;
+        channelDataDict?: Record<string, number[][]>;
         measurementsDict?: Record<string, Record<string, number>>;
       }>
     ) {

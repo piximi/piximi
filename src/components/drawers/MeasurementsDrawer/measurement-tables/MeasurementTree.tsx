@@ -1,11 +1,17 @@
-import React from "react";
-import { selectSelectedTableMeasurements } from "store/measurements/selectors";
+import React, { useEffect, useMemo } from "react";
+import {
+  selectMeasurementData,
+  selectSelectedTableMeasurements,
+} from "store/measurements/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { SelectionTreeItems, MeasurementTable } from "store/measurements/types";
 import { RecursivePartial } from "utils/common/types";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
 import { SelectionTree } from "components/styled-components";
-import { selectTreeItemChildren } from "utils/common/helpers";
+import { isObjectEmpty, selectTreeItemChildren } from "utils/common/helpers";
+import { AnnotationObject, ImageObject } from "store/data/types";
+import { intersection } from "lodash";
+import { selectThingsDictionary } from "store/data/selectors";
 
 export const TableMeasurementTree = ({
   table,
@@ -15,6 +21,12 @@ export const TableMeasurementTree = ({
   const dispatch = useDispatch();
   const selectedMeasurements = useSelector(selectSelectedTableMeasurements)(
     table.id
+  );
+  const thingDict = useSelector(selectThingsDictionary);
+  const measurementData = useSelector(selectMeasurementData);
+  const measurementWorker: Worker = useMemo(
+    () => new Worker(new URL("./measurementWorker.ts", import.meta.url)),
+    []
   );
 
   const handleSelect = (event: React.SyntheticEvent, itemIds: string[]) => {
@@ -29,7 +41,20 @@ export const TableMeasurementTree = ({
       table.measurementsStatus,
       updatedSelectionStatus
     );
+    const { splitThings, activeMeasurements } = prepareMeasure(
+      table.kind,
+      thingDict,
+      table.splitStatus,
+      updates
+    );
 
+    if (window.Worker) {
+      measurementWorker.postMessage({
+        currentMeasurements: measurementData,
+        activeMeasurements,
+        thingIds: splitThings,
+      });
+    }
     dispatch(
       measurementsSlice.actions.updateTableMeasurementState({
         tableId: table.id,
@@ -37,6 +62,22 @@ export const TableMeasurementTree = ({
       })
     );
   };
+
+  useEffect(() => {
+    if (window.Worker) {
+      measurementWorker.onmessage = (
+        e: MessageEvent<Record<string, Record<string, number>>>
+      ) => {
+        if (!isObjectEmpty(e.data)) {
+          dispatch(
+            measurementsSlice.actions.updateMeasurements({
+              measurementsDict: e.data,
+            })
+          );
+        }
+      };
+    }
+  }, [measurementWorker, dispatch]);
 
   return (
     <SelectionTree
@@ -46,4 +87,44 @@ export const TableMeasurementTree = ({
       entryPoint="intensity"
     />
   );
+};
+
+const prepareMeasure = (
+  kind: string,
+  things: Record<string, AnnotationObject | ImageObject>,
+  splitStatus: SelectionTreeItems,
+  updatedMeasurements: RecursivePartial<SelectionTreeItems>
+) => {
+  const includeSplits: string[] = [];
+  Object.values(splitStatus).forEach((split) => {
+    if (split.state === "on") {
+      includeSplits.push(split.id.toLowerCase());
+    }
+  });
+
+  const splitThings = Object.values(things).reduce((split: string[], thing) => {
+    if (thing.kind === kind) {
+      const identifiers = [
+        thing.categoryId.toLowerCase(),
+        thing.partition.toLowerCase(),
+      ];
+      const matchedIdentifiers = intersection(identifiers, includeSplits);
+      if (matchedIdentifiers.length > 0) {
+        split.push(thing.id);
+      }
+    }
+    return split;
+  }, []);
+
+  const activeMeasurements = Object.entries(updatedMeasurements).reduce(
+    (active: string[], measurement) => {
+      if (measurement[1]!.state === "on") {
+        active.push(measurement[0]);
+      }
+      return active;
+    },
+    []
+  );
+
+  return { splitThings, activeMeasurements };
 };
