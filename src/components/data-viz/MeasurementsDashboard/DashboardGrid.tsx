@@ -26,9 +26,12 @@ export const DashboardGrid = ({
   }, [numColumns, children]);
   return (
     <Box display="flex" flexDirection="row" width="100%">
-      {nodeColumns.map((column) => {
+      {nodeColumns.map((column, idx) => {
         return (
-          <Stack width={100 / numColumns + "%"}>
+          <Stack
+            key={`dashboardGridColumn-${idx}`}
+            width={100 / numColumns + "%"}
+          >
             {column.map((child) => {
               return child;
             })}

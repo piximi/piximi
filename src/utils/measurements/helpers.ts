@@ -1,4 +1,15 @@
-import { Tensor1D, Tensor4D, moments, tidy, topk } from "@tensorflow/tfjs";
+import {
+  Tensor1D,
+  Tensor4D,
+  moments,
+  tidy,
+  topk,
+  stack,
+  Tensor2D,
+  tensor1d,
+  booleanMaskAsync,
+} from "@tensorflow/tfjs";
+import { DataArray } from "utils/file-io/types";
 
 //TODO: Write tests
 export const sortTensor = (tensor: Tensor1D): Tensor1D => {
@@ -56,78 +67,96 @@ export const getTensorMAD = (tensor: Tensor1D, sorted?: boolean): Tensor1D => {
   });
 };
 
-export const getMeasurement = (
-  thingData: Tensor4D,
-  measuredChannel: number,
+export const prepareChannels = (thingData: Tensor4D) => {
+  return tidy(() => {
+    const [planes, height, width, channels] = thingData.shape;
+    const numPixels = planes * width * height;
+    const squashedTensor = thingData.reshape([numPixels, channels]);
+
+    const channelTensors: Array<Tensor1D> = [];
+    for (let i = 0; i < channels; i++) {
+      const gatheredTensor = squashedTensor.gather([i], 1);
+      const channelTensor = gatheredTensor.flatten();
+      channelTensors.push(channelTensor);
+    }
+
+    return stack(channelTensors) as Tensor2D;
+  });
+};
+export const getIntensityMeasurement = (
+  channelTensor: Tensor1D,
   measurement: string
 ) => {
-  const [planes, height, width, channels] = thingData.shape;
-  const numPixels = planes * width * height;
-  const squashedTensor = thingData.reshape([numPixels, channels]);
-  const gatheredTensor = squashedTensor.gather([measuredChannel], 1);
-  squashedTensor.dispose();
-  const channelTensor = gatheredTensor.flatten();
-  gatheredTensor.dispose();
   const sortedChannelTensor = sortTensor(channelTensor);
 
   let measurementResults: number | undefined = undefined;
 
   switch (measurement) {
     case "intensity-total":
-      const total = channelTensor.sum().arraySync() as number;
+      const total = tidy(() => {
+        return channelTensor.sum().arraySync() as number;
+      });
 
       measurementResults = total;
       break;
 
     case "intensity-mean":
-      const mean = channelTensor.mean().arraySync() as number;
+      const mean = tidy(() => {
+        return channelTensor.mean().arraySync() as number;
+      });
 
       measurementResults = mean;
       break;
 
     case "intensity-median":
-      const median = getTensorMedian(sortedChannelTensor, true).arraySync();
+      const median = tidy(() => {
+        return getTensorMedian(sortedChannelTensor, true).arraySync();
+      });
 
       measurementResults = Array.isArray(median) ? median[0] : median;
       break;
 
     case "intensity-std":
-      const std = getTensorStdDev(sortedChannelTensor).arraySync();
+      const std = tidy(() => {
+        return getTensorStdDev(sortedChannelTensor).arraySync();
+      });
 
       measurementResults = Array.isArray(std) ? std[0] : std;
       break;
     case "intensity-MAD":
-      const mad = getTensorMAD(sortedChannelTensor, true).arraySync();
+      const mad = tidy(() => {
+        return getTensorMAD(sortedChannelTensor, true).arraySync();
+      });
 
       measurementResults = Array.isArray(mad) ? mad[0] : mad;
       break;
     case "intensity-min":
-      const min = channelTensor.min().arraySync() as number;
+      const min = tidy(() => {
+        return channelTensor.min().arraySync() as number;
+      });
 
       measurementResults = min;
       break;
     case "intensity-max":
-      const max = channelTensor.max().arraySync() as number;
+      const max = tidy(() => {
+        return channelTensor.max().arraySync() as number;
+      });
 
       measurementResults = max;
       break;
     case "intensity-upper-quartile":
-      const upperQuartile = getTensorPercentile(
-        sortedChannelTensor,
-        0.25,
-        true
-      ).arraySync();
+      const upperQuartile = tidy(() => {
+        return getTensorPercentile(sortedChannelTensor, 0.25, true).arraySync();
+      });
 
       measurementResults = Array.isArray(upperQuartile)
         ? upperQuartile[0]
         : upperQuartile;
       break;
     case "intensity-lower-quartile":
-      const lowerQuartile = getTensorPercentile(
-        sortedChannelTensor,
-        0.75,
-        true
-      ).arraySync();
+      const lowerQuartile = tidy(() => {
+        return getTensorPercentile(sortedChannelTensor, 0.75, true).arraySync();
+      });
 
       measurementResults = Array.isArray(lowerQuartile)
         ? lowerQuartile[0]
@@ -136,7 +165,18 @@ export const getMeasurement = (
     default:
       break;
   }
-  channelTensor.dispose();
   sortedChannelTensor.dispose();
   return measurementResults;
+};
+
+export const getObjectMaskData = async (
+  channelData: Tensor2D,
+  objectMask: DataArray
+) => {
+  const maskArray = Array.from(objectMask);
+  const maskTensor = tensor1d(maskArray, "bool");
+
+  const maskedChannels = await booleanMaskAsync(channelData, maskTensor, 1);
+  maskTensor.dispose();
+  return maskedChannels as Tensor2D;
 };

@@ -89,7 +89,8 @@ export const selectTablesMeasurementTableData = createSelector(
                   });
               } else {
                 const measuredValues = splitThings.map(
-                  (thingId) => measurementData[thingId][measurement.id]
+                  (thingId) =>
+                    measurementData[thingId].measurements[measurement.id]
                 );
                 const stats = getStatistics(measuredValues);
 

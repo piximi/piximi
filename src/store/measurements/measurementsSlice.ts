@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RecursivePartial } from "utils/common/types";
 import {
-  MeasurementsData,
   MeasurementsState,
   MeasurementTable,
   SelectionTreeItems,
@@ -11,6 +10,7 @@ import { merge } from "lodash";
 import { baseMeasurementOptions } from "./constants";
 import { Category } from "store/data/types";
 import { Partition } from "utils/models/enums";
+import { Tensor2D } from "@tensorflow/tfjs";
 
 const initialState: MeasurementsState = {
   measurementData: {},
@@ -150,13 +150,32 @@ export const measurementsSlice = createSlice({
     updateMeasurements(
       state,
       action: PayloadAction<{
-        measurements: MeasurementsData;
+        channelDataDict?: Record<string, Tensor2D>;
+        measurementsDict?: Record<string, Record<string, number>>;
       }>
     ) {
-      state.measurementData = merge(
-        state.measurementData,
-        action.payload.measurements
-      );
+      const { channelDataDict, measurementsDict } = action.payload;
+      if (channelDataDict) {
+        for (const thingId in channelDataDict) {
+          if (thingId in state.measurementData) {
+            state.measurementData[thingId].channelData =
+              channelDataDict[thingId];
+          } else {
+            state.measurementData[thingId] = {
+              channelData: channelDataDict[thingId],
+              measurements: {},
+            };
+          }
+        }
+      }
+      if (measurementsDict) {
+        for (const thingId in measurementsDict) {
+          state.measurementData[thingId].measurements = merge(
+            state.measurementData[thingId].measurements,
+            measurementsDict[thingId]
+          );
+        }
+      }
     },
   },
 });
