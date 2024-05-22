@@ -13,42 +13,66 @@ self.onmessage = async (
   const { currentMeasurements, activeMeasurements, thingIds } = e.data;
   const newMeasurements: Record<string, Record<string, number>> = {};
   activeMeasurements.forEach((measurement) => {
-    const measurementdetails = measurement.split("-channel-");
-    const measurementName = measurementdetails[0];
-    const channel = +measurementdetails[1];
+    if (measurement.includes("intensity")) {
+      const measurementdetails = measurement.split("-channel-");
+      const measurementName = measurementdetails[0];
+      const channel = +measurementdetails[1];
 
-    thingIds.forEach((thingId) => {
-      if (
-        thingId in currentMeasurements &&
-        measurement in currentMeasurements[thingId].measurements
-      ) {
-        return;
-      } else {
-        const thingChannelData = currentMeasurements[thingId].channelData!;
-
-        const measuredChannel = tf.tidy(() => {
-          return tf
-            .tensor2d(thingChannelData)
-            .slice(channel, 1)
-            .squeeze() as tf.Tensor1D;
-        });
-
-        const result = getIntensityMeasurement(
-          measuredChannel,
-          measurementName
-        );
-        if (result === undefined)
-          throw new Error(
-            `Error calculating ${measurementName} on channel ${channel}`
-          );
-        if (thingId in newMeasurements) {
-          newMeasurements[thingId][measurement] = result;
+      thingIds.forEach((thingId) => {
+        if (
+          thingId in currentMeasurements &&
+          measurement in currentMeasurements[thingId].measurements
+        ) {
+          return;
         } else {
-          newMeasurements[thingId] = { [measurement]: result };
+          const thingChannelData = currentMeasurements[thingId].channelData!;
+
+          const measuredChannel = tf.tidy(() => {
+            return tf
+              .tensor2d(thingChannelData)
+              .slice(channel, 1)
+              .squeeze() as tf.Tensor1D;
+          });
+
+          const result = getIntensityMeasurement(
+            measuredChannel,
+            measurementName
+          );
+          if (result === undefined)
+            throw new Error(
+              `Error calculating ${measurementName} on channel ${channel}`
+            );
+          if (thingId in newMeasurements) {
+            newMeasurements[thingId][measurement] = result;
+          } else {
+            newMeasurements[thingId] = { [measurement]: result };
+          }
+          measuredChannel.dispose();
         }
-        measuredChannel.dispose();
+      });
+    } else if (measurement.includes("geometry")) {
+      if (measurement.includes("area")) {
+        thingIds.forEach((thingId) => {
+          if (
+            thingId in currentMeasurements &&
+            measurement in currentMeasurements[thingId].measurements
+          ) {
+            return;
+          } else {
+            const thingChannelData = currentMeasurements[thingId].channelData!;
+            const result = thingChannelData[0].length;
+
+            if (result === undefined)
+              throw new Error(`Error calculating area `);
+            if (thingId in newMeasurements) {
+              newMeasurements[thingId][measurement] = result;
+            } else {
+              newMeasurements[thingId] = { [measurement]: result };
+            }
+          }
+        });
       }
-    });
+    }
   });
   /* eslint-disable-next-line no-restricted-globals */
   self.postMessage(newMeasurements);

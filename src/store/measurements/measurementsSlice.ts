@@ -61,16 +61,18 @@ export const measurementsSlice = createSlice({
         kind: string;
         categories: Category[];
         thingIds: string[];
+        numChannels?: number;
       }>
     ) {
+      const { kind, categories, thingIds, numChannels } = action.payload;
       const tableId = generateUUID();
 
       const usedNames = Object.values(state.tables).map((table) => table.name);
       let version = 2;
-      let candidateName = `${action.payload.kind} Measurements`;
+      let candidateName = `${kind} Measurements`;
 
       while (usedNames.includes(candidateName)) {
-        candidateName = `${action.payload.kind} Measurements - Table ${version}`;
+        candidateName = `${kind} Measurements - Table ${version}`;
         version++;
       }
 
@@ -79,7 +81,7 @@ export const measurementsSlice = createSlice({
           id: "categoryId",
           name: "Category",
           state: "off",
-          children: action.payload.categories.map((c) => c.id),
+          children: categories.map((c) => c.id),
         },
         partition: {
           id: "partition",
@@ -88,7 +90,7 @@ export const measurementsSlice = createSlice({
           children: Object.keys(Partition).map((p) => p.toLowerCase()),
         },
       };
-      action.payload.categories.forEach((c) => {
+      categories.forEach((c) => {
         tableSplitStatus[c.id] = {
           id: c.id,
           name: c.name,
@@ -105,13 +107,40 @@ export const measurementsSlice = createSlice({
         };
       });
 
+      const tableMeasurementStatus: SelectionTreeItems = {};
+      for (const measurement in baseMeasurementOptions) {
+        const option = { ...baseMeasurementOptions[measurement] };
+        if (
+          option.thingType === "all" ||
+          option.thingType === kind ||
+          (option.thingType !== "Image" && kind !== "Image")
+        ) {
+          if (option.hasChannels) {
+            option.children = [];
+            let i = 0;
+            while (i < numChannels!) {
+              const id = `${measurement}-channel-${i}`;
+              tableMeasurementStatus[id] = {
+                id,
+                name: `Channel ${i}`,
+                state: "off",
+                parent: measurement,
+              };
+              option.children.push(id);
+              i++;
+            }
+          }
+          tableMeasurementStatus[measurement] = option;
+        }
+      }
+
       state.tables[tableId] = {
         id: tableId,
         name: candidateName,
-        kind: action.payload.kind,
-        measurementsStatus: state.measurementsStatus,
+        kind: kind,
+        measurementsStatus: tableMeasurementStatus,
         splitStatus: tableSplitStatus,
-        thingIds: [],
+        thingIds: thingIds,
       } as MeasurementTable;
     },
     removeTable(state, action: PayloadAction<{ tableId: string }>) {

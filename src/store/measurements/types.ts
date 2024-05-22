@@ -5,8 +5,14 @@ export interface SelectionTreeItem {
   state: "on" | "off" | "loading";
   parent?: string;
 }
+export interface MeasurementOption extends SelectionTreeItem {
+  hasChannels?: boolean;
+  thingType?: "Image" | "Object" | "all";
+  includeCategories?: boolean;
+}
 
 export type SelectionTreeItems = Record<string, SelectionTreeItem>;
+export type MeasurementOptions = Record<string, MeasurementOption>;
 
 export type MeasurementTable = {
   id: string;
