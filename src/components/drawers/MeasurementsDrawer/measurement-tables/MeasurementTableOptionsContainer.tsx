@@ -75,12 +75,14 @@ export const MeasurementTableOptionsContainer = () => {
       worker.onmessage = (
         e: MessageEvent<{ kind: string; channels: Record<string, number[][]> }>
       ) => {
+        const numChannels = Object.values(e.data.channels)[0].length;
         batch(() => {
           dispatch(
             measurementsSlice.actions.createTable({
               kind: e.data.kind,
               categories: categoriesByKind(e.data.kind),
               thingIds: Object.keys(e.data.channels),
+              numChannels,
             })
           );
           dispatch(

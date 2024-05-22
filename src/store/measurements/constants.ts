@@ -1,6 +1,6 @@
-import { SelectionTreeItems } from "./types";
+import { MeasurementOptions } from "./types";
 
-export const baseMeasurementOptions: SelectionTreeItems = {
+export const baseMeasurementOptions: MeasurementOptions = {
   intensity: {
     id: "intensity",
     name: "Intensity",
@@ -15,53 +15,84 @@ export const baseMeasurementOptions: SelectionTreeItems = {
       "intensity-upper-quartile",
     ],
     state: "off",
+    thingType: "all",
   },
   "intensity-total": {
     id: "intensity-total",
     name: "Total",
     parent: "intensity",
     state: "off",
+    hasChannels: true,
+    thingType: "all",
   },
   "intensity-mean": {
     id: "intensity-mean",
     name: "Mean",
     parent: "intensity",
     state: "off",
+    hasChannels: true,
+    thingType: "all",
   },
   "intensity-std": {
     id: "intensity-std",
     name: "Standard Deviation",
     parent: "intensity",
     state: "off",
+    hasChannels: true,
+    thingType: "all",
   },
   "intensity-MAD": {
     id: "intensity-MAD",
     name: "MAD",
     parent: "intensity",
     state: "off",
+    hasChannels: true,
+    thingType: "all",
   },
   "intensity-min": {
     id: "intensity-min",
     name: "Minimum",
     parent: "intensity",
     state: "off",
+    hasChannels: true,
+    thingType: "all",
   },
   "intensity-max": {
     id: "intensity-max",
     name: "Maximum",
     parent: "intensity",
     state: "off",
+    hasChannels: true,
+    thingType: "all",
   },
   "intensity-lower-quartile": {
     id: "intensity-lower-quartile",
     name: "Lower Quartile",
     parent: "intensity",
     state: "off",
+    hasChannels: true,
+    thingType: "all",
   },
   "intensity-upper-quartile": {
     id: "intensity-upper-quartile",
     name: "Upper Quartile",
     parent: "intensity",
     state: "off",
+    hasChannels: true,
+    thingType: "all",
+  },
+  "object-geometry": {
+    id: "object-geometry",
+    name: "Object Geometry",
+    children: ["object-geometry-area"],
+    state: "off",
+    thingType: "Object",
+  },
+  "object-geometry-area": {
+    id: "object-geometry-area",
+    name: "Area",
+    state: "off",
+    parent: "object-geometry",
+    thingType: "Object",
   },
 };
