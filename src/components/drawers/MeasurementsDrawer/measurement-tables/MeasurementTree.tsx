@@ -12,7 +12,7 @@ import { isObjectEmpty, selectTreeItemChildren } from "utils/common/helpers";
 import { AnnotationObject, ImageObject } from "store/data/types";
 import { intersection } from "lodash";
 import { selectThingsDictionary } from "store/data/selectors";
-
+//import { theThing } from "./roiManager";
 export const TableMeasurementTree = ({
   table,
 }: {
@@ -47,6 +47,14 @@ export const TableMeasurementTree = ({
       table.splitStatus,
       updates
     );
+
+    splitThings.slice(0, 2).forEach((thing) => {
+      // const result = theThing(
+      //   measurementData[thing].maskData!,
+      //   measurementData[thing].maskShape!
+      // );
+      //@ts-ignore
+    });
 
     if (window.Worker) {
       measurementWorker.postMessage({

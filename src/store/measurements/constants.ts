@@ -84,13 +84,20 @@ export const baseMeasurementOptions: MeasurementOptions = {
   "object-geometry": {
     id: "object-geometry",
     name: "Object Geometry",
-    children: ["object-geometry-area"],
+    children: ["object-geometry-area", "object-geometry-perimeter"],
     state: "off",
     thingType: "Object",
   },
   "object-geometry-area": {
     id: "object-geometry-area",
     name: "Area",
+    state: "off",
+    parent: "object-geometry",
+    thingType: "Object",
+  },
+  "object-geometry-perimeter": {
+    id: "object-geometry-perimeter",
+    name: "Perimeter",
     state: "off",
     parent: "object-geometry",
     thingType: "Object",
