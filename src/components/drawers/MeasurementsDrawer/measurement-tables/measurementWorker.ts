@@ -72,6 +72,28 @@ self.onmessage = async (
           }
         });
       }
+      if (measurement.includes("perimeter")) {
+        thingIds.forEach((thingId) => {
+          if (
+            thingId in currentMeasurements &&
+            measurement in currentMeasurements[thingId].measurements
+          ) {
+            return;
+          } else {
+            // const result = theThing(
+            //   currentMeasurements[thingId].maskData!,
+            //   currentMeasurements[thingId].maskShape!
+            // );
+            // if (result === undefined)
+            //   throw new Error(`Error calculating area `);
+            // if (thingId in newMeasurements) {
+            //   newMeasurements[thingId][measurement] = result;
+            // } else {
+            //   newMeasurements[thingId] = { [measurement]: result };
+            // }
+          }
+        });
+      }
     }
   });
   /* eslint-disable-next-line no-restricted-globals */

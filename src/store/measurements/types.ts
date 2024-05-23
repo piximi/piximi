@@ -1,3 +1,5 @@
+import { DataArray } from "utils/file-io/types";
+
 export interface SelectionTreeItem {
   id: string;
   name: string;
@@ -25,7 +27,12 @@ export type MeasurementTable = {
 
 export type MeasurementsData = Record<
   string,
-  { channelData: number[][]; measurements: Record<string, number> }
+  {
+    channelData: number[][];
+    maskData?: DataArray;
+    maskShape?: { width: number; height: number };
+    measurements: Record<string, number>;
+  }
 >;
 
 export type MeasurementsState = {

@@ -73,21 +73,31 @@ export const MeasurementTableOptionsContainer = () => {
   useEffect(() => {
     if (window.Worker) {
       worker.onmessage = (
-        e: MessageEvent<{ kind: string; channels: Record<string, number[][]> }>
+        e: MessageEvent<{
+          kind: string;
+          data: Record<
+            string,
+            {
+              channels: number[][];
+              maskData: DataArray | undefined;
+              maskShape: { width: number; height: number } | undefined;
+            }
+          >;
+        }>
       ) => {
-        const numChannels = Object.values(e.data.channels)[0].length;
+        const numChannels = Object.values(e.data.data)[0].channels.length;
         batch(() => {
           dispatch(
             measurementsSlice.actions.createTable({
               kind: e.data.kind,
               categories: categoriesByKind(e.data.kind),
-              thingIds: Object.keys(e.data.channels),
+              thingIds: Object.keys(e.data.data),
               numChannels,
             })
           );
           dispatch(
             measurementsSlice.actions.updateMeasurements({
-              channelDataDict: e.data.channels,
+              dataDict: e.data.data,
             })
           );
         });

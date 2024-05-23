@@ -10,6 +10,7 @@ import { merge } from "lodash";
 import { baseMeasurementOptions } from "./constants";
 import { Category } from "store/data/types";
 import { Partition } from "utils/models/enums";
+import { DataArray } from "image-js";
 
 const initialState: MeasurementsState = {
   measurementData: {},
@@ -182,19 +183,32 @@ export const measurementsSlice = createSlice({
     updateMeasurements(
       state,
       action: PayloadAction<{
-        channelDataDict?: Record<string, number[][]>;
+        dataDict?: Record<
+          string,
+          {
+            channels: number[][];
+            maskData: DataArray | undefined;
+            maskShape: { width: number; height: number } | undefined;
+          }
+        >;
         measurementsDict?: Record<string, Record<string, number>>;
       }>
     ) {
-      const { channelDataDict, measurementsDict } = action.payload;
-      if (channelDataDict) {
-        for (const thingId in channelDataDict) {
+      const { dataDict, measurementsDict } = action.payload;
+      if (dataDict) {
+        for (const thingId in dataDict) {
           if (thingId in state.measurementData) {
             state.measurementData[thingId].channelData =
-              channelDataDict[thingId];
+              dataDict[thingId].channels;
+            state.measurementData[thingId].maskData =
+              dataDict[thingId].maskData;
+            state.measurementData[thingId].maskShape =
+              dataDict[thingId].maskShape;
           } else {
             state.measurementData[thingId] = {
-              channelData: channelDataDict[thingId],
+              channelData: dataDict[thingId].channels,
+              maskData: dataDict[thingId].maskData,
+              maskShape: dataDict[thingId].maskShape,
               measurements: {},
             };
           }

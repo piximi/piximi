@@ -16,10 +16,19 @@ self.onmessage = async (
     }[];
   }>
 ) => {
-  const thingChannels: Record<string, number[][]> = {};
+  const thingInfo: Record<
+    string,
+    {
+      channels: number[][];
+      maskData?: DataArray;
+      maskShape?: { width: number; height: number };
+    }
+  > = {};
   for await (const thingData of e.data.things) {
     const data = tf.tensor4d(thingData.data);
     let channelData: tf.Tensor2D;
+    let maskData: DataArray | undefined = undefined;
+    let maskShape: { width: number; height: number } | undefined;
     if (thingData.decodedMask) {
       const fullChannelData = prepareChannels(data);
       channelData = await getObjectMaskData(
@@ -27,19 +36,33 @@ self.onmessage = async (
         thingData.decodedMask
       );
       fullChannelData.dispose();
+      maskData = thingData.decodedMask;
+      maskShape = {
+        height: thingData.data[0].length,
+        width: thingData.data[0][0].length,
+      };
     } else if (thingData.encodedMask) {
       const decodedMask = Uint8Array.from(decode(thingData.encodedMask));
       const fullChannelData = prepareChannels(data);
       channelData = await getObjectMaskData(fullChannelData, decodedMask);
       fullChannelData.dispose();
+      maskData = decodedMask;
+      maskShape = {
+        height: thingData.data[0].length,
+        width: thingData.data[0][0].length,
+      };
     } else {
       channelData = prepareChannels(data);
     }
-    thingChannels[thingData.id] = channelData.arraySync();
+    thingInfo[thingData.id] = {
+      channels: channelData.arraySync(),
+      maskData,
+      maskShape,
+    };
     channelData.dispose();
   }
   /* eslint-disable-next-line no-restricted-globals */
-  self.postMessage({ kind: e.data.kind, channels: thingChannels });
+  self.postMessage({ kind: e.data.kind, data: thingInfo });
 };
 
 export {};
