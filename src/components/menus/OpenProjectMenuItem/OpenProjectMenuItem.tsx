@@ -48,7 +48,7 @@ export const OpenProjectMenuItem = ({
     dispatch(
       projectSlice.actions.setLoadPercent({
         loadPercent: -1,
-        loadMessage: "deserializing proejct...",
+        loadMessage: "deserializing project...",
       })
     );
 
