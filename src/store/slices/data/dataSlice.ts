@@ -1013,7 +1013,7 @@ export const dataSlice = createSlice({
         type: "_reconcileImageCategories",
         payload: { keepChanges },
       });
-
+      console.log("here");
       state.imagesByCategory = { [UNKNOWN_IMAGE_CATEGORY_ID]: [] };
       state.annotationsByCategory = { [UNKNOWN_ANNOTATION_CATEGORY_ID]: [] };
       state.annotationsByImage = {};
