@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Divider, Drawer } from "@mui/material";
+import { Box, Drawer } from "@mui/material";
 import { ApplicationOptionsList } from "components/lists";
 
 export const BaseAppDrawer = ({
@@ -28,7 +28,7 @@ export const BaseAppDrawer = ({
       variant="persistent"
     >
       <Box sx={{ overflowY: "scroll", overflowX: "hidden" }}>{children}</Box>
-      <Divider />
+
       <ApplicationOptionsList />
     </Drawer>
   );

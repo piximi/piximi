@@ -9,6 +9,7 @@ import {
   tensor1d,
   booleanMaskAsync,
 } from "@tensorflow/tfjs";
+import { findContours } from "utils/annotator";
 import { DataArray } from "utils/file-io/types";
 
 //TODO: Write tests
@@ -179,4 +180,63 @@ export const getObjectMaskData = async (
   const maskedChannels = await booleanMaskAsync(channelData, maskTensor, 1);
   maskTensor.dispose();
   return maskedChannels as Tensor2D;
+};
+
+export const getPerimeterFromMask = (
+  mask: DataArray,
+  maskShape: { width: number; height: number }
+) => {
+  const nMask: number[] = [];
+  Array.from(mask).forEach((i) => {
+    nMask.push(i / 255);
+  });
+  const contourArray = findContours(
+    Int8Array.from(nMask),
+    maskShape.width,
+    maskShape.height
+  );
+  return contourArray.reduce((perimeter: number, contour) => {
+    return (
+      perimeter +
+      getPerimeter(contour.points.map((point) => [point.x, point.y]))
+    );
+  }, 0);
+};
+
+export const getPerimeter = (vertices: Array<Array<number>>) => {
+  let total = 0;
+  for (let i = 0; i < vertices.length; i++) {
+    let fromX = vertices[i][0];
+    let fromY = vertices[i][1];
+    let toX = vertices[i === vertices.length - 1 ? 0 : i + 1][0];
+    let toY = vertices[i === vertices.length - 1 ? 0 : i + 1][1];
+    total += Math.sqrt((toX - fromX) ** 2 + (toY - fromY) ** 2);
+  }
+  return total;
+};
+export const getEQPC = (area: number) => {
+  return 2 * Math.sqrt(area / Math.PI);
+};
+export const getPEQPC = (area: number) => {
+  return 2 * Math.sqrt(area * Math.PI);
+};
+
+export const getObjectFormFactor = (
+  area: number,
+  maskData: DataArray,
+  maskShape: { width: number; height: number }
+) => {
+  const peqpc = getPEQPC(area);
+
+  const per = getPerimeterFromMask(maskData, maskShape);
+
+  return peqpc / per;
+};
+
+export const getPE = (
+  mask: DataArray,
+  maskShape: { width: number; height: number }
+) => {
+  const perimeter = getPerimeterFromMask(mask, maskShape);
+  return perimeter / Math.PI;
 };

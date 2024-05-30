@@ -5,12 +5,17 @@ import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import SortIcon from "@mui/icons-material/Sort";
+import StraightenIcon from "@mui/icons-material/Straighten";
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
 import LabelIcon from "@mui/icons-material/Label";
 import { FileList } from "components/lists";
 import { CategoriesList } from "components/lists";
 
-import { FilterOptions, InformationOptions } from "./tool-options-drawer";
+import {
+  FilterOptions,
+  InformationOptions,
+  MeasurementOptions,
+} from "./tool-options-drawer";
 import { useMobileView, useTranslation } from "hooks";
 import { ToolOptionsDrawer } from "./tool-options-drawer/ToolOptionsDrawer/ToolOptionsDrawer";
 import { AppBarOffset, SortSelection } from "components/styled-components";
@@ -59,6 +64,13 @@ const imageTools: Record<string, OperationType> = {
     description: "-",
     options: <InformationOptions />,
     hotkey: "I",
+  },
+  measurements: {
+    icon: (color) => <StraightenIcon sx={{ color: color }} />,
+    name: "measurements",
+    description: "-",
+    options: <MeasurementOptions />,
+    hotkey: "M",
   },
   learning: {
     icon: (color) => <ScatterPlotIcon sx={{ color }} />,
