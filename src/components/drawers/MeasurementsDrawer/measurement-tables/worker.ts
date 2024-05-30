@@ -43,6 +43,7 @@ self.onmessage = async (
       };
     } else if (thingData.encodedMask) {
       const decodedMask = Uint8Array.from(decode(thingData.encodedMask));
+
       const fullChannelData = prepareChannels(data);
       channelData = await getObjectMaskData(fullChannelData, decodedMask);
       fullChannelData.dispose();

@@ -107,7 +107,6 @@ const CustomContent = React.forwardRef(function CustomContent(
     selected,
     handleExpansion,
     handleSelection,
-
     preventSelection,
   } = useTreeItemState(itemId);
 
@@ -149,7 +148,12 @@ const CustomContent = React.forwardRef(function CustomContent(
         {selected ? (
           <CheckBoxOutlinedIcon fontSize="small" />
         ) : (
-          <CheckBoxOutlineBlankOutlinedIcon fontSize="small" />
+          <CheckBoxOutlineBlankOutlinedIcon
+            fontSize="small"
+            sx={(theme) => ({
+              color: disabled ? theme.palette.action.disabled : "",
+            })}
+          />
         )}
       </div>
 

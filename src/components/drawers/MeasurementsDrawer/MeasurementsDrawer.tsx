@@ -1,13 +1,15 @@
 import React from "react";
 import { AppBarOffset } from "components/styled-components";
-import { MeasurementBaseAppDrawer } from "./MeasurementBaseAppDrawer";
 import { MeasurementTableOptionsContainer } from "./measurement-tables/MeasurementTableOptionsContainer";
+import { BaseAppDrawer } from "../BaseAppDrawer";
+import { MeasurementsAppBar } from "components/app-bars";
 
 export const MeasurementsDrawer = () => {
   return (
-    <MeasurementBaseAppDrawer>
+    <BaseAppDrawer>
+      <MeasurementsAppBar />
       <AppBarOffset />
       <MeasurementTableOptionsContainer />
-    </MeasurementBaseAppDrawer>
+    </BaseAppDrawer>
   );
 };

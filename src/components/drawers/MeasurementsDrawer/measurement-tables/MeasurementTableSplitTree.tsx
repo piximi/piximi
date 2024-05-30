@@ -15,8 +15,12 @@ import { RecursivePartial } from "utils/common/types";
 
 export const MeasurementTableSplitTree = ({
   table,
+  loading,
+  setLoading,
 }: {
   table: MeasurementTable;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const dispatch = useDispatch();
   const selectedSplits = useSelector(selectSelectedTableSplits)(table.id);
@@ -27,6 +31,7 @@ export const MeasurementTableSplitTree = ({
     []
   );
   const handleSelect = (event: React.SyntheticEvent, itemIds: string[]) => {
+    if (loading) return;
     const itemId = itemIds[0];
     const updates: RecursivePartial<SelectionTreeItems> = {};
     const updatedSelectionStatus = selectedSplits.includes(itemId)
@@ -47,6 +52,7 @@ export const MeasurementTableSplitTree = ({
     );
 
     if (window.Worker) {
+      setLoading(true);
       splitWorker.postMessage({
         currentMeasurements: measurementData,
         activeMeasurements,
@@ -66,6 +72,7 @@ export const MeasurementTableSplitTree = ({
       splitWorker.onmessage = (
         e: MessageEvent<Record<string, Record<string, number>>>
       ) => {
+        setLoading(false);
         if (!isObjectEmpty(e.data)) {
           dispatch(
             measurementsSlice.actions.updateMeasurements({
@@ -75,7 +82,7 @@ export const MeasurementTableSplitTree = ({
         }
       };
     }
-  }, [splitWorker, dispatch]);
+  }, [splitWorker, dispatch, setLoading]);
 
   return (
     <SelectionTree

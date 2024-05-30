@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, CircularProgress, IconButton, Typography } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
 import { MeasurementTableOptions } from "./MeasurementTableOptions";
 import { SelectDialog } from "components/dialogs";
@@ -22,6 +22,7 @@ export const MeasurementTableOptionsContainer = () => {
   const thingData = useSelector(selectThingsDictionary);
   const dispatch = useDispatch();
   const [expandedTable, setExpandedTable] = useState<string | undefined>();
+  const [loading, setLoading] = useState(false);
   const worker: Worker = useMemo(
     () => new Worker(new URL("./worker.ts", import.meta.url)),
     []
@@ -57,6 +58,7 @@ export const MeasurementTableOptionsContainer = () => {
     });
 
     if (window.Worker) {
+      setLoading(true);
       worker.postMessage({ kind: kind, things: convertedThingData });
     }
   };
@@ -101,6 +103,7 @@ export const MeasurementTableOptionsContainer = () => {
             })
           );
         });
+        setLoading(false);
       };
     }
   }, [worker, dispatch, categoriesByKind]);
@@ -138,18 +141,32 @@ export const MeasurementTableOptionsContainer = () => {
             flexGrow: 1,
           })}
         />
-        <IconButton
-          disableRipple
-          sx={(theme) => ({
-            p: 0,
-            pl: "calc(8px* 1.2)",
-            pr: "calc(8px* 1.2)",
-            "&:hover": { color: theme.palette.primary.main },
-          })}
-          onClick={handleOpenTableDialog}
-        >
-          <Add fontSize="small" />
-        </IconButton>
+        {loading ? (
+          <Box
+            sx={{
+              p: 0,
+              pl: "calc(8px* 1.2)",
+              pr: "calc(8px* 1.2)",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress size="1.25rem" />
+          </Box>
+        ) : (
+          <IconButton
+            disableRipple
+            sx={(theme) => ({
+              p: 0,
+              pl: "calc(8px* 1.2)",
+              pr: "calc(8px* 1.2)",
+              "&:hover": { color: theme.palette.primary.main },
+            })}
+            onClick={handleOpenTableDialog}
+          >
+            <Add fontSize="small" />
+          </IconButton>
+        )}
         <Box
           sx={(theme) => ({
             height: 0,

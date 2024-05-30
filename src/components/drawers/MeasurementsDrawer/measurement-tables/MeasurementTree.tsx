@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   selectMeasurementData,
   selectSelectedTableMeasurements,
+  selectSelectedTableSplits,
 } from "store/measurements/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { SelectionTreeItems, MeasurementTable } from "store/measurements/types";
@@ -12,24 +13,32 @@ import { isObjectEmpty, selectTreeItemChildren } from "utils/common/helpers";
 import { AnnotationObject, ImageObject } from "store/data/types";
 import { intersection } from "lodash";
 import { selectThingsDictionary } from "store/data/selectors";
+import { Box, Tooltip } from "@mui/material";
 //import { theThing } from "./roiManager";
 export const TableMeasurementTree = ({
   table,
+  setLoading,
+  loading,
 }: {
   table: MeasurementTable;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  loading: boolean;
 }) => {
   const dispatch = useDispatch();
   const selectedMeasurements = useSelector(selectSelectedTableMeasurements)(
     table.id
   );
+  const splits = useSelector(selectSelectedTableSplits)(table.id);
   const thingDict = useSelector(selectThingsDictionary);
   const measurementData = useSelector(selectMeasurementData);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
   const measurementWorker: Worker = useMemo(
     () => new Worker(new URL("./measurementWorker.ts", import.meta.url)),
     []
   );
 
   const handleSelect = (event: React.SyntheticEvent, itemIds: string[]) => {
+    if (splits.length === 0 || loading) return;
     const itemId = itemIds[0];
     const updates: RecursivePartial<SelectionTreeItems> = {};
     const updatedSelectionStatus = selectedMeasurements.includes(itemId)
@@ -48,15 +57,8 @@ export const TableMeasurementTree = ({
       updates
     );
 
-    splitThings.slice(0, 2).forEach((thing) => {
-      // const result = theThing(
-      //   measurementData[thing].maskData!,
-      //   measurementData[thing].maskShape!
-      // );
-      //@ts-ignore
-    });
-
     if (window.Worker) {
+      setLoading(true);
       measurementWorker.postMessage({
         currentMeasurements: measurementData,
         activeMeasurements,
@@ -76,6 +78,7 @@ export const TableMeasurementTree = ({
       measurementWorker.onmessage = (
         e: MessageEvent<Record<string, Record<string, number>>>
       ) => {
+        setLoading(false);
         if (!isObjectEmpty(e.data)) {
           dispatch(
             measurementsSlice.actions.updateMeasurements({
@@ -85,15 +88,35 @@ export const TableMeasurementTree = ({
         }
       };
     }
-  }, [measurementWorker, dispatch]);
+  }, [measurementWorker, dispatch, setLoading]);
+  const handleClose = () => {
+    setTooltipOpen(false);
+  };
+
+  const handleOpen = () => {
+    if (splits.length === 0) {
+      setTooltipOpen(true);
+    }
+  };
 
   return (
-    <SelectionTree
-      treeItems={table.measurementsStatus}
-      selectedItems={selectedMeasurements}
-      handleSelect={handleSelect}
-      entryPoint="intensity"
-    />
+    <Tooltip
+      title="Select split"
+      followCursor
+      open={tooltipOpen}
+      onOpen={handleOpen}
+      onClose={handleClose}
+      disableInteractive
+    >
+      <Box>
+        <SelectionTree
+          treeItems={table.measurementsStatus}
+          selectedItems={selectedMeasurements}
+          handleSelect={handleSelect}
+          entryPoint="intensity"
+        />
+      </Box>
+    </Tooltip>
   );
 };
 
