@@ -6,7 +6,7 @@ import { SerializedFileType } from "utils/file-io/types";
 import { fileFromPath, loadImageFileAsStack } from "./helpers";
 import { convertToImage } from "utils/common/tensorHelpers";
 import { getPropertiesFromImageSync } from "utils/common/helpers";
-import { OldAnnotationType, OldCategory } from "store/data/types";
+import { Category, OldAnnotationType } from "store/data/types";
 
 export const loadExampleImage = async (
   imagePath: string,
@@ -44,7 +44,7 @@ export const loadExampleImage = async (
   });
 
   for (const annotation of deserializedAnnotations) {
-    const annImProps = await getPropertiesFromImageSync(
+    const annImProps = getPropertiesFromImageSync(
       renderedIm,
       image,
       annotation
@@ -56,8 +56,7 @@ export const loadExampleImage = async (
     } as OldAnnotationType);
   }
 
-  const annotationCategories =
-    serializedAnnotations.categories as OldCategory[];
+  const annotationCategories = serializedAnnotations.categories as Category[];
 
   return {
     image,
