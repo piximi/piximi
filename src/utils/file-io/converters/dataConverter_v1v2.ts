@@ -190,6 +190,7 @@ export const dataConverter_v1v2 = (data: {
       { planes: 0, height: 0, width: 0, channels: 0 }
     );
     _annotation.partition = Partition.Unassigned;
+    _annotation.bitDepth = things.entities[_annotation.imageId].saved.bitDepth;
     things.ids.push(_annotation.id);
 
     things.entities[_annotation.id] = {

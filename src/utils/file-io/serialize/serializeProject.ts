@@ -64,6 +64,8 @@ const serializeThings = async (
       thing.shape.channels,
     ]);
     await data.attrs.setItem("bit_depth", thing.bitDepth);
+    // const bd = await getAttr(data, "bit_depth");
+
     await thingGroup.attrs.setItem("thing_id", thing.id);
     await thingGroup.attrs.setItem("active_plane", thing.activePlane);
     await thingGroup.attrs.setItem("class_category_id", thing.categoryId);

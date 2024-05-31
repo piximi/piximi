@@ -438,7 +438,8 @@ export const getPropertiesFromImageSync = (
     data: data,
     src: objSrc,
     imageId: image.id,
-    boundingBox: bbox,
+    boundingBox: bbox as [number, number, number, number],
+    bitDepth: image.bitDepth,
   };
 };
 const componentToHex = (c: number) => {

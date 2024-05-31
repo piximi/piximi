@@ -12,7 +12,10 @@ import { RawArray } from "zarr/types/rawArray";
 import { tensor4d } from "@tensorflow/tfjs";
 import { DeferredEntityState } from "store/entities";
 import { Partition } from "utils/models/enums";
-import { createRenderedTensor } from "utils/common/tensorHelpers";
+import {
+  createRenderedTensor,
+  generateBlankColors,
+} from "utils/common/tensorHelpers";
 import { BitDepth, LoadCB } from "utils/file-io/types";
 import { CustomStore } from "utils/file-io/zarrStores";
 import { ProjectState } from "store/types";
@@ -27,7 +30,7 @@ const deserializeThingGroup = async (
   name: string,
   thingGroup: Group
 ): Promise<ImageObject | AnnotationObject> => {
-  const id = (await getAttr(thingGroup, "image_id")) as string;
+  const id = (await getAttr(thingGroup, "thing_id")) as string;
   const activePlane = (await getAttr(thingGroup, "active_plane")) as number;
   const categoryId = (await getAttr(thingGroup, "class_category_id")) as string;
   const partition = (await getAttr(
@@ -40,9 +43,6 @@ const deserializeThingGroup = async (
   //   "classifier_partition"
   // )) as Partition;
 
-  const colorsGroup = await getGroup(thingGroup, "colors");
-  const colors = await deserializeColorsGroup(colorsGroup);
-
   const imageDataset = await getDataset(thingGroup, name);
   const imageRawArray = (await imageDataset.getRaw()) as RawArray;
   const imageData = imageRawArray.data as Float32Array;
@@ -54,12 +54,6 @@ const deserializeThingGroup = async (
     [planes, height, width, channels],
     "float32"
   );
-  const src = await createRenderedTensor(
-    imageTensor,
-    colors,
-    bitDepth,
-    activePlane
-  );
 
   const thing = {
     id,
@@ -68,7 +62,6 @@ const deserializeThingGroup = async (
     activePlane,
     categoryId,
     partition,
-    colors,
     data: imageTensor,
     bitDepth,
     shape: {
@@ -77,14 +70,20 @@ const deserializeThingGroup = async (
       width,
       channels,
     },
-    src,
   };
 
   if (kind === "Image") {
     const colorsGroup = await getGroup(thingGroup, "colors");
     const colors = await deserializeColorsGroup(colorsGroup);
+    const src = await createRenderedTensor(
+      imageTensor,
+      colors,
+      bitDepth,
+      activePlane
+    );
     const contents = (await getAttr(thingGroup, "contents")) as string[];
-    return { ...thing, colors, containing: contents } as ImageObject;
+
+    return { ...thing, colors, src, containing: contents } as ImageObject;
   } else {
     const boundingBox = (await getAttr(thingGroup, "bbox")) as [
       number,
@@ -93,14 +92,28 @@ const deserializeThingGroup = async (
       number
     ];
     const encodedMask = (await getAttr(thingGroup, "mask")) as number[];
-    const imageId = (await getAttr(thingGroup, "image_id")) as string;
 
-    return { ...thing, boundingBox, encodedMask, imageId } as AnnotationObject;
+    const imageId = (await getAttr(thingGroup, "image_id")) as string;
+    const colors = await generateBlankColors(thing.shape.channels);
+    const src = await createRenderedTensor(
+      thing.data,
+      colors,
+      bitDepth,
+      activePlane
+    );
+
+    return {
+      ...thing,
+      boundingBox,
+      encodedMask,
+      imageId,
+      src,
+    } as AnnotationObject;
   }
 };
 
 const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
-  const thingNames = (await getAttr(thingsGroup, "image_names")) as string[];
+  const thingNames = (await getAttr(thingsGroup, "thing_names")) as string[];
 
   const things: DeferredEntityState<ImageObject | AnnotationObject> = {
     ids: [],
@@ -117,7 +130,6 @@ const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
     );
 
     const thingGroup = await getGroup(thingsGroup, name);
-
     const thing = await deserializeThingGroup(name, thingGroup);
     things.ids.push(thing.id);
     things.entities[thing.id] = { saved: thing, changes: {} };

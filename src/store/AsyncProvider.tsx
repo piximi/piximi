@@ -10,25 +10,14 @@ import { dataSlice } from "./data/dataSlice";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
 
-import { DeferredEntityState } from "./entities";
 import { initStore } from "./productionStore";
 import { Provider } from "react-redux";
-import { generateUUID } from "utils/common/helpers";
 import { logger } from "utils/common/helpers";
-import { Partition } from "utils/models/enums";
 import { SerializedFileType } from "utils/file-io/types";
 import { loadExampleImage } from "utils/file-io/loadExampleImage";
-import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
-import {
-  OldCategory,
-  OldImageType,
-  Kind,
-  AnnotationObject,
-  Category,
-  ImageObject,
-} from "./data/types";
-import { UNKNOWN_CATEGORY_NAME } from "./data/constants";
+import { OldCategory, OldImageType, OldAnnotationType } from "./data/types";
 import { measurementsSlice } from "./measurements/measurementsSlice";
+import { dataConverter_v1v2 } from "utils/file-io/converters/dataConverter_v1v2";
 
 const loadState = async () => {
   const preloadedState: RootState = {
@@ -51,125 +40,15 @@ const loadState = async () => {
   )) as {
     image: OldImageType;
     annotationCategories: OldCategory[];
-    annotations: AnnotationObject[];
+    annotations: OldAnnotationType[];
   };
 
-  const categories: DeferredEntityState<Category> = {
-    ids: [],
-    entities: {},
-  };
-  const things: DeferredEntityState<ImageObject | AnnotationObject> = {
-    ids: [],
-    entities: {},
-  };
-  const kinds: DeferredEntityState<Kind> = { ids: [], entities: {} };
-
-  kinds.ids.push("Image");
-  const unknownCategoryId = generateUUID({ definesUnknown: true });
-  const unknownCategory: Category = {
-    id: unknownCategoryId,
-    name: UNKNOWN_CATEGORY_NAME,
-    color: UNKNOWN_IMAGE_CATEGORY_COLOR,
-    containing: [],
-    kind: "Image",
-    visible: true,
-  };
-
-  kinds.entities["Image"] = {
-    saved: {
-      id: "Image",
-      containing: [image.id],
-      categories: [unknownCategoryId],
-      unknownCategoryId,
-    },
-    changes: {},
-  };
-
-  image.kind = "Image";
-  image.categoryId = unknownCategoryId;
-  image.containing = annotations.map((annotation) => annotation.id);
-
-  things.ids.push(image.id);
-
-  things.entities[image.id] = { saved: image as ImageObject, changes: {} };
-
-  categories.ids.push(unknownCategoryId);
-  categories.entities[unknownCategoryId] = {
-    saved: {
-      ...unknownCategory,
-      containing: [image.id],
-    },
-    changes: {},
-  };
-  const anCat2KindNAme: Record<string, string> = {};
-  for (const anCat of annotationCategories) {
-    kinds.ids.push(anCat.name);
-    const unknownCategoryId = generateUUID({ definesUnknown: true });
-    const unknownCategory: Category = {
-      id: unknownCategoryId,
-      name: UNKNOWN_CATEGORY_NAME,
-      color: UNKNOWN_IMAGE_CATEGORY_COLOR,
-      containing: [],
-      kind: anCat.name,
-      visible: true,
-    };
-    kinds.entities[anCat.name] = {
-      saved: {
-        id: anCat.name,
-        containing: [],
-        categories: [unknownCategoryId],
-        unknownCategoryId,
-      },
-      changes: {},
-    };
-    anCat2KindNAme[anCat.id] = anCat.name;
-    categories.ids.push(unknownCategoryId);
-    categories.entities[unknownCategoryId] = {
-      saved: {
-        ...unknownCategory,
-        containing: [],
-      },
-      changes: {},
-    };
-  }
-  const numAnnotationsOfKindPerImage: Record<string, number> = {};
-
-  for (const annotation of annotations) {
-    annotation.kind = anCat2KindNAme[annotation.categoryId];
-    annotation.activePlane = annotation.plane ?? 0;
-    let annotationName: string = `${image.name}-${annotation.kind}`;
-    if (annotationName in numAnnotationsOfKindPerImage) {
-      annotationName += `_${numAnnotationsOfKindPerImage[annotationName]++}`;
-    } else {
-      numAnnotationsOfKindPerImage[annotationName] = 1;
-      annotationName += "_0";
-    }
-    const kind = kinds.entities[annotation.kind];
-
-    annotation.name = annotationName;
-    annotation.categoryId = kind.saved.unknownCategoryId;
-    const shapeArray = annotation.data.shape;
-    annotation.shape = {
-      planes: shapeArray[0],
-      height: shapeArray[1],
-      width: shapeArray[2],
-      channels: shapeArray[3],
-    };
-
-    annotation.partition = Partition.Unassigned;
-    things.ids.push(annotation.id);
-
-    things.entities[annotation.id] = {
-      saved: annotation as AnnotationObject,
-      changes: {},
-    };
-
-    kinds.entities[annotation.kind].saved.containing.push(annotation.id);
-    categories.entities[annotation.categoryId].saved.containing.push(
-      annotation.id
-    );
-  }
-  preloadedState.data = { kinds, categories, things };
+  preloadedState.data = dataConverter_v1v2({
+    images: [image],
+    oldCategories: [],
+    annotations,
+    annotationCategories,
+  });
   return preloadedState;
 };
 
