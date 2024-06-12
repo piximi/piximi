@@ -19,7 +19,7 @@ import Stardist2DFluorescenceWeights2 from "data/model-data/stardist-fluo/group1
  *   from relative paths described by the paths fields in weights manifest.
  */
 
-export async function loadStardist() {
+export async function loadStardistFluo() {
   let modelDescription: File;
   let modelWeights1: File;
   let modelWeights2: File;
@@ -50,7 +50,7 @@ export async function loadStardist() {
     const error: Error = err as Error;
     process.env.NODE_ENV !== "production" &&
       process.env.REACT_APP_LOG_LEVEL === "1" &&
-      console.error(`error loading stardist: ${error.message}`);
+      console.error(`error loading stardist fluorescence: ${error.message}`);
     throw err;
   }
 
@@ -65,7 +65,7 @@ export async function loadStardist() {
 
     process.env.NODE_ENV !== "production" &&
       process.env.REACT_APP_LOG_LEVEL === "1" &&
-      console.error(`error loading stardist: ${error.message}`);
+      console.error(`error loading stardist fluorescence: ${error.message}`);
 
     throw err;
   }
