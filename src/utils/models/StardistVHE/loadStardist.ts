@@ -1,10 +1,10 @@
 import { io, loadGraphModel } from "@tensorflow/tfjs";
 
-import Stardist2DBrightfieldModel from "data/model-data/stardist/model.json";
+import Stardist2DBrightfieldModel from "data/model-data/stardist-vhe/model.json";
 //@ts-ignore
-import Stardist2DBrightfieldWeights1 from "data/model-data/stardist/group1-shard1of2.bin";
+import Stardist2DBrightfieldWeights1 from "data/model-data/stardist-vhe/group1-shard1of2.bin";
 //@ts-ignore
-import Stardist2DBrightfieldWeights2 from "data/model-data//stardist/group1-shard2of2.bin";
+import Stardist2DBrightfieldWeights2 from "data/model-data//stardist-vhe/group1-shard2of2.bin";
 
 /*
  * model.json contains 'modelTopology' and 'weightsManifest
