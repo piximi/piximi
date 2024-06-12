@@ -10,13 +10,12 @@ import { ModelTask } from "../enums";
 import { Kind, ImageObject } from "store/data/types";
 
 /*
- * TODO: make sure this has Fluorescence model info:
- * Stardist (Versatile) H&E Nuclei Segmentation
- * https://zenodo.org/record/6338615
- * https://bioimage.io/#/?tags=stardist&id=10.5281%2Fzenodo.6338614&type=model
+ * Stardist (Versatile) Fluorescence Nuclei Segmentation
+ * https://zenodo.org/records/6348085
+ * https://bioimage.io/#/?tags=stardist&id=10.5281%2Fzenodo.6348084
  * https://github.com/stardist/stardist/blob/master/README.md#pretrained-models-for-2d
  * Stardist: model for object detection / instance segmentation with star-convex shapes
- * This pretrained model: meant to segment individual cell nuclei from brightfield images with H&E staining
+ * This pretrained model: meant to segment individual cell nuclei from single channel fluorescence data (2018 DSB)
  */
 export class StardistFluo extends Segmenter {
   protected _fgKind?: Kind;
@@ -40,7 +39,7 @@ export class StardistFluo extends Segmenter {
 
   public async loadModel() {
     if (this._model) return;
-    // inputs: [ {name: 'input', shape: [-1,-1,-1,3], dtype: 'float32'} ]
+    // inputs: [ {name: 'input', shape: [-1,-1,-1,1], dtype: 'float32'} ]
     // outputs: [ {name: 'concatenate_4/concat', shape: [-1, -1, -1, 33], dtype: 'float32'} ]
     // where each -1 matches on input and output of corresponding dim/axis
     // 33 -> 1 probability score, followed by 32 radial equiangular distances of rays
@@ -55,7 +54,7 @@ export class StardistFluo extends Segmenter {
   // (for VHE in particular), see:
   // https://github.com/stardist/stardist/blob/468c60552c8c93403969078e51bddc9c2c702035/stardist/models/model2d.py#L543
   // https://github.com/stardist/stardist/blob/master/stardist/models/model2d.py#L201C30-L201C30
-  // and config here (under source -> grid): https://bioimage.io/#/?tags=stardist&id=10.5281%2Fzenodo.6338614
+  // and config here (under source -> grid): https://bioimage.io/#/?tags=stardist&id=10.5281%2Fzenodo.6348084&type=model
   // basically, in the case of VHE: 2^3 * 2 = 16
   protected _getPaddings(height: number, width: number) {
     const padY = height % 16 === 0 ? 0 : 16 - (height % 16);
