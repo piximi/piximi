@@ -29,7 +29,9 @@ export abstract class Stardist extends Segmenter {
   // (for VHE in particular), see:
   // https://github.com/stardist/stardist/blob/468c60552c8c93403969078e51bddc9c2c702035/stardist/models/model2d.py#L543
   // https://github.com/stardist/stardist/blob/master/stardist/models/model2d.py#L201C30-L201C30
-  // and config here (under source -> grid): https://bioimage.io/#/?tags=stardist&id=10.5281%2Fzenodo.6348084&type=model
+  // and config here (under source -> grid):
+  // https://bioimage.io/#/?tags=stardist&id=10.5281%2Fzenodo.6348084
+  // https://bioimage.io/#/?tags=stardist&id=10.5281%2Fzenodo.6338614
   // basically, in the case of VHE: 2^3 * 2 = 16
   protected _getPaddings(height: number, width: number) {
     const padY = height % 16 === 0 ? 0 : 16 - (height % 16);
