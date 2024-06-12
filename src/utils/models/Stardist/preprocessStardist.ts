@@ -52,7 +52,7 @@ const padImage = (image: {
     }
   });
 
-  // no casting, stardistFluo input should be float32
+  // no casting, stardist input should be float32
   return imageTensor as Tensor3D;
 };
 
