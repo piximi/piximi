@@ -18,7 +18,7 @@ export class StardistFluo extends Stardist {
       graph: true,
       pretrained: true,
       trainable: false,
-      requiredChannels: 3,
+      requiredChannels: 1,
     });
   }
 
