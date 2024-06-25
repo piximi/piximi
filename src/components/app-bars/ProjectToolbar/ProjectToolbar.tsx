@@ -63,18 +63,8 @@ export const ProjectToolbar = () => {
   const dispatch = useDispatch();
   const activeKind = useSelector(selectActiveKindId);
   const loadPercent = useSelector(selectLoadPercent);
-  const loadMessage = useSelector(selectLoadMessage);
-  const projectName = useSelector(selectProjectName);
-  const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
-    React.useState<null | HTMLElement>(null);
-
-  const categories = useSelector(selectActiveCategories);
-  const [value, setValue] = useState<number>(1);
-  const [newProjectName, setNewProjectName] = useState<string>(projectName);
-  const inputRef = useRef<HTMLInputElement>(null);
   const isMobile = useMobileView();
   const navigate = useNavigate();
-  const { onOpen, onClose, open, anchorEl } = useMenu();
 
   const {
     allSelected,
@@ -90,21 +80,6 @@ export const ProjectToolbar = () => {
     open: deleteImagesDialogisOpen,
   } = useDialogHotkey(HotkeyView.DialogWithAction);
 
-  const handleSizeChange = (event: Event, newValue: number | number[]) => {
-    setValue(newValue as number);
-    dispatch(
-      applicationSettingsSlice.actions.updateTileSize({
-        newValue: newValue as number,
-      })
-    );
-  };
-  const onOpenCategoriesMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    setCategoryMenuAnchorEl(event.currentTarget);
-  };
-
-  const onCloseCategoryMenu = () => {
-    setCategoryMenuAnchorEl(null);
-  };
   const handleDelete = () => {
     dispatch(
       dataSlice.actions.deleteThings({
@@ -113,59 +88,6 @@ export const ProjectToolbar = () => {
         isPermanent: true,
       })
     );
-  };
-
-  const onZoomOut = () => {
-    const newValue = value - 0.1 >= minZoom ? value - 0.1 : minZoom;
-    setValue(newValue as number);
-    dispatch(
-      applicationSettingsSlice.actions.updateTileSize({
-        newValue: newValue as number,
-      })
-    );
-  };
-
-  const onZoomIn = () => {
-    const newValue = value + 0.1 <= maxZoom ? value + 0.1 : maxZoom;
-    setValue(newValue as number);
-    dispatch(
-      applicationSettingsSlice.actions.updateTileSize({
-        newValue: newValue as number,
-      })
-    );
-  };
-  const handleUpdateCategories = (categoryId: string) => {
-    const updates = unfilteredSelectedThings.map((thingId) => ({
-      id: thingId,
-      categoryId: categoryId,
-      partition: Partition.Unassigned,
-    }));
-    dispatch(
-      dataSlice.actions.updateThings({
-        updates,
-        isPermanent: true,
-      })
-    );
-  };
-
-  const handleTextFieldBlur = () => {
-    if (projectName === newProjectName) return;
-    dispatch(projectSlice.actions.setProjectName({ name: newProjectName }));
-    setNewProjectName("");
-  };
-
-  const handleTextFieldChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setNewProjectName(event.target.value);
-  };
-
-  const handleTextFieldEnter = (
-    event: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (event.key === "Enter") {
-      inputRef.current?.blur();
-    }
   };
 
   const handleNavigateImageViewer = () => {
@@ -196,47 +118,12 @@ export const ProjectToolbar = () => {
       <Toolbar>
         <LogoLoader width={250} height={50} loadPercent={loadPercent} />
 
-        {loadMessage ? (
-          <Typography ml={5} sx={{ flexGrow: 1 }}>
-            {loadMessage}
-          </Typography>
-        ) : (
-          <FormControl>
-            <TextField
-              onChange={handleTextFieldChange}
-              onBlur={handleTextFieldBlur}
-              onKeyDown={handleTextFieldEnter}
-              defaultValue={projectName}
-              inputRef={inputRef}
-              size="small"
-              sx={{ ml: 5 }}
-            />
-          </FormControl>
-        )}
+        <ProjectTextField />
 
         <Box sx={{ flexGrow: 1 }} />
 
         {isMobile ? (
-          <>
-            <IconButton color="inherit" onClick={onOpen}>
-              <ZoomInIcon />
-            </IconButton>
-            <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
-              <Box display="flex" flexDirection="column" alignItems="center">
-                <AddIcon />
-                <Slider
-                  orientation="vertical"
-                  value={value}
-                  min={minZoom}
-                  max={maxZoom}
-                  step={0.1}
-                  onChange={handleSizeChange}
-                  sx={{ height: (maxZoom - minZoom) * 20 + "px", my: 1, mr: 0 }}
-                />
-                <RemoveIcon />
-              </Box>
-            </Menu>
-          </>
+          <ZoomControl />
         ) : (
           <>
             <SortSelection />
@@ -246,24 +133,7 @@ export const ProjectToolbar = () => {
               flexItem
               sx={{ ml: 2 }}
             />
-            <IconButton color="inherit" onClick={onOpen}>
-              <ZoomInIcon />
-            </IconButton>
-            <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
-              <Box display="flex" flexDirection="column" alignItems="center">
-                <AddIcon onClick={onZoomIn} />
-                <Slider
-                  orientation="vertical"
-                  value={value}
-                  min={minZoom}
-                  max={maxZoom}
-                  step={0.1}
-                  onChange={handleSizeChange}
-                  sx={{ height: (maxZoom - minZoom) * 20 + "px", my: 1, mr: 0 }}
-                />
-                <RemoveIcon onClick={onZoomOut} />
-              </Box>
-            </Menu>
+            <ZoomControl />
 
             <TooltipButton
               tooltipTitle={TooltipTitle(`Select all`, "control", "a")}
@@ -306,24 +176,9 @@ export const ProjectToolbar = () => {
               flexItem
               sx={{ mr: 2 }}
             />
-            <Tooltip
-              title={
-                unfilteredSelectedThings.length === 0
-                  ? "Select Objects to Categorize"
-                  : "Categorize Selection"
-              }
-            >
-              <span>
-                <Chip
-                  avatar={<LabelOutlinedIcon color="inherit" />}
-                  label="Categorize"
-                  onClick={onOpenCategoriesMenu}
-                  variant="outlined"
-                  sx={{ marginRight: 1 }}
-                  disabled={unfilteredSelectedThings.length === 0}
-                />
-              </span>
-            </Tooltip>
+            <CategorizeChip
+              unfilteredSelectedThings={unfilteredSelectedThings}
+            />
             <Tooltip
               title={
                 allSelectedThingIds.length === 0
@@ -355,14 +210,7 @@ export const ProjectToolbar = () => {
           </>
         )}
       </Toolbar>
-      <ImageCategoryMenu
-        anchorEl={categoryMenuAnchorEl as HTMLElement}
-        selectedIds={unfilteredSelectedThings}
-        onClose={onCloseCategoryMenu}
-        open={Boolean(categoryMenuAnchorEl as HTMLElement)}
-        onUpdateCategories={handleUpdateCategories}
-        categories={categories}
-      />
+
       <DialogWithAction
         title={`Delete ${pluralize(
           "Object",
@@ -377,6 +225,176 @@ export const ProjectToolbar = () => {
         isOpen={deleteImagesDialogisOpen}
         onClose={handleCloseDeleteImagesDialog}
       />
+    </>
+  );
+};
+
+const ZoomControl = () => {
+  const dispatch = useDispatch();
+  const [value, setValue] = useState<number>(1);
+  const { onOpen, onClose, open, anchorEl } = useMenu();
+
+  const handleSizeChange = (event: Event, newValue: number | number[]) => {
+    setValue(newValue as number);
+    dispatch(
+      applicationSettingsSlice.actions.updateTileSize({
+        newValue: newValue as number,
+      })
+    );
+  };
+
+  const onZoomOut = () => {
+    const newValue = value - 0.1 >= minZoom ? value - 0.1 : minZoom;
+    setValue(newValue as number);
+    dispatch(
+      applicationSettingsSlice.actions.updateTileSize({
+        newValue: newValue as number,
+      })
+    );
+  };
+
+  const onZoomIn = () => {
+    const newValue = value + 0.1 <= maxZoom ? value + 0.1 : maxZoom;
+    setValue(newValue as number);
+    dispatch(
+      applicationSettingsSlice.actions.updateTileSize({
+        newValue: newValue as number,
+      })
+    );
+  };
+
+  return (
+    <>
+      <IconButton color="inherit" onClick={onOpen}>
+        <ZoomInIcon />
+      </IconButton>
+      <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
+        <Box display="flex" flexDirection="column" alignItems="center">
+          <AddIcon onClick={onZoomIn} />
+          <Slider
+            orientation="vertical"
+            value={value}
+            min={minZoom}
+            max={maxZoom}
+            step={0.1}
+            onChange={handleSizeChange}
+            sx={{ height: (maxZoom - minZoom) * 20 + "px", my: 1, mr: 0 }}
+          />
+          <RemoveIcon onClick={onZoomOut} />
+        </Box>
+      </Menu>
+    </>
+  );
+};
+
+const CategorizeChip = ({
+  unfilteredSelectedThings,
+}: {
+  unfilteredSelectedThings: string[];
+}) => {
+  const dispatch = useDispatch();
+  const categories = useSelector(selectActiveCategories);
+  const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
+    React.useState<null | HTMLElement>(null);
+  const onOpenCategoriesMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+    setCategoryMenuAnchorEl(event.currentTarget);
+  };
+
+  const onCloseCategoryMenu = () => {
+    setCategoryMenuAnchorEl(null);
+  };
+  const handleUpdateCategories = (categoryId: string) => {
+    const updates = unfilteredSelectedThings.map((thingId) => ({
+      id: thingId,
+      categoryId: categoryId,
+      partition: Partition.Unassigned,
+    }));
+    dispatch(
+      dataSlice.actions.updateThings({
+        updates,
+        isPermanent: true,
+      })
+    );
+  };
+  return (
+    <>
+      <Tooltip
+        title={
+          unfilteredSelectedThings.length === 0
+            ? "Select Objects to Categorize"
+            : "Categorize Selection"
+        }
+      >
+        <span>
+          <Chip
+            avatar={<LabelOutlinedIcon color="inherit" />}
+            label="Categorize"
+            onClick={onOpenCategoriesMenu}
+            variant="outlined"
+            sx={{ marginRight: 1 }}
+            disabled={unfilteredSelectedThings.length === 0}
+          />
+        </span>
+      </Tooltip>
+      <ImageCategoryMenu
+        anchorEl={categoryMenuAnchorEl as HTMLElement}
+        selectedIds={unfilteredSelectedThings}
+        onClose={onCloseCategoryMenu}
+        open={Boolean(categoryMenuAnchorEl as HTMLElement)}
+        onUpdateCategories={handleUpdateCategories}
+        categories={categories}
+      />
+    </>
+  );
+};
+
+const ProjectTextField = () => {
+  const dispatch = useDispatch();
+
+  const loadMessage = useSelector(selectLoadMessage);
+  const projectName = useSelector(selectProjectName);
+  const [newProjectName, setNewProjectName] = useState<string>(projectName);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleTextFieldBlur = () => {
+    if (projectName === newProjectName) return;
+    dispatch(projectSlice.actions.setProjectName({ name: newProjectName }));
+    setNewProjectName("");
+  };
+
+  const handleTextFieldChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setNewProjectName(event.target.value);
+  };
+
+  const handleTextFieldEnter = (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (event.key === "Enter") {
+      inputRef.current?.blur();
+    }
+  };
+
+  return (
+    <>
+      {loadMessage ? (
+        <Typography ml={5} sx={{ flexGrow: 1 }}>
+          {loadMessage}
+        </Typography>
+      ) : (
+        <FormControl>
+          <TextField
+            onChange={handleTextFieldChange}
+            onBlur={handleTextFieldBlur}
+            onKeyDown={handleTextFieldEnter}
+            defaultValue={projectName}
+            inputRef={inputRef}
+            size="small"
+            sx={{ ml: 5 }}
+          />
+        </FormControl>
+      )}
     </>
   );
 };
