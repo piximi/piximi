@@ -18,6 +18,7 @@ export { useErrorHandler } from "./useErrorHandler";
 export { useUnloadConfirmation } from "./useUnloadConfirmation";
 export { useBreakpointObserver } from "./useBreakpointObserver";
 export { useMobileView } from "./useMobileView";
+export { useThingSelection } from "./useThingSelection";
 
 // useDefaultImage not included to encourage use of
 // import {useDefaultImage, DispatchLocation} from "hooks/useDefaultImage"

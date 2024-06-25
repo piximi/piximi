@@ -71,6 +71,7 @@ const imageTools: Record<string, OperationType> = {
     description: "-",
     options: <MeasurementOptions />,
     hotkey: "M",
+    mobile: true,
   },
   learning: {
     icon: (color) => <ScatterPlotIcon sx={{ color }} />,

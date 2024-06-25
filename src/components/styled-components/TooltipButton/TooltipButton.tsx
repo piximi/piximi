@@ -1,11 +1,13 @@
-import { Button, ButtonProps, Tooltip } from "@mui/material";
+import { Button, ButtonProps, IconButton, Tooltip } from "@mui/material";
 import React, { ReactNode } from "react";
 
 type TooltipButtonProps = ButtonProps & {
   tooltipTitle: string | ReactNode;
+  icon?: boolean;
 };
 export const TooltipButton = ({
   tooltipTitle,
+  icon,
   ...props
 }: TooltipButtonProps) => {
   return (
@@ -21,9 +23,7 @@ export const TooltipButton = ({
       title={tooltipTitle}
       disableInteractive
     >
-      <span>
-        <Button {...props} />
-      </span>
+      <span>{icon ? <IconButton {...props} /> : <Button {...props} />}</span>
     </Tooltip>
   );
 };

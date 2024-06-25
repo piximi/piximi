@@ -256,6 +256,14 @@ export class PseudoFileList {
 }
 
 /*
+  STRING HELPERS
+*/
+
+export const pluralize = (word: string, count: number) => {
+  return `${count > 1 ? word + "s" : word}`;
+};
+
+/*
  =======================
  General Utility Methods
  =======================

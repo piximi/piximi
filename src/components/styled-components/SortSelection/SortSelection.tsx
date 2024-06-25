@@ -28,7 +28,7 @@ export const SortSelection = () => {
       <Select //TODO: This should be a styled component. Styling keeps label in border
         size="small"
         sx={{
-          width: 200,
+          width: 120,
           "& legend": {
             visibility: "visible",
             maxWidth: "100%",
@@ -50,7 +50,12 @@ export const SortSelection = () => {
         onChange={onSortKeyChange}
       >
         {Object.values(ThingSortKey).map((sortType) => (
-          <MenuItem key={sortType} value={sortType} dense>
+          <MenuItem
+            key={sortType}
+            value={sortType}
+            dense
+            sx={{ width: "120px" }}
+          >
             {sortType}
           </MenuItem>
         ))}
