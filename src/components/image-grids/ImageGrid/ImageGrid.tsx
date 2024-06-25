@@ -67,36 +67,28 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
           })}
           maxWidth={false}
         >
-          <div
-            onClick={() => {
-              dispatch(
-                projectSlice.actions.deselectThings({ ids: selectedThingIds })
-              );
+          <Grid
+            container
+            gap={2}
+            sx={{
+              transform: "translateZ(0)",
+              height: "100%",
+              overflowY: "scroll",
             }}
           >
-            <Grid
-              container
-              gap={2}
-              sx={{
-                transform: "translateZ(0)",
-                height: "100%",
-                overflowY: "scroll",
-              }}
-            >
-              {things
-                .slice(0, max_images)
-                .sort(sortFunction)
-                .map((thing: ImageObject | AnnotationObject) => (
-                  <ProjectGridItem
-                    key={thing.id}
-                    thing={thing}
-                    handleClick={handleSelectThing}
-                    selected={selectedThingIds.includes(thing.id)}
-                    filtered={isFiltered(thing, thingFilters ?? {})}
-                  />
-                ))}
-            </Grid>
-          </div>
+            {things
+              .slice(0, max_images)
+              .sort(sortFunction)
+              .map((thing: ImageObject | AnnotationObject) => (
+                <ProjectGridItem
+                  key={thing.id}
+                  thing={thing}
+                  handleClick={handleSelectThing}
+                  selected={selectedThingIds.includes(thing.id)}
+                  filtered={isFiltered(thing, thingFilters ?? {})}
+                />
+              ))}
+          </Grid>
         </Container>
       </>
     </DropBox>
