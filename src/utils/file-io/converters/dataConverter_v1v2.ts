@@ -23,6 +23,7 @@ import {
   generateUnknownCategory,
   generateUUID,
   getPropertiesFromImageSync,
+  isUnknownCategory,
 } from "utils/common/helpers";
 import { logger } from "utils/common/helpers";
 import { Partition } from "utils/models/enums";
@@ -71,29 +72,39 @@ export const dataConverter_v1v2 = (data: {
     },
     changes: {},
   };
+  const nonUnknownCategoryMap: Record<string, string> = {};
   for (const category of oldCategories) {
     if (category.id === UNKNOWN_IMAGE_CATEGORY_ID) {
       continue;
     } else {
-      categories.ids.push(category.id);
-      categories.entities[category.id] = {
+      let catId: string = category.id;
+      if (isUnknownCategory(catId)) {
+        catId = "1" + category.id.slice(1);
+        nonUnknownCategoryMap[category.id] = catId;
+      }
+      categories.ids.push(catId);
+      categories.entities[catId] = {
         saved: {
           ...category,
+          id: catId,
+          kind: "Image",
           containing: [],
         } as Category,
         changes: {},
       };
-      kinds.entities["Image"].saved.categories.push(category.id);
+      kinds.entities["Image"].saved.categories.push(catId);
     }
   }
 
   for (const image of images) {
     image.kind = "Image";
     kinds.entities["Image"].saved.containing.push(image.id);
-    const cat =
-      image.categoryId === UNKNOWN_IMAGE_CATEGORY_ID
-        ? unknownCategoryId
-        : image.categoryId;
+    let cat: string;
+    if (image.categoryId === UNKNOWN_IMAGE_CATEGORY_ID) {
+      cat = unknownCategoryId;
+    } else {
+      cat = nonUnknownCategoryMap[image.categoryId] ?? image.categoryId;
+    }
     image.categoryId = cat;
     image.containing = [];
 
