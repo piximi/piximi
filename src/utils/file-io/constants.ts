@@ -3,4 +3,5 @@ export const MIMETYPES = [
   "image/jpeg",
   "image/tiff",
   "image/dicom",
+  "image/bmp",
 ] as const;
