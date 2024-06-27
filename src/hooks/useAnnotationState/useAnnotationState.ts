@@ -39,14 +39,8 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
 
   const onAnnotated = useMemo(() => {
     const func = () => {
-      dispatch(
-        annotatorSlice.actions.setAnnotationState({
-          annotationState: AnnotationState.Annotated,
-          kind: selectedCategory?.kind,
-          annotationTool,
-        })
-      );
       if (selectionMode !== AnnotationMode.New) return;
+
       if (!selectedCategory) {
         if (!defaultSelectedCategory) return;
         dispatch(
@@ -66,6 +60,14 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
           activeImageId!
         );
       }
+
+      dispatch(
+        annotatorSlice.actions.setAnnotationState({
+          annotationState: AnnotationState.Annotated,
+          kind: selectedCategory?.kind ?? defaultSelectedCategory?.kind,
+          annotationTool,
+        })
+      );
     };
     return func;
   }, [
