@@ -132,6 +132,12 @@ export const ExampleProjectCard = ({
 
       batch(() => {
         // loadPercent will be set to 1 here
+        dispatch(
+          projectSlice.actions.setProjectImageChannels({
+            channels: Object.values(data.things.entities)[0].saved.shape
+              .channels,
+          })
+        );
         dispatch(dataSlice.actions.initializeState({ data }));
         dispatch(projectSlice.actions.setProject({ project }));
 

@@ -6,6 +6,7 @@ import { dataConverter_v1v2 } from "utils/file-io/converters/dataConverter_v1v2"
 import { dataSlice } from "store/data/dataSlice";
 import { SerializedFileType } from "utils/file-io/types";
 import { loadExampleImage } from "utils/file-io/loadExampleImage";
+import { projectSlice } from "store/project";
 
 type ExampleImageType = {
   name: string;
@@ -50,6 +51,7 @@ export const ExampleImageCard = ({
     });
 
     batch(() => {
+      dispatch(projectSlice.actions.setProjectImageChannels({ channels: 3 }));
       dispatch(
         dataSlice.actions.initializeState({
           data,

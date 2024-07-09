@@ -49,6 +49,9 @@ const loadState = async () => {
     annotations,
     annotationCategories,
   });
+
+  preloadedState.project = { ...preloadedState.project, imageChannels: 3 };
+
   return preloadedState;
 };
 

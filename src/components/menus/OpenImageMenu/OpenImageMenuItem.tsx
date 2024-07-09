@@ -1,12 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { ListItemText, MenuItem } from "@mui/material";
 
-import { useUpload } from "hooks";
-
-import { ImageShapeDialog } from "components/dialogs/ImageShapeDialog/ImageShapeDialog";
-import { ImageShapeInfo } from "utils/file-io/types";
-import { ImageShapeEnum } from "utils/file-io/enums";
+import { useFileUpload } from "contexts/FileUploadContext";
 
 //TODO: MenuItem??
 
@@ -15,26 +11,11 @@ type OpenImageMenuItemProps = {
 };
 
 export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
-  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
-
-  const [imageShape, setImageShape] = useState<ImageShapeInfo>({
-    shape: ImageShapeEnum.InvalidImage,
-  });
-
-  const [files, setFiles] = React.useState<FileList>();
-
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
+  const uploadFiles = useFileUpload();
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.currentTarget.files) return;
+    if (!event.currentTarget.files || !uploadFiles) return;
     const files: FileList = Object.assign([], event.currentTarget.files);
-    const shapeInfo = await uploadFiles(files);
-
-    if (shapeInfo.shape === ImageShapeEnum.HyperStackImage) {
-      setImageShape(shapeInfo);
-      setFiles(files);
-    } else {
-      onCloseMenu();
-    }
+    await uploadFiles(files);
   };
 
   return (
@@ -50,17 +31,6 @@ export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
           type="file"
         />
       </MenuItem>
-      {files?.length && (
-        <ImageShapeDialog
-          files={files}
-          open={openDimensionsDialogBox}
-          onClose={() => {
-            setOpenDimensionsDialogBox(false);
-            onCloseMenu();
-          }}
-          referenceImageShape={imageShape}
-        />
-      )}
     </React.Fragment>
   );
 };

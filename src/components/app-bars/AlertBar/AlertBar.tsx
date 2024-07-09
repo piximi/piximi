@@ -154,7 +154,7 @@ export const AlertBar = ({
             color: colorTheme.contrastText,
           }}
         >
-          <Typography sx={{ pl: 3, pb: 1 }}>
+          <Typography sx={{ pl: 3, pb: 1, whiteSpace: "pre-wrap" }}>
             {alertState.description}
           </Typography>
         </Box>

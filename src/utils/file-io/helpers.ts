@@ -9,10 +9,7 @@ import {
   MIMEType,
 } from "./types";
 import { MIMETYPES } from "./constants";
-import {
-  convertToImage,
-  getImageInformation,
-} from "utils/common/tensorHelpers";
+import { convertToImage } from "utils/common/tensorHelpers";
 import { ImageShapeEnum } from "./enums";
 import { getStackTraceFromError } from "utils/common/helpers";
 import { AlertState } from "utils/common/types";
@@ -22,39 +19,7 @@ import { ImageObject } from "store/data/types";
 async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   let imageStack: ImageJS.Stack;
   if (imageTypeEnum === ImageShapeEnum.DicomImage) {
-    const imgArrayBuffer = await imageFile.arrayBuffer();
-
-    const imgArray = new Uint8Array(imgArrayBuffer);
-
-    var dicomImgData = DicomParser.parseDicom(imgArray);
-    var pixelDataElement = dicomImgData.elements.x7fe00010;
-
-    const samplesPerPixel = dicomImgData.int16("x00280002");
-    const rows = dicomImgData.int16("x00280010");
-    const columns = dicomImgData.int16("x00280011");
-    const bitsAllocated = dicomImgData.int16("x00280100");
-
-    if (!samplesPerPixel || !rows || !columns || !bitsAllocated) {
-      throw Error("Failed to parse dicom image tags");
-    }
-
-    var pixelData = new Uint16Array(
-      dicomImgData.byteArray.buffer,
-      pixelDataElement.dataOffset,
-      pixelDataElement.length / 2
-    );
-
-    const img = new ImageJS.Image(rows, columns, pixelData, {
-      components: samplesPerPixel,
-      bitDepth: bitsAllocated,
-      alpha: 0,
-    });
-
-    const channels: ImageJS.Image[] = [];
-    for (let i = 0; i < samplesPerPixel; i++) {
-      channels.push(img.getChannel(i));
-    }
-    imageStack = new ImageJS.Stack(channels);
+    imageStack = await decodeDicomImage(imageFile);
   } else {
     imageStack = await loadImageFileAsStack(imageFile);
   }
@@ -65,6 +30,78 @@ async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   } as ImageFileType;
 }
 
+export const decodeDicomImage = async (imageFile: File) => {
+  const imgArrayBuffer = await imageFile.arrayBuffer();
+
+  const imgArray = new Uint8Array(imgArrayBuffer);
+
+  var dicomImgData = DicomParser.parseDicom(imgArray);
+  var pixelDataElement = dicomImgData.elements.x7fe00010;
+
+  const samplesPerPixel = dicomImgData.int16("x00280002");
+  const rows = dicomImgData.int16("x00280010");
+  const columns = dicomImgData.int16("x00280011");
+  const bitsAllocated = dicomImgData.int16("x00280100");
+
+  if (!samplesPerPixel || !rows || !columns || !bitsAllocated) {
+    throw Error("Failed to parse dicom image tags");
+  }
+
+  var pixelData = new Uint16Array(
+    dicomImgData.byteArray.buffer,
+    pixelDataElement.dataOffset,
+    pixelDataElement.length / 2
+  );
+
+  const img = new ImageJS.Image(rows, columns, pixelData, {
+    components: samplesPerPixel,
+    bitDepth: bitsAllocated,
+    alpha: 0,
+  });
+
+  const channels: ImageJS.Image[] = [];
+  for (let i = 0; i < samplesPerPixel; i++) {
+    channels.push(img.getChannel(i));
+  }
+  return new ImageJS.Stack(channels);
+};
+/*
+  Receives a File blob and returns an ImageJS.Stack
+  
+  If the file is a greyscale, rgb, rgba, ImageJS will return a single
+  ImageJS.Image object, where the data field has the pixel data interleaved
+  (including alpha, if present).
+
+    e.g. for rgba: [r1, g1, b1, a1, r2, g2, b2, a2, ...]
+
+  Otherwise ImageJS will return an ImageJS.Stack object, which is a sublcass
+  of a simple array, where each element is a single channel ImageJS.Image object.
+
+  Instead we want to always return a stack, regardless of filetype.
+  Alpha channel is discarded, if present.
+  BitDepth and datat type is preserved.
+
+  ---
+
+  The File object, may come from an HTML <input type="file">,
+  
+  or generated via "fileFromPath" either here or in "nodeImageHelper.ts"
+*/
+export const loadImageFileAsStack = async (file: File) => {
+  try {
+    const buffer = await file.arrayBuffer();
+
+    const image = (await ImageJS.Image.load(buffer, {
+      ignorePalette: true,
+    })) as ImageJS.Image | ImageJS.Stack;
+
+    return forceStack(image);
+  } catch (err) {
+    process.env.NODE_ENV !== "production" &&
+      console.error(`Error loading image file ${file.name}`);
+    throw err;
+  }
+};
 function isImageShapeValid(
   imageStack: Array<ImageJS.Image>,
   channels: number,
@@ -169,21 +206,15 @@ export const uploadImages = async (
  ----------------------------
  */
 
-const forceStack = async (image: ImageJS.Image | ImageJS.Stack) => {
-  const imageShapeInfo = getImageInformation(image);
-
-  if (imageShapeInfo.shape !== ImageShapeEnum.HyperStackImage) {
-    image = (image as ImageJS.Image).split({ preserveAlpha: false });
-    // preserveAlpha removes the alpha data from each ImageJS.Image
-    // but its still present as its own ImageJS.Image as the final
-    // element of the stack, so remove it
-    if (imageShapeInfo.alpha) {
-      image = new ImageJS.Stack(image.splice(0, image.length - 1));
-    }
-    return image;
-  } else {
+export const forceStack = async (image: ImageJS.Image | ImageJS.Stack) => {
+  if (Array.isArray(image)) {
     return image as ImageJS.Stack;
   }
+  const splitImage = (image as ImageJS.Image).split({ preserveAlpha: false });
+  if (image.alpha === 1) {
+    return new ImageJS.Stack(splitImage.splice(0, splitImage.length - 1));
+  }
+  return splitImage;
 };
 
 /*
@@ -225,44 +256,6 @@ export const fileFromPath = async (
 };
 
 /*
-  Receives a File blob and returns an ImageJS.Stack
-  
-  If the file is a greyscale, rgb, rgba, ImageJS will return a single
-  ImageJS.Image object, where the data field has the pixel data interleaved
-  (including alpha, if present).
-
-    e.g. for rgba: [r1, g1, b1, a1, r2, g2, b2, a2, ...]
-
-  Otherwise ImageJS will return an ImageJS.Stack object, which is a sublcass
-  of a simple array, where each element is a single channel ImageJS.Image object.
-
-  Instead we want to always return a stack, regardless of filetype.
-  Alpha channel is discarded, if present.
-  BitDepth and datat type is preserved.
-
-  ---
-
-  The File object, may come from an HTML <input type="file">,
-  
-  or generated via "fileFromPath" either here or in "nodeImageHelper.ts"
-*/
-export const loadImageFileAsStack = async (file: File) => {
-  try {
-    const buffer = await file.arrayBuffer();
-
-    const image = (await ImageJS.Image.load(buffer, {
-      ignorePalette: true,
-    })) as ImageJS.Image | ImageJS.Stack;
-
-    return forceStack(image);
-  } catch (err) {
-    process.env.NODE_ENV !== "production" &&
-      console.error(`Error loading image file ${file.name}`);
-    throw err;
-  }
-};
-
-/*
   Converts a base64 dataURL encoded image into an ImageJS stack
 
   If the encoded image is a greyscale, rgb, or rgba, ImageJS will return a single
@@ -289,6 +282,44 @@ export const loadDataUrlAsStack = async (dataURL: string) => {
     process.env.NODE_ENV !== "production" &&
       console.error("Error loading dataURL");
     throw err;
+  }
+};
+
+export const getImageInformation = (
+  image: ImageJS.Image | ImageJS.Stack
+): ImageShapeInfo => {
+  // a "proper" RGB will be an ImageJS.Image object with 3 components
+  if (!Array.isArray(image) && image.components === 3) {
+    return {
+      shape: ImageShapeEnum.SingleRGBImage,
+      components: image.components,
+      bitDepth: image.bitDepth,
+      alpha: image.alpha === 1,
+    };
+    // 1 channel (greyscale) image will also be an ImageJs.Image object
+  } else if (!Array.isArray(image) && image.components === 1) {
+    return {
+      shape: ImageShapeEnum.GreyScale,
+      components: image.components,
+      bitDepth: image.bitDepth,
+      alpha: image.alpha === 1,
+    };
+    // should not happen
+  } else if (!Array.isArray(image)) {
+    process.env.NODE_ENV !== "production" &&
+      console.error("Unrecognized Image.JS.Image type, channels not in [1,3]");
+    return {
+      shape: ImageShapeEnum.InvalidImage,
+    };
+  }
+  // else RGBstack, or multi-channel, or multi-z-stack image as an ImageJS.Stack object
+  else {
+    return {
+      shape: ImageShapeEnum.HyperStackImage,
+      components: image.length,
+      bitDepth: image[0].bitDepth,
+      alpha: image[0].alpha === 1,
+    };
   }
 };
 

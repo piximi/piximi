@@ -34,10 +34,11 @@ export const CategoriesList = () => {
   const categories = useSelector(selectActiveCategories);
   const activeUnknownCategory = useSelector(selectActiveUnknownCategory);
   const activeKind = useSelector(selectActiveKindId);
+
   const [selectedCategory, setSelectedCategory] = useState<Category>();
   const [categoryIndex, setCategoryIndex] = useState("");
-
   const highlightedCategory = useSelector(selectHighlightedCategory);
+
   const modelStatus = useSelector(selectClassifierModelStatus);
   const selectedImageIds = useSelector(selectActiveSelectedThingIds);
 
@@ -120,6 +121,18 @@ export const CategoriesList = () => {
   useHotkeys(
     "shift",
     () => {
+      if (
+        categoryIndex.length !== 0 &&
+        !Number.isNaN(+categoryIndex) &&
+        categories[+categoryIndex]
+      ) {
+        dispatch(
+          projectSlice.actions.updateHighlightedCategory({
+            categoryId: categories[+categoryIndex].id,
+          })
+        );
+        setSelectedCategory(categories[+categoryIndex]);
+      }
       if (selectedImageIds.length > 0) {
         dispatch(
           dataSlice.actions.updateThings({
@@ -142,13 +155,11 @@ export const CategoriesList = () => {
 
   useEffect(() => {
     const allCategories = categories;
-    if (categoryIndex.length === 0) {
-      dispatch(
-        projectSlice.actions.updateHighlightedCategory({
-          categoryId: undefined,
-        })
-      );
-    } else if (!Number.isNaN(+categoryIndex) && allCategories[+categoryIndex]) {
+    if (
+      categoryIndex.length !== 0 &&
+      !Number.isNaN(+categoryIndex) &&
+      allCategories[+categoryIndex]
+    ) {
       dispatch(
         projectSlice.actions.updateHighlightedCategory({
           categoryId: allCategories[+categoryIndex].id,
@@ -156,6 +167,7 @@ export const CategoriesList = () => {
       );
     }
   }, [dispatch, categoryIndex, categories]);
+  useEffect(() => {}, [selectedCategory]);
 
   return (
     <>
@@ -212,6 +224,7 @@ export const CategoriesList = () => {
         kind={activeKind}
         onClose={handleCloseCreateCategoryDialog}
         open={isCreateCategoryDialogOpen}
+        changesPermanent={true}
       />
 
       <DialogWithAction
