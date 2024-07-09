@@ -12,52 +12,13 @@ import {
   tidy,
 } from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
-import { ImageShapeEnum } from "utils/file-io/enums";
-import { BitDepth, ImageShapeInfo } from "utils/file-io/types";
+import { BitDepth } from "utils/file-io/types";
 import { Partition } from "utils/models/enums";
 import { generateUUID } from "./helpers";
 import { DEFAULT_COLORS } from "./constants";
 import { Colors } from "./types";
 import { ImageObject } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
-
-export const getImageInformation = (
-  image: ImageJS.Image | ImageJS.Stack
-): ImageShapeInfo => {
-  // a "proper" RGB will be an ImageJS.Image object with 3 components
-  if (!Array.isArray(image) && image.components === 3) {
-    return {
-      shape: ImageShapeEnum.SingleRGBImage,
-      components: image.components,
-      bitDepth: image.bitDepth,
-      alpha: image.alpha === 1,
-    };
-    // 1 channel (greyscale) image will also be an ImageJs.Image object
-  } else if (!Array.isArray(image) && image.components === 1) {
-    return {
-      shape: ImageShapeEnum.GreyScale,
-      components: image.components,
-      bitDepth: image.bitDepth,
-      alpha: image.alpha === 1,
-    };
-    // should not happen
-  } else if (!Array.isArray(image)) {
-    process.env.NODE_ENV !== "production" &&
-      console.error("Unrecognized Image.JS.Image type, channels not in [1,3]");
-    return {
-      shape: ImageShapeEnum.InvalidImage,
-    };
-  }
-  // else RGBstack, or multi-channel, or multi-z-stack image as an ImageJS.Stack object
-  else {
-    return {
-      shape: ImageShapeEnum.HyperStackImage,
-      components: image.length,
-      bitDepth: image[0].bitDepth,
-      alpha: image[0].alpha === 1,
-    };
-  }
-};
 
 /*
  ========================================

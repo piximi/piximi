@@ -6,6 +6,7 @@ import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { intersection } from "lodash";
 
 import {
+  generateUnknownCategory,
   generateUUID,
   isUnknownCategory,
   mutatingFilter,
@@ -48,7 +49,24 @@ export const dataSlice = createSlice({
   name: "data",
   initialState: initialState,
   reducers: {
-    resetData: (state) => initialState(),
+    resetData: (state) => {
+      const newState = initialState();
+      const newUnknownCategory = generateUnknownCategory("Image");
+      const imageKind = {
+        id: "Image",
+        categories: [newUnknownCategory.id],
+        containing: [],
+        unknownCategoryId: newUnknownCategory.id,
+      } as Kind;
+      newState.kinds.ids.push(imageKind.id);
+      newState.kinds.entities[imageKind.id] = { saved: imageKind, changes: {} };
+      newState.categories.ids.push(newUnknownCategory.id);
+      newState.categories.entities[newUnknownCategory.id] = {
+        saved: newUnknownCategory,
+        changes: {},
+      };
+      return newState;
+    },
     initializeState(
       state,
       action: PayloadAction<{

@@ -37,11 +37,13 @@ export const MeasurementView = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(
-      measurementsSlice.actions.updateChannelOptions({
-        numChannels: projectImageChannels,
-      })
-    );
+    if (projectImageChannels) {
+      dispatch(
+        measurementsSlice.actions.updateChannelOptions({
+          numChannels: projectImageChannels,
+        })
+      );
+    }
   }, [projectImageChannels, dispatch]);
 
   return (

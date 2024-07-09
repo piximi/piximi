@@ -28,10 +28,12 @@ import {
   selectKindTabFilters,
 } from "store/project/selectors";
 import { AddKindMenu } from "components/menus";
+import { selectKindDictionary } from "store/data/selectors";
 
 export const ProjectViewer = () => {
   const dispatch = useDispatch();
   const activeKind = useSelector(selectActiveKindId);
+  const kinds = useSelector(selectKindDictionary);
   const visibleKinds = useSelector(selectVisibleKinds) as string[];
   const filteredKinds = useSelector(selectKindTabFilters) as string[];
   const isMobile = useMobileView();
@@ -67,6 +69,11 @@ export const ProjectViewer = () => {
 
   const handleTabChange = (tab: string) => {
     dispatch(projectSlice.actions.setActiveKind({ kind: tab }));
+    dispatch(
+      projectSlice.actions.updateHighlightedCategory({
+        categoryId: kinds[tab].unknownCategoryId,
+      })
+    );
   };
 
   useEffect(() => {

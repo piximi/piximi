@@ -1,31 +1,16 @@
+import React, { ReactElement } from "react";
 import { Box } from "@mui/material";
-import { ImageShapeDialog } from "components/dialogs";
-import { useDndFileDrop, useUpload } from "hooks";
-import React, { ReactElement, useCallback, useState } from "react";
-import { ImageShapeEnum } from "utils/file-io/enums";
-import { ImageShapeInfo } from "utils/file-io/types";
+import { useFileUpload } from "contexts/FileUploadContext";
+import { useDndFileDrop } from "hooks";
 
 export const DropBox = ({ children }: { children: ReactElement }) => {
-  const [imageShape, setImageShape] = useState<ImageShapeInfo>({
-    shape: ImageShapeEnum.InvalidImage,
-  });
-  const [files, setFiles] = useState<FileList>();
-  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
+  const uploadFiles = useFileUpload();
 
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
-
-  const handleCloseDimensionsDialog = () => {
-    setOpenDimensionsDialogBox(false);
+  const handleDrop = async (files: FileList) => {
+    if (uploadFiles) {
+      await uploadFiles(files);
+    }
   };
-
-  const handleDrop = useCallback(
-    async (files: FileList) => {
-      const imageShapeInfo = await uploadFiles(files);
-      setImageShape(imageShapeInfo);
-      setFiles(files);
-    },
-    [uploadFiles]
-  );
   const [{ isOver }, dropTarget] = useDndFileDrop(handleDrop);
   return (
     <>
@@ -43,14 +28,6 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
       >
         {children}
       </Box>
-      {files?.length && (
-        <ImageShapeDialog
-          files={files}
-          open={openDimensionsDialogBox}
-          onClose={handleCloseDimensionsDialog}
-          referenceImageShape={imageShape}
-        />
-      )}
     </>
   );
 };

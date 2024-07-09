@@ -16,7 +16,7 @@ export const initialState: ProjectState = {
   loadPercent: 1,
   loadMessage: "",
   kindTabFilters: [],
-  imageChannels: 3,
+  imageChannels: undefined,
 };
 
 export const projectSlice = createSlice({
@@ -26,8 +26,7 @@ export const projectSlice = createSlice({
     resetProject: () => initialState,
 
     createNewProject(state, action: PayloadAction<{ name: string }>) {
-      state.name = action.payload.name;
-      state.sortType = ThingSortKey.None;
+      Object.assign(state, initialState, { name: action.payload.name });
     },
     setProject(state, action: PayloadAction<{ project: ProjectState }>) {
       // WARNING, don't do below (overwrites draft object)
@@ -216,6 +215,12 @@ export const projectSlice = createSlice({
     },
     removeAllKindTabFilters(state) {
       state.kindTabFilters = [];
+    },
+    setProjectImageChannels(
+      state,
+      action: PayloadAction<{ channels: number | undefined }>
+    ) {
+      state.imageChannels = action.payload.channels;
     },
   },
 });

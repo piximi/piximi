@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { FormControl, TextField } from "@mui/material";
+import { FormControl, FormHelperText, TextField } from "@mui/material";
 
 const intRegExpr = new RegExp("^[0-9]+(.0*)?$");
 const floatRegExpr = new RegExp("-*^[0-9]*(.[0-9]*)?$");
@@ -10,6 +10,7 @@ type CustomNumberTextFieldProps = {
   label: string;
   value: number;
   dispatchCallBack: (input: number) => void;
+  errorChecker?: (value: string) => { isError: boolean; message: string };
   min?: number;
   max?: number;
   enableFloat?: boolean;
@@ -23,6 +24,7 @@ export const CustomNumberTextField = ({
   label,
   value,
   dispatchCallBack,
+  errorChecker,
   min = Number.MIN_SAFE_INTEGER,
   max = Number.MAX_SAFE_INTEGER,
   enableFloat = false,
@@ -42,20 +44,20 @@ export const CustomNumberTextField = ({
 
   const [inputError, setInputError] = React.useState<boolean>(false);
 
+  const [errorHelpText, setErrorHelpText] = React.useState<string>(" ");
+
   const regExp = enableFloat ? floatRegExpr : intRegExpr;
 
-  var rangeHelperText = ".";
-  if (min !== Number.MIN_SAFE_INTEGER && max !== Number.MAX_SAFE_INTEGER) {
-    rangeHelperText = ` between ${min} and ${max}.`;
-  } else if (min !== Number.MIN_SAFE_INTEGER) {
-    rangeHelperText = ` ${min} or above.`;
-  } else if (max !== Number.MAX_SAFE_INTEGER) {
-    rangeHelperText = ` ${max} or below.`;
-  }
-
-  const errorHelpText = `${label} must be a ${
-    enableFloat ? "floating point" : "integer"
-  } value${rangeHelperText}`;
+  const rangeHelperText = React.useMemo(() => {
+    if (min !== Number.MIN_SAFE_INTEGER && max !== Number.MAX_SAFE_INTEGER) {
+      return ` between ${min} and ${max}`;
+    } else if (min !== Number.MIN_SAFE_INTEGER) {
+      return ` ${min} or above`;
+    } else if (max !== Number.MAX_SAFE_INTEGER) {
+      return ` ${max} or below`;
+    }
+    return "";
+  }, [max, min]);
 
   const onInputChange = (event: React.FormEvent<EventTarget>) => {
     const target = event.target as HTMLInputElement;
@@ -64,6 +66,11 @@ export const CustomNumberTextField = ({
     setValueString(inputString);
 
     if (!regExp.test(target.value) || target.value === "") {
+      setErrorHelpText(
+        `Must be a${
+          enableFloat ? " floating point" : "n integer"
+        } ${rangeHelperText}`
+      );
       setInputError(true);
       return;
     }
@@ -71,10 +78,24 @@ export const CustomNumberTextField = ({
     const arg = Number(inputString);
 
     if (isNaN(arg) || arg < min || arg > max) {
+      setErrorHelpText(
+        `Must be a${
+          enableFloat ? " floating point" : "n integer"
+        } value${rangeHelperText}`
+      );
       setInputError(true);
       return;
     }
 
+    if (errorChecker) {
+      const res = errorChecker(inputString);
+      if (res.isError) {
+        setInputError(true);
+        setErrorHelpText(res.message);
+        return;
+      }
+    }
+    setErrorHelpText(" ");
     setInputError(false);
     setInputValue(arg);
   };
@@ -90,7 +111,6 @@ export const CustomNumberTextField = ({
         onBlur={dispatchValue}
         label={label}
         error={inputError}
-        helperText={inputError ? errorHelpText : ""}
         value={valueString}
         onChange={onInputChange}
         type="text"
@@ -98,8 +118,15 @@ export const CustomNumberTextField = ({
         autoComplete="off"
         disabled={disabled}
         size={size}
-        sx={{ width: width ? width : "inherit" }}
+        sx={{
+          width: width ? width : "inherit",
+          // "& .MuiFormHelperText-root.Mui-error": {
+          //   position: "absolute",
+          //   top: "100%",
+          // },
+        }}
       />
+      <FormHelperText error={inputError}>{errorHelpText}</FormHelperText>
     </FormControl>
   );
 };

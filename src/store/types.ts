@@ -70,7 +70,7 @@ export type ProjectState = {
   loadPercent: number;
   loadMessage: string;
   kindTabFilters: string[];
-  imageChannels: number;
+  imageChannels: number | undefined;
 };
 
 export type ImageViewerState = {
