@@ -69,6 +69,11 @@ export const SegmenterList = () => {
       </Box>
 
       <ImportTensorflowModelDialog
+        loadedModel={
+          selectedModel?.name === "Fully Convolutional Network"
+            ? undefined
+            : selectedModel
+        }
         onClose={onCloseImportSegmenterDialog}
         open={openImportSegmenterDialog}
         modelTask={ModelTask.Segmentation}

@@ -19,16 +19,18 @@ export const PretrainedModelSelector = ({
   setModel,
   error,
   errorText,
+  initModel = "-1",
 }: {
   values: Array<Model>;
   setModel: (model: Model | undefined) => void;
   error?: boolean;
   errorText?: string;
+  initModel: string;
 }) => {
   const [modelIdxs, setModelIdxs] = useState<number[]>(
     range(-1, values.length)
   );
-  const [selectedIdxVal, setSelectedIdxVal] = useState("-1");
+  const [selectedIdxVal, setSelectedIdxVal] = useState(initModel);
 
   useEffect(() => {
     setModelIdxs(range(-1, values.length));
@@ -58,7 +60,6 @@ export const PretrainedModelSelector = ({
           labelId="pretrained-select-label"
           id="pretrained-simple-select"
           value={selectedIdxVal}
-          //value={selectedIdx === -1 ? "None" : String(values[selectedIdx])}
           label="Pre-trained Models"
           onChange={handlePreTrainedModelChange}
           error={error}

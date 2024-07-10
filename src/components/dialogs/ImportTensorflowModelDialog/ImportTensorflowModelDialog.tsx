@@ -73,6 +73,7 @@ const ToolTipTab = (
 
 type ImportTensorflowModelDialogProps = {
   onClose: () => void;
+  loadedModel?: Model;
   open: boolean;
   modelTask: ModelTask;
   dispatchFunction: (model: Model, inputShape: Shape) => void;
@@ -80,12 +81,17 @@ type ImportTensorflowModelDialogProps = {
 
 export const ImportTensorflowModelDialog = ({
   onClose,
+  loadedModel,
   open,
   modelTask,
   dispatchFunction,
 }: ImportTensorflowModelDialogProps) => {
   const projectChannels = useSelector(selectProjectImageChannels);
-  const [selectedModel, setSelectedModel] = useState<Model>();
+  const [selectedModel, setSelectedModel] = useState<Model | undefined>(
+    loadedModel?.name === "Fully Convolutional Network"
+      ? undefined
+      : loadedModel
+  );
   const [inputShape, setInputShape] = useState<Shape>({
     height: 256,
     width: 256,
@@ -120,13 +126,15 @@ export const ImportTensorflowModelDialog = ({
 
     dispatchFunction(selectedModel, inputShape);
 
-    closeDialog();
+    setCloudWarning(false);
+    setInvalidModel(false);
+    onClose();
   };
 
   const closeDialog = () => {
     setCloudWarning(false);
     setInvalidModel(false);
-    setSelectedModel(undefined);
+    setSelectedModel(loadedModel);
     onClose();
   };
 
@@ -228,6 +236,13 @@ export const ImportTensorflowModelDialog = ({
       <Box hidden={tabVal !== "1"}>
         <PretrainedModelSelector
           values={pretrainedModels}
+          initModel={
+            selectedModel
+              ? pretrainedModels.findIndex(
+                  (model) => model.name === selectedModel.name
+                ) + ""
+              : "-1"
+          }
           setModel={onModelChange}
           error={invalidModel}
           errorText={
