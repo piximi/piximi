@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import {
   DialogContent,
   FormControl,
+  FormHelperText,
   InputLabel,
   MenuItem,
   Select,
@@ -16,11 +17,14 @@ import { range } from "lodash";
 export const PretrainedModelSelector = ({
   values,
   setModel,
+  error,
+  errorText,
 }: {
   values: Array<Model>;
   setModel: (model: Model | undefined) => void;
+  error?: boolean;
+  errorText?: string;
 }) => {
-  // const [errMessage, setErrMessage] = useState<string>("");
   const [modelIdxs, setModelIdxs] = useState<number[]>(
     range(-1, values.length)
   );
@@ -44,36 +48,29 @@ export const PretrainedModelSelector = ({
           Choose from a provided pre-trained model
         </Typography>
       </DialogContent>
-      <MenuItem>
-        <FormControl sx={{ width: "75%", ml: 2 }} size="small">
-          <InputLabel id="pretrained-select-label">
-            Pre-trained Models
-          </InputLabel>
-          <Select
-            labelId="pretrained-select-label"
-            id="pretrained-simple-select"
-            value={selectedIdxVal}
-            //value={selectedIdx === -1 ? "None" : String(values[selectedIdx])}
-            label="Pre-trained Models"
-            onChange={handlePreTrainedModelChange}
-          >
-            {modelIdxs.map((idx) => (
-              <MenuItem key={`Pretrained-${idx}`} value={String(idx)}>
-                {idx === -1 ? "None" : values[idx].name}
-              </MenuItem>
-            ))}
-          </Select>
-          {/* <Typography
-            style={{
-              whiteSpace: "pre-line",
-              fontSize: "0.75rem",
-              color: "red",
-            }}
-          >
-            {errMessage}
-          </Typography> */}
-        </FormControl>
-      </MenuItem>
+      <FormControl
+        sx={{ width: "75%", ml: 2, pb: 2 }}
+        size="small"
+        error={error}
+      >
+        <InputLabel id="pretrained-select-label">Pre-trained Models</InputLabel>
+        <Select
+          labelId="pretrained-select-label"
+          id="pretrained-simple-select"
+          value={selectedIdxVal}
+          //value={selectedIdx === -1 ? "None" : String(values[selectedIdx])}
+          label="Pre-trained Models"
+          onChange={handlePreTrainedModelChange}
+          error={error}
+        >
+          {modelIdxs.map((idx) => (
+            <MenuItem key={`Pretrained-${idx}`} value={String(idx)}>
+              {idx === -1 ? "None" : values[idx].name}
+            </MenuItem>
+          ))}
+        </Select>
+        <FormHelperText>{errorText}</FormHelperText>
+      </FormControl>
     </>
   );
 };
