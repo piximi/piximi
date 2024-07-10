@@ -32,6 +32,8 @@ import { availableClassifierModels } from "utils/models/availableClassificationM
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import { HotkeyView } from "utils/common/enums";
 import { Shape } from "store/data/types";
+import { selectProjectImageChannels } from "store/project/selectors";
+import { useSelector } from "react-redux";
 
 const ToolTipTab = (
   props: TabProps & {
@@ -82,6 +84,7 @@ export const ImportTensorflowModelDialog = ({
   modelTask,
   dispatchFunction,
 }: ImportTensorflowModelDialogProps) => {
+  const projectChannels = useSelector(selectProjectImageChannels);
   const [selectedModel, setSelectedModel] = useState<Model>();
   const [inputShape, setInputShape] = useState<Shape>({
     height: 256,
@@ -96,6 +99,7 @@ export const ImportTensorflowModelDialog = ({
   const [cloudWarning, setCloudWarning] = useState(false);
 
   const [tabVal, setTabVal] = useState("1");
+  const [invalidModel, setInvalidModel] = useState(false);
 
   const onModelChange = useCallback((model: Model | undefined) => {
     setSelectedModel(model);
@@ -121,6 +125,8 @@ export const ImportTensorflowModelDialog = ({
 
   const closeDialog = () => {
     setCloudWarning(false);
+    setInvalidModel(false);
+    setSelectedModel(undefined);
     onClose();
   };
 
@@ -152,6 +158,16 @@ export const ImportTensorflowModelDialog = ({
       _pretrainedModels.length === 0 && curr === "1" ? "2" : curr
     );
   }, [modelTask]);
+
+  useEffect(() => {
+    if (modelTask === ModelTask.Segmentation) {
+      if (selectedModel && selectedModel.requiredChannels !== projectChannels) {
+        setInvalidModel(true);
+      } else {
+        setInvalidModel(false);
+      }
+    }
+  }, [modelTask, projectChannels, selectedModel]);
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={closeDialog} open={open}>
@@ -213,6 +229,14 @@ export const ImportTensorflowModelDialog = ({
         <PretrainedModelSelector
           values={pretrainedModels}
           setModel={onModelChange}
+          error={invalidModel}
+          errorText={
+            !selectedModel
+              ? "Select a Model"
+              : invalidModel
+              ? `Model requires ${selectedModel.requiredChannels}-channel images`
+              : ""
+          }
         />
       </Box>
 
@@ -246,7 +270,7 @@ export const ImportTensorflowModelDialog = ({
         <Button
           onClick={dispatchModelToStore}
           color="primary"
-          disabled={!selectedModel}
+          disabled={!selectedModel || invalidModel}
         >
           Open{" "}
           {modelTask === ModelTask.Classification
