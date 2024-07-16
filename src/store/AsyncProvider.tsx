@@ -70,8 +70,11 @@ export const AsyncProvider = ({
       .then((state: RootState) => {
         setPreloaded({ isReady: true, state });
       })
-      .catch(() => {
-        logger("Failed to load preloaded state");
+      .catch((err) => {
+        const error = err as Error;
+        logger(
+          `Failed to load preloaded state: \n ${error} \n${error.message}`
+        );
         setPreloaded({ isReady: true, state: undefined });
       });
   }, [setPreloaded]);

@@ -86,34 +86,40 @@ const getUploadedFileTypes = async (files: FileList) => {
         });
       }
 
-      if (file.name.endsWith("dcm") || file.name.endsWith("DICOM")) {
+      if (
+        file.name.endsWith("dcm") ||
+        file.name.endsWith("DICOM") ||
+        file.name.endsWith("DCM")
+      ) {
         const image = await decodeDicomImage(file);
+
         updateRecord(images, ImageShapeEnum.DicomImage, {
           shape: ImageShapeEnum.DicomImage,
+          components: image.length,
           fileName: file.name,
           ext: "image/dicom",
           image,
         });
+      } else {
+        const buffer = await file.arrayBuffer();
+        const image: ImageJS.Image | ImageJS.Stack = await ImageJS.Image.load(
+          buffer,
+          {
+            ignorePalette: true,
+          }
+        );
+
+        const imageInfo = getImageInformation(image);
+
+        const imageStack = await forceStack(image);
+
+        updateRecord(images, imageInfo.shape, {
+          ...imageInfo,
+          ext,
+          image: imageStack,
+          fileName: file.name,
+        });
       }
-
-      const buffer = await file.arrayBuffer();
-      const image: ImageJS.Image | ImageJS.Stack = await ImageJS.Image.load(
-        buffer,
-        {
-          ignorePalette: true,
-        }
-      );
-
-      const imageInfo = getImageInformation(image);
-
-      const imageStack = await forceStack(image);
-
-      updateRecord(images, imageInfo.shape, {
-        ...imageInfo,
-        ext,
-        image: imageStack,
-        fileName: file.name,
-      });
     } catch (err) {
       const error = err as Error;
       updateRecord(images, ImageShapeEnum.InvalidImage, {
@@ -156,7 +162,8 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
     setFileInfo(imageInfo);
     if (!numChannels) {
       if (
-        ImageShapeEnum.GreyScale in imageInfo &&
+        (ImageShapeEnum.DicomImage in imageInfo ||
+          ImageShapeEnum.GreyScale in imageInfo) &&
         ImageShapeEnum.SingleRGBImage in imageInfo
       ) {
         setUploadPromptMessage(
@@ -169,12 +176,30 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
         setOpenDimensionsDialogBox(true);
       } else if (ImageShapeEnum.GreyScale in imageInfo) {
         updateChannels(imageInfo![ImageShapeEnum.GreyScale]![0].components!);
+      } else if (ImageShapeEnum.DicomImage in imageInfo) {
+        updateChannels(1);
       } else if (ImageShapeEnum.SingleRGBImage in imageInfo) {
         updateChannels(imageInfo[ImageShapeEnum.SingleRGBImage][0].components!);
       } else if (ImageShapeEnum.HyperStackImage in imageInfo) {
         setUploadPromptMessage("How many channels do your images consist of?");
         setReferenceHyperStack(imageInfo[ImageShapeEnum.HyperStackImage][0]);
         setOpenDimensionsDialogBox(true);
+      } else if (ImageShapeEnum.InvalidImage in imageInfo) {
+        const errors = imageInfo[ImageShapeEnum.InvalidImage].map(
+          (info) => `${info.fileName} -- ${info.error}`
+        );
+
+        if (errors.length > 0) {
+          dispatch(
+            applicationSettingsSlice.actions.updateAlertState({
+              alertState: {
+                alertType: AlertType.Error,
+                name: "File Upload Error",
+                description: [...errors].join("\n---\n"),
+              },
+            })
+          );
+        }
       }
     } else {
       setStartUpload(true);
@@ -214,7 +239,11 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
 
       const convertedImages: ImageObject[] = [];
       for await (const fileInfo of uploadedFiles) {
-        if (fileInfo.components! !== numChannels && fileInfo.components! <= 3) {
+        if (
+          fileInfo.ext !== "image/dicom" &&
+          fileInfo.components! !== numChannels &&
+          fileInfo.components! <= 3
+        ) {
           errors.push(
             `${
               fileInfo.fileName
