@@ -47,23 +47,44 @@ export const decodeDicomImage = async (imageFile: File) => {
     throw Error("Failed to parse dicom image tags");
   }
 
-  var pixelData = new Uint16Array(
-    dicomImgData.byteArray.buffer,
-    pixelDataElement.dataOffset,
-    pixelDataElement.length / 2
-  );
-
-  const img = new ImageJS.Image(rows, columns, pixelData, {
-    components: samplesPerPixel,
-    bitDepth: bitsAllocated,
-    alpha: 0,
-  });
-
-  const channels: ImageJS.Image[] = [];
-  for (let i = 0; i < samplesPerPixel; i++) {
-    channels.push(img.getChannel(i));
+  var pixelData: Uint16Array | Uint8Array;
+  if (bitsAllocated === 8) {
+    pixelData = new Uint8Array(
+      dicomImgData.byteArray.buffer,
+      pixelDataElement.dataOffset,
+      pixelDataElement.length / 2
+    );
+  } else {
+    pixelData = new Uint16Array(
+      dicomImgData.byteArray.buffer,
+      pixelDataElement.dataOffset,
+      pixelDataElement.length / 2
+    );
   }
-  return new ImageJS.Stack(channels);
+
+  const rowXCol = rows * columns;
+  const dataSize = pixelData.length;
+  const slices = dataSize / rowXCol;
+
+  const images: ImageJS.Image[] = [];
+  if (Number.isInteger(slices)) {
+    for (let i = 0; i < dataSize; i += rowXCol) {
+      const slicePixelData = pixelData.slice(i, i + rowXCol);
+      const img = new ImageJS.Image(rows, columns, slicePixelData, {
+        components: samplesPerPixel,
+        bitDepth: bitsAllocated,
+        alpha: 0,
+      });
+
+      for (let i = 0; i < samplesPerPixel; i++) {
+        images.push(img.getChannel(i));
+      }
+    }
+  } else {
+    throw new Error("Could not parse dicom image slices.");
+  }
+
+  return new ImageJS.Stack(images);
 };
 /*
   Receives a File blob and returns an ImageJS.Stack
