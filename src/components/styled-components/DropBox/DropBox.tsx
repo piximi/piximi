@@ -1,10 +1,10 @@
 import React, { ReactElement } from "react";
 import { Box } from "@mui/material";
-import { useFileUpload } from "contexts/FileUploadContext";
+import { useFileUploadContext } from "contexts";
 import { useDndFileDrop } from "hooks";
 
 export const DropBox = ({ children }: { children: ReactElement }) => {
-  const uploadFiles = useFileUpload();
+  const uploadFiles = useFileUploadContext();
 
   const handleDrop = async (files: FileList) => {
     if (uploadFiles) {

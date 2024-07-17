@@ -77,7 +77,7 @@ export const DialogWithAction = ({
         </IconButton>
       </Box>
 
-      {content && <DialogContent>{content}</DialogContent>}
+      {content && <DialogContent sx={{ py: 0 }}>{content}</DialogContent>}
 
       <DialogActions>
         <Button

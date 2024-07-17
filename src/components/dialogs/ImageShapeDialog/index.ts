@@ -1,1 +1,0 @@
-export { ImageShapeDialog } from "./ImageShapeDialog";

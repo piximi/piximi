@@ -1,16 +1,13 @@
 import * as ImageJS from "image-js";
-//import * as DicomParser from "dicom-parser";
 import {
   createContext,
   FormEvent,
-  ReactElement,
   ReactNode,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
-import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data";
@@ -29,18 +26,10 @@ import {
   MIMEType,
 } from "utils/file-io/types";
 import { updateRecord } from "utils/common/helpers";
-import { useHotkeys } from "hooks";
-import { AlertType, HotkeyView } from "utils/common/enums";
+import { AlertType } from "utils/common/enums";
 import {
   Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogProps,
-  DialogTitle,
   FormControl,
-  IconButton,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -55,6 +44,7 @@ import {
   selectProjectImageChannels,
 } from "store/project/selectors";
 import { projectSlice } from "store/project";
+import { DialogWithAction } from "components/dialogs";
 
 type ImageShapeInfoImage = ImageFileShapeInfo & {
   fileName: string;
@@ -209,12 +199,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
   const handleCloseDimensionsDialog = () => {
     setUploadPromptMessage("");
     setOpenDimensionsDialogBox(false);
-  };
-  const cancelChannelUpdate = () => {
-    setNumChannels(undefined);
     setChannelOptions(undefined);
-
-    setFileInfo({});
   };
 
   const updateChannels = (channels: number) => {
@@ -329,45 +314,37 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
     <>
       <FileUploadContext.Provider value={uploadFiles}>
         {children}
-        <ImageShapeDialog
-          channelOptions={channelOptions}
-          fileInfo={fileInfo!}
-          promptMessage={uploadPromptMessage}
-          referenceHyperStack={referenceHyperStack}
-          open={openDimensionsDialogBox}
-          onClose={handleCloseDimensionsDialog}
-          onConfirm={updateChannels}
-          onReject={cancelChannelUpdate}
-        />
+        {openDimensionsDialogBox && (
+          <ImageShapeDialog
+            channelOptions={channelOptions}
+            promptMessage={uploadPromptMessage}
+            referenceHyperStack={referenceHyperStack}
+            open={openDimensionsDialogBox}
+            onClose={handleCloseDimensionsDialog}
+            onConfirm={updateChannels}
+          />
+        )}
       </FileUploadContext.Provider>
     </>
   );
 }
 
-export function useFileUpload() {
-  return useContext(FileUploadContext);
-}
-
 type ImageShapeDialogProps = {
   channelOptions?: number[];
   promptMessage: string;
-  fileInfo: Record<number, ImageShapeInfoImage[]>;
   referenceHyperStack?: ImageShapeInfoImage;
   open: boolean;
   onClose: () => void;
   onConfirm: (channels: number) => void;
-  onReject: () => void;
   referenceImageShape?: ImageShapeInfo;
 };
 
 export const ImageShapeDialog = ({
   channelOptions,
   promptMessage,
-  fileInfo,
   referenceHyperStack,
   open,
   onConfirm,
-  onReject,
   onClose,
 }: ImageShapeDialogProps) => {
   const [channels, setChannels] = useState<number>(
@@ -442,17 +419,21 @@ export const ImageShapeDialog = ({
         <Box sx={{ display: "flex", flexDirection: "column" }}>
           <Typography>{promptMessage}</Typography>
           {channelOptions ? (
-            <Select value={"" + channels} onChange={handleSelectChange}>
-              {channelOptions.map((channel) => {
-                return (
-                  <MenuItem key={`channel-${channel}`} value={channel}>
-                    {channel}
-                  </MenuItem>
-                );
-              })}
-            </Select>
+            <Box sx={{ pt: 1 }}>
+              <FormControl size="small" sx={{ width: "15ch", py: "20px" }}>
+                <Select value={"" + channels} onChange={handleSelectChange}>
+                  {channelOptions.map((channel) => {
+                    return (
+                      <MenuItem key={`channel-${channel}`} value={channel}>
+                        {channel}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            </Box>
           ) : (
-            <Box sx={{ pt: 0, pb: 0 }}>
+            <Box sx={{ pt: 2, pb: 0 }}>
               <FormControl size="small" sx={{ width: "15ch", py: "20px" }}>
                 <TextField
                   id="channels-c"
@@ -486,105 +467,20 @@ export const ImageShapeDialog = ({
           )}
         </Box>
       }
-      confirmAndClose={() => {
+      onConfirm={() => {
         onConfirm(channels);
-        onClose();
       }}
       onClose={() => {
-        onReject();
         onClose();
       }}
     />
   );
 };
 
-type DialogWithActionProps = Omit<
-  DialogProps,
-  "children" | "open" | "content"
-> & {
-  title: string;
-  content?: ReactElement | string;
-  confirmAndClose: () => void;
-  rejectAndClose?: () => void;
-  onClose: () => void;
-  isOpen: boolean;
-  confirmText?: string;
-  rejectText?: string;
-  confirmDisabled?: boolean;
-};
-
-export const DialogWithAction = ({
-  title,
-  content,
-  confirmAndClose,
-  rejectAndClose,
-  onClose,
-  confirmText = "Confirm",
-  rejectText = "Reject",
-  isOpen,
-  confirmDisabled,
-  ...rest
-}: DialogWithActionProps) => {
-  useHotkeys(
-    "enter",
-    () => {
-      confirmAndClose();
-    },
-    HotkeyView.DialogWithAction,
-    { enableOnTags: ["INPUT"], enabled: isOpen },
-    [confirmAndClose]
-  );
-
-  return (
-    <Dialog fullWidth onClose={onClose} open={isOpen} {...rest}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        px={1}
-        pb={1.5}
-        pt={1}
-      >
-        <DialogTitle sx={{ p: 1 }}>{title}</DialogTitle>
-        <IconButton
-          onClick={onClose}
-          sx={(theme) => ({
-            maxHeight: "40px",
-          })}
-        >
-          <CloseIcon />
-        </IconButton>
-      </Box>
-
-      {content && <DialogContent sx={{ pb: 0 }}>{content}</DialogContent>}
-
-      <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Cancel
-        </Button>
-        {rejectAndClose ? (
-          <Button onClick={rejectAndClose} color="primary">
-            {rejectText}
-          </Button>
-        ) : (
-          <></>
-        )}
-        <Button
-          onClick={confirmAndClose}
-          color="primary"
-          disabled={confirmDisabled}
-        >
-          {confirmText}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
-
 const intRegExpr = new RegExp("^[0-9]+(.0*)?$");
 const floatRegExpr = new RegExp("-*^[0-9]*(.[0-9]*)?$");
 
-type CustomNumberTextFieldProps = {
+type ChannelTextFieldProps = {
   id: string;
   label: string;
   value: number;
@@ -598,7 +494,7 @@ type CustomNumberTextFieldProps = {
   width?: string;
 };
 
-export const CustomNumberTextField = ({
+export const ChannelTextField = ({
   id,
   label,
   value,
@@ -610,12 +506,8 @@ export const CustomNumberTextField = ({
   disabled = false,
   size = "small",
   width,
-}: CustomNumberTextFieldProps) => {
+}: ChannelTextFieldProps) => {
   const [valueString, setValueString] = useState<string>(value.toString());
-
-  useEffect(() => {
-    setValueString(value.toString());
-  }, [value]);
 
   const [inputValue, setInputValue] = useState<number>(value);
 
@@ -680,6 +572,9 @@ export const CustomNumberTextField = ({
   const dispatchValue = () => {
     dispatchCallBack(inputValue);
   };
+  useEffect(() => {
+    setValueString(value.toString());
+  }, [value]);
 
   return (
     <>
@@ -698,10 +593,6 @@ export const CustomNumberTextField = ({
           size={size}
           sx={{
             width: width ? width : "inherit",
-            // "& .MuiFormHelperText-root.Mui-error": {
-            //   position: "absolute",
-            //   top: "100%",
-            // },
           }}
         />
       </FormControl>
@@ -724,3 +615,7 @@ export const CustomNumberTextField = ({
     </>
   );
 };
+
+export function useFileUploadContext() {
+  return useContext(FileUploadContext);
+}

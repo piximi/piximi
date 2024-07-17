@@ -2,7 +2,7 @@ import React from "react";
 
 import { ListItemText, MenuItem } from "@mui/material";
 
-import { useFileUpload } from "contexts/FileUploadContext";
+import { useFileUploadContext } from "contexts";
 
 //TODO: MenuItem??
 
@@ -11,7 +11,7 @@ type OpenImageMenuItemProps = {
 };
 
 export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
-  const uploadFiles = useFileUpload();
+  const uploadFiles = useFileUploadContext();
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.currentTarget.files || !uploadFiles) return;
     const files: FileList = Object.assign([], event.currentTarget.files);

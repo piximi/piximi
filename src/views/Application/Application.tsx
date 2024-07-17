@@ -8,7 +8,7 @@ import { usePreferredMuiTheme } from "hooks";
 import { ProjectViewer } from "views/ProjectViewer";
 import { ImageViewer } from "views/ImageViewer";
 import { MeasurementView } from "views/MeasurementView";
-import { FileUploadProvider } from "contexts/FileUploadContext";
+import { FileUploadProvider } from "contexts";
 
 export const Application = () => {
   const theme = usePreferredMuiTheme();
