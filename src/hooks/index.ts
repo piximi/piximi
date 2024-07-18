@@ -9,7 +9,6 @@ export { useMenu } from "./useMenu";
 export { useStageHandlers } from "./useStageHandlers";
 export { usePreferredMuiTheme, usePreferredNivoTheme } from "./useTheme";
 export { useTranslation } from "./useTranslation";
-export { useUpload } from "./useUpload";
 export { useZoom } from "./useZoom";
 export { useLocalGlobalState } from "./useLocalGlobalState";
 export { useHotkeys } from "./useHotkeys";
@@ -19,6 +18,7 @@ export { useUnloadConfirmation } from "./useUnloadConfirmation";
 export { useBreakpointObserver } from "./useBreakpointObserver";
 export { useMobileView } from "./useMobileView";
 export { useThingSelection } from "./useThingSelection";
+export { useSortFunction } from "./useSortFunction";
 
 // useDefaultImage not included to encourage use of
 // import {useDefaultImage, DispatchLocation} from "hooks/useDefaultImage"

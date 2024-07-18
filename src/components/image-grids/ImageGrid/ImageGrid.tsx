@@ -7,7 +7,7 @@ import { projectSlice } from "store/project";
 
 import { selectThingsOfKind } from "store/data";
 import { ProjectGridItem } from "../ProjectGridItem";
-import { useSortFunction } from "hooks/useSortFunction/useSortFunction";
+import { useSortFunction } from "hooks";
 import { DropBox } from "components/styled-components/DropBox/DropBox";
 import { selectThingFilters } from "store/project/selectors";
 import { isFiltered } from "utils/common/helpers";

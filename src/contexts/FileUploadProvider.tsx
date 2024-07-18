@@ -5,7 +5,6 @@ import {
   ReactNode,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -339,7 +338,7 @@ type ImageShapeDialogProps = {
   referenceImageShape?: ImageShapeInfo;
 };
 
-export const ImageShapeDialog = ({
+const ImageShapeDialog = ({
   channelOptions,
   promptMessage,
   referenceHyperStack,
@@ -474,145 +473,6 @@ export const ImageShapeDialog = ({
         onClose();
       }}
     />
-  );
-};
-
-const intRegExpr = new RegExp("^[0-9]+(.0*)?$");
-const floatRegExpr = new RegExp("-*^[0-9]*(.[0-9]*)?$");
-
-type ChannelTextFieldProps = {
-  id: string;
-  label: string;
-  value: number;
-  dispatchCallBack: (input: number) => void;
-  errorChecker?: (value: string) => { isError: boolean; message: string };
-  min?: number;
-  max?: number;
-  enableFloat?: boolean;
-  disabled?: boolean;
-  size?: "small" | "medium";
-  width?: string;
-};
-
-export const ChannelTextField = ({
-  id,
-  label,
-  value,
-  dispatchCallBack,
-  errorChecker,
-  min = Number.MIN_SAFE_INTEGER,
-  max = Number.MAX_SAFE_INTEGER,
-  enableFloat = false,
-  disabled = false,
-  size = "small",
-  width,
-}: ChannelTextFieldProps) => {
-  const [valueString, setValueString] = useState<string>(value.toString());
-
-  const [inputValue, setInputValue] = useState<number>(value);
-
-  const [inputError, setInputError] = useState<boolean>(false);
-
-  const [errorHelpText, setErrorHelpText] = useState<string>(" ");
-
-  const regExp = enableFloat ? floatRegExpr : intRegExpr;
-
-  const rangeHelperText = useMemo(() => {
-    if (min !== Number.MIN_SAFE_INTEGER && max !== Number.MAX_SAFE_INTEGER) {
-      return ` between ${min} and ${max}`;
-    } else if (min !== Number.MIN_SAFE_INTEGER) {
-      return ` ${min} or above`;
-    } else if (max !== Number.MAX_SAFE_INTEGER) {
-      return ` ${max} or below`;
-    }
-    return "";
-  }, [max, min]);
-
-  const onInputChange = (event: FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const inputString = target.value;
-
-    setValueString(inputString);
-
-    if (!regExp.test(target.value) || target.value === "") {
-      setErrorHelpText(
-        `Must be a${
-          enableFloat ? " floating point" : "n integer"
-        } ${rangeHelperText}`
-      );
-      setInputError(true);
-      return;
-    }
-
-    const arg = Number(inputString);
-
-    if (isNaN(arg) || arg < min || arg > max) {
-      setErrorHelpText(
-        `Must be a${
-          enableFloat ? " floating point" : "n integer"
-        } value${rangeHelperText}`
-      );
-      setInputError(true);
-      return;
-    }
-
-    if (errorChecker) {
-      const res = errorChecker(inputString);
-      if (res.isError) {
-        setInputError(true);
-        setErrorHelpText(res.message);
-        return;
-      }
-    }
-    setErrorHelpText(" ");
-    setInputError(false);
-    setInputValue(arg);
-  };
-
-  const dispatchValue = () => {
-    dispatchCallBack(inputValue);
-  };
-  useEffect(() => {
-    setValueString(value.toString());
-  }, [value]);
-
-  return (
-    <>
-      <FormControl size={size}>
-        <TextField
-          id={id}
-          onBlur={dispatchValue}
-          label={label}
-          error={inputError}
-          value={valueString}
-          onChange={onInputChange}
-          type="text"
-          margin="normal"
-          autoComplete="off"
-          disabled={disabled}
-          size={size}
-          sx={{
-            width: width ? width : "inherit",
-          }}
-        />
-      </FormControl>
-      <Box
-        width="100%"
-        display="flex"
-        justifyContent="center"
-        height="2em"
-        alignContent="center"
-      >
-        {inputError && (
-          <Typography
-            variant="body2"
-            sx={(theme) => ({ color: theme.palette.error.main })}
-          >
-            {errorHelpText}
-          </Typography>
-        )}
-      </Box>
-    </>
   );
 };
 
