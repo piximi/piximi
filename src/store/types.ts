@@ -155,7 +155,7 @@ export type AnnotatorState = {
   toolType: ToolType;
 };
 
-export type AppState = {
+type AppState = {
   classifier: ClassifierState;
   segmenter: SegmenterState;
   imageViewer: ImageViewerState;
