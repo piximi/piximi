@@ -56,7 +56,6 @@ const FileUploadContext = createContext<
 >(null);
 
 const minChannels = 1;
-const maxChannels = 5;
 
 const getUploadedFileTypes = async (files: FileList) => {
   const images: Record<number, Array<ImageShapeInfoImage>> = {};
@@ -367,15 +366,8 @@ const ImageShapeDialog = ({
     const inputString = target.value;
     setChannelsString(inputString);
     const _channels = Number(inputString);
-    if (
-      target.value === "" ||
-      isNaN(_channels) ||
-      _channels < minChannels ||
-      _channels > maxChannels
-    ) {
-      setErrorHelpText(
-        `Must be an integer between ${minChannels} and ${maxChannels}`
-      );
+    if (target.value === "" || isNaN(_channels) || _channels < minChannels) {
+      setErrorHelpText(`Must be an integer greater than 0`);
       setInvalidImageShape(true);
       return;
     }
