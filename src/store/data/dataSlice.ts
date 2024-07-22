@@ -31,6 +31,7 @@ import {
 import { UNKNOWN_CATEGORY_NAME } from "./constants";
 import { updateContents } from "./helpers";
 
+const unknownCategory = generateUnknownCategory("Image");
 export const kindsAdapter = createDeferredEntityAdapter<Kind>();
 export const categoriesAdapter = createDeferredEntityAdapter<Category>();
 export const thingsAdapter = createDeferredEntityAdapter<
@@ -39,8 +40,29 @@ export const thingsAdapter = createDeferredEntityAdapter<
 
 export const initialState = (): DataState => {
   return {
-    kinds: kindsAdapter.getInitialState(),
-    categories: categoriesAdapter.getInitialState(),
+    kinds: kindsAdapter.getInitialState({
+      ids: ["Image"],
+      entities: {
+        Image: {
+          saved: {
+            id: "Image",
+            containing: [],
+            categories: [unknownCategory.id],
+            unknownCategoryId: unknownCategory.id,
+          },
+          changes: {},
+        },
+      },
+    }),
+    categories: categoriesAdapter.getInitialState({
+      ids: [unknownCategory.id],
+      entities: {
+        [unknownCategory.id]: {
+          saved: unknownCategory,
+          changes: {},
+        },
+      },
+    }),
     things: thingsAdapter.getInitialState(),
   };
 };
