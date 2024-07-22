@@ -36,6 +36,7 @@ export const selectActiveKindObject = createSelector(
 export const selectActiveUnknownCategoryId = createSelector(
   selectActiveKindObject,
   (activeKind) => {
+    if (!activeKind) return;
     return activeKind.unknownCategoryId;
   }
 );
@@ -43,6 +44,7 @@ export const selectActiveUnknownCategoryId = createSelector(
 export const selectActiveCategories = createSelector(
   [selectKindDictionary, selectCategoriesDictionary, selectActiveKindId],
   (kindDict, categoriesDict, kind) => {
+    if (!kindDict[kind]) return [];
     const categoriesOfKind = kindDict[kind].categories;
 
     return categoriesOfKind.map((catId) => categoriesDict[catId]);
@@ -60,6 +62,7 @@ export const selectActiveUnknownCategory = createSelector(
   selectActiveUnknownCategoryId,
   selectCategoriesDictionary,
   (unknownCatId, catDict) => {
+    if (!unknownCatId) return;
     return catDict[unknownCatId];
   }
 );
@@ -113,6 +116,7 @@ export const selectUnfilteredActiveCategoryIds = createSelector(
 export const selectActiveThingIds = createSelector(
   selectActiveKindObject,
   (kind) => {
+    if (!kind) return [];
     return kind.containing;
   }
 );

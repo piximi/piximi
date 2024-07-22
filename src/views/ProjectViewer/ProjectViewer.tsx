@@ -2,7 +2,7 @@ import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 
-import { Box, CssBaseline } from "@mui/material";
+import { Box } from "@mui/material";
 
 import {
   useErrorHandler,
@@ -110,7 +110,6 @@ export const ProjectViewer = () => {
       <ErrorBoundary FallbackComponent={FallBackDialog}>
         <div tabIndex={-1}>
           <Box sx={{ height: "100vh" }}>
-            <CssBaseline />
             <ProjectAppBar />
 
             <ProjectDrawer />
