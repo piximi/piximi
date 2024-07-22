@@ -10,7 +10,7 @@ export const createSimpleCNN = (
   numClasses: number,
   randomizeWeights: boolean
 ) => {
-  const seed = randomizeWeights ? Math.random() : 0.42;
+  const seed = randomizeWeights ? Math.floor(Math.random() * 1000) : 42;
 
   const imageWidth = inputShape.width;
   const imageHeight = inputShape.height;
