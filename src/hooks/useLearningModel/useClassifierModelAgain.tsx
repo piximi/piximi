@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAlertState } from "store/applicationSettings/selectors";
 import { classifierSlice } from "store/classifier";
 import {
   selectClassifierFitOptions,
-  selectClassifierHistory,
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
   selectClassifierTrainingPercentage,
@@ -48,9 +47,22 @@ export const useClassificationModelAgain = () => {
   const alertState = useSelector(selectAlertState);
   const fitOptions = useSelector(selectClassifierFitOptions);
   const trainingPercentage = useSelector(selectClassifierTrainingPercentage);
-  const modelHistory = useSelector((state) => {
-    return selectClassifierHistory(state, historyItems);
-  });
+
+  const modelHistory = useMemo(() => {
+    const fullHistory = selectedModel.history.history;
+    const selectedHistory: { [key: string]: number[] } = {};
+    for (const k of historyItems) {
+      if (k === "epochs") {
+        selectedHistory[k] = selectedModel.history.epochs;
+      } else {
+        selectedHistory[k] = fullHistory.flatMap(
+          (cycleHistory) => cycleHistory[k]
+        );
+      }
+    }
+
+    return selectedHistory;
+  }, [selectedModel]);
   const noLabeledThingsAlert: AlertState = {
     alertType: AlertType.Info,
     name: "No labeled images",
@@ -122,6 +134,7 @@ export const useClassificationModelAgain = () => {
       setShowWarning(true);
     }
   }, [labeledThingsCount, selectedModel]);
+
   useEffect(() => {
     setTrainingAccuracy(
       modelHistory.categoricalAccuracy.map((y, i) => ({ x: i + 0.5, y }))
@@ -174,6 +187,15 @@ export const useClassificationModelAgain = () => {
     }
   }, [fitOptions.batchSize, trainingPercentage, labeledThingsCount]);
 
+  useEffect(() => {
+    if (modelStatus === ModelStatus.Uninitialized) {
+      setTrainingAccuracy([]);
+      setValidationAccuracy([]);
+      setTrainingLoss([]);
+      setValidationLoss([]);
+      setShowPlots(false);
+    }
+  }, [modelStatus]);
   return {
     showWarning,
     setShowWarning,

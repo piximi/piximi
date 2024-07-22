@@ -59,7 +59,10 @@ export const classifierSlice = createSlice({
   name: "classifier",
   initialState: initialState,
   reducers: {
-    resetClassifier: () => initialState,
+    resetClassifier: (state) => {
+      availableClassifierModels[state.selectedModelIdx].dispose();
+      return initialState;
+    },
     setClassifier(
       state,
       action: PayloadAction<{ classifier: ClassifierState }>
@@ -70,6 +73,9 @@ export const classifierSlice = createSlice({
     },
     setDefaults(state, action: PayloadAction<{}>) {
       // TODO - segmenter: dispose() and state.selectedModel = SimpleCNN(), or whatever
+
+      availableClassifierModels[state.selectedModelIdx].dispose();
+
       state.modelStatus = ModelStatus.Uninitialized;
       state.evaluationResult = {
         confusionMatrix: [],
