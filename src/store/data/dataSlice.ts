@@ -72,6 +72,12 @@ export const dataSlice = createSlice({
   initialState: initialState,
   reducers: {
     resetData: (state) => {
+      Object.values(state.things.entities).forEach((entity) => {
+        dispose(entity.saved.data as unknown as TensorContainer);
+        if ("colors" in entity.saved) {
+          dispose(entity.saved.colors as unknown as TensorContainer);
+        }
+      });
       return initialState();
     },
     initializeState(
@@ -849,7 +855,7 @@ export const dataSlice = createSlice({
     ) {
       if (!action.payload.preparedByListener) return;
       if (!("thingIds" in action.payload)) return;
-      const { thingIds, disposeColorTensors, isPermanent } = action.payload;
+      const { thingIds, isPermanent } = action.payload;
       const imageChanges: Record<
         string,
         {
@@ -885,10 +891,8 @@ export const dataSlice = createSlice({
               const kind = state.kinds.entities[thingKind];
               const category = state.categories.entities[thingCategoryId];
               if (isPermanent) {
-                if (disposeColorTensors) {
-                  dispose(containedThing.saved.data as TensorContainer);
-                  dispose(containedThing.changes as TensorContainer);
-                }
+                dispose(containedThing.saved.data as TensorContainer);
+                dispose(containedThing.changes as TensorContainer);
 
                 /* UPDATE KIND'S CONTAINING LIST */
                 mutatingFilter(
@@ -952,10 +956,8 @@ export const dataSlice = createSlice({
         const kind = state.kinds.entities[thingKind];
         const category = state.categories.entities[thingCategoryId];
         if (isPermanent) {
-          if (disposeColorTensors) {
-            dispose(thingEntity.saved.data as TensorContainer);
-            dispose(thingEntity.changes as TensorContainer);
-          }
+          dispose(thingEntity.saved.data as TensorContainer);
+          dispose(thingEntity.changes as TensorContainer);
 
           /* UPDATE KIND'S CONTAINING LIST */
 

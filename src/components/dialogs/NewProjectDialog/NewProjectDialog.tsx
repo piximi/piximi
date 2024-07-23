@@ -35,7 +35,6 @@ export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
       })
     );
     dispatch(dataSlice.actions.resetData());
-
     dispatch(classifierSlice.actions.resetClassifier());
 
     closeDialog();

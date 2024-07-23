@@ -441,6 +441,7 @@ export const getPropertiesFromImageSync = (
   });
   const objSrc = objectImage.getCanvas().toDataURL();
   const data = tfImage.cropAndResize(image.data, box, [0], [height, width]);
+  box.dispose();
 
   return {
     data: data,
