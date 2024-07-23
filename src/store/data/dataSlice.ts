@@ -72,22 +72,7 @@ export const dataSlice = createSlice({
   initialState: initialState,
   reducers: {
     resetData: (state) => {
-      const newState = initialState();
-      const newUnknownCategory = generateUnknownCategory("Image");
-      const imageKind = {
-        id: "Image",
-        categories: [newUnknownCategory.id],
-        containing: [],
-        unknownCategoryId: newUnknownCategory.id,
-      } as Kind;
-      newState.kinds.ids.push(imageKind.id);
-      newState.kinds.entities[imageKind.id] = { saved: imageKind, changes: {} };
-      newState.categories.ids.push(newUnknownCategory.id);
-      newState.categories.entities[newUnknownCategory.id] = {
-        saved: newUnknownCategory,
-        changes: {},
-      };
-      return newState;
+      return initialState();
     },
     initializeState(
       state,
