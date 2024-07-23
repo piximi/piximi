@@ -378,22 +378,22 @@ export const findMinMaxs = async <T extends Tensor3D | Tensor4D>(
 ): Promise<[number[], number[]]> => {
   let mins: number[];
   let maxs: number[];
+  let minTensor: Tensor1D;
+  let maxTensor: Tensor1D;
 
   if (imageTensor.rank === 3) {
-    mins = await tidy(
-      () => (imageTensor as Tensor3D).min([0, 1]) as Tensor1D
-    ).array();
-    maxs = await tidy(
-      () => (imageTensor as Tensor3D).max([0, 1]) as Tensor1D
-    ).array();
+    minTensor = (imageTensor as Tensor3D).min([0, 1]);
+    mins = minTensor.arraySync();
+    maxTensor = (imageTensor as Tensor3D).max([0, 1]);
+    maxs = maxTensor.arraySync();
   } else {
-    mins = await tidy(
-      () => (imageTensor as Tensor4D).min([0, 1, 2]) as Tensor1D
-    ).array();
-    maxs = await tidy(
-      () => (imageTensor as Tensor4D).max([0, 1, 2]) as Tensor1D
-    ).array();
+    minTensor = (imageTensor as Tensor4D).min([0, 1, 2]);
+    mins = minTensor.arraySync();
+    maxTensor = (imageTensor as Tensor4D).max([0, 1, 2]);
+    maxs = maxTensor.arraySync();
   }
+  minTensor.dispose();
+  maxTensor.dispose();
 
   opts.disposeImageTensor && imageTensor.dispose();
   return [mins, maxs];
