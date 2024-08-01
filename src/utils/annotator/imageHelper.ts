@@ -235,14 +235,14 @@ export const colorOverlayROI = (
     }).resize({ factor: scalingFactor });
   } catch (err) {
     if (process.env.NODE_ENV !== "production") {
-      logger("could not create crop", "error");
+      logger("could not create crop", { level: "error" });
       logger(`boundingbox: ${boundingBox}`);
       logger(`boxWidth: ${boxWidth}`);
       logger(`boxHeight: ${boxHeight}`);
       logger(`bwxbh: ${boxHeight * boxWidth}`);
       logger(`decodedMask length: ${decodedMask.length}`);
       logger(`diff: ${boxHeight * boxWidth - decodedMask.length}`);
-      logger(err, "error");
+      logger(err, { level: "error" });
     }
   }
 

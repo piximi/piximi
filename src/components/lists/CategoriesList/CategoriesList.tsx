@@ -6,7 +6,7 @@ import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 
 import { useDialogHotkey, useHotkeys } from "hooks";
 
-import { DialogWithAction } from "components/dialogs";
+import { ConfirmationDialog } from "components/dialogs";
 
 import { CustomListItemButton } from "components/list-items";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,12 +15,12 @@ import { CategoryItemMenu } from "components/menus";
 import { projectSlice } from "store/project";
 import { selectHighlightedCategory } from "store/project/selectors";
 import { selectActiveKindId } from "store/project/selectors";
-import { CreateCategoryDialog } from "components/dialogs/CreateCategoryDialog/CreateCategoryDialog";
+import { CreateCategoryDialog } from "components/dialogs";
 import { dataSlice } from "store/data/dataSlice";
 import { PredictionListItems } from "components/list-items";
 import { isUnknownCategory } from "utils/common/helpers";
 import { ModelStatus, Partition } from "utils/models/enums";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { Category } from "store/data/types";
 import {
   selectActiveCategories,
@@ -47,13 +47,13 @@ export const CategoriesList = () => {
     onClose: handleCloseCreateCategoryDialog,
     onOpen: handleOpenCreateCategoryDialog,
     open: isCreateCategoryDialogOpen,
-  } = useDialogHotkey(HotkeyView.DialogWithAction);
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const {
     onClose: handleCloseDeleteCategoryDialog,
     onOpen: handleOpenDeleteCategoryDialog,
     open: isDeleteCategoryDialogOpen,
-  } = useDialogHotkey(HotkeyView.DialogWithAction);
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const selectCategory = useCallback(
     (category: Category) => {
@@ -98,7 +98,7 @@ export const CategoriesList = () => {
         });
       }
     },
-    [HotkeyView.Annotator, HotkeyView.ProjectView],
+    [HotkeyContext.AnnotatorView, HotkeyContext.ProjectView],
 
     []
   );
@@ -112,7 +112,7 @@ export const CategoriesList = () => {
         });
       }
     },
-    [HotkeyView.ProjectView],
+    [HotkeyContext.ProjectView],
     []
   );
 
@@ -146,7 +146,7 @@ export const CategoriesList = () => {
 
       setCategoryIndex("");
     },
-    [HotkeyView.Annotator, HotkeyView.ProjectView],
+    [HotkeyContext.AnnotatorView, HotkeyContext.ProjectView],
     { keyup: true, enabled: true },
     [dispatch, selectedImageIds]
   );
@@ -227,7 +227,7 @@ export const CategoriesList = () => {
         changesPermanent={true}
       />
 
-      <DialogWithAction
+      <ConfirmationDialog
         title="Delete All Categories"
         content={`Affected objects will NOT be deleted, and instead be labelled as "Unknown"`}
         onConfirm={handleRemoveAllCategories}

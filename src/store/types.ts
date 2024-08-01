@@ -11,7 +11,7 @@ import {
 } from "utils/annotator/types";
 
 import { AlertState, FilterType } from "utils/common/types";
-import { HotkeyView, Languages, ThingSortKey } from "utils/common/enums";
+import { HotkeyContext, Languages, ThingSortKey } from "utils/common/enums";
 import { ThemeMode } from "themes/enums";
 
 import {
@@ -141,7 +141,7 @@ export type AppSettingsState = {
   imageSelectionColor: string;
   selectedImageBorderWidth: number;
   alertState: AlertState;
-  hotkeyStack: HotkeyView[];
+  hotkeyStack: HotkeyContext[];
   language: Languages;
   soundEnabled: boolean;
 };

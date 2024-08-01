@@ -3,14 +3,14 @@ import React from "react";
 import { Box, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
-import { DialogWithAction } from "components/dialogs";
+import { ConfirmationDialog } from "components/dialogs";
 
-import { UpdateCategoryDialog } from "components/dialogs/UpdateCategoryDialog";
+import { UpdateCategoryDialog } from "components/dialogs";
 import { selectActiveKindId } from "store/project/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { dataSlice } from "store/data/dataSlice";
 import { imageViewerSlice } from "store/imageViewer";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { Category } from "store/data/types";
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 
@@ -41,18 +41,18 @@ export const CategoryItemMenu = ({
     onClose: handleCloseEditCategoryDialog,
     onOpen: handleOpenEditCategoryDialog,
     open: isEditCategoryDialogOpen,
-  } = useDialogHotkey(HotkeyView.EditCategoryDialog);
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
   const {
     onClose: handleCloseDeleteCategoryDialog,
     onOpen: handleOpenDeleteCategoryDialog,
     open: isDeleteCategoryDialogOpen,
-  } = useDialogHotkey(HotkeyView.DeleteCategoryDialog);
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const {
     onClose: handleCloseDeleteObjectsDialog,
     onOpen: handleOpenDeleteObjectsDialog,
     open: isDeleteObjectsDialogOpen,
-  } = useDialogHotkey(HotkeyView.DeleteCategoryDialog);
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const handleRemoveCategory = () => {
     dispatch(
@@ -123,7 +123,7 @@ export const CategoryItemMenu = ({
         open={isEditCategoryDialogOpen}
         kind={activeKind}
       />
-      <DialogWithAction
+      <ConfirmationDialog
         title={`Delete "${category.name}" Category`}
         content={`Objects categorized as "${category.name}" will NOT be deleted, and instead will be labeled as
         "Unknown".`}
@@ -131,7 +131,7 @@ export const CategoryItemMenu = ({
         onClose={() => handleMenuCloseWith(handleCloseDeleteCategoryDialog)}
         isOpen={isDeleteCategoryDialogOpen}
       />
-      <DialogWithAction
+      <ConfirmationDialog
         title={`Delete All "${category.name}" Objects`}
         content={`Objects categorized as "${category.name}" will be deleted. ${
           activeKind === "Image"

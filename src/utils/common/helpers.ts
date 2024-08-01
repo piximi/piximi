@@ -51,23 +51,48 @@ export const createGitHubIssue = (
 
 export const logger = (
   message: any | any[],
-  level: "log" | "warn" | "error" = "log"
+  options?: { level?: "log" | "warn" | "error"; dev?: boolean }
 ) => {
+  if (!options) {
+    options = { level: "log" };
+  } else {
+    if (!options.level) {
+      options.level = "log";
+    }
+  }
   if (Array.isArray(message)) {
     message = message.join("");
   }
-  switch (level) {
-    case "log":
-      console.log(message);
-      break;
-    case "warn":
-      console.warn(message);
-      break;
-    case "error":
-      console.error(message);
-      break;
-    default:
-      break;
+  if (options?.dev) {
+    if (process.env.NODE_ENV !== "production") {
+      switch (options.level) {
+        case "log":
+          console.log(message);
+          break;
+        case "warn":
+          console.warn(message);
+          break;
+        case "error":
+          console.error(message);
+          break;
+        default:
+          break;
+      }
+    }
+  } else {
+    switch (options.level) {
+      case "log":
+        console.log(message);
+        break;
+      case "warn":
+        console.warn(message);
+        break;
+      case "error":
+        console.error(message);
+        break;
+      default:
+        break;
+    }
   }
 };
 

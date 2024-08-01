@@ -4,13 +4,13 @@ import AddIcon from "@mui/icons-material/Add";
 
 import { useDialogHotkey } from "hooks";
 
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { CustomListItemButton } from "../CustomListItemButton";
 import { NewProjectDialog } from "components/dialogs";
 
 export const NewProjectListItem = () => {
   const { onClose, onOpen, open } = useDialogHotkey(
-    HotkeyView.NewProjectDialog
+    HotkeyContext.ConfirmationDialog
   );
 
   return (

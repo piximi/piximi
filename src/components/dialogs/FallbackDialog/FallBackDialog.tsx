@@ -27,7 +27,7 @@ import { useDialogHotkey } from "hooks";
 
 import { SaveFittedModelDialog, SaveProjectDialog } from "components/dialogs";
 
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 
 import { ModelStatus } from "utils/models/enums";
 import { APPLICATION_COLORS } from "utils/common/constants";
@@ -74,7 +74,7 @@ export const FallBackDialog = (props: any) => {
     onClose: onSaveProjectDialogClose,
     onOpen: onSaveProjectDialogOpen,
     open: openSaveProjectDialog,
-  } = useDialogHotkey(HotkeyView.SaveProjectDialog);
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   // const routePath = useLocation().pathname;
   // const inAnnotator = routePath === "/annotator";
@@ -83,13 +83,13 @@ export const FallBackDialog = (props: any) => {
     onClose: onSaveClassifierDialogClose,
     onOpen: onSaveClassifierDialogOpen,
     open: openSaveClassifierDialog,
-  } = useDialogHotkey(HotkeyView.SaveFittedModelDialog);
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const {
     onClose: onSaveSegmenterDialogClose,
     onOpen: onSaveSegmenterDialogOpen,
     open: openSaveSegmenterDialog,
-  } = useDialogHotkey(HotkeyView.SaveFittedModelDialog);
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const selectedClassifierModel = useSelector(selectClassifierSelectedModel);
   const classifierModelStatus = useSelector(selectClassifierModelStatus);

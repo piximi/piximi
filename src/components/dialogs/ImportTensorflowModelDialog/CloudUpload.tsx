@@ -3,11 +3,9 @@ import React, { useState } from "react";
 import {
   Button,
   Checkbox,
-  DialogContent,
   FormControl,
   FormControlLabel,
   InputAdornment,
-  MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
@@ -103,63 +101,62 @@ export const CloudUpload = ({
 
   return (
     <>
-      <DialogContent>
-        <Typography>{"Upload a model from the internet."}</Typography>
-      </DialogContent>
-      <MenuItem>
-        <FormControl sx={{ width: "75%", ml: 2, pr: 1 }}>
-          <TextField
-            variant={"standard"}
-            id="web-upload-input-label"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LanguageIcon />
-                </InputAdornment>
-              ),
-            }}
-            size={"small"}
-            value={modelUrl}
-            onChange={handleModelUrlChange}
-            error={errMessage.length > 0}
-          />
-          <Typography
-            style={{
-              whiteSpace: "pre-line",
-              fontSize: "0.75rem",
-              color: "red",
-            }}
-          >
-            {errMessage}
-          </Typography>
-          <Typography
-            style={{
-              whiteSpace: "pre-line",
-              fontSize: "0.75rem",
-              color: "green",
-            }}
-          >
-            {successMessage}
-          </Typography>
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={isFromTFHub}
-                onChange={handleSourceChange}
-              />
-            }
-            label="From TF Hub?"
-          />
-        </FormControl>
-        <Button
-          onClick={async () => loadModel()}
-          color="primary"
-          disabled={errMessage.length !== 0 || modelUrl.length === 0}
+      <Typography gutterBottom>
+        {"Upload a model from the internet."}
+      </Typography>
+
+      <FormControl sx={{ ml: 2, pr: 1 }}>
+        <TextField
+          variant={"standard"}
+          id="web-upload-input-label"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <LanguageIcon />
+              </InputAdornment>
+            ),
+          }}
+          size={"small"}
+          value={modelUrl}
+          onChange={handleModelUrlChange}
+          error={errMessage.length > 0}
+        />
+        <Typography
+          style={{
+            whiteSpace: "pre-line",
+            fontSize: "0.75rem",
+            color: "red",
+          }}
         >
-          Load Model
-        </Button>
-      </MenuItem>
+          {errMessage}
+        </Typography>
+        <Typography
+          style={{
+            whiteSpace: "pre-line",
+            fontSize: "0.75rem",
+            color: "green",
+          }}
+        >
+          {successMessage}
+        </Typography>
+        <FormControlLabel
+          control={
+            <Checkbox
+              size="small"
+              checked={isFromTFHub}
+              onChange={handleSourceChange}
+            />
+          }
+          label="From TF Hub?"
+        />
+      </FormControl>
+      <Button
+        onClick={async () => loadModel()}
+        color="primary"
+        disabled={errMessage.length !== 0 || modelUrl.length === 0}
+      >
+        Load Model
+      </Button>
     </>
   );
 };

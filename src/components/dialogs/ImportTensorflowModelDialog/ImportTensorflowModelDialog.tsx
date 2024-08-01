@@ -7,6 +7,7 @@ import {
   Collapse,
   Dialog,
   DialogActions,
+  DialogContent,
   DialogTitle,
   IconButton,
   Tab,
@@ -30,7 +31,7 @@ import { Cellpose } from "utils/models/Cellpose";
 import { ModelTask } from "utils/models/enums";
 import { availableClassifierModels } from "utils/models/availableClassificationModels";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { Shape } from "store/data/types";
 import { selectProjectImageChannels } from "store/project/selectors";
 import { useSelector } from "react-redux";
@@ -76,7 +77,7 @@ type ImportTensorflowModelDialogProps = {
   loadedModel?: Model;
   open: boolean;
   modelTask: ModelTask;
-  dispatchFunction: (model: Model, inputShape: Shape) => void;
+  dispatchFunction: (model: Model, inputShape: Shape) => Promise<void>;
 };
 
 export const ImportTensorflowModelDialog = ({
@@ -117,14 +118,14 @@ export const ImportTensorflowModelDialog = ({
     }
   }, []);
 
-  const dispatchModelToStore = () => {
+  const dispatchModelToStore = async () => {
     if (!selectedModel) {
       process.env.NODE_ENV !== "production" &&
         console.warn("Attempting to dispatch undefined model");
       return;
     }
 
-    dispatchFunction(selectedModel, inputShape);
+    await dispatchFunction(selectedModel, inputShape);
 
     setCloudWarning(false);
     setInvalidModel(false);
@@ -144,10 +145,12 @@ export const ImportTensorflowModelDialog = ({
 
   useHotkeys(
     "enter",
-    () => dispatchModelToStore(),
-    HotkeyView.ImportTensorflowModelDialog,
-    { enableOnTags: ["INPUT"] },
-    [dispatchModelToStore]
+    (event) => {
+      selectedModel && !invalidModel && dispatchModelToStore();
+    },
+    HotkeyContext.ConfirmationDialog,
+
+    [dispatchModelToStore, selectedModel, invalidModel]
   );
 
   useEffect(() => {
@@ -232,51 +235,51 @@ export const ImportTensorflowModelDialog = ({
           disabled={modelTask === ModelTask.Segmentation}
         />
       </Tabs>
+      <DialogContent>
+        <Box hidden={tabVal !== "1"}>
+          <PretrainedModelSelector
+            values={pretrainedModels}
+            initModel={
+              selectedModel
+                ? pretrainedModels.findIndex(
+                    (model) => model.name === selectedModel.name
+                  ) + ""
+                : "-1"
+            }
+            setModel={onModelChange}
+            error={invalidModel}
+            errorText={
+              !selectedModel
+                ? "Select a Model"
+                : invalidModel
+                ? `Model requires ${selectedModel.requiredChannels}-channel images`
+                : ""
+            }
+          />
+        </Box>
 
-      <Box hidden={tabVal !== "1"}>
-        <PretrainedModelSelector
-          values={pretrainedModels}
-          initModel={
-            selectedModel
-              ? pretrainedModels.findIndex(
-                  (model) => model.name === selectedModel.name
-                ) + ""
-              : "-1"
-          }
-          setModel={onModelChange}
-          error={invalidModel}
-          errorText={
-            !selectedModel
-              ? "Select a Model"
-              : invalidModel
-              ? `Model requires ${selectedModel.requiredChannels}-channel images`
-              : ""
-          }
-        />
-      </Box>
+        <Box hidden={tabVal !== "2" && tabVal !== "3"} pb={2}>
+          <ModelFormatSelection isGraph={isGraph} setIsGraph={setIsGraph} />
+        </Box>
 
-      <Box hidden={tabVal !== "2" && tabVal !== "3"}>
-        <ModelFormatSelection isGraph={isGraph} setIsGraph={setIsGraph} />
-      </Box>
+        <Box hidden={tabVal !== "2"}>
+          <LocalFileUpload
+            modelTask={modelTask}
+            isGraph={isGraph}
+            setModel={onModelChange}
+            setInputShape={setInputShape}
+          />
+        </Box>
 
-      <Box hidden={tabVal !== "2"}>
-        <LocalFileUpload
-          modelTask={modelTask}
-          isGraph={isGraph}
-          setModel={onModelChange}
-          setInputShape={setInputShape}
-        />
-      </Box>
-
-      <Box hidden={tabVal !== "3"}>
-        <CloudUpload
-          modelTask={modelTask}
-          isGraph={isGraph}
-          setModel={onModelChange}
-          setInputShape={setInputShape}
-        />
-      </Box>
-
+        <Box hidden={tabVal !== "3"}>
+          <CloudUpload
+            modelTask={modelTask}
+            isGraph={isGraph}
+            setModel={onModelChange}
+            setInputShape={setInputShape}
+          />
+        </Box>
+      </DialogContent>
       <DialogActions>
         <Button onClick={closeDialog} color="primary">
           Cancel

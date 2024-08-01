@@ -26,7 +26,7 @@ import { selectActiveImage } from "store/imageViewer/reselectors";
 import { useStageHandlers, useAnnotationTool } from "hooks";
 import { StageContext } from "contexts";
 import { AnnotationState, ToolType } from "utils/annotator/enums";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import {
   selectActiveImageId,
   selectActiveImageRenderedSrcs,
@@ -141,7 +141,7 @@ export const Stage = ({
     (event) => {
       setDraggable(event.type === "keydown" ? true : false);
     },
-    HotkeyView.Annotator,
+    HotkeyContext.AnnotatorView,
     { keydown: true, keyup: true }
   );
 

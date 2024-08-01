@@ -7,7 +7,7 @@ import { getOverlappingAnnotations } from "utils/annotator";
 import { getAnnotationsInBox } from "utils/annotator/imageHelper";
 import { Point } from "utils/annotator/types";
 import { ToolType } from "utils/annotator/enums";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { DecodedAnnotationObject } from "store/data/types";
 import { selectActiveImageId } from "store/imageViewer/selectors";
 import { selectActiveAnnotations } from "store/imageViewer/reselectors";
@@ -39,7 +39,7 @@ export const usePointerTool = (
         setShift(false);
       }
     },
-    HotkeyView.Annotator,
+    HotkeyContext.AnnotatorView,
     { keyup: true, keydown: true }
   );
 

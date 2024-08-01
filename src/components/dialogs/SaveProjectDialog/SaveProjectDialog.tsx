@@ -6,11 +6,9 @@ import { Grid, TextField } from "@mui/material";
 import { projectSlice } from "store/project";
 // TODO: implement segmenter serialization
 
-import { HotkeyView } from "utils/common/enums";
-import { useHotkeys } from "hooks";
 import { saveAs } from "file-saver";
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { DialogWithAction } from "../DialogWithAction";
+import { ConfirmationDialog } from "../ConfirmationDialog";
 import { selectDataProject } from "store/data/selectors";
 import { logger } from "utils/common/helpers";
 import { serializeProject } from "utils/file-io/serialize";
@@ -109,18 +107,8 @@ export const SaveProjectDialog = ({
     setProjectName(event.target.value);
   };
 
-  useHotkeys(
-    "enter",
-    () => {
-      onSaveProjectClick();
-    },
-    HotkeyView.SaveProjectDialog,
-    { enableOnTags: ["INPUT"] },
-    [onSaveProjectClick]
-  );
-
   return (
-    <DialogWithAction
+    <ConfirmationDialog
       isOpen={open}
       onClose={onCancel}
       title="Save Project"
@@ -133,6 +121,7 @@ export const SaveProjectDialog = ({
               id="name"
               label="Project file name"
               margin="dense"
+              variant="standard"
               value={projectName}
               onChange={onNameChange}
             />

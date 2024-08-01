@@ -1,9 +1,9 @@
 import { useHotkeys } from "hooks";
 
-import { HotkeyView } from "utils/common/enums";
-import { DialogWithAction } from "./DialogWithAction";
+import { HotkeyContext } from "utils/common/enums";
+import { ConfirmationDialog } from "./ConfirmationDialog";
 
-type DialogWithActionHKProps = {
+type ConfirmationDialogProps = {
   title: string;
   content: string;
   onConfirm: () => void;
@@ -16,7 +16,7 @@ type DialogWithActionHKProps = {
 
 //NOTE: SHK : Sans Hotkey for storybook
 
-export const DialogWithActionSHK = ({
+export const ConfirmationDialogSHK = ({
   title,
   content,
   onConfirm,
@@ -25,7 +25,7 @@ export const DialogWithActionSHK = ({
   confirmText = "Confirm",
   rejectText = "Reject",
   isOpen,
-}: DialogWithActionHKProps) => {
+}: ConfirmationDialogProps) => {
   const handleConfirm = () => {
     onConfirm();
 
@@ -37,13 +37,13 @@ export const DialogWithActionSHK = ({
     () => {
       handleConfirm();
     },
-    HotkeyView.DeleteCategoryDialog,
+    HotkeyContext.ConfirmationDialog,
     { enableOnTags: ["INPUT"] },
     [handleConfirm]
   );
 
   return (
-    <DialogWithAction
+    <ConfirmationDialog
       title={title}
       content={content}
       onConfirm={handleConfirm}

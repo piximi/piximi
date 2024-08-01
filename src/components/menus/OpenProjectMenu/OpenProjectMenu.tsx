@@ -4,7 +4,7 @@ import { Menu, MenuItem } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { ExampleProjectDialog } from "components/dialogs";
 import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
 
@@ -20,41 +20,40 @@ export const OpenProjectMenu = ({
   open,
 }: OpenProjectMenuProps) => {
   const {
-    onClose: onCloseExampleProjectDialog,
-    onOpen: onExampleProjectDialog,
-    open: openExampleProject,
-  } = useDialogHotkey(HotkeyView.ExampleClassifierDialog);
+    onClose: handleCloseCloseExampleProjectDialog,
+    onOpen: handleOpenExampleProjectDialog,
+    open: ExampleProjectOpen,
+  } = useDialogHotkey(HotkeyContext.ExampleProjectDialog);
 
-  const onMenuDialogClose = (onDialogClose: () => void) => {
-    return () => {
-      onDialogClose();
-      onClose();
-    };
+  const handleCloseDialog = () => {
+    handleCloseCloseExampleProjectDialog();
+    onClose();
   };
 
   return (
-    <Menu
-      anchorEl={anchorEl}
-      open={open}
-      onClose={onClose}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "left",
-      }}
-    >
-      <OpenProjectMenuItem onMenuClose={onClose} />
-      <MenuItem onClick={onExampleProjectDialog} dense>
-        Example Project
-      </MenuItem>
-
+    <>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={onClose}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+      >
+        <OpenProjectMenuItem onMenuClose={onClose} />
+        <MenuItem onClick={handleOpenExampleProjectDialog} dense>
+          Example Project
+        </MenuItem>
+      </Menu>
       <ExampleProjectDialog
-        onClose={onMenuDialogClose(onCloseExampleProjectDialog)}
-        open={openExampleProject}
+        onClose={handleCloseDialog}
+        open={ExampleProjectOpen}
       />
-    </Menu>
+    </>
   );
 };

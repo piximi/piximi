@@ -20,7 +20,7 @@ import { dimensions } from "utils/common/constants";
 import { InteractiveTabbedView } from "components/styled-components";
 import { ImageGrid } from "components/image-grids";
 import { ProjectAppBar } from "components/app-bars/";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { dataSlice } from "store/data/dataSlice";
 import { selectVisibleKinds } from "store/project/reselectors";
 import {
@@ -78,18 +78,19 @@ export const ProjectViewer = () => {
 
   useEffect(() => {
     dispatch(
-      applicationSettingsSlice.actions.registerHotkeyView({
-        hotkeyView: HotkeyView.ProjectView,
+      applicationSettingsSlice.actions.registerHotkeyContext({
+        context: HotkeyContext.ProjectView,
       })
     );
     return () => {
       dispatch(
-        applicationSettingsSlice.actions.unregisterHotkeyView({
-          hotkeyView: HotkeyView.ProjectView,
+        applicationSettingsSlice.actions.unregisterHotkeyContext({
+          context: HotkeyContext.ProjectView,
         })
       );
     };
   }, [dispatch]);
+
   useEffect(() => {
     if (isMobile) {
       const minimizeOnResize = visibleKinds.filter(

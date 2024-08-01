@@ -20,7 +20,7 @@ import { selectImageViewerImages } from "store/imageViewer/reselectors";
 import { ImageList } from "components/lists/ImageList";
 import { ImageViewerCategoryList } from "components/lists/ImageViewerCategoryList";
 import { useDialogHotkey } from "hooks";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { CreateKindDialog } from "components/dialogs";
 
 export const ImageViewerDrawer = () => {
@@ -31,7 +31,7 @@ export const ImageViewerDrawer = () => {
     onClose: handleCloseCreateKindDialog,
     onOpen: handleOpenCreateKindDialog,
     open: isCreateKindDialogOpen,
-  } = useDialogHotkey(HotkeyView.DialogWithAction);
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   return (
     <>

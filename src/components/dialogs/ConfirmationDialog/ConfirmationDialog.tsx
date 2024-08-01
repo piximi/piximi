@@ -10,10 +10,10 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useHotkeys } from "hooks";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { ReactElement } from "react";
 
-type DialogWithActionProps = Omit<
+type ConfirmationDialogProps = Omit<
   DialogProps,
   "children" | "open" | "content"
 > & {
@@ -26,34 +26,40 @@ type DialogWithActionProps = Omit<
   confirmText?: string;
   rejectText?: string;
   confirmDisabled?: boolean;
+  disableHotkeyOnInput?: boolean;
 };
 
-export const DialogWithAction = ({
+export const ConfirmationDialog = ({
   title,
   content,
   onConfirm,
   onClose: handleClose,
-  onReject: handleReject,
+  onReject,
   confirmText = "Confirm",
   rejectText = "Reject",
   isOpen,
   confirmDisabled,
+  disableHotkeyOnInput,
   ...rest
-}: DialogWithActionProps) => {
+}: ConfirmationDialogProps) => {
   const handleConfirm = () => {
+    handleClose();
     onConfirm();
+  };
 
+  const handleReject = () => {
+    onReject && onReject();
     handleClose();
   };
 
   useHotkeys(
     "enter",
     () => {
-      handleConfirm();
+      !confirmDisabled && handleConfirm();
     },
-    HotkeyView.DialogWithAction,
-    { enableOnTags: ["INPUT"], enabled: isOpen },
-    [handleConfirm]
+    HotkeyContext.ConfirmationDialog,
+    { enableOnTags: disableHotkeyOnInput ? [] : ["INPUT"], enabled: isOpen },
+    [handleConfirm, confirmDisabled, handleReject]
   );
 
   return (
@@ -77,25 +83,25 @@ export const DialogWithAction = ({
         </IconButton>
       </Box>
 
-      {content && <DialogContent sx={{ py: 0 }}>{content}</DialogContent>}
+      {content && <DialogContent>{content}</DialogContent>}
 
       <DialogActions>
-        <Button
-          onClick={handleConfirm}
-          color="primary"
-          disabled={confirmDisabled}
-        >
-          {confirmText}
+        <Button onClick={handleClose} color="primary">
+          Cancel
         </Button>
-        {handleReject ? (
+
+        {onReject && (
           <Button onClick={handleReject} color="primary">
             {rejectText}
           </Button>
-        ) : (
-          <></>
         )}
-        <Button onClick={handleClose} color="primary">
-          Cancel
+        <Button
+          onClick={handleConfirm}
+          color="primary"
+          variant="contained"
+          disabled={confirmDisabled}
+        >
+          {confirmText}
         </Button>
       </DialogActions>
     </Dialog>

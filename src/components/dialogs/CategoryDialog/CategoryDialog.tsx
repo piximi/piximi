@@ -1,6 +1,6 @@
 import { TextField, Box } from "@mui/material";
 
-import { DialogWithAction } from "../DialogWithAction";
+import { ConfirmationDialog } from "../ConfirmationDialog";
 import { useCategoryValidation } from "hooks/useCategoryValidation/useCategoryValidation";
 import { ColorIcon } from "components/controls";
 
@@ -37,7 +37,9 @@ export const CategoryDialog = ({
   } = useCategoryValidation({ kind, initName, initColor });
 
   const handleConfirm = () => {
-    onConfirm(name, color, kind);
+    if (!isInvalidName) {
+      onConfirm(name, color, kind);
+    }
   };
 
   const handleClose = () => {
@@ -46,7 +48,7 @@ export const CategoryDialog = ({
   };
 
   return (
-    <DialogWithAction
+    <ConfirmationDialog
       onClose={handleClose}
       isOpen={open}
       title={`${action} Category`}

@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import {
-  DialogContent,
+  Autocomplete,
   FormControl,
   FormHelperText,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
+  TextField,
   Typography,
 } from "@mui/material";
 
 import { Model } from "utils/models/Model/Model";
-import { range } from "lodash";
 
+interface ModelOptionType {
+  label: string;
+  id: number;
+}
 export const PretrainedModelSelector = ({
   values,
   setModel,
@@ -27,50 +27,47 @@ export const PretrainedModelSelector = ({
   errorText?: string;
   initModel: string;
 }) => {
-  const [modelIdxs, setModelIdxs] = useState<number[]>(
-    range(-1, values.length)
-  );
-  const [selectedIdxVal, setSelectedIdxVal] = useState(initModel);
-
-  useEffect(() => {
-    setModelIdxs(range(-1, values.length));
+  const modelOptions: ModelOptionType[] = useMemo(() => {
+    return values.map((value, idx) => ({ label: value.name, id: idx }));
   }, [values]);
+  const [selectedModel, setSelectedModel] = useState<ModelOptionType | null>(
+    modelOptions[+initModel] ?? null
+  );
 
-  const handlePreTrainedModelChange = async (event: SelectChangeEvent) => {
-    const idxVal = event.target.value;
-    setSelectedIdxVal(idxVal);
-    const idx = Number(idxVal);
-    setModel(idx >= 0 ? values[idx] : undefined);
+  const handlePreTrainedModelChange = (
+    event: React.SyntheticEvent<Element, Event>,
+    newValue: ModelOptionType | null
+  ) => {
+    setSelectedModel(newValue ? modelOptions[newValue.id] : null);
+    setModel(newValue ? values[newValue.id] : undefined);
   };
 
   return (
     <>
-      <DialogContent>
-        <Typography gutterBottom>
-          Choose from a provided pre-trained model
-        </Typography>
-      </DialogContent>
+      <Typography gutterBottom sx={{ pb: 2 }}>
+        Choose from a provided pre-trained model
+      </Typography>
       <FormControl
         sx={{ width: "75%", ml: 2, pb: 2 }}
         size="small"
         error={error}
       >
-        <InputLabel id="pretrained-select-label">Pre-trained Models</InputLabel>
-        <Select
-          labelId="pretrained-select-label"
-          id="pretrained-simple-select"
-          value={selectedIdxVal}
-          label="Pre-trained Models"
+        <Autocomplete
+          id="pre-trained-model-select"
+          options={modelOptions}
+          value={selectedModel}
           onChange={handlePreTrainedModelChange}
-          error={error}
-        >
-          {modelIdxs.map((idx) => (
-            <MenuItem key={`Pretrained-${idx}`} value={String(idx)}>
-              {idx === -1 ? "None" : values[idx].name}
-            </MenuItem>
-          ))}
-        </Select>
-        <FormHelperText>{errorText}</FormHelperText>
+          sx={{ width: 300 }}
+          // eslint-disable-next-line react/jsx-no-undef
+          renderInput={(params) => (
+            <TextField {...params} label="Pre-trained Models" />
+          )}
+          blurOnSelect
+          openOnFocus
+          size="small"
+        />
+
+        <FormHelperText>{errorText ?? " "}</FormHelperText>
       </FormControl>
     </>
   );

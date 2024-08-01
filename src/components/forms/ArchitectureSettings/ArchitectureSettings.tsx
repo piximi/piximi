@@ -13,15 +13,10 @@ import {
 
 import { CustomNumberTextField } from "..";
 
-import { DialogWithAction } from "components/dialogs";
-import { useDialog } from "hooks";
+import { ConfirmationDialog } from "components/dialogs";
+import { useDialogHotkey } from "hooks";
 import { Shape } from "store/data/types";
-
-enum ClearOptions {
-  cancel,
-  keep,
-  discard,
-}
+import { HotkeyContext } from "utils/common/enums";
 
 type SelectedModelType = {
   name: string;
@@ -57,25 +52,25 @@ export const ArchitectureSettings = ({
   const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
     useState<string>("");
 
-  const [clearModel, setClearModel] = useState(ClearOptions.keep);
+  const [clearDialogText, setClearDialogText] = useState(
+    `Keep ${selectedModel.model.name} training history?`
+  );
 
   const {
-    onClose: onCloseClearDialog,
-    open: openClearDialog,
-    onOpen: onOpenClearDialog,
-  } = useDialog();
+    onClose: handleCloseClearDialog,
+    open: clearDialogOpen,
+    onOpen: handleOpenClearDialog,
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const dispatchModelOnExit = () => {
-    if (clearModel !== ClearOptions.cancel) {
-      dispatchModel(clearModel === ClearOptions.discard, nextModelIdx);
-    }
+    // "selectedModel" updates before the dialog's onClose() method is called
+    // resulting in next model name appearing briefly.
+    // This will update the dialog text after closing
+    setClearDialogText(`Keep ${selectedModel.model.name} training history?`);
   };
 
-  const handleClearSelect = (_clearModel: ClearOptions) => {
-    onCloseClearDialog();
-    // don't call dispatchModel directly here
-    // it needs to be triggered on dialog exit
-    setClearModel(_clearModel);
+  const handleModelDispatch = (dialogAction: "keep" | "discard") => {
+    dispatchModel(dialogAction === "discard", nextModelIdx);
   };
 
   const handleSelectedModelChange = (event: SelectChangeEvent) => {
@@ -83,7 +78,7 @@ export const ArchitectureSettings = ({
     if (Number.isNaN(modelIdx)) return;
     setNextModelIdx(modelIdx);
     if (selectedModel.model.modelLoaded) {
-      onOpenClearDialog();
+      handleOpenClearDialog();
     } else {
       // if not loaded skip the clear dialog
       dispatchModel(false, modelIdx);
@@ -171,14 +166,14 @@ export const ArchitectureSettings = ({
           )}
         </Grid>
       </Grid>
-      <DialogWithAction
-        title={`Keep ${selectedModel.model.name} training history?`}
-        onClose={() => handleClearSelect(ClearOptions.cancel)}
-        onConfirm={() => handleClearSelect(ClearOptions.keep)}
+      <ConfirmationDialog
+        title={clearDialogText}
+        onClose={handleCloseClearDialog}
+        onConfirm={() => handleModelDispatch("keep")}
+        onReject={() => handleModelDispatch("discard")}
         confirmText="Keep"
-        onReject={() => handleClearSelect(ClearOptions.discard)}
         rejectText="Discard"
-        isOpen={openClearDialog}
+        isOpen={clearDialogOpen}
         TransitionComponent={Fade}
         TransitionProps={{ onExited: dispatchModelOnExit }}
       />

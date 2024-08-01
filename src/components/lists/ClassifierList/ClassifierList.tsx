@@ -15,7 +15,7 @@ import { ModelExecButtonGroup } from "components/list-items/ClassifierExecListIt
 
 import { ModelIOButtonGroup } from "components/list-items/ModelIOButtonGroup/ModelIOButtonGroup";
 import { useClassificationModel } from "hooks/useLearningModel/useClassifierModel";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { ModelStatus, ModelTask } from "utils/models/enums";
 
 export const ClassifierList = () => {
@@ -39,7 +39,7 @@ export const ClassifierList = () => {
     onClose: handleCloseImportClassifierDialog,
     onOpen: handleOpenImportClassifierDialog,
     open: ImportClassifierDialogOpen,
-  } = useDialogHotkey(HotkeyView.ImportTensorflowModelDialog);
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
   const {
     onClose: handleCloseSaveClassifierDialog,
     onOpen: handleOpenSaveClassifierDialog,
@@ -49,7 +49,7 @@ export const ClassifierList = () => {
     onClose: handleCloseFitClassifierDialog,
     onOpen: handleOpenFitClassifierDialog,
     open: fitClassifierDialogOpen,
-  } = useDialogHotkey(HotkeyView.Classifier, false);
+  } = useDialogHotkey(HotkeyContext.ClassifierDialog, false);
 
   useEffect(() => {
     if (modelStatus === ModelStatus.Trained && waitingForResults) {

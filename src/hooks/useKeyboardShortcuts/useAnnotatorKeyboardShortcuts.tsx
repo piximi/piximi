@@ -16,7 +16,7 @@ import {
   ToolType,
 } from "utils/annotator/enums";
 import { AnnotationTool } from "utils/annotator/tools";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import {
   OldDecodedAnnotationType,
   DecodedAnnotationObject,
@@ -101,7 +101,7 @@ export const useAnnotatorKeyboardShortcuts = ({
   //       })
   //     );
   //   },
-  //   HotkeyView.Annotator
+  //   HotkeyView.AnnotatorView
   // );
   /*
    * Select color tool (C)
@@ -115,7 +115,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         })
       );
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
   /*
    * Select pencil tool (D)
@@ -129,7 +129,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         })
       );
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
   /*
    * Select elliptical tool (E)
@@ -143,7 +143,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         })
       );
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
   /*
    * Select hand tool (H)
@@ -155,7 +155,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         annotatorSlice.actions.setToolType({ operation: ToolType.Hand })
       );
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
   /*
    * Select intensity adjustment tool (I)
@@ -169,7 +169,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         })
       );
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
   /*
    * Select lasso tool (L)
@@ -183,7 +183,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         })
       );
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
   /*
    * Select magnetic tool (M)
@@ -197,7 +197,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         })
       );
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
   /*
    * Select polygonal tool (P)
@@ -211,7 +211,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         })
       );
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
   /*
    * Select quick tool (Q)
@@ -225,7 +225,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         })
       );
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
   /*
    * Select rectangular tool (R)
@@ -239,7 +239,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         })
       );
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
   /*
    * Select arrange tool (S)
@@ -251,7 +251,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         annotatorSlice.actions.setToolType({ operation: ToolType.Pointer })
       );
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
 
   /*
@@ -266,7 +266,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         })
       );
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
 
   /*
@@ -279,14 +279,14 @@ export const useAnnotatorKeyboardShortcuts = ({
         annotatorSlice.actions.setToolType({ operation: ToolType.Zoom })
       );
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
   useHotkeys(
     "enter",
     () => {
       confirmAnnotations();
     },
-    HotkeyView.Annotator,
+    HotkeyContext.AnnotatorView,
     [
       activeImageId,
       annotationTool,
@@ -310,7 +310,7 @@ export const useAnnotatorKeyboardShortcuts = ({
       if (toolType !== ToolType.Zoom) return;
       resetZoomSelection();
     },
-    HotkeyView.Annotator,
+    HotkeyContext.AnnotatorView,
     [annotationTool, soundEnabled, toolType]
   );
 
@@ -322,7 +322,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
       deselectAnnotation();
     },
-    HotkeyView.Annotator,
+    HotkeyContext.AnnotatorView,
     [selectedAnnotationsIds, soundEnabled]
   );
 
@@ -348,7 +348,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         })
       );
     },
-    HotkeyView.Annotator,
+    HotkeyContext.AnnotatorView,
     [images, activeImageId]
   );
 
@@ -374,7 +374,7 @@ export const useAnnotatorKeyboardShortcuts = ({
         })
       );
     },
-    HotkeyView.Annotator,
+    HotkeyContext.AnnotatorView,
     [images, activeImageId]
   );
 };

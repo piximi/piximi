@@ -18,7 +18,7 @@ import { selectProjectName } from "store/project/selectors";
 
 import { ExportAnnotationsDialog } from "components/dialogs";
 
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { selectImageViewerImages } from "store/imageViewer/reselectors";
 import {
   selectAllObjectCategories,
@@ -89,7 +89,7 @@ export const ExportAnnotationsMenu = ({
     onClose: onCloseSaveAnnotatorDialog,
     onOpen: onOpenSaveAnnotatorDialog,
     open: openSaveAnnotatorDialog,
-  } = useDialogHotkey(HotkeyView.ExportAnnotationsDialog);
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const onMenusClose = useCallback(() => {
     onCloseSaveAnnotatorDialog();

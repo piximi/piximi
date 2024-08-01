@@ -125,10 +125,7 @@ export const ExampleProjectCard = ({
       );
       if (!deserializedProject) return;
 
-      const project = deserializedProject.project;
-      const data = deserializedProject.data;
-
-      const classifier = deserializedProject.classifier;
+      const { project, data, classifier } = deserializedProject;
 
       batch(() => {
         // loadPercent will be set to 1 here

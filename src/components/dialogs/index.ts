@@ -1,4 +1,4 @@
-export { DialogWithAction } from "./DialogWithAction";
+export { ConfirmationDialog } from "./ConfirmationDialog";
 export { DialogTransitionSlide } from "./DialogTransitionSlide";
 export { FallBackDialog } from "./FallbackDialog";
 export { ImportTensorflowModelDialog } from "./ImportTensorflowModelDialog";
@@ -11,8 +11,8 @@ export { ExportAnnotationsDialog } from "./ExportAnnotationsDialog";
 export { CreateKindDialog } from "./CreateKindDialog";
 export { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";
 export { FitClassifierDialog } from "./FitClassifierDialog";
-export { ExampleImageDialog } from "./ExampleImageDialog";
-export { ExampleProjectDialog } from "./ExampleProjectDialog";
 export { FitSegmenterDialog } from "./FitSegmenterDialog";
 export { NewProjectDialog } from "./NewProjectDialog";
 export { SelectDialog } from "./SelectDialog";
+export { ExampleImageDialog, ExampleProjectDialog } from "./OpenExampleDialog";
+export { CreateCategoryDialog, UpdateCategoryDialog } from "./CategoryDialog";

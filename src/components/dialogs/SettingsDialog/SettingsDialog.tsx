@@ -35,6 +35,8 @@ import {
   selectSoundEnabled,
   selectThemeMode,
 } from "store/applicationSettings/selectors";
+import { useHotkeys } from "hooks";
+import { HotkeyContext } from "utils/common/enums";
 
 const SettingsItem = ({
   title,
@@ -66,39 +68,40 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
   const dispatch = useDispatch();
 
   const themeMode = useSelector(selectThemeMode);
-
+  const soundEnabled = useSelector(selectSoundEnabled);
   const initialSelectedImageBorderWidth = useSelector(
     selectSelectedImageBorderWidth
   );
+  const initialSelectionColor = useSelector(selectImageSelectionColor);
+  const availableColors = useSelector(selectActiveCategoryColors);
+
   const [selectionSize, setSelectionSize] = useState<number>(
     initialSelectedImageBorderWidth
   );
-
-  const initialSelectionColor = useSelector(selectImageSelectionColor);
   const [selectionColor, setSelectionColor] = useState<string>(
     initialSelectionColor
   );
-  const availableColors = useSelector(selectActiveCategoryColors);
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
     React.useState<null | HTMLButtonElement>(null);
   const colorPopupOpen = Boolean(colorMenuAnchorEl);
 
-  const soundEnabled = useSelector(selectSoundEnabled);
-
   const preClose = () => {
     batch(() => {
-      dispatch(
-        applicationSettingsSlice.actions.setSelectedImageBorderWidth({
-          selectionSize,
-        })
-      );
-      dispatch(
-        applicationSettingsSlice.actions.setImageSelectionColor({
-          selectionColor,
-        })
-      );
+      if (selectionSize !== initialSelectedImageBorderWidth) {
+        dispatch(
+          applicationSettingsSlice.actions.setSelectedImageBorderWidth({
+            selectionSize,
+          })
+        );
+      }
+      if (selectionColor !== initialSelectionColor) {
+        dispatch(
+          applicationSettingsSlice.actions.setImageSelectionColor({
+            selectionColor,
+          })
+        );
+      }
     });
-
     onClose();
   };
 
@@ -130,6 +133,16 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
       })
     );
   };
+
+  useHotkeys(
+    "enter",
+    () => {
+      preClose();
+    },
+    HotkeyContext.AppSettingsDialog,
+    { enableOnTags: ["INPUT"], enabled: open },
+    [preClose]
+  );
 
   return (
     <Dialog onClose={preClose} open={open}>
@@ -177,6 +190,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
                 inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                 InputLabelProps={{ shrink: true }}
                 size="small"
+                variant="standard"
                 sx={{ maxWidth: "80px", marginLeft: "10px" }}
               />
             </SettingsItem>

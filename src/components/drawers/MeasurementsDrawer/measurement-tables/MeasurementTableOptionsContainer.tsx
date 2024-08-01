@@ -11,8 +11,9 @@ import {
   selectThingsDictionary,
 } from "store/data/selectors";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
-import { useDialog } from "hooks";
+import { useDialogHotkey } from "hooks";
 import { DataArray } from "utils/file-io/types";
+import { HotkeyContext } from "utils/common/enums";
 
 export const MeasurementTableOptionsContainer = () => {
   const tables = useSelector(selectMeasurementTables);
@@ -32,7 +33,7 @@ export const MeasurementTableOptionsContainer = () => {
     onClose: handleCloseTableDialog,
     onOpen: handleOpenTableDialog,
     open: isTableDialogOpen,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const handleCreateTable = (kind: string) => {
     const thingIds = kinds[kind].containing;

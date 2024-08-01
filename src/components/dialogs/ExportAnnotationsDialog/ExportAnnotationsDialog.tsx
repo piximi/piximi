@@ -1,11 +1,7 @@
 import React, { ChangeEvent, useState } from "react";
 
 import { Grid, TextField } from "@mui/material";
-
-import { useHotkeys } from "hooks";
-
-import { HotkeyView } from "utils/common/enums";
-import { DialogWithAction } from "../DialogWithAction";
+import { ConfirmationDialog } from "../ConfirmationDialog";
 
 type ExportAnnotationsDialogProps = {
   onClose: () => void;
@@ -22,28 +18,17 @@ export const ExportAnnotationsDialog = ({
 }: ExportAnnotationsDialogProps) => {
   const [projectName, setProjectName] = useState<string>(defaultName);
 
-  const onCancel = () => {
+  const handleCancel = () => {
     setProjectName(defaultName);
     onClose();
   };
 
-  const onNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setProjectName(event.target.value);
   };
 
-  useHotkeys(
-    "enter",
-    () => {
-      handleSave(projectName);
-      onClose();
-    },
-    HotkeyView.ExportAnnotationsDialog,
-    { enableOnTags: ["INPUT"] },
-    [handleSave]
-  );
-
   return (
-    <DialogWithAction
+    <ConfirmationDialog
       title="Export Annotations"
       content={
         <Grid container spacing={1}>
@@ -54,13 +39,14 @@ export const ExportAnnotationsDialog = ({
               id="name"
               label="Project file name"
               margin="dense"
+              variant="standard"
               defaultValue={projectName}
-              onChange={onNameChange}
+              onChange={handleNameChange}
             />
           </Grid>
         </Grid>
       }
-      onClose={onCancel}
+      onClose={handleCancel}
       onConfirm={() => handleSave(projectName)}
       confirmText="Export Annotations"
       isOpen={open}
