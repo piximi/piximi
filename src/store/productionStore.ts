@@ -18,7 +18,7 @@ import { imageViewerSlice } from "./imageViewer";
 import { dataSlice } from "./data/dataSlice";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
-import { classifierMiddleware } from "./classifier/classiferListener";
+import { classifierMiddleware } from "./classifier/classifierListener";
 import { segmenterMiddleware } from "./segmenter/segmenterListeners";
 import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
