@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ArrowBack } from "@mui/icons-material";
@@ -10,25 +10,31 @@ import {
   Typography,
 } from "@mui/material";
 
-import { useDialog } from "hooks";
+import { useDialogHotkey } from "hooks";
 
 import { ExitAnnotatorDialog } from "components/dialogs";
 
 import { LogoLoader } from "components/styled-components";
+import { HotkeyContext } from "utils/common/enums";
 
 export const ImageViewerAppBar = () => {
+  const [returnToProject, setReturnToProject] = useState(false);
   const {
     onClose: onCloseExitAnnotatorDialog,
     onOpen: onOpenExitAnnotatorDialog,
-    open: openExitAnnotatorDialog,
-  } = useDialog();
+    open: ExitAnnotatorDialogOpen,
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const navigate = useNavigate();
 
   const onReturnToMainProject = () => {
-    onCloseExitAnnotatorDialog();
-    navigate("/");
+    setReturnToProject(true);
   };
+
+  useEffect(() => {
+    //NOTE: Wait until ExitAnnotatorDialogOpen is finished updating. Otherwise unmounted component access warning
+    if (returnToProject && !ExitAnnotatorDialogOpen) navigate("/");
+  }, [returnToProject, ExitAnnotatorDialogOpen, navigate]);
 
   return (
     <>
@@ -58,9 +64,9 @@ export const ImageViewerAppBar = () => {
       </AppBar>
 
       <ExitAnnotatorDialog
-        onReturnToProject={onReturnToMainProject}
+        returnToProject={onReturnToMainProject}
         onClose={onCloseExitAnnotatorDialog}
-        open={openExitAnnotatorDialog}
+        open={ExitAnnotatorDialogOpen}
       />
     </>
   );

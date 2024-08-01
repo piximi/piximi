@@ -31,34 +31,32 @@ export function useCategoryValidation({
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
-    validateInput(event.target.value);
   };
 
   const validateInput = useCallback(
     (categoryName: string) => {
-      let validInput = true;
+      let invalidInput = false;
       let helperText = " ";
 
       if (categoryName === "") {
         helperText = "Please type a category name.";
-        validInput = false;
+        invalidInput = true;
       } else if (
         categoryName !== initName &&
         unavailableNames.includes(categoryName)
       ) {
-        helperText =
-          "Category names must be unique. A category with this name already exits.";
-        validInput = false;
+        helperText = "A category with this name already exits.";
+        invalidInput = true;
       }
-      setErrorHelperText(helperText);
-      setIsInvalidName(!validInput);
-      return validInput;
+      return { isInvalid: invalidInput, helperText };
     },
     [initName, unavailableNames]
   );
 
   useEffect(() => {
-    validateInput(name);
+    const { isInvalid, helperText } = validateInput(name);
+    setErrorHelperText(helperText);
+    setIsInvalidName(isInvalid);
   }, [name, validateInput]);
 
   useEffect(() => {

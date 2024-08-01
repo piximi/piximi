@@ -2,10 +2,11 @@ import React from "react";
 import { BaseMenu } from "../BaseMenu";
 import { MenuItem, Typography } from "@mui/material";
 import { CreateKindDialog } from "components/dialogs";
-import { useDialog, useMobileView } from "hooks";
+import { useDialogHotkey, useMobileView } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 import { projectSlice } from "store/project";
 import { selectActiveKindId } from "store/project/selectors";
+import { HotkeyContext } from "utils/common/enums";
 
 export const AddKindMenu = ({
   anchor,
@@ -25,7 +26,7 @@ export const AddKindMenu = ({
     onOpen: handleOpenCreateKindDialog,
     onClose: handleCloseCreateKindDialog,
     open: isCreateKindDialogOpen,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const handleUnfilterKind = (kindId: string) => {
     dispatch(projectSlice.actions.removeKindTabFilter({ kindId }));

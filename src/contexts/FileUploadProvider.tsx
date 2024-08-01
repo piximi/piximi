@@ -43,7 +43,7 @@ import {
   selectProjectImageChannels,
 } from "store/project/selectors";
 import { projectSlice } from "store/project";
-import { DialogWithAction } from "components/dialogs";
+import { ConfirmationDialog } from "components/dialogs";
 
 type ImageShapeInfoImage = ImageFileShapeInfo & {
   fileName: string;
@@ -403,7 +403,7 @@ const ImageShapeDialog = ({
   }, [referenceHyperStack]);
 
   return (
-    <DialogWithAction
+    <ConfirmationDialog
       title={"Select Channels"}
       isOpen={open}
       content={
@@ -411,7 +411,7 @@ const ImageShapeDialog = ({
           <Typography>{promptMessage}</Typography>
           {channelOptions ? (
             <Box sx={{ pt: 1 }}>
-              <FormControl size="small" sx={{ width: "15ch", py: "20px" }}>
+              <FormControl size="small" sx={{ width: "15ch" }}>
                 <Select value={"" + channels} onChange={handleSelectChange}>
                   {channelOptions.map((channel) => {
                     return (
@@ -424,27 +424,22 @@ const ImageShapeDialog = ({
               </FormControl>
             </Box>
           ) : (
-            <Box sx={{ pt: 2, pb: 0 }}>
-              <FormControl size="small" sx={{ width: "15ch", py: "20px" }}>
+            <Box>
+              <FormControl size="small" sx={{ width: "15ch" }}>
                 <TextField
                   id="channels-c"
                   label="Channels"
                   error={invalidImageShape}
                   value={channelsString}
                   onChange={onTextFieldChange}
+                  variant="standard"
                   type="text"
                   margin="normal"
                   autoComplete="off"
                   size="small"
                 />
               </FormControl>
-              <Box
-                width="100%"
-                display="flex"
-                justifyContent="center"
-                height="2em"
-                alignContent="center"
-              >
+              <Box position="absolute">
                 {invalidImageShape && (
                   <Typography
                     variant="body2"

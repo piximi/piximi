@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { defaultAlert } from "utils/common/constants";
 import { AlertState } from "utils/common/types";
-import { HotkeyView, Languages } from "utils/common/enums";
+import { HotkeyContext, Languages } from "utils/common/enums";
 import { ThemeMode } from "themes/enums";
 import { AppSettingsState } from "store/types";
+import { logger } from "utils/common/helpers";
 
 const initialState: AppSettingsState = {
   init: false,
@@ -31,12 +32,7 @@ export const applicationSettingsSlice = createSlice({
     hideAlertState(state, action: PayloadAction<{}>) {
       state.alertState.visible = false;
     },
-    registerHotkeyView(
-      state,
-      action: PayloadAction<{ hotkeyView: HotkeyView }>
-    ) {
-      state.hotkeyStack.push(action.payload.hotkeyView);
-    },
+
     setLanguage(state, action: PayloadAction<{ language: Languages }>) {
       state.language = action.payload.language;
     },
@@ -61,8 +57,24 @@ export const applicationSettingsSlice = createSlice({
     setSoundEnabled(state, action: PayloadAction<{ soundEnabled: boolean }>) {
       state.soundEnabled = action.payload.soundEnabled;
     },
-    unregisterHotkeyView(state, action: PayloadAction<{}>) {
-      state.hotkeyStack.pop();
+    registerHotkeyContext(
+      state,
+      action: PayloadAction<{ context: HotkeyContext }>
+    ) {
+      state.hotkeyStack.push(action.payload.context);
+    },
+    unregisterHotkeyContext(
+      state,
+      action: PayloadAction<{ context: HotkeyContext }>
+    ) {
+      if (
+        state.hotkeyStack[state.hotkeyStack.length - 1] ===
+        action.payload.context
+      ) {
+        state.hotkeyStack.pop();
+      } else {
+        logger("Hotkey not at top of stack. Nothing popped.", { dev: true });
+      }
     },
     updateAlertState(state, action: PayloadAction<{ alertState: AlertState }>) {
       state.alertState = action.payload.alertState;

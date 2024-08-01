@@ -10,7 +10,7 @@ import { useUnloadConfirmation } from "hooks";
 
 import { selectProjectImageChannels } from "store/project/selectors";
 import { dimensions } from "utils/common/constants";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
 
@@ -23,14 +23,14 @@ export const MeasurementView = () => {
 
   useEffect(() => {
     dispatch(
-      applicationSettingsSlice.actions.registerHotkeyView({
-        hotkeyView: HotkeyView.ProjectView,
+      applicationSettingsSlice.actions.registerHotkeyContext({
+        context: HotkeyContext.ProjectView,
       })
     );
     return () => {
       dispatch(
-        applicationSettingsSlice.actions.unregisterHotkeyView({
-          hotkeyView: HotkeyView.ProjectView,
+        applicationSettingsSlice.actions.unregisterHotkeyContext({
+          context: HotkeyContext.ProjectView,
         })
       );
     };

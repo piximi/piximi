@@ -1,6 +1,6 @@
 import { batch, useDispatch, useSelector } from "react-redux";
 import { dataSlice } from "store/data/dataSlice";
-import { DialogWithAction } from "../DialogWithAction";
+import { ConfirmationDialog } from "../ConfirmationDialog";
 import { Box, TextField } from "@mui/material";
 import { selectAllKindIds } from "store/data/selectors";
 import { ChangeEvent, useCallback, useState } from "react";
@@ -88,7 +88,7 @@ export const CreateKindDialog = ({
   };
 
   return (
-    <DialogWithAction
+    <ConfirmationDialog
       onClose={onClose}
       isOpen={open}
       title={"Create Kind"}

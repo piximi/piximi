@@ -45,12 +45,12 @@ import {
   useThingSelection,
 } from "hooks";
 import { TooltipTitle } from "components/tooltips";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { useNavigate } from "react-router-dom";
 import { selectActiveCategories } from "store/project/reselectors";
 import { imageViewerSlice } from "store/imageViewer";
 import { TooltipButton } from "components/styled-components/TooltipButton/TooltipButton";
-import { DialogWithAction } from "components/dialogs";
+import { ConfirmationDialog } from "components/dialogs";
 import { ImageCategoryMenu } from "components/menus";
 import { Partition } from "utils/models/enums";
 import { dataSlice } from "store/data";
@@ -78,7 +78,7 @@ export const ProjectToolbar = () => {
     onClose: handleCloseDeleteImagesDialog,
     onOpen: onOpenDeleteImagesDialog,
     open: deleteImagesDialogisOpen,
-  } = useDialogHotkey(HotkeyView.DialogWithAction);
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const handleDelete = () => {
     dispatch(
@@ -97,8 +97,8 @@ export const ProjectToolbar = () => {
       })
     );
     dispatch(
-      applicationSettingsSlice.actions.unregisterHotkeyView({
-        hotkeyView: HotkeyView.MainImageGridAppBar,
+      applicationSettingsSlice.actions.unregisterHotkeyContext({
+        context: HotkeyContext.MainImageGridAppBar,
       })
     );
     navigate("/imageviewer");
@@ -106,8 +106,8 @@ export const ProjectToolbar = () => {
 
   const handleNavigateMeasurements = () => {
     dispatch(
-      applicationSettingsSlice.actions.unregisterHotkeyView({
-        hotkeyView: HotkeyView.MainImageGridAppBar,
+      applicationSettingsSlice.actions.unregisterHotkeyContext({
+        context: HotkeyContext.MainImageGridAppBar,
       })
     );
     navigate("/measurements");
@@ -211,7 +211,7 @@ export const ProjectToolbar = () => {
         )}
       </Toolbar>
 
-      <DialogWithAction
+      <ConfirmationDialog
         title={`Delete ${pluralize(
           "Object",
           unfilteredSelectedThings.length
@@ -392,6 +392,8 @@ const ProjectTextField = () => {
             inputRef={inputRef}
             size="small"
             sx={{ ml: 5 }}
+            variant="standard"
+            inputProps={{ min: 0, style: { textAlign: "center" } }}
           />
         </FormControl>
       )}

@@ -21,7 +21,7 @@ import { Tool } from "../../stage/Tool";
 import { annotatorSlice } from "store/annotator";
 import { selectToolType } from "store/annotator/selectors";
 
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { ToolType as OperationType } from "utils/annotator/enums";
 
 import {
@@ -120,7 +120,7 @@ export const AnnotatorToolDrawer = ({
     () => {
       togglePersistHandler();
     },
-    HotkeyView.Annotator
+    HotkeyContext.AnnotatorView
   );
   const t = useTranslation();
 

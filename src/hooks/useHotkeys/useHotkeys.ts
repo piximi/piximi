@@ -9,7 +9,7 @@ import {
   HotkeyKeyHandler,
 } from "utils/common/types";
 import { selectHotkeyView } from "store/applicationSettings/selectors";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 
 // We implement our own custom filter system.
 
@@ -33,26 +33,26 @@ const isKeyboardEventTriggeredByInput = (ev: KeyboardEvent) => {
 export function useHotkeys(
   keys: string,
   callback: HotkeyKeyHandler,
-  hotkeyView: HotkeyView | Array<HotkeyView>,
+  hotkeyView: HotkeyContext | Array<HotkeyContext>,
   options?: HotkeyOptions
 ): void;
 export function useHotkeys(
   keys: string,
   callback: HotkeyKeyHandler,
-  hotkeyView: HotkeyView | Array<HotkeyView>,
+  hotkeyView: HotkeyContext | Array<HotkeyContext>,
   deps?: any[]
 ): void;
 export function useHotkeys(
   keys: string,
   callback: HotkeyKeyHandler,
-  hotkeyView: HotkeyView | Array<HotkeyView>,
+  hotkeyView: HotkeyContext | Array<HotkeyContext>,
   options?: HotkeyOptions,
   deps?: any[]
 ): void;
 export function useHotkeys(
   keys: string,
   callback: () => void,
-  hotkeyView: HotkeyView | Array<HotkeyView>,
+  hotkeyView: HotkeyContext | Array<HotkeyContext>,
   options?: any[] | HotkeyOptions,
   deps?: any[]
 ): void {

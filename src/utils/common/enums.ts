@@ -4,27 +4,16 @@ export enum AlertType {
   Info,
 }
 
-export enum HotkeyView {
-  Annotator,
-  Classifier,
-  Segmenter,
-  CreateCategoryDialog,
-  DeleteAnnotationCategoryDialog,
-  DeleteAllCategoriesDialog,
-  DeleteCategoryDialog,
-  DeleteImagesDialog,
-  EditCategoryDialog,
-  ExampleClassifierDialog,
-  ImageShapeDialog,
-  ImportTensorflowModelDialog,
-  MainImageGrid,
-  MainImageGridAppBar,
-  NewProjectDialog,
-  ExportAnnotationsDialog,
-  SaveFittedModelDialog,
-  SaveProjectDialog,
+export enum HotkeyContext {
   ProjectView,
-  DialogWithAction,
+  AnnotatorView,
+  ClassifierDialog,
+  SegmenterDialog,
+  ExampleProjectDialog,
+  ImportTensorflowModelDialog,
+  MainImageGridAppBar,
+  ConfirmationDialog,
+  AppSettingsDialog,
 }
 
 export enum Languages {

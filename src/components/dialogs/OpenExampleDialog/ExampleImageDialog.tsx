@@ -1,4 +1,4 @@
-import { BaseExampleDialog } from "../BaseExampleDialog";
+import { BaseExampleDialog } from "./BaseExampleDialog";
 
 import malaria from "images/malaria.png";
 import cellPainting from "images/cell-painting.png";

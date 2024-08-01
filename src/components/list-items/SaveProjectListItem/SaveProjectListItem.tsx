@@ -2,16 +2,17 @@ import React from "react";
 
 import DownloadIcon from "@mui/icons-material/Download";
 
-import { useDialog } from "hooks";
+import { useDialogHotkey } from "hooks";
 import { CustomListItemButton } from "../CustomListItemButton";
 import { SaveProjectDialog } from "components/dialogs";
+import { HotkeyContext } from "utils/common/enums";
 
 export const SaveProjectListItem = () => {
   const {
     onClose: onSaveProjectDialogClose,
     onOpen: onSaveProjectDialogOpen,
     open: openSaveProjectDialog,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   return (
     <>

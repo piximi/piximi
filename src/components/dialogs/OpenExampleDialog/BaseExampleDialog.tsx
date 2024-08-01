@@ -2,7 +2,6 @@ import { ReactElement } from "react";
 import {
   Box,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
@@ -69,7 +68,6 @@ export const BaseExampleDialog = ({
           {children}
         </Box>
       </DialogContent>
-      <DialogActions />
     </Dialog>
   );
 };

@@ -36,7 +36,7 @@ export const useClassificationModel = () => {
       })
     );
   };
-  const handleImportModel = (model: Model, inputShape: Shape) => {
+  const handleImportModel = async (model: Model, inputShape: Shape) => {
     if (model instanceof SequentialClassifier) {
       dispatch(
         classifierSlice.actions.loadUserSelectedModel({

@@ -1,14 +1,16 @@
 import React, { ChangeEvent } from "react";
 import { useDispatch } from "react-redux";
-import { useHotkeys } from "hooks";
 
 import { TextField } from "@mui/material";
 
 import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
-import { HotkeyView } from "utils/common/enums";
-import { DialogWithAction } from "../DialogWithAction";
+import { ConfirmationDialog } from "../ConfirmationDialog";
 import { dataSlice } from "store/data/dataSlice";
+import { annotatorSlice } from "store/annotator";
+import { imageViewerSlice } from "store/imageViewer";
+import { measurementsSlice } from "store/measurements/measurementsSlice";
+import { segmenterSlice } from "store/segmenter";
 
 type NewProjectDialogProps = {
   onClose: () => void;
@@ -36,8 +38,10 @@ export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
     );
     dispatch(dataSlice.actions.resetData());
     dispatch(classifierSlice.actions.resetClassifier());
-
-    closeDialog();
+    dispatch(annotatorSlice.actions.resetAnnotator());
+    dispatch(imageViewerSlice.actions.resetImageViewer());
+    dispatch(measurementsSlice.actions.resetMeasurements());
+    dispatch(segmenterSlice.actions.resetSegmenter());
   };
 
   const onChangeClassifierName = (event: ChangeEvent<HTMLInputElement>) => {
@@ -58,16 +62,8 @@ export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
     onClose();
   };
 
-  useHotkeys(
-    "enter",
-    () => onCreateNewProject(),
-    HotkeyView.NewProjectDialog,
-    { enableOnTags: ["INPUT"] },
-    [onCreateNewProject]
-  );
-
   return (
-    <DialogWithAction
+    <ConfirmationDialog
       onClose={closeDialog}
       isOpen={open}
       title="New Project"
@@ -78,6 +74,7 @@ export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
           id="name"
           label="Name"
           margin="dense"
+          variant="standard"
           value={projectName}
           onChange={onChangeClassifierName}
           error={invalidProjectName}

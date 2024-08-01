@@ -1,11 +1,9 @@
 import { ChangeEvent, useState } from "react";
-import { useHotkeys } from "hooks";
 
 import { Grid, TextField } from "@mui/material";
 
-import { HotkeyView } from "utils/common/enums";
 import { Model } from "utils/models/Model/Model";
-import { DialogWithAction } from "../DialogWithAction";
+import { ConfirmationDialog } from "../ConfirmationDialog";
 import { ModelStatus } from "utils/models/enums";
 
 type SaveFittedModelDialogProps = {
@@ -33,18 +31,8 @@ export const SaveFittedModelDialog = ({
     setName(event.target.value);
   };
 
-  useHotkeys(
-    "enter",
-    () => {
-      onSaveClassifierClick();
-    },
-    HotkeyView.SaveFittedModelDialog,
-    { enableOnTags: ["INPUT"] },
-    [onSaveClassifierClick]
-  );
-
   return (
-    <DialogWithAction
+    <ConfirmationDialog
       isOpen={open}
       onClose={onClose}
       title={`Save ${model.name}`}
@@ -59,6 +47,7 @@ export const SaveFittedModelDialog = ({
               value={name}
               defaultValue={model.name}
               margin="dense"
+              variant="standard"
               onChange={onNameChange}
               helperText={
                 modelStatus !== ModelStatus.Trained

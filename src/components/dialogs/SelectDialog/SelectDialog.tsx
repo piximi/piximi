@@ -1,16 +1,8 @@
 import React, { useState } from "react";
-import { useHotkeys } from "hooks";
 
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-} from "@mui/material";
+import { Autocomplete, FormControl, TextField } from "@mui/material";
 
-import { HotkeyView } from "utils/common/enums";
-import { DialogWithAction } from "../DialogWithAction";
+import { ConfirmationDialog } from "../ConfirmationDialog";
 
 type SelectDialogProps = {
   options: string[];
@@ -30,48 +22,42 @@ export const SelectDialog = ({
   title,
   open,
 }: SelectDialogProps) => {
-  const [currentOption, setCurrentOption] = useState(options[0]);
+  const [currentOption, setCurrentOption] = useState<string>(options[0]);
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setCurrentOption(event.target.value as string);
+  const handleOptionsChange = (
+    event: React.SyntheticEvent<Element, Event>,
+    newValue: string | null
+  ) => {
+    if (!newValue) return;
+    setCurrentOption(newValue);
   };
 
-  useHotkeys(
-    "enter",
-    () => onConfirm(currentOption),
-    HotkeyView.NewProjectDialog,
-    { enableOnTags: ["INPUT"] },
-    [onConfirm]
-  );
-
   return (
-    <DialogWithAction
+    <ConfirmationDialog
       onClose={onClose}
       isOpen={open}
       title={title}
       content={
-        <FormControl fullWidth>
-          <InputLabel id="dialog-select-label">{selectLabel}</InputLabel>
-          <Select
-            labelId="dialog-select-label"
-            id="dialog-select"
+        <FormControl>
+          <Autocomplete
+            id={`${selectLabel}-select`}
+            options={options}
+            sx={{ width: 300 }}
+            // eslint-disable-next-line react/jsx-no-undef
             value={currentOption}
-            label={selectLabel}
-            onChange={handleChange}
-          >
-            {options.map((option) => (
-              <MenuItem
-                key={`${title}-select-dialog-menu-item-${option}`}
-                value={option}
-              >
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
+            onChange={handleOptionsChange}
+            renderInput={(params) => (
+              <TextField {...params} label={selectLabel} />
+            )}
+            blurOnSelect
+            openOnFocus
+            size="small"
+          />
         </FormControl>
       }
       onConfirm={() => onConfirm(currentOption)}
       confirmText="Confirm"
+      disableHotkeyOnInput
     />
   );
 };

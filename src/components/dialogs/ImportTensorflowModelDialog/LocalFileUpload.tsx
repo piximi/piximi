@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 import {
-  DialogContent,
   ListItemIcon,
   ListItemText,
   MenuItem,
@@ -114,13 +113,11 @@ export const LocalFileUpload = ({
 
   return (
     <>
-      <DialogContent>
-        <Typography>Upload model files from your computer.</Typography>
-        <Typography gutterBottom fontSize={"small"} sx={{ ml: 1 }}>
-          Tensorflow requires a .json files containing the model description as
-          well as the corresponding model weights (.bin file(s)).
-        </Typography>
-      </DialogContent>
+      <Typography>Upload model files from your computer.</Typography>
+      <Typography gutterBottom fontSize={"small"}>
+        Tensorflow requires a .json files containing the model description as
+        well as the corresponding model weights (.bin file(s)).
+      </Typography>
 
       <label htmlFor="open-model-file">
         <MenuItem component="span" dense sx={{ ml: 2 }}>

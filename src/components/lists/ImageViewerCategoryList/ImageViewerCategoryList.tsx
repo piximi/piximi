@@ -5,9 +5,9 @@ import { ImageViewerCategoryItem } from "components/list-items/CategoryItem/Imag
 import { CollapsibleListItem } from "components/list-items/CollapsibleListItem";
 import { useDispatch, useSelector } from "react-redux";
 import { imageViewerSlice } from "store/imageViewer";
-import { CreateCategoryDialog } from "components/dialogs/CreateCategoryDialog/CreateCategoryDialog";
+import { CreateCategoryDialog } from "components/dialogs";
 import { useDialogHotkey } from "hooks";
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { KindWithCategories } from "store/data/types";
 import { selectFilteredImageViewerCategoryIds } from "store/imageViewer/selectors";
 import { selectImageViewerActiveKindsWithFullCat } from "store/imageViewer/reselectors";
@@ -24,7 +24,7 @@ export const ImageViewerCategoryList = () => {
     onClose: handleCloseCreateCategoryDialog,
     onOpen: handleOpenCreateCategoryDialog,
     open: isCreateCategoryDialogOpen,
-  } = useDialogHotkey(HotkeyView.DialogWithAction);
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const isKindFiltered = (kind: KindWithCategories) => {
     //HACK: refactor -- O(n*m)

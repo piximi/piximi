@@ -1,17 +1,17 @@
 import { batch, useDispatch, useSelector } from "react-redux";
-import { DialogWithAction } from "../DialogWithAction";
+import { ConfirmationDialog } from "../ConfirmationDialog";
 import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data/dataSlice";
 import { selectActiveImageId } from "store/imageViewer/selectors";
 
 type ExitAnnotatorDialogProps = {
-  onReturnToProject: () => void;
+  returnToProject: () => void;
   onClose: () => void;
   open: boolean;
 };
 
 export const ExitAnnotatorDialog = ({
-  onReturnToProject,
+  returnToProject,
   onClose,
   open,
 }: ExitAnnotatorDialogProps) => {
@@ -19,7 +19,7 @@ export const ExitAnnotatorDialog = ({
 
   const activeImageId = useSelector(selectActiveImageId);
 
-  const onSaveChanges = () => {
+  const handleSaveChanges = () => {
     batch(() => {
       dispatch(
         imageViewerSlice.actions.setActiveImageId({
@@ -30,11 +30,10 @@ export const ExitAnnotatorDialog = ({
       dispatch(dataSlice.actions.reconcile({ keepChanges: true }));
       dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
     });
-
-    onReturnToProject();
+    returnToProject();
   };
 
-  const onDiscardChanges = () => {
+  const handleDiscardChanges = () => {
     batch(() => {
       dispatch(
         imageViewerSlice.actions.setActiveImageId({
@@ -44,19 +43,22 @@ export const ExitAnnotatorDialog = ({
       );
       dispatch(dataSlice.actions.reconcile({ keepChanges: false }));
     });
+    returnToProject();
+  };
 
-    onReturnToProject();
+  const handleClose = () => {
+    onClose();
   };
 
   return (
-    <DialogWithAction
+    <ConfirmationDialog
       title="Save Changes?"
       content="Would you like to save the changes to these annotations and return to the project page?"
-      onConfirm={onSaveChanges}
+      onConfirm={handleSaveChanges}
       confirmText="SAVE"
-      onReject={onDiscardChanges}
+      onReject={handleDiscardChanges}
       rejectText="DISCARD"
-      onClose={onClose}
+      onClose={handleClose}
       isOpen={open}
     />
   );

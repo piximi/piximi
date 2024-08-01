@@ -9,7 +9,7 @@ import {
   SaveFittedModelDialog,
 } from "components/dialogs";
 
-import { HotkeyView } from "utils/common/enums";
+import { HotkeyContext } from "utils/common/enums";
 import { ModelIOButtonGroup } from "components/list-items/ModelIOButtonGroup/ModelIOButtonGroup";
 import { ModelExecButtonGroup } from "components/list-items/ClassifierExecListItem/ModelExecButtonGroup";
 import { useSegmentationModel } from "hooks/useLearningModel/useSegmentationModel";
@@ -31,19 +31,21 @@ export const SegmenterList = () => {
   const {
     onClose: onCloseImportSegmenterDialog,
     onOpen: onOpenImportSegmenterDialog,
-    open: openImportSegmenterDialog,
-  } = useDialogHotkey(HotkeyView.ImportTensorflowModelDialog);
+    open: importSegmenterDialogOpen,
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const {
     onClose: onCloseSaveSegmenterDialog,
     onOpen: onOpenSaveSegmenterDialog,
     open: openSaveSegmenterDialog,
   } = useDialog();
+
   const {
     onClose: handleCloseFitModelDialog,
     onOpen: handleOpenFitModelDialog,
     open: fittingOpen,
-  } = useDialogHotkey(HotkeyView.Segmenter, false);
+  } = useDialogHotkey(HotkeyContext.SegmenterDialog, false);
+
   useEffect(() => {
     if (modelStatus === ModelStatus.Trained && waitingForResults) {
       setWaitingForResults(false);
@@ -75,7 +77,7 @@ export const SegmenterList = () => {
             : selectedModel
         }
         onClose={onCloseImportSegmenterDialog}
-        open={openImportSegmenterDialog}
+        open={importSegmenterDialogOpen}
         modelTask={ModelTask.Segmentation}
         dispatchFunction={handleImportModel}
       />

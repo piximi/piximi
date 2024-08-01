@@ -4,9 +4,9 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { List } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 
-import { useDialog, useTranslation } from "hooks";
+import { useDialogHotkey, useTranslation } from "hooks";
 
-import { DialogWithAction } from "components/dialogs";
+import { ConfirmationDialog } from "components/dialogs";
 import { imageViewerSlice } from "store/imageViewer";
 import { CustomListItemButton } from "components/list-items";
 import { dataSlice } from "store/data";
@@ -14,6 +14,7 @@ import {
   selectActiveAnnotationIds,
   selectSelectedAnnotationIds,
 } from "store/imageViewer/selectors";
+import { HotkeyContext } from "utils/common/enums";
 
 type DeleteType = "ALL" | "SELECTED";
 export const ClearAnnotationsGroup = () => {
@@ -26,7 +27,7 @@ export const ClearAnnotationsGroup = () => {
     onClose: handleCloseDeleteAnnotationsDialog,
     onOpen: handleOpenDeleteAnnotationsDialog,
     open: isDeleteAnnotationsDialogOpen,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const handleOpenAndTrack = (deleteType: DeleteType) => {
     setDeleteOp(deleteType);
@@ -89,7 +90,7 @@ export const ClearAnnotationsGroup = () => {
         icon={<DeleteIcon color="disabled" />}
       />
 
-      <DialogWithAction
+      <ConfirmationDialog
         title={`Delete ${deleteOp}  annotations`}
         content={`${
           deleteOp === "ALL"

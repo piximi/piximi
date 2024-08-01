@@ -1,9 +1,10 @@
+// ignore-no-logs
 import type { Meta, StoryObj } from "@storybook/react";
-import { DialogWithActionSHK } from "./DialogWithActionSHK";
+import { ConfirmationDialogSHK } from "./ConfirmationDialogSHK";
 
-const meta: Meta<typeof DialogWithActionSHK> = {
-  title: "Common/DialogWithAction",
-  component: DialogWithActionSHK,
+const meta: Meta<typeof ConfirmationDialogSHK> = {
+  title: "Common/ConfirmationDialog",
+  component: ConfirmationDialogSHK,
   tags: ["autodocs"],
   parameters: {
     docs: {
@@ -16,11 +17,11 @@ const meta: Meta<typeof DialogWithActionSHK> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof DialogWithActionSHK>;
+type Story = StoryObj<typeof ConfirmationDialogSHK>;
 
 export const Default: Story = {
   args: {
-    title: "Dialog with Action",
+    title: "Confirmation Dialog",
     content: "Dialog content",
     onConfirm: () => {
       console.log("I'm confirmed");
@@ -34,7 +35,7 @@ export const Default: Story = {
 
 export const AltText: Story = {
   args: {
-    title: "Dialog with Action",
+    title: "Confirmation Dialog",
     content: "Dialog content",
     onConfirm: () => {
       console.log("I'm confirmed");
@@ -49,7 +50,7 @@ export const AltText: Story = {
 
 export const WithReject: Story = {
   args: {
-    title: "Dialog with Action",
+    title: "Confirmation Dialog",
     content: "Dialog content",
     onConfirm: () => {
       console.log("I'm confirmed");
