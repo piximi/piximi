@@ -7,11 +7,11 @@ export enum AlertType {
 export enum HotkeyContext {
   ProjectView,
   AnnotatorView,
+  MeasurementsView,
   ClassifierDialog,
   SegmenterDialog,
   ExampleProjectDialog,
   ImportTensorflowModelDialog,
-  MainImageGridAppBar,
   ConfirmationDialog,
   AppSettingsDialog,
 }

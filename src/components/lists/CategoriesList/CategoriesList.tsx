@@ -35,6 +35,8 @@ export const CategoriesList = () => {
 
   const [selectedCategory, setSelectedCategory] = useState<Category>();
   const [categoryIndex, setCategoryIndex] = useState("");
+  const [showHK, setShowHK] = useState(false);
+
   const highlightedCategory = useSelector(selectHighlightedCategory);
 
   const modelStatus = useSelector(selectClassifierModelStatus);
@@ -119,6 +121,7 @@ export const CategoriesList = () => {
   useHotkeys(
     "shift",
     () => {
+      setShowHK(false);
       if (
         categoryIndex.length !== 0 &&
         !Number.isNaN(+categoryIndex) &&
@@ -151,6 +154,16 @@ export const CategoriesList = () => {
     [dispatch, selectedImageIds]
   );
 
+  useHotkeys(
+    "shift",
+    () => {
+      setShowHK(true);
+    },
+    [HotkeyContext.AnnotatorView, HotkeyContext.ProjectView],
+    { enabled: true },
+    [dispatch, selectedImageIds]
+  );
+
   useEffect(() => {
     const allCategories = categories;
     if (
@@ -171,9 +184,11 @@ export const CategoriesList = () => {
     <>
       <List dense>
         <List dense sx={{ maxHeight: "20rem", overflowY: "scroll" }}>
-          {categories.map((category: Category) => {
+          {categories.map((category: Category, idx) => {
             return (
               <CategoryItem
+                showHK={showHK}
+                HKIndex={idx}
                 category={category}
                 key={category.id}
                 isSelected={

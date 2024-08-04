@@ -96,20 +96,11 @@ export const ProjectToolbar = () => {
         selectedThingIds: allSelectedThingIds,
       })
     );
-    dispatch(
-      applicationSettingsSlice.actions.unregisterHotkeyContext({
-        context: HotkeyContext.MainImageGridAppBar,
-      })
-    );
+
     navigate("/imageviewer");
   };
 
   const handleNavigateMeasurements = () => {
-    dispatch(
-      applicationSettingsSlice.actions.unregisterHotkeyContext({
-        context: HotkeyContext.MainImageGridAppBar,
-      })
-    );
     navigate("/measurements");
   };
 
