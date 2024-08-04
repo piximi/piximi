@@ -133,18 +133,18 @@ export const CategoriesList = () => {
           })
         );
         setSelectedCategory(categories[+categoryIndex]);
-      }
-      if (selectedImageIds.length > 0) {
-        dispatch(
-          dataSlice.actions.updateThings({
-            updates: selectedImageIds.map((imageId) => ({
-              id: imageId,
-              categoryId: highlightedCategory,
-              partition: Partition.Unassigned,
-            })),
-            isPermanent: true,
-          })
-        );
+        if (selectedImageIds.length > 0) {
+          dispatch(
+            dataSlice.actions.updateThings({
+              updates: selectedImageIds.map((imageId) => ({
+                id: imageId,
+                categoryId: highlightedCategory,
+                partition: Partition.Unassigned,
+              })),
+              isPermanent: true,
+            })
+          );
+        }
       }
 
       setCategoryIndex("");
