@@ -24,13 +24,13 @@ export const MeasurementView = () => {
   useEffect(() => {
     dispatch(
       applicationSettingsSlice.actions.registerHotkeyContext({
-        context: HotkeyContext.ProjectView,
+        context: HotkeyContext.MeasurementsView,
       })
     );
     return () => {
       dispatch(
         applicationSettingsSlice.actions.unregisterHotkeyContext({
-          context: HotkeyContext.ProjectView,
+          context: HotkeyContext.MeasurementsView,
         })
       );
     };
