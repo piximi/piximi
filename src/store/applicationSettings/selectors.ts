@@ -11,7 +11,7 @@ export const selectAlertState = ({
   return applicationSettings.alertState;
 };
 
-export const selectHotkeyView = ({
+export const selectHotkeyContext = ({
   applicationSettings,
 }: {
   applicationSettings: AppSettingsState;

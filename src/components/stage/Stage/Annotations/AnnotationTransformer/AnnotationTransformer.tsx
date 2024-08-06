@@ -28,6 +28,8 @@ import {
   selectWorkingAnnotation,
 } from "store/imageViewer/selectors";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
+import { useHotkeys } from "hooks";
+import { HotkeyContext } from "utils/common/enums";
 
 const buttonWidth = 65;
 const buttonHeight = 26;
@@ -99,7 +101,7 @@ export const AnnotationTransformer = ({
   };
 
   const handleConfirmOrDeleteAnnotation = (
-    event: Konva.KonvaEventObject<Event>
+    event?: Konva.KonvaEventObject<Event>
   ) => {
     if (!activeImageId) return;
     const container = stageRef!.current!.container();
@@ -141,7 +143,7 @@ export const AnnotationTransformer = ({
     clearAnnotation();
   };
 
-  const cancelAnnotationHandler = (event: Konva.KonvaEventObject<Event>) => {
+  const cancelAnnotationHandler = (event?: Konva.KonvaEventObject<Event>) => {
     const container = stageRef!.current!.container();
     container.style.cursor = cursor;
     clearAnnotation();
@@ -218,6 +220,31 @@ export const AnnotationTransformer = ({
     };
   }, [annotationId, stageRef]);
 
+  useHotkeys(
+    "enter",
+    (event) => {
+      if (!event.repeat) {
+        if (workingAnnotation.saved?.id === annotationId) {
+          handleConfirmOrDeleteAnnotation();
+        }
+      }
+    },
+    HotkeyContext.AnnotatorView,
+    [workingAnnotation.saved]
+  );
+  useHotkeys(
+    "esc",
+    (event) => {
+      if (!event.repeat) {
+        if (workingAnnotation.saved?.id === annotationId) {
+          cancelAnnotationHandler();
+        }
+      }
+    },
+    HotkeyContext.AnnotatorView,
+    [workingAnnotation.saved]
+  );
+
   return (
     <>
       <ReactKonva.Group>
@@ -229,82 +256,82 @@ export const AnnotationTransformer = ({
           borderStrokeWidth={1}
           borderStroke="white" //TODO: It would be pretty cool if the border color could set depending on the primary color of the underlying image for contrast
         />
-        {workingAnnotation && (
-          <>
-            <ReactKonva.Group
-              id={"label-group"}
-              position={{ x: xPos, y: yPos }}
-              scaleX={1 / (stageRef?.current?.scaleX() ?? 1)}
-              scaleY={1 / (stageRef?.current?.scaleX() ?? 1)}
+        {/* {workingAnnotation && ( */}
+        <>
+          <ReactKonva.Group
+            id={"label-group"}
+            position={{ x: xPos, y: yPos }}
+            scaleX={1 / (stageRef?.current?.scaleX() ?? 1)}
+            scaleY={1 / (stageRef?.current?.scaleX() ?? 1)}
+          >
+            <ReactKonva.Label
+              position={{
+                x: labelPosition.x,
+                y: labelPosition.y1,
+              }}
+              onClick={handleConfirmOrDeleteAnnotation}
+              onTap={handleConfirmOrDeleteAnnotation}
+              id={"label"}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
-              <ReactKonva.Label
-                position={{
-                  x: labelPosition.x,
-                  y: labelPosition.y1,
-                }}
-                onClick={handleConfirmOrDeleteAnnotation}
-                onTap={handleConfirmOrDeleteAnnotation}
-                id={"label"}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
-                <ReactKonva.Tag
-                  cornerRadius={3}
-                  fill={"darkgreen"}
-                  lineJoin={"round"}
-                  shadowColor={"black"}
-                  shadowBlur={10}
-                  shadowOffset={{ x: 5, y: 5 }}
-                />
-                <ReactKonva.Text
-                  fill={"white"}
-                  fontSize={14}
-                  padding={6}
-                  text={
-                    activeAnnotationIds.includes(annotationId) &&
-                    Object.keys(workingAnnotation.changes).length === 0
-                      ? "Delete"
-                      : "Confirm"
-                  }
-                  width={buttonWidth}
-                  height={buttonHeight}
-                  align={"center"}
-                  name={"transformer-button"}
-                />
-              </ReactKonva.Label>
-              <ReactKonva.Label
-                position={{
-                  x: labelPosition.x,
-                  y: labelPosition.y2,
-                }}
-                onClick={cancelAnnotationHandler}
-                onTap={cancelAnnotationHandler}
-                id={"label"}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
-                <ReactKonva.Tag
-                  cornerRadius={3}
-                  fill={"darkred"}
-                  lineJoin={"round"}
-                  shadowColor={"black"}
-                  shadowBlur={10}
-                  shadowOffset={{ x: 5, y: 5 }}
-                />
-                <ReactKonva.Text
-                  fill={"white"}
-                  fontSize={14}
-                  padding={6}
-                  text={"Cancel"}
-                  width={buttonWidth}
-                  height={buttonHeight}
-                  align={"center"}
-                  name={"transformer-button"}
-                />
-              </ReactKonva.Label>
-            </ReactKonva.Group>
-          </>
-        )}
+              <ReactKonva.Tag
+                cornerRadius={3}
+                fill={"darkgreen"}
+                lineJoin={"round"}
+                shadowColor={"black"}
+                shadowBlur={10}
+                shadowOffset={{ x: 5, y: 5 }}
+              />
+              <ReactKonva.Text
+                fill={"white"}
+                fontSize={14}
+                padding={6}
+                text={
+                  activeAnnotationIds.includes(annotationId) &&
+                  Object.keys(workingAnnotation.changes).length === 0
+                    ? "Delete"
+                    : "Confirm"
+                }
+                width={buttonWidth}
+                height={buttonHeight}
+                align={"center"}
+                name={"transformer-button"}
+              />
+            </ReactKonva.Label>
+            <ReactKonva.Label
+              position={{
+                x: labelPosition.x,
+                y: labelPosition.y2,
+              }}
+              onClick={cancelAnnotationHandler}
+              onTap={cancelAnnotationHandler}
+              id={"label"}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              <ReactKonva.Tag
+                cornerRadius={3}
+                fill={"darkred"}
+                lineJoin={"round"}
+                shadowColor={"black"}
+                shadowBlur={10}
+                shadowOffset={{ x: 5, y: 5 }}
+              />
+              <ReactKonva.Text
+                fill={"white"}
+                fontSize={14}
+                padding={6}
+                text={"Cancel"}
+                width={buttonWidth}
+                height={buttonHeight}
+                align={"center"}
+                name={"transformer-button"}
+              />
+            </ReactKonva.Label>
+          </ReactKonva.Group>
+        </>
+        {/* )} */}
       </ReactKonva.Group>
     </>
   );

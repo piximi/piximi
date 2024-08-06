@@ -14,7 +14,7 @@ import {
   LockOpen as LockOpenIcon,
 } from "@mui/icons-material";
 
-import { useHotkeys, useTranslation } from "hooks";
+import { useAnnotatorToolShortcuts, useHotkeys, useTranslation } from "hooks";
 
 import { Tool } from "../../stage/Tool";
 
@@ -115,12 +115,14 @@ export const AnnotatorToolDrawer = ({
     setPersistOptions((visible) => !visible);
   };
 
+  useAnnotatorToolShortcuts();
   useHotkeys(
     "shift+o",
     () => {
       togglePersistHandler();
     },
-    HotkeyContext.AnnotatorView
+    HotkeyContext.AnnotatorView,
+    [persistOptions]
   );
   const t = useTranslation();
 

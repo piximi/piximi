@@ -25,7 +25,7 @@ export const ImageViewer = () => {
   const dispatch = useDispatch();
   const stageRef = useRef<Konva.Stage>(null);
 
-  const [optionsVisible, setOptionsVisibile] = useState<boolean>(true);
+  const [optionsVisible, setOptionsVisibile] = useState<boolean>(false);
   const [persistOptions, setPersistOptions] = useState<boolean>(false);
   const isMobile = useMobileView();
   const alertState = useSelector(selectAlertState);
