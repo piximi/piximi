@@ -3,7 +3,7 @@ export { useContextMenu } from "./useContextMenu";
 export { useDebounce } from "./useDebounce";
 export { useDialog, useDialogHotkey } from "./useDialog";
 export { useDndFileDrop } from "./useDndFileDrop";
-export { useAnnotatorKeyboardShortcuts } from "./useKeyboardShortcuts";
+export { useAnnotatorToolShortcuts } from "./useKeyboardShortcuts";
 export { useMarchingAnts } from "./useMarchingAnts";
 export { useMenu } from "./useMenu";
 export { useStageHandlers } from "./useStageHandlers";

@@ -100,7 +100,7 @@ export const CategoriesList = () => {
         });
       }
     },
-    [HotkeyContext.AnnotatorView, HotkeyContext.ProjectView],
+    [HotkeyContext.ProjectView],
 
     []
   );
@@ -149,7 +149,7 @@ export const CategoriesList = () => {
 
       setCategoryIndex("");
     },
-    [HotkeyContext.AnnotatorView, HotkeyContext.ProjectView],
+    [HotkeyContext.ProjectView],
     { keyup: true, enabled: true },
     [dispatch, selectedImageIds]
   );
@@ -159,7 +159,7 @@ export const CategoriesList = () => {
     () => {
       setShowHK(true);
     },
-    [HotkeyContext.AnnotatorView, HotkeyContext.ProjectView],
+    [HotkeyContext.ProjectView],
     { enabled: true },
     [dispatch, selectedImageIds]
   );

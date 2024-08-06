@@ -5,10 +5,7 @@ import { KonvaEventObject } from "konva/lib/Node";
 import Konva from "konva";
 import { throttle } from "lodash";
 
-import {
-  useZoom,
-  //useAnnotatorKeyboardShortcuts
-} from "hooks";
+import { useZoom } from "hooks";
 
 import {
   imageViewerSlice,
@@ -265,18 +262,6 @@ export const useStageHandlers = (
     handleZoomDblClick(event);
     setCurrentMousePosition();
   };
-
-  //   useAnnotatorKeyboardShortcuts({
-  //     annotationTool,
-  //     deleteAnnotations,
-  //     deselectAllAnnotations,
-  //     deselectAnnotation,
-  //     resetZoomSelection,
-  //     workingAnnotationEntity,
-  //     selectedAnnotationsIds,
-  //     selectionMode,
-  //     toolType,
-  //   });
 
   return {
     onPointerMouseDown,

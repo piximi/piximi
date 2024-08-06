@@ -40,7 +40,8 @@ export const usePointerTool = (
       }
     },
     HotkeyContext.AnnotatorView,
-    { keyup: true, keydown: true }
+    { keyup: true, keydown: true },
+    []
   );
 
   /*

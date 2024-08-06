@@ -8,7 +8,7 @@ import {
   HotkeysEvent,
   HotkeyKeyHandler,
 } from "utils/common/types";
-import { selectHotkeyView } from "store/applicationSettings/selectors";
+import { selectHotkeyContext } from "store/applicationSettings/selectors";
 import { HotkeyContext } from "utils/common/enums";
 
 // We implement our own custom filter system.
@@ -33,26 +33,26 @@ const isKeyboardEventTriggeredByInput = (ev: KeyboardEvent) => {
 export function useHotkeys(
   keys: string,
   callback: HotkeyKeyHandler,
-  hotkeyView: HotkeyContext | Array<HotkeyContext>,
+  hotkeyContext: HotkeyContext | Array<HotkeyContext>,
   options?: HotkeyOptions
 ): void;
 export function useHotkeys(
   keys: string,
   callback: HotkeyKeyHandler,
-  hotkeyView: HotkeyContext | Array<HotkeyContext>,
+  hotkeyContext: HotkeyContext | Array<HotkeyContext>,
   deps?: any[]
 ): void;
 export function useHotkeys(
   keys: string,
   callback: HotkeyKeyHandler,
-  hotkeyView: HotkeyContext | Array<HotkeyContext>,
+  hotkeycontext: HotkeyContext | Array<HotkeyContext>,
   options?: HotkeyOptions,
   deps?: any[]
 ): void;
 export function useHotkeys(
   keys: string,
   callback: () => void,
-  hotkeyView: HotkeyContext | Array<HotkeyContext>,
+  hotkeyContext: HotkeyContext | Array<HotkeyContext>,
   options?: any[] | HotkeyOptions,
   deps?: any[]
 ): void {
@@ -70,7 +70,7 @@ export function useHotkeys(
     enabled = true,
     enableOnContentEditable = false,
   } = (options as HotkeyOptions) || {};
-  const currentHotkeyView = useSelector(selectHotkeyView);
+  const currentHotkeyContext = useSelector(selectHotkeyContext);
   // The return value of this callback determines if the browsers default behavior is prevented.
 
   const memoisedCallback = useCallback(
@@ -90,8 +90,10 @@ export function useHotkeys(
       }
 
       if (
-        (Array.isArray(hotkeyView) && hotkeyView.includes(currentHotkeyView)) ||
-        (!Array.isArray(hotkeyView) && hotkeyView === currentHotkeyView)
+        (Array.isArray(hotkeyContext) &&
+          hotkeyContext.includes(currentHotkeyContext)) ||
+        (!Array.isArray(hotkeyContext) &&
+          hotkeyContext === currentHotkeyContext)
       ) {
         callback(keyboardEvent, hotkeysEvent);
         return true;
@@ -100,8 +102,8 @@ export function useHotkeys(
       return false;
     }, //eslint-disable-next-line react-hooks/exhaustive-deps
     deps
-      ? [hotkeyView, currentHotkeyView, enableOnTags, filter, ...deps]
-      : [hotkeyView, currentHotkeyView, enableOnTags, filter]
+      ? [hotkeyContext, currentHotkeyContext, enableOnTags, filter, ...deps]
+      : [hotkeyContext, currentHotkeyContext, enableOnTags, filter]
   );
 
   useEffect(() => {
@@ -116,9 +118,10 @@ export function useHotkeys(
     if (keyup && keydown !== true) {
       (options as HotkeyOptions).keydown = false;
     }
-
     hotkeys(keys, (options as HotkeyOptions) || {}, memoisedCallback);
 
-    return () => hotkeys.unbind(keys, memoisedCallback);
+    return () => {
+      hotkeys.unbind(keys, memoisedCallback);
+    };
   }, [keyup, keydown, options, memoisedCallback, keys, enabled]);
 }

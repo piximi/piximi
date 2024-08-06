@@ -59,7 +59,7 @@ export const ConfirmationDialog = ({
     },
     HotkeyContext.ConfirmationDialog,
     { enableOnTags: disableHotkeyOnInput ? [] : ["INPUT"], enabled: isOpen },
-    [handleConfirm, confirmDisabled, handleReject]
+    [handleConfirm, confirmDisabled]
   );
 
   return (
