@@ -17,7 +17,6 @@ export enum ToolType {
   ColorAdjustment,
   ColorAnnotation,
   EllipticalAnnotation,
-  Hand,
   LassoAnnotation,
   MagneticAnnotation,
   ObjectAnnotation,

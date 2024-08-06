@@ -46,11 +46,6 @@ export const useAnnotatorToolShortcuts = () => {
               })
             );
             break;
-          case "H":
-            dispatch(
-              annotatorSlice.actions.setToolType({ operation: ToolType.Hand })
-            );
-            break;
           case "I":
             dispatch(
               annotatorSlice.actions.setToolType({
