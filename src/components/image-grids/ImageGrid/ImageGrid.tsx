@@ -39,23 +39,6 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
     [dispatch]
   );
 
-  //   useHotkeys("esc", () => handleDeselectAll(), HotkeyView.ProjectView, {
-  //     enabled: tabIndex === 0,
-  //   });
-  //   useHotkeys(
-  //     "backspace, delete",
-  //     () => onOpenDeleteImagesDialog(),
-  //     HotkeyView.ProjectView,
-  //     { enabled: tabIndex === 0 }
-  //   );
-  //   useHotkeys(
-  //     "control+a",
-  //     () => handleSelectAll(),
-  //     HotkeyView.ProjectView,
-  //     { enabled: tabIndex === 0 },
-  //     [images]
-  //   );
-
   return (
     <DropBox>
       <>
