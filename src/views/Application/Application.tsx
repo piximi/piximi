@@ -18,6 +18,7 @@ import { dataConverter_v1v2 } from "utils/file-io/converters/dataConverter_v1v2"
 import { SerializedFileType } from "utils/file-io/types";
 import { dataSlice } from "store/data";
 import { LoadingScreen } from "./LoadingScreen";
+import { projectSlice } from "store/project";
 
 export const Application = () => {
   const theme = usePreferredMuiTheme();
@@ -60,15 +61,20 @@ export const Application = () => {
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
-        <FileUploadProvider>
-          <BrowserRouter basename={"/"}>
-            <Routes>
-              <Route path="/" element={<ProjectViewer />} />
-              <Route path="imageviewer" element={<ImageViewer />} />
-              <Route path="measurements" element={<MeasurementView />} />
-            </Routes>
-          </BrowserRouter>
-        </FileUploadProvider>
+        <CssBaseline />
+        {hasLoaded ? (
+          <FileUploadProvider>
+            <BrowserRouter basename={"/"}>
+              <Routes>
+                <Route path="/" element={<ProjectViewer />} />
+                <Route path="imageviewer" element={<ImageViewer />} />
+                <Route path="measurements" element={<MeasurementView />} />
+              </Routes>
+            </BrowserRouter>
+          </FileUploadProvider>
+        ) : (
+          <LoadingScreen />
+        )}
       </ThemeProvider>
     </StyledEngineProvider>
   );
