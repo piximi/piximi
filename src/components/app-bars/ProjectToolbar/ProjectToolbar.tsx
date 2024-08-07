@@ -40,6 +40,7 @@ import {
 } from "store/project/selectors";
 import {
   useDialogHotkey,
+  useHotkeys,
   useMenu,
   useMobileView,
   useThingSelection,
@@ -103,6 +104,29 @@ export const ProjectToolbar = () => {
   const handleNavigateMeasurements = () => {
     navigate("/measurements");
   };
+
+  useHotkeys(
+    "esc",
+    () => {
+      unfilteredSelectedThings.length > 0 && handleDeselectAll();
+    },
+    HotkeyContext.ProjectView,
+    [handleDeselectAll, unfilteredSelectedThings]
+  );
+  useHotkeys(
+    "delete, backspace",
+    () => {
+      unfilteredSelectedThings.length > 0 && onOpenDeleteImagesDialog();
+    },
+    HotkeyContext.ProjectView,
+    [unfilteredSelectedThings]
+  );
+  useHotkeys(
+    "control+a",
+    () => !allSelected && handleSelectAll(),
+    HotkeyContext.ProjectView,
+    [handleSelectAll]
+  );
 
   return (
     <>
