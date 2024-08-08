@@ -20,6 +20,7 @@ export type ModelArgs = {
   graph: boolean;
   pretrained: boolean;
   trainable: boolean;
+  kind?: string;
   src?: string;
   requiredChannels?: number;
 };

@@ -14,6 +14,7 @@ export class StardistFluo extends Stardist {
   constructor() {
     super({
       name: "StardistFluo",
+      kind: "Nucleus",
       task: ModelTask.Segmentation,
       graph: true,
       pretrained: true,

@@ -14,6 +14,7 @@ export class StardistVHE extends Stardist {
   constructor() {
     super({
       name: "StardistVHE",
+      kind: "Nucleus",
       task: ModelTask.Segmentation,
       graph: true,
       pretrained: true,
