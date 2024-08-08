@@ -13,7 +13,7 @@ import LanguageIcon from "@mui/icons-material/Language";
 
 import { useDebounce } from "hooks";
 import { Model } from "utils/models/Model";
-import { UploadedClassifier } from "utils/models/UploadedClassifier/UploadedClassifier";
+import { UploadedClassifier } from "utils/models/classification/UploadedClassifier/UploadedClassifier";
 import { ModelTask } from "utils/models/enums";
 import { Shape } from "store/data/types";
 

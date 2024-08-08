@@ -6,7 +6,7 @@ import {
   selectClassifierSelectedModel,
 } from "store/classifier/selectors";
 import { Shape } from "store/data/types";
-import { SequentialClassifier } from "utils/models/AbstractClassifier";
+import { SequentialClassifier } from "utils/models/classification/AbstractClassifier";
 import { ModelStatus, ModelTask } from "utils/models/enums";
 import { Model } from "utils/models/Model";
 

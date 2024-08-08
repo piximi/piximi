@@ -1,5 +1,5 @@
 import "@tensorflow/tfjs-node";
-import { SequentialClassifier } from "../AbstractClassifier/AbstractClassifier";
+import { SequentialClassifier } from "../classification/AbstractClassifier/AbstractClassifier";
 
 import { fileFromPath } from "utils/file-io/nodeImageHelper";
 import {

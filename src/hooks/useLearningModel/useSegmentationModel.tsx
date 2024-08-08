@@ -6,7 +6,7 @@ import {
   selectSegmenterModel,
   selectSegmenterModelStatus,
 } from "store/segmenter/selectors";
-import { Segmenter } from "utils/models/AbstractSegmenter/AbstractSegmenter";
+import { Segmenter } from "utils/models/segmentation/AbstractSegmenter";
 import { ModelStatus, ModelTask } from "utils/models/enums";
 import { Model } from "utils/models/Model/Model";
 
