@@ -18,6 +18,7 @@ export class Glas extends Segmenter {
     super({
       name: "GlandSegmentation",
       task: ModelTask.Segmentation,
+      kind: "Glands",
       graph: true,
       pretrained: true,
       trainable: false,

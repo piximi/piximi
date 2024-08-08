@@ -12,7 +12,7 @@ export const ModelIOButtonGroup = ({
 }) => {
   const t = useTranslation();
   return (
-    <Box py={1}>
+    <Box display="flex" justifyContent="space-between" width="100%">
       <Button color="inherit" size="small" onClick={handleImportModel}>
         <AddIcon sx={{ fontSize: "1.15rem", mr: 0.5 }} />
         {t("Load Model")}

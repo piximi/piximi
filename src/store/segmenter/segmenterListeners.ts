@@ -36,6 +36,7 @@ import {
   Shape,
 } from "store/data/types";
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
+import { intersection } from "lodash";
 
 export const segmenterMiddleware = createListenerMiddleware();
 
@@ -116,11 +117,20 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     dataState.kinds.entities["Image"],
     "containing"
   );
+  const existingObjects: string[] = [];
+  if (model.kind) {
+    const fullKind = kinds.find((kind) => kind.id === model.kind);
+    if (fullKind && fullKind.containing.length > 0) {
+      existingObjects.push(...fullKind.containing);
+    }
+  }
   const inferenceImages = imageIds.reduce((infIms: ImageObject[], id) => {
     const image = getCompleteEntity(dataState.things.entities[id]);
 
     if (image && "containing" in image) {
-      if (image.containing.length === 0) {
+      const containedObjects = image.containing;
+
+      if (intersection(containedObjects, existingObjects).length === 0) {
         infIms.push(image);
       }
     }
@@ -129,10 +139,10 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
 
   if (inferenceImages.length === 0) {
     await handleError(
-      "Inference set it empty",
+      "Inference set is empty",
       listenerAPI,
       previousModelStatus,
-      "No unlabeled images to predict."
+      `Images cannot have existing "${model.kind}" objects.`
     );
 
     return;

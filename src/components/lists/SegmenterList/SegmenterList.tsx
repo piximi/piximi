@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { Box } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 
 import { useDialog, useDialogHotkey } from "hooks";
 
@@ -54,12 +54,38 @@ export const SegmenterList = () => {
 
   return (
     <>
-      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        gap={1}
+        width="100%"
+        px={1}
+      >
         <ModelIOButtonGroup
           handleImportModel={onOpenImportSegmenterDialog}
           handleSaveModel={onOpenSaveSegmenterDialog}
         />
 
+        {selectedModel && (
+          <Stack
+            width="100%"
+            py={0.5}
+            borderTop={"1px solid white"}
+            borderBottom={"1px solid white"}
+            sx={(theme) => ({
+              borderTop: `1px solid ${theme.palette.divider}`,
+              borderBottom: `1px solid ${theme.palette.divider}`,
+            })}
+          >
+            <Typography variant="caption" noWrap>
+              {`Selected Model:  ${selectedModel.name}`}
+            </Typography>
+            <Typography variant="caption" noWrap>
+              {`Model Kind:  ${selectedModel.kind ?? "N/A"}`}
+            </Typography>
+          </Stack>
+        )}
         <ModelExecButtonGroup
           modelStatus={modelStatus}
           handleEvaluate={handleEvaluate}

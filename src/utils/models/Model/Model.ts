@@ -10,6 +10,7 @@ export abstract class Model {
   readonly graph: boolean;
   readonly pretrained: boolean;
   readonly trainable: boolean;
+  readonly kind?: string;
   readonly src?: string;
   readonly requiredChannels?: number;
 
@@ -19,6 +20,7 @@ export abstract class Model {
   constructor({
     name,
     task,
+    kind,
     graph,
     pretrained,
     trainable,
@@ -27,6 +29,7 @@ export abstract class Model {
   }: ModelArgs) {
     this.name = name;
     this.task = task;
+    this.kind = kind;
     this.graph = graph;
     this.pretrained = pretrained;
     this.trainable = trainable;

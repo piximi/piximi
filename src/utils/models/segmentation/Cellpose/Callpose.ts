@@ -41,6 +41,7 @@ export class Cellpose extends Segmenter {
   constructor() {
     super({
       name: "Cellpose",
+      kind: "Nucleus",
       task: ModelTask.Segmentation,
       graph: true,
       pretrained: true,
