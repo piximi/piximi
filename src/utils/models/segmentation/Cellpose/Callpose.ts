@@ -20,6 +20,8 @@ type LoadInferenceDataArgs = {
   kinds?: Array<Kind>;
 };
 
+const KIND_NAME = "cellpose_nucleus";
+
 /*
  * Cellpose
  * https://github.com/mouseland/cellpose
@@ -41,7 +43,7 @@ export class Cellpose extends Segmenter {
   constructor() {
     super({
       name: "Cellpose",
-      kind: "Nucleus",
+      kind: KIND_NAME,
       task: ModelTask.Segmentation,
       graph: true,
       pretrained: true,
@@ -96,7 +98,7 @@ export class Cellpose extends Segmenter {
     } else if (!this._fgKind) {
       const unknownCategoryId = generateUUID({ definesUnknown: true });
       this._fgKind = {
-        id: "Nucleus",
+        id: KIND_NAME,
         categories: [unknownCategoryId],
         containing: [],
         unknownCategoryId,

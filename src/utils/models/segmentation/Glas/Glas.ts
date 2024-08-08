@@ -8,6 +8,7 @@ import { ModelTask } from "../../enums";
 import { Kind, ImageObject } from "store/data/types";
 import { loadGlas } from "./loadGlas";
 
+const KIND_NAME = "glas_glands";
 export class Glas extends Segmenter {
   protected _fgKind?: Kind;
   protected _inferenceDataDims?: Array<{
@@ -18,7 +19,7 @@ export class Glas extends Segmenter {
     super({
       name: "GlandSegmentation",
       task: ModelTask.Segmentation,
-      kind: "Glands",
+      kind: KIND_NAME,
       graph: true,
       pretrained: true,
       trainable: false,
@@ -54,7 +55,7 @@ export class Glas extends Segmenter {
     } else if (!this._fgKind) {
       const unknownCategoryId = generateUUID({ definesUnknown: true });
       this._fgKind = {
-        id: "Glands",
+        id: KIND_NAME,
         categories: [unknownCategoryId],
         containing: [],
         unknownCategoryId,

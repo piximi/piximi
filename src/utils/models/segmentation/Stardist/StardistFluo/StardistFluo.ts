@@ -1,4 +1,4 @@
-import { Stardist } from "../AbstractStardist";
+import { KIND_NAME, Stardist } from "../AbstractStardist";
 import { loadStardistFluo } from "./loadStardistFluo";
 import { ModelTask } from "../../../enums";
 
@@ -14,7 +14,7 @@ export class StardistFluo extends Stardist {
   constructor() {
     super({
       name: "StardistFluo",
-      kind: "Nucleus",
+      kind: KIND_NAME,
       task: ModelTask.Segmentation,
       graph: true,
       pretrained: true,
