@@ -7,6 +7,7 @@ import { generateUUID } from "utils/common/helpers";
 import { LoadInferenceDataArgs } from "../../types";
 import { Kind, ImageObject } from "store/data/types";
 
+export const KIND_NAME = "stardist_nucleus";
 /*
  * Abstract model for Stardist variants
  */
@@ -65,7 +66,7 @@ export abstract class Stardist extends Segmenter {
     } else if (!this._fgKind) {
       const unknownCategoryId = generateUUID({ definesUnknown: true });
       this._fgKind = {
-        id: "Nucleus",
+        id: KIND_NAME,
         categories: [unknownCategoryId],
         containing: [],
         unknownCategoryId,
