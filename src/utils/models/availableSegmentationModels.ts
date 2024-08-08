@@ -1,9 +1,9 @@
-import { Segmenter } from "./AbstractSegmenter";
-import { Cellpose } from "./Cellpose";
-import { CocoSSD } from "./CocoSSD";
-import { FullyConvolutionalSegmenter } from "./FullyConvolutionalSegmenter";
-import { Glas } from "./Glas/Glas";
-import { StardistVHE, StardistFluo } from "./Stardist";
+import { Segmenter } from "./segmentation/AbstractSegmenter";
+import { Cellpose } from "./segmentation/Cellpose";
+import { CocoSSD } from "./segmentation/CocoSSD";
+import { FullyConvolutionalSegmenter } from "./segmentation/FullyConvolutionalSegmenter";
+import { Glas } from "./segmentation/Glas";
+import { StardistVHE, StardistFluo } from "./segmentation/Stardist";
 
 export const availableSegmenterModels: Array<Segmenter> = [
   new FullyConvolutionalSegmenter(),

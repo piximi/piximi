@@ -1,6 +1,6 @@
 // TODO: post PR #407, get working for segmenter
 import "@tensorflow/tfjs-node";
-import { preprocessSegmentationImages } from "../FullyConvolutionalSegmenter/preprocessSegmenter";
+import { preprocessSegmentationImages } from "../segmentation/FullyConvolutionalSegmenter/preprocessSegmenter";
 import { fileFromPath } from "utils/file-io/nodeImageHelper";
 import { generateUUID } from "utils/common/helpers";
 import {

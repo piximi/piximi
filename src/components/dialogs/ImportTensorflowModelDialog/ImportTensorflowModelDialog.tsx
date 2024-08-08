@@ -27,7 +27,7 @@ import { CloudUpload } from "./CloudUpload";
 
 import { Model } from "utils/models/Model/Model";
 import { ModelFormatSelection } from "./ModelFormatSelection";
-import { Cellpose } from "utils/models/Cellpose";
+import { Cellpose } from "utils/models/segmentation/Cellpose";
 import { ModelTask } from "utils/models/enums";
 import { availableClassifierModels } from "utils/models/availableClassificationModels";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";

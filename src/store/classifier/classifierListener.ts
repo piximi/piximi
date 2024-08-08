@@ -23,8 +23,8 @@ import {
   getSubset,
   isUnknownCategory,
 } from "utils/common/helpers";
-import { SimpleCNN } from "utils/models/SimpleCNN/SimpleCNN";
-import { MobileNet } from "utils/models/MobileNet/MobileNet";
+import { SimpleCNN } from "utils/models/classification/SimpleCNN/SimpleCNN";
+import { MobileNet } from "utils/models/classification/MobileNet/MobileNet";
 import { logger } from "utils/common/helpers";
 import { CompileOptions, TrainingCallbacks } from "utils/models/types";
 import { ModelStatus, Partition } from "utils/models/enums";

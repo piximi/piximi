@@ -20,7 +20,7 @@ import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data/dataSlice";
 import Image from "image-js";
-import { OrphanedAnnotationObject } from "utils/models/AbstractSegmenter/AbstractSegmenter";
+import { OrphanedAnnotationObject } from "utils/models/segmentation/AbstractSegmenter";
 import { TrainingCallbacks } from "utils/models/types";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
