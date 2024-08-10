@@ -471,6 +471,7 @@ export const saveAnnotationsAsLabelMatrix = async (
   binary: boolean = false
 ) => {
   // image id -> image
+
   const imIdMap = images.reduce(
     (idMap, im) => ({ ...idMap, [im.id]: im }),
     {} as { [internalImageId: string]: ImageObject }
@@ -489,6 +490,7 @@ export const saveAnnotationsAsLabelMatrix = async (
 
   for (const ann of annotations) {
     const im = imIdMap[ann.imageId];
+
     const catName = catIdMap[ann.categoryId];
 
     if (!annIdMap.hasOwnProperty(im.name)) {
@@ -504,6 +506,7 @@ export const saveAnnotationsAsLabelMatrix = async (
 
   for (const im of images) {
     // for image names like blah.png
+
     const imCleanName = im.name.split(".")[0];
 
     for (const cat of categories) {

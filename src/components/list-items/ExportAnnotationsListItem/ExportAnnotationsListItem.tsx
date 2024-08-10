@@ -15,6 +15,7 @@ export const ExportAnnotationsListItem = () => {
         primaryText="Export Annotations"
         onClick={onOpen}
         icon={<DownloadIcon />}
+        selected={open}
       />
 
       <ExportAnnotationsMenu

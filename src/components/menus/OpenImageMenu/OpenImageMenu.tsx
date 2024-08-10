@@ -21,8 +21,8 @@ export const OpenImageMenu = ({
       anchorEl={anchorEl}
       onClose={onCloseMenu}
       anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
+        vertical: "bottom",
+        horizontal: "center",
       }}
       transformOrigin={{
         vertical: "top",
