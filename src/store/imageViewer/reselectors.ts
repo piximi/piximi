@@ -241,3 +241,18 @@ export const selectActiveImageCategoryObjectCount = createSelector(
     return objectsInBoth.length;
   }
 );
+
+export const selectAllImageViewerObjects = createSelector(
+  selectImageStackImageIds,
+  selectThingsDictionary,
+  (imageIds, thingDict) => {
+    const objects: AnnotationObject[] = [];
+    for (const imId of imageIds) {
+      const annIds = (thingDict[imId] as ImageObject).containing;
+      for (const annId of annIds) {
+        objects.push(thingDict[annId] as AnnotationObject);
+      }
+    }
+    return objects;
+  }
+);

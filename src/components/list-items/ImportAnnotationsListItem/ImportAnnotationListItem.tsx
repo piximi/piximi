@@ -13,6 +13,7 @@ export const ImportAnnotationListItem = () => {
         primaryText="Import Annotations"
         onClick={onOpen}
         icon={<FolderOpenIcon />}
+        selected={open}
       />
 
       <OpenImageMenu anchorEl={anchorEl} onCloseMenu={onClose} open={open} />

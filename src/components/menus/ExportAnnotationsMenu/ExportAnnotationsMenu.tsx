@@ -5,7 +5,7 @@ import { ListItemText, Menu, MenuItem } from "@mui/material";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 
-import { useDialogHotkey, useMenu } from "hooks";
+import { useDialogHotkey } from "hooks";
 
 import { serializeCOCOFile, serializeProject } from "utils/annotator";
 import {
@@ -19,11 +19,13 @@ import { selectProjectName } from "store/project/selectors";
 import { ExportAnnotationsDialog } from "components/dialogs";
 
 import { HotkeyContext } from "utils/common/enums";
-import { selectImageViewerImages } from "store/imageViewer/reselectors";
+import {
+  selectAllImageViewerObjects,
+  selectImageViewerImages,
+} from "store/imageViewer/reselectors";
 import {
   selectAllObjectCategories,
   selectAllObjectKinds,
-  selectAllObjects,
 } from "store/data/selectors";
 import { AnnotationExportType } from "utils/file-io/enums";
 
@@ -73,17 +75,10 @@ export const ExportAnnotationsMenu = ({
   open,
 }: ExportAnnotationsMenuProps) => {
   const images = useSelector(selectImageViewerImages);
-  const annotations = useSelector(selectAllObjects);
+  const annotations = useSelector(selectAllImageViewerObjects);
   const annotationCategories = useSelector(selectAllObjectCategories);
   const projectName = useSelector(selectProjectName);
   const objectKinds = useSelector(selectAllObjectKinds);
-
-  const {
-    anchorEl: subMenuAnchorEl,
-    onClose: onSubMenuClose,
-    onOpen: onSubMenuOpen,
-    open: subMenuOpen,
-  } = useMenu();
 
   const {
     onClose: onCloseSaveAnnotatorDialog,
@@ -91,11 +86,10 @@ export const ExportAnnotationsMenu = ({
     open: openSaveAnnotatorDialog,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
-  const onMenusClose = useCallback(() => {
+  const onMenuClose = useCallback(() => {
     onCloseSaveAnnotatorDialog();
-    onSubMenuClose();
     onClose();
-  }, [onCloseSaveAnnotatorDialog, onSubMenuClose, onClose]);
+  }, [onCloseSaveAnnotatorDialog, onClose]);
 
   const [onProjectName, setOnProjectName] = useState<
     ((userProjectName: string) => void) | null
@@ -210,14 +204,14 @@ export const ExportAnnotationsMenu = ({
             break;
         }
 
-        onMenusClose();
+        onMenuClose();
       });
       onOpenSaveAnnotatorDialog();
     },
     [
       setOnProjectName,
       onOpenSaveAnnotatorDialog,
-      onMenusClose,
+      onMenuClose,
       annotationCategories,
       images,
       objectKinds,
@@ -226,37 +220,45 @@ export const ExportAnnotationsMenu = ({
   );
 
   return (
-    <div>
-      <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
-        <MenuItem onClick={onSubMenuOpen}>Export annotations as</MenuItem>
-        <Menu
-          id="save-annotations-as-menu"
-          anchorEl={subMenuAnchorEl}
-          keepMounted
-          open={subMenuOpen}
-          onClose={onSubMenuClose}
-        >
-          {exportOptions.map((option) => {
-            return (
-              <MenuItem
-                onClick={() => handleMenuItemClick(option.type)}
-                key={`exportType_${option.type}`}
-              >
-                <ListItemText primary={option.title} />
-              </MenuItem>
-            );
-          })}
-        </Menu>
-
-        <ExportAnnotationsDialog
-          onClose={() => {
-            onMenusClose();
-          }}
-          open={openSaveAnnotatorDialog}
-          handleSave={onProjectName!}
-          defaultName={projectName}
-        />
+    <>
+      <Menu
+        id="save-annotations-as-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={open}
+        onClose={onMenuClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+      >
+        {exportOptions.map((option) => {
+          return (
+            <MenuItem
+              onClick={() => handleMenuItemClick(option.type)}
+              key={`exportType_${option.type}`}
+            >
+              <ListItemText
+                primaryTypographyProps={{ variant: "body2" }}
+                primary={option.title}
+              />
+            </MenuItem>
+          );
+        })}
       </Menu>
-    </div>
+
+      <ExportAnnotationsDialog
+        onClose={() => {
+          onMenuClose();
+        }}
+        open={openSaveAnnotatorDialog}
+        handleSave={onProjectName!}
+        defaultName={projectName}
+      />
+    </>
   );
 };
