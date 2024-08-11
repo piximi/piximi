@@ -160,17 +160,6 @@ export const ExportAnnotationsMenu = ({
 
             break;
 
-          case AnnotationExportType.BinaryInstances:
-            saveAnnotationsAsBinaryInstanceSegmentationMasks(
-              images,
-              annotations,
-              annotationCategories,
-              zip,
-              userProjectName
-            );
-
-            break;
-
           case AnnotationExportType.LabeledInstances:
             saveAnnotationsAsLabelMatrix(
               imageDict,
@@ -199,6 +188,16 @@ export const ExportAnnotationsMenu = ({
                 saveAs(blob, `${userProjectName}.zip`);
               });
             });
+
+            break;
+          case AnnotationExportType.BinaryInstances:
+            saveAnnotationsAsBinaryInstanceSegmentationMasks(
+              images,
+              annotations,
+              annotationCategories,
+              zip,
+              userProjectName
+            );
 
             break;
 
