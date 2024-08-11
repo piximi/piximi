@@ -20,12 +20,15 @@ import { ExportAnnotationsDialog } from "components/dialogs";
 
 import { HotkeyContext } from "utils/common/enums";
 import {
-  selectAllImageViewerObjects,
+  selectImageViewerObjects,
   selectImageViewerImages,
+  selectImageViewerObjectDict,
+  selectImageViewerImageDict,
 } from "store/imageViewer/reselectors";
 import {
   selectAllObjectCategories,
   selectAllObjectKinds,
+  selectObjectCategoryDict,
 } from "store/data/selectors";
 import { AnnotationExportType } from "utils/file-io/enums";
 
@@ -75,8 +78,11 @@ export const ExportAnnotationsMenu = ({
   open,
 }: ExportAnnotationsMenuProps) => {
   const images = useSelector(selectImageViewerImages);
-  const annotations = useSelector(selectAllImageViewerObjects);
+  const imageDict = useSelector(selectImageViewerImageDict);
+  const annotations = useSelector(selectImageViewerObjects);
+  const annotationDict = useSelector(selectImageViewerObjectDict);
   const annotationCategories = useSelector(selectAllObjectCategories);
+  const annotationCategoryDict = useSelector(selectObjectCategoryDict);
   const projectName = useSelector(selectProjectName);
   const objectKinds = useSelector(selectAllObjectKinds);
 
@@ -141,9 +147,10 @@ export const ExportAnnotationsMenu = ({
 
           case AnnotationExportType.Matrix:
             saveAnnotationsAsLabelMatrix(
-              images,
-              annotations,
-              annotationCategories,
+              imageDict,
+              annotationDict,
+              annotationCategoryDict,
+              userProjectName,
               zip
             ).then(() => {
               zip.generateAsync({ type: "blob" }).then((blob) => {
@@ -166,11 +173,12 @@ export const ExportAnnotationsMenu = ({
 
           case AnnotationExportType.LabeledInstances:
             saveAnnotationsAsLabelMatrix(
-              images,
-              annotations,
-              annotationCategories,
+              imageDict,
+              annotationDict,
+              annotationCategoryDict,
+              userProjectName,
               zip,
-              true
+              { random: true, color: true }
             ).then(() => {
               zip.generateAsync({ type: "blob" }).then((blob) => {
                 saveAs(blob, `${userProjectName}.zip`);
@@ -180,17 +188,18 @@ export const ExportAnnotationsMenu = ({
 
           case AnnotationExportType.BinarySemanticMasks:
             saveAnnotationsAsLabelMatrix(
-              images,
-              annotations,
-              annotationCategories,
+              imageDict,
+              annotationDict,
+              annotationCategoryDict,
+              userProjectName,
               zip,
-              false,
-              true
+              { binary: true }
             ).then(() => {
               zip.generateAsync({ type: "blob" }).then((blob) => {
                 saveAs(blob, `${userProjectName}.zip`);
               });
             });
+
             break;
 
           case AnnotationExportType.LabeledSemanticMasks:
@@ -216,6 +225,9 @@ export const ExportAnnotationsMenu = ({
       images,
       objectKinds,
       annotations,
+      imageDict,
+      annotationDict,
+      annotationCategoryDict,
     ]
   );
 

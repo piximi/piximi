@@ -15,6 +15,7 @@ import {
   DecodedAnnotationObject,
   ImageObject,
 } from "store/data/types";
+import { merge } from "lodash";
 
 export const generatePoints = (buffer: Array<number> | undefined) => {
   if (!buffer) return undefined;
@@ -463,114 +464,123 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
 };
 
 export const saveAnnotationsAsLabelMatrix = async (
-  images: Array<ImageObject>,
-  annotations: Array<AnnotationObject>,
-  categories: Array<Category>,
+  images: Record<string, ImageObject>,
+  annotations: Record<string, AnnotationObject>,
+  categories: Record<string, Category>,
+  projectName: string,
   zip: JSZip,
-  random: boolean = false,
-  binary: boolean = false
+  options: { random?: boolean; binary?: boolean; color?: boolean } = {
+    random: false,
+    binary: false,
+    color: false,
+  }
 ) => {
   // image id -> image
 
-  const imIdMap = images.reduce(
-    (idMap, im) => ({ ...idMap, [im.id]: im }),
-    {} as { [internalImageId: string]: ImageObject }
-  );
+  let matrices: Record<
+    string,
+    Record<string, Record<string, Record<string, ImageJS.Image>>>
+  > = {};
+  let r = options.binary ? 255 : 0;
+  let g = options.binary ? 255 : 0;
+  let b = options.binary ? 255 : 0;
 
-  // cat id -> cat name
-  const catIdMap = categories.reduce(
-    (idMap, cat) => ({ ...idMap, [cat.id]: cat.name }),
-    {} as { [internalCategoryId: string]: string }
-  );
-
-  // image name -> cat name -> annotations
-  const annIdMap = {} as {
-    [imName: string]: { [catName: string]: AnnotationObject[] };
-  };
-
-  for (const ann of annotations) {
-    const im = imIdMap[ann.imageId];
-
-    const catName = catIdMap[ann.categoryId];
-
-    if (!annIdMap.hasOwnProperty(im.name)) {
-      annIdMap[im.name] = {};
-    }
-
-    if (!annIdMap[im.name].hasOwnProperty(catName)) {
-      annIdMap[im.name][catName] = [];
-    }
-
-    annIdMap[im.name][catName].push(ann);
-  }
-
-  for (const im of images) {
+  const imageOptions: ImageJS.ImageConstructorOptions = options.color
+    ? { components: 1, alpha: 0 }
+    : { components: 1, alpha: 0, colorModel: "GREY" as ImageJS.ColorModel };
+  for (const annId in annotations) {
     // for image names like blah.png
-
+    const ann = annotations[annId];
+    const annPlane = `plane-${ann.activePlane}`;
+    const im = images[ann.imageId];
+    const catName = categories[ann.categoryId].name;
     const imCleanName = im.name.split(".")[0];
-
-    for (const cat of categories) {
-      const fullLabelImage = new ImageJS.Image(
-        im.shape.width,
-        im.shape.height,
-        new Uint8Array().fill(0),
-        { components: 1, alpha: 0 }
-      );
-
-      let r = binary ? 255 : 1;
-      let g = binary ? 255 : 1;
-      let b = binary ? 255 : 1;
-
-      const imCatAnns = annIdMap[im.name][cat.name];
-
-      // no annotations for this category, in this image
-      if (!imCatAnns) continue;
-
-      for (const ann of imCatAnns) {
-        if (random) {
-          r = Math.round(Math.random() * 255);
-          g = Math.round(Math.random() * 255);
-          b = Math.round(Math.random() * 255);
-        } else if (!binary) {
-          r = r + 1;
-          b = b + 1;
-          g = g + 1;
-        }
-
-        const decoded = decode(ann.encodedMask);
-        const boundingBox = ann.boundingBox;
-        const endX = Math.min(im.shape.width, boundingBox[2]);
-        const endY = Math.min(im.shape.height, boundingBox[3]);
-
-        //extract bounding box params
-        const boundingBoxWidth = endX - boundingBox[0];
-        const boundingBoxHeight = endY - boundingBox[1];
-
-        const roiMask = new ImageJS.Image(
-          boundingBoxWidth,
-          boundingBoxHeight,
-          decoded,
-          {
-            components: 1,
-            alpha: 0,
-          }
+    if (!matrices?.[imCleanName]?.[annPlane]?.[ann.kind]?.[catName]) {
+      let fullLabelImage: ImageJS.Image;
+      if (options.color) {
+        fullLabelImage = new ImageJS.Image(
+          im.shape.width,
+          im.shape.height,
+          new Uint8Array().fill(0),
+          imageOptions
         );
-        for (let i = 0; i < boundingBoxWidth; i++) {
-          for (let j = 0; j < boundingBoxHeight; j++) {
-            if (roiMask.getPixelXY(i, j)[0] > 0) {
-              fullLabelImage.setPixelXY(
-                i + ann.boundingBox[0],
-                j + ann.boundingBox[1],
-                [r, g, b]
-              );
-            }
+      } else {
+        fullLabelImage = new ImageJS.Image(
+          im.shape.width,
+          im.shape.height,
+          imageOptions
+        );
+      }
+      matrices = merge(matrices, {
+        [imCleanName]: {
+          [annPlane]: { [ann.kind]: { [catName]: fullLabelImage } },
+        },
+      });
+    }
+
+    if (options.random) {
+      r = Math.round(Math.random() * 255);
+      g = Math.round(Math.random() * 255);
+      b = Math.round(Math.random() * 255);
+    } else if (!options.binary) {
+      r = r + 1;
+      b = b + 1;
+      g = g + 1;
+    }
+
+    const decoded = decode(ann.encodedMask);
+    const boundingBox = ann.boundingBox;
+    const endX = Math.min(im.shape.width, boundingBox[2]);
+    const endY = Math.min(im.shape.height, boundingBox[3]);
+
+    //extract bounding box params
+    const boundingBoxWidth = endX - boundingBox[0];
+    const boundingBoxHeight = endY - boundingBox[1];
+
+    const roiMask = new ImageJS.Image(
+      boundingBoxWidth,
+      boundingBoxHeight,
+      decoded,
+      imageOptions
+    );
+    for (let i = 0; i < boundingBoxWidth; i++) {
+      for (let j = 0; j < boundingBoxHeight; j++) {
+        if (roiMask.getPixelXY(i, j)[0] > 0) {
+          if (options.color) {
+            matrices[imCleanName][annPlane][ann.kind][catName].setPixelXY(
+              i + ann.boundingBox[0],
+              j + ann.boundingBox[1],
+              [r, g, b]
+            );
+          } else {
+            matrices[imCleanName][annPlane][ann.kind][catName].setValueXY(
+              i + ann.boundingBox[0],
+              j + ann.boundingBox[1],
+              0,
+              r
+            );
           }
         }
       }
+    }
+  }
 
-      const imCatBlob = await fullLabelImage.toBlob("image/png");
-      zip.folder(`${imCleanName}`);
-      zip.file(`${imCleanName}/${cat.name}.png`, imCatBlob, { base64: true });
+  zip.folder(`${projectName}`);
+  for await (const [imName, planes] of Object.entries(matrices)) {
+    zip.folder(`${projectName}/${imName}`);
+    for await (const [planeName, kinds] of Object.entries(planes)) {
+      zip.folder(`${projectName}/${imName}/${planeName}`);
+      for await (const [kindName, cats] of Object.entries(kinds)) {
+        zip.folder(`${projectName}/${imName}/${planeName}/${kindName}`);
+        for await (const [catName, labelImage] of Object.entries(cats)) {
+          const imCatBlob = await labelImage.toBlob("image/png");
+          zip.file(
+            `${projectName}/${imName}/${planeName}/${kindName}/${catName}.png`,
+            imCatBlob,
+            { base64: true }
+          );
+        }
+      }
     }
   }
 };

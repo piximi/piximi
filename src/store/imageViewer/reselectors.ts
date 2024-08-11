@@ -53,6 +53,23 @@ export const selectImageViewerImages = createSelector(
     return imageViewerImages;
   }
 );
+export const selectImageViewerImageDict = createSelector(
+  selectImageStackImageIds,
+  selectThingsDictionary,
+  (imageStackIds, thingDict) => {
+    const imageViewerImages = imageStackIds.reduce(
+      (images: Record<string, ImageObject>, id) => {
+        const image = thingDict[id];
+        if (image) {
+          images[id] = image as ImageObject;
+        }
+        return images;
+      },
+      {}
+    );
+    return imageViewerImages;
+  }
+);
 
 export const selectActiveImageRawColor = createSelector(
   selectActiveImage,
@@ -242,7 +259,7 @@ export const selectActiveImageCategoryObjectCount = createSelector(
   }
 );
 
-export const selectAllImageViewerObjects = createSelector(
+export const selectImageViewerObjects = createSelector(
   selectImageStackImageIds,
   selectThingsDictionary,
   (imageIds, thingDict) => {
@@ -251,6 +268,21 @@ export const selectAllImageViewerObjects = createSelector(
       const annIds = (thingDict[imId] as ImageObject).containing;
       for (const annId of annIds) {
         objects.push(thingDict[annId] as AnnotationObject);
+      }
+    }
+    return objects;
+  }
+);
+
+export const selectImageViewerObjectDict = createSelector(
+  selectImageStackImageIds,
+  selectThingsDictionary,
+  (imageIds, thingDict) => {
+    const objects: Record<string, AnnotationObject> = {};
+    for (const imId of imageIds) {
+      const annIds = (thingDict[imId] as ImageObject).containing;
+      for (const annId of annIds) {
+        objects[annId] = thingDict[annId] as AnnotationObject;
       }
     }
     return objects;
