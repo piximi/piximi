@@ -488,6 +488,8 @@ export const saveAnnotationsAsLabelMatrix = async (
   const imageOptions: ImageJS.ImageConstructorOptions = options.color
     ? { components: 1, alpha: 0 }
     : { components: 1, alpha: 0, colorModel: "GREY" as ImageJS.ColorModel };
+
+  const colorValues: string[] = [];
   for (const annId in annotations) {
     // for image names like blah.png
     const ann = annotations[annId];
@@ -522,6 +524,15 @@ export const saveAnnotationsAsLabelMatrix = async (
       r = Math.round(Math.random() * 255);
       g = Math.round(Math.random() * 255);
       b = Math.round(Math.random() * 255);
+      let colorString = `${r} ${g} ${b}`;
+      while (colorValues.includes(colorString)) {
+        r = Math.round(Math.random() * 255);
+        g = Math.round(Math.random() * 255);
+        b = Math.round(Math.random() * 255);
+        colorString = `${r} ${g} ${b}`;
+      }
+
+      colorValues.push(colorString);
     } else if (!options.binary) {
       r = r + 1;
       b = b + 1;
