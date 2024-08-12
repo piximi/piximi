@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { ListItemText, Menu, MenuItem } from "@mui/material";
 import { saveAs } from "file-saver";
@@ -14,9 +14,15 @@ import {
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
 } from "utils/annotator/imageHelper";
 
-import { selectProjectName } from "store/project/selectors";
+import {
+  selectHasUnsavedChanges,
+  selectProjectName,
+} from "store/project/selectors";
 
-import { ExportAnnotationsDialog } from "components/dialogs";
+import {
+  ConfirmationDialog,
+  ExportAnnotationsDialog,
+} from "components/dialogs";
 
 import { HotkeyContext } from "utils/common/enums";
 import {
@@ -31,6 +37,7 @@ import {
   selectObjectCategoryDict,
 } from "store/data/selectors";
 import { AnnotationExportType } from "utils/file-io/enums";
+import { dataSlice } from "store/data";
 
 //TODO: MenuItem??
 
@@ -77,6 +84,7 @@ export const ExportAnnotationsMenu = ({
   onClose,
   open,
 }: ExportAnnotationsMenuProps) => {
+  const dispatch = useDispatch();
   const images = useSelector(selectImageViewerImages);
   const imageDict = useSelector(selectImageViewerImageDict);
   const annotations = useSelector(selectImageViewerObjects);
@@ -85,17 +93,33 @@ export const ExportAnnotationsMenu = ({
   const annotationCategoryDict = useSelector(selectObjectCategoryDict);
   const projectName = useSelector(selectProjectName);
   const objectKinds = useSelector(selectAllObjectKinds);
+  const hasUnsavedChanges = useSelector(selectHasUnsavedChanges);
 
   const {
-    onClose: onCloseSaveAnnotatorDialog,
-    onOpen: onOpenSaveAnnotatorDialog,
-    open: openSaveAnnotatorDialog,
+    onClose: handleCloseExportAnnotationsDialog,
+    onOpen: handleOpenExportAnnotationsDialog,
+    open: exportAnnotationsDialogOpen,
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
+  const {
+    onClose: handleCloseSaveChangesDialog,
+    onOpen: handleOpenSaveChangesDialog,
+    open: saveChangesDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
-  const onMenuClose = useCallback(() => {
-    onCloseSaveAnnotatorDialog();
+  const handleCancelSaveChanges = () => {
+    handleCloseSaveChangesDialog();
     onClose();
-  }, [onCloseSaveAnnotatorDialog, onClose]);
+  };
+
+  const handleSaveChanges = () => {
+    dispatch(dataSlice.actions.reconcile({ keepChanges: true }));
+    handleOpenExportAnnotationsDialog();
+  };
+
+  const onMenuClose = useCallback(() => {
+    handleCloseExportAnnotationsDialog();
+    onClose();
+  }, [onClose, handleCloseExportAnnotationsDialog]);
 
   const [onProjectName, setOnProjectName] = useState<
     ((userProjectName: string) => void) | null
@@ -108,7 +132,7 @@ export const ExportAnnotationsMenu = ({
   // when that dialog is confirmed the function in the useState
   // gets the project name, and the body of the export function
   // is invoked
-  const handleMenuItemClick = useCallback(
+  const _handleMenuItemClick = useCallback(
     (exportType: AnnotationExportType) => {
       setOnProjectName(() => (userProjectName: string) => {
         let zip = new JSZip();
@@ -220,14 +244,18 @@ export const ExportAnnotationsMenu = ({
             break;
         }
 
-        onMenuClose();
+        onClose();
       });
-      onOpenSaveAnnotatorDialog();
+      if (hasUnsavedChanges) {
+        handleOpenSaveChangesDialog();
+      } else {
+        handleOpenExportAnnotationsDialog();
+      }
     },
     [
       setOnProjectName,
-      onOpenSaveAnnotatorDialog,
-      onMenuClose,
+      handleOpenExportAnnotationsDialog,
+      onClose,
       annotationCategories,
       images,
       objectKinds,
@@ -235,6 +263,8 @@ export const ExportAnnotationsMenu = ({
       imageDict,
       annotationDict,
       annotationCategoryDict,
+      hasUnsavedChanges,
+      handleOpenSaveChangesDialog,
     ]
   );
 
@@ -258,7 +288,7 @@ export const ExportAnnotationsMenu = ({
         {exportOptions.map((option) => {
           return (
             <MenuItem
-              onClick={() => handleMenuItemClick(option.type)}
+              onClick={() => _handleMenuItemClick(option.type)}
               key={`exportType_${option.type}`}
             >
               <ListItemText
@@ -274,9 +304,16 @@ export const ExportAnnotationsMenu = ({
         onClose={() => {
           onMenuClose();
         }}
-        open={openSaveAnnotatorDialog}
+        open={exportAnnotationsDialogOpen}
         handleSave={onProjectName!}
         defaultName={projectName}
+      />
+      <ConfirmationDialog
+        title="Save Changes"
+        content={"Save changes before exporting"}
+        isOpen={saveChangesDialogOpen}
+        onConfirm={handleSaveChanges}
+        onClose={handleCancelSaveChanges}
       />
     </>
   );

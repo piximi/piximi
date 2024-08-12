@@ -16,19 +16,38 @@ import { ExitAnnotatorDialog } from "components/dialogs";
 
 import { LogoLoader } from "components/styled-components";
 import { HotkeyContext } from "utils/common/enums";
+import { batch, useDispatch, useSelector } from "react-redux";
+import { imageViewerSlice } from "store/imageViewer";
+import { selectActiveImageId } from "store/imageViewer/selectors";
+import { selectHasUnsavedChanges } from "store/project/selectors";
 
 export const ImageViewerAppBar = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [returnToProject, setReturnToProject] = useState(false);
+  const activeImageId = useSelector(selectActiveImageId);
+  const hasUnsavedChanges = useSelector(selectHasUnsavedChanges);
   const {
     onClose: onCloseExitAnnotatorDialog,
     onOpen: onOpenExitAnnotatorDialog,
     open: ExitAnnotatorDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
-  const navigate = useNavigate();
-
-  const onReturnToMainProject = () => {
-    setReturnToProject(true);
+  const handleReturnToMainProject = () => {
+    if (hasUnsavedChanges) {
+      onOpenExitAnnotatorDialog();
+    } else {
+      batch(() => {
+        dispatch(
+          imageViewerSlice.actions.setActiveImageId({
+            imageId: undefined,
+            prevImageId: activeImageId,
+          })
+        );
+        dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
+      });
+      navigate("/");
+    }
   };
 
   useEffect(() => {
@@ -49,7 +68,7 @@ export const ImageViewerAppBar = () => {
           <Tooltip title="Save and return to project" placement="bottom">
             <IconButton
               edge="start"
-              onClick={onOpenExitAnnotatorDialog}
+              onClick={() => handleReturnToMainProject()}
               aria-label="Exit Annotator"
               href={""}
             >
@@ -64,7 +83,7 @@ export const ImageViewerAppBar = () => {
       </AppBar>
 
       <ExitAnnotatorDialog
-        returnToProject={onReturnToMainProject}
+        returnToProject={() => setReturnToProject(true)}
         onClose={onCloseExitAnnotatorDialog}
         open={ExitAnnotatorDialogOpen}
       />

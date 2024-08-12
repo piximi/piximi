@@ -22,6 +22,18 @@ export const selectProjectName = ({ project }: { project: ProjectState }) => {
 };
 
 /*
+UNSAVED CHANGES
+*/
+
+export const selectHasUnsavedChanges = ({
+  project,
+}: {
+  project: ProjectState;
+}) => {
+  return project.hasUnsavedChanges;
+};
+
+/*
 SELECTED THINGS
 */
 

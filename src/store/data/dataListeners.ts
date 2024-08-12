@@ -180,3 +180,33 @@ startAppListening({
     );
   },
 });
+startAppListening({
+  predicate: (action) => {
+    const type = action.type.split("/");
+
+    if (type[0] !== "data") return false;
+    if (["initializeState", "resetData", "reconcile"].includes(type[1]))
+      return false;
+    if (
+      action.payload &&
+      "isPermanent" in action.payload &&
+      action.payload.isPermanent
+    )
+      return false;
+    return true;
+  },
+  effect: (action, listenerAPI) => {
+    listenerAPI.dispatch(
+      projectSlice.actions.setHasUnsavedChanges({ hasUnsavedChanges: true })
+    );
+  },
+});
+
+startAppListening({
+  actionCreator: dataSlice.actions.reconcile,
+  effect: (action, listenerAPI) => {
+    listenerAPI.dispatch(
+      projectSlice.actions.setHasUnsavedChanges({ hasUnsavedChanges: false })
+    );
+  },
+});
