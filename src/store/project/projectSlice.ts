@@ -7,6 +7,7 @@ import { Partition } from "utils/models/enums";
 
 export const initialState: ProjectState = {
   name: "Untitled project",
+  hasUnsavedChanges: false,
   selectedThingIds: [],
   sortType: ThingSortKey.None,
   activeKind: "Image",
@@ -24,7 +25,6 @@ export const projectSlice = createSlice({
   initialState: initialState,
   reducers: {
     resetProject: () => initialState,
-
     createNewProject(state, action: PayloadAction<{ name: string }>) {
       Object.assign(state, initialState, { name: action.payload.name });
     },
@@ -32,6 +32,12 @@ export const projectSlice = createSlice({
       // WARNING, don't do below (overwrites draft object)
       // state = action.payload.project;
       return action.payload.project;
+    },
+    setHasUnsavedChanges(
+      state,
+      action: PayloadAction<{ hasUnsavedChanges: boolean }>
+    ) {
+      state.hasUnsavedChanges = action.payload.hasUnsavedChanges;
     },
     setActiveKind(state, action: PayloadAction<{ kind: string }>) {
       state.activeKind = action.payload.kind;

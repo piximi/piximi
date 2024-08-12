@@ -59,6 +59,7 @@ export type SegmenterState = {
 
 export type ProjectState = {
   name: string;
+  hasUnsavedChanges: boolean;
   selectedThingIds: Array<string>;
   sortType: ThingSortKey;
   thingFilters: Record<

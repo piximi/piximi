@@ -13,7 +13,6 @@ import { distinctFilter, mutatingFilter } from "utils/common/helpers";
 
 const initialState: ImageViewerState = {
   imageStack: [],
-
   colorAdjustment: {
     blackPoint: 0,
     brightness: 0,
