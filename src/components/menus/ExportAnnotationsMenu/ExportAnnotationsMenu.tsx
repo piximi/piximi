@@ -192,23 +192,31 @@ export const ExportAnnotationsMenu = ({
             break;
           case AnnotationExportType.BinaryInstances:
             saveAnnotationsAsBinaryInstanceSegmentationMasks(
-              images,
-              annotations,
-              annotationCategories,
-              zip,
-              userProjectName
-            );
+              imageDict,
+              annotationDict,
+              annotationCategoryDict,
+              userProjectName,
+              zip
+            ).then(() => {
+              zip.generateAsync({ type: "blob" }).then((blob) => {
+                saveAs(blob, `${userProjectName}.zip`);
+              });
+            });
 
             break;
 
           case AnnotationExportType.LabeledSemanticMasks:
             saveAnnotationsAsLabeledSemanticSegmentationMasks(
-              images,
-              annotations,
-              annotationCategories,
-              zip,
-              userProjectName
-            );
+              imageDict,
+              annotationDict,
+              annotationCategoryDict,
+              userProjectName,
+              zip
+            ).then(() => {
+              zip.generateAsync({ type: "blob" }).then((blob) => {
+                saveAs(blob, `${userProjectName}.zip`);
+              });
+            });
             break;
         }
 
