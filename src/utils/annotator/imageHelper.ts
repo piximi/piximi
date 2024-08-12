@@ -1,5 +1,4 @@
 import * as ImageJS from "image-js";
-import { saveAs } from "file-saver";
 import JSZip from "jszip";
 
 import { decode } from "./rle";
@@ -9,7 +8,6 @@ import { logger } from "utils/common/helpers";
 import { Point } from "./types";
 import { DataArray } from "utils/file-io/types";
 import {
-  OldCategory,
   AnnotationObject,
   Category,
   DecodedAnnotationObject,
@@ -309,158 +307,188 @@ export const hexToRGBA = (color: string, alpha?: number) => {
   // return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
-  images: Array<ImageObject>,
-  annotations: Array<AnnotationObject>,
-  categories: Array<Category>,
-  zip: any,
-  projectName: string
-): any => {
+export const saveAnnotationsAsBinaryInstanceSegmentationMasks = async (
+  images: Record<string, ImageObject>,
+  annotations: Record<string, AnnotationObject>,
+  categories: Record<string, Category>,
+  projectName: string,
+  zip: any
+) => {
   // imageId -> list of annotations it owns
-  const annsByImId = annotations.reduce((idMap, ann) => {
-    if (idMap[ann.imageId]) {
-      idMap[ann.imageId].push(ann);
-    } else {
-      idMap[ann.imageId] = [ann];
+  let masks: Record<
+    string,
+    Record<
+      string,
+      Record<string, Record<string, { id: string; mask: ImageJS.Image }[]>>
+    >
+  > = {};
+
+  for (const annId in annotations) {
+    // for image names like blah.png
+    const ann = annotations[annId];
+    const annPlane = `plane-${ann.activePlane}`;
+    const im = images[ann.imageId];
+    const catName = categories[ann.categoryId].name;
+    const imCleanName = im.name.split(".")[0];
+    if (!masks?.[imCleanName]?.[annPlane]?.[ann.kind]?.[catName]) {
+      masks = merge(masks, {
+        [imCleanName]: {
+          [annPlane]: { [ann.kind]: { [catName]: [] } },
+        },
+      });
     }
-    return idMap;
-  }, {} as { [imageId: string]: AnnotationObject[] });
+    const fullLabelMask = new ImageJS.Image(im.shape.width, im.shape.height, {
+      components: 1,
+      alpha: 0,
+      colorModel: "GREY" as ImageJS.ColorModel,
+    });
 
-  images.forEach((current) => {
-    annsByImId[current.id].forEach((ann) => {
-      const height = current.shape.height;
-      const width = current.shape.width;
+    const decoded = decode(ann.encodedMask);
+    const boundingBox = ann.boundingBox;
+    const endX = Math.min(im.shape.width, boundingBox[2]);
+    const endY = Math.min(im.shape.height, boundingBox[3]);
 
-      const fullLabelImage = new ImageJS.Image(
-        width,
-        height,
-        new Uint8Array().fill(0),
-        {
-          components: 1,
-          alpha: 0,
+    //extract bounding box params
+    const boundingBoxWidth = endX - boundingBox[0];
+    const boundingBoxHeight = endY - boundingBox[1];
+
+    const roiMask = new ImageJS.Image(
+      boundingBoxWidth,
+      boundingBoxHeight,
+      decoded,
+      { components: 1, alpha: 0, colorModel: "GREY" as ImageJS.ColorModel }
+    );
+    for (let i = 0; i < boundingBoxWidth; i++) {
+      for (let j = 0; j < boundingBoxHeight; j++) {
+        if (roiMask.getPixelXY(i, j)[0] > 0) {
+          fullLabelMask.setValueXY(
+            i + ann.boundingBox[0],
+            j + ann.boundingBox[1],
+            0,
+            255
+          );
         }
-      );
-      const decoded = decode(ann.encodedMask);
-      const boundingBox = ann.boundingBox;
-      const endX = Math.min(width, boundingBox[2]);
-      const endY = Math.min(height, boundingBox[3]);
-
-      //extract bounding box params
-      const boundingBoxWidth = endX - boundingBox[0];
-      const boundingBoxHeight = endY - boundingBox[1];
-
-      const roiMask = new ImageJS.Image(
-        boundingBoxWidth,
-        boundingBoxHeight,
-        decoded,
-        {
-          components: 1,
-          alpha: 0,
-        }
-      );
-      for (let i = 0; i < boundingBoxWidth; i++) {
-        for (let j = 0; j < boundingBoxHeight; j++) {
-          if (roiMask.getPixelXY(i, j)[0] > 0) {
-            fullLabelImage.setPixelXY(
-              i + ann.boundingBox[0],
-              j + ann.boundingBox[1],
-              [255, 255, 255]
+      }
+    }
+    masks[imCleanName][annPlane][ann.kind][catName].push({
+      id: annId,
+      mask: fullLabelMask,
+    });
+  }
+  zip.folder(`${projectName}`);
+  for await (const [imName, planes] of Object.entries(masks)) {
+    zip.folder(`${projectName}/${imName}`);
+    for await (const [planeName, kinds] of Object.entries(planes)) {
+      zip.folder(`${projectName}/${imName}/${planeName}`);
+      for await (const [kindName, cats] of Object.entries(kinds)) {
+        zip.folder(`${projectName}/${imName}/${planeName}/${kindName}`);
+        for await (const [catName, maskObjs] of Object.entries(cats)) {
+          zip.folder(
+            `${projectName}/${imName}/${planeName}/${kindName}/${catName}`
+          );
+          for await (const maskObj of maskObjs) {
+            const maskBlob = await maskObj.mask.toBlob("image/png");
+            zip.file(
+              `${projectName}/${imName}/${planeName}/${kindName}/${catName}/${maskObj.id}.png`,
+              maskBlob,
+              { base64: true }
             );
           }
         }
       }
-      const blob = fullLabelImage.toBlob("image/png");
-      const category = categories.find((category: OldCategory) => {
-        return category.id === ann.categoryId;
-      });
-      if (category) {
-        zip.folder(`${current.name}/${category.name}`);
-        zip.file(`${current.name}/${category.name}/${ann.id}.png`, blob, {
-          base64: true,
-        });
-      }
-    });
-  });
-  zip.generateAsync({ type: "blob" }).then((blob: Blob) => {
-    saveAs(blob, `${projectName}.zip`);
-  });
+    }
+  }
 };
 
-export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
-  images: Array<ImageObject>,
-  annotations: Array<AnnotationObject>,
-  categories: Array<Category>,
-  zip: any,
-  projectName: string
-): any => {
-  // imageId -> list of annotations it owns
-  const annsByImId = annotations.reduce((idMap, ann) => {
-    if (idMap[ann.imageId]) {
-      idMap[ann.imageId].push(ann);
-    } else {
-      idMap[ann.imageId] = [ann];
+export const saveAnnotationsAsLabeledSemanticSegmentationMasks = async (
+  images: Record<string, ImageObject>,
+  annotations: Record<string, AnnotationObject>,
+  categories: Record<string, Category>,
+  projectName: string,
+  zip: JSZip
+) => {
+  // image id -> image
+
+  let masks: Record<string, Record<string, ImageJS.Image>> = {};
+  let colorMap: Record<string, Record<string, string>> = {};
+
+  for (const annId in annotations) {
+    // for image names like blah.png
+    const ann = annotations[annId];
+    const annPlane = `plane-${ann.activePlane}`;
+    const im = images[ann.imageId];
+    const cat = categories[ann.categoryId];
+    const imCleanName = im.name.split(".")[0];
+    const catColor = hexToRGBA(cat.color);
+    const catName = cat.name;
+    const kind = ann.kind;
+    if (!masks?.[imCleanName]?.[annPlane]) {
+      let fullLabelImage: ImageJS.Image;
+
+      fullLabelImage = new ImageJS.Image(
+        im.shape.width,
+        im.shape.height,
+        new Uint8Array().fill(0),
+        { components: 1, alpha: 0 }
+      );
+
+      masks = merge(masks, {
+        [imCleanName]: {
+          [annPlane]: fullLabelImage,
+        },
+      });
     }
-    return idMap;
-  }, {} as { [imageId: string]: AnnotationObject[] });
+    if (!colorMap?.[kind]?.[catName]) {
+      colorMap = merge(colorMap, {
+        [kind]: {
+          [catName]: catColor,
+        },
+      });
+    }
 
-  images.forEach((current) => {
-    const height = current.shape.height;
-    const width = current.shape.width;
+    const decoded = decode(ann.encodedMask);
+    const boundingBox = ann.boundingBox;
+    const endX = Math.min(im.shape.width, boundingBox[2]);
+    const endY = Math.min(im.shape.height, boundingBox[3]);
 
-    const fullLabelImage = new ImageJS.Image(
-      width,
-      height,
-      new Uint8Array().fill(0),
-      {
-        components: 1,
-        alpha: 0,
-      }
+    //extract bounding box params
+    const boundingBoxWidth = endX - boundingBox[0];
+    const boundingBoxHeight = endY - boundingBox[1];
+
+    const roiMask = new ImageJS.Image(
+      boundingBoxWidth,
+      boundingBoxHeight,
+      decoded,
+      { components: 1, alpha: 0 }
     );
-    categories.forEach((category: OldCategory) => {
-      const categoryColor = hexToRGBA(category.color);
-      if (!categoryColor) return;
-
-      for (let ann of annsByImId[current.id]) {
-        if (ann.categoryId !== category.id) continue;
-        const decoded = decode(ann.encodedMask!);
-        const boundingBox = ann.boundingBox;
-        const endX = Math.min(width, boundingBox[2]);
-        const endY = Math.min(height, boundingBox[3]);
-
-        //extract bounding box params
-        const boundingBoxWidth = endX - boundingBox[0];
-        const boundingBoxHeight = endY - boundingBox[1];
-
-        const roiMask = new ImageJS.Image(
-          boundingBoxWidth,
-          boundingBoxHeight,
-          decoded,
-          {
-            components: 1,
-            alpha: 0,
-          }
-        );
-        for (let i = 0; i < boundingBoxWidth; i++) {
-          for (let j = 0; j < boundingBoxHeight; j++) {
-            if (roiMask.getPixelXY(i, j)[0] > 0) {
-              fullLabelImage.setPixelXY(
-                i + ann.boundingBox[0],
-                j + ann.boundingBox[1],
-                categoryColor
-              );
-            }
-          }
+    for (let i = 0; i < boundingBoxWidth; i++) {
+      for (let j = 0; j < boundingBoxHeight; j++) {
+        if (roiMask.getPixelXY(i, j)[0] > 0) {
+          masks[imCleanName][annPlane].setPixelXY(
+            i + ann.boundingBox[0],
+            j + ann.boundingBox[1],
+            catColor
+          );
         }
       }
-    });
-    const blob = fullLabelImage.toBlob("image/png");
-    zip.file(`${current.name}.png`, blob, {
-      base64: true,
-    });
+    }
+  }
+
+  zip.folder(`${projectName}`);
+
+  const colorMapBlob = new Blob([JSON.stringify(colorMap)], {
+    type: "application/json",
   });
-  zip.generateAsync({ type: "blob" }).then((blob: Blob) => {
-    saveAs(blob, `${projectName}.zip`);
-  });
+  zip.file(`${projectName}/colorMap.json`, colorMapBlob);
+  for await (const [imName, planes] of Object.entries(masks)) {
+    zip.folder(`${projectName}/${imName}`);
+    for await (const [planeName, planeMask] of Object.entries(planes)) {
+      const planeMaskBlob = await planeMask.toBlob("image/png");
+      zip.file(`${projectName}/${imName}/${planeName}.png`, planeMaskBlob, {
+        base64: true,
+      });
+    }
+  }
 };
 
 export const saveAnnotationsAsLabelMatrix = async (
