@@ -39,11 +39,17 @@ export class PolygonalAnnotationTool extends AnnotationTool {
   onMouseDown(position: { x: number; y: number }) {
     if (this.annotationState === AnnotationState.Annotated) return;
 
+    // Needed for touch events
+    if (this.annotationState === AnnotationState.Annotating) {
+      this.terminal = position;
+    }
+
     if (!this.origin) {
       this.origin = position;
       this.buffer.push(position);
 
       this.setAnnotating();
+      return;
     }
   }
 

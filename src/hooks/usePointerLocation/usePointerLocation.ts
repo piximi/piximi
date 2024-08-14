@@ -9,7 +9,8 @@ export const usePointerLocation = (
   originalImage: ImageJS.Image
 ) => {
   const [absolutePosition, setAbsolutePosition] = useState<Point>();
-  const [positionByStage, setPositionByStage] = useState<Point>();
+  const [relativePositionByStage, setRelativePositionByStage] =
+    useState<Point>();
   const [outOfBounds, setOutOfBounds] = useState<boolean>(false);
   const [pixelColor, setPixelColor] = useState<string>();
 
@@ -30,62 +31,69 @@ export const usePointerLocation = (
     },
     [imageRef, originalImage]
   );
-  const getRelativePosition = useCallback(
-    (position: Point, ref: Konva.Node | null): Point | undefined => {
-      if (!ref) return;
 
-      const transform = ref.getAbsoluteTransform().copy();
-
-      transform.invert();
-      return transform.point(position);
-    },
-    []
-  );
-  const setCurrentMousePosition = useCallback(() => {
+  const getPositionRelativeToStage = useCallback((): Point | undefined => {
     if (!stageRef.current) return;
     const position = stageRef.current.getPointerPosition();
-
     if (!position) return;
+    const transform = stageRef.current.getAbsoluteTransform().copy();
 
-    const relative = getRelativePosition(position, imageRef.current);
+    transform.invert();
+    return transform.point(position);
+  }, [stageRef]);
 
-    if (!relative) return;
+  const getAbsolutePosition = useCallback(():
+    | { point: Point; oob: boolean }
+    | undefined => {
+    if (!imageRef.current) return;
+    if (!stageRef.current) return;
+    const position = stageRef.current.getPointerPosition();
+    if (!position) return;
+    const transform = imageRef.current.getAbsoluteTransform().copy();
 
-    setPositionByStage(getRelativePosition(position, stageRef.current));
-
+    const positionRelativeToImage = transform.invert().point(position);
+    if (!positionRelativeToImage) return;
     let adjustedX: number;
     let adjustedY: number;
     let xOut: boolean;
     let yOut: boolean;
 
-    if (relative.x < 0) {
+    if (positionRelativeToImage.x < 0) {
       adjustedX = 0;
       xOut = true;
-    } else if (relative.x > originalImage.width) {
+    } else if (positionRelativeToImage.x > originalImage.width) {
       adjustedX = originalImage.width;
       xOut = true;
     } else {
-      adjustedX = relative.x;
+      adjustedX = positionRelativeToImage.x;
       xOut = false;
     }
 
-    if (relative.y < 0) {
+    if (positionRelativeToImage.y < 0) {
       adjustedY = 0;
       yOut = true;
-    } else if (relative.y > originalImage.height) {
+    } else if (positionRelativeToImage.y > originalImage.height) {
       adjustedY = originalImage.height;
       yOut = true;
     } else {
-      adjustedY = relative.y;
+      adjustedY = positionRelativeToImage.y;
       yOut = false;
     }
 
-    relative.x = Math.round(adjustedX);
-    relative.y = Math.round(adjustedY);
+    positionRelativeToImage.x = Math.round(adjustedX);
+    positionRelativeToImage.y = Math.round(adjustedY);
 
-    setAbsolutePosition(relative);
-    setOutOfBounds(xOut || yOut);
-  }, [stageRef, getRelativePosition, originalImage, imageRef]);
+    return { point: positionRelativeToImage, oob: xOut || yOut };
+  }, [stageRef, imageRef, originalImage]);
+
+  const setCurrentMousePosition = useCallback(() => {
+    if (!stageRef.current) return;
+    const absolutePosition = getAbsolutePosition();
+    if (!absolutePosition) return;
+    setRelativePositionByStage(getPositionRelativeToStage());
+    setAbsolutePosition(absolutePosition?.point);
+    setOutOfBounds(absolutePosition.oob);
+  }, [stageRef, getPositionRelativeToStage, getAbsolutePosition]);
 
   useEffect(() => {
     if (!absolutePosition?.x || outOfBounds) return;
@@ -108,10 +116,12 @@ export const usePointerLocation = (
 
   return {
     absolutePosition,
-    positionByStage,
+    relativePositionByStage,
     outOfBounds,
     pixelColor,
     getPositionFromImage,
     setCurrentMousePosition,
+    getPositionRelativeToStage,
+    getAbsolutePosition,
   };
 };
