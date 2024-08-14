@@ -164,11 +164,30 @@ export const AnnotatorToolDrawer = ({
               <Tool
                 name={t(name)}
                 onClick={() => {
-                  dispatch(
-                    annotatorSlice.actions.setToolType({
-                      operation: toolMap[name].operation,
-                    })
-                  );
+                  if (activeOperation !== toolMap[name].operation)
+                    dispatch(
+                      annotatorSlice.actions.setToolType({
+                        operation: toolMap[name].operation,
+                      })
+                    );
+                }}
+                onTouch={() => {
+                  if (activeOperation !== toolMap[name].operation) {
+                    dispatch(
+                      annotatorSlice.actions.setToolType({
+                        operation: toolMap[name].operation,
+                      })
+                    );
+                    if (!persistOptions) {
+                      if (!optionsVisibility) {
+                        setOptionsVisibility(true);
+                      }
+                    }
+                  } else {
+                    if (!persistOptions) {
+                      setOptionsVisibility((visible) => !visible);
+                    }
+                  }
                 }}
               >
                 {toolMap[name].icon(

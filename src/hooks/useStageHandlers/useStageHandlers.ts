@@ -42,7 +42,14 @@ export const useStageHandlers = (
   draggable: boolean,
   annotationState: AnnotationState,
   outOfBounds: boolean,
-  setCurrentMousePosition: () => void
+  setCurrentMousePosition: () => void,
+  getAbsolutePosition: () =>
+    | {
+        point: Point;
+        oob: boolean;
+      }
+    | undefined,
+  getPositionRelativeToStage: () => Point | undefined
 ) => {
   const selectionMode = useSelector(selectAnnotationSelectionMode);
   //const workingAnnotationEntity = useSelector(selectWorkingAnnotationNew);
@@ -82,20 +89,17 @@ export const useStageHandlers = (
       })
     );
   }, [dispatch, annotationTool]);
-  const {
-    onPointerMouseDown,
-    handlePointerMouseMove,
-    handlePointerMouseUp,
-    dragging,
-    minimum,
-    maximum,
-    selecting,
-  } = usePointerTool(
-    absolutePosition,
-    deselectAllAnnotations,
-    selectedAnnotationsIds,
-    toolType
-  );
+  const { onPointerMouseDown, handlePointerMouseMove, handlePointerMouseUp } =
+    usePointerTool(
+      absolutePosition,
+      deselectAllAnnotations,
+      selectedAnnotationsIds,
+      toolType
+    );
+
+  /*
+   * * MOUSE EVENTS * *
+   */
 
   const handleMouseDown = (
     event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
@@ -103,6 +107,7 @@ export const useStageHandlers = (
     process.env.NODE_ENV !== "production" &&
       process.env.REACT_APP_LOG_LEVEL === "2" &&
       logger(event);
+
     if (
       !event.target.getParent() ||
       event.target.getParent().className === transformerClassName ||
@@ -175,6 +180,7 @@ export const useStageHandlers = (
         if (toolType === ToolType.Pointer) {
           handlePointerMouseMove(absolutePosition!);
         }
+
         annotationTool.onMouseMove(absolutePosition!);
       }
     };
@@ -192,31 +198,12 @@ export const useStageHandlers = (
     absolutePosition,
   ]);
 
-  const handleTouchMove = useMemo(() => {
-    const func = (event: KonvaEventObject<TouchEvent>) => {
-      if (!stageRef || !stageRef.current || draggable) return;
-      setCurrentMousePosition();
-      if (!absolutePosition) return;
-      handlePointerMouseMove(absolutePosition);
-    };
-    const throttled = throttle(func, 5);
-    return (event: KonvaEventObject<TouchEvent>) => throttled(event);
-  }, [
-    stageRef,
-    handlePointerMouseMove,
-    setCurrentMousePosition,
-    absolutePosition,
-    draggable,
-  ]);
-
   /*
    * * HANDLE MOUSE UP * *
    */
 
   const handleMouseUp = useMemo(() => {
-    const func = async (
-      event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
-    ) => {
+    const func = async (event: KonvaEventObject<MouseEvent>) => {
       if (!positionByStage || !absolutePosition || draggable) return;
       if (toolType === ToolType.Zoom) {
         handleZoomMouseUp(
@@ -236,9 +223,7 @@ export const useStageHandlers = (
       }
     };
     const throttled = throttle(func, 10);
-    return (
-      event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
-    ) => throttled(event);
+    return (event: KonvaEventObject<MouseEvent>) => throttled(event);
   }, [
     handlePointerMouseUp,
     handleZoomMouseUp,
@@ -248,6 +233,144 @@ export const useStageHandlers = (
     draggable,
     annotationTool,
     toolType,
+  ]);
+
+  /*
+   * * TOUCH EVENTS * *
+   */
+
+  const handleTouchStart = (event: KonvaEventObject<TouchEvent>) => {
+    process.env.NODE_ENV !== "production" &&
+      process.env.REACT_APP_LOG_LEVEL === "2" &&
+      logger(event);
+
+    if (
+      !event.target.getParent() ||
+      event.target.getParent().className === transformerClassName ||
+      event.target.attrs.name === transformerButtonAttrNAme
+    )
+      return;
+    memoizedOnTouchStart(event as KonvaEventObject<TouchEvent>);
+  };
+  const memoizedOnTouchStart = useMemo(() => {
+    const func = (event: KonvaEventObject<TouchEvent>) => {
+      if (
+        !stageRef ||
+        !stageRef.current ||
+        draggable ||
+        toolType === ToolType.ColorAdjustment
+      )
+        return;
+      if (event.evt.touches.length > 1) {
+        annotationTool.deselect();
+        return;
+      }
+      const absolutePosition = getAbsolutePosition();
+      if (!absolutePosition) return;
+      const positionByStage = getPositionRelativeToStage();
+      if (!positionByStage) return;
+      setCurrentMousePosition();
+
+      if (toolType === ToolType.Zoom) {
+        handleZoomMouseDown(positionByStage, event);
+        return;
+      } else {
+        if (toolType === ToolType.Pointer) {
+          onPointerMouseDown(absolutePosition.point);
+        }
+        if (annotationState === AnnotationState.Annotated) {
+          deselectAnnotation();
+          if (selectionMode === AnnotationMode.New) {
+            deselectAllAnnotations();
+            return;
+          }
+        }
+        if (absolutePosition.oob) return;
+
+        annotationTool.onMouseDown(absolutePosition.point);
+      }
+    };
+    const throttled = throttle(func, 5);
+    return (event: KonvaEventObject<TouchEvent>) => throttled(event);
+  }, [
+    onPointerMouseDown,
+    handleZoomMouseDown,
+    draggable,
+    annotationState,
+    annotationTool,
+    deselectAllAnnotations,
+    deselectAnnotation,
+    selectionMode,
+    toolType,
+    stageRef,
+    getAbsolutePosition,
+    getPositionRelativeToStage,
+    setCurrentMousePosition,
+  ]);
+
+  const handleTouchMove = useMemo(() => {
+    const func = (event: KonvaEventObject<TouchEvent>) => {
+      if (!stageRef || !stageRef.current || draggable) return;
+      if (event.evt.touches.length > 1) {
+        return;
+      }
+      setCurrentMousePosition();
+      if (!absolutePosition) return;
+
+      if (toolType === ToolType.Pointer) {
+        handlePointerMouseMove(absolutePosition);
+      }
+      annotationTool.onMouseMove(absolutePosition);
+    };
+    const throttled = throttle(func, 5);
+    return (event: KonvaEventObject<TouchEvent>) => throttled(event);
+  }, [
+    stageRef,
+    handlePointerMouseMove,
+    setCurrentMousePosition,
+    absolutePosition,
+    draggable,
+    annotationTool,
+    toolType,
+  ]);
+
+  const handleTouchEnd = useMemo(() => {
+    const func = async (event: KonvaEventObject<TouchEvent>) => {
+      if (event.evt.touches.length > 1) {
+        return;
+      }
+      const absolutePosition = getAbsolutePosition();
+      if (!absolutePosition) return;
+      const positionByStage = getPositionRelativeToStage();
+      if (!positionByStage) return;
+      setCurrentMousePosition();
+      if (toolType === ToolType.Zoom) {
+        handleZoomMouseUp(
+          positionByStage,
+          event as KonvaEventObject<TouchEvent>
+        );
+        setCurrentMousePosition();
+      } else {
+        if (toolType === ToolType.Pointer) {
+          handlePointerMouseUp(absolutePosition.point);
+        } else if (toolType === ToolType.ObjectAnnotation) {
+          await (annotationTool as ObjectAnnotationTool).onMouseUp(
+            absolutePosition.point
+          );
+        }
+        annotationTool.onMouseUp(absolutePosition.point);
+      }
+    };
+    const throttled = throttle(func, 10);
+    return (event: KonvaEventObject<TouchEvent>) => throttled(event);
+  }, [
+    handlePointerMouseUp,
+    handleZoomMouseUp,
+    setCurrentMousePosition,
+    annotationTool,
+    toolType,
+    getAbsolutePosition,
+    getPositionRelativeToStage,
   ]);
 
   /*
@@ -264,16 +387,13 @@ export const useStageHandlers = (
   };
 
   return {
-    onPointerMouseDown,
     handleMouseUp,
     handleMouseMove,
     handleTouchMove,
     handleZoomWheel,
     handleDblClickToZoom,
-    dragging,
-    selecting,
-    minimum,
-    maximum,
     handleMouseDown,
+    handleTouchStart,
+    handleTouchEnd,
   };
 };

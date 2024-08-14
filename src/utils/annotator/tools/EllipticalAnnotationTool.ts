@@ -17,6 +17,10 @@ export class EllipticalAnnotationTool extends AnnotationTool {
   onMouseDown(position: { x: number; y: number }) {
     if (this.annotationState === AnnotationState.Annotated) return;
 
+    // Needed for touch events
+    if (this.annotationState === AnnotationState.Annotating) {
+      this.resize(position);
+    }
     if (!this.radius) {
       this.origin = position;
 
@@ -26,7 +30,8 @@ export class EllipticalAnnotationTool extends AnnotationTool {
 
   onMouseMove(position: { x: number; y: number }) {
     if (this.annotationState === AnnotationState.Annotated) return;
-
+    if (this.annotationState === AnnotationState.Annotating) {
+    }
     this.resize(position);
   }
 
@@ -73,14 +78,17 @@ export class EllipticalAnnotationTool extends AnnotationTool {
 
   private resize(position: Point) {
     if (this.origin) {
+      const xRadius = Math.floor(Math.abs((position.x - this.origin.x) / 2));
+      const yRadius = Math.floor(Math.abs((position.y - this.origin.y) / 2));
+      if (xRadius === 0 || yRadius === 0) return;
       this.center = {
         x: (position.x - this.origin.x) / 2 + this.origin.x,
         y: (position.y - this.origin.y) / 2 + this.origin.y,
       };
 
       this.radius = {
-        x: Math.abs((position.x - this.origin.x) / 2),
-        y: Math.abs((position.y - this.origin.y) / 2),
+        x: xRadius,
+        y: yRadius,
       };
     }
   }

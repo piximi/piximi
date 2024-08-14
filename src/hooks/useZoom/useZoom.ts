@@ -70,7 +70,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
 
   const handleZoomMouseDown = (
     position: { x: number; y: number },
-    event: KonvaEventObject<MouseEvent>
+    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
   ) => {
     if (toolType !== ToolType.Zoom) return;
     const stage = event.target.getStage()!;
@@ -89,7 +89,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
 
   const handleZoomMouseMove = (
     position: { x: number; y: number },
-    event: KonvaEventObject<MouseEvent>
+    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
   ) => {
     const stage = event.target.getStage()!;
     const _position = stage.getPointerPosition()!;
@@ -115,7 +115,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
 
   const handleZoomMouseUp = (
     position: { x: number; y: number },
-    event: KonvaEventObject<MouseEvent>
+    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
   ) => {
     if (!activeImageId || !zoomSelection.selecting || !stage) return;
     if (zoomSelection.dragging) {
@@ -213,7 +213,9 @@ export const useZoom = (stage?: Konva.Stage | null) => {
     });
   };
 
-  const handleZoomDblClick = (event: KonvaEventObject<MouseEvent>) => {
+  const handleZoomDblClick = (
+    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+  ) => {
     event.evt.preventDefault();
     if (!activeImageId) return;
     const stage = event.target.getStage()!;

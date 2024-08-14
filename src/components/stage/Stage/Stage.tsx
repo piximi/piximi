@@ -68,8 +68,10 @@ export const Stage = ({
     absolutePosition,
     outOfBounds,
     setCurrentMousePosition,
-    positionByStage,
+    relativePositionByStage,
     pixelColor,
+    getAbsolutePosition,
+    getPositionRelativeToStage,
   } = usePointerLocation(imageRef, stageRef!, annotationTool.image);
 
   const {
@@ -79,15 +81,19 @@ export const Stage = ({
     handleTouchMove,
     handleDblClickToZoom,
     handleZoomWheel,
+    handleTouchStart,
+    handleTouchEnd,
   } = useStageHandlers(
     stageRef,
     annotationTool,
-    positionByStage,
+    relativePositionByStage,
     absolutePosition,
     draggable,
     annotationState,
     outOfBounds,
-    setCurrentMousePosition
+    setCurrentMousePosition,
+    getAbsolutePosition,
+    getPositionRelativeToStage
   );
 
   useEffect(() => {
@@ -150,14 +156,19 @@ export const Stage = ({
       <ReactKonva.Stage
         draggable={draggable}
         height={stageHeight}
-        onMouseDown={(evt) => handleMouseDown(evt)}
-        onTouchStart={(evt) => handleMouseDown(evt)}
+        onMouseDown={(evt) => {
+          handleMouseDown(evt);
+        }}
+        onTouchStart={(evt) => {
+          handleTouchStart(evt);
+        }}
         onMouseMove={(evt) => handleMouseMove(evt)}
         onTouchMove={(evt) => handleTouchMove(evt)}
         onMouseUp={(evt) => handleMouseUp(evt)}
-        onTouchEnd={(evt) => handleMouseUp(evt)}
+        onTouchEnd={(evt) => handleTouchEnd(evt)}
         onWheel={(evt) => handleZoomWheel(evt)}
         onDblClick={(evt) => handleDblClickToZoom(evt)}
+        on
         position={stagePosition}
         ref={stageRef}
         width={stageWidth}
@@ -193,7 +204,7 @@ export const Stage = ({
                   <Selection tool={annotationTool} toolType={toolType} />
                 )}
                 <Cursor
-                  positionByStage={positionByStage}
+                  positionByStage={relativePositionByStage}
                   absolutePosition={absolutePosition}
                   annotationState={annotationState}
                   outOfBounds={outOfBounds}

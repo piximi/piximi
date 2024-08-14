@@ -68,6 +68,7 @@ export class QuickAnnotationTool extends AnnotationTool {
     this.currentSuperpixels.clear();
     this.lastSuperpixel = 0;
     this.annotation = undefined;
+    this.currentMask = undefined;
 
     this.setBlank();
   }

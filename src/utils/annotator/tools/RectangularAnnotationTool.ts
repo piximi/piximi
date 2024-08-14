@@ -18,6 +18,12 @@ export class RectangularAnnotationTool extends AnnotationTool {
 
   onMouseDown(position: { x: number; y: number }) {
     if (this.annotationState === AnnotationState.Annotated) return;
+
+    // Needed for touch events
+    if (this.annotationState === AnnotationState.Annotating) {
+      this.resize(position);
+      return;
+    }
     if (!this.width) {
       this.origin = position;
       this.setAnnotating();
