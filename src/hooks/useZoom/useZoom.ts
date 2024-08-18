@@ -16,10 +16,11 @@ import {
   selectZoomSelection,
   selectZoomToolOptions,
 } from "store/imageViewer/selectors";
-
+import { getDistance } from "utils/annotator";
+const delta = 10;
 export const useZoom = (stage?: Konva.Stage | null) => {
-  const delta = 10;
   const [selectStart, setSelectStart] = useState<{ x: number; y: number }>();
+  const [oldDist, setOldDist] = useState<number>();
 
   const dispatch = useDispatch();
   const stageWidth = useSelector(selectStageWidth);
@@ -186,6 +187,67 @@ export const useZoom = (stage?: Konva.Stage | null) => {
     } else {
       center = stage.getPointerPosition() as Point;
     }
+
+    if (!center) return;
+    zoomAndOffset(newScale, center);
+
+    updateZoomScale(newScale);
+
+    const labelGroup = stage.find(`#label-group`)[0];
+    if (!labelGroup) return;
+    const labelPosition = labelGroup.position();
+    const labelPointTo = {
+      x: labelPosition.x / oldScale - stage.x() / oldScale,
+      y: labelPosition.y / oldScale - stage.y() / oldScale,
+    };
+    labelGroup.setAttrs({
+      scaleX: 1 / stage.scaleX(),
+      scaleY: 1 / stage.scaleY(),
+    });
+
+    var newLabelPos = {
+      x: labelPosition.x - labelPointTo.x * newScale,
+      y: labelPosition.y - labelPointTo.y * newScale,
+    };
+
+    labelGroup.setAttrs({
+      position: newLabelPos,
+    });
+  };
+
+  const handlePinchZoom = (event: KonvaEventObject<TouchEvent>) => {
+    event.evt.preventDefault();
+    if (!activeImageId) return;
+    const stage = event.target.getStage()!;
+
+    const oldScale = stage.scaleX();
+    const touches = stage.getPointersPositions();
+    if (touches.length < 2) {
+      return;
+    }
+    const p1 = touches[0];
+    const p2 = touches[1];
+    const dist = getDistance(p1, p2);
+
+    if (!oldDist) {
+      setOldDist(dist);
+      return;
+    }
+    const scaleBy = dist / oldDist;
+
+    const newScale = oldScale * scaleBy;
+    setOldDist(dist);
+
+    let center;
+    if (automaticCentering) {
+      center = {
+        x: (stage.width() / 2) * stage.scaleX() + stage.x(),
+        y: (stage.height() / 2) * stage.scaleX() + stage.y(),
+      };
+    } else {
+      center = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 } as Point;
+    }
+
     if (!center) return;
     zoomAndOffset(newScale, center);
 
@@ -269,5 +331,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
     handleZoomScroll,
     zoomAndOffset,
     handleZoomDblClick,
+    handlePinchZoom,
+    setOldDist,
   };
 };

@@ -89,6 +89,7 @@ export const Stage = ({
     relativePositionByStage,
     absolutePosition,
     draggable,
+    setDraggable,
     annotationState,
     outOfBounds,
     setCurrentMousePosition,
