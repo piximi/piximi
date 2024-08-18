@@ -40,6 +40,7 @@ export const useStageHandlers = (
   positionByStage: Point | undefined,
   absolutePosition: Point | undefined,
   draggable: boolean,
+  setDraggable: React.Dispatch<React.SetStateAction<boolean>>,
   annotationState: AnnotationState,
   outOfBounds: boolean,
   setCurrentMousePosition: () => void,
@@ -63,6 +64,8 @@ export const useStageHandlers = (
     handleZoomMouseMove,
     handleZoomMouseUp,
     handleZoomScroll,
+    handlePinchZoom,
+    setOldDist,
     //resetZoomSelection,
   } = useZoom(stageRef?.current);
 
@@ -263,6 +266,12 @@ export const useStageHandlers = (
         return;
       if (event.evt.touches.length > 1) {
         annotationTool.deselect();
+        if (event.evt.touches.length === 3) {
+          if (!draggable) {
+            setDraggable(true);
+          }
+        }
+
         return;
       }
       const absolutePosition = getAbsolutePosition();
@@ -306,12 +315,16 @@ export const useStageHandlers = (
     getAbsolutePosition,
     getPositionRelativeToStage,
     setCurrentMousePosition,
+    setDraggable,
   ]);
 
   const handleTouchMove = useMemo(() => {
     const func = (event: KonvaEventObject<TouchEvent>) => {
-      if (!stageRef || !stageRef.current || draggable) return;
-      if (event.evt.touches.length > 1) {
+      if (!stageRef || !stageRef.current) return;
+      if (event.evt.touches.length === 2) {
+        handlePinchZoom(event);
+        return;
+      } else if (draggable) {
         return;
       }
       setCurrentMousePosition();
@@ -329,15 +342,17 @@ export const useStageHandlers = (
     handlePointerMouseMove,
     setCurrentMousePosition,
     absolutePosition,
-    draggable,
     annotationTool,
     toolType,
+    draggable,
+    handlePinchZoom,
   ]);
 
   const handleTouchEnd = useMemo(() => {
     const func = async (event: KonvaEventObject<TouchEvent>) => {
-      if (event.evt.touches.length > 1) {
-        return;
+      setOldDist(undefined);
+      if (draggable) {
+        setDraggable(false);
       }
       const absolutePosition = getAbsolutePosition();
       if (!absolutePosition) return;
@@ -371,6 +386,9 @@ export const useStageHandlers = (
     toolType,
     getAbsolutePosition,
     getPositionRelativeToStage,
+    setDraggable,
+    draggable,
+    setOldDist,
   ]);
 
   /*
