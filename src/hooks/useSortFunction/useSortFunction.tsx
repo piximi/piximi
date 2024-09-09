@@ -27,6 +27,15 @@ const splitmix32 = (seed: number) => {
   return ((t = t ^ (t >>> 15)) >>> 0) / 4294967296;
 };
 
+// the number of possible values for this variable is equal to
+// the number of possible "random" sortings that will be produced,
+// e.g. if it's only one of `0` or `1`, then there will "randomly"
+// be one of two possible sortings of Things.
+// it must be a 32 bit number, therefore we generate across the largest
+// distribution available to us by generatng a random positive 32 bit
+// number. 2**31 because its signed, and we want a positive number
+const generateSeed = () => Math.floor(Math.random() * (2 ** 31 - 1));
+
 export const useSortFunction = () => {
   const sortType = useSelector(selectSortType);
   const [previousSortType, setPreviousSortType] = useState<ThingSortKey>(
@@ -42,14 +51,7 @@ export const useSortFunction = () => {
 
   useEffect(() => {
     if (sortType !== previousSortType && sortType !== ThingSortKey.Category) {
-      // the number of possible values for this variable is equal to
-      // the number of possible "random" sortings that will be produced,
-      // e.g. if it's only one of `0` or `1`, then there will "randomly"
-      // be one of two possible sortings of Things.
-      // it must be a 32 bit number, therefore we generate across the largest
-      // distribution available to us by generatng a random positive 32 bit
-      // number. 2**31 because its signed, and we want a positive number
-      const randomSeed = Math.floor(Math.random() * (2 ** 31 - 1));
+      const randomSeed = generateSeed();
       setPreviousSortType(sortType);
       switch (sortType) {
         case ThingSortKey.FileName:
@@ -60,10 +62,8 @@ export const useSortFunction = () => {
 
         case ThingSortKey.Random:
           setSortFunction(() => (a: Thing, b: Thing) => {
-            const aHash = hash(a.name);
-            const bHash = hash(b.name);
-            const aVal = splitmix32(aHash + randomSeed);
-            const bVal = splitmix32(bHash + randomSeed);
+            const aVal = splitmix32(hash(a.id) + randomSeed);
+            const bVal = splitmix32(hash(b.id) + randomSeed);
             return aVal - bVal;
           });
           break;
