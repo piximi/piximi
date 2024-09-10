@@ -9,6 +9,8 @@ import {
   tensor1d,
   booleanMaskAsync,
 } from "@tensorflow/tfjs";
+import { intersection } from "lodash";
+import { MeasurementOption } from "store/measurements/types";
 import { findContours } from "utils/annotator";
 import { DataArray } from "utils/file-io/types";
 
@@ -240,3 +242,73 @@ export const getPE = (
   const perimeter = getPerimeterFromMask(mask, maskShape);
   return perimeter / Math.PI;
 };
+
+export const findSelected = (
+  parents: MeasurementOption[],
+  selectedMeasurements: string[]
+) => {
+  parents.forEach((parent) => {
+    const containedChildren = intersection(
+      parent.children!,
+      selectedMeasurements
+    );
+    if (
+      containedChildren.length === parent.children!.length &&
+      !selectedMeasurements.includes(parent.id)
+    ) {
+      selectedMeasurements.push(parent.id);
+      findSelected(parents, selectedMeasurements);
+    }
+  });
+};
+
+export const getMean = (values: number[]) => {
+  return (
+    values.reduce((sum: number, value) => {
+      return sum + value;
+    }, 0) / values.length
+  );
+};
+
+export const getMedian = (values: number[]) => {
+  const middleIndex = values.length / 2;
+  const flooredIndex = Math.floor(middleIndex);
+  let median: number;
+  if (flooredIndex === middleIndex) {
+    median = (values[middleIndex - 1] + values[middleIndex]) / 2;
+  } else {
+    median = values[flooredIndex];
+  }
+  return { median, index: flooredIndex };
+};
+
+export const getSTD = (values: number[], mean: number) => {
+  const _std =
+    values.reduce((sqsum: number, value) => {
+      return sqsum + (value - mean) ** 2;
+    }, 0) / values.length;
+
+  return Math.sqrt(_std);
+};
+
+export const getStatistics = (values: number[]) => {
+  const sortedValues = [...values];
+  sortedValues.sort(compareDecimals);
+  const mean = getMean(sortedValues);
+  const { median, index } = getMedian(sortedValues);
+  const std = getSTD(sortedValues, mean);
+  const lowerHalf = sortedValues.slice(0, index);
+  const upperHalf = sortedValues.slice(index);
+  const { median: lowerQuartile } = getMedian(lowerHalf);
+  const { median: upperQuartile } = getMedian(upperHalf);
+  const max = sortedValues.at(-1)!;
+  const min = sortedValues[0];
+
+  return { mean, median, std, min, max, lowerQuartile, upperQuartile };
+};
+
+function compareDecimals(a: number, b: number) {
+  if (a === b) return 0;
+
+  return a < b ? -1 : 1;
+}

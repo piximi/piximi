@@ -17,7 +17,6 @@ import { projectSlice } from "store/project";
 import { ProjectDrawer, ImageToolDrawer } from "components/drawers";
 import { FallBackDialog } from "components/dialogs";
 import { dimensions } from "utils/common/constants";
-import { InteractiveTabbedView } from "components/styled-components";
 import { ImageGrid } from "components/image-grids";
 import { ProjectAppBar } from "components/app-bars/";
 import { HotkeyContext } from "utils/common/enums";
@@ -29,6 +28,7 @@ import {
 } from "store/project/selectors";
 import { AddKindMenu } from "components/menus";
 import { selectKindDictionary } from "store/data/selectors";
+import { CustomTabs } from "components/styled-components";
 
 export const ProjectViewer = () => {
   const dispatch = useDispatch();
@@ -49,20 +49,27 @@ export const ProjectViewer = () => {
   useUnloadConfirmation();
 
   const handleTabClose = useCallback(
-    (action: "delete" | "hide", item: string, newItem?: string) => {
+    (item: string, newItem?: string) => {
       if (newItem) {
         dispatch(projectSlice.actions.setActiveKind({ kind: newItem }));
       }
-      if (action === "delete") {
-        dispatch(
-          dataSlice.actions.deleteKind({
-            deletedKindId: item,
-            isPermanent: true,
-          })
-        );
-      } else {
-        dispatch(projectSlice.actions.addKindTabFilter({ kindId: item }));
+
+      dispatch(
+        dataSlice.actions.deleteKind({
+          deletedKindId: item,
+          isPermanent: true,
+        })
+      );
+    },
+    [dispatch]
+  );
+  const handleTabMinimize = useCallback(
+    (item: string, newItem?: string) => {
+      if (newItem) {
+        dispatch(projectSlice.actions.setActiveKind({ kind: newItem }));
       }
+
+      dispatch(projectSlice.actions.addKindTabFilter({ kindId: item }));
     },
     [dispatch]
   );
@@ -96,9 +103,9 @@ export const ProjectViewer = () => {
       const minimizeOnResize = visibleKinds.filter(
         (kind) => kind !== activeKind
       );
-      minimizeOnResize.forEach((kind) => handleTabClose("hide", kind));
+      minimizeOnResize.forEach((kind) => handleTabMinimize(kind));
     }
-  }, [isMobile, activeKind, handleTabClose, visibleKinds]);
+  }, [isMobile, activeKind, handleTabMinimize, visibleKinds]);
 
   useEffect(() => {
     if (!isMobile) {
@@ -127,17 +134,20 @@ export const ProjectViewer = () => {
                 marginLeft: isMobile ? 0 : theme.spacing(32),
               })}
             >
-              <InteractiveTabbedView
+              <CustomTabs
+                extendable
+                transition="sliding"
                 childClassName="grid-tabs"
                 labels={visibleKinds}
                 secondaryEffect={handleTabChange}
-                onTabClose={handleTabClose}
-                onNew={handleOpenAddKindMenu}
+                handleTabClose={handleTabClose}
+                handleNew={handleOpenAddKindMenu}
+                handleTabMin={handleTabMinimize}
               >
                 {visibleKinds.map((kind) => (
                   <ImageGrid key={`${kind}-imageGrid`} kind={kind} />
                 ))}
-              </InteractiveTabbedView>
+              </CustomTabs>
             </Box>
             <ImageToolDrawer />
           </Box>

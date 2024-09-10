@@ -2,10 +2,8 @@ import React, { useEffect } from "react";
 import { ErrorBoundary, useErrorHandler } from "react-error-boundary";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, CssBaseline } from "@mui/material";
-import { MeasurementDashboard } from "components/data-viz";
 import { FallBackDialog } from "components/dialogs";
 import { MeasurementsDrawer } from "components/drawers";
-import { TabbedView } from "components/styled-components";
 import { useUnloadConfirmation } from "hooks";
 
 import { selectProjectImageChannels } from "store/project/selectors";
@@ -13,6 +11,7 @@ import { dimensions } from "utils/common/constants";
 import { HotkeyContext } from "utils/common/enums";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
+import { MeasurementDashboard } from "components/measurements";
 
 export const MeasurementView = () => {
   const dispatch = useDispatch();
@@ -72,11 +71,7 @@ export const MeasurementView = () => {
             backgroundColor: theme.palette.background.default,
           })}
         >
-          <TabbedView childClassName="grid-tabs" labels={["Tables"]}>
-            <MeasurementDashboard />
-
-            <></>
-          </TabbedView>
+          <MeasurementDashboard />
         </Box>
       </Box>
     </ErrorBoundary>

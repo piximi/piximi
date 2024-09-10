@@ -1,20 +1,46 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { selectMeasurementData, selectMeasurementTables } from "./selectors";
+import { selectMeasurementData, selectMeasurementGroups } from "./selectors";
 import {
+  selectCategoriesDictionary,
   selectKindDictionary,
   selectThingsDictionary,
 } from "store/data/selectors";
 import {
-  DisplayTableColumn,
   DisplayTableRow,
   GroupedMeasurementDisplayTable,
+  MeasurementOption,
+  ParsedMeasurementData,
 } from "./types";
 import { Thing } from "store/data/types";
 import { capitalize } from "utils/common/helpers";
+import { Partition } from "utils/models/enums";
+import { getStatistics } from "utils/measurements/helpers";
+
+export const selectPlotData = createSelector(
+  selectMeasurementData,
+  selectThingsDictionary,
+  selectCategoriesDictionary,
+  (measurementData, things, categories) => {
+    const parsedMeasurementData: ParsedMeasurementData = {};
+
+    Object.keys(measurementData).forEach((thingId) => {
+      const thing = things[thingId];
+      parsedMeasurementData[thingId] = {
+        id: thingId,
+        kind: thing.kind,
+        category: categories[thing.categoryId].name,
+        partition: thing.partition,
+        measurements: measurementData[thingId].measurements,
+      };
+    });
+
+    return parsedMeasurementData;
+  }
+);
 
 export const selectTablesMeasurementTableData = createSelector(
   selectMeasurementData,
-  selectMeasurementTables,
+  selectMeasurementGroups,
   selectThingsDictionary,
   selectKindDictionary,
   (measurementData, tables, things, kinds) => {
@@ -22,47 +48,17 @@ export const selectTablesMeasurementTableData = createSelector(
     Object.values(tables).forEach((table) => {
       const groupedTable: GroupedMeasurementDisplayTable = {
         id: table.id,
+        kind: table.kind,
         title: table.name,
         measurements: {},
+        thingIds: table.thingIds,
       };
-      type NewType = DisplayTableColumn;
 
-      const columns: NewType[] = [
-        {
-          id: "split",
-          label: "Split",
-          minWidth: 170,
-          format: (value: number) => value.toFixed(2),
-        },
-        {
-          id: "mean",
-          label: "Mean",
-          minWidth: 100,
-          format: (value: number) => value.toFixed(2),
-        },
-        {
-          id: "std",
-          label: "Standard Deviation",
-          minWidth: 100,
-          format: (value: number) => value.toFixed(2),
-        },
-        {
-          id: "median",
-          label: "Median",
-          minWidth: 100,
-          align: "right",
-          format: (value: number) => value.toFixed(2),
-        },
-      ];
-      const thingsOfKind = kinds[table.kind].containing.map(
-        (thingId) => things[thingId]
-      );
+      const thingsOfKind = table.thingIds.map((thingId) => things[thingId]);
 
       Object.values(table.measurementsStatus).forEach((measurement) => {
         if (measurement.state === "on") {
-          type NewType = DisplayTableRow;
-
-          const rows: NewType[] = [];
+          const rows: DisplayTableRow[] = [];
           Object.values(table.splitStatus).forEach((split) => {
             if (split.state === "on") {
               const splitThings = thingsOfKind.reduce(
@@ -83,6 +79,7 @@ export const selectTablesMeasurementTableData = createSelector(
                 if (split.parent)
                   rows.push({
                     split: `${capitalize(split.parent ?? "")} - ${split.name}`,
+                    ...getSplitType(split),
                     mean: "N/A",
                     std: "N/A",
                     median: "N/A",
@@ -97,6 +94,7 @@ export const selectTablesMeasurementTableData = createSelector(
                 if (split.parent)
                   rows.push({
                     split: `${capitalize(split.parent ?? "")} - ${split.name}`,
+                    ...getSplitType(split),
                     mean: stats.mean,
                     std: stats.std,
                     median: stats.median,
@@ -106,9 +104,9 @@ export const selectTablesMeasurementTableData = createSelector(
           });
           const groupName = capitalize(measurement.id.replaceAll("-", " "));
           groupedTable.measurements[groupName] = {
-            title: table.id,
-            columns: columns,
-            rows: rows,
+            tableId: table.id,
+            measurementId: measurement.id,
+            splits: rows,
           };
         }
       });
@@ -119,40 +117,10 @@ export const selectTablesMeasurementTableData = createSelector(
   }
 );
 
-const getMean = (values: number[]) => {
-  return (
-    values.reduce((sum: number, value) => {
-      return sum + value;
-    }, 0) / values.length
-  );
-};
-
-const getMedian = (values: number[]) => {
-  const middleIndex = values.length / 2;
-  const flooredIndex = Math.floor(middleIndex);
-  let median: number;
-  if (flooredIndex === middleIndex) {
-    median = (values[middleIndex - 1] + values[middleIndex]) / 2;
-  } else {
-    median = values[flooredIndex];
+const getSplitType = (split: MeasurementOption) => {
+  if (split.parent === "partition") {
+    return { partition: split.name as Partition };
+  } else if (split.parent === "categoryId") {
+    return { category: split.name };
   }
-  return median;
-};
-
-const getSTD = (values: number[], mean: number) => {
-  const _std =
-    values.reduce((sqsum: number, value) => {
-      return sqsum + (value - mean) ** 2;
-    }, 0) / values.length;
-
-  return Math.sqrt(_std);
-};
-
-const getStatistics = (values: number[]) => {
-  values.sort();
-  const mean = getMean(values);
-  const median = getMedian(values);
-  const std = getSTD(values, mean);
-
-  return { mean, median, std };
 };

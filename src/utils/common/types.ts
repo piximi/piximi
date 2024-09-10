@@ -103,6 +103,10 @@ export type RecursivePartial<T> = {
   [K in keyof T]?: RecursivePartial<T[K]>;
 };
 
+export type KeysWithValuesOfType<T, V> = {
+  [K in keyof T]-?: T[K] extends V | undefined ? K : never;
+}[keyof T];
+
 /*
 SORTING
 */

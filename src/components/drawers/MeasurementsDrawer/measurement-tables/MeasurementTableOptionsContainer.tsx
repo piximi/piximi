@@ -4,7 +4,7 @@ import { MeasurementTableOptions } from "./MeasurementTableOptions";
 import { SelectDialog } from "components/dialogs";
 import { Add } from "@mui/icons-material";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { selectMeasurementTables } from "store/measurements/selectors";
+import { selectMeasurementGroups } from "store/measurements/selectors";
 import {
   selectCategoriesByKind,
   selectKindDictionary,
@@ -16,7 +16,7 @@ import { DataArray } from "utils/file-io/types";
 import { HotkeyContext } from "utils/common/enums";
 
 export const MeasurementTableOptionsContainer = () => {
-  const tables = useSelector(selectMeasurementTables);
+  const tables = useSelector(selectMeasurementGroups);
   const categoriesByKind = useSelector(selectCategoriesByKind);
   const kinds = useSelector(selectKindDictionary);
   const [kindOptions, setKindOptions] = useState<string[]>(Object.keys(kinds));

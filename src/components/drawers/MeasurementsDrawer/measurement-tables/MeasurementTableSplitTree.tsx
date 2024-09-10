@@ -9,7 +9,7 @@ import {
   selectMeasurementData,
   selectSelectedTableSplits,
 } from "store/measurements/selectors";
-import { SelectionTreeItems, MeasurementTable } from "store/measurements/types";
+import { MeasurementOptions, MeasurementGroup } from "store/measurements/types";
 import { isObjectEmpty, selectTreeItemChildren } from "utils/common/helpers";
 import { RecursivePartial } from "utils/common/types";
 
@@ -18,7 +18,7 @@ export const MeasurementTableSplitTree = ({
   loading,
   setLoading,
 }: {
-  table: MeasurementTable;
+  table: MeasurementGroup;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
@@ -33,7 +33,7 @@ export const MeasurementTableSplitTree = ({
   const handleSelect = (event: React.SyntheticEvent, itemIds: string[]) => {
     if (loading) return;
     const itemId = itemIds[0];
-    const updates: RecursivePartial<SelectionTreeItems> = {};
+    const updates: RecursivePartial<MeasurementOptions> = {};
     const updatedSelectionStatus = selectedSplits.includes(itemId)
       ? "off"
       : "on";
@@ -96,8 +96,8 @@ export const MeasurementTableSplitTree = ({
 const prepareMeasure = (
   kind: string,
   things: Record<string, AnnotationObject | ImageObject>,
-  updatedSplitStatus: RecursivePartial<SelectionTreeItems>,
-  measurementsStatus: SelectionTreeItems
+  updatedSplitStatus: RecursivePartial<MeasurementOptions>,
+  measurementsStatus: MeasurementOptions
 ) => {
   const activeSplits = Object.entries(updatedSplitStatus).reduce(
     (active: string[], split) => {

@@ -1,6 +1,11 @@
 import * as React from "react";
 
-import { FormControl, FormHelperText, TextField } from "@mui/material";
+import {
+  FormControl,
+  FormControlProps,
+  FormHelperText,
+  TextField,
+} from "@mui/material";
 
 const intRegExpr = new RegExp("^[0-9]+(.0*)?$");
 const floatRegExpr = new RegExp("-*^[0-9]*(.[0-9]*)?$");
@@ -17,6 +22,9 @@ type CustomNumberTextFieldProps = {
   disabled?: boolean;
   size?: "small" | "medium";
   width?: string;
+  formControlFullWidth?: boolean;
+  variant?: "filled" | "outlined" | "standard";
+  formControlProps?: FormControlProps;
 };
 
 export const CustomNumberTextField = ({
@@ -31,6 +39,9 @@ export const CustomNumberTextField = ({
   disabled = false,
   size = "small",
   width,
+  formControlFullWidth,
+  variant = "outlined",
+  formControlProps,
 }: CustomNumberTextFieldProps) => {
   const [valueString, setValueString] = React.useState<string>(
     value.toString()
@@ -105,7 +116,7 @@ export const CustomNumberTextField = ({
   };
 
   return (
-    <FormControl size={size}>
+    <FormControl size={size} fullWidth={formControlFullWidth}>
       <TextField
         id={id}
         onBlur={dispatchValue}
@@ -120,11 +131,9 @@ export const CustomNumberTextField = ({
         size={size}
         sx={{
           width: width ? width : "inherit",
-          // "& .MuiFormHelperText-root.Mui-error": {
-          //   position: "absolute",
-          //   top: "100%",
-          // },
+          ...formControlProps?.sx,
         }}
+        variant={variant}
       />
       <FormHelperText error={inputError}>{errorHelpText}</FormHelperText>
     </FormControl>

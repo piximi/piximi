@@ -2,14 +2,12 @@ import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 
 import { selectTablesMeasurementTableData } from "store/measurements/reselectors";
-import { MeasurementTableContainer } from "./measurement-tables/MeasurementTableContainer";
-import { useBreakpointObserver } from "hooks";
+import { MeasurementTableContainer } from "../MeasurementsTableContainer/MeasurementTableContainer";
 import { GroupedMeasurementDisplayTable } from "store/measurements/types";
 import { DashboardGrid } from "./DashboardGrid";
 
 export const MeasurementsDashboard = () => {
   const measurementTables = useSelector(selectTablesMeasurementTableData);
-  const breakpoint = useBreakpointObserver();
   const generateNodes = (tables: GroupedMeasurementDisplayTable[]) => {
     return tables.map((table) => (
       <MeasurementTableContainer
@@ -27,14 +25,12 @@ export const MeasurementsDashboard = () => {
           duration: theme.transitions.duration.enteringScreen,
           easing: theme.transitions.easing.easeOut,
         }),
-        height: "calc(100vh - 64px - 49px)",
+        height: "100%",
         p: 4,
         overflowY: "scroll",
       })}
     >
-      <DashboardGrid
-        numColumns={["md", "sm", "xs"].includes(breakpoint) ? 1 : 2}
-      >
+      <DashboardGrid numColumns={1}>
         {generateNodes(measurementTables)}
       </DashboardGrid>
     </Box>
