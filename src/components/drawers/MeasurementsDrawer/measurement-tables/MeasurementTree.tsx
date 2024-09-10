@@ -5,7 +5,7 @@ import {
   selectSelectedTableSplits,
 } from "store/measurements/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import { SelectionTreeItems, MeasurementTable } from "store/measurements/types";
+import { MeasurementOptions, MeasurementGroup } from "store/measurements/types";
 import { RecursivePartial } from "utils/common/types";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
 import { SelectionTree } from "components/styled-components";
@@ -20,7 +20,7 @@ export const TableMeasurementTree = ({
   setLoading,
   loading,
 }: {
-  table: MeasurementTable;
+  table: MeasurementGroup;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   loading: boolean;
 }) => {
@@ -40,7 +40,7 @@ export const TableMeasurementTree = ({
   const handleSelect = (event: React.SyntheticEvent, itemIds: string[]) => {
     if (splits.length === 0 || loading) return;
     const itemId = itemIds[0];
-    const updates: RecursivePartial<SelectionTreeItems> = {};
+    const updates: RecursivePartial<MeasurementOptions> = {};
     const updatedSelectionStatus = selectedMeasurements.includes(itemId)
       ? "off"
       : "on";
@@ -123,8 +123,8 @@ export const TableMeasurementTree = ({
 const prepareMeasure = (
   kind: string,
   things: Record<string, AnnotationObject | ImageObject>,
-  splitStatus: SelectionTreeItems,
-  updatedMeasurements: RecursivePartial<SelectionTreeItems>
+  splitStatus: MeasurementOptions,
+  updatedMeasurements: RecursivePartial<MeasurementOptions>
 ) => {
   const includeSplits: string[] = [];
   Object.values(splitStatus).forEach((split) => {

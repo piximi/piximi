@@ -1,9 +1,9 @@
 // import React, { useEffect, useState } from "react";
 // import { useSelector } from "react-redux";
-import { SelectionTreeItems } from "store/measurements/types";
+import { MeasurementOptions } from "store/measurements/types";
 // import { selectProjectImageChannels } from "store/project/selectors";
 
-export const baseIntensityOptions: SelectionTreeItems = {
+export const baseIntensityOptions: MeasurementOptions = {
   intensity: {
     id: "intensity",
     name: "Intensity",

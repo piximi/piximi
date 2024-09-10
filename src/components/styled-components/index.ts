@@ -5,5 +5,7 @@ export { KeyboardKey } from "./KeyboardKey";
 export { LogoLoader } from "./LogoLoader";
 export { DividerHeader } from "./DividerHeader";
 export { CountChip } from "./CountChip";
-export { InteractiveTabbedView, TabbedView } from "./CustomTabSwitcher";
+export { CustomTabs as InteractiveTabs } from "./CustomTabSwitcher";
 export { SelectionTree } from "./SelectionTree";
+export { FlexColumnBox, FlexRowBox } from "./boxes";
+export { CustomTabs } from "./CustomTabSwitcher";

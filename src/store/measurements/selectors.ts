@@ -1,44 +1,26 @@
-import { SelectionTreeItem, MeasurementsState } from "./types";
+import { MeasurementsState } from "./types";
 import { createSelector } from "@reduxjs/toolkit";
 
-import { intersection } from "lodash";
+import { findSelected } from "utils/measurements/helpers";
 
 export const selectMeasurementData = ({
   measurements,
 }: {
   measurements: MeasurementsState;
 }) => {
-  return measurements.measurementData;
+  return measurements.data;
 };
 
-export const selectMeasurementTables = ({
+export const selectMeasurementGroups = ({
   measurements,
 }: {
   measurements: MeasurementsState;
 }) => {
-  return measurements.tables;
+  return measurements.groups;
 };
 
-const findSelected = (
-  parents: SelectionTreeItem[],
-  selectedMeasurements: string[]
-) => {
-  parents.forEach((parent) => {
-    const containedChildren = intersection(
-      parent.children!,
-      selectedMeasurements
-    );
-    if (
-      containedChildren.length === parent.children!.length &&
-      !selectedMeasurements.includes(parent.id)
-    ) {
-      selectedMeasurements.push(parent.id);
-      findSelected(parents, selectedMeasurements);
-    }
-  });
-};
 export const selectSelectedTableMeasurements = createSelector(
-  selectMeasurementTables,
+  selectMeasurementGroups,
   (tables) => (tableId: string) => {
     const selectedMeasurements: string[] = [];
     const table = tables[tableId];
@@ -60,7 +42,7 @@ export const selectSelectedTableMeasurements = createSelector(
   }
 );
 export const selectSelectedTableSplits = createSelector(
-  selectMeasurementTables,
+  selectMeasurementGroups,
   (tables) => (tableId: string) => {
     const selectedSplits: string[] = [];
     const table = tables[tableId];

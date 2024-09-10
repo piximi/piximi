@@ -4,10 +4,12 @@ import { StyledTextField, StyledTextFieldProps } from "./StyledTextField";
 export const BlurActionTextField = ({
   currentText,
   callback,
+  blurCallback,
   ...rest
 }: {
   currentText: string;
   callback: (name: string) => void;
+  blurCallback?: () => void;
 } & StyledTextFieldProps) => {
   const [newText, setNewText] = useState<string>(currentText);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -16,7 +18,11 @@ export const BlurActionTextField = ({
     setNewText(event.target.value);
   };
   const handleBlur = () => {
-    if (currentText === newText) return;
+    if (currentText === newText) {
+      blurCallback && blurCallback();
+
+      return;
+    }
     callback(newText);
   };
   const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {

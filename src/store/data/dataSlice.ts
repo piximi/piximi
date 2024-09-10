@@ -190,6 +190,38 @@ export const dataSlice = createSlice({
         }
       }
     },
+    //Buggy,  old kind persists in annotator and measurements. Old kind name for old and new in annotator
+    updateKindName(
+      state,
+      action: PayloadAction<{
+        currentKindName: string;
+        newKindName: string;
+      }>
+    ) {
+      const { currentKindName, newKindName } = action.payload;
+      if (
+        currentKindName === newKindName ||
+        !state.kinds.entities[currentKindName]
+      )
+        return;
+
+      const kind = getCompleteEntity(state.kinds.entities[currentKindName])!;
+      const kindCategories = kind.categories;
+      const kindThings = kind.containing;
+
+      kindCategories.forEach((catId) => {
+        state.categories.entities[catId].saved.kind = newKindName;
+      });
+      kindThings.forEach((thingId) => {
+        state.things.entities[thingId].saved.kind = newKindName;
+      });
+      const kindIndex = state.kinds.ids.findIndex(
+        (name) => name === currentKindName
+      );
+      state.kinds.ids.splice(kindIndex, 1, newKindName);
+      state.kinds.entities[newKindName] = state.kinds.entities[currentKindName];
+      delete state.things.entities[currentKindName];
+    },
     deleteKind(
       state,
       action: PayloadAction<{
