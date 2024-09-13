@@ -3,9 +3,9 @@ import { CustomStore } from "../zarrStores";
 import { openGroup } from "zarr";
 import { getAttr } from "./helpers";
 import semver from "semver";
-import { deserializeProject_v1 } from "./v1/deserializeProject_v1";
-import { dataConverter_v1v2 } from "utils/file-io/converters/dataConverter_v1v2";
-import { deserializeProject_v2 } from "./v2/deserializeProject_v2";
+import { deserializeProject_v01 } from "./v01/deserializeProject_v01";
+import { dataConverter_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";
+import { deserializeProject_v02 } from "./v02/deserializeProject_v02";
 import { LoadCB } from "../types";
 
 export const deserializeProject = async (
@@ -24,8 +24,8 @@ export const deserializeProject = async (
     throw Error(`File version ${piximiVersion} is unsupported.`);
   } else if (semver.eq(piximiVersion!, "0.1.0")) {
     const { project, classifier, data, segmenter } =
-      await deserializeProject_v1(fileStore, loadCb);
-    const { kinds, categories, things } = dataConverter_v1v2({
+      await deserializeProject_v01(fileStore, loadCb);
+    const { kinds, categories, things } = dataConverter_v01v02({
       images: data.images,
       annotations: data.annotations,
       annotationCategories: data.annotationCategories,
@@ -39,7 +39,7 @@ export const deserializeProject = async (
     };
   } else if (semver.eq(piximiVersion!, "0.2.0")) {
     const { project, classifier, data, segmenter } =
-      await deserializeProject_v2(fileStore, loadCb);
+      await deserializeProject_v02(fileStore, loadCb);
 
     return {
       project,

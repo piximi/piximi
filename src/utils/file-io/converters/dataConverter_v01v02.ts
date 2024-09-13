@@ -28,7 +28,7 @@ import {
 import { logger } from "utils/common/helpers";
 import { Partition } from "utils/models/enums";
 
-export const dataConverter_v1v2 = (data: {
+export const dataConverter_v01v02 = (data: {
   images: OldImageType[];
   oldCategories: OldCategory[];
   annotationCategories: OldCategory[];
@@ -217,7 +217,7 @@ export const dataConverter_v1v2 = (data: {
   return { kinds, categories, things };
 };
 
-export const convertAnnotationsWithExistingProject_v1_2 = async (
+export const convertAnnotationsWithExistingProject_v01v02 = async (
   existingImages: Record<string, ImageObject>,
   existingKinds: Record<string, Kind>,
   oldAnnotations: OldAnnotationType[],

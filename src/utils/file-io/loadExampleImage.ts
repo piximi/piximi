@@ -1,6 +1,6 @@
 import { ColorModel, Image as ImageJS } from "image-js";
 
-import { deserializeAnnotations_v1 } from "utils/file-io/deserialize/v1/deserializePiximiAnnotations_v1";
+import { deserializeAnnotations_v01 } from "utils/file-io/deserialize/v01/deserializePiximiAnnotations_v01";
 
 import { SerializedFileType } from "utils/file-io/types";
 import { fileFromPath, loadImageFileAsStack } from "./helpers";
@@ -25,7 +25,7 @@ export const loadExampleImage = async (
     3
   );
 
-  const deserializedAnnotations = deserializeAnnotations_v1(
+  const deserializedAnnotations = deserializeAnnotations_v01(
     serializedAnnotations.annotations,
     image.id
   );

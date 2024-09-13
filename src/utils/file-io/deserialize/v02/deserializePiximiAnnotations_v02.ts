@@ -25,7 +25,7 @@ type ImageMap = Record<
   { new: SerializedAnnotatorImageType; existing?: ImageObject }
 >;
 
-export const deserializeAnnotations = (
+export const deserializeAnnotations_v02 = (
   serializedAnnotations: Array<NewSerializedAnnotationType>,
   imageId: string
 ) => {
@@ -100,7 +100,7 @@ const reconcileImages = (
   return imageMap;
 };
 
-export const deserializePiximiAnnotations_v2 = async (
+export const deserializePiximiAnnotations_v02 = async (
   serializedProject: SerializedFileTypeV2,
   existingImages: Array<ImageObject>,
   existingCategories: Array<Category>,

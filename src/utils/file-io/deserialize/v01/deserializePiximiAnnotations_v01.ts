@@ -7,7 +7,7 @@ import {
 } from "../../types";
 import { OldAnnotationType, OldCategory, OldImageType } from "store/data/types";
 
-export const deserializeAnnotations_v1 = (
+export const deserializeAnnotations_v01 = (
   serializedAnnotations: Array<SerializedAnnotationType>,
   imageId: string
 ) => {
@@ -144,7 +144,7 @@ const reconcileImages = (
   return { matchedIms, imModdedAnnotations };
 };
 
-export const deserializePiximiAnnotations_v1 = (
+export const deserializePiximiAnnotations_v01 = (
   serializedProject: SerializedFileType,
   existingImages: Array<OldImageType>,
   existingCategories: Array<OldCategory>
@@ -173,7 +173,7 @@ export const deserializePiximiAnnotations_v1 = (
   }, {} as { [imageId: string]: Array<SerializedAnnotationType> });
 
   const encodedAnnotations = matchedIms.flatMap((im) => {
-    return deserializeAnnotations_v1(annMap[im.id], im.id);
+    return deserializeAnnotations_v01(annMap[im.id], im.id);
   });
 
   return {

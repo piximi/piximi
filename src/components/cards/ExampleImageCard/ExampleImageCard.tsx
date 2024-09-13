@@ -2,7 +2,7 @@ import React from "react";
 import { batch, useDispatch } from "react-redux";
 
 import { BaseHorizCard } from "../BaseHorizCard";
-import { dataConverter_v1v2 } from "utils/file-io/converters/dataConverter_v1v2";
+import { dataConverter_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";
 import { dataSlice } from "store/data/dataSlice";
 import { SerializedFileType } from "utils/file-io/types";
 import { loadExampleImage } from "utils/file-io/loadExampleImage";
@@ -43,7 +43,7 @@ export const ExampleImageCard = ({
       exampleImage.name
     );
 
-    const data = dataConverter_v1v2({
+    const data = dataConverter_v01v02({
       images: [image],
       oldCategories: [],
       annotations,
