@@ -243,7 +243,7 @@ const deserializeCOCOAnnotation = (
   return { encodedMask, decodedMask, bbox, skip };
 };
 
-export const deserializeCOCOFile_v2 = async (
+export const deserializeCOCOFile_v02 = async (
   cocoFile: SerializedCOCOFileType,
   existingImages: Array<ImageObject>,
   existingCategories: Array<Category>,

@@ -14,7 +14,7 @@ import { loadExampleImage } from "utils/file-io/loadExampleImage";
 import colorImage from "images/cell-painting.png";
 import { cellPaintingAnnotations } from "data/exampleImages";
 import { OldAnnotationType, OldCategory, OldImageType } from "store/data/types";
-import { dataConverter_v1v2 } from "utils/file-io/converters/dataConverter_v1v2";
+import { dataConverter_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";
 import { SerializedFileType } from "utils/file-io/types";
 import { dataSlice } from "store/data";
 import { LoadingScreen } from "./LoadingScreen";
@@ -39,7 +39,7 @@ export const Application = () => {
         annotations: OldAnnotationType[];
       };
 
-    const dataState = dataConverter_v1v2({
+    const dataState = dataConverter_v01v02({
       images: [image],
       oldCategories: [],
       annotations,

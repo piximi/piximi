@@ -243,7 +243,7 @@ const deserializeProjectGroup = async (
   };
 };
 
-export const deserializeProject_v2 = async (
+export const deserializeProject_v02 = async (
   fileStore: CustomStore,
   loadCb: LoadCB
 ) => {

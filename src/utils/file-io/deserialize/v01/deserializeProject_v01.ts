@@ -226,7 +226,7 @@ const deserializeProjectGroup = async (
   };
 };
 
-export const deserializeProject_v1 = async (
+export const deserializeProject_v01 = async (
   fileStore: CustomStore,
   loadCb: LoadCB
 ) => {

@@ -1,6 +1,6 @@
-import { deserializePiximiAnnotations_v1 } from "./v1/deserializePiximiAnnotations_v1";
-import { deserializePiximiAnnotations_v2 } from "./v2/deserializePiximiAnnotations_v2";
-import { convertAnnotationsWithExistingProject_v1_2 } from "utils/file-io/converters/dataConverter_v1v2";
+import { deserializePiximiAnnotations_v01 } from "./v01/deserializePiximiAnnotations_v01";
+import { deserializePiximiAnnotations_v02 } from "./v02/deserializePiximiAnnotations_v02";
+import { convertAnnotationsWithExistingProject_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";
 import { logger } from "utils/common/helpers";
 import { SerializedFileType, SerializedFileTypeV2 } from "../types";
 import { Kind, Category, ImageObject } from "store/data/types";
@@ -12,12 +12,12 @@ export const deserializePiximiAnnotations = async (
   existingKinds: Record<string, Kind>
 ) => {
   if (!("version" in serializedAnnotations)) {
-    const { annotations, newCategories } = deserializePiximiAnnotations_v1(
+    const { annotations, newCategories } = deserializePiximiAnnotations_v01(
       serializedAnnotations as SerializedFileType,
       Object.values(existingImages),
       Object.values(existingCategories)
     );
-    const convertedData = await convertAnnotationsWithExistingProject_v1_2(
+    const convertedData = await convertAnnotationsWithExistingProject_v01v02(
       existingImages,
       existingKinds,
       annotations,
@@ -28,7 +28,7 @@ export const deserializePiximiAnnotations = async (
   switch (serializedAnnotations.version) {
     case "0.2.0": {
       const { annotations, newCategories, newKinds } =
-        await deserializePiximiAnnotations_v2(
+        await deserializePiximiAnnotations_v02(
           serializedAnnotations as SerializedFileTypeV2,
           Object.values(existingImages),
           Object.values(existingCategories),
