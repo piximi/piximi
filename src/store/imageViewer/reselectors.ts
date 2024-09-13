@@ -223,7 +223,6 @@ export const selectImageViewerActiveKindsWithFullCat = createSelector(
   selectCategoriesDictionary,
   (allKinds, catDict) => {
     const activeKinds: Array<KindWithCategories> = [];
-
     allKinds.forEach((kind) => {
       if (kind.id === "Image") return;
       activeKinds.push({

@@ -1,7 +1,7 @@
 import React from "react";
 import { AppBarOffset } from "components/styled-components";
-import { MeasurementTableOptionsContainer } from "./measurement-tables/MeasurementTableOptionsContainer";
-import { BaseAppDrawer } from "../BaseAppDrawer";
+import { MeasurementGroupOptionsContainer } from "../MeasurementGroupOptionsContainer";
+import { BaseAppDrawer } from "components/drawers/BaseAppDrawer";
 import { MeasurementsAppBar } from "components/app-bars";
 
 export const MeasurementsDrawer = () => {
@@ -9,7 +9,7 @@ export const MeasurementsDrawer = () => {
     <BaseAppDrawer>
       <MeasurementsAppBar />
       <AppBarOffset />
-      <MeasurementTableOptionsContainer />
+      <MeasurementGroupOptionsContainer />
     </BaseAppDrawer>
   );
 };

@@ -14,7 +14,6 @@ import { AlertType, ImageSortKey } from "./enums";
 import { FilterType, ImageSortKeyType, RecursivePartial } from "./types";
 import { Category, ImageObject, Shape, ShapeArray } from "store/data/types";
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
-import { MeasurementOptions } from "store/measurements/types";
 
 /* 
   ERROR HANDLING / LOGGING
@@ -511,31 +510,6 @@ export const updateRecord = <T extends string | number | symbol, K>(
     record[key].push(value);
   } else {
     record[key] = [value];
-  }
-};
-
-/*
-  Given a selection tree item, updates the selection status of all of its children
-*/
-export const selectTreeItemChildren = (
-  updates: RecursivePartial<MeasurementOptions>,
-  itemId: string,
-  items: MeasurementOptions,
-  selectionStatus: "on" | "off"
-) => {
-  const dataItem = items[itemId];
-  if (dataItem) {
-    // data item exists
-    if (dataItem.children) {
-      // data item has children, select or deselect all children
-      dataItem.children.forEach((child) => {
-        selectTreeItemChildren(updates, child, items, selectionStatus);
-      });
-    } else {
-      updates[dataItem.id as keyof MeasurementOptions] = {
-        state: selectionStatus,
-      };
-    }
   }
 };
 

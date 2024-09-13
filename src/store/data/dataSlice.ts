@@ -143,6 +143,7 @@ export const dataSlice = createSlice({
           contents,
           updateType
         );
+
         if (isPermanent) {
           state.kinds.entities[kindId].saved.containing = newContents;
           state.kinds.entities[kindId].changes = {};
@@ -503,14 +504,6 @@ export const dataSlice = createSlice({
                 updateType: "remove",
                 contents: thingsToRemove,
               },
-            ],
-            isPermanent,
-          },
-        });
-        dataSlice.caseReducers.updateCategoryContents(state, {
-          type: "updateCategoryContents",
-          payload: {
-            changes: [
               {
                 categoryId: state.kinds.entities[kind].saved.unknownCategoryId,
                 updateType: "add",
@@ -520,6 +513,7 @@ export const dataSlice = createSlice({
             isPermanent,
           },
         });
+
         const thingUpdates = thingsToRemove.map((thing) => ({
           id: thing,
           categoryId: state.kinds.entities[kind].saved.unknownCategoryId,

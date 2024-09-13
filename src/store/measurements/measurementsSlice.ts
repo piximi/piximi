@@ -4,13 +4,14 @@ import {
   MeasurementsState,
   MeasurementGroup,
   MeasurementOptions,
+  ThingData,
+  ThingMeasurements,
 } from "./types";
 import { generateUUID } from "utils/common/helpers";
-import { merge } from "lodash";
+import { isArray, merge, mergeWith } from "lodash";
 import { baseMeasurementOptions } from "./constants";
 import { Category } from "store/data/types";
 import { Partition } from "utils/models/enums";
-import { DataArray } from "image-js";
 
 const initialState: MeasurementsState = {
   data: {},
@@ -52,7 +53,7 @@ export const measurementsSlice = createSlice({
       }
       Object.assign(state.status, measurementOptions, channelOptions);
     },
-    createTable(
+    createGroup(
       state,
       action: PayloadAction<{
         kind: string;
@@ -62,18 +63,18 @@ export const measurementsSlice = createSlice({
       }>
     ) {
       const { kind, categories, thingIds, numChannels } = action.payload;
-      const tableId = generateUUID();
+      const groupId = generateUUID();
 
       const usedNames = Object.values(state.groups).map((table) => table.name);
-      let version = 2;
+      let replicateNumber = 2;
       let candidateName = `${kind} Measurements`;
 
       while (usedNames.includes(candidateName)) {
-        candidateName = `${kind} Measurements - Table ${version}`;
-        version++;
+        candidateName = `${kind} Measurements - Table ${replicateNumber}`;
+        replicateNumber++;
       }
 
-      const tableSplitStatus: MeasurementOptions = {
+      const groupSplitStatus: MeasurementOptions = {
         categoryId: {
           id: "categoryId",
           name: "Category",
@@ -88,7 +89,7 @@ export const measurementsSlice = createSlice({
         },
       };
       categories.forEach((c) => {
-        tableSplitStatus[c.id] = {
+        groupSplitStatus[c.id] = {
           id: c.id,
           name: c.name,
           state: "off",
@@ -96,7 +97,7 @@ export const measurementsSlice = createSlice({
         };
       });
       Object.keys(Partition).forEach((p) => {
-        tableSplitStatus[p.toLowerCase()] = {
+        groupSplitStatus[p.toLowerCase()] = {
           id: p.toLowerCase(),
           name: p,
           state: "off",
@@ -104,7 +105,7 @@ export const measurementsSlice = createSlice({
         };
       });
 
-      const tableMeasurementStatus: MeasurementOptions = {};
+      const groupMeasurementStatus: MeasurementOptions = {};
       for (const measurement in baseMeasurementOptions) {
         const option = { ...baseMeasurementOptions[measurement] };
         if (
@@ -117,7 +118,7 @@ export const measurementsSlice = createSlice({
             let i = 0;
             while (i < numChannels!) {
               const id = `${measurement}-channel-${i}`;
-              tableMeasurementStatus[id] = {
+              groupMeasurementStatus[id] = {
                 id,
                 name: `Channel ${i}`,
                 state: "off",
@@ -127,67 +128,103 @@ export const measurementsSlice = createSlice({
               i++;
             }
           }
-          tableMeasurementStatus[measurement] = option;
+          groupMeasurementStatus[measurement] = option;
         }
       }
 
-      state.groups[tableId] = {
-        id: tableId,
+      state.groups[groupId] = {
+        id: groupId,
         name: candidateName,
         kind: kind,
-        measurementsStatus: tableMeasurementStatus,
-        splitStatus: tableSplitStatus,
+        measurementsStatus: groupMeasurementStatus,
+        splitStatus: groupSplitStatus,
         thingIds: thingIds,
+        upToDate: true,
       } as MeasurementGroup;
     },
-    removeTable(state, action: PayloadAction<{ tableId: string }>) {
-      delete state.groups[action.payload.tableId];
+    removeGroup(state, action: PayloadAction<{ groupId: string }>) {
+      delete state.groups[action.payload.groupId];
     },
-    updateTableMeasurementState(
+    updateGroupMeasurementState(
       state,
       action: PayloadAction<{
-        tableId: string;
+        groupId: string;
         updates: RecursivePartial<MeasurementOptions>;
       }>
     ) {
-      const { tableId, updates } = action.payload;
-      state.groups[tableId].measurementsStatus = merge(
-        state.groups[tableId].measurementsStatus,
+      const { groupId, updates } = action.payload;
+      state.groups[groupId].measurementsStatus = merge(
+        state.groups[groupId].measurementsStatus,
         updates
       );
     },
-    updateTableName(
+    updateGroupName(
       state,
-      action: PayloadAction<{ tableId: string; newName: string }>
+      action: PayloadAction<{ groupId: string; newName: string }>
     ) {
-      state.groups[action.payload.tableId].name = action.payload.newName;
+      state.groups[action.payload.groupId].name = action.payload.newName;
     },
-    updateTableSplitState(
+    updateGroupSplitState(
       state,
       action: PayloadAction<{
-        tableId: string;
+        groupId: string;
         updates: RecursivePartial<MeasurementOptions>;
       }>
     ) {
-      const { tableId, updates } = action.payload;
-      state.groups[tableId].splitStatus = merge(
-        state.groups[tableId].splitStatus,
+      const { groupId, updates } = action.payload;
+      state.groups[groupId].splitStatus = merge(
+        state.groups[groupId].splitStatus,
         updates
       );
+    },
+    updateGroupSplitValues(
+      state,
+      action: PayloadAction<{
+        groupId: string;
+        remove?: string[];
+
+        updates?: RecursivePartial<MeasurementOptions>;
+      }>
+    ) {
+      const { groupId, remove, updates } = action.payload;
+      if (updates) {
+        state.groups[groupId].splitStatus = mergeWith(
+          state.groups[groupId].splitStatus,
+          updates,
+          (
+            objValue: MeasurementOptions,
+            srcValue: RecursivePartial<MeasurementOptions>
+          ) => {
+            if (isArray(objValue)) {
+              return srcValue;
+            }
+          }
+        );
+      }
+
+      if (remove) {
+        remove.forEach((id) => {
+          delete state.groups[groupId].splitStatus[id];
+        });
+      }
+    },
+
+    updateGroupThingIds(
+      state,
+      action: PayloadAction<{
+        groupId: string;
+        thingIds: string[];
+      }>
+    ) {
+      const { groupId, thingIds } = action.payload;
+      state.groups[groupId].thingIds = thingIds;
     },
 
     updateMeasurements(
       state,
       action: PayloadAction<{
-        dataDict?: Record<
-          string,
-          {
-            channels: number[][];
-            maskData: DataArray | undefined;
-            maskShape: { width: number; height: number } | undefined;
-          }
-        >;
-        measurementsDict?: Record<string, Record<string, number>>;
+        dataDict?: ThingData;
+        measurementsDict?: ThingMeasurements;
       }>
     ) {
       const { dataDict, measurementsDict } = action.payload;
@@ -215,6 +252,20 @@ export const measurementsSlice = createSlice({
           );
         }
       }
+    },
+    removeThingMeasurements(
+      state,
+      action: PayloadAction<{ thingIds: string[] }>
+    ) {
+      action.payload.thingIds.forEach((id) => {
+        delete state.data[id];
+      });
+    },
+    setUpToDate(
+      state,
+      action: PayloadAction<{ groupId: string; upToDate: boolean }>
+    ) {
+      state.groups[action.payload.groupId].upToDate = action.payload.upToDate;
     },
   },
 });

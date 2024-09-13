@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Divider,
   Drawer,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   SvgIcon,
   useTheme,
@@ -148,13 +148,13 @@ export const AnnotatorToolDrawer = ({
           name={`${persistOptions ? "Unlock" : "Lock"} Options`}
           letter="O"
         >
-          <ListItem button onClick={togglePersistHandler}>
+          <ListItemButton sx={{ flexGrow: 0 }} onClick={togglePersistHandler}>
             <ListItemIcon sx={{ pt: "1rem" }}>
               <SvgIcon fontSize="small">
                 {persistOptions ? <LockIcon /> : <LockOpenIcon />}
               </SvgIcon>
             </ListItemIcon>
-          </ListItem>
+          </ListItemButton>
         </CustomToolTip>
 
         <br />

@@ -26,6 +26,7 @@ type CategoryItemMenuProps = {
   handleCloseCategoryMenu: () => void;
   openCategoryMenu: boolean;
   menuFunctions?: MenuFunctions;
+  kind?: string;
 };
 
 export const CategoryItemMenu = ({
@@ -34,6 +35,7 @@ export const CategoryItemMenu = ({
   handleCloseCategoryMenu,
   openCategoryMenu,
   menuFunctions,
+  kind,
 }: CategoryItemMenuProps) => {
   const activeKind = useSelector(selectActiveKindId);
   const dispatch = useDispatch();
@@ -58,7 +60,7 @@ export const CategoryItemMenu = ({
     dispatch(
       dataSlice.actions.removeCategoriesFromKind({
         categoryIds: [category.id],
-        kind: activeKind,
+        kind: kind ?? activeKind,
         isPermanent: menuFunctions ? menuFunctions.Delete?.permanent : true,
       })
     );
@@ -74,7 +76,7 @@ export const CategoryItemMenu = ({
     dispatch(
       dataSlice.actions.deleteThings({
         ofCategories: [category.id],
-        activeKind: activeKind,
+        activeKind: kind ?? activeKind,
         isPermanent: menuFunctions
           ? menuFunctions["Clear Objects"].permanent
           : true,
