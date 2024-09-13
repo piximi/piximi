@@ -26,6 +26,7 @@ export type MeasurementGroup = {
   measurementsStatus: MeasurementOptions;
   splitStatus: MeasurementOptions;
   thingIds: string[];
+  upToDate: boolean;
 };
 
 export type ThingMeasurementsDatum = {
@@ -69,3 +70,14 @@ export type ParsedMeasurementDatum = {
 };
 
 export type ParsedMeasurementData = Record<string, ParsedMeasurementDatum>;
+
+export type ThingData = Record<
+  string,
+  {
+    channels: number[][];
+    maskData: DataArray | undefined;
+    maskShape: { width: number; height: number } | undefined;
+  }
+>;
+
+export type ThingMeasurements = Record<string, Record<string, number>>;

@@ -31,7 +31,8 @@ self.onmessage = async (
           return;
         } else {
           const thingChannelData = currentMeasurements[thingId].channelData!;
-
+          if (!thingChannelData) {
+          }
           const measuredChannel = tf.tidy(() => {
             return tf
               .tensor2d(thingChannelData)

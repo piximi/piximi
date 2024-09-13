@@ -2,7 +2,6 @@ import { createSelector } from "@reduxjs/toolkit";
 import { selectMeasurementData, selectMeasurementGroups } from "./selectors";
 import {
   selectCategoriesDictionary,
-  selectKindDictionary,
   selectThingsDictionary,
 } from "store/data/selectors";
 import {
@@ -38,35 +37,34 @@ export const selectPlotData = createSelector(
   }
 );
 
-export const selectTablesMeasurementTableData = createSelector(
+export const selectGroupMeasurementDisplayData = createSelector(
   selectMeasurementData,
   selectMeasurementGroups,
   selectThingsDictionary,
-  selectKindDictionary,
-  (measurementData, tables, things, kinds) => {
-    const rtables: GroupedMeasurementDisplayTable[] = [];
-    Object.values(tables).forEach((table) => {
+  (measurementData, groups, things) => {
+    const rGroups: GroupedMeasurementDisplayTable[] = [];
+    Object.values(groups).forEach((group) => {
       const groupedTable: GroupedMeasurementDisplayTable = {
-        id: table.id,
-        kind: table.kind,
-        title: table.name,
+        id: group.id,
+        kind: group.kind,
+        title: group.name,
         measurements: {},
-        thingIds: table.thingIds,
+        thingIds: group.thingIds,
       };
 
-      const thingsOfKind = table.thingIds.map((thingId) => things[thingId]);
+      const thingsOfKind = group.thingIds.map((thingId) => things[thingId]);
 
-      Object.values(table.measurementsStatus).forEach((measurement) => {
-        if (measurement.state === "on") {
+      Object.values(group.measurementsStatus).forEach((measurement) => {
+        if (!measurement.children && measurement.state === "on") {
           const rows: DisplayTableRow[] = [];
-          Object.values(table.splitStatus).forEach((split) => {
-            if (split.state === "on") {
+          Object.values(group.splitStatus).forEach((split) => {
+            if (split.state === "on" && split.parent) {
               const splitThings = thingsOfKind.reduce(
                 (ids: string[], thing) => {
+                  const parent = thing[split.parent! as keyof Thing] as string;
                   if (
-                    (
-                      thing[split.parent! as string as keyof Thing] as string
-                    ).toLowerCase() === split.id.toLowerCase()
+                    parent &&
+                    parent.toLowerCase() === split.id.toLowerCase()
                   ) {
                     ids.push(thing.id);
                   }
@@ -104,16 +102,16 @@ export const selectTablesMeasurementTableData = createSelector(
           });
           const groupName = capitalize(measurement.id.replaceAll("-", " "));
           groupedTable.measurements[groupName] = {
-            tableId: table.id,
+            tableId: group.id,
             measurementId: measurement.id,
             splits: rows,
           };
         }
       });
-      rtables.push(groupedTable);
+      rGroups.push(groupedTable);
     });
 
-    return rtables;
+    return rGroups;
   }
 );
 

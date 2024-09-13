@@ -81,6 +81,7 @@ export const ImageViewerCategoryItem = ({
         dense
       />
       <CategoryItemMenu
+        kind={kind}
         anchorElCategoryMenu={categoryMenuAnchorEl}
         category={category}
         handleCloseCategoryMenu={handleCloseMenu}

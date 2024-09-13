@@ -3,7 +3,7 @@ export { SortSelection } from "./SortSelection";
 export { Cursor } from "./Cursor";
 export { KeyboardKey } from "./KeyboardKey";
 export { LogoLoader } from "./LogoLoader";
-export { DividerHeader } from "./DividerHeader";
+export { DividerHeader, DividerWithLoading } from "./DividerHeader";
 export { CountChip } from "./CountChip";
 export { CustomTabs as InteractiveTabs } from "./CustomTabSwitcher";
 export { SelectionTree } from "./SelectionTree";

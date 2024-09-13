@@ -1,6 +1,12 @@
 import React, { ReactElement, useState } from "react";
 
-import { Badge, Drawer, ListItem, ListItemIcon, useTheme } from "@mui/material";
+import {
+  Badge,
+  Drawer,
+  ListItemButton,
+  ListItemIcon,
+  useTheme,
+} from "@mui/material";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
@@ -146,8 +152,8 @@ export const ImageToolDrawer = () => {
                 <ToolHotkeyTitle toolName={t(tool.name.toLocaleUpperCase())} />
               }
             >
-              <ListItem
-                button
+              <ListItemButton
+                sx={{ flexGrow: 0 }}
                 onClick={() => {
                   handleSelectTool(tool.name);
                 }}
@@ -173,7 +179,7 @@ export const ImageToolDrawer = () => {
                     )
                   )}
                 </ListItemIcon>
-              </ListItem>
+              </ListItemButton>
             </TooltipCard>
           ) : (
             <React.Fragment key={`tool-drawer-${tool.name}`}></React.Fragment>

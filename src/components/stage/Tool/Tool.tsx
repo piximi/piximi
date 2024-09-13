@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ListItem, ListItemIcon, SvgIcon } from "@mui/material";
+import { ListItemButton, ListItemIcon, SvgIcon } from "@mui/material";
 
 import { ToolHotkeyTitle, TooltipCard } from "components/tooltips";
 
@@ -26,11 +26,11 @@ export const Tool = ({
   return (
     <>
       <TooltipCard description={description}>
-        <ListItem button onClick={handleClick} onTouchEnd={handleTouch}>
+        <ListItemButton onClick={handleClick}>
           <ListItemIcon>
             <SvgIcon fontSize="small">{children}</SvgIcon>
           </ListItemIcon>
-        </ListItem>
+        </ListItemButton>
       </TooltipCard>
     </>
   );

@@ -19,7 +19,7 @@ export const selectMeasurementGroups = ({
   return measurements.groups;
 };
 
-export const selectSelectedTableMeasurements = createSelector(
+export const selectSelectedGroupMeasurements = createSelector(
   selectMeasurementGroups,
   (tables) => (tableId: string) => {
     const selectedMeasurements: string[] = [];
@@ -41,7 +41,7 @@ export const selectSelectedTableMeasurements = createSelector(
     return selectedMeasurements;
   }
 );
-export const selectSelectedTableSplits = createSelector(
+export const selectSelectedGroupSplits = createSelector(
   selectMeasurementGroups,
   (tables) => (tableId: string) => {
     const selectedSplits: string[] = [];
