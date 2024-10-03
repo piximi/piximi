@@ -1,0 +1,13 @@
+[project]
+authors = ["Nodar Gogoberidze <gnodar01@gmail.com>"]
+channels = ["conda-forge"]
+description = "Add a short description here"
+name = "piximi"
+platforms = ["osx-64"]
+version = "0.1.0"
+
+[tasks]
+install = { cmd = ["yarn", "install"], env = { CXX = "/usr/bin/g++", PYTHON = "${CONDA_PREFIX}/bin/python" } }
+
+[dependencies]
+python = "3.9.*"
