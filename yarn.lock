@@ -7938,7 +7938,7 @@ dicom-parser@^1.8.13:
   resolved "https://registry.yarnpkg.com/dicom-parser/-/dicom-parser-1.8.21.tgz#916fdc77776367976b8457cad462b5b7cf74eaea"
   integrity sha512-lYCweHQDsC8UFpXErPlg86Px2A8bay0HiUY+wzoG3xv5GzgqVHU3lziwSc/Gzn7VV7y2KeP072SzCviuOoU02w==
 
-dicom.ts@^1.0.5:
+dicom.ts@~1.0.5:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/dicom.ts/-/dicom.ts-1.0.6.tgz#928b7e434ac2af285c61430e64b78ebf834a90eb"
   integrity sha512-Rpb/MuBWu2cT3499oV47Wfsq3ulbkNoKVddInwOjd+Lea9n5kk/e3/Xtkii0Tl2OXgaIx6x9qclaoVz4jMidyQ==
