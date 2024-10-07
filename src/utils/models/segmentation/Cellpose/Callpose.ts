@@ -20,7 +20,7 @@ type LoadInferenceDataArgs = {
   kinds?: Array<Kind>;
 };
 
-const KIND_NAME = "cellpose_nucleus";
+const KIND_NAME = "cellpose_cells";
 
 /*
  * Cellpose
