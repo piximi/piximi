@@ -204,7 +204,8 @@ export const ImportTensorflowModelDialog = ({
           }
           sx={{ mb: 2 }}
         >
-          This model performs inference in the cloud ☁️; images will leave your machine. 
+          This model performs inference in the cloud ☁️; images will leave your
+          machine.
         </Alert>
       </Collapse>
       <DialogTitle>
