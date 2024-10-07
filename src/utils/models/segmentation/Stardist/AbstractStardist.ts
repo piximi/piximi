@@ -1,6 +1,9 @@
 import { GraphModel, History, LayersModel } from "@tensorflow/tfjs";
 
-import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
+import {
+  OrphanedAnnotationObject,
+  Segmenter,
+} from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
 import { generateUUID } from "utils/common/helpers";
@@ -108,17 +111,18 @@ export abstract class Stardist extends Segmenter {
     const graphModel = this._model as GraphModel;
 
     const infT = await this._inferenceDataset.toArray();
+    const annotations: Array<OrphanedAnnotationObject[]> = [];
     // imTensor disposed in `predictStardist`
-    const annotationsPromises = infT.map((imTensor, idx) => {
-      return predictStardist(
+    for await (const [idx, imTensor] of infT.entries()) {
+      const annotObj = await predictStardist(
         graphModel,
         imTensor,
         this._fgKind!.id,
         this._fgKind!.unknownCategoryId,
         this._inferenceDataDims![idx]
       );
-    });
-    const annotations = await Promise.all(annotationsPromises);
+      annotations.push(annotObj);
+    }
 
     return annotations;
   }
