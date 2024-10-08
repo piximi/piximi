@@ -132,7 +132,7 @@ export class Cellpose extends Segmenter {
 
     const annotations: Array<OrphanedAnnotationObject[]> = [];
     for await (const imTensor of infT) {
-      // imTensor disposed in _predictOne
+      // imTensor disposed in predictCellpose
       const annotObj = await predictCellpose(
         imTensor,
         this._fgKind!.id,
