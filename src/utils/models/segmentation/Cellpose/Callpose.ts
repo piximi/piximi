@@ -5,7 +5,10 @@ import {
   data as tfdata,
 } from "@tensorflow/tfjs";
 
-import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
+import {
+  Segmenter,
+  OrphanedAnnotationObject,
+} from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCellpose } from "./predictCellpose";
 import { generateUUID } from "utils/common/helpers";
 import { FitOptions } from "../../types";
@@ -127,18 +130,18 @@ export class Cellpose extends Segmenter {
 
     const infT = await this._inferenceDataset.toArray();
 
-    const annotationPromises = infT.map((imTensor) => {
+    const annotations: Array<OrphanedAnnotationObject[]> = [];
+    for await (const imTensor of infT) {
       // imTensor disposed in _predictOne
-      return predictCellpose(
+      const annotObj = await predictCellpose(
         imTensor,
         this._fgKind!.id,
         this._fgKind!.unknownCategoryId,
         this._service,
         this._config
       );
-    });
-
-    const annotations = await Promise.all(annotationPromises);
+      annotations.push(annotObj);
+    }
 
     return annotations;
   }
