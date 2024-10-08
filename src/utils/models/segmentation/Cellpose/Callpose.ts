@@ -85,9 +85,7 @@ export class Cellpose extends Segmenter {
   ): void {
     this._inferenceDataset = tfdata
       .generator(this._sampleGenerator(images))
-      .batch(
-        preprocessingArgs.fitOptions.batchSize
-      ) as tfdata.Dataset<Tensor4D>;
+      .batch(1) as tfdata.Dataset<Tensor4D>;
 
     if (preprocessingArgs.kinds) {
       if (preprocessingArgs.kinds.length !== 1)
