@@ -200,7 +200,8 @@ export const ImportTensorflowModelDialog = ({
           sx={{ mb: 2 }}
         >
           This model performs inference in the cloud ☁️; images will leave your
-          machine.
+          machine. This requires internet access and may take time. Please choose
+          another option if your data is sensitive and should not be transmitted.
         </Alert>
       </Collapse>
       <DialogTitle>
