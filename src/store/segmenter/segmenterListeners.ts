@@ -346,6 +346,13 @@ async function handleError(
     stackTrace,
   };
 
+  if (process.env.NODE_ENV !== "production") {
+    console.error(description);
+    if (stackTrace) {
+      console.error(stackTrace);
+    }
+  }
+
   listenerAPI.dispatch(
     applicationSettingsSlice.actions.updateAlertState({
       alertState: alertState,
