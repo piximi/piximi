@@ -3,6 +3,7 @@ import {
   createContext,
   FormEvent,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -143,81 +144,8 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
   const [referenceHyperStack, setReferenceHyperStack] =
     useState<ImageShapeInfoImage>();
 
-  const uploadFiles = async (files: FileList) => {
-    setChannelOptions(undefined);
-
-    const imageInfo = await getUploadedFileTypes(files);
-
-    setFileInfo(imageInfo);
-    if (!numChannels) {
-      if (
-        (ImageShapeEnum.DicomImage in imageInfo ||
-          ImageShapeEnum.GreyScale in imageInfo) &&
-        ImageShapeEnum.SingleRGBImage in imageInfo
-      ) {
-        setUploadPromptMessage(
-          "Your files contain both 3-channel and greyscale images, but channels across images must be uniform. Which would you like to use?"
-        );
-        setChannelOptions([
-          imageInfo[ImageShapeEnum.GreyScale][0].components!,
-          imageInfo[ImageShapeEnum.SingleRGBImage][0].components!,
-        ]);
-        setOpenDimensionsDialogBox(true);
-      } else if (ImageShapeEnum.GreyScale in imageInfo) {
-        updateChannels(imageInfo![ImageShapeEnum.GreyScale]![0].components!);
-      } else if (ImageShapeEnum.DicomImage in imageInfo) {
-        updateChannels(1);
-      } else if (ImageShapeEnum.SingleRGBImage in imageInfo) {
-        updateChannels(imageInfo[ImageShapeEnum.SingleRGBImage][0].components!);
-      } else if (ImageShapeEnum.HyperStackImage in imageInfo) {
-        setUploadPromptMessage("How many channels do your images consist of?");
-        setReferenceHyperStack(imageInfo[ImageShapeEnum.HyperStackImage][0]);
-        setOpenDimensionsDialogBox(true);
-      } else if (ImageShapeEnum.InvalidImage in imageInfo) {
-        const errors = imageInfo[ImageShapeEnum.InvalidImage].map(
-          (info) => `${info.fileName} -- ${info.error}`
-        );
-
-        if (errors.length > 0) {
-          dispatch(
-            applicationSettingsSlice.actions.updateAlertState({
-              alertState: {
-                alertType: AlertType.Error,
-                name: "File Upload Error",
-                description: [...errors].join("\n---\n"),
-              },
-            })
-          );
-        }
-      }
-    } else {
-      setStartUpload(true);
-    }
-  };
-
-  const handleCloseDimensionsDialog = () => {
-    setUploadPromptMessage("");
-    setOpenDimensionsDialogBox(false);
-    setChannelOptions(undefined);
-  };
-
-  const updateChannels = (channels: number) => {
-    dispatch(projectSlice.actions.setProjectImageChannels({ channels }));
-    setNumChannels(channels);
-    setStartUpload(true);
-  };
-
-  useEffect(() => {
-    const errors: string[] = [];
-    if (fileInfo[ImageShapeEnum.InvalidImage]) {
-      errors.push(
-        ...fileInfo[ImageShapeEnum.InvalidImage].map(
-          (info) => `${info.fileName} -- ${info.error}`
-        )
-      );
-    }
-
-    const uploadImages = async () => {
+  const uploadImages = useCallback(
+    async (errors: string[]) => {
       delete fileInfo[ImageShapeEnum.InvalidImage];
       const uploadedFiles = Object.values(fileInfo).flat();
 
@@ -300,20 +228,98 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
           })
         );
       }
-    };
+    },
+    [dispatch, fileInfo, kind, numChannels, selectedCategory, unknownCategory]
+  );
+
+  const updateChannels = useCallback(
+    (channels: number) => {
+      dispatch(projectSlice.actions.setProjectImageChannels({ channels }));
+      setNumChannels(channels);
+      setStartUpload(true);
+    },
+    [dispatch]
+  );
+  const uploadFiles = useCallback(
+    async (files: FileList) => {
+      setChannelOptions(undefined);
+
+      const imageInfo = await getUploadedFileTypes(files);
+
+      setFileInfo(imageInfo);
+      if (!numChannels) {
+        if (
+          (ImageShapeEnum.DicomImage in imageInfo ||
+            ImageShapeEnum.GreyScale in imageInfo) &&
+          ImageShapeEnum.SingleRGBImage in imageInfo
+        ) {
+          setUploadPromptMessage(
+            "Your files contain both 3-channel and greyscale images, but channels across images must be uniform. Which would you like to use?"
+          );
+          setChannelOptions([
+            imageInfo[ImageShapeEnum.GreyScale][0].components!,
+            imageInfo[ImageShapeEnum.SingleRGBImage][0].components!,
+          ]);
+          setOpenDimensionsDialogBox(true);
+        } else if (ImageShapeEnum.GreyScale in imageInfo) {
+          updateChannels(imageInfo![ImageShapeEnum.GreyScale]![0].components!);
+        } else if (ImageShapeEnum.DicomImage in imageInfo) {
+          updateChannels(1);
+        } else if (ImageShapeEnum.SingleRGBImage in imageInfo) {
+          updateChannels(
+            imageInfo[ImageShapeEnum.SingleRGBImage][0].components!
+          );
+        } else if (ImageShapeEnum.HyperStackImage in imageInfo) {
+          setUploadPromptMessage(
+            "How many channels do your images consist of?"
+          );
+          setReferenceHyperStack(imageInfo[ImageShapeEnum.HyperStackImage][0]);
+          setOpenDimensionsDialogBox(true);
+        } else if (ImageShapeEnum.InvalidImage in imageInfo) {
+          const errors = imageInfo[ImageShapeEnum.InvalidImage].map(
+            (info) => `${info.fileName} -- ${info.error}`
+          );
+
+          if (errors.length > 0) {
+            dispatch(
+              applicationSettingsSlice.actions.updateAlertState({
+                alertState: {
+                  alertType: AlertType.Error,
+                  name: "File Upload Error",
+                  description: [...errors].join("\n---\n"),
+                },
+              })
+            );
+          }
+        }
+      } else {
+        setStartUpload(true);
+      }
+    },
+    [dispatch, numChannels, updateChannels]
+  );
+
+  const handleCloseDimensionsDialog = () => {
+    setUploadPromptMessage("");
+    setOpenDimensionsDialogBox(false);
+    setChannelOptions(undefined);
+  };
+
+  useEffect(() => {
+    const errors: string[] = [];
+    if (fileInfo[ImageShapeEnum.InvalidImage]) {
+      errors.push(
+        ...fileInfo[ImageShapeEnum.InvalidImage].map(
+          (info) => `${info.fileName} -- ${info.error}`
+        )
+      );
+    }
+
     if (startUpload) {
-      uploadImages();
+      uploadImages(errors);
       setStartUpload(false);
     }
-  }, [
-    startUpload,
-    dispatch,
-    fileInfo,
-    selectedCategory,
-    unknownCategory,
-    numChannels,
-    kind,
-  ]);
+  }, [startUpload, fileInfo, uploadImages]);
 
   useEffect(() => {
     setNumChannels(projectChannels);
