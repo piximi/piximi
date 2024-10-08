@@ -346,7 +346,7 @@ const cleanBuffer = (tensor: Tensor) => {
   }
 };
 
-const writeArray = async (
+export const writeArray = async (
   group: Group,
   name: string,
   value: Float32Array | Uint8Array | Int32Array | Uint16Array | Uint32Array,
@@ -360,7 +360,7 @@ const writeArray = async (
   });
 };
 
-const writeTensor = async (
+export const writeTensor = async (
   group: Group,
   name: string,
   tensor: Tensor,
