@@ -22,8 +22,8 @@ export const ResponsiveHistogram = ({
   const theme = usePreferredNivoTheme();
 
   useEffect(() => {
-    const yAxis = chartConfig["y-axis"];
-    if (!yAxis) return;
+    const xAxis = chartConfig["x-axis"];
+    if (!xAxis) return;
     const rawData: number[] = [];
     const formattedData: {
       id: number;
@@ -34,7 +34,7 @@ export const ResponsiveHistogram = ({
     thingIds
       .map((thingId) => measurementData[thingId])
       .forEach((thing) => {
-        const data = thing.measurements[yAxis.measurementType];
+        const data = thing.measurements[xAxis.measurementType];
         if (data) {
           rawData.push(data);
         }
@@ -59,7 +59,7 @@ export const ResponsiveHistogram = ({
     setFormattedData(formattedData);
   }, [chartConfig, measurementData, thingIds]);
 
-  return chartConfig["y-axis"] ? (
+  return chartConfig["x-axis"] ? (
     <ResponsiveMarimekko
       theme={theme}
       colors={{ scheme: chartConfig.colorTheme }}
@@ -82,8 +82,8 @@ export const ResponsiveHistogram = ({
         ticksPosition: "before",
         tickValues: xAxis,
         format: (value) => format(value + xMin),
-        legend: chartConfig["y-axis"]!.measurementType,
-        legendOffset: 55,
+        legend: chartConfig["x-axis"]!.measurementType,
+        legendOffset: 65,
         legendPosition: "middle",
         truncateTickAt: 0,
       }}

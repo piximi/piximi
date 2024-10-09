@@ -9,9 +9,9 @@ import { getObjectMaskData, prepareChannels } from "utils/measurements/helpers";
 import { decode } from "utils/annotator";
 import * as tf from "@tensorflow/tfjs";
 
-export const format = (value: string | number) => {
+export const format = (value: string | number, sf: number = 2) => {
   if (typeof value === "number") {
-    return value.toFixed(2);
+    return value.toFixed(sf);
   } else {
     return value;
   }
