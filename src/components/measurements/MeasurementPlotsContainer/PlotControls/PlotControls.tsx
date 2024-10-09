@@ -5,11 +5,7 @@ import {
   ScatterOptions,
   SwarmOptions,
 } from "./ControlOptions";
-import {
-  ChartMeasurementSelect,
-  ColorThemeSelect,
-  PlotSelect,
-} from "./ControlInputs";
+import { ColorThemeSelect, PlotSelect } from "./ControlInputs";
 import { usePlotControl } from "components/measurements/providers/hooks";
 import { ChartType } from "components/measurements/types";
 
@@ -39,7 +35,6 @@ export const PlotControls = () => {
       <Box sx={{ pl: 1, pb: 1 }}>
         <PlotSelect />
         <ColorThemeSelect />
-        <ChartMeasurementSelect type="y-axis" />
         {renderOptions(selectedPlot.chartConfig.chart)}
       </Box>
     </Box>

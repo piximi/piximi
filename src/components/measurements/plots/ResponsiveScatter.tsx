@@ -81,7 +81,7 @@ export const ResponsiveScatter = ({
         tickRotation: 0,
         legend: chartConfig["x-axis"]!.measurementType,
         legendPosition: "middle",
-        legendOffset: 46,
+        legendOffset: 50,
         truncateTickAt: 0,
       }}
       axisLeft={{
@@ -100,7 +100,7 @@ export const ResponsiveScatter = ({
           justify: false,
           translateX: 130,
           translateY: 0,
-          itemWidth: 100,
+          itemWidth: 120,
           itemHeight: 12,
           itemsSpacing: 5,
           itemDirection: "left-to-right",

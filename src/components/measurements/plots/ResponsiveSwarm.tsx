@@ -215,7 +215,7 @@ export const ResponsiveSwarm = ({
         tickPadding: 5,
         tickRotation: 0,
         legendPosition: "middle",
-        legendOffset: 46,
+        legendOffset: 65,
         truncateTickAt: 0,
       }}
       axisLeft={{
