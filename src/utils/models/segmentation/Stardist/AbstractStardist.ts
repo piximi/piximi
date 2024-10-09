@@ -6,7 +6,7 @@ import {
 } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
-import { generateUUID } from "utils/common/helpers";
+import { generateUUID, logger } from "utils/common/helpers";
 import { LoadInferenceDataArgs } from "../../types";
 import { Kind, ImageObject } from "store/data/types";
 
@@ -122,6 +122,8 @@ export abstract class Stardist extends Segmenter {
         this._inferenceDataDims![idx]
       );
       annotations.push(annotObj);
+      // TODO: replace with progress animation callback
+      logger(`${idx + 1} of ${infT.length} images processed`);
     }
 
     return annotations;

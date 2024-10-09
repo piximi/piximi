@@ -10,7 +10,7 @@ import {
   OrphanedAnnotationObject,
 } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCellpose } from "./predictCellpose";
-import { generateUUID } from "utils/common/helpers";
+import { generateUUID, logger } from "utils/common/helpers";
 import { FitOptions } from "../../types";
 import { ModelTask } from "../../enums";
 import { getImageSlice } from "utils/common/tensorHelpers";
@@ -131,7 +131,7 @@ export class Cellpose extends Segmenter {
     const infT = await this._inferenceDataset.toArray();
 
     const annotations: Array<OrphanedAnnotationObject[]> = [];
-    for await (const imTensor of infT) {
+    for await (const [idx, imTensor] of infT.entries()) {
       // imTensor disposed in predictCellpose
       const annotObj = await predictCellpose(
         imTensor,
@@ -141,6 +141,8 @@ export class Cellpose extends Segmenter {
         this._config
       );
       annotations.push(annotObj);
+      // TODO: replace with progress animation callback
+      logger(`${idx + 1} of ${infT.length} images processed`);
     }
 
     return annotations;
