@@ -137,7 +137,7 @@ export const exportAnnotationMasks = (
           const arraySize = maskOptions.color
             ? imageShape.width * imageShape.height * imageShape.planes * 3
             : imageShape.width * imageShape.height * imageShape.planes;
-          const imageArray = new Uint16Array(arraySize);
+          const imageArray = new Uint8Array(arraySize);
           imageArray.fill(0);
 
           masks = merge(masks, {
@@ -175,7 +175,10 @@ export const exportAnnotationMasks = (
       const arraySize = maskOptions.color
         ? imageShape.width * imageShape.height * imageShape.planes * 3
         : imageShape.width * imageShape.height * imageShape.planes;
-      const imageArray = new Uint16Array(arraySize);
+      const imageArray =
+        exportType === AnnotationExportType.LabeledInstances
+          ? new Uint8Array(arraySize)
+          : new Uint16Array(arraySize);
       imageArray.fill(0);
 
       masks = merge(masks, {
@@ -196,8 +199,10 @@ export const exportAnnotationMasks = (
     const c = Object.values(colors);
 
     for (let i = 0; i < decodedMask.byteLength; i++) {
-      const pixel = decodedMask[i];
-      if (pixel === 0) continue;
+      if (decodedMask[i] === 0) continue;
+      const pixel =
+        2 ** (masks[imageName][kind][categoryName].mask.BYTES_PER_ELEMENT * 8) -
+        1;
       const bboxOffsetY = bboxShape.y + Math.floor(i / bboxShape.width);
       const offsetX = bboxShape.x + (i % bboxShape.width);
       if (maskOptions.color) {
