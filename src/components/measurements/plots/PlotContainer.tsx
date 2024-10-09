@@ -16,6 +16,10 @@ export const PlotContainer = ({ children }: { children: ReactNode }) => {
       plotRef.current.innerHTML,
       "image/svg+xml"
     );
+    const errorNode = data.querySelector("parsererror");
+    if (errorNode) {
+      throw new Error(errorNode.textContent || "Unknown error parsing svg");
+    }
 
     const svgData = data.getElementsByTagName("svg")[0];
 
@@ -34,10 +38,12 @@ export const PlotContainer = ({ children }: { children: ReactNode }) => {
     if (!ctx) {
       return;
     }
-    ctx.drawImage(img, 0, 0, width, height);
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, width, height);
 
-    const url = canvas.toDataURL("image/png");
-    saveAs(url, `${selectedPlot.name}`);
+      const url = canvas.toDataURL("image/png");
+      saveAs(url, `${selectedPlot.name}`);
+    };
   };
 
   return (
