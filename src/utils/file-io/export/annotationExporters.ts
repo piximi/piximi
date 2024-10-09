@@ -2,8 +2,7 @@ import { decode } from "utils/annotator";
 import JSZip from "jszip";
 import { AnnotationObject, Category, ImageObject } from "store/data/types";
 import { merge } from "lodash";
-import { UTIF } from "./tiffIO";
-import { BaseIFD } from "./tiffUtils";
+import { TiffIO, BaseIFD } from "../tiff-io";
 import { AnnotationExportType } from "../enums";
 
 type MaskOptions =
@@ -83,7 +82,7 @@ export const exportAnnotationMasks = (
 
   exportType: AnnotationExportType = AnnotationExportType.LabeledInstances
 ) => {
-  const utif = new UTIF();
+  const utif = new TiffIO();
   let masks: LMasksTiff = {};
   const maskOptions: MaskOptions = {
     random: false,
