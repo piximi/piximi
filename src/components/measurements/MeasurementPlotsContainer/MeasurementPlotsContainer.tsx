@@ -3,7 +3,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import React from "react";
 import { GroupedMeasurementDisplayTable } from "store/measurements/types";
 import { PlotControls } from "./PlotControls/PlotControls";
-import { PlotContainer } from "./PlotContainer";
+import { PlotTabs } from "./PlotContainer";
 import { MeasurementsProvider } from "../providers/MeasurementsProvider";
 
 export const MeasurementPlotsContainer = ({
@@ -29,7 +29,7 @@ export const MeasurementPlotsContainer = ({
             />
           </>
           <Panel id="plot" defaultSize={70}>
-            <PlotContainer />
+            <PlotTabs />
           </Panel>
         </PanelGroup>
       </Box>
