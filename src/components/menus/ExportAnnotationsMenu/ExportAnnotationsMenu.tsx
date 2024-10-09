@@ -35,8 +35,6 @@ import { AnnotationExportType } from "utils/file-io/enums";
 import { dataSlice } from "store/data";
 import { exportAnnotationMasks } from "utils/file-io/export/annotationExporters";
 
-//TODO: MenuItem??
-
 type ExportAnnotationsMenuProps = {
   anchorEl: HTMLElement | null;
   onClose: () => void;
