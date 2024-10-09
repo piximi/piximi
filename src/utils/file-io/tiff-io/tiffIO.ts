@@ -9,7 +9,7 @@ import {
   tagType,
 } from "./tiffUtils";
 
-export class UTIF {
+export class TiffIO {
   // Initialize typed arrays for binary operations
   private ui8 = new Uint8Array(8);
   private i16 = new Int16Array(this.ui8.buffer);
@@ -385,7 +385,7 @@ export class UTIF {
           const subfd: Uint8Array[] = [];
           for (let j = 0; j < oarr.length; j++)
             //@ts-ignore
-            UTIF._readIFD(bin, data, oarr[j], subfd, depth + 1, prm);
+            TiffIO._readIFD(bin, data, oarr[j], subfd, depth + 1, prm);
           //@ts-ignore
           if (tag === 330) ifd.subIFD = subfd;
           //@ts-ignore
