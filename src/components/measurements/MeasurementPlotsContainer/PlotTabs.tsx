@@ -10,6 +10,7 @@ import {
   ResponsiveSwarm,
 } from "../plots";
 import { ChartConfig, ChartType } from "../types";
+import { PlotContainer } from "../plots/PlotContainer";
 
 export const PlotTabs = () => {
   const measurementData = useSelector(selectPlotData);
@@ -27,33 +28,38 @@ export const PlotTabs = () => {
 
   const renderPlot = useCallback(
     (config: ChartConfig) => {
+      let plot: JSX.Element;
       switch (config.chart) {
         case ChartType.Histogram:
-          return (
+          plot = (
             <ResponsiveHistogram
               measurementData={measurementData}
               chartConfig={config}
               thingIds={groupThingIds}
             />
           );
+          break;
         case ChartType.Scatter:
-          return (
+          plot = (
             <ResponsiveScatter
               measurementData={measurementData}
               chartConfig={config}
               thingIds={groupThingIds}
             />
           );
+          break;
 
         case ChartType.Swarm:
-          return (
+          plot = (
             <ResponsiveSwarm
               measurementData={measurementData}
               chartConfig={config}
               thingIds={groupThingIds}
             />
           );
+          break;
       }
+      return <PlotContainer>{plot}</PlotContainer>;
     },
     [measurementData, groupThingIds]
   );

@@ -47,7 +47,6 @@
     "dicom.ts": "~1.0.5",
     "file-saver": "^2.0.5",
     "fp-ts": "^2.13.1",
-    "html-to-image": "^1.11.11",
     "i18next": "19.0.0",
     "image-js": "0.35.2",
     "imjoy-rpc": "0.5.48",
