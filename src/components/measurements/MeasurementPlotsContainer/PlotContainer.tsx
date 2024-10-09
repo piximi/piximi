@@ -11,7 +11,7 @@ import {
 } from "../plots";
 import { ChartConfig, ChartType } from "../types";
 
-export const PlotContainer = () => {
+export const PlotTabs = () => {
   const measurementData = useSelector(selectPlotData);
   const { groupThingIds } = useMeasurementParameters();
   const {
