@@ -11,6 +11,7 @@ import {
 import { TrainingCallbacks } from "../../types";
 import { OldCategory, Kind, AnnotationObject } from "store/data/types";
 import { logger } from "utils/common/helpers";
+import { LoadCB } from "utils/file-io/types";
 
 export type OrphanedAnnotationObject = Omit<
   AnnotationObject,
@@ -29,9 +30,9 @@ export abstract class Segmenter extends Model {
     super.dispose();
   }
 
-  public abstract predict():
-    | OrphanedAnnotationObject[][]
-    | Promise<OrphanedAnnotationObject[][]>;
+  public abstract predict(
+    loadCb?: LoadCB
+  ): OrphanedAnnotationObject[][] | Promise<OrphanedAnnotationObject[][]>;
 
   /*
    * Concrete classes must keep track of their inference categories somehow,

@@ -6,9 +6,10 @@ import {
 } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
-import { generateUUID, logger } from "utils/common/helpers";
+import { generateUUID } from "utils/common/helpers";
 import { LoadInferenceDataArgs } from "../../types";
 import { Kind, ImageObject } from "store/data/types";
+import { LoadCB } from "utils/file-io/types";
 
 export const KIND_NAME = "stardist_nucleus";
 /*
@@ -85,7 +86,7 @@ export abstract class Stardist extends Segmenter {
     }
   }
 
-  public async predict() {
+  public async predict(loadCb?: LoadCB) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -122,8 +123,12 @@ export abstract class Stardist extends Segmenter {
         this._inferenceDataDims![idx]
       );
       annotations.push(annotObj);
-      // TODO: replace with progress animation callback
-      logger(`${idx + 1} of ${infT.length} images processed`);
+      if (loadCb) {
+        loadCb(
+          (idx + 1) / infT.length,
+          `${idx + 1} of ${infT.length} images predicted`
+        );
+      }
     }
 
     return annotations;

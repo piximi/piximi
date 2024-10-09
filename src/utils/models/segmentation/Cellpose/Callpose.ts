@@ -10,11 +10,12 @@ import {
   OrphanedAnnotationObject,
 } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCellpose } from "./predictCellpose";
-import { generateUUID, logger } from "utils/common/helpers";
+import { generateUUID } from "utils/common/helpers";
 import { FitOptions } from "../../types";
 import { ModelTask } from "../../enums";
 import { getImageSlice } from "utils/common/tensorHelpers";
 import { Kind, ImageObject } from "store/data/types";
+import { LoadCB } from "utils/file-io/types";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
@@ -115,7 +116,7 @@ export class Cellpose extends Segmenter {
     }
   }
 
-  public async predict() {
+  public async predict(loadCb?: LoadCB) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -141,8 +142,12 @@ export class Cellpose extends Segmenter {
         this._config
       );
       annotations.push(annotObj);
-      // TODO: replace with progress animation callback
-      logger(`${idx + 1} of ${infT.length} images processed`);
+      if (loadCb) {
+        loadCb(
+          (idx + 1) / infT.length,
+          `${idx + 1} of ${infT.length} images predicted`
+        );
+      }
     }
 
     return annotations;

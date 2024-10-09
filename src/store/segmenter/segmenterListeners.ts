@@ -4,6 +4,8 @@ import {
   createListenerMiddleware,
 } from "@reduxjs/toolkit";
 import * as tf from "@tensorflow/tfjs";
+import { intersection } from "lodash";
+import Image from "image-js";
 import {
   AnnotatorState,
   AppDispatch,
@@ -19,7 +21,7 @@ import { segmenterSlice } from "./segmenterSlice";
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data/dataSlice";
-import Image from "image-js";
+import { projectSlice } from "store/project/projectSlice";
 import { OrphanedAnnotationObject } from "utils/models/segmentation/AbstractSegmenter";
 import { TrainingCallbacks } from "utils/models/types";
 import { ModelStatus, Partition } from "utils/models/enums";
@@ -36,7 +38,7 @@ import {
   Shape,
 } from "store/data/types";
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
-import { intersection } from "lodash";
+import { LoadCB } from "utils/file-io/types";
 
 export const segmenterMiddleware = createListenerMiddleware();
 
@@ -177,9 +179,23 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     return;
   }
 
+  const progressCb: LoadCB = (
+    progressPercent: number,
+    progressMessage: string
+  ) => {
+    listenerAPI.dispatch(
+      projectSlice.actions.setLoadPercent({
+        loadPercent: progressPercent,
+        loadMessage: progressMessage,
+      })
+    );
+  };
+
+  progressCb(-1, "starting inference...");
+
   let predictedAnnotations: OrphanedAnnotationObject[][];
   try {
-    predictedAnnotations = await model.predict();
+    predictedAnnotations = await model.predict(progressCb);
     for (let i = 0; i < predictedAnnotations.length; i++) {
       for (let j = 0; j < predictedAnnotations[i].length; j++) {
         const bbox = predictedAnnotations[i][j].boundingBox;
@@ -207,6 +223,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       previousModelStatus,
       error as Error
     );
+    progressCb(1, "");
     return;
   }
 
@@ -299,6 +316,8 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       previousModelStatus,
       error as Error
     );
+    progressCb(1, "");
+
     return;
   }
 
@@ -307,6 +326,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       modelStatus: ModelStatus.Trained,
     })
   );
+  progressCb(1, "");
 };
 
 async function handleError(

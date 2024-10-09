@@ -66,4 +66,4 @@ export interface ImageFileShapeInfo extends ImageShapeInfo {
   ext: MIMEType;
 }
 
-export type LoadCB = (laodPercent: number, loadMessage: string) => void;
+export type LoadCB = (loadPercent: number, loadMessage: string) => void;
