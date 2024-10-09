@@ -173,7 +173,7 @@ export const ExportAnnotationsMenu = ({
               exportType
             );
             zip.generateAsync({ type: "blob" }).then((blob) => {
-              saveAs(blob, `${userProjectName + "_Matrix"}.zip`);
+              saveAs(blob, `${userProjectName}.zip`);
             });
 
             break;
