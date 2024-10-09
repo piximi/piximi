@@ -172,7 +172,12 @@ export const ImportTensorflowModelDialog = ({
 
   useEffect(() => {
     if (modelTask === ModelTask.Segmentation) {
-      if (selectedModel && selectedModel.requiredChannels !== projectChannels) {
+      if (
+        selectedModel &&
+        selectedModel.requiredChannels !== undefined &&
+        projectChannels !== undefined &&
+        selectedModel.requiredChannels !== projectChannels
+      ) {
         setInvalidModel(true);
       } else {
         setInvalidModel(false);
