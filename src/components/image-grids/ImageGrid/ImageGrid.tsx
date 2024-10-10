@@ -14,7 +14,7 @@ import { isFiltered } from "utils/common/helpers";
 import { selectActiveSelectedThingIds } from "store/project/reselectors";
 import { AnnotationObject, ImageObject } from "store/data/types";
 
-const max_images = 1000; //number of images from the project that we'll show
+const MAX_IMAGES = 1000; //number of images from the project that we'll show
 
 //NOTE: kind is passed as a prop and used internally instead of the kind returned
 // by the active kind selector to keep from rerendering the grid items when switching tabs
@@ -60,8 +60,8 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
             }}
           >
             {things
-              .slice(0, max_images)
               .sort(sortFunction)
+              .slice(0, MAX_IMAGES)
               .map((thing: ImageObject | AnnotationObject) => (
                 <ProjectGridItem
                   key={thing.id}
