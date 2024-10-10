@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { useSelector } from "react-redux";
 
-import { Box, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 
 import { ThingDetailContainer } from "./ThingDetailContainer";
 import { selectCategoryProperty } from "store/data/selectors";
@@ -18,7 +18,7 @@ type ProjectGridItemProps = {
   selected: boolean;
   handleClick: (id: string, selected: boolean) => void;
   thing: ImageObject | AnnotationObject;
-  filtered: boolean;
+  placeHolder?: boolean;
 };
 
 const getIconPosition = (
@@ -44,7 +44,7 @@ const printSize = (scale: number) => {
 };
 
 export const ProjectGridItem = memo(
-  ({ selected, handleClick, thing, filtered }: ProjectGridItemProps) => {
+  ({ selected, handleClick, thing, placeHolder }: ProjectGridItemProps) => {
     const imageSelectionColor = useSelector(selectImageSelectionColor);
     const selectedImageBorderWidth = useSelector(
       selectSelectedImageBorderWidth
@@ -62,23 +62,34 @@ export const ProjectGridItem = memo(
       handleClick(thing.id, selected);
     };
 
-    return filtered ? (
-      <></>
+    return placeHolder ? (
+      <Box>
+        Name: {thing.name}
+        <br />
+        <span style={{ color: categoryColor }}>Category: {categoryName}</span>
+        <br />
+        Width: {thing.shape.width}
+        <br />
+        Height: {thing.shape.height}
+        <br />
+        Channels: {thing.shape.channels}
+        <br />
+        Planes: {thing.shape.planes}
+        <br />
+        Partition: {thing.partition}
+      </Box>
     ) : (
-      <Grid
-        item
+      <Box
         position="relative" // must be a position element for absolutely positioned ImageIconLabel
         onClick={handleSelect}
         sx={{
-          width: printSize(scaleFactor),
-          height: printSize(scaleFactor),
-          margin: "2px",
           border: `solid ${selectedImageBorderWidth}px ${
             selected ? imageSelectionColor : "transparent"
           }`,
           borderRadius: selectedImageBorderWidth + "px",
+          width: printSize(scaleFactor),
+          height: printSize(scaleFactor),
         }}
-        //onContextMenu={() => handleContextSelectImage(itemDetails.id)}
       >
         <Box
           component="img"
@@ -107,7 +118,7 @@ export const ProjectGridItem = memo(
             thing.shape.width
           )}
         />
-      </Grid>
+      </Box>
     );
   }
 );
