@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -391,6 +391,10 @@ const ProjectTextField = () => {
     }
   };
 
+  useEffect(() => {
+    setNewProjectName(projectName);
+  }, [projectName]);
+
   return (
     <>
       {loadMessage ? (
@@ -404,6 +408,7 @@ const ProjectTextField = () => {
             onBlur={handleTextFieldBlur}
             onKeyDown={handleTextFieldEnter}
             defaultValue={projectName}
+            value={newProjectName}
             inputRef={inputRef}
             size="small"
             sx={{ ml: 5 }}
