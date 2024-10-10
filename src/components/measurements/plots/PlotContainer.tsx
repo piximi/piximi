@@ -59,7 +59,7 @@ export const PlotContainer = ({ children }: { children: ReactNode }) => {
       </Box>
       <Button
         variant="text"
-        sx={{ alignSelf: "flex-end" }}
+        sx={{ alignSelf: "flex-end", mr: 1 }}
         onClick={handleSave}
       >
         Save to PNG
