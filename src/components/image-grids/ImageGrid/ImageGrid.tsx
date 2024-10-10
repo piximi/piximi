@@ -12,9 +12,8 @@ import { DropBox } from "components/styled-components/DropBox/DropBox";
 import { selectThingFilters } from "store/project/selectors";
 import { isFiltered } from "utils/common/helpers";
 import { selectActiveSelectedThingIds } from "store/project/reselectors";
-import { AnnotationObject, ImageObject } from "store/data/types";
 
-const max_images = 1000; //number of images from the project that we'll show
+const MAX_IMAGES = 1000; //number of images from the project that we'll show
 
 //NOTE: kind is passed as a prop and used internally instead of the kind returned
 // by the active kind selector to keep from rerendering the grid items when switching tabs
@@ -60,15 +59,37 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
             }}
           >
             {things
-              .slice(0, max_images)
-              .sort(sortFunction)
-              .map((thing: ImageObject | AnnotationObject) => (
+              .map((thing) =>
+                isFiltered(thing, thingFilters ?? {})
+                  ? { filtered: true, thing }
+                  : { filtered: false, thing }
+              )
+              // doing isFiltered(...) in sort would duplicate work,
+              // so we do it above just once
+              .sort((thingContainerA, thingContainerB) => {
+                // all filtered go to bottom, regardless of "actual" sort order
+                if (thingContainerA.filtered && thingContainerB.filtered) {
+                  return 0;
+                } else if (thingContainerA.filtered) {
+                  return 1;
+                } else if (thingContainerB.filtered) {
+                  return -1;
+                }
+                // then determine "actual" sort order of non-filtered things
+                return sortFunction(
+                  thingContainerA.thing,
+                  thingContainerB.thing
+                );
+              })
+              .map((thingContainer, idx) => (
                 <ProjectGridItem
-                  key={thing.id}
-                  thing={thing}
+                  key={thingContainer.thing.id}
+                  thing={thingContainer.thing}
                   handleClick={handleSelectThing}
-                  selected={selectedThingIds.includes(thing.id)}
-                  filtered={isFiltered(thing, thingFilters ?? {})}
+                  selected={selectedThingIds.includes(thingContainer.thing.id)}
+                  // if we have more unfiltered things than MAX_IMAGES,
+                  // we filter them out too
+                  filtered={idx >= MAX_IMAGES || thingContainer.filtered}
                 />
               ))}
           </Grid>

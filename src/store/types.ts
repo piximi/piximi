@@ -63,7 +63,7 @@ export type ProjectState = {
   selectedThingIds: Array<string>;
   sortType: ThingSortKey;
   thingFilters: Record<
-    string,
+    string, // kind
     Required<Pick<FilterType<Thing>, "categoryId" | "partition">>
   >;
   highlightedCategory: string | undefined;
