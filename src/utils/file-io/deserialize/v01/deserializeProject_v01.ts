@@ -221,6 +221,7 @@ const deserializeProjectGroup = async (
     project: {
       ...initialProjectState,
       name,
+      imageChannels: images[0]?.shape.channels,
     },
     data: { images, annotations, categories, annotationCategories },
   };
