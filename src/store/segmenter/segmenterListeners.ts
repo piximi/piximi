@@ -3,7 +3,6 @@ import {
   ListenerEffectAPI,
   createListenerMiddleware,
 } from "@reduxjs/toolkit";
-import * as tf from "@tensorflow/tfjs";
 import { intersection } from "lodash";
 import Image from "image-js";
 import {
@@ -27,7 +26,10 @@ import { TrainingCallbacks } from "utils/models/types";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
-import { getStackTraceFromError } from "utils/common/helpers";
+import {
+  getPropertiesFromImage,
+  getStackTraceFromError,
+} from "utils/common/helpers";
 import { AlertType } from "utils/common/enums";
 import { AlertState } from "utils/common/types";
 import {
@@ -280,22 +282,16 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
         if (bbox[1] + height > imageJsImage.height) {
           continue;
         }
-        const annObj = imageJsImage.crop({
-          x: bbox[0],
-          y: bbox[1],
-          width,
-          height,
+
+        const { src, data } = await getPropertiesFromImage(image, {
+          boundingBox: bbox,
         });
-        const src = annObj.getCanvas().toDataURL();
         const shape: Shape = {
           planes: 1,
           channels: image.shape.channels,
           width,
           height,
         };
-        const data = tf.tidy(() =>
-          tf.browser.fromPixels(annObj).expandDims(1)
-        ) as tf.Tensor4D;
 
         ann.src = src;
         ann.data = data;
