@@ -55,7 +55,7 @@ import { ConfirmationDialog } from "components/dialogs";
 import { ImageCategoryMenu } from "components/menus";
 import { Partition } from "utils/models/enums";
 import { dataSlice } from "store/data";
-import { pluralize } from "utils/common/helpers";
+import { isUnknownCategory, pluralize } from "utils/common/helpers";
 
 const minZoom = 0.6;
 const maxZoom = 4;
@@ -322,7 +322,9 @@ const CategorizeChip = ({
     const updates = unfilteredSelectedThings.map((thingId) => ({
       id: thingId,
       categoryId: categoryId,
-      partition: Partition.Unassigned,
+      partition: isUnknownCategory(categoryId)
+        ? Partition.Inference
+        : Partition.Unassigned,
     }));
     dispatch(
       dataSlice.actions.updateThings({
