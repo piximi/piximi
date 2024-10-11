@@ -24,7 +24,7 @@ import { dataSlice } from "store/data/dataSlice";
 import { projectSlice } from "store/project/projectSlice";
 import { OrphanedAnnotationObject } from "utils/models/segmentation/AbstractSegmenter";
 import { TrainingCallbacks } from "utils/models/types";
-import { ModelStatus, Partition } from "utils/models/enums";
+import { ModelStatus } from "utils/models/enums";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
 import { getStackTraceFromError } from "utils/common/helpers";
@@ -149,16 +149,6 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
 
     return;
   }
-
-  listenerAPI.dispatch(
-    dataSlice.actions.updateThings({
-      updates: inferenceImages.map((image) => ({
-        id: image.id,
-        partition: Partition.Inference,
-      })),
-      isPermanent: true,
-    })
-  );
 
   /* PREDICT */
 
