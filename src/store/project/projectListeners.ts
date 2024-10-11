@@ -110,3 +110,25 @@ startAppListening({
     );
   },
 });
+
+startAppListening({
+  predicate: (action, currentState, previousState) => {
+    return (
+      currentState.project.imageChannels !== previousState.project.imageChannels
+    );
+  },
+  effect: async (action, listenerApi) => {
+    const { classifier } = listenerApi.getState();
+
+    if (action.payload.channels) {
+      listenerApi.dispatch(
+        classifierSlice.actions.updateInputShape({
+          inputShape: {
+            ...classifier.inputShape,
+            channels: action.payload.channels,
+          },
+        })
+      );
+    }
+  },
+});
