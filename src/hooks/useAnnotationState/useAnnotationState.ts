@@ -1,5 +1,5 @@
 import { AnnotationTool } from "utils/annotator/tools";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { annotatorSlice } from "store/annotator";
 import { selectAnnotationSelectionMode } from "store/annotator/selectors";
@@ -24,6 +24,7 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
     selectCategoryById(state, selectedCategoryId!)
   );
   const defaultSelectedCategory = useSelector(selectFirstUnknownCategory);
+  const [noKindAvailable, setNoKindAvailable] = useState<boolean>(false);
 
   const onAnnotating = useMemo(() => {
     const func = () => {
@@ -42,7 +43,10 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
       if (selectionMode !== AnnotationMode.New) return;
 
       if (!selectedCategory) {
-        if (!defaultSelectedCategory) return;
+        if (!defaultSelectedCategory) {
+          setNoKindAvailable(true);
+          return;
+        }
         dispatch(
           imageViewerSlice.actions.setSelectedCategoryId({
             selectedCategoryId: defaultSelectedCategory.id,
@@ -97,4 +101,6 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
     annotationTool.registerOnAnnotatingHandler(onAnnotating);
     annotationTool.registerOnDeselectHandler(onDeselect);
   }, [annotationTool, onAnnotated, onAnnotating, onDeselect]);
+
+  return { noKindAvailable, setNoKindAvailable };
 };
