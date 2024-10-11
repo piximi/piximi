@@ -24,7 +24,7 @@ import {
   ImageShapeInfo,
   MIMEType,
 } from "utils/file-io/types";
-import { updateRecord } from "utils/common/helpers";
+import { isUnknownCategory, updateRecord } from "utils/common/helpers";
 import { AlertType } from "utils/common/enums";
 import {
   Box,
@@ -44,6 +44,7 @@ import {
 } from "store/project/selectors";
 import { projectSlice } from "store/project";
 import { ConfirmationDialog } from "components/dialogs";
+import { Partition } from "utils/models/enums";
 
 type ImageShapeInfoImage = ImageFileShapeInfo & {
   fileName: string;
@@ -260,6 +261,11 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
             numChannels!
           );
           imageToUpload.categoryId = selectedCategory ?? unknownCategory;
+          imageToUpload.partition =
+            !selectedCategory ||
+            (selectedCategory && isUnknownCategory(selectedCategory))
+              ? Partition.Inference
+              : Partition.Unassigned;
           imageToUpload.kind = kind;
 
           convertedImages.push(imageToUpload);
@@ -275,6 +281,11 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
           dataSlice.actions.addThings({
             things: convertedImages,
             isPermanent: true,
+          })
+        );
+        dispatch(
+          projectSlice.actions.selectThings({
+            ids: convertedImages.map((im) => im.id),
           })
         );
       }
