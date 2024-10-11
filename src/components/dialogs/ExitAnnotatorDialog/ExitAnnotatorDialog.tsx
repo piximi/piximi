@@ -3,6 +3,7 @@ import { ConfirmationDialog } from "../ConfirmationDialog";
 import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data/dataSlice";
 import { selectActiveImageId } from "store/imageViewer/selectors";
+import { annotatorSlice } from "store/annotator";
 
 type ExitAnnotatorDialogProps = {
   returnToProject: () => void;
@@ -29,6 +30,10 @@ export const ExitAnnotatorDialog = ({
       );
       dispatch(dataSlice.actions.reconcile({ keepChanges: true }));
       dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
+      dispatch(
+        imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })
+      );
+      dispatch(annotatorSlice.actions.resetAnnotator());
     });
     returnToProject();
   };
@@ -42,6 +47,10 @@ export const ExitAnnotatorDialog = ({
         })
       );
       dispatch(dataSlice.actions.reconcile({ keepChanges: false }));
+      dispatch(
+        imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })
+      );
+      dispatch(annotatorSlice.actions.resetAnnotator());
     });
     returnToProject();
   };

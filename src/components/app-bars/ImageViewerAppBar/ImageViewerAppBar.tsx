@@ -45,6 +45,11 @@ export const ImageViewerAppBar = () => {
           })
         );
         dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
+        dispatch(
+          imageViewerSlice.actions.setWorkingAnnotation({
+            annotation: undefined,
+          })
+        );
       });
       navigate("/");
     }
