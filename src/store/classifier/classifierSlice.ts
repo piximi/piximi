@@ -20,8 +20,8 @@ export const initialState: ClassifierState = {
   modelStatus: ModelStatus.Uninitialized,
   inputShape: {
     planes: 1,
-    height: 256,
-    width: 256,
+    height: 64,
+    width: 64,
     channels: 3,
   },
   fitOptions: {

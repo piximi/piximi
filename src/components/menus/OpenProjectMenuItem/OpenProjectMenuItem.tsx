@@ -8,7 +8,6 @@ import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";
 
-import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data/dataSlice";
 import { deserializeProject } from "utils/file-io/deserialize";
 import { fListToStore } from "utils/file-io/zarrStores";
@@ -58,11 +57,7 @@ export const OpenProjectMenuItem = ({
         batch(() => {
           // indefinite load until dispatches complete
           dispatch(projectSlice.actions.setLoadPercent({ loadPercent: -1 }));
-          dispatch(classifierSlice.actions.resetClassifier());
-          dispatch(segmenterSlice.actions.resetSegmenter());
-          dispatch(imageViewerSlice.actions.resetImageViewer());
           dispatch(projectSlice.actions.resetProject());
-
           dispatch(dataSlice.actions.initializeState({ data: res.data }));
           // loadPerecnt set to 1 here
           dispatch(
