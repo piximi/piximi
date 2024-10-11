@@ -407,7 +407,6 @@ const ProjectTextField = () => {
             onChange={handleTextFieldChange}
             onBlur={handleTextFieldBlur}
             onKeyDown={handleTextFieldEnter}
-            defaultValue={projectName}
             value={newProjectName}
             inputRef={inputRef}
             size="small"

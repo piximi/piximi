@@ -2,12 +2,7 @@ import { Tensor4D } from "@tensorflow/tfjs";
 import { DataArray } from "utils/file-io/types";
 import { BitDepth } from "image-js";
 import { Partition } from "utils/models/enums";
-import {
-  Colors,
-  PartialBy,
-  RequireField,
-  RequireOnly,
-} from "utils/common/types";
+import { Colors, PartialBy, RequireOnly } from "utils/common/types";
 
 export type Thing = {
   id: string;
@@ -45,7 +40,14 @@ export type PartialDecodedAnnotationObject = PartialBy<
   "src" | "data" | "name" | "kind" | "bitDepth" | "shape"
 >;
 
-export type Category = RequireField<OldCategory, "containing" | "kind">;
+export type Category = {
+  color: string; // 3 byte hex, eg. "#a08cd2"
+  id: string;
+  name: string;
+  visible: boolean;
+  containing: string[];
+  kind: string;
+};
 
 export type Kind = {
   id: string;
@@ -84,14 +86,7 @@ export type OldImageType = {
   containing?: string[]; // The URI to be displayed on the canvas
 };
 
-export type OldCategory = {
-  color: string; // 3 byte hex, eg. "#a08cd2"
-  id: string;
-  name: string;
-  visible: boolean;
-  containing?: string[];
-  kind?: string;
-};
+export type OldCategory = PartialBy<Category, "containing" | "kind">;
 
 export type OldAnnotationType = {
   id: string;

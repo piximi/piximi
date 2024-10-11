@@ -21,8 +21,9 @@ startAppListening({
   },
   effect: async (action, listenerAPI) => {
     if (
-      action.payload.hasOwnProperty("isPermanent") &&
-      !action.payload.isPermanent
+      !action.payload ||
+      (action.payload.hasOwnProperty("isPermanent") &&
+        !action.payload.isPermanent)
     )
       return;
     const { data: dataState, measurements: measurementState } =
