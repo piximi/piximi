@@ -63,7 +63,16 @@ export const ProjectGridItem = memo(
     };
 
     return placeHolder ? (
-      <Box>
+      <Box
+        sx={{
+          border: `solid ${selectedImageBorderWidth}px ${
+            selected ? imageSelectionColor : "transparent"
+          }`,
+          borderRadius: selectedImageBorderWidth + "px",
+          width: printSize(scaleFactor),
+          height: printSize(scaleFactor),
+        }}
+      >
         Name: {thing.name}
         <br />
         <span style={{ color: categoryColor }}>Category: {categoryName}</span>
