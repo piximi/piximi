@@ -84,8 +84,9 @@ startAppListening({
 
       let annotationName: string = `${activeImage.name}-${kind}_0`;
       let i = 1;
-      while (annotationName in currentAnnotationNames) {
-        annotationName = annotationName.split("_")[0] + `_${i}`;
+      while (currentAnnotationNames.includes(annotationName)) {
+        annotationName = annotationName.replace(/_(\d+)$/, `_${i}`);
+        i++;
       }
 
       listenerAPI.dispatch(
