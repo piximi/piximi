@@ -27,7 +27,7 @@ import { ModelStatus } from "utils/models/enums";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
 import {
-  getPropertiesFromImage,
+  getPropertiesFromImageSync,
   getStackTraceFromError,
 } from "utils/common/helpers";
 import { AlertType } from "utils/common/enums";
@@ -273,7 +273,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
           continue;
         }
 
-        const { src, data } = await getPropertiesFromImage(image, {
+        const { src, data } = getPropertiesFromImageSync(imageJsImage, image, {
           boundingBox: bbox,
         });
         const shape: Shape = {
