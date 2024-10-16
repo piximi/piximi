@@ -32,6 +32,12 @@ export type AlertState = {
   visible?: boolean;
 };
 
+export type LoadStatus = {
+  loading: boolean;
+  value?: number;
+  message?: string;
+};
+
 /*
 GENERATOR TYPES
 */

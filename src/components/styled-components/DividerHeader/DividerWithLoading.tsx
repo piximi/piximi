@@ -1,13 +1,14 @@
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { ReactNode } from "react";
+import { LoadStatus } from "utils/common/types";
 
 export const DividerWithLoading = ({
   title,
-  loading,
+  loadStatus,
   loadedStateIcon,
 }: {
   title: string;
-  loading: boolean;
+  loadStatus: LoadStatus;
   loadedStateIcon?: ReactNode;
 }) => {
   return (
@@ -42,7 +43,7 @@ export const DividerWithLoading = ({
           flexGrow: 1,
         })}
       />
-      {loading ? (
+      {loadStatus.loading ? (
         <Box
           sx={{
             p: 0,
@@ -52,7 +53,23 @@ export const DividerWithLoading = ({
             alignItems: "center",
           }}
         >
-          <CircularProgress size="1.25rem" />
+          <CircularProgress
+            size="1.25rem"
+            variant={loadStatus.value ? "determinate" : "indeterminate"}
+            value={loadStatus.value}
+            sx={
+              loadStatus.value
+                ? {
+                    transition:
+                      "transform 10ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+                    "& .MuiCircularProgress-circle": {
+                      transition:
+                        "transform 10ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+                    },
+                  }
+                : {}
+            }
+          />
         </Box>
       ) : (
         <>{loadedStateIcon}</>

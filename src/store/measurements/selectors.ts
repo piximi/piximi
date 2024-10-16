@@ -24,7 +24,7 @@ export const selectSelectedGroupMeasurements = createSelector(
   (tables) => (tableId: string) => {
     const selectedMeasurements: string[] = [];
     const table = tables[tableId];
-    const tableMeasurements = Object.values(table.measurementsStatus);
+    const tableMeasurements = Object.values(table.measurementStates);
 
     const parents = tableMeasurements.filter(
       (measurement) => measurement.children && measurement.children.length
@@ -46,7 +46,7 @@ export const selectSelectedGroupSplits = createSelector(
   (tables) => (tableId: string) => {
     const selectedSplits: string[] = [];
     const table = tables[tableId];
-    const tableSplits = Object.values(table.splitStatus);
+    const tableSplits = Object.values(table.splitStates);
 
     const parents = tableSplits.filter(
       (split) => split.children && split.children.length

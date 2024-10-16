@@ -54,10 +54,10 @@ export const selectGroupMeasurementDisplayData = createSelector(
 
       const thingsOfKind = group.thingIds.map((thingId) => things[thingId]);
 
-      Object.values(group.measurementsStatus).forEach((measurement) => {
+      Object.values(group.measurementStates).forEach((measurement) => {
         if (!measurement.children && measurement.state === "on") {
           const rows: DisplayTableRow[] = [];
-          Object.values(group.splitStatus).forEach((split) => {
+          Object.values(group.splitStates).forEach((split) => {
             if (split.state === "on" && split.parent) {
               const splitThings = thingsOfKind.reduce(
                 (ids: string[], thing) => {

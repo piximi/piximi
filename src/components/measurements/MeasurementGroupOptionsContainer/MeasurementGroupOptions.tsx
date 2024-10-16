@@ -20,6 +20,7 @@ import { useState } from "react";
 import { useTableExport } from "components/measurements/hooks";
 import { SplitTree } from "./SplitTree";
 import { MeasurementsTree } from "./MeasurementTree";
+import { LoadStatus } from "utils/common/types";
 
 export const MeasurementGroupOptions = ({
   table,
@@ -31,7 +32,7 @@ export const MeasurementGroupOptions = ({
   handleTableExpand: (tableId: string) => void;
 }) => {
   const theme = useTheme();
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<LoadStatus>({ loading: false });
   const dispatch = useDispatch();
   const handleRemoveTable = (tableId: string) => {
     dispatch(measurementsSlice.actions.removeGroup({ groupId: tableId }));
@@ -90,12 +91,12 @@ export const MeasurementGroupOptions = ({
           >
             Splits
           </DividerHeader>
-          <SplitTree group={table} loading={loading} />
-          <DividerWithLoading title="Measurements" loading={loading} />
+          <SplitTree group={table} measurementStatus={status} />
+          <DividerWithLoading title="Measurements" loadStatus={status} />
           <MeasurementsTree
             group={table}
-            loading={loading}
-            setLoading={setLoading}
+            measurementStatus={status}
+            setMeasurementStatus={setStatus}
           />
           <Box
             sx={{

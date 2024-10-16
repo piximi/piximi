@@ -3,7 +3,7 @@ import { Partition } from "utils/models/enums";
 
 export type MeasurementsState = {
   data: MeasurementsData;
-  status: MeasurementOptions;
+  state: MeasurementOptions;
   groups: Record<string, MeasurementGroup>;
 };
 export interface MeasurementOption {
@@ -23,8 +23,8 @@ export type MeasurementGroup = {
   id: string;
   kind: string;
   name: string;
-  measurementsStatus: MeasurementOptions;
-  splitStatus: MeasurementOptions;
+  measurementStates: MeasurementOptions;
+  splitStates: MeasurementOptions;
   thingIds: string[];
   upToDate: boolean;
 };

@@ -13,7 +13,7 @@ export const MeasurementGroupOptionsContainer = () => {
   const [expandedTable, setExpandedTable] = useState<string | undefined>();
 
   const {
-    loading,
+    status,
     handleCloseTableDialog,
     handleCreateTable,
     handleOpenTableDialog,
@@ -31,7 +31,7 @@ export const MeasurementGroupOptionsContainer = () => {
     <>
       <DividerWithLoading
         title="Tables"
-        loading={loading}
+        loadStatus={status}
         loadedStateIcon={
           <>
             <IconButton

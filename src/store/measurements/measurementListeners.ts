@@ -39,7 +39,7 @@ startAppListening({
       }
 
       const { splitUpdates, deletedCats } = updateCategories(
-        group.splitStatus,
+        group.splitStates,
         kind.categories,
         dataState.categories.entities
       );
@@ -63,9 +63,7 @@ startAppListening({
       const unsavedThings: string[] = [];
       if (unmeasuredThings.length) {
         // Turns measurements off -- Users need to manually recalculate new values
-        const inactiveMeasurements = resetMeasurements(
-          group.measurementsStatus
-        );
+        const inactiveMeasurements = resetMeasurements(group.measurementStates);
         listenerAPI.dispatch(
           measurementsSlice.actions.updateGroupMeasurementState({
             groupId: group.id,
@@ -122,21 +120,21 @@ const resetMeasurements = (measurements: MeasurementOptions) => {
 };
 
 const updateCategories = (
-  status: MeasurementOptions,
+  state: MeasurementOptions,
   kindCategories: string[],
   categoryEntities: DeferredDictionary<Category>
 ) => {
-  const groupCats = status["categoryId"].children!;
+  const groupCats = state["categoryId"].children!;
   const newCats = difference(kindCategories, groupCats);
   const deletedCats = difference(groupCats, kindCategories);
   const persistingCats = intersection(
-    status["categoryId"].children!,
+    state["categoryId"].children!,
     kindCategories
   );
 
   const newNames = persistingCats.reduce(
     (newNames: { id: string; name: string }[], id) => {
-      if (status[id]!.name !== categoryEntities[id]!.saved.name) {
+      if (state[id]!.name !== categoryEntities[id]!.saved.name) {
         newNames.push({
           id,
           name: categoryEntities[id]!.saved.name,
@@ -150,7 +148,7 @@ const updateCategories = (
   const splitUpdates: RecursivePartial<MeasurementOptions> = {};
   if (newCats.length || deletedCats.length || newNames) {
     splitUpdates["categoryId"] = {
-      ...status["categoryId"],
+      ...state["categoryId"],
       children: kindCategories,
     };
     newCats.forEach((id) => {
@@ -163,7 +161,7 @@ const updateCategories = (
     });
     newNames.forEach(({ id, name }) => {
       splitUpdates[id] = {
-        ...status[id],
+        ...state[id],
         name,
       };
     });

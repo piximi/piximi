@@ -17,6 +17,8 @@ self.onmessage = async (
   }>
 ) => {
   const thingInfo: ThingData = {};
+  const thingCount = e.data.things.length;
+  let i = 0;
   for await (const thingData of e.data.things) {
     const { id, data: rawData, encodedMask, decodedMask } = thingData;
 
@@ -27,6 +29,9 @@ self.onmessage = async (
       decodedMask,
     });
     thingInfo[id] = preparedThing;
+    /* eslint-disable-next-line no-restricted-globals */
+    self.postMessage({ loadValue: Math.floor((i / thingCount) * 100) });
+    i++;
   }
   /* eslint-disable-next-line no-restricted-globals */
   self.postMessage({ kind: e.data.kind, data: thingInfo });

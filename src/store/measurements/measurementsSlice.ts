@@ -15,7 +15,7 @@ import { Partition } from "utils/models/enums";
 
 const initialState: MeasurementsState = {
   data: {},
-  status: baseMeasurementOptions,
+  state: baseMeasurementOptions,
   groups: {},
 };
 
@@ -32,8 +32,8 @@ export const measurementsSlice = createSlice({
       const measurementOptions: MeasurementOptions = {};
       const channelOptions: MeasurementOptions = {};
       const numChannels = action.payload.numChannels;
-      for (const measurement in state.status) {
-        const option = state.status[measurement];
+      for (const measurement in state.state) {
+        const option = state.state[measurement];
         if (!option.children) {
           option.children = [];
           let i = 0;
@@ -51,7 +51,7 @@ export const measurementsSlice = createSlice({
           measurementOptions[measurement] = option;
         }
       }
-      Object.assign(state.status, measurementOptions, channelOptions);
+      Object.assign(state.state, measurementOptions, channelOptions);
     },
     createGroup(
       state,
@@ -74,7 +74,7 @@ export const measurementsSlice = createSlice({
         replicateNumber++;
       }
 
-      const groupSplitStatus: MeasurementOptions = {
+      const groupSplitState: MeasurementOptions = {
         categoryId: {
           id: "categoryId",
           name: "Category",
@@ -89,7 +89,7 @@ export const measurementsSlice = createSlice({
         },
       };
       categories.forEach((c) => {
-        groupSplitStatus[c.id] = {
+        groupSplitState[c.id] = {
           id: c.id,
           name: c.name,
           state: "off",
@@ -97,7 +97,7 @@ export const measurementsSlice = createSlice({
         };
       });
       Object.keys(Partition).forEach((p) => {
-        groupSplitStatus[p.toLowerCase()] = {
+        groupSplitState[p.toLowerCase()] = {
           id: p.toLowerCase(),
           name: p,
           state: "off",
@@ -105,7 +105,7 @@ export const measurementsSlice = createSlice({
         };
       });
 
-      const groupMeasurementStatus: MeasurementOptions = {};
+      const groupMeasurementState: MeasurementOptions = {};
       for (const measurement in baseMeasurementOptions) {
         const option = { ...baseMeasurementOptions[measurement] };
         if (
@@ -118,7 +118,7 @@ export const measurementsSlice = createSlice({
             let i = 0;
             while (i < numChannels!) {
               const id = `${measurement}-channel-${i}`;
-              groupMeasurementStatus[id] = {
+              groupMeasurementState[id] = {
                 id,
                 name: `Channel ${i}`,
                 state: "off",
@@ -128,7 +128,7 @@ export const measurementsSlice = createSlice({
               i++;
             }
           }
-          groupMeasurementStatus[measurement] = option;
+          groupMeasurementState[measurement] = option;
         }
       }
 
@@ -136,8 +136,8 @@ export const measurementsSlice = createSlice({
         id: groupId,
         name: candidateName,
         kind: kind,
-        measurementsStatus: groupMeasurementStatus,
-        splitStatus: groupSplitStatus,
+        measurementStates: groupMeasurementState,
+        splitStates: groupSplitState,
         thingIds: thingIds,
         upToDate: true,
       } as MeasurementGroup;
@@ -153,8 +153,8 @@ export const measurementsSlice = createSlice({
       }>
     ) {
       const { groupId, updates } = action.payload;
-      state.groups[groupId].measurementsStatus = merge(
-        state.groups[groupId].measurementsStatus,
+      state.groups[groupId].measurementStates = merge(
+        state.groups[groupId].measurementStates,
         updates
       );
     },
@@ -172,8 +172,8 @@ export const measurementsSlice = createSlice({
       }>
     ) {
       const { groupId, updates } = action.payload;
-      state.groups[groupId].splitStatus = merge(
-        state.groups[groupId].splitStatus,
+      state.groups[groupId].splitStates = merge(
+        state.groups[groupId].splitStates,
         updates
       );
     },
@@ -188,8 +188,8 @@ export const measurementsSlice = createSlice({
     ) {
       const { groupId, remove, updates } = action.payload;
       if (updates) {
-        state.groups[groupId].splitStatus = mergeWith(
-          state.groups[groupId].splitStatus,
+        state.groups[groupId].splitStates = mergeWith(
+          state.groups[groupId].splitStates,
           updates,
           (
             objValue: MeasurementOptions,
@@ -204,7 +204,7 @@ export const measurementsSlice = createSlice({
 
       if (remove) {
         remove.forEach((id) => {
-          delete state.groups[groupId].splitStatus[id];
+          delete state.groups[groupId].splitStates[id];
         });
       }
     },
