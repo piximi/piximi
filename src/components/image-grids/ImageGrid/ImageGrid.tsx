@@ -15,7 +15,7 @@ import { ProjectGridItem } from "../ProjectGridItem";
 import { useSortFunction } from "hooks";
 import { DropBox } from "components/styled-components/DropBox/DropBox";
 import { selectThingFilters } from "store/project/selectors";
-import { isFiltered } from "utils/common/helpers";
+import { getInnerElementWidth, isFiltered } from "utils/common/helpers";
 import { selectActiveSelectedThingIds } from "store/project/reselectors";
 import { selectTileSize } from "store/applicationSettings/selectors";
 
@@ -29,6 +29,8 @@ type CellData = {
   numColumns: number;
 };
 
+const GRID_GAP = 18;
+const DEFAULT_ITEM_WIDTH = 220;
 const createItemData = memoize(
   (
     things: Things,
@@ -109,15 +111,20 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
       if (gridRef && gridRef.current) {
         const numVisible = visibleThings.length;
 
-        const _gridContainerWidth = gridRef.current.offsetWidth;
+        const _gridContainerWidth = getInnerElementWidth(gridRef.current);
         const _gridContainerHeight = gridRef.current.offsetHeight;
 
-        const _columnWidth = 220 * scaleFactor + 18;
-        const _rowHeight = _columnWidth;
-        const _maxNumColumns = Math.floor(_gridContainerWidth / _columnWidth);
-        const _gridWidth = _maxNumColumns * _columnWidth;
+        const _calculatedColumnWidth =
+          DEFAULT_ITEM_WIDTH * scaleFactor + GRID_GAP;
+        const _maxNumColumns = Math.floor(
+          _gridContainerWidth / _calculatedColumnWidth
+        );
+
         const _numColumns =
           numVisible > _maxNumColumns ? _maxNumColumns : numVisible;
+        const _columnWidth = _gridContainerWidth / _numColumns;
+        const _rowHeight = _columnWidth;
+        const _gridWidth = _gridContainerWidth;
         const _numVirtualRows = Math.ceil(numVisible / _numColumns);
         const _gridHeight = _gridContainerHeight;
 
@@ -153,9 +160,14 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
       <>
         <Container
           sx={(theme) => ({
-            paddingBottom: theme.spacing(8),
+            paddingBottom: `${GRID_GAP}px`,
+            pl: `${GRID_GAP}px`,
+            pr: 0,
+            "@media (min-width: 600px)": {
+              pl: `${GRID_GAP}px`,
+              pr: 0,
+            },
             height: "100%",
-            overflowY: "scroll",
           })}
           maxWidth={false}
           ref={gridRef}
