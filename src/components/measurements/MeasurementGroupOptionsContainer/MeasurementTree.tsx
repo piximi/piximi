@@ -5,7 +5,7 @@ import {
 } from "store/measurements/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { MeasurementOptions, MeasurementGroup } from "store/measurements/types";
-import { RecursivePartial } from "utils/common/types";
+import { LoadStatus, RecursivePartial } from "utils/common/types";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
 import { SelectionTree } from "components/styled-components";
 import { isObjectEmpty } from "utils/common/helpers";
@@ -15,12 +15,12 @@ import { selectTreeItemChildren } from "../utils";
 
 export const MeasurementsTree = ({
   group,
-  setLoading,
-  loading,
+  setMeasurementStatus,
+  measurementStatus,
 }: {
   group: MeasurementGroup;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  loading: boolean;
+  setMeasurementStatus: React.Dispatch<React.SetStateAction<LoadStatus>>;
+  measurementStatus: LoadStatus;
 }) => {
   const dispatch = useDispatch();
   const selectedMeasurements = useSelector(selectSelectedGroupMeasurements)(
@@ -34,24 +34,24 @@ export const MeasurementsTree = ({
   );
 
   const handleSelect = (event: React.SyntheticEvent, itemIds: string[]) => {
-    if (loading) return;
+    if (measurementStatus.loading) return;
 
     const itemId = xor(itemIds, selectedMeasurements)[0];
     const updates: RecursivePartial<MeasurementOptions> = {};
-    const updatedSelectionStatus = selectedMeasurements.includes(itemId)
+    const updatedSelectionState = selectedMeasurements.includes(itemId)
       ? "off"
       : "on";
     selectTreeItemChildren(
       updates,
       itemId,
-      group.measurementsStatus,
-      updatedSelectionStatus
+      group.measurementStates,
+      updatedSelectionState
     );
 
     const activeMeasurements = prepareActiveMeasurements(updates);
 
     if (window.Worker) {
-      setLoading(true);
+      setMeasurementStatus({ loading: true });
       measurementWorker.postMessage({
         currentMeasurements: measurementData,
         activeMeasurements,
@@ -69,24 +69,32 @@ export const MeasurementsTree = ({
   useEffect(() => {
     if (window.Worker) {
       measurementWorker.onmessage = (
-        e: MessageEvent<Record<string, Record<string, number>>>
+        e: MessageEvent<
+          | { data: Record<string, Record<string, number>>; loadValue?: number }
+          | { loadValue: number; data?: Record<string, Record<string, number>> }
+        >
       ) => {
-        setLoading(false);
-        if (!isObjectEmpty(e.data)) {
-          dispatch(
-            measurementsSlice.actions.updateMeasurements({
-              measurementsDict: e.data,
-            })
-          );
+        if (e.data.loadValue) {
+          setMeasurementStatus({ loading: true, value: e.data.loadValue });
+        }
+        if (e.data.data) {
+          setMeasurementStatus({ loading: false });
+          if (!isObjectEmpty(e.data.data)) {
+            dispatch(
+              measurementsSlice.actions.updateMeasurements({
+                measurementsDict: e.data.data,
+              })
+            );
+          }
         }
       };
     }
-  }, [measurementWorker, dispatch, setLoading]);
+  }, [measurementWorker, dispatch, setMeasurementStatus]);
 
   return (
     <Box>
       <SelectionTree
-        treeItems={group.measurementsStatus}
+        treeItems={group.measurementStates}
         selectedItems={selectedMeasurements}
         handleSelect={handleSelect}
         checkboxSize="small"

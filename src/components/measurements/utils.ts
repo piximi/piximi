@@ -72,25 +72,25 @@ export const getHistogramData = (
 };
 
 /*
-  Given a selection tree item, updates the selection status of all of its children
+  Given a selection tree item, updates the selection state of all of its children
 */
 export const selectTreeItemChildren = (
   updates: RecursivePartial<MeasurementOptions>,
   itemId: string,
   items: MeasurementOptions,
-  selectionStatus: "on" | "off"
+  selectionState: "on" | "off"
 ) => {
   const dataItem = items[itemId];
   if (dataItem) {
     // data item exists
     updates[dataItem.id as keyof MeasurementOptions] = {
-      state: selectionStatus,
+      state: selectionState,
       children: dataItem.children,
     };
     if (dataItem.children) {
       // data item has children, select or deselect all children
       dataItem.children.forEach((child) => {
-        selectTreeItemChildren(updates, child, items, selectionStatus);
+        selectTreeItemChildren(updates, child, items, selectionState);
       });
     }
   }

@@ -17,6 +17,8 @@ self.onmessage = async (
 ) => {
   const { currentMeasurements, activeMeasurements, thingIds } = e.data;
   const newMeasurements: Record<string, Record<string, number>> = {};
+  const measurementCount = activeMeasurements.length;
+  let i = 0;
   activeMeasurements.forEach((measurement) => {
     if (measurement.includes("intensity")) {
       const measurementdetails = measurement.split("-channel-");
@@ -241,9 +243,12 @@ self.onmessage = async (
         });
       }
     }
+    /* eslint-disable-next-line no-restricted-globals */
+    self.postMessage({ loadValue: Math.floor((i / measurementCount) * 100) });
+    i++;
   });
   /* eslint-disable-next-line no-restricted-globals */
-  self.postMessage(newMeasurements);
+  self.postMessage({ data: newMeasurements });
 };
 
 export {};

@@ -18,6 +18,7 @@ import { useDialogHotkey } from "hooks";
 import { HotkeyContext } from "utils/common/enums";
 import { DataArray } from "image-js";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
+import { LoadStatus } from "utils/common/types";
 
 export const useMeasurementParameters = () => {
   return useContext(MeasurementsContext)!;
@@ -130,7 +131,7 @@ export const useCreateMeasurementTable = () => {
   const kinds = useSelector(selectKindDictionary);
   const thingData = useSelector(selectThingsDictionary);
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<LoadStatus>({ loading: false });
   const worker: Worker = useMemo(
     () =>
       new Worker(new URL("./workers/prepareDataWorker.ts", import.meta.url)),
@@ -167,7 +168,7 @@ export const useCreateMeasurementTable = () => {
     });
 
     if (window.Worker) {
-      setLoading(true);
+      setStatus({ loading: true });
       worker.postMessage({ kind: kind, things: convertedThingData });
     }
   };
@@ -175,34 +176,43 @@ export const useCreateMeasurementTable = () => {
   useEffect(() => {
     if (window.Worker) {
       worker.onmessage = (
-        e: MessageEvent<{
-          kind: string;
-          data: ThingData;
-        }>
+        e: MessageEvent<
+          | {
+              kind: string;
+              data: ThingData;
+              loadValue?: number;
+            }
+          | { loadValue: number; kind?: string; data?: ThingData }
+        >
       ) => {
-        const numChannels = Object.values(e.data.data)[0].channels.length;
-        batch(() => {
-          dispatch(
-            measurementsSlice.actions.createGroup({
-              kind: e.data.kind,
-              categories: categoriesByKind(e.data.kind),
-              thingIds: Object.keys(e.data.data),
-              numChannels,
-            })
-          );
-          dispatch(
-            measurementsSlice.actions.updateMeasurements({
-              dataDict: e.data.data,
-            })
-          );
-        });
-        setLoading(false);
+        if (e.data.loadValue) {
+          setStatus({ loading: true, value: e.data.loadValue });
+        }
+        if (e.data.data && e.data.kind) {
+          const numChannels = Object.values(e.data.data)[0].channels.length;
+          batch(() => {
+            dispatch(
+              measurementsSlice.actions.createGroup({
+                kind: e.data.kind!,
+                categories: categoriesByKind(e.data.kind!),
+                thingIds: Object.keys(e.data.data!),
+                numChannels,
+              })
+            );
+            dispatch(
+              measurementsSlice.actions.updateMeasurements({
+                dataDict: e.data.data,
+              })
+            );
+          });
+          setStatus({ loading: false });
+        }
       };
     }
   }, [worker, dispatch, categoriesByKind]);
 
   return {
-    loading,
+    status,
     handleOpenTableDialog,
     handleCloseTableDialog,
     isTableDialogOpen,
