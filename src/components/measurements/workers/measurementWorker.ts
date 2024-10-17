@@ -18,7 +18,14 @@ self.onmessage = async (
   const { currentMeasurements, activeMeasurements, thingIds } = e.data;
   const newMeasurements: Record<string, Record<string, number>> = {};
   const measurementCount = activeMeasurements.length;
-  let i = 0;
+  const thingCount = thingIds.length;
+  const postLoadPercent = (num: number) => {
+    /* eslint-disable-next-line no-restricted-globals */
+    self.postMessage({
+      loadValue: Math.floor((num / (measurementCount * thingCount)) * 100),
+    });
+  };
+  let numCounted = 0;
   activeMeasurements.forEach((measurement) => {
     if (measurement.includes("intensity")) {
       const measurementdetails = measurement.split("-channel-");
@@ -57,6 +64,8 @@ self.onmessage = async (
           }
           measuredChannel.dispose();
         }
+
+        postLoadPercent(++numCounted);
       });
     } else if (measurement.includes("geometry")) {
       if (measurement.includes("area")) {
@@ -78,6 +87,8 @@ self.onmessage = async (
               newMeasurements[thingId] = { [measurement]: result };
             }
           }
+
+          postLoadPercent(++numCounted);
         });
       }
       if (measurement.includes("perimeter")) {
@@ -100,6 +111,8 @@ self.onmessage = async (
               newMeasurements[thingId] = { [measurement]: result };
             }
           }
+
+          postLoadPercent(++numCounted);
         });
       }
       if (measurement.includes("extent")) {
@@ -123,6 +136,8 @@ self.onmessage = async (
               newMeasurements[thingId] = { [measurement]: result };
             }
           }
+
+          postLoadPercent(++numCounted);
         });
       }
       if (measurement.includes("bbox")) {
@@ -144,6 +159,8 @@ self.onmessage = async (
               newMeasurements[thingId] = { [measurement]: result };
             }
           }
+
+          postLoadPercent(++numCounted);
         });
       }
       if (measurement.includes("eqpc")) {
@@ -166,9 +183,10 @@ self.onmessage = async (
               newMeasurements[thingId] = { [measurement]: result };
             }
           }
+
+          postLoadPercent(++numCounted);
         });
       }
-
       if (measurement.includes("ped")) {
         thingIds.forEach((thingId) => {
           if (
@@ -192,6 +210,8 @@ self.onmessage = async (
               newMeasurements[thingId] = { [measurement]: result };
             }
           }
+
+          postLoadPercent(++numCounted);
         });
       }
       if (measurement.includes("sphericity")) {
@@ -215,6 +235,8 @@ self.onmessage = async (
               newMeasurements[thingId] = { [measurement]: result };
             }
           }
+
+          postLoadPercent(++numCounted);
         });
       }
       if (measurement.includes("compactness")) {
@@ -240,12 +262,11 @@ self.onmessage = async (
               newMeasurements[thingId] = { [measurement]: result };
             }
           }
+
+          postLoadPercent(++numCounted);
         });
       }
     }
-    /* eslint-disable-next-line no-restricted-globals */
-    self.postMessage({ loadValue: Math.floor((i / measurementCount) * 100) });
-    i++;
   });
   /* eslint-disable-next-line no-restricted-globals */
   self.postMessage({ data: newMeasurements });
