@@ -69,7 +69,7 @@ const Cell = memo(
           thing={thing}
           handleClick={data.handleSelectThing}
           selected={data.selectedThingIds.includes(thing.id)}
-          placeHolder={isScrolling}
+          isScrolling={isScrolling}
         />
       </div>
     );
