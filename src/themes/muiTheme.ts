@@ -5,6 +5,14 @@ export const lightTheme = createTheme({
     contrastThreshold: 4.5, // contrast ration needs to be 4.5:1 for accessibility
   },
   components: {
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          borderRadius: 8,
+          backgroundImage: "none",
+        },
+      },
+    },
     MuiButtonBase: {
       defaultProps: {
         disableRipple: true,
@@ -30,6 +38,7 @@ export const darkTheme = createTheme({
     MuiDialog: {
       styleOverrides: {
         paper: {
+          borderRadius: 8,
           backgroundImage: "none",
         },
       },

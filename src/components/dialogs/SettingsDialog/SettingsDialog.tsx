@@ -1,32 +1,31 @@
-import React, { ChangeEvent, ReactNode, useState } from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
+import React, { ReactNode, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { BlockPicker, ColorResult } from "react-color";
 
 import {
-  Container,
   Dialog,
   DialogContent,
   IconButton,
   Popover,
-  TextField,
-  Toolbar,
   Typography,
   Stack,
   Box,
+  DialogTitle,
+  Button,
+  ButtonGroup,
 } from "@mui/material";
 
 import {
   Close as CloseIcon,
   Palette as PaletteIcon,
+  DarkMode as DarkModeIcon,
+  LightMode as LightModeIcon,
+  VolumeUp as VolumeUpIcon,
+  VolumeOff as VolumeOffIcon,
 } from "@mui/icons-material";
 
-import { MaterialUISwitch } from "components/controls";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
-import Sun from "icons/Sun.svg";
-import Moon from "icons/Moon.svg";
-import VolumeUp from "icons/VolumeUp.svg";
-import VolumeOff from "icons/VolumeOff.svg";
 import { ThemeMode } from "themes/enums";
 import { selectActiveCategoryColors } from "store/project/reselectors";
 import {
@@ -37,12 +36,14 @@ import {
 } from "store/applicationSettings/selectors";
 import { useHotkeys } from "hooks";
 import { HotkeyContext } from "utils/common/enums";
+import { DividerHeader } from "components/styled-components";
+import { CustomSwitch } from "components/controls";
 
 const SettingsItem = ({
   title,
   children,
 }: {
-  title: string;
+  title: string | ReactNode;
   children: ReactNode;
 }) => {
   return (
@@ -50,10 +51,11 @@ const SettingsItem = ({
       display="flex"
       flexDirection="row"
       justifyContent="space-between"
-      alignItems="center"
-      gap={8}
+      alignItems="flex-end"
+      height="40px"
     >
-      <Typography fontWeight={"bold"}>{title}</Typography>
+      {typeof title === "string" ? <Typography>{title}</Typography> : title}
+
       {children}
     </Box>
   );
@@ -65,67 +67,233 @@ type SettingsDialogProps = {
 };
 
 export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
-  const dispatch = useDispatch();
-
-  const themeMode = useSelector(selectThemeMode);
-  const soundEnabled = useSelector(selectSoundEnabled);
-  const initialSelectedImageBorderWidth = useSelector(
-    selectSelectedImageBorderWidth
+  useHotkeys(
+    "enter",
+    () => {
+      onClose();
+    },
+    HotkeyContext.AppSettingsDialog,
+    { enableOnTags: ["INPUT"], enabled: open },
+    [onClose]
   );
+
+  return (
+    <Dialog onClose={onClose} open={open} fullWidth maxWidth="xs">
+      <DialogTitle sx={{ m: 0, p: 2 }}>Settings</DialogTitle>
+
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={(theme) => ({
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: theme.palette.grey[500],
+        })}
+      >
+        <CloseIcon />
+      </IconButton>
+
+      <DialogContent sx={{ px: 0, pb: 2.5, pt: 1 }}>
+        <DividerHeader
+          typographyVariant="body1"
+          textAlign="left"
+          sx={(theme) => ({ color: theme.palette.grey[500] })}
+        >
+          UI
+        </DividerHeader>
+        <Stack
+          spacing={1}
+          sx={{
+            px: 2,
+            ".MuiGrid-root:first-of-type": { marginLeft: "0px" },
+          }}
+        >
+          <ThemeSelector />
+          <BorderWidthSelector />
+          <BorderColorSelector />
+          <SoundSelector />
+          {/* <LanguageSettings /> */}
+        </Stack>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const ThemeSelector = () => {
+  const themeMode = useSelector(selectThemeMode);
+  const dispatch = useDispatch();
+  const onToggleTheme = (mode: ThemeMode) => {
+    dispatch(applicationSettingsSlice.actions.setThemeMode({ mode }));
+  };
+  return (
+    <SettingsItem
+      title={
+        <Box display="flex">
+          <Typography>{"Theme: "}</Typography>
+          {themeMode === ThemeMode.Dark ? (
+            <DarkModeIcon sx={{ ml: 1 }} />
+          ) : (
+            <LightModeIcon sx={{ ml: 1 }} />
+          )}
+        </Box>
+      }
+    >
+      <CustomSwitch
+        checked={themeMode === ThemeMode.Light}
+        onChange={() =>
+          onToggleTheme(
+            themeMode === ThemeMode.Dark ? ThemeMode.Light : ThemeMode.Dark
+          )
+        }
+        height={24}
+        width={62}
+      />
+    </SettingsItem>
+  );
+};
+
+const BorderWidthSelector = () => {
+  const dispatch = useDispatch();
+  const selectedBorderWidth = useSelector(selectSelectedImageBorderWidth);
+
+  const updateSelectionBorderWidth = (op: "inc" | "dec") => {
+    const newWidth =
+      op === "inc"
+        ? Math.min(selectedBorderWidth + 1, 10)
+        : Math.max(selectedBorderWidth - 1, 1);
+    if (newWidth === selectedBorderWidth) return;
+    dispatch(
+      applicationSettingsSlice.actions.setSelectedImageBorderWidth({
+        selectionSize: newWidth,
+      })
+    );
+  };
+
+  return (
+    <SettingsItem
+      title={
+        <Box display="flex">
+          <Typography display="inline">{"Selection Border Width: "}</Typography>
+          <Box
+            sx={(theme) => ({
+              display: "inline-block",
+              justifySelf: "center",
+              alignSelf: "center",
+              width: 64,
+              height: selectedBorderWidth,
+              backgroundColor: theme.palette.text.primary,
+              borderRadius: theme.shape.borderRadius,
+              marginLeft: 1,
+            })}
+          ></Box>
+        </Box>
+      }
+    >
+      <ButtonGroup
+        sx={{
+          height: 28,
+          "& .MuiButtonGroup-grouped": { minWidth: 32 },
+          "& .MuiButton-root": {
+            p: 0,
+          },
+        }}
+      >
+        <Button
+          onClick={() => updateSelectionBorderWidth("inc")}
+          variant="outlined"
+          size="small"
+        >
+          +
+        </Button>
+        <Button
+          onClick={() => updateSelectionBorderWidth("dec")}
+          variant="outlined"
+          size="small"
+        >
+          -
+        </Button>
+      </ButtonGroup>
+    </SettingsItem>
+  );
+};
+
+const BorderColorSelector = () => {
   const initialSelectionColor = useSelector(selectImageSelectionColor);
   const availableColors = useSelector(selectActiveCategoryColors);
-
-  const [selectionSize, setSelectionSize] = useState<number>(
-    initialSelectedImageBorderWidth
-  );
   const [selectionColor, setSelectionColor] = useState<string>(
     initialSelectionColor
   );
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
     React.useState<null | HTMLButtonElement>(null);
   const colorPopupOpen = Boolean(colorMenuAnchorEl);
-
-  const preClose = () => {
-    batch(() => {
-      if (selectionSize !== initialSelectedImageBorderWidth) {
-        dispatch(
-          applicationSettingsSlice.actions.setSelectedImageBorderWidth({
-            selectionSize,
-          })
-        );
-      }
-      if (selectionColor !== initialSelectionColor) {
-        dispatch(
-          applicationSettingsSlice.actions.setImageSelectionColor({
-            selectionColor,
-          })
-        );
-      }
-    });
-    onClose();
-  };
-
-  const onToggleTheme = (mode: ThemeMode) => {
-    dispatch(applicationSettingsSlice.actions.setThemeMode({ mode }));
-  };
-
-  const onChangeImageSelectionWidth = (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    let size = parseInt(event.target.value);
-    if (!size) return;
-    size = size < 0 ? 0 : size;
-
-    setSelectionSize(size);
-  };
-
   const onOpenColorPicker = (event: React.MouseEvent<HTMLButtonElement>) => {
     setColorMenuAnchorEl(event.currentTarget);
   };
   const onCloseColorPicker = () => {
     setColorMenuAnchorEl(null);
   };
+  return (
+    <SettingsItem
+      title={
+        <Box display="flex">
+          <Typography display="inline">{"Selection Border Color: "}</Typography>
+          <Box
+            sx={(theme) => ({
+              display: "inline-block",
+              justifySelf: "center",
+              alignSelf: "center",
+              width: "1rem",
+              height: "1rem",
+              backgroundColor: selectionColor,
+              borderRadius: 1,
+              marginLeft: 1,
+            })}
+          ></Box>
+        </Box>
+      }
+    >
+      <Button
+        onClick={onOpenColorPicker}
+        sx={(theme) => ({
+          height: 28,
+          minWidth: 64,
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+        })}
+      >
+        <PaletteIcon />
+      </Button>
 
+      <Popover
+        id="image-color-selection-menu"
+        open={colorPopupOpen}
+        anchorEl={colorMenuAnchorEl}
+        onClose={onCloseColorPicker}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <BlockPicker
+          color={selectionColor}
+          onChangeComplete={(color: ColorResult) =>
+            setSelectionColor(color.hex)
+          }
+          colors={availableColors}
+        />
+      </Popover>
+    </SettingsItem>
+  );
+};
+
+const SoundSelector = () => {
+  const dispatch = useDispatch();
+  const soundEnabled = useSelector(selectSoundEnabled);
   const toggleSoundEnabled = () => {
     dispatch(
       applicationSettingsSlice.actions.setSoundEnabled({
@@ -133,113 +301,26 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
       })
     );
   };
-
-  useHotkeys(
-    "enter",
-    () => {
-      preClose();
-    },
-    HotkeyContext.AppSettingsDialog,
-    { enableOnTags: ["INPUT"], enabled: open },
-    [preClose]
-  );
-
   return (
-    <Dialog onClose={preClose} open={open}>
-      <Toolbar sx={{ backgroundColor: "inherit" }}>
-        <Typography sx={{ flexGrow: 1 }} variant="h6">
-          Settings
-        </Typography>
-
-        <IconButton onClick={preClose}>
-          <CloseIcon />
-        </IconButton>
-      </Toolbar>
-
-      <DialogContent sx={{ marginTop: (theme) => theme.spacing(2) }}>
-        <Container maxWidth="md">
-          <Stack
-            spacing={4}
-            sx={{
-              ".MuiGrid-root:first-of-type": { marginLeft: "0px" },
-            }}
-          >
-            <SettingsItem
-              title={themeMode === ThemeMode.Dark ? "Dark Mode" : "Light Mode"}
-            >
-              <MaterialUISwitch
-                disable_icon={Moon}
-                enable_icon={Sun}
-                checked={themeMode === ThemeMode.Dark}
-                onChange={() =>
-                  onToggleTheme(
-                    themeMode === ThemeMode.Dark
-                      ? ThemeMode.Light
-                      : ThemeMode.Dark
-                  )
-                }
-              />
-            </SettingsItem>
-            <SettingsItem title="Image Selection Size">
-              <TextField
-                id="outlined-number"
-                label="Pixels"
-                defaultValue={selectionSize}
-                onChange={onChangeImageSelectionWidth}
-                type="number"
-                inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                InputLabelProps={{ shrink: true }}
-                size="small"
-                variant="standard"
-                sx={{ maxWidth: "80px", marginLeft: "10px" }}
-              />
-            </SettingsItem>
-            <SettingsItem title="Image Selection Color">
-              <IconButton
-                onClick={onOpenColorPicker}
-                edge="start"
-                sx={{ marginLeft: 0 }}
-              >
-                <PaletteIcon sx={{ color: selectionColor, fontSize: 40 }} />
-              </IconButton>
-
-              <Popover
-                id="image-color-selection-menu"
-                open={colorPopupOpen}
-                anchorEl={colorMenuAnchorEl}
-                onClose={onCloseColorPicker}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "center",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "center",
-                }}
-              >
-                <BlockPicker
-                  color={selectionColor}
-                  onChangeComplete={(color: ColorResult) =>
-                    setSelectionColor(color.hex)
-                  }
-                  colors={availableColors}
-                />
-              </Popover>
-            </SettingsItem>
-            <SettingsItem title="Sound effects">
-              <MaterialUISwitch
-                disable_icon={VolumeOff}
-                enable_icon={VolumeUp}
-                checked={!soundEnabled}
-                onChange={toggleSoundEnabled}
-                name="soundEnabled"
-              />
-            </SettingsItem>
-            {/* <LanguageSettings /> */}
-          </Stack>
-        </Container>
-      </DialogContent>
-    </Dialog>
+    <SettingsItem
+      title={
+        <Box display="flex">
+          <Typography display="inline">{"SoundEffects: "}</Typography>
+          {soundEnabled ? (
+            <VolumeUpIcon sx={{ ml: 1 }} />
+          ) : (
+            <VolumeOffIcon sx={{ ml: 1 }} />
+          )}
+        </Box>
+      }
+    >
+      <CustomSwitch
+        checked={soundEnabled}
+        onChange={toggleSoundEnabled}
+        height={24}
+        width={62}
+      />
+    </SettingsItem>
   );
 };
 

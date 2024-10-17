@@ -18,7 +18,7 @@ type ProjectGridItemProps = {
   selected: boolean;
   handleClick: (id: string, selected: boolean) => void;
   thing: ImageObject | AnnotationObject;
-  placeHolder?: boolean;
+  isScrolling?: boolean;
 };
 
 const getIconPosition = (
@@ -44,7 +44,7 @@ const printSize = (scale: number) => {
 };
 
 export const ProjectGridItem = memo(
-  ({ selected, handleClick, thing, placeHolder }: ProjectGridItemProps) => {
+  ({ selected, handleClick, thing, isScrolling }: ProjectGridItemProps) => {
     const imageSelectionColor = useSelector(selectImageSelectionColor);
     const selectedImageBorderWidth = useSelector(
       selectSelectedImageBorderWidth
@@ -62,7 +62,7 @@ export const ProjectGridItem = memo(
       handleClick(thing.id, selected);
     };
 
-    return placeHolder ? (
+    return isScrolling ? (
       <Box
         sx={{
           border: `solid ${selectedImageBorderWidth}px ${

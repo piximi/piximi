@@ -1,1 +1,1 @@
-export { MaterialUISwitch } from "./MaterialUISwitch";
+export { IconSwitch, CustomSwitch } from "./MaterialUISwitch";
