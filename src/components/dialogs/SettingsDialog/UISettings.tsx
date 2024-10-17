@@ -121,7 +121,7 @@ const BorderWidthSetting = () => {
               justifySelf: "center",
               alignSelf: "center",
               width: 64,
-              height: selectedBorderWidth,
+              height: selectedBorderWidth + "px",
               backgroundColor: theme.palette.text.primary,
               borderRadius: theme.shape.borderRadius,
               marginLeft: 1,

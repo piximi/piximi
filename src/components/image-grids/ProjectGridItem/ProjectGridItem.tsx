@@ -65,42 +65,38 @@ export const ProjectGridItem = memo(
     };
 
     return isScrolling ? (
-      textOnScroll ? (
-        <Box
-          sx={{
-            border: `solid ${selectedImageBorderWidth}px ${
-              selected ? imageSelectionColor : "transparent"
-            }`,
-            borderRadius: selectedImageBorderWidth + "px",
-            width: printSize(scaleFactor),
-            height: printSize(scaleFactor),
-          }}
-        >
-          Name: {thing.name}
-          <br />
-          <span style={{ color: categoryColor }}>Category: {categoryName}</span>
-          <br />
-          Width: {thing.shape.width}
-          <br />
-          Height: {thing.shape.height}
-          <br />
-          Channels: {thing.shape.channels}
-          <br />
-          Planes: {thing.shape.planes}
-          <br />
-          Partition: {thing.partition}
-        </Box>
-      ) : (
-        <Box
-          sx={{
-            border: `solid ${selectedImageBorderWidth}px ${
-              selected ? imageSelectionColor : "transparent"
-            }`,
-            borderRadius: selectedImageBorderWidth + "px",
-            width: printSize(scaleFactor),
-            height: printSize(scaleFactor),
-          }}
-        >
+      <Box
+        sx={{
+          position: "relative",
+          boxSizing: "content-box",
+          border: `solid ${selectedImageBorderWidth}px ${
+            selected ? imageSelectionColor : "transparent"
+          }`,
+          margin: `${10 - selectedImageBorderWidth}px`,
+          borderRadius: selectedImageBorderWidth + "px",
+          width: printSize(scaleFactor),
+          height: printSize(scaleFactor),
+        }}
+      >
+        {textOnScroll ? (
+          <>
+            Name: {thing.name}
+            <br />
+            <span style={{ color: categoryColor }}>
+              Category: {categoryName}
+            </span>
+            <br />
+            Width: {thing.shape.width}
+            <br />
+            Height: {thing.shape.height}
+            <br />
+            Channels: {thing.shape.channels}
+            <br />
+            Planes: {thing.shape.planes}
+            <br />
+            Partition: {thing.partition}
+          </>
+        ) : (
           <Box
             component="img"
             alt=""
@@ -114,17 +110,19 @@ export const ProjectGridItem = memo(
             }}
             draggable={false}
           />
-        </Box>
-      )
+        )}
+      </Box>
     ) : (
       <Box
         position="relative" // must be a position element for absolutely positioned ImageIconLabel
         onClick={handleSelect}
         sx={{
+          boxSizing: "content-box",
           border: `solid ${selectedImageBorderWidth}px ${
             selected ? imageSelectionColor : "transparent"
           }`,
           borderRadius: selectedImageBorderWidth + "px",
+          margin: `${10 - selectedImageBorderWidth}px`,
           width: printSize(scaleFactor),
           height: printSize(scaleFactor),
         }}
