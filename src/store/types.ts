@@ -145,6 +145,7 @@ export type AppSettingsState = {
   hotkeyStack: HotkeyContext[];
   language: Languages;
   soundEnabled: boolean;
+  textOnScroll: boolean;
 };
 
 export type AnnotatorState = {

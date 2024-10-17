@@ -16,6 +16,7 @@ const initialState: AppSettingsState = {
   selectedImageBorderWidth: 5,
   alertState: defaultAlert,
   hotkeyStack: [],
+  textOnScroll: false,
 };
 
 export const applicationSettingsSlice = createSlice({
@@ -85,6 +86,12 @@ export const applicationSettingsSlice = createSlice({
       action: PayloadAction<{ newValue: number }>
     ) {
       state.tileSize = action.payload.newValue!;
+    },
+    setTextOnScroll(
+      state: AppSettingsState,
+      action: PayloadAction<{ textOnScroll: boolean }>
+    ) {
+      state.textOnScroll = action.payload.textOnScroll;
     },
   },
 });

@@ -12,6 +12,8 @@ import {
   LightMode as LightModeIcon,
   VolumeUp as VolumeUpIcon,
   VolumeOff as VolumeOffIcon,
+  Notes as NotesIcon,
+  Image as ImageIcon,
 } from "@mui/icons-material";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +22,7 @@ import {
   selectImageSelectionColor,
   selectSelectedImageBorderWidth,
   selectSoundEnabled,
+  selectTextOnScroll,
   selectThemeMode,
 } from "store/applicationSettings/selectors";
 import { ThemeMode } from "themes/enums";
@@ -46,17 +49,18 @@ export const UISettings = () => {
           ".MuiGrid-root:first-of-type": { marginLeft: "0px" },
         }}
       >
-        <ThemeSelector />
-        <BorderWidthSelector />
-        <BorderColorSelector />
-        <SoundSelector />
+        <ThemeSetting />
+        <BorderWidthSetting />
+        <BorderColorSetting />
+        <SoundSetting />
+        <TextOnScrollSetting />
         {/* <LanguageSettings /> */}
       </Stack>
     </>
   );
 };
 
-const ThemeSelector = () => {
+const ThemeSetting = () => {
   const themeMode = useSelector(selectThemeMode);
   const dispatch = useDispatch();
   const onToggleTheme = (mode: ThemeMode) => {
@@ -89,7 +93,7 @@ const ThemeSelector = () => {
   );
 };
 
-const BorderWidthSelector = () => {
+const BorderWidthSetting = () => {
   const dispatch = useDispatch();
   const selectedBorderWidth = useSelector(selectSelectedImageBorderWidth);
 
@@ -154,7 +158,7 @@ const BorderWidthSelector = () => {
   );
 };
 
-const BorderColorSelector = () => {
+const BorderColorSetting = () => {
   const initialSelectionColor = useSelector(selectImageSelectionColor);
   const availableColors = useSelector(selectActiveCategoryColors);
   const [selectionColor, setSelectionColor] = useState<string>(
@@ -227,7 +231,7 @@ const BorderColorSelector = () => {
   );
 };
 
-const SoundSelector = () => {
+const SoundSetting = () => {
   const dispatch = useDispatch();
   const soundEnabled = useSelector(selectSoundEnabled);
   const toggleSoundEnabled = () => {
@@ -241,7 +245,7 @@ const SoundSelector = () => {
     <SettingsItem
       title={
         <Box display="flex">
-          <Typography display="inline">{"SoundEffects: "}</Typography>
+          <Typography display="inline">{"Sound Effects: "}</Typography>
           {soundEnabled ? (
             <VolumeUpIcon sx={{ ml: 1 }} />
           ) : (
@@ -253,6 +257,39 @@ const SoundSelector = () => {
       <CustomSwitch
         checked={soundEnabled}
         onChange={toggleSoundEnabled}
+        height={24}
+        width={62}
+      />
+    </SettingsItem>
+  );
+};
+
+const TextOnScrollSetting = () => {
+  const dispatch = useDispatch();
+  const textOnScrollEnabled = useSelector(selectTextOnScroll);
+  const toggletextOnScroll = () => {
+    dispatch(
+      applicationSettingsSlice.actions.setTextOnScroll({
+        textOnScroll: !textOnScrollEnabled,
+      })
+    );
+  };
+  return (
+    <SettingsItem
+      title={
+        <Box display="flex">
+          <Typography display="inline">{"Show Text on Scroll: "}</Typography>
+          {textOnScrollEnabled ? (
+            <NotesIcon sx={{ ml: 1 }} />
+          ) : (
+            <ImageIcon sx={{ ml: 1 }} />
+          )}
+        </Box>
+      }
+    >
+      <CustomSwitch
+        checked={textOnScrollEnabled}
+        onChange={toggletextOnScroll}
         height={24}
         width={62}
       />

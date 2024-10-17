@@ -74,3 +74,11 @@ export const selectTileSize = ({
 }): number => {
   return applicationSettings.tileSize;
 };
+
+export const selectTextOnScroll = ({
+  applicationSettings,
+}: {
+  applicationSettings: AppSettingsState;
+}): boolean => {
+  return applicationSettings.textOnScroll;
+};
