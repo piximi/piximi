@@ -11,6 +11,7 @@ import { AnnotationObject, ImageObject } from "store/data/types";
 import {
   selectImageSelectionColor,
   selectSelectedImageBorderWidth,
+  selectTextOnScroll,
   selectTileSize,
 } from "store/applicationSettings/selectors";
 
@@ -50,6 +51,7 @@ export const ProjectGridItem = memo(
       selectSelectedImageBorderWidth
     );
     const scaleFactor = useSelector(selectTileSize);
+    const textOnScroll = useSelector(selectTextOnScroll);
 
     const getCategoryProperty = useSelector(selectCategoryProperty);
     const categoryName = getCategoryProperty(thing.categoryId, "name") ?? "";
@@ -63,30 +65,57 @@ export const ProjectGridItem = memo(
     };
 
     return isScrolling ? (
-      <Box
-        sx={{
-          border: `solid ${selectedImageBorderWidth}px ${
-            selected ? imageSelectionColor : "transparent"
-          }`,
-          borderRadius: selectedImageBorderWidth + "px",
-          width: printSize(scaleFactor),
-          height: printSize(scaleFactor),
-        }}
-      >
-        Name: {thing.name}
-        <br />
-        <span style={{ color: categoryColor }}>Category: {categoryName}</span>
-        <br />
-        Width: {thing.shape.width}
-        <br />
-        Height: {thing.shape.height}
-        <br />
-        Channels: {thing.shape.channels}
-        <br />
-        Planes: {thing.shape.planes}
-        <br />
-        Partition: {thing.partition}
-      </Box>
+      textOnScroll ? (
+        <Box
+          sx={{
+            border: `solid ${selectedImageBorderWidth}px ${
+              selected ? imageSelectionColor : "transparent"
+            }`,
+            borderRadius: selectedImageBorderWidth + "px",
+            width: printSize(scaleFactor),
+            height: printSize(scaleFactor),
+          }}
+        >
+          Name: {thing.name}
+          <br />
+          <span style={{ color: categoryColor }}>Category: {categoryName}</span>
+          <br />
+          Width: {thing.shape.width}
+          <br />
+          Height: {thing.shape.height}
+          <br />
+          Channels: {thing.shape.channels}
+          <br />
+          Planes: {thing.shape.planes}
+          <br />
+          Partition: {thing.partition}
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            border: `solid ${selectedImageBorderWidth}px ${
+              selected ? imageSelectionColor : "transparent"
+            }`,
+            borderRadius: selectedImageBorderWidth + "px",
+            width: printSize(scaleFactor),
+            height: printSize(scaleFactor),
+          }}
+        >
+          <Box
+            component="img"
+            alt=""
+            src={thing.src}
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              top: 0,
+              transform: "none",
+            }}
+            draggable={false}
+          />
+        </Box>
+      )
     ) : (
       <Box
         position="relative" // must be a position element for absolutely positioned ImageIconLabel
