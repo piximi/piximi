@@ -1,6 +1,7 @@
 import React, { ReactElement, useEffect, useState } from "react";
 
 import {
+  alpha,
   ListItem,
   ListItemButton,
   ListItemIcon,
@@ -50,9 +51,12 @@ export const ListItemHoldButton = ({
   return (
     <ListItem
       disablePadding
-      sx={{
-        backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.3) ${loadPercent}%, rgba(255,255,255,0) 1%)`,
-      }}
+      sx={(theme) => ({
+        backgroundImage: `linear-gradient(to right, ${alpha(
+          theme.palette.primary.main,
+          0.3
+        )} ${loadPercent}%, rgba(255,255,255,0) 1%)`,
+      })}
     >
       <ListItemButton
         onMouseDown={handleMouseDown}
