@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { useSelector } from "react-redux";
 
-import { Box, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 
 import { ThingDetailContainer } from "./ThingDetailContainer";
 import { selectCategoryProperty } from "store/data/selectors";
@@ -11,6 +11,7 @@ import { AnnotationObject, ImageObject } from "store/data/types";
 import {
   selectImageSelectionColor,
   selectSelectedImageBorderWidth,
+  selectTextOnScroll,
   selectTileSize,
 } from "store/applicationSettings/selectors";
 
@@ -18,7 +19,7 @@ type ProjectGridItemProps = {
   selected: boolean;
   handleClick: (id: string, selected: boolean) => void;
   thing: ImageObject | AnnotationObject;
-  filtered: boolean;
+  isScrolling?: boolean;
 };
 
 const getIconPosition = (
@@ -44,12 +45,13 @@ const printSize = (scale: number) => {
 };
 
 export const ProjectGridItem = memo(
-  ({ selected, handleClick, thing, filtered }: ProjectGridItemProps) => {
+  ({ selected, handleClick, thing, isScrolling }: ProjectGridItemProps) => {
     const imageSelectionColor = useSelector(selectImageSelectionColor);
     const selectedImageBorderWidth = useSelector(
       selectSelectedImageBorderWidth
     );
     const scaleFactor = useSelector(selectTileSize);
+    const textOnScroll = useSelector(selectTextOnScroll);
 
     const getCategoryProperty = useSelector(selectCategoryProperty);
     const categoryName = getCategoryProperty(thing.categoryId, "name") ?? "";
@@ -62,23 +64,68 @@ export const ProjectGridItem = memo(
       handleClick(thing.id, selected);
     };
 
-    return filtered ? (
-      <></>
+    return isScrolling ? (
+      <Box
+        sx={{
+          position: "relative",
+          boxSizing: "content-box",
+          border: `solid ${selectedImageBorderWidth}px ${
+            selected ? imageSelectionColor : "transparent"
+          }`,
+          margin: `${10 - selectedImageBorderWidth}px`,
+          borderRadius: selectedImageBorderWidth + "px",
+          width: printSize(scaleFactor),
+          height: printSize(scaleFactor),
+        }}
+      >
+        {textOnScroll ? (
+          <>
+            Name: {thing.name}
+            <br />
+            <span style={{ color: categoryColor }}>
+              Category: {categoryName}
+            </span>
+            <br />
+            Width: {thing.shape.width}
+            <br />
+            Height: {thing.shape.height}
+            <br />
+            Channels: {thing.shape.channels}
+            <br />
+            Planes: {thing.shape.planes}
+            <br />
+            Partition: {thing.partition}
+          </>
+        ) : (
+          <Box
+            component="img"
+            alt=""
+            src={thing.src}
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              top: 0,
+              transform: "none",
+            }}
+            draggable={false}
+          />
+        )}
+      </Box>
     ) : (
-      <Grid
-        item
+      <Box
         position="relative" // must be a position element for absolutely positioned ImageIconLabel
         onClick={handleSelect}
         sx={{
-          width: printSize(scaleFactor),
-          height: printSize(scaleFactor),
-          margin: "2px",
+          boxSizing: "content-box",
           border: `solid ${selectedImageBorderWidth}px ${
             selected ? imageSelectionColor : "transparent"
           }`,
           borderRadius: selectedImageBorderWidth + "px",
+          margin: `${10 - selectedImageBorderWidth}px`,
+          width: printSize(scaleFactor),
+          height: printSize(scaleFactor),
         }}
-        //onContextMenu={() => handleContextSelectImage(itemDetails.id)}
       >
         <Box
           component="img"
@@ -107,7 +154,7 @@ export const ProjectGridItem = memo(
             thing.shape.width
           )}
         />
-      </Grid>
+      </Box>
     );
   }
 );
