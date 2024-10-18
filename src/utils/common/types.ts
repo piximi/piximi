@@ -98,10 +98,14 @@ export type FilterType<T> = {
   [K in keyof T]?: Array<T[K]>;
 };
 
+// --> PartialField
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<T>;
+
+// --> RequiredField
 export type RequireField<T, K extends keyof T> = Omit<T, K> &
   Required<Pick<T, K>>;
 
+// --> PartialExcept
 export type RequireOnly<T, K extends keyof T> = Partial<Omit<T, K>> &
   Required<Pick<T, K>>;
 
