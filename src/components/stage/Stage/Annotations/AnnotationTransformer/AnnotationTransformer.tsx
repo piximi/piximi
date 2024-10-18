@@ -112,17 +112,21 @@ export const AnnotationTransformer = ({
 
     if (activeAnnotationIds.includes(annotationId)) {
       if (Object.keys(workingAnnotation.changes).length === 0) {
-        dispatch(
-          imageViewerSlice.actions.removeActiveAnnotationIds({
-            annotationIds: [annotationId],
-          })
-        );
-        dispatch(
-          dataSlice.actions.deleteThings({
-            thingIds: [annotationId],
-            disposeColorTensors: false,
-          })
-        );
+        batch(() => {
+          dispatch(
+            imageViewerSlice.actions.removeActiveAnnotationIds({
+              annotationIds: selectedAnnotations.map(
+                (annotation) => annotation.id
+              ),
+            })
+          );
+          dispatch(
+            dataSlice.actions.deleteThings({
+              thingIds: selectedAnnotations.map((annotation) => annotation.id),
+              disposeColorTensors: false,
+            })
+          );
+        });
       } else {
         dispatch(
           dataSlice.actions.updateThings({
