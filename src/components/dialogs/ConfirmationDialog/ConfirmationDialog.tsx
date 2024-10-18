@@ -54,11 +54,16 @@ export const ConfirmationDialog = ({
 
   useHotkeys(
     "enter",
-    () => {
+    (keyboardEvent) => {
+      keyboardEvent.preventDefault();
       !confirmDisabled && handleConfirm();
     },
     HotkeyContext.ConfirmationDialog,
-    { enableOnTags: disableHotkeyOnInput ? [] : ["INPUT"], enabled: isOpen },
+    {
+      enableOnTags: disableHotkeyOnInput ? [] : ["INPUT"],
+      enabled: isOpen,
+      filterPreventDefault: false,
+    },
     [handleConfirm, confirmDisabled]
   );
 
