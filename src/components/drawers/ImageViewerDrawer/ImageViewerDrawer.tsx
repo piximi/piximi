@@ -7,10 +7,7 @@ import { Add } from "@mui/icons-material";
 import { ClearAnnotationsGroup } from "components/lists";
 import { AppBarOffset, DividerHeader } from "components/styled-components";
 
-import {
-  ImportAnnotationListItem,
-  ExportAnnotationsListItem,
-} from "components/list-items";
+import { ExportAnnotationsListItem } from "components/list-items";
 import { ImageViewerAppBar } from "components/app-bars";
 
 //import { selectCreatedAnnotationCategories } from "store/slices/data";
@@ -43,7 +40,6 @@ export const ImageViewerDrawer = () => {
         <Divider />
 
         <List dense>
-          <ImportAnnotationListItem />
           <ExportAnnotationsListItem />
         </List>
 
