@@ -3,7 +3,7 @@ import { dataSlice } from "store/data/dataSlice";
 import { ConfirmationDialog } from "../ConfirmationDialog";
 import { Box, TextField } from "@mui/material";
 import { selectAllKindIds } from "store/data/selectors";
-import { ChangeEvent, useCallback, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { generateUnknownCategory } from "utils/common/helpers";
 import { Kind } from "store/data/types";
 
@@ -32,7 +32,11 @@ export const CreateKindDialog = ({
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
-    validateInput(event.target.value);
+  };
+
+  const handleClose = () => {
+    setName("");
+    onClose();
   };
 
   const validateInput = useCallback(
@@ -84,12 +88,17 @@ export const CreateKindDialog = ({
       );
     });
     secondaryAction && secondaryAction();
-    onClose();
+
+    handleClose();
   };
+
+  useEffect(() => {
+    validateInput(name);
+  }, [existingKinds, name, validateInput]);
 
   return (
     <ConfirmationDialog
-      onClose={onClose}
+      onClose={handleClose}
       isOpen={open}
       title={"Create Kind"}
       content={
@@ -115,7 +124,7 @@ export const CreateKindDialog = ({
           />
         </Box>
       }
-      onConfirm={() => handleConfirm()}
+      onConfirm={handleConfirm}
       confirmDisabled={isInvalidName}
     />
   );
