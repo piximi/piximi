@@ -8,11 +8,6 @@ import JSZip from "jszip";
 import { useDialogHotkey } from "hooks";
 
 import { serializeCOCOFile, serializeProject } from "utils/annotator";
-import {
-  saveAnnotationsAsBinaryInstanceSegmentationMasks,
-  saveAnnotationsAsLabelMatrix,
-  saveAnnotationsAsLabeledSemanticSegmentationMasks,
-} from "utils/annotator/imageHelper";
 
 import {
   selectHasUnsavedChanges,
@@ -38,8 +33,7 @@ import {
 } from "store/data/selectors";
 import { AnnotationExportType } from "utils/file-io/enums";
 import { dataSlice } from "store/data";
-
-//TODO: MenuItem??
+import { exportAnnotationMasks } from "utils/file-io/export/annotationExporters";
 
 type ExportAnnotationsMenuProps = {
   anchorEl: HTMLElement | null;
@@ -169,78 +163,19 @@ export const ExportAnnotationsMenu = ({
 
             break;
 
-          case AnnotationExportType.Matrix:
-            saveAnnotationsAsLabelMatrix(
-              imageDict,
-              annotationDict,
-              annotationCategoryDict,
-              userProjectName,
-              zip
-            ).then(() => {
-              zip.generateAsync({ type: "blob" }).then((blob) => {
-                saveAs(blob, `${userProjectName}.zip`);
-              });
-            });
-
-            break;
-
-          case AnnotationExportType.LabeledInstances:
-            saveAnnotationsAsLabelMatrix(
+          default:
+            exportAnnotationMasks(
               imageDict,
               annotationDict,
               annotationCategoryDict,
               userProjectName,
               zip,
-              { random: true, color: true }
-            ).then(() => {
-              zip.generateAsync({ type: "blob" }).then((blob) => {
-                saveAs(blob, `${userProjectName}.zip`);
-              });
-            });
-            break;
-
-          case AnnotationExportType.BinarySemanticMasks:
-            saveAnnotationsAsLabelMatrix(
-              imageDict,
-              annotationDict,
-              annotationCategoryDict,
-              userProjectName,
-              zip,
-              { binary: true }
-            ).then(() => {
-              zip.generateAsync({ type: "blob" }).then((blob) => {
-                saveAs(blob, `${userProjectName}.zip`);
-              });
+              exportType
+            );
+            zip.generateAsync({ type: "blob" }).then((blob) => {
+              saveAs(blob, `${userProjectName}.zip`);
             });
 
-            break;
-          case AnnotationExportType.BinaryInstances:
-            saveAnnotationsAsBinaryInstanceSegmentationMasks(
-              imageDict,
-              annotationDict,
-              annotationCategoryDict,
-              userProjectName,
-              zip
-            ).then(() => {
-              zip.generateAsync({ type: "blob" }).then((blob) => {
-                saveAs(blob, `${userProjectName}.zip`);
-              });
-            });
-
-            break;
-
-          case AnnotationExportType.LabeledSemanticMasks:
-            saveAnnotationsAsLabeledSemanticSegmentationMasks(
-              imageDict,
-              annotationDict,
-              annotationCategoryDict,
-              userProjectName,
-              zip
-            ).then(() => {
-              zip.generateAsync({ type: "blob" }).then((blob) => {
-                saveAs(blob, `${userProjectName}.zip`);
-              });
-            });
             break;
         }
 
