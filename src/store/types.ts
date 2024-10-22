@@ -130,6 +130,7 @@ export type ClassifierState = {
   evaluationResult: ClassifierEvaluationResultType;
   // status flags
   modelStatus: ModelStatus;
+  showClearPredictionsWarning: boolean;
 };
 
 export type AppSettingsState = {

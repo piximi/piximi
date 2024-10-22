@@ -53,6 +53,7 @@ export const initialState: ClassifierState = {
     recall: -1,
     f1Score: -1,
   },
+  showClearPredictionsWarning: true,
 };
 
 export const classifierSlice = createSlice({
@@ -207,6 +208,13 @@ export const classifierSlice = createSlice({
       const { evaluationResult } = action.payload;
 
       state.evaluationResult = evaluationResult;
+    },
+    updateShowClearPredictionsWarning(
+      state,
+      action: PayloadAction<{ showClearPredictionsWarning: boolean }>
+    ) {
+      state.showClearPredictionsWarning =
+        action.payload.showClearPredictionsWarning;
     },
   },
 });

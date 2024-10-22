@@ -147,6 +147,9 @@ const fitListener = async (
 
   const activeKind = getCompleteEntity(dataState.kinds.entities[activeKindId]);
   if (!activeKind) return;
+  // listenerAPI.dispatch(
+  //   dataSlice.actions.clearPredictions({ kind: activeKindId })
+  // );
   const activeThingIds = activeKind.containing;
   const unknownThingIds = getDeferredProperty(
     dataState.categories.entities[activeKind.unknownCategoryId],

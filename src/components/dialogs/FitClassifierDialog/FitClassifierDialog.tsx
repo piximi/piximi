@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, List } from "@mui/material";
 
-import { useClassificationModelAgain } from "hooks/useLearningModel/useClassifierModelAgain";
+import { useFitClassificationModel } from "hooks/useLearningModel/useClassifierModelAgain";
 import { AlertBar, FitClassifierDialogAppBar } from "components/app-bars";
 
 import { ModelSummaryTable, TwoDataPlot } from "components/data-viz";
@@ -31,7 +31,7 @@ export const FitClassifierDialog = ({
     validationAccuracy,
     trainingLoss,
     validationLoss,
-    labeledThingsCount,
+    noLabeledThings,
     selectedModel,
     modelStatus,
     alertState,
@@ -39,7 +39,8 @@ export const FitClassifierDialog = ({
     trainingPercentage,
     noLabeledThingsAlert,
     handleFit,
-  } = useClassificationModelAgain();
+    hasLabeledInference,
+  } = useFitClassificationModel();
 
   return (
     <>
@@ -54,13 +55,14 @@ export const FitClassifierDialog = ({
         <FitClassifierDialogAppBar
           closeDialog={closeDialog}
           fit={handleFit}
-          noLabels={labeledThingsCount === 0}
+          noLabels={noLabeledThings}
+          hasLabeledInference={hasLabeledInference}
           noTrain={!selectedModel.trainable}
           epochs={fitOptions.epochs}
           currentEpoch={currentEpoch}
         />
 
-        {showWarning && labeledThingsCount === 0 && selectedModel.trainable && (
+        {showWarning && noLabeledThings && selectedModel.trainable && (
           <AlertBar
             setShowAlertBar={setShowWarning}
             alertState={noLabeledThingsAlert}

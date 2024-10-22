@@ -7,6 +7,9 @@ import {
   IconButton,
   Toolbar,
   Tooltip,
+  Checkbox,
+  FormGroup,
+  FormControlLabel,
 } from "@mui/material";
 
 import { Close, PlayCircleOutline, Stop } from "@mui/icons-material";
@@ -20,12 +23,19 @@ import { APPLICATION_COLORS } from "utils/common/constants";
 import {
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
+  selectShowClearPredictionsWarning,
 } from "store/classifier/selectors";
+import { selectActiveKindId } from "store/project/selectors";
+import { dataSlice } from "store/data";
+import { useDialogHotkey } from "hooks";
+import { HotkeyContext } from "utils/common/enums";
+import { ConfirmationDialog } from "components/dialogs";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
   fit: any;
   noLabels: boolean;
+  hasLabeledInference: boolean;
   noTrain: boolean;
   epochs: number;
   currentEpoch: number;
@@ -35,14 +45,24 @@ export const FitClassifierDialogAppBar = ({
   closeDialog,
   fit,
   noLabels,
+  hasLabeledInference,
   noTrain,
   epochs,
   currentEpoch,
 }: FitClassifierDialogAppBarProps) => {
   const dispatch = useDispatch();
-
+  const activeKind = useSelector(selectActiveKindId);
   const selectedModel = useSelector(selectClassifierSelectedModel);
   const modelStatus = useSelector(selectClassifierModelStatus);
+  const showClearPredictionsWarning = useSelector(
+    selectShowClearPredictionsWarning
+  );
+
+  const {
+    open: warningDialogOpen,
+    onClose: handleCloseWarningDialog,
+    onOpen: handleOpenWarningDialog,
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const onStopFitting = () => {
     if (modelStatus !== ModelStatus.Training) return;
@@ -54,6 +74,23 @@ export const FitClassifierDialogAppBar = ({
         modelStatus: ModelStatus.Trained,
       })
     );
+  };
+
+  const clearAndFit = () => {
+    dispatch(
+      dataSlice.actions.clearPredictions({
+        kind: activeKind,
+        isPermanent: true,
+      })
+    );
+    fit();
+  };
+  const handleFit = async () => {
+    if (hasLabeledInference && showClearPredictionsWarning) {
+      handleOpenWarningDialog();
+    } else {
+      clearAndFit();
+    }
   };
 
   return (
@@ -104,7 +141,7 @@ export const FitClassifierDialogAppBar = ({
             <span>
               <Button
                 variant="outlined"
-                onClick={fit}
+                onClick={handleFit}
                 disabled={noLabels || noTrain}
                 startIcon={<PlayCircleOutline />}
               >
@@ -126,6 +163,39 @@ export const FitClassifierDialogAppBar = ({
           </span>
         </Tooltip>
       </Toolbar>
+      <ConfirmationDialog
+        isOpen={warningDialogOpen}
+        onClose={handleCloseWarningDialog}
+        title="Current predictions will be lost"
+        content={
+          <Box>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={!showClearPredictionsWarning}
+                    onChange={() =>
+                      dispatch(
+                        classifierSlice.actions.updateShowClearPredictionsWarning(
+                          {
+                            showClearPredictionsWarning:
+                              !showClearPredictionsWarning,
+                          }
+                        )
+                      )
+                    }
+                  />
+                }
+                label="Don't show this again"
+              />
+            </FormGroup>
+          </Box>
+        }
+        onConfirm={() => {
+          clearAndFit();
+          handleCloseWarningDialog();
+        }}
+      />
     </AppBar>
   );
 };

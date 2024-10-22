@@ -8,13 +8,17 @@ import {
   selectClassifierSelectedModel,
   selectClassifierTrainingPercentage,
 } from "store/classifier/selectors";
-import { selectActiveLabeledThingsCount } from "store/project/reselectors";
+import {
+  selectActiveLabeledThings,
+  selectActiveLabeledThingsCount,
+} from "store/project/reselectors";
 import { AlertType } from "utils/common/enums";
-import { logger } from "utils/common/helpers";
+import { isUnknownCategory, logger } from "utils/common/helpers";
 import { AlertState } from "utils/common/types";
-import { ModelStatus } from "utils/models/enums";
+import { ModelStatus, Partition } from "utils/models/enums";
 import { TrainingCallbacks } from "utils/models/types";
 
+type PlotData = { x: number; y: number }[];
 const historyItems = [
   "loss",
   "val_loss",
@@ -23,30 +27,44 @@ const historyItems = [
   "epochs",
 ];
 
-export const useClassificationModelAgain = () => {
+const noLabeledThingsAlert: AlertState = {
+  alertType: AlertType.Info,
+  name: "No labeled images",
+  description: "Please label images to train a model.",
+};
+export const useFitClassificationModel = () => {
   const dispatch = useDispatch();
 
+  // ComponentState
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
   const [showWarning, setShowWarning] = useState<boolean>(true);
   const [showPlots, setShowPlots] = useState<boolean>(false);
-  const [trainingAccuracy, setTrainingAccuracy] = useState<
-    { x: number; y: number }[]
-  >([]);
-  const [validationAccuracy, setValidationAccuracy] = useState<
-    { x: number; y: number }[]
-  >([]);
-  const [trainingLoss, setTrainingLoss] = useState<{ x: number; y: number }[]>(
-    []
-  );
-  const [validationLoss, setValidationLoss] = useState<
-    { x: number; y: number }[]
-  >([]);
+  const [trainingAccuracy, setTrainingAccuracy] = useState<PlotData>([]);
+  const [validationAccuracy, setValidationAccuracy] = useState<PlotData>([]);
+  const [trainingLoss, setTrainingLoss] = useState<PlotData>([]);
+  const [validationLoss, setValidationLoss] = useState<PlotData>([]);
+
+  // StoreState
+  const activeLabeledThings = useSelector(selectActiveLabeledThings);
   const labeledThingsCount = useSelector(selectActiveLabeledThingsCount);
   const selectedModel = useSelector(selectClassifierSelectedModel);
   const modelStatus = useSelector(selectClassifierModelStatus);
   const alertState = useSelector(selectAlertState);
   const fitOptions = useSelector(selectClassifierFitOptions);
   const trainingPercentage = useSelector(selectClassifierTrainingPercentage);
+
+  const hasLabeledInference = useMemo(() => {
+    return activeLabeledThings.some(
+      (thing) =>
+        !isUnknownCategory(thing.categoryId) &&
+        thing.partition === Partition.Inference
+    );
+  }, [activeLabeledThings]);
+
+  const noLabeledThings = useMemo(
+    () => labeledThingsCount === 0,
+    [labeledThingsCount]
+  );
 
   const modelHistory = useMemo(() => {
     const fullHistory = selectedModel.history.history;
@@ -63,11 +81,6 @@ export const useClassificationModelAgain = () => {
 
     return selectedHistory;
   }, [selectedModel]);
-  const noLabeledThingsAlert: AlertState = {
-    alertType: AlertType.Info,
-    name: "No labeled images",
-    description: "Please label images to train a model.",
-  };
 
   const trainingHistoryCallback: TrainingCallbacks["onEpochEnd"] = async (
     epoch,
@@ -130,10 +143,10 @@ export const useClassificationModelAgain = () => {
   };
 
   useEffect(() => {
-    if (labeledThingsCount > 0 && selectedModel.trainable) {
+    if (!noLabeledThings && selectedModel.trainable) {
       setShowWarning(true);
     }
-  }, [labeledThingsCount, selectedModel]);
+  }, [noLabeledThings, selectedModel.trainable]);
 
   useEffect(() => {
     setTrainingAccuracy(
@@ -154,6 +167,7 @@ export const useClassificationModelAgain = () => {
 
     setCurrentEpoch(0);
   }, [modelHistory]);
+
   useEffect(() => {
     if (
       process.env.NODE_ENV !== "production" &&
@@ -205,7 +219,7 @@ export const useClassificationModelAgain = () => {
     validationAccuracy,
     trainingLoss,
     validationLoss,
-    labeledThingsCount,
+    noLabeledThings,
     selectedModel,
     modelStatus,
     alertState,
@@ -213,5 +227,6 @@ export const useClassificationModelAgain = () => {
     trainingPercentage,
     noLabeledThingsAlert,
     handleFit,
+    hasLabeledInference,
   };
 };
