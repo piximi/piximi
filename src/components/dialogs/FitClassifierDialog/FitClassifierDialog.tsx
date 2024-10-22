@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, List } from "@mui/material";
 
-import { useFitClassificationModel } from "hooks/useLearningModel/useClassifierModelAgain";
+import { useFitClassificationModel } from "hooks/useLearningModel/";
 import { AlertBar, FitClassifierDialogAppBar } from "components/app-bars";
 
 import { ModelSummaryTable, TwoDataPlot } from "components/data-viz";
