@@ -8,10 +8,10 @@ import {
   SegmenterState,
   TypedAppStartListening,
 } from "store/types";
-import { difference, intersection, shuffle, take, takeRight } from "lodash";
+import { shuffle, take, takeRight } from "lodash";
 
 import { classifierSlice } from "./classifierSlice";
-import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
+import { getCompleteEntity } from "store/entities/utils";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { CombinedState, ListenerEffectAPI } from "@reduxjs/toolkit";
 import { DataState } from "store/types";
@@ -147,19 +147,44 @@ const fitListener = async (
 
   const activeKind = getCompleteEntity(dataState.kinds.entities[activeKindId]);
   if (!activeKind) return;
-  // listenerAPI.dispatch(
-  //   dataSlice.actions.clearPredictions({ kind: activeKindId })
-  // );
   const activeThingIds = activeKind.containing;
-  const unknownThingIds = getDeferredProperty(
-    dataState.categories.entities[activeKind.unknownCategoryId],
-    "containing"
+
+  const {
+    unlabeledThings,
+    labeledTraining,
+    labeledValidation,
+    labeledUnassigned,
+  } = activeThingIds.reduce(
+    (
+      groupedThings: {
+        unlabeledThings: Thing[];
+        labeledTraining: Thing[];
+        labeledValidation: Thing[];
+        labeledUnassigned: Thing[];
+      },
+      id
+    ) => {
+      const thing = getCompleteEntity(dataState.things.entities[id]);
+      if (!thing) return groupedThings;
+      if (isUnknownCategory(thing.categoryId)) {
+        groupedThings.unlabeledThings.push(thing);
+      } else if (thing.partition === Partition.Unassigned) {
+        groupedThings.labeledUnassigned.push(thing);
+      } else if (thing.partition === Partition.Training) {
+        groupedThings.labeledTraining.push(thing);
+      } else if (thing.partition === Partition.Validation) {
+        groupedThings.labeledValidation.push(thing);
+      }
+      return groupedThings;
+    },
+    {
+      unlabeledThings: [],
+      labeledTraining: [],
+      labeledValidation: [],
+      labeledUnassigned: [],
+    }
   );
-  let labeledThingIds = difference(activeThingIds, unknownThingIds);
-  labeledThingIds = preprocessOptions.shuffle
-    ? shuffle(labeledThingIds)
-    : labeledThingIds;
-  const unlabeledThingIds = intersection(activeThingIds, unknownThingIds);
+
   const categories: Array<Category> = [];
   const numClasses = activeKind.categories.reduce((count, id) => {
     const category = getCompleteEntity(dataState.categories.entities[id]);
@@ -176,48 +201,59 @@ const fitListener = async (
 
   /* SEPARATE LABELED DATA INTO TRAINING AND VALIDATION */
 
-  const trainingThingsLength = Math.round(
-    trainingPercentage * labeledThingIds.length
-  );
-  const validationThingsLength = labeledThingIds.length - trainingThingsLength;
-  const trainingThingIds = take(labeledThingIds, trainingThingsLength);
-  const validationThingIds = takeRight(labeledThingIds, validationThingsLength);
-  const trainingThings: Array<Thing> = trainingThingIds.reduce(
-    (things: Array<Thing>, id) => {
-      const thing = getCompleteEntity(dataState.things.entities[id]);
-      if (thing) things.push(thing);
-      return things;
-    },
-    []
-  );
-  const validationThings: Array<Thing> = validationThingIds.reduce(
-    (things: Array<Thing>, id) => {
-      const thing = getCompleteEntity(dataState.things.entities[id]);
-      if (thing) things.push(thing);
-      return things;
-    },
-    []
-  );
+  let splitLabeledTraining: Thing[] = [];
+  let splitLabeledValidation: Thing[] = [];
+  if (classifierState.modelStatus === ModelStatus.InitFit) {
+    const trainingThingsLength = Math.round(
+      trainingPercentage * labeledUnassigned.length
+    );
+    const validationThingsLength =
+      labeledUnassigned.length - trainingThingsLength;
 
-  listenerAPI.dispatch(
-    dataSlice.actions.updateThings({
-      updates: [
-        ...trainingThingIds.map((id) => ({
-          id,
+    const preparedLabeledUnassigned = preprocessOptions.shuffle
+      ? shuffle(labeledUnassigned)
+      : labeledUnassigned;
+
+    splitLabeledTraining = take(
+      preparedLabeledUnassigned,
+      trainingThingsLength
+    );
+    splitLabeledValidation = takeRight(
+      preparedLabeledUnassigned,
+      validationThingsLength
+    );
+    listenerAPI.dispatch(
+      dataSlice.actions.updateThings({
+        updates: [
+          ...splitLabeledTraining.map((thing) => ({
+            id: thing.id,
+            partition: Partition.Training,
+          })),
+          ...splitLabeledValidation.map((thing) => ({
+            id: thing.id,
+            partition: Partition.Validation,
+          })),
+          ...unlabeledThings.map((thing) => ({
+            id: thing.id,
+            partition: Partition.Inference,
+          })),
+        ],
+        isPermanent: true,
+      })
+    );
+  } else {
+    splitLabeledTraining = labeledUnassigned;
+    listenerAPI.dispatch(
+      dataSlice.actions.updateThings({
+        updates: labeledUnassigned.map((thing) => ({
+          id: thing.id,
           partition: Partition.Training,
         })),
-        ...validationThingIds.map((id) => ({
-          id,
-          partition: Partition.Validation,
-        })),
-        ...unlabeledThingIds.map((id) => ({
-          id,
-          partition: Partition.Inference,
-        })),
-      ],
-      isPermanent: true,
-    })
-  );
+
+        isPermanent: true,
+      })
+    );
+  }
 
   /* LOAD CLASSIFIER MODEL */
 
@@ -262,8 +298,14 @@ const fitListener = async (
       preprocessOptions,
       fitOptions,
     };
-    model.loadTraining(trainingThings, loadDataArgs);
-    model.loadValidation(validationThings, loadDataArgs);
+    model.loadTraining(
+      [...labeledTraining, ...splitLabeledTraining],
+      loadDataArgs
+    );
+    model.loadValidation(
+      [...labeledValidation, ...splitLabeledValidation],
+      loadDataArgs
+    );
   } catch (error) {
     handleError(listenerAPI, error as Error, "Error in preprocessing", {
       fittingError: true,
