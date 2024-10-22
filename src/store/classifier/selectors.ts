@@ -149,3 +149,11 @@ export const selectClassifierTrainingPercentage = ({
 }): number => {
   return classifier.trainingPercentage;
 };
+
+export const selectShowClearPredictionsWarning = ({
+  classifier,
+}: {
+  classifier: ClassifierState;
+}): boolean => {
+  return classifier.showClearPredictionsWarning;
+};
