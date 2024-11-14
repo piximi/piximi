@@ -1,3 +1,4 @@
+// ignore-no-logs
 import type { Meta, StoryObj } from "@storybook/react";
 import { BaseHorizCard } from "./BaseHorizCard";
 
