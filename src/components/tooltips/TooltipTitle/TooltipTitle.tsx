@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { KeyboardKey } from "components/styled-components";
+import { KeyboardKey } from "components/KeyboardKey";
 
 export const TooltipTitle = (
   tooltip: string,

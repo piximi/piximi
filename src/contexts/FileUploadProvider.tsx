@@ -44,7 +44,7 @@ import {
   selectProjectImageChannels,
 } from "store/project/selectors";
 import { projectSlice } from "store/project";
-import { ConfirmationDialog } from "components/dialogs";
+import { ConfirmationDialog } from "components/ConfirmationDialog";
 import { Partition } from "utils/models/enums";
 
 type ImageShapeInfoImage = ImageFileShapeInfo & {
