@@ -5,7 +5,7 @@ import { getDeferredProperty } from "store/entities/utils";
 import { difference, intersection } from "lodash";
 import { RecursivePartial } from "utils/common/types";
 import { MeasurementOptions, ThingData } from "./types";
-import { prepareThingData } from "components/measurements/utils";
+import { prepareThingData } from "sections/measurements/utils";
 import { isPendingReconciliation } from "store/data/helpers";
 import { DeferredDictionary } from "store/entities";
 import { Category } from "store/data/types";
