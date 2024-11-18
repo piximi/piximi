@@ -6,13 +6,17 @@ import { Box } from "@mui/material";
 
 import { useErrorHandler, useUnloadConfirmation } from "hooks";
 
-import { applicationSettingsSlice } from "store/applicationSettings";
-
-import { ProjectDrawer, ImageToolDrawer } from "sections/drawers";
 import { FallBackDialog } from "sections/dialogs";
-import { ProjectAppBar } from "sections/app-bars";
+
+import {
+  ProjectDrawer,
+  ImageToolDrawer,
+  ProjectAppBar,
+  ProjectImageGrid,
+} from "sections/project";
+
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { HotkeyContext } from "utils/common/enums";
-import { ProjectImageGrid } from "sections/ProjectImageGrid";
 
 export const ProjectViewer = () => {
   const dispatch = useDispatch();

@@ -5,21 +5,22 @@ import { ErrorBoundary } from "react-error-boundary";
 import { AppBar, Box } from "@mui/material";
 
 import { useMobileView } from "hooks";
+import { AlertBar } from "components/AlertBar";
 
 import { FallBackDialog } from "sections/dialogs";
-import { ImageViewerDrawer } from "sections/drawers";
-import { AlertBar } from "sections/app-bars";
-
-import { StageWrapper } from "sections/stage/StageWrapper";
-
-import { applicationSettingsSlice } from "store/applicationSettings";
+import {
+  AnnotatorToolDrawer,
+  ImageViewerDrawer,
+  StageWrapper,
+} from "sections/image-viewer";
 
 import { StageContext } from "contexts";
-import { AnnotatorToolDrawer } from "sections/drawers";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { selectAlertState } from "store/applicationSettings/selectors";
+
 import { APPLICATION_COLORS } from "utils/common/constants";
 import { getStackTraceFromError } from "utils/common/helpers";
 import { AlertType, HotkeyContext } from "utils/common/enums";
-import { selectAlertState } from "store/applicationSettings/selectors";
 
 export const ImageViewer = () => {
   const dispatch = useDispatch();

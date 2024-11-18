@@ -1,7 +1,7 @@
 import React from "react";
 import { batch, useDispatch } from "react-redux";
 
-import { BaseHorizCard } from "../../../components/BaseHorizCard";
+import { BaseHorizCard } from "components/BaseHorizCard";
 import { dataConverter_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";
 import { dataSlice } from "store/data/dataSlice";
 import { SerializedFileType } from "utils/file-io/types";

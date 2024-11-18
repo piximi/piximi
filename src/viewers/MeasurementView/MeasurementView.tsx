@@ -2,16 +2,22 @@ import React, { useEffect } from "react";
 import { ErrorBoundary, useErrorHandler } from "react-error-boundary";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, CssBaseline } from "@mui/material";
-import { FallBackDialog } from "sections/dialogs";
-import { MeasurementsDrawer } from "sections/drawers";
+
 import { useUnloadConfirmation } from "hooks";
 
+import { FallBackDialog } from "sections/dialogs";
+
+import {
+  MeasurementDashboard,
+  MeasurementsDrawer,
+} from "sections/measurements";
+
 import { selectProjectImageChannels } from "store/project/selectors";
-import { dimensions } from "utils/common/constants";
-import { HotkeyContext } from "utils/common/enums";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
-import { MeasurementDashboard } from "sections/measurements";
+
+import { dimensions } from "utils/common/constants";
+import { HotkeyContext } from "utils/common/enums";
 
 export const MeasurementView = () => {
   const dispatch = useDispatch();

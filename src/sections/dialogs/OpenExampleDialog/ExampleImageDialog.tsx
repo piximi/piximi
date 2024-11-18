@@ -7,7 +7,7 @@ import {
   cellPaintingAnnotations,
 } from "data/exampleImages";
 
-import { ExampleImageCard } from "sections/cards";
+import { ExampleImageCard } from "./ExampleImageCard";
 import { SerializedFileType } from "utils/file-io/types";
 const exampleImages = [
   {

@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { CustomTabs } from "components/CustomTabSwitcher";
 import React, { useCallback, useEffect } from "react";
-import { ImageGrid } from "sections/ImageGrid";
+import { ImageGrid } from "sections/project/ProjectImageGrid/ImageGrid";
 import { AddKindMenu } from "./AddKindMenu";
 import { useDispatch, useSelector } from "react-redux";
 import {

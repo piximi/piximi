@@ -4,7 +4,7 @@ import { AppBarOffset } from "components/AppBarOffset";
 import { DividerHeader } from "components/DividerHeader";
 import { BaseAppDrawer } from "components/BaseAppDrawer";
 import { FileIO } from "sections/file-io";
-import { ModelTaskSection } from "../../ModelTaskSection/ModelTaskSection";
+import { ModelTaskSection } from "../ModelTaskSection/ModelTaskSection";
 import { useMobileView } from "hooks";
 import { ProjectViewerCategories } from "sections/categories";
 

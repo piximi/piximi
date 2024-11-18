@@ -25,7 +25,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import { useHotkeys, usePointerLocation } from "hooks";
 import { useAnnotationState } from "hooks/useAnnotationState";
-import { Cursor } from "components/Cursor";
+import { Cursor } from "sections/image-viewer/Stage/Cursor";
 
 import { Layer } from "./Layer";
 import { Selection } from "./Selection";
