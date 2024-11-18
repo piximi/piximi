@@ -14,7 +14,7 @@ import SortIcon from "@mui/icons-material/Sort";
 import StraightenIcon from "@mui/icons-material/Straighten";
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
 import LabelIcon from "@mui/icons-material/Label";
-import { FileIO } from "sections/FileIO";
+import { FileIO } from "sections/file-io";
 import { CategoriesSection } from "sections/CategoriesSection";
 
 import {

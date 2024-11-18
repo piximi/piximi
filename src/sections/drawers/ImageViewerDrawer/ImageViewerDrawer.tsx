@@ -4,11 +4,11 @@ import { useSelector } from "react-redux";
 import { Box, Divider, IconButton, List, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 
-import { ClearAnnotationsGroup } from "../../ClearAnnotationsGroup";
+import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
 import { AppBarOffset } from "components/AppBarOffset";
 import { DividerHeader } from "components/DividerHeader";
 
-import { ExportAnnotationsListItem } from "sections/FileIO";
+import { ExportAnnotationsListItem } from "sections/file-io";
 import { ImageViewerAppBar } from "sections/app-bars";
 
 //import { selectCreatedAnnotationCategories } from "store/slices/data";

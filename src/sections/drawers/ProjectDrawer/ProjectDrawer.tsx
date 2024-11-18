@@ -3,7 +3,7 @@ import React from "react";
 import { AppBarOffset } from "components/AppBarOffset";
 import { DividerHeader } from "components/DividerHeader";
 import { BaseAppDrawer } from "components/BaseAppDrawer";
-import { FileIO } from "sections/FileIO";
+import { FileIO } from "sections/file-io";
 import { ModelTaskSection } from "../../ModelTaskSection/ModelTaskSection";
 import { useMobileView } from "hooks";
 import { CategoriesSection } from "sections/CategoriesSection";
