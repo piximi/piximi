@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 import {
   Slider,
-  Toolbar,
   Box,
   Typography,
   TextField,
@@ -14,7 +13,6 @@ import {
   Chip,
   Divider,
   Badge,
-  AppBar,
 } from "@mui/material";
 import {
   ZoomIn as ZoomInIcon,
@@ -58,8 +56,8 @@ import { Partition } from "utils/models/enums";
 import { dataSlice } from "store/data";
 import { isUnknownCategory, pluralize } from "utils/common/helpers";
 import { selectAlertState } from "store/applicationSettings/selectors";
-import { APPLICATION_COLORS } from "utils/common/constants";
-import { AlertBar } from "../AlertBar";
+import { AlertBar } from "../../../components/AlertBar";
+import { CustomAppBar } from "components/CustomAppBar";
 
 const minZoom = 0.6;
 const maxZoom = 4;
@@ -136,110 +134,101 @@ export const ProjectAppBar = () => {
   return (
     <>
       <Box>
-        <AppBar
-          sx={{
-            borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
-            boxShadow: "none",
-          }}
-          color="inherit"
-          position="fixed"
-        >
-          <Toolbar>
-            <LogoLoader width={250} height={50} loadPercent={loadPercent} />
+        <CustomAppBar>
+          <LogoLoader width={250} height={50} loadPercent={loadPercent} />
 
-            <ProjectTextField />
+          <ProjectTextField />
 
-            <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ flexGrow: 1 }} />
 
-            {isMobile ? (
+          {isMobile ? (
+            <ZoomControl />
+          ) : (
+            <>
+              <SortSelection />
+              <Divider
+                variant="middle"
+                orientation="vertical"
+                flexItem
+                sx={{ ml: 2 }}
+              />
               <ZoomControl />
-            ) : (
-              <>
-                <SortSelection />
-                <Divider
-                  variant="middle"
-                  orientation="vertical"
-                  flexItem
-                  sx={{ ml: 2 }}
-                />
-                <ZoomControl />
 
-                <TooltipButton
-                  tooltipTitle={TooltipTitle(`Select all`, "control", "a")}
-                  color="inherit"
-                  onClick={handleSelectAll}
-                  disabled={allSelected}
-                  icon={true}
+              <TooltipButton
+                tooltipTitle={TooltipTitle(`Select all`, "control", "a")}
+                color="inherit"
+                onClick={handleSelectAll}
+                disabled={allSelected}
+                icon={true}
+              >
+                <Badge
+                  badgeContent={unfilteredSelectedThings.length}
+                  color="primary"
                 >
-                  <Badge
-                    badgeContent={unfilteredSelectedThings.length}
-                    color="primary"
-                  >
-                    <SelectAllIcon />
-                  </Badge>
-                </TooltipButton>
+                  <SelectAllIcon />
+                </Badge>
+              </TooltipButton>
 
-                <TooltipButton
-                  tooltipTitle={TooltipTitle(`Deselect`, "esc")}
-                  color="inherit"
-                  onClick={handleDeselectAll}
-                  disabled={unfilteredSelectedThings.length === 0}
-                  icon={true}
-                >
-                  <DeselectIcon />
-                </TooltipButton>
+              <TooltipButton
+                tooltipTitle={TooltipTitle(`Deselect`, "esc")}
+                color="inherit"
+                onClick={handleDeselectAll}
+                disabled={unfilteredSelectedThings.length === 0}
+                icon={true}
+              >
+                <DeselectIcon />
+              </TooltipButton>
 
-                <TooltipButton
-                  tooltipTitle={TooltipTitle(`Delete selected`, "delete")}
-                  color="inherit"
-                  disabled={unfilteredSelectedThings.length === 0}
-                  onClick={onOpenDeleteImagesDialog}
-                  icon={true}
-                >
-                  <DeleteIcon />
-                </TooltipButton>
+              <TooltipButton
+                tooltipTitle={TooltipTitle(`Delete selected`, "delete")}
+                color="inherit"
+                disabled={unfilteredSelectedThings.length === 0}
+                onClick={onOpenDeleteImagesDialog}
+                icon={true}
+              >
+                <DeleteIcon />
+              </TooltipButton>
 
-                <Divider
-                  variant="middle"
-                  orientation="vertical"
-                  flexItem
-                  sx={{ mr: 2 }}
-                />
-                <CategorizeChip
-                  unfilteredSelectedThings={unfilteredSelectedThings}
-                />
-                <Tooltip
-                  title={
-                    allSelectedThingIds.length === 0
-                      ? "Select Objects to Annotate"
-                      : "Annotate Selection"
-                  }
-                >
-                  <span>
-                    <Chip
-                      avatar={<GestureIcon color="inherit" />}
-                      label="Annotate"
-                      onClick={handleNavigateImageViewer}
-                      variant="outlined"
-                      sx={{ marginRight: 1 }}
-                      disabled={allSelectedThingIds.length === 0}
-                    />
-                  </span>
-                </Tooltip>
-                <Tooltip title="Go to Measurements">
-                  <span>
-                    <Chip
-                      avatar={<StraightenIcon color="inherit" />}
-                      label="Measurements"
-                      onClick={handleNavigateMeasurements}
-                      variant="outlined"
-                    />
-                  </span>
-                </Tooltip>
-              </>
-            )}
-          </Toolbar>
-        </AppBar>
+              <Divider
+                variant="middle"
+                orientation="vertical"
+                flexItem
+                sx={{ mr: 2 }}
+              />
+              <CategorizeChip
+                unfilteredSelectedThings={unfilteredSelectedThings}
+              />
+              <Tooltip
+                title={
+                  allSelectedThingIds.length === 0
+                    ? "Select Objects to Annotate"
+                    : "Annotate Selection"
+                }
+              >
+                <span>
+                  <Chip
+                    avatar={<GestureIcon color="inherit" />}
+                    label="Annotate"
+                    onClick={handleNavigateImageViewer}
+                    variant="outlined"
+                    sx={{ marginRight: 1 }}
+                    disabled={allSelectedThingIds.length === 0}
+                  />
+                </span>
+              </Tooltip>
+              <Tooltip title="Go to Measurements">
+                <span>
+                  <Chip
+                    avatar={<StraightenIcon color="inherit" />}
+                    label="Measurements"
+                    onClick={handleNavigateMeasurements}
+                    variant="outlined"
+                  />
+                </span>
+              </Tooltip>
+            </>
+          )}
+        </CustomAppBar>
       </Box>
       {alertState.visible && <AlertBar alertState={alertState} />}
       <ConfirmationDialog

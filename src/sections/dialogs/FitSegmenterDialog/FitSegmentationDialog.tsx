@@ -1,16 +1,16 @@
 import { Dialog, DialogContent, List } from "@mui/material";
 
-import {
-  SegmenterOptimizerListItem,
-  SegmenterDatasetListItem,
-  SegmenterArchitectureListItem,
-} from "sections/list-items";
 import { TwoDataPlot } from "components/TwoDataPlot";
 import { ModelSummaryTable } from "components/ModelSummaryTable";
 import { DialogTransitionSlide } from "components/DialogTransitionSlide";
-import { FitSegmenterDialogAppBar, AlertBar } from "sections/app-bars";
+
 import { useSegmentationModelAgain } from "hooks/useLearningModel/useSegmentationModelAgain";
 import { ModelStatus } from "utils/models/enums";
+import { FitSegmenterDialogAppBar } from "./FitSegmenterDialogAppBar";
+import { AlertBar } from "sections/app-bars";
+import { SegmenterArchitectureListItem } from "./SegmenterArchitectureListItem";
+import { SegmenterOptimizerListItem } from "./SegmenterOptimizerListItem";
+import { SegmenterDatasetListItem } from "./SegmenterDatasetListItem";
 
 type FitSegmenterDialogProps = {
   closeDialog: () => void;

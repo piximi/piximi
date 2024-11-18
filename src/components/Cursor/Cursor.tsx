@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 
 import { StageContext } from "contexts";
 import { PenAnnotationToolTip } from "sections/stage/Stage/PenAnnotationToolTip";
-
 import { Point } from "utils/annotator/types";
 import { AnnotationState, ToolType } from "utils/annotator/enums";
 import { selectCursor } from "store/imageViewer/selectors";

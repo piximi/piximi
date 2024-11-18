@@ -1,6 +1,4 @@
 export { ImageViewerAppBar } from "./ImageViewerAppBar";
 export { ProjectAppBar } from "./ProjectAppBar";
-export { FitSegmenterDialogAppBar } from "./FitSegmenterDialogAppBar";
-export { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
-export { AlertBar } from "./AlertBar";
+export { AlertBar } from "../../components/AlertBar";
 export { MeasurementsAppBar } from "./MeasurementsAppBar";

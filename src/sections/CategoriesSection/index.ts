@@ -1,0 +1,1 @@
+export { CategoriesSection } from "./CategoriesSection";

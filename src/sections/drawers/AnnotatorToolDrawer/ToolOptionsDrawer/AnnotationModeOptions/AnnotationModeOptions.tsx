@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { List, ListSubheader, Radio, RadioGroup } from "@mui/material";
 
 import { useTranslation } from "hooks";
-import { CustomListItemButton } from "sections/list-items";
+import { CustomListItemButton } from "components/CustomListItemButton";
 
 import { annotatorSlice } from "store/annotator";
 import {

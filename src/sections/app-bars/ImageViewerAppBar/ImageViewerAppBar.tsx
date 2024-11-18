@@ -2,13 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ArrowBack } from "@mui/icons-material";
-import {
-  AppBar,
-  IconButton,
-  Toolbar,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { IconButton, Tooltip, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
@@ -20,6 +14,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { imageViewerSlice } from "store/imageViewer";
 import { selectActiveImageId } from "store/imageViewer/selectors";
 import { selectHasUnsavedChanges } from "store/project/selectors";
+import { CustomAppBar } from "components/CustomAppBar";
 
 export const ImageViewerAppBar = () => {
   const navigate = useNavigate();
@@ -62,30 +57,22 @@ export const ImageViewerAppBar = () => {
 
   return (
     <>
-      <AppBar
-        color="default"
-        sx={{
-          boxShadow: "none",
-          position: "absolute",
-        }}
-      >
-        <Toolbar>
-          <Tooltip title="Save and return to project" placement="bottom">
-            <IconButton
-              edge="start"
-              onClick={() => handleReturnToMainProject()}
-              aria-label="Exit Annotator"
-              href={""}
-            >
-              <ArrowBack />
-            </IconButton>
-          </Tooltip>
-          <LogoLoader width={30} height={30} loadPercent={1} fullLogo={false} />
-          <Typography variant="h5" color={"#02aec5"}>
-            Annotator
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <CustomAppBar>
+        <Tooltip title="Save and return to project" placement="bottom">
+          <IconButton
+            edge="start"
+            onClick={() => handleReturnToMainProject()}
+            aria-label="Exit Annotator"
+            href={""}
+          >
+            <ArrowBack />
+          </IconButton>
+        </Tooltip>
+        <LogoLoader width={30} height={30} loadPercent={1} fullLogo={false} />
+        <Typography variant="h5" color={"#02aec5"}>
+          Annotator
+        </Typography>
+      </CustomAppBar>
 
       <ExitAnnotatorDialog
         returnToProject={() => setReturnToProject(true)}

@@ -9,7 +9,7 @@ import { imageViewerSlice } from "store/imageViewer";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 import { encode } from "utils/annotator";
-import { CustomListItemButton } from "sections/list-items";
+import { CustomListItemButton } from "components/CustomListItemButton";
 import { dataSlice } from "store/data/dataSlice";
 import { selectWorkingAnnotation } from "store/imageViewer/selectors";
 

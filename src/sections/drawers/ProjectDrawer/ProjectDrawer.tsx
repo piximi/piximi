@@ -2,11 +2,11 @@ import React from "react";
 
 import { AppBarOffset } from "components/AppBarOffset";
 import { DividerHeader } from "components/DividerHeader";
-import { BaseAppDrawer } from "../../../components/BaseAppDrawer";
-import { FileList } from "sections/lists";
-import { CategoriesList } from "sections/lists";
-import { ModelTaskSection } from "./ModelTaskSection";
+import { BaseAppDrawer } from "components/BaseAppDrawer";
+import { FileIO } from "sections/FileIO";
+import { ModelTaskSection } from "../../ModelTaskSection/ModelTaskSection";
 import { useMobileView } from "hooks";
+import { CategoriesSection } from "sections/CategoriesSection";
 
 export const ProjectDrawer = () => {
   const isMobile = useMobileView();
@@ -16,7 +16,7 @@ export const ProjectDrawer = () => {
     <BaseAppDrawer>
       <AppBarOffset />
 
-      <FileList />
+      <FileIO />
       <DividerHeader sx={{ my: 1 }} textAlign="left" typographyVariant="body2">
         Learning Task
       </DividerHeader>
@@ -25,7 +25,7 @@ export const ProjectDrawer = () => {
       <DividerHeader sx={{ my: 1 }} textAlign="left" typographyVariant="body2">
         Categories
       </DividerHeader>
-      <CategoriesList />
+      <CategoriesSection />
     </BaseAppDrawer>
   );
 };
