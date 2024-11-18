@@ -8,13 +8,6 @@ import { useTranslation } from "hooks";
 
 import { imageViewerSlice } from "store/imageViewer";
 
-// import { ImageType } from "types";
-
-// import {
-//   saveAnnotationsAsLabelMatrix,
-//   saveAnnotationsAsLabeledSemanticSegmentationMasks,
-//   saveAnnotationsAsBinaryInstanceSegmentationMasks,
-// } from "utils/annotator/imageHelper";
 import { projectSlice } from "store/project";
 import { dataSlice } from "store/data/dataSlice";
 import { ImageObject } from "store/data/types";

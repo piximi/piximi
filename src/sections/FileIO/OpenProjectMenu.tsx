@@ -6,7 +6,7 @@ import { useDialogHotkey } from "hooks";
 
 import { HotkeyContext } from "utils/common/enums";
 import { ExampleProjectDialog } from "sections/dialogs";
-import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
+import { OpenProjectMenuItem } from "./OpenProjectMenuItem";
 
 type OpenProjectMenuProps = {
   anchorEl: HTMLElement | null;

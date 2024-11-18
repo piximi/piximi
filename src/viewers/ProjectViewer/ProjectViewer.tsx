@@ -26,9 +26,9 @@ import {
   selectActiveKindId,
   selectKindTabFilters,
 } from "store/project/selectors";
-import { AddKindMenu } from "sections/menus";
 import { selectKindDictionary } from "store/data/selectors";
 import { CustomTabs } from "components/CustomTabSwitcher";
+import { AddKindMenu } from "sections/AddKindMenu";
 
 export const ProjectViewer = () => {
   const dispatch = useDispatch();

@@ -5,11 +5,10 @@ import { KeyboardArrowRight as KeyboardArrowRightIcon } from "@mui/icons-materia
 
 import { useMenu } from "hooks";
 
-import { BaseMenu } from "../../../components/BaseMenu";
-import { OpenProjectMenu } from "../OpenProjectMenu";
-import { OpenImageMenu } from "../OpenImageMenu";
-import { ImportAnnotationsMenu } from "../ImportAnnotationsMenu";
-
+import { BaseMenu } from "components/BaseMenu";
+import { OpenProjectMenu } from "./OpenProjectMenu";
+import { OpenImageMenu } from "./OpenImageMenu";
+import { ImportAnnotationsMenu } from "./ImportAnnotationsMenu";
 type OpenMenuProps = {
   anchorEl: HTMLElement | null;
   onClose: () => void;
