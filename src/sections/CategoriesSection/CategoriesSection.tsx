@@ -11,7 +11,6 @@ import { ConfirmationDialog } from "components/ConfirmationDialog";
 import { CustomListItemButton } from "components/CustomListItemButton";
 import { useDispatch, useSelector } from "react-redux";
 import { CategoryItem } from "./CategoryItem";
-import { CategoryItemMenu } from "sections/menus";
 import { projectSlice } from "store/project";
 import { selectHighlightedCategory } from "store/project/selectors";
 import { selectActiveKindId } from "store/project/selectors";
@@ -27,6 +26,7 @@ import {
   selectActiveSelectedThingIds,
 } from "store/project/reselectors";
 import { selectClassifierModelStatus } from "store/classifier/selectors";
+import { CategoryItemMenu } from "./CategoryItemMenu";
 
 export const CategoriesSection = () => {
   const dispatch = useDispatch();

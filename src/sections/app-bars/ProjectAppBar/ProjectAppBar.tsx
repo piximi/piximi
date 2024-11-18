@@ -51,13 +51,13 @@ import { selectActiveCategories } from "store/project/reselectors";
 import { imageViewerSlice } from "store/imageViewer";
 import { TooltipButton } from "components/tooltips/TooltipButton/TooltipButton";
 import { ConfirmationDialog } from "components/ConfirmationDialog";
-import { ImageCategoryMenu } from "sections/menus";
 import { Partition } from "utils/models/enums";
 import { dataSlice } from "store/data";
 import { isUnknownCategory, pluralize } from "utils/common/helpers";
 import { selectAlertState } from "store/applicationSettings/selectors";
 import { AlertBar } from "../../../components/AlertBar";
 import { CustomAppBar } from "components/CustomAppBar";
+import { ImageCategoryMenu } from "./ImageCategoryMenu";
 
 const minZoom = 0.6;
 const maxZoom = 4;

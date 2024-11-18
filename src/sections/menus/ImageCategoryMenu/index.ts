@@ -1,1 +1,0 @@
-export { ImageCategoryMenu } from "./ImageCategoryMenu";
