@@ -13,10 +13,10 @@ import { ImageViewerAppBar } from "sections/app-bars";
 
 //import { selectCreatedAnnotationCategories } from "store/slices/data";
 
-import { BaseAppDrawer } from "../../../components/BaseAppDrawer";
+import { BaseAppDrawer } from "components/BaseAppDrawer";
 import { selectImageViewerImages } from "store/imageViewer/reselectors";
 import { ImageList } from "./ImageList";
-import { ImageViewerCategorySection } from "./ImageViewerCategorySection";
+import { ImageViewerCategories } from "../../categories";
 import { useDialogHotkey } from "hooks";
 import { HotkeyContext } from "utils/common/enums";
 import { CreateKindDialog } from "sections/dialogs";
@@ -105,7 +105,7 @@ export const ImageViewerDrawer = () => {
           />
         </Box>
 
-        <ImageViewerCategorySection />
+        <ImageViewerCategories />
 
         <Divider sx={{ mt: 1 }} />
 

@@ -15,7 +15,7 @@ import StraightenIcon from "@mui/icons-material/Straighten";
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
 import LabelIcon from "@mui/icons-material/Label";
 import { FileIO } from "sections/file-io";
-import { CategoriesSection } from "sections/CategoriesSection";
+import { ProjectViewerCategories } from "sections/categories";
 
 import {
   FilterOptions,
@@ -92,7 +92,7 @@ const imageTools: Record<string, OperationType> = {
     icon: (color) => <LabelIcon sx={{ color }} />,
     name: "categories",
     description: "-",
-    options: <CategoriesSection />,
+    options: <ProjectViewerCategories />,
     hotkey: "C",
     mobile: true,
   },

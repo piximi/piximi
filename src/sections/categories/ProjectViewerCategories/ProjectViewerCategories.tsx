@@ -16,7 +16,6 @@ import { selectHighlightedCategory } from "store/project/selectors";
 import { selectActiveKindId } from "store/project/selectors";
 import { CreateCategoryDialog } from "sections/dialogs";
 import { dataSlice } from "store/data/dataSlice";
-import { PredictionListItems } from "./PredictionListItems";
 import { isUnknownCategory } from "utils/common/helpers";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { HotkeyContext } from "utils/common/enums";
@@ -26,9 +25,10 @@ import {
   selectActiveSelectedThingIds,
 } from "store/project/reselectors";
 import { selectClassifierModelStatus } from "store/classifier/selectors";
-import { CategoryItemMenu } from "./CategoryItemMenu";
+import { PredictionListItems } from "./PredictionListItems";
+import { CategoryItemMenu } from "../CategoryItemMenu";
 
-export const CategoriesSection = () => {
+export const ProjectViewerCategories = () => {
   const dispatch = useDispatch();
   const categories = useSelector(selectActiveCategories);
   const activeKind = useSelector(selectActiveKindId);

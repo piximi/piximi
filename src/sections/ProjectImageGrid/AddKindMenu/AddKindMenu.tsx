@@ -1,5 +1,5 @@
 import React from "react";
-import { BaseMenu } from "../../components/BaseMenu";
+import { BaseMenu } from "components/BaseMenu";
 import { MenuItem, Typography } from "@mui/material";
 import { CreateKindDialog } from "sections/dialogs";
 import { useDialogHotkey, useMobileView } from "hooks";

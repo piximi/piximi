@@ -11,7 +11,7 @@ import memoize from "memoize-one";
 
 import { projectSlice } from "store/project";
 import { selectThingsOfKind } from "store/data";
-import { ProjectGridItem } from "../ProjectGridItem";
+import { ProjectGridItem } from "./ProjectGridItem";
 import { useSortFunction } from "hooks";
 import { DropBox } from "components/DropBox/DropBox";
 import { selectThingFilters } from "store/project/selectors";
