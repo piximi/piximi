@@ -9,7 +9,7 @@ import { AppBarOffset } from "components/AppBarOffset";
 import { DividerHeader } from "components/DividerHeader";
 
 import { ExportAnnotationsListItem } from "sections/file-io";
-import { ImageViewerAppBar } from "sections/app-bars";
+import { ImageViewerAppBar } from "sections/image-viewer/ImageViewerAppBar";
 
 //import { selectCreatedAnnotationCategories } from "store/slices/data";
 

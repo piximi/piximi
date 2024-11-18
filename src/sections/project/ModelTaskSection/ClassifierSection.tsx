@@ -11,9 +11,9 @@ import {
   FitClassifierDialog,
 } from "sections/dialogs";
 
-import { ModelExecButtonGroup } from "sections/ModelTaskSection/ModelExecButtonGroup";
+import { ModelExecButtonGroup } from "sections/project/ModelTaskSection/ModelExecButtonGroup";
 
-import { ModelIOButtonGroup } from "sections/ModelTaskSection/ModelIOButtonGroup";
+import { ModelIOButtonGroup } from "sections/project/ModelTaskSection/ModelIOButtonGroup";
 import { useClassificationModel } from "hooks/useLearningModel/useClassifierModel";
 import { HotkeyContext } from "utils/common/enums";
 import { ModelStatus, ModelTask } from "utils/models/enums";

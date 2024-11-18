@@ -1,9 +1,9 @@
 import React from "react";
 import { Divider, List } from "@mui/material";
 
-import { HelpDrawer } from "sections/drawers";
 import { SettingsListItem } from "./SettingsListItem";
 import { SendFeedbackListItem } from "./SendFeedbackListItem";
+import { HelpDrawer } from "components/HelpDrawer";
 
 export const ApplicationOptions = () => {
   return (

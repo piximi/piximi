@@ -30,7 +30,7 @@ import { dimensions } from "utils/common/constants";
 import { useSelector } from "react-redux";
 import { ToolHotkeyTitle, TooltipCard } from "components/tooltips";
 import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
-import { ModelTaskSection } from "../../ModelTaskSection/ModelTaskSection";
+import { ModelTaskSection } from "../ModelTaskSection/ModelTaskSection";
 
 export type OperationType = {
   icon: (color: string) => ReactElement;

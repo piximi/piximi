@@ -16,8 +16,6 @@ import {
 
 import { useAnnotatorToolShortcuts, useHotkeys, useTranslation } from "hooks";
 
-import { Tool } from "sections/stage/Tool";
-
 import { annotatorSlice } from "store/annotator";
 import { selectToolType } from "store/annotator/selectors";
 
@@ -37,9 +35,10 @@ import {
   Selection,
   Zoom,
 } from "icons";
-import { CustomToolTip } from "sections/stage/Tool/CustomToolTip";
 import { dimensions } from "utils/common/constants";
 import { ToolOptionsDrawer } from "./ToolOptionsDrawer";
+import { CustomToolTip } from "../Tool/CustomToolTip";
+import { Tool } from "../Tool";
 
 type AnnotatorToolDrawerProps = {
   optionsVisibility: boolean;

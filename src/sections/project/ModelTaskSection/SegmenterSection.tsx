@@ -10,8 +10,8 @@ import {
 } from "sections/dialogs";
 
 import { HotkeyContext } from "utils/common/enums";
-import { ModelIOButtonGroup } from "sections/ModelTaskSection/ModelIOButtonGroup";
-import { ModelExecButtonGroup } from "sections/ModelTaskSection/ModelExecButtonGroup";
+import { ModelIOButtonGroup } from "sections/project/ModelTaskSection/ModelIOButtonGroup";
+import { ModelExecButtonGroup } from "sections/project/ModelTaskSection/ModelExecButtonGroup";
 import { useSegmentationModel } from "hooks/useLearningModel/useSegmentationModel";
 import { FitSegmenterDialog } from "sections/dialogs";
 import { ModelStatus, ModelTask } from "utils/models/enums";

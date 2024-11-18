@@ -5,7 +5,7 @@ import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 import { PseudoFileList, fListToStore } from "utils/file-io/zarrStores";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
-import { BaseHorizCard } from "../../../components/BaseHorizCard";
+import { BaseHorizCard } from "components/BaseHorizCard";
 import { dataSlice } from "store/data/dataSlice";
 import { deserializeProject } from "utils/file-io/deserialize";
 import { AlertState } from "utils/common/types";

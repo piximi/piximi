@@ -8,7 +8,7 @@ import {
 } from "@mui/icons-material";
 
 import { CustomListItemButton } from "components/CustomListItemButton";
-import { useImageViewerCategoryItemState } from "../../drawers/ImageViewerDrawer/useImageViewerCategoryItemState";
+import { useImageViewerCategoryItemState } from "../../image-viewer/ImageViewerDrawer/useImageViewerCategoryItemState";
 import { CountChip } from "components/CountChip";
 import { APPLICATION_COLORS } from "utils/common/constants";
 import { Category } from "store/data/types";

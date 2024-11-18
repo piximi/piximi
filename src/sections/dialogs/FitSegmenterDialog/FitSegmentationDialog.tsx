@@ -7,7 +7,7 @@ import { DialogTransitionSlide } from "components/DialogTransitionSlide";
 import { useSegmentationModelAgain } from "hooks/useLearningModel/useSegmentationModelAgain";
 import { ModelStatus } from "utils/models/enums";
 import { FitSegmenterDialogAppBar } from "./FitSegmenterDialogAppBar";
-import { AlertBar } from "sections/app-bars";
+import { AlertBar } from "components/AlertBar";
 import { SegmenterArchitectureListItem } from "./SegmenterArchitectureListItem";
 import { SegmenterOptimizerListItem } from "./SegmenterOptimizerListItem";
 import { SegmenterDatasetListItem } from "./SegmenterDatasetListItem";
