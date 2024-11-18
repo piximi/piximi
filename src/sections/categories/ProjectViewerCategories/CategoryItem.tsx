@@ -5,7 +5,7 @@ import {
   MoreHoriz as MoreHorizIcon,
 } from "@mui/icons-material";
 
-import { CustomListItemButton } from "../../components/CustomListItemButton";
+import { CustomListItemButton } from "components/CustomListItemButton";
 import { useSelector } from "react-redux";
 import { selectNumThingsByCatAndKind } from "store/data/selectors";
 import { selectActiveKindId } from "store/project/selectors";

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Box, IconButton, List } from "@mui/material";
 import { Visibility, VisibilityOff, Add } from "@mui/icons-material";
-import { ImageViewerCategoryItem } from "./ImageViewerCategoryItem";
 import { CollapsibleListItem } from "components/CollapsibleListItem";
 import { useDispatch, useSelector } from "react-redux";
 import { imageViewerSlice } from "store/imageViewer";
@@ -11,8 +10,9 @@ import { HotkeyContext } from "utils/common/enums";
 import { KindWithCategories } from "store/data/types";
 import { selectFilteredImageViewerCategoryIds } from "store/imageViewer/selectors";
 import { selectImageViewerActiveKindsWithFullCat } from "store/imageViewer/reselectors";
+import { ImageViewerCategoryItem } from "./ImageViewerCategoryItem";
 
-export const ImageViewerCategorySection = () => {
+export const ImageViewerCategories = () => {
   const dispatch = useDispatch();
   const kinds = useSelector(selectImageViewerActiveKindsWithFullCat);
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);

@@ -6,7 +6,7 @@ import { BaseAppDrawer } from "components/BaseAppDrawer";
 import { FileIO } from "sections/file-io";
 import { ModelTaskSection } from "../../ModelTaskSection/ModelTaskSection";
 import { useMobileView } from "hooks";
-import { CategoriesSection } from "sections/CategoriesSection";
+import { ProjectViewerCategories } from "sections/categories";
 
 export const ProjectDrawer = () => {
   const isMobile = useMobileView();
@@ -25,7 +25,7 @@ export const ProjectDrawer = () => {
       <DividerHeader sx={{ my: 1 }} textAlign="left" typographyVariant="body2">
         Categories
       </DividerHeader>
-      <CategoriesSection />
+      <ProjectViewerCategories />
     </BaseAppDrawer>
   );
 };
