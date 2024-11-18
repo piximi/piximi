@@ -9,7 +9,7 @@ import { ZStackSlider } from "../ZStackSlider";
 import { ApplyColorsButton } from "../ApplyColorsButton";
 import { ChannelsList } from "../ChannelsList";
 
-import { CustomListItemButton } from "sections/list-items";
+import { CustomListItemButton } from "components/CustomListItemButton";
 import { CustomListItem } from "components/CustomListItem";
 import { selectLoadMessage } from "store/project/selectors";
 import { selectActiveImage } from "store/imageViewer/reselectors";

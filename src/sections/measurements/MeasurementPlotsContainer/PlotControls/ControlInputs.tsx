@@ -16,7 +16,7 @@ import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import { ReactElement, ReactNode, useCallback, useMemo } from "react";
 import { KeysWithValuesOfType } from "utils/common/types";
 import { capitalize } from "utils/common/helpers";
-import { CustomNumberTextField } from "sections/forms";
+import { CustomNumberTextField } from "components/CustomNumberTextField";
 import type { ColorSchemeId } from "@nivo/colors";
 import { nivoColorSpaces } from "themes/nivoTheme";
 import {

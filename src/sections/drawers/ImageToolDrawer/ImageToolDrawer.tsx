@@ -14,8 +14,8 @@ import SortIcon from "@mui/icons-material/Sort";
 import StraightenIcon from "@mui/icons-material/Straighten";
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
 import LabelIcon from "@mui/icons-material/Label";
-import { FileList } from "sections/lists";
-import { CategoriesList } from "sections/lists";
+import { FileIO } from "sections/FileIO";
+import { CategoriesSection } from "sections/CategoriesSection";
 
 import {
   FilterOptions,
@@ -30,7 +30,7 @@ import { dimensions } from "utils/common/constants";
 import { useSelector } from "react-redux";
 import { ToolHotkeyTitle, TooltipCard } from "components/tooltips";
 import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
-import { ModelTaskSection } from "../ProjectDrawer/ModelTaskSection";
+import { ModelTaskSection } from "../../ModelTaskSection/ModelTaskSection";
 
 export type OperationType = {
   icon: (color: string) => ReactElement;
@@ -46,7 +46,7 @@ const imageTools: Record<string, OperationType> = {
     icon: (color) => <FolderOpenIcon sx={{ color }} />,
     name: "fileIO",
     description: "-",
-    options: <FileList />,
+    options: <FileIO />,
     hotkey: "O",
     mobile: true,
   },
@@ -92,7 +92,7 @@ const imageTools: Record<string, OperationType> = {
     icon: (color) => <LabelIcon sx={{ color }} />,
     name: "categories",
     description: "-",
-    options: <CategoriesList />,
+    options: <CategoriesSection />,
     hotkey: "C",
     mobile: true,
   },

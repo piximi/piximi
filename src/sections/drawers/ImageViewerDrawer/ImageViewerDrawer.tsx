@@ -4,19 +4,19 @@ import { useSelector } from "react-redux";
 import { Box, Divider, IconButton, List, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 
-import { ClearAnnotationsGroup } from "sections/lists";
+import { ClearAnnotationsGroup } from "../../ClearAnnotationsGroup";
 import { AppBarOffset } from "components/AppBarOffset";
 import { DividerHeader } from "components/DividerHeader";
 
-import { ExportAnnotationsListItem } from "sections/list-items";
+import { ExportAnnotationsListItem } from "sections/FileIO";
 import { ImageViewerAppBar } from "sections/app-bars";
 
 //import { selectCreatedAnnotationCategories } from "store/slices/data";
 
 import { BaseAppDrawer } from "../../../components/BaseAppDrawer";
 import { selectImageViewerImages } from "store/imageViewer/reselectors";
-import { ImageList } from "sections/lists/ImageList";
-import { ImageViewerCategoryList } from "sections/lists/ImageViewerCategoryList";
+import { ImageList } from "./ImageList";
+import { ImageViewerCategorySection } from "./ImageViewerCategorySection";
 import { useDialogHotkey } from "hooks";
 import { HotkeyContext } from "utils/common/enums";
 import { CreateKindDialog } from "sections/dialogs";
@@ -105,7 +105,7 @@ export const ImageViewerDrawer = () => {
           />
         </Box>
 
-        <ImageViewerCategoryList />
+        <ImageViewerCategorySection />
 
         <Divider sx={{ mt: 1 }} />
 

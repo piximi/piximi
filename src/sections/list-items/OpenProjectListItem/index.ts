@@ -1,1 +1,0 @@
-export { OpenProjectListItem } from "./OpenProjectListItem";

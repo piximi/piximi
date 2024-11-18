@@ -11,9 +11,9 @@ import { HelpContent, HelpContentType } from "./HelpContent/HelpContent";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { CustomListItemButton } from "sections/list-items";
 import { CustomListItem } from "components/CustomListItem";
 import { AlertType } from "utils/common/enums";
+import { CustomListItemButton } from "components/CustomListItemButton";
 
 export const HelpDrawer = () => {
   const dispatch = useDispatch();

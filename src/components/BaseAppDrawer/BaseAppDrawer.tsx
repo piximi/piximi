@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Drawer } from "@mui/material";
-import { ApplicationOptionsList } from "sections/lists";
+import { ApplicationOptions } from "components/ApplicationOptions";
 
 export const BaseAppDrawer = ({
   children,
@@ -29,7 +29,7 @@ export const BaseAppDrawer = ({
     >
       <Box sx={{ overflowY: "scroll", overflowX: "hidden" }}>{children}</Box>
 
-      <ApplicationOptionsList />
+      <ApplicationOptions />
     </Drawer>
   );
 };

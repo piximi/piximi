@@ -9,7 +9,7 @@ import { useTranslation } from "hooks";
 import { imageViewerSlice } from "store/imageViewer";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
-import { CustomListItemButton } from "sections/list-items";
+import { CustomListItemButton } from "components/CustomListItemButton";
 import { CollapsibleListItem } from "components/CollapsibleListItem";
 import { selectAllCategories } from "store/data/selectors";
 import { OldCategory } from "store/data/types";

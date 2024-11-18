@@ -27,7 +27,7 @@ import {
   RadioCheckedIcon,
   RadioUncheckedIcon,
 } from "icons";
-import { CustomListItemButton } from "sections/list-items";
+import { CustomListItemButton } from "components/CustomListItemButton";
 import { CustomListItem } from "components/CustomListItem";
 import { DividerHeader } from "components/DividerHeader";
 import { StageContext } from "contexts";
