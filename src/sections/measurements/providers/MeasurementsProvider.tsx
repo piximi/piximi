@@ -6,17 +6,17 @@ import React, {
   useState,
 } from "react";
 
-import { GroupedMeasurementDisplayTable } from "store/measurements/types";
+import { formatChartItems } from "../utils";
+import { plotViewReducer } from "./reducers";
+import { initialPlotView } from "./initialStates";
 
+import { GroupedMeasurementDisplayTable } from "store/measurements/types";
 import {
   MeasurementDisplayParameters,
   PlotDetails,
   PlotViewActionProps,
   ViewReducer,
 } from "../types";
-import { formatChartItems } from "../utils";
-import { plotViewReducer } from "./reducers";
-import { initialPlotView } from "./initialStates";
 
 export const MeasurementsContext =
   createContext<null | MeasurementDisplayParameters>(null);

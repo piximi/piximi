@@ -36,12 +36,14 @@ import {
   selectSegmenterModelStatus,
 } from "store/segmenter/selectors";
 
-import { HotkeyContext } from "utils/common/enums";
-import { APPLICATION_COLORS } from "utils/common/constants";
 import { createGitHubIssue } from "utils/common/helpers";
-import { AlertState } from "utils/common/types";
+
+import { APPLICATION_COLORS } from "utils/common/constants";
+import { HotkeyContext } from "utils/common/enums";
 import { AlertType } from "utils/common/enums";
 import { ModelStatus } from "utils/models/enums";
+
+import { AlertState } from "utils/common/types";
 
 export const FallBackDialog = (props: any) => {
   const error = props.error as Error;

@@ -25,8 +25,6 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { dataSlice } from "store/data";
 import { selectUnknownImageCategory } from "store/data/selectors";
-import { ImageObject } from "store/data/types";
-
 import { projectSlice } from "store/project";
 import {
   selectActiveKindId,
@@ -34,23 +32,25 @@ import {
   selectProjectImageChannels,
 } from "store/project/selectors";
 
-import { MIMETYPES } from "utils/file-io/constants";
-import { ImageShapeEnum } from "utils/file-io/enums";
 import {
   decodeDicomImage,
   forceStack,
   getImageInformation,
 } from "utils/file-io/helpers";
+import { isUnknownCategory, updateRecord } from "utils/common/helpers";
+import { convertToImage } from "utils/common/tensorHelpers";
+
+import { MIMETYPES } from "utils/file-io/constants";
+import { ImageShapeEnum } from "utils/file-io/enums";
+import { AlertType } from "utils/common/enums";
+import { Partition } from "utils/models/enums";
+
+import { ImageObject } from "store/data/types";
 import {
   ImageFileShapeInfo,
   ImageShapeInfo,
   MIMEType,
 } from "utils/file-io/types";
-
-import { isUnknownCategory, updateRecord } from "utils/common/helpers";
-import { AlertType } from "utils/common/enums";
-import { convertToImage } from "utils/common/tensorHelpers";
-import { Partition } from "utils/models/enums";
 
 type ImageShapeInfoImage = ImageFileShapeInfo & {
   fileName: string;

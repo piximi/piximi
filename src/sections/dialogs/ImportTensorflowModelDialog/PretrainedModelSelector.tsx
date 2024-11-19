@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { Model } from "utils/models/Model/Model";
+import { Model } from "utils/models/Model";
 
 interface ModelOptionType {
   label: string;

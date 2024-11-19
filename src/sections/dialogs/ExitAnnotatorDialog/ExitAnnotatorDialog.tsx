@@ -3,9 +3,10 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { ConfirmationDialog } from "components/ConfirmationDialog";
 
 import { imageViewerSlice } from "store/imageViewer";
-import { dataSlice } from "store/data/dataSlice";
-import { selectActiveImageId } from "store/imageViewer/selectors";
+import { dataSlice } from "store/data/";
 import { annotatorSlice } from "store/annotator";
+
+import { selectActiveImageId } from "store/imageViewer/selectors";
 
 type ExitAnnotatorDialogProps = {
   returnToProject: () => void;

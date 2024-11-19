@@ -8,8 +8,8 @@ import {
   MeasurementDisplayTable,
   MeasurementOptions,
 } from "store/measurements/types";
-import { ChartValues } from "./types";
 import { RecursivePartial } from "utils/common/types";
+import { ChartValues } from "./types";
 
 export const format = (value: string | number, sf: number = 2) => {
   if (typeof value === "number") {

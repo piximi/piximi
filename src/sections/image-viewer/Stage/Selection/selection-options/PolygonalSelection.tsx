@@ -5,8 +5,9 @@ import { useSelector } from "react-redux";
 import { useMarchingAnts } from "hooks";
 
 import { StageContext } from "contexts";
-import { PolygonalAnnotationTool } from "utils/annotator/tools";
 import { selectImageOrigin } from "store/imageViewer/selectors";
+
+import { PolygonalAnnotationTool } from "utils/annotator/tools";
 
 type PolygonalSelectionProps = {
   operator: PolygonalAnnotationTool;

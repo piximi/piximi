@@ -11,10 +11,11 @@ import { CollapsibleListItem } from "components/CollapsibleListItem";
 
 import { imageViewerSlice } from "store/imageViewer";
 import { selectAllCategories } from "store/data/selectors";
-import { OldCategory } from "store/data/types";
 import { selectActiveAnnotations } from "store/imageViewer/reselectors";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
+
+import { OldCategory } from "store/data/types";
 
 export const PointerSelectionOptions = () => {
   const t = useTranslation();

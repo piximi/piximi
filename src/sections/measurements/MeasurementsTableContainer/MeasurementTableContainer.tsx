@@ -16,9 +16,9 @@ import { CustomTabs } from "components/CustomTabSwitcher";
 import { MeasurementPlotsContainer } from "../MeasurementPlotsContainer";
 import { MeasurementTable } from "./MeasurementTable";
 
-import { GroupedMeasurementDisplayTable } from "store/measurements/types";
-
 import { capitalize } from "utils/common/helpers";
+
+import { GroupedMeasurementDisplayTable } from "store/measurements/types";
 
 export const MeasurementTableContainer = ({
   table,

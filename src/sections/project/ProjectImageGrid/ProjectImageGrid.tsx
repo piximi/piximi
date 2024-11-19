@@ -8,12 +8,12 @@ import { CustomTabs } from "components/CustomTabSwitcher";
 import { ImageGrid } from "./ImageGrid";
 import { AddKindMenu } from "./AddKindMenu";
 
+import { projectSlice } from "store/project";
+import { dataSlice } from "store/data";
 import {
   selectActiveKindId,
   selectKindTabFilters,
 } from "store/project/selectors";
-import { projectSlice } from "store/project";
-import { dataSlice } from "store/data";
 import { selectKindDictionary } from "store/data/selectors";
 import { selectVisibleKinds } from "store/project/reselectors";
 

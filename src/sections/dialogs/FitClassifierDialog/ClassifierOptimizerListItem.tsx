@@ -7,8 +7,9 @@ import { OptimizerSettingsGrid } from "sections/model-settings";
 import { classifierSlice } from "store/classifier";
 import { selectClassifierCompileOptions } from "store/classifier/selectors";
 
-import { FitOptions } from "utils/models/types";
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
+
+import { FitOptions } from "utils/models/types";
 
 export const ClassifierOptimizerListItem = ({
   fitOptions,

@@ -3,12 +3,13 @@ import { batch, useDispatch } from "react-redux";
 
 import { BaseHorizCard } from "components/BaseHorizCard";
 
-import { dataSlice } from "store/data/dataSlice";
+import { dataSlice } from "store/data";
 import { projectSlice } from "store/project";
 
 import { dataConverter_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";
-import { SerializedFileType } from "utils/file-io/types";
 import { loadExampleImage } from "utils/file-io/loadExampleImage";
+
+import { SerializedFileType } from "utils/file-io/types";
 
 type ExampleImageType = {
   name: string;

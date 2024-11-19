@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import { selectAlertState } from "store/applicationSettings/selectors";
 import { classifierSlice } from "store/classifier";
 import {
@@ -12,10 +13,13 @@ import {
   selectActiveLabeledThings,
   selectActiveLabeledThingsCount,
 } from "store/project/reselectors";
-import { AlertType } from "utils/common/enums";
+
 import { isUnknownCategory, logger } from "utils/common/helpers";
-import { AlertState } from "utils/common/types";
+
 import { ModelStatus, Partition } from "utils/models/enums";
+import { AlertType } from "utils/common/enums";
+
+import { AlertState } from "utils/common/types";
 import { TrainingCallbacks } from "utils/models/types";
 
 type PlotData = { x: number; y: number }[];

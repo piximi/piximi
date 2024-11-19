@@ -13,9 +13,9 @@ import {
 } from "store/annotator/selectors";
 import { selectWorkingAnnotation } from "store/imageViewer/selectors";
 
-import { AnnotationMode, AnnotationState } from "utils/annotator/enums";
-
 import { RadioCheckedIcon, RadioUncheckedIcon } from "icons";
+
+import { AnnotationMode, AnnotationState } from "utils/annotator/enums";
 
 export const AnnotationModeOptions = () => {
   const dispatch = useDispatch();

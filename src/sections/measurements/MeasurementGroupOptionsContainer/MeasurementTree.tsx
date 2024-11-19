@@ -5,16 +5,17 @@ import { Box } from "@mui/material";
 
 import { SelectionTree } from "components/SelectionTree";
 
+import { measurementsSlice } from "store/measurements";
 import {
   selectMeasurementData,
   selectSelectedGroupMeasurements,
 } from "store/measurements/selectors";
-import { MeasurementOptions, MeasurementGroup } from "store/measurements/types";
-import { measurementsSlice } from "store/measurements/measurementsSlice";
 
-import { selectTreeItemChildren } from "../utils";
-import { LoadStatus, RecursivePartial } from "utils/common/types";
 import { isObjectEmpty } from "utils/common/helpers";
+import { selectTreeItemChildren } from "../utils";
+
+import { LoadStatus, RecursivePartial } from "utils/common/types";
+import { MeasurementOptions, MeasurementGroup } from "store/measurements/types";
 
 export const MeasurementsTree = ({
   group,

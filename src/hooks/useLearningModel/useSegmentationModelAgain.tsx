@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import { selectAlertState } from "store/applicationSettings/selectors";
 import { selectAnnotatedImages } from "store/data/selectors";
 import { segmenterSlice } from "store/segmenter";
@@ -10,10 +11,13 @@ import {
   selectSegmenterModelStatus,
   selectSegmenterTrainingPercentage,
 } from "store/segmenter/selectors";
-import { AlertType } from "utils/common/enums";
+
 import { logger } from "utils/common/helpers";
-import { AlertState } from "utils/common/types";
+
+import { AlertType } from "utils/common/enums";
 import { ModelStatus } from "utils/models/enums";
+
+import { AlertState } from "utils/common/types";
 import { TrainingCallbacks } from "utils/models/types";
 
 const items = [

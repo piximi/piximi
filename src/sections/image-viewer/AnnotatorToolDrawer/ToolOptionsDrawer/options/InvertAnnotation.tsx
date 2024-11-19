@@ -7,12 +7,12 @@ import { useAnnotationTool, useTranslation } from "hooks";
 import { CustomListItemButton } from "components/CustomListItemButton";
 
 import { imageViewerSlice } from "store/imageViewer";
-import { dataSlice } from "store/data/dataSlice";
+import { dataSlice } from "store/data";
 import { selectWorkingAnnotation } from "store/imageViewer/selectors";
 
-import { encode } from "utils/annotator";
-
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
+
+import { encode } from "utils/annotator";
 
 //TODO: change to listItem
 

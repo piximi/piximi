@@ -9,6 +9,7 @@ import {
   MeasurementsContext,
   PlotViewContext,
 } from "./providers/MeasurementsProvider";
+import { measurementsSlice } from "store/measurements";
 import { selectMeasurementData } from "store/measurements/selectors";
 import {
   selectCategoriesByKind,
@@ -16,7 +17,6 @@ import {
   selectKindDictionary,
   selectThingsDictionary,
 } from "store/data/selectors";
-import { measurementsSlice } from "store/measurements/measurementsSlice";
 
 import { HotkeyContext } from "utils/common/enums";
 

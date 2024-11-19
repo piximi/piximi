@@ -3,9 +3,9 @@ import { ResponsiveMarimekko } from "@nivo/marimekko";
 
 import { usePreferredNivoTheme } from "hooks";
 
-import { ParsedMeasurementData } from "store/measurements/types";
-
 import { format, getHistogramData } from "../utils";
+
+import { ParsedMeasurementData } from "store/measurements/types";
 import { ChartConfig } from "../types";
 
 export const ResponsiveHistogram = ({

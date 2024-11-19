@@ -1,17 +1,20 @@
 import { useCallback, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
+
 import { useHotkeys } from "../useHotkeys";
 
-import { DecodedAnnotationObject } from "store/data/types";
 import { imageViewerSlice } from "store/imageViewer";
 import { selectActiveImageId } from "store/imageViewer/selectors";
 import { selectActiveAnnotations } from "store/imageViewer/reselectors";
 
 import { getOverlappingAnnotations } from "utils/annotator";
 import { getAnnotationsInBox } from "utils/annotator/imageHelper";
-import { Point } from "utils/annotator/types";
+
 import { ToolType } from "utils/annotator/enums";
 import { HotkeyContext } from "utils/common/enums";
+
+import { Point } from "utils/annotator/types";
+import { DecodedAnnotationObject } from "store/data/types";
 
 const delta = 10;
 

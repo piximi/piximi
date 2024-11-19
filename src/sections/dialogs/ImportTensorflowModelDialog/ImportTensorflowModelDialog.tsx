@@ -27,15 +27,17 @@ import { PretrainedModelSelector } from "./PretrainedModelSelector";
 import { CloudUpload } from "./CloudUpload";
 import { ModelFormatSelection } from "./ModelFormatSelection";
 
-import { Shape } from "store/data/types";
 import { selectProjectImageChannels } from "store/project/selectors";
 
 import { Model } from "utils/models/Model";
 import { Cellpose } from "utils/models/segmentation";
-import { ModelTask } from "utils/models/enums";
+
 import { availableClassifierModels } from "utils/models/availableClassificationModels";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
+import { ModelTask } from "utils/models/enums";
 import { HotkeyContext } from "utils/common/enums";
+
+import { Shape } from "store/data/types";
 
 const ToolTipTab = (
   props: TabProps & {

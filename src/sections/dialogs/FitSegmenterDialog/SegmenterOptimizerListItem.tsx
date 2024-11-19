@@ -6,8 +6,9 @@ import { OptimizerSettingsGrid } from "sections/model-settings";
 import { segmenterSlice } from "store/segmenter";
 import { selectSegmenterCompileOptions } from "store/segmenter/selectors";
 
-import { FitOptions } from "utils/models/types";
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
+
+import { FitOptions } from "utils/models/types";
 
 export const SegmenterOptimizerListItem = ({
   fitOptions,

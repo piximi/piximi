@@ -6,14 +6,15 @@ import { BaseHorizCard } from "components/BaseHorizCard";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
-import { dataSlice } from "store/data/dataSlice";
+import { dataSlice } from "store/data";
 
 import { PseudoFileList, fListToStore } from "utils/file-io/zarrStores";
 import { deserializeProject } from "utils/file-io/deserialize";
-import { AlertState } from "utils/common/types";
-import { AlertType } from "utils/common/enums";
 
+import { AlertType } from "utils/common/enums";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
+
+import { AlertState } from "utils/common/types";
 
 type ExampleProjectType = {
   name: string;

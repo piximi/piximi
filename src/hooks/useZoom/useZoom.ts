@@ -14,9 +14,11 @@ import {
   selectZoomToolOptions,
 } from "store/imageViewer/selectors";
 
-import { Point } from "utils/annotator/types";
-import { ToolType, ZoomMode } from "utils/annotator/enums";
 import { getDistance } from "utils/annotator";
+
+import { ToolType, ZoomMode } from "utils/annotator/enums";
+
+import { Point } from "utils/annotator/types";
 
 const delta = 10;
 export const useZoom = (stage?: Konva.Stage | null) => {

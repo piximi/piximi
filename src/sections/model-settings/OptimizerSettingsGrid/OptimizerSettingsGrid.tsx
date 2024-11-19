@@ -4,6 +4,7 @@ import { CustomFormSelectField } from "components/CustomFormSelectField";
 import { CustomNumberTextField } from "components/CustomNumberTextField";
 
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
+
 import { CompileOptions, FitOptions } from "utils/models/types";
 
 type OptimizerSettingsGridProps = {

@@ -9,18 +9,16 @@ import { useDialogHotkey } from "hooks";
 import { ConfirmationDialog } from "components/ConfirmationDialog";
 import { ExportAnnotationsDialog } from "sections/dialogs";
 
-import {
-  selectHasUnsavedChanges,
-  selectProjectName,
-} from "store/project/selectors";
-
 import { dataSlice } from "store/data";
 import {
   selectAllObjectCategories,
   selectAllObjectKinds,
   selectObjectCategoryDict,
 } from "store/data/selectors";
-
+import {
+  selectHasUnsavedChanges,
+  selectProjectName,
+} from "store/project/selectors";
 import {
   selectImageViewerObjects,
   selectImageViewerImages,

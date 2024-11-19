@@ -7,8 +7,9 @@ import {
 } from "./ControlOptions";
 import { ColorThemeSelect, PlotSelect } from "./ControlInputs";
 
-import { usePlotControl } from "sections/measurements/providers/hooks";
-import { ChartType } from "sections/measurements/types";
+import { usePlotControl } from "../../providers/hooks";
+
+import { ChartType } from "../../types";
 
 export const PlotControls = () => {
   const { selectedPlot } = usePlotControl();

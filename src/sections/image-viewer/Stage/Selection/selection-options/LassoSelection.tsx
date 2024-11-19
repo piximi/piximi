@@ -6,6 +6,7 @@ import { useMarchingAnts } from "hooks";
 
 import { StageContext } from "contexts";
 import { selectImageOrigin } from "store/imageViewer/selectors";
+
 import { LassoAnnotationTool } from "utils/annotator/tools";
 
 type LassoSelectionProps = {

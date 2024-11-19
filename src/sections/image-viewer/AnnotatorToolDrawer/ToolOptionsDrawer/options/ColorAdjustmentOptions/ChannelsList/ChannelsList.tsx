@@ -17,15 +17,18 @@ import { useLocalGlobalState } from "hooks";
 import { CollapsibleList } from "components/CollapsibleList";
 import { Palette } from "../Palette";
 
+import { dataSlice } from "store/data";
 import {
   selectActiveImage,
   selectActiveImageRawColor,
 } from "store/imageViewer/reselectors";
-import { dataSlice } from "store/data/dataSlice";
-import { scaleDownRange, scaleUpRange } from "utils/common/helpers";
-import { BitDepth } from "utils/file-io/types";
-import { rgbToHex } from "utils/common/helpers";
+
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
+
+import { scaleDownRange, scaleUpRange } from "utils/common/helpers";
+import { rgbToHex } from "utils/common/helpers";
+
+import { BitDepth } from "utils/file-io/types";
 
 //TODO: Slider Components
 

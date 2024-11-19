@@ -4,11 +4,12 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import Image from "image-js";
 
+import { dataSlice } from "store/data";
 import { selectImageOrigin } from "store/imageViewer/selectors";
-import { dataSlice } from "store/data/dataSlice";
-import { DecodedAnnotationObject, Shape } from "store/data/types";
 
 import { hexToRGBA, colorOverlayROI, encode } from "utils/annotator";
+
+import { DecodedAnnotationObject, Shape } from "store/data/types";
 
 type AnnotationProps = {
   annotation: DecodedAnnotationObject;

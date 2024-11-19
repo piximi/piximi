@@ -12,8 +12,9 @@ import { CustomListItemButton } from "components/CustomListItemButton";
 import { CountChip } from "components/CountChip";
 import { CategoryItemMenu } from "sections/categories/CategoryItemMenu";
 
-import { Category } from "store/data/types";
 import { APPLICATION_COLORS } from "utils/common/constants";
+
+import { Category } from "store/data/types";
 
 type ImageViewerCategoryItemProps = {
   category: Category;

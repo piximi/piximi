@@ -8,12 +8,13 @@ import { ConfirmationDialog } from "components/ConfirmationDialog";
 import { UpdateCategoryDialog } from "sections/dialogs";
 
 import { dataSlice } from "store/data/dataSlice";
-import { Category } from "store/data/types";
-import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
-import { selectActiveKindId } from "store/project/selectors";
 import { imageViewerSlice } from "store/imageViewer";
+import { selectActiveKindId } from "store/project/selectors";
 
+import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 import { HotkeyContext } from "utils/common/enums";
+
+import { Category } from "store/data/types";
 
 type MenuFunctions = {
   Edit?: { permanent: boolean };

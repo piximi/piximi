@@ -18,8 +18,9 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { ImageMenu } from "./ImageMenu";
 
 import { imageViewerSlice } from "store/imageViewer";
-import { ImageObject } from "store/data/types";
 import { selectActiveImageId } from "store/imageViewer/selectors";
+
+import { ImageObject } from "store/data/types";
 
 const NUM_BUFFERED_IMS = 20;
 const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 4);

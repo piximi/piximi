@@ -33,6 +33,7 @@ import {
 import { OperationType, ToolOptionsDrawer } from "./ToolOptionsDrawer";
 
 import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
+
 import { dimensions } from "utils/common/constants";
 
 const imageTools: Record<string, OperationType> = {

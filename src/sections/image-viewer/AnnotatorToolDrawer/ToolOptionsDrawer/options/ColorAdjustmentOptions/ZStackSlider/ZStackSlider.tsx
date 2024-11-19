@@ -4,8 +4,8 @@ import { List, ListItem, Slider } from "@mui/material";
 
 import { CustomListItem } from "components/CustomListItem";
 
+import { dataSlice } from "store/data";
 import { selectActiveImage } from "store/imageViewer/reselectors";
-import { dataSlice } from "store/data/dataSlice";
 import { selectActiveImageRenderedSrcs } from "store/imageViewer/selectors";
 
 //TODO: change slider style

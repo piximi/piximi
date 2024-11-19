@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+
 import { CommonTabPanelProps } from "./props";
 
 export function SlidingTabPanel(props: CommonTabPanelProps) {

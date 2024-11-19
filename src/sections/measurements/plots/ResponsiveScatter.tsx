@@ -4,7 +4,6 @@ import { ResponsiveScatterPlot } from "@nivo/scatterplot";
 import { usePreferredNivoTheme } from "hooks";
 
 import { ParsedMeasurementData } from "store/measurements/types";
-
 import { ChartConfig, ScatterData, ScatterGroup, ScatterPoint } from "../types";
 
 export const ResponsiveScatter = ({

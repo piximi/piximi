@@ -15,8 +15,9 @@ import { useDialogHotkey } from "hooks";
 import { CustomNumberTextField } from "components/CustomNumberTextField";
 import { ConfirmationDialog } from "components/ConfirmationDialog";
 
-import { Shape } from "store/data/types";
 import { HotkeyContext } from "utils/common/enums";
+
+import { Shape } from "store/data/types";
 
 type SelectedModelType = {
   name: string;

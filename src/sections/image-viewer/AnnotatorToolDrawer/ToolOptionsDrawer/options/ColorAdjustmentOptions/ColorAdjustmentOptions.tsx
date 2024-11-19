@@ -12,9 +12,9 @@ import { ZStackSlider } from "./ZStackSlider";
 import { ApplyColorsButton } from "./ApplyColorsButton";
 import { ChannelsList } from "./ChannelsList";
 
+import { dataSlice } from "store/data";
 import { selectLoadMessage } from "store/project/selectors";
 import { selectActiveImage } from "store/imageViewer/reselectors";
-import { dataSlice } from "store/data/dataSlice";
 
 import { generateDefaultColors } from "utils/common/tensorHelpers";
 

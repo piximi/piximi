@@ -1,7 +1,8 @@
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { sample } from "lodash";
 import { ColorResult } from "react-color";
-import { useSelector } from "react-redux";
+
 import {
   selectActiveCategoryColors,
   selectActiveCategoryNames,

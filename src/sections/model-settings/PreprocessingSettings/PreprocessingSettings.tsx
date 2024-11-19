@@ -10,8 +10,9 @@ import {
 import { CustomNumberTextField } from "components/CustomNumberTextField";
 import { CustomFormSelectField } from "components/CustomFormSelectField";
 
-import { CropOptions, RescaleOptions } from "utils/models/types";
 import { CropSchema } from "utils/models/enums";
+
+import { CropOptions, RescaleOptions } from "utils/models/types";
 
 type PreprocessingSettingsProps = {
   cropOptions: CropOptions;

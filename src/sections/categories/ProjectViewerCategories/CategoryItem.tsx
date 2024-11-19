@@ -1,18 +1,20 @@
 import React from "react";
-
+import { useSelector } from "react-redux";
+import { Tooltip } from "@mui/material";
 import {
   Label as LabelIcon,
   MoreHoriz as MoreHorizIcon,
 } from "@mui/icons-material";
 
 import { CustomListItemButton } from "components/CustomListItemButton";
-import { useSelector } from "react-redux";
+import { CountChip } from "components/CountChip";
+
 import { selectNumThingsByCatAndKind } from "store/data/selectors";
 import { selectActiveKindId } from "store/project/selectors";
-import { CountChip } from "components/CountChip";
+
 import { APPLICATION_COLORS } from "utils/common/constants";
+
 import { Category } from "store/data/types";
-import { Tooltip } from "@mui/material";
 
 type CategoryItemProps = {
   showHK?: boolean;

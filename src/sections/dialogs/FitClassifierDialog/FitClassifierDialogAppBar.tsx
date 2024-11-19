@@ -20,16 +20,16 @@ import { ConfirmationDialog } from "components/ConfirmationDialog";
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
 import { classifierSlice } from "store/classifier";
+import { dataSlice } from "store/data";
 import {
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
   selectShowClearPredictionsWarning,
 } from "store/classifier/selectors";
 import { selectActiveKindId } from "store/project/selectors";
-import { dataSlice } from "store/data";
 
-import { ModelStatus } from "utils/models/enums";
 import { APPLICATION_COLORS } from "utils/common/constants";
+import { ModelStatus } from "utils/models/enums";
 import { HotkeyContext } from "utils/common/enums";
 
 type FitClassifierDialogAppBarProps = {

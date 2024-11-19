@@ -5,6 +5,7 @@ import { DividerHeader } from "components/DividerHeader";
 import { FilterChip } from "./FilterChip";
 
 import { selectUnfilteredActivePartitions } from "store/project/selectors";
+
 import { Partition } from "utils/models/enums";
 
 export const PartitionFilterList = ({

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectAlertState } from "store/applicationSettings/selectors";
+
 import { AlertType, HotkeyContext } from "utils/common/enums";
 
 export const useDialog = (closeOnError: boolean = true) => {

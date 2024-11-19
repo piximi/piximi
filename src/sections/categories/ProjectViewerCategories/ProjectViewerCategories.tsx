@@ -1,32 +1,33 @@
 import React, { useCallback, useEffect, useState } from "react";
-
+import { useDispatch, useSelector } from "react-redux";
 import { List } from "@mui/material";
-
 import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 
 import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { ConfirmationDialog } from "components/ConfirmationDialog";
-
 import { CustomListItemButton } from "components/CustomListItemButton";
-import { useDispatch, useSelector } from "react-redux";
+import { CreateCategoryDialog } from "sections/dialogs";
+import { CategoryItemMenu } from "../CategoryItemMenu";
 import { CategoryItem } from "./CategoryItem";
+import { PredictionListItems } from "./PredictionListItems";
+
 import { projectSlice } from "store/project";
 import { selectHighlightedCategory } from "store/project/selectors";
 import { selectActiveKindId } from "store/project/selectors";
-import { CreateCategoryDialog } from "sections/dialogs";
-import { dataSlice } from "store/data/dataSlice";
-import { isUnknownCategory } from "utils/common/helpers";
-import { ModelStatus, Partition } from "utils/models/enums";
-import { HotkeyContext } from "utils/common/enums";
-import { Category } from "store/data/types";
 import {
   selectActiveCategories,
   selectActiveSelectedThingIds,
 } from "store/project/reselectors";
+import { dataSlice } from "store/data/dataSlice";
 import { selectClassifierModelStatus } from "store/classifier/selectors";
-import { PredictionListItems } from "./PredictionListItems";
-import { CategoryItemMenu } from "../CategoryItemMenu";
+
+import { isUnknownCategory } from "utils/common/helpers";
+
+import { ModelStatus, Partition } from "utils/models/enums";
+import { HotkeyContext } from "utils/common/enums";
+
+import { Category } from "store/data/types";
 
 export const ProjectViewerCategories = () => {
   const dispatch = useDispatch();
