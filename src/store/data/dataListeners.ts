@@ -1,13 +1,16 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { TypedAppStartListening } from "store/types";
-import { dataSlice } from "./dataSlice";
-import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { intersection } from "lodash";
-import { DeferredEntity } from "store/entities/models";
+
+import { dataSlice } from "./dataSlice";
 import { projectSlice } from "../project";
 import { imageViewerSlice } from "../imageViewer";
+
+import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { createRenderedTensor } from "utils/common/tensorHelpers";
+
+import { DeferredEntity } from "store/entities/models";
 import { ImageObject } from "./types";
+import { TypedAppStartListening } from "store/types";
 
 export const dataMiddleware = createListenerMiddleware();
 

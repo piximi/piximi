@@ -1,9 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { ProjectState } from "store/types";
-import { ThingSortKey } from "utils/common/enums";
 import { mutatingFilter, toUnique } from "utils/common/helpers";
+
+import { ThingSortKey } from "utils/common/enums";
 import { Partition } from "utils/models/enums";
+
+import { ProjectState } from "store/types";
 
 export const initialState: ProjectState = {
   name: "Untitled project",

@@ -1,10 +1,13 @@
 import { v4 as uuidv4 } from "uuid";
-import { Category, Kind, Thing } from "./types";
+import { union } from "lodash";
+
+import { isObjectEmpty } from "utils/common/helpers";
+
 import { UNKNOWN_CATEGORY_NAME } from "./constants";
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
-import { union } from "lodash";
+
 import { DeferredEntity } from "store/entities/models";
-import { isObjectEmpty } from "utils/common/helpers";
+import { Category, Kind, Thing } from "./types";
 
 export const generateUUID = (options?: { definesUnknown: boolean }) => {
   let id = uuidv4();

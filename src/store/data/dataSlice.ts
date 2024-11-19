@@ -1,10 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
-
-import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
+import { dispose, TensorContainer } from "@tensorflow/tfjs";
 import { intersection } from "lodash";
 
+import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
+import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import {
   generateUnknownCategory,
   generateUUID,
@@ -12,13 +11,15 @@ import {
   mutatingFilter,
   newReplaceDuplicateName,
 } from "utils/common/helpers";
-import { dispose, TensorContainer } from "@tensorflow/tfjs";
-import { DataState } from "store/types";
-import { DeferredEntity, DeferredEntityState } from "store/entities/models";
 import { encode } from "utils/annotator/rle";
+import { updateContents } from "./helpers";
+
 import { Partition } from "utils/models/enums";
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
+import { UNKNOWN_CATEGORY_NAME } from "./constants";
+
 import { PartialBy } from "utils/common/types";
+import { DataState } from "store/types";
 import {
   Kind,
   AnnotationObject,
@@ -28,8 +29,7 @@ import {
   ThingsUpdates,
   CategoryUpdates,
 } from "./types";
-import { UNKNOWN_CATEGORY_NAME } from "./constants";
-import { updateContents } from "./helpers";
+import { DeferredEntity, DeferredEntityState } from "store/entities/models";
 
 const unknownCategory = generateUnknownCategory("Image");
 export const kindsAdapter = createDeferredEntityAdapter<Kind>();

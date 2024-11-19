@@ -1,9 +1,16 @@
 import { createSelector } from "@reduxjs/toolkit";
+
 import { selectMeasurementData, selectMeasurementGroups } from "./selectors";
 import {
   selectCategoriesDictionary,
   selectThingsDictionary,
 } from "store/data/selectors";
+
+import { capitalize } from "utils/common/helpers";
+import { getStatistics } from "utils/measurements/helpers";
+
+import { Partition } from "utils/models/enums";
+
 import {
   DisplayTableRow,
   GroupedMeasurementDisplayTable,
@@ -11,9 +18,6 @@ import {
   ParsedMeasurementData,
 } from "./types";
 import { Thing } from "store/data/types";
-import { capitalize } from "utils/common/helpers";
-import { Partition } from "utils/models/enums";
-import { getStatistics } from "utils/measurements/helpers";
 
 export const selectPlotData = createSelector(
   selectMeasurementData,

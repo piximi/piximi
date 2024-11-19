@@ -1,10 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { History } from "@tensorflow/tfjs";
-import { SegmenterState } from "store/types";
-import {
-  SegmenterEvaluationResultType,
-  TrainingCallbacks,
-} from "utils/models/types";
+
 import {
   CropSchema,
   LossFunction,
@@ -13,6 +9,12 @@ import {
   OptimizationAlgorithm,
 } from "utils/models/enums";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
+
+import { SegmenterState } from "store/types";
+import {
+  SegmenterEvaluationResultType,
+  TrainingCallbacks,
+} from "utils/models/types";
 import { Shape } from "store/data/types";
 
 export const initialState: SegmenterState = {

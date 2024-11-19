@@ -1,4 +1,29 @@
-import { createListenerMiddleware } from "@reduxjs/toolkit";
+import {
+  createListenerMiddleware,
+  CombinedState,
+  ListenerEffectAPI,
+} from "@reduxjs/toolkit";
+import { ENV, enableDebugMode, History } from "@tensorflow/tfjs";
+import { shuffle, take, takeRight } from "lodash";
+
+import { classifierSlice } from "./classifierSlice";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { dataSlice } from "store/data/dataSlice";
+
+import {
+  getStackTraceFromError,
+  getSubset,
+  isUnknownCategory,
+  logger,
+} from "utils/common/helpers";
+import { getCompleteEntity } from "store/entities/utils";
+
+import { SimpleCNN, MobileNet } from "utils/models/classification";
+
+import { availableClassifierModels } from "utils/models/availableClassificationModels";
+import { ModelStatus, Partition } from "utils/models/enums";
+import { AlertType } from "utils/common/enums";
+
 import {
   AnnotatorState,
   AppSettingsState,
@@ -8,29 +33,10 @@ import {
   SegmenterState,
   TypedAppStartListening,
 } from "store/types";
-import { shuffle, take, takeRight } from "lodash";
-
-import { classifierSlice } from "./classifierSlice";
-import { getCompleteEntity } from "store/entities/utils";
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { CombinedState, ListenerEffectAPI } from "@reduxjs/toolkit";
+import { CompileOptions, TrainingCallbacks } from "utils/models/types";
 import { DataState } from "store/types";
 import { AppDispatch } from "store/types";
-import { dataSlice } from "store/data/dataSlice";
-import { ENV, enableDebugMode, History } from "@tensorflow/tfjs";
-import {
-  getStackTraceFromError,
-  getSubset,
-  isUnknownCategory,
-} from "utils/common/helpers";
-import { SimpleCNN } from "utils/models/classification/SimpleCNN/SimpleCNN";
-import { MobileNet } from "utils/models/classification/MobileNet/MobileNet";
-import { logger } from "utils/common/helpers";
-import { CompileOptions, TrainingCallbacks } from "utils/models/types";
-import { ModelStatus, Partition } from "utils/models/enums";
-import { availableClassifierModels } from "utils/models/availableClassificationModels";
 import { AlertState } from "utils/common/types";
-import { AlertType } from "utils/common/enums";
 import { Category, Thing } from "store/data/types";
 
 export const classifierMiddleware = createListenerMiddleware();

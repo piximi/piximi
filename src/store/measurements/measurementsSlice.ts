@@ -1,4 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { isArray, merge, mergeWith } from "lodash";
+
+import { generateUUID } from "utils/common/helpers";
+
+import { baseMeasurementOptions } from "./constants";
+import { Partition } from "utils/models/enums";
+
+import { Category } from "store/data/types";
 import { RecursivePartial } from "utils/common/types";
 import {
   MeasurementsState,
@@ -7,11 +15,6 @@ import {
   ThingData,
   ThingMeasurements,
 } from "./types";
-import { generateUUID } from "utils/common/helpers";
-import { isArray, merge, mergeWith } from "lodash";
-import { baseMeasurementOptions } from "./constants";
-import { Category } from "store/data/types";
-import { Partition } from "utils/models/enums";
 
 const initialState: MeasurementsState = {
   data: {},

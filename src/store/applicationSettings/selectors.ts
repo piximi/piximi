@@ -1,7 +1,8 @@
-import { AppSettingsState } from "store/types";
-import { ThemeMode } from "themes/enums";
 import { HotkeyContext } from "utils/common/enums";
+import { ThemeMode } from "themes/enums";
+
 import { AlertState } from "utils/common/types";
+import { AppSettingsState } from "store/types";
 
 export const selectAlertState = ({
   applicationSettings,

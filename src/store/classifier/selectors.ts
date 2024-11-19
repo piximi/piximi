@@ -1,8 +1,11 @@
 import { createSelector } from "@reduxjs/toolkit";
+
+import { availableClassifierModels } from "utils/models/availableClassificationModels";
+
+import { ModelStatus } from "utils/models/enums";
+
 import { Shape } from "store/data/types";
 import { ClassifierState } from "store/types";
-import { availableClassifierModels } from "utils/models/availableClassificationModels";
-import { ModelStatus } from "utils/models/enums";
 import {
   ClassifierEvaluationResultType,
   CompileOptions,
