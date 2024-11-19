@@ -1,12 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
-import { ArchitectureSettings } from "sections/dialogs/FitClassifierDialog/settings";
-import { CollapsibleListItem } from "../../../components/CollapsibleListItem";
+
+import { CollapsibleListItem } from "components/CollapsibleListItem";
+import { ArchitectureSettings } from "sections/model-settings";
+
 import { segmenterSlice } from "store/segmenter";
-import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import {
   selectSegmenterInputShape,
   selectSegmenterModelIdx,
 } from "store/segmenter/selectors";
+
+import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 
 const modelOptions = availableSegmenterModels
   .map((m, i) => ({

@@ -1,0 +1,10 @@
+export { ColorSelection } from "./ColorSelection";
+export { PenSelection } from "./PenSelection";
+export { EllipticalSelection } from "./EllipticalSelection";
+export { RectangularSelection } from "./RectangularSelection";
+export { PolygonalSelection } from "./PolygonalSelection";
+export { LassoSelection } from "./LassoSelection";
+export { MagneticSelection } from "./MagneticSelection";
+export { ObjectSelection } from "./ObjectSelection";
+export { QuickSelection } from "./QuickSelection";
+export { ZoomSelection } from "./ZoomSelection";

@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import {
   ListSubheader,
   ListSubheaderProps,
@@ -6,7 +7,6 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { ReactNode } from "react";
 
 export function GroupedSelectListSubheader(props: ListSubheaderProps) {
   return (

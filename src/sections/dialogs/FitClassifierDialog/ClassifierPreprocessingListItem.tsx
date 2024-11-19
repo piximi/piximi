@@ -1,8 +1,10 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+
+import { CollapsibleListItem } from "components/CollapsibleListItem";
+import { PreprocessingSettings } from "sections/model-settings";
+
 import { classifierSlice } from "store/classifier";
-import { CollapsibleListItem } from "../../../components/CollapsibleListItem";
-import { PreprocessingSettings } from "sections/dialogs/FitClassifierDialog/settings";
 import { CropOptions, RescaleOptions } from "utils/models/types";
 import {
   selectClassifierCropOptions,

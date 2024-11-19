@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 import {
   Alert,
@@ -24,17 +25,17 @@ import { useHotkeys } from "hooks";
 import { LocalFileUpload } from "./LocalFileUpload";
 import { PretrainedModelSelector } from "./PretrainedModelSelector";
 import { CloudUpload } from "./CloudUpload";
-
-import { Model } from "utils/models/Model/Model";
 import { ModelFormatSelection } from "./ModelFormatSelection";
-import { Cellpose } from "utils/models/segmentation/Cellpose";
+
+import { Shape } from "store/data/types";
+import { selectProjectImageChannels } from "store/project/selectors";
+
+import { Model } from "utils/models/Model";
+import { Cellpose } from "utils/models/segmentation";
 import { ModelTask } from "utils/models/enums";
 import { availableClassifierModels } from "utils/models/availableClassificationModels";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import { HotkeyContext } from "utils/common/enums";
-import { Shape } from "store/data/types";
-import { selectProjectImageChannels } from "store/project/selectors";
-import { useSelector } from "react-redux";
 
 const ToolTipTab = (
   props: TabProps & {

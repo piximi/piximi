@@ -1,22 +1,23 @@
+// TODO: implement segmenter serialization
 import { ChangeEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
+import { saveAs } from "file-saver";
 import { Grid, TextField } from "@mui/material";
 
-import { projectSlice } from "store/project";
-// TODO: implement segmenter serialization
+import { ConfirmationDialog } from "components/ConfirmationDialog";
 
-import { saveAs } from "file-saver";
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { ConfirmationDialog } from "../../../components/ConfirmationDialog";
-import { selectDataProject } from "store/data/selectors";
-import { logger } from "utils/common/helpers";
-import { serializeProject } from "utils/file-io/serialize";
-import { AlertState } from "utils/common/types";
-import { AlertType } from "utils/common/enums";
+import { projectSlice } from "store/project";
 import { selectProject } from "store/project/selectors";
+
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectClassifier } from "store/classifier/selectors";
 import { selectSegmenter } from "store/segmenter/selectors";
+import { selectDataProject } from "store/data/selectors";
+
+import { serializeProject } from "utils/file-io/serialize";
+import { logger } from "utils/common/helpers";
+import { AlertState } from "utils/common/types";
+import { AlertType } from "utils/common/enums";
 
 type SaveProjectDialogProps = {
   onClose: () => void;

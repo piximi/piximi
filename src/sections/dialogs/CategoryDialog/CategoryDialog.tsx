@@ -1,7 +1,8 @@
 import { TextField, Box } from "@mui/material";
 
-import { ConfirmationDialog } from "../../../components/ConfirmationDialog";
-import { useCategoryValidation } from "hooks/useCategoryValidation/useCategoryValidation";
+import { useCategoryValidation } from "hooks";
+
+import { ConfirmationDialog } from "components/ConfirmationDialog";
 import { ColorIcon } from "components/ColorIcon";
 
 type CategoryDialogProps = {

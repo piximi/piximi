@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 
 import { projectSlice } from "store/project";
-
 import { selectSortType } from "store/project/selectors";
+
 import { ThingSortKey } from "utils/common/enums";
 
 export const SortSelection = () => {

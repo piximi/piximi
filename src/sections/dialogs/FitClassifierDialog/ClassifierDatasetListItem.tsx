@@ -1,8 +1,10 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CollapsibleListItem } from "../../../components/CollapsibleListItem";
+
+import { CollapsibleListItem } from "components/CollapsibleListItem";
+import { DatasetSettings } from "sections/model-settings";
+
 import { classifierSlice } from "store/classifier";
-import { DatasetSettings } from "sections/dialogs/FitClassifierDialog/settings/DatasetSettings";
 import { selectClassifierShuffleOptions } from "store/classifier/selectors";
 
 export const ClassifierDatasetListItem = ({

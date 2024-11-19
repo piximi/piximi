@@ -9,15 +9,18 @@ import {
 } from "react-window";
 import memoize from "memoize-one";
 
+import { useSortFunction } from "hooks";
+
+import { DropBox } from "components/DropBox/DropBox";
+import { ProjectGridItem } from "./ProjectGridItem";
+
 import { projectSlice } from "store/project";
 import { selectThingsOfKind } from "store/data";
-import { ProjectGridItem } from "./ProjectGridItem";
-import { useSortFunction } from "hooks";
-import { DropBox } from "components/DropBox/DropBox";
 import { selectThingFilters } from "store/project/selectors";
-import { getInnerElementWidth, isFiltered } from "utils/common/helpers";
 import { selectActiveSelectedThingIds } from "store/project/reselectors";
 import { selectTileSize } from "store/applicationSettings/selectors";
+
+import { getInnerElementWidth, isFiltered } from "utils/common/helpers";
 
 type Things = ReturnType<ReturnType<typeof selectThingsOfKind>>;
 type SelectHandler = (id: string, selected: boolean) => void;

@@ -1,12 +1,15 @@
-import { IconButton } from "@mui/material";
 import React, { useState } from "react";
-import { MeasurementGroupOptions } from "./MeasurementGroupOptions";
-import { SelectDialog } from "components/SelectDialog";
-import { Add } from "@mui/icons-material";
 import { useSelector } from "react-redux";
-import { selectMeasurementGroups } from "store/measurements/selectors";
-import { DividerWithLoading } from "components/DividerHeader";
+import { IconButton } from "@mui/material";
+import { Add } from "@mui/icons-material";
+
 import { useCreateMeasurementTable } from "../hooks";
+
+import { SelectDialog } from "components/SelectDialog";
+import { DividerWithLoading } from "components/DividerHeader";
+import { MeasurementGroupOptions } from "./MeasurementGroupOptions";
+
+import { selectMeasurementGroups } from "store/measurements/selectors";
 
 export const MeasurementGroupOptionsContainer = () => {
   const tables = useSelector(selectMeasurementGroups);

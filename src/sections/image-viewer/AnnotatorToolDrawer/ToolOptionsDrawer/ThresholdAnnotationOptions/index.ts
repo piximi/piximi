@@ -1,1 +1,0 @@
-export { ThresholdAnnotationOptions } from "./ThresholdAnnotationOptions";

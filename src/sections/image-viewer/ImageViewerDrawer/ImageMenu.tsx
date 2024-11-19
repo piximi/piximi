@@ -1,13 +1,11 @@
 import React from "react";
 import { batch, useDispatch } from "react-redux";
 // import JSZip from "jszip";
-
 import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
 import { imageViewerSlice } from "store/imageViewer";
-
 import { projectSlice } from "store/project";
 import { dataSlice } from "store/data/dataSlice";
 import { ImageObject } from "store/data/types";

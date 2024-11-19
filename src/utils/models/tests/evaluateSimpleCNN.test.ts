@@ -6,7 +6,7 @@ import {
   profile as tfprofile,
 } from "@tensorflow/tfjs-node";
 
-import { UploadedClassifier } from "../classification/UploadedClassifier/UploadedClassifier";
+import { UploadedClassifier } from "../classification";
 import {
   ClassifierEvaluationResultType,
   CropOptions,

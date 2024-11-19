@@ -1,14 +1,13 @@
 import React from "react";
 import { batch, useDispatch } from "react-redux";
-
 import { ListItemText, MenuItem } from "@mui/material";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";
-
 import { dataSlice } from "store/data/dataSlice";
+
 import { deserializeProject } from "utils/file-io/deserialize";
 import { fListToStore } from "utils/file-io/zarrStores";
 import { AlertState } from "utils/common/types";

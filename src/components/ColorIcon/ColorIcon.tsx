@@ -2,9 +2,11 @@ import * as React from "react";
 import { CirclePicker, ColorResult } from "react-color";
 
 import { Popover, Box } from "@mui/material";
-import { Label } from "@mui/icons-material";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
+import {
+  Label,
+  ArrowDropDown as ArrowDropDownIcon,
+  ArrowDropUp as ArrowDropUpIcon,
+} from "@mui/icons-material";
 
 type ColorIconButtonProps = {
   color: string;

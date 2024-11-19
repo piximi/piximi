@@ -2,9 +2,8 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 import { Annotation } from "./Annotation";
-
-import { AnnotationTool } from "utils/annotator/tools";
 import { AnnotationTransformer } from "./AnnotationTransformer";
+
 import {
   selectImageViewerFilters,
   selectSelectedAnnotationIds,
@@ -13,6 +12,8 @@ import {
   selectActiveAnnotationsViews,
   selectWorkingAnnotationView,
 } from "store/imageViewer/reselectors";
+
+import { AnnotationTool } from "utils/annotator/tools";
 
 type AnnotationsProps = {
   annotationTool: AnnotationTool;

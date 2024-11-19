@@ -1,4 +1,5 @@
 import { useCallback, useContext, useMemo } from "react";
+
 import { MeasurementsContext, PlotViewContext } from "./MeasurementsProvider";
 import { ChartConfig } from "../types";
 

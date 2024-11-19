@@ -4,8 +4,10 @@ import {
   Label as LabelIcon,
   LabelImportant as LabelImportantIcon,
 } from "@mui/icons-material";
+
 import { ItemDetailTooltip } from "./ItemDetailTooltip";
 import { ThingDetailList } from "./ThingDetailList";
+
 import { Thing } from "store/data/types";
 
 export const ThingDetailContainer = ({

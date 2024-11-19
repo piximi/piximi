@@ -1,10 +1,12 @@
+import React from "react";
 import { Box, useTheme } from "@mui/material";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import React from "react";
-import { GroupedMeasurementDisplayTable } from "store/measurements/types";
-import { PlotControls } from "./PlotControls/PlotControls";
+
+import { PlotControls } from "./PlotControls";
 import { PlotTabs } from "./PlotTabs";
+
 import { MeasurementsProvider } from "../providers/MeasurementsProvider";
+import { GroupedMeasurementDisplayTable } from "store/measurements/types";
 
 export const MeasurementPlotsContainer = ({
   measurementGroup,

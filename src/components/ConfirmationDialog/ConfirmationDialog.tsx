@@ -1,3 +1,4 @@
+import { ReactElement } from "react";
 import {
   Button,
   Dialog,
@@ -11,7 +12,6 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { useHotkeys } from "hooks";
 import { HotkeyContext } from "utils/common/enums";
-import { ReactElement } from "react";
 
 type ConfirmationDialogProps = Omit<
   DialogProps,

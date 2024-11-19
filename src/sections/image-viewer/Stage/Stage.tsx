@@ -23,38 +23,42 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-import { useHotkeys, usePointerLocation } from "hooks";
-import { useAnnotationState } from "hooks/useAnnotationState";
-import { Cursor } from "sections/image-viewer/Stage/Cursor";
+import {
+  useHotkeys,
+  usePointerLocation,
+  useAnnotationState,
+  useStageHandlers,
+  useAnnotationTool,
+} from "hooks";
 
+import { Cursor } from "./Cursor";
 import { Layer } from "./Layer";
 import { Selection } from "./Selection";
 import { Annotations } from "./Annotations";
+import { Image } from "./Image";
 
+import { StageContext } from "contexts";
 import { imageViewerSlice } from "store/imageViewer";
 import {
   selectAnnotationState,
   selectToolType,
 } from "store/annotator/selectors";
-
-import { dimensions } from "utils/common/constants";
-import { Image } from "./Image";
 import { selectActiveImage } from "store/imageViewer/reselectors";
-import { useStageHandlers, useAnnotationTool } from "hooks";
-import { StageContext } from "contexts";
-import { AnnotationState, ToolType } from "utils/annotator/enums";
-import { HotkeyContext } from "utils/common/enums";
 import {
   selectActiveImageId,
   selectActiveImageRenderedSrcs,
   selectImageIsloading,
   selectStagePosition,
 } from "store/imageViewer/selectors";
-import { generateUnknownCategory, generateUUID } from "utils/common/helpers";
 import { Category, Kind } from "store/data/types";
 import { CATEGORY_COLORS } from "store/data/constants";
 import { dataSlice } from "store/data";
 import { annotatorSlice } from "store/annotator";
+
+import { dimensions } from "utils/common/constants";
+import { AnnotationState, ToolType } from "utils/annotator/enums";
+import { HotkeyContext } from "utils/common/enums";
+import { generateUnknownCategory, generateUUID } from "utils/common/helpers";
 
 const normalizeFont = 1300;
 

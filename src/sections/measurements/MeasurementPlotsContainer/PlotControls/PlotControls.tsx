@@ -6,6 +6,7 @@ import {
   SwarmOptions,
 } from "./ControlOptions";
 import { ColorThemeSelect, PlotSelect } from "./ControlInputs";
+
 import { usePlotControl } from "sections/measurements/providers/hooks";
 import { ChartType } from "sections/measurements/types";
 

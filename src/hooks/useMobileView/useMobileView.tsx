@@ -1,5 +1,5 @@
-import { useBreakpointObserver } from "hooks/useBreakpointObserver/useBreakpointObserver";
 import { useEffect, useState } from "react";
+import { useBreakpointObserver } from "../useBreakpointObserver";
 import { mobileBreakpoints } from "utils/common/constants";
 
 export const useMobileView = () => {

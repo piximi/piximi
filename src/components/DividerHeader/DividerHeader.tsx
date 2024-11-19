@@ -1,10 +1,10 @@
+import React from "react";
 import {
   Divider,
   Typography,
   DividerProps,
   TypographyProps,
 } from "@mui/material";
-import React from "react";
 
 type DividerHeaderProps = Pick<
   DividerProps,

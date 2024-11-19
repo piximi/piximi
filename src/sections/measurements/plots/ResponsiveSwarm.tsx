@@ -1,14 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { alpha, darken } from "@mui/material";
 import {
   ResponsiveSwarmPlot,
   SwarmPlotCustomLayerProps,
 } from "@nivo/swarmplot";
 import { ScaleLinear } from "@nivo/scales";
-import { ParsedMeasurementData } from "store/measurements/types";
-import { getMean, getStatistics } from "utils/measurements/helpers";
-import { alpha, darken } from "@mui/material";
-import { ChartConfig, NodeGroupRecord, SwarmData, SwarmDatum } from "../types";
+
 import { usePreferredNivoTheme } from "hooks";
+
+import { ParsedMeasurementData } from "store/measurements/types";
+
+import { getMean, getStatistics } from "utils/measurements/helpers";
+import { ChartConfig, NodeGroupRecord, SwarmData, SwarmDatum } from "../types";
 
 const StatLayer = ({
   nodes,

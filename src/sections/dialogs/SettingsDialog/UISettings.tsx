@@ -1,3 +1,6 @@
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { BlockPicker, ColorResult } from "react-color";
 import {
   Box,
   Button,
@@ -15,8 +18,11 @@ import {
   Notes as NotesIcon,
   Image as ImageIcon,
 } from "@mui/icons-material";
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+
+import { CustomSwitch } from "components/CustomSwitch";
+import { DividerHeader } from "components/DividerHeader";
+import { SettingsItem } from "./SettingsItem";
+
 import { applicationSettingsSlice } from "store/applicationSettings";
 import {
   selectImageSelectionColor,
@@ -25,12 +31,9 @@ import {
   selectTextOnScroll,
   selectThemeMode,
 } from "store/applicationSettings/selectors";
-import { ThemeMode } from "themes/enums";
-import { SettingsItem } from "./SettingsItem";
-import { CustomSwitch } from "components/CustomSwitch";
 import { selectActiveCategoryColors } from "store/project/reselectors";
-import { BlockPicker, ColorResult } from "react-color";
-import { DividerHeader } from "components/DividerHeader";
+
+import { ThemeMode } from "themes/enums";
 
 export const UISettings = () => {
   return (

@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
-
 import { Box, Stack, Typography } from "@mui/material";
 
-import { useDialog, useDialogHotkey } from "hooks";
+import { useDialog, useDialogHotkey, useClassificationModel } from "hooks";
 
 import { ImportTensorflowModelDialog } from "sections/dialogs";
 import {
@@ -10,11 +9,9 @@ import {
   EvaluateClassifierDialog,
   FitClassifierDialog,
 } from "sections/dialogs";
+import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
+import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
 
-import { ModelExecButtonGroup } from "sections/project/ModelTaskSection/ModelExecButtonGroup";
-
-import { ModelIOButtonGroup } from "sections/project/ModelTaskSection/ModelIOButtonGroup";
-import { useClassificationModel } from "hooks/useLearningModel/useClassifierModel";
 import { HotkeyContext } from "utils/common/enums";
 import { ModelStatus, ModelTask } from "utils/models/enums";
 

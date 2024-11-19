@@ -4,9 +4,8 @@ import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 
 import { ThingDetailContainer } from "./ThingDetailContainer";
+
 import { selectCategoryProperty } from "store/data/selectors";
-import { isUnknownCategory } from "utils/common/helpers";
-import { Partition } from "utils/models/enums";
 import { AnnotationObject, ImageObject } from "store/data/types";
 import {
   selectImageSelectionColor,
@@ -14,6 +13,9 @@ import {
   selectTextOnScroll,
   selectTileSize,
 } from "store/applicationSettings/selectors";
+
+import { isUnknownCategory } from "utils/common/helpers";
+import { Partition } from "utils/models/enums";
 
 type ProjectGridItemProps = {
   selected: boolean;

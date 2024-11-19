@@ -1,7 +1,7 @@
 import React from "react";
-
 import { Menu, MenuItem, MenuList, PopoverReference } from "@mui/material";
 import LabelIcon from "@mui/icons-material/Label";
+
 import { Category } from "store/data/types";
 
 type ImageCategoryMenuProps = {

@@ -1,11 +1,14 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { batch, useDispatch, useSelector } from "react-redux";
+import saveAs from "file-saver";
+import { DataArray } from "image-js";
+
+import { useDialogHotkey } from "hooks";
+
 import {
   MeasurementsContext,
   PlotViewContext,
 } from "./providers/MeasurementsProvider";
-import { ChartConfig } from "./types";
-import { MeasurementGroup, ThingData } from "store/measurements/types";
-import { batch, useDispatch, useSelector } from "react-redux";
 import { selectMeasurementData } from "store/measurements/selectors";
 import {
   selectCategoriesByKind,
@@ -13,12 +16,13 @@ import {
   selectKindDictionary,
   selectThingsDictionary,
 } from "store/data/selectors";
-import saveAs from "file-saver";
-import { useDialogHotkey } from "hooks";
-import { HotkeyContext } from "utils/common/enums";
-import { DataArray } from "image-js";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
+
+import { HotkeyContext } from "utils/common/enums";
+
+import { MeasurementGroup, ThingData } from "store/measurements/types";
 import { LoadStatus } from "utils/common/types";
+import { ChartConfig } from "./types";
 
 export const useMeasurementParameters = () => {
   return useContext(MeasurementsContext)!;

@@ -1,1 +1,0 @@
-export { PenSelectionIconOptions } from "./PenSelectionIconOptions";

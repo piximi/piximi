@@ -1,6 +1,5 @@
 import React, { ReactElement } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
 import {
   Divider,
   Drawer,
@@ -16,11 +15,16 @@ import {
 
 import { useAnnotatorToolShortcuts, useHotkeys, useTranslation } from "hooks";
 
+import { CustomToolTip } from "../Tool/CustomToolTip";
+import { Tool } from "../Tool";
+import { ToolOptionsDrawer } from "./ToolOptionsDrawer";
+
 import { annotatorSlice } from "store/annotator";
 import { selectToolType } from "store/annotator/selectors";
 
 import { HotkeyContext } from "utils/common/enums";
 import { ToolType as OperationType } from "utils/annotator/enums";
+import { dimensions } from "utils/common/constants";
 
 import {
   ColorAdjustment,
@@ -35,10 +39,6 @@ import {
   Selection,
   Zoom,
 } from "icons";
-import { dimensions } from "utils/common/constants";
-import { ToolOptionsDrawer } from "./ToolOptionsDrawer";
-import { CustomToolTip } from "../Tool/CustomToolTip";
-import { Tool } from "../Tool";
 
 type AnnotatorToolDrawerProps = {
   optionsVisibility: boolean;

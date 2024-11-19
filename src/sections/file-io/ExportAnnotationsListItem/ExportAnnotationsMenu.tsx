@@ -1,37 +1,40 @@
 import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
-import { ListItemText, Menu, MenuItem } from "@mui/material";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
+import { ListItemText, Menu, MenuItem } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { serializeCOCOFile, serializeProject } from "utils/annotator";
+import { ConfirmationDialog } from "components/ConfirmationDialog";
+import { ExportAnnotationsDialog } from "sections/dialogs";
 
 import {
   selectHasUnsavedChanges,
   selectProjectName,
 } from "store/project/selectors";
 
-import { ExportAnnotationsDialog } from "sections/dialogs";
-import { ConfirmationDialog } from "components/ConfirmationDialog";
+import { dataSlice } from "store/data";
+import {
+  selectAllObjectCategories,
+  selectAllObjectKinds,
+  selectObjectCategoryDict,
+} from "store/data/selectors";
 
-import { HotkeyContext } from "utils/common/enums";
 import {
   selectImageViewerObjects,
   selectImageViewerImages,
   selectImageViewerObjectDict,
   selectImageViewerImageDict,
 } from "store/imageViewer/reselectors";
-import {
-  selectAllObjectCategories,
-  selectAllObjectKinds,
-  selectObjectCategoryDict,
-} from "store/data/selectors";
+
+import { serializeCOCOFile, serializeProject } from "utils/annotator";
+
+import { HotkeyContext } from "utils/common/enums";
 import { AnnotationExportType } from "utils/file-io/enums";
-import { dataSlice } from "store/data";
 import { exportAnnotationMasks } from "utils/file-io/export/annotationExporters";
+
+//TODO: MenuItem??
 
 type ExportAnnotationsMenuProps = {
   anchorEl: HTMLElement | null;

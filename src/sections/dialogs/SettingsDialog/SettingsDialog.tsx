@@ -1,12 +1,12 @@
 import React from "react";
-
 import { Dialog, DialogContent, IconButton, DialogTitle } from "@mui/material";
-
 import { Close as CloseIcon } from "@mui/icons-material";
 
 import { useHotkeys } from "hooks";
-import { HotkeyContext } from "utils/common/enums";
+
 import { UISettings } from "./UISettings";
+
+import { HotkeyContext } from "utils/common/enums";
 
 type SettingsDialogProps = {
   onClose: () => void;

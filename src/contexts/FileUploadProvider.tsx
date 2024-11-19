@@ -1,4 +1,3 @@
-import * as ImageJS from "image-js";
 import {
   createContext,
   FormEvent,
@@ -8,11 +7,33 @@ import {
   useEffect,
   useState,
 } from "react";
+import * as ImageJS from "image-js";
 import { useDispatch, useSelector } from "react-redux";
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { dataSlice } from "store/data";
+import {
+  Box,
+  FormControl,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Typography,
+} from "@mui/material";
 
+import { ConfirmationDialog } from "components/ConfirmationDialog";
+
+import { applicationSettingsSlice } from "store/applicationSettings";
+
+import { dataSlice } from "store/data";
 import { selectUnknownImageCategory } from "store/data/selectors";
+import { ImageObject } from "store/data/types";
+
+import { projectSlice } from "store/project";
+import {
+  selectActiveKindId,
+  selectHighlightedCategory,
+  selectProjectImageChannels,
+} from "store/project/selectors";
+
 import { MIMETYPES } from "utils/file-io/constants";
 import { ImageShapeEnum } from "utils/file-io/enums";
 import {
@@ -25,26 +46,10 @@ import {
   ImageShapeInfo,
   MIMEType,
 } from "utils/file-io/types";
+
 import { isUnknownCategory, updateRecord } from "utils/common/helpers";
 import { AlertType } from "utils/common/enums";
-import {
-  Box,
-  FormControl,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  TextField,
-  Typography,
-} from "@mui/material";
 import { convertToImage } from "utils/common/tensorHelpers";
-import { ImageObject } from "store/data/types";
-import {
-  selectActiveKindId,
-  selectHighlightedCategory,
-  selectProjectImageChannels,
-} from "store/project/selectors";
-import { projectSlice } from "store/project";
-import { ConfirmationDialog } from "components/ConfirmationDialog";
 import { Partition } from "utils/models/enums";
 
 type ImageShapeInfoImage = ImageFileShapeInfo & {

@@ -1,18 +1,19 @@
 import { Dialog, DialogContent, List } from "@mui/material";
 
-import { useFitClassificationModel } from "hooks/useLearningModel/";
+import { useFitClassificationModel } from "hooks";
 
 import { ModelSummaryTable } from "components/ModelSummaryTable";
 import { TwoDataPlot } from "components/TwoDataPlot";
-
 import { DialogTransitionSlide } from "components/DialogTransitionSlide";
-import { ModelStatus } from "utils/models/enums";
-import { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
 import { AlertBar } from "components/AlertBar";
+
+import { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
 import { ClassifierPreprocessingListItem } from "./ClassifierPreprocessingListItem";
 import { ClassifierArchitectureListItem } from "./ClassifierArchitectureListItem";
 import { ClassifierOptimizerListItem } from "./ClassifierOptimizerListItem";
 import { ClassifierDatasetListItem } from "./ClassifierDatasetListItem";
+
+import { ModelStatus } from "utils/models/enums";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;

@@ -1,18 +1,22 @@
-import { Box } from "@mui/material";
-import { CustomTabs } from "components/CustomTabSwitcher";
 import React, { useCallback, useEffect } from "react";
-import { ImageGrid } from "sections/project/ProjectImageGrid/ImageGrid";
-import { AddKindMenu } from "./AddKindMenu";
 import { useDispatch, useSelector } from "react-redux";
+import { Box } from "@mui/material";
+
+import { useMenu, useMobileView } from "hooks";
+
+import { CustomTabs } from "components/CustomTabSwitcher";
+import { ImageGrid } from "./ImageGrid";
+import { AddKindMenu } from "./AddKindMenu";
+
 import {
   selectActiveKindId,
   selectKindTabFilters,
 } from "store/project/selectors";
-import { useMenu, useMobileView } from "hooks";
 import { projectSlice } from "store/project";
 import { dataSlice } from "store/data";
 import { selectKindDictionary } from "store/data/selectors";
 import { selectVisibleKinds } from "store/project/reselectors";
+
 import { dimensions } from "utils/common/constants";
 
 export const ProjectImageGrid = () => {

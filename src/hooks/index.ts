@@ -12,13 +12,22 @@ export { useTranslation } from "./useTranslation";
 export { useZoom } from "./useZoom";
 export { useLocalGlobalState } from "./useLocalGlobalState";
 export { useHotkeys } from "./useHotkeys";
-export { usePointerLocation } from "./usePointerLocation/usePointerLocation";
+export { usePointerLocation } from "./usePointerLocation";
 export { useErrorHandler } from "./useErrorHandler";
 export { useUnloadConfirmation } from "./useUnloadConfirmation";
 export { useBreakpointObserver } from "./useBreakpointObserver";
 export { useMobileView } from "./useMobileView";
 export { useThingSelection } from "./useThingSelection";
 export { useSortFunction } from "./useSortFunction";
+export { useImageViewerCategoryItemState } from "./useImageViewerCategoryItemState";
+export { useCategoryValidation } from "./useCategoryValidation";
+export {
+  useClassificationModel,
+  useFitClassificationModel,
+  useSegmentationModel,
+  useSegmentationModelAgain,
+} from "./useLearningModel";
+export { useAnnotationState } from "./useAnnotationState";
 
 // useDefaultImage not included to encourage use of
 // import {useDefaultImage, DispatchLocation} from "hooks/useDefaultImage"

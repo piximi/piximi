@@ -1,12 +1,12 @@
 import React from "react";
-
 import { Menu, MenuItem } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { HotkeyContext } from "utils/common/enums";
 import { ExampleProjectDialog } from "sections/dialogs";
 import { OpenProjectMenuItem } from "./OpenProjectMenuItem";
+
+import { HotkeyContext } from "utils/common/enums";
 
 type OpenProjectMenuProps = {
   anchorEl: HTMLElement | null;

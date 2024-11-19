@@ -1,5 +1,6 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
 import { ReactNode } from "react";
+import { Box, CircularProgress, Typography } from "@mui/material";
+
 import { LoadStatus } from "utils/common/types";
 
 export const DividerWithLoading = ({

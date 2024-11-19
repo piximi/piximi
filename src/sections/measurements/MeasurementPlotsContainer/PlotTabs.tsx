@@ -1,16 +1,20 @@
-import { Box } from "@mui/material";
-import { useSelector } from "react-redux";
-import { selectPlotData } from "store/measurements/reselectors";
-import { CustomTabs } from "components/CustomTabSwitcher";
 import { useCallback } from "react";
+import { useSelector } from "react-redux";
+import { Box } from "@mui/material";
+
 import { useMeasurementParameters, usePlotControl } from "../providers/hooks";
+
+import { CustomTabs } from "components/CustomTabSwitcher";
 import {
   ResponsiveHistogram,
   ResponsiveScatter,
   ResponsiveSwarm,
+  PlotContainer,
 } from "../plots";
+
+import { selectPlotData } from "store/measurements/reselectors";
+
 import { ChartConfig, ChartType } from "../types";
-import { PlotContainer } from "../plots/PlotContainer";
 
 export const PlotTabs = () => {
   const measurementData = useSelector(selectPlotData);

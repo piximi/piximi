@@ -1,7 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { CollapsibleListItem } from "../../../components/CollapsibleListItem";
-import { DatasetSettings } from "sections/dialogs/FitClassifierDialog/settings/DatasetSettings";
+import { CollapsibleListItem } from "components/CollapsibleListItem";
+import { DatasetSettings } from "sections/model-settings";
+
 import { segmenterSlice } from "store/segmenter";
 import { selectSegmenterShuffleOptions } from "store/segmenter/selectors";
 

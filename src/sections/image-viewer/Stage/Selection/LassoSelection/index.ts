@@ -1,1 +1,0 @@
-export { LassoSelection } from "./LassoSelection";

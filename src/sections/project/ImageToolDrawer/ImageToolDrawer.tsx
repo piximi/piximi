@@ -1,5 +1,5 @@
-import React, { ReactElement, useState } from "react";
-
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import {
   Badge,
   Drawer,
@@ -7,39 +7,33 @@ import {
   ListItemIcon,
   useTheme,
 } from "@mui/material";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import FolderOpenIcon from "@mui/icons-material/FolderOpen";
-import SortIcon from "@mui/icons-material/Sort";
-import StraightenIcon from "@mui/icons-material/Straighten";
-import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
-import LabelIcon from "@mui/icons-material/Label";
+import {
+  FilterAltOutlined as FilterAltOutlinedIcon,
+  InfoOutlined as InfoOutlinedIcon,
+  FolderOpen as FolderOpenIcon,
+  Sort as SortIcon,
+  Straighten as StraightenIcon,
+  ScatterPlot as ScatterPlotIcon,
+  Label as LabelIcon,
+} from "@mui/icons-material";
+
+import { useMobileView, useTranslation } from "hooks";
+
+import { AppBarOffset } from "components/AppBarOffset";
+import { SortSelection } from "components/SortSelection";
+import { ToolHotkeyTitle, TooltipCard } from "components/tooltips";
 import { FileIO } from "sections/file-io";
 import { ProjectViewerCategories } from "sections/categories";
-
+import { ModelTaskSection } from "../ModelTaskSection";
 import {
   FilterOptions,
   InformationOptions,
   MeasurementOptions,
-} from "./tool-options-drawer";
-import { useMobileView, useTranslation } from "hooks";
-import { ToolOptionsDrawer } from "./tool-options-drawer/ToolOptionsDrawer/ToolOptionsDrawer";
-import { AppBarOffset } from "components/AppBarOffset";
-import { SortSelection } from "components/SortSelection";
-import { dimensions } from "utils/common/constants";
-import { useSelector } from "react-redux";
-import { ToolHotkeyTitle, TooltipCard } from "components/tooltips";
-import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
-import { ModelTaskSection } from "../ModelTaskSection/ModelTaskSection";
+} from "./tool-options";
+import { OperationType, ToolOptionsDrawer } from "./ToolOptionsDrawer";
 
-export type OperationType = {
-  icon: (color: string) => ReactElement;
-  name: string;
-  description: string;
-  options: ReactElement;
-  hotkey: string;
-  mobile?: boolean;
-};
+import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
+import { dimensions } from "utils/common/constants";
 
 const imageTools: Record<string, OperationType> = {
   fileIO: {

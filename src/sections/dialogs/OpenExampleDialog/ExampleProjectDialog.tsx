@@ -1,12 +1,14 @@
+import { Stack } from "@mui/material";
+
+import { BaseExampleDialog } from "./BaseExampleDialog";
+import { ExampleProjectCard } from "./ExampleProjectCard";
+
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import mnistExampleIcon from "data/exampleProjects/mnistExampleProjectIcon.png";
 import cElegansExampleIcon from "data/exampleProjects/cElegansExampleProjectIcon.png";
 import humanU2OSCellsExampleIcon from "data/exampleProjects/humanU2OSCellsExampleProjectIcon.png";
 import BBBC013ExampleIcon from "data/exampleProjects/BBBC013ExampleProjectIcon.png";
 import PLP1ExampleIcon from "data/exampleProjects/PLP1ExampleProjectIcon.png";
-import { BaseExampleDialog } from "./BaseExampleDialog";
-import { ExampleProjectCard } from "./ExampleProjectCard";
-import { Stack } from "@mui/material";
 
 const exampleProjects = [
   {

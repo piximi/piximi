@@ -6,14 +6,15 @@ import { useLocation } from "react-router-dom";
 import { Drawer, IconButton } from "@mui/material";
 import { Help as HelpIcon, Close as CloseIcon } from "@mui/icons-material";
 
-import { AppBarOffset } from "components/AppBarOffset/AppBarOffset";
+import { AppBarOffset } from "components/AppBarOffset";
+import { CustomListItem } from "components/CustomListItem";
+import { CustomListItemButton } from "components/CustomListItemButton";
+
 import { HelpContent, HelpContentType } from "./HelpContent/HelpContent";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { CustomListItem } from "components/CustomListItem";
 import { AlertType } from "utils/common/enums";
-import { CustomListItemButton } from "components/CustomListItemButton";
 
 export const HelpDrawer = () => {
   const dispatch = useDispatch();

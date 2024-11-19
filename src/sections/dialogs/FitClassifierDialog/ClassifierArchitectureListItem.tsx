@@ -1,12 +1,15 @@
-import { ArchitectureSettings } from "sections/dialogs/FitClassifierDialog/settings";
-import { CollapsibleListItem } from "../../../components/CollapsibleListItem";
 import { useDispatch, useSelector } from "react-redux";
+
+import { CollapsibleListItem } from "components/CollapsibleListItem";
+import { ArchitectureSettings } from "sections/model-settings";
+
 import { classifierSlice } from "store/classifier";
-import { availableClassifierModels } from "utils/models/availableClassificationModels";
 import {
   selectClassifierInputShape,
   selectClassifierSelectedModelIdx,
 } from "store/classifier/selectors";
+
+import { availableClassifierModels } from "utils/models/availableClassificationModels";
 
 const modelOptions = availableClassifierModels
   .map((m, i) => ({

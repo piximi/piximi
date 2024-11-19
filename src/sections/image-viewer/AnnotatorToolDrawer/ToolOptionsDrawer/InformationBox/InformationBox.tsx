@@ -1,6 +1,6 @@
 import React from "react";
-
 import { AppBar, Box, Toolbar, Typography } from "@mui/material";
+
 import { KeyboardKey } from "components/KeyboardKey";
 
 type InformationBoxProps = {

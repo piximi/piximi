@@ -1,15 +1,17 @@
 import React from "react";
 
-import { EllipticalSelection } from "./EllipticalSelection";
-import { LassoSelection } from "./LassoSelection";
-import { MagneticSelection } from "./MagneticSelection";
-import { ObjectSelection } from "./ObjectSelection";
-import { PolygonalSelection } from "./PolygonalSelection";
-import { RectangularSelection } from "./RectangularSelection";
-import { ColorSelection } from "./ColorSelection/ColorSelection";
-import { QuickSelection } from "./QuickSelection/QuickSelection";
-import { PenSelection } from "./PenSelection";
-import { ZoomSelection } from "./ZoomSelection";
+import {
+  EllipticalSelection,
+  LassoSelection,
+  MagneticSelection,
+  ObjectSelection,
+  PenSelection,
+  PolygonalSelection,
+  RectangularSelection,
+  ZoomSelection,
+  ColorSelection,
+  QuickSelection,
+} from "./selection-options";
 
 import {
   Tool,

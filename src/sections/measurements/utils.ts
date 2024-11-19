@@ -1,13 +1,15 @@
+import { DataArray } from "image-js";
+import * as tf from "@tensorflow/tfjs";
+
+import { getObjectMaskData, prepareChannels } from "utils/measurements/helpers";
+import { decode } from "utils/annotator";
+
 import {
   MeasurementDisplayTable,
   MeasurementOptions,
 } from "store/measurements/types";
 import { ChartValues } from "./types";
 import { RecursivePartial } from "utils/common/types";
-import { DataArray } from "image-js";
-import { getObjectMaskData, prepareChannels } from "utils/measurements/helpers";
-import { decode } from "utils/annotator";
-import * as tf from "@tensorflow/tfjs";
 
 export const format = (value: string | number, sf: number = 2) => {
   if (typeof value === "number") {

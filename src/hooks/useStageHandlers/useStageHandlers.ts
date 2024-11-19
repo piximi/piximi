@@ -5,12 +5,14 @@ import { KonvaEventObject } from "konva/lib/Node";
 import Konva from "konva";
 import { throttle } from "lodash";
 
-import { useZoom } from "hooks";
+import { useZoom } from "../useZoom";
+import { usePointerTool } from "../usePointerTool";
 
 import {
   imageViewerSlice,
   //selectWorkingAnnotation,
 } from "store/imageViewer";
+import { selectSelectedAnnotationIds } from "store/imageViewer/selectors";
 
 import {
   selectAnnotationSelectionMode,
@@ -19,7 +21,6 @@ import {
 
 import { annotatorSlice } from "store/annotator";
 
-import { usePointerTool } from "hooks/usePointerTool";
 import { logger } from "utils/common/helpers";
 import { Point } from "utils/annotator/types";
 import {
@@ -28,7 +29,6 @@ import {
   ToolType,
 } from "utils/annotator/enums";
 import { AnnotationTool, ObjectAnnotationTool } from "utils/annotator/tools";
-import { selectSelectedAnnotationIds } from "store/imageViewer/selectors";
 //import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/selectWorkingAnnotation";
 
 const transformerClassName = "Transformer";

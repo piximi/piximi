@@ -1,11 +1,15 @@
 import React from "react";
-import { BaseMenu } from "components/BaseMenu";
-import { MenuItem, Typography } from "@mui/material";
-import { CreateKindDialog } from "sections/dialogs";
-import { useDialogHotkey, useMobileView } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
+import { MenuItem, Typography } from "@mui/material";
+
+import { useDialogHotkey, useMobileView } from "hooks";
+
+import { BaseMenu } from "components/BaseMenu";
+import { CreateKindDialog } from "sections/dialogs";
+
 import { projectSlice } from "store/project";
 import { selectActiveKindId } from "store/project/selectors";
+
 import { HotkeyContext } from "utils/common/enums";
 
 export const AddKindMenu = ({

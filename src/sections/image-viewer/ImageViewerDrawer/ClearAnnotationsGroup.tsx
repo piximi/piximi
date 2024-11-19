@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
-
 import { List } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 
 import { useDialogHotkey, useTranslation } from "hooks";
 
 import { ConfirmationDialog } from "components/ConfirmationDialog";
-import { imageViewerSlice } from "store/imageViewer";
 import { CustomListItemButton } from "components/CustomListItemButton";
+import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
 import {
   selectActiveAnnotationIds,
   selectSelectedAnnotationIds,
 } from "store/imageViewer/selectors";
+
 import { HotkeyContext } from "utils/common/enums";
 
 type DeleteType = "ALL" | "SELECTED";

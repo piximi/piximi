@@ -1,10 +1,10 @@
+import { useEffect, useState } from "react";
 import range from "lodash/range";
 import { ResponsiveLine } from "@nivo/line";
 
 import { Container, Typography, useMediaQuery, useTheme } from "@mui/material";
 
 import { usePreferredNivoTheme } from "hooks";
-import { useEffect, useState } from "react";
 import { APPLICATION_COLORS } from "utils/common/constants";
 
 type TwoDataPlotProps = {

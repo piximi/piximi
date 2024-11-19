@@ -1,6 +1,6 @@
 import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
-
 import { Close } from "@mui/icons-material";
+
 import { APPLICATION_COLORS } from "utils/common/constants";
 
 type FitClassifierDialogAppBarProps = {

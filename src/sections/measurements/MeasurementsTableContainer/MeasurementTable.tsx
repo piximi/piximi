@@ -1,9 +1,10 @@
+import { useMemo } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+
 import {
   DisplayTableRow,
   MeasurementDisplayTable,
 } from "store/measurements/types";
-import { useMemo } from "react";
 
 type ExtendedDisplayTableRow = {
   id: number;

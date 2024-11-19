@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import { ArrowBack } from "@mui/icons-material";
 import { IconButton, Tooltip, Typography } from "@mui/material";
+import { ArrowBack } from "@mui/icons-material";
 
 import { LogoLoader } from "components/LogoLoader";
 import { CustomAppBar } from "components/CustomAppBar";

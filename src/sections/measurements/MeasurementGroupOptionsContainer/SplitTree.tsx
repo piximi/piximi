@@ -1,10 +1,13 @@
 import React from "react";
-import { xor } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
+import { xor } from "lodash";
+
 import { SelectionTree } from "components/SelectionTree";
+
 import { measurementsSlice } from "store/measurements/measurementsSlice";
 import { selectSelectedGroupSplits } from "store/measurements/selectors";
 import { MeasurementOptions, MeasurementGroup } from "store/measurements/types";
+
 import { LoadStatus, RecursivePartial } from "utils/common/types";
 import { selectTreeItemChildren } from "../utils";
 
