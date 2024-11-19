@@ -8,6 +8,7 @@ import {
   selectToolType,
 } from "store/annotator/selectors";
 import { selectActiveImage } from "store/imageViewer/reselectors";
+
 import { ToolType } from "utils/annotator/enums";
 
 type PenAnnotationToolTipProps = {

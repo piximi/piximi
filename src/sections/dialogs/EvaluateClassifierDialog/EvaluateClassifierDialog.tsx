@@ -1,9 +1,11 @@
+import { useSelector } from "react-redux";
 import { Dialog, DialogContent, Stack, Typography, Grid } from "@mui/material";
+
+import { DialogTransitionSlide } from "components/DialogTransitionSlide";
 import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
 import { ConfusionMatrix } from "./ConfusionMatrix";
-import { useSelector } from "react-redux";
-import { DialogTransitionSlide } from "components/DialogTransitionSlide";
 import { EvaluateClassifierDialogAppBar } from "./EvaluateClassifierAppBar";
+
 import { OldCategory } from "store/data/types";
 import { selectActiveKnownCategories } from "store/project/reselectors";
 import { selectClassifierEvaluationResult } from "store/classifier/selectors";

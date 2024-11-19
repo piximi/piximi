@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 import {
   Box,
   Button,
@@ -7,16 +9,19 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { MeasurementGroup } from "store/measurements/types";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import {
+  ExpandMore as ExpandMoreIcon,
+  ChevronRight as ChevronRightIcon,
+} from "@mui/icons-material";
+
 import { DividerHeader, DividerWithLoading } from "components/DividerHeader";
-import { measurementsSlice } from "store/measurements/measurementsSlice";
-import { useDispatch } from "react-redux";
-import { useState } from "react";
-import { useTableExport } from "sections/measurements/hooks";
+import { useTableExport } from "../hooks";
 import { SplitTree } from "./SplitTree";
 import { MeasurementsTree } from "./MeasurementTree";
+
+import { MeasurementGroup } from "store/measurements/types";
+import { measurementsSlice } from "store/measurements/measurementsSlice";
+
 import { LoadStatus } from "utils/common/types";
 
 export const MeasurementGroupOptions = ({

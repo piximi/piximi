@@ -1,7 +1,8 @@
+import React, { useState } from "react";
 import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
+
 import { ClassifierSection } from "./ClassifierSection";
 import { SegmenterSection } from "./SegmenterSection";
-import React, { useState } from "react";
 
 export const ModelTaskSection = () => {
   const [learningTask, setLearningTask] = useState<

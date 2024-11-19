@@ -12,10 +12,12 @@ import {
 import LanguageIcon from "@mui/icons-material/Language";
 
 import { useDebounce } from "hooks";
-import { Model } from "utils/models/Model";
-import { UploadedClassifier } from "utils/models/classification/UploadedClassifier/UploadedClassifier";
-import { ModelTask } from "utils/models/enums";
+
 import { Shape } from "store/data/types";
+
+import { UploadedClassifier } from "utils/models/classification";
+import { Model } from "utils/models/Model";
+import { ModelTask } from "utils/models/enums";
 
 export const CloudUpload = ({
   modelTask,

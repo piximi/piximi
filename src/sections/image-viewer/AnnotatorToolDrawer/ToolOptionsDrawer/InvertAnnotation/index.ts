@@ -1,1 +1,0 @@
-export { InvertAnnotation } from "./InvertAnnotation";

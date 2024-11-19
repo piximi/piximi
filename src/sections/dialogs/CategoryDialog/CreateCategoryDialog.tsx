@@ -1,6 +1,8 @@
 import { useDispatch } from "react-redux";
-import { dataSlice } from "store/data/dataSlice";
+
 import { CategoryDialog } from "./CategoryDialog";
+
+import { dataSlice } from "store/data/dataSlice";
 
 type CreateCategoriesDialogProps = {
   onClose: () => void;

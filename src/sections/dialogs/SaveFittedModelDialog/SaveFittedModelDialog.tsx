@@ -1,9 +1,9 @@
 import { ChangeEvent, useState } from "react";
-
 import { Grid, TextField } from "@mui/material";
 
+import { ConfirmationDialog } from "components/ConfirmationDialog";
+
 import { Model } from "utils/models/Model/Model";
-import { ConfirmationDialog } from "../../../components/ConfirmationDialog";
 import { ModelStatus } from "utils/models/enums";
 
 type SaveFittedModelDialogProps = {

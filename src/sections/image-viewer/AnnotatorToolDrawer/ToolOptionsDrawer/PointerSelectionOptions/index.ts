@@ -1,1 +1,0 @@
-export { PointerSelectionOptions } from "./PointerSelectionOptions";

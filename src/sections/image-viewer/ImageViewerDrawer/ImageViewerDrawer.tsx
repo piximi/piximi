@@ -1,25 +1,24 @@
 import React from "react";
 import { useSelector } from "react-redux";
-
 import { Box, Divider, IconButton, List, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 
-import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
+import { useDialogHotkey } from "hooks";
+
 import { AppBarOffset } from "components/AppBarOffset";
 import { DividerHeader } from "components/DividerHeader";
-
+import { BaseAppDrawer } from "components/BaseAppDrawer";
 import { ExportAnnotationsListItem } from "sections/file-io";
-import { ImageViewerAppBar } from "sections/image-viewer/ImageViewerAppBar";
+import { ImageViewerCategories } from "sections/categories";
+import { CreateKindDialog } from "sections/dialogs";
+import { ImageViewerAppBar } from "../ImageViewerAppBar";
+import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
+import { ImageList } from "./ImageList";
 
 //import { selectCreatedAnnotationCategories } from "store/slices/data";
-
-import { BaseAppDrawer } from "components/BaseAppDrawer";
 import { selectImageViewerImages } from "store/imageViewer/reselectors";
-import { ImageList } from "./ImageList";
-import { ImageViewerCategories } from "../../categories";
-import { useDialogHotkey } from "hooks";
+
 import { HotkeyContext } from "utils/common/enums";
-import { CreateKindDialog } from "sections/dialogs";
 
 export const ImageViewerDrawer = () => {
   // const createdCategories = useSelector(selectCreatedAnnotationCategories);

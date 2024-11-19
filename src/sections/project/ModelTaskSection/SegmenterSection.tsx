@@ -2,18 +2,17 @@ import React, { useEffect } from "react";
 
 import { Box, Stack, Typography } from "@mui/material";
 
-import { useDialog, useDialogHotkey } from "hooks";
+import { useDialog, useDialogHotkey, useSegmentationModel } from "hooks";
 
 import {
   ImportTensorflowModelDialog,
   SaveFittedModelDialog,
+  FitSegmenterDialog,
 } from "sections/dialogs";
+import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
+import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
 
 import { HotkeyContext } from "utils/common/enums";
-import { ModelIOButtonGroup } from "sections/project/ModelTaskSection/ModelIOButtonGroup";
-import { ModelExecButtonGroup } from "sections/project/ModelTaskSection/ModelExecButtonGroup";
-import { useSegmentationModel } from "hooks/useLearningModel/useSegmentationModel";
-import { FitSegmenterDialog } from "sections/dialogs";
 import { ModelStatus, ModelTask } from "utils/models/enums";
 
 export const SegmenterSection = () => {

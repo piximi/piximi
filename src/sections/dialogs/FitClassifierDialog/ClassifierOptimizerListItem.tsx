@@ -1,11 +1,14 @@
 import React from "react";
-import { CollapsibleListItem } from "../../../components/CollapsibleListItem";
-import { OptimizerSettingsGrid } from "sections/dialogs/FitClassifierDialog/settings";
 import { useDispatch, useSelector } from "react-redux";
+
+import { CollapsibleListItem } from "components/CollapsibleListItem";
+import { OptimizerSettingsGrid } from "sections/model-settings";
+
 import { classifierSlice } from "store/classifier";
+import { selectClassifierCompileOptions } from "store/classifier/selectors";
+
 import { FitOptions } from "utils/models/types";
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
-import { selectClassifierCompileOptions } from "store/classifier/selectors";
 
 export const ClassifierOptimizerListItem = ({
   fitOptions,

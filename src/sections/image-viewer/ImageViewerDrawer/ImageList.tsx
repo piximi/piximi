@@ -1,6 +1,5 @@
 import React, { memo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
 import {
   Avatar,
   Box,
@@ -14,13 +13,13 @@ import {
   ListItemText,
   Tooltip,
 } from "@mui/material";
-
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+
+import { ImageMenu } from "./ImageMenu";
 
 import { imageViewerSlice } from "store/imageViewer";
 import { ImageObject } from "store/data/types";
 import { selectActiveImageId } from "store/imageViewer/selectors";
-import { ImageMenu } from "./ImageMenu";
 
 const NUM_BUFFERED_IMS = 20;
 const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 4);

@@ -1,8 +1,9 @@
 import React from "react";
+
 import { AppBarOffset } from "components/AppBarOffset";
-import { MeasurementGroupOptionsContainer } from "../MeasurementGroupOptionsContainer";
 import { BaseAppDrawer } from "components/BaseAppDrawer";
-import { MeasurementsAppBar } from "sections/measurements/MeasurementsAppBar";
+import { MeasurementGroupOptionsContainer } from "../MeasurementGroupOptionsContainer";
+import { MeasurementsAppBar } from "../MeasurementsAppBar";
 
 export const MeasurementsDrawer = () => {
   return (

@@ -7,9 +7,10 @@ import {
   IconButton,
   useTheme,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 
 import { useTranslation } from "hooks";
+
+import CloseIcon from "@mui/icons-material/Close";
 
 type BaseExampleDialogProps = {
   open: boolean;

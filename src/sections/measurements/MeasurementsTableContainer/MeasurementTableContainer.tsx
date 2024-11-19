@@ -11,11 +11,14 @@ import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
 } from "@mui/icons-material";
-import { GroupedMeasurementDisplayTable } from "store/measurements/types";
-import { capitalize } from "utils/common/helpers";
-import { MeasurementTable } from "./MeasurementTable";
+
 import { CustomTabs } from "components/CustomTabSwitcher";
-import { MeasurementPlotsContainer } from "sections/measurements/MeasurementPlotsContainer";
+import { MeasurementPlotsContainer } from "../MeasurementPlotsContainer";
+import { MeasurementTable } from "./MeasurementTable";
+
+import { GroupedMeasurementDisplayTable } from "store/measurements/types";
+
+import { capitalize } from "utils/common/helpers";
 
 export const MeasurementTableContainer = ({
   table,

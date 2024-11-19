@@ -6,21 +6,26 @@ import React, {
   useState,
 } from "react";
 import { Box, Divider, IconButton, Tab, Tabs, Typography } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import MinimizeIcon from "@mui/icons-material/Minimize";
-import EditIcon from "@mui/icons-material/Edit";
-import AddIcon from "@mui/icons-material/Add";
+
 import {
-  CommonTabsProps,
-  EditableTabsProps,
-  ExtendableTabsProps,
-} from "./props";
-import { BlurActionTextField } from "../inputs";
+  Delete as DeleteIcon,
+  Minimize as MinimizeIcon,
+  Edit as EditIcon,
+  Add as AddIcon,
+} from "@mui/icons-material";
+
 import {
   BasicTabPanel,
   ControlledTabPanel,
   SlidingTabPanel,
 } from "./TabPanels";
+
+import { BlurActionTextField } from "../inputs";
+import {
+  CommonTabsProps,
+  EditableTabsProps,
+  ExtendableTabsProps,
+} from "./props";
 
 const TabContext = createContext<number>(0);
 

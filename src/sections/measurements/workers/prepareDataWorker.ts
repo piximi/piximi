@@ -1,7 +1,9 @@
 import * as tf from "@tensorflow/tfjs";
+
+import { ThingData } from "store/measurements/types";
+
 import { DataArray } from "utils/file-io/types";
 import { prepareThingData } from "../utils";
-import { ThingData } from "store/measurements/types";
 
 /* eslint-disable-next-line no-restricted-globals */
 self.onmessage = async (

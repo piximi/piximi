@@ -7,6 +7,7 @@ import {
   selectAnnotationState,
   selectToolType,
 } from "store/annotator/selectors";
+
 import { AnnotationState, ToolType } from "utils/annotator/enums";
 
 type ColorAnnotationToolTipProps = {

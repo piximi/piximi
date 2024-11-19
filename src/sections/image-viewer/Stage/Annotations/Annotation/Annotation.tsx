@@ -5,10 +5,10 @@ import * as ReactKonva from "react-konva";
 import Image from "image-js";
 
 import { selectImageOrigin } from "store/imageViewer/selectors";
-
-import { hexToRGBA, colorOverlayROI, encode } from "utils/annotator";
 import { dataSlice } from "store/data/dataSlice";
 import { DecodedAnnotationObject, Shape } from "store/data/types";
+
+import { hexToRGBA, colorOverlayROI, encode } from "utils/annotator";
 
 type AnnotationProps = {
   annotation: DecodedAnnotationObject;

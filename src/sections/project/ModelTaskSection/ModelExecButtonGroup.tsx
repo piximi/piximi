@@ -1,8 +1,10 @@
 import React from "react";
-import { ScatterPlot as ScatterPlotIcon } from "@mui/icons-material";
-import { LabelImportant as LabelImportantIcon } from "@mui/icons-material";
-import AssessmentIcon from "@mui/icons-material/Assessment";
 import { Box, CircularProgress } from "@mui/material";
+import {
+  ScatterPlot as ScatterPlotIcon,
+  LabelImportant as LabelImportantIcon,
+  Assessment as AssessmentIcon,
+} from "@mui/icons-material";
 
 import { TooltipButton } from "components/tooltips/TooltipButton/TooltipButton";
 import { ModelStatus } from "utils/models/enums";

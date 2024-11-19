@@ -1,5 +1,4 @@
 import React from "react";
-
 import { Checkbox } from "@mui/material";
 import {
   Label as LabelIcon,
@@ -7,12 +6,14 @@ import {
   MoreHoriz as MoreHorizIcon,
 } from "@mui/icons-material";
 
+import { useImageViewerCategoryItemState } from "hooks";
+
 import { CustomListItemButton } from "components/CustomListItemButton";
-import { useImageViewerCategoryItemState } from "../../image-viewer/ImageViewerDrawer/useImageViewerCategoryItemState";
 import { CountChip } from "components/CountChip";
-import { APPLICATION_COLORS } from "utils/common/constants";
-import { Category } from "store/data/types";
 import { CategoryItemMenu } from "sections/categories/CategoryItemMenu";
+
+import { Category } from "store/data/types";
+import { APPLICATION_COLORS } from "utils/common/constants";
 
 type ImageViewerCategoryItemProps = {
   category: Category;

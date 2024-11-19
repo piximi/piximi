@@ -1,3 +1,4 @@
+import { ReactElement, ReactNode, useCallback, useMemo } from "react";
 import {
   Box,
   Checkbox,
@@ -13,16 +14,19 @@ import {
   useTheme,
 } from "@mui/material";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import { ReactElement, ReactNode, useCallback, useMemo } from "react";
-import { KeysWithValuesOfType } from "utils/common/types";
-import { capitalize } from "utils/common/helpers";
-import { CustomNumberTextField } from "components/CustomNumberTextField";
 import type { ColorSchemeId } from "@nivo/colors";
-import { nivoColorSpaces } from "themes/nivoTheme";
+
 import {
   useMeasurementParameters,
   usePlotControl,
 } from "sections/measurements/providers/hooks";
+
+import { CustomNumberTextField } from "components/CustomNumberTextField";
+
+import { KeysWithValuesOfType } from "utils/common/types";
+import { capitalize } from "utils/common/helpers";
+
+import { nivoColorSpaces } from "themes/nivoTheme";
 import {
   ChartConfig,
   ChartItem,

@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
 import { ArrowBack } from "@mui/icons-material";
 import { IconButton, Tooltip, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
+import { LogoLoader } from "components/LogoLoader";
+import { CustomAppBar } from "components/CustomAppBar";
 import { ExitAnnotatorDialog } from "sections/dialogs";
 
-import { LogoLoader } from "components/LogoLoader";
-import { HotkeyContext } from "utils/common/enums";
-import { batch, useDispatch, useSelector } from "react-redux";
 import { imageViewerSlice } from "store/imageViewer";
 import { selectActiveImageId } from "store/imageViewer/selectors";
 import { selectHasUnsavedChanges } from "store/project/selectors";
-import { CustomAppBar } from "components/CustomAppBar";
+import { HotkeyContext } from "utils/common/enums";
 
 export const ImageViewerAppBar = () => {
   const navigate = useNavigate();

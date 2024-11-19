@@ -2,24 +2,19 @@ import { useContext, useLayoutEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
+import useSound from "use-sound";
+
+import { useHotkeys } from "hooks";
 
 import { StageContext } from "contexts";
 import { imageViewerSlice } from "store/imageViewer";
-
 import { annotatorSlice } from "store/annotator";
-
-import useSound from "use-sound";
-
-import { AnnotationTool } from "utils/annotator/tools";
-import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
-import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
 import { dataSlice } from "store/data/dataSlice";
 import { getCompleteEntity } from "store/entities/utils";
 import {
   selectActiveImage,
   selectSelectedAnnotations,
 } from "store/imageViewer/reselectors";
-import { AnnotationMode } from "utils/annotator/enums";
 import {
   selectActiveAnnotationIds,
   selectActiveImageId,
@@ -28,8 +23,13 @@ import {
   selectWorkingAnnotation,
 } from "store/imageViewer/selectors";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
-import { useHotkeys } from "hooks";
+
+import { AnnotationTool } from "utils/annotator/tools";
+import { AnnotationMode } from "utils/annotator/enums";
 import { HotkeyContext } from "utils/common/enums";
+
+import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
+import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
 
 const buttonWidth = 65;
 const buttonHeight = 26;

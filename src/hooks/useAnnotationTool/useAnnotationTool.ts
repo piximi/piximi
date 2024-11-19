@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import * as ImageJS from "image-js";
 import { useSelector } from "react-redux";
+import * as ImageJS from "image-js";
 
 import { StageContext } from "contexts";
 import {
@@ -9,6 +9,7 @@ import {
   selectToolType,
   selectThresholdAnnotationValue,
 } from "store/annotator/selectors";
+import { selectActiveImage } from "store/imageViewer/reselectors";
 
 import {
   AnnotationTool,
@@ -26,7 +27,6 @@ import {
   BlankAnnotationTool,
 } from "utils/annotator/tools";
 import { ToolType } from "utils/annotator/enums";
-import { selectActiveImage } from "store/imageViewer/reselectors";
 
 export const useAnnotationTool = () => {
   const [image, setImage] = useState<ImageJS.Image>();

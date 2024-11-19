@@ -1,1 +1,0 @@
-export { PolygonalSelection } from "./PolygonalSelection";

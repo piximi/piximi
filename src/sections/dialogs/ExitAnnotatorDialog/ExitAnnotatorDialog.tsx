@@ -1,5 +1,7 @@
 import { batch, useDispatch, useSelector } from "react-redux";
-import { ConfirmationDialog } from "../../../components/ConfirmationDialog";
+
+import { ConfirmationDialog } from "components/ConfirmationDialog";
+
 import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data/dataSlice";
 import { selectActiveImageId } from "store/imageViewer/selectors";

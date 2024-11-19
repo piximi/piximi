@@ -1,8 +1,8 @@
 import React from "react";
-
 import { Menu } from "@mui/material";
 
 import { ImportAnnotationsFileMenuItem } from "./ImportAnnotationsFileMenuItem";
+
 import { ProjectFileType } from "utils/file-io/runtimeTypes";
 
 type ImportAnnotationsMenuProps = {

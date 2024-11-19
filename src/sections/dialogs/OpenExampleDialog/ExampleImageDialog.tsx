@@ -1,5 +1,7 @@
 import { BaseExampleDialog } from "./BaseExampleDialog";
+import { ExampleImageCard } from "./ExampleImageCard";
 
+import { SerializedFileType } from "utils/file-io/types";
 import malaria from "images/malaria.png";
 import cellPainting from "images/cell-painting.png";
 import {
@@ -7,8 +9,6 @@ import {
   cellPaintingAnnotations,
 } from "data/exampleImages";
 
-import { ExampleImageCard } from "./ExampleImageCard";
-import { SerializedFileType } from "utils/file-io/types";
 const exampleImages = [
   {
     name: "Malaria infected human blood smears",

@@ -6,6 +6,7 @@ import { useDialogHotkey } from "hooks";
 
 import { SettingsDialog } from "sections/dialogs";
 import { CustomListItemButton } from "../CustomListItemButton";
+
 import { HotkeyContext } from "utils/common/enums";
 
 export const SettingsListItem = () => {

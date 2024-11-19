@@ -1,8 +1,9 @@
 import React, { ReactNode, useMemo, useRef } from "react";
-import { usePlotControl } from "../hooks";
 import saveAs from "file-saver";
 import { Box, Button } from "@mui/material";
+
 import { usePreferredNivoTheme } from "hooks";
+import { usePlotControl } from "../hooks";
 
 export const PlotContainer = ({ children }: { children: ReactNode }) => {
   const plotRef = useRef<HTMLDivElement | null>(null);

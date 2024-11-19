@@ -1,6 +1,6 @@
-import { intersection } from "lodash";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { intersection } from "lodash";
 import { projectSlice } from "store/project";
 import { selectActiveThings } from "store/project/reselectors";
 import {

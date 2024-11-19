@@ -1,17 +1,20 @@
 import React, { useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { xor } from "lodash";
+import { Box } from "@mui/material";
+
+import { SelectionTree } from "components/SelectionTree";
+
 import {
   selectMeasurementData,
   selectSelectedGroupMeasurements,
 } from "store/measurements/selectors";
-import { useDispatch, useSelector } from "react-redux";
 import { MeasurementOptions, MeasurementGroup } from "store/measurements/types";
-import { LoadStatus, RecursivePartial } from "utils/common/types";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
-import { SelectionTree } from "components/SelectionTree";
-import { isObjectEmpty } from "utils/common/helpers";
-import { xor } from "lodash";
-import { Box } from "@mui/material";
+
 import { selectTreeItemChildren } from "../utils";
+import { LoadStatus, RecursivePartial } from "utils/common/types";
+import { isObjectEmpty } from "utils/common/helpers";
 
 export const MeasurementsTree = ({
   group,

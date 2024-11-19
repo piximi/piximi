@@ -14,12 +14,12 @@ import {
 
 import { Close, PlayCircleOutline, Stop } from "@mui/icons-material";
 
+import { useDialogHotkey } from "hooks";
+
+import { ConfirmationDialog } from "components/ConfirmationDialog";
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
 import { classifierSlice } from "store/classifier";
-
-import { ModelStatus } from "utils/models/enums";
-import { APPLICATION_COLORS } from "utils/common/constants";
 import {
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
@@ -27,9 +27,10 @@ import {
 } from "store/classifier/selectors";
 import { selectActiveKindId } from "store/project/selectors";
 import { dataSlice } from "store/data";
-import { useDialogHotkey } from "hooks";
+
+import { ModelStatus } from "utils/models/enums";
+import { APPLICATION_COLORS } from "utils/common/constants";
 import { HotkeyContext } from "utils/common/enums";
-import { ConfirmationDialog } from "components/ConfirmationDialog";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;

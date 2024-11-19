@@ -1,10 +1,11 @@
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 
-import { selectGroupMeasurementDisplayData } from "store/measurements/reselectors";
-import { MeasurementTableContainer } from "../MeasurementsTableContainer/MeasurementTableContainer";
-import { GroupedMeasurementDisplayTable } from "store/measurements/types";
+import { MeasurementTableContainer } from "../MeasurementsTableContainer";
 import { DashboardGrid } from "./DashboardGrid";
+
+import { selectGroupMeasurementDisplayData } from "store/measurements/reselectors";
+import { GroupedMeasurementDisplayTable } from "store/measurements/types";
 
 export const MeasurementsDashboard = () => {
   const measurementTables = useSelector(selectGroupMeasurementDisplayData);

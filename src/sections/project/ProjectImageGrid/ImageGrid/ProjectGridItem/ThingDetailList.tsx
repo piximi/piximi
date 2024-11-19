@@ -1,5 +1,6 @@
 import React from "react";
 import { List, ListItem, ListItemText } from "@mui/material";
+
 import { Thing } from "store/data/types";
 
 export const ThingDetailList = ({

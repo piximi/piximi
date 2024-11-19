@@ -1,6 +1,7 @@
-import { PlotDetails, PlotViewActionProps } from "../types";
-import { initialChartConfig } from "./initialStates";
 import { v4 as uuidv4 } from "uuid";
+
+import { initialChartConfig } from "./initialStates";
+import { PlotDetails, PlotViewActionProps } from "../types";
 
 export function plotViewReducer(
   plotDetails: PlotDetails,

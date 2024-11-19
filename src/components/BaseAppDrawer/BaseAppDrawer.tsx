@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Drawer } from "@mui/material";
+
 import { ApplicationOptions } from "components/ApplicationOptions";
 
 export const BaseAppDrawer = ({

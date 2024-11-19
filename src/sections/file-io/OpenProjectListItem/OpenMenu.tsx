@@ -9,6 +9,7 @@ import { BaseMenu } from "components/BaseMenu";
 import { OpenProjectMenu } from "./OpenProjectMenu";
 import { OpenImageMenu } from "./OpenImageMenu";
 import { ImportAnnotationsMenu } from "./ImportAnnotationsMenu";
+
 type OpenMenuProps = {
   anchorEl: HTMLElement | null;
   onClose: () => void;

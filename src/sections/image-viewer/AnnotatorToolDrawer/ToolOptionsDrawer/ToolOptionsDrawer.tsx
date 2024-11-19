@@ -1,19 +1,24 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-
 import { Drawer } from "@mui/material";
 
 import { useTranslation } from "hooks";
-import { AppBarOffset } from "components/AppBarOffset";
 
-import { PenSelectionIconOptions } from "./PenSelectionIconOptions";
-import { QuickAnnotationOptions } from "./QuickAnnotationOptions";
-import { ZoomOptions } from "./ZoomOptions";
-import { ThresholdAnnotationOptions } from "./ThresholdAnnotationOptions";
+import { AppBarOffset } from "components/AppBarOffset";
 import { InformationBox } from "./InformationBox";
-import { BaseOptions } from "./BaseOptions";
+import {
+  BaseOptions,
+  ColorAdjustmentOptions,
+  PenSelectionIconOptions,
+  PointerSelectionOptions,
+  QuickAnnotationOptions,
+  ThresholdAnnotationOptions,
+  ZoomOptions,
+} from "./options";
 
 import { selectToolType } from "store/annotator/selectors";
+
+import { ToolType } from "utils/annotator/enums";
 
 import {
   ColorAdjustmentIcon,
@@ -28,9 +33,6 @@ import {
   RectangularSelectionIcon,
   ZoomIcon,
 } from "icons";
-import { PointerSelectionOptions } from "./PointerSelectionOptions";
-import { ColorAdjustmentOptions } from "./color-adjustment-options";
-import { ToolType } from "utils/annotator/enums";
 
 type OperationType = {
   icon: ReactElement;

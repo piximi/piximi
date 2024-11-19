@@ -1,12 +1,13 @@
 import React from "react";
 
+import { useMobileView } from "hooks";
+
 import { AppBarOffset } from "components/AppBarOffset";
 import { DividerHeader } from "components/DividerHeader";
 import { BaseAppDrawer } from "components/BaseAppDrawer";
 import { FileIO } from "sections/file-io";
-import { ModelTaskSection } from "../ModelTaskSection/ModelTaskSection";
-import { useMobileView } from "hooks";
 import { ProjectViewerCategories } from "sections/categories";
+import { ModelTaskSection } from "../ModelTaskSection";
 
 export const ProjectDrawer = () => {
   const isMobile = useMobileView();

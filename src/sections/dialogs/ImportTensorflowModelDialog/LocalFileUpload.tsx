@@ -9,10 +9,11 @@ import {
 
 import FileOpenIcon from "@mui/icons-material/FileOpen";
 
-import { Model } from "utils/models/Model/Model";
-import { UploadedClassifier } from "utils/models/classification/UploadedClassifier/UploadedClassifier";
-import { ModelTask } from "utils/models/enums";
 import { Shape } from "store/data/types";
+
+import { Model } from "utils/models/Model/Model";
+import { UploadedClassifier } from "utils/models/classification";
+import { ModelTask } from "utils/models/enums";
 
 //TODO: MenuItem??
 

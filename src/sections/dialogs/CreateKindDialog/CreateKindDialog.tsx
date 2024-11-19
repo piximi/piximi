@@ -1,11 +1,14 @@
-import { batch, useDispatch, useSelector } from "react-redux";
-import { dataSlice } from "store/data/dataSlice";
-import { ConfirmationDialog } from "../../../components/ConfirmationDialog";
-import { Box, TextField } from "@mui/material";
-import { selectAllKindIds } from "store/data/selectors";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { generateUnknownCategory } from "utils/common/helpers";
+import { batch, useDispatch, useSelector } from "react-redux";
+import { Box, TextField } from "@mui/material";
+
+import { ConfirmationDialog } from "components/ConfirmationDialog";
+
+import { dataSlice } from "store/data/dataSlice";
+import { selectAllKindIds } from "store/data/selectors";
 import { Kind } from "store/data/types";
+
+import { generateUnknownCategory } from "utils/common/helpers";
 
 type CreateCategoriesDialogProps = {
   onClose: () => void;

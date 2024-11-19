@@ -1,8 +1,8 @@
 import React, { useLayoutEffect, useState } from "react";
-
 import { Box } from "@mui/material";
 
 import { Stage } from "../Stage";
+
 import { dimensions } from "utils/common/constants";
 
 type StageWrapperProps = {

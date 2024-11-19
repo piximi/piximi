@@ -1,16 +1,16 @@
 import React, { ChangeEvent } from "react";
 import { useDispatch } from "react-redux";
-
 import { TextField } from "@mui/material";
+
+import { ConfirmationDialog } from "components/ConfirmationDialog";
 
 import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
-import { ConfirmationDialog } from "../../../components/ConfirmationDialog";
 import { dataSlice } from "store/data/dataSlice";
 import { annotatorSlice } from "store/annotator";
 import { imageViewerSlice } from "store/imageViewer";
-import { measurementsSlice } from "store/measurements/measurementsSlice";
 import { segmenterSlice } from "store/segmenter";
+import { measurementsSlice } from "store/measurements";
 
 type NewProjectDialogProps = {
   onClose: () => void;

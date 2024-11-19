@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import {
   Slider,
@@ -26,17 +27,6 @@ import {
   Straighten as StraightenIcon,
 } from "@mui/icons-material";
 
-import { LogoLoader } from "components/LogoLoader";
-
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { projectSlice } from "store/project";
-import { SortSelection } from "components/SortSelection";
-import {
-  selectActiveKindId,
-  selectLoadMessage,
-  selectLoadPercent,
-  selectProjectName,
-} from "store/project/selectors";
 import {
   useDialogHotkey,
   useHotkeys,
@@ -44,20 +34,32 @@ import {
   useMobileView,
   useThingSelection,
 } from "hooks";
+
+import { LogoLoader } from "components/LogoLoader";
+import { SortSelection } from "components/SortSelection";
 import { TooltipTitle } from "components/tooltips";
-import { HotkeyContext } from "utils/common/enums";
-import { useNavigate } from "react-router-dom";
+import { CustomAppBar } from "components/CustomAppBar";
+import { AlertBar } from "components/AlertBar";
+import { ImageCategoryMenu } from "./ImageCategoryMenu";
+import { ConfirmationDialog } from "components/ConfirmationDialog";
+import { TooltipButton } from "components/tooltips/TooltipButton/TooltipButton";
+
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { projectSlice } from "store/project";
+import {
+  selectActiveKindId,
+  selectLoadMessage,
+  selectLoadPercent,
+  selectProjectName,
+} from "store/project/selectors";
 import { selectActiveCategories } from "store/project/reselectors";
 import { imageViewerSlice } from "store/imageViewer";
-import { TooltipButton } from "components/tooltips/TooltipButton/TooltipButton";
-import { ConfirmationDialog } from "components/ConfirmationDialog";
-import { Partition } from "utils/models/enums";
 import { dataSlice } from "store/data";
-import { isUnknownCategory, pluralize } from "utils/common/helpers";
 import { selectAlertState } from "store/applicationSettings/selectors";
-import { AlertBar } from "../../../components/AlertBar";
-import { CustomAppBar } from "components/CustomAppBar";
-import { ImageCategoryMenu } from "./ImageCategoryMenu";
+
+import { HotkeyContext } from "utils/common/enums";
+import { Partition } from "utils/models/enums";
+import { isUnknownCategory, pluralize } from "utils/common/helpers";
 
 const minZoom = 0.6;
 const maxZoom = 4;

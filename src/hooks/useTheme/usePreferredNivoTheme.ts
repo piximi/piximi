@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Theme } from "@nivo/core";
 
-import { getNivoTheme } from "themes/nivoTheme";
 import { selectThemeMode } from "store/applicationSettings/selectors";
+import { getNivoTheme } from "themes/nivoTheme";
 
 export const usePreferredNivoTheme = () => {
   const themeMode = useSelector(selectThemeMode);
