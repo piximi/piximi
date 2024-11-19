@@ -1,9 +1,10 @@
-import { AnnotatorState } from "store/types";
 import {
   AnnotationMode,
   AnnotationState,
   ToolType,
 } from "utils/annotator/enums";
+
+import { AnnotatorState } from "store/types";
 
 export const selectAnnotationState = ({
   annotator,

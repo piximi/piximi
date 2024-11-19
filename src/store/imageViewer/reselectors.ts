@@ -1,11 +1,24 @@
 import { createSelector } from "@reduxjs/toolkit";
+import { intersection } from "lodash";
+
 import {
   selectAllKinds,
   selectCategoriesDictionary,
   selectKindDictionary,
   selectThingsDictionary,
 } from "store/data/selectors";
+import {
+  selectActiveAnnotationIds,
+  selectActiveImageId,
+  selectImageStackImageIds,
+  selectSelectedAnnotationIds,
+  selectWorkingAnnotation,
+} from "./selectors";
+
 import { generateBlankColors } from "utils/common/tensorHelpers";
+import { decodeAnnotation } from "utils/annotator/rle";
+import { getCompleteEntity } from "store/entities/utils";
+
 import { Colors, ColorsRaw } from "utils/common/types";
 import {
   AnnotationObject,
@@ -16,16 +29,6 @@ import {
   KindWithCategories,
   Shape,
 } from "store/data/types";
-import {
-  selectActiveAnnotationIds,
-  selectActiveImageId,
-  selectImageStackImageIds,
-  selectSelectedAnnotationIds,
-  selectWorkingAnnotation,
-} from "./selectors";
-import { decodeAnnotation } from "utils/annotator/rle";
-import { getCompleteEntity } from "store/entities/utils";
-import { intersection } from "lodash";
 
 export const selectActiveImage = createSelector(
   selectActiveImageId,

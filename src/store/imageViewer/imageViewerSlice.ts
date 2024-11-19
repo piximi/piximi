@@ -1,15 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+import { distinctFilter, mutatingFilter } from "utils/common/helpers";
+
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
+import { ZoomMode } from "utils/annotator/enums";
+
 import { DecodedAnnotationObject } from "store/data/types";
 import { ImageViewerState } from "store/types";
-
-import { ZoomMode } from "utils/annotator/enums";
 import {
   ColorAdjustmentOptionsType,
   ZoomToolOptionsType,
 } from "utils/annotator/types";
-
-import { distinctFilter, mutatingFilter } from "utils/common/helpers";
 
 const initialState: ImageViewerState = {
   imageStack: [],

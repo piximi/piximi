@@ -1,12 +1,14 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { TypedAppStartListening } from "store/types";
-import { projectSlice } from "./projectSlice";
+import { difference, intersection } from "lodash";
+
 import { annotatorSlice } from "store/annotator";
 import { classifierSlice } from "store/classifier";
 import { segmenterSlice } from "store/segmenter";
 import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
-import { difference, intersection } from "lodash";
+import { projectSlice } from "./projectSlice";
+
+import { TypedAppStartListening } from "store/types";
 
 export const projectMiddleware = createListenerMiddleware();
 const startAppListening =

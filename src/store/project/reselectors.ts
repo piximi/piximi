@@ -1,3 +1,6 @@
+import { createSelector } from "@reduxjs/toolkit";
+import { difference, intersection } from "lodash";
+
 import {
   selectAllKindIds,
   selectCategoriesDictionary,
@@ -10,12 +13,13 @@ import {
   selectKindTabFilters,
   selectSelectedThingIds,
 } from "./selectors";
-import { createSelector } from "@reduxjs/toolkit";
-import { difference, intersection } from "lodash";
+
 import { isUnknownCategory, updateRecord } from "utils/common/helpers";
+
 import { CATEGORY_COLORS } from "utils/common/constants";
-import { AnnotationObject, ImageObject, Thing } from "store/data/types";
 import { Partition } from "utils/models/enums";
+
+import { AnnotationObject, ImageObject, Thing } from "store/data/types";
 
 export const selectVisibleKinds = createSelector(
   selectKindTabFilters,

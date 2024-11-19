@@ -1,10 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {
-  ClassifierEvaluationResultType,
-  CropOptions,
-  RescaleOptions,
-  TrainingCallbacks,
-} from "utils/models/types";
+
+import { availableClassifierModels } from "utils/models/availableClassificationModels";
+
 import {
   CropSchema,
   LossFunction,
@@ -12,7 +9,13 @@ import {
   ModelStatus,
   OptimizationAlgorithm,
 } from "utils/models/enums";
-import { availableClassifierModels } from "utils/models/availableClassificationModels";
+
+import {
+  ClassifierEvaluationResultType,
+  CropOptions,
+  RescaleOptions,
+  TrainingCallbacks,
+} from "utils/models/types";
 import { ClassifierState } from "store/types";
 import { Shape } from "store/data/types";
 

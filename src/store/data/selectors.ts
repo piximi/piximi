@@ -1,8 +1,10 @@
 import { createSelector } from "@reduxjs/toolkit";
+import { intersection } from "lodash";
+
 import { kindsAdapter, categoriesAdapter, thingsAdapter } from "./dataSlice";
 import { RootState } from "store/rootReducer";
+
 import { AnnotationObject, Category, ImageObject, Kind } from "./types";
-import { intersection } from "lodash";
 
 const kindsSelectors = kindsAdapter.getSelectors(
   (state: RootState) => state.data.kinds

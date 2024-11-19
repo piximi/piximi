@@ -1,18 +1,22 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-
-import { TypedAppStartListening } from "store/types";
-import { annotatorSlice } from "./annotatorSlice";
-import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
-import { imageViewerSlice } from "store/imageViewer";
 import { intersection } from "lodash";
+
+import { annotatorSlice } from "./annotatorSlice";
+
+import { imageViewerSlice } from "store/imageViewer";
+
+import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { encodeAnnotation } from "utils/annotator/rle";
+import { BlankAnnotationTool } from "utils/annotator/tools";
+import { getPropertiesFromImage } from "utils/common/helpers";
+
 import {
   AnnotationMode,
   AnnotationState,
   ToolType,
 } from "utils/annotator/enums";
-import { getPropertiesFromImage } from "utils/common/helpers";
-import { BlankAnnotationTool } from "utils/annotator/tools";
+
+import { TypedAppStartListening } from "store/types";
 import { DecodedAnnotationObject, ImageObject } from "store/data/types";
 
 export const annotatorMiddleware = createListenerMiddleware();

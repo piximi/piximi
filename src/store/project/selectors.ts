@@ -1,9 +1,10 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { difference } from "lodash";
-import { ProjectState } from "store/types";
 
 import { ThingSortKey } from "utils/common/enums";
 import { Partition } from "utils/models/enums";
+
+import { ProjectState } from "store/types";
 
 export const selectProject = ({
   project,

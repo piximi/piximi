@@ -7,7 +7,7 @@ import {
 import logger from "redux-logger";
 
 import { rootReducer, RootState } from "./rootReducer";
-import { annotatorMiddleware } from "store/annotator/annotatorListeners";
+import { annotatorMiddleware } from "./annotator/annotatorListeners";
 import { imageViewerMiddleware } from "./imageViewer/imageViewerListeners";
 import { projectMiddleware } from "./project/projectListeners";
 import { dataMiddleware } from "./data/dataListeners";

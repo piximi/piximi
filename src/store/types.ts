@@ -1,26 +1,13 @@
 import { History } from "@tensorflow/tfjs";
+import { AnyAction, Dispatch, TypedStartListening } from "@reduxjs/toolkit";
+
 import {
   AnnotationMode,
   AnnotationState,
   ToolType,
 } from "utils/annotator/enums";
-
-import {
-  ColorAdjustmentOptionsType,
-  ZoomToolOptionsType,
-} from "utils/annotator/types";
-
-import { AlertState, FilterType } from "utils/common/types";
 import { HotkeyContext, Languages, ThingSortKey } from "utils/common/enums";
 import { ThemeMode } from "themes/enums";
-
-import {
-  ClassifierEvaluationResultType,
-  FitOptions,
-  PreprocessOptions,
-  CompileOptions,
-  SegmenterEvaluationResultType,
-} from "utils/models/types";
 import {
   LossFunction,
   Metric,
@@ -29,7 +16,18 @@ import {
 } from "utils/models/enums";
 
 import { DeferredEntityState } from "./entities";
-import { AnyAction, Dispatch, TypedStartListening } from "@reduxjs/toolkit";
+import { AlertState, FilterType } from "utils/common/types";
+import {
+  ClassifierEvaluationResultType,
+  FitOptions,
+  PreprocessOptions,
+  CompileOptions,
+  SegmenterEvaluationResultType,
+} from "utils/models/types";
+import {
+  ColorAdjustmentOptionsType,
+  ZoomToolOptionsType,
+} from "utils/annotator/types";
 import {
   Kind,
   AnnotationObject,

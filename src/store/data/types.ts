@@ -1,7 +1,9 @@
 import { Tensor4D } from "@tensorflow/tfjs";
-import { DataArray } from "utils/file-io/types";
 import { BitDepth } from "image-js";
+
 import { Partition } from "utils/models/enums";
+
+import { DataArray } from "utils/file-io/types";
 import { Colors, PartialBy, RequireOnly } from "utils/common/types";
 
 export type Thing = {

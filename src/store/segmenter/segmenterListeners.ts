@@ -5,6 +5,34 @@ import {
 } from "@reduxjs/toolkit";
 import { intersection } from "lodash";
 import Image from "image-js";
+
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { dataSlice } from "store/data/dataSlice";
+import { projectSlice } from "store/project/projectSlice";
+import { segmenterSlice } from "./segmenterSlice";
+
+import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
+import {
+  getPropertiesFromImageSync,
+  getStackTraceFromError,
+} from "utils/common/helpers";
+
+import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
+import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
+import { AlertType } from "utils/common/enums";
+import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
+import { ModelStatus } from "utils/models/enums";
+
+import { OrphanedAnnotationObject } from "utils/models/segmentation/AbstractSegmenter";
+import { TrainingCallbacks } from "utils/models/types";
+import { AlertState } from "utils/common/types";
+import {
+  Kind,
+  AnnotationObject,
+  Category,
+  ImageObject,
+  Shape,
+} from "store/data/types";
 import {
   AnnotatorState,
   AppDispatch,
@@ -16,30 +44,6 @@ import {
   TypedAppStartListening,
 } from "store/types";
 import { DataState } from "store/types";
-import { segmenterSlice } from "./segmenterSlice";
-import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { dataSlice } from "store/data/dataSlice";
-import { projectSlice } from "store/project/projectSlice";
-import { OrphanedAnnotationObject } from "utils/models/segmentation/AbstractSegmenter";
-import { TrainingCallbacks } from "utils/models/types";
-import { ModelStatus } from "utils/models/enums";
-import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
-import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
-import {
-  getPropertiesFromImageSync,
-  getStackTraceFromError,
-} from "utils/common/helpers";
-import { AlertType } from "utils/common/enums";
-import { AlertState } from "utils/common/types";
-import {
-  Kind,
-  AnnotationObject,
-  Category,
-  ImageObject,
-  Shape,
-} from "store/data/types";
-import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 import { LoadCB } from "utils/file-io/types";
 
 export const segmenterMiddleware = createListenerMiddleware();

@@ -1,13 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { AnnotatorState } from "store/types";
+import { AnnotationTool } from "utils/annotator/tools/AnnotationTool";
 
 import {
   AnnotationMode,
   AnnotationState,
   ToolType,
 } from "utils/annotator/enums";
-import { AnnotationTool } from "utils/annotator/tools/AnnotationTool";
+
+import { AnnotatorState } from "store/types";
 
 const initialState: AnnotatorState = {
   annotationState: AnnotationState.Blank,

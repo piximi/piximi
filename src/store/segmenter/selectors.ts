@@ -1,8 +1,10 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { Shape } from "store/data/types";
-import { SegmenterState } from "store/types";
+
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import { ModelStatus } from "utils/models/enums";
+
+import { Shape } from "store/data/types";
+import { SegmenterState } from "store/types";
 import {
   CompileOptions,
   FitOptions,

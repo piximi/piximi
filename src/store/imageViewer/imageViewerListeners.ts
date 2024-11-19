@@ -1,15 +1,18 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { TypedAppStartListening } from "store/types";
+import { difference, intersection } from "lodash";
+
 import { imageViewerSlice } from "./imageViewerSlice";
+
 import { getCompleteEntity } from "store/entities/utils";
 import { decodeAnnotation } from "utils/annotator/rle";
 import { createRenderedTensor } from "utils/common/tensorHelpers";
+
 import {
   AnnotationObject,
   DecodedAnnotationObject,
   ImageObject,
 } from "store/data/types";
-import { difference, intersection } from "lodash";
+import { TypedAppStartListening } from "store/types";
 
 export const imageViewerMiddleware = createListenerMiddleware();
 const startAppListening =

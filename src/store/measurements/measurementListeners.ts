@@ -1,14 +1,17 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { TypedAppStartListening } from "store/types";
-import { measurementsSlice } from "./measurementsSlice";
-import { getDeferredProperty } from "store/entities/utils";
 import { difference, intersection } from "lodash";
-import { RecursivePartial } from "utils/common/types";
-import { MeasurementOptions, ThingData } from "./types";
+
+import { measurementsSlice } from "./measurementsSlice";
+
+import { getDeferredProperty } from "store/entities/utils";
 import { prepareThingData } from "sections/measurements/utils";
 import { isPendingReconciliation } from "store/data/helpers";
+
 import { DeferredDictionary } from "store/entities";
 import { Category } from "store/data/types";
+import { TypedAppStartListening } from "store/types";
+import { RecursivePartial } from "utils/common/types";
+import { MeasurementOptions, ThingData } from "./types";
 
 export const measurementsMiddleware = createListenerMiddleware();
 

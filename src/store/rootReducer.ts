@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { classifierSlice } from "store/classifier";
 import { imageViewerSlice } from "store/imageViewer";
