@@ -5,11 +5,12 @@ import { CollapsibleListItem } from "components/CollapsibleListItem";
 import { PreprocessingSettings } from "sections/model-settings";
 
 import { classifierSlice } from "store/classifier";
-import { CropOptions, RescaleOptions } from "utils/models/types";
 import {
   selectClassifierCropOptions,
   selectClassifierRescaleOptions,
 } from "store/classifier/selectors";
+
+import { CropOptions, RescaleOptions } from "utils/models/types";
 
 export const ClassifierPreprocessingListItem = () => {
   const cropOptions = useSelector(selectClassifierCropOptions);

@@ -1,5 +1,6 @@
 import React from "react";
 import { SimpleTreeView, TreeItem, treeItemClasses } from "@mui/x-tree-view";
+
 import { TreeData } from "utils/measurements/types";
 
 export const SelectionTree = ({

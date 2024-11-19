@@ -19,9 +19,9 @@ import { useTableExport } from "../hooks";
 import { SplitTree } from "./SplitTree";
 import { MeasurementsTree } from "./MeasurementTree";
 
-import { MeasurementGroup } from "store/measurements/types";
-import { measurementsSlice } from "store/measurements/measurementsSlice";
+import { measurementsSlice } from "store/measurements";
 
+import { MeasurementGroup } from "store/measurements/types";
 import { LoadStatus } from "utils/common/types";
 
 export const MeasurementGroupOptions = ({

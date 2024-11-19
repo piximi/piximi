@@ -12,9 +12,10 @@ import { CreateCategoryDialog } from "sections/dialogs";
 import { imageViewerSlice } from "store/imageViewer";
 import { selectFilteredImageViewerCategoryIds } from "store/imageViewer/selectors";
 import { selectImageViewerActiveKindsWithFullCat } from "store/imageViewer/reselectors";
-import { KindWithCategories } from "store/data/types";
 
 import { HotkeyContext } from "utils/common/enums";
+
+import { KindWithCategories } from "store/data/types";
 
 export const ImageViewerCategories = () => {
   const dispatch = useDispatch();

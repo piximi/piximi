@@ -13,6 +13,7 @@ import { ExitAnnotatorDialog } from "sections/dialogs";
 import { imageViewerSlice } from "store/imageViewer";
 import { selectActiveImageId } from "store/imageViewer/selectors";
 import { selectHasUnsavedChanges } from "store/project/selectors";
+
 import { HotkeyContext } from "utils/common/enums";
 
 export const ImageViewerAppBar = () => {

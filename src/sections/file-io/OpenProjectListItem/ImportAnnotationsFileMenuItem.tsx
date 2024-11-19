@@ -14,13 +14,17 @@ import {
 import { selectActiveImageId } from "store/imageViewer/selectors";
 
 import {
+  deserializeCOCOFile,
+  deserializePiximiAnnotations,
+} from "utils/file-io/deserialize";
+
+import { CATEGORY_COLORS } from "utils/common/constants";
+
+import { ProjectFileType, validateFileType } from "utils/file-io/runtimeTypes";
+import {
   SerializedCOCOFileType,
   SerializedFileType,
 } from "utils/file-io/types";
-import { ProjectFileType, validateFileType } from "utils/file-io/runtimeTypes";
-import { CATEGORY_COLORS } from "utils/common/constants";
-import { deserializeCOCOFile } from "utils/file-io/deserialize";
-import { deserializePiximiAnnotations } from "utils/file-io/deserialize";
 
 //TODO: MenuItem??
 

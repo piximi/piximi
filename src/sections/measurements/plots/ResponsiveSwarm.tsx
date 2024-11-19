@@ -8,9 +8,9 @@ import { ScaleLinear } from "@nivo/scales";
 
 import { usePreferredNivoTheme } from "hooks";
 
-import { ParsedMeasurementData } from "store/measurements/types";
-
 import { getMean, getStatistics } from "utils/measurements/helpers";
+
+import { ParsedMeasurementData } from "store/measurements/types";
 import { ChartConfig, NodeGroupRecord, SwarmData, SwarmDatum } from "../types";
 
 const StatLayer = ({

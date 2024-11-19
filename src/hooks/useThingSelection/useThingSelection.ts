@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { intersection } from "lodash";
+
 import { projectSlice } from "store/project";
 import { selectActiveThings } from "store/project/reselectors";
 import {
@@ -8,6 +9,7 @@ import {
   selectActiveThingFilters,
   selectSelectedThingIds,
 } from "store/project/selectors";
+
 import { isFiltered } from "utils/common/helpers";
 
 export const useThingSelection = () => {

@@ -39,6 +39,8 @@ import { Image } from "./Image";
 
 import { StageContext } from "contexts";
 import { imageViewerSlice } from "store/imageViewer";
+import { dataSlice } from "store/data";
+import { annotatorSlice } from "store/annotator";
 import {
   selectAnnotationState,
   selectToolType,
@@ -50,15 +52,15 @@ import {
   selectImageIsloading,
   selectStagePosition,
 } from "store/imageViewer/selectors";
-import { Category, Kind } from "store/data/types";
-import { CATEGORY_COLORS } from "store/data/constants";
-import { dataSlice } from "store/data";
-import { annotatorSlice } from "store/annotator";
 
+import { generateUnknownCategory, generateUUID } from "utils/common/helpers";
+
+import { CATEGORY_COLORS } from "store/data/constants";
 import { dimensions } from "utils/common/constants";
 import { AnnotationState, ToolType } from "utils/annotator/enums";
 import { HotkeyContext } from "utils/common/enums";
-import { generateUnknownCategory, generateUUID } from "utils/common/helpers";
+
+import { Category, Kind } from "store/data/types";
 
 const normalizeFont = 1300;
 

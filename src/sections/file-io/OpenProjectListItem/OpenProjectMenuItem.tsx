@@ -10,8 +10,10 @@ import { dataSlice } from "store/data/dataSlice";
 
 import { deserializeProject } from "utils/file-io/deserialize";
 import { fListToStore } from "utils/file-io/zarrStores";
-import { AlertState } from "utils/common/types";
+
 import { AlertType } from "utils/common/enums";
+
+import { AlertState } from "utils/common/types";
 
 //TODO: MenuItem??
 

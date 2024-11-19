@@ -4,12 +4,13 @@ import { xor } from "lodash";
 
 import { SelectionTree } from "components/SelectionTree";
 
-import { measurementsSlice } from "store/measurements/measurementsSlice";
+import { measurementsSlice } from "store/measurements";
 import { selectSelectedGroupSplits } from "store/measurements/selectors";
-import { MeasurementOptions, MeasurementGroup } from "store/measurements/types";
+
+import { selectTreeItemChildren } from "../utils";
 
 import { LoadStatus, RecursivePartial } from "utils/common/types";
-import { selectTreeItemChildren } from "../utils";
+import { MeasurementOptions, MeasurementGroup } from "store/measurements/types";
 
 export const SplitTree = ({
   group,

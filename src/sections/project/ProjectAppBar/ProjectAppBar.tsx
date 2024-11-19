@@ -40,12 +40,14 @@ import { SortSelection } from "components/SortSelection";
 import { TooltipTitle } from "components/tooltips";
 import { CustomAppBar } from "components/CustomAppBar";
 import { AlertBar } from "components/AlertBar";
-import { ImageCategoryMenu } from "./ImageCategoryMenu";
 import { ConfirmationDialog } from "components/ConfirmationDialog";
 import { TooltipButton } from "components/tooltips/TooltipButton/TooltipButton";
+import { ImageCategoryMenu } from "./ImageCategoryMenu";
 
-import { applicationSettingsSlice } from "store/applicationSettings";
 import { projectSlice } from "store/project";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { imageViewerSlice } from "store/imageViewer";
+import { dataSlice } from "store/data";
 import {
   selectActiveKindId,
   selectLoadMessage,
@@ -53,13 +55,12 @@ import {
   selectProjectName,
 } from "store/project/selectors";
 import { selectActiveCategories } from "store/project/reselectors";
-import { imageViewerSlice } from "store/imageViewer";
-import { dataSlice } from "store/data";
 import { selectAlertState } from "store/applicationSettings/selectors";
+
+import { isUnknownCategory, pluralize } from "utils/common/helpers";
 
 import { HotkeyContext } from "utils/common/enums";
 import { Partition } from "utils/models/enums";
-import { isUnknownCategory, pluralize } from "utils/common/helpers";
 
 const minZoom = 0.6;
 const maxZoom = 4;

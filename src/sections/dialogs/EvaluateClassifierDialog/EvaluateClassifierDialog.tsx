@@ -6,9 +6,10 @@ import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
 import { ConfusionMatrix } from "./ConfusionMatrix";
 import { EvaluateClassifierDialogAppBar } from "./EvaluateClassifierAppBar";
 
-import { OldCategory } from "store/data/types";
 import { selectActiveKnownCategories } from "store/project/reselectors";
 import { selectClassifierEvaluationResult } from "store/classifier/selectors";
+
+import { OldCategory } from "store/data/types";
 
 type EvaluateClassifierDialogProps = {
   closeDialog: () => void;

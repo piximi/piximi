@@ -1,6 +1,8 @@
 import React, { ReactElement } from "react";
 import { Box } from "@mui/material";
+
 import { useDndFileDrop } from "hooks";
+
 import { useFileUploadContext } from "contexts";
 
 export const DropBox = ({ children }: { children: ReactElement }) => {

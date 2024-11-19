@@ -1,7 +1,7 @@
 import React from "react";
 import { Divider, List } from "@mui/material";
 
-import { HelpDrawer } from "components/HelpDrawer";
+import { HelpDrawer } from "../HelpDrawer";
 import { SettingsListItem } from "./SettingsListItem";
 import { SendFeedbackListItem } from "./SendFeedbackListItem";
 

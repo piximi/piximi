@@ -3,7 +3,8 @@ import { Grid, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/ConfirmationDialog";
 
-import { Model } from "utils/models/Model/Model";
+import { Model } from "utils/models/Model";
+
 import { ModelStatus } from "utils/models/enums";
 
 type SaveFittedModelDialogProps = {

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Konva from "konva";
 import * as ImageJS from "image-js";
+
 import { Point } from "utils/annotator/types";
 
 export const usePointerLocation = (

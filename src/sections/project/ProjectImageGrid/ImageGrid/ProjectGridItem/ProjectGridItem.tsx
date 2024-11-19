@@ -6,7 +6,6 @@ import { Box } from "@mui/material";
 import { ThingDetailContainer } from "./ThingDetailContainer";
 
 import { selectCategoryProperty } from "store/data/selectors";
-import { AnnotationObject, ImageObject } from "store/data/types";
 import {
   selectImageSelectionColor,
   selectSelectedImageBorderWidth,
@@ -15,7 +14,10 @@ import {
 } from "store/applicationSettings/selectors";
 
 import { isUnknownCategory } from "utils/common/helpers";
+
 import { Partition } from "utils/models/enums";
+
+import { AnnotationObject, ImageObject } from "store/data/types";
 
 type ProjectGridItemProps = {
   selected: boolean;

@@ -10,7 +10,9 @@ import {
   DialogProps,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+
 import { useHotkeys } from "hooks";
+
 import { HotkeyContext } from "utils/common/enums";
 
 type ConfirmationDialogProps = Omit<

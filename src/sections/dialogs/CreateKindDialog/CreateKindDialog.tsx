@@ -6,9 +6,10 @@ import { ConfirmationDialog } from "components/ConfirmationDialog";
 
 import { dataSlice } from "store/data/dataSlice";
 import { selectAllKindIds } from "store/data/selectors";
-import { Kind } from "store/data/types";
 
 import { generateUnknownCategory } from "utils/common/helpers";
+
+import { Kind } from "store/data/types";
 
 type CreateCategoriesDialogProps = {
   onClose: () => void;

@@ -5,6 +5,7 @@ import { ResponsiveLine } from "@nivo/line";
 import { Container, Typography, useMediaQuery, useTheme } from "@mui/material";
 
 import { usePreferredNivoTheme } from "hooks";
+
 import { APPLICATION_COLORS } from "utils/common/constants";
 
 type TwoDataPlotProps = {

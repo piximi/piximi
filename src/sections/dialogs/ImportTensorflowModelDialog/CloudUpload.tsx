@@ -13,11 +13,12 @@ import LanguageIcon from "@mui/icons-material/Language";
 
 import { useDebounce } from "hooks";
 
-import { Shape } from "store/data/types";
-
 import { UploadedClassifier } from "utils/models/classification";
 import { Model } from "utils/models/Model";
+
 import { ModelTask } from "utils/models/enums";
+
+import { Shape } from "store/data/types";
 
 export const CloudUpload = ({
   modelTask,

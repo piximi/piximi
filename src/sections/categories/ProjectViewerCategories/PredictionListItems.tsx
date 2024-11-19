@@ -10,13 +10,14 @@ import {
 
 import { useTranslation } from "hooks";
 
-import { classifierSlice } from "store/classifier";
-
 import { CustomListItemButton } from "components/CustomListItemButton";
-import { projectSlice } from "store/project";
 import { ListItemHoldButton } from "components/ListItemHoldButton";
+
+import { classifierSlice } from "store/classifier";
+import { projectSlice } from "store/project";
 import { dataSlice } from "store/data/dataSlice";
 import { selectActiveKindId } from "store/project/selectors";
+
 import { ModelStatus, Partition } from "utils/models/enums";
 
 export const PredictionListItems = () => {

@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+
 import { selectCategoriesDictionary } from "store/data/selectors";
-import { Thing } from "store/data/types";
 import { selectSortType } from "store/project/selectors";
+
 import { ThingSortKey } from "utils/common/enums";
+
+import { Thing } from "store/data/types";
 
 // uuid -> numerical value (determenistic)
 const hash = (id: Thing["id"]) => {

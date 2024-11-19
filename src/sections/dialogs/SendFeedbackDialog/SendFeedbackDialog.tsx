@@ -6,6 +6,7 @@ import { useTranslation } from "hooks";
 import { ConfirmationDialog } from "components/ConfirmationDialog";
 
 import { createGitHubIssue } from "utils/common/helpers";
+
 import { AlertType } from "utils/common/enums";
 
 type SendFeedbackDialogProps = {

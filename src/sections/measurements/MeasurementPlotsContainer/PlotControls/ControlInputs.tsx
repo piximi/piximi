@@ -19,20 +19,16 @@ import type { ColorSchemeId } from "@nivo/colors";
 import {
   useMeasurementParameters,
   usePlotControl,
-} from "sections/measurements/providers/hooks";
+} from "../../providers/hooks";
 
 import { CustomNumberTextField } from "components/CustomNumberTextField";
 
-import { KeysWithValuesOfType } from "utils/common/types";
 import { capitalize } from "utils/common/helpers";
 
+import { KeysWithValuesOfType } from "utils/common/types";
+import { ChartConfig, ChartItem, ChartType, SplitType } from "../../types";
+
 import { nivoColorSpaces } from "themes/nivoTheme";
-import {
-  ChartConfig,
-  ChartItem,
-  ChartType,
-  SplitType,
-} from "sections/measurements/types";
 
 const splitTypes = ["partition", "category"];
 

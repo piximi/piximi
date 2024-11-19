@@ -8,28 +8,25 @@ import { throttle } from "lodash";
 import { useZoom } from "../useZoom";
 import { usePointerTool } from "../usePointerTool";
 
-import {
-  imageViewerSlice,
-  //selectWorkingAnnotation,
-} from "store/imageViewer";
+import { imageViewerSlice } from "store/imageViewer";
 import { selectSelectedAnnotationIds } from "store/imageViewer/selectors";
-
 import {
   selectAnnotationSelectionMode,
   selectToolType,
 } from "store/annotator/selectors";
-
 import { annotatorSlice } from "store/annotator";
 
+import { AnnotationTool, ObjectAnnotationTool } from "utils/annotator/tools";
+
 import { logger } from "utils/common/helpers";
-import { Point } from "utils/annotator/types";
+
 import {
   AnnotationMode,
   AnnotationState,
   ToolType,
 } from "utils/annotator/enums";
-import { AnnotationTool, ObjectAnnotationTool } from "utils/annotator/tools";
-//import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/selectWorkingAnnotation";
+
+import { Point } from "utils/annotator/types";
 
 const transformerClassName = "Transformer";
 const transformerButtonAttrNAme = "transformer-button";

@@ -6,8 +6,9 @@ import { PenAnnotationToolTip } from "../PenAnnotationToolTip";
 import { StageContext } from "contexts";
 import { selectCursor } from "store/imageViewer/selectors";
 
-import { Point } from "utils/annotator/types";
 import { AnnotationState, ToolType } from "utils/annotator/enums";
+
+import { Point } from "utils/annotator/types";
 
 type CursorProps = {
   positionByStage: Point | undefined;

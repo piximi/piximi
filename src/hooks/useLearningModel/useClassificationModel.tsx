@@ -1,14 +1,18 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import { classifierSlice } from "store/classifier";
 import {
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
 } from "store/classifier/selectors";
-import { Shape } from "store/data/types";
-import { SequentialClassifier } from "utils/models/classification/AbstractClassifier";
-import { ModelStatus, ModelTask } from "utils/models/enums";
+
+import { SequentialClassifier } from "utils/models/classification";
 import { Model } from "utils/models/Model";
+
+import { ModelStatus, ModelTask } from "utils/models/enums";
+
+import { Shape } from "store/data/types";
 
 export const useClassificationModel = () => {
   const dispatch = useDispatch();

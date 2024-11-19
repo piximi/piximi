@@ -1,4 +1,5 @@
 import { useContext, useLayoutEffect, useState } from "react";
+
 import { StageContext } from "contexts";
 
 export const useMarchingAnts = () => {

@@ -18,8 +18,6 @@ import {
 
 import { selectToolType } from "store/annotator/selectors";
 
-import { ToolType } from "utils/annotator/enums";
-
 import {
   ColorAdjustmentIcon,
   ColorSelectionIcon,
@@ -33,6 +31,8 @@ import {
   RectangularSelectionIcon,
   ZoomIcon,
 } from "icons";
+
+import { ToolType } from "utils/annotator/enums";
 
 type OperationType = {
   icon: ReactElement;

@@ -7,17 +7,18 @@ import { Grid, TextField } from "@mui/material";
 import { ConfirmationDialog } from "components/ConfirmationDialog";
 
 import { projectSlice } from "store/project";
-import { selectProject } from "store/project/selectors";
-
 import { applicationSettingsSlice } from "store/applicationSettings";
+import { selectProject } from "store/project/selectors";
 import { selectClassifier } from "store/classifier/selectors";
 import { selectSegmenter } from "store/segmenter/selectors";
 import { selectDataProject } from "store/data/selectors";
 
 import { serializeProject } from "utils/file-io/serialize";
 import { logger } from "utils/common/helpers";
-import { AlertState } from "utils/common/types";
+
 import { AlertType } from "utils/common/enums";
+
+import { AlertState } from "utils/common/types";
 
 type SaveProjectDialogProps = {
   onClose: () => void;

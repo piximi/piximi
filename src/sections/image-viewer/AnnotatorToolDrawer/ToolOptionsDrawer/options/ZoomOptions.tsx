@@ -32,13 +32,14 @@ import {
   selectZoomToolOptions,
 } from "store/imageViewer/selectors";
 
-import { ZoomMode } from "utils/annotator/enums";
 import {
   CheckboxCheckedIcon,
   CheckboxUncheckedIcon,
   RadioCheckedIcon,
   RadioUncheckedIcon,
 } from "icons";
+
+import { ZoomMode } from "utils/annotator/enums";
 
 //TODO: Slider
 

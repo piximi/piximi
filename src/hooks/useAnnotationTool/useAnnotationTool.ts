@@ -26,6 +26,7 @@ import {
   SelectionTool,
   BlankAnnotationTool,
 } from "utils/annotator/tools";
+
 import { ToolType } from "utils/annotator/enums";
 
 export const useAnnotationTool = () => {

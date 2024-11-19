@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { MenuItem, SelectChangeEvent } from "@mui/material";
+
 import { StyledSelect, StyledSelectProps } from "./StyledSelect";
+
 import { Partition } from "utils/models/enums";
 
 export const ImagePartitionSelect = ({

@@ -9,8 +9,7 @@ import { useHotkeys } from "hooks";
 import { StageContext } from "contexts";
 import { imageViewerSlice } from "store/imageViewer";
 import { annotatorSlice } from "store/annotator";
-import { dataSlice } from "store/data/dataSlice";
-import { getCompleteEntity } from "store/entities/utils";
+import { dataSlice } from "store/data";
 import {
   selectActiveImage,
   selectSelectedAnnotations,
@@ -25,6 +24,9 @@ import {
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
 
 import { AnnotationTool } from "utils/annotator/tools";
+
+import { getCompleteEntity } from "store/entities/utils";
+
 import { AnnotationMode } from "utils/annotator/enums";
 import { HotkeyContext } from "utils/common/enums";
 

@@ -1,11 +1,13 @@
 import * as tf from "@tensorflow/tfjs";
-import { MeasurementsData } from "store/measurements/types";
+
 import {
   getEQPC,
   getIntensityMeasurement,
   getObjectFormFactor,
   getPerimeterFromMask,
 } from "utils/measurements/helpers";
+
+import { MeasurementsData } from "store/measurements/types";
 
 /* eslint-disable-next-line no-restricted-globals */
 self.onmessage = async (

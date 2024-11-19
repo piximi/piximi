@@ -22,10 +22,6 @@ import { ToolOptionsDrawer } from "./ToolOptionsDrawer";
 import { annotatorSlice } from "store/annotator";
 import { selectToolType } from "store/annotator/selectors";
 
-import { HotkeyContext } from "utils/common/enums";
-import { ToolType as OperationType } from "utils/annotator/enums";
-import { dimensions } from "utils/common/constants";
-
 import {
   ColorAdjustment,
   ColorAnnotation,
@@ -39,6 +35,10 @@ import {
   Selection,
   Zoom,
 } from "icons";
+
+import { HotkeyContext } from "utils/common/enums";
+import { ToolType as OperationType } from "utils/annotator/enums";
+import { dimensions } from "utils/common/constants";
 
 type AnnotatorToolDrawerProps = {
   optionsVisibility: boolean;

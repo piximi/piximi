@@ -9,9 +9,10 @@ import {
 } from "components/inputs";
 
 import { dataSlice } from "store/data/dataSlice";
-import { Thing } from "store/data/types";
 
 import { Partition } from "utils/models/enums";
+
+import { Thing } from "store/data/types";
 
 export const ThingInformationTable = ({
   thing,

@@ -12,13 +12,13 @@ import {
   selectActiveImageId,
   selectSelectedIVCategoryId,
 } from "store/imageViewer/selectors";
-
 import {
   selectCategoryById,
   selectFirstUnknownCategory,
 } from "store/data/selectors";
 
 import { AnnotationTool } from "utils/annotator/tools";
+
 import { AnnotationMode, AnnotationState } from "utils/annotator/enums";
 
 export const useAnnotationState = (annotationTool: AnnotationTool) => {

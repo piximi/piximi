@@ -6,6 +6,7 @@ import { PlotControls } from "./PlotControls";
 import { PlotTabs } from "./PlotTabs";
 
 import { MeasurementsProvider } from "../providers/MeasurementsProvider";
+
 import { GroupedMeasurementDisplayTable } from "store/measurements/types";
 
 export const MeasurementPlotsContainer = ({
