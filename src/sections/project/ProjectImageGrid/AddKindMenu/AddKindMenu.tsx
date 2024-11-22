@@ -4,8 +4,8 @@ import { MenuItem, Typography } from "@mui/material";
 
 import { useDialogHotkey, useMobileView } from "hooks";
 
-import { BaseMenu } from "components/BaseMenu";
-import { CreateKindDialog } from "sections/dialogs";
+import { BaseMenu } from "components/ui/BaseMenu";
+import { CreateKindDialog } from "components/dialogs";
 
 import { projectSlice } from "store/project";
 import { selectActiveKindId } from "store/project/selectors";

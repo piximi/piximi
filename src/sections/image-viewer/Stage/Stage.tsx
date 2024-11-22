@@ -23,13 +23,13 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
+import { useHotkeys } from "hooks";
 import {
-  useHotkeys,
+  useStageHandlers,
   usePointerLocation,
   useAnnotationState,
-  useStageHandlers,
   useAnnotationTool,
-} from "hooks";
+} from "../hooks";
 
 import { Cursor } from "./Cursor";
 import { Layer } from "./Layer";

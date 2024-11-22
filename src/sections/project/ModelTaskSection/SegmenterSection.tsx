@@ -4,13 +4,11 @@ import { Box, Stack, Typography } from "@mui/material";
 
 import { useDialog, useDialogHotkey, useSegmentationModel } from "hooks";
 
-import {
-  ImportTensorflowModelDialog,
-  SaveFittedModelDialog,
-  FitSegmenterDialog,
-} from "sections/dialogs";
+import { SaveFittedModelDialog } from "components/dialogs";
 import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
 import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
+import { ImportTensorflowModelDialog } from "./ImportTensorflowModelDialog";
+import { FitSegmenterDialog } from "./FitSegmenterDialog";
 
 import { HotkeyContext } from "utils/common/enums";
 import { ModelStatus, ModelTask } from "utils/models/enums";

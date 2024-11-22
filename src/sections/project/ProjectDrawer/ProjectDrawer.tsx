@@ -2,11 +2,11 @@ import React from "react";
 
 import { useMobileView } from "hooks";
 
-import { AppBarOffset } from "components/AppBarOffset";
-import { DividerHeader } from "components/DividerHeader";
-import { BaseAppDrawer } from "components/BaseAppDrawer";
-import { FileIO } from "sections/file-io";
-import { ProjectViewerCategories } from "sections/categories";
+import { AppBarOffset } from "components/ui/AppBarOffset";
+import { DividerHeader } from "components/ui/DividerHeader";
+import { BaseAppDrawer } from "components/layout";
+import { FileIO } from "components/file-io";
+import { ProjectViewerCategories } from "../components/ProjectViewerCategories";
 import { ModelTaskSection } from "../ModelTaskSection";
 
 export const ProjectDrawer = () => {

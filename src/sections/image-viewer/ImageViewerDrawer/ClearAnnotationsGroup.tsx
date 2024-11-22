@@ -5,8 +5,8 @@ import { Delete as DeleteIcon } from "@mui/icons-material";
 
 import { useDialogHotkey, useTranslation } from "hooks";
 
-import { ConfirmationDialog } from "components/ConfirmationDialog";
-import { CustomListItemButton } from "components/CustomListItemButton";
+import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
+import { CustomListItemButton } from "components/ui/CustomListItemButton";
 
 import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";

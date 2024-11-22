@@ -6,7 +6,7 @@ import { Box } from "@mui/material";
 
 import { useErrorHandler, useUnloadConfirmation } from "hooks";
 
-import { FallBackDialog } from "sections/dialogs";
+import { FallBackDialog } from "components/dialogs";
 
 import {
   ProjectDrawer,

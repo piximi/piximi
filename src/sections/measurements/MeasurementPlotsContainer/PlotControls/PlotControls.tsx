@@ -7,7 +7,7 @@ import {
 } from "./ControlOptions";
 import { ColorThemeSelect, PlotSelect } from "./ControlInputs";
 
-import { usePlotControl } from "../../providers/hooks";
+import { usePlotControl } from "../../hooks";
 
 import { ChartType } from "../../types";
 

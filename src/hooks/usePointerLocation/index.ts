@@ -1,1 +1,0 @@
-export { usePointerLocation } from "./usePointerLocation";

@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import * as ReactKonva from "react-konva";
 import { useSelector } from "react-redux";
 
-import { useMarchingAnts } from "hooks";
+import { useMarchingAnts } from "../../../hooks";
 
 import { StageContext } from "contexts";
 import { selectImageOrigin } from "store/imageViewer/selectors";

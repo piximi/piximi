@@ -5,7 +5,7 @@ import { Box, CssBaseline } from "@mui/material";
 
 import { useUnloadConfirmation } from "hooks";
 
-import { FallBackDialog } from "sections/dialogs";
+import { FallBackDialog } from "components/dialogs";
 
 import {
   MeasurementDashboard,

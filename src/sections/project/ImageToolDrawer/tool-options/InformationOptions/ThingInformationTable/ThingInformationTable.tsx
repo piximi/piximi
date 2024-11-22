@@ -1,7 +1,6 @@
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
-import { DataTable, DataTableRow } from "components/DataTable";
 import {
   BlurActionTextField,
   ImageCategorySelect,
@@ -13,6 +12,8 @@ import { dataSlice } from "store/data/dataSlice";
 import { Partition } from "utils/models/enums";
 
 import { Thing } from "store/data/types";
+import { DataTable } from "./DataTable";
+import { DataTableRow } from "./DataTableRow";
 
 export const ThingInformationTable = ({
   thing,

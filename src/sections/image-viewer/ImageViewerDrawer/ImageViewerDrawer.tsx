@@ -5,13 +5,13 @@ import { Add } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 
-import { AppBarOffset } from "components/AppBarOffset";
-import { DividerHeader } from "components/DividerHeader";
-import { BaseAppDrawer } from "components/BaseAppDrawer";
-import { ExportAnnotationsListItem } from "sections/file-io";
-import { ImageViewerCategories } from "sections/categories";
-import { CreateKindDialog } from "sections/dialogs";
+import { AppBarOffset } from "components/ui/AppBarOffset";
+import { DividerHeader } from "components/ui/DividerHeader";
+import { BaseAppDrawer } from "components/layout";
+import { ExportAnnotationsListItem } from "components/file-io";
+import { CreateKindDialog } from "components/dialogs";
 import { ImageViewerAppBar } from "../ImageViewerAppBar";
+import { ImageViewerCategories } from "../components";
 import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
 import { ImageList } from "./ImageList";
 

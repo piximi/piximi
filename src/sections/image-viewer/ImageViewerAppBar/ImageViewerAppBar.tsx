@@ -6,9 +6,9 @@ import { IconButton, Tooltip, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { LogoLoader } from "components/LogoLoader";
-import { CustomAppBar } from "components/CustomAppBar";
-import { ExitAnnotatorDialog } from "sections/dialogs";
+import { LogoLoader } from "components/ui/LogoLoader";
+import { CustomAppBar } from "components/layout";
+import { ExitAnnotatorDialog } from "components/dialogs";
 
 import { imageViewerSlice } from "store/imageViewer";
 import { selectActiveImageId } from "store/imageViewer/selectors";

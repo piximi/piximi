@@ -2,9 +2,9 @@ import { useCallback } from "react";
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 
-import { useMeasurementParameters, usePlotControl } from "../providers/hooks";
+import { useMeasurementParameters, usePlotControl } from "../hooks";
 
-import { CustomTabs } from "components/CustomTabSwitcher";
+import { CustomTabs } from "components/layout";
 import {
   ResponsiveHistogram,
   ResponsiveScatter,

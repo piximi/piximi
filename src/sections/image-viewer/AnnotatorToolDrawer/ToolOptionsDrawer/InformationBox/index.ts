@@ -1,1 +1,0 @@
-export { InformationBox } from "./InformationBox";

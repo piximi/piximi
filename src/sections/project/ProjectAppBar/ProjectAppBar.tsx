@@ -27,21 +27,16 @@ import {
   Straighten as StraightenIcon,
 } from "@mui/icons-material";
 
-import {
-  useDialogHotkey,
-  useHotkeys,
-  useMenu,
-  useMobileView,
-  useThingSelection,
-} from "hooks";
+import { useDialogHotkey, useHotkeys, useMenu, useMobileView } from "hooks";
+import { useThingSelection } from "../hooks";
 
-import { LogoLoader } from "components/LogoLoader";
-import { SortSelection } from "components/SortSelection";
-import { TooltipTitle } from "components/tooltips";
-import { CustomAppBar } from "components/CustomAppBar";
-import { AlertBar } from "components/AlertBar";
-import { ConfirmationDialog } from "components/ConfirmationDialog";
-import { TooltipButton } from "components/tooltips/TooltipButton/TooltipButton";
+import { LogoLoader } from "components/ui/LogoLoader";
+import { SortSelection } from "sections/project/SortSelection";
+import { TooltipTitle } from "components/ui/tooltips";
+import { CustomAppBar } from "components/layout";
+import { AlertBar } from "components/ui/AlertBar";
+import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
+import { TooltipButton } from "components/ui/tooltips/TooltipButton/TooltipButton";
 import { ImageCategoryMenu } from "./ImageCategoryMenu";
 
 import { projectSlice } from "store/project";
@@ -200,6 +195,12 @@ export const ProjectAppBar = () => {
               />
               <CategorizeChip
                 unfilteredSelectedThings={unfilteredSelectedThings}
+              />
+              <Divider
+                variant="middle"
+                orientation="vertical"
+                flexItem
+                sx={{ mr: 2 }}
               />
               <Tooltip
                 title={

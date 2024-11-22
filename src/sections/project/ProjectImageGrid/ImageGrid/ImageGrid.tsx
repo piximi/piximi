@@ -9,9 +9,9 @@ import {
 } from "react-window";
 import memoize from "memoize-one";
 
-import { useSortFunction } from "hooks";
+import { useSortFunction } from "../../hooks";
 
-import { DropBox } from "components/DropBox/DropBox";
+import { DropBox } from "components/layout";
 import { ProjectGridItem } from "./ProjectGridItem";
 
 import { projectSlice } from "store/project";
