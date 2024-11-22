@@ -266,7 +266,7 @@ const fitListener = async (
         compileOptions,
       });
     } else if (model instanceof MobileNet) {
-      (model as MobileNet).loadModel({
+      await (model as MobileNet).loadModel({
         inputShape,
         numClasses,
         compileOptions,
