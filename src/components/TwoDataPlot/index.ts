@@ -1,1 +1,0 @@
-export { TwoDataPlot } from "./TwoDataPlot";

@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { IconButton, Tooltip, Typography } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 
-import { LogoLoader } from "components/LogoLoader";
-import { CustomAppBar } from "components/CustomAppBar";
+import { LogoLoader } from "components/ui/LogoLoader";
+import { CustomAppBar } from "components/layout";
 
 export const MeasurementsAppBar = () => {
   const navigate = useNavigate();

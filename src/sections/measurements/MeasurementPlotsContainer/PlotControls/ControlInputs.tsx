@@ -16,12 +16,9 @@ import {
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import type { ColorSchemeId } from "@nivo/colors";
 
-import {
-  useMeasurementParameters,
-  usePlotControl,
-} from "../../providers/hooks";
+import { useMeasurementParameters, usePlotControl } from "../../hooks";
 
-import { CustomNumberTextField } from "components/CustomNumberTextField";
+import { CustomNumberTextField } from "components/inputs";
 
 import { capitalize } from "utils/common/helpers";
 

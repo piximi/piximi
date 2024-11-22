@@ -12,7 +12,7 @@ import {
   ExpandLess as ExpandLessIcon,
 } from "@mui/icons-material";
 
-import { CustomTabs } from "components/CustomTabSwitcher";
+import { CustomTabs } from "components/layout";
 import { MeasurementPlotsContainer } from "../MeasurementPlotsContainer";
 import { MeasurementTable } from "./MeasurementTable";
 

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import * as ReactKonva from "react-konva";
 
-import { useMarchingAnts } from "hooks";
+import { useMarchingAnts } from "../../../hooks";
 
 import { StageContext } from "contexts";
 

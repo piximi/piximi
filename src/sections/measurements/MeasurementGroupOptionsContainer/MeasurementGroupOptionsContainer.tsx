@@ -5,8 +5,8 @@ import { Add } from "@mui/icons-material";
 
 import { useCreateMeasurementTable } from "../hooks";
 
-import { SelectDialog } from "components/SelectDialog";
-import { DividerWithLoading } from "components/DividerHeader";
+import { SelectDialog } from "components/dialogs";
+import { DividerWithLoading } from "components/ui/DividerHeader";
 import { MeasurementGroupOptions } from "./MeasurementGroupOptions";
 
 import { selectMeasurementGroups } from "store/measurements/selectors";

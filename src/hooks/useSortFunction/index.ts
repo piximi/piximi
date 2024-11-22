@@ -1,1 +1,0 @@
-export { useSortFunction } from "./useSortFunction";

@@ -1,1 +1,0 @@
-export { useAnnotatorToolShortcuts } from "./useAnnotatorToolShortcuts";

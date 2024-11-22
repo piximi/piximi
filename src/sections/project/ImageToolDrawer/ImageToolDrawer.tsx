@@ -19,11 +19,11 @@ import {
 
 import { useMobileView, useTranslation } from "hooks";
 
-import { AppBarOffset } from "components/AppBarOffset";
-import { SortSelection } from "components/SortSelection";
-import { ToolHotkeyTitle, TooltipCard } from "components/tooltips";
-import { FileIO } from "sections/file-io";
-import { ProjectViewerCategories } from "sections/categories";
+import { AppBarOffset } from "components/ui/AppBarOffset";
+import { SortSelection } from "sections/project/SortSelection";
+import { ToolHotkeyTitle, TooltipCard } from "components/ui/tooltips";
+import { FileIO } from "components/file-io";
+import { ProjectViewerCategories } from "../components";
 import { ModelTaskSection } from "../ModelTaskSection";
 import {
   FilterOptions,

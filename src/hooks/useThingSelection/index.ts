@@ -1,1 +1,0 @@
-export { useThingSelection } from "./useThingSelection";

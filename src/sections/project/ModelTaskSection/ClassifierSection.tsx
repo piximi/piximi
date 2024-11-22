@@ -3,14 +3,12 @@ import { Box, Stack, Typography } from "@mui/material";
 
 import { useDialog, useDialogHotkey, useClassificationModel } from "hooks";
 
-import { ImportTensorflowModelDialog } from "sections/dialogs";
-import {
-  SaveFittedModelDialog,
-  EvaluateClassifierDialog,
-  FitClassifierDialog,
-} from "sections/dialogs";
+import { SaveFittedModelDialog } from "components/dialogs";
 import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
 import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
+import { ImportTensorflowModelDialog } from "./ImportTensorflowModelDialog";
+import { FitClassifierDialog } from "./FitClassifierDialog";
+import { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";
 
 import { HotkeyContext } from "utils/common/enums";
 import { ModelStatus, ModelTask } from "utils/models/enums";

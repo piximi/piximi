@@ -1,8 +1,8 @@
 import React, { ReactElement } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  Divider,
   Drawer,
+  Divider,
   ListItemButton,
   ListItemIcon,
   SvgIcon,
@@ -13,11 +13,11 @@ import {
   LockOpen as LockOpenIcon,
 } from "@mui/icons-material";
 
-import { useAnnotatorToolShortcuts, useHotkeys, useTranslation } from "hooks";
+import { useHotkeys, useTranslation } from "hooks";
+import { useAnnotatorToolShortcuts } from "../hooks";
 
-import { CustomToolTip } from "../Tool/CustomToolTip";
-import { Tool } from "../Tool";
-import { ToolOptionsDrawer } from "./ToolOptionsDrawer";
+import { CustomToolTip, Tool } from "../components";
+import { ToolOptions } from "./ToolOptions";
 
 import { annotatorSlice } from "store/annotator";
 import { selectToolType } from "store/annotator/selectors";
@@ -100,6 +100,7 @@ const toolMap: Record<
     icon: (color) => <RectangleAnnotation color={color} />,
   },
 };
+
 export const AnnotatorToolDrawer = ({
   optionsVisibility,
   setOptionsVisibility,
@@ -109,6 +110,7 @@ export const AnnotatorToolDrawer = ({
   const dispatch = useDispatch();
   const theme = useTheme();
   const activeOperation = useSelector(selectToolType);
+  const t = useTranslation();
 
   const togglePersistHandler = () => {
     setPersistOptions((visible) => !visible);
@@ -123,11 +125,49 @@ export const AnnotatorToolDrawer = ({
     HotkeyContext.AnnotatorView,
     [persistOptions]
   );
-  const t = useTranslation();
+
+  const handleToolClick = (toolName: string) => {
+    if (activeOperation !== toolMap[toolName].operation)
+      dispatch(
+        annotatorSlice.actions.setToolType({
+          operation: toolMap[toolName].operation,
+        })
+      );
+  };
+
+  const handleToolTouch = (toolName: string) => {
+    if (activeOperation !== toolMap[toolName].operation) {
+      dispatch(
+        annotatorSlice.actions.setToolType({
+          operation: toolMap[toolName].operation,
+        })
+      );
+      if (!persistOptions && !optionsVisibility) {
+        setOptionsVisibility(true);
+      }
+    } else {
+      if (!persistOptions) {
+        setOptionsVisibility((visible) => !visible);
+      }
+    }
+  };
 
   return (
     <>
-      <ToolOptionsDrawer optionsVisibility={optionsVisibility} />
+      <Drawer
+        anchor="right"
+        sx={{
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
+            width: 240,
+            right: 56,
+          },
+        }}
+        variant="persistent"
+        open={optionsVisibility}
+      >
+        <ToolOptions optionsVisibility={optionsVisibility} />
+      </Drawer>
       <Drawer
         anchor="right"
         sx={{
@@ -162,32 +202,8 @@ export const AnnotatorToolDrawer = ({
             <React.Fragment key={`${name}_${idx}`}>
               <Tool
                 name={t(name)}
-                onClick={() => {
-                  if (activeOperation !== toolMap[name].operation)
-                    dispatch(
-                      annotatorSlice.actions.setToolType({
-                        operation: toolMap[name].operation,
-                      })
-                    );
-                }}
-                onTouch={() => {
-                  if (activeOperation !== toolMap[name].operation) {
-                    dispatch(
-                      annotatorSlice.actions.setToolType({
-                        operation: toolMap[name].operation,
-                      })
-                    );
-                    if (!persistOptions) {
-                      if (!optionsVisibility) {
-                        setOptionsVisibility(true);
-                      }
-                    }
-                  } else {
-                    if (!persistOptions) {
-                      setOptionsVisibility((visible) => !visible);
-                    }
-                  }
-                }}
+                onClick={() => handleToolClick(name)}
+                onTouch={() => handleToolTouch(name)}
               >
                 {toolMap[name].icon(
                   activeOperation === toolMap[name].operation
@@ -205,16 +221,6 @@ export const AnnotatorToolDrawer = ({
             </React.Fragment>
           );
         })}
-
-        {/* <Tool
-        name={t("Object annotation")}
-       onClick={() => {
-          dispatch(applicationSettingsSlice.actions.setOperation({ operation: OperationType.ObjectAnnotation, }) );
-      }}
-        selected={activeOperation === OperationType.ObjectAnnotation}
-      >
-        <ObjectSelectionIcon />
-      </Tool> */}
         <br />
       </Drawer>
     </>

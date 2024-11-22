@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 
 import { useMenu, useMobileView } from "hooks";
 
-import { CustomTabs } from "components/CustomTabSwitcher";
+import { CustomTabs } from "components/layout";
 import { ImageGrid } from "./ImageGrid";
 import { AddKindMenu } from "./AddKindMenu";
 

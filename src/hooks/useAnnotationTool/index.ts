@@ -1,1 +1,0 @@
-export { useAnnotationTool } from "./useAnnotationTool";

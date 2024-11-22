@@ -19,7 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { ConfirmationDialog } from "components/ConfirmationDialog";
+import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 
