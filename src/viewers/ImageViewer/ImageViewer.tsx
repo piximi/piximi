@@ -5,7 +5,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { AppBar, Box } from "@mui/material";
 
 import { useMobileView } from "hooks";
-import { AlertBar } from "components/ui/AlertBar";
+import { AlertBar } from "components/UI_/AlertBar";
 
 import { FallBackDialog } from "components/dialogs";
 import {

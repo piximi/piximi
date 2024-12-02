@@ -5,8 +5,8 @@ import { Divider, List } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
-import { CustomListItem } from "components/ui/CustomListItem";
+import { CustomListItemButton } from "components/UI_/CustomListItemButton";
+import { CustomListItem } from "components/UI_/CustomListItem";
 
 import { ZStackSlider } from "./ZStackSlider";
 import { ApplyColorsButton } from "./ApplyColorsButton";

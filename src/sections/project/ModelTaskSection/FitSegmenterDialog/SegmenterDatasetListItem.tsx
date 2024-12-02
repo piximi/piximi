@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { CollapsibleListItem } from "components/ui/CollapsibleListItem";
+import { CollapsibleListItem } from "components/UI_/CollapsibleListItem";
 import { DatasetSettings } from "../training-settings";
 
 import { segmenterSlice } from "store/segmenter";

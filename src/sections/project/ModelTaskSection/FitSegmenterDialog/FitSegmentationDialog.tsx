@@ -7,7 +7,7 @@ import {
   ModelSummaryTable,
 } from "sections/project/ModelTaskSection/data-display";
 import { DialogTransitionSlide } from "components/dialogs";
-import { AlertBar } from "components/ui/AlertBar";
+import { AlertBar } from "components/UI_/AlertBar";
 
 import { FitSegmenterDialogAppBar } from "./FitSegmenterDialogAppBar";
 import { SegmenterArchitectureListItem } from "./SegmenterArchitectureListItem";

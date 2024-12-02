@@ -7,7 +7,7 @@ import {
   TwoDataPlot,
 } from "sections/project/ModelTaskSection/data-display";
 import { DialogTransitionSlide } from "components/dialogs";
-import { AlertBar } from "components/ui/AlertBar";
+import { AlertBar } from "components/UI_/AlertBar";
 
 import { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
 import { ClassifierPreprocessingListItem } from "./ClassifierPreprocessingListItem";

@@ -6,9 +6,9 @@ import { useLocation } from "react-router-dom";
 import { Drawer, IconButton } from "@mui/material";
 import { Help as HelpIcon, Close as CloseIcon } from "@mui/icons-material";
 
-import { AppBarOffset } from "components/ui/AppBarOffset";
-import { CustomListItem } from "components/ui/CustomListItem";
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
+import { AppBarOffset } from "components/UI_/AppBarOffset";
+import { CustomListItem } from "components/UI_/CustomListItem";
+import { CustomListItemButton } from "components/UI_/CustomListItemButton";
 import { HelpContent, HelpContentType } from "./HelpContent";
 
 import { applicationSettingsSlice } from "store/applicationSettings";

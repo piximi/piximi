@@ -19,9 +19,9 @@ import {
 
 import { useMobileView, useTranslation } from "hooks";
 
-import { AppBarOffset } from "components/ui/AppBarOffset";
+import { AppBarOffset } from "components/UI_/AppBarOffset";
 import { SortSelection } from "sections/project/SortSelection";
-import { ToolHotkeyTitle, TooltipCard } from "components/ui/tooltips";
+import { ToolHotkeyTitle, TooltipCard } from "components/UI_/tooltips";
 import { FileIO } from "components/file-io";
 import { ProjectViewerCategories } from "../components";
 import { ModelTaskSection } from "../ModelTaskSection";

@@ -20,7 +20,7 @@ import {
 } from "@mui/icons-material";
 
 import { CustomSwitch } from "components/inputs";
-import { DividerHeader } from "components/ui/DividerHeader";
+import { DividerHeader } from "components/UI_/DividerHeader";
 import { SettingsItem } from "./SettingsItem";
 
 import { applicationSettingsSlice } from "store/applicationSettings";

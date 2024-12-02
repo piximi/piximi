@@ -4,10 +4,10 @@ import { Box, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { AppBarOffset } from "components/ui/AppBarOffset";
+import { AppBarOffset } from "components/UI_/AppBarOffset";
 import { ToolType } from "utils/annotator/enums";
 import { CustomAppBar } from "components/layout";
-import { KeyboardKey } from "components/ui/KeyboardKey";
+import { KeyboardKey } from "components/UI_/KeyboardKey";
 import { BaseOptions } from "./BaseOptions";
 import { ColorAdjustmentOptions } from "./ColorAdjustmentOptions";
 import { PenSelectionIconOptions } from "./PenSelectionIconOptions";

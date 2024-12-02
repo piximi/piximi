@@ -8,8 +8,8 @@ import {
 
 import { useImageViewerCategoryItemState } from "../hooks";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
-import { CountChip } from "components/ui/CountChip";
+import { CustomListItemButton } from "components/UI_/CustomListItemButton";
+import { CountChip } from "components/UI_/CountChip";
 import { CategoryItemMenu } from "components/categories/CategoryItemMenu";
 
 import { APPLICATION_COLORS } from "utils/common/constants";

@@ -2,7 +2,7 @@ import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 
 import { useMenu } from "hooks";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
+import { CustomListItemButton } from "components/UI_/CustomListItemButton";
 import { OpenMenu } from "./OpenMenu";
 
 export const OpenProjectListItem = () => {
