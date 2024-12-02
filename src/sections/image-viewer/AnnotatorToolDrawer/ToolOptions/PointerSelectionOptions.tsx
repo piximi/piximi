@@ -6,8 +6,8 @@ import { Label as LabelIcon } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
 
-import { CustomListItemButton } from "components/UI_/CustomListItemButton";
-import { CollapsibleListItem } from "components/UI_/CollapsibleListItem";
+import { CustomListItemButton } from "components/ui/CustomListItemButton";
+import { CollapsibleListItem } from "components/ui/CollapsibleListItem";
 
 import { imageViewerSlice } from "store/imageViewer";
 import { selectAllCategories } from "store/data/selectors";

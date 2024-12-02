@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Box, useTheme } from "@mui/material";
 
-import { DividerHeader } from "components/UI_/DividerHeader";
+import { DividerHeader } from "components/ui/DividerHeader";
 import { FilterChip } from "./FilterChip";
 
 import { selectUnfilteredActivePartitions } from "store/project/selectors";

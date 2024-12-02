@@ -1,6 +1,6 @@
 import React from "react";
 
-import { BaseMenu } from "components/UI_/BaseMenu";
+import { BaseMenu } from "components/ui/BaseMenu";
 import { OpenImageMenuItem } from "./OpenImageMenuItem";
 import { OpenExampleImageMenuItem } from "./OpenExampleImageMenuItem";
 

@@ -4,7 +4,7 @@ import { List, ListSubheader, Radio, RadioGroup } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { CustomListItemButton } from "components/UI_/CustomListItemButton";
+import { CustomListItemButton } from "components/ui/CustomListItemButton";
 
 import { annotatorSlice } from "store/annotator";
 import {

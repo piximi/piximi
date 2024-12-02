@@ -5,7 +5,7 @@ import { KeyboardArrowRight as KeyboardArrowRightIcon } from "@mui/icons-materia
 
 import { useMenu } from "hooks";
 
-import { BaseMenu } from "components/UI_/BaseMenu";
+import { BaseMenu } from "components/ui/BaseMenu";
 import { OpenProjectMenu } from "./OpenProjectMenu";
 import { OpenImageMenu } from "./OpenImageMenu";
 import { ImportAnnotationsMenu } from "./ImportAnnotationsMenu";

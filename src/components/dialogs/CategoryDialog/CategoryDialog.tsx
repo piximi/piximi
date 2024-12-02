@@ -3,7 +3,7 @@ import { TextField, Box } from "@mui/material";
 import { useCategoryValidation } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { ColorIcon } from "components/UI_/ColorIcon";
+import { ColorIcon } from "components/ui/ColorIcon";
 
 type CategoryDialogProps = {
   onClose: () => void;

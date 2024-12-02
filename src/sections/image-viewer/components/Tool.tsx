@@ -2,7 +2,7 @@ import React from "react";
 
 import { ListItemButton, ListItemIcon, SvgIcon } from "@mui/material";
 
-import { ToolHotkeyTitle, TooltipCard } from "components/UI_/tooltips";
+import { ToolHotkeyTitle, TooltipCard } from "components/ui/tooltips";
 
 type ToolProps = {
   children: React.ReactNode;

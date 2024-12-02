@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { CollapsibleListItem } from "components/UI_/CollapsibleListItem";
+import { CollapsibleListItem } from "components/ui/CollapsibleListItem";
 import { OptimizerSettingsGrid } from "../training-settings";
 
 import { classifierSlice } from "store/classifier";
