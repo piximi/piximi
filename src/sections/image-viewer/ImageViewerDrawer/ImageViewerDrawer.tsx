@@ -5,8 +5,8 @@ import { Add } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 
-import { AppBarOffset } from "components/UI_/AppBarOffset";
-import { DividerHeader } from "components/UI_/DividerHeader";
+import { AppBarOffset } from "components/ui/AppBarOffset";
+import { DividerHeader } from "components/ui/DividerHeader";
 import { BaseAppDrawer } from "components/layout";
 import { ExportAnnotationsListItem } from "components/file-io";
 import { CreateKindDialog } from "components/dialogs";

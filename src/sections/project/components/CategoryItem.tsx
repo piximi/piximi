@@ -6,8 +6,8 @@ import {
   MoreHoriz as MoreHorizIcon,
 } from "@mui/icons-material";
 
-import { CustomListItemButton } from "components/UI_/CustomListItemButton";
-import { CountChip } from "components/UI_/CountChip";
+import { CustomListItemButton } from "components/ui/CustomListItemButton";
+import { CountChip } from "components/ui/CountChip";
 
 import { selectNumThingsByCatAndKind } from "store/data/selectors";
 import { selectActiveKindId } from "store/project/selectors";

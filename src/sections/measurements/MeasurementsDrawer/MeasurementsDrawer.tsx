@@ -1,6 +1,6 @@
 import React from "react";
 
-import { AppBarOffset } from "components/UI_/AppBarOffset";
+import { AppBarOffset } from "components/ui/AppBarOffset";
 import { BaseAppDrawer } from "components/layout";
 import { MeasurementGroupOptionsContainer } from "../MeasurementGroupOptionsContainer";
 import { MeasurementsAppBar } from "../MeasurementsAppBar";

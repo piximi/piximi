@@ -10,8 +10,8 @@ import {
 
 import { useTranslation } from "hooks";
 
-import { CustomListItemButton } from "components/UI_/CustomListItemButton";
-import { ListItemHoldButton } from "components/UI_/ListItemHoldButton";
+import { CustomListItemButton } from "components/ui/CustomListItemButton";
+import { ListItemHoldButton } from "components/ui/ListItemHoldButton";
 
 import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";

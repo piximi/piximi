@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Drawer } from "@mui/material";
 
-import { ApplicationOptions } from "components/UI_/ApplicationOptions";
+import { ApplicationOptions } from "components/ui/ApplicationOptions";
 
 export const BaseAppDrawer = ({
   children,

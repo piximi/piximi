@@ -6,7 +6,7 @@ import { IconButton, Tooltip, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { LogoLoader } from "components/UI_/LogoLoader";
+import { LogoLoader } from "components/ui/LogoLoader";
 import { CustomAppBar } from "components/layout";
 import { ExitAnnotatorDialog } from "components/dialogs";
 

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { xor } from "lodash";
 import { Box } from "@mui/material";
 
-import { SelectionTree } from "components/UI_/SelectionTree";
+import { SelectionTree } from "components/ui/SelectionTree";
 
 import { measurementsSlice } from "store/measurements";
 import {

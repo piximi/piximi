@@ -2,7 +2,7 @@ import React from "react";
 import { tensor2d } from "@tensorflow/tfjs";
 import { useDispatch, useSelector } from "react-redux";
 
-import { CustomListItemButton } from "components/UI_/CustomListItemButton";
+import { CustomListItemButton } from "components/ui/CustomListItemButton";
 
 import { dataSlice } from "store/data/dataSlice";
 import { selectActiveImageRawColor } from "store/imageViewer/reselectors";

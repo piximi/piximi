@@ -5,7 +5,7 @@ import { Visibility, VisibilityOff, Add } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 
-import { CollapsibleListItem } from "components/UI_/CollapsibleListItem";
+import { CollapsibleListItem } from "components/ui/CollapsibleListItem";
 import { CreateCategoryDialog } from "components/dialogs";
 import { ImageViewerCategoryItem } from "./ImageViewerCategoryItem";
 
