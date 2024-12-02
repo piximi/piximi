@@ -3,7 +3,7 @@ import AddIcon from "@mui/icons-material/Add";
 
 import { useDialogHotkey } from "hooks";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
+import { CustomListItemButton } from "components/UI_/CustomListItemButton";
 import { NewProjectDialog } from "components/dialogs";
 
 import { HotkeyContext } from "utils/common/enums";

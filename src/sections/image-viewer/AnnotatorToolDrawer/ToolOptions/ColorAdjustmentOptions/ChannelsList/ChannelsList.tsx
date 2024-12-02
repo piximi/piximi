@@ -14,7 +14,7 @@ import {
 
 import { useLocalGlobalState } from "hooks";
 
-import { CollapsibleList } from "components/ui/CollapsibleList";
+import { CollapsibleList } from "components/UI_/CollapsibleList";
 import { Palette } from "../Palette";
 
 import { dataSlice } from "store/data";

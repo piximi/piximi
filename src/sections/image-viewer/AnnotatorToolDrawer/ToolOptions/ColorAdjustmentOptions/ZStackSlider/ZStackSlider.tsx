@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { List, ListItem, Slider } from "@mui/material";
 
-import { CustomListItem } from "components/ui/CustomListItem";
+import { CustomListItem } from "components/UI_/CustomListItem";
 
 import { dataSlice } from "store/data";
 import { selectActiveImage } from "store/imageViewer/reselectors";

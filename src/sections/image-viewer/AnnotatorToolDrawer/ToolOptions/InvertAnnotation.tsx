@@ -5,7 +5,7 @@ import { List, SvgIcon } from "@mui/material";
 import { useTranslation } from "hooks";
 import { useAnnotationTool } from "../../hooks";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
+import { CustomListItemButton } from "components/UI_/CustomListItemButton";
 
 import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";

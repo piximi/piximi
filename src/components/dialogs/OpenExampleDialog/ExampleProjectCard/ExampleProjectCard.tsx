@@ -1,7 +1,7 @@
 import React from "react";
 import { batch, useDispatch } from "react-redux";
 
-import { BaseHorizCard } from "components/ui/BaseHorizCard";
+import { BaseHorizCard } from "components/UI_/BaseHorizCard";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { classifierSlice } from "store/classifier";

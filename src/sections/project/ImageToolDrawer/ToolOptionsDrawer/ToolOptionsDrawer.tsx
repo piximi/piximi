@@ -3,7 +3,7 @@ import { Box, Drawer, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { AppBarOffset } from "components/ui/AppBarOffset";
+import { AppBarOffset } from "components/UI_/AppBarOffset";
 
 export type OperationType = {
   icon: (color: string) => ReactElement;

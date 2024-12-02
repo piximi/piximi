@@ -3,7 +3,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 
 import { useMenu } from "hooks";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
+import { CustomListItemButton } from "components/UI_/CustomListItemButton";
 import { ExportAnnotationsMenu } from "./ExportAnnotationsMenu";
 
 export const ExportAnnotationsListItem = () => {

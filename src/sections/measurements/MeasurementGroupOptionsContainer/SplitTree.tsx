@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { xor } from "lodash";
 
-import { SelectionTree } from "components/ui/SelectionTree";
+import { SelectionTree } from "components/UI_/SelectionTree";
 
 import { measurementsSlice } from "store/measurements";
 import { selectSelectedGroupSplits } from "store/measurements/selectors";

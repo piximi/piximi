@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { Logo } from "components/ui/Logo";
+import { Logo } from "components/UI_/Logo";
 
 export const LoadingScreen = () => {
   return (

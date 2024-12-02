@@ -6,7 +6,7 @@ import {
   Assessment as AssessmentIcon,
 } from "@mui/icons-material";
 
-import { TooltipButton } from "components/ui/tooltips/TooltipButton/TooltipButton";
+import { TooltipButton } from "components/UI_/tooltips/TooltipButton/TooltipButton";
 
 import { ModelStatus } from "utils/models/enums";
 

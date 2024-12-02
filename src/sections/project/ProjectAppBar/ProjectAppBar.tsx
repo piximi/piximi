@@ -30,13 +30,13 @@ import {
 import { useDialogHotkey, useHotkeys, useMenu, useMobileView } from "hooks";
 import { useThingSelection } from "../hooks";
 
-import { LogoLoader } from "components/ui/LogoLoader";
+import { LogoLoader } from "components/UI_/LogoLoader";
 import { SortSelection } from "sections/project/SortSelection";
-import { TooltipTitle } from "components/ui/tooltips";
+import { TooltipTitle } from "components/UI_/tooltips";
 import { CustomAppBar } from "components/layout";
-import { AlertBar } from "components/ui/AlertBar";
+import { AlertBar } from "components/UI_/AlertBar";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { TooltipButton } from "components/ui/tooltips/TooltipButton/TooltipButton";
+import { TooltipButton } from "components/UI_/tooltips/TooltipButton/TooltipButton";
 import { ImageCategoryMenu } from "./ImageCategoryMenu";
 
 import { projectSlice } from "store/project";
