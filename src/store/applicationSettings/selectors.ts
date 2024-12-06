@@ -85,17 +85,17 @@ export const selectTextOnScroll = ({
 };
 
 export const selectLoadPercent = ({
-  project,
+  applicationSettings,
 }: {
-  project: AppSettingsState;
+  applicationSettings: AppSettingsState;
 }) => {
-  return project.loadPercent;
+  return applicationSettings.loadPercent;
 };
 
 export const selectLoadMessage = ({
-  project,
+  applicationSettings,
 }: {
-  project: AppSettingsState;
+  applicationSettings: AppSettingsState;
 }) => {
-  return project.loadMessage;
+  return applicationSettings.loadMessage;
 };
