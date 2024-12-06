@@ -13,7 +13,7 @@ import {
   ImageToolDrawer,
   ProjectAppBar,
   ProjectImageGrid,
-} from "sections/project";
+} from "./sections";
 
 import { projectSlice } from "store/project";
 import { applicationSettingsSlice } from "store/applicationSettings";
