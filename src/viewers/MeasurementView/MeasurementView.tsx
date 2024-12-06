@@ -7,10 +7,7 @@ import { useUnloadConfirmation } from "hooks";
 
 import { FallBackDialog } from "components/dialogs";
 
-import {
-  MeasurementDashboard,
-  MeasurementsDrawer,
-} from "sections/measurements";
+import { MeasurementDashboard, MeasurementsDrawer } from "./sections";
 
 import { selectProjectImageChannels } from "store/project/selectors";
 import { applicationSettingsSlice } from "store/applicationSettings";

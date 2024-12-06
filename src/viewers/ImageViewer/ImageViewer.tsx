@@ -12,7 +12,7 @@ import {
   AnnotatorToolDrawer,
   ImageViewerDrawer,
   StageWrapper,
-} from "sections/image-viewer";
+} from "./sections";
 
 import { StageContext } from "contexts";
 import { applicationSettingsSlice } from "store/applicationSettings";
