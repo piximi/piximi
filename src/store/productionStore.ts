@@ -22,6 +22,7 @@ import { classifierMiddleware } from "./classifier/classifierListener";
 import { segmenterMiddleware } from "./segmenter/segmenterListeners";
 import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
+import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 
 const enhancers: StoreEnhancer[] = [];
 
@@ -45,6 +46,7 @@ let listenerMiddlewares: Middleware[] = [
   classifierMiddleware.middleware,
   segmenterMiddleware.middleware,
   measurementsMiddleware.middleware,
+  applicationMiddleware.middleware,
 ];
 
 const preloadedState: RootState = {

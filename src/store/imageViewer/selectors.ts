@@ -182,9 +182,9 @@ UNSAVED CHANGES
 */
 
 export const selectHasUnsavedChanges = ({
-  project,
+  imageViewer,
 }: {
-  project: ImageViewerState;
+  imageViewer: ImageViewerState;
 }) => {
-  return project.hasUnsavedChanges;
+  return imageViewer.hasUnsavedChanges;
 };

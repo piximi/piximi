@@ -2,9 +2,9 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { TypedAppStartListening } from "store/types";
 import { applicationSettingsSlice } from "./applicationSettingsSlice";
 
-export const projectMiddleware = createListenerMiddleware();
+export const applicationMiddleware = createListenerMiddleware();
 const startAppListening =
-  projectMiddleware.startListening as TypedAppStartListening;
+  applicationMiddleware.startListening as TypedAppStartListening;
 
 startAppListening({
   actionCreator: applicationSettingsSlice.actions.sendLoadPercent,
