@@ -37,6 +37,7 @@ const processAnnotation = (
   const bbox = ann.boundingBox;
 
   return {
+    // TODO: use utility function for this
     imageName: image.name.split(".")[0],
     bboxShape: {
       x: bbox[0],
