@@ -9,8 +9,8 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { CategoryItemMenu } from "components/categories/CategoryItemMenu";
 import { CreateCategoryDialog } from "components/dialogs";
-import { CategoryItem } from "./CategoryItem";
-import { PredictionListItems } from "./PredictionListItems";
+import { CategoryItem } from "./list-items/CategoryItem";
+import { PredictionListItems } from "./list-items/PredictionListItems";
 
 import { projectSlice } from "store/project";
 import { selectHighlightedCategory } from "store/project/selectors";

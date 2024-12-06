@@ -5,8 +5,7 @@ import { useMobileView } from "hooks";
 import { AppBarOffset } from "components/ui/AppBarOffset";
 import { DividerHeader } from "components/ui/DividerHeader";
 import { BaseAppDrawer } from "components/layout";
-import { FileIO } from "components/file-io";
-import { ProjectViewerCategories } from "../../components/ProjectViewerCategories";
+import { ProjectViewerCategories, FileIO } from "../../components";
 import { ModelTaskSection } from "../ModelTaskSection";
 
 export const ProjectDrawer = () => {

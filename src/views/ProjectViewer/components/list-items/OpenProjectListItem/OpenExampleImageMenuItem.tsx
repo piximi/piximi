@@ -3,7 +3,7 @@ import { MenuItem, ListItemText } from "@mui/material";
 
 import { useDialog } from "hooks";
 
-import { ExampleImageDialog } from "components/dialogs";
+import { ExampleImageDialog } from "../../dialogs";
 
 //TODO: MenuItem??
 
