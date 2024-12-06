@@ -24,6 +24,7 @@ export type ExtendableTabsProps = {
   handleTabClose: (item: string, newItem?: string) => void;
   handleNew: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   handleTabMin?: (item: string, newItem?: string) => void;
+  persistentTabs?: string[];
 };
 
 export type EditableTabsProps = {

@@ -61,6 +61,7 @@ export function CustomTabs(
     handleTabEdit,
     renderLabel,
     handleTabMin,
+    persistentTabs,
   } = props;
   const [tabIndex, setTabIndex] = useState(0);
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -179,11 +180,13 @@ export function CustomTabs(
                 onClick={(event) => handleTabDeletion(event, label, "hide")}
               />
             )}
-            <DeleteIcon
-              fontSize="small"
-              sx={{ p: 0 }}
-              onClick={(event) => handleTabDeletion(event, label, "delete")}
-            />
+            {!(persistentTabs && persistentTabs.includes(label)) && (
+              <DeleteIcon
+                fontSize="small"
+                sx={{ p: 0 }}
+                onClick={(event) => handleTabDeletion(event, label, "delete")}
+              />
+            )}
           </Box>
         </Box>
       ) : (
@@ -209,6 +212,7 @@ export function CustomTabs(
       tabIndex,
       renderLabel,
       handleTabMin,
+      persistentTabs,
     ]
   );
 
