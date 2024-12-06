@@ -1,9 +1,9 @@
 import React from "react";
 import { List } from "@mui/material";
 
-import { NewProjectListItem } from "../NewProjectListItem";
-import { OpenProjectListItem } from "../OpenProjectListItem";
-import { SaveProjectListItem } from "../SaveProjectListIItem";
+import { NewProjectListItem } from "./list-items";
+import { OpenProjectListItem } from "./list-items";
+import { SaveProjectListItem } from "./list-items";
 
 export const FileIO = () => {
   return (
