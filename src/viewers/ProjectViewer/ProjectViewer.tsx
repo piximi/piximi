@@ -15,6 +15,7 @@ import {
   ProjectImageGrid,
 } from "sections/project";
 
+import { projectSlice } from "store/project";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { HotkeyContext } from "utils/common/enums";
 
@@ -30,6 +31,7 @@ export const ProjectViewer = () => {
         context: HotkeyContext.ProjectView,
       })
     );
+    dispatch(projectSlice.actions.setActiveKind({ kind: "Image" }));
     return () => {
       dispatch(
         applicationSettingsSlice.actions.unregisterHotkeyContext({
