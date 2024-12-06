@@ -5,7 +5,7 @@ import { useFitClassificationModel } from "hooks";
 import {
   ModelSummaryTable,
   TwoDataPlot,
-} from "viewers/ProjectViewer/sections/ModelTaskSection/data-display";
+} from "views/ProjectViewer/sections/ModelTaskSection/data-display";
 import { DialogTransitionSlide } from "components/dialogs";
 import { AlertBar } from "components/ui/AlertBar";
 

@@ -4,7 +4,7 @@ import { difference, intersection } from "lodash";
 import { measurementsSlice } from "./measurementsSlice";
 
 import { getDeferredProperty } from "store/entities/utils";
-import { prepareThingData } from "viewers/MeasurementView/utils";
+import { prepareThingData } from "views/MeasurementView/utils";
 import { isPendingReconciliation } from "store/data/helpers";
 
 import { DeferredDictionary } from "store/entities";

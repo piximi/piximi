@@ -20,7 +20,7 @@ import {
 import { useMobileView, useTranslation } from "hooks";
 
 import { AppBarOffset } from "components/ui/AppBarOffset";
-import { SortSelection } from "viewers/ProjectViewer/sections/SortSelection";
+import { SortSelection } from "views/ProjectViewer/sections/SortSelection";
 import { ToolHotkeyTitle, TooltipCard } from "components/ui/tooltips";
 import { FileIO } from "components/file-io";
 import { ProjectViewerCategories } from "../../components";

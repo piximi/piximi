@@ -31,7 +31,7 @@ import { useDialogHotkey, useHotkeys, useMenu, useMobileView } from "hooks";
 import { useThingSelection } from "../../hooks";
 
 import { LogoLoader } from "components/ui/LogoLoader";
-import { SortSelection } from "viewers/ProjectViewer/sections/SortSelection";
+import { SortSelection } from "views/ProjectViewer/sections/SortSelection";
 import { TooltipTitle } from "components/ui/tooltips";
 import { CustomAppBar } from "components/layout";
 import { AlertBar } from "components/ui/AlertBar";
