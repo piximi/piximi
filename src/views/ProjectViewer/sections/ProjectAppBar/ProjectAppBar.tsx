@@ -43,14 +43,14 @@ import { projectSlice } from "store/project";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
-import {
-  selectActiveKindId,
-  selectLoadMessage,
-  selectLoadPercent,
-  selectProjectName,
-} from "store/project/selectors";
+import { selectActiveKindId, selectProjectName } from "store/project/selectors";
+
 import { selectActiveCategories } from "store/project/reselectors";
-import { selectAlertState } from "store/applicationSettings/selectors";
+import {
+  selectAlertState,
+  selectLoadPercent,
+  selectLoadMessage,
+} from "store/applicationSettings/selectors";
 
 import { isUnknownCategory, pluralize } from "utils/common/helpers";
 

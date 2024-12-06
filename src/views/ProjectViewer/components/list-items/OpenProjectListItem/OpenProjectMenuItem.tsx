@@ -28,7 +28,10 @@ export const OpenProjectMenuItem = ({
 
   const onLoadProgress = (loadPercent: number, loadMessage: string) => {
     dispatch(
-      projectSlice.actions.sendLoadPercent({ loadPercent, loadMessage })
+      applicationSettingsSlice.actions.sendLoadPercent({
+        loadPercent,
+        loadMessage,
+      })
     );
   };
 
@@ -42,7 +45,7 @@ export const OpenProjectMenuItem = ({
 
     // set indefinite loading
     dispatch(
-      projectSlice.actions.setLoadPercent({
+      applicationSettingsSlice.actions.setLoadPercent({
         loadPercent: -1,
         loadMessage: "deserializing proejct...",
       })
@@ -57,7 +60,9 @@ export const OpenProjectMenuItem = ({
         if (!res) return;
         batch(() => {
           // indefinite load until dispatches complete
-          dispatch(projectSlice.actions.setLoadPercent({ loadPercent: -1 }));
+          dispatch(
+            applicationSettingsSlice.actions.setLoadPercent({ loadPercent: -1 })
+          );
           dispatch(projectSlice.actions.resetProject());
           dispatch(dataSlice.actions.initializeState({ data: res.data }));
           // loadPerecnt set to 1 here

@@ -13,7 +13,7 @@ import { ApplyColorsButton } from "./ApplyColorsButton";
 import { ChannelsList } from "./ChannelsList";
 
 import { dataSlice } from "store/data";
-import { selectLoadMessage } from "store/project/selectors";
+import { selectLoadMessage } from "store/applicationSettings/selectors";
 import { selectActiveImage } from "store/imageViewer/reselectors";
 
 import { generateDefaultColors } from "utils/common/tensorHelpers";

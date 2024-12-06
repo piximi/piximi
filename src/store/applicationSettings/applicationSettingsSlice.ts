@@ -20,6 +20,8 @@ const initialState: AppSettingsState = {
   alertState: defaultAlert,
   hotkeyStack: [],
   textOnScroll: false,
+  loadPercent: 1,
+  loadMessage: "",
 };
 
 export const applicationSettingsSlice = createSlice({
@@ -95,6 +97,33 @@ export const applicationSettingsSlice = createSlice({
       action: PayloadAction<{ textOnScroll: boolean }>
     ) {
       state.textOnScroll = action.payload.textOnScroll;
+    },
+    setLoadPercent(
+      state,
+      action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>
+    ) {
+      const { loadPercent, loadMessage } = action.payload;
+
+      if (!loadPercent) {
+        state.loadPercent = 1; // not / done loading
+        state.loadMessage = "";
+      } else if (loadPercent < 0) {
+        state.loadPercent = -1; // indefinite loading
+        state.loadMessage = loadMessage ?? "Loading...";
+      } else if (loadPercent >= 1) {
+        state.loadPercent = 1; // default to not loading if invalid
+        state.loadMessage = "";
+      } else {
+        state.loadPercent = loadPercent; // loading [0, 1]
+        state.loadMessage = loadMessage ?? "";
+      }
+    },
+    sendLoadPercent(
+      state,
+      action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>
+    ) {},
+    setLoadMessage(state, action: PayloadAction<{ message: string }>) {
+      state.loadMessage = action.payload.message;
     },
   },
 });

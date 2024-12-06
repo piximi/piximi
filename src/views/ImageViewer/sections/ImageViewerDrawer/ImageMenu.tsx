@@ -1,12 +1,10 @@
 import React from "react";
-import { batch, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 // import JSZip from "jszip";
 import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { imageViewerSlice } from "store/imageViewer";
-import { projectSlice } from "store/project";
 import { dataSlice } from "store/data/dataSlice";
 
 import { ImageObject } from "store/data/types";
@@ -14,7 +12,6 @@ import { ImageObject } from "store/data/types";
 type ImageMenuProps = {
   anchorElImageMenu: any;
   selectedImage: ImageObject;
-  previousImageId: string | undefined;
   onCloseImageMenu: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   openImageMenu: boolean;
 };
@@ -22,7 +19,6 @@ type ImageMenuProps = {
 export const ImageMenu = ({
   anchorElImageMenu,
   selectedImage,
-  previousImageId,
   onCloseImageMenu,
   openImageMenu,
 }: ImageMenuProps) => {
@@ -38,32 +34,6 @@ export const ImageMenu = ({
         disposeColorTensors: true,
       })
     );
-
-    onCloseImageMenu(event);
-  };
-
-  const handleDeleteImage = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    if (!selectedImage) return;
-
-    batch(() => {
-      dispatch(
-        imageViewerSlice.actions.setActiveImageId({
-          imageId: previousImageId,
-          prevImageId: undefined,
-        })
-      );
-      dispatch(
-        projectSlice.actions.deselectThings({ ids: [selectedImage.id] })
-      );
-      dispatch(
-        dataSlice.actions.deleteThings({
-          thingIds: [selectedImage.id],
-          disposeColorTensors: true,
-        })
-      );
-    });
 
     onCloseImageMenu(event);
   };
@@ -238,9 +208,6 @@ export const ImageMenu = ({
           <Divider />
           <MenuItem onClick={handleClearAnnotations}>
             <Typography variant="inherit">{t("Clear Annotations")}</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleDeleteImage}>
-            <Typography variant="inherit">{t("Delete Image")}</Typography>
           </MenuItem>
         </div>
       </MenuList>

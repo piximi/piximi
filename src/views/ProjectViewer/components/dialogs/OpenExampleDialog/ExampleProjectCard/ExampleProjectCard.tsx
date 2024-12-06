@@ -44,7 +44,10 @@ export const ExampleProjectCard = ({
 
   const onLoadProgress = (loadPercent: number, loadMessage: string) => {
     dispatch(
-      projectSlice.actions.sendLoadPercent({ loadPercent, loadMessage })
+      applicationSettingsSlice.actions.sendLoadPercent({
+        loadPercent,
+        loadMessage,
+      })
     );
   };
 
@@ -58,7 +61,7 @@ export const ExampleProjectCard = ({
     onClose();
 
     dispatch(
-      projectSlice.actions.setLoadPercent({
+      applicationSettingsSlice.actions.setLoadPercent({
         loadPercent: -1,
         loadMessage: "loading example project...",
       })
@@ -164,7 +167,9 @@ export const ExampleProjectCard = ({
       );
     }
 
-    dispatch(projectSlice.actions.setLoadPercent({ loadPercent: 1 }));
+    dispatch(
+      applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 })
+    );
   };
   return (
     <BaseHorizCard

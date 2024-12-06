@@ -172,11 +172,6 @@ export const ImageList = ({ images }: { images: Array<ImageObject> }) => {
       <ImageMenu
         anchorElImageMenu={imageAnchorEl}
         selectedImage={images[selectedImageIndex]}
-        previousImageId={
-          images.length > 1
-            ? images[Math.abs(selectedImageIndex - 1)].id
-            : undefined
-        }
         onCloseImageMenu={onImageMenuClose}
         openImageMenu={Boolean(imageAnchorEl)}
       />

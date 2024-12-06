@@ -1,14 +1,13 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { intersection } from "lodash";
 
 import { dataSlice } from "./dataSlice";
-import { projectSlice } from "../project";
+
 import { imageViewerSlice } from "../imageViewer";
+import { applicationSettingsSlice } from "../applicationSettings";
 
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { createRenderedTensor } from "utils/common/tensorHelpers";
 
-import { DeferredEntity } from "store/entities/models";
 import { ImageObject } from "./types";
 import { TypedAppStartListening } from "store/types";
 
@@ -22,9 +21,7 @@ startAppListening({
   effect: (action, listenerAPI) => {
     const state = listenerAPI.getState();
     const data = state.data;
-    const project = state.project;
     let explicitThingIds: string[] = [];
-    let implicitThingIds: string[] = [];
 
     if ("thingIds" in action.payload) {
       if (action.payload.thingIds === "all") {
@@ -64,29 +61,6 @@ startAppListening({
         }
       });
     }
-
-    for (const thingId of explicitThingIds) {
-      const thing = data.things.entities[thingId];
-      if (!thing) continue;
-      if (getDeferredProperty(thing, "kind") === "Image") {
-        const containedThingIds = getDeferredProperty(
-          thing as DeferredEntity<ImageObject>,
-          "containing"
-        );
-        implicitThingIds.push(...containedThingIds);
-      }
-    }
-
-    const selectedThings = project.selectedThingIds;
-
-    const deletedThingsToDeselect = intersection(
-      [...explicitThingIds, ...implicitThingIds],
-      selectedThings
-    );
-
-    listenerAPI.dispatch(
-      projectSlice.actions.deselectThings({ ids: deletedThingsToDeselect })
-    );
 
     listenerAPI.unsubscribe();
     listenerAPI.dispatch(
@@ -159,7 +133,7 @@ startAppListening({
           );
         }
         listenerAPI.dispatch(
-          projectSlice.actions.setLoadMessage({
+          applicationSettingsSlice.actions.setLoadMessage({
             message: `Updating image ${imageNumber} of ${numImages}`,
           })
         );
@@ -177,7 +151,7 @@ startAppListening({
       listenerAPI.subscribe();
     }
     listenerAPI.dispatch(
-      projectSlice.actions.setLoadMessage({
+      applicationSettingsSlice.actions.setLoadMessage({
         message: "",
       })
     );
@@ -200,7 +174,7 @@ startAppListening({
   },
   effect: (action, listenerAPI) => {
     listenerAPI.dispatch(
-      projectSlice.actions.setHasUnsavedChanges({ hasUnsavedChanges: true })
+      imageViewerSlice.actions.setHasUnsavedChanges({ hasUnsavedChanges: true })
     );
   },
 });
@@ -209,7 +183,9 @@ startAppListening({
   actionCreator: dataSlice.actions.reconcile,
   effect: (action, listenerAPI) => {
     listenerAPI.dispatch(
-      projectSlice.actions.setHasUnsavedChanges({ hasUnsavedChanges: false })
+      imageViewerSlice.actions.setHasUnsavedChanges({
+        hasUnsavedChanges: false,
+      })
     );
   },
 });

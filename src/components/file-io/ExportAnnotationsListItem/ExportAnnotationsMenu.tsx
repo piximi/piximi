@@ -15,10 +15,8 @@ import {
   selectAllObjectKinds,
   selectObjectCategoryDict,
 } from "store/data/selectors";
-import {
-  selectHasUnsavedChanges,
-  selectProjectName,
-} from "store/project/selectors";
+import { selectProjectName } from "store/project/selectors";
+import { selectHasUnsavedChanges } from "store/imageViewer/selectors";
 import {
   selectImageViewerObjects,
   selectImageViewerImages,

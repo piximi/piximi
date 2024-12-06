@@ -8,7 +8,6 @@ import Image from "image-js";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data/dataSlice";
-import { projectSlice } from "store/project/projectSlice";
 import { segmenterSlice } from "./segmenterSlice";
 
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
@@ -180,7 +179,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     progressMessage: string
   ) => {
     listenerAPI.dispatch(
-      projectSlice.actions.setLoadPercent({
+      applicationSettingsSlice.actions.setLoadPercent({
         loadPercent: progressPercent,
         loadMessage: progressMessage,
       })

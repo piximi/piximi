@@ -9,15 +9,13 @@ import { ProjectState } from "store/types";
 
 export const initialState: ProjectState = {
   name: "Untitled project",
-  hasUnsavedChanges: false,
   selectedThingIds: [],
   sortType: ThingSortKey.None,
   activeKind: "Image",
   thingFilters: {},
 
   highlightedCategory: undefined,
-  loadPercent: 1,
-  loadMessage: "",
+
   kindTabFilters: [],
   imageChannels: undefined,
 };
@@ -35,12 +33,7 @@ export const projectSlice = createSlice({
       // state = action.payload.project;
       return action.payload.project;
     },
-    setHasUnsavedChanges(
-      state,
-      action: PayloadAction<{ hasUnsavedChanges: boolean }>
-    ) {
-      state.hasUnsavedChanges = action.payload.hasUnsavedChanges;
-    },
+
     setActiveKind(state, action: PayloadAction<{ kind: string }>) {
       state.activeKind = action.payload.kind;
     },
@@ -76,33 +69,7 @@ export const projectSlice = createSlice({
     setProjectName(state, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;
     },
-    setLoadPercent(
-      state,
-      action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>
-    ) {
-      const { loadPercent, loadMessage } = action.payload;
 
-      if (!loadPercent) {
-        state.loadPercent = 1; // not / done loading
-        state.loadMessage = "";
-      } else if (loadPercent < 0) {
-        state.loadPercent = -1; // indefinite loading
-        state.loadMessage = loadMessage ?? "Loading...";
-      } else if (loadPercent >= 1) {
-        state.loadPercent = 1; // default to not loading if invalid
-        state.loadMessage = "";
-      } else {
-        state.loadPercent = loadPercent; // loading [0, 1]
-        state.loadMessage = loadMessage ?? "";
-      }
-    },
-    sendLoadPercent(
-      state,
-      action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>
-    ) {},
-    setLoadMessage(state, action: PayloadAction<{ message: string }>) {
-      state.loadMessage = action.payload.message;
-    },
     updateHighlightedCategory(
       state,
       action: PayloadAction<{ categoryId: string | undefined }>
