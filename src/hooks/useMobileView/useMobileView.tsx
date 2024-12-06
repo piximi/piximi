@@ -1,17 +1,9 @@
-import { useEffect, useState } from "react";
-
-import { useBreakpointObserver } from "../useBreakpointObserver";
-
-import { mobileBreakpoints } from "utils/common/constants";
+import { useMediaQuery, useTheme } from "@mui/material";
 
 export const useMobileView = () => {
-  const breakpoint = useBreakpointObserver();
-  const [isMobile, setIsMobile] = useState(
-    mobileBreakpoints.includes(breakpoint)
-  );
-  useEffect(() => {
-    setIsMobile(mobileBreakpoints.includes(breakpoint));
-  }, [breakpoint]);
+  const theme = useTheme();
 
-  return isMobile;
+  const matches = useMediaQuery(theme.breakpoints.down("sm"));
+
+  return matches;
 };

@@ -112,38 +112,36 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
   useEffect(() => {
     const handleResize = () => {
       if (gridRef && gridRef.current) {
-        const numVisible = visibleThings.length;
+        const gridContainerWidth = getInnerElementWidth(gridRef.current);
+        const gridContainerHeight = gridRef.current.offsetHeight;
 
-        const _gridContainerWidth = getInnerElementWidth(gridRef.current);
-        const _gridContainerHeight = gridRef.current.offsetHeight;
-
-        const _calculatedColumnWidth =
-          DEFAULT_ITEM_WIDTH * scaleFactor + GRID_GAP;
-        const _maxNumColumns = Math.floor(
-          _gridContainerWidth / _calculatedColumnWidth
-        );
-
-        const _numColumns =
-          numVisible > _maxNumColumns ? _maxNumColumns : numVisible;
-        const _columnWidth = _gridContainerWidth / _numColumns;
-        const _rowHeight = _columnWidth;
-        const _gridWidth = _gridContainerWidth;
-        const _numVirtualRows = Math.ceil(numVisible / _numColumns);
-        const _gridHeight = _gridContainerHeight;
-
-        setGridWidth(_gridWidth);
-        setGridHeight(_gridHeight);
-        setColumnWidth(_columnWidth);
-        setRowHeight(_rowHeight);
-        setNumColumns(_numColumns);
-        setNumRows(_numVirtualRows);
+        setGridWidth(gridContainerWidth);
+        setGridHeight(gridContainerHeight);
       }
     };
     handleResize();
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [scaleFactor, visibleThings.length]);
+  }, []);
+
+  useEffect(() => {
+    const numVisible = visibleThings.length;
+
+    const calculatedColumnWidth = DEFAULT_ITEM_WIDTH * scaleFactor + GRID_GAP;
+    const maxNumColumns = Math.floor(gridWidth / calculatedColumnWidth);
+
+    const numColumns = numVisible > maxNumColumns ? maxNumColumns : numVisible;
+    const columnWidth = numColumns > 0 ? gridWidth / numColumns : 0;
+    const rowHeight = numColumns > 0 ? calculatedColumnWidth : 0;
+    const numVirtualRows =
+      numColumns > 0 ? Math.ceil(numVisible / numColumns) : 0;
+
+    setColumnWidth(columnWidth);
+    setRowHeight(rowHeight);
+    setNumColumns(numColumns);
+    setNumRows(numVirtualRows);
+  }, [gridWidth, gridHeight, scaleFactor, visibleThings.length]);
 
   //const { contextMenu, handleContextMenu, closeContextMenu } = useContextMenu();
 
@@ -160,21 +158,21 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
 
   return (
     <DropBox>
-      <>
-        <Container
-          sx={(theme) => ({
-            paddingBottom: `${GRID_GAP}px`,
+      <Container
+        sx={(theme) => ({
+          paddingBottom: `${GRID_GAP}px`,
+          pl: `${GRID_GAP}px`,
+          pr: 0,
+          "@media (min-width: 600px)": {
             pl: `${GRID_GAP}px`,
             pr: 0,
-            "@media (min-width: 600px)": {
-              pl: `${GRID_GAP}px`,
-              pr: 0,
-            },
-            height: "100%",
-          })}
-          maxWidth={false}
-          ref={gridRef}
-        >
+          },
+          height: "100%",
+        })}
+        maxWidth={false}
+        ref={gridRef}
+      >
+        {gridWidth > 0 && gridHeight > 0 && (
           <Grid
             useIsScrolling
             columnWidth={columnWidth}
@@ -193,8 +191,8 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
           >
             {Cell}
           </Grid>
-        </Container>
-      </>
+        )}
+      </Container>
     </DropBox>
   );
 };
