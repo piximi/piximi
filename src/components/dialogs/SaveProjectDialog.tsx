@@ -6,7 +6,6 @@ import { Grid, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { projectSlice } from "store/project";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectProject } from "store/project/selectors";
 import { selectClassifier } from "store/classifier/selectors";
@@ -41,7 +40,10 @@ export const SaveProjectDialog = ({
 
   const onLoadProgress = (loadPercent: number, loadMessage: string) => {
     dispatch(
-      projectSlice.actions.sendLoadPercent({ loadPercent, loadMessage })
+      applicationSettingsSlice.actions.sendLoadPercent({
+        loadPercent,
+        loadMessage,
+      })
     );
   };
 
@@ -77,7 +79,9 @@ export const SaveProjectDialog = ({
         saveAs(blob, `${projectName}.zip`);
         // don't use onLoadProgress here, it may be sleeping
         // and ignoring updates; this *must* go through
-        dispatch(projectSlice.actions.setLoadPercent({ loadPercent: 1 }));
+        dispatch(
+          applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 })
+        );
       })
       .catch((err: Error) => {
         process.env.REACT_APP_LOG_LEVEL === "1" && console.error(err);

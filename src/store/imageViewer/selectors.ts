@@ -176,3 +176,15 @@ export const selectActiveAnnotationIds = ({
 }) => {
   return imageViewer.activeAnnotationIds;
 };
+
+/*
+UNSAVED CHANGES
+*/
+
+export const selectHasUnsavedChanges = ({
+  project,
+}: {
+  project: ImageViewerState;
+}) => {
+  return project.hasUnsavedChanges;
+};

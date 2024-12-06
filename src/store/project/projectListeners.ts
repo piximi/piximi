@@ -9,6 +9,9 @@ import { dataSlice } from "store/data";
 import { projectSlice } from "./projectSlice";
 
 import { TypedAppStartListening } from "store/types";
+import { getDeferredProperty } from "store/entities/utils";
+import { DeferredEntity } from "store/entities/models";
+import { ImageObject } from "store/data/types";
 
 export const projectMiddleware = createListenerMiddleware();
 const startAppListening =
@@ -22,28 +25,6 @@ startAppListening({
     listenerAPI.dispatch(classifierSlice.actions.resetClassifier());
     listenerAPI.dispatch(segmenterSlice.actions.resetSegmenter());
     listenerAPI.dispatch(imageViewerSlice.actions.resetImageViewer());
-  },
-});
-
-startAppListening({
-  actionCreator: projectSlice.actions.sendLoadPercent,
-  effect: async (action, listenerApi) => {
-    // do work
-    listenerApi.dispatch(
-      projectSlice.actions.setLoadPercent({
-        loadPercent: action.payload.loadPercent,
-        loadMessage: action.payload.loadMessage,
-      })
-    );
-
-    // prevent others from doing work
-    listenerApi.unsubscribe();
-
-    // for the next 100ms
-    await listenerApi.delay(100);
-
-    // then continue letting others do work
-    listenerApi.subscribe();
   },
 });
 
@@ -132,5 +113,38 @@ startAppListening({
         })
       );
     }
+  },
+});
+
+startAppListening({
+  actionCreator: dataSlice.actions.deleteThings,
+  effect: (action, listenerAPI) => {
+    const { project, data } = listenerAPI.getState();
+    if (action.payload.preparedByListener && "thingIds" in action.payload) {
+      const { thingIds } = action.payload;
+      const selectedThings = project.selectedThingIds;
+      const implicitThingIds: string[] = [];
+      for (const thingId of thingIds) {
+        const thing = data.things.entities[thingId];
+        if (!thing) continue;
+        if (getDeferredProperty(thing, "kind") === "Image") {
+          const containedThingIds = getDeferredProperty(
+            thing as DeferredEntity<ImageObject>,
+            "containing"
+          );
+          implicitThingIds.push(...containedThingIds);
+        }
+      }
+      const deletedThingsToDeselect = intersection(
+        [...thingIds, ...implicitThingIds],
+        selectedThings
+      );
+
+      listenerAPI.dispatch(
+        projectSlice.actions.deselectThings({ ids: deletedThingsToDeselect })
+      );
+    }
+
+    return;
   },
 });

@@ -23,18 +23,6 @@ export const selectProjectName = ({ project }: { project: ProjectState }) => {
 };
 
 /*
-UNSAVED CHANGES
-*/
-
-export const selectHasUnsavedChanges = ({
-  project,
-}: {
-  project: ProjectState;
-}) => {
-  return project.hasUnsavedChanges;
-};
-
-/*
 SELECTED THINGS
 */
 
@@ -133,22 +121,6 @@ export const selectKindTabFilters = ({
   project: ProjectState;
 }) => {
   return project.kindTabFilters;
-};
-
-/*
-LOAD PERCENT
-*/
-
-export const selectLoadPercent = ({ project }: { project: ProjectState }) => {
-  return project.loadPercent;
-};
-
-/*
-LOAD MESSAGE
-*/
-
-export const selectLoadMessage = ({ project }: { project: ProjectState }) => {
-  return project.loadMessage;
 };
 
 export const selectProjectImageChannels = ({

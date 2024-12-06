@@ -56,6 +56,7 @@ const initialState: ImageViewerState = {
   },
   imageIsLoading: false,
   highlightedCategory: undefined,
+  hasUnsavedChanges: false,
 };
 
 export const imageViewerSlice = createSlice({
@@ -69,6 +70,12 @@ export const imageViewerSlice = createSlice({
     ) => {},
     setImageStack(state, action: PayloadAction<{ imageIds: string[] }>) {
       state.imageStack = action.payload.imageIds;
+    },
+    setHasUnsavedChanges(
+      state,
+      action: PayloadAction<{ hasUnsavedChanges: boolean }>
+    ) {
+      state.hasUnsavedChanges = action.payload.hasUnsavedChanges;
     },
     addActiveAnnotationId(
       state,

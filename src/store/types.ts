@@ -57,7 +57,7 @@ export type SegmenterState = {
 
 export type ProjectState = {
   name: string;
-  hasUnsavedChanges: boolean;
+
   selectedThingIds: Array<string>;
   sortType: ThingSortKey;
   thingFilters: Record<
@@ -66,14 +66,13 @@ export type ProjectState = {
   >;
   highlightedCategory: string | undefined;
   activeKind: string;
-  loadPercent: number;
-  loadMessage: string;
   kindTabFilters: string[];
   imageChannels: number | undefined;
 };
 
 export type ImageViewerState = {
   imageStack: string[];
+  hasUnsavedChanges: boolean;
   colorAdjustment: ColorAdjustmentOptionsType;
   cursor: string;
   activeImageId?: string;
@@ -145,6 +144,8 @@ export type AppSettingsState = {
   language: Languages;
   soundEnabled: boolean;
   textOnScroll: boolean;
+  loadPercent: number;
+  loadMessage: string;
 };
 
 export type AnnotatorState = {

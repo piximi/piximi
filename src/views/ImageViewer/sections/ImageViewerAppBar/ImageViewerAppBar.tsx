@@ -11,8 +11,10 @@ import { CustomAppBar } from "components/layout";
 import { ExitAnnotatorDialog } from "components/dialogs";
 
 import { imageViewerSlice } from "store/imageViewer";
-import { selectActiveImageId } from "store/imageViewer/selectors";
-import { selectHasUnsavedChanges } from "store/project/selectors";
+import {
+  selectActiveImageId,
+  selectHasUnsavedChanges,
+} from "store/imageViewer/selectors";
 
 import { HotkeyContext } from "utils/common/enums";
 

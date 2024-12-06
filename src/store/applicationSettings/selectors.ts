@@ -83,3 +83,19 @@ export const selectTextOnScroll = ({
 }): boolean => {
   return applicationSettings.textOnScroll;
 };
+
+export const selectLoadPercent = ({
+  project,
+}: {
+  project: AppSettingsState;
+}) => {
+  return project.loadPercent;
+};
+
+export const selectLoadMessage = ({
+  project,
+}: {
+  project: AppSettingsState;
+}) => {
+  return project.loadMessage;
+};
