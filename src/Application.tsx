@@ -6,9 +6,9 @@ import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 
 import { usePreferredMuiTheme } from "hooks";
 
-import { ProjectViewer } from "viewers/ProjectViewer";
-import { ImageViewer } from "viewers/ImageViewer";
-import { MeasurementView } from "viewers/MeasurementView";
+import { ProjectViewer } from "views/ProjectViewer";
+import { ImageViewer } from "views/ImageViewer";
+import { MeasurementView } from "views/MeasurementView";
 import { FileUploadProvider } from "contexts";
 import { loadExampleImage } from "utils/file-io/loadExampleImage";
 import colorImage from "images/cell-painting.png";

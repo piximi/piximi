@@ -5,7 +5,7 @@ import { useSegmentationModelAgain } from "hooks";
 import {
   TwoDataPlot,
   ModelSummaryTable,
-} from "viewers/ProjectViewer/sections/ModelTaskSection/data-display";
+} from "views/ProjectViewer/sections/ModelTaskSection/data-display";
 import { DialogTransitionSlide } from "components/dialogs";
 import { AlertBar } from "components/ui/AlertBar";
 
