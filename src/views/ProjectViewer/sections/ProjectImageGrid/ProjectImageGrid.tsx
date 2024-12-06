@@ -108,6 +108,7 @@ export const ProjectImageGrid = () => {
         handleTabClose={handleTabClose}
         handleNew={handleOpenAddKindMenu}
         handleTabMin={handleTabMinimize}
+        persistentTabs={["Image"]}
       >
         {visibleKinds.map((kind) => (
           <ImageGrid key={`${kind}-imageGrid`} kind={kind} />
