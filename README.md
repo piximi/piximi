@@ -6,6 +6,8 @@ Piximi's target users are computational or non-computational scientists interest
 
 [Try Piximi now at Piximi.app!](https://www.piximi.app)
 
+[Read the pre-print](https://www.biorxiv.org/content/10.1101/2024.06.03.597232v1)
+
 # Development
 
 ## Available Scripts
