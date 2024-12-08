@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 import { Annotation } from "./Annotation";
@@ -24,9 +24,27 @@ export const Annotations = ({ annotationTool }: AnnotationsProps) => {
   const workingAnnotationObject = useSelector(selectWorkingAnnotationView);
   const imageViewerFilters = useSelector(selectImageViewerFilters);
 
+  const nonWorkingAnnotationObjects = useMemo(
+    () =>
+      annotationObjects.filter(
+        (annObj) =>
+          annObj.annotation.id !== workingAnnotationObject?.annotation.id
+      ),
+    [annotationObjects, workingAnnotationObject]
+  );
+
+  const nonWorkingSelectedAnnotationsIds = useMemo(
+    () =>
+      selectedAnnotationsIds.filter(
+        (selectedAnnotationId) =>
+          selectedAnnotationId !== workingAnnotationObject?.annotation.id
+      ),
+    [selectedAnnotationsIds, workingAnnotationObject]
+  );
+
   return (
     <>
-      {annotationObjects.map((annotationObject) => (
+      {nonWorkingAnnotationObjects.map((annotationObject) => (
         <Annotation
           key={annotationObject.annotation.id}
           annotation={annotationObject.annotation}
@@ -38,32 +56,29 @@ export const Annotations = ({ annotationTool }: AnnotationsProps) => {
           )}
         />
       ))}
-      {selectedAnnotationsIds.map((selectedAnnotationId) => (
+      {nonWorkingSelectedAnnotationsIds.map((selectedAnnotationId) => (
         <AnnotationTransformer
           key={`tr-${selectedAnnotationId}`}
           annotationId={selectedAnnotationId}
           annotationTool={annotationTool}
         />
       ))}
-      {workingAnnotationObject &&
-        !annotationObjects
-          .map((annotation) => annotation.annotation.id)
-          .includes(workingAnnotationObject.annotation.id) && (
-          <>
-            <Annotation
-              key={workingAnnotationObject.annotation.id}
-              annotation={workingAnnotationObject.annotation}
-              imageShape={workingAnnotationObject.imageShape}
-              fillColor={workingAnnotationObject.fillColor}
-              selected={true}
-            />
-            <AnnotationTransformer
-              key={`tr-${workingAnnotationObject.annotation.id}`}
-              annotationId={workingAnnotationObject.annotation.id}
-              annotationTool={annotationTool}
-            />
-          </>
-        )}
+      {workingAnnotationObject && (
+        <>
+          <Annotation
+            key={workingAnnotationObject.annotation.id}
+            annotation={workingAnnotationObject.annotation}
+            imageShape={workingAnnotationObject.imageShape}
+            fillColor={workingAnnotationObject.fillColor}
+            selected={true}
+          />
+          <AnnotationTransformer
+            key={`tr-${workingAnnotationObject.annotation.id}`}
+            annotationId={workingAnnotationObject.annotation.id}
+            annotationTool={annotationTool}
+          />
+        </>
+      )}
     </>
   );
 };

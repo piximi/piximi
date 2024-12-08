@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store/rootReducer";
 
 import { annotatorSlice } from "store/annotator";
-import { selectAnnotationSelectionMode } from "store/annotator/selectors";
 
 import { imageViewerSlice } from "store/imageViewer";
 import { selectActiveImage } from "store/imageViewer/reselectors";
@@ -19,11 +18,10 @@ import {
 
 import { AnnotationTool } from "utils/annotator/tools";
 
-import { AnnotationMode, AnnotationState } from "utils/annotator/enums";
+import { AnnotationState } from "utils/annotator/enums";
 
 export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();
-  const selectionMode = useSelector(selectAnnotationSelectionMode);
   const activeImage = useSelector(selectActiveImage);
   const activeImageId = useSelector(selectActiveImageId);
   const selectedCategoryId = useSelector(selectSelectedIVCategoryId);
@@ -47,8 +45,6 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
 
   const onAnnotated = useMemo(() => {
     const func = () => {
-      if (selectionMode !== AnnotationMode.New) return;
-
       if (!selectedCategory) {
         if (!defaultSelectedCategory) {
           setNoKindAvailable(true);
@@ -85,7 +81,6 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
     annotationTool,
     selectedCategory,
     activeImage,
-    selectionMode,
     dispatch,
     activeImageId,
     defaultSelectedCategory,
