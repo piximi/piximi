@@ -139,7 +139,6 @@ export const useStageHandlers = (
           deselectAnnotation();
           if (selectionMode === AnnotationMode.New) {
             deselectAllAnnotations();
-            return;
           }
         }
         if (outOfBounds) return;
