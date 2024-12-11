@@ -190,7 +190,7 @@ const ImageListItem = memo(
         enterDelay={500}
         enterNextDelay={500}
         arrow={true}
-        componentsProps={{
+        slotProps={{
           tooltip: {
             sx: {
               backgroundColor: "#565656",
