@@ -8,6 +8,7 @@ import { useTranslation } from "hooks";
 import { dataSlice } from "store/data/dataSlice";
 
 import { ImageObject } from "store/data/types";
+import { imageViewerSlice } from "store/imageViewer";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
@@ -28,6 +29,11 @@ export const ImageMenu = ({
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     if (!selectedImage) return;
+    dispatch(
+      imageViewerSlice.actions.removeActiveAnnotationIds({
+        annotationIds: selectedImage.containing,
+      })
+    );
     dispatch(
       dataSlice.actions.deleteThings({
         thingIds: selectedImage.containing,
