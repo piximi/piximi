@@ -24,11 +24,15 @@ import {
   selectImageViewerImageDict,
 } from "store/imageViewer/reselectors";
 
-import { serializeCOCOFile, serializeProject } from "utils/annotator";
+import {
+  serializeCOCOFile,
+  serializePiximiAnnotations,
+} from "utils/file-io/serialize";
 
 import { HotkeyContext } from "utils/common/enums";
 import { AnnotationExportType } from "utils/file-io/enums";
 import { exportAnnotationMasks } from "utils/file-io/export/annotationExporters";
+import { AnnotationObject, ImageObject } from "store/data/types";
 
 //TODO: MenuItem??
 
@@ -36,6 +40,7 @@ type ExportAnnotationsMenuProps = {
   anchorEl: HTMLElement | null;
   onClose: () => void;
   open: boolean;
+  selectedImage?: ImageObject;
 };
 
 const exportOptions = [
@@ -74,6 +79,7 @@ export const ExportAnnotationsMenu = ({
   anchorEl,
   onClose,
   open,
+  selectedImage,
 }: ExportAnnotationsMenuProps) => {
   const dispatch = useDispatch();
   const images = useSelector(selectImageViewerImages);
@@ -127,10 +133,17 @@ export const ExportAnnotationsMenu = ({
     (exportType: AnnotationExportType) => {
       setOnProjectName(() => (userProjectName: string) => {
         let zip = new JSZip();
-
+        let exportedAnnotations: Record<string, AnnotationObject> = {};
+        if (selectedImage) {
+          for (const annId of selectedImage.containing) {
+            exportedAnnotations[annId] = annotationDict[annId];
+          }
+        } else {
+          exportedAnnotations = { ...annotationDict };
+        }
         switch (exportType) {
           case AnnotationExportType.PIXIMI:
-            const piximiSerializedProject = serializeProject(
+            const piximiSerializedProject = serializePiximiAnnotations(
               images,
               annotations,
               annotationCategories,
@@ -163,7 +176,7 @@ export const ExportAnnotationsMenu = ({
           default:
             exportAnnotationMasks(
               imageDict,
-              annotationDict,
+              exportedAnnotations,
               annotationCategoryDict,
               userProjectName,
               zip,
@@ -197,6 +210,7 @@ export const ExportAnnotationsMenu = ({
       annotationCategoryDict,
       hasUnsavedChanges,
       handleOpenSaveChangesDialog,
+      selectedImage,
     ]
   );
 
