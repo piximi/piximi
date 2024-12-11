@@ -18,9 +18,6 @@ export {
 } from "./point-operations";
 export { findContours, padMask } from "./find-contours";
 
-export { serializeCOCOFile } from "../file-io/serialize/serializeCOCO";
-export { serializePiximiAnnotations as serializeProject } from "../file-io/serialize/serializePiximiAnnotations";
-
 export {
   getIdx,
   connectPoints,
