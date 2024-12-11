@@ -83,6 +83,9 @@ export const OpenProjectMenuItem = ({
               segmenter: res.segmenter,
             })
           );
+          dispatch(
+            applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 })
+          );
         });
       })
       .catch((err: Error) => {
