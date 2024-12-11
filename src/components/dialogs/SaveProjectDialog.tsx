@@ -1,5 +1,5 @@
 // TODO: implement segmenter serialization
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { saveAs } from "file-saver";
 import { Grid, TextField } from "@mui/material";
@@ -112,6 +112,9 @@ export const SaveProjectDialog = ({
   const onNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setProjectName(event.target.value);
   };
+  useEffect(() => {
+    setProjectName(project.name);
+  }, [project.name]);
 
   return (
     <ConfirmationDialog
