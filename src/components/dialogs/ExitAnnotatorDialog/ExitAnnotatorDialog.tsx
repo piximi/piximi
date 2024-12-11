@@ -34,6 +34,12 @@ export const ExitAnnotatorDialog = ({
       dispatch(dataSlice.actions.reconcile({ keepChanges: true }));
       dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
       dispatch(
+        imageViewerSlice.actions.setSelectedAnnotationIds({
+          annotationIds: [],
+          workingAnnotationId: undefined,
+        })
+      );
+      dispatch(
         imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })
       );
       dispatch(annotatorSlice.actions.resetAnnotator());
@@ -50,6 +56,12 @@ export const ExitAnnotatorDialog = ({
         })
       );
       dispatch(dataSlice.actions.reconcile({ keepChanges: false }));
+      dispatch(
+        imageViewerSlice.actions.setSelectedAnnotationIds({
+          annotationIds: [],
+          workingAnnotationId: undefined,
+        })
+      );
       dispatch(
         imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })
       );
