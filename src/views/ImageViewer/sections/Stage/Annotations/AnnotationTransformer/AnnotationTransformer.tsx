@@ -167,29 +167,31 @@ export const AnnotationTransformer = ({
   };
 
   useLayoutEffect(() => {
-    const imageHeight = activeImage!.shape.height;
-    if (workingAnnotation.saved) {
-      const fullWorkingAnnotation = {
-        ...workingAnnotation.saved,
-        ...workingAnnotation.changes,
-      };
+    if (activeImage) {
+      const imageHeight = activeImage.shape.height;
+      if (workingAnnotation.saved) {
+        const fullWorkingAnnotation = {
+          ...workingAnnotation.saved,
+          ...workingAnnotation.changes,
+        };
 
-      const newX =
-        Math.max(
-          fullWorkingAnnotation.boundingBox[0],
-          fullWorkingAnnotation.boundingBox[2]
-        ) + imageOrigin.x;
-      setXPos(newX);
+        const newX =
+          Math.max(
+            fullWorkingAnnotation.boundingBox[0],
+            fullWorkingAnnotation.boundingBox[2]
+          ) + imageOrigin.x;
+        setXPos(newX);
 
-      const yMax = Math.max(
-        fullWorkingAnnotation.boundingBox[1],
-        fullWorkingAnnotation.boundingBox[3]
-      );
-      const newY =
-        yMax + 56 > imageHeight!
-          ? imageHeight! - 65 + imageOrigin.y
-          : yMax + imageOrigin.y;
-      setYPos(newY);
+        const yMax = Math.max(
+          fullWorkingAnnotation.boundingBox[1],
+          fullWorkingAnnotation.boundingBox[3]
+        );
+        const newY =
+          yMax + 56 > imageHeight!
+            ? imageHeight! - 65 + imageOrigin.y
+            : yMax + imageOrigin.y;
+        setYPos(newY);
+      }
     }
   }, [
     workingAnnotation,

@@ -43,6 +43,12 @@ export const ImageViewerAppBar = () => {
         );
         dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
         dispatch(
+          imageViewerSlice.actions.setSelectedAnnotationIds({
+            annotationIds: [],
+            workingAnnotationId: undefined,
+          })
+        );
+        dispatch(
           imageViewerSlice.actions.setWorkingAnnotation({
             annotation: undefined,
           })
