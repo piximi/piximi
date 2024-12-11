@@ -83,6 +83,9 @@ export const AlertBar = ({
   const StyledToolbar = styled(Toolbar)(() => ({
     backgroundColor: colorTheme?.light,
     color: colorTheme?.contrastText,
+    zIndex: 5000,
+    position: "relative",
+    width: "100%",
     "@media all": {
       minHeight: "10px",
     },
@@ -97,7 +100,7 @@ export const AlertBar = ({
   };
 
   return (
-    <div>
+    <div style={{ position: "absolute", width: "100%", zIndex: 5000 }}>
       <StyledToolbar>
         {errorStateIcon}
 

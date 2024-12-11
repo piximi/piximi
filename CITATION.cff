@@ -1,54 +1,89 @@
 cff-version: 1.2.0
+title: Piximi - an images to discovery web platform
 message: "If you use this software, please cite it as below."
+type: software
+url: "https://piximi.app"
+repository-code: "https://github.com/piximi"
 authors:
-- family-names: "Goodman"
-  given-names: "Allen"
-  orcid: "https://orcid.org/0000-0002-6434-2320"
-- family-names: "Lucas"
-  given-names: "Alice"
-  orcid: "https://orcid.org/0000-0001-5914-4154"
-- family-names: "Gogoberidze"
-  given-names: "Nodar"
-  orcid: "https://orcid.org/0000-0002-9395-4676"
-- family-names: "Moser"
-  given-names: "Levin"
-  orcid: "https://orcid.org/0000-0002-4212-404X"
-- family-names: "Dao"
-  given-names: "David"
-  orcid: "https://orcid.org/0000-0002-6752-9166"
-- family-names: "Friedrich"
-  given-names: "Christoph"
-- family-names: "Paavolainen"
-  given-names: "Lassi"
-  orcid: "https://orcid.org/0000-0003-1508-2718"
-- family-names: "Papaleo"
-  given-names: "Andréa"
-  orcid: "https://orcid.org/0000-0003-2269-9337"
-- family-names: "Stirling"
-  given-names: "David"
-  orcid: "https://orcid.org/0000-0001-6802-4103"
-- family-names: "Hubis"
-  given-names: "Frances"
-- family-names: "Molnar"
-  given-names: "Csaba"
-  orcid: "https://orcid.org/0000-0002-6124-1209"
-- family-names: "Ryder"
-  given-names: "Pearl"
-  orcid: "https://orcid.org/0000-0003-3699-3633"
-- family-names: "Wang"
-  given-names: "Rex"
-- family-names: "Hung"
-  given-names: "Jane"
-- family-names: "Horvath"
-  given-names: "Peter"
-  orcid: "https://orcid.org/0000-0002-4492-1798"
-- family-names: "Cimini"
-  given-names: "Beth"
-  orcid: "https://orcid.org/0000-0001-9640-9318"
-- family-names: "Carpenter"
-  given-names: "Anne"
-  orcid: "https://orcid.org/0000-0003-1555-8261"
-title: "Piximi - an images to discovery web platform"
-version: 0.0.0
-date-released: 2021-06-29
-url: "https://github.com/piximi/piximi"
+  - family-names: "Goodman"
+    given-names: "Allen"
+    orcid: "https://orcid.org/0000-0002-6434-2320"
+  - family-names: "Lucas"
+    given-names: "Alice"
+    orcid: "https://orcid.org/0000-0001-5914-4154"
+  - family-names: "Gogoberidze"
+    given-names: "Nodar"
+    orcid: "https://orcid.org/0000-0002-9395-4676"
+  - family-names: "Moser"
+    given-names: "Levin"
+    orcid: "https://orcid.org/0000-0002-4212-404X"
+  - family-names: "Dao"
+    given-names: "David"
+    orcid: "https://orcid.org/0000-0002-6752-9166"
+  - family-names: "Friedrich"
+    given-names: "Christoph"
+  - family-names: "Paavolainen"
+    given-names: "Lassi"
+    orcid: "https://orcid.org/0000-0003-1508-2718"
+  - family-names: "Papaleo"
+    given-names: "Andréa"
+    orcid: "https://orcid.org/0000-0003-2269-9337"
+  - family-names: "Stirling"
+    given-names: "David"
+    orcid: "https://orcid.org/0000-0001-6802-4103"
+  - family-names: "Hubis"
+    given-names: "Frances"
+  - family-names: "Molnar"
+    given-names: "Csaba"
+    orcid: "https://orcid.org/0000-0002-6124-1209"
+  - family-names: "Ryder"
+    given-names: "Pearl"
+    orcid: "https://orcid.org/0000-0003-3699-3633"
+  - family-names: "Wang"
+    given-names: "Rex"
+  - family-names: "Hung"
+    given-names: "Jane"
+  - family-names: "Horvath"
+    given-names: "Peter"
+    orcid: "https://orcid.org/0000-0002-4492-1798"
+  - family-names: "Cimini"
+    given-names: "Beth"
+    orcid: "https://orcid.org/0000-0001-9640-9318"
+  - family-names: "Carpenter"
+    given-names: "Anne"
+    orcid: "https://orcid.org/0000-0003-1555-8261"
+identifiers:
+  - type: doi
+    value: 10.1101/2024.06.03.597232
+    description: >-
+      Piximi - An Images to Discovery web tool for bioimages
+      and beyond
+abstract: >-
+  Deep learning has greatly accelerated research in
+  biological image analysis yet it often requires
+  programming skills and specialized tool installation. Here
+  we present Piximi, a modern, no-programming image analysis
+  tool leveraging deep learning. Implemented as a web
+  application at Piximi.app, Piximi requires no installation
+  and can be accessed by any modern web browser. Its
+  client-only architecture preserves the security of
+  researcher data by running all computation locally. Piximi
+  offers four core modules: a deep learning classifier, an
+  image annotator, measurement modules, and pre-trained deep
+  learning segmentation modules. Piximi is interoperable
+  with existing tools and workflows by supporting import and
+  export of common data and model formats. The intuitive
+  researcher interface and easy access to Piximi allows
+  biological researchers to obtain insights into images
+  within just a few minutes. Piximi aims to bring deep
+  learning-powered image analysis to a broader community by
+  eliminating barriers to entry.
+keywords:
+  - bioimage analysis
+  - deep learning
+  - annotation
+  - measurement
+  - scientific images
+commit: 27db44ea62b43a7e0471af75bddba126cd0b0b76
+version: 0.0.1
+date-released: "2024-11-22"
