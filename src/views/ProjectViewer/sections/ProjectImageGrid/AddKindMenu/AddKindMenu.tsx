@@ -78,6 +78,7 @@ export const AddKindMenu = ({
         onClose={handleCloseCreateKindDialogAndMenu}
         open={isCreateKindDialogOpen}
         secondaryAction={isMobile ? closeActiveKind : undefined}
+        changesPermanent={true}
       />
     </>
   );
