@@ -1,4 +1,3 @@
-/// <reference types="vitest" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import viteTsconfigPaths from "vite-tsconfig-paths";
@@ -14,9 +13,5 @@ export default defineConfig({
     // this sets a default port to 3000
     port: 3000,
   },
-  assetsInclude: ["**/*.bin", "**/*.svg", "**/*.zip"],
-  test: {
-    setupFiles: ["./test-setup.ts"],
-    environment: "happy-dom",
-  },
+  assetsInclude: ["**/*.bin", "**/*.svg"],
 });
