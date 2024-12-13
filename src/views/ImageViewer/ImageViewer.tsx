@@ -29,7 +29,7 @@ export const ImageViewer = () => {
   const alertState = useSelector(selectAlertState);
 
   const onUnload = (e: any) => {
-    if (process.env.NODE_ENV === "development") {
+    if (import.meta.env.NODE_ENV === "development") {
       return;
     } else {
       e.preventDefault();

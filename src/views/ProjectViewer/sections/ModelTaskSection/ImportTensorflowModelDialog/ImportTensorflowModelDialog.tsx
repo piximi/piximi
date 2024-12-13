@@ -123,7 +123,7 @@ export const ImportTensorflowModelDialog = ({
 
   const dispatchModelToStore = async () => {
     if (!selectedModel) {
-      process.env.NODE_ENV !== "production" &&
+      import.meta.env.NODE_ENV !== "production" &&
         console.warn("Attempting to dispatch undefined model");
       return;
     }

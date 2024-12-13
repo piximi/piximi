@@ -224,7 +224,7 @@ function ccwNon0(
       return { ij, rightExamined };
     }
   }
-  process.env.NODE_ENV !== "production" &&
+  import.meta.env.NODE_ENV !== "production" &&
     logNeighbors(
       fij,
       baseI,
@@ -485,7 +485,7 @@ export const findContours = (F: MaskData, width: number, height: number) => {
         );
 
         if (i4j4 === null) {
-          process.env.NODE_ENV !== "production" &&
+          import.meta.env.NODE_ENV !== "production" &&
             console.warn(
               `i4j4 is invalid: i ${iRaster}, j ${jRaster}, i1 ${i1CwFound}, j1 ${j1CwFound}, i2 ${i2PrevStep}, j2 ${j2PrevStep}, i3 ${i3CurrStep}, j3 ${j3CurrStep}, i4j4j ${i4j4}`
             );
