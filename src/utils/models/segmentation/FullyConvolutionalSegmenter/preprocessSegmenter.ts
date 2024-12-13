@@ -95,7 +95,7 @@ const decodeFromOriginalSrc = async (
         return x2d as Tensor2D;
       })
       .catch((err) => {
-        process.env.NODE_ENV !== "production" && console.error(err);
+        import.meta.env.NODE_ENV !== "production" && console.error(err);
         return tensor2d([[]]);
       });
 

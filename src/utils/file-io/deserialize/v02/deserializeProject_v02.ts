@@ -121,7 +121,7 @@ const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
   };
 
   for (const [i, name] of Object.entries(thingNames)) {
-    // process.env.REACT_APP_LOG_LEVEL === "1" &&
+    // import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
     //   logger(`deserializing image ${+i + 1}/${thingNames.length}`);
 
     loadCb(
@@ -254,7 +254,7 @@ export const deserializeProject_v02 = async (
   const segmenterGroup = await getGroup(rootGroup, "segmenter");
   const segmenter = await deserializeSegmenterGroup(segmenterGroup);
 
-  process.env.REACT_APP_LOG_LEVEL === "1" &&
+  import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
     logger(`closed ${fileStore.rootName}`);
 
   return { project, classifier, segmenter, data };
