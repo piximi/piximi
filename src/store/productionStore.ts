@@ -30,10 +30,18 @@ import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 
-const loggingMiddleware: Middleware[] =
+const enhancers: StoreEnhancer[] = [];
+
+/* In order to ensure that sagas are ran after the dispatched action,
+ * always keep "saga" as the last item in the middleware array .
+ * https://redux-saga.js.org/docs/api/index.html#selectselector-args
+ *
+ * For infor on changing the execution order, see https://github.com/redux-saga/redux-saga/issues/148
+ */
+let loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&
   import.meta.env.VITE_APP_LOG_LEVEL === "2"
-    ? [logger as Middleware<object, any, Dispatch<UnknownAction>>]
+    ? [logger]
     : [];
 
 const listenerMiddlewares: Middleware[] = [
