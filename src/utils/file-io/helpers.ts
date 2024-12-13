@@ -118,7 +118,7 @@ export const loadImageFileAsStack = async (file: File) => {
 
     return forceStack(image);
   } catch (err) {
-    process.env.NODE_ENV !== "production" &&
+    import.meta.env.NODE_ENV !== "production" &&
       console.error(`Error loading image file ${file.name}`);
     throw err;
   }
@@ -200,7 +200,7 @@ export const uploadImages = async (
         }
       }
     } catch (err) {
-      process.env.NODE_ENV !== "production" && console.error(err);
+      import.meta.env.NODE_ENV !== "production" && console.error(err);
       invalidImageFiles.push({
         fileName: file.name,
         error: "Could not decode",
@@ -300,7 +300,7 @@ export const loadDataUrlAsStack = async (dataURL: string) => {
 
     return forceStack(image);
   } catch (err) {
-    process.env.NODE_ENV !== "production" &&
+    import.meta.env.NODE_ENV !== "production" &&
       console.error("Error loading dataURL");
     throw err;
   }
@@ -327,7 +327,7 @@ export const getImageInformation = (
     };
     // should not happen
   } else if (!Array.isArray(image)) {
-    process.env.NODE_ENV !== "production" &&
+    import.meta.env.NODE_ENV !== "production" &&
       console.error("Unrecognized Image.JS.Image type, channels not in [1,3]");
     return {
       shape: ImageShapeEnum.InvalidImage,
@@ -351,7 +351,7 @@ export const getImageFileInformation = async (
   try {
     // https://stackoverflow.com/questions/56565528/typescript-const-assertions-how-to-use-array-prototype-includes
     if (!(MIMETYPES as ReadonlyArray<string>).includes(file.type)) {
-      process.env.NODE_ENV !== "production" &&
+      import.meta.env.NODE_ENV !== "production" &&
         console.error("Invalid MIME Type:", ext);
       return { shape: ImageShapeEnum.InvalidImage, ext };
     }

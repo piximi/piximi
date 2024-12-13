@@ -68,7 +68,7 @@ export const FallBackDialog = (props: any) => {
 
   React.useEffect(() => {
     if (stackTrace) {
-      process.env.NODE_ENV !== "production" && console.error(stackTrace);
+      import.meta.env.NODE_ENV !== "production" && console.error(stackTrace);
     }
   }, [stackTrace]);
 

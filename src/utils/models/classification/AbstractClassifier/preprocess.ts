@@ -127,7 +127,7 @@ const cropResize = (
       cropCoords = [0.0, 0.0, 1.0, 1.0];
       break;
     default:
-      if (process.env.NODE_ENV !== "production") {
+      if (import.meta.env.NODE_ENV !== "production") {
         console.error(
           "No case for CropSchema:",
           preprocessOptions.cropOptions.cropSchema
@@ -203,7 +203,7 @@ const doShowImages = async (
     const refHeight = xsData.length;
     const refWidth = xsData[0].length;
 
-    if (process.env.NODE_ENV === "test") {
+    if (import.meta.env.NODE_ENV === "test") {
       const { createCanvas } = require("canvas");
       canvas = createCanvas(refWidth, refHeight);
     } else {
@@ -216,7 +216,7 @@ const doShowImages = async (
     const imageDataArr = await browser.toPixels(imTensor);
     imTensor.dispose();
     let imageData;
-    if (process.env.NODE_ENV === "test") {
+    if (import.meta.env.NODE_ENV === "test") {
       const { createImageData } = require("canvas");
       imageData = createImageData(imageDataArr, imTensor.shape[1]);
     } else {
@@ -253,7 +253,7 @@ const doShowImages = async (
       );
     }
   } catch (e) {
-    if (process.env.NODE_ENV !== "production") console.error(e);
+    if (import.meta.env.NODE_ENV !== "production") console.error(e);
   }
 };
 
@@ -369,7 +369,7 @@ export const preprocessClassifier = ({
     imageData = imageData.map(scale.bind(null, images[0].bitDepth));
   }
 
-  if (process.env.REACT_APP_LOG_LEVEL === "4") {
+  if (import.meta.env.VITE_APP_LOG_LEVEL === "4") {
     imageData.forEachAsync(
       doShow.bind(
         null,

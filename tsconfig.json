@@ -6,12 +6,10 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
+    "types": ["vite/client"],
+    "target": "ESNext",
     "jsx": "react-jsx",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
@@ -19,11 +17,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "ES2022",
     "noErrorTruncation": true
   },
-  "include": [
-    "src"
-  ],
-  "sourcemap": true,
+  "include": ["src", "src/icons/svg.d.ts"],
+  "sourcemap": true
 }

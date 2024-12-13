@@ -62,8 +62,8 @@ const reconcileCOCOCategories = (
   }));
 
   if (
-    process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "1"
+    import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "1"
   ) {
     const numMatched = matchedCats.length;
     const numNew = newCats.length;
@@ -128,8 +128,8 @@ const reconcileImages = (
     .map((ann) => ({ ...ann, image_id: imIdMap[ann.image_id] }));
 
   if (
-    process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "1"
+    import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "1"
   ) {
     const numImsDiscarded = discardedIms.length;
     const numAnnsDiscarded = discardedAnnotations.length;
@@ -185,7 +185,7 @@ export const deserializeCOCOFile_v01 = (
     const parentIm = matchedIms.find((im) => im.id === cocoAnn.image_id);
 
     if (!parentIm) {
-      if (process.env.NODE_ENV !== "production") {
+      if (import.meta.env.NODE_ENV !== "production") {
         console.error(
           "Somehow received an imageless annotation that was not filtered out"
         );
@@ -252,8 +252,8 @@ export const deserializeCOCOFile_v01 = (
   }
 
   if (
-    process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "1"
+    import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "1"
   ) {
     const numMalformed = malformed.length;
     const numCrowded = crowded.length;

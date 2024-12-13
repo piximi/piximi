@@ -14,6 +14,8 @@ import { HelpContent, HelpContentType } from "./HelpContent";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { AlertType } from "utils/common/enums";
+import AnnotatorHelpContent from "./AnnotatorHelpContent.json";
+import ClassifierHelpContent from "./ClassifierHelpContent.json";
 
 export const HelpDrawer = () => {
   const dispatch = useDispatch();
@@ -26,8 +28,8 @@ export const HelpDrawer = () => {
   const location = useLocation();
   const helpContent: HelpContentType =
     location.pathname === "/annotator"
-      ? require("./AnnotatorHelpContent.json")
-      : require("./ClassifierHelpContent.json");
+      ? (AnnotatorHelpContent as HelpContentType)
+      : (ClassifierHelpContent as HelpContentType);
 
   const handleError = (error: Error, info: { componentStack: string }) => {
     dispatch(

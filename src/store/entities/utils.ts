@@ -10,7 +10,7 @@ import type {
 export function selectIdValue<T>(entity: T, selectId: IdSelector<T>) {
   const key = selectId(entity);
 
-  if (process.env.NODE_ENV !== "production" && key === undefined) {
+  if (import.meta.env.NODE_ENV !== "production" && key === undefined) {
     console.warn(
       "The entity passed to the `selectId` implementation returned undefined.",
       "You should probably provide your own `selectId` implementation.",
@@ -89,7 +89,7 @@ export function splitAddedDeferredEntities<T>(
 export function selectDeferredIdValue<T>(entity: T, selectId: IdSelector<T>) {
   const key = selectId(entity);
 
-  if (process.env.NODE_ENV !== "production" && key === undefined) {
+  if (import.meta.env.NODE_ENV !== "production" && key === undefined) {
     console.warn(
       "The entity passed to the `selectId` implementation returned undefined.",
       "You should probably provide your own `selectId` implementation.",

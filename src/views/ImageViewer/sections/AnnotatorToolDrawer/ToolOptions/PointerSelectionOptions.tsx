@@ -13,7 +13,7 @@ import { imageViewerSlice } from "store/imageViewer";
 import { selectAllCategories } from "store/data/selectors";
 import { selectActiveAnnotations } from "store/imageViewer/reselectors";
 
-import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
+import { InvertSelectionIcon } from "icons";
 
 import { OldCategory } from "store/data/types";
 
@@ -64,22 +64,14 @@ export const PointerSelectionOptions = () => {
         <CustomListItemButton
           primaryText={t("Select All")}
           onClick={handleSelectAll}
-          icon={
-            <SvgIcon>
-              <InvertSelectionIcon />
-            </SvgIcon>
-          }
+          icon={<SvgIcon>{InvertSelectionIcon}</SvgIcon>}
           dense
         />
 
         <CustomListItemButton
           primaryText={t("Deselect All")}
           onClick={handleDeselectAll}
-          icon={
-            <SvgIcon>
-              <InvertSelectionIcon />
-            </SvgIcon>
-          }
+          icon={<SvgIcon>{InvertSelectionIcon}</SvgIcon>}
           dense
         />
 

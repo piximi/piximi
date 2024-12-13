@@ -104,8 +104,8 @@ export const useStageHandlers = (
   const handleMouseDown = (
     event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
   ) => {
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "2" &&
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "2" &&
       logger(event);
 
     if (
@@ -239,8 +239,8 @@ export const useStageHandlers = (
    */
 
   const handleTouchStart = (event: KonvaEventObject<TouchEvent>) => {
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "2" &&
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "2" &&
       logger(event);
 
     if (

@@ -89,7 +89,7 @@ export function maskFromPoints(
   const height = boundingBox[3] - boundingBox[1];
 
   if (width <= 0 || height <= 0) {
-    process.env.NODE_ENV !== "production" &&
+    import.meta.env.NODE_ENV !== "production" &&
       console.warn(
         `Received negative image dimensions w: ${width}, h: ${height}`
       );

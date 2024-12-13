@@ -37,7 +37,7 @@ export class QuickAnnotationTool extends AnnotationTool {
 
   // throttled to prevent repeated expensive calls while resizing
   initializeSuperpixels(regionSize: number) {
-    if (process.env.NODE_ENV !== "test") {
+    if (import.meta.env.NODE_ENV !== "test") {
       if (this.throttleTimer) return;
       this.throttleTimer = true;
 

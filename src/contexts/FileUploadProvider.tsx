@@ -71,7 +71,7 @@ const getUploadedFileTypes = async (files: FileList) => {
     try {
       // https://stackoverflow.com/questions/56565528/typescript-const-assertions-how-to-use-array-prototype-includes
       if (!(MIMETYPES as ReadonlyArray<string>).includes(file.type)) {
-        process.env.NODE_ENV !== "production" &&
+        import.meta.env.NODE_ENV !== "production" &&
           console.error("Invalid MIME Type:", ext);
         updateRecord(images, ImageShapeEnum.InvalidImage, {
           shape: ImageShapeEnum.InvalidImage,

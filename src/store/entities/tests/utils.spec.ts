@@ -2,15 +2,15 @@ import { AClockworkOrange } from "./fixtures/book";
 
 describe("Entity utils", () => {
   describe(`selectIdValue()`, () => {
-    const OLD_ENV = process.env;
+    const OLD_ENV = import.meta.env;
 
     beforeEach(() => {
       jest.resetModules(); // this is important - it clears the cache
-      process.env = { ...OLD_ENV, NODE_ENV: "development" };
+      import.meta.env = { ...OLD_ENV, NODE_ENV: "development" };
     });
 
     afterEach(() => {
-      process.env = OLD_ENV;
+      import.meta.env = OLD_ENV;
       jest.resetAllMocks();
     });
 
@@ -42,7 +42,7 @@ describe("Entity utils", () => {
     });
 
     // it("should not warn when key does not exist in prod mode", () => {
-    //   process.env.NODE_ENV = "production";
+    //   import.meta.env.NODE_ENV = "production";
     //   const { selectIdValue } = require("../utils");
     //   const spy = jest.spyOn(console, "warn");
 
@@ -52,7 +52,7 @@ describe("Entity utils", () => {
     // });
 
     // it("should not warn when key is undefined in prod mode", () => {
-    //   process.env.NODE_ENV = "production";
+    //   import.meta.env.NODE_ENV = "production";
     //   const { selectIdValue } = require("../utils");
     //   const spy = jest.spyOn(console, "warn");
 

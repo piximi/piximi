@@ -11,7 +11,7 @@ import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
 import { selectWorkingAnnotation } from "store/imageViewer/selectors";
 
-import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
+import { InvertSelectionIcon } from "icons";
 
 import { encode } from "utils/annotator";
 
@@ -65,11 +65,7 @@ export const InvertAnnotation = () => {
       <CustomListItemButton
         primaryText={t("Invert annotation")}
         onClick={handleInvertClick}
-        icon={
-          <SvgIcon>
-            <InvertSelectionIcon />
-          </SvgIcon>
-        }
+        icon={<SvgIcon>{InvertSelectionIcon}</SvgIcon>}
         dense
       />
     </List>

@@ -71,7 +71,7 @@ const handleError = async (
     description: `${error.name}:\n${error.message}`,
     stackTrace: stackTrace,
   };
-  if (process.env.NODE_ENV !== "production") {
+  if (import.meta.env.NODE_ENV !== "production") {
     console.error(
       alertState.name,
       "\n",
@@ -119,12 +119,12 @@ const fitListener = async (
   onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
   listenerAPI: StoreListemerAPI
 ) => {
-  process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "3" &&
+  import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "3" &&
     enableDebugMode();
 
-  process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "2" &&
+  import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "2" &&
     logger(["tensorflow flags:", ENV.features]);
 
   const {
@@ -280,8 +280,8 @@ const fitListener = async (
         useCustomTopLayer: true,
       });
     } else {
-      process.env.NODE_ENV !== "production" &&
-        process.env.REACT_APP_LOG_LEVEL === "1" &&
+      import.meta.env.NODE_ENV !== "production" &&
+        import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
         console.warn("Unhandled architecture", model.name);
       return;
     }
@@ -329,7 +329,7 @@ const fitListener = async (
 
   try {
     if (!onEpochEnd) {
-      if (process.env.NODE_ENV !== "production") {
+      if (import.meta.env.NODE_ENV !== "production") {
         console.warn("Epoch end callback not provided");
       }
       onEpochEnd = async (epoch: number, logs: any) => {
@@ -339,8 +339,8 @@ const fitListener = async (
     }
 
     var history: History = await model.train(fitOptions, { onEpochEnd });
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "1" &&
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
       logger(history);
   } catch (error) {
     handleError(listenerAPI, error as Error, "Error training the model");

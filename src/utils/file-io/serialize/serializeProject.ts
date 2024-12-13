@@ -299,8 +299,8 @@ export const serializeProject = async (
   const zipStore = new ZipStore(name);
   const root = await group(zipStore, zipStore.rootName);
 
-  // yarn/npm start/build must be run with REACT_APP_VERSION=$npm_package_version
-  const piximiVersion = process.env.REACT_APP_VERSION;
+  // yarn/npm start/build must be run with VITE_APP_VERSION=$npm_package_version
+  const piximiVersion = import.meta.env.VITE_APP_VERSION;
 
   if (!piximiVersion) {
     throw Error("Missing Piximi version");
