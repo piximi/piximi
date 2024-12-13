@@ -356,7 +356,7 @@ async function handleError(
     stackTrace,
   };
 
-  if (process.env.NODE_ENV !== "production") {
+  if (import.meta.env.NODE_ENV !== "production") {
     console.error(description);
     if (stackTrace) {
       console.error(stackTrace);

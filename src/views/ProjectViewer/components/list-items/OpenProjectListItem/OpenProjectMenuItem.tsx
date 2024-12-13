@@ -89,8 +89,8 @@ export const OpenProjectMenuItem = ({
         });
       })
       .catch((err: Error) => {
-        process.env.NODE_ENV !== "production" &&
-          process.env.REACT_APP_LOG_LEVEL === "1" &&
+        import.meta.env.NODE_ENV !== "production" &&
+          import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
           console.error(err);
 
         const warning: AlertState = {

@@ -224,7 +224,7 @@ export const colorOverlayROI = (
       alpha: 0,
     }).resize({ factor: scalingFactor });
   } catch (err) {
-    if (process.env.NODE_ENV !== "production") {
+    if (import.meta.env.NODE_ENV !== "production") {
       logger("could not create crop", { level: "error" });
       logger(`boundingbox: ${boundingBox}`);
       logger(`boxWidth: ${boxWidth}`);
