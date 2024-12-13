@@ -23,6 +23,24 @@
     "@nivo/swarmplot": "^0.87.0",
     "@reduxjs/toolkit": "^2.5.1",
     "@tensorflow/tfjs": "4.2.0",
+    "@testing-library/dom": "^7.21.4",
+    "@testing-library/jest-dom": "^5.15.0",
+    "@testing-library/react": "^11.2.2",
+    "@testing-library/user-event": "^12.8.3",
+    "@types/file-saver": "^2.0.4",
+    "@types/jest": "^27.5.1",
+    "@types/lodash": "^4.14.177",
+    "@types/node": "^18.7.18",
+    "@types/numeral": "^2.0.2",
+    "@types/react": "^17.0.39",
+    "@types/react-color": "^3.0.4",
+    "@types/react-dom": "^17.0.11",
+    "@types/react-redux": "^7.1.13",
+    "@types/react-vis": "^1.11.10",
+    "@types/react-window": "^1.8.8",
+    "@types/redux-logger": "^3.0.8",
+    "@types/uuid": "^8.3.3",
+    "@vitejs/plugin-react": "^4.3.4",
     "dicom-parser": "^1.8.13",
     "file-saver": "^2.0.5",
     "fp-ts": "^2.13.1",
@@ -35,6 +53,9 @@
     "lodash": "^4.17.20",
     "memoize-one": "^6.0.0",
     "ngraph.graph": "^19.1.0",
+    "ngraph.path": "^1.3.1",
+    "numeral": "^2.0.6",
+    "pnpm": "^9.15.0",
     "react": "^17.0.2",
     "react-color": "^2.19.3",
     "react-dnd": "^15.0.0",
@@ -53,6 +74,8 @@
     "ts-priority-queue": "^0.1.1",
     "use-sound": "^4.0.1",
     "uuid": "^8.3.2",
+    "vite": "^6.0.3",
+    "vite-tsconfig-paths": "^5.1.4",
     "web-vitals": "^2.1.2",
     "zarr": "^0.6.1"
   },
@@ -108,7 +131,7 @@
     "build-local": "PUBLIC_URL=/ NODE_OPTIONS=\"--max-old-space-size=8192\" VITE_APP_VERSION=$npm_package_version vite build",
     "start": "BROWSER='none' VITE_APP_VERSION=$npm_package_version vite",
     "start-logger": "BROWSER='none' VITE_APP_VERSION=$npm_package_version VITE_APP_LOG_LEVEL='1' vite",
-    "test": "vitest --dom",
+    "test": "vite test",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "husky install; node scripts/prepare.js",
@@ -131,5 +154,33 @@
       "last 1 safari version"
     ]
   },
-  "private": true
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest",
+      "plugin:storybook/recommended"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "**/*.stories.*"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
+    ]
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write"
+    ],
+    "src/**/*.{js,jsx,ts,tsx}": [
+      "yarn run eslint --max-warnings 0"
+    ]
+  },
+  "private": true,
+  "jest": {
+    "resetMocks": false
+  }
 }

@@ -70,37 +70,42 @@ export const ExampleProjectCard = ({
     let exampleProjectFilePath: string;
     switch (exampleProject.enum) {
       case ExampleProject.Mnist:
-        exampleProjectFilePath = import.meta.env.PROD
-          ? `${domain}/${rootPath}/mnistExampleProject.${ext}`
-          : (await import("data/exampleProjects/mnistExampleProject.zip"))
-              .default;
+        exampleProjectFilePath =
+          import.meta.env.NODE_ENV === "production"
+            ? `${domain}/${rootPath}/mnistExampleProject.${ext}`
+            : (await import("data/exampleProjects/mnistExampleProject.zip"))
+                .default;
         break;
       case ExampleProject.CElegans:
-        exampleProjectFilePath = import.meta.env.PROD
-          ? `${domain}/${rootPath}/cElegansExampleProject.${ext}`
-          : (await import("data/exampleProjects/cElegansExampleProject.zip"))
-              .default;
+        exampleProjectFilePath =
+          import.meta.env.NODE_ENV === "production"
+            ? `${domain}/${rootPath}/cElegansExampleProject.${ext}`
+            : (await import("data/exampleProjects/cElegansExampleProject.zip"))
+                .default;
         break;
       case ExampleProject.HumanU2OSCells:
-        exampleProjectFilePath = import.meta.env.PROD
-          ? `${domain}/${rootPath}/HumanU2OSCellsExampleProject.${ext}`
-          : (
-              await import(
-                "data/exampleProjects/HumanU2OSCellsExampleProject.zip"
-              )
-            ).default;
+        exampleProjectFilePath =
+          import.meta.env.NODE_ENV === "production"
+            ? `${domain}/${rootPath}/HumanU2OSCellsExampleProject.${ext}`
+            : (
+                await import(
+                  "data/exampleProjects/HumanU2OSCellsExampleProject.zip"
+                )
+              ).default;
         break;
       case ExampleProject.BBBC013:
-        exampleProjectFilePath = import.meta.env.PROD
-          ? `${domain}/${rootPath}/BBBC013ExampleProject.${ext}`
-          : (await import("data/exampleProjects/BBBC013ExampleProject.zip"))
-              .default;
+        exampleProjectFilePath =
+          import.meta.env.NODE_ENV === "production"
+            ? `${domain}/${rootPath}/BBBC013ExampleProject.${ext}`
+            : (await import("data/exampleProjects/BBBC013ExampleProject.zip"))
+                .default;
         break;
       case ExampleProject.PLP1:
-        exampleProjectFilePath = import.meta.env.PROD
-          ? `${domain}/${rootPath}/PLP1ExampleProject.${ext}`
-          : (await import("data/exampleProjects/PLP1ExampleProject.zip"))
-              .default;
+        exampleProjectFilePath =
+          import.meta.env.NODE_ENV === "production"
+            ? `${domain}/${rootPath}/PLP1ExampleProject.${ext}`
+            : (await import("data/exampleProjects/PLP1ExampleProject.zip"))
+                .default;
         break;
       default:
         return;
@@ -113,7 +118,7 @@ export const ExampleProjectCard = ({
           new PseudoFileList([new File([blob], exampleProject.name, blob)]),
       )
       .catch((err: any) => {
-        import.meta.env.PROD &&
+        import.meta.env.NODE_ENV === "production" &&
           import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
           console.error(err);
         throw err;
