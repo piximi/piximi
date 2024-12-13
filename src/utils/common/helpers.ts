@@ -70,7 +70,7 @@ export const logger = (
     message = message.join("");
   }
   if (options?.dev) {
-    if (process.env.NODE_ENV !== "production") {
+    if (import.meta.env.NODE_ENV !== "production") {
       switch (options.level) {
         case "log":
           console.log(message);

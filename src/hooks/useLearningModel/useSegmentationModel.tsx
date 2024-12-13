@@ -51,7 +51,7 @@ export const useSegmentationModel = () => {
           model: model as Segmenter,
         })
       );
-    } else if (process.env.NODE_ENV !== "production") {
+    } else if (import.meta.env.NODE_ENV !== "production") {
       console.warn(
         `Attempting to dispatch a model with task ${
           ModelTask[model.task]

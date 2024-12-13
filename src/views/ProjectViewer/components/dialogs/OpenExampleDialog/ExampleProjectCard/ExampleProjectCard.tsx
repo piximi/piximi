@@ -71,21 +71,21 @@ export const ExampleProjectCard = ({
     switch (exampleProject.enum) {
       case ExampleProject.Mnist:
         exampleProjectFilePath =
-          process.env.NODE_ENV === "production"
+          import.meta.env.NODE_ENV === "production"
             ? `${domain}/${rootPath}/mnistExampleProject.${ext}`
             : (await import("data/exampleProjects/mnistExampleProject.zip"))
                 .default;
         break;
       case ExampleProject.CElegans:
         exampleProjectFilePath =
-          process.env.NODE_ENV === "production"
+          import.meta.env.NODE_ENV === "production"
             ? `${domain}/${rootPath}/cElegansExampleProject.${ext}`
             : (await import("data/exampleProjects/cElegansExampleProject.zip"))
                 .default;
         break;
       case ExampleProject.HumanU2OSCells:
         exampleProjectFilePath =
-          process.env.NODE_ENV === "production"
+          import.meta.env.NODE_ENV === "production"
             ? `${domain}/${rootPath}/HumanU2OSCellsExampleProject.${ext}`
             : (
                 await import(
@@ -95,14 +95,14 @@ export const ExampleProjectCard = ({
         break;
       case ExampleProject.BBBC013:
         exampleProjectFilePath =
-          process.env.NODE_ENV === "production"
+          import.meta.env.NODE_ENV === "production"
             ? `${domain}/${rootPath}/BBBC013ExampleProject.${ext}`
             : (await import("data/exampleProjects/BBBC013ExampleProject.zip"))
                 .default;
         break;
       case ExampleProject.PLP1:
         exampleProjectFilePath =
-          process.env.NODE_ENV === "production"
+          import.meta.env.NODE_ENV === "production"
             ? `${domain}/${rootPath}/PLP1ExampleProject.${ext}`
             : (await import("data/exampleProjects/PLP1ExampleProject.zip"))
                 .default;
@@ -118,8 +118,8 @@ export const ExampleProjectCard = ({
           new PseudoFileList([new File([blob], exampleProject.name, blob)])
       )
       .catch((err: any) => {
-        process.env.NODE_ENV === "production" &&
-          process.env.REACT_APP_LOG_LEVEL === "1" &&
+        import.meta.env.NODE_ENV === "production" &&
+          import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
           console.error(err);
         throw err;
       });
@@ -150,8 +150,8 @@ export const ExampleProjectCard = ({
     } catch (err) {
       const error: Error = err as Error;
 
-      process.env.NODE_ENV !== "production" &&
-        process.env.REACT_APP_LOG_LEVEL === "1" &&
+      import.meta.env.NODE_ENV !== "production" &&
+        import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
         console.error(err);
 
       const warning: AlertState = {

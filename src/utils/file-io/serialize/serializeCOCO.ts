@@ -58,7 +58,7 @@ export const serializeCOCOFile = (
     const outerBorder = contours.find((b) => b.seqNum === 2);
 
     if (!outerBorder) {
-      process.env.NODE_ENV !== "production" &&
+      import.meta.env.NODE_ENV !== "production" &&
         logger(`Could not find outer border of annotation ${ann.id}`);
       throw new Error(
         `Could not determine contours of annotation belonging to image ${
@@ -93,7 +93,7 @@ export const serializeCOCOFile = (
   const info = {
     year: new Date().getFullYear(),
     // provided in package.json scripts
-    version: process.env.REACT_APP_VERSION as string,
+    version: import.meta.env.VITE_APP_VERSION as string,
     description: "",
     contributor: "",
     url: "",

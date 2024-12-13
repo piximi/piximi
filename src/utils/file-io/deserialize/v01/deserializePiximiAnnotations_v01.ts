@@ -63,8 +63,8 @@ const reconcileCategories = (
   }));
 
   if (
-    process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "1"
+    import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "1"
   ) {
     const numMatched = matchedCats.length;
     const numNew = newCats.length;
@@ -124,8 +124,8 @@ const reconcileImages = (
     .map((ann) => ({ ...ann, imageId: imIdMap[ann.imageId] }));
 
   if (
-    process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "1"
+    import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "1"
   ) {
     const numImsDiscarded = discardedIms.length;
     const numAnnsDiscarded = discardedAnnotations.length;

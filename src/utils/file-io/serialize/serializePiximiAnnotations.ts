@@ -12,13 +12,13 @@ export const serializePiximiAnnotations = (
   categories: Array<Category>,
   kinds: Array<Kind>
 ) => {
-  const piximiVersion = process.env.REACT_APP_VERSION;
+  const piximiVersion = import.meta.env.VITE_APP_VERSION;
 
   const serializedImages = images.map((im) => ({ id: im.id, name: im.name }));
 
   /*
     serializedCategories and serializedKinds are mapped to make sure serialization remains consitent even if data structure changes.
-    If serialization needs to change, update REACT_APP_VERSION
+    If serialization needs to change, update VITE_APP_VERSION
   */
   const serializedCategories = categories.map((cat) => ({
     id: cat.id,
