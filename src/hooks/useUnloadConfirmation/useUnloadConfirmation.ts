@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 export const useUnloadConfirmation = () => {
   const handleUnload = (e: any) => {
-    if (import.meta.env.DEV) {
+    if (import.meta.env.NODE_ENV === "development") {
       return;
     } else {
       e.preventDefault();

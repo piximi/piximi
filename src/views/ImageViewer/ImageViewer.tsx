@@ -27,7 +27,15 @@ export const ImageViewer = () => {
   const stageRef = useRef<Konva.Stage>(null);
   const isMobile = useMobileView();
   const alertState = useSelector(selectAlertState);
-  useUnloadConfirmation();
+
+  const onUnload = (e: any) => {
+    if (import.meta.env.NODE_ENV === "development") {
+      return;
+    } else {
+      e.preventDefault();
+      return (e.returnValue = "Are you sure you want to exit?");
+    }
+  };
 
   const handleError = useCallback(
     async (e: any) => {

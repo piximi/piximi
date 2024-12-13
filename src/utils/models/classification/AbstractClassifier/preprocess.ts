@@ -203,17 +203,29 @@ const doShowImages = async (
     const refHeight = xsData.length;
     const refWidth = xsData[0].length;
 
-    canvas.width = refWidth;
-    canvas.height = refHeight;
+    if (import.meta.env.NODE_ENV === "test") {
+      const { createCanvas } = require("canvas");
+      canvas = createCanvas(refWidth, refHeight);
+    } else {
+      canvas = document.createElement("canvas");
+      canvas.width = refWidth;
+      canvas.height = refHeight;
+    }
 
     const imTensor = tensor3d(xsData, undefined, "int32");
     const imageDataArr = await browser.toPixels(imTensor);
     imTensor.dispose();
-    const imageData = new ImageData(
-      imageDataArr,
-      imTensor.shape[1], // width
-      imTensor.shape[0], // height
-    );
+    let imageData;
+    if (import.meta.env.NODE_ENV === "test") {
+      const { createImageData } = require("canvas");
+      imageData = createImageData(imageDataArr, imTensor.shape[1]);
+    } else {
+      imageData = new ImageData(
+        imageDataArr,
+        imTensor.shape[1], // width
+        imTensor.shape[0] // height
+      );
+    }
     const ctx = canvas.getContext("2d");
     if (ctx) ctx.putImageData(imageData, 0, 0);
 
