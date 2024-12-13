@@ -133,7 +133,7 @@ export const SerializedFileRTypeV02 = T.type({
 //#endregion Basic Serialization Type
 
 const toError = (errors: any) => {
-  process.env.NODE_ENV !== "production" && logger(errors);
+  import.meta.env.NODE_ENV !== "production" && logger(errors);
   throw new Error(failure(errors).join("\n"));
 };
 
