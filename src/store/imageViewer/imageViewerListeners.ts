@@ -27,7 +27,6 @@ startAppListening({
     let imageIds: string[] = [];
     const annotationIds: string[] = [];
     let activeImageId: string | undefined = undefined;
-
     selectedThingIds.forEach((thingId) => {
       const thing = getCompleteEntity(dataState.things.entities[thingId]);
       if (thing) {

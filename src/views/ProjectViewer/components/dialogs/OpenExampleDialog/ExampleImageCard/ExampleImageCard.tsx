@@ -54,6 +54,7 @@ export const ExampleImageCard = ({
     });
 
     batch(() => {
+      dispatch(projectSlice.actions.resetProject());
       dispatch(projectSlice.actions.setProjectImageChannels({ channels: 3 }));
       dispatch(
         dataSlice.actions.initializeState({
