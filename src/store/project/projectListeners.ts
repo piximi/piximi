@@ -103,7 +103,7 @@ startAppListening({
   effect: async (action, listenerApi) => {
     const { classifier } = listenerApi.getState();
 
-    if (action.payload.channels) {
+    if (action.payload && action.payload.channels) {
       listenerApi.dispatch(
         classifierSlice.actions.updateInputShape({
           inputShape: {
