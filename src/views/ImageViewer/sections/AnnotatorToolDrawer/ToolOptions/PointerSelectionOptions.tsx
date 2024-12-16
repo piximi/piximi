@@ -36,6 +36,9 @@ export const PointerSelectionOptions = () => {
         workingAnnotationId: undefined,
       })
     );
+    dispatch(
+      imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })
+    );
   };
 
   const handleSelectCategory = (categoryId: string) => {

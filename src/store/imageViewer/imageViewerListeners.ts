@@ -48,9 +48,17 @@ startAppListening({
     }
 
     listenerAPI.dispatch(imageViewerSlice.actions.setImageStack({ imageIds }));
-    // listenerAPI.dispatch(
-    //   imageViewerSlice.actions.setSelectedAnnotationIds({ annotationIds })
-    // );
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setSelectedAnnotationIds({
+        annotationIds,
+        workingAnnotationId: annotationIds[0],
+      })
+    );
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setWorkingAnnotation({
+        annotation: annotationIds[0],
+      })
+    );
     listenerAPI.dispatch(
       imageViewerSlice.actions.setActiveImageId({
         imageId: activeImageId,
@@ -125,6 +133,20 @@ startAppListening({
       })
     );
     listenerAPI.subscribe();
+  },
+});
+
+startAppListening({
+  actionCreator: imageViewerSlice.actions.setAllSelectedAnnotationIds,
+  effect: (action, listenerAPI) => {
+    const { imageViewer } = listenerAPI.getState();
+    const activeAnnotationId = imageViewer.activeAnnotationIds[0];
+
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setWorkingAnnotation({
+        annotation: activeAnnotationId,
+      })
+    );
   },
 });
 
