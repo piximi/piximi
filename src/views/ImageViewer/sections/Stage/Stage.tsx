@@ -62,8 +62,6 @@ import { HotkeyContext } from "utils/common/enums";
 
 import { Category, Kind } from "store/data/types";
 
-const normalizeFont = 1300;
-
 export const Stage = ({
   stageWidth,
   stageHeight,
@@ -277,17 +275,7 @@ export const Stage = ({
             <DndProvider backend={HTML5Backend}>
               <Layer>
                 {!(htmlImages && htmlImages.length) ? (
-                  <ReactKonva.Text
-                    x={stageWidth / 6} //center depending on window width
-                    y={0.4 * stageHeight}
-                    width={(2 * stageWidth) / 3}
-                    align="center"
-                    text={
-                      'To start annotating, drag and drop an image onto the canvas or click on "Open Image".'
-                    }
-                    fill={"black"}
-                    fontSize={(30 * stageWidth) / normalizeFont} //scale font depending on window width
-                  />
+                  <></>
                 ) : !imageIsLoading ? (
                   <Image
                     ref={imageRef}
