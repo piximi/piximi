@@ -45,11 +45,13 @@ const labelPosition = {
 type AnnotationTransformerProps = {
   annotationId: string;
   annotationTool: AnnotationTool;
+  hasControl?: boolean;
 };
 
 export const AnnotationTransformer = ({
   annotationId,
   annotationTool,
+  hasControl,
 }: AnnotationTransformerProps) => {
   const stageRef = useContext(StageContext);
 
@@ -254,93 +256,89 @@ export const AnnotationTransformer = ({
   );
 
   return (
-    <>
-      <ReactKonva.Group>
-        <ReactKonva.Transformer
-          id={"tr-".concat(annotationId)}
-          ref={trRef}
-          rotateEnabled={false}
-          resizeEnabled={false}
-          borderStrokeWidth={1}
-          borderStroke="white" //TODO: It would be pretty cool if the border color could set depending on the primary color of the underlying image for contrast
-        />
-        {/* {workingAnnotation && ( */}
-        <>
-          <ReactKonva.Group
-            id={"label-group"}
-            position={{ x: xPos, y: yPos }}
-            scaleX={1 / (stageRef?.current?.scaleX() ?? 1)}
-            scaleY={1 / (stageRef?.current?.scaleX() ?? 1)}
+    <ReactKonva.Group>
+      <ReactKonva.Transformer
+        id={"tr-".concat(annotationId)}
+        ref={trRef}
+        rotateEnabled={false}
+        resizeEnabled={false}
+        borderStrokeWidth={1}
+        borderStroke="white" //TODO: It would be pretty cool if the border color could set depending on the primary color of the underlying image for contrast
+      />
+      {hasControl && (
+        <ReactKonva.Group
+          id={"label-group"}
+          position={{ x: xPos, y: yPos }}
+          scaleX={1 / (stageRef?.current?.scaleX() ?? 1)}
+          scaleY={1 / (stageRef?.current?.scaleX() ?? 1)}
+        >
+          <ReactKonva.Label
+            position={{
+              x: labelPosition.x,
+              y: labelPosition.y1,
+            }}
+            onClick={handleConfirmOrDeleteAnnotation}
+            onTap={handleConfirmOrDeleteAnnotation}
+            id={"label"}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
-            <ReactKonva.Label
-              position={{
-                x: labelPosition.x,
-                y: labelPosition.y1,
-              }}
-              onClick={handleConfirmOrDeleteAnnotation}
-              onTap={handleConfirmOrDeleteAnnotation}
-              id={"label"}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-            >
-              <ReactKonva.Tag
-                cornerRadius={3}
-                fill={"darkgreen"}
-                lineJoin={"round"}
-                shadowColor={"black"}
-                shadowBlur={10}
-                shadowOffset={{ x: 5, y: 5 }}
-              />
-              <ReactKonva.Text
-                fill={"white"}
-                fontSize={14}
-                padding={6}
-                text={
-                  activeAnnotationIds.includes(annotationId) &&
-                  Object.keys(workingAnnotation.changes).length === 0
-                    ? "Delete"
-                    : "Confirm"
-                }
-                width={buttonWidth}
-                height={buttonHeight}
-                align={"center"}
-                name={"transformer-button"}
-              />
-            </ReactKonva.Label>
-            <ReactKonva.Label
-              position={{
-                x: labelPosition.x,
-                y: labelPosition.y2,
-              }}
-              onClick={cancelAnnotationHandler}
-              onTap={cancelAnnotationHandler}
-              id={"label"}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-            >
-              <ReactKonva.Tag
-                cornerRadius={3}
-                fill={"darkred"}
-                lineJoin={"round"}
-                shadowColor={"black"}
-                shadowBlur={10}
-                shadowOffset={{ x: 5, y: 5 }}
-              />
-              <ReactKonva.Text
-                fill={"white"}
-                fontSize={14}
-                padding={6}
-                text={"Cancel"}
-                width={buttonWidth}
-                height={buttonHeight}
-                align={"center"}
-                name={"transformer-button"}
-              />
-            </ReactKonva.Label>
-          </ReactKonva.Group>
-        </>
-        {/* )} */}
-      </ReactKonva.Group>
-    </>
+            <ReactKonva.Tag
+              cornerRadius={3}
+              fill={"darkgreen"}
+              lineJoin={"round"}
+              shadowColor={"black"}
+              shadowBlur={10}
+              shadowOffset={{ x: 5, y: 5 }}
+            />
+            <ReactKonva.Text
+              fill={"white"}
+              fontSize={14}
+              padding={6}
+              text={
+                activeAnnotationIds.includes(annotationId) &&
+                Object.keys(workingAnnotation.changes).length === 0
+                  ? "Delete"
+                  : "Confirm"
+              }
+              width={buttonWidth}
+              height={buttonHeight}
+              align={"center"}
+              name={"transformer-button"}
+            />
+          </ReactKonva.Label>
+          <ReactKonva.Label
+            position={{
+              x: labelPosition.x,
+              y: labelPosition.y2,
+            }}
+            onClick={cancelAnnotationHandler}
+            onTap={cancelAnnotationHandler}
+            id={"label"}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <ReactKonva.Tag
+              cornerRadius={3}
+              fill={"darkred"}
+              lineJoin={"round"}
+              shadowColor={"black"}
+              shadowBlur={10}
+              shadowOffset={{ x: 5, y: 5 }}
+            />
+            <ReactKonva.Text
+              fill={"white"}
+              fontSize={14}
+              padding={6}
+              text={"Cancel"}
+              width={buttonWidth}
+              height={buttonHeight}
+              align={"center"}
+              name={"transformer-button"}
+            />
+          </ReactKonva.Label>
+        </ReactKonva.Group>
+      )}
+    </ReactKonva.Group>
   );
 };

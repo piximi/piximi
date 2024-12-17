@@ -18,7 +18,7 @@ export const DividerHeader = (props: DividerHeaderProps) => {
     <Divider sx={props.sx} textAlign={props.textAlign} variant={props.variant}>
       <Typography
         variant={props.typographyVariant}
-        sx={{ textTransform: "uppercase" }}
+        sx={{ textTransform: "capitalize" }}
       >
         {props.children}
       </Typography>

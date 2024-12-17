@@ -32,7 +32,7 @@ export const DividerWithLoading = ({
           fontSize: "0.875rem",
           lineHeight: "1.43",
           letterSpacing: "0.01071em",
-          textTransform: "uppercase",
+          textTransform: "capitalize",
         }}
       >
         {title}
