@@ -1,17 +1,13 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
+import { annotatorSlice } from "store/annotator";
 import { imageViewerSlice } from "./imageViewerSlice";
 
 import { getCompleteEntity } from "store/entities/utils";
-import { decodeAnnotation } from "utils/annotator/rle";
 import { createRenderedTensor } from "utils/common/tensorHelpers";
 
-import {
-  AnnotationObject,
-  DecodedAnnotationObject,
-  ImageObject,
-} from "store/data/types";
+import { AnnotationObject, ImageObject } from "store/data/types";
 import { TypedAppStartListening } from "store/types";
 
 export const imageViewerMiddleware = createListenerMiddleware();
@@ -49,13 +45,13 @@ startAppListening({
 
     listenerAPI.dispatch(imageViewerSlice.actions.setImageStack({ imageIds }));
     listenerAPI.dispatch(
-      imageViewerSlice.actions.setSelectedAnnotationIds({
+      annotatorSlice.actions.setSelectedAnnotationIds({
         annotationIds,
         workingAnnotationId: annotationIds[0],
       })
     );
     listenerAPI.dispatch(
-      imageViewerSlice.actions.setWorkingAnnotation({
+      annotatorSlice.actions.setWorkingAnnotation({
         annotation: annotationIds[0],
       })
     );
@@ -107,45 +103,6 @@ startAppListening({
     );
     listenerAPI.dispatch(
       imageViewerSlice.actions.setImageIsLoading({ isLoading: false })
-    );
-  },
-});
-
-startAppListening({
-  actionCreator: imageViewerSlice.actions.setWorkingAnnotation,
-  effect: async (action, listenerAPI) => {
-    const dataState = listenerAPI.getState().data;
-    let annotationValue = action.payload.annotation;
-    if (typeof annotationValue === "string") {
-      const annotation = getCompleteEntity(
-        dataState.things.entities[annotationValue]
-      ) as AnnotationObject;
-      if (!annotation) return undefined;
-      annotationValue = !annotation.decodedMask
-        ? decodeAnnotation(annotation)
-        : (annotation as DecodedAnnotationObject);
-    }
-    listenerAPI.unsubscribe();
-    listenerAPI.dispatch(
-      imageViewerSlice.actions.setWorkingAnnotation({
-        annotation: annotationValue,
-        preparedByListener: true,
-      })
-    );
-    listenerAPI.subscribe();
-  },
-});
-
-startAppListening({
-  actionCreator: imageViewerSlice.actions.setAllSelectedAnnotationIds,
-  effect: (action, listenerAPI) => {
-    const { imageViewer } = listenerAPI.getState();
-    const activeAnnotationId = imageViewer.activeAnnotationIds[0];
-
-    listenerAPI.dispatch(
-      imageViewerSlice.actions.setWorkingAnnotation({
-        annotation: activeAnnotationId,
-      })
     );
   },
 });

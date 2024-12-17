@@ -6,11 +6,12 @@ import { IconButton, Tooltip, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { LogoLoader } from "components/ui/LogoLoader";
+import { LogoLoader } from "components/ui";
 import { CustomAppBar } from "components/layout";
 import { ExitAnnotatorDialog } from "components/dialogs";
 
 import { imageViewerSlice } from "store/imageViewer";
+import { annotatorSlice } from "store/annotator";
 import {
   selectActiveImageId,
   selectHasUnsavedChanges,
@@ -43,13 +44,13 @@ export const ImageViewerAppBar = () => {
         );
         dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
         dispatch(
-          imageViewerSlice.actions.setSelectedAnnotationIds({
+          annotatorSlice.actions.setSelectedAnnotationIds({
             annotationIds: [],
             workingAnnotationId: undefined,
           })
         );
         dispatch(
-          imageViewerSlice.actions.setWorkingAnnotation({
+          annotatorSlice.actions.setWorkingAnnotation({
             annotation: undefined,
           })
         );

@@ -18,9 +18,11 @@ import {
 import { useTranslation } from "hooks";
 import { useZoom } from "../../../hooks";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
-import { CustomListItem } from "components/ui/CustomListItem";
-import { DividerHeader } from "components/ui/DividerHeader";
+import {
+  CustomListItemButton,
+  CustomListItem,
+  DividerHeader,
+} from "components/ui";
 
 import { StageContext } from "contexts";
 import { imageViewerSlice } from "store/imageViewer";

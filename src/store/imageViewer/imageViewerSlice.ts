@@ -5,7 +5,6 @@ import { distinctFilter, mutatingFilter } from "utils/common/helpers";
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 import { ZoomMode } from "utils/annotator/enums";
 
-import { DecodedAnnotationObject } from "store/data/types";
 import { ImageViewerState } from "store/types";
 import {
   ColorAdjustmentOptionsType,
@@ -31,10 +30,6 @@ const initialState: ImageViewerState = {
   activeImageRenderedSrcs: [],
   imageOrigin: { x: 0, y: 0 },
   filters: { categoryId: [] },
-  workingAnnotationId: undefined,
-
-  workingAnnotation: { saved: undefined, changes: {} },
-  selectedAnnotationIds: [],
   selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
   stageHeight: 1000,
   stageScale: 1,
@@ -130,100 +125,7 @@ export const imageViewerSlice = createSlice({
         });
       }
     },
-    addSelectedAnnotationId(
-      state,
-      action: PayloadAction<{ annotationId: string }>
-    ) {
-      state.selectedAnnotationIds.push(action.payload.annotationId);
-    },
-    addSelectedAnnotationIds(
-      state,
-      action: PayloadAction<{ annotationIds: Array<string> }>
-    ) {
-      for (const annotationId of action.payload.annotationIds) {
-        imageViewerSlice.caseReducers.addSelectedAnnotationId(state, {
-          type: "addSelectedAnnotationId",
-          payload: { annotationId },
-        });
-      }
-    },
-    setSelectedAnnotationIds(
-      state,
-      action: PayloadAction<{
-        annotationIds: Array<string>;
-        workingAnnotationId?: string;
-      }>
-    ) {
-      const { annotationIds, workingAnnotationId } = action.payload;
-      state.selectedAnnotationIds = [];
-      state.workingAnnotationId = workingAnnotationId
-        ? workingAnnotationId
-        : annotationIds[0];
-      imageViewerSlice.caseReducers.addSelectedAnnotationIds(state, {
-        type: "addSelectedAnnotationIds",
-        payload: { annotationIds: action.payload.annotationIds },
-      });
-    },
-    setAllSelectedAnnotationIds(state, action: PayloadAction<{}>) {
-      state.selectedAnnotationIds = [];
-      imageViewerSlice.caseReducers.addSelectedAnnotationIds(state, {
-        type: "addSelectedAnnotationIds",
-        payload: { annotationIds: state.activeAnnotationIds },
-      });
 
-      state.workingAnnotationId =
-        state.workingAnnotationId ?? state.activeAnnotationIds[0];
-    },
-    removeSelectedAnnotationId(
-      state,
-      action: PayloadAction<{
-        annotationId: string;
-      }>
-    ) {
-      if (state.workingAnnotationId === action.payload.annotationId) {
-        state.workingAnnotationId = undefined;
-      }
-      mutatingFilter(
-        state.selectedAnnotationIds,
-        (annotationId) => annotationId !== action.payload.annotationId
-      );
-    },
-    removeSelectedAnnotationIds(
-      state,
-      action: PayloadAction<{
-        annotationIds: string[];
-      }>
-    ) {
-      for (const annotationId of action.payload.annotationIds) {
-        imageViewerSlice.caseReducers.removeSelectedAnnotationId(state, {
-          type: "removeSelectedAnnotationId",
-          payload: { annotationId },
-        });
-      }
-    },
-    setWorkingAnnotation(
-      state,
-      action: PayloadAction<{
-        annotation: DecodedAnnotationObject | string | undefined;
-        preparedByListener?: boolean;
-      }>
-    ) {
-      const { annotation, preparedByListener } = action.payload;
-      if (!preparedByListener) return;
-
-      state.workingAnnotation.saved = annotation as
-        | DecodedAnnotationObject
-        | undefined;
-      state.workingAnnotation.changes = {};
-    },
-    updateWorkingAnnotation(
-      state,
-      action: PayloadAction<{ changes: Partial<DecodedAnnotationObject> }>
-    ) {
-      if (state.workingAnnotation.saved) {
-        state.workingAnnotation.changes = action.payload.changes;
-      }
-    },
     setSelectedCategoryId(
       state,
       action: PayloadAction<{ selectedCategoryId: string }>

@@ -1,27 +1,29 @@
 import React, { useMemo, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
+import { groupBy } from "lodash";
 
 import { Collapse, Divider, IconButton, List, SvgIcon } from "@mui/material";
-import { Label as LabelIcon } from "@mui/icons-material";
-
-import { useTranslation } from "hooks";
-
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
-
 import {
+  Label as LabelIcon,
   KeyboardArrowRight as KeyboardArrowRightIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
 } from "@mui/icons-material";
 
-import { imageViewerSlice } from "store/imageViewer";
+import { useTranslation } from "hooks";
+
+import {
+  CustomListItemButton,
+  DividerHeader,
+  FunctionalDivider,
+} from "components/ui";
+
+import { annotatorSlice } from "store/annotator";
 import { selectAllCategories } from "store/data/selectors";
 import { selectActiveAnnotations } from "store/imageViewer/reselectors";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 
 import { OldCategory } from "store/data/types";
-import { groupBy } from "lodash";
-import { DividerHeader, FunctionalDivider } from "components/ui/DividerHeader";
 
 export const PointerSelectionOptions = () => {
   const t = useTranslation();
@@ -39,18 +41,28 @@ export const PointerSelectionOptions = () => {
   }, [annotationCategories]);
 
   const handleSelectAll = () => {
-    dispatch(imageViewerSlice.actions.setAllSelectedAnnotationIds({}));
+    dispatch(
+      annotatorSlice.actions.setSelectedAnnotationIds({
+        annotationIds: activeAnnotations.map((annotation) => annotation.id),
+        workingAnnotationId: activeAnnotations[0].id,
+      })
+    );
+    dispatch(
+      annotatorSlice.actions.setWorkingAnnotation({
+        annotation: activeAnnotations[0],
+      })
+    );
   };
 
   const handleDeselectAll = () => {
     dispatch(
-      imageViewerSlice.actions.setSelectedAnnotationIds({
+      annotatorSlice.actions.setSelectedAnnotationIds({
         annotationIds: [],
         workingAnnotationId: undefined,
       })
     );
     dispatch(
-      imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })
+      annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined })
     );
   };
 
@@ -66,13 +78,13 @@ export const PointerSelectionOptions = () => {
     );
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.setSelectedAnnotationIds({
+        annotatorSlice.actions.setSelectedAnnotationIds({
           annotationIds: annotationIds,
           workingAnnotationId: annotationIds[0],
         })
       );
       dispatch(
-        imageViewerSlice.actions.setWorkingAnnotation({
+        annotatorSlice.actions.setWorkingAnnotation({
           annotation: annotationIds[0],
         })
       );

@@ -5,11 +5,11 @@ import { List, SvgIcon } from "@mui/material";
 import { useTranslation } from "hooks";
 import { useAnnotationTool } from "../../../hooks";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
+import { CustomListItemButton } from "components/ui";
 
-import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
-import { selectWorkingAnnotation } from "store/imageViewer/selectors";
+import { annotatorSlice } from "store/annotator";
+import { selectWorkingAnnotation } from "store/annotator/selectors";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 
@@ -51,7 +51,7 @@ export const InvertAnnotation = () => {
     );
 
     dispatch(
-      imageViewerSlice.actions.setSelectedAnnotationIds({
+      annotatorSlice.actions.setSelectedAnnotationIds({
         annotationIds: [workingAnnotation.id],
         workingAnnotationId: workingAnnotation.id,
       })
