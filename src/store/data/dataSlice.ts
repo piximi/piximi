@@ -5,8 +5,10 @@ import { intersection } from "lodash";
 import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import {
+  copyValues,
   generateUnknownCategory,
   generateUUID,
+  isObjectEmpty,
   isUnknownCategory,
   mutatingFilter,
   newReplaceDuplicateName,
@@ -1143,8 +1145,14 @@ export const dataSlice = createSlice({
         "remove"
       );
       for (const id of state.things.ids) {
-        const thing = state.things.entities[id];
-        if (!thing.changes) continue;
+        let thing = state.things.entities[id];
+        if (isObjectEmpty(thing.changes)) continue;
+        if (thing.saved.kind === "Image") {
+          thing = state.things.entities[id] as DeferredEntity<ImageObject>;
+        } else {
+          thing = state.things.entities[id] as DeferredEntity<AnnotationObject>;
+        }
+
         if ("deleted" in thing.changes) {
           dispose(thing.saved.data as TensorContainer);
           dispose(thing.changes.data as TensorContainer);
@@ -1152,7 +1160,8 @@ export const dataSlice = createSlice({
           delete state.things.entities[id];
         } else {
           let { added, deleted, ...preparedDeferred } = thing.changes;
-          Object.assign(thing.saved, preparedDeferred);
+
+          copyValues(thing.saved, preparedDeferred);
           thing.changes = {};
         }
       }

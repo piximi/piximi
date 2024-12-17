@@ -5,15 +5,17 @@ import StackTrace from "stacktrace-js";
 import { BitDepth, DataArray } from "utils/file-io/types";
 import * as ImageJS from "image-js";
 import { tensor2d, image as tfImage } from "@tensorflow/tfjs";
+
 import {
   availableImageSortKeys,
   defaultImageSortKey,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "./constants";
-import { AlertType, ImageSortKey } from "./enums";
-import { FilterType, ImageSortKeyType, RecursivePartial } from "./types";
-import { Category, ImageObject, Shape, ShapeArray } from "store/data/types";
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
+import { AlertType, ImageSortKey } from "./enums";
+
+import { Category, ImageObject, Shape, ShapeArray } from "store/data/types";
+import { FilterType, ImageSortKeyType, RecursivePartial } from "./types";
 
 /* 
   ERROR HANDLING / LOGGING
@@ -96,8 +98,12 @@ export const logger = (
 };
 
 /* 
-  ARRAY HELPERS
+  ARRAY / OBJECT HELPERS
 */
+
+export const isObjectEmpty = <T extends Object>(obj: T) => {
+  return Object.keys(obj).length === 0;
+};
 
 export const enumKeys = <O extends object, K extends keyof O = keyof O>(
   obj: O
@@ -151,6 +157,15 @@ export const filterObjects = <T extends object>(
       // If the key is not present in the record, include the item
       return true;
     });
+  });
+};
+
+export const copyValues = <T extends object>(
+  existingObject: T,
+  updates: Partial<T>
+) => {
+  Object.entries(updates).forEach(([key, value]) => {
+    existingObject[key as keyof T] = value as T[keyof T];
   });
 };
 
@@ -208,6 +223,30 @@ export const capitalize = (input: string) => {
     capitalized.push(word.charAt(0).toUpperCase() + word.slice(1));
   });
   return capitalized.join(" ");
+};
+
+export const sortTypeByKey = (key: ImageSortKey): ImageSortKeyType => {
+  const sortKeyIdx = availableImageSortKeys
+    .map((e) => e.imageSortKey)
+    .indexOf(key);
+
+  if (sortKeyIdx >= 0) {
+    return availableImageSortKeys[sortKeyIdx];
+  } else {
+    return defaultImageSortKey;
+  }
+};
+
+export const updateRecord = <T extends string | number | symbol, K>(
+  record: Record<T, K[]>,
+  key: T,
+  value: K
+) => {
+  if (key in record) {
+    record[key].push(value);
+  } else {
+    record[key] = [value];
+  }
 };
 
 /*
@@ -499,32 +538,4 @@ export const rgbToHex = (rgb: [number, number, number]) => {
     componentToHex(rgb[1]) +
     componentToHex(rgb[2])
   );
-};
-
-export const sortTypeByKey = (key: ImageSortKey): ImageSortKeyType => {
-  const sortKeyIdx = availableImageSortKeys
-    .map((e) => e.imageSortKey)
-    .indexOf(key);
-
-  if (sortKeyIdx >= 0) {
-    return availableImageSortKeys[sortKeyIdx];
-  } else {
-    return defaultImageSortKey;
-  }
-};
-
-export const updateRecord = <T extends string | number | symbol, K>(
-  record: Record<T, K[]>,
-  key: T,
-  value: K
-) => {
-  if (key in record) {
-    record[key].push(value);
-  } else {
-    record[key] = [value];
-  }
-};
-
-export const isObjectEmpty = <T extends Object>(obj: T) => {
-  return Object.keys(obj).length === 0;
 };

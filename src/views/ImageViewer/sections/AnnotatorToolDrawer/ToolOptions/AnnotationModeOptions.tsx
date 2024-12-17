@@ -4,14 +4,14 @@ import { List, ListSubheader, Radio, RadioGroup } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
+import { CustomListItemButton } from "components/ui";
 
 import { annotatorSlice } from "store/annotator";
 import {
   selectAnnotationState,
   selectAnnotationSelectionMode,
+  selectWorkingAnnotation,
 } from "store/annotator/selectors";
-import { selectWorkingAnnotation } from "store/imageViewer/selectors";
 
 import { RadioCheckedIcon, RadioUncheckedIcon } from "icons";
 
