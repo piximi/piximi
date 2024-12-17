@@ -1,10 +1,8 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
-import { annotatorSlice } from "store/annotator";
 import { classifierSlice } from "store/classifier";
-import { segmenterSlice } from "store/segmenter";
-import { imageViewerSlice } from "store/imageViewer";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data";
 import { projectSlice } from "./projectSlice";
 
@@ -18,24 +16,9 @@ const startAppListening =
   projectMiddleware.startListening as TypedAppStartListening;
 
 startAppListening({
-  actionCreator: projectSlice.actions.resetProject,
+  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
   effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(dataSlice.actions.resetData());
-    listenerAPI.dispatch(annotatorSlice.actions.resetAnnotator());
-    listenerAPI.dispatch(classifierSlice.actions.resetClassifier());
-    listenerAPI.dispatch(segmenterSlice.actions.resetSegmenter());
-    listenerAPI.dispatch(imageViewerSlice.actions.resetImageViewer());
-  },
-});
-
-startAppListening({
-  actionCreator: projectSlice.actions.resetProject,
-  effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(dataSlice.actions.resetData());
-    listenerAPI.dispatch(annotatorSlice.actions.resetAnnotator());
-    listenerAPI.dispatch(classifierSlice.actions.resetClassifier());
-    listenerAPI.dispatch(segmenterSlice.actions.resetSegmenter());
-    listenerAPI.dispatch(imageViewerSlice.actions.resetImageViewer());
+    listenerAPI.dispatch(projectSlice.actions.resetProject());
   },
 });
 

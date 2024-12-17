@@ -1,6 +1,7 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { measurementsSlice } from "./measurementsSlice";
 
 import { getDeferredProperty } from "store/entities/utils";
@@ -17,6 +18,13 @@ export const measurementsMiddleware = createListenerMiddleware();
 
 const startAppListening =
   measurementsMiddleware.startListening as TypedAppStartListening;
+
+startAppListening({
+  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
+  effect: (action, listenerAPI) => {
+    listenerAPI.dispatch(measurementsSlice.actions.resetMeasurements());
+  },
+});
 
 startAppListening({
   predicate: (action, currentState, previousState) => {

@@ -2,6 +2,7 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
 import { annotatorSlice } from "store/annotator";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { imageViewerSlice } from "./imageViewerSlice";
 
 import { getCompleteEntity } from "store/entities/utils";
@@ -13,6 +14,13 @@ import { TypedAppStartListening } from "store/types";
 export const imageViewerMiddleware = createListenerMiddleware();
 const startAppListening =
   imageViewerMiddleware.startListening as TypedAppStartListening;
+
+startAppListening({
+  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
+  effect: (action, listenerAPI) => {
+    listenerAPI.dispatch(imageViewerSlice.actions.resetImageViewer());
+  },
+});
 
 startAppListening({
   actionCreator: imageViewerSlice.actions.prepareImageViewer,
