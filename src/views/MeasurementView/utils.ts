@@ -1,8 +1,8 @@
 import { DataArray } from "image-js";
-import * as tf from "@tensorflow/tfjs";
+import { Tensor2D, Tensor4D } from "@tensorflow/tfjs";
 
 import { getObjectMaskData, prepareChannels } from "utils/measurements/helpers";
-import { decode } from "utils/annotator";
+import { decode } from "views/ImageViewer/utils";
 
 import {
   MeasurementDisplayTable,
@@ -20,7 +20,7 @@ export const format = (value: string | number, sf: number = 2) => {
 };
 
 export const formatChartItems = (
-  measurementTables: Record<string, MeasurementDisplayTable>
+  measurementTables: Record<string, MeasurementDisplayTable>,
 ): ChartValues => {
   const items: ChartValues = {};
   const measurementData = Object.values(measurementTables);
@@ -28,7 +28,7 @@ export const formatChartItems = (
     return items;
   }
 
-  measurementData.forEach((data, idx) => {
+  measurementData.forEach((data) => {
     const measurementType = data.measurementId;
 
     items[measurementType] = {
@@ -41,7 +41,7 @@ export const formatChartItems = (
 
 export const getHistogramData = (
   rawData: number[],
-  numBins: number
+  numBins: number,
 ):
   | { data: number[]; xAxis: number[]; binSize: number; min: number }
   | undefined => {
@@ -80,7 +80,7 @@ export const selectTreeItemChildren = (
   updates: RecursivePartial<MeasurementOptions>,
   itemId: string,
   items: MeasurementOptions,
-  selectionState: "on" | "off"
+  selectionState: "on" | "off",
 ) => {
   const dataItem = items[itemId];
   if (dataItem) {
@@ -99,18 +99,18 @@ export const selectTreeItemChildren = (
 };
 
 export const prepareThingData = async (thingData: {
-  data: tf.Tensor4D;
+  data: Tensor4D;
   encodedMask?: number[];
   decodedMask?: DataArray;
 }) => {
-  let channelData: tf.Tensor2D;
+  let channelData: Tensor2D;
   let maskData: DataArray | undefined = undefined;
   let maskShape: { width: number; height: number } | undefined;
   if (thingData.decodedMask) {
     const fullChannelData = prepareChannels(thingData.data);
     channelData = await getObjectMaskData(
       fullChannelData,
-      thingData.decodedMask
+      thingData.decodedMask,
     );
     fullChannelData.dispose();
     maskData = thingData.decodedMask;

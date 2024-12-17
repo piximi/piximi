@@ -29,7 +29,7 @@ export const ClassifierOptimizerListItem = ({
     dispatch(
       classifierSlice.actions.updateLearningRate({
         learningRate: learningRate,
-      })
+      }),
     );
   };
 
@@ -38,12 +38,12 @@ export const ClassifierOptimizerListItem = ({
   };
 
   const dispatchOptimizationAlgorithmCallback = (
-    optimizationAlgorithm: OptimizationAlgorithm
+    optimizationAlgorithm: OptimizationAlgorithm,
   ) => {
     dispatch(
       classifierSlice.actions.updateOptimizationAlgorithm({
         optimizationAlgorithm: optimizationAlgorithm,
-      })
+      }),
     );
   };
 
@@ -51,7 +51,7 @@ export const ClassifierOptimizerListItem = ({
     dispatch(
       classifierSlice.actions.updateLossFunction({
         lossFunction: lossFunction,
-      })
+      }),
     );
   };
   return (

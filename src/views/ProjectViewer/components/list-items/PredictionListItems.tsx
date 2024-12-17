@@ -37,13 +37,13 @@ export const PredictionListItems = () => {
             Partition.Validation,
             Partition.Unassigned,
           ],
-        })
+        }),
       );
     } else {
       dispatch(
         projectSlice.actions.removeThingPartitionFilters({
           partitions: "all",
-        })
+        }),
       );
     }
     setLabeledImagesVisible((isShown) => !isShown);
@@ -53,8 +53,7 @@ export const PredictionListItems = () => {
     dispatch(
       dataSlice.actions.clearPredictions({
         kind: activeKind,
-        isPermanent: true,
-      })
+      }),
     );
 
     if (!labeledImagesVisible) {
@@ -63,32 +62,31 @@ export const PredictionListItems = () => {
       dispatch(
         projectSlice.actions.removeThingPartitionFilters({
           partitions: "all",
-        })
+        }),
       );
     }
 
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Trained,
-      })
+      }),
     );
   };
   const acceptPredictions = () => {
     dispatch(
       dataSlice.actions.acceptPredictions({
         kind: activeKind,
-        isPermanent: true,
-      })
+      }),
     );
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Trained,
-      })
+      }),
     );
     dispatch(
       projectSlice.actions.removeThingPartitionFilters({
         partitions: "all",
-      })
+      }),
     );
   };
 
@@ -96,7 +94,7 @@ export const PredictionListItems = () => {
     <>
       <CustomListItemButton
         primaryText={t(
-          `${labeledImagesVisible ? "Hide" : "Show"} labeled images`
+          `${labeledImagesVisible ? "Hide" : "Show"} labeled images`,
         )}
         onClick={toggleShowLabeledImages}
         icon={labeledImagesVisible ? <VisibilityOffIcon /> : <VisibilityIcon />}

@@ -1,8 +1,9 @@
 // TODO: post PR #407, get working for segmenter
+import { expect, it } from "vitest";
 import "@tensorflow/tfjs-node";
 import { preprocessSegmentationImages } from "../segmentation/FullyConvolutionalSegmenter/preprocessSegmenter";
 import { fileFromPath } from "utils/file-io/nodeImageHelper";
-import { generateUUID } from "utils/common/helpers";
+import { generateUUID } from "store/data/helpers";
 import {
   CropOptions,
   FitOptions,
@@ -108,7 +109,7 @@ it.skip("preprocessSegmenter", async () => {
       preIm.name,
       undefined,
       1,
-      imStack.length
+      imStack.length,
     );
 
     images.push({
@@ -122,7 +123,7 @@ it.skip("preprocessSegmenter", async () => {
     annotationCategories,
     inputShape,
     preprocessingOptions,
-    fitOptions
+    fitOptions,
   );
 
   // future warning: toArrayForTest is undocumented

@@ -1,7 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-// import { useLocation } from "react-router-dom";
-import StackTrace from "stacktrace-js";
+import { fromError } from "stacktrace-js";
 
 import {
   AppBar,
@@ -51,15 +50,15 @@ export const FallBackDialog = (props: any) => {
   const [expanded, setExpanded] = React.useState(false);
 
   const [stackTrace, setStackTrace] = React.useState<string | undefined>(
-    error.stack
+    error.stack,
   );
 
   React.useEffect(() => {
     if (error.stack) {
-      StackTrace.fromError(error)
+      fromError(error)
         .then((stacktrace) => {
           setStackTrace(
-            stacktrace.map((stackFrame) => stackFrame.toString()).join("\n")
+            stacktrace.map((stackFrame) => stackFrame.toString()).join("\n"),
           );
         })
         .catch((err) => console.error("could not resolve stacktrace", err));
@@ -68,7 +67,7 @@ export const FallBackDialog = (props: any) => {
 
   React.useEffect(() => {
     if (stackTrace) {
-      process.env.NODE_ENV !== "production" && console.error(stackTrace);
+      import.meta.env.NODE_ENV !== "production" && console.error(stackTrace);
     }
   }, [stackTrace]);
 
@@ -167,7 +166,7 @@ export const FallBackDialog = (props: any) => {
                 createGitHubIssue(
                   errorState.name,
                   issueDescription,
-                  AlertType.Error
+                  AlertType.Error,
                 )
               }
             >

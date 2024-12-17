@@ -1,139 +1,150 @@
-import * as T from "io-ts";
+import {
+  Integer as IOTSInteger,
+  string as IOTSString,
+  number as IOTSNumber,
+  type as IOTSType,
+  array as IOTSArray,
+  tuple as IOTSTuple,
+  union as IOTSUnion,
+  literal as IOTSLiteral,
+  boolean as IOTSBoolean,
+} from "io-ts";
 import { getOrElseW } from "fp-ts/Either";
 import { failure } from "io-ts/PathReporter";
 import { logger } from "utils/common/helpers";
 
 //#region COCO Serialization Type
 
-const SerializedCOCOInfoRtype = T.type({
-  year: T.Integer,
-  version: T.string,
-  description: T.string,
-  contributor: T.string,
-  url: T.string,
-  date_created: T.string,
+const SerializedCOCOInfoRtype = IOTSType({
+  year: IOTSInteger,
+  version: IOTSString,
+  description: IOTSString,
+  contributor: IOTSString,
+  url: IOTSString,
+  date_created: IOTSString,
 });
 
-export const SerializedCOCOImageRType = T.type({
-  id: T.Integer,
-  width: T.Integer,
-  height: T.Integer,
-  file_name: T.string,
-  license: T.Integer,
-  flickr_url: T.string,
-  coco_url: T.string,
-  date_captured: T.string,
+export const SerializedCOCOImageRType = IOTSType({
+  id: IOTSInteger,
+  width: IOTSInteger,
+  height: IOTSInteger,
+  file_name: IOTSString,
+  license: IOTSInteger,
+  flickr_url: IOTSString,
+  coco_url: IOTSString,
+  date_captured: IOTSString,
 });
 
-const SerializedCOCOLicenseRType = T.type({
-  id: T.Integer,
-  name: T.string,
-  url: T.string,
+const SerializedCOCOLicenseRType = IOTSType({
+  id: IOTSInteger,
+  name: IOTSString,
+  url: IOTSString,
 });
 
 // when iscrowd is true
-const SerializedCOCORLERType = T.type({
-  size: T.tuple([T.number, T.number]),
-  counts: T.array(T.Integer),
+const SerializedCOCORLERType = IOTSType({
+  size: IOTSTuple([IOTSNumber, IOTSNumber]),
+  counts: IOTSArray(IOTSInteger),
 });
 
 // when iscrowd is false
-const SerializedCOCOPolygonRType = T.array(T.array(T.number));
+const SerializedCOCOPolygonRType = IOTSArray(IOTSArray(IOTSNumber));
 
-export const SerializedCOCOAnnotationRType = T.type({
-  id: T.Integer,
-  image_id: T.Integer,
-  category_id: T.Integer,
-  segmentation: T.union([SerializedCOCOPolygonRType, SerializedCOCORLERType]),
-  area: T.number,
+export const SerializedCOCOAnnotationRType = IOTSType({
+  id: IOTSInteger,
+  image_id: IOTSInteger,
+  category_id: IOTSInteger,
+  segmentation: IOTSUnion([SerializedCOCOPolygonRType, SerializedCOCORLERType]),
+  area: IOTSNumber,
   // x, y, width, height
-  bbox: T.tuple([T.number, T.number, T.number, T.number]),
-  iscrowd: T.union([T.literal(0), T.literal(1)]),
+  bbox: IOTSTuple([IOTSNumber, IOTSNumber, IOTSNumber, IOTSNumber]),
+  iscrowd: IOTSUnion([IOTSLiteral(0), IOTSLiteral(1)]),
 });
 
-export const SerializedCOCOCategoryRType = T.type({
-  id: T.Integer,
-  name: T.string,
-  supercategory: T.string,
+export const SerializedCOCOCategoryRType = IOTSType({
+  id: IOTSInteger,
+  name: IOTSString,
+  supercategory: IOTSString,
 });
 
-export const SerializedCOCOFileRType = T.type({
+export const SerializedCOCOFileRType = IOTSType({
   info: SerializedCOCOInfoRtype,
-  images: T.array(SerializedCOCOImageRType),
-  annotations: T.array(SerializedCOCOAnnotationRType),
-  licenses: T.array(SerializedCOCOLicenseRType),
-  categories: T.array(SerializedCOCOCategoryRType),
+  images: IOTSArray(SerializedCOCOImageRType),
+  annotations: IOTSArray(SerializedCOCOAnnotationRType),
+  licenses: IOTSArray(SerializedCOCOLicenseRType),
+  categories: IOTSArray(SerializedCOCOCategoryRType),
 });
 
 //#endregion COCO Serialization Type
 
 //#region Basic Serialization Type
 
-const SerializedCategoryRType = T.type({
-  id: T.string,
-  color: T.string, // 3 byte hex, eg "#a08cd2"
-  name: T.string,
-  visible: T.boolean,
+const SerializedCategoryRType = IOTSType({
+  id: IOTSString,
+  color: IOTSString, // 3 byte hex, eg "#a08cd2"
+  name: IOTSString,
+  visible: IOTSBoolean,
 });
-const SerializedCategoryRTypeV02 = T.type({
-  id: T.string,
-  color: T.string, // 3 byte hex, eg "#a08cd2"
-  name: T.string,
-  visible: T.boolean,
-  containing: T.array(T.string),
-  kind: T.string,
+const SerializedCategoryRTypeV02 = IOTSType({
+  id: IOTSString,
+  color: IOTSString, // 3 byte hex, eg "#a08cd2"
+  name: IOTSString,
+  visible: IOTSBoolean,
+  containing: IOTSArray(IOTSString),
+  kind: IOTSString,
 });
-const SerializedKindRType = T.type({
-  id: T.string,
-  categories: T.array(T.string), // 3 byte hex, eg "#a08cd2"
-  unknownCategoryId: T.string,
-  containing: T.array(T.string),
-});
-
-export const SerializedImageRType = T.type({
-  id: T.string,
-  name: T.string,
+const SerializedKindRType = IOTSType({
+  id: IOTSString,
+  displayName: IOTSString,
+  categories: IOTSArray(IOTSString), // 3 byte hex, eg "#a08cd2"
+  unknownCategoryId: IOTSString,
+  containing: IOTSArray(IOTSString),
 });
 
-export const SerializedAnnotationRType = T.type({
-  categoryId: T.string, // category id, matching id of a SerializedCategory
-  imageId: T.string, // image id, matching id of SerializedImage
-  id: T.string,
-  mask: T.string, // e.g. "114 1 66 1 66 2 ..."
-  plane: T.number,
-  boundingBox: T.array(T.number), // [x1, y1, x2, y2]
+export const SerializedImageRType = IOTSType({
+  id: IOTSString,
+  name: IOTSString,
 });
 
-export const SerializedAnnotationRTypeV02 = T.type({
-  categoryId: T.string, // category id, matching id of a SerializedCategory
-  imageId: T.string, // image id, matching id of SerializedImage
-  name: T.string,
-  id: T.string,
-  mask: T.string, // e.g. "114 1 66 1 66 2 ..."
-  activePlane: T.number,
-  boundingBox: T.array(T.number), // [x1, y1, x2, y2]
-  kind: T.string,
-  partition: T.string,
-  shape: T.array(T.number),
+export const SerializedAnnotationRType = IOTSType({
+  categoryId: IOTSString, // category id, matching id of a SerializedCategory
+  imageId: IOTSString, // image id, matching id of SerializedImage
+  id: IOTSString,
+  mask: IOTSString, // e.g. "114 1 66 1 66 2 ..."
+  plane: IOTSNumber,
+  boundingBox: IOTSArray(IOTSNumber), // [x1, y1, x2, y2]
 });
 
-export const SerializedFileRType = T.type({
-  categories: T.array(SerializedCategoryRType),
-  annotations: T.array(SerializedAnnotationRType),
-  images: T.array(SerializedImageRType),
+export const SerializedAnnotationRTypeV02 = IOTSType({
+  categoryId: IOTSString, // category id, matching id of a SerializedCategory
+  imageId: IOTSString, // image id, matching id of SerializedImage
+  name: IOTSString,
+  id: IOTSString,
+  mask: IOTSString, // e.g. "114 1 66 1 66 2 ..."
+  activePlane: IOTSNumber,
+  boundingBox: IOTSArray(IOTSNumber), // [x1, y1, x2, y2]
+  kind: IOTSString,
+  partition: IOTSString,
+  shape: IOTSArray(IOTSNumber),
 });
-export const SerializedFileRTypeV02 = T.type({
-  categories: T.array(SerializedCategoryRTypeV02),
-  annotations: T.array(SerializedAnnotationRTypeV02),
-  images: T.array(SerializedImageRType),
-  kinds: T.array(SerializedKindRType),
-  version: T.string,
+
+export const SerializedFileRType = IOTSType({
+  categories: IOTSArray(SerializedCategoryRType),
+  annotations: IOTSArray(SerializedAnnotationRType),
+  images: IOTSArray(SerializedImageRType),
+});
+export const SerializedFileRTypeV02 = IOTSType({
+  categories: IOTSArray(SerializedCategoryRTypeV02),
+  annotations: IOTSArray(SerializedAnnotationRTypeV02),
+  images: IOTSArray(SerializedImageRType),
+  kinds: IOTSArray(SerializedKindRType),
+  version: IOTSString,
 });
 
 //#endregion Basic Serialization Type
 
 const toError = (errors: any) => {
-  process.env.NODE_ENV !== "production" && logger(errors);
+  import.meta.env.NODE_ENV !== "production" && logger(errors);
   throw new Error(failure(errors).join("\n"));
 };
 
@@ -144,7 +155,7 @@ export enum ProjectFileType {
 
 export const validateFileType = (
   encodedFileContents: string,
-  projectType: ProjectFileType = ProjectFileType.PIXIMI
+  projectType: ProjectFileType = ProjectFileType.PIXIMI,
 ) => {
   const annotations = JSON.parse(encodedFileContents);
   switch (projectType) {

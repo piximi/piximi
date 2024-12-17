@@ -1,4 +1,4 @@
-import * as React from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import {
   FormControl,
@@ -43,23 +43,21 @@ export const CustomNumberTextField = ({
   variant = "outlined",
   formControlProps,
 }: CustomNumberTextFieldProps) => {
-  const [valueString, setValueString] = React.useState<string>(
-    value.toString()
-  );
+  const [valueString, setValueString] = useState<string>(value.toString());
 
-  React.useEffect(() => {
+  useEffect(() => {
     setValueString(value.toString());
   }, [value]);
 
-  const [inputValue, setInputValue] = React.useState<number>(value);
+  const [inputValue, setInputValue] = useState<number>(value);
 
-  const [inputError, setInputError] = React.useState<boolean>(false);
+  const [inputError, setInputError] = useState<boolean>(false);
 
-  const [errorHelpText, setErrorHelpText] = React.useState<string>(" ");
+  const [errorHelpText, setErrorHelpText] = useState<string>(" ");
 
   const regExp = enableFloat ? floatRegExpr : intRegExpr;
 
-  const rangeHelperText = React.useMemo(() => {
+  const rangeHelperText = useMemo(() => {
     if (min !== Number.MIN_SAFE_INTEGER && max !== Number.MAX_SAFE_INTEGER) {
       return ` between ${min} and ${max}`;
     } else if (min !== Number.MIN_SAFE_INTEGER) {
@@ -70,7 +68,7 @@ export const CustomNumberTextField = ({
     return "";
   }, [max, min]);
 
-  const onInputChange = (event: React.FormEvent<EventTarget>) => {
+  const onInputChange = (event: FormEvent<EventTarget>) => {
     const target = event.target as HTMLInputElement;
     const inputString = target.value;
 
@@ -80,7 +78,7 @@ export const CustomNumberTextField = ({
       setErrorHelpText(
         `Must be a${
           enableFloat ? " floating point" : "n integer"
-        } ${rangeHelperText}`
+        } ${rangeHelperText}`,
       );
       setInputError(true);
       return;
@@ -92,7 +90,7 @@ export const CustomNumberTextField = ({
       setErrorHelpText(
         `Must be a${
           enableFloat ? " floating point" : "n integer"
-        } value${rangeHelperText}`
+        } value${rangeHelperText}`,
       );
       setInputError(true);
       return;

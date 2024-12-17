@@ -1,34 +1,50 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Divider, IconButton, List } from "@mui/material";
 import { Add } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 
-import { AppBarOffset } from "components/ui/AppBarOffset";
-import { DividerHeader, FunctionalDivider } from "components/ui/DividerHeader";
+import { AppBarOffset, DividerHeader, FunctionalDivider } from "components/ui";
 import { BaseAppDrawer } from "components/layout";
-import { ExportAnnotationsListItem } from "components/file-io";
 import { CreateKindDialog } from "components/dialogs";
-import { ImageViewerCategories } from "../../components";
+import {
+  ImageViewerCategories,
+  ExportAnnotationsListItem,
+} from "../../components";
 import { ImageViewerAppBar } from "../ImageViewerAppBar";
 import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
 import { ImageList } from "./ImageList";
 
 //import { selectCreatedAnnotationCategories } from "store/slices/data";
-import { selectImageViewerImages } from "store/imageViewer/reselectors";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import {
+  selectImagesArray,
+  selectKindsArray,
+} from "views/ImageViewer/state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
+import { Category, Kind } from "store/data/types";
 
 export const ImageViewerDrawer = () => {
-  // const createdCategories = useSelector(selectCreatedAnnotationCategories);
-
-  const imageViewerImages = useSelector(selectImageViewerImages);
+  const dispatch = useDispatch();
+  const imageViewerImages = useSelector(selectImagesArray);
+  const kinds = useSelector(selectKindsArray);
+  const existingKindIds = useMemo(() => kinds.map((kind) => kind.id), [kinds]);
   const {
     onClose: handleCloseCreateKindDialog,
     onOpen: handleOpenCreateKindDialog,
     open: isCreateKindDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
+
+  const addKind = (kind: Kind, newUnknownCategory: Category) => {
+    dispatch(
+      annotatorSlice.actions.addKind({
+        kind,
+        unknownCategory: newUnknownCategory,
+      }),
+    );
+  };
 
   return (
     <>
@@ -60,6 +76,7 @@ export const ImageViewerDrawer = () => {
               <Add fontSize="small" />
             </IconButton>
           }
+          containerStyle={{ marginTop: 1, marginBottom: 0 }}
         />
 
         <ImageViewerCategories />
@@ -71,6 +88,8 @@ export const ImageViewerDrawer = () => {
       <CreateKindDialog
         onClose={handleCloseCreateKindDialog}
         open={isCreateKindDialogOpen}
+        storeDispatch={addKind}
+        existingKinds={existingKindIds}
       />
     </>
   );

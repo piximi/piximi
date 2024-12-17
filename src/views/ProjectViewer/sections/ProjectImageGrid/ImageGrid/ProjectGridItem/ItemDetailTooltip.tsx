@@ -15,7 +15,7 @@ export const ItemDetailTooltip = ({
       title={contents}
       placement="right"
       arrow
-      componentsProps={{
+      slotProps={{
         tooltip: {
           sx: {
             borderRadius: 2,

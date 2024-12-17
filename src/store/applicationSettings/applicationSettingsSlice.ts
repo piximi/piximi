@@ -31,11 +31,11 @@ export const applicationSettingsSlice = createSlice({
     initialized(state: AppSettingsState) {
       state.init = true;
     },
-    resetApplicationSettingsSetings(state: AppSettingsState) {
+    resetApplicationSettingsSetings(_state: AppSettingsState) {
       return initialState;
     },
 
-    hideAlertState(state, action: PayloadAction<{}>) {
+    hideAlertState(state) {
       state.alertState.visible = false;
     },
 
@@ -44,19 +44,19 @@ export const applicationSettingsSlice = createSlice({
     },
     setImageSelectionColor(
       state: AppSettingsState,
-      action: PayloadAction<{ selectionColor: string }>
+      action: PayloadAction<{ selectionColor: string }>,
     ) {
       state.imageSelectionColor = action.payload.selectionColor;
     },
     setSelectedImageBorderWidth(
       state: AppSettingsState,
-      action: PayloadAction<{ selectionSize: number }>
+      action: PayloadAction<{ selectionSize: number }>,
     ) {
       state.selectedImageBorderWidth = action.payload.selectionSize;
     },
     setThemeMode(
       state: AppSettingsState,
-      action: PayloadAction<{ mode: ThemeMode }>
+      action: PayloadAction<{ mode: ThemeMode }>,
     ) {
       state.themeMode = action.payload.mode;
     },
@@ -65,13 +65,13 @@ export const applicationSettingsSlice = createSlice({
     },
     registerHotkeyContext(
       state,
-      action: PayloadAction<{ context: HotkeyContext }>
+      action: PayloadAction<{ context: HotkeyContext }>,
     ) {
       state.hotkeyStack.push(action.payload.context);
     },
     unregisterHotkeyContext(
       state,
-      action: PayloadAction<{ context: HotkeyContext }>
+      action: PayloadAction<{ context: HotkeyContext }>,
     ) {
       if (
         state.hotkeyStack[state.hotkeyStack.length - 1] ===
@@ -88,19 +88,19 @@ export const applicationSettingsSlice = createSlice({
     },
     updateTileSize(
       state: AppSettingsState,
-      action: PayloadAction<{ newValue: number }>
+      action: PayloadAction<{ newValue: number }>,
     ) {
       state.tileSize = action.payload.newValue!;
     },
     setTextOnScroll(
       state: AppSettingsState,
-      action: PayloadAction<{ textOnScroll: boolean }>
+      action: PayloadAction<{ textOnScroll: boolean }>,
     ) {
       state.textOnScroll = action.payload.textOnScroll;
     },
     setLoadPercent(
       state,
-      action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>
+      action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>,
     ) {
       const { loadPercent, loadMessage } = action.payload;
 
@@ -119,11 +119,12 @@ export const applicationSettingsSlice = createSlice({
       }
     },
     sendLoadPercent(
-      state,
-      action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>
+      _state,
+      _action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>,
     ) {},
     setLoadMessage(state, action: PayloadAction<{ message: string }>) {
       state.loadMessage = action.payload.message;
     },
+    resetApplicationState() {},
   },
 });

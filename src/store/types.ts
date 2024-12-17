@@ -1,11 +1,12 @@
 import { History } from "@tensorflow/tfjs";
-import { AnyAction, Dispatch, TypedStartListening } from "@reduxjs/toolkit";
-
 import {
-  AnnotationMode,
-  AnnotationState,
-  ToolType,
-} from "utils/annotator/enums";
+  Dispatch,
+  EntityState,
+  ListenerEffectAPI,
+  TypedStartListening,
+  UnknownAction,
+} from "@reduxjs/toolkit";
+
 import { HotkeyContext, Languages, ThingSortKey } from "utils/common/enums";
 import { ThemeMode } from "themes/enums";
 import {
@@ -15,7 +16,6 @@ import {
   OptimizationAlgorithm,
 } from "utils/models/enums";
 
-import { DeferredEntityState } from "./entities";
 import { AlertState, FilterType } from "utils/common/types";
 import {
   ClassifierEvaluationResultType,
@@ -25,19 +25,42 @@ import {
   SegmenterEvaluationResultType,
 } from "utils/models/types";
 import {
-  ColorAdjustmentOptionsType,
-  ZoomToolOptionsType,
-} from "utils/annotator/types";
-import {
   Kind,
   AnnotationObject,
   Category,
-  DecodedAnnotationObject,
   ImageObject,
   Shape,
   Thing,
 } from "./data/types";
 import { MeasurementsState } from "./measurements/types";
+import {
+  AnnotatorState,
+  ImageViewerState,
+} from "views/ImageViewer/utils/types";
+
+export type AppSettingsState = {
+  // async work for setting initial states,
+  // for all store slices,
+  // should be completed before this flag is set to true
+  init: boolean;
+  tileSize: number;
+  themeMode: ThemeMode;
+  imageSelectionColor: string;
+  selectedImageBorderWidth: number;
+  alertState: AlertState;
+  hotkeyStack: HotkeyContext[];
+  language: Languages;
+  soundEnabled: boolean;
+  textOnScroll: boolean;
+  loadPercent: number;
+  loadMessage: string;
+};
+
+export type DataState = {
+  kinds: EntityState<Kind, string>;
+  categories: EntityState<Category, string>;
+  things: EntityState<AnnotationObject | ImageObject, string>;
+};
 
 export type SegmenterState = {
   // pre-fit state
@@ -53,61 +76,6 @@ export type SegmenterState = {
   evaluationResult: SegmenterEvaluationResultType;
 
   modelStatus: ModelStatus;
-};
-
-export type ProjectState = {
-  name: string;
-
-  selectedThingIds: Array<string>;
-  sortType: ThingSortKey;
-  thingFilters: Record<
-    string, // kind
-    Required<Pick<FilterType<Thing>, "categoryId" | "partition">>
-  >;
-  highlightedCategory: string | undefined;
-  activeKind: string;
-  kindTabFilters: string[];
-  imageChannels: number | undefined;
-};
-
-export type ImageViewerState = {
-  imageStack: string[];
-  hasUnsavedChanges: boolean;
-  colorAdjustment: ColorAdjustmentOptionsType;
-  cursor: string;
-  activeImageId?: string;
-  activeAnnotationIds: Array<string>;
-  previousImageId?: string;
-  filters: Required<Pick<FilterType<AnnotationObject>, "categoryId">>;
-  activeImageRenderedSrcs: Array<string>;
-  imageOrigin: { x: number; y: number };
-  workingAnnotationId: string | undefined;
-  workingAnnotation: {
-    saved: DecodedAnnotationObject | undefined;
-    changes: Partial<DecodedAnnotationObject>;
-  };
-  selectedAnnotationIds: Array<string>;
-  selectedCategoryId: string;
-  stageHeight: number;
-  stageScale: number;
-  stageWidth: number;
-  stagePosition: { x: number; y: number };
-  zoomSelection: {
-    dragging: boolean;
-    minimum: { x: number; y: number } | undefined;
-    maximum: { x: number; y: number } | undefined;
-    selecting: boolean;
-    centerPoint: { x: number; y: number } | undefined;
-  };
-  zoomOptions: ZoomToolOptionsType;
-  imageIsLoading: boolean;
-  highlightedCategory?: string;
-};
-
-export type DataState = {
-  kinds: DeferredEntityState<Kind>;
-  categories: DeferredEntityState<Category>;
-  things: DeferredEntityState<AnnotationObject | ImageObject>;
 };
 
 export type ClassifierState = {
@@ -130,34 +98,22 @@ export type ClassifierState = {
   showClearPredictionsWarning: boolean;
 };
 
-export type AppSettingsState = {
-  // async work for setting initial states,
-  // for all store slices,
-  // should be completed before this flag is set to true
-  init: boolean;
-  tileSize: number;
-  themeMode: ThemeMode;
-  imageSelectionColor: string;
-  selectedImageBorderWidth: number;
-  alertState: AlertState;
-  hotkeyStack: HotkeyContext[];
-  language: Languages;
-  soundEnabled: boolean;
-  textOnScroll: boolean;
-  loadPercent: number;
-  loadMessage: string;
+export type ProjectState = {
+  name: string;
+
+  selectedThingIds: Array<string>;
+  sortType: ThingSortKey;
+  thingFilters: Record<
+    string, // kind
+    Required<Pick<FilterType<Thing>, "categoryId" | "partition">>
+  >;
+  highlightedCategory: string | undefined;
+  activeKind: string;
+  kindTabFilters: string[];
+  imageChannels: number | undefined;
 };
 
-export type AnnotatorState = {
-  annotationState: AnnotationState;
-  penSelectionBrushSize: number;
-  quickSelectionRegionSize: number;
-  thresholdAnnotationValue: number;
-  selectionMode: AnnotationMode;
-  toolType: ToolType;
-};
-
-type AppState = {
+export type AppState = {
   classifier: ClassifierState;
   segmenter: SegmenterState;
   imageViewer: ImageViewerState;
@@ -168,6 +124,20 @@ type AppState = {
   measurements: MeasurementsState;
 };
 
-export type AppDispatch = Dispatch<AnyAction>;
+export type AppDispatch = Dispatch<UnknownAction>;
 
 export type TypedAppStartListening = TypedStartListening<AppState, AppDispatch>;
+
+export type StoreListemerAPI = ListenerEffectAPI<
+  {
+    classifier: ClassifierState;
+    segmenter: SegmenterState;
+    imageViewer: ImageViewerState;
+    project: ProjectState;
+    applicationSettings: AppSettingsState;
+    annotator: AnnotatorState;
+    data: DataState;
+  },
+  AppDispatch,
+  unknown
+>;

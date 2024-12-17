@@ -10,15 +10,15 @@ export const serializePiximiAnnotations = (
   images: Array<ImageObject>,
   annotations: Array<AnnotationObject>,
   categories: Array<Category>,
-  kinds: Array<Kind>
+  kinds: Array<Kind>,
 ) => {
-  const piximiVersion = process.env.REACT_APP_VERSION;
+  const piximiVersion = import.meta.env.VITE_APP_VERSION;
 
   const serializedImages = images.map((im) => ({ id: im.id, name: im.name }));
 
   /*
     serializedCategories and serializedKinds are mapped to make sure serialization remains consitent even if data structure changes.
-    If serialization needs to change, update REACT_APP_VERSION
+    If serialization needs to change, update VITE_APP_VERSION
   */
   const serializedCategories = categories.map((cat) => ({
     id: cat.id,
@@ -31,6 +31,7 @@ export const serializePiximiAnnotations = (
 
   const serializedKinds = kinds.map((kind) => ({
     id: kind.id,
+    displayName: kind.displayName,
     containing: kind.containing,
     categories: kind.categories,
     unknownCategoryId: kind.unknownCategoryId,

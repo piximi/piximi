@@ -41,7 +41,6 @@ import { ImageCategoryMenu } from "./ImageCategoryMenu";
 
 import { projectSlice } from "store/project";
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
 import { selectActiveKindId, selectProjectName } from "store/project/selectors";
 
@@ -52,7 +51,8 @@ import {
   selectLoadMessage,
 } from "store/applicationSettings/selectors";
 
-import { isUnknownCategory, pluralize } from "utils/common/helpers";
+import { pluralize } from "utils/common/helpers";
+import { isUnknownCategory } from "store/data/helpers";
 
 import { HotkeyContext } from "utils/common/enums";
 import { Partition } from "utils/models/enums";
@@ -87,19 +87,16 @@ export const ProjectAppBar = () => {
       dataSlice.actions.deleteThings({
         thingIds: unfilteredSelectedThings,
         disposeColorTensors: true,
-        isPermanent: true,
-      })
+      }),
     );
   };
 
   const handleNavigateImageViewer = () => {
-    dispatch(
-      imageViewerSlice.actions.prepareImageViewer({
-        selectedThingIds: allSelectedThingIds,
-      })
-    );
-
-    navigate("/imageviewer");
+    navigate("/imageviewer", {
+      state: {
+        initialThingIds: allSelectedThingIds,
+      },
+    });
   };
 
   const handleNavigateMeasurements = () => {
@@ -112,7 +109,7 @@ export const ProjectAppBar = () => {
       unfilteredSelectedThings.length > 0 && handleDeselectAll();
     },
     HotkeyContext.ProjectView,
-    [handleDeselectAll, unfilteredSelectedThings]
+    [handleDeselectAll, unfilteredSelectedThings],
   );
   useHotkeys(
     "delete, backspace",
@@ -120,13 +117,13 @@ export const ProjectAppBar = () => {
       unfilteredSelectedThings.length > 0 && onOpenDeleteImagesDialog();
     },
     HotkeyContext.ProjectView,
-    [unfilteredSelectedThings]
+    [unfilteredSelectedThings],
   );
   useHotkeys(
     "control+a",
     () => !allSelected && handleSelectAll(),
     HotkeyContext.ProjectView,
-    [handleSelectAll]
+    [handleSelectAll],
   );
 
   return (
@@ -238,7 +235,7 @@ export const ProjectAppBar = () => {
       <ConfirmationDialog
         title={`Delete ${pluralize(
           "Object",
-          unfilteredSelectedThings.length
+          unfilteredSelectedThings.length,
         )}?`}
         content={`Objects will be deleted from the project. ${
           activeKind === "Image"
@@ -263,7 +260,7 @@ const ZoomControl = () => {
     dispatch(
       applicationSettingsSlice.actions.updateTileSize({
         newValue: newValue as number,
-      })
+      }),
     );
   };
 
@@ -273,7 +270,7 @@ const ZoomControl = () => {
     dispatch(
       applicationSettingsSlice.actions.updateTileSize({
         newValue: newValue as number,
-      })
+      }),
     );
   };
 
@@ -283,7 +280,7 @@ const ZoomControl = () => {
     dispatch(
       applicationSettingsSlice.actions.updateTileSize({
         newValue: newValue as number,
-      })
+      }),
     );
   };
 
@@ -338,8 +335,7 @@ const CategorizeChip = ({
     dispatch(
       dataSlice.actions.updateThings({
         updates,
-        isPermanent: true,
-      })
+      }),
     );
   };
   return (
@@ -389,13 +385,13 @@ const ProjectTextField = () => {
   };
 
   const handleTextFieldChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setNewProjectName(event.target.value);
   };
 
   const handleTextFieldEnter = (
-    event: React.KeyboardEvent<HTMLInputElement>
+    event: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     if (event.key === "Enter") {
       inputRef.current?.blur();

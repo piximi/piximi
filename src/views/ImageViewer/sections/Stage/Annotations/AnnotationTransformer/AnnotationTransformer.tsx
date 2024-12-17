@@ -1,33 +1,35 @@
 import { useContext, useLayoutEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
-import * as ReactKonva from "react-konva";
+import {
+  Group as KonvaGroup,
+  Label as KonvaLabel,
+  Tag as KonvaTag,
+  Text as KonvaText,
+  Transformer as KonvaTransformer,
+} from "react-konva";
 import useSound from "use-sound";
 
 import { useHotkeys } from "hooks";
 
-import { StageContext } from "contexts";
-import { imageViewerSlice } from "store/imageViewer";
-import { annotatorSlice } from "store/annotator";
-import { dataSlice } from "store/data";
+import { StageContext } from "views/ImageViewer/state/StageContext";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
-  selectActiveImage,
-  selectSelectedAnnotations,
-} from "store/imageViewer/reselectors";
-import {
-  selectActiveAnnotationIds,
-  selectActiveImageId,
   selectCursor,
   selectImageOrigin,
-  selectWorkingAnnotation,
-} from "store/imageViewer/selectors";
+} from "views/ImageViewer/state/imageViewer/selectors";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
+import { selectWorkingAnnotationEntity } from "views/ImageViewer/state/annotator/selectors";
+import {
+  selectSelectedAnnotations,
+  selectActiveImage,
+} from "views/ImageViewer/state/annotator/reselectors";
 
-import { AnnotationTool } from "utils/annotator/tools";
+import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
-import { getCompleteEntity } from "store/entities/utils";
+import { getCompleteEntity } from "utils/common/helpers";
 
-import { AnnotationMode } from "utils/annotator/enums";
+import { AnnotationMode } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/common/enums";
 
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
@@ -58,13 +60,11 @@ export const AnnotationTransformer = ({
   const [xPos, setXPos] = useState<number>(0);
   const [yPos, setYPos] = useState<number>(0);
 
-  const activeAnnotationIds = useSelector(selectActiveAnnotationIds);
-  const workingAnnotation = useSelector(selectWorkingAnnotation);
+  const activeImage = useSelector(selectActiveImage)!;
+  const workingAnnotation = useSelector(selectWorkingAnnotationEntity);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
-  const activeImageId = useSelector(selectActiveImageId);
   const cursor = useSelector(selectCursor);
   const soundEnabled = useSelector(selectSoundEnabled);
-  const activeImage = useSelector(selectActiveImage);
   const imageOrigin = useSelector(selectImageOrigin);
 
   const trRef = useRef<Konva.Transformer | null>(null);
@@ -75,95 +75,85 @@ export const AnnotationTransformer = ({
   const dispatch = useDispatch();
 
   const [playCreateAnnotationSoundEffect] = useSound(
-    createAnnotationSoundEffect
+    createAnnotationSoundEffect,
   );
   const [playDeleteAnnotationSoundEffect] = useSound(
-    deleteAnnotationSoundEffect
+    deleteAnnotationSoundEffect,
   );
 
   const clearAnnotation = () => {
     annotationTool.deselect();
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.setWorkingAnnotation({
+        annotatorSlice.actions.setWorkingAnnotation({
           annotation: undefined,
-        })
+        }),
       );
       dispatch(
-        annotatorSlice.actions.setSelectionMode({
-          selectionMode: AnnotationMode.New,
-        })
+        annotatorSlice.actions.setAnnotationMode({
+          annotationMode: AnnotationMode.New,
+        }),
       );
 
       dispatch(
-        imageViewerSlice.actions.setSelectedAnnotationIds({
+        annotatorSlice.actions.setSelectedAnnotationIds({
           annotationIds: [],
           workingAnnotationId: undefined,
-        })
+        }),
       );
     });
   };
 
   const handleConfirmOrDeleteAnnotation = (
-    event?: Konva.KonvaEventObject<Event>
+    _event?: Konva.KonvaEventObject<Event>,
   ) => {
-    if (!activeImageId) return;
+    if (!activeImage) return;
     const container = stageRef!.current!.container();
     container.style.cursor = cursor;
 
     trRef.current!.detach();
     trRef.current!.getLayer()?.batchDraw();
 
-    if (activeAnnotationIds.includes(annotationId)) {
+    if (activeImage.containing.includes(annotationId)) {
       if (Object.keys(workingAnnotation.changes).length === 0) {
-        batch(() => {
-          dispatch(
-            imageViewerSlice.actions.removeActiveAnnotationIds({
-              annotationIds: selectedAnnotations.map(
-                (annotation) => annotation.id
-              ),
-            })
-          );
-          dispatch(
-            dataSlice.actions.deleteThings({
-              thingIds: selectedAnnotations.map((annotation) => annotation.id),
-              disposeColorTensors: false,
-            })
-          );
-        });
+        dispatch(
+          annotatorSlice.actions.deleteThings({
+            things: selectedAnnotations,
+          }),
+        );
       } else {
         dispatch(
-          dataSlice.actions.updateThings({
+          annotatorSlice.actions.editThings({
             updates: [{ id: annotationId, ...workingAnnotation.changes }],
-          })
+          }),
         );
       }
       if (soundEnabled) playDeleteAnnotationSoundEffect();
     } else {
       const completeWorkingAnnotation = getCompleteEntity(workingAnnotation)!;
       dispatch(
-        dataSlice.actions.addAnnotations({
-          annotations: [completeWorkingAnnotation],
-        })
+        annotatorSlice.actions.addThing({
+          thing: completeWorkingAnnotation,
+        }),
       );
       if (soundEnabled) playCreateAnnotationSoundEffect();
     }
     clearAnnotation();
   };
 
-  const cancelAnnotationHandler = (event?: Konva.KonvaEventObject<Event>) => {
+  const cancelAnnotationHandler = (_event?: Konva.KonvaEventObject<Event>) => {
     const container = stageRef!.current!.container();
     container.style.cursor = cursor;
     clearAnnotation();
     if (soundEnabled) playDeleteAnnotationSoundEffect();
   };
 
-  const handleMouseEnter = (event: Konva.KonvaEventObject<MouseEvent>) => {
+  const handleMouseEnter = () => {
     const container = stageRef!.current!.container();
     container.style.cursor = "pointer";
   };
 
-  const handleMouseLeave = (event: Konva.KonvaEventObject<MouseEvent>) => {
+  const handleMouseLeave = () => {
     const container = stageRef!.current!.container();
     container.style.cursor = cursor;
   };
@@ -180,13 +170,13 @@ export const AnnotationTransformer = ({
         const newX =
           Math.max(
             fullWorkingAnnotation.boundingBox[0],
-            fullWorkingAnnotation.boundingBox[2]
+            fullWorkingAnnotation.boundingBox[2],
           ) + imageOrigin.x;
         setXPos(newX);
 
         const yMax = Math.max(
           fullWorkingAnnotation.boundingBox[1],
-          fullWorkingAnnotation.boundingBox[3]
+          fullWorkingAnnotation.boundingBox[3],
         );
         const newY =
           yMax + 56 > imageHeight!
@@ -207,7 +197,7 @@ export const AnnotationTransformer = ({
     if (!stageRef || !stageRef.current) return;
     const transformerId = "tr-".concat(annotationId);
     const transformer: Konva.Transformer | undefined = stageRef.current.findOne(
-      `#${transformerId}`
+      `#${transformerId}`,
     ) as Konva.Transformer;
     const line = stageRef.current.findOne(`#${annotationId}`);
     if (!line || !transformer) return;
@@ -240,7 +230,7 @@ export const AnnotationTransformer = ({
       }
     },
     HotkeyContext.AnnotatorView,
-    [workingAnnotation.saved]
+    [workingAnnotation.saved],
   );
   useHotkeys(
     "esc",
@@ -252,12 +242,12 @@ export const AnnotationTransformer = ({
       }
     },
     HotkeyContext.AnnotatorView,
-    [workingAnnotation.saved]
+    [workingAnnotation.saved],
   );
 
   return (
-    <ReactKonva.Group>
-      <ReactKonva.Transformer
+    <KonvaGroup>
+      <KonvaTransformer
         id={"tr-".concat(annotationId)}
         ref={trRef}
         rotateEnabled={false}
@@ -266,79 +256,88 @@ export const AnnotationTransformer = ({
         borderStroke="white" //TODO: It would be pretty cool if the border color could set depending on the primary color of the underlying image for contrast
       />
       {hasControl && (
-        <ReactKonva.Group
+        <KonvaGroup
           id={"label-group"}
           position={{ x: xPos, y: yPos }}
           scaleX={1 / (stageRef?.current?.scaleX() ?? 1)}
           scaleY={1 / (stageRef?.current?.scaleX() ?? 1)}
         >
-          <ReactKonva.Label
-            position={{
-              x: labelPosition.x,
-              y: labelPosition.y1,
-            }}
-            onClick={handleConfirmOrDeleteAnnotation}
-            onTap={handleConfirmOrDeleteAnnotation}
-            id={"label"}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <ReactKonva.Tag
-              cornerRadius={3}
-              fill={"darkgreen"}
-              lineJoin={"round"}
-              shadowColor={"black"}
-              shadowBlur={10}
-              shadowOffset={{ x: 5, y: 5 }}
-            />
-            <ReactKonva.Text
-              fill={"white"}
-              fontSize={14}
-              padding={6}
-              text={
-                activeAnnotationIds.includes(annotationId) &&
-                Object.keys(workingAnnotation.changes).length === 0
-                  ? "Delete"
-                  : "Confirm"
-              }
-              width={buttonWidth}
-              height={buttonHeight}
-              align={"center"}
-              name={"transformer-button"}
-            />
-          </ReactKonva.Label>
-          <ReactKonva.Label
-            position={{
-              x: labelPosition.x,
-              y: labelPosition.y2,
-            }}
-            onClick={cancelAnnotationHandler}
-            onTap={cancelAnnotationHandler}
-            id={"label"}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <ReactKonva.Tag
-              cornerRadius={3}
-              fill={"darkred"}
-              lineJoin={"round"}
-              shadowColor={"black"}
-              shadowBlur={10}
-              shadowOffset={{ x: 5, y: 5 }}
-            />
-            <ReactKonva.Text
-              fill={"white"}
-              fontSize={14}
-              padding={6}
-              text={"Cancel"}
-              width={buttonWidth}
-              height={buttonHeight}
-              align={"center"}
-              name={"transformer-button"}
-            />
-          </ReactKonva.Label>
-        </ReactKonva.Group>
+          <KonvaButton
+            xPosition={labelPosition.x}
+            yPosition={labelPosition.y1}
+            handleConfirmOrDeleteAnnotation={handleConfirmOrDeleteAnnotation}
+            handleMouseEnter={handleMouseEnter}
+            handleMouseLeave={handleMouseLeave}
+            text={
+              activeImage.containing.includes(annotationId) &&
+              Object.keys(workingAnnotation.changes).length === 0
+                ? "Delete"
+                : "Confirm"
+            }
+            fillColor={"darkgreen"}
+          />
+          <KonvaButton
+            xPosition={labelPosition.x}
+            yPosition={labelPosition.y2}
+            handleConfirmOrDeleteAnnotation={cancelAnnotationHandler}
+            handleMouseEnter={handleMouseEnter}
+            handleMouseLeave={handleMouseLeave}
+            text={"Cancel"}
+            fillColor={"darkred"}
+          />
+        </KonvaGroup>
       )}
-    </ReactKonva.Group>
+    </KonvaGroup>
+  );
+};
+
+const KonvaButton = ({
+  xPosition,
+  yPosition,
+  handleConfirmOrDeleteAnnotation,
+  handleMouseEnter,
+  handleMouseLeave,
+  text,
+  fillColor,
+}: {
+  xPosition: number;
+  yPosition: number;
+  handleConfirmOrDeleteAnnotation: () => void;
+  handleMouseEnter: () => void;
+  handleMouseLeave: () => void;
+  text: string;
+  fillColor: string;
+}) => {
+  return (
+    <KonvaLabel
+      position={{
+        x: xPosition,
+        y: yPosition,
+      }}
+      onClick={handleConfirmOrDeleteAnnotation}
+      onTap={handleConfirmOrDeleteAnnotation}
+      id={"label"}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <KonvaTag
+        cornerRadius={3}
+        fill={fillColor}
+        lineJoin={"round"}
+        shadowColor={"black"}
+        shadowBlur={10}
+        shadowOffset={{ x: 5, y: 5 }}
+      />
+      <KonvaText
+        fill={"white"}
+        fontSize={14}
+        padding={6}
+        text={text}
+        width={buttonWidth}
+        height={buttonHeight}
+        align={"center"}
+        name={"transformer-button"}
+      />
+    </KonvaLabel>
   );
 };

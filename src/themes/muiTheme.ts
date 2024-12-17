@@ -17,6 +17,18 @@ export const lightTheme = createTheme({
       defaultProps: {
         disableRipple: true,
       },
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+        },
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+        },
+      },
     },
     MuiListItemIcon: {
       styleOverrides: {
@@ -33,6 +45,18 @@ export const darkTheme = createTheme({
     MuiButtonBase: {
       defaultProps: {
         disableRipple: true,
+      },
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+        },
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+        },
       },
     },
     MuiDialog: {
@@ -88,6 +112,9 @@ export const darkTheme = createTheme({
   },
   palette: {
     contrastThreshold: 4.5, // contrast ration needs to be 4.5:1 for accessibility
+    action: {
+      active: "rgba(200, 200, 200)",
+    },
     background: {
       paper: "rgba(40, 40, 40)",
       default: "rgba(50, 50, 50)",

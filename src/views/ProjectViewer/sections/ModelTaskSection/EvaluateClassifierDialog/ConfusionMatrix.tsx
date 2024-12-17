@@ -8,12 +8,12 @@ const getHeatMapData = (confusionMatrix: number[][], classNames: string[]) => {
   const data = [];
 
   const numberOfClasses = classNames.length;
-  for (var i = 0; i < numberOfClasses; i++) {
+  for (let i = 0; i < numberOfClasses; i++) {
     const datum: { id: string; data: { x: string; y: number }[] } = {
       id: classNames[i],
       data: [],
     };
-    for (var j = 0; j < numberOfClasses; j++) {
+    for (let j = 0; j < numberOfClasses; j++) {
       const datumEntry = { x: classNames[j], y: confusionMatrix[i][j] };
       datum.data.push(datumEntry);
     }
@@ -81,7 +81,7 @@ export const ConfusionMatrix = ({
         }}
         animate={false}
         emptyColor="#555555"
-        tooltip={(x, y) => <div></div>}
+        tooltip={(_x, _y) => <div></div>}
       />
     </div>
   );

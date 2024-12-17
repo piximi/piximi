@@ -11,7 +11,7 @@ import {
 } from "@tensorflow/tfjs";
 import { intersection } from "lodash";
 import { MeasurementOption } from "store/measurements/types";
-import { findContours } from "utils/annotator";
+import { findContours } from "views/ImageViewer/utils";
 import { DataArray } from "utils/file-io/types";
 
 //TODO: Write tests
@@ -26,7 +26,7 @@ export const sortTensor = (tensor: Tensor1D): Tensor1D => {
 
 export const getTensorMedian = (
   tensor: Tensor1D,
-  sorted?: boolean
+  sorted?: boolean,
 ): Tensor1D => {
   return tidy(() => {
     if (!sorted) tensor = sortTensor(tensor);
@@ -44,7 +44,7 @@ export const getTensorMedian = (
 export const getTensorPercentile = (
   tensor: Tensor1D,
   percentile: number,
-  sorted?: boolean
+  sorted?: boolean,
 ): Tensor1D => {
   return tidy(() => {
     if (!sorted) tensor = sortTensor(tensor);
@@ -88,7 +88,7 @@ export const prepareChannels = (thingData: Tensor4D) => {
 };
 export const getIntensityMeasurement = (
   channelTensor: Tensor1D,
-  measurement: string
+  measurement: string,
 ) => {
   const sortedChannelTensor = sortTensor(channelTensor);
 
@@ -174,7 +174,7 @@ export const getIntensityMeasurement = (
 
 export const getObjectMaskData = async (
   channelData: Tensor2D,
-  objectMask: DataArray
+  objectMask: DataArray,
 ) => {
   const maskArray = Array.from(objectMask);
   const maskTensor = tensor1d(maskArray, "bool");
@@ -186,7 +186,7 @@ export const getObjectMaskData = async (
 
 export const getPerimeterFromMask = (
   mask: DataArray,
-  maskShape: { width: number; height: number }
+  maskShape: { width: number; height: number },
 ) => {
   const nMask: number[] = [];
   Array.from(mask).forEach((i) => {
@@ -195,7 +195,7 @@ export const getPerimeterFromMask = (
   const contourArray = findContours(
     Int8Array.from(nMask),
     maskShape.width,
-    maskShape.height
+    maskShape.height,
   );
   return contourArray.reduce((perimeter: number, contour) => {
     return (
@@ -208,10 +208,10 @@ export const getPerimeterFromMask = (
 export const getPerimeter = (vertices: Array<Array<number>>) => {
   let total = 0;
   for (let i = 0; i < vertices.length; i++) {
-    let fromX = vertices[i][0];
-    let fromY = vertices[i][1];
-    let toX = vertices[i === vertices.length - 1 ? 0 : i + 1][0];
-    let toY = vertices[i === vertices.length - 1 ? 0 : i + 1][1];
+    const fromX = vertices[i][0];
+    const fromY = vertices[i][1];
+    const toX = vertices[i === vertices.length - 1 ? 0 : i + 1][0];
+    const toY = vertices[i === vertices.length - 1 ? 0 : i + 1][1];
     total += Math.sqrt((toX - fromX) ** 2 + (toY - fromY) ** 2);
   }
   return total;
@@ -226,7 +226,7 @@ export const getPEQPC = (area: number) => {
 export const getObjectFormFactor = (
   area: number,
   maskData: DataArray,
-  maskShape: { width: number; height: number }
+  maskShape: { width: number; height: number },
 ) => {
   const peqpc = getPEQPC(area);
 
@@ -237,7 +237,7 @@ export const getObjectFormFactor = (
 
 export const getPE = (
   mask: DataArray,
-  maskShape: { width: number; height: number }
+  maskShape: { width: number; height: number },
 ) => {
   const perimeter = getPerimeterFromMask(mask, maskShape);
   return perimeter / Math.PI;
@@ -245,12 +245,12 @@ export const getPE = (
 
 export const findSelected = (
   parents: MeasurementOption[],
-  selectedMeasurements: string[]
+  selectedMeasurements: string[],
 ) => {
   parents.forEach((parent) => {
     const containedChildren = intersection(
       parent.children!,
-      selectedMeasurements
+      selectedMeasurements,
     );
     if (
       containedChildren.length === parent.children!.length &&

@@ -13,7 +13,7 @@ import {
   selectTileSize,
 } from "store/applicationSettings/selectors";
 
-import { isUnknownCategory } from "utils/common/helpers";
+import { isUnknownCategory } from "store/data/helpers";
 
 import { Partition } from "utils/models/enums";
 
@@ -29,7 +29,7 @@ type ProjectGridItemProps = {
 const getIconPosition = (
   scale: number,
   height: number | undefined,
-  width: number | undefined
+  width: number | undefined,
 ) => {
   if (!height || !width) return { top: 0, left: 0 };
   const containerSize = 220 * scale;
@@ -52,7 +52,7 @@ export const ProjectGridItem = memo(
   ({ selected, handleClick, thing, isScrolling }: ProjectGridItemProps) => {
     const imageSelectionColor = useSelector(selectImageSelectionColor);
     const selectedImageBorderWidth = useSelector(
-      selectSelectedImageBorderWidth
+      selectSelectedImageBorderWidth,
     );
     const scaleFactor = useSelector(selectTileSize);
     const textOnScroll = useSelector(selectTextOnScroll);
@@ -62,7 +62,7 @@ export const ProjectGridItem = memo(
     const categoryColor = getCategoryProperty(thing.categoryId, "color") ?? "";
 
     const handleSelect = (
-      evt: React.MouseEvent<HTMLDivElement, MouseEvent>
+      evt: React.MouseEvent<HTMLDivElement, MouseEvent>,
     ) => {
       evt.stopPropagation();
       handleClick(thing.id, selected);
@@ -155,10 +155,10 @@ export const ProjectGridItem = memo(
           position={getIconPosition(
             scaleFactor,
             thing.shape.height,
-            thing.shape.width
+            thing.shape.width,
           )}
         />
       </Box>
     );
-  }
+  },
 );

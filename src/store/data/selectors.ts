@@ -5,15 +5,16 @@ import { kindsAdapter, categoriesAdapter, thingsAdapter } from "./dataSlice";
 import { RootState } from "store/rootReducer";
 
 import { AnnotationObject, Category, ImageObject, Kind } from "./types";
+import { DataState } from "store/types";
 
 const kindsSelectors = kindsAdapter.getSelectors(
-  (state: RootState) => state.data.kinds
+  (state: RootState) => state.data.kinds,
 );
 const categorySelectors = categoriesAdapter.getSelectors(
-  (state: RootState) => state.data.categories
+  (state: RootState) => state.data.categories,
 );
 const thingsSelectors = thingsAdapter.getSelectors(
-  (state: RootState) => state.data.things
+  (state: RootState) => state.data.things,
 );
 
 export const selectKindDictionary = kindsSelectors.selectEntities; // returns kinds dict
@@ -32,13 +33,15 @@ export const selectAllThings = thingsSelectors.selectAll; // returns an array
 export const selectAllThingIds = thingsSelectors.selectIds;
 export const selectTotalThingCount = thingsSelectors.selectTotal;
 
+export const selectDataState = ({ data }: { data: DataState }) => data;
+
 export const selectDataProject = createSelector(
   selectAllKinds,
   selectAllCategories,
   selectAllThings,
   (kinds, categories, things) => {
     return { kinds, categories, things };
-  }
+  },
 );
 
 /*
@@ -56,7 +59,12 @@ export const selectObjectKindDict = createSelector(
       kindDict[kind.id] = kind;
       return kindDict;
     }, {});
-  }
+  },
+);
+
+export const selectRenderKindName = createSelector(
+  selectKindDictionary,
+  (kinds) => (kindId: string) => kinds[kindId].displayName,
 );
 
 /*
@@ -70,6 +78,15 @@ export const selectAllImages = createSelector(selectAllThings, (things) => {
 export const selectAllObjects = createSelector(selectAllThings, (things) => {
   return things.filter((thing) => thing.kind !== "Image") as AnnotationObject[];
 });
+export const selectObjectDict = createSelector(
+  selectAllObjects,
+  (objects): Record<string, AnnotationObject> => {
+    return objects.reduce((objDict: Record<string, AnnotationObject>, obj) => {
+      objDict[obj.id] = obj;
+      return objDict;
+    }, {});
+  },
+);
 
 export const selectSplitThingDict = createSelector(
   selectAllThings,
@@ -80,7 +97,7 @@ export const selectSplitThingDict = createSelector(
           images: Record<string, ImageObject>;
           objects: Record<string, AnnotationObject>;
         },
-        thing
+        thing,
       ) => {
         if (thing.kind === "Image") {
           splitDict.images[thing.id] = thing as ImageObject;
@@ -89,30 +106,30 @@ export const selectSplitThingDict = createSelector(
         }
         return splitDict;
       },
-      { images: {}, objects: {} }
+      { images: {}, objects: {} },
     );
-  }
+  },
 );
 
 export const selectThingsOfKind = createSelector(
   [selectKindDictionary, selectThingsDictionary],
   (kindDict, thingDict) => {
     return (kind: string) => {
-      const thingsOfKind = kindDict[kind].containing;
-      return thingsOfKind.map((thingId) => thingDict[thingId]);
+      const thingsOfKind = kindDict[kind]!.containing;
+      return thingsOfKind.map((thingId) => thingDict[thingId]!);
     };
-  }
+  },
 );
 
 export const selectNumThingsByCatAndKind = createSelector(
   selectKindDictionary,
   selectCategoriesDictionary,
   (kindDict, catDict) => (catId: string, kind: string) => {
-    const thingsOfKind = kindDict[kind].containing;
-    const thingsOfCat = catDict[catId].containing;
+    const thingsOfKind = kindDict[kind]!.containing;
+    const thingsOfCat = catDict[catId]!.containing;
 
     return intersection(thingsOfCat, thingsOfKind).length;
-  }
+  },
 );
 
 export const selectAnnotatedImages = createSelector(
@@ -125,7 +142,7 @@ export const selectAnnotatedImages = createSelector(
       }
       return false;
     }) as ImageObject[];
-  }
+  },
 );
 
 /*
@@ -137,41 +154,41 @@ export const selectUnknownCategoryByKind = createSelector(
   selectCategoriesDictionary,
   (kindDict, catDict) => {
     return (kind: string) => {
-      const unknownCatId = kindDict[kind].unknownCategoryId;
-      return catDict[unknownCatId];
+      const unknownCatId = kindDict[kind]!.unknownCategoryId;
+      return catDict[unknownCatId]!;
     };
-  }
+  },
 );
 
 export const selectCategoriesByKind = createSelector(
   [selectKindDictionary, selectCategoriesDictionary],
   (kindDict, categoriesDict) => {
     return (kind: string) => {
-      const categoriesOfKind = kindDict[kind].categories;
-      return categoriesOfKind.map((catId) => categoriesDict[catId]);
+      const categoriesOfKind = kindDict[kind]!.categories;
+      return categoriesOfKind.map((catId) => categoriesDict[catId]!);
     };
-  }
+  },
 );
 
 export const selectAllImageCategories = createSelector(
   selectAllCategories,
   (categories) => {
     return categories.filter((category) => category.kind !== "Image");
-  }
+  },
 );
 
 export const selectUnknownImageCategory = createSelector(
   selectKindDictionary,
   (kinds) => {
-    return kinds["Image"]?.unknownCategoryId;
-  }
+    return kinds["Image"]!.unknownCategoryId;
+  },
 );
 
 export const selectAllObjectCategories = createSelector(
   selectAllCategories,
   (categories) => {
     return categories.filter((category) => category.kind !== "Image");
-  }
+  },
 );
 
 export const selectObjectCategoryDict = createSelector(
@@ -181,7 +198,7 @@ export const selectObjectCategoryDict = createSelector(
       catDict[c.id] = c;
       return catDict;
     }, {});
-  }
+  },
 );
 
 export const selectCategoryProperty = createSelector(
@@ -191,15 +208,5 @@ export const selectCategoryProperty = createSelector(
       const category = entities[id];
       if (!category) return;
       return category[property];
-    }
-);
-
-export const selectFirstUnknownCategory = createSelector(
-  selectAllKinds,
-  selectCategoriesDictionary,
-  (kinds, catDict) => {
-    if (kinds.length < 2) return;
-    const unknownCatId = kinds[1].unknownCategoryId;
-    return catDict[unknownCatId];
-  }
+    },
 );

@@ -22,7 +22,7 @@ export const ClassifierPreprocessingListItem = () => {
     dispatch(
       classifierSlice.actions.updateCropOptions({
         cropOptions,
-      })
+      }),
     );
   };
 
@@ -30,7 +30,7 @@ export const ClassifierPreprocessingListItem = () => {
     dispatch(
       classifierSlice.actions.updateRescaleOptions({
         rescaleOptions,
-      })
+      }),
     );
   };
 

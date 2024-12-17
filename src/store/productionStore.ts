@@ -1,20 +1,22 @@
 import {
   configureStore,
+  Dispatch,
   EnhancedStore,
   Middleware,
-  StoreEnhancer,
+  Tuple,
+  UnknownAction,
 } from "@reduxjs/toolkit";
 import logger from "redux-logger";
 
+import { annotatorMiddleware } from "views/ImageViewer/state/annotator/annotatorListeners";
+import { imageViewerMiddleware } from "views/ImageViewer/state/imageViewer/imageViewerListeners";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { rootReducer, RootState } from "./rootReducer";
-import { annotatorMiddleware } from "./annotator/annotatorListeners";
-import { imageViewerMiddleware } from "./imageViewer/imageViewerListeners";
 import { projectMiddleware } from "./project/projectListeners";
 import { dataMiddleware } from "./data/dataListeners";
 import { classifierSlice } from "./classifier";
-import { annotatorSlice } from "./annotator";
 import { applicationSettingsSlice } from "./applicationSettings";
-import { imageViewerSlice } from "./imageViewer";
 import { dataSlice } from "./data/dataSlice";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
@@ -24,21 +26,13 @@ import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 
-const enhancers: StoreEnhancer[] = [];
-
-/* In order to ensure that sagas are ran after the dispatched action,
- * always keep "saga" as the last item in the middleware array .
- * https://redux-saga.js.org/docs/api/index.html#selectselector-args
- *
- * For infor on changing the execution order, see https://github.com/redux-saga/redux-saga/issues/148
- */
-let loggingMiddleware: Middleware[] =
-  process.env.NODE_ENV !== "production" &&
-  process.env.REACT_APP_LOG_LEVEL === "2"
-    ? [logger]
+const loggingMiddleware: Middleware[] =
+  import.meta.env.NODE_ENV !== "production" &&
+  import.meta.env.VITE_APP_LOG_LEVEL === "2"
+    ? [logger as Middleware<object, any, Dispatch<UnknownAction>>]
     : [];
 
-let listenerMiddlewares: Middleware[] = [
+const listenerMiddlewares: Middleware[] = [
   annotatorMiddleware.middleware,
   imageViewerMiddleware.middleware,
   projectMiddleware.middleware,
@@ -61,9 +55,8 @@ const preloadedState: RootState = {
 };
 
 const options = {
-  devTools: true,
-  enhancers: enhancers,
-  middleware: [...listenerMiddlewares, ...loggingMiddleware],
+  devTools: { trace: true, traceLimit: 15 }, // A traceLimit of 11 seems to be the minumum to get the full trace, set to 15 for a buffer
+  middleware: () => new Tuple(...listenerMiddlewares, ...loggingMiddleware),
   preloadedState: preloadedState,
   reducer: rootReducer,
 };
@@ -72,9 +65,8 @@ export const productionStore: EnhancedStore = configureStore(options);
 
 export const initStore = (loadedData: RootState | undefined) => {
   const options = {
-    devTools: true,
-    enhancers: enhancers,
-    middleware: [...listenerMiddlewares, ...loggingMiddleware],
+    devTools: { trace: true, traceLimit: 15 },
+    middleware: () => new Tuple(...listenerMiddlewares, ...loggingMiddleware),
     preloadedState: loadedData ?? {},
     reducer: rootReducer,
   };

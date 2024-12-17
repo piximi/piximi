@@ -31,20 +31,20 @@ const TabContext = createContext<number>(0);
 
 export function CustomTabs(props: CommonTabsProps): JSX.Element;
 export function CustomTabs(
-  props: CommonTabsProps & ExtendableTabsProps
+  props: CommonTabsProps & ExtendableTabsProps,
 ): JSX.Element;
 
 export function CustomTabs(
-  props: CommonTabsProps & EditableTabsProps
+  props: CommonTabsProps & EditableTabsProps,
 ): JSX.Element;
 export function CustomTabs(
-  props: CommonTabsProps & EditableTabsProps & ExtendableTabsProps
+  props: CommonTabsProps & EditableTabsProps & ExtendableTabsProps,
 ): JSX.Element;
 
 export function CustomTabs(
   props: CommonTabsProps &
     Partial<ExtendableTabsProps> &
-    Partial<EditableTabsProps>
+    Partial<EditableTabsProps>,
 ): JSX.Element {
   const {
     children,
@@ -68,7 +68,7 @@ export function CustomTabs(
 
   const handleTabChange = (
     event: React.SyntheticEvent<Element, Event>,
-    newValue: number
+    newValue: number,
   ) => {
     setTabIndex(newValue);
     secondaryEffect && secondaryEffect(labels[newValue]);
@@ -99,14 +99,13 @@ export function CustomTabs(
         } else {
           if (labelIndex < tabIndex) {
             setTabIndex(tabIndex - 1);
-          } else {
           }
           action === "hide" && handleTabMin
             ? handleTabMin(label)
             : handleTabClose(label);
         }
       },
-    [handleTabClose, labels, tabIndex, handleTabMin]
+    [handleTabClose, labels, tabIndex, handleTabMin],
   );
 
   const addClass = (children: JSX.Element[]) => {
@@ -170,7 +169,7 @@ export function CustomTabs(
               <EditIcon
                 fontSize="small"
                 sx={{ p: 0 }}
-                onClick={(event) => setIsEditing(true)}
+                onClick={() => setIsEditing(true)}
               />
             )}
             {handleTabMin && (
@@ -213,7 +212,7 @@ export function CustomTabs(
       renderLabel,
       handleTabMin,
       persistentTabs,
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -225,7 +224,7 @@ export function CustomTabs(
   return (
     <TabContext.Provider value={tabIndex}>
       <Box
-        sx={(theme) => ({
+        sx={() => ({
           width: "100%",
           flexGrow: 1,
           height: "100%",

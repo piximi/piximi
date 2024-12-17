@@ -6,15 +6,16 @@ import { IconButton, Tooltip, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { LogoLoader } from "components/ui/LogoLoader";
+import { LogoLoader } from "components/ui";
 import { CustomAppBar } from "components/layout";
-import { ExitAnnotatorDialog } from "components/dialogs";
+import { ExitAnnotatorDialog } from "../../components/dialogs";
 
-import { imageViewerSlice } from "store/imageViewer";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
   selectActiveImageId,
   selectHasUnsavedChanges,
-} from "store/imageViewer/selectors";
+} from "views/ImageViewer/state/imageViewer/selectors";
 
 import { HotkeyContext } from "utils/common/enums";
 
@@ -39,28 +40,28 @@ export const ImageViewerAppBar = () => {
           imageViewerSlice.actions.setActiveImageId({
             imageId: undefined,
             prevImageId: activeImageId,
-          })
+          }),
         );
         dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
         dispatch(
-          imageViewerSlice.actions.setSelectedAnnotationIds({
+          annotatorSlice.actions.setSelectedAnnotationIds({
             annotationIds: [],
             workingAnnotationId: undefined,
-          })
+          }),
         );
         dispatch(
-          imageViewerSlice.actions.setWorkingAnnotation({
+          annotatorSlice.actions.setWorkingAnnotation({
             annotation: undefined,
-          })
+          }),
         );
       });
-      navigate("/");
+      navigate("/project");
     }
   };
 
   useEffect(() => {
     //NOTE: Wait until ExitAnnotatorDialogOpen is finished updating. Otherwise unmounted component access warning
-    if (returnToProject && !ExitAnnotatorDialogOpen) navigate("/");
+    if (returnToProject && !ExitAnnotatorDialogOpen) navigate("/project");
   }, [returnToProject, ExitAnnotatorDialogOpen, navigate]);
 
   return (

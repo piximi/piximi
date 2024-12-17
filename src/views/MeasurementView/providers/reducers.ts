@@ -6,11 +6,11 @@ import { PlotDetails, PlotViewActionProps } from "../types";
 
 export function plotViewReducer(
   plotDetails: PlotDetails,
-  action: PlotViewActionProps
+  action: PlotViewActionProps,
 ) {
   const { type } = action;
   switch (type) {
-    case "add":
+    case "add": {
       const numPlots = Object.keys(plotDetails.plots).length;
       const plotId = uuidv4();
       const plotName = `Plot ${numPlots + 1}`;
@@ -21,6 +21,7 @@ export function plotViewReducer(
         chartConfig: initialChartConfig,
       };
       return structuredClone(plotDetails);
+    }
     case "edit":
       plotDetails.plots[action.id!].name = action.name!;
       return structuredClone(plotDetails);

@@ -31,7 +31,7 @@ export const ClassifierArchitectureListItem = () => {
       classifierSlice.actions.updateSelectedModelIdx({
         modelIdx: modelIdx,
         disposePrevious,
-      })
+      }),
     );
 
     const model = availableClassifierModels[modelIdx];
@@ -44,7 +44,7 @@ export const ClassifierArchitectureListItem = () => {
             ...inputShape,
             channels: model.requiredChannels,
           },
-        })
+        }),
       );
     }
   };
@@ -55,21 +55,21 @@ export const ClassifierArchitectureListItem = () => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, height: value },
-          })
+          }),
         );
         return;
       case "shape-cols":
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, width: value },
-          })
+          }),
         );
         return;
       case "shape-channels":
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, channels: value },
-          })
+          }),
         );
     }
   };

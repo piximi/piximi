@@ -10,6 +10,7 @@ type SelectDialogProps = {
   selectLabel: string;
   title: string;
   open: boolean;
+  getOptionLabel?: (option: object) => string;
 };
 
 // TODO: Should alert since data will be deleted
@@ -25,7 +26,7 @@ export const SelectDialog = ({
 
   const handleOptionsChange = (
     event: React.SyntheticEvent<Element, Event>,
-    newValue: string | null
+    newValue: string | null,
   ) => {
     if (!newValue) return;
     setCurrentOption(newValue);
@@ -42,7 +43,6 @@ export const SelectDialog = ({
             id={`${selectLabel}-select`}
             options={options}
             sx={{ width: 300 }}
-            // eslint-disable-next-line react/jsx-no-undef
             value={currentOption}
             onChange={handleOptionsChange}
             renderInput={(params) => (

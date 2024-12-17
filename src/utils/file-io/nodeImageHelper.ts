@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import { readFileSync } from "fs";
 import { MIMEType } from "./types";
 
 /*
@@ -34,7 +34,7 @@ export const fileFromPath = async (
   imPath: string,
   mimetype: MIMEType,
   url: boolean = false,
-  name: string | undefined = undefined
+  name: string | undefined = undefined,
 ) => {
   let imName: string;
   let bufferData: BlobPart;
@@ -49,14 +49,10 @@ export const fileFromPath = async (
   if (url) {
     bufferData = await fetch(imPath).then((res) => res.blob());
   } else {
-    bufferData = fs.readFileSync(imPath).buffer;
+    bufferData = new Blob([new Uint8Array(readFileSync(imPath).buffer)]);
   }
 
   const file = new File([bufferData], imName, { type: mimetype });
-  // hacking node runtime File type to be more like browser File type
-  file.arrayBuffer = () =>
-    //@ts-ignore
-    file[Object.getOwnPropertySymbols(file)[0]]._buffer;
 
   return file;
 };

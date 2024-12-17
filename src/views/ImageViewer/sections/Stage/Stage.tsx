@@ -7,21 +7,8 @@ import {
   useStore,
 } from "react-redux";
 import Konva from "konva";
-import * as ReactKonva from "react-konva";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  TextField,
-  Typography,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { Stage as KonvaStage } from "react-konva";
+import { Box, Typography } from "@mui/material";
 
 import { useHotkeys } from "hooks";
 import {
@@ -31,36 +18,41 @@ import {
   useAnnotationTool,
 } from "../../hooks";
 
+import { NewKindDialog } from "views/ImageViewer/components/dialogs/NewKindDialog";
 import { Cursor } from "./Cursor";
 import { Layer } from "./Layer";
 import { Selection } from "./Selection";
 import { Annotations } from "./Annotations";
 import { Image } from "./Image";
 
-import { StageContext } from "contexts";
-import { imageViewerSlice } from "store/imageViewer";
-import { dataSlice } from "store/data";
-import { annotatorSlice } from "store/annotator";
+import { StageContext } from "../../state/StageContext";
+import { imageViewerSlice } from "../../state/imageViewer";
+import { annotatorSlice } from "../../state/annotator";
 import {
   selectAnnotationState,
   selectToolType,
-} from "store/annotator/selectors";
-import { selectActiveImage } from "store/imageViewer/reselectors";
+} from "../../state/annotator/selectors";
+import {
+  selectActiveImage,
+  selectImageViewerObjectsArray,
+} from "../../state/annotator/reselectors";
 import {
   selectActiveImageId,
   selectActiveImageRenderedSrcs,
   selectImageIsloading,
   selectStagePosition,
-} from "store/imageViewer/selectors";
+} from "../../state/imageViewer/selectors";
 
-import { generateUnknownCategory, generateUUID } from "utils/common/helpers";
+import { generateKind, generateUUID } from "store/data/helpers";
 
 import { CATEGORY_COLORS } from "store/data/constants";
 import { dimensions } from "utils/common/constants";
-import { AnnotationState, ToolType } from "utils/annotator/enums";
+import { AnnotationState, ToolType } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/common/enums";
 
-import { Category, Kind } from "store/data/types";
+import { Category } from "store/data/types";
+import { createProtoAnnotation } from "views/ImageViewer/utils/annotationUtils";
+import { Partition } from "utils/models/enums";
 
 export const Stage = ({
   stageWidth,
@@ -86,6 +78,7 @@ export const Stage = ({
   const renderedSrcs = useSelector(selectActiveImageRenderedSrcs);
   const activeImageId = useSelector(selectActiveImageId);
   const activeImage = useSelector(selectActiveImage);
+  const existingObjects = useSelector(selectImageViewerObjectsArray);
 
   const { annotationTool } = useAnnotationTool();
   const { noKindAvailable, setNoKindAvailable } =
@@ -121,61 +114,75 @@ export const Stage = ({
     outOfBounds,
     setCurrentMousePosition,
     getAbsolutePosition,
-    getPositionRelativeToStage
+    getPositionRelativeToStage,
   );
 
-  const handleNewKind = (kindName: string, catName?: string) => {
-    const kindCategories: Category[] = [];
-    const newUnknownCategory = generateUnknownCategory(kindName);
-    kindCategories.push(newUnknownCategory);
+  const handleNewKind = async (kindName: string, catName?: string) => {
+    let newCategory: Category | undefined;
+    const { kind: newKind, unknownCategory: unknownCategory } = generateKind(
+      kindName,
+      true,
+    );
     if (catName) {
       const newId = generateUUID();
-      const newCategory: Category = {
+      newCategory = {
         id: newId,
         name: catName,
         containing: [],
         color: CATEGORY_COLORS.darkcyan,
         visible: true,
-        kind: kindName,
+        kind: newKind.id,
       };
-      kindCategories.push(newCategory);
     }
-    const newKind: Kind = {
-      id: kindName,
-      categories: kindCategories.map((cat) => cat.id),
-      containing: [],
-      unknownCategoryId: newUnknownCategory.id,
-    };
 
     batch(() => {
       dispatch(
-        dataSlice.actions.addCategories({
-          categories: kindCategories,
-        })
+        annotatorSlice.actions.addKind({
+          kind: newKind,
+          unknownCategory: unknownCategory,
+        }),
       );
-
-      dispatch(
-        dataSlice.actions.addKinds({
-          kinds: [newKind],
-        })
-      );
+      if (newCategory) {
+        dispatch(
+          annotatorSlice.actions.addCategory({
+            category: newCategory,
+          }),
+        );
+      }
       dispatch(
         imageViewerSlice.actions.setSelectedCategoryId({
-          selectedCategoryId: kindCategories.at(-1)!.id,
-        })
+          selectedCategoryId: newCategory ? newCategory.id : unknownCategory.id,
+        }),
       );
     });
-    annotationTool.annotate(
-      kindCategories.at(-1)!,
-      activeImage!.activePlane,
-      activeImageId!
+    if (!activeImage) throw new Error("Active image not found");
+    if (!annotationTool.decodedMask) throw new Error("No mask found");
+    if (!annotationTool.boundingBox) throw new Error("No bounding box found");
+
+    const newAnnotation = await createProtoAnnotation(
+      {
+        boundingBox: annotationTool.boundingBox,
+        categoryId: (newCategory ?? unknownCategory).id,
+        imageId: activeImage.id,
+        decodedMask: annotationTool.decodedMask,
+        activePlane: activeImage.activePlane,
+        partition: Partition.Unassigned,
+      },
+      activeImage,
+      newKind,
+      existingObjects.map((obj) => obj.name),
+    );
+    dispatch(
+      annotatorSlice.actions.setWorkingAnnotation({
+        annotation: newAnnotation,
+      }),
     );
     dispatch(
       annotatorSlice.actions.setAnnotationState({
         annotationState: AnnotationState.Annotated,
-        kind: kindName,
+        kind: newKind.id,
         annotationTool,
-      })
+      }),
     );
 
     //setNoKindAvailable(false);
@@ -204,7 +211,7 @@ export const Stage = ({
             y: (stageHeight / 2) * stage.scaleX() + stage.y(),
           },
         },
-      })
+      }),
     );
   }, [draggable, stageRef, dispatch, stageHeight, stageWidth]);
 
@@ -216,7 +223,7 @@ export const Stage = ({
           x: (stageWidth - activeImage.shape.width) / 2,
           y: (stageHeight - activeImage.shape.height) / 2,
         },
-      })
+      }),
     );
   }, [stageWidth, stageHeight, activeImage?.shape, dispatch]);
 
@@ -226,7 +233,7 @@ export const Stage = ({
         const imgElem = document.createElement("img");
         imgElem.src = src;
         return imgElem;
-      })
+      }),
     );
   }, [renderedSrcs, stageRef, dispatch]);
 
@@ -235,7 +242,7 @@ export const Stage = ({
     dispatch(
       imageViewerSlice.actions.setStagePosition({
         stagePosition: { x: 0, y: 0 },
-      })
+      }),
     );
   }, [activeImageId, stageRef, dispatch]);
 
@@ -245,12 +252,12 @@ export const Stage = ({
       setDraggable(event.type === "keydown" ? true : false);
     },
     HotkeyContext.AnnotatorView,
-    { keydown: true, keyup: true }
+    { keydown: true, keyup: true },
   );
 
   return (
-    <>
-      <ReactKonva.Stage
+    <Box sx={{ gridArea: "stage", zIndex: 999 }}>
+      <KonvaStage
         draggable={draggable}
         height={stageHeight}
         onMouseDown={(evt) => {
@@ -272,40 +279,38 @@ export const Stage = ({
       >
         <Provider store={store}>
           <StageContext.Provider value={stageRef}>
-            <DndProvider backend={HTML5Backend}>
-              <Layer>
-                {!(htmlImages && htmlImages.length) ? (
-                  <></>
-                ) : !imageIsLoading ? (
-                  <Image
-                    ref={imageRef}
-                    images={htmlImages}
-                    stageHeight={stageHeight}
-                    stageWidth={stageWidth}
-                  />
-                ) : (
-                  <></>
-                )}
-                {(annotationState === AnnotationState.Annotating ||
-                  toolType === ToolType.QuickAnnotation) && ( //TODO: remind myself why quick annotation special
-                  <Selection tool={annotationTool} toolType={toolType} />
-                )}
-                <Cursor
-                  positionByStage={relativePositionByStage}
-                  absolutePosition={absolutePosition}
-                  annotationState={annotationState}
-                  outOfBounds={outOfBounds}
-                  draggable={draggable}
-                  toolType={toolType}
+            <Layer>
+              {!(htmlImages && htmlImages.length) ? (
+                <></>
+              ) : !imageIsLoading ? (
+                <Image
+                  ref={imageRef}
+                  images={htmlImages}
+                  stageHeight={stageHeight}
+                  stageWidth={stageWidth}
                 />
-                {!imageIsLoading && (
-                  <Annotations annotationTool={annotationTool} />
-                )}
-              </Layer>
-            </DndProvider>
+              ) : (
+                <></>
+              )}
+              {(annotationState === AnnotationState.Annotating ||
+                toolType === ToolType.QuickAnnotation) && ( //TODO: remind myself why quick annotation special
+                <Selection tool={annotationTool} toolType={toolType} />
+              )}
+              <Cursor
+                positionByStage={relativePositionByStage}
+                absolutePosition={absolutePosition}
+                annotationState={annotationState}
+                outOfBounds={outOfBounds}
+                draggable={draggable}
+                toolType={toolType}
+              />
+              {!imageIsLoading && (
+                <Annotations annotationTool={annotationTool} />
+              )}
+            </Layer>
           </StageContext.Provider>
         </Provider>
-      </ReactKonva.Stage>
+      </KonvaStage>
       <Box
         sx={{
           width: stageWidth - 24,
@@ -330,124 +335,6 @@ export const Stage = ({
           onReject={handleClose}
         />
       )}
-    </>
-  );
-};
-
-const NewKindDialog = ({
-  open,
-  onConfirm,
-  onReject,
-}: {
-  open: boolean;
-  onConfirm: (kindName: string, catName?: string) => void;
-  onReject: (reason: string) => void;
-}) => {
-  const [kindName, setKindName] = useState<string>("");
-  const [userTyped, setUserTyped] = useState<boolean>(false);
-  const [categoryName, setCategoryName] = useState<string>("");
-  const [error, setError] = useState<string>();
-  const handleKindChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setKindName(e.target.value);
-  };
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCategoryName(e.target.value);
-  };
-
-  const handleConfirm = () => {
-    if (!error) {
-      const catName = categoryName.length > 0 ? categoryName : undefined;
-      onConfirm(kindName, catName);
-    }
-  };
-
-  // useEffect(() => {
-  //   if (!userTyped && kindName.length !== 0) {
-  //     setUserTyped(true);
-  //   }
-  // }, [kindName,userTyped]);
-
-  useEffect(() => {
-    if (!userTyped && kindName.length !== 0) {
-      setUserTyped(true);
-    } else if (userTyped && kindName.length === 0) {
-      setError("Kind name cannot be blank");
-    } else {
-      setError(undefined);
-    }
-  }, [userTyped, kindName]);
-  return (
-    <>
-      <Dialog
-        fullWidth
-        onClose={(event, reason) => onReject(reason)}
-        open={open}
-      >
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          px={1}
-          pb={1.5}
-          pt={1}
-        >
-          <DialogTitle sx={{ p: 1 }}>Create New Kind</DialogTitle>
-          <IconButton
-            onClick={() => onReject("cancelled")}
-            sx={(theme) => ({
-              maxHeight: "40px",
-            })}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
-        <DialogContent>
-          <Box
-            display="flex"
-            flexDirection="row"
-            justifyContent="space-between"
-            alignItems={"center"}
-            gap={2}
-          >
-            <TextField
-              error={!!error}
-              helperText={error}
-              autoFocus
-              fullWidth
-              label="Kind Name"
-              margin="dense"
-              variant="standard"
-              value={kindName}
-              onChange={handleKindChange}
-            />
-            <TextField
-              placeholder="Unknown"
-              fullWidth
-              label="Category Name"
-              value={categoryName}
-              margin="dense"
-              variant="standard"
-              onChange={handleCategoryChange}
-            />
-          </Box>
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={() => onReject("cancelled")} color="primary">
-            Cancel
-          </Button>
-
-          <Button
-            onClick={handleConfirm}
-            color="primary"
-            variant="contained"
-            disabled={!!error}
-          >
-            Create Kind
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+    </Box>
   );
 };

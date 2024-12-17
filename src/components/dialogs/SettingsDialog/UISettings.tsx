@@ -20,7 +20,7 @@ import {
 } from "@mui/icons-material";
 
 import { CustomSwitch } from "components/inputs";
-import { DividerHeader } from "components/ui/DividerHeader";
+import { DividerHeader } from "components/ui";
 import { SettingsItem } from "./SettingsItem";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
@@ -86,7 +86,7 @@ const ThemeSetting = () => {
         checked={themeMode === ThemeMode.Light}
         onChange={() =>
           onToggleTheme(
-            themeMode === ThemeMode.Dark ? ThemeMode.Light : ThemeMode.Dark
+            themeMode === ThemeMode.Dark ? ThemeMode.Light : ThemeMode.Dark,
           )
         }
         height={24}
@@ -109,7 +109,7 @@ const BorderWidthSetting = () => {
     dispatch(
       applicationSettingsSlice.actions.setSelectedImageBorderWidth({
         selectionSize: newWidth,
-      })
+      }),
     );
   };
 
@@ -165,7 +165,7 @@ const BorderColorSetting = () => {
   const initialSelectionColor = useSelector(selectImageSelectionColor);
   const availableColors = useSelector(selectActiveCategoryColors);
   const [selectionColor, setSelectionColor] = useState<string>(
-    initialSelectionColor
+    initialSelectionColor,
   );
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
     React.useState<null | HTMLButtonElement>(null);
@@ -182,7 +182,7 @@ const BorderColorSetting = () => {
         <Box display="flex">
           <Typography display="inline">{"Selection Border Color: "}</Typography>
           <Box
-            sx={(theme) => ({
+            sx={() => ({
               display: "inline-block",
               justifySelf: "center",
               alignSelf: "center",
@@ -241,7 +241,7 @@ const SoundSetting = () => {
     dispatch(
       applicationSettingsSlice.actions.setSoundEnabled({
         soundEnabled: !soundEnabled,
-      })
+      }),
     );
   };
   return (
@@ -274,7 +274,7 @@ const TextOnScrollSetting = () => {
     dispatch(
       applicationSettingsSlice.actions.setTextOnScroll({
         textOnScroll: !textOnScrollEnabled,
-      })
+      }),
     );
   };
   return (

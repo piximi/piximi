@@ -27,18 +27,18 @@ export const selectPlotData = createSelector(
     const parsedMeasurementData: ParsedMeasurementData = {};
 
     Object.keys(measurementData).forEach((thingId) => {
-      const thing = things[thingId];
+      const thing = things[thingId]!;
       parsedMeasurementData[thingId] = {
         id: thingId,
         kind: thing.kind,
-        category: categories[thing.categoryId].name,
+        category: categories[thing.categoryId]!.name,
         partition: thing.partition,
         measurements: measurementData[thingId].measurements,
       };
     });
 
     return parsedMeasurementData;
-  }
+  },
 );
 
 export const selectGroupMeasurementDisplayData = createSelector(
@@ -56,7 +56,7 @@ export const selectGroupMeasurementDisplayData = createSelector(
         thingIds: group.thingIds,
       };
 
-      const thingsOfKind = group.thingIds.map((thingId) => things[thingId]);
+      const thingsOfKind = group.thingIds.map((thingId) => things[thingId]!);
 
       Object.values(group.measurementStates).forEach((measurement) => {
         if (!measurement.children && measurement.state === "on") {
@@ -74,7 +74,7 @@ export const selectGroupMeasurementDisplayData = createSelector(
                   }
                   return ids;
                 },
-                []
+                [],
               );
 
               if (splitThings.length === 0) {
@@ -89,7 +89,7 @@ export const selectGroupMeasurementDisplayData = createSelector(
               } else {
                 const measuredValues = splitThings.map(
                   (thingId) =>
-                    measurementData[thingId].measurements[measurement.id]
+                    measurementData[thingId].measurements[measurement.id],
                 );
                 const stats = getStatistics(measuredValues);
 
@@ -116,7 +116,7 @@ export const selectGroupMeasurementDisplayData = createSelector(
     });
 
     return rGroups;
-  }
+  },
 );
 
 const getSplitType = (split: MeasurementOption) => {

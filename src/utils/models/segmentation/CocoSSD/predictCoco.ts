@@ -13,9 +13,9 @@ import {
   Tensor4D,
 } from "@tensorflow/tfjs";
 
-import { encode } from "utils/annotator";
+import { encode } from "views/ImageViewer/utils";
 import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
-import { generateUUID } from "utils/common/helpers";
+import { generateUUID } from "store/data/helpers";
 import { Partition } from "../../enums";
 import { Kind } from "store/data/types";
 
@@ -25,7 +25,7 @@ export const predictCoco = async (
   kinds: Array<Kind>,
   maxNumBoxes = 20,
   minScore = 0.5,
-  overlapThreshold = 0.5
+  overlapThreshold = 0.5,
 ) => {
   const height = imTensor.shape[1];
   const width = imTensor.shape[2];
@@ -39,7 +39,7 @@ export const predictCoco = async (
   // 10/90 of them are dummys and in theory should never be chosen as max prob
   const results = (await model.executeAsync(imTensor)) as [
     Tensor<Rank.R3>,
-    Tensor<Rank.R4>
+    Tensor<Rank.R4>,
   ];
 
   // length of `scores` is number of bounding boxes found (total)
@@ -59,7 +59,7 @@ export const predictCoco = async (
   const [maxScores, classes] = calculateMaxScores(
     scores,
     results[0].shape[1], // num boxes
-    results[0].shape[2] // num classes
+    results[0].shape[2], // num classes
   );
 
   const prevBackend = getBackend();
@@ -79,7 +79,7 @@ export const predictCoco = async (
       maxNumBoxes,
       overlapThreshold,
       minScore,
-      1
+      1,
     ).selectedIndices as Tensor<Rank.R1>;
 
     // return tfimage.nonMaxSuppression(
@@ -111,7 +111,7 @@ export const predictCoco = async (
 const calculateMaxScores = (
   scores: Float32Array,
   numBoxes: number,
-  numClasses: number
+  numClasses: number,
 ): [number[], number[]] => {
   const maxes = [];
   const classes = [];
@@ -136,7 +136,7 @@ const buildDetectedObjects = (
   boxes: Float32Array,
   indices: Float32Array,
   classes: Array<number>,
-  kinds: Array<Kind>
+  kinds: Array<Kind>,
 ) => {
   const annotations: Array<OrphanedAnnotationObject> = [];
   const count = indices.length;
@@ -157,7 +157,7 @@ const buildDetectedObjects = (
       number,
       number,
       number,
-      number
+      number,
     ];
     // x_1, y_1, W, H
     // const annotationBbox = [minX, minY, maxX - minX, maxY - minY] as [

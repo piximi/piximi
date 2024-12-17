@@ -8,8 +8,7 @@ import {
 
 import { useImageViewerCategoryItemState } from "../hooks";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
-import { CountChip } from "components/ui/CountChip";
+import { CustomListItemButton, CountChip } from "components/ui/";
 import { CategoryItemMenu } from "components/categories/CategoryItemMenu";
 
 import { APPLICATION_COLORS } from "utils/common/constants";
@@ -32,7 +31,11 @@ export const ImageViewerCategoryItem = ({
     objectCount,
     handleSelect,
     handleToggleCategoryVisibility,
-  } = useImageViewerCategoryItemState(category, kind);
+    editCategory,
+    deleteCategory,
+    clearObjects,
+  } = useImageViewerCategoryItemState(category);
+
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
 
@@ -88,10 +91,9 @@ export const ImageViewerCategoryItem = ({
         category={category}
         handleCloseCategoryMenu={handleCloseMenu}
         openCategoryMenu={Boolean(categoryMenuAnchorEl)}
-        menuFunctions={{
-          "Clear Objects": { imageViewer: true, permanent: false },
-          Delete: { permanent: false },
-        }}
+        editCategory={editCategory}
+        deleteCategory={deleteCategory}
+        clearObjects={clearObjects}
       />
     </>
   );

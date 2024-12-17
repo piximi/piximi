@@ -55,7 +55,7 @@ export const FitSegmenterDialogAppBar = ({
     dispatch(
       segmenterSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Trained,
-      })
+      }),
     );
   };
 
@@ -99,8 +99,8 @@ export const FitSegmenterDialogAppBar = ({
               noLabels
                 ? "Please annotate images before fitting a model."
                 : noTrain
-                ? "Model not trainable"
-                : "Fit the model"
+                  ? "Model not trainable"
+                  : "Fit the model"
             }
             placement="bottom"
           >

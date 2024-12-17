@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { isArray, merge, mergeWith } from "lodash";
 
-import { generateUUID } from "utils/common/helpers";
+import { generateUUID } from "store/data/helpers";
 
 import { baseMeasurementOptions } from "./constants";
 import { Partition } from "utils/models/enums";
@@ -30,7 +30,7 @@ export const measurementsSlice = createSlice({
 
     updateChannelOptions(
       state,
-      action: PayloadAction<{ numChannels: number }>
+      action: PayloadAction<{ numChannels: number }>,
     ) {
       const measurementOptions: MeasurementOptions = {};
       const channelOptions: MeasurementOptions = {};
@@ -59,21 +59,23 @@ export const measurementsSlice = createSlice({
     createGroup(
       state,
       action: PayloadAction<{
-        kind: string;
+        kindId: string;
+        displayName?: string;
         categories: Category[];
         thingIds: string[];
         numChannels?: number;
-      }>
+      }>,
     ) {
-      const { kind, categories, thingIds, numChannels } = action.payload;
+      const { kindId, categories, thingIds, numChannels } = action.payload;
+      const displayName = action.payload.displayName ?? kindId;
       const groupId = generateUUID();
 
       const usedNames = Object.values(state.groups).map((table) => table.name);
       let replicateNumber = 2;
-      let candidateName = `${kind} Measurements`;
+      let candidateName = `${displayName} Measurements`;
 
       while (usedNames.includes(candidateName)) {
-        candidateName = `${kind} Measurements - Table ${replicateNumber}`;
+        candidateName = `${displayName} Measurements - Table ${replicateNumber}`;
         replicateNumber++;
       }
 
@@ -113,8 +115,8 @@ export const measurementsSlice = createSlice({
         const option = { ...baseMeasurementOptions[measurement] };
         if (
           option.thingType === "all" ||
-          option.thingType === kind ||
-          (option.thingType !== "Image" && kind !== "Image")
+          option.thingType === kindId ||
+          (option.thingType !== "Image" && kindId !== "Image")
         ) {
           if (option.hasChannels) {
             option.children = [];
@@ -138,7 +140,7 @@ export const measurementsSlice = createSlice({
       state.groups[groupId] = {
         id: groupId,
         name: candidateName,
-        kind: kind,
+        kind: kindId,
         measurementStates: groupMeasurementState,
         splitStates: groupSplitState,
         thingIds: thingIds,
@@ -153,17 +155,17 @@ export const measurementsSlice = createSlice({
       action: PayloadAction<{
         groupId: string;
         updates: RecursivePartial<MeasurementOptions>;
-      }>
+      }>,
     ) {
       const { groupId, updates } = action.payload;
       state.groups[groupId].measurementStates = merge(
         state.groups[groupId].measurementStates,
-        updates
+        updates,
       );
     },
     updateGroupName(
       state,
-      action: PayloadAction<{ groupId: string; newName: string }>
+      action: PayloadAction<{ groupId: string; newName: string }>,
     ) {
       state.groups[action.payload.groupId].name = action.payload.newName;
     },
@@ -172,12 +174,12 @@ export const measurementsSlice = createSlice({
       action: PayloadAction<{
         groupId: string;
         updates: RecursivePartial<MeasurementOptions>;
-      }>
+      }>,
     ) {
       const { groupId, updates } = action.payload;
       state.groups[groupId].splitStates = merge(
         state.groups[groupId].splitStates,
-        updates
+        updates,
       );
     },
     updateGroupSplitValues(
@@ -187,7 +189,7 @@ export const measurementsSlice = createSlice({
         remove?: string[];
 
         updates?: RecursivePartial<MeasurementOptions>;
-      }>
+      }>,
     ) {
       const { groupId, remove, updates } = action.payload;
       if (updates) {
@@ -196,12 +198,12 @@ export const measurementsSlice = createSlice({
           updates,
           (
             objValue: MeasurementOptions,
-            srcValue: RecursivePartial<MeasurementOptions>
+            srcValue: RecursivePartial<MeasurementOptions>,
           ) => {
             if (isArray(objValue)) {
               return srcValue;
             }
-          }
+          },
         );
       }
 
@@ -217,7 +219,7 @@ export const measurementsSlice = createSlice({
       action: PayloadAction<{
         groupId: string;
         thingIds: string[];
-      }>
+      }>,
     ) {
       const { groupId, thingIds } = action.payload;
       state.groups[groupId].thingIds = thingIds;
@@ -228,7 +230,7 @@ export const measurementsSlice = createSlice({
       action: PayloadAction<{
         dataDict?: ThingData;
         measurementsDict?: ThingMeasurements;
-      }>
+      }>,
     ) {
       const { dataDict, measurementsDict } = action.payload;
       if (dataDict) {
@@ -251,14 +253,14 @@ export const measurementsSlice = createSlice({
         for (const thingId in measurementsDict) {
           state.data[thingId].measurements = merge(
             state.data[thingId].measurements,
-            measurementsDict[thingId]
+            measurementsDict[thingId],
           );
         }
       }
     },
     removeThingMeasurements(
       state,
-      action: PayloadAction<{ thingIds: string[] }>
+      action: PayloadAction<{ thingIds: string[] }>,
     ) {
       action.payload.thingIds.forEach((id) => {
         delete state.data[id];
@@ -266,7 +268,7 @@ export const measurementsSlice = createSlice({
     },
     setUpToDate(
       state,
-      action: PayloadAction<{ groupId: string; upToDate: boolean }>
+      action: PayloadAction<{ groupId: string; upToDate: boolean }>,
     ) {
       state.groups[action.payload.groupId].upToDate = action.payload.upToDate;
     },

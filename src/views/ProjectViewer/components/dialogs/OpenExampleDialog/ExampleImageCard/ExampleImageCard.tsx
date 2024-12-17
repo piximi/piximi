@@ -43,7 +43,7 @@ export const ExampleImageCard = ({
     const { image, annotations, annotationCategories } = await loadExampleImage(
       exampleImage.imageData,
       exampleImage.annotationsFile as SerializedFileType,
-      exampleImage.name
+      exampleImage.name,
     );
 
     const data = dataConverter_v01v02({
@@ -59,7 +59,7 @@ export const ExampleImageCard = ({
       dispatch(
         dataSlice.actions.initializeState({
           data,
-        })
+        }),
       );
     });
   };

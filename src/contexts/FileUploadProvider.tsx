@@ -7,7 +7,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import * as ImageJS from "image-js";
+import IJSImage, { Stack as IJSStack } from "image-js";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -37,8 +37,9 @@ import {
   forceStack,
   getImageInformation,
 } from "utils/file-io/helpers";
-import { isUnknownCategory, updateRecord } from "utils/common/helpers";
+import { updateRecordArray } from "utils/common/helpers";
 import { convertToImage } from "utils/common/tensorHelpers";
+import { isUnknownCategory } from "store/data/helpers";
 
 import { MIMETYPES } from "utils/file-io/constants";
 import { ImageShapeEnum } from "utils/file-io/enums";
@@ -54,7 +55,7 @@ import {
 
 type ImageShapeInfoImage = ImageFileShapeInfo & {
   fileName: string;
-  image?: ImageJS.Stack;
+  image?: IJSStack;
   error?: string;
 };
 
@@ -71,9 +72,9 @@ const getUploadedFileTypes = async (files: FileList) => {
     try {
       // https://stackoverflow.com/questions/56565528/typescript-const-assertions-how-to-use-array-prototype-includes
       if (!(MIMETYPES as ReadonlyArray<string>).includes(file.type)) {
-        process.env.NODE_ENV !== "production" &&
+        import.meta.env.NODE_ENV !== "production" &&
           console.error("Invalid MIME Type:", ext);
-        updateRecord(images, ImageShapeEnum.InvalidImage, {
+        updateRecordArray(images, ImageShapeEnum.InvalidImage, {
           shape: ImageShapeEnum.InvalidImage,
           fileName: file.name,
           ext,
@@ -88,7 +89,7 @@ const getUploadedFileTypes = async (files: FileList) => {
       ) {
         const image = await decodeDicomImage(file);
 
-        updateRecord(images, ImageShapeEnum.DicomImage, {
+        updateRecordArray(images, ImageShapeEnum.DicomImage, {
           shape: ImageShapeEnum.DicomImage,
           components: image.length,
           fileName: file.name,
@@ -97,18 +98,15 @@ const getUploadedFileTypes = async (files: FileList) => {
         });
       } else {
         const buffer = await file.arrayBuffer();
-        const image: ImageJS.Image | ImageJS.Stack = await ImageJS.Image.load(
-          buffer,
-          {
-            ignorePalette: true,
-          }
-        );
+        const image: IJSImage | IJSStack = await IJSImage.load(buffer, {
+          ignorePalette: true,
+        });
 
         const imageInfo = getImageInformation(image);
 
         const imageStack = await forceStack(image);
 
-        updateRecord(images, imageInfo.shape, {
+        updateRecordArray(images, imageInfo.shape, {
           ...imageInfo,
           ext,
           image: imageStack,
@@ -117,7 +115,7 @@ const getUploadedFileTypes = async (files: FileList) => {
       }
     } catch (err) {
       const error = err as Error;
-      updateRecord(images, ImageShapeEnum.InvalidImage, {
+      updateRecordArray(images, ImageShapeEnum.InvalidImage, {
         shape: ImageShapeEnum.InvalidImage,
         fileName: file.name,
         ext,
@@ -141,7 +139,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
   const [channelOptions, setChannelOptions] = useState<number[]>();
   const [numChannels, setNumChannels] = useState<number | undefined>(
-    projectChannels
+    projectChannels,
   );
   const [uploadPromptMessage, setUploadPromptMessage] = useState<string>("");
 
@@ -164,7 +162,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
           errors.push(
             `${
               fileInfo.fileName
-            } -- All images in project must be ${numChannels}-channel, recieved ${fileInfo.components!}-channel image.`
+            } -- All images in project must be ${numChannels}-channel, recieved ${fileInfo.components!}-channel image.`,
           );
           continue;
         }
@@ -180,7 +178,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
           errors.push(
             `${fileInfo.fileName} -- Unsupported bit depth of ${
               fileInfo.image![0].bitDepth
-            }`
+            }`,
           );
 
           continue;
@@ -191,7 +189,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
             fileInfo.fileName,
             undefined,
             fileInfo.components! / numChannels!,
-            numChannels!
+            numChannels!,
           );
           imageToUpload.categoryId = selectedCategory ?? unknownCategory;
           imageToUpload.partition =
@@ -205,7 +203,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
         } catch (err) {
           const error = err as Error;
           errors.push(
-            `Error converting ${fileInfo.fileName}: ${error.message}`
+            `Error converting ${fileInfo.fileName}: ${error.message}`,
           );
         }
       }
@@ -213,13 +211,12 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
         dispatch(
           dataSlice.actions.addThings({
             things: convertedImages,
-            isPermanent: true,
-          })
+          }),
         );
         dispatch(
           projectSlice.actions.selectThings({
             ids: convertedImages.map((im) => im.id),
-          })
+          }),
         );
       }
       if (errors.length > 0) {
@@ -230,11 +227,11 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
               name: "File Upload Error",
               description: [...errors].join("\n---\n"),
             },
-          })
+          }),
         );
       }
     },
-    [dispatch, fileInfo, kind, numChannels, selectedCategory, unknownCategory]
+    [dispatch, fileInfo, kind, numChannels, selectedCategory, unknownCategory],
   );
 
   const updateChannels = useCallback(
@@ -243,7 +240,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
       setNumChannels(channels);
       setStartUpload(true);
     },
-    [dispatch]
+    [dispatch],
   );
   const uploadFiles = useCallback(
     async (files: FileList) => {
@@ -259,7 +256,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
           ImageShapeEnum.SingleRGBImage in imageInfo
         ) {
           setUploadPromptMessage(
-            "Your files contain both 3-channel and greyscale images, but channels across images must be uniform. Which would you like to use?"
+            "Your files contain both 3-channel and greyscale images, but channels across images must be uniform. Which would you like to use?",
           );
           setChannelOptions([
             imageInfo[ImageShapeEnum.GreyScale][0].components!,
@@ -272,17 +269,17 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
           updateChannels(1);
         } else if (ImageShapeEnum.SingleRGBImage in imageInfo) {
           updateChannels(
-            imageInfo[ImageShapeEnum.SingleRGBImage][0].components!
+            imageInfo[ImageShapeEnum.SingleRGBImage][0].components!,
           );
         } else if (ImageShapeEnum.HyperStackImage in imageInfo) {
           setUploadPromptMessage(
-            "How many channels do your images consist of?"
+            "How many channels do your images consist of?",
           );
           setReferenceHyperStack(imageInfo[ImageShapeEnum.HyperStackImage][0]);
           setOpenDimensionsDialogBox(true);
         } else if (ImageShapeEnum.InvalidImage in imageInfo) {
           const errors = imageInfo[ImageShapeEnum.InvalidImage].map(
-            (info) => `${info.fileName} -- ${info.error}`
+            (info) => `${info.fileName} -- ${info.error}`,
           );
 
           if (errors.length > 0) {
@@ -293,7 +290,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
                   name: "File Upload Error",
                   description: [...errors].join("\n---\n"),
                 },
-              })
+              }),
             );
           }
         }
@@ -301,7 +298,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
         setStartUpload(true);
       }
     },
-    [dispatch, numChannels, updateChannels]
+    [dispatch, numChannels, updateChannels],
   );
 
   const handleCloseDimensionsDialog = () => {
@@ -315,8 +312,8 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
     if (fileInfo[ImageShapeEnum.InvalidImage]) {
       errors.push(
         ...fileInfo[ImageShapeEnum.InvalidImage].map(
-          (info) => `${info.fileName} -- ${info.error}`
-        )
+          (info) => `${info.fileName} -- ${info.error}`,
+        ),
       );
     }
 
@@ -368,10 +365,10 @@ const ImageShapeDialog = ({
   onClose,
 }: ImageShapeDialogProps) => {
   const [channels, setChannels] = useState<number>(
-    channelOptions ? channelOptions[0] : 1
+    channelOptions ? channelOptions[0] : 1,
   );
   const [channelsString, setChannelsString] = useState<string>(
-    channels.toString()
+    channels.toString(),
   );
   const [frames, setFrames] = useState<number>(-1);
 
@@ -400,7 +397,7 @@ const ImageShapeDialog = ({
         setErrorHelpText(
           `Invalid Image Shape: Cannot create a ${_channels} (c) x ${(
             frames / _channels
-          ).toFixed(2)} (z) image from file.`
+          ).toFixed(2)} (z) image from file.`,
         );
         setInvalidImageShape(true);
         return;

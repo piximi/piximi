@@ -12,7 +12,7 @@ import {
   FormControlLabel,
 } from "@mui/material";
 
-import { Close, PlayCircleOutline, Stop } from "@mui/icons-material";
+import { Close, PlayCircleOutline, Stop, Delete } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 
@@ -56,7 +56,7 @@ export const FitClassifierDialogAppBar = ({
   const selectedModel = useSelector(selectClassifierSelectedModel);
   const modelStatus = useSelector(selectClassifierModelStatus);
   const showClearPredictionsWarning = useSelector(
-    selectShowClearPredictionsWarning
+    selectShowClearPredictionsWarning,
   );
 
   const {
@@ -73,7 +73,16 @@ export const FitClassifierDialogAppBar = ({
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Trained,
-      })
+      }),
+    );
+  };
+
+  const handleDisposeModel = () => {
+    selectedModel.dispose();
+    dispatch(
+      classifierSlice.actions.updateModelStatus({
+        modelStatus: ModelStatus.Uninitialized,
+      }),
     );
   };
 
@@ -81,8 +90,7 @@ export const FitClassifierDialogAppBar = ({
     dispatch(
       dataSlice.actions.clearPredictions({
         kind: activeKind,
-        isPermanent: true,
-      })
+      }),
     );
     fit();
   };
@@ -110,7 +118,6 @@ export const FitClassifierDialogAppBar = ({
             color="primary"
             onClick={closeDialog}
             aria-label="Close"
-            href={""}
           >
             <Close />
           </IconButton>
@@ -134,8 +141,8 @@ export const FitClassifierDialogAppBar = ({
               noLabels
                 ? "Please label images before fitting a model."
                 : noTrain
-                ? "Model not trainable"
-                : "Fit the model"
+                  ? "Model not trainable"
+                  : "Fit the model"
             }
             placement="bottom"
           >
@@ -145,6 +152,7 @@ export const FitClassifierDialogAppBar = ({
                 onClick={handleFit}
                 disabled={noLabels || noTrain}
                 startIcon={<PlayCircleOutline />}
+                sx={{ mr: 1 }}
               >
                 Fit Classifier
               </Button>
@@ -160,6 +168,26 @@ export const FitClassifierDialogAppBar = ({
               color="primary"
             >
               <Stop />
+            </IconButton>
+          </span>
+        </Tooltip>
+        <Tooltip
+          title={
+            hasLabeledInference
+              ? "Clear or accept predictions before disposing"
+              : "Dispose the current model"
+          }
+          placement="bottom"
+        >
+          <span>
+            <IconButton
+              onClick={handleDisposeModel}
+              disabled={
+                modelStatus !== ModelStatus.Trained || hasLabeledInference
+              }
+              color="primary"
+            >
+              <Delete />
             </IconButton>
           </span>
         </Tooltip>
@@ -181,8 +209,8 @@ export const FitClassifierDialogAppBar = ({
                           {
                             showClearPredictionsWarning:
                               !showClearPredictionsWarning,
-                          }
-                        )
+                          },
+                        ),
                       )
                     }
                   />

@@ -34,10 +34,10 @@ import { logger } from "utils/common/helpers";
 
 const createClassificationIdxs = <
   T extends { id: string; categoryId: string; name: string },
-  K extends { id: string }
+  K extends { id: string },
 >(
   images: T[],
-  categories: K[]
+  categories: K[],
 ) => {
   const categoryIdxs: number[] = [];
 
@@ -47,7 +47,7 @@ const createClassificationIdxs = <
         return cat.id === im.categoryId;
       } else {
         throw Error(
-          `image "${im.name}" has an unrecognized category id of "${im.categoryId}"`
+          `image "${im.name}" has an unrecognized category id of "${im.categoryId}"`,
         );
       }
     });
@@ -60,7 +60,7 @@ const createClassificationIdxs = <
 
 const sampleGenerator = <T extends Omit<Thing, "kind">, K extends OldCategory>(
   images: Array<T>,
-  categories: Array<K>
+  categories: Array<K>,
 ) => {
   const count = images.length;
   const categoryIdxs = createClassificationIdxs(images, categories);
@@ -104,7 +104,7 @@ const cropResize = (
   item: {
     xs: Tensor3D;
     ys: Tensor1D;
-  }
+  },
 ): {
   xs: Tensor3D;
   ys: Tensor1D;
@@ -127,10 +127,10 @@ const cropResize = (
       cropCoords = [0.0, 0.0, 1.0, 1.0];
       break;
     default:
-      if (process.env.NODE_ENV !== "production") {
+      if (import.meta.env.NODE_ENV !== "production") {
         console.error(
           "No case for CropSchema:",
-          preprocessOptions.cropOptions.cropSchema
+          preprocessOptions.cropOptions.cropSchema,
         );
       }
       throw Error("CropSchema has unknown value");
@@ -146,7 +146,7 @@ const cropResize = (
         ? padToMatch(
             item.xs,
             { width: cropSize[1], height: cropSize[0] },
-            "constant"
+            "constant",
           )
         : item.xs;
 
@@ -158,7 +158,7 @@ const cropResize = (
         box,
         boxInd,
         cropSize,
-        "bilinear"
+        "bilinear",
       )
       .reshape([
         inputShape.height,
@@ -178,7 +178,7 @@ const scale = (
   items: {
     xs: Tensor3D;
     ys: Tensor1D;
-  }
+  },
 ) => {
   const scaleddXs = denormalizeTensor(items.xs, bitDepth);
 
@@ -196,72 +196,58 @@ let infLimit = 0;
 const doShowImages = async (
   partition: Partition,
   xsData: number[][][],
-  ysData: number[]
+  ysData: number[],
 ) => {
   try {
-    let canvas: HTMLCanvasElement;
+    const canvas: HTMLCanvasElement = document.createElement("canvas");
     const refHeight = xsData.length;
     const refWidth = xsData[0].length;
 
-    if (process.env.NODE_ENV === "test") {
-      const { createCanvas } = require("canvas");
-      canvas = createCanvas(refWidth, refHeight);
-    } else {
-      canvas = document.createElement("canvas");
-      canvas.width = refWidth;
-      canvas.height = refHeight;
-    }
+    canvas.width = refWidth;
+    canvas.height = refHeight;
 
     const imTensor = tensor3d(xsData, undefined, "int32");
     const imageDataArr = await browser.toPixels(imTensor);
     imTensor.dispose();
-    let imageData;
-    if (process.env.NODE_ENV === "test") {
-      const { createImageData } = require("canvas");
-      imageData = createImageData(imageDataArr, imTensor.shape[1]);
-    } else {
-      imageData = new ImageData(
-        imageDataArr,
-        imTensor.shape[1], // width
-        imTensor.shape[0] // height
-      );
-    }
+    const imageData = new ImageData(
+      imageDataArr,
+      imTensor.shape[1], // width
+      imTensor.shape[0], // height
+    );
     const ctx = canvas.getContext("2d");
-    //@ts-ignore
-    ctx.putImageData(imageData, 0, 0);
+    if (ctx) ctx.putImageData(imageData, 0, 0);
 
     if (partition === Partition.Training && trainLimit < 5) {
       trainLimit++;
       logger(
         `Training, class: 
         ${ysData.findIndex((e) => e === 1)}
-        ${canvas.toDataURL()}`
+        ${canvas.toDataURL()}`,
       );
     } else if (partition === Partition.Validation && valLimit < 5) {
       valLimit++;
       logger(
         `Validation, class: 
         ${ysData.findIndex((e) => e === 1)}
-        ${canvas.toDataURL()}`
+        ${canvas.toDataURL()}`,
       );
     } else if (partition === Partition.Inference && infLimit < 5) {
       infLimit++;
       logger(
         `Inference, class: 
         ${ysData.findIndex((e) => e === 1)}
-        ${canvas.toDataURL()}`
+        ${canvas.toDataURL()}`,
       );
     }
   } catch (e) {
-    if (process.env.NODE_ENV !== "production") console.error(e);
+    if (import.meta.env.NODE_ENV !== "production") console.error(e);
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const doShow = (
   partition: Partition,
   scale: boolean,
-  value: TensorContainer
+  value: TensorContainer,
 ) => {
   const items = value as {
     xs: Tensor3D;
@@ -282,14 +268,14 @@ const doShow = (
     if (numChannels === 2) {
       const ch3 = fill(
         [items.xs.shape[0], items.xs.shape[1], items.xs.shape[2], 1],
-        0
+        0,
       );
       xsIm = items.xs.concat(ch3, 3) as Tensor3D;
     } else if (numChannels > 3) {
       xsIm = slice(
         items.xs,
         [0, 0, 0],
-        [items.xs.shape[0], items.xs.shape[1], 3]
+        [items.xs.shape[0], items.xs.shape[1], 3],
       );
     } else {
       xsIm = items.xs;
@@ -336,10 +322,10 @@ export const preprocessClassifier = ({
   ) {
     // no need to copy the tensors here
     imageSet = images.flatMap((im) =>
-      Array(preprocessOptions.cropOptions.numCrops).fill(im)
+      Array(preprocessOptions.cropOptions.numCrops).fill(im),
     );
     catSet = categories.flatMap((cat) =>
-      Array(preprocessOptions.cropOptions.numCrops).fill(cat)
+      Array(preprocessOptions.cropOptions.numCrops).fill(cat),
     );
   } else {
     imageSet = images;
@@ -353,8 +339,8 @@ export const preprocessClassifier = ({
         null,
         inputShape,
         preprocessOptions,
-        images[0].partition === Partition.Training
-      )
+        images[0].partition === Partition.Training,
+      ),
     );
 
   // If we took crops, the crops from each sample will be sequentially arranged
@@ -369,13 +355,13 @@ export const preprocessClassifier = ({
     imageData = imageData.map(scale.bind(null, images[0].bitDepth));
   }
 
-  if (process.env.REACT_APP_LOG_LEVEL === "4") {
+  if (import.meta.env.VITE_APP_LOG_LEVEL === "4") {
     imageData.forEachAsync(
       doShow.bind(
         null,
         images[0].partition,
-        preprocessOptions.rescaleOptions.rescale
-      )
+        preprocessOptions.rescaleOptions.rescale,
+      ),
     );
   }
 

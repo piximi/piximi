@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom";
-// import * as serviceWorker from "./serviceWorker";
 
 import { DndProvider } from "react-dnd";
 import { Provider } from "react-redux";
@@ -14,7 +13,5 @@ ReactDOM.render(
       <Application />
     </DndProvider>
   </Provider>,
-  document.getElementById("root")
+  document.getElementById("root"),
 );
-
-// serviceWorker.register();

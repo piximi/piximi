@@ -22,7 +22,7 @@ export const ListItemHoldButton = ({
   icon?: ReactElement;
 } & Pick<ListItemTextProps, "primaryTypographyProps">) => {
   const [holdElapsed, setHoldElapsed] = useState<number>(0);
-  const [intervalId, setIntervalId] = useState<NodeJS.Timer>();
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout>();
   const [loadPercent, setLoadPercent] = useState<number>(0);
 
   const handleMouseDown = () => {
@@ -33,7 +33,7 @@ export const ListItemHoldButton = ({
   };
 
   const handleMouseUp = () => {
-    clearInterval(intervalId);
+    if (intervalId) clearInterval(intervalId);
 
     setHoldElapsed(0);
   };
@@ -54,7 +54,7 @@ export const ListItemHoldButton = ({
       sx={(theme) => ({
         backgroundImage: `linear-gradient(to right, ${alpha(
           theme.palette.primary.main,
-          0.3
+          0.3,
         )} ${loadPercent}%, rgba(255,255,255,0) 1%)`,
       })}
     >

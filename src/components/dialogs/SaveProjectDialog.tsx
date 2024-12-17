@@ -43,7 +43,7 @@ export const SaveProjectDialog = ({
       applicationSettingsSlice.actions.sendLoadPercent({
         loadPercent,
         loadMessage,
-      })
+      }),
     );
   };
 
@@ -54,7 +54,7 @@ export const SaveProjectDialog = ({
       data,
       classifier,
       segmenter,
-      onLoadProgress
+      onLoadProgress,
     )
       .then((zip) => {
         return zip.generateAsync(
@@ -67,11 +67,11 @@ export const SaveProjectDialog = ({
           (meta: { percent: number }) => {
             onLoadProgress(
               meta.percent / 100,
-              `compressing ${meta.percent.toFixed(2)}%`
+              `compressing ${meta.percent.toFixed(2)}%`,
             );
-            // process.env.REACT_APP_LOG_LEVEL === "1" &&
+            // import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
             logger(`zipping %${Math.floor(meta.percent)}`);
-          }
+          },
         );
       })
       .then((blob) => {
@@ -80,14 +80,14 @@ export const SaveProjectDialog = ({
         // don't use onLoadProgress here, it may be sleeping
         // and ignoring updates; this *must* go through
         dispatch(
-          applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 })
+          applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 }),
         );
       })
       .catch((err: Error) => {
-        process.env.REACT_APP_LOG_LEVEL === "1" && console.error(err);
+        import.meta.env.VITE_APP_LOG_LEVEL === "1" && console.error(err);
 
-        process.env.NODE_ENV !== "production" &&
-          process.env.REACT_APP_LOG_LEVEL === "1" &&
+        import.meta.env.NODE_ENV !== "production" &&
+          import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
           console.error(err);
         const warning: AlertState = {
           alertType: AlertType.Warning,
@@ -98,7 +98,7 @@ export const SaveProjectDialog = ({
         dispatch(
           applicationSettingsSlice.actions.updateAlertState({
             alertState: warning,
-          })
+          }),
         );
       });
 

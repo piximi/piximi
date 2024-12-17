@@ -47,7 +47,7 @@ export const AlertBar = ({
   const [showCreateGitHubIssue, setShowCreateGitHubIssue] =
     React.useState(false);
   const [colorTheme, setColorTheme] = React.useState<PaletteColor>(
-    theme.palette.primary
+    theme.palette.primary,
   );
   const [errorStateIcon, setErrorStateIcon] = React.useState<JSX.Element>();
   const [issueDescription, setIssueDescription] = React.useState("");
@@ -62,7 +62,7 @@ export const AlertBar = ({
           alertState.description +
             "\n\n**Steps to reproduce:**\n" +
             "\n\n**Stacktrace:**\n" +
-            alertState.stackTrace
+            alertState.stackTrace,
         );
         break;
       case AlertType.Warning:
@@ -95,7 +95,7 @@ export const AlertBar = ({
     if (setShowAlertBar) {
       setShowAlertBar(false);
     } else {
-      dispatch(applicationSettingsSlice.actions.hideAlertState({}));
+      dispatch(applicationSettingsSlice.actions.hideAlertState());
     }
   };
 
@@ -120,7 +120,7 @@ export const AlertBar = ({
                 createGitHubIssue(
                   alertState.name,
                   issueDescription,
-                  AlertType.Error
+                  AlertType.Error,
                 )
               }
             >

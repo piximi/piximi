@@ -14,7 +14,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 type BaseExampleDialogProps = {
   open: boolean;
-  onClose: () => void;
+  onClose: (event?: object, reason?: "backdropClick" | "escapeKeyDown") => void;
   title: string;
   children: ReactElement;
 };
@@ -46,7 +46,7 @@ export const BaseExampleDialog = ({
             right: theme.spacing(1),
             top: theme.spacing(1),
           })}
-          onClick={onClose}
+          onClick={(event) => onClose(event, "escapeKeyDown")}
         >
           <CloseIcon />
         </IconButton>

@@ -28,7 +28,7 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
   } = useMenu();
 
   const handleSelectProjectMenu = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
+    event: React.MouseEvent<HTMLElement, MouseEvent>,
   ) => {
     setSelectedMenu("project");
     handleOpenProjectMenu(event);
@@ -53,7 +53,7 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
   } = useMenu();
 
   const handleSelectImageMenu = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
+    event: React.MouseEvent<HTMLElement, MouseEvent>,
   ) => {
     setSelectedMenu("image");
     handleOpenImageMenu(event);

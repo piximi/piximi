@@ -1,5 +1,9 @@
-import * as T from "io-ts";
-import * as ImageJS from "image-js";
+import { TypeOf as IOTSTypeOf } from "io-ts";
+import {
+  Stack as IJSStack,
+  BitDepth as IJSBitDepth,
+  DataArray as IJSDataArray,
+} from "image-js";
 import {
   SerializedAnnotationRType,
   SerializedAnnotationRTypeV02,
@@ -14,34 +18,36 @@ import {
 import { MIMETYPES } from "./constants";
 import { ImageShapeEnum } from "./enums";
 
-export type SerializedCOCOAnnotationType = T.TypeOf<
+export type SerializedCOCOAnnotationType = IOTSTypeOf<
   typeof SerializedCOCOAnnotationRType
 >;
 
-export type SerializedCOCOCategoryType = T.TypeOf<
+export type SerializedCOCOCategoryType = IOTSTypeOf<
   typeof SerializedCOCOCategoryRType
 >;
-export type SerializedAnnotatorImageType = T.TypeOf<
+export type SerializedAnnotatorImageType = IOTSTypeOf<
   typeof SerializedImageRType
 >;
 
-export type SerializedCOCOImageType = T.TypeOf<typeof SerializedCOCOImageRType>;
+export type SerializedCOCOImageType = IOTSTypeOf<
+  typeof SerializedCOCOImageRType
+>;
 
-export type SerializedCOCOFileType = T.TypeOf<typeof SerializedCOCOFileRType>;
+export type SerializedCOCOFileType = IOTSTypeOf<typeof SerializedCOCOFileRType>;
 
-export type SerializedFileType = T.TypeOf<typeof SerializedFileRType>;
-export type SerializedFileTypeV02 = T.TypeOf<typeof SerializedFileRTypeV02>;
-export type SerializedAnnotationType = T.TypeOf<
+export type SerializedFileType = IOTSTypeOf<typeof SerializedFileRType>;
+export type SerializedFileTypeV02 = IOTSTypeOf<typeof SerializedFileRTypeV02>;
+export type SerializedAnnotationType = IOTSTypeOf<
   typeof SerializedAnnotationRType
 >;
 
-export type NewSerializedAnnotationType = T.TypeOf<
+export type NewSerializedAnnotationType = IOTSTypeOf<
   typeof SerializedAnnotationRTypeV02
 >;
 
 export type ImageFileType = {
   fileName: string;
-  imageStack: ImageJS.Stack;
+  imageStack: IJSStack;
 };
 
 export type ImageFileError = {
@@ -51,9 +57,9 @@ export type ImageFileError = {
 
 export type MIMEType = (typeof MIMETYPES)[number];
 
-export type BitDepth = ImageJS.BitDepth;
+export type BitDepth = IJSBitDepth;
 
-export type DataArray = ImageJS.DataArray;
+export type DataArray = IJSDataArray;
 
 export interface ImageShapeInfo {
   shape: ImageShapeEnum;

@@ -4,16 +4,14 @@ import { useSelector } from "react-redux";
 import { Annotation } from "./Annotation";
 import { AnnotationTransformer } from "./AnnotationTransformer";
 
-import {
-  selectImageViewerFilters,
-  selectSelectedAnnotationIds,
-} from "store/imageViewer/selectors";
+import { selectImageViewerFilters } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectSelectedAnnotationIds } from "views/ImageViewer/state/annotator/selectors";
 import {
   selectActiveAnnotationsViews,
   selectWorkingAnnotationView,
-} from "store/imageViewer/reselectors";
+} from "views/ImageViewer/state/annotator/reselectors";
 
-import { AnnotationTool } from "utils/annotator/tools";
+import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
 type AnnotationsProps = {
   annotationTool: AnnotationTool;
@@ -28,18 +26,18 @@ export const Annotations = ({ annotationTool }: AnnotationsProps) => {
     () =>
       annotationObjects.filter(
         (annObj) =>
-          annObj.annotation.id !== workingAnnotationObject?.annotation.id
+          annObj.annotation.id !== workingAnnotationObject?.annotation.id,
       ),
-    [annotationObjects, workingAnnotationObject]
+    [annotationObjects, workingAnnotationObject],
   );
 
   const nonWorkingSelectedAnnotationsIds = useMemo(
     () =>
       selectedAnnotationsIds.filter(
         (selectedAnnotationId) =>
-          selectedAnnotationId !== workingAnnotationObject?.annotation.id
+          selectedAnnotationId !== workingAnnotationObject?.annotation.id,
       ),
-    [selectedAnnotationsIds, workingAnnotationObject]
+    [selectedAnnotationsIds, workingAnnotationObject],
   );
 
   return (
@@ -52,7 +50,7 @@ export const Annotations = ({ annotationTool }: AnnotationsProps) => {
           fillColor={annotationObject.fillColor}
           selected={true}
           isFiltered={imageViewerFilters.categoryId.includes(
-            annotationObject.annotation.categoryId
+            annotationObject.annotation.categoryId,
           )}
         />
       ))}

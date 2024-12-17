@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Box, useTheme } from "@mui/material";
 
-import { DividerHeader } from "components/ui/DividerHeader";
+import { DividerHeader } from "components/ui";
 import { FilterChip } from "./FilterChip";
 
 import { selectUnfilteredActiveCategoryIds } from "store/project/reselectors";
@@ -37,8 +37,8 @@ export const CategoryFilterList = ({
           return (
             <FilterChip
               key={`cat-filter-chip-${catId}`}
-              label={categories[catId].name}
-              color={categories[catId].color}
+              label={categories[catId]!.name}
+              color={categories[catId]!.color}
               toggleFilter={() => toggleFilter(catId)}
               isFiltered={true}
             />
@@ -48,8 +48,8 @@ export const CategoryFilterList = ({
           return (
             <FilterChip
               key={`cat-filter-chip-${catId}`}
-              label={categories[catId].name}
-              color={categories[catId].color}
+              label={categories[catId]!.name}
+              color={categories[catId]!.color}
               toggleFilter={() => toggleFilter(catId)}
               isFiltered={false}
             />

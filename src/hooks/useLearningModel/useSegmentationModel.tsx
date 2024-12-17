@@ -26,7 +26,7 @@ export const useSegmentationModel = () => {
     dispatch(
       segmenterSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Predicting,
-      })
+      }),
     );
   };
 
@@ -36,7 +36,7 @@ export const useSegmentationModel = () => {
     dispatch(
       segmenterSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Evaluating,
-      })
+      }),
     );
   };
   const handleImportModel = async (model: Model, inputShape: Shape) => {
@@ -49,13 +49,13 @@ export const useSegmentationModel = () => {
         segmenterSlice.actions.loadUserSelectedModel({
           inputShape,
           model: model as Segmenter,
-        })
+        }),
       );
-    } else if (process.env.NODE_ENV !== "production") {
+    } else if (import.meta.env.NODE_ENV !== "production") {
       console.warn(
         `Attempting to dispatch a model with task ${
           ModelTask[model.task]
-        }, should be ${ModelTask[ModelTask.Segmentation]}`
+        }, should be ${ModelTask[ModelTask.Segmentation]}`,
       );
     }
   };

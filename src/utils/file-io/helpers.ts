@@ -1,5 +1,5 @@
-import * as ImageJS from "image-js";
-import * as DicomParser from "dicom-parser";
+import IJSImage, { Stack as IJSStack } from "image-js";
+import { parseDicom } from "dicom-parser";
 
 import {
   ImageFileError,
@@ -17,7 +17,7 @@ import { AlertType } from "utils/common/enums";
 import { ImageObject } from "store/data/types";
 
 async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
-  let imageStack: ImageJS.Stack;
+  let imageStack: IJSStack;
   if (imageTypeEnum === ImageShapeEnum.DicomImage) {
     imageStack = await decodeDicomImage(imageFile);
   } else {
@@ -35,8 +35,8 @@ export const decodeDicomImage = async (imageFile: File) => {
 
   const imgArray = new Uint8Array(imgArrayBuffer);
 
-  var dicomImgData = DicomParser.parseDicom(imgArray);
-  var pixelDataElement = dicomImgData.elements.x7fe00010;
+  const dicomImgData = parseDicom(imgArray);
+  const pixelDataElement = dicomImgData.elements.x7fe00010;
 
   const samplesPerPixel = dicomImgData.int16("x00280002");
   const rows = dicomImgData.int16("x00280010");
@@ -47,18 +47,18 @@ export const decodeDicomImage = async (imageFile: File) => {
     throw Error("Failed to parse dicom image tags");
   }
 
-  var pixelData: Uint16Array | Uint8Array;
+  let pixelData: Uint16Array | Uint8Array;
   if (bitsAllocated === 8) {
     pixelData = new Uint8Array(
       dicomImgData.byteArray.buffer,
       pixelDataElement.dataOffset,
-      pixelDataElement.length / 2
+      pixelDataElement.length / 2,
     );
   } else {
     pixelData = new Uint16Array(
       dicomImgData.byteArray.buffer,
       pixelDataElement.dataOffset,
-      pixelDataElement.length / 2
+      pixelDataElement.length / 2,
     );
   }
 
@@ -66,11 +66,11 @@ export const decodeDicomImage = async (imageFile: File) => {
   const dataSize = pixelData.length;
   const slices = dataSize / rowXCol;
 
-  const images: ImageJS.Image[] = [];
+  const images: IJSImage[] = [];
   if (Number.isInteger(slices)) {
     for (let i = 0; i < dataSize; i += rowXCol) {
       const slicePixelData = pixelData.slice(i, i + rowXCol);
-      const img = new ImageJS.Image(rows, columns, slicePixelData, {
+      const img = new IJSImage(rows, columns, slicePixelData, {
         components: samplesPerPixel,
         bitDepth: bitsAllocated,
         alpha: 0,
@@ -84,19 +84,19 @@ export const decodeDicomImage = async (imageFile: File) => {
     throw new Error("Could not parse dicom image slices.");
   }
 
-  return new ImageJS.Stack(images);
+  return new IJSStack(images);
 };
 /*
-  Receives a File blob and returns an ImageJS.Stack
+  Receives a File blob and returns an IJSStack
   
   If the file is a greyscale, rgb, rgba, ImageJS will return a single
-  ImageJS.Image object, where the data field has the pixel data interleaved
+  IJSImage object, where the data field has the pixel data interleaved
   (including alpha, if present).
 
     e.g. for rgba: [r1, g1, b1, a1, r2, g2, b2, a2, ...]
 
-  Otherwise ImageJS will return an ImageJS.Stack object, which is a sublcass
-  of a simple array, where each element is a single channel ImageJS.Image object.
+  Otherwise ImageJS will return an IJSStack object, which is a sublcass
+  of a simple array, where each element is a single channel IJSImage object.
 
   Instead we want to always return a stack, regardless of filetype.
   Alpha channel is discarded, if present.
@@ -112,22 +112,22 @@ export const loadImageFileAsStack = async (file: File) => {
   try {
     const buffer = await file.arrayBuffer();
 
-    const image = (await ImageJS.Image.load(buffer, {
+    const image = (await IJSImage.load(buffer, {
       ignorePalette: true,
-    })) as ImageJS.Image | ImageJS.Stack;
+    })) as IJSImage | IJSStack;
 
     return forceStack(image);
   } catch (err) {
-    process.env.NODE_ENV !== "production" &&
+    import.meta.env.NODE_ENV !== "production" &&
       console.error(`Error loading image file ${file.name}`);
     throw err;
   }
 };
 function isImageShapeValid(
-  imageStack: Array<ImageJS.Image>,
+  imageStack: Array<IJSImage>,
   channels: number,
   slices: number,
-  imageShape: ImageShapeEnum
+  imageShape: ImageShapeEnum,
 ) {
   if (imageShape === ImageShapeEnum.GreyScale) {
     return channels === 1 && imageStack.length === 1;
@@ -143,7 +143,7 @@ export const uploadImages = async (
   channels: number,
   slices: number,
   referenceShape: ImageShapeInfo,
-  categoryId: string
+  categoryId: string,
 ): Promise<{
   imagesToUpload: ImageObject[];
   warning: any;
@@ -158,7 +158,7 @@ export const uploadImages = async (
     try {
       const { imageStack, fileName } = await decodeImageFile(
         file,
-        referenceShape.shape
+        referenceShape.shape,
       );
       if (
         !isImageShapeValid(imageStack, channels, slices, referenceShape.shape)
@@ -181,7 +181,7 @@ export const uploadImages = async (
             fileName,
             undefined,
             slices,
-            channels
+            channels,
           );
           imageToUpload.kind = "Image";
           imageToUpload.categoryId = categoryId;
@@ -200,7 +200,7 @@ export const uploadImages = async (
         }
       }
     } catch (err) {
-      process.env.NODE_ENV !== "production" && console.error(err);
+      import.meta.env.NODE_ENV !== "production" && console.error(err);
       invalidImageFiles.push({
         fileName: file.name,
         error: "Could not decode",
@@ -214,7 +214,7 @@ export const uploadImages = async (
       name: "Could not draw image from files",
       description: `Could not load or resolve images from the following files: ${invalidImageFiles.reduce(
         (prev, curr) => prev + "\n" + curr.fileName + ": (" + curr.error + ")",
-        ""
+        "",
       )}`,
     };
   }
@@ -227,13 +227,13 @@ export const uploadImages = async (
  ----------------------------
  */
 
-export const forceStack = async (image: ImageJS.Image | ImageJS.Stack) => {
+export const forceStack = async (image: IJSImage | IJSStack) => {
   if (Array.isArray(image)) {
-    return image as ImageJS.Stack;
+    return image as IJSStack;
   }
-  const splitImage = (image as ImageJS.Image).split({ preserveAlpha: false });
+  const splitImage = (image as IJSImage).split({ preserveAlpha: false });
   if (image.alpha === 1) {
-    return new ImageJS.Stack(splitImage.splice(0, splitImage.length - 1));
+    return new IJSStack(splitImage.splice(0, splitImage.length - 1));
   }
   return splitImage;
 };
@@ -260,7 +260,7 @@ export const forceStack = async (image: ImageJS.Image | ImageJS.Stack) => {
 */
 export const fileFromPath = async (
   imPath: string,
-  name: string | undefined = undefined
+  name: string | undefined = undefined,
 ) => {
   let imName: string;
 
@@ -280,13 +280,13 @@ export const fileFromPath = async (
   Converts a base64 dataURL encoded image into an ImageJS stack
 
   If the encoded image is a greyscale, rgb, or rgba, ImageJS will return a single
-  ImageJS.Image object, where the data field has the pixel data interleaved
+  IJSImage object, where the data field has the pixel data interleaved
   (including alpha, if present).
 
     e.g. for rgba: [r1, g1, b1, a1, r2, g2, b2, a2, ...]
 
-  Otherwise ImageJS will return an ImageJS.Stack object, which is a sublcass
-  of a simple array, where each element is a single channel ImageJS.Image object.
+  Otherwise ImageJS will return an IJSStack object, which is a sublcass
+  of a simple array, where each element is a single channel IJSImage object.
 
   Instead we want to always return a stack, regardless of filetype.
   Alpha channel is discarded, if present.
@@ -294,22 +294,22 @@ export const fileFromPath = async (
  */
 export const loadDataUrlAsStack = async (dataURL: string) => {
   try {
-    const image = await ImageJS.Image.load(dataURL, {
+    const image = await IJSImage.load(dataURL, {
       ignorePalette: true,
     });
 
     return forceStack(image);
   } catch (err) {
-    process.env.NODE_ENV !== "production" &&
+    import.meta.env.NODE_ENV !== "production" &&
       console.error("Error loading dataURL");
     throw err;
   }
 };
 
 export const getImageInformation = (
-  image: ImageJS.Image | ImageJS.Stack
+  image: IJSImage | IJSStack,
 ): ImageShapeInfo => {
-  // a "proper" RGB will be an ImageJS.Image object with 3 components
+  // a "proper" RGB will be an IJSImage object with 3 components
   if (!Array.isArray(image) && image.components === 3) {
     return {
       shape: ImageShapeEnum.SingleRGBImage,
@@ -317,7 +317,7 @@ export const getImageInformation = (
       bitDepth: image.bitDepth,
       alpha: image.alpha === 1,
     };
-    // 1 channel (greyscale) image will also be an ImageJs.Image object
+    // 1 channel (greyscale) image will also be an IJSImage object
   } else if (!Array.isArray(image) && image.components === 1) {
     return {
       shape: ImageShapeEnum.GreyScale,
@@ -327,13 +327,13 @@ export const getImageInformation = (
     };
     // should not happen
   } else if (!Array.isArray(image)) {
-    process.env.NODE_ENV !== "production" &&
+    import.meta.env.NODE_ENV !== "production" &&
       console.error("Unrecognized Image.JS.Image type, channels not in [1,3]");
     return {
       shape: ImageShapeEnum.InvalidImage,
     };
   }
-  // else RGBstack, or multi-channel, or multi-z-stack image as an ImageJS.Stack object
+  // else RGBstack, or multi-channel, or multi-z-stack image as an IJSStack object
   else {
     return {
       shape: ImageShapeEnum.HyperStackImage,
@@ -345,13 +345,13 @@ export const getImageInformation = (
 };
 
 export const getImageFileInformation = async (
-  file: File
+  file: File,
 ): Promise<ImageFileShapeInfo> => {
   const ext = file.type as MIMEType;
   try {
     // https://stackoverflow.com/questions/56565528/typescript-const-assertions-how-to-use-array-prototype-includes
     if (!(MIMETYPES as ReadonlyArray<string>).includes(file.type)) {
-      process.env.NODE_ENV !== "production" &&
+      import.meta.env.NODE_ENV !== "production" &&
         console.error("Invalid MIME Type:", ext);
       return { shape: ImageShapeEnum.InvalidImage, ext };
     }
@@ -361,15 +361,12 @@ export const getImageFileInformation = async (
     }
 
     const buffer = await file.arrayBuffer();
-    const image: ImageJS.Image | ImageJS.Stack = await ImageJS.Image.load(
-      buffer,
-      {
-        ignorePalette: true,
-      }
-    );
+    const image: IJSImage | IJSStack = await IJSImage.load(buffer, {
+      ignorePalette: true,
+    });
 
     return { ...getImageInformation(image), ext };
-  } catch (err) {
+  } catch {
     return { shape: ImageShapeEnum.InvalidImage, ext };
   }
 };

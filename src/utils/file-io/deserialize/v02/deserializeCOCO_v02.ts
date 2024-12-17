@@ -1,5 +1,6 @@
-import { encode, maskFromPoints } from "utils/annotator";
-import { generateUUID, getPropertiesFromImage } from "utils/common/helpers";
+import { encode, maskFromPoints } from "views/ImageViewer/utils";
+import { generateUUID } from "store/data/helpers";
+import { getPropertiesFromImage } from "utils/common/helpers";
 import { logger } from "utils/common/helpers";
 
 import { Partition } from "utils/models/enums";
@@ -9,7 +10,7 @@ import {
   SerializedCOCOFileType,
   SerializedCOCOImageType,
 } from "../../types";
-import { Point } from "utils/annotator/types";
+import { Point } from "views/ImageViewer/utils/types";
 import { UNKNOWN_ANNOTATION_CATEGORY_COLOR } from "utils/common/constants";
 import { RequireOnly } from "utils/common/types";
 import {
@@ -39,7 +40,7 @@ const reconcileCOCOCategories = (
   existingCategories: Array<Category>,
   existingKinds: Array<Kind>,
   serializedCategories: Array<SerializedCOCOCategoryType>,
-  availableColors: Array<string> = []
+  availableColors: Array<string> = [],
 ) => {
   const categoryMap: CategoryMap = {};
   const isolatedUnknownCats: Record<string, Category> = {};
@@ -53,10 +54,10 @@ const reconcileCOCOCategories = (
     const existingCat = existingCategories.find(
       (c) =>
         c.name.toLowerCase() === cocoCat.name.toLowerCase() &&
-        c.kind.toLowerCase() === cocoCat.supercategory.toLowerCase()
+        c.kind.toLowerCase() === cocoCat.supercategory.toLowerCase(),
     );
     const existingKind = existingKinds.find(
-      (k) => k.id === cocoCat.supercategory
+      (k) => k.id === cocoCat.supercategory,
     );
 
     if (existingCat) {
@@ -113,6 +114,7 @@ const reconcileCOCOCategories = (
         } else {
           const newKind: Kind = {
             id: cocoCat.supercategory,
+            displayName: cocoCat.supercategory,
             categories: [newUnknownCatId],
             containing: [],
             unknownCategoryId: newUnknownCatId,
@@ -134,7 +136,7 @@ const reconcileCOCOCategories = (
           categoryMap[cocoCat.id] = { new: newUnknownCategory };
 
           const previouslyIsolated = Object.values(isolatedUnknownCats).find(
-            (c) => c.kind === cocoCat.supercategory
+            (c) => c.kind === cocoCat.supercategory,
           );
 
           if (previouslyIsolated) {
@@ -172,12 +174,12 @@ const reconcileCOCOCategories = (
 
 const reconcileCOCOImages = (
   existingImages: Array<ImageObject>,
-  serializedImages: Array<SerializedCOCOImageType>
+  serializedImages: Array<SerializedCOCOImageType>,
 ) => {
   const imageMap: ImageMap = {};
   serializedImages.forEach((cocoIm) => {
     const existingImage = existingImages.find(
-      (i) => cocoIm.file_name === i.name
+      (i) => cocoIm.file_name === i.name,
     );
     imageMap[cocoIm.id] = { new: cocoIm };
     if (existingImage) {
@@ -192,7 +194,7 @@ const deserializeCOCOAnnotation = (
   cocoAnn: SerializedCOCOAnnotationType,
   crowded: Array<number>,
   multipart: Array<number>,
-  malformed: Array<number>
+  malformed: Array<number>,
 ) => {
   let skip = false;
 
@@ -236,7 +238,7 @@ const deserializeCOCOAnnotation = (
     points,
     { width: imageShape.width, height: imageShape.height },
     bbox,
-    true
+    true,
   );
 
   const encodedMask = encode(decodedMask);
@@ -248,7 +250,7 @@ export const deserializeCOCOFile_v02 = async (
   existingImages: Array<ImageObject>,
   existingCategories: Array<Category>,
   existingKinds: Array<Kind>,
-  availableColors: Array<string> = []
+  availableColors: Array<string> = [],
 ) => {
   const reconciledAnnotations: AnnotationObject[] = [];
   const annotationNames: Record<string, number> = {};
@@ -262,7 +264,7 @@ export const deserializeCOCOFile_v02 = async (
     existingCategories,
     existingKinds,
     cocoFile.categories,
-    availableColors
+    availableColors,
   );
 
   const imageMap = reconcileCOCOImages(existingImages, cocoFile.images);
@@ -290,7 +292,7 @@ export const deserializeCOCOFile_v02 = async (
       cocoAnn,
       crowded,
       multipart,
-      malformed
+      malformed,
     );
     if (skip) {
       continue;
@@ -304,7 +306,7 @@ export const deserializeCOCOFile_v02 = async (
 
     const annPropsFromIm = await getPropertiesFromImage(
       image,
-      reconciledAnnotation as RequireOnly<AnnotationObject, "boundingBox">
+      reconciledAnnotation as RequireOnly<AnnotationObject, "boundingBox">,
     );
     Object.assign(reconciledAnnotation, annPropsFromIm);
 
@@ -349,8 +351,8 @@ export const deserializeCOCOFile_v02 = async (
   }
 
   if (
-    process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "1"
+    import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "1"
   ) {
     const numMalformed = malformed.length;
     const numCrowded = crowded.length;
@@ -360,13 +362,13 @@ export const deserializeCOCOFile_v02 = async (
 
     malformed.length > 0 &&
       logger(
-        `Dropped ${malformed.length} annotations with malformed polygon shapes: ${malformed}`
+        `Dropped ${malformed.length} annotations with malformed polygon shapes: ${malformed}`,
       );
     crowded.length > 0 &&
       logger(`Dropped ${crowded.length} annotations with iscrowd=1`);
     multipart.length > 0 &&
       logger(
-        `Dropped ${multipart.length} annotations with multiple polygon parts`
+        `Dropped ${multipart.length} annotations with multiple polygon parts`,
       );
     logger(`Created ${numKept}/${numInFile} annotations`);
   }

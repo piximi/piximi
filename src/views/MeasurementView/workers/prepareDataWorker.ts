@@ -1,11 +1,10 @@
-import * as tf from "@tensorflow/tfjs";
+import { tensor4d } from "@tensorflow/tfjs";
 
 import { prepareThingData } from "../utils";
 
 import { ThingData } from "store/measurements/types";
 import { DataArray } from "utils/file-io/types";
 
-/* eslint-disable-next-line no-restricted-globals */
 self.onmessage = async (
   e: MessageEvent<{
     kind: string;
@@ -16,7 +15,7 @@ self.onmessage = async (
       encodedMask?: number[];
       decodedMask?: DataArray;
     }[];
-  }>
+  }>,
 ) => {
   const thingInfo: ThingData = {};
   const thingCount = e.data.things.length;
@@ -24,18 +23,16 @@ self.onmessage = async (
   for await (const thingData of e.data.things) {
     const { id, data: rawData, encodedMask, decodedMask } = thingData;
 
-    const data = tf.tensor4d(rawData);
+    const data = tensor4d(rawData);
     const preparedThing = await prepareThingData({
       data,
       encodedMask,
       decodedMask,
     });
     thingInfo[id] = preparedThing;
-    /* eslint-disable-next-line no-restricted-globals */
     self.postMessage({ loadValue: Math.floor((i / thingCount) * 100) });
     i++;
   }
-  /* eslint-disable-next-line no-restricted-globals */
   self.postMessage({ kind: e.data.kind, data: thingInfo });
 };
 

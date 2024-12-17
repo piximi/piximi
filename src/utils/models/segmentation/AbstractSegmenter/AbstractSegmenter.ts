@@ -31,7 +31,7 @@ export abstract class Segmenter extends Model {
   }
 
   public abstract predict(
-    loadCb?: LoadCB
+    loadCb?: LoadCB,
   ): OrphanedAnnotationObject[][] | Promise<OrphanedAnnotationObject[][]>;
 
   /*
@@ -80,11 +80,9 @@ export abstract class Segmenter extends Model {
 
     // if that failed, and we have a graph, check the model signature
     if (outputShape === undefined && this.graph) {
-      outputShape =
-        // @ts-ignore TFJS doesn't expose these types
+      outputShape = // @ts-ignore TFJS doesn't expose these types
         this._model.modelSignature?.outputs?.output?.tensorShape?.dim?.map(
-          // @ts-ignore
-          (dimShapeObj) => parseInt(dimShapeObj.size)
+          (dimShapeObj: any) => parseInt(dimShapeObj.size),
         );
     }
 
@@ -105,8 +103,8 @@ export abstract class Segmenter extends Model {
   }
 
   public onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (
-    epochs,
-    logs
+    _epochs,
+    _logs,
   ) => {};
 
   public get modelSummary() {
@@ -150,7 +148,7 @@ export abstract class Segmenter extends Model {
 
     dummyData.dispose();
 
-    let _outputShapes: number[][] = [];
+    const _outputShapes: number[][] = [];
 
     if (!(preds instanceof Array)) {
       preds = [preds];
@@ -162,7 +160,7 @@ export abstract class Segmenter extends Model {
     }
 
     logger(
-      `Output Shape(s) are ${_outputShapes}, after replacing input dims ${variableDimIdxs} (excluding batch dims)`
+      `Output Shape(s) are ${_outputShapes}, after replacing input dims ${variableDimIdxs} (excluding batch dims)`,
     );
   }
 }

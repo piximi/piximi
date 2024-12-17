@@ -88,7 +88,7 @@ const eachUnbind = ({
 function eventHandler(
   event: KeyboardEvent,
   handler: HotkeyHandlerItem,
-  element: Document
+  element: Document,
 ) {
   if (handler.element !== element) {
     return;
@@ -267,16 +267,16 @@ function hotkeys(hotkeys: string, option: Option, method: Function) {
   }
 
   if (Object.prototype.toString.call(option) === "[object Object]") {
-    if (option.element) element = option.element; // eslint-disable-line
-    if (option.keyup) keyup = option.keyup; // eslint-disable-line
-    if (option.keydown !== undefined) keydown = option.keydown; // eslint-disable-line
-    if (option.capture !== undefined) capture = option.capture; // eslint-disable-line
-    if (typeof option.splitKey === "string") splitKey = option.splitKey; // eslint-disable-line
+    if (option.element) element = option.element;
+    if (option.keyup) keyup = option.keyup;
+    if (option.keydown !== undefined) keydown = option.keydown;
+    if (option.capture !== undefined) capture = option.capture;
+    if (typeof option.splitKey === "string") splitKey = option.splitKey;
   }
 
   // for each shortcut key
   for (let i = 0; i < keyList.length; i++) {
-    let key = keyList[i].split(splitKey); // key list
+    const key = keyList[i].split(splitKey); // key list
 
     mods = [];
 
@@ -284,8 +284,8 @@ function hotkeys(hotkeys: string, option: Option, method: Function) {
     if (key.length > 1) mods = getMods(_modifier, key);
 
     // Convert non-modifier keys to keycodes
-    let hotkey = key.at(-1)!;
-    let keyCode = hotkey === "*" ? "*" : getCode(hotkey); // * means match all shortcut keys
+    const hotkey = key.at(-1)!;
+    const keyCode = hotkey === "*" ? "*" : getCode(hotkey); // * means match all shortcut keys
     // Determine whether the key is in _handlers, if not, assign an empty array
     if (!(keyCode in _handlers)) _handlers[keyCode] = [];
     _handlers[keyCode].push({
@@ -308,7 +308,7 @@ function hotkeys(hotkeys: string, option: Option, method: Function) {
       (e) => {
         dispatch(e, element);
       },
-      capture
+      capture,
     );
     if (!winListendFocus) {
       winListendFocus = true;
@@ -318,7 +318,7 @@ function hotkeys(hotkeys: string, option: Option, method: Function) {
         () => {
           _downKeys = [];
         },
-        capture
+        capture,
       );
     }
     element.addEventListener(
@@ -327,7 +327,7 @@ function hotkeys(hotkeys: string, option: Option, method: Function) {
         dispatch(e, element);
         clearModifier(e);
       },
-      capture
+      capture,
     );
   }
 }
@@ -342,19 +342,21 @@ function trigger(shortcut: string) {
 }
 
 function setModifier(modifier: string, value: boolean) {
-  switch (modifier) {
-    case "shift" || "⇧":
-      hotkeys.shift = value;
-      return;
-    case "⌥" || "alt" || "option":
-      hotkeys.alt = value;
-      return;
-    case "⌃" || "ctrl" || "control":
-      hotkeys.control = value;
-      return;
-    case "⌘" || "cmd" || "command":
-      hotkeys.command = value;
-      return;
+  if (["shift", "⇧"].includes(modifier)) {
+    hotkeys.shift = value;
+    return;
+  }
+  if (["⌥", "alt", "option"].includes(modifier)) {
+    hotkeys.alt = value;
+    return;
+  }
+  if (["⌃", "ctrl", "control"].includes(modifier)) {
+    hotkeys.control = value;
+    return;
+  }
+  if (["⌘", "cmd", "command"].includes(modifier)) {
+    hotkeys.command = value;
+    return;
   }
 }
 

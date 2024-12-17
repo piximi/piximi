@@ -1,4 +1,4 @@
-//@ts-nocheck
+//@ts-nocheck TODO
 import hotkeys from "utils/common/hotkeys"; //{ HotkeysEvent, KeyHandler }
 import { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -18,14 +18,14 @@ import {
 
 const tagFilter = (
   { target }: KeyboardEvent,
-  enableOnTags?: HotkeyAvailableTags[]
+  enableOnTags?: HotkeyAvailableTags[],
 ) => {
   const targetTagName = target && (target as HTMLElement).tagName;
 
   return Boolean(
     targetTagName &&
       enableOnTags &&
-      enableOnTags.includes(targetTagName as HotkeyAvailableTags)
+      enableOnTags.includes(targetTagName as HotkeyAvailableTags),
   );
 };
 
@@ -37,27 +37,27 @@ export function useHotkeys(
   keys: string,
   callback: HotkeyKeyHandler,
   hotkeyContext: HotkeyContext | Array<HotkeyContext>,
-  options?: HotkeyOptions
+  options?: HotkeyOptions,
 ): void;
 export function useHotkeys(
   keys: string,
   callback: HotkeyKeyHandler,
   hotkeyContext: HotkeyContext | Array<HotkeyContext>,
-  deps?: any[]
+  deps?: any[],
 ): void;
 export function useHotkeys(
   keys: string,
   callback: HotkeyKeyHandler,
   hotkeycontext: HotkeyContext | Array<HotkeyContext>,
   options?: HotkeyOptions,
-  deps?: any[]
+  deps?: any[],
 ): void;
 export function useHotkeys(
   keys: string,
   callback: () => void,
   hotkeyContext: HotkeyContext | Array<HotkeyContext>,
   options?: any[] | HotkeyOptions,
-  deps?: any[]
+  deps?: any[],
 ): void {
   if (options instanceof Array) {
     deps = options;
@@ -103,10 +103,10 @@ export function useHotkeys(
       }
 
       return false;
-    }, //eslint-disable-next-line react-hooks/exhaustive-deps
+    },
     deps
       ? [hotkeyContext, currentHotkeyContext, enableOnTags, filter, ...deps]
-      : [hotkeyContext, currentHotkeyContext, enableOnTags, filter]
+      : [hotkeyContext, currentHotkeyContext, enableOnTags, filter],
   );
 
   useEffect(() => {

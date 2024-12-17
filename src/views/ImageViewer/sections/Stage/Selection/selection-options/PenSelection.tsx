@@ -1,10 +1,10 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import * as ReactKonva from "react-konva";
+import { Group as KonvaGroup, Line as KonvaLine } from "react-konva";
 
-import { selectImageOrigin } from "store/imageViewer/selectors";
+import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
-import { PenAnnotationTool } from "utils/annotator/tools";
+import { PenAnnotationTool } from "views/ImageViewer/utils/tools";
 
 type PenSelectionProps = {
   operator: PenAnnotationTool;
@@ -14,8 +14,8 @@ export const PenSelection = ({ operator }: PenSelectionProps) => {
   const imageOrigin = useSelector(selectImageOrigin);
   return (
     <>
-      <ReactKonva.Group>
-        <ReactKonva.Line
+      <KonvaGroup>
+        <KonvaLine
           points={operator.buffer.flatMap((point) => [
             point.x + imageOrigin.x,
             point.y + imageOrigin.y,
@@ -25,7 +25,7 @@ export const PenSelection = ({ operator }: PenSelectionProps) => {
           stroke="red"
           strokeWidth={operator.brushSize * 2}
         />
-      </ReactKonva.Group>
+      </KonvaGroup>
     </>
   );
 };

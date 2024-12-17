@@ -2,6 +2,16 @@ import { Tensor2D } from "@tensorflow/tfjs";
 import { AlertType, ImageSortKey } from "./enums";
 import { OldCategory } from "store/data/types";
 
+export type Deferred<T> = Partial<T> & {
+  deleted?: boolean;
+  added?: boolean;
+};
+
+export type DeferredEntity<T> = {
+  saved: T;
+  changes: Deferred<T>;
+};
+
 /*
 TENSORFLOW
 */
@@ -42,13 +52,8 @@ export type LoadStatus = {
 GENERATOR TYPES
 */
 // https://stackoverflow.com/questions/55105558/is-there-a-way-i-can-get-the-return-type-of-the-generator-function
-export type GeneratorReturnType<T extends Generator> = T extends Generator<
-  any,
-  infer R,
-  any
->
-  ? R
-  : never;
+export type GeneratorReturnType<T extends Generator> =
+  T extends Generator<any, infer R, any> ? R : never;
 
 /*
   HOTKEY TYPES
@@ -126,7 +131,18 @@ export type ImageSortKeyType = {
   imageSortKey: ImageSortKey;
   comparerFunction: (
     a: { name: string; category: OldCategory },
-    b: { name: string; category: OldCategory }
+    b: { name: string; category: OldCategory },
   ) => number;
   objectType: string;
+};
+
+/*
+GENERAL
+*/
+
+export type SliderOptions = {
+  min: number;
+  max: number;
+  step: number;
+  initial: number;
 };

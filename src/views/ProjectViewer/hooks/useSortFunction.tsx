@@ -42,10 +42,10 @@ const generateSeed = () => Math.floor(Math.random() * (2 ** 31 - 1));
 export const useSortFunction = () => {
   const sortType = useSelector(selectSortType);
   const [previousSortType, setPreviousSortType] = useState<ThingSortKey>(
-    ThingSortKey.None
+    ThingSortKey.None,
   );
   const categories = useSelector(selectCategoriesDictionary);
-  const theSortFunction = function (a: Thing, b: Thing) {
+  const theSortFunction = function (_a: Thing, _b: Thing) {
     return 0;
   };
   const [sortFunction, setSortFunction] = useState<
@@ -59,7 +59,7 @@ export const useSortFunction = () => {
       switch (sortType) {
         case ThingSortKey.FileName:
           setSortFunction(
-            () => (a: Thing, b: Thing) => a.name.localeCompare(b.name)
+            () => (a: Thing, b: Thing) => a.name.localeCompare(b.name),
           );
           break;
 
@@ -72,12 +72,12 @@ export const useSortFunction = () => {
           break;
         case ThingSortKey.Name:
           setSortFunction(
-            () => (a: Thing, b: Thing) => a.name.localeCompare(b.name)
+            () => (a: Thing, b: Thing) => a.name.localeCompare(b.name),
           );
           break;
         case ThingSortKey.None:
         default:
-          setSortFunction(() => (a: Thing, b: Thing) => 0);
+          setSortFunction(() => (_a: Thing, _b: Thing) => 0);
       }
     }
   }, [sortType, categories, previousSortType]);
@@ -87,9 +87,9 @@ export const useSortFunction = () => {
       setPreviousSortType(sortType);
       setSortFunction(
         () => (a: Thing, b: Thing) =>
-          categories[a.categoryId].name.localeCompare(
-            categories[b.categoryId].name
-          )
+          categories[a.categoryId]!.name.localeCompare(
+            categories[b.categoryId]!.name,
+          ),
       );
     }
   }, [sortType, categories]);

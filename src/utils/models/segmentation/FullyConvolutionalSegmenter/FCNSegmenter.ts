@@ -11,7 +11,7 @@ import { Shape } from "store/data/types";
  */
 export const createFCNSegmenterModel = (
   inputShape: Shape,
-  numClasses: number
+  _numClasses: number,
 ) => {
   const imageWidth = inputShape.width;
   const imageHeight = inputShape.height;
@@ -266,7 +266,7 @@ export const createFCNSegmenterModel = (
   const model = tfmodel({
     name: "AdvancedCNN",
     inputs: input,
-    //@ts-ignore
+    //@ts-ignore SymbolicTensor is fine
     outputs: conv_upsample,
   });
 

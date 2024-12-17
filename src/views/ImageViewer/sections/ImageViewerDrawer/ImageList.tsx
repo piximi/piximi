@@ -17,8 +17,8 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 import { ImageMenu } from "./ImageMenu";
 
-import { imageViewerSlice } from "store/imageViewer";
-import { selectActiveImageId } from "store/imageViewer/selectors";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { ImageObject } from "store/data/types";
 
@@ -36,7 +36,7 @@ export const ImageList = ({ images }: { images: Array<ImageObject> }) => {
   const dispatch = useDispatch();
 
   const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
-    null
+    null,
   );
   const [bufferRange, setBufferRange] = React.useState({
     start: 0,
@@ -54,11 +54,11 @@ export const ImageList = ({ images }: { images: Array<ImageObject> }) => {
           imageViewerSlice.actions.setActiveImageId({
             imageId: image.id,
             prevImageId: activeImageId,
-          })
+          }),
         );
       }
     },
-    [dispatch, activeImageId]
+    [dispatch, activeImageId],
   );
 
   const handleImageMenuOpen = React.useCallback(
@@ -66,7 +66,7 @@ export const ImageList = ({ images }: { images: Array<ImageObject> }) => {
       setImageAnchorEl(target);
       setSelectedImageIndex(imageIndex);
     },
-    []
+    [],
   );
 
   const onImageMenuClose = () => {
@@ -215,7 +215,7 @@ const ImageListItem = memo(
                 }
                 sx={{
                   mr: listItemRef.current?.classList.contains(
-                    "MuiListItem-dense"
+                    "MuiListItem-dense",
                   )
                     ? "-15px"
                     : "",
@@ -253,5 +253,5 @@ const ImageListItem = memo(
         </span>
       </Tooltip>
     );
-  }
+  },
 );

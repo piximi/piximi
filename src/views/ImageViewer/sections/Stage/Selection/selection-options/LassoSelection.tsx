@@ -1,13 +1,17 @@
 import React, { useContext } from "react";
 import { useSelector } from "react-redux";
-import * as ReactKonva from "react-konva";
+import {
+  Circle as KonvaCircle,
+  Group as KonvaGroup,
+  Line as KonvaLine,
+} from "react-konva";
 
 import { useMarchingAnts } from "../../../../hooks";
 
-import { StageContext } from "contexts";
-import { selectImageOrigin } from "store/imageViewer/selectors";
+import { StageContext } from "views/ImageViewer/state/StageContext";
+import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
-import { LassoAnnotationTool } from "utils/annotator/tools";
+import { LassoAnnotationTool } from "views/ImageViewer/utils/tools";
 
 type LassoSelectionProps = {
   operator: LassoAnnotationTool;
@@ -21,8 +25,8 @@ export const LassoSelection = ({ operator }: LassoSelectionProps) => {
 
   return (
     <>
-      <ReactKonva.Group>
-        <ReactKonva.Circle
+      <KonvaGroup>
+        <KonvaCircle
           fill="white"
           radius={3 / stageScale}
           stroke="black"
@@ -33,7 +37,7 @@ export const LassoSelection = ({ operator }: LassoSelectionProps) => {
 
         {operator.anchor && (
           <>
-            <ReactKonva.Circle
+            <KonvaCircle
               fill="black"
               radius={3 / stageScale}
               stroke="white"
@@ -43,7 +47,7 @@ export const LassoSelection = ({ operator }: LassoSelectionProps) => {
             />
           </>
         )}
-        <ReactKonva.Line
+        <KonvaLine
           points={operator.buffer.flatMap((point) => [
             point.x + imageOrigin.x,
             point.y + imageOrigin.y,
@@ -51,7 +55,7 @@ export const LassoSelection = ({ operator }: LassoSelectionProps) => {
           stroke="black"
           strokeWidth={1 / stageScale}
         />
-        <ReactKonva.Line
+        <KonvaLine
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
           stroke="white"
@@ -61,7 +65,7 @@ export const LassoSelection = ({ operator }: LassoSelectionProps) => {
           ])}
           strokeWidth={1 / stageScale}
         />
-      </ReactKonva.Group>
+      </KonvaGroup>
     </>
   );
 };

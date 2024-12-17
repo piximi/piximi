@@ -7,7 +7,7 @@ export type StyledTextFieldProps = TextFieldProps &
 export const StyledTextField = styled(TextField, {
   shouldForwardProp: (prop) =>
     prop !== "maxWidth" && prop !== "fontSize" && prop !== "textAlign",
-})<StyledTextFieldProps>(({ maxWidth, fontSize, textAlign, theme }) => ({
+})<StyledTextFieldProps>(({ maxWidth, fontSize, textAlign }) => ({
   maxWidth: maxWidth ?? "",
   fontSize: fontSize ?? "",
   "& .MuiInputBase-root": {

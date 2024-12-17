@@ -5,6 +5,7 @@ import { selectAlertState } from "store/applicationSettings/selectors";
 import { classifierSlice } from "store/classifier";
 import {
   selectClassifierFitOptions,
+  selectClassifierHyperparameters,
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
   selectClassifierTrainingPercentage,
@@ -14,13 +15,16 @@ import {
   selectActiveLabeledThingsCount,
 } from "store/project/reselectors";
 
-import { isUnknownCategory, logger } from "utils/common/helpers";
+import { logger } from "utils/common/helpers";
+import { isUnknownCategory } from "store/data/helpers";
 
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/common/enums";
 
 import { AlertState } from "utils/common/types";
 import { TrainingCallbacks } from "utils/models/types";
+import saveAs from "file-saver";
+import { selectProjectName } from "store/project/selectors";
 
 type PlotData = { x: number; y: number }[];
 const historyItems = [
@@ -55,19 +59,21 @@ export const useFitClassificationModel = () => {
   const modelStatus = useSelector(selectClassifierModelStatus);
   const alertState = useSelector(selectAlertState);
   const fitOptions = useSelector(selectClassifierFitOptions);
+  const hyperparameters = useSelector(selectClassifierHyperparameters);
+  const projectName = useSelector(selectProjectName);
   const trainingPercentage = useSelector(selectClassifierTrainingPercentage);
 
   const hasLabeledInference = useMemo(() => {
     return activeLabeledThings.some(
       (thing) =>
         !isUnknownCategory(thing.categoryId) &&
-        thing.partition === Partition.Inference
+        thing.partition === Partition.Inference,
     );
   }, [activeLabeledThings]);
 
   const noLabeledThings = useMemo(
     () => labeledThingsCount === 0,
-    [labeledThingsCount]
+    [labeledThingsCount],
   );
 
   const modelHistory = useMemo(() => {
@@ -78,7 +84,7 @@ export const useFitClassificationModel = () => {
         selectedHistory[k] = selectedModel.history.epochs;
       } else {
         selectedHistory[k] = fullHistory.flatMap(
-          (cycleHistory) => cycleHistory[k]
+          (cycleHistory) => cycleHistory[k],
         );
       }
     }
@@ -88,7 +94,7 @@ export const useFitClassificationModel = () => {
 
   const trainingHistoryCallback: TrainingCallbacks["onEpochEnd"] = async (
     epoch,
-    logs
+    logs,
   ) => {
     const nextEpoch = selectedModel.numEpochs + epoch + 1;
     const trainingEpochIndicator = nextEpoch - 0.5;
@@ -102,7 +108,7 @@ export const useFitClassificationModel = () => {
         prevState.concat({
           x: trainingEpochIndicator,
           y: logs.categoricalAccuracy as number,
-        })
+        }),
       );
     }
     if (logs.val_categoricalAccuracy) {
@@ -110,17 +116,17 @@ export const useFitClassificationModel = () => {
         prevState.concat({
           x: nextEpoch,
           y: logs.val_categoricalAccuracy as number,
-        })
+        }),
       );
     }
     if (logs.loss) {
       setTrainingLoss((prevState) =>
-        prevState.concat({ x: trainingEpochIndicator, y: logs.loss as number })
+        prevState.concat({ x: trainingEpochIndicator, y: logs.loss as number }),
       );
     }
     if (logs.val_loss) {
       setValidationLoss((prevState) =>
-        prevState.concat({ x: nextEpoch, y: logs.val_loss as number })
+        prevState.concat({ x: nextEpoch, y: logs.val_loss as number }),
       );
     }
 
@@ -134,16 +140,24 @@ export const useFitClassificationModel = () => {
         classifierSlice.actions.updateModelStatus({
           modelStatus: ModelStatus.InitFit,
           onEpochEnd: trainingHistoryCallback,
-        })
+        }),
       );
     } else {
       dispatch(
         classifierSlice.actions.updateModelStatus({
           modelStatus: ModelStatus.Training,
           onEpochEnd: trainingHistoryCallback,
-        })
+        }),
       );
     }
+  };
+
+  const handleExportHyperparameters = () => {
+    const data = new Blob([JSON.stringify(hyperparameters)], {
+      type: "application/json;charset=utf-8",
+    });
+
+    saveAs(data, `${projectName}-model_hyperparameters.json`);
   };
 
   useEffect(() => {
@@ -154,10 +168,10 @@ export const useFitClassificationModel = () => {
 
   useEffect(() => {
     setTrainingAccuracy(
-      modelHistory.categoricalAccuracy.map((y, i) => ({ x: i + 0.5, y }))
+      modelHistory.categoricalAccuracy.map((y, i) => ({ x: i + 0.5, y })),
     );
     setValidationAccuracy(
-      modelHistory.val_categoricalAccuracy.map((y, i) => ({ x: i + 1, y }))
+      modelHistory.val_categoricalAccuracy.map((y, i) => ({ x: i + 1, y })),
     );
     setTrainingLoss(modelHistory.loss.map((y, i) => ({ x: i + 0.5, y })));
     setValidationLoss(modelHistory.val_loss.map((y, i) => ({ x: i + 1, y })));
@@ -174,8 +188,8 @@ export const useFitClassificationModel = () => {
 
   useEffect(() => {
     if (
-      process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "1" &&
+      import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
       labeledThingsCount > 0
     ) {
       const trainingSize = Math.round(labeledThingsCount * trainingPercentage);
@@ -183,24 +197,24 @@ export const useFitClassificationModel = () => {
 
       logger(
         `Set training size to Round[${labeledThingsCount} * ${trainingPercentage}] = ${trainingSize}
-        ; val size to ${labeledThingsCount} - ${trainingSize} = ${validationSize}`
+        ; val size to ${labeledThingsCount} - ${trainingSize} = ${validationSize}`,
       );
 
       logger(
         `Set training batches per epoch to RoundUp[${trainingSize} / ${
           fitOptions.batchSize
-        }] = ${Math.ceil(trainingSize / fitOptions.batchSize)}`
+        }] = ${Math.ceil(trainingSize / fitOptions.batchSize)}`,
       );
 
       logger(
         `Set validation batches per epoch to RoundUp[${validationSize} / ${
           fitOptions.batchSize
-        }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`
+        }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`,
       );
 
       logger(
         `Training last batch size is ${trainingSize % fitOptions.batchSize}
-        ; validation is ${validationSize % fitOptions.batchSize}`
+        ; validation is ${validationSize % fitOptions.batchSize}`,
       );
     }
   }, [fitOptions.batchSize, trainingPercentage, labeledThingsCount]);
@@ -232,5 +246,6 @@ export const useFitClassificationModel = () => {
     noLabeledThingsAlert,
     handleFit,
     hasLabeledInference,
+    handleExportHyperparameters,
   };
 };

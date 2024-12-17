@@ -1,15 +1,15 @@
 import React, { useContext } from "react";
 import { useSelector } from "react-redux";
-import * as ReactKonva from "react-konva";
+import { Ellipse as KonvaEllipse } from "react-konva";
 
-import { StageContext } from "contexts";
+import { StageContext } from "views/ImageViewer/state/StageContext";
 import {
   selectPenSelectionBrushSize,
   selectToolType,
-} from "store/annotator/selectors";
-import { selectActiveImage } from "store/imageViewer/reselectors";
+} from "views/ImageViewer/state/annotator/selectors";
+import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 
-import { ToolType } from "utils/annotator/enums";
+import { ToolType } from "views/ImageViewer/utils/enums";
 
 type PenAnnotationToolTipProps = {
   currentPosition?: { x: number; y: number };
@@ -41,7 +41,7 @@ export const PenAnnotationToolTip = ({
 
   return (
     <>
-      <ReactKonva.Ellipse
+      <KonvaEllipse
         radiusX={penSelectionBrushSize / stageScale}
         radiusY={penSelectionBrushSize / stageScale}
         x={currentPosition.x}

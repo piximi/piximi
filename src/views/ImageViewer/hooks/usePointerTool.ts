@@ -1,20 +1,20 @@
 import { useCallback, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import { useHotkeys } from "../../../hooks/useHotkeys";
+import { useHotkeys } from "hooks/useHotkeys";
 
-import { imageViewerSlice } from "store/imageViewer";
-import { selectActiveImageId } from "store/imageViewer/selectors";
-import { selectActiveAnnotations } from "store/imageViewer/reselectors";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectActiveAnnotationsArray } from "views/ImageViewer/state/annotator/reselectors";
 
-import { getOverlappingAnnotations } from "utils/annotator";
-import { getAnnotationsInBox } from "utils/annotator/imageHelper";
+import { getOverlappingAnnotations } from "views/ImageViewer/utils";
+import { getAnnotationsInBox } from "views/ImageViewer/utils/imageHelper";
 
-import { ToolType } from "utils/annotator/enums";
+import { ToolType } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/common/enums";
 
-import { Point } from "utils/annotator/types";
-import { DecodedAnnotationObject } from "store/data/types";
+import { Point, ProtoAnnotationObject } from "views/ImageViewer/utils/types";
 
 const delta = 10;
 
@@ -22,11 +22,11 @@ export const usePointerTool = (
   absolutePosition: any,
   deselectAllAnnotations: any,
   selectedAnnotationsIds: any,
-  toolType: any
+  toolType: any,
 ) => {
   const dispatch = useDispatch();
   const activeImageId = useSelector(selectActiveImageId);
-  const activeAnnotations = useSelector(selectActiveAnnotations);
+  const activeAnnotations = useSelector(selectActiveAnnotationsArray);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shift, setShift] = useState<boolean>(false);
   const [dragging, setDragging] = useState<boolean>(false);
@@ -45,7 +45,7 @@ export const usePointerTool = (
     },
     HotkeyContext.AnnotatorView,
     { keyup: true, keydown: true },
-    []
+    [],
   );
 
   /*
@@ -58,7 +58,7 @@ export const usePointerTool = (
       setMinimum(position);
       setSelecting(true);
     },
-    []
+    [],
   );
 
   const handlePointerMouseMove = useCallback(
@@ -68,7 +68,7 @@ export const usePointerTool = (
       setDragging(Math.abs(position.x - minimum.x) >= delta);
       setMaximum(position);
     },
-    [minimum, selecting]
+    [minimum, selecting],
   );
 
   const selectEnclosedAnnotations = useCallback(
@@ -93,12 +93,12 @@ export const usePointerTool = (
       const annotationsInBox = getAnnotationsInBox(
         minimumNew,
         maximumNew,
-        activeAnnotations
+        activeAnnotations,
       );
 
       if (annotationsInBox.length) {
         let newSelectedAnnotations: string[] = annotationsInBox.map(
-          (an) => an.id
+          (an) => an.id,
         );
         if (shift) {
           newSelectedAnnotations = [
@@ -110,7 +110,7 @@ export const usePointerTool = (
           const additionalAnnotations = newSelectedAnnotations.filter(
             (id: string) => {
               return !selectedAnnotationsIds.includes(id);
-            }
+            },
           );
           newSelectedAnnotations = [
             ...selectedAnnotationsIds,
@@ -119,17 +119,17 @@ export const usePointerTool = (
         }
         batch(() => {
           dispatch(
-            imageViewerSlice.actions.setSelectedAnnotationIds({
+            annotatorSlice.actions.setSelectedAnnotationIds({
               annotationIds: newSelectedAnnotations,
               workingAnnotationId: newSelectedAnnotations[0],
-            })
+            }),
           );
           dispatch(
-            imageViewerSlice.actions.setWorkingAnnotation({
+            annotatorSlice.actions.setWorkingAnnotation({
               annotation: activeAnnotations.filter(
-                (annotation) => annotation.id === newSelectedAnnotations[0]
+                (annotation) => annotation.id === newSelectedAnnotations[0],
               )[0],
-            })
+            }),
           );
         });
       }
@@ -143,7 +143,7 @@ export const usePointerTool = (
       selectedAnnotationsIds,
       selecting,
       shift,
-    ]
+    ],
   );
 
   const handleClick = useCallback(() => {
@@ -154,19 +154,19 @@ export const usePointerTool = (
       !activeImageId
     )
       return;
-    let currentAnnotation: DecodedAnnotationObject | undefined;
+    let currentAnnotation: ProtoAnnotationObject | undefined;
 
     const overlappingAnnotationIds = getOverlappingAnnotations(
       absolutePosition,
-      activeAnnotations as DecodedAnnotationObject[]
+      activeAnnotations,
     );
 
     if (overlappingAnnotationIds.length === 0) {
       deselectAllAnnotations();
       dispatch(
-        imageViewerSlice.actions.setWorkingAnnotation({
+        annotatorSlice.actions.setWorkingAnnotation({
           annotation: undefined,
-        })
+        }),
       );
     } else if (overlappingAnnotationIds.length > 1) {
       setCurrentIndex((currentIndex) => {
@@ -178,15 +178,15 @@ export const usePointerTool = (
       const nextAnnotationId = overlappingAnnotationIds[currentIndex];
 
       currentAnnotation = activeAnnotations.find(
-        (annotation: DecodedAnnotationObject) => {
+        (annotation: ProtoAnnotationObject) => {
           return annotation.id === nextAnnotationId;
-        }
+        },
       );
     } else {
       currentAnnotation = activeAnnotations.find(
-        (annotation: DecodedAnnotationObject) => {
+        (annotation: ProtoAnnotationObject) => {
           return annotation.id === overlappingAnnotationIds[0];
-        }
+        },
       );
       setCurrentIndex(0);
     }
@@ -196,20 +196,20 @@ export const usePointerTool = (
     if (!shift) {
       batch(() => {
         dispatch(
-          imageViewerSlice.actions.setSelectedAnnotationIds({
+          annotatorSlice.actions.setSelectedAnnotationIds({
             annotationIds: [currentAnnotation!.id],
             workingAnnotationId: currentAnnotation?.id,
-          })
+          }),
         );
         dispatch(
-          imageViewerSlice.actions.setWorkingAnnotation({
+          annotatorSlice.actions.setWorkingAnnotation({
             annotation: currentAnnotation!,
-          })
+          }),
         );
         dispatch(
           imageViewerSlice.actions.setSelectedCategoryId({
             selectedCategoryId: currentAnnotation!.categoryId,
-          })
+          }),
         );
       });
     }
@@ -217,15 +217,15 @@ export const usePointerTool = (
     if (shift && !selectedAnnotationsIds.includes(currentAnnotation.id)) {
       //include newly selected annotation if not already selected
       dispatch(
-        imageViewerSlice.actions.setSelectedAnnotationIds({
+        annotatorSlice.actions.setSelectedAnnotationIds({
           annotationIds: [...selectedAnnotationsIds, currentAnnotation.id],
           workingAnnotationId: currentAnnotation.id,
-        })
+        }),
       );
       dispatch(
-        imageViewerSlice.actions.setWorkingAnnotation({
+        annotatorSlice.actions.setWorkingAnnotation({
           annotation: currentAnnotation,
-        })
+        }),
       );
     }
   }, [
@@ -252,7 +252,7 @@ export const usePointerTool = (
       setDragging(false);
       setSelecting(false);
     },
-    [dragging, minimum, selecting, selectEnclosedAnnotations, handleClick]
+    [dragging, minimum, selecting, selectEnclosedAnnotations, handleClick],
   );
 
   return {

@@ -1,9 +1,14 @@
-// ignore-no-logs
-import * as tf from "@tensorflow/tfjs-node";
+import { describe, expect, it } from "vitest";
+import {
+  tensor3d,
+  profile as tfProfile,
+  Tensor3D,
+} from "@tensorflow/tfjs-node";
+
 import { matchedCropPad, padToMatch } from "../helpers";
 
 it("padToMatch", async () => {
-  const sample = tf.tensor3d([
+  const sample = tensor3d([
     [
       [1, 10, 100],
       [2, 20, 200],
@@ -18,14 +23,11 @@ it("padToMatch", async () => {
     ],
   ]);
 
-  const profile = await tf.profile(() =>
-    padToMatch(sample, { width: 5, height: 5 }, "constant")
+  const profile = await tfProfile(() =>
+    padToMatch(sample, { width: 5, height: 5 }, "constant"),
   );
-  const result = profile.result as tf.Tensor3D;
+  const result = profile.result as Tensor3D;
   const padded = result.arraySync();
-
-  // console.log(`newBytes: ${profile.newBytes}`);
-  // console.log(`newTensors: ${profile.newTensors}`);
 
   const expected = [
     [
@@ -68,7 +70,7 @@ it("padToMatch", async () => {
   const paddedAgain = padToMatch(
     result,
     { width: 5, height: 5 },
-    "constant"
+    "constant",
   ).arraySync();
 
   expect(padded).toStrictEqual(expected);
@@ -77,7 +79,7 @@ it("padToMatch", async () => {
 
 const matchedRandomCropExpectations = (
   cropCoords: [number, number, number, number],
-  cropCoordsExpected: number[][]
+  cropCoordsExpected: number[][],
 ) => {
   expect(cropCoords[0]).toBeGreaterThanOrEqual(cropCoordsExpected[0][0]);
   expect(cropCoords[0]).toBeLessThanOrEqual(cropCoordsExpected[0][1]);
@@ -94,7 +96,7 @@ const matchedRandomCropExpectations = (
 
 const matchedCenterCropExpectations = (
   cropCoords: [number, number, number, number],
-  cropCoordsExpected: number[]
+  cropCoordsExpected: number[],
 ) => {
   expect(cropCoords[0]).toBe(cropCoordsExpected[0]);
   expect(cropCoords[1]).toBe(cropCoordsExpected[1]);
@@ -111,7 +113,7 @@ const matchedCropExpectations = (
     randomCrop: boolean;
   },
   cropCoords: [number, number, number, number],
-  cropCoordsExpected: number[][] | number[]
+  cropCoordsExpected: number[][] | number[],
 ) => {
   if (dims.randomCrop) {
     matchedRandomCropExpectations(cropCoords, cropCoordsExpected as number[][]);
@@ -121,11 +123,11 @@ const matchedCropExpectations = (
 
   expect(cropCoords[2] - cropCoords[0]).toBeCloseTo(
     dims.cropHeight / dims.sampleHeight,
-    5
+    5,
   );
   expect(cropCoords[3] - cropCoords[1]).toBeCloseTo(
     dims.cropWidth / dims.sampleWidth,
-    5
+    5,
   );
 };
 
@@ -190,7 +192,6 @@ describe("matchedCropPad - random", () => {
       [1.0, 1.0],
     ];
 
-    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 
@@ -212,7 +213,6 @@ describe("matchedCropPad - random", () => {
       [0.66666, 1.0],
     ];
 
-    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 
@@ -234,7 +234,6 @@ describe("matchedCropPad - random", () => {
       [1.0, 1.0],
     ];
 
-    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 });
@@ -285,7 +284,6 @@ describe("matchedCropPad - center", () => {
 
     const cropCoordsExpected = [0.25, 0.0, 0.75, 1.0];
 
-    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 
@@ -302,7 +300,6 @@ describe("matchedCropPad - center", () => {
 
     const cropCoordsExpected = [0.25, 1 / 8, 0.75, 7 / 8];
 
-    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 
@@ -319,7 +316,6 @@ describe("matchedCropPad - center", () => {
 
     const cropCoordsExpected = [0.0, 0.0, 1.0, 1.0];
 
-    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 });

@@ -31,13 +31,13 @@ export const OpenProjectMenuItem = ({
       applicationSettingsSlice.actions.sendLoadPercent({
         loadPercent,
         loadMessage,
-      })
+      }),
     );
   };
 
   const onOpenProject = async (
     event: React.ChangeEvent<HTMLInputElement>,
-    zip: boolean
+    zip: boolean,
   ) => {
     event.persist();
 
@@ -48,7 +48,7 @@ export const OpenProjectMenuItem = ({
       applicationSettingsSlice.actions.setLoadPercent({
         loadPercent: -1,
         loadMessage: "deserializing project...",
-      })
+      }),
     );
 
     const files = event.currentTarget.files;
@@ -61,7 +61,9 @@ export const OpenProjectMenuItem = ({
         batch(() => {
           // indefinite load until dispatches complete
           dispatch(
-            applicationSettingsSlice.actions.setLoadPercent({ loadPercent: -1 })
+            applicationSettingsSlice.actions.setLoadPercent({
+              loadPercent: -1,
+            }),
           );
           dispatch(projectSlice.actions.resetProject());
           dispatch(dataSlice.actions.initializeState({ data: res.data }));
@@ -69,28 +71,28 @@ export const OpenProjectMenuItem = ({
           dispatch(
             projectSlice.actions.setProject({
               project: res.project,
-            })
+            }),
           );
 
           dispatch(
             classifierSlice.actions.setClassifier({
               classifier: res.classifier,
-            })
+            }),
           );
 
           dispatch(
             segmenterSlice.actions.setSegmenter({
               segmenter: res.segmenter,
-            })
+            }),
           );
           dispatch(
-            applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 })
+            applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 }),
           );
         });
       })
       .catch((err: Error) => {
-        process.env.NODE_ENV !== "production" &&
-          process.env.REACT_APP_LOG_LEVEL === "1" &&
+        import.meta.env.NODE_ENV !== "production" &&
+          import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
           console.error(err);
 
         const warning: AlertState = {
@@ -102,7 +104,7 @@ export const OpenProjectMenuItem = ({
         dispatch(
           applicationSettingsSlice.actions.updateAlertState({
             alertState: warning,
-          })
+          }),
         );
       });
 
@@ -122,7 +124,7 @@ export const OpenProjectMenuItem = ({
             onOpenProject(event, false);
           }}
           type="file"
-          // @ts-ignore
+          // @ts-ignore: need it for some reason
           webkitdirectory=""
         />
       </MenuItem>

@@ -144,8 +144,8 @@ export class ZipStore implements AsyncStore<ValidStoreType> {
 export type CustomStore = FileStore | ZipStore;
 
 export const fListToStore = async (
-  files: FileList,
-  zipFile: boolean
+  files: FileList | PseudoFileList,
+  zipFile: boolean,
 ): Promise<CustomStore> => {
   if (zipFile) {
     const file = files[0];
@@ -188,7 +188,8 @@ export class PseudoFileList {
   private _files: File[];
 
   constructor(files: File[]) {
-    let self = this;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
     this._files = files;
 
     return new Proxy(this, {
@@ -199,6 +200,7 @@ export class PseudoFileList {
           return Reflect.get(target, prop);
         }
       },
+      // @ts-ignore only sort of satisfies FileList
     }) satisfies FileList;
   }
 

@@ -1,8 +1,4 @@
-import {
-  createListenerMiddleware,
-  CombinedState,
-  ListenerEffectAPI,
-} from "@reduxjs/toolkit";
+import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { ENV, enableDebugMode, History } from "@tensorflow/tfjs";
 import { shuffle, take, takeRight } from "lodash";
 
@@ -13,10 +9,9 @@ import { dataSlice } from "store/data/dataSlice";
 import {
   getStackTraceFromError,
   getSubset,
-  isUnknownCategory,
   logger,
 } from "utils/common/helpers";
-import { getCompleteEntity } from "store/entities/utils";
+import { isUnknownCategory } from "store/data/helpers";
 
 import { SimpleCNN, MobileNet } from "utils/models/classification";
 
@@ -24,18 +19,8 @@ import { availableClassifierModels } from "utils/models/availableClassificationM
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/common/enums";
 
-import {
-  AnnotatorState,
-  AppSettingsState,
-  ClassifierState,
-  ImageViewerState,
-  ProjectState,
-  SegmenterState,
-  TypedAppStartListening,
-} from "store/types";
+import { StoreListemerAPI, TypedAppStartListening } from "store/types";
 import { CompileOptions, TrainingCallbacks } from "utils/models/types";
-import { DataState } from "store/types";
-import { AppDispatch } from "store/types";
 import { AlertState } from "utils/common/types";
 import { Category, Thing } from "store/data/types";
 
@@ -44,25 +29,11 @@ export const classifierMiddleware = createListenerMiddleware();
 const startAppListening =
   classifierMiddleware.startListening as TypedAppStartListening;
 
-type StoreListemerAPI = ListenerEffectAPI<
-  CombinedState<{
-    classifier: ClassifierState;
-    segmenter: SegmenterState;
-    imageViewer: ImageViewerState;
-    project: ProjectState;
-    applicationSettings: AppSettingsState;
-    annotator: AnnotatorState;
-    data: DataState;
-  }>,
-  AppDispatch,
-  unknown
->;
-
 const handleError = async (
   listenerAPI: StoreListemerAPI,
   error: Error,
   name: string,
-  errorType?: { fittingError: boolean }
+  errorType?: { fittingError: boolean },
 ) => {
   const stackTrace = await getStackTraceFromError(error);
   const alertState: AlertState = {
@@ -71,28 +42,35 @@ const handleError = async (
     description: `${error.name}:\n${error.message}`,
     stackTrace: stackTrace,
   };
-  if (process.env.NODE_ENV !== "production") {
+  if (import.meta.env.NODE_ENV !== "production") {
     console.error(
       alertState.name,
       "\n",
       alertState.description,
       "\n",
-      alertState.stackTrace
+      alertState.stackTrace,
     );
   }
   listenerAPI.dispatch(
     applicationSettingsSlice.actions.updateAlertState({
       alertState: alertState,
-    })
+    }),
   );
   if (errorType && errorType.fittingError) {
     listenerAPI.dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Uninitialized,
-      })
+      }),
     );
   }
 };
+
+startAppListening({
+  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
+  effect: (action, listenerAPI) => {
+    listenerAPI.dispatch(classifierSlice.actions.resetClassifier());
+  },
+});
 
 startAppListening({
   actionCreator: classifierSlice.actions.updateModelStatus,
@@ -117,14 +95,14 @@ startAppListening({
 
 const fitListener = async (
   onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
-  listenerAPI: StoreListemerAPI
+  listenerAPI: StoreListemerAPI,
 ) => {
-  process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "3" &&
+  import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "3" &&
     enableDebugMode();
 
-  process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "2" &&
+  import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "2" &&
     logger(["tensorflow flags:", ENV.features]);
 
   const {
@@ -147,11 +125,11 @@ const fitListener = async (
   ]) as CompileOptions;
   const modelIdx = classifierState.selectedModelIdx;
 
-  let model = availableClassifierModels[modelIdx];
+  const model = availableClassifierModels[modelIdx];
 
   /* DATA */
 
-  const activeKind = getCompleteEntity(dataState.kinds.entities[activeKindId]);
+  const activeKind = dataState.kinds.entities[activeKindId]!;
   if (!activeKind) return;
   const activeThingIds = activeKind.containing;
 
@@ -168,9 +146,9 @@ const fitListener = async (
         labeledValidation: Thing[];
         labeledUnassigned: Thing[];
       },
-      id
+      id,
     ) => {
-      const thing = getCompleteEntity(dataState.things.entities[id]);
+      const thing = dataState.things.entities[id];
       if (!thing) return groupedThings;
       if (isUnknownCategory(thing.categoryId)) {
         groupedThings.unlabeledThings.push(thing);
@@ -188,12 +166,12 @@ const fitListener = async (
       labeledTraining: [],
       labeledValidation: [],
       labeledUnassigned: [],
-    }
+    },
   );
 
   const categories: Array<Category> = [];
   const numClasses = activeKind.categories.reduce((count, id) => {
-    const category = getCompleteEntity(dataState.categories.entities[id]);
+    const category = dataState.categories.entities[id];
     if (isUnknownCategory(id) || !category) return count;
     categories.push(category);
     return ++count;
@@ -202,7 +180,7 @@ const fitListener = async (
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
       modelStatus: ModelStatus.Loading,
-    })
+    }),
   );
 
   /* SEPARATE LABELED DATA INTO TRAINING AND VALIDATION */
@@ -211,7 +189,7 @@ const fitListener = async (
   let splitLabeledValidation: Thing[] = [];
   if (classifierState.modelStatus === ModelStatus.InitFit) {
     const trainingThingsLength = Math.round(
-      trainingPercentage * labeledUnassigned.length
+      trainingPercentage * labeledUnassigned.length,
     );
     const validationThingsLength =
       labeledUnassigned.length - trainingThingsLength;
@@ -222,11 +200,11 @@ const fitListener = async (
 
     splitLabeledTraining = take(
       preparedLabeledUnassigned,
-      trainingThingsLength
+      trainingThingsLength,
     );
     splitLabeledValidation = takeRight(
       preparedLabeledUnassigned,
-      validationThingsLength
+      validationThingsLength,
     );
     listenerAPI.dispatch(
       dataSlice.actions.updateThings({
@@ -244,8 +222,7 @@ const fitListener = async (
             partition: Partition.Inference,
           })),
         ],
-        isPermanent: true,
-      })
+      }),
     );
   } else {
     splitLabeledTraining = labeledUnassigned;
@@ -255,9 +232,7 @@ const fitListener = async (
           id: thing.id,
           partition: Partition.Training,
         })),
-
-        isPermanent: true,
-      })
+      }),
     );
   }
 
@@ -280,8 +255,8 @@ const fitListener = async (
         useCustomTopLayer: true,
       });
     } else {
-      process.env.NODE_ENV !== "production" &&
-        process.env.REACT_APP_LOG_LEVEL === "1" &&
+      import.meta.env.NODE_ENV !== "production" &&
+        import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
         console.warn("Unhandled architecture", model.name);
       return;
     }
@@ -290,7 +265,7 @@ const fitListener = async (
       listenerAPI,
       error as Error,
       "Failed to create tensorflow model",
-      { fittingError: true }
+      { fittingError: true },
     );
     return;
   }
@@ -306,11 +281,11 @@ const fitListener = async (
     };
     model.loadTraining(
       [...labeledTraining, ...splitLabeledTraining],
-      loadDataArgs
+      loadDataArgs,
     );
     model.loadValidation(
       [...labeledValidation, ...splitLabeledValidation],
-      loadDataArgs
+      loadDataArgs,
     );
   } catch (error) {
     handleError(listenerAPI, error as Error, "Error in preprocessing", {
@@ -322,14 +297,14 @@ const fitListener = async (
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
       modelStatus: ModelStatus.Training,
-    })
+    }),
   );
 
   /* TRAIN MODEL */
 
   try {
     if (!onEpochEnd) {
-      if (process.env.NODE_ENV !== "production") {
+      if (import.meta.env.NODE_ENV !== "production") {
         console.warn("Epoch end callback not provided");
       }
       onEpochEnd = async (epoch: number, logs: any) => {
@@ -338,9 +313,9 @@ const fitListener = async (
       };
     }
 
-    var history: History = await model.train(fitOptions, { onEpochEnd });
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "1" &&
+    const history: History = await model.train(fitOptions, { onEpochEnd });
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
       logger(history);
   } catch (error) {
     handleError(listenerAPI, error as Error, "Error training the model");
@@ -350,7 +325,7 @@ const fitListener = async (
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
       modelStatus: ModelStatus.Trained,
-    })
+    }),
   );
 };
 
@@ -365,17 +340,17 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   const activeKindId = projectData.activeKind;
 
   /* DATA */
-  const activeKind = getCompleteEntity(dataState.kinds.entities[activeKindId]);
+  const activeKind = dataState.kinds.entities[activeKindId]!;
   if (!activeKind) return;
   const activeThingIds = activeKind.containing;
   const activeCategoryIds = activeKind.categories.filter(
-    (id) => !isUnknownCategory(id)
+    (id) => !isUnknownCategory(id),
   );
   const activeCategories = activeCategoryIds.map(
-    (id) => getCompleteEntity(dataState.categories.entities[id])!
+    (id) => dataState.categories.entities[id]!,
   );
   const inferenceThings = activeThingIds.reduce((things: Array<Thing>, id) => {
-    const thing = getCompleteEntity(dataState.things.entities[id]);
+    const thing = dataState.things.entities[id];
 
     if (thing && thing.partition === Partition.Inference) {
       things.push(thing);
@@ -387,7 +362,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
 
   const { preprocessOptions, fitOptions, inputShape } = classifierState;
   const modelIdx = classifierState.selectedModelIdx;
-  let model = availableClassifierModels[modelIdx];
+  const model = availableClassifierModels[modelIdx];
   let finalModelStatus = ModelStatus.Trained;
 
   /* CHECK FOR SIMPLE ERRORS */
@@ -409,7 +384,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     handleError(
       listenerAPI,
       new Error("No selectable model in store"),
-      "Failed to get tensorflow model"
+      "Failed to get tensorflow model",
     );
   }
 
@@ -417,7 +392,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
 
   if (alertState) {
     listenerAPI.dispatch(
-      applicationSettingsSlice.actions.updateAlertState({ alertState })
+      applicationSettingsSlice.actions.updateAlertState({ alertState }),
     );
   } else {
     try {
@@ -438,8 +413,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
               id: thingId,
               categoryId: categoryIds[idx],
             })),
-            isPermanent: true,
-          })
+          }),
         );
       }
       finalModelStatus = ModelStatus.Suggesting;
@@ -447,7 +421,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       handleError(
         listenerAPI,
         error as Error,
-        "Error in preprocessing the inference data"
+        "Error in preprocessing the inference data",
       );
     }
   }
@@ -455,7 +429,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
       modelStatus: finalModelStatus,
-    })
+    }),
   );
 };
 
@@ -466,13 +440,13 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
     project: projectState,
   } = listenerAPI.getState();
 
-  listenerAPI.dispatch(applicationSettingsSlice.actions.hideAlertState({}));
+  listenerAPI.dispatch(applicationSettingsSlice.actions.hideAlertState());
 
   /* ACTIVE KIND */
   const activeKindId = projectState.activeKind;
 
   /* DATA */
-  const activeKind = getCompleteEntity(dataState.kinds.entities[activeKindId]);
+  const activeKind = dataState.kinds.entities[activeKindId]!;
   if (!activeKind) return;
   const activeKnownCategoryCount = activeKind.categories.reduce((count, id) => {
     if (!isUnknownCategory(id)) {
@@ -495,7 +469,7 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
           name: "Validation set is empty",
           description: "Cannot evaluate model on empty validation set.",
         },
-      })
+      }),
     );
   } else if (model.numClasses !== activeKnownCategoryCount) {
     listenerAPI.dispatch(
@@ -505,7 +479,7 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
           name: "The output shape of your model does not correspond to the number of categories!",
           description: `The trained model has an output shape of ${model.numClasses} but there are ${activeKnownCategoryCount} categories in  the project.\nMake sure these numbers match by retraining the model with the given setup or upload a corresponding new model.`,
         },
-      })
+      }),
     );
   } else {
     try {
@@ -513,13 +487,13 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
       listenerAPI.dispatch(
         classifierSlice.actions.updateEvaluationResult({
           evaluationResult,
-        })
+        }),
       );
     } catch (error) {
       handleError(
         listenerAPI,
         error as Error,
-        "Error computing the evaluation results"
+        "Error computing the evaluation results",
       );
       return;
     }
@@ -527,6 +501,6 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
       modelStatus: ModelStatus.Trained,
-    })
+    }),
   );
 };

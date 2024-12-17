@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 import { useSelector } from "react-redux";
-import * as ReactKonva from "react-konva";
+import { Group as KonvaGroup, Rect as KonvaRect } from "react-konva";
 
-import { StageContext } from "contexts";
-import { selectZoomSelection } from "store/imageViewer/selectors";
+import { StageContext } from "views/ImageViewer/state/StageContext";
+import { selectZoomSelection } from "../../../../state/imageViewer/selectors";
 
 export const ZoomSelection = () => {
   const { dragging, minimum, maximum, selecting } =
@@ -14,33 +14,35 @@ export const ZoomSelection = () => {
 
   return (
     <>
-      <ReactKonva.Group>
-        <ReactKonva.Rect
+      <KonvaGroup>
+        <KonvaRect
           dash={[
-            4 / stageRef?.current?.scaleX()!,
-            2 / stageRef?.current?.scaleX()!,
+            // or 100 for no particular reason, because it shouldn't happen
+            4 / (stageRef?.current?.scaleX() || 100),
+            2 / (stageRef?.current?.scaleX() || 100),
           ]}
           height={maximum.y - minimum.y}
           stroke="black"
-          strokeWidth={1 / stageRef?.current?.scaleX()!}
+          strokeWidth={1 / (stageRef?.current?.scaleX() || 100)}
           width={maximum.x - minimum.x}
           x={minimum.x}
           y={minimum.y}
         />
-        <ReactKonva.Rect
+        <KonvaRect
           dash={[
-            4 / stageRef?.current?.scaleX()!,
-            2 / stageRef?.current?.scaleX()!,
+            // or 100 for no particular reason, because it shouldn't happen
+            4 / (stageRef?.current?.scaleX() || 100),
+            2 / (stageRef?.current?.scaleX() || 100),
           ]}
           //dashOffset={-dashOffset}
           height={maximum.y - minimum.y}
           stroke="white"
-          strokeWidth={1 / stageRef?.current?.scaleX()!}
+          strokeWidth={1 / (stageRef?.current?.scaleX() || 100)}
           width={maximum.x - minimum.x}
           x={minimum.x}
           y={minimum.y}
         />
-      </ReactKonva.Group>
+      </KonvaGroup>
     </>
   );
 };

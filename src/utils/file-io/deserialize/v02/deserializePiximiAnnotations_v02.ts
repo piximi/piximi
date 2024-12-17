@@ -1,8 +1,8 @@
 import {
   convertArrayToShape,
-  generateUUID,
   getPropertiesFromImage,
 } from "utils/common/helpers";
+import { generateUUID } from "store/data/helpers";
 import { Partition } from "utils/models/enums";
 import {
   NewSerializedAnnotationType,
@@ -27,7 +27,7 @@ type ImageMap = Record<
 
 export const deserializeAnnotations_v02 = (
   serializedAnnotations: Array<NewSerializedAnnotationType>,
-  imageId: string
+  imageId: string,
 ) => {
   const annotations: Array<
     PartialBy<AnnotationObject, "bitDepth" | "data" | "src">
@@ -53,7 +53,7 @@ export const deserializeAnnotations_v02 = (
 
 const reconcileKinds = (
   existingKinds: Array<Kind>,
-  serializedKinds: Array<Kind>
+  serializedKinds: Array<Kind>,
 ) => {
   const kindMap: KindMap = {};
 
@@ -70,12 +70,12 @@ const reconcileKinds = (
 
 const reconcileCategories = (
   existingCategories: Array<Category>,
-  serializedCategories: Array<Category>
+  serializedCategories: Array<Category>,
 ) => {
   const categoryMap: CategoryMap = {};
   serializedCategories.forEach((category) => {
     const existingCategory = existingCategories.find(
-      (c) => category.name === c.name && category.kind === c.kind
+      (c) => category.name === c.name && category.kind === c.kind,
     );
     categoryMap[category.id] = { new: category };
     if (existingCategory) {
@@ -87,7 +87,7 @@ const reconcileCategories = (
 
 const reconcileImages = (
   existingImages: Array<ImageObject>,
-  serializedImages: Array<SerializedAnnotatorImageType>
+  serializedImages: Array<SerializedAnnotatorImageType>,
 ) => {
   const imageMap: ImageMap = {};
   serializedImages.forEach((image) => {
@@ -104,7 +104,7 @@ export const deserializePiximiAnnotations_v02 = async (
   serializedProject: SerializedFileTypeV02,
   existingImages: Array<ImageObject>,
   existingCategories: Array<Category>,
-  existingKinds: Array<Kind>
+  existingKinds: Array<Kind>,
 ) => {
   // this must come first
   const imageMap = reconcileImages(existingImages, serializedProject.images);
@@ -113,7 +113,7 @@ export const deserializePiximiAnnotations_v02 = async (
 
   const catMap = reconcileCategories(
     existingCategories,
-    serializedProject.categories
+    serializedProject.categories,
   );
 
   const reconciledAnnotations: AnnotationObject[] = [];
@@ -132,7 +132,9 @@ export const deserializePiximiAnnotations_v02 = async (
     // If no existing image we cant build the annotation
     if (!annImage.existing) continue;
     const image = annImage.existing;
-    const annPropsFromIm = await getPropertiesFromImage(image, annotation);
+    const annPropsFromIm = await getPropertiesFromImage(image, {
+      boundingBox: annotation.boundingBox as [number, number, number, number],
+    });
     annotation = { ...annotation, ...annPropsFromIm };
 
     /*
@@ -168,7 +170,7 @@ export const deserializePiximiAnnotations_v02 = async (
 
     const annotationShape = convertArrayToShape(annotation.shape as ShapeArray);
     const annotationEncoding = annotation.mask.split(" ").map((e) => +e);
-    const { mask, ...deserializedAnnotation } = {
+    const { mask: _mask, ...deserializedAnnotation } = {
       ...annotation,
       shape: annotationShape,
       encodedMask: annotationEncoding,

@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import FileOpenIcon from "@mui/icons-material/FileOpen";
+import { FileOpen as FileOpenIcon } from "@mui/icons-material";
 
 import { Model } from "utils/models/Model";
 import { UploadedClassifier } from "utils/models/classification";
@@ -72,7 +72,7 @@ export const LocalFileUpload = ({
       setSuccessMessage(
         `Successfully uploaded Classification ${
           isGraph ? "Graph" : "Layers"
-        } Model ("${model.name}")`
+        } Model ("${model.name}")`,
       );
     } else {
       // TODO - segmenter
@@ -81,7 +81,7 @@ export const LocalFileUpload = ({
   };
 
   const handleFilesSelected = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     event.persist();
 
@@ -90,14 +90,14 @@ export const LocalFileUpload = ({
       return;
     } else if (event.currentTarget.files.length < 2) {
       setErrMessage(
-        "Must include model description (.json) and at least one weights file (.bin)"
+        "Must include model description (.json) and at least one weights file (.bin)",
       );
       return;
     } else {
       setErrMessage("");
     }
 
-    let weightsFiles: Array<File> = [];
+    const weightsFiles: Array<File> = [];
     let jsonFile = event.currentTarget.files[0];
     for (let i = 0; i < event.currentTarget.files.length; i++) {
       const file = event.currentTarget.files[i];

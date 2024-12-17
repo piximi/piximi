@@ -10,9 +10,9 @@ import { LoadCB } from "../types";
 
 export const deserializeProject = async (
   fileStore: CustomStore,
-  loadCb: LoadCB
+  loadCb: LoadCB,
 ) => {
-  process.env.REACT_APP_LOG_LEVEL === "1" &&
+  import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
     logger(`starting deserialization of ${fileStore.rootName}`);
 
   const rootGroup = await openGroup(fileStore, fileStore.rootName, "r");

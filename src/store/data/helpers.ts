@@ -1,16 +1,13 @@
 import { v4 as uuidv4 } from "uuid";
 import { union } from "lodash";
 
-import { isObjectEmpty } from "utils/common/helpers";
-
 import { UNKNOWN_CATEGORY_NAME } from "./constants";
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
 
-import { DeferredEntity } from "store/entities/models";
-import { Category, Kind, Thing } from "./types";
+import { Category, Kind } from "./types";
 
 export const generateUUID = (options?: { definesUnknown: boolean }) => {
-  let id = uuidv4();
+  const id = uuidv4();
   let unknownFlag: string;
   if (options?.definesUnknown) {
     unknownFlag = "0";
@@ -37,23 +34,25 @@ export const generateUnknownCategory = (kind: string) => {
   return unknownCategory;
 };
 
-export const generateNewKind = (id: string) => {
-  const unknownCategory = generateUnknownCategory(id);
-  const newKind: Kind = {
-    id,
+export const generateKind = (kindName: string, useUUID?: boolean) => {
+  const kindId = useUUID ? generateUUID() : kindName;
+  const unknownCategory = generateUnknownCategory(kindId);
+  const kind: Kind = {
+    id: kindId,
+    displayName: kindName,
     categories: [unknownCategory.id],
     unknownCategoryId: unknownCategory.id,
     containing: [],
   };
-  return { newKind, unknownCategory };
+  return { kind, unknownCategory };
 };
 
 export const updateContents = (
   previousContents: string[],
   contents: string[],
-  updateType: "add" | "remove" | "replace"
+  updateType: "add" | "remove" | "replace",
 ) => {
-  var newContents: string[];
+  let newContents: string[];
 
   switch (updateType) {
     case "add":
@@ -66,10 +65,4 @@ export const updateContents = (
       newContents = contents;
   }
   return newContents;
-};
-
-export const isPendingReconciliation = (
-  item: DeferredEntity<Category | Thing | Kind>
-) => {
-  return !isObjectEmpty(item.changes);
 };

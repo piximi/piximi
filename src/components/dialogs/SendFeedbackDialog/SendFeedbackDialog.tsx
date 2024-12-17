@@ -44,7 +44,7 @@ export const SendFeedbackDialog = ({
             }}
           >
             {t(
-              "Use this form to report issues with Piximi via our GitHub page, or visit"
+              "Use this form to report issues with Piximi via our GitHub page, or visit",
             )}{" "}
             <a
               href="https://forum.image.sc/tag/piximi"

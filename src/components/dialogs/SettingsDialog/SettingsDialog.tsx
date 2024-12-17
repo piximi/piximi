@@ -21,7 +21,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
     },
     HotkeyContext.AppSettingsDialog,
     { enableOnTags: ["INPUT"], enabled: open },
-    [onClose]
+    [onClose],
   );
 
   return (

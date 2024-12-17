@@ -1,1 +1,0 @@
-export { AnnotatorToolDrawer } from "./AnnotatorToolDrawer";
