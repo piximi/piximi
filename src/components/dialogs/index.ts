@@ -1,7 +1,6 @@
 export { FallBackDialog } from "./FallbackDialog";
 export { SendFeedbackDialog } from "./SendFeedbackDialog";
 export { SettingsDialog } from "./SettingsDialog";
-export { ExitAnnotatorDialog } from "./ExitAnnotatorDialog";
 export { SaveFittedModelDialog } from "./SaveFittedModelDialog";
 export { ExportAnnotationsDialog } from "./ExportAnnotationsDialog";
 export { CreateKindDialog } from "./CreateKindDialog";

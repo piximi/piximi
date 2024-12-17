@@ -8,7 +8,7 @@ import { useDialogHotkey } from "hooks";
 
 import { LogoLoader } from "components/ui";
 import { CustomAppBar } from "components/layout";
-import { ExitAnnotatorDialog } from "components/dialogs";
+import { ExitAnnotatorDialog } from "../../components/dialogs";
 
 import { imageViewerSlice } from "store/imageViewer";
 import { annotatorSlice } from "store/annotator";

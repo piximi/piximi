@@ -125,5 +125,6 @@ export const applicationSettingsSlice = createSlice({
     setLoadMessage(state, action: PayloadAction<{ message: string }>) {
       state.loadMessage = action.payload.message;
     },
+    resetApplicationState() {},
   },
 });
