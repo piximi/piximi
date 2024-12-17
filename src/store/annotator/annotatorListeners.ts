@@ -5,6 +5,7 @@ import { annotatorSlice } from "./annotatorSlice";
 
 import { imageViewerSlice } from "store/imageViewer";
 
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { decodeAnnotation, encodeAnnotation } from "utils/annotator/rle";
 import { BlankAnnotationTool } from "utils/annotator/tools";
@@ -27,6 +28,13 @@ export const annotatorMiddleware = createListenerMiddleware();
 
 const startAppListening =
   annotatorMiddleware.startListening as TypedAppStartListening;
+
+startAppListening({
+  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
+  effect: (action, listenerAPI) => {
+    listenerAPI.dispatch(annotatorSlice.actions.resetAnnotator());
+  },
+});
 
 startAppListening({
   actionCreator: annotatorSlice.actions.setAnnotationState,
