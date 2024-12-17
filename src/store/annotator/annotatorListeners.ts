@@ -6,7 +6,7 @@ import { annotatorSlice } from "./annotatorSlice";
 import { imageViewerSlice } from "store/imageViewer";
 
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
-import { encodeAnnotation } from "utils/annotator/rle";
+import { decodeAnnotation, encodeAnnotation } from "utils/annotator/rle";
 import { BlankAnnotationTool } from "utils/annotator/tools";
 import { getPropertiesFromImage } from "utils/common/helpers";
 
@@ -17,7 +17,11 @@ import {
 } from "utils/annotator/enums";
 
 import { TypedAppStartListening } from "store/types";
-import { DecodedAnnotationObject, ImageObject } from "store/data/types";
+import {
+  AnnotationObject,
+  DecodedAnnotationObject,
+  ImageObject,
+} from "store/data/types";
 
 export const annotatorMiddleware = createListenerMiddleware();
 
@@ -94,7 +98,7 @@ startAppListening({
       }
 
       listenerAPI.dispatch(
-        imageViewerSlice.actions.setWorkingAnnotation({
+        annotatorSlice.actions.setWorkingAnnotation({
           annotation: {
             ...annotationTool.annotation,
             ...imageProperties,
@@ -109,8 +113,8 @@ startAppListening({
       const toolType = annotatorState.toolType;
 
       if (toolType === ToolType.Zoom) return;
-      const savedWorkingAnnotation = IVState.workingAnnotation.saved;
-      const workingAnnotationChanges = IVState.workingAnnotation.changes;
+      const savedWorkingAnnotation = annotatorState.workingAnnotation.saved;
+      const workingAnnotationChanges = annotatorState.workingAnnotation.changes;
       if (
         !savedWorkingAnnotation ||
         annotationTool.annotationState !== AnnotationState.Annotated
@@ -157,7 +161,7 @@ startAppListening({
       const annotation = encodeAnnotation(combinedSelectedAnnotation);
 
       listenerAPI.dispatch(
-        imageViewerSlice.actions.updateWorkingAnnotation({
+        annotatorSlice.actions.updateWorkingAnnotation({
           changes: annotation!,
         })
       );
@@ -166,10 +170,36 @@ startAppListening({
         annotationTool.annotate(
           selectedCategory,
           activeImage.activePlane,
-          activeImageId
+          activeImageId,
+          annotation.id
         );
       }
     }
+  },
+});
+
+startAppListening({
+  actionCreator: annotatorSlice.actions.setWorkingAnnotation,
+  effect: async (action, listenerAPI) => {
+    const dataState = listenerAPI.getState().data;
+    let annotationValue = action.payload.annotation;
+    if (typeof annotationValue === "string") {
+      const annotation = getCompleteEntity(
+        dataState.things.entities[annotationValue]
+      ) as AnnotationObject;
+      if (!annotation) return undefined;
+      annotationValue = !annotation.decodedMask
+        ? decodeAnnotation(annotation)
+        : (annotation as DecodedAnnotationObject);
+    }
+    listenerAPI.unsubscribe();
+    listenerAPI.dispatch(
+      annotatorSlice.actions.setWorkingAnnotation({
+        annotation: annotationValue,
+        preparedByListener: true,
+      })
+    );
+    listenerAPI.subscribe();
   },
 });
 startAppListening({

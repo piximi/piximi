@@ -26,21 +26,6 @@ export const selectZoomSelection = ({
   return imageViewer.zoomSelection;
 };
 
-export const selectWorkingAnnotationId = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}): string | undefined => {
-  return imageViewer.workingAnnotationId;
-};
-export const selectWorkingAnnotation = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.workingAnnotation;
-};
-
 export const selectStageWidth = ({
   imageViewer,
 }: {
@@ -71,14 +56,6 @@ export const selectStageHeight = ({
   imageViewer: ImageViewerState;
 }): number => {
   return imageViewer.stageHeight;
-};
-
-export const selectSelectedAnnotationIds = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}): string[] => {
-  return imageViewer.selectedAnnotationIds;
 };
 
 export const selectSelectedIVCategoryId = ({

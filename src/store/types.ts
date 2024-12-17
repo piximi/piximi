@@ -39,6 +39,30 @@ import {
 } from "./data/types";
 import { MeasurementsState } from "./measurements/types";
 
+export type AppSettingsState = {
+  // async work for setting initial states,
+  // for all store slices,
+  // should be completed before this flag is set to true
+  init: boolean;
+  tileSize: number;
+  themeMode: ThemeMode;
+  imageSelectionColor: string;
+  selectedImageBorderWidth: number;
+  alertState: AlertState;
+  hotkeyStack: HotkeyContext[];
+  language: Languages;
+  soundEnabled: boolean;
+  textOnScroll: boolean;
+  loadPercent: number;
+  loadMessage: string;
+};
+
+export type DataState = {
+  kinds: DeferredEntityState<Kind>;
+  categories: DeferredEntityState<Category>;
+  things: DeferredEntityState<AnnotationObject | ImageObject>;
+};
+
 export type SegmenterState = {
   // pre-fit state
   selectedModelIdx: number;
@@ -53,6 +77,26 @@ export type SegmenterState = {
   evaluationResult: SegmenterEvaluationResultType;
 
   modelStatus: ModelStatus;
+};
+
+export type ClassifierState = {
+  // pre-fit state
+  selectedModelIdx: number;
+  inputShape: Shape;
+  preprocessOptions: PreprocessOptions;
+  fitOptions: FitOptions;
+
+  learningRate: number;
+  lossFunction: LossFunction;
+  optimizationAlgorithm: OptimizationAlgorithm;
+  metrics: Array<Metric>;
+
+  trainingPercentage: number;
+  // post-evaluation results
+  evaluationResult: ClassifierEvaluationResultType;
+  // status flags
+  modelStatus: ModelStatus;
+  showClearPredictionsWarning: boolean;
 };
 
 export type ProjectState = {
@@ -81,12 +125,7 @@ export type ImageViewerState = {
   filters: Required<Pick<FilterType<AnnotationObject>, "categoryId">>;
   activeImageRenderedSrcs: Array<string>;
   imageOrigin: { x: number; y: number };
-  workingAnnotationId: string | undefined;
-  workingAnnotation: {
-    saved: DecodedAnnotationObject | undefined;
-    changes: Partial<DecodedAnnotationObject>;
-  };
-  selectedAnnotationIds: Array<string>;
+
   selectedCategoryId: string;
   stageHeight: number;
   stageScale: number;
@@ -104,51 +143,13 @@ export type ImageViewerState = {
   highlightedCategory?: string;
 };
 
-export type DataState = {
-  kinds: DeferredEntityState<Kind>;
-  categories: DeferredEntityState<Category>;
-  things: DeferredEntityState<AnnotationObject | ImageObject>;
-};
-
-export type ClassifierState = {
-  // pre-fit state
-  selectedModelIdx: number;
-  inputShape: Shape;
-  preprocessOptions: PreprocessOptions;
-  fitOptions: FitOptions;
-
-  learningRate: number;
-  lossFunction: LossFunction;
-  optimizationAlgorithm: OptimizationAlgorithm;
-  metrics: Array<Metric>;
-
-  trainingPercentage: number;
-  // post-evaluation results
-  evaluationResult: ClassifierEvaluationResultType;
-  // status flags
-  modelStatus: ModelStatus;
-  showClearPredictionsWarning: boolean;
-};
-
-export type AppSettingsState = {
-  // async work for setting initial states,
-  // for all store slices,
-  // should be completed before this flag is set to true
-  init: boolean;
-  tileSize: number;
-  themeMode: ThemeMode;
-  imageSelectionColor: string;
-  selectedImageBorderWidth: number;
-  alertState: AlertState;
-  hotkeyStack: HotkeyContext[];
-  language: Languages;
-  soundEnabled: boolean;
-  textOnScroll: boolean;
-  loadPercent: number;
-  loadMessage: string;
-};
-
 export type AnnotatorState = {
+  workingAnnotationId: string | undefined;
+  workingAnnotation: {
+    saved: DecodedAnnotationObject | undefined;
+    changes: Partial<DecodedAnnotationObject>;
+  };
+  selectedAnnotationIds: Array<string>;
   annotationState: AnnotationState;
   penSelectionBrushSize: number;
   quickSelectionRegionSize: number;
