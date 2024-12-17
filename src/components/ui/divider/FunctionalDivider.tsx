@@ -1,5 +1,5 @@
-import { Box, Typography } from "@mui/material";
 import React, { ReactNode } from "react";
+import { Box, Typography } from "@mui/material";
 
 export const FunctionalDivider = ({
   headerText,

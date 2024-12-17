@@ -8,17 +8,15 @@ import { throttle } from "lodash";
 import { useZoom } from "./useZoom";
 import { usePointerTool } from "./usePointerTool";
 
-import { imageViewerSlice } from "store/imageViewer";
-import { selectSelectedAnnotationIds } from "store/imageViewer/selectors";
+import { annotatorSlice } from "store/annotator";
 import {
   selectAnnotationSelectionMode,
+  selectSelectedAnnotationIds,
   selectToolType,
 } from "store/annotator/selectors";
-import { annotatorSlice } from "store/annotator";
-
-import { AnnotationTool, ObjectAnnotationTool } from "utils/annotator/tools";
 
 import { logger } from "utils/common/helpers";
+import { AnnotationTool, ObjectAnnotationTool } from "utils/annotator/tools";
 
 import {
   AnnotationMode,
@@ -77,7 +75,7 @@ export const useStageHandlers = (
 
   const deselectAllAnnotations = useCallback(() => {
     dispatch(
-      imageViewerSlice.actions.setSelectedAnnotationIds({
+      annotatorSlice.actions.setSelectedAnnotationIds({
         annotationIds: [],
         workingAnnotationId: undefined,
       })

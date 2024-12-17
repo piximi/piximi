@@ -7,11 +7,13 @@ import {
   maskFromPoints,
 } from "utils/annotator";
 import { convertToDataArray, generateUUID } from "utils/common/helpers";
+
 import { Partition } from "utils/models/enums";
-import { Point } from "../types";
 import { AnnotationState } from "../enums";
+
 import { DataArray } from "utils/file-io/types";
 import { Category, PartialDecodedAnnotationObject } from "store/data/types";
+import { Point } from "../types";
 
 export abstract class AnnotationTool extends Tool {
   /**
@@ -150,13 +152,19 @@ export abstract class AnnotationTool extends Tool {
    * @param plane Index of the image plane that corresponds to the annotation.
    * @returns
    */
-  public annotate(category: Category, plane: number, imageId: string): void {
+  public annotate(
+    category: Category,
+    plane: number,
+    imageId: string,
+    id?: string
+  ): void {
     if (!this.boundingBox || !this.decodedMask) return;
 
+    const annotationId = id ? id : generateUUID();
     this.annotation = {
       boundingBox: this.boundingBox,
       categoryId: category.id,
-      id: this.annotation ? this.annotation.id : generateUUID(),
+      id: annotationId,
       imageId,
       decodedMask: this.decodedMask,
       activePlane: plane,
