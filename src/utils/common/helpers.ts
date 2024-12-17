@@ -5,16 +5,16 @@ import { BitDepth, DataArray } from "utils/file-io/types";
 import IJSImage from "image-js";
 import { tensor2d, image as tfImage } from "@tensorflow/tfjs";
 
-import { availableImageSortKeys, defaultImageSortKey } from "./constants";
+import {
+  availableImageSortKeys,
+  defaultImageSortKey,
+  UNKNOWN_IMAGE_CATEGORY_COLOR,
+} from "./constants";
+import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 import { AlertType, ImageSortKey } from "./enums";
 
-import { ImageObject, Shape, ShapeArray } from "store/data/types";
-import {
-  DeferredEntity,
-  FilterType,
-  ImageSortKeyType,
-  RecursivePartial,
-} from "./types";
+import { Category, ImageObject, Shape, ShapeArray } from "store/data/types";
+import { FilterType, ImageSortKeyType, RecursivePartial } from "./types";
 
 /* 
   ERROR HANDLING / LOGGING
@@ -100,7 +100,7 @@ export const logger = (
   ARRAY / OBJECT HELPERS
 */
 
-export const isObjectEmpty = <T extends object>(obj: T) => {
+export const isObjectEmpty = <T extends Object>(obj: T) => {
   return Object.keys(obj).length === 0;
 };
 
@@ -160,6 +160,15 @@ export const filterObjects = <T extends object>(
 };
 
 export const copyValues = <T extends object>(
+  existingObject: T,
+  updates: Partial<T>
+) => {
+  Object.entries(updates).forEach(([key, value]) => {
+    existingObject[key as keyof T] = value as T[keyof T];
+  });
+};
+
+export const recursiveAssign = <T extends object>(
   existingObject: T,
   updates: Partial<T>,
 ) => {
@@ -228,6 +237,29 @@ export const sortTypeByKey = (key: ImageSortKey): ImageSortKeyType => {
   const sortKeyIdx = availableImageSortKeys
     .map((e) => e.imageSortKey)
     .indexOf(key);
+
+  if (sortKeyIdx >= 0) {
+    return availableImageSortKeys[sortKeyIdx];
+  } else {
+    return defaultImageSortKey;
+  }
+};
+
+export const updateRecord = <T extends string | number | symbol, K>(
+  record: Record<T, K[]>,
+  key: T,
+  value: K
+) => {
+  if (key in record) {
+    record[key].push(value);
+  } else {
+    record[key] = [value];
+  }
+};
+
+/*
+  CATEGORY HELPERS
+*/
 
   if (sortKeyIdx >= 0) {
     return availableImageSortKeys[sortKeyIdx];
@@ -511,16 +543,3 @@ export const rgbToHex = (rgb: [number, number, number]) => {
     componentToHex(rgb[2])
   );
 };
-
-export function getCompleteEntity<T>(entity: DeferredEntity<T>): T | undefined {
-  if (entity.changes.deleted) return;
-  const {
-    added: _added,
-    deleted: _deleted,
-    ...completeEntity
-  } = {
-    ...entity.saved,
-    ...entity.changes,
-  };
-  return completeEntity as T;
-}

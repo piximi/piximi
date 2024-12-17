@@ -15,15 +15,15 @@ import { useHotkeys } from "hooks";
 import { StageContext } from "views/ImageViewer/state/StageContext";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
+  selectActiveAnnotationIds,
+  selectActiveImageId,
   selectCursor,
   selectImageOrigin,
-} from "views/ImageViewer/state/imageViewer/selectors";
+} from "store/imageViewer/selectors";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
-import { selectWorkingAnnotationEntity } from "views/ImageViewer/state/annotator/selectors";
-import {
-  selectSelectedAnnotations,
-  selectActiveImage,
-} from "views/ImageViewer/state/annotator/reselectors";
+import { selectWorkingAnnotation } from "store/annotator/selectors";
+import { selectSelectedAnnotations } from "store/annotator/reselectors";
+import { selectActiveImage } from "store/imageViewer/reselectors";
 
 import { AnnotationTool } from "views/ImageViewer/utils/tools";
 

@@ -5,7 +5,7 @@ import { distinctFilter, mutatingFilter } from "utils/common/helpers";
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 import { ZoomMode } from "views/ImageViewer/utils/enums";
 
-import { ImageViewerState } from "../../utils/types";
+import { ImageViewerState } from "store/types";
 import {
   ColorAdjustmentOptionsType,
   ZoomToolOptionsType,
@@ -125,6 +125,7 @@ export const imageViewerSlice = createSlice({
         });
       }
     },
+
     setSelectedCategoryId(
       state,
       action: PayloadAction<{ selectedCategoryId: string }>,

@@ -5,9 +5,8 @@ import { Tool } from "./Tool";
 import {
   computeBoundingBoxFromContours as _computeBoundingBoxFromContours,
   maskFromPoints,
-} from "views/ImageViewer/utils";
-import { convertToDataArray } from "utils/common/helpers";
-import { generateUUID } from "store/data/helpers";
+} from "utils/annotator";
+import { convertToDataArray, generateUUID } from "utils/common/helpers";
 
 import { Partition } from "utils/models/enums";
 import { AnnotationState } from "../enums";
@@ -157,7 +156,7 @@ export abstract class AnnotationTool extends Tool {
     category: Category,
     plane: number,
     imageId: string,
-    id?: string,
+    id?: string
   ): void {
     if (!this.boundingBox || !this.decodedMask) return;
 

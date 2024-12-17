@@ -21,4 +21,3 @@ export { Logo } from "./Logo";
 export { LogoLoader } from "./LogoLoader";
 export { SelectionTree } from "./SelectionTree";
 export { ToolHotkeyTitle, TooltipCard, TooltipTitle } from "./tooltips";
-export { Tool, PopoverTool, ResizableTool } from "./Tool";
