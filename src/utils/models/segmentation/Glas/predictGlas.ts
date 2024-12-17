@@ -12,9 +12,9 @@ import {
 } from "@tensorflow/tfjs";
 import { ColorModel, Image as ImageJS, ImageKind } from "image-js";
 
-import { encode } from "utils/annotator";
+import { encode } from "views/ImageViewer/utils";
 import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
-import { generateUUID } from "utils/common/helpers";
+import { generateUUID } from "store/data/helpers";
 import { Partition } from "../../enums";
 
 const labelToAnnotation = async (
@@ -23,7 +23,7 @@ const labelToAnnotation = async (
   maskH: number,
   maskW: number,
   kindId: string,
-  unknownCategoryId: string
+  unknownCategoryId: string,
 ): Promise<OrphanedAnnotationObject | undefined> => {
   const labelFilter = tidy(() => onesLike(labelMask).mul(label));
 
@@ -55,8 +55,8 @@ const labelToAnnotation = async (
   let maxY = 0;
 
   idxsArr.forEach((idx) => {
-    let Y = getY(idx);
-    let X = getX(idx);
+    const Y = getY(idx);
+    const X = getX(idx);
 
     minY = Y < minY ? Y : minY;
     minX = X < minX ? X : minX;
@@ -105,7 +105,7 @@ const labelMaskToAnnotation = async (
   maskH: number,
   maskW: number,
   kindId: string,
-  unknownCategoryId: string
+  unknownCategoryId: string,
 ) => {
   const { values, indices } = unique(labelMask);
 
@@ -124,7 +124,7 @@ const labelMaskToAnnotation = async (
         maskH,
         maskW,
         kindId,
-        unknownCategoryId
+        unknownCategoryId,
       );
       if (annotation) {
         annotations.push(annotation);
@@ -146,7 +146,7 @@ export const predictGlas = async (
   inputImDims: {
     width: number;
     height: number;
-  }
+  },
 ) => {
   const yHat = model.execute(imTensor) as Tensor4D;
 
@@ -161,7 +161,7 @@ export const predictGlas = async (
 
   const outputImageTensor = tidy(() =>
     // probably should be astype("bool")
-    output.sigmoid().greater(0.5).mul(255).round().asType("int32")
+    output.sigmoid().greater(0.5).mul(255).round().asType("int32"),
   ) as Tensor3D;
 
   output.dispose();
@@ -214,7 +214,7 @@ export const predictGlas = async (
       1,
     ])
       .resizeBilinear([inputImDims.height, inputImDims.width])
-      .asType("float32")
+      .asType("float32"),
   ) as Tensor3D;
 
   const resizedImage = new ImageJS({
@@ -233,7 +233,7 @@ export const predictGlas = async (
   const labelMask = labelConnectedComponents(
     resizedImage.data as Uint8Array,
     resizedImage.width,
-    resizedImage.height
+    resizedImage.height,
   );
 
   const maskTensor = tensor1d(labelMask);
@@ -243,7 +243,7 @@ export const predictGlas = async (
     inputImDims.height,
     inputImDims.width,
     fgKindId,
-    unknownCategoryId
+    unknownCategoryId,
   );
 
   return annotations;
@@ -252,7 +252,7 @@ export const predictGlas = async (
 const labelConnectedComponents = (
   image: Uint8Array,
   width: number,
-  height: number
+  height: number,
 ): Uint8Array => {
   const output = new Uint8Array(image.length);
   const stack: number[] = [];

@@ -1,15 +1,17 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 // import JSZip from "jszip";
 import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { dataSlice } from "store/data/dataSlice";
+import { ExportAnnotationsMenu } from "../../components/ExportAnnotationsMenu";
 
-import { ImageObject } from "store/data/types";
-import { imageViewerSlice } from "store/imageViewer";
-import { ExportAnnotationsMenu } from "components/file-io/ExportAnnotationsListItem/ExportAnnotationsMenu";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+
+import { DecodedAnnotationObject, ImageObject } from "store/data/types";
+import { selectImageViewerObjects } from "views/ImageViewer/state/annotator/reselectors";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
@@ -25,21 +27,23 @@ export const ImageMenu = ({
   openImageMenu,
 }: ImageMenuProps) => {
   const dispatch = useDispatch();
+  const annotationDict = useSelector(selectImageViewerObjects);
 
   const handleClearAnnotations = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
+    event: React.MouseEvent<HTMLElement, MouseEvent>,
   ) => {
     if (!selectedImage) return;
     dispatch(
       imageViewerSlice.actions.removeActiveAnnotationIds({
         annotationIds: selectedImage.containing,
-      })
+      }),
     );
     dispatch(
-      dataSlice.actions.deleteThings({
-        thingIds: selectedImage.containing,
-        disposeColorTensors: true,
-      })
+      annotatorSlice.actions.deleteThings({
+        things: selectedImage.containing.map(
+          (id) => annotationDict[id] as DecodedAnnotationObject,
+        ),
+      }),
     );
 
     onCloseImageMenu(event);

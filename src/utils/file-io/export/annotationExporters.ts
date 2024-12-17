@@ -1,4 +1,4 @@
-import { decode } from "utils/annotator";
+import { decode } from "views/ImageViewer/utils";
 import JSZip from "jszip";
 import { AnnotationObject, Category, ImageObject } from "store/data/types";
 import { merge } from "lodash";
@@ -30,7 +30,7 @@ type LMasksTiff = Record<
 const processAnnotation = (
   ann: AnnotationObject,
   images: Record<string, ImageObject>,
-  categories: Record<string, Category>
+  categories: Record<string, Category>,
 ) => {
   const image = images[ann.imageId];
   const imageShape = image.shape;
@@ -56,7 +56,7 @@ const processAnnotation = (
 const updateColors = (
   colors: { r: number; g: number; b: number },
   maskOptions: MaskOptions,
-  colorValues: string[]
+  colorValues: string[],
 ) => {
   if (maskOptions.random) {
     do {
@@ -81,7 +81,7 @@ export const exportAnnotationMasks = (
   projectName: string,
   zip: JSZip,
 
-  exportType: AnnotationExportType = AnnotationExportType.LabeledInstances
+  exportType: AnnotationExportType = AnnotationExportType.LabeledInstances,
 ) => {
   const utif = new TiffIO();
   let masks: LMasksTiff = {};
@@ -98,11 +98,12 @@ export const exportAnnotationMasks = (
 
   const colorValues: string[] = [];
   const annotationCounts: Record<string, number> = {};
-  let categoryColorMap: Record<string, Record<string, number>> = {};
+  const categoryColorMap: Record<string, Record<string, number>> = {};
   for (const annId in annotations) {
     // for image names like blah.png
     const annotation = annotations[annId];
 
+    /* eslint-disable prefer-const */
     let {
       imageName,
       bboxShape,
@@ -111,6 +112,7 @@ export const exportAnnotationMasks = (
       categoryName,
       kind,
       imageShape,
+      /* eslint-enable prefer-const */
     } = processAnnotation(annotation, images, categories);
 
     switch (exportType) {
@@ -162,7 +164,7 @@ export const exportAnnotationMasks = (
         } else {
           if (!(categoryName in categoryColorMap[kind])) {
             categoryColorMap[kind][categoryName] = Object.keys(
-              categoryColorMap[kind]
+              categoryColorMap[kind],
             ).length;
           }
         }
@@ -266,7 +268,7 @@ export const exportAnnotationMasks = (
           : labelImage.planes;
         const { ifds, ifdBlockSize } = utif.generateIFDObject(
           ifdTemplate,
-          numIfds
+          numIfds,
         );
 
         const encoded = utif.encodeImage(labelImage.mask, ifds, ifdBlockSize);

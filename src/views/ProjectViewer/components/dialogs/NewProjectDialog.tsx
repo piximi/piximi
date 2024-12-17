@@ -4,13 +4,9 @@ import { TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 import { dataSlice } from "store/data/dataSlice";
-import { annotatorSlice } from "store/annotator";
-import { imageViewerSlice } from "store/imageViewer";
-import { segmenterSlice } from "store/segmenter";
-import { measurementsSlice } from "store/measurements";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
 type NewProjectDialogProps = {
   onClose: () => void;
@@ -30,18 +26,14 @@ export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
     if (invalidProjectName) {
       return;
     }
+    dispatch(applicationSettingsSlice.actions.resetApplicationState());
 
     dispatch(
       projectSlice.actions.createNewProject({
         name: projectName,
-      })
+      }),
     );
     dispatch(dataSlice.actions.resetData());
-    dispatch(classifierSlice.actions.resetClassifier());
-    dispatch(annotatorSlice.actions.resetAnnotator());
-    dispatch(imageViewerSlice.actions.resetImageViewer());
-    dispatch(measurementsSlice.actions.resetMeasurements());
-    dispatch(segmenterSlice.actions.resetSegmenter());
   };
 
   const onChangeClassifierName = (event: ChangeEvent<HTMLInputElement>) => {

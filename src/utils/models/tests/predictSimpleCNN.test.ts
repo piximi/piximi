@@ -1,4 +1,7 @@
-// ignore-no-logs
+import fs from "fs";
+import path from "path";
+import { expect, it } from "vitest";
+
 import {
   memory as tfmemory, //eslint-disable-line @typescript-eslint/no-unused-vars
   time as tftime, //eslint-disable-line @typescript-eslint/no-unused-vars
@@ -16,8 +19,6 @@ import { CropSchema, ModelTask, Partition } from "../enums";
 import { loadDataUrlAsStack } from "utils/file-io/helpers";
 import { convertToImage } from "utils/common/tensorHelpers";
 import { Category, ImageObject, Shape } from "store/data/types";
-
-jest.setTimeout(100000);
 
 const categories: Array<Category> = [
   // {
@@ -181,30 +182,27 @@ it("predict", async () => {
       "mnist",
       undefined,
       inputShape.planes,
-      inputShape.channels
+      inputShape.channels,
     );
     inferrenceImages.push({ ...loadedIm, ...im });
     imageIds.push(im.id);
   }
 
-  const fs = require("fs");
-  const path = require("path");
-
   const jsonFileBuffer = fs.readFileSync(
-    path.join(__dirname, "mnist_classifier.json")
+    path.join(__dirname, "mnist_classifier.json"),
   );
 
   const weightsFileBuffer = fs.readFileSync(
-    path.join(__dirname, "mnist_classifier.weights.bin")
+    path.join(__dirname, "mnist_classifier.weights.bin"),
   );
 
   const jsonFile = new File(
     [new Blob([new Uint8Array(jsonFileBuffer)])],
-    "mnist_classifier.json"
+    "mnist_classifier.json",
   );
   const weightsFile = new File(
     [new Blob([new Uint8Array(weightsFileBuffer)])],
-    "mnist_classifier.weights.bin"
+    "mnist_classifier.weights.bin",
   );
 
   const model = new UploadedClassifier({
@@ -290,10 +288,12 @@ it("predict", async () => {
 
   // can't guarantee order, but must guarantee each image id has the correct category id
   for (let i = 0; i < expectedImageIds.length; i++) {
-    let resultImageId = imageIds[i];
-    let resultCategoryId = categoryIds[i];
+    const resultImageId = imageIds[i];
+    const resultCategoryId = categoryIds[i];
 
-    let expectedIdx = expectedImageIds.findIndex((id) => id === resultImageId);
+    const expectedIdx = expectedImageIds.findIndex(
+      (id) => id === resultImageId,
+    );
 
     expect(resultCategoryId).toStrictEqual(expectedCategoryIds[expectedIdx]);
   }

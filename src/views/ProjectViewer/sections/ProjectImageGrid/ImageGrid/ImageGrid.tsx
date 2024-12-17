@@ -39,13 +39,13 @@ const createItemData = memoize(
     things: Things,
     handleSelectThing: SelectHandler,
     selectedThingIds: SelectedThingIds,
-    numColumns: number
+    numColumns: number,
   ) => ({
     things,
     handleSelectThing,
     selectedThingIds,
     numColumns,
-  })
+  }),
 );
 
 const Cell = memo(
@@ -77,7 +77,7 @@ const Cell = memo(
       </div>
     );
   },
-  areEqual
+  areEqual,
 );
 
 //NOTE: kind is passed as a prop and used internally instead of the kind returned
@@ -106,7 +106,7 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
       things
         .filter((thing) => !isFiltered(thing, thingFilters ?? {}))
         .sort(sortFunction),
-    [things, thingFilters, sortFunction]
+    [things, thingFilters, sortFunction],
   );
 
   useEffect(() => {
@@ -153,13 +153,13 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
         dispatch(projectSlice.actions.selectThings({ ids: id }));
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
   return (
     <DropBox>
       <Container
-        sx={(theme) => ({
+        sx={() => ({
           paddingBottom: `${GRID_GAP}px`,
           pl: `${GRID_GAP}px`,
           pr: 0,
@@ -185,7 +185,7 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
               visibleThings,
               handleSelectThing,
               selectedThingIds,
-              numColumns
+              numColumns,
             )}
             style={{ width: gridWidth }}
           >

@@ -9,7 +9,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import LanguageIcon from "@mui/icons-material/Language";
+import { Language as LanguageIcon } from "@mui/icons-material";
 
 import { useDebounce } from "hooks";
 
@@ -94,7 +94,7 @@ export const CloudUpload = ({
       setSuccessMessage(
         `Successfully uploaded Classification ${
           isGraph ? "Graph" : "Layers"
-        } Model ("${model.name}")`
+        } Model ("${model.name}")`,
       );
     } else {
       // TODO - segmenter

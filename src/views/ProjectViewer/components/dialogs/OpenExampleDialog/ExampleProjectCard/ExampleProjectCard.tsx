@@ -33,7 +33,7 @@ type ExampleProjectType = {
 
 type ExampleProjectCardProps = {
   exampleProject: ExampleProjectType;
-  onClose: () => void;
+  onClose: (event?: object, reason?: "backdropClick" | "escapeKeyDown") => void;
 };
 
 export const ExampleProjectCard = ({
@@ -47,7 +47,7 @@ export const ExampleProjectCard = ({
       applicationSettingsSlice.actions.sendLoadPercent({
         loadPercent,
         loadMessage,
-      })
+      }),
     );
   };
 
@@ -64,48 +64,43 @@ export const ExampleProjectCard = ({
       applicationSettingsSlice.actions.setLoadPercent({
         loadPercent: -1,
         loadMessage: "loading example project...",
-      })
+      }),
     );
 
-    var exampleProjectFilePath: string;
+    let exampleProjectFilePath: string;
     switch (exampleProject.enum) {
       case ExampleProject.Mnist:
-        exampleProjectFilePath =
-          process.env.NODE_ENV === "production"
-            ? `${domain}/${rootPath}/mnistExampleProject.${ext}`
-            : (await import("data/exampleProjects/mnistExampleProject.zip"))
-                .default;
+        exampleProjectFilePath = import.meta.env.PROD
+          ? `${domain}/${rootPath}/mnistExampleProject.${ext}`
+          : (await import("data/exampleProjects/mnistExampleProject.zip"))
+              .default;
         break;
       case ExampleProject.CElegans:
-        exampleProjectFilePath =
-          process.env.NODE_ENV === "production"
-            ? `${domain}/${rootPath}/cElegansExampleProject.${ext}`
-            : (await import("data/exampleProjects/cElegansExampleProject.zip"))
-                .default;
+        exampleProjectFilePath = import.meta.env.PROD
+          ? `${domain}/${rootPath}/cElegansExampleProject.${ext}`
+          : (await import("data/exampleProjects/cElegansExampleProject.zip"))
+              .default;
         break;
       case ExampleProject.HumanU2OSCells:
-        exampleProjectFilePath =
-          process.env.NODE_ENV === "production"
-            ? `${domain}/${rootPath}/HumanU2OSCellsExampleProject.${ext}`
-            : (
-                await import(
-                  "data/exampleProjects/HumanU2OSCellsExampleProject.zip"
-                )
-              ).default;
+        exampleProjectFilePath = import.meta.env.PROD
+          ? `${domain}/${rootPath}/HumanU2OSCellsExampleProject.${ext}`
+          : (
+              await import(
+                "data/exampleProjects/HumanU2OSCellsExampleProject.zip"
+              )
+            ).default;
         break;
       case ExampleProject.BBBC013:
-        exampleProjectFilePath =
-          process.env.NODE_ENV === "production"
-            ? `${domain}/${rootPath}/BBBC013ExampleProject.${ext}`
-            : (await import("data/exampleProjects/BBBC013ExampleProject.zip"))
-                .default;
+        exampleProjectFilePath = import.meta.env.PROD
+          ? `${domain}/${rootPath}/BBBC013ExampleProject.${ext}`
+          : (await import("data/exampleProjects/BBBC013ExampleProject.zip"))
+              .default;
         break;
       case ExampleProject.PLP1:
-        exampleProjectFilePath =
-          process.env.NODE_ENV === "production"
-            ? `${domain}/${rootPath}/PLP1ExampleProject.${ext}`
-            : (await import("data/exampleProjects/PLP1ExampleProject.zip"))
-                .default;
+        exampleProjectFilePath = import.meta.env.PROD
+          ? `${domain}/${rootPath}/PLP1ExampleProject.${ext}`
+          : (await import("data/exampleProjects/PLP1ExampleProject.zip"))
+              .default;
         break;
       default:
         return;
@@ -115,11 +110,11 @@ export const ExampleProjectCard = ({
       .then((res) => res.blob())
       .then(
         (blob) =>
-          new PseudoFileList([new File([blob], exampleProject.name, blob)])
+          new PseudoFileList([new File([blob], exampleProject.name, blob)]),
       )
       .catch((err: any) => {
-        process.env.NODE_ENV === "production" &&
-          process.env.REACT_APP_LOG_LEVEL === "1" &&
+        import.meta.env.PROD &&
+          import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
           console.error(err);
         throw err;
       });
@@ -129,7 +124,7 @@ export const ExampleProjectCard = ({
     try {
       const deserializedProject = await deserializeProject(
         fileStore,
-        onLoadProgress
+        onLoadProgress,
       );
       if (!deserializedProject) return;
 
@@ -140,18 +135,18 @@ export const ExampleProjectCard = ({
 
         dispatch(dataSlice.actions.initializeState({ data }));
         dispatch(projectSlice.actions.setProject({ project }));
-        dispatch(classifierSlice.actions.setDefaults({}));
+        dispatch(classifierSlice.actions.setDefaults());
         dispatch(
           classifierSlice.actions.setClassifier({
             classifier,
-          })
+          }),
         );
       });
     } catch (err) {
       const error: Error = err as Error;
 
-      process.env.NODE_ENV !== "production" &&
-        process.env.REACT_APP_LOG_LEVEL === "1" &&
+      import.meta.env.NODE_ENV !== "production" &&
+        import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
         console.error(err);
 
       const warning: AlertState = {
@@ -163,12 +158,12 @@ export const ExampleProjectCard = ({
       dispatch(
         applicationSettingsSlice.actions.updateAlertState({
           alertState: warning,
-        })
+        }),
       );
     }
 
     dispatch(
-      applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 })
+      applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 }),
     );
   };
   return (

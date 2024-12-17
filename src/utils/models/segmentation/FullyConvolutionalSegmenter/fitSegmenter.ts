@@ -14,7 +14,7 @@ export const fitSegmenter = async (
     }>;
   },
   options: FitOptions,
-  onEpochEnd: any
+  _onEpochEnd: any,
 ): Promise<{ fitted: LayersModel; status: History }> => {
   const args = {
     // callbacks: [

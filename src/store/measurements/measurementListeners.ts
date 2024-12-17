@@ -1,13 +1,11 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { measurementsSlice } from "./measurementsSlice";
 
-import { getDeferredProperty } from "store/entities/utils";
 import { prepareThingData } from "views/MeasurementView/utils";
-import { isPendingReconciliation } from "store/data/helpers";
 
-import { DeferredDictionary } from "store/entities";
 import { Category } from "store/data/types";
 import { TypedAppStartListening } from "store/types";
 import { RecursivePartial } from "utils/common/types";
@@ -19,24 +17,25 @@ const startAppListening =
   measurementsMiddleware.startListening as TypedAppStartListening;
 
 startAppListening({
+  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
+  effect: (action, listenerAPI) => {
+    listenerAPI.dispatch(measurementsSlice.actions.resetMeasurements());
+  },
+});
+
+startAppListening({
   predicate: (action, currentState, previousState) => {
     return currentState.data !== previousState.data;
   },
   effect: async (action, listenerAPI) => {
-    if (
-      !action.payload ||
-      (action.payload.hasOwnProperty("isPermanent") &&
-        !action.payload.isPermanent)
-    )
-      return;
     const { data: dataState, measurements: measurementState } =
       listenerAPI.getState();
     for await (const group of Object.values(measurementState.groups)) {
-      const kind = dataState.kinds.entities[group.kind]?.saved;
+      const kind = dataState.kinds.entities[group.kind];
       if (!kind) {
         //remove group from measurements
         listenerAPI.dispatch(
-          measurementsSlice.actions.removeGroup({ groupId: group.id })
+          measurementsSlice.actions.removeGroup({ groupId: group.id }),
         );
         break;
       }
@@ -44,7 +43,7 @@ startAppListening({
       const { splitUpdates, deletedCats } = updateCategories(
         group.splitStates,
         kind.categories,
-        dataState.categories.entities
+        dataState.categories.entities,
       );
 
       listenerAPI.dispatch(
@@ -52,7 +51,7 @@ startAppListening({
           groupId: group.id,
           updates: splitUpdates,
           remove: deletedCats,
-        })
+        }),
       );
 
       const groupThings = group.thingIds;
@@ -61,9 +60,9 @@ startAppListening({
       if (!(newThings.length || deletedThings.length)) return;
       // Used to distinguish between actual new objects and objects which may have just changed kinds
       const unmeasuredThings = newThings.filter(
-        (id) => !measurementState.data[id]
+        (id) => !measurementState.data[id],
       );
-      const unsavedThings: string[] = [];
+
       if (unmeasuredThings.length) {
         // Turns measurements off -- Users need to manually recalculate new values
         const inactiveMeasurements = resetMeasurements(group.measurementStates);
@@ -71,41 +70,37 @@ startAppListening({
           measurementsSlice.actions.updateGroupMeasurementState({
             groupId: group.id,
             updates: inactiveMeasurements,
-          })
+          }),
         );
 
         // For new measurements, data needs to be computed
         const preparedThings: ThingData = {};
 
         for await (const thingId of unmeasuredThings) {
-          if (isPendingReconciliation(dataState.things.entities[thingId])) {
-            unsavedThings.push(thingId);
-            continue;
-          }
-          const thing = dataState.things.entities[thingId].saved;
+          const thing = dataState.things.entities[thingId]!;
           const preparedThing = await prepareThingData(thing);
           preparedThings[thingId] = preparedThing;
         }
         listenerAPI.dispatch(
           measurementsSlice.actions.updateMeasurements({
             dataDict: preparedThings,
-          })
+          }),
         );
       }
       listenerAPI.dispatch(
         measurementsSlice.actions.updateGroupThingIds({
           groupId: group.id,
-          thingIds: difference(kind.containing, unsavedThings), // Dont add things which are currently being changed
-        })
+          thingIds: kind.containing,
+        }),
       );
       const trulyDeleted = deletedThings.filter(
-        (id) => !dataState.things.entities[id]
+        (id) => !dataState.things.entities[id],
       );
       if (trulyDeleted.length) {
         listenerAPI.dispatch(
           measurementsSlice.actions.removeThingMeasurements({
             thingIds: trulyDeleted,
-          })
+          }),
         );
       }
     }
@@ -118,34 +113,34 @@ const resetMeasurements = (measurements: MeasurementOptions) => {
       newOptions[id] = { ...measurements[id], state: "off" };
       return newOptions;
     },
-    {}
+    {},
   );
 };
 
 const updateCategories = (
   state: MeasurementOptions,
   kindCategories: string[],
-  categoryEntities: DeferredDictionary<Category>
+  categoryEntities: Record<string, Category>,
 ) => {
   const groupCats = state["categoryId"].children!;
   const newCats = difference(kindCategories, groupCats);
   const deletedCats = difference(groupCats, kindCategories);
   const persistingCats = intersection(
     state["categoryId"].children!,
-    kindCategories
+    kindCategories,
   );
 
   const newNames = persistingCats.reduce(
     (newNames: { id: string; name: string }[], id) => {
-      if (state[id]!.name !== categoryEntities[id]!.saved.name) {
+      if (state[id]!.name !== categoryEntities[id]!.name) {
         newNames.push({
           id,
-          name: categoryEntities[id]!.saved.name,
+          name: categoryEntities[id]!.name,
         });
       }
       return newNames;
     },
-    []
+    [],
   );
 
   const splitUpdates: RecursivePartial<MeasurementOptions> = {};
@@ -157,7 +152,7 @@ const updateCategories = (
     newCats.forEach((id) => {
       splitUpdates[id] = {
         id,
-        name: getDeferredProperty(categoryEntities[id], "name"),
+        name: categoryEntities[id]!.name,
         state: "off",
         parent: "categoryId",
       };

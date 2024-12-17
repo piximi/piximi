@@ -1,17 +1,20 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { dispose, TensorContainer } from "@tensorflow/tfjs";
-import { intersection } from "lodash";
-
-import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
-import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import {
-  generateUnknownCategory,
-  generateUUID,
-  isUnknownCategory,
+  createEntityAdapter,
+  createSlice,
+  Draft,
+  EntityState,
+  PayloadAction,
+} from "@reduxjs/toolkit";
+import { dispose, TensorContainer } from "@tensorflow/tfjs";
+import { difference, intersection } from "lodash";
+
+import {
   mutatingFilter,
   newReplaceDuplicateName,
+  updateRecordArray,
 } from "utils/common/helpers";
-import { encode } from "utils/annotator/rle";
+import { generateUUID, generateKind, isUnknownCategory } from "./helpers";
+import { encode } from "views/ImageViewer/utils/rle";
 import { updateContents } from "./helpers";
 
 import { Partition } from "utils/models/enums";
@@ -29,42 +32,84 @@ import {
   ThingsUpdates,
   CategoryUpdates,
 } from "./types";
-import { DeferredEntity, DeferredEntityState } from "store/entities/models";
 
-const unknownCategory = generateUnknownCategory("Image");
-export const kindsAdapter = createDeferredEntityAdapter<Kind>();
-export const categoriesAdapter = createDeferredEntityAdapter<Category>();
-export const thingsAdapter = createDeferredEntityAdapter<
+const { kind: imageKind, unknownCategory } = generateKind("Image");
+export const kindsAdapter = createEntityAdapter<Kind>();
+export const categoriesAdapter = createEntityAdapter<Category>();
+export const thingsAdapter = createEntityAdapter<
   ImageObject | AnnotationObject
 >();
 
 export const initialState = (): DataState => {
   return {
     kinds: kindsAdapter.getInitialState({
-      ids: ["Image"],
+      ids: [imageKind.id],
       entities: {
-        Image: {
-          saved: {
-            id: "Image",
-            containing: [],
-            categories: [unknownCategory.id],
-            unknownCategoryId: unknownCategory.id,
-          },
-          changes: {},
-        },
+        [imageKind.id]: imageKind,
       },
     }),
     categories: categoriesAdapter.getInitialState({
       ids: [unknownCategory.id],
       entities: {
-        [unknownCategory.id]: {
-          saved: unknownCategory,
-          changes: {},
-        },
+        [unknownCategory.id]: unknownCategory,
       },
     }),
     things: thingsAdapter.getInitialState(),
   };
+};
+
+const gatherThings = (
+  state: Draft<DataState>,
+  payload:
+    | {
+        thingIds: Array<string> | "all" | "annotations";
+        activeKind?: string;
+        disposeColorTensors: boolean;
+      }
+    | {
+        ofKinds: Array<string>;
+        activeKind?: string;
+        disposeColorTensors: boolean;
+      }
+    | {
+        ofCategories: Array<string>;
+        activeKind: string;
+        disposeColorTensors: boolean;
+      },
+) => {
+  let explicitThingIds: string[] = [];
+
+  if ("thingIds" in payload) {
+    if (payload.thingIds === "all") {
+      explicitThingIds = state.things.ids as string[];
+    } else if (payload.thingIds === "annotations") {
+      explicitThingIds = state.kinds.ids.reduce((tIds: string[], kindId) => {
+        if (kindId !== "Image") {
+          tIds.push(...state.kinds.entities[kindId]!.containing);
+        }
+        return tIds;
+      }, []);
+    } else {
+      explicitThingIds = payload.thingIds;
+    }
+  } else if ("ofKinds" in payload) {
+    payload.ofKinds.forEach((kindId) => {
+      if (kindId in state.kinds.entities) {
+        explicitThingIds.push(...state.kinds.entities[kindId]!.containing);
+      }
+    });
+  } else {
+    //"ofCategories" in action.payload
+    payload.ofCategories.forEach((categoryId) => {
+      if (categoryId in state.categories.entities) {
+        const containedThings =
+          state.categories.entities[categoryId]!.containing;
+
+        explicitThingIds.push(...containedThings);
+      }
+    });
+  }
+  return explicitThingIds;
 };
 
 export const dataSlice = createSlice({
@@ -73,9 +118,9 @@ export const dataSlice = createSlice({
   reducers: {
     resetData: (state) => {
       Object.values(state.things.entities).forEach((entity) => {
-        dispose(entity.saved.data as unknown as TensorContainer);
-        if ("colors" in entity.saved) {
-          dispose(entity.saved.colors as unknown as TensorContainer);
+        dispose(entity!.data as unknown as TensorContainer);
+        if ("colors" in entity!) {
+          dispose(entity!.colors as unknown as TensorContainer);
         }
       });
       return initialState();
@@ -84,11 +129,11 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         data: {
-          kinds: DeferredEntityState<Kind>;
-          categories: DeferredEntityState<Category>;
-          things: DeferredEntityState<AnnotationObject | ImageObject>;
+          kinds: EntityState<Kind, string>;
+          categories: EntityState<Category, string>;
+          things: EntityState<AnnotationObject | ImageObject, string>;
         };
-      }>
+      }>,
     ) {
       Object.values(state.things.entities).forEach((entity) => {
         dispose(entity as unknown as TensorContainer);
@@ -102,21 +147,27 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         kinds: Array<PartialBy<Kind, "containing">>;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      const { kinds, isPermanent } = action.payload;
+      const { kinds } = action.payload;
       for (const kind of kinds) {
         if (state.kinds.entities[kind.id]) continue;
         if (!kind.containing) kind.containing = [];
 
-        if (isPermanent) {
-          state.kinds.entities[kind.id] = { saved: kind as Kind, changes: {} };
-          state.kinds.ids.push(kind.id);
-        } else {
-          kindsAdapter.addOne(state.kinds, kind as Kind);
-        }
+        kindsAdapter.addOne(state.kinds, kind as Kind);
       }
+    },
+    // Exclusively updates kinds in store. Unsafe because it does not:
+    // - Reconcile existence (or lack thereof) of categories
+    // - Reconcile existence (or lack thereof) of things
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    updateKinds_unsafe(
+      state,
+      action: PayloadAction<{
+        updates: Array<{ id: string; changes: Omit<Partial<Kind>, "id"> }>;
+      }>,
+    ) {
+      kindsAdapter.updateMany(state.kinds, action.payload.updates);
     },
     updateKindContents(
       state,
@@ -126,33 +177,23 @@ export const dataSlice = createSlice({
           updateType: "add" | "remove" | "replace";
           contents: string[];
         }>;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      const { changes, isPermanent } = action.payload;
+      const { changes } = action.payload;
       for (const { kindId, contents, updateType } of changes) {
-        const previousContents = getDeferredProperty(
-          state.kinds.entities[kindId],
-          "containing"
-        );
-
         if (!state.kinds.entities[kindId]) continue;
+        const previousContents = state.kinds.entities[kindId]!.containing;
 
         const newContents = updateContents(
           previousContents,
           contents,
-          updateType
+          updateType,
         );
 
-        if (isPermanent) {
-          state.kinds.entities[kindId].saved.containing = newContents;
-          state.kinds.entities[kindId].changes = {};
-        } else {
-          kindsAdapter.updateOne(state.kinds, {
-            id: kindId,
-            changes: { containing: newContents },
-          });
-        }
+        kindsAdapter.updateOne(state.kinds, {
+          id: kindId,
+          changes: { containing: newContents },
+        });
       }
     },
     updateKindCategories(
@@ -163,113 +204,127 @@ export const dataSlice = createSlice({
           updateType: "add" | "remove" | "replace";
           categories: string[];
         }>;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      const { changes, isPermanent } = action.payload;
+      const { changes } = action.payload;
 
       for (const { kindId, categories, updateType } of changes) {
         if (!state.kinds.entities[kindId]) continue;
-        const previousCategories = getDeferredProperty(
-          state.kinds.entities[kindId],
-          "categories"
-        );
+        const previousCategories = state.kinds.entities[kindId]!.categories;
 
         const newCategories = updateContents(
           previousCategories,
           categories,
-          updateType
+          updateType,
         );
-        if (isPermanent) {
-          state.kinds.entities[kindId].saved.categories = newCategories;
-          state.kinds.entities[kindId].changes = {};
-        } else {
-          kindsAdapter.updateOne(state.kinds, {
-            id: kindId,
-            changes: { categories: newCategories },
-          });
-        }
+
+        kindsAdapter.updateOne(state.kinds, {
+          id: kindId,
+          changes: { categories: newCategories },
+        });
       }
     },
-    //Buggy,  old kind persists in annotator and measurements. Old kind name for old and new in annotator
     updateKindName(
       state,
       action: PayloadAction<{
-        currentKindName: string;
-        newKindName: string;
-      }>
+        kindId: string;
+        displayName: string;
+      }>,
     ) {
-      const { currentKindName, newKindName } = action.payload;
-      if (
-        currentKindName === newKindName ||
-        !state.kinds.entities[currentKindName]
-      )
+      const { kindId, displayName } = action.payload;
+      const kind = state.kinds.entities[kindId];
+      if (kindId === displayName || !kind) return;
+      kindsAdapter.updateOne(state.kinds, {
+        id: kindId,
+        changes: { displayName: displayName },
+      });
+    },
+    // Exclusively removes kind. Unsafe because it does not:
+    // - Remove associated categories
+    // - Remove associated things
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    deleteKind_unsafe(state, action: PayloadAction<{ deletedKindId: string }>) {
+      const { deletedKindId } = action.payload;
+      if (!state.kinds.entities[deletedKindId] || deletedKindId === "Image")
         return;
+      kindsAdapter.removeOne(state.kinds, deletedKindId);
+    },
+    // Exclusively removes kinds. Unsafe because it does not:
+    // - Remove associated categories
+    // - Remove associated things
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    deleteKinds_unsafe(state, action: PayloadAction<{ kindIds: string[] }>) {
+      const { kindIds } = action.payload;
+      if (kindIds.includes("Image")) return;
 
-      const kind = getCompleteEntity(state.kinds.entities[currentKindName])!;
-      const kindCategories = kind.categories;
-      const kindThings = kind.containing;
-
-      kindCategories.forEach((catId) => {
-        state.categories.entities[catId].saved.kind = newKindName;
-      });
-      kindThings.forEach((thingId) => {
-        state.things.entities[thingId].saved.kind = newKindName;
-      });
-      const kindIndex = state.kinds.ids.findIndex(
-        (name) => name === currentKindName
-      );
-      state.kinds.ids.splice(kindIndex, 1, newKindName);
-      state.kinds.entities[newKindName] = state.kinds.entities[currentKindName];
-      delete state.things.entities[currentKindName];
+      kindsAdapter.removeMany(state.kinds, kindIds);
     },
     deleteKind(
       state,
       action: PayloadAction<{
         deletedKindId: string;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      const { deletedKindId, isPermanent } = action.payload;
-      const deletedKind = getCompleteEntity(
-        state.kinds.entities[deletedKindId]
-      );
-      if (!deletedKind) return;
-      const kindThings = deletedKind.containing;
-      const kindCats = deletedKind.categories;
+      const { deletedKindId } = action.payload;
+      if (!state.kinds.entities[deletedKindId] || deletedKindId === "Image")
+        return;
+      const deletedKind = state.kinds.entities[deletedKindId]!;
+      const associatedThings = deletedKind.containing;
+      const associatedCategories = deletedKind.categories;
 
-      dataSlice.caseReducers.deleteThings(state, {
-        type: "deleteThings",
-        payload: {
-          thingIds: kindThings,
-          isPermanent,
-          disposeColorTensors: true,
-          preparedByListener: true,
-        },
-      });
-      dataSlice.caseReducers.deleteCategories(state, {
-        type: "deleteCategories",
-        payload: {
-          categoryIds: kindCats,
-          isPermanent,
-        },
-      });
+      const deletedThingsByImage: Record<string, string[]> = {};
 
-      if (isPermanent) {
-        mutatingFilter(state.kinds.ids, (id) => id !== deletedKindId);
-        delete state.kinds.entities[deletedKindId];
-      } else {
-        kindsAdapter.removeOne(state.kinds, deletedKindId);
+      for (const thingId of associatedThings) {
+        const thing = state.things.entities[thingId] as AnnotationObject;
+        updateRecordArray(deletedThingsByImage, thing.imageId, thingId);
+        dispose(thing.data as TensorContainer);
+        thingsAdapter.removeOne(state.things, thingId);
       }
+
+      categoriesAdapter.removeMany(state.categories, associatedCategories);
+      for (const [imageId, deletedThings] of Object.entries(
+        deletedThingsByImage,
+      )) {
+        const image = state.things.entities[imageId] as ImageObject;
+        thingsAdapter.updateOne(state.things, {
+          id: imageId,
+          changes: {
+            containing: difference(image.containing, deletedThings),
+          },
+        });
+      }
+
+      kindsAdapter.removeOne(state.kinds, deletedKindId);
+    },
+    deleteKinds(state, action: PayloadAction<{ kindIds: string[] }>) {
+      const { kindIds } = action.payload;
+      for (const kindId of kindIds) {
+        dataSlice.caseReducers.deleteKind(state, {
+          type: "deleteKind",
+          payload: { deletedKindId: kindId },
+        });
+      }
+    },
+    // Exclusively add categories to store. Unsafe because it does not:
+    // - Update kind's category list
+    // - Check for duplicates
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    addCategories_unsafe(
+      state,
+      action: PayloadAction<{
+        categories: Array<Category>;
+      }>,
+    ) {
+      const { categories } = action.payload;
+      categoriesAdapter.addMany(state.categories, categories);
     },
     addCategories(
       state,
       action: PayloadAction<{
         categories: Array<Category>;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      const { categories, isPermanent } = action.payload;
+      const { categories } = action.payload;
       for (const category of categories) {
         if (state.categories.ids.includes(category.id)) continue;
 
@@ -283,14 +338,10 @@ export const dataSlice = createSlice({
                 categories: [category.id],
               },
             ],
-            isPermanent,
           },
         });
 
         categoriesAdapter.addOne(state.categories, category);
-        if (isPermanent) {
-          state.categories.entities[category.id].changes = {};
-        }
       }
     },
     createCategory(
@@ -299,10 +350,9 @@ export const dataSlice = createSlice({
         name: string;
         color: string;
         kind: string;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      const { name, color, isPermanent, kind } = action.payload;
+      const { name, color, kind } = action.payload;
 
       let kindsToUpdate = [];
 
@@ -319,28 +369,15 @@ export const dataSlice = createSlice({
         id = generateUUID();
         idIsUnique = !state.categories.ids.includes(id);
       }
-      if (isPermanent) {
-        state.categories.entities[id] = {
-          saved: {
-            id: id,
-            name: name,
-            color: color,
-            visible: true,
-            containing: [],
-            kind: kind,
-          } as Category,
-          changes: {},
-        };
-      } else {
-        categoriesAdapter.addOne(state.categories, {
-          id: id,
-          name: name,
-          color: color,
-          visible: true,
-          containing: [],
-          kind: kind,
-        } as Category);
-      }
+
+      categoriesAdapter.addOne(state.categories, {
+        id: id,
+        name: name,
+        color: color,
+        visible: true,
+        containing: [],
+        kind: kind,
+      } as Category);
 
       kindsToUpdate.forEach((kind) =>
         dataSlice.caseReducers.updateKindCategories(state, {
@@ -353,28 +390,29 @@ export const dataSlice = createSlice({
                 categories: [id],
               },
             ],
-            isPermanent,
           },
-        })
+        }),
       );
+    },
+    updateCategories_unsafe(
+      state,
+      action: PayloadAction<{
+        updates: Array<{ id: string; changes: Omit<Partial<Category>, "id"> }>;
+      }>,
+    ) {
+      const { updates } = action.payload;
+      categoriesAdapter.updateMany(state.categories, updates);
     },
     updateCategory(
       state,
       action: PayloadAction<{
         updates: CategoryUpdates;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      let { updates, isPermanent } = action.payload;
+      const { updates } = action.payload;
 
       const id = updates.id;
 
-      if (isPermanent) {
-        state.categories.entities[id].saved = {
-          ...state.categories.entities[id].saved,
-          ...updates.changes,
-        };
-      }
       categoriesAdapter.updateOne(state.categories, {
         id: id,
         changes: updates,
@@ -388,31 +426,24 @@ export const dataSlice = createSlice({
           updateType: "add" | "remove" | "replace";
           contents: string[];
         }>;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      const { changes, isPermanent } = action.payload;
+      const { changes } = action.payload;
       for (const { categoryId, contents, updateType } of changes) {
         if (!state.categories.entities[categoryId]) continue;
-        const previousContents = getDeferredProperty(
-          state.categories.entities[categoryId],
-          "containing"
-        );
+        const previousContents =
+          state.categories.entities[categoryId]!.containing;
 
         const newContents = updateContents(
           previousContents,
           contents,
-          updateType
+          updateType,
         );
-        if (isPermanent) {
-          state.categories.entities[categoryId].saved.containing = newContents;
-          state.categories.entities[categoryId].changes = {};
-        } else {
-          categoriesAdapter.updateOne(state.categories, {
-            id: categoryId,
-            changes: { containing: newContents },
-          });
-        }
+
+        categoriesAdapter.updateOne(state.categories, {
+          id: categoryId,
+          changes: { containing: newContents },
+        });
       }
     },
 
@@ -420,55 +451,108 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         categories: Array<Category>;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      const { categories, isPermanent } = action.payload;
+      const { categories } = action.payload;
 
       dataSlice.caseReducers.deleteCategories(state, {
         type: "deleteCategories",
-        payload: { categoryIds: "all", isPermanent },
+        payload: { categoryIds: "all" },
       });
       dataSlice.caseReducers.addCategories(state, {
         type: "addCategories",
         payload: {
           categories: categories,
-          isPermanent: isPermanent,
         },
       });
     },
-
+    // Exclusively removes categories store. Unsafe because it does not:
+    // - Update kind's category list
+    // - Recategorize associated things
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    deleteCategories_unsafe(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[] | "all";
+      }>,
+    ) {
+      let { categoryIds } = action.payload;
+      if (categoryIds === "all") {
+        categoryIds = state.categories.ids as string[];
+      }
+      const excludingUnknown = categoryIds.filter(
+        (id) => !isUnknownCategory(id),
+      );
+      categoriesAdapter.removeMany(state.categories, excludingUnknown);
+    },
     deleteCategories(
       state,
       action: PayloadAction<{
         categoryIds: string[] | "all";
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      let { categoryIds, isPermanent } = action.payload;
+      let { categoryIds } = action.payload;
       if (categoryIds === "all") {
         categoryIds = state.categories.ids as string[];
       }
+
+      const removedCategoriesByKind: Record<string, string[]> = {};
+      const newUnknownThings: Record<string, string[]> = {};
+
       for (const categoryId of categoryIds) {
         if (isUnknownCategory(categoryId)) continue;
-        if (isPermanent) {
-          delete state.categories.entities[categoryId];
-          mutatingFilter(state.categories.ids, (catId) => catId !== categoryId);
-        } else {
-          categoriesAdapter.removeOne(state.categories, categoryId);
-        }
+        const category = state.categories.entities[categoryId];
+        if (!category) continue;
+        const associatedKindId = category.kind;
+        const associatedKind = state.kinds.entities[associatedKindId];
+        const associatedUnknownCategoryId = associatedKind!.unknownCategoryId;
+
+        updateRecordArray(
+          removedCategoriesByKind,
+          associatedKindId,
+          categoryId,
+        );
+        updateRecordArray(
+          newUnknownThings,
+          associatedUnknownCategoryId,
+          category.containing,
+        );
       }
+      for (const [kindId, categories] of Object.entries(
+        removedCategoriesByKind,
+      )) {
+        const existingCategories = state.kinds.entities[kindId]!.categories;
+        kindsAdapter.updateOne(state.kinds, {
+          id: kindId,
+          changes: {
+            categories: difference(existingCategories, categories),
+          },
+        });
+      }
+      for (const [unknownCategoryId, things] of Object.entries(
+        newUnknownThings,
+      )) {
+        const existingThings =
+          state.categories.entities[unknownCategoryId]!.containing;
+        categoriesAdapter.updateOne(state.categories, {
+          id: unknownCategoryId,
+          changes: {
+            containing: [...existingThings, ...things],
+          },
+        });
+      }
+      categoriesAdapter.removeMany(state.categories, categoryIds);
     },
     removeCategoriesFromKind(
       state,
       action: PayloadAction<{
         categoryIds: string[] | "all";
         kind: string;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
       //HACK: Should check for empty category. if category empty, delete completely
-      let { categoryIds, kind, isPermanent } = action.payload;
+      let categoryIds = action.payload.categoryIds;
+      const kind = action.payload.kind;
       if (categoryIds === "all") {
         categoryIds = state.categories.ids as string[];
       }
@@ -482,17 +566,12 @@ export const dataSlice = createSlice({
             changes: [
               { kindId: kind, updateType: "remove", categories: [categoryId] },
             ],
-            isPermanent,
           },
         });
-        const thingsOfKind = getDeferredProperty(
-          state.kinds.entities[kind],
-          "containing"
-        );
-        const thingsOfCategory = getDeferredProperty(
-          state.categories.entities[categoryId],
-          "containing"
-        );
+        const thingsOfKind = state.kinds.entities[kind]!.containing;
+
+        const thingsOfCategory =
+          state.categories.entities[categoryId]!.containing;
         const thingsToRemove = intersection(thingsOfKind, thingsOfCategory);
 
         dataSlice.caseReducers.updateCategoryContents(state, {
@@ -505,50 +584,60 @@ export const dataSlice = createSlice({
                 contents: thingsToRemove,
               },
               {
-                categoryId: state.kinds.entities[kind].saved.unknownCategoryId,
+                categoryId: state.kinds.entities[kind]!.unknownCategoryId,
                 updateType: "add",
                 contents: thingsToRemove,
               },
             ],
-            isPermanent,
           },
         });
 
         const thingUpdates = thingsToRemove.map((thing) => ({
           id: thing,
-          categoryId: state.kinds.entities[kind].saved.unknownCategoryId,
+          categoryId: state.kinds.entities[kind]!.unknownCategoryId,
         }));
 
         dataSlice.caseReducers.updateThings(state, {
           type: "updateThings",
-          payload: { updates: thingUpdates, isPermanent },
+          payload: { updates: thingUpdates },
         });
       }
     },
-
+    // Exclusively add thing to store. Unsafe because it does not:
+    // - Update kind's containing list
+    // - Update category's containing list
+    // - Update image's containing list
+    // - Check for duplicates
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    addThings_unsafe(
+      state,
+      action: PayloadAction<{
+        things: Array<ImageObject | AnnotationObject>;
+      }>,
+    ) {
+      const { things } = action.payload;
+      for (const readOnlyThing of things) {
+        const thing = { ...readOnlyThing };
+        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
+        thingsAdapter.addOne(state.things, thing);
+      }
+    },
     addThings(
       state,
       action: PayloadAction<{
         things: Array<ImageObject | AnnotationObject>;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      const { things, isPermanent } = action.payload;
-      for (const thing of things) {
-        const splitName = thing.name!.split(".");
-        const ext = splitName.at(-1);
-        const name = splitName.slice(0, splitName.length - 1).join(".");
-        const existingImageIds =
-          state.kinds.entities[thing.kind]?.saved.containing ?? [];
+      const { things } = action.payload;
+      for (const readOnlyThing of things) {
+        const thing = { ...readOnlyThing };
+        const [name, ext] = thing.name!.split(".");
 
-        const existingPrefixes = Object.values(existingImageIds).map(
-          (id) =>
-            (
-              getDeferredProperty(
-                state.things.entities[id] as DeferredEntity<ImageObject>,
-                "name"
-              ) as string
-            ).split(".")[0]
+        const existingImageIds =
+          state.kinds.entities[thing.kind]?.containing ?? [];
+
+        const existingPrefixes = existingImageIds.map(
+          (id) => (state.things.entities[id]!.name as string).split(".")[0],
         );
 
         let updatedNamePrefix = newReplaceDuplicateName(name, existingPrefixes);
@@ -557,7 +646,7 @@ export const dataSlice = createSlice({
           updatedNamePrefix += `.${ext}`;
         }
 
-        thing.name = updatedNamePrefix;
+        Object.assign(thing, { name: updatedNamePrefix });
         if (state.kinds.entities[thing.kind]) {
           dataSlice.caseReducers.updateKindContents(state, {
             type: "updateKindContents",
@@ -565,7 +654,6 @@ export const dataSlice = createSlice({
               changes: [
                 { kindId: thing.kind, contents: [thing.id], updateType: "add" },
               ],
-              isPermanent,
             },
           });
         } else {
@@ -588,12 +676,12 @@ export const dataSlice = createSlice({
               kinds: [
                 {
                   id: thing.kind,
+                  displayName: thing.kind,
                   containing: [thing.id],
                   categories: [unknownCategoryId],
                   unknownCategoryId,
                 },
               ],
-              isPermanent,
             },
           });
         }
@@ -608,7 +696,6 @@ export const dataSlice = createSlice({
                   updateType: "add",
                 },
               ],
-              isPermanent,
             },
           });
         }
@@ -623,31 +710,45 @@ export const dataSlice = createSlice({
                 updateType: "add",
               },
             ],
-            isPermanent,
           },
         });
-
+        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
         thingsAdapter.addOne(state.things, thing);
-        if (isPermanent) {
-          state.things.entities[thing.id].changes = {};
-        }
       }
+    },
+    // Exclusively add annotations to store. Unsafe because it does not:
+    // - Update kind's containing list
+    // - Update category's containing list
+    // - Update image's containing list
+    // - Check for duplicates
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    addAnnotations_unsafe(
+      state,
+      action: PayloadAction<{
+        annotations: Array<AnnotationObject>;
+      }>,
+    ) {
+      const { annotations } = action.payload;
+
+      dataSlice.caseReducers.addThings_unsafe(state, {
+        type: "addThings_unsafe",
+        payload: { things: annotations },
+      });
     },
     addAnnotations(
       state,
       action: PayloadAction<{
         annotations: Array<AnnotationObject | DecodedAnnotationObject>;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      const { annotations, isPermanent } = action.payload;
+      const { annotations } = action.payload;
       const encodedAnnotations: AnnotationObject[] = [];
       for (const annotation of annotations) {
         if (state.things.ids.includes(annotation.id)) continue;
 
         if (annotation.decodedMask) {
           (annotation as AnnotationObject).encodedMask = encode(
-            annotation.decodedMask
+            annotation.decodedMask,
           );
           delete annotation.decodedMask;
         }
@@ -655,33 +756,30 @@ export const dataSlice = createSlice({
       }
       dataSlice.caseReducers.addThings(state, {
         type: "addThings",
-        payload: { things: encodedAnnotations, isPermanent },
+        payload: { things: encodedAnnotations },
       });
     },
     // Sets the category for the inference images back to Unknown
     clearPredictions(
       state,
-      action: PayloadAction<{ kind: string; isPermanent?: boolean }>
+      action: PayloadAction<{ kind: string; isPermanent?: boolean }>,
     ) {
-      const { isPermanent, kind } = action.payload;
+      const { kind } = action.payload;
       if (!(kind in state.kinds.entities)) return;
 
       const updates: Array<
         { id: string } & (Partial<ImageObject> | Partial<AnnotationObject>)
       > = [];
 
-      const thingIds = getDeferredProperty(
-        state.kinds.entities[kind],
-        "containing"
-      );
+      const thingIds = state.kinds.entities[kind]!.containing;
 
       thingIds.forEach((id) => {
-        const thing = getCompleteEntity(state.things.entities[id]);
+        const thing = state.things.entities[id];
         if (!thing) return;
         if (thing.partition === Partition.Inference) {
           updates.push({
             id: id as string,
-            categoryId: state.kinds.entities[kind].saved.unknownCategoryId,
+            categoryId: state.kinds.entities[kind]!.unknownCategoryId,
           });
         }
       });
@@ -690,25 +788,21 @@ export const dataSlice = createSlice({
         type: "updateThings",
         payload: {
           updates: updates,
-          isPermanent: isPermanent,
         },
       });
     },
     acceptPredictions(
       state,
-      action: PayloadAction<{ kind: string; isPermanent?: boolean }>
+      action: PayloadAction<{ kind: string; isPermanent?: boolean }>,
     ) {
-      const { isPermanent, kind } = action.payload;
-      if (!(kind in state.kinds.entities)) return;
-      const thingIds = getDeferredProperty(
-        state.kinds.entities[kind],
-        "containing"
-      );
+      const { kind } = action.payload;
+      if (!state.kinds.entities[kind]) return;
+      const thingIds = state.kinds.entities[kind]!.containing;
       const updates: Array<
         { id: string } & (Partial<ImageObject> | Partial<AnnotationObject>)
       > = [];
       thingIds.forEach((id) => {
-        const thing = getCompleteEntity(state.things.entities[id]);
+        const thing = state.things.entities[id];
         if (!thing) return;
         const imagePartition = thing.partition;
         const categoryId = thing.categoryId;
@@ -726,19 +820,41 @@ export const dataSlice = createSlice({
         type: "updateThings",
         payload: {
           updates: updates,
-          isPermanent: isPermanent,
         },
       });
     },
+    // Exclusively updates things in store. Unsafe because it does not:
+    // - Update category's containing list
+    // - Update image's containing list
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    updateThings_unsafe(
+      state,
+      action: PayloadAction<{
+        updates: Array<{
+          id: string;
+          changes: Omit<Partial<ImageObject | AnnotationObject>, "id">;
+        }>;
+      }>,
+    ) {
+      const { updates } = action.payload;
 
+      for (const update of updates) {
+        const { id, ...changes } = update;
+        if ("data" in changes) {
+          dispose(state.things.entities[id]!.data as TensorContainer);
+        }
+      }
+
+      // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
+      thingsAdapter.updateMany(state.things, updates);
+    },
     updateThings(
       state,
       action: PayloadAction<{
         updates: ThingsUpdates;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      const { updates, isPermanent } = action.payload;
+      const { updates } = action.payload;
 
       for (const update of updates) {
         const { id, ...changes } = update;
@@ -746,10 +862,8 @@ export const dataSlice = createSlice({
         if (!state.things.ids.includes(id)) continue;
 
         if ("categoryId" in changes) {
-          const oldCategory = getDeferredProperty(
-            state.things.entities[id],
-            "categoryId"
-          );
+          const oldCategory = state.things.entities[id]!.categoryId;
+
           dataSlice.caseReducers.updateCategoryContents(state, {
             type: "updateCategoryContents",
             payload: {
@@ -760,7 +874,6 @@ export const dataSlice = createSlice({
                   contents: [id],
                 },
               ],
-              isPermanent,
             },
           });
           dataSlice.caseReducers.updateCategoryContents(state, {
@@ -773,32 +886,26 @@ export const dataSlice = createSlice({
                   contents: [id],
                 },
               ],
-              isPermanent,
             },
           });
         }
 
-        if (isPermanent) {
-          Object.assign(state.things.entities[id].saved, changes);
-        } else {
-          thingsAdapter.updateOne(state.things, { id, changes });
-        }
+        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
+        thingsAdapter.updateOne(state.things, { id, changes });
       }
     },
     updateThingName(
       state,
-      action: PayloadAction<{ id: string; name: string; isPermanent: boolean }>
+      action: PayloadAction<{ id: string; name: string }>,
     ) {
-      const { id, name, isPermanent } = action.payload;
+      const { id, name } = action.payload;
       const changes: Array<{ id: string; name: string }> = [{ id, name }];
-      const thing = getCompleteEntity(state.things.entities[id]);
+      const thing = state.things.entities[id];
       if (thing) {
         if ("containing" in thing) {
           const containedThingIds = thing.containing;
           containedThingIds.forEach((containedId) => {
-            const containedThing = getCompleteEntity(
-              state.things.entities[containedId]
-            );
+            const containedThing = state.things.entities[containedId];
             if (containedThing) {
               const containedThingName = containedThing.name;
               if (containedThing.name.includes(thing.name)) {
@@ -813,8 +920,23 @@ export const dataSlice = createSlice({
       }
       dataSlice.caseReducers.updateThings(state, {
         type: "updateThings",
-        payload: { updates: changes, isPermanent },
+        payload: { updates: changes },
       });
+    },
+    // Exclusively updates image contents store. Unsafe because it does not:
+    // - Confirm existence (or lack thereof) of annotations
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    updateImageContents_unsafe(
+      state,
+      action: PayloadAction<{
+        updates: Array<{
+          id: string;
+          changes: Omit<Partial<ImageObject>, "id">;
+        }>;
+      }>,
+    ) {
+      const { updates } = action.payload;
+      thingsAdapter.updateMany(state.things, updates);
     },
     updateThingContents(
       state,
@@ -824,35 +946,68 @@ export const dataSlice = createSlice({
           updateType: "add" | "remove" | "replace";
           contents: string[];
         }>;
-        isPermanent?: boolean;
-      }>
+      }>,
     ) {
-      const { changes, isPermanent } = action.payload;
+      const { changes } = action.payload;
       for (const { thingId, contents, updateType } of changes) {
-        const thing = state.things.entities[
-          thingId
-        ] as DeferredEntity<ImageObject>;
-        if (!("containing" in state.things.entities[thingId].saved)) continue;
-        const previousContents = getDeferredProperty(thing, "containing");
+        const thing = state.things.entities[thingId] as ImageObject;
+        if (!("containing" in thing)) continue;
+        const previousContents = thing.containing;
 
         if (!state.things.entities[thingId]) continue;
 
         const newContents = updateContents(
           previousContents,
           contents,
-          updateType
+          updateType,
         );
-        if (isPermanent) {
-          thing.saved.containing = newContents;
-          //TODO: Change so entire changes object isnt removed
-          thing.changes = {};
-        } else {
-          thingsAdapter.updateOne(state.things, {
-            id: thingId,
-            changes: { containing: newContents },
-          });
+
+        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
+        thingsAdapter.updateOne(state.things, {
+          id: thingId,
+          changes: { containing: newContents },
+        });
+      }
+      thingsAdapter.removeMany(state.things, explicitThingIds);
+    },
+    // Exclusively removes things from store. Unsafe because it does not:
+    // - Update kind's containing list
+    // - Update category's containing list
+    // - Update image's containing list
+    // - Check for duplicates
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    deleteThings_unsafe(
+      state,
+      action: PayloadAction<
+        | {
+            thingIds: Array<string> | "all" | "annotations";
+            activeKind?: string;
+            disposeColorTensors: boolean;
+          }
+        | {
+            ofKinds: Array<string>;
+            activeKind?: string;
+            disposeColorTensors: boolean;
+          }
+        | {
+            ofCategories: Array<string>;
+            activeKind: string;
+            disposeColorTensors: boolean;
+          }
+      >,
+    ) {
+      const explicitThingIds = gatherThings(state, action.payload);
+
+      for (const thingId of explicitThingIds) {
+        const thing = state.things.entities[thingId];
+        if (!thing) continue;
+        dispose(thing.data as TensorContainer);
+
+        if (action.payload.disposeColorTensors && "colors" in thing) {
+          dispose(thing.colors.color as TensorContainer);
         }
       }
+      thingsAdapter.removeMany(state.things, explicitThingIds);
     },
     deleteThings(
       state,
@@ -861,28 +1016,25 @@ export const dataSlice = createSlice({
             thingIds: Array<string> | "all" | "annotations";
             activeKind?: string;
             disposeColorTensors: boolean;
-            isPermanent?: boolean;
             preparedByListener?: boolean;
           }
         | {
             ofKinds: Array<string>;
             activeKind?: string;
             disposeColorTensors: boolean;
-            isPermanent?: boolean;
             preparedByListener?: boolean;
           }
         | {
             ofCategories: Array<string>;
             activeKind: string;
             disposeColorTensors: boolean;
-            isPermanent?: boolean;
             preparedByListener?: boolean;
           }
-      >
+      >,
     ) {
       if (!action.payload.preparedByListener) return;
       if (!("thingIds" in action.payload)) return;
-      const { thingIds, isPermanent } = action.payload;
+      const { thingIds } = action.payload;
       const imageChanges: Record<
         string,
         {
@@ -897,8 +1049,7 @@ export const dataSlice = createSlice({
         contents: string[];
       }> = [];
       for (const thingId of [...thingIds]) {
-        const thingEntity = state.things.entities[thingId];
-        const thing = getCompleteEntity(state.things.entities[thingId]);
+        const thing = state.things.entities[thingId];
 
         if (!thing) continue;
 
@@ -910,58 +1061,34 @@ export const dataSlice = createSlice({
               const containedThing = state.things.entities[containedThingId];
               if (!containedThing) continue;
 
-              const thingKind = getDeferredProperty(containedThing, "kind");
-              const thingCategoryId = getDeferredProperty(
-                containedThing,
-                "categoryId"
-              );
+              const thingKind = containedThing.kind;
+              const thingCategoryId = containedThing.categoryId;
               const kind = state.kinds.entities[thingKind];
               const category = state.categories.entities[thingCategoryId];
-              if (isPermanent) {
-                dispose(containedThing.saved.data as TensorContainer);
-                dispose(containedThing.changes as TensorContainer);
 
-                /* UPDATE KIND'S CONTAINING LIST */
-                mutatingFilter(
-                  kind.saved.containing,
-                  (containedId) => containedId !== containedThingId
-                );
-                if (kind.changes.containing) {
-                  mutatingFilter(
-                    kind.changes.containing,
-                    (containedId) => containedId !== containedThingId
-                  );
-                }
-                /* UPDATE CATEGORY'S CONTAINING LIST */
-                mutatingFilter(
-                  category.saved.containing,
-                  (thingId) => thingId !== containedThingId
-                );
-                if (category.changes.containing) {
-                  mutatingFilter(
-                    category.changes.containing,
-                    (thingId) => thingId !== containedThingId
-                  );
-                }
+              dispose(containedThing.data as TensorContainer);
 
-                /* REMOVE THING */
-                delete state.things.entities[containedThingId];
-                mutatingFilter(
-                  state.things.ids,
-                  (thingId) => thingId !== containedThingId
-                );
-              } else {
-                kind.changes.containing = getDeferredProperty(
-                  kind,
-                  "containing"
-                ).filter((thingId) => thingId !== containedThingId);
-                category.changes.containing = getDeferredProperty(
-                  category,
-                  "containing"
-                ).filter((thingId) => thingId !== containedThingId);
+              /* UPDATE KIND'S CONTAINING LIST */
+              mutatingFilter(
+                kind!.containing,
+                (containedId) => containedId !== containedThingId,
+              );
 
-                thingsAdapter.removeOne(state.things, containedThingId);
-              }
+              /* UPDATE CATEGORY'S CONTAINING LIST */
+              mutatingFilter(
+                category!.containing,
+                (thingId) => thingId !== containedThingId,
+              );
+
+              /* REMOVE THING */
+              delete state.things.entities[containedThingId];
+              mutatingFilter(
+                state.things.ids,
+                (thingId) => thingId !== containedThingId,
+              );
+
+              // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
+              thingsAdapter.removeOne(state.things, containedThingId);
             }
           }
         } else {
@@ -982,186 +1109,34 @@ export const dataSlice = createSlice({
 
         const kind = state.kinds.entities[thingKind];
         const category = state.categories.entities[thingCategoryId];
-        if (isPermanent) {
-          dispose(thingEntity.saved.data as TensorContainer);
-          dispose(thingEntity.changes as TensorContainer);
 
-          /* UPDATE KIND'S CONTAINING LIST */
+        dispose(thing.data as TensorContainer);
 
-          mutatingFilter(
-            kind.saved.containing,
-            (containedId) => containedId !== thingId
-          );
-          if (kind.changes.containing) {
-            mutatingFilter(
-              kind.changes.containing,
-              (containedId) => containedId !== thingId
-            );
-          }
+        /* UPDATE KIND'S CONTAINING LIST */
 
-          /* UPDATE CATEGORY'S CONTAINING LIST */
-          mutatingFilter(
-            category.saved.containing,
-            (_thingId) => _thingId !== thingId
-          );
-          if (category.changes.containing) {
-            mutatingFilter(
-              category.changes.containing,
-              (_thingId) => _thingId !== thingId
-            );
-          }
+        mutatingFilter(
+          kind!.containing,
+          (containedId) => containedId !== thingId,
+        );
 
-          /* REMOVE THING */
-          delete state.things.entities[thingId];
-          mutatingFilter(state.things.ids, (_thingId) => _thingId !== thingId);
-        } else {
-          kind.changes.containing = getDeferredProperty(
-            kind,
-            "containing"
-          ).filter((_thingId) => _thingId !== thingId);
-          category.changes.containing = getDeferredProperty(
-            category,
-            "containing"
-          ).filter((_thingId) => _thingId !== thingId);
+        /* UPDATE CATEGORY'S CONTAINING LIST */
+        mutatingFilter(
+          category!.containing,
+          (_thingId) => _thingId !== thingId,
+        );
 
-          thingsAdapter.removeOne(state.things, thingId);
-        }
+        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
+        thingsAdapter.removeOne(state.things, thingId);
       }
-      for (let [imageId, changes] of Object.entries(imageChanges)) {
+      for (const [imageId, changes] of Object.entries(imageChanges)) {
         if (!thingIds.includes(imageId)) {
           imageChangesArray.push(changes);
         }
       }
       dataSlice.caseReducers.updateThingContents(state, {
         type: "updateThingContents",
-        payload: { changes: imageChangesArray, isPermanent },
+        payload: { changes: imageChangesArray },
       });
-    },
-
-    reconcile(
-      state,
-      action: PayloadAction<{
-        keepChanges: boolean;
-      }>
-    ) {
-      if (action.payload.keepChanges) {
-        dataSlice.caseReducers.keepChanges(state);
-      } else {
-        dataSlice.caseReducers.revertChanges(state);
-      }
-    },
-
-    revertChanges(state) {
-      const kindsToRemove = [];
-      const categoriesToRemove = [];
-      const thingsToRemove = [];
-      for (const id of state.kinds.ids) {
-        const kind = state.kinds.entities[id];
-        if (!kind.changes) continue;
-        if ("added" in kind.changes) {
-          kindsToRemove.push(id);
-          delete state.kinds.entities[id];
-        } else {
-          kind.changes = {};
-        }
-      }
-      state.kinds.ids = updateContents(
-        [...state.kinds.ids] as string[],
-        kindsToRemove as string[],
-        "remove"
-      );
-      for (const id of state.categories.ids) {
-        const category = state.categories.entities[id];
-        if (!category.changes) continue;
-        if ("added" in category.changes) {
-          categoriesToRemove.push(id);
-          delete state.categories.entities[id];
-        } else {
-          category.changes = {};
-        }
-      }
-      state.categories.ids = updateContents(
-        [...state.categories.ids] as string[],
-        categoriesToRemove as string[],
-        "remove"
-      );
-      for (const id of state.things.ids) {
-        const thing = state.things.entities[id];
-        if (!thing.changes) continue;
-        if ("added" in thing.changes) {
-          dispose(thing.saved.data as TensorContainer);
-          dispose(thing.changes.data as TensorContainer);
-          thingsToRemove.push(id);
-          delete state.things.entities[id];
-        } else {
-          dispose(thing.changes.data as TensorContainer);
-          thing.changes = {};
-        }
-      }
-      state.things.ids = updateContents(
-        [...state.things.ids] as string[],
-        thingsToRemove as string[],
-        "remove"
-      );
-    },
-    keepChanges(state) {
-      const kindsToRemove = [];
-      const categoriesToRemove = [];
-      const thingsToRemove = [];
-      for (const id of state.kinds.ids) {
-        const kind = state.kinds.entities[id];
-
-        if (!kind.changes) continue;
-        if ("deleted" in kind.changes) {
-          kindsToRemove.push(id);
-          continue;
-        } else {
-          let { added, deleted, ...preparedDeferred } = kind.changes;
-          Object.assign(kind.saved, preparedDeferred);
-          kind.changes = {};
-        }
-      }
-      state.kinds.ids = updateContents(
-        [...state.kinds.ids] as string[],
-        kindsToRemove as string[],
-        "remove"
-      );
-      for (const id of state.categories.ids) {
-        const category = state.categories.entities[id];
-        if (!category.changes) continue;
-        if ("deleted" in category.changes) {
-          categoriesToRemove.push(id);
-          delete state.categories.entities[id];
-        } else {
-          let { added, deleted, ...preparedDeferred } = category.changes;
-          Object.assign(category.saved, preparedDeferred);
-          category.changes = {};
-        }
-      }
-      state.categories.ids = updateContents(
-        [...state.categories.ids] as string[],
-        categoriesToRemove as string[],
-        "remove"
-      );
-      for (const id of state.things.ids) {
-        const thing = state.things.entities[id];
-        if (!thing.changes) continue;
-        if ("deleted" in thing.changes) {
-          dispose(thing.saved.data as TensorContainer);
-          dispose(thing.changes.data as TensorContainer);
-          thingsToRemove.push(id);
-          delete state.things.entities[id];
-        } else {
-          let { added, deleted, ...preparedDeferred } = thing.changes;
-          Object.assign(thing.saved, preparedDeferred);
-          thing.changes = {};
-        }
-      }
-      state.things.ids = updateContents(
-        [...state.things.ids] as string[],
-        thingsToRemove as string[],
-        "remove"
-      );
     },
   },
 });

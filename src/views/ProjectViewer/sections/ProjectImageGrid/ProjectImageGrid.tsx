@@ -44,11 +44,10 @@ export const ProjectImageGrid = () => {
       dispatch(
         dataSlice.actions.deleteKind({
           deletedKindId: item,
-          isPermanent: true,
-        })
+        }),
       );
     },
-    [dispatch]
+    [dispatch],
   );
 
   const handleTabMinimize = useCallback(
@@ -59,22 +58,33 @@ export const ProjectImageGrid = () => {
 
       dispatch(projectSlice.actions.addKindTabFilter({ kindId: item }));
     },
-    [dispatch]
+    [dispatch],
   );
 
   const handleTabChange = (tab: string) => {
     dispatch(projectSlice.actions.setActiveKind({ kind: tab }));
     dispatch(
       projectSlice.actions.updateHighlightedCategory({
-        categoryId: kinds[tab].unknownCategoryId,
-      })
+        categoryId: kinds[tab]!.unknownCategoryId,
+      }),
     );
   };
+
+  const handleKindEdit = (kindId: string, newDisplayName: string) => {
+    dispatch(
+      dataSlice.actions.updateKindName({ kindId, displayName: newDisplayName }),
+    );
+  };
+
+  const renderTabLabel = useCallback(
+    (label: string) => kinds[label].displayName,
+    [kinds],
+  );
 
   useEffect(() => {
     if (isMobile) {
       const minimizeOnResize = visibleKinds.filter(
-        (kind) => kind !== activeKind
+        (kind) => kind !== activeKind,
       );
       minimizeOnResize.forEach((kind) => handleTabMinimize(kind));
     }
@@ -109,6 +119,9 @@ export const ProjectImageGrid = () => {
         handleNew={handleOpenAddKindMenu}
         handleTabMin={handleTabMinimize}
         persistentTabs={["Image"]}
+        editable
+        handleTabEdit={handleKindEdit}
+        renderLabel={renderTabLabel}
       >
         {visibleKinds.map((kind) => (
           <ImageGrid key={`${kind}-imageGrid`} kind={kind} />

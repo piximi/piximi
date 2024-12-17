@@ -27,7 +27,7 @@ export const useClassificationModel = () => {
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Predicting,
-      })
+      }),
     );
   };
 
@@ -37,7 +37,7 @@ export const useClassificationModel = () => {
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Evaluating,
-      })
+      }),
     );
   };
   const handleImportModel = async (model: Model, inputShape: Shape) => {
@@ -46,13 +46,13 @@ export const useClassificationModel = () => {
         classifierSlice.actions.loadUserSelectedModel({
           inputShape: inputShape,
           model,
-        })
+        }),
       );
-    } else if (process.env.NODE_ENV !== "production") {
+    } else if (import.meta.env.NODE_ENV !== "production") {
       console.warn(
         `Attempting to dispatch a model with task ${
           ModelTask[model.task]
-        }, should be ${ModelTask[ModelTask.Classification]}`
+        }, should be ${ModelTask[ModelTask.Classification]}`,
       );
     }
   };

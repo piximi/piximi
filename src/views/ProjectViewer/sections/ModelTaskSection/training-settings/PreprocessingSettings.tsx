@@ -30,11 +30,11 @@ export const PreprocessingSettings = ({
   updateRescaleOptions,
 }: PreprocessingSettingsProps) => {
   const [disabled, setDisabled] = React.useState<boolean>(
-    !rescaleOptions.rescale
+    !rescaleOptions.rescale,
   );
 
   const [cropDisabled, setCropDisabled] = React.useState<boolean>(
-    cropOptions.cropSchema === CropSchema.None
+    cropOptions.cropSchema === CropSchema.None,
   );
 
   const dispatchNumCrops = (numCrops: number) => {

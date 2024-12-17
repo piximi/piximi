@@ -11,7 +11,7 @@ export const ModelTaskSection = () => {
 
   const handleToggleLearningTask = (
     event: React.MouseEvent<HTMLElement>,
-    newLearningTask: "Classification" | "Segmentation" | null
+    newLearningTask: "Classification" | "Segmentation" | null,
   ) => {
     if (newLearningTask !== null) {
       setLearningTask(newLearningTask);

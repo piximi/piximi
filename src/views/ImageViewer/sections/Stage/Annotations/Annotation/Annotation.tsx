@@ -1,18 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
-import * as ReactKonva from "react-konva";
+import { Image as KonvaImage } from "react-konva";
 import Image from "image-js";
 
-import { dataSlice } from "store/data";
-import { selectImageOrigin } from "store/imageViewer/selectors";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
-import { hexToRGBA, colorOverlayROI, encode } from "utils/annotator";
+import { hexToRGBA, colorOverlayROI, encode } from "views/ImageViewer/utils";
 
-import { DecodedAnnotationObject, Shape } from "store/data/types";
+import { ProtoAnnotationObject } from "views/ImageViewer/utils/types";
+import { Shape } from "store/data/types";
 
 type AnnotationProps = {
-  annotation: DecodedAnnotationObject;
+  annotation: ProtoAnnotationObject;
   imageShape: Shape;
   fillColor: string;
   selected?: boolean;
@@ -46,8 +47,8 @@ export const Annotation = ({
         imageWidth,
         imageHeight,
         color,
-        1
-      )
+        1,
+      ),
     );
   }, [
     annotation.decodedMask,
@@ -109,16 +110,16 @@ export const Annotation = ({
     };
 
     dispatch(
-      dataSlice.actions.updateThings({
+      annotatorSlice.actions.editThings({
         updates: [tempUpdated],
-      })
+      }),
     );
   };
 
   return isFiltered ? (
     <></>
   ) : (
-    <ReactKonva.Image
+    <KonvaImage
       ref={annotatorRef}
       id={annotation.id}
       image={imageMask}

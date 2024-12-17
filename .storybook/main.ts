@@ -1,17 +1,15 @@
-import type { StorybookConfig } from "@storybook/react-webpack5";
-import path from "path";
+import type { StorybookConfig } from "@storybook/react-vite";
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
-    "@storybook/preset-create-react-app",
     "@storybook/addon-interactions",
-    "@storybook/addon-styling",
+    "@storybook/addon-themes",
   ],
   framework: {
-    name: "@storybook/react-webpack5",
+    name: "@storybook/react-vite",
     options: {},
   },
   docs: {
@@ -20,7 +18,6 @@ const config: StorybookConfig = {
   staticDirs: ["../public"],
   typescript: {
     check: false,
-    checkOptions: {},
     reactDocgen: "react-docgen-typescript",
     reactDocgenTypescriptOptions: {
       shouldExtractLiteralValuesFromEnum: true, // makes union prop types like variant and size appear as select controls
@@ -31,11 +28,7 @@ const config: StorybookConfig = {
           : true,
     },
   },
-  webpackFinal: async (config, { configType }) => {
-    config.resolve!.modules = [
-      path.resolve(__dirname, "..", "src"),
-      "node_modules",
-    ];
+  async viteFinal(config) {
     return config;
   },
 };

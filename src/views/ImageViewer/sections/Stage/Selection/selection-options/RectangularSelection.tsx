@@ -1,16 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import * as ReactKonva from "react-konva";
+import { Group as KonvaGroup, Rect as KonvaRect } from "react-konva";
 
 import { useMarchingAnts } from "../../../../hooks";
 
-import { StageContext } from "contexts";
-import { selectImageOrigin } from "store/imageViewer/selectors";
+import { StageContext } from "views/ImageViewer/state/StageContext";
 
 import {
   RectangularAnnotationTool,
   SelectionTool,
-} from "utils/annotator/tools";
+} from "views/ImageViewer/utils/tools";
+import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
 type RectangularSelectionProps = {
   operator: RectangularAnnotationTool | SelectionTool;
@@ -43,8 +43,8 @@ export const RectangularSelection = ({
     !operator.height ||
     x === 0 ? null : (
     <>
-      <ReactKonva.Group>
-        <ReactKonva.Rect
+      <KonvaGroup>
+        <KonvaRect
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
           height={operator.height}
@@ -54,7 +54,7 @@ export const RectangularSelection = ({
           x={x}
           y={y}
         />
-        <ReactKonva.Rect
+        <KonvaRect
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
           height={operator.height}
@@ -64,7 +64,7 @@ export const RectangularSelection = ({
           x={x}
           y={y}
         />
-      </ReactKonva.Group>
+      </KonvaGroup>
     </>
   );
 };

@@ -1,3 +1,4 @@
+import { expect, it } from "vitest";
 import "@tensorflow/tfjs-node";
 import { SequentialClassifier } from "../classification/AbstractClassifier/AbstractClassifier";
 
@@ -13,8 +14,6 @@ import { loadImageFileAsStack } from "utils/file-io/helpers";
 import { convertToImage } from "utils/common/tensorHelpers";
 import { MIMEType } from "utils/file-io/types";
 import { Category, ImageObject, Shape } from "store/data/types";
-
-jest.setTimeout(50000);
 
 class GenericClassifier extends SequentialClassifier {
   constructor() {
@@ -114,7 +113,7 @@ it("preprocessClassifier", async () => {
       preIm.name,
       undefined,
       1,
-      imStack.length
+      imStack.length,
     );
     images.push(im);
   }

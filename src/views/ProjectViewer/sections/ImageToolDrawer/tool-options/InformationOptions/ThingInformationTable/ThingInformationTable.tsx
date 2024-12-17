@@ -1,5 +1,5 @@
 import { ReactElement, useCallback, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   BlurActionTextField,
@@ -14,6 +14,7 @@ import { Partition } from "utils/models/enums";
 import { Thing } from "store/data/types";
 import { DataTable } from "./DataTable";
 import { DataTableRow } from "./DataTableRow";
+import { selectRenderKindName } from "store/data/selectors";
 
 export const ThingInformationTable = ({
   thing,
@@ -26,6 +27,7 @@ export const ThingInformationTable = ({
   const [tableData, setTableData] = useState<
     Array<Array<string | number | ReactElement>>
   >([]);
+  const renderedKindName = useSelector(selectRenderKindName);
 
   const handleImageNameChange = useCallback(
     (name: string) => {
@@ -33,11 +35,10 @@ export const ThingInformationTable = ({
         dataSlice.actions.updateThingName({
           id: thing.id,
           name,
-          isPermanent: true,
-        })
+        }),
       );
     },
-    [dispatch, thing]
+    [dispatch, thing],
   );
 
   const handleCategorySelect = useCallback(
@@ -51,11 +52,10 @@ export const ThingInformationTable = ({
               partition: Partition.Unassigned,
             },
           ],
-          isPermanent: true,
-        })
+        }),
       );
     },
-    [dispatch, thing]
+    [dispatch, thing],
   );
 
   const handlePartitionSelect = useCallback(
@@ -63,18 +63,17 @@ export const ThingInformationTable = ({
       dispatch(
         dataSlice.actions.updateThings({
           updates: [{ id: thing.id, partition }],
-          isPermanent: true,
-        })
+        }),
       );
     },
-    [dispatch, thing]
+    [dispatch, thing],
   );
 
   useEffect(() => {
     const data: Array<Array<string | number>> = [];
     const editableData: Array<Array<string | ReactElement>> = [[], [], []];
     Object.entries(thing).forEach((entry) => {
-      let [key, value] = entry;
+      const [key, value] = entry;
 
       switch (key) {
         case "name":
@@ -88,6 +87,7 @@ export const ThingInformationTable = ({
               variant="standard"
               fontSize={"inherit"}
               textAlign="right"
+              key={key}
             />,
           ];
           break;
@@ -100,6 +100,7 @@ export const ThingInformationTable = ({
               size="small"
               variant="standard"
               fontSize="inherit"
+              key={key}
             />,
           ];
           break;
@@ -112,18 +113,23 @@ export const ThingInformationTable = ({
               size="small"
               variant="standard"
               fontSize="inherit"
+              key={key}
             />,
           ];
+          break;
+        case "kind":
+          data.push(["Kind", renderedKindName(thing.kind)]);
           break;
         case "shape":
           Object.entries(value).forEach((shapeEntry) => {
             data.push([shapeEntry[0] as string, shapeEntry[1] as string]);
           });
           break;
-        case "containing":
+        case "containing": {
           const values = value as unknown;
           data.push([key as string, (values as any[]).length]);
           break;
+        }
         case "colors":
         case "visible":
         case "src":

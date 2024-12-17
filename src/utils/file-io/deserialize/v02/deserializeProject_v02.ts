@@ -10,7 +10,6 @@ import {
 import { getAttr, getDataset, getGroup } from "../helpers";
 import { RawArray } from "zarr/types/rawArray";
 import { tensor4d } from "@tensorflow/tfjs";
-import { DeferredEntityState } from "store/entities";
 import { Partition } from "utils/models/enums";
 import {
   createRenderedTensor,
@@ -25,17 +24,18 @@ import {
   Category,
   ImageObject,
 } from "store/data/types";
+import { EntityState } from "@reduxjs/toolkit";
 
 const deserializeThingGroup = async (
   name: string,
-  thingGroup: Group
+  thingGroup: Group,
 ): Promise<ImageObject | AnnotationObject> => {
   const id = (await getAttr(thingGroup, "thing_id")) as string;
   const activePlane = (await getAttr(thingGroup, "active_plane")) as number;
   const categoryId = (await getAttr(thingGroup, "class_category_id")) as string;
   const partition = (await getAttr(
     thingGroup,
-    "classifier_partition"
+    "classifier_partition",
   )) as Partition;
   const kind = (await getAttr(thingGroup, "kind")) as string;
   // const classifierPartition = (await getAttr(
@@ -52,7 +52,7 @@ const deserializeThingGroup = async (
   const imageTensor = tensor4d(
     imageData,
     [planes, height, width, channels],
-    "float32"
+    "float32",
   );
 
   const thing = {
@@ -79,7 +79,7 @@ const deserializeThingGroup = async (
       imageTensor,
       colors,
       bitDepth,
-      activePlane
+      activePlane,
     );
     const contents = (await getAttr(thingGroup, "contents")) as string[];
 
@@ -89,7 +89,7 @@ const deserializeThingGroup = async (
       number,
       number,
       number,
-      number
+      number,
     ];
     const encodedMask = (await getAttr(thingGroup, "mask")) as number[];
 
@@ -99,7 +99,7 @@ const deserializeThingGroup = async (
       thing.data,
       colors,
       bitDepth,
-      activePlane
+      activePlane,
     );
 
     return {
@@ -115,24 +115,24 @@ const deserializeThingGroup = async (
 const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
   const thingNames = (await getAttr(thingsGroup, "thing_names")) as string[];
 
-  const things: DeferredEntityState<ImageObject | AnnotationObject> = {
+  const things: EntityState<ImageObject | AnnotationObject, string> = {
     ids: [],
     entities: {},
   };
 
   for (const [i, name] of Object.entries(thingNames)) {
-    // process.env.REACT_APP_LOG_LEVEL === "1" &&
+    // import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
     //   logger(`deserializing image ${+i + 1}/${thingNames.length}`);
 
     loadCb(
       +i / (thingNames.length - 1),
-      `deserializing image ${+i + 1}/${thingNames.length}`
+      `deserializing image ${+i + 1}/${thingNames.length}`,
     );
 
     const thingGroup = await getGroup(thingsGroup, name);
     const thing = await deserializeThingGroup(name, thingGroup);
     things.ids.push(thing.id);
-    things.entities[thing.id] = { saved: thing, changes: {} };
+    things.entities[thing.id] = thing;
   }
 
   // final image complete
@@ -141,8 +141,8 @@ const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
   return things;
 };
 const deserializeCategoriesGroup = async (
-  categoriesGroup: Group
-): Promise<DeferredEntityState<Category>> => {
+  categoriesGroup: Group,
+): Promise<EntityState<Category, string>> => {
   const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
   const colors = (await getAttr(categoriesGroup, "color")) as string[];
   const names = (await getAttr(categoriesGroup, "name")) as string[];
@@ -151,41 +151,38 @@ const deserializeCategoriesGroup = async (
 
   if (ids.length !== colors.length || ids.length !== names.length) {
     throw Error(
-      `Expected categories group "${categoriesGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`
+      `Expected categories group "${categoriesGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`,
     );
   }
 
-  const categories: DeferredEntityState<Category> = {
+  const categories: EntityState<Category, string> = {
     ids: [],
     entities: {},
   };
   for (let i = 0; i < ids.length; i++) {
     categories.ids.push(ids[i]);
     categories.entities[ids[i]] = {
-      saved: {
-        id: ids[i],
-        color: colors[i],
-        name: names[i],
-        kind: kinds[i],
-        containing: contents[i],
-        visible: true,
-      } as Category,
-      changes: {},
-    };
+      id: ids[i],
+      color: colors[i],
+      name: names[i],
+      kind: kinds[i],
+      containing: contents[i],
+      visible: true,
+    } as Category;
   }
 
   return categories;
 };
 
 const deserializeKindsGroup = async (
-  kindsGroup: Group
-): Promise<DeferredEntityState<Kind>> => {
+  kindsGroup: Group,
+): Promise<EntityState<Kind, string>> => {
   const ids = (await getAttr(kindsGroup, "kind_id")) as string[];
   const contents = (await getAttr(kindsGroup, "contents")) as string[][];
   const categories = (await getAttr(kindsGroup, "categories")) as string[][];
   const unknownCategoryIds = (await getAttr(
     kindsGroup,
-    "unknown_category_id"
+    "unknown_category_id",
   )) as string[];
 
   if (
@@ -193,21 +190,19 @@ const deserializeKindsGroup = async (
     ids.length !== unknownCategoryIds.length
   ) {
     throw Error(
-      `Expected categories group "${kindsGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`
+      `Expected categories group "${kindsGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`,
     );
   }
 
-  const kinds: DeferredEntityState<Kind> = { ids: [], entities: {} };
+  const kinds: EntityState<Kind, string> = { ids: [], entities: {} };
   for (let i = 0; i < ids.length; i++) {
     kinds.ids.push(ids[i]);
     kinds.entities[ids[i]] = {
-      saved: {
-        id: ids[i],
-        containing: contents[i],
-        categories: categories[i],
-        unknownCategoryId: unknownCategoryIds[i],
-      },
-      changes: {},
+      id: ids[i],
+      displayName: ids[i],
+      containing: contents[i],
+      categories: categories[i],
+      unknownCategoryId: unknownCategoryIds[i],
     };
   }
 
@@ -216,19 +211,19 @@ const deserializeKindsGroup = async (
 
 const deserializeProjectGroup = async (
   projectGroup: Group,
-  loadCb: LoadCB
+  loadCb: LoadCB,
 ): Promise<{
   project: ProjectState;
   data: {
-    things: DeferredEntityState<ImageObject | AnnotationObject>;
-    categories: DeferredEntityState<Category>;
-    kinds: DeferredEntityState<Kind>;
+    things: EntityState<ImageObject | AnnotationObject, string>;
+    categories: EntityState<Category, string>;
+    kinds: EntityState<Kind, string>;
   };
 }> => {
   const name = (await getAttr(projectGroup, "name")) as string;
   const imageChannels = (await getAttr(
     projectGroup,
-    "imageChannels"
+    "imageChannels",
   )) as number;
   const thingsGroup = await getGroup(projectGroup, "things");
   const things = await deserializeThingsGroup(thingsGroup, loadCb);
@@ -249,7 +244,7 @@ const deserializeProjectGroup = async (
 
 export const deserializeProject_v02 = async (
   fileStore: CustomStore,
-  loadCb: LoadCB
+  loadCb: LoadCB,
 ) => {
   const rootGroup = await openGroup(fileStore, fileStore.rootName, "r");
   const projectGroup = await getGroup(rootGroup, "project");
@@ -260,7 +255,7 @@ export const deserializeProject_v02 = async (
   const segmenterGroup = await getGroup(rootGroup, "segmenter");
   const segmenter = await deserializeSegmenterGroup(segmenterGroup);
 
-  process.env.REACT_APP_LOG_LEVEL === "1" &&
+  import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
     logger(`closed ${fileStore.rootName}`);
 
   return { project, classifier, segmenter, data };

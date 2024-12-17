@@ -8,25 +8,26 @@ import { throttle } from "lodash";
 import { useZoom } from "./useZoom";
 import { usePointerTool } from "./usePointerTool";
 
-import { imageViewerSlice } from "store/imageViewer";
-import { selectSelectedAnnotationIds } from "store/imageViewer/selectors";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
-  selectAnnotationSelectionMode,
+  selectAnnotationMode,
+  selectSelectedAnnotationIds,
   selectToolType,
-} from "store/annotator/selectors";
-import { annotatorSlice } from "store/annotator";
-
-import { AnnotationTool, ObjectAnnotationTool } from "utils/annotator/tools";
+} from "views/ImageViewer/state/annotator/selectors";
 
 import { logger } from "utils/common/helpers";
+import {
+  AnnotationTool,
+  ObjectAnnotationTool,
+} from "views/ImageViewer/utils/tools";
 
 import {
   AnnotationMode,
   AnnotationState,
   ToolType,
-} from "utils/annotator/enums";
+} from "views/ImageViewer/utils/enums";
 
-import { Point } from "utils/annotator/types";
+import { Point } from "views/ImageViewer/utils/types";
 
 const transformerClassName = "Transformer";
 const transformerButtonAttrNAme = "transformer-button";
@@ -47,9 +48,9 @@ export const useStageHandlers = (
         oob: boolean;
       }
     | undefined,
-  getPositionRelativeToStage: () => Point | undefined
+  getPositionRelativeToStage: () => Point | undefined,
 ) => {
-  const selectionMode = useSelector(selectAnnotationSelectionMode);
+  const selectionMode = useSelector(selectAnnotationMode);
   //const workingAnnotationEntity = useSelector(selectWorkingAnnotationNew);
   const dispatch = useDispatch();
   const toolType = useSelector(selectToolType);
@@ -77,16 +78,16 @@ export const useStageHandlers = (
 
   const deselectAllAnnotations = useCallback(() => {
     dispatch(
-      imageViewerSlice.actions.setSelectedAnnotationIds({
+      annotatorSlice.actions.setSelectedAnnotationIds({
         annotationIds: [],
         workingAnnotationId: undefined,
-      })
+      }),
     );
     dispatch(
       annotatorSlice.actions.setAnnotationState({
         annotationState: AnnotationState.Blank,
         annotationTool,
-      })
+      }),
     );
   }, [dispatch, annotationTool]);
   const { onPointerMouseDown, handlePointerMouseMove, handlePointerMouseUp } =
@@ -94,7 +95,7 @@ export const useStageHandlers = (
       absolutePosition,
       deselectAllAnnotations,
       selectedAnnotationsIds,
-      toolType
+      toolType,
     );
 
   /*
@@ -102,10 +103,10 @@ export const useStageHandlers = (
    */
 
   const handleMouseDown = (
-    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>,
   ) => {
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "2" &&
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "2" &&
       logger(event);
 
     if (
@@ -207,7 +208,7 @@ export const useStageHandlers = (
       if (toolType === ToolType.Zoom) {
         handleZoomMouseUp(
           positionByStage,
-          event as KonvaEventObject<MouseEvent>
+          event as KonvaEventObject<MouseEvent>,
         );
         setCurrentMousePosition();
       } else {
@@ -215,7 +216,7 @@ export const useStageHandlers = (
           handlePointerMouseUp(absolutePosition);
         } else if (toolType === ToolType.ObjectAnnotation) {
           await (annotationTool as ObjectAnnotationTool).onMouseUp(
-            absolutePosition
+            absolutePosition,
           );
         }
         annotationTool.onMouseUp(absolutePosition);
@@ -239,8 +240,8 @@ export const useStageHandlers = (
    */
 
   const handleTouchStart = (event: KonvaEventObject<TouchEvent>) => {
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "2" &&
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "2" &&
       logger(event);
 
     if (
@@ -358,7 +359,7 @@ export const useStageHandlers = (
       if (toolType === ToolType.Zoom) {
         handleZoomMouseUp(
           positionByStage,
-          event as KonvaEventObject<TouchEvent>
+          event as KonvaEventObject<TouchEvent>,
         );
         setCurrentMousePosition();
       } else {
@@ -366,7 +367,7 @@ export const useStageHandlers = (
           handlePointerMouseUp(absolutePosition.point);
         } else if (toolType === ToolType.ObjectAnnotation) {
           await (annotationTool as ObjectAnnotationTool).onMouseUp(
-            absolutePosition.point
+            absolutePosition.point,
           );
         }
         annotationTool.onMouseUp(absolutePosition.point);

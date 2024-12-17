@@ -3,15 +3,12 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import { imageViewerSlice } from "store/imageViewer";
-
 import { dataSlice } from "store/data";
 import {
   selectObjectCategoryDict,
   selectObjectKindDict,
   selectSplitThingDict,
 } from "store/data/selectors";
-import { selectActiveImageId } from "store/imageViewer/selectors";
 
 import {
   deserializeCOCOFile,
@@ -38,8 +35,6 @@ export const ImportAnnotationsFileMenuItem = ({
   projectType,
 }: ImportAnnotationsMenuItemProps) => {
   const dispatch = useDispatch();
-
-  const activeImageId = useSelector(selectActiveImageId);
 
   const existingObjectCategories = useSelector(selectObjectCategoryDict);
 
@@ -68,46 +63,33 @@ export const ImportAnnotationsFileMenuItem = ({
                   serializedProject as SerializedFileType,
                   existingThings.images,
                   existingObjectCategories,
-                  existingObjectKinds
+                  existingObjectKinds,
                 )
               : await deserializeCOCOFile(
                   serializedProject as SerializedCOCOFileType,
                   Object.values(existingThings.images),
                   Object.values(existingObjectCategories),
                   Object.values(existingObjectKinds),
-                  Object.values(CATEGORY_COLORS)
+                  Object.values(CATEGORY_COLORS),
                 );
 
           batch(() => {
             dispatch(
               dataSlice.actions.addKinds({
                 kinds: newKinds,
-                isPermanent: true,
-              })
+              }),
             );
             dispatch(
               dataSlice.actions.addCategories({
                 categories: newCategories,
-                isPermanent: true,
-              })
+              }),
             );
             dispatch(
               dataSlice.actions.addThings({
                 things: newAnnotations,
-                isPermanent: true,
-              })
+              }),
             );
           });
-
-          // when a deserialized annotation is associated with the active image
-          // this needs to invoke the decoding process for the in-view image
-          // annotations; prevImageId undefined to avoid encoding step
-          dispatch(
-            imageViewerSlice.actions.setActiveImageId({
-              imageId: activeImageId,
-              prevImageId: undefined,
-            })
-          );
         }
       };
 
@@ -115,12 +97,11 @@ export const ImportAnnotationsFileMenuItem = ({
     },
     [
       dispatch,
-      activeImageId,
       existingObjectCategories,
       existingThings.images,
       existingObjectKinds,
       projectType,
-    ]
+    ],
   );
 
   return (

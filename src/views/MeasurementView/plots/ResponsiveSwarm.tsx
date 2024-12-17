@@ -43,7 +43,7 @@ const StatLayer = ({
 
           return acc;
         },
-        { minX: Infinity, maxX: 0 }
+        { minX: Infinity, maxX: 0 },
       );
       const width =
         Math.max(Math.abs(groupMeanX - minX), Math.abs(groupMeanX - maxX)) + 15;
@@ -183,7 +183,7 @@ export const ResponsiveSwarm = ({
       groups={groupNames}
       id="id"
       value="value"
-      // @ts-ignore
+      // @ts-ignore: TODO not sure why ts complains
       layers={swarmLayers}
       size={
         chartConfig.size

@@ -1,5 +1,5 @@
-const fs = require("fs");
-const semver = require("semver");
+import fs from "fs";
+import semver from "semver";
 
 const packageJsonPath = "./package.json";
 let bumpType = process.argv[2]; // 'bump:patch', 'bump:minor', 'bump:major'
@@ -8,7 +8,7 @@ if (
   !["bump:none", "bump:patch", "bump:minor", "bump:major"].includes(bumpType)
 ) {
   console.error(
-    'Invalid bump type. Use "bump:none", "bump:patch", "bump:minor", "bump:major".'
+    'Invalid bump type. Use "bump:none", "bump:patch", "bump:minor", "bump:major".',
   );
   process.exit(1);
 }
@@ -36,7 +36,7 @@ if (bumpType === "none") {
   fs.writeFileSync(
     packageJsonPath,
     JSON.stringify(packageJson, null, 2) + "\n",
-    "utf-8"
+    "utf-8",
   );
 
   console.log("Updated package.json with new version:", newVersion);

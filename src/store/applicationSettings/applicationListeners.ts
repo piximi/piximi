@@ -14,7 +14,7 @@ startAppListening({
       applicationSettingsSlice.actions.setLoadPercent({
         loadPercent: action.payload.loadPercent,
         loadMessage: action.payload.loadMessage,
-      })
+      }),
     );
 
     // prevent others from doing work

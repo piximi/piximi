@@ -40,7 +40,7 @@ export const ConfirmationDialogSHK = ({
     },
     HotkeyContext.ConfirmationDialog,
     { enableOnTags: ["INPUT"] },
-    [handleConfirm]
+    [handleConfirm],
   );
 
   return (

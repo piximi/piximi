@@ -5,7 +5,7 @@ type Timer = ReturnType<typeof setTimeout>;
 
 export function useDebounce<Func extends PassedFunc>(
   func: Func,
-  delay: number
+  delay: number,
 ) {
   // State and setters for debounced value
   const timer = useRef<Timer>();

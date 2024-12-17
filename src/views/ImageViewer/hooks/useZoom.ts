@@ -5,20 +5,20 @@ import { KonvaEventObject } from "konva/lib/Node";
 
 import { useDebounce } from "../../../hooks/useDebounce";
 
-import { imageViewerSlice } from "store/imageViewer";
-import { selectToolType } from "store/annotator/selectors";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
 import {
   selectActiveImageId,
   selectStageWidth,
   selectZoomSelection,
   selectZoomToolOptions,
-} from "store/imageViewer/selectors";
+} from "views/ImageViewer/state/imageViewer/selectors";
 
-import { getDistance } from "utils/annotator";
+import { getDistance } from "views/ImageViewer/utils";
 
-import { ToolType, ZoomMode } from "utils/annotator/enums";
+import { ToolType, ZoomMode } from "views/ImageViewer/utils/enums";
 
-import { Point } from "utils/annotator/types";
+import { Point } from "views/ImageViewer/utils/types";
 
 const delta = 10;
 export const useZoom = (stage?: Konva.Stage | null) => {
@@ -33,7 +33,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
   const activeImageId = useSelector(selectActiveImageId);
   const updateZoomScale = useDebounce((scale: number) => {
     dispatch(
-      imageViewerSlice.actions.setZoomToolOptions({ options: { scale } })
+      imageViewerSlice.actions.setZoomToolOptions({ options: { scale } }),
     );
   }, 300);
 
@@ -49,7 +49,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
       y: (center.y - stageY!) / stageScale,
     };
 
-    var newPos = {
+    const newPos = {
       x: center.x - mousePointTo.x * newScale,
       y: center.y - mousePointTo.y * newScale,
     };
@@ -68,13 +68,13 @@ export const useZoom = (stage?: Konva.Stage | null) => {
           dragging: false,
           centerPoint: undefined,
         },
-      })
+      }),
     );
   };
 
   const handleZoomMouseDown = (
     position: { x: number; y: number },
-    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>,
   ) => {
     if (toolType !== ToolType.Zoom) return;
     const stage = event.target.getStage()!;
@@ -87,13 +87,13 @@ export const useZoom = (stage?: Konva.Stage | null) => {
           minimum: position,
           selecting: true,
         },
-      })
+      }),
     );
   };
 
   const handleZoomMouseMove = (
     position: { x: number; y: number },
-    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>,
   ) => {
     const stage = event.target.getStage()!;
     const _position = stage.getPointerPosition()!;
@@ -113,13 +113,13 @@ export const useZoom = (stage?: Konva.Stage | null) => {
           dragging: Math.abs(_position.x - selectStart.x) >= delta,
           maximum: position,
         },
-      })
+      }),
     );
   };
 
   const handleZoomMouseUp = (
     position: { x: number; y: number },
-    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>,
   ) => {
     if (!activeImageId || !zoomSelection.selecting || !stage) return;
     if (zoomSelection.dragging) {
@@ -130,7 +130,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
       dispatch(
         imageViewerSlice.actions.setZoomSelection({
           zoomSelection: { ...zoomSelection, maximum: position },
-        })
+        }),
       );
 
       if (!zoomSelection.minimum) return;
@@ -138,7 +138,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
       const selectedWidth = Math.abs(_position.x - selectStart.x);
       const newScale = Math.max(
         Math.min(stageWidth / selectedWidth, 5),
-        stage.scaleX()
+        stage.scaleX(),
       );
       let topLeft;
       if (selectStart.x < _position.x) {
@@ -163,7 +163,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
     dispatch(
       imageViewerSlice.actions.setZoomSelection({
         zoomSelection: { ...zoomSelection, dragging: false, selecting: false },
-      })
+      }),
     );
   };
 
@@ -208,7 +208,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
       scaleY: 1 / stage.scaleY(),
     });
 
-    var newLabelPos = {
+    const newLabelPos = {
       x: labelPosition.x - labelPointTo.x * newScale,
       y: labelPosition.y - labelPointTo.y * newScale,
     };
@@ -268,7 +268,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
       scaleY: 1 / stage.scaleY(),
     });
 
-    var newLabelPos = {
+    const newLabelPos = {
       x: labelPosition.x - labelPointTo.x * newScale,
       y: labelPosition.y - labelPointTo.y * newScale,
     };
@@ -279,7 +279,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
   };
 
   const handleZoomDblClick = (
-    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>,
   ) => {
     event.evt.preventDefault();
     if (!activeImageId) return;
@@ -316,7 +316,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
       scaleY: 1 / stage.scaleY(),
     });
 
-    var newLabelPos = {
+    const newLabelPos = {
       x: labelPosition.x - labelPointTo.x * newScale,
       y: labelPosition.y - labelPointTo.y * newScale,
     };

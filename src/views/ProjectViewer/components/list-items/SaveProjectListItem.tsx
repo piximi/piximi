@@ -1,5 +1,5 @@
 import React from "react";
-import DownloadIcon from "@mui/icons-material/Download";
+import { Download as DownloadIcon } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 

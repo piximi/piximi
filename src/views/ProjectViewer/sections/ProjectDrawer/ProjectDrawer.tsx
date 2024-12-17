@@ -2,8 +2,7 @@ import React from "react";
 
 import { useMobileView } from "hooks";
 
-import { AppBarOffset } from "components/ui/AppBarOffset";
-import { DividerHeader } from "components/ui/DividerHeader";
+import { AppBarOffset, DividerHeader } from "components/ui";
 import { BaseAppDrawer } from "components/layout";
 import { ProjectViewerCategories, FileIO } from "../../components";
 import { ModelTaskSection } from "../ModelTaskSection";

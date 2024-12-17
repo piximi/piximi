@@ -11,16 +11,14 @@ import {
 export function useCategoryValidation({
   initName,
   initColor,
-  kind,
 }: {
   initName?: string;
   initColor?: string;
-  kind: string;
 }) {
   const unavailableNames = useSelector(selectActiveCategoryNames);
   const availableColors = useSelector(selectActiveCategoryColors);
   const [color, setColor] = useState<string>(
-    initColor ?? "" //sample(availableColors)!
+    initColor ?? "", //sample(availableColors)!
   );
   const [name, setName] = useState<string>(initName ?? "");
   const [errorHelperText, setErrorHelperText] = useState<string>(" ");
@@ -51,7 +49,7 @@ export function useCategoryValidation({
       }
       return { isInvalid: invalidInput, helperText };
     },
-    [initName, unavailableNames]
+    [initName, unavailableNames],
   );
 
   useEffect(() => {

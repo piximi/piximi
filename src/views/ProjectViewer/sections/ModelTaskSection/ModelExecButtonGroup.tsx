@@ -42,8 +42,8 @@ export const ModelExecButtonGroup = ({
           modelStatus === ModelStatus.Predicting
             ? "...predicting"
             : modelStatus !== ModelStatus.Trained
-            ? helperText
-            : "Predict Model"
+              ? helperText
+              : "Predict Model"
         }
         onClick={handlePredict}
         disabled={modelStatus !== ModelStatus.Trained}
@@ -64,9 +64,9 @@ export const ModelExecButtonGroup = ({
           !modelTrainable
             ? "Can't evaluate non-trainable models"
             : modelStatus !== ModelStatus.Trained &&
-              modelStatus !== ModelStatus.Evaluating
-            ? helperText
-            : "Evaluate Model"
+                modelStatus !== ModelStatus.Evaluating
+              ? helperText
+              : "Evaluate Model"
         }
         disableRipple
         onClick={handleEvaluate}

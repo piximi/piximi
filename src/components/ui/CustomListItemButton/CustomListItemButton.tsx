@@ -50,7 +50,7 @@ export const CustomListItemButton = ({
 }: CustomListItemButtonProps) => {
   const listItemRef = useRef<HTMLLIElement | null>(null);
   const [_tooltipProps] = useState<TooltipType>({
-    placement: "bottom" as "bottom",
+    placement: "bottom" as const,
     disableInteractive: true,
     enterDelay: 500,
     enterNextDelay: 500,

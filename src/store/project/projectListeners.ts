@@ -1,41 +1,21 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
-import { annotatorSlice } from "store/annotator";
 import { classifierSlice } from "store/classifier";
-import { segmenterSlice } from "store/segmenter";
-import { imageViewerSlice } from "store/imageViewer";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data";
 import { projectSlice } from "./projectSlice";
 
 import { TypedAppStartListening } from "store/types";
-import { getDeferredProperty } from "store/entities/utils";
-import { DeferredEntity } from "store/entities/models";
-import { ImageObject } from "store/data/types";
 
 export const projectMiddleware = createListenerMiddleware();
 const startAppListening =
   projectMiddleware.startListening as TypedAppStartListening;
 
 startAppListening({
-  actionCreator: projectSlice.actions.resetProject,
+  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
   effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(dataSlice.actions.resetData());
-    listenerAPI.dispatch(annotatorSlice.actions.resetAnnotator());
-    listenerAPI.dispatch(classifierSlice.actions.resetClassifier());
-    listenerAPI.dispatch(segmenterSlice.actions.resetSegmenter());
-    listenerAPI.dispatch(imageViewerSlice.actions.resetImageViewer());
-  },
-});
-
-startAppListening({
-  actionCreator: projectSlice.actions.resetProject,
-  effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(dataSlice.actions.resetData());
-    listenerAPI.dispatch(annotatorSlice.actions.resetAnnotator());
-    listenerAPI.dispatch(classifierSlice.actions.resetClassifier());
-    listenerAPI.dispatch(segmenterSlice.actions.resetSegmenter());
-    listenerAPI.dispatch(imageViewerSlice.actions.resetImageViewer());
+    listenerAPI.dispatch(projectSlice.actions.resetProject());
   },
 });
 
@@ -51,10 +31,10 @@ startAppListening({
     const { data: oldData } = listenerApi.getOriginalState();
     const deletedCategories = difference(
       oldData.categories.ids,
-      data.categories.ids
+      data.categories.ids,
     ) as string[];
     const filters = project.thingFilters;
-    for (let kind in filters) {
+    for (const kind in filters) {
       const filteredCats = filters[kind].categoryId;
       const deletedFilters = intersection(filteredCats, deletedCategories);
       if (deletedFilters.length > 0) {
@@ -62,7 +42,7 @@ startAppListening({
           projectSlice.actions.removeThingCategoryFilters({
             categoryIds: deletedFilters,
             kinds: [kind],
-          })
+          }),
         );
       }
     }
@@ -76,20 +56,20 @@ startAppListening({
     const { data: oldData } = listenerApi.getOriginalState();
     const deletedKinds = difference(
       oldData.kinds.ids,
-      data.kinds.ids
+      data.kinds.ids,
     ) as string[];
 
     listenerApi.dispatch(
       projectSlice.actions.removeThingCategoryFilters({
         categoryIds: "all",
         kinds: deletedKinds,
-      })
+      }),
     );
     listenerApi.dispatch(
       projectSlice.actions.removeThingPartitionFilters({
         partitions: "all",
         kinds: deletedKinds,
-      })
+      }),
     );
   },
 });
@@ -101,18 +81,17 @@ startAppListening({
     );
   },
   effect: async (action, listenerApi) => {
-    const { classifier } = listenerApi.getState();
+    const { classifier, project } = listenerApi.getState();
 
-    if (action.payload && action.payload.channels) {
+    if (project.imageChannels)
       listenerApi.dispatch(
         classifierSlice.actions.updateInputShape({
           inputShape: {
             ...classifier.inputShape,
-            channels: action.payload.channels,
+            channels: project.imageChannels,
           },
-        })
+        }),
       );
-    }
   },
 });
 
@@ -127,21 +106,18 @@ startAppListening({
       for (const thingId of thingIds) {
         const thing = data.things.entities[thingId];
         if (!thing) continue;
-        if (getDeferredProperty(thing, "kind") === "Image") {
-          const containedThingIds = getDeferredProperty(
-            thing as DeferredEntity<ImageObject>,
-            "containing"
-          );
+        if ("containing" in thing) {
+          const containedThingIds = thing.containing;
           implicitThingIds.push(...containedThingIds);
         }
       }
       const deletedThingsToDeselect = intersection(
         [...thingIds, ...implicitThingIds],
-        selectedThings
+        selectedThings,
       );
 
       listenerAPI.dispatch(
-        projectSlice.actions.deselectThings({ ids: deletedThingsToDeselect })
+        projectSlice.actions.deselectThings({ ids: deletedThingsToDeselect }),
       );
     }
 

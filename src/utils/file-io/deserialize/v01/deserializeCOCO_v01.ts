@@ -1,6 +1,6 @@
-import { encode, maskFromPoints } from "utils/annotator";
+import { encode, maskFromPoints } from "views/ImageViewer/utils";
 
-import { generateUUID } from "utils/common/helpers";
+import { generateUUID } from "store/data/helpers";
 import { logger } from "utils/common/helpers";
 import {
   SerializedCOCOAnnotationType,
@@ -8,7 +8,7 @@ import {
   SerializedCOCOFileType,
   SerializedCOCOImageType,
 } from "../../types";
-import { Point } from "utils/annotator/types";
+import { Point } from "views/ImageViewer/utils/types";
 import { OldAnnotationType, OldCategory, OldImageType } from "store/data/types";
 
 /*
@@ -21,7 +21,7 @@ const reconcileCOCOCategories = (
   existingCategories: Array<OldCategory>,
   serializedCategories: Array<SerializedCOCOCategoryType>,
   serializedAnnotations: Array<SerializedCOCOAnnotationType>,
-  availableColors: Array<string> = []
+  availableColors: Array<string> = [],
 ) => {
   if (availableColors.length === 0) {
     availableColors = ["#000000"];
@@ -62,8 +62,8 @@ const reconcileCOCOCategories = (
   }));
 
   if (
-    process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "1"
+    import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "1"
   ) {
     const numMatched = matchedCats.length;
     const numNew = newCats.length;
@@ -72,7 +72,7 @@ const reconcileCOCOCategories = (
 
     numMatched !== numExisting &&
       logger(
-        `Categories matched: ${numMatched}, newly created: ${numNew}, unmatched: ${numUnmatched}`
+        `Categories matched: ${numMatched}, newly created: ${numNew}, unmatched: ${numUnmatched}`,
       );
   }
 
@@ -93,7 +93,7 @@ const reconcileImages = (
   // reconcileCOCOCategories changes 'category_id' type
   serializedAnnotations: Array<
     Omit<SerializedCOCOAnnotationType, "category_id"> & { category_id: string }
-  >
+  >,
 ) => {
   // incoming image id -> existing image id
   const imIdMap: { [imId: string]: string } = {};
@@ -128,8 +128,8 @@ const reconcileImages = (
     .map((ann) => ({ ...ann, image_id: imIdMap[ann.image_id] }));
 
   if (
-    process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "1"
+    import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "1"
   ) {
     const numImsDiscarded = discardedIms.length;
     const numAnnsDiscarded = discardedAnnotations.length;
@@ -158,21 +158,21 @@ export const deserializeCOCOFile_v01 = (
   cocoFile: SerializedCOCOFileType,
   existingImages: Array<OldImageType>,
   existingCategories: Array<OldCategory>,
-  availableColors: Array<string> = []
+  availableColors: Array<string> = [],
 ) => {
   // this must come first
   const { newCats, catModdedAnnotations } = reconcileCOCOCategories(
     existingCategories,
     cocoFile.categories,
     cocoFile.annotations,
-    availableColors
+    availableColors,
   );
 
   // this must come second
   const { matchedIms, imModdedAnnotations } = reconcileImages(
     existingImages,
     cocoFile.images,
-    catModdedAnnotations
+    catModdedAnnotations,
   );
 
   const crowded: Array<number> = [];
@@ -185,9 +185,9 @@ export const deserializeCOCOFile_v01 = (
     const parentIm = matchedIms.find((im) => im.id === cocoAnn.image_id);
 
     if (!parentIm) {
-      if (process.env.NODE_ENV !== "production") {
+      if (import.meta.env.NODE_ENV !== "production") {
         console.error(
-          "Somehow received an imageless annotation that was not filtered out"
+          "Somehow received an imageless annotation that was not filtered out",
         );
       }
       continue;
@@ -234,7 +234,7 @@ export const deserializeCOCOFile_v01 = (
       points,
       { width: parentIm.shape.width, height: parentIm.shape.height },
       bbox,
-      true
+      true,
     );
 
     const encodedMask = encode(decodedMask);
@@ -252,8 +252,8 @@ export const deserializeCOCOFile_v01 = (
   }
 
   if (
-    process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "1"
+    import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "1"
   ) {
     const numMalformed = malformed.length;
     const numCrowded = crowded.length;
@@ -263,13 +263,13 @@ export const deserializeCOCOFile_v01 = (
 
     malformed.length > 0 &&
       logger(
-        `Dropped ${malformed.length} annotations with malformed polygon shapes: ${malformed}`
+        `Dropped ${malformed.length} annotations with malformed polygon shapes: ${malformed}`,
       );
     crowded.length > 0 &&
       logger(`Dropped ${crowded.length} annotations with iscrowd=1`);
     multipart.length > 0 &&
       logger(
-        `Dropped ${multipart.length} annotations with multiple polygon parts`
+        `Dropped ${multipart.length} annotations with multiple polygon parts`,
       );
     logger(`Created ${numKept}/${numInFile} annotations`);
   }

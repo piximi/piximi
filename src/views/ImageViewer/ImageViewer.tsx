@@ -1,20 +1,18 @@
-import React, { useEffect, useCallback, useState, useRef } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import Konva from "konva";
 import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 import { AppBar, Box } from "@mui/material";
 
-import { useMobileView } from "hooks";
+import { useMobileView, useUnloadConfirmation } from "hooks";
 import { AlertBar } from "components/ui/AlertBar";
 
 import { FallBackDialog } from "components/dialogs";
-import {
-  AnnotatorToolDrawer,
-  ImageViewerDrawer,
-  StageWrapper,
-} from "./sections";
+import { ImageViewerDrawer, StageWrapper } from "./sections";
 
-import { StageContext } from "contexts";
+import { StageContext } from "views/ImageViewer/state/StageContext";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectAlertState } from "store/applicationSettings/selectors";
 
@@ -24,26 +22,16 @@ import { AlertType, HotkeyContext } from "utils/common/enums";
 
 export const ImageViewer = () => {
   const dispatch = useDispatch();
+  const routerLocation = useLocation();
   const stageRef = useRef<Konva.Stage>(null);
-
-  const [optionsVisible, setOptionsVisibile] = useState<boolean>(false);
-  const [persistOptions, setPersistOptions] = useState<boolean>(false);
   const isMobile = useMobileView();
   const alertState = useSelector(selectAlertState);
-
-  const onUnload = (e: any) => {
-    if (process.env.NODE_ENV === "development") {
-      return;
-    } else {
-      e.preventDefault();
-      return (e.returnValue = "Are you sure you want to exit?");
-    }
-  };
+  useUnloadConfirmation();
 
   const handleError = useCallback(
     async (e: any) => {
       e.preventDefault();
-      var error = e.error as Error;
+      const error = e.error as Error;
       const stackTrace = await getStackTraceFromError(error);
       dispatch(
         applicationSettingsSlice.actions.updateAlertState({
@@ -53,10 +41,10 @@ export const ImageViewer = () => {
             description: error.message,
             stackTrace: stackTrace,
           },
-        })
+        }),
       );
     },
-    [dispatch]
+    [dispatch],
   );
 
   const handleUncaughtRejection = useCallback(
@@ -70,32 +58,33 @@ export const ImageViewer = () => {
             description: String(e.reason.message),
             stackTrace: String(e.reason.stack),
           },
-        })
+        }),
       );
     },
-    [dispatch]
+    [dispatch],
   );
 
   useEffect(() => {
-    window.addEventListener("beforeunload", onUnload);
-    return () => {
-      window.removeEventListener("beforeunload", onUnload);
-    };
-  }, []);
-  useEffect(() => {
+    dispatch(
+      imageViewerSlice.actions.prepareImageViewer({
+        selectedThingIds: routerLocation.state?.initialThingIds
+          ? routerLocation.state.initialThingIds
+          : [],
+      }),
+    );
     dispatch(
       applicationSettingsSlice.actions.registerHotkeyContext({
         context: HotkeyContext.AnnotatorView,
-      })
+      }),
     );
     return () => {
       dispatch(
         applicationSettingsSlice.actions.unregisterHotkeyContext({
           context: HotkeyContext.AnnotatorView,
-        })
+        }),
       );
     };
-  }, [dispatch]);
+  }, [dispatch, routerLocation.state]);
 
   useEffect(() => {
     window.addEventListener("error", handleError);
@@ -126,21 +115,7 @@ export const ImageViewer = () => {
 
           {isMobile ? <></> : <ImageViewerDrawer />}
 
-          <StageWrapper
-            setOptionsVisibility={setOptionsVisibile}
-            persistOptions={persistOptions}
-          />
-
-          {isMobile ? (
-            <></>
-          ) : (
-            <AnnotatorToolDrawer
-              optionsVisibility={optionsVisible}
-              setOptionsVisibility={setOptionsVisibile}
-              persistOptions={persistOptions}
-              setPersistOptions={setPersistOptions}
-            />
-          )}
+          <StageWrapper />
         </Box>
       </ErrorBoundary>
     </StageContext.Provider>

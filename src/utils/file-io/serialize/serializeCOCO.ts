@@ -3,7 +3,7 @@ import {
   padMask,
   findContours,
   simplifyPolygon,
-} from "utils/annotator";
+} from "views/ImageViewer/utils";
 
 import { logger } from "utils/common/helpers";
 import {
@@ -17,36 +17,42 @@ import { AnnotationObject, Category, ImageObject } from "store/data/types";
 export const serializeCOCOFile = (
   images: Array<ImageObject>,
   annotations: Array<AnnotationObject>,
-  categories: Array<Category>
+  categories: Array<Category>,
 ): SerializedCOCOFileType => {
   let imCount = 0;
   let catCount = 0;
   let annCount = 0;
 
-  const imIdMap = images.reduce((idMap, im) => {
-    idMap[im.id] = {
-      id: imCount++,
-      width: im.shape.width,
-      height: im.shape.height,
-      file_name: im.name,
-      license: 0,
-      flickr_url: "",
-      coco_url: "",
-      date_captured: "",
-    };
-    return idMap;
-  }, {} as { [internalImageId: string]: SerializedCOCOImageType });
+  const imIdMap = images.reduce(
+    (idMap, im) => {
+      idMap[im.id] = {
+        id: imCount++,
+        width: im.shape.width,
+        height: im.shape.height,
+        file_name: im.name,
+        license: 0,
+        flickr_url: "",
+        coco_url: "",
+        date_captured: "",
+      };
+      return idMap;
+    },
+    {} as { [internalImageId: string]: SerializedCOCOImageType },
+  );
 
-  const catIdMap = categories.reduce((idMap, cat) => {
-    idMap[cat.id] = {
-      id: catCount++,
-      name: cat.name,
-      supercategory: cat.kind,
-    };
-    return idMap;
-  }, {} as { [internalCategoryId: string]: SerializedCOCOCategoryType });
+  const catIdMap = categories.reduce(
+    (idMap, cat) => {
+      idMap[cat.id] = {
+        id: catCount++,
+        name: cat.name,
+        supercategory: cat.kind,
+      };
+      return idMap;
+    },
+    {} as { [internalCategoryId: string]: SerializedCOCOCategoryType },
+  );
 
-  let serializedAnnotations: Array<SerializedCOCOAnnotationType> = [];
+  const serializedAnnotations: Array<SerializedCOCOAnnotationType> = [];
 
   for (const ann of annotations) {
     const boxWidth = ann.boundingBox[2] - ann.boundingBox[0];
@@ -58,12 +64,12 @@ export const serializeCOCOFile = (
     const outerBorder = contours.find((b) => b.seqNum === 2);
 
     if (!outerBorder) {
-      process.env.NODE_ENV !== "production" &&
+      import.meta.env.NODE_ENV !== "production" &&
         logger(`Could not find outer border of annotation ${ann.id}`);
       throw new Error(
         `Could not determine contours of annotation belonging to image ${
           imIdMap[ann.imageId].file_name
-        }`
+        }`,
       );
     }
 
@@ -93,7 +99,7 @@ export const serializeCOCOFile = (
   const info = {
     year: new Date().getFullYear(),
     // provided in package.json scripts
-    version: process.env.REACT_APP_VERSION as string,
+    version: import.meta.env.VITE_APP_VERSION as string,
     description: "",
     contributor: "",
     url: "",

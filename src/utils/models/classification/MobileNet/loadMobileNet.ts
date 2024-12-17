@@ -7,13 +7,13 @@ import {
   Sequential,
   serialization,
 } from "@tensorflow/tfjs";
-import _ from "lodash";
+import { isEqual } from "lodash";
 import { Shape } from "store/data/types";
 
 const copyLayer = (
   fromModel: LayersModel,
   toModel: Sequential,
-  layerIdx: number
+  layerIdx: number,
 ) => {
   const sourceLayer = fromModel.layers[layerIdx];
   const classMap = serialization.SerializationMap.getMap().classNameMap;
@@ -75,7 +75,7 @@ export const createMobileNet = async ({
   const model = sequential();
 
   // if we need to change the input shape
-  if (!_.isEqual(input_shape, defaultInputShape)) {
+  if (!isEqual(input_shape, defaultInputShape)) {
     mobilenet.layers[0].dispose();
 
     model.add(layers.inputLayer({ inputShape: input_shape }));
@@ -97,7 +97,7 @@ export const createMobileNet = async ({
           dilationRate: [1, 1],
           useBias: false,
           biasInitializer: "zeros",
-        })
+        }),
       );
     }
   } else {
@@ -125,7 +125,7 @@ export const createMobileNet = async ({
     model.add(
       layers.reshape({
         targetShape: [1, 1, numfeat as number],
-      })
+      }),
     );
 
     model.add(layers.dropout({ rate: 0.001 }));
@@ -134,19 +134,19 @@ export const createMobileNet = async ({
       layers.conv2d({
         filters: numClasses,
         kernelSize: [1, 1],
-      })
+      }),
     );
 
     model.add(
       layers.reshape({
         targetShape: [numClasses],
-      })
+      }),
     );
 
     model.add(
       layers.activation({
         activation: "softmax",
-      })
+      }),
     );
   }
 

@@ -42,7 +42,7 @@ export const usePlotControl = () => {
     (label: string) => {
       return plotDetails.plots[label].name;
     },
-    [plotDetails.plots]
+    [plotDetails.plots],
   );
   const addPlot = useCallback(() => {
     dispatch({ type: "add" });
@@ -51,7 +51,7 @@ export const usePlotControl = () => {
     (id: string, name: string) => {
       dispatch({ type: "edit", id, name });
     },
-    [dispatch]
+    [dispatch],
   );
   type NewType = ChartConfig;
 
@@ -65,17 +65,17 @@ export const usePlotControl = () => {
         chartConfig: newConfig,
       });
     },
-    [plotDetails, dispatch]
+    [plotDetails, dispatch],
   );
   const removePlot = useCallback(
     (id: string, newId?: string) => {
       dispatch({ type: "remove", id, newId });
     },
-    [dispatch]
+    [dispatch],
   );
   const setActiveLabel = useCallback(
     (plotId: string) => dispatch({ type: "select", id: plotId }),
-    [dispatch]
+    [dispatch],
   );
 
   return {
@@ -101,15 +101,15 @@ export const useTableExport = () => {
       const thingIds = table.thingIds;
       const exportData: Record<string, number | string>[] = [];
       thingIds.forEach((thingId) => {
-        const thing = thingDetails[thingId];
+        const thing = thingDetails[thingId]!;
         const data: Record<string, number | string> = { id: thingId };
         data.name = thing.name;
         data.kind = thing.kind;
         if ("imageId" in thing) {
-          data.imageName = thingDetails[thing.imageId].name;
+          data.imageName = thingDetails[thing.imageId]!.name;
           data["bbox [x1:y1:x2:y2]"] = `[${thing.boundingBox.join(":")}]`;
         }
-        data.category = categories[thing.categoryId].name;
+        data.category = categories[thing.categoryId]!.name;
         data.partition = thing.partition;
         Object.assign(data, measurementData[thingId].measurements);
         exportData.push(data);
@@ -124,7 +124,7 @@ export const useTableExport = () => {
       const objUrl = URL.createObjectURL(blob);
       saveAs(objUrl, `${table.kind}-measurements.csv`);
     },
-    [categories, measurementData, thingDetails]
+    [categories, measurementData, thingDetails],
   );
 
   return handleExportTable;
@@ -138,10 +138,22 @@ export const useCreateMeasurementTable = () => {
   const [status, setStatus] = useState<LoadStatus>({ loading: false });
   const worker: Worker = useMemo(
     () =>
-      new Worker(new URL("./workers/prepareDataWorker.ts", import.meta.url)),
-    []
+      new Worker(new URL("./workers/prepareDataWorker.ts", import.meta.url), {
+        type: "module",
+      }),
+    [],
   );
-  const kindOptions = useMemo(() => Object.keys(kinds), [kinds]);
+  const kindOptions = useMemo(
+    () =>
+      Object.values(kinds).reduce(
+        (optionsArray: { kindId: string; displayName: string }[], kind) => {
+          optionsArray.push({ kindId: kind.id, displayName: kind.displayName });
+          return optionsArray;
+        },
+        [],
+      ),
+    [kinds],
+  );
   const {
     onClose: handleCloseTableDialog,
     onOpen: handleOpenTableDialog,
@@ -149,7 +161,7 @@ export const useCreateMeasurementTable = () => {
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const handleCreateTable = (kind: string) => {
-    const thingIds = kinds[kind].containing;
+    const thingIds = kinds[kind]!.containing;
     const convertedThingData: {
       id: string;
       kind: string;
@@ -157,7 +169,7 @@ export const useCreateMeasurementTable = () => {
       encodedMask?: number[];
       decodedMask?: DataArray;
     }[] = thingIds.map((thingId) => {
-      const thing = thingData[thingId];
+      const thing = thingData[thingId]!;
       if ("encodedMask" in thing) {
         return {
           id: thing.id,
@@ -187,7 +199,7 @@ export const useCreateMeasurementTable = () => {
               loadValue?: number;
             }
           | { loadValue: number; kind?: string; data?: ThingData }
-        >
+        >,
       ) => {
         if (e.data.loadValue) {
           setStatus({ loading: true, value: e.data.loadValue });
@@ -197,16 +209,17 @@ export const useCreateMeasurementTable = () => {
           batch(() => {
             dispatch(
               measurementsSlice.actions.createGroup({
-                kind: e.data.kind!,
+                kindId: e.data.kind!,
+                displayName: kinds[e.data.kind!].displayName,
                 categories: categoriesByKind(e.data.kind!),
                 thingIds: Object.keys(e.data.data!),
                 numChannels,
-              })
+              }),
             );
             dispatch(
               measurementsSlice.actions.updateMeasurements({
                 dataDict: e.data.data,
-              })
+              }),
             );
           });
           setStatus({ loading: false });

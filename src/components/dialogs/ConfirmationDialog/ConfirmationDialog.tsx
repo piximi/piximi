@@ -66,7 +66,7 @@ export const ConfirmationDialog = ({
       enabled: isOpen,
       filterPreventDefault: false,
     },
-    [handleConfirm, confirmDisabled]
+    [handleConfirm, confirmDisabled],
   );
 
   return (
@@ -82,7 +82,7 @@ export const ConfirmationDialog = ({
         <DialogTitle sx={{ p: 1 }}>{title}</DialogTitle>
         <IconButton
           onClick={handleClose}
-          sx={(theme) => ({
+          sx={() => ({
             maxHeight: "40px",
           })}
         >

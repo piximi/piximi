@@ -10,12 +10,12 @@ import {
   OrphanedAnnotationObject,
 } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCellpose } from "./predictCellpose";
-import { generateUUID } from "utils/common/helpers";
 import { FitOptions } from "../../types";
 import { ModelTask } from "../../enums";
 import { getImageSlice } from "utils/common/tensorHelpers";
 import { Kind, ImageObject } from "store/data/types";
 import { LoadCB } from "utils/file-io/types";
+import { generateKind } from "store/data/helpers";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
@@ -62,9 +62,12 @@ export class Cellpose extends Segmenter {
     this._model = { dispose: () => {} } as GraphModel;
   }
 
-  public loadTraining(images: ImageObject[], preprocessingArgs: any): void {}
+  public loadTraining(_images: ImageObject[], _preprocessingArgs: any): void {}
 
-  public loadValidation(images: ImageObject[], preprocessingArgs: any): void {}
+  public loadValidation(
+    _images: ImageObject[],
+    _preprocessingArgs: any,
+  ): void {}
 
   private _sampleGenerator(images: Array<ImageObject>) {
     const count = images.length;
@@ -85,7 +88,7 @@ export class Cellpose extends Segmenter {
 
   public loadInference(
     images: ImageObject[],
-    preprocessingArgs: LoadInferenceDataArgs
+    preprocessingArgs: LoadInferenceDataArgs,
   ): void {
     this._inferenceDataset = tfdata
       .generator(this._sampleGenerator(images))
@@ -94,21 +97,16 @@ export class Cellpose extends Segmenter {
     if (preprocessingArgs.kinds) {
       if (preprocessingArgs.kinds.length !== 1)
         throw Error(
-          `${this.name} Model only takes a single foreground category`
+          `${this.name} Model only takes a single foreground category`,
         );
       this._fgKind = preprocessingArgs.kinds[0];
     } else if (!this._fgKind) {
-      const unknownCategoryId = generateUUID({ definesUnknown: true });
-      this._fgKind = {
-        id: KIND_NAME,
-        categories: [unknownCategoryId],
-        containing: [],
-        unknownCategoryId,
-      };
+      const { kind } = generateKind(KIND_NAME, true);
+      this._fgKind = kind;
     }
   }
 
-  public async train(options: any, callbacks: any): Promise<History> {
+  public async train(_options: any, _callbacks: any): Promise<History> {
     if (!this.trainable) {
       throw new Error(`Training not supported for Model ${this.name}`);
     } else {
@@ -139,13 +137,13 @@ export class Cellpose extends Segmenter {
         this._fgKind!.id,
         this._fgKind!.unknownCategoryId,
         this._service,
-        this._config
+        this._config,
       );
       annotations.push(annotObj);
       if (loadCb) {
         loadCb(
           (idx + 1) / infT.length,
-          `${idx + 1} of ${infT.length} images predicted`
+          `${idx + 1} of ${infT.length} images predicted`,
         );
       }
     }
@@ -160,7 +158,7 @@ export class Cellpose extends Segmenter {
 
     return kinds.includes(this._fgKind.id) ? [this._fgKind] : [];
   }
-  public inferenceCategoriesById(catIds: Array<string>) {
+  public inferenceCategoriesById(_catIds: Array<string>) {
     return [];
   }
 

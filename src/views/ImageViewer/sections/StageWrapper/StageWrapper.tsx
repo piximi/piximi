@@ -4,22 +4,20 @@ import { Box } from "@mui/material";
 import { Stage } from "../Stage";
 
 import { dimensions } from "utils/common/constants";
+import { useMobileView } from "hooks";
+import { SideToolBar, TopToolBar } from "../tool-bars";
 
-type StageWrapperProps = {
-  setOptionsVisibility: React.Dispatch<React.SetStateAction<boolean>>;
-  persistOptions: boolean;
-};
-
-export const StageWrapper = ({
-  setOptionsVisibility,
-  persistOptions,
-}: StageWrapperProps) => {
+export const StageWrapper = () => {
   const [width, setWidth] = useState<number>(
-    window.innerWidth - dimensions.leftDrawerWidth - dimensions.toolDrawerWidth
+    window.innerWidth - dimensions.leftDrawerWidth - dimensions.toolDrawerWidth,
   );
   const [height, setHeight] = useState<number>(
-    window.innerHeight - dimensions.stageInfoHeight
+    window.innerHeight -
+      dimensions.stageInfoHeight -
+      dimensions.toolDrawerWidth,
   );
+
+  const isMobile = useMobileView();
 
   //useDefaultImage(DispatchLocation.ImageViewer);
   useLayoutEffect(() => {
@@ -27,9 +25,13 @@ export const StageWrapper = ({
       setWidth(
         window.innerWidth -
           dimensions.leftDrawerWidth -
-          dimensions.toolDrawerWidth
+          dimensions.toolDrawerWidth,
       );
-      setHeight(window.innerHeight - dimensions.stageInfoHeight);
+      setHeight(
+        window.innerHeight -
+          dimensions.stageInfoHeight -
+          dimensions.toolDrawerWidth,
+      );
     };
     window.addEventListener("resize", resizeHandler);
     return () => {
@@ -43,14 +45,17 @@ export const StageWrapper = ({
         backgroundColor: theme.palette.background.default,
         width: width,
         height: height,
+        display: "grid",
+        gridTemplateColumns: `1fr ${dimensions.toolDrawerWidth}px`,
+        gridTemplateRows: `${dimensions.toolDrawerWidth}px 1fr`,
+        gridTemplateAreas: `"top-tools top-tools" "stage side-tools"`,
         transition: "width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-        p: "1.5rem 1.5rem 0 1.5rem",
+        overflow: "visible",
       })}
-      onMouseEnter={() => {
-        !persistOptions && setOptionsVisibility(false);
-      }}
     >
-      <Stage stageWidth={width - 48} stageHeight={height - 24} />
+      <TopToolBar />
+      <Stage stageWidth={width} stageHeight={height} />
+      {isMobile ? <></> : <SideToolBar />}
     </Box>
   );
 };

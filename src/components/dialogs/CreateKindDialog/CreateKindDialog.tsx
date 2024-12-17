@@ -1,35 +1,26 @@
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
 import { Box, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { dataSlice } from "store/data/dataSlice";
-import { selectAllKindIds } from "store/data/selectors";
-
-import { generateUnknownCategory } from "utils/common/helpers";
-
-import { Kind } from "store/data/types";
+import { Category, Kind } from "store/data/types";
+import { generateKind } from "store/data/helpers";
 
 type CreateCategoriesDialogProps = {
   onClose: () => void;
-  withContainedThings?: string[];
-  withContainedCategories?: string[];
   open: boolean;
-  changesPermanent?: boolean;
   secondaryAction?: () => void;
+  storeDispatch: (kind: Kind, newUnknownCategory: Category) => void;
+  existingKinds: string[];
 };
 
 export const CreateKindDialog = ({
   onClose,
-  withContainedThings = [],
-  withContainedCategories = [],
   open,
-  changesPermanent,
   secondaryAction,
+  storeDispatch,
+  existingKinds,
 }: CreateCategoriesDialogProps) => {
-  const dispatch = useDispatch();
-  const existingKinds = useSelector(selectAllKindIds);
   const [name, setName] = useState<string>("");
   const [errorHelperText, setErrorHelperText] = useState<string>(" ");
   const [isInvalidName, setIsInvalidName] = useState<boolean>(false);
@@ -64,33 +55,12 @@ export const CreateKindDialog = ({
       setIsInvalidName(!validInput);
       return validInput;
     },
-    [existingKinds]
+    [existingKinds],
   );
 
   const handleConfirm = () => {
-    const newUnknownCategory = generateUnknownCategory(name);
-    const kind: Kind = {
-      id: name,
-      categories: [...withContainedCategories, newUnknownCategory.id],
-      containing: withContainedThings,
-      unknownCategoryId: newUnknownCategory.id,
-    };
-
-    batch(() => {
-      dispatch(
-        dataSlice.actions.addCategories({
-          categories: [newUnknownCategory],
-          isPermanent: changesPermanent,
-        })
-      );
-
-      dispatch(
-        dataSlice.actions.addKinds({
-          kinds: [kind],
-          isPermanent: changesPermanent,
-        })
-      );
-    });
+    const { kind, unknownCategory } = generateKind(name, true);
+    storeDispatch(kind, unknownCategory);
     secondaryAction && secondaryAction();
 
     handleClose();

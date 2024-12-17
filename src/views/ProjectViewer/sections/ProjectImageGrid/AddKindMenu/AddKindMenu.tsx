@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { MenuItem, Typography } from "@mui/material";
 
 import { useDialogHotkey, useMobileView } from "hooks";
@@ -7,10 +7,13 @@ import { useDialogHotkey, useMobileView } from "hooks";
 import { BaseMenu } from "components/ui/BaseMenu";
 import { CreateKindDialog } from "components/dialogs";
 
+import { dataSlice } from "store/data";
 import { projectSlice } from "store/project";
 import { selectActiveKindId } from "store/project/selectors";
+import { selectAllKindIds } from "store/data/selectors";
 
 import { HotkeyContext } from "utils/common/enums";
+import { Category, Kind } from "store/data/types";
 
 export const AddKindMenu = ({
   anchor,
@@ -25,6 +28,8 @@ export const AddKindMenu = ({
 }) => {
   const dispatch = useDispatch();
   const activeKind = useSelector(selectActiveKindId);
+  const existingKinds = useSelector(selectAllKindIds);
+
   const isMobile = useMobileView();
   const {
     onOpen: handleOpenCreateKindDialog,
@@ -46,6 +51,21 @@ export const AddKindMenu = ({
   const handleCloseCreateKindDialogAndMenu = () => {
     handleCloseCreateKindDialog();
     onClose();
+  };
+  const addKind = (kind: Kind, newUnknownCategory: Category) => {
+    batch(() => {
+      dispatch(
+        dataSlice.actions.addCategories({
+          categories: [newUnknownCategory],
+        }),
+      );
+
+      dispatch(
+        dataSlice.actions.addKinds({
+          kinds: [kind],
+        }),
+      );
+    });
   };
   return (
     <>
@@ -78,7 +98,8 @@ export const AddKindMenu = ({
         onClose={handleCloseCreateKindDialogAndMenu}
         open={isCreateKindDialogOpen}
         secondaryAction={isMobile ? closeActiveKind : undefined}
-        changesPermanent={true}
+        storeDispatch={addKind}
+        existingKinds={existingKinds as string[]}
       />
     </>
   );

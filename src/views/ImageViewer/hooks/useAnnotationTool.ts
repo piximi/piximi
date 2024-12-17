@@ -1,15 +1,15 @@
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 
-import { StageContext } from "contexts";
+import { StageContext } from "views/ImageViewer/state/StageContext";
 import {
   selectPenSelectionBrushSize,
   selectQuickSelectionRegionSize,
   selectToolType,
   selectThresholdAnnotationValue,
-} from "store/annotator/selectors";
-import { selectActiveImage } from "store/imageViewer/reselectors";
+} from "views/ImageViewer/state/annotator/selectors";
+import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 
 import {
   AnnotationTool,
@@ -25,14 +25,14 @@ import {
   ThresholdAnnotationTool,
   SelectionTool,
   BlankAnnotationTool,
-} from "utils/annotator/tools";
+} from "views/ImageViewer/utils/tools";
 
-import { ToolType } from "utils/annotator/enums";
+import { ToolType } from "views/ImageViewer/utils/enums";
 
 export const useAnnotationTool = () => {
-  const [image, setImage] = useState<ImageJS.Image>();
+  const [image, setImage] = useState<IJSImage>();
   const [operator, setOperator] = useState<AnnotationTool>(
-    new BlankAnnotationTool()
+    new BlankAnnotationTool(),
   );
 
   const activeImage = useSelector(selectActiveImage);
@@ -45,7 +45,7 @@ export const useAnnotationTool = () => {
   useEffect(() => {
     if (!activeImage) return;
     const loadImage = async () => {
-      const image = await ImageJS.Image.load(activeImage.src, {
+      const image = await IJSImage.load(activeImage.src, {
         ignorePalette: true,
       });
       setImage(image);
@@ -77,7 +77,7 @@ export const useAnnotationTool = () => {
         ObjectAnnotationTool.compile(image).then(
           (operator: ObjectAnnotationTool) => {
             setOperator(operator);
-          }
+          },
         );
 
         return;

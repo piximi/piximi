@@ -236,18 +236,21 @@
     "kinds": [
       {
         "id": "clock",
+        "displayName": "clock",
         "categories": ["0125", "1125"],
         "containing": ["63258", "98145", "74147", "63058"],
         "unknownCategoryId": "0125"
       },
       {
         "id": "sports ball",
+        "displayName": "sports ball",
         "categories": ["0786"],
         "containing": ["58156"],
         "unknownCategoryId": "0786"
       },
       {
         "id": "sheep",
+        "displayName": "sheep",
         "categories": ["0848"],
         "containing": ["34681"],
         "unknownCategoryId": "0848"

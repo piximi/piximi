@@ -6,7 +6,7 @@ import {
 } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
-import { generateUUID } from "utils/common/helpers";
+import { generateKind } from "store/data/helpers";
 import { LoadInferenceDataArgs } from "../../types";
 import { Kind, ImageObject } from "store/data/types";
 import { LoadCB } from "utils/file-io/types";
@@ -26,9 +26,12 @@ export abstract class Stardist extends Segmenter {
 
   public abstract loadModel(): Promise<void>;
 
-  public loadTraining(images: ImageObject[], preprocessingArgs: any): void {}
+  public loadTraining(_images: ImageObject[], _preprocessingArgs: any): void {}
 
-  public loadValidation(images: ImageObject[], preprocessingArgs: any): void {}
+  public loadValidation(
+    _images: ImageObject[],
+    _preprocessingArgs: any,
+  ): void {}
 
   // This Stardist model requires image dimensions to be a multiple of 16
   // (for VHE in particular), see:
@@ -47,7 +50,7 @@ export abstract class Stardist extends Segmenter {
 
   public loadInference(
     images: ImageObject[],
-    preprocessingArgs: LoadInferenceDataArgs
+    preprocessingArgs: LoadInferenceDataArgs,
   ): void {
     this._inferenceDataDims = images.map((im) => {
       const { height, width } = im.shape;
@@ -58,27 +61,22 @@ export abstract class Stardist extends Segmenter {
     this._inferenceDataset = preprocessStardist(
       images,
       1,
-      this._inferenceDataDims
+      this._inferenceDataDims,
     );
 
     if (preprocessingArgs.kinds) {
       if (preprocessingArgs.kinds.length !== 1)
         throw Error(
-          `${this.name} Model only takes a single foreground category`
+          `${this.name} Model only takes a single foreground category`,
         );
       this._fgKind = preprocessingArgs.kinds[0];
     } else if (!this._fgKind) {
-      const unknownCategoryId = generateUUID({ definesUnknown: true });
-      this._fgKind = {
-        id: KIND_NAME,
-        categories: [unknownCategoryId],
-        containing: [],
-        unknownCategoryId,
-      };
+      const { kind } = generateKind(KIND_NAME, true);
+      this._fgKind = kind;
     }
   }
 
-  public async train(options: any, callbacks: any): Promise<History> {
+  public async train(_options: any, _callbacks: any): Promise<History> {
     if (!this.trainable) {
       throw new Error(`Training not supported for Model ${this.name}`);
     } else {
@@ -105,7 +103,7 @@ export abstract class Stardist extends Segmenter {
 
     if (!this._inferenceDataDims) {
       throw Error(
-        `"${this.name}" Model's inference data dimensions and padding information not loaded`
+        `"${this.name}" Model's inference data dimensions and padding information not loaded`,
       );
     }
 
@@ -120,13 +118,13 @@ export abstract class Stardist extends Segmenter {
         imTensor,
         this._fgKind!.id,
         this._fgKind!.unknownCategoryId,
-        this._inferenceDataDims![idx]
+        this._inferenceDataDims![idx],
       );
       annotations.push(annotObj);
       if (loadCb) {
         loadCb(
           (idx + 1) / infT.length,
-          `${idx + 1} of ${infT.length} images predicted`
+          `${idx + 1} of ${infT.length} images predicted`,
         );
       }
     }
@@ -134,7 +132,7 @@ export abstract class Stardist extends Segmenter {
     return annotations;
   }
 
-  public inferenceCategoriesById(catIds: Array<string>) {
+  public inferenceCategoriesById(_catIds: Array<string>) {
     return [];
   }
   public inferenceKindsById(kinds: string[]) {

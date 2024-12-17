@@ -15,7 +15,7 @@ export const PlotContainer = ({ children }: { children: ReactNode }) => {
     if (!plotRef.current) return;
     const data = parser.parseFromString(
       plotRef.current.innerHTML,
-      "image/svg+xml"
+      "image/svg+xml",
     );
     const errorNode = data.querySelector("parsererror");
     if (errorNode) {

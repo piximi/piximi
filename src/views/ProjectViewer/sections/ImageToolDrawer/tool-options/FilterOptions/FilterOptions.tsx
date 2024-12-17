@@ -23,17 +23,17 @@ export const FilterOptions = () => {
         dispatch(
           projectSlice.actions.removeThingCategoryFilters({
             categoryIds: [categoryId],
-          })
+          }),
         );
       } else {
         dispatch(
           projectSlice.actions.addThingCategoryFilters({
             categoryIds: [categoryId],
-          })
+          }),
         );
       }
     },
-    [dispatch, thingFilters.categoryId]
+    [dispatch, thingFilters.categoryId],
   );
 
   const toggleThingPartition = useCallback(
@@ -45,17 +45,17 @@ export const FilterOptions = () => {
         dispatch(
           projectSlice.actions.removeThingPartitionFilters({
             partitions: [partition],
-          })
+          }),
         );
       } else {
         dispatch(
           projectSlice.actions.addThingPartitionFilters({
             partitions: [partition],
-          })
+          }),
         );
       }
     },
-    [dispatch, thingFilters.partition]
+    [dispatch, thingFilters.partition],
   );
 
   return (

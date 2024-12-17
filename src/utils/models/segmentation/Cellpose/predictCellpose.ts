@@ -10,9 +10,9 @@ import {
 import { ColorModel, Image as ImageJS } from "image-js";
 import { hyphaWebsocketClient } from "imjoy-rpc";
 
-import { encode } from "utils/annotator";
+import { encode } from "views/ImageViewer/utils";
 import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
-import { generateUUID } from "utils/common/helpers";
+import { generateUUID } from "store/data/helpers";
 import { Partition } from "../../enums";
 
 const labelToAnnotation = async (
@@ -21,7 +21,7 @@ const labelToAnnotation = async (
   maskH: number,
   maskW: number,
   kindId: string,
-  unknownCategoryId: string
+  unknownCategoryId: string,
 ): Promise<OrphanedAnnotationObject> => {
   const labelFilter = tidy(() => onesLike(labelMask).mul(label));
 
@@ -98,7 +98,7 @@ const labelMaskToAnnotation = async (
   maskH: number,
   maskW: number,
   kindId: string,
-  unknownCategoryId: string
+  unknownCategoryId: string,
 ) => {
   const { values, indices } = unique(labelMask);
 
@@ -117,7 +117,7 @@ const labelMaskToAnnotation = async (
         maskH,
         maskW,
         kindId,
-        unknownCategoryId
+        unknownCategoryId,
       );
       annotations.push(annotation);
     }
@@ -134,12 +134,12 @@ export const predictCellpose = async (
   fgKindId: string,
   unknownCategoryId: string,
   service: string,
-  serverConfig: { name: string; server_url: string; passive: boolean }
+  serverConfig: { name: string; server_url: string; passive: boolean },
 ) => {
   const reshapedIm = tidy(() =>
     imTensor
       .reshape([imTensor.shape[1], imTensor.shape[2], imTensor.shape[3]])
-      .transpose([2, 0, 1])
+      .transpose([2, 0, 1]),
   );
 
   imTensor.dispose();
@@ -205,7 +205,7 @@ export const predictCellpose = async (
     imTensor.shape[1],
     imTensor.shape[2],
     fgKindId,
-    unknownCategoryId
+    unknownCategoryId,
   );
 
   return annotations;

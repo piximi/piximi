@@ -1,6 +1,6 @@
 import React from "react";
 
-import SettingsIcon from "@mui/icons-material/Settings";
+import { Settings as SettingsIcon } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 
@@ -11,7 +11,7 @@ import { HotkeyContext } from "utils/common/enums";
 
 export const SettingsListItem = () => {
   const { onClose, onOpen, open } = useDialogHotkey(
-    HotkeyContext.AppSettingsDialog
+    HotkeyContext.AppSettingsDialog,
   );
 
   return (

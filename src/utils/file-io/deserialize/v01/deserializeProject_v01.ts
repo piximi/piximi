@@ -26,13 +26,13 @@ import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
  */
 
 const deserializeAnnotationsGroup = async (
-  annotationsGroup: Group
+  annotationsGroup: Group,
 ): Promise<Array<OldAnnotationType>> => {
   const imageIds = (await getAttr(annotationsGroup, "image_id")) as string[];
 
   const categories = (await getAttr(
     annotationsGroup,
-    "annotation_category_id"
+    "annotation_category_id",
   )) as string[];
 
   const ids = (await getAttr(annotationsGroup, "annotation_id")) as string[];
@@ -44,7 +44,7 @@ const deserializeAnnotationsGroup = async (
   const maskLengths = await getDatasetSelection(
     annotationsGroup,
     "mask_length",
-    [null]
+    [null],
   ).then((ra) => ra.data as Uint8Array);
 
   const masks = await getDatasetSelection(annotationsGroup, "mask", [
@@ -55,7 +55,7 @@ const deserializeAnnotationsGroup = async (
     null,
   ]).then((ra) => ra.data as Uint8Array);
 
-  let annotations: Array<OldAnnotationType> = [];
+  const annotations: Array<OldAnnotationType> = [];
   let bboxIdx = 0;
   let maskIdx = 0;
   for (let i = 0; i < ids.length; i++) {
@@ -67,7 +67,7 @@ const deserializeAnnotationsGroup = async (
         number,
         number,
         number,
-        number
+        number,
       ],
       encodedMask: Array.from(masks.slice(maskIdx, maskIdx + maskLengths[i])),
       imageId: imageIds[i],
@@ -82,7 +82,7 @@ const deserializeAnnotationsGroup = async (
 
 const deserializeImageGroup = async (
   name: string,
-  imageGroup: Group
+  imageGroup: Group,
 ): Promise<OldImageType> => {
   const id = (await getAttr(imageGroup, "image_id")) as string;
   const activePlane = (await getAttr(imageGroup, "active_plane")) as number;
@@ -104,13 +104,13 @@ const deserializeImageGroup = async (
   const imageTensor = tensor4d(
     imageData,
     [planes, height, width, channels],
-    "float32"
+    "float32",
   );
   const src = await createRenderedTensor(
     imageTensor,
     colors,
     bitDepth,
-    activePlane
+    activePlane,
   );
 
   return {
@@ -141,12 +141,12 @@ const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
   const images: Array<OldImageType> = [];
 
   for (const [i, name] of Object.entries(imageNames)) {
-    // process.env.REACT_APP_LOG_LEVEL === "1" &&
+    // import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
     //   logger(`deserializing image ${+i + 1}/${imageNames.length}`);
 
     loadCb(
       +i / (imageNames.length - 1),
-      `deserializing image ${+i + 1}/${imageNames.length}`
+      `deserializing image ${+i + 1}/${imageNames.length}`,
     );
 
     const imageGroup = await getGroup(imagesGroup, name);
@@ -161,7 +161,7 @@ const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
 };
 
 const deserializeCategoriesGroup = async (
-  categoriesGroup: Group
+  categoriesGroup: Group,
 ): Promise<Array<OldCategory>> => {
   const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
   const colors = (await getAttr(categoriesGroup, "color")) as string[];
@@ -169,7 +169,7 @@ const deserializeCategoriesGroup = async (
 
   if (ids.length !== colors.length || ids.length !== names.length) {
     throw Error(
-      `Expected categories group "${categoriesGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`
+      `Expected categories group "${categoriesGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`,
     );
   }
 
@@ -188,7 +188,7 @@ const deserializeCategoriesGroup = async (
 
 const deserializeProjectGroup = async (
   projectGroup: Group,
-  loadCb: LoadCB
+  loadCb: LoadCB,
 ): Promise<{
   project: ProjectState;
   data: {
@@ -211,10 +211,10 @@ const deserializeProjectGroup = async (
 
   const annotationCategoriesGroup = await getGroup(
     projectGroup,
-    "annotationCategories"
+    "annotationCategories",
   );
   const annotationCategories = await deserializeCategoriesGroup(
-    annotationCategoriesGroup
+    annotationCategoriesGroup,
   );
 
   return {
@@ -229,7 +229,7 @@ const deserializeProjectGroup = async (
 
 export const deserializeProject_v01 = async (
   fileStore: CustomStore,
-  loadCb: LoadCB
+  loadCb: LoadCB,
 ) => {
   const rootGroup = await openGroup(fileStore, fileStore.rootName, "r");
 
@@ -242,7 +242,7 @@ export const deserializeProject_v01 = async (
   const segmenterGroup = await getGroup(rootGroup, "segmenter");
   const segmenter = await deserializeSegmenterGroup(segmenterGroup);
 
-  process.env.REACT_APP_LOG_LEVEL === "1" &&
+  import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
     logger(`closed ${fileStore.rootName}`);
 
   return {

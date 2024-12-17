@@ -1,8 +1,4 @@
-import {
-  CombinedState,
-  ListenerEffectAPI,
-  createListenerMiddleware,
-} from "@reduxjs/toolkit";
+import { ListenerEffectAPI, createListenerMiddleware } from "@reduxjs/toolkit";
 import { intersection } from "lodash";
 import Image from "image-js";
 
@@ -10,7 +6,6 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data/dataSlice";
 import { segmenterSlice } from "./segmenterSlice";
 
-import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import {
   getPropertiesFromImageSync,
   getStackTraceFromError,
@@ -33,16 +28,18 @@ import {
   Shape,
 } from "store/data/types";
 import {
-  AnnotatorState,
   AppDispatch,
   AppSettingsState,
   ClassifierState,
-  ImageViewerState,
   ProjectState,
   SegmenterState,
   TypedAppStartListening,
 } from "store/types";
 import { DataState } from "store/types";
+import {
+  AnnotatorState,
+  ImageViewerState,
+} from "views/ImageViewer/utils/types";
 import { LoadCB } from "utils/file-io/types";
 
 export const segmenterMiddleware = createListenerMiddleware();
@@ -51,7 +48,7 @@ const startAppListening =
   segmenterMiddleware.startListening as TypedAppStartListening;
 
 type StoreListemerAPI = ListenerEffectAPI<
-  CombinedState<{
+  {
     classifier: ClassifierState;
     segmenter: SegmenterState;
     imageViewer: ImageViewerState;
@@ -59,10 +56,17 @@ type StoreListemerAPI = ListenerEffectAPI<
     applicationSettings: AppSettingsState;
     annotator: AnnotatorState;
     data: DataState;
-  }>,
+  },
   AppDispatch,
   unknown
 >;
+
+startAppListening({
+  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
+  effect: (action, listenerAPI) => {
+    listenerAPI.dispatch(segmenterSlice.actions.resetSegmenter());
+  },
+});
 
 startAppListening({
   actionCreator: segmenterSlice.actions.updateModelStatus,
@@ -85,8 +89,8 @@ startAppListening({
 });
 
 const fitListener = async (
-  onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
-  listenerAPI: StoreListemerAPI
+  _onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
+  _listenerAPI: StoreListemerAPI,
 ) => {};
 
 const predictListener = async (listenerAPI: StoreListemerAPI) => {
@@ -100,12 +104,12 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   const fitOptions = segmenterState.fitOptions;
 
   /* KIND */
-  const imageKind = getCompleteEntity(dataState.kinds.entities["Image"]);
+  const imageKind = dataState.kinds.entities["Image"];
   if (!imageKind) {
     listenerAPI.dispatch(
       segmenterSlice.actions.updateModelStatus({
         modelStatus: previousModelStatus,
-      })
+      }),
     );
     return;
   }
@@ -113,17 +117,14 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   /* DATA */
   const kinds = dataState.kinds.ids.reduce((kinds: Kind[], id) => {
     if (id !== "Image") {
-      const kind = getCompleteEntity(dataState.kinds.entities[id]);
+      const kind = dataState.kinds.entities[id]!;
       if (kind) {
         kinds.push(kind);
       }
     }
     return kinds;
   }, []);
-  const imageIds = getDeferredProperty(
-    dataState.kinds.entities["Image"],
-    "containing"
-  );
+  const imageIds = dataState.kinds.entities["Image"]!.containing;
   const existingObjects: string[] = [];
   if (model.kind) {
     const fullKind = kinds.find((kind) => kind.id === model.kind);
@@ -132,7 +133,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     }
   }
   const inferenceImages = imageIds.reduce((infIms: ImageObject[], id) => {
-    const image = getCompleteEntity(dataState.things.entities[id]);
+    const image = dataState.things.entities[id]!;
 
     if (image && "containing" in image) {
       const containedObjects = image.containing;
@@ -149,7 +150,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       "Inference set is empty",
       listenerAPI,
       previousModelStatus,
-      `Images cannot have existing "${model.kind}" objects.`
+      `Images cannot have existing "${model.kind}" objects.`,
     );
 
     return;
@@ -169,20 +170,20 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       "Error in processing the inference data.",
       listenerAPI,
       previousModelStatus,
-      error as Error
+      error as Error,
     );
     return;
   }
 
   const progressCb: LoadCB = (
     progressPercent: number,
-    progressMessage: string
+    progressMessage: string,
   ) => {
     listenerAPI.dispatch(
       applicationSettingsSlice.actions.setLoadPercent({
         loadPercent: progressPercent,
         loadMessage: progressMessage,
-      })
+      }),
     );
   };
 
@@ -216,7 +217,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       "Error in running predictions",
       listenerAPI,
       previousModelStatus,
-      error as Error
+      error as Error,
     );
     progressCb(1, "");
     return;
@@ -227,8 +228,8 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       const uniquePredictedKinds = [
         ...new Set(
           predictedAnnotations.flatMap((imAnns) =>
-            imAnns.map((ann) => ann.kind as string)
-          )
+            imAnns.map((ann) => ann.kind as string),
+          ),
         ),
       ];
 
@@ -239,8 +240,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       listenerAPI.dispatch(
         dataSlice.actions.addKinds({
           kinds: generatedKinds,
-          isPermanent: true,
-        })
+        }),
       );
 
       const newUnknownCategories = generatedKinds.map((kind) => {
@@ -256,8 +256,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       listenerAPI.dispatch(
         dataSlice.actions.addCategories({
           categories: newUnknownCategories,
-          isPermanent: true,
-        })
+        }),
       );
     }
     const annotations: AnnotationObject[] = [];
@@ -295,15 +294,13 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
         annotations.push(ann as AnnotationObject);
       }
     }
-    listenerAPI.dispatch(
-      dataSlice.actions.addThings({ things: annotations, isPermanent: true })
-    );
+    listenerAPI.dispatch(dataSlice.actions.addThings({ things: annotations }));
   } catch (error) {
     await handleError(
       "Error converting predictions to Piximi types",
       listenerAPI,
       previousModelStatus,
-      error as Error
+      error as Error,
     );
     progressCb(1, "");
 
@@ -313,7 +310,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   listenerAPI.dispatch(
     segmenterSlice.actions.updateModelStatus({
       modelStatus: ModelStatus.Trained,
-    })
+    }),
   );
   progressCb(1, "");
 };
@@ -322,19 +319,19 @@ async function handleError(
   name: string,
   listenerAPI: StoreListemerAPI,
   previousModelStatus: ModelStatus,
-  description: string
+  description: string,
 ): Promise<void>;
 async function handleError(
   name: string,
   listenerAPI: StoreListemerAPI,
   previousModelStatus: ModelStatus,
-  error: Error
+  error: Error,
 ): Promise<void>;
 async function handleError(
   name: string,
   listenerAPI: StoreListemerAPI,
   previousModelStatus: ModelStatus,
-  descriptionOrError: string | Error
+  descriptionOrError: string | Error,
 ) {
   let description: string;
   let stackTrace: string | undefined = undefined;
@@ -355,7 +352,7 @@ async function handleError(
     stackTrace,
   };
 
-  if (process.env.NODE_ENV !== "production") {
+  if (import.meta.env.NODE_ENV !== "production") {
     console.error(description);
     if (stackTrace) {
       console.error(stackTrace);
@@ -365,11 +362,11 @@ async function handleError(
   listenerAPI.dispatch(
     applicationSettingsSlice.actions.updateAlertState({
       alertState: alertState,
-    })
+    }),
   );
   listenerAPI.dispatch(
     segmenterSlice.actions.updateModelStatus({
       modelStatus: previousModelStatus,
-    })
+    }),
   );
 }

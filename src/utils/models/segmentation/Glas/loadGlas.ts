@@ -1,15 +1,15 @@
 import { io, loadGraphModel } from "@tensorflow/tfjs";
 
 import GlasModel from "data/model-data/glas/model.json";
-//@ts-ignore
+//@ts-ignore: load bin
 import glasWeights1 from "data/model-data/glas/group1-shard1of5.bin";
-//@ts-ignore
+//@ts-ignore: load bin
 import glasWeights2 from "data/model-data//glas/group1-shard2of5.bin";
-//@ts-ignore
+//@ts-ignore: load bin
 import glasWeights3 from "data/model-data/glas/group1-shard3of5.bin";
-//@ts-ignore
+//@ts-ignore: load bin
 import glasWeights4 from "data/model-data//glas/group1-shard4of5.bin";
-//@ts-ignore
+//@ts-ignore: load bin
 import glasWeights5 from "data/model-data//glas/group1-shard5of5.bin";
 
 /*
@@ -68,8 +68,8 @@ export async function loadGlas() {
     });
   } catch (err) {
     const error: Error = err as Error;
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "1" &&
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
       console.error(`error loading stardist: ${error.message}`);
     throw err;
   }
@@ -83,15 +83,15 @@ export async function loadGlas() {
         modelWeights3,
         modelWeights4,
         modelWeights5,
-      ])
+      ]),
     );
 
     return model;
   } catch (err) {
     const error: Error = err as Error;
 
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "1" &&
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
       console.error(`error loading stardist: ${error.message}`);
 
     throw err;

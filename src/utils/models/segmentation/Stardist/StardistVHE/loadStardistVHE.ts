@@ -1,9 +1,9 @@
 import { io, loadGraphModel } from "@tensorflow/tfjs";
 
 import Stardist2DBrightfieldModel from "data/model-data/stardist-vhe/model.json";
-//@ts-ignore
+//@ts-ignore: load the .bin
 import Stardist2DBrightfieldWeights1 from "data/model-data/stardist-vhe/group1-shard1of2.bin";
-//@ts-ignore
+//@ts-ignore: load the .bin
 import Stardist2DBrightfieldWeights2 from "data/model-data//stardist-vhe/group1-shard2of2.bin";
 
 /*
@@ -29,7 +29,7 @@ export async function loadStardistVHE() {
       [JSON.stringify(Stardist2DBrightfieldModel)],
       {
         type: "application/json",
-      }
+      },
     );
     modelDescription = new File([model_desc_blob], "model.json", {
       type: "application/json",
@@ -48,23 +48,23 @@ export async function loadStardistVHE() {
     });
   } catch (err) {
     const error: Error = err as Error;
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "1" &&
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
       console.error(`error loading stardist H&E: ${error.message}`);
     throw err;
   }
 
   try {
     const model = await loadGraphModel(
-      io.browserFiles([modelDescription, modelWeights1, modelWeights2])
+      io.browserFiles([modelDescription, modelWeights1, modelWeights2]),
     );
 
     return model;
   } catch (err) {
     const error: Error = err as Error;
 
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "1" &&
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
       console.error(`error loading stardist H&E: ${error.message}`);
 
     throw err;

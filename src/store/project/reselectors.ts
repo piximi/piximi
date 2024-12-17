@@ -14,7 +14,8 @@ import {
   selectSelectedThingIds,
 } from "./selectors";
 
-import { isUnknownCategory, updateRecord } from "utils/common/helpers";
+import { updateRecordArray } from "utils/common/helpers";
+import { isUnknownCategory } from "store/data/helpers";
 
 import { CATEGORY_COLORS } from "utils/common/constants";
 import { Partition } from "utils/models/enums";
@@ -26,15 +27,15 @@ export const selectVisibleKinds = createSelector(
   selectAllKindIds,
   (filteredKinds, allKinds) => {
     return difference(allKinds, filteredKinds);
-  }
+  },
 );
 
 export const selectActiveKindObject = createSelector(
   selectActiveKindId,
   selectKindDictionary,
   (activeKind, kindDict) => {
-    return kindDict[activeKind];
-  }
+    return kindDict[activeKind]!;
+  },
 );
 
 export const selectActiveUnknownCategoryId = createSelector(
@@ -42,24 +43,24 @@ export const selectActiveUnknownCategoryId = createSelector(
   (activeKind) => {
     if (!activeKind) return;
     return activeKind.unknownCategoryId;
-  }
+  },
 );
 
 export const selectActiveCategories = createSelector(
   [selectKindDictionary, selectCategoriesDictionary, selectActiveKindId],
   (kindDict, categoriesDict, kind) => {
     if (!kindDict[kind]) return [];
-    const categoriesOfKind = kindDict[kind].categories;
+    const categoriesOfKind = kindDict[kind]!.categories;
 
-    return categoriesOfKind.map((catId) => categoriesDict[catId]);
-  }
+    return categoriesOfKind.map((catId) => categoriesDict[catId]!);
+  },
 );
 
 export const selectActiveKnownCategories = createSelector(
   selectActiveCategories,
   (activeCategories) => {
     return activeCategories.filter((cat) => !isUnknownCategory(cat.id));
-  }
+  },
 );
 
 export const selectActiveUnknownCategory = createSelector(
@@ -67,29 +68,29 @@ export const selectActiveUnknownCategory = createSelector(
   selectCategoriesDictionary,
   (unknownCatId, catDict) => {
     if (!unknownCatId) return;
-    return catDict[unknownCatId];
-  }
+    return catDict[unknownCatId]!;
+  },
 );
 
 export const selectActiveCategoryCount = createSelector(
   selectActiveCategories,
   (activeCategories) => {
     return activeCategories.length;
-  }
+  },
 );
 
 export const selectActiveKnownCategoryCount = createSelector(
   selectActiveKnownCategories,
   (activeKnownCategories) => {
     return activeKnownCategories.length;
-  }
+  },
 );
 
 export const selectActiveCategoryNames = createSelector(
   selectActiveCategories,
   (activeCategories) => {
     return activeCategories.map((cat) => cat.name);
-  }
+  },
 );
 
 export const selectActiveCategoryColors = createSelector(
@@ -97,11 +98,11 @@ export const selectActiveCategoryColors = createSelector(
   (activeCategories) => {
     const activeColors = activeCategories.map((cat) => cat.color.toUpperCase());
     const allCategoryColors = Object.values(CATEGORY_COLORS).map((color) =>
-      color.toUpperCase()
+      color.toUpperCase(),
     );
     const availableColors = difference(allCategoryColors, activeColors);
     return availableColors;
-  }
+  },
 );
 
 export const selectUnfilteredActiveCategoryIds = createSelector(
@@ -111,10 +112,10 @@ export const selectUnfilteredActiveCategoryIds = createSelector(
     const filteredCategories = thingFilters.categoryId;
     const unfilteredCategories = difference(
       activeCategories.map((cat) => cat.id),
-      filteredCategories
+      filteredCategories,
     );
     return unfilteredCategories;
-  }
+  },
 );
 
 export const selectActiveThingIds = createSelector(
@@ -122,14 +123,14 @@ export const selectActiveThingIds = createSelector(
   (kind) => {
     if (!kind) return [];
     return kind.containing;
-  }
+  },
 );
 
 export const selectActiveThings = createSelector(
   [selectActiveThingIds, selectThingsDictionary],
   (activeThingIds, thingDict) => {
-    return activeThingIds.map((thingId) => thingDict[thingId]);
-  }
+    return activeThingIds.map((thingId) => thingDict[thingId]!);
+  },
 );
 
 export const selectActiveLabeledThingsIds = createSelector(
@@ -139,16 +140,16 @@ export const selectActiveLabeledThingsIds = createSelector(
     if (!activeKind) return [];
     const thingsInKind = activeKind.containing;
     const unknownCategoryId = activeKind.unknownCategoryId;
-    const unknownThings = catDict[unknownCategoryId].containing;
+    const unknownThings = catDict[unknownCategoryId]!.containing;
     return difference(thingsInKind, unknownThings);
-  }
+  },
 );
 
 export const selectActiveLabeledThingsCount = createSelector(
   selectActiveLabeledThingsIds,
   (activeLabeledThings) => {
     return activeLabeledThings.length;
-  }
+  },
 );
 
 export const selectActiveLabeledThings = createSelector(
@@ -162,7 +163,7 @@ export const selectActiveLabeledThings = createSelector(
     }
 
     return activeLabeledThings;
-  }
+  },
 );
 
 export const selectActiveUnlabeledThingsIds = createSelector(
@@ -172,9 +173,9 @@ export const selectActiveUnlabeledThingsIds = createSelector(
     if (!activeKind) return [];
     const thingsInKind = activeKind.containing;
     const unknownCategoryId = activeKind.unknownCategoryId;
-    const unknownThings = catDict[unknownCategoryId].containing;
+    const unknownThings = catDict[unknownCategoryId]!.containing;
     return intersection(thingsInKind, unknownThings);
-  }
+  },
 );
 
 export const selectActiveUnlabeledThings = createSelector(
@@ -188,7 +189,7 @@ export const selectActiveUnlabeledThings = createSelector(
     }
 
     return activeLabeledThings;
-  }
+  },
 );
 
 export const selectActiveSelectedThingIds = createSelector(
@@ -196,7 +197,7 @@ export const selectActiveSelectedThingIds = createSelector(
   selectActiveThingIds,
   (selectedIds, activeIds) => {
     return intersection(activeIds, selectedIds);
-  }
+  },
 );
 
 export const selectActiveSelectedThings = createSelector(
@@ -211,11 +212,11 @@ export const selectActiveSelectedThings = createSelector(
         }
         return things;
       },
-      []
+      [],
     );
 
     return activeSelectedThings;
-  }
+  },
 );
 
 export const selectActiveThingsByPartition = createSelector(
@@ -224,26 +225,26 @@ export const selectActiveThingsByPartition = createSelector(
     const thingsByPartition = activeThings.reduce(
       (
         byPartition: Record<string, Array<ImageObject | ImageObject>>,
-        thing
+        thing,
       ) => {
         switch (thing.partition) {
           case Partition.Inference:
-            updateRecord(byPartition, Partition.Inference, thing);
+            updateRecordArray(byPartition, Partition.Inference, thing);
             break;
           case Partition.Training:
-            updateRecord(byPartition, Partition.Training, thing);
+            updateRecordArray(byPartition, Partition.Training, thing);
             break;
           case Partition.Unassigned:
-            updateRecord(byPartition, Partition.Unassigned, thing);
+            updateRecordArray(byPartition, Partition.Unassigned, thing);
             break;
           case Partition.Validation:
-            updateRecord(byPartition, Partition.Validation, thing);
+            updateRecordArray(byPartition, Partition.Validation, thing);
             break;
         }
         return byPartition;
       },
-      {}
+      {},
     );
     return thingsByPartition;
-  }
+  },
 );

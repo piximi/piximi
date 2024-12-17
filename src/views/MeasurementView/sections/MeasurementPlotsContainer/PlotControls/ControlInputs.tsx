@@ -13,7 +13,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
+import { HelpOutlineOutlined as HelpOutlineOutlinedIcon } from "@mui/icons-material";
 import type { ColorSchemeId } from "@nivo/colors";
 
 import { useMeasurementParameters, usePlotControl } from "../../../hooks";
@@ -42,7 +42,7 @@ export const ColorThemeSelect = () => {
           elementArray.push(
             <ListSubheader key={`color-space-${space.name}`}>
               {space.name}
-            </ListSubheader>
+            </ListSubheader>,
           );
           Object.values(space.themes).forEach((theme) => {
             elementArray.push(
@@ -61,21 +61,21 @@ export const ColorThemeSelect = () => {
                     ></span>
                   );
                 })}
-              </MenuItem>
+              </MenuItem>,
             );
           });
           return elementArray;
         },
-        []
+        [],
       ),
-    []
+    [],
   );
 
   const defaultValue = useMemo(() => "Select color theme", []);
 
   const inputValue = useMemo(
     () => selectedPlot.chartConfig.colorTheme ?? "",
-    [selectedPlot.chartConfig]
+    [selectedPlot.chartConfig],
   );
 
   const renderValue = useCallback((value: string) => {
@@ -110,14 +110,14 @@ export const PlotSelect = () => {
           </MenuItem>
         );
       }),
-    []
+    [],
   );
 
   const defaultValue = useMemo(() => "Select plot type", []);
 
   const inputValue = useMemo(
     () => selectedPlot.chartConfig.chart ?? "",
-    [selectedPlot.chartConfig]
+    [selectedPlot.chartConfig],
   );
   const renderValue = useCallback(
     (value: string) => {
@@ -127,7 +127,7 @@ export const PlotSelect = () => {
         return value;
       }
     },
-    [defaultValue]
+    [defaultValue],
   );
 
   return (
@@ -169,17 +169,17 @@ export const ChartMeasurementSelect = ({
           </MenuItem>
         );
       }),
-    [measurementPlotOptions, nullable]
+    [measurementPlotOptions, nullable],
   );
 
   const defaultValue = useMemo(
     () => (nullable ? "--" : `Select ${type} measurement`),
-    [nullable, type]
+    [nullable, type],
   );
 
   const inputValue = useMemo(
     () => selectedPlot.chartConfig[type]?.measurementType ?? "",
-    [type, selectedPlot.chartConfig]
+    [type, selectedPlot.chartConfig],
   );
 
   const renderValue = useCallback(
@@ -190,7 +190,7 @@ export const ChartMeasurementSelect = ({
         return value;
       }
     },
-    [defaultValue]
+    [defaultValue],
   );
   return (
     <ChartControlSelect
@@ -226,17 +226,17 @@ export const ChartSplitSelect = ({
           </MenuItem>
         );
       }),
-    [nullable]
+    [nullable],
   );
 
   const defaultValue = useMemo(
     () => (nullable ? "--" : `Select ${type} split`),
-    [nullable, type]
+    [nullable, type],
   );
 
   const inputValue = useMemo(
     () => selectedPlot.chartConfig[type] ?? "",
-    [type, selectedPlot.chartConfig]
+    [type, selectedPlot.chartConfig],
   );
 
   const renderValue = useCallback(
@@ -247,7 +247,7 @@ export const ChartSplitSelect = ({
         return value;
       }
     },
-    [defaultValue]
+    [defaultValue],
   );
 
   return (
@@ -369,7 +369,7 @@ const BoxPlotHelpTooltip = () => {
 
   const helpTextColor = useMemo(
     () => muiTheme.palette.getContrastText(muiTheme.palette.background.paper),
-    [muiTheme]
+    [muiTheme],
   );
   return (
     <svg

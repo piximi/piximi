@@ -1,9 +1,9 @@
 import { io, loadGraphModel } from "@tensorflow/tfjs";
 
 import Stardist2DFluorescenceModel from "data/model-data/stardist-fluo/model.json";
-//@ts-ignore
+//@ts-ignore: load the .bin
 import Stardist2DFluorescenceWeights1 from "data/model-data/stardist-fluo/group1-shard1of2.bin";
-//@ts-ignore
+//@ts-ignore: load the .bin
 import Stardist2DFluorescenceWeights2 from "data/model-data/stardist-fluo/group1-shard2of2.bin";
 
 /*
@@ -29,7 +29,7 @@ export async function loadStardistFluo() {
       [JSON.stringify(Stardist2DFluorescenceModel)],
       {
         type: "application/json",
-      }
+      },
     );
     modelDescription = new File([model_desc_blob], "model.json", {
       type: "application/json",
@@ -48,23 +48,23 @@ export async function loadStardistFluo() {
     });
   } catch (err) {
     const error: Error = err as Error;
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "1" &&
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
       console.error(`error loading stardist fluorescence: ${error.message}`);
     throw err;
   }
 
   try {
     const model = await loadGraphModel(
-      io.browserFiles([modelDescription, modelWeights1, modelWeights2])
+      io.browserFiles([modelDescription, modelWeights1, modelWeights2]),
     );
 
     return model;
   } catch (err) {
     const error: Error = err as Error;
 
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "1" &&
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
       console.error(`error loading stardist fluorescence: ${error.message}`);
 
     throw err;

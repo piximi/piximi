@@ -25,7 +25,7 @@ export const SplitTree = ({
   const handleSelect = (
     event: React.SyntheticEvent,
     newSelectedItems: string[],
-    oldeSelectedItems: string[] = selectedSplits
+    oldeSelectedItems: string[] = selectedSplits,
   ) => {
     if (measurementStatus.loading) return;
     const itemId = xor(newSelectedItems, oldeSelectedItems)[0];
@@ -37,14 +37,14 @@ export const SplitTree = ({
       updates,
       itemId,
       group.splitStates,
-      updatedSelectionState
+      updatedSelectionState,
     );
 
     dispatch(
       measurementsSlice.actions.updateGroupSplitState({
         groupId: group.id,
         updates,
-      })
+      }),
     );
   };
 

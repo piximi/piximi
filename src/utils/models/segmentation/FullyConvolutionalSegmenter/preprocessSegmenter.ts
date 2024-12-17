@@ -1,12 +1,5 @@
-// @ts-nocheck
-// TODO: post PR #407, fix for segmenter
+// @ts-nocheck: TODO - post PR #407, fix for segmenter
 import {
-  Tensor1D,
-  Tensor2D,
-  Tensor3D,
-  Tensor4D,
-  tensor2d,
-  tensor3d,
   util as tfutil,
   image as tfimage,
   data as tfdata,
@@ -14,8 +7,14 @@ import {
   scalar,
   stack,
   tidy,
+  Tensor1D,
+  Tensor2D,
+  Tensor3D,
+  Tensor4D,
+  tensor2d,
+  tensor3d,
 } from "@tensorflow/tfjs";
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 import {
   Category,
   DecodedAnnotationObject,
@@ -35,7 +34,7 @@ const drawSegmentationMask = async (
     annotations: DecodedAnnotationObject[];
     id: string;
     shape: Shape;
-  }
+  },
 ): Promise<{
   xs: Tensor3D;
   ys: Tensor3D;
@@ -45,7 +44,7 @@ const drawSegmentationMask = async (
     const segmentationMasks = encodeAnnotationToSegmentationMask(
       item.annotations,
       item.shape,
-      createdCategoriesIDs
+      createdCategoriesIDs,
     );
 
     return tensor3d(segmentationMasks);
@@ -63,7 +62,7 @@ const decodeFromOriginalSrc = async (
     annotations: DecodedAnnotationObject[];
     id: string;
     shape: Shape;
-  }
+  },
 ): Promise<{
   xs: Tensor3D;
   annotations: DecodedAnnotationObject[];
@@ -76,7 +75,7 @@ const decodeFromOriginalSrc = async (
     const channelPromise = tfutil
       .fetch(channelData)
       .then((fetched) => fetched.arrayBuffer())
-      .then((buffer) => ImageJS.Image.load(buffer))
+      .then((buffer) => IJSImage.load(buffer))
       .then((im) => {
         const canvas = im.getCanvas();
         let x2d: Tensor2D = tidy(() => {
@@ -95,7 +94,7 @@ const decodeFromOriginalSrc = async (
         return x2d as Tensor2D;
       })
       .catch((err) => {
-        process.env.NODE_ENV !== "production" && console.error(err);
+        import.meta.env.NODE_ENV !== "production" && console.error(err);
         return tensor2d([[]]);
       });
 
@@ -105,7 +104,7 @@ const decodeFromOriginalSrc = async (
   return Promise.all(channelPromises).then((channels) => {
     const x: Tensor3D = stack(
       channels,
-      2 // axis to stack on, producing tensor of dims: [height, width, channels]
+      2, // axis to stack on, producing tensor of dims: [height, width, channels]
     ) as Tensor3D;
 
     for (const c of channels) {
@@ -124,7 +123,7 @@ const decodeImage = async (
     annotations: DecodedAnnotationObject[];
     id: string;
     shape: Shape;
-  }
+  },
 ): Promise<{
   xs: Tensor3D;
   annotations: DecodedAnnotationObject[];
@@ -140,7 +139,7 @@ const decodeImage = async (
           annotations: DecodedAnnotationObject[];
           id: string;
           shape: Shape;
-        }
+        },
       )
     : decodeFromOriginalSrc(
         rescaleOptions,
@@ -149,7 +148,7 @@ const decodeImage = async (
           annotations: DecodedAnnotationObject[];
           id: string;
           shape: Shape;
-        }
+        },
       );
 };
 
@@ -185,7 +184,7 @@ const resize = async (
     xs: Tensor3D;
     ys: Tensor3D;
     id: string;
-  }
+  },
 ): Promise<{
   xs: Tensor3D;
   ys: Tensor3D;
@@ -218,7 +217,7 @@ export const preprocessSegmentationImages = async (
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
   fitOptions: FitOptions,
-  operation?: "training" | "validation" | "inference"
+  operation?: "training" | "validation" | "inference",
 ): Promise<
   | tfdata.Dataset<{
       xs: Tensor4D;
@@ -245,8 +244,8 @@ export const preprocessSegmentationImages = async (
       decodeImage.bind(
         null,
         inputShape.channels,
-        preprocessOptions.rescaleOptions
-      )
+        preprocessOptions.rescaleOptions,
+      ),
     )
     .mapAsync(drawSegmentationMask.bind(null, createdCategoriesIDs))
     .mapAsync(resize.bind(null, inputShape));

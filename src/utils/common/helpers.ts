@@ -1,27 +1,28 @@
 // ignore-no-logs
 
-import { v4 as uuidv4 } from "uuid";
 import StackTrace from "stacktrace-js";
 import { BitDepth, DataArray } from "utils/file-io/types";
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 import { tensor2d, image as tfImage } from "@tensorflow/tfjs";
-import {
-  availableImageSortKeys,
-  defaultImageSortKey,
-  UNKNOWN_IMAGE_CATEGORY_COLOR,
-} from "./constants";
+
+import { availableImageSortKeys, defaultImageSortKey } from "./constants";
 import { AlertType, ImageSortKey } from "./enums";
-import { FilterType, ImageSortKeyType, RecursivePartial } from "./types";
-import { Category, ImageObject, Shape, ShapeArray } from "store/data/types";
-import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
+
+import { ImageObject, Shape, ShapeArray } from "store/data/types";
+import {
+  DeferredEntity,
+  FilterType,
+  ImageSortKeyType,
+  RecursivePartial,
+} from "./types";
 
 /* 
   ERROR HANDLING / LOGGING
 */
 export const getStackTraceFromError = async (error: Error): Promise<string> => {
-  var stacktrace = error.stack ? error.stack : "";
+  let stacktrace = error.stack ? error.stack : "";
   try {
-    var stackFrames = await StackTrace.fromError(error);
+    const stackFrames = await StackTrace.fromError(error);
     stacktrace = stackFrames
       .map((stackFrame) => stackFrame.toString())
       .join("\n");
@@ -35,7 +36,7 @@ export const getStackTraceFromError = async (error: Error): Promise<string> => {
 export const createGitHubIssue = (
   title: string,
   body: string,
-  alertType: AlertType = AlertType.Error
+  alertType: AlertType = AlertType.Error,
 ) => {
   const label = alertType === AlertType.Error ? "bug" : "help%20wanted";
   const url =
@@ -50,7 +51,7 @@ export const createGitHubIssue = (
 
 export const logger = (
   message: any | any[],
-  options?: { level?: "log" | "warn" | "error"; dev?: boolean }
+  options?: { level?: "log" | "warn" | "error"; dev?: boolean },
 ) => {
   if (!options) {
     options = { level: "log" };
@@ -63,7 +64,7 @@ export const logger = (
     message = message.join("");
   }
   if (options?.dev) {
-    if (process.env.NODE_ENV !== "production") {
+    if (import.meta.env.NODE_ENV !== "production") {
       switch (options.level) {
         case "log":
           console.log(message);
@@ -96,18 +97,22 @@ export const logger = (
 };
 
 /* 
-  ARRAY HELPERS
+  ARRAY / OBJECT HELPERS
 */
 
+export const isObjectEmpty = <T extends object>(obj: T) => {
+  return Object.keys(obj).length === 0;
+};
+
 export const enumKeys = <O extends object, K extends keyof O = keyof O>(
-  obj: O
+  obj: O,
 ): K[] => {
   return Object.keys(obj).filter((k) => Number.isNaN(+k)) as K[];
 };
 
 export const mutatingFilter = <T>(
   array: Array<T>,
-  condition: (arg: T) => boolean
+  condition: (arg: T) => boolean,
 ): void => {
   for (let l = array.length - 1; l >= 0; l -= 1) {
     if (!condition(array[l])) array.splice(l, 1);
@@ -120,7 +125,7 @@ export const toUnique = <T>(array: T[]): T[] => {
 
 export const isFiltered = <T extends object>(
   object: T,
-  filters: FilterType<T>
+  filters: FilterType<T>,
 ): boolean => {
   return Object.keys(object).some((key) => {
     const itemValue = object[key as keyof T];
@@ -137,7 +142,7 @@ export const isFiltered = <T extends object>(
 
 export const filterObjects = <T extends object>(
   objectArr: T[],
-  filters: FilterType<T>
+  filters: FilterType<T>,
 ): T[] => {
   return objectArr.filter((item) => {
     return Object.keys(item).every((key) => {
@@ -154,20 +159,29 @@ export const filterObjects = <T extends object>(
   });
 };
 
-export const recursiveAssign = <T extends object>(
+export const copyValues = <T extends object>(
   existingObject: T,
-  updates: RecursivePartial<T>
+  updates: Partial<T>,
 ) => {
   Object.entries(updates).forEach(([key, value]) => {
+    existingObject[key as keyof T] = value as T[keyof T];
+  });
+};
+
+export const recursiveAssign = <T extends object>(
+  existingObject: T,
+  updates: RecursivePartial<T>,
+) => {
+  Object.entries(updates).forEach(([key, _value]) => {
     if (typeof existingObject[key as keyof T] === "object") {
       recursiveAssign(
         existingObject[key as keyof T] as object,
-        updates[key as keyof T]!
+        updates[key as keyof T]!,
       );
     } else {
       Object.assign(
         existingObject[key as keyof T] as object,
-        updates[key as keyof T]!
+        updates[key as keyof T]!,
       );
     }
   });
@@ -210,36 +224,31 @@ export const capitalize = (input: string) => {
   return capitalized.join(" ");
 };
 
-/*
-  CATEGORY HELPERS
-*/
+export const sortTypeByKey = (key: ImageSortKey): ImageSortKeyType => {
+  const sortKeyIdx = availableImageSortKeys
+    .map((e) => e.imageSortKey)
+    .indexOf(key);
 
-export const generateUUID = (options?: { definesUnknown: boolean }) => {
-  let id = uuidv4();
-  let unknownFlag: string;
-  if (options?.definesUnknown) {
-    unknownFlag = "0";
+  if (sortKeyIdx >= 0) {
+    return availableImageSortKeys[sortKeyIdx];
   } else {
-    unknownFlag = "1";
+    return defaultImageSortKey;
   }
-  return unknownFlag + id.slice(1);
 };
 
-export const isUnknownCategory = (categoryId: string) => {
-  return categoryId[0] === "0";
-};
-
-export const generateUnknownCategory = (kind: string) => {
-  const unknownCategoryId = generateUUID({ definesUnknown: true });
-  const unknownCategory: Category = {
-    id: unknownCategoryId,
-    name: UNKNOWN_CATEGORY_NAME,
-    color: UNKNOWN_IMAGE_CATEGORY_COLOR,
-    containing: [],
-    kind: kind,
-    visible: true,
-  };
-  return unknownCategory;
+export const updateRecordArray = <T extends string | number | symbol, K>(
+  record: Record<T, K[]>,
+  key: T,
+  value: K | K[],
+) => {
+  if (!Array.isArray(value)) {
+    value = [value];
+  }
+  if (key in record) {
+    record[key].push(...value);
+  } else {
+    record[key] = [...value];
+  }
 };
 
 /*
@@ -250,7 +259,8 @@ export class PseudoFileList {
   private _files: File[];
 
   constructor(files: File[]) {
-    let self = this;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
     this._files = files;
 
     return new Proxy(this, {
@@ -261,6 +271,7 @@ export class PseudoFileList {
           return Reflect.get(target, prop);
         }
       },
+      // @ts-ignore only sort-of satisfies it, like when we use it
     }) satisfies FileList;
   }
 
@@ -310,7 +321,7 @@ export const getInnerElementWidth = (el: HTMLElement) => {
  */
 export const replaceDuplicateName = (
   newName: string,
-  existingNames: Array<string>
+  existingNames: Array<string>,
 ) => {
   let currentName = newName;
   let i = 1;
@@ -324,14 +335,14 @@ export const replaceDuplicateName = (
 //HACK: new
 export const newReplaceDuplicateName = (
   newName: string,
-  existingNames: Array<string>
+  existingNames: Array<string>,
 ) => {
-  let currentName = newName;
+  const currentName = newName;
   let count = 0;
   // eslint-disable-next-line
   const nameRe = new RegExp(`${newName}(_\d+)?`, "g");
   existingNames.forEach((name) => {
-    if (!!nameRe.exec(name)) {
+    if (nameRe.exec(name)) {
       const suffix = +name.split("_")[1];
       if (suffix > count) {
         count = suffix;
@@ -343,7 +354,7 @@ export const newReplaceDuplicateName = (
 
 export const scaleUpRange = (
   range: [number, number],
-  bitDepth: BitDepth
+  bitDepth: BitDepth,
 ): [number, number] => {
   return [
     Math.floor(range[0] * (2 ** bitDepth - 1)),
@@ -354,9 +365,9 @@ export const scaleUpRange = (
 export const scaleUpRanges = (
   ranges: { [channel: number]: [number, number] },
   bitDepth: BitDepth,
-  opts: { inPlace: boolean } = { inPlace: false }
+  opts: { inPlace: boolean } = { inPlace: false },
 ): { [channel: number]: [number, number] } => {
-  let operandRanges = opts.inPlace ? ranges : { ...ranges };
+  const operandRanges = opts.inPlace ? ranges : { ...ranges };
 
   for (const ch of Object.keys(ranges)) {
     const chKey = parseInt(ch);
@@ -368,7 +379,7 @@ export const scaleUpRanges = (
 
 export const scaleDownRange = (
   range: [number, number],
-  bitDepth: BitDepth
+  bitDepth: BitDepth,
 ): [number, number] => {
   return [range[0] / (2 ** bitDepth - 1), range[1] / (2 ** bitDepth - 1)];
 };
@@ -376,9 +387,9 @@ export const scaleDownRange = (
 export const scaleDownRanges = (
   ranges: { [channel: number]: [number, number] },
   bitDepth: BitDepth,
-  opts: { inPlace: boolean } = { inPlace: false }
+  opts: { inPlace: boolean } = { inPlace: false },
 ): { [channel: number]: [number, number] } => {
-  let operandRanges = opts.inPlace ? ranges : { ...ranges };
+  const operandRanges = opts.inPlace ? ranges : { ...ranges };
 
   for (const ch of Object.keys(ranges)) {
     const chKey = parseInt(ch);
@@ -406,7 +417,7 @@ export const extractMinMax = (ranges: {
 
 export const convertToDataArray = (
   depth: number,
-  source: DataArray | Array<number>
+  source: DataArray | Array<number>,
 ): DataArray => {
   switch (depth) {
     case 1:
@@ -424,9 +435,9 @@ export const convertToDataArray = (
 
 export const getPropertiesFromImage = async (
   image: ImageObject,
-  annotation: { boundingBox: number[] }
+  annotation: { boundingBox: [number, number, number, number] },
 ) => {
-  const renderedIm = await ImageJS.Image.load(image.src);
+  const renderedIm = await IJSImage.load(image.src);
   const normalizingWidth = image.shape.width - 1;
   const normalizingHeight = image.shape.height - 1;
   const bbox = annotation.boundingBox;
@@ -455,9 +466,9 @@ export const getPropertiesFromImage = async (
 };
 
 export const getPropertiesFromImageSync = (
-  renderedIm: ImageJS.Image,
+  renderedIm: IJSImage,
   image: ImageObject,
-  annotation: { boundingBox: number[] }
+  annotation: { boundingBox: number[] },
 ) => {
   const normalizingWidth = image.shape.width - 1;
   const normalizingHeight = image.shape.height - 1;
@@ -488,7 +499,7 @@ export const getPropertiesFromImageSync = (
   };
 };
 const componentToHex = (c: number) => {
-  var hex = (c * 255).toString(16);
+  const hex = (c * 255).toString(16);
   return hex.length === 1 ? "0" + hex : hex;
 };
 
@@ -501,30 +512,15 @@ export const rgbToHex = (rgb: [number, number, number]) => {
   );
 };
 
-export const sortTypeByKey = (key: ImageSortKey): ImageSortKeyType => {
-  const sortKeyIdx = availableImageSortKeys
-    .map((e) => e.imageSortKey)
-    .indexOf(key);
-
-  if (sortKeyIdx >= 0) {
-    return availableImageSortKeys[sortKeyIdx];
-  } else {
-    return defaultImageSortKey;
-  }
-};
-
-export const updateRecord = <T extends string | number | symbol, K>(
-  record: Record<T, K[]>,
-  key: T,
-  value: K
-) => {
-  if (key in record) {
-    record[key].push(value);
-  } else {
-    record[key] = [value];
-  }
-};
-
-export const isObjectEmpty = <T extends Object>(obj: T) => {
-  return Object.keys(obj).length === 0;
-};
+export function getCompleteEntity<T>(entity: DeferredEntity<T>): T | undefined {
+  if (entity.changes.deleted) return;
+  const {
+    added: _added,
+    deleted: _deleted,
+    ...completeEntity
+  } = {
+    ...entity.saved,
+    ...entity.changes,
+  };
+  return completeEntity as T;
+}
