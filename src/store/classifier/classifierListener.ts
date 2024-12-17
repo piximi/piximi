@@ -95,6 +95,13 @@ const handleError = async (
 };
 
 startAppListening({
+  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
+  effect: (action, listenerAPI) => {
+    listenerAPI.dispatch(classifierSlice.actions.resetClassifier());
+  },
+});
+
+startAppListening({
   actionCreator: classifierSlice.actions.updateModelStatus,
   effect: async (action, listenerAPI) => {
     listenerAPI.unsubscribe();
