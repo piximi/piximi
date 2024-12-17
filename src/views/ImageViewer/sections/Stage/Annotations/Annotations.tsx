@@ -76,6 +76,7 @@ export const Annotations = ({ annotationTool }: AnnotationsProps) => {
             key={`tr-${workingAnnotationObject.annotation.id}`}
             annotationId={workingAnnotationObject.annotation.id}
             annotationTool={annotationTool}
+            hasControl={true}
           />
         </>
       )}

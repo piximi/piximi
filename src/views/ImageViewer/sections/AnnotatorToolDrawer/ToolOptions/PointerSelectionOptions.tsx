@@ -1,13 +1,17 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useMemo, useState } from "react";
+import { batch, useDispatch, useSelector } from "react-redux";
 
-import { Divider, List, SvgIcon } from "@mui/material";
+import { Collapse, Divider, IconButton, List, SvgIcon } from "@mui/material";
 import { Label as LabelIcon } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
 
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
-import { CollapsibleListItem } from "components/ui/CollapsibleListItem";
+
+import {
+  KeyboardArrowRight as KeyboardArrowRightIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+} from "@mui/icons-material";
 
 import { imageViewerSlice } from "store/imageViewer";
 import { selectAllCategories } from "store/data/selectors";
@@ -16,6 +20,8 @@ import { selectActiveAnnotations } from "store/imageViewer/reselectors";
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 
 import { OldCategory } from "store/data/types";
+import { groupBy } from "lodash";
+import { DividerHeader, FunctionalDivider } from "components/ui/DividerHeader";
 
 export const PointerSelectionOptions = () => {
   const t = useTranslation();
@@ -24,6 +30,13 @@ export const PointerSelectionOptions = () => {
 
   const activeAnnotations = useSelector(selectActiveAnnotations);
   const annotationCategories = useSelector(selectAllCategories);
+  const [showCategories, setShowCategories] = useState(false);
+  const groupedCategories = useMemo(() => {
+    const objectCategories = annotationCategories.filter(
+      (cat) => cat.kind !== "Image"
+    );
+    return Object.entries(groupBy(objectCategories, "kind"));
+  }, [annotationCategories]);
 
   const handleSelectAll = () => {
     dispatch(imageViewerSlice.actions.setAllSelectedAnnotationIds({}));
@@ -42,7 +55,7 @@ export const PointerSelectionOptions = () => {
   };
 
   const handleSelectCategory = (categoryId: string) => {
-    const desiredAnnotationIds = activeAnnotations.reduce(
+    const annotationIds = activeAnnotations.reduce(
       (ids: string[], annotation) => {
         if (annotation.categoryId === categoryId) {
           ids.push(annotation.id);
@@ -51,12 +64,23 @@ export const PointerSelectionOptions = () => {
       },
       []
     );
-    dispatch(
-      imageViewerSlice.actions.setSelectedAnnotationIds({
-        annotationIds: desiredAnnotationIds,
-        workingAnnotationId: desiredAnnotationIds[0],
-      })
-    );
+    batch(() => {
+      dispatch(
+        imageViewerSlice.actions.setSelectedAnnotationIds({
+          annotationIds: annotationIds,
+          workingAnnotationId: annotationIds[0],
+        })
+      );
+      dispatch(
+        imageViewerSlice.actions.setWorkingAnnotation({
+          annotation: annotationIds[0],
+        })
+      );
+    });
+  };
+
+  const handleToggleCategories = () => {
+    setShowCategories(!showCategories);
   };
 
   return (
@@ -86,29 +110,58 @@ export const PointerSelectionOptions = () => {
           dense
         />
 
-        <Divider />
+        <FunctionalDivider
+          headerText={t("Select by Category")}
+          actions={
+            <IconButton onClick={handleToggleCategories}>
+              {showCategories ? (
+                <KeyboardArrowDownIcon fontSize="small" />
+              ) : (
+                <KeyboardArrowRightIcon fontSize="small" />
+              )}
+            </IconButton>
+          }
+        />
 
-        <CollapsibleListItem
-          beginCollapsed
-          primaryText={t("Select by Category")}
-          carotPosition="start"
-          dense
-        >
-          <List>
-            {annotationCategories.map((category: OldCategory, idx: number) => {
-              return (
-                <CustomListItemButton
-                  key={idx}
-                  primaryText={category.name}
-                  onClick={() => handleSelectCategory(category.id)}
-                  icon={<LabelIcon style={{ color: category.color }} />}
-                  dense
-                  disableGutters
-                />
-              );
-            })}
-          </List>
-        </CollapsibleListItem>
+        <Collapse in={showCategories} sx={{ px: 1 }}>
+          {groupedCategories.map(([kind, categories]) => {
+            return (
+              <React.Fragment key={kind}>
+                <DividerHeader
+                  key={kind}
+                  typographyVariant="body2"
+                  textAlign="left"
+                >
+                  {kind}
+                </DividerHeader>
+                <List sx={{ pl: 4 }}>
+                  {categories.map((category: OldCategory, idx: number) => {
+                    return (
+                      <CustomListItemButton
+                        key={`${kind}-${idx}`}
+                        primaryText={category.name}
+                        onClick={() => handleSelectCategory(category.id)}
+                        icon={
+                          <LabelIcon
+                            sx={{ color: category.color }}
+                            fontSize="small"
+                          />
+                        }
+                        sx={{
+                          "& .MuiListItemIcon-root": {
+                            minWidth: 25,
+                          },
+                        }}
+                        dense
+                        disableGutters
+                      />
+                    );
+                  })}
+                </List>
+              </React.Fragment>
+            );
+          })}
+        </Collapse>
       </List>
     </>
   );
