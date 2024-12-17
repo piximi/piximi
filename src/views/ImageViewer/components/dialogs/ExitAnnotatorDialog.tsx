@@ -44,7 +44,7 @@ export const ExitAnnotatorDialog = ({
         }),
       );
       dispatch(
-        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
+        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined })
       );
       dispatch(annotatorSlice.actions.resetAnnotator());
     });
@@ -67,7 +67,7 @@ export const ExitAnnotatorDialog = ({
         }),
       );
       dispatch(
-        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
+        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined })
       );
       dispatch(annotatorSlice.actions.resetAnnotator());
     });

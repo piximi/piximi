@@ -4,8 +4,8 @@ import { useSelector } from "react-redux";
 import { Annotation } from "./Annotation";
 import { AnnotationTransformer } from "./AnnotationTransformer";
 
-import { selectImageViewerFilters } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectSelectedAnnotationIds } from "views/ImageViewer/state/annotator/selectors";
+import { selectImageViewerFilters } from "store/imageViewer/selectors";
+import { selectSelectedAnnotationIds } from "store/annotator/selectors";
 import {
   selectActiveAnnotationsViews,
   selectWorkingAnnotationView,

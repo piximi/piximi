@@ -1,11 +1,10 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
-import { annotatorSlice } from "../annotator";
-import { dataSlice } from "store/data";
-import { applicationSettingsSlice } from "store/applicationSettings";
+import { annotatorSlice } from "store/annotator";
 import { imageViewerSlice } from "./imageViewerSlice";
 
+import { getCompleteEntity } from "store/entities/utils";
 import { createRenderedTensor } from "utils/common/tensorHelpers";
 
 import { AnnotationObject, ImageObject } from "store/data/types";
@@ -110,7 +109,7 @@ startAppListening({
       imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs }),
     );
     listenerAPI.dispatch(
-      imageViewerSlice.actions.setImageIsLoading({ isLoading: false }),
+      imageViewerSlice.actions.setImageIsLoading({ isLoading: false })
     );
   },
 });

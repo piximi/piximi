@@ -1,14 +1,9 @@
 import {
-  createEntityAdapter,
-  createSlice,
-  Draft,
-  EntityState,
-  PayloadAction,
-} from "@reduxjs/toolkit";
-import { dispose, TensorContainer } from "@tensorflow/tfjs";
-import { difference, intersection } from "lodash";
-
-import {
+  copyValues,
+  generateUnknownCategory,
+  generateUUID,
+  isObjectEmpty,
+  isUnknownCategory,
   mutatingFilter,
   newReplaceDuplicateName,
   updateRecordArray,
@@ -1137,6 +1132,139 @@ export const dataSlice = createSlice({
         type: "updateThingContents",
         payload: { changes: imageChangesArray },
       });
+    },
+
+    reconcile(
+      state,
+      action: PayloadAction<{
+        keepChanges: boolean;
+      }>
+    ) {
+      if (action.payload.keepChanges) {
+        dataSlice.caseReducers.keepChanges(state);
+      } else {
+        dataSlice.caseReducers.revertChanges(state);
+      }
+    },
+
+    revertChanges(state) {
+      const kindsToRemove = [];
+      const categoriesToRemove = [];
+      const thingsToRemove = [];
+      for (const id of state.kinds.ids) {
+        const kind = state.kinds.entities[id];
+        if (!kind.changes) continue;
+        if ("added" in kind.changes) {
+          kindsToRemove.push(id);
+          delete state.kinds.entities[id];
+        } else {
+          kind.changes = {};
+        }
+      }
+      state.kinds.ids = updateContents(
+        [...state.kinds.ids] as string[],
+        kindsToRemove as string[],
+        "remove"
+      );
+      for (const id of state.categories.ids) {
+        const category = state.categories.entities[id];
+        if (!category.changes) continue;
+        if ("added" in category.changes) {
+          categoriesToRemove.push(id);
+          delete state.categories.entities[id];
+        } else {
+          category.changes = {};
+        }
+      }
+      state.categories.ids = updateContents(
+        [...state.categories.ids] as string[],
+        categoriesToRemove as string[],
+        "remove"
+      );
+      for (const id of state.things.ids) {
+        const thing = state.things.entities[id];
+        if (!thing.changes) continue;
+        if ("added" in thing.changes) {
+          dispose(thing.saved.data as TensorContainer);
+          dispose(thing.changes.data as TensorContainer);
+          thingsToRemove.push(id);
+          delete state.things.entities[id];
+        } else {
+          dispose(thing.changes.data as TensorContainer);
+          thing.changes = {};
+        }
+      }
+      state.things.ids = updateContents(
+        [...state.things.ids] as string[],
+        thingsToRemove as string[],
+        "remove"
+      );
+    },
+    keepChanges(state) {
+      const kindsToRemove = [];
+      const categoriesToRemove = [];
+      const thingsToRemove = [];
+      for (const id of state.kinds.ids) {
+        const kind = state.kinds.entities[id];
+
+        if (!kind.changes) continue;
+        if ("deleted" in kind.changes) {
+          kindsToRemove.push(id);
+          continue;
+        } else {
+          let { added, deleted, ...preparedDeferred } = kind.changes;
+          Object.assign(kind.saved, preparedDeferred);
+          kind.changes = {};
+        }
+      }
+      state.kinds.ids = updateContents(
+        [...state.kinds.ids] as string[],
+        kindsToRemove as string[],
+        "remove"
+      );
+      for (const id of state.categories.ids) {
+        const category = state.categories.entities[id];
+        if (!category.changes) continue;
+        if ("deleted" in category.changes) {
+          categoriesToRemove.push(id);
+          delete state.categories.entities[id];
+        } else {
+          let { added, deleted, ...preparedDeferred } = category.changes;
+          Object.assign(category.saved, preparedDeferred);
+          category.changes = {};
+        }
+      }
+      state.categories.ids = updateContents(
+        [...state.categories.ids] as string[],
+        categoriesToRemove as string[],
+        "remove"
+      );
+      for (const id of state.things.ids) {
+        let thing = state.things.entities[id];
+        if (isObjectEmpty(thing.changes)) continue;
+        if (thing.saved.kind === "Image") {
+          thing = state.things.entities[id] as DeferredEntity<ImageObject>;
+        } else {
+          thing = state.things.entities[id] as DeferredEntity<AnnotationObject>;
+        }
+
+        if ("deleted" in thing.changes) {
+          dispose(thing.saved.data as TensorContainer);
+          dispose(thing.changes.data as TensorContainer);
+          thingsToRemove.push(id);
+          delete state.things.entities[id];
+        } else {
+          let { added, deleted, ...preparedDeferred } = thing.changes;
+
+          copyValues(thing.saved, preparedDeferred);
+          thing.changes = {};
+        }
+      }
+      state.things.ids = updateContents(
+        [...state.things.ids] as string[],
+        thingsToRemove as string[],
+        "remove"
+      );
     },
   },
 });
