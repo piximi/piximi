@@ -5,15 +5,14 @@ import { Delete as DeleteIcon } from "@mui/icons-material";
 
 import { useDialogHotkey, useTranslation } from "hooks";
 
-import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
+import { ConfirmationDialog } from "components/dialogs";
+import { CustomListItemButton } from "components/ui";
 
 import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
-import {
-  selectActiveAnnotationIds,
-  selectSelectedAnnotationIds,
-} from "store/imageViewer/selectors";
+import { annotatorSlice } from "store/annotator";
+import { selectSelectedAnnotationIds } from "store/annotator/selectors";
+import { selectActiveAnnotationIds } from "store/imageViewer/selectors";
 
 import { HotkeyContext } from "utils/common/enums";
 
@@ -39,8 +38,9 @@ export const ClearAnnotationsGroup = () => {
     batch(() => {
       if (deleteOp === "ALL") {
         dispatch(
-          imageViewerSlice.actions.removeSelectedAnnotationIds({
-            annotationIds: activeAnnotationsIds,
+          annotatorSlice.actions.setSelectedAnnotationIds({
+            annotationIds: [],
+            workingAnnotationId: undefined,
           })
         );
         dispatch(
@@ -61,8 +61,9 @@ export const ClearAnnotationsGroup = () => {
           })
         );
         dispatch(
-          imageViewerSlice.actions.removeSelectedAnnotationIds({
-            annotationIds: selectedAnnotationIds,
+          annotatorSlice.actions.setSelectedAnnotationIds({
+            annotationIds: [],
+            workingAnnotationId: undefined,
           })
         );
         dispatch(
@@ -73,7 +74,7 @@ export const ClearAnnotationsGroup = () => {
         );
       }
       dispatch(
-        imageViewerSlice.actions.setWorkingAnnotation({
+        annotatorSlice.actions.setWorkingAnnotation({
           annotation: undefined,
         })
       );

@@ -11,17 +11,15 @@ import { imageViewerSlice } from "store/imageViewer";
 import { annotatorSlice } from "store/annotator";
 import { dataSlice } from "store/data";
 import {
-  selectActiveImage,
-  selectSelectedAnnotations,
-} from "store/imageViewer/reselectors";
-import {
   selectActiveAnnotationIds,
   selectActiveImageId,
   selectCursor,
   selectImageOrigin,
-  selectWorkingAnnotation,
 } from "store/imageViewer/selectors";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
+import { selectWorkingAnnotation } from "store/annotator/selectors";
+import { selectSelectedAnnotations } from "store/annotator/reselectors";
+import { selectActiveImage } from "store/imageViewer/reselectors";
 
 import { AnnotationTool } from "utils/annotator/tools";
 
@@ -85,7 +83,7 @@ export const AnnotationTransformer = ({
     annotationTool.deselect();
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.setWorkingAnnotation({
+        annotatorSlice.actions.setWorkingAnnotation({
           annotation: undefined,
         })
       );
@@ -96,7 +94,7 @@ export const AnnotationTransformer = ({
       );
 
       dispatch(
-        imageViewerSlice.actions.setSelectedAnnotationIds({
+        annotatorSlice.actions.setSelectedAnnotationIds({
           annotationIds: [],
           workingAnnotationId: undefined,
         })

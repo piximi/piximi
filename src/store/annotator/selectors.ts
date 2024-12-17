@@ -52,3 +52,24 @@ export const selectToolType = ({
 }): ToolType => {
   return annotator.toolType;
 };
+export const selectWorkingAnnotationId = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}): string | undefined => {
+  return annotator.workingAnnotationId;
+};
+export const selectWorkingAnnotation = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}) => {
+  return annotator.workingAnnotation;
+};
+export const selectSelectedAnnotationIds = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}): string[] => {
+  return annotator.selectedAnnotationIds;
+};
