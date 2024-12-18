@@ -24,7 +24,7 @@ import {
   DividerHeader,
 } from "components/ui";
 
-import { StageContext } from "contexts";
+import { StageContext } from "views/ImageViewer/state/StageContext";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 import {
