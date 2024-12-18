@@ -41,7 +41,6 @@ import { ImageCategoryMenu } from "./ImageCategoryMenu";
 
 import { projectSlice } from "store/project";
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
 import { selectActiveKindId, selectProjectName } from "store/project/selectors";
 
@@ -93,13 +92,11 @@ export const ProjectAppBar = () => {
   };
 
   const handleNavigateImageViewer = () => {
-    dispatch(
-      imageViewerSlice.actions.prepareImageViewer({
-        selectedThingIds: allSelectedThingIds,
-      })
-    );
-
-    navigate("/imageviewer");
+    navigate("/imageviewer", {
+      state: {
+        initialThingIds: allSelectedThingIds,
+      },
+    });
   };
 
   const handleNavigateMeasurements = () => {
