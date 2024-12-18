@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Checkbox } from "@mui/material";
 import {
   Label as LabelIcon,
@@ -14,6 +14,9 @@ import { CategoryItemMenu } from "components/categories/CategoryItemMenu";
 import { APPLICATION_COLORS } from "utils/common/constants";
 
 import { Category } from "store/data/types";
+import { useDispatch } from "react-redux";
+import { imageViewerSlice } from "store/imageViewer";
+import { dataSlice } from "store/data";
 
 type ImageViewerCategoryItemProps = {
   category: Category;
@@ -31,11 +34,9 @@ export const ImageViewerCategoryItem = ({
     objectCount,
     handleSelect,
     handleToggleCategoryVisibility,
-    editCategory,
-    deleteCategory,
-    clearObjects,
-  } = useImageViewerCategoryItemState(category);
+  } = useImageViewerCategoryItemState(category, kind);
 
+  const dispatch = useDispatch();
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
 
@@ -46,6 +47,28 @@ export const ImageViewerCategoryItem = ({
   const handleCloseMenu = () => {
     setCategoryMenuAnchorEl(null);
   };
+
+  const menuFunctions = useMemo(
+    () => ({
+      "Clear Objects": () => {
+        dispatch(
+          imageViewerSlice.actions.removeActiveAnnotationIds({
+            annotationIds: category.containing,
+          })
+        );
+        dispatch(
+          dataSlice.actions.deleteThings({
+            ofCategories: [category.id],
+            activeKind: kind,
+            isPermanent: false,
+            disposeColorTensors: true,
+          })
+        );
+      },
+      Delete: { permanent: false },
+    }),
+    [category.containing, kind, dispatch, category.id]
+  );
 
   return (
     <>
@@ -91,9 +114,7 @@ export const ImageViewerCategoryItem = ({
         category={category}
         handleCloseCategoryMenu={handleCloseMenu}
         openCategoryMenu={Boolean(categoryMenuAnchorEl)}
-        editCategory={editCategory}
-        deleteCategory={deleteCategory}
-        clearObjects={clearObjects}
+        menuFunctions={menuFunctions}
       />
     </>
   );

@@ -7,11 +7,10 @@ import { useTranslation } from "hooks";
 
 import { ExportAnnotationsMenu } from "../../components/ExportAnnotationsMenu";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { dataSlice } from "store/data/dataSlice";
 
-import { DecodedAnnotationObject, ImageObject } from "store/data/types";
-import { selectImageViewerObjects } from "views/ImageViewer/state/annotator/reselectors";
+import { ImageObject } from "store/data/types";
+import { imageViewerSlice } from "store/imageViewer";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
