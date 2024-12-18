@@ -2,8 +2,8 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 
 import { dataSlice } from "./dataSlice";
 
-import { imageViewerSlice } from "../imageViewer";
-import { applicationSettingsSlice } from "../applicationSettings";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { createRenderedTensor } from "utils/common/tensorHelpers";

@@ -17,7 +17,7 @@ import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
 import { ImageList } from "./ImageList";
 
 //import { selectCreatedAnnotationCategories } from "store/slices/data";
-import { selectImageViewerImages } from "store/imageViewer/reselectors";
+import { selectImageViewerImages } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
 

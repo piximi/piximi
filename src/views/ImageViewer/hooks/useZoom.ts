@@ -5,14 +5,14 @@ import { KonvaEventObject } from "konva/lib/Node";
 
 import { useDebounce } from "../../../hooks/useDebounce";
 
-import { imageViewerSlice } from "store/imageViewer";
-import { selectToolType } from "store/annotator/selectors";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
 import {
   selectActiveImageId,
   selectStageWidth,
   selectZoomSelection,
   selectZoomToolOptions,
-} from "store/imageViewer/selectors";
+} from "views/ImageViewer/state/imageViewer/selectors";
 
 import { getDistance } from "utils/annotator";
 

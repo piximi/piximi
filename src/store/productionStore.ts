@@ -7,14 +7,14 @@ import {
 import logger from "redux-logger";
 
 import { rootReducer, RootState } from "./rootReducer";
-import { annotatorMiddleware } from "./annotator/annotatorListeners";
-import { imageViewerMiddleware } from "./imageViewer/imageViewerListeners";
+import { annotatorMiddleware } from "views/ImageViewer/state/annotator/annotatorListeners";
+import { imageViewerMiddleware } from "views/ImageViewer/state/imageViewer/imageViewerListeners";
 import { projectMiddleware } from "./project/projectListeners";
 import { dataMiddleware } from "./data/dataListeners";
 import { classifierSlice } from "./classifier";
-import { annotatorSlice } from "./annotator";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { applicationSettingsSlice } from "./applicationSettings";
-import { imageViewerSlice } from "./imageViewer";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { dataSlice } from "./data/dataSlice";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";

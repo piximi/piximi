@@ -1,7 +1,7 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
-import { annotatorSlice } from "store/annotator";
+import { annotatorSlice } from "../annotator";
 import { dataSlice } from "store/data";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { imageViewerSlice } from "./imageViewerSlice";

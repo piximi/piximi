@@ -5,7 +5,7 @@ import * as ReactKonva from "react-konva";
 import { useMarchingAnts } from "../../../../hooks";
 
 import { StageContext } from "contexts";
-import { selectImageOrigin } from "store/imageViewer/selectors";
+import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { EllipticalAnnotationTool } from "utils/annotator/tools";
 

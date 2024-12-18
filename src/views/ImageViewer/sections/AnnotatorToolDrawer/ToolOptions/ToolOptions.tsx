@@ -16,7 +16,7 @@ import { QuickAnnotationOptions } from "./QuickAnnotationOptions";
 import { ThresholdAnnotationOptions } from "./ThresholdAnnotationOptions";
 import { ZoomOptions } from "./ZoomOptions";
 
-import { selectToolType } from "store/annotator/selectors";
+import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
 
 import {
   ColorAdjustmentIcon,

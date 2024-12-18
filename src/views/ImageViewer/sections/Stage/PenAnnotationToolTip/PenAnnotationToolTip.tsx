@@ -6,8 +6,8 @@ import { StageContext } from "contexts";
 import {
   selectPenSelectionBrushSize,
   selectToolType,
-} from "store/annotator/selectors";
-import { selectActiveImage } from "store/imageViewer/reselectors";
+} from "views/ImageViewer/state/annotator/selectors";
+import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { ToolType } from "utils/annotator/enums";
 
