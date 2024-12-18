@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Konva from "konva";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,8 +11,8 @@ import { AlertBar } from "components/ui/AlertBar";
 import { FallBackDialog } from "components/dialogs";
 import { ImageViewerDrawer, StageWrapper } from "./sections";
 
-import { StageContext } from "views/ImageViewer/state/StageContext";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { StageContext } from "contexts";
+import { imageViewerSlice } from "store/imageViewer";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectAlertState } from "store/applicationSettings/selectors";
 
@@ -23,6 +23,7 @@ import { AlertType, HotkeyContext } from "utils/common/enums";
 export const ImageViewer = () => {
   const dispatch = useDispatch();
   const routerLocation = useLocation();
+
   const stageRef = useRef<Konva.Stage>(null);
   const isMobile = useMobileView();
   const alertState = useSelector(selectAlertState);
@@ -71,6 +72,13 @@ export const ImageViewer = () => {
           ? routerLocation.state.initialThingIds
           : [],
       }),
+    );
+    dispatch(
+      imageViewerSlice.actions.prepareImageViewer({
+        selectedThingIds: routerLocation.state?.initialThingIds
+          ? routerLocation.state.initialThingIds
+          : [],
+      })
     );
     dispatch(
       applicationSettingsSlice.actions.registerHotkeyContext({

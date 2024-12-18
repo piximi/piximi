@@ -6,6 +6,7 @@ import { useDialogHotkey } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
+import { dataSlice } from "store/data/dataSlice";
 import { selectActiveKindId } from "store/project/selectors";
 
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
@@ -14,6 +15,12 @@ import { HotkeyContext } from "utils/common/enums";
 import { Category } from "store/data/types";
 import { CategoryDialog } from "components/dialogs/CategoryDialog/CategoryDialog";
 
+type MenuFunctions = {
+  Edit?: { permanent: boolean };
+  "Edit Color"?: { permanent: boolean };
+  Delete?: { permanent: boolean };
+  "Clear Objects": () => void;
+};
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;
   category: Category;
@@ -52,6 +59,30 @@ export const CategoryItemMenu = ({
     onOpen: handleOpenDeleteObjectsDialog,
     open: isDeleteObjectsDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
+
+  const handleRemoveCategory = () => {
+    dispatch(
+      dataSlice.actions.removeCategoriesFromKind({
+        categoryIds: [category.id],
+        kind: kind ?? activeKind,
+        isPermanent: menuFunctions ? menuFunctions.Delete?.permanent : true,
+      })
+    );
+  };
+  const handleDeleteObjects = () => {
+    if (menuFunctions) {
+      menuFunctions["Clear Objects"]();
+    } else {
+      dispatch(
+        dataSlice.actions.deleteThings({
+          ofCategories: [category.id],
+          activeKind: kind ?? activeKind,
+          isPermanent: true,
+          disposeColorTensors: true,
+        })
+      );
+    }
+  };
 
   const handleMenuCloseWith = (dialogClose: () => void) => {
     dialogClose();
