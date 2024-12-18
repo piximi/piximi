@@ -17,11 +17,7 @@ import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
 import { ImageList } from "./ImageList";
 
 //import { selectCreatedAnnotationCategories } from "store/slices/data";
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import {
-  selectImagesArray,
-  selectKindsArray,
-} from "views/ImageViewer/state/annotator/reselectors";
+import { selectImageViewerImages } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
 import { Category, Kind } from "store/data/types";

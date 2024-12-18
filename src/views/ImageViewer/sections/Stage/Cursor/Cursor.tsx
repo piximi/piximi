@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 import { PenAnnotationToolTip } from "../PenAnnotationToolTip";
 
-import { StageContext } from "views/ImageViewer/state/StageContext";
+import { StageContext } from "contexts";
 import { selectCursor } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { AnnotationState, ToolType } from "views/ImageViewer/utils/enums";

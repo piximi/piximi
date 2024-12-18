@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { selectActiveImageRawColor } from "views/ImageViewer/state/annotator/reselectors";
+import { dataSlice } from "store/data/dataSlice";
+import { selectActiveImageRawColor } from "views/ImageViewer/state/imageViewer/reselectors";
 import { selectImageStackImageIds } from "views/ImageViewer/state/imageViewer/selectors";
 
 export const ApplyColorsButton = () => {

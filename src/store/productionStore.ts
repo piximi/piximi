@@ -13,10 +13,14 @@ import { imageViewerMiddleware } from "views/ImageViewer/state/imageViewer/image
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { rootReducer, RootState } from "./rootReducer";
+import { annotatorMiddleware } from "views/ImageViewer/state/annotator/annotatorListeners";
+import { imageViewerMiddleware } from "views/ImageViewer/state/imageViewer/imageViewerListeners";
 import { projectMiddleware } from "./project/projectListeners";
 import { dataMiddleware } from "./data/dataListeners";
 import { classifierSlice } from "./classifier";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { applicationSettingsSlice } from "./applicationSettings";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { dataSlice } from "./data/dataSlice";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
