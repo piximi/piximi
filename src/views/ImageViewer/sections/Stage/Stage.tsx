@@ -25,8 +25,8 @@ import { Selection } from "./Selection";
 import { Annotations } from "./Annotations";
 import { Image } from "./Image";
 
-import { StageContext } from "contexts";
 import { dataSlice } from "store/data";
+import { StageContext } from "../../state/StageContext";
 import { imageViewerSlice } from "../../state/imageViewer";
 import { annotatorSlice } from "../../state/annotator";
 import {
