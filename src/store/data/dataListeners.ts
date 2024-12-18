@@ -85,22 +85,6 @@ startAppListening({
 });
 
 startAppListening({
-  actionCreator: dataSlice.actions.addAnnotations,
-  effect: (action, listenerAPI) => {
-    action.payload.annotations.forEach((annotation) => {
-      const imageId = annotation.imageId;
-      if (imageId === listenerAPI.getState().imageViewer.activeImageId) {
-        listenerAPI.dispatch(
-          imageViewerSlice.actions.addActiveAnnotationId({
-            annotationId: annotation.id,
-          })
-        );
-      }
-    });
-  },
-});
-
-startAppListening({
   actionCreator: dataSlice.actions.updateThings,
   effect: async (action, listenerAPI) => {
     const { updates } = action.payload;
@@ -160,38 +144,6 @@ startAppListening({
     listenerAPI.dispatch(
       applicationSettingsSlice.actions.setLoadMessage({
         message: "",
-      })
-    );
-  },
-});
-startAppListening({
-  predicate: (action) => {
-    const type = action.type.split("/");
-
-    if (type[0] !== "data") return false;
-    if (["initializeState", "resetData", "reconcile"].includes(type[1]))
-      return false;
-    if (
-      action.payload &&
-      "isPermanent" in action.payload &&
-      action.payload.isPermanent
-    )
-      return false;
-    return true;
-  },
-  effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(
-      imageViewerSlice.actions.setHasUnsavedChanges({ hasUnsavedChanges: true })
-    );
-  },
-});
-
-startAppListening({
-  actionCreator: dataSlice.actions.reconcile,
-  effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(
-      imageViewerSlice.actions.setHasUnsavedChanges({
-        hasUnsavedChanges: false,
       })
     );
   },
