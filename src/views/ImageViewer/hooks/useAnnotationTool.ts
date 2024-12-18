@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ImageJS from "image-js";
 
-import { StageContext } from "contexts";
+import { StageContext } from "views/ImageViewer/state/StageContext";
 import {
   selectPenSelectionBrushSize,
   selectQuickSelectionRegionSize,
