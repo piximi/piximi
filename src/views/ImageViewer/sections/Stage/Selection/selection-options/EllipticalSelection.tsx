@@ -4,7 +4,7 @@ import { Ellipse as KonvaEllipse, Group as KonvaGroup } from "react-konva";
 
 import { useMarchingAnts } from "../../../../hooks";
 
-import { StageContext } from "contexts";
+import { StageContext } from "views/ImageViewer/state/StageContext";
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { EllipticalAnnotationTool } from "views/ImageViewer/utils/tools";
