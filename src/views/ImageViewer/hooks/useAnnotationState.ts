@@ -12,10 +12,13 @@ import {
   selectSelectedIVCategoryId,
 } from "views/ImageViewer/state/imageViewer/selectors";
 import {
-  createProtoAnnotation,
-  editProtoAnnotation,
-} from "../utils/annotationUtils";
-import { Partition } from "utils/models/enums";
+  selectCategoryById,
+  selectFirstUnknownCategory,
+} from "store/data/selectors";
+
+import { AnnotationTool } from "views/ImageViewer/utils/tools";
+
+import { AnnotationState } from "views/ImageViewer/utils/enums";
 
 export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();

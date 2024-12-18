@@ -18,7 +18,7 @@ import {
 } from "./selectors";
 
 import { generateBlankColors } from "utils/common/tensorHelpers";
-import { decodeAnnotation } from "utils/annotator/rle";
+import { decodeAnnotation } from "views/ImageViewer/utils/rle";
 import { getCompleteEntity } from "store/entities/utils";
 
 import { Colors, ColorsRaw } from "utils/common/types";
