@@ -4,12 +4,12 @@ import { Group as KonvaGroup, Rect as KonvaRect } from "react-konva";
 
 import { useMarchingAnts } from "../../../../hooks";
 
-import { StageContext } from "views/ImageViewer/state/StageContext";
+import { StageContext } from "contexts";
 
 import {
   RectangularAnnotationTool,
   SelectionTool,
-} from "views/ImageViewer/utils/tools";
+} from "utils/annotator/tools";
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
 type RectangularSelectionProps = {

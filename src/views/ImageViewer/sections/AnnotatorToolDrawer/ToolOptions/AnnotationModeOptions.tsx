@@ -6,12 +6,12 @@ import { useTranslation } from "hooks";
 
 import { CustomListItemButton } from "components/ui";
 
-import { annotatorSlice } from "store/annotator";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
   selectAnnotationState,
   selectAnnotationSelectionMode,
   selectWorkingAnnotation,
-} from "store/annotator/selectors";
+} from "views/ImageViewer/state/annotator/selectors";
 
 import { RadioCheckedIcon, RadioUncheckedIcon } from "icons";
 

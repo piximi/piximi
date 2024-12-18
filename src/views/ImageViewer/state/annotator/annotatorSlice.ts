@@ -1,48 +1,27 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { merge } from "lodash";
 
-import { AnnotationTool } from "views/ImageViewer/utils/tools/AnnotationTool";
+import { AnnotationTool } from "utils/annotator/tools/AnnotationTool";
 
 import {
   AnnotationMode,
   AnnotationState,
   ToolType,
-} from "views/ImageViewer/utils/enums";
+} from "utils/annotator/enums";
 
 import { mutatingFilter } from "utils/common/helpers";
-import {
-  AnnotatorState,
-  ProtoAnnotationObject,
-} from "views/ImageViewer/utils/types";
-import { Category, Kind, ThingsUpdates } from "store/data/types";
-import {
-  addCategoryContents,
-  addKindContents,
-  deleteCategoryEntry,
-  deleteKindEntry,
-  deleteThingEntry,
-  editCategory,
-  removeCategoryContents,
-  removeKindContents,
-  updateKind,
-  updateThing,
-} from "./utils";
+import { AnnotatorState } from "store/types";
+import { DecodedAnnotationObject } from "store/data/types";
 
-export const initialState: AnnotatorState = {
+const initialState: AnnotatorState = {
   workingAnnotationId: undefined,
 
   workingAnnotation: { saved: undefined, changes: {} },
   selectedAnnotationIds: [],
-  changes: {
-    kinds: { added: {}, deleted: [], edited: {} },
-    categories: { added: {}, deleted: [], edited: {} },
-    things: { added: {}, deleted: [], edited: {} },
-  },
   annotationState: AnnotationState.Blank,
   penSelectionBrushSize: 10,
   quickSelectionRegionSize: 40,
   thresholdAnnotationValue: 150,
-  annotationMode: AnnotationMode.New,
+  selectionMode: AnnotationMode.New,
   toolType: ToolType.RectangularAnnotation,
 };
 
@@ -51,18 +30,15 @@ export const annotatorSlice = createSlice({
   name: "annotator",
   reducers: {
     resetAnnotator: () => initialState,
-    resetChanges: (state) => {
-      state.changes = initialState.changes;
-    },
     addSelectedAnnotationId(
       state,
-      action: PayloadAction<{ annotationId: string }>,
+      action: PayloadAction<{ annotationId: string }>
     ) {
       state.selectedAnnotationIds.push(action.payload.annotationId);
     },
     addSelectedAnnotationIds(
       state,
-      action: PayloadAction<{ annotationIds: Array<string> }>,
+      action: PayloadAction<{ annotationIds: Array<string> }>
     ) {
       for (const annotationId of action.payload.annotationIds) {
         annotatorSlice.caseReducers.addSelectedAnnotationId(state, {
@@ -76,7 +52,7 @@ export const annotatorSlice = createSlice({
       action: PayloadAction<{
         annotationIds: Array<string>;
         workingAnnotationId?: string;
-      }>,
+      }>
     ) {
       const { annotationIds, workingAnnotationId } = action.payload;
       state.selectedAnnotationIds = [];
@@ -93,21 +69,21 @@ export const annotatorSlice = createSlice({
       state,
       action: PayloadAction<{
         annotationId: string;
-      }>,
+      }>
     ) {
       if (state.workingAnnotationId === action.payload.annotationId) {
         state.workingAnnotationId = undefined;
       }
       mutatingFilter(
         state.selectedAnnotationIds,
-        (annotationId) => annotationId !== action.payload.annotationId,
+        (annotationId) => annotationId !== action.payload.annotationId
       );
     },
     removeSelectedAnnotationIds(
       state,
       action: PayloadAction<{
         annotationIds: string[];
-      }>,
+      }>
     ) {
       for (const annotationId of action.payload.annotationIds) {
         annotatorSlice.caseReducers.removeSelectedAnnotationId(state, {
@@ -119,21 +95,21 @@ export const annotatorSlice = createSlice({
     setWorkingAnnotation(
       state,
       action: PayloadAction<{
-        annotation: ProtoAnnotationObject | string | undefined;
+        annotation: DecodedAnnotationObject | string | undefined;
         preparedByListener?: boolean;
-      }>,
+      }>
     ) {
       const { annotation, preparedByListener } = action.payload;
       if (!preparedByListener) return;
 
       state.workingAnnotation.saved = annotation as
-        | ProtoAnnotationObject
+        | DecodedAnnotationObject
         | undefined;
       state.workingAnnotation.changes = {};
     },
     updateWorkingAnnotation(
       state,
-      action: PayloadAction<{ changes: Partial<ProtoAnnotationObject> }>,
+      action: PayloadAction<{ changes: Partial<DecodedAnnotationObject> }>
     ) {
       if (state.workingAnnotation.saved) {
         state.workingAnnotation.changes = action.payload.changes;
@@ -146,7 +122,7 @@ export const annotatorSlice = createSlice({
         annotationState: AnnotationState;
         kind?: string;
         annotationTool: AnnotationTool;
-      }>,
+      }>
     ) {
       state.annotationState = action.payload.annotationState;
     },
@@ -156,164 +132,29 @@ export const annotatorSlice = createSlice({
     },
     setPenSelectionBrushSize(
       state,
-      action: PayloadAction<{ penSelectionBrushSize: number }>,
+      action: PayloadAction<{ penSelectionBrushSize: number }>
     ) {
       state.penSelectionBrushSize = action.payload.penSelectionBrushSize;
     },
     setQuickSelectionRegionSize(
       state,
-      action: PayloadAction<{ quickSelectionRegionSize: number }>,
+      action: PayloadAction<{ quickSelectionRegionSize: number }>
     ) {
       state.quickSelectionRegionSize = action.payload.quickSelectionRegionSize;
     },
 
-    setAnnotationMode(
+    setSelectionMode(
       state,
-      action: PayloadAction<{ annotationMode: AnnotationMode }>,
+      action: PayloadAction<{ selectionMode: AnnotationMode }>
     ) {
-      state.annotationMode = action.payload.annotationMode;
+      state.selectionMode = action.payload.selectionMode;
     },
 
     setThresholdAnnotationValue(
       state,
-      action: PayloadAction<{ thresholdAnnotationValue: number }>,
+      action: PayloadAction<{ thresholdAnnotationValue: number }>
     ) {
       state.thresholdAnnotationValue = action.payload.thresholdAnnotationValue;
-    },
-    addKind(
-      state,
-      action: PayloadAction<{
-        kind: Kind;
-        unknownCategory: Category;
-      }>,
-    ) {
-      const { kind, unknownCategory } = action.payload;
-      state.changes.kinds.added[kind.id] = kind;
-      state.changes.categories.added[unknownCategory.id] = unknownCategory;
-    },
-    editKindName(
-      state,
-      action: PayloadAction<{
-        kindId: string;
-        displayName: string;
-      }>,
-    ) {
-      const { kindId, displayName } = action.payload;
-      updateKind(state, { id: kindId, displayName });
-    },
-
-    deleteKind(
-      state,
-      action: PayloadAction<{
-        kind: Kind;
-      }>,
-    ) {
-      const { id: kindId, categories, containing } = action.payload.kind;
-
-      // keep track of affected categories and things
-      const affectedCategories = categories;
-      const affectedThings = containing;
-      // keep track of whether the kind was added during this annotation session
-
-      deleteKindEntry(state, kindId);
-
-      for (const categoryId of affectedCategories) {
-        deleteCategoryEntry(state, categoryId);
-      }
-
-      for (const thingId of affectedThings) {
-        deleteThingEntry(state, thingId);
-      }
-    },
-
-    addCategory(
-      state,
-      action: PayloadAction<{
-        category: Category;
-      }>,
-    ) {
-      const { category } = action.payload;
-      state.changes.categories.added[category.id] = category;
-      addKindContents(state, {
-        id: category.kind,
-        categories: [category.id],
-      });
-    },
-    updateCategory(
-      state,
-      action: PayloadAction<{
-        category: { id: string; color: string; name: string };
-      }>,
-    ) {
-      const { category } = action.payload;
-      editCategory(state, category);
-    },
-    deleteCategory(
-      state,
-      action: PayloadAction<{
-        category: Category;
-        associatedUnknownKind: string;
-      }>,
-    ) {
-      const { category, associatedUnknownKind } = action.payload;
-      const associatedThings = category.containing;
-      deleteCategoryEntry(state, category.id);
-      removeKindContents(state, {
-        id: category.kind,
-        categories: [category.id],
-      });
-      addCategoryContents(state, associatedUnknownKind, associatedThings);
-      associatedThings.forEach((thingId) => {
-        updateThing(state, { id: thingId, categoryId: associatedUnknownKind });
-      });
-    },
-    addThing(
-      state,
-      action: PayloadAction<{
-        thing: ProtoAnnotationObject;
-      }>,
-    ) {
-      const { thing } = action.payload;
-      state.changes.things.added[thing.id] = thing;
-      addKindContents(state, { id: thing.kind, containing: [thing.id] });
-      addCategoryContents(state, thing.categoryId, [thing.id]);
-    },
-    editThings(
-      state,
-      action: PayloadAction<{
-        updates: ThingsUpdates;
-      }>,
-    ) {
-      const { updates } = action.payload;
-      for (const update of updates) {
-        const { id, ...changes } = update;
-        if (id in state.changes.things.added) {
-          state.changes.things.added[id] = merge(
-            state.changes.things.added[id],
-            changes,
-          );
-        } else if (id in state.changes.things.edited) {
-          state.changes.things.edited[id] = merge(
-            state.changes.things.edited[id],
-            changes,
-          );
-        } else {
-          state.changes.things.edited[id] = { id, ...changes };
-        }
-      }
-    },
-    deleteThings(
-      state,
-      action: PayloadAction<{
-        things: Array<ProtoAnnotationObject>;
-      }>,
-    ) {
-      const { things } = action.payload;
-      for (const thing of things) {
-        deleteThingEntry(state, thing.id);
-        removeKindContents(state, { id: thing.kind, containing: [thing.id] });
-        removeCategoryContents(state, thing.categoryId, [thing.id]);
-      }
     },
   },
 });

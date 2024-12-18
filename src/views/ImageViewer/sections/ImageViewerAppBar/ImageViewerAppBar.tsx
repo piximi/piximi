@@ -10,8 +10,8 @@ import { LogoLoader } from "components/ui";
 import { CustomAppBar } from "components/layout";
 import { ExitAnnotatorDialog } from "../../components/dialogs";
 
-import { imageViewerSlice } from "store/imageViewer";
-import { annotatorSlice } from "store/annotator";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
   selectActiveImageId,
   selectHasUnsavedChanges,

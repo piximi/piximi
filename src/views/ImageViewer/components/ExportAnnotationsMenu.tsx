@@ -23,8 +23,9 @@ import {
 } from "views/ImageViewer/state/annotator/reselectors";
 import {
   selectImageViewerImages,
-  selectImagesArray,
-} from "../state/annotator/reselectors";
+  selectImageViewerObjectDict,
+  selectImageViewerImageDict,
+} from "views/ImageViewer/state/imageViewer/reselectors";
 
 import {
   serializeCOCOFile,

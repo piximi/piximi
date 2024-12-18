@@ -3,10 +3,10 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { useHotkeys } from "hooks/useHotkeys";
 
-import { annotatorSlice } from "store/annotator";
-import { imageViewerSlice } from "store/imageViewer";
-import { selectActiveImageId } from "store/imageViewer/selectors";
-import { selectActiveAnnotations } from "store/imageViewer/reselectors";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectActiveAnnotations } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { getOverlappingAnnotations } from "views/ImageViewer/utils";
 import { getAnnotationsInBox } from "views/ImageViewer/utils/imageHelper";

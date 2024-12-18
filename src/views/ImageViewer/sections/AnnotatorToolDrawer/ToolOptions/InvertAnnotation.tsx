@@ -8,8 +8,8 @@ import { useAnnotationTool } from "../../../hooks";
 import { CustomListItemButton } from "components/ui";
 
 import { dataSlice } from "store/data";
-import { annotatorSlice } from "store/annotator";
-import { selectWorkingAnnotation } from "store/annotator/selectors";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { selectWorkingAnnotation } from "views/ImageViewer/state/annotator/selectors";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 
