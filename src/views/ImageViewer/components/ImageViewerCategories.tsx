@@ -9,9 +9,9 @@ import { CollapsibleListItem } from "components/ui/CollapsibleListItem";
 import { CreateCategoryDialog } from "components/dialogs";
 import { ImageViewerCategoryItem } from "./ImageViewerCategoryItem";
 
-import { imageViewerSlice } from "store/imageViewer";
-import { selectFilteredImageViewerCategoryIds } from "store/imageViewer/selectors";
-import { selectImageViewerActiveKindsWithFullCat } from "store/imageViewer/reselectors";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { selectFilteredImageViewerCategoryIds } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectImageViewerActiveKindsWithFullCat } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
 

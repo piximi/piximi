@@ -4,8 +4,8 @@ import Konva from "konva";
 
 import { MemoizedKonvaImage } from "./MemoizedKonvaImage";
 
-import { selectImageOrigin } from "store/imageViewer/selectors";
-import { selectActiveImage } from "store/imageViewer/reselectors";
+import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
 export const Image = forwardRef<
   Konva.Image,

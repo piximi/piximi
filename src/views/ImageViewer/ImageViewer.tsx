@@ -16,7 +16,7 @@ import {
 } from "./sections";
 
 import { StageContext } from "contexts";
-import { imageViewerSlice } from "store/imageViewer";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectAlertState } from "store/applicationSettings/selectors";
 

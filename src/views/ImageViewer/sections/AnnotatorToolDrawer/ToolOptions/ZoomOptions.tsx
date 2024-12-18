@@ -25,15 +25,15 @@ import {
 } from "components/ui";
 
 import { StageContext } from "contexts";
-import { imageViewerSlice } from "store/imageViewer";
-import { selectActiveImage } from "store/imageViewer/reselectors";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 import {
   selectStageHeight,
   selectStageScale,
   selectStageWidth,
   selectZoomSelection,
   selectZoomToolOptions,
-} from "store/imageViewer/selectors";
+} from "views/ImageViewer/state/imageViewer/selectors";
 
 import {
   CheckboxCheckedIcon,

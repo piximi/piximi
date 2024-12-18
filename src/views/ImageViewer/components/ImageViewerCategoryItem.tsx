@@ -16,7 +16,7 @@ import { APPLICATION_COLORS } from "utils/common/constants";
 
 import { Category } from "store/data/types";
 import { useDispatch } from "react-redux";
-import { imageViewerSlice } from "store/imageViewer";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { dataSlice } from "store/data";
 
 type ImageViewerCategoryItemProps = {

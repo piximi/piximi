@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
 import { StageContext } from "contexts";
-import { selectZoomSelection } from "store/imageViewer/selectors";
+import { selectZoomSelection } from "../../../../state/imageViewer/selectors";
 
 export const ZoomSelection = () => {
   const { dragging, minimum, maximum, selecting } =

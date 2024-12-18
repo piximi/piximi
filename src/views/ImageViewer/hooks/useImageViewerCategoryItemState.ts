@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { imageViewerSlice } from "store/imageViewer";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import {
   selectFilteredImageViewerCategoryIds,
   selectHighligtedIVCatogory,
   selectSelectedIVCategoryId,
-} from "store/imageViewer/selectors";
-import { selectActiveImageCategoryObjectCount } from "store/imageViewer/reselectors";
+} from "views/ImageViewer/state/imageViewer/selectors";
+import { selectActiveImageCategoryObjectCount } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { isUnknownCategory } from "utils/common/helpers";
 

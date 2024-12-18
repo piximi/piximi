@@ -17,8 +17,8 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 import { ImageMenu } from "./ImageMenu";
 
-import { imageViewerSlice } from "store/imageViewer";
-import { selectActiveImageId } from "store/imageViewer/selectors";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { ImageObject } from "store/data/types";
 

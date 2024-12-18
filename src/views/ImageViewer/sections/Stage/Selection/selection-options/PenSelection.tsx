@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { selectImageOrigin } from "store/imageViewer/selectors";
+import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { PenAnnotationTool } from "utils/annotator/tools";
 
