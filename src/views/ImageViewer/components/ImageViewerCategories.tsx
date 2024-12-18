@@ -10,15 +10,9 @@ import { CategoryDialog } from "components/dialogs";
 import { ImageViewerCategoryItem } from "./ImageViewerCategoryItem";
 import { EditableKindField } from "./EditableKindField";
 
-import { imageViewerSlice } from "../state/imageViewer";
-import { selectFilteredImageViewerCategoryIds } from "../state/imageViewer/selectors";
-import { annotatorSlice } from "../state/annotator";
-import {
-  selectCategoriesByKind,
-  selectImageViewerKinds,
-  renderImageViewerKindName,
-  selectImageViewerObjects,
-} from "../state/annotator/reselectors";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { selectFilteredImageViewerCategoryIds } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectImageViewerActiveKindsWithFullCat } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
 import { generateUUID } from "store/data/helpers";

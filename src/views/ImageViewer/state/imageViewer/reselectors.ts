@@ -10,7 +10,7 @@ import {
 import {
   selectSelectedAnnotationIds,
   selectWorkingAnnotation,
-} from "store/annotator/selectors";
+} from "../annotator/selectors";
 import {
   selectActiveAnnotationIds,
   selectActiveImageId,

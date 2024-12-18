@@ -17,9 +17,9 @@ import {
   FunctionalDivider,
 } from "components/ui";
 
-import { annotatorSlice } from "store/annotator";
 import { selectAllCategories } from "store/data/selectors";
-import { selectActiveAnnotations } from "store/imageViewer/reselectors";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { selectActiveAnnotations } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 

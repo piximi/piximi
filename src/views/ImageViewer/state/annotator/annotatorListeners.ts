@@ -1,15 +1,21 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
+import { intersection } from "lodash";
 
 import { annotatorSlice } from "./annotatorSlice";
-import { initialState as initialAnnotatorState } from "./annotatorSlice";
 
 import { imageViewerSlice } from "../imageViewer";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { decodeAnnotation } from "views/ImageViewer/utils/rle";
-import { createRenderedTensor } from "utils/common/tensorHelpers";
+import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
+import { decodeAnnotation, encodeAnnotation } from "utils/annotator/rle";
+import { BlankAnnotationTool } from "utils/annotator/tools";
+import { getPropertiesFromImage } from "utils/common/helpers";
 
-import { ToolType } from "views/ImageViewer/utils/enums";
+import {
+  AnnotationMode,
+  AnnotationState,
+  ToolType,
+} from "utils/annotator/enums";
 
 import { TypedAppStartListening } from "store/types";
 import {
@@ -17,7 +23,6 @@ import {
   DecodedAnnotationObject,
   ImageObject,
 } from "store/data/types";
-import { isEqual } from "lodash";
 
 export const annotatorMiddleware = createListenerMiddleware();
 
@@ -32,14 +37,164 @@ startAppListening({
 });
 
 startAppListening({
+  actionCreator: annotatorSlice.actions.setAnnotationState,
+  effect: async (action, listenerAPI) => {
+    const {
+      imageViewer: IVState,
+      data: dataState,
+      annotator: annotatorState,
+    } = listenerAPI.getState();
+    const { annotationState, annotationTool, kind } = action.payload;
+
+    if (
+      annotationTool instanceof BlankAnnotationTool ||
+      annotationState !== AnnotationState.Annotated ||
+      !kind
+    )
+      return;
+    const kindObject = getCompleteEntity(dataState.kinds.entities[kind]);
+    if (!kindObject) return;
+    const selectionMode = annotatorState.selectionMode;
+    const activeImageId = IVState.activeImageId;
+    if (!activeImageId) return;
+    const activeImage = getCompleteEntity(
+      dataState.things.entities[activeImageId]
+    ) as ImageObject;
+    if (!activeImage) return;
+    const selectedAnnotationCategoryId = IVState.selectedCategoryId;
+    const selectedCategory = getCompleteEntity(
+      dataState.categories.entities[selectedAnnotationCategoryId]
+    )!;
+
+    if (
+      selectionMode === AnnotationMode.New &&
+      annotationTool.annotationState === AnnotationState.Annotated
+    ) {
+      annotationTool.annotate(
+        selectedCategory,
+        activeImage!.activePlane,
+        activeImageId
+      );
+      if (!annotationTool.annotation) return;
+      const bbox = annotationTool.annotation.boundingBox;
+
+      const bitDepth = activeImage.bitDepth;
+      const imageProperties = await getPropertiesFromImage(
+        activeImage,
+        annotationTool.annotation!
+      );
+      //TODO: add suppoert for multiple planes
+      const shape = {
+        planes: 1,
+        height: bbox[3] - bbox[1],
+        width: bbox[2] - bbox[0],
+        channels: activeImage.shape.channels,
+      };
+
+      const currentAnnotationNames = intersection(
+        activeImage.containing,
+        kindObject.containing
+      ).map((id) => {
+        return getDeferredProperty(dataState.things.entities[id], "name");
+      });
+
+      let annotationName: string = `${activeImage.name}-${kind}_0`;
+      let i = 1;
+      while (currentAnnotationNames.includes(annotationName)) {
+        annotationName = annotationName.replace(/_(\d+)$/, `_${i}`);
+        i++;
+      }
+
+      listenerAPI.dispatch(
+        annotatorSlice.actions.setWorkingAnnotation({
+          annotation: {
+            ...annotationTool.annotation,
+            ...imageProperties,
+            bitDepth,
+            shape,
+            name: annotationName,
+            kind,
+          } as DecodedAnnotationObject,
+        })
+      );
+    } else {
+      const toolType = annotatorState.toolType;
+
+      if (toolType === ToolType.Zoom) return;
+      const savedWorkingAnnotation = annotatorState.workingAnnotation.saved;
+      const workingAnnotationChanges = annotatorState.workingAnnotation.changes;
+      if (
+        !savedWorkingAnnotation ||
+        annotationTool.annotationState !== AnnotationState.Annotated
+      )
+        return;
+      const workingAnnotation = {
+        ...savedWorkingAnnotation,
+        ...workingAnnotationChanges,
+      };
+      let combinedMask, combinedBoundingBox;
+
+      if (selectionMode === AnnotationMode.Add) {
+        [combinedMask, combinedBoundingBox] = annotationTool.add(
+          workingAnnotation.decodedMask!,
+          workingAnnotation.boundingBox
+        );
+      } else if (selectionMode === AnnotationMode.Subtract) {
+        [combinedMask, combinedBoundingBox] = annotationTool.subtract(
+          workingAnnotation.decodedMask!,
+          workingAnnotation.boundingBox
+        );
+      } else if (selectionMode === AnnotationMode.Intersect) {
+        [combinedMask, combinedBoundingBox] = annotationTool.intersect(
+          workingAnnotation.decodedMask!,
+          workingAnnotation.boundingBox
+        );
+      } else {
+        return;
+      }
+
+      annotationTool.decodedMask = combinedMask;
+      annotationTool.boundingBox = combinedBoundingBox;
+
+      const combinedSelectedAnnotation = annotationTool.decodedMask.length
+        ? {
+            ...workingAnnotation,
+            boundingBox: annotationTool.boundingBox,
+            decodedMask: annotationTool.decodedMask,
+          }
+        : undefined;
+
+      if (!combinedSelectedAnnotation) return;
+
+      const annotation = encodeAnnotation(combinedSelectedAnnotation);
+
+      listenerAPI.dispatch(
+        annotatorSlice.actions.updateWorkingAnnotation({
+          changes: annotation!,
+        })
+      );
+
+      if (annotationTool.decodedMask.length) {
+        annotationTool.annotate(
+          selectedCategory,
+          activeImage.activePlane,
+          activeImageId,
+          annotation.id
+        );
+      }
+    }
+  },
+});
+
+startAppListening({
   actionCreator: annotatorSlice.actions.setWorkingAnnotation,
   effect: async (action, listenerAPI) => {
     const dataState = listenerAPI.getState().data;
     let annotationValue = action.payload.annotation;
     if (typeof annotationValue === "string") {
-      const annotation = dataState.things.entities[
-        annotationValue
-      ] as AnnotationObject;
+      const annotation = getCompleteEntity(
+        dataState.things.entities[annotationValue]
+      ) as AnnotationObject;
       if (!annotation) return undefined;
       annotationValue = !annotation.decodedMask
         ? decodeAnnotation(annotation)
@@ -50,7 +205,7 @@ startAppListening({
       annotatorSlice.actions.setWorkingAnnotation({
         annotation: annotationValue,
         preparedByListener: true,
-      }),
+      })
     );
     listenerAPI.subscribe();
   },
@@ -73,93 +228,5 @@ startAppListening({
     }
 
     listenerAPI.dispatch(imageViewerSlice.actions.setCursor({ cursor }));
-  },
-});
-
-startAppListening({
-  actionCreator: annotatorSlice.actions.editThings,
-  effect: async (action, listenerAPI) => {
-    const { updates } = action.payload;
-    const { data: dataState, imageViewer: imageViewerState } =
-      listenerAPI.getState();
-
-    const srcUpdates: Array<{ id: string } & Partial<ImageObject>> = [];
-    let renderedSrcs: string[] = [];
-    const numImages = updates.length;
-    let imageNumber = 1;
-    for await (const update of updates) {
-      const { id: imageId, ...changes } = update;
-      if ("colors" in changes && changes.colors) {
-        const colors = changes.colors;
-        const image = dataState.things.entities[imageId]! as ImageObject;
-
-        const colorsEditable = {
-          range: { ...colors.range },
-          visible: { ...colors.visible },
-          color: colors.color,
-        };
-        renderedSrcs = await createRenderedTensor(
-          image.data,
-          colorsEditable,
-          image.bitDepth,
-          undefined,
-        );
-
-        srcUpdates.push({ id: imageId, src: renderedSrcs[image.activePlane] });
-        if (imageId === imageViewerState.activeImageId) {
-          listenerAPI.dispatch(
-            imageViewerSlice.actions.setActiveImageRenderedSrcs({
-              renderedSrcs,
-            }),
-          );
-        }
-        listenerAPI.dispatch(
-          applicationSettingsSlice.actions.setLoadMessage({
-            message: `Updating image ${imageNumber} of ${numImages}`,
-          }),
-        );
-        imageNumber++;
-      }
-    }
-
-    if (srcUpdates.length !== 0) {
-      listenerAPI.unsubscribe();
-      listenerAPI.dispatch(
-        annotatorSlice.actions.editThings({
-          updates: srcUpdates,
-        }),
-      );
-      listenerAPI.subscribe();
-    }
-    listenerAPI.dispatch(
-      applicationSettingsSlice.actions.setLoadMessage({
-        message: "",
-      }),
-    );
-  },
-});
-
-startAppListening({
-  predicate: (action, currentState, previousState) => {
-    if (action.type.split("/")[0] !== "annotator") return false;
-    const currentChanges = currentState.annotator.changes;
-    const previousChanges = previousState.annotator.changes;
-    return !isEqual(currentChanges, previousChanges);
-  },
-  effect: (action, listenerAPI) => {
-    const annotatorState = listenerAPI.getState().annotator;
-    if (isEqual(annotatorState.changes, initialAnnotatorState.changes)) {
-      listenerAPI.dispatch(
-        imageViewerSlice.actions.setHasUnsavedChanges({
-          hasUnsavedChanges: false,
-        }),
-      );
-    } else {
-      listenerAPI.dispatch(
-        imageViewerSlice.actions.setHasUnsavedChanges({
-          hasUnsavedChanges: true,
-        }),
-      );
-    }
   },
 });
