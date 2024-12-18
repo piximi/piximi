@@ -3,7 +3,7 @@ import * as ReactKonva from "react-konva";
 
 import { useMarchingAnts } from "../../../../hooks";
 
-import { StageContext } from "contexts";
+import { StageContext } from "views/ImageViewer/state/StageContext";
 
 import { ObjectAnnotationTool } from "utils/annotator/tools";
 
