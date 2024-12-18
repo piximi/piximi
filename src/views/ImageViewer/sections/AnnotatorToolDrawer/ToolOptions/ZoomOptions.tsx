@@ -42,7 +42,7 @@ import {
   RadioUncheckedIcon,
 } from "icons";
 
-import { ZoomMode } from "utils/annotator/enums";
+import { ZoomMode } from "views/ImageViewer/utils/enums";
 
 //TODO: Slider
 
