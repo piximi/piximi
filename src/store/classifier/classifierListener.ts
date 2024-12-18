@@ -25,10 +25,8 @@ import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/common/enums";
 
 import {
-  AnnotatorState,
   AppSettingsState,
   ClassifierState,
-  ImageViewerState,
   ProjectState,
   SegmenterState,
   TypedAppStartListening,
@@ -38,6 +36,10 @@ import { DataState } from "store/types";
 import { AppDispatch } from "store/types";
 import { AlertState } from "utils/common/types";
 import { Category, Thing } from "store/data/types";
+import {
+  AnnotatorState,
+  ImageViewerState,
+} from "views/ImageViewer/utils/types";
 
 export const classifierMiddleware = createListenerMiddleware();
 

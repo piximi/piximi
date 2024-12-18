@@ -1,4 +1,4 @@
-import { encode, maskFromPoints } from "utils/annotator";
+import { encode, maskFromPoints } from "views/ImageViewer/utils";
 import { generateUUID, getPropertiesFromImage } from "utils/common/helpers";
 import { logger } from "utils/common/helpers";
 
@@ -9,7 +9,7 @@ import {
   SerializedCOCOFileType,
   SerializedCOCOImageType,
 } from "../../types";
-import { Point } from "utils/annotator/types";
+import { Point } from "views/ImageViewer/utils/types";
 import { UNKNOWN_ANNOTATION_CATEGORY_COLOR } from "utils/common/constants";
 import { RequireOnly } from "utils/common/types";
 import {

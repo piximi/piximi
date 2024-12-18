@@ -1,5 +1,5 @@
 import { test } from "@jest/globals";
-import { padMask, findContours } from "utils/annotator";
+import { padMask, findContours } from "views/ImageViewer/utils";
 import { Point } from "../types";
 
 const p = (y: number, x: number) => ({ y, x });

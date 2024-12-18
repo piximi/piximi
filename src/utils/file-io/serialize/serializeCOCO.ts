@@ -3,7 +3,7 @@ import {
   padMask,
   findContours,
   simplifyPolygon,
-} from "utils/annotator";
+} from "views/ImageViewer/utils";
 
 import { logger } from "utils/common/helpers";
 import {

@@ -2,7 +2,10 @@ import * as ImageJS from "image-js";
 
 import { AnnotationTool } from "./AnnotationTool";
 
-import { connectPoints, computeBoundingBoxFromContours } from "utils/annotator";
+import {
+  connectPoints,
+  computeBoundingBoxFromContours,
+} from "views/ImageViewer/utils";
 import { Point } from "../types";
 import { AnnotationState } from "../enums";
 

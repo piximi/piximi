@@ -11,7 +11,7 @@ import {
 } from "@tensorflow/tfjs";
 import { intersection } from "lodash";
 import { MeasurementOption } from "store/measurements/types";
-import { findContours } from "utils/annotator";
+import { findContours } from "views/ImageViewer/utils";
 import { DataArray } from "utils/file-io/types";
 
 //TODO: Write tests

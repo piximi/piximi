@@ -4,7 +4,7 @@ import * as ReactKonva from "react-konva";
 
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
-import { QuickAnnotationTool } from "utils/annotator/tools";
+import { QuickAnnotationTool } from "views/ImageViewer/utils/tools";
 
 type QuickSelectionProps = {
   operator: QuickAnnotationTool;

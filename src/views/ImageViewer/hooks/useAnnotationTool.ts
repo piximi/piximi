@@ -25,9 +25,9 @@ import {
   ThresholdAnnotationTool,
   SelectionTool,
   BlankAnnotationTool,
-} from "utils/annotator/tools";
+} from "views/ImageViewer/utils/tools";
 
-import { ToolType } from "utils/annotator/enums";
+import { ToolType } from "views/ImageViewer/utils/enums";
 
 export const useAnnotationTool = () => {
   const [image, setImage] = useState<ImageJS.Image>();
