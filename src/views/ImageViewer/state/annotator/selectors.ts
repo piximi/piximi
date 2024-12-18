@@ -2,9 +2,9 @@ import {
   AnnotationMode,
   AnnotationState,
   ToolType,
-} from "views/ImageViewer/utils/enums";
+} from "utils/annotator/enums";
 
-import { AnnotatorState } from "../../utils/types";
+import { AnnotatorState } from "store/types";
 
 export const selectAnnotationState = ({
   annotator,
@@ -14,12 +14,12 @@ export const selectAnnotationState = ({
   return annotator.annotationState;
 };
 
-export const selectAnnotationMode = ({
+export const selectAnnotationSelectionMode = ({
   annotator,
 }: {
   annotator: AnnotatorState;
 }): AnnotationMode => {
-  return annotator.annotationMode;
+  return annotator.selectionMode;
 };
 export const selectPenSelectionBrushSize = ({
   annotator,
@@ -59,7 +59,7 @@ export const selectWorkingAnnotationId = ({
 }): string | undefined => {
   return annotator.workingAnnotationId;
 };
-export const selectWorkingAnnotationEntity = ({
+export const selectWorkingAnnotation = ({
   annotator,
 }: {
   annotator: AnnotatorState;
@@ -72,32 +72,4 @@ export const selectSelectedAnnotationIds = ({
   annotator: AnnotatorState;
 }): string[] => {
   return annotator.selectedAnnotationIds;
-};
-
-export const selectChanges = ({ annotator }: { annotator: AnnotatorState }) => {
-  return annotator.changes;
-};
-
-export const selectKindChanges = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.changes.kinds;
-};
-
-export const selectCategoryChanges = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.changes.categories;
-};
-
-export const selectThingChanges = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.changes.things;
 };

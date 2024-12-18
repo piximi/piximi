@@ -3,24 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
-import {
-  selectActiveImage,
-  selectImageViewerCategories,
-  selectCategoriesByKindArray,
-  selectFullWorkingAnnotation,
-  selectImageViewerObjectsArray,
-  selectImageViewerKinds,
-} from "views/ImageViewer/state/annotator/reselectors";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 import {
   selectActiveImageId,
   selectSelectedIVCategoryId,
 } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectAnnotationMode } from "../state/annotator/selectors";
-
-import { AnnotationTool } from "views/ImageViewer/utils/tools";
-
-import { AnnotationMode, AnnotationState } from "views/ImageViewer/utils/enums";
-import { isUnknownCategory } from "store/data/helpers";
 import {
   createProtoAnnotation,
   editProtoAnnotation,

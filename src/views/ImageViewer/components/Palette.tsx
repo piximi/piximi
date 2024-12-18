@@ -8,9 +8,9 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { dataSlice } from "store/data";
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectActiveImageRawColor } from "views/ImageViewer/state/annotator/reselectors";
+import { selectActiveImageRawColor } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { rgbToHex } from "utils/common/helpers";
 

@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { annotatorSlice } from "../state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import {
-  selectImageViewerKinds,
-  selectImageViewerObjects,
-} from "../state/annotator/reselectors";
 import {
   selectFilteredImageViewerCategoryIds,
   selectHighligtedIVCatogory,
   selectSelectedIVCategoryId,
 } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectActiveImageCategoryObjectCount } from "views/ImageViewer/state/imageViewer/reselectors";
+
+import { isUnknownCategory } from "utils/common/helpers";
 
 import { Category } from "store/data/types";
 import { ProtoAnnotationObject } from "../utils/types";

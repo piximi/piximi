@@ -8,7 +8,7 @@ import {
 
 import { useMarchingAnts } from "../../../../hooks";
 
-import { StageContext } from "views/ImageViewer/state/StageContext";
+import { StageContext } from "contexts";
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { LassoAnnotationTool } from "views/ImageViewer/utils/tools";

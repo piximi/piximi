@@ -25,17 +25,15 @@ import { Selection } from "./Selection";
 import { Annotations } from "./Annotations";
 import { Image } from "./Image";
 
-import { StageContext } from "../../state/StageContext";
+import { StageContext } from "contexts";
+import { dataSlice } from "store/data";
 import { imageViewerSlice } from "../../state/imageViewer";
 import { annotatorSlice } from "../../state/annotator";
 import {
   selectAnnotationState,
   selectToolType,
 } from "../../state/annotator/selectors";
-import {
-  selectActiveImage,
-  selectImageViewerObjectsArray,
-} from "../../state/annotator/reselectors";
+import { selectActiveImage } from "../../state/imageViewer/reselectors";
 import {
   selectActiveImageId,
   selectActiveImageRenderedSrcs,
