@@ -364,15 +364,29 @@ export const dataSlice = createSlice({
         id = generateUUID();
         idIsUnique = !state.categories.ids.includes(id);
       }
-
-      categoriesAdapter.addOne(state.categories, {
-        id: id,
-        name: name,
-        color: color,
-        visible: true,
-        containing: [],
-        kind: kind,
-      } as Category);
+      if (isPermanent) {
+        state.categories.entities[id] = {
+          saved: {
+            id: id,
+            name: name,
+            color: color,
+            visible: true,
+            containing: [],
+            kind: kind,
+          } as Category,
+          changes: {},
+        };
+        state.categories.ids.push(id);
+      } else {
+        categoriesAdapter.addOne(state.categories, {
+          id: id,
+          name: name,
+          color: color,
+          visible: true,
+          containing: [],
+          kind: kind,
+        } as Category);
+      }
 
       kindsToUpdate.forEach((kind) =>
         dataSlice.caseReducers.updateKindCategories(state, {
