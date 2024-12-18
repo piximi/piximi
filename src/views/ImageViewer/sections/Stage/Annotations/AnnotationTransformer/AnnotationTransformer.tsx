@@ -12,7 +12,7 @@ import useSound from "use-sound";
 
 import { useHotkeys } from "hooks";
 
-import { StageContext } from "contexts";
+import { StageContext } from "views/ImageViewer/state/StageContext";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { dataSlice } from "store/data";
