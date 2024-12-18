@@ -2,7 +2,7 @@ import { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { selectImageOrigin } from "store/imageViewer/selectors";
+import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { QuickAnnotationTool } from "utils/annotator/tools";
 

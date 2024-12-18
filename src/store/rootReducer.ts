@@ -2,10 +2,10 @@ import { combineReducers } from "redux";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { classifierSlice } from "store/classifier";
-import { imageViewerSlice } from "store/imageViewer";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";
-import { annotatorSlice } from "store/annotator";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { dataSlice } from "./data/dataSlice";
 import { measurementsSlice } from "./measurements/measurementsSlice";
 

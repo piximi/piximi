@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useMarchingAnts } from "../../../../hooks";
 
 import { StageContext } from "contexts";
-import { selectImageOrigin } from "store/imageViewer/selectors";
+import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { PolygonalAnnotationTool } from "utils/annotator/tools";
 

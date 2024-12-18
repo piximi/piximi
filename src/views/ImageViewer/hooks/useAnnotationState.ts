@@ -3,14 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { RootState } from "store/rootReducer";
 
-import { annotatorSlice } from "store/annotator";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
-import { imageViewerSlice } from "store/imageViewer";
-import { selectActiveImage } from "store/imageViewer/reselectors";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 import {
   selectActiveImageId,
   selectSelectedIVCategoryId,
-} from "store/imageViewer/selectors";
+} from "views/ImageViewer/state/imageViewer/selectors";
 import {
   selectCategoryById,
   selectFirstUnknownCategory,

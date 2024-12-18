@@ -3,7 +3,7 @@ import { intersection } from "lodash";
 
 import { annotatorSlice } from "./annotatorSlice";
 
-import { imageViewerSlice } from "store/imageViewer";
+import { imageViewerSlice } from "../imageViewer";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";

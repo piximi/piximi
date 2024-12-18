@@ -8,8 +8,8 @@ import {
   selectQuickSelectionRegionSize,
   selectToolType,
   selectThresholdAnnotationValue,
-} from "store/annotator/selectors";
-import { selectActiveImage } from "store/imageViewer/reselectors";
+} from "views/ImageViewer/state/annotator/selectors";
+import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import {
   AnnotationTool,

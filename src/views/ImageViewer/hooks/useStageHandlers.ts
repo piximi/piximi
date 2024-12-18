@@ -8,12 +8,12 @@ import { throttle } from "lodash";
 import { useZoom } from "./useZoom";
 import { usePointerTool } from "./usePointerTool";
 
-import { annotatorSlice } from "store/annotator";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
   selectAnnotationSelectionMode,
   selectSelectedAnnotationIds,
   selectToolType,
-} from "store/annotator/selectors";
+} from "views/ImageViewer/state/annotator/selectors";
 
 import { logger } from "utils/common/helpers";
 import { AnnotationTool, ObjectAnnotationTool } from "utils/annotator/tools";
