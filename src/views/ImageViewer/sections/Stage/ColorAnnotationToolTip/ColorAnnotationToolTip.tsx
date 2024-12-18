@@ -6,7 +6,7 @@ import { StageContext } from "contexts";
 import {
   selectAnnotationState,
   selectToolType,
-} from "store/annotator/selectors";
+} from "views/ImageViewer/state/annotator/selectors";
 
 import { AnnotationState, ToolType } from "utils/annotator/enums";
 

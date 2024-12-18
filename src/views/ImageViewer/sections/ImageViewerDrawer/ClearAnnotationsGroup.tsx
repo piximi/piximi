@@ -8,11 +8,11 @@ import { useDialogHotkey, useTranslation } from "hooks";
 import { ConfirmationDialog } from "components/dialogs";
 import { CustomListItemButton } from "components/ui";
 
-import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
-import { annotatorSlice } from "store/annotator";
-import { selectSelectedAnnotationIds } from "store/annotator/selectors";
-import { selectActiveAnnotationIds } from "store/imageViewer/selectors";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { selectSelectedAnnotationIds } from "views/ImageViewer/state/annotator/selectors";
+import { selectActiveAnnotationIds } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { HotkeyContext } from "utils/common/enums";
 

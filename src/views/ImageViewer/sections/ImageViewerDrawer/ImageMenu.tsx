@@ -10,7 +10,7 @@ import { ExportAnnotationsMenu } from "../../components/ExportAnnotationsMenu";
 import { dataSlice } from "store/data/dataSlice";
 
 import { ImageObject } from "store/data/types";
-import { imageViewerSlice } from "store/imageViewer";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;

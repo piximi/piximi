@@ -4,8 +4,8 @@ import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
 import { BaseOptions } from "./BaseOptions";
 
-import { annotatorSlice } from "store/annotator";
-import { selectThresholdAnnotationValue } from "store/annotator/selectors";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { selectThresholdAnnotationValue } from "views/ImageViewer/state/annotator/selectors";
 
 //TODO: Slider
 

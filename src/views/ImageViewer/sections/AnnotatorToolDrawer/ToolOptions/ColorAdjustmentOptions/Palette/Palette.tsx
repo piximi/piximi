@@ -9,8 +9,8 @@ import {
 } from "@mui/icons-material";
 
 import { dataSlice } from "store/data";
-import { selectActiveImageId } from "store/imageViewer/selectors";
-import { selectActiveImageRawColor } from "store/imageViewer/reselectors";
+import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectActiveImageRawColor } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { rgbToHex } from "utils/common/helpers";
 

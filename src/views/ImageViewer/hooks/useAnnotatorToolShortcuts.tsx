@@ -1,11 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
 
-import { imageViewerSlice } from "store/imageViewer";
-import { selectActiveImageId } from "store/imageViewer/selectors";
-import { selectImageViewerImages } from "store/imageViewer/reselectors";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectImageViewerImages } from "views/ImageViewer/state/imageViewer/reselectors";
 
-import { annotatorSlice } from "store/annotator";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
 import { ToolType } from "utils/annotator/enums";
 import { HotkeyContext } from "utils/common/enums";

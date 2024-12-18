@@ -7,19 +7,19 @@ import useSound from "use-sound";
 import { useHotkeys } from "hooks";
 
 import { StageContext } from "contexts";
-import { imageViewerSlice } from "store/imageViewer";
-import { annotatorSlice } from "store/annotator";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { dataSlice } from "store/data";
 import {
   selectActiveAnnotationIds,
   selectActiveImageId,
   selectCursor,
   selectImageOrigin,
-} from "store/imageViewer/selectors";
+} from "views/ImageViewer/state/imageViewer/selectors";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
-import { selectWorkingAnnotation } from "store/annotator/selectors";
-import { selectSelectedAnnotations } from "store/annotator/reselectors";
-import { selectActiveImage } from "store/imageViewer/reselectors";
+import { selectWorkingAnnotation } from "views/ImageViewer/state/annotator/selectors";
+import { selectSelectedAnnotations } from "views/ImageViewer/state/annotator/reselectors";
+import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { AnnotationTool } from "utils/annotator/tools";
 
