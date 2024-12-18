@@ -3,7 +3,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { selectSelectedAnnotationIds } from "./selectors";
 import { selectThingsDictionary } from "store/data/selectors";
 
-import { decodeAnnotation } from "utils/annotator/rle";
+import { decodeAnnotation } from "views/ImageViewer/utils/rle";
 
 import { AnnotationObject, DecodedAnnotationObject } from "store/data/types";
 

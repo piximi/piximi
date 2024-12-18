@@ -16,9 +16,9 @@ import {
   selectFirstUnknownCategory,
 } from "store/data/selectors";
 
-import { AnnotationTool } from "utils/annotator/tools";
+import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
-import { AnnotationState } from "utils/annotator/enums";
+import { AnnotationState } from "views/ImageViewer/utils/enums";
 
 export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();

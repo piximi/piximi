@@ -7,7 +7,7 @@ import Image from "image-js";
 import { dataSlice } from "store/data";
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
-import { hexToRGBA, colorOverlayROI, encode } from "utils/annotator";
+import { hexToRGBA, colorOverlayROI, encode } from "views/ImageViewer/utils";
 
 import { DecodedAnnotationObject, Shape } from "store/data/types";
 

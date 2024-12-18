@@ -2,7 +2,7 @@ import { DataArray } from "image-js";
 import * as tf from "@tensorflow/tfjs";
 
 import { getObjectMaskData, prepareChannels } from "utils/measurements/helpers";
-import { decode } from "utils/annotator";
+import { decode } from "views/ImageViewer/utils";
 
 import {
   MeasurementDisplayTable,

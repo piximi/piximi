@@ -4,7 +4,7 @@ import * as ReactKonva from "react-konva";
 
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
-import { PenAnnotationTool } from "utils/annotator/tools";
+import { PenAnnotationTool } from "views/ImageViewer/utils/tools";
 
 type PenSelectionProps = {
   operator: PenAnnotationTool;

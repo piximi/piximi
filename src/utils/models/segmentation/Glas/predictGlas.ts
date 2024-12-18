@@ -12,7 +12,7 @@ import {
 } from "@tensorflow/tfjs";
 import { ColorModel, Image as ImageJS, ImageKind } from "image-js";
 
-import { encode } from "utils/annotator";
+import { encode } from "views/ImageViewer/utils";
 import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
 import { generateUUID } from "utils/common/helpers";
 import { Partition } from "../../enums";

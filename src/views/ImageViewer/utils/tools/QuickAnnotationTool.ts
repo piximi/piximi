@@ -2,7 +2,7 @@ import * as ImageJS from "image-js";
 
 import { AnnotationTool } from "./AnnotationTool";
 
-import { slic } from "utils/annotator";
+import { slic } from "views/ImageViewer/utils";
 import { AnnotationState } from "../enums";
 
 export class QuickAnnotationTool extends AnnotationTool {
