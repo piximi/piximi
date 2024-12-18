@@ -333,6 +333,7 @@ export const dataSlice = createSlice({
           } as Category,
           changes: {},
         };
+        state.categories.ids.push(id);
       } else {
         categoriesAdapter.addOne(state.categories, {
           id: id,
