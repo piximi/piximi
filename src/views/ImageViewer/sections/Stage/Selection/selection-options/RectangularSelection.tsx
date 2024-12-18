@@ -4,7 +4,7 @@ import { Group as KonvaGroup, Rect as KonvaRect } from "react-konva";
 
 import { useMarchingAnts } from "../../../../hooks";
 
-import { StageContext } from "contexts";
+import { StageContext } from "views/ImageViewer/state/StageContext";
 
 import {
   RectangularAnnotationTool,

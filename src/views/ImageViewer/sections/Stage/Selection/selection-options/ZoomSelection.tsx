@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { useSelector } from "react-redux";
 import { Group as KonvaGroup, Rect as KonvaRect } from "react-konva";
 
-import { StageContext } from "contexts";
+import { StageContext } from "views/ImageViewer/state/StageContext";
 import { selectZoomSelection } from "../../../../state/imageViewer/selectors";
 
 export const ZoomSelection = () => {
