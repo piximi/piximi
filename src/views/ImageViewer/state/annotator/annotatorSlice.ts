@@ -1,15 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { AnnotationTool } from "utils/annotator/tools/AnnotationTool";
+import { AnnotationTool } from "views/ImageViewer/utils/tools/AnnotationTool";
 
 import {
   AnnotationMode,
   AnnotationState,
   ToolType,
-} from "utils/annotator/enums";
+} from "views/ImageViewer/utils/enums";
 
 import { mutatingFilter } from "utils/common/helpers";
-import { AnnotatorState } from "store/types";
+import { AnnotatorState } from "views/ImageViewer/utils/types";
 import { DecodedAnnotationObject } from "store/data/types";
 
 const initialState: AnnotatorState = {

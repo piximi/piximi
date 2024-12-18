@@ -37,7 +37,7 @@ import {
 } from "icons";
 
 import { HotkeyContext } from "utils/common/enums";
-import { ToolType as OperationType } from "utils/annotator/enums";
+import { ToolType as OperationType } from "views/ImageViewer/utils/enums";
 import { dimensions } from "utils/common/constants";
 
 type AnnotatorToolDrawerProps = {

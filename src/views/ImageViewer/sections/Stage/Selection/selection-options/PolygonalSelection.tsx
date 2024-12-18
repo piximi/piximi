@@ -7,7 +7,7 @@ import { useMarchingAnts } from "../../../../hooks";
 import { StageContext } from "views/ImageViewer/state/StageContext";
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
-import { PolygonalAnnotationTool } from "utils/annotator/tools";
+import { PolygonalAnnotationTool } from "views/ImageViewer/utils/tools";
 
 type PolygonalSelectionProps = {
   operator: PolygonalAnnotationTool;

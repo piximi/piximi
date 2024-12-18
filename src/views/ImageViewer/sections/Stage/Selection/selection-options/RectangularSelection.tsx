@@ -9,7 +9,7 @@ import { StageContext } from "views/ImageViewer/state/StageContext";
 import {
   RectangularAnnotationTool,
   SelectionTool,
-} from "utils/annotator/tools";
+} from "views/ImageViewer/utils/tools";
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
 type RectangularSelectionProps = {

@@ -10,7 +10,7 @@ import {
 import { ColorModel, Image as ImageJS } from "image-js";
 import { hyphaWebsocketClient } from "imjoy-rpc";
 
-import { encode } from "utils/annotator";
+import { encode } from "views/ImageViewer/utils";
 import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
 import { generateUUID } from "utils/common/helpers";
 import { Partition } from "../../enums";

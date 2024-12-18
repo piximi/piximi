@@ -13,7 +13,7 @@ import {
   Tensor4D,
 } from "@tensorflow/tfjs";
 
-import { encode } from "utils/annotator";
+import { encode } from "views/ImageViewer/utils";
 import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
 import { generateUUID } from "utils/common/helpers";
 import { Partition } from "../../enums";

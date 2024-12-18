@@ -3,13 +3,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { distinctFilter, mutatingFilter } from "utils/common/helpers";
 
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
-import { ZoomMode } from "utils/annotator/enums";
+import { ZoomMode } from "views/ImageViewer/utils/enums";
 
-import { ImageViewerState } from "store/types";
+import { ImageViewerState } from "../../utils/types";
 import {
   ColorAdjustmentOptionsType,
   ZoomToolOptionsType,
-} from "utils/annotator/types";
+} from "views/ImageViewer/utils/types";
 
 const initialState: ImageViewerState = {
   imageStack: [],

@@ -8,7 +8,7 @@ import {
   selectToolType,
 } from "views/ImageViewer/state/annotator/selectors";
 
-import { AnnotationState, ToolType } from "utils/annotator/enums";
+import { AnnotationState, ToolType } from "views/ImageViewer/utils/enums";
 
 type ColorAnnotationToolTipProps = {
   toolTipPosition?: { x: number; y: number };

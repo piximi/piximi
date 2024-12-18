@@ -1,4 +1,4 @@
-import { decode } from "utils/annotator";
+import { decode } from "views/ImageViewer/utils";
 import JSZip from "jszip";
 import { AnnotationObject, Category, ImageObject } from "store/data/types";
 import { merge } from "lodash";

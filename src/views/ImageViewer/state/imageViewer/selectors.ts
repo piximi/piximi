@@ -1,8 +1,8 @@
-import { ImageViewerState } from "store/types";
+import { ImageViewerState } from "../../utils/types";
 import {
   ColorAdjustmentOptionsType,
   ZoomToolOptionsType,
-} from "utils/annotator/types";
+} from "views/ImageViewer/utils/types";
 
 export const selectZoomToolOptions = ({
   imageViewer,

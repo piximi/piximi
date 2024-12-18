@@ -33,16 +33,18 @@ import {
   Shape,
 } from "store/data/types";
 import {
-  AnnotatorState,
   AppDispatch,
   AppSettingsState,
   ClassifierState,
-  ImageViewerState,
   ProjectState,
   SegmenterState,
   TypedAppStartListening,
 } from "store/types";
 import { DataState } from "store/types";
+import {
+  AnnotatorState,
+  ImageViewerState,
+} from "views/ImageViewer/utils/types";
 import { LoadCB } from "utils/file-io/types";
 
 export const segmenterMiddleware = createListenerMiddleware();

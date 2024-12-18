@@ -25,8 +25,8 @@ import {
   QuickAnnotationTool,
   RectangularAnnotationTool,
   SelectionTool,
-} from "utils/annotator/tools";
-import { ToolType } from "utils/annotator/enums";
+} from "views/ImageViewer/utils/tools";
+import { ToolType } from "views/ImageViewer/utils/enums";
 
 type SelectionProps = {
   tool: Tool;
