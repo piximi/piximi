@@ -1,11 +1,6 @@
-import { FilterType, RequireOnly } from "utils/common/types";
+import { FilterType } from "utils/common/types";
 import { AnnotationMode, AnnotationState, ToolType, ZoomMode } from "./enums";
-import {
-  AnnotationObject,
-  Category,
-  DecodedAnnotationObject,
-  Kind,
-} from "store/data/types";
+import { AnnotationObject, DecodedAnnotationObject } from "store/data/types";
 
 export type ImageViewerState = {
   imageStack: string[];
@@ -36,63 +31,19 @@ export type ImageViewerState = {
   highlightedCategory?: string;
 };
 
-export type ProtoAnnotationObject = Omit<
-  DecodedAnnotationObject,
-  "src" | "data"
->;
 export type AnnotatorState = {
   workingAnnotationId: string | undefined;
   workingAnnotation: {
-    saved: ProtoAnnotationObject | undefined;
-    changes: Partial<ProtoAnnotationObject>;
+    saved: DecodedAnnotationObject | undefined;
+    changes: Partial<DecodedAnnotationObject>;
   };
-  changes: AnnotatorChanges;
   selectedAnnotationIds: Array<string>;
   annotationState: AnnotationState;
   penSelectionBrushSize: number;
   quickSelectionRegionSize: number;
   thresholdAnnotationValue: number;
-  annotationMode: AnnotationMode;
+  selectionMode: AnnotationMode;
   toolType: ToolType;
-};
-
-export type KindEdits = Omit<
-  RequireOnly<Kind, "id">,
-  "categories" | "containing"
-> & {
-  categories?: {
-    added: string[];
-    deleted: string[];
-  };
-  containing?: {
-    added: string[];
-    deleted: string[];
-  };
-};
-
-export type CategoryEdits = Omit<RequireOnly<Category, "id">, "containing"> & {
-  containing?: {
-    added: string[];
-    deleted: string[];
-  };
-};
-
-export type AnnotatorChanges = {
-  kinds: {
-    added: Record<string, Kind>;
-    deleted: string[];
-    edited: Record<string, KindEdits>;
-  };
-  categories: {
-    added: Record<string, Category>;
-    deleted: string[];
-    edited: Record<string, CategoryEdits>;
-  };
-  things: {
-    added: Record<string, ProtoAnnotationObject>;
-    deleted: string[];
-    edited: Record<string, RequireOnly<ProtoAnnotationObject, "id">>;
-  };
 };
 export type Point = {
   x: number;
