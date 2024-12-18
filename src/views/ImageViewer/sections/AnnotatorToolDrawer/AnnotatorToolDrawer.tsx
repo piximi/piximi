@@ -19,8 +19,8 @@ import { useAnnotatorToolShortcuts } from "../../hooks";
 import { CustomToolTip, Tool } from "../../components";
 import { ToolOptions } from "./ToolOptions";
 
-import { annotatorSlice } from "store/annotator";
-import { selectToolType } from "store/annotator/selectors";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
 
 import {
   ColorAdjustment,

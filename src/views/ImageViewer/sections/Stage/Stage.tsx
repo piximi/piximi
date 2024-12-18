@@ -38,20 +38,20 @@ import { Annotations } from "./Annotations";
 import { Image } from "./Image";
 
 import { StageContext } from "contexts";
-import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
-import { annotatorSlice } from "store/annotator";
+import { imageViewerSlice } from "../../state/imageViewer";
+import { annotatorSlice } from "../../state/annotator";
 import {
   selectAnnotationState,
   selectToolType,
-} from "store/annotator/selectors";
-import { selectActiveImage } from "store/imageViewer/reselectors";
+} from "../../state/annotator/selectors";
+import { selectActiveImage } from "../../state/imageViewer/reselectors";
 import {
   selectActiveImageId,
   selectActiveImageRenderedSrcs,
   selectImageIsloading,
   selectStagePosition,
-} from "store/imageViewer/selectors";
+} from "../../state/imageViewer/selectors";
 
 import { generateUnknownCategory, generateUUID } from "utils/common/helpers";
 

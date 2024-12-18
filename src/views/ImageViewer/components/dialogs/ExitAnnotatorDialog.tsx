@@ -2,11 +2,11 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { imageViewerSlice } from "store/imageViewer";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { dataSlice } from "store/data/";
-import { annotatorSlice } from "store/annotator";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
-import { selectActiveImageId } from "store/imageViewer/selectors";
+import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
 
 type ExitAnnotatorDialogProps = {
   returnToProject: () => void;

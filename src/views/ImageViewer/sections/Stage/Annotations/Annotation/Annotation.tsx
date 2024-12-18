@@ -5,7 +5,7 @@ import * as ReactKonva from "react-konva";
 import Image from "image-js";
 
 import { dataSlice } from "store/data";
-import { selectImageOrigin } from "store/imageViewer/selectors";
+import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { hexToRGBA, colorOverlayROI, encode } from "utils/annotator";
 

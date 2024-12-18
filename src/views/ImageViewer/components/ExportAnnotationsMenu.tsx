@@ -16,13 +16,13 @@ import {
   selectObjectCategoryDict,
 } from "store/data/selectors";
 import { selectProjectName } from "store/project/selectors";
-import { selectHasUnsavedChanges } from "store/imageViewer/selectors";
+import { selectHasUnsavedChanges } from "views/ImageViewer/state/imageViewer/selectors";
 import {
   selectImageViewerObjects,
   selectImageViewerImages,
   selectImageViewerObjectDict,
   selectImageViewerImageDict,
-} from "store/imageViewer/reselectors";
+} from "views/ImageViewer/state/imageViewer/reselectors";
 
 import {
   serializeCOCOFile,

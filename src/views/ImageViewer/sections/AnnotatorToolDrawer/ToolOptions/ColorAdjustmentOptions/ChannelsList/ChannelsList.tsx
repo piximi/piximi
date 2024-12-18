@@ -21,7 +21,7 @@ import { dataSlice } from "store/data";
 import {
   selectActiveImage,
   selectActiveImageRawColor,
-} from "store/imageViewer/reselectors";
+} from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
 
