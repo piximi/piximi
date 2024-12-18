@@ -11,7 +11,7 @@ import {
   selectWorkingAnnotationView,
 } from "views/ImageViewer/state/imageViewer/reselectors";
 
-import { AnnotationTool } from "utils/annotator/tools";
+import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
 type AnnotationsProps = {
   annotationTool: AnnotationTool;

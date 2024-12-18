@@ -1,6 +1,6 @@
 import { AnnotationState } from "../enums";
 import { AnnotationTool } from "./AnnotationTool";
-import { drawRectangle } from "utils/annotator";
+import { drawRectangle } from "views/ImageViewer/utils";
 
 export class ThresholdAnnotationTool extends AnnotationTool {
   threshold = 255;

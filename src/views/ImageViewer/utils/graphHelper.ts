@@ -3,7 +3,7 @@ import createGraph, { Graph, Node } from "ngraph.graph";
 import { NodeHeap } from "./NodeHeap";
 import { cachedAStarPathSearch } from "./PathFinder";
 
-import { getIdx } from "utils/annotator/imageHelper";
+import { getIdx } from "views/ImageViewer/utils/imageHelper";
 import { Point } from "./types";
 import { DataArray } from "utils/file-io/types";
 

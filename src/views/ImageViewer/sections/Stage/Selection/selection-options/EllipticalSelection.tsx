@@ -7,7 +7,7 @@ import { useMarchingAnts } from "../../../../hooks";
 import { StageContext } from "views/ImageViewer/state/StageContext";
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
-import { EllipticalAnnotationTool } from "utils/annotator/tools";
+import { EllipticalAnnotationTool } from "views/ImageViewer/utils/tools";
 
 type EllipticalSelectionProps = {
   operator: EllipticalAnnotationTool;

@@ -5,7 +5,7 @@ import { useMarchingAnts } from "../../../../hooks";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
 
-import { ObjectAnnotationTool } from "utils/annotator/tools";
+import { ObjectAnnotationTool } from "views/ImageViewer/utils/tools";
 
 type ObjectSelectionProps = {
   operator: ObjectAnnotationTool;

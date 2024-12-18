@@ -9,7 +9,7 @@ import {
 } from "views/ImageViewer/state/annotator/selectors";
 import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
-import { ToolType } from "utils/annotator/enums";
+import { ToolType } from "views/ImageViewer/utils/enums";
 
 type PenAnnotationToolTipProps = {
   currentPosition?: { x: number; y: number };

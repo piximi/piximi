@@ -1,11 +1,6 @@
 import { History } from "@tensorflow/tfjs";
 import { AnyAction, Dispatch, TypedStartListening } from "@reduxjs/toolkit";
 
-import {
-  AnnotationMode,
-  AnnotationState,
-  ToolType,
-} from "utils/annotator/enums";
 import { HotkeyContext, Languages, ThingSortKey } from "utils/common/enums";
 import { ThemeMode } from "themes/enums";
 import {
@@ -25,19 +20,18 @@ import {
   SegmenterEvaluationResultType,
 } from "utils/models/types";
 import {
-  ColorAdjustmentOptionsType,
-  ZoomToolOptionsType,
-} from "utils/annotator/types";
-import {
   Kind,
   AnnotationObject,
   Category,
-  DecodedAnnotationObject,
   ImageObject,
   Shape,
   Thing,
 } from "./data/types";
 import { MeasurementsState } from "./measurements/types";
+import {
+  AnnotatorState,
+  ImageViewerState,
+} from "views/ImageViewer/utils/types";
 
 export type AppSettingsState = {
   // async work for setting initial states,
@@ -112,50 +106,6 @@ export type ProjectState = {
   activeKind: string;
   kindTabFilters: string[];
   imageChannels: number | undefined;
-};
-
-export type ImageViewerState = {
-  imageStack: string[];
-  hasUnsavedChanges: boolean;
-  colorAdjustment: ColorAdjustmentOptionsType;
-  cursor: string;
-  activeImageId?: string;
-  activeAnnotationIds: Array<string>;
-  previousImageId?: string;
-  filters: Required<Pick<FilterType<AnnotationObject>, "categoryId">>;
-  activeImageRenderedSrcs: Array<string>;
-  imageOrigin: { x: number; y: number };
-
-  selectedCategoryId: string;
-  stageHeight: number;
-  stageScale: number;
-  stageWidth: number;
-  stagePosition: { x: number; y: number };
-  zoomSelection: {
-    dragging: boolean;
-    minimum: { x: number; y: number } | undefined;
-    maximum: { x: number; y: number } | undefined;
-    selecting: boolean;
-    centerPoint: { x: number; y: number } | undefined;
-  };
-  zoomOptions: ZoomToolOptionsType;
-  imageIsLoading: boolean;
-  highlightedCategory?: string;
-};
-
-export type AnnotatorState = {
-  workingAnnotationId: string | undefined;
-  workingAnnotation: {
-    saved: DecodedAnnotationObject | undefined;
-    changes: Partial<DecodedAnnotationObject>;
-  };
-  selectedAnnotationIds: Array<string>;
-  annotationState: AnnotationState;
-  penSelectionBrushSize: number;
-  quickSelectionRegionSize: number;
-  thresholdAnnotationValue: number;
-  selectionMode: AnnotationMode;
-  toolType: ToolType;
 };
 
 type AppState = {
