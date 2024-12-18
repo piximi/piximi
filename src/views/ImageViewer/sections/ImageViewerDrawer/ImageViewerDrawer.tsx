@@ -7,9 +7,11 @@ import { useDialogHotkey } from "hooks";
 
 import { AppBarOffset, DividerHeader, FunctionalDivider } from "components/ui";
 import { BaseAppDrawer } from "components/layout";
-import { ExportAnnotationsListItem } from "components/file-io";
 import { CreateKindDialog } from "components/dialogs";
-import { ImageViewerCategories } from "../../components";
+import {
+  ImageViewerCategories,
+  ExportAnnotationsListItem,
+} from "../../components";
 import { ImageViewerAppBar } from "../ImageViewerAppBar";
 import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
 import { ImageList } from "./ImageList";

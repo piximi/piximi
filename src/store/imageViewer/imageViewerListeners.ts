@@ -2,6 +2,7 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
 import { annotatorSlice } from "store/annotator";
+import { dataSlice } from "store/data";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { imageViewerSlice } from "./imageViewerSlice";
 
@@ -27,7 +28,7 @@ startAppListening({
   effect: (action, listenerAPI) => {
     const selectedThingIds = action.payload.selectedThingIds;
     const dataState = listenerAPI.getState().data;
-
+    if (selectedThingIds.length === 0) return;
     let imageIds: string[] = [];
     const annotationIds: string[] = [];
     let activeImageId: string | undefined = undefined;
@@ -138,5 +139,53 @@ startAppListening({
         })
       );
     }
+  },
+});
+startAppListening({
+  actionCreator: dataSlice.actions.addAnnotations,
+  effect: (action, listenerAPI) => {
+    action.payload.annotations.forEach((annotation) => {
+      const imageId = annotation.imageId;
+      if (imageId === listenerAPI.getState().imageViewer.activeImageId) {
+        listenerAPI.dispatch(
+          imageViewerSlice.actions.addActiveAnnotationId({
+            annotationId: annotation.id,
+          })
+        );
+      }
+    });
+  },
+});
+
+startAppListening({
+  predicate: (action) => {
+    const type = action.type.split("/");
+
+    if (type[0] !== "data") return false;
+    if (["initializeState", "resetData", "reconcile"].includes(type[1]))
+      return false;
+    if (
+      action.payload &&
+      "isPermanent" in action.payload &&
+      action.payload.isPermanent
+    )
+      return false;
+    return true;
+  },
+  effect: (action, listenerAPI) => {
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setHasUnsavedChanges({ hasUnsavedChanges: true })
+    );
+  },
+});
+
+startAppListening({
+  actionCreator: dataSlice.actions.reconcile,
+  effect: (action, listenerAPI) => {
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setHasUnsavedChanges({
+        hasUnsavedChanges: false,
+      })
+    );
   },
 });

@@ -8,7 +8,6 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { UpdateCategoryDialog } from "components/dialogs";
 
 import { dataSlice } from "store/data/dataSlice";
-import { imageViewerSlice } from "store/imageViewer";
 import { selectActiveKindId } from "store/project/selectors";
 
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
@@ -20,7 +19,7 @@ type MenuFunctions = {
   Edit?: { permanent: boolean };
   "Edit Color"?: { permanent: boolean };
   Delete?: { permanent: boolean };
-  "Clear Objects": { permanent: boolean; imageViewer?: boolean };
+  "Clear Objects": () => void;
 };
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;
@@ -68,23 +67,18 @@ export const CategoryItemMenu = ({
     );
   };
   const handleDeleteObjects = () => {
-    if (menuFunctions && menuFunctions["Clear Objects"].imageViewer) {
+    if (menuFunctions) {
+      menuFunctions["Clear Objects"]();
+    } else {
       dispatch(
-        imageViewerSlice.actions.removeActiveAnnotationIds({
-          annotationIds: category.containing,
+        dataSlice.actions.deleteThings({
+          ofCategories: [category.id],
+          activeKind: kind ?? activeKind,
+          isPermanent: true,
+          disposeColorTensors: true,
         })
       );
     }
-    dispatch(
-      dataSlice.actions.deleteThings({
-        ofCategories: [category.id],
-        activeKind: kind ?? activeKind,
-        isPermanent: menuFunctions
-          ? menuFunctions["Clear Objects"].permanent
-          : true,
-        disposeColorTensors: true,
-      })
-    );
   };
 
   const handleMenuCloseWith = (dialogClose: () => void) => {
