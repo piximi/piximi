@@ -5,7 +5,7 @@ import { Box, Typography } from "@mui/material";
 import { useTranslation } from "hooks";
 
 import { AppBarOffset } from "components/ui/AppBarOffset";
-import { ToolType } from "utils/annotator/enums";
+import { ToolType } from "views/ImageViewer/utils/enums";
 import { CustomAppBar } from "components/layout";
 import { KeyboardKey } from "components/ui/KeyboardKey";
 import { BaseOptions } from "./BaseOptions";

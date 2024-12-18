@@ -5,7 +5,7 @@ import { Tool } from "./Tool";
 import {
   computeBoundingBoxFromContours as _computeBoundingBoxFromContours,
   maskFromPoints,
-} from "utils/annotator";
+} from "views/ImageViewer/utils";
 import { convertToDataArray, generateUUID } from "utils/common/helpers";
 
 import { Partition } from "utils/models/enums";

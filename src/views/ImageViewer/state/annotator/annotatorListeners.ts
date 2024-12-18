@@ -7,15 +7,18 @@ import { imageViewerSlice } from "../imageViewer";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
-import { decodeAnnotation, encodeAnnotation } from "utils/annotator/rle";
-import { BlankAnnotationTool } from "utils/annotator/tools";
+import {
+  decodeAnnotation,
+  encodeAnnotation,
+} from "views/ImageViewer/utils/rle";
+import { BlankAnnotationTool } from "views/ImageViewer/utils/tools";
 import { getPropertiesFromImage } from "utils/common/helpers";
 
 import {
   AnnotationMode,
   AnnotationState,
   ToolType,
-} from "utils/annotator/enums";
+} from "views/ImageViewer/utils/enums";
 
 import { TypedAppStartListening } from "store/types";
 import {

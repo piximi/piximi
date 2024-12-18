@@ -13,7 +13,7 @@ import { selectWorkingAnnotation } from "views/ImageViewer/state/annotator/selec
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 
-import { encode } from "utils/annotator";
+import { encode } from "views/ImageViewer/utils";
 
 //TODO: change to listItem
 

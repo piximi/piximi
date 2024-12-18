@@ -8,7 +8,6 @@ import {
   newReplaceDuplicateName,
   updateRecordArray,
 } from "utils/common/helpers";
-import { generateUUID, generateKind, isUnknownCategory } from "./helpers";
 import { encode } from "views/ImageViewer/utils/rle";
 import { updateContents } from "./helpers";
 
