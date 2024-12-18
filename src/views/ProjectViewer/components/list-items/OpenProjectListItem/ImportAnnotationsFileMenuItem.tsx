@@ -3,15 +3,12 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import { imageViewerSlice } from "store/imageViewer";
-
 import { dataSlice } from "store/data";
 import {
   selectObjectCategoryDict,
   selectObjectKindDict,
   selectSplitThingDict,
 } from "store/data/selectors";
-import { selectActiveImageId } from "store/imageViewer/selectors";
 
 import {
   deserializeCOCOFile,
@@ -38,8 +35,6 @@ export const ImportAnnotationsFileMenuItem = ({
   projectType,
 }: ImportAnnotationsMenuItemProps) => {
   const dispatch = useDispatch();
-
-  const activeImageId = useSelector(selectActiveImageId);
 
   const existingObjectCategories = useSelector(selectObjectCategoryDict);
 
@@ -98,16 +93,6 @@ export const ImportAnnotationsFileMenuItem = ({
               })
             );
           });
-
-          // when a deserialized annotation is associated with the active image
-          // this needs to invoke the decoding process for the in-view image
-          // annotations; prevImageId undefined to avoid encoding step
-          dispatch(
-            imageViewerSlice.actions.setActiveImageId({
-              imageId: activeImageId,
-              prevImageId: undefined,
-            })
-          );
         }
       };
 
@@ -115,7 +100,6 @@ export const ImportAnnotationsFileMenuItem = ({
     },
     [
       dispatch,
-      activeImageId,
       existingObjectCategories,
       existingThings.images,
       existingObjectKinds,
