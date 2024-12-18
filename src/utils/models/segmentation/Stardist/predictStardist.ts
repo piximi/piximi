@@ -10,12 +10,12 @@ import {
   getBackend,
 } from "@tensorflow/tfjs";
 
-import { encode, scanline, simplifyPolygon } from "utils/annotator";
-import { connectPoints } from "utils/annotator";
+import { encode, scanline, simplifyPolygon } from "views/ImageViewer/utils";
+import { connectPoints } from "views/ImageViewer/utils";
 import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
 import { generateUUID } from "utils/common/helpers";
 import { Partition } from "../../enums";
-import { Point } from "utils/annotator/types";
+import { Point } from "views/ImageViewer/utils/types";
 
 const computeAnnotationMaskFromPoints = (
   cropDims: { x: number; y: number; width: number; height: number },

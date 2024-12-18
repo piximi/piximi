@@ -21,11 +21,11 @@ import { selectWorkingAnnotation } from "views/ImageViewer/state/annotator/selec
 import { selectSelectedAnnotations } from "views/ImageViewer/state/annotator/reselectors";
 import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
-import { AnnotationTool } from "utils/annotator/tools";
+import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
 import { getCompleteEntity } from "store/entities/utils";
 
-import { AnnotationMode } from "utils/annotator/enums";
+import { AnnotationMode } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/common/enums";
 
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";

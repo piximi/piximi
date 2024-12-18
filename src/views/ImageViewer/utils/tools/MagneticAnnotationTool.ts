@@ -7,7 +7,7 @@ import {
   PiximiGraph,
   pointsAreEqual,
   getIdx,
-} from "utils/annotator";
+} from "views/ImageViewer/utils";
 import { Point } from "../types";
 import { AnnotationState } from "../enums";
 

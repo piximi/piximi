@@ -13,7 +13,7 @@ import {
   mutatingFilter,
   newReplaceDuplicateName,
 } from "utils/common/helpers";
-import { encode } from "utils/annotator/rle";
+import { encode } from "views/ImageViewer/utils/rle";
 import { updateContents } from "./helpers";
 
 import { Partition } from "utils/models/enums";

@@ -57,7 +57,7 @@ import { generateUnknownCategory, generateUUID } from "utils/common/helpers";
 
 import { CATEGORY_COLORS } from "store/data/constants";
 import { dimensions } from "utils/common/constants";
-import { AnnotationState, ToolType } from "utils/annotator/enums";
+import { AnnotationState, ToolType } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/common/enums";
 
 import { Category, Kind } from "store/data/types";

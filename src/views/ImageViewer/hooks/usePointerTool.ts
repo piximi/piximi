@@ -8,13 +8,13 @@ import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
 import { selectActiveAnnotations } from "views/ImageViewer/state/imageViewer/reselectors";
 
-import { getOverlappingAnnotations } from "utils/annotator";
-import { getAnnotationsInBox } from "utils/annotator/imageHelper";
+import { getOverlappingAnnotations } from "views/ImageViewer/utils";
+import { getAnnotationsInBox } from "views/ImageViewer/utils/imageHelper";
 
-import { ToolType } from "utils/annotator/enums";
+import { ToolType } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/common/enums";
 
-import { Point } from "utils/annotator/types";
+import { Point } from "views/ImageViewer/utils/types";
 import { DecodedAnnotationObject } from "store/data/types";
 
 const delta = 10;

@@ -6,7 +6,7 @@ import { ColorAnnotationToolTip } from "../../ColorAnnotationToolTip";
 
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
-import { ColorAnnotationTool } from "utils/annotator/tools";
+import { ColorAnnotationTool } from "views/ImageViewer/utils/tools";
 
 type ColorSelectionProps = {
   operator: ColorAnnotationTool;

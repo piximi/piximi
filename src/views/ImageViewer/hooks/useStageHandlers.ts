@@ -16,15 +16,18 @@ import {
 } from "views/ImageViewer/state/annotator/selectors";
 
 import { logger } from "utils/common/helpers";
-import { AnnotationTool, ObjectAnnotationTool } from "utils/annotator/tools";
+import {
+  AnnotationTool,
+  ObjectAnnotationTool,
+} from "views/ImageViewer/utils/tools";
 
 import {
   AnnotationMode,
   AnnotationState,
   ToolType,
-} from "utils/annotator/enums";
+} from "views/ImageViewer/utils/enums";
 
-import { Point } from "utils/annotator/types";
+import { Point } from "views/ImageViewer/utils/types";
 
 const transformerClassName = "Transformer";
 const transformerButtonAttrNAme = "transformer-button";
