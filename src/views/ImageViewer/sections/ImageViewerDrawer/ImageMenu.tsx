@@ -5,11 +5,12 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
+import { ExportAnnotationsMenu } from "../../components/ExportAnnotationsMenu";
+
 import { dataSlice } from "store/data/dataSlice";
 
 import { ImageObject } from "store/data/types";
 import { imageViewerSlice } from "store/imageViewer";
-import { ExportAnnotationsMenu } from "components/file-io/ExportAnnotationsListItem/ExportAnnotationsMenu";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
