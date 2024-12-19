@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import { annotatorSlice } from "../state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { selectKinds } from "../state/annotator/reselectors";
 import {
   selectFilteredImageViewerCategoryIds,
   selectHighligtedIVCatogory,
   selectSelectedIVCategoryId,
 } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectActiveImageCategoryObjectCount } from "views/ImageViewer/state/imageViewer/reselectors";
-
-import { isUnknownCategory } from "utils/common/helpers";
 
 import { Category } from "store/data/types";
 import { ProtoAnnotationObject } from "../utils/types";
@@ -23,8 +22,7 @@ export const useImageViewerCategoryItemState = (category: Category) => {
     return category.containing.length;
   }, [category.containing]);
   const dispatch = useDispatch();
-  const kindDictionary = useSelector(selectImageViewerKinds);
-  const things = useSelector(selectImageViewerObjects);
+  const kindDictionary = useSelector(selectKinds);
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);
   const selectedCategory = useSelector(selectSelectedIVCategoryId);
   const highlightedCategory = useSelector(selectHighligtedIVCatogory);
@@ -44,23 +42,27 @@ export const useImageViewerCategoryItemState = (category: Category) => {
         associatedUnknownKind: kindDictionary[kindId].unknownCategoryId,
       }),
     );
-  };
+  }, [category.id, dispatch]);
 
-  const editCategory = (id: string, name: string, color: string) => {
+  const deleteCategory = (category: Category, kindId: string) => {
     dispatch(
-      annotatorSlice.actions.updateCategory({
-        category: { id, name, color },
-      }),
+      annotatorSlice.actions.deleteCategories({
+        categories: [category],
+        kind: kindDictionary[kindId],
+      })
     );
   };
 
   const clearObjects = (category: Category) => {
+    // dispatch(
+    //   imageViewerSlice.actions.removeActiveAnnotationIds({
+    //     annotationIds: category.containing,
+    //   })
+    // );
     dispatch(
       annotatorSlice.actions.deleteThings({
-        things: category.containing.map(
-          (thingId) => things[thingId] as ProtoAnnotationObject,
-        ),
-      }),
+        thingIds: category.containing,
+      })
     );
   };
 
@@ -71,17 +73,17 @@ export const useImageViewerCategoryItemState = (category: Category) => {
         dispatch(
           imageViewerSlice.actions.removeFilters({
             categoryIds: [category.id],
-          }),
+          })
         );
       } else {
         dispatch(
           imageViewerSlice.actions.addFilters({
             categoryIds: [categoryId],
-          }),
+          })
         );
       }
     },
-    [category.id, dispatch, filteredCategoryIds],
+    [category.id, dispatch, filteredCategoryIds]
   );
 
   useEffect(() => {
@@ -103,7 +105,6 @@ export const useImageViewerCategoryItemState = (category: Category) => {
     objectCount,
     handleSelect,
     handleToggleCategoryVisibility,
-    editCategory,
     deleteCategory,
     clearObjects,
   };

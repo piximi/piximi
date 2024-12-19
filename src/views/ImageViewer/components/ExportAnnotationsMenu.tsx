@@ -9,6 +9,7 @@ import { useDialogHotkey } from "hooks";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { ExportAnnotationsDialog } from "components/dialogs";
 
+import { annotatorSlice } from "../state/annotator";
 import {
   selectAllObjectCategories,
   selectAllObjectKinds,
@@ -19,13 +20,12 @@ import { selectProjectName } from "store/project/selectors";
 import { selectHasUnsavedChanges } from "views/ImageViewer/state/imageViewer/selectors";
 import {
   selectImageViewerObjects,
-  selectImageViewerObjectsArray,
+  selectImageViewerObjectDict,
 } from "views/ImageViewer/state/annotator/reselectors";
 import {
-  selectImageViewerImages,
-  selectImageViewerObjectDict,
-  selectImageViewerImageDict,
-} from "views/ImageViewer/state/imageViewer/reselectors";
+  selectImages,
+  selectImagesArray,
+} from "../state/annotator/reselectors";
 
 import {
   serializeCOCOFile,
@@ -86,12 +86,11 @@ export const ExportAnnotationsMenu = ({
   open,
   selectedImage,
 }: ExportAnnotationsMenuProps) => {
-  const dataState = useSelector(selectDataState);
-  const annotatorChanges = useSelector(selectChanges);
+  const dispatch = useDispatch();
   const images = useSelector(selectImagesArray);
-  const imageDict = useSelector(selectImageViewerImages);
-  const annotations = useSelector(selectImageViewerObjectsArray);
-  const annotationDict = useSelector(selectImageViewerObjects);
+  const imageDict = useSelector(selectImages);
+  const annotations = useSelector(selectImageViewerObjects);
+  const annotationDict = useSelector(selectImageViewerObjectDict);
   const annotationCategories = useSelector(selectAllObjectCategories);
   const annotationCategoryDict = useSelector(selectObjectCategoryDict);
   const projectName = useSelector(selectProjectName);
@@ -114,8 +113,8 @@ export const ExportAnnotationsMenu = ({
     onClose();
   };
 
-  const handleSaveChanges = async () => {
-    await reconcileChanges(dataState, annotatorChanges);
+  const handleSaveChanges = () => {
+    dispatch(annotatorSlice.actions.reconcileChanges({}));
     handleOpenExportAnnotationsDialog();
   };
 

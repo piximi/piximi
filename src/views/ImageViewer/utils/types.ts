@@ -1,6 +1,11 @@
-import { FilterType } from "utils/common/types";
+import { FilterType, RequireOnly } from "utils/common/types";
 import { AnnotationMode, AnnotationState, ToolType, ZoomMode } from "./enums";
-import { AnnotationObject, DecodedAnnotationObject } from "store/data/types";
+import {
+  AnnotationObject,
+  Category,
+  DecodedAnnotationObject,
+  Kind,
+} from "store/data/types";
 
 export type ImageViewerState = {
   imageStack: string[];
@@ -36,6 +41,23 @@ export type AnnotatorState = {
   workingAnnotation: {
     saved: DecodedAnnotationObject | undefined;
     changes: Partial<DecodedAnnotationObject>;
+  };
+  changes: {
+    kinds: {
+      added: Record<string, Kind>;
+      deleted: string[];
+      edited: Record<string, RequireOnly<Kind, "id">>;
+    };
+    categories: {
+      added: Record<string, Category>;
+      deleted: string[];
+      edited: Record<string, RequireOnly<Category, "id">>;
+    };
+    things: {
+      added: Record<string, DecodedAnnotationObject>;
+      deleted: string[];
+      edited: Record<string, RequireOnly<AnnotationObject, "id">>;
+    };
   };
   selectedAnnotationIds: Array<string>;
   annotationState: AnnotationState;

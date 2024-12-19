@@ -208,5 +208,5 @@ export const selectCategoryProperty = createSelector(
       const category = entities[id];
       if (!category) return;
       return category[property];
-    },
+    }
 );

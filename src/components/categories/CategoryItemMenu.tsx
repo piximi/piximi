@@ -6,7 +6,6 @@ import { useDialogHotkey } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { dataSlice } from "store/data/dataSlice";
 import { selectActiveKindId } from "store/project/selectors";
 
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
@@ -15,19 +14,12 @@ import { HotkeyContext } from "utils/common/enums";
 import { Category } from "store/data/types";
 import { CategoryDialog } from "components/dialogs/CategoryDialog/CategoryDialog";
 
-type MenuFunctions = {
-  Edit?: { permanent: boolean };
-  "Edit Color"?: { permanent: boolean };
-  Delete?: { permanent: boolean };
-  "Clear Objects": () => void;
-};
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;
   category: Category;
   handleCloseCategoryMenu: () => void;
   openCategoryMenu: boolean;
   kind?: string;
-  editCategory: (kindOrId: string, name: string, color: string) => void;
   deleteCategory: (category: Category, kindId: string) => void;
   clearObjects: (category: Category) => void;
 };
@@ -38,7 +30,6 @@ export const CategoryItemMenu = ({
   handleCloseCategoryMenu,
   openCategoryMenu,
   kind,
-  editCategory,
   deleteCategory,
   clearObjects,
 }: CategoryItemMenuProps) => {
@@ -59,30 +50,6 @@ export const CategoryItemMenu = ({
     onOpen: handleOpenDeleteObjectsDialog,
     open: isDeleteObjectsDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
-
-  const handleRemoveCategory = () => {
-    dispatch(
-      dataSlice.actions.removeCategoriesFromKind({
-        categoryIds: [category.id],
-        kind: kind ?? activeKind,
-        isPermanent: menuFunctions ? menuFunctions.Delete?.permanent : true,
-      })
-    );
-  };
-  const handleDeleteObjects = () => {
-    if (menuFunctions) {
-      menuFunctions["Clear Objects"]();
-    } else {
-      dispatch(
-        dataSlice.actions.deleteThings({
-          ofCategories: [category.id],
-          activeKind: kind ?? activeKind,
-          isPermanent: true,
-          disposeColorTensors: true,
-        })
-      );
-    }
-  };
 
   const handleMenuCloseWith = (dialogClose: () => void) => {
     dialogClose();
@@ -126,6 +93,7 @@ export const CategoryItemMenu = ({
         id={category.id}
         onClose={() => handleMenuCloseWith(handleCloseEditCategoryDialog)}
         open={isEditCategoryDialogOpen}
+        kind={kind ?? activeKind}
       />
       <ConfirmationDialog
         title={`Delete "${category.name}" Category`}
