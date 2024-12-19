@@ -73,3 +73,27 @@ export const selectSelectedAnnotationIds = ({
 }): string[] => {
   return annotator.selectedAnnotationIds;
 };
+
+export const selectKindChanges = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}) => {
+  return annotator.changes.kinds;
+};
+
+export const selectCategoryChanges = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}) => {
+  return annotator.changes.categories;
+};
+
+export const selectThingChanges = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}) => {
+  return annotator.changes.things;
+};
