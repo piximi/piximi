@@ -9,7 +9,7 @@ import {
   selectToolType,
   selectThresholdAnnotationValue,
 } from "views/ImageViewer/state/annotator/selectors";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
+import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 
 import {
   AnnotationTool,

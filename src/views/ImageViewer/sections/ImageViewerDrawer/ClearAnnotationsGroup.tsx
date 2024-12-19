@@ -9,11 +9,10 @@ import { useDialogHotkey, useTranslation } from "hooks";
 import { ConfirmationDialog } from "components/dialogs";
 import { CustomListItemButton } from "components/ui";
 
-import { dataSlice } from "store/data";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectSelectedAnnotationIds } from "views/ImageViewer/state/annotator/selectors";
-import { selectActiveAnnotationIds } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectActiveImageObjectIds } from "views/ImageViewer/state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
 
@@ -21,11 +20,7 @@ type DeleteType = "ALL" | "SELECTED";
 export const ClearAnnotationsGroup = () => {
   const dispatch = useDispatch();
   const selectedAnnotationIds = useSelector(selectSelectedAnnotationIds);
-  const activeSelectedAnnotations = useSelector(
-    selectSelectedActiveAnnotations,
-  );
   const activeAnnotationsIds = useSelector(selectActiveImageObjectIds);
-  const activeAnnotations = useSelector(selectActiveAnnotationsArray);
   const [deleteOp, setDeleteOp] = useState<DeleteType>();
 
   const selectedActiveAnnotationIds = useMemo(() => {
@@ -61,8 +56,8 @@ export const ClearAnnotationsGroup = () => {
         );
         dispatch(
           annotatorSlice.actions.deleteThings({
-            things: activeAnnotations,
-          }),
+            thingIds: activeAnnotationsIds,
+          })
         );
       } else {
         dispatch(
@@ -78,8 +73,8 @@ export const ClearAnnotationsGroup = () => {
         );
         dispatch(
           annotatorSlice.actions.deleteThings({
-            things: activeSelectedAnnotations,
-          }),
+            thingIds: selectedAnnotationIds,
+          })
         );
       }
       dispatch(

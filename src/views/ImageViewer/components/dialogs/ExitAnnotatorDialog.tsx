@@ -3,7 +3,6 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { dataSlice } from "store/data/";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
@@ -34,6 +33,7 @@ export const ExitAnnotatorDialog = ({
           prevImageId: activeImageId,
         }),
       );
+      dispatch(annotatorSlice.actions.reconcileChanges({}));
       dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
       dispatch(
         annotatorSlice.actions.setSelectedAnnotationIds({
@@ -57,7 +57,9 @@ export const ExitAnnotatorDialog = ({
           prevImageId: activeImageId,
         }),
       );
-      dispatch(annotatorSlice.actions.resetChanges());
+      dispatch(
+        annotatorSlice.actions.reconcileChanges({ discardChanges: true })
+      );
       dispatch(
         annotatorSlice.actions.setSelectedAnnotationIds({
           annotationIds: [],

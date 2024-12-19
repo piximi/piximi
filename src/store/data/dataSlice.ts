@@ -636,12 +636,11 @@ export const dataSlice = createSlice({
         things: Array<ImageObject | AnnotationObject>;
       }>,
     ) {
-      const { things } = action.payload;
+      const { things, isPermanent } = action.payload;
       for (const readOnlyThing of things) {
         const thing = { ...readOnlyThing };
-        const splitName = thing.name!.split(".");
-        const ext = splitName.at(-1);
-        const name = splitName.slice(0, splitName.length - 1).join(".");
+        const [name, ext] = thing.name!.split(".");
+
         const existingImageIds =
           state.kinds.entities[thing.kind]?.containing ?? [];
 

@@ -4,8 +4,8 @@ import { List, ListItem, Slider } from "@mui/material";
 
 import { CustomListItem } from "components/ui/CustomListItem";
 
-import { dataSlice } from "store/data";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 import { selectActiveImageRenderedSrcs } from "views/ImageViewer/state/imageViewer/selectors";
 
 //TODO: change slider style
@@ -18,7 +18,7 @@ export const ZStackSlider = () => {
   const handleChange = async (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
       dispatch(
-        dataSlice.actions.updateThings({
+        annotatorSlice.actions.editThings({
           updates: [
             {
               id: activeImage!.id,
