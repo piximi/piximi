@@ -7,7 +7,6 @@ import { useAnnotationTool } from "../../../hooks";
 
 import { CustomListItemButton } from "components/ui";
 
-import { dataSlice } from "store/data";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectWorkingAnnotation } from "views/ImageViewer/state/annotator/selectors";
 
@@ -39,7 +38,7 @@ export const InvertAnnotation = () => {
     const encodedMask = encode(invertedMask);
 
     dispatch(
-      dataSlice.actions.updateThings({
+      annotatorSlice.actions.editThings({
         updates: [
           {
             id: workingAnnotation.id,

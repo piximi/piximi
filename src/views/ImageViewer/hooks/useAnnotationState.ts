@@ -1,34 +1,43 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { RootState } from "store/rootReducer";
-
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
+import {
+  selectActiveImage,
+  selectCategories,
+  selectCategoriesByKindArray,
+} from "views/ImageViewer/state/annotator/reselectors";
 import {
   selectActiveImageId,
   selectSelectedIVCategoryId,
 } from "views/ImageViewer/state/imageViewer/selectors";
-import {
-  selectCategoryById,
-  selectFirstUnknownCategory,
-} from "store/data/selectors";
 
 import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
 import { AnnotationState } from "views/ImageViewer/utils/enums";
+import { isUnknownCategory } from "utils/common/helpers";
 
 export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();
   const activeImage = useSelector(selectActiveImage);
   const activeImageId = useSelector(selectActiveImageId);
   const selectedCategoryId = useSelector(selectSelectedIVCategoryId);
-  const selectedCategory = useSelector((state: RootState) =>
-    selectCategoryById(state, selectedCategoryId!)
-  );
-  const defaultSelectedCategory = useSelector(selectFirstUnknownCategory);
+  const categories = useSelector(selectCategories);
+  const categoriesByKindArray = useSelector(selectCategoriesByKindArray);
+
+  const selectedCategory = useMemo(() => {
+    if (!selectedCategoryId) return undefined;
+    return categories[selectedCategoryId];
+  }, [categories, selectedCategoryId]);
+
+  const defaultSelectedCategory = useMemo(() => {
+    return categoriesByKindArray[0]?.categories.find((c) =>
+      isUnknownCategory(c.id)
+    );
+  }, [categoriesByKindArray]);
+
   const [noKindAvailable, setNoKindAvailable] = useState<boolean>(false);
 
   const onAnnotating = useMemo(() => {

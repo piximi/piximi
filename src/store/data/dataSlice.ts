@@ -537,7 +537,8 @@ export const dataSlice = createSlice({
       }>
     ) {
       const { things, isPermanent } = action.payload;
-      for (const thing of things) {
+      for (const readOnlyThing of things) {
+        const thing = { ...readOnlyThing };
         const [name, ext] = thing.name!.split(".");
 
         const existingImageIds =
@@ -559,7 +560,7 @@ export const dataSlice = createSlice({
           updatedNamePrefix += `.${ext}`;
         }
 
-        thing.name = updatedNamePrefix;
+        Object.assign(thing, { name: updatedNamePrefix });
         if (state.kinds.entities[thing.kind]) {
           dataSlice.caseReducers.updateKindContents(state, {
             type: "updateKindContents",

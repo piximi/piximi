@@ -37,7 +37,6 @@ import { Selection } from "./Selection";
 import { Annotations } from "./Annotations";
 import { Image } from "./Image";
 
-import { dataSlice } from "store/data";
 import { StageContext } from "../../state/StageContext";
 import { imageViewerSlice } from "../../state/imageViewer";
 import { annotatorSlice } from "../../state/annotator";
@@ -45,7 +44,7 @@ import {
   selectAnnotationState,
   selectToolType,
 } from "../../state/annotator/selectors";
-import { selectActiveImage } from "../../state/imageViewer/reselectors";
+import { selectActiveImage } from "../../state/annotator/reselectors";
 import {
   selectActiveImageId,
   selectActiveImageRenderedSrcs,
@@ -149,14 +148,15 @@ export const Stage = ({
 
     batch(() => {
       dispatch(
-        dataSlice.actions.addCategories({
+        annotatorSlice.actions.addCategories({
           categories: kindCategories,
         })
       );
 
       dispatch(
-        dataSlice.actions.addKinds({
-          kinds: [newKind],
+        annotatorSlice.actions.addKind({
+          kind: newKind,
+          unknownCategory: newUnknownCategory,
         })
       );
       dispatch(

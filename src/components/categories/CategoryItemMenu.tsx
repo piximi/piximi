@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Box, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
@@ -7,7 +7,6 @@ import { useDialogHotkey } from "hooks";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { UpdateCategoryDialog } from "components/dialogs";
 
-import { dataSlice } from "store/data/dataSlice";
 import { selectActiveKindId } from "store/project/selectors";
 
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
@@ -15,19 +14,14 @@ import { HotkeyContext } from "utils/common/enums";
 
 import { Category } from "store/data/types";
 
-type MenuFunctions = {
-  Edit?: { permanent: boolean };
-  "Edit Color"?: { permanent: boolean };
-  Delete?: { permanent: boolean };
-  "Clear Objects": () => void;
-};
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;
   category: Category;
   handleCloseCategoryMenu: () => void;
   openCategoryMenu: boolean;
-  menuFunctions?: MenuFunctions;
   kind?: string;
+  deleteCategory: (category: Category, kindId: string) => void;
+  clearObjects: (category: Category) => void;
 };
 
 export const CategoryItemMenu = ({
@@ -35,11 +29,11 @@ export const CategoryItemMenu = ({
   category,
   handleCloseCategoryMenu,
   openCategoryMenu,
-  menuFunctions,
   kind,
+  deleteCategory,
+  clearObjects,
 }: CategoryItemMenuProps) => {
   const activeKind = useSelector(selectActiveKindId);
-  const dispatch = useDispatch();
   const {
     onClose: handleCloseEditCategoryDialog,
     onOpen: handleOpenEditCategoryDialog,
@@ -56,30 +50,6 @@ export const CategoryItemMenu = ({
     onOpen: handleOpenDeleteObjectsDialog,
     open: isDeleteObjectsDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
-
-  const handleRemoveCategory = () => {
-    dispatch(
-      dataSlice.actions.removeCategoriesFromKind({
-        categoryIds: [category.id],
-        kind: kind ?? activeKind,
-        isPermanent: menuFunctions ? menuFunctions.Delete?.permanent : true,
-      })
-    );
-  };
-  const handleDeleteObjects = () => {
-    if (menuFunctions) {
-      menuFunctions["Clear Objects"]();
-    } else {
-      dispatch(
-        dataSlice.actions.deleteThings({
-          ofCategories: [category.id],
-          activeKind: kind ?? activeKind,
-          isPermanent: true,
-          disposeColorTensors: true,
-        })
-      );
-    }
-  };
 
   const handleMenuCloseWith = (dialogClose: () => void) => {
     dialogClose();
@@ -119,13 +89,13 @@ export const CategoryItemMenu = ({
         category={category}
         onClose={() => handleMenuCloseWith(handleCloseEditCategoryDialog)}
         open={isEditCategoryDialogOpen}
-        kind={activeKind}
+        kind={kind ?? activeKind}
       />
       <ConfirmationDialog
         title={`Delete "${category.name}" Category`}
         content={`Objects categorized as "${category.name}" will NOT be deleted, and instead will be labeled as
         "Unknown".`}
-        onConfirm={handleRemoveCategory}
+        onConfirm={() => deleteCategory(category, kind ?? activeKind)}
         onClose={() => handleMenuCloseWith(handleCloseDeleteCategoryDialog)}
         isOpen={isDeleteCategoryDialogOpen}
       />
@@ -136,7 +106,7 @@ export const CategoryItemMenu = ({
             ? "Associated annotations will also be removed."
             : ""
         } `}
-        onConfirm={handleDeleteObjects}
+        onConfirm={() => clearObjects(category)}
         onClose={() => handleMenuCloseWith(handleCloseDeleteObjectsDialog)}
         isOpen={isDeleteObjectsDialogOpen}
       />
