@@ -57,13 +57,13 @@ export const AddKindMenu = ({
       dispatch(
         dataSlice.actions.addCategories({
           categories: [newUnknownCategory],
-        }),
+        })
       );
 
       dispatch(
         dataSlice.actions.addKinds({
           kinds: [kind],
-        }),
+        })
       );
     });
   };
@@ -98,6 +98,7 @@ export const AddKindMenu = ({
         onClose={handleCloseCreateKindDialogAndMenu}
         open={isCreateKindDialogOpen}
         secondaryAction={isMobile ? closeActiveKind : undefined}
+        changesPermanent={true}
         storeDispatch={addKind}
         existingKinds={existingKinds as string[]}
       />

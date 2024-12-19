@@ -17,9 +17,11 @@ import {
   FunctionalDivider,
 } from "components/ui";
 
-import { selectAllCategories } from "store/data/selectors";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { selectActiveAnnotations } from "views/ImageViewer/state/imageViewer/reselectors";
+import {
+  selectActiveAnnotations,
+  selectCategoriesArray,
+} from "views/ImageViewer/state/annotator/reselectors";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 
@@ -31,7 +33,7 @@ export const PointerSelectionOptions = () => {
   const dispatch = useDispatch();
 
   const activeAnnotations = useSelector(selectActiveAnnotations);
-  const annotationCategories = useSelector(selectAllCategories);
+  const annotationCategories = useSelector(selectCategoriesArray);
   const [showCategories, setShowCategories] = useState(false);
   const groupedCategories = useMemo(() => {
     const objectCategories = annotationCategories.filter(

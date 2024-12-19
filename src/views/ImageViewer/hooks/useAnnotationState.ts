@@ -3,51 +3,40 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
+import {
+  selectActiveImage,
+  selectCategories,
+  selectCategoriesByKindArray,
+} from "views/ImageViewer/state/annotator/reselectors";
 import {
   selectActiveImageId,
   selectSelectedIVCategoryId,
 } from "views/ImageViewer/state/imageViewer/selectors";
-import {
-  selectCategoryById,
-  selectFirstUnknownCategory,
-} from "store/data/selectors";
 
 import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
 import { AnnotationState } from "views/ImageViewer/utils/enums";
+import { isUnknownCategory } from "utils/common/helpers";
 
 export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();
   const activeImage = useSelector(selectActiveImage);
   const activeImageId = useSelector(selectActiveImageId);
   const selectedCategoryId = useSelector(selectSelectedIVCategoryId);
-  const categories = useSelector(selectImageViewerCategories);
+  const categories = useSelector(selectCategories);
   const categoriesByKindArray = useSelector(selectCategoriesByKindArray);
-  const kinds = useSelector(selectImageViewerKinds);
-  const annotationMode = useSelector(selectAnnotationMode);
-  const objects = useSelector(selectImageViewerObjectsArray);
-  const workingAnnotation = useSelector(selectFullWorkingAnnotation);
 
-  const objectNames = useMemo(() => {
-    return objects.map((obj) => obj.name);
-  }, [objects]);
+  const selectedCategory = useMemo(() => {
+    if (!selectedCategoryId) return undefined;
+    return categories[selectedCategoryId];
+  }, [categories, selectedCategoryId]);
 
-  const annotationCategory = useMemo(() => {
-    if (categories[selectedCategoryId]) return categories[selectedCategoryId];
-    const defaultKindCategories = Object.entries(categoriesByKindArray).find(
-      (k) => k[0] !== selectedCategoryId,
+  const defaultSelectedCategory = useMemo(() => {
+    return categoriesByKindArray[0]?.categories.find((c) =>
+      isUnknownCategory(c.id)
     );
-    if (!defaultKindCategories) return undefined;
-    const defaultCategory = defaultKindCategories[1].categories.find((c) =>
-      isUnknownCategory(c.id),
-    );
-
-    return defaultCategory;
-  }, [categories, selectedCategoryId, categoriesByKindArray]);
+  }, [categoriesByKindArray]);
 
   const [noKindAvailable, setNoKindAvailable] = useState<boolean>(false);
 
