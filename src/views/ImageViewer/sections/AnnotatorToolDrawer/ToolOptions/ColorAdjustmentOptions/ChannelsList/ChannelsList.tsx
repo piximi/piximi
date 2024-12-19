@@ -17,11 +17,11 @@ import { useLocalGlobalState } from "hooks";
 import { CollapsibleList } from "components/ui/CollapsibleList";
 import { Palette } from "../Palette";
 
-import { dataSlice } from "store/data";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
   selectActiveImage,
   selectActiveImageRawColor,
-} from "views/ImageViewer/state/imageViewer/reselectors";
+} from "views/ImageViewer/state/annotator/reselectors";
 
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
 
@@ -42,7 +42,7 @@ export const ChannelsList = () => {
     dispatchState: dispatchActiveImageColors,
   } = useLocalGlobalState(
     selectActiveImageRawColor,
-    dataSlice.actions.updateThings,
+    annotatorSlice.actions.editThings,
     {
       range: {},
       visible: {},
@@ -88,7 +88,7 @@ export const ChannelsList = () => {
     newColors.visible[index] = enabled;
 
     dispatch(
-      dataSlice.actions.updateThings({
+      annotatorSlice.actions.editThings({
         updates: [{ id: activeImage!.id, colors: newColors }],
       })
     );

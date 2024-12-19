@@ -193,13 +193,3 @@ export const selectCategoryProperty = createSelector(
       return category[property];
     }
 );
-
-export const selectFirstUnknownCategory = createSelector(
-  selectAllKinds,
-  selectCategoriesDictionary,
-  (kinds, catDict) => {
-    if (kinds.length < 2) return;
-    const unknownCatId = kinds[1].unknownCategoryId;
-    return catDict[unknownCatId];
-  }
-);

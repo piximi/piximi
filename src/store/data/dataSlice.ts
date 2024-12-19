@@ -537,7 +537,9 @@ export const dataSlice = createSlice({
       }>
     ) {
       const { things, isPermanent } = action.payload;
-      for (const thing of things) {
+
+      for (const readOnlyThing of things) {
+        const thing = { ...readOnlyThing };
         const splitName = thing.name!.split(".");
         const ext = splitName.at(-1);
         const name = splitName.slice(0, splitName.length - 1).join(".");
@@ -560,7 +562,7 @@ export const dataSlice = createSlice({
           updatedNamePrefix += `.${ext}`;
         }
 
-        thing.name = updatedNamePrefix;
+        Object.assign(thing, { name: updatedNamePrefix });
         if (state.kinds.entities[thing.kind]) {
           dataSlice.caseReducers.updateKindContents(state, {
             type: "updateKindContents",

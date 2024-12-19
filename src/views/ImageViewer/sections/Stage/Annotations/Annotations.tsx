@@ -9,7 +9,7 @@ import { selectSelectedAnnotationIds } from "views/ImageViewer/state/annotator/s
 import {
   selectActiveAnnotationsViews,
   selectWorkingAnnotationView,
-} from "views/ImageViewer/state/imageViewer/reselectors";
+} from "views/ImageViewer/state/annotator/reselectors";
 
 import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
