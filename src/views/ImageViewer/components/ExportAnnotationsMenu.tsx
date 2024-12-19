@@ -9,7 +9,7 @@ import { useDialogHotkey } from "hooks";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { ExportAnnotationsDialog } from "components/dialogs";
 
-import { dataSlice } from "store/data";
+import { annotatorSlice } from "../state/annotator";
 import {
   selectAllObjectCategories,
   selectAllObjectKinds,
@@ -19,10 +19,12 @@ import { selectProjectName } from "store/project/selectors";
 import { selectHasUnsavedChanges } from "views/ImageViewer/state/imageViewer/selectors";
 import {
   selectImageViewerObjects,
-  selectImageViewerImages,
   selectImageViewerObjectDict,
-  selectImageViewerImageDict,
-} from "views/ImageViewer/state/imageViewer/reselectors";
+} from "views/ImageViewer/state/annotator/reselectors";
+import {
+  selectImages,
+  selectImagesArray,
+} from "../state/annotator/reselectors";
 
 import {
   serializeCOCOFile,
@@ -82,8 +84,8 @@ export const ExportAnnotationsMenu = ({
   selectedImage,
 }: ExportAnnotationsMenuProps) => {
   const dispatch = useDispatch();
-  const images = useSelector(selectImageViewerImages);
-  const imageDict = useSelector(selectImageViewerImageDict);
+  const images = useSelector(selectImagesArray);
+  const imageDict = useSelector(selectImages);
   const annotations = useSelector(selectImageViewerObjects);
   const annotationDict = useSelector(selectImageViewerObjectDict);
   const annotationCategories = useSelector(selectAllObjectCategories);
@@ -109,7 +111,7 @@ export const ExportAnnotationsMenu = ({
   };
 
   const handleSaveChanges = () => {
-    dispatch(dataSlice.actions.reconcile({ keepChanges: true }));
+    dispatch(annotatorSlice.actions.reconcileChanges({}));
     handleOpenExportAnnotationsDialog();
   };
 

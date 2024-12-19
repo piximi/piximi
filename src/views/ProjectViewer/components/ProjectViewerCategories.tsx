@@ -70,6 +70,25 @@ export const ProjectViewerCategories = () => {
     },
     [dispatch]
   );
+  const deleteCategory = (category: Category, kindId: string) => {
+    dispatch(
+      dataSlice.actions.removeCategoriesFromKind({
+        categoryIds: [category.id],
+        kind: kindId ?? activeKind,
+        isPermanent: true,
+      })
+    );
+  };
+  const deleteObjects = (category: Category) => {
+    dispatch(
+      dataSlice.actions.deleteThings({
+        thingIds: category.containing,
+        activeKind: activeKind,
+        disposeColorTensors: true,
+        isPermanent: true,
+      })
+    );
+  };
 
   const onOpenCategoryMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -233,6 +252,8 @@ export const ProjectViewerCategories = () => {
           category={selectedCategory}
           handleCloseCategoryMenu={onCloseCategoryMenu}
           openCategoryMenu={Boolean(categoryMenuAnchorEl)}
+          deleteCategory={deleteCategory}
+          clearObjects={deleteObjects}
         />
       )}
 

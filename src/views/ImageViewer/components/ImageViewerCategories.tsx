@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, IconButton, List } from "@mui/material";
 import { Visibility, VisibilityOff, Add } from "@mui/icons-material";
@@ -6,20 +6,25 @@ import { Visibility, VisibilityOff, Add } from "@mui/icons-material";
 import { useDialogHotkey } from "hooks";
 
 import { CollapsibleListItem } from "components/ui/CollapsibleListItem";
-import { CreateCategoryDialog } from "components/dialogs";
 import { ImageViewerCategoryItem } from "./ImageViewerCategoryItem";
 
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectFilteredImageViewerCategoryIds } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectImageViewerActiveKindsWithFullCat } from "views/ImageViewer/state/imageViewer/reselectors";
+import { selectCategoriesByKind } from "../state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
 
-import { KindWithCategories } from "store/data/types";
+import { CategoryDialog } from "components/dialogs/CategoryDialog/CategoryDialog";
+import { annotatorSlice } from "../state/annotator";
+import { generateUUID } from "utils/common/helpers";
 
 export const ImageViewerCategories = () => {
   const dispatch = useDispatch();
-  const kinds = useSelector(selectImageViewerActiveKindsWithFullCat);
+  const categoriesByKind = useSelector(selectCategoriesByKind);
+  const categoriesByKindArray = useMemo(
+    () => Object.values(categoriesByKind),
+    [categoriesByKind]
+  );
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);
   // NOTE: keep for quick checking if kind is hidden
   const [filteredKinds, setFilteredKinds] = useState<Array<string>>([]);
@@ -31,33 +36,34 @@ export const ImageViewerCategories = () => {
     open: isCreateCategoryDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
-  const isKindFiltered = (kind: KindWithCategories) => {
+  const isKindFiltered = (kindId: string) => {
     //HACK: refactor -- O(n*m)
-    return kind.categories.every((cat) => {
+    return categoriesByKind[kindId].categories.every((cat) => {
       return filteredCategoryIds.includes(cat.id);
     });
   };
 
   const handleToggleKindVisibility = (
     event: React.MouseEvent,
-    kind: KindWithCategories
+    kindId: string
   ) => {
     event.stopPropagation();
-    if (filteredKinds.includes(kind.id)) {
+    const categories = categoriesByKind[kindId].categories;
+    if (filteredKinds.includes(kindId)) {
       setFilteredKinds(
-        filteredKinds.filter((hiddenKind) => hiddenKind !== kind.id)
+        filteredKinds.filter((hiddenKind) => hiddenKind !== kindId)
       );
 
       dispatch(
         imageViewerSlice.actions.removeFilters({
-          categoryIds: kind.categories.map((category) => category.id),
+          categoryIds: categories.map((category) => category.id),
         })
       );
     } else {
-      setFilteredKinds([...filteredKinds, kind.id]);
+      setFilteredKinds([...filteredKinds, kindId]);
       dispatch(
         imageViewerSlice.actions.addFilters({
-          categoryIds: kind.categories.map((category) => category.id),
+          categoryIds: categories.map((category) => category.id),
         })
       );
     }
@@ -72,14 +78,30 @@ export const ImageViewerCategories = () => {
     handleOpenCreateCategoryDialog();
   };
 
+  const handleCreateCategory = (name: string, color: string, kind: string) => {
+    const newId = generateUUID();
+    dispatch(
+      annotatorSlice.actions.addCategories({
+        categories: {
+          id: newId,
+          name,
+          color,
+          kind: kind,
+          containing: [],
+          visible: true,
+        },
+      })
+    );
+  };
+
   return (
     <>
       <List dense sx={(theme) => ({ py: 0 })}>
-        {kinds.map((kind) => {
+        {categoriesByKindArray.map(({ kindId, categories }) => {
           return (
             <CollapsibleListItem
-              primaryText={kind.id}
-              key={kind.id}
+              primaryText={kindId}
+              key={kindId}
               carotPosition="start"
               secondary={
                 <Box
@@ -96,16 +118,18 @@ export const ImageViewerCategories = () => {
                   <IconButton
                     disableRipple
                     onClick={(event) => {
-                      handleOpenCreateCategoryOfKind(event, kind.id);
+                      handleOpenCreateCategoryOfKind(event, kindId);
                     }}
                   >
                     <Add fontSize="small" />
                   </IconButton>
                   <IconButton
                     disableRipple
-                    onClick={(event) => handleToggleKindVisibility(event, kind)}
+                    onClick={(event) =>
+                      handleToggleKindVisibility(event, kindId)
+                    }
                   >
-                    {isKindFiltered(kind) ? (
+                    {isKindFiltered(kindId) ? (
                       <VisibilityOff fontSize="small" />
                     ) : (
                       <Visibility fontSize="small" />
@@ -114,11 +138,11 @@ export const ImageViewerCategories = () => {
                 </Box>
               }
             >
-              {kind.categories.map((category) => {
+              {categories.map((category) => {
                 return (
                   <ImageViewerCategoryItem
                     category={category}
-                    kind={kind.id}
+                    kind={kindId}
                     key={category.id}
                   />
                 );
@@ -128,11 +152,12 @@ export const ImageViewerCategories = () => {
         })}
       </List>
       {selectedKind && (
-        <CreateCategoryDialog
+        <CategoryDialog
           kind={selectedKind}
           onClose={handleCloseCreateCategoryDialog}
           open={isCreateCategoryDialogOpen}
-          changesPermanent={false}
+          action="Create"
+          onConfirm={handleCreateCategory}
         />
       )}
     </>

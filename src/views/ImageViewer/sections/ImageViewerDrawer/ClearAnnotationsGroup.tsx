@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { intersection } from "lodash";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { List } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
@@ -8,11 +9,10 @@ import { useDialogHotkey, useTranslation } from "hooks";
 import { ConfirmationDialog } from "components/dialogs";
 import { CustomListItemButton } from "components/ui";
 
-import { dataSlice } from "store/data";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectSelectedAnnotationIds } from "views/ImageViewer/state/annotator/selectors";
-import { selectActiveAnnotationIds } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectActiveImageObjectIds } from "views/ImageViewer/state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
 
@@ -20,8 +20,14 @@ type DeleteType = "ALL" | "SELECTED";
 export const ClearAnnotationsGroup = () => {
   const dispatch = useDispatch();
   const selectedAnnotationIds = useSelector(selectSelectedAnnotationIds);
-  const activeAnnotationsIds = useSelector(selectActiveAnnotationIds);
+  const activeAnnotationsIds = useSelector(selectActiveImageObjectIds);
   const [deleteOp, setDeleteOp] = useState<DeleteType>();
+
+  const selectedActiveAnnotationIds = useMemo(() => {
+    if (selectedAnnotationIds.length === 0 || activeAnnotationsIds.length === 0)
+      return [];
+    return intersection(activeAnnotationsIds, selectedAnnotationIds);
+  }, [selectedAnnotationIds, activeAnnotationsIds]);
 
   const {
     onClose: handleCloseDeleteAnnotationsDialog,
@@ -49,9 +55,8 @@ export const ClearAnnotationsGroup = () => {
           })
         );
         dispatch(
-          dataSlice.actions.deleteThings({
+          annotatorSlice.actions.deleteThings({
             thingIds: activeAnnotationsIds,
-            disposeColorTensors: true,
           })
         );
       } else {
@@ -67,9 +72,8 @@ export const ClearAnnotationsGroup = () => {
           })
         );
         dispatch(
-          dataSlice.actions.deleteThings({
+          annotatorSlice.actions.deleteThings({
             thingIds: selectedAnnotationIds,
-            disposeColorTensors: true,
           })
         );
       }
@@ -97,7 +101,7 @@ export const ClearAnnotationsGroup = () => {
         content={`${
           deleteOp === "ALL"
             ? activeAnnotationsIds.length
-            : selectActiveAnnotationIds.length
+            : selectedActiveAnnotationIds.length
         } annotations will be deleted`}
         onConfirm={handleDeleteAnnotations}
         onClose={handleCloseDeleteAnnotationsDialog}

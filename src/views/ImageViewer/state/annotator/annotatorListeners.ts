@@ -5,6 +5,7 @@ import { annotatorSlice } from "./annotatorSlice";
 
 import { imageViewerSlice } from "../imageViewer";
 
+import { dataSlice } from "store/data";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import {
@@ -13,6 +14,7 @@ import {
 } from "views/ImageViewer/utils/rle";
 import { BlankAnnotationTool } from "views/ImageViewer/utils/tools";
 import { getPropertiesFromImage } from "utils/common/helpers";
+import { createRenderedTensor } from "utils/common/tensorHelpers";
 
 import {
   AnnotationMode,
@@ -23,8 +25,10 @@ import {
 import { TypedAppStartListening } from "store/types";
 import {
   AnnotationObject,
+  Category,
   DecodedAnnotationObject,
   ImageObject,
+  Kind,
 } from "store/data/types";
 
 export const annotatorMiddleware = createListenerMiddleware();
@@ -55,19 +59,64 @@ startAppListening({
       !kind
     )
       return;
-    const kindObject = getCompleteEntity(dataState.kinds.entities[kind]);
-    if (!kindObject) return;
+
     const selectionMode = annotatorState.selectionMode;
+    let kindObject: Kind;
+    if (dataState.kinds.entities[kind]) {
+      kindObject = getCompleteEntity(dataState.kinds.entities[kind])!;
+      if (annotatorState.changes.kinds.edited[kind]) {
+        kindObject = {
+          ...kindObject,
+          ...annotatorState.changes.kinds.edited[kind],
+        };
+      }
+    } else if (annotatorState.changes.kinds.added[kind]) {
+      kindObject = annotatorState.changes.kinds.added[kind];
+    } else {
+      return;
+    }
+
     const activeImageId = IVState.activeImageId;
     if (!activeImageId) return;
-    const activeImage = getCompleteEntity(
-      dataState.things.entities[activeImageId]
-    ) as ImageObject;
-    if (!activeImage) return;
+    let activeImage: ImageObject;
+    if (dataState.things.entities[activeImageId]) {
+      activeImage = getCompleteEntity(
+        dataState.things.entities[activeImageId]
+      ) as ImageObject;
+      if (annotatorState.changes.things.edited[activeImageId]) {
+        activeImage = {
+          ...activeImage,
+          ...annotatorState.changes.things.edited[activeImageId],
+        };
+      }
+    } else {
+      return;
+    }
+
     const selectedAnnotationCategoryId = IVState.selectedCategoryId;
-    const selectedCategory = getCompleteEntity(
-      dataState.categories.entities[selectedAnnotationCategoryId]
-    )!;
+    let selectedCategory: Category;
+    if (dataState.categories.entities[selectedAnnotationCategoryId]) {
+      selectedCategory = getCompleteEntity(
+        dataState.categories.entities[selectedAnnotationCategoryId]
+      )!;
+      if (
+        annotatorState.changes.categories.edited[selectedAnnotationCategoryId]
+      ) {
+        selectedCategory = {
+          ...selectedCategory,
+          ...annotatorState.changes.categories.edited[
+            selectedAnnotationCategoryId
+          ],
+        };
+      }
+    } else if (
+      annotatorState.changes.categories.added[selectedAnnotationCategoryId]
+    ) {
+      selectedCategory =
+        annotatorState.changes.categories.added[selectedAnnotationCategoryId];
+    } else {
+      return;
+    }
 
     if (
       selectionMode === AnnotationMode.New &&
@@ -231,5 +280,133 @@ startAppListening({
     }
 
     listenerAPI.dispatch(imageViewerSlice.actions.setCursor({ cursor }));
+  },
+});
+
+startAppListening({
+  actionCreator: annotatorSlice.actions.reconcileChanges,
+  effect: (action, listenerAPI) => {
+    const { discardChanges } = action.payload;
+    if (discardChanges) {
+      return;
+    }
+    const { annotator: annotatorState } = listenerAPI.getState();
+    const {
+      kinds: kindChanges,
+      categories: categoryChanges,
+      things: thingChanges,
+    } = annotatorState.changes;
+
+    listenerAPI.dispatch(
+      dataSlice.actions.addKinds({
+        kinds: Object.values(kindChanges.added),
+        isPermanent: true,
+      })
+    );
+    for (const id in kindChanges.deleted) {
+      listenerAPI.dispatch(
+        dataSlice.actions.deleteKind({ deletedKindId: id, isPermanent: true })
+      );
+    }
+    listenerAPI.dispatch(
+      dataSlice.actions.addCategories({
+        categories: Object.values(categoryChanges.added),
+        isPermanent: true,
+      })
+    );
+
+    listenerAPI.dispatch(
+      dataSlice.actions.deleteCategories({
+        categoryIds: categoryChanges.deleted,
+        isPermanent: true,
+      })
+    );
+
+    listenerAPI.dispatch(
+      dataSlice.actions.addThings({
+        things: Object.values(thingChanges.added) as Array<
+          ImageObject | AnnotationObject
+        >,
+        isPermanent: true,
+      })
+    );
+    listenerAPI.dispatch(
+      dataSlice.actions.updateThings({
+        updates: Object.values(thingChanges.edited),
+        isPermanent: true,
+      })
+    );
+    listenerAPI.dispatch(
+      dataSlice.actions.deleteThings({
+        thingIds: thingChanges.deleted,
+        isPermanent: true,
+        disposeColorTensors: true,
+      })
+    );
+  },
+});
+
+startAppListening({
+  actionCreator: annotatorSlice.actions.editThings,
+  effect: async (action, listenerAPI) => {
+    const { updates } = action.payload;
+    const { data: dataState, imageViewer: imageViewerState } =
+      listenerAPI.getState();
+
+    const srcUpdates: Array<{ id: string } & Partial<ImageObject>> = [];
+    let renderedSrcs: string[] = [];
+    const numImages = updates.length;
+    let imageNumber = 1;
+    for await (const update of updates) {
+      const { id: imageId, ...changes } = update;
+      if ("colors" in changes && changes.colors) {
+        const colors = changes.colors;
+        const image = getCompleteEntity(
+          dataState.things.entities[imageId]
+        )! as ImageObject;
+
+        const colorsEditable = {
+          range: { ...colors.range },
+          visible: { ...colors.visible },
+          color: colors.color,
+        };
+        renderedSrcs = await createRenderedTensor(
+          image.data,
+          colorsEditable,
+          image.bitDepth,
+          undefined
+        );
+
+        srcUpdates.push({ id: imageId, src: renderedSrcs[image.activePlane] });
+        if (imageId === imageViewerState.activeImageId) {
+          listenerAPI.dispatch(
+            imageViewerSlice.actions.setActiveImageRenderedSrcs({
+              renderedSrcs,
+            })
+          );
+        }
+        listenerAPI.dispatch(
+          applicationSettingsSlice.actions.setLoadMessage({
+            message: `Updating image ${imageNumber} of ${numImages}`,
+          })
+        );
+        imageNumber++;
+      }
+    }
+
+    if (srcUpdates.length !== 0) {
+      listenerAPI.unsubscribe();
+      listenerAPI.dispatch(
+        annotatorSlice.actions.editThings({
+          updates: srcUpdates,
+        })
+      );
+      listenerAPI.subscribe();
+    }
+    listenerAPI.dispatch(
+      applicationSettingsSlice.actions.setLoadMessage({
+        message: "",
+      })
+    );
   },
 });
