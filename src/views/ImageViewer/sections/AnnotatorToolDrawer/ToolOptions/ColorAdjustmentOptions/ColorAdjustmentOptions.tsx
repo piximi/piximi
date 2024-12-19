@@ -12,9 +12,9 @@ import { ZStackSlider } from "./ZStackSlider";
 import { ApplyColorsButton } from "./ApplyColorsButton";
 import { ChannelsList } from "./ChannelsList";
 
-import { dataSlice } from "store/data";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectLoadMessage } from "store/applicationSettings/selectors";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
+import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 
 import { generateDefaultColors } from "utils/common/tensorHelpers";
 
@@ -33,7 +33,7 @@ export const ColorAdjustmentOptions = () => {
     const defaultColors = await generateDefaultColors(activeImage.data);
 
     dispatch(
-      dataSlice.actions.updateThings({
+      annotatorSlice.actions.editThings({
         updates: [{ id: activeImage.id!, colors: defaultColors }],
       })
     );

@@ -1,15 +1,11 @@
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
 import { Box, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { dataSlice } from "store/data/dataSlice";
-import { selectAllKindIds } from "store/data/selectors";
-
 import { generateUnknownCategory } from "utils/common/helpers";
 
-import { Kind } from "store/data/types";
+import { Category, Kind } from "store/data/types";
 
 type CreateCategoriesDialogProps = {
   onClose: () => void;
@@ -18,6 +14,8 @@ type CreateCategoriesDialogProps = {
   open: boolean;
   changesPermanent?: boolean;
   secondaryAction?: () => void;
+  storeDispatch: (kind: Kind, newUnknownCategory: Category) => void;
+  existingKinds: string[];
 };
 
 export const CreateKindDialog = ({
@@ -27,9 +25,9 @@ export const CreateKindDialog = ({
   open,
   changesPermanent,
   secondaryAction,
+  storeDispatch,
+  existingKinds,
 }: CreateCategoriesDialogProps) => {
-  const dispatch = useDispatch();
-  const existingKinds = useSelector(selectAllKindIds);
   const [name, setName] = useState<string>("");
   const [errorHelperText, setErrorHelperText] = useState<string>(" ");
   const [isInvalidName, setIsInvalidName] = useState<boolean>(false);
@@ -72,25 +70,11 @@ export const CreateKindDialog = ({
     const kind: Kind = {
       id: name,
       categories: [...withContainedCategories, newUnknownCategory.id],
-      containing: withContainedThings,
+      containing: withContainedThings ?? [],
       unknownCategoryId: newUnknownCategory.id,
     };
 
-    batch(() => {
-      dispatch(
-        dataSlice.actions.addCategories({
-          categories: [newUnknownCategory],
-          isPermanent: changesPermanent,
-        })
-      );
-
-      dispatch(
-        dataSlice.actions.addKinds({
-          kinds: [kind],
-          isPermanent: changesPermanent,
-        })
-      );
-    });
+    storeDispatch(kind, newUnknownCategory);
     secondaryAction && secondaryAction();
 
     handleClose();

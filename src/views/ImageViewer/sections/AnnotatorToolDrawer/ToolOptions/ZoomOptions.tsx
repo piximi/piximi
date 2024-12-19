@@ -26,7 +26,7 @@ import {
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
+import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 import {
   selectStageHeight,
   selectStageScale,
