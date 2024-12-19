@@ -13,19 +13,17 @@ import useSound from "use-sound";
 import { useHotkeys } from "hooks";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { dataSlice } from "store/data";
 import {
-  selectActiveAnnotationIds,
-  selectActiveImageId,
   selectCursor,
   selectImageOrigin,
 } from "views/ImageViewer/state/imageViewer/selectors";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
 import { selectWorkingAnnotation } from "views/ImageViewer/state/annotator/selectors";
-import { selectSelectedAnnotations } from "views/ImageViewer/state/annotator/reselectors";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
+import {
+  selectSelectedAnnotations,
+  selectActiveImage,
+} from "views/ImageViewer/state/annotator/reselectors";
 
 import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
@@ -63,7 +61,7 @@ export const AnnotationTransformer = ({
   const [yPos, setYPos] = useState<number>(0);
 
   const activeImage = useSelector(selectActiveImage)!;
-  const workingAnnotation = useSelector(selectWorkingAnnotationEntity);
+  const workingAnnotation = useSelector(selectWorkingAnnotation);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
   const cursor = useSelector(selectCursor);
   const soundEnabled = useSelector(selectSoundEnabled);
@@ -118,11 +116,20 @@ export const AnnotationTransformer = ({
 
     if (activeImage.containing.includes(annotationId)) {
       if (Object.keys(workingAnnotation.changes).length === 0) {
-        dispatch(
-          annotatorSlice.actions.deleteThings({
-            things: selectedAnnotations,
-          }),
-        );
+        batch(() => {
+          // dispatch(
+          //   imageViewerSlice.actions.removeActiveAnnotationIds({
+          //     annotationIds: selectedAnnotations.map(
+          //       (annotation) => annotation.id
+          //     ),
+          //   })
+          // );
+          dispatch(
+            annotatorSlice.actions.deleteThings({
+              thingIds: selectedAnnotations.map((annotation) => annotation.id),
+            })
+          );
+        });
       } else {
         dispatch(
           annotatorSlice.actions.editThings({
@@ -134,9 +141,9 @@ export const AnnotationTransformer = ({
     } else {
       const completeWorkingAnnotation = getCompleteEntity(workingAnnotation)!;
       dispatch(
-        annotatorSlice.actions.addThing({
-          thing: completeWorkingAnnotation,
-        }),
+        annotatorSlice.actions.addThings({
+          things: [completeWorkingAnnotation],
+        })
       );
       if (soundEnabled) playCreateAnnotationSoundEffect();
     }
@@ -287,7 +294,7 @@ export const AnnotationTransformer = ({
             text={"Cancel"}
             fillColor={"darkred"}
           />
-        </KonvaGroup>
+        </ReactKonva.Group>
       )}
     </KonvaGroup>
   );
@@ -341,5 +348,56 @@ const KonvaButton = ({
         name={"transformer-button"}
       />
     </KonvaLabel>
+  );
+};
+
+const KonvaButton = ({
+  xPosition,
+  yPosition,
+  handleConfirmOrDeleteAnnotation,
+  handleMouseEnter,
+  handleMouseLeave,
+  text,
+  fillColor,
+}: {
+  xPosition: number;
+  yPosition: number;
+  handleConfirmOrDeleteAnnotation: () => void;
+  handleMouseEnter: () => void;
+  handleMouseLeave: () => void;
+  text: string;
+  fillColor: string;
+}) => {
+  return (
+    <ReactKonva.Label
+      position={{
+        x: xPosition,
+        y: yPosition,
+      }}
+      onClick={handleConfirmOrDeleteAnnotation}
+      onTap={handleConfirmOrDeleteAnnotation}
+      id={"label"}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <ReactKonva.Tag
+        cornerRadius={3}
+        fill={fillColor}
+        lineJoin={"round"}
+        shadowColor={"black"}
+        shadowBlur={10}
+        shadowOffset={{ x: 5, y: 5 }}
+      />
+      <ReactKonva.Text
+        fill={"white"}
+        fontSize={14}
+        padding={6}
+        text={text}
+        width={buttonWidth}
+        height={buttonHeight}
+        align={"center"}
+        name={"transformer-button"}
+      />
+    </ReactKonva.Label>
   );
 };

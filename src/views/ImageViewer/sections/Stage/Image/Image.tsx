@@ -5,7 +5,7 @@ import Konva from "konva";
 import { MemoizedKonvaImage } from "./MemoizedKonvaImage";
 
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
+import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 
 export const Image = React.forwardRef<
   Konva.Image,

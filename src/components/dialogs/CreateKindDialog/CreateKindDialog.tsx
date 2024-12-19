@@ -3,8 +3,9 @@ import { Box, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
+import { generateUnknownCategory } from "utils/common/helpers";
+
 import { Category, Kind } from "store/data/types";
-import { generateKind } from "store/data/helpers";
 
 type CreateCategoriesDialogProps = {
   onClose: () => void;
@@ -59,8 +60,15 @@ export const CreateKindDialog = ({
   );
 
   const handleConfirm = () => {
-    const { kind, unknownCategory } = generateKind(name, true);
-    storeDispatch(kind, unknownCategory);
+    const newUnknownCategory = generateUnknownCategory(name);
+    const kind: Kind = {
+      id: name,
+      categories: [...withContainedCategories, newUnknownCategory.id],
+      containing: withContainedThings ?? [],
+      unknownCategoryId: newUnknownCategory.id,
+    };
+
+    storeDispatch(kind, newUnknownCategory);
     secondaryAction && secondaryAction();
 
     handleClose();

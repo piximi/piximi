@@ -20,7 +20,7 @@ import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
   selectActiveImage,
   selectActiveImageRawColor,
-} from "views/ImageViewer/state/imageViewer/reselectors";
+} from "views/ImageViewer/state/annotator/reselectors";
 
 import { rgbToHex, scaleDownRange, scaleUpRange } from "utils/common/helpers";
 
