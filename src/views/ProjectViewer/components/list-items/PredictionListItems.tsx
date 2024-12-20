@@ -53,7 +53,6 @@ export const PredictionListItems = () => {
     dispatch(
       dataSlice.actions.clearPredictions({
         kind: activeKind,
-        isPermanent: true,
       })
     );
 
@@ -77,7 +76,6 @@ export const PredictionListItems = () => {
     dispatch(
       dataSlice.actions.acceptPredictions({
         kind: activeKind,
-        isPermanent: true,
       })
     );
     dispatch(

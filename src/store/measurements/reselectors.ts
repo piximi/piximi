@@ -27,11 +27,11 @@ export const selectPlotData = createSelector(
     const parsedMeasurementData: ParsedMeasurementData = {};
 
     Object.keys(measurementData).forEach((thingId) => {
-      const thing = things[thingId];
+      const thing = things[thingId]!;
       parsedMeasurementData[thingId] = {
         id: thingId,
         kind: thing.kind,
-        category: categories[thing.categoryId].name,
+        category: categories[thing.categoryId]!.name,
         partition: thing.partition,
         measurements: measurementData[thingId].measurements,
       };
@@ -56,7 +56,7 @@ export const selectGroupMeasurementDisplayData = createSelector(
         thingIds: group.thingIds,
       };
 
-      const thingsOfKind = group.thingIds.map((thingId) => things[thingId]);
+      const thingsOfKind = group.thingIds.map((thingId) => things[thingId]!);
 
       Object.values(group.measurementStates).forEach((measurement) => {
         if (!measurement.children && measurement.state === "on") {
