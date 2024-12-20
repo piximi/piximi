@@ -15,7 +15,12 @@ import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 import { AlertType, ImageSortKey } from "./enums";
 
 import { Category, ImageObject, Shape, ShapeArray } from "store/data/types";
-import { FilterType, ImageSortKeyType, RecursivePartial } from "./types";
+import {
+  DeferredEntity,
+  FilterType,
+  ImageSortKeyType,
+  RecursivePartial,
+} from "./types";
 
 /* 
   ERROR HANDLING / LOGGING
@@ -539,3 +544,12 @@ export const rgbToHex = (rgb: [number, number, number]) => {
     componentToHex(rgb[2])
   );
 };
+
+export function getCompleteEntity<T>(entity: DeferredEntity<T>): T | undefined {
+  if (entity.changes.deleted) return;
+  const { added, deleted, ...completeEntity } = {
+    ...entity.saved,
+    ...entity.changes,
+  };
+  return completeEntity as T;
+}

@@ -31,7 +31,6 @@ export const UpdateCategoryDialog = ({
             color,
           },
         },
-        isPermanent: true,
       })
     );
   };

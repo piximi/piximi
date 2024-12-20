@@ -10,7 +10,6 @@ import {
 import { getAttr, getDataset, getGroup } from "../helpers";
 import { RawArray } from "zarr/types/rawArray";
 import { tensor4d } from "@tensorflow/tfjs";
-import { DeferredEntityState } from "store/entities";
 import { Partition } from "utils/models/enums";
 import {
   createRenderedTensor,
@@ -25,6 +24,7 @@ import {
   Category,
   ImageObject,
 } from "store/data/types";
+import { EntityState } from "@reduxjs/toolkit";
 
 const deserializeThingGroup = async (
   name: string,
@@ -115,7 +115,7 @@ const deserializeThingGroup = async (
 const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
   const thingNames = (await getAttr(thingsGroup, "thing_names")) as string[];
 
-  const things: DeferredEntityState<ImageObject | AnnotationObject> = {
+  const things: EntityState<ImageObject | AnnotationObject> = {
     ids: [],
     entities: {},
   };
@@ -132,7 +132,7 @@ const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
     const thingGroup = await getGroup(thingsGroup, name);
     const thing = await deserializeThingGroup(name, thingGroup);
     things.ids.push(thing.id);
-    things.entities[thing.id] = { saved: thing, changes: {} };
+    things.entities[thing.id] = thing;
   }
 
   // final image complete
@@ -142,7 +142,7 @@ const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
 };
 const deserializeCategoriesGroup = async (
   categoriesGroup: Group
-): Promise<DeferredEntityState<Category>> => {
+): Promise<EntityState<Category>> => {
   const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
   const colors = (await getAttr(categoriesGroup, "color")) as string[];
   const names = (await getAttr(categoriesGroup, "name")) as string[];
@@ -155,23 +155,20 @@ const deserializeCategoriesGroup = async (
     );
   }
 
-  const categories: DeferredEntityState<Category> = {
+  const categories: EntityState<Category> = {
     ids: [],
     entities: {},
   };
   for (let i = 0; i < ids.length; i++) {
     categories.ids.push(ids[i]);
     categories.entities[ids[i]] = {
-      saved: {
-        id: ids[i],
-        color: colors[i],
-        name: names[i],
-        kind: kinds[i],
-        containing: contents[i],
-        visible: true,
-      } as Category,
-      changes: {},
-    };
+      id: ids[i],
+      color: colors[i],
+      name: names[i],
+      kind: kinds[i],
+      containing: contents[i],
+      visible: true,
+    } as Category;
   }
 
   return categories;
@@ -179,7 +176,7 @@ const deserializeCategoriesGroup = async (
 
 const deserializeKindsGroup = async (
   kindsGroup: Group
-): Promise<DeferredEntityState<Kind>> => {
+): Promise<EntityState<Kind>> => {
   const ids = (await getAttr(kindsGroup, "kind_id")) as string[];
   const contents = (await getAttr(kindsGroup, "contents")) as string[][];
   const categories = (await getAttr(kindsGroup, "categories")) as string[][];
@@ -197,17 +194,14 @@ const deserializeKindsGroup = async (
     );
   }
 
-  const kinds: DeferredEntityState<Kind> = { ids: [], entities: {} };
+  const kinds: EntityState<Kind> = { ids: [], entities: {} };
   for (let i = 0; i < ids.length; i++) {
     kinds.ids.push(ids[i]);
     kinds.entities[ids[i]] = {
-      saved: {
-        id: ids[i],
-        containing: contents[i],
-        categories: categories[i],
-        unknownCategoryId: unknownCategoryIds[i],
-      },
-      changes: {},
+      id: ids[i],
+      containing: contents[i],
+      categories: categories[i],
+      unknownCategoryId: unknownCategoryIds[i],
     };
   }
 
@@ -220,9 +214,9 @@ const deserializeProjectGroup = async (
 ): Promise<{
   project: ProjectState;
   data: {
-    things: DeferredEntityState<ImageObject | AnnotationObject>;
-    categories: DeferredEntityState<Category>;
-    kinds: DeferredEntityState<Kind>;
+    things: EntityState<ImageObject | AnnotationObject>;
+    categories: EntityState<Category>;
+    kinds: EntityState<Kind>;
   };
 }> => {
   const name = (await getAttr(projectGroup, "name")) as string;

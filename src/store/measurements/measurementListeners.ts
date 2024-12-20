@@ -1,14 +1,11 @@
-import { createListenerMiddleware } from "@reduxjs/toolkit";
+import { createListenerMiddleware, Dictionary } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { measurementsSlice } from "./measurementsSlice";
 
-import { getDeferredProperty } from "store/entities/utils";
 import { prepareThingData } from "views/MeasurementView/utils";
-import { isPendingReconciliation } from "store/data/helpers";
 
-import { DeferredDictionary } from "store/entities";
 import { Category } from "store/data/types";
 import { TypedAppStartListening } from "store/types";
 import { RecursivePartial } from "utils/common/types";
@@ -40,7 +37,7 @@ startAppListening({
     const { data: dataState, measurements: measurementState } =
       listenerAPI.getState();
     for await (const group of Object.values(measurementState.groups)) {
-      const kind = dataState.kinds.entities[group.kind]?.saved;
+      const kind = dataState.kinds.entities[group.kind];
       if (!kind) {
         //remove group from measurements
         listenerAPI.dispatch(
@@ -71,7 +68,7 @@ startAppListening({
       const unmeasuredThings = newThings.filter(
         (id) => !measurementState.data[id]
       );
-      const unsavedThings: string[] = [];
+
       if (unmeasuredThings.length) {
         // Turns measurements off -- Users need to manually recalculate new values
         const inactiveMeasurements = resetMeasurements(group.measurementStates);
@@ -86,11 +83,7 @@ startAppListening({
         const preparedThings: ThingData = {};
 
         for await (const thingId of unmeasuredThings) {
-          if (isPendingReconciliation(dataState.things.entities[thingId])) {
-            unsavedThings.push(thingId);
-            continue;
-          }
-          const thing = dataState.things.entities[thingId].saved;
+          const thing = dataState.things.entities[thingId]!;
           const preparedThing = await prepareThingData(thing);
           preparedThings[thingId] = preparedThing;
         }
@@ -103,7 +96,7 @@ startAppListening({
       listenerAPI.dispatch(
         measurementsSlice.actions.updateGroupThingIds({
           groupId: group.id,
-          thingIds: difference(kind.containing, unsavedThings), // Dont add things which are currently being changed
+          thingIds: kind.containing,
         })
       );
       const trulyDeleted = deletedThings.filter(
@@ -133,7 +126,7 @@ const resetMeasurements = (measurements: MeasurementOptions) => {
 const updateCategories = (
   state: MeasurementOptions,
   kindCategories: string[],
-  categoryEntities: DeferredDictionary<Category>
+  categoryEntities: Dictionary<Category>
 ) => {
   const groupCats = state["categoryId"].children!;
   const newCats = difference(kindCategories, groupCats);
@@ -145,10 +138,10 @@ const updateCategories = (
 
   const newNames = persistingCats.reduce(
     (newNames: { id: string; name: string }[], id) => {
-      if (state[id]!.name !== categoryEntities[id]!.saved.name) {
+      if (state[id]!.name !== categoryEntities[id]!.name) {
         newNames.push({
           id,
-          name: categoryEntities[id]!.saved.name,
+          name: categoryEntities[id]!.name,
         });
       }
       return newNames;
@@ -165,7 +158,7 @@ const updateCategories = (
     newCats.forEach((id) => {
       splitUpdates[id] = {
         id,
-        name: getDeferredProperty(categoryEntities[id], "name"),
+        name: categoryEntities[id]!.name,
         state: "off",
         parent: "categoryId",
       };

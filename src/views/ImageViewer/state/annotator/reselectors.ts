@@ -20,7 +20,7 @@ import {
 
 import { decodeAnnotation } from "views/ImageViewer/utils/rle";
 import { generateBlankColors } from "utils/common/tensorHelpers";
-import { getCompleteEntity } from "store/entities/utils";
+import { getCompleteEntity } from "utils/common/helpers";
 
 import {
   AnnotationObject,
@@ -275,7 +275,7 @@ export const selectUpdatedObjects = createSelector(
 
     for (const thingId of remainingThings) {
       const thing = thingsDict[thingId];
-      if (thing.kind === "Image") continue;
+      if (thing!.kind === "Image") continue;
 
       if (thingChanges.edited[thingId]) {
         finalThings[thingId] = {
@@ -301,7 +301,7 @@ export const selectUpdatedImages = createSelector(
     );
     for (const thingId of remainingThings) {
       const thing = thingsDict[thingId];
-      if (thing.kind !== "Image") continue;
+      if (thing!.kind !== "Image") continue;
       if (thingChanges.edited[thingId]) {
         finalThings[thingId] = {
           ...(thing as ImageObject),
