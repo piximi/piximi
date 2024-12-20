@@ -7,7 +7,6 @@ import { imageViewerSlice } from "../imageViewer";
 
 import { dataSlice } from "store/data";
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import {
   decodeAnnotation,
   encodeAnnotation,
@@ -63,7 +62,7 @@ startAppListening({
     const selectionMode = annotatorState.selectionMode;
     let kindObject: Kind;
     if (dataState.kinds.entities[kind]) {
-      kindObject = getCompleteEntity(dataState.kinds.entities[kind])!;
+      kindObject = dataState.kinds.entities[kind]!;
       if (annotatorState.changes.kinds.edited[kind]) {
         kindObject = {
           ...kindObject,
@@ -80,9 +79,7 @@ startAppListening({
     if (!activeImageId) return;
     let activeImage: ImageObject;
     if (dataState.things.entities[activeImageId]) {
-      activeImage = getCompleteEntity(
-        dataState.things.entities[activeImageId]
-      ) as ImageObject;
+      activeImage = dataState.things.entities[activeImageId]! as ImageObject;
       if (annotatorState.changes.things.edited[activeImageId]) {
         activeImage = {
           ...activeImage,
@@ -96,9 +93,8 @@ startAppListening({
     const selectedAnnotationCategoryId = IVState.selectedCategoryId;
     let selectedCategory: Category;
     if (dataState.categories.entities[selectedAnnotationCategoryId]) {
-      selectedCategory = getCompleteEntity(
-        dataState.categories.entities[selectedAnnotationCategoryId]
-      )!;
+      selectedCategory =
+        dataState.categories.entities[selectedAnnotationCategoryId]!;
       if (
         annotatorState.changes.categories.edited[selectedAnnotationCategoryId]
       ) {
@@ -147,7 +143,7 @@ startAppListening({
         activeImage.containing,
         kindObject.containing
       ).map((id) => {
-        return getDeferredProperty(dataState.things.entities[id], "name");
+        return dataState.things.entities[id]!.name;
       });
 
       let annotationName: string = `${activeImage.name}-${kind}_0`;
@@ -244,9 +240,9 @@ startAppListening({
     const dataState = listenerAPI.getState().data;
     let annotationValue = action.payload.annotation;
     if (typeof annotationValue === "string") {
-      const annotation = getCompleteEntity(
-        dataState.things.entities[annotationValue]
-      ) as AnnotationObject;
+      const annotation = dataState.things.entities[
+        annotationValue
+      ] as AnnotationObject;
       if (!annotation) return undefined;
       annotationValue = !annotation.decodedMask
         ? decodeAnnotation(annotation)
@@ -300,25 +296,20 @@ startAppListening({
     listenerAPI.dispatch(
       dataSlice.actions.addKinds({
         kinds: Object.values(kindChanges.added),
-        isPermanent: true,
       })
     );
     for (const id in kindChanges.deleted) {
-      listenerAPI.dispatch(
-        dataSlice.actions.deleteKind({ deletedKindId: id, isPermanent: true })
-      );
+      listenerAPI.dispatch(dataSlice.actions.deleteKind({ deletedKindId: id }));
     }
     listenerAPI.dispatch(
       dataSlice.actions.addCategories({
         categories: Object.values(categoryChanges.added),
-        isPermanent: true,
       })
     );
 
     listenerAPI.dispatch(
       dataSlice.actions.deleteCategories({
         categoryIds: categoryChanges.deleted,
-        isPermanent: true,
       })
     );
 
@@ -327,19 +318,17 @@ startAppListening({
         things: Object.values(thingChanges.added) as Array<
           ImageObject | AnnotationObject
         >,
-        isPermanent: true,
       })
     );
     listenerAPI.dispatch(
       dataSlice.actions.updateThings({
         updates: Object.values(thingChanges.edited),
-        isPermanent: true,
       })
     );
     listenerAPI.dispatch(
       dataSlice.actions.deleteThings({
         thingIds: thingChanges.deleted,
-        isPermanent: true,
+
         disposeColorTensors: true,
       })
     );
@@ -361,9 +350,7 @@ startAppListening({
       const { id: imageId, ...changes } = update;
       if ("colors" in changes && changes.colors) {
         const colors = changes.colors;
-        const image = getCompleteEntity(
-          dataState.things.entities[imageId]
-        )! as ImageObject;
+        const image = dataState.things.entities[imageId]! as ImageObject;
 
         const colorsEditable = {
           range: { ...colors.range },

@@ -87,7 +87,7 @@ export const ProjectAppBar = () => {
       dataSlice.actions.deleteThings({
         thingIds: unfilteredSelectedThings,
         disposeColorTensors: true,
-      }),
+      })
     );
   };
 
@@ -335,7 +335,7 @@ const CategorizeChip = ({
     dispatch(
       dataSlice.actions.updateThings({
         updates,
-      }),
+      })
     );
   };
   return (

@@ -35,7 +35,7 @@ export const ThingInformationTable = ({
         dataSlice.actions.updateThingName({
           id: thing.id,
           name,
-        }),
+        })
       );
     },
     [dispatch, thing],
@@ -52,7 +52,7 @@ export const ThingInformationTable = ({
               partition: Partition.Unassigned,
             },
           ],
-        }),
+        })
       );
     },
     [dispatch, thing],
@@ -63,7 +63,7 @@ export const ThingInformationTable = ({
       dispatch(
         dataSlice.actions.updateThings({
           updates: [{ id: thing.id, partition }],
-        }),
+        })
       );
     },
     [dispatch, thing],

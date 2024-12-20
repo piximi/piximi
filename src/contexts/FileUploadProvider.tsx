@@ -211,7 +211,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
         dispatch(
           dataSlice.actions.addThings({
             things: convertedImages,
-          }),
+          })
         );
         dispatch(
           projectSlice.actions.selectThings({

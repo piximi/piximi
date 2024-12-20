@@ -90,7 +90,7 @@ export const FitClassifierDialogAppBar = ({
     dispatch(
       dataSlice.actions.clearPredictions({
         kind: activeKind,
-      }),
+      })
     );
     fit();
   };
