@@ -115,7 +115,7 @@ const deserializeThingGroup = async (
 const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
   const thingNames = (await getAttr(thingsGroup, "thing_names")) as string[];
 
-  const things: EntityState<ImageObject | AnnotationObject, string> = {
+  const things: EntityState<ImageObject | AnnotationObject> = {
     ids: [],
     entities: {},
   };
@@ -141,8 +141,8 @@ const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
   return things;
 };
 const deserializeCategoriesGroup = async (
-  categoriesGroup: Group,
-): Promise<EntityState<Category, string>> => {
+  categoriesGroup: Group
+): Promise<EntityState<Category>> => {
   const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
   const colors = (await getAttr(categoriesGroup, "color")) as string[];
   const names = (await getAttr(categoriesGroup, "name")) as string[];
@@ -155,7 +155,7 @@ const deserializeCategoriesGroup = async (
     );
   }
 
-  const categories: EntityState<Category, string> = {
+  const categories: EntityState<Category> = {
     ids: [],
     entities: {},
   };
@@ -175,8 +175,8 @@ const deserializeCategoriesGroup = async (
 };
 
 const deserializeKindsGroup = async (
-  kindsGroup: Group,
-): Promise<EntityState<Kind, string>> => {
+  kindsGroup: Group
+): Promise<EntityState<Kind>> => {
   const ids = (await getAttr(kindsGroup, "kind_id")) as string[];
   const contents = (await getAttr(kindsGroup, "contents")) as string[][];
   const categories = (await getAttr(kindsGroup, "categories")) as string[][];
@@ -194,12 +194,11 @@ const deserializeKindsGroup = async (
     );
   }
 
-  const kinds: EntityState<Kind, string> = { ids: [], entities: {} };
+  const kinds: EntityState<Kind> = { ids: [], entities: {} };
   for (let i = 0; i < ids.length; i++) {
     kinds.ids.push(ids[i]);
     kinds.entities[ids[i]] = {
       id: ids[i],
-      displayName: ids[i],
       containing: contents[i],
       categories: categories[i],
       unknownCategoryId: unknownCategoryIds[i],
@@ -215,9 +214,9 @@ const deserializeProjectGroup = async (
 ): Promise<{
   project: ProjectState;
   data: {
-    things: EntityState<ImageObject | AnnotationObject, string>;
-    categories: EntityState<Category, string>;
-    kinds: EntityState<Kind, string>;
+    things: EntityState<ImageObject | AnnotationObject>;
+    categories: EntityState<Category>;
+    kinds: EntityState<Kind>;
   };
 }> => {
   const name = (await getAttr(projectGroup, "name")) as string;

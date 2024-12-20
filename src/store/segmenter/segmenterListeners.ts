@@ -240,7 +240,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       listenerAPI.dispatch(
         dataSlice.actions.addKinds({
           kinds: generatedKinds,
-        }),
+        })
       );
 
       const newUnknownCategories = generatedKinds.map((kind) => {
@@ -256,7 +256,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       listenerAPI.dispatch(
         dataSlice.actions.addCategories({
           categories: newUnknownCategories,
-        }),
+        })
       );
     }
     const annotations: AnnotationObject[] = [];

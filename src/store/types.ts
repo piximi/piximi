@@ -1,5 +1,10 @@
 import { History } from "@tensorflow/tfjs";
-import { AnyAction, Dispatch, TypedStartListening } from "@reduxjs/toolkit";
+import {
+  AnyAction,
+  Dispatch,
+  EntityState,
+  TypedStartListening,
+} from "@reduxjs/toolkit";
 
 import { HotkeyContext, Languages, ThingSortKey } from "utils/common/enums";
 import { ThemeMode } from "themes/enums";
@@ -51,9 +56,9 @@ export type AppSettingsState = {
 };
 
 export type DataState = {
-  kinds: DeferredEntityState<Kind>;
-  categories: DeferredEntityState<Category>;
-  things: DeferredEntityState<AnnotationObject | ImageObject>;
+  kinds: EntityState<Kind>;
+  categories: EntityState<Category>;
+  things: EntityState<AnnotationObject | ImageObject>;
 };
 
 export type SegmenterState = {

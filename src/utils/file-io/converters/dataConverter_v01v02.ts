@@ -17,6 +17,7 @@ import {
   Shape,
   ShapeArray,
 } from "store/data/types";
+import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
 import {
   convertArrayToShape,
   getPropertiesFromImageSync,
@@ -31,15 +32,15 @@ export const dataConverter_v01v02 = (data: {
   annotations: OldAnnotationType[];
 }) => {
   const { images, oldCategories, annotationCategories, annotations } = data;
-  const categories: EntityState<Category, string> = {
+  const categories: EntityState<Category> = {
     ids: [],
     entities: {},
   };
-  const things: EntityState<ImageObject | AnnotationObject, string> = {
+  const things: EntityState<ImageObject | AnnotationObject> = {
     ids: [],
     entities: {},
   };
-  const kinds: EntityState<Kind, string> = { ids: [], entities: {} };
+  const kinds: EntityState<Kind> = { ids: [], entities: {} };
 
   const { kind: imageKind, unknownCategory } = generateKind("Image");
   kinds.ids.push(imageKind.id);
@@ -48,6 +49,20 @@ export const dataConverter_v01v02 = (data: {
 
   categories.ids.push(unknownCategory.id);
   categories.entities[unknownCategory.id] = {
+    ...unknownCategory,
+    containing: [],
+    kind: "Image",
+    visible: true,
+  };
+  kinds.entities["Image"] = {
+    id: "Image",
+    containing: [],
+    categories: [unknownCategoryId],
+    unknownCategoryId,
+  };
+
+  categories.ids.push(unknownCategoryId);
+  categories.entities[unknownCategoryId] = {
     ...unknownCategory,
     containing: [],
   };
@@ -75,8 +90,8 @@ export const dataConverter_v01v02 = (data: {
   }
 
   for (const image of images) {
-    image.kind = imageKind.id;
-    kinds.entities[imageKind.id].containing.push(image.id);
+    image.kind = "Image";
+    kinds.entities["Image"].containing.push(image.id);
     let cat: string;
     if (image.categoryId === UNKNOWN_IMAGE_CATEGORY_ID) {
       cat = unknownCategory.id;
@@ -106,6 +121,19 @@ export const dataConverter_v01v02 = (data: {
     categories.entities[unknownCategory.id] = {
       ...unknownCategory,
       containing: [],
+      kind: anCat.name,
+      visible: true,
+    };
+    kinds.entities[anCat.name] = {
+      id: anCat.name,
+      containing: [],
+      categories: [unknownCategoryId],
+      unknownCategoryId,
+    };
+    categories.ids.push(unknownCategoryId);
+    categories.entities[unknownCategoryId] = {
+      ...unknownCategory,
+      containing: [],
     };
     anCat2KindNAme[anCat.id] = anCat.name;
   }
@@ -125,7 +153,7 @@ export const dataConverter_v01v02 = (data: {
         _annotation.kind
       }`;
       (things.entities[_annotation.imageId] as ImageObject).containing.push(
-        _annotation.id,
+        _annotation.id
       );
     } else {
       annotationName = `${_annotation.kind}`;
