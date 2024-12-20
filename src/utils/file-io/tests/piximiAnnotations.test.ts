@@ -4,7 +4,6 @@ import * as tf from "@tensorflow/tfjs";
 
 import { productionStore } from "store";
 import { dataSlice } from "store/data";
-import { DeferredEntityState } from "store/entities";
 import {
   selectObjectCategoryDict,
   selectObjectKindDict,
@@ -26,6 +25,7 @@ import {
   Category,
   ImageObject,
 } from "store/data/types";
+import { EntityState } from "@reduxjs/toolkit";
 tf.setBackend("cpu");
 
 //below image fields not needed for serializing annotations file so fake it
@@ -263,12 +263,9 @@ describe("deserialize into project with matching image, no matching kinds or cat
     const imData = tf.browser.fromPixels(image).expandDims(0) as tf.Tensor4D;
     im1T1.data = imData;
     const thingsT2 = [...t1Ims].reduce(
-      (
-        entities: DeferredEntityState<AnnotationObject | ImageObject>,
-        thing
-      ) => {
+      (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
         entities.ids.push(thing.id);
-        entities.entities[thing.id] = { saved: thing, changes: {} };
+        entities.entities[thing.id] = thing;
         return entities;
       },
       { ids: [], entities: {} }
@@ -360,29 +357,26 @@ describe("deserialize into project with matching image, matching kind", () => {
     const imData = tf.browser.fromPixels(image).expandDims(0) as tf.Tensor4D;
     const im1T2: ImageObject = { ...im1T1, containing: [], data: imData };
     const thingsT2 = [im1T2].reduce(
-      (
-        entities: DeferredEntityState<AnnotationObject | ImageObject>,
-        thing
-      ) => {
+      (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
         entities.ids.push(thing.id);
-        entities.entities[thing.id] = { saved: thing, changes: {} };
+        entities.entities[thing.id] = thing;
         return entities;
       },
       { ids: [], entities: {} }
     );
     const kindsT2 = [k1T2].reduce(
-      (entities: DeferredEntityState<Kind>, kind) => {
+      (entities: EntityState<Kind>, kind) => {
         entities.ids.push(kind.id);
-        entities.entities[kind.id] = { saved: kind, changes: {} };
+        entities.entities[kind.id] = kind;
         return entities;
       },
       { ids: [], entities: {} }
     );
 
     const categoriesT2 = [uC1T2].reduce(
-      (entities: DeferredEntityState<Category>, category) => {
+      (entities: EntityState<Category>, category) => {
         entities.ids.push(category.id);
-        entities.entities[category.id] = { saved: category, changes: {} };
+        entities.entities[category.id] = category;
         return entities;
       },
       { ids: [], entities: {} }
@@ -478,29 +472,26 @@ describe("deserialize into project with matching image, matching kind, and match
     const imData = tf.browser.fromPixels(image).expandDims(0) as tf.Tensor4D;
     const im1T2: ImageObject = { ...im1T1, containing: [], data: imData };
     const thingsT2 = [im1T2].reduce(
-      (
-        entities: DeferredEntityState<AnnotationObject | ImageObject>,
-        thing
-      ) => {
+      (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
         entities.ids.push(thing.id);
-        entities.entities[thing.id] = { saved: thing, changes: {} };
+        entities.entities[thing.id] = thing;
         return entities;
       },
       { ids: [], entities: {} }
     );
     const kindsT2 = [k1T2].reduce(
-      (entities: DeferredEntityState<Kind>, kind) => {
+      (entities: EntityState<Kind>, kind) => {
         entities.ids.push(kind.id);
-        entities.entities[kind.id] = { saved: kind, changes: {} };
+        entities.entities[kind.id] = kind;
         return entities;
       },
       { ids: [], entities: {} }
     );
 
     const categoriesT2 = [uC1T2, c1T2].reduce(
-      (entities: DeferredEntityState<Category>, category) => {
+      (entities: EntityState<Category>, category) => {
         entities.ids.push(category.id);
-        entities.entities[category.id] = { saved: category, changes: {} };
+        entities.entities[category.id] = category;
         return entities;
       },
       { ids: [], entities: {} }

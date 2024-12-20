@@ -33,7 +33,7 @@ export const selectActiveKindObject = createSelector(
   selectActiveKindId,
   selectKindDictionary,
   (activeKind, kindDict) => {
-    return kindDict[activeKind];
+    return kindDict[activeKind]!;
   }
 );
 
@@ -49,9 +49,9 @@ export const selectActiveCategories = createSelector(
   [selectKindDictionary, selectCategoriesDictionary, selectActiveKindId],
   (kindDict, categoriesDict, kind) => {
     if (!kindDict[kind]) return [];
-    const categoriesOfKind = kindDict[kind].categories;
+    const categoriesOfKind = kindDict[kind]!.categories;
 
-    return categoriesOfKind.map((catId) => categoriesDict[catId]);
+    return categoriesOfKind.map((catId) => categoriesDict[catId]!);
   }
 );
 
@@ -67,7 +67,7 @@ export const selectActiveUnknownCategory = createSelector(
   selectCategoriesDictionary,
   (unknownCatId, catDict) => {
     if (!unknownCatId) return;
-    return catDict[unknownCatId];
+    return catDict[unknownCatId]!;
   }
 );
 
@@ -128,7 +128,7 @@ export const selectActiveThingIds = createSelector(
 export const selectActiveThings = createSelector(
   [selectActiveThingIds, selectThingsDictionary],
   (activeThingIds, thingDict) => {
-    return activeThingIds.map((thingId) => thingDict[thingId]);
+    return activeThingIds.map((thingId) => thingDict[thingId]!);
   }
 );
 
@@ -139,7 +139,7 @@ export const selectActiveLabeledThingsIds = createSelector(
     if (!activeKind) return [];
     const thingsInKind = activeKind.containing;
     const unknownCategoryId = activeKind.unknownCategoryId;
-    const unknownThings = catDict[unknownCategoryId].containing;
+    const unknownThings = catDict[unknownCategoryId]!.containing;
     return difference(thingsInKind, unknownThings);
   }
 );
@@ -172,7 +172,7 @@ export const selectActiveUnlabeledThingsIds = createSelector(
     if (!activeKind) return [];
     const thingsInKind = activeKind.containing;
     const unknownCategoryId = activeKind.unknownCategoryId;
-    const unknownThings = catDict[unknownCategoryId].containing;
+    const unknownThings = catDict[unknownCategoryId]!.containing;
     return intersection(thingsInKind, unknownThings);
   }
 );

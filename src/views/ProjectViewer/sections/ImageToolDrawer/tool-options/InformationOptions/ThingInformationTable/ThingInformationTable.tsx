@@ -33,7 +33,6 @@ export const ThingInformationTable = ({
         dataSlice.actions.updateThingName({
           id: thing.id,
           name,
-          isPermanent: true,
         })
       );
     },
@@ -51,7 +50,6 @@ export const ThingInformationTable = ({
               partition: Partition.Unassigned,
             },
           ],
-          isPermanent: true,
         })
       );
     },
@@ -63,7 +61,6 @@ export const ThingInformationTable = ({
       dispatch(
         dataSlice.actions.updateThings({
           updates: [{ id: thing.id, partition }],
-          isPermanent: true,
         })
       );
     },

@@ -16,7 +16,6 @@ import {
   isUnknownCategory,
   logger,
 } from "utils/common/helpers";
-import { getCompleteEntity } from "store/entities/utils";
 
 import { SimpleCNN, MobileNet } from "utils/models/classification";
 
@@ -160,7 +159,7 @@ const fitListener = async (
 
   /* DATA */
 
-  const activeKind = getCompleteEntity(dataState.kinds.entities[activeKindId]);
+  const activeKind = dataState.kinds.entities[activeKindId]!;
   if (!activeKind) return;
   const activeThingIds = activeKind.containing;
 
@@ -179,7 +178,7 @@ const fitListener = async (
       },
       id
     ) => {
-      const thing = getCompleteEntity(dataState.things.entities[id]);
+      const thing = dataState.things.entities[id];
       if (!thing) return groupedThings;
       if (isUnknownCategory(thing.categoryId)) {
         groupedThings.unlabeledThings.push(thing);
@@ -202,7 +201,7 @@ const fitListener = async (
 
   const categories: Array<Category> = [];
   const numClasses = activeKind.categories.reduce((count, id) => {
-    const category = getCompleteEntity(dataState.categories.entities[id]);
+    const category = dataState.categories.entities[id];
     if (isUnknownCategory(id) || !category) return count;
     categories.push(category);
     return ++count;
@@ -253,7 +252,6 @@ const fitListener = async (
             partition: Partition.Inference,
           })),
         ],
-        isPermanent: true,
       })
     );
   } else {
@@ -264,8 +262,6 @@ const fitListener = async (
           id: thing.id,
           partition: Partition.Training,
         })),
-
-        isPermanent: true,
       })
     );
   }
@@ -374,17 +370,17 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   const activeKindId = projectData.activeKind;
 
   /* DATA */
-  const activeKind = getCompleteEntity(dataState.kinds.entities[activeKindId]);
+  const activeKind = dataState.kinds.entities[activeKindId]!;
   if (!activeKind) return;
   const activeThingIds = activeKind.containing;
   const activeCategoryIds = activeKind.categories.filter(
     (id) => !isUnknownCategory(id)
   );
   const activeCategories = activeCategoryIds.map(
-    (id) => getCompleteEntity(dataState.categories.entities[id])!
+    (id) => dataState.categories.entities[id]!
   );
   const inferenceThings = activeThingIds.reduce((things: Array<Thing>, id) => {
-    const thing = getCompleteEntity(dataState.things.entities[id]);
+    const thing = dataState.things.entities[id];
 
     if (thing && thing.partition === Partition.Inference) {
       things.push(thing);
@@ -447,7 +443,6 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
               id: thingId,
               categoryId: categoryIds[idx],
             })),
-            isPermanent: true,
           })
         );
       }
@@ -481,7 +476,7 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
   const activeKindId = projectState.activeKind;
 
   /* DATA */
-  const activeKind = getCompleteEntity(dataState.kinds.entities[activeKindId]);
+  const activeKind = dataState.kinds.entities[activeKindId]!;
   if (!activeKind) return;
   const activeKnownCategoryCount = activeKind.categories.reduce((count, id) => {
     if (!isUnknownCategory(id)) {

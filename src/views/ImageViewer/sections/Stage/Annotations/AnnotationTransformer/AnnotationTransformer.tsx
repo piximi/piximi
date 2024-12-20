@@ -21,7 +21,7 @@ import {
 
 import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
-import { getCompleteEntity } from "store/entities/utils";
+import { getCompleteEntity } from "utils/common/helpers";
 
 import { AnnotationMode } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/common/enums";

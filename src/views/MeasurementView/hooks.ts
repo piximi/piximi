@@ -101,15 +101,15 @@ export const useTableExport = () => {
       const thingIds = table.thingIds;
       const exportData: Record<string, number | string>[] = [];
       thingIds.forEach((thingId) => {
-        const thing = thingDetails[thingId];
+        const thing = thingDetails[thingId]!;
         const data: Record<string, number | string> = { id: thingId };
         data.name = thing.name;
         data.kind = thing.kind;
         if ("imageId" in thing) {
-          data.imageName = thingDetails[thing.imageId].name;
+          data.imageName = thingDetails[thing.imageId]!.name;
           data["bbox [x1:y1:x2:y2]"] = `[${thing.boundingBox.join(":")}]`;
         }
-        data.category = categories[thing.categoryId].name;
+        data.category = categories[thing.categoryId]!.name;
         data.partition = thing.partition;
         Object.assign(data, measurementData[thingId].measurements);
         exportData.push(data);
@@ -149,7 +149,7 @@ export const useCreateMeasurementTable = () => {
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const handleCreateTable = (kind: string) => {
-    const thingIds = kinds[kind].containing;
+    const thingIds = kinds[kind]!.containing;
     const convertedThingData: {
       id: string;
       kind: string;
@@ -157,7 +157,7 @@ export const useCreateMeasurementTable = () => {
       encodedMask?: number[];
       decodedMask?: DataArray;
     }[] = thingIds.map((thingId) => {
-      const thing = thingData[thingId];
+      const thing = thingData[thingId]!;
       if ("encodedMask" in thing) {
         return {
           id: thing.id,

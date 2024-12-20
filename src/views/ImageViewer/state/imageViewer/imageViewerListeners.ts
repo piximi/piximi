@@ -6,7 +6,6 @@ import { dataSlice } from "store/data";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { imageViewerSlice } from "./imageViewerSlice";
 
-import { getCompleteEntity } from "store/entities/utils";
 import { createRenderedTensor } from "utils/common/tensorHelpers";
 
 import { AnnotationObject, ImageObject } from "store/data/types";
@@ -34,7 +33,7 @@ startAppListening({
     const annotationIds: string[] = [];
     let activeImageId: string | undefined = undefined;
     selectedThingIds.forEach((thingId) => {
-      const thing = getCompleteEntity(dataState.things.entities[thingId]);
+      const thing = dataState.things.entities[thingId];
       if (thing) {
         if (thing.kind === "Image") {
           imageIds.push(thingId);
@@ -92,9 +91,9 @@ startAppListening({
       );
       return;
     }
-    const activeImage = getCompleteEntity(
-      dataState.things.entities[newActiveImageId]
-    )! as ImageObject;
+    const activeImage = dataState.things.entities[
+      newActiveImageId
+    ]! as ImageObject;
 
     listenerAPI.dispatch(
       imageViewerSlice.actions.setActiveAnnotationIds({
