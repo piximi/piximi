@@ -181,7 +181,7 @@ export const selectUnknownImageCategory = createSelector(
   selectKindDictionary,
   (kinds) => {
     return kinds["Image"]!.unknownCategoryId;
-  },
+  }
 );
 
 export const selectAllObjectCategories = createSelector(

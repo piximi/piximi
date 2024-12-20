@@ -88,8 +88,8 @@ export const useSortFunction = () => {
       setSortFunction(
         () => (a: Thing, b: Thing) =>
           categories[a.categoryId]!.name.localeCompare(
-            categories[b.categoryId]!.name,
-          ),
+            categories[b.categoryId]!.name
+          )
       );
     }
   }, [sortType, categories]);
