@@ -44,7 +44,6 @@ export const ProjectImageGrid = () => {
       dispatch(
         dataSlice.actions.deleteKind({
           deletedKindId: item,
-          isPermanent: true,
         })
       );
     },
@@ -66,7 +65,7 @@ export const ProjectImageGrid = () => {
     dispatch(projectSlice.actions.setActiveKind({ kind: tab }));
     dispatch(
       projectSlice.actions.updateHighlightedCategory({
-        categoryId: kinds[tab].unknownCategoryId,
+        categoryId: kinds[tab]!.unknownCategoryId,
       })
     );
   };

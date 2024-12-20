@@ -10,7 +10,6 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data/dataSlice";
 import { segmenterSlice } from "./segmenterSlice";
 
-import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import {
   getPropertiesFromImageSync,
   getStackTraceFromError,
@@ -109,7 +108,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   const fitOptions = segmenterState.fitOptions;
 
   /* KIND */
-  const imageKind = getCompleteEntity(dataState.kinds.entities["Image"]);
+  const imageKind = dataState.kinds.entities["Image"];
   if (!imageKind) {
     listenerAPI.dispatch(
       segmenterSlice.actions.updateModelStatus({
@@ -122,17 +121,14 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   /* DATA */
   const kinds = dataState.kinds.ids.reduce((kinds: Kind[], id) => {
     if (id !== "Image") {
-      const kind = getCompleteEntity(dataState.kinds.entities[id]);
+      const kind = dataState.kinds.entities[id]!;
       if (kind) {
         kinds.push(kind);
       }
     }
     return kinds;
   }, []);
-  const imageIds = getDeferredProperty(
-    dataState.kinds.entities["Image"],
-    "containing"
-  );
+  const imageIds = dataState.kinds.entities["Image"]!.containing;
   const existingObjects: string[] = [];
   if (model.kind) {
     const fullKind = kinds.find((kind) => kind.id === model.kind);
@@ -141,7 +137,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     }
   }
   const inferenceImages = imageIds.reduce((infIms: ImageObject[], id) => {
-    const image = getCompleteEntity(dataState.things.entities[id]);
+    const image = dataState.things.entities[id]!;
 
     if (image && "containing" in image) {
       const containedObjects = image.containing;
@@ -248,7 +244,6 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       listenerAPI.dispatch(
         dataSlice.actions.addKinds({
           kinds: generatedKinds,
-          isPermanent: true,
         })
       );
 
@@ -265,7 +260,6 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       listenerAPI.dispatch(
         dataSlice.actions.addCategories({
           categories: newUnknownCategories,
-          isPermanent: true,
         })
       );
     }
@@ -304,9 +298,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
         annotations.push(ann as AnnotationObject);
       }
     }
-    listenerAPI.dispatch(
-      dataSlice.actions.addThings({ things: annotations, isPermanent: true })
-    );
+    listenerAPI.dispatch(dataSlice.actions.addThings({ things: annotations }));
   } catch (error) {
     await handleError(
       "Error converting predictions to Piximi types",

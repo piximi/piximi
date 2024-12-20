@@ -8,14 +8,12 @@ type CreateCategoriesDialogProps = {
   onClose: () => void;
   kind: string;
   open: boolean;
-  changesPermanent?: boolean;
 };
 
 export const CreateCategoryDialog = ({
   onClose,
   kind,
   open,
-  changesPermanent,
 }: CreateCategoriesDialogProps) => {
   const dispatch = useDispatch();
 
@@ -25,7 +23,6 @@ export const CreateCategoryDialog = ({
         name,
         color,
         kind: kind,
-        isPermanent: changesPermanent,
       })
     );
   };

@@ -81,7 +81,6 @@ export const FitClassifierDialogAppBar = ({
     dispatch(
       dataSlice.actions.clearPredictions({
         kind: activeKind,
-        isPermanent: true,
       })
     );
     fit();

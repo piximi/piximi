@@ -37,8 +37,8 @@ export const CategoryFilterList = ({
           return (
             <FilterChip
               key={`cat-filter-chip-${catId}`}
-              label={categories[catId].name}
-              color={categories[catId].color}
+              label={categories[catId]!.name}
+              color={categories[catId]!.color}
               toggleFilter={() => toggleFilter(catId)}
               isFiltered={true}
             />
@@ -48,8 +48,8 @@ export const CategoryFilterList = ({
           return (
             <FilterChip
               key={`cat-filter-chip-${catId}`}
-              label={categories[catId].name}
-              color={categories[catId].color}
+              label={categories[catId]!.name}
+              color={categories[catId]!.color}
               toggleFilter={() => toggleFilter(catId)}
               isFiltered={false}
             />

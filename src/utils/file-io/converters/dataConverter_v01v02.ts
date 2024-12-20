@@ -1,3 +1,4 @@
+import { EntityState } from "@reduxjs/toolkit";
 import Image from "image-js";
 import { intersection } from "lodash";
 import {
@@ -16,7 +17,6 @@ import {
   Shape,
   ShapeArray,
 } from "store/data/types";
-import { DeferredEntityState } from "store/entities";
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
 import {
   convertArrayToShape,
@@ -35,15 +35,15 @@ export const dataConverter_v01v02 = (data: {
   annotations: OldAnnotationType[];
 }) => {
   const { images, oldCategories, annotationCategories, annotations } = data;
-  const categories: DeferredEntityState<Category> = {
+  const categories: EntityState<Category> = {
     ids: [],
     entities: {},
   };
-  const things: DeferredEntityState<ImageObject | AnnotationObject> = {
+  const things: EntityState<ImageObject | AnnotationObject> = {
     ids: [],
     entities: {},
   };
-  const kinds: DeferredEntityState<Kind> = { ids: [], entities: {} };
+  const kinds: EntityState<Kind> = { ids: [], entities: {} };
 
   kinds.ids.push("Image");
   const unknownCategoryId = generateUUID({ definesUnknown: true });
@@ -56,22 +56,18 @@ export const dataConverter_v01v02 = (data: {
     visible: true,
   };
   kinds.entities["Image"] = {
-    saved: {
-      id: "Image",
-      containing: [],
-      categories: [unknownCategoryId],
-      unknownCategoryId,
-    },
-    changes: {},
+    id: "Image",
+    containing: [],
+    categories: [unknownCategoryId],
+    unknownCategoryId,
   };
+
   categories.ids.push(unknownCategoryId);
   categories.entities[unknownCategoryId] = {
-    saved: {
-      ...unknownCategory,
-      containing: [],
-    },
-    changes: {},
+    ...unknownCategory,
+    containing: [],
   };
+
   const nonUnknownCategoryMap: Record<string, string> = {};
   for (const category of oldCategories) {
     if (category.id === UNKNOWN_IMAGE_CATEGORY_ID) {
@@ -84,21 +80,19 @@ export const dataConverter_v01v02 = (data: {
       }
       categories.ids.push(catId);
       categories.entities[catId] = {
-        saved: {
-          ...category,
-          id: catId,
-          kind: "Image",
-          containing: [],
-        } as Category,
-        changes: {},
-      };
-      kinds.entities["Image"].saved.categories.push(catId);
+        ...category,
+        id: catId,
+        kind: "Image",
+        containing: [],
+      } as Category;
+
+      kinds.entities["Image"].categories.push(catId);
     }
   }
 
   for (const image of images) {
     image.kind = "Image";
-    kinds.entities["Image"].saved.containing.push(image.id);
+    kinds.entities["Image"].containing.push(image.id);
     let cat: string;
     if (image.categoryId === UNKNOWN_IMAGE_CATEGORY_ID) {
       cat = unknownCategoryId;
@@ -110,9 +104,9 @@ export const dataConverter_v01v02 = (data: {
 
     things.ids.push(image.id);
 
-    things.entities[image.id] = { saved: image as ImageObject, changes: {} };
+    things.entities[image.id] = image as ImageObject;
     if (cat in categories.entities) {
-      categories.entities[cat].saved.containing.push(image.id);
+      categories.entities[cat]!.containing.push(image.id);
     }
   }
 
@@ -130,21 +124,15 @@ export const dataConverter_v01v02 = (data: {
       visible: true,
     };
     kinds.entities[anCat.name] = {
-      saved: {
-        id: anCat.name,
-        containing: [],
-        categories: [unknownCategoryId],
-        unknownCategoryId,
-      },
-      changes: {},
+      id: anCat.name,
+      containing: [],
+      categories: [unknownCategoryId],
+      unknownCategoryId,
     };
     categories.ids.push(unknownCategoryId);
     categories.entities[unknownCategoryId] = {
-      saved: {
-        ...unknownCategory,
-        containing: [],
-      },
-      changes: {},
+      ...unknownCategory,
+      containing: [],
     };
     anCat2KindNAme[anCat.id] = anCat.name;
   }
@@ -157,16 +145,15 @@ export const dataConverter_v01v02 = (data: {
       activePlane: annotation.plane,
     };
     _annotation.kind = anCat2KindNAme[_annotation.categoryId];
-    const unknownCategory =
-      kinds.entities[_annotation.kind].saved.unknownCategoryId;
+    const unknownCategory = kinds.entities[_annotation.kind]!.unknownCategoryId;
     let annotationName: string;
     if (_annotation.imageId in things.entities) {
-      annotationName = `${things.entities[_annotation.imageId].saved.name}-${
+      annotationName = `${things.entities[_annotation.imageId]!.name}-${
         _annotation.kind
       }`;
-      (
-        things.entities[_annotation.imageId].saved as ImageObject
-      ).containing.push(_annotation.id);
+      (things.entities[_annotation.imageId] as ImageObject).containing.push(
+        _annotation.id
+      );
     } else {
       annotationName = `${_annotation.kind}`;
     }
@@ -201,17 +188,14 @@ export const dataConverter_v01v02 = (data: {
       { planes: 0, height: 0, width: 0, channels: 0 }
     );
     _annotation.partition = Partition.Unassigned;
-    _annotation.bitDepth = things.entities[_annotation.imageId].saved.bitDepth;
+    _annotation.bitDepth = things.entities[_annotation.imageId]!.bitDepth;
     things.ids.push(_annotation.id);
 
-    things.entities[_annotation.id] = {
-      saved: _annotation as AnnotationObject,
-      changes: {},
-    };
+    things.entities[_annotation.id] = _annotation as AnnotationObject;
 
-    kinds.entities[_annotation.kind].saved.containing.push(_annotation.id);
+    kinds.entities[_annotation.kind]!.containing.push(_annotation.id);
 
-    categories.entities[unknownCategory].saved.containing.push(_annotation.id);
+    categories.entities[unknownCategory]!.containing.push(_annotation.id);
   }
 
   return { kinds, categories, things };

@@ -1,13 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 import { union } from "lodash";
 
-import { isObjectEmpty } from "utils/common/helpers";
-
 import { UNKNOWN_CATEGORY_NAME } from "./constants";
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
 
-import { DeferredEntity } from "store/entities/models";
-import { Category, Kind, Thing } from "./types";
+import { Category, Kind } from "./types";
 
 export const generateUUID = (options?: { definesUnknown: boolean }) => {
   let id = uuidv4();
@@ -66,10 +63,4 @@ export const updateContents = (
       newContents = contents;
   }
   return newContents;
-};
-
-export const isPendingReconciliation = (
-  item: DeferredEntity<Category | Thing | Kind>
-) => {
-  return !isObjectEmpty(item.changes);
 };
