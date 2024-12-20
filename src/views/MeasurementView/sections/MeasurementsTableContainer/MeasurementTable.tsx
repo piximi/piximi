@@ -76,7 +76,6 @@ export const MeasurementTable = ({
     return Object.entries(tableMeasurements).reduce(
       (measurementRows: ExtendedDisplayTableRow[], measurementType, idx) => {
         const type = measurementType[0].split(" ");
-        type.splice(1, 1);
         const typeSplitString = type.join(" ");
         const idx1 = idx;
         measurementType[1].splits.forEach((row, idx) => {
