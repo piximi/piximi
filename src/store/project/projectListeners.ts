@@ -7,9 +7,6 @@ import { dataSlice } from "store/data";
 import { projectSlice } from "./projectSlice";
 
 import { TypedAppStartListening } from "store/types";
-import { getDeferredProperty } from "store/entities/utils";
-import { DeferredEntity } from "store/entities/models";
-import { ImageObject } from "store/data/types";
 
 export const projectMiddleware = createListenerMiddleware();
 const startAppListening =
@@ -110,11 +107,8 @@ startAppListening({
       for (const thingId of thingIds) {
         const thing = data.things.entities[thingId];
         if (!thing) continue;
-        if (getDeferredProperty(thing, "kind") === "Image") {
-          const containedThingIds = getDeferredProperty(
-            thing as DeferredEntity<ImageObject>,
-            "containing"
-          );
+        if ("containing" in thing) {
+          const containedThingIds = thing.containing;
           implicitThingIds.push(...containedThingIds);
         }
       }

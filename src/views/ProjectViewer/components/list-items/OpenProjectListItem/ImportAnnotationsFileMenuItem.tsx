@@ -77,19 +77,16 @@ export const ImportAnnotationsFileMenuItem = ({
             dispatch(
               dataSlice.actions.addKinds({
                 kinds: newKinds,
-                isPermanent: true,
               })
             );
             dispatch(
               dataSlice.actions.addCategories({
                 categories: newCategories,
-                isPermanent: true,
               })
             );
             dispatch(
               dataSlice.actions.addThings({
                 things: newAnnotations,
-                isPermanent: true,
               })
             );
           });

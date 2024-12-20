@@ -98,8 +98,8 @@ export const selectThingsOfKind = createSelector(
   [selectKindDictionary, selectThingsDictionary],
   (kindDict, thingDict) => {
     return (kind: string) => {
-      const thingsOfKind = kindDict[kind].containing;
-      return thingsOfKind.map((thingId) => thingDict[thingId]);
+      const thingsOfKind = kindDict[kind]!.containing;
+      return thingsOfKind.map((thingId) => thingDict[thingId]!);
     };
   }
 );
@@ -108,8 +108,8 @@ export const selectNumThingsByCatAndKind = createSelector(
   selectKindDictionary,
   selectCategoriesDictionary,
   (kindDict, catDict) => (catId: string, kind: string) => {
-    const thingsOfKind = kindDict[kind].containing;
-    const thingsOfCat = catDict[catId].containing;
+    const thingsOfKind = kindDict[kind]!.containing;
+    const thingsOfCat = catDict[catId]!.containing;
 
     return intersection(thingsOfCat, thingsOfKind).length;
   }
@@ -137,8 +137,8 @@ export const selectUnknownCategoryByKind = createSelector(
   selectCategoriesDictionary,
   (kindDict, catDict) => {
     return (kind: string) => {
-      const unknownCatId = kindDict[kind].unknownCategoryId;
-      return catDict[unknownCatId];
+      const unknownCatId = kindDict[kind]!.unknownCategoryId;
+      return catDict[unknownCatId]!;
     };
   }
 );
@@ -147,8 +147,8 @@ export const selectCategoriesByKind = createSelector(
   [selectKindDictionary, selectCategoriesDictionary],
   (kindDict, categoriesDict) => {
     return (kind: string) => {
-      const categoriesOfKind = kindDict[kind].categories;
-      return categoriesOfKind.map((catId) => categoriesDict[catId]);
+      const categoriesOfKind = kindDict[kind]!.categories;
+      return categoriesOfKind.map((catId) => categoriesDict[catId]!);
     };
   }
 );
@@ -163,7 +163,7 @@ export const selectAllImageCategories = createSelector(
 export const selectUnknownImageCategory = createSelector(
   selectKindDictionary,
   (kinds) => {
-    return kinds["Image"]?.unknownCategoryId;
+    return kinds["Image"]!.unknownCategoryId;
   }
 );
 

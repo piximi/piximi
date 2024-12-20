@@ -22,7 +22,6 @@ import {
 import { serializeCOCOFile } from "../serialize/serializeCOCO";
 import { deserializeCOCOFile } from "../deserialize/deserializeCOCO";
 
-import { DeferredEntityState } from "store/entities";
 import { Partition } from "utils/models/enums";
 import { SerializedCOCOFileType } from "../types";
 import { CATEGORY_COLORS } from "utils/common/constants";
@@ -32,6 +31,7 @@ import {
   Category,
   ImageObject,
 } from "store/data/types";
+import { EntityState } from "@reduxjs/toolkit";
 
 tf.setBackend("cpu");
 const imDataMap: Record<string, string> = {
@@ -197,12 +197,9 @@ describe("deserialize into project with matching image, no matching kinds or cat
     );
 
     const thingsT2 = imagesT1.reduce(
-      (
-        entities: DeferredEntityState<AnnotationObject | ImageObject>,
-        thing
-      ) => {
+      (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
         entities.ids.push(thing.id);
-        entities.entities[thing.id] = { saved: thing, changes: {} };
+        entities.entities[thing.id] = thing;
         return entities;
       },
       { ids: [], entities: {} }
@@ -265,12 +262,9 @@ describe("deserialize into project with matching image, matching kinds", () => {
     );
 
     const thingsT2 = imagesT1.reduce(
-      (
-        entities: DeferredEntityState<AnnotationObject | ImageObject>,
-        thing
-      ) => {
+      (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
         entities.ids.push(thing.id);
-        entities.entities[thing.id] = { saved: thing, changes: {} };
+        entities.entities[thing.id] = thing;
         return entities;
       },
       { ids: [], entities: {} }
@@ -325,18 +319,18 @@ describe("deserialize into project with matching image, matching kinds", () => {
     k3T2.categories = [uC3T2.id];
     k3T2.unknownCategoryId = uC3T2.id;
     const kindsT2 = [k1T2, k2T2, k3T2].reduce(
-      (entities: DeferredEntityState<Kind>, kind) => {
+      (entities: EntityState<Kind>, kind) => {
         entities.ids.push(kind.id);
-        entities.entities[kind.id] = { saved: kind, changes: {} };
+        entities.entities[kind.id] = kind;
         return entities;
       },
       { ids: [], entities: {} }
     );
 
     const categoriesT2 = [uC1T2, uC2T2, uC3T2].reduce(
-      (entities: DeferredEntityState<Category>, category) => {
+      (entities: EntityState<Category>, category) => {
         entities.ids.push(category.id);
-        entities.entities[category.id] = { saved: category, changes: {} };
+        entities.entities[category.id] = category;
         return entities;
       },
       { ids: [], entities: {} }
@@ -397,12 +391,9 @@ describe("deserialize into project with matching image, matching kinds and categ
     );
 
     const thingsT2 = imagesT1.reduce(
-      (
-        entities: DeferredEntityState<AnnotationObject | ImageObject>,
-        thing
-      ) => {
+      (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
         entities.ids.push(thing.id);
-        entities.entities[thing.id] = { saved: thing, changes: {} };
+        entities.entities[thing.id] = thing;
         return entities;
       },
       { ids: [], entities: {} }
@@ -467,18 +458,18 @@ describe("deserialize into project with matching image, matching kinds and categ
     k1T2.categories = [c1T2.id];
     k1T2.unknownCategoryId = c1T2.id;
     const kindsT2 = [k1T2, k2T2, k3T2].reduce(
-      (entities: DeferredEntityState<Kind>, kind) => {
+      (entities: EntityState<Kind>, kind) => {
         entities.ids.push(kind.id);
-        entities.entities[kind.id] = { saved: kind, changes: {} };
+        entities.entities[kind.id] = kind;
         return entities;
       },
       { ids: [], entities: {} }
     );
     t2categories = [uC1T2, uC2T2, uC3T2, c1T2];
     const categoriesT2 = t2categories.reduce(
-      (entities: DeferredEntityState<Category>, category) => {
+      (entities: EntityState<Category>, category) => {
         entities.ids.push(category.id);
-        entities.entities[category.id] = { saved: category, changes: {} };
+        entities.entities[category.id] = category;
         return entities;
       },
       { ids: [], entities: {} }

@@ -5,7 +5,6 @@ import { dataSlice } from "./dataSlice";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { createRenderedTensor } from "utils/common/tensorHelpers";
 
 import { ImageObject } from "./types";
@@ -36,9 +35,7 @@ startAppListening({
       } else if (action.payload.thingIds === "annotations") {
         explicitThingIds = data.kinds.ids.reduce((tIds: string[], kindId) => {
           if (kindId !== "Image") {
-            tIds.push(
-              ...getDeferredProperty(data.kinds.entities[kindId], "containing")
-            );
+            tIds.push(...data.kinds.entities[kindId]!.containing);
           }
           return tIds;
         }, []);
@@ -48,9 +45,7 @@ startAppListening({
     } else if ("ofKinds" in action.payload) {
       action.payload.ofKinds.forEach((kindId) => {
         if (kindId in data.kinds.entities) {
-          explicitThingIds.push(
-            ...getDeferredProperty(data.kinds.entities[kindId], "containing")
-          );
+          explicitThingIds.push(...data.kinds.entities[kindId]!.containing);
         }
       });
     } else {
@@ -59,10 +54,7 @@ startAppListening({
         if (categoryId in data.categories.entities) {
           let containedThings: string[];
 
-          containedThings = getDeferredProperty(
-            data.categories.entities[categoryId],
-            "containing"
-          );
+          containedThings = data.categories.entities[categoryId]!.containing;
 
           explicitThingIds.push(...containedThings);
         }
@@ -74,7 +66,6 @@ startAppListening({
       dataSlice.actions.deleteThings({
         thingIds: explicitThingIds,
         disposeColorTensors: action.payload.disposeColorTensors,
-        isPermanent: action.payload.isPermanent,
         preparedByListener: true,
       })
     );
@@ -99,9 +90,7 @@ startAppListening({
       const { id: imageId, ...changes } = update;
       if ("colors" in changes && changes.colors) {
         const colors = changes.colors;
-        const image = getCompleteEntity(
-          dataState.things.entities[imageId]
-        )! as ImageObject;
+        const image = dataState.things.entities[imageId]! as ImageObject;
 
         const colorsEditable = {
           range: { ...colors.range },

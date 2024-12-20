@@ -2,6 +2,16 @@ import { Tensor2D } from "@tensorflow/tfjs";
 import { AlertType, ImageSortKey } from "./enums";
 import { OldCategory } from "store/data/types";
 
+export type Deferred<T> = Partial<T> & {
+  deleted?: boolean;
+  added?: boolean;
+};
+
+export type DeferredEntity<T> = {
+  saved: T;
+  changes: Deferred<T>;
+};
+
 /*
 TENSORFLOW
 */
