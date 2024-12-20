@@ -52,8 +52,9 @@ startAppListening({
       //"ofCategories" in action.payload
       action.payload.ofCategories.forEach((categoryId) => {
         if (categoryId in data.categories.entities) {
-          const containedThings =
-            data.categories.entities[categoryId]!.containing;
+          let containedThings: string[];
+
+          containedThings = data.categories.entities[categoryId]!.containing;
 
           explicitThingIds.push(...containedThings);
         }

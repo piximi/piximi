@@ -74,7 +74,6 @@ export const ProjectViewerCategories = () => {
       dataSlice.actions.removeCategoriesFromKind({
         categoryIds: [category.id],
         kind: kindId ?? activeKind,
-        isPermanent: true,
       })
     );
   };
@@ -84,7 +83,6 @@ export const ProjectViewerCategories = () => {
         thingIds: category.containing,
         activeKind: activeKind,
         disposeColorTensors: true,
-        isPermanent: true,
       })
     );
   };
@@ -140,7 +138,7 @@ export const ProjectViewerCategories = () => {
       dataSlice.actions.removeCategoriesFromKind({
         categoryIds: "all",
         kind: activeKind,
-      }),
+      })
     );
   };
 
@@ -194,7 +192,7 @@ export const ProjectViewerCategories = () => {
                 categoryId: highlightedCategory,
                 partition: Partition.Unassigned,
               })),
-            }),
+            })
           );
         }
       }
@@ -294,7 +292,6 @@ export const ProjectViewerCategories = () => {
         onConfirm={createCategory}
         onClose={handleCloseCreateCategoryDialog}
         open={isCreateCategoryDialogOpen}
-        action={"create"}
       />
 
       <ConfirmationDialog
