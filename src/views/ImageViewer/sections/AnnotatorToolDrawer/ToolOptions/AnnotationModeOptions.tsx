@@ -9,8 +9,8 @@ import { CustomListItemButton } from "components/ui";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
   selectAnnotationState,
-  selectAnnotationSelectionMode,
-  selectWorkingAnnotation,
+  selectAnnotationMode,
+  selectWorkingAnnotationEntity,
 } from "views/ImageViewer/state/annotator/selectors";
 
 import { RadioCheckedIcon, RadioUncheckedIcon } from "icons";
@@ -20,11 +20,11 @@ import { AnnotationMode, AnnotationState } from "views/ImageViewer/utils/enums";
 export const AnnotationModeOptions = () => {
   const dispatch = useDispatch();
 
-  const annotationMode = useSelector(selectAnnotationSelectionMode);
+  const annotationMode = useSelector(selectAnnotationMode);
 
   const annotationState = useSelector(selectAnnotationState);
 
-  const workingAnnotation = useSelector(selectWorkingAnnotation);
+  const workingAnnotation = useSelector(selectWorkingAnnotationEntity);
 
   const [disableAnnotationEdits, setDisabledAnnotationEdit] =
     React.useState(true);
@@ -42,9 +42,9 @@ export const AnnotationModeOptions = () => {
 
   const onClickLabel = (event: any, mode: AnnotationMode) => {
     const payload = {
-      selectionMode: mode,
+      annotationMode: mode,
     };
-    dispatch(annotatorSlice.actions.setSelectionMode(payload));
+    dispatch(annotatorSlice.actions.setAnnotationMode(payload));
   };
 
   const t = useTranslation();

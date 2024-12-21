@@ -34,7 +34,7 @@ export const initialState: AnnotatorState = {
   penSelectionBrushSize: 10,
   quickSelectionRegionSize: 40,
   thresholdAnnotationValue: 150,
-  selectionMode: AnnotationMode.New,
+  annotationMode: AnnotationMode.New,
   toolType: ToolType.RectangularAnnotation,
 };
 
@@ -156,11 +156,11 @@ export const annotatorSlice = createSlice({
       state.quickSelectionRegionSize = action.payload.quickSelectionRegionSize;
     },
 
-    setSelectionMode(
+    setAnnotationMode(
       state,
-      action: PayloadAction<{ selectionMode: AnnotationMode }>
+      action: PayloadAction<{ annotationMode: AnnotationMode }>
     ) {
-      state.selectionMode = action.payload.selectionMode;
+      state.annotationMode = action.payload.annotationMode;
     },
 
     setThresholdAnnotationValue(
