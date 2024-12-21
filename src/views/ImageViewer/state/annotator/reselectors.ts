@@ -6,7 +6,7 @@ import {
   selectKindChanges,
   selectSelectedAnnotationIds,
   selectThingChanges,
-  selectWorkingAnnotation,
+  selectWorkingAnnotationEntity,
 } from "./selectors";
 import {
   selectAllCategories,
@@ -314,6 +314,18 @@ export const selectUpdatedImages = createSelector(
   }
 );
 
+export const selectFullWorkingAnnotation = createSelector(
+  selectWorkingAnnotationEntity,
+
+  (workingAnnotationEntity) => {
+    if (!workingAnnotationEntity.saved) return;
+    return {
+      ...workingAnnotationEntity.saved,
+      ...workingAnnotationEntity.changes,
+    } as DecodedAnnotationObject;
+  }
+);
+
 export const selectActiveAnnotations = createSelector(
   [selectActiveImage, selectUpdatedObjects],
   (activeImage, objects): Array<DecodedAnnotationObject> => {
@@ -366,7 +378,7 @@ export const selectActiveAnnotationsViews = createSelector(
   }
 );
 export const selectWorkingAnnotationView = createSelector(
-  selectWorkingAnnotation,
+  selectWorkingAnnotationEntity,
   selectActiveImage,
   selectCategories,
   (workingAnnotationEntity, activeImage, catDict) => {
