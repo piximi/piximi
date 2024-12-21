@@ -18,20 +18,10 @@ import { availableClassifierModels } from "utils/models/availableClassificationM
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/common/enums";
 
-import {
-  AppSettingsState,
-  ClassifierState,
-  ProjectState,
-  SegmenterState,
-  TypedAppStartListening,
-} from "store/types";
+import { StoreListemerAPI, TypedAppStartListening } from "store/types";
 import { CompileOptions, TrainingCallbacks } from "utils/models/types";
 import { AlertState } from "utils/common/types";
 import { Category, Thing } from "store/data/types";
-import {
-  AnnotatorState,
-  ImageViewerState,
-} from "views/ImageViewer/utils/types";
 
 export const classifierMiddleware = createListenerMiddleware();
 

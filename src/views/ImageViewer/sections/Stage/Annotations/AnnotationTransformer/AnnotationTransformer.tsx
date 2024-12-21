@@ -19,7 +19,7 @@ import {
   selectImageOrigin,
 } from "views/ImageViewer/state/imageViewer/selectors";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
-import { selectWorkingAnnotation } from "views/ImageViewer/state/annotator/selectors";
+import { selectWorkingAnnotationEntity } from "views/ImageViewer/state/annotator/selectors";
 import {
   selectSelectedAnnotations,
   selectActiveImage,
@@ -61,7 +61,7 @@ export const AnnotationTransformer = ({
   const [yPos, setYPos] = useState<number>(0);
 
   const activeImage = useSelector(selectActiveImage)!;
-  const workingAnnotation = useSelector(selectWorkingAnnotation);
+  const workingAnnotation = useSelector(selectWorkingAnnotationEntity);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
   const cursor = useSelector(selectCursor);
   const soundEnabled = useSelector(selectSoundEnabled);
@@ -92,7 +92,7 @@ export const AnnotationTransformer = ({
       dispatch(
         annotatorSlice.actions.setAnnotationMode({
           annotationMode: AnnotationMode.New,
-        }),
+        })
       );
 
       dispatch(
