@@ -8,7 +8,7 @@ import { useAnnotationTool } from "../../../hooks";
 import { CustomListItemButton } from "components/ui";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { selectWorkingAnnotation } from "views/ImageViewer/state/annotator/selectors";
+import { selectWorkingAnnotationEntity } from "views/ImageViewer/state/annotator/selectors";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 
@@ -20,7 +20,7 @@ export const InvertAnnotation = () => {
   const dispatch = useDispatch();
 
   const { annotationTool } = useAnnotationTool();
-  const workingAnnotationEntity = useSelector(selectWorkingAnnotation);
+  const workingAnnotationEntity = useSelector(selectWorkingAnnotationEntity);
 
   const handleInvertClick = () => {
     if (!workingAnnotationEntity.saved) return;

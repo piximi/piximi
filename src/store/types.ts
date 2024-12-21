@@ -1,8 +1,10 @@
 import { History } from "@tensorflow/tfjs";
 import {
   AnyAction,
+  CombinedState,
   Dispatch,
   EntityState,
+  ListenerEffectAPI,
   TypedStartListening,
 } from "@reduxjs/toolkit";
 
@@ -128,7 +130,7 @@ export type AppDispatch = Dispatch<UnknownAction>;
 export type TypedAppStartListening = TypedStartListening<AppState, AppDispatch>;
 
 export type StoreListemerAPI = ListenerEffectAPI<
-  {
+  CombinedState<{
     classifier: ClassifierState;
     segmenter: SegmenterState;
     imageViewer: ImageViewerState;
@@ -136,7 +138,7 @@ export type StoreListemerAPI = ListenerEffectAPI<
     applicationSettings: AppSettingsState;
     annotator: AnnotatorState;
     data: DataState;
-  },
+  }>,
   AppDispatch,
   unknown
 >;
