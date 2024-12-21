@@ -1,8 +1,4 @@
-import {
-  createListenerMiddleware,
-  CombinedState,
-  ListenerEffectAPI,
-} from "@reduxjs/toolkit";
+import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { ENV, enableDebugMode, History } from "@tensorflow/tfjs";
 import { shuffle, take, takeRight } from "lodash";
 
@@ -23,41 +19,15 @@ import { availableClassifierModels } from "utils/models/availableClassificationM
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/common/enums";
 
-import {
-  AppSettingsState,
-  ClassifierState,
-  ProjectState,
-  SegmenterState,
-  TypedAppStartListening,
-} from "store/types";
+import { StoreListemerAPI, TypedAppStartListening } from "store/types";
 import { CompileOptions, TrainingCallbacks } from "utils/models/types";
-import { DataState } from "store/types";
-import { AppDispatch } from "store/types";
 import { AlertState } from "utils/common/types";
 import { Category, Thing } from "store/data/types";
-import {
-  AnnotatorState,
-  ImageViewerState,
-} from "views/ImageViewer/utils/types";
 
 export const classifierMiddleware = createListenerMiddleware();
 
 const startAppListening =
   classifierMiddleware.startListening as TypedAppStartListening;
-
-type StoreListemerAPI = ListenerEffectAPI<
-  CombinedState<{
-    classifier: ClassifierState;
-    segmenter: SegmenterState;
-    imageViewer: ImageViewerState;
-    project: ProjectState;
-    applicationSettings: AppSettingsState;
-    annotator: AnnotatorState;
-    data: DataState;
-  }>,
-  AppDispatch,
-  unknown
->;
 
 const handleError = async (
   listenerAPI: StoreListemerAPI,
