@@ -14,12 +14,12 @@ export const selectAnnotationState = ({
   return annotator.annotationState;
 };
 
-export const selectAnnotationSelectionMode = ({
+export const selectAnnotationMode = ({
   annotator,
 }: {
   annotator: AnnotatorState;
 }): AnnotationMode => {
-  return annotator.selectionMode;
+  return annotator.annotationMode;
 };
 export const selectPenSelectionBrushSize = ({
   annotator,
@@ -59,7 +59,7 @@ export const selectWorkingAnnotationId = ({
 }): string | undefined => {
   return annotator.workingAnnotationId;
 };
-export const selectWorkingAnnotation = ({
+export const selectWorkingAnnotationEntity = ({
   annotator,
 }: {
   annotator: AnnotatorState;
@@ -72,6 +72,10 @@ export const selectSelectedAnnotationIds = ({
   annotator: AnnotatorState;
 }): string[] => {
   return annotator.selectedAnnotationIds;
+};
+
+export const selectChanges = ({ annotator }: { annotator: AnnotatorState }) => {
+  return annotator.changes;
 };
 
 export const selectKindChanges = ({
