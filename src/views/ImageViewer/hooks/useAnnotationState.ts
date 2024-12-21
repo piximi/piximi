@@ -3,11 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import {
   selectActiveImage,
   selectCategories,
   selectCategoriesByKindArray,
+  selectFullWorkingAnnotation,
+  selectImageViewerObjects,
+  selectKinds,
 } from "views/ImageViewer/state/annotator/reselectors";
 import {
   selectActiveImageId,
@@ -16,8 +18,20 @@ import {
 
 import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
-import { AnnotationState } from "views/ImageViewer/utils/enums";
-import { isUnknownCategory } from "utils/common/helpers";
+import { AnnotationMode, AnnotationState } from "views/ImageViewer/utils/enums";
+import {
+  getPropertiesFromImage,
+  isUnknownCategory,
+} from "utils/common/helpers";
+import { selectAnnotationMode } from "../state/annotator/selectors";
+import {
+  AnnotationObject,
+  DecodedAnnotationObject,
+  ImageObject,
+  Kind,
+  PartialDecodedAnnotationObject,
+} from "store/data/types";
+import { encodeAnnotation } from "../utils/rle";
 
 export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();
@@ -26,17 +40,27 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const selectedCategoryId = useSelector(selectSelectedIVCategoryId);
   const categories = useSelector(selectCategories);
   const categoriesByKindArray = useSelector(selectCategoriesByKindArray);
+  const kinds = useSelector(selectKinds);
+  const annotationMode = useSelector(selectAnnotationMode);
+  const objects = useSelector(selectImageViewerObjects);
+  const workingAnnotation = useSelector(selectFullWorkingAnnotation);
 
-  const selectedCategory = useMemo(() => {
-    if (!selectedCategoryId) return undefined;
-    return categories[selectedCategoryId];
-  }, [categories, selectedCategoryId]);
+  const objectNames = useMemo(() => {
+    return objects.map((obj) => obj.name);
+  }, [objects]);
 
-  const defaultSelectedCategory = useMemo(() => {
-    return categoriesByKindArray[0]?.categories.find((c) =>
+  const annotationCategory = useMemo(() => {
+    if (categories[selectedCategoryId]) return categories[selectedCategoryId];
+    const defaultKindCategories = Object.entries(categoriesByKindArray).find(
+      (k) => k[0] !== selectedCategoryId
+    );
+    if (!defaultKindCategories) return undefined;
+    const defaultCategory = defaultKindCategories[1].categories.find((c) =>
       isUnknownCategory(c.id)
     );
-  }, [categoriesByKindArray]);
+
+    return defaultCategory;
+  }, [categories, selectedCategoryId, categoriesByKindArray]);
 
   const [noKindAvailable, setNoKindAvailable] = useState<boolean>(false);
 
@@ -53,34 +77,50 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
   }, [annotationTool, dispatch]);
 
   const onAnnotated = useMemo(() => {
-    const func = () => {
-      if (!selectedCategory) {
-        if (!defaultSelectedCategory) {
-          setNoKindAvailable(true);
-          return;
-        }
+    const func = async () => {
+      if (!annotationCategory) {
+        setNoKindAvailable(true);
+        return;
+      }
+      if (!activeImage) return;
+      annotationTool.annotate(
+        annotationCategory,
+        activeImage!.activePlane,
+        activeImageId!
+      );
+      const kind = kinds[annotationCategory.kind];
+      if (annotationMode === AnnotationMode.New) {
+        const newAnnotation = await createAnnotation(
+          annotationTool.annotation!,
+
+          activeImage!,
+          kind,
+          objectNames
+        );
         dispatch(
-          imageViewerSlice.actions.setSelectedCategoryId({
-            selectedCategoryId: defaultSelectedCategory.id,
+          annotatorSlice.actions.setWorkingAnnotation({
+            annotation: newAnnotation,
           })
         );
-        annotationTool.annotate(
-          defaultSelectedCategory,
-          activeImage!.activePlane,
-          activeImageId!
-        );
       } else {
-        annotationTool.annotate(
-          selectedCategory,
-          activeImage!.activePlane,
-          activeImageId!
+        if (!workingAnnotation) return;
+        const updatedAnnotation = await editAnnotation(
+          workingAnnotation,
+          annotationMode,
+          annotationTool,
+          activeImage
+        );
+
+        dispatch(
+          annotatorSlice.actions.updateWorkingAnnotation({
+            changes: updatedAnnotation,
+          })
         );
       }
-
       dispatch(
         annotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationState.Annotated,
-          kind: selectedCategory?.kind ?? defaultSelectedCategory?.kind,
+          kind: annotationCategory.kind,
           annotationTool,
         })
       );
@@ -88,11 +128,14 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
     return func;
   }, [
     annotationTool,
-    selectedCategory,
+    annotationCategory,
     activeImage,
     dispatch,
     activeImageId,
-    defaultSelectedCategory,
+    kinds,
+    annotationMode,
+    objectNames,
+    workingAnnotation,
   ]);
 
   const onDeselect = useMemo(() => {
@@ -100,13 +143,13 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
       dispatch(
         annotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationState.Blank,
-          kind: selectedCategory?.kind,
+          kind: annotationCategory?.kind,
           annotationTool,
         })
       );
     };
     return func;
-  }, [annotationTool, selectedCategory, dispatch]);
+  }, [annotationTool, annotationCategory, dispatch]);
   useEffect(() => {
     annotationTool.registerOnAnnotatedHandler(onAnnotated);
     annotationTool.registerOnAnnotatingHandler(onAnnotating);
@@ -114,4 +157,94 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
   }, [annotationTool, onAnnotated, onAnnotating, onDeselect]);
 
   return { noKindAvailable, setNoKindAvailable };
+};
+
+const createAnnotation = async (
+  toolAnnotation: PartialDecodedAnnotationObject,
+
+  activeImage: ImageObject,
+
+  kindObject: Kind,
+  existingNames: string[]
+) => {
+  const bbox = toolAnnotation.boundingBox;
+
+  const bitDepth = activeImage.bitDepth;
+  const imageProperties = await getPropertiesFromImage(
+    activeImage,
+    toolAnnotation
+  );
+  //TODO: add suppoert for multiple planes
+  const shape = {
+    planes: 1,
+    height: bbox[3] - bbox[1],
+    width: bbox[2] - bbox[0],
+    channels: activeImage.shape.channels,
+  };
+
+  let annotationName: string = `${activeImage.name}-${kindObject.id}_0`;
+  let i = 1;
+  while (existingNames.includes(annotationName)) {
+    annotationName = annotationName.replace(/_(\d+)$/, `_${i}`);
+    i++;
+  }
+
+  return {
+    ...toolAnnotation,
+    ...imageProperties,
+    bitDepth,
+    shape,
+    name: annotationName,
+    kind: kindObject.id,
+  } as DecodedAnnotationObject;
+};
+
+const editAnnotation = async (
+  workingAnnotation: DecodedAnnotationObject,
+  annotationMode: AnnotationMode,
+  annotationTool: AnnotationTool,
+  activeImage: ImageObject
+): Promise<AnnotationObject | DecodedAnnotationObject> => {
+  let combinedMask, combinedBoundingBox;
+
+  if (annotationMode === AnnotationMode.Add) {
+    [combinedMask, combinedBoundingBox] = annotationTool.add(
+      workingAnnotation.decodedMask!,
+      workingAnnotation.boundingBox
+    );
+  } else if (annotationMode === AnnotationMode.Subtract) {
+    [combinedMask, combinedBoundingBox] = annotationTool.subtract(
+      workingAnnotation.decodedMask!,
+      workingAnnotation.boundingBox
+    );
+  } else if (annotationMode === AnnotationMode.Intersect) {
+    [combinedMask, combinedBoundingBox] = annotationTool.intersect(
+      workingAnnotation.decodedMask!,
+      workingAnnotation.boundingBox
+    );
+  } else {
+    return workingAnnotation;
+  }
+
+  annotationTool.decodedMask = combinedMask;
+  annotationTool.boundingBox = combinedBoundingBox;
+
+  const combinedSelectedAnnotation = {
+    ...workingAnnotation,
+    boundingBox: combinedBoundingBox,
+    decodedMask: annotationTool.decodedMask,
+  } as DecodedAnnotationObject;
+
+  const annotation = encodeAnnotation(combinedSelectedAnnotation);
+  const { data, src } = await getPropertiesFromImage(activeImage, annotation);
+
+  //TODO: add suppoert for multiple planes
+  const shape = {
+    planes: 1,
+    height: combinedBoundingBox[3] - combinedBoundingBox[1],
+    width: combinedBoundingBox[2] - combinedBoundingBox[0],
+    channels: activeImage.shape.channels,
+  };
+
+  return { ...annotation, data, src, shape } as AnnotationObject;
 };
