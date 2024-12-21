@@ -42,30 +42,32 @@ export type AnnotatorState = {
     saved: DecodedAnnotationObject | undefined;
     changes: Partial<DecodedAnnotationObject>;
   };
-  changes: {
-    kinds: {
-      added: Record<string, Kind>;
-      deleted: string[];
-      edited: Record<string, RequireOnly<Kind, "id">>;
-    };
-    categories: {
-      added: Record<string, Category>;
-      deleted: string[];
-      edited: Record<string, RequireOnly<Category, "id">>;
-    };
-    things: {
-      added: Record<string, DecodedAnnotationObject>;
-      deleted: string[];
-      edited: Record<string, RequireOnly<AnnotationObject, "id">>;
-    };
-  };
+  changes: AnnotatorChanges;
   selectedAnnotationIds: Array<string>;
   annotationState: AnnotationState;
   penSelectionBrushSize: number;
   quickSelectionRegionSize: number;
   thresholdAnnotationValue: number;
-  selectionMode: AnnotationMode;
+  annotationMode: AnnotationMode;
   toolType: ToolType;
+};
+
+export type AnnotatorChanges = {
+  kinds: {
+    added: Record<string, Kind>;
+    deleted: string[];
+    edited: Record<string, RequireOnly<Kind, "id">>;
+  };
+  categories: {
+    added: Record<string, Category>;
+    deleted: string[];
+    edited: Record<string, RequireOnly<Category, "id">>;
+  };
+  things: {
+    added: Record<string, DecodedAnnotationObject>;
+    deleted: string[];
+    edited: Record<string, RequireOnly<AnnotationObject, "id">>;
+  };
 };
 export type Point = {
   x: number;

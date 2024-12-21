@@ -10,7 +10,7 @@ import { usePointerTool } from "./usePointerTool";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
-  selectAnnotationSelectionMode,
+  selectAnnotationMode,
   selectSelectedAnnotationIds,
   selectToolType,
 } from "views/ImageViewer/state/annotator/selectors";
@@ -50,7 +50,7 @@ export const useStageHandlers = (
     | undefined,
   getPositionRelativeToStage: () => Point | undefined
 ) => {
-  const selectionMode = useSelector(selectAnnotationSelectionMode);
+  const selectionMode = useSelector(selectAnnotationMode);
   //const workingAnnotationEntity = useSelector(selectWorkingAnnotationNew);
   const dispatch = useDispatch();
   const toolType = useSelector(selectToolType);
