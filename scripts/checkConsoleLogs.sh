@@ -1,4 +1,3 @@
-#!/bin/bash
 
 EXITCODE=0
 PTRN='console\.log'
