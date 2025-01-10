@@ -1,0 +1,82 @@
+name: Version Bump
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  check-labels:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Install semver globally
+        run: |
+          npm install -g semver
+          npm ls -g
+          # enusre globally installed semver is available as a script
+          # to be run locally
+          echo "NODE_PATH=$(npm root -g)" >> $GITHUB_ENV
+
+      - name: Analyze PR labels
+        id: analyze_labels
+        env:
+          # in order to use the gh api
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Analyzing labels..."
+
+          # Define the labels to check
+          LABELS_TO_CHECK=("bump:none" "bump:patch" "bump:major" "bump:minor")
+          FOUND_LABELS=()
+
+          REPO=${{ github.repository }}
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          # use the gh cli to get the labels from the PR
+          while IFS= read -r label; do
+            LABELS+=("$label")
+          done < <(gh api --jq '.labels[].name' /repos/$REPO/pulls/$PR_NUMBER)
+
+          # Check each target label
+          for TARGET_LABEL in "${LABELS_TO_CHECK[@]}"; do
+            if [[ "${LABELS[*]}" == *"$TARGET_LABEL"* ]]; then
+              FOUND_LABELS+=("$TARGET_LABEL")
+            fi
+          done
+
+          echo "Labels checked for:"
+          echo ${LABELS_TO_CHECK[@]}
+          echo "Labels in PR:"
+          echo ${LABELS[@]}
+          echo "Label(s) matched:"
+          echo ${FOUND_LABELS[@]}
+
+          # Output result based on found labels
+          if [[ ${#FOUND_LABELS[@]} -eq 0 ]]; then
+            echo "no explicit label, doing patch bump"
+            npm run bump bump:patch
+          elif [[ ${#FOUND_LABELS[@]} -eq 1 ]]; then
+            echo "doing bump on label: ${FOUND_LABELS[0]}"
+            npm run bump ${FOUND_LABELS[0]}
+          else
+            echo "too many labels found: ${FOUND_LABELS[*]}"
+            exit 1
+          fi
+
+      - name: Commit and Push Changes
+        if: ${{ success() }}
+        run: |
+          # if there are changes to the worktree, commit and push them
+          if [[ -n $(git status --porcelain)  ]]; then
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add package.json
+            git commit -m "Bump version ($(cat package.json | jq '.version')) based on labels"
+            git push
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
