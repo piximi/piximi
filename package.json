@@ -121,7 +121,8 @@
     "build-storybook": "storybook build",
     "prepare": "husky install; node scripts/prepare.js",
     "prune-dead": "ts-prune",
-    "no-console-logs": "./scripts/checkConsoleLogs.sh"
+    "no-console-logs": "./scripts/checkConsoleLogs.sh",
+    "bump": "node ./scripts/bump.js"
   },
   "browserslist": {
     "production": [
