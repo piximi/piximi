@@ -7,7 +7,7 @@ import { Partition } from "utils/models/enums";
 import {
   NewSerializedAnnotationType,
   SerializedAnnotatorImageType,
-  SerializedFileTypeV2,
+  SerializedFileTypeV02,
 } from "../../types";
 import { PartialBy } from "utils/common/types";
 import {
@@ -101,7 +101,7 @@ const reconcileImages = (
 };
 
 export const deserializePiximiAnnotations_v02 = async (
-  serializedProject: SerializedFileTypeV2,
+  serializedProject: SerializedFileTypeV02,
   existingImages: Array<ImageObject>,
   existingCategories: Array<Category>,
   existingKinds: Array<Kind>

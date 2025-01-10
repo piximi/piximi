@@ -18,7 +18,7 @@ import { generateUUID, isUnknownCategory } from "utils/common/helpers";
 import { serializePiximiAnnotations } from "../serialize/serializePiximiAnnotations";
 import { deserializePiximiAnnotations } from "../deserialize";
 
-import { SerializedFileTypeV2 } from "../types";
+import { SerializedFileTypeV02 } from "../types";
 import { CATEGORY_COLORS } from "utils/common/constants";
 import {
   Kind,
@@ -153,13 +153,14 @@ k1T1.containing = im1AnnotationsT1.map((ann) => ann.id);
 uC1T1.containing = [im1AnnotationsT1[0].id];
 c1T1.containing = [im1AnnotationsT1[1].id];
 
+const ANNOTATIONS_VERSION = "0.2.0";
 const t1Categories = [uC1T1, c1T1];
 const t1Kinds = [k1T1];
 const t1Ims = [im1T1, im2T1];
 const t1Objects = [...im1AnnotationsT1];
 
 describe("serializes piximi project", () => {
-  let serializedPiximi: SerializedFileTypeV2;
+  let serializedPiximi: SerializedFileTypeV02;
 
   beforeAll(async () => {
     serializedPiximi = serializePiximiAnnotations(
@@ -168,10 +169,10 @@ describe("serializes piximi project", () => {
       [uC1T1, c1T1],
       [k1T1]
     );
-    serializedPiximi.version = "0.2.0";
+    serializedPiximi.version = ANNOTATIONS_VERSION;
   });
   test("has version", () => {
-    expect(serializedPiximi.version).toBe("0.2.0");
+    expect(serializedPiximi.version).toBe(ANNOTATIONS_VERSION);
   });
   test("properly serialized images", () => {
     expect(serializedPiximi.images.length).toBe(t1Ims.length);
@@ -217,7 +218,7 @@ describe("deserialize into empty project (no matching images)", () => {
       [uC1T1, c1T1],
       [k1T1]
     );
-    serializedPiximi.version = "0.2.0";
+    serializedPiximi.version = ANNOTATIONS_VERSION;
     productionStore.dispatch(dataSlice.actions.resetData());
     const rootState = productionStore.getState();
     const { images } = selectSplitThingDict(rootState);
@@ -257,7 +258,7 @@ describe("deserialize into project with matching image, no matching kinds or cat
       [uC1T1, c1T1],
       [k1T1]
     );
-    serializedPiximi.version = "0.2.0";
+    serializedPiximi.version = ANNOTATIONS_VERSION;
     const image = await Image.load(im1T1.src);
     const imData = tf.browser.fromPixels(image).expandDims(0) as tf.Tensor4D;
     im1T1.data = imData;
@@ -335,7 +336,7 @@ describe("deserialize into project with matching image, matching kind", () => {
       [uC1T1, c1T1],
       [k1T1]
     );
-    serializedPiximi.version = "0.2.0";
+    serializedPiximi.version = ANNOTATIONS_VERSION;
 
     const k1T2: Kind = {
       id: "kT1",
@@ -445,7 +446,7 @@ describe("deserialize into project with matching image, matching kind, and match
       [uC1T1, c1T1],
       [k1T1]
     );
-    serializedPiximi.version = "0.2.0";
+    serializedPiximi.version = ANNOTATIONS_VERSION;
 
     const k1T2: Kind = {
       id: "kT1",
