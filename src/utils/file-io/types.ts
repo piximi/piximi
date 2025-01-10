@@ -2,13 +2,13 @@ import * as T from "io-ts";
 import * as ImageJS from "image-js";
 import {
   SerializedAnnotationRType,
-  SerializedAnnotationRTypeV2,
+  SerializedAnnotationRTypeV02,
   SerializedCOCOAnnotationRType,
   SerializedCOCOCategoryRType,
   SerializedCOCOFileRType,
   SerializedCOCOImageRType,
   SerializedFileRType,
-  SerializedFileRTypeV2,
+  SerializedFileRTypeV02,
   SerializedImageRType,
 } from "./runtimeTypes";
 import { MIMETYPES } from "./constants";
@@ -30,13 +30,13 @@ export type SerializedCOCOImageType = T.TypeOf<typeof SerializedCOCOImageRType>;
 export type SerializedCOCOFileType = T.TypeOf<typeof SerializedCOCOFileRType>;
 
 export type SerializedFileType = T.TypeOf<typeof SerializedFileRType>;
-export type SerializedFileTypeV2 = T.TypeOf<typeof SerializedFileRTypeV2>;
+export type SerializedFileTypeV02 = T.TypeOf<typeof SerializedFileRTypeV02>;
 export type SerializedAnnotationType = T.TypeOf<
   typeof SerializedAnnotationRType
 >;
 
 export type NewSerializedAnnotationType = T.TypeOf<
-  typeof SerializedAnnotationRTypeV2
+  typeof SerializedAnnotationRTypeV02
 >;
 
 export type ImageFileType = {

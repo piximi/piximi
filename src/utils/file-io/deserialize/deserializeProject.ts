@@ -18,6 +18,9 @@ export const deserializeProject = async (
   const rootGroup = await openGroup(fileStore, fileStore.rootName, "r");
 
   const piximiVersionRaw = (await getAttr(rootGroup, "version")) as string;
+  if (!piximiVersionRaw) {
+    throw Error("No version field found.");
+  }
   const piximiVersion = semver.clean(piximiVersionRaw);
 
   if (!semver.valid(piximiVersion) || semver.lt(piximiVersion!, "0.1.0")) {
@@ -37,7 +40,7 @@ export const deserializeProject = async (
       segmenter,
       data: { kinds, categories, things },
     };
-  } else if (semver.eq(piximiVersion!, "0.2.0")) {
+  } else if (semver.gte(piximiVersion!, "0.2.0")) {
     const { project, classifier, data, segmenter } =
       await deserializeProject_v02(fileStore, loadCb);
 
