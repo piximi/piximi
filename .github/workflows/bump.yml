@@ -1,12 +1,12 @@
 name: Version Bump
 
 on:
-  push:
-    branches:
-      - master
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   check-labels:
+    if: github.event.review.state == 'approved'
     runs-on: ubuntu-latest
 
     steps:
