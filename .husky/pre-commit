@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-yarn run lint-staged
+pnpm lint-staged
 
-yarn run no-console-logs
+pnpm run no-console-logs
 
 # enable for testing, run `HUSKY_DEBUG=true git commit -m "..."``
 # exit 1
