@@ -90,6 +90,7 @@
     "zarr": "^0.6.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.18.0",
     "@storybook/addon-essentials": "^7.0.26",
     "@storybook/addon-interactions": "^7.0.26",
     "@storybook/addon-links": "^7.0.26",
@@ -100,13 +101,19 @@
     "@storybook/react-webpack5": "^7.0.26",
     "@storybook/testing-library": "^0.0.14-next.2",
     "@tensorflow/tfjs-node": "4.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.20.0",
+    "@typescript-eslint/parser": "^8.20.0",
     "babel-plugin-named-exports-order": "^0.0.2",
     "canvas": "^2.9.1",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.2",
-    "eslint-plugin-storybook": "^0.6.12",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-storybook": "^0.10.2",
+    "globals": "^15.14.0",
     "husky": "^8.0.0",
+    "install": "^0.13.0",
     "jest-canvas-mock": "^2.3.0",
     "lint-staged": "^13.1.0",
     "prettier": "^2.8.8",
@@ -116,6 +123,7 @@
     "ts-node": "^10.9.1",
     "ts-prune": "^0.10.3",
     "tslib": "^2.4.0",
+    "typescript-eslint": "^8.20.0",
     "vite-plugin-svgr": "^4.3.0",
     "webpack": "^5.74.0"
   },
@@ -142,23 +150,6 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
-    ]
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest",
-      "plugin:storybook/recommended"
-    ],
-    "overrides": [
-      {
-        "files": [
-          "**/*.stories.*"
-        ],
-        "rules": {
-          "import/no-anonymous-default-export": "off"
-        }
-      }
     ]
   },
   "lint-staged": {
