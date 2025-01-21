@@ -4,7 +4,8 @@ import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
 import pluginStorybook from "eslint-plugin-storybook";
 
-/** @type {import('eslint').Linter.Config[]} */
+import type { Linter } from "eslint";
+
 export default [
   {
     files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
@@ -45,4 +46,4 @@ export default [
 
   // JS/TS linting
   pluginJs.configs.recommended,
-];
+] satisfies Linter.Config[];
