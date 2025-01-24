@@ -112,7 +112,7 @@ export const exportAnnotationMasks = (
       categoryName,
       kind,
       imageShape,
-      /* eslint-enable prefer-const */
+    /* eslint-enable prefer-const */
     } = processAnnotation(annotation, images, categories);
 
     switch (exportType) {

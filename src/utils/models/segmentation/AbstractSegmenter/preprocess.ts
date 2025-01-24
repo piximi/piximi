@@ -22,7 +22,7 @@ const inferenceGenerator = (images: Array<ImageObject>) => {
 
 export const preprocessInference = (
   images: Array<ImageObject>,
-  _fitOptions: FitOptions,
+  _fitOptions: FitOptions
 ) => {
   return (
     tfdata

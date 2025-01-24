@@ -105,7 +105,7 @@ export const AnnotationTransformer = ({
   };
 
   const handleConfirmOrDeleteAnnotation = (
-    _event?: Konva.KonvaEventObject<Event>,
+    _event?: Konva.KonvaEventObject<Event>
   ) => {
     if (!activeImage) return;
     const container = stageRef!.current!.container();

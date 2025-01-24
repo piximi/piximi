@@ -312,7 +312,7 @@ const fitListener = async (
       };
     }
 
-    var history: History = await model.train(fitOptions, { onEpochEnd });
+    const history: History = await model.train(fitOptions, { onEpochEnd });
     import.meta.env.NODE_ENV !== "production" &&
       import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
       logger(history);

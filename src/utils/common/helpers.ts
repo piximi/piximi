@@ -177,15 +177,6 @@ export const recursiveAssign = <T extends object>(
   existingObject: T,
   updates: Partial<T>,
 ) => {
-  Object.entries(updates).forEach(([key, value]) => {
-    existingObject[key as keyof T] = value as T[keyof T];
-  });
-};
-
-export const recursiveAssign = <T extends object>(
-  existingObject: T,
-  updates: RecursivePartial<T>,
-) => {
   Object.entries(updates).forEach(([key, _value]) => {
     if (typeof existingObject[key as keyof T] === "object") {
       recursiveAssign(
@@ -266,8 +257,11 @@ export const updateRecord = <T extends string | number | symbol, K>(
   CATEGORY HELPERS
 */
 
-  if (sortKeyIdx >= 0) {
-    return availableImageSortKeys[sortKeyIdx];
+export const generateUUID = (options?: { definesUnknown: boolean }) => {
+  const id = uuidv4();
+  let unknownFlag: string;
+  if (options?.definesUnknown) {
+    unknownFlag = "0";
   } else {
     return defaultImageSortKey;
   }
