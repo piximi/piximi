@@ -140,7 +140,8 @@ export const dataConverter_v01v02 = (data: {
   const numAnnotationsOfKindPerImage: Record<string, number> = {};
 
   for (const annotation of annotations as AnnotationObject[]) {
-    const { plane, ..._annotation } = {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { plane: _plane, ..._annotation } = {
       ...annotation,
       activePlane: annotation.plane,
     };

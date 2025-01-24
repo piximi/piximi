@@ -31,11 +31,11 @@ export const applicationSettingsSlice = createSlice({
     initialized(state: AppSettingsState) {
       state.init = true;
     },
-    resetApplicationSettingsSetings(state: AppSettingsState) {
+    resetApplicationSettingsSetings(_state: AppSettingsState) {
       return initialState;
     },
 
-    hideAlertState(state, action: PayloadAction<{}>) {
+    hideAlertState(state) {
       state.alertState.visible = false;
     },
 
@@ -118,10 +118,7 @@ export const applicationSettingsSlice = createSlice({
         state.loadMessage = loadMessage ?? "";
       }
     },
-    sendLoadPercent(
-      state,
-      action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>
-    ) {},
+    sendLoadPercent(_state) {},
     setLoadMessage(state, action: PayloadAction<{ message: string }>) {
       state.loadMessage = action.payload.message;
     },

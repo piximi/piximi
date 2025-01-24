@@ -30,12 +30,11 @@ export class EllipticalAnnotationTool extends AnnotationTool {
 
   onMouseMove(position: { x: number; y: number }) {
     if (this.annotationState === AnnotationState.Annotated) return;
-    if (this.annotationState === AnnotationState.Annotating) {
-    }
+    // if (this.annotationState === AnnotationState.Annotating) {}
     this.resize(position);
   }
 
-  onMouseUp(position: { x: number; y: number }) {
+  onMouseUp(_position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationState.Annotating || !this.radius)
       return;
     this.points = this.convertToPoints();

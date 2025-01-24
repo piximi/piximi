@@ -49,10 +49,10 @@ function buildPolygon(
 ) {
   const THETA = (2 / distances.length) * Math.PI; // 0.19635, for 32 distances
   const points: Array<Point> = [];
-  var xMin = Infinity;
-  var yMin = Infinity;
-  var xMax = 0;
-  var yMax = 0;
+  let xMin = Infinity;
+  let yMin = Infinity;
+  let xMax = 0;
+  let yMax = 0;
 
   distances.forEach((length, idx) => {
     const y = Math.max(
@@ -88,7 +88,7 @@ function buildPolygon(
     points.push({ x, y });
   });
 
-  let bbox: [number, number, number, number] = [
+  const bbox: [number, number, number, number] = [
     Math.max(0, xMin),
     Math.max(0, yMin),
     Math.min(inputImDims.width, xMax),
@@ -100,7 +100,7 @@ function buildPolygon(
 
   if (boxW <= 0 || boxH <= 0) return;
 
-  let cropDims = { x: bbox[0], y: bbox[1], width: boxW, height: boxH };
+  const cropDims = { x: bbox[0], y: bbox[1], width: boxW, height: boxH };
 
   const poly = computeAnnotationMaskFromPoints(cropDims, points, imH, imW);
 

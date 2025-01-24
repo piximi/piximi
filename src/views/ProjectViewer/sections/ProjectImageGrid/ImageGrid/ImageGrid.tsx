@@ -159,7 +159,7 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
   return (
     <DropBox>
       <Container
-        sx={(theme) => ({
+        sx={() => ({
           paddingBottom: `${GRID_GAP}px`,
           pl: `${GRID_GAP}px`,
           pr: 0,

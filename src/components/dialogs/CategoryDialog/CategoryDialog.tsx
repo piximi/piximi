@@ -23,7 +23,7 @@ export const CategoryDialog = ({
   action,
   initName,
   initColor,
-  id,
+  id: _id,
   open,
 }: CategoryDialogProps) => {
   const {

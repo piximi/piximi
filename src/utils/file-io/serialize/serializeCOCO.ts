@@ -46,7 +46,7 @@ export const serializeCOCOFile = (
     return idMap;
   }, {} as { [internalCategoryId: string]: SerializedCOCOCategoryType });
 
-  let serializedAnnotations: Array<SerializedCOCOAnnotationType> = [];
+  const serializedAnnotations: Array<SerializedCOCOAnnotationType> = [];
 
   for (const ann of annotations) {
     const boxWidth = ann.boundingBox[2] - ann.boundingBox[0];

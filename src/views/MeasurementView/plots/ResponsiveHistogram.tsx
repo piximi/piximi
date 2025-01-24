@@ -18,7 +18,7 @@ export const ResponsiveHistogram = ({
   thingIds: string[];
 }) => {
   const [formattedData, setFormattedData] = useState<
-    { id: Number; title: string; numValues: number; total: number }[]
+    { id: number; title: string; numValues: number; total: number }[]
   >([]);
   const [xMin, setXMin] = useState<number>(0);
   const [xAxis, setXAxis] = useState<number[]>([]);

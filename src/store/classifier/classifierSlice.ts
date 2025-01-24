@@ -75,7 +75,7 @@ export const classifierSlice = createSlice({
       // state = action.payload.classifier;
       return action.payload.classifier;
     },
-    setDefaults(state, action: PayloadAction<{}>) {
+    setDefaults(state) {
       // TODO - segmenter: dispose() and state.selectedModel = SimpleCNN(), or whatever
 
       availableClassifierModels[state.selectedModelIdx].dispose();

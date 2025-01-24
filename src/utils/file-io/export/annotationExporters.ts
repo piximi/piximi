@@ -98,11 +98,12 @@ export const exportAnnotationMasks = (
 
   const colorValues: string[] = [];
   const annotationCounts: Record<string, number> = {};
-  let categoryColorMap: Record<string, Record<string, number>> = {};
+  const categoryColorMap: Record<string, Record<string, number>> = {};
   for (const annId in annotations) {
     // for image names like blah.png
     const annotation = annotations[annId];
 
+    /* eslint-disable prefer-const */
     let {
       imageName,
       bboxShape,
@@ -111,6 +112,7 @@ export const exportAnnotationMasks = (
       categoryName,
       kind,
       imageShape,
+    /* eslint-enable prefer-const */
     } = processAnnotation(annotation, images, categories);
 
     switch (exportType) {

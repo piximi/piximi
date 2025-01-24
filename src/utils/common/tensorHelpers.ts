@@ -481,7 +481,7 @@ export async function renderTensor(
     });
     return image.toDataURL("image/png", { useCanvas: opts.useCanvas });
   } else {
-    let imageURLs: string[] = [];
+    const imageURLs: string[] = [];
 
     const [slices, height, width, components] = (compositeTensor as Tensor4D)
       .shape;
@@ -631,7 +631,7 @@ export const generateDefaultColors = async <T extends Tensor3D | Tensor4D>(
 ): Promise<Colors> => {
   const range: { [channel: number]: [number, number] } = {};
   const visible: { [channel: number]: boolean } = {};
-  let color: Array<[number, number, number]> = [];
+  const color: Array<[number, number, number]> = [];
 
   const numChannels =
     imageTensor.rank === 3
@@ -671,7 +671,7 @@ export const generateDefaultColors = async <T extends Tensor3D | Tensor4D>(
 export const generateBlankColors = (numChannels: number): Colors => {
   const range: { [channel: number]: [number, number] } = {};
   const visible: { [channel: number]: boolean } = {};
-  let color: Array<[number, number, number]> = [];
+  const color: Array<[number, number, number]> = [];
 
   for (let i = 0; i < numChannels; i++) {
     color.push(

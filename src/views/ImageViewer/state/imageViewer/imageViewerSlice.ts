@@ -60,8 +60,8 @@ export const imageViewerSlice = createSlice({
   reducers: {
     resetImageViewer: () => initialState,
     prepareImageViewer: (
-      state,
-      action: PayloadAction<{ selectedThingIds: string[] }>
+      _state,
+      _action: PayloadAction<{ selectedThingIds: string[] }>
     ) => {},
     setImageStack(state, action: PayloadAction<{ imageIds: string[] }>) {
       state.imageStack = action.payload.imageIds;

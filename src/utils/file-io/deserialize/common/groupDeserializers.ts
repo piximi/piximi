@@ -44,8 +44,8 @@ export const deserializeColorsGroup = async (
     );
   }
 
-  let range: Colors["range"] = {};
-  let visible: Colors["visible"] = {};
+  const range: Colors["range"] = {};
+  const visible: Colors["visible"] = {};
   for (let i = 0; i < numChannels; i++) {
     range[i] = [rangeMins[i], rangeMaxs[i]];
     visible[i] = Boolean(visibilities[i]);

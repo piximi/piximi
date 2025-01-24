@@ -148,7 +148,7 @@ export const ImportTensorflowModelDialog = ({
 
   useHotkeys(
     "enter",
-    (event) => {
+    () => {
       selectedModel && !invalidModel && dispatchModelToStore();
     },
     HotkeyContext.ConfirmationDialog,

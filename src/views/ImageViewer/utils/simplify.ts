@@ -8,7 +8,7 @@ import { Point } from "./types";
 
 // square distance between 2 points
 function getSqDist(p1: Point, p2: Point) {
-  var dx = p1.x - p2.x,
+  const dx = p1.x - p2.x,
     dy = p1.y - p2.y;
 
   return dx * dx + dy * dy;
@@ -16,13 +16,13 @@ function getSqDist(p1: Point, p2: Point) {
 
 // square distance from a point to a segment
 function getSqSegDist(p: Point, p1: Point, p2: Point) {
-  var x = p1.x,
+  let x = p1.x,
     y = p1.y,
     dx = p2.x - x,
     dy = p2.y - y;
 
   if (dx !== 0 || dy !== 0) {
-    var t = ((p.x - x) * dx + (p.y - y) * dy) / (dx * dx + dy * dy);
+    const t = ((p.x - x) * dx + (p.y - y) * dy) / (dx * dx + dy * dy);
 
     if (t > 1) {
       x = p2.x;
@@ -41,11 +41,11 @@ function getSqSegDist(p: Point, p1: Point, p2: Point) {
 
 // basic distance-based simplification
 function simplifyRadialDist(points: Array<Point>, sqTolerance: number) {
-  var prevPoint = points[0];
-  var newPoints = [prevPoint];
-  var point: Point | undefined;
+  let prevPoint = points[0];
+  const newPoints = [prevPoint];
+  let point: Point | undefined;
 
-  for (var i = 1, len = points.length; i < len; i++) {
+  for (let i = 1, len = points.length; i < len; i++) {
     point = points[i];
 
     if (getSqDist(point, prevPoint) > sqTolerance) {
@@ -69,8 +69,8 @@ function simplifyDPStep(
   let maxSqDist = sqTolerance;
   let index: number = 0;
 
-  for (var i = first + 1; i < last; i++) {
-    var sqDist = getSqSegDist(points[i], points[first], points[last]);
+  for (let i = first + 1; i < last; i++) {
+    const sqDist = getSqSegDist(points[i], points[first], points[last]);
 
     if (sqDist > maxSqDist) {
       index = i;
@@ -89,9 +89,9 @@ function simplifyDPStep(
 
 // simplification using Ramer-Douglas-Peucker algorithm
 function simplifyDouglasPeucker(points: Array<Point>, sqTolerance: number) {
-  var last = points.length - 1;
+  const last = points.length - 1;
 
-  var simplified = [points[0]];
+  const simplified = [points[0]];
   simplifyDPStep(points, 0, last, sqTolerance, simplified);
   simplified.push(points[last]);
 

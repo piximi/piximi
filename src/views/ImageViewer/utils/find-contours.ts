@@ -70,7 +70,7 @@ function unpadContours(contours: Array<Border>) {
   return unpaddedContours;
 }
 
-function _f_ij(F: MaskData, width: number, height: number) {
+function _f_ij(F: MaskData, width: number, _height: number) {
   return {
     get: (i: number, j: number) => F[i * width + j],
     set: (i: number, j: number, value: number) => {
@@ -111,8 +111,8 @@ function neighborCoordToIdx(
   neighborI: number,
   neighborJ: number
 ) {
-  let di = neighborI - baseI;
-  let dj = neighborJ - baseJ;
+  const di = neighborI - baseI;
+  const dj = neighborJ - baseJ;
 
   if (di === 0 && dj === 1) {
     return 0;
@@ -162,9 +162,9 @@ function logNeighbors(
   ];
 
   for (let ccwIdx = 0; ccwIdx < N_PIXEL_NEIGHBOR; ccwIdx++) {
-    let neighborIdx =
+    const neighborIdx =
       (ccwIdx + startIdx + offset + N_PIXEL_NEIGHBOR * 2) % N_PIXEL_NEIGHBOR;
-    let ij = neighborIdxToCoord(baseI, baseJ, neighborIdx);
+    const ij = neighborIdxToCoord(baseI, baseJ, neighborIdx);
 
     neighborVals[neighborIdx] =
       neighborIdx === startIdx + offset
@@ -211,14 +211,14 @@ function ccwNon0(
 ) {
   let rightExamined = false;
 
-  let startIdx = neighborCoordToIdx(baseI, baseJ, neighborI, neighborJ);
+  const startIdx = neighborCoordToIdx(baseI, baseJ, neighborI, neighborJ);
   for (let ccwIdx = 0; ccwIdx < N_PIXEL_NEIGHBOR; ccwIdx++) {
-    let neighborIdx =
+    const neighborIdx =
       (ccwIdx + startIdx + offset + N_PIXEL_NEIGHBOR * 2) % N_PIXEL_NEIGHBOR;
 
     rightExamined = neighborIdx === 0 ? true : rightExamined;
 
-    let ij = neighborIdxToCoord(baseI, baseJ, neighborIdx);
+    const ij = neighborIdxToCoord(baseI, baseJ, neighborIdx);
 
     if (fij.get(ij[0], ij[1]) !== 0) {
       return { ij, rightExamined };
@@ -257,11 +257,11 @@ function cwNon0(
   neighborJ: number,
   offset: number
 ) {
-  let startIdx = neighborCoordToIdx(baseI, baseJ, neighborI, neighborJ);
+  const startIdx = neighborCoordToIdx(baseI, baseJ, neighborI, neighborJ);
   for (let ccwIdx = 0; ccwIdx < N_PIXEL_NEIGHBOR; ccwIdx++) {
-    let neighborIdx =
+    const neighborIdx =
       (-ccwIdx + startIdx - offset + N_PIXEL_NEIGHBOR * 2) % N_PIXEL_NEIGHBOR;
-    let ij = neighborIdxToCoord(baseI, baseJ, neighborIdx);
+    const ij = neighborIdxToCoord(baseI, baseJ, neighborIdx);
     if (fij.get(ij[0], ij[1]) !== 0) {
       return ij;
     }
@@ -289,7 +289,7 @@ export const findContours = (F: MaskData, width: number, height: number) => {
   // Topological Structural Analysis of Digitized Binary Images by Border Following.
   // Suzuki, S. and Abe, K., CVGIP 30 1, pp 32-46 (1985)
 
-  let contours: Array<Border> = [];
+  const contours: Array<Border> = [];
 
   // Without loss of generality, we assume that 0-pixels fill the frame
   // of a binary picture
@@ -333,7 +333,7 @@ export const findContours = (F: MaskData, width: number, height: number) => {
       }
 
       // current border 0 used in (2)
-      let B: Partial<Border> = {
+      const B: Partial<Border> = {
         isHole: undefined,
         seqNum: undefined,
         points: [{ y: iRaster, x: jRaster }],
@@ -442,7 +442,7 @@ export const findContours = (F: MaskData, width: number, height: number) => {
       //       in the neigh- borhood of (i, j) and find a nonzero pixel.
       //       Let (i1, j1) be the first found nonzero pixel. If no nonzero
       //       pixel is found, assign -NBD to fij and go to (4).
-      let i1j1 = cwNon0(
+      const i1j1 = cwNon0(
         fij,
         width,
         height,
@@ -460,7 +460,7 @@ export const findContours = (F: MaskData, width: number, height: number) => {
         }
         continue;
       }
-      let [i1CwFound, j1CwFound] = i1j1;
+      const [i1CwFound, j1CwFound] = i1j1;
 
       // (3.2) (i2, j2) <- (i1, j1) and (i3,j3) <- (i, j).
       let [i2PrevStep, j2PrevStep] = [i1CwFound, j1CwFound];
@@ -473,7 +473,7 @@ export const findContours = (F: MaskData, width: number, height: number) => {
         //       the pixels in the neighborhood of the current pixel (i3, j3)
         //       to find a nonzero pixel and let the first one be (i4, j4).
 
-        let { ij: i4j4, rightExamined } = ccwNon0(
+        const { ij: i4j4, rightExamined } = ccwNon0(
           fij,
           width,
           height,
@@ -492,7 +492,7 @@ export const findContours = (F: MaskData, width: number, height: number) => {
           // break;
         }
 
-        var [i4CcwFound, j4CcwFound] = i4j4 as number[];
+        const [i4CcwFound, j4CcwFound] = i4j4 as number[];
 
         // save the point
         contours[contours.length - 1].points.push({

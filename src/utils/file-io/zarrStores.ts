@@ -188,7 +188,8 @@ export class PseudoFileList {
   private _files: File[];
 
   constructor(files: File[]) {
-    let self = this;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
     this._files = files;
 
     return new Proxy(this, {

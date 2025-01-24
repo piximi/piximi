@@ -7,7 +7,7 @@ import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
 import { Category, Kind } from "./types";
 
 export const generateUUID = (options?: { definesUnknown: boolean }) => {
-  let id = uuidv4();
+  const id = uuidv4();
   let unknownFlag: string;
   if (options?.definesUnknown) {
     unknownFlag = "0";
@@ -50,7 +50,7 @@ export const updateContents = (
   contents: string[],
   updateType: "add" | "remove" | "replace"
 ) => {
-  var newContents: string[];
+  let newContents: string[];
 
   switch (updateType) {
     case "add":
