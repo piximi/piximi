@@ -48,11 +48,7 @@ export const connectPoints = (coordinates: Array<Point>) => {
 const drawLine = (p1: Point, p2: Point) => {
   const coords: Array<Point> = [];
 
-  let x: number,
-      y: number,
-     dx: number,
-     dy: number,
-      i: number;
+  let x: number, y: number, dx: number, dy: number, i: number;
 
   const x1 = Math.round(p1.x);
   const y1 = Math.round(p1.y);
