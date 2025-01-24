@@ -14,7 +14,7 @@ import {
 
 import { useLocalGlobalState } from "hooks";
 
-import { Palette } from "./Palette";
+import { Palette } from "../Palette";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
