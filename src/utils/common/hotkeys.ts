@@ -342,22 +342,22 @@ function trigger(shortcut: string) {
 }
 
 function setModifier(modifier: string, value: boolean) {
-  if (["shift", "⇧"].includes(modifier)) {
-    hotkeys.shift = value;
-    return;
-  }
-  if (["⌥", "alt", "option"].includes(modifier)) {
-    hotkeys.alt = value;
-    return;
-  }
-  if (["⌃", "ctrl", "control"].includes(modifier)) {
-    hotkeys.control = value;
-    return;
-  }
-  if (["⌘", "cmd", "command"].includes(modifier)) {
-    hotkeys.command = value;
-    return;
-  }
+    if (["shift", "⇧"].includes(modifier)) {
+      hotkeys.shift = value;
+      return;
+    }
+    if (["⌥", "alt", "option"].includes(modifier)) {
+      hotkeys.alt = value;
+      return;
+    }
+    if (["⌃", "ctrl", "control"].includes(modifier)) {
+      hotkeys.control = value;
+      return;
+    }
+    if (["⌘", "cmd", "command"].includes(modifier)) {
+      hotkeys.command = value;
+      return;
+    }
 }
 
 hotkeys.trigger = trigger;

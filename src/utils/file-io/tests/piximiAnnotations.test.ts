@@ -200,14 +200,8 @@ describe("serializes piximi project", () => {
     expect(objects.length).toBe(t1Objects.length);
     expect(objects).toEqual(
       t1Objects.map((ob) => {
-        const {
-          data: _data,
-          src: _src,
-          shape,
-          encodedMask: _encodedMask,
-          bitDepth: _bitDepth,
-          ...rest
-        } = ob;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { data: _data, src: _src, shape, encodedMask: _encodedMask, bitDepth: _bitDepth, ...rest } = ob;
         return {
           ...rest,
           shape: Object.values(shape),

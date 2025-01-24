@@ -28,7 +28,11 @@ const config: StorybookConfig = {
           : true,
     },
   },
-  async viteFinal(config) {
+  webpackFinal: async (config) => {
+    config.resolve!.modules = [
+      path.resolve(__dirname, "..", "src"),
+      "node_modules",
+    ];
     return config;
   },
 };

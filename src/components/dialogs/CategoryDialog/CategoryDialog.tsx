@@ -16,18 +16,16 @@ type CreateCategoryDialogProps = BaseCategoryDialogProps & {
   kind: string;
 };
 
-type UpdateCategoryDialogProps = BaseCategoryDialogProps & {
-  action: "edit";
-  initName: string;
-  initColor: string;
-  id: string;
-};
-
-export const CategoryDialog = (
-  props: CreateCategoryDialogProps | UpdateCategoryDialogProps,
-) => {
-  const { onClose, onConfirm, action, open } = props;
-  const isEditMode = action === "edit";
+export const CategoryDialog = ({
+  onClose,
+  onConfirm,
+  kind,
+  action,
+  initName,
+  initColor,
+  id: _id,
+  open,
+}: CategoryDialogProps) => {
   const {
     name,
     color,

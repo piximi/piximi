@@ -90,7 +90,7 @@ startAppListening({
 
 const fitListener = async (
   _onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
-  _listenerAPI: StoreListemerAPI,
+  _listenerAPI: StoreListemerAPI
 ) => {};
 
 const predictListener = async (listenerAPI: StoreListemerAPI) => {

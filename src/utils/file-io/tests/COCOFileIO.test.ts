@@ -53,13 +53,8 @@ const categoriesT1: Category[] = initialState.project.categories;
 
 beforeAll(async () => {
   for await (const image of initialImages) {
-    const {
-      data: _data,
-      annotations: _annotations,
-      partition: _partition,
-      colors: _colors,
-      ...buildImage
-    } = image;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { data: _data, annotations: _annotations, partition: _partition, colors: _colors, ...buildImage } = image;
     const imPath = imDataMap[image.name];
     const imFile = await fileFromPath(imPath, "image/jpeg");
     const imBuffer = await imFile.arrayBuffer();
@@ -76,6 +71,7 @@ beforeAll(async () => {
     } as ImageObject;
     imagesT1.push(finalImage);
     for (const annotation of image.annotations) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { plane: _plane, mask, boundingBox, ...buildAnn } = annotation;
       const imageProperties = getPropertiesFromImageSync(rawImage, finalImage, {
         boundingBox,

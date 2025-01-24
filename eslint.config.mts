@@ -24,8 +24,17 @@ export default [
       react: pluginReact,
     },
     rules: {
+      "no-prototype-builtins": "off",
+      "no-case-declarations": "off",
+      "react/no-deprecated": "off", // TODO remove after move to REACT 18
+      "react/display-name": "off",
       "react/prop-types": "off", // Disable PropTypes checking for TypeScript
       "react/react-in-jsx-scope": "off", // Disable React in scope rule (React 17+)
+      "@typescript-eslint/no-unsafe-function-type": "off",
+      "@typescript-eslint/no-unused-vars": ["warn", {"args": "after-used", "argsIgnorePattern": "^_"}],
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-expressions": ["error", { "allowShortCircuit": true, "allowTernary": true }],
+      "@typescript-eslint/ban-ts-comment": ["error", {"ts-ignore": "allow-with-description", "ts-nocheck": "allow-with-description"}],
     },
   },
 
@@ -39,5 +48,17 @@ export default [
       storybook: pluginStorybook,
     },
   },
+
+  {
+    files: ["**/*.{.js,mjs,jsx", "**/*test*", "**/tests/**", "scripts/*"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+      "no-undef": "off",
+    },
+  },
+
+  {
+    ignores: ["**/*.json", "**/*.yml"]
+  }
 
 ] satisfies Linter.Config[];
