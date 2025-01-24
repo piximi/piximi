@@ -267,11 +267,11 @@ function hotkeys(hotkeys: string, option: Option, method: Function) {
   }
 
   if (Object.prototype.toString.call(option) === "[object Object]") {
-    if (option.element) element = option.element;  
-    if (option.keyup) keyup = option.keyup;  
-    if (option.keydown !== undefined) keydown = option.keydown;  
-    if (option.capture !== undefined) capture = option.capture;  
-    if (typeof option.splitKey === "string") splitKey = option.splitKey;  
+    if (option.element) element = option.element;
+    if (option.keyup) keyup = option.keyup;
+    if (option.keydown !== undefined) keydown = option.keydown;
+    if (option.capture !== undefined) capture = option.capture;
+    if (typeof option.splitKey === "string") splitKey = option.splitKey;
   }
 
   // for each shortcut key
@@ -342,22 +342,22 @@ function trigger(shortcut: string) {
 }
 
 function setModifier(modifier: string, value: boolean) {
-    if (["shift", "⇧"].includes(modifier)) {
-      hotkeys.shift = value;
-      return;
-    }
-    if (["⌥", "alt", "option"].includes(modifier)) {
-      hotkeys.alt = value;
-      return;
-    }
-    if (["⌃", "ctrl", "control"].includes(modifier)) {
-      hotkeys.control = value;
-      return;
-    }
-    if (["⌘", "cmd", "command"].includes(modifier)) {
-      hotkeys.command = value;
-      return;
-    }
+  if (["shift", "⇧"].includes(modifier)) {
+    hotkeys.shift = value;
+    return;
+  }
+  if (["⌥", "alt", "option"].includes(modifier)) {
+    hotkeys.alt = value;
+    return;
+  }
+  if (["⌃", "ctrl", "control"].includes(modifier)) {
+    hotkeys.control = value;
+    return;
+  }
+  if (["⌘", "cmd", "command"].includes(modifier)) {
+    hotkeys.command = value;
+    return;
+  }
 }
 
 hotkeys.trigger = trigger;
