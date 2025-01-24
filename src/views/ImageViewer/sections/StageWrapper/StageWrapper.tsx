@@ -5,16 +5,15 @@ import { Stage } from "../Stage";
 
 import { dimensions } from "utils/common/constants";
 import { useMobileView } from "hooks";
-import { SideToolBar, TopToolBar } from "../tool-bars";
+import { SideToolBar } from "../AnnotatorToolDrawer/SideToolBar";
+import { TopToolBar } from "../AnnotatorToolDrawer/TopToolBar";
 
 export const StageWrapper = () => {
   const [width, setWidth] = useState<number>(
     window.innerWidth - dimensions.leftDrawerWidth - dimensions.toolDrawerWidth,
   );
   const [height, setHeight] = useState<number>(
-    window.innerHeight -
-      dimensions.stageInfoHeight -
-      dimensions.toolDrawerWidth,
+    window.innerHeight - dimensions.stageInfoHeight - dimensions.toolDrawerWidth
   );
 
   const isMobile = useMobileView();
@@ -31,6 +30,11 @@ export const StageWrapper = () => {
         window.innerHeight -
           dimensions.stageInfoHeight -
           dimensions.toolDrawerWidth,
+      );
+      setHeight(
+        window.innerHeight -
+          dimensions.stageInfoHeight -
+          dimensions.toolDrawerWidth
       );
     };
     window.addEventListener("resize", resizeHandler);
