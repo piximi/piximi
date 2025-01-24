@@ -140,3 +140,14 @@ export type ImageSortKeyType = {
   ) => number;
   objectType: string;
 };
+
+/*
+GENERAL
+*/
+
+export type SliderOptions = {
+  min: number;
+  max: number;
+  step: number;
+  initial: number;
+};

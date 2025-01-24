@@ -10,10 +10,17 @@ export const useMenu = () => {
     setAnchorEl(null);
   }, []);
 
-  const onOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
-    setOpen(true);
-    setAnchorEl(event.currentTarget);
-  }, []);
+  const onOpen = useCallback(
+    (event: React.MouseEvent<HTMLElement> | HTMLElement) => {
+      setOpen(true);
+      if (event instanceof HTMLElement) {
+        setAnchorEl(event);
+        return;
+      }
+      setAnchorEl(event.currentTarget);
+    },
+    []
+  );
 
   return {
     anchorEl,
