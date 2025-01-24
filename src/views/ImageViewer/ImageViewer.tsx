@@ -40,7 +40,7 @@ export const ImageViewer = () => {
   const handleError = useCallback(
     async (e: any) => {
       e.preventDefault();
-      var error = e.error as Error;
+      const error = e.error as Error;
       const stackTrace = await getStackTraceFromError(error);
       dispatch(
         applicationSettingsSlice.actions.updateAlertState({

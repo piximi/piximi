@@ -71,7 +71,7 @@ export const ThingInformationTable = ({
     const data: Array<Array<string | number>> = [];
     const editableData: Array<Array<string | ReactElement>> = [[], [], []];
     Object.entries(thing).forEach((entry) => {
-      let [key, value] = entry;
+      const [key, value] = entry;
 
       switch (key) {
         case "name":
@@ -85,6 +85,7 @@ export const ThingInformationTable = ({
               variant="standard"
               fontSize={"inherit"}
               textAlign="right"
+              key={key}
             />,
           ];
           break;
@@ -97,6 +98,7 @@ export const ThingInformationTable = ({
               size="small"
               variant="standard"
               fontSize="inherit"
+              key={key}
             />,
           ];
           break;
@@ -109,6 +111,7 @@ export const ThingInformationTable = ({
               size="small"
               variant="standard"
               fontSize="inherit"
+              key={key}
             />,
           ];
           break;
@@ -117,10 +120,11 @@ export const ThingInformationTable = ({
             data.push([shapeEntry[0] as string, shapeEntry[1] as string]);
           });
           break;
-        case "containing":
+        case "containing": {
           const values = value as unknown;
           data.push([key as string, (values as any[]).length]);
           break;
+        }
         case "colors":
         case "visible":
         case "src":

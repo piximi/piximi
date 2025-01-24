@@ -134,7 +134,7 @@ export const ExportAnnotationsMenu = ({
   const _handleMenuItemClick = useCallback(
     (exportType: AnnotationExportType) => {
       setOnProjectName(() => (userProjectName: string) => {
-        let zip = new JSZip();
+        const zip = new JSZip();
         let exportedAnnotations: Record<string, AnnotationObject> = {};
         if (selectedImage) {
           for (const annId of selectedImage.containing) {

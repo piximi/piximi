@@ -9,7 +9,6 @@ import {
 
 import { MeasurementsData } from "store/measurements/types";
 
-/* eslint-disable-next-line no-restricted-globals */
 self.onmessage = async (
   e: MessageEvent<{
     currentMeasurements: MeasurementsData;
@@ -243,7 +242,6 @@ self.onmessage = async (
       }
     }
   });
-  /* eslint-disable-next-line no-restricted-globals */
   self.postMessage(newMeasurements);
 };
 

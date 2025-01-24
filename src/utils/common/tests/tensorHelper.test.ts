@@ -34,7 +34,9 @@ interface CustomMatchers<R = unknown> {
 }
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface Expect extends CustomMatchers {}
   }
 }
@@ -50,7 +52,7 @@ describe("color generation", () => {
 
   const v = [0, 1 / 6, 2 / 6, 3 / 6, 4 / 6, 5 / 6, 1];
   // prettier-ignore
-  let dummyTensor = tensor4d(
+  const dummyTensor = tensor4d(
   [
     [[[v[0], v[0], v[1], v[1], v[0], v[6], v[2]], [v[6], v[3], v[4], v[5], v[0], v[6], v[3]]],
      [[v[0], v[1], v[2], v[1], v[0], v[6], v[2]], [v[6], v[4], v[5], v[5], v[0], v[6], v[3]]],
@@ -524,7 +526,7 @@ describe("Tensor -> Composite Image", () => {
 
   it("should create tensor - Image -> Tensor4D", async () => {
     // prettier-ignore
-    let expectedTensorArray =
+    const expectedTensorArray =
     [
       [[[1111, 1112, 1113, 1114, 1115], [1121, 1122, 1123, 1124, 1125]],
        [[1211, 1212, 1213, 1214, 1215], [1221, 1222, 1223, 1224, 1225]],
@@ -808,10 +810,10 @@ describe("Tensor -> Composite Image", () => {
       const scaledCh: number[] = [];
 
       for (let i = 0; i < 4; i++) {
-        let value = values[i];
-        let max = maxs[i];
-        let min = mins[i];
-        let range = max - min;
+        const value = values[i];
+        const max = maxs[i];
+        const min = mins[i];
+        const range = max - min;
 
         scaledCh.push(((value - min) / range) * (2 ** bitDepth - 1));
       }
@@ -869,10 +871,10 @@ describe("Tensor -> Composite Image", () => {
       const scaledCh: number[] = [];
 
       for (let i = 0; i < 4; i++) {
-        let value = values[i];
-        let max = maxs[i];
-        let min = mins[i];
-        let range = max - min;
+        const value = values[i];
+        const max = maxs[i];
+        const min = mins[i];
+        const range = max - min;
 
         scaledCh.push(((value - min) / range) * (2 ** bitDepth - 1));
       }
@@ -996,7 +998,6 @@ describe("Tensor -> Composite Image", () => {
     const filteredSlice = sliceVisibleChannels(imageSlice, visibleChannels);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
-    //eslint-disable-next-line testing-library/render-result-naming-convention
     const renderedURL = await renderTensor(compositeImage, BITDEPTH, {
       useCanvas,
     });
@@ -1083,7 +1084,6 @@ describe("Tensor -> Composite Image", () => {
     const filteredSlice = sliceVisibleChannels(imageTensor, visibleChannels);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
-    //eslint-disable-next-line testing-library/render-result-naming-convention
     const renderedURLs = await renderTensor(compositeImage, BITDEPTH, {
       useCanvas,
     });
@@ -1147,7 +1147,7 @@ describe("Tensor -> Composite Image", () => {
     ];
 
     const imageStack = new ImageJS.Stack(
-      stackData.map((imData, i) => {
+      stackData.map((_imData, i) => {
         return new ImageJS.Image({
           width: W,
           height: H,
@@ -1175,7 +1175,6 @@ describe("Tensor -> Composite Image", () => {
     const filteredSlice = sliceVisibleChannels(imageSlice, visibleChannels);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
-    //eslint-disable-next-line testing-library/render-result-naming-convention
     const renderedURL = await renderTensor(compositeImage, BITDEPTH, {
       useCanvas,
     });
@@ -1206,7 +1205,7 @@ describe("Tensor -> Composite Image", () => {
     );
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
-    //eslint-disable-next-line @typescript-eslint/no-unused-vars, testing-library/render-result-naming-convention
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
     const renderedURL = await renderTensor(compositeImage, BITDEPTH);
 
     // intermediary tensors should be disposed

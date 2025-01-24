@@ -73,7 +73,7 @@ export class QuickAnnotationTool extends AnnotationTool {
     this.setBlank();
   }
 
-  onMouseDown(position: { x: number; y: number }) {
+  onMouseDown(_position: { x: number; y: number }) {
     if (this.annotationState === AnnotationState.Annotated) return;
 
     if (!this.currentMask) {
@@ -126,20 +126,19 @@ export class QuickAnnotationTool extends AnnotationTool {
     });
   }
 
-  onMouseUp(position: { x: number; y: number }) {
+  onMouseUp(_position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationState.Annotating) return;
 
     if (!this.currentMask) return;
 
     const greyMask = this.currentMask.grey();
-    //@ts-ignore
     const binaryMask = greyMask.mask({ algorithm: "threshold", threshold: 1 });
 
     //compute bounding box with ROI manager
     const roiManager = this.image.getRoiManager();
-    // @ts-ignore
+    // @ts-ignore it does exist
     roiManager.fromMask(binaryMask);
-    // @ts-ignore
+    // @ts-ignore it does exist
     const roi = roiManager.getRois()[0];
     this._boundingBox = [roi.minX, roi.minY, roi.maxX, roi.maxY];
 

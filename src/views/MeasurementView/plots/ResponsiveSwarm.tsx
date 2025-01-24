@@ -183,7 +183,7 @@ export const ResponsiveSwarm = ({
       groups={groupNames}
       id="id"
       value="value"
-      // @ts-ignore
+      // @ts-ignore: TODO not sure why ts complains
       layers={swarmLayers}
       size={
         chartConfig.size

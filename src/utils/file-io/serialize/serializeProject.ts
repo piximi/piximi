@@ -55,9 +55,9 @@ const serializeThings = async (
   loadCb(0, `serializing ${things.length} images`);
 
   for (let i = 0; i < things.length; i++) {
-    let thing = things[i];
-    let thingGroup = await thingsGroup.createGroup(thingNames[i]);
-    let data = await writeTensor(thingGroup, thingNames[i], thing.data, [
+    const thing = things[i];
+    const thingGroup = await thingsGroup.createGroup(thingNames[i]);
+    const data = await writeTensor(thingGroup, thingNames[i], thing.data, [
       thing.shape.planes,
       thing.shape.height,
       thing.shape.width,
@@ -78,7 +78,7 @@ const serializeThings = async (
         (thing as ImageObject).containing
       );
 
-      let colorGroup = await thingGroup.createGroup("colors");
+      const colorGroup = await thingGroup.createGroup("colors");
       await serializeImageColors(colorGroup, (thing as ImageObject).colors);
     } else {
       await thingGroup.attrs.setItem(

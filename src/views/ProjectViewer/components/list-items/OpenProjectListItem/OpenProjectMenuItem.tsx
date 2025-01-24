@@ -122,7 +122,7 @@ export const OpenProjectMenuItem = ({
             onOpenProject(event, false);
           }}
           type="file"
-          // @ts-ignore
+          // @ts-ignore: need it for some reason
           webkitdirectory=""
         />
       </MenuItem>

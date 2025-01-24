@@ -6,7 +6,7 @@ import { AnnotationObject, DecodedAnnotationObject } from "store/data/types";
  * @returns The decoded input array
  */
 export const decode = (encoded: Array<number>): Uint8ClampedArray => {
-  let decoded = [];
+  const decoded = [];
 
   let background = true;
 
@@ -66,7 +66,7 @@ export const encode = (
 
   let lastSequenceSize = 1;
 
-  let encoded = [];
+  const encoded = [];
 
   // Float32Array data usually holds normalized data between 0 and 1,
   // in which case it must be denormalized before calling this func

@@ -45,7 +45,7 @@ export const useSortFunction = () => {
     ThingSortKey.None
   );
   const categories = useSelector(selectCategoriesDictionary);
-  const theSortFunction = function (a: Thing, b: Thing) {
+  const theSortFunction = function (_a: Thing, _b: Thing) {
     return 0;
   };
   const [sortFunction, setSortFunction] = useState<
@@ -77,7 +77,7 @@ export const useSortFunction = () => {
           break;
         case ThingSortKey.None:
         default:
-          setSortFunction(() => (a: Thing, b: Thing) => 0);
+          setSortFunction(() => (_a: Thing, _b: Thing) => 0);
       }
     }
   }, [sortType, categories, previousSortType]);

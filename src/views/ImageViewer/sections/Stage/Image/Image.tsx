@@ -10,7 +10,7 @@ import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors
 export const Image = forwardRef<
   Konva.Image,
   { stageWidth: number; stageHeight: number; images: HTMLImageElement[] }
->(({ stageWidth, stageHeight, images }, ref) => {
+>(({ stageWidth: _stageWidth, stageHeight: _stageHeight, images }, ref) => {
   const activeImage = useSelector(selectActiveImage);
   const [filters] = useState<Array<any>>();
   const imagePosition = useSelector(selectImageOrigin);
@@ -19,10 +19,11 @@ export const Image = forwardRef<
       {images.map((image, idx) => (
         <MemoizedKonvaImage
           image={image}
-          height={activeImage?.shape.height!}
-          width={activeImage?.shape.width!}
+          // 100 for no particular reason; shouldn't happen
+          height={activeImage?.shape.height || 100}
+          width={activeImage?.shape.width || 100}
           imagePosition={imagePosition!}
-          activePlane={activeImage?.activePlane!}
+          activePlane={activeImage?.activePlane || 0}
           filters={filters!}
           idx={idx}
           key={idx}

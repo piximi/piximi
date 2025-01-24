@@ -85,7 +85,6 @@ export const Logo = ({ width, height }: { width: number; height: number }) => {
             Elliptical Arc Curve: A, a
             ClosePath: Z, z
           */}
-          ''
           {/* Cyto */}
           <g transform="translate(-185.381 -899.778)">
             <g clipPath="url(#clipPath24744)">

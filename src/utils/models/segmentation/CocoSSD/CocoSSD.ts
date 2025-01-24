@@ -65,8 +65,8 @@ export class CocoSSD extends Segmenter {
     this._model = await loadGraphModel(this.src, { fromTFHub: isTFHub });
   }
 
-  public loadTraining(images: ImageObject[], preprocessingArgs: any): void {}
-  public loadValidation(images: ImageObject[], preprocessingArgs: any): void {}
+  public loadTraining(_images: ImageObject[], _preprocessingArgs: any): void {}
+  public loadValidation(_images: ImageObject[], _preprocessingArgs: any): void {}
 
   public loadInference(
     images: ImageObject[],
@@ -84,7 +84,7 @@ export class CocoSSD extends Segmenter {
     }
   }
 
-  public async train(options: any, callbacks: any): Promise<History> {
+  public async train(_options: any, _callbacks: any): Promise<History> {
     if (!this.trainable) {
       throw new Error(`Training not supported for Model ${this.name}`);
     } else {
@@ -121,7 +121,7 @@ export class CocoSSD extends Segmenter {
     return annotations;
   }
 
-  public inferenceCategoriesById(catIds: Array<string>) {
+  public inferenceCategoriesById(_catIds: Array<string>) {
     return [];
   }
   public inferenceKindsById(kinds: string[]) {

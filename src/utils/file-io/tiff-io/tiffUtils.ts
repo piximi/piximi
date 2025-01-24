@@ -1621,7 +1621,7 @@ export const tagType: {
   gps: { main: number[]; rest: Record<number, number> };
 } = (() => {
   // tags start at 250
-  var main: number[] = new Array(250);
+  let main: number[] = new Array(250);
   main.fill(0);
   main = main.concat([
     0, 0, 0, 0, 4, 3, 3, 3, 3, 3, 0, 0, 3, 0, 0, 0, 3, 0, 0, 2, 2, 2, 2, 4, 3,
@@ -1656,7 +1656,7 @@ export const tagType: {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   ]);
-  var rest = {
+  const rest = {
     33432: 2,
     33434: 5,
     33437: 5,

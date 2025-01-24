@@ -1,15 +1,15 @@
 import { io, loadGraphModel } from "@tensorflow/tfjs";
 
 import GlasModel from "data/model-data/glas/model.json";
-//@ts-ignore
+//@ts-ignore: load bin
 import glasWeights1 from "data/model-data/glas/group1-shard1of5.bin";
-//@ts-ignore
+//@ts-ignore: load bin
 import glasWeights2 from "data/model-data//glas/group1-shard2of5.bin";
-//@ts-ignore
+//@ts-ignore: load bin
 import glasWeights3 from "data/model-data/glas/group1-shard3of5.bin";
-//@ts-ignore
+//@ts-ignore: load bin
 import glasWeights4 from "data/model-data//glas/group1-shard4of5.bin";
-//@ts-ignore
+//@ts-ignore: load bin
 import glasWeights5 from "data/model-data//glas/group1-shard5of5.bin";
 
 /*

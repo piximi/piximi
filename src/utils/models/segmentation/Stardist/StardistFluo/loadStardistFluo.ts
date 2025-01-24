@@ -1,9 +1,9 @@
 import { io, loadGraphModel } from "@tensorflow/tfjs";
 
 import Stardist2DFluorescenceModel from "data/model-data/stardist-fluo/model.json";
-//@ts-ignore
+//@ts-ignore: load the .bin
 import Stardist2DFluorescenceWeights1 from "data/model-data/stardist-fluo/group1-shard1of2.bin";
-//@ts-ignore
+//@ts-ignore: load the .bin
 import Stardist2DFluorescenceWeights2 from "data/model-data/stardist-fluo/group1-shard2of2.bin";
 
 /*
