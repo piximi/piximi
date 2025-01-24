@@ -42,7 +42,6 @@ export const SelectDialog = ({
             id={`${selectLabel}-select`}
             options={options}
             sx={{ width: 300 }}
-             
             value={currentOption}
             onChange={handleOptionsChange}
             renderInput={(params) => (

@@ -64,7 +64,10 @@ export class Cellpose extends Segmenter {
 
   public loadTraining(_images: ImageObject[], _preprocessingArgs: any): void {}
 
-  public loadValidation(_images: ImageObject[], _preprocessingArgs: any): void {}
+  public loadValidation(
+    _images: ImageObject[],
+    _preprocessingArgs: any
+  ): void {}
 
   private _sampleGenerator(images: Array<ImageObject>) {
     const count = images.length;

@@ -22,8 +22,14 @@ export class FullyConvolutionalSegmenter extends Segmenter {
   public loadModel({ simple: _simple }: LoadModelArgs) {}
 
   public loadTraining(_images: OldImageType[], _preprocessingArgs: any): void {}
-  public loadValidation(_images: OldImageType[], _preprocessingArgs: any): void {}
-  public loadInference(_images: OldImageType[], _preprocessingArgs: any): void {}
+  public loadValidation(
+    _images: OldImageType[],
+    _preprocessingArgs: any
+  ): void {}
+  public loadInference(
+    _images: OldImageType[],
+    _preprocessingArgs: any
+  ): void {}
 
   public async train(_options: any, _callbacks: any): Promise<History> {
     if (!this.trainable) {
