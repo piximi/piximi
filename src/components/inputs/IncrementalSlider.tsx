@@ -4,7 +4,7 @@ import { Add, Remove } from "@mui/icons-material";
 import { dimensions } from "utils/common/constants";
 import { CSSProperties, useMemo, useRef, useState } from "react";
 
-export const IncrementalSlider = ({
+const IncrementalSlider = ({
   min,
   max,
   step,
@@ -25,7 +25,7 @@ export const IncrementalSlider = ({
 }) => {
   const [value, setValue] = useState<number>(initialValue);
   const [valueLabelDisplay, setvalueLabelDisplay] = useState<"auto" | "on">(
-    "auto",
+    "auto"
   );
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -92,7 +92,7 @@ export const IncrementalSlider = ({
       display="flex"
       sx={(theme) => ({
         backgroundColor: theme.palette.background.paper,
-        borderRadius: "8px",
+        borderRadius: "0 0 0.25rem 0.25rem",
         ...containerStyle,
       })}
     >
@@ -123,6 +123,7 @@ export const IncrementalSlider = ({
           if (callbackOnSlide) return;
           callback(value as number);
         }}
+        track={orientation === "horizontal" ? "normal" : "inverted"}
         sx={{
           " & .MuiSlider-thumb.Mui-focusVisible, .MuiSlider-thumb:hover": {
             boxShadow: "none",
@@ -148,3 +149,5 @@ export const IncrementalSlider = ({
     </Box>
   );
 };
+
+export default IncrementalSlider;

@@ -9,9 +9,7 @@ export { PolygonAnnotation } from "./PolygonAnnotation";
 export { QuickAnnotation } from "./QuickAnnotation";
 export { RectangleAnnotation } from "./RectangleAnnotation";
 export { Selection } from "./Selection";
-
-export { CursorZoom, StageZoom, Zoom } from "./Zoom";
-export { SubtractAnnotationsIcon } from "./SubtractAnnotationsIcon";
-export { CombineAnnotationsIcon } from "./CombineAnnotationsIcon";
-export { IntersectAnnotationsIcon } from "./IntersectAnnotationsIcon";
-export { NewAnnotationIcon } from "./NewAnnotationIcon";
+export { ReactComponent as ZoomIcon } from "./Zoom.svg";
+export { Zoom, CursorZoom, StageZoom } from "./Zoom";
+export { ReactComponent as Sun } from "./Sun.svg";
+export { ReactComponent as Moon } from "./Moon.svg";
