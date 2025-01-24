@@ -35,7 +35,7 @@ export const decodeDicomImage = async (imageFile: File) => {
 
   const imgArray = new Uint8Array(imgArrayBuffer);
 
-  const dicomImgData = parseDicom(imgArray);
+  const dicomImgData = DicomParser.parseDicom(imgArray);
   const pixelDataElement = dicomImgData.elements.x7fe00010;
 
   const samplesPerPixel = dicomImgData.int16("x00280002");

@@ -58,7 +58,7 @@ export const PretrainedModelSelector = ({
           options={modelOptions}
           value={selectedModel}
           onChange={handlePreTrainedModelChange}
-          sx={{ width: 300, mx: "auto" }}
+          sx={{ width: 300 }}
           renderInput={(params) => (
             <TextField {...params} label="Pre-trained Models" />
           )}

@@ -21,7 +21,7 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
   prediction?: IJSImage;
   points: Array<Point> = [];
   // @ts-ignore it does exist
-  roi?: IJSImage.Roi;
+  roi?: ImageJS.Roi;
   offset?: { x: number; y: number };
   output?: IJSImage;
 

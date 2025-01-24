@@ -11,7 +11,7 @@ import { Shape } from "store/data/types";
  */
 export const createFCNSegmenterModel = (
   inputShape: Shape,
-  _numClasses: number,
+  _numClasses: number
 ) => {
   const imageWidth = inputShape.width;
   const imageHeight = inputShape.height;

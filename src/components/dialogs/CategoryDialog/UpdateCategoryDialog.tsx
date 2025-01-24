@@ -21,7 +21,7 @@ export const UpdateCategoryDialog = ({
 }: UpdateCategoriesDialogProps) => {
   const dispatch = useDispatch();
 
-  const handleConfirm = (name: string, color: string, kind: string) => {
+  const handleConfirm = (name: string, color: string, _kind: string) => {
     dispatch(
       dataSlice.actions.updateCategory({
         updates: {

@@ -118,10 +118,7 @@ export const applicationSettingsSlice = createSlice({
         state.loadMessage = loadMessage ?? "";
       }
     },
-    sendLoadPercent(
-      _state,
-      _action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>,
-    ) {},
+    sendLoadPercent(_state) {},
     setLoadMessage(state, action: PayloadAction<{ message: string }>) {
       state.loadMessage = action.payload.message;
     },

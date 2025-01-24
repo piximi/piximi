@@ -10,7 +10,7 @@ export const evaluateSegmenter = async (
     id: Tensor<Rank.R1>;
   }>,
   _validationImages: ImageObject[],
-  _categories: OldCategory[],
+  _categories: OldCategory[]
 ): Promise<SegmenterEvaluationResultType> => {
   // TODO #357: Implement evaluation of segmentation
 

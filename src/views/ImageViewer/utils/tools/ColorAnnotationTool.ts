@@ -241,7 +241,7 @@ export class ColorAnnotationTool extends AnnotationTool {
     width: number,
     height: number,
   ) {
-    const overlay = new IJSImage(
+    const overlay = new ImageJS.Image(
       width,
       height,
       new Uint8Array(width * height * 4),
