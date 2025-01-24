@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState, useRef } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Konva from "konva";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,11 +9,7 @@ import { useMobileView } from "hooks";
 import { AlertBar } from "components/ui/AlertBar";
 
 import { FallBackDialog } from "components/dialogs";
-import {
-  AnnotatorToolDrawer,
-  ImageViewerDrawer,
-  StageWrapper,
-} from "./sections";
+import { ImageViewerDrawer, StageWrapper } from "./sections";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
@@ -29,9 +25,6 @@ export const ImageViewer = () => {
   const routerLocation = useLocation();
 
   const stageRef = useRef<Konva.Stage>(null);
-
-  const [optionsVisible, setOptionsVisibile] = useState<boolean>(false);
-  const [persistOptions, setPersistOptions] = useState<boolean>(false);
   const isMobile = useMobileView();
   const alertState = useSelector(selectAlertState);
 
@@ -137,21 +130,7 @@ export const ImageViewer = () => {
 
           {isMobile ? <></> : <ImageViewerDrawer />}
 
-          <StageWrapper
-            setOptionsVisibility={setOptionsVisibile}
-            persistOptions={persistOptions}
-          />
-
-          {isMobile ? (
-            <></>
-          ) : (
-            <AnnotatorToolDrawer
-              optionsVisibility={optionsVisible}
-              setOptionsVisibility={setOptionsVisibile}
-              persistOptions={persistOptions}
-              setPersistOptions={setPersistOptions}
-            />
-          )}
+          <StageWrapper />
         </Box>
       </ErrorBoundary>
     </StageContext.Provider>

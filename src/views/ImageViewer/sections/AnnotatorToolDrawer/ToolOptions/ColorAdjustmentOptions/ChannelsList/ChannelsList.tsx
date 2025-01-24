@@ -6,6 +6,7 @@ import { debounce } from "lodash";
 
 import {
   Checkbox,
+  List,
   ListItem,
   ListItemIcon,
   ListItemText,
@@ -14,7 +15,6 @@ import {
 
 import { useLocalGlobalState } from "hooks";
 
-import { CollapsibleList } from "components/ui/CollapsibleList";
 import { Palette } from "../Palette";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
@@ -112,7 +112,7 @@ export const ChannelsList = () => {
             tabIndex={-1}
           />
         </ListItemIcon>
-        <ListItemText primary={name} />
+        <ListItemText primary={name} sx={{ mr: 1 }} />
         <Slider
           key={index}
           disabled={!isVisible}
@@ -140,6 +140,7 @@ export const ChannelsList = () => {
           onChangeCommitted={handleSliderChangeCommitted}
           valueLabelDisplay="auto"
           aria-labelledby="range-slider"
+          size="small"
         />
         <Palette channelIdx={index} />
       </ListItem>
@@ -147,12 +148,12 @@ export const ChannelsList = () => {
   };
 
   return (
-    <CollapsibleList closed dense primary="Channels">
+    <List dense>
       {Array(localActiveImageColors.color.length)
         .fill(0)
         .map((_, i) => {
           return colorAdjustmentSlider(i, `Ch. ${i}`);
         })}
-    </CollapsibleList>
+    </List>
   );
 };

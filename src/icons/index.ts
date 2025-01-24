@@ -28,6 +28,6 @@ export { RectangleAnnotation } from "./RectangleAnnotation";
 export { ReactComponent as SelectionIcon } from "./Selection.svg";
 export { Selection } from "./Selection";
 export { ReactComponent as ZoomIcon } from "./Zoom.svg";
-export { Zoom } from "./Zoom";
+export { Zoom, CursorZoom, StageZoom } from "./Zoom";
 export { ReactComponent as Sun } from "./Sun.svg";
 export { ReactComponent as Moon } from "./Moon.svg";
