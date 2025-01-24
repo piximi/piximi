@@ -67,7 +67,7 @@ export const ExampleProjectCard = ({
       })
     );
 
-    var exampleProjectFilePath: string;
+    let exampleProjectFilePath: string;
     switch (exampleProject.enum) {
       case ExampleProject.Mnist:
         exampleProjectFilePath =

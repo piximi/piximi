@@ -204,6 +204,7 @@ const doShowImages = async (
     const refWidth = xsData[0].length;
 
     if (import.meta.env.NODE_ENV === "test") {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { createCanvas } = require("canvas");
       canvas = createCanvas(refWidth, refHeight);
     } else {
@@ -217,6 +218,7 @@ const doShowImages = async (
     imTensor.dispose();
     let imageData;
     if (import.meta.env.NODE_ENV === "test") {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { createImageData } = require("canvas");
       imageData = createImageData(imageDataArr, imTensor.shape[1]);
     } else {
@@ -227,8 +229,7 @@ const doShowImages = async (
       );
     }
     const ctx = canvas.getContext("2d");
-    //@ts-ignore
-    ctx.putImageData(imageData, 0, 0);
+    if (ctx) ctx.putImageData(imageData, 0, 0);
 
     if (partition === Partition.Training && trainLimit < 5) {
       trainLimit++;
@@ -257,7 +258,6 @@ const doShowImages = async (
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const doShow = (
   partition: Partition,
   scale: boolean,

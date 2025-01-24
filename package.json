@@ -116,7 +116,6 @@
     "install": "^0.13.0",
     "jest-canvas-mock": "^2.3.0",
     "jiti": "^2.4.2",
-    "lint-staged": "^13.1.0",
     "prettier": "^2.8.8",
     "prop-types": "^15.8.1",
     "react-test-renderer": "^18.2.0",
@@ -151,14 +150,6 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
-    ]
-  },
-  "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
-      "prettier --write"
-    ],
-    "src/**/*.{js,jsx,ts,tsx}": [
-      "pnpm eslint --max-warnings 0"
     ]
   },
   "private": true,

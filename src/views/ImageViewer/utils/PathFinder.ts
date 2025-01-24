@@ -157,7 +157,7 @@ function reconstructPath(
 
   const point = fromIdxToCoord(searchNode.id as number, width);
   const newCoord = { x: point.x / factor, y: point.y / factor };
-  let coords: Array<Point> = [];
+  const coords: Array<Point> = [];
   const fromId = graph.fromId;
   if (searchNode!.parentId !== null) {
     const parentNode = graph.getNode(searchNode!.parentId) as PiximiNode;

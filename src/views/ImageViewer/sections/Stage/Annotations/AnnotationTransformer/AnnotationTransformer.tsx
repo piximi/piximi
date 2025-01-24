@@ -99,7 +99,7 @@ export const AnnotationTransformer = ({
   };
 
   const handleConfirmOrDeleteAnnotation = (
-    event?: Konva.KonvaEventObject<Event>
+    _event?: Konva.KonvaEventObject<Event>
   ) => {
     if (!activeImage) return;
     const container = stageRef!.current!.container();
@@ -144,7 +144,7 @@ export const AnnotationTransformer = ({
     clearAnnotation();
   };
 
-  const cancelAnnotationHandler = (event?: Konva.KonvaEventObject<Event>) => {
+  const cancelAnnotationHandler = (_event?: Konva.KonvaEventObject<Event>) => {
     const container = stageRef!.current!.container();
     container.style.cursor = cursor;
     clearAnnotation();

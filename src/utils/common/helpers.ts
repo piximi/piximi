@@ -26,9 +26,9 @@ import {
   ERROR HANDLING / LOGGING
 */
 export const getStackTraceFromError = async (error: Error): Promise<string> => {
-  var stacktrace = error.stack ? error.stack : "";
+  let stacktrace = error.stack ? error.stack : "";
   try {
-    var stackFrames = await StackTrace.fromError(error);
+    const stackFrames = await StackTrace.fromError(error);
     stacktrace = stackFrames
       .map((stackFrame) => stackFrame.toString())
       .join("\n");
@@ -178,7 +178,7 @@ export const recursiveAssign = <T extends object>(
   existingObject: T,
   updates: RecursivePartial<T>
 ) => {
-  Object.entries(updates).forEach(([key, value]) => {
+  Object.entries(updates).forEach(([key, _value]) => {
     if (typeof existingObject[key as keyof T] === "object") {
       recursiveAssign(
         existingObject[key as keyof T] as object,
@@ -259,7 +259,7 @@ export const updateRecord = <T extends string | number | symbol, K>(
 */
 
 export const generateUUID = (options?: { definesUnknown: boolean }) => {
-  let id = uuidv4();
+  const id = uuidv4();
   let unknownFlag: string;
   if (options?.definesUnknown) {
     unknownFlag = "0";
@@ -294,7 +294,8 @@ export class PseudoFileList {
   private _files: File[];
 
   constructor(files: File[]) {
-    let self = this;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
     this._files = files;
 
     return new Proxy(this, {
@@ -370,12 +371,12 @@ export const newReplaceDuplicateName = (
   newName: string,
   existingNames: Array<string>
 ) => {
-  let currentName = newName;
+  const currentName = newName;
   let count = 0;
   // eslint-disable-next-line
   const nameRe = new RegExp(`${newName}(_\d+)?`, "g");
   existingNames.forEach((name) => {
-    if (!!nameRe.exec(name)) {
+    if (nameRe.exec(name)) {
       const suffix = +name.split("_")[1];
       if (suffix > count) {
         count = suffix;
@@ -400,7 +401,7 @@ export const scaleUpRanges = (
   bitDepth: BitDepth,
   opts: { inPlace: boolean } = { inPlace: false }
 ): { [channel: number]: [number, number] } => {
-  let operandRanges = opts.inPlace ? ranges : { ...ranges };
+  const operandRanges = opts.inPlace ? ranges : { ...ranges };
 
   for (const ch of Object.keys(ranges)) {
     const chKey = parseInt(ch);
@@ -422,7 +423,7 @@ export const scaleDownRanges = (
   bitDepth: BitDepth,
   opts: { inPlace: boolean } = { inPlace: false }
 ): { [channel: number]: [number, number] } => {
-  let operandRanges = opts.inPlace ? ranges : { ...ranges };
+  const operandRanges = opts.inPlace ? ranges : { ...ranges };
 
   for (const ch of Object.keys(ranges)) {
     const chKey = parseInt(ch);
@@ -532,7 +533,7 @@ export const getPropertiesFromImageSync = (
   };
 };
 const componentToHex = (c: number) => {
-  var hex = (c * 255).toString(16);
+  const hex = (c * 255).toString(16);
   return hex.length === 1 ? "0" + hex : hex;
 };
 

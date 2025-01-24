@@ -20,7 +20,7 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
   graph?: LayersModel;
   prediction?: ImageJS.Image;
   points: Array<Point> = [];
-  // @ts-ignore
+  // @ts-ignore it does exist
   roi?: ImageJS.Roi;
   offset?: { x: number; y: number };
   output?: ImageJS.Image;
@@ -39,7 +39,7 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
     this.setBlank();
   }
 
-  async onMouseUp(position: { x: number; y: number }) {
+  async onMouseUp(_position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationState.Annotating) return;
 
     await this.predict();
@@ -122,14 +122,13 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
 
       //compute bounding box with ROI manager
       const roiManager = this.image.getRoiManager();
-      //@ts-ignore
       const binaryMask = greyMask.mask({
         algorithm: "threshold",
         threshold: 1,
       });
-      // @ts-ignore
+      // @ts-ignore it does exist
       roiManager.fromMask(binaryMask);
-      // @ts-ignore
+      // @ts-ignore it does exist
       const rois = roiManager.getRois();
       const roi = rois.sort((a: any, b: any) => {
         return b.surface - a.surface;
@@ -139,7 +138,6 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
       //threshold
       const thresholded = greyMask.data.map((i: number) => (i > 1 ? 255 : 0)); //threshold necessary because output of NN is not binary
 
-      // @ts-ignore
       this.decodedMask = thresholded;
 
       this.width = undefined;

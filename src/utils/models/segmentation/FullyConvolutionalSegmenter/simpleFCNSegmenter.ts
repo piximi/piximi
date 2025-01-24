@@ -166,7 +166,7 @@ export const createSimpleFCNSegmenterModel = (
     })
   );
 
-  //@ts-ignore
+  //@ts-ignore: TODO
   //const model = model( { name: 'SimpleFCN', inputs: input, outputs: conv_upsample } );
 
   return model;

@@ -290,10 +290,10 @@ it("predict", async () => {
 
   // can't guarantee order, but must guarantee each image id has the correct category id
   for (let i = 0; i < expectedImageIds.length; i++) {
-    let resultImageId = imageIds[i];
-    let resultCategoryId = categoryIds[i];
+    const resultImageId = imageIds[i];
+    const resultCategoryId = categoryIds[i];
 
-    let expectedIdx = expectedImageIds.findIndex((id) => id === resultImageId);
+    const expectedIdx = expectedImageIds.findIndex((id) => id === resultImageId);
 
     expect(resultCategoryId).toStrictEqual(expectedCategoryIds[expectedIdx]);
   }

@@ -3,12 +3,12 @@ import { ListItemText, MenuItem } from "@mui/material";
 
 import { useFileUploadContext } from "contexts";
 
-//TODO: MenuItem??
-
 type OpenImageMenuItemProps = {
   onCloseMenu: () => void;
 };
 
+// TODO: MenuItem??
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
   const uploadFiles = useFileUploadContext();
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {

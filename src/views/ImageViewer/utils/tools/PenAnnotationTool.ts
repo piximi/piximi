@@ -36,7 +36,7 @@ export class PenAnnotationTool extends AnnotationTool {
     this.buffer = [...this.buffer, position];
   }
 
-  onMouseUp(position: { x: number; y: number }) {
+  onMouseUp(_position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationState.Annotating) return;
 
     this.points = this.buffer;

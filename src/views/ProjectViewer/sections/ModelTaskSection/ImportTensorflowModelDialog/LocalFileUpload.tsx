@@ -97,7 +97,7 @@ export const LocalFileUpload = ({
       setErrMessage("");
     }
 
-    let weightsFiles: Array<File> = [];
+    const weightsFiles: Array<File> = [];
     let jsonFile = event.currentTarget.files[0];
     for (let i = 0; i < event.currentTarget.files.length; i++) {
       const file = event.currentTarget.files[i];

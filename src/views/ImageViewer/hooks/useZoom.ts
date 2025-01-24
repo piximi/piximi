@@ -49,7 +49,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
       y: (center.y - stageY!) / stageScale,
     };
 
-    var newPos = {
+    const newPos = {
       x: center.x - mousePointTo.x * newScale,
       y: center.y - mousePointTo.y * newScale,
     };
@@ -208,7 +208,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
       scaleY: 1 / stage.scaleY(),
     });
 
-    var newLabelPos = {
+    const newLabelPos = {
       x: labelPosition.x - labelPointTo.x * newScale,
       y: labelPosition.y - labelPointTo.y * newScale,
     };
@@ -268,7 +268,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
       scaleY: 1 / stage.scaleY(),
     });
 
-    var newLabelPos = {
+    const newLabelPos = {
       x: labelPosition.x - labelPointTo.x * newScale,
       y: labelPosition.y - labelPointTo.y * newScale,
     };
@@ -316,7 +316,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
       scaleY: 1 / stage.scaleY(),
     });
 
-    var newLabelPos = {
+    const newLabelPos = {
       x: labelPosition.x - labelPointTo.x * newScale,
       y: labelPosition.y - labelPointTo.y * newScale,
     };

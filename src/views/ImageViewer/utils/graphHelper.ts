@@ -46,8 +46,8 @@ const validNeighbours = (
   if (y < height - 1) {
     yoffsets.push(1);
   }
-  for (let xoffset of xoffsets) {
-    for (let yoffset of yoffsets) {
+  for (const xoffset of xoffsets) {
+    for (const yoffset of yoffsets) {
       if (!(xoffset === 0 && yoffset === 0)) {
         output.push({ x: x + xoffset, y: y + yoffset });
       }
@@ -67,7 +67,7 @@ export const makeGraph = (
   height: number,
   width: number
 ) => {
-  let graph: any = createGraph();
+  const graph: any = createGraph();
   graph.fromId = -1;
   graph.openSet = new NodeHeap();
   let cap = 255;
@@ -83,7 +83,7 @@ export const makeGraph = (
 
       const pixels = validNeighbours(x, y, height, width);
 
-      for (let pixel of pixels) {
+      for (const pixel of pixels) {
         const idx = getIdx(width, 1, pixel.x, pixel.y, 0);
         graph.addLink(startIdx, idx);
       }

@@ -125,7 +125,7 @@ const fitListener = async (
   ]) as CompileOptions;
   const modelIdx = classifierState.selectedModelIdx;
 
-  let model = availableClassifierModels[modelIdx];
+  const model = availableClassifierModels[modelIdx];
 
   /* DATA */
 
@@ -313,7 +313,7 @@ const fitListener = async (
       };
     }
 
-    var history: History = await model.train(fitOptions, { onEpochEnd });
+    const history: History = await model.train(fitOptions, { onEpochEnd });
     import.meta.env.NODE_ENV !== "production" &&
       import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
       logger(history);
@@ -362,7 +362,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
 
   const { preprocessOptions, fitOptions, inputShape } = classifierState;
   const modelIdx = classifierState.selectedModelIdx;
-  let model = availableClassifierModels[modelIdx];
+  const model = availableClassifierModels[modelIdx];
   let finalModelStatus = ModelStatus.Trained;
 
   /* CHECK FOR SIMPLE ERRORS */

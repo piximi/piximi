@@ -55,7 +55,7 @@ export class ThresholdAnnotationTool extends AnnotationTool {
     this.resize(position);
   }
 
-  onMouseUp(position: { x: number; y: number }) {
+  onMouseUp(_position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationState.Annotating) return;
 
     this.computeMask();

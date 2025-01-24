@@ -12,7 +12,7 @@ const p = (y: number, x: number) => ({ y, x });
 const expectRotationInvariantPoints = (actualPoints: Array<Point>) => {
   return {
     toStrictEqual: (expectedPoints: typeof actualPoints) => {
-      let numExpected = expectedPoints.length;
+      const numExpected = expectedPoints.length;
       const numActual = actualPoints.length;
 
       const startingPointIdx = actualPoints.findIndex(
@@ -29,8 +29,8 @@ const expectRotationInvariantPoints = (actualPoints: Array<Point>) => {
           : -1;
 
       for (let i = 0; i < numExpected; i++) {
-        let actualPoint = actualPoints[(startingPointIdx + i) % numExpected];
-        let expectedPoint =
+        const actualPoint = actualPoints[(startingPointIdx + i) % numExpected];
+        const expectedPoint =
           expectedPoints[(dir * i + numExpected) % numExpected];
 
         expect(actualPoint).toStrictEqual(expectedPoint);
