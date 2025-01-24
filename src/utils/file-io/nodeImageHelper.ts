@@ -53,6 +53,10 @@ export const fileFromPath = async (
   }
 
   const file = new File([bufferData], imName, { type: mimetype });
+  // hacking node runtime File type to be more like browser File type
+  file.arrayBuffer = () =>
+    //@ts-ignore any is fine
+    file[Object.getOwnPropertySymbols(file)[0]]._buffer;
 
   return file;
 };

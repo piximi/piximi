@@ -38,7 +38,7 @@ const enhancers: StoreEnhancer[] = [];
  *
  * For infor on changing the execution order, see https://github.com/redux-saga/redux-saga/issues/148
  */
-let loggingMiddleware: Middleware[] =
+const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&
   import.meta.env.VITE_APP_LOG_LEVEL === "2"
     ? [logger]
