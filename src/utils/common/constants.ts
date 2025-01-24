@@ -79,7 +79,8 @@ export const availableImageSortKeys: ImageSortKeyType[] = [
   {
     imageSortKeyName: "Random",
     imageSortKey: ImageSortKey.Random,
-    comparerFunction: (_a, _b) => (Math.round(Math.random() * 10) >= 5 ? 1 : -1),
+    comparerFunction: (_a, _b) =>
+      Math.round(Math.random() * 10) >= 5 ? 1 : -1,
     objectType: "All",
   },
   {
