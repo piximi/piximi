@@ -182,7 +182,7 @@ const BorderColorSetting = () => {
         <Box display="flex">
           <Typography display="inline">{"Selection Border Color: "}</Typography>
           <Box
-            sx={(theme) => ({
+            sx={() => ({
               display: "inline-block",
               justifySelf: "center",
               alignSelf: "center",

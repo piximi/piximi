@@ -11,7 +11,7 @@ import {
 export function useCategoryValidation({
   initName,
   initColor,
-  kind,
+  kind: _kind,
 }: {
   initName?: string;
   initColor?: string;

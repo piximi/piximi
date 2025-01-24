@@ -59,7 +59,7 @@ export const defaultAlert: AlertState = {
 export const defaultImageSortKey: ImageSortKeyType = {
   imageSortKeyName: "None",
   imageSortKey: ImageSortKey.None,
-  comparerFunction: (a, b) => 0,
+  comparerFunction: (_a, _b) => 0,
   objectType: "All",
 };
 
@@ -79,7 +79,7 @@ export const availableImageSortKeys: ImageSortKeyType[] = [
   {
     imageSortKeyName: "Random",
     imageSortKey: ImageSortKey.Random,
-    comparerFunction: (a, b) => (Math.round(Math.random() * 10) >= 5 ? 1 : -1),
+    comparerFunction: (_a, _b) => (Math.round(Math.random() * 10) >= 5 ? 1 : -1),
     objectType: "All",
   },
   {

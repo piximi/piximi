@@ -6,7 +6,7 @@ export type StyledSelectProps = SelectProps &
   Partial<Pick<CSSProperties, "fontSize">>;
 export const StyledSelect = styled(Select, {
   shouldForwardProp: (prop) => prop !== "maxWidth" && prop !== "fontSize",
-})<StyledSelectProps>(({ fontSize, theme }) => ({
+})<StyledSelectProps>(({ fontSize }) => ({
   fontSize: fontSize ?? "",
   "& .MuiInputBase-root": {
     fontSize: fontSize ?? "",

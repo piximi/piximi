@@ -99,7 +99,6 @@ export function CustomTabs(
         } else {
           if (labelIndex < tabIndex) {
             setTabIndex(tabIndex - 1);
-          } else {
           }
           action === "hide" && handleTabMin
             ? handleTabMin(label)
@@ -170,7 +169,7 @@ export function CustomTabs(
               <EditIcon
                 fontSize="small"
                 sx={{ p: 0 }}
-                onClick={(event) => setIsEditing(true)}
+                onClick={() => setIsEditing(true)}
               />
             )}
             {handleTabMin && (
@@ -225,7 +224,7 @@ export function CustomTabs(
   return (
     <TabContext.Provider value={tabIndex}>
       <Box
-        sx={(theme) => ({
+        sx={() => ({
           width: "100%",
           flexGrow: 1,
           height: "100%",

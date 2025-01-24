@@ -23,17 +23,17 @@ export class BlankAnnotationTool extends AnnotationTool {
     this.setBlank();
   }
 
-  onMouseDown(position: { x: number; y: number }) {
+  onMouseDown(_position: { x: number; y: number }) {
     if (this.annotationState === AnnotationState.Annotated) return;
 
     this.setAnnotating();
   }
 
-  onMouseMove(position: { x: number; y: number }) {
+  onMouseMove(_position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationState.Annotating) return;
   }
 
-  onMouseUp(position: { x: number; y: number }) {
+  onMouseUp(_position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationState.Annotating) return;
 
     this.setAnnotated();

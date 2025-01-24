@@ -1,9 +1,12 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-pnpm lint-staged
+pnpm prettier --write "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}"
+pnpm eslint --max-warnings 0 "src/**/*.{js,mjs,jsx,ts,tjs,tsx}"
 
 pnpm run no-console-logs
+
+
 
 # enable for testing, run `HUSKY_DEBUG=true git commit -m "..."``
 # exit 1

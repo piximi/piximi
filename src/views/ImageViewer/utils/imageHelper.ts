@@ -49,25 +49,20 @@ const drawLine = (p1: Point, p2: Point) => {
   const coords: Array<Point> = [];
 
   let x: number,
-    y: number,
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    dx: number,
-    dy: number,
-    step: number,
-    i: number;
+      y: number,
+     dx: number,
+     dy: number,
+      i: number;
 
-  x1 = Math.round(p1.x);
-  y1 = Math.round(p1.y);
-  x2 = Math.round(p2.x);
-  y2 = Math.round(p2.y);
+  const x1 = Math.round(p1.x);
+  const y1 = Math.round(p1.y);
+  const x2 = Math.round(p2.x);
+  const y2 = Math.round(p2.y);
 
   dx = x2 - x1;
   dy = y2 - y1;
 
-  step = Math.abs(dx) >= Math.abs(dy) ? Math.abs(dx) : Math.abs(dy);
+  const step = Math.abs(dx) >= Math.abs(dy) ? Math.abs(dx) : Math.abs(dy);
 
   dx = dx / step;
   dy = dy / step;
@@ -247,7 +242,7 @@ export const colorOverlayROI = (
     y: number
   ): boolean => {
     if (x === 0 || x === croppedImage.width - 1) return true;
-    for (let [dx, dy] of [
+    for (const [dx, dy] of [
       [0, 1],
       [1, 0],
       [0, -1],

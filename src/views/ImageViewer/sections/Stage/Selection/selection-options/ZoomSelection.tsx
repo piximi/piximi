@@ -17,25 +17,27 @@ export const ZoomSelection = () => {
       <ReactKonva.Group>
         <ReactKonva.Rect
           dash={[
-            4 / stageRef?.current?.scaleX()!,
-            2 / stageRef?.current?.scaleX()!,
+            // or 100 for no particular reason, because it shouldn't happen
+            4 / (stageRef?.current?.scaleX() || 100),
+            2 / (stageRef?.current?.scaleX() || 100),
           ]}
           height={maximum.y - minimum.y}
           stroke="black"
-          strokeWidth={1 / stageRef?.current?.scaleX()!}
+          strokeWidth={1 / (stageRef?.current?.scaleX() || 100)}
           width={maximum.x - minimum.x}
           x={minimum.x}
           y={minimum.y}
         />
         <ReactKonva.Rect
           dash={[
-            4 / stageRef?.current?.scaleX()!,
-            2 / stageRef?.current?.scaleX()!,
+            // or 100 for no particular reason, because it shouldn't happen
+            4 / (stageRef?.current?.scaleX() || 100),
+            2 / (stageRef?.current?.scaleX() || 100),
           ]}
           //dashOffset={-dashOffset}
           height={maximum.y - minimum.y}
           stroke="white"
-          strokeWidth={1 / stageRef?.current?.scaleX()!}
+          strokeWidth={1 / (stageRef?.current?.scaleX() || 100)}
           width={maximum.x - minimum.x}
           x={minimum.x}
           y={minimum.y}

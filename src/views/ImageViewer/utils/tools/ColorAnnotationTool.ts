@@ -94,15 +94,15 @@ export class ColorAnnotationTool extends AnnotationTool {
     }
   }
 
-  onMouseUp(position: { x: number; y: number }) {
+  onMouseUp(_position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationState.Annotating) return;
     if (!this.roiManager || !this.roiMask) return;
 
-    // @ts-ignore
+    // @ts-ignore it does exist
     this.roiManager.fromMask(this.roiMask);
-    // @ts-ignore
+    // @ts-ignore it does exist
     this.roiMask = this.roiManager.getMasks()[0];
-    //@ts-ignore
+    //@ts-ignore it does exist
     const roi = this.roiManager.getRois()[0];
 
     this._boundingBox = [roi.minX, roi.minY, roi.maxX + 1, roi.maxY + 1];
@@ -122,7 +122,6 @@ export class ColorAnnotationTool extends AnnotationTool {
 
     for (let x = 0; x < boundingBoxWidth; x++) {
       for (let y = 0; y < boundingBoxHeight; y++) {
-        //@ts-ignore
         if (this.roiMask.getBitXY(x, y)) {
           imgMask.setPixelXY(x, y, [255]);
         }
@@ -193,13 +192,13 @@ export class ColorAnnotationTool extends AnnotationTool {
       [0, -1],
     ];
     while (queue.length > 0 && queue.peek()[2] <= tolerance) {
-      let currentPoint = queue.dequeue();
+      const currentPoint = queue.dequeue();
       maxTol = Math.max(currentPoint[2], maxTol);
       floodMap.setPixelXY(currentPoint[0], currentPoint[1], [maxTol]);
-      for (let dir of dirs) {
-        let newX = currentPoint[0] + dir[0];
-        let newY = currentPoint[1] + dir[1];
-        let idx = newX + newY * toleranceMap.width;
+      for (const dir of dirs) {
+        const newX = currentPoint[0] + dir[0];
+        const newY = currentPoint[1] + dir[1];
+        const idx = newX + newY * toleranceMap.width;
         if (
           !seen.has(idx) &&
           newX >= 0 &&
@@ -247,7 +246,7 @@ export class ColorAnnotationTool extends AnnotationTool {
     width: number,
     height: number
   ) {
-    let overlay = new ImageJS.Image(
+    const overlay = new ImageJS.Image(
       width,
       height,
       new Uint8Array(width * height * 4),

@@ -230,8 +230,8 @@ export abstract class SequentialClassifier extends Model {
       )
       .array();
 
-    var accuracy: number[];
-    var crossEntropy: number[];
+    let accuracy: number[];
+    let crossEntropy: number[];
     if (numClasses === 2) {
       accuracy = (await metrics
         .binaryAccuracy(inferredTensors.ys, inferredTensors.predsOneHot)
@@ -354,7 +354,7 @@ export abstract class SequentialClassifier extends Model {
   }
 
   public onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (
-    epochs,
-    logs
+    _epochs,
+    _logs
   ) => {};
 }

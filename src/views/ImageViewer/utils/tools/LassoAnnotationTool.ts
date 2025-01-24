@@ -42,7 +42,7 @@ export class LassoAnnotationTool extends AnnotationTool {
     }
   }
 
-  onMouseUp(position: { x: number; y: number }) {
+  onMouseUp(_position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationState.Annotating || !this.origin) {
       return;
     }

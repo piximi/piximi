@@ -55,7 +55,7 @@ const deserializeAnnotationsGroup = async (
     null,
   ]).then((ra) => ra.data as Uint8Array);
 
-  let annotations: Array<OldAnnotationType> = [];
+  const annotations: Array<OldAnnotationType> = [];
   let bboxIdx = 0;
   let maskIdx = 0;
   for (let i = 0; i < ids.length; i++) {

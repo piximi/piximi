@@ -1,4 +1,4 @@
-//@ts-nocheck
+//@ts-nocheck TODO
 import hotkeys from "utils/common/hotkeys"; //{ HotkeysEvent, KeyHandler }
 import { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -103,7 +103,7 @@ export function useHotkeys(
       }
 
       return false;
-    }, //eslint-disable-next-line react-hooks/exhaustive-deps
+    },
     deps
       ? [hotkeyContext, currentHotkeyContext, enableOnTags, filter, ...deps]
       : [hotkeyContext, currentHotkeyContext, enableOnTags, filter]

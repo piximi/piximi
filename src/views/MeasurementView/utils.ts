@@ -28,7 +28,7 @@ export const formatChartItems = (
     return items;
   }
 
-  measurementData.forEach((data, idx) => {
+  measurementData.forEach((data) => {
     const measurementType = data.measurementId;
 
     items[measurementType] = {
