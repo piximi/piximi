@@ -7,7 +7,9 @@ import {
   useStore,
 } from "react-redux";
 import Konva from "konva";
-import { Stage as KonvaStage } from "react-konva";
+import * as ReactKonva from "react-konva";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { Box, Typography } from "@mui/material";
 
 import { useHotkeys } from "hooks";
@@ -47,9 +49,8 @@ import { dimensions } from "utils/common/constants";
 import { AnnotationState, ToolType } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/common/enums";
 
-import { Category } from "store/data/types";
-import { createProtoAnnotation } from "views/ImageViewer/utils/annotationUtils";
-import { Partition } from "utils/models/enums";
+import { Category, Kind } from "store/data/types";
+import { NewKindDialog } from "views/ImageViewer/components/dialogs/NewKindDialog";
 
 export const Stage = ({
   stageWidth,
@@ -260,7 +261,7 @@ export const Stage = ({
 
   return (
     <Box sx={{ gridArea: "stage", zIndex: 999 }}>
-      <KonvaStage
+      <ReactKonva.Stage
         draggable={draggable}
         height={stageHeight}
         onMouseDown={(evt) => {
