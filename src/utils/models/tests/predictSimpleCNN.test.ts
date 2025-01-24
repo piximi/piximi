@@ -291,7 +291,9 @@ it("predict", async () => {
     const resultImageId = imageIds[i];
     const resultCategoryId = categoryIds[i];
 
-    const expectedIdx = expectedImageIds.findIndex((id) => id === resultImageId);
+    const expectedIdx = expectedImageIds.findIndex(
+      (id) => id === resultImageId
+    );
 
     expect(resultCategoryId).toStrictEqual(expectedCategoryIds[expectedIdx]);
   }
