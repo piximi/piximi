@@ -20,7 +20,7 @@ export function SlidingTabPanel(props: CommonTabPanelProps) {
     >
       <Box
         display="flex"
-        sx={(theme) => ({
+        sx={() => ({
           minWidth: "100%",
           maxHeight: "calc(100vh - 60px)",
           height: "100%",
@@ -55,7 +55,7 @@ export function BasicTabPanel(props: CommonTabPanelProps) {
       {value === index && (
         <Box
           display="flex"
-          sx={(theme) => ({
+          sx={() => ({
             minWidth: "100%",
             maxHeight: "calc(100vh - 60px)",
             height: "100%",
@@ -91,7 +91,7 @@ export function ControlledTabPanel(
     >
       <Box
         display="flex"
-        sx={(theme) => ({
+        sx={() => ({
           minWidth: "100%",
           maxHeight: "calc(100vh - 60px)",
           height: "100%",

@@ -8,7 +8,7 @@ const isff =
 // Convert modifier keys to corresponding key codes
 function getMods(modifier: Record<string, number>, key: string[]) {
   const mod_names = key.slice(0, key.length - 1);
-  let mod_keys = [];
+  const mod_keys = [];
   for (let i = 0; i < mod_names.length; i++)
     mod_keys.push(modifier[mod_names[i].toLowerCase()]);
   return mod_keys;

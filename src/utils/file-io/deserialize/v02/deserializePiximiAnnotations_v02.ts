@@ -168,7 +168,8 @@ export const deserializePiximiAnnotations_v02 = async (
 
     const annotationShape = convertArrayToShape(annotation.shape as ShapeArray);
     const annotationEncoding = annotation.mask.split(" ").map((e) => +e);
-    const { mask, ...deserializedAnnotation } = {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { mask: _mask, ...deserializedAnnotation } = {
       ...annotation,
       shape: annotationShape,
       encodedMask: annotationEncoding,

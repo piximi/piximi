@@ -122,13 +122,13 @@ export const padToMatch = (
   const dHeight = targetDims.height - sampleHeight;
   const dWidth = targetDims.width - sampleWidth;
 
-  let padY: [number, number] = [0, 0];
+  const padY: [number, number] = [0, 0];
   if (dHeight > 0) {
     padY[0] = Math.floor(dHeight / 2);
     padY[1] = Math.ceil(dHeight / 2);
   }
 
-  let padX: [number, number] = [0, 0];
+  const padX: [number, number] = [0, 0];
   if (dWidth > 0) {
     padX[0] = Math.floor(dWidth / 2);
     padX[1] = Math.ceil(dWidth / 2);
@@ -162,7 +162,7 @@ export const matchedCropPad = ({
   randomCrop: boolean;
 }): [number, number, number, number] => {
   // [y1, x1, y2, x2]
-  let cropCoords: [number, number, number, number] = [0.0, 0.0, 1.0, 1.0];
+  const cropCoords: [number, number, number, number] = [0.0, 0.0, 1.0, 1.0];
 
   if (sampleHeight > cropHeight) {
     const hRatio = cropHeight / sampleHeight;
@@ -183,9 +183,9 @@ export const evaluateConfusionMatrix = (
   nClasses: number,
   confusionMatrix: number[][]
 ) => {
-  var precision = 0;
-  var recall = 0;
-  var f1Score = 0;
+  let precision = 0;
+  let recall = 0;
+  let f1Score = 0;
 
   if (nClasses === 2) {
     precision =
@@ -194,9 +194,9 @@ export const evaluateConfusionMatrix = (
       confusionMatrix[0][0] / (confusionMatrix[0][0] + confusionMatrix[1][0]);
     f1Score = (2 * (precision * recall)) / (precision + recall);
   } else {
-    var diagonal: number[] = new Array(nClasses).fill(0);
-    var rowSums: number[] = new Array(nClasses).fill(0);
-    var colSums: number[] = new Array(nClasses).fill(0);
+    const diagonal: number[] = new Array(nClasses).fill(0);
+    const rowSums: number[] = new Array(nClasses).fill(0);
+    const colSums: number[] = new Array(nClasses).fill(0);
     for (let i = 0; i < nClasses; i++) {
       for (let j = 0; j < nClasses; j++) {
         if (i === j) {

@@ -19,13 +19,13 @@ export class FullyConvolutionalSegmenter extends Segmenter {
     });
   }
 
-  public loadModel({ simple }: LoadModelArgs) {}
+  public loadModel({ simple: _simple }: LoadModelArgs) {}
 
-  public loadTraining(images: OldImageType[], preprocessingArgs: any): void {}
-  public loadValidation(images: OldImageType[], preprocessingArgs: any): void {}
-  public loadInference(images: OldImageType[], preprocessingArgs: any): void {}
+  public loadTraining(_images: OldImageType[], _preprocessingArgs: any): void {}
+  public loadValidation(_images: OldImageType[], _preprocessingArgs: any): void {}
+  public loadInference(_images: OldImageType[], _preprocessingArgs: any): void {}
 
-  public async train(options: any, callbacks: any): Promise<History> {
+  public async train(_options: any, _callbacks: any): Promise<History> {
     if (!this.trainable) {
       throw new Error(`Training not supported for Model ${this.name}`);
     } else {
@@ -37,10 +37,10 @@ export class FullyConvolutionalSegmenter extends Segmenter {
     return [];
   }
 
-  public inferenceCategoriesById(catIds: string[]): OldCategory[] {
+  public inferenceCategoriesById(_catIds: string[]): OldCategory[] {
     return [];
   }
-  public inferenceKindsById(kinds: string[]): Kind[] {
+  public inferenceKindsById(_kinds: string[]): Kind[] {
     return [];
   }
 

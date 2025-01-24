@@ -82,7 +82,7 @@ export const ConfirmationDialog = ({
         <DialogTitle sx={{ p: 1 }}>{title}</DialogTitle>
         <IconButton
           onClick={handleClose}
-          sx={(theme) => ({
+          sx={() => ({
             maxHeight: "40px",
           })}
         >

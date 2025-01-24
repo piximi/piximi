@@ -1,9 +1,9 @@
 import { io, loadGraphModel } from "@tensorflow/tfjs";
 
 import Stardist2DBrightfieldModel from "data/model-data/stardist-vhe/model.json";
-//@ts-ignore
+//@ts-ignore: load the .bin
 import Stardist2DBrightfieldWeights1 from "data/model-data/stardist-vhe/group1-shard1of2.bin";
-//@ts-ignore
+//@ts-ignore: load the .bin
 import Stardist2DBrightfieldWeights2 from "data/model-data//stardist-vhe/group1-shard2of2.bin";
 
 /*

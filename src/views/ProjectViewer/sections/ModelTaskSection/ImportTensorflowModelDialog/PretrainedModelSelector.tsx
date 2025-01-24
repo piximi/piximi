@@ -58,7 +58,6 @@ export const PretrainedModelSelector = ({
           value={selectedModel}
           onChange={handlePreTrainedModelChange}
           sx={{ width: 300 }}
-          // eslint-disable-next-line react/jsx-no-undef
           renderInput={(params) => (
             <TextField {...params} label="Pre-trained Models" />
           )}

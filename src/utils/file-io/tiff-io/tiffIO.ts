@@ -33,7 +33,7 @@ export class TiffIO {
 
     // Function to read a signed short (2 bytes) from the buffer
     readShort: (buffer: Uint8Array, position: number) => {
-      var byteArray = this.ui8;
+      const byteArray = this.ui8;
       byteArray[0] = buffer[position + 1];
       byteArray[1] = buffer[position + 0];
       return this.i16[0];
@@ -41,7 +41,7 @@ export class TiffIO {
 
     // Function to read a signed integer (4 bytes) from the buffer
     readInt: (buffer: Uint8Array, position: number) => {
-      var byteArray = this.ui8;
+      const byteArray = this.ui8;
       byteArray[0] = buffer[position + 3];
       byteArray[1] = buffer[position + 2];
       byteArray[2] = buffer[position + 1];
@@ -51,7 +51,7 @@ export class TiffIO {
 
     // Function to read an unsigned integer (4 bytes) from the buffer
     readUint: (buffer: Uint8Array, position: number) => {
-      var byteArray = this.ui8;
+      const byteArray = this.ui8;
       byteArray[0] = buffer[position + 3];
       byteArray[1] = buffer[position + 2];
       byteArray[2] = buffer[position + 1];
@@ -61,8 +61,8 @@ export class TiffIO {
 
     // Function to read an ASCII string from the buffer
     readASCII: (buffer: Uint8Array, position: number, length: number) => {
-      var string = "";
-      for (var i = 0; i < length; i++) {
+      let string = "";
+      for (let i = 0; i < length; i++) {
         string += String.fromCharCode(buffer[position + i]);
       }
       return string;
@@ -70,8 +70,8 @@ export class TiffIO {
 
     // Function to read a float (4 bytes) from the buffer
     readFloat: (buffer: Uint8Array, position: number) => {
-      var byteArray = this.ui8;
-      for (var i = 0; i < 4; i++) {
+      const byteArray = this.ui8;
+      for (let i = 0; i < 4; i++) {
         byteArray[i] = buffer[position + 3 - i];
       }
       return this.fl32[0];
@@ -79,8 +79,8 @@ export class TiffIO {
 
     // Function to read a double (8 bytes) from the buffer
     readDouble: (buffer: Uint8Array, position: number) => {
-      var byteArray = this.ui8;
-      for (var i = 0; i < 8; i++) {
+      const byteArray = this.ui8;
+      for (let i = 0; i < 8; i++) {
         byteArray[i] = buffer[position + 7 - i];
       }
       return this.fl64[0];
@@ -94,7 +94,7 @@ export class TiffIO {
 
     // Function to write a signed integer (4 bytes) to the buffer
     writeInt: (buffer: Uint8Array, position: number, number: number) => {
-      var byteArray = this.ui8;
+      const byteArray = this.ui8;
       this.i32[0] = number;
       buffer[position + 3] = byteArray[0];
       buffer[position + 2] = byteArray[1];
@@ -112,7 +112,7 @@ export class TiffIO {
 
     // Function to write an ASCII string to the buffer
     writeASCII: (buffer: Uint8Array, position: number, string: string) => {
-      for (var i = 0; i < string.length; i++) {
+      for (let i = 0; i < string.length; i++) {
         buffer[position + i] = string.charCodeAt(i);
       }
     },
@@ -120,7 +120,7 @@ export class TiffIO {
     // Function to write a double (8 bytes) to the buffer
     writeDouble: (buffer: Uint8Array, position: number, number: number) => {
       this.fl64[0] = number;
-      for (var i = 0; i < 8; i++) {
+      for (let i = 0; i < 8; i++) {
         buffer[position + i] = this.ui8[7 - i];
       }
     },
@@ -136,7 +136,7 @@ export class TiffIO {
 
     // Function to read a signed short (2 bytes) from the buffer
     readShort: (buff: Uint8Array, position: number) => {
-      var a = this.ui8;
+      const a = this.ui8;
       a[0] = buff[position + 0];
       a[1] = buff[position + 1];
       return this.i16[0];
@@ -144,7 +144,7 @@ export class TiffIO {
 
     // Function to read a signed integer (4 bytes) from the buffer
     readInt: (buff: Uint8Array, position: number) => {
-      var a = this.ui8;
+      const a = this.ui8;
       a[0] = buff[position + 0];
       a[1] = buff[position + 1];
       a[2] = buff[position + 2];
@@ -154,7 +154,7 @@ export class TiffIO {
 
     // Function to read an unsigned integer (4 bytes) from the buffer
     readUint: (buff: Uint8Array, position: number) => {
-      var a = this.ui8;
+      const a = this.ui8;
       a[0] = buff[position + 0];
       a[1] = buff[position + 1];
       a[2] = buff[position + 2];
@@ -167,15 +167,15 @@ export class TiffIO {
 
     // Function to read a float (4 bytes) from the buffer
     readFloat: (buff: Uint8Array, position: number) => {
-      var a = this.ui8;
-      for (var i = 0; i < 4; i++) a[i] = buff[position + i];
+      const a = this.ui8;
+      for (let i = 0; i < 4; i++) a[i] = buff[position + i];
       return this.fl32[0];
     },
 
     // Function to read a double (8 bytes) from the buffer
     readDouble: (buff: Uint8Array, position: number) => {
-      var a = this.ui8;
-      for (var i = 0; i < 8; i++) a[i] = buff[position + i];
+      const a = this.ui8;
+      for (let i = 0; i < 8; i++) a[i] = buff[position + i];
       return this.fl64[0];
     },
 
@@ -187,7 +187,7 @@ export class TiffIO {
 
     // Function to write a signed integer (4 bytes) to the buffer
     writeInt: (buff: Uint8Array, position: number, number: number) => {
-      var a = this.ui8;
+      const a = this.ui8;
       this.i32[0] = number;
       buff[position + 0] = a[0];
       buff[position + 1] = a[1];
@@ -384,17 +384,17 @@ export class TiffIO {
               : (arr as Uint8Array);
           const subfd: Uint8Array[] = [];
           for (let j = 0; j < oarr.length; j++)
-            //@ts-ignore
+            //@ts-ignore it does
             TiffIO._readIFD(bin, data, oarr[j], subfd, depth + 1, prm);
-          //@ts-ignore
+          //@ts-ignore it does
           if (tag === 330) ifd.subIFD = subfd;
-          //@ts-ignore
+          //@ts-ignore it does
           if (tag === 34665) ifd.exifIFD = subfd[0];
-          //@ts-ignore
+          //@ts-ignore it does
           if (tag === 34853) ifd.gpsiIFD = subfd[0];
-          //@ts-ignore
+          //@ts-ignore it does
           if (tag === 50740) ifd.dngPrvt = subfd[0];
-          //@ts-ignore
+          //@ts-ignore it does
           if (tag === 61440) ifd.fujiIFD = subfd[0];
         }
       }
@@ -512,21 +512,21 @@ export class TiffIO {
   public encode(ifds: IFD[], encoding: "BE" | "LE" = "LE") {
     // Initialize the data array and set the initial offset
     const data = new Uint8Array(20000);
-    var offset = 4;
+    let offset = 4;
     // Determine the binary operations to use based on the encoding
-    var bin = encoding === "LE" ? this._binLE : this._binBE;
+    const bin = encoding === "LE" ? this._binLE : this._binBE;
     // Write the TIFF header
     data[0] = data[1] = encoding === "LE" ? 73 : 77;
     bin.writeUshort(data, 2, 42);
-    var ifdo = 8;
+    let ifdo = 8;
     bin.writeUint(data, offset, ifdo);
 
     offset += 4;
 
     // Iterate through each IFD and write it to the data array
-    for (var i = 0; i < ifds.length; i++) {
+    for (let i = 0; i < ifds.length; i++) {
       // Write the current IFD and get the offset of the next IFD
-      var noffs = this.writeIFD(bin, tagType.basic, data, ifdo, ifds[i]);
+      const noffs = this.writeIFD(bin, tagType.basic, data, ifdo, ifds[i]);
       // Update the offset for the next IFD
       ifdo = noffs[1];
 
@@ -558,8 +558,8 @@ export class TiffIO {
     ifd: IFD
   ): [number, number] {
     // Count the number of entries, excluding exifIFD and gpsiIFD
-    var keys = Object.keys(ifd);
-    var knum = keys.length;
+    const keys = Object.keys(ifd);
+    let knum = keys.length;
     if (ifd["exifIFD"]) knum--;
     if (ifd["gpsiIFD"]) knum--;
 
@@ -568,23 +568,23 @@ export class TiffIO {
     offset += 2;
 
     // Calculate the initial offset for the values
-    var eoff = offset + knum * 12 + 4;
+    let eoff = offset + knum * 12 + 4;
 
     // Iterate through all keys in the IFD
-    for (var ki = 0; ki < keys.length; ki++) {
-      var key = keys[ki] as keyof IFD;
+    for (let ki = 0; ki < keys.length; ki++) {
+      let key = keys[ki] as keyof IFD;
 
       // Handle special cases for EXIF and GPS IFDs
       if (key === "34665" || key === "34853") continue;
       if (key === "exifIFD") key = "34665";
       if (key === "gpsiIFD") key = "34853";
 
-      var tag = parseInt(key);
-      var type = types.main[tag] ?? types.rest[tag];
+      const tag = parseInt(key);
+      const type = types.main[tag] ?? types.rest[tag];
       if (type === null || type === 0)
         throw new Error("unknown type of tag: " + tag);
 
-      var val: TiffTag | Uint8Array | string | number[][] | IFD = ifd[key]!;
+      let val: TiffTag | Uint8Array | string | number[][] | IFD = ifd[key]!;
 
       // Handle EXIF IFD
       if (tag === 34665) {
@@ -616,7 +616,7 @@ export class TiffIO {
       // Handle ASCII strings
       if (type === 2) val = val[0] + "\u0000";
 
-      var num = val.length;
+      const num = val.length;
 
       // Write tag, type, and count
       bin.writeUshort(data, offset, tag);
@@ -627,8 +627,8 @@ export class TiffIO {
       offset += 4;
 
       // Calculate data length and offset
-      var dlen = [-1, 1, 1, 2, 4, 8, 0, 1, 0, 4, 8, 0, 8][type] * num;
-      var toff = offset;
+      let dlen = [-1, 1, 1, 2, 4, 8, 0, 1, 0, 4, 8, 0, 8][type] * num;
+      let toff = offset;
       if (dlen > 4) {
         bin.writeUint(data, offset, eoff);
         toff = eoff;
@@ -637,7 +637,7 @@ export class TiffIO {
       // Write the actual data based on its type
       if (type === 1 || type === 7) {
         // BYTE or UNDEFINE
-        for (var i = 0; i < num; i++) data[toff + i] = val[i] as number;
+        for (let i = 0; i < num; i++) data[toff + i] = val[i] as number;
       } else if (type === 2) {
         // ASCII
         bin.writeASCII(data, toff, val);
@@ -650,11 +650,11 @@ export class TiffIO {
         for (let i = 0; i < num; i++) bin.writeUint(data, toff + 4 * i, val[i]);
       } else if (type === 5 || type === 10) {
         // RATIONAL or SRATIONAL
-        var wr = type === 5 ? bin.writeUint : bin.writeInt;
+        const wr = type === 5 ? bin.writeUint : bin.writeInt;
         for (let i = 0; i < num; i++) {
-          var v = val[i] as number[];
-          var nu = v[0];
-          var de = v[1];
+          const v = val[i] as number[];
+          const nu = v[0];
+          const de = v[1];
           if (nu === null)
             throw new Error(`Invalid number ${v} for tag ${tag}`);
           wr(data, toff + 8 * i, nu);

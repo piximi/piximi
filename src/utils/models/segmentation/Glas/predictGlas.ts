@@ -55,8 +55,8 @@ const labelToAnnotation = async (
   let maxY = 0;
 
   idxsArr.forEach((idx) => {
-    let Y = getY(idx);
-    let X = getX(idx);
+    const Y = getY(idx);
+    const X = getX(idx);
 
     minY = Y < minY ? Y : minY;
     minX = X < minX ? X : minX;

@@ -83,8 +83,7 @@ export abstract class Segmenter extends Model {
       outputShape =
         // @ts-ignore TFJS doesn't expose these types
         this._model.modelSignature?.outputs?.output?.tensorShape?.dim?.map(
-          // @ts-ignore
-          (dimShapeObj) => parseInt(dimShapeObj.size)
+          (dimShapeObj: any) => parseInt(dimShapeObj.size)
         );
     }
 
@@ -105,8 +104,8 @@ export abstract class Segmenter extends Model {
   }
 
   public onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (
-    epochs,
-    logs
+    _epochs,
+    _logs
   ) => {};
 
   public get modelSummary() {
@@ -150,7 +149,7 @@ export abstract class Segmenter extends Model {
 
     dummyData.dispose();
 
-    let _outputShapes: number[][] = [];
+    const _outputShapes: number[][] = [];
 
     if (!(preds instanceof Array)) {
       preds = [preds];

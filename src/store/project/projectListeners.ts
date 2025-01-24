@@ -34,7 +34,7 @@ startAppListening({
       data.categories.ids
     ) as string[];
     const filters = project.thingFilters;
-    for (let kind in filters) {
+    for (const kind in filters) {
       const filteredCats = filters[kind].categoryId;
       const deletedFilters = intersection(filteredCats, deletedCategories);
       if (deletedFilters.length > 0) {

@@ -35,8 +35,8 @@ export const decodeDicomImage = async (imageFile: File) => {
 
   const imgArray = new Uint8Array(imgArrayBuffer);
 
-  var dicomImgData = DicomParser.parseDicom(imgArray);
-  var pixelDataElement = dicomImgData.elements.x7fe00010;
+  const dicomImgData = DicomParser.parseDicom(imgArray);
+  const pixelDataElement = dicomImgData.elements.x7fe00010;
 
   const samplesPerPixel = dicomImgData.int16("x00280002");
   const rows = dicomImgData.int16("x00280010");
@@ -47,7 +47,7 @@ export const decodeDicomImage = async (imageFile: File) => {
     throw Error("Failed to parse dicom image tags");
   }
 
-  var pixelData: Uint16Array | Uint8Array;
+  let pixelData: Uint16Array | Uint8Array;
   if (bitsAllocated === 8) {
     pixelData = new Uint8Array(
       dicomImgData.byteArray.buffer,
@@ -369,7 +369,7 @@ export const getImageFileInformation = async (
     );
 
     return { ...getImageInformation(image), ext };
-  } catch (err) {
+  } catch {
     return { shape: ImageShapeEnum.InvalidImage, ext };
   }
 };

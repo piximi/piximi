@@ -1,5 +1,4 @@
-// @ts-nocheck
-// TODO: post PR #407, fix for segmenter
+// @ts-nocheck: TODO - post PR #407, fix for segmenter
 import {
   Tensor1D,
   Tensor2D,

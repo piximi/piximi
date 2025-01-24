@@ -9,7 +9,6 @@ import {
 
 import { MeasurementsData } from "store/measurements/types";
 
-/* eslint-disable-next-line no-restricted-globals */
 self.onmessage = async (
   e: MessageEvent<{
     currentMeasurements: MeasurementsData;
@@ -22,7 +21,6 @@ self.onmessage = async (
   const measurementCount = activeMeasurements.length;
   const thingCount = thingIds.length;
   const postLoadPercent = (num: number) => {
-    /* eslint-disable-next-line no-restricted-globals */
     self.postMessage({
       loadValue: Math.floor((num / (measurementCount * thingCount)) * 100),
     });
@@ -42,8 +40,6 @@ self.onmessage = async (
           return;
         } else {
           const thingChannelData = currentMeasurements[thingId].channelData!;
-          if (!thingChannelData) {
-          }
           const measuredChannel = tf.tidy(() => {
             return tf
               .tensor2d(thingChannelData)
@@ -270,7 +266,6 @@ self.onmessage = async (
       }
     }
   });
-  /* eslint-disable-next-line no-restricted-globals */
   self.postMessage({ data: newMeasurements });
 };
 

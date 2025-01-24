@@ -42,7 +42,7 @@ export const SelectDialog = ({
             id={`${selectLabel}-select`}
             options={options}
             sx={{ width: 300 }}
-            // eslint-disable-next-line react/jsx-no-undef
+             
             value={currentOption}
             onChange={handleOptionsChange}
             renderInput={(params) => (

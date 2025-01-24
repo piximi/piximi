@@ -852,7 +852,7 @@ export const dataSlice = createSlice({
         // @ts-ignore
         thingsAdapter.removeOne(state.things, thingId);
       }
-      for (let [imageId, changes] of Object.entries(imageChanges)) {
+      for (const [imageId, changes] of Object.entries(imageChanges)) {
         if (!thingIds.includes(imageId)) {
           imageChangesArray.push(changes);
         }
