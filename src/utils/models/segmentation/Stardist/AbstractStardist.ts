@@ -28,7 +28,10 @@ export abstract class Stardist extends Segmenter {
 
   public loadTraining(_images: ImageObject[], _preprocessingArgs: any): void {}
 
-  public loadValidation(_images: ImageObject[], _preprocessingArgs: any): void {}
+  public loadValidation(
+    _images: ImageObject[],
+    _preprocessingArgs: any
+  ): void {}
 
   // This Stardist model requires image dimensions to be a multiple of 16
   // (for VHE in particular), see:
