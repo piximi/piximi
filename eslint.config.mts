@@ -27,7 +27,7 @@ export default [
       "no-prototype-builtins": "off",
       "no-case-declarations": "off",
       "react/display-name": "off",
-      "react/prop-types": "off", // Disable PropTypes checking for TypeScript
+      "react/prop-types": "off",
       "@typescript-eslint/no-unsafe-function-type": "off",
       "@typescript-eslint/no-unused-vars": [
         "warn",
