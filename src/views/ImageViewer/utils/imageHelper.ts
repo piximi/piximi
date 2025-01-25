@@ -125,7 +125,7 @@ Given a click at a position, return all overlapping annotations ids
  */
 export const getOverlappingAnnotations = (
   position: { x: number; y: number },
-  annotations: Array<ProtoAnnotationObject>,
+  annotations: Array<DecodedAnnotationObject>,
 ) => {
   const overlappingAnnotations = annotations.filter(
     (annotation: ProtoAnnotationObject) => {
@@ -161,7 +161,7 @@ export const getOverlappingAnnotations = (
 export const getAnnotationsInBox = (
   minimum: { x: number; y: number },
   maximum: { x: number; y: number },
-  annotations: Array<ProtoAnnotationObject>,
+  annotations: Array<DecodedAnnotationObject>,
 ) => {
   return annotations.filter((annotation: ProtoAnnotationObject) => {
     return (
@@ -231,7 +231,11 @@ export const colorOverlayROI = (
     alpha: 1,
   }).resize({ factor: scalingFactor });
 
-  const checkNeighbors = (arr: IJSImage, x: number, y: number): boolean => {
+  const checkNeighbors = (
+    arr: ImageJS.Image,
+    x: number,
+    y: number,
+  ): boolean => {
     if (x === 0 || x === croppedImage.width - 1) return true;
     for (const [dx, dy] of [
       [0, 1],

@@ -43,7 +43,9 @@ export const CustomNumberTextField = ({
   variant = "outlined",
   formControlProps,
 }: CustomNumberTextFieldProps) => {
-  const [valueString, setValueString] = useState<string>(value.toString());
+  const [valueString, setValueString] = React.useState<string>(
+    value.toString(),
+  );
 
   useEffect(() => {
     setValueString(value.toString());

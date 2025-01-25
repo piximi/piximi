@@ -355,6 +355,6 @@ export abstract class SequentialClassifier extends Model {
 
   public onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (
     _epochs,
-    _logs
+    _logs,
   ) => {};
 }

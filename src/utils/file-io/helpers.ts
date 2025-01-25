@@ -307,7 +307,7 @@ export const loadDataUrlAsStack = async (dataURL: string) => {
 };
 
 export const getImageInformation = (
-  image: IJSImage | IJSStack,
+  image: ImageJS.Image | ImageJS.Stack,
 ): ImageShapeInfo => {
   // a "proper" RGB will be an IJSImage object with 3 components
   if (!Array.isArray(image) && image.components === 3) {
@@ -361,9 +361,12 @@ export const getImageFileInformation = async (
     }
 
     const buffer = await file.arrayBuffer();
-    const image: IJSImage | IJSStack = await IJSImage.load(buffer, {
-      ignorePalette: true,
-    });
+    const image: ImageJS.Image | ImageJS.Stack = await ImageJS.Image.load(
+      buffer,
+      {
+        ignorePalette: true,
+      },
+    );
 
     return { ...getImageInformation(image), ext };
   } catch {

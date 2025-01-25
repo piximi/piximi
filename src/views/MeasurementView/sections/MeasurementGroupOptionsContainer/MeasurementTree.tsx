@@ -35,7 +35,6 @@ export const MeasurementsTree = ({
     () =>
       new Worker(
         new URL("../../workers/measurementWorker.ts", import.meta.url),
-        { type: "module" },
       ),
     [],
   );
