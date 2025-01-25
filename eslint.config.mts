@@ -3,6 +3,7 @@ import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
 import pluginStorybook from "eslint-plugin-storybook";
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
 import type { Linter } from "eslint";
 
@@ -73,4 +74,7 @@ export default [
   {
     ignores: ["**/*.json", "**/*.yml"],
   },
+
+  // must be last
+  eslintPluginPrettierRecommended,
 ] satisfies Linter.Config[];
