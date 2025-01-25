@@ -53,13 +53,14 @@ const categoriesT1: Category[] = initialState.project.categories;
 
 beforeAll(async () => {
   for await (const image of initialImages) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     const {
       data: _data,
       annotations: _annotations,
       partition: _partition,
       colors: _colors,
       ...buildImage
+    /* eslint-enable @typescript-eslint/no-unused-vars */
     } = image;
     const imPath = imDataMap[image.name];
     const imFile = await fileFromPath(imPath, "image/jpeg");
