@@ -114,7 +114,7 @@ export const padToMatch = (
   sample: Tensor3D,
   targetDims: { width: number; height: number },
   padMode: "constant" | "reflect" | "symmetric",
-  constantValue?: number
+  constantValue?: number,
 ): Tensor3D => {
   const sampleHeight = sample.shape[0];
   const sampleWidth = sample.shape[1];
@@ -181,7 +181,7 @@ export const matchedCropPad = ({
 
 export const evaluateConfusionMatrix = (
   nClasses: number,
-  confusionMatrix: number[][]
+  confusionMatrix: number[][],
 ) => {
   let precision = 0;
   let recall = 0;

@@ -20,7 +20,7 @@ const sampleGenerator = (images: Array<OldImageType>) => {
 
 export const preprocessGlas = (
   images: Array<ImageObject>,
-  batchSize: number
+  batchSize: number,
 ) => {
   return tfdata
     .generator(sampleGenerator(images))

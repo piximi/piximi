@@ -5,7 +5,7 @@ import { KeyboardKey } from "components/ui/KeyboardKey";
 export const TooltipTitle = (
   tooltip: string,
   firstKey: string,
-  secondKey?: string
+  secondKey?: string,
 ) => {
   return (
     <Box sx={{ display: "flex", alignItems: "center", typography: "caption" }}>

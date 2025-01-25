@@ -34,7 +34,7 @@ export const useDialog = (closeOnError: boolean = true) => {
 
 export const useDialogHotkey = (
   view?: HotkeyContext,
-  closeOnError: boolean = true
+  closeOnError: boolean = true,
 ) => {
   const dispatch = useDispatch();
   const {
@@ -48,7 +48,7 @@ export const useDialogHotkey = (
       dispatch(
         applicationSettingsSlice.actions.registerHotkeyContext({
           context: view,
-        })
+        }),
       );
     onDialogOpen();
   };
@@ -58,7 +58,7 @@ export const useDialogHotkey = (
       dispatch(
         applicationSettingsSlice.actions.unregisterHotkeyContext({
           context: view,
-        })
+        }),
       );
     onDialogClose();
   };

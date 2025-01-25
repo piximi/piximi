@@ -10,7 +10,7 @@ import { HotkeyContext } from "utils/common/enums";
 
 export const NewProjectListItem = () => {
   const { onClose, onOpen, open } = useDialogHotkey(
-    HotkeyContext.ConfirmationDialog
+    HotkeyContext.ConfirmationDialog,
   );
 
   return (

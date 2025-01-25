@@ -21,7 +21,7 @@ import { Edge, Point } from "./types";
 export function scanline(
   polygon: Array<Point>,
   imageWidth: number,
-  imageHeight: number
+  imageHeight: number,
 ) {
   const maskImage = new ImageJS.Image({
     width: imageWidth,
@@ -37,7 +37,7 @@ export function scanline(
   // initialize the edge and active edge tables
 
   const edgeTable: Array<Edge> = pointsToEdges(polygon).sort(
-    (e1: Edge, e2: Edge) => getYMin(e2) - getYMin(e1)
+    (e1: Edge, e2: Edge) => getYMin(e2) - getYMin(e1),
   );
 
   const activeEdgeTable: Array<Edge> = [];

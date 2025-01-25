@@ -65,7 +65,7 @@ export const segmenterSlice = createSlice({
       state,
       action: PayloadAction<{
         segmenter: SegmenterState;
-      }>
+      }>,
     ) {
       // WARNING, don't do below (overwrites draft object)
       // state = action.payload.segmenter;
@@ -76,7 +76,7 @@ export const segmenterSlice = createSlice({
       action: PayloadAction<{
         inputShape: Shape;
         model: (typeof availableSegmenterModels)[number];
-      }>
+      }>,
     ) {
       const { model, inputShape } = action.payload;
 
@@ -85,7 +85,7 @@ export const segmenterSlice = createSlice({
       if (model.pretrained) {
         state.modelStatus = ModelStatus.Trained;
         const selectedModelIdx = availableSegmenterModels.findIndex(
-          (m) => m.name === model.name
+          (m) => m.name === model.name,
         );
         state.selectedModelIdx = selectedModelIdx >= 0 ? selectedModelIdx : 0;
       } else {
@@ -99,7 +99,7 @@ export const segmenterSlice = createSlice({
       action: PayloadAction<{
         modelStatus: ModelStatus;
         onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
-      }>
+      }>,
     ) {
       state.modelStatus = action.payload.modelStatus;
     },
@@ -111,7 +111,7 @@ export const segmenterSlice = createSlice({
 
     updateSegmentationBatchSize(
       state,
-      action: PayloadAction<{ batchSize: number }>
+      action: PayloadAction<{ batchSize: number }>,
     ) {
       state.fitOptions.batchSize = action.payload.batchSize;
     },
@@ -120,31 +120,31 @@ export const segmenterSlice = createSlice({
     },
     updateSegmentationInputShape(
       state,
-      action: PayloadAction<{ inputShape: Shape }>
+      action: PayloadAction<{ inputShape: Shape }>,
     ) {
       state.inputShape = action.payload.inputShape;
     },
     updateSegmentationLearningRate(
       state,
-      action: PayloadAction<{ learningRate: number }>
+      action: PayloadAction<{ learningRate: number }>,
     ) {
       state.compileOptions.learningRate = action.payload.learningRate;
     },
     updateSegmentationLossFunction(
       state,
-      action: PayloadAction<{ lossFunction: LossFunction }>
+      action: PayloadAction<{ lossFunction: LossFunction }>,
     ) {
       state.compileOptions.lossFunction = action.payload.lossFunction;
     },
     updateSegmentationMetrics(
       state,
-      action: PayloadAction<{ metrics: Array<Metric> }>
+      action: PayloadAction<{ metrics: Array<Metric> }>,
     ) {
       state.compileOptions.metrics = action.payload.metrics;
     },
     updateSelectedModelIdx(
       state,
-      action: PayloadAction<{ modelIdx: number; disposePrevious: boolean }>
+      action: PayloadAction<{ modelIdx: number; disposePrevious: boolean }>,
     ) {
       const { modelIdx, disposePrevious } = action.payload;
 
@@ -163,20 +163,22 @@ export const segmenterSlice = createSlice({
     },
     updateSegmentationOptimizationAlgorithm(
       state,
-      action: PayloadAction<{ optimizationAlgorithm: OptimizationAlgorithm }>
+      action: PayloadAction<{ optimizationAlgorithm: OptimizationAlgorithm }>,
     ) {
       state.compileOptions.optimizationAlgorithm =
         action.payload.optimizationAlgorithm;
     },
     updateSegmentationTrainingPercentage(
       state,
-      action: PayloadAction<{ trainingPercentage: number }>
+      action: PayloadAction<{ trainingPercentage: number }>,
     ) {
       state.trainingPercentage = action.payload.trainingPercentage;
     },
     updateSegmentationEvaluationResult(
       state,
-      action: PayloadAction<{ evaluationResult: SegmenterEvaluationResultType }>
+      action: PayloadAction<{
+        evaluationResult: SegmenterEvaluationResultType;
+      }>,
     ) {
       state.evaluationResult = action.payload.evaluationResult;
     },

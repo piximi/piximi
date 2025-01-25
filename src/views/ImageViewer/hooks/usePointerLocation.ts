@@ -7,7 +7,7 @@ import { Point } from "views/ImageViewer/utils/types";
 export const usePointerLocation = (
   imageRef: React.MutableRefObject<Konva.Image | null>,
   stageRef: React.RefObject<Konva.Stage | null>,
-  originalImage: ImageJS.Image
+  originalImage: ImageJS.Image,
 ) => {
   const [absolutePosition, setAbsolutePosition] = useState<Point>();
   const [relativePositionByStage, setRelativePositionByStage] =
@@ -30,7 +30,7 @@ export const usePointerLocation = (
         y: (imageOffset.y / imageRef.current.height()) * originalImage.height,
       };
     },
-    [imageRef, originalImage]
+    [imageRef, originalImage],
   );
 
   const getPositionRelativeToStage = useCallback((): Point | undefined => {

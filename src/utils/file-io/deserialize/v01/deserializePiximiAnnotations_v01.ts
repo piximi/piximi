@@ -9,7 +9,7 @@ import { OldAnnotationType, OldCategory, OldImageType } from "store/data/types";
 
 export const deserializeAnnotations_v01 = (
   serializedAnnotations: Array<SerializedAnnotationType>,
-  imageId: string
+  imageId: string,
 ) => {
   const annotations: Array<OldAnnotationType> = [];
 
@@ -36,7 +36,7 @@ change the incoming annotations to refer to the updated incoming category id
 const reconcileCategories = (
   existingCategories: Array<OldCategory>,
   serializedCategories: Array<OldCategory>,
-  serializedAnnotations: Array<SerializedAnnotationType>
+  serializedAnnotations: Array<SerializedAnnotationType>,
 ) => {
   // incoming cat id -> existing cat id
   const catIdMap: { [catId: string]: string } = {};
@@ -89,7 +89,7 @@ If the image doesn't exist, then there's nothing to assign the annotation to, an
 const reconcileImages = (
   existingImages: Array<OldImageType>,
   serializedImages: Array<SerializedAnnotatorImageType>,
-  serializedAnnotations: Array<SerializedAnnotationType>
+  serializedAnnotations: Array<SerializedAnnotationType>,
 ) => {
   // incoming image id -> existing image id
   const imIdMap: { [imId: string]: string } = {};
@@ -147,30 +147,33 @@ const reconcileImages = (
 export const deserializePiximiAnnotations_v01 = (
   serializedProject: SerializedFileType,
   existingImages: Array<OldImageType>,
-  existingCategories: Array<OldCategory>
+  existingCategories: Array<OldCategory>,
 ) => {
   // this must come first
   const { newCats, catModdedAnnotations } = reconcileCategories(
     existingCategories,
     serializedProject.categories,
-    serializedProject.annotations
+    serializedProject.annotations,
   );
 
   // this must come second
   const { matchedIms, imModdedAnnotations } = reconcileImages(
     existingImages,
     serializedProject.images,
-    catModdedAnnotations
+    catModdedAnnotations,
   );
 
-  const annMap = imModdedAnnotations.reduce((idMap, ann) => {
-    if (idMap.hasOwnProperty(ann.imageId)) {
-      idMap[ann.imageId].push(ann);
-    } else {
-      idMap[ann.imageId] = [ann];
-    }
-    return idMap;
-  }, {} as { [imageId: string]: Array<SerializedAnnotationType> });
+  const annMap = imModdedAnnotations.reduce(
+    (idMap, ann) => {
+      if (idMap.hasOwnProperty(ann.imageId)) {
+        idMap[ann.imageId].push(ann);
+      } else {
+        idMap[ann.imageId] = [ann];
+      }
+      return idMap;
+    },
+    {} as { [imageId: string]: Array<SerializedAnnotationType> },
+  );
 
   const encodedAnnotations = matchedIms.flatMap((im) => {
     return deserializeAnnotations_v01(annMap[im.id], im.id);

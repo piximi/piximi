@@ -64,7 +64,7 @@ function simplifyDPStep(
   first: number,
   last: number,
   sqTolerance: number,
-  simplified: Array<Point>
+  simplified: Array<Point>,
 ) {
   let maxSqDist = sqTolerance;
   let index: number = 0;
@@ -108,7 +108,7 @@ function simplifyDouglasPeucker(points: Array<Point>, sqTolerance: number) {
 export function simplifyPolygon(
   points: Array<Point>,
   tolerance = 1,
-  highestQuality = true
+  highestQuality = true,
 ) {
   if (points.length <= 2) return points;
 

@@ -65,7 +65,7 @@ export const PlotTabs = () => {
       }
       return <PlotContainer>{plot}</PlotContainer>;
     },
-    [measurementData, groupThingIds]
+    [measurementData, groupThingIds],
   );
 
   return (

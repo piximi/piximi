@@ -21,7 +21,7 @@ export const usePreferredMuiTheme = () => {
     dispatch(
       applicationSettingsSlice.actions.setThemeMode({
         mode: prefersDarkMode ? ThemeMode.Dark : ThemeMode.Light,
-      })
+      }),
     );
   }, [prefersDarkMode, dispatch]);
 

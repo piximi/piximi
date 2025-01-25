@@ -22,10 +22,10 @@ export const useErrorHandler = () => {
             description: error.message,
             stackTrace: stackTrace,
           },
-        })
+        }),
       );
     },
-    [dispatch]
+    [dispatch],
   );
 
   const handleUncaughtRejection = useCallback(
@@ -39,10 +39,10 @@ export const useErrorHandler = () => {
             description: String(e.reason.message),
             stackTrace: String(e.reason.stack),
           },
-        })
+        }),
       );
     },
-    [dispatch]
+    [dispatch],
   );
 
   useEffect(() => {

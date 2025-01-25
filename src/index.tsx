@@ -14,7 +14,7 @@ ReactDOM.render(
       <Application />
     </DndProvider>
   </Provider>,
-  document.getElementById("root")
+  document.getElementById("root"),
 );
 
 // serviceWorker.register();

@@ -114,7 +114,7 @@ it("preprocessClassifier", async () => {
       preIm.name,
       undefined,
       1,
-      imStack.length
+      imStack.length,
     );
     images.push(im);
   }

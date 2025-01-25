@@ -72,7 +72,7 @@ export const LocalFileUpload = ({
       setSuccessMessage(
         `Successfully uploaded Classification ${
           isGraph ? "Graph" : "Layers"
-        } Model ("${model.name}")`
+        } Model ("${model.name}")`,
       );
     } else {
       // TODO - segmenter
@@ -81,7 +81,7 @@ export const LocalFileUpload = ({
   };
 
   const handleFilesSelected = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     event.persist();
 
@@ -90,7 +90,7 @@ export const LocalFileUpload = ({
       return;
     } else if (event.currentTarget.files.length < 2) {
       setErrMessage(
-        "Must include model description (.json) and at least one weights file (.bin)"
+        "Must include model description (.json) and at least one weights file (.bin)",
       );
       return;
     } else {

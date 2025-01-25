@@ -40,19 +40,19 @@ export const ImageViewerAppBar = () => {
           imageViewerSlice.actions.setActiveImageId({
             imageId: undefined,
             prevImageId: activeImageId,
-          })
+          }),
         );
         dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
         dispatch(
           annotatorSlice.actions.setSelectedAnnotationIds({
             annotationIds: [],
             workingAnnotationId: undefined,
-          })
+          }),
         );
         dispatch(
           annotatorSlice.actions.setWorkingAnnotation({
             annotation: undefined,
-          })
+          }),
         );
       });
       navigate("/");

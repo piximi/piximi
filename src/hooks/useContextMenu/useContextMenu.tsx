@@ -14,7 +14,7 @@ export const useContextMenu = () => {
             mouseX: event.clientX + 2,
             mouseY: event.clientY - 6,
           }
-        : null
+        : null,
     );
   }, []);
 

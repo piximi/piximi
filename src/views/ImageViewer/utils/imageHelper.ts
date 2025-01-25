@@ -34,7 +34,7 @@ export const connectPoints = (coordinates: Array<Point>) => {
     .map((coord, i) => [coord, coordinates[i + 1]]);
 
   const adjacentPoints = consecutiveCoords.filter(
-    ([current, next]) => !pointsAreEqual(current, next)
+    ([current, next]) => !pointsAreEqual(current, next),
   );
 
   adjacentPoints.forEach(([current, next]) => {
@@ -79,7 +79,7 @@ const drawLine = (p1: Point, p2: Point) => {
 export const drawRectangle = (
   origin: Point | undefined,
   width: number | undefined,
-  height: number | undefined
+  height: number | undefined,
 ) => {
   if (!width || !height || !origin) return [];
 
@@ -104,7 +104,7 @@ export const drawRectangle = (
     ...[
       { x: x1, y: y1 },
       { x: x2, y: y2 },
-    ]
+    ],
   );
 
   return points;
@@ -115,7 +115,7 @@ export const getIdx = (
   nchannels: number,
   x: number,
   y: number,
-  index: number
+  index: number,
 ) => {
   index = index || 0;
   return Math.floor((width * y + x) * nchannels + index);
@@ -126,7 +126,7 @@ Given a click at a position, return all overlapping annotations ids
  */
 export const getOverlappingAnnotations = (
   position: { x: number; y: number },
-  annotations: Array<DecodedAnnotationObject>
+  annotations: Array<DecodedAnnotationObject>,
 ) => {
   const overlappingAnnotations = annotations.filter(
     (annotation: DecodedAnnotationObject) => {
@@ -140,19 +140,19 @@ export const getOverlappingAnnotations = (
             boundingBoxWidth,
             boundingBoxHeight,
             annotation.decodedMask,
-            { components: 1, alpha: 0 }
+            { components: 1, alpha: 0 },
           );
           if (
             maskROI.getPixelXY(
               Math.round(position.x - boundingBox[0]),
-              Math.round(position.y - boundingBox[1])
+              Math.round(position.y - boundingBox[1]),
             )[0]
           )
             return true;
         }
       }
       return false;
-    }
+    },
   );
   return overlappingAnnotations.map((annotation: DecodedAnnotationObject) => {
     return annotation.id;
@@ -162,7 +162,7 @@ export const getOverlappingAnnotations = (
 export const getAnnotationsInBox = (
   minimum: { x: number; y: number },
   maximum: { x: number; y: number },
-  annotations: Array<DecodedAnnotationObject>
+  annotations: Array<DecodedAnnotationObject>,
 ) => {
   return annotations.filter((annotation: DecodedAnnotationObject) => {
     return (
@@ -185,7 +185,7 @@ export const colorOverlayROI = (
   imageWidth: number,
   imageHeight: number,
   color: Array<number>,
-  scalingFactor: number
+  scalingFactor: number,
 ): HTMLImageElement | undefined => {
   if (!decodedMask) return undefined;
 
@@ -207,7 +207,7 @@ export const colorOverlayROI = (
     {
       components: 1,
       alpha: 0,
-    }
+    },
   ).resize({ factor: scalingFactor });
   try {
     croppedImage = new ImageJS.Image(boxWidth, boxHeight, decodedMask, {
@@ -235,7 +235,7 @@ export const colorOverlayROI = (
   const checkNeighbors = (
     arr: ImageJS.Image,
     x: number,
-    y: number
+    y: number,
   ): boolean => {
     if (x === 0 || x === croppedImage.width - 1) return true;
     for (const [dx, dy] of [
@@ -282,8 +282,8 @@ export const hexToRGBA = (color: string, alpha?: number) => {
   const a = alpha
     ? alpha
     : color.length === 9
-    ? parseInt(color.slice(7, 9), 16)
-    : undefined;
+      ? parseInt(color.slice(7, 9), 16)
+      : undefined;
 
   return a ? [r, g, b, a] : [r, g, b];
   // return `rgba(${r}, ${g}, ${b}, ${alpha})`;

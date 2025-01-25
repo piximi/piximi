@@ -24,7 +24,7 @@ export const SegmenterOptimizerListItem = ({
     dispatch(
       segmenterSlice.actions.updateSegmentationBatchSize({
         batchSize: batchSize,
-      })
+      }),
     );
   };
 
@@ -32,23 +32,23 @@ export const SegmenterOptimizerListItem = ({
     dispatch(
       segmenterSlice.actions.updateSegmentationLearningRate({
         learningRate: learningRate,
-      })
+      }),
     );
   };
 
   const dispatchEpochsCallback = (epochs: number) => {
     dispatch(
-      segmenterSlice.actions.updateSegmentationEpochs({ epochs: epochs })
+      segmenterSlice.actions.updateSegmentationEpochs({ epochs: epochs }),
     );
   };
 
   const dispatchOptimizationAlgorithmCallback = (
-    optimizationAlgorithm: OptimizationAlgorithm
+    optimizationAlgorithm: OptimizationAlgorithm,
   ) => {
     dispatch(
       segmenterSlice.actions.updateSegmentationOptimizationAlgorithm({
         optimizationAlgorithm: optimizationAlgorithm,
-      })
+      }),
     );
   };
 
@@ -56,7 +56,7 @@ export const SegmenterOptimizerListItem = ({
     dispatch(
       segmenterSlice.actions.updateSegmentationLossFunction({
         lossFunction: lossFunction,
-      })
+      }),
     );
   };
   return (

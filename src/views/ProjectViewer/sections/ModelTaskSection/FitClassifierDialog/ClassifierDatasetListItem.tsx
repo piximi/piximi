@@ -20,7 +20,7 @@ export const ClassifierDatasetListItem = ({
     dispatch(
       classifierSlice.actions.updateTrainingPercentage({
         trainingPercentage,
-      })
+      }),
     );
   };
 
@@ -28,7 +28,7 @@ export const ClassifierDatasetListItem = ({
     dispatch(
       classifierSlice.actions.updateShuffleOptions({
         shuffle: !shuffle,
-      })
+      }),
     );
   };
 

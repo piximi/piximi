@@ -52,13 +52,13 @@ export const decodeDicomImage = async (imageFile: File) => {
     pixelData = new Uint8Array(
       dicomImgData.byteArray.buffer,
       pixelDataElement.dataOffset,
-      pixelDataElement.length / 2
+      pixelDataElement.length / 2,
     );
   } else {
     pixelData = new Uint16Array(
       dicomImgData.byteArray.buffer,
       pixelDataElement.dataOffset,
-      pixelDataElement.length / 2
+      pixelDataElement.length / 2,
     );
   }
 
@@ -127,7 +127,7 @@ function isImageShapeValid(
   imageStack: Array<ImageJS.Image>,
   channels: number,
   slices: number,
-  imageShape: ImageShapeEnum
+  imageShape: ImageShapeEnum,
 ) {
   if (imageShape === ImageShapeEnum.GreyScale) {
     return channels === 1 && imageStack.length === 1;
@@ -143,7 +143,7 @@ export const uploadImages = async (
   channels: number,
   slices: number,
   referenceShape: ImageShapeInfo,
-  categoryId: string
+  categoryId: string,
 ): Promise<{
   imagesToUpload: ImageObject[];
   warning: any;
@@ -158,7 +158,7 @@ export const uploadImages = async (
     try {
       const { imageStack, fileName } = await decodeImageFile(
         file,
-        referenceShape.shape
+        referenceShape.shape,
       );
       if (
         !isImageShapeValid(imageStack, channels, slices, referenceShape.shape)
@@ -181,7 +181,7 @@ export const uploadImages = async (
             fileName,
             undefined,
             slices,
-            channels
+            channels,
           );
           imageToUpload.kind = "Image";
           imageToUpload.categoryId = categoryId;
@@ -214,7 +214,7 @@ export const uploadImages = async (
       name: "Could not draw image from files",
       description: `Could not load or resolve images from the following files: ${invalidImageFiles.reduce(
         (prev, curr) => prev + "\n" + curr.fileName + ": (" + curr.error + ")",
-        ""
+        "",
       )}`,
     };
   }
@@ -260,7 +260,7 @@ export const forceStack = async (image: ImageJS.Image | ImageJS.Stack) => {
 */
 export const fileFromPath = async (
   imPath: string,
-  name: string | undefined = undefined
+  name: string | undefined = undefined,
 ) => {
   let imName: string;
 
@@ -307,7 +307,7 @@ export const loadDataUrlAsStack = async (dataURL: string) => {
 };
 
 export const getImageInformation = (
-  image: ImageJS.Image | ImageJS.Stack
+  image: ImageJS.Image | ImageJS.Stack,
 ): ImageShapeInfo => {
   // a "proper" RGB will be an ImageJS.Image object with 3 components
   if (!Array.isArray(image) && image.components === 3) {
@@ -345,7 +345,7 @@ export const getImageInformation = (
 };
 
 export const getImageFileInformation = async (
-  file: File
+  file: File,
 ): Promise<ImageFileShapeInfo> => {
   const ext = file.type as MIMEType;
   try {
@@ -365,7 +365,7 @@ export const getImageFileInformation = async (
       buffer,
       {
         ignorePalette: true,
-      }
+      },
     );
 
     return { ...getImageInformation(image), ext };

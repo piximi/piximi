@@ -6,7 +6,7 @@ import { PlotDetails, PlotViewActionProps } from "../types";
 
 export function plotViewReducer(
   plotDetails: PlotDetails,
-  action: PlotViewActionProps
+  action: PlotViewActionProps,
 ) {
   const { type } = action;
   switch (type) {
