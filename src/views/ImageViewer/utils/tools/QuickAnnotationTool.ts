@@ -57,7 +57,7 @@ export class QuickAnnotationTool extends AnnotationTool {
       data,
       this.image.width,
       this.image.height,
-      this.regionSize
+      this.regionSize,
     );
 
     return superpixels;
@@ -81,7 +81,7 @@ export class QuickAnnotationTool extends AnnotationTool {
         this.image.width,
         this.image.height,
         new Uint8Array(this.image.width * this.image.height * 4),
-        { alpha: 1 }
+        { alpha: 1 },
       );
     }
 
@@ -115,7 +115,7 @@ export class QuickAnnotationTool extends AnnotationTool {
         this.image.width,
         this.image.height,
         new Uint8Array(this.image.width * this.image.height * 4),
-        { alpha: 1 }
+        { alpha: 1 },
       );
     }
 
@@ -156,7 +156,7 @@ export class QuickAnnotationTool extends AnnotationTool {
     });
 
     const thresholdMask = croppedGreyMask.data.map((i: number) =>
-      i > 1 ? 255 : 0
+      i > 1 ? 255 : 0,
     );
 
     this.decodedMask = Uint8Array.from(thresholdMask);

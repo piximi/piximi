@@ -77,7 +77,7 @@ export function BasicTabPanel(props: CommonTabPanelProps) {
 }
 
 export function ControlledTabPanel(
-  props: Omit<CommonTabPanelProps, "value" | "index">
+  props: Omit<CommonTabPanelProps, "value" | "index">,
 ) {
   const { children, childClassName, ...other } = props;
 

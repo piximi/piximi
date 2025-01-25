@@ -30,7 +30,7 @@ export const SegmenterArchitectureListItem = () => {
       segmenterSlice.actions.updateSelectedModelIdx({
         modelIdx: _nextModelIdx,
         disposePrevious,
-      })
+      }),
     );
 
     const nextModel = availableSegmenterModels[_nextModelIdx];
@@ -44,7 +44,7 @@ export const SegmenterArchitectureListItem = () => {
             ...inputShape,
             channels: nextModel.requiredChannels,
           },
-        })
+        }),
       );
     }
   };
@@ -54,21 +54,21 @@ export const SegmenterArchitectureListItem = () => {
         dispatch(
           segmenterSlice.actions.updateSegmentationInputShape({
             inputShape: { ...inputShape, height: value },
-          })
+          }),
         );
         return;
       case "shape-cols":
         dispatch(
           segmenterSlice.actions.updateSegmentationInputShape({
             inputShape: { ...inputShape, width: value },
-          })
+          }),
         );
         return;
       case "shape-channels":
         dispatch(
           segmenterSlice.actions.updateSegmentationInputShape({
             inputShape: { ...inputShape, channels: value },
-          })
+          }),
         );
     }
   };

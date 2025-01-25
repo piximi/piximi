@@ -57,7 +57,7 @@ export function interpolateX(yScan: number, edge: Edge) {
 }
 
 export function computeBoundingBoxFromContours(
-  contour: Array<Point>
+  contour: Array<Point>,
 ): [number, number, number, number] {
   if (contour.length === 0) return [0, 0, 0, 0];
 
@@ -79,7 +79,7 @@ export function maskFromPoints(
   coordinates: Array<Point>,
   imageDims: { width: number; height: number },
   boundingBox?: [number, number, number, number],
-  simplifyPoints: boolean = true
+  simplifyPoints: boolean = true,
 ) {
   if (!boundingBox) {
     boundingBox = computeBoundingBoxFromContours(coordinates);
@@ -91,10 +91,10 @@ export function maskFromPoints(
   if (width <= 0 || height <= 0) {
     import.meta.env.NODE_ENV !== "production" &&
       console.warn(
-        `Received negative image dimensions w: ${width}, h: ${height}`
+        `Received negative image dimensions w: ${width}, h: ${height}`,
       );
     throw Error(
-      "Could not calculate mask from points, with given image dimensions"
+      "Could not calculate mask from points, with given image dimensions",
     );
   }
 
@@ -108,7 +108,7 @@ export function maskFromPoints(
   const greyScaleMask = scanline(
     connectedPoints,
     imageDims.width,
-    imageDims.height
+    imageDims.height,
   );
 
   const maskImage = greyScaleMask.crop({

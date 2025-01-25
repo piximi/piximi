@@ -62,13 +62,13 @@ export const selectSegmenterHistory = createSelector(
         selectedHistory[k] = model.history.epochs;
       } else {
         selectedHistory[k] = fullHistory.flatMap(
-          (cycleHistory) => cycleHistory[k]
+          (cycleHistory) => cycleHistory[k],
         );
       }
     }
 
     return selectedHistory;
-  }
+  },
 );
 
 const selectedIdxSelector = ({ segmenter }: { segmenter: SegmenterState }) =>
@@ -79,7 +79,7 @@ export const selectSegmenterModelIdx = createSelector(
   (idx) => ({
     idx,
     model: availableSegmenterModels[idx],
-  })
+  }),
 );
 
 export const selectSegmenterModelStatus = ({

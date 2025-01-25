@@ -88,7 +88,7 @@ const eachUnbind = ({
 function eventHandler(
   event: KeyboardEvent,
   handler: HotkeyHandlerItem,
-  element: Document
+  element: Document,
 ) {
   if (handler.element !== element) {
     return;
@@ -308,7 +308,7 @@ function hotkeys(hotkeys: string, option: Option, method: Function) {
       (e) => {
         dispatch(e, element);
       },
-      capture
+      capture,
     );
     if (!winListendFocus) {
       winListendFocus = true;
@@ -318,7 +318,7 @@ function hotkeys(hotkeys: string, option: Option, method: Function) {
         () => {
           _downKeys = [];
         },
-        capture
+        capture,
       );
     }
     element.addEventListener(
@@ -327,7 +327,7 @@ function hotkeys(hotkeys: string, option: Option, method: Function) {
         dispatch(e, element);
         clearModifier(e);
       },
-      capture
+      capture,
     );
   }
 }

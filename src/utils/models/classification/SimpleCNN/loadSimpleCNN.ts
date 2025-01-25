@@ -8,7 +8,7 @@ import { Shape } from "store/data/types";
 export const createSimpleCNN = (
   inputShape: Shape,
   numClasses: number,
-  randomizeWeights: boolean
+  randomizeWeights: boolean,
 ) => {
   const seed = randomizeWeights ? Math.floor(Math.random() * 1000) : 42;
 
@@ -30,7 +30,7 @@ export const createSimpleCNN = (
       strides: 1,
       activation: "relu",
       kernelInitializer: initializers.varianceScaling({ seed }),
-    })
+    }),
   );
 
   // The MaxPooling layer acts as a sort of downsampling using max values
@@ -46,7 +46,7 @@ export const createSimpleCNN = (
       strides: 1,
       activation: "relu",
       kernelInitializer: initializers.varianceScaling({ seed }),
-    })
+    }),
   );
   model.add(layers.maxPooling2d({ poolSize: [2, 2], strides: [2, 2] }));
 
@@ -61,7 +61,7 @@ export const createSimpleCNN = (
       units: numClasses,
       kernelInitializer: initializers.varianceScaling({ seed }),
       activation: "softmax",
-    })
+    }),
   );
 
   return model;

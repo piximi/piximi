@@ -34,7 +34,7 @@ const drawSegmentationMask = async (
     annotations: DecodedAnnotationObject[];
     id: string;
     shape: Shape;
-  }
+  },
 ): Promise<{
   xs: Tensor3D;
   ys: Tensor3D;
@@ -44,7 +44,7 @@ const drawSegmentationMask = async (
     const segmentationMasks = encodeAnnotationToSegmentationMask(
       item.annotations,
       item.shape,
-      createdCategoriesIDs
+      createdCategoriesIDs,
     );
 
     return tensor3d(segmentationMasks);
@@ -62,7 +62,7 @@ const decodeFromOriginalSrc = async (
     annotations: DecodedAnnotationObject[];
     id: string;
     shape: Shape;
-  }
+  },
 ): Promise<{
   xs: Tensor3D;
   annotations: DecodedAnnotationObject[];
@@ -104,7 +104,7 @@ const decodeFromOriginalSrc = async (
   return Promise.all(channelPromises).then((channels) => {
     const x: Tensor3D = stack(
       channels,
-      2 // axis to stack on, producing tensor of dims: [height, width, channels]
+      2, // axis to stack on, producing tensor of dims: [height, width, channels]
     ) as Tensor3D;
 
     for (const c of channels) {
@@ -123,7 +123,7 @@ const decodeImage = async (
     annotations: DecodedAnnotationObject[];
     id: string;
     shape: Shape;
-  }
+  },
 ): Promise<{
   xs: Tensor3D;
   annotations: DecodedAnnotationObject[];
@@ -139,7 +139,7 @@ const decodeImage = async (
           annotations: DecodedAnnotationObject[];
           id: string;
           shape: Shape;
-        }
+        },
       )
     : decodeFromOriginalSrc(
         rescaleOptions,
@@ -148,7 +148,7 @@ const decodeImage = async (
           annotations: DecodedAnnotationObject[];
           id: string;
           shape: Shape;
-        }
+        },
       );
 };
 
@@ -184,7 +184,7 @@ const resize = async (
     xs: Tensor3D;
     ys: Tensor3D;
     id: string;
-  }
+  },
 ): Promise<{
   xs: Tensor3D;
   ys: Tensor3D;
@@ -217,7 +217,7 @@ export const preprocessSegmentationImages = async (
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
   fitOptions: FitOptions,
-  operation?: "training" | "validation" | "inference"
+  operation?: "training" | "validation" | "inference",
 ): Promise<
   | tfdata.Dataset<{
       xs: Tensor4D;
@@ -244,8 +244,8 @@ export const preprocessSegmentationImages = async (
       decodeImage.bind(
         null,
         inputShape.channels,
-        preprocessOptions.rescaleOptions
-      )
+        preprocessOptions.rescaleOptions,
+      ),
     )
     .mapAsync(drawSegmentationMask.bind(null, createdCategoriesIDs))
     .mapAsync(resize.bind(null, inputShape));

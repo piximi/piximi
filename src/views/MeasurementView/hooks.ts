@@ -42,7 +42,7 @@ export const usePlotControl = () => {
     (label: string) => {
       return plotDetails.plots[label].name;
     },
-    [plotDetails.plots]
+    [plotDetails.plots],
   );
   const addPlot = useCallback(() => {
     dispatch({ type: "add" });
@@ -51,7 +51,7 @@ export const usePlotControl = () => {
     (id: string, name: string) => {
       dispatch({ type: "edit", id, name });
     },
-    [dispatch]
+    [dispatch],
   );
   type NewType = ChartConfig;
 
@@ -65,17 +65,17 @@ export const usePlotControl = () => {
         chartConfig: newConfig,
       });
     },
-    [plotDetails, dispatch]
+    [plotDetails, dispatch],
   );
   const removePlot = useCallback(
     (id: string, newId?: string) => {
       dispatch({ type: "remove", id, newId });
     },
-    [dispatch]
+    [dispatch],
   );
   const setActiveLabel = useCallback(
     (plotId: string) => dispatch({ type: "select", id: plotId }),
-    [dispatch]
+    [dispatch],
   );
 
   return {
@@ -124,7 +124,7 @@ export const useTableExport = () => {
       const objUrl = URL.createObjectURL(blob);
       saveAs(objUrl, `${table.kind}-measurements.csv`);
     },
-    [categories, measurementData, thingDetails]
+    [categories, measurementData, thingDetails],
   );
 
   return handleExportTable;
@@ -139,7 +139,7 @@ export const useCreateMeasurementTable = () => {
   const worker: Worker = useMemo(
     () =>
       new Worker(new URL("./workers/prepareDataWorker.ts", import.meta.url)),
-    []
+    [],
   );
   const kindOptions = useMemo(() => Object.keys(kinds), [kinds]);
   const {
@@ -187,7 +187,7 @@ export const useCreateMeasurementTable = () => {
               loadValue?: number;
             }
           | { loadValue: number; kind?: string; data?: ThingData }
-        >
+        >,
       ) => {
         if (e.data.loadValue) {
           setStatus({ loading: true, value: e.data.loadValue });
@@ -201,12 +201,12 @@ export const useCreateMeasurementTable = () => {
                 categories: categoriesByKind(e.data.kind!),
                 thingIds: Object.keys(e.data.data!),
                 numChannels,
-              })
+              }),
             );
             dispatch(
               measurementsSlice.actions.updateMeasurements({
                 dataDict: e.data.data,
-              })
+              }),
             );
           });
           setStatus({ loading: false });

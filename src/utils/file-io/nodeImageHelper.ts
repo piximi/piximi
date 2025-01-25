@@ -34,7 +34,7 @@ export const fileFromPath = async (
   imPath: string,
   mimetype: MIMEType,
   url: boolean = false,
-  name: string | undefined = undefined
+  name: string | undefined = undefined,
 ) => {
   let imName: string;
   let bufferData: BlobPart;

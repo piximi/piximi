@@ -56,7 +56,7 @@ export class UploadedClassifier extends SequentialClassifier {
 
     if ((this.TFHub || this.src) && this._ioHandler) {
       throw Error(
-        "A model cannot have both a url source and uploaded model files"
+        "A model cannot have both a url source and uploaded model files",
       );
     }
   }

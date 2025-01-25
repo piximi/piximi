@@ -361,7 +361,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
         imProps.data = await fileFromPath(
           imProps.filepath,
           imProps.mimetype,
-          false
+          false,
         );
       } catch (err) {
         console.error(err);
@@ -402,7 +402,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
         expect(img.alpha).toBe(0);
         expect(img.size).toBe(expectedWidth * expectedHeight);
       });
-    }
+    },
   );
 
   it.each(Object.keys(testDataUnloaded))(
@@ -424,7 +424,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
       const imageTensor = convertToTensor(
         imageStack,
         expectedSlices,
-        expectedChannels
+        expectedChannels,
       );
 
       const [axis0, axis1, axis2, axis3] = imageTensor.shape;
@@ -463,7 +463,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
             for (let colIdx = 0; colIdx < axis2; colIdx++) {
               diffs.push(
                 imageTensorData[sliceIdx][rowIdx][colIdx][channelIdx] -
-                  imageStack[frameIdx].data[pixelIdx]
+                  imageStack[frameIdx].data[pixelIdx],
               );
               pixelIdx++;
             }
@@ -473,7 +473,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
       }
 
       expect(diffs.reduce((partialSum, diff) => partialSum + diff, 0)).toBe(0);
-    }
+    },
   );
 });
 
@@ -521,7 +521,7 @@ describe("Tensor -> Composite Image", () => {
         alpha: 0,
         colorModel: "GREY" as ImageJS.ColorModel,
       });
-    })
+    }),
   );
 
   it("should create tensor - Image -> Tensor4D", async () => {
@@ -777,7 +777,7 @@ describe("Tensor -> Composite Image", () => {
           alpha: 0,
           colorModel: "GREY" as ImageJS.ColorModel,
         });
-      })
+      }),
     );
 
     const imageTensor = convertToTensor(imageStack, Z, C);
@@ -805,7 +805,7 @@ describe("Tensor -> Composite Image", () => {
       values: number[],
       mins: number[] = MINS,
       maxs: number[] = MAXS,
-      bitDepth: number = BITDEPTH
+      bitDepth: number = BITDEPTH,
     ) => {
       const scaledCh: number[] = [];
 
@@ -848,7 +848,7 @@ describe("Tensor -> Composite Image", () => {
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(
       scaledImageSlice,
-      visibleChannels
+      visibleChannels,
     );
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
@@ -866,7 +866,7 @@ describe("Tensor -> Composite Image", () => {
       values: number[],
       mins: number[] = MINS,
       maxs: number[] = MAXS,
-      bitDepth: number = BITDEPTH
+      bitDepth: number = BITDEPTH,
     ) => {
       const scaledCh: number[] = [];
 
@@ -912,7 +912,7 @@ describe("Tensor -> Composite Image", () => {
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(
       scaledImageSlice,
-      visibleChannels
+      visibleChannels,
     );
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
@@ -981,7 +981,7 @@ describe("Tensor -> Composite Image", () => {
           alpha: 0,
           colorModel: "GREY" as ImageJS.ColorModel,
         });
-      })
+      }),
     );
 
     const imageTensor = convertToTensor(imageStack, Z, C);
@@ -1068,7 +1068,7 @@ describe("Tensor -> Composite Image", () => {
           alpha: 0,
           colorModel: "GREY" as ImageJS.ColorModel,
         });
-      })
+      }),
     );
 
     const imageTensor = convertToTensor(imageStack, Z, C);
@@ -1158,7 +1158,7 @@ describe("Tensor -> Composite Image", () => {
           alpha: 0,
           colorModel: "GREY" as ImageJS.ColorModel,
         });
-      })
+      }),
     );
 
     const imageTensor = convertToTensor(imageStack, Z, C);
@@ -1201,7 +1201,7 @@ describe("Tensor -> Composite Image", () => {
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(
       scaledImageSlice,
-      visibleChannels
+      visibleChannels,
     );
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);

@@ -144,7 +144,7 @@ export enum ProjectFileType {
 
 export const validateFileType = (
   encodedFileContents: string,
-  projectType: ProjectFileType = ProjectFileType.PIXIMI
+  projectType: ProjectFileType = ProjectFileType.PIXIMI,
 ) => {
   const annotations = JSON.parse(encodedFileContents);
   switch (projectType) {

@@ -28,7 +28,7 @@ const NO_PATH: never[] = [];
 export function cachedAStarPathSearch(
   graph: PiximiGraph,
   width: number,
-  factor: number
+  factor: number,
 ) {
   // whether traversal should be considered over oriented graph.
   const oriented = true;
@@ -151,7 +151,7 @@ function reconstructPath(
   graph: PiximiGraph,
   searchNode: PiximiNode | null,
   width: number,
-  factor: number = 1
+  factor: number = 1,
 ) {
   if (!searchNode) return;
 
@@ -215,6 +215,6 @@ const pathDirection = (from: Point, to: Point) => {
     }
   }
   logger(
-    `Invalid direction, this should never appear so check the code ${dx} ${dy}`
+    `Invalid direction, this should never appear so check the code ${dx} ${dy}`,
   );
 };

@@ -32,7 +32,7 @@ import { ToolType } from "views/ImageViewer/utils/enums";
 export const useAnnotationTool = () => {
   const [image, setImage] = useState<ImageJS.Image>();
   const [operator, setOperator] = useState<AnnotationTool>(
-    new BlankAnnotationTool()
+    new BlankAnnotationTool(),
   );
 
   const activeImage = useSelector(selectActiveImage);
@@ -77,7 +77,7 @@ export const useAnnotationTool = () => {
         ObjectAnnotationTool.compile(image).then(
           (operator: ObjectAnnotationTool) => {
             setOperator(operator);
-          }
+          },
         );
 
         return;

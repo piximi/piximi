@@ -32,7 +32,7 @@ export const Application = () => {
         cellPaintingAnnotations as SerializedFileType,
         // imageFile.name points to
         // "/static/media/cell-painting.f118ef087853056f08e6.png"
-        "cell-painting.png"
+        "cell-painting.png",
       )) as {
         image: OldImageType;
         annotationCategories: OldCategory[];

@@ -11,7 +11,7 @@ import { Category, OldAnnotationType } from "store/data/types";
 export const loadExampleImage = async (
   imagePath: string,
   serializedAnnotations: SerializedFileType,
-  imageName?: string
+  imageName?: string,
 ) => {
   const imageFile = await fileFromPath(imagePath);
 
@@ -22,12 +22,12 @@ export const loadExampleImage = async (
     imageName ? imageName : imageFile.name,
     undefined,
     1,
-    3
+    3,
   );
 
   const deserializedAnnotations = deserializeAnnotations_v01(
     serializedAnnotations.annotations,
-    image.id
+    image.id,
   );
   const annotations: Array<OldAnnotationType> = [];
 
@@ -47,7 +47,7 @@ export const loadExampleImage = async (
     const annImProps = getPropertiesFromImageSync(
       renderedIm,
       image,
-      annotation
+      annotation,
     );
 
     annotations.push({

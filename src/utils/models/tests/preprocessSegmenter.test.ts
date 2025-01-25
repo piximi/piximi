@@ -108,7 +108,7 @@ it.skip("preprocessSegmenter", async () => {
       preIm.name,
       undefined,
       1,
-      imStack.length
+      imStack.length,
     );
 
     images.push({
@@ -122,7 +122,7 @@ it.skip("preprocessSegmenter", async () => {
     annotationCategories,
     inputShape,
     preprocessingOptions,
-    fitOptions
+    fitOptions,
   );
 
   // future warning: toArrayForTest is undocumented

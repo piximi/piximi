@@ -86,15 +86,15 @@ export abstract class Model {
   public abstract loadModel(loadModelArgs?: any): void | Promise<void>;
   public abstract loadTraining(
     images: ImageObject[],
-    preprocessingArgs: any
+    preprocessingArgs: any,
   ): void;
   public abstract loadValidation(
     images: ImageObject[],
-    preprocessingArgs: any
+    preprocessingArgs: any,
   ): void;
   public abstract loadInference(
     images: ImageObject[],
-    preprocessingArgs: any
+    preprocessingArgs: any,
   ): void;
 
   public abstract train(options: any, callbacks: any): Promise<History>;

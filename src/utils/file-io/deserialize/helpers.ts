@@ -14,7 +14,7 @@ export const getDataset = async (root: Group, key: string) => {
 export const getDatasetSelection = async (
   root: Group,
   key: string,
-  selection: Array<number | null>
+  selection: Array<number | null>,
 ) => {
   const dataset = await root.getItem(key);
 
@@ -44,7 +44,7 @@ export const getGroup = async (root: Group, key: string) => {
     return group as Group;
   } else {
     throw Error(
-      `Expected key "${key}" of type "Group" in group "${root.path}"`
+      `Expected key "${key}" of type "Group" in group "${root.path}"`,
     );
   }
 };

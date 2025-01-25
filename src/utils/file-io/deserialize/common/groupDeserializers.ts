@@ -19,7 +19,7 @@ import { ClassifierState } from "store/types";
 import { Colors } from "utils/common/types";
 
 export const deserializeColorsGroup = async (
-  colorsGroup: Group
+  colorsGroup: Group,
 ): Promise<Colors> => {
   const colorsDataset = await getDatasetSelection(colorsGroup, "color", [null]);
   const numChannels = colorsDataset.shape[0];
@@ -40,7 +40,7 @@ export const deserializeColorsGroup = async (
     visibilities.length !== numChannels
   ) {
     throw Error(
-      `Expected colors group "${colorsGroup.path}" to have "${numChannels}" channels, range and visibility`
+      `Expected colors group "${colorsGroup.path}" to have "${numChannels}" channels, range and visibility`,
     );
   }
 
@@ -59,7 +59,7 @@ export const deserializeColorsGroup = async (
 };
 
 const deserializeFitOptionsGroup = async (
-  fitOptionsGroup: Group
+  fitOptionsGroup: Group,
 ): Promise<FitOptions> => {
   const epochs = (await getAttr(fitOptionsGroup, "epochs")) as number;
   const batchSize = (await getAttr(fitOptionsGroup, "batch_size")) as number;
@@ -77,24 +77,24 @@ type OptSettings = {
   fitOptions: FitOptions;
 };
 const deserializeOptimizerSettingsGroup = async (
-  optSettingsGroup: Group
+  optSettingsGroup: Group,
 ): Promise<OptSettings> => {
   const fitOptions = await deserializeFitOptionsGroup(optSettingsGroup);
 
   const optimizationAlgorithm = (await getAttr(
     optSettingsGroup,
-    "optimization_algorithm"
+    "optimization_algorithm",
   )) as string as OptimizationAlgorithm;
   const learningRateRaw = (await getAttr(
     optSettingsGroup,
-    "learning_rate"
+    "learning_rate",
   )) as number;
   // round to account for serialization error
   // convert to number
   const learningRate = +learningRateRaw.toFixed(6);
   const lossFunction = (await getAttr(
     optSettingsGroup,
-    "loss_function"
+    "loss_function",
   )) as string as LossFunction;
 
   return {
@@ -106,11 +106,11 @@ const deserializeOptimizerSettingsGroup = async (
 };
 
 const deserializeCropOptionsGroup = async (
-  cropOptionsGroup: Group
+  cropOptionsGroup: Group,
 ): Promise<CropOptions> => {
   const cropSchema = (await getAttr(
     cropOptionsGroup,
-    "crop_schema"
+    "crop_schema",
   )) as string as CropSchema;
 
   const numCrops = (await getAttr(cropOptionsGroup, "num_crops")) as number;
@@ -119,13 +119,13 @@ const deserializeCropOptionsGroup = async (
 };
 
 const deserializeRescaleOptionsGroup = async (
-  rescaleOptionsGroup: Group
+  rescaleOptionsGroup: Group,
 ): Promise<RescaleOptions> => {
   const centerRaw = (await getAttr(rescaleOptionsGroup, "center_B")) as number;
   const center = Boolean(centerRaw);
   const rescaleRaw = (await getAttr(
     rescaleOptionsGroup,
-    "rescale_B"
+    "rescale_B",
   )) as number;
   const rescale = Boolean(rescaleRaw);
 
@@ -133,33 +133,32 @@ const deserializeRescaleOptionsGroup = async (
 };
 
 const deserializePreprocessOptionsGroup = async (
-  preprocessOptionsGroup: Group
+  preprocessOptionsGroup: Group,
 ): Promise<PreprocessOptions> => {
   const shuffleRaw = (await getAttr(
     preprocessOptionsGroup,
-    "shuffle_B"
+    "shuffle_B",
   )) as number;
   const shuffle = Boolean(shuffleRaw);
 
   const cropOptionsGroup = await getGroup(
     preprocessOptionsGroup,
-    "crop_options"
+    "crop_options",
   );
   const cropOptions = await deserializeCropOptionsGroup(cropOptionsGroup);
 
   const rescaleOptionsGroup = await getGroup(
     preprocessOptionsGroup,
-    "rescale_options"
+    "rescale_options",
   );
-  const rescaleOptions = await deserializeRescaleOptionsGroup(
-    rescaleOptionsGroup
-  );
+  const rescaleOptions =
+    await deserializeRescaleOptionsGroup(rescaleOptionsGroup);
 
   return { cropOptions, rescaleOptions, shuffle };
 };
 
 export const deserializeClassifierGroup = async (
-  classifierGroup: Group
+  classifierGroup: Group,
 ): Promise<ClassifierState> => {
   // present, but not used currently
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -174,18 +173,18 @@ export const deserializeClassifierGroup = async (
   // convert to number
   const trainingPercentageRaw = (await getAttr(
     classifierGroup,
-    "training_percent"
+    "training_percent",
   )) as number;
   const trainingPercentage = +trainingPercentageRaw.toFixed(2);
 
   const metrics = (await getAttr(
     classifierGroup,
-    "metrics"
+    "metrics",
   )) as string[] as Metric[];
 
   const optSettingsGroup = await getGroup(
     classifierGroup,
-    "optimizer_settings"
+    "optimizer_settings",
   );
 
   const { optimizationAlgorithm, learningRate, lossFunction, fitOptions } =
@@ -193,10 +192,10 @@ export const deserializeClassifierGroup = async (
 
   const preprocessOptionsGroup = await getGroup(
     classifierGroup,
-    "preprocess_options"
+    "preprocess_options",
   );
   const preprocessOptions = await deserializePreprocessOptionsGroup(
-    preprocessOptionsGroup
+    preprocessOptionsGroup,
   );
 
   return {

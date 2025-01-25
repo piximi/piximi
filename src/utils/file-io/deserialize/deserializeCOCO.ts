@@ -7,13 +7,13 @@ export const deserializeCOCOFile = async (
   existingImages: Array<ImageObject>,
   existingCategories: Array<Category>,
   existingKinds: Array<Kind>,
-  availableColors: Array<string> = []
+  availableColors: Array<string> = [],
 ) => {
   return deserializeCOCOFile_v02(
     cocoFile,
     existingImages,
     existingCategories,
     existingKinds,
-    availableColors
+    availableColors,
   );
 };

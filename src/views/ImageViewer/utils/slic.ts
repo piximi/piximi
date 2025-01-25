@@ -3,7 +3,7 @@ export const slic = (
   width: number,
   height: number,
   regionSize: number = 40,
-  minRegionSize?: number
+  minRegionSize?: number,
 ) => {
   if (!minRegionSize) {
     minRegionSize = (regionSize * regionSize) / 4;
@@ -35,12 +35,12 @@ export const slic = (
 
     const g = Math.pow(
       parseFloat(String(data[4 * i + 1])) * 0.00392156862,
-      gamma
+      gamma,
     );
 
     const b = Math.pow(
       parseFloat(String(data[4 * i + 2])) * 0.00392156862,
-      gamma
+      gamma,
     );
 
     xyz[i] = r * 0.488718 + g * 0.31068 + b * 0.200602;
@@ -191,7 +191,7 @@ export const slic = (
 
           const distance = Math.sqrt(
             appearance / parameters[region * 2] +
-              spatial / parameters[region * 2 + 1]
+              spatial / parameters[region * 2 + 1],
           );
 
           if (distance < distanceMap[y2 * imWidth + x2]) {

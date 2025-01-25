@@ -19,7 +19,7 @@ export const SortSelection = () => {
     dispatch(
       projectSlice.actions.setSortType_new({
         sortType: event.target.value as ThingSortKey,
-      })
+      }),
     );
   };
 

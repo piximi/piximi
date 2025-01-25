@@ -34,7 +34,7 @@ export const MeasurementsProvider = ({
 }) => {
   const [plotDetails, dispatch] = useReducer<ViewReducer>(
     plotViewReducer,
-    initialPlotView
+    initialPlotView,
   );
   const [measurementParameters, setMeasurementParameters] =
     useState<MeasurementDisplayParameters>({
@@ -46,7 +46,7 @@ export const MeasurementsProvider = ({
   useEffect(() => {
     setMeasurementParameters((measurementParameters) => {
       const measurementPlotOptions = formatChartItems(
-        measurementGroup.measurements
+        measurementGroup.measurements,
       );
       return { ...measurementParameters, measurementPlotOptions };
     });
