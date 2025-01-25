@@ -23,7 +23,7 @@ it("padToMatch", async () => {
     ],
   ]);
 
-  const profile = await tfProfile(() =>
+  const profile = await tf.profile(() =>
     padToMatch(sample, { width: 5, height: 5 }, "constant"),
   );
   const result = profile.result as Tensor3D;

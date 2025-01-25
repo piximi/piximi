@@ -138,21 +138,8 @@ export const useCreateMeasurementTable = () => {
   const [status, setStatus] = useState<LoadStatus>({ loading: false });
   const worker: Worker = useMemo(
     () =>
-      new Worker(new URL("./workers/prepareDataWorker.ts", import.meta.url), {
-        type: "module",
-      }),
+      new Worker(new URL("./workers/prepareDataWorker.ts", import.meta.url)),
     [],
-  );
-  const kindOptions = useMemo(
-    () =>
-      Object.values(kinds).reduce(
-        (optionsArray: { kindId: string; displayName: string }[], kind) => {
-          optionsArray.push({ kindId: kind.id, displayName: kind.displayName });
-          return optionsArray;
-        },
-        [],
-      ),
-    [kinds],
   );
   const {
     onClose: handleCloseTableDialog,

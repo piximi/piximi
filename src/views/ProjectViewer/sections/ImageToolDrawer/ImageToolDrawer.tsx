@@ -150,12 +150,31 @@ export const ImageToolDrawer = () => {
               key={`tool-drawer-${tool.name}`}
               tooltipLocation="left"
             >
-              {tool.name === "filters" ? (
-                <Badge color="primary" variant="dot" invisible={!filtersExist}>
-                  {tool.icon(
-                    activeTool === tool.name
-                      ? theme.palette.primary.dark
-                      : theme.palette.grey[400],
+              <ListItemButton
+                sx={{ flexGrow: 0 }}
+                onClick={() => {
+                  handleSelectTool(tool.name);
+                }}
+              >
+                <ListItemIcon>
+                  {tool.name === "filters" ? (
+                    <Badge
+                      color="primary"
+                      variant="dot"
+                      invisible={!filtersExist}
+                    >
+                      {tool.icon(
+                        activeTool === tool.name
+                          ? theme.palette.primary.dark
+                          : theme.palette.grey[400],
+                      )}
+                    </Badge>
+                  ) : (
+                    tool.icon(
+                      activeTool === tool.name
+                        ? theme.palette.primary.dark
+                        : theme.palette.grey[400],
+                    )
                   )}
                 </Badge>
               ) : (

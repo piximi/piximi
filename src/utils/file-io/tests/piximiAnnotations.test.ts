@@ -208,7 +208,7 @@ describe("serializes piximi project", () => {
           encodedMask: _encodedMask,
           bitDepth: _bitDepth,
           ...rest
-        /* eslint-enable @typescript-eslint/no-unused-vars */
+          /* eslint-enable @typescript-eslint/no-unused-vars */
         } = ob;
         return {
           ...rest,
