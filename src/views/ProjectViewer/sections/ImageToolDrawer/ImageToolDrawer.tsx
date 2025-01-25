@@ -163,14 +163,14 @@ export const ImageToolDrawer = () => {
                       {tool.icon(
                         activeTool === tool.name
                           ? theme.palette.primary.dark
-                          : theme.palette.grey[400]
+                          : theme.palette.grey[400],
                       )}
                     </Badge>
                   ) : (
                     tool.icon(
                       activeTool === tool.name
                         ? theme.palette.primary.dark
-                        : theme.palette.grey[400]
+                        : theme.palette.grey[400],
                     )
                   )}
                 </ListItemIcon>

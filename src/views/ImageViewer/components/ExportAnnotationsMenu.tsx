@@ -149,7 +149,7 @@ export const ExportAnnotationsMenu = ({
               images,
               annotations,
               annotationCategories,
-              objectKinds
+              objectKinds,
             );
 
             const data = new Blob([JSON.stringify(piximiSerializedProject)], {
@@ -164,7 +164,7 @@ export const ExportAnnotationsMenu = ({
             const cocoSerializedProject = serializeCOCOFile(
               images,
               annotations,
-              annotationCategories
+              annotationCategories,
             );
 
             const blob = new Blob([JSON.stringify(cocoSerializedProject)], {
@@ -182,7 +182,7 @@ export const ExportAnnotationsMenu = ({
               annotationCategoryDict,
               userProjectName,
               zip,
-              exportType
+              exportType,
             );
             zip.generateAsync({ type: "blob" }).then((blob) => {
               saveAs(blob, `${userProjectName}.zip`);
@@ -213,7 +213,7 @@ export const ExportAnnotationsMenu = ({
       hasUnsavedChanges,
       handleOpenSaveChangesDialog,
       selectedImage,
-    ]
+    ],
   );
 
   return (

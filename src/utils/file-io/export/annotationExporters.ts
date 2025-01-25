@@ -30,7 +30,7 @@ type LMasksTiff = Record<
 const processAnnotation = (
   ann: AnnotationObject,
   images: Record<string, ImageObject>,
-  categories: Record<string, Category>
+  categories: Record<string, Category>,
 ) => {
   const image = images[ann.imageId];
   const imageShape = image.shape;
@@ -56,7 +56,7 @@ const processAnnotation = (
 const updateColors = (
   colors: { r: number; g: number; b: number },
   maskOptions: MaskOptions,
-  colorValues: string[]
+  colorValues: string[],
 ) => {
   if (maskOptions.random) {
     do {
@@ -81,7 +81,7 @@ export const exportAnnotationMasks = (
   projectName: string,
   zip: JSZip,
 
-  exportType: AnnotationExportType = AnnotationExportType.LabeledInstances
+  exportType: AnnotationExportType = AnnotationExportType.LabeledInstances,
 ) => {
   const utif = new TiffIO();
   let masks: LMasksTiff = {};
@@ -164,7 +164,7 @@ export const exportAnnotationMasks = (
         } else {
           if (!(categoryName in categoryColorMap[kind])) {
             categoryColorMap[kind][categoryName] = Object.keys(
-              categoryColorMap[kind]
+              categoryColorMap[kind],
             ).length;
           }
         }
@@ -268,7 +268,7 @@ export const exportAnnotationMasks = (
           : labelImage.planes;
         const { ifds, ifdBlockSize } = utif.generateIFDObject(
           ifdTemplate,
-          numIfds
+          numIfds,
         );
 
         const encoded = utif.encodeImage(labelImage.mask, ifds, ifdBlockSize);

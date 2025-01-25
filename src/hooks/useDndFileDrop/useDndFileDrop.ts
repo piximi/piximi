@@ -20,6 +20,6 @@ export const useDndFileDrop = (onDrop: (files: FileList) => void) => {
         isOver: monitor.isOver(),
       }),
     }),
-    [onDrop]
+    [onDrop],
   );
 };

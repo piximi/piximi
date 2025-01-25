@@ -54,7 +54,7 @@ export abstract class AnnotationTool extends Tool {
   }
 
   set boundingBox(
-    updatedBoundingBox: [number, number, number, number] | undefined
+    updatedBoundingBox: [number, number, number, number] | undefined,
   ) {
     this._boundingBox = updatedBoundingBox;
   }
@@ -104,7 +104,7 @@ export abstract class AnnotationTool extends Tool {
     this.decodedMask = maskFromPoints(
       this.points,
       { width: this.image.width, height: this.image.height },
-      this.boundingBox
+      this.boundingBox,
     );
   }
 
@@ -182,7 +182,7 @@ export abstract class AnnotationTool extends Tool {
   private isInBoundingBox(
     x: number,
     y: number,
-    boundingBox: [number, number, number, number]
+    boundingBox: [number, number, number, number],
   ) {
     if (x < 0 || y < 0) return false;
     if (x >= boundingBox[2] - boundingBox[0]) return false;
@@ -198,7 +198,7 @@ export abstract class AnnotationTool extends Tool {
    */
   public add(
     newEncodedMaskData: DataArray,
-    newBoundingBox: [number, number, number, number]
+    newBoundingBox: [number, number, number, number],
   ): [Uint8Array, [number, number, number, number]] {
     if (!this._decodedMask || !this._boundingBox)
       return [convertToDataArray(8, []) as Uint8Array, [0, 0, 0, 0]];
@@ -268,7 +268,7 @@ export abstract class AnnotationTool extends Tool {
    */
   public intersect(
     decodedMask1: DataArray,
-    boundingBox1: [number, number, number, number]
+    boundingBox1: [number, number, number, number],
   ): [Uint8Array, [number, number, number, number]] {
     if (!this._decodedMask || !this._boundingBox)
       return [convertToDataArray(8, []) as Uint8Array, [0, 0, 0, 0]];
@@ -343,7 +343,7 @@ export abstract class AnnotationTool extends Tool {
    */
   public invert(
     selectedMask: DataArray,
-    selectedBoundingBox: [number, number, number, number]
+    selectedBoundingBox: [number, number, number, number],
   ): [Uint8Array, [number, number, number, number]] {
     const encodedMask = selectedMask;
 
@@ -376,7 +376,7 @@ export abstract class AnnotationTool extends Tool {
           this.isInBoundingBox(
             x_encodedMask,
             y_encodedMask,
-            selectedBoundingBox
+            selectedBoundingBox,
           )
         ) {
           invertedMask.setPixelXY(x, y, [0]);
@@ -419,7 +419,7 @@ export abstract class AnnotationTool extends Tool {
    */
   public subtract(
     encodedMinuendData: DataArray,
-    minuendBoundingBox: [number, number, number, number]
+    minuendBoundingBox: [number, number, number, number],
   ): [Uint8Array, [number, number, number, number]] {
     if (!this._decodedMask || !this._boundingBox)
       return [convertToDataArray(8, []) as Uint8Array, [0, 0, 0, 0]];

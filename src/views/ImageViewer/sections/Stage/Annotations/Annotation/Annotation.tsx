@@ -46,8 +46,8 @@ export const Annotation = ({
         imageWidth,
         imageHeight,
         color,
-        1
-      )
+        1,
+      ),
     );
   }, [
     annotation.decodedMask,
@@ -111,7 +111,7 @@ export const Annotation = ({
     dispatch(
       annotatorSlice.actions.editThings({
         updates: [tempUpdated],
-      })
+      }),
     );
   };
 

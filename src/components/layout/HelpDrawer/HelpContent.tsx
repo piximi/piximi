@@ -65,14 +65,14 @@ export const HelpContent = (helpContent: Array<HelpTopic>) => {
                               </Typography>
                             </Box>
                           );
-                        }
+                        },
                       )}
                       {subtopicIndex < helpContent.subtopics.length - 1 && (
                         <Divider sx={{ my: 2 }} />
                       )}
                     </Box>
                   );
-                }
+                },
               )}
             </Container>
           </CollapsibleList>

@@ -25,7 +25,7 @@ type CategoryItemProps = {
   selectCategory: (category: Category) => void;
   handleOpenCategoryMenu: (
     event: React.MouseEvent<HTMLButtonElement>,
-    category: Category
+    category: Category,
   ) => void;
 };
 

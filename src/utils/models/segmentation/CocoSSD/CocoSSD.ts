@@ -68,16 +68,16 @@ export class CocoSSD extends Segmenter {
   public loadTraining(_images: ImageObject[], _preprocessingArgs: any): void {}
   public loadValidation(
     _images: ImageObject[],
-    _preprocessingArgs: any
+    _preprocessingArgs: any,
   ): void {}
 
   public loadInference(
     images: ImageObject[],
-    preprocessingArgs: LoadInferenceDataArgs
+    preprocessingArgs: LoadInferenceDataArgs,
   ) {
     this._inferenceDataset = preprocessInference(
       images,
-      preprocessingArgs.fitOptions
+      preprocessingArgs.fitOptions,
     );
 
     if (preprocessingArgs.kinds) {

@@ -13,7 +13,7 @@ type OptimizerSettingsGridProps = {
   compileOptions: CompileOptions;
   dispatchLossFunctionCallback: (lossFunction: LossFunction) => void;
   dispatchOptimizationAlgorithmCallback: (
-    optimizationAlgorithm: OptimizationAlgorithm
+    optimizationAlgorithm: OptimizationAlgorithm,
   ) => void;
   dispatchLearningRateCallback: (learningRate: number) => void;
   fitOptions: FitOptions;

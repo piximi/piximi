@@ -28,7 +28,7 @@ const validNeighbours = (
   x: number,
   y: number,
   height: number,
-  width: number
+  width: number,
 ) => {
   const xoffsets = [0];
   const yoffsets = [0];
@@ -65,7 +65,7 @@ export const fromIdxToCoord = (idx: number, width: number) => {
 export const makeGraph = (
   edges: Uint8ClampedArray | DataArray,
   height: number,
-  width: number
+  width: number,
 ) => {
   const graph: any = createGraph();
   graph.fromId = -1;
@@ -95,7 +95,7 @@ export const makeGraph = (
 export const createPathFinder = (
   graph: PiximiGraph,
   width: number,
-  factor: number
+  factor: number,
 ) => {
   return cachedAStarPathSearch(graph, width, factor);
 };

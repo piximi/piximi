@@ -23,7 +23,7 @@ export function useLocalGlobalState<StateType, PayloadType>(
     payload: PayloadType;
     type: string;
   },
-  defaultStateValue: StateType
+  defaultStateValue: StateType,
 ) {
   const globalState = useSelector(selector);
   const dispatch = useDispatch();
