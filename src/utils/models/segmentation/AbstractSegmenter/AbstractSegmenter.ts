@@ -81,9 +81,9 @@ export abstract class Segmenter extends Model {
     // if that failed, and we have a graph, check the model signature
     if (outputShape === undefined && this.graph) {
       outputShape = // @ts-ignore TFJS doesn't expose these types
-      this._model.modelSignature?.outputs?.output?.tensorShape?.dim?.map(
-        (dimShapeObj: any) => parseInt(dimShapeObj.size),
-      );
+        this._model.modelSignature?.outputs?.output?.tensorShape?.dim?.map(
+          (dimShapeObj: any) => parseInt(dimShapeObj.size),
+        );
     }
 
     // idx 0 is the batch dim
