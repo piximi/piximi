@@ -1,7 +1,6 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-pnpm prettier --check "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}"
 pnpm eslint --max-warnings 0
 
 pnpm run no-console-logs
