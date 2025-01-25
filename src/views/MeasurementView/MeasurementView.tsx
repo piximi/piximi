@@ -27,13 +27,13 @@ export const MeasurementView = () => {
     dispatch(
       applicationSettingsSlice.actions.registerHotkeyContext({
         context: HotkeyContext.MeasurementsView,
-      })
+      }),
     );
     return () => {
       dispatch(
         applicationSettingsSlice.actions.unregisterHotkeyContext({
           context: HotkeyContext.MeasurementsView,
-        })
+        }),
       );
     };
   }, [dispatch]);
@@ -43,7 +43,7 @@ export const MeasurementView = () => {
       dispatch(
         measurementsSlice.actions.updateChannelOptions({
           numChannels: projectImageChannels,
-        })
+        }),
       );
     }
   }, [projectImageChannels, dispatch]);

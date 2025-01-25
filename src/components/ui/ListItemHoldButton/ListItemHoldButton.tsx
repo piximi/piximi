@@ -54,7 +54,7 @@ export const ListItemHoldButton = ({
       sx={(theme) => ({
         backgroundImage: `linear-gradient(to right, ${alpha(
           theme.palette.primary.main,
-          0.3
+          0.3,
         )} ${loadPercent}%, rgba(255,255,255,0) 1%)`,
       })}
     >

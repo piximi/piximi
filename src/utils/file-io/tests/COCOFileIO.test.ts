@@ -55,7 +55,7 @@ beforeAll(async () => {
       partition: _partition,
       colors: _colors,
       ...buildImage
-    /* eslint-enable @typescript-eslint/no-unused-vars */
+      /* eslint-enable @typescript-eslint/no-unused-vars */
     } = image;
     const imPath = imDataMap[image.name];
     const imFile = await fileFromPath(imPath, "image/jpeg");

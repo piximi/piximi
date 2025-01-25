@@ -26,18 +26,18 @@ export const Annotations = ({ annotationTool }: AnnotationsProps) => {
     () =>
       annotationObjects.filter(
         (annObj) =>
-          annObj.annotation.id !== workingAnnotationObject?.annotation.id
+          annObj.annotation.id !== workingAnnotationObject?.annotation.id,
       ),
-    [annotationObjects, workingAnnotationObject]
+    [annotationObjects, workingAnnotationObject],
   );
 
   const nonWorkingSelectedAnnotationsIds = useMemo(
     () =>
       selectedAnnotationsIds.filter(
         (selectedAnnotationId) =>
-          selectedAnnotationId !== workingAnnotationObject?.annotation.id
+          selectedAnnotationId !== workingAnnotationObject?.annotation.id,
       ),
-    [selectedAnnotationsIds, workingAnnotationObject]
+    [selectedAnnotationsIds, workingAnnotationObject],
   );
 
   return (
@@ -50,7 +50,7 @@ export const Annotations = ({ annotationTool }: AnnotationsProps) => {
           fillColor={annotationObject.fillColor}
           selected={true}
           isFiltered={imageViewerFilters.categoryId.includes(
-            annotationObject.annotation.categoryId
+            annotationObject.annotation.categoryId,
           )}
         />
       ))}

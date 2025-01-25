@@ -181,7 +181,7 @@ it("predict", async () => {
       "mnist",
       undefined,
       inputShape.planes,
-      inputShape.channels
+      inputShape.channels,
     );
     inferrenceImages.push({ ...loadedIm, ...im });
     imageIds.push(im.id);
@@ -191,20 +191,20 @@ it("predict", async () => {
   const path = require("path");
 
   const jsonFileBuffer = fs.readFileSync(
-    path.join(__dirname, "mnist_classifier.json")
+    path.join(__dirname, "mnist_classifier.json"),
   );
 
   const weightsFileBuffer = fs.readFileSync(
-    path.join(__dirname, "mnist_classifier.weights.bin")
+    path.join(__dirname, "mnist_classifier.weights.bin"),
   );
 
   const jsonFile = new File(
     [new Blob([new Uint8Array(jsonFileBuffer)])],
-    "mnist_classifier.json"
+    "mnist_classifier.json",
   );
   const weightsFile = new File(
     [new Blob([new Uint8Array(weightsFileBuffer)])],
-    "mnist_classifier.weights.bin"
+    "mnist_classifier.weights.bin",
   );
 
   const model = new UploadedClassifier({
@@ -294,7 +294,7 @@ it("predict", async () => {
     const resultCategoryId = categoryIds[i];
 
     const expectedIdx = expectedImageIds.findIndex(
-      (id) => id === resultImageId
+      (id) => id === resultImageId,
     );
 
     expect(resultCategoryId).toStrictEqual(expectedCategoryIds[expectedIdx]);

@@ -58,7 +58,7 @@ export class EllipticalAnnotationTool extends AnnotationTool {
     const r = (
       theta: number,
       a: number = this.radius!.x,
-      b: number = this.radius!.y
+      b: number = this.radius!.y,
     ) => {
       return (
         (a * b) /

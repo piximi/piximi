@@ -31,12 +31,12 @@ export const PretrainedModelSelector = ({
     return values.map((value, idx) => ({ label: value.name, id: idx }));
   }, [values]);
   const [selectedModel, setSelectedModel] = useState<ModelOptionType | null>(
-    modelOptions[+initModel] ?? null
+    modelOptions[+initModel] ?? null,
   );
 
   const handlePreTrainedModelChange = (
     event: React.SyntheticEvent<Element, Event>,
-    newValue: ModelOptionType | null
+    newValue: ModelOptionType | null,
   ) => {
     setSelectedModel(newValue ? modelOptions[newValue.id] : null);
     setModel(newValue ? values[newValue.id] : undefined);

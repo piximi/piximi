@@ -28,15 +28,15 @@ export const MeasurementsTree = ({
 }) => {
   const dispatch = useDispatch();
   const selectedMeasurements = useSelector(selectSelectedGroupMeasurements)(
-    group.id
+    group.id,
   );
   const measurementData = useSelector(selectMeasurementData);
   const measurementWorker: Worker = useMemo(
     () =>
       new Worker(
-        new URL("../../workers/measurementWorker.ts", import.meta.url)
+        new URL("../../workers/measurementWorker.ts", import.meta.url),
       ),
-    []
+    [],
   );
 
   const handleSelect = (event: React.SyntheticEvent, itemIds: string[]) => {
@@ -51,7 +51,7 @@ export const MeasurementsTree = ({
       updates,
       itemId,
       group.measurementStates,
-      updatedSelectionState
+      updatedSelectionState,
     );
 
     const activeMeasurements = prepareActiveMeasurements(updates);
@@ -68,7 +68,7 @@ export const MeasurementsTree = ({
       measurementsSlice.actions.updateGroupMeasurementState({
         groupId: group.id,
         updates,
-      })
+      }),
     );
   };
 
@@ -78,7 +78,7 @@ export const MeasurementsTree = ({
         e: MessageEvent<
           | { data: Record<string, Record<string, number>>; loadValue?: number }
           | { loadValue: number; data?: Record<string, Record<string, number>> }
-        >
+        >,
       ) => {
         if (e.data.loadValue) {
           setMeasurementStatus({ loading: true, value: e.data.loadValue });
@@ -89,7 +89,7 @@ export const MeasurementsTree = ({
             dispatch(
               measurementsSlice.actions.updateMeasurements({
                 measurementsDict: e.data.data,
-              })
+              }),
             );
           }
         }
@@ -110,7 +110,7 @@ export const MeasurementsTree = ({
 };
 
 const prepareActiveMeasurements = (
-  updatedMeasurements: RecursivePartial<MeasurementOptions>
+  updatedMeasurements: RecursivePartial<MeasurementOptions>,
 ) => {
   const activeMeasurements = Object.entries(updatedMeasurements).reduce(
     (active: string[], measurement) => {
@@ -119,7 +119,7 @@ const prepareActiveMeasurements = (
       }
       return active;
     },
-    []
+    [],
   );
 
   return activeMeasurements;

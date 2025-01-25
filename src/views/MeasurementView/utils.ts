@@ -20,7 +20,7 @@ export const format = (value: string | number, sf: number = 2) => {
 };
 
 export const formatChartItems = (
-  measurementTables: Record<string, MeasurementDisplayTable>
+  measurementTables: Record<string, MeasurementDisplayTable>,
 ): ChartValues => {
   const items: ChartValues = {};
   const measurementData = Object.values(measurementTables);
@@ -41,7 +41,7 @@ export const formatChartItems = (
 
 export const getHistogramData = (
   rawData: number[],
-  numBins: number
+  numBins: number,
 ):
   | { data: number[]; xAxis: number[]; binSize: number; min: number }
   | undefined => {
@@ -80,7 +80,7 @@ export const selectTreeItemChildren = (
   updates: RecursivePartial<MeasurementOptions>,
   itemId: string,
   items: MeasurementOptions,
-  selectionState: "on" | "off"
+  selectionState: "on" | "off",
 ) => {
   const dataItem = items[itemId];
   if (dataItem) {
@@ -110,7 +110,7 @@ export const prepareThingData = async (thingData: {
     const fullChannelData = prepareChannels(thingData.data);
     channelData = await getObjectMaskData(
       fullChannelData,
-      thingData.decodedMask
+      thingData.decodedMask,
     );
     fullChannelData.dispose();
     maskData = thingData.decodedMask;

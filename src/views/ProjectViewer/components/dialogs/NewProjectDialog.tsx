@@ -31,7 +31,7 @@ export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
     dispatch(
       projectSlice.actions.createNewProject({
         name: projectName,
-      })
+      }),
     );
     dispatch(dataSlice.actions.resetData());
   };

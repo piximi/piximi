@@ -38,7 +38,7 @@ export const selectPlotData = createSelector(
     });
 
     return parsedMeasurementData;
-  }
+  },
 );
 
 export const selectGroupMeasurementDisplayData = createSelector(
@@ -74,7 +74,7 @@ export const selectGroupMeasurementDisplayData = createSelector(
                   }
                   return ids;
                 },
-                []
+                [],
               );
 
               if (splitThings.length === 0) {
@@ -89,7 +89,7 @@ export const selectGroupMeasurementDisplayData = createSelector(
               } else {
                 const measuredValues = splitThings.map(
                   (thingId) =>
-                    measurementData[thingId].measurements[measurement.id]
+                    measurementData[thingId].measurements[measurement.id],
                 );
                 const stats = getStatistics(measuredValues);
 
@@ -116,7 +116,7 @@ export const selectGroupMeasurementDisplayData = createSelector(
     });
 
     return rGroups;
-  }
+  },
 );
 
 const getSplitType = (split: MeasurementOption) => {

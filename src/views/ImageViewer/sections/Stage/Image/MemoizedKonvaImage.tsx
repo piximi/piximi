@@ -28,5 +28,5 @@ export const MemoizedKonvaImage = memo(
         key={props.idx}
       />
     );
-  })
+  }),
 );

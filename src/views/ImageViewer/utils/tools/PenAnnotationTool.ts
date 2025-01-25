@@ -91,7 +91,7 @@ export class PenAnnotationTool extends AnnotationTool {
         this.brushSize,
         0,
         Math.PI * 2,
-        true
+        true,
       );
       ctx.fill();
     });

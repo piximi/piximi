@@ -83,7 +83,7 @@ export async function loadGlas() {
         modelWeights3,
         modelWeights4,
         modelWeights5,
-      ])
+      ]),
     );
 
     return model;

@@ -50,10 +50,10 @@ export const ImageViewer = () => {
             description: error.message,
             stackTrace: stackTrace,
           },
-        })
+        }),
       );
     },
-    [dispatch]
+    [dispatch],
   );
 
   const handleUncaughtRejection = useCallback(
@@ -67,10 +67,10 @@ export const ImageViewer = () => {
             description: String(e.reason.message),
             stackTrace: String(e.reason.stack),
           },
-        })
+        }),
       );
     },
-    [dispatch]
+    [dispatch],
   );
 
   useEffect(() => {
@@ -90,13 +90,13 @@ export const ImageViewer = () => {
     dispatch(
       applicationSettingsSlice.actions.registerHotkeyContext({
         context: HotkeyContext.AnnotatorView,
-      })
+      }),
     );
     return () => {
       dispatch(
         applicationSettingsSlice.actions.unregisterHotkeyContext({
           context: HotkeyContext.AnnotatorView,
-        })
+        }),
       );
     };
   }, [dispatch, routerLocation.state]);

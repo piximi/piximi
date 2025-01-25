@@ -36,7 +36,7 @@ const N_PIXEL_NEIGHBOR = 8;
 export function padMask(
   unpaddedMask: Array<number> | Uint8Array | Uint8ClampedArray,
   unPaddedWidth: number,
-  unPaddedHeight: number
+  unPaddedHeight: number,
 ): MaskData {
   const paddedWidth = unPaddedWidth + 2;
   const paddedHeight = unPaddedHeight + 2;
@@ -109,7 +109,7 @@ function neighborCoordToIdx(
   baseI: number,
   baseJ: number,
   neighborI: number,
-  neighborJ: number
+  neighborJ: number,
 ) {
   const di = neighborI - baseI;
   const dj = neighborJ - baseJ;
@@ -148,7 +148,7 @@ function logNeighbors(
   baseJ: number,
   startIdx: number,
   offset: number,
-  logMessage?: string
+  logMessage?: string,
 ) {
   const neighborVals: Array<string | number> = [
     "_",
@@ -179,7 +179,7 @@ function logNeighbors(
       neighborVals[4]
     }| ${fij.get(baseI, baseJ)} |${neighborVals[0]}|\n|${neighborVals[5]}|${
       neighborVals[6]
-    }|${neighborVals[7]}|`
+    }|${neighborVals[7]}|`,
   );
 }
 
@@ -207,7 +207,7 @@ function ccwNon0(
   baseJ: number,
   neighborI: number,
   neighborJ: number,
-  offset: number
+  offset: number,
 ) {
   let rightExamined = false;
 
@@ -231,7 +231,7 @@ function ccwNon0(
       baseJ,
       startIdx,
       offset,
-      "ccw scan - nothing found"
+      "ccw scan - nothing found",
     );
   return { ij: null, rightExamined };
 }
@@ -255,7 +255,7 @@ function cwNon0(
   baseJ: number,
   neighborI: number,
   neighborJ: number,
-  offset: number
+  offset: number,
 ) {
   const startIdx = neighborCoordToIdx(baseI, baseJ, neighborI, neighborJ);
   for (let ccwIdx = 0; ccwIdx < N_PIXEL_NEIGHBOR; ccwIdx++) {
@@ -450,7 +450,7 @@ export const findContours = (F: MaskData, width: number, height: number) => {
         jRaster,
         i2CwStart,
         j2CwStart,
-        0
+        0,
       );
       if (i1j1 === null) {
         fij.set(iRaster, jRaster, -NBD);
@@ -481,13 +481,13 @@ export const findContours = (F: MaskData, width: number, height: number) => {
           j3CurrStep,
           i2PrevStep,
           j2PrevStep,
-          1
+          1,
         );
 
         if (i4j4 === null) {
           import.meta.env.NODE_ENV !== "production" &&
             console.warn(
-              `i4j4 is invalid: i ${iRaster}, j ${jRaster}, i1 ${i1CwFound}, j1 ${j1CwFound}, i2 ${i2PrevStep}, j2 ${j2PrevStep}, i3 ${i3CurrStep}, j3 ${j3CurrStep}, i4j4j ${i4j4}`
+              `i4j4 is invalid: i ${iRaster}, j ${jRaster}, i1 ${i1CwFound}, j1 ${j1CwFound}, i2 ${i2PrevStep}, j2 ${j2PrevStep}, i3 ${i3CurrStep}, j3 ${j3CurrStep}, i4j4j ${i4j4}`,
             );
           // break;
         }
@@ -509,7 +509,7 @@ export const findContours = (F: MaskData, width: number, height: number) => {
             i3CurrStep,
             j3CurrStep,
             // B.isHole to account for donut, see find-contours.test.ts
-            rightExamined || B.isHole ? -NBD : NBD
+            rightExamined || B.isHole ? -NBD : NBD,
           );
 
           // (3.4-b) If the pixel (i3, j3 + 1) is not a O-pixel examined

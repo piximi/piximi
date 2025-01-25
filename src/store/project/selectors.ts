@@ -112,7 +112,7 @@ export const selectUnfilteredActivePartitions = createSelector(
     const allPartitions = Object.values(Partition);
     const unfilteredPartitions = difference(allPartitions, filteredPartitions);
     return unfilteredPartitions;
-  }
+  },
 );
 
 export const selectKindTabFilters = ({

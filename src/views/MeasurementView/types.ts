@@ -39,7 +39,7 @@ export type PlotViewActionProps =
 
 export type ViewReducer = (
   prevState: PlotDetails,
-  action: PlotViewActionProps
+  action: PlotViewActionProps,
 ) => PlotDetails;
 
 export type SplitType = keyof Pick<

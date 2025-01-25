@@ -10,7 +10,7 @@ export const serializePiximiAnnotations = (
   images: Array<ImageObject>,
   annotations: Array<AnnotationObject>,
   categories: Array<Category>,
-  kinds: Array<Kind>
+  kinds: Array<Kind>,
 ) => {
   const piximiVersion = import.meta.env.VITE_APP_VERSION;
 

@@ -239,14 +239,14 @@ export class TiffIO {
       // Read the type of the first tag to check for errors
       const typ = bin.readUshort(
         data,
-        ifdo + TIFF_OFFSETS.ifd.numFields + TIFF_OFFSETS.field.tagID
+        ifdo + TIFF_OFFSETS.ifd.numFields + TIFF_OFFSETS.field.tagID,
       );
 
       // Check for errors in the first tag and type
       if (cnt !== 0)
         if (typ < 1 || 13 < typ) {
           logger(
-            `error in TIFF -- tag: ${_tag} -- count: ${cnt} -- type: ${typ}`
+            `error in TIFF -- tag: ${_tag} -- count: ${cnt} -- type: ${typ}`,
           );
           break;
         }
@@ -304,8 +304,8 @@ export class TiffIO {
             (arr as any[]).push(
               bin.readUshort(
                 data,
-                (count < 3 ? inner_offset - 4 : voff) + 2 * j
-              )
+                (count < 3 ? inner_offset - 4 : voff) + 2 * j,
+              ),
             );
         }
         if (type === 4 || type === 13) {
@@ -313,7 +313,7 @@ export class TiffIO {
 
           for (let j = 0; j < count; j++)
             (arr as any[]).push(
-              bin.readUint(data, (count < 2 ? inner_offset - 4 : voff) + 4 * j)
+              bin.readUint(data, (count < 2 ? inner_offset - 4 : voff) + 4 * j),
             );
         }
         if (type === 5 || type === 10) {
@@ -331,7 +331,10 @@ export class TiffIO {
 
           for (let j = 0; j < count; j++)
             (arr as any[]).push(
-              bin.readShort(data, (count < 3 ? inner_offset - 4 : voff) + 2 * j)
+              bin.readShort(
+                data,
+                (count < 3 ? inner_offset - 4 : voff) + 2 * j,
+              ),
             );
         }
         if (type === 9) {
@@ -339,7 +342,7 @@ export class TiffIO {
 
           for (let j = 0; j < count; j++)
             (arr as any[]).push(
-              bin.readInt(data, (count < 2 ? inner_offset - 4 : voff) + 4 * j)
+              bin.readInt(data, (count < 2 ? inner_offset - 4 : voff) + 4 * j),
             );
         }
         if (type === 11) {
@@ -426,19 +429,19 @@ export class TiffIO {
       h: number;
       channels: number;
       metadata: Partial<IFD>;
-    }
+    },
   ): ArrayBuffer;
   public encodeImage(
     imageData: Uint8Array | Uint16Array,
     ifds: IFD[],
-    ifdBlockSize: number
+    ifdBlockSize: number,
   ): ArrayBuffer;
   public encodeImage(
     imageData: Uint8Array | Uint16Array,
     ifdsOrInfo:
       | IFD[]
       | { w: number; h: number; channels: number; metadata: Partial<IFD> },
-    ifdBlockSize?: number
+    ifdBlockSize?: number,
   ): ArrayBuffer {
     // Initialize IFDs array and set default IFD block size if not provided
     let ifds: IFD[] = [];
@@ -555,7 +558,7 @@ export class TiffIO {
     types: typeof tagType.basic | typeof tagType.gps,
     data: Uint8Array,
     offset: number,
-    ifd: IFD
+    ifd: IFD,
   ): [number, number] {
     // Count the number of entries, excluding exifIFD and gpsiIFD
     const keys = Object.keys(ifd);
@@ -593,7 +596,7 @@ export class TiffIO {
           types,
           data,
           eoff,
-          ifd["exifIFD"] as IFD
+          ifd["exifIFD"] as IFD,
         );
         val = [eoff];
         eoff = outp[1];
@@ -606,7 +609,7 @@ export class TiffIO {
           tagType.gps,
           data,
           eoff,
-          ifd["gpsiIFD"] as IFD
+          ifd["gpsiIFD"] as IFD,
         );
         val = [eoff];
         eoff = outp[1];

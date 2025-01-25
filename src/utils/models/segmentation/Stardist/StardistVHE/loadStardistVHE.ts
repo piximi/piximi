@@ -29,7 +29,7 @@ export async function loadStardistVHE() {
       [JSON.stringify(Stardist2DBrightfieldModel)],
       {
         type: "application/json",
-      }
+      },
     );
     modelDescription = new File([model_desc_blob], "model.json", {
       type: "application/json",
@@ -56,7 +56,7 @@ export async function loadStardistVHE() {
 
   try {
     const model = await loadGraphModel(
-      io.browserFiles([modelDescription, modelWeights1, modelWeights2])
+      io.browserFiles([modelDescription, modelWeights1, modelWeights2]),
     );
 
     return model;

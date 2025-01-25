@@ -17,34 +17,40 @@ import { AnnotationObject, Category, ImageObject } from "store/data/types";
 export const serializeCOCOFile = (
   images: Array<ImageObject>,
   annotations: Array<AnnotationObject>,
-  categories: Array<Category>
+  categories: Array<Category>,
 ): SerializedCOCOFileType => {
   let imCount = 0;
   let catCount = 0;
   let annCount = 0;
 
-  const imIdMap = images.reduce((idMap, im) => {
-    idMap[im.id] = {
-      id: imCount++,
-      width: im.shape.width,
-      height: im.shape.height,
-      file_name: im.name,
-      license: 0,
-      flickr_url: "",
-      coco_url: "",
-      date_captured: "",
-    };
-    return idMap;
-  }, {} as { [internalImageId: string]: SerializedCOCOImageType });
+  const imIdMap = images.reduce(
+    (idMap, im) => {
+      idMap[im.id] = {
+        id: imCount++,
+        width: im.shape.width,
+        height: im.shape.height,
+        file_name: im.name,
+        license: 0,
+        flickr_url: "",
+        coco_url: "",
+        date_captured: "",
+      };
+      return idMap;
+    },
+    {} as { [internalImageId: string]: SerializedCOCOImageType },
+  );
 
-  const catIdMap = categories.reduce((idMap, cat) => {
-    idMap[cat.id] = {
-      id: catCount++,
-      name: cat.name,
-      supercategory: cat.kind,
-    };
-    return idMap;
-  }, {} as { [internalCategoryId: string]: SerializedCOCOCategoryType });
+  const catIdMap = categories.reduce(
+    (idMap, cat) => {
+      idMap[cat.id] = {
+        id: catCount++,
+        name: cat.name,
+        supercategory: cat.kind,
+      };
+      return idMap;
+    },
+    {} as { [internalCategoryId: string]: SerializedCOCOCategoryType },
+  );
 
   const serializedAnnotations: Array<SerializedCOCOAnnotationType> = [];
 
@@ -63,7 +69,7 @@ export const serializeCOCOFile = (
       throw new Error(
         `Could not determine contours of annotation belonging to image ${
           imIdMap[ann.imageId].file_name
-        }`
+        }`,
       );
     }
 

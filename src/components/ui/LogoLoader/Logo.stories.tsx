@@ -25,7 +25,7 @@ const Controller = ({
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: newStatus,
-      })
+      }),
     );
   };
 
@@ -51,7 +51,7 @@ const Controller = ({
               flipLoad(
                 modelStatus === ModelStatus.Predicting
                   ? ModelStatus.Trained
-                  : ModelStatus.Predicting
+                  : ModelStatus.Predicting,
               )
             }
           >

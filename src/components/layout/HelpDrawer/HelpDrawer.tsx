@@ -40,7 +40,7 @@ export const HelpDrawer = () => {
           description: error.name + ": " + error.message,
           stackTrace: info.componentStack,
         },
-      })
+      }),
     );
   };
 

@@ -109,7 +109,7 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
 
     if (prediction) {
       const clamped: Uint8ClampedArray = await browser.toPixels(
-        prediction as Tensor3D
+        prediction as Tensor3D,
       );
       // .then(async (clamped) => {
       this.output = new ImageJS.Image({

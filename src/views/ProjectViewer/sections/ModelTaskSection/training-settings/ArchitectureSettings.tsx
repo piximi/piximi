@@ -54,7 +54,7 @@ export const ArchitectureSettings = ({
     useState<string>("");
 
   const [clearDialogText, setClearDialogText] = useState(
-    `Keep ${selectedModel.model.name} training history?`
+    `Keep ${selectedModel.model.name} training history?`,
   );
 
   const {
@@ -90,7 +90,7 @@ export const ArchitectureSettings = ({
     if (selectedModel.model.requiredChannels) {
       setFixedNumberOfChannels(true);
       setFixedNumberOfChannelsHelperText(
-        `${selectedModel.model.name} requires ${selectedModel.model.requiredChannels} channels!`
+        `${selectedModel.model.name} requires ${selectedModel.model.requiredChannels} channels!`,
       );
     } else {
       setFixedNumberOfChannels(false);

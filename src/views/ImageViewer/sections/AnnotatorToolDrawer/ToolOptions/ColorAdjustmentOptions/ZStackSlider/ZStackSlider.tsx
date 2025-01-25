@@ -26,7 +26,7 @@ export const ZStackSlider = () => {
               src: renderedSrcs[newValue],
             },
           ],
-        })
+        }),
       );
     }
   };

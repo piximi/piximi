@@ -94,7 +94,7 @@ export const CloudUpload = ({
       setSuccessMessage(
         `Successfully uploaded Classification ${
           isGraph ? "Graph" : "Layers"
-        } Model ("${model.name}")`
+        } Model ("${model.name}")`,
       );
     } else {
       // TODO - segmenter

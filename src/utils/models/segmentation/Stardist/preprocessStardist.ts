@@ -5,7 +5,7 @@ import { OldImageType, ImageObject } from "store/data/types";
 
 const sampleGenerator = (
   images: Array<OldImageType>,
-  padVals: Array<{ padX: number; padY: number }>
+  padVals: Array<{ padX: number; padY: number }>,
 ) => {
   const count = images.length;
 
@@ -42,7 +42,7 @@ const padImage = (image: {
           height: image.data.shape[0] + image.padY,
           width: image.data.shape[1] + image.padX,
         },
-        "reflect"
+        "reflect",
       );
 
       // image.data disposed by padToMatch, and would be disposed by tf anyway
@@ -59,7 +59,7 @@ const padImage = (image: {
 export const preprocessStardist = (
   images: Array<ImageObject>,
   batchSize: number,
-  dataDims: Array<{ padX: number; padY: number }>
+  dataDims: Array<{ padX: number; padY: number }>,
 ) => {
   return tfdata
     .generator(sampleGenerator(images, dataDims))

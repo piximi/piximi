@@ -16,7 +16,7 @@ const expectRotationInvariantPoints = (actualPoints: Array<Point>) => {
       const numActual = actualPoints.length;
 
       const startingPointIdx = actualPoints.findIndex(
-        (p) => p.y === expectedPoints[0].y && p.x === expectedPoints[0].x
+        (p) => p.y === expectedPoints[0].y && p.x === expectedPoints[0].x,
       );
 
       expect(startingPointIdx).toBeGreaterThanOrEqual(0);
@@ -67,7 +67,7 @@ test("single point", () => {
   const contours = findContours(
     paddedSinglePoint,
     unpaddedW + 2,
-    unpaddedH + 2
+    unpaddedH + 2,
   );
 
   expect(contours.length).toBe(1);
@@ -77,7 +77,7 @@ test("single point", () => {
   expect(contours[0].parent).toBe(1);
 
   expectRotationInvariantPoints(contours[0].points).toStrictEqual(
-    expectedPoints
+    expectedPoints,
   );
 });
 
@@ -131,7 +131,7 @@ test("find single contour of simple circle", () => {
   const contours = findContours(
     paddedSimpleCircle,
     unpaddedW + 2,
-    unpaddedH + 2
+    unpaddedH + 2,
   );
 
   expect(contours.length).toBe(1);
@@ -141,7 +141,7 @@ test("find single contour of simple circle", () => {
   expect(contours[0].parent).toBe(1);
 
   expectRotationInvariantPoints(contours[0].points).toStrictEqual(
-    expectedPoints
+    expectedPoints,
   );
 });
 
@@ -217,7 +217,7 @@ test("find both contours of donut", () => {
   expect(contours[0].parent).toBe(1);
 
   expectRotationInvariantPoints(contours[0].points).toStrictEqual(
-    expectedOuterBorderPoints
+    expectedOuterBorderPoints,
   );
 
   expect(contours[1].isHole).toBe(true);
@@ -225,7 +225,7 @@ test("find both contours of donut", () => {
   expect(contours[1].parent).toBe(2);
 
   expectRotationInvariantPoints(contours[1].points).toStrictEqual(
-    exepectedHoleBorderPoints
+    exepectedHoleBorderPoints,
   );
 });
 
@@ -318,7 +318,7 @@ test("find all contours in complex mask", () => {
   expect(contours[0].parent).toBe(1);
 
   expectRotationInvariantPoints(contours[0].points).toStrictEqual(
-    expectedOuterMostBorderPoints
+    expectedOuterMostBorderPoints,
   );
 
   expect(contours[1].isHole).toBe(true);
@@ -326,7 +326,7 @@ test("find all contours in complex mask", () => {
   expect(contours[1].parent).toBe(2);
 
   expectRotationInvariantPoints(contours[1].points).toStrictEqual(
-    expectedHoleBorderPoints
+    expectedHoleBorderPoints,
   );
 
   expect(contours[2].isHole).toBe(false);
@@ -334,7 +334,7 @@ test("find all contours in complex mask", () => {
   expect(contours[2].parent).toBe(3);
 
   expectRotationInvariantPoints(contours[2].points).toStrictEqual(
-    expectedInnerIslandBorderPoints
+    expectedInnerIslandBorderPoints,
   );
 
   expect(contours[3].isHole).toBe(false);
@@ -342,7 +342,7 @@ test("find all contours in complex mask", () => {
   expect(contours[3].parent).toBe(1);
 
   expectRotationInvariantPoints(contours[3].points).toStrictEqual(
-    expectedOuterIslandBorderPoints
+    expectedOuterIslandBorderPoints,
   );
 });
 
@@ -431,7 +431,7 @@ test("find all contours in double border and single point island mask - donut pr
   expect(contours[0].parent).toBe(1);
 
   expectRotationInvariantPoints(contours[0].points).toStrictEqual(
-    expectedOuterMostBorderPoints
+    expectedOuterMostBorderPoints,
   );
 
   expect(contours[1].isHole).toBe(true);
@@ -439,7 +439,7 @@ test("find all contours in double border and single point island mask - donut pr
   expect(contours[1].parent).toBe(2);
 
   expectRotationInvariantPoints(contours[1].points).toStrictEqual(
-    expectedLeftHoleBorderPoints
+    expectedLeftHoleBorderPoints,
   );
 
   expect(contours[2].isHole).toBe(false);
@@ -447,7 +447,7 @@ test("find all contours in double border and single point island mask - donut pr
   expect(contours[2].parent).toBe(1);
 
   expectRotationInvariantPoints(contours[2].points).toStrictEqual(
-    expectedIslandPoints
+    expectedIslandPoints,
   );
 });
 
@@ -520,7 +520,7 @@ test.skip("find all contours in double border and single point island mask - don
   expect(contours[0].parent).toBe(1);
 
   expectRotationInvariantPoints(contours[0].points).toStrictEqual(
-    expectedOuterMostBorderPoints
+    expectedOuterMostBorderPoints,
   );
 
   expect(contours[1].isHole).toBe(true);
@@ -528,7 +528,7 @@ test.skip("find all contours in double border and single point island mask - don
   expect(contours[1].parent).toBe(2);
 
   expectRotationInvariantPoints(contours[1].points).toStrictEqual(
-    expectedLeftHoleBorderPoints
+    expectedLeftHoleBorderPoints,
   );
 
   expect(contours[2].isHole).toBe(true);
@@ -536,7 +536,7 @@ test.skip("find all contours in double border and single point island mask - don
   expect(contours[2].parent).toBe(2);
 
   expectRotationInvariantPoints(contours[2].points).toStrictEqual(
-    expectedRightHoleBorderPoints
+    expectedRightHoleBorderPoints,
   );
 
   expect(contours[3].isHole).toBe(false);
@@ -544,6 +544,6 @@ test.skip("find all contours in double border and single point island mask - don
   expect(contours[3].parent).toBe(1);
 
   expectRotationInvariantPoints(contours[3].points).toStrictEqual(
-    expectedIslandPoints
+    expectedIslandPoints,
   );
 });

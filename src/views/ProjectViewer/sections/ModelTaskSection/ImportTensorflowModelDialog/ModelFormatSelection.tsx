@@ -14,7 +14,7 @@ export const ModelFormatSelection = ({
   setIsGraph: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const handleModelFormatChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => setIsGraph(event.target.value === "Graph");
 
   return (

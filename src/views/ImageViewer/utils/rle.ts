@@ -22,7 +22,7 @@ export const decode = (encoded: Array<number>): Uint8ClampedArray => {
 };
 
 export const decodeAnnotation = (
-  encodedAnnotation: AnnotationObject
+  encodedAnnotation: AnnotationObject,
 ): DecodedAnnotationObject => {
   // TODO - serializtion: temporary measure, remove when done
   if (!encodedAnnotation.encodedMask)
@@ -45,7 +45,7 @@ export const decodeAnnotation = (
  */
 export const encode = (
   decoded: Uint8Array | Uint8ClampedArray | Uint16Array | Float32Array,
-  expectBinary: boolean = false
+  expectBinary: boolean = false,
 ): Array<number> => {
   let highVal: number;
 
@@ -56,8 +56,8 @@ export const encode = (
       decoded.constructor === Uint16Array
         ? 16
         : decoded.constructor === Float32Array
-        ? 32
-        : 8; // Uint8[Clamped]Array
+          ? 32
+          : 8; // Uint8[Clamped]Array
 
     highVal = 2 ** bitDepth - 1;
   }
@@ -94,7 +94,7 @@ export const encode = (
 };
 
 export const encodeAnnotation = (
-  decodedAnnotation: DecodedAnnotationObject
+  decodedAnnotation: DecodedAnnotationObject,
 ): AnnotationObject => {
   // TODO - serializtion: temporary measure, remove when done
   if (!decodedAnnotation.decodedMask)

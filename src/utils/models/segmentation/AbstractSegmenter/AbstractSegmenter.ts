@@ -31,7 +31,7 @@ export abstract class Segmenter extends Model {
   }
 
   public abstract predict(
-    loadCb?: LoadCB
+    loadCb?: LoadCB,
   ): OrphanedAnnotationObject[][] | Promise<OrphanedAnnotationObject[][]>;
 
   /*
@@ -80,11 +80,10 @@ export abstract class Segmenter extends Model {
 
     // if that failed, and we have a graph, check the model signature
     if (outputShape === undefined && this.graph) {
-      outputShape =
-        // @ts-ignore TFJS doesn't expose these types
-        this._model.modelSignature?.outputs?.output?.tensorShape?.dim?.map(
-          (dimShapeObj: any) => parseInt(dimShapeObj.size)
-        );
+      outputShape = // @ts-ignore TFJS doesn't expose these types
+      this._model.modelSignature?.outputs?.output?.tensorShape?.dim?.map(
+        (dimShapeObj: any) => parseInt(dimShapeObj.size),
+      );
     }
 
     // idx 0 is the batch dim
@@ -105,7 +104,7 @@ export abstract class Segmenter extends Model {
 
   public onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (
     _epochs,
-    _logs
+    _logs,
   ) => {};
 
   public get modelSummary() {
@@ -161,7 +160,7 @@ export abstract class Segmenter extends Model {
     }
 
     logger(
-      `Output Shape(s) are ${_outputShapes}, after replacing input dims ${variableDimIdxs} (excluding batch dims)`
+      `Output Shape(s) are ${_outputShapes}, after replacing input dims ${variableDimIdxs} (excluding batch dims)`,
     );
   }
 }

@@ -20,14 +20,14 @@ export const SegmenterDatasetListItem = ({
     dispatch(
       segmenterSlice.actions.updateSegmentationTrainingPercentage({
         trainingPercentage: trainPercentage,
-      })
+      }),
     );
   };
   const toggleShuffle = () => {
     dispatch(
       segmenterSlice.actions.updateShuffleOptions({
         shuffle: !shuffle,
-      })
+      }),
     );
   };
 

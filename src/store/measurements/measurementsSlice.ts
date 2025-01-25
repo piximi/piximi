@@ -30,7 +30,7 @@ export const measurementsSlice = createSlice({
 
     updateChannelOptions(
       state,
-      action: PayloadAction<{ numChannels: number }>
+      action: PayloadAction<{ numChannels: number }>,
     ) {
       const measurementOptions: MeasurementOptions = {};
       const channelOptions: MeasurementOptions = {};
@@ -63,7 +63,7 @@ export const measurementsSlice = createSlice({
         categories: Category[];
         thingIds: string[];
         numChannels?: number;
-      }>
+      }>,
     ) {
       const { kind, categories, thingIds, numChannels } = action.payload;
       const groupId = generateUUID();
@@ -153,17 +153,17 @@ export const measurementsSlice = createSlice({
       action: PayloadAction<{
         groupId: string;
         updates: RecursivePartial<MeasurementOptions>;
-      }>
+      }>,
     ) {
       const { groupId, updates } = action.payload;
       state.groups[groupId].measurementStates = merge(
         state.groups[groupId].measurementStates,
-        updates
+        updates,
       );
     },
     updateGroupName(
       state,
-      action: PayloadAction<{ groupId: string; newName: string }>
+      action: PayloadAction<{ groupId: string; newName: string }>,
     ) {
       state.groups[action.payload.groupId].name = action.payload.newName;
     },
@@ -172,12 +172,12 @@ export const measurementsSlice = createSlice({
       action: PayloadAction<{
         groupId: string;
         updates: RecursivePartial<MeasurementOptions>;
-      }>
+      }>,
     ) {
       const { groupId, updates } = action.payload;
       state.groups[groupId].splitStates = merge(
         state.groups[groupId].splitStates,
-        updates
+        updates,
       );
     },
     updateGroupSplitValues(
@@ -187,7 +187,7 @@ export const measurementsSlice = createSlice({
         remove?: string[];
 
         updates?: RecursivePartial<MeasurementOptions>;
-      }>
+      }>,
     ) {
       const { groupId, remove, updates } = action.payload;
       if (updates) {
@@ -196,12 +196,12 @@ export const measurementsSlice = createSlice({
           updates,
           (
             objValue: MeasurementOptions,
-            srcValue: RecursivePartial<MeasurementOptions>
+            srcValue: RecursivePartial<MeasurementOptions>,
           ) => {
             if (isArray(objValue)) {
               return srcValue;
             }
-          }
+          },
         );
       }
 
@@ -217,7 +217,7 @@ export const measurementsSlice = createSlice({
       action: PayloadAction<{
         groupId: string;
         thingIds: string[];
-      }>
+      }>,
     ) {
       const { groupId, thingIds } = action.payload;
       state.groups[groupId].thingIds = thingIds;
@@ -228,7 +228,7 @@ export const measurementsSlice = createSlice({
       action: PayloadAction<{
         dataDict?: ThingData;
         measurementsDict?: ThingMeasurements;
-      }>
+      }>,
     ) {
       const { dataDict, measurementsDict } = action.payload;
       if (dataDict) {
@@ -251,14 +251,14 @@ export const measurementsSlice = createSlice({
         for (const thingId in measurementsDict) {
           state.data[thingId].measurements = merge(
             state.data[thingId].measurements,
-            measurementsDict[thingId]
+            measurementsDict[thingId],
           );
         }
       }
     },
     removeThingMeasurements(
       state,
-      action: PayloadAction<{ thingIds: string[] }>
+      action: PayloadAction<{ thingIds: string[] }>,
     ) {
       action.payload.thingIds.forEach((id) => {
         delete state.data[id];
@@ -266,7 +266,7 @@ export const measurementsSlice = createSlice({
     },
     setUpToDate(
       state,
-      action: PayloadAction<{ groupId: string; upToDate: boolean }>
+      action: PayloadAction<{ groupId: string; upToDate: boolean }>,
     ) {
       state.groups[action.payload.groupId].upToDate = action.payload.upToDate;
     },
