@@ -118,12 +118,12 @@ export const selectClassifierHistory = createSelector(
         selectedHistory[k] = model.history.epochs;
       } else {
         selectedHistory[k] = fullHistory.flatMap(
-          (cycleHistory) => cycleHistory[k]
+          (cycleHistory) => cycleHistory[k],
         );
       }
     }
     return selectedHistory;
-  }
+  },
 );
 
 const selectedIdxSelector = ({ classifier }: { classifier: ClassifierState }) =>
@@ -134,7 +134,7 @@ export const selectClassifierSelectedModelIdx = createSelector(
   (idx) => ({
     idx,
     model: availableClassifierModels[idx],
-  })
+  }),
 );
 
 export const selectClassifierShuffleOptions = ({

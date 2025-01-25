@@ -91,7 +91,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
 
   private connected(
     position: Point,
-    threshold: number = 4
+    threshold: number = 4,
   ): boolean | undefined {
     if (!this.origin) return undefined;
 

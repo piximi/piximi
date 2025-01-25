@@ -11,7 +11,7 @@ import { HotkeyContext } from "utils/common/enums";
 
 export const SettingsListItem = () => {
   const { onClose, onOpen, open } = useDialogHotkey(
-    HotkeyContext.AppSettingsDialog
+    HotkeyContext.AppSettingsDialog,
   );
 
   return (

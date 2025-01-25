@@ -30,7 +30,7 @@ export abstract class Stardist extends Segmenter {
 
   public loadValidation(
     _images: ImageObject[],
-    _preprocessingArgs: any
+    _preprocessingArgs: any,
   ): void {}
 
   // This Stardist model requires image dimensions to be a multiple of 16
@@ -50,7 +50,7 @@ export abstract class Stardist extends Segmenter {
 
   public loadInference(
     images: ImageObject[],
-    preprocessingArgs: LoadInferenceDataArgs
+    preprocessingArgs: LoadInferenceDataArgs,
   ): void {
     this._inferenceDataDims = images.map((im) => {
       const { height, width } = im.shape;
@@ -61,13 +61,13 @@ export abstract class Stardist extends Segmenter {
     this._inferenceDataset = preprocessStardist(
       images,
       1,
-      this._inferenceDataDims
+      this._inferenceDataDims,
     );
 
     if (preprocessingArgs.kinds) {
       if (preprocessingArgs.kinds.length !== 1)
         throw Error(
-          `${this.name} Model only takes a single foreground category`
+          `${this.name} Model only takes a single foreground category`,
         );
       this._fgKind = preprocessingArgs.kinds[0];
     } else if (!this._fgKind) {
@@ -108,7 +108,7 @@ export abstract class Stardist extends Segmenter {
 
     if (!this._inferenceDataDims) {
       throw Error(
-        `"${this.name}" Model's inference data dimensions and padding information not loaded`
+        `"${this.name}" Model's inference data dimensions and padding information not loaded`,
       );
     }
 
@@ -123,13 +123,13 @@ export abstract class Stardist extends Segmenter {
         imTensor,
         this._fgKind!.id,
         this._fgKind!.unknownCategoryId,
-        this._inferenceDataDims![idx]
+        this._inferenceDataDims![idx],
       );
       annotations.push(annotObj);
       if (loadCb) {
         loadCb(
           (idx + 1) / infT.length,
-          `${idx + 1} of ${infT.length} images predicted`
+          `${idx + 1} of ${infT.length} images predicted`,
         );
       }
     }

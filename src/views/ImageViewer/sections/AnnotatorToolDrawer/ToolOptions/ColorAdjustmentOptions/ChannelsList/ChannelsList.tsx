@@ -47,7 +47,7 @@ export const ChannelsList = () => {
       range: {},
       visible: {},
       color: [],
-    }
+    },
   );
 
   const handleSliderChange = useMemo(
@@ -57,12 +57,12 @@ export const ChannelsList = () => {
           setLocalActiveImageColors(
             produce((draftColor) => {
               draftColor.range[idx] = scaleDownRange(newValue, bitDepth);
-            })
+            }),
           );
         },
-        10
+        10,
       ),
-    [setLocalActiveImageColors]
+    [setLocalActiveImageColors],
   );
 
   const handleSliderChangeCommitted = async () => {
@@ -90,7 +90,7 @@ export const ChannelsList = () => {
     dispatch(
       annotatorSlice.actions.editThings({
         updates: [{ id: activeImage!.id, colors: newColors }],
-      })
+      }),
     );
   };
 
@@ -127,14 +127,14 @@ export const ChannelsList = () => {
           }}
           value={scaleUpRange(
             localActiveImageColors.range[index],
-            activeImage.bitDepth
+            activeImage.bitDepth,
           )}
           max={2 ** activeImage.bitDepth - 1}
           onChange={(event, value: number | number[]) =>
             handleSliderChange(
               index,
               value as [number, number],
-              activeImage.bitDepth
+              activeImage.bitDepth,
             )
           }
           onChangeCommitted={handleSliderChangeCommitted}

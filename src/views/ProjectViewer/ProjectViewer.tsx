@@ -29,14 +29,14 @@ export const ProjectViewer = () => {
     dispatch(
       applicationSettingsSlice.actions.registerHotkeyContext({
         context: HotkeyContext.ProjectView,
-      })
+      }),
     );
     dispatch(projectSlice.actions.setActiveKind({ kind: "Image" }));
     return () => {
       dispatch(
         applicationSettingsSlice.actions.unregisterHotkeyContext({
           context: HotkeyContext.ProjectView,
-        })
+        }),
       );
     };
   }, [dispatch]);

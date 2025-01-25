@@ -15,7 +15,7 @@ self.onmessage = async (
       encodedMask?: number[];
       decodedMask?: DataArray;
     }[];
-  }>
+  }>,
 ) => {
   const thingInfo: ThingData = {};
   const thingCount = e.data.things.length;

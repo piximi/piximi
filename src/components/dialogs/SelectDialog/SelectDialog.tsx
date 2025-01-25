@@ -25,7 +25,7 @@ export const SelectDialog = ({
 
   const handleOptionsChange = (
     event: React.SyntheticEvent<Element, Event>,
-    newValue: string | null
+    newValue: string | null,
   ) => {
     if (!newValue) return;
     setCurrentOption(newValue);

@@ -27,7 +27,7 @@ export const selectSelectedGroupMeasurements = createSelector(
     const tableMeasurements = Object.values(table.measurementStates);
 
     const parents = tableMeasurements.filter(
-      (measurement) => measurement.children && measurement.children.length
+      (measurement) => measurement.children && measurement.children.length,
     );
 
     tableMeasurements.forEach((measurement) => {
@@ -39,7 +39,7 @@ export const selectSelectedGroupMeasurements = createSelector(
     findSelected(parents, selectedMeasurements);
 
     return selectedMeasurements;
-  }
+  },
 );
 export const selectSelectedGroupSplits = createSelector(
   selectMeasurementGroups,
@@ -49,7 +49,7 @@ export const selectSelectedGroupSplits = createSelector(
     const tableSplits = Object.values(table.splitStates);
 
     const parents = tableSplits.filter(
-      (split) => split.children && split.children.length
+      (split) => split.children && split.children.length,
     );
 
     tableSplits.forEach((split) => {
@@ -61,5 +61,5 @@ export const selectSelectedGroupSplits = createSelector(
     findSelected(parents, selectedSplits);
 
     return selectedSplits;
-  }
+  },
 );

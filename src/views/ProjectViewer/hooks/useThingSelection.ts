@@ -40,7 +40,7 @@ export const useThingSelection = () => {
           }
           return thingIds;
         },
-        []
+        [],
       );
       setUnfilteredThings(_unfilteredThingIds);
     }
@@ -49,11 +49,11 @@ export const useThingSelection = () => {
   useEffect(() => {
     const _unfilteredSelectedThings = intersection(
       selectedThingIds,
-      unfilteredThings
+      unfilteredThings,
     );
     setUnfilteredSelectedThings(_unfilteredSelectedThings);
     setAllSelected(
-      _unfilteredSelectedThings.length === unfilteredThings.length
+      _unfilteredSelectedThings.length === unfilteredThings.length,
     );
   }, [selectedThingIds, unfilteredThings]);
 

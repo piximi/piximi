@@ -43,7 +43,7 @@ const StatLayer = ({
 
           return acc;
         },
-        { minX: Infinity, maxX: 0 }
+        { minX: Infinity, maxX: 0 },
       );
       const width =
         Math.max(Math.abs(groupMeanX - minX), Math.abs(groupMeanX - maxX)) + 15;

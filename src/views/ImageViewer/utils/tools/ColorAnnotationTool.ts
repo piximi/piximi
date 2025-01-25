@@ -50,7 +50,7 @@ export class ColorAnnotationTool extends AnnotationTool {
     });
 
     const empty = new Array(this.image.height * this.image.width).fill(
-      Infinity
+      Infinity,
     );
 
     this.floodMap = new ImageJS.Image(
@@ -60,7 +60,7 @@ export class ColorAnnotationTool extends AnnotationTool {
       {
         alpha: 0,
         components: 1,
-      }
+      },
     );
 
     this.toleranceQueue.clear();
@@ -84,7 +84,7 @@ export class ColorAnnotationTool extends AnnotationTool {
   onMouseMove(position: { x: number; y: number }) {
     if (this.annotationState === AnnotationState.Annotating) {
       const diff = Math.ceil(
-        Math.hypot(position.x - this.origin!.x, position.y - this.origin!.y)
+        Math.hypot(position.x - this.origin!.x, position.y - this.origin!.y),
       );
       if (diff !== this.tolerance) {
         this.tolerance = diff;
@@ -183,7 +183,7 @@ export class ColorAnnotationTool extends AnnotationTool {
     queue: PriorityQueue<Array<number>>,
     tolerance: number,
     maxTol: number,
-    seen: Set<number>
+    seen: Set<number>,
   ) => {
     const dirs = [
       [1, 0],
@@ -220,7 +220,7 @@ export class ColorAnnotationTool extends AnnotationTool {
       this.toleranceQueue,
       this.tolerance,
       0,
-      this.seen
+      this.seen,
     );
     // Make a threshold mask
     this.roiMask = this.floodMap!.mask({
@@ -235,7 +235,7 @@ export class ColorAnnotationTool extends AnnotationTool {
       this.offset,
       position,
       this.image.width,
-      this.image.height
+      this.image.height,
     );
   }
 
@@ -244,13 +244,13 @@ export class ColorAnnotationTool extends AnnotationTool {
     offset: { x: number; y: number },
     position: { x: number; y: number },
     width: number,
-    height: number
+    height: number,
   ) {
     const overlay = new ImageJS.Image(
       width,
       height,
       new Uint8Array(width * height * 4),
-      { alpha: 1 }
+      { alpha: 1 },
     );
 
     // roiPaint doesn't respect alpha, so we'll paint it ourselves.

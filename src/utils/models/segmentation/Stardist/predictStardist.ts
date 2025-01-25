@@ -21,7 +21,7 @@ const computeAnnotationMaskFromPoints = (
   cropDims: { x: number; y: number; width: number; height: number },
   coordinates: Array<Point>,
   imH: number,
-  imW: number
+  imW: number,
 ) => {
   // get coordinates of connected points and draw boundaries of mask
   const connectedPoints = connectPoints(coordinates);
@@ -45,7 +45,7 @@ function buildPolygon(
     height: number;
     padX: number;
     padY: number;
-  }
+  },
 ) {
   const THETA = (2 / distances.length) * Math.PI; // 0.19635, for 32 distances
   const points: Array<Point> = [];
@@ -62,9 +62,9 @@ function buildPolygon(
         Math.round(
           row +
             length * Math.sin(idx * THETA) -
-            Math.floor(inputImDims.padY / 2)
-        )
-      )
+            Math.floor(inputImDims.padY / 2),
+        ),
+      ),
     );
 
     const x = Math.max(
@@ -74,9 +74,9 @@ function buildPolygon(
         Math.round(
           col +
             length * Math.cos(idx * THETA) -
-            Math.floor(inputImDims.padX / 2)
-        )
-      )
+            Math.floor(inputImDims.padX / 2),
+        ),
+      ),
     );
 
     yMin = y < yMin ? y : yMin;
@@ -119,7 +119,7 @@ function generateAnnotations(
     padX: number;
     padY: number;
   },
-  scoreThresh: number
+  scoreThresh: number,
 ) {
   const generatedAnnotations: Array<OrphanedAnnotationObject> = [];
   const scores: Array<number> = [];
@@ -134,7 +134,7 @@ function generateAnnotations(
           j,
           height,
           width,
-          inputImDims
+          inputImDims,
         );
 
         if (!polygon) return;
@@ -174,7 +174,7 @@ export const predictStardist = async (
   NMS_IoUThresh: number = 0.1,
   NMS_scoreThresh: number = 0.3,
   NMS_maxOutputSize: number = 500,
-  NMS_softNmsSigma: number = 0.0
+  NMS_softNmsSigma: number = 0.0,
 ) => {
   // [batchSize, H, W, 33]
   const res = model.execute(imTensor) as Tensor4D;
@@ -196,7 +196,7 @@ export const predictStardist = async (
     res.shape[1], // H
     res.shape[2], // W
     inputImDims,
-    NMS_scoreThresh
+    NMS_scoreThresh,
   );
 
   const indexTensor = tidy(() => {
@@ -209,7 +209,7 @@ export const predictStardist = async (
       NMS_maxOutputSize,
       NMS_IoUThresh,
       NMS_scoreThresh,
-      NMS_softNmsSigma
+      NMS_softNmsSigma,
     ).selectedIndices;
   });
 

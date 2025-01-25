@@ -66,7 +66,7 @@ export class Cellpose extends Segmenter {
 
   public loadValidation(
     _images: ImageObject[],
-    _preprocessingArgs: any
+    _preprocessingArgs: any,
   ): void {}
 
   private _sampleGenerator(images: Array<ImageObject>) {
@@ -88,7 +88,7 @@ export class Cellpose extends Segmenter {
 
   public loadInference(
     images: ImageObject[],
-    preprocessingArgs: LoadInferenceDataArgs
+    preprocessingArgs: LoadInferenceDataArgs,
   ): void {
     this._inferenceDataset = tfdata
       .generator(this._sampleGenerator(images))
@@ -97,7 +97,7 @@ export class Cellpose extends Segmenter {
     if (preprocessingArgs.kinds) {
       if (preprocessingArgs.kinds.length !== 1)
         throw Error(
-          `${this.name} Model only takes a single foreground category`
+          `${this.name} Model only takes a single foreground category`,
         );
       this._fgKind = preprocessingArgs.kinds[0];
     } else if (!this._fgKind) {
@@ -142,13 +142,13 @@ export class Cellpose extends Segmenter {
         this._fgKind!.id,
         this._fgKind!.unknownCategoryId,
         this._service,
-        this._config
+        this._config,
       );
       annotations.push(annotObj);
       if (loadCb) {
         loadCb(
           (idx + 1) / infT.length,
-          `${idx + 1} of ${infT.length} images predicted`
+          `${idx + 1} of ${infT.length} images predicted`,
         );
       }
     }

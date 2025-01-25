@@ -145,7 +145,7 @@ export type CustomStore = FileStore | ZipStore;
 
 export const fListToStore = async (
   files: FileList,
-  zipFile: boolean
+  zipFile: boolean,
 ): Promise<CustomStore> => {
   if (zipFile) {
     const file = files[0];

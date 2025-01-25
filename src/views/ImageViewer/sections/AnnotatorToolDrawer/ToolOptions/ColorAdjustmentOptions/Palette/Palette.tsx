@@ -42,7 +42,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
     event:
       | React.MouseEvent<HTMLAnchorElement>
       | React.MouseEvent<HTMLButtonElement>,
-    newColor: [number, number, number]
+    newColor: [number, number, number],
   ) => {
     const updatedColors = colors.color.map((color, i) => {
       return i === channelIdx ? newColor : color;
@@ -56,7 +56,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
             colors: { ...colors, color: tensor2d(updatedColors) },
           },
         ],
-      })
+      }),
     );
 
     handleClose();
@@ -76,7 +76,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
         onClick={(
           event:
             | React.MouseEvent<HTMLAnchorElement>
-            | React.MouseEvent<HTMLButtonElement>
+            | React.MouseEvent<HTMLButtonElement>,
         ) => assignColor(event, color)}
       >
         <LensIcon sx={{ fill: rgbToHex(color) }} />

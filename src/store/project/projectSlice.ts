@@ -39,7 +39,7 @@ export const projectSlice = createSlice({
     },
     selectThings(
       state,
-      action: PayloadAction<{ ids: Array<string> | string }>
+      action: PayloadAction<{ ids: Array<string> | string }>,
     ) {
       const ids =
         typeof action.payload.ids === "string"
@@ -53,14 +53,14 @@ export const projectSlice = createSlice({
     },
     deselectThings(
       state,
-      action: PayloadAction<{ ids: Array<string> | string }>
+      action: PayloadAction<{ ids: Array<string> | string }>,
     ) {
       const ids =
         typeof action.payload.ids === "string"
           ? [action.payload.ids]
           : action.payload.ids;
       state.selectedThingIds = state.selectedThingIds.filter(
-        (id: string) => !ids.includes(id)
+        (id: string) => !ids.includes(id),
       );
     },
     setSortType_new(state, action: PayloadAction<{ sortType: ThingSortKey }>) {
@@ -72,7 +72,7 @@ export const projectSlice = createSlice({
 
     updateHighlightedCategory(
       state,
-      action: PayloadAction<{ categoryId: string | undefined }>
+      action: PayloadAction<{ categoryId: string | undefined }>,
     ) {
       state.highlightedCategory = action.payload.categoryId;
     },
@@ -81,7 +81,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{
         categoryIds: string[];
         kinds?: string[];
-      }>
+      }>,
     ) {
       const { categoryIds, kinds } = {
         kinds: [state.activeKind],
@@ -103,7 +103,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{
         categoryIds: string[] | "all";
         kinds?: string[];
-      }>
+      }>,
     ) {
       const { categoryIds, kinds } = {
         kinds: [state.activeKind],
@@ -117,7 +117,7 @@ export const projectSlice = createSlice({
         } else {
           mutatingFilter(
             state.thingFilters[kind].categoryId,
-            (id) => !categoryIds!.includes(id)
+            (id) => !categoryIds!.includes(id),
           );
         }
         if (
@@ -133,7 +133,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{
         partitions: Partition[];
         kinds?: string[];
-      }>
+      }>,
     ) {
       const { partitions, kinds } = {
         kinds: [state.activeKind],
@@ -155,7 +155,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{
         partitions: string[] | "all";
         kinds?: string[];
-      }>
+      }>,
     ) {
       const { partitions, kinds } = {
         kinds: [state.activeKind],
@@ -168,7 +168,7 @@ export const projectSlice = createSlice({
         } else {
           mutatingFilter(
             state.thingFilters[kind].partition,
-            (id) => !partitions.includes(id)
+            (id) => !partitions.includes(id),
           );
         }
         if (
@@ -185,7 +185,7 @@ export const projectSlice = createSlice({
     removeKindTabFilter(state, action: PayloadAction<{ kindId: string }>) {
       mutatingFilter(
         state.kindTabFilters,
-        (id) => id !== action.payload.kindId
+        (id) => id !== action.payload.kindId,
       );
     },
     removeAllKindTabFilters(state) {
@@ -193,7 +193,7 @@ export const projectSlice = createSlice({
     },
     setProjectImageChannels(
       state,
-      action: PayloadAction<{ channels: number | undefined }>
+      action: PayloadAction<{ channels: number | undefined }>,
     ) {
       state.imageChannels = action.payload.channels;
     },

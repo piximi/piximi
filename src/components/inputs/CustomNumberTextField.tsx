@@ -44,7 +44,7 @@ export const CustomNumberTextField = ({
   formControlProps,
 }: CustomNumberTextFieldProps) => {
   const [valueString, setValueString] = React.useState<string>(
-    value.toString()
+    value.toString(),
   );
 
   React.useEffect(() => {
@@ -80,7 +80,7 @@ export const CustomNumberTextField = ({
       setErrorHelpText(
         `Must be a${
           enableFloat ? " floating point" : "n integer"
-        } ${rangeHelperText}`
+        } ${rangeHelperText}`,
       );
       setInputError(true);
       return;
@@ -92,7 +92,7 @@ export const CustomNumberTextField = ({
       setErrorHelpText(
         `Must be a${
           enableFloat ? " floating point" : "n integer"
-        } value${rangeHelperText}`
+        } value${rangeHelperText}`,
       );
       setInputError(true);
       return;

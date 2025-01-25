@@ -11,7 +11,7 @@ import { Shape } from "store/data/types";
  */
 export const createSimpleFCNSegmenterModel = (
   inputShape: Shape,
-  numClasses: number
+  numClasses: number,
 ) => {
   const imageWidth = inputShape.width;
   const imageHeight = inputShape.height;
@@ -30,7 +30,7 @@ export const createSimpleFCNSegmenterModel = (
       activation: "relu",
       kernelInitializer: "varianceScaling",
       padding: "same",
-    })
+    }),
   );
   // model.add(
   //   layers.conv2d({
@@ -63,7 +63,7 @@ export const createSimpleFCNSegmenterModel = (
       activation: "relu",
       kernelInitializer: "varianceScaling",
       padding: "same",
-    })
+    }),
   );
   // model.add(
   //   layers.conv2d({
@@ -96,7 +96,7 @@ export const createSimpleFCNSegmenterModel = (
       activation: "relu",
       kernelInitializer: "varianceScaling",
       padding: "same",
-    })
+    }),
   );
 
   //const fcn_13 = layers.conv2d({ kernelSize: [7, 7], strides: [1, 1], activation: 'relu', padding: 'same', filters: 4096 }).apply(fcn_12);
@@ -111,7 +111,7 @@ export const createSimpleFCNSegmenterModel = (
   model.add(
     layers.upSampling2d({
       size: [2, 2],
-    })
+    }),
   );
   model.add(
     layers.conv2d({
@@ -121,13 +121,13 @@ export const createSimpleFCNSegmenterModel = (
       activation: "relu",
       kernelInitializer: "varianceScaling",
       padding: "same",
-    })
+    }),
   );
 
   model.add(
     layers.upSampling2d({
       size: [2, 2],
-    })
+    }),
   );
   model.add(
     layers.conv2d({
@@ -137,7 +137,7 @@ export const createSimpleFCNSegmenterModel = (
       activation: "relu",
       kernelInitializer: "varianceScaling",
       padding: "same",
-    })
+    }),
   );
 
   // const upsample_2 = layers.upSampling2d( { size: [2, 2] } ).apply(conv_upsample1);
@@ -163,7 +163,7 @@ export const createSimpleFCNSegmenterModel = (
       activation: "softmax",
       kernelInitializer: "varianceScaling",
       padding: "same",
-    })
+    }),
   );
 
   //@ts-ignore: TODO

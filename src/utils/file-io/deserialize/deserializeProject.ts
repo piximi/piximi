@@ -10,7 +10,7 @@ import { LoadCB } from "../types";
 
 export const deserializeProject = async (
   fileStore: CustomStore,
-  loadCb: LoadCB
+  loadCb: LoadCB,
 ) => {
   import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
     logger(`starting deserialization of ${fileStore.rootName}`);

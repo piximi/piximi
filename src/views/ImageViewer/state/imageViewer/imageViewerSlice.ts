@@ -125,7 +125,6 @@ export const imageViewerSlice = createSlice({
         });
       }
     },
-
     setSelectedCategoryId(
       state,
       action: PayloadAction<{ selectedCategoryId: string }>

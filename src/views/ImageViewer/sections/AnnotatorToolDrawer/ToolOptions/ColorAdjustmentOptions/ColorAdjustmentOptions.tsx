@@ -35,7 +35,7 @@ export const ColorAdjustmentOptions = () => {
     dispatch(
       annotatorSlice.actions.editThings({
         updates: [{ id: activeImage.id!, colors: defaultColors }],
-      })
+      }),
     );
   };
 

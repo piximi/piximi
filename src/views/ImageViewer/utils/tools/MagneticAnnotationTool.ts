@@ -33,13 +33,13 @@ export class MagneticAnnotationTool extends AnnotationTool {
     this.graph = makeGraph(
       this.response.data,
       this.response.height,
-      this.response.width
+      this.response.width,
     );
 
     this.pathfinder = createPathFinder(
       this.graph,
       this.image.width * factor,
-      factor
+      factor,
     );
   }
 
@@ -81,7 +81,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
         1,
         Math.floor(this.anchor.x * this.factor),
         Math.floor(this.anchor.y * this.factor),
-        0
+        0,
       );
 
       const destination = getIdx(
@@ -89,7 +89,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
         1,
         Math.floor(position.x * this.factor),
         Math.floor(position.y * this.factor),
-        0
+        0,
       );
 
       this.path = this.pathfinder.find(source, destination).flat();
@@ -109,7 +109,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
         1,
         Math.floor(this.origin.x * this.factor),
         Math.floor(this.origin.y * this.factor),
-        0
+        0,
       );
 
       const destination = getIdx(
@@ -117,7 +117,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
         1,
         Math.floor(position.x * this.factor),
         Math.floor(position.y * this.factor),
-        0
+        0,
       );
 
       this.path = this.pathfinder.find(source, destination).flat();
@@ -161,7 +161,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
         1,
         Math.floor(this.anchor.x * this.factor),
         Math.floor(this.anchor.y * this.factor),
-        0
+        0,
       );
 
       const destination = getIdx(
@@ -169,7 +169,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
         1,
         Math.floor(this.buffer.at(-1)!.x * this.factor),
         Math.floor(this.buffer.at(-1)!.y * this.factor),
-        0
+        0,
       );
 
       if (!this.pathfinder) return;
@@ -197,7 +197,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
         1,
         Math.floor(this.origin.x * this.factor),
         Math.floor(this.origin.y * this.factor),
-        0
+        0,
       );
 
       const destination = getIdx(
@@ -205,7 +205,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
         1,
         Math.floor(this.buffer.at(-1)!.x * this.factor),
         Math.floor(this.buffer.at(-1)!.y * this.factor),
-        0
+        0,
       );
 
       this.path = this.pathfinder.find(source, destination).flat();
@@ -219,7 +219,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
 
   private connected(
     position: { x: number; y: number },
-    threshold: number = 4
+    threshold: number = 4,
   ): boolean | undefined {
     if (!this.origin) return undefined;
 
