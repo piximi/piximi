@@ -159,7 +159,7 @@ export const usePointerTool = (
 
     const overlappingAnnotationIds = getOverlappingAnnotations(
       absolutePosition,
-      activeAnnotations,
+      activeAnnotations as DecodedAnnotationObject[],
     );
 
     if (overlappingAnnotationIds.length === 0) {

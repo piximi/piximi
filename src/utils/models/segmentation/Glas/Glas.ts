@@ -45,7 +45,7 @@ export class Glas extends Segmenter {
 
   public loadValidation(
     _images: ImageObject[],
-    _preprocessingArgs: any
+    _preprocessingArgs: any,
   ): void {}
 
   public loadInference(

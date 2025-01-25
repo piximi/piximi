@@ -7,7 +7,7 @@ import { Point } from "views/ImageViewer/utils/types";
 export const usePointerLocation = (
   imageRef: React.MutableRefObject<Konva.Image | null>,
   stageRef: React.RefObject<Konva.Stage | null>,
-  originalImage: IJSImage,
+  originalImage: ImageJS.Image,
 ) => {
   const [absolutePosition, setAbsolutePosition] = useState<Point>();
   const [relativePositionByStage, setRelativePositionByStage] =

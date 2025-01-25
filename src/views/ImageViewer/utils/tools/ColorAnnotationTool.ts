@@ -53,10 +53,15 @@ export class ColorAnnotationTool extends AnnotationTool {
       Infinity,
     );
 
-    this.floodMap = new IJSImage(this.image.width, this.image.height, empty, {
-      alpha: 0,
-      components: 1,
-    });
+    this.floodMap = new ImageJS.Image(
+      this.image.width,
+      this.image.height,
+      empty,
+      {
+        alpha: 0,
+        components: 1,
+      },
+    );
 
     this.toleranceQueue.clear();
     this.seen.clear();

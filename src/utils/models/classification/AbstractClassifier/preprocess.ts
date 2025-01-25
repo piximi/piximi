@@ -225,7 +225,7 @@ const doShowImages = async (
       imageData = new ImageData(
         imageDataArr,
         imTensor.shape[1], // width
-        imTensor.shape[0] // height
+        imTensor.shape[0], // height
       );
     }
     const ctx = canvas.getContext("2d");
