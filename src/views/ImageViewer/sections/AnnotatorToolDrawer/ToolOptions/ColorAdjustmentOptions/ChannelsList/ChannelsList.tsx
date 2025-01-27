@@ -1,9 +1,8 @@
-import React, { useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import produce from "immer";
 import { tensor2d } from "@tensorflow/tfjs";
+import { produce } from "immer";
 import { debounce } from "lodash";
-
+import { useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Checkbox,
   List,
@@ -23,10 +22,7 @@ import {
   selectActiveImageRawColor,
 } from "views/ImageViewer/state/annotator/reselectors";
 
-import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
-
-import { scaleDownRange, scaleUpRange } from "utils/common/helpers";
-import { rgbToHex } from "utils/common/helpers";
+import { rgbToHex, scaleDownRange, scaleUpRange } from "utils/common/helpers";
 
 import { BitDepth } from "utils/file-io/types";
 
@@ -107,8 +103,6 @@ export const ChannelsList = () => {
             checked={isVisible}
             disableRipple
             edge="start"
-            icon={<CheckboxUncheckedIcon />}
-            checkedIcon={<CheckboxCheckedIcon />}
             tabIndex={-1}
           />
         </ListItemIcon>

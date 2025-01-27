@@ -9,16 +9,20 @@ import { usePreferredMuiTheme } from "hooks";
 import { ProjectViewer } from "views/ProjectViewer";
 import { ImageViewer } from "views/ImageViewer";
 import { MeasurementView } from "views/MeasurementView";
-import { FileUploadProvider } from "contexts";
-import { loadExampleImage } from "utils/file-io/loadExampleImage";
-import colorImage from "images/cell-painting.png";
-import { cellPaintingAnnotations } from "data/exampleImages";
-import { OldAnnotationType, OldCategory, OldImageType } from "store/data/types";
-import { dataConverter_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";
-import { SerializedFileType } from "utils/file-io/types";
-import { dataSlice } from "store/data";
 import { LoadingScreen } from "./LoadingScreen";
+
+import { FileUploadProvider } from "contexts";
+import { dataSlice } from "store/data";
 import { projectSlice } from "store/project";
+
+import { loadExampleImage } from "utils/file-io/loadExampleImage";
+import { dataConverter_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";
+
+import { OldAnnotationType, OldCategory, OldImageType } from "store/data/types";
+import { SerializedFileType } from "utils/file-io/types";
+
+import { cellPaintingAnnotations } from "data/exampleImages";
+import colorImage from "images/cell-painting.png";
 
 export const Application = () => {
   const theme = usePreferredMuiTheme();
