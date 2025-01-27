@@ -1,13 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
-
 import { Box } from "@mui/material";
 
 import { useErrorHandler, useUnloadConfirmation } from "hooks";
 
 import { FallBackDialog } from "components/dialogs";
-
 import {
   ProjectDrawer,
   ImageToolDrawer,
@@ -17,6 +15,7 @@ import {
 
 import { projectSlice } from "store/project";
 import { applicationSettingsSlice } from "store/applicationSettings";
+
 import { HotkeyContext } from "utils/common/enums";
 
 export const ProjectViewer = () => {
