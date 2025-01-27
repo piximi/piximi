@@ -400,7 +400,7 @@ export const dataSlice = createSlice({
         updates: CategoryUpdates;
       }>
     ) {
-      let { updates } = action.payload;
+      const { updates } = action.payload;
 
       const id = updates.id;
 
@@ -528,7 +528,8 @@ export const dataSlice = createSlice({
       }>
     ) {
       //HACK: Should check for empty category. if category empty, delete completely
-      let { categoryIds, kind } = action.payload;
+      let categoryIds = action.payload.categoryIds;
+      const kind = action.payload.kind;
       if (categoryIds === "all") {
         categoryIds = state.categories.ids as string[];
       }
@@ -688,8 +689,7 @@ export const dataSlice = createSlice({
             ],
           },
         });
-        //HACK: This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-        // @ts-ignore
+        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
         thingsAdapter.addOne(state.things, thing);
       }
     },
@@ -867,8 +867,7 @@ export const dataSlice = createSlice({
           });
         }
 
-        //HACK: This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-        // @ts-ignore
+        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
         thingsAdapter.updateOne(state.things, { id, changes });
       }
     },
@@ -940,8 +939,7 @@ export const dataSlice = createSlice({
           updateType,
         );
 
-        //HACK: This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-        // @ts-ignore
+        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
         thingsAdapter.updateOne(state.things, {
           id: thingId,
           changes: { containing: newContents },
@@ -1027,8 +1025,7 @@ export const dataSlice = createSlice({
                 (thingId) => thingId !== containedThingId
               );
 
-              //HACK: This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-              // @ts-ignore
+              // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
               thingsAdapter.removeOne(state.things, containedThingId);
             }
           }
@@ -1066,8 +1063,7 @@ export const dataSlice = createSlice({
           (_thingId) => _thingId !== thingId
         );
 
-        //HACK: This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-        // @ts-ignore
+        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
         thingsAdapter.removeOne(state.things, thingId);
       }
       for (const [imageId, changes] of Object.entries(imageChanges)) {

@@ -71,9 +71,9 @@ export const NewKindDialog = ({
           <DialogTitle sx={{ p: 1 }}>Create New Kind</DialogTitle>
           <IconButton
             onClick={() => onReject("cancelled")}
-            sx={(theme) => ({
+            sx={{
               maxHeight: "40px",
-            })}
+            }}
           >
             <CloseIcon />
           </IconButton>

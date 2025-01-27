@@ -107,7 +107,7 @@ export const ImageViewerCategories = () => {
 
   return (
     <>
-      <List dense sx={(theme) => ({ py: 0 })}>
+      <List dense sx={{ py: 0 }}>
         {categoriesByKindArray.map(({ kindId, categories }) => {
           return (
             <CollapsibleListItem
