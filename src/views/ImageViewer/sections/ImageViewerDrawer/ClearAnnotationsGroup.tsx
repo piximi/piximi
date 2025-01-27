@@ -47,40 +47,40 @@ export const ClearAnnotationsGroup = () => {
           annotatorSlice.actions.setSelectedAnnotationIds({
             annotationIds: [],
             workingAnnotationId: undefined,
-          })
+          }),
         );
         dispatch(
           imageViewerSlice.actions.removeActiveAnnotationIds({
             annotationIds: activeAnnotationsIds,
-          })
+          }),
         );
         dispatch(
           annotatorSlice.actions.deleteThings({
             thingIds: activeAnnotationsIds,
-          })
+          }),
         );
       } else {
         dispatch(
           imageViewerSlice.actions.removeActiveAnnotationIds({
             annotationIds: selectedAnnotationIds,
-          })
+          }),
         );
         dispatch(
           annotatorSlice.actions.setSelectedAnnotationIds({
             annotationIds: [],
             workingAnnotationId: undefined,
-          })
+          }),
         );
         dispatch(
           annotatorSlice.actions.deleteThings({
             thingIds: selectedAnnotationIds,
-          })
+          }),
         );
       }
       dispatch(
         annotatorSlice.actions.setWorkingAnnotation({
           annotation: undefined,
-        })
+        }),
       );
     });
   };

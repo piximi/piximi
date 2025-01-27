@@ -84,7 +84,7 @@ export const dataSlice = createSlice({
           categories: EntityState<Category>;
           things: EntityState<AnnotationObject | ImageObject>;
         };
-      }>
+      }>,
     ) {
       Object.values(state.things.entities).forEach((entity) => {
         dispose(entity as unknown as TensorContainer);
@@ -98,7 +98,7 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         kinds: Array<PartialBy<Kind, "containing">>;
-      }>
+      }>,
     ) {
       const { kinds } = action.payload;
       for (const kind of kinds) {
@@ -116,7 +116,7 @@ export const dataSlice = createSlice({
           updateType: "add" | "remove" | "replace";
           contents: string[];
         }>;
-      }>
+      }>,
     ) {
       const { changes } = action.payload;
       for (const { kindId, contents, updateType } of changes) {
@@ -126,7 +126,7 @@ export const dataSlice = createSlice({
         const newContents = updateContents(
           previousContents,
           contents,
-          updateType
+          updateType,
         );
 
         kindsAdapter.updateOne(state.kinds, {
@@ -143,7 +143,7 @@ export const dataSlice = createSlice({
           updateType: "add" | "remove" | "replace";
           categories: string[];
         }>;
-      }>
+      }>,
     ) {
       const { changes } = action.payload;
 
@@ -154,7 +154,7 @@ export const dataSlice = createSlice({
         const newCategories = updateContents(
           previousCategories,
           categories,
-          updateType
+          updateType,
         );
 
         kindsAdapter.updateOne(state.kinds, {
@@ -169,7 +169,7 @@ export const dataSlice = createSlice({
       action: PayloadAction<{
         currentKindName: string;
         newKindName: string;
-      }>
+      }>,
     ) {
       const { currentKindName, newKindName } = action.payload;
       if (
@@ -189,7 +189,7 @@ export const dataSlice = createSlice({
         state.things.entities[thingId]!.kind = newKindName;
       });
       const kindIndex = state.kinds.ids.findIndex(
-        (name) => name === currentKindName
+        (name) => name === currentKindName,
       );
       state.kinds.ids.splice(kindIndex, 1, newKindName);
       state.kinds.entities[newKindName] = state.kinds.entities[currentKindName];
@@ -199,7 +199,7 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         deletedKindId: string;
-      }>
+      }>,
     ) {
       const { deletedKindId } = action.payload;
       if (!state.kinds.entities[deletedKindId]) return;
@@ -228,7 +228,7 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         categories: Array<Category>;
-      }>
+      }>,
     ) {
       const { categories } = action.payload;
       for (const category of categories) {
@@ -256,7 +256,7 @@ export const dataSlice = createSlice({
         name: string;
         color: string;
         kind: string;
-      }>
+      }>,
     ) {
       const { name, color, kind } = action.payload;
 
@@ -297,14 +297,14 @@ export const dataSlice = createSlice({
               },
             ],
           },
-        })
+        }),
       );
     },
     updateCategory(
       state,
       action: PayloadAction<{
         updates: CategoryUpdates;
-      }>
+      }>,
     ) {
       const { updates } = action.payload;
 
@@ -323,7 +323,7 @@ export const dataSlice = createSlice({
           updateType: "add" | "remove" | "replace";
           contents: string[];
         }>;
-      }>
+      }>,
     ) {
       const { changes } = action.payload;
       for (const { categoryId, contents, updateType } of changes) {
@@ -334,7 +334,7 @@ export const dataSlice = createSlice({
         const newContents = updateContents(
           previousContents,
           contents,
-          updateType
+          updateType,
         );
 
         categoriesAdapter.updateOne(state.categories, {
@@ -348,7 +348,7 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         categories: Array<Category>;
-      }>
+      }>,
     ) {
       const { categories } = action.payload;
 
@@ -368,7 +368,7 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         categoryIds: string[] | "all";
-      }>
+      }>,
     ) {
       let { categoryIds } = action.payload;
       if (categoryIds === "all") {
@@ -385,7 +385,7 @@ export const dataSlice = createSlice({
       action: PayloadAction<{
         categoryIds: string[] | "all";
         kind: string;
-      }>
+      }>,
     ) {
       //HACK: Should check for empty category. if category empty, delete completely
       let categoryIds = action.payload.categoryIds;
@@ -445,7 +445,7 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         things: Array<ImageObject | AnnotationObject>;
-      }>
+      }>,
     ) {
       const { things } = action.payload;
       for (const readOnlyThing of things) {
@@ -456,7 +456,7 @@ export const dataSlice = createSlice({
           state.kinds.entities[thing.kind]?.containing ?? [];
 
         const existingPrefixes = Object.values(existingImageIds).map(
-          (id) => (state.things.entities[id]!.name as string).split(".")[0]
+          (id) => (state.things.entities[id]!.name as string).split(".")[0],
         );
 
         let updatedNamePrefix = newReplaceDuplicateName(name, existingPrefixes);
@@ -538,7 +538,7 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         annotations: Array<AnnotationObject | DecodedAnnotationObject>;
-      }>
+      }>,
     ) {
       const { annotations } = action.payload;
       const encodedAnnotations: AnnotationObject[] = [];
@@ -547,7 +547,7 @@ export const dataSlice = createSlice({
 
         if (annotation.decodedMask) {
           (annotation as AnnotationObject).encodedMask = encode(
-            annotation.decodedMask
+            annotation.decodedMask,
           );
           delete annotation.decodedMask;
         }
@@ -561,7 +561,7 @@ export const dataSlice = createSlice({
     // Sets the category for the inference images back to Unknown
     clearPredictions(
       state,
-      action: PayloadAction<{ kind: string; isPermanent?: boolean }>
+      action: PayloadAction<{ kind: string; isPermanent?: boolean }>,
     ) {
       const { kind } = action.payload;
       if (!(kind in state.kinds.entities)) return;
@@ -592,7 +592,7 @@ export const dataSlice = createSlice({
     },
     acceptPredictions(
       state,
-      action: PayloadAction<{ kind: string; isPermanent?: boolean }>
+      action: PayloadAction<{ kind: string; isPermanent?: boolean }>,
     ) {
       const { kind } = action.payload;
       if (!state.kinds.entities[kind]) return;
@@ -627,7 +627,7 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         updates: ThingsUpdates;
-      }>
+      }>,
     ) {
       const { updates } = action.payload;
 
@@ -671,7 +671,7 @@ export const dataSlice = createSlice({
     },
     updateThingName(
       state,
-      action: PayloadAction<{ id: string; name: string }>
+      action: PayloadAction<{ id: string; name: string }>,
     ) {
       const { id, name } = action.payload;
       const changes: Array<{ id: string; name: string }> = [{ id, name }];
@@ -706,7 +706,7 @@ export const dataSlice = createSlice({
           updateType: "add" | "remove" | "replace";
           contents: string[];
         }>;
-      }>
+      }>,
     ) {
       const { changes } = action.payload;
       for (const { thingId, contents, updateType } of changes) {
@@ -719,7 +719,7 @@ export const dataSlice = createSlice({
         const newContents = updateContents(
           previousContents,
           contents,
-          updateType
+          updateType,
         );
 
         // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
@@ -750,7 +750,7 @@ export const dataSlice = createSlice({
             disposeColorTensors: boolean;
             preparedByListener?: boolean;
           }
-      >
+      >,
     ) {
       if (!action.payload.preparedByListener) return;
       if (!("thingIds" in action.payload)) return;
@@ -791,20 +791,20 @@ export const dataSlice = createSlice({
               /* UPDATE KIND'S CONTAINING LIST */
               mutatingFilter(
                 kind!.containing,
-                (containedId) => containedId !== containedThingId
+                (containedId) => containedId !== containedThingId,
               );
 
               /* UPDATE CATEGORY'S CONTAINING LIST */
               mutatingFilter(
                 category!.containing,
-                (thingId) => thingId !== containedThingId
+                (thingId) => thingId !== containedThingId,
               );
 
               /* REMOVE THING */
               delete state.things.entities[containedThingId];
               mutatingFilter(
                 state.things.ids,
-                (thingId) => thingId !== containedThingId
+                (thingId) => thingId !== containedThingId,
               );
 
               // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
@@ -836,13 +836,13 @@ export const dataSlice = createSlice({
 
         mutatingFilter(
           kind!.containing,
-          (containedId) => containedId !== thingId
+          (containedId) => containedId !== thingId,
         );
 
         /* UPDATE CATEGORY'S CONTAINING LIST */
         mutatingFilter(
           category!.containing,
-          (_thingId) => _thingId !== thingId
+          (_thingId) => _thingId !== thingId,
         );
 
         // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors

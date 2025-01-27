@@ -45,13 +45,13 @@ export const annotatorSlice = createSlice({
     resetAnnotator: () => initialState,
     addSelectedAnnotationId(
       state,
-      action: PayloadAction<{ annotationId: string }>
+      action: PayloadAction<{ annotationId: string }>,
     ) {
       state.selectedAnnotationIds.push(action.payload.annotationId);
     },
     addSelectedAnnotationIds(
       state,
-      action: PayloadAction<{ annotationIds: Array<string> }>
+      action: PayloadAction<{ annotationIds: Array<string> }>,
     ) {
       for (const annotationId of action.payload.annotationIds) {
         annotatorSlice.caseReducers.addSelectedAnnotationId(state, {
@@ -65,7 +65,7 @@ export const annotatorSlice = createSlice({
       action: PayloadAction<{
         annotationIds: Array<string>;
         workingAnnotationId?: string;
-      }>
+      }>,
     ) {
       const { annotationIds, workingAnnotationId } = action.payload;
       state.selectedAnnotationIds = [];
@@ -82,21 +82,21 @@ export const annotatorSlice = createSlice({
       state,
       action: PayloadAction<{
         annotationId: string;
-      }>
+      }>,
     ) {
       if (state.workingAnnotationId === action.payload.annotationId) {
         state.workingAnnotationId = undefined;
       }
       mutatingFilter(
         state.selectedAnnotationIds,
-        (annotationId) => annotationId !== action.payload.annotationId
+        (annotationId) => annotationId !== action.payload.annotationId,
       );
     },
     removeSelectedAnnotationIds(
       state,
       action: PayloadAction<{
         annotationIds: string[];
-      }>
+      }>,
     ) {
       for (const annotationId of action.payload.annotationIds) {
         annotatorSlice.caseReducers.removeSelectedAnnotationId(state, {
@@ -110,7 +110,7 @@ export const annotatorSlice = createSlice({
       action: PayloadAction<{
         annotation: DecodedAnnotationObject | string | undefined;
         preparedByListener?: boolean;
-      }>
+      }>,
     ) {
       const { annotation, preparedByListener } = action.payload;
       if (!preparedByListener) return;
@@ -122,7 +122,7 @@ export const annotatorSlice = createSlice({
     },
     updateWorkingAnnotation(
       state,
-      action: PayloadAction<{ changes: Partial<DecodedAnnotationObject> }>
+      action: PayloadAction<{ changes: Partial<DecodedAnnotationObject> }>,
     ) {
       if (state.workingAnnotation.saved) {
         state.workingAnnotation.changes = action.payload.changes;
@@ -135,7 +135,7 @@ export const annotatorSlice = createSlice({
         annotationState: AnnotationState;
         kind?: string;
         annotationTool: AnnotationTool;
-      }>
+      }>,
     ) {
       state.annotationState = action.payload.annotationState;
     },
@@ -145,27 +145,27 @@ export const annotatorSlice = createSlice({
     },
     setPenSelectionBrushSize(
       state,
-      action: PayloadAction<{ penSelectionBrushSize: number }>
+      action: PayloadAction<{ penSelectionBrushSize: number }>,
     ) {
       state.penSelectionBrushSize = action.payload.penSelectionBrushSize;
     },
     setQuickSelectionRegionSize(
       state,
-      action: PayloadAction<{ quickSelectionRegionSize: number }>
+      action: PayloadAction<{ quickSelectionRegionSize: number }>,
     ) {
       state.quickSelectionRegionSize = action.payload.quickSelectionRegionSize;
     },
 
     setAnnotationMode(
       state,
-      action: PayloadAction<{ annotationMode: AnnotationMode }>
+      action: PayloadAction<{ annotationMode: AnnotationMode }>,
     ) {
       state.annotationMode = action.payload.annotationMode;
     },
 
     setThresholdAnnotationValue(
       state,
-      action: PayloadAction<{ thresholdAnnotationValue: number }>
+      action: PayloadAction<{ thresholdAnnotationValue: number }>,
     ) {
       state.thresholdAnnotationValue = action.payload.thresholdAnnotationValue;
     },
@@ -174,7 +174,7 @@ export const annotatorSlice = createSlice({
       action: PayloadAction<{
         kind: Kind;
         unknownCategory: Category;
-      }>
+      }>,
     ) {
       const { kind, unknownCategory } = action.payload;
       state.changes.kinds.added[kind.id] = kind;
@@ -184,18 +184,18 @@ export const annotatorSlice = createSlice({
       state,
       action: PayloadAction<{
         kind: RequireOnly<Kind, "id">;
-      }>
+      }>,
     ) {
       const { kind } = action.payload;
       if (kind.id in state.changes.kinds.added) {
         state.changes.kinds.edited[kind.id] = merge(
           state.changes.kinds.added[kind.id],
-          kind
+          kind,
         );
       } else if (kind.id in state.changes.kinds.edited) {
         state.changes.kinds.edited[kind.id] = merge(
           state.changes.kinds.edited[kind.id],
-          kind
+          kind,
         );
       } else {
         state.changes.kinds.edited[kind.id] = kind;
@@ -206,7 +206,7 @@ export const annotatorSlice = createSlice({
       state,
       action: PayloadAction<{
         kindId: string;
-      }>
+      }>,
     ) {
       const { kindId } = action.payload;
       let affectedCategories: string[] | undefined;
@@ -237,7 +237,7 @@ export const annotatorSlice = createSlice({
       state,
       action: PayloadAction<{
         categories: Category | Array<Category>;
-      }>
+      }>,
     ) {
       let { categories } = action.payload;
       if (!Array.isArray(categories)) categories = [categories];
@@ -249,19 +249,19 @@ export const annotatorSlice = createSlice({
       state,
       action: PayloadAction<{
         category: { id: string; color: string; name: string };
-      }>
+      }>,
     ) {
       const { category } = action.payload;
 
       if (category.id in state.changes.categories.added) {
         state.changes.categories.added[category.id] = merge(
           state.changes.categories.added[category.id],
-          category
+          category,
         );
       } else if (category.id in state.changes.categories.edited) {
         state.changes.categories.edited[category.id] = merge(
           state.changes.categories.edited[category.id],
-          category
+          category,
         );
       } else {
         state.changes.categories.edited[category.id] = category;
@@ -272,7 +272,7 @@ export const annotatorSlice = createSlice({
       action: PayloadAction<{
         categories: Array<Category>;
         kind: Kind;
-      }>
+      }>,
     ) {
       const { categories, kind } = action.payload;
       const unknownCategory = kind.unknownCategoryId;
@@ -294,13 +294,13 @@ export const annotatorSlice = createSlice({
           affectedThings.reduce(
             (
               edits: Record<string, RequireOnly<AnnotationObject, "id">>,
-              id
+              id,
             ) => {
               edits[id] = { id, categoryId: unknownCategory };
               return edits;
             },
-            {}
-          )
+            {},
+          ),
         );
 
         // update categories
@@ -331,7 +331,7 @@ export const annotatorSlice = createSlice({
       state,
       action: PayloadAction<{
         things: DecodedAnnotationObject | Array<DecodedAnnotationObject>;
-      }>
+      }>,
     ) {
       let { things } = action.payload;
       if (!Array.isArray(things)) things = [things];
@@ -343,7 +343,7 @@ export const annotatorSlice = createSlice({
       state,
       action: PayloadAction<{
         updates: ThingsUpdates;
-      }>
+      }>,
     ) {
       const { updates } = action.payload;
       for (const update of updates) {
@@ -351,12 +351,12 @@ export const annotatorSlice = createSlice({
         if (id in state.changes.things.added) {
           state.changes.things.added[id] = merge(
             state.changes.things.added[id],
-            changes
+            changes,
           );
         } else if (id in state.changes.things.edited) {
           state.changes.things.edited[id] = merge(
             state.changes.things.edited[id],
-            changes
+            changes,
           );
         } else {
           state.changes.things.edited[id] = { id, ...changes };
@@ -367,7 +367,7 @@ export const annotatorSlice = createSlice({
       state,
       action: PayloadAction<{
         thingIds: Array<string>;
-      }>
+      }>,
     ) {
       const { thingIds } = action.payload;
       for (const thingId of thingIds) {
@@ -383,7 +383,7 @@ export const annotatorSlice = createSlice({
     },
     reconcileChanges(
       state,
-      action: PayloadAction<{ discardChanges?: boolean }>
+      action: PayloadAction<{ discardChanges?: boolean }>,
     ) {
       const { discardChanges } = action.payload;
       if (discardChanges) {

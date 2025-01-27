@@ -41,7 +41,7 @@ startAppListening({
       if (!kind) {
         //remove group from measurements
         listenerAPI.dispatch(
-          measurementsSlice.actions.removeGroup({ groupId: group.id })
+          measurementsSlice.actions.removeGroup({ groupId: group.id }),
         );
         break;
       }
@@ -49,7 +49,7 @@ startAppListening({
       const { splitUpdates, deletedCats } = updateCategories(
         group.splitStates,
         kind.categories,
-        dataState.categories.entities
+        dataState.categories.entities,
       );
 
       listenerAPI.dispatch(
@@ -57,7 +57,7 @@ startAppListening({
           groupId: group.id,
           updates: splitUpdates,
           remove: deletedCats,
-        })
+        }),
       );
 
       const groupThings = group.thingIds;
@@ -66,7 +66,7 @@ startAppListening({
       if (!(newThings.length || deletedThings.length)) return;
       // Used to distinguish between actual new objects and objects which may have just changed kinds
       const unmeasuredThings = newThings.filter(
-        (id) => !measurementState.data[id]
+        (id) => !measurementState.data[id],
       );
 
       if (unmeasuredThings.length) {
@@ -76,7 +76,7 @@ startAppListening({
           measurementsSlice.actions.updateGroupMeasurementState({
             groupId: group.id,
             updates: inactiveMeasurements,
-          })
+          }),
         );
 
         // For new measurements, data needs to be computed
@@ -90,23 +90,23 @@ startAppListening({
         listenerAPI.dispatch(
           measurementsSlice.actions.updateMeasurements({
             dataDict: preparedThings,
-          })
+          }),
         );
       }
       listenerAPI.dispatch(
         measurementsSlice.actions.updateGroupThingIds({
           groupId: group.id,
           thingIds: kind.containing,
-        })
+        }),
       );
       const trulyDeleted = deletedThings.filter(
-        (id) => !dataState.things.entities[id]
+        (id) => !dataState.things.entities[id],
       );
       if (trulyDeleted.length) {
         listenerAPI.dispatch(
           measurementsSlice.actions.removeThingMeasurements({
             thingIds: trulyDeleted,
-          })
+          }),
         );
       }
     }
@@ -119,21 +119,21 @@ const resetMeasurements = (measurements: MeasurementOptions) => {
       newOptions[id] = { ...measurements[id], state: "off" };
       return newOptions;
     },
-    {}
+    {},
   );
 };
 
 const updateCategories = (
   state: MeasurementOptions,
   kindCategories: string[],
-  categoryEntities: Dictionary<Category>
+  categoryEntities: Dictionary<Category>,
 ) => {
   const groupCats = state["categoryId"].children!;
   const newCats = difference(kindCategories, groupCats);
   const deletedCats = difference(groupCats, kindCategories);
   const persistingCats = intersection(
     state["categoryId"].children!,
-    kindCategories
+    kindCategories,
   );
 
   const newNames = persistingCats.reduce(
@@ -146,7 +146,7 @@ const updateCategories = (
       }
       return newNames;
     },
-    []
+    [],
   );
 
   const splitUpdates: RecursivePartial<MeasurementOptions> = {};

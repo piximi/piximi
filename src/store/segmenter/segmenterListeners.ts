@@ -94,7 +94,7 @@ startAppListening({
 
 const fitListener = async (
   _onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
-  _listenerAPI: StoreListemerAPI
+  _listenerAPI: StoreListemerAPI,
 ) => {};
 
 const predictListener = async (listenerAPI: StoreListemerAPI) => {
@@ -113,7 +113,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     listenerAPI.dispatch(
       segmenterSlice.actions.updateModelStatus({
         modelStatus: previousModelStatus,
-      })
+      }),
     );
     return;
   }
@@ -154,7 +154,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       "Inference set is empty",
       listenerAPI,
       previousModelStatus,
-      `Images cannot have existing "${model.kind}" objects.`
+      `Images cannot have existing "${model.kind}" objects.`,
     );
 
     return;
@@ -174,20 +174,20 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       "Error in processing the inference data.",
       listenerAPI,
       previousModelStatus,
-      error as Error
+      error as Error,
     );
     return;
   }
 
   const progressCb: LoadCB = (
     progressPercent: number,
-    progressMessage: string
+    progressMessage: string,
   ) => {
     listenerAPI.dispatch(
       applicationSettingsSlice.actions.setLoadPercent({
         loadPercent: progressPercent,
         loadMessage: progressMessage,
-      })
+      }),
     );
   };
 
@@ -221,7 +221,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       "Error in running predictions",
       listenerAPI,
       previousModelStatus,
-      error as Error
+      error as Error,
     );
     progressCb(1, "");
     return;
@@ -232,8 +232,8 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       const uniquePredictedKinds = [
         ...new Set(
           predictedAnnotations.flatMap((imAnns) =>
-            imAnns.map((ann) => ann.kind as string)
-          )
+            imAnns.map((ann) => ann.kind as string),
+          ),
         ),
       ];
 
@@ -244,7 +244,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       listenerAPI.dispatch(
         dataSlice.actions.addKinds({
           kinds: generatedKinds,
-        })
+        }),
       );
 
       const newUnknownCategories = generatedKinds.map((kind) => {
@@ -260,7 +260,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       listenerAPI.dispatch(
         dataSlice.actions.addCategories({
           categories: newUnknownCategories,
-        })
+        }),
       );
     }
     const annotations: AnnotationObject[] = [];
@@ -304,7 +304,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       "Error converting predictions to Piximi types",
       listenerAPI,
       previousModelStatus,
-      error as Error
+      error as Error,
     );
     progressCb(1, "");
 
@@ -314,7 +314,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   listenerAPI.dispatch(
     segmenterSlice.actions.updateModelStatus({
       modelStatus: ModelStatus.Trained,
-    })
+    }),
   );
   progressCb(1, "");
 };
@@ -323,19 +323,19 @@ async function handleError(
   name: string,
   listenerAPI: StoreListemerAPI,
   previousModelStatus: ModelStatus,
-  description: string
+  description: string,
 ): Promise<void>;
 async function handleError(
   name: string,
   listenerAPI: StoreListemerAPI,
   previousModelStatus: ModelStatus,
-  error: Error
+  error: Error,
 ): Promise<void>;
 async function handleError(
   name: string,
   listenerAPI: StoreListemerAPI,
   previousModelStatus: ModelStatus,
-  descriptionOrError: string | Error
+  descriptionOrError: string | Error,
 ) {
   let description: string;
   let stackTrace: string | undefined = undefined;
@@ -366,11 +366,11 @@ async function handleError(
   listenerAPI.dispatch(
     applicationSettingsSlice.actions.updateAlertState({
       alertState: alertState,
-    })
+    }),
   );
   listenerAPI.dispatch(
     segmenterSlice.actions.updateModelStatus({
       modelStatus: previousModelStatus,
-    })
+    }),
   );
 }

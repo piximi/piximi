@@ -110,7 +110,7 @@ export const Stage = ({
     outOfBounds,
     setCurrentMousePosition,
     getAbsolutePosition,
-    getPositionRelativeToStage
+    getPositionRelativeToStage,
   );
 
   const handleNewKind = (kindName: string, catName?: string) => {
@@ -140,32 +140,32 @@ export const Stage = ({
       dispatch(
         annotatorSlice.actions.addCategories({
           categories: kindCategories,
-        })
+        }),
       );
 
       dispatch(
         annotatorSlice.actions.addKind({
           kind: newKind,
           unknownCategory: newUnknownCategory,
-        })
+        }),
       );
       dispatch(
         imageViewerSlice.actions.setSelectedCategoryId({
           selectedCategoryId: kindCategories.at(-1)!.id,
-        })
+        }),
       );
     });
     annotationTool.annotate(
       kindCategories.at(-1)!,
       activeImage!.activePlane,
-      activeImageId!
+      activeImageId!,
     );
     dispatch(
       annotatorSlice.actions.setAnnotationState({
         annotationState: AnnotationState.Annotated,
         kind: kindName,
         annotationTool,
-      })
+      }),
     );
 
     //setNoKindAvailable(false);
@@ -194,7 +194,7 @@ export const Stage = ({
             y: (stageHeight / 2) * stage.scaleX() + stage.y(),
           },
         },
-      })
+      }),
     );
   }, [draggable, stageRef, dispatch, stageHeight, stageWidth]);
 
@@ -206,7 +206,7 @@ export const Stage = ({
           x: (stageWidth - activeImage.shape.width) / 2,
           y: (stageHeight - activeImage.shape.height) / 2,
         },
-      })
+      }),
     );
   }, [stageWidth, stageHeight, activeImage?.shape, dispatch]);
 
@@ -216,7 +216,7 @@ export const Stage = ({
         const imgElem = document.createElement("img");
         imgElem.src = src;
         return imgElem;
-      })
+      }),
     );
   }, [renderedSrcs, stageRef, dispatch]);
 
@@ -225,7 +225,7 @@ export const Stage = ({
     dispatch(
       imageViewerSlice.actions.setStagePosition({
         stagePosition: { x: 0, y: 0 },
-      })
+      }),
     );
   }, [activeImageId, stageRef, dispatch]);
 
@@ -235,7 +235,7 @@ export const Stage = ({
       setDraggable(event.type === "keydown" ? true : false);
     },
     HotkeyContext.AnnotatorView,
-    { keydown: true, keyup: true }
+    { keydown: true, keyup: true },
   );
 
   return (
