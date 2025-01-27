@@ -94,7 +94,7 @@ export const ToolOptions = () => {
       dispatch(
         annotatorSlice.actions.setToolType({
           operation: toolMap[toolName].operation,
-        })
+        }),
       );
   };
 
@@ -104,21 +104,21 @@ export const ToolOptions = () => {
         dispatch(
           annotatorSlice.actions.setPenSelectionBrushSize({
             penSelectionBrushSize: value,
-          })
+          }),
         );
         break;
       case ToolType.QuickAnnotation:
         dispatch(
           annotatorSlice.actions.setQuickSelectionRegionSize({
             quickSelectionRegionSize: value,
-          })
+          }),
         );
         break;
       case ToolType.ThresholdAnnotation:
         dispatch(
           annotatorSlice.actions.setThresholdAnnotationValue({
             thresholdAnnotationValue: value,
-          })
+          }),
         );
         break;
     }
@@ -141,7 +141,7 @@ export const ToolOptions = () => {
             {tool.icon(
               activeTool === tool.operation
                 ? theme.palette.primary.dark
-                : theme.palette.grey[400]
+                : theme.palette.grey[400],
             )}
           </ResizableTool>
         ) : (
@@ -153,7 +153,7 @@ export const ToolOptions = () => {
             {tool.icon(
               activeTool === tool.operation
                 ? theme.palette.primary.dark
-                : theme.palette.grey[400]
+                : theme.palette.grey[400],
             )}
           </Tool>
         );

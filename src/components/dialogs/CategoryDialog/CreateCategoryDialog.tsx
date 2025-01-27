@@ -23,7 +23,7 @@ export const CreateCategoryDialog = ({
         name,
         color,
         kind: kind,
-      })
+      }),
     );
   };
 

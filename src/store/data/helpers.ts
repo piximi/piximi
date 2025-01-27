@@ -48,7 +48,7 @@ export const generateNewKind = (id: string) => {
 export const updateContents = (
   previousContents: string[],
   contents: string[],
-  updateType: "add" | "remove" | "replace"
+  updateType: "add" | "remove" | "replace",
 ) => {
   let newContents: string[];
 

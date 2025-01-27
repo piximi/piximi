@@ -19,7 +19,7 @@ export const useMenu = () => {
       }
       setAnchorEl(event.currentTarget);
     },
-    []
+    [],
   );
 
   return {

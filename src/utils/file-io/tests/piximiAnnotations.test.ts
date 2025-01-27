@@ -167,7 +167,7 @@ describe("serializes piximi project", () => {
       [im1T1, im2T1],
       im1AnnotationsT1,
       [uC1T1, c1T1],
-      [k1T1]
+      [k1T1],
     );
     serializedPiximi.version = ANNOTATIONS_VERSION;
   });
@@ -177,7 +177,7 @@ describe("serializes piximi project", () => {
   test("properly serialized images", () => {
     expect(serializedPiximi.images.length).toBe(t1Ims.length);
     expect(serializedPiximi.images).toEqual(
-      t1Ims.map((im) => ({ id: im.id, name: im.name }))
+      t1Ims.map((im) => ({ id: im.id, name: im.name })),
     );
   });
   test("properly serialized kinds", () => {
@@ -208,7 +208,7 @@ describe("serializes piximi project", () => {
           shape: Object.values(shape),
           mask: ob.encodedMask.join(" "),
         };
-      })
+      }),
     );
   });
 });
@@ -223,7 +223,7 @@ describe("deserialize into empty project (no matching images)", () => {
       [im1T1, im2T1],
       im1AnnotationsT1,
       [uC1T1, c1T1],
-      [k1T1]
+      [k1T1],
     );
     serializedPiximi.version = ANNOTATIONS_VERSION;
     productionStore.dispatch(dataSlice.actions.resetData());
@@ -236,7 +236,7 @@ describe("deserialize into empty project (no matching images)", () => {
       serializedPiximi,
       images,
       categories,
-      kinds
+      kinds,
     );
     newAnnotations = deserialized.newAnnotations;
     newKinds = deserialized.newKinds;
@@ -263,7 +263,7 @@ describe("deserialize into project with matching image, no matching kinds or cat
       [im1T1, im2T1],
       im1AnnotationsT1,
       [uC1T1, c1T1],
-      [k1T1]
+      [k1T1],
     );
     serializedPiximi.version = ANNOTATIONS_VERSION;
     const image = await Image.load(im1T1.src);
@@ -275,7 +275,7 @@ describe("deserialize into project with matching image, no matching kinds or cat
         entities.entities[thing.id] = thing;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
     const kindsT2 = { ids: [], entities: {} };
 
@@ -285,7 +285,7 @@ describe("deserialize into project with matching image, no matching kinds or cat
     productionStore.dispatch(
       dataSlice.actions.initializeState({
         data: { things: thingsT2, categories: categoriesT2, kinds: kindsT2 },
-      })
+      }),
     );
 
     const rootState = productionStore.getState();
@@ -297,7 +297,7 @@ describe("deserialize into project with matching image, no matching kinds or cat
       serializedPiximi,
       images,
       categories,
-      kinds
+      kinds,
     );
     newAnnotations = deserialized.newAnnotations;
     newKinds = deserialized.newKinds;
@@ -317,12 +317,12 @@ describe("deserialize into project with matching image, no matching kinds or cat
       newAnnotations.map((ann) => ({
         categoryId: ann.categoryId,
         kind: ann.kind,
-      }))
+      })),
     ).toEqual(
       im1AnnotationsT1.map((ann) => ({
         categoryId: ann.categoryId,
         kind: ann.kind,
-      }))
+      })),
     );
   });
 });
@@ -338,7 +338,7 @@ describe("deserialize into project with matching image, matching kind", () => {
       [im1T1, im2T1],
       im1AnnotationsT1,
       [uC1T1, c1T1],
-      [k1T1]
+      [k1T1],
     );
     serializedPiximi.version = ANNOTATIONS_VERSION;
 
@@ -369,7 +369,7 @@ describe("deserialize into project with matching image, matching kind", () => {
         entities.entities[thing.id] = thing;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
     const kindsT2 = [k1T2].reduce(
       (entities: EntityState<Kind>, kind) => {
@@ -377,7 +377,7 @@ describe("deserialize into project with matching image, matching kind", () => {
         entities.entities[kind.id] = kind;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
 
     const categoriesT2 = [uC1T2].reduce(
@@ -386,14 +386,14 @@ describe("deserialize into project with matching image, matching kind", () => {
         entities.entities[category.id] = category;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
 
     productionStore.dispatch(dataSlice.actions.resetData());
     productionStore.dispatch(
       dataSlice.actions.initializeState({
         data: { things: thingsT2, categories: categoriesT2, kinds: kindsT2 },
-      })
+      }),
     );
 
     const rootState = productionStore.getState();
@@ -406,7 +406,7 @@ describe("deserialize into project with matching image, matching kind", () => {
       serializedPiximi,
       images,
       categories,
-      kinds
+      kinds,
     );
     newAnnotations = deserialized.newAnnotations;
     newKinds = deserialized.newKinds;
@@ -428,8 +428,8 @@ describe("deserialize into project with matching image, matching kind", () => {
       newAnnotations.some(
         (ann) =>
           isUnknownCategory(ann.categoryId) &&
-          ann.categoryId !== existingKindUnknownId
-      )
+          ann.categoryId !== existingKindUnknownId,
+      ),
     ).toBeFalsy();
   });
 });
@@ -445,7 +445,7 @@ describe("deserialize into project with matching image, matching kind, and match
       [im1T1, im2T1],
       im1AnnotationsT1,
       [uC1T1, c1T1],
-      [k1T1]
+      [k1T1],
     );
     serializedPiximi.version = ANNOTATIONS_VERSION;
 
@@ -484,7 +484,7 @@ describe("deserialize into project with matching image, matching kind, and match
         entities.entities[thing.id] = thing;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
     const kindsT2 = [k1T2].reduce(
       (entities: EntityState<Kind>, kind) => {
@@ -492,7 +492,7 @@ describe("deserialize into project with matching image, matching kind, and match
         entities.entities[kind.id] = kind;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
 
     const categoriesT2 = [uC1T2, c1T2].reduce(
@@ -501,14 +501,14 @@ describe("deserialize into project with matching image, matching kind, and match
         entities.entities[category.id] = category;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
 
     productionStore.dispatch(dataSlice.actions.resetData());
     productionStore.dispatch(
       dataSlice.actions.initializeState({
         data: { things: thingsT2, categories: categoriesT2, kinds: kindsT2 },
-      })
+      }),
     );
 
     const rootState = productionStore.getState();
@@ -521,7 +521,7 @@ describe("deserialize into project with matching image, matching kind, and match
       serializedPiximi,
       images,
       categories,
-      kinds
+      kinds,
     );
     newAnnotations = deserialized.newAnnotations;
     newKinds = deserialized.newKinds;
@@ -539,8 +539,8 @@ describe("deserialize into project with matching image, matching kind, and match
   test("category ids of new annotations should match existing category ids", () => {
     expect(
       newAnnotations.every((ann) =>
-        t2categories.map((c) => c.id).includes(ann.categoryId)
-      )
+        t2categories.map((c) => c.id).includes(ann.categoryId),
+      ),
     ).toBeTruthy();
   });
 });

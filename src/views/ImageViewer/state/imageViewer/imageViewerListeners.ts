@@ -57,18 +57,18 @@ startAppListening({
       annotatorSlice.actions.setSelectedAnnotationIds({
         annotationIds,
         workingAnnotationId: annotationIds[0],
-      })
+      }),
     );
     listenerAPI.dispatch(
       annotatorSlice.actions.setWorkingAnnotation({
         annotation: annotationIds[0],
-      })
+      }),
     );
     listenerAPI.dispatch(
       imageViewerSlice.actions.setActiveImageId({
         imageId: activeImageId,
         prevImageId: undefined,
-      })
+      }),
     );
   },
 });
@@ -76,7 +76,7 @@ startAppListening({
   actionCreator: imageViewerSlice.actions.setActiveImageId,
   effect: async (action, listenerAPI) => {
     listenerAPI.dispatch(
-      imageViewerSlice.actions.setImageIsLoading({ isLoading: true })
+      imageViewerSlice.actions.setImageIsLoading({ isLoading: true }),
     );
     const newActiveImageId = action.payload.imageId;
     const dataState = listenerAPI.getState().data;
@@ -84,10 +84,10 @@ startAppListening({
       listenerAPI.dispatch(
         imageViewerSlice.actions.setActiveImageRenderedSrcs({
           renderedSrcs: [],
-        })
+        }),
       );
       listenerAPI.dispatch(
-        imageViewerSlice.actions.setActiveAnnotationIds({ annotationIds: [] })
+        imageViewerSlice.actions.setActiveAnnotationIds({ annotationIds: [] }),
       );
       return;
     }
@@ -98,20 +98,20 @@ startAppListening({
     listenerAPI.dispatch(
       imageViewerSlice.actions.setActiveAnnotationIds({
         annotationIds: activeImage.containing,
-      })
+      }),
     );
     const renderedSrcs = await createRenderedTensor(
       activeImage.data,
       activeImage.colors,
       activeImage.bitDepth,
-      undefined
+      undefined,
     );
 
     listenerAPI.dispatch(
-      imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
+      imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs }),
     );
     listenerAPI.dispatch(
-      imageViewerSlice.actions.setImageIsLoading({ isLoading: false })
+      imageViewerSlice.actions.setImageIsLoading({ isLoading: false }),
     );
   },
 });
@@ -128,7 +128,7 @@ startAppListening({
     const { data: oldData } = listenerApi.getOriginalState();
     const deletedCategories = difference(
       oldData.categories.ids,
-      data.categories.ids
+      data.categories.ids,
     ) as string[];
     const filteredCats = imageViewer.filters.categoryId;
     const deletedFilters = intersection(filteredCats, deletedCategories);
@@ -136,7 +136,7 @@ startAppListening({
       listenerApi.dispatch(
         imageViewerSlice.actions.removeFilters({
           categoryIds: deletedFilters,
-        })
+        }),
       );
     }
   },
@@ -150,7 +150,7 @@ startAppListening({
         listenerAPI.dispatch(
           imageViewerSlice.actions.addActiveAnnotationId({
             annotationId: annotation.id,
-          })
+          }),
         );
       }
     });
@@ -170,13 +170,13 @@ startAppListening({
       listenerAPI.dispatch(
         imageViewerSlice.actions.setHasUnsavedChanges({
           hasUnsavedChanges: false,
-        })
+        }),
       );
     } else {
       listenerAPI.dispatch(
         imageViewerSlice.actions.setHasUnsavedChanges({
           hasUnsavedChanges: true,
-        })
+        }),
       );
     }
   },
@@ -188,7 +188,7 @@ startAppListening({
     listenerAPI.dispatch(
       imageViewerSlice.actions.setHasUnsavedChanges({
         hasUnsavedChanges: false,
-      })
+      }),
     );
   },
 });

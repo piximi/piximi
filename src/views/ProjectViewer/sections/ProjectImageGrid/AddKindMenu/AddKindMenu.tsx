@@ -57,13 +57,13 @@ export const AddKindMenu = ({
       dispatch(
         dataSlice.actions.addCategories({
           categories: [newUnknownCategory],
-        })
+        }),
       );
 
       dispatch(
         dataSlice.actions.addKinds({
           kinds: [kind],
-        })
+        }),
       );
     });
   };

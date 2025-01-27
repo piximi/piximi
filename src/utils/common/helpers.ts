@@ -42,7 +42,7 @@ export const getStackTraceFromError = async (error: Error): Promise<string> => {
 export const createGitHubIssue = (
   title: string,
   body: string,
-  alertType: AlertType = AlertType.Error
+  alertType: AlertType = AlertType.Error,
 ) => {
   const label = alertType === AlertType.Error ? "bug" : "help%20wanted";
   const url =
@@ -57,7 +57,7 @@ export const createGitHubIssue = (
 
 export const logger = (
   message: any | any[],
-  options?: { level?: "log" | "warn" | "error"; dev?: boolean }
+  options?: { level?: "log" | "warn" | "error"; dev?: boolean },
 ) => {
   if (!options) {
     options = { level: "log" };
@@ -111,14 +111,14 @@ export const isObjectEmpty = <T extends object>(obj: T) => {
 };
 
 export const enumKeys = <O extends object, K extends keyof O = keyof O>(
-  obj: O
+  obj: O,
 ): K[] => {
   return Object.keys(obj).filter((k) => Number.isNaN(+k)) as K[];
 };
 
 export const mutatingFilter = <T>(
   array: Array<T>,
-  condition: (arg: T) => boolean
+  condition: (arg: T) => boolean,
 ): void => {
   for (let l = array.length - 1; l >= 0; l -= 1) {
     if (!condition(array[l])) array.splice(l, 1);
@@ -131,7 +131,7 @@ export const toUnique = <T>(array: T[]): T[] => {
 
 export const isFiltered = <T extends object>(
   object: T,
-  filters: FilterType<T>
+  filters: FilterType<T>,
 ): boolean => {
   return Object.keys(object).some((key) => {
     const itemValue = object[key as keyof T];
@@ -148,7 +148,7 @@ export const isFiltered = <T extends object>(
 
 export const filterObjects = <T extends object>(
   objectArr: T[],
-  filters: FilterType<T>
+  filters: FilterType<T>,
 ): T[] => {
   return objectArr.filter((item) => {
     return Object.keys(item).every((key) => {
@@ -167,7 +167,7 @@ export const filterObjects = <T extends object>(
 
 export const copyValues = <T extends object>(
   existingObject: T,
-  updates: Partial<T>
+  updates: Partial<T>,
 ) => {
   Object.entries(updates).forEach(([key, value]) => {
     existingObject[key as keyof T] = value as T[keyof T];
@@ -176,18 +176,18 @@ export const copyValues = <T extends object>(
 
 export const recursiveAssign = <T extends object>(
   existingObject: T,
-  updates: RecursivePartial<T>
+  updates: RecursivePartial<T>,
 ) => {
   Object.entries(updates).forEach(([key, _value]) => {
     if (typeof existingObject[key as keyof T] === "object") {
       recursiveAssign(
         existingObject[key as keyof T] as object,
-        updates[key as keyof T]!
+        updates[key as keyof T]!,
       );
     } else {
       Object.assign(
         existingObject[key as keyof T] as object,
-        updates[key as keyof T]!
+        updates[key as keyof T]!,
       );
     }
   });
@@ -245,7 +245,7 @@ export const sortTypeByKey = (key: ImageSortKey): ImageSortKeyType => {
 export const updateRecord = <T extends string | number | symbol, K>(
   record: Record<T, K[]>,
   key: T,
-  value: K
+  value: K,
 ) => {
   if (key in record) {
     record[key].push(value);
@@ -355,7 +355,7 @@ export const getInnerElementWidth = (el: HTMLElement) => {
  */
 export const replaceDuplicateName = (
   newName: string,
-  existingNames: Array<string>
+  existingNames: Array<string>,
 ) => {
   let currentName = newName;
   let i = 1;
@@ -369,7 +369,7 @@ export const replaceDuplicateName = (
 //HACK: new
 export const newReplaceDuplicateName = (
   newName: string,
-  existingNames: Array<string>
+  existingNames: Array<string>,
 ) => {
   const currentName = newName;
   let count = 0;
@@ -388,7 +388,7 @@ export const newReplaceDuplicateName = (
 
 export const scaleUpRange = (
   range: [number, number],
-  bitDepth: BitDepth
+  bitDepth: BitDepth,
 ): [number, number] => {
   return [
     Math.floor(range[0] * (2 ** bitDepth - 1)),
@@ -399,7 +399,7 @@ export const scaleUpRange = (
 export const scaleUpRanges = (
   ranges: { [channel: number]: [number, number] },
   bitDepth: BitDepth,
-  opts: { inPlace: boolean } = { inPlace: false }
+  opts: { inPlace: boolean } = { inPlace: false },
 ): { [channel: number]: [number, number] } => {
   const operandRanges = opts.inPlace ? ranges : { ...ranges };
 
@@ -413,7 +413,7 @@ export const scaleUpRanges = (
 
 export const scaleDownRange = (
   range: [number, number],
-  bitDepth: BitDepth
+  bitDepth: BitDepth,
 ): [number, number] => {
   return [range[0] / (2 ** bitDepth - 1), range[1] / (2 ** bitDepth - 1)];
 };
@@ -421,7 +421,7 @@ export const scaleDownRange = (
 export const scaleDownRanges = (
   ranges: { [channel: number]: [number, number] },
   bitDepth: BitDepth,
-  opts: { inPlace: boolean } = { inPlace: false }
+  opts: { inPlace: boolean } = { inPlace: false },
 ): { [channel: number]: [number, number] } => {
   const operandRanges = opts.inPlace ? ranges : { ...ranges };
 
@@ -451,7 +451,7 @@ export const extractMinMax = (ranges: {
 
 export const convertToDataArray = (
   depth: number,
-  source: DataArray | Array<number>
+  source: DataArray | Array<number>,
 ): DataArray => {
   switch (depth) {
     case 1:
@@ -469,7 +469,7 @@ export const convertToDataArray = (
 
 export const getPropertiesFromImage = async (
   image: ImageObject,
-  annotation: { boundingBox: number[] }
+  annotation: { boundingBox: number[] },
 ) => {
   const renderedIm = await ImageJS.Image.load(image.src);
   const normalizingWidth = image.shape.width - 1;
@@ -502,7 +502,7 @@ export const getPropertiesFromImage = async (
 export const getPropertiesFromImageSync = (
   renderedIm: ImageJS.Image,
   image: ImageObject,
-  annotation: { boundingBox: number[] }
+  annotation: { boundingBox: number[] },
 ) => {
   const normalizingWidth = image.shape.width - 1;
   const normalizingHeight = image.shape.height - 1;

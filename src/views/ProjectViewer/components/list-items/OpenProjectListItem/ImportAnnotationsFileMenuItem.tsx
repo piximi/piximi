@@ -63,31 +63,31 @@ export const ImportAnnotationsFileMenuItem = ({
                   serializedProject as SerializedFileType,
                   existingThings.images,
                   existingObjectCategories,
-                  existingObjectKinds
+                  existingObjectKinds,
                 )
               : await deserializeCOCOFile(
                   serializedProject as SerializedCOCOFileType,
                   Object.values(existingThings.images),
                   Object.values(existingObjectCategories),
                   Object.values(existingObjectKinds),
-                  Object.values(CATEGORY_COLORS)
+                  Object.values(CATEGORY_COLORS),
                 );
 
           batch(() => {
             dispatch(
               dataSlice.actions.addKinds({
                 kinds: newKinds,
-              })
+              }),
             );
             dispatch(
               dataSlice.actions.addCategories({
                 categories: newCategories,
-              })
+              }),
             );
             dispatch(
               dataSlice.actions.addThings({
                 things: newAnnotations,
-              })
+              }),
             );
           });
         }
@@ -101,7 +101,7 @@ export const ImportAnnotationsFileMenuItem = ({
       existingThings.images,
       existingObjectKinds,
       projectType,
-    ]
+    ],
   );
 
   return (
