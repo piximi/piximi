@@ -1,4 +1,5 @@
 import {
+  AnyAction,
   configureStore,
   Dispatch,
   EnhancedStore,
@@ -13,14 +14,10 @@ import { imageViewerMiddleware } from "views/ImageViewer/state/imageViewer/image
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { rootReducer, RootState } from "./rootReducer";
-import { annotatorMiddleware } from "views/ImageViewer/state/annotator/annotatorListeners";
-import { imageViewerMiddleware } from "views/ImageViewer/state/imageViewer/imageViewerListeners";
 import { projectMiddleware } from "./project/projectListeners";
 import { dataMiddleware } from "./data/dataListeners";
 import { classifierSlice } from "./classifier";
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { applicationSettingsSlice } from "./applicationSettings";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { dataSlice } from "./data/dataSlice";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
@@ -32,16 +29,10 @@ import { applicationMiddleware } from "./applicationSettings/applicationListener
 
 const enhancers: StoreEnhancer[] = [];
 
-/* In order to ensure that sagas are ran after the dispatched action,
- * always keep "saga" as the last item in the middleware array .
- * https://redux-saga.js.org/docs/api/index.html#selectselector-args
- *
- * For infor on changing the execution order, see https://github.com/redux-saga/redux-saga/issues/148
- */
 const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&
   import.meta.env.VITE_APP_LOG_LEVEL === "2"
-    ? [logger]
+    ? [logger as Middleware<object, any, Dispatch<AnyAction>>]
     : [];
 
 const listenerMiddlewares: Middleware[] = [
