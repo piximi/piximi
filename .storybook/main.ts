@@ -1,5 +1,4 @@
-import path from "path";
-import type { StorybookConfig } from "@storybook/react-webpack5";
+import type { StorybookConfig } from "@storybook/react-vite";
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
@@ -29,11 +28,7 @@ const config: StorybookConfig = {
           : true,
     },
   },
-  webpackFinal: async (config) => {
-    config.resolve!.modules = [
-      path.resolve(__dirname, "..", "src"),
-      "node_modules",
-    ];
+  async viteFinal(config) {
     return config;
   },
 };
