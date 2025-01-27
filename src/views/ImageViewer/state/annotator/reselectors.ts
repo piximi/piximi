@@ -46,7 +46,7 @@ export const selectImages = createSelector(
         ];
         return byImage;
       },
-      {}
+      {},
     );
     for (const imageId of imageIds) {
       const image = things[imageId] as ImageObject;
@@ -60,23 +60,24 @@ export const selectImages = createSelector(
       }
       finalImage.containing = difference(
         finalImage.containing,
-        changes.deleted
+        changes.deleted,
       );
       finalImage.containing.push(...(newObjectsByImage[imageId] ?? []));
       images[imageId] = finalImage;
     }
     return images;
-  }
+  },
 );
 
 export const selectImagesArray = createSelector(selectImages, (images) =>
-  Object.values(images)
+  Object.values(images),
 );
 
 export const selectActiveImage = createSelector(
   selectActiveImageId,
   selectImages,
-  (activeImageId, images) => (activeImageId ? images[activeImageId] : undefined)
+  (activeImageId, images) =>
+    activeImageId ? images[activeImageId] : undefined,
 );
 export const selectActiveImageRawColor = createSelector(
   selectActiveImage,
@@ -94,12 +95,12 @@ export const selectActiveImageRawColor = createSelector(
       range: colors.range,
       visible: colors.visible,
     };
-  }
+  },
 );
 
 export const selectActiveImageObjectIds = createSelector(
   selectActiveImage,
-  (activeImage) => activeImage?.containing ?? []
+  (activeImage) => activeImage?.containing ?? [],
 );
 
 export const selectKinds = createSelector(
@@ -117,14 +118,14 @@ export const selectKinds = createSelector(
         ];
         return byImage;
       },
-      {}
+      {},
     );
     const newCategoriesByKind = Object.values(categoryChanges.added).reduce(
       (byKind: Record<string, string[]>, change) => {
         byKind[change.kind] = [...(byKind[change.kind] ?? []), change.id];
         return byKind;
       },
-      {}
+      {},
     );
     for (const kind of rootKinds) {
       let finalKind: Kind = { ...kind };
@@ -138,21 +139,21 @@ export const selectKinds = createSelector(
       }
       finalKind.containing = difference(
         finalKind.containing,
-        thingChanges.deleted
+        thingChanges.deleted,
       );
       finalKind.containing.push(...(newObjectsByKind[kindId] ?? []));
       finalKind.categories = difference(
         finalKind.categories,
-        categoryChanges.deleted
+        categoryChanges.deleted,
       );
       finalKind.categories.push(...(newCategoriesByKind[kindId] ?? []));
       finalKinds[kindId] = finalKind;
     }
     return finalKinds;
-  }
+  },
 );
 export const selectKindsArray = createSelector(selectKinds, (kinds) =>
-  Object.values(kinds)
+  Object.values(kinds),
 );
 
 export const selectCategories = createSelector(
@@ -169,7 +170,7 @@ export const selectCategories = createSelector(
         ];
         return byCategory;
       },
-      {}
+      {},
     );
     const editedObjectsByCategory = Object.values(thingChanges.edited).reduce(
       (byCategory: Record<string, string[]>, change) => {
@@ -181,19 +182,19 @@ export const selectCategories = createSelector(
         }
         return byCategory;
       },
-      {}
+      {},
     );
     for (const category of rootCategories) {
       let finalCategory: Category = { ...category };
       const categoryId = category.id;
       finalCategory.containing = difference(
         finalCategory.containing,
-        thingChanges.deleted
+        thingChanges.deleted,
       );
 
       finalCategory.containing.push(
         ...(newObjectsByCategory[categoryId] ?? []),
-        ...(editedObjectsByCategory[categoryId] ?? [])
+        ...(editedObjectsByCategory[categoryId] ?? []),
       );
       if (categoryChanges.edited[categoryId]) {
         finalCategory = {
@@ -204,12 +205,12 @@ export const selectCategories = createSelector(
       finalCategories[categoryId] = finalCategory;
     }
     return finalCategories;
-  }
+  },
 );
 
 export const selectCategoriesArray = createSelector(
   selectCategories,
-  (categories) => Object.values(categories)
+  (categories) => Object.values(categories),
 );
 
 export const selectCategoriesByKind = createSelector(
@@ -229,12 +230,12 @@ export const selectCategoriesByKind = createSelector(
     });
 
     return catsByKind;
-  }
+  },
 );
 
 export const selectCategoriesByKindArray = createSelector(
   selectCategoriesByKind,
-  (catsByKind) => Object.values(catsByKind)
+  (catsByKind) => Object.values(catsByKind),
 );
 
 export const selectUpdatedThings = createSelector(
@@ -246,7 +247,7 @@ export const selectUpdatedThings = createSelector(
     };
     const remainingThings = difference(
       Object.keys(thingsDict),
-      thingChanges.deleted
+      thingChanges.deleted,
     );
     for (const thingId of remainingThings) {
       const thing = thingsDict[thingId];
@@ -259,7 +260,7 @@ export const selectUpdatedThings = createSelector(
     }
 
     return finalThings;
-  }
+  },
 );
 export const selectUpdatedObjects = createSelector(
   selectThingsDictionary,
@@ -270,7 +271,7 @@ export const selectUpdatedObjects = createSelector(
     };
     const remainingThings = difference(
       Object.keys(thingsDict),
-      thingChanges.deleted
+      thingChanges.deleted,
     );
 
     for (const thingId of remainingThings) {
@@ -288,7 +289,7 @@ export const selectUpdatedObjects = createSelector(
     }
 
     return finalThings;
-  }
+  },
 );
 export const selectUpdatedImages = createSelector(
   selectThingsDictionary,
@@ -297,7 +298,7 @@ export const selectUpdatedImages = createSelector(
     const finalThings: Record<string, ImageObject> = {};
     const remainingThings = difference(
       Object.keys(thingsDict),
-      thingChanges.deleted
+      thingChanges.deleted,
     );
     for (const thingId of remainingThings) {
       const thing = thingsDict[thingId];
@@ -311,7 +312,7 @@ export const selectUpdatedImages = createSelector(
     }
 
     return finalThings;
-  }
+  },
 );
 
 export const selectFullWorkingAnnotation = createSelector(
@@ -323,7 +324,7 @@ export const selectFullWorkingAnnotation = createSelector(
       ...workingAnnotationEntity.saved,
       ...workingAnnotationEntity.changes,
     } as DecodedAnnotationObject;
-  }
+  },
 );
 
 export const selectActiveAnnotations = createSelector(
@@ -338,7 +339,7 @@ export const selectActiveAnnotations = createSelector(
         : (annotation as DecodedAnnotationObject);
       return decodedAnnotation;
     });
-  }
+  },
 );
 
 export const selectActiveAnnotationsViews = createSelector(
@@ -375,7 +376,7 @@ export const selectActiveAnnotationsViews = createSelector(
       }
     }
     return annotationObjects;
-  }
+  },
 );
 export const selectWorkingAnnotationView = createSelector(
   selectWorkingAnnotationEntity,
@@ -384,7 +385,7 @@ export const selectWorkingAnnotationView = createSelector(
   (workingAnnotationEntity, activeImage, catDict) => {
     if (!workingAnnotationEntity.saved || !activeImage) return;
     const workingAnnotation = getCompleteEntity(
-      workingAnnotationEntity
+      workingAnnotationEntity,
     ) as AnnotationObject;
     const annotation = !workingAnnotation.decodedMask
       ? decodeAnnotation(workingAnnotation)
@@ -395,7 +396,7 @@ export const selectWorkingAnnotationView = createSelector(
       fillColor: fillColor,
       imageShape: activeImage.shape,
     };
-  }
+  },
 );
 
 export const selectSelectedActiveAnnotations = createSelector(
@@ -410,7 +411,7 @@ export const selectSelectedActiveAnnotations = createSelector(
         : (annotation as DecodedAnnotationObject);
       return decodedAnnotation;
     });
-  }
+  },
 );
 
 export const selectImageViewerObjects = createSelector(
@@ -425,7 +426,7 @@ export const selectImageViewerObjects = createSelector(
       }
     }
     return annotationObjects;
-  }
+  },
 );
 
 export const selectImageViewerObjectDict = createSelector(
@@ -440,7 +441,7 @@ export const selectImageViewerObjectDict = createSelector(
       }
     }
     return annotationObjects;
-  }
+  },
 );
 
 export const selectSelectedAnnotations = createSelector(
@@ -459,7 +460,7 @@ export const selectSelectedAnnotations = createSelector(
         }
         return anns;
       },
-      []
+      [],
     );
-  }
+  },
 );

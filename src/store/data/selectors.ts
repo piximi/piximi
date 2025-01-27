@@ -62,11 +62,6 @@ export const selectObjectKindDict = createSelector(
   },
 );
 
-export const selectRenderKindName = createSelector(
-  selectKindDictionary,
-  (kinds) => (kindId: string) => kinds[kindId].displayName,
-);
-
 /*
   THINGS
 */
@@ -181,7 +176,7 @@ export const selectUnknownImageCategory = createSelector(
   selectKindDictionary,
   (kinds) => {
     return kinds["Image"]!.unknownCategoryId;
-  }
+  },
 );
 
 export const selectAllObjectCategories = createSelector(
@@ -208,5 +203,5 @@ export const selectCategoryProperty = createSelector(
       const category = entities[id];
       if (!category) return;
       return category[property];
-    }
+    },
 );

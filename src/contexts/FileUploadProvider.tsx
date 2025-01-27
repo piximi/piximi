@@ -98,9 +98,12 @@ const getUploadedFileTypes = async (files: FileList) => {
         });
       } else {
         const buffer = await file.arrayBuffer();
-        const image: IJSImage | IJSStack = await IJSImage.load(buffer, {
-          ignorePalette: true,
-        });
+        const image: ImageJS.Image | ImageJS.Stack = await ImageJS.Image.load(
+          buffer,
+          {
+            ignorePalette: true,
+          },
+        );
 
         const imageInfo = getImageInformation(image);
 
@@ -211,7 +214,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
         dispatch(
           dataSlice.actions.addThings({
             things: convertedImages,
-          })
+          }),
         );
         dispatch(
           projectSlice.actions.selectThings({

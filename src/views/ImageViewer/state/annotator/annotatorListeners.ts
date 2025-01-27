@@ -49,7 +49,7 @@ startAppListening({
       annotatorSlice.actions.setWorkingAnnotation({
         annotation: annotationValue,
         preparedByListener: true,
-      })
+      }),
     );
     listenerAPI.subscribe();
   },
@@ -92,7 +92,7 @@ startAppListening({
     listenerAPI.dispatch(
       dataSlice.actions.addKinds({
         kinds: Object.values(kindChanges.added),
-      })
+      }),
     );
     for (const id in kindChanges.deleted) {
       listenerAPI.dispatch(dataSlice.actions.deleteKind({ deletedKindId: id }));
@@ -100,13 +100,13 @@ startAppListening({
     listenerAPI.dispatch(
       dataSlice.actions.addCategories({
         categories: Object.values(categoryChanges.added),
-      })
+      }),
     );
 
     listenerAPI.dispatch(
       dataSlice.actions.deleteCategories({
         categoryIds: categoryChanges.deleted,
-      })
+      }),
     );
 
     listenerAPI.dispatch(
@@ -114,19 +114,19 @@ startAppListening({
         things: Object.values(thingChanges.added) as Array<
           ImageObject | AnnotationObject
         >,
-      })
+      }),
     );
     listenerAPI.dispatch(
       dataSlice.actions.updateThings({
         updates: Object.values(thingChanges.edited),
-      })
+      }),
     );
     listenerAPI.dispatch(
       dataSlice.actions.deleteThings({
         thingIds: thingChanges.deleted,
 
         disposeColorTensors: true,
-      })
+      }),
     );
   },
 });
@@ -157,7 +157,7 @@ startAppListening({
           image.data,
           colorsEditable,
           image.bitDepth,
-          undefined
+          undefined,
         );
 
         srcUpdates.push({ id: imageId, src: renderedSrcs[image.activePlane] });
@@ -165,13 +165,13 @@ startAppListening({
           listenerAPI.dispatch(
             imageViewerSlice.actions.setActiveImageRenderedSrcs({
               renderedSrcs,
-            })
+            }),
           );
         }
         listenerAPI.dispatch(
           applicationSettingsSlice.actions.setLoadMessage({
             message: `Updating image ${imageNumber} of ${numImages}`,
-          })
+          }),
         );
         imageNumber++;
       }
@@ -182,14 +182,14 @@ startAppListening({
       listenerAPI.dispatch(
         annotatorSlice.actions.editThings({
           updates: srcUpdates,
-        })
+        }),
       );
       listenerAPI.subscribe();
     }
     listenerAPI.dispatch(
       applicationSettingsSlice.actions.setLoadMessage({
         message: "",
-      })
+      }),
     );
   },
 });

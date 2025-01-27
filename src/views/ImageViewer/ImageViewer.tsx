@@ -86,7 +86,7 @@ export const ImageViewer = () => {
         selectedThingIds: routerLocation.state?.initialThingIds
           ? routerLocation.state.initialThingIds
           : [],
-      })
+      }),
     );
     dispatch(
       applicationSettingsSlice.actions.registerHotkeyContext({
