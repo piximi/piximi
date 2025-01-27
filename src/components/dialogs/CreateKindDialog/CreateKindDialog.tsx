@@ -12,7 +12,6 @@ type CreateCategoriesDialogProps = {
   withContainedThings?: string[];
   withContainedCategories?: string[];
   open: boolean;
-  changesPermanent?: boolean;
   secondaryAction?: () => void;
   storeDispatch: (kind: Kind, newUnknownCategory: Category) => void;
   existingKinds: string[];
@@ -23,7 +22,6 @@ export const CreateKindDialog = ({
   withContainedThings = [],
   withContainedCategories = [],
   open,
-  changesPermanent,
   secondaryAction,
   storeDispatch,
   existingKinds,
