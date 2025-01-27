@@ -35,7 +35,7 @@ export const selectActiveKindObject = createSelector(
   selectKindDictionary,
   (activeKind, kindDict) => {
     return kindDict[activeKind]!;
-  }
+  },
 );
 
 export const selectActiveUnknownCategoryId = createSelector(
@@ -53,7 +53,7 @@ export const selectActiveCategories = createSelector(
     const categoriesOfKind = kindDict[kind]!.categories;
 
     return categoriesOfKind.map((catId) => categoriesDict[catId]!);
-  }
+  },
 );
 
 export const selectActiveKnownCategories = createSelector(
@@ -69,7 +69,7 @@ export const selectActiveUnknownCategory = createSelector(
   (unknownCatId, catDict) => {
     if (!unknownCatId) return;
     return catDict[unknownCatId]!;
-  }
+  },
 );
 
 export const selectActiveCategoryCount = createSelector(
@@ -130,7 +130,7 @@ export const selectActiveThings = createSelector(
   [selectActiveThingIds, selectThingsDictionary],
   (activeThingIds, thingDict) => {
     return activeThingIds.map((thingId) => thingDict[thingId]!);
-  }
+  },
 );
 
 export const selectActiveLabeledThingsIds = createSelector(

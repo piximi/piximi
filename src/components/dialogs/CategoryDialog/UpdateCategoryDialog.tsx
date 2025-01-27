@@ -31,7 +31,7 @@ export const UpdateCategoryDialog = ({
             color,
           },
         },
-      })
+      }),
     );
   };
 

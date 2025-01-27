@@ -92,7 +92,7 @@ export const AnnotationTransformer = ({
       dispatch(
         annotatorSlice.actions.setAnnotationMode({
           annotationMode: AnnotationMode.New,
-        })
+        }),
       );
 
       dispatch(
@@ -105,7 +105,7 @@ export const AnnotationTransformer = ({
   };
 
   const handleConfirmOrDeleteAnnotation = (
-    _event?: Konva.KonvaEventObject<Event>
+    _event?: Konva.KonvaEventObject<Event>,
   ) => {
     if (!activeImage) return;
     const container = stageRef!.current!.container();
@@ -127,7 +127,7 @@ export const AnnotationTransformer = ({
           dispatch(
             annotatorSlice.actions.deleteThings({
               thingIds: selectedAnnotations.map((annotation) => annotation.id),
-            })
+            }),
           );
         });
       } else {
@@ -143,7 +143,7 @@ export const AnnotationTransformer = ({
       dispatch(
         annotatorSlice.actions.addThings({
           things: [completeWorkingAnnotation],
-        })
+        }),
       );
       if (soundEnabled) playCreateAnnotationSoundEffect();
     }

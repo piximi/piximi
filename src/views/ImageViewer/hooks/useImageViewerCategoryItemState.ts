@@ -37,19 +37,10 @@ export const useImageViewerCategoryItemState = (category: Category) => {
 
   const deleteCategory = (category: Category, kindId: string) => {
     dispatch(
-      annotatorSlice.actions.deleteCategory({
-        category: category,
-        associatedUnknownKind: kindDictionary[kindId].unknownCategoryId,
-      }),
-    );
-  }, [category.id, dispatch]);
-
-  const deleteCategory = (category: Category, kindId: string) => {
-    dispatch(
       annotatorSlice.actions.deleteCategories({
         categories: [category],
         kind: kindDictionary[kindId],
-      })
+      }),
     );
   };
 
@@ -62,7 +53,7 @@ export const useImageViewerCategoryItemState = (category: Category) => {
     dispatch(
       annotatorSlice.actions.deleteThings({
         thingIds: category.containing,
-      })
+      }),
     );
   };
 
@@ -73,17 +64,17 @@ export const useImageViewerCategoryItemState = (category: Category) => {
         dispatch(
           imageViewerSlice.actions.removeFilters({
             categoryIds: [category.id],
-          })
+          }),
         );
       } else {
         dispatch(
           imageViewerSlice.actions.addFilters({
             categoryIds: [categoryId],
-          })
+          }),
         );
       }
     },
-    [category.id, dispatch, filteredCategoryIds]
+    [category.id, dispatch, filteredCategoryIds],
   );
 
   useEffect(() => {

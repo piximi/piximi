@@ -156,7 +156,7 @@ export abstract class AnnotationTool extends Tool {
     category: Category,
     plane: number,
     imageId: string,
-    id?: string
+    id?: string,
   ): void {
     if (!this.boundingBox || !this.decodedMask) return;
 

@@ -74,7 +74,7 @@ export const ProjectViewerCategories = () => {
       dataSlice.actions.removeCategoriesFromKind({
         categoryIds: [category.id],
         kind: kindId ?? activeKind,
-      })
+      }),
     );
   };
   const deleteObjects = (category: Category) => {
@@ -83,7 +83,7 @@ export const ProjectViewerCategories = () => {
         thingIds: category.containing,
         activeKind: activeKind,
         disposeColorTensors: true,
-      })
+      }),
     );
   };
 
@@ -138,7 +138,7 @@ export const ProjectViewerCategories = () => {
       dataSlice.actions.removeCategoriesFromKind({
         categoryIds: "all",
         kind: activeKind,
-      })
+      }),
     );
   };
 
@@ -192,7 +192,7 @@ export const ProjectViewerCategories = () => {
                 categoryId: highlightedCategory,
                 partition: Partition.Unassigned,
               })),
-            })
+            }),
           );
         }
       }

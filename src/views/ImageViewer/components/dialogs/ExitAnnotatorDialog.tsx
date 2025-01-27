@@ -42,7 +42,7 @@ export const ExitAnnotatorDialog = ({
         }),
       );
       dispatch(
-        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined })
+        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
       );
       dispatch(annotatorSlice.actions.resetAnnotator());
     });
@@ -58,7 +58,7 @@ export const ExitAnnotatorDialog = ({
         }),
       );
       dispatch(
-        annotatorSlice.actions.reconcileChanges({ discardChanges: true })
+        annotatorSlice.actions.reconcileChanges({ discardChanges: true }),
       );
       dispatch(
         annotatorSlice.actions.setSelectedAnnotationIds({
@@ -67,7 +67,7 @@ export const ExitAnnotatorDialog = ({
         }),
       );
       dispatch(
-        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined })
+        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
       );
       dispatch(annotatorSlice.actions.resetAnnotator());
     });
