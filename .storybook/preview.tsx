@@ -2,7 +2,7 @@ import React from "react";
 import type { Preview } from "@storybook/react";
 import { Provider } from "react-redux";
 import { ThemeProvider, CssBaseline } from "@mui/material";
-import { withThemeFromJSXProvider } from "@storybook/addon-styling";
+import { withThemeFromJSXProvider } from "@storybook/addon-themes";
 // .storybook/preview.js
 
 /* TODO: update import for your custom Material UI themes */
