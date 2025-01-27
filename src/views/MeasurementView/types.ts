@@ -1,6 +1,7 @@
-import { ParsedMeasurementDatum } from "store/measurements/types";
-import type { ColorSchemeId } from "@nivo/colors";
 import { ComputedDatum } from "@nivo/swarmplot";
+import type { ColorSchemeId } from "@nivo/colors";
+
+import { ParsedMeasurementDatum } from "store/measurements/types";
 
 export type MeasurementDisplayParameters = {
   measurementPlotOptions: ChartValues;
