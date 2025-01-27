@@ -54,7 +54,7 @@ export const selectImages = createSelector(
       if (changes.deleted.includes(imageId)) {
         continue;
       } else if (changes.edited[imageId]) {
-        const { id, ...imageChanges } = changes.edited[imageId];
+        const { id: _id, ...imageChanges } = changes.edited[imageId];
 
         finalImage = { ...finalImage, ...imageChanges };
       }

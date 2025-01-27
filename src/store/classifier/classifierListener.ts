@@ -440,7 +440,7 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
     project: projectState,
   } = listenerAPI.getState();
 
-  listenerAPI.dispatch(applicationSettingsSlice.actions.hideAlertState({}));
+  listenerAPI.dispatch(applicationSettingsSlice.actions.hideAlertState());
 
   /* ACTIVE KIND */
   const activeKindId = projectState.activeKind;

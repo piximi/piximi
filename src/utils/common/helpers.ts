@@ -106,7 +106,7 @@ export const logger = (
   ARRAY / OBJECT HELPERS
 */
 
-export const isObjectEmpty = <T extends Object>(obj: T) => {
+export const isObjectEmpty = <T extends object>(obj: T) => {
   return Object.keys(obj).length === 0;
 };
 
@@ -548,7 +548,11 @@ export const rgbToHex = (rgb: [number, number, number]) => {
 
 export function getCompleteEntity<T>(entity: DeferredEntity<T>): T | undefined {
   if (entity.changes.deleted) return;
-  const { added, deleted, ...completeEntity } = {
+  const {
+    added: _added,
+    deleted: _deleted,
+    ...completeEntity
+  } = {
     ...entity.saved,
     ...entity.changes,
   };
