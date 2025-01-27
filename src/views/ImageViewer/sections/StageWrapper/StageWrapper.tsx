@@ -10,10 +10,12 @@ import { TopToolBar } from "../AnnotatorToolDrawer/TopToolBar";
 
 export const StageWrapper = () => {
   const [width, setWidth] = useState<number>(
-    window.innerWidth - dimensions.leftDrawerWidth - dimensions.toolDrawerWidth
+    window.innerWidth - dimensions.leftDrawerWidth - dimensions.toolDrawerWidth,
   );
   const [height, setHeight] = useState<number>(
-    window.innerHeight - dimensions.stageInfoHeight - dimensions.toolDrawerWidth
+    window.innerHeight -
+      dimensions.stageInfoHeight -
+      dimensions.toolDrawerWidth,
   );
 
   const isMobile = useMobileView();
@@ -24,12 +26,12 @@ export const StageWrapper = () => {
       setWidth(
         window.innerWidth -
           dimensions.leftDrawerWidth -
-          dimensions.toolDrawerWidth
+          dimensions.toolDrawerWidth,
       );
       setHeight(
         window.innerHeight -
           dimensions.stageInfoHeight -
-          dimensions.toolDrawerWidth
+          dimensions.toolDrawerWidth,
       );
     };
     window.addEventListener("resize", resizeHandler);

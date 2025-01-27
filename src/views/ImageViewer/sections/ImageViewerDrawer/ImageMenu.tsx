@@ -28,18 +28,18 @@ export const ImageMenu = ({
   const dispatch = useDispatch();
 
   const handleClearAnnotations = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
+    event: React.MouseEvent<HTMLElement, MouseEvent>,
   ) => {
     if (!selectedImage) return;
     dispatch(
       imageViewerSlice.actions.removeActiveAnnotationIds({
         annotationIds: selectedImage.containing,
-      })
+      }),
     );
     dispatch(
       annotatorSlice.actions.deleteThings({
         thingIds: selectedImage.containing,
-      })
+      }),
     );
 
     onCloseImageMenu(event);

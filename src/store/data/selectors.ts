@@ -7,13 +7,13 @@ import { RootState } from "store/rootReducer";
 import { AnnotationObject, Category, ImageObject, Kind } from "./types";
 
 const kindsSelectors = kindsAdapter.getSelectors(
-  (state: RootState) => state.data.kinds
+  (state: RootState) => state.data.kinds,
 );
 const categorySelectors = categoriesAdapter.getSelectors(
-  (state: RootState) => state.data.categories
+  (state: RootState) => state.data.categories,
 );
 const thingsSelectors = thingsAdapter.getSelectors(
-  (state: RootState) => state.data.things
+  (state: RootState) => state.data.things,
 );
 
 export const selectKindDictionary = kindsSelectors.selectEntities; // returns kinds dict
@@ -38,7 +38,7 @@ export const selectDataProject = createSelector(
   selectAllThings,
   (kinds, categories, things) => {
     return { kinds, categories, things };
-  }
+  },
 );
 
 /*
@@ -56,7 +56,7 @@ export const selectObjectKindDict = createSelector(
       kindDict[kind.id] = kind;
       return kindDict;
     }, {});
-  }
+  },
 );
 
 /*
@@ -80,7 +80,7 @@ export const selectSplitThingDict = createSelector(
           images: Record<string, ImageObject>;
           objects: Record<string, AnnotationObject>;
         },
-        thing
+        thing,
       ) => {
         if (thing.kind === "Image") {
           splitDict.images[thing.id] = thing as ImageObject;
@@ -89,9 +89,9 @@ export const selectSplitThingDict = createSelector(
         }
         return splitDict;
       },
-      { images: {}, objects: {} }
+      { images: {}, objects: {} },
     );
-  }
+  },
 );
 
 export const selectThingsOfKind = createSelector(
@@ -101,7 +101,7 @@ export const selectThingsOfKind = createSelector(
       const thingsOfKind = kindDict[kind]!.containing;
       return thingsOfKind.map((thingId) => thingDict[thingId]!);
     };
-  }
+  },
 );
 
 export const selectNumThingsByCatAndKind = createSelector(
@@ -112,7 +112,7 @@ export const selectNumThingsByCatAndKind = createSelector(
     const thingsOfCat = catDict[catId]!.containing;
 
     return intersection(thingsOfCat, thingsOfKind).length;
-  }
+  },
 );
 
 export const selectAnnotatedImages = createSelector(
@@ -125,7 +125,7 @@ export const selectAnnotatedImages = createSelector(
       }
       return false;
     }) as ImageObject[];
-  }
+  },
 );
 
 /*
@@ -140,7 +140,7 @@ export const selectUnknownCategoryByKind = createSelector(
       const unknownCatId = kindDict[kind]!.unknownCategoryId;
       return catDict[unknownCatId]!;
     };
-  }
+  },
 );
 
 export const selectCategoriesByKind = createSelector(
@@ -150,28 +150,28 @@ export const selectCategoriesByKind = createSelector(
       const categoriesOfKind = kindDict[kind]!.categories;
       return categoriesOfKind.map((catId) => categoriesDict[catId]!);
     };
-  }
+  },
 );
 
 export const selectAllImageCategories = createSelector(
   selectAllCategories,
   (categories) => {
     return categories.filter((category) => category.kind !== "Image");
-  }
+  },
 );
 
 export const selectUnknownImageCategory = createSelector(
   selectKindDictionary,
   (kinds) => {
     return kinds["Image"]!.unknownCategoryId;
-  }
+  },
 );
 
 export const selectAllObjectCategories = createSelector(
   selectAllCategories,
   (categories) => {
     return categories.filter((category) => category.kind !== "Image");
-  }
+  },
 );
 
 export const selectObjectCategoryDict = createSelector(
@@ -181,7 +181,7 @@ export const selectObjectCategoryDict = createSelector(
       catDict[c.id] = c;
       return catDict;
     }, {});
-  }
+  },
 );
 
 export const selectCategoryProperty = createSelector(
@@ -191,5 +191,5 @@ export const selectCategoryProperty = createSelector(
       const category = entities[id];
       if (!category) return;
       return category[property];
-    }
+    },
 );
