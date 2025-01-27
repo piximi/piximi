@@ -111,7 +111,7 @@ startAppListening({
       imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs }),
     );
     listenerAPI.dispatch(
-      imageViewerSlice.actions.setImageIsLoading({ isLoading: false })
+      imageViewerSlice.actions.setImageIsLoading({ isLoading: false }),
     );
   },
 });
@@ -150,7 +150,7 @@ startAppListening({
         listenerAPI.dispatch(
           imageViewerSlice.actions.addActiveAnnotationId({
             annotationId: annotation.id,
-          })
+          }),
         );
       }
     });
@@ -170,13 +170,13 @@ startAppListening({
       listenerAPI.dispatch(
         imageViewerSlice.actions.setHasUnsavedChanges({
           hasUnsavedChanges: false,
-        })
+        }),
       );
     } else {
       listenerAPI.dispatch(
         imageViewerSlice.actions.setHasUnsavedChanges({
           hasUnsavedChanges: true,
-        })
+        }),
       );
     }
   },
@@ -188,7 +188,7 @@ startAppListening({
     listenerAPI.dispatch(
       imageViewerSlice.actions.setHasUnsavedChanges({
         hasUnsavedChanges: false,
-      })
+      }),
     );
   },
 });

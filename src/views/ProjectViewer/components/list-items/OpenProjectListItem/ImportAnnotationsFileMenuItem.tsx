@@ -77,17 +77,17 @@ export const ImportAnnotationsFileMenuItem = ({
             dispatch(
               dataSlice.actions.addKinds({
                 kinds: newKinds,
-              })
+              }),
             );
             dispatch(
               dataSlice.actions.addCategories({
                 categories: newCategories,
-              })
+              }),
             );
             dispatch(
               dataSlice.actions.addThings({
                 things: newAnnotations,
-              })
+              }),
             );
           });
         }

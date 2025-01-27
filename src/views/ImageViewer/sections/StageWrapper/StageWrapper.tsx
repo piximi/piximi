@@ -13,7 +13,9 @@ export const StageWrapper = () => {
     window.innerWidth - dimensions.leftDrawerWidth - dimensions.toolDrawerWidth,
   );
   const [height, setHeight] = useState<number>(
-    window.innerHeight - dimensions.stageInfoHeight - dimensions.toolDrawerWidth
+    window.innerHeight -
+      dimensions.stageInfoHeight -
+      dimensions.toolDrawerWidth,
   );
 
   const isMobile = useMobileView();
@@ -30,11 +32,6 @@ export const StageWrapper = () => {
         window.innerHeight -
           dimensions.stageInfoHeight -
           dimensions.toolDrawerWidth,
-      );
-      setHeight(
-        window.innerHeight -
-          dimensions.stageInfoHeight -
-          dimensions.toolDrawerWidth
       );
     };
     window.addEventListener("resize", resizeHandler);

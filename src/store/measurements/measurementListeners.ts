@@ -91,7 +91,7 @@ startAppListening({
         measurementsSlice.actions.updateGroupThingIds({
           groupId: group.id,
           thingIds: kind.containing,
-        })
+        }),
       );
       const trulyDeleted = deletedThings.filter(
         (id) => !dataState.things.entities[id],
@@ -120,7 +120,7 @@ const resetMeasurements = (measurements: MeasurementOptions) => {
 const updateCategories = (
   state: MeasurementOptions,
   kindCategories: string[],
-  categoryEntities: Dictionary<Category>
+  categoryEntities: Dictionary<Category>,
 ) => {
   const groupCats = state["categoryId"].children!;
   const newCats = difference(kindCategories, groupCats);

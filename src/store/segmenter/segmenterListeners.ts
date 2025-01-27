@@ -90,7 +90,7 @@ startAppListening({
 
 const fitListener = async (
   _onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
-  _listenerAPI: StoreListemerAPI
+  _listenerAPI: StoreListemerAPI,
 ) => {};
 
 const predictListener = async (listenerAPI: StoreListemerAPI) => {
@@ -240,7 +240,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       listenerAPI.dispatch(
         dataSlice.actions.addKinds({
           kinds: generatedKinds,
-        })
+        }),
       );
 
       const newUnknownCategories = generatedKinds.map((kind) => {
@@ -256,7 +256,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       listenerAPI.dispatch(
         dataSlice.actions.addCategories({
           categories: newUnknownCategories,
-        })
+        }),
       );
     }
     const annotations: AnnotationObject[] = [];

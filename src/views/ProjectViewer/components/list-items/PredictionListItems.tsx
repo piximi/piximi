@@ -53,7 +53,7 @@ export const PredictionListItems = () => {
     dispatch(
       dataSlice.actions.clearPredictions({
         kind: activeKind,
-      })
+      }),
     );
 
     if (!labeledImagesVisible) {
@@ -76,7 +76,7 @@ export const PredictionListItems = () => {
     dispatch(
       dataSlice.actions.acceptPredictions({
         kind: activeKind,
-      })
+      }),
     );
     dispatch(
       classifierSlice.actions.updateModelStatus({

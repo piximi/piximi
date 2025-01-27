@@ -25,7 +25,7 @@ const IncrementalSlider = ({
 }) => {
   const [value, setValue] = useState<number>(initialValue);
   const [valueLabelDisplay, setvalueLabelDisplay] = useState<"auto" | "on">(
-    "auto"
+    "auto",
   );
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 

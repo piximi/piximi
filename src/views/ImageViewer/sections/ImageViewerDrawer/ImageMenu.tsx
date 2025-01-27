@@ -40,7 +40,7 @@ export const ImageMenu = ({
     dispatch(
       annotatorSlice.actions.deleteThings({
         thingIds: selectedImage.containing,
-      })
+      }),
     );
 
     onCloseImageMenu(event);
