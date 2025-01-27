@@ -201,14 +201,6 @@ export const annotatorSlice = createSlice({
         state.changes.kinds.edited[kind.id] = kind;
       }
     },
-    updateKindContents(
-      state,
-      action: PayloadAction<{
-        kindId: string;
-        containing?: string[];
-        categories?: string[];
-      }>
-    ) {},
 
     deleteKind(
       state,
@@ -259,7 +251,7 @@ export const annotatorSlice = createSlice({
         category: { id: string; color: string; name: string };
       }>
     ) {
-      let { category } = action.payload;
+      const { category } = action.payload;
 
       if (category.id in state.changes.categories.added) {
         state.changes.categories.added[category.id] = merge(
