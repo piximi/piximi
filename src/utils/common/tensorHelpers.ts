@@ -61,7 +61,7 @@ import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 export const convertToTensor = (
   imageStack: ImageJS.Stack,
   numSlices: number,
-  numChannels: number,
+  numChannels: number
 ): Tensor4D => {
   const { bitDepth, width, height } = imageStack[0];
 
@@ -106,9 +106,8 @@ export const convertToTensor = (
 export const getImageSlice = (
   imageTensor: Tensor4D,
   sliceIdx: number,
-  opts: { disposeImageTensor: boolean } = { disposeImageTensor: false },
+  opts: { disposeImageTensor: boolean } = { disposeImageTensor: false }
 ): Tensor3D => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, height, width, numChannels] = imageTensor.shape;
 
   return tidy("getImageSlice", () => {
@@ -158,7 +157,7 @@ export const filterVisibleChannels = (colors: Colors): Array<number> => {
 export const sliceVisibleChannels = <T extends Tensor3D | Tensor4D>(
   imageSlice: T,
   filter: Array<number>,
-  opts: { disposeImageSlice: boolean } = { disposeImageSlice: true },
+  opts: { disposeImageSlice: boolean } = { disposeImageSlice: true }
 ): T => {
   // channel axis is innermost
   const channelAxis = imageSlice.rank - 1;
@@ -186,7 +185,7 @@ export const sliceVisibleChannels = <T extends Tensor3D | Tensor4D>(
  */
 export const sliceVisibleColors = (
   colors: Colors,
-  filter: Array<number>,
+  filter: Array<number>
 ): Tensor2D => {
   // channel axis is outermost
   const channelAxis = 0;
@@ -258,7 +257,7 @@ export const generateColoredTensor = <T extends Tensor3D | Tensor4D>(
   opts: {
     disposeImageSlice?: boolean;
     disposeColors?: boolean;
-  } = {},
+  } = {}
 ): T => {
   opts.disposeImageSlice = opts.disposeImageSlice ?? true;
   opts.disposeColors = opts.disposeColors ?? true;
@@ -325,10 +324,10 @@ export const generateColoredTensor = <T extends Tensor3D | Tensor4D>(
 export const denormalizeTensor = <T extends Tensor3D | Tensor4D>(
   normalTensor: T,
   bitDepth: BitDepth,
-  opts: { disposeNormalTensor: boolean } = { disposeNormalTensor: true },
+  opts: { disposeNormalTensor: boolean } = { disposeNormalTensor: true }
 ) => {
   const denormalizedTensor = tidy(() =>
-    normalTensor.mul(2 ** bitDepth - 1).round(),
+    normalTensor.mul(2 ** bitDepth - 1).round()
   ) as T;
 
   opts.disposeNormalTensor && normalTensor.dispose();
@@ -344,7 +343,7 @@ export const denormalizeTensor = <T extends Tensor3D | Tensor4D>(
 const getImageTensorData = async (
   imageTensor: Tensor3D | Tensor4D,
   bitDepth: BitDepth,
-  opts: { disposeImageTensor: boolean } = { disposeImageTensor: true },
+  opts: { disposeImageTensor: boolean } = { disposeImageTensor: true }
 ) => {
   //NOTE: Split the following into two steps. Previously created a tensor and called data() in one step, but the tensor was never disposed of
   const denormalizedImageTensor = denormalizeTensor(imageTensor, bitDepth, {
@@ -374,7 +373,7 @@ const getImageTensorData = async (
  */
 export const findMinMaxs = async <T extends Tensor3D | Tensor4D>(
   imageTensor: T,
-  opts: { disposeImageTensor: boolean } = { disposeImageTensor: false },
+  opts: { disposeImageTensor: boolean } = { disposeImageTensor: false }
 ): Promise<[number[], number[]]> => {
   let mins: number[];
   let maxs: number[];
@@ -409,7 +408,7 @@ export const findMinMaxs = async <T extends Tensor3D | Tensor4D>(
 export const scaleImageTensor = <T extends Tensor3D | Tensor4D>(
   imageTensor: T,
   colors: Colors,
-  opts: { disposeImageTensor: boolean } = { disposeImageTensor: true },
+  opts: { disposeImageTensor: boolean } = { disposeImageTensor: true }
 ): T => {
   const numChannels = imageTensor.shape[imageTensor.rank - 1];
 
@@ -423,7 +422,7 @@ export const scaleImageTensor = <T extends Tensor3D | Tensor4D>(
   }
 
   const scaledImageTensor: T = tidy(() =>
-    imageTensor.sub(tensor1d(mins)).div(tensor1d(ranges)),
+    imageTensor.sub(tensor1d(mins)).div(tensor1d(ranges))
   );
 
   opts.disposeImageTensor && imageTensor.dispose();
@@ -438,13 +437,13 @@ export const scaleImageTensor = <T extends Tensor3D | Tensor4D>(
 export async function renderTensor<T extends Tensor3D | Tensor4D>(
   compositeTensor: T,
   bitDepth: BitDepth,
-  opts?: { disposeCompositeTensor?: boolean; useCanvas?: boolean },
+  opts?: { disposeCompositeTensor?: boolean; useCanvas?: boolean }
 ): Promise<T extends Tensor3D ? string : string[]>;
 
 export async function renderTensor(
   compositeTensor: Tensor3D | Tensor4D,
   bitDepth: BitDepth,
-  opts?: { disposeCompositeTensor?: boolean; useCanvas?: boolean },
+  opts?: { disposeCompositeTensor?: boolean; useCanvas?: boolean }
 ): Promise<string | string[]> {
   opts = opts ?? {};
   opts.disposeCompositeTensor = opts.disposeCompositeTensor ?? true;
@@ -504,7 +503,7 @@ export async function renderTensor(
       });
 
       imageURLs.push(
-        image.toDataURL("image/png", { useCanvas: opts.useCanvas }),
+        image.toDataURL("image/png", { useCanvas: opts.useCanvas })
       );
     }
 
@@ -521,14 +520,14 @@ export async function createRenderedTensor<T extends number | undefined>(
   imageTensor: Tensor4D,
   colors: Colors,
   bitDepth: BitDepth,
-  plane: T,
+  plane: T
 ): Promise<T extends number ? string : string[]>;
 
 export async function createRenderedTensor(
   imageTensor: Tensor4D,
   colors: Colors,
   bitDepth: BitDepth,
-  plane: number | undefined,
+  plane: number | undefined
 ) {
   const compositeImage = tidy(() => {
     let operandTensor: Tensor4D | Tensor3D;
@@ -554,7 +553,7 @@ export async function createRenderedTensor(
     // image slice filtered by visible channels: [H, W, VC] or [Z, H, W, VC]
     const filteredSlice = sliceVisibleChannels(
       scaledImageSlice,
-      visibleChannels,
+      visibleChannels
     );
 
     // color matrix filtered by visible channels: [VC, 3]
@@ -577,7 +576,7 @@ export const convertToImage = async (
   filename: string,
   currentColors: Colors | undefined,
   numSlices: number,
-  numChannels: number,
+  numChannels: number
 ): Promise<ImageObject> => {
   if (!imageStack.length) {
     throw Error("Expected image stack");
@@ -598,7 +597,7 @@ export const convertToImage = async (
     imageTensor,
     colors,
     bitDepth,
-    activePlane,
+    activePlane
   );
 
   const [planes, height, width, channels] = imageTensor.shape;
@@ -627,7 +626,7 @@ export const convertToImage = async (
  */
 
 export const generateDefaultColors = async <T extends Tensor3D | Tensor4D>(
-  imageTensor: T,
+  imageTensor: T
 ): Promise<Colors> => {
   const range: { [channel: number]: [number, number] } = {};
   const visible: { [channel: number]: boolean } = {};
@@ -642,7 +641,7 @@ export const generateDefaultColors = async <T extends Tensor3D | Tensor4D>(
 
   if (mins.length !== numChannels || maxs.length !== numChannels) {
     throw Error(
-      `Expected num channels, min values, and max values to all be ${numChannels}`,
+      `Expected num channels, min values, and max values to all be ${numChannels}`
     );
   }
 
@@ -650,7 +649,7 @@ export const generateDefaultColors = async <T extends Tensor3D | Tensor4D>(
     color.push(
       numChannels > 1 && i < DEFAULT_COLORS.length
         ? DEFAULT_COLORS[i]
-        : [1, 1, 1],
+        : [1, 1, 1]
     );
 
     range[i] = [mins[i], maxs[i]];
@@ -677,7 +676,7 @@ export const generateBlankColors = (numChannels: number): Colors => {
     color.push(
       numChannels > 1 && i < DEFAULT_COLORS.length
         ? DEFAULT_COLORS[i]
-        : [1, 1, 1],
+        : [1, 1, 1]
     );
 
     range[i] = [0, 1];
@@ -700,7 +699,7 @@ export const generateBlankColors = (numChannels: number): Colors => {
  */
 export const scaleColors = (
   colors: Colors,
-  minMax: { mins: number[]; maxs: number[] },
+  minMax: { mins: number[]; maxs: number[] }
 ) => {
   const { mins, maxs } = minMax;
 
