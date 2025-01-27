@@ -166,7 +166,7 @@ export const filterObjects = <T extends object>(
 
 export const copyValues = <T extends object>(
   existingObject: T,
-  updates: Partial<T>
+  updates: Partial<T>,
 ) => {
   Object.entries(updates).forEach(([key, value]) => {
     existingObject[key as keyof T] = value as T[keyof T];
@@ -175,7 +175,7 @@ export const copyValues = <T extends object>(
 
 export const recursiveAssign = <T extends object>(
   existingObject: T,
-  updates: Partial<T>,
+  updates: RecursivePartial<T>,
 ) => {
   Object.entries(updates).forEach(([key, _value]) => {
     if (typeof existingObject[key as keyof T] === "object") {
@@ -244,7 +244,7 @@ export const sortTypeByKey = (key: ImageSortKey): ImageSortKeyType => {
 export const updateRecord = <T extends string | number | symbol, K>(
   record: Record<T, K[]>,
   key: T,
-  value: K
+  value: K,
 ) => {
   if (key in record) {
     record[key].push(value);
@@ -466,7 +466,7 @@ export const convertToDataArray = (
 
 export const getPropertiesFromImage = async (
   image: ImageObject,
-  annotation: { boundingBox: [number, number, number, number] },
+  annotation: { boundingBox: number[] },
 ) => {
   const renderedIm = await IJSImage.load(image.src);
   const normalizingWidth = image.shape.width - 1;

@@ -137,14 +137,14 @@ export const Stage = ({
       dispatch(
         annotatorSlice.actions.addCategories({
           categories: kindCategories,
-        })
+        }),
       );
 
       dispatch(
         annotatorSlice.actions.addKind({
           kind: newKind,
           unknownCategory: newUnknownCategory,
-        })
+        }),
       );
       if (newCategory) {
         dispatch(
@@ -155,31 +155,14 @@ export const Stage = ({
       }
       dispatch(
         imageViewerSlice.actions.setSelectedCategoryId({
-          selectedCategoryId: newCategory ? newCategory.id : unknownCategory.id,
+          selectedCategoryId: kindCategories.at(-1)!.id,
         }),
       );
     });
-    if (!activeImage) throw new Error("Active image not found");
-    if (!annotationTool.decodedMask) throw new Error("No mask found");
-    if (!annotationTool.boundingBox) throw new Error("No bounding box found");
-
-    const newAnnotation = await createProtoAnnotation(
-      {
-        boundingBox: annotationTool.boundingBox,
-        categoryId: (newCategory ?? unknownCategory).id,
-        imageId: activeImage.id,
-        decodedMask: annotationTool.decodedMask,
-        activePlane: activeImage.activePlane,
-        partition: Partition.Unassigned,
-      },
-      activeImage,
-      newKind,
-      existingObjects.map((obj) => obj.name),
-    );
-    dispatch(
-      annotatorSlice.actions.setWorkingAnnotation({
-        annotation: newAnnotation,
-      }),
+    annotationTool.annotate(
+      kindCategories.at(-1)!,
+      activeImage!.activePlane,
+      activeImageId!,
     );
     dispatch(
       annotatorSlice.actions.setAnnotationState({

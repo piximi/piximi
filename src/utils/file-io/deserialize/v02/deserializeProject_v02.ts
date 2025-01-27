@@ -141,7 +141,7 @@ const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
   return things;
 };
 const deserializeCategoriesGroup = async (
-  categoriesGroup: Group
+  categoriesGroup: Group,
 ): Promise<EntityState<Category>> => {
   const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
   const colors = (await getAttr(categoriesGroup, "color")) as string[];
@@ -175,7 +175,7 @@ const deserializeCategoriesGroup = async (
 };
 
 const deserializeKindsGroup = async (
-  kindsGroup: Group
+  kindsGroup: Group,
 ): Promise<EntityState<Kind>> => {
   const ids = (await getAttr(kindsGroup, "kind_id")) as string[];
   const contents = (await getAttr(kindsGroup, "contents")) as string[][];

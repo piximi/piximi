@@ -221,7 +221,7 @@ const fitListener = async (
             partition: Partition.Inference,
           })),
         ],
-      })
+      }),
     );
   } else {
     splitLabeledTraining = labeledUnassigned;
@@ -231,7 +231,7 @@ const fitListener = async (
           id: thing.id,
           partition: Partition.Training,
         })),
-      })
+      }),
     );
   }
 
@@ -346,7 +346,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     (id) => !isUnknownCategory(id),
   );
   const activeCategories = activeCategoryIds.map(
-    (id) => dataState.categories.entities[id]!
+    (id) => dataState.categories.entities[id]!,
   );
   const inferenceThings = activeThingIds.reduce((things: Array<Thing>, id) => {
     const thing = dataState.things.entities[id];
@@ -412,7 +412,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
               id: thingId,
               categoryId: categoryIds[idx],
             })),
-          })
+          }),
         );
       }
       finalModelStatus = ModelStatus.Suggesting;

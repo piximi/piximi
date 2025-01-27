@@ -47,7 +47,7 @@ export const ClearAnnotationsGroup = () => {
           annotatorSlice.actions.setSelectedAnnotationIds({
             annotationIds: [],
             workingAnnotationId: undefined,
-          })
+          }),
         );
         dispatch(
           imageViewerSlice.actions.removeActiveAnnotationIds({
@@ -57,7 +57,7 @@ export const ClearAnnotationsGroup = () => {
         dispatch(
           annotatorSlice.actions.deleteThings({
             thingIds: activeAnnotationsIds,
-          })
+          }),
         );
       } else {
         dispatch(
@@ -69,12 +69,12 @@ export const ClearAnnotationsGroup = () => {
           annotatorSlice.actions.setSelectedAnnotationIds({
             annotationIds: [],
             workingAnnotationId: undefined,
-          })
+          }),
         );
         dispatch(
           annotatorSlice.actions.deleteThings({
             thingIds: selectedAnnotationIds,
-          })
+          }),
         );
       }
       dispatch(

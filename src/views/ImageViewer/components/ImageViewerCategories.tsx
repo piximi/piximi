@@ -24,7 +24,7 @@ export const ImageViewerCategories = () => {
   const categoriesByKind = useSelector(selectCategoriesByKind);
   const categoriesByKindArray = useMemo(
     () => Object.values(categoriesByKind),
-    [categoriesByKind]
+    [categoriesByKind],
   );
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);
   const things = useSelector(selectImageViewerObjects);
@@ -56,26 +56,26 @@ export const ImageViewerCategories = () => {
 
   const handleToggleKindVisibility = (
     event: React.MouseEvent,
-    kindId: string
+    kindId: string,
   ) => {
     event.stopPropagation();
     const categories = categoriesByKind[kindId].categories;
     if (filteredKinds.includes(kindId)) {
       setFilteredKinds(
-        filteredKinds.filter((hiddenKind) => hiddenKind !== kindId)
+        filteredKinds.filter((hiddenKind) => hiddenKind !== kindId),
       );
 
       dispatch(
         imageViewerSlice.actions.removeFilters({
           categoryIds: categories.map((category) => category.id),
-        })
+        }),
       );
     } else {
       setFilteredKinds([...filteredKinds, kindId]);
       dispatch(
         imageViewerSlice.actions.addFilters({
           categoryIds: categories.map((category) => category.id),
-        })
+        }),
       );
     }
   };
@@ -101,7 +101,7 @@ export const ImageViewerCategories = () => {
           containing: [],
           visible: true,
         },
-      })
+      }),
     );
   };
 

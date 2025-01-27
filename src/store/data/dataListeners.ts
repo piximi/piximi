@@ -132,7 +132,7 @@ startAppListening({
     listenerAPI.dispatch(
       applicationSettingsSlice.actions.setLoadMessage({
         message: "",
-      })
+      }),
     );
   },
 });

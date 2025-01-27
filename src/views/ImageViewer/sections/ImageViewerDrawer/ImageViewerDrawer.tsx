@@ -43,7 +43,7 @@ export const ImageViewerDrawer = () => {
       annotatorSlice.actions.addKind({
         kind,
         unknownCategory: newUnknownCategory,
-      })
+      }),
     );
   };
 

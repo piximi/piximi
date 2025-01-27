@@ -38,7 +38,7 @@ export const CreationOptions = () => {
       dispatch(
         annotatorSlice.actions.setAnnotationMode({
           annotationMode: mode,
-        })
+        }),
       );
   };
 
@@ -55,7 +55,7 @@ export const CreationOptions = () => {
       workingAnnotation.decodedMask,
       workingAnnotation.boundingBox,
       image.shape.width,
-      image.shape.height
+      image.shape.height,
     );
 
     const encodedMask = encode(invertedMask);
@@ -69,14 +69,14 @@ export const CreationOptions = () => {
             boundingBox: invertedBoundingBox,
           },
         ],
-      })
+      }),
     );
 
     dispatch(
       annotatorSlice.actions.setSelectedAnnotationIds({
         annotationIds: [workingAnnotation.id],
         workingAnnotationId: workingAnnotation.id,
-      })
+      }),
     );
   };
 

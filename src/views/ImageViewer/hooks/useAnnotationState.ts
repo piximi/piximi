@@ -52,11 +52,11 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const annotationCategory = useMemo(() => {
     if (categories[selectedCategoryId]) return categories[selectedCategoryId];
     const defaultKindCategories = Object.entries(categoriesByKindArray).find(
-      (k) => k[0] !== selectedCategoryId
+      (k) => k[0] !== selectedCategoryId,
     );
     if (!defaultKindCategories) return undefined;
     const defaultCategory = defaultKindCategories[1].categories.find((c) =>
-      isUnknownCategory(c.id)
+      isUnknownCategory(c.id),
     );
 
     return defaultCategory;
@@ -86,7 +86,7 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
       annotationTool.annotate(
         annotationCategory,
         activeImage!.activePlane,
-        activeImageId!
+        activeImageId!,
       );
       const kind = kinds[annotationCategory.kind];
       if (annotationMode === AnnotationMode.New) {
@@ -95,12 +95,12 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
 
           activeImage!,
           kind,
-          objectNames
+          objectNames,
         );
         dispatch(
           annotatorSlice.actions.setWorkingAnnotation({
             annotation: newAnnotation,
-          })
+          }),
         );
       } else {
         if (!workingAnnotation) return;
@@ -108,13 +108,13 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
           workingAnnotation,
           annotationMode,
           annotationTool,
-          activeImage
+          activeImage,
         );
 
         dispatch(
           annotatorSlice.actions.updateWorkingAnnotation({
             changes: updatedAnnotation,
-          })
+          }),
         );
       }
       dispatch(
@@ -165,14 +165,14 @@ const createAnnotation = async (
   activeImage: ImageObject,
 
   kindObject: Kind,
-  existingNames: string[]
+  existingNames: string[],
 ) => {
   const bbox = toolAnnotation.boundingBox;
 
   const bitDepth = activeImage.bitDepth;
   const imageProperties = await getPropertiesFromImage(
     activeImage,
-    toolAnnotation
+    toolAnnotation,
   );
   //TODO: add suppoert for multiple planes
   const shape = {
@@ -203,24 +203,24 @@ const editAnnotation = async (
   workingAnnotation: DecodedAnnotationObject,
   annotationMode: AnnotationMode,
   annotationTool: AnnotationTool,
-  activeImage: ImageObject
+  activeImage: ImageObject,
 ): Promise<AnnotationObject | DecodedAnnotationObject> => {
   let combinedMask, combinedBoundingBox;
 
   if (annotationMode === AnnotationMode.Add) {
     [combinedMask, combinedBoundingBox] = annotationTool.add(
       workingAnnotation.decodedMask!,
-      workingAnnotation.boundingBox
+      workingAnnotation.boundingBox,
     );
   } else if (annotationMode === AnnotationMode.Subtract) {
     [combinedMask, combinedBoundingBox] = annotationTool.subtract(
       workingAnnotation.decodedMask!,
-      workingAnnotation.boundingBox
+      workingAnnotation.boundingBox,
     );
   } else if (annotationMode === AnnotationMode.Intersect) {
     [combinedMask, combinedBoundingBox] = annotationTool.intersect(
       workingAnnotation.decodedMask!,
-      workingAnnotation.boundingBox
+      workingAnnotation.boundingBox,
     );
   } else {
     return workingAnnotation;
