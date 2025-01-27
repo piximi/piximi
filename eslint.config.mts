@@ -34,7 +34,9 @@ export default [
         {
           args: "after-used",
           argsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
           varsIgnorePattern: "^React$",
+          ignoreRestSiblings: true,
         },
       ],
       "@typescript-eslint/no-explicit-any": "off",

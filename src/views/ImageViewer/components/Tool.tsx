@@ -101,13 +101,13 @@ export const ResizableTool = ({
 
   return (
     <Box
-      sx={(theme) => ({
+      sx={{
         display: "flex",
         flexDirection: "column",
         position: "relative",
         overflowY: "visible",
         zIndex: "inherit",
-      })}
+      }}
     >
       <Tooltip
         sx={{ zIndex: 1001 }}
@@ -122,10 +122,10 @@ export const ResizableTool = ({
               handleClick();
               onClickOpen && onOpen(event);
             }}
-            sx={(theme) => ({
+            sx={{
               bgcolor: "background.paper",
               zIndex: 1001,
-            })}
+            }}
           >
             <SvgIcon
               fontSize="small"
@@ -142,7 +142,7 @@ export const ResizableTool = ({
       </Tooltip>
       {selected && (
         <IconButton
-          sx={(theme) => ({
+          sx={{
             bgcolor: "background.paper",
             py: 0,
             pb: 0.5,
@@ -150,7 +150,7 @@ export const ResizableTool = ({
             "&:hover": {
               bgcolor: "background.paper",
             },
-          })}
+          }}
           onClick={(event) => {
             onOpen(event.currentTarget.parentElement!);
           }}
@@ -212,14 +212,14 @@ export const PopoverTool = ({
 
   return (
     <Box
-      sx={(theme) => ({
+      sx={{
         display: "flex",
         flexDirection: "row",
         position: "relative",
         overflowY: "visible",
         overflowX: "visible",
         zIndex: "inherit",
-      })}
+      }}
     >
       <Tooltip
         sx={{ zIndex: 1001 }}
@@ -230,10 +230,10 @@ export const PopoverTool = ({
         <span>
           <IconButton
             onClick={!open ? onOpen : onClose}
-            sx={(theme) => ({
+            sx={{
               bgcolor: "background.paper",
               zIndex: 1001,
-            })}
+            }}
           >
             <SvgIcon
               fontSize="small"

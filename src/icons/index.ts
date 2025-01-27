@@ -15,9 +15,7 @@ export * as RadioCheckedIcon from "./RadioChecked.svg";
 export * as RadioUncheckedIcon from "./RadioUnchecked.svg";
 export * as RectangularSelectionIcon from "./RectangularAnnotation.svg";
 export * as SelectionIcon from "./Selection.svg";
-export * as ZoomIcon from "./Zoom.svg";
-export * as Sun from "./Sun.svg";
-export * as Moon from "./Moon.svg";
+
 export * as InvertSelectionIcon from "./InvertAnnotation.svg";
 
 // Import and export components
