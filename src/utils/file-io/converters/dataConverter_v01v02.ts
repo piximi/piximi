@@ -152,7 +152,7 @@ export const dataConverter_v01v02 = (data: {
         _annotation.kind
       }`;
       (things.entities[_annotation.imageId] as ImageObject).containing.push(
-        _annotation.id
+        _annotation.id,
       );
     } else {
       annotationName = `${_annotation.kind}`;
@@ -185,7 +185,7 @@ export const dataConverter_v01v02 = (data: {
         }
         return shape;
       },
-      { planes: 0, height: 0, width: 0, channels: 0 }
+      { planes: 0, height: 0, width: 0, channels: 0 },
     );
     _annotation.partition = Partition.Unassigned;
     _annotation.bitDepth = things.entities[_annotation.imageId]!.bitDepth;
@@ -205,7 +205,7 @@ export const convertAnnotationsWithExistingProject_v01v02 = async (
   existingImages: Record<string, ImageObject>,
   existingKinds: Record<string, Kind>,
   oldAnnotations: OldAnnotationType[],
-  oldAnnotationCategories: OldCategory[]
+  oldAnnotationCategories: OldCategory[],
 ) => {
   const catId2Name: Record<string, string> = {};
   const newKinds: Record<string, Kind> = {};
@@ -248,7 +248,7 @@ export const convertAnnotationsWithExistingProject_v01v02 = async (
     newAnn.categoryId = kind.unknownCategoryId;
     const numAnns = intersection(
       existingImage.containing,
-      kind.containing
+      kind.containing,
     ).length;
     newAnn.name = `${existingImage.name}-${kind.id}_${numAnns}`;
     let renderedIm: Image;
@@ -261,7 +261,7 @@ export const convertAnnotationsWithExistingProject_v01v02 = async (
     const imageProperties = getPropertiesFromImageSync(
       renderedIm,
       existingImage,
-      ann
+      ann,
     );
     Object.assign(newAnn, imageProperties);
     newAnn.shape = convertArrayToShape(newAnn.data!.shape as ShapeArray);

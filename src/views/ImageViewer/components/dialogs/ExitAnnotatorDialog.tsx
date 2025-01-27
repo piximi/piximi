@@ -28,7 +28,7 @@ export const ExitAnnotatorDialog = ({
         imageViewerSlice.actions.setActiveImageId({
           imageId: undefined,
           prevImageId: activeImageId,
-        })
+        }),
       );
       dispatch(annotatorSlice.actions.reconcileChanges({}));
       dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
@@ -36,10 +36,10 @@ export const ExitAnnotatorDialog = ({
         annotatorSlice.actions.setSelectedAnnotationIds({
           annotationIds: [],
           workingAnnotationId: undefined,
-        })
+        }),
       );
       dispatch(
-        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined })
+        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
       );
       dispatch(annotatorSlice.actions.resetAnnotator());
     });
@@ -52,19 +52,19 @@ export const ExitAnnotatorDialog = ({
         imageViewerSlice.actions.setActiveImageId({
           imageId: undefined,
           prevImageId: activeImageId,
-        })
+        }),
       );
       dispatch(
-        annotatorSlice.actions.reconcileChanges({ discardChanges: true })
+        annotatorSlice.actions.reconcileChanges({ discardChanges: true }),
       );
       dispatch(
         annotatorSlice.actions.setSelectedAnnotationIds({
           annotationIds: [],
           workingAnnotationId: undefined,
-        })
+        }),
       );
       dispatch(
-        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined })
+        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
       );
       dispatch(annotatorSlice.actions.resetAnnotator());
     });

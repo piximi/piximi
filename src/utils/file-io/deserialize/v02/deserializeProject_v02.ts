@@ -28,14 +28,14 @@ import { EntityState } from "@reduxjs/toolkit";
 
 const deserializeThingGroup = async (
   name: string,
-  thingGroup: Group
+  thingGroup: Group,
 ): Promise<ImageObject | AnnotationObject> => {
   const id = (await getAttr(thingGroup, "thing_id")) as string;
   const activePlane = (await getAttr(thingGroup, "active_plane")) as number;
   const categoryId = (await getAttr(thingGroup, "class_category_id")) as string;
   const partition = (await getAttr(
     thingGroup,
-    "classifier_partition"
+    "classifier_partition",
   )) as Partition;
   const kind = (await getAttr(thingGroup, "kind")) as string;
   // const classifierPartition = (await getAttr(
@@ -52,7 +52,7 @@ const deserializeThingGroup = async (
   const imageTensor = tensor4d(
     imageData,
     [planes, height, width, channels],
-    "float32"
+    "float32",
   );
 
   const thing = {
@@ -79,7 +79,7 @@ const deserializeThingGroup = async (
       imageTensor,
       colors,
       bitDepth,
-      activePlane
+      activePlane,
     );
     const contents = (await getAttr(thingGroup, "contents")) as string[];
 
@@ -89,7 +89,7 @@ const deserializeThingGroup = async (
       number,
       number,
       number,
-      number
+      number,
     ];
     const encodedMask = (await getAttr(thingGroup, "mask")) as number[];
 
@@ -99,7 +99,7 @@ const deserializeThingGroup = async (
       thing.data,
       colors,
       bitDepth,
-      activePlane
+      activePlane,
     );
 
     return {
@@ -126,7 +126,7 @@ const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
 
     loadCb(
       +i / (thingNames.length - 1),
-      `deserializing image ${+i + 1}/${thingNames.length}`
+      `deserializing image ${+i + 1}/${thingNames.length}`,
     );
 
     const thingGroup = await getGroup(thingsGroup, name);
@@ -141,7 +141,7 @@ const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
   return things;
 };
 const deserializeCategoriesGroup = async (
-  categoriesGroup: Group
+  categoriesGroup: Group,
 ): Promise<EntityState<Category>> => {
   const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
   const colors = (await getAttr(categoriesGroup, "color")) as string[];
@@ -151,7 +151,7 @@ const deserializeCategoriesGroup = async (
 
   if (ids.length !== colors.length || ids.length !== names.length) {
     throw Error(
-      `Expected categories group "${categoriesGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`
+      `Expected categories group "${categoriesGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`,
     );
   }
 
@@ -175,14 +175,14 @@ const deserializeCategoriesGroup = async (
 };
 
 const deserializeKindsGroup = async (
-  kindsGroup: Group
+  kindsGroup: Group,
 ): Promise<EntityState<Kind>> => {
   const ids = (await getAttr(kindsGroup, "kind_id")) as string[];
   const contents = (await getAttr(kindsGroup, "contents")) as string[][];
   const categories = (await getAttr(kindsGroup, "categories")) as string[][];
   const unknownCategoryIds = (await getAttr(
     kindsGroup,
-    "unknown_category_id"
+    "unknown_category_id",
   )) as string[];
 
   if (
@@ -190,7 +190,7 @@ const deserializeKindsGroup = async (
     ids.length !== unknownCategoryIds.length
   ) {
     throw Error(
-      `Expected categories group "${kindsGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`
+      `Expected categories group "${kindsGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`,
     );
   }
 
@@ -210,7 +210,7 @@ const deserializeKindsGroup = async (
 
 const deserializeProjectGroup = async (
   projectGroup: Group,
-  loadCb: LoadCB
+  loadCb: LoadCB,
 ): Promise<{
   project: ProjectState;
   data: {
@@ -222,7 +222,7 @@ const deserializeProjectGroup = async (
   const name = (await getAttr(projectGroup, "name")) as string;
   const imageChannels = (await getAttr(
     projectGroup,
-    "imageChannels"
+    "imageChannels",
   )) as number;
   const thingsGroup = await getGroup(projectGroup, "things");
   const things = await deserializeThingsGroup(thingsGroup, loadCb);
@@ -243,7 +243,7 @@ const deserializeProjectGroup = async (
 
 export const deserializeProject_v02 = async (
   fileStore: CustomStore,
-  loadCb: LoadCB
+  loadCb: LoadCB,
 ) => {
   const rootGroup = await openGroup(fileStore, fileStore.rootName, "r");
   const projectGroup = await getGroup(rootGroup, "project");

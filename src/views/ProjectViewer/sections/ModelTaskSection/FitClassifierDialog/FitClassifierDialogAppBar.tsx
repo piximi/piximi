@@ -56,7 +56,7 @@ export const FitClassifierDialogAppBar = ({
   const selectedModel = useSelector(selectClassifierSelectedModel);
   const modelStatus = useSelector(selectClassifierModelStatus);
   const showClearPredictionsWarning = useSelector(
-    selectShowClearPredictionsWarning
+    selectShowClearPredictionsWarning,
   );
 
   const {
@@ -73,7 +73,7 @@ export const FitClassifierDialogAppBar = ({
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Trained,
-      })
+      }),
     );
   };
 
@@ -81,7 +81,7 @@ export const FitClassifierDialogAppBar = ({
     dispatch(
       dataSlice.actions.clearPredictions({
         kind: activeKind,
-      })
+      }),
     );
     fit();
   };
@@ -133,8 +133,8 @@ export const FitClassifierDialogAppBar = ({
               noLabels
                 ? "Please label images before fitting a model."
                 : noTrain
-                ? "Model not trainable"
-                : "Fit the model"
+                  ? "Model not trainable"
+                  : "Fit the model"
             }
             placement="bottom"
           >
@@ -180,8 +180,8 @@ export const FitClassifierDialogAppBar = ({
                           {
                             showClearPredictionsWarning:
                               !showClearPredictionsWarning,
-                          }
-                        )
+                          },
+                        ),
                       )
                     }
                   />

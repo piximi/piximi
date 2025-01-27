@@ -12,7 +12,7 @@ import { convertToDataArray } from "utils/common/helpers";
 export const isInBoundingBox = (
   x: number,
   y: number,
-  boundingBox: [number, number, number, number]
+  boundingBox: [number, number, number, number],
 ) => {
   if (x < 0 || y < 0) return false;
   if (x >= boundingBox[2] - boundingBox[0]) return false;
@@ -30,7 +30,7 @@ export const invert = (
   selectedMask: DataArray,
   selectedBoundingBox: [number, number, number, number],
   imageWidth: number,
-  imageHeight: number
+  imageHeight: number,
 ): [Uint8Array, [number, number, number, number]] => {
   const encodedMask = selectedMask;
 

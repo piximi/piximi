@@ -38,7 +38,7 @@ export const Tool = ({
   const theme = useTheme();
   const description = useMemo(
     () => <ToolHotkeyTitle toolName={name} />,
-    [name]
+    [name],
   );
 
   return (
@@ -90,7 +90,7 @@ export const ResizableTool = ({
 
   const description = useMemo(
     () => <ToolHotkeyTitle toolName={name} />,
-    [name]
+    [name],
   );
 
   useEffect(() => {
@@ -207,7 +207,7 @@ export const PopoverTool = ({
 
   const description = useMemo(
     () => <ToolHotkeyTitle toolName={name} />,
-    [name]
+    [name],
   );
 
   return (

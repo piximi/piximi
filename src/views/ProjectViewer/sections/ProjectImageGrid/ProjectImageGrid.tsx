@@ -44,10 +44,10 @@ export const ProjectImageGrid = () => {
       dispatch(
         dataSlice.actions.deleteKind({
           deletedKindId: item,
-        })
+        }),
       );
     },
-    [dispatch]
+    [dispatch],
   );
 
   const handleTabMinimize = useCallback(
@@ -58,7 +58,7 @@ export const ProjectImageGrid = () => {
 
       dispatch(projectSlice.actions.addKindTabFilter({ kindId: item }));
     },
-    [dispatch]
+    [dispatch],
   );
 
   const handleTabChange = (tab: string) => {
@@ -66,14 +66,14 @@ export const ProjectImageGrid = () => {
     dispatch(
       projectSlice.actions.updateHighlightedCategory({
         categoryId: kinds[tab]!.unknownCategoryId,
-      })
+      }),
     );
   };
 
   useEffect(() => {
     if (isMobile) {
       const minimizeOnResize = visibleKinds.filter(
-        (kind) => kind !== activeKind
+        (kind) => kind !== activeKind,
       );
       minimizeOnResize.forEach((kind) => handleTabMinimize(kind));
     }

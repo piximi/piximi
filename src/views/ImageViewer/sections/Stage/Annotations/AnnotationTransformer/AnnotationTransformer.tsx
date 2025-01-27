@@ -69,10 +69,10 @@ export const AnnotationTransformer = ({
   const dispatch = useDispatch();
 
   const [playCreateAnnotationSoundEffect] = useSound(
-    createAnnotationSoundEffect
+    createAnnotationSoundEffect,
   );
   const [playDeleteAnnotationSoundEffect] = useSound(
-    deleteAnnotationSoundEffect
+    deleteAnnotationSoundEffect,
   );
 
   const clearAnnotation = () => {
@@ -81,25 +81,25 @@ export const AnnotationTransformer = ({
       dispatch(
         annotatorSlice.actions.setWorkingAnnotation({
           annotation: undefined,
-        })
+        }),
       );
       dispatch(
         annotatorSlice.actions.setAnnotationMode({
           annotationMode: AnnotationMode.New,
-        })
+        }),
       );
 
       dispatch(
         annotatorSlice.actions.setSelectedAnnotationIds({
           annotationIds: [],
           workingAnnotationId: undefined,
-        })
+        }),
       );
     });
   };
 
   const handleConfirmOrDeleteAnnotation = (
-    _event?: Konva.KonvaEventObject<Event>
+    _event?: Konva.KonvaEventObject<Event>,
   ) => {
     if (!activeImage) return;
     const container = stageRef!.current!.container();
@@ -121,14 +121,14 @@ export const AnnotationTransformer = ({
           dispatch(
             annotatorSlice.actions.deleteThings({
               thingIds: selectedAnnotations.map((annotation) => annotation.id),
-            })
+            }),
           );
         });
       } else {
         dispatch(
           annotatorSlice.actions.editThings({
             updates: [{ id: annotationId, ...workingAnnotation.changes }],
-          })
+          }),
         );
       }
       if (soundEnabled) playDeleteAnnotationSoundEffect();
@@ -137,7 +137,7 @@ export const AnnotationTransformer = ({
       dispatch(
         annotatorSlice.actions.addThings({
           things: [completeWorkingAnnotation],
-        })
+        }),
       );
       if (soundEnabled) playCreateAnnotationSoundEffect();
     }
@@ -173,13 +173,13 @@ export const AnnotationTransformer = ({
         const newX =
           Math.max(
             fullWorkingAnnotation.boundingBox[0],
-            fullWorkingAnnotation.boundingBox[2]
+            fullWorkingAnnotation.boundingBox[2],
           ) + imageOrigin.x;
         setXPos(newX);
 
         const yMax = Math.max(
           fullWorkingAnnotation.boundingBox[1],
-          fullWorkingAnnotation.boundingBox[3]
+          fullWorkingAnnotation.boundingBox[3],
         );
         const newY =
           yMax + 56 > imageHeight!
@@ -200,7 +200,7 @@ export const AnnotationTransformer = ({
     if (!stageRef || !stageRef.current) return;
     const transformerId = "tr-".concat(annotationId);
     const transformer: Konva.Transformer | undefined = stageRef.current.findOne(
-      `#${transformerId}`
+      `#${transformerId}`,
     ) as Konva.Transformer;
     const line = stageRef.current.findOne(`#${annotationId}`);
     if (!line || !transformer) return;
@@ -233,7 +233,7 @@ export const AnnotationTransformer = ({
       }
     },
     HotkeyContext.AnnotatorView,
-    [workingAnnotation.saved]
+    [workingAnnotation.saved],
   );
   useHotkeys(
     "esc",
@@ -245,7 +245,7 @@ export const AnnotationTransformer = ({
       }
     },
     HotkeyContext.AnnotatorView,
-    [workingAnnotation.saved]
+    [workingAnnotation.saved],
   );
 
   return (

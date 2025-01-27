@@ -61,26 +61,26 @@ export const imageViewerSlice = createSlice({
     resetImageViewer: () => initialState,
     prepareImageViewer: (
       _state,
-      _action: PayloadAction<{ selectedThingIds: string[] }>
+      _action: PayloadAction<{ selectedThingIds: string[] }>,
     ) => {},
     setImageStack(state, action: PayloadAction<{ imageIds: string[] }>) {
       state.imageStack = action.payload.imageIds;
     },
     setHasUnsavedChanges(
       state,
-      action: PayloadAction<{ hasUnsavedChanges: boolean }>
+      action: PayloadAction<{ hasUnsavedChanges: boolean }>,
     ) {
       state.hasUnsavedChanges = action.payload.hasUnsavedChanges;
     },
     addActiveAnnotationId(
       state,
-      action: PayloadAction<{ annotationId: string }>
+      action: PayloadAction<{ annotationId: string }>,
     ) {
       state.activeAnnotationIds.push(action.payload.annotationId);
     },
     addActiveAnnotationIds(
       state,
-      action: PayloadAction<{ annotationIds: Array<string> }>
+      action: PayloadAction<{ annotationIds: Array<string> }>,
     ) {
       for (const annotationId of action.payload.annotationIds) {
         imageViewerSlice.caseReducers.addActiveAnnotationId(state, {
@@ -93,7 +93,7 @@ export const imageViewerSlice = createSlice({
       state,
       action: PayloadAction<{
         annotationIds: Array<string>;
-      }>
+      }>,
     ) {
       state.activeAnnotationIds = [];
       imageViewerSlice.caseReducers.addActiveAnnotationIds(state, {
@@ -105,18 +105,18 @@ export const imageViewerSlice = createSlice({
       state,
       action: PayloadAction<{
         annotationId: string;
-      }>
+      }>,
     ) {
       mutatingFilter(
         state.activeAnnotationIds,
-        (annotationId) => annotationId !== action.payload.annotationId
+        (annotationId) => annotationId !== action.payload.annotationId,
       );
     },
     removeActiveAnnotationIds(
       state,
       action: PayloadAction<{
         annotationIds: Array<string>;
-      }>
+      }>,
     ) {
       for (const annotationId of action.payload.annotationIds) {
         imageViewerSlice.caseReducers.removeActiveAnnotationId(state, {
@@ -127,7 +127,7 @@ export const imageViewerSlice = createSlice({
     },
     setSelectedCategoryId(
       state,
-      action: PayloadAction<{ selectedCategoryId: string }>
+      action: PayloadAction<{ selectedCategoryId: string }>,
     ) {
       state.selectedCategoryId = action.payload.selectedCategoryId;
     },
@@ -136,7 +136,7 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{
         imageId: string | undefined;
         prevImageId: string | undefined;
-      }>
+      }>,
     ) {
       state.activeImageId = action.payload.imageId;
       // reset selected annotations
@@ -145,13 +145,13 @@ export const imageViewerSlice = createSlice({
       state,
       action: PayloadAction<{
         renderedSrcs: Array<string>;
-      }>
+      }>,
     ) {
       state.activeImageRenderedSrcs = action.payload.renderedSrcs;
     },
     setImageOrigin(
       state,
-      action: PayloadAction<{ origin: { x: number; y: number } }>
+      action: PayloadAction<{ origin: { x: number; y: number } }>,
     ) {
       state.imageOrigin = action.payload.origin;
     },
@@ -159,7 +159,7 @@ export const imageViewerSlice = createSlice({
       state,
       action: PayloadAction<{
         changes: Partial<ColorAdjustmentOptionsType>;
-      }>
+      }>,
     ) {
       Object.assign(state.colorAdjustment, action.payload.changes);
     },
@@ -167,7 +167,7 @@ export const imageViewerSlice = createSlice({
       state,
       action: PayloadAction<{
         cursor: string;
-      }>
+      }>,
     ) {
       state.cursor = action.payload.cursor;
     },
@@ -176,7 +176,7 @@ export const imageViewerSlice = createSlice({
     },
     setStagePosition(
       state,
-      action: PayloadAction<{ stagePosition: { x: number; y: number } }>
+      action: PayloadAction<{ stagePosition: { x: number; y: number } }>,
     ) {
       state.stagePosition = action.payload.stagePosition;
     },
@@ -196,7 +196,7 @@ export const imageViewerSlice = createSlice({
           selecting: boolean;
           centerPoint: { x: number; y: number } | undefined;
         };
-      }>
+      }>,
     ) {
       state.zoomSelection = action.payload.zoomSelection;
     },
@@ -210,13 +210,13 @@ export const imageViewerSlice = createSlice({
           selecting: boolean;
           centerPoint: { x: number; y: number } | undefined;
         }>;
-      }>
+      }>,
     ) {
       Object.assign(state.zoomSelection, action.payload.changes);
     },
     setZoomToolOptions(
       state,
-      action: PayloadAction<{ options: Partial<ZoomToolOptionsType> }>
+      action: PayloadAction<{ options: Partial<ZoomToolOptionsType> }>,
     ) {
       state.zoomOptions = { ...state.zoomOptions, ...action.payload.options };
     },
@@ -225,7 +225,7 @@ export const imageViewerSlice = createSlice({
     },
     updateHighlightedAnnotationCategory(
       state,
-      action: PayloadAction<{ categoryId: string | undefined }>
+      action: PayloadAction<{ categoryId: string | undefined }>,
     ) {
       state.highlightedCategory = action.payload.categoryId;
     },
@@ -233,7 +233,7 @@ export const imageViewerSlice = createSlice({
       state,
       action: PayloadAction<{
         categoryIds: string[];
-      }>
+      }>,
     ) {
       const newFilters = [
         ...state.filters["categoryId"],
@@ -246,7 +246,7 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{
         categoryIds?: string[];
         all?: boolean;
-      }>
+      }>,
     ) {
       if (action.payload.all) {
         state.filters["categoryId"] = [];
@@ -255,7 +255,7 @@ export const imageViewerSlice = createSlice({
       if (action.payload.categoryIds) {
         mutatingFilter(
           state.filters["categoryId"],
-          (id) => !action.payload.categoryIds!.includes(id)
+          (id) => !action.payload.categoryIds!.includes(id),
         );
       }
     },
