@@ -34,7 +34,7 @@ export const ImageOptions = () => {
     dispatch(
       annotatorSlice.actions.editThings({
         updates: [{ id: activeImage.id!, colors: defaultColors }],
-      })
+      }),
     );
   };
 
@@ -58,7 +58,7 @@ export const ImageOptions = () => {
               src: renderedSrcs[newValue],
             },
           ],
-        })
+        }),
       );
     }
   };

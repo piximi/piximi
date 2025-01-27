@@ -33,10 +33,10 @@ export const ThingInformationTable = ({
         dataSlice.actions.updateThingName({
           id: thing.id,
           name,
-        })
+        }),
       );
     },
-    [dispatch, thing]
+    [dispatch, thing],
   );
 
   const handleCategorySelect = useCallback(
@@ -50,10 +50,10 @@ export const ThingInformationTable = ({
               partition: Partition.Unassigned,
             },
           ],
-        })
+        }),
       );
     },
-    [dispatch, thing]
+    [dispatch, thing],
   );
 
   const handlePartitionSelect = useCallback(
@@ -61,10 +61,10 @@ export const ThingInformationTable = ({
       dispatch(
         dataSlice.actions.updateThings({
           updates: [{ id: thing.id, partition }],
-        })
+        }),
       );
     },
-    [dispatch, thing]
+    [dispatch, thing],
   );
 
   useEffect(() => {

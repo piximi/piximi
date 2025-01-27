@@ -107,14 +107,14 @@ describe("serializes to coco format", () => {
         width: im.width,
         height: im.height,
         file_name: im.file_name,
-      }))
+      })),
     ).toEqual(
       imagesT1.map((im, idx) => ({
         id: idx,
         width: im.shape.width,
         height: im.shape.height,
         file_name: im.name,
-      }))
+      })),
     );
   });
   test("properly serializes categories", () => {
@@ -125,8 +125,8 @@ describe("serializes to coco format", () => {
           id: idx,
           name: c.name,
           supercategory: c.kind,
-        }))
-      )
+        })),
+      ),
     );
   });
   test("properly serializes annotations", () => {
@@ -137,7 +137,7 @@ describe("serializes to coco format", () => {
         image_id: a.image_id,
         category_id: a.category_id,
         bbox: a.bbox,
-      }))
+      })),
     ).toEqual(
       annotationsT1.map((a, idx) => ({
         id: idx,
@@ -149,7 +149,7 @@ describe("serializes to coco format", () => {
           a.shape.width,
           a.shape.height,
         ],
-      }))
+      })),
     );
   });
 });
@@ -162,7 +162,7 @@ describe("deserialize into empty project (no matching images)", () => {
     const serializedCOCO = serializeCOCOFile(
       imagesT1,
       annotationsT1,
-      categoriesT1
+      categoriesT1,
     );
     productionStore.dispatch(dataSlice.actions.resetData());
     const rootState = productionStore.getState();
@@ -174,7 +174,7 @@ describe("deserialize into empty project (no matching images)", () => {
       Object.values(images),
       Object.values(categories),
       Object.values(kinds),
-      Object.values(CATEGORY_COLORS)
+      Object.values(CATEGORY_COLORS),
     );
     newAnnotations = deserializedCOCO.newAnnotations;
     newCategories = deserializedCOCO.newCategories;
@@ -199,7 +199,7 @@ describe("deserialize into project with matching image, no matching kinds or cat
     const serializedCOCO = serializeCOCOFile(
       imagesT1,
       annotationsT1,
-      categoriesT1
+      categoriesT1,
     );
 
     const thingsT2 = imagesT1.reduce(
@@ -208,7 +208,7 @@ describe("deserialize into project with matching image, no matching kinds or cat
         entities.entities[thing.id] = thing;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
     const kindsT2 = { ids: [], entities: {} };
 
@@ -217,7 +217,7 @@ describe("deserialize into project with matching image, no matching kinds or cat
     productionStore.dispatch(
       dataSlice.actions.initializeState({
         data: { things: thingsT2, categories: categoriesT2, kinds: kindsT2 },
-      })
+      }),
     );
     const rootState = productionStore.getState();
     const { images } = selectSplitThingDict(rootState);
@@ -228,7 +228,7 @@ describe("deserialize into project with matching image, no matching kinds or cat
       Object.values(images),
       Object.values(categories),
       Object.values(kinds),
-      Object.values(CATEGORY_COLORS)
+      Object.values(CATEGORY_COLORS),
     );
     newAnnotations = deserializedCOCO.newAnnotations;
     newCategories = deserializedCOCO.newCategories;
@@ -246,12 +246,12 @@ describe("deserialize into project with matching image, no matching kinds or cat
       newAnnotations.map((ann) => ({
         kind: ann.kind,
         bbox: ann.boundingBox,
-      }))
+      })),
     ).toEqual(
       annotationsT1.map((ann) => ({
         kind: ann.kind,
         bbox: ann.boundingBox,
-      }))
+      })),
     );
   });
 });
@@ -264,7 +264,7 @@ describe("deserialize into project with matching image, matching kinds", () => {
     const serializedCOCO = serializeCOCOFile(
       imagesT1,
       annotationsT1,
-      categoriesT1
+      categoriesT1,
     );
 
     const thingsT2 = imagesT1.reduce(
@@ -273,7 +273,7 @@ describe("deserialize into project with matching image, matching kinds", () => {
         entities.entities[thing.id] = thing;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
     const k1T2: Kind = {
       id: "clock",
@@ -330,7 +330,7 @@ describe("deserialize into project with matching image, matching kinds", () => {
         entities.entities[kind.id] = kind;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
 
     const categoriesT2 = [uC1T2, uC2T2, uC3T2].reduce(
@@ -339,13 +339,13 @@ describe("deserialize into project with matching image, matching kinds", () => {
         entities.entities[category.id] = category;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
     productionStore.dispatch(dataSlice.actions.resetData());
     productionStore.dispatch(
       dataSlice.actions.initializeState({
         data: { things: thingsT2, categories: categoriesT2, kinds: kindsT2 },
-      })
+      }),
     );
     const rootState = productionStore.getState();
     const { images } = selectSplitThingDict(rootState);
@@ -356,7 +356,7 @@ describe("deserialize into project with matching image, matching kinds", () => {
       Object.values(images),
       Object.values(categories),
       Object.values(kinds),
-      Object.values(CATEGORY_COLORS)
+      Object.values(CATEGORY_COLORS),
     );
     newAnnotations = deserializedCOCO.newAnnotations;
     newCategories = deserializedCOCO.newCategories;
@@ -374,12 +374,12 @@ describe("deserialize into project with matching image, matching kinds", () => {
       newAnnotations.map((ann) => ({
         kind: ann.kind,
         bbox: ann.boundingBox,
-      }))
+      })),
     ).toEqual(
       annotationsT1.map((ann) => ({
         kind: ann.kind,
         bbox: ann.boundingBox,
-      }))
+      })),
     );
   });
 });
@@ -393,7 +393,7 @@ describe("deserialize into project with matching image, matching kinds and categ
     const serializedCOCO = serializeCOCOFile(
       imagesT1,
       annotationsT1,
-      categoriesT1
+      categoriesT1,
     );
 
     const thingsT2 = imagesT1.reduce(
@@ -402,7 +402,7 @@ describe("deserialize into project with matching image, matching kinds and categ
         entities.entities[thing.id] = thing;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
     const k1T2: Kind = {
       id: "clock",
@@ -469,7 +469,7 @@ describe("deserialize into project with matching image, matching kinds and categ
         entities.entities[kind.id] = kind;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
     t2categories = [uC1T2, uC2T2, uC3T2, c1T2];
     const categoriesT2 = t2categories.reduce(
@@ -478,13 +478,13 @@ describe("deserialize into project with matching image, matching kinds and categ
         entities.entities[category.id] = category;
         return entities;
       },
-      { ids: [], entities: {} }
+      { ids: [], entities: {} },
     );
     productionStore.dispatch(dataSlice.actions.resetData());
     productionStore.dispatch(
       dataSlice.actions.initializeState({
         data: { things: thingsT2, categories: categoriesT2, kinds: kindsT2 },
-      })
+      }),
     );
     const rootState = productionStore.getState();
     const { images } = selectSplitThingDict(rootState);
@@ -495,7 +495,7 @@ describe("deserialize into project with matching image, matching kinds and categ
       Object.values(images),
       Object.values(categories),
       Object.values(kinds),
-      Object.values(CATEGORY_COLORS)
+      Object.values(CATEGORY_COLORS),
     );
     newAnnotations = deserializedCOCO.newAnnotations;
     newCategories = deserializedCOCO.newCategories;
@@ -513,19 +513,19 @@ describe("deserialize into project with matching image, matching kinds and categ
       newAnnotations.map((ann) => ({
         kind: ann.kind,
         bbox: ann.boundingBox,
-      }))
+      })),
     ).toEqual(
       annotationsT1.map((ann) => ({
         kind: ann.kind,
         bbox: ann.boundingBox,
-      }))
+      })),
     );
   });
   test("category ids of new annotations should match existing category ids", () => {
     expect(
       newAnnotations.every((ann) =>
-        t2categories.map((c) => c.id).includes(ann.categoryId)
-      )
+        t2categories.map((c) => c.id).includes(ann.categoryId),
+      ),
     ).toBeTruthy();
   });
 });

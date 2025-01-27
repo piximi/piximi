@@ -60,7 +60,7 @@ export const CreateKindDialog = ({
       setIsInvalidName(!validInput);
       return validInput;
     },
-    [existingKinds]
+    [existingKinds],
   );
 
   const handleConfirm = () => {

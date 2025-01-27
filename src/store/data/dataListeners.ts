@@ -66,7 +66,7 @@ startAppListening({
         thingIds: explicitThingIds,
         disposeColorTensors: action.payload.disposeColorTensors,
         preparedByListener: true,
-      })
+      }),
     );
     listenerAPI.subscribe();
 
@@ -100,7 +100,7 @@ startAppListening({
           image.data,
           colorsEditable,
           image.bitDepth,
-          undefined
+          undefined,
         );
 
         srcUpdates.push({ id: imageId, src: renderedSrcs[image.activePlane] });
@@ -108,13 +108,13 @@ startAppListening({
           listenerAPI.dispatch(
             imageViewerSlice.actions.setActiveImageRenderedSrcs({
               renderedSrcs,
-            })
+            }),
           );
         }
         listenerAPI.dispatch(
           applicationSettingsSlice.actions.setLoadMessage({
             message: `Updating image ${imageNumber} of ${numImages}`,
-          })
+          }),
         );
         imageNumber++;
       }
@@ -125,14 +125,14 @@ startAppListening({
       listenerAPI.dispatch(
         dataSlice.actions.updateThings({
           updates: srcUpdates,
-        })
+        }),
       );
       listenerAPI.subscribe();
     }
     listenerAPI.dispatch(
       applicationSettingsSlice.actions.setLoadMessage({
         message: "",
-      })
+      }),
     );
   },
 });
