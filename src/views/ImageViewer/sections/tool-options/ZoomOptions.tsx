@@ -77,15 +77,16 @@ export const ZoomOptions = () => {
     zoomAndOffset(1, { x: stageWidth / 2, y: stageHeight / 2 });
   };
   const handleResetPosition = () => {
+    if (!stageRef?.current) return;
     stageRef?.current?.position({
-      x: ((1 - stageRef?.current?.scaleX()!) * stageWidth) / 2,
-      y: ((1 - stageRef?.current?.scaleX()!) * stageHeight) / 2,
+      x: ((1 - stageRef.current.scaleX()!) * stageWidth) / 2,
+      y: ((1 - stageRef.current.scaleX()!) * stageHeight) / 2,
     });
     dispatch(
       imageViewerSlice.actions.setStagePosition({
         stagePosition: {
-          x: ((1 - stageRef?.current?.scaleX()!) * stageWidth) / 2,
-          y: ((1 - stageRef?.current?.scaleX()!) * stageHeight) / 2,
+          x: ((1 - stageRef.current.scaleX()!) * stageWidth) / 2,
+          y: ((1 - stageRef.current.scaleX()!) * stageHeight) / 2,
         },
       })
     );
