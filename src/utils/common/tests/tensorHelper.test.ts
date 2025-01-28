@@ -1,4 +1,4 @@
-import { test } from "@jest/globals";
+import { test, describe, expect, beforeAll, it } from "vitest";
 import "@tensorflow/tfjs-node";
 import {
   scalar,
