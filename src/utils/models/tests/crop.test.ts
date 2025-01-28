@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  tensor3d,
-  profile as tfProfile,
-  Tensor3D,
-} from "@tensorflow/tfjs-node";
+import * as tf from "@tensorflow/tfjs-node";
 
 import { matchedCropPad, padToMatch } from "../helpers";
 
