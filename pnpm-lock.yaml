@@ -150,7 +150,7 @@ importers:
         specifier: ^3.0.6
         version: 3.0.6
       semver:
-        specifier: ^7.5.4
+        specifier: ^7.6.3
         version: 7.6.3
       stacktrace-js:
         specifier: ^2.0.2

@@ -51,7 +51,7 @@
     "react-window": "^1.8.10",
     "redux": "^5.0.1",
     "redux-logger": "^3.0.6",
-    "semver": "^7.5.4",
+    "semver": "^7.6.3",
     "stacktrace-js": "^2.0.2",
     "ts-priority-queue": "^0.1.1",
     "typescript": "^4.5.2",
