@@ -128,7 +128,7 @@
     "prune-dead": "ts-prune",
     "no-console-logs": "./scripts/checkConsoleLogs.sh",
     "bump": "node ./scripts/bump.js",
-    "lint": "eslint --max-warnings 0"
+    "lint": "./scripts/lint.sh"
   },
   "browserslist": {
     "production": [
