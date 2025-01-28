@@ -74,12 +74,7 @@
     "@storybook/react-vite": "^8.5.2",
     "@storybook/testing-library": "^0.0.14-next.2",
     "@tensorflow/tfjs-node": "4.2.0",
-    "@testing-library/dom": "^7.21.4",
-    "@testing-library/jest-dom": "^5.15.0",
-    "@testing-library/react": "^11.2.2",
-    "@testing-library/user-event": "^12.8.3",
     "@types/file-saver": "^2.0.4",
-    "@types/jest": "^27.5.1",
     "@types/lodash": "^4.14.177",
     "@types/node": "^18.7.18",
     "@types/numeral": "^2.0.2",
@@ -101,9 +96,9 @@
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-storybook": "^0.10.2",
     "globals": "^15.14.0",
+    "happy-dom": "^16.7.3",
     "husky": "^8.0.0",
     "install": "^0.13.0",
-    "jest-canvas-mock": "^2.3.0",
     "jiti": "^2.4.2",
     "pnpm": "^9.15.0",
     "prettier": "^3.4.2",
@@ -121,7 +116,7 @@
     "build-local": "PUBLIC_URL=/ NODE_OPTIONS=\"--max-old-space-size=8192\" VITE_APP_VERSION=$npm_package_version vite build",
     "start": "BROWSER='none' VITE_APP_VERSION=$npm_package_version vite",
     "start-logger": "BROWSER='none' VITE_APP_VERSION=$npm_package_version VITE_APP_LOG_LEVEL='1' vite",
-    "test": "vite test",
+    "test": "vitest --dom",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "husky install; node scripts/prepare.js",
@@ -142,8 +137,5 @@
       "last 1 safari version"
     ]
   },
-  "private": true,
-  "jest": {
-    "resetMocks": false
-  }
+  "private": true
 }
