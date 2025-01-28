@@ -1,4 +1,4 @@
-import { test } from "@jest/globals";
+import { test, expect, describe, it } from "vitest";
 import { Image } from "image-js";
 
 import { ColorAnnotationTool } from "../tools/ColorAnnotationTool";

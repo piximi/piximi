@@ -1,4 +1,4 @@
-import { test } from "@jest/globals";
+import { test, describe, expect, beforeAll } from "vitest";
 import Image from "image-js";
 import * as tf from "@tensorflow/tfjs";
 
