@@ -1,4 +1,4 @@
-import { test } from "@jest/globals";
+import { test, expect } from "vitest";
 import { Image } from "image-js";
 import { data } from "data/test-data/annotatorToolsTestData.json";
 import { PenAnnotationTool } from "../tools";

@@ -1,5 +1,6 @@
-// ignore-no-logs
+import { describe, expect, it } from "vitest";
 import * as tf from "@tensorflow/tfjs-node";
+
 import { matchedCropPad, padToMatch } from "../helpers";
 
 it("padToMatch", async () => {
