@@ -1,5 +1,6 @@
-import { test } from "@jest/globals";
+import { test, describe, expect, beforeAll } from "vitest";
 import Image from "image-js";
+// TODO: use node?
 import * as tf from "@tensorflow/tfjs";
 
 import { productionStore } from "store/";
@@ -92,12 +93,13 @@ beforeAll(async () => {
   }
 });
 
-describe("serializes to coco format", () => {
-  let serializedCOCO: SerializedCOCOFileType;
+ describe("serializes to coco format", () => {
+   let serializedCOCO: SerializedCOCOFileType;
 
-  beforeAll(() => {
-    serializedCOCO = serializeCOCOFile(imagesT1, annotationsT1, categoriesT1);
-  });
+   beforeAll(() => {
+     serializedCOCO = serializeCOCOFile(imagesT1, annotationsT1, categoriesT1);
+   });
+
 
   test("propery serializes images", () => {
     expect(serializedCOCO.images.length).toBe(imagesT1.length);
@@ -180,6 +182,7 @@ describe("deserialize into empty project (no matching images)", () => {
     newCategories = deserializedCOCO.newCategories;
     newKinds = deserializedCOCO.newKinds;
   });
+
   test("should return empty annotation array", () => {
     expect(newAnnotations.length).toBe(0);
   });
