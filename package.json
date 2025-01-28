@@ -126,7 +126,8 @@
     "prepare": "husky install; node scripts/prepare.js",
     "prune-dead": "ts-prune",
     "no-console-logs": "./scripts/checkConsoleLogs.sh",
-    "bump": "node ./scripts/bump.js"
+    "bump": "node ./scripts/bump.js",
+    "lint": "eslint --max-warnings 0"
   },
   "browserslist": {
     "production": [
