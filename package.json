@@ -128,9 +128,7 @@
     "prune-dead": "ts-prune",
     "no-console-logs": "./scripts/checkConsoleLogs.sh",
     "bump": "node ./scripts/bump.js",
-    "lint": "./scripts/lint.sh",
-    "format-check": "prettier --cache --check 'src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'",
-    "format-write": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'"
+    "lint": "eslint --max-warnings 0"
   },
   "browserslist": {
     "production": [
