@@ -51,7 +51,7 @@ test("onMouseUp-NoMove", async () => {
   const operator = new PenAnnotationTool(image);
 
   operator.onMouseDown({ x: 0, y: 0 });
-  //operator.onMouseMove({ x: 100, y: 100 });
+
   operator.onMouseUp({ x: 0, y: 0 });
 
   expect(operator.annotationState).toBe(AnnotationState.Annotated);
