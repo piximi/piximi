@@ -138,7 +138,9 @@ export const useCreateMeasurementTable = () => {
   const [status, setStatus] = useState<LoadStatus>({ loading: false });
   const worker: Worker = useMemo(
     () =>
-      new Worker(new URL("./workers/prepareDataWorker.ts", import.meta.url)),
+      new Worker(new URL("./workers/prepareDataWorker.ts", import.meta.url), {
+        type: "module",
+      }),
     [],
   );
   const {
