@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-pnpm eslint --max-warnings 0
+pnpm run lint
 
 pnpm run no-console-logs
 
