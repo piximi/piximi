@@ -93,13 +93,12 @@ beforeAll(async () => {
   }
 });
 
- describe("serializes to coco format", () => {
-   let serializedCOCO: SerializedCOCOFileType;
+describe("serializes to coco format", () => {
+  let serializedCOCO: SerializedCOCOFileType;
 
-   beforeAll(() => {
-     serializedCOCO = serializeCOCOFile(imagesT1, annotationsT1, categoriesT1);
-   });
-
+  beforeAll(() => {
+    serializedCOCO = serializeCOCOFile(imagesT1, annotationsT1, categoriesT1);
+  });
 
   test("propery serializes images", () => {
     expect(serializedCOCO.images.length).toBe(imagesT1.length);
