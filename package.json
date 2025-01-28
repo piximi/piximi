@@ -109,7 +109,8 @@
     "tslib": "^2.4.0",
     "typescript-eslint": "^8.20.0",
     "vite-plugin-svgr": "^4.3.0",
-    "vitest": "^3.0.4"
+    "vitest": "^3.0.4",
+    "vitest-webgl-canvas-mock": "^1.1.0"
   },
   "scripts": {
     "build": "NODE_OPTIONS=\"--max-old-space-size=6192\" VITE_APP_VERSION=$npm_package_version vite build",
