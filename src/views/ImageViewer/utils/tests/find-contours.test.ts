@@ -1,4 +1,5 @@
-import { test } from "@jest/globals";
+import { test, expect } from "vitest";
+
 import { padMask, findContours } from "views/ImageViewer/utils";
 import { Point } from "../types";
 

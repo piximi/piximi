@@ -1,4 +1,5 @@
-// ignore-no-logs
+import { expect, it } from "vitest";
+
 import {
   memory as tfmemory, //eslint-disable-line @typescript-eslint/no-unused-vars
   time as tftime, //eslint-disable-line @typescript-eslint/no-unused-vars
@@ -16,8 +17,6 @@ import { CropSchema, ModelTask, Partition } from "../enums";
 import { loadDataUrlAsStack } from "utils/file-io/helpers";
 import { convertToImage } from "utils/common/tensorHelpers";
 import { Category, ImageObject, Shape } from "store/data/types";
-
-jest.setTimeout(100000);
 
 const categories: Array<Category> = [
   // {
