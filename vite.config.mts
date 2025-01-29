@@ -14,8 +14,4 @@ export default defineConfig({
     port: 3000,
   },
   assetsInclude: ["**/*.bin", "**/*.svg"],
-  test: {
-    setupFiles: ["./test-setup.ts"],
-    environment: "happy-dom",
-  },
 });
