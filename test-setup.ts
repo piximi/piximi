@@ -15,8 +15,8 @@ const interceptCreateElem = (name: Parameters<typeof origCreateElem>[0], options
 window.document.createElement = interceptCreateElem;
 
 class ImageData {
-    constructor(data: Uint8ClampedArray, width: number, _height: number) {
-        return createImageData(data, width);
+    constructor(data: Uint8ClampedArray, width: number, height: number) {
+        return createImageData(data, width, height);
     }
 }
 // @ts-ignore
