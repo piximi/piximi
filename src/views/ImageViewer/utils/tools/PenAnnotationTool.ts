@@ -54,9 +54,7 @@ export class PenAnnotationTool extends AnnotationTool {
   }
 
   private computeCircleData(): Uint8Array | undefined {
-    let canvas: HTMLCanvasElement;
-
-    canvas = document.createElement("canvas");
+    const canvas = document.createElement("canvas");
     canvas.width = this.image.width;
     canvas.height = this.image.height;
 
