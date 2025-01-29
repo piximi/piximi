@@ -56,15 +56,9 @@ export class PenAnnotationTool extends AnnotationTool {
   private computeCircleData(): Uint8Array | undefined {
     let canvas: HTMLCanvasElement;
 
-    if (import.meta.env.NODE_ENV === "test") {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { createCanvas } = require("canvas");
-      canvas = createCanvas(this.image.width, this.image.height);
-    } else {
-      canvas = document.createElement("canvas");
-      canvas.width = this.image.width;
-      canvas.height = this.image.height;
-    }
+    canvas = document.createElement("canvas");
+    canvas.width = this.image.width;
+    canvas.height = this.image.height;
 
     const ctx = canvas.getContext("2d");
 
