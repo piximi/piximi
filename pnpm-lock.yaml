@@ -318,9 +318,6 @@ importers:
       vitest:
         specifier: ^3.0.4
         version: 3.0.4(@types/node@18.19.74)(happy-dom@16.7.3)(jiti@2.4.2)
-      vitest-webgl-canvas-mock:
-        specifier: ^1.1.0
-        version: 1.1.0
 
 packages:
 
@@ -2022,9 +2019,6 @@ packages:
   code-block-writer@11.0.3:
     resolution: {integrity: sha512-NiujjUFB4SwScJq2bwbYUtXbZhBSlY6vYzm++3Q6oC+U+injTqfPYFK8wS9COOmb2lueqp0ZRB4nK1VYeHgNyw==}
 
-  color-convert@0.5.3:
-    resolution: {integrity: sha512-RwBeO/B/vZR3dfKL1ye/vx8MHZ40ugzpyfeVG5GsiuGnrlMWe2o8wxBbLCpw9CsxV+wHuzYlCiWnybrIA0ling==}
-
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
     engines: {node: '>=7.0.0'}
@@ -2084,9 +2078,6 @@ packages:
 
   css.escape@1.5.1:
     resolution: {integrity: sha512-YUifsXXuknHlUsmlgyY0PKzgPOr7/FjCePfHNt0jxm83wHZi44VDMQ7/fGNkjY3/jV1MC+1CmZbaHzugyeRtpg==}
-
-  cssfontparser@1.2.1:
-    resolution: {integrity: sha512-6tun4LoZnj7VN6YeegOVb67KBX/7JJsqvj+pv3ZA7F878/eN33AbGa5b/S/wXxS/tcp8nc40xRUrsPlxIyNUPg==}
 
   csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
@@ -3338,9 +3329,6 @@ packages:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
     engines: {node: '>=6'}
 
-  parse-color@1.0.0:
-    resolution: {integrity: sha512-fuDHYgFHJGbpGMgw9skY/bj3HL/Jrn4l/5rSspy00DoT4RyLnDcRvPxdZ+r6OFwIsgAuhDh4I09tAId4mI12bw==}
-
   parse-json@5.2.0:
     resolution: {integrity: sha512-ayCKvm/phCGxOkYRSCM82iDwct8/EonSEgCSxWxD7ve6jHggsFl4fZVQBPRNgQoKiuV/odhFrGzQXZwbifC8Rg==}
     engines: {node: '>=8'}
@@ -4168,9 +4156,6 @@ packages:
         optional: true
       yaml:
         optional: true
-
-  vitest-webgl-canvas-mock@1.1.0:
-    resolution: {integrity: sha512-F/5+XvBs7cSZPe41IGQTbSjNimB4NntPnRqv4eWb42voFKQINH8y2xZkibNUxYJCGIuDFsYp1lDQgTvWLahSzA==}
 
   vitest@3.0.4:
     resolution: {integrity: sha512-6XG8oTKy2gnJIFTHP6LD7ExFeNLxiTkK3CfMvT7IfR8IN+BYICCf0lXUQmX7i7JoxUP8QmeP4mTnWXgflu4yjw==}
@@ -6392,8 +6377,6 @@ snapshots:
 
   code-block-writer@11.0.3: {}
 
-  color-convert@0.5.3: {}
-
   color-convert@2.0.1:
     dependencies:
       color-name: 1.1.4
@@ -6446,8 +6429,6 @@ snapshots:
       which: 2.0.2
 
   css.escape@1.5.1: {}
-
-  cssfontparser@1.2.1: {}
 
   csstype@3.1.3: {}
 
@@ -7879,10 +7860,6 @@ snapshots:
     dependencies:
       callsites: 3.1.0
 
-  parse-color@1.0.0:
-    dependencies:
-      color-convert: 0.5.3
-
   parse-json@5.2.0:
     dependencies:
       '@babel/code-frame': 7.26.2
@@ -8801,11 +8778,6 @@ snapshots:
       '@types/node': 18.19.74
       fsevents: 2.3.3
       jiti: 2.4.2
-
-  vitest-webgl-canvas-mock@1.1.0:
-    dependencies:
-      cssfontparser: 1.2.1
-      parse-color: 1.0.0
 
   vitest@3.0.4(@types/node@18.19.74)(happy-dom@16.7.3)(jiti@2.4.2):
     dependencies:
