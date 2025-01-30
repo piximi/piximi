@@ -3,13 +3,7 @@ import React from "react";
 import { useTranslation } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  JoinFull,
-  JoinInner,
-  Add,
-  Remove,
-  FilterBAndW,
-} from "@mui/icons-material";
+import { FilterBAndW } from "@mui/icons-material";
 
 import { Tool } from "../../components";
 
@@ -24,10 +18,18 @@ import { FlexRowBox } from "components/ui";
 import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 import { invert } from "views/ImageViewer/utils/annotationUtils";
 import { encode } from "views/ImageViewer/utils";
+import {
+  CombineAnnotationsIcon,
+  IntersectAnnotationsIcon,
+  NewAnnotationIcon,
+  SubtractAnnotationsIcon,
+} from "icons";
+import { useTheme } from "@mui/material";
 
 export const CreationOptions = () => {
   const dispatch = useDispatch();
   const t = useTranslation();
+  const theme = useTheme();
 
   const annotationMode = useSelector(selectAnnotationMode);
   const workingAnnotationEntity = useSelector(selectWorkingAnnotationEntity);
@@ -97,23 +99,41 @@ export const CreationOptions = () => {
         disabled={!workingAnnotationEntity.saved}
         selected={annotationMode === AnnotationMode.New}
       >
-        <Add />
+        <NewAnnotationIcon
+          color={
+            annotationMode === AnnotationMode.Add
+              ? theme.palette.primary.dark
+              : theme.palette.grey[400]
+          }
+        />
       </Tool>
       <Tool
-        name={t("Combine Annotations")}
+        name={t("Subtract Annotations")}
         onClick={() => handleModeSelection(AnnotationMode.Add)}
         disabled={!workingAnnotationEntity.saved}
         selected={annotationMode === AnnotationMode.Add}
       >
-        <Remove />
+        <SubtractAnnotationsIcon
+          color={
+            annotationMode === AnnotationMode.Add
+              ? theme.palette.primary.dark
+              : theme.palette.grey[400]
+          }
+        />
       </Tool>
       <Tool
-        name={t("Subtract Annotations")}
+        name={t("Combine Annotations")}
         onClick={() => handleModeSelection(AnnotationMode.Subtract)}
         disabled={!workingAnnotationEntity.saved}
         selected={annotationMode === AnnotationMode.Subtract}
       >
-        <JoinFull />
+        <CombineAnnotationsIcon
+          color={
+            annotationMode === AnnotationMode.Add
+              ? theme.palette.primary.dark
+              : theme.palette.grey[400]
+          }
+        />
       </Tool>
       <Tool
         name={t("Annotation Intersection")}
@@ -121,7 +141,13 @@ export const CreationOptions = () => {
         disabled={!workingAnnotationEntity.saved}
         selected={annotationMode === AnnotationMode.Intersect}
       >
-        <JoinInner />
+        <IntersectAnnotationsIcon
+          color={
+            annotationMode === AnnotationMode.Add
+              ? theme.palette.primary.dark
+              : theme.palette.grey[400]
+          }
+        />
       </Tool>
     </FlexRowBox>
   );
