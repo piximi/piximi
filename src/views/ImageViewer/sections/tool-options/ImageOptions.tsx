@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { useTranslation } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Tune as TuneIcon, Layers as LayersIcon } from "@mui/icons-material";
+import { Layers as LayersIcon } from "@mui/icons-material";
 
 import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 import { Box, Divider, List, useTheme } from "@mui/material";
@@ -16,6 +16,7 @@ import { generateDefaultColors } from "utils/common/tensorHelpers";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectActiveImageRenderedSrcs } from "views/ImageViewer/state/imageViewer/selectors";
 import IncrementalSlider from "components/inputs/IncrementalSlider";
+import { ColorAdjustment } from "icons";
 
 export const ImageOptions = () => {
   const dispatch = useDispatch();
@@ -87,11 +88,7 @@ export const ImageOptions = () => {
           </Box>
         }
       >
-        <TuneIcon
-          sx={{
-            color: theme.palette.grey[400],
-          }}
-        />
+        <ColorAdjustment color={theme.palette.grey[400]} />
       </PopoverTool>
       <PopoverTool
         name={t("Z-Stack")}
