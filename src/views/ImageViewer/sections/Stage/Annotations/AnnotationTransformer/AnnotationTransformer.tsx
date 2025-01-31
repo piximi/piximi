@@ -294,7 +294,7 @@ export const AnnotationTransformer = ({
             text={"Cancel"}
             fillColor={"darkred"}
           />
-        </ReactKonva.Group>
+        </KonvaGroup>
       )}
     </KonvaGroup>
   );
@@ -348,56 +348,5 @@ const KonvaButton = ({
         name={"transformer-button"}
       />
     </KonvaLabel>
-  );
-};
-
-const KonvaButton = ({
-  xPosition,
-  yPosition,
-  handleConfirmOrDeleteAnnotation,
-  handleMouseEnter,
-  handleMouseLeave,
-  text,
-  fillColor,
-}: {
-  xPosition: number;
-  yPosition: number;
-  handleConfirmOrDeleteAnnotation: () => void;
-  handleMouseEnter: () => void;
-  handleMouseLeave: () => void;
-  text: string;
-  fillColor: string;
-}) => {
-  return (
-    <ReactKonva.Label
-      position={{
-        x: xPosition,
-        y: yPosition,
-      }}
-      onClick={handleConfirmOrDeleteAnnotation}
-      onTap={handleConfirmOrDeleteAnnotation}
-      id={"label"}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <ReactKonva.Tag
-        cornerRadius={3}
-        fill={fillColor}
-        lineJoin={"round"}
-        shadowColor={"black"}
-        shadowBlur={10}
-        shadowOffset={{ x: 5, y: 5 }}
-      />
-      <ReactKonva.Text
-        fill={"white"}
-        fontSize={14}
-        padding={6}
-        text={text}
-        width={buttonWidth}
-        height={buttonHeight}
-        align={"center"}
-        name={"transformer-button"}
-      />
-    </ReactKonva.Label>
   );
 };

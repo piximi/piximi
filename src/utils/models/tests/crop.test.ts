@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import * as tf from "@tensorflow/tfjs-node";
+import {
+  tensor3d,
+  profile as tfProfile,
+  Tensor3D,
+} from "@tensorflow/tfjs-node";
 
 import { matchedCropPad, padToMatch } from "../helpers";
 
@@ -19,7 +23,7 @@ it("padToMatch", async () => {
     ],
   ]);
 
-  const profile = await tf.profile(() =>
+  const profile = await tfProfile(() =>
     padToMatch(sample, { width: 5, height: 5 }, "constant"),
   );
   const result = profile.result as Tensor3D;

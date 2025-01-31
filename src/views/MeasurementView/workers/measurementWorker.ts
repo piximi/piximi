@@ -40,9 +40,8 @@ self.onmessage = async (
           return;
         } else {
           const thingChannelData = currentMeasurements[thingId].channelData!;
-          const measuredChannel = tf.tidy(() => {
-            return tf
-              .tensor2d(thingChannelData)
+          const measuredChannel = tidy(() => {
+            return tensor2d(thingChannelData)
               .slice(channel, 1)
               .squeeze() as Tensor1D;
           });
