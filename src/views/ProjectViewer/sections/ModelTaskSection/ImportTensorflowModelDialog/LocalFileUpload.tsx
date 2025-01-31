@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import FileOpenIcon from "@mui/icons-material/FileOpen";
+import { FileOpen as FileOpenIcon } from "@mui/icons-material";
 
 import { Model } from "utils/models/Model";
 import { UploadedClassifier } from "utils/models/classification";

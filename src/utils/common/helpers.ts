@@ -3,7 +3,7 @@
 import { v4 as uuidv4 } from "uuid";
 import StackTrace from "stacktrace-js";
 import { BitDepth, DataArray } from "utils/file-io/types";
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 import { tensor2d, image as tfImage } from "@tensorflow/tfjs";
 
 import {
@@ -471,7 +471,7 @@ export const getPropertiesFromImage = async (
   image: ImageObject,
   annotation: { boundingBox: number[] },
 ) => {
-  const renderedIm = await ImageJS.Image.load(image.src);
+  const renderedIm = await IJSImage.load(image.src);
   const normalizingWidth = image.shape.width - 1;
   const normalizingHeight = image.shape.height - 1;
   const bbox = annotation.boundingBox;
@@ -500,7 +500,7 @@ export const getPropertiesFromImage = async (
 };
 
 export const getPropertiesFromImageSync = (
-  renderedIm: ImageJS.Image,
+  renderedIm: IJSImage,
   image: ImageObject,
   annotation: { boundingBox: number[] },
 ) => {

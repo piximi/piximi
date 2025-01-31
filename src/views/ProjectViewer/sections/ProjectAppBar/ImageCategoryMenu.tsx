@@ -1,6 +1,6 @@
 import React from "react";
 import { Menu, MenuItem, MenuList, PopoverReference } from "@mui/material";
-import LabelIcon from "@mui/icons-material/Label";
+import { Label as LabelIcon } from "@mui/icons-material";
 
 import { Category } from "store/data/types";
 

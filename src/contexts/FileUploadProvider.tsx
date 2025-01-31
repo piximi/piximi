@@ -7,7 +7,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import * as ImageJS from "image-js";
+import IJSImage, { Stack as IJSStack } from "image-js";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -54,7 +54,7 @@ import {
 
 type ImageShapeInfoImage = ImageFileShapeInfo & {
   fileName: string;
-  image?: ImageJS.Stack;
+  image?: IJSStack;
   error?: string;
 };
 
@@ -97,12 +97,9 @@ const getUploadedFileTypes = async (files: FileList) => {
         });
       } else {
         const buffer = await file.arrayBuffer();
-        const image: ImageJS.Image | ImageJS.Stack = await ImageJS.Image.load(
-          buffer,
-          {
-            ignorePalette: true,
-          },
-        );
+        const image: IJSImage | IJSStack = await IJSImage.load(buffer, {
+          ignorePalette: true,
+        });
 
         const imageInfo = getImageInformation(image);
 

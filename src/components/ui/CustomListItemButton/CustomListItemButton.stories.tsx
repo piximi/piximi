@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { CustomListItemButton } from "./CustomListItemButton";
 import { List } from "@mui/material";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
+import { MenuBook as MenuBookIcon } from "@mui/icons-material";
 
 const meta: Meta<typeof CustomListItemButton> = {
   title: "Common/CustomListItemButton",

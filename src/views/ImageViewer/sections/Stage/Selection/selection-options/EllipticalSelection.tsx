@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { useSelector } from "react-redux";
-import * as ReactKonva from "react-konva";
+import { Ellipse as KonvaEllipse, Group as KonvaGroup } from "react-konva";
 
 import { useMarchingAnts } from "../../../../hooks";
 
@@ -24,8 +24,8 @@ export const EllipticalSelection = ({ operator }: EllipticalSelectionProps) => {
 
   return (
     <>
-      <ReactKonva.Group>
-        <ReactKonva.Ellipse
+      <KonvaGroup>
+        <KonvaEllipse
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
           radiusX={operator.radius.x}
@@ -35,7 +35,7 @@ export const EllipticalSelection = ({ operator }: EllipticalSelectionProps) => {
           x={x}
           y={y}
         />
-        <ReactKonva.Ellipse
+        <KonvaEllipse
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
           radiusX={operator.radius.x}
@@ -45,7 +45,7 @@ export const EllipticalSelection = ({ operator }: EllipticalSelectionProps) => {
           x={x}
           y={y}
         />
-      </ReactKonva.Group>
+      </KonvaGroup>
     </>
   );
 };

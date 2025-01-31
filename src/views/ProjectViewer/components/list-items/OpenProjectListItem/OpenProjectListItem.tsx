@@ -1,4 +1,4 @@
-import FolderOpenIcon from "@mui/icons-material/FolderOpen";
+import { FolderOpen as FolderOpenIcon } from "@mui/icons-material";
 
 import { useMenu } from "hooks";
 

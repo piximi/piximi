@@ -1,6 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import * as ReactKonva from "react-konva";
+import {
+  Group as KonvaGroup,
+  Label as KonvaLabel,
+  Line as KonvaLine,
+  Tag as KonvaTag,
+  Text as KonvaText,
+} from "react-konva";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
 import {
@@ -45,8 +51,8 @@ export const ColorAnnotationToolTip = ({
 
   return (
     <>
-      <ReactKonva.Group>
-        <ReactKonva.Line
+      <KonvaGroup>
+        <KonvaLine
           points={[
             toolTipPosition.x,
             toolTipPosition.y,
@@ -56,22 +62,22 @@ export const ColorAnnotationToolTip = ({
           strokeWidth={1 / stageScale}
           stroke="white"
         />
-        <ReactKonva.Label
+        <KonvaLabel
           position={{
             x: toolTipPosition.x, //+ imageOrigin!.x,
             y: toolTipPosition.y, //+ imageOrigin!.y,
           }}
           opacity={0.75}
         >
-          <ReactKonva.Tag fill={"black"} />
-          <ReactKonva.Text
+          <KonvaTag fill={"black"} />
+          <KonvaText
             fill={"white"}
             fontSize={12 / stageScale}
             padding={5 / stageScale}
             text={text}
           />
-        </ReactKonva.Label>
-      </ReactKonva.Group>
+        </KonvaLabel>
+      </KonvaGroup>
     </>
   );
 };
