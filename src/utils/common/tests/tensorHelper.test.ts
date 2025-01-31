@@ -1151,9 +1151,9 @@ describe("Tensor -> Composite Image", () => {
       new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
     ];
 
-    const imageStack = new ImageJS.Stack(
+    const imageStack = new IJSStack(
       stackData.map((_imData, i) => {
-        return new ImageJS.Image({
+        return new IJSImage({
           width: W,
           height: H,
           data: stackData[i],

@@ -49,7 +49,7 @@ export const fileFromPath = async (
   if (url) {
     bufferData = await fetch(imPath).then((res) => res.blob());
   } else {
-    bufferData = new Blob([new Uint8Array(readFileSync(imPath).buffer)]);
+    bufferData = readFileSync(imPath).buffer;
   }
 
   const file = new File([bufferData], imName, { type: mimetype });

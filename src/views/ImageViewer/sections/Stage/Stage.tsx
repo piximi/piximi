@@ -7,7 +7,7 @@ import {
   useStore,
 } from "react-redux";
 import Konva from "konva";
-import * as ReactKonva from "react-konva";
+import { Stage as KonvaStage } from "react-konva";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Box, Typography } from "@mui/material";
@@ -244,7 +244,7 @@ export const Stage = ({
 
   return (
     <Box sx={{ gridArea: "stage", zIndex: 999 }}>
-      <ReactKonva.Stage
+      <KonvaStage
         draggable={draggable}
         height={stageHeight}
         onMouseDown={(evt) => {

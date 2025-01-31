@@ -35,7 +35,7 @@ export const decodeDicomImage = async (imageFile: File) => {
 
   const imgArray = new Uint8Array(imgArrayBuffer);
 
-  const dicomImgData = DicomParser.parseDicom(imgArray);
+  const dicomImgData = parseDicom(imgArray);
   const pixelDataElement = dicomImgData.elements.x7fe00010;
 
   const samplesPerPixel = dicomImgData.int16("x00280002");
@@ -307,7 +307,7 @@ export const loadDataUrlAsStack = async (dataURL: string) => {
 };
 
 export const getImageInformation = (
-  image: ImageJS.Image | ImageJS.Stack,
+  image: IJSImage | IJSStack,
 ): ImageShapeInfo => {
   // a "proper" RGB will be an IJSImage object with 3 components
   if (!Array.isArray(image) && image.components === 3) {
@@ -361,12 +361,9 @@ export const getImageFileInformation = async (
     }
 
     const buffer = await file.arrayBuffer();
-    const image: ImageJS.Image | ImageJS.Stack = await ImageJS.Image.load(
-      buffer,
-      {
-        ignorePalette: true,
-      },
-    );
+    const image: IJSImage | IJSStack = await IJSImage.load(buffer, {
+      ignorePalette: true,
+    });
 
     return { ...getImageInformation(image), ext };
   } catch {

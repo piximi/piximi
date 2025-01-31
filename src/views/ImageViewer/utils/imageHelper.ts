@@ -231,11 +231,7 @@ export const colorOverlayROI = (
     alpha: 1,
   }).resize({ factor: scalingFactor });
 
-  const checkNeighbors = (
-    arr: ImageJS.Image,
-    x: number,
-    y: number,
-  ): boolean => {
+  const checkNeighbors = (arr: IJSImage, x: number, y: number): boolean => {
     if (x === 0 || x === croppedImage.width - 1) return true;
     for (const [dx, dy] of [
       [0, 1],

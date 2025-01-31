@@ -30,7 +30,7 @@ import {
   ImageObject,
 } from "store/data/types";
 import { EntityState } from "@reduxjs/toolkit";
-tf.setBackend("cpu");
+tfSetBackend("cpu");
 
 //below image fields not needed for serializing annotations file so fake it
 const dummyImFields = {
