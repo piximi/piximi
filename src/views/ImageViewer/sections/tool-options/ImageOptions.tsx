@@ -1,22 +1,23 @@
 import React, { useMemo } from "react";
-
-import { useTranslation } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
-
+import { Box, Divider, List, useTheme } from "@mui/material";
 import { Layers as LayersIcon } from "@mui/icons-material";
 
-import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
-import { Box, Divider, List, useTheme } from "@mui/material";
+import { useTranslation } from "hooks";
+
+import { CustomListItem, CustomListItemButton } from "components/ui";
+import { IncrementalSlider } from "components/inputs";
 import { PopoverTool } from "views/ImageViewer/components/Tool";
 import { ChannelsList } from "../AnnotatorToolDrawer/ToolOptions/ColorAdjustmentOptions/ChannelsList";
-import { CustomListItem, CustomListItemButton } from "components/ui";
 import { ApplyColorsButton } from "../AnnotatorToolDrawer/ToolOptions/ColorAdjustmentOptions/ApplyColorsButton";
+
 import { selectLoadMessage } from "store/applicationSettings/selectors";
-import { generateDefaultColors } from "utils/common/tensorHelpers";
+import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectActiveImageRenderedSrcs } from "views/ImageViewer/state/imageViewer/selectors";
-import { IncrementalSlider } from "components/inputs";
+
 import { ColorAdjustment } from "icons";
+import { generateDefaultColors } from "utils/common/tensorHelpers";
 
 export const ImageOptions = () => {
   const dispatch = useDispatch();
