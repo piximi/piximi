@@ -1,6 +1,6 @@
 import React from "react";
 
-import FeedbackIcon from "@mui/icons-material/Feedback";
+import { Feedback as FeedbackIcon } from "@mui/icons-material";
 
 import { useDialog } from "hooks";
 

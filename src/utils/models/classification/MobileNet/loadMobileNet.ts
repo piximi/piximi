@@ -7,7 +7,7 @@ import {
   Sequential,
   serialization,
 } from "@tensorflow/tfjs";
-import _ from "lodash";
+import { isEqual } from "lodash";
 import { Shape } from "store/data/types";
 
 const copyLayer = (
@@ -75,7 +75,7 @@ export const createMobileNet = async ({
   const model = sequential();
 
   // if we need to change the input shape
-  if (!_.isEqual(input_shape, defaultInputShape)) {
+  if (!isEqual(input_shape, defaultInputShape)) {
     mobilenet.layers[0].dispose();
 
     model.add(layers.inputLayer({ inputShape: input_shape }));

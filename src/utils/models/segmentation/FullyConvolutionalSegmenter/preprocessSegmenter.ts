@@ -1,11 +1,5 @@
 // @ts-nocheck: TODO - post PR #407, fix for segmenter
 import {
-  Tensor1D,
-  Tensor2D,
-  Tensor3D,
-  Tensor4D,
-  tensor2d,
-  tensor3d,
   util as tfutil,
   image as tfimage,
   data as tfdata,
@@ -13,8 +7,14 @@ import {
   scalar,
   stack,
   tidy,
+  Tensor1D,
+  Tensor2D,
+  Tensor3D,
+  Tensor4D,
+  tensor2d,
+  tensor3d,
 } from "@tensorflow/tfjs";
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 import {
   Category,
   DecodedAnnotationObject,
@@ -75,7 +75,7 @@ const decodeFromOriginalSrc = async (
     const channelPromise = tfutil
       .fetch(channelData)
       .then((fetched) => fetched.arrayBuffer())
-      .then((buffer) => ImageJS.Image.load(buffer))
+      .then((buffer) => IJSImage.load(buffer))
       .then((im) => {
         const canvas = im.getCanvas();
         let x2d: Tensor2D = tidy(() => {

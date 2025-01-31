@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { useSelector } from "react-redux";
-import * as ReactKonva from "react-konva";
+import { Group as KonvaGroup, Rect as KonvaRect } from "react-konva";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
 import { selectZoomSelection } from "../../../../state/imageViewer/selectors";
@@ -14,8 +14,8 @@ export const ZoomSelection = () => {
 
   return (
     <>
-      <ReactKonva.Group>
-        <ReactKonva.Rect
+      <KonvaGroup>
+        <KonvaRect
           dash={[
             // or 100 for no particular reason, because it shouldn't happen
             4 / (stageRef?.current?.scaleX() || 100),
@@ -28,7 +28,7 @@ export const ZoomSelection = () => {
           x={minimum.x}
           y={minimum.y}
         />
-        <ReactKonva.Rect
+        <KonvaRect
           dash={[
             // or 100 for no particular reason, because it shouldn't happen
             4 / (stageRef?.current?.scaleX() || 100),
@@ -42,7 +42,7 @@ export const ZoomSelection = () => {
           x={minimum.x}
           y={minimum.y}
         />
-      </ReactKonva.Group>
+      </KonvaGroup>
     </>
   );
 };

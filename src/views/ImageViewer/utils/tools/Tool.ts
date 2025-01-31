@@ -1,12 +1,12 @@
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 export abstract class Tool {
   /**
    * Image-JS object of the active image (i.e. of the image that we are annotating on).
    * https://image-js.github.io/image-js/#image
    */
-  image: ImageJS.Image;
+  image: IJSImage;
 
-  constructor(image: ImageJS.Image) {
+  constructor(image: IJSImage) {
     this.image = image;
   }
 }

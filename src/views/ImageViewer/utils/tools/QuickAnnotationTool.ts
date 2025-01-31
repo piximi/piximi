@@ -1,4 +1,4 @@
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 
 import { AnnotationTool } from "./AnnotationTool";
 
@@ -12,7 +12,7 @@ export class QuickAnnotationTool extends AnnotationTool {
   lastSuperpixel: number = 0;
   superpixels?: Int32Array;
   superpixelsMap?: { [key: number]: Array<number> };
-  currentMask?: ImageJS.Image;
+  currentMask?: IJSImage;
   map?: Uint8Array | Uint8ClampedArray;
   startAnnotating = false;
   throttleTimer: boolean = false;
@@ -77,7 +77,7 @@ export class QuickAnnotationTool extends AnnotationTool {
     if (this.annotationState === AnnotationState.Annotated) return;
 
     if (!this.currentMask) {
-      this.currentMask = new ImageJS.Image(
+      this.currentMask = new IJSImage(
         this.image.width,
         this.image.height,
         new Uint8Array(this.image.width * this.image.height * 4),
@@ -111,7 +111,7 @@ export class QuickAnnotationTool extends AnnotationTool {
     if (this.annotationState !== AnnotationState.Annotating) {
       this.currentSuperpixels.clear();
 
-      this.currentMask = new ImageJS.Image(
+      this.currentMask = new IJSImage(
         this.image.width,
         this.image.height,
         new Uint8Array(this.image.width * this.image.height * 4),

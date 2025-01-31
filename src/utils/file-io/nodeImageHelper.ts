@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import { readFileSync } from "fs";
 import { MIMEType } from "./types";
 
 /*
@@ -49,7 +49,7 @@ export const fileFromPath = async (
   if (url) {
     bufferData = await fetch(imPath).then((res) => res.blob());
   } else {
-    bufferData = fs.readFileSync(imPath).buffer;
+    bufferData = readFileSync(imPath).buffer;
   }
 
   const file = new File([bufferData], imName, { type: mimetype });

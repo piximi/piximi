@@ -1,4 +1,4 @@
-import * as ImageJS from "image-js";
+import IJSImage, { ImageKind as IJSImageKind } from "image-js";
 
 import {
   getXofYMax,
@@ -23,13 +23,13 @@ export function scanline(
   imageWidth: number,
   imageHeight: number,
 ) {
-  const maskImage = new ImageJS.Image({
+  const maskImage = new IJSImage({
     width: imageWidth,
     height: imageHeight,
     bitDepth: 8,
     components: 1,
     alpha: 0,
-    kind: "GREY" as ImageJS.ImageKind,
+    kind: "GREY" as IJSImageKind,
   });
 
   if (polygon.length < 3) return maskImage;
@@ -92,7 +92,7 @@ function getSpans(yScan: number, activeEdgeTable: Array<Edge>) {
  * @param yScan
  * @param img
  */
-function drawSpans(spans: Array<number>, yScan: number, img: ImageJS.Image) {
+function drawSpans(spans: Array<number>, yScan: number, img: IJSImage) {
   spans.sort((e1, e2) => e1 - e2);
 
   for (let i = 0; i < spans.length; i += 2) {
@@ -108,7 +108,7 @@ function drawSpans(spans: Array<number>, yScan: number, img: ImageJS.Image) {
  * @param img Image on which the annotation id drawn
  *
  */
-function fillSpan(x1: number, x2: number, y: number, img: ImageJS.Image) {
+function fillSpan(x1: number, x2: number, y: number, img: IJSImage) {
   for (let x = x1; x < x2; x++) {
     img.setPixelXY(x, y, [255]);
   }

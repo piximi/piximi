@@ -1,4 +1,4 @@
-import * as ImageJS from "image-js";
+import IJSImage, { RoiManager as IJSRoiManager } from "image-js";
 import PriorityQueue from "ts-priority-queue";
 
 import { AnnotationTool } from "./AnnotationTool";
@@ -6,16 +6,16 @@ import { Point } from "../types";
 import { AnnotationState } from "../enums";
 
 export class ColorAnnotationTool extends AnnotationTool {
-  roiContour?: ImageJS.Image;
-  roiMask?: ImageJS.Image;
-  roiManager?: ImageJS.RoiManager;
+  roiContour?: IJSImage;
+  roiMask?: IJSImage;
+  roiManager?: IJSRoiManager;
   offset: { x: number; y: number } = { x: 0, y: 0 };
   overlayData: string = "";
   points: Array<Point> = [];
   origin: { x: number; y: number } = { x: 0, y: 0 };
   tolerance: number = 1;
-  toleranceMap?: ImageJS.Image;
-  floodMap?: ImageJS.Image;
+  toleranceMap?: IJSImage;
+  floodMap?: IJSImage;
   toleranceQueue: PriorityQueue<Array<number>> = new PriorityQueue({
     comparator: function (a: Array<number>, b: Array<number>) {
       return a[2] - b[2];
@@ -53,15 +53,10 @@ export class ColorAnnotationTool extends AnnotationTool {
       Infinity,
     );
 
-    this.floodMap = new ImageJS.Image(
-      this.image.width,
-      this.image.height,
-      empty,
-      {
-        alpha: 0,
-        components: 1,
-      },
-    );
+    this.floodMap = new IJSImage(this.image.width, this.image.height, empty, {
+      alpha: 0,
+      components: 1,
+    });
 
     this.toleranceQueue.clear();
     this.seen.clear();
@@ -115,7 +110,7 @@ export class ColorAnnotationTool extends AnnotationTool {
     if (!boundingBoxWidth || !boundingBoxHeight) return;
 
     //mask should be the whole image, not just the ROI
-    const imgMask = new ImageJS.Image(boundingBoxWidth, boundingBoxHeight, {
+    const imgMask = new IJSImage(boundingBoxWidth, boundingBoxHeight, {
       components: 1,
       alpha: 0,
     });
@@ -140,7 +135,7 @@ export class ColorAnnotationTool extends AnnotationTool {
   }: {
     x: number;
     y: number;
-    image: ImageJS.Image;
+    image: IJSImage;
   }) => {
     const tol: Array<number> = [];
 
@@ -170,7 +165,7 @@ export class ColorAnnotationTool extends AnnotationTool {
       }
     }
 
-    return new ImageJS.Image(image.width, image.height, tol, {
+    return new IJSImage(image.width, image.height, tol, {
       alpha: 0,
       components: 1,
     });
@@ -178,8 +173,8 @@ export class ColorAnnotationTool extends AnnotationTool {
 
   // Expand a watershed map until the desired tolerance is reached.
   private createFloodMap = (
-    floodMap: ImageJS.Image,
-    toleranceMap: ImageJS.Image,
+    floodMap: IJSImage,
+    toleranceMap: IJSImage,
     queue: PriorityQueue<Array<number>>,
     tolerance: number,
     maxTol: number,
@@ -240,13 +235,13 @@ export class ColorAnnotationTool extends AnnotationTool {
   }
 
   private colorOverlay(
-    mask: ImageJS.Image,
+    mask: IJSImage,
     offset: { x: number; y: number },
     position: { x: number; y: number },
     width: number,
     height: number,
   ) {
-    const overlay = new ImageJS.Image(
+    const overlay = new IJSImage(
       width,
       height,
       new Uint8Array(width * height * 4),

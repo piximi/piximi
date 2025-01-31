@@ -4,3 +4,4 @@ export { ImagePartitionSelect } from "./ImagePartitionSelect";
 export { CustomFormSelectField } from "./CustomFormSelectField";
 export { CustomNumberTextField } from "./CustomNumberTextField";
 export { CustomSwitch } from "./CustomSwitch";
+export { IncrementalSlider } from "./IncrementalSlider";

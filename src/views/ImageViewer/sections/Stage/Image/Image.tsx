@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import Konva from "konva";
 
@@ -7,7 +7,7 @@ import { MemoizedKonvaImage } from "./MemoizedKonvaImage";
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 
-export const Image = forwardRef<
+export const Image = React.forwardRef<
   Konva.Image,
   { stageWidth: number; stageHeight: number; images: HTMLImageElement[] }
 >(({ stageWidth: _stageWidth, stageHeight: _stageHeight, images }, ref) => {

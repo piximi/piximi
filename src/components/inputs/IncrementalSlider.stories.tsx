@@ -1,6 +1,6 @@
 // ignore-no-logs
 import type { Meta, StoryObj } from "@storybook/react";
-import IncrementalSlider from "./IncrementalSlider";
+import { IncrementalSlider } from "./IncrementalSlider";
 
 const meta: Meta<typeof IncrementalSlider> = {
   title: "Components/IncrementalSlider",

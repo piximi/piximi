@@ -1,4 +1,4 @@
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 import { AnnotationTool } from "./AnnotationTool";
 import {
   createPathFinder,
@@ -19,9 +19,9 @@ export class MagneticAnnotationTool extends AnnotationTool {
   pathfinder?: { find: (fromId: number, toId: number) => any };
   points: Array<Point> = [];
   previous: Array<Point> = [];
-  response?: ImageJS.Image;
+  response?: IJSImage;
 
-  constructor(image: ImageJS.Image, factor: number = 0.5) {
+  constructor(image: IJSImage, factor: number = 0.5) {
     super(image);
 
     this.factor = factor;

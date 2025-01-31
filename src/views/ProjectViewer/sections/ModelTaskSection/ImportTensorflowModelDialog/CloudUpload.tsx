@@ -9,7 +9,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import LanguageIcon from "@mui/icons-material/Language";
+import { Language as LanguageIcon } from "@mui/icons-material";
 
 import { useDebounce } from "hooks";
 

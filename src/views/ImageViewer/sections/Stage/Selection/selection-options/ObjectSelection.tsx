@@ -1,5 +1,9 @@
 import React, { useContext } from "react";
-import * as ReactKonva from "react-konva";
+import {
+  Group as KonvaGroup,
+  Line as KonvaLine,
+  Rect as KonvaRect,
+} from "react-konva";
 
 import { useMarchingAnts } from "../../../../hooks";
 
@@ -25,8 +29,8 @@ export const ObjectSelection = ({ operator }: ObjectSelectionProps) => {
 
   return (
     <>
-      <ReactKonva.Group>
-        <ReactKonva.Rect
+      <KonvaGroup>
+        <KonvaRect
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
           scale={{ x: stageScale, y: stageScale }}
@@ -37,7 +41,7 @@ export const ObjectSelection = ({ operator }: ObjectSelectionProps) => {
           x={x}
           y={y}
         />
-        <ReactKonva.Rect
+        <KonvaRect
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
           height={operator.height}
@@ -48,13 +52,13 @@ export const ObjectSelection = ({ operator }: ObjectSelectionProps) => {
           x={x}
           y={y}
         />
-        <ReactKonva.Line
+        <KonvaLine
           scale={{ x: stageScale, y: stageScale }}
           stroke="white"
           points={operator.points.flatMap((point) => [point.x, point.y])}
           strokeWidth={1}
         />
-      </ReactKonva.Group>
+      </KonvaGroup>
     </>
   );
 };

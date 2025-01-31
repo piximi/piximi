@@ -1,4 +1,4 @@
-import * as tf from "@tensorflow/tfjs";
+import { tidy, tensor2d, Tensor1D } from "@tensorflow/tfjs";
 
 import {
   getEQPC,
@@ -40,11 +40,10 @@ self.onmessage = async (
           return;
         } else {
           const thingChannelData = currentMeasurements[thingId].channelData!;
-          const measuredChannel = tf.tidy(() => {
-            return tf
-              .tensor2d(thingChannelData)
+          const measuredChannel = tidy(() => {
+            return tensor2d(thingChannelData)
               .slice(channel, 1)
-              .squeeze() as tf.Tensor1D;
+              .squeeze() as Tensor1D;
           });
 
           const result = getIntensityMeasurement(
