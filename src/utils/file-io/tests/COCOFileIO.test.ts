@@ -1,7 +1,11 @@
 import { test, describe, expect, beforeAll } from "vitest";
 import Image from "image-js";
 // TODO: use node?
-import * as tf from "@tensorflow/tfjs";
+import {
+  setBackend as tfSetBackend,
+  browser as tfBrowser,
+  Tensor4D,
+} from "@tensorflow/tfjs";
 
 import { productionStore } from "store/";
 import { dataSlice } from "store/data";

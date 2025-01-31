@@ -4,7 +4,7 @@ import { Add, Remove } from "@mui/icons-material";
 import { dimensions } from "utils/common/constants";
 import { CSSProperties, useMemo, useRef, useState } from "react";
 
-const IncrementalSlider = ({
+export const IncrementalSlider = ({
   min,
   max,
   step,
@@ -149,5 +149,3 @@ const IncrementalSlider = ({
     </Box>
   );
 };
-
-export default IncrementalSlider;
