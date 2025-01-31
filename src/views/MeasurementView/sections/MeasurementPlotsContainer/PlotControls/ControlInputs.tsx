@@ -13,7 +13,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
+import { HelpOutlineOutlined as HelpOutlineOutlinedIcon } from "@mui/icons-material";
 import type { ColorSchemeId } from "@nivo/colors";
 
 import { useMeasurementParameters, usePlotControl } from "../../../hooks";

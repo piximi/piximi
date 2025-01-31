@@ -1,4 +1,5 @@
-import * as React from "react";
+import { useState, MouseEvent, Fragment } from "react";
+
 import { CirclePicker, ColorResult } from "react-color";
 
 import { Popover, Box } from "@mui/material";
@@ -20,11 +21,11 @@ export const ColorIcon = ({
   unusedColors,
 }: ColorIconButtonProps) => {
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
-    React.useState<null | HTMLDivElement>(null);
+    useState<null | HTMLDivElement>(null);
 
   const colorPopupOpen = Boolean(colorMenuAnchorEl);
 
-  const onOpenColorPicker = (event: React.MouseEvent<HTMLDivElement>) => {
+  const onOpenColorPicker = (event: MouseEvent<HTMLDivElement>) => {
     if (colorPopupOpen) {
       setColorMenuAnchorEl(null);
     } else {
@@ -42,7 +43,7 @@ export const ColorIcon = ({
   };
   //TODO: should be dialog and button
   return (
-    <React.Fragment>
+    <Fragment>
       <Box
         display="flex"
         flexDirection={"row"}
@@ -80,6 +81,6 @@ export const ColorIcon = ({
           <CirclePicker colors={unusedColors} onChange={onChange} />
         </Box>
       </Popover>
-    </React.Fragment>
+    </Fragment>
   );
 };

@@ -1,5 +1,4 @@
-import { styled } from "@mui/material";
-import Select, { SelectProps } from "@mui/material/Select";
+import { Select, SelectProps, styled } from "@mui/material";
 import { CSSProperties } from "@mui/material/styles/createMixins";
 
 export type StyledSelectProps = SelectProps &

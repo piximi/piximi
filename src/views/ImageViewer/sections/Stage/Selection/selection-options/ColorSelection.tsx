@@ -1,6 +1,6 @@
 import { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import * as ReactKonva from "react-konva";
+import { Group as KonvaGroup, Image as KonvaImage } from "react-konva";
 
 import { ColorAnnotationToolTip } from "../../ColorAnnotationToolTip";
 
@@ -34,13 +34,9 @@ export const ColorSelection = ({ operator }: ColorSelectionProps) => {
 
   return (
     <>
-      <ReactKonva.Group>
-        <ReactKonva.Image
-          image={image}
-          x={imagePosition.x}
-          y={imagePosition.y}
-        />
-      </ReactKonva.Group>
+      <KonvaGroup>
+        <KonvaImage image={image} x={imagePosition.x} y={imagePosition.y} />
+      </KonvaGroup>
       <ColorAnnotationToolTip
         toolTipPosition={{
           x: operator.toolTipPosition!.x + imagePosition.x,

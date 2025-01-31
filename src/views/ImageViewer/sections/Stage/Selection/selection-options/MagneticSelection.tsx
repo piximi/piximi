@@ -1,6 +1,10 @@
 import React, { useContext } from "react";
 import { useSelector } from "react-redux";
-import * as ReactKonva from "react-konva";
+import {
+  Circle as KonvaCircle,
+  Group as KonvaGroup,
+  Line as KonvaLine,
+} from "react-konva";
 
 import { useMarchingAnts } from "../../../../hooks";
 
@@ -22,8 +26,8 @@ export const MagneticSelection = ({ operator }: MagneticSelectionProps) => {
 
   return (
     <>
-      <ReactKonva.Group>
-        <ReactKonva.Circle
+      <KonvaGroup>
+        <KonvaCircle
           fill="white"
           radius={3 / stageScale}
           stroke="black"
@@ -33,7 +37,7 @@ export const MagneticSelection = ({ operator }: MagneticSelectionProps) => {
         />
         {operator.anchor && (
           <>
-            <ReactKonva.Circle
+            <KonvaCircle
               fill="black"
               radius={3 / stageScale}
               stroke="white"
@@ -43,7 +47,7 @@ export const MagneticSelection = ({ operator }: MagneticSelectionProps) => {
             />
           </>
         )}
-        <ReactKonva.Line
+        <KonvaLine
           points={operator.buffer.flatMap((point) => [
             point.x + imageOrigin.x,
             point.y + imageOrigin.y,
@@ -51,7 +55,7 @@ export const MagneticSelection = ({ operator }: MagneticSelectionProps) => {
           stroke="black"
           strokeWidth={1 / stageScale}
         />
-        <ReactKonva.Line
+        <KonvaLine
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
           stroke="white"
@@ -61,7 +65,7 @@ export const MagneticSelection = ({ operator }: MagneticSelectionProps) => {
           ])}
           strokeWidth={1 / stageScale}
         />
-      </ReactKonva.Group>
+      </KonvaGroup>
     </>
   );
 };

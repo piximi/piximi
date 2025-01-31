@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { ExpandMore, ExpandLess } from "@mui/icons-material";
 import { ToolHotkeyTitle } from "components/ui/tooltips";
-import IncrementalSlider from "components/inputs/IncrementalSlider";
+import { IncrementalSlider } from "components/inputs";
 import { useMenu } from "hooks";
 import { SliderOptions } from "utils/common/types";
 

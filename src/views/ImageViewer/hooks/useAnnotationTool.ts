@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
 import {
@@ -30,7 +30,7 @@ import {
 import { ToolType } from "views/ImageViewer/utils/enums";
 
 export const useAnnotationTool = () => {
-  const [image, setImage] = useState<ImageJS.Image>();
+  const [image, setImage] = useState<IJSImage>();
   const [operator, setOperator] = useState<AnnotationTool>(
     new BlankAnnotationTool(),
   );
@@ -45,7 +45,7 @@ export const useAnnotationTool = () => {
   useEffect(() => {
     if (!activeImage) return;
     const loadImage = async () => {
-      const image = await ImageJS.Image.load(activeImage.src, {
+      const image = await IJSImage.load(activeImage.src, {
         ignorePalette: true,
       });
       setImage(image);

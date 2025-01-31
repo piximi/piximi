@@ -1,7 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-// import { useLocation } from "react-router-dom";
-import StackTrace from "stacktrace-js";
+import { fromError } from "stacktrace-js";
 
 import {
   AppBar,
@@ -56,7 +55,7 @@ export const FallBackDialog = (props: any) => {
 
   React.useEffect(() => {
     if (error.stack) {
-      StackTrace.fromError(error)
+      fromError(error)
         .then((stacktrace) => {
           setStackTrace(
             stacktrace.map((stackFrame) => stackFrame.toString()).join("\n"),
