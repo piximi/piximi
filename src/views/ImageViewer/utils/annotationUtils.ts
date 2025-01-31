@@ -1,5 +1,5 @@
 import { DataArray } from "utils/file-io/types";
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 import { convertToDataArray } from "utils/common/helpers";
 
 /**
@@ -42,7 +42,7 @@ export const invert = (
     0,
   ];
 
-  const invertedMask = new ImageJS.Image(imageWidth, imageHeight, {
+  const invertedMask = new IJSImage(imageWidth, imageHeight, {
     components: 1,
     alpha: 0,
   });
