@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import Konva from "konva";
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 
 import { Point } from "views/ImageViewer/utils/types";
 
 export const usePointerLocation = (
   imageRef: React.MutableRefObject<Konva.Image | null>,
   stageRef: React.RefObject<Konva.Stage | null>,
-  originalImage: ImageJS.Image,
+  originalImage: IJSImage,
 ) => {
   const [absolutePosition, setAbsolutePosition] = useState<Point>();
   const [relativePositionByStage, setRelativePositionByStage] =

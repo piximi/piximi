@@ -1,4 +1,4 @@
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 import { pointsAreEqual } from "./point-operations";
 
 import { logger } from "utils/common/helpers";
@@ -136,7 +136,7 @@ export const getOverlappingAnnotations = (
         const boundingBoxHeight = boundingBox[3] - boundingBox[1];
         if (boundingBoxHeight && boundingBoxWidth) {
           //return annotation if clicked on actual selected data
-          const maskROI = new ImageJS.Image(
+          const maskROI = new IJSImage(
             boundingBoxWidth,
             boundingBoxHeight,
             annotation.decodedMask,
@@ -200,7 +200,7 @@ export const colorOverlayROI = (
   // const boxHeight = boundingBox[3] - boundingBox[1];
 
   if (!boxWidth || !boxHeight) return undefined;
-  let croppedImage = new ImageJS.Image(
+  let croppedImage = new IJSImage(
     boxWidth,
     boxHeight,
     Array(boxHeight * boxWidth).fill(0),
@@ -210,7 +210,7 @@ export const colorOverlayROI = (
     },
   ).resize({ factor: scalingFactor });
   try {
-    croppedImage = new ImageJS.Image(boxWidth, boxHeight, decodedMask, {
+    croppedImage = new IJSImage(boxWidth, boxHeight, decodedMask, {
       components: 1,
       alpha: 0,
     }).resize({ factor: scalingFactor });
@@ -227,16 +227,12 @@ export const colorOverlayROI = (
     }
   }
 
-  const colorROIImage = new ImageJS.Image(boxWidth, boxHeight, {
+  const colorROIImage = new IJSImage(boxWidth, boxHeight, {
     components: 3,
     alpha: 1,
   }).resize({ factor: scalingFactor });
 
-  const checkNeighbors = (
-    arr: ImageJS.Image,
-    x: number,
-    y: number,
-  ): boolean => {
+  const checkNeighbors = (arr: IJSImage, x: number, y: number): boolean => {
     if (x === 0 || x === croppedImage.width - 1) return true;
     for (const [dx, dy] of [
       [0, 1],

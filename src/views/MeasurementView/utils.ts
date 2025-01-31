@@ -1,5 +1,5 @@
 import { DataArray } from "image-js";
-import * as tf from "@tensorflow/tfjs";
+import { Tensor2D, Tensor4D } from "@tensorflow/tfjs";
 
 import { getObjectMaskData, prepareChannels } from "utils/measurements/helpers";
 import { decode } from "views/ImageViewer/utils";
@@ -99,11 +99,11 @@ export const selectTreeItemChildren = (
 };
 
 export const prepareThingData = async (thingData: {
-  data: tf.Tensor4D;
+  data: Tensor4D;
   encodedMask?: number[];
   decodedMask?: DataArray;
 }) => {
-  let channelData: tf.Tensor2D;
+  let channelData: Tensor2D;
   let maskData: DataArray | undefined = undefined;
   let maskShape: { width: number; height: number } | undefined;
   if (thingData.decodedMask) {

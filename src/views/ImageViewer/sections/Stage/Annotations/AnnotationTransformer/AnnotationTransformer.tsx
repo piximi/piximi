@@ -1,7 +1,13 @@
 import { useContext, useLayoutEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
-import * as ReactKonva from "react-konva";
+import {
+  Group as KonvaGroup,
+  Label as KonvaLabel,
+  Tag as KonvaTag,
+  Text as KonvaText,
+  Transformer as KonvaTransformer,
+} from "react-konva";
 import useSound from "use-sound";
 
 import { useHotkeys } from "hooks";
@@ -249,8 +255,8 @@ export const AnnotationTransformer = ({
   );
 
   return (
-    <ReactKonva.Group>
-      <ReactKonva.Transformer
+    <KonvaGroup>
+      <KonvaTransformer
         id={"tr-".concat(annotationId)}
         ref={trRef}
         rotateEnabled={false}
@@ -259,7 +265,7 @@ export const AnnotationTransformer = ({
         borderStroke="white" //TODO: It would be pretty cool if the border color could set depending on the primary color of the underlying image for contrast
       />
       {hasControl && (
-        <ReactKonva.Group
+        <KonvaGroup
           id={"label-group"}
           position={{ x: xPos, y: yPos }}
           scaleX={1 / (stageRef?.current?.scaleX() ?? 1)}
@@ -288,9 +294,9 @@ export const AnnotationTransformer = ({
             text={"Cancel"}
             fillColor={"darkred"}
           />
-        </ReactKonva.Group>
+        </KonvaGroup>
       )}
-    </ReactKonva.Group>
+    </KonvaGroup>
   );
 };
 
@@ -312,7 +318,7 @@ const KonvaButton = ({
   fillColor: string;
 }) => {
   return (
-    <ReactKonva.Label
+    <KonvaLabel
       position={{
         x: xPosition,
         y: yPosition,
@@ -323,7 +329,7 @@ const KonvaButton = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <ReactKonva.Tag
+      <KonvaTag
         cornerRadius={3}
         fill={fillColor}
         lineJoin={"round"}
@@ -331,7 +337,7 @@ const KonvaButton = ({
         shadowBlur={10}
         shadowOffset={{ x: 5, y: 5 }}
       />
-      <ReactKonva.Text
+      <KonvaText
         fill={"white"}
         fontSize={14}
         padding={6}
@@ -341,6 +347,6 @@ const KonvaButton = ({
         align={"center"}
         name={"transformer-button"}
       />
-    </ReactKonva.Label>
+    </KonvaLabel>
   );
 };

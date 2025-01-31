@@ -1,4 +1,4 @@
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 
 import { AnnotationTool } from "./AnnotationTool";
 
@@ -97,7 +97,7 @@ export class PenAnnotationTool extends AnnotationTool {
       ctx.fill();
     });
 
-    const rgbMask = ImageJS.Image.fromCanvas(canvas);
+    const rgbMask = IJSImage.fromCanvas(canvas);
 
     const width = this._boundingBox[2] - this._boundingBox[0];
     const height = this._boundingBox[3] - this._boundingBox[1];
@@ -117,7 +117,7 @@ export class PenAnnotationTool extends AnnotationTool {
     return thresholdMaskImg.data as Uint8Array;
   }
 
-  private thresholdMask = (mask: ImageJS.Image) => {
+  private thresholdMask = (mask: IJSImage) => {
     for (let x = 0; x < mask.width; x++) {
       for (let y = 0; y < mask.height; y++) {
         if (mask.getPixelXY(x, y)[0] > 1) {

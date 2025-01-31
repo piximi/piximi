@@ -1,5 +1,5 @@
 import React, { forwardRef, memo } from "react";
-import * as ReactKonva from "react-konva";
+import { Image as KonvaImage } from "react-konva";
 import Konva from "konva";
 
 import { Point } from "views/ImageViewer/utils/types";
@@ -17,7 +17,7 @@ interface KonvaImageProps {
 export const MemoizedKonvaImage = memo(
   forwardRef<Konva.Image, KonvaImageProps>((props, ref) => {
     return (
-      <ReactKonva.Image
+      <KonvaImage
         height={props.height}
         image={props.image}
         ref={ref}

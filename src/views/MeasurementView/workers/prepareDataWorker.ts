@@ -1,4 +1,4 @@
-import * as tf from "@tensorflow/tfjs";
+import { tensor4d } from "@tensorflow/tfjs";
 
 import { prepareThingData } from "../utils";
 
@@ -23,7 +23,7 @@ self.onmessage = async (
   for await (const thingData of e.data.things) {
     const { id, data: rawData, encodedMask, decodedMask } = thingData;
 
-    const data = tf.tensor4d(rawData);
+    const data = tensor4d(rawData);
     const preparedThing = await prepareThingData({
       data,
       encodedMask,

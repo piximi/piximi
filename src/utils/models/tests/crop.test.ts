@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
-import * as tf from "@tensorflow/tfjs-node";
+import {
+  tensor3d,
+  profile as tfProfile,
+  Tensor3D,
+} from "@tensorflow/tfjs-node";
 
 import { matchedCropPad, padToMatch } from "../helpers";
 
 it("padToMatch", async () => {
-  const sample = tf.tensor3d([
+  const sample = tensor3d([
     [
       [1, 10, 100],
       [2, 20, 200],
@@ -19,14 +23,11 @@ it("padToMatch", async () => {
     ],
   ]);
 
-  const profile = await tf.profile(() =>
+  const profile = await tfProfile(() =>
     padToMatch(sample, { width: 5, height: 5 }, "constant"),
   );
-  const result = profile.result as tf.Tensor3D;
+  const result = profile.result as Tensor3D;
   const padded = result.arraySync();
-
-  // console.log(`newBytes: ${profile.newBytes}`);
-  // console.log(`newTensors: ${profile.newTensors}`);
 
   const expected = [
     [
@@ -191,7 +192,6 @@ describe("matchedCropPad - random", () => {
       [1.0, 1.0],
     ];
 
-    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 
@@ -213,7 +213,6 @@ describe("matchedCropPad - random", () => {
       [0.66666, 1.0],
     ];
 
-    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 
@@ -235,7 +234,6 @@ describe("matchedCropPad - random", () => {
       [1.0, 1.0],
     ];
 
-    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 });
@@ -286,7 +284,6 @@ describe("matchedCropPad - center", () => {
 
     const cropCoordsExpected = [0.25, 0.0, 0.75, 1.0];
 
-    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 
@@ -303,7 +300,6 @@ describe("matchedCropPad - center", () => {
 
     const cropCoordsExpected = [0.25, 1 / 8, 0.75, 7 / 8];
 
-    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 
@@ -320,7 +316,6 @@ describe("matchedCropPad - center", () => {
 
     const cropCoordsExpected = [0.0, 0.0, 1.0, 1.0];
 
-    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 });

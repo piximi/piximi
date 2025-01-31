@@ -9,7 +9,12 @@ import {
   Tensor4D,
   tidy,
 } from "@tensorflow/tfjs";
-import * as ImageJS from "image-js";
+import IJSImage, {
+  Stack as IJSStack,
+  ImageKind as IJSImageKind,
+  ColorModel as IJSColorModel,
+  BitDepth as IJSBitDepth,
+} from "image-js";
 
 import { fileFromPath } from "../../file-io/nodeImageHelper";
 import { MIMEType } from "utils/file-io/types";
@@ -388,8 +393,8 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
 
       const imageStack = await loadImageFileAsStack(testData[im].data);
 
-      // is ImageJS.Stack (subclass of array, containing ImageJS.Image objects)
-      // and correct number of ImageJS.Image objects
+      // is IJSStack (subclass of array, containing IJSImage objects)
+      // and correct number of IJSImage objects
       expect(imageStack.length || false).toBe(expectedFrames);
 
       // each frame has correct properties
@@ -509,17 +514,17 @@ describe("Tensor -> Composite Image", () => {
     new Uint16Array([2115, 2125, 2215, 2225, 2315, 2325]),
   ];
 
-  const imageStack = new ImageJS.Stack(
+  const imageStack = new IJSStack(
     stackData.map((imData, i) => {
-      return new ImageJS.Image({
+      return new IJSImage({
         width: W,
         height: H,
         data: stackData[i],
-        kind: "GREY" as ImageJS.ImageKind,
-        bitDepth: BITDEPTH as ImageJS.BitDepth,
+        kind: "GREY" as IJSImageKind,
+        bitDepth: BITDEPTH as IJSBitDepth,
         components: 1,
         alpha: 0,
-        colorModel: "GREY" as ImageJS.ColorModel,
+        colorModel: "GREY" as IJSColorModel,
       });
     }),
   );
@@ -765,17 +770,17 @@ describe("Tensor -> Composite Image", () => {
        [[228, 255, 128], [255, 228, 128]],
        [[255, 178, 255], [255, 128, 255]]]
 
-    const imageStack = new ImageJS.Stack(
+    const imageStack = new IJSStack(
       stackData.map((imData, i) => {
-        return new ImageJS.Image({
+        return new IJSImage({
           width: W,
           height: H,
           data: stackData[i],
-          kind: "GREY" as ImageJS.ImageKind,
-          bitDepth: BITDEPTH as ImageJS.BitDepth,
+          kind: "GREY" as IJSImageKind,
+          bitDepth: BITDEPTH as IJSBitDepth,
           components: 1,
           alpha: 0,
-          colorModel: "GREY" as ImageJS.ColorModel,
+          colorModel: "GREY" as IJSColorModel,
         });
       }),
     );
@@ -940,15 +945,15 @@ describe("Tensor -> Composite Image", () => {
       255, 255, 255,
     ];
 
-    const expectedImage = new ImageJS.Image({
+    const expectedImage = new IJSImage({
       width: W,
       height: H,
       data: new Uint8Array(expectedOutput),
-      kind: "RGB" as ImageJS.ImageKind,
-      bitDepth: BITDEPTH as ImageJS.BitDepth,
+      kind: "RGB" as IJSImageKind,
+      bitDepth: BITDEPTH as IJSBitDepth,
       components: 3,
       alpha: 0,
-      colorModel: "RGB" as ImageJS.ColorModel,
+      colorModel: "RGB" as IJSColorModel,
     });
 
     const expectedDataURL = expectedImage.toDataURL("image/png", {
@@ -969,17 +974,17 @@ describe("Tensor -> Composite Image", () => {
       new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
     ];
 
-    const imageStack = new ImageJS.Stack(
+    const imageStack = new IJSStack(
       stackData.map((imData, i) => {
-        return new ImageJS.Image({
+        return new IJSImage({
           width: W,
           height: H,
           data: stackData[i],
-          kind: "GREY" as ImageJS.ImageKind,
-          bitDepth: BITDEPTH as ImageJS.BitDepth,
+          kind: "GREY" as IJSImageKind,
+          bitDepth: BITDEPTH as IJSBitDepth,
           components: 1,
           alpha: 0,
-          colorModel: "GREY" as ImageJS.ColorModel,
+          colorModel: "GREY" as IJSColorModel,
         });
       }),
     );
@@ -1002,7 +1007,7 @@ describe("Tensor -> Composite Image", () => {
       useCanvas,
     });
 
-    const image = await ImageJS.Image.load(renderedURL);
+    const image = await IJSImage.load(renderedURL);
     const imageData = Array.from(image.data);
 
     expect(renderedURL).toBe(expectedDataURL);
@@ -1027,15 +1032,15 @@ describe("Tensor -> Composite Image", () => {
       255, 255, 255,
     ];
 
-    const expectedImage = new ImageJS.Image({
+    const expectedImage = new IJSImage({
       width: W,
       height: H,
       data: new Uint8Array(expectedOutput),
-      kind: "RGB" as ImageJS.ImageKind,
-      bitDepth: BITDEPTH as ImageJS.BitDepth,
+      kind: "RGB" as IJSImageKind,
+      bitDepth: BITDEPTH as IJSBitDepth,
       components: 3,
       alpha: 0,
-      colorModel: "RGB" as ImageJS.ColorModel,
+      colorModel: "RGB" as IJSColorModel,
     });
 
     const expectedDataURL = expectedImage.toDataURL("image/png", {
@@ -1056,17 +1061,17 @@ describe("Tensor -> Composite Image", () => {
       new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
     ];
 
-    const imageStack = new ImageJS.Stack(
+    const imageStack = new IJSStack(
       stackData.map((imData, i) => {
-        return new ImageJS.Image({
+        return new IJSImage({
           width: W,
           height: H,
           data: stackData[i],
-          kind: "GREY" as ImageJS.ImageKind,
-          bitDepth: BITDEPTH as ImageJS.BitDepth,
+          kind: "GREY" as IJSImageKind,
+          bitDepth: BITDEPTH as IJSBitDepth,
           components: 1,
           alpha: 0,
-          colorModel: "GREY" as ImageJS.ColorModel,
+          colorModel: "GREY" as IJSColorModel,
         });
       }),
     );
@@ -1091,7 +1096,7 @@ describe("Tensor -> Composite Image", () => {
     expect(renderedURLs.length).toBe(Z);
 
     for (let i = 0; i < renderedURLs.length; i++) {
-      const image = await ImageJS.Image.load(renderedURLs[i]);
+      const image = await IJSImage.load(renderedURLs[i]);
       const imageData = Array.from(image.data);
 
       expect(renderedURLs[i]).toBe(expectedDataURL);
@@ -1117,15 +1122,15 @@ describe("Tensor -> Composite Image", () => {
       65535, 65535, 65535,
     ];
 
-    const expectedImage = new ImageJS.Image({
+    const expectedImage = new IJSImage({
       width: W,
       height: H,
       data: new Uint16Array(expectedOutput),
-      kind: "RGB" as ImageJS.ImageKind,
-      bitDepth: BITDEPTH as ImageJS.BitDepth,
+      kind: "RGB" as IJSImageKind,
+      bitDepth: BITDEPTH as IJSBitDepth,
       components: 3,
       alpha: 0,
-      colorModel: "RGB" as ImageJS.ColorModel,
+      colorModel: "RGB" as IJSColorModel,
     });
 
     const expectedDataURL = expectedImage.toDataURL("image/png", {
@@ -1146,17 +1151,17 @@ describe("Tensor -> Composite Image", () => {
       new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
     ];
 
-    const imageStack = new ImageJS.Stack(
+    const imageStack = new IJSStack(
       stackData.map((_imData, i) => {
-        return new ImageJS.Image({
+        return new IJSImage({
           width: W,
           height: H,
           data: stackData[i],
-          kind: "GREY" as ImageJS.ImageKind,
-          bitDepth: BITDEPTH as ImageJS.BitDepth,
+          kind: "GREY" as IJSImageKind,
+          bitDepth: BITDEPTH as IJSBitDepth,
           components: 1,
           alpha: 0,
-          colorModel: "GREY" as ImageJS.ColorModel,
+          colorModel: "GREY" as IJSColorModel,
         });
       }),
     );
@@ -1179,7 +1184,7 @@ describe("Tensor -> Composite Image", () => {
       useCanvas,
     });
 
-    const image = await ImageJS.Image.load(renderedURL);
+    const image = await IJSImage.load(renderedURL);
     const imageData = Array.from(image.data);
 
     expect(renderedURL).toBe(expectedDataURL);

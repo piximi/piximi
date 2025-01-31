@@ -1,6 +1,6 @@
 import React from "react";
 
-import SettingsIcon from "@mui/icons-material/Settings";
+import { Settings as SettingsIcon } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 

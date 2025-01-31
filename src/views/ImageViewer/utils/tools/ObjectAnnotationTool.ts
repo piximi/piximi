@@ -10,7 +10,7 @@ import {
   browser,
   scalar,
 } from "@tensorflow/tfjs";
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 
 import { RectangularAnnotationTool } from "./RectangularAnnotationTool";
 import { Point } from "../types";
@@ -18,12 +18,12 @@ import { AnnotationState } from "../enums";
 
 export class ObjectAnnotationTool extends RectangularAnnotationTool {
   graph?: LayersModel;
-  prediction?: ImageJS.Image;
+  prediction?: IJSImage;
   points: Array<Point> = [];
   // @ts-ignore it does exist
-  roi?: ImageJS.Roi;
+  roi?: IJSImage.Roi;
   offset?: { x: number; y: number };
-  output?: ImageJS.Image;
+  output?: IJSImage;
 
   deselect() {
     this.prediction = undefined;
@@ -45,7 +45,7 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
     await this.predict();
   }
 
-  static async compile(image: ImageJS.Image) {
+  static async compile(image: IJSImage) {
     const instance = new ObjectAnnotationTool(image);
 
     const pathname =
@@ -112,7 +112,7 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
         prediction as Tensor3D,
       );
       // .then(async (clamped) => {
-      this.output = new ImageJS.Image({
+      this.output = new IJSImage({
         width: this.image.width,
         height: this.image.height,
         data: clamped,

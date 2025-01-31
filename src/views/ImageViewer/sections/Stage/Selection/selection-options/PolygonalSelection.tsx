@@ -1,5 +1,9 @@
 import React, { useContext } from "react";
-import * as ReactKonva from "react-konva";
+import {
+  Circle as KonvaCircle,
+  Group as KonvaGroup,
+  Line as KonvaLine,
+} from "react-konva";
 import { useSelector } from "react-redux";
 
 import { useMarchingAnts } from "../../../../hooks";
@@ -23,8 +27,8 @@ export const PolygonalSelection = ({ operator }: PolygonalSelectionProps) => {
 
   return (
     <>
-      <ReactKonva.Group>
-        <ReactKonva.Circle
+      <KonvaGroup>
+        <KonvaCircle
           fill="white"
           radius={3 / stageScale}
           stroke="black"
@@ -35,7 +39,7 @@ export const PolygonalSelection = ({ operator }: PolygonalSelectionProps) => {
 
         {operator.anchor && (
           <>
-            <ReactKonva.Circle
+            <KonvaCircle
               fill="black"
               radius={3 / stageScale}
               stroke="white"
@@ -45,7 +49,7 @@ export const PolygonalSelection = ({ operator }: PolygonalSelectionProps) => {
             />
           </>
         )}
-        <ReactKonva.Line
+        <KonvaLine
           points={operator.buffer.flatMap((point) => [
             point.x + imageOrigin.x,
             point.y + imageOrigin.y,
@@ -53,7 +57,7 @@ export const PolygonalSelection = ({ operator }: PolygonalSelectionProps) => {
           stroke="black"
           strokeWidth={1 / stageScale}
         />
-        <ReactKonva.Line
+        <KonvaLine
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
           stroke="white"
@@ -63,7 +67,7 @@ export const PolygonalSelection = ({ operator }: PolygonalSelectionProps) => {
           ])}
           strokeWidth={1 / stageScale}
         />
-      </ReactKonva.Group>
+      </KonvaGroup>
     </>
   );
 };

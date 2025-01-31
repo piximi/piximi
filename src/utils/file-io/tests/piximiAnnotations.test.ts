@@ -1,6 +1,10 @@
 import { test, describe, expect, beforeAll } from "vitest";
 import Image from "image-js";
-import * as tf from "@tensorflow/tfjs";
+import {
+  setBackend as tfSetBackend,
+  browser as tfBrowser,
+  Tensor4D,
+} from "@tensorflow/tfjs";
 
 import { productionStore } from "store";
 import { dataSlice } from "store/data";
@@ -26,7 +30,7 @@ import {
   ImageObject,
 } from "store/data/types";
 import { EntityState } from "@reduxjs/toolkit";
-tf.setBackend("cpu");
+tfSetBackend("cpu");
 
 //below image fields not needed for serializing annotations file so fake it
 const dummyImFields = {
@@ -267,7 +271,7 @@ describe("deserialize into project with matching image, no matching kinds or cat
     );
     serializedPiximi.version = ANNOTATIONS_VERSION;
     const image = await Image.load(im1T1.src);
-    const imData = tf.browser.fromPixels(image).expandDims(0) as tf.Tensor4D;
+    const imData = tfBrowser.fromPixels(image).expandDims(0) as Tensor4D;
     im1T1.data = imData;
     const thingsT2 = [...t1Ims].reduce(
       (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
@@ -361,7 +365,7 @@ describe("deserialize into project with matching image, matching kind", () => {
     k1T2.categories = [uC1T2.id];
     k1T2.unknownCategoryId = uC1T2.id;
     const image = await Image.load(im1T1.src);
-    const imData = tf.browser.fromPixels(image).expandDims(0) as tf.Tensor4D;
+    const imData = tfBrowser.fromPixels(image).expandDims(0) as Tensor4D;
     const im1T2: ImageObject = { ...im1T1, containing: [], data: imData };
     const thingsT2 = [im1T2].reduce(
       (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
@@ -476,7 +480,7 @@ describe("deserialize into project with matching image, matching kind, and match
     k1T2.categories = [uC1T2.id, c1T2.id];
     k1T2.unknownCategoryId = uC1T2.id;
     const image = await Image.load(im1T1.src);
-    const imData = tf.browser.fromPixels(image).expandDims(0) as tf.Tensor4D;
+    const imData = tfBrowser.fromPixels(image).expandDims(0) as Tensor4D;
     const im1T2: ImageObject = { ...im1T1, containing: [], data: imData };
     const thingsT2 = [im1T2].reduce(
       (entities: EntityState<AnnotationObject | ImageObject>, thing) => {

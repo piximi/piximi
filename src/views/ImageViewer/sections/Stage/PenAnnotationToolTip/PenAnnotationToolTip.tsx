@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { useSelector } from "react-redux";
-import * as ReactKonva from "react-konva";
+import { Ellipse as KonvaEllipse } from "react-konva";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
 import {
@@ -41,7 +41,7 @@ export const PenAnnotationToolTip = ({
 
   return (
     <>
-      <ReactKonva.Ellipse
+      <KonvaEllipse
         radiusX={penSelectionBrushSize / stageScale}
         radiusY={penSelectionBrushSize / stageScale}
         x={currentPosition.x}

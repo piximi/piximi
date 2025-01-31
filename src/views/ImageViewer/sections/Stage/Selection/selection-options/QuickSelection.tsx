@@ -1,6 +1,6 @@
 import { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import * as ReactKonva from "react-konva";
+import { Group as KonvaGroup, Image as KonvaImage } from "react-konva";
 
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
@@ -36,9 +36,9 @@ export const QuickSelection = ({ operator }: QuickSelectionProps) => {
 
   return (
     <>
-      <ReactKonva.Group>
-        <ReactKonva.Image image={image} x={imageOrigin.x} y={imageOrigin.y} />
-      </ReactKonva.Group>
+      <KonvaGroup>
+        <KonvaImage image={image} x={imageOrigin.x} y={imageOrigin.y} />
+      </KonvaGroup>
     </>
   );
 };
