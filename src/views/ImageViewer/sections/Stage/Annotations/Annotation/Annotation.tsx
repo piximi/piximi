@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
-import * as ReactKonva from "react-konva";
+import { Image as KonvaImage } from "react-konva";
 import Image from "image-js";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
@@ -118,7 +118,7 @@ export const Annotation = ({
   return isFiltered ? (
     <></>
   ) : (
-    <ReactKonva.Image
+    <KonvaImage
       ref={annotatorRef}
       id={annotation.id}
       image={imageMask}

@@ -1,4 +1,4 @@
-import * as ImageJS from "image-js";
+import IJSImage from "image-js";
 
 import { Tool } from "./Tool";
 
@@ -358,7 +358,7 @@ export abstract class AnnotationTool extends Tool {
       0,
     ];
 
-    const invertedMask = new ImageJS.Image(imageWidth, imageHeight, {
+    const invertedMask = new IJSImage(imageWidth, imageHeight, {
       components: 1,
       alpha: 0,
     });

@@ -15,7 +15,7 @@ import { selectLoadMessage } from "store/applicationSettings/selectors";
 import { generateDefaultColors } from "utils/common/tensorHelpers";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectActiveImageRenderedSrcs } from "views/ImageViewer/state/imageViewer/selectors";
-import IncrementalSlider from "components/inputs/IncrementalSlider";
+import { IncrementalSlider } from "components/inputs";
 import { ColorAdjustment } from "icons";
 
 export const ImageOptions = () => {

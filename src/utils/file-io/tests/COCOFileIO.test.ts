@@ -1,7 +1,11 @@
 import { test, describe, expect, beforeAll } from "vitest";
 import Image from "image-js";
 // TODO: use node?
-import * as tf from "@tensorflow/tfjs";
+import {
+  setBackend as tfSetBackend,
+  browser as tfBrowser,
+  Tensor4D,
+} from "@tensorflow/tfjs";
 
 import { productionStore } from "store/";
 import { dataSlice } from "store/data";
@@ -34,7 +38,7 @@ import {
 } from "store/data/types";
 import { EntityState } from "@reduxjs/toolkit";
 
-tf.setBackend("cpu");
+tfSetBackend("cpu");
 const imDataMap: Record<string, string> = {
   "1clockTower.jpg": "src/data/test-data/COCO/1clockTower.jpg",
   "2golfer.jpg": "src/data/test-data/COCO/2golfer.jpg",
@@ -61,7 +65,7 @@ beforeAll(async () => {
     const imBuffer = await imFile.arrayBuffer();
     const rawImage = await Image.load(imBuffer);
     const imSrc = rawImage.toDataURL();
-    const imData = tf.browser.fromPixels(rawImage).expandDims(0) as tf.Tensor4D;
+    const imData = tfBrowser.fromPixels(rawImage).expandDims(0) as Tensor4D;
     const finalImage = {
       ...buildImage,
       src: imSrc,

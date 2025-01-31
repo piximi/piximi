@@ -11,7 +11,11 @@ import {
   Tensor4D,
   tidy,
 } from "@tensorflow/tfjs";
-import * as ImageJS from "image-js";
+import IJSImage, {
+  Stack as IJSStack,
+  ImageKind as IJSImageKind,
+  ColorModel as IJSColorModel,
+} from "image-js";
 import { BitDepth } from "utils/file-io/types";
 import { Partition } from "utils/models/enums";
 import { generateUUID } from "./helpers";
@@ -59,7 +63,7 @@ import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
  Return the resulting imageTensor
  */
 export const convertToTensor = (
-  imageStack: ImageJS.Stack,
+  imageStack: IJSStack,
   numSlices: number,
   numChannels: number,
 ): Tensor4D => {
@@ -468,15 +472,15 @@ export async function renderTensor(
   if (compositeTensor.rank === 3) {
     const [height, width, components] = (compositeTensor as Tensor3D).shape;
 
-    const image = new ImageJS.Image({
+    const image = new IJSImage({
       width,
       height,
       data: imageData,
-      kind: "RGB" as ImageJS.ImageKind,
+      kind: "RGB" as IJSImageKind,
       bitDepth: bitDepth,
       components,
       alpha: 0,
-      colorModel: "RGB" as ImageJS.ColorModel,
+      colorModel: "RGB" as IJSColorModel,
     });
     return image.toDataURL("image/png", { useCanvas: opts.useCanvas });
   } else {
@@ -491,15 +495,15 @@ export async function renderTensor(
       const sliceStart = i * strideLength;
       const sliceEnd = sliceStart + strideLength;
 
-      const image = new ImageJS.Image({
+      const image = new IJSImage({
         width,
         height,
         data: imageData.slice(sliceStart, sliceEnd),
-        kind: "RGB" as ImageJS.ImageKind,
+        kind: "RGB" as IJSImageKind,
         bitDepth: bitDepth,
         components,
         alpha: 0,
-        colorModel: "RGB" as ImageJS.ColorModel,
+        colorModel: "RGB" as IJSColorModel,
       });
 
       imageURLs.push(
@@ -572,7 +576,7 @@ export async function createRenderedTensor(
 }
 
 export const convertToImage = async (
-  imageStack: ImageJS.Stack,
+  imageStack: IJSStack,
   filename: string,
   currentColors: Colors | undefined,
   numSlices: number,
