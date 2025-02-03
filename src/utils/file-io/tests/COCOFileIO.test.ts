@@ -209,7 +209,10 @@ describe("deserialize into project with matching image, no matching kinds or cat
     );
 
     const thingsT2 = imagesT1.reduce(
-      (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
+      (
+        entities: EntityState<AnnotationObject | ImageObject, string>,
+        thing,
+      ) => {
         entities.ids.push(thing.id);
         entities.entities[thing.id] = thing;
         return entities;
@@ -274,7 +277,10 @@ describe("deserialize into project with matching image, matching kinds", () => {
     );
 
     const thingsT2 = imagesT1.reduce(
-      (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
+      (
+        entities: EntityState<AnnotationObject | ImageObject, string>,
+        thing,
+      ) => {
         entities.ids.push(thing.id);
         entities.entities[thing.id] = thing;
         return entities;
@@ -334,7 +340,7 @@ describe("deserialize into project with matching image, matching kinds", () => {
     k3T2.categories = [uC3T2.id];
     k3T2.unknownCategoryId = uC3T2.id;
     const kindsT2 = [k1T2, k2T2, k3T2].reduce(
-      (entities: EntityState<Kind>, kind) => {
+      (entities: EntityState<Kind, string>, kind) => {
         entities.ids.push(kind.id);
         entities.entities[kind.id] = kind;
         return entities;
@@ -343,7 +349,7 @@ describe("deserialize into project with matching image, matching kinds", () => {
     );
 
     const categoriesT2 = [uC1T2, uC2T2, uC3T2].reduce(
-      (entities: EntityState<Category>, category) => {
+      (entities: EntityState<Category, string>, category) => {
         entities.ids.push(category.id);
         entities.entities[category.id] = category;
         return entities;
@@ -406,7 +412,10 @@ describe("deserialize into project with matching image, matching kinds and categ
     );
 
     const thingsT2 = imagesT1.reduce(
-      (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
+      (
+        entities: EntityState<AnnotationObject | ImageObject, string>,
+        thing,
+      ) => {
         entities.ids.push(thing.id);
         entities.entities[thing.id] = thing;
         return entities;
@@ -476,7 +485,7 @@ describe("deserialize into project with matching image, matching kinds and categ
     k1T2.categories = [c1T2.id];
     k1T2.unknownCategoryId = c1T2.id;
     const kindsT2 = [k1T2, k2T2, k3T2].reduce(
-      (entities: EntityState<Kind>, kind) => {
+      (entities: EntityState<Kind, string>, kind) => {
         entities.ids.push(kind.id);
         entities.entities[kind.id] = kind;
         return entities;
@@ -485,7 +494,7 @@ describe("deserialize into project with matching image, matching kinds and categ
     );
     t2categories = [uC1T2, uC2T2, uC3T2, c1T2];
     const categoriesT2 = t2categories.reduce(
-      (entities: EntityState<Category>, category) => {
+      (entities: EntityState<Category, string>, category) => {
         entities.ids.push(category.id);
         entities.entities[category.id] = category;
         return entities;

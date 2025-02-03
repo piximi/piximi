@@ -1,11 +1,10 @@
 import { History } from "@tensorflow/tfjs";
 import {
-  AnyAction,
-  CombinedState,
   Dispatch,
   EntityState,
   ListenerEffectAPI,
   TypedStartListening,
+  UnknownAction,
 } from "@reduxjs/toolkit";
 
 import { HotkeyContext, Languages, ThingSortKey } from "utils/common/enums";
@@ -58,9 +57,9 @@ export type AppSettingsState = {
 };
 
 export type DataState = {
-  kinds: EntityState<Kind>;
-  categories: EntityState<Category>;
-  things: EntityState<AnnotationObject | ImageObject>;
+  kinds: EntityState<Kind, string>;
+  categories: EntityState<Category, string>;
+  things: EntityState<AnnotationObject | ImageObject, string>;
 };
 
 export type SegmenterState = {
@@ -130,7 +129,7 @@ export type AppDispatch = Dispatch<UnknownAction>;
 export type TypedAppStartListening = TypedStartListening<AppState, AppDispatch>;
 
 export type StoreListemerAPI = ListenerEffectAPI<
-  CombinedState<{
+  {
     classifier: ClassifierState;
     segmenter: SegmenterState;
     imageViewer: ImageViewerState;
@@ -138,7 +137,7 @@ export type StoreListemerAPI = ListenerEffectAPI<
     applicationSettings: AppSettingsState;
     annotator: AnnotatorState;
     data: DataState;
-  }>,
+  },
   AppDispatch,
   unknown
 >;

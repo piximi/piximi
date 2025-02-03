@@ -1,5 +1,4 @@
 import {
-  AnyAction,
   configureStore,
   Dispatch,
   EnhancedStore,
@@ -27,12 +26,10 @@ import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 
-const enhancers: StoreEnhancer[] = [];
-
 const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&
   import.meta.env.VITE_APP_LOG_LEVEL === "2"
-    ? [logger as Middleware<object, any, Dispatch<AnyAction>>]
+    ? [logger as Middleware<object, any, Dispatch<UnknownAction>>]
     : [];
 
 const listenerMiddlewares: Middleware[] = [
@@ -58,7 +55,7 @@ const preloadedState: RootState = {
 };
 
 const options = {
-  devTools: { trace: true, traceLimit: 15 }, // A traceLimit of 11 seems to be the minumum to get the full trace, set to 15 for a buffer
+  devTools: true,
   middleware: () => new Tuple(...listenerMiddlewares, ...loggingMiddleware),
   preloadedState: preloadedState,
   reducer: rootReducer,
@@ -68,7 +65,7 @@ export const productionStore: EnhancedStore = configureStore(options);
 
 export const initStore = (loadedData: RootState | undefined) => {
   const options = {
-    devTools: { trace: true, traceLimit: 15 },
+    devTools: true,
     middleware: () => new Tuple(...listenerMiddlewares, ...loggingMiddleware),
     preloadedState: loadedData ?? {},
     reducer: rootReducer,

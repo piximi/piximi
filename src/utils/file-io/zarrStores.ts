@@ -144,7 +144,7 @@ export class ZipStore implements AsyncStore<ValidStoreType> {
 export type CustomStore = FileStore | ZipStore;
 
 export const fListToStore = async (
-  files: FileList,
+  files: FileList | PseudoFileList,
   zipFile: boolean,
 ): Promise<CustomStore> => {
   if (zipFile) {
