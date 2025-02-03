@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 
 import { useTranslation } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,7 +24,7 @@ import {
   NewAnnotationIcon,
   SubtractAnnotationsIcon,
 } from "icons";
-import { useTheme } from "@mui/material";
+import { SvgIcon, useTheme } from "@mui/material";
 
 export const CreationOptions = () => {
   const dispatch = useDispatch();
@@ -43,6 +43,17 @@ export const CreationOptions = () => {
         }),
       );
   };
+
+  const getIconColor = useCallback(
+    (annotationMode: AnnotationMode) => {
+      return !workingAnnotationEntity.saved
+        ? theme.palette.action.disabled
+        : annotationMode === AnnotationMode.New
+          ? theme.palette.primary.dark
+          : theme.palette.grey[400];
+    },
+    [theme, workingAnnotationEntity.saved],
+  );
 
   //TODO: not working, but will fix after annotation handling refector
   const handleInvertAnnotation = () => {
@@ -82,6 +93,13 @@ export const CreationOptions = () => {
     );
   };
 
+  useEffect(() => {
+    console.log(
+      "annotationMode === AnnotationMode.New:",
+      annotationMode === AnnotationMode.New,
+    ); //LOG:
+  });
+
   return (
     <FlexRowBox>
       <Tool
@@ -91,7 +109,9 @@ export const CreationOptions = () => {
         }}
         disabled={!workingAnnotationEntity.saved}
       >
-        <FilterBAndW />
+        <SvgIcon>
+          <FilterBAndW />
+        </SvgIcon>
       </Tool>
       <Tool
         name={t("New Annotation")}
@@ -99,40 +119,24 @@ export const CreationOptions = () => {
         disabled={!workingAnnotationEntity.saved}
         selected={annotationMode === AnnotationMode.New}
       >
-        <NewAnnotationIcon
-          color={
-            annotationMode === AnnotationMode.Add
-              ? theme.palette.primary.dark
-              : theme.palette.grey[400]
-          }
-        />
+        <NewAnnotationIcon color={getIconColor(AnnotationMode.New)} />
       </Tool>
       <Tool
-        name={t("Subtract Annotations")}
+        name={t("Combine Annotations")}
         onClick={() => handleModeSelection(AnnotationMode.Add)}
         disabled={!workingAnnotationEntity.saved}
         selected={annotationMode === AnnotationMode.Add}
       >
-        <SubtractAnnotationsIcon
-          color={
-            annotationMode === AnnotationMode.Add
-              ? theme.palette.primary.dark
-              : theme.palette.grey[400]
-          }
-        />
+        <CombineAnnotationsIcon color={getIconColor(AnnotationMode.Add)} />
       </Tool>
       <Tool
-        name={t("Combine Annotations")}
+        name={t("Subtract Annotations")}
         onClick={() => handleModeSelection(AnnotationMode.Subtract)}
         disabled={!workingAnnotationEntity.saved}
         selected={annotationMode === AnnotationMode.Subtract}
       >
-        <CombineAnnotationsIcon
-          color={
-            annotationMode === AnnotationMode.Add
-              ? theme.palette.primary.dark
-              : theme.palette.grey[400]
-          }
+        <SubtractAnnotationsIcon
+          color={getIconColor(AnnotationMode.Subtract)}
         />
       </Tool>
       <Tool
@@ -142,11 +146,7 @@ export const CreationOptions = () => {
         selected={annotationMode === AnnotationMode.Intersect}
       >
         <IntersectAnnotationsIcon
-          color={
-            annotationMode === AnnotationMode.Add
-              ? theme.palette.primary.dark
-              : theme.palette.grey[400]
-          }
+          color={getIconColor(AnnotationMode.Intersect)}
         />
       </Tool>
     </FlexRowBox>
