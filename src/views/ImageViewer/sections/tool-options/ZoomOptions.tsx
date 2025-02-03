@@ -124,7 +124,14 @@ export const ZoomOptions = () => {
         tooltipLocation="left"
         selected={activeTool === ToolType.Zoom}
       >
-        <CropFreeIcon />
+        <CropFreeIcon
+          sx={{
+            color:
+              activeTool === ToolType.Zoom
+                ? theme.palette.primary.dark
+                : theme.palette.grey[400],
+          }}
+        />
       </Tool>
       <Tool
         name={t("Actual Size")}

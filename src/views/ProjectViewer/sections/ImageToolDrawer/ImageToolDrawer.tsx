@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import {
-  Badge,
-  Drawer,
-  ListItemButton,
-  ListItemIcon,
-  useTheme,
-} from "@mui/material";
+import { Badge, Drawer, useTheme } from "@mui/material";
 import {
   FilterAltOutlined as FilterAltOutlinedIcon,
   InfoOutlined as InfoOutlinedIcon,
@@ -21,7 +15,6 @@ import { useMobileView, useTranslation } from "hooks";
 
 import { AppBarOffset } from "components/ui/AppBarOffset";
 import { SortSelection } from "views/ProjectViewer/sections/SortSelection";
-import { ToolHotkeyTitle, TooltipCard } from "components/ui/tooltips";
 import { ProjectViewerCategories, FileIO } from "../../components";
 import { ModelTaskSection } from "../ModelTaskSection";
 import {
@@ -34,10 +27,12 @@ import { OperationType, ToolOptionsDrawer } from "./ToolOptionsDrawer";
 import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
 
 import { dimensions } from "utils/common/constants";
+import { Tool } from "views/ImageViewer/components";
+import { capitalize } from "utils/common/helpers";
 
 const imageTools: Record<string, OperationType> = {
   fileIO: {
-    icon: (color) => <FolderOpenIcon sx={{ color }} />,
+    icon: (color) => <FolderOpenIcon fontSize="small" sx={{ color }} />,
     name: "fileIO",
     description: "-",
     options: <FileIO />,
@@ -45,7 +40,7 @@ const imageTools: Record<string, OperationType> = {
     mobile: true,
   },
   sort: {
-    icon: (color) => <SortIcon sx={{ color }} />,
+    icon: (color) => <SortIcon fontSize="small" sx={{ color }} />,
     name: "sort",
     description: "-",
     options: <SortSelection />,
@@ -53,21 +48,25 @@ const imageTools: Record<string, OperationType> = {
     mobile: true,
   },
   filters: {
-    icon: (color) => <FilterAltOutlinedIcon sx={{ color: color }} />,
+    icon: (color) => (
+      <FilterAltOutlinedIcon fontSize="small" sx={{ color: color }} />
+    ),
     name: "filters",
     description: "-",
     options: <FilterOptions />,
     hotkey: "F",
   },
   information: {
-    icon: (color) => <InfoOutlinedIcon sx={{ color: color }} />,
+    icon: (color) => (
+      <InfoOutlinedIcon fontSize="small" sx={{ color: color }} />
+    ),
     name: "information",
     description: "-",
     options: <InformationOptions />,
     hotkey: "I",
   },
   measurements: {
-    icon: (color) => <StraightenIcon sx={{ color: color }} />,
+    icon: (color) => <StraightenIcon fontSize="small" sx={{ color: color }} />,
     name: "measurements",
     description: "-",
     options: <MeasurementOptions />,
@@ -75,7 +74,7 @@ const imageTools: Record<string, OperationType> = {
     mobile: true,
   },
   learning: {
-    icon: (color) => <ScatterPlotIcon sx={{ color }} />,
+    icon: (color) => <ScatterPlotIcon fontSize="small" sx={{ color }} />,
     name: "learning",
     description: "-",
     options: <ModelTaskSection />,
@@ -83,7 +82,7 @@ const imageTools: Record<string, OperationType> = {
     mobile: true,
   },
   categories: {
-    icon: (color) => <LabelIcon sx={{ color }} />,
+    icon: (color) => <LabelIcon fontSize="small" sx={{ color }} />,
     name: "categories",
     description: "-",
     options: <ProjectViewerCategories />,
@@ -133,6 +132,9 @@ export const ImageToolDrawer = () => {
             zIndex: 99,
             width: dimensions.toolDrawerWidth + "px",
             pt: theme.spacing(1),
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           },
         })}
         variant="permanent"
@@ -141,41 +143,30 @@ export const ImageToolDrawer = () => {
         <AppBarOffset />
         {Object.values(imageTools).map((tool) => {
           return !tool.mobile || isMobile ? (
-            <TooltipCard
+            <Tool
+              name={t(capitalize(tool.name))}
+              onClick={() => {
+                handleSelectTool(tool.name);
+              }}
               key={`tool-drawer-${tool.name}`}
-              description={
-                <ToolHotkeyTitle toolName={t(tool.name.toLocaleUpperCase())} />
-              }
+              tooltipLocation="left"
             >
-              <ListItemButton
-                sx={{ flexGrow: 0 }}
-                onClick={() => {
-                  handleSelectTool(tool.name);
-                }}
-              >
-                <ListItemIcon>
-                  {tool.name === "filters" ? (
-                    <Badge
-                      color="primary"
-                      variant="dot"
-                      invisible={!filtersExist}
-                    >
-                      {tool.icon(
-                        activeTool === tool.name
-                          ? theme.palette.primary.dark
-                          : theme.palette.grey[400],
-                      )}
-                    </Badge>
-                  ) : (
-                    tool.icon(
-                      activeTool === tool.name
-                        ? theme.palette.primary.dark
-                        : theme.palette.grey[400],
-                    )
+              {tool.name === "filters" ? (
+                <Badge color="primary" variant="dot" invisible={!filtersExist}>
+                  {tool.icon(
+                    activeTool === tool.name
+                      ? theme.palette.primary.dark
+                      : theme.palette.grey[400],
                   )}
-                </ListItemIcon>
-              </ListItemButton>
-            </TooltipCard>
+                </Badge>
+              ) : (
+                tool.icon(
+                  activeTool === tool.name
+                    ? theme.palette.primary.dark
+                    : theme.palette.grey[400],
+                )
+              )}
+            </Tool>
           ) : (
             <React.Fragment key={`tool-drawer-${tool.name}`}></React.Fragment>
           );

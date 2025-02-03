@@ -33,9 +33,7 @@ export const Tool = ({
   onClick: handleClick,
   disabled = false,
   tooltipLocation = "bottom",
-  selected,
 }: ToolProps) => {
-  const theme = useTheme();
   const description = useMemo(
     () => <ToolHotkeyTitle toolName={name} />,
     [name],
@@ -50,17 +48,8 @@ export const Tool = ({
     >
       <Tooltip title={description} placement={tooltipLocation}>
         <span>
-          <IconButton disabled={disabled} onClick={handleClick}>
-            <SvgIcon
-              fontSize="small"
-              sx={{
-                color: selected
-                  ? theme.palette.primary.dark
-                  : theme.palette.grey[400],
-              }}
-            >
-              {children}
-            </SvgIcon>
+          <IconButton size="small" disabled={disabled} onClick={handleClick}>
+            {children}
           </IconButton>
         </span>
       </Tooltip>
