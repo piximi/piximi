@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 
 import { useTranslation } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
@@ -92,13 +92,6 @@ export const CreationOptions = () => {
       }),
     );
   };
-
-  useEffect(() => {
-    console.log(
-      "annotationMode === AnnotationMode.New:",
-      annotationMode === AnnotationMode.New,
-    ); //LOG:
-  });
 
   return (
     <FlexRowBox>
