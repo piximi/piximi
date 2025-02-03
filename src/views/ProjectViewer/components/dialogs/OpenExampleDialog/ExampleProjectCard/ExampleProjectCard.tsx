@@ -140,7 +140,7 @@ export const ExampleProjectCard = ({
 
         dispatch(dataSlice.actions.initializeState({ data }));
         dispatch(projectSlice.actions.setProject({ project }));
-        dispatch(classifierSlice.actions.setDefaults({}));
+        dispatch(classifierSlice.actions.setDefaults());
         dispatch(
           classifierSlice.actions.setClassifier({
             classifier,

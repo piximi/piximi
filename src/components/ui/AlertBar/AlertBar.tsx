@@ -95,7 +95,7 @@ export const AlertBar = ({
     if (setShowAlertBar) {
       setShowAlertBar(false);
     } else {
-      dispatch(applicationSettingsSlice.actions.hideAlertState({}));
+      dispatch(applicationSettingsSlice.actions.hideAlertState());
     }
   };
 
