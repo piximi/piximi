@@ -1,4 +1,4 @@
-import { createListenerMiddleware, Dictionary } from "@reduxjs/toolkit";
+import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
@@ -28,12 +28,6 @@ startAppListening({
     return currentState.data !== previousState.data;
   },
   effect: async (action, listenerAPI) => {
-    if (
-      !action.payload ||
-      (action.payload.hasOwnProperty("isPermanent") &&
-        !action.payload.isPermanent)
-    )
-      return;
     const { data: dataState, measurements: measurementState } =
       listenerAPI.getState();
     for await (const group of Object.values(measurementState.groups)) {
@@ -126,7 +120,7 @@ const resetMeasurements = (measurements: MeasurementOptions) => {
 const updateCategories = (
   state: MeasurementOptions,
   kindCategories: string[],
-  categoryEntities: Dictionary<Category>,
+  categoryEntities: Record<string, Category>,
 ) => {
   const groupCats = state["categoryId"].children!;
   const newCats = difference(kindCategories, groupCats);

@@ -81,18 +81,17 @@ startAppListening({
     );
   },
   effect: async (action, listenerApi) => {
-    const { classifier } = listenerApi.getState();
+    const { classifier, project } = listenerApi.getState();
 
-    if (action.payload && action.payload.channels) {
+    if (project.imageChannels)
       listenerApi.dispatch(
         classifierSlice.actions.updateInputShape({
           inputShape: {
             ...classifier.inputShape,
-            channels: action.payload.channels,
+            channels: project.imageChannels,
           },
         }),
       );
-    }
   },
 });
 
