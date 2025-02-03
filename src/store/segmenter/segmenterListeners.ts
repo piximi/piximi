@@ -1,8 +1,4 @@
-import {
-  CombinedState,
-  ListenerEffectAPI,
-  createListenerMiddleware,
-} from "@reduxjs/toolkit";
+import { ListenerEffectAPI, createListenerMiddleware } from "@reduxjs/toolkit";
 import { intersection } from "lodash";
 import Image from "image-js";
 
@@ -52,7 +48,7 @@ const startAppListening =
   segmenterMiddleware.startListening as TypedAppStartListening;
 
 type StoreListemerAPI = ListenerEffectAPI<
-  CombinedState<{
+  {
     classifier: ClassifierState;
     segmenter: SegmenterState;
     imageViewer: ImageViewerState;
@@ -60,7 +56,7 @@ type StoreListemerAPI = ListenerEffectAPI<
     applicationSettings: AppSettingsState;
     annotator: AnnotatorState;
     data: DataState;
-  }>,
+  },
   AppDispatch,
   unknown
 >;
