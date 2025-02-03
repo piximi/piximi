@@ -35,15 +35,15 @@ export const dataConverter_v01v02 = (data: {
   annotations: OldAnnotationType[];
 }) => {
   const { images, oldCategories, annotationCategories, annotations } = data;
-  const categories: EntityState<Category> = {
+  const categories: EntityState<Category, string> = {
     ids: [],
     entities: {},
   };
-  const things: EntityState<ImageObject | AnnotationObject> = {
+  const things: EntityState<ImageObject | AnnotationObject, string> = {
     ids: [],
     entities: {},
   };
-  const kinds: EntityState<Kind> = { ids: [], entities: {} };
+  const kinds: EntityState<Kind, string> = { ids: [], entities: {} };
 
   kinds.ids.push("Image");
   const unknownCategoryId = generateUUID({ definesUnknown: true });
