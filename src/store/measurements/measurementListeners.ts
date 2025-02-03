@@ -1,4 +1,4 @@
-import { createListenerMiddleware, Dictionary } from "@reduxjs/toolkit";
+import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
@@ -120,7 +120,7 @@ const resetMeasurements = (measurements: MeasurementOptions) => {
 const updateCategories = (
   state: MeasurementOptions,
   kindCategories: string[],
-  categoryEntities: Dictionary<Category>,
+  categoryEntities: Record<string, Category>,
 ) => {
   const groupCats = state["categoryId"].children!;
   const newCats = difference(kindCategories, groupCats);

@@ -275,7 +275,10 @@ describe("deserialize into project with matching image, no matching kinds or cat
     const imData = tfBrowser.fromPixels(image).expandDims(0) as Tensor4D;
     im1T1.data = imData;
     const thingsT2 = [...t1Ims].reduce(
-      (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
+      (
+        entities: EntityState<AnnotationObject | ImageObject, string>,
+        thing,
+      ) => {
         entities.ids.push(thing.id);
         entities.entities[thing.id] = thing;
         return entities;
@@ -370,7 +373,10 @@ describe("deserialize into project with matching image, matching kind", () => {
     const imData = tfBrowser.fromPixels(image).expandDims(0) as Tensor4D;
     const im1T2: ImageObject = { ...im1T1, containing: [], data: imData };
     const thingsT2 = [im1T2].reduce(
-      (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
+      (
+        entities: EntityState<AnnotationObject | ImageObject, string>,
+        thing,
+      ) => {
         entities.ids.push(thing.id);
         entities.entities[thing.id] = thing;
         return entities;
@@ -378,7 +384,7 @@ describe("deserialize into project with matching image, matching kind", () => {
       { ids: [], entities: {} },
     );
     const kindsT2 = [k1T2].reduce(
-      (entities: EntityState<Kind>, kind) => {
+      (entities: EntityState<Kind, string>, kind) => {
         entities.ids.push(kind.id);
         entities.entities[kind.id] = kind;
         return entities;
@@ -387,7 +393,7 @@ describe("deserialize into project with matching image, matching kind", () => {
     );
 
     const categoriesT2 = [uC1T2].reduce(
-      (entities: EntityState<Category>, category) => {
+      (entities: EntityState<Category, string>, category) => {
         entities.ids.push(category.id);
         entities.entities[category.id] = category;
         return entities;
@@ -486,7 +492,10 @@ describe("deserialize into project with matching image, matching kind, and match
     const imData = tfBrowser.fromPixels(image).expandDims(0) as Tensor4D;
     const im1T2: ImageObject = { ...im1T1, containing: [], data: imData };
     const thingsT2 = [im1T2].reduce(
-      (entities: EntityState<AnnotationObject | ImageObject>, thing) => {
+      (
+        entities: EntityState<AnnotationObject | ImageObject, string>,
+        thing,
+      ) => {
         entities.ids.push(thing.id);
         entities.entities[thing.id] = thing;
         return entities;
@@ -494,7 +503,7 @@ describe("deserialize into project with matching image, matching kind, and match
       { ids: [], entities: {} },
     );
     const kindsT2 = [k1T2].reduce(
-      (entities: EntityState<Kind>, kind) => {
+      (entities: EntityState<Kind, string>, kind) => {
         entities.ids.push(kind.id);
         entities.entities[kind.id] = kind;
         return entities;
@@ -503,7 +512,7 @@ describe("deserialize into project with matching image, matching kind, and match
     );
 
     const categoriesT2 = [uC1T2, c1T2].reduce(
-      (entities: EntityState<Category>, category) => {
+      (entities: EntityState<Category, string>, category) => {
         entities.ids.push(category.id);
         entities.entities[category.id] = category;
         return entities;
