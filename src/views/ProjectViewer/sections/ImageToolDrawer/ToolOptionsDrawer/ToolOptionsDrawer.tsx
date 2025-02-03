@@ -4,6 +4,7 @@ import { Box, Drawer, Typography } from "@mui/material";
 import { useTranslation } from "hooks";
 
 import { AppBarOffset } from "components/ui/AppBarOffset";
+import { dimensions } from "utils/common/constants";
 
 export type OperationType = {
   icon: (color: string) => ReactElement;
@@ -29,7 +30,7 @@ export const ToolOptionsDrawer = ({
         flexShrink: 0,
         "& .MuiDrawer-paper": {
           width: 240,
-          right: 56,
+          right: dimensions.toolDrawerWidth,
           zIndex: 99,
           pt: theme.spacing(1),
         },
