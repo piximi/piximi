@@ -27,6 +27,7 @@ import { OperationType, ToolOptionsDrawer } from "./ToolOptionsDrawer";
 import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
 
 import { dimensions } from "utils/common/constants";
+import { Tool } from "views/ImageViewer/components";
 import { capitalize } from "utils/common/helpers";
 
 const imageTools: Record<string, OperationType> = {
@@ -150,31 +151,12 @@ export const ImageToolDrawer = () => {
               key={`tool-drawer-${tool.name}`}
               tooltipLocation="left"
             >
-              <ListItemButton
-                sx={{ flexGrow: 0 }}
-                onClick={() => {
-                  handleSelectTool(tool.name);
-                }}
-              >
-                <ListItemIcon>
-                  {tool.name === "filters" ? (
-                    <Badge
-                      color="primary"
-                      variant="dot"
-                      invisible={!filtersExist}
-                    >
-                      {tool.icon(
-                        activeTool === tool.name
-                          ? theme.palette.primary.dark
-                          : theme.palette.grey[400],
-                      )}
-                    </Badge>
-                  ) : (
-                    tool.icon(
-                      activeTool === tool.name
-                        ? theme.palette.primary.dark
-                        : theme.palette.grey[400],
-                    )
+              {tool.name === "filters" ? (
+                <Badge color="primary" variant="dot" invisible={!filtersExist}>
+                  {tool.icon(
+                    activeTool === tool.name
+                      ? theme.palette.primary.dark
+                      : theme.palette.grey[400],
                   )}
                 </Badge>
               ) : (
