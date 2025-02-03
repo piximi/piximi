@@ -306,6 +306,7 @@ export class PseudoFileList {
           return Reflect.get(target, prop);
         }
       },
+      // @ts-ignore only sort-of satisfies it, like when we use it
     }) satisfies FileList;
   }
 

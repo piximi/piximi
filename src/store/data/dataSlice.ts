@@ -80,9 +80,9 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         data: {
-          kinds: EntityState<Kind>;
-          categories: EntityState<Category>;
-          things: EntityState<AnnotationObject | ImageObject>;
+          kinds: EntityState<Kind, string>;
+          categories: EntityState<Category, string>;
+          things: EntityState<AnnotationObject | ImageObject, string>;
         };
       }>,
     ) {

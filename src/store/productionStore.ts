@@ -1,10 +1,10 @@
 import {
-  AnyAction,
   configureStore,
   Dispatch,
   EnhancedStore,
   Middleware,
-  StoreEnhancer,
+  Tuple,
+  UnknownAction,
 } from "@reduxjs/toolkit";
 import logger from "redux-logger";
 
@@ -26,12 +26,10 @@ import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 
-const enhancers: StoreEnhancer[] = [];
-
 const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&
   import.meta.env.VITE_APP_LOG_LEVEL === "2"
-    ? [logger as Middleware<object, any, Dispatch<AnyAction>>]
+    ? [logger as Middleware<object, any, Dispatch<UnknownAction>>]
     : [];
 
 const listenerMiddlewares: Middleware[] = [
@@ -58,8 +56,7 @@ const preloadedState: RootState = {
 
 const options = {
   devTools: true,
-  enhancers: enhancers,
-  middleware: [...listenerMiddlewares, ...loggingMiddleware],
+  middleware: () => new Tuple(...listenerMiddlewares, ...loggingMiddleware),
   preloadedState: preloadedState,
   reducer: rootReducer,
 };
@@ -69,8 +66,7 @@ export const productionStore: EnhancedStore = configureStore(options);
 export const initStore = (loadedData: RootState | undefined) => {
   const options = {
     devTools: true,
-    enhancers: enhancers,
-    middleware: [...listenerMiddlewares, ...loggingMiddleware],
+    middleware: () => new Tuple(...listenerMiddlewares, ...loggingMiddleware),
     preloadedState: loadedData ?? {},
     reducer: rootReducer,
   };
