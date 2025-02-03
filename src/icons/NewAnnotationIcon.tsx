@@ -11,7 +11,7 @@ export const NewAnnotationIcon = ({ color }: { color: string }) => {
         d="m 3 3 v 19 h 19 v -19 h -19 v 9.5 h4 v-1.5 h4 v-4 h3 v4 h4 v3 h-4 v4 h-3 v-4 h-4 v-1.5"
         fill={color}
         strokeWidth="1.5"
-        stroke={color}
+        //stroke={color}
         strokeLinejoin="round"
       />
     </svg>
