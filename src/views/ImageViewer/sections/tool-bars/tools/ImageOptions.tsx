@@ -8,8 +8,7 @@ import { useTranslation } from "hooks";
 import { CustomListItem, CustomListItemButton } from "components/ui";
 import { IncrementalSlider } from "components/inputs";
 import { PopoverTool } from "views/ImageViewer/components/Tool";
-import { ChannelsList } from "../AnnotatorToolDrawer/ToolOptions/ColorAdjustmentOptions/ChannelsList";
-import { ApplyColorsButton } from "../AnnotatorToolDrawer/ToolOptions/ColorAdjustmentOptions/ApplyColorsButton";
+import { ChannelsList, ApplyColorsButton } from "views/ImageViewer/components";
 
 import { selectLoadMessage } from "store/applicationSettings/selectors";
 import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
@@ -71,7 +70,13 @@ export const ImageOptions = () => {
         name={t("Channel Adjustment")}
         tooltipLocation="left"
         popoverElement={
-          <Box sx={{ bgcolor: "background.paper", minWidth: "200px" }}>
+          <Box
+            sx={{
+              bgcolor: "background.paper",
+              minWidth: "200px",
+              borderRadius: "8px",
+            }}
+          >
             <ChannelsList />
 
             <Divider />
@@ -89,15 +94,17 @@ export const ImageOptions = () => {
           </Box>
         }
       >
-        <ColorAdjustment color={theme.palette.grey[400]} />
+        <ColorAdjustment color={theme.palette.text.primary} />
       </PopoverTool>
       <PopoverTool
         name={t("Z-Stack")}
         tooltipLocation="left"
+        disabled={zStackLimits.max === 0}
         popoverElement={
           <Box
             sx={{
               bgcolor: "background.paper",
+              borderRadius: "8px",
             }}
           >
             <IncrementalSlider

@@ -113,9 +113,9 @@ export const ZoomOptions = () => {
         tooltipLocation="left"
       >
         {options.automaticCentering ? (
-          <StageZoom color={theme.palette.grey[400]} />
+          <StageZoom color={theme.palette.text.primary} />
         ) : (
-          <CursorZoom color={theme.palette.grey[400]} />
+          <CursorZoom color={theme.palette.text.primary} />
         )}
       </Tool>
       <Tool
@@ -129,7 +129,7 @@ export const ZoomOptions = () => {
             color:
               activeTool === ToolType.Zoom
                 ? theme.palette.primary.dark
-                : theme.palette.grey[400],
+                : theme.palette.text.primary,
           }}
         />
       </Tool>
@@ -138,33 +138,21 @@ export const ZoomOptions = () => {
         onClick={handleResetSize}
         tooltipLocation="left"
       >
-        <AspectRatioIcon
-          sx={{
-            color: theme.palette.grey[400],
-          }}
-        />
+        <AspectRatioIcon />
       </Tool>
       <Tool
         name={t("Fit Screen")}
         onClick={handleFitToScreen}
         tooltipLocation="left"
       >
-        <FitScreenIcon
-          sx={{
-            color: theme.palette.grey[400],
-          }}
-        />
+        <FitScreenIcon />
       </Tool>
       <Tool
         name={t("ResetPosition")}
         onClick={handleResetPosition}
         tooltipLocation="left"
       >
-        <ControlCameraIcon
-          sx={{
-            color: theme.palette.grey[400],
-          }}
-        />
+        <ControlCameraIcon />
       </Tool>
     </>
   );

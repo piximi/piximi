@@ -4,7 +4,7 @@ import { Divider, Box } from "@mui/material";
 import { useAnnotatorToolShortcuts } from "../../hooks";
 
 import { dimensions } from "utils/common/constants";
-import { CreationOptions, ToolOptions } from "../tool-options";
+import { CreationOptions, ToolOptions } from "./tools";
 
 export const TopToolBar = () => {
   useAnnotatorToolShortcuts();
@@ -21,6 +21,7 @@ export const TopToolBar = () => {
         height: dimensions.toolDrawerWidth,
         overflowY: "visible",
         zIndex: 1002,
+        borderBottom: `1px solid ${theme.palette.divider}`,
       })}
     >
       <CreationOptions />

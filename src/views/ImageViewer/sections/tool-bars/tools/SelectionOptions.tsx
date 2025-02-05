@@ -3,9 +3,9 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { Divider, useTheme, Box, List } from "@mui/material";
 
 import { useTranslation } from "hooks";
-import { useAnnotatorToolShortcuts } from "../../hooks";
+import { useAnnotatorToolShortcuts } from "../../../hooks";
 
-import { Tool } from "../../components";
+import { Tool } from "../../../components";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
@@ -112,7 +112,7 @@ export const SelectionOptions = () => {
           color={
             activeTool === ToolType.Pointer
               ? theme.palette.primary.dark
-              : theme.palette.grey[400]
+              : theme.palette.text.primary
           }
         />
       </Tool>
@@ -121,22 +121,14 @@ export const SelectionOptions = () => {
         onClick={handleSelectAll}
         tooltipLocation="left"
       >
-        <SelectAllIcon
-          sx={{
-            color: theme.palette.grey[400],
-          }}
-        />
+        <SelectAllIcon />
       </Tool>
       <Tool
         name={t("Deselect All")}
         onClick={handleDeselectAll}
         tooltipLocation="left"
       >
-        <DeselectIcon
-          sx={{
-            color: theme.palette.grey[400],
-          }}
-        />
+        <DeselectIcon />
       </Tool>
       <PopoverTool
         name={t("Select By...")}
@@ -184,11 +176,7 @@ export const SelectionOptions = () => {
           </Box>
         }
       >
-        <LabelOutlinedIcon
-          sx={{
-            color: theme.palette.grey[400],
-          }}
-        />
+        <LabelOutlinedIcon />
       </PopoverTool>
     </Box>
   );
