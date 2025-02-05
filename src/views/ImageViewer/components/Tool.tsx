@@ -6,7 +6,6 @@ import {
   IconButton,
   Popover,
   Popper,
-  SvgIcon,
   Tooltip,
   useTheme,
 } from "@mui/material";
@@ -112,20 +111,11 @@ export const ResizableTool = ({
               onClickOpen && onOpen(event);
             }}
             sx={{
-              bgcolor: "background.paper",
               zIndex: 1001,
             }}
+            size="small"
           >
-            <SvgIcon
-              fontSize="small"
-              sx={{
-                color: selected
-                  ? theme.palette.primary.dark
-                  : theme.palette.grey[400],
-              }}
-            >
-              {children}
-            </SvgIcon>
+            {children}
           </IconButton>
         </span>
       </Tooltip>
@@ -136,6 +126,8 @@ export const ResizableTool = ({
             py: 0,
             pb: 0.5,
             borderRadius: "0 0 4px 4px",
+            border: `1px solid ${theme.palette.divider}`,
+            borderTop: "none",
             "&:hover": {
               bgcolor: "background.paper",
             },
@@ -154,13 +146,17 @@ export const ResizableTool = ({
         anchorEl={anchorEl}
         disablePortal
         placement={tooltipLocation}
+        sx={{
+          bgcolor: "background.paper",
+          borderRadius: "0 0 8px 8px",
+          border: `1px solid ${theme.palette.divider}`,
+          borderTop: "none",
+        }}
       >
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
-            borderRadius: "8px",
-            bgcolor: "background.paper",
           }}
         >
           <IncrementalSlider
@@ -186,13 +182,12 @@ export const PopoverTool = ({
   children,
   name,
   tooltipLocation = "bottom",
-  selected,
   popoverElement,
+  disabled,
 }: Omit<ToolProps, "onClick"> & {
   popoverElement?: React.ReactNode;
 }) => {
   const { anchorEl, onClose, onOpen, open } = useMenu();
-  const theme = useTheme();
 
   const description = useMemo(
     () => <ToolHotkeyTitle toolName={name} />,
@@ -200,16 +195,7 @@ export const PopoverTool = ({
   );
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "row",
-        position: "relative",
-        overflowY: "visible",
-        overflowX: "visible",
-        zIndex: "inherit",
-      }}
-    >
+    <Box sx={{}}>
       <Tooltip
         sx={{ zIndex: 1001 }}
         title={description}
@@ -223,17 +209,10 @@ export const PopoverTool = ({
               bgcolor: "background.paper",
               zIndex: 1001,
             }}
+            disabled={disabled}
+            size="small"
           >
-            <SvgIcon
-              fontSize="small"
-              sx={{
-                color: selected
-                  ? theme.palette.primary.dark
-                  : theme.palette.grey[400],
-              }}
-            >
-              {children}
-            </SvgIcon>
+            {children}
           </IconButton>
         </span>
       </Tooltip>

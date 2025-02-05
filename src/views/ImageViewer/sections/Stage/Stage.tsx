@@ -8,8 +8,6 @@ import {
 } from "react-redux";
 import Konva from "konva";
 import { Stage as KonvaStage } from "react-konva";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import { Box, Typography } from "@mui/material";
 
 import { useHotkeys } from "hooks";

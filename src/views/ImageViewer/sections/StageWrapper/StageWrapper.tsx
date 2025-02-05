@@ -5,8 +5,7 @@ import { Stage } from "../Stage";
 
 import { dimensions } from "utils/common/constants";
 import { useMobileView } from "hooks";
-import { SideToolBar } from "../AnnotatorToolDrawer/SideToolBar";
-import { TopToolBar } from "../AnnotatorToolDrawer/TopToolBar";
+import { SideToolBar, TopToolBar } from "../tool-bars";
 
 export const StageWrapper = () => {
   const [width, setWidth] = useState<number>(

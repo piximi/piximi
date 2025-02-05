@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { FilterBAndW } from "@mui/icons-material";
 
-import { Tool } from "components/ui";
+import { Tool } from "../../../components";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
@@ -14,9 +14,10 @@ import {
 } from "views/ImageViewer/state/annotator/selectors";
 
 import { AnnotationMode } from "views/ImageViewer/utils/enums";
-import { FlexColumnBox } from "components/ui";
+import { FlexRowBox } from "components/ui";
 import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 import { invert } from "views/ImageViewer/utils/annotationUtils";
+import { encode } from "views/ImageViewer/utils";
 import {
   CombineAnnotationsIcon,
   IntersectAnnotationsIcon,
@@ -44,20 +45,14 @@ export const CreationOptions = () => {
   };
 
   const getIconColor = useCallback(
-    (mode: AnnotationMode) => {
-      if (mode === AnnotationMode.New && mode === annotationMode) {
-        return theme.palette.primary.dark;
-      }
-      if (workingAnnotationEntity.saved) {
-        if (mode === annotationMode) {
-          return theme.palette.primary.dark;
-        } else {
-          return theme.palette.action.active;
-        }
-      }
-      return theme.palette.action.disabled;
+    (annotationMode: AnnotationMode) => {
+      return !workingAnnotationEntity.saved
+        ? theme.palette.action.disabled
+        : annotationMode === AnnotationMode.New
+          ? theme.palette.primary.dark
+          : theme.palette.text.primary;
     },
-    [theme, workingAnnotationEntity.saved, annotationMode],
+    [theme, workingAnnotationEntity.saved],
   );
 
   //TODO: not working, but will fix after annotation handling refector
@@ -76,24 +71,46 @@ export const CreationOptions = () => {
       image.shape.height,
     );
 
+    const encodedMask = encode(invertedMask);
+
     dispatch(
-      annotatorSlice.actions.updateWorkingAnnotation({
-        changes: {
-          boundingBox: invertedBoundingBox,
-          decodedMask: invertedMask,
-        },
+      annotatorSlice.actions.editThings({
+        updates: [
+          {
+            id: workingAnnotation.id,
+            encodedMask,
+            boundingBox: invertedBoundingBox,
+          },
+        ],
+      }),
+    );
+
+    dispatch(
+      annotatorSlice.actions.setSelectedAnnotationIds({
+        annotationIds: [workingAnnotation.id],
+        workingAnnotationId: workingAnnotation.id,
       }),
     );
   };
 
   return (
-    <FlexColumnBox>
+    <FlexRowBox>
+      <Tool
+        name={t("Invert Annotation")}
+        onClick={() => {
+          handleInvertAnnotation();
+        }}
+        disabled={!workingAnnotationEntity.saved}
+      >
+        <SvgIcon>
+          <FilterBAndW />
+        </SvgIcon>
+      </Tool>
       <Tool
         name={t("New Annotation")}
         onClick={() => handleModeSelection(AnnotationMode.New)}
         disabled={!workingAnnotationEntity.saved}
         selected={annotationMode === AnnotationMode.New}
-        tooltipLocation="left"
       >
         <NewAnnotationIcon color={getIconColor(AnnotationMode.New)} />
       </Tool>
@@ -102,17 +119,14 @@ export const CreationOptions = () => {
         onClick={() => handleModeSelection(AnnotationMode.Add)}
         disabled={!workingAnnotationEntity.saved}
         selected={annotationMode === AnnotationMode.Add}
-        tooltipLocation="left"
       >
         <CombineAnnotationsIcon color={getIconColor(AnnotationMode.Add)} />
       </Tool>
-
       <Tool
         name={t("Subtract Annotations")}
         onClick={() => handleModeSelection(AnnotationMode.Subtract)}
         disabled={!workingAnnotationEntity.saved}
         selected={annotationMode === AnnotationMode.Subtract}
-        tooltipLocation="left"
       >
         <SubtractAnnotationsIcon
           color={getIconColor(AnnotationMode.Subtract)}
@@ -123,24 +137,11 @@ export const CreationOptions = () => {
         onClick={() => handleModeSelection(AnnotationMode.Intersect)}
         disabled={!workingAnnotationEntity.saved}
         selected={annotationMode === AnnotationMode.Intersect}
-        tooltipLocation="left"
       >
         <IntersectAnnotationsIcon
           color={getIconColor(AnnotationMode.Intersect)}
         />
       </Tool>
-      <Tool
-        name={t("Invert Annotation")}
-        onClick={() => {
-          handleInvertAnnotation();
-        }}
-        disabled={!workingAnnotationEntity.saved}
-        tooltipLocation="left"
-      >
-        <SvgIcon>
-          <FilterBAndW />
-        </SvgIcon>
-      </Tool>
-    </FlexColumnBox>
+    </FlexRowBox>
   );
 };
