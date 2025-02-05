@@ -92,7 +92,7 @@ export const IncrementalSlider = ({
       display="flex"
       sx={(theme) => ({
         backgroundColor: theme.palette.background.paper,
-        borderRadius: "0 0 0.25rem 0.25rem",
+        borderRadius: "8px",
         ...containerStyle,
       })}
     >
