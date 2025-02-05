@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "@mui/material";
 import { Margin } from "@mui/icons-material";
 
-import { Tool } from "../../components";
+import { Tool } from "../../../components";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
@@ -141,7 +141,7 @@ export const ToolOptions = () => {
             {tool.icon(
               activeTool === tool.operation
                 ? theme.palette.primary.dark
-                : theme.palette.grey[400],
+                : theme.palette.text.primary,
             )}
           </ResizableTool>
         ) : (
@@ -153,7 +153,7 @@ export const ToolOptions = () => {
             {tool.icon(
               activeTool === tool.operation
                 ? theme.palette.primary.dark
-                : theme.palette.grey[400],
+                : theme.palette.text.primary,
             )}
           </Tool>
         );
