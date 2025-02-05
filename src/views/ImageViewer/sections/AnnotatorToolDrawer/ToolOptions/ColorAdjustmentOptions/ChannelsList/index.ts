@@ -1,1 +1,0 @@
-export { ChannelsList } from "./ChannelsList";
