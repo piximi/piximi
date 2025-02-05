@@ -44,7 +44,6 @@ export const APPLICATION_COLORS = {
 export const dimensions = {
   leftDrawerWidth: 256,
   toolDrawerWidth: 36,
-  annotatorToolOptionsWidth: 200,
   stagePaddingX: 50,
   stageInfoHeight: 21,
 };

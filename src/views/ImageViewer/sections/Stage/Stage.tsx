@@ -8,8 +8,6 @@ import {
 } from "react-redux";
 import Konva from "konva";
 import { Stage as KonvaStage } from "react-konva";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import { Box, Typography } from "@mui/material";
 
 import { useHotkeys } from "hooks";
@@ -262,37 +260,35 @@ export const Stage = ({
       >
         <Provider store={store}>
           <StageContext.Provider value={stageRef}>
-            <DndProvider backend={HTML5Backend}>
-              <Layer>
-                {!(htmlImages && htmlImages.length) ? (
-                  <></>
-                ) : !imageIsLoading ? (
-                  <Image
-                    ref={imageRef}
-                    images={htmlImages}
-                    stageHeight={stageHeight}
-                    stageWidth={stageWidth}
-                  />
-                ) : (
-                  <></>
-                )}
-                {(annotationState === AnnotationState.Annotating ||
-                  toolType === ToolType.QuickAnnotation) && ( //TODO: remind myself why quick annotation special
-                  <Selection tool={annotationTool} toolType={toolType} />
-                )}
-                <Cursor
-                  positionByStage={relativePositionByStage}
-                  absolutePosition={absolutePosition}
-                  annotationState={annotationState}
-                  outOfBounds={outOfBounds}
-                  draggable={draggable}
-                  toolType={toolType}
+            <Layer>
+              {!(htmlImages && htmlImages.length) ? (
+                <></>
+              ) : !imageIsLoading ? (
+                <Image
+                  ref={imageRef}
+                  images={htmlImages}
+                  stageHeight={stageHeight}
+                  stageWidth={stageWidth}
                 />
-                {!imageIsLoading && (
-                  <Annotations annotationTool={annotationTool} />
-                )}
-              </Layer>
-            </DndProvider>
+              ) : (
+                <></>
+              )}
+              {(annotationState === AnnotationState.Annotating ||
+                toolType === ToolType.QuickAnnotation) && ( //TODO: remind myself why quick annotation special
+                <Selection tool={annotationTool} toolType={toolType} />
+              )}
+              <Cursor
+                positionByStage={relativePositionByStage}
+                absolutePosition={absolutePosition}
+                annotationState={annotationState}
+                outOfBounds={outOfBounds}
+                draggable={draggable}
+                toolType={toolType}
+              />
+              {!imageIsLoading && (
+                <Annotations annotationTool={annotationTool} />
+              )}
+            </Layer>
           </StageContext.Provider>
         </Provider>
       </KonvaStage>
