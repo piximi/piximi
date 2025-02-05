@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { FilterBAndW } from "@mui/icons-material";
 
-import { Tool } from "../../components";
+import { Tool } from "../../../components";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
@@ -50,7 +50,7 @@ export const CreationOptions = () => {
         ? theme.palette.action.disabled
         : annotationMode === AnnotationMode.New
           ? theme.palette.primary.dark
-          : theme.palette.grey[400];
+          : theme.palette.text.primary;
     },
     [theme, workingAnnotationEntity.saved],
   );
