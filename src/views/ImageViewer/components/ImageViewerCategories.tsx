@@ -17,6 +17,7 @@ import { HotkeyContext } from "utils/common/enums";
 import { CategoryDialog } from "components/dialogs/CategoryDialog/CategoryDialog";
 import { annotatorSlice } from "../state/annotator";
 import { generateUUID } from "utils/common/helpers";
+import { selectRenderKindName } from "store/data/selectors";
 
 export const ImageViewerCategories = () => {
   const dispatch = useDispatch();
@@ -26,6 +27,7 @@ export const ImageViewerCategories = () => {
     [categoriesByKind],
   );
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);
+  const renderKindName = useSelector(selectRenderKindName);
   // NOTE: keep for quick checking if kind is hidden
   const [filteredKinds, setFilteredKinds] = useState<Array<string>>([]);
   const [selectedKind, setSelectedKind] = useState<string>();
@@ -100,7 +102,7 @@ export const ImageViewerCategories = () => {
         {categoriesByKindArray.map(({ kindId, categories }) => {
           return (
             <CollapsibleListItem
-              primaryText={kindId}
+              primaryText={renderKindName(kindId)}
               key={kindId}
               carotPosition="start"
               secondary={

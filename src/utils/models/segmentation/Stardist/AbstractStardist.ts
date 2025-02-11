@@ -74,6 +74,7 @@ export abstract class Stardist extends Segmenter {
       const unknownCategoryId = generateUUID({ definesUnknown: true });
       this._fgKind = {
         id: KIND_NAME,
+        displayName: KIND_NAME,
         categories: [unknownCategoryId],
         containing: [],
         unknownCategoryId,

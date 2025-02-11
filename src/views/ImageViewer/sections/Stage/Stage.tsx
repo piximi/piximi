@@ -129,6 +129,7 @@ export const Stage = ({
     }
     const newKind: Kind = {
       id: kindName,
+      displayName: kindName,
       categories: kindCategories.map((cat) => cat.id),
       containing: [],
       unknownCategoryId: newUnknownCategory.id,
