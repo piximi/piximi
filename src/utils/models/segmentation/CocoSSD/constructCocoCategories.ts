@@ -29,6 +29,7 @@ export const constructCocoKinds = () => {
 
     kinds.push({
       id: cocoClass,
+      displayName: cocoClass,
       categories: [unknownCategoryId],
       containing: [],
       unknownCategoryId,

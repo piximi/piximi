@@ -59,21 +59,23 @@ export const measurementsSlice = createSlice({
     createGroup(
       state,
       action: PayloadAction<{
-        kind: string;
+        kindId: string;
+        displayName?: string;
         categories: Category[];
         thingIds: string[];
         numChannels?: number;
       }>,
     ) {
-      const { kind, categories, thingIds, numChannels } = action.payload;
+      const { kindId, categories, thingIds, numChannels } = action.payload;
+      const displayName = action.payload.displayName ?? kindId;
       const groupId = generateUUID();
 
       const usedNames = Object.values(state.groups).map((table) => table.name);
       let replicateNumber = 2;
-      let candidateName = `${kind} Measurements`;
+      let candidateName = `${displayName} Measurements`;
 
       while (usedNames.includes(candidateName)) {
-        candidateName = `${kind} Measurements - Table ${replicateNumber}`;
+        candidateName = `${displayName} Measurements - Table ${replicateNumber}`;
         replicateNumber++;
       }
 
@@ -113,8 +115,8 @@ export const measurementsSlice = createSlice({
         const option = { ...baseMeasurementOptions[measurement] };
         if (
           option.thingType === "all" ||
-          option.thingType === kind ||
-          (option.thingType !== "Image" && kind !== "Image")
+          option.thingType === kindId ||
+          (option.thingType !== "Image" && kindId !== "Image")
         ) {
           if (option.hasChannels) {
             option.children = [];
@@ -138,7 +140,7 @@ export const measurementsSlice = createSlice({
       state.groups[groupId] = {
         id: groupId,
         name: candidateName,
-        kind: kind,
+        kind: kindId,
         measurementStates: groupMeasurementState,
         splitStates: groupSplitState,
         thingIds: thingIds,

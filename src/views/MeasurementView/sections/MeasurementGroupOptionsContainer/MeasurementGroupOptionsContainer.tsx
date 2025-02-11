@@ -5,11 +5,11 @@ import { Add } from "@mui/icons-material";
 
 import { useCreateMeasurementTable } from "../../hooks";
 
-import { SelectDialog } from "components/dialogs";
 import { DividerWithLoading } from "components/ui";
 import { MeasurementGroupOptions } from "./MeasurementGroupOptions";
 
 import { selectMeasurementGroups } from "store/measurements/selectors";
+import { CreateMeasurementGroupDialog } from "views/MeasurementView/components/dialogs";
 
 export const MeasurementGroupOptionsContainer = () => {
   const tables = useSelector(selectMeasurementGroups);
@@ -61,10 +61,10 @@ export const MeasurementGroupOptionsContainer = () => {
           handleTableExpand={handleTableTreeExpand}
         />
       ))}
-      <SelectDialog
+      <CreateMeasurementGroupDialog
         open={isTableDialogOpen}
         onClose={handleCloseTableDialog}
-        options={kindOptions as string[]}
+        options={kindOptions}
         selectLabel="Kind"
         title="Create Measurement Table"
         onConfirm={handleCreateTable}

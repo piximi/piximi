@@ -199,6 +199,7 @@ const deserializeKindsGroup = async (
     kinds.ids.push(ids[i]);
     kinds.entities[ids[i]] = {
       id: ids[i],
+      displayName: ids[i],
       containing: contents[i],
       categories: categories[i],
       unknownCategoryId: unknownCategoryIds[i],

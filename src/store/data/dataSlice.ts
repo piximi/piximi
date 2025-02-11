@@ -8,7 +8,7 @@ import { dispose, TensorContainer } from "@tensorflow/tfjs";
 import { intersection } from "lodash";
 
 import {
-  generateUnknownCategory,
+  generateKind,
   generateUUID,
   isUnknownCategory,
   mutatingFilter,
@@ -33,7 +33,7 @@ import {
   CategoryUpdates,
 } from "./types";
 
-const unknownCategory = generateUnknownCategory("Image");
+const { kind: imageKind, unknownCategory } = generateKind("Image");
 export const kindsAdapter = createEntityAdapter<Kind>();
 export const categoriesAdapter = createEntityAdapter<Category>();
 export const thingsAdapter = createEntityAdapter<
@@ -43,14 +43,9 @@ export const thingsAdapter = createEntityAdapter<
 export const initialState = (): DataState => {
   return {
     kinds: kindsAdapter.getInitialState({
-      ids: ["Image"],
+      ids: [imageKind.id],
       entities: {
-        Image: {
-          id: "Image",
-          containing: [],
-          categories: [unknownCategory.id],
-          unknownCategoryId: unknownCategory.id,
-        },
+        [imageKind.id]: imageKind,
       },
     }),
     categories: categoriesAdapter.getInitialState({
@@ -496,6 +491,7 @@ export const dataSlice = createSlice({
               kinds: [
                 {
                   id: thing.kind,
+                  displayName: thing.kind,
                   containing: [thing.id],
                   categories: [unknownCategoryId],
                   unknownCategoryId,
