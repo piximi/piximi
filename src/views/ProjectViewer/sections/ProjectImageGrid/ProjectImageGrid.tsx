@@ -70,6 +70,11 @@ export const ProjectImageGrid = () => {
     );
   };
 
+  const renderTabLabel = useCallback(
+    (label: string) => kinds[label].displayName,
+    [kinds],
+  );
+
   useEffect(() => {
     if (isMobile) {
       const minimizeOnResize = visibleKinds.filter(
@@ -108,6 +113,7 @@ export const ProjectImageGrid = () => {
         handleNew={handleOpenAddKindMenu}
         handleTabMin={handleTabMinimize}
         persistentTabs={["Image"]}
+        renderLabel={renderTabLabel}
       >
         {visibleKinds.map((kind) => (
           <ImageGrid key={`${kind}-imageGrid`} kind={kind} />

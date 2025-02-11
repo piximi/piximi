@@ -113,6 +113,7 @@ const reconcileCOCOCategories = (
         } else {
           const newKind: Kind = {
             id: cocoCat.supercategory,
+            displayName: cocoCat.supercategory,
             categories: [newUnknownCatId],
             containing: [],
             unknownCategoryId: newUnknownCatId,

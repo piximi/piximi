@@ -1,5 +1,5 @@
 import { ReactElement, useCallback, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   BlurActionTextField,
@@ -14,6 +14,7 @@ import { Partition } from "utils/models/enums";
 import { Thing } from "store/data/types";
 import { DataTable } from "./DataTable";
 import { DataTableRow } from "./DataTableRow";
+import { selectRenderKindName } from "store/data/selectors";
 
 export const ThingInformationTable = ({
   thing,
@@ -26,6 +27,7 @@ export const ThingInformationTable = ({
   const [tableData, setTableData] = useState<
     Array<Array<string | number | ReactElement>>
   >([]);
+  const renderedKindName = useSelector(selectRenderKindName);
 
   const handleImageNameChange = useCallback(
     (name: string) => {
@@ -114,6 +116,9 @@ export const ThingInformationTable = ({
               key={key}
             />,
           ];
+          break;
+        case "kind":
+          data.push(["Kind", renderedKindName(thing.kind)]);
           break;
         case "shape":
           Object.entries(value).forEach((shapeEntry) => {
