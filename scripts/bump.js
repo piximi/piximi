@@ -8,7 +8,7 @@ if (
   !["bump:none", "bump:patch", "bump:minor", "bump:major"].includes(bumpType)
 ) {
   console.error(
-    'Invalid bump type. Use "bump:none", "bump:patch", "bump:minor", "bump:major".'
+    'Invalid bump type. Use "bump:none", "bump:patch", "bump:minor", "bump:major".',
   );
   process.exit(1);
 }
@@ -36,7 +36,7 @@ if (bumpType === "none") {
   fs.writeFileSync(
     packageJsonPath,
     JSON.stringify(packageJson, null, 2) + "\n",
-    "utf-8"
+    "utf-8",
   );
 
   console.log("Updated package.json with new version:", newVersion);

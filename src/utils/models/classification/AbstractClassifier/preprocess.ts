@@ -199,11 +199,10 @@ const doShowImages = async (
   ysData: number[],
 ) => {
   try {
-    let canvas: HTMLCanvasElement;
+    const canvas: HTMLCanvasElement = document.createElement("canvas");
     const refHeight = xsData.length;
     const refWidth = xsData[0].length;
 
-    canvas = document.createElement("canvas");
     canvas.width = refWidth;
     canvas.height = refHeight;
 

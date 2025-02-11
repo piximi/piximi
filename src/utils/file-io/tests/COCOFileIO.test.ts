@@ -289,18 +289,21 @@ describe("deserialize into project with matching image, matching kinds", () => {
     );
     const k1T2: Kind = {
       id: "clock",
+      displayName: "clock",
       categories: [],
       containing: [],
       unknownCategoryId: "",
     };
     const k2T2: Kind = {
       id: "sports ball",
+      displayName: "sports ball",
       categories: [],
       containing: [],
       unknownCategoryId: "",
     };
     const k3T2: Kind = {
       id: "sheep",
+      displayName: "sheep",
       categories: [],
       containing: [],
       unknownCategoryId: "",
@@ -421,18 +424,21 @@ describe("deserialize into project with matching image, matching kinds and categ
     );
     const k1T2: Kind = {
       id: "clock",
+      displayName: "clock",
       categories: [],
       containing: [],
       unknownCategoryId: "",
     };
     const k2T2: Kind = {
       id: "sports ball",
+      displayName: "sports ball",
       categories: [],
       containing: [],
       unknownCategoryId: "",
     };
     const k3T2: Kind = {
       id: "sheep",
+      displayName: "sheep",
       categories: [],
       containing: [],
       unknownCategoryId: "",

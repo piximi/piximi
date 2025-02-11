@@ -38,6 +38,7 @@ export const generateNewKind = (id: string) => {
   const unknownCategory = generateUnknownCategory(id);
   const newKind: Kind = {
     id,
+    displayName: id,
     categories: [unknownCategory.id],
     unknownCategoryId: unknownCategory.id,
     containing: [],

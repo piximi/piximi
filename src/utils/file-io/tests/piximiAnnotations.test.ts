@@ -77,6 +77,7 @@ const im2T1: ImageObject = {
 
 const k1T1: Kind = {
   id: "kT1",
+  displayName: "kT1",
   categories: [],
   containing: [],
   unknownCategoryId: "",
@@ -351,6 +352,7 @@ describe("deserialize into project with matching image, matching kind", () => {
 
     const k1T2: Kind = {
       id: "kT1",
+      displayName: "kT1",
       categories: [],
       containing: [],
       unknownCategoryId: "",
@@ -461,6 +463,7 @@ describe("deserialize into project with matching image, matching kind, and match
 
     const k1T2: Kind = {
       id: "kT1",
+      displayName: "kT1",
       categories: [],
       containing: [],
       unknownCategoryId: "",

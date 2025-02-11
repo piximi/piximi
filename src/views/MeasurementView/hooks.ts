@@ -143,7 +143,17 @@ export const useCreateMeasurementTable = () => {
       }),
     [],
   );
-  const kindOptions = useMemo(() => Object.keys(kinds), [kinds]);
+  const kindOptions = useMemo(
+    () =>
+      Object.values(kinds).reduce(
+        (optionsArray: { kindId: string; displayName: string }[], kind) => {
+          optionsArray.push({ kindId: kind.id, displayName: kind.displayName });
+          return optionsArray;
+        },
+        [],
+      ),
+    [kinds],
+  );
   const {
     onClose: handleCloseTableDialog,
     onOpen: handleOpenTableDialog,
@@ -199,7 +209,8 @@ export const useCreateMeasurementTable = () => {
           batch(() => {
             dispatch(
               measurementsSlice.actions.createGroup({
-                kind: e.data.kind!,
+                kindId: e.data.kind!,
+                displayName: kinds[e.data.kind!].displayName,
                 categories: categoriesByKind(e.data.kind!),
                 thingIds: Object.keys(e.data.data!),
                 numChannels,
