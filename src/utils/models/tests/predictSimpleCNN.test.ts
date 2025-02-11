@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { expect, it } from "vitest";
 
 import {
@@ -185,9 +187,6 @@ it("predict", async () => {
     inferrenceImages.push({ ...loadedIm, ...im });
     imageIds.push(im.id);
   }
-
-  const fs = require("fs");
-  const path = require("path");
 
   const jsonFileBuffer = fs.readFileSync(
     path.join(__dirname, "mnist_classifier.json"),
