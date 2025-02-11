@@ -1,9 +1,9 @@
 {
   "name": "piximi",
   "license": "BSD-style license",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "type": "module",
-  "homepage": "https://piximi.app",
+  "homepage": "https://beta.piximi.app",
   "dependencies": {
     "@emotion/react": "^11.6.0",
     "@emotion/styled": "^11.6.0",

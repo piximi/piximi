@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { expect, it } from "vitest";
 
 import {
