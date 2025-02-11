@@ -17,9 +17,9 @@ import {
   Shape,
   ShapeArray,
 } from "store/data/types";
-import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
 import {
   convertArrayToShape,
+  generateKind,
   getPropertiesFromImageSync,
   logger,
 } from "utils/common/helpers";
@@ -51,20 +51,6 @@ export const dataConverter_v01v02 = (data: {
   categories.entities[unknownCategory.id] = {
     ...unknownCategory,
     containing: [],
-    kind: "Image",
-    visible: true,
-  };
-  kinds.entities["Image"] = {
-    id: "Image",
-    containing: [],
-    categories: [unknownCategoryId],
-    unknownCategoryId,
-  };
-
-  categories.ids.push(unknownCategoryId);
-  categories.entities[unknownCategoryId] = {
-    ...unknownCategory,
-    containing: [],
   };
 
   const nonUnknownCategoryMap: Record<string, string> = {};
@@ -90,8 +76,8 @@ export const dataConverter_v01v02 = (data: {
   }
 
   for (const image of images) {
-    image.kind = "Image";
-    kinds.entities["Image"].containing.push(image.id);
+    image.kind = imageKind.id;
+    kinds.entities[imageKind.id].containing.push(image.id);
     let cat: string;
     if (image.categoryId === UNKNOWN_IMAGE_CATEGORY_ID) {
       cat = unknownCategory.id;
@@ -119,19 +105,6 @@ export const dataConverter_v01v02 = (data: {
     kinds.entities[anKind.id] = anKind;
     categories.ids.push(unknownCategory.id);
     categories.entities[unknownCategory.id] = {
-      ...unknownCategory,
-      containing: [],
-      kind: anCat.name,
-      visible: true,
-    };
-    kinds.entities[anCat.name] = {
-      id: anCat.name,
-      containing: [],
-      categories: [unknownCategoryId],
-      unknownCategoryId,
-    };
-    categories.ids.push(unknownCategoryId);
-    categories.entities[unknownCategoryId] = {
       ...unknownCategory,
       containing: [],
     };
