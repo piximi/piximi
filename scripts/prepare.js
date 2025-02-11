@@ -1,5 +1,5 @@
-const https = require("https");
-const fs = require("fs");
+import https from "https";
+import fs from "fs";
 
 const projectPath = "src/data/exampleProjects";
 
