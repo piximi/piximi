@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { expect, it } from "vitest";
 
 import {
@@ -170,9 +172,6 @@ it("evaluateClassifier", async () => {
     const loadedIm = await convertToImage(imStack, "mnist", undefined, 1, 1);
     validationImages.push({ ...loadedIm, ...im });
   }
-
-  const fs = require("fs");
-  const path = require("path");
 
   const jsonFileBuffer = fs.readFileSync(
     path.join(__dirname, "mnist_classifier.json"),
