@@ -143,6 +143,17 @@ export const useCreateMeasurementTable = () => {
       }),
     [],
   );
+  const kindOptions = useMemo(
+    () =>
+      Object.values(kinds).reduce(
+        (optionsArray: { kindId: string; displayName: string }[], kind) => {
+          optionsArray.push({ kindId: kind.id, displayName: kind.displayName });
+          return optionsArray;
+        },
+        [],
+      ),
+    [kinds],
+  );
   const {
     onClose: handleCloseTableDialog,
     onOpen: handleOpenTableDialog,

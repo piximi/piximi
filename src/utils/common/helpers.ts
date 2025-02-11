@@ -13,7 +13,13 @@ import {
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 import { AlertType, ImageSortKey } from "./enums";
 
-import { Category, ImageObject, Shape, ShapeArray } from "store/data/types";
+import {
+  Category,
+  ImageObject,
+  Kind,
+  Shape,
+  ShapeArray,
+} from "store/data/types";
 import {
   DeferredEntity,
   FilterType,
@@ -280,6 +286,18 @@ export const updateRecordArray = <T extends string | number | symbol, K>(
   } else {
     record[key] = [...value];
   }
+};
+
+export const generateKind = (kindId: string, displayName?: string) => {
+  const unknownCategory = generateUnknownCategory(kindId);
+  const kind: Kind = {
+    id: kindId,
+    displayName: displayName ?? "_" + kindId,
+    containing: [],
+    categories: [unknownCategory.id],
+    unknownCategoryId: unknownCategory.id,
+  };
+  return { kind, unknownCategory };
 };
 
 /*

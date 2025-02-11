@@ -70,12 +70,6 @@ export const ProjectImageGrid = () => {
     );
   };
 
-  const handleKindEdit = (kindId: string, newDisplayName: string) => {
-    dispatch(
-      dataSlice.actions.updateKindName({ kindId, displayName: newDisplayName }),
-    );
-  };
-
   const renderTabLabel = useCallback(
     (label: string) => kinds[label].displayName,
     [kinds],
@@ -119,8 +113,6 @@ export const ProjectImageGrid = () => {
         handleNew={handleOpenAddKindMenu}
         handleTabMin={handleTabMinimize}
         persistentTabs={["Image"]}
-        editable
-        handleTabEdit={handleKindEdit}
         renderLabel={renderTabLabel}
       >
         {visibleKinds.map((kind) => (
