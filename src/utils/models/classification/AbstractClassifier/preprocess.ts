@@ -203,7 +203,6 @@ const doShowImages = async (
     const refHeight = xsData.length;
     const refWidth = xsData[0].length;
 
-    canvas = document.createElement("canvas");
     canvas.width = refWidth;
     canvas.height = refHeight;
 

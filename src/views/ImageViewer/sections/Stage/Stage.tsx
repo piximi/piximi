@@ -130,6 +130,13 @@ export const Stage = ({
         kind: newKind.id,
       };
     }
+    const newKind: Kind = {
+      id: kindName,
+      displayName: kindName,
+      categories: kindCategories.map((cat) => cat.id),
+      containing: [],
+      unknownCategoryId: newUnknownCategory.id,
+    };
 
     batch(() => {
       dispatch(

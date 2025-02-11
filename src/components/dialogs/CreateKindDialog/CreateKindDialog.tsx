@@ -63,6 +63,7 @@ export const CreateKindDialog = ({
     const newUnknownCategory = generateUnknownCategory(name);
     const kind: Kind = {
       id: name,
+      displayName: name,
       categories: [...withContainedCategories, newUnknownCategory.id],
       containing: withContainedThings ?? [],
       unknownCategoryId: newUnknownCategory.id,
