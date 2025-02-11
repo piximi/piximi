@@ -1,5 +1,5 @@
-const fs = require("fs");
-const semver = require("semver");
+import fs from "fs";
+import semver from "semver";
 
 const packageJsonPath = "./package.json";
 let bumpType = process.argv[2]; // 'bump:patch', 'bump:minor', 'bump:major'
