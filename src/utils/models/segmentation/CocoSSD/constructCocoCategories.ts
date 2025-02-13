@@ -25,15 +25,8 @@ export const constructCocoKinds = () => {
   const kinds: Array<Kind> = [];
 
   cocoClasses.forEach((cocoClass) => {
-    const unknownCategoryId = generateUUID({ definesUnknown: true });
-
-    kinds.push({
-      id: cocoClass,
-      displayName: cocoClass,
-      categories: [unknownCategoryId],
-      containing: [],
-      unknownCategoryId,
-    });
+    const { kind } = generateKind(cocoClass, true);
+    kinds.push(kind);
   });
   return kinds;
 };

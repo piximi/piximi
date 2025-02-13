@@ -5,16 +5,14 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { dispose, TensorContainer } from "@tensorflow/tfjs";
-import { intersection } from "lodash";
+import { difference, intersection } from "lodash";
 
 import {
-  generateKind,
-  generateUUID,
-  isUnknownCategory,
   mutatingFilter,
   newReplaceDuplicateName,
-  updateRecordArray,
+  updateArrayRecord,
 } from "utils/common/helpers";
+import { generateUUID, generateKind, isUnknownCategory } from "./helpers";
 import { encode } from "views/ImageViewer/utils/rle";
 import { updateContents } from "./helpers";
 
@@ -247,27 +245,44 @@ export const dataSlice = createSlice({
       }>,
     ) {
       const { deletedKindId } = action.payload;
-      if (!state.kinds.entities[deletedKindId]) return;
+      if (!state.kinds.entities[deletedKindId] || deletedKindId === "Image")
+        return;
       const deletedKind = state.kinds.entities[deletedKindId]!;
-      const kindThings = deletedKind.containing;
-      const kindCats = deletedKind.categories;
+      const associatedThings = deletedKind.containing;
+      const associatedCategories = deletedKind.categories;
 
-      dataSlice.caseReducers.deleteThings(state, {
-        type: "deleteThings",
-        payload: {
-          thingIds: kindThings,
-          disposeColorTensors: true,
-          preparedByListener: true,
-        },
-      });
-      dataSlice.caseReducers.deleteCategories(state, {
-        type: "deleteCategories",
-        payload: {
-          categoryIds: kindCats,
-        },
-      });
+      const deletedThingsByImage: Record<string, string[]> = {};
+
+      for (const thingId of associatedThings) {
+        const thing = state.things.entities[thingId] as AnnotationObject;
+        updateArrayRecord(deletedThingsByImage, thing.imageId, thingId);
+        dispose(thing.data as TensorContainer);
+        thingsAdapter.removeOne(state.things, thingId);
+      }
+
+      categoriesAdapter.removeMany(state.categories, associatedCategories);
+      for (const [imageId, deletedThings] of Object.entries(
+        deletedThingsByImage,
+      )) {
+        const image = state.things.entities[imageId] as ImageObject;
+        thingsAdapter.updateOne(state.things, {
+          id: imageId,
+          changes: {
+            containing: difference(image.containing, deletedThings),
+          },
+        });
+      }
 
       kindsAdapter.removeOne(state.kinds, deletedKindId);
+    },
+    deleteKinds(state, action: PayloadAction<{ kindIds: string[] }>) {
+      const { kindIds } = action.payload;
+      for (const kindId of kindIds) {
+        dataSlice.caseReducers.deleteKind(state, {
+          type: "deleteKind",
+          payload: { deletedKindId: kindId },
+        });
+      }
     },
     addCategories(
       state,
@@ -452,8 +467,22 @@ export const dataSlice = createSlice({
 
       for (const categoryId of categoryIds) {
         if (isUnknownCategory(categoryId)) continue;
+        const category = state.categories.entities[categoryId];
+        if (!category) continue;
+        const associatedKindId = category.kind;
+        const associatedKind = state.kinds.entities[associatedKindId];
+        const associatedUnknownCategoryId = associatedKind!.unknownCategoryId;
 
-        categoriesAdapter.removeOne(state.categories, categoryId);
+        updateArrayRecord(
+          removedCategoriesByKind,
+          associatedKindId,
+          categoryId,
+        );
+        updateArrayRecord(
+          newUnknownThings,
+          associatedUnknownCategoryId,
+          category.containing,
+        );
       }
       for (const [kindId, categories] of Object.entries(
         removedCategoriesByKind,

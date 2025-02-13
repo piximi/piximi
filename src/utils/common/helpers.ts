@@ -247,33 +247,7 @@ export const sortTypeByKey = (key: ImageSortKey): ImageSortKeyType => {
   }
 };
 
-export const updateRecord = <T extends string | number | symbol, K>(
-  record: Record<T, K[]>,
-  key: T,
-  value: K,
-) => {
-  if (key in record) {
-    record[key].push(value);
-  } else {
-    record[key] = [value];
-  }
-};
-
-/*
-  CATEGORY HELPERS
-*/
-
-export const generateUUID = (options?: { definesUnknown: boolean }) => {
-  const id = uuidv4();
-  let unknownFlag: string;
-  if (options?.definesUnknown) {
-    unknownFlag = "0";
-  } else {
-    return defaultImageSortKey;
-  }
-};
-
-export const updateRecordArray = <T extends string | number | symbol, K>(
+export const updateArrayRecord = <T extends string | number | symbol, K>(
   record: Record<T, K[]>,
   key: T,
   value: K | K[],
@@ -286,18 +260,6 @@ export const updateRecordArray = <T extends string | number | symbol, K>(
   } else {
     record[key] = [...value];
   }
-};
-
-export const generateKind = (kindId: string, displayName?: string) => {
-  const unknownCategory = generateUnknownCategory(kindId);
-  const kind: Kind = {
-    id: kindId,
-    displayName: displayName ?? "_" + kindId,
-    containing: [],
-    categories: [unknownCategory.id],
-    unknownCategoryId: unknownCategory.id,
-  };
-  return { kind, unknownCategory };
 };
 
 /*
