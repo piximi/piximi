@@ -1,7 +1,7 @@
 import COCO_CLASSES from "data/model-data/cocossd-classes";
 import { OldCategory, Kind } from "store/data/types";
 import { CATEGORY_COLORS } from "utils/common/constants";
-import { generateUUID } from "utils/common/helpers";
+import { generateKind, generateUUID } from "store/data/helpers";
 
 export const constructCocoCategories = () => {
   const categories: Array<OldCategory> = [];
@@ -25,15 +25,8 @@ export const constructCocoKinds = () => {
   const kinds: Array<Kind> = [];
 
   cocoClasses.forEach((cocoClass) => {
-    const unknownCategoryId = generateUUID({ definesUnknown: true });
-
-    kinds.push({
-      id: cocoClass,
-      displayName: cocoClass,
-      categories: [unknownCategoryId],
-      containing: [],
-      unknownCategoryId,
-    });
+    const { kind } = generateKind(cocoClass, true);
+    kinds.push(kind);
   });
   return kinds;
 };

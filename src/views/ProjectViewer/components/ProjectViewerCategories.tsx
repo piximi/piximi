@@ -21,7 +21,7 @@ import {
 import { dataSlice } from "store/data/dataSlice";
 import { selectClassifierModelStatus } from "store/classifier/selectors";
 
-import { isUnknownCategory } from "utils/common/helpers";
+import { isUnknownCategory } from "store/data/helpers";
 
 import { ModelStatus, Partition } from "utils/models/enums";
 import { HotkeyContext } from "utils/common/enums";
