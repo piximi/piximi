@@ -34,16 +34,17 @@ export const generateUnknownCategory = (kind: string) => {
   return unknownCategory;
 };
 
-export const generateNewKind = (id: string) => {
-  const unknownCategory = generateUnknownCategory(id);
-  const newKind: Kind = {
-    id,
-    displayName: id,
+export const generateKind = (kindName: string, useUUID?: boolean) => {
+  const kindId = useUUID ? generateUUID() : kindName;
+  const unknownCategory = generateUnknownCategory(kindId);
+  const kind: Kind = {
+    id: kindId,
+    displayName: kindName,
     categories: [unknownCategory.id],
     unknownCategoryId: unknownCategory.id,
     containing: [],
   };
-  return { newKind, unknownCategory };
+  return { kind, unknownCategory };
 };
 
 export const updateContents = (

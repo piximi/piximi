@@ -1,23 +1,32 @@
-import React, { useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, IconButton, List } from "@mui/material";
-import { Visibility, VisibilityOff, Add, Edit } from "@mui/icons-material";
+import { Visibility, VisibilityOff, Add, MoreHoriz } from "@mui/icons-material";
 
-import { useDialogHotkey } from "hooks";
+import { useDialogHotkey, useMenu } from "hooks";
 
 import { CustomListItemButton, CollapsibleListItem } from "components/ui";
 import { CategoryDialog } from "components/dialogs";
 import { ImageViewerCategoryItem } from "./ImageViewerCategoryItem";
 import { EditableKindField } from "./EditableKindField";
 
-import { selectRenderKindName } from "store/data/selectors";
 import { imageViewerSlice } from "../state/imageViewer";
 import { selectFilteredImageViewerCategoryIds } from "../state/imageViewer/selectors";
 import { annotatorSlice } from "../state/annotator";
-import { selectCategoriesByKind } from "../state/annotator/reselectors";
+import {
+  selectCategoriesByKind,
+  selectImageViewerKinds,
+} from "../state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
-import { generateUUID } from "utils/common/helpers";
+import { generateUUID } from "store/data/helpers";
+import { KindMenu } from "./KindMenu";
 
 export const ImageViewerCategories = () => {
   const dispatch = useDispatch();
@@ -26,18 +35,31 @@ export const ImageViewerCategories = () => {
     () => Object.values(categoriesByKind),
     [categoriesByKind],
   );
+  const kindDict = useSelector(selectImageViewerKinds);
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);
-  const renderKindName = useSelector(selectRenderKindName);
+  const renderKindName = useCallback(
+    (kindId: string) => {
+      return kindDict[kindId].displayName;
+    },
+    [kindDict],
+  );
   // NOTE: keep for quick checking if kind is hidden
   const [filteredKinds, setFilteredKinds] = useState<Array<string>>([]);
   const [selectedKind, setSelectedKind] = useState<string>();
   const [editingKind, setEditingKind] = useState<string | undefined>(undefined);
+  const editingKindRef = useRef<HTMLInputElement>(null);
 
   const {
     onClose: handleCloseCreateCategoryDialog,
     onOpen: handleOpenCreateCategoryDialog,
     open: isCreateCategoryDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
+  const {
+    anchorEl: kindMenuAnchorEl,
+    onClose: handleCloseKindMenu,
+    onOpen: handleOpenKindMenu,
+    open: kindMenuOpened,
+  } = useMenu();
 
   const isKindFiltered = (kindId: string) => {
     //HACK: refactor -- O(n*m)
@@ -109,6 +131,34 @@ export const ImageViewerCategories = () => {
     );
   };
 
+  const handleMenuCloseAndDeselectKind = () => {
+    handleCloseKindMenu();
+    setSelectedKind(undefined);
+  };
+
+  const handleEditKind = () => {
+    handleCloseKindMenu();
+    setEditingKind(selectedKind);
+  };
+
+  const handleDeleteKind = (kindId: string) => {
+    dispatch(annotatorSlice.actions.deleteKind({ kind: kindDict[kindId] }));
+  };
+
+  const handleClearKindObjects = (kindId: string) => {
+    dispatch(
+      annotatorSlice.actions.deleteThings({
+        thingIds: kindDict[kindId].containing,
+      }),
+    );
+  };
+
+  useEffect(() => {
+    if (editingKind) {
+      editingKindRef.current?.focus();
+    }
+  }, [editingKind]);
+
   return (
     <>
       <List dense sx={{ py: 0 }}>
@@ -142,10 +192,11 @@ export const ImageViewerCategories = () => {
                     disableRipple
                     onClick={(event) => {
                       event.stopPropagation();
-                      setEditingKind(kindId);
+                      handleOpenKindMenu(event.currentTarget);
+                      setSelectedKind(kindId);
                     }}
                   >
-                    <Edit fontSize="small" />
+                    <MoreHoriz fontSize="small" />
                   </IconButton>
                   <IconButton
                     disableRipple
@@ -183,13 +234,25 @@ export const ImageViewerCategories = () => {
         })}
       </List>
       {selectedKind && (
-        <CategoryDialog
-          kind={selectedKind}
-          onClose={handleCloseCreateCategoryDialog}
-          open={isCreateCategoryDialogOpen}
-          action="create"
-          onConfirm={handleCreateCategory}
-        />
+        <>
+          <CategoryDialog
+            kind={selectedKind}
+            onClose={handleCloseCreateCategoryDialog}
+            open={isCreateCategoryDialogOpen}
+            action="create"
+            onConfirm={handleCreateCategory}
+          />
+
+          <KindMenu
+            anchorEl={kindMenuAnchorEl}
+            kindId={selectedKind}
+            onClose={handleMenuCloseAndDeselectKind}
+            opened={kindMenuOpened}
+            onEdit={handleEditKind}
+            deleteKind={handleDeleteKind}
+            clearObjects={handleClearKindObjects}
+          />
+        </>
       )}
     </>
   );

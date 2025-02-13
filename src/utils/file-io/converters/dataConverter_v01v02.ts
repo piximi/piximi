@@ -5,6 +5,7 @@ import {
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   UNKNOWN_IMAGE_CATEGORY_ID,
 } from "store/data/constants";
+import { generateKind, isUnknownCategory } from "store/data/helpers";
 import {
   OldAnnotationType,
   OldCategory,
@@ -18,11 +19,9 @@ import {
 } from "store/data/types";
 import {
   convertArrayToShape,
-  generateKind,
   getPropertiesFromImageSync,
-  isUnknownCategory,
+  logger,
 } from "utils/common/helpers";
-import { logger } from "utils/common/helpers";
 import { Partition } from "utils/models/enums";
 
 export const dataConverter_v01v02 = (data: {
