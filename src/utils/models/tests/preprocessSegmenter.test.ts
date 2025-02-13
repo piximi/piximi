@@ -3,7 +3,7 @@ import { expect, it } from "vitest";
 import "@tensorflow/tfjs-node";
 import { preprocessSegmentationImages } from "../segmentation/FullyConvolutionalSegmenter/preprocessSegmenter";
 import { fileFromPath } from "utils/file-io/nodeImageHelper";
-import { generateUUID } from "utils/common/helpers";
+import { generateUUID } from "store/data/helpers";
 import {
   CropOptions,
   FitOptions,

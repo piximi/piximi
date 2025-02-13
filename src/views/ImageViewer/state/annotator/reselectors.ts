@@ -103,7 +103,7 @@ export const selectActiveImageObjectIds = createSelector(
   (activeImage) => activeImage?.containing ?? [],
 );
 
-export const selectKinds = createSelector(
+export const selectImageViewerKinds = createSelector(
   selectAllKinds,
   selectKindChanges,
   selectCategoryChanges,
@@ -112,12 +112,9 @@ export const selectKinds = createSelector(
     const addedKinds = Object.values(kindChanges.added);
     const finalKinds: Record<string, Kind> = {};
     const newObjectsByKind = Object.values(thingChanges.added).reduce(
-      (byImage: Record<string, string[]>, change) => {
-        byImage[change.imageId] = [
-          ...(byImage[change.imageId] ?? []),
-          change.id,
-        ];
-        return byImage;
+      (byKind: Record<string, string[]>, change) => {
+        byKind[change.kind] = [...(byKind[change.kind] ?? []), change.id];
+        return byKind;
       },
       {},
     );
@@ -157,8 +154,9 @@ export const selectKinds = createSelector(
     return finalKinds;
   },
 );
-export const selectKindsArray = createSelector(selectKinds, (kinds) =>
-  Object.values(kinds),
+export const selectKindsArray = createSelector(
+  selectImageViewerKinds,
+  (kinds) => Object.values(kinds),
 );
 
 export const selectCategories = createSelector(
