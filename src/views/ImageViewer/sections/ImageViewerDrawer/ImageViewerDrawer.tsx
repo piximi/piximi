@@ -77,6 +77,7 @@ export const ImageViewerDrawer = () => {
               <Add fontSize="small" />
             </IconButton>
           }
+          containerStyle={{ marginTop: 1, marginBottom: 0 }}
         />
 
         <ImageViewerCategories />
