@@ -5,10 +5,8 @@ import { Box, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 import { useDialogHotkey } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-
-import { renderImageViewerKindName } from "../state/annotator/reselectors";
-
 import { HotkeyContext } from "utils/common/enums";
+import { selectRenderKindName } from "store/data/selectors";
 
 type KindMenuProps = {
   anchorEl: any;
@@ -29,7 +27,7 @@ export const KindMenu = ({
   deleteKind,
   clearObjects,
 }: KindMenuProps) => {
-  const renderKindName = useSelector(renderImageViewerKindName);
+  const renderKindName = useSelector(selectRenderKindName);
   const {
     onClose: handleCloseDeleteKindDialog,
     onOpen: handleOpenDeleteKindDialog,

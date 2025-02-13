@@ -11,6 +11,7 @@ import {
   getSubset,
   logger,
 } from "utils/common/helpers";
+import { isUnknownCategory } from "store/data/helpers";
 
 import { SimpleCNN, MobileNet } from "utils/models/classification";
 
