@@ -205,32 +205,51 @@ export const annotatorSlice = createSlice({
     deleteKind(
       state,
       action: PayloadAction<{
-        kindId: string;
+        kind: Kind;
       }>,
     ) {
-      const { kindId } = action.payload;
-      let affectedCategories: string[] | undefined;
-      let affectedThings: string[] | undefined;
+      const { id: kindId, categories, containing } = action.payload.kind;
+      const affectedCategories: Set<string> = new Set(categories);
+      const affectedThings: Set<string> = new Set(containing);
+      let addToDeleted = true;
       if (kindId in state.changes.kinds.added) {
-        affectedCategories = state.changes.kinds.added[kindId].categories;
-        affectedThings = state.changes.kinds.added[kindId].containing;
+        state.changes.kinds.added[kindId].categories.forEach(
+          affectedCategories.add,
+          affectedCategories,
+        );
+        state.changes.kinds.added[kindId].containing.forEach(
+          affectedThings.add,
+          affectedThings,
+        );
         delete state.changes.kinds.added[kindId];
-      } else if (kindId in state.changes.kinds.edited) {
-        affectedCategories = state.changes.kinds.edited[kindId].categories;
-        affectedThings = state.changes.kinds.edited[kindId].containing;
+        addToDeleted = false;
+      }
+      if (kindId in state.changes.kinds.edited) {
+        state.changes.kinds.edited[kindId].categories?.forEach(
+          affectedCategories.add,
+          affectedCategories,
+        );
+        state.changes.kinds.edited[kindId].containing?.forEach(
+          affectedThings.add,
+          affectedThings,
+        );
         delete state.changes.kinds.edited[kindId];
       }
-      if (affectedCategories) {
+      if (affectedCategories.size > 0) {
         for (const categoryId of affectedCategories) {
+          delete state.changes.categories.added[categoryId];
           delete state.changes.categories.edited[categoryId];
+          state.changes.categories.deleted.push(categoryId);
         }
       }
-      if (affectedThings) {
+      if (affectedThings.size > 0) {
         for (const thingId of affectedThings) {
+          delete state.changes.things.added[thingId];
           delete state.changes.things.edited[thingId];
+          state.changes.things.deleted.push(thingId);
         }
       }
-      state.changes.kinds.deleted.push(kindId);
+      if (addToDeleted) state.changes.kinds.deleted.push(kindId);
     },
 
     addCategories(

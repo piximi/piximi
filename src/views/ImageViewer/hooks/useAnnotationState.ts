@@ -9,7 +9,7 @@ import {
   selectCategoriesByKindArray,
   selectFullWorkingAnnotation,
   selectImageViewerObjects,
-  selectKinds,
+  selectImageViewerKinds,
 } from "views/ImageViewer/state/annotator/reselectors";
 import {
   selectActiveImageId,
@@ -19,10 +19,8 @@ import {
 import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
 import { AnnotationMode, AnnotationState } from "views/ImageViewer/utils/enums";
-import {
-  getPropertiesFromImage,
-  isUnknownCategory,
-} from "utils/common/helpers";
+import { getPropertiesFromImage } from "utils/common/helpers";
+import { isUnknownCategory } from "store/data/helpers";
 import { selectAnnotationMode } from "../state/annotator/selectors";
 import {
   AnnotationObject,
@@ -40,7 +38,7 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const selectedCategoryId = useSelector(selectSelectedIVCategoryId);
   const categories = useSelector(selectCategories);
   const categoriesByKindArray = useSelector(selectCategoriesByKindArray);
-  const kinds = useSelector(selectKinds);
+  const kinds = useSelector(selectImageViewerKinds);
   const annotationMode = useSelector(selectAnnotationMode);
   const objects = useSelector(selectImageViewerObjects);
   const workingAnnotation = useSelector(selectFullWorkingAnnotation);

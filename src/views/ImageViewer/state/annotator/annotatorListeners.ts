@@ -82,19 +82,26 @@ startAppListening({
     if (discardChanges) {
       return;
     }
-    const { annotator: annotatorState } = listenerAPI.getState();
+    const { annotator: annotatorState, data: dataState } =
+      listenerAPI.getState();
     const {
       kinds: kindChanges,
       categories: categoryChanges,
       things: thingChanges,
     } = annotatorState.changes;
 
-    listenerAPI.dispatch(
-      dataSlice.actions.addKinds({
-        kinds: Object.values(kindChanges.added),
-      }),
-    );
-    for (const id in kindChanges.deleted) {
+    if (Object.keys(kindChanges.added).length > 0) {
+      listenerAPI.dispatch(
+        dataSlice.actions.addKinds({
+          kinds: Object.values(kindChanges.added),
+        }),
+      );
+    }
+    const deletedCategoriesIds: string[] = [];
+    const deletedThingsIds: string[] = [];
+    for (const id of kindChanges.deleted) {
+      deletedCategoriesIds.push(...dataState.kinds.entities[id]!.categories);
+      deletedThingsIds.push(...dataState.kinds.entities[id]!.containing);
       listenerAPI.dispatch(dataSlice.actions.deleteKind({ deletedKindId: id }));
     }
 
