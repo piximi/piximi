@@ -19,7 +19,6 @@ import {
 } from "store/data/types";
 import {
   convertArrayToShape,
-  generateKind,
   getPropertiesFromImageSync,
   logger,
 } from "utils/common/helpers";

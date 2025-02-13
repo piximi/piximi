@@ -37,7 +37,7 @@ import {
   forceStack,
   getImageInformation,
 } from "utils/file-io/helpers";
-import { updateRecordArray } from "utils/common/helpers";
+import { updateArrayRecord } from "utils/common/helpers";
 import { convertToImage } from "utils/common/tensorHelpers";
 import { isUnknownCategory } from "store/data/helpers";
 
@@ -74,7 +74,7 @@ const getUploadedFileTypes = async (files: FileList) => {
       if (!(MIMETYPES as ReadonlyArray<string>).includes(file.type)) {
         import.meta.env.NODE_ENV !== "production" &&
           console.error("Invalid MIME Type:", ext);
-        updateRecordArray(images, ImageShapeEnum.InvalidImage, {
+        updateArrayRecord(images, ImageShapeEnum.InvalidImage, {
           shape: ImageShapeEnum.InvalidImage,
           fileName: file.name,
           ext,
@@ -89,7 +89,7 @@ const getUploadedFileTypes = async (files: FileList) => {
       ) {
         const image = await decodeDicomImage(file);
 
-        updateRecordArray(images, ImageShapeEnum.DicomImage, {
+        updateArrayRecord(images, ImageShapeEnum.DicomImage, {
           shape: ImageShapeEnum.DicomImage,
           components: image.length,
           fileName: file.name,
@@ -106,7 +106,7 @@ const getUploadedFileTypes = async (files: FileList) => {
 
         const imageStack = await forceStack(image);
 
-        updateRecordArray(images, imageInfo.shape, {
+        updateArrayRecord(images, imageInfo.shape, {
           ...imageInfo,
           ext,
           image: imageStack,
@@ -115,7 +115,7 @@ const getUploadedFileTypes = async (files: FileList) => {
       }
     } catch (err) {
       const error = err as Error;
-      updateRecordArray(images, ImageShapeEnum.InvalidImage, {
+      updateArrayRecord(images, ImageShapeEnum.InvalidImage, {
         shape: ImageShapeEnum.InvalidImage,
         fileName: file.name,
         ext,

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { annotatorSlice } from "../state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { selectKinds } from "../state/annotator/reselectors";
+import { selectImageViewerKinds } from "../state/annotator/reselectors";
 import {
   selectFilteredImageViewerCategoryIds,
   selectHighligtedIVCatogory,
@@ -22,7 +22,7 @@ export const useImageViewerCategoryItemState = (category: Category) => {
     return category.containing.length;
   }, [category.containing]);
   const dispatch = useDispatch();
-  const kindDictionary = useSelector(selectKinds);
+  const kindDictionary = useSelector(selectImageViewerKinds);
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);
   const selectedCategory = useSelector(selectSelectedIVCategoryId);
   const highlightedCategory = useSelector(selectHighligtedIVCatogory);
@@ -53,11 +53,6 @@ export const useImageViewerCategoryItemState = (category: Category) => {
   };
 
   const clearObjects = (category: Category) => {
-    // dispatch(
-    //   imageViewerSlice.actions.removeActiveAnnotationIds({
-    //     annotationIds: category.containing,
-    //   })
-    // );
     dispatch(
       annotatorSlice.actions.deleteThings({
         thingIds: category.containing,
