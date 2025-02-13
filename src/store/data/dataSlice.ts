@@ -228,8 +228,8 @@ export const dataSlice = createSlice({
     updateKindName(
       state,
       action: PayloadAction<{
-        currentKindName: string;
-        newKindName: string;
+        kindId: string;
+        displayName: string;
       }>,
     ) {
       const { kindId, displayName } = action.payload;
@@ -239,41 +239,6 @@ export const dataSlice = createSlice({
         id: kindId,
         changes: { displayName: displayName },
       });
-    },
-    // Exclusively removes kind. Unsafe because it does not:
-    // - Remove associated categories
-    // - Remove associated things
-    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
-    deleteKind_unsafe(state, action: PayloadAction<{ deletedKindId: string }>) {
-      const { deletedKindId } = action.payload;
-      if (!state.kinds.entities[deletedKindId] || deletedKindId === "Image")
-        return;
-      kindsAdapter.removeOne(state.kinds, deletedKindId);
-    },
-    // Exclusively removes kinds. Unsafe because it does not:
-    // - Remove associated categories
-    // - Remove associated things
-    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
-    deleteKinds_unsafe(state, action: PayloadAction<{ kindIds: string[] }>) {
-      const { kindIds } = action.payload;
-      if (kindIds.includes("Image")) return;
-
-      const kind = state.kinds.entities[currentKindName]!;
-      const kindCategories = kind.categories;
-      const kindThings = kind.containing;
-
-      kindCategories.forEach((catId) => {
-        state.categories.entities[catId]!.kind = newKindName;
-      });
-      kindThings.forEach((thingId) => {
-        state.things.entities[thingId]!.kind = newKindName;
-      });
-      const kindIndex = state.kinds.ids.findIndex(
-        (name) => name === currentKindName,
-      );
-      state.kinds.ids.splice(kindIndex, 1, newKindName);
-      state.kinds.entities[newKindName] = state.kinds.entities[currentKindName];
-      delete state.things.entities[currentKindName];
     },
     deleteKind(
       state,
