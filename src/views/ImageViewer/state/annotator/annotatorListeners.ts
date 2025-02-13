@@ -97,6 +97,19 @@ startAppListening({
     for (const id in kindChanges.deleted) {
       listenerAPI.dispatch(dataSlice.actions.deleteKind({ deletedKindId: id }));
     }
+
+    for (const id in kindChanges.edited) {
+      const newDisplayName = kindChanges.edited[id].displayName;
+      if (!newDisplayName) {
+        continue;
+      }
+      listenerAPI.dispatch(
+        dataSlice.actions.updateKindName({
+          kindId: id,
+          displayName: newDisplayName,
+        }),
+      );
+    }
     listenerAPI.dispatch(
       dataSlice.actions.addCategories({
         categories: Object.values(categoryChanges.added),

@@ -1,15 +1,19 @@
-import React, { ReactNode } from "react";
+import React, { CSSProperties, ReactNode } from "react";
 import { Box, Typography } from "@mui/material";
 
 export const FunctionalDivider = ({
   headerText,
   actions,
+  containerStyle,
 }: {
   headerText: string;
   actions: ReactNode;
+  containerStyle?: CSSProperties;
 }) => {
   return (
-    <Box display="flex" alignItems="center" my={1}>
+    <Box
+      sx={{ display: "flex", alignItems: "center", my: 1, ...containerStyle }}
+    >
       <Box
         sx={(theme) => ({
           height: 0,

@@ -28,6 +28,7 @@ type GenericCollapsibleListItemProps = {
   carotPosition?: "start" | "end";
   beginCollapsed?: boolean;
   disabled?: boolean;
+  disabledCollapse?: boolean;
   enforceHeight?: "sm" | "md" | "lg";
   indentSpacing?: number;
 };
@@ -41,13 +42,14 @@ export const CollapsibleListItem = ({
   carotPosition = "end",
   beginCollapsed = true,
   disabled,
+  disabledCollapse,
   enforceHeight,
   indentSpacing = 4,
 }: GenericCollapsibleListItemProps) => {
   const [collapsed, setCollapsed] = React.useState(beginCollapsed);
 
   const handleCollapse = () => {
-    setCollapsed(!collapsed);
+    !disabledCollapse && setCollapsed(!collapsed);
   };
 
   return (
