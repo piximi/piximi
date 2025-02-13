@@ -13,7 +13,7 @@ import {
   selectTileSize,
 } from "store/applicationSettings/selectors";
 
-import { isUnknownCategory } from "utils/common/helpers";
+import { isUnknownCategory } from "store/data/helpers";
 
 import { Partition } from "utils/models/enums";
 
