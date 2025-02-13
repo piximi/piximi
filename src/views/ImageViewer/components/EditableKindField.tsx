@@ -1,5 +1,5 @@
 import { ClickAwayListener, Input } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 export const EditableKindField = ({
   kindId,
@@ -13,7 +13,6 @@ export const EditableKindField = ({
   onFinishedEditing: (kindId: string, newDisplayName: string) => void;
 }) => {
   const [editedKindName, setEditedKindName] = useState<string>(kindName);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFinishedEditing = () => {
     if (editedKindName.length === 0) {
@@ -21,11 +20,6 @@ export const EditableKindField = ({
     }
     onFinishedEditing(kindId, editedKindName);
   };
-  useEffect(() => {
-    if (isEditing) {
-      inputRef.current?.focus();
-    }
-  });
   return (
     <ClickAwayListener
       onClickAway={handleFinishedEditing}
@@ -33,7 +27,6 @@ export const EditableKindField = ({
       touchEvent={isEditing ? "onTouchStart" : false}
     >
       <Input
-        inputRef={inputRef}
         value={editedKindName}
         readOnly={!isEditing}
         onChange={(event) => setEditedKindName(event.target.value)}

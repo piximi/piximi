@@ -1,24 +1,23 @@
 import React, { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, IconButton, List } from "@mui/material";
-import { Visibility, VisibilityOff, Add, MoreHoriz } from "@mui/icons-material";
+import { Visibility, VisibilityOff, Add, Edit } from "@mui/icons-material";
 
 import { useDialogHotkey, useMenu } from "hooks";
 
-import { CollapsibleListItem } from "components/ui/CollapsibleListItem";
+import { CustomListItemButton, CollapsibleListItem } from "components/ui";
+import { CategoryDialog } from "components/dialogs";
 import { ImageViewerCategoryItem } from "./ImageViewerCategoryItem";
 import { EditableKindField } from "./EditableKindField";
 
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { selectFilteredImageViewerCategoryIds } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectRenderKindName } from "store/data/selectors";
+import { imageViewerSlice } from "../state/imageViewer";
+import { selectFilteredImageViewerCategoryIds } from "../state/imageViewer/selectors";
+import { annotatorSlice } from "../state/annotator";
 import { selectCategoriesByKind } from "../state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
-
-import { CategoryDialog } from "components/dialogs/CategoryDialog/CategoryDialog";
-import { annotatorSlice } from "../state/annotator";
 import { generateUUID } from "utils/common/helpers";
-import { selectRenderKindName } from "store/data/selectors";
 
 export const ImageViewerCategories = () => {
   const dispatch = useDispatch();
@@ -33,7 +32,6 @@ export const ImageViewerCategories = () => {
   const [filteredKinds, setFilteredKinds] = useState<Array<string>>([]);
   const [selectedKind, setSelectedKind] = useState<string>();
   const [editingKind, setEditingKind] = useState<string | undefined>(undefined);
-  const editingKindRef = useRef<HTMLInputElement>(null);
 
   const {
     onClose: handleCloseCreateCategoryDialog,
@@ -105,13 +103,33 @@ export const ImageViewerCategories = () => {
     );
   };
 
+  const handleUpdateKindName = (kindId: string, newDisplayName: string) => {
+    setEditingKind(undefined);
+    if (newDisplayName.length === 0) {
+      return;
+    }
+    dispatch(
+      annotatorSlice.actions.editKind({
+        kind: { id: kindId, displayName: newDisplayName },
+      }),
+    );
+  };
+
   return (
     <>
       <List dense sx={{ py: 0 }}>
         {categoriesByKindArray.map(({ kindId, categories }) => {
           return (
             <CollapsibleListItem
-              primaryText={renderKindName(kindId)}
+              disabledCollapse={editingKind === kindId}
+              primaryText={
+                <EditableKindField
+                  kindId={kindId}
+                  kindName={renderKindName(kindId)}
+                  isEditing={editingKind === kindId}
+                  onFinishedEditing={handleUpdateKindName}
+                />
+              }
               key={kindId}
               carotPosition="start"
               secondary={
@@ -129,10 +147,11 @@ export const ImageViewerCategories = () => {
                   <IconButton
                     disableRipple
                     onClick={(event) => {
-                      handleOpenCreateCategoryOfKind(event, kindId);
+                      event.stopPropagation();
+                      setEditingKind(kindId);
                     }}
                   >
-                    <MoreHoriz fontSize="small" />
+                    <Edit fontSize="small" />
                   </IconButton>
                   <IconButton
                     disableRipple

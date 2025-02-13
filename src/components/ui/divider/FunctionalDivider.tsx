@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { CSSProperties, ReactNode } from "react";
 import { Box, Typography } from "@mui/material";
 
 export const FunctionalDivider = ({
