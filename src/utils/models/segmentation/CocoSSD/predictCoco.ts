@@ -15,7 +15,7 @@ import {
 
 import { encode } from "views/ImageViewer/utils";
 import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
-import { generateUUID } from "utils/common/helpers";
+import { generateUUID } from "store/data/helpers";
 import { Partition } from "../../enums";
 import { Kind } from "store/data/types";
 

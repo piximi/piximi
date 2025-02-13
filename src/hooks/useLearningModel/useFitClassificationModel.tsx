@@ -14,7 +14,8 @@ import {
   selectActiveLabeledThingsCount,
 } from "store/project/reselectors";
 
-import { isUnknownCategory, logger } from "utils/common/helpers";
+import { logger } from "utils/common/helpers";
+import { isUnknownCategory } from "store/data/helpers";
 
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/common/enums";
