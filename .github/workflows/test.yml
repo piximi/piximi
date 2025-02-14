@@ -8,21 +8,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [20.x]
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "yarn"
+          cache: "pnpm"
       - name: Install Packages
-        run: yarn install
+        run: pnpm install
       - name: Lint code
-        run: yarn run --silent prettier --check --loglevel log "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}" && yarn run eslint --max-warnings 0 "src/**/*.{js,jsx,ts,tsx}"
+        run: pnpm run --silent prettier --check --loglevel log "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}" && pnpm run eslint --max-warnings 0 "src/**/*.{js,jsx,ts,tsx}"
       - name: Run Tests
-        run: yarn test --silent
+        run: pnpm test --silent
         env:
           CI: true
       # - name: Build page
-      #   run: yarn build
+      #   run: pnpm build
