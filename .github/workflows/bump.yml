@@ -16,11 +16,11 @@ jobs:
 
       - name: Install semver globally
         run: |
-          npm install -g semver
-          npm ls -g
+          pnpm install -g semver
+          pnpm ls -g
           # enusre globally installed semver is available as a script
           # to be run locally
-          echo "NODE_PATH=$(npm root -g)" >> $GITHUB_ENV
+          echo "NODE_PATH=$(pnpm root -g)" >> $GITHUB_ENV
 
       - name: Analyze PR labels
         id: analyze_labels
@@ -58,10 +58,10 @@ jobs:
           # Output result based on found labels
           if [[ ${#FOUND_LABELS[@]} -eq 0 ]]; then
             echo "no explicit label, doing patch bump"
-            npm run bump bump:patch
+            pnpm run bump bump:patch
           elif [[ ${#FOUND_LABELS[@]} -eq 1 ]]; then
             echo "doing bump on label: ${FOUND_LABELS[0]}"
-            npm run bump ${FOUND_LABELS[0]}
+            pnpm run bump ${FOUND_LABELS[0]}
           else
             echo "too many labels found: ${FOUND_LABELS[*]}"
             exit 1
