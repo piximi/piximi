@@ -6,7 +6,7 @@ import {
   CropFree as CropFreeIcon,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material";
-import { Tool } from "views/ImageViewer/components/Tool";
+import { Tool } from "components/ui/Tool/Tool";
 import { useTranslation } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -22,6 +22,7 @@ import { CursorZoom, StageZoom } from "icons";
 import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
 import { ToolType } from "views/ImageViewer/utils/enums";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { FlexRowBox } from "components/ui";
 
 export const ZoomOptions = () => {
   const stageRef = useContext(StageContext);
@@ -102,7 +103,7 @@ export const ZoomOptions = () => {
     dispatch(imageViewerSlice.actions.setZoomToolOptions(payload));
   };
   return (
-    <>
+    <FlexRowBox>
       <Tool
         name={t(
           `Toggle Zoom Center: ${
@@ -110,7 +111,6 @@ export const ZoomOptions = () => {
           }`,
         )}
         onClick={handleSetCenteringOption}
-        tooltipLocation="left"
       >
         {options.automaticCentering ? (
           <StageZoom color={theme.palette.text.primary} />
@@ -121,7 +121,6 @@ export const ZoomOptions = () => {
       <Tool
         name={t("Zoom To Region")}
         onClick={handleSetRegionTool}
-        tooltipLocation="left"
         selected={activeTool === ToolType.Zoom}
       >
         <CropFreeIcon
@@ -133,27 +132,15 @@ export const ZoomOptions = () => {
           }}
         />
       </Tool>
-      <Tool
-        name={t("Actual Size")}
-        onClick={handleResetSize}
-        tooltipLocation="left"
-      >
+      <Tool name={t("Actual Size")} onClick={handleResetSize}>
         <AspectRatioIcon />
       </Tool>
-      <Tool
-        name={t("Fit Screen")}
-        onClick={handleFitToScreen}
-        tooltipLocation="left"
-      >
+      <Tool name={t("Fit Screen")} onClick={handleFitToScreen}>
         <FitScreenIcon />
       </Tool>
-      <Tool
-        name={t("ResetPosition")}
-        onClick={handleResetPosition}
-        tooltipLocation="left"
-      >
+      <Tool name={t("ResetPosition")} onClick={handleResetPosition}>
         <ControlCameraIcon />
       </Tool>
-    </>
+    </FlexRowBox>
   );
 };

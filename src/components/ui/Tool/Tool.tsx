@@ -9,7 +9,7 @@ import {
   Tooltip,
   useTheme,
 } from "@mui/material";
-import { ExpandMore, ExpandLess } from "@mui/icons-material";
+import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { ToolHotkeyTitle } from "components/ui/tooltips";
 import { IncrementalSlider } from "components/inputs";
 import { useMenu } from "hooks";
@@ -91,7 +91,7 @@ export const ResizableTool = ({
     <Box
       sx={{
         display: "flex",
-        flexDirection: "column",
+        flexDirection: "row-reverse",
         position: "relative",
         overflowY: "visible",
         zIndex: "inherit",
@@ -112,6 +112,7 @@ export const ResizableTool = ({
             }}
             sx={{
               zIndex: 1001,
+              ml: "1px",
             }}
             size="small"
           >
@@ -123,11 +124,11 @@ export const ResizableTool = ({
         <IconButton
           sx={{
             bgcolor: "background.paper",
-            py: 0,
-            pb: 0.5,
-            borderRadius: "0 0 4px 4px",
+            pr: 0,
+            pl: 0.5,
+            borderRadius: "4px 0 0 4px",
             border: `1px solid ${theme.palette.divider}`,
-            borderTop: "none",
+            borderRight: "none",
             "&:hover": {
               bgcolor: "background.paper",
             },
@@ -136,7 +137,7 @@ export const ResizableTool = ({
             onOpen(event.currentTarget.parentElement!);
           }}
         >
-          <ExpandMore
+          <KeyboardArrowLeft
             sx={{ fontSize: "0.75rem", mx: "auto", lineHeight: "0.75rem" }}
           />
         </IconButton>
@@ -148,9 +149,8 @@ export const ResizableTool = ({
         placement={tooltipLocation}
         sx={{
           bgcolor: "background.paper",
-          borderRadius: "0 0 8px 8px",
+          borderRadius: "8px",
           border: `1px solid ${theme.palette.divider}`,
-          borderTop: "none",
         }}
       >
         <Box
@@ -170,14 +170,20 @@ export const ResizableTool = ({
             callbackOnSlide={callbackOnSlide}
           />
           <Divider />
-          <IconButton onClick={onClose} sx={{ p: 0.5 }}>
-            <ExpandLess sx={{ fontSize: "1rem", lineHeight: "0.75rem" }} />
+          <IconButton
+            onClick={onClose}
+            sx={{ p: 0.5, borderRadius: "0 0 8px 8px" }}
+          >
+            <KeyboardArrowRight
+              sx={{ fontSize: "1rem", lineHeight: "0.75rem" }}
+            />
           </IconButton>
         </Box>
       </Popper>
     </Box>
   );
 };
+
 export const PopoverTool = ({
   children,
   name,
@@ -222,12 +228,12 @@ export const PopoverTool = ({
         anchorEl={anchorEl}
         onClose={onClose}
         anchorOrigin={{
-          vertical: "center",
-          horizontal: "left",
+          vertical: "bottom",
+          horizontal: "center",
         }}
         transformOrigin={{
-          vertical: "center",
-          horizontal: "right",
+          vertical: "top",
+          horizontal: "center",
         }}
         slotProps={{ paper: { sx: { overflow: "visible" } } }}
       >
