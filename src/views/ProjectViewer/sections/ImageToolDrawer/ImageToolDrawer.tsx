@@ -13,7 +13,7 @@ import {
 
 import { useMobileView, useTranslation } from "hooks";
 
-import { AppBarOffset } from "components/ui/AppBarOffset";
+import { AppBarOffset, Tool } from "components/ui";
 import { SortSelection } from "views/ProjectViewer/sections/SortSelection";
 import { ProjectViewerCategories, FileIO } from "../../components";
 import { ModelTaskSection } from "../ModelTaskSection";
@@ -27,7 +27,6 @@ import { OperationType, ToolOptionsDrawer } from "./ToolOptionsDrawer";
 import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
 
 import { dimensions } from "utils/common/constants";
-import { Tool } from "views/ImageViewer/components";
 import { capitalize } from "utils/common/helpers";
 
 const imageTools: Record<string, OperationType> = {
