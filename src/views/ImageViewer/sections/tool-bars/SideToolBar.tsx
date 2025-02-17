@@ -1,7 +1,8 @@
 import React from "react";
 import { Divider, useTheme, Box } from "@mui/material";
 
-import { ZoomOptions, SelectionOptions, ColorOptions } from "./tools";
+import { CreationOptions, ToolOptions } from "./tools";
+import { dimensions } from "utils/common/constants";
 
 export const SideToolBar = () => {
   const theme = useTheme();
@@ -13,15 +14,13 @@ export const SideToolBar = () => {
         borderLeft: `1px solid ${theme.palette.divider}`,
         gridArea: "side-tools",
         position: "relative",
+        width: dimensions.toolDrawerWidth,
+        zIndex: 1002,
       }}
     >
-      <SelectionOptions />
+      <CreationOptions />
       <Divider />
-
-      <ZoomOptions />
-
-      <Divider />
-      <ColorOptions />
+      <ToolOptions />
     </Box>
   );
 };
