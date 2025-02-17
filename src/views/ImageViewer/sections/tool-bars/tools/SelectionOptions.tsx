@@ -154,18 +154,10 @@ export const SelectionOptions = () => {
         <LabelOutlinedIcon />
       </PopoverTool>
 
-      <Tool
-        name={t("Select All")}
-        onClick={handleSelectAll}
-        tooltipLocation="left"
-      >
+      <Tool name={t("Select All")} onClick={handleSelectAll}>
         <SelectAllIcon />
       </Tool>
-      <Tool
-        name={t("Deselect All")}
-        onClick={handleDeselectAll}
-        tooltipLocation="left"
-      >
+      <Tool name={t("Deselect All")} onClick={handleDeselectAll}>
         <DeselectIcon />
       </Tool>
       <Tool name={t("Selection Tool")} onClick={handleSetSelectionTool}>
