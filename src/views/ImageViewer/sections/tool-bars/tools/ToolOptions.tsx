@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "@mui/material";
 import { Margin } from "@mui/icons-material";
 
-import { Tool } from "../../../components";
+import { Tool } from "components/ui";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
@@ -23,14 +23,14 @@ import {
 } from "icons";
 
 import { ToolType } from "views/ImageViewer/utils/enums";
-import { ResizableTool } from "views/ImageViewer/components/Tool";
+import { ResizableTool } from "components/ui/Tool/Tool";
 import { SliderOptions } from "utils/common/types";
 import {
   penToolSizeControls,
   QuickToolSizeControls,
   ThresholdToolSizeControls,
 } from "views/ImageViewer/utils/consts";
-import { FlexRowBox } from "components/ui";
+import { FlexColumnBox } from "components/ui";
 
 type ToolMap = Record<
   string,
@@ -125,7 +125,7 @@ export const ToolOptions = () => {
   };
 
   return (
-    <FlexRowBox>
+    <FlexColumnBox>
       {Object.keys(toolMap).map((name, idx) => {
         const tool = toolMap[name];
 
@@ -137,6 +137,7 @@ export const ToolOptions = () => {
             selected={activeTool === tool.operation}
             callback={sliderCallback}
             toolLimits={tool.options}
+            tooltipLocation="left"
           >
             {tool.icon(
               activeTool === tool.operation
@@ -149,6 +150,7 @@ export const ToolOptions = () => {
             key={`${name}_${idx}`}
             name={t(name)}
             onClick={() => handleToolClick(name)}
+            tooltipLocation="left"
           >
             {tool.icon(
               activeTool === tool.operation
@@ -158,6 +160,6 @@ export const ToolOptions = () => {
           </Tool>
         );
       })}
-    </FlexRowBox>
+    </FlexColumnBox>
   );
 };
