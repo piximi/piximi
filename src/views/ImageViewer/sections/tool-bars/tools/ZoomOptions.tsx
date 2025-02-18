@@ -113,9 +113,9 @@ export const ZoomOptions = () => {
         onClick={handleSetCenteringOption}
       >
         {options.automaticCentering ? (
-          <StageZoom color={theme.palette.text.primary} />
+          <StageZoom color={theme.palette.action.active} />
         ) : (
-          <CursorZoom color={theme.palette.text.primary} />
+          <CursorZoom color={theme.palette.action.active} />
         )}
       </Tool>
       <Tool
@@ -128,7 +128,7 @@ export const ZoomOptions = () => {
             color:
               activeTool === ToolType.Zoom
                 ? theme.palette.primary.dark
-                : theme.palette.text.primary,
+                : theme.palette.action.active,
           }}
         />
       </Tool>
