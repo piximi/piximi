@@ -97,7 +97,7 @@ export const ImageOptions = () => {
           </Box>
         }
       >
-        <ColorAdjustment color={theme.palette.text.primary} />
+        <ColorAdjustment color={theme.palette.action.active} />
       </PopoverTool>
       <PopoverTool
         name={t("Z-Stack")}

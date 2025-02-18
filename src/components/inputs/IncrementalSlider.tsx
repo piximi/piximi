@@ -123,7 +123,6 @@ export const IncrementalSlider = ({
           if (callbackOnSlide) return;
           callback(value as number);
         }}
-        track={orientation === "horizontal" ? "normal" : "inverted"}
         sx={{
           " & .MuiSlider-thumb.Mui-focusVisible, .MuiSlider-thumb:hover": {
             boxShadow: "none",
