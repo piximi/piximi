@@ -109,7 +109,8 @@ export const selectKinds = createSelector(
   selectCategoryChanges,
   selectThingChanges,
   (rootKinds, kindChanges, categoryChanges, thingChanges) => {
-    const finalKinds = { ...kindChanges.added };
+    const addedKinds = Object.values(kindChanges.added);
+    const finalKinds: Record<string, Kind> = {};
     const newObjectsByKind = Object.values(thingChanges.added).reduce(
       (byImage: Record<string, string[]>, change) => {
         byImage[change.imageId] = [
@@ -127,7 +128,7 @@ export const selectKinds = createSelector(
       },
       {},
     );
-    for (const kind of rootKinds) {
+    for (const kind of [...rootKinds, ...addedKinds]) {
       let finalKind: Kind = { ...kind };
       const kindId = kind.id;
       if (kindChanges.deleted.includes(kindId)) {
@@ -146,7 +147,11 @@ export const selectKinds = createSelector(
         finalKind.categories,
         categoryChanges.deleted,
       );
-      finalKind.categories.push(...(newCategoriesByKind[kindId] ?? []));
+      finalKind.categories.push(
+        ...(newCategoriesByKind[kindId] ?? []).filter(
+          (catId) => catId !== finalKind.unknownCategoryId,
+        ),
+      );
       finalKinds[kindId] = finalKind;
     }
     return finalKinds;
@@ -161,7 +166,8 @@ export const selectCategories = createSelector(
   selectCategoryChanges,
   selectThingChanges,
   (rootCategories, categoryChanges, thingChanges) => {
-    const finalCategories = { ...categoryChanges.added };
+    const addedCategories = Object.values(categoryChanges.added);
+    const finalCategories: Record<string, Category> = {};
     const newObjectsByCategory = Object.values(thingChanges.added).reduce(
       (byCategory: Record<string, string[]>, change) => {
         byCategory[change.categoryId] = [
@@ -184,7 +190,7 @@ export const selectCategories = createSelector(
       },
       {},
     );
-    for (const category of rootCategories) {
+    for (const category of [...rootCategories, ...addedCategories]) {
       let finalCategory: Category = { ...category };
       const categoryId = category.id;
       finalCategory.containing = difference(
