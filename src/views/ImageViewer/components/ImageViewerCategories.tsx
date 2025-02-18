@@ -89,7 +89,7 @@ export const ImageViewerCategories = () => {
     handleOpenCreateCategoryDialog();
   };
 
-  const handleCreateCategory = (name: string, color: string, kind: string) => {
+  const handleCreateCategory = (kind: string, name: string, color: string) => {
     const newId = generateUUID();
     dispatch(
       annotatorSlice.actions.addCategories({
@@ -174,7 +174,7 @@ export const ImageViewerCategories = () => {
           kind={selectedKind}
           onClose={handleCloseCreateCategoryDialog}
           open={isCreateCategoryDialogOpen}
-          action="Create"
+          action="create"
           onConfirm={handleCreateCategory}
         />
       )}

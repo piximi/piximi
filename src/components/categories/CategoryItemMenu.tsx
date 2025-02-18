@@ -20,6 +20,7 @@ type CategoryItemMenuProps = {
   handleCloseCategoryMenu: () => void;
   openCategoryMenu: boolean;
   kind?: string;
+  editCategory: (kindOrId: string, name: string, color: string) => void;
   deleteCategory: (category: Category, kindId: string) => void;
   clearObjects: (category: Category) => void;
 };
@@ -30,6 +31,7 @@ export const CategoryItemMenu = ({
   handleCloseCategoryMenu,
   openCategoryMenu,
   kind,
+  editCategory,
   deleteCategory,
   clearObjects,
 }: CategoryItemMenuProps) => {
@@ -93,7 +95,6 @@ export const CategoryItemMenu = ({
         id={category.id}
         onClose={() => handleMenuCloseWith(handleCloseEditCategoryDialog)}
         open={isEditCategoryDialogOpen}
-        kind={kind ?? activeKind}
       />
       <ConfirmationDialog
         title={`Delete "${category.name}" Category`}

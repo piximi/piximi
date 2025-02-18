@@ -69,6 +69,24 @@ export const ProjectViewerCategories = () => {
     },
     [dispatch],
   );
+
+  const createCategory = (kind: string, name: string, color: string) => {
+    dispatch(
+      dataSlice.actions.createCategory({
+        name,
+        color,
+        kind: kind,
+      }),
+    );
+  };
+
+  const editCategory = (id: string, name: string, color: string) => {
+    dispatch(
+      dataSlice.actions.updateCategory({
+        updates: { id, changes: { name, color } },
+      }),
+    );
+  };
   const deleteCategory = (category: Category, kindId: string) => {
     dispatch(
       dataSlice.actions.removeCategoriesFromKind({
@@ -282,6 +300,7 @@ export const ProjectViewerCategories = () => {
           category={selectedCategory}
           handleCloseCategoryMenu={onCloseCategoryMenu}
           openCategoryMenu={Boolean(categoryMenuAnchorEl)}
+          editCategory={editCategory}
           deleteCategory={deleteCategory}
           clearObjects={deleteObjects}
         />
@@ -292,6 +311,7 @@ export const ProjectViewerCategories = () => {
         onConfirm={createCategory}
         onClose={handleCloseCreateCategoryDialog}
         open={isCreateCategoryDialogOpen}
+        action={"create"}
       />
 
       <ConfirmationDialog
