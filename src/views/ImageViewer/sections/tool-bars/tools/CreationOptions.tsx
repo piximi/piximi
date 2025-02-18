@@ -46,12 +46,17 @@ export const CreationOptions = () => {
 
   const getIconColor = useCallback(
     (mode: AnnotationMode) => {
-      const color = workingAnnotationEntity.saved
-        ? mode === annotationMode
-          ? theme.palette.primary.dark
-          : theme.palette.text.primary
-        : theme.palette.action.disabled;
-      return color;
+      if (mode === AnnotationMode.New && mode === annotationMode) {
+        return theme.palette.primary.dark;
+      }
+      if (workingAnnotationEntity.saved) {
+        if (mode === annotationMode) {
+          return theme.palette.primary.dark;
+        } else {
+          return theme.palette.action.active;
+        }
+      }
+      return theme.palette.action.disabled;
     },
     [theme, workingAnnotationEntity.saved, annotationMode],
   );
