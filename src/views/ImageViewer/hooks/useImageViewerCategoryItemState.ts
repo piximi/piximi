@@ -43,6 +43,14 @@ export const useImageViewerCategoryItemState = (category: Category) => {
     );
   };
 
+  const editCategory = (id: string, name: string, color: string) => {
+    dispatch(
+      annotatorSlice.actions.editCategory({
+        category: { id, name, color },
+      }),
+    );
+  };
+
   const clearObjects = (category: Category) => {
     // dispatch(
     //   imageViewerSlice.actions.removeActiveAnnotationIds({
@@ -95,6 +103,7 @@ export const useImageViewerCategoryItemState = (category: Category) => {
     objectCount,
     handleSelect,
     handleToggleCategoryVisibility,
+    editCategory,
     deleteCategory,
     clearObjects,
   };
