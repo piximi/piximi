@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, IconButton, List } from "@mui/material";
 import { Visibility, VisibilityOff, Add, MoreHoriz } from "@mui/icons-material";
@@ -22,6 +16,7 @@ import { annotatorSlice } from "../state/annotator";
 import {
   selectCategoriesByKind,
   selectImageViewerKinds,
+  renderImageViewerKindName,
 } from "../state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
@@ -37,12 +32,7 @@ export const ImageViewerCategories = () => {
   );
   const kindDict = useSelector(selectImageViewerKinds);
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);
-  const renderKindName = useCallback(
-    (kindId: string) => {
-      return kindDict[kindId].displayName;
-    },
-    [kindDict],
-  );
+  const renderKindName = useSelector(renderImageViewerKindName);
   // NOTE: keep for quick checking if kind is hidden
   const [filteredKinds, setFilteredKinds] = useState<Array<string>>([]);
   const [selectedKind, setSelectedKind] = useState<string>();
