@@ -11,11 +11,9 @@ import {
 export function useCategoryValidation({
   initName,
   initColor,
-  kind: _kind,
 }: {
   initName?: string;
   initColor?: string;
-  kind: string;
 }) {
   const unavailableNames = useSelector(selectActiveCategoryNames);
   const availableColors = useSelector(selectActiveCategoryColors);

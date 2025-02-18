@@ -32,6 +32,7 @@ export const ImageViewerCategoryItem = ({
     objectCount,
     handleSelect,
     handleToggleCategoryVisibility,
+    editCategory,
     deleteCategory,
     clearObjects,
   } = useImageViewerCategoryItemState(category);
@@ -91,6 +92,7 @@ export const ImageViewerCategoryItem = ({
         category={category}
         handleCloseCategoryMenu={handleCloseMenu}
         openCategoryMenu={Boolean(categoryMenuAnchorEl)}
+        editCategory={editCategory}
         deleteCategory={deleteCategory}
         clearObjects={clearObjects}
       />

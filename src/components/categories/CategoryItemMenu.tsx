@@ -5,7 +5,6 @@ import { Box, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 import { useDialogHotkey } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { UpdateCategoryDialog } from "components/dialogs";
 
 import { selectActiveKindId } from "store/project/selectors";
 
@@ -13,6 +12,7 @@ import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 import { HotkeyContext } from "utils/common/enums";
 
 import { Category } from "store/data/types";
+import { CategoryDialog } from "components/dialogs/CategoryDialog/CategoryDialog";
 
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;
@@ -20,6 +20,7 @@ type CategoryItemMenuProps = {
   handleCloseCategoryMenu: () => void;
   openCategoryMenu: boolean;
   kind?: string;
+  editCategory: (kindOrId: string, name: string, color: string) => void;
   deleteCategory: (category: Category, kindId: string) => void;
   clearObjects: (category: Category) => void;
 };
@@ -30,6 +31,7 @@ export const CategoryItemMenu = ({
   handleCloseCategoryMenu,
   openCategoryMenu,
   kind,
+  editCategory,
   deleteCategory,
   clearObjects,
 }: CategoryItemMenuProps) => {
@@ -85,11 +87,14 @@ export const CategoryItemMenu = ({
           />
         </Box>
       </MenuList>
-      <UpdateCategoryDialog
-        category={category}
+      <CategoryDialog
+        action="edit"
+        onConfirm={editCategory}
+        initColor={category.color}
+        initName={category.name}
+        id={category.id}
         onClose={() => handleMenuCloseWith(handleCloseEditCategoryDialog)}
         open={isEditCategoryDialogOpen}
-        kind={kind ?? activeKind}
       />
       <ConfirmationDialog
         title={`Delete "${category.name}" Category`}

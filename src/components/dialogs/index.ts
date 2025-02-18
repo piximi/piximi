@@ -4,7 +4,7 @@ export { SettingsDialog } from "./SettingsDialog";
 export { SaveFittedModelDialog } from "./SaveFittedModelDialog";
 export { ExportAnnotationsDialog } from "./ExportAnnotationsDialog";
 export { CreateKindDialog } from "./CreateKindDialog";
-export { CreateCategoryDialog, UpdateCategoryDialog } from "./CategoryDialog";
+export { CategoryDialog } from "./CategoryDialog";
 export { DialogTransitionSlide } from "./DialogTransitionSlide";
 export { ConfirmationDialog } from "./ConfirmationDialog";
 export { SelectDialog } from "./SelectDialog";

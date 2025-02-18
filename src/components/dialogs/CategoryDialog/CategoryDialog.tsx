@@ -5,27 +5,29 @@ import { useCategoryValidation } from "hooks";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { ColorIcon } from "components/ui/ColorIcon";
 
-type CategoryDialogProps = {
+type BaseCategoryDialogProps = {
   onClose: () => void;
-  onConfirm: (name: string, color: string, kind: string) => void;
-  initName?: string;
-  initColor?: string;
-  action: "Create" | "Update";
-  kind: string;
-  id?: string;
+  onConfirm: (kindOrId: string, name: string, color: string) => void;
+
   open: boolean;
 };
+type CreateCategoryDialogProps = BaseCategoryDialogProps & {
+  action: "create";
+  kind: string;
+};
 
-export const CategoryDialog = ({
-  onClose,
-  onConfirm,
-  kind,
-  action,
-  initName,
-  initColor,
-  id: _id,
-  open,
-}: CategoryDialogProps) => {
+type UpdateCategoryDialogProps = BaseCategoryDialogProps & {
+  action: "edit";
+  initName: string;
+  initColor: string;
+  id: string;
+};
+
+export const CategoryDialog = (
+  props: CreateCategoryDialogProps | UpdateCategoryDialogProps,
+) => {
+  const { onClose, onConfirm, action, open } = props;
+  const isEditMode = action === "edit";
   const {
     name,
     color,
@@ -35,11 +37,18 @@ export const CategoryDialog = ({
     errorHelperText,
     availableColors,
     setName,
-  } = useCategoryValidation({ kind, initName, initColor });
+  } = useCategoryValidation({
+    initName: isEditMode ? props.initName : "",
+    initColor: isEditMode ? props.initColor : "",
+  });
 
   const handleConfirm = () => {
     if (!isInvalidName) {
-      onConfirm(name, color, kind);
+      if (isEditMode) {
+        onConfirm(props.id, name, color);
+      } else {
+        onConfirm(props.kind, name, color);
+      }
     }
   };
 
