@@ -142,7 +142,7 @@ export const ToolOptions = () => {
             {tool.icon(
               activeTool === tool.operation
                 ? theme.palette.primary.dark
-                : theme.palette.text.primary,
+                : theme.palette.action.active,
             )}
           </ResizableTool>
         ) : (
@@ -155,7 +155,7 @@ export const ToolOptions = () => {
             {tool.icon(
               activeTool === tool.operation
                 ? theme.palette.primary.dark
-                : theme.palette.text.primary,
+                : theme.palette.action.active,
             )}
           </Tool>
         );
