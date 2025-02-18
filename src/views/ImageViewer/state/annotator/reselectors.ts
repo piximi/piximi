@@ -158,6 +158,10 @@ export const selectKindsArray = createSelector(
   selectImageViewerKinds,
   (kinds) => Object.values(kinds),
 );
+export const renderImageViewerKindName = createSelector(
+  selectImageViewerKinds,
+  (kinds) => (kindId: string) => kinds[kindId].displayName,
+);
 
 export const selectCategories = createSelector(
   selectAllCategories,
