@@ -55,7 +55,7 @@ const preloadedState: RootState = {
 };
 
 const options = {
-  devTools: true,
+  devTools: { trace: true, traceLimit: 15 }, // A traceLimit of 11 seems to be the minumum to get the full trace, set to 15 for a buffer
   middleware: () => new Tuple(...listenerMiddlewares, ...loggingMiddleware),
   preloadedState: preloadedState,
   reducer: rootReducer,
@@ -65,7 +65,7 @@ export const productionStore: EnhancedStore = configureStore(options);
 
 export const initStore = (loadedData: RootState | undefined) => {
   const options = {
-    devTools: true,
+    devTools: { trace: true, traceLimit: 15 },
     middleware: () => new Tuple(...listenerMiddlewares, ...loggingMiddleware),
     preloadedState: loadedData ?? {},
     reducer: rootReducer,
