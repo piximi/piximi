@@ -15,7 +15,7 @@ export const ThingDetailList = ({
       <ListItem>
         <ListItemText
           primary={`Name: ${thing.name}`}
-          primaryTypographyProps={{ sx: { color: color } }}
+          slotProps={{ primary: { sx: { color: color } } }}
         />
       </ListItem>
       {thing.shape && (
@@ -23,25 +23,25 @@ export const ThingDetailList = ({
           <ListItem>
             <ListItemText
               primary={`Width: ${thing.shape.width} px`}
-              primaryTypographyProps={{ sx: { color: color } }}
+              slotProps={{ primary: { sx: { color: color } } }}
             />
           </ListItem>
           <ListItem>
             <ListItemText
               primary={`Height: ${thing.shape.height} px`}
-              primaryTypographyProps={{ sx: { color: color } }}
+              slotProps={{ primary: { sx: { color: color } } }}
             />
           </ListItem>
           <ListItem>
             <ListItemText
               primary={`Channels: ${thing.shape.channels}`}
-              primaryTypographyProps={{ sx: { color: color } }}
+              slotProps={{ primary: { sx: { color: color } } }}
             />
           </ListItem>
           <ListItem>
             <ListItemText
               primary={`Planes: ${thing.shape.planes}`}
-              primaryTypographyProps={{ sx: { color: color } }}
+              slotProps={{ primary: { sx: { color: color } } }}
             />
           </ListItem>
         </>
@@ -49,7 +49,7 @@ export const ThingDetailList = ({
       <ListItem>
         <ListItemText
           primary={`Partition: ${thing.partition}`}
-          primaryTypographyProps={{ sx: { color: color } }}
+          slotProps={{ primary: { sx: { color: color } } }}
         />
       </ListItem>
     </List>

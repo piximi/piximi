@@ -1,8 +1,8 @@
 import {
   convertArrayToShape,
-  generateUUID,
   getPropertiesFromImage,
 } from "utils/common/helpers";
+import { generateUUID } from "store/data/helpers";
 import { Partition } from "utils/models/enums";
 import {
   NewSerializedAnnotationType,

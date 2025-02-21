@@ -5,15 +5,14 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { dispose, TensorContainer } from "@tensorflow/tfjs";
-import { intersection } from "lodash";
+import { difference, intersection } from "lodash";
 
 import {
-  generateUnknownCategory,
-  generateUUID,
-  isUnknownCategory,
   mutatingFilter,
   newReplaceDuplicateName,
+  updateArrayRecord,
 } from "utils/common/helpers";
+import { generateUUID, generateKind, isUnknownCategory } from "./helpers";
 import { encode } from "views/ImageViewer/utils/rle";
 import { updateContents } from "./helpers";
 
@@ -33,7 +32,7 @@ import {
   CategoryUpdates,
 } from "./types";
 
-const unknownCategory = generateUnknownCategory("Image");
+const { kind: imageKind, unknownCategory } = generateKind("Image");
 export const kindsAdapter = createEntityAdapter<Kind>();
 export const categoriesAdapter = createEntityAdapter<Category>();
 export const thingsAdapter = createEntityAdapter<
@@ -43,14 +42,9 @@ export const thingsAdapter = createEntityAdapter<
 export const initialState = (): DataState => {
   return {
     kinds: kindsAdapter.getInitialState({
-      ids: ["Image"],
+      ids: [imageKind.id],
       entities: {
-        Image: {
-          id: "Image",
-          containing: [],
-          categories: [unknownCategory.id],
-          unknownCategoryId: unknownCategory.id,
-        },
+        [imageKind.id]: imageKind,
       },
     }),
     categories: categoriesAdapter.getInitialState({
@@ -163,37 +157,20 @@ export const dataSlice = createSlice({
         });
       }
     },
-    //Buggy,  old kind persists in annotator and measurements. Old kind name for old and new in annotator
     updateKindName(
       state,
       action: PayloadAction<{
-        currentKindName: string;
-        newKindName: string;
+        kindId: string;
+        displayName: string;
       }>,
     ) {
-      const { currentKindName, newKindName } = action.payload;
-      if (
-        currentKindName === newKindName ||
-        !state.kinds.entities[currentKindName]
-      )
-        return;
-
-      const kind = state.kinds.entities[currentKindName]!;
-      const kindCategories = kind.categories;
-      const kindThings = kind.containing;
-
-      kindCategories.forEach((catId) => {
-        state.categories.entities[catId]!.kind = newKindName;
+      const { kindId, displayName } = action.payload;
+      const kind = state.kinds.entities[kindId];
+      if (kindId === displayName || !kind) return;
+      kindsAdapter.updateOne(state.kinds, {
+        id: kindId,
+        changes: { displayName: displayName },
       });
-      kindThings.forEach((thingId) => {
-        state.things.entities[thingId]!.kind = newKindName;
-      });
-      const kindIndex = state.kinds.ids.findIndex(
-        (name) => name === currentKindName,
-      );
-      state.kinds.ids.splice(kindIndex, 1, newKindName);
-      state.kinds.entities[newKindName] = state.kinds.entities[currentKindName];
-      delete state.things.entities[currentKindName];
     },
     deleteKind(
       state,
@@ -202,27 +179,44 @@ export const dataSlice = createSlice({
       }>,
     ) {
       const { deletedKindId } = action.payload;
-      if (!state.kinds.entities[deletedKindId]) return;
+      if (!state.kinds.entities[deletedKindId] || deletedKindId === "Image")
+        return;
       const deletedKind = state.kinds.entities[deletedKindId]!;
-      const kindThings = deletedKind.containing;
-      const kindCats = deletedKind.categories;
+      const associatedThings = deletedKind.containing;
+      const associatedCategories = deletedKind.categories;
 
-      dataSlice.caseReducers.deleteThings(state, {
-        type: "deleteThings",
-        payload: {
-          thingIds: kindThings,
-          disposeColorTensors: true,
-          preparedByListener: true,
-        },
-      });
-      dataSlice.caseReducers.deleteCategories(state, {
-        type: "deleteCategories",
-        payload: {
-          categoryIds: kindCats,
-        },
-      });
+      const deletedThingsByImage: Record<string, string[]> = {};
+
+      for (const thingId of associatedThings) {
+        const thing = state.things.entities[thingId] as AnnotationObject;
+        updateArrayRecord(deletedThingsByImage, thing.imageId, thingId);
+        dispose(thing.data as TensorContainer);
+        thingsAdapter.removeOne(state.things, thingId);
+      }
+
+      categoriesAdapter.removeMany(state.categories, associatedCategories);
+      for (const [imageId, deletedThings] of Object.entries(
+        deletedThingsByImage,
+      )) {
+        const image = state.things.entities[imageId] as ImageObject;
+        thingsAdapter.updateOne(state.things, {
+          id: imageId,
+          changes: {
+            containing: difference(image.containing, deletedThings),
+          },
+        });
+      }
 
       kindsAdapter.removeOne(state.kinds, deletedKindId);
+    },
+    deleteKinds(state, action: PayloadAction<{ kindIds: string[] }>) {
+      const { kindIds } = action.payload;
+      for (const kindId of kindIds) {
+        dataSlice.caseReducers.deleteKind(state, {
+          type: "deleteKind",
+          payload: { deletedKindId: kindId },
+        });
+      }
     },
     addCategories(
       state,
@@ -374,11 +368,53 @@ export const dataSlice = createSlice({
       if (categoryIds === "all") {
         categoryIds = state.categories.ids as string[];
       }
+
+      const removedCategoriesByKind: Record<string, string[]> = {};
+      const newUnknownThings: Record<string, string[]> = {};
+
       for (const categoryId of categoryIds) {
         if (isUnknownCategory(categoryId)) continue;
+        const category = state.categories.entities[categoryId];
+        if (!category) continue;
+        const associatedKindId = category.kind;
+        const associatedKind = state.kinds.entities[associatedKindId];
+        const associatedUnknownCategoryId = associatedKind!.unknownCategoryId;
 
-        categoriesAdapter.removeOne(state.categories, categoryId);
+        updateArrayRecord(
+          removedCategoriesByKind,
+          associatedKindId,
+          categoryId,
+        );
+        updateArrayRecord(
+          newUnknownThings,
+          associatedUnknownCategoryId,
+          category.containing,
+        );
       }
+      for (const [kindId, categories] of Object.entries(
+        removedCategoriesByKind,
+      )) {
+        const existingCategories = state.kinds.entities[kindId]!.categories;
+        kindsAdapter.updateOne(state.kinds, {
+          id: kindId,
+          changes: {
+            categories: difference(existingCategories, categories),
+          },
+        });
+      }
+      for (const [unknownCategoryId, things] of Object.entries(
+        newUnknownThings,
+      )) {
+        const existingThings =
+          state.categories.entities[unknownCategoryId]!.containing;
+        categoriesAdapter.updateOne(state.categories, {
+          id: unknownCategoryId,
+          changes: {
+            containing: [...existingThings, ...things],
+          },
+        });
+      }
+      categoriesAdapter.removeMany(state.categories, categoryIds);
     },
     removeCategoriesFromKind(
       state,
@@ -495,6 +531,7 @@ export const dataSlice = createSlice({
               kinds: [
                 {
                   id: thing.kind,
+                  displayName: thing.kind,
                   containing: [thing.id],
                   categories: [unknownCategoryId],
                   unknownCategoryId,

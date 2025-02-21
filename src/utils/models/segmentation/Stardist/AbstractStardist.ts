@@ -6,7 +6,7 @@ import {
 } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
-import { generateUUID } from "utils/common/helpers";
+import { generateKind } from "store/data/helpers";
 import { LoadInferenceDataArgs } from "../../types";
 import { Kind, ImageObject } from "store/data/types";
 import { LoadCB } from "utils/file-io/types";
@@ -71,13 +71,8 @@ export abstract class Stardist extends Segmenter {
         );
       this._fgKind = preprocessingArgs.kinds[0];
     } else if (!this._fgKind) {
-      const unknownCategoryId = generateUUID({ definesUnknown: true });
-      this._fgKind = {
-        id: KIND_NAME,
-        categories: [unknownCategoryId],
-        containing: [],
-        unknownCategoryId,
-      };
+      const { kind } = generateKind(KIND_NAME, true);
+      this._fgKind = kind;
     }
   }
 

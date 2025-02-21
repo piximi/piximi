@@ -5,10 +5,9 @@ import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 
 import { useDialogHotkey, useHotkeys } from "hooks";
 
-import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
+import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { CategoryItemMenu } from "components/categories/CategoryItemMenu";
-import { CreateCategoryDialog } from "components/dialogs";
 import { CategoryItem } from "./list-items/CategoryItem";
 import { PredictionListItems } from "./list-items/PredictionListItems";
 
@@ -22,7 +21,7 @@ import {
 import { dataSlice } from "store/data/dataSlice";
 import { selectClassifierModelStatus } from "store/classifier/selectors";
 
-import { isUnknownCategory } from "utils/common/helpers";
+import { isUnknownCategory } from "store/data/helpers";
 
 import { ModelStatus, Partition } from "utils/models/enums";
 import { HotkeyContext } from "utils/common/enums";
@@ -70,6 +69,24 @@ export const ProjectViewerCategories = () => {
     },
     [dispatch],
   );
+
+  const createCategory = (kind: string, name: string, color: string) => {
+    dispatch(
+      dataSlice.actions.createCategory({
+        name,
+        color,
+        kind: kind,
+      }),
+    );
+  };
+
+  const editCategory = (id: string, name: string, color: string) => {
+    dispatch(
+      dataSlice.actions.updateCategory({
+        updates: { id, changes: { name, color } },
+      }),
+    );
+  };
   const deleteCategory = (category: Category, kindId: string) => {
     dispatch(
       dataSlice.actions.removeCategoriesFromKind({
@@ -248,15 +265,18 @@ export const ProjectViewerCategories = () => {
           category={selectedCategory}
           handleCloseCategoryMenu={onCloseCategoryMenu}
           openCategoryMenu={Boolean(categoryMenuAnchorEl)}
+          editCategory={editCategory}
           deleteCategory={deleteCategory}
           clearObjects={deleteObjects}
         />
       )}
 
-      <CreateCategoryDialog
+      <CategoryDialog
         kind={activeKind}
+        onConfirm={createCategory}
         onClose={handleCloseCreateCategoryDialog}
         open={isCreateCategoryDialogOpen}
+        action={"create"}
       />
 
       <ConfirmationDialog

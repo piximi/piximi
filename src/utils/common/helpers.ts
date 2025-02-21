@@ -14,7 +14,13 @@ import {
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 import { AlertType, ImageSortKey } from "./enums";
 
-import { Category, ImageObject, Shape, ShapeArray } from "store/data/types";
+import {
+  Category,
+  ImageObject,
+  Kind,
+  Shape,
+  ShapeArray,
+} from "store/data/types";
 import {
   DeferredEntity,
   FilterType,
@@ -242,48 +248,19 @@ export const sortTypeByKey = (key: ImageSortKey): ImageSortKeyType => {
   }
 };
 
-export const updateRecord = <T extends string | number | symbol, K>(
+export const updateArrayRecord = <T extends string | number | symbol, K>(
   record: Record<T, K[]>,
   key: T,
-  value: K,
+  value: K | K[],
 ) => {
+  if (!Array.isArray(value)) {
+    value = [value];
+  }
   if (key in record) {
-    record[key].push(value);
+    record[key].push(...value);
   } else {
-    record[key] = [value];
+    record[key] = [...value];
   }
-};
-
-/*
-  CATEGORY HELPERS
-*/
-
-export const generateUUID = (options?: { definesUnknown: boolean }) => {
-  const id = uuidv4();
-  let unknownFlag: string;
-  if (options?.definesUnknown) {
-    unknownFlag = "0";
-  } else {
-    unknownFlag = "1";
-  }
-  return unknownFlag + id.slice(1);
-};
-
-export const isUnknownCategory = (categoryId: string) => {
-  return categoryId[0] === "0";
-};
-
-export const generateUnknownCategory = (kind: string) => {
-  const unknownCategoryId = generateUUID({ definesUnknown: true });
-  const unknownCategory: Category = {
-    id: unknownCategoryId,
-    name: UNKNOWN_CATEGORY_NAME,
-    color: UNKNOWN_IMAGE_CATEGORY_COLOR,
-    containing: [],
-    kind: kind,
-    visible: true,
-  };
-  return unknownCategory;
 };
 
 /*

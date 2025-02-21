@@ -9,9 +9,9 @@ import { dataSlice } from "store/data/dataSlice";
 import {
   getStackTraceFromError,
   getSubset,
-  isUnknownCategory,
   logger,
 } from "utils/common/helpers";
+import { isUnknownCategory } from "store/data/helpers";
 
 import { SimpleCNN, MobileNet } from "utils/models/classification";
 

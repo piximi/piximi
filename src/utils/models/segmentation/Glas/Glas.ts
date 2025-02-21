@@ -2,11 +2,11 @@ import { GraphModel, History, LayersModel } from "@tensorflow/tfjs";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessGlas } from "./preprocessGlas";
 import { predictGlas } from "./predictGlas";
-import { generateUUID } from "utils/common/helpers";
 import { LoadInferenceDataArgs } from "../../types";
 import { ModelTask } from "../../enums";
 import { Kind, ImageObject } from "store/data/types";
 import { loadGlas } from "./loadGlas";
+import { generateKind } from "store/data/helpers";
 
 const KIND_NAME = "glas_glands";
 export class Glas extends Segmenter {
@@ -56,13 +56,8 @@ export class Glas extends Segmenter {
         );
       this._fgKind = preprocessingArgs.kinds[0];
     } else if (!this._fgKind) {
-      const unknownCategoryId = generateUUID({ definesUnknown: true });
-      this._fgKind = {
-        id: KIND_NAME,
-        categories: [unknownCategoryId],
-        containing: [],
-        unknownCategoryId,
-      };
+      const { kind } = generateKind(KIND_NAME, true);
+      this._fgKind = kind;
     }
   }
 

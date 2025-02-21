@@ -3,9 +3,9 @@ import Image from "image-js";
 import { intersection } from "lodash";
 import {
   UNKNOWN_ANNOTATION_CATEGORY_ID,
-  UNKNOWN_CATEGORY_NAME,
   UNKNOWN_IMAGE_CATEGORY_ID,
 } from "store/data/constants";
+import { generateKind, isUnknownCategory } from "store/data/helpers";
 import {
   OldAnnotationType,
   OldCategory,
@@ -17,15 +17,11 @@ import {
   Shape,
   ShapeArray,
 } from "store/data/types";
-import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
 import {
   convertArrayToShape,
-  generateUnknownCategory,
-  generateUUID,
   getPropertiesFromImageSync,
-  isUnknownCategory,
+  logger,
 } from "utils/common/helpers";
-import { logger } from "utils/common/helpers";
 import { Partition } from "utils/models/enums";
 
 export const dataConverter_v01v02 = (data: {
@@ -45,25 +41,13 @@ export const dataConverter_v01v02 = (data: {
   };
   const kinds: EntityState<Kind, string> = { ids: [], entities: {} };
 
-  kinds.ids.push("Image");
-  const unknownCategoryId = generateUUID({ definesUnknown: true });
-  const unknownCategory: Category = {
-    id: unknownCategoryId,
-    name: UNKNOWN_CATEGORY_NAME,
-    color: UNKNOWN_IMAGE_CATEGORY_COLOR,
-    containing: [],
-    kind: "Image",
-    visible: true,
-  };
-  kinds.entities["Image"] = {
-    id: "Image",
-    containing: [],
-    categories: [unknownCategoryId],
-    unknownCategoryId,
-  };
+  const { kind: imageKind, unknownCategory } = generateKind("Image");
+  kinds.ids.push(imageKind.id);
 
-  categories.ids.push(unknownCategoryId);
-  categories.entities[unknownCategoryId] = {
+  kinds.entities[imageKind.id] = imageKind;
+
+  categories.ids.push(unknownCategory.id);
+  categories.entities[unknownCategory.id] = {
     ...unknownCategory,
     containing: [],
   };
@@ -91,11 +75,11 @@ export const dataConverter_v01v02 = (data: {
   }
 
   for (const image of images) {
-    image.kind = "Image";
-    kinds.entities["Image"].containing.push(image.id);
+    image.kind = imageKind.id;
+    kinds.entities[imageKind.id].containing.push(image.id);
     let cat: string;
     if (image.categoryId === UNKNOWN_IMAGE_CATEGORY_ID) {
-      cat = unknownCategoryId;
+      cat = unknownCategory.id;
     } else {
       cat = nonUnknownCategoryMap[image.categoryId] ?? image.categoryId;
     }
@@ -113,24 +97,13 @@ export const dataConverter_v01v02 = (data: {
   const anCat2KindNAme: Record<string, string> = {};
   for (const anCat of annotationCategories) {
     if (anCat.id === UNKNOWN_ANNOTATION_CATEGORY_ID) continue;
-    kinds.ids.push(anCat.name);
-    const unknownCategoryId = generateUUID({ definesUnknown: true });
-    const unknownCategory: Category = {
-      id: unknownCategoryId,
-      name: UNKNOWN_CATEGORY_NAME,
-      color: UNKNOWN_IMAGE_CATEGORY_COLOR,
-      containing: [],
-      kind: anCat.name,
-      visible: true,
-    };
-    kinds.entities[anCat.name] = {
-      id: anCat.name,
-      containing: [],
-      categories: [unknownCategoryId],
-      unknownCategoryId,
-    };
-    categories.ids.push(unknownCategoryId);
-    categories.entities[unknownCategoryId] = {
+
+    const { kind: anKind, unknownCategory } = generateKind(anCat.name);
+    kinds.ids.push(anKind.id);
+
+    kinds.entities[anKind.id] = anKind;
+    categories.ids.push(unknownCategory.id);
+    categories.entities[unknownCategory.id] = {
       ...unknownCategory,
       containing: [],
     };
@@ -216,15 +189,11 @@ export const convertAnnotationsWithExistingProject_v01v02 = async (
   oldAnnotationCategories.forEach((anCat) => {
     catId2Name[anCat.id] = anCat.name;
     if (!(anCat.name in existingKinds) && !(anCat.name in newKinds)) {
-      const newUnknownCategory = generateUnknownCategory(anCat.name);
+      const { kind: anKind, unknownCategory: newUnknownCategory } =
+        generateKind(anCat.name);
       newCategories[newUnknownCategory.id] = newUnknownCategory;
-      const kind: Kind = {
-        id: anCat.name,
-        containing: [],
-        categories: [newUnknownCategory.id],
-        unknownCategoryId: newUnknownCategory.id,
-      };
-      newKinds[anCat.name] = kind;
+
+      newKinds[anKind.id] = anKind;
     }
   });
   for await (const ann of oldAnnotations) {

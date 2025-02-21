@@ -1,22 +1,27 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, IconButton, List } from "@mui/material";
-import { Visibility, VisibilityOff, Add } from "@mui/icons-material";
+import { Visibility, VisibilityOff, Add, MoreHoriz } from "@mui/icons-material";
 
-import { useDialogHotkey } from "hooks";
+import { useDialogHotkey, useMenu } from "hooks";
 
-import { CollapsibleListItem } from "components/ui/CollapsibleListItem";
+import { CustomListItemButton, CollapsibleListItem } from "components/ui";
+import { CategoryDialog } from "components/dialogs";
 import { ImageViewerCategoryItem } from "./ImageViewerCategoryItem";
+import { EditableKindField } from "./EditableKindField";
 
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { selectFilteredImageViewerCategoryIds } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectCategoriesByKind } from "../state/annotator/reselectors";
+import { imageViewerSlice } from "../state/imageViewer";
+import { selectFilteredImageViewerCategoryIds } from "../state/imageViewer/selectors";
+import { annotatorSlice } from "../state/annotator";
+import {
+  selectCategoriesByKind,
+  selectImageViewerKinds,
+  renderImageViewerKindName,
+} from "../state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
-
-import { CategoryDialog } from "components/dialogs/CategoryDialog/CategoryDialog";
-import { annotatorSlice } from "../state/annotator";
-import { generateUUID } from "utils/common/helpers";
+import { generateUUID } from "store/data/helpers";
+import { KindMenu } from "./KindMenu";
 
 export const ImageViewerCategories = () => {
   const dispatch = useDispatch();
@@ -25,16 +30,26 @@ export const ImageViewerCategories = () => {
     () => Object.values(categoriesByKind),
     [categoriesByKind],
   );
+  const kindDict = useSelector(selectImageViewerKinds);
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);
+  const renderKindName = useSelector(renderImageViewerKindName);
   // NOTE: keep for quick checking if kind is hidden
   const [filteredKinds, setFilteredKinds] = useState<Array<string>>([]);
   const [selectedKind, setSelectedKind] = useState<string>();
+  const [editingKind, setEditingKind] = useState<string | undefined>(undefined);
+  const editingKindRef = useRef<HTMLInputElement>(null);
 
   const {
     onClose: handleCloseCreateCategoryDialog,
     onOpen: handleOpenCreateCategoryDialog,
     open: isCreateCategoryDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
+  const {
+    anchorEl: kindMenuAnchorEl,
+    onClose: handleCloseKindMenu,
+    onOpen: handleOpenKindMenu,
+    open: kindMenuOpened,
+  } = useMenu();
 
   const isKindFiltered = (kindId: string) => {
     //HACK: refactor -- O(n*m)
@@ -78,7 +93,7 @@ export const ImageViewerCategories = () => {
     handleOpenCreateCategoryDialog();
   };
 
-  const handleCreateCategory = (name: string, color: string, kind: string) => {
+  const handleCreateCategory = (kind: string, name: string, color: string) => {
     const newId = generateUUID();
     dispatch(
       annotatorSlice.actions.addCategories({
@@ -94,13 +109,61 @@ export const ImageViewerCategories = () => {
     );
   };
 
+  const handleUpdateKindName = (kindId: string, newDisplayName: string) => {
+    setEditingKind(undefined);
+    if (newDisplayName.length === 0) {
+      return;
+    }
+    dispatch(
+      annotatorSlice.actions.editKind({
+        kind: { id: kindId, displayName: newDisplayName },
+      }),
+    );
+  };
+
+  const handleMenuCloseAndDeselectKind = () => {
+    handleCloseKindMenu();
+    setSelectedKind(undefined);
+  };
+
+  const handleEditKind = () => {
+    handleCloseKindMenu();
+    setEditingKind(selectedKind);
+  };
+
+  const handleDeleteKind = (kindId: string) => {
+    dispatch(annotatorSlice.actions.deleteKind({ kind: kindDict[kindId] }));
+  };
+
+  const handleClearKindObjects = (kindId: string) => {
+    dispatch(
+      annotatorSlice.actions.deleteThings({
+        thingIds: kindDict[kindId].containing,
+      }),
+    );
+  };
+
+  useEffect(() => {
+    if (editingKind) {
+      editingKindRef.current?.focus();
+    }
+  }, [editingKind]);
+
   return (
     <>
       <List dense sx={{ py: 0 }}>
         {categoriesByKindArray.map(({ kindId, categories }) => {
           return (
             <CollapsibleListItem
-              primaryText={kindId}
+              disabledCollapse={editingKind === kindId}
+              primaryText={
+                <EditableKindField
+                  kindId={kindId}
+                  kindName={renderKindName(kindId)}
+                  isEditing={editingKind === kindId}
+                  onFinishedEditing={handleUpdateKindName}
+                />
+              }
               key={kindId}
               carotPosition="start"
               secondary={
@@ -118,10 +181,12 @@ export const ImageViewerCategories = () => {
                   <IconButton
                     disableRipple
                     onClick={(event) => {
-                      handleOpenCreateCategoryOfKind(event, kindId);
+                      event.stopPropagation();
+                      handleOpenKindMenu(event.currentTarget);
+                      setSelectedKind(kindId);
                     }}
                   >
-                    <Add fontSize="small" />
+                    <MoreHoriz fontSize="small" />
                   </IconButton>
                   <IconButton
                     disableRipple
@@ -147,18 +212,37 @@ export const ImageViewerCategories = () => {
                   />
                 );
               })}
+              <CustomListItemButton
+                primaryText="Add Category"
+                icon={<Add fontSize="small" />}
+                onClick={(event) =>
+                  handleOpenCreateCategoryOfKind(event, kindId)
+                }
+              />
             </CollapsibleListItem>
           );
         })}
       </List>
       {selectedKind && (
-        <CategoryDialog
-          kind={selectedKind}
-          onClose={handleCloseCreateCategoryDialog}
-          open={isCreateCategoryDialogOpen}
-          action="Create"
-          onConfirm={handleCreateCategory}
-        />
+        <>
+          <CategoryDialog
+            kind={selectedKind}
+            onClose={handleCloseCreateCategoryDialog}
+            open={isCreateCategoryDialogOpen}
+            action="create"
+            onConfirm={handleCreateCategory}
+          />
+
+          <KindMenu
+            anchorEl={kindMenuAnchorEl}
+            kindId={selectedKind}
+            onClose={handleMenuCloseAndDeselectKind}
+            opened={kindMenuOpened}
+            onEdit={handleEditKind}
+            deleteKind={handleDeleteKind}
+            clearObjects={handleClearKindObjects}
+          />
+        </>
       )}
     </>
   );

@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { Divider, useTheme, Box, List } from "@mui/material";
+import { useTheme, Box, List } from "@mui/material";
 
 import { useTranslation } from "hooks";
 import { useAnnotatorToolShortcuts } from "../../../hooks";
 
-import { Tool } from "../../../components";
+import { FlexRowBox, Tool } from "components/ui";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
@@ -23,7 +23,7 @@ import {
   selectActiveAnnotations,
   selectCategoriesArray,
 } from "views/ImageViewer/state/annotator/reselectors";
-import { PopoverTool } from "views/ImageViewer/components/Tool";
+import { PopoverTool } from "components/ui/Tool/Tool";
 import { groupBy } from "lodash";
 import { CustomListItemButton, DividerHeader } from "components/ui";
 import { Category } from "store/data/types";
@@ -105,34 +105,9 @@ export const SelectionOptions = () => {
   };
 
   return (
-    <Box>
-      <Divider orientation="vertical" flexItem />
-      <Tool name={t("Selection Tool")} onClick={handleSetSelectionTool}>
-        <Selection
-          color={
-            activeTool === ToolType.Pointer
-              ? theme.palette.primary.dark
-              : theme.palette.text.primary
-          }
-        />
-      </Tool>
-      <Tool
-        name={t("Select All")}
-        onClick={handleSelectAll}
-        tooltipLocation="left"
-      >
-        <SelectAllIcon />
-      </Tool>
-      <Tool
-        name={t("Deselect All")}
-        onClick={handleDeselectAll}
-        tooltipLocation="left"
-      >
-        <DeselectIcon />
-      </Tool>
+    <FlexRowBox>
       <PopoverTool
         name={t("Select By...")}
-        tooltipLocation="left"
         popoverElement={
           <Box sx={{ bgcolor: "background.paper", p: 1, minWidth: "200px" }}>
             {groupedCategories.map(([kind, categories]) => {
@@ -178,6 +153,22 @@ export const SelectionOptions = () => {
       >
         <LabelOutlinedIcon />
       </PopoverTool>
-    </Box>
+
+      <Tool name={t("Select All")} onClick={handleSelectAll}>
+        <SelectAllIcon />
+      </Tool>
+      <Tool name={t("Deselect All")} onClick={handleDeselectAll}>
+        <DeselectIcon />
+      </Tool>
+      <Tool name={t("Selection Tool")} onClick={handleSetSelectionTool}>
+        <Selection
+          color={
+            activeTool === ToolType.Pointer
+              ? theme.palette.primary.dark
+              : theme.palette.text.primary
+          }
+        />
+      </Tool>
+    </FlexRowBox>
   );
 };

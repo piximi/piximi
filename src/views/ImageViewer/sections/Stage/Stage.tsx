@@ -39,7 +39,7 @@ import {
   selectStagePosition,
 } from "../../state/imageViewer/selectors";
 
-import { generateUnknownCategory, generateUUID } from "utils/common/helpers";
+import { generateUnknownCategory, generateUUID } from "store/data/helpers";
 
 import { CATEGORY_COLORS } from "store/data/constants";
 import { dimensions } from "utils/common/constants";
@@ -129,6 +129,7 @@ export const Stage = ({
     }
     const newKind: Kind = {
       id: kindName,
+      displayName: kindName,
       categories: kindCategories.map((cat) => cat.id),
       containing: [],
       unknownCategoryId: newUnknownCategory.id,

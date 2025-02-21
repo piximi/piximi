@@ -82,14 +82,13 @@ export const selectThingFilters = ({ project }: { project: ProjectState }) => {
   return project.thingFilters;
 };
 
-export const selectActiveThingFilters = ({
-  project,
-}: {
-  project: ProjectState;
-}) => {
-  const activeKind = project.activeKind;
-  return project.thingFilters[activeKind] ?? {};
-};
+export const selectActiveThingFilters = createSelector(
+  selectActiveKindId,
+  selectThingFilters,
+  (activeKind, thingFilters) => {
+    return thingFilters[activeKind] ?? {};
+  },
+);
 export const selectActiveFilteredStateHasFilters = ({
   project,
 }: {

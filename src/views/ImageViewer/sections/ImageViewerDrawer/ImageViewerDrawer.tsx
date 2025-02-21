@@ -27,7 +27,6 @@ import { HotkeyContext } from "utils/common/enums";
 import { Category, Kind } from "store/data/types";
 
 export const ImageViewerDrawer = () => {
-  // const createdCategories = useSelector(selectCreatedAnnotationCategories);
   const dispatch = useDispatch();
   const imageViewerImages = useSelector(selectImagesArray);
   const kinds = useSelector(selectKindsArray);
@@ -77,6 +76,7 @@ export const ImageViewerDrawer = () => {
               <Add fontSize="small" />
             </IconButton>
           }
+          containerStyle={{ marginTop: 1, marginBottom: 0 }}
         />
 
         <ImageViewerCategories />

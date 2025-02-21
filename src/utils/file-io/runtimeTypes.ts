@@ -95,6 +95,7 @@ const SerializedCategoryRTypeV02 = IOTSType({
 });
 const SerializedKindRType = IOTSType({
   id: IOTSString,
+  displayName: IOTSString,
   categories: IOTSArray(IOTSString), // 3 byte hex, eg "#a08cd2"
   unknownCategoryId: IOTSString,
   containing: IOTSArray(IOTSString),

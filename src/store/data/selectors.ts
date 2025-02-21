@@ -59,6 +59,11 @@ export const selectObjectKindDict = createSelector(
   },
 );
 
+export const selectRenderKindName = createSelector(
+  selectKindDictionary,
+  (kinds) => (kindId: string) => kinds[kindId].displayName,
+);
+
 /*
   THINGS
 */

@@ -8,8 +8,7 @@ import {
 
 import { useImageViewerCategoryItemState } from "../hooks";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
-import { CountChip } from "components/ui/CountChip";
+import { CustomListItemButton, CountChip } from "components/ui/";
 import { CategoryItemMenu } from "components/categories/CategoryItemMenu";
 
 import { APPLICATION_COLORS } from "utils/common/constants";
@@ -32,6 +31,7 @@ export const ImageViewerCategoryItem = ({
     objectCount,
     handleSelect,
     handleToggleCategoryVisibility,
+    editCategory,
     deleteCategory,
     clearObjects,
   } = useImageViewerCategoryItemState(category);
@@ -91,6 +91,7 @@ export const ImageViewerCategoryItem = ({
         category={category}
         handleCloseCategoryMenu={handleCloseMenu}
         openCategoryMenu={Boolean(categoryMenuAnchorEl)}
+        editCategory={editCategory}
         deleteCategory={deleteCategory}
         clearObjects={clearObjects}
       />

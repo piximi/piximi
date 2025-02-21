@@ -5,9 +5,13 @@ import { Layers as LayersIcon } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
 
-import { CustomListItem, CustomListItemButton } from "components/ui";
+import {
+  CustomListItem,
+  CustomListItemButton,
+  FlexRowBox,
+} from "components/ui";
 import { IncrementalSlider } from "components/inputs";
-import { PopoverTool } from "views/ImageViewer/components/Tool";
+import { PopoverTool } from "components/ui/Tool/Tool";
 import { ChannelsList, ApplyColorsButton } from "views/ImageViewer/components";
 
 import { selectLoadMessage } from "store/applicationSettings/selectors";
@@ -65,10 +69,9 @@ export const ImageOptions = () => {
   };
 
   return (
-    <Box>
+    <FlexRowBox>
       <PopoverTool
         name={t("Channel Adjustment")}
-        tooltipLocation="left"
         popoverElement={
           <Box
             sx={{
@@ -94,11 +97,10 @@ export const ImageOptions = () => {
           </Box>
         }
       >
-        <ColorAdjustment color={theme.palette.text.primary} />
+        <ColorAdjustment color={theme.palette.action.active} />
       </PopoverTool>
       <PopoverTool
         name={t("Z-Stack")}
-        tooltipLocation="left"
         disabled={zStackLimits.max === 0}
         popoverElement={
           <Box
@@ -122,6 +124,6 @@ export const ImageOptions = () => {
       >
         <LayersIcon />
       </PopoverTool>
-    </Box>
+    </FlexRowBox>
   );
 };

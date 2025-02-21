@@ -53,6 +53,7 @@ export type Category = {
 
 export type Kind = {
   id: string;
+  displayName: string;
   containing: string[];
   categories: string[];
   unknownCategoryId: string;

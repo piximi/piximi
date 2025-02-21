@@ -10,12 +10,12 @@ import {
   OrphanedAnnotationObject,
 } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCellpose } from "./predictCellpose";
-import { generateUUID } from "utils/common/helpers";
 import { FitOptions } from "../../types";
 import { ModelTask } from "../../enums";
 import { getImageSlice } from "utils/common/tensorHelpers";
 import { Kind, ImageObject } from "store/data/types";
 import { LoadCB } from "utils/file-io/types";
+import { generateKind } from "store/data/helpers";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
@@ -101,13 +101,8 @@ export class Cellpose extends Segmenter {
         );
       this._fgKind = preprocessingArgs.kinds[0];
     } else if (!this._fgKind) {
-      const unknownCategoryId = generateUUID({ definesUnknown: true });
-      this._fgKind = {
-        id: KIND_NAME,
-        categories: [unknownCategoryId],
-        containing: [],
-        unknownCategoryId,
-      };
+      const { kind } = generateKind(KIND_NAME, true);
+      this._fgKind = kind;
     }
   }
 
