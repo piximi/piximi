@@ -3,7 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { annotatorSlice } from "../state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { selectImageViewerKinds } from "../state/annotator/reselectors";
+import {
+  selectImageViewerKinds,
+  selectImageViewerObjects,
+} from "../state/annotator/reselectors";
 import {
   selectFilteredImageViewerCategoryIds,
   selectHighligtedIVCatogory,
@@ -11,6 +14,7 @@ import {
 } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { Category } from "store/data/types";
+import { ProtoAnnotationObject } from "../utils/types";
 
 export const useImageViewerCategoryItemState = (category: Category) => {
   const [isSelected, setIsSelected] = useState<boolean>(false);
@@ -22,6 +26,7 @@ export const useImageViewerCategoryItemState = (category: Category) => {
   }, [category.containing]);
   const dispatch = useDispatch();
   const kindDictionary = useSelector(selectImageViewerKinds);
+  const things = useSelector(selectImageViewerObjects);
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);
   const selectedCategory = useSelector(selectSelectedIVCategoryId);
   const highlightedCategory = useSelector(selectHighligtedIVCatogory);
@@ -36,16 +41,16 @@ export const useImageViewerCategoryItemState = (category: Category) => {
 
   const deleteCategory = (category: Category, kindId: string) => {
     dispatch(
-      annotatorSlice.actions.deleteCategories({
-        categories: [category],
-        kind: kindDictionary[kindId],
+      annotatorSlice.actions.deleteCategory({
+        category: category,
+        associatedUnknownKind: kindDictionary[kindId].unknownCategoryId,
       }),
     );
   };
 
   const editCategory = (id: string, name: string, color: string) => {
     dispatch(
-      annotatorSlice.actions.editCategory({
+      annotatorSlice.actions.updateCategory({
         category: { id, name, color },
       }),
     );
@@ -54,7 +59,9 @@ export const useImageViewerCategoryItemState = (category: Category) => {
   const clearObjects = (category: Category) => {
     dispatch(
       annotatorSlice.actions.deleteThings({
-        thingIds: category.containing,
+        things: category.containing.map(
+          (thingId) => things[thingId] as ProtoAnnotationObject,
+        ),
       }),
     );
   };

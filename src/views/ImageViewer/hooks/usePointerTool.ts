@@ -6,7 +6,7 @@ import { useHotkeys } from "hooks/useHotkeys";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectActiveAnnotations } from "views/ImageViewer/state/annotator/reselectors";
+import { selectActiveAnnotationsArray } from "views/ImageViewer/state/annotator/reselectors";
 
 import { getOverlappingAnnotations } from "views/ImageViewer/utils";
 import { getAnnotationsInBox } from "views/ImageViewer/utils/imageHelper";
@@ -14,8 +14,7 @@ import { getAnnotationsInBox } from "views/ImageViewer/utils/imageHelper";
 import { ToolType } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/common/enums";
 
-import { Point } from "views/ImageViewer/utils/types";
-import { DecodedAnnotationObject } from "store/data/types";
+import { Point, ProtoAnnotationObject } from "views/ImageViewer/utils/types";
 
 const delta = 10;
 
@@ -27,7 +26,7 @@ export const usePointerTool = (
 ) => {
   const dispatch = useDispatch();
   const activeImageId = useSelector(selectActiveImageId);
-  const activeAnnotations = useSelector(selectActiveAnnotations);
+  const activeAnnotations = useSelector(selectActiveAnnotationsArray);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shift, setShift] = useState<boolean>(false);
   const [dragging, setDragging] = useState<boolean>(false);
@@ -155,11 +154,11 @@ export const usePointerTool = (
       !activeImageId
     )
       return;
-    let currentAnnotation: DecodedAnnotationObject | undefined;
+    let currentAnnotation: ProtoAnnotationObject | undefined;
 
     const overlappingAnnotationIds = getOverlappingAnnotations(
       absolutePosition,
-      activeAnnotations as DecodedAnnotationObject[],
+      activeAnnotations,
     );
 
     if (overlappingAnnotationIds.length === 0) {
@@ -179,13 +178,13 @@ export const usePointerTool = (
       const nextAnnotationId = overlappingAnnotationIds[currentIndex];
 
       currentAnnotation = activeAnnotations.find(
-        (annotation: DecodedAnnotationObject) => {
+        (annotation: ProtoAnnotationObject) => {
           return annotation.id === nextAnnotationId;
         },
       );
     } else {
       currentAnnotation = activeAnnotations.find(
-        (annotation: DecodedAnnotationObject) => {
+        (annotation: ProtoAnnotationObject) => {
           return annotation.id === overlappingAnnotationIds[0];
         },
       );

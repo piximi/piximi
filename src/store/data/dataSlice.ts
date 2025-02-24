@@ -1,6 +1,7 @@
 import {
   createEntityAdapter,
   createSlice,
+  Draft,
   EntityState,
   PayloadAction,
 } from "@reduxjs/toolkit";
@@ -10,7 +11,7 @@ import { difference, intersection } from "lodash";
 import {
   mutatingFilter,
   newReplaceDuplicateName,
-  updateArrayRecord,
+  updateRecordArray,
 } from "utils/common/helpers";
 import { generateUUID, generateKind, isUnknownCategory } from "./helpers";
 import { encode } from "views/ImageViewer/utils/rle";
@@ -57,6 +58,60 @@ export const initialState = (): DataState => {
   };
 };
 
+const gatherThings = (
+  state: Draft<DataState>,
+  payload:
+    | {
+        thingIds: Array<string> | "all" | "annotations";
+        activeKind?: string;
+        disposeColorTensors: boolean;
+      }
+    | {
+        ofKinds: Array<string>;
+        activeKind?: string;
+        disposeColorTensors: boolean;
+      }
+    | {
+        ofCategories: Array<string>;
+        activeKind: string;
+        disposeColorTensors: boolean;
+      },
+) => {
+  let explicitThingIds: string[] = [];
+
+  if ("thingIds" in payload) {
+    if (payload.thingIds === "all") {
+      explicitThingIds = state.things.ids as string[];
+    } else if (payload.thingIds === "annotations") {
+      explicitThingIds = state.kinds.ids.reduce((tIds: string[], kindId) => {
+        if (kindId !== "Image") {
+          tIds.push(...state.kinds.entities[kindId]!.containing);
+        }
+        return tIds;
+      }, []);
+    } else {
+      explicitThingIds = payload.thingIds;
+    }
+  } else if ("ofKinds" in payload) {
+    payload.ofKinds.forEach((kindId) => {
+      if (kindId in state.kinds.entities) {
+        explicitThingIds.push(...state.kinds.entities[kindId]!.containing);
+      }
+    });
+  } else {
+    //"ofCategories" in action.payload
+    payload.ofCategories.forEach((categoryId) => {
+      if (categoryId in state.categories.entities) {
+        const containedThings =
+          state.categories.entities[categoryId]!.containing;
+
+        explicitThingIds.push(...containedThings);
+      }
+    });
+  }
+  return explicitThingIds;
+};
+
 export const dataSlice = createSlice({
   name: "data",
   initialState: initialState,
@@ -101,6 +156,18 @@ export const dataSlice = createSlice({
 
         kindsAdapter.addOne(state.kinds, kind as Kind);
       }
+    },
+    // Exclusively updates kinds in store. Unsafe because it does not:
+    // - Reconcile existence (or lack thereof) of categories
+    // - Reconcile existence (or lack thereof) of things
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    updateKinds_unsafe(
+      state,
+      action: PayloadAction<{
+        updates: Array<{ id: string; changes: Omit<Partial<Kind>, "id"> }>;
+      }>,
+    ) {
+      kindsAdapter.updateMany(state.kinds, action.payload.updates);
     },
     updateKindContents(
       state,
@@ -172,6 +239,26 @@ export const dataSlice = createSlice({
         changes: { displayName: displayName },
       });
     },
+    // Exclusively removes kind. Unsafe because it does not:
+    // - Remove associated categories
+    // - Remove associated things
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    deleteKind_unsafe(state, action: PayloadAction<{ deletedKindId: string }>) {
+      const { deletedKindId } = action.payload;
+      if (!state.kinds.entities[deletedKindId] || deletedKindId === "Image")
+        return;
+      kindsAdapter.removeOne(state.kinds, deletedKindId);
+    },
+    // Exclusively removes kinds. Unsafe because it does not:
+    // - Remove associated categories
+    // - Remove associated things
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    deleteKinds_unsafe(state, action: PayloadAction<{ kindIds: string[] }>) {
+      const { kindIds } = action.payload;
+      if (kindIds.includes("Image")) return;
+
+      kindsAdapter.removeMany(state.kinds, kindIds);
+    },
     deleteKind(
       state,
       action: PayloadAction<{
@@ -189,7 +276,7 @@ export const dataSlice = createSlice({
 
       for (const thingId of associatedThings) {
         const thing = state.things.entities[thingId] as AnnotationObject;
-        updateArrayRecord(deletedThingsByImage, thing.imageId, thingId);
+        updateRecordArray(deletedThingsByImage, thing.imageId, thingId);
         dispose(thing.data as TensorContainer);
         thingsAdapter.removeOne(state.things, thingId);
       }
@@ -217,6 +304,19 @@ export const dataSlice = createSlice({
           payload: { deletedKindId: kindId },
         });
       }
+    },
+    // Exclusively add categories to store. Unsafe because it does not:
+    // - Update kind's category list
+    // - Check for duplicates
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    addCategories_unsafe(
+      state,
+      action: PayloadAction<{
+        categories: Array<Category>;
+      }>,
+    ) {
+      const { categories } = action.payload;
+      categoriesAdapter.addMany(state.categories, categories);
     },
     addCategories(
       state,
@@ -294,6 +394,15 @@ export const dataSlice = createSlice({
         }),
       );
     },
+    updateCategories_unsafe(
+      state,
+      action: PayloadAction<{
+        updates: Array<{ id: string; changes: Omit<Partial<Category>, "id"> }>;
+      }>,
+    ) {
+      const { updates } = action.payload;
+      categoriesAdapter.updateMany(state.categories, updates);
+    },
     updateCategory(
       state,
       action: PayloadAction<{
@@ -357,7 +466,25 @@ export const dataSlice = createSlice({
         },
       });
     },
-
+    // Exclusively removes categories store. Unsafe because it does not:
+    // - Update kind's category list
+    // - Recategorize associated things
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    deleteCategories_unsafe(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[] | "all";
+      }>,
+    ) {
+      let { categoryIds } = action.payload;
+      if (categoryIds === "all") {
+        categoryIds = state.categories.ids as string[];
+      }
+      const excludingUnknown = categoryIds.filter(
+        (id) => !isUnknownCategory(id),
+      );
+      categoriesAdapter.removeMany(state.categories, excludingUnknown);
+    },
     deleteCategories(
       state,
       action: PayloadAction<{
@@ -380,12 +507,12 @@ export const dataSlice = createSlice({
         const associatedKind = state.kinds.entities[associatedKindId];
         const associatedUnknownCategoryId = associatedKind!.unknownCategoryId;
 
-        updateArrayRecord(
+        updateRecordArray(
           removedCategoriesByKind,
           associatedKindId,
           categoryId,
         );
-        updateArrayRecord(
+        updateRecordArray(
           newUnknownThings,
           associatedUnknownCategoryId,
           category.containing,
@@ -476,7 +603,25 @@ export const dataSlice = createSlice({
         });
       }
     },
-
+    // Exclusively add thing to store. Unsafe because it does not:
+    // - Update kind's containing list
+    // - Update category's containing list
+    // - Update image's containing list
+    // - Check for duplicates
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    addThings_unsafe(
+      state,
+      action: PayloadAction<{
+        things: Array<ImageObject | AnnotationObject>;
+      }>,
+    ) {
+      const { things } = action.payload;
+      for (const readOnlyThing of things) {
+        const thing = { ...readOnlyThing };
+        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
+        thingsAdapter.addOne(state.things, thing);
+      }
+    },
     addThings(
       state,
       action: PayloadAction<{
@@ -491,7 +636,7 @@ export const dataSlice = createSlice({
         const existingImageIds =
           state.kinds.entities[thing.kind]?.containing ?? [];
 
-        const existingPrefixes = Object.values(existingImageIds).map(
+        const existingPrefixes = existingImageIds.map(
           (id) => (state.things.entities[id]!.name as string).split(".")[0],
         );
 
@@ -570,6 +715,25 @@ export const dataSlice = createSlice({
         // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
         thingsAdapter.addOne(state.things, thing);
       }
+    },
+    // Exclusively add annotations to store. Unsafe because it does not:
+    // - Update kind's containing list
+    // - Update category's containing list
+    // - Update image's containing list
+    // - Check for duplicates
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    addAnnotations_unsafe(
+      state,
+      action: PayloadAction<{
+        annotations: Array<AnnotationObject>;
+      }>,
+    ) {
+      const { annotations } = action.payload;
+
+      dataSlice.caseReducers.addThings_unsafe(state, {
+        type: "addThings_unsafe",
+        payload: { things: annotations },
+      });
     },
     addAnnotations(
       state,
@@ -659,7 +823,31 @@ export const dataSlice = createSlice({
         },
       });
     },
+    // Exclusively updates things in store. Unsafe because it does not:
+    // - Update category's containing list
+    // - Update image's containing list
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    updateThings_unsafe(
+      state,
+      action: PayloadAction<{
+        updates: Array<{
+          id: string;
+          changes: Omit<Partial<ImageObject | AnnotationObject>, "id">;
+        }>;
+      }>,
+    ) {
+      const { updates } = action.payload;
 
+      for (const update of updates) {
+        const { id, ...changes } = update;
+        if ("data" in changes) {
+          dispose(state.things.entities[id]!.data as TensorContainer);
+        }
+      }
+
+      // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
+      thingsAdapter.updateMany(state.things, updates);
+    },
     updateThings(
       state,
       action: PayloadAction<{
@@ -735,6 +923,21 @@ export const dataSlice = createSlice({
         payload: { updates: changes },
       });
     },
+    // Exclusively updates image contents store. Unsafe because it does not:
+    // - Confirm existence (or lack thereof) of annotations
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    updateImageContents_unsafe(
+      state,
+      action: PayloadAction<{
+        updates: Array<{
+          id: string;
+          changes: Omit<Partial<ImageObject>, "id">;
+        }>;
+      }>,
+    ) {
+      const { updates } = action.payload;
+      thingsAdapter.updateMany(state.things, updates);
+    },
     updateThingContents(
       state,
       action: PayloadAction<{
@@ -765,6 +968,45 @@ export const dataSlice = createSlice({
           changes: { containing: newContents },
         });
       }
+    },
+    // Exclusively removes things from store. Unsafe because it does not:
+    // - Update kind's containing list
+    // - Update category's containing list
+    // - Update image's containing list
+    // - Check for duplicates
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    deleteThings_unsafe(
+      state,
+      action: PayloadAction<
+        | {
+            thingIds: Array<string> | "all" | "annotations";
+            activeKind?: string;
+            disposeColorTensors: boolean;
+          }
+        | {
+            ofKinds: Array<string>;
+            activeKind?: string;
+            disposeColorTensors: boolean;
+          }
+        | {
+            ofCategories: Array<string>;
+            activeKind: string;
+            disposeColorTensors: boolean;
+          }
+      >,
+    ) {
+      const explicitThingIds = gatherThings(state, action.payload);
+
+      for (const thingId of explicitThingIds) {
+        const thing = state.things.entities[thingId];
+        if (!thing) continue;
+        dispose(thing.data as TensorContainer);
+
+        if (action.payload.disposeColorTensors && "colors" in thing) {
+          dispose(thing.colors.color as TensorContainer);
+        }
+      }
+      thingsAdapter.removeMany(state.things, explicitThingIds);
     },
     deleteThings(
       state,

@@ -9,10 +9,11 @@ import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors
 
 import { hexToRGBA, colorOverlayROI, encode } from "views/ImageViewer/utils";
 
-import { DecodedAnnotationObject, Shape } from "store/data/types";
+import { ProtoAnnotationObject } from "views/ImageViewer/utils/types";
+import { Shape } from "store/data/types";
 
 type AnnotationProps = {
-  annotation: DecodedAnnotationObject;
+  annotation: ProtoAnnotationObject;
   imageShape: Shape;
   fillColor: string;
   selected?: boolean;

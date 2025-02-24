@@ -5,6 +5,7 @@ import { kindsAdapter, categoriesAdapter, thingsAdapter } from "./dataSlice";
 import { RootState } from "store/rootReducer";
 
 import { AnnotationObject, Category, ImageObject, Kind } from "./types";
+import { DataState } from "store/types";
 
 const kindsSelectors = kindsAdapter.getSelectors(
   (state: RootState) => state.data.kinds,
@@ -31,6 +32,8 @@ export const selectThingsDictionary = thingsSelectors.selectEntities; // returns
 export const selectAllThings = thingsSelectors.selectAll; // returns an array
 export const selectAllThingIds = thingsSelectors.selectIds;
 export const selectTotalThingCount = thingsSelectors.selectTotal;
+
+export const selectDataState = ({ data }: { data: DataState }) => data;
 
 export const selectDataProject = createSelector(
   selectAllKinds,
@@ -75,6 +78,15 @@ export const selectAllImages = createSelector(selectAllThings, (things) => {
 export const selectAllObjects = createSelector(selectAllThings, (things) => {
   return things.filter((thing) => thing.kind !== "Image") as AnnotationObject[];
 });
+export const selectObjectDict = createSelector(
+  selectAllObjects,
+  (objects): Record<string, AnnotationObject> => {
+    return objects.reduce((objDict: Record<string, AnnotationObject>, obj) => {
+      objDict[obj.id] = obj;
+      return objDict;
+    }, {});
+  },
+);
 
 export const selectSplitThingDict = createSelector(
   selectAllThings,
