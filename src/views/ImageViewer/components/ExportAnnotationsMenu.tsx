@@ -9,7 +9,6 @@ import { useDialogHotkey } from "hooks";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { ExportAnnotationsDialog } from "components/dialogs";
 
-import { annotatorSlice } from "../state/annotator";
 import {
   selectAllObjectCategories,
   selectAllObjectKinds,
@@ -20,10 +19,10 @@ import { selectProjectName } from "store/project/selectors";
 import { selectHasUnsavedChanges } from "views/ImageViewer/state/imageViewer/selectors";
 import {
   selectImageViewerObjects,
-  selectImageViewerObjectDict,
+  selectImageViewerObjectsArray,
 } from "views/ImageViewer/state/annotator/reselectors";
 import {
-  selectImages,
+  selectImageViewerImages,
   selectImagesArray,
 } from "../state/annotator/reselectors";
 
@@ -86,11 +85,12 @@ export const ExportAnnotationsMenu = ({
   open,
   selectedImage,
 }: ExportAnnotationsMenuProps) => {
-  const dispatch = useDispatch();
+  const dataState = useSelector(selectDataState);
+  const annotatorChanges = useSelector(selectChanges);
   const images = useSelector(selectImagesArray);
-  const imageDict = useSelector(selectImages);
-  const annotations = useSelector(selectImageViewerObjects);
-  const annotationDict = useSelector(selectImageViewerObjectDict);
+  const imageDict = useSelector(selectImageViewerImages);
+  const annotations = useSelector(selectImageViewerObjectsArray);
+  const annotationDict = useSelector(selectImageViewerObjects);
   const annotationCategories = useSelector(selectAllObjectCategories);
   const annotationCategoryDict = useSelector(selectObjectCategoryDict);
   const projectName = useSelector(selectProjectName);
@@ -113,8 +113,8 @@ export const ExportAnnotationsMenu = ({
     onClose();
   };
 
-  const handleSaveChanges = () => {
-    dispatch(annotatorSlice.actions.reconcileChanges({}));
+  const handleSaveChanges = async () => {
+    await reconcileChanges(dataState, annotatorChanges);
     handleOpenExportAnnotationsDialog();
   };
 

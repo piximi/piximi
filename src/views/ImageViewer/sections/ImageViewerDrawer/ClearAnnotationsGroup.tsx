@@ -12,7 +12,11 @@ import { CustomListItemButton } from "components/ui";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectSelectedAnnotationIds } from "views/ImageViewer/state/annotator/selectors";
-import { selectActiveImageObjectIds } from "views/ImageViewer/state/annotator/reselectors";
+import {
+  selectActiveAnnotationsArray,
+  selectActiveImageObjectIds,
+  selectSelectedActiveAnnotations,
+} from "views/ImageViewer/state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
 
@@ -20,7 +24,11 @@ type DeleteType = "ALL" | "SELECTED";
 export const ClearAnnotationsGroup = () => {
   const dispatch = useDispatch();
   const selectedAnnotationIds = useSelector(selectSelectedAnnotationIds);
+  const activeSelectedAnnotations = useSelector(
+    selectSelectedActiveAnnotations,
+  );
   const activeAnnotationsIds = useSelector(selectActiveImageObjectIds);
+  const activeAnnotations = useSelector(selectActiveAnnotationsArray);
   const [deleteOp, setDeleteOp] = useState<DeleteType>();
 
   const selectedActiveAnnotationIds = useMemo(() => {
@@ -56,7 +64,7 @@ export const ClearAnnotationsGroup = () => {
         );
         dispatch(
           annotatorSlice.actions.deleteThings({
-            thingIds: activeAnnotationsIds,
+            things: activeAnnotations,
           }),
         );
       } else {
@@ -73,7 +81,7 @@ export const ClearAnnotationsGroup = () => {
         );
         dispatch(
           annotatorSlice.actions.deleteThings({
-            thingIds: selectedAnnotationIds,
+            things: activeSelectedAnnotations,
           }),
         );
       }
