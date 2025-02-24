@@ -6,6 +6,9 @@ import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
+import { reconcileChanges } from "views/ImageViewer/utils/annotationUtils";
+import { selectDataState } from "store/data/selectors";
+import { selectChanges } from "views/ImageViewer/state/annotator/selectors";
 
 type ExitAnnotatorDialogProps = {
   returnToProject: () => void;
@@ -19,10 +22,13 @@ export const ExitAnnotatorDialog = ({
   open,
 }: ExitAnnotatorDialogProps) => {
   const dispatch = useDispatch();
-
+  const dataState = useSelector(selectDataState);
+  const annotatorChanges = useSelector(selectChanges);
   const activeImageId = useSelector(selectActiveImageId);
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
+    await reconcileChanges(dataState, annotatorChanges);
+
     batch(() => {
       dispatch(
         imageViewerSlice.actions.setActiveImageId({
@@ -30,7 +36,6 @@ export const ExitAnnotatorDialog = ({
           prevImageId: activeImageId,
         }),
       );
-      dispatch(annotatorSlice.actions.reconcileChanges({}));
       dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
       dispatch(
         annotatorSlice.actions.setSelectedAnnotationIds({
@@ -54,9 +59,7 @@ export const ExitAnnotatorDialog = ({
           prevImageId: activeImageId,
         }),
       );
-      dispatch(
-        annotatorSlice.actions.reconcileChanges({ discardChanges: true }),
-      );
+      dispatch(annotatorSlice.actions.resetChanges());
       dispatch(
         annotatorSlice.actions.setSelectedAnnotationIds({
           annotationIds: [],
