@@ -1,5 +1,5 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { difference, intersection, isEqual } from "lodash";
+import { difference, intersection } from "lodash";
 
 import { annotatorSlice } from "../annotator";
 import { dataSlice } from "store/data";
@@ -10,7 +10,6 @@ import { createRenderedTensor } from "utils/common/tensorHelpers";
 
 import { AnnotationObject, ImageObject } from "store/data/types";
 import { TypedAppStartListening } from "store/types";
-import { initialState as annotatorInitialState } from "../annotator/annotatorSlice";
 
 export const imageViewerMiddleware = createListenerMiddleware();
 const startAppListening =
@@ -154,41 +153,5 @@ startAppListening({
         );
       }
     });
-  },
-});
-
-startAppListening({
-  predicate: (action, currentState, previousState) => {
-    if (action.type.split("/")[0] !== "annotator") return false;
-    const currentChanges = currentState.annotator.changes;
-    const previousChanges = previousState.annotator.changes;
-    return !isEqual(currentChanges, previousChanges);
-  },
-  effect: (action, listenerAPI) => {
-    const annotatorState = listenerAPI.getState().annotator;
-    if (isEqual(annotatorState.changes, annotatorInitialState.changes)) {
-      listenerAPI.dispatch(
-        imageViewerSlice.actions.setHasUnsavedChanges({
-          hasUnsavedChanges: false,
-        }),
-      );
-    } else {
-      listenerAPI.dispatch(
-        imageViewerSlice.actions.setHasUnsavedChanges({
-          hasUnsavedChanges: true,
-        }),
-      );
-    }
-  },
-});
-
-startAppListening({
-  actionCreator: annotatorSlice.actions.reconcileChanges,
-  effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(
-      imageViewerSlice.actions.setHasUnsavedChanges({
-        hasUnsavedChanges: false,
-      }),
-    );
   },
 });

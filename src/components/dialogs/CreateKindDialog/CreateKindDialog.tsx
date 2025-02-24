@@ -60,11 +60,6 @@ export const CreateKindDialog = ({
 
   const handleConfirm = () => {
     const { kind, unknownCategory } = generateKind(name, true);
-    kind.categories.push(...withContainedCategories);
-    if (withContainedThings) {
-      kind.containing.push(...withContainedThings);
-    }
-
     storeDispatch(kind, unknownCategory);
     secondaryAction && secondaryAction();
 

@@ -113,7 +113,7 @@ export type ProjectState = {
   imageChannels: number | undefined;
 };
 
-type AppState = {
+export type AppState = {
   classifier: ClassifierState;
   segmenter: SegmenterState;
   imageViewer: ImageViewerState;

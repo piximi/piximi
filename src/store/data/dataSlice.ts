@@ -1,6 +1,7 @@
 import {
   createEntityAdapter,
   createSlice,
+  Draft,
   EntityState,
   PayloadAction,
 } from "@reduxjs/toolkit";
@@ -10,7 +11,7 @@ import { difference, intersection } from "lodash";
 import {
   mutatingFilter,
   newReplaceDuplicateName,
-  updateArrayRecord,
+  updateRecordArray,
 } from "utils/common/helpers";
 import { generateUUID, generateKind, isUnknownCategory } from "./helpers";
 import { encode } from "views/ImageViewer/utils/rle";
@@ -238,6 +239,26 @@ export const dataSlice = createSlice({
         changes: { displayName: displayName },
       });
     },
+    // Exclusively removes kind. Unsafe because it does not:
+    // - Remove associated categories
+    // - Remove associated things
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    deleteKind_unsafe(state, action: PayloadAction<{ deletedKindId: string }>) {
+      const { deletedKindId } = action.payload;
+      if (!state.kinds.entities[deletedKindId] || deletedKindId === "Image")
+        return;
+      kindsAdapter.removeOne(state.kinds, deletedKindId);
+    },
+    // Exclusively removes kinds. Unsafe because it does not:
+    // - Remove associated categories
+    // - Remove associated things
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    deleteKinds_unsafe(state, action: PayloadAction<{ kindIds: string[] }>) {
+      const { kindIds } = action.payload;
+      if (kindIds.includes("Image")) return;
+
+      kindsAdapter.removeMany(state.kinds, kindIds);
+    },
     deleteKind(
       state,
       action: PayloadAction<{
@@ -255,7 +276,7 @@ export const dataSlice = createSlice({
 
       for (const thingId of associatedThings) {
         const thing = state.things.entities[thingId] as AnnotationObject;
-        updateArrayRecord(deletedThingsByImage, thing.imageId, thingId);
+        updateRecordArray(deletedThingsByImage, thing.imageId, thingId);
         dispose(thing.data as TensorContainer);
         thingsAdapter.removeOne(state.things, thingId);
       }
@@ -283,6 +304,19 @@ export const dataSlice = createSlice({
           payload: { deletedKindId: kindId },
         });
       }
+    },
+    // Exclusively add categories to store. Unsafe because it does not:
+    // - Update kind's category list
+    // - Check for duplicates
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    addCategories_unsafe(
+      state,
+      action: PayloadAction<{
+        categories: Array<Category>;
+      }>,
+    ) {
+      const { categories } = action.payload;
+      categoriesAdapter.addMany(state.categories, categories);
     },
     addCategories(
       state,
@@ -473,12 +507,12 @@ export const dataSlice = createSlice({
         const associatedKind = state.kinds.entities[associatedKindId];
         const associatedUnknownCategoryId = associatedKind!.unknownCategoryId;
 
-        updateArrayRecord(
+        updateRecordArray(
           removedCategoriesByKind,
           associatedKindId,
           categoryId,
         );
-        updateArrayRecord(
+        updateRecordArray(
           newUnknownThings,
           associatedUnknownCategoryId,
           category.containing,
@@ -602,7 +636,7 @@ export const dataSlice = createSlice({
         const existingImageIds =
           state.kinds.entities[thing.kind]?.containing ?? [];
 
-        const existingPrefixes = Object.values(existingImageIds).map(
+        const existingPrefixes = existingImageIds.map(
           (id) => (state.things.entities[id]!.name as string).split(".")[0],
         );
 
@@ -933,6 +967,45 @@ export const dataSlice = createSlice({
           id: thingId,
           changes: { containing: newContents },
         });
+      }
+      thingsAdapter.removeMany(state.things, explicitThingIds);
+    },
+    // Exclusively removes things from store. Unsafe because it does not:
+    // - Update kind's containing list
+    // - Update category's containing list
+    // - Update image's containing list
+    // - Check for duplicates
+    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
+    deleteThings_unsafe(
+      state,
+      action: PayloadAction<
+        | {
+            thingIds: Array<string> | "all" | "annotations";
+            activeKind?: string;
+            disposeColorTensors: boolean;
+          }
+        | {
+            ofKinds: Array<string>;
+            activeKind?: string;
+            disposeColorTensors: boolean;
+          }
+        | {
+            ofCategories: Array<string>;
+            activeKind: string;
+            disposeColorTensors: boolean;
+          }
+      >,
+    ) {
+      const explicitThingIds = gatherThings(state, action.payload);
+
+      for (const thingId of explicitThingIds) {
+        const thing = state.things.entities[thingId];
+        if (!thing) continue;
+        dispose(thing.data as TensorContainer);
+
+        if (action.payload.disposeColorTensors && "colors" in thing) {
+          dispose(thing.colors.color as TensorContainer);
+        }
       }
       thingsAdapter.removeMany(state.things, explicitThingIds);
     },

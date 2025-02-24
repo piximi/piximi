@@ -14,7 +14,7 @@ import {
   selectSelectedThingIds,
 } from "./selectors";
 
-import { updateArrayRecord } from "utils/common/helpers";
+import { updateRecordArray } from "utils/common/helpers";
 import { isUnknownCategory } from "store/data/helpers";
 
 import { CATEGORY_COLORS } from "utils/common/constants";
@@ -229,16 +229,16 @@ export const selectActiveThingsByPartition = createSelector(
       ) => {
         switch (thing.partition) {
           case Partition.Inference:
-            updateArrayRecord(byPartition, Partition.Inference, thing);
+            updateRecordArray(byPartition, Partition.Inference, thing);
             break;
           case Partition.Training:
-            updateArrayRecord(byPartition, Partition.Training, thing);
+            updateRecordArray(byPartition, Partition.Training, thing);
             break;
           case Partition.Unassigned:
-            updateArrayRecord(byPartition, Partition.Unassigned, thing);
+            updateRecordArray(byPartition, Partition.Unassigned, thing);
             break;
           case Partition.Validation:
-            updateArrayRecord(byPartition, Partition.Validation, thing);
+            updateRecordArray(byPartition, Partition.Validation, thing);
             break;
         }
         return byPartition;
