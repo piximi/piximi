@@ -10,7 +10,8 @@ import { ExportAnnotationsMenu } from "../../components/ExportAnnotationsMenu";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 
-import { ImageObject } from "store/data/types";
+import { DecodedAnnotationObject, ImageObject } from "store/data/types";
+import { selectImageViewerObjects } from "views/ImageViewer/state/annotator/reselectors";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
@@ -39,7 +40,9 @@ export const ImageMenu = ({
     );
     dispatch(
       annotatorSlice.actions.deleteThings({
-        thingIds: selectedImage.containing,
+        things: selectedImage.containing.map(
+          (id) => annotationDict[id] as DecodedAnnotationObject,
+        ),
       }),
     );
 

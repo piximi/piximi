@@ -125,7 +125,7 @@ Given a click at a position, return all overlapping annotations ids
  */
 export const getOverlappingAnnotations = (
   position: { x: number; y: number },
-  annotations: Array<DecodedAnnotationObject>,
+  annotations: Array<ProtoAnnotationObject>,
 ) => {
   const overlappingAnnotations = annotations.filter(
     (annotation: ProtoAnnotationObject) => {
@@ -161,7 +161,7 @@ export const getOverlappingAnnotations = (
 export const getAnnotationsInBox = (
   minimum: { x: number; y: number },
   maximum: { x: number; y: number },
-  annotations: Array<DecodedAnnotationObject>,
+  annotations: Array<ProtoAnnotationObject>,
 ) => {
   return annotations.filter((annotation: ProtoAnnotationObject) => {
     return (

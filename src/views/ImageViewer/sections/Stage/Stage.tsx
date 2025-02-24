@@ -32,7 +32,10 @@ import {
   selectAnnotationState,
   selectToolType,
 } from "../../state/annotator/selectors";
-import { selectActiveImage } from "../../state/annotator/reselectors";
+import {
+  selectActiveImage,
+  selectImageViewerObjectsArray,
+} from "../../state/annotator/reselectors";
 import {
   selectActiveImageId,
   selectActiveImageRenderedSrcs,
@@ -40,15 +43,16 @@ import {
   selectStagePosition,
 } from "../../state/imageViewer/selectors";
 
-import { generateUnknownCategory, generateUUID } from "store/data/helpers";
+import { generateKind, generateUUID } from "store/data/helpers";
 
 import { CATEGORY_COLORS } from "store/data/constants";
 import { dimensions } from "utils/common/constants";
 import { AnnotationState, ToolType } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/common/enums";
 
-import { Category, Kind } from "store/data/types";
-import { NewKindDialog } from "views/ImageViewer/components/dialogs/NewKindDialog";
+import { Category } from "store/data/types";
+import { createProtoAnnotation } from "views/ImageViewer/utils/annotationUtils";
+import { Partition } from "utils/models/enums";
 
 export const Stage = ({
   stageWidth,
@@ -130,25 +134,12 @@ export const Stage = ({
         kind: newKind.id,
       };
     }
-    const newKind: Kind = {
-      id: kindName,
-      displayName: kindName,
-      categories: kindCategories.map((cat) => cat.id),
-      containing: [],
-      unknownCategoryId: newUnknownCategory.id,
-    };
 
     batch(() => {
       dispatch(
-        annotatorSlice.actions.addCategories({
-          categories: kindCategories,
-        }),
-      );
-
-      dispatch(
         annotatorSlice.actions.addKind({
           kind: newKind,
-          unknownCategory: newUnknownCategory,
+          unknownCategory: unknownCategory,
         }),
       );
       if (newCategory) {
@@ -160,14 +151,31 @@ export const Stage = ({
       }
       dispatch(
         imageViewerSlice.actions.setSelectedCategoryId({
-          selectedCategoryId: kindCategories.at(-1)!.id,
+          selectedCategoryId: newCategory ? newCategory.id : unknownCategory.id,
         }),
       );
     });
-    annotationTool.annotate(
-      kindCategories.at(-1)!,
-      activeImage!.activePlane,
-      activeImageId!,
+    if (!activeImage) throw new Error("Active image not found");
+    if (!annotationTool.decodedMask) throw new Error("No mask found");
+    if (!annotationTool.boundingBox) throw new Error("No bounding box found");
+
+    const newAnnotation = await createProtoAnnotation(
+      {
+        boundingBox: annotationTool.boundingBox,
+        categoryId: (newCategory ?? unknownCategory).id,
+        imageId: activeImage.id,
+        decodedMask: annotationTool.decodedMask,
+        activePlane: activeImage.activePlane,
+        partition: Partition.Unassigned,
+      },
+      activeImage,
+      newKind,
+      existingObjects.map((obj) => obj.name),
+    );
+    dispatch(
+      annotatorSlice.actions.setWorkingAnnotation({
+        annotation: newAnnotation,
+      }),
     );
     dispatch(
       annotatorSlice.actions.setAnnotationState({

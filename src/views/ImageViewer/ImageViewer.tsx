@@ -23,19 +23,10 @@ import { AlertType, HotkeyContext } from "utils/common/enums";
 export const ImageViewer = () => {
   const dispatch = useDispatch();
   const routerLocation = useLocation();
-
   const stageRef = useRef<Konva.Stage>(null);
   const isMobile = useMobileView();
   const alertState = useSelector(selectAlertState);
-
-  const onUnload = (e: any) => {
-    if (import.meta.env.DEV) {
-      return;
-    } else {
-      e.preventDefault();
-      return (e.returnValue = "Are you sure you want to exit?");
-    }
-  };
+  useUnloadConfirmation();
 
   const handleError = useCallback(
     async (e: any) => {
@@ -74,13 +65,6 @@ export const ImageViewer = () => {
   );
 
   useEffect(() => {
-    dispatch(
-      imageViewerSlice.actions.prepareImageViewer({
-        selectedThingIds: routerLocation.state?.initialThingIds
-          ? routerLocation.state.initialThingIds
-          : [],
-      }),
-    );
     dispatch(
       imageViewerSlice.actions.prepareImageViewer({
         selectedThingIds: routerLocation.state?.initialThingIds

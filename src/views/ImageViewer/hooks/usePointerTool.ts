@@ -6,7 +6,7 @@ import { useHotkeys } from "hooks/useHotkeys";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectActiveAnnotations } from "views/ImageViewer/state/annotator/reselectors";
+import { selectActiveAnnotationsArray } from "views/ImageViewer/state/annotator/reselectors";
 
 import { getOverlappingAnnotations } from "views/ImageViewer/utils";
 import { getAnnotationsInBox } from "views/ImageViewer/utils/imageHelper";
@@ -14,8 +14,7 @@ import { getAnnotationsInBox } from "views/ImageViewer/utils/imageHelper";
 import { ToolType } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/common/enums";
 
-import { Point } from "views/ImageViewer/utils/types";
-import { DecodedAnnotationObject } from "store/data/types";
+import { Point, ProtoAnnotationObject } from "views/ImageViewer/utils/types";
 
 const delta = 10;
 
@@ -159,7 +158,7 @@ export const usePointerTool = (
 
     const overlappingAnnotationIds = getOverlappingAnnotations(
       absolutePosition,
-      activeAnnotations as DecodedAnnotationObject[],
+      activeAnnotations,
     );
 
     if (overlappingAnnotationIds.length === 0) {
