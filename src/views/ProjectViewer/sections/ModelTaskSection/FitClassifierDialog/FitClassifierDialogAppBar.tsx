@@ -118,7 +118,6 @@ export const FitClassifierDialogAppBar = ({
             color="primary"
             onClick={closeDialog}
             aria-label="Close"
-            href={""}
           >
             <Close />
           </IconButton>
@@ -153,6 +152,7 @@ export const FitClassifierDialogAppBar = ({
                 onClick={handleFit}
                 disabled={noLabels || noTrain}
                 startIcon={<PlayCircleOutline />}
+                sx={{ mr: 1 }}
               >
                 Fit Classifier
               </Button>
