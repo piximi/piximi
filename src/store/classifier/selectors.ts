@@ -23,18 +23,17 @@ export const selectClassifier = ({
   return classifier;
 };
 
-export const selectClassifierCompileOptions = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): CompileOptions => {
-  return {
-    learningRate: classifier.learningRate,
-    lossFunction: classifier.lossFunction,
-    metrics: classifier.metrics,
-    optimizationAlgorithm: classifier.optimizationAlgorithm,
-  };
-};
+export const selectClassifierCompileOptions = createSelector(
+  selectClassifier,
+  (classifier): CompileOptions => {
+    return {
+      learningRate: classifier.learningRate,
+      lossFunction: classifier.lossFunction,
+      metrics: classifier.metrics,
+      optimizationAlgorithm: classifier.optimizationAlgorithm,
+    };
+  },
+);
 
 export const selectClassifierCropOptions = ({
   classifier,
