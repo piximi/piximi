@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 // import JSZip from "jszip";
 import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
@@ -10,7 +10,8 @@ import { ExportAnnotationsMenu } from "../../components/ExportAnnotationsMenu";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 
-import { ImageObject } from "store/data/types";
+import { DecodedAnnotationObject, ImageObject } from "store/data/types";
+import { selectImageViewerObjects } from "views/ImageViewer/state/annotator/reselectors";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
@@ -26,6 +27,7 @@ export const ImageMenu = ({
   openImageMenu,
 }: ImageMenuProps) => {
   const dispatch = useDispatch();
+  const annotationDict = useSelector(selectImageViewerObjects);
 
   const handleClearAnnotations = (
     event: React.MouseEvent<HTMLElement, MouseEvent>,
@@ -38,7 +40,9 @@ export const ImageMenu = ({
     );
     dispatch(
       annotatorSlice.actions.deleteThings({
-        thingIds: selectedImage.containing,
+        things: selectedImage.containing.map(
+          (id) => annotationDict[id] as DecodedAnnotationObject,
+        ),
       }),
     );
 

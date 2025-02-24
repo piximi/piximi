@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import { ListItemText, Menu, MenuItem } from "@mui/material";
@@ -9,20 +9,20 @@ import { useDialogHotkey } from "hooks";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { ExportAnnotationsDialog } from "components/dialogs";
 
-import { annotatorSlice } from "../state/annotator";
 import {
   selectAllObjectCategories,
   selectAllObjectKinds,
+  selectDataState,
   selectObjectCategoryDict,
 } from "store/data/selectors";
 import { selectProjectName } from "store/project/selectors";
 import { selectHasUnsavedChanges } from "views/ImageViewer/state/imageViewer/selectors";
 import {
   selectImageViewerObjects,
-  selectImageViewerObjectDict,
+  selectImageViewerObjectsArray,
 } from "views/ImageViewer/state/annotator/reselectors";
 import {
-  selectImages,
+  selectImageViewerImages,
   selectImagesArray,
 } from "../state/annotator/reselectors";
 
@@ -35,6 +35,8 @@ import { HotkeyContext } from "utils/common/enums";
 import { AnnotationExportType } from "utils/file-io/enums";
 import { exportAnnotationMasks } from "utils/file-io/export/annotationExporters";
 import { AnnotationObject, ImageObject } from "store/data/types";
+import { selectChanges } from "../state/annotator/selectors";
+import { reconcileChanges } from "../utils/annotationUtils";
 
 //TODO: MenuItem??
 
@@ -83,11 +85,12 @@ export const ExportAnnotationsMenu = ({
   open,
   selectedImage,
 }: ExportAnnotationsMenuProps) => {
-  const dispatch = useDispatch();
+  const dataState = useSelector(selectDataState);
+  const annotatorChanges = useSelector(selectChanges);
   const images = useSelector(selectImagesArray);
-  const imageDict = useSelector(selectImages);
-  const annotations = useSelector(selectImageViewerObjects);
-  const annotationDict = useSelector(selectImageViewerObjectDict);
+  const imageDict = useSelector(selectImageViewerImages);
+  const annotations = useSelector(selectImageViewerObjectsArray);
+  const annotationDict = useSelector(selectImageViewerObjects);
   const annotationCategories = useSelector(selectAllObjectCategories);
   const annotationCategoryDict = useSelector(selectObjectCategoryDict);
   const projectName = useSelector(selectProjectName);
@@ -110,8 +113,8 @@ export const ExportAnnotationsMenu = ({
     onClose();
   };
 
-  const handleSaveChanges = () => {
-    dispatch(annotatorSlice.actions.reconcileChanges({}));
+  const handleSaveChanges = async () => {
+    await reconcileChanges(dataState, annotatorChanges);
     handleOpenExportAnnotationsDialog();
   };
 

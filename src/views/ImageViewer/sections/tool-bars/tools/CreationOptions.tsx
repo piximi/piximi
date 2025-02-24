@@ -17,7 +17,6 @@ import { AnnotationMode } from "views/ImageViewer/utils/enums";
 import { FlexColumnBox } from "components/ui";
 import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 import { invert } from "views/ImageViewer/utils/annotationUtils";
-import { encode } from "views/ImageViewer/utils";
 import {
   CombineAnnotationsIcon,
   IntersectAnnotationsIcon,
@@ -77,24 +76,12 @@ export const CreationOptions = () => {
       image.shape.height,
     );
 
-    const encodedMask = encode(invertedMask);
-
     dispatch(
-      annotatorSlice.actions.editThings({
-        updates: [
-          {
-            id: workingAnnotation.id,
-            encodedMask,
-            boundingBox: invertedBoundingBox,
-          },
-        ],
-      }),
-    );
-
-    dispatch(
-      annotatorSlice.actions.setSelectedAnnotationIds({
-        annotationIds: [workingAnnotation.id],
-        workingAnnotationId: workingAnnotation.id,
+      annotatorSlice.actions.updateWorkingAnnotation({
+        changes: {
+          boundingBox: invertedBoundingBox,
+          decodedMask: invertedMask,
+        },
       }),
     );
   };

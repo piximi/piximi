@@ -8,8 +8,6 @@ import { generateKind } from "store/data/helpers";
 
 type CreateCategoriesDialogProps = {
   onClose: () => void;
-  withContainedThings?: string[];
-  withContainedCategories?: string[];
   open: boolean;
   secondaryAction?: () => void;
   storeDispatch: (kind: Kind, newUnknownCategory: Category) => void;
@@ -18,8 +16,6 @@ type CreateCategoriesDialogProps = {
 
 export const CreateKindDialog = ({
   onClose,
-  withContainedThings = [],
-  withContainedCategories = [],
   open,
   secondaryAction,
   storeDispatch,
@@ -64,11 +60,6 @@ export const CreateKindDialog = ({
 
   const handleConfirm = () => {
     const { kind, unknownCategory } = generateKind(name, true);
-    kind.categories.push(...withContainedCategories);
-    if (withContainedThings) {
-      kind.containing.push(...withContainedThings);
-    }
-
     storeDispatch(kind, unknownCategory);
     secondaryAction && secondaryAction();
 
