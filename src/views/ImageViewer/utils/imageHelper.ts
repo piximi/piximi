@@ -2,9 +2,8 @@ import IJSImage from "image-js";
 import { pointsAreEqual } from "./point-operations";
 
 import { logger } from "utils/common/helpers";
-import { Point } from "./types";
+import { Point, ProtoAnnotationObject } from "./types";
 import { DataArray } from "utils/file-io/types";
-import { DecodedAnnotationObject } from "store/data/types";
 
 export const generatePoints = (buffer: Array<number> | undefined) => {
   if (!buffer) return undefined;
@@ -126,10 +125,10 @@ Given a click at a position, return all overlapping annotations ids
  */
 export const getOverlappingAnnotations = (
   position: { x: number; y: number },
-  annotations: Array<DecodedAnnotationObject>,
+  annotations: Array<ProtoAnnotationObject>,
 ) => {
   const overlappingAnnotations = annotations.filter(
-    (annotation: DecodedAnnotationObject) => {
+    (annotation: ProtoAnnotationObject) => {
       const boundingBox = annotation.boundingBox;
       if (pointInBox(position, boundingBox)) {
         const boundingBoxWidth = boundingBox[2] - boundingBox[0];
@@ -154,7 +153,7 @@ export const getOverlappingAnnotations = (
       return false;
     },
   );
-  return overlappingAnnotations.map((annotation: DecodedAnnotationObject) => {
+  return overlappingAnnotations.map((annotation: ProtoAnnotationObject) => {
     return annotation.id;
   });
 };
@@ -162,9 +161,9 @@ export const getOverlappingAnnotations = (
 export const getAnnotationsInBox = (
   minimum: { x: number; y: number },
   maximum: { x: number; y: number },
-  annotations: Array<DecodedAnnotationObject>,
+  annotations: Array<ProtoAnnotationObject>,
 ) => {
-  return annotations.filter((annotation: DecodedAnnotationObject) => {
+  return annotations.filter((annotation: ProtoAnnotationObject) => {
     return (
       minimum.x <= annotation.boundingBox[0] &&
       minimum.y <= annotation.boundingBox[1] &&

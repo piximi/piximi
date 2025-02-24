@@ -1,10 +1,10 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 
 import { annotatorSlice } from "./annotatorSlice";
+import { initialState as initialAnnotatorState } from "./annotatorSlice";
 
 import { imageViewerSlice } from "../imageViewer";
 
-import { dataSlice } from "store/data";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { decodeAnnotation } from "views/ImageViewer/utils/rle";
 import { createRenderedTensor } from "utils/common/tensorHelpers";
@@ -17,6 +17,7 @@ import {
   DecodedAnnotationObject,
   ImageObject,
 } from "store/data/types";
+import { isEqual } from "lodash";
 
 export const annotatorMiddleware = createListenerMiddleware();
 
@@ -72,82 +73,6 @@ startAppListening({
     }
 
     listenerAPI.dispatch(imageViewerSlice.actions.setCursor({ cursor }));
-  },
-});
-
-startAppListening({
-  actionCreator: annotatorSlice.actions.reconcileChanges,
-  effect: (action, listenerAPI) => {
-    const { discardChanges } = action.payload;
-    if (discardChanges) {
-      return;
-    }
-    const { annotator: annotatorState, data: dataState } =
-      listenerAPI.getState();
-    const {
-      kinds: kindChanges,
-      categories: categoryChanges,
-      things: thingChanges,
-    } = annotatorState.changes;
-
-    if (Object.keys(kindChanges.added).length > 0) {
-      listenerAPI.dispatch(
-        dataSlice.actions.addKinds({
-          kinds: Object.values(kindChanges.added),
-        }),
-      );
-    }
-    const deletedCategoriesIds: string[] = [];
-    const deletedThingsIds: string[] = [];
-    for (const id of kindChanges.deleted) {
-      deletedCategoriesIds.push(...dataState.kinds.entities[id]!.categories);
-      deletedThingsIds.push(...dataState.kinds.entities[id]!.containing);
-      listenerAPI.dispatch(dataSlice.actions.deleteKind({ deletedKindId: id }));
-    }
-
-    for (const id in kindChanges.edited) {
-      const newDisplayName = kindChanges.edited[id].displayName;
-      if (!newDisplayName) {
-        continue;
-      }
-      listenerAPI.dispatch(
-        dataSlice.actions.updateKindName({
-          kindId: id,
-          displayName: newDisplayName,
-        }),
-      );
-    }
-    listenerAPI.dispatch(
-      dataSlice.actions.addCategories({
-        categories: Object.values(categoryChanges.added),
-      }),
-    );
-
-    listenerAPI.dispatch(
-      dataSlice.actions.deleteCategories({
-        categoryIds: categoryChanges.deleted,
-      }),
-    );
-
-    listenerAPI.dispatch(
-      dataSlice.actions.addThings({
-        things: Object.values(thingChanges.added) as Array<
-          ImageObject | AnnotationObject
-        >,
-      }),
-    );
-    listenerAPI.dispatch(
-      dataSlice.actions.updateThings({
-        updates: Object.values(thingChanges.edited),
-      }),
-    );
-    listenerAPI.dispatch(
-      dataSlice.actions.deleteThings({
-        thingIds: thingChanges.deleted,
-
-        disposeColorTensors: true,
-      }),
-    );
   },
 });
 
@@ -211,5 +136,30 @@ startAppListening({
         message: "",
       }),
     );
+  },
+});
+
+startAppListening({
+  predicate: (action, currentState, previousState) => {
+    if (action.type.split("/")[0] !== "annotator") return false;
+    const currentChanges = currentState.annotator.changes;
+    const previousChanges = previousState.annotator.changes;
+    return !isEqual(currentChanges, previousChanges);
+  },
+  effect: (action, listenerAPI) => {
+    const annotatorState = listenerAPI.getState().annotator;
+    if (isEqual(annotatorState.changes, initialAnnotatorState.changes)) {
+      listenerAPI.dispatch(
+        imageViewerSlice.actions.setHasUnsavedChanges({
+          hasUnsavedChanges: false,
+        }),
+      );
+    } else {
+      listenerAPI.dispatch(
+        imageViewerSlice.actions.setHasUnsavedChanges({
+          hasUnsavedChanges: true,
+        }),
+      );
+    }
   },
 });

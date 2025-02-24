@@ -132,7 +132,9 @@ export const deserializePiximiAnnotations_v02 = async (
     // If no existing image we cant build the annotation
     if (!annImage.existing) continue;
     const image = annImage.existing;
-    const annPropsFromIm = await getPropertiesFromImage(image, annotation);
+    const annPropsFromIm = await getPropertiesFromImage(image, {
+      boundingBox: annotation.boundingBox as [number, number, number, number],
+    });
     annotation = { ...annotation, ...annPropsFromIm };
 
     /*

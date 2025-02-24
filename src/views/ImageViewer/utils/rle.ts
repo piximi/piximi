@@ -24,6 +24,8 @@ export const decode = (encoded: Array<number>): Uint8ClampedArray => {
 export const decodeAnnotation = (
   encodedAnnotation: AnnotationObject,
 ): DecodedAnnotationObject => {
+  if (encodedAnnotation.decodedMask)
+    return encodedAnnotation as DecodedAnnotationObject;
   // TODO - serializtion: temporary measure, remove when done
   if (!encodedAnnotation.encodedMask)
     throw Error(`Annotation ${encodedAnnotation.id} has no encoded mask`);
