@@ -94,6 +94,7 @@ export const ProjectAppBar = () => {
   const handleNavigateImageViewer = () => {
     navigate("/imageviewer", {
       state: {
+        fromHome: true,
         initialThingIds: allSelectedThingIds,
       },
     });

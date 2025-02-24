@@ -9,8 +9,9 @@ import {
   selectWorkingAnnotationEntity,
 } from "./selectors";
 import {
-  selectAllCategories,
-  selectAllKinds,
+  selectObjectCategoryDict,
+  selectObjectDict,
+  selectObjectKindDict,
   selectThingsDictionary,
 } from "store/data/selectors";
 import {
@@ -25,20 +26,20 @@ import { getCompleteEntity } from "utils/common/helpers";
 import {
   AnnotationObject,
   Category,
-  DecodedAnnotationObject,
   ImageObject,
   Kind,
   Shape,
 } from "store/data/types";
 import { Colors, ColorsRaw } from "utils/common/types";
+import { ProtoAnnotationObject } from "views/ImageViewer/utils/types";
 
-export const selectImages = createSelector(
+export const selectImageViewerImages = createSelector(
   selectImageStackImageIds,
   selectThingsDictionary,
   selectThingChanges,
-  (imageIds, things, changes) => {
+  (imageIds, things, thingChanges) => {
     const images: Record<string, ImageObject> = {};
-    const newObjectsByImage = Object.values(changes.added).reduce(
+    const newObjectsByImage = Object.values(thingChanges.added).reduce(
       (byImage: Record<string, string[]>, change) => {
         byImage[change.imageId] = [
           ...(byImage[change.imageId] ?? []),
@@ -51,31 +52,32 @@ export const selectImages = createSelector(
     for (const imageId of imageIds) {
       const image = things[imageId] as ImageObject;
       let finalImage = { ...image };
-      if (changes.deleted.includes(imageId)) {
+      if (thingChanges.deleted.includes(imageId)) {
         continue;
-      } else if (changes.edited[imageId]) {
-        const { id: _id, ...imageChanges } = changes.edited[imageId];
+      } else if (thingChanges.edited[imageId]) {
+        const { id: _id, ...imageChanges } = thingChanges.edited[imageId];
 
         finalImage = { ...finalImage, ...imageChanges };
       }
       finalImage.containing = difference(
         finalImage.containing,
-        changes.deleted,
+        thingChanges.deleted,
       );
       finalImage.containing.push(...(newObjectsByImage[imageId] ?? []));
       images[imageId] = finalImage;
     }
+
     return images;
   },
 );
-
-export const selectImagesArray = createSelector(selectImages, (images) =>
-  Object.values(images),
+export const selectImagesArray = createSelector(
+  selectImageViewerImages,
+  (images) => Object.values(images),
 );
 
 export const selectActiveImage = createSelector(
   selectActiveImageId,
-  selectImages,
+  selectImageViewerImages,
   (activeImageId, images) =>
     activeImageId ? images[activeImageId] : undefined,
 );
@@ -104,56 +106,49 @@ export const selectActiveImageObjectIds = createSelector(
 );
 
 export const selectImageViewerKinds = createSelector(
-  selectAllKinds,
+  selectObjectKindDict,
   selectKindChanges,
-  selectCategoryChanges,
-  selectThingChanges,
-  (rootKinds, kindChanges, categoryChanges, thingChanges) => {
-    const addedKinds = Object.values(kindChanges.added);
-    const finalKinds: Record<string, Kind> = {};
-    const newObjectsByKind = Object.values(thingChanges.added).reduce(
-      (byKind: Record<string, string[]>, change) => {
-        byKind[change.kind] = [...(byKind[change.kind] ?? []), change.id];
-        return byKind;
-      },
-      {},
+  (rootKinds, kindChanges): Record<string, Kind> => {
+    const finalKinds: Record<string, Kind> = { ...kindChanges.added };
+    const remainingKinds = difference(
+      Object.keys(rootKinds),
+      kindChanges.deleted,
     );
-    const newCategoriesByKind = Object.values(categoryChanges.added).reduce(
-      (byKind: Record<string, string[]>, change) => {
-        byKind[change.kind] = [...(byKind[change.kind] ?? []), change.id];
-        return byKind;
-      },
-      {},
-    );
-    for (const kind of [...rootKinds, ...addedKinds]) {
-      let finalKind: Kind = { ...kind };
-      const kindId = kind.id;
-      if (kindChanges.deleted.includes(kindId)) {
+    for (const kindId of remainingKinds) {
+      const kind = rootKinds[kindId];
+      if (!(kind.id in kindChanges.edited)) {
+        finalKinds[kind.id] = kind;
         continue;
-      } else if (kindChanges.edited[kindId]) {
-        const { id, ...changes } = kindChanges.edited[kindId];
-
-        finalKind = { ...finalKind, ...changes };
       }
-      finalKind.containing = difference(
-        finalKind.containing,
-        thingChanges.deleted,
-      );
-      finalKind.containing.push(...(newObjectsByKind[kindId] ?? []));
-      finalKind.categories = difference(
-        finalKind.categories,
-        categoryChanges.deleted,
-      );
-      finalKind.categories.push(
-        ...(newCategoriesByKind[kindId] ?? []).filter(
-          (catId) => catId !== finalKind.unknownCategoryId,
-        ),
-      );
-      finalKinds[kindId] = finalKind;
+      const {
+        categories: editedCategories,
+        containing: editedThings,
+        ...editedKind
+      } = kindChanges.edited[kind.id];
+      let updatedCategories = [...kind.categories];
+      let updatedThings = [...kind.containing];
+      if (editedCategories) {
+        updatedCategories.push(...editedCategories.added);
+        updatedCategories = difference(
+          updatedCategories,
+          editedCategories.deleted,
+        );
+      }
+      if (editedThings) {
+        updatedThings.push(...editedThings.added);
+        updatedThings = difference(updatedThings, editedThings.deleted);
+      }
+      finalKinds[kind.id] = {
+        ...kind,
+        ...editedKind,
+        categories: updatedCategories,
+        containing: updatedThings,
+      };
     }
     return finalKinds;
   },
 );
+
 export const selectKindsArray = createSelector(
   selectImageViewerKinds,
   (kinds) => Object.values(kinds),
@@ -163,67 +158,47 @@ export const renderImageViewerKindName = createSelector(
   (kinds) => (kindId: string) => kinds[kindId].displayName,
 );
 
-export const selectCategories = createSelector(
-  selectAllCategories,
+export const selectImageViewerCategories = createSelector(
+  selectObjectCategoryDict,
   selectCategoryChanges,
-  selectThingChanges,
-  (rootCategories, categoryChanges, thingChanges) => {
-    const addedCategories = Object.values(categoryChanges.added);
-    const finalCategories: Record<string, Category> = {};
-    const newObjectsByCategory = Object.values(thingChanges.added).reduce(
-      (byCategory: Record<string, string[]>, change) => {
-        byCategory[change.categoryId] = [
-          ...(byCategory[change.categoryId] ?? []),
-          change.id,
-        ];
-        return byCategory;
-      },
-      {},
+  (rootCategories, categoryChanges): Record<string, Category> => {
+    const finalCategories = { ...categoryChanges.added };
+    const remainingCategories = difference(
+      Object.values(rootCategories).map((c) => c.id),
+      categoryChanges.deleted,
     );
-    const editedObjectsByCategory = Object.values(thingChanges.edited).reduce(
-      (byCategory: Record<string, string[]>, change) => {
-        if (change.categoryId) {
-          byCategory[change.categoryId] = [
-            ...(byCategory[change.categoryId] ?? []),
-            change.id,
-          ];
-        }
-        return byCategory;
-      },
-      {},
-    );
-    for (const category of [...rootCategories, ...addedCategories]) {
-      let finalCategory: Category = { ...category };
-      const categoryId = category.id;
-      finalCategory.containing = difference(
-        finalCategory.containing,
-        thingChanges.deleted,
-      );
-
-      finalCategory.containing.push(
-        ...(newObjectsByCategory[categoryId] ?? []),
-        ...(editedObjectsByCategory[categoryId] ?? []),
-      );
-      if (categoryChanges.edited[categoryId]) {
-        finalCategory = {
-          ...finalCategory,
-          ...categoryChanges.edited[categoryId],
-        };
+    for (const categoryId of remainingCategories) {
+      const category = rootCategories[categoryId];
+      if (!(category.id in categoryChanges.edited)) {
+        finalCategories[category.id] = category;
+        continue;
       }
-      finalCategories[categoryId] = finalCategory;
+      const { containing: editedThings, ...editedCategory } =
+        categoryChanges.edited[category.id];
+      let updatedThings = [...category.containing];
+      if (editedThings) {
+        updatedThings.push(...editedThings.added);
+
+        updatedThings = difference(updatedThings, editedThings.deleted);
+      }
+      finalCategories[category.id] = {
+        ...category,
+        ...editedCategory,
+        containing: updatedThings,
+      };
     }
     return finalCategories;
   },
 );
 
 export const selectCategoriesArray = createSelector(
-  selectCategories,
+  selectImageViewerCategories,
   (categories) => Object.values(categories),
 );
 
 export const selectCategoriesByKind = createSelector(
   selectKindsArray,
-  selectCategories,
+  selectImageViewerCategories,
   (allKinds, catDict) => {
     const catsByKind: Record<
       string,
@@ -236,7 +211,6 @@ export const selectCategoriesByKind = createSelector(
         categories: kind.categories.map((id) => catDict[id]),
       };
     });
-
     return catsByKind;
   },
 );
@@ -246,35 +220,11 @@ export const selectCategoriesByKindArray = createSelector(
   (catsByKind) => Object.values(catsByKind),
 );
 
-export const selectUpdatedThings = createSelector(
-  selectThingsDictionary,
-  selectThingChanges,
-  (thingsDict, thingChanges) => {
-    const finalThings: Record<string, ImageObject | DecodedAnnotationObject> = {
-      ...thingChanges.added,
-    };
-    const remainingThings = difference(
-      Object.keys(thingsDict),
-      thingChanges.deleted,
-    );
-    for (const thingId of remainingThings) {
-      const thing = thingsDict[thingId];
-      if (thingChanges.edited[thingId]) {
-        finalThings[thingId] = {
-          ...(thing as ImageObject | DecodedAnnotationObject),
-          ...thingChanges.edited[thingId],
-        };
-      }
-    }
-
-    return finalThings;
-  },
-);
 export const selectUpdatedObjects = createSelector(
-  selectThingsDictionary,
+  selectObjectDict,
   selectThingChanges,
   (thingsDict, thingChanges) => {
-    const finalThings: Record<string, DecodedAnnotationObject> = {
+    const finalThings: Record<string, ProtoAnnotationObject> = {
       ...thingChanges.added,
     };
     const remainingThings = difference(
@@ -283,161 +233,23 @@ export const selectUpdatedObjects = createSelector(
     );
 
     for (const thingId of remainingThings) {
-      const thing = thingsDict[thingId];
-      if (thing!.kind === "Image") continue;
+      const thing = decodeAnnotation(thingsDict[thingId]);
 
       if (thingChanges.edited[thingId]) {
         finalThings[thingId] = {
-          ...(thing as DecodedAnnotationObject),
+          ...(thing as ProtoAnnotationObject),
           ...thingChanges.edited[thingId],
         };
       } else {
-        finalThings[thingId] = thing as DecodedAnnotationObject;
+        finalThings[thingId] = thing as ProtoAnnotationObject;
       }
     }
 
     return finalThings;
-  },
-);
-export const selectUpdatedImages = createSelector(
-  selectThingsDictionary,
-  selectThingChanges,
-  (thingsDict, thingChanges) => {
-    const finalThings: Record<string, ImageObject> = {};
-    const remainingThings = difference(
-      Object.keys(thingsDict),
-      thingChanges.deleted,
-    );
-    for (const thingId of remainingThings) {
-      const thing = thingsDict[thingId];
-      if (thing!.kind !== "Image") continue;
-      if (thingChanges.edited[thingId]) {
-        finalThings[thingId] = {
-          ...(thing as ImageObject),
-          ...thingChanges.edited[thingId],
-        };
-      }
-    }
-
-    return finalThings;
-  },
-);
-
-export const selectFullWorkingAnnotation = createSelector(
-  selectWorkingAnnotationEntity,
-
-  (workingAnnotationEntity) => {
-    if (!workingAnnotationEntity.saved) return;
-    return {
-      ...workingAnnotationEntity.saved,
-      ...workingAnnotationEntity.changes,
-    } as DecodedAnnotationObject;
-  },
-);
-
-export const selectActiveAnnotations = createSelector(
-  [selectActiveImage, selectUpdatedObjects],
-  (activeImage, objects): Array<DecodedAnnotationObject> => {
-    if (!activeImage) return [];
-    return activeImage.containing.map((annotationId) => {
-      const annotation = objects[annotationId] as AnnotationObject;
-
-      const decodedAnnotation = !annotation.decodedMask
-        ? decodeAnnotation(annotation)
-        : (annotation as DecodedAnnotationObject);
-      return decodedAnnotation;
-    });
-  },
-);
-
-export const selectActiveAnnotationsViews = createSelector(
-  selectActiveImage,
-  selectUpdatedObjects,
-  selectCategories,
-  (activeImage, objects, catDict) => {
-    if (!activeImage) return [];
-    const imageShape = activeImage.shape;
-    const activePlane = activeImage.activePlane;
-    const annotationObjects: Array<{
-      annotation: DecodedAnnotationObject;
-      fillColor: string;
-      imageShape: Shape;
-    }> = [];
-
-    for (const annotationId of activeImage.containing) {
-      const annotation = objects[annotationId] as AnnotationObject;
-
-      const decodedAnnotation = !annotation.decodedMask
-        ? decodeAnnotation(annotation)
-        : (annotation as DecodedAnnotationObject);
-
-      if (
-        annotation.plane === activePlane ||
-        annotation.activePlane === activePlane
-      ) {
-        const fillColor = catDict[annotation.categoryId].color;
-        annotationObjects.push({
-          annotation: decodedAnnotation,
-          fillColor,
-          imageShape: imageShape,
-        });
-      }
-    }
-    return annotationObjects;
-  },
-);
-export const selectWorkingAnnotationView = createSelector(
-  selectWorkingAnnotationEntity,
-  selectActiveImage,
-  selectCategories,
-  (workingAnnotationEntity, activeImage, catDict) => {
-    if (!workingAnnotationEntity.saved || !activeImage) return;
-    const workingAnnotation = getCompleteEntity(
-      workingAnnotationEntity,
-    ) as AnnotationObject;
-    const annotation = !workingAnnotation.decodedMask
-      ? decodeAnnotation(workingAnnotation)
-      : (workingAnnotation as DecodedAnnotationObject);
-    const fillColor = catDict[workingAnnotation.categoryId].color;
-    return {
-      annotation: annotation,
-      fillColor: fillColor,
-      imageShape: activeImage.shape,
-    };
-  },
-);
-
-export const selectSelectedActiveAnnotations = createSelector(
-  [selectSelectedAnnotationIds, selectUpdatedObjects],
-  (annotationIds, objects): Array<DecodedAnnotationObject> => {
-    if (!annotationIds.length) return [];
-
-    return annotationIds.map((annotationId) => {
-      const annotation = objects[annotationId] as AnnotationObject;
-      const decodedAnnotation = !annotation.decodedMask
-        ? decodeAnnotation(annotation)
-        : (annotation as DecodedAnnotationObject);
-      return decodedAnnotation;
-    });
   },
 );
 
 export const selectImageViewerObjects = createSelector(
-  selectImagesArray,
-  selectUpdatedObjects,
-  (images, objects) => {
-    const annotationObjects: AnnotationObject[] = [];
-    for (const im of images) {
-      const annIds = im.containing;
-      for (const annId of annIds) {
-        annotationObjects.push(objects[annId] as AnnotationObject);
-      }
-    }
-    return annotationObjects;
-  },
-);
-
-export const selectImageViewerObjectDict = createSelector(
   selectImagesArray,
   selectUpdatedObjects,
   (images, objects) => {
@@ -452,23 +264,120 @@ export const selectImageViewerObjectDict = createSelector(
   },
 );
 
+export const selectImageViewerObjectsArray = createSelector(
+  selectImageViewerObjects,
+  (objects) => {
+    return Object.values(objects);
+  },
+);
+
+export const selectFullWorkingAnnotation = createSelector(
+  selectWorkingAnnotationEntity,
+
+  (workingAnnotationEntity) => {
+    if (!workingAnnotationEntity.saved) return;
+    return {
+      ...workingAnnotationEntity.saved,
+      ...workingAnnotationEntity.changes,
+    } as ProtoAnnotationObject;
+  },
+);
+
+export const selectActiveAnnotations = createSelector(
+  [selectActiveImage, selectUpdatedObjects],
+  (activeImage, objects): Record<string, ProtoAnnotationObject> => {
+    const activeAnnotationDict: Record<string, ProtoAnnotationObject> = {};
+    if (!activeImage) return activeAnnotationDict;
+    activeImage.containing.forEach((annotationId) => {
+      activeAnnotationDict[annotationId] = objects[annotationId];
+    });
+
+    return activeAnnotationDict;
+  },
+);
+
+export const selectActiveAnnotationsArray = createSelector(
+  selectActiveAnnotations,
+  (activeAnnotationDict): Array<ProtoAnnotationObject> => {
+    return Object.values(activeAnnotationDict);
+  },
+);
+
+export const selectActiveAnnotationsViews = createSelector(
+  selectActiveImage,
+  selectUpdatedObjects,
+  selectImageViewerCategories,
+  (activeImage, objects, catDict) => {
+    if (!activeImage) return [];
+    const imageShape = activeImage.shape;
+    const activePlane = activeImage.activePlane;
+    const annotationObjects: Array<{
+      annotation: ProtoAnnotationObject;
+      fillColor: string;
+      imageShape: Shape;
+    }> = [];
+
+    for (const annotationId of activeImage.containing) {
+      const annotation = objects[annotationId];
+
+      if (
+        annotation.plane === activePlane ||
+        annotation.activePlane === activePlane
+      ) {
+        const fillColor = catDict[annotation.categoryId].color;
+        annotationObjects.push({
+          annotation: annotation,
+          fillColor,
+          imageShape: imageShape,
+        });
+      }
+    }
+    return annotationObjects;
+  },
+);
+export const selectWorkingAnnotationView = createSelector(
+  selectWorkingAnnotationEntity,
+  selectActiveImage,
+  selectImageViewerCategories,
+  (workingAnnotationEntity, activeImage, catDict) => {
+    if (!workingAnnotationEntity.saved || !activeImage) return;
+    const workingAnnotation = getCompleteEntity(
+      workingAnnotationEntity,
+    ) as AnnotationObject;
+    const annotation = !workingAnnotation.decodedMask
+      ? decodeAnnotation(workingAnnotation)
+      : (workingAnnotation as ProtoAnnotationObject);
+    const fillColor = catDict[workingAnnotation.categoryId].color;
+    return {
+      annotation: annotation,
+      fillColor: fillColor,
+      imageShape: activeImage.shape,
+    };
+  },
+);
+
+export const selectSelectedActiveAnnotations = createSelector(
+  [selectSelectedAnnotationIds, selectUpdatedObjects],
+  (annotationIds, objects): Array<ProtoAnnotationObject> => {
+    if (!annotationIds.length) return [];
+
+    return annotationIds.map((annotationId) => {
+      const annotation = objects[annotationId];
+      return annotation;
+    });
+  },
+);
+
 export const selectSelectedAnnotations = createSelector(
   selectSelectedAnnotationIds,
   selectUpdatedObjects,
-  (selectedAnnotationIds, thingsDict) => {
-    return selectedAnnotationIds.reduce(
-      (anns: DecodedAnnotationObject[], id) => {
-        const ann = thingsDict[id] as AnnotationObject;
-        if (ann) {
-          const decodedAnn =
-            ann.decodedMask === undefined
-              ? decodeAnnotation(ann)
-              : (ann as DecodedAnnotationObject);
-          anns.push(decodedAnn);
-        }
-        return anns;
-      },
-      [],
-    );
+  (selectedAnnotationIds, thingsDict): ProtoAnnotationObject[] => {
+    return selectedAnnotationIds.reduce((anns: ProtoAnnotationObject[], id) => {
+      const ann = thingsDict[id];
+      if (ann) {
+        anns.push(ann);
+      }
+      return anns;
+    }, []);
   },
 );

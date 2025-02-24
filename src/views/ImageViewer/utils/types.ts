@@ -36,11 +36,15 @@ export type ImageViewerState = {
   highlightedCategory?: string;
 };
 
+export type ProtoAnnotationObject = Omit<
+  DecodedAnnotationObject,
+  "src" | "data"
+>;
 export type AnnotatorState = {
   workingAnnotationId: string | undefined;
   workingAnnotation: {
-    saved: DecodedAnnotationObject | undefined;
-    changes: Partial<DecodedAnnotationObject>;
+    saved: ProtoAnnotationObject | undefined;
+    changes: Partial<ProtoAnnotationObject>;
   };
   changes: AnnotatorChanges;
   selectedAnnotationIds: Array<string>;
@@ -52,21 +56,42 @@ export type AnnotatorState = {
   toolType: ToolType;
 };
 
+export type KindEdits = Omit<
+  RequireOnly<Kind, "id">,
+  "categories" | "containing"
+> & {
+  categories?: {
+    added: string[];
+    deleted: string[];
+  };
+  containing?: {
+    added: string[];
+    deleted: string[];
+  };
+};
+
+export type CategoryEdits = Omit<RequireOnly<Category, "id">, "containing"> & {
+  containing?: {
+    added: string[];
+    deleted: string[];
+  };
+};
+
 export type AnnotatorChanges = {
   kinds: {
     added: Record<string, Kind>;
     deleted: string[];
-    edited: Record<string, RequireOnly<Kind, "id">>;
+    edited: Record<string, KindEdits>;
   };
   categories: {
     added: Record<string, Category>;
     deleted: string[];
-    edited: Record<string, RequireOnly<Category, "id">>;
+    edited: Record<string, CategoryEdits>;
   };
   things: {
-    added: Record<string, DecodedAnnotationObject>;
+    added: Record<string, ProtoAnnotationObject>;
     deleted: string[];
-    edited: Record<string, RequireOnly<AnnotationObject, "id">>;
+    edited: Record<string, RequireOnly<ProtoAnnotationObject, "id">>;
   };
 };
 export type Point = {

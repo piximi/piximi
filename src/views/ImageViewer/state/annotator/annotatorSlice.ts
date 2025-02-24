@@ -10,15 +10,23 @@ import {
 } from "views/ImageViewer/utils/enums";
 
 import { mutatingFilter } from "utils/common/helpers";
-import { AnnotatorState } from "views/ImageViewer/utils/types";
 import {
-  AnnotationObject,
-  Category,
-  DecodedAnnotationObject,
-  Kind,
-  ThingsUpdates,
-} from "store/data/types";
-import { RequireOnly } from "utils/common/types";
+  AnnotatorState,
+  ProtoAnnotationObject,
+} from "views/ImageViewer/utils/types";
+import { Category, Kind, ThingsUpdates } from "store/data/types";
+import {
+  addCategoryContents,
+  addKindContents,
+  deleteCategoryEntry,
+  deleteKindEntry,
+  deleteThingEntry,
+  editCategory,
+  removeCategoryContents,
+  removeKindContents,
+  updateKind,
+  updateThing,
+} from "./utils";
 
 export const initialState: AnnotatorState = {
   workingAnnotationId: undefined,
@@ -43,6 +51,9 @@ export const annotatorSlice = createSlice({
   name: "annotator",
   reducers: {
     resetAnnotator: () => initialState,
+    resetChanges: (state) => {
+      state.changes = initialState.changes;
+    },
     addSelectedAnnotationId(
       state,
       action: PayloadAction<{ annotationId: string }>,
@@ -108,7 +119,7 @@ export const annotatorSlice = createSlice({
     setWorkingAnnotation(
       state,
       action: PayloadAction<{
-        annotation: DecodedAnnotationObject | string | undefined;
+        annotation: ProtoAnnotationObject | string | undefined;
         preparedByListener?: boolean;
       }>,
     ) {
@@ -116,13 +127,13 @@ export const annotatorSlice = createSlice({
       if (!preparedByListener) return;
 
       state.workingAnnotation.saved = annotation as
-        | DecodedAnnotationObject
+        | ProtoAnnotationObject
         | undefined;
       state.workingAnnotation.changes = {};
     },
     updateWorkingAnnotation(
       state,
-      action: PayloadAction<{ changes: Partial<DecodedAnnotationObject> }>,
+      action: PayloadAction<{ changes: Partial<ProtoAnnotationObject> }>,
     ) {
       if (state.workingAnnotation.saved) {
         state.workingAnnotation.changes = action.payload.changes;
@@ -180,26 +191,15 @@ export const annotatorSlice = createSlice({
       state.changes.kinds.added[kind.id] = kind;
       state.changes.categories.added[unknownCategory.id] = unknownCategory;
     },
-    editKind(
+    editKindName(
       state,
       action: PayloadAction<{
-        kind: RequireOnly<Kind, "id">;
+        kindId: string;
+        displayName: string;
       }>,
     ) {
-      const { kind } = action.payload;
-      if (kind.id in state.changes.kinds.added) {
-        state.changes.kinds.edited[kind.id] = merge(
-          state.changes.kinds.added[kind.id],
-          kind,
-        );
-      } else if (kind.id in state.changes.kinds.edited) {
-        state.changes.kinds.edited[kind.id] = merge(
-          state.changes.kinds.edited[kind.id],
-          kind,
-        );
-      } else {
-        state.changes.kinds.edited[kind.id] = kind;
-      }
+      const { kindId, displayName } = action.payload;
+      updateKind(state, { id: kindId, displayName });
     },
 
     deleteKind(
@@ -209,154 +209,74 @@ export const annotatorSlice = createSlice({
       }>,
     ) {
       const { id: kindId, categories, containing } = action.payload.kind;
-      const affectedCategories: Set<string> = new Set(categories);
-      const affectedThings: Set<string> = new Set(containing);
-      let addToDeleted = true;
-      if (kindId in state.changes.kinds.added) {
-        state.changes.kinds.added[kindId].categories.forEach(
-          affectedCategories.add,
-          affectedCategories,
-        );
-        state.changes.kinds.added[kindId].containing.forEach(
-          affectedThings.add,
-          affectedThings,
-        );
-        delete state.changes.kinds.added[kindId];
-        addToDeleted = false;
+
+      // keep track of affected categories and things
+      const affectedCategories = categories;
+      const affectedThings = containing;
+      // keep track of whether the kind was added during this annotation session
+
+      deleteKindEntry(state, kindId);
+
+      for (const categoryId of affectedCategories) {
+        deleteCategoryEntry(state, categoryId);
       }
-      if (kindId in state.changes.kinds.edited) {
-        state.changes.kinds.edited[kindId].categories?.forEach(
-          affectedCategories.add,
-          affectedCategories,
-        );
-        state.changes.kinds.edited[kindId].containing?.forEach(
-          affectedThings.add,
-          affectedThings,
-        );
-        delete state.changes.kinds.edited[kindId];
+
+      for (const thingId of affectedThings) {
+        deleteThingEntry(state, thingId);
       }
-      if (affectedCategories.size > 0) {
-        for (const categoryId of affectedCategories) {
-          delete state.changes.categories.added[categoryId];
-          delete state.changes.categories.edited[categoryId];
-          state.changes.categories.deleted.push(categoryId);
-        }
-      }
-      if (affectedThings.size > 0) {
-        for (const thingId of affectedThings) {
-          delete state.changes.things.added[thingId];
-          delete state.changes.things.edited[thingId];
-          state.changes.things.deleted.push(thingId);
-        }
-      }
-      if (addToDeleted) state.changes.kinds.deleted.push(kindId);
     },
 
-    addCategories(
+    addCategory(
       state,
       action: PayloadAction<{
-        categories: Category | Array<Category>;
+        category: Category;
       }>,
     ) {
-      let { categories } = action.payload;
-      if (!Array.isArray(categories)) categories = [categories];
-      for (const category of categories) {
-        state.changes.categories.added[category.id] = category;
-      }
+      const { category } = action.payload;
+      state.changes.categories.added[category.id] = category;
+      addKindContents(state, {
+        id: category.kind,
+        categories: [category.id],
+      });
     },
-    editCategory(
+    updateCategory(
       state,
       action: PayloadAction<{
         category: { id: string; color: string; name: string };
       }>,
     ) {
       const { category } = action.payload;
-
-      if (category.id in state.changes.categories.added) {
-        state.changes.categories.added[category.id] = merge(
-          state.changes.categories.added[category.id],
-          category,
-        );
-      } else if (category.id in state.changes.categories.edited) {
-        state.changes.categories.edited[category.id] = merge(
-          state.changes.categories.edited[category.id],
-          category,
-        );
-      } else {
-        state.changes.categories.edited[category.id] = category;
-      }
+      editCategory(state, category);
     },
-    deleteCategories(
+    deleteCategory(
       state,
       action: PayloadAction<{
-        categories: Array<Category>;
-        kind: Kind;
+        category: Category;
+        associatedUnknownKind: string;
       }>,
     ) {
-      const { categories, kind } = action.payload;
-      const unknownCategory = kind.unknownCategoryId;
-      const affectedThings: string[] = [];
-      for (const category of categories) {
-        affectedThings.push(...category.containing);
-        if (category.id in state.changes.categories.added) {
-          delete state.changes.categories.added[category.id];
-          continue;
-        }
-        delete state.changes.categories.edited[category.id];
-        state.changes.categories.deleted.push(category.id);
-      }
-
-      // update things
-      if (affectedThings.length > 0) {
-        state.changes.things.edited = merge(
-          state.changes.things.edited,
-          affectedThings.reduce(
-            (
-              edits: Record<string, RequireOnly<AnnotationObject, "id">>,
-              id,
-            ) => {
-              edits[id] = { id, categoryId: unknownCategory };
-              return edits;
-            },
-            {},
-          ),
-        );
-
-        // update categories
-        // if (unknownCategory in state.changes.categories.added) {
-        //   state.changes.categories.added[unknownCategory].containing.push(
-        //     ...affectedThings
-        //   );
-        // } else if (unknownCategory in state.changes.categories.edited) {
-        //   if (
-        //     "containing" in state.changes.categories.edited[unknownCategory]
-        //   ) {
-        //     state.changes.categories.edited[unknownCategory].containing!.push(
-        //       ...affectedThings
-        //     );
-        //   } else {
-        //     state.changes.categories.edited[unknownCategory].containing =
-        //       affectedThings;
-        //   }
-        // } else {
-        //   state.changes.categories.edited[unknownCategory] = {
-        //     id: unknownCategory,
-        //     containing: affectedThings,
-        //   };
-        // }
-      }
+      const { category, associatedUnknownKind } = action.payload;
+      const associatedThings = category.containing;
+      deleteCategoryEntry(state, category.id);
+      removeKindContents(state, {
+        id: category.kind,
+        categories: [category.id],
+      });
+      addCategoryContents(state, associatedUnknownKind, associatedThings);
+      associatedThings.forEach((thingId) => {
+        updateThing(state, { id: thingId, categoryId: associatedUnknownKind });
+      });
     },
-    addThings(
+    addThing(
       state,
       action: PayloadAction<{
-        things: DecodedAnnotationObject | Array<DecodedAnnotationObject>;
+        thing: ProtoAnnotationObject;
       }>,
     ) {
-      let { things } = action.payload;
-      if (!Array.isArray(things)) things = [things];
-      for (const thing of things) {
-        state.changes.things.added[thing.id] = thing;
-      }
+      const { thing } = action.payload;
+      state.changes.things.added[thing.id] = thing;
+      addKindContents(state, { id: thing.kind, containing: [thing.id] });
+      addCategoryContents(state, thing.categoryId, [thing.id]);
     },
     editThings(
       state,
@@ -385,28 +305,14 @@ export const annotatorSlice = createSlice({
     deleteThings(
       state,
       action: PayloadAction<{
-        thingIds: Array<string>;
+        things: Array<ProtoAnnotationObject>;
       }>,
     ) {
-      const { thingIds } = action.payload;
-      for (const thingId of thingIds) {
-        if (thingId in state.changes.things.added) {
-          delete state.changes.things.added[thingId];
-          continue;
-        }
-
-        delete state.changes.things.edited[thingId];
-
-        state.changes.things.deleted.push(thingId);
-      }
-    },
-    reconcileChanges(
-      state,
-      action: PayloadAction<{ discardChanges?: boolean }>,
-    ) {
-      const { discardChanges } = action.payload;
-      if (discardChanges) {
-        state.changes = initialState.changes;
+      const { things } = action.payload;
+      for (const thing of things) {
+        deleteThingEntry(state, thing.id);
+        removeKindContents(state, { id: thing.kind, containing: [thing.id] });
+        removeCategoryContents(state, thing.categoryId, [thing.id]);
       }
     },
   },
