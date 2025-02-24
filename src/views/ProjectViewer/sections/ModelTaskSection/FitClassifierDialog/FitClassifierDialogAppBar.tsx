@@ -77,6 +77,15 @@ export const FitClassifierDialogAppBar = ({
     );
   };
 
+  const handleDisposeModel = () => {
+    selectedModel.dispose();
+    dispatch(
+      classifierSlice.actions.updateModelStatus({
+        modelStatus: ModelStatus.Uninitialized,
+      }),
+    );
+  };
+
   const clearAndFit = () => {
     dispatch(
       dataSlice.actions.clearPredictions({
