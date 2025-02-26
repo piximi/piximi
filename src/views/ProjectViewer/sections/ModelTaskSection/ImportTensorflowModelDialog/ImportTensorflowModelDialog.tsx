@@ -218,7 +218,13 @@ export const ImportTensorflowModelDialog = ({
       </DialogTitle>
 
       <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
-        <ToolTipTab label="Load Pretrained" value="1" placement="top" />
+        <ToolTipTab
+          label="Load Pretrained"
+          value="1"
+          disabledMessage="None Available"
+          placement="top"
+          disabled={pretrainedModels.length === 0}
+        />
         {/* 
         <ToolTipTab
           label="Upload Local"
