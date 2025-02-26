@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, List } from "@mui/material";
+import { Box, Button, Dialog, DialogContent, List, Tabs } from "@mui/material";
 
 import { useFitClassificationModel } from "hooks";
 
@@ -16,6 +16,8 @@ import { ClassifierOptimizerListItem } from "./ClassifierOptimizerListItem";
 import { ClassifierDatasetListItem } from "./ClassifierDatasetListItem";
 
 import { ModelStatus } from "utils/models/enums";
+import { ToolTipTab } from "components/layout";
+import { useEffect, useState } from "react";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -26,6 +28,7 @@ export const FitClassifierDialog = ({
   closeDialog,
   openedDialog,
 }: FitClassifierDialogProps) => {
+  const [tabVal, setTabVal] = useState("1");
   const {
     showWarning,
     setShowWarning,
@@ -44,7 +47,24 @@ export const FitClassifierDialog = ({
     noLabeledThingsAlert,
     handleFit,
     hasLabeledInference,
+    handleExportHyperparameters,
   } = useFitClassificationModel();
+
+  const onTabSelect = (_event: React.SyntheticEvent, newValue: string) => {
+    setTabVal(newValue);
+  };
+
+  useEffect(() => {
+    if (showPlots) {
+      setTabVal("2");
+    }
+  }, [showPlots]);
+
+  useEffect(() => {
+    if (modelStatus > ModelStatus.Training && !selectedModel.graph) {
+      setTabVal("3");
+    }
+  }, [modelStatus, selectedModel.graph]);
 
   return (
     <>
@@ -53,8 +73,12 @@ export const FitClassifierDialog = ({
         maxWidth="md"
         onClose={closeDialog}
         open={openedDialog}
-        TransitionComponent={DialogTransitionSlide}
-        style={{ zIndex: 1203, height: "100%" }}
+        slots={{ transition: DialogTransitionSlide }}
+        style={{
+          zIndex: 1203,
+          height: "100%",
+          transition: "height 2s ease-in-out",
+        }}
       >
         <FitClassifierDialogAppBar
           closeDialog={closeDialog}
@@ -74,24 +98,48 @@ export const FitClassifierDialog = ({
         )}
 
         {alertState.visible && <AlertBar alertState={alertState} />}
+        <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
+          <ToolTipTab label="HyperParameters" value="1" placement="top" />
 
+          <ToolTipTab
+            label="Training Plots"
+            value="2"
+            disabledMessage="No Trained Model"
+            placement="top"
+            disabled={!showPlots}
+          />
+
+          <ToolTipTab
+            label="Model Summary"
+            value="3"
+            disabledMessage="No Trained Model"
+            placement="top"
+            disabled={
+              modelStatus <= ModelStatus.Training || selectedModel.graph
+            }
+          />
+        </Tabs>
         <DialogContent>
-          <List dense>
-            <ClassifierPreprocessingListItem />
+          <Box hidden={tabVal !== "1"}>
+            <List dense>
+              <ClassifierPreprocessingListItem />
 
-            <ClassifierArchitectureListItem />
+              <ClassifierArchitectureListItem />
 
-            <ClassifierOptimizerListItem
-              fitOptions={fitOptions}
-              trainable={selectedModel.trainable}
-            />
-
-            <ClassifierDatasetListItem
-              trainingPercentage={trainingPercentage}
-              trainable={selectedModel.trainable}
-            />
-          </List>
-          {showPlots && (
+              <ClassifierOptimizerListItem
+                fitOptions={fitOptions}
+                trainable={selectedModel.trainable}
+              />
+              <ClassifierDatasetListItem
+                trainingPercentage={trainingPercentage}
+                trainable={selectedModel.trainable}
+              />
+            </List>
+            <Button onClick={handleExportHyperparameters}>
+              Export Hyperparameters
+            </Button>
+          </Box>
+          <Box hidden={tabVal !== "2"}>
             <div>
               <TwoDataPlot
                 title="Training History - Accuracy per Epoch"
@@ -114,13 +162,13 @@ export const FitClassifierDialog = ({
                 dynamicYRange={true}
               />
             </div>
-          )}
-          {/* TODO: implement model summary for graph models */}
-          {modelStatus > ModelStatus.Training && !selectedModel.graph && (
-            <div>
+          </Box>
+          <Box hidden={tabVal !== "3"}>
+            {/* TODO: implement model summary for graph models */}
+            {modelStatus > ModelStatus.Training && !selectedModel.graph && (
               <ModelSummaryTable model={selectedModel} />
-            </div>
-          )}
+            )}
+          </Box>
         </DialogContent>
       </Dialog>
     </>

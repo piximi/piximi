@@ -5,6 +5,7 @@ import { selectAlertState } from "store/applicationSettings/selectors";
 import { classifierSlice } from "store/classifier";
 import {
   selectClassifierFitOptions,
+  selectClassifierHyperparameters,
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
   selectClassifierTrainingPercentage,
@@ -22,6 +23,8 @@ import { AlertType } from "utils/common/enums";
 
 import { AlertState } from "utils/common/types";
 import { TrainingCallbacks } from "utils/models/types";
+import saveAs from "file-saver";
+import { selectProjectName } from "store/project/selectors";
 
 type PlotData = { x: number; y: number }[];
 const historyItems = [
@@ -56,6 +59,8 @@ export const useFitClassificationModel = () => {
   const modelStatus = useSelector(selectClassifierModelStatus);
   const alertState = useSelector(selectAlertState);
   const fitOptions = useSelector(selectClassifierFitOptions);
+  const hyperparameters = useSelector(selectClassifierHyperparameters);
+  const projectName = useSelector(selectProjectName);
   const trainingPercentage = useSelector(selectClassifierTrainingPercentage);
 
   const hasLabeledInference = useMemo(() => {
@@ -147,6 +152,14 @@ export const useFitClassificationModel = () => {
     }
   };
 
+  const handleExportHyperparameters = () => {
+    const data = new Blob([JSON.stringify(hyperparameters)], {
+      type: "application/json;charset=utf-8",
+    });
+
+    saveAs(data, `${projectName}-model_hyperparameters.json`);
+  };
+
   useEffect(() => {
     if (!noLabeledThings && selectedModel.trainable) {
       setShowWarning(true);
@@ -233,5 +246,6 @@ export const useFitClassificationModel = () => {
     noLabeledThingsAlert,
     handleFit,
     hasLabeledInference,
+    handleExportHyperparameters,
   };
 };
