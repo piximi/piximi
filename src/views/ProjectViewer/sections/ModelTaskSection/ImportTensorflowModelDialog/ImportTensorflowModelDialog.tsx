@@ -34,42 +34,7 @@ import { ModelTask } from "utils/models/enums";
 import { HotkeyContext } from "utils/common/enums";
 
 import { Shape } from "store/data/types";
-
-const ToolTipTab = (
-  props: TabProps & {
-    disabledMessage: string;
-    placement: TooltipProps["placement"];
-  },
-) => {
-  const {
-    label,
-    disabled,
-    onChange,
-    value,
-    placement,
-    disabledMessage,
-    ...rest
-  } = props;
-
-  return (
-    <Tab
-      style={{ pointerEvents: "auto" }}
-      value={value}
-      label={
-        <Tooltip
-          title={disabled ? disabledMessage : ""}
-          arrow
-          placement={placement}
-        >
-          <span>{label}</span>
-        </Tooltip>
-      }
-      disabled={disabled}
-      onChange={onChange}
-      {...rest}
-    />
-  );
-};
+import { ToolTipTab } from "components/layout";
 
 type ImportTensorflowModelDialogProps = {
   onClose: () => void;
@@ -218,13 +183,7 @@ export const ImportTensorflowModelDialog = ({
       </DialogTitle>
 
       <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
-        <ToolTipTab
-          label="Load Pretrained"
-          value="1"
-          disabledMessage="None Available"
-          placement="top"
-          disabled={pretrainedModels.length === 0}
-        />
+        <ToolTipTab label="Load Pretrained" value="1" placement="top" />
         {/*
         <ToolTipTab
           label="Upload Local"
