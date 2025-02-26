@@ -1,4 +1,5 @@
 import {
+  Button,
   Container,
   Table,
   TableBody,
@@ -6,8 +7,10 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from "@mui/material";
+import saveAs from "file-saver";
+import { useSelector } from "react-redux";
+import { selectProjectName } from "store/project/selectors";
 import { Model } from "utils/models/Model/Model";
 
 interface Column {
@@ -37,23 +40,34 @@ type ModelSummaryTableProps = {
 
 export const ModelSummaryTable = (props: ModelSummaryTableProps) => {
   const { model } = props;
+  const projectName = useSelector(selectProjectName);
 
+  const handleExportModelSummary = () => {
+    const headers = columns.map((column) => column.label).join(",") + "\n";
+    const rows = model.modelSummary
+      .map((row) =>
+        columns
+          .map((column) => {
+            return column.id === "outputShape"
+              ? `"'${row[column.id].replaceAll(",", " ")}"`
+              : row[column.id];
+          })
+          .join(","),
+      )
+      .join("\n");
+    const csvContent = headers + rows;
+
+    const data = new Blob([csvContent], { type: "text/csv" });
+    saveAs(data, `${projectName}-model_summary.csv`);
+  };
   return (
     <Container sx={{ maxHeight: 400, width: "100%" }}>
-      <Typography
-        align={"center"}
-        variant="h5"
-        gutterBottom
-        sx={(theme) => ({ pb: theme.spacing(1) })}
-      >
-        Model Summary
-      </Typography>
-
-      <TableContainer sx={{ maxHeight: 300, width: "100%" }}>
+      <TableContainer sx={{ maxHeight: 300, width: "100%", my: 2 }}>
         <Table
           stickyHeader
           aria-label="sticky table"
           sx={{ alignContent: "center" }}
+          size="small"
         >
           <TableHead>
             <TableRow>
@@ -76,6 +90,7 @@ export const ModelSummaryTable = (props: ModelSummaryTableProps) => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Button onClick={handleExportModelSummary}>Export Model Summary</Button>
     </Container>
   );
 };
