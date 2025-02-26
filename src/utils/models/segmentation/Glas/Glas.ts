@@ -9,6 +9,15 @@ import { loadGlas } from "./loadGlas";
 import { generateKind } from "store/data/helpers";
 
 const KIND_NAME = "glas_glands";
+/*
+ * Gland Segmentation
+ * Contest GitHub: http://github.com/twpkevin06222/Gland-Segmentation/tree/main
+ * Kaggle dataset: https://www.kaggle.com/datasets/sani84/glasmiccai2015-gland-segmentation
+ * Model GitHub: https://github.com/binli123/glas-tensorflow-deeplab
+ * Contest paper: https://pubmed.ncbi.nlm.nih.gov/27614792/
+ * Gland segmentation task with GlaS 2015 dataset using UNet model
+ * Trained on images of Hematoxylin and Eosin (H&E) stained slides, consisting of a variety of histologic grades
+ */
 export class Glas extends Segmenter {
   protected _fgKind?: Kind;
   protected _inferenceDataDims?: Array<{
