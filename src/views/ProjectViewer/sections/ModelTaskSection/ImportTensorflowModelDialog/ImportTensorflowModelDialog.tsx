@@ -189,7 +189,7 @@ export const ImportTensorflowModelDialog = ({
   }, [modelTask, projectChannels, selectedModel]);
 
   return (
-    <Dialog fullWidth maxWidth="xs" onClose={closeDialog} open={open}>
+    <Dialog fullWidth maxWidth="sm" onClose={closeDialog} open={open}>
       <Collapse in={cloudWarning}>
         <Alert
           severity="warning"
@@ -221,7 +221,7 @@ export const ImportTensorflowModelDialog = ({
         model
       </DialogTitle>
 
-      <Tabs value={tabVal} onChange={onTabSelect}>
+      <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
         <ToolTipTab
           label="Load Pretrained"
           value="1"
@@ -229,7 +229,7 @@ export const ImportTensorflowModelDialog = ({
           placement="top"
           disabled={pretrainedModels.length === 0}
         />
-
+        {/* 
         <ToolTipTab
           label="Upload Local"
           value="2"
@@ -244,10 +244,17 @@ export const ImportTensorflowModelDialog = ({
           disabledMessage="Not Yet Supported"
           placement="top"
           disabled={modelTask === ModelTask.Segmentation}
-        />
+        /> */}
       </Tabs>
       <DialogContent>
-        <Box hidden={tabVal !== "1"}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+          hidden={tabVal !== "1"}
+        >
           <PretrainedModelSelector
             values={pretrainedModels}
             initModel={
