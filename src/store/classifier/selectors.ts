@@ -35,54 +35,6 @@ export const selectClassifierCompileOptions = createSelector(
   },
 );
 
-export const selectClassifierCropOptions = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): CropOptions => {
-  return classifier.preprocessOptions.cropOptions;
-};
-
-export const selectClassifierEpochs = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): number => {
-  return classifier.fitOptions.epochs;
-};
-
-export const selectClassifierEvaluationResult = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): ClassifierEvaluationResultType => {
-  return classifier.evaluationResult!;
-};
-
-export const selectClassifierFitOptions = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): FitOptions => {
-  return classifier.fitOptions;
-};
-
-export const selectClassifierInputShape = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): Shape => {
-  return classifier.inputShape;
-};
-
-export const selectClassifierModelStatus = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): ModelStatus => {
-  return classifier.modelStatus;
-};
-
 export const selectClassifierPreprocessOptions = ({
   classifier,
 }: {
