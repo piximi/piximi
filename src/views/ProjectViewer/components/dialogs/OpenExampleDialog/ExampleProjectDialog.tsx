@@ -92,7 +92,7 @@ const exampleProjects = [
 
 type ExampleProjectDialogProps = {
   open: boolean;
-  onClose: () => void;
+  onClose: (event?: object, reason?: "backdropClick" | "escapeKeyDown") => void;
 };
 
 export const ExampleProjectDialog = (props: ExampleProjectDialogProps) => {
