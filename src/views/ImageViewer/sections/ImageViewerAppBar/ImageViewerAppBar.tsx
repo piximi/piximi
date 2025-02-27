@@ -55,13 +55,13 @@ export const ImageViewerAppBar = () => {
           }),
         );
       });
-      navigate("/");
+      navigate("/project");
     }
   };
 
   useEffect(() => {
     //NOTE: Wait until ExitAnnotatorDialogOpen is finished updating. Otherwise unmounted component access warning
-    if (returnToProject && !ExitAnnotatorDialogOpen) navigate("/");
+    if (returnToProject && !ExitAnnotatorDialogOpen) navigate("/project");
   }, [returnToProject, ExitAnnotatorDialogOpen, navigate]);
 
   return (
