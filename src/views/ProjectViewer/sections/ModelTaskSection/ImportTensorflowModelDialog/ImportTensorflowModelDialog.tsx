@@ -11,11 +11,7 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  Tab,
-  TabProps,
   Tabs,
-  Tooltip,
-  TooltipProps,
 } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
@@ -38,42 +34,7 @@ import { ModelTask } from "utils/models/enums";
 import { HotkeyContext } from "utils/common/enums";
 
 import { Shape } from "store/data/types";
-
-const ToolTipTab = (
-  props: TabProps & {
-    disabledMessage: string;
-    placement: TooltipProps["placement"];
-  },
-) => {
-  const {
-    label,
-    disabled,
-    onChange,
-    value,
-    placement,
-    disabledMessage,
-    ...rest
-  } = props;
-
-  return (
-    <Tab
-      style={{ pointerEvents: "auto" }}
-      value={value}
-      label={
-        <Tooltip
-          title={disabled ? disabledMessage : ""}
-          arrow
-          placement={placement}
-        >
-          <span>{label}</span>
-        </Tooltip>
-      }
-      disabled={disabled}
-      onChange={onChange}
-      {...rest}
-    />
-  );
-};
+import { ToolTipTab } from "components/layout";
 
 type ImportTensorflowModelDialogProps = {
   onClose: () => void;
@@ -189,7 +150,7 @@ export const ImportTensorflowModelDialog = ({
   }, [modelTask, projectChannels, selectedModel]);
 
   return (
-    <Dialog fullWidth maxWidth="xs" onClose={closeDialog} open={open}>
+    <Dialog fullWidth maxWidth="sm" onClose={closeDialog} open={open}>
       <Collapse in={cloudWarning}>
         <Alert
           severity="warning"
@@ -221,15 +182,9 @@ export const ImportTensorflowModelDialog = ({
         model
       </DialogTitle>
 
-      <Tabs value={tabVal} onChange={onTabSelect}>
-        <ToolTipTab
-          label="Load Pretrained"
-          value="1"
-          disabledMessage="None Available"
-          placement="top"
-          disabled={pretrainedModels.length === 0}
-        />
-
+      <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
+        <ToolTipTab label="Load Pretrained" value="1" placement="top" />
+        {/* 
         <ToolTipTab
           label="Upload Local"
           value="2"
@@ -244,10 +199,17 @@ export const ImportTensorflowModelDialog = ({
           disabledMessage="Not Yet Supported"
           placement="top"
           disabled={modelTask === ModelTask.Segmentation}
-        />
+        /> */}
       </Tabs>
       <DialogContent>
-        <Box hidden={tabVal !== "1"}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+          hidden={tabVal !== "1"}
+        >
           <PretrainedModelSelector
             values={pretrainedModels}
             initModel={

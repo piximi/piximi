@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 import { AppBar, Box } from "@mui/material";
 
-import { useMobileView } from "hooks";
+import { useMobileView, useUnloadConfirmation } from "hooks";
 import { AlertBar } from "components/ui/AlertBar";
 
 import { FallBackDialog } from "components/dialogs";
@@ -23,19 +23,10 @@ import { AlertType, HotkeyContext } from "utils/common/enums";
 export const ImageViewer = () => {
   const dispatch = useDispatch();
   const routerLocation = useLocation();
-
   const stageRef = useRef<Konva.Stage>(null);
   const isMobile = useMobileView();
   const alertState = useSelector(selectAlertState);
-
-  const onUnload = (e: any) => {
-    if (import.meta.env.DEV) {
-      return;
-    } else {
-      e.preventDefault();
-      return (e.returnValue = "Are you sure you want to exit?");
-    }
-  };
+  useUnloadConfirmation();
 
   const handleError = useCallback(
     async (e: any) => {
@@ -73,12 +64,6 @@ export const ImageViewer = () => {
     [dispatch],
   );
 
-  useEffect(() => {
-    window.addEventListener("beforeunload", onUnload);
-    return () => {
-      window.removeEventListener("beforeunload", onUnload);
-    };
-  }, []);
   useEffect(() => {
     dispatch(
       imageViewerSlice.actions.prepareImageViewer({

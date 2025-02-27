@@ -17,11 +17,13 @@ import {
   selectCategoriesByKind,
   selectImageViewerKinds,
   renderImageViewerKindName,
+  selectImageViewerObjects,
 } from "../state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/common/enums";
 import { generateUUID } from "store/data/helpers";
 import { KindMenu } from "./KindMenu";
+import { DecodedAnnotationObject } from "store/data/types";
 
 export const ImageViewerCategories = () => {
   const dispatch = useDispatch();
@@ -32,6 +34,7 @@ export const ImageViewerCategories = () => {
   );
   const kindDict = useSelector(selectImageViewerKinds);
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);
+  const things = useSelector(selectImageViewerObjects);
   const renderKindName = useSelector(renderImageViewerKindName);
   // NOTE: keep for quick checking if kind is hidden
   const [filteredKinds, setFilteredKinds] = useState<Array<string>>([]);
@@ -96,8 +99,8 @@ export const ImageViewerCategories = () => {
   const handleCreateCategory = (kind: string, name: string, color: string) => {
     const newId = generateUUID();
     dispatch(
-      annotatorSlice.actions.addCategories({
-        categories: {
+      annotatorSlice.actions.addCategory({
+        category: {
           id: newId,
           name,
           color,
@@ -115,8 +118,9 @@ export const ImageViewerCategories = () => {
       return;
     }
     dispatch(
-      annotatorSlice.actions.editKind({
-        kind: { id: kindId, displayName: newDisplayName },
+      annotatorSlice.actions.editKindName({
+        kindId,
+        displayName: newDisplayName,
       }),
     );
   };
@@ -138,7 +142,9 @@ export const ImageViewerCategories = () => {
   const handleClearKindObjects = (kindId: string) => {
     dispatch(
       annotatorSlice.actions.deleteThings({
-        thingIds: kindDict[kindId].containing,
+        things: kindDict[kindId].containing.map(
+          (thingId) => things[thingId] as DecodedAnnotationObject,
+        ),
       }),
     );
   };

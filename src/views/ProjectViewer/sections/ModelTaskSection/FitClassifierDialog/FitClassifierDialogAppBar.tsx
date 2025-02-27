@@ -12,7 +12,7 @@ import {
   FormControlLabel,
 } from "@mui/material";
 
-import { Close, PlayCircleOutline, Stop } from "@mui/icons-material";
+import { Close, PlayCircleOutline, Stop, Delete } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 
@@ -77,6 +77,15 @@ export const FitClassifierDialogAppBar = ({
     );
   };
 
+  const handleDisposeModel = () => {
+    selectedModel.dispose();
+    dispatch(
+      classifierSlice.actions.updateModelStatus({
+        modelStatus: ModelStatus.Uninitialized,
+      }),
+    );
+  };
+
   const clearAndFit = () => {
     dispatch(
       dataSlice.actions.clearPredictions({
@@ -109,7 +118,6 @@ export const FitClassifierDialogAppBar = ({
             color="primary"
             onClick={closeDialog}
             aria-label="Close"
-            href={""}
           >
             <Close />
           </IconButton>
@@ -144,6 +152,7 @@ export const FitClassifierDialogAppBar = ({
                 onClick={handleFit}
                 disabled={noLabels || noTrain}
                 startIcon={<PlayCircleOutline />}
+                sx={{ mr: 1 }}
               >
                 Fit Classifier
               </Button>
@@ -159,6 +168,26 @@ export const FitClassifierDialogAppBar = ({
               color="primary"
             >
               <Stop />
+            </IconButton>
+          </span>
+        </Tooltip>
+        <Tooltip
+          title={
+            hasLabeledInference
+              ? "Clear or accept predictions before disposing"
+              : "Dispose the current model"
+          }
+          placement="bottom"
+        >
+          <span>
+            <IconButton
+              onClick={handleDisposeModel}
+              disabled={
+                modelStatus !== ModelStatus.Trained || hasLabeledInference
+              }
+              color="primary"
+            >
+              <Delete />
             </IconButton>
           </span>
         </Tooltip>

@@ -1,26 +1,14 @@
 // ignore-no-logs
 
-import { v4 as uuidv4 } from "uuid";
 import StackTrace from "stacktrace-js";
 import { BitDepth, DataArray } from "utils/file-io/types";
 import IJSImage from "image-js";
 import { tensor2d, image as tfImage } from "@tensorflow/tfjs";
 
-import {
-  availableImageSortKeys,
-  defaultImageSortKey,
-  UNKNOWN_IMAGE_CATEGORY_COLOR,
-} from "./constants";
-import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
+import { availableImageSortKeys, defaultImageSortKey } from "./constants";
 import { AlertType, ImageSortKey } from "./enums";
 
-import {
-  Category,
-  ImageObject,
-  Kind,
-  Shape,
-  ShapeArray,
-} from "store/data/types";
+import { ImageObject, Shape, ShapeArray } from "store/data/types";
 import {
   DeferredEntity,
   FilterType,
@@ -248,7 +236,7 @@ export const sortTypeByKey = (key: ImageSortKey): ImageSortKeyType => {
   }
 };
 
-export const updateArrayRecord = <T extends string | number | symbol, K>(
+export const updateRecordArray = <T extends string | number | symbol, K>(
   record: Record<T, K[]>,
   key: T,
   value: K | K[],
@@ -447,7 +435,7 @@ export const convertToDataArray = (
 
 export const getPropertiesFromImage = async (
   image: ImageObject,
-  annotation: { boundingBox: number[] },
+  annotation: { boundingBox: [number, number, number, number] },
 ) => {
   const renderedIm = await IJSImage.load(image.src);
   const normalizingWidth = image.shape.width - 1;

@@ -116,20 +116,11 @@ export const AnnotationTransformer = ({
 
     if (activeImage.containing.includes(annotationId)) {
       if (Object.keys(workingAnnotation.changes).length === 0) {
-        batch(() => {
-          // dispatch(
-          //   imageViewerSlice.actions.removeActiveAnnotationIds({
-          //     annotationIds: selectedAnnotations.map(
-          //       (annotation) => annotation.id
-          //     ),
-          //   })
-          // );
-          dispatch(
-            annotatorSlice.actions.deleteThings({
-              thingIds: selectedAnnotations.map((annotation) => annotation.id),
-            }),
-          );
-        });
+        dispatch(
+          annotatorSlice.actions.deleteThings({
+            things: selectedAnnotations,
+          }),
+        );
       } else {
         dispatch(
           annotatorSlice.actions.editThings({
@@ -141,8 +132,8 @@ export const AnnotationTransformer = ({
     } else {
       const completeWorkingAnnotation = getCompleteEntity(workingAnnotation)!;
       dispatch(
-        annotatorSlice.actions.addThings({
-          things: [completeWorkingAnnotation],
+        annotatorSlice.actions.addThing({
+          thing: completeWorkingAnnotation,
         }),
       );
       if (soundEnabled) playCreateAnnotationSoundEffect();

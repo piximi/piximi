@@ -23,66 +23,17 @@ export const selectClassifier = ({
   return classifier;
 };
 
-export const selectClassifierCompileOptions = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): CompileOptions => {
-  return {
-    learningRate: classifier.learningRate,
-    lossFunction: classifier.lossFunction,
-    metrics: classifier.metrics,
-    optimizationAlgorithm: classifier.optimizationAlgorithm,
-  };
-};
-
-export const selectClassifierCropOptions = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): CropOptions => {
-  return classifier.preprocessOptions.cropOptions;
-};
-
-export const selectClassifierEpochs = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): number => {
-  return classifier.fitOptions.epochs;
-};
-
-export const selectClassifierEvaluationResult = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): ClassifierEvaluationResultType => {
-  return classifier.evaluationResult!;
-};
-
-export const selectClassifierFitOptions = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): FitOptions => {
-  return classifier.fitOptions;
-};
-
-export const selectClassifierInputShape = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): Shape => {
-  return classifier.inputShape;
-};
-
-export const selectClassifierModelStatus = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): ModelStatus => {
-  return classifier.modelStatus;
-};
+export const selectClassifierCompileOptions = createSelector(
+  selectClassifier,
+  (classifier): CompileOptions => {
+    return {
+      learningRate: classifier.learningRate,
+      lossFunction: classifier.lossFunction,
+      metrics: classifier.metrics,
+      optimizationAlgorithm: classifier.optimizationAlgorithm,
+    };
+  },
+);
 
 export const selectClassifierPreprocessOptions = ({
   classifier,
@@ -98,6 +49,68 @@ export const selectClassifierRescaleOptions = ({
   classifier: ClassifierState;
 }): RescaleOptions => {
   return classifier.preprocessOptions.rescaleOptions;
+};
+export const selectClassifierCropOptions = ({
+  classifier,
+}: {
+  classifier: ClassifierState;
+}): CropOptions => {
+  return classifier.preprocessOptions.cropOptions;
+};
+
+export const selectClassifierFitOptions = ({
+  classifier,
+}: {
+  classifier: ClassifierState;
+}): FitOptions => {
+  return classifier.fitOptions;
+};
+export const selectClassifierEpochs = ({
+  classifier,
+}: {
+  classifier: ClassifierState;
+}): number => {
+  return classifier.fitOptions.epochs;
+};
+
+export const selectClassifierInputShape = ({
+  classifier,
+}: {
+  classifier: ClassifierState;
+}): Shape => {
+  return classifier.inputShape;
+};
+
+export const selectClassifierEvaluationResult = ({
+  classifier,
+}: {
+  classifier: ClassifierState;
+}): ClassifierEvaluationResultType => {
+  return classifier.evaluationResult!;
+};
+
+export const selectClassifierShuffleOptions = ({
+  classifier,
+}: {
+  classifier: ClassifierState;
+}): boolean => {
+  return classifier.preprocessOptions.shuffle;
+};
+
+export const selectClassifierTrainingPercentage = ({
+  classifier,
+}: {
+  classifier: ClassifierState;
+}): number => {
+  return classifier.trainingPercentage;
+};
+
+export const selectClassifierModelStatus = ({
+  classifier,
+}: {
+  classifier: ClassifierState;
+}): ModelStatus => {
+  return classifier.modelStatus;
 };
 
 export const selectClassifierSelectedModel = ({
@@ -137,22 +150,6 @@ export const selectClassifierSelectedModelIdx = createSelector(
   }),
 );
 
-export const selectClassifierShuffleOptions = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): boolean => {
-  return classifier.preprocessOptions.shuffle;
-};
-
-export const selectClassifierTrainingPercentage = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): number => {
-  return classifier.trainingPercentage;
-};
-
 export const selectShowClearPredictionsWarning = ({
   classifier,
 }: {
@@ -160,3 +157,16 @@ export const selectShowClearPredictionsWarning = ({
 }): boolean => {
   return classifier.showClearPredictionsWarning;
 };
+
+export const selectClassifierHyperparameters = createSelector(
+  selectClassifierPreprocessOptions,
+  selectClassifierCompileOptions,
+  selectClassifierFitOptions,
+  (preprocessOptions, compileOptions, fitOptions) => {
+    return {
+      preprocessOptions,
+      compileOptions,
+      fitOptions,
+    };
+  },
+);
