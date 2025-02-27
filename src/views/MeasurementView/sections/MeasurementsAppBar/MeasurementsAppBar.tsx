@@ -11,7 +11,7 @@ export const MeasurementsAppBar = () => {
   const navigate = useNavigate();
 
   const onReturnToMainProject = () => {
-    navigate("/");
+    navigate("/project");
   };
 
   return (
