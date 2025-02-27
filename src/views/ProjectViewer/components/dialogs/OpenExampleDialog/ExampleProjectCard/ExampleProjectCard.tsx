@@ -33,7 +33,7 @@ type ExampleProjectType = {
 
 type ExampleProjectCardProps = {
   exampleProject: ExampleProjectType;
-  onClose: () => void;
+  onClose: (event?: object, reason?: "backdropClick" | "escapeKeyDown") => void;
 };
 
 export const ExampleProjectCard = ({
