@@ -36,3 +36,5 @@ export const DEFAULT_COLORS: Array<[number, number, number]> = [
 
 export const UNKNOWN_IMAGE_CATEGORY_COLOR = "#AAAAAA";
 export const UNKNOWN_ANNOTATION_CATEGORY_COLOR = "#920000";
+
+export const DEFAULT_KIND = "Image";

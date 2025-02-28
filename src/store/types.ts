@@ -80,7 +80,7 @@ export type SegmenterState = {
 
 export type ClassifierState = {
   // pre-fit state
-  selectedModelIdx: number;
+  selectedModelIdx: Record<Kind["id"], number>;
   inputShape: Shape;
   preprocessOptions: PreprocessOptions;
   fitOptions: FitOptions;

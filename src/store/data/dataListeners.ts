@@ -9,6 +9,12 @@ import { createRenderedTensor } from "utils/common/tensorHelpers";
 
 import { ImageObject } from "./types";
 import { TypedAppStartListening } from "store/types";
+import {
+  addClassifierModels,
+  deleteClassifierModels,
+} from "utils/models/availableClassificationModels";
+import _ from "lodash";
+import { classifierSlice } from "store/classifier/classifierSlice";
 
 export const dataMiddleware = createListenerMiddleware();
 
@@ -66,7 +72,7 @@ startAppListening({
         thingIds: explicitThingIds,
         disposeColorTensors: action.payload.disposeColorTensors,
         preparedByListener: true,
-      }),
+      })
     );
     listenerAPI.subscribe();
 
@@ -100,7 +106,7 @@ startAppListening({
           image.data,
           colorsEditable,
           image.bitDepth,
-          undefined,
+          undefined
         );
 
         srcUpdates.push({ id: imageId, src: renderedSrcs[image.activePlane] });
@@ -108,13 +114,13 @@ startAppListening({
           listenerAPI.dispatch(
             imageViewerSlice.actions.setActiveImageRenderedSrcs({
               renderedSrcs,
-            }),
+            })
           );
         }
         listenerAPI.dispatch(
           applicationSettingsSlice.actions.setLoadMessage({
             message: `Updating image ${imageNumber} of ${numImages}`,
-          }),
+          })
         );
         imageNumber++;
       }
@@ -125,14 +131,48 @@ startAppListening({
       listenerAPI.dispatch(
         dataSlice.actions.updateThings({
           updates: srcUpdates,
-        }),
+        })
       );
       listenerAPI.subscribe();
     }
     listenerAPI.dispatch(
       applicationSettingsSlice.actions.setLoadMessage({
         message: "",
-      }),
+      })
+    );
+  },
+});
+
+startAppListening({
+  predicate: (action, currentState, previousState) => {
+    return currentState.data.kinds.ids !== previousState.data.kinds.ids;
+  },
+  effect: async (action, listenerAPI) => {
+    const currentDataStateKinds = listenerAPI.getState().data.kinds.ids;
+
+    const previousDataStateKinds =
+      listenerAPI.getOriginalState().data.kinds.ids;
+
+    const deletedKinds = _.difference(
+      previousDataStateKinds,
+      currentDataStateKinds
+    );
+    const addedKinds = _.difference(
+      currentDataStateKinds,
+      previousDataStateKinds
+    );
+
+    if (deletedKinds.length) {
+      deleteClassifierModels(deletedKinds);
+    }
+    if (addedKinds.length) {
+      addClassifierModels(addedKinds);
+    }
+
+    listenerAPI.dispatch(
+      classifierSlice.actions.updateModelIdxDict({
+        changes: { del: deletedKinds, add: addedKinds },
+      })
     );
   },
 });
