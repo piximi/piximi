@@ -47,7 +47,7 @@ const serializeImageColors = async (colorsGroup: Group, colors: Colors) => {
 const serializeThings = async (
   thingsGroup: Group,
   things: Array<AnnotationObject | ImageObject>,
-  loadCb: LoadCB
+  loadCb: LoadCB,
 ) => {
   const thingNames = things.map((thing) => thing.name);
 
@@ -75,7 +75,7 @@ const serializeThings = async (
     if (thing.kind === "Image") {
       await thingGroup.attrs.setItem(
         "contents",
-        (thing as ImageObject).containing
+        (thing as ImageObject).containing,
       );
 
       const colorGroup = await thingGroup.createGroup("colors");
@@ -83,65 +83,65 @@ const serializeThings = async (
     } else {
       await thingGroup.attrs.setItem(
         "bbox",
-        (thing as AnnotationObject).boundingBox
+        (thing as AnnotationObject).boundingBox,
       );
       await thingGroup.attrs.setItem(
         "mask",
-        (thing as AnnotationObject).encodedMask
+        (thing as AnnotationObject).encodedMask,
       );
       await thingGroup.attrs.setItem(
         "image_id",
-        (thing as AnnotationObject).imageId
+        (thing as AnnotationObject).imageId,
       );
     }
     loadCb(
       (i + 1) / thingNames.length,
-      `serialized image ${i + 1}/${thingNames.length}`
+      `serialized image ${i + 1}/${thingNames.length}`,
     );
   }
 };
 
 const serializeCategories = async (
   categoryGroup: Group,
-  categories: Category[]
+  categories: Category[],
 ) => {
   await categoryGroup.attrs.setItem(
     "category_id",
-    categories.map((cat) => cat.id)
+    categories.map((cat) => cat.id),
   );
   await categoryGroup.attrs.setItem(
     "color",
-    categories.map((cat) => cat.color)
+    categories.map((cat) => cat.color),
   );
   await categoryGroup.attrs.setItem(
     "name",
-    categories.map((cat) => cat.name)
+    categories.map((cat) => cat.name),
   );
   await categoryGroup.attrs.setItem(
     "kind",
-    categories.map((cat) => cat.kind)
+    categories.map((cat) => cat.kind),
   );
   await categoryGroup.attrs.setItem(
     "contents",
-    categories.map((cat) => cat.containing)
+    categories.map((cat) => cat.containing),
   );
 };
 const serializeKinds = async (kindGroup: Group, kinds: Kind[]) => {
   await kindGroup.attrs.setItem(
     "kind_id",
-    kinds.map((k) => k.id)
+    kinds.map((k) => k.id),
   );
   await kindGroup.attrs.setItem(
     "contents",
-    kinds.map((k) => k.containing)
+    kinds.map((k) => k.containing),
   );
   await kindGroup.attrs.setItem(
     "categories",
-    kinds.map((k) => k.categories)
+    kinds.map((k) => k.categories),
   );
   await kindGroup.attrs.setItem(
     "unknown_category_id",
-    kinds.map((k) => k.unknownCategoryId)
+    kinds.map((k) => k.unknownCategoryId),
   );
 };
 
@@ -153,7 +153,7 @@ const _serializeProject = async (
     categories: Array<Category>;
     things: Array<ImageObject | AnnotationObject>;
   },
-  loadCb: LoadCB
+  loadCb: LoadCB,
 ) => {
   await projectGroup.attrs.setItem("name", project.name);
   await projectGroup.attrs.setItem("imageChannels", project.imageChannels);
@@ -177,11 +177,11 @@ const _serializeProject = async (
 
 const serializePreprocessOptions = async (
   preprocessOptionsGroup: Group,
-  preprocessOptions: PreprocessOptions
+  preprocessOptions: PreprocessOptions,
 ) => {
   await preprocessOptionsGroup.attrs.setItem(
     "shuffle_B",
-    Number(preprocessOptions.shuffle)
+    Number(preprocessOptions.shuffle),
   );
 
   const rescaleOptionsGroup =
@@ -189,29 +189,29 @@ const serializePreprocessOptions = async (
 
   await rescaleOptionsGroup.attrs.setItem(
     "rescale_B",
-    Number(preprocessOptions.rescaleOptions.rescale)
+    Number(preprocessOptions.rescaleOptions.rescale),
   );
 
   await rescaleOptionsGroup.attrs.setItem(
     "center_B",
-    Number(preprocessOptions.rescaleOptions.center)
+    Number(preprocessOptions.rescaleOptions.center),
   );
 
   const cropOptionsGroup =
     await preprocessOptionsGroup.createGroup("crop_options");
   await cropOptionsGroup.attrs.setItem(
     "num_crops",
-    preprocessOptions.cropOptions.numCrops
+    preprocessOptions.cropOptions.numCrops,
   );
   await cropOptionsGroup.attrs.setItem(
     "crop_schema",
-    preprocessOptions.cropOptions.cropSchema
+    preprocessOptions.cropOptions.cropSchema,
   );
 };
 
 const serializeClassifier = async (
   classifierGroup: Group,
-  classifier: ClassifierState
+  classifier: ClassifierState,
 ) => {
   const classifierModel =
     // @ts-ignore TODO multiple-classifiers
@@ -223,12 +223,12 @@ const serializeClassifier = async (
   await writeArray(
     classifierGroup,
     "input_shape",
-    new Uint8Array([planes, height, width, channels])
+    new Uint8Array([planes, height, width, channels]),
   );
 
   await classifierGroup.attrs.setItem(
     "training_percent",
-    classifier.trainingPercentage
+    classifier.trainingPercentage,
   );
 
   await classifierGroup.attrs.setItem("metrics", classifier.metrics);
@@ -240,35 +240,35 @@ const serializeClassifier = async (
 
   await optSettingsGroup.attrs.setItem(
     "batch_size",
-    classifier.fitOptions.batchSize
+    classifier.fitOptions.batchSize,
   );
 
   await optSettingsGroup.attrs.setItem(
     "optimization_algorithm",
-    classifier.optimizationAlgorithm
+    classifier.optimizationAlgorithm,
   );
 
   await optSettingsGroup.attrs.setItem(
     "learning_rate",
-    classifier.learningRate
+    classifier.learningRate,
   );
 
   await optSettingsGroup.attrs.setItem(
     "loss_function",
-    classifier.lossFunction
+    classifier.lossFunction,
   );
 
   const preprocessOptionsGroup =
     await classifierGroup.createGroup("preprocess_options");
   await serializePreprocessOptions(
     preprocessOptionsGroup,
-    classifier.preprocessOptions
+    classifier.preprocessOptions,
   );
 };
 
 const serializeSegmenter = async (
   segmenterGroup: Group,
-  segmenter: SegmenterState
+  segmenter: SegmenterState,
 ) => {
   const segmenterModel = availableSegmenterModels[segmenter.selectedModelIdx];
 
@@ -291,7 +291,7 @@ export const serializeProject = async (
   },
   classifierSlice: ClassifierState,
   segmenterSlice: SegmenterState,
-  loadCb: LoadCB
+  loadCb: LoadCB,
 ) => {
   const zipStore = new ZipStore(name);
   const root = await group(zipStore, zipStore.rootName);
@@ -348,7 +348,7 @@ export const writeArray = async (
   group: Group,
   name: string,
   value: Float32Array | Uint8Array | Int32Array | Uint16Array | Uint32Array,
-  shape?: number[]
+  shape?: number[],
 ) => {
   const nested = new NestedArray(value, shape);
   return group.createDataset(name, undefined, nested, {
@@ -362,12 +362,12 @@ export const writeTensor = async (
   group: Group,
   name: string,
   tensor: Tensor,
-  shape?: number[]
+  shape?: number[],
 ) => {
   return writeArray(
     group,
     name,
     cleanBuffer(tensor),
-    shape ? shape : tensor.shape
+    shape ? shape : tensor.shape,
   );
 };
