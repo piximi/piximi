@@ -32,7 +32,7 @@ export const selectClassifierCompileOptions = createSelector(
       metrics: classifier.metrics,
       optimizationAlgorithm: classifier.optimizationAlgorithm,
     };
-  }
+  },
 );
 
 export const selectClassifierPreprocessOptions = ({
@@ -137,5 +137,5 @@ export const selectClassifierHyperparameters = createSelector(
       compileOptions,
       fitOptions,
     };
-  }
+  },
 );

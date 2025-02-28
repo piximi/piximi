@@ -56,7 +56,7 @@ export const FitClassifierDialogAppBar = ({
   const selectedModel = useSelector(selectClassifierSelectedModel);
   const modelStatus = useSelector(selectClassifierModelStatus);
   const showClearPredictionsWarning = useSelector(
-    selectShowClearPredictionsWarning
+    selectShowClearPredictionsWarning,
   );
 
   const {
@@ -73,7 +73,7 @@ export const FitClassifierDialogAppBar = ({
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Trained,
-      })
+      }),
     );
   };
 
@@ -82,7 +82,7 @@ export const FitClassifierDialogAppBar = ({
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Uninitialized,
-      })
+      }),
     );
   };
 
@@ -90,7 +90,7 @@ export const FitClassifierDialogAppBar = ({
     dispatch(
       dataSlice.actions.clearPredictions({
         kind: activeKind,
-      })
+      }),
     );
     fit();
   };
@@ -209,8 +209,8 @@ export const FitClassifierDialogAppBar = ({
                           {
                             showClearPredictionsWarning:
                               !showClearPredictionsWarning,
-                          }
-                        )
+                          },
+                        ),
                       )
                     }
                   />
