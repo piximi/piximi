@@ -1,6 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { availableClassifierModels } from "utils/models/availableClassificationModels";
+import {
+  availableClassifierModels,
+  deleteClassifierModels,
+} from "utils/models/availableClassificationModels";
 
 import {
   CropSchema,
@@ -17,7 +20,8 @@ import {
   TrainingCallbacks,
 } from "utils/models/types";
 import { ClassifierState } from "store/types";
-import { Shape } from "store/data/types";
+import { Kind, Shape } from "store/data/types";
+import { DEFAULT_KIND } from "store/data/constants";
 
 export const initialState: ClassifierState = {
   modelStatus: ModelStatus.Uninitialized,
@@ -33,7 +37,7 @@ export const initialState: ClassifierState = {
   },
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
-  selectedModelIdx: 0,
+  selectedModelIdx: { [DEFAULT_KIND]: 0 },
   metrics: [Metric.CategoricalAccuracy],
   optimizationAlgorithm: OptimizationAlgorithm.Adam,
   preprocessOptions: {
@@ -63,13 +67,14 @@ export const classifierSlice = createSlice({
   name: "classifier",
   initialState: initialState,
   reducers: {
-    resetClassifier: (state) => {
-      availableClassifierModels[state.selectedModelIdx].dispose();
+    resetClassifiers: (state) => {
+      const kindsToDelete = Object.keys(state.selectedModelIdx);
+      deleteClassifierModels(kindsToDelete);
       return initialState;
     },
     setClassifier(
       state,
-      action: PayloadAction<{ classifier: ClassifierState }>,
+      action: PayloadAction<{ classifier: ClassifierState }>
     ) {
       // WARNING, don't do below (overwrites draft object)
       // state = action.payload.classifier;
@@ -78,7 +83,8 @@ export const classifierSlice = createSlice({
     setDefaults(state) {
       // TODO - segmenter: dispose() and state.selectedModel = SimpleCNN(), or whatever
 
-      availableClassifierModels[state.selectedModelIdx].dispose();
+      const kindsToDelete = Object.keys(state.selectedModelIdx);
+      deleteClassifierModels(kindsToDelete);
 
       state.modelStatus = ModelStatus.Uninitialized;
       state.evaluationResult = {
@@ -96,7 +102,7 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{
         modelStatus: ModelStatus;
         onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
-      }>,
+      }>
     ) {
       state.modelStatus = action.payload.modelStatus;
     },
@@ -121,7 +127,7 @@ export const classifierSlice = createSlice({
     },
     updateLossFunction(
       state,
-      action: PayloadAction<{ lossFunction: LossFunction }>,
+      action: PayloadAction<{ lossFunction: LossFunction }>
     ) {
       const { lossFunction } = action.payload;
 
@@ -132,18 +138,38 @@ export const classifierSlice = createSlice({
 
       state.metrics = metrics;
     },
+    updateModelIdxDict(
+      state,
+      action: PayloadAction<{
+        changes: { add?: Array<Kind["id"]>; del?: Array<Kind["id"]> };
+      }>
+    ) {
+      const changes = action.payload.changes;
+      if (changes.add) {
+        changes.add.forEach((kid) => (state.selectedModelIdx[kid] = 0));
+      }
+      if (changes.del) {
+        changes.del.forEach((kid) => delete state.selectedModelIdx[kid]);
+      }
+    },
     updateSelectedModelIdx(
       state,
-      action: PayloadAction<{ modelIdx: number; disposePrevious: boolean }>,
+      action: PayloadAction<{
+        modelIdx: number;
+        kindId: Kind["id"];
+        disposePrevious: boolean;
+      }>
     ) {
-      const { modelIdx, disposePrevious } = action.payload;
+      const { modelIdx, kindId, disposePrevious } = action.payload;
 
       if (disposePrevious) {
-        availableClassifierModels[state.selectedModelIdx].dispose();
+        availableClassifierModels[kindId][
+          state.selectedModelIdx[kindId]
+        ].dispose();
       }
 
-      state.selectedModelIdx = modelIdx;
-      const selectedModel = availableClassifierModels[modelIdx];
+      state.selectedModelIdx[kindId] = modelIdx;
+      const selectedModel = availableClassifierModels[kindId][modelIdx];
 
       if (selectedModel.history.epochs.length > 0 || selectedModel.pretrained) {
         state.modelStatus = ModelStatus.Trained;
@@ -155,13 +181,18 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         inputShape: Shape;
-        model: (typeof availableClassifierModels)[number];
-      }>,
+        activeKindId: Kind["id"];
+        model: (typeof availableClassifierModels)[string][number];
+      }>
     ) {
-      const { inputShape, model } = action.payload;
+      const { inputShape, activeKindId, model } = action.payload;
 
-      availableClassifierModels.push(model);
-      state.selectedModelIdx = availableClassifierModels.length - 1;
+      for (const kid of Object.keys(availableClassifierModels)) {
+        availableClassifierModels[kid].push(model);
+      }
+
+      state.selectedModelIdx[activeKindId] =
+        availableClassifierModels[activeKindId].length - 1;
 
       state.inputShape = inputShape;
 
@@ -173,7 +204,7 @@ export const classifierSlice = createSlice({
     },
     updateOptimizationAlgorithm(
       state,
-      action: PayloadAction<{ optimizationAlgorithm: OptimizationAlgorithm }>,
+      action: PayloadAction<{ optimizationAlgorithm: OptimizationAlgorithm }>
     ) {
       const { optimizationAlgorithm } = action.payload;
 
@@ -181,7 +212,7 @@ export const classifierSlice = createSlice({
     },
     updateRescaleOptions(
       state,
-      action: PayloadAction<{ rescaleOptions: RescaleOptions }>,
+      action: PayloadAction<{ rescaleOptions: RescaleOptions }>
     ) {
       state.preprocessOptions.rescaleOptions = action.payload.rescaleOptions;
     },
@@ -190,13 +221,13 @@ export const classifierSlice = createSlice({
     },
     updateCropOptions(
       state,
-      action: PayloadAction<{ cropOptions: CropOptions }>,
+      action: PayloadAction<{ cropOptions: CropOptions }>
     ) {
       state.preprocessOptions.cropOptions = action.payload.cropOptions;
     },
     updateTrainingPercentage(
       state,
-      action: PayloadAction<{ trainingPercentage: number }>,
+      action: PayloadAction<{ trainingPercentage: number }>
     ) {
       const { trainingPercentage } = action.payload;
 
@@ -206,7 +237,7 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         evaluationResult: ClassifierEvaluationResultType;
-      }>,
+      }>
     ) {
       const { evaluationResult } = action.payload;
 
@@ -214,7 +245,7 @@ export const classifierSlice = createSlice({
     },
     updateShowClearPredictionsWarning(
       state,
-      action: PayloadAction<{ showClearPredictionsWarning: boolean }>,
+      action: PayloadAction<{ showClearPredictionsWarning: boolean }>
     ) {
       state.showClearPredictionsWarning =
         action.payload.showClearPredictionsWarning;

@@ -7,9 +7,9 @@ import {
   selectClassifierFitOptions,
   selectClassifierHyperparameters,
   selectClassifierModelStatus,
-  selectClassifierSelectedModel,
   selectClassifierTrainingPercentage,
 } from "store/classifier/selectors";
+import { selectClassifierSelectedModel } from "store/classifier/reselectors";
 import {
   selectActiveLabeledThings,
   selectActiveLabeledThingsCount,
@@ -67,13 +67,13 @@ export const useFitClassificationModel = () => {
     return activeLabeledThings.some(
       (thing) =>
         !isUnknownCategory(thing.categoryId) &&
-        thing.partition === Partition.Inference,
+        thing.partition === Partition.Inference
     );
   }, [activeLabeledThings]);
 
   const noLabeledThings = useMemo(
     () => labeledThingsCount === 0,
-    [labeledThingsCount],
+    [labeledThingsCount]
   );
 
   const modelHistory = useMemo(() => {
@@ -84,7 +84,7 @@ export const useFitClassificationModel = () => {
         selectedHistory[k] = selectedModel.history.epochs;
       } else {
         selectedHistory[k] = fullHistory.flatMap(
-          (cycleHistory) => cycleHistory[k],
+          (cycleHistory) => cycleHistory[k]
         );
       }
     }
@@ -94,7 +94,7 @@ export const useFitClassificationModel = () => {
 
   const trainingHistoryCallback: TrainingCallbacks["onEpochEnd"] = async (
     epoch,
-    logs,
+    logs
   ) => {
     const nextEpoch = selectedModel.numEpochs + epoch + 1;
     const trainingEpochIndicator = nextEpoch - 0.5;
@@ -108,7 +108,7 @@ export const useFitClassificationModel = () => {
         prevState.concat({
           x: trainingEpochIndicator,
           y: logs.categoricalAccuracy as number,
-        }),
+        })
       );
     }
     if (logs.val_categoricalAccuracy) {
@@ -116,17 +116,17 @@ export const useFitClassificationModel = () => {
         prevState.concat({
           x: nextEpoch,
           y: logs.val_categoricalAccuracy as number,
-        }),
+        })
       );
     }
     if (logs.loss) {
       setTrainingLoss((prevState) =>
-        prevState.concat({ x: trainingEpochIndicator, y: logs.loss as number }),
+        prevState.concat({ x: trainingEpochIndicator, y: logs.loss as number })
       );
     }
     if (logs.val_loss) {
       setValidationLoss((prevState) =>
-        prevState.concat({ x: nextEpoch, y: logs.val_loss as number }),
+        prevState.concat({ x: nextEpoch, y: logs.val_loss as number })
       );
     }
 
@@ -140,14 +140,14 @@ export const useFitClassificationModel = () => {
         classifierSlice.actions.updateModelStatus({
           modelStatus: ModelStatus.InitFit,
           onEpochEnd: trainingHistoryCallback,
-        }),
+        })
       );
     } else {
       dispatch(
         classifierSlice.actions.updateModelStatus({
           modelStatus: ModelStatus.Training,
           onEpochEnd: trainingHistoryCallback,
-        }),
+        })
       );
     }
   };
@@ -168,10 +168,10 @@ export const useFitClassificationModel = () => {
 
   useEffect(() => {
     setTrainingAccuracy(
-      modelHistory.categoricalAccuracy.map((y, i) => ({ x: i + 0.5, y })),
+      modelHistory.categoricalAccuracy.map((y, i) => ({ x: i + 0.5, y }))
     );
     setValidationAccuracy(
-      modelHistory.val_categoricalAccuracy.map((y, i) => ({ x: i + 1, y })),
+      modelHistory.val_categoricalAccuracy.map((y, i) => ({ x: i + 1, y }))
     );
     setTrainingLoss(modelHistory.loss.map((y, i) => ({ x: i + 0.5, y })));
     setValidationLoss(modelHistory.val_loss.map((y, i) => ({ x: i + 1, y })));
@@ -197,24 +197,24 @@ export const useFitClassificationModel = () => {
 
       logger(
         `Set training size to Round[${labeledThingsCount} * ${trainingPercentage}] = ${trainingSize}
-        ; val size to ${labeledThingsCount} - ${trainingSize} = ${validationSize}`,
+        ; val size to ${labeledThingsCount} - ${trainingSize} = ${validationSize}`
       );
 
       logger(
         `Set training batches per epoch to RoundUp[${trainingSize} / ${
           fitOptions.batchSize
-        }] = ${Math.ceil(trainingSize / fitOptions.batchSize)}`,
+        }] = ${Math.ceil(trainingSize / fitOptions.batchSize)}`
       );
 
       logger(
         `Set validation batches per epoch to RoundUp[${validationSize} / ${
           fitOptions.batchSize
-        }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`,
+        }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`
       );
 
       logger(
         `Training last batch size is ${trainingSize % fitOptions.batchSize}
-        ; validation is ${validationSize % fitOptions.batchSize}`,
+        ; validation is ${validationSize % fitOptions.batchSize}`
       );
     }
   }, [fitOptions.batchSize, trainingPercentage, labeledThingsCount]);
