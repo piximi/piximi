@@ -74,7 +74,7 @@ export const classifierSlice = createSlice({
     },
     setClassifier(
       state,
-      action: PayloadAction<{ classifier: ClassifierState }>
+      action: PayloadAction<{ classifier: ClassifierState }>,
     ) {
       // WARNING, don't do below (overwrites draft object)
       // state = action.payload.classifier;
@@ -102,7 +102,7 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{
         modelStatus: ModelStatus;
         onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
-      }>
+      }>,
     ) {
       state.modelStatus = action.payload.modelStatus;
     },
@@ -127,7 +127,7 @@ export const classifierSlice = createSlice({
     },
     updateLossFunction(
       state,
-      action: PayloadAction<{ lossFunction: LossFunction }>
+      action: PayloadAction<{ lossFunction: LossFunction }>,
     ) {
       const { lossFunction } = action.payload;
 
@@ -142,7 +142,7 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         changes: { add?: Array<Kind["id"]>; del?: Array<Kind["id"]> };
-      }>
+      }>,
     ) {
       const changes = action.payload.changes;
       if (changes.add) {
@@ -158,7 +158,7 @@ export const classifierSlice = createSlice({
         modelIdx: number;
         kindId: Kind["id"];
         disposePrevious: boolean;
-      }>
+      }>,
     ) {
       const { modelIdx, kindId, disposePrevious } = action.payload;
 
@@ -183,7 +183,7 @@ export const classifierSlice = createSlice({
         inputShape: Shape;
         activeKindId: Kind["id"];
         model: (typeof availableClassifierModels)[string][number];
-      }>
+      }>,
     ) {
       const { inputShape, activeKindId, model } = action.payload;
 
@@ -204,7 +204,7 @@ export const classifierSlice = createSlice({
     },
     updateOptimizationAlgorithm(
       state,
-      action: PayloadAction<{ optimizationAlgorithm: OptimizationAlgorithm }>
+      action: PayloadAction<{ optimizationAlgorithm: OptimizationAlgorithm }>,
     ) {
       const { optimizationAlgorithm } = action.payload;
 
@@ -212,7 +212,7 @@ export const classifierSlice = createSlice({
     },
     updateRescaleOptions(
       state,
-      action: PayloadAction<{ rescaleOptions: RescaleOptions }>
+      action: PayloadAction<{ rescaleOptions: RescaleOptions }>,
     ) {
       state.preprocessOptions.rescaleOptions = action.payload.rescaleOptions;
     },
@@ -221,13 +221,13 @@ export const classifierSlice = createSlice({
     },
     updateCropOptions(
       state,
-      action: PayloadAction<{ cropOptions: CropOptions }>
+      action: PayloadAction<{ cropOptions: CropOptions }>,
     ) {
       state.preprocessOptions.cropOptions = action.payload.cropOptions;
     },
     updateTrainingPercentage(
       state,
-      action: PayloadAction<{ trainingPercentage: number }>
+      action: PayloadAction<{ trainingPercentage: number }>,
     ) {
       const { trainingPercentage } = action.payload;
 
@@ -237,7 +237,7 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         evaluationResult: ClassifierEvaluationResultType;
-      }>
+      }>,
     ) {
       const { evaluationResult } = action.payload;
 
@@ -245,7 +245,7 @@ export const classifierSlice = createSlice({
     },
     updateShowClearPredictionsWarning(
       state,
-      action: PayloadAction<{ showClearPredictionsWarning: boolean }>
+      action: PayloadAction<{ showClearPredictionsWarning: boolean }>,
     ) {
       state.showClearPredictionsWarning =
         action.payload.showClearPredictionsWarning;

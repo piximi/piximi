@@ -8,14 +8,14 @@ export const selectActiveKindModelIdx = createSelector(
   selectActiveKindId,
   (selectedModelIdxDict, activeKindId) => {
     return selectedModelIdxDict[activeKindId];
-  }
+  },
 );
 
 export const selectActiveKindClassifiers = createSelector(
   selectActiveKindId,
   (selectedActiveKindId) => {
     return availableClassifierModels[selectedActiveKindId];
-  }
+  },
 );
 
 export const selectClassifierSelectedModel = createSelector(
@@ -23,7 +23,7 @@ export const selectClassifierSelectedModel = createSelector(
   selectActiveKindClassifiers,
   (selectedActiveKindModelIdx, selectedActiveKindClassifiers) => {
     return selectedActiveKindClassifiers[selectedActiveKindModelIdx];
-  }
+  },
 );
 
 export const selectClassifierHistory = createSelector(
@@ -36,12 +36,12 @@ export const selectClassifierHistory = createSelector(
         selectedHistory[k] = model.history.epochs;
       } else {
         selectedHistory[k] = fullHistory.flatMap(
-          (cycleHistory) => cycleHistory[k]
+          (cycleHistory) => cycleHistory[k],
         );
       }
     }
     return selectedHistory;
-  }
+  },
 );
 
 export const selectClassifierSelectedModelIdx = createSelector(
@@ -50,5 +50,5 @@ export const selectClassifierSelectedModelIdx = createSelector(
   (modelIdx, model) => ({
     idx: modelIdx,
     model,
-  })
+  }),
 );

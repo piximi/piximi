@@ -56,7 +56,7 @@ export const ImportTensorflowModelDialog = ({
   const [selectedModel, setSelectedModel] = useState<Model | undefined>(
     loadedModel?.name === "Fully Convolutional Network"
       ? undefined
-      : loadedModel
+      : loadedModel,
   );
   const [inputShape, setInputShape] = useState<Shape>({
     height: 256,
@@ -115,7 +115,7 @@ export const ImportTensorflowModelDialog = ({
     },
     HotkeyContext.ConfirmationDialog,
 
-    [dispatchModelToStore, selectedModel, invalidModel]
+    [dispatchModelToStore, selectedModel, invalidModel],
   );
 
   useEffect(() => {
@@ -125,13 +125,13 @@ export const ImportTensorflowModelDialog = ({
         : availableSegmenterModels;
 
     const _pretrainedModels = (allModels as Model[]).filter(
-      (m) => m.pretrained
+      (m) => m.pretrained,
     );
 
     setPretrainedModels(_pretrainedModels);
     // if no pretrained models, make sure not on tab 1
     setTabVal((curr) =>
-      _pretrainedModels.length === 0 && curr === "1" ? "2" : curr
+      _pretrainedModels.length === 0 && curr === "1" ? "2" : curr,
     );
   }, [modelTask]);
 
@@ -216,7 +216,7 @@ export const ImportTensorflowModelDialog = ({
             initModel={
               selectedModel
                 ? pretrainedModels.findIndex(
-                    (model) => model.name === selectedModel.name
+                    (model) => model.name === selectedModel.name,
                   ) + ""
                 : "-1"
             }
