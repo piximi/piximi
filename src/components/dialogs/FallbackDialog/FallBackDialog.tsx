@@ -48,7 +48,7 @@ export const FallBackDialog = (props: any) => {
   const [expanded, setExpanded] = React.useState(false);
 
   const [stackTrace, setStackTrace] = React.useState<string | undefined>(
-    error.stack
+    error.stack,
   );
 
   React.useEffect(() => {
@@ -56,7 +56,7 @@ export const FallBackDialog = (props: any) => {
       fromError(error)
         .then((stacktrace) => {
           setStackTrace(
-            stacktrace.map((stackFrame) => stackFrame.toString()).join("\n")
+            stacktrace.map((stackFrame) => stackFrame.toString()).join("\n"),
           );
         })
         .catch((err) => console.error("could not resolve stacktrace", err));
@@ -164,7 +164,7 @@ export const FallBackDialog = (props: any) => {
                 createGitHubIssue(
                   errorState.name,
                   issueDescription,
-                  AlertType.Error
+                  AlertType.Error,
                 )
               }
             >
