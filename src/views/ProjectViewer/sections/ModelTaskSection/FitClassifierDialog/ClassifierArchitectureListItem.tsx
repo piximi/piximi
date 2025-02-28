@@ -28,7 +28,7 @@ export const ClassifierArchitectureListItem = () => {
           idx: i,
         }))
         .filter((m) => m.trainable || m.loaded),
-    [activeKindId]
+    [activeKindId],
   );
 
   const dispatchModel = (disposePrevious: boolean, modelIdx: number) => {
@@ -37,7 +37,7 @@ export const ClassifierArchitectureListItem = () => {
         modelIdx: modelIdx,
         kindId: activeKindId,
         disposePrevious,
-      })
+      }),
     );
 
     // if the selected model requires a specific number of input channels,
@@ -49,7 +49,7 @@ export const ClassifierArchitectureListItem = () => {
             ...inputShape,
             channels: selectedModel.model.requiredChannels,
           },
-        })
+        }),
       );
     }
   };
@@ -60,21 +60,21 @@ export const ClassifierArchitectureListItem = () => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, height: value },
-          })
+          }),
         );
         return;
       case "shape-cols":
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, width: value },
-          })
+          }),
         );
         return;
       case "shape-channels":
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, channels: value },
-          })
+          }),
         );
     }
   };
