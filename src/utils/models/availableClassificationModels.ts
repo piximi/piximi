@@ -19,7 +19,7 @@ export const addClassifierModels = (kindIds: Array<Kind["id"]>) => {
   for (const kid of kindIds) {
     if (kid in availableClassifierModels) {
       throw new Error(
-        `Trying to add classifier models for an already existing kind id: ${kid}`
+        `Trying to add classifier models for an already existing kind id: ${kid}`,
       );
     }
 
@@ -31,7 +31,7 @@ export const deleteClassifierModels = (kindIds: Array<Kind["id"]>) => {
   for (const kid of kindIds) {
     if (!(kid in availableClassifierModels)) {
       throw new Error(
-        `Trying to delete classifier models for an non-existant kind id: ${kid}`
+        `Trying to delete classifier models for an non-existant kind id: ${kid}`,
       );
     }
 
