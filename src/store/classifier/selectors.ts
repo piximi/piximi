@@ -32,7 +32,7 @@ export const selectClassifierCompileOptions = createSelector(
       metrics: classifier.metrics,
       optimizationAlgorithm: classifier.optimizationAlgorithm,
     };
-  },
+  }
 );
 
 export const selectClassifierPreprocessOptions = ({
@@ -113,42 +113,11 @@ export const selectClassifierModelStatus = ({
   return classifier.modelStatus;
 };
 
-export const selectClassifierSelectedModel = ({
+export const selectedIdxSelector = ({
   classifier,
 }: {
   classifier: ClassifierState;
-}) => {
-  return availableClassifierModels[classifier.selectedModelIdx];
-};
-
-export const selectClassifierHistory = createSelector(
-  [selectClassifierSelectedModel, (state, items: string[]) => items],
-  (model, items) => {
-    const fullHistory = model.history.history;
-    const selectedHistory: { [key: string]: number[] } = {};
-    for (const k of items) {
-      if (k === "epochs") {
-        selectedHistory[k] = model.history.epochs;
-      } else {
-        selectedHistory[k] = fullHistory.flatMap(
-          (cycleHistory) => cycleHistory[k],
-        );
-      }
-    }
-    return selectedHistory;
-  },
-);
-
-const selectedIdxSelector = ({ classifier }: { classifier: ClassifierState }) =>
-  classifier.selectedModelIdx;
-
-export const selectClassifierSelectedModelIdx = createSelector(
-  selectedIdxSelector,
-  (idx) => ({
-    idx,
-    model: availableClassifierModels[idx],
-  }),
-);
+}) => classifier.selectedModelIdx;
 
 export const selectShowClearPredictionsWarning = ({
   classifier,
@@ -168,5 +137,5 @@ export const selectClassifierHyperparameters = createSelector(
       compileOptions,
       fitOptions,
     };
-  },
+  }
 );
