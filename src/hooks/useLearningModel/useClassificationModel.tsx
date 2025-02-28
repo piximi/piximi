@@ -2,10 +2,9 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { classifierSlice } from "store/classifier";
-import {
-  selectClassifierModelStatus,
-  selectClassifierSelectedModel,
-} from "store/classifier/selectors";
+import { selectClassifierModelStatus } from "store/classifier/selectors";
+import { selectClassifierSelectedModel } from "store/classifier/reselectors";
+import { selectActiveKindId } from "store/project/selectors";
 
 import { SequentialClassifier } from "utils/models/classification";
 import { Model } from "utils/models/Model";
@@ -19,6 +18,7 @@ export const useClassificationModel = () => {
 
   const modelStatus = useSelector(selectClassifierModelStatus);
   const selectedModel = useSelector(selectClassifierSelectedModel);
+  const activeKindId = useSelector(selectActiveKindId);
   const [waitingForResults, setWaitingForResults] = React.useState(false);
   const [helperText, setHelperText] =
     React.useState<string>("No trained model");
@@ -27,7 +27,7 @@ export const useClassificationModel = () => {
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Predicting,
-      }),
+      })
     );
   };
 
@@ -37,7 +37,7 @@ export const useClassificationModel = () => {
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Evaluating,
-      }),
+      })
     );
   };
   const handleImportModel = async (model: Model, inputShape: Shape) => {
@@ -45,14 +45,15 @@ export const useClassificationModel = () => {
       dispatch(
         classifierSlice.actions.loadUserSelectedModel({
           inputShape: inputShape,
+          activeKindId,
           model,
-        }),
+        })
       );
     } else if (import.meta.env.NODE_ENV !== "production") {
       console.warn(
         `Attempting to dispatch a model with task ${
           ModelTask[model.task]
-        }, should be ${ModelTask[ModelTask.Classification]}`,
+        }, should be ${ModelTask[ModelTask.Classification]}`
       );
     }
   };
