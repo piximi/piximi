@@ -2,8 +2,10 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { classifierSlice } from "store/classifier";
-import { selectClassifierModelStatus } from "store/classifier/selectors";
-import { selectClassifierSelectedModel } from "store/classifier/reselectors";
+import {
+  selectActiveClassifierModelStatus,
+  selectActiveClassifierModel,
+} from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 
 import { SequentialClassifier } from "utils/models/classification";
@@ -16,8 +18,8 @@ import { Shape } from "store/data/types";
 export const useClassificationModel = () => {
   const dispatch = useDispatch();
 
-  const modelStatus = useSelector(selectClassifierModelStatus);
-  const selectedModel = useSelector(selectClassifierSelectedModel);
+  const modelStatus = useSelector(selectActiveClassifierModelStatus);
+  const selectedModel = useSelector(selectActiveClassifierModel);
   const activeKindId = useSelector(selectActiveKindId);
   const [waitingForResults, setWaitingForResults] = React.useState(false);
   const [helperText, setHelperText] =
@@ -26,6 +28,7 @@ export const useClassificationModel = () => {
   const handlePredict = () => {
     dispatch(
       classifierSlice.actions.updateModelStatus({
+        kindId: activeKindId,
         modelStatus: ModelStatus.Predicting,
       }),
     );
@@ -36,6 +39,7 @@ export const useClassificationModel = () => {
 
     dispatch(
       classifierSlice.actions.updateModelStatus({
+        kindId: activeKindId,
         modelStatus: ModelStatus.Evaluating,
       }),
     );
@@ -45,7 +49,7 @@ export const useClassificationModel = () => {
       dispatch(
         classifierSlice.actions.loadUserSelectedModel({
           inputShape: inputShape,
-          activeKindId,
+          kindId: activeKindId,
           model,
         }),
       );

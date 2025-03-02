@@ -1,10 +1,8 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import { availableClassifierModels } from "utils/models/availableClassificationModels";
-
 import { ModelStatus } from "utils/models/enums";
 
-import { Shape } from "store/data/types";
+import { Kind, Shape } from "store/data/types";
 import { ClassifierState } from "store/types";
 import {
   ClassifierEvaluationResultType,
@@ -105,11 +103,11 @@ export const selectClassifierTrainingPercentage = ({
   return classifier.trainingPercentage;
 };
 
-export const selectClassifierModelStatus = ({
+export const selectClassifierModelStatusDict = ({
   classifier,
 }: {
   classifier: ClassifierState;
-}): ModelStatus => {
+}): Record<Kind["id"], Record<string | number, ModelStatus>> => {
   return classifier.modelStatus;
 };
 

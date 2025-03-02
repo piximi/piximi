@@ -94,7 +94,7 @@ export type ClassifierState = {
   // post-evaluation results
   evaluationResult: ClassifierEvaluationResultType;
   // status flags
-  modelStatus: ModelStatus;
+  modelStatus: Record<Kind["id"], Record<string | number, ModelStatus>>;
   showClearPredictionsWarning: boolean;
 };
 
