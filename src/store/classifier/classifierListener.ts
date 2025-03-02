@@ -15,14 +15,14 @@ import { isUnknownCategory } from "store/data/helpers";
 
 import { SimpleCNN, MobileNet } from "utils/models/classification";
 
-import { availableClassifierModels } from "utils/models/availableClassificationModels";
+import { kindClassifierModelDict } from "utils/models/availableClassificationModels";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/common/enums";
 
 import { StoreListemerAPI, TypedAppStartListening } from "store/types";
 import { CompileOptions, TrainingCallbacks } from "utils/models/types";
 import { AlertState } from "utils/common/types";
-import { Category, Thing } from "store/data/types";
+import { Category, Kind, Thing } from "store/data/types";
 
 export const classifierMiddleware = createListenerMiddleware();
 
@@ -33,6 +33,7 @@ const handleError = async (
   listenerAPI: StoreListemerAPI,
   error: Error,
   name: string,
+  kindId: Kind["id"],
   errorType?: { fittingError: boolean },
 ) => {
   const stackTrace = await getStackTraceFromError(error);
@@ -59,6 +60,7 @@ const handleError = async (
   if (errorType && errorType.fittingError) {
     listenerAPI.dispatch(
       classifierSlice.actions.updateModelStatus({
+        kindId,
         modelStatus: ModelStatus.Uninitialized,
       }),
     );
@@ -125,7 +127,8 @@ const fitListener = async (
   ]) as CompileOptions;
   const modelIdx = classifierState.selectedModelIdx[activeKindId];
 
-  const model = availableClassifierModels[activeKindId][modelIdx];
+  const model = kindClassifierModelDict[activeKindId][modelIdx];
+  const modelStatus = classifierState.modelStatus[activeKindId][modelIdx];
 
   /* DATA */
 
@@ -179,6 +182,7 @@ const fitListener = async (
 
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
+      kindId: activeKindId,
       modelStatus: ModelStatus.Loading,
     }),
   );
@@ -187,7 +191,7 @@ const fitListener = async (
 
   let splitLabeledTraining: Thing[] = [];
   let splitLabeledValidation: Thing[] = [];
-  if (classifierState.modelStatus === ModelStatus.InitFit) {
+  if (modelStatus === ModelStatus.InitFit) {
     const trainingThingsLength = Math.round(
       trainingPercentage * labeledUnassigned.length,
     );
@@ -265,6 +269,7 @@ const fitListener = async (
       listenerAPI,
       error as Error,
       "Failed to create tensorflow model",
+      activeKindId,
       { fittingError: true },
     );
     return;
@@ -288,14 +293,21 @@ const fitListener = async (
       loadDataArgs,
     );
   } catch (error) {
-    handleError(listenerAPI, error as Error, "Error in preprocessing", {
-      fittingError: true,
-    });
+    handleError(
+      listenerAPI,
+      error as Error,
+      "Error in preprocessing",
+      activeKindId,
+      {
+        fittingError: true,
+      },
+    );
     return;
   }
 
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
+      kindId: activeKindId,
       modelStatus: ModelStatus.Training,
     }),
   );
@@ -318,12 +330,18 @@ const fitListener = async (
       import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
       logger(history);
   } catch (error) {
-    handleError(listenerAPI, error as Error, "Error training the model");
+    handleError(
+      listenerAPI,
+      error as Error,
+      "Error training the model",
+      activeKindId,
+    );
     return;
   }
 
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
+      kindId: activeKindId,
       modelStatus: ModelStatus.Trained,
     }),
   );
@@ -362,7 +380,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
 
   const { preprocessOptions, fitOptions, inputShape } = classifierState;
   const modelIdx = classifierState.selectedModelIdx[activeKindId];
-  const model = availableClassifierModels[activeKindId][modelIdx];
+  const model = kindClassifierModelDict[activeKindId][modelIdx];
   let finalModelStatus = ModelStatus.Trained;
 
   /* CHECK FOR SIMPLE ERRORS */
@@ -385,6 +403,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       listenerAPI,
       new Error("No selectable model in store"),
       "Failed to get tensorflow model",
+      activeKindId,
     );
   }
 
@@ -422,12 +441,14 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
         listenerAPI,
         error as Error,
         "Error in preprocessing the inference data",
+        activeKindId,
       );
     }
   }
 
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
+      kindId: activeKindId,
       modelStatus: finalModelStatus,
     }),
   );
@@ -457,7 +478,7 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
 
   /* CLASSIFIER*/
   const modelIdx = classifierState.selectedModelIdx[activeKindId];
-  const model = availableClassifierModels[activeKindId][modelIdx];
+  const model = kindClassifierModelDict[activeKindId][modelIdx];
 
   /* EVALUATE */
 
@@ -494,12 +515,14 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
         listenerAPI,
         error as Error,
         "Error computing the evaluation results",
+        activeKindId,
       );
       return;
     }
   }
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
+      kindId: activeKindId,
       modelStatus: ModelStatus.Trained,
     }),
   );

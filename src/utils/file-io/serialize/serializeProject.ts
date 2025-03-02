@@ -3,7 +3,7 @@ import { Group, NestedArray, group } from "zarr";
 
 import { Tensor } from "@tensorflow/tfjs";
 import { PreprocessOptions } from "utils/models/types";
-import { availableClassifierModels } from "utils/models/availableClassificationModels";
+import { kindClassifierModelDict } from "utils/models/availableClassificationModels";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import { ZipStore } from "../zarrStores";
 import { LoadCB } from "../types";
@@ -215,7 +215,7 @@ const serializeClassifier = async (
 ) => {
   const classifierModel =
     // @ts-ignore TODO multiple-classifiers
-    availableClassifierModels[classifier.selectedModelIdx];
+    kindClassifierModelDict[classifier.selectedModelIdx];
 
   await classifierGroup.attrs.setItem("name", classifierModel.name);
 

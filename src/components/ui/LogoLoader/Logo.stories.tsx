@@ -6,7 +6,8 @@ import { Box, Button, Slider } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "store/classifier";
 import { ModelStatus } from "utils/models/enums";
-import { selectClassifierModelStatus } from "store/classifier/selectors";
+import { selectActiveClassifierModelStatus } from "store/classifier/reselectors";
+import { selectActiveKindId } from "store/project/selectors";
 
 const Controller = ({
   width,
@@ -18,12 +19,14 @@ const Controller = ({
   fullLogo: boolean;
 }) => {
   const dispatch = useDispatch();
-  const modelStatus = useSelector(selectClassifierModelStatus);
+  const modelStatus = useSelector(selectActiveClassifierModelStatus);
+  const activeKindId = useSelector(selectActiveKindId);
   const [sliderVal, setSliderVal] = useState(100);
 
   const flipLoad = (newStatus: ModelStatus) => {
     dispatch(
       classifierSlice.actions.updateModelStatus({
+        kindId: activeKindId,
         modelStatus: newStatus,
       }),
     );
