@@ -174,5 +174,10 @@ startAppListening({
         changes: { del: deletedKinds, add: addedKinds },
       }),
     );
+    listenerAPI.dispatch(
+      classifierSlice.actions.updateModelStatusDict({
+        changes: { del: deletedKinds, add: addedKinds },
+      }),
+    );
   },
 });

@@ -21,11 +21,11 @@ import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
 import { classifierSlice } from "store/classifier";
 import { dataSlice } from "store/data";
+import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
 import {
-  selectClassifierModelStatus,
-  selectShowClearPredictionsWarning,
-} from "store/classifier/selectors";
-import { selectClassifierSelectedModel } from "store/classifier/reselectors";
+  selectActiveClassifierModel,
+  selectActiveClassifierModelStatus,
+} from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 
 import { APPLICATION_COLORS } from "utils/common/constants";
@@ -52,9 +52,9 @@ export const FitClassifierDialogAppBar = ({
   currentEpoch,
 }: FitClassifierDialogAppBarProps) => {
   const dispatch = useDispatch();
-  const activeKind = useSelector(selectActiveKindId);
-  const selectedModel = useSelector(selectClassifierSelectedModel);
-  const modelStatus = useSelector(selectClassifierModelStatus);
+  const activeKindId = useSelector(selectActiveKindId);
+  const selectedModel = useSelector(selectActiveClassifierModel);
+  const modelStatus = useSelector(selectActiveClassifierModelStatus);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
@@ -72,6 +72,7 @@ export const FitClassifierDialogAppBar = ({
 
     dispatch(
       classifierSlice.actions.updateModelStatus({
+        kindId: activeKindId,
         modelStatus: ModelStatus.Trained,
       }),
     );
@@ -81,6 +82,7 @@ export const FitClassifierDialogAppBar = ({
     selectedModel.dispose();
     dispatch(
       classifierSlice.actions.updateModelStatus({
+        kindId: activeKindId,
         modelStatus: ModelStatus.Uninitialized,
       }),
     );
@@ -89,7 +91,7 @@ export const FitClassifierDialogAppBar = ({
   const clearAndFit = () => {
     dispatch(
       dataSlice.actions.clearPredictions({
-        kind: activeKind,
+        kind: activeKindId,
       }),
     );
     fit();

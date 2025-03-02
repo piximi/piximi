@@ -1,33 +1,54 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { availableClassifierModels } from "utils/models/availableClassificationModels";
+import { kindClassifierModelDict } from "utils/models/availableClassificationModels";
 import { selectActiveKindId } from "../project/selectors";
-import { selectedIdxSelector } from "./selectors";
+import {
+  selectClassifierModelStatusDict,
+  selectedIdxSelector,
+} from "./selectors";
+import { SequentialClassifier } from "utils/models/classification";
+import { ModelStatus } from "utils/models/enums";
 
-export const selectActiveKindModelIdx = createSelector(
+export const selectActiveClassifierModelIdx = createSelector(
   selectedIdxSelector,
   selectActiveKindId,
-  (selectedModelIdxDict, activeKindId) => {
-    return selectedModelIdxDict[activeKindId];
+  (modelIdxDict, activeKindId): number => {
+    return modelIdxDict[activeKindId];
   },
 );
 
-export const selectActiveKindClassifiers = createSelector(
+export const selectActiveClassifiers = createSelector(
   selectActiveKindId,
-  (selectedActiveKindId) => {
-    return availableClassifierModels[selectedActiveKindId];
+  (activeKindId): Array<SequentialClassifier> => {
+    return kindClassifierModelDict[activeKindId];
   },
 );
 
-export const selectClassifierSelectedModel = createSelector(
-  selectActiveKindModelIdx,
-  selectActiveKindClassifiers,
+export const selectActiveModelStatuses = createSelector(
+  selectActiveKindId,
+  selectClassifierModelStatusDict,
+  (activeKindId, modelStatuses): Record<string | number, ModelStatus> => {
+    return modelStatuses[activeKindId];
+  },
+);
+
+export const selectActiveClassifierModelStatus = createSelector(
+  selectActiveClassifierModelIdx,
+  selectActiveModelStatuses,
+  (modelIdx, statuses): ModelStatus => {
+    return statuses[modelIdx];
+  },
+);
+
+export const selectActiveClassifierModel = createSelector(
+  selectActiveClassifierModelIdx,
+  selectActiveClassifiers,
   (selectedActiveKindModelIdx, selectedActiveKindClassifiers) => {
     return selectedActiveKindClassifiers[selectedActiveKindModelIdx];
   },
 );
 
-export const selectClassifierHistory = createSelector(
-  [selectClassifierSelectedModel, (state, items: string[]) => items],
+export const selectActiveClassifierHistory = createSelector(
+  [selectActiveClassifierModel, (state, items: string[]) => items],
   (model, items) => {
     const fullHistory = model.history.history;
     const selectedHistory: { [key: string]: number[] } = {};
@@ -44,9 +65,9 @@ export const selectClassifierHistory = createSelector(
   },
 );
 
-export const selectClassifierSelectedModelIdx = createSelector(
-  selectActiveKindModelIdx,
-  selectClassifierSelectedModel,
+export const selectActiveClassifierModelWithIdx = createSelector(
+  selectActiveClassifierModelIdx,
+  selectActiveClassifierModel,
   (modelIdx, model) => ({
     idx: modelIdx,
     model,
