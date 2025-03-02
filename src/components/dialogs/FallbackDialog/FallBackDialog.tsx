@@ -26,8 +26,10 @@ import { useDialogHotkey } from "hooks";
 
 import { SaveFittedModelDialog, SaveProjectDialog } from "components/dialogs";
 
-import { selectClassifierModelStatus } from "store/classifier/selectors";
-import { selectClassifierSelectedModel } from "store/classifier/reselectors";
+import {
+  selectActiveClassifierModel,
+  selectActiveClassifierModelStatus,
+} from "store/classifier/reselectors";
 import {
   selectSegmenterModel,
   selectSegmenterModelStatus,
@@ -90,8 +92,8 @@ export const FallBackDialog = (props: any) => {
     open: openSaveSegmenterDialog,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
-  const selectedClassifierModel = useSelector(selectClassifierSelectedModel);
-  const classifierModelStatus = useSelector(selectClassifierModelStatus);
+  const selectedClassifierModel = useSelector(selectActiveClassifierModel);
+  const classifierModelStatus = useSelector(selectActiveClassifierModelStatus);
 
   const selectedSegmenterModel = useSelector(selectSegmenterModel);
   const segmenterModelStatus = useSelector(selectSegmenterModelStatus);
