@@ -1,15 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectAlertState } from "store/applicationSettings/selectors";
 import { classifierSlice } from "store/classifier";
+import { selectAlertState } from "store/applicationSettings/selectors";
+import { selectActiveKindId, selectProjectName } from "store/project/selectors";
 import {
   selectClassifierFitOptions,
   selectClassifierHyperparameters,
-  selectClassifierModelStatus,
   selectClassifierTrainingPercentage,
 } from "store/classifier/selectors";
-import { selectClassifierSelectedModel } from "store/classifier/reselectors";
+import {
+  selectActiveClassifierModel,
+  selectActiveClassifierModelStatus,
+} from "store/classifier/reselectors";
 import {
   selectActiveLabeledThings,
   selectActiveLabeledThingsCount,
@@ -24,7 +27,6 @@ import { AlertType } from "utils/common/enums";
 import { AlertState } from "utils/common/types";
 import { TrainingCallbacks } from "utils/models/types";
 import saveAs from "file-saver";
-import { selectProjectName } from "store/project/selectors";
 
 type PlotData = { x: number; y: number }[];
 const historyItems = [
@@ -53,10 +55,11 @@ export const useFitClassificationModel = () => {
   const [validationLoss, setValidationLoss] = useState<PlotData>([]);
 
   // StoreState
+  const activeKindId = useSelector(selectActiveKindId);
   const activeLabeledThings = useSelector(selectActiveLabeledThings);
   const labeledThingsCount = useSelector(selectActiveLabeledThingsCount);
-  const selectedModel = useSelector(selectClassifierSelectedModel);
-  const modelStatus = useSelector(selectClassifierModelStatus);
+  const selectedModel = useSelector(selectActiveClassifierModel);
+  const modelStatus = useSelector(selectActiveClassifierModelStatus);
   const alertState = useSelector(selectAlertState);
   const fitOptions = useSelector(selectClassifierFitOptions);
   const hyperparameters = useSelector(selectClassifierHyperparameters);
@@ -138,6 +141,7 @@ export const useFitClassificationModel = () => {
     if (modelStatus === ModelStatus.Uninitialized) {
       dispatch(
         classifierSlice.actions.updateModelStatus({
+          kindId: activeKindId,
           modelStatus: ModelStatus.InitFit,
           onEpochEnd: trainingHistoryCallback,
         }),
@@ -145,6 +149,7 @@ export const useFitClassificationModel = () => {
     } else {
       dispatch(
         classifierSlice.actions.updateModelStatus({
+          kindId: activeKindId,
           modelStatus: ModelStatus.Training,
           onEpochEnd: trainingHistoryCallback,
         }),

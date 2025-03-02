@@ -6,21 +6,21 @@ import { ArchitectureSettings } from "../training-settings";
 
 import { classifierSlice } from "store/classifier";
 import { selectClassifierInputShape } from "store/classifier/selectors";
-import { selectClassifierSelectedModelIdx } from "store/classifier/reselectors";
+import { selectActiveClassifierModelWithIdx } from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 
-import { availableClassifierModels } from "utils/models/availableClassificationModels";
+import { kindClassifierModelDict } from "utils/models/availableClassificationModels";
 
 export const ClassifierArchitectureListItem = () => {
   const dispatch = useDispatch();
 
   const inputShape = useSelector(selectClassifierInputShape);
-  const selectedModel = useSelector(selectClassifierSelectedModelIdx);
+  const selectedModel = useSelector(selectActiveClassifierModelWithIdx);
   const activeKindId = useSelector(selectActiveKindId);
 
   const modelOptions = useMemo(
     () =>
-      availableClassifierModels[activeKindId]
+      kindClassifierModelDict[activeKindId]
         .map((m, i) => ({
           name: m.name,
           trainable: m.trainable,

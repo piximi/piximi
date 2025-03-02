@@ -34,7 +34,7 @@ import { HotkeyContext } from "utils/common/enums";
 
 import { Shape } from "store/data/types";
 import { ToolTipTab } from "components/layout";
-import { selectActiveKindClassifiers } from "store/classifier/reselectors";
+import { selectActiveClassifiers } from "store/classifier/reselectors";
 
 type ImportTensorflowModelDialogProps = {
   onClose: () => void;
@@ -52,7 +52,7 @@ export const ImportTensorflowModelDialog = ({
   dispatchFunction,
 }: ImportTensorflowModelDialogProps) => {
   const projectChannels = useSelector(selectProjectImageChannels);
-  const availableClassifierModels = useSelector(selectActiveKindClassifiers);
+  const availableClassifierModels = useSelector(selectActiveClassifiers);
   const [selectedModel, setSelectedModel] = useState<Model | undefined>(
     loadedModel?.name === "Fully Convolutional Network"
       ? undefined
