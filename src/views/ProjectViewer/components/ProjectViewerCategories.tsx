@@ -19,7 +19,7 @@ import {
   selectActiveSelectedThingIds,
 } from "store/project/reselectors";
 import { dataSlice } from "store/data/dataSlice";
-import { selectClassifierModelStatus } from "store/classifier/selectors";
+import { selectActiveClassifierModelStatus } from "store/classifier/reselectors";
 
 import { isUnknownCategory } from "store/data/helpers";
 
@@ -39,7 +39,7 @@ export const ProjectViewerCategories = () => {
 
   const highlightedCategory = useSelector(selectHighlightedCategory);
 
-  const modelStatus = useSelector(selectClassifierModelStatus);
+  const modelStatus = useSelector(selectActiveClassifierModelStatus);
   const selectedImageIds = useSelector(selectActiveSelectedThingIds);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =

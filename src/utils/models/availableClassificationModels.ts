@@ -4,42 +4,46 @@ import { MobileNet } from "./classification/MobileNet/MobileNet";
 import { SimpleCNN } from "./classification/SimpleCNN/SimpleCNN";
 import { DEFAULT_KIND } from "store/data/constants";
 
-export const availableClassifierModels: Record<
+export const availableClassifierModels = [SimpleCNN, MobileNet];
+
+export const kindClassifierModelDict: Record<
   Kind["id"],
   Array<SequentialClassifier>
 > = {
-  [DEFAULT_KIND]: [new SimpleCNN(), new MobileNet()],
+  [DEFAULT_KIND]: availableClassifierModels.map((model) => new model()),
 };
 // prevent deleting DEFAULT_KIND
-Object.defineProperty(availableClassifierModels, DEFAULT_KIND, {
+Object.defineProperty(kindClassifierModelDict, DEFAULT_KIND, {
   configurable: false,
 });
 
 export const addClassifierModels = (kindIds: Array<Kind["id"]>) => {
-  for (const kid of kindIds) {
-    if (kid in availableClassifierModels) {
+  for (const id of kindIds) {
+    if (id in kindClassifierModelDict) {
       throw new Error(
-        `Trying to add classifier models for an already existing kind id: ${kid}`,
+        `Trying to add classifier models for an already existing kind id: ${id}`,
       );
     }
 
-    availableClassifierModels[kid] = [new SimpleCNN(), new MobileNet()];
+    kindClassifierModelDict[id] = availableClassifierModels.map(
+      (model) => new model(),
+    );
   }
 };
 
 export const deleteClassifierModels = (kindIds: Array<Kind["id"]>) => {
-  for (const kid of kindIds) {
-    if (!(kid in availableClassifierModels)) {
+  for (const id of kindIds) {
+    if (!(id in kindClassifierModelDict)) {
       throw new Error(
-        `Trying to delete classifier models for an non-existant kind id: ${kid}`,
+        `Trying to delete classifier models for an non-existant kind id: ${id}`,
       );
     }
 
-    for (const model of availableClassifierModels[kid]) {
+    for (const model of kindClassifierModelDict[id]) {
       model.dispose();
     }
     try {
-      delete availableClassifierModels[kid];
+      delete kindClassifierModelDict[id];
     } catch {
       // do nothing; we expect this when "delete" called on DEFAULT_KIND
     }
