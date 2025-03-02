@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import {
-  availableClassifierModels,
+  kindClassifierModelDict,
   deleteClassifierModels,
+  availableClassifierModels,
 } from "utils/models/availableClassificationModels";
 
 import {
@@ -24,7 +25,13 @@ import { Kind, Shape } from "store/data/types";
 import { DEFAULT_KIND } from "store/data/constants";
 
 export const initialState: ClassifierState = {
-  modelStatus: ModelStatus.Uninitialized,
+  modelStatus: {
+    [DEFAULT_KIND]: Object.fromEntries(
+      Object.entries(
+        availableClassifierModels.map((_model) => ModelStatus.Uninitialized),
+      ),
+    ),
+  },
   inputShape: {
     planes: 1,
     height: 64,
@@ -86,7 +93,15 @@ export const classifierSlice = createSlice({
       const kindsToDelete = Object.keys(state.selectedModelIdx);
       deleteClassifierModels(kindsToDelete);
 
-      state.modelStatus = ModelStatus.Uninitialized;
+      state.modelStatus = {
+        [DEFAULT_KIND]: Object.fromEntries(
+          Object.entries(
+            availableClassifierModels.map(
+              (_model) => ModelStatus.Uninitialized,
+            ),
+          ),
+        ),
+      };
       state.evaluationResult = {
         confusionMatrix: [],
         accuracy: -1,
@@ -96,15 +111,39 @@ export const classifierSlice = createSlice({
         f1Score: -1,
       };
     },
-
+    updateModelStatusDict(
+      state,
+      action: PayloadAction<{
+        changes: { add?: Array<Kind["id"]>; del?: Array<Kind["id"]> };
+      }>,
+    ) {
+      const changes = action.payload.changes;
+      if (changes.add) {
+        changes.add.forEach(
+          (kindId) =>
+            (state.modelStatus[kindId] = Object.fromEntries(
+              Object.entries(
+                availableClassifierModels.map(
+                  (_model) => ModelStatus.Uninitialized,
+                ),
+              ),
+            )),
+        );
+      }
+      if (changes.del) {
+        changes.del.forEach((kindId) => delete state.modelStatus[kindId]);
+      }
+    },
     updateModelStatus(
       state,
       action: PayloadAction<{
         modelStatus: ModelStatus;
+        kindId: Kind["id"];
         onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
       }>,
     ) {
-      state.modelStatus = action.payload.modelStatus;
+      const { kindId, modelStatus } = action.payload;
+      state.modelStatus[kindId][state.selectedModelIdx[kindId]] = modelStatus;
     },
 
     updateBatchSize(state, action: PayloadAction<{ batchSize: number }>) {
@@ -146,10 +185,10 @@ export const classifierSlice = createSlice({
     ) {
       const changes = action.payload.changes;
       if (changes.add) {
-        changes.add.forEach((kid) => (state.selectedModelIdx[kid] = 0));
+        changes.add.forEach((kindId) => (state.selectedModelIdx[kindId] = 0));
       }
       if (changes.del) {
-        changes.del.forEach((kid) => delete state.selectedModelIdx[kid]);
+        changes.del.forEach((kindId) => delete state.selectedModelIdx[kindId]);
       }
     },
     updateSelectedModelIdx(
@@ -163,43 +202,44 @@ export const classifierSlice = createSlice({
       const { modelIdx, kindId, disposePrevious } = action.payload;
 
       if (disposePrevious) {
-        availableClassifierModels[kindId][
+        kindClassifierModelDict[kindId][
           state.selectedModelIdx[kindId]
         ].dispose();
       }
 
       state.selectedModelIdx[kindId] = modelIdx;
-      const selectedModel = availableClassifierModels[kindId][modelIdx];
+      const selectedModel = kindClassifierModelDict[kindId][modelIdx];
 
       if (selectedModel.history.epochs.length > 0 || selectedModel.pretrained) {
-        state.modelStatus = ModelStatus.Trained;
+        state.modelStatus[kindId][modelIdx] = ModelStatus.Trained;
       } else {
-        state.modelStatus = ModelStatus.Uninitialized;
+        state.modelStatus[kindId][modelIdx] = ModelStatus.Uninitialized;
       }
     },
     loadUserSelectedModel(
       state,
       action: PayloadAction<{
         inputShape: Shape;
-        activeKindId: Kind["id"];
-        model: (typeof availableClassifierModels)[string][number];
+        kindId: Kind["id"];
+        model: (typeof kindClassifierModelDict)[string][number];
       }>,
     ) {
-      const { inputShape, activeKindId, model } = action.payload;
+      const { inputShape, kindId, model } = action.payload;
 
-      for (const kid of Object.keys(availableClassifierModels)) {
-        availableClassifierModels[kid].push(model);
+      for (const kindId of Object.keys(kindClassifierModelDict)) {
+        kindClassifierModelDict[kindId].push(model);
       }
 
-      state.selectedModelIdx[activeKindId] =
-        availableClassifierModels[activeKindId].length - 1;
+      const newModelIdx = kindClassifierModelDict[kindId].length - 1;
+
+      state.selectedModelIdx[kindId] = newModelIdx;
 
       state.inputShape = inputShape;
 
       if (model.pretrained || model.history.epochs.length > 0) {
-        state.modelStatus = ModelStatus.Trained;
+        state.modelStatus[kindId][newModelIdx] = ModelStatus.Trained;
       } else {
-        state.modelStatus = ModelStatus.Uninitialized;
+        state.modelStatus[kindId][newModelIdx] = ModelStatus.Uninitialized;
       }
     },
     updateOptimizationAlgorithm(
