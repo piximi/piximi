@@ -87,9 +87,11 @@ startAppListening({
       listenerApi.dispatch(
         classifierSlice.actions.updateInputShape({
           inputShape: {
-            ...classifier.inputShape,
+            ...classifier.kindClassifiers[project.activeKind].modelInfoDict[0]
+              .params.inputShape,
             channels: project.imageChannels,
           },
+          kindId: project.activeKind,
         }),
       );
   },

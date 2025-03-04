@@ -12,7 +12,7 @@ import { UploadedClassifier } from "../classification/";
 import {
   CropOptions,
   FitOptions,
-  PreprocessOptions,
+  PreprocessSettings,
   RescaleOptions,
 } from "../types";
 import { CropSchema, ModelTask, Partition } from "../enums";
@@ -126,10 +126,11 @@ const cropOptions: CropOptions = {
   cropSchema: CropSchema.None,
 };
 
-const preprocessOptions: PreprocessOptions = {
+const preprocessOptions: PreprocessSettings = {
   shuffle: false,
   rescaleOptions,
   cropOptions,
+  trainingPercentage: 100,
 };
 
 const fitOptions: FitOptions = {

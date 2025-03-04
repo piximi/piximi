@@ -7,7 +7,7 @@ import { generateUUID } from "store/data/helpers";
 import {
   CropOptions,
   FitOptions,
-  PreprocessOptions,
+  SegmenterPreprocessSettings,
   RescaleOptions,
 } from "../types";
 import { CropSchema, Partition } from "../enums";
@@ -40,7 +40,7 @@ const cropOptions: CropOptions = {
   cropSchema: CropSchema.None,
 };
 
-const preprocessingOptions: PreprocessOptions = {
+const preprocessingOptions: SegmenterPreprocessSettings = {
   shuffle: true,
   rescaleOptions,
   cropOptions,

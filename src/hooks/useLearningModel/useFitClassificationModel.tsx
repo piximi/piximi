@@ -5,11 +5,9 @@ import { classifierSlice } from "store/classifier";
 import { selectAlertState } from "store/applicationSettings/selectors";
 import { selectActiveKindId, selectProjectName } from "store/project/selectors";
 import {
-  selectClassifierFitOptions,
-  selectClassifierHyperparameters,
-  selectClassifierTrainingPercentage,
-} from "store/classifier/selectors";
-import {
+  selectActiveClassifierFitOptions,
+  selectActiveClassifierHyperparameters,
+  selectActiveClassifierTrainingPercentage,
   selectActiveClassifierModel,
   selectActiveClassifierModelStatus,
 } from "store/classifier/reselectors";
@@ -61,10 +59,12 @@ export const useFitClassificationModel = () => {
   const selectedModel = useSelector(selectActiveClassifierModel);
   const modelStatus = useSelector(selectActiveClassifierModelStatus);
   const alertState = useSelector(selectAlertState);
-  const fitOptions = useSelector(selectClassifierFitOptions);
-  const hyperparameters = useSelector(selectClassifierHyperparameters);
+  const fitOptions = useSelector(selectActiveClassifierFitOptions);
+  const hyperparameters = useSelector(selectActiveClassifierHyperparameters);
   const projectName = useSelector(selectProjectName);
-  const trainingPercentage = useSelector(selectClassifierTrainingPercentage);
+  const trainingPercentage = useSelector(
+    selectActiveClassifierTrainingPercentage,
+  );
 
   const hasLabeledInference = useMemo(() => {
     return activeLabeledThings.some(

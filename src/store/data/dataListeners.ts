@@ -168,14 +168,8 @@ startAppListening({
     if (addedKinds.length) {
       addClassifierModels(addedKinds);
     }
-
     listenerAPI.dispatch(
-      classifierSlice.actions.updateModelIdxDict({
-        changes: { del: deletedKinds, add: addedKinds },
-      }),
-    );
-    listenerAPI.dispatch(
-      classifierSlice.actions.updateModelStatusDict({
+      classifierSlice.actions.updateKindClassifiers({
         changes: { del: deletedKinds, add: addedKinds },
       }),
     );
