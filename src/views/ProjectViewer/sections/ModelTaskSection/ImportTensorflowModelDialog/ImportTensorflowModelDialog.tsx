@@ -23,6 +23,7 @@ import { PretrainedModelSelector } from "./PretrainedModelSelector";
 import { CloudUpload } from "./CloudUpload";
 import { ModelFormatSelection } from "./ModelFormatSelection";
 
+import { selectActiveAvailableClassifierModels } from "store/classifier/reselectors";
 import { selectProjectImageChannels } from "store/project/selectors";
 
 import { Model } from "utils/models/Model";
@@ -34,7 +35,6 @@ import { HotkeyContext } from "utils/common/enums";
 
 import { Shape } from "store/data/types";
 import { ToolTipTab } from "components/layout";
-import { selectActiveAvailableClassifierModels } from "store/classifier/reselectors";
 
 type ImportTensorflowModelDialogProps = {
   onClose: () => void;
@@ -52,7 +52,9 @@ export const ImportTensorflowModelDialog = ({
   dispatchFunction,
 }: ImportTensorflowModelDialogProps) => {
   const projectChannels = useSelector(selectProjectImageChannels);
-  const availableClassifierModels = useSelector(selectActiveAvailableClassifierModels);
+  const availableClassifierModels = useSelector(
+    selectActiveAvailableClassifierModels,
+  );
   const [selectedModel, setSelectedModel] = useState<Model | undefined>(
     loadedModel?.name === "Fully Convolutional Network"
       ? undefined
