@@ -6,30 +6,34 @@ import { PreprocessingSettings } from "../training-settings";
 
 import { classifierSlice } from "store/classifier";
 import {
-  selectClassifierCropOptions,
-  selectClassifierRescaleOptions,
-} from "store/classifier/selectors";
+  selectActiveClassifierCropOptions,
+  selectActiveClassifierRescaleOptions,
+} from "store/classifier/reselectors";
+import { selectActiveKindId } from "store/project/selectors";
 
 import { CropOptions, RescaleOptions } from "utils/models/types";
 
 export const ClassifierPreprocessingListItem = () => {
-  const cropOptions = useSelector(selectClassifierCropOptions);
-  const rescaleOptions = useSelector(selectClassifierRescaleOptions);
+  const cropOptions = useSelector(selectActiveClassifierCropOptions);
+  const rescaleOptions = useSelector(selectActiveClassifierRescaleOptions);
+  const activeKindId = useSelector(selectActiveKindId);
 
   const dispatch = useDispatch();
 
   const updateCropOptions = (cropOptions: CropOptions) => {
     dispatch(
-      classifierSlice.actions.updateCropOptions({
-        cropOptions,
+      classifierSlice.actions.updateModelPreprocessOptions({
+        settings: { cropOptions },
+        kindId: activeKindId,
       }),
     );
   };
 
   const updateRescaleOptions = (rescaleOptions: RescaleOptions) => {
     dispatch(
-      classifierSlice.actions.updateRescaleOptions({
-        rescaleOptions,
+      classifierSlice.actions.updateModelPreprocessOptions({
+        settings: { rescaleOptions },
+        kindId: activeKindId,
       }),
     );
   };

@@ -6,9 +6,9 @@ import { ModelStatus } from "utils/models/enums";
 import { Shape } from "store/data/types";
 import { SegmenterState } from "store/types";
 import {
-  CompileOptions,
   FitOptions,
-  PreprocessOptions,
+  SegmenterCompileSettings,
+  SegmenterPreprocessSettings,
 } from "utils/models/types";
 
 export const selectSegmenter = ({
@@ -23,7 +23,7 @@ export const selectSegmenterCompileOptions = ({
   segmenter,
 }: {
   segmenter: SegmenterState;
-}): CompileOptions => {
+}): SegmenterCompileSettings => {
   return segmenter.compileOptions;
 };
 
@@ -94,7 +94,7 @@ export const selectSegmenterPreprocessOptions = ({
   segmenter,
 }: {
   segmenter: SegmenterState;
-}): PreprocessOptions => {
+}): SegmenterPreprocessSettings => {
   return segmenter.preprocessOptions;
 };
 

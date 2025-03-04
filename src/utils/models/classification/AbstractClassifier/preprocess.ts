@@ -18,7 +18,7 @@ import {
 } from "@tensorflow/tfjs";
 
 import { matchedCropPad, padToMatch } from "../../helpers";
-import { FitOptions, PreprocessOptions } from "../../types";
+import { FitOptions, PreprocessSettings } from "../../types";
 import { CropSchema, Partition } from "../../enums";
 import { denormalizeTensor, getImageSlice } from "utils/common/tensorHelpers";
 import { BitDepth } from "utils/file-io/types";
@@ -99,7 +99,7 @@ const sampleGenerator = <T extends Omit<Thing, "kind">, K extends OldCategory>(
 
 const cropResize = (
   inputShape: Shape,
-  preprocessOptions: PreprocessOptions,
+  preprocessOptions: PreprocessSettings,
   training: boolean,
   item: {
     xs: Tensor3D;
@@ -299,7 +299,7 @@ type PreprocessArgs = {
   images: Array<Omit<OldImageType, "colors">>;
   categories: Array<OldCategory>;
   inputShape: Shape;
-  preprocessOptions: PreprocessOptions;
+  preprocessOptions: PreprocessSettings;
   fitOptions: FitOptions;
 };
 

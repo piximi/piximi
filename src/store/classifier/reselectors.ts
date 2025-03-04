@@ -1,49 +1,66 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { kindClassifierModelDict } from "utils/models/availableClassificationModels";
 import { selectActiveKindId } from "../project/selectors";
-import {
-  selectClassifierModelStatusDict,
-  selectedIdxSelector,
-} from "./selectors";
+import { selectKindClassifiers } from "./selectors";
 import { SequentialClassifier } from "utils/models/classification";
 import { ModelStatus } from "utils/models/enums";
+import { KindClassifier, ModelInfo } from "store/types";
+import {
+  ClassifierEvaluationResultType,
+  OptimizerSettings,
+  CropOptions,
+  FitOptions,
+  PreprocessSettings,
+  RescaleOptions,
+} from "utils/models/types";
+import { Shape } from "store/data/types";
 
-export const selectActiveClassifierModelIdx = createSelector(
-  selectedIdxSelector,
-  selectActiveKindId,
-  (modelIdxDict, activeKindId): number => {
-    return modelIdxDict[activeKindId];
-  },
-);
-
-export const selectActiveClassifiers = createSelector(
+export const selectActiveAvailableClassifierModels = createSelector(
   selectActiveKindId,
   (activeKindId): Array<SequentialClassifier> => {
     return kindClassifierModelDict[activeKindId];
   },
 );
 
-export const selectActiveModelStatuses = createSelector(
+const selectActiveClassifier = createSelector(
+  selectKindClassifiers,
   selectActiveKindId,
-  selectClassifierModelStatusDict,
-  (activeKindId, modelStatuses): Record<string | number, ModelStatus> => {
-    return modelStatuses[activeKindId];
+  (classifiers, activeKindId): KindClassifier => {
+    return classifiers[activeKindId];
+  },
+);
+
+export const selectActiveClassifierSelectedModelIdx = createSelector(
+  selectActiveClassifier,
+  (classifier): number => {
+    return classifier.selectedModelIdx;
+  },
+);
+export const selectActiveClassifierModel = createSelector(
+  selectActiveClassifierSelectedModelIdx,
+  selectActiveAvailableClassifierModels,
+  (selectedActiveKindModelIdx, selectedActiveKindClassifiers) => {
+    return selectedActiveKindClassifiers[selectedActiveKindModelIdx];
+  },
+);
+export const selectActiveClassifierModelInfoDict = createSelector(
+  selectActiveClassifier,
+  (classifier): Record<string | number, ModelInfo> => {
+    return classifier.modelInfoDict;
+  },
+);
+
+export const selectActiveClassifierModelInfo = createSelector(
+  selectActiveClassifier,
+  (classifier): ModelInfo => {
+    return classifier.modelInfoDict[classifier.selectedModelIdx];
   },
 );
 
 export const selectActiveClassifierModelStatus = createSelector(
-  selectActiveClassifierModelIdx,
-  selectActiveModelStatuses,
-  (modelIdx, statuses): ModelStatus => {
-    return statuses[modelIdx];
-  },
-);
-
-export const selectActiveClassifierModel = createSelector(
-  selectActiveClassifierModelIdx,
-  selectActiveClassifiers,
-  (selectedActiveKindModelIdx, selectedActiveKindClassifiers) => {
-    return selectedActiveKindClassifiers[selectedActiveKindModelIdx];
+  selectActiveClassifierModelInfo,
+  (modelInfo): ModelStatus => {
+    return modelInfo.status;
   },
 );
 
@@ -66,10 +83,94 @@ export const selectActiveClassifierHistory = createSelector(
 );
 
 export const selectActiveClassifierModelWithIdx = createSelector(
-  selectActiveClassifierModelIdx,
+  selectActiveClassifierSelectedModelIdx,
   selectActiveClassifierModel,
   (modelIdx, model) => ({
     idx: modelIdx,
     model,
   }),
+);
+
+export const selectActiveClassifierOptimizerSettings = createSelector(
+  selectActiveClassifierModelInfo,
+  (modelInfo): OptimizerSettings => {
+    return modelInfo.params.optimizerSettings;
+  },
+);
+
+export const selectActiveClassifierPreprocessOptions = createSelector(
+  selectActiveClassifierModelInfo,
+  (modelInfo): PreprocessSettings => {
+    return modelInfo.params.preprocessSettings;
+  },
+);
+
+export const selectActiveClassifierRescaleOptions = createSelector(
+  selectActiveClassifierPreprocessOptions,
+  (settings): RescaleOptions => {
+    return settings.rescaleOptions;
+  },
+);
+export const selectActiveClassifierCropOptions = createSelector(
+  selectActiveClassifierPreprocessOptions,
+  (settings): CropOptions => {
+    return settings.cropOptions;
+  },
+);
+
+export const selectActiveClassifierFitOptions = createSelector(
+  selectActiveClassifierOptimizerSettings,
+  (settings): FitOptions => {
+    return {
+      epochs: settings.epochs,
+      batchSize: settings.batchSize,
+    };
+  },
+);
+export const selectActiveClassifierEpochs = createSelector(
+  selectActiveClassifierFitOptions,
+  (settings): number => {
+    return settings.epochs;
+  },
+);
+
+export const selectActiveClassifierInputShape = createSelector(
+  selectActiveClassifierModelInfo,
+  (modelInfo): Shape => {
+    return modelInfo.params.inputShape;
+  },
+);
+
+export const selectActiveClassifierEvaluationResult = createSelector(
+  selectActiveClassifierModelInfo,
+  (modelInfo): ClassifierEvaluationResultType => {
+    return modelInfo.evalResults;
+  },
+);
+
+export const selectActiveClassifierShuffleOptions = createSelector(
+  selectActiveClassifierPreprocessOptions,
+  (settings): boolean => {
+    return settings.shuffle;
+  },
+);
+
+export const selectActiveClassifierTrainingPercentage = createSelector(
+  selectActiveClassifierPreprocessOptions,
+  (settings): number => {
+    return settings.trainingPercentage;
+  },
+);
+
+export const selectActiveClassifierHyperparameters = createSelector(
+  selectActiveClassifierPreprocessOptions,
+  selectActiveClassifierOptimizerSettings,
+  selectActiveClassifierFitOptions,
+  (preprocessOptions, compileOptions, fitOptions) => {
+    return {
+      preprocessOptions,
+      compileOptions,
+      fitOptions,
+    };
+  },
 );
