@@ -22,7 +22,7 @@ import { ModelStatus, Partition } from "utils/models/enums";
 
 export const PredictionListItems = () => {
   const dispatch = useDispatch();
-  const activeKind = useSelector(selectActiveKindId);
+  const activeKindId = useSelector(selectActiveKindId);
 
   const [labeledImagesVisible, setLabeledImagesVisible] = React.useState(true);
 
@@ -52,7 +52,7 @@ export const PredictionListItems = () => {
   const clearPredictions = () => {
     dispatch(
       dataSlice.actions.clearPredictions({
-        kind: activeKind,
+        kind: activeKindId,
       }),
     );
 
@@ -69,18 +69,20 @@ export const PredictionListItems = () => {
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Trained,
+        kindId: activeKindId,
       }),
     );
   };
   const acceptPredictions = () => {
     dispatch(
       dataSlice.actions.acceptPredictions({
-        kind: activeKind,
+        kind: activeKindId,
       }),
     );
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Trained,
+        kindId: activeKindId,
       }),
     );
     dispatch(

@@ -2,7 +2,7 @@ import { Group, openGroup } from "zarr";
 
 import { logger } from "utils/common/helpers";
 import { initialState as initialProjectState } from "store/project/projectSlice";
-import { deserializeClassifierGroupV01_1 } from "../common/group-deserializers/classifierDeserializers";
+import { deserializeClassifierGroupV11 } from "../common/group-deserializers/classifierDeserializers";
 import { deserializeColorsGroup } from "../common/group-deserializers/dataDeserializers";
 import { deserializeSegmenterGroup } from "../common/group-deserializers/segmenterDeserializers";
 import { getAttr, getDataset, getGroup } from "../helpers";
@@ -92,7 +92,7 @@ const deserializeThingGroup = async (
     const encodedMask = (await getAttr(thingGroup, "mask")) as number[];
 
     const imageId = (await getAttr(thingGroup, "image_id")) as string;
-    const colors = await generateBlankColors(thing.shape.channels);
+    const colors = generateBlankColors(thing.shape.channels);
     const src = await createRenderedTensor(
       thing.data,
       colors,
@@ -182,7 +182,7 @@ const deserializeKindsGroup = async (
     kindsGroup,
     "unknown_category_id",
   )) as string[];
-
+  const displayNames = (await getAttr(kindsGroup, "display_name")) as string[];
   if (
     ids.length !== contents.length ||
     ids.length !== unknownCategoryIds.length
@@ -197,7 +197,7 @@ const deserializeKindsGroup = async (
     kinds.ids.push(ids[i]);
     kinds.entities[ids[i]] = {
       id: ids[i],
-      displayName: ids[i],
+      displayName: displayNames[i],
       containing: contents[i],
       categories: categories[i],
       unknownCategoryId: unknownCategoryIds[i],
@@ -219,10 +219,9 @@ const deserializeProjectGroup = async (
   };
 }> => {
   const name = (await getAttr(projectGroup, "name")) as string;
-  const imageChannels = (await getAttr(
-    projectGroup,
-    "imageChannels",
-  )) as number;
+  const imageChannels = (await getAttr(projectGroup, "imageChannels")) as
+    | number
+    | string;
   const thingsGroup = await getGroup(projectGroup, "things");
   const things = await deserializeThingsGroup(thingsGroup, loadCb);
   const kindsGroup = await getGroup(projectGroup, "kinds");
@@ -234,13 +233,13 @@ const deserializeProjectGroup = async (
     project: {
       ...initialProjectState,
       name,
-      imageChannels,
+      imageChannels: imageChannels === "undefined" ? undefined : +imageChannels,
     },
     data: { things, kinds, categories },
   };
 };
 
-export const deserializeProject_v02 = async (
+export const deserializeProject_v11 = async (
   fileStore: CustomStore,
   loadCb: LoadCB,
 ) => {
@@ -248,7 +247,7 @@ export const deserializeProject_v02 = async (
   const projectGroup = await getGroup(rootGroup, "project");
   const { project, data } = await deserializeProjectGroup(projectGroup, loadCb);
   const classifierGroup = await getGroup(rootGroup, "classifier");
-  const classifier = await deserializeClassifierGroupV01_1(classifierGroup);
+  const classifier = await deserializeClassifierGroupV11(classifierGroup);
 
   const segmenterGroup = await getGroup(rootGroup, "segmenter");
   const segmenter = await deserializeSegmenterGroup(segmenterGroup);

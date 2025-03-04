@@ -20,7 +20,11 @@ import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/common/enums";
 
 import { StoreListemerAPI, TypedAppStartListening } from "store/types";
-import { CompileOptions, TrainingCallbacks } from "utils/models/types";
+import {
+  FitOptions,
+  OptimizerSettings,
+  TrainingCallbacks,
+} from "utils/models/types";
 import { AlertState } from "utils/common/types";
 import { Category, Kind, Thing } from "store/data/types";
 
@@ -115,25 +119,29 @@ const fitListener = async (
 
   /* ACTIVE KIND */
   const activeKindId = projectState.activeKind;
-
+  const activeKind = dataState.kinds.entities[activeKindId]!;
+  if (!activeKind) return;
   /* CLASSIFIER  */
-  const { trainingPercentage, fitOptions, preprocessOptions, inputShape } =
-    classifierState;
-  const compileOptions = getSubset(classifierState, [
+  const activeClassifier = classifierState.kindClassifiers[activeKindId];
+  const modelIdx = activeClassifier.selectedModelIdx;
+  const model = kindClassifierModelDict[activeKindId][modelIdx];
+  const modelInfo = activeClassifier.modelInfoDict[modelIdx];
+  const modelStatus = modelInfo.status;
+  const { optimizerSettings, preprocessSettings: preprocessOptions, inputShape } = modelInfo.params;
+
+  const compileOptions = getSubset(optimizerSettings, [
     "learningRate",
     "lossFunction",
     "metrics",
     "optimizationAlgorithm",
-  ]) as CompileOptions;
-  const modelIdx = classifierState.selectedModelIdx[activeKindId];
-
-  const model = kindClassifierModelDict[activeKindId][modelIdx];
-  const modelStatus = classifierState.modelStatus[activeKindId][modelIdx];
+  ]) as OptimizerSettings;
+  const fitOptions = getSubset(optimizerSettings, [
+    "batchSize",
+    "epochs",
+  ]) as FitOptions;
 
   /* DATA */
 
-  const activeKind = dataState.kinds.entities[activeKindId]!;
-  if (!activeKind) return;
   const activeThingIds = activeKind.containing;
 
   const {
@@ -193,7 +201,7 @@ const fitListener = async (
   let splitLabeledValidation: Thing[] = [];
   if (modelStatus === ModelStatus.InitFit) {
     const trainingThingsLength = Math.round(
-      trainingPercentage * labeledUnassigned.length,
+      preprocessOptions.trainingPercentage * labeledUnassigned.length,
     );
     const validationThingsLength =
       labeledUnassigned.length - trainingThingsLength;
@@ -378,9 +386,16 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
 
   /* CLASSIFIER */
 
-  const { preprocessOptions, fitOptions, inputShape } = classifierState;
-  const modelIdx = classifierState.selectedModelIdx[activeKindId];
+  const activeClassifier = classifierState.kindClassifiers[activeKindId];
+  const modelIdx = activeClassifier.selectedModelIdx;
   const model = kindClassifierModelDict[activeKindId][modelIdx];
+  const modelInfo = activeClassifier.modelInfoDict[modelIdx];
+
+  const { preprocessSettings: preprocessOptions, optimizerSettings, inputShape } = modelInfo.params;
+  const fitOptions = getSubset(optimizerSettings, [
+    "batchSize",
+    "epochs",
+  ]) as FitOptions;
   let finalModelStatus = ModelStatus.Trained;
 
   /* CHECK FOR SIMPLE ERRORS */
@@ -477,7 +492,8 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
   }, 0);
 
   /* CLASSIFIER*/
-  const modelIdx = classifierState.selectedModelIdx[activeKindId];
+  const modelIdx =
+    classifierState.kindClassifiers[activeKindId].selectedModelIdx;
   const model = kindClassifierModelDict[activeKindId][modelIdx];
 
   /* EVALUATE */
@@ -508,6 +524,7 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
       listenerAPI.dispatch(
         classifierSlice.actions.updateEvaluationResult({
           evaluationResult,
+          kindId: activeKindId,
         }),
       );
     } catch (error) {

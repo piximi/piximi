@@ -5,8 +5,10 @@ import { CollapsibleListItem } from "components/ui/CollapsibleListItem";
 import { ArchitectureSettings } from "../training-settings";
 
 import { classifierSlice } from "store/classifier";
-import { selectClassifierInputShape } from "store/classifier/selectors";
-import { selectActiveClassifierModelWithIdx } from "store/classifier/reselectors";
+import {
+  selectActiveClassifierInputShape,
+  selectActiveClassifierModelWithIdx,
+} from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 
 import { kindClassifierModelDict } from "utils/models/availableClassificationModels";
@@ -14,7 +16,7 @@ import { kindClassifierModelDict } from "utils/models/availableClassificationMod
 export const ClassifierArchitectureListItem = () => {
   const dispatch = useDispatch();
 
-  const inputShape = useSelector(selectClassifierInputShape);
+  const inputShape = useSelector(selectActiveClassifierInputShape);
   const selectedModel = useSelector(selectActiveClassifierModelWithIdx);
   const activeKindId = useSelector(selectActiveKindId);
 
@@ -49,6 +51,7 @@ export const ClassifierArchitectureListItem = () => {
             ...inputShape,
             channels: selectedModel.model.requiredChannels,
           },
+          kindId: activeKindId,
         }),
       );
     }
@@ -60,6 +63,7 @@ export const ClassifierArchitectureListItem = () => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, height: value },
+            kindId: activeKindId,
           }),
         );
         return;
@@ -67,6 +71,7 @@ export const ClassifierArchitectureListItem = () => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, width: value },
+            kindId: activeKindId,
           }),
         );
         return;
@@ -74,6 +79,7 @@ export const ClassifierArchitectureListItem = () => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, channels: value },
+            kindId: activeKindId,
           }),
         );
     }
