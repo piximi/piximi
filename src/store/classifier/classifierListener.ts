@@ -127,7 +127,8 @@ const fitListener = async (
   const model = kindClassifierModelDict[activeKindId][modelIdx];
   const modelInfo = activeClassifier.modelInfoDict[modelIdx];
   const modelStatus = modelInfo.status;
-  const { optimizerSettings, preprocessSettings: preprocessOptions, inputShape } = modelInfo.params;
+  const { optimizerSettings, preprocessSettings, inputShape } =
+    modelInfo.params;
 
   const compileOptions = getSubset(optimizerSettings, [
     "learningRate",
@@ -201,12 +202,12 @@ const fitListener = async (
   let splitLabeledValidation: Thing[] = [];
   if (modelStatus === ModelStatus.InitFit) {
     const trainingThingsLength = Math.round(
-      preprocessOptions.trainingPercentage * labeledUnassigned.length,
+      preprocessSettings.trainingPercentage * labeledUnassigned.length,
     );
     const validationThingsLength =
       labeledUnassigned.length - trainingThingsLength;
 
-    const preparedLabeledUnassigned = preprocessOptions.shuffle
+    const preparedLabeledUnassigned = preprocessSettings.shuffle
       ? shuffle(labeledUnassigned)
       : labeledUnassigned;
 
@@ -255,7 +256,7 @@ const fitListener = async (
       (model as SimpleCNN).loadModel({
         inputShape,
         numClasses,
-        randomizeWeights: preprocessOptions.shuffle,
+        randomizeWeights: preprocessSettings.shuffle,
         compileOptions,
       });
     } else if (model instanceof MobileNet) {
@@ -289,7 +290,7 @@ const fitListener = async (
     const loadDataArgs = {
       categories,
       inputShape,
-      preprocessOptions,
+      preprocessOptions: preprocessSettings,
       fitOptions,
     };
     model.loadTraining(
@@ -391,7 +392,11 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   const model = kindClassifierModelDict[activeKindId][modelIdx];
   const modelInfo = activeClassifier.modelInfoDict[modelIdx];
 
-  const { preprocessSettings: preprocessOptions, optimizerSettings, inputShape } = modelInfo.params;
+  const {
+    preprocessSettings: preprocessOptions,
+    optimizerSettings,
+    inputShape,
+  } = modelInfo.params;
   const fitOptions = getSubset(optimizerSettings, [
     "batchSize",
     "epochs",
