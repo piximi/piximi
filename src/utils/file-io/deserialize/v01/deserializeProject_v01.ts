@@ -6,11 +6,9 @@ import { initialState as initialProjectState } from "store/project/projectSlice"
 import { RawArray } from "zarr/types/rawArray";
 import { logger } from "utils/common/helpers";
 import { getAttr, getDataset, getDatasetSelection, getGroup } from "../helpers";
-import {
-  deserializeClassifierGroup,
-  deserializeColorsGroup,
-  deserializeSegmenterGroup,
-} from "../common/groupDeserializers";
+import { deserializeClassifierGroupV01_1 } from "../common/group-deserializers/classifierDeserializers";
+import { deserializeColorsGroup } from "../common/group-deserializers/dataDeserializers";
+import { deserializeSegmenterGroup } from "../common/group-deserializers/segmenterDeserializers";
 import { Partition } from "utils/models/enums";
 import { createRenderedTensor } from "utils/common/tensorHelpers";
 import { BitDepth, LoadCB } from "utils/file-io/types";
@@ -237,7 +235,7 @@ export const deserializeProject_v01 = async (
   const { project, data } = await deserializeProjectGroup(projectGroup, loadCb);
 
   const classifierGroup = await getGroup(rootGroup, "classifier");
-  const classifier = await deserializeClassifierGroup(classifierGroup);
+  const classifier = await deserializeClassifierGroupV01_1(classifierGroup);
 
   const segmenterGroup = await getGroup(rootGroup, "segmenter");
   const segmenter = await deserializeSegmenterGroup(segmenterGroup);

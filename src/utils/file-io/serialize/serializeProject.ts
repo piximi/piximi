@@ -2,12 +2,17 @@ import { Group, NestedArray, group } from "zarr";
 //import { Blosc } from "numcodecs";
 
 import { Tensor } from "@tensorflow/tfjs";
-import { PreprocessOptions } from "utils/models/types";
+import { OptimizerSettings, PreprocessSettings } from "utils/models/types";
 import { kindClassifierModelDict } from "utils/models/availableClassificationModels";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import { ZipStore } from "../zarrStores";
 import { LoadCB } from "../types";
-import { ClassifierState, ProjectState, SegmenterState } from "store/types";
+import {
+  ClassifierState,
+  ModelParams,
+  ProjectState,
+  SegmenterState,
+} from "store/types";
 import { Colors } from "utils/common/types";
 import {
   Kind,
@@ -143,6 +148,10 @@ const serializeKinds = async (kindGroup: Group, kinds: Kind[]) => {
     "unknown_category_id",
     kinds.map((k) => k.unknownCategoryId),
   );
+  await kindGroup.attrs.setItem(
+    "display_name",
+    kinds.map((k) => k.displayName),
+  );
 };
 
 const _serializeProject = async (
@@ -156,7 +165,10 @@ const _serializeProject = async (
   loadCb: LoadCB,
 ) => {
   await projectGroup.attrs.setItem("name", project.name);
-  await projectGroup.attrs.setItem("imageChannels", project.imageChannels);
+  await projectGroup.attrs.setItem(
+    "imageChannels",
+    project.imageChannels ?? "undefined",
+  );
 
   const thingsGroup = await projectGroup.createGroup("things");
 
@@ -177,11 +189,11 @@ const _serializeProject = async (
 
 const serializePreprocessOptions = async (
   preprocessOptionsGroup: Group,
-  preprocessOptions: PreprocessOptions,
+  preprocessSettings: PreprocessSettings,
 ) => {
   await preprocessOptionsGroup.attrs.setItem(
     "shuffle_B",
-    Number(preprocessOptions.shuffle),
+    Number(preprocessSettings.shuffle),
   );
 
   const rescaleOptionsGroup =
@@ -189,23 +201,83 @@ const serializePreprocessOptions = async (
 
   await rescaleOptionsGroup.attrs.setItem(
     "rescale_B",
-    Number(preprocessOptions.rescaleOptions.rescale),
+    Number(preprocessSettings.rescaleOptions.rescale),
   );
 
   await rescaleOptionsGroup.attrs.setItem(
     "center_B",
-    Number(preprocessOptions.rescaleOptions.center),
+    Number(preprocessSettings.rescaleOptions.center),
   );
 
   const cropOptionsGroup =
     await preprocessOptionsGroup.createGroup("crop_options");
   await cropOptionsGroup.attrs.setItem(
     "num_crops",
-    preprocessOptions.cropOptions.numCrops,
+    preprocessSettings.cropOptions.numCrops,
   );
   await cropOptionsGroup.attrs.setItem(
     "crop_schema",
-    preprocessOptions.cropOptions.cropSchema,
+    preprocessSettings.cropOptions.cropSchema,
+  );
+  await preprocessOptionsGroup.attrs.setItem(
+    "training_percent",
+    preprocessSettings.trainingPercentage,
+  );
+};
+
+const serializeOptimizerSettings = async (
+  optimizerSettingsGroup: Group,
+  optimizerSettings: OptimizerSettings,
+) => {
+  await optimizerSettingsGroup.attrs.setItem(
+    "metrics",
+    optimizerSettings.metrics,
+  );
+  await optimizerSettingsGroup.attrs.setItem(
+    "epochs",
+    optimizerSettings.epochs,
+  );
+
+  await optimizerSettingsGroup.attrs.setItem(
+    "batch_size",
+    optimizerSettings.batchSize,
+  );
+
+  await optimizerSettingsGroup.attrs.setItem(
+    "optimization_algorithm",
+    optimizerSettings.optimizationAlgorithm,
+  );
+
+  await optimizerSettingsGroup.attrs.setItem(
+    "learning_rate",
+    optimizerSettings.learningRate,
+  );
+
+  await optimizerSettingsGroup.attrs.setItem(
+    "loss_function",
+    optimizerSettings.lossFunction,
+  );
+};
+
+const serializeModalParams = async (paramGroup: Group, params: ModelParams) => {
+  const { planes, height, width, channels } = params.inputShape;
+  await writeArray(
+    paramGroup,
+    "input_shape",
+    new Uint8Array([planes, height, width, channels]),
+  );
+  const preprocessSetingsGroup = await paramGroup.createGroup(
+    "preprocessing_settings",
+  );
+  await serializePreprocessOptions(
+    preprocessSetingsGroup,
+    params.preprocessSettings,
+  );
+  const optimizerSettingsGroup =
+    await paramGroup.createGroup("optimizer_settings");
+  await serializeOptimizerSettings(
+    optimizerSettingsGroup,
+    params.optimizerSettings,
   );
 };
 
@@ -213,57 +285,25 @@ const serializeClassifier = async (
   classifierGroup: Group,
   classifier: ClassifierState,
 ) => {
-  const classifierModel =
-    // @ts-ignore TODO multiple-classifiers
-    kindClassifierModelDict[classifier.selectedModelIdx];
+  const kindClassifiers = classifier.kindClassifiers;
+  const classifierKinds = Object.keys(kindClassifiers);
+  await classifierGroup.attrs.setItem("classifier_kinds", classifierKinds);
 
-  await classifierGroup.attrs.setItem("name", classifierModel.name);
+  for await (const kindId of classifierKinds) {
+    const kindModels = kindClassifiers[kindId];
+    const kindClassifierGroup = await classifierGroup.createGroup(kindId);
+    const kindModelIdxs = Object.keys(kindModels.modelInfoDict);
+    await kindClassifierGroup.attrs.setItem("model_keys", kindModelIdxs);
+    for await (const idx of kindModelIdxs) {
+      const modelInfo = kindModels.modelInfoDict[idx];
+      const classifierModel = kindClassifierModelDict[kindId][+idx];
+      const modelGroup = await kindClassifierGroup.createGroup(idx);
+      await modelGroup.attrs.setItem("name", classifierModel.name);
 
-  const { planes, height, width, channels } = classifier.inputShape;
-  await writeArray(
-    classifierGroup,
-    "input_shape",
-    new Uint8Array([planes, height, width, channels]),
-  );
-
-  await classifierGroup.attrs.setItem(
-    "training_percent",
-    classifier.trainingPercentage,
-  );
-
-  await classifierGroup.attrs.setItem("metrics", classifier.metrics);
-
-  const optSettingsGroup =
-    await classifierGroup.createGroup("optimizer_settings");
-
-  await optSettingsGroup.attrs.setItem("epochs", classifier.fitOptions.epochs);
-
-  await optSettingsGroup.attrs.setItem(
-    "batch_size",
-    classifier.fitOptions.batchSize,
-  );
-
-  await optSettingsGroup.attrs.setItem(
-    "optimization_algorithm",
-    classifier.optimizationAlgorithm,
-  );
-
-  await optSettingsGroup.attrs.setItem(
-    "learning_rate",
-    classifier.learningRate,
-  );
-
-  await optSettingsGroup.attrs.setItem(
-    "loss_function",
-    classifier.lossFunction,
-  );
-
-  const preprocessOptionsGroup =
-    await classifierGroup.createGroup("preprocess_options");
-  await serializePreprocessOptions(
-    preprocessOptionsGroup,
-    classifier.preprocessOptions,
-  );
+      const paramGroup = await modelGroup.createGroup("params");
+      await serializeModalParams(paramGroup, modelInfo.params);
+    }
+  }
 };
 
 const serializeSegmenter = async (
@@ -296,7 +336,7 @@ export const serializeProject = async (
   const zipStore = new ZipStore(name);
   const root = await group(zipStore, zipStore.rootName);
 
-  // yarn/npm start/build must be run with VITE_APP_VERSION=$npm_package_version
+  // pnpm start/build must be run with VITE_APP_VERSION=$npm_package_version
   const piximiVersion = import.meta.env.VITE_APP_VERSION;
 
   if (!piximiVersion) {
