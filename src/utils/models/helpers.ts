@@ -3,10 +3,10 @@ import { ModelCompileArgs, train, losses } from "@tensorflow/tfjs";
 import { Tensor3D } from "@tensorflow/tfjs";
 import { random } from "lodash";
 import { LayersModel } from "@tensorflow/tfjs";
-import { CompileOptions, ModelLayerData } from "./types";
+import { OptimizerSettings, ModelLayerData } from "./types";
 import { LossFunction, Metric, OptimizationAlgorithm } from "./enums";
 
-export const createCompileArgs = (options: CompileOptions) => {
+export const createCompileArgs = (options: OptimizerSettings) => {
   const loss = (): ModelCompileArgs["loss"] => {
     switch (options.lossFunction) {
       case LossFunction.AbsoluteDifference: {

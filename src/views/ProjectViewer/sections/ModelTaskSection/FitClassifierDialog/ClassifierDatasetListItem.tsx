@@ -5,7 +5,8 @@ import { CollapsibleListItem } from "components/ui/CollapsibleListItem";
 import { DatasetSettings } from "../training-settings";
 
 import { classifierSlice } from "store/classifier";
-import { selectClassifierShuffleOptions } from "store/classifier/selectors";
+import { selectActiveClassifierShuffleOptions } from "store/classifier/reselectors";
+import { selectActiveKindId } from "store/project/selectors";
 
 export const ClassifierDatasetListItem = ({
   trainingPercentage,
@@ -15,19 +16,23 @@ export const ClassifierDatasetListItem = ({
   trainable: boolean;
 }) => {
   const dispatch = useDispatch();
-  const shuffle = useSelector(selectClassifierShuffleOptions);
+  const shuffle = useSelector(selectActiveClassifierShuffleOptions);
+  const activeKindId = useSelector(selectActiveKindId);
+
   const dispatchTrainingPercentage = (trainingPercentage: number) => {
     dispatch(
-      classifierSlice.actions.updateTrainingPercentage({
-        trainingPercentage,
+      classifierSlice.actions.updateModelPreprocessOptions({
+        settings: { trainingPercentage },
+        kindId: activeKindId,
       }),
     );
   };
 
   const toggleShuffle = () => {
     dispatch(
-      classifierSlice.actions.updateShuffleOptions({
-        shuffle: !shuffle,
+      classifierSlice.actions.updateModelPreprocessOptions({
+        settings: { shuffle },
+        kindId: activeKindId,
       }),
     );
   };

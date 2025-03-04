@@ -7,10 +7,10 @@ import {
 
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
 
-import { CompileOptions, FitOptions } from "utils/models/types";
+import { SegmenterCompileSettings, FitOptions } from "utils/models/types";
 
 type OptimizerSettingsGridProps = {
-  compileOptions: CompileOptions;
+  compileOptions: SegmenterCompileSettings;
   dispatchLossFunctionCallback: (lossFunction: LossFunction) => void;
   dispatchOptimizationAlgorithmCallback: (
     optimizationAlgorithm: OptimizationAlgorithm,

@@ -9,20 +9,17 @@ import {
 
 import { HotkeyContext, Languages, ThingSortKey } from "utils/common/enums";
 import { ThemeMode } from "themes/enums";
-import {
-  LossFunction,
-  Metric,
-  ModelStatus,
-  OptimizationAlgorithm,
-} from "utils/models/enums";
+import { ModelStatus } from "utils/models/enums";
 
 import { AlertState, FilterType } from "utils/common/types";
 import {
   ClassifierEvaluationResultType,
   FitOptions,
-  PreprocessOptions,
-  CompileOptions,
+  PreprocessSettings,
+  OptimizerSettings,
   SegmenterEvaluationResultType,
+  SegmenterPreprocessSettings,
+  SegmenterCompileSettings,
 } from "utils/models/types";
 import {
   Kind,
@@ -66,10 +63,10 @@ export type SegmenterState = {
   // pre-fit state
   selectedModelIdx: number;
   inputShape: Shape;
-  preprocessOptions: PreprocessOptions;
+  preprocessOptions: SegmenterPreprocessSettings;
   fitOptions: FitOptions;
 
-  compileOptions: CompileOptions;
+  compileOptions: SegmenterCompileSettings;
 
   trainingPercentage: number;
   trainingHistory?: History;
@@ -78,23 +75,25 @@ export type SegmenterState = {
   modelStatus: ModelStatus;
 };
 
-export type ClassifierState = {
-  // pre-fit state
-  selectedModelIdx: Record<Kind["id"], number>;
+export type ModelParams = {
   inputShape: Shape;
-  preprocessOptions: PreprocessOptions;
-  fitOptions: FitOptions;
+  preprocessSettings: PreprocessSettings;
+  optimizerSettings: OptimizerSettings;
+};
 
-  learningRate: number;
-  lossFunction: LossFunction;
-  optimizationAlgorithm: OptimizationAlgorithm;
-  metrics: Array<Metric>;
+export type ModelInfo = {
+  status: ModelStatus;
+  params: ModelParams;
+  evalResults: ClassifierEvaluationResultType;
+};
+export type KindClassifier = {
+  selectedModelIdx: number;
+  modelInfoDict: Record<string | number, ModelInfo>;
+};
 
-  trainingPercentage: number;
-  // post-evaluation results
-  evaluationResult: ClassifierEvaluationResultType;
-  // status flags
-  modelStatus: Record<Kind["id"], Record<string | number, ModelStatus>>;
+export type KindClassifierDict = Record<Kind["id"], KindClassifier>;
+export type ClassifierState = {
+  kindClassifiers: KindClassifierDict;
   showClearPredictionsWarning: boolean;
 };
 
