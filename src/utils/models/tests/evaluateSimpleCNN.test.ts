@@ -1,3 +1,4 @@
+// ignore-no-logs
 import { expect, it } from "vitest";
 
 import {
@@ -12,7 +13,7 @@ import {
   ClassifierEvaluationResultType,
   CropOptions,
   FitOptions,
-  PreprocessOptions,
+  PreprocessSettings,
   RescaleOptions,
 } from "../types";
 import { CropSchema, ModelTask, Partition } from "../enums";
@@ -126,10 +127,11 @@ const cropOptions: CropOptions = {
   cropSchema: CropSchema.None,
 };
 
-const preprocessOptions: PreprocessOptions = {
+const preprocessOptions: PreprocessSettings = {
   shuffle: true,
   rescaleOptions,
   cropOptions,
+  trainingPercentage: 100,
 };
 
 const fitOptions: FitOptions = {

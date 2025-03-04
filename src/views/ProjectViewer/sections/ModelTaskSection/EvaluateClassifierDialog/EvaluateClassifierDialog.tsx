@@ -7,7 +7,7 @@ import { ConfusionMatrix } from "./ConfusionMatrix";
 import { EvaluateClassifierDialogAppBar } from "./EvaluateClassifierAppBar";
 
 import { selectActiveKnownCategories } from "store/project/reselectors";
-import { selectClassifierEvaluationResult } from "store/classifier/selectors";
+import { selectActiveClassifierEvaluationResult } from "store/classifier/reselectors";
 
 import { OldCategory } from "store/data/types";
 
@@ -20,7 +20,7 @@ export const EvaluateClassifierDialog = ({
   closeDialog,
   openedDialog,
 }: EvaluateClassifierDialogProps) => {
-  const evaluationResults = useSelector(selectClassifierEvaluationResult);
+  const evaluationResults = useSelector(selectActiveClassifierEvaluationResult);
   const categories = useSelector(selectActiveKnownCategories);
 
   return (
