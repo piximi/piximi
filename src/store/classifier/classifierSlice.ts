@@ -4,7 +4,7 @@ import {
   kindClassifierModelDict,
   deleteClassifierModels,
   availableClassifierModels,
-  DEFAULT_MODEL_INFO,
+  getDefaultModelInfo,
 } from "utils/models/availableClassificationModels";
 
 import { ModelStatus } from "utils/models/enums";
@@ -26,7 +26,7 @@ export const initialState: ClassifierState = {
       selectedModelIdx: 0,
       modelInfoDict: Object.fromEntries(
         Object.entries(
-          availableClassifierModels.map((_model) => DEFAULT_MODEL_INFO),
+          availableClassifierModels.map((_model) => getDefaultModelInfo()),
         ),
       ),
     },
@@ -63,7 +63,7 @@ export const classifierSlice = createSlice({
           selectedModelIdx: 0,
           modelInfoDict: Object.fromEntries(
             Object.entries(
-              availableClassifierModels.map((_model) => DEFAULT_MODEL_INFO),
+              availableClassifierModels.map((_model) => getDefaultModelInfo()),
             ),
           ),
         },
@@ -83,7 +83,9 @@ export const classifierSlice = createSlice({
               selectedModelIdx: 0,
               modelInfoDict: Object.fromEntries(
                 Object.entries(
-                  availableClassifierModels.map((_model) => DEFAULT_MODEL_INFO),
+                  availableClassifierModels.map((_model) =>
+                    getDefaultModelInfo(),
+                  ),
                 ),
               ),
             }),
@@ -192,15 +194,13 @@ export const classifierSlice = createSlice({
       const newModelIdx = kindClassifierModelDict[kindId].length - 1;
 
       kindClassifier.selectedModelIdx = newModelIdx;
-      kindClassifier.modelInfoDict[newModelIdx] = DEFAULT_MODEL_INFO;
-      const newSelectedModelInfo = kindClassifier.modelInfoDict[newModelIdx];
-      newSelectedModelInfo.params.inputShape = inputShape;
+      const uploadedModelInfo = getDefaultModelInfo();
+      uploadedModelInfo.params.inputShape = inputShape;
 
       if (model.pretrained || model.history.epochs.length > 0) {
-        newSelectedModelInfo.status = ModelStatus.Trained;
-      } else {
-        newSelectedModelInfo.status = ModelStatus.Uninitialized;
+        uploadedModelInfo.status = ModelStatus.Trained;
       }
+      kindClassifier.modelInfoDict[newModelIdx] = uploadedModelInfo;
     },
     updateEvaluationResult(
       state,

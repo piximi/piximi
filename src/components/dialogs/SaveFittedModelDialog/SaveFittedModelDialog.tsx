@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from "react";
-import { Grid, TextField } from "@mui/material";
+import { Grid2 as Grid, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
@@ -39,7 +39,7 @@ export const SaveFittedModelDialog = ({
       title={`Save ${model.name}`}
       content={
         <Grid container spacing={1}>
-          <Grid item xs={10}>
+          <Grid size={{ xs: 10 }}>
             <TextField
               autoFocus
               fullWidth

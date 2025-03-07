@@ -1,4 +1,4 @@
-import { GraphModel, History, LayersModel, Tensor } from "@tensorflow/tfjs";
+import { GraphModel, History, LayersModel, Tensor, io } from "@tensorflow/tfjs";
 
 import { ModelArgs, ModelHistory, ModelLayerData } from "../types";
 import { ModelTask } from "../enums";
@@ -103,8 +103,89 @@ export abstract class Model {
 
   public abstract stopTraining(): void;
 
+  public async getSavedModelFiles() {
+    let weightsBlob: Blob | undefined = undefined;
+    let modelJsonBlob: Blob | undefined = undefined;
+    const weightsFileName = this.name + ".weights.bin";
+    const modelJsonFileName = this.name + ".json";
+    const saveHandler = async (modelArtifacts: io.ModelArtifacts) => {
+      weightsBlob = new Blob([modelArtifacts.weightData!], {
+        type: "application/octet-stream",
+      });
+      if (modelArtifacts.modelTopology instanceof ArrayBuffer) {
+        throw new Error(
+          "BrowserDownloads.save() does not support saving model topology " +
+            "in binary formats yet.",
+        );
+      } else {
+        const weightsManifest = [
+          {
+            paths: ["./" + weightsFileName],
+            weights: modelArtifacts.weightSpecs,
+          },
+        ];
+        const modelJSON: {
+          modelTopology: typeof modelArtifacts.modelTopology;
+          format: typeof modelArtifacts.format;
+          generatedBy: typeof modelArtifacts.generatedBy;
+          convertedBy: typeof modelArtifacts.convertedBy;
+          weightsManifest: typeof weightsManifest;
+          signature?: typeof modelArtifacts.signature;
+          userDefinedMetadata?: typeof modelArtifacts.userDefinedMetadata;
+          modelInitializer?: typeof modelArtifacts.modelInitializer;
+          initializerSignature?: typeof modelArtifacts.initializerSignature;
+          trainingConfig?: typeof modelArtifacts.trainingConfig;
+        } = {
+          modelTopology: modelArtifacts.modelTopology,
+          format: modelArtifacts.format,
+          generatedBy: modelArtifacts.generatedBy,
+          convertedBy: modelArtifacts.convertedBy,
+          weightsManifest: weightsManifest,
+        };
+        if (modelArtifacts.signature != null) {
+          modelJSON.signature = modelArtifacts.signature;
+        }
+        if (modelArtifacts.userDefinedMetadata != null) {
+          modelJSON.userDefinedMetadata = modelArtifacts.userDefinedMetadata;
+        }
+        if (modelArtifacts.modelInitializer != null) {
+          modelJSON.modelInitializer = modelArtifacts.modelInitializer;
+        }
+        if (modelArtifacts.initializerSignature != null) {
+          modelJSON.initializerSignature = modelArtifacts.initializerSignature;
+        }
+        if (modelArtifacts.trainingConfig != null) {
+          modelJSON.trainingConfig = modelArtifacts.trainingConfig;
+        }
+        modelJsonBlob = new Blob([JSON.stringify(modelJSON)], {
+          type: "application/json",
+        });
+
+        return {
+          modelArtifactsInfo: io.getModelArtifactsInfoForJSON(modelArtifacts),
+          modelJsonBlob,
+          weightsBlob,
+        };
+      }
+    };
+    if (!this._model) throw Error(`Model ${this.name} not loaded`);
+    const output = (await this._model.save(
+      io.withSaveHandler(saveHandler),
+    )) as {
+      modelArtifactsInfo: io.ModelArtifactsInfo;
+      modelJsonBlob: Blob;
+      weightsBlob: Blob;
+    };
+    return {
+      weightsBlob: output.weightsBlob,
+      modelJsonBlob: output.modelJsonBlob,
+      weightsFileName,
+      modelJsonFileName,
+    };
+  }
   public async saveModel() {
     if (!this._model) throw Error(`Model ${this.name} not loaded`);
+
     await this._model.save(`downloads://${this.name}`);
   }
 

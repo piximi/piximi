@@ -15,7 +15,7 @@ import { ClassifierEvaluationResultType } from "./types";
 
 export const availableClassifierModels = [SimpleCNN, MobileNet];
 
-export const DEFAULT_MODEL_PARAMS: ModelParams = {
+export const getDefaultModelParams = (): ModelParams => ({
   inputShape: {
     planes: 1,
     height: 64,
@@ -42,22 +42,22 @@ export const DEFAULT_MODEL_PARAMS: ModelParams = {
     },
     trainingPercentage: 0.75,
   },
-};
+});
 
-export const DEFAULT_EVAL_RESULTS: ClassifierEvaluationResultType = {
+export const getDefaultEvalResults = (): ClassifierEvaluationResultType => ({
   confusionMatrix: [],
   accuracy: -1,
   crossEntropy: -1,
   precision: -1,
   recall: -1,
   f1Score: -1,
-};
+});
 
-export const DEFAULT_MODEL_INFO: ModelInfo = {
+export const getDefaultModelInfo = (): ModelInfo => ({
   status: ModelStatus.Uninitialized,
-  params: DEFAULT_MODEL_PARAMS,
-  evalResults: DEFAULT_EVAL_RESULTS,
-};
+  params: getDefaultModelParams(),
+  evalResults: getDefaultEvalResults(),
+});
 export const kindClassifierModelDict: Record<
   Kind["id"],
   Array<SequentialClassifier>
