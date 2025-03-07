@@ -23,3 +23,5 @@ git-sim_media
 src/data/exampleProjects/*.zip
 .vim
 .vimspector.json
+.cursorignore
+
