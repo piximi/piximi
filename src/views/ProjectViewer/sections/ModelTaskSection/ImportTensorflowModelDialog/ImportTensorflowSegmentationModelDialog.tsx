@@ -18,55 +18,43 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import { useHotkeys } from "hooks";
 
-import { LocalFileUpload } from "./LocalFileUpload";
 import { PretrainedModelSelector } from "./PretrainedModelSelector";
-import { CloudUpload } from "./CloudUpload";
-import { ModelFormatSelection } from "./ModelFormatSelection";
-
-import { selectActiveAvailableClassifierModels } from "store/classifier/reselectors";
 import { selectProjectImageChannels } from "store/project/selectors";
 
 import { Model } from "utils/models/Model";
 import { Cellpose } from "utils/models/segmentation";
 
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
-import { ModelTask } from "utils/models/enums";
 import { HotkeyContext } from "utils/common/enums";
 
 import { Shape } from "store/data/types";
 import { ToolTipTab } from "components/layout";
 
-type ImportTensorflowModelDialogProps = {
+type ImportTensorflowSegmentationModelDialogProps = {
   onClose: () => void;
   loadedModel?: Model;
   open: boolean;
-  modelTask: ModelTask;
   dispatchFunction: (model: Model, inputShape: Shape) => Promise<void>;
 };
 
-export const ImportTensorflowModelDialog = ({
+export const ImportTensorflowSegmentationModelDialog = ({
   onClose,
   loadedModel,
   open,
-  modelTask,
   dispatchFunction,
-}: ImportTensorflowModelDialogProps) => {
+}: ImportTensorflowSegmentationModelDialogProps) => {
   const projectChannels = useSelector(selectProjectImageChannels);
-  const availableClassifierModels = useSelector(
-    selectActiveAvailableClassifierModels,
-  );
   const [selectedModel, setSelectedModel] = useState<Model | undefined>(
     loadedModel?.name === "Fully Convolutional Network"
       ? undefined
       : loadedModel,
   );
-  const [inputShape, setInputShape] = useState<Shape>({
+  const [inputShape, _setInputShape] = useState<Shape>({
     height: 256,
     width: 256,
     channels: 3,
     planes: 1,
   });
-  const [isGraph, setIsGraph] = useState(false);
 
   const [pretrainedModels, setPretrainedModels] = useState<Array<Model>>([]);
 
@@ -121,10 +109,7 @@ export const ImportTensorflowModelDialog = ({
   );
 
   useEffect(() => {
-    const allModels =
-      modelTask === ModelTask.Classification
-        ? availableClassifierModels
-        : availableSegmenterModels;
+    const allModels = availableSegmenterModels;
 
     const _pretrainedModels = (allModels as Model[]).filter(
       (m) => m.pretrained,
@@ -135,22 +120,20 @@ export const ImportTensorflowModelDialog = ({
     setTabVal((curr) =>
       _pretrainedModels.length === 0 && curr === "1" ? "2" : curr,
     );
-  }, [modelTask]);
+  }, []);
 
   useEffect(() => {
-    if (modelTask === ModelTask.Segmentation) {
-      if (
-        selectedModel &&
-        selectedModel.requiredChannels !== undefined &&
-        projectChannels !== undefined &&
-        selectedModel.requiredChannels !== projectChannels
-      ) {
-        setInvalidModel(true);
-      } else {
-        setInvalidModel(false);
-      }
+    if (
+      selectedModel &&
+      selectedModel.requiredChannels !== undefined &&
+      projectChannels !== undefined &&
+      selectedModel.requiredChannels !== projectChannels
+    ) {
+      setInvalidModel(true);
+    } else {
+      setInvalidModel(false);
     }
-  }, [modelTask, projectChannels, selectedModel]);
+  }, [projectChannels, selectedModel]);
 
   return (
     <Dialog fullWidth maxWidth="sm" onClose={closeDialog} open={open}>
@@ -177,32 +160,10 @@ export const ImportTensorflowModelDialog = ({
           transmitted.
         </Alert>
       </Collapse>
-      <DialogTitle>
-        Load{" "}
-        {modelTask === ModelTask.Classification
-          ? "Classification"
-          : "Segmentation"}{" "}
-        model
-      </DialogTitle>
+      <DialogTitle>Load Segmentation model</DialogTitle>
 
       <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
         <ToolTipTab label="Load Pretrained" value="1" placement="top" />
-        {/* 
-        <ToolTipTab
-          label="Upload Local"
-          value="2"
-          disabledMessage="Not Yet Supported"
-          placement="top"
-          disabled={modelTask === ModelTask.Segmentation}
-        />
-
-        <ToolTipTab
-          label="Fetch Remote"
-          value="3"
-          disabledMessage="Not Yet Supported"
-          placement="top"
-          disabled={modelTask === ModelTask.Segmentation}
-        /> */}
       </Tabs>
       <DialogContent>
         <Box
@@ -233,28 +194,6 @@ export const ImportTensorflowModelDialog = ({
             }
           />
         </Box>
-
-        <Box hidden={tabVal !== "2" && tabVal !== "3"} pb={2}>
-          <ModelFormatSelection isGraph={isGraph} setIsGraph={setIsGraph} />
-        </Box>
-
-        <Box hidden={tabVal !== "2"}>
-          <LocalFileUpload
-            modelTask={modelTask}
-            isGraph={isGraph}
-            setModel={onModelChange}
-            setInputShape={setInputShape}
-          />
-        </Box>
-
-        <Box hidden={tabVal !== "3"}>
-          <CloudUpload
-            modelTask={modelTask}
-            isGraph={isGraph}
-            setModel={onModelChange}
-            setInputShape={setInputShape}
-          />
-        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={closeDialog} color="primary">
@@ -266,11 +205,7 @@ export const ImportTensorflowModelDialog = ({
           color="primary"
           disabled={!selectedModel || invalidModel}
         >
-          Open{" "}
-          {modelTask === ModelTask.Classification
-            ? "Classification"
-            : "Segmentation"}{" "}
-          model
+          Open Segmentation model
         </Button>
       </DialogActions>
     </Dialog>

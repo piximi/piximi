@@ -1,1 +1,2 @@
-export { ImportTensorflowModelDialog } from "./ImportTensorflowModelDialog";
+export { ImportTensorflowSegmentationModelDialog } from "./ImportTensorflowSegmentationModelDialog";
+export { ImportTensorflowClassificationModelDialog } from "./ImportTensorflowClassificationModelDialog";
