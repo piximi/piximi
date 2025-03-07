@@ -20,7 +20,7 @@ import {
 import { initialClassifierStateV01_02 } from "utils/file-io/constants";
 import { ClassifierState, KindClassifierDict, ModelParams } from "store/types";
 import { Kind } from "store/data/types";
-import { DEFAULT_MODEL_INFO } from "utils/models/availableClassificationModels";
+import { getDefaultModelInfo } from "utils/models/availableClassificationModels";
 
 // COMMON
 const deserializeFitOptionsGroup = async (
@@ -302,7 +302,7 @@ export const deserializeClassifierGroupV11 = async (
       const paramsGroup = await getGroup(modelGroup, "params");
       const modelParams = await deserializeModelParams(paramsGroup);
       kindClassifiers[kindId].modelInfoDict[idx] = {
-        ...DEFAULT_MODEL_INFO,
+        ...getDefaultModelInfo(),
         params: modelParams,
       };
     }

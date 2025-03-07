@@ -48,7 +48,7 @@ export const LocalFileUpload = ({
         task: modelTask,
         graph: isGraph,
         pretrained: true,
-        trainable: isGraph,
+        trainable: !isGraph,
       });
 
       try {
