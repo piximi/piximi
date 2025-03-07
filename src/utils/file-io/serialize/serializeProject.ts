@@ -5,7 +5,7 @@ import { Tensor } from "@tensorflow/tfjs";
 import { OptimizerSettings, PreprocessSettings } from "utils/models/types";
 import { kindClassifierModelDict } from "utils/models/availableClassificationModels";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
-import { ZipStore } from "../zarrStores";
+import { PiximiStore, SerializedModels } from "../zarrStores";
 import { LoadCB } from "../types";
 import {
   ClassifierState,
@@ -289,13 +289,7 @@ const serializeClassifier = async (
   const kindClassifiers = classifier.kindClassifiers;
   const classifierKinds = Object.keys(kindClassifiers);
   await classifierGroup.attrs.setItem("classifier_kinds", classifierKinds);
-  const userModels: Record<
-    Kind["id"],
-    Array<{
-      modelJson: { blob: Blob; fileName: string };
-      modelWeights: { blob: Blob; fileName: string };
-    }>
-  > = {};
+  const userModels: SerializedModels = {};
 
   for await (const kindId of classifierKinds) {
     const kindModels = kindClassifiers[kindId];
@@ -354,8 +348,8 @@ export const serializeProject = async (
   segmenterSlice: SegmenterState,
   loadCb: LoadCB,
 ) => {
-  const zipStore = new ZipStore(name);
-  const root = await group(zipStore, zipStore.rootName);
+  const piximiStore = new PiximiStore(name);
+  const root = await group(piximiStore, piximiStore.rootName);
 
   // pnpm start/build must be run with VITE_APP_VERSION=$npm_package_version
   const piximiVersion = import.meta.env.VITE_APP_VERSION;
@@ -368,17 +362,17 @@ export const serializeProject = async (
 
   const projectGroup = await root.createGroup("project");
   await _serializeProject(projectGroup, projectSlice, data, loadCb);
-  await root.createGroup("classifier");
-  // const classifierGroup = await root.createGroup("classifier");
-  // const userModels = await serializeClassifier(
-  //   classifierGroup,
-  //   classifierSlice,
-  // );
+  const classifierGroup = await root.createGroup("classifier");
+  const userModels = await serializeClassifier(
+    classifierGroup,
+    classifierSlice,
+  );
+  piximiStore.attachModels(userModels);
 
   const segmenterGroup = await root.createGroup("segmenter");
   await serializeSegmenter(segmenterGroup, segmenterSlice);
 
-  return zipStore.zip;
+  return piximiStore.zip;
 };
 
 /*
