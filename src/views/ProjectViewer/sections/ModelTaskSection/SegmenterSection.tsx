@@ -7,11 +7,11 @@ import { useDialog, useDialogHotkey, useSegmentationModel } from "hooks";
 import { SaveFittedModelDialog } from "components/dialogs";
 import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
 import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
-import { ImportTensorflowModelDialog } from "./ImportTensorflowModelDialog";
+import { ImportTensorflowSegmentationModelDialog } from "./ImportTensorflowModelDialog";
 import { FitSegmenterDialog } from "./FitSegmenterDialog";
 
 import { HotkeyContext } from "utils/common/enums";
-import { ModelStatus, ModelTask } from "utils/models/enums";
+import { ModelStatus } from "utils/models/enums";
 
 export const SegmenterSection = () => {
   const {
@@ -93,7 +93,7 @@ export const SegmenterSection = () => {
         />
       </Box>
 
-      <ImportTensorflowModelDialog
+      <ImportTensorflowSegmentationModelDialog
         loadedModel={
           selectedModel?.name === "Fully Convolutional Network"
             ? undefined
@@ -101,7 +101,6 @@ export const SegmenterSection = () => {
         }
         onClose={onCloseImportSegmenterDialog}
         open={importSegmenterDialogOpen}
-        modelTask={ModelTask.Segmentation}
         dispatchFunction={handleImportModel}
       />
       <SaveFittedModelDialog

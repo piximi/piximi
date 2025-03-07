@@ -6,12 +6,12 @@ import { useDialog, useDialogHotkey, useClassificationModel } from "hooks";
 import { SaveFittedModelDialog } from "components/dialogs";
 import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
 import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
-import { ImportTensorflowModelDialog } from "./ImportTensorflowModelDialog";
+import { ImportTensorflowClassificationModelDialog } from "./ImportTensorflowModelDialog";
 import { FitClassifierDialog } from "./FitClassifierDialog";
 import { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";
 
 import { HotkeyContext } from "utils/common/enums";
-import { ModelStatus, ModelTask } from "utils/models/enums";
+import { ModelStatus } from "utils/models/enums";
 
 export const ClassifierSection = () => {
   const {
@@ -97,10 +97,9 @@ export const ClassifierSection = () => {
           helperText={helperText}
         />
       </Box>
-      <ImportTensorflowModelDialog
+      <ImportTensorflowClassificationModelDialog
         onClose={handleCloseImportClassifierDialog}
         open={ImportClassifierDialogOpen}
-        modelTask={ModelTask.Classification}
         dispatchFunction={handleImportModel}
       />
       <SaveFittedModelDialog
