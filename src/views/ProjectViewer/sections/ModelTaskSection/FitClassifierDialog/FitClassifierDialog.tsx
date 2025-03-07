@@ -17,7 +17,7 @@ import { ClassifierDatasetListItem } from "./ClassifierDatasetListItem";
 
 import { ModelStatus } from "utils/models/enums";
 import { ToolTipTab } from "components/layout";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -29,6 +29,8 @@ export const FitClassifierDialog = ({
   openedDialog,
 }: FitClassifierDialogProps) => {
   const [tabVal, setTabVal] = useState("1");
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [dialogHeight, setDialogHeight] = useState<number>();
   const {
     showWarning,
     setShowWarning,
@@ -61,10 +63,8 @@ export const FitClassifierDialog = ({
   }, [showPlots]);
 
   useEffect(() => {
-    if (modelStatus > ModelStatus.Training && !selectedModel.graph) {
-      setTabVal("3");
-    }
-  }, [modelStatus, selectedModel.graph]);
+    setDialogHeight(contentRef.current?.clientHeight);
+  }, [tabVal]);
 
   return (
     <>
@@ -72,12 +72,13 @@ export const FitClassifierDialog = ({
         fullWidth
         maxWidth="md"
         onClose={closeDialog}
+        onTransitionEnter={() =>
+          setDialogHeight(contentRef.current?.clientHeight)
+        }
         open={openedDialog}
         slots={{ transition: DialogTransitionSlide }}
-        style={{
+        sx={{
           zIndex: 1203,
-          height: "100%",
-          transition: "height 2s ease-in-out",
         }}
       >
         <FitClassifierDialogAppBar
@@ -119,57 +120,64 @@ export const FitClassifierDialog = ({
             }
           />
         </Tabs>
-        <DialogContent>
-          <Box hidden={tabVal !== "1"}>
-            <List dense>
-              <ClassifierPreprocessingListItem />
+        <Box
+          sx={(theme) => ({
+            height: dialogHeight,
+            transition: `height ${theme.transitions.duration.standard}ms ${theme.transitions.easing.easeInOut}`,
+          })}
+        >
+          <DialogContent ref={contentRef}>
+            <Box hidden={tabVal !== "1"}>
+              <List dense>
+                <ClassifierPreprocessingListItem />
 
-              <ClassifierArchitectureListItem />
+                <ClassifierArchitectureListItem />
 
-              <ClassifierOptimizerListItem
-                fitOptions={fitOptions}
-                trainable={selectedModel.trainable}
-              />
-              <ClassifierDatasetListItem
-                trainingPercentage={trainingPercentage}
-                trainable={selectedModel.trainable}
-              />
-            </List>
-            <Button onClick={handleExportHyperparameters}>
-              Export Hyperparameters
-            </Button>
-          </Box>
-          <Box hidden={tabVal !== "2"}>
-            <div>
-              <TwoDataPlot
-                title="Training History - Accuracy per Epoch"
-                yLabel="Accuracy"
-                xLabel="Epoch"
-                yData1={trainingAccuracy}
-                id1="Accuracy"
-                yData2={validationAccuracy}
-                id2="Validation Accuracy"
-              />
+                <ClassifierOptimizerListItem
+                  fitOptions={fitOptions}
+                  trainable={selectedModel.trainable}
+                />
+                <ClassifierDatasetListItem
+                  trainingPercentage={trainingPercentage}
+                  trainable={selectedModel.trainable}
+                />
+              </List>
+              <Button onClick={handleExportHyperparameters}>
+                Export Hyperparameters
+              </Button>
+            </Box>
+            <Box hidden={tabVal !== "2"}>
+              <div>
+                <TwoDataPlot
+                  title="Training History - Accuracy per Epoch"
+                  yLabel="Accuracy"
+                  xLabel="Epoch"
+                  yData1={trainingAccuracy}
+                  id1="Accuracy"
+                  yData2={validationAccuracy}
+                  id2="Validation Accuracy"
+                />
 
-              <TwoDataPlot
-                title="Training History - Loss per Epoch"
-                yLabel="Loss"
-                xLabel="Epoch"
-                yData1={trainingLoss}
-                id1="Loss"
-                yData2={validationLoss}
-                id2="Validation Loss"
-                dynamicYRange={true}
-              />
-            </div>
-          </Box>
-          <Box hidden={tabVal !== "3"}>
-            {/* TODO: implement model summary for graph models */}
-            {modelStatus > ModelStatus.Training && !selectedModel.graph && (
-              <ModelSummaryTable model={selectedModel} />
-            )}
-          </Box>
-        </DialogContent>
+                <TwoDataPlot
+                  title="Training History - Loss per Epoch"
+                  yLabel="Loss"
+                  xLabel="Epoch"
+                  yData1={trainingLoss}
+                  id1="Loss"
+                  yData2={validationLoss}
+                  id2="Validation Loss"
+                  dynamicYRange={true}
+                />
+              </div>
+            </Box>
+            <Box hidden={tabVal !== "3"}>
+              {/* TODO: implement model summary for graph models */}
+              {modelStatus > ModelStatus.Training && !selectedModel.graph && (
+                <ModelSummaryTable model={selectedModel} />
+              )}
+            </Box>
+          </DialogContent>
+        </Box>
       </Dialog>
     </>
   );
