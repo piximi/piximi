@@ -176,8 +176,8 @@ export const FitClassifierDialogAppBar = ({
         <Tooltip
           title={
             hasLabeledInference
-              ? "Clear or accept predictions before disposing"
-              : "Dispose the current model"
+              ? "Clear or accept predictions before clearing"
+              : "Clear the current model"
           }
           placement="bottom"
         >

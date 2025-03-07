@@ -20,6 +20,7 @@ import {
   Category,
   ImageObject,
 } from "store/data/types";
+import { updateRecordArray } from "utils/common/helpers";
 
 /* 
    =====================
@@ -288,6 +289,13 @@ const serializeClassifier = async (
   const kindClassifiers = classifier.kindClassifiers;
   const classifierKinds = Object.keys(kindClassifiers);
   await classifierGroup.attrs.setItem("classifier_kinds", classifierKinds);
+  const userModels: Record<
+    Kind["id"],
+    Array<{
+      modelJson: { blob: Blob; fileName: string };
+      modelWeights: { blob: Blob; fileName: string };
+    }>
+  > = {};
 
   for await (const kindId of classifierKinds) {
     const kindModels = kindClassifiers[kindId];
@@ -299,11 +307,24 @@ const serializeClassifier = async (
       const classifierModel = kindClassifierModelDict[kindId][+idx];
       const modelGroup = await kindClassifierGroup.createGroup(idx);
       await modelGroup.attrs.setItem("name", classifierModel.name);
-
+      if (+idx > 1) {
+        const savedModelInfo = await classifierModel.getSavedModelFiles();
+        updateRecordArray(userModels, kindId, {
+          modelJson: {
+            blob: savedModelInfo.modelJsonBlob,
+            fileName: savedModelInfo.modelJsonFileName,
+          },
+          modelWeights: {
+            blob: savedModelInfo.weightsBlob,
+            fileName: savedModelInfo.weightsFileName,
+          },
+        });
+      }
       const paramGroup = await modelGroup.createGroup("params");
       await serializeModalParams(paramGroup, modelInfo.params);
     }
   }
+  return userModels;
 };
 
 const serializeSegmenter = async (
@@ -347,9 +368,12 @@ export const serializeProject = async (
 
   const projectGroup = await root.createGroup("project");
   await _serializeProject(projectGroup, projectSlice, data, loadCb);
-
-  const classifierGroup = await root.createGroup("classifier");
-  await serializeClassifier(classifierGroup, classifierSlice);
+  await root.createGroup("classifier");
+  // const classifierGroup = await root.createGroup("classifier");
+  // const userModels = await serializeClassifier(
+  //   classifierGroup,
+  //   classifierSlice,
+  // );
 
   const segmenterGroup = await root.createGroup("segmenter");
   await serializeSegmenter(segmenterGroup, segmenterSlice);
