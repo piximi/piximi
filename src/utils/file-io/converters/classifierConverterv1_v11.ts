@@ -1,6 +1,6 @@
 import {
   availableClassifierModels,
-  DEFAULT_MODEL_INFO,
+  getDefaultModelInfo,
 } from "utils/models/availableClassificationModels";
 import { ClassifierStateV01_02 } from "../types";
 import { OptimizerSettings, PreprocessSettings } from "utils/models/types";
@@ -35,7 +35,7 @@ export const classifierConverterv1_v11 = (
     kindClassifiers[kindId] = { selectedModelIdx: 0, modelInfoDict: {} };
     for (const i in availableClassifierModels)
       kindClassifiers[kindId].modelInfoDict[i] = {
-        ...DEFAULT_MODEL_INFO,
+        ...getDefaultModelInfo(),
         params: modelParams,
       };
   });
