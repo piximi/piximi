@@ -1,6 +1,15 @@
 import JSZip from "jszip";
 import { KeyError } from "zarr";
 import { AsyncStore, ValidStoreType } from "zarr/types/storage/types";
+import { Kind } from "store/data/types";
+
+export type SerializedModels = Record<
+  Kind["id"],
+  Array<{
+    modelJson: { blob: Blob; fileName: string };
+    modelWeights: { blob: Blob; fileName: string };
+  }>
+>;
 
 /**
  * Preserves (double) slashes earlier in the path, so this works better
@@ -71,7 +80,7 @@ export class FileStore
 
 export class ZipStore implements AsyncStore<ValidStoreType> {
   private _rootName: string;
-  private _zip: ReturnType<JSZip>;
+  protected _zip: ReturnType<JSZip>;
   private _needsInitialGroup: boolean;
 
   private createGroup() {
@@ -139,6 +148,20 @@ export class ZipStore implements AsyncStore<ValidStoreType> {
 
   //  getSize?: (path?: string) => Promise<number>;
   //  rename?: (path?: string) => Promise<void>;
+}
+
+export class PiximiStore extends ZipStore {
+  constructor(name: string, zip?: JSZip) {
+    super(name, zip);
+  }
+  attachModels(modelsByKind: SerializedModels) {
+    Object.values(modelsByKind).forEach((models) => {
+      models.forEach((model) => {
+        this._zip.file(model.modelJson.fileName, model.modelJson.blob);
+        this._zip.file(model.modelWeights.fileName, model.modelWeights.blob);
+      });
+    });
+  }
 }
 
 export type CustomStore = FileStore | ZipStore;
