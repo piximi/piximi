@@ -95,12 +95,17 @@ export const ProjectAppBar = () => {
     navigate("/imageviewer", {
       state: {
         initialThingIds: allSelectedThingIds,
+        from: "/",
       },
     });
   };
 
   const handleNavigateMeasurements = () => {
-    navigate("/measurements");
+    navigate("/measurements", {
+      state: {
+        from: "/",
+      },
+    });
   };
 
   useHotkeys(
