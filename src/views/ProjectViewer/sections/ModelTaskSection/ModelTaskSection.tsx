@@ -6,6 +6,7 @@ import { SegmenterSection } from "./SegmenterSection";
 import { ClassifierStatusProvider } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { ClassifierHistoryProvider } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
 import { ClassMapDialogProvider } from "views/ProjectViewer/hooks/useClassMapDialog";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ModelTaskSection = () => {
   const [learningTask, setLearningTask] = useState<
@@ -29,6 +30,7 @@ export const ModelTaskSection = () => {
       gap={1}
     >
       <ToggleButtonGroup
+        data-help={HelpItem.LearningTask}
         value={learningTask}
         size="small"
         color="primary"
