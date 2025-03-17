@@ -5,6 +5,7 @@ import { useTranslation } from "hooks";
 
 import { AppBarOffset } from "components/ui/AppBarOffset";
 import { dimensions } from "utils/constants";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export type OperationType = {
   icon: (color: string) => ReactElement;
@@ -13,6 +14,7 @@ export type OperationType = {
   options: ReactElement;
   hotkey: string;
   mobile?: boolean;
+  helpContext?: HelpItem;
 };
 export const ToolOptionsDrawer = ({
   optionsVisibility,
