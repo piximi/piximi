@@ -142,3 +142,4 @@ export type Edge = {
 };
 
 export type Points = Array<Point>;
+export type HTMLDataAttributes = Record<`data-${string}`, string>;
