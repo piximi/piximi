@@ -4,6 +4,7 @@ import { useMenu } from "hooks";
 
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { OpenMenu } from "./OpenMenu";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const OpenProjectListItem = () => {
   const { anchorEl, onClose, open, onOpen } = useMenu();
@@ -11,6 +12,7 @@ export const OpenProjectListItem = () => {
   return (
     <>
       <CustomListItemButton
+        data-help={HelpItem.OpenMenu}
         primaryText="Open"
         onClick={onOpen}
         icon={<FolderOpenIcon />}
