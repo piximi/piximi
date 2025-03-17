@@ -5,12 +5,25 @@ import pluginReact from "eslint-plugin-react";
 import pluginStorybook from "eslint-plugin-storybook";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 import type { Linter } from "eslint";
 
 export default [
   js.configs.recommended,
 
-  ...tseslint.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
+  {
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: __dirname,
+      },
+    },
+  },
 
   pluginReact.configs.flat.recommended,
   pluginReact.configs.flat["jsx-runtime"],
@@ -75,6 +88,12 @@ export default [
 
   {
     ignores: ["**/*.json", "**/*.yml"],
+  },
+
+  {
+    rules: {
+      "@typescript-eslint/no-deprecated": "error",
+    },
   },
 
   // must be last
