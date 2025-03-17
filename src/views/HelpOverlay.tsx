@@ -4,21 +4,26 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  GlobalStyles,
   Snackbar,
   Typography,
 } from "@mui/material";
+import { Lock as LockIcon } from "@mui/icons-material";
 import { useHelp } from "contexts";
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   helpContent,
   HelpItem,
 } from "components/layout/HelpDrawer/HelpContent";
+import { ThemeMode } from "themes/enums";
+import { formatString } from "utils/common/helpers";
 
 const HelpOverlay = () => {
   const { helpMode, setHelpMode } = useHelp()!;
   const [helpText, setHelpText] = useState<string | null>(null);
   const [lastTarget, setLastTarget] = useState<HTMLElement | null>(null);
   const [helpItem, setHelpItem] = useState<HelpItem | null>(null);
+  const [priorityHelp, setPriotityHelp] = useState<HelpItem | null>(null);
 
   const helpToggle = (event: KeyboardEvent) => {
     if (event.key === "H" && event.shiftKey) {
@@ -38,7 +43,8 @@ const HelpOverlay = () => {
   useEffect(() => {
     if (!helpMode) return;
 
-    const handleClick = (e: MouseEvent) => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (priorityHelp) return;
       let currentTarget = e.target as HTMLElement;
       let helpItem = currentTarget.getAttribute("data-help");
       let parentLevel = 0;
@@ -61,16 +67,67 @@ const HelpOverlay = () => {
         e.stopPropagation();
       }
     };
-    document.addEventListener("mousemove", handleClick, true);
-    return () => document.removeEventListener("mousemove", handleClick, true);
-  }, [helpMode, lastTarget]);
+    const handleClick = (e: MouseEvent) => {
+      if (!e.shiftKey) return;
 
-  useEffect(() => {
-    console.log(!!helpText);
-  }, [helpText]);
+      e.preventDefault();
+      e.stopPropagation();
+
+      let currentTarget = e.target as HTMLElement;
+      let _helpItem = currentTarget.getAttribute("data-help");
+      let parentLevel = 0;
+      while (currentTarget && currentTarget.parentElement && !_helpItem) {
+        _helpItem = currentTarget.getAttribute("data-help");
+
+        if (_helpItem || parentLevel >= 3) break;
+
+        currentTarget = currentTarget.parentElement;
+        parentLevel++;
+      }
+      if (priorityHelp === _helpItem) {
+        setPriotityHelp(null);
+        return;
+      }
+      setPriotityHelp(_helpItem as HelpItem);
+
+      if (_helpItem && _helpItem !== helpItem) {
+        const helpText = helpContent["help-items"][_helpItem as HelpItem]
+          ? helpContent["help-items"][_helpItem as HelpItem].brief
+          : null;
+        setHelpText(helpText);
+        setHelpItem(_helpItem as HelpItem);
+      }
+    };
+    document.addEventListener("mousemove", handleMouseMove, true);
+    document.addEventListener("click", handleClick, true);
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove, true);
+      document.removeEventListener("click", handleClick, true);
+    };
+  }, [helpMode, lastTarget, priorityHelp]);
+
+  const globalStyles = useMemo(
+    () => (
+      <GlobalStyles
+        styles={(theme) => ({
+          "html [data-help]": helpMode
+            ? {
+                outline: `2px dashed ${theme.palette.info.main}`,
+                outlineOffset: "-3px",
+              }
+            : {},
+          [`html [data-help=${priorityHelp ?? "undefined"}]`]: {
+            outlineColor: theme.palette.secondary.main,
+          },
+        })}
+      />
+    ),
+    [helpMode, priorityHelp]
+  );
 
   return (
     <>
+      {globalStyles}
       <Snackbar
         open={helpMode}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
@@ -88,7 +145,9 @@ const HelpOverlay = () => {
             subheader="Shift+H to toggle"
             sx={(theme) => ({
               color: theme.palette.info.contrastText,
-              backgroundColor: theme.palette.info.main,
+              backgroundColor: priorityHelp
+                ? theme.palette.secondary.main
+                : theme.palette.info.main,
               fontSize: 14,
             })}
             slotProps={{
@@ -98,7 +157,15 @@ const HelpOverlay = () => {
           />
           <CardContent>
             <Typography sx={{ color: "text.secondary", mb: 1.5 }}>
-              {helpItem}
+              {helpItem ? formatString(helpItem, "-", "every-word") : ""}
+              {priorityHelp && (
+                <LockIcon
+                  sx={(theme) => ({
+                    ml: 1,
+                    fontSize: theme.typography.body1.fontSize,
+                  })}
+                />
+              )}
             </Typography>
             <Typography variant="body2">{helpText}</Typography>
           </CardContent>
@@ -114,37 +181,7 @@ const HelpOverlay = () => {
             </Button>
           </CardActions>
         </Card>
-        {/* <Alert severity="info" variant="filled" sx={{ width: "100%" }}>
-          {helpText ? helpText : "Help Mode Active (H+Shift to toggle)"}
-        </Alert> */}
       </Snackbar>
-      {/* <Snackbar
-        open={!!helpText}
-        sx={{ minWidth: "max-content" }}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert severity="info" variant="filled" sx={{ width: "100%" }}>
-          {helpText}
-        </Alert>
-      </Snackbar> */}
-      {/* <Popper
-        open={!!helpText}
-        anchorEl={docRef.current}
-        placement="bottom-end"
-        modifiers={[{ name: "offset", options: { offset: [-20, -200] } }]}
-      >
-        <Box
-          sx={(theme) => ({
-            width: "200px",
-            height: "200px",
-            backgroundColor: "paper",
-            border: "1px solid white",
-            borderRadius: theme.shape.borderRadius,
-          })}
-        >
-          <Typography>{helpText}</Typography>
-        </Box>
-      </Popper> */}
     </>
   );
 };

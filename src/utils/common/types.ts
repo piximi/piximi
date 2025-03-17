@@ -131,7 +131,7 @@ export type ImageSortKeyType = {
   imageSortKey: ImageSortKey;
   comparerFunction: (
     a: { name: string; category: OldCategory },
-    b: { name: string; category: OldCategory },
+    b: { name: string; category: OldCategory }
   ) => number;
   objectType: string;
 };
@@ -146,3 +146,5 @@ export type SliderOptions = {
   step: number;
   initial: number;
 };
+
+export type HTMLDataAttributes = Record<`data-${string}`, string>;

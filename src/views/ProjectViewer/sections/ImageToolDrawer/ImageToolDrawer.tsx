@@ -28,6 +28,7 @@ import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
 
 import { dimensions } from "utils/common/constants";
 import { capitalize } from "utils/common/helpers";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 const imageTools: Record<string, OperationType> = {
   fileIO: {
@@ -54,6 +55,7 @@ const imageTools: Record<string, OperationType> = {
     description: "-",
     options: <FilterOptions />,
     hotkey: "F",
+    helpContext: HelpItem.FilterImageGrid,
   },
   information: {
     icon: (color) => (
@@ -63,6 +65,7 @@ const imageTools: Record<string, OperationType> = {
     description: "-",
     options: <InformationOptions />,
     hotkey: "I",
+    helpContext: HelpItem.GridItemInfo,
   },
   measurements: {
     icon: (color) => <StraightenIcon fontSize="small" sx={{ color: color }} />,
@@ -143,6 +146,7 @@ export const ImageToolDrawer = () => {
         {Object.values(imageTools).map((tool) => {
           return !tool.mobile || isMobile ? (
             <Tool
+              data-help={tool.helpContext}
               name={t(capitalize(tool.name))}
               onClick={() => {
                 handleSelectTool(tool.name);
@@ -155,14 +159,14 @@ export const ImageToolDrawer = () => {
                   {tool.icon(
                     activeTool === tool.name
                       ? theme.palette.primary.dark
-                      : theme.palette.grey[400],
+                      : theme.palette.grey[400]
                   )}
                 </Badge>
               ) : (
                 tool.icon(
                   activeTool === tool.name
                     ? theme.palette.primary.dark
-                    : theme.palette.grey[400],
+                    : theme.palette.grey[400]
                 )
               )}
             </Tool>
