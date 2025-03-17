@@ -27,6 +27,13 @@ export enum HelpItem {
   LossFunction = "loss-function",
   BatchSize = "batch-size",
   Epochs = "epochs",
+  DeleteAllCategories = "delete-all-categories",
+  Settings = "settings",
+  SendFeedback = "send-feedback",
+  FilterImageGrid = "filter-image-grid",
+  GridItemInfo = "grid-item-info",
+  NavigateImageViewer = "navigate-to-imageviewer",
+  NavigateMeasurements = "navigate-to-measurements",
 }
 export type HelpItemContent = { desc: string; brief: string };
 
@@ -158,6 +165,39 @@ export const helpContent: {
       desc: "Optimization algorithms are what update the internal parameters of the model automatically in response to its own performance. These algorithms will compare a prediction made by the model to the expected output and adjust model parameters to bring the predictions closer to the expected output.",
       brief:
         "Optimization algorithms are what update the internal parameters of the model automatically in response to its own performance. These algorithms will compare a prediction made by the model to the expected output and adjust model parameters to bring the predictions closer to the expected output.",
+    },
+    [HelpItem.DeleteAllCategories]: {
+      desc: "Delete all categories belinging to the active 'Kind'. Associated onjects well be recategorized as 'Unknown'.",
+      brief:
+        "Delete all categories belinging to the active 'Kind'. Associated onjects well be recategorized as 'Unknown'.",
+    },
+    [HelpItem.Settings]: {
+      desc: "Open the application settings.",
+      brief: "Open the application settings.",
+    },
+    [HelpItem.SendFeedback]: {
+      desc: "Report issues or send feedback about Piximi to the Github Repository",
+      brief:
+        "Report issues or send feedback about Piximi to the Github Repository",
+    },
+    [HelpItem.FilterImageGrid]: {
+      desc: "Filter the images in the image grid by 'Category' or Training 'Partition'.",
+      brief:
+        "Filter the images in the image grid by 'Category' or Training 'Partition'.",
+    },
+    [HelpItem.GridItemInfo]: {
+      desc: "View details of selected items in the 'Image Grid",
+      brief: "View details of selected items in the 'Image Grid",
+    },
+    [HelpItem.NavigateImageViewer]: {
+      desc: "Navigate to the Image Viewer to inspect and work with the selected images and objects.",
+      brief:
+        "Navigate to the Image Viewer to inspect and work with the selected images and objects.",
+    },
+    [HelpItem.NavigateMeasurements]: {
+      desc: "Navigate to the Measurements view to perform measurements on the project data and visualize results.",
+      brief:
+        "Navigate to the Measurements view to perform measurements on the project data and visualize results.",
     },
   },
 };

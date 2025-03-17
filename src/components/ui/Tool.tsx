@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { HTMLAttributes, useEffect, useMemo } from "react";
 
 import {
   Box,
@@ -14,8 +14,9 @@ import { ToolHotkeyTitle } from "components/ui/tooltips";
 import { IncrementalSlider } from "components/inputs";
 import { useMenu } from "hooks";
 import { SliderOptions } from "utils/types";
+import { HTMLDataAttributes } from "utils/types";
 
-type ToolProps = {
+type ToolProps = HTMLDataAttributes & {
   children: React.ReactNode;
   name: string;
   onClick: () => void;
@@ -32,6 +33,7 @@ export const Tool = ({
   onClick: handleClick,
   disabled = false,
   tooltipLocation = "bottom",
+  ...attributes
 }: ToolProps) => {
   const description = useMemo(
     () => <ToolHotkeyTitle toolName={name} />,
@@ -47,7 +49,12 @@ export const Tool = ({
     >
       <Tooltip title={description} placement={tooltipLocation}>
         <span>
-          <IconButton size="small" disabled={disabled} onClick={handleClick}>
+          <IconButton
+            size="small"
+            disabled={disabled}
+            onClick={handleClick}
+            {...attributes}
+          >
             {children}
           </IconButton>
         </span>
