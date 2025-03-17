@@ -3,7 +3,7 @@
   "appBarOffset": true,
   "topics": [
     {
-      "topic": "Opening images",
+      "topic": "Left Drawer",
       "subtopics": [
         {
           "subtitle": "Open image",
@@ -27,7 +27,7 @@
       ]
     },
     {
-      "topic": "Creating categories",
+      "topic": "Top Bar",
       "subtopics": [
         {
           "subtitle": "Creating a new category",
@@ -44,7 +44,7 @@
       ]
     },
     {
-      "topic": "Saving and opening projects",
+      "topic": "Side Bar",
       "subtopics": [
         {
           "subtitle": "Saving a project",

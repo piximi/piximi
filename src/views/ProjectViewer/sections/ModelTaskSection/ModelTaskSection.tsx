@@ -3,6 +3,7 @@ import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 import { ClassifierSection } from "./ClassifierSection";
 import { SegmenterSection } from "./SegmenterSection";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ModelTaskSection = () => {
   const [learningTask, setLearningTask] = useState<
@@ -26,6 +27,7 @@ export const ModelTaskSection = () => {
       gap={1}
     >
       <ToggleButtonGroup
+        data-help={HelpItem.LearningTask}
         value={learningTask}
         size="small"
         color="primary"

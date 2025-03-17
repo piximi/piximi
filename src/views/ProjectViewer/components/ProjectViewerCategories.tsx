@@ -27,6 +27,7 @@ import { ModelStatus, Partition } from "utils/models/enums";
 import { HotkeyContext } from "utils/common/enums";
 
 import { Category } from "store/data/types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ProjectViewerCategories = () => {
   const dispatch = useDispatch();
@@ -239,6 +240,7 @@ export const ProjectViewerCategories = () => {
 
         {modelStatus === ModelStatus.Suggesting && <PredictionListItems />}
         <CustomListItemButton
+          data-help={HelpItem.CreateCategory}
           icon={<AddIcon />}
           primaryText="Create Category"
           onClick={handleOpenCreateCategoryDialog}

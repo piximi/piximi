@@ -6,6 +6,7 @@ import {
   FormHelperText,
   TextField,
 } from "@mui/material";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 const intRegExpr = new RegExp("^[0-9]+(.0*)?$");
 const floatRegExpr = new RegExp("-*^[0-9]*(.[0-9]*)?$");
@@ -25,6 +26,7 @@ type CustomNumberTextFieldProps = {
   formControlFullWidth?: boolean;
   variant?: "filled" | "outlined" | "standard";
   formControlProps?: FormControlProps;
+  helpContext?: HelpItem;
 };
 
 export const CustomNumberTextField = ({
@@ -42,6 +44,7 @@ export const CustomNumberTextField = ({
   formControlFullWidth,
   variant = "outlined",
   formControlProps,
+  helpContext,
 }: CustomNumberTextFieldProps) => {
   const [valueString, setValueString] = useState<string>(value.toString());
 
@@ -118,7 +121,9 @@ export const CustomNumberTextField = ({
       <TextField
         id={id}
         onBlur={dispatchValue}
-        label={label}
+        label={
+          <span data-help={helpContext ? helpContext : undefined}>{label}</span>
+        }
         error={inputError}
         value={valueString}
         onChange={onInputChange}

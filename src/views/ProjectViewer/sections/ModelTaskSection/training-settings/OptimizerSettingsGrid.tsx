@@ -4,6 +4,7 @@ import {
   CustomNumberTextField,
   CustomFormSelectField,
 } from "components/inputs";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
 
@@ -51,6 +52,7 @@ export const OptimizerSettingsGrid = ({
       <Grid container spacing={2}>
         <Grid item xs={4}>
           <CustomFormSelectField
+            helpContext={HelpItem.OptimizationAlgorithm}
             keySource={OptimizationAlgorithm}
             value={compileOptions.optimizationAlgorithm as string}
             onChange={onOptimizationAlgorithmChange}
@@ -62,6 +64,7 @@ export const OptimizerSettingsGrid = ({
       <Grid container spacing={2}>
         <Grid item xs={4}>
           <CustomNumberTextField
+            helpContext={HelpItem.LearningRate}
             id="learning-rate"
             label="Learning rate"
             value={compileOptions.learningRate}
@@ -75,6 +78,7 @@ export const OptimizerSettingsGrid = ({
       <Grid container spacing={2}>
         <Grid item xs={4}>
           <CustomFormSelectField
+            helpContext={HelpItem.LossFunction}
             keySource={LossFunction}
             value={compileOptions.lossFunction as string}
             onChange={onLossFunctionChange}
@@ -86,6 +90,7 @@ export const OptimizerSettingsGrid = ({
       <Grid container direction={"row"} spacing={2}>
         <Grid item xs={12} md={4} lg={4}>
           <CustomNumberTextField
+            helpContext={HelpItem.BatchSize}
             id="batch-size"
             label="Batch size"
             value={fitOptions.batchSize}
@@ -97,6 +102,7 @@ export const OptimizerSettingsGrid = ({
 
         <Grid item xs={12} md={4} lg={4}>
           <CustomNumberTextField
+            helpContext={HelpItem.Epochs}
             id="epochs"
             label="Epochs"
             value={fitOptions.epochs}

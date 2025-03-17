@@ -15,3 +15,7 @@ export { SubtractAnnotationsIcon } from "./SubtractAnnotationsIcon";
 export { CombineAnnotationsIcon } from "./CombineAnnotationsIcon";
 export { IntersectAnnotationsIcon } from "./IntersectAnnotationsIcon";
 export { NewAnnotationIcon } from "./NewAnnotationIcon";
+export { LeftDrawer } from "./LeftDrawer";
+export { RightBar } from "./RightBar";
+export { TopBar } from "./TopBar";
+export { MainContent } from "./MainContent";

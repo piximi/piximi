@@ -56,6 +56,7 @@ import { isUnknownCategory } from "store/data/helpers";
 
 import { HotkeyContext } from "utils/common/enums";
 import { Partition } from "utils/models/enums";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 const minZoom = 0.6;
 const maxZoom = 4;
@@ -286,7 +287,11 @@ const ZoomControl = () => {
 
   return (
     <>
-      <IconButton color="inherit" onClick={onOpen}>
+      <IconButton
+        data-help={HelpItem.GridZoom}
+        color="inherit"
+        onClick={onOpen}
+      >
         <ZoomInIcon />
       </IconButton>
       <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
@@ -349,6 +354,7 @@ const CategorizeChip = ({
       >
         <span>
           <Chip
+            data-help={HelpItem.Categorize}
             avatar={<LabelOutlinedIcon color="inherit" />}
             label="Categorize"
             onClick={onOpenCategoriesMenu}
@@ -411,6 +417,7 @@ const ProjectTextField = () => {
       ) : (
         <FormControl>
           <TextField
+            data-help={HelpItem.ProjectName}
             onChange={handleTextFieldChange}
             onBlur={handleTextFieldBlur}
             onKeyDown={handleTextFieldEnter}
@@ -419,7 +426,13 @@ const ProjectTextField = () => {
             size="small"
             sx={{ ml: 5 }}
             variant="standard"
-            inputProps={{ min: 0, style: { textAlign: "center" } }}
+            slotProps={{
+              input: {
+                slotProps: {
+                  input: { min: 0, style: { textAlign: "center" } },
+                },
+              },
+            }}
           />
         </FormControl>
       )}

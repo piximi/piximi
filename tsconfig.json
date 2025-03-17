@@ -17,7 +17,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "noErrorTruncation": true
+    "noErrorTruncation": true,
+    
   },
   "include": ["src", "src/icons/svg.d.ts"],
   "sourcemap": true

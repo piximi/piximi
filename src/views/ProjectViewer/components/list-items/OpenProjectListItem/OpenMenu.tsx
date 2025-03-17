@@ -9,6 +9,7 @@ import { BaseMenu } from "components/ui/BaseMenu";
 import { OpenProjectMenu } from "./OpenProjectMenu";
 import { OpenImageMenu } from "./OpenImageMenu";
 import { ImportAnnotationsMenu } from "./ImportAnnotationsMenu";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 type OpenMenuProps = {
   anchorEl: HTMLElement | null;
@@ -67,6 +68,7 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
   return (
     <BaseMenu anchorEl={anchorEl} open={open} onClose={onClose}>
       <MenuItem
+        data-help={HelpItem.OpenProject}
         onClick={handleSelectProjectMenu}
         sx={(theme) => ({
           display: "flex",
@@ -79,6 +81,7 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
         <KeyboardArrowRightIcon />
       </MenuItem>
       <MenuItem
+        data-help={HelpItem.OpenImage}
         onClick={handleSelectImageMenu}
         sx={(theme) => ({
           display: "flex",

@@ -8,9 +8,10 @@ import { usePreferredMuiTheme } from "hooks";
 import { ProjectViewer } from "views/ProjectViewer";
 import { ImageViewer } from "views/ImageViewer";
 import { MeasurementView } from "views/MeasurementView";
-import { WelcomeScreen } from "./WelcomeScreen";
+import { WelcomeScreen } from "./views/WelcomeScreen";
 
-import { FileUploadProvider } from "contexts";
+import { FileUploadProvider, HelpProvider } from "contexts";
+import HelpOverlay from "views/HelpOverlay";
 
 export const Application = () => {
   const theme = usePreferredMuiTheme();
@@ -20,14 +21,17 @@ export const Application = () => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <FileUploadProvider>
-          <BrowserRouter basename={"/"}>
-            <Routes>
-              <Route path="/" element={<WelcomeScreen />} />
-              <Route path="project" element={<ProjectViewer />} />
-              <Route path="imageviewer" element={<ImageViewer />} />
-              <Route path="measurements" element={<MeasurementView />} />
-            </Routes>
-          </BrowserRouter>
+          <HelpProvider>
+            <HelpOverlay />
+            <BrowserRouter basename={"/"}>
+              <Routes>
+                <Route path="/" element={<WelcomeScreen />} />
+                <Route path="project" element={<ProjectViewer />} />
+                <Route path="imageviewer" element={<ImageViewer />} />
+                <Route path="measurements" element={<MeasurementView />} />
+              </Routes>
+            </BrowserRouter>
+          </HelpProvider>
         </FileUploadProvider>
       </ThemeProvider>
     </StyledEngineProvider>

@@ -1,4 +1,5 @@
 import { TabProps } from "@mui/material";
+import { HelpItem } from "../HelpDrawer/HelpContent";
 
 export type BasicTabProps = { label: string } & Omit<TabProps, "label">;
 
@@ -17,6 +18,13 @@ export type CommonTabsProps = {
   secondaryEffect?: (tab: string) => void;
   activeLabel?: string;
   transition?: "basic" | "sliding" | "controlled";
+  tabHelp?: {
+    tabBar: HelpItem;
+    edit?: HelpItem;
+    minimize?: HelpItem;
+    delete?: HelpItem;
+    create?: HelpItem;
+  };
 };
 
 export type ExtendableTabsProps = {
