@@ -207,6 +207,7 @@ export const ProjectAppBar = () => {
               >
                 <span>
                   <Chip
+                    data-help={HelpItem.NavigateImageViewer}
                     avatar={<GestureIcon color="inherit" />}
                     label="Annotate"
                     onClick={handleNavigateImageViewer}
@@ -219,6 +220,7 @@ export const ProjectAppBar = () => {
               <Tooltip title="Go to Measurements">
                 <span>
                   <Chip
+                    data-help={HelpItem.NavigateMeasurements}
                     avatar={<StraightenIcon color="inherit" />}
                     label="Measurements"
                     onClick={handleNavigateMeasurements}
