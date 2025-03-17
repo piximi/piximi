@@ -84,6 +84,7 @@
     "canvas": "^2.9.1",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.2",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-storybook": "^0.10.2",

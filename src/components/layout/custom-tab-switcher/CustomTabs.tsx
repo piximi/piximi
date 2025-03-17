@@ -169,6 +169,7 @@ export function CustomTabs(
           >
             {editable && (
               <EditIcon
+                data-help={props.tabHelp?.edit}
                 fontSize="small"
                 sx={{ p: 0 }}
                 onClick={() => setIsEditing(true)}
@@ -176,6 +177,7 @@ export function CustomTabs(
             )}
             {handleTabMin && (
               <MinimizeIcon
+                data-help={props.tabHelp?.minimize}
                 fontSize="small"
                 sx={{ p: 0 }}
                 onClick={(event) => handleTabDeletion(event, label, "hide")}
@@ -183,6 +185,7 @@ export function CustomTabs(
             )}
             {!(persistentTabs && persistentTabs.includes(label)) && (
               <DeleteIcon
+                data-help={props.tabHelp?.delete}
                 fontSize="small"
                 sx={{ p: 0 }}
                 onClick={(event) => handleTabDeletion(event, label, "delete")}
@@ -247,6 +250,7 @@ export function CustomTabs(
             {labels?.map((label, idx) => {
               return typeof label === "string" ? (
                 <Tab
+                  data-help={props.tabHelp?.tabBar}
                   key={`Tab-${childClassName}-tab-${idx}`}
                   label={renderTabLabel(label)}
                   disabled={disabledTabs && disabledTabs.includes(idx)}
@@ -260,7 +264,11 @@ export function CustomTabs(
             <>
               <Divider orientation="vertical" />
               <Box display="flex" flexShrink={1} justifySelf="flex-end">
-                <IconButton onClick={handleNew} disableRipple>
+                <IconButton
+                  data-help={props.tabHelp?.create}
+                  onClick={handleNew}
+                  disableRipple
+                >
                   <AddIcon />
                 </IconButton>
               </Box>

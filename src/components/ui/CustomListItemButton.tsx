@@ -90,7 +90,7 @@ export const CustomListItemButton = ({
             ) : undefined
           }
           disablePadding
-          {...rest}
+          {...{ ...rest, "data-help": undefined }}
         >
           <ListItemButton onClick={handleClick} {...rest}>
             {icon && <ListItemIcon>{icon}</ListItemIcon>}

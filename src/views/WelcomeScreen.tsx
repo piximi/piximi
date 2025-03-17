@@ -1,5 +1,7 @@
 import { Box, Button, Stack } from "@mui/material";
-import { Logo } from "components/ui/logo";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { Logo } from "components/ui";
+
 import { useDialogHotkey } from "hooks";
 import { useNavigate } from "react-router-dom";
 import { HotkeyContext } from "utils/enums";
@@ -25,6 +27,7 @@ export const WelcomeScreen = () => {
   const handleNewProject = () => {
     navigate("/project", { state: { init: true } });
   };
+
   return (
     <Box
       sx={{
@@ -43,10 +46,16 @@ export const WelcomeScreen = () => {
       >
         <Logo width={500} height={100} />
         <Stack spacing={2} sx={{ mt: 4 }}>
-          <Button onClick={handleNewProject} variant="outlined" color="primary">
+          <Button
+            data-help={HelpItem.StartNewProject}
+            onClick={handleNewProject}
+            variant="outlined"
+            color="primary"
+          >
             Start New Project
           </Button>
           <Button
+            data-help={HelpItem.StartNewProject}
             onClick={handleOpenExampleProjectDialog}
             variant="outlined"
             color="primary"
@@ -54,6 +63,7 @@ export const WelcomeScreen = () => {
             Open Example Project
           </Button>
           <Button
+            data-help={HelpItem.Documentation}
             component="a"
             href="https://documentation.piximi.app"
             target="_blank"
