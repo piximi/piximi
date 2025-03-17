@@ -2,6 +2,7 @@ import { Box, Container, Divider, Typography } from "@mui/material";
 
 import { ToolHotkeyTitle } from "components/ui/tooltips/ToolHotkeyTitle";
 import { CollapsibleList } from "components/ui/CollapsibleList";
+import { LeftDrawer, RightBar, TopBar } from "icons";
 
 type Subtopic = {
   subtitle: string;
@@ -33,9 +34,20 @@ export const HelpContent = (helpContent: Array<HelpTopic>) => {
           <CollapsibleList
             key={idx}
             primary={
-              <Typography variant="h6" fontSize={18}>
-                {helpContent.topic}
-              </Typography>
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent={"space-between"}
+              >
+                <Typography variant="h6" fontSize={18}>
+                  {helpContent.topic}
+                </Typography>
+                {helpContent.topic === "Left Drawer" && (
+                  <LeftDrawer color="white" />
+                )}
+                {helpContent.topic === "Top Bar" && <TopBar color="white" />}
+                {helpContent.topic === "Side Bar" && <RightBar color="white" />}
+              </Box>
             }
             closed={true}
             dense={true}

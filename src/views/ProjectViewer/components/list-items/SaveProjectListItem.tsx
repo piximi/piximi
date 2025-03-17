@@ -7,6 +7,7 @@ import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { SaveProjectDialog } from "components/dialogs";
 
 import { HotkeyContext } from "utils/enums";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const SaveProjectListItem = () => {
   const {
@@ -18,6 +19,7 @@ export const SaveProjectListItem = () => {
   return (
     <>
       <CustomListItemButton
+        data-help={HelpItem.SaveProject}
         primaryText="Save"
         onClick={onSaveProjectDialogOpen}
         icon={<DownloadIcon />}
