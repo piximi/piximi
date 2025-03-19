@@ -30,6 +30,7 @@ import {
   QuickToolSizeControls,
   ThresholdToolSizeControls,
 } from "views/ImageViewer/utils/consts";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 type ToolMap = Record<
   string,
@@ -124,7 +125,7 @@ export const ToolOptions = () => {
   };
 
   return (
-    <Stack>
+    <Stack data-help={HelpItem.ObjectCreationTools}>
       {Object.keys(toolMap).map((name, idx) => {
         const tool = toolMap[name];
 

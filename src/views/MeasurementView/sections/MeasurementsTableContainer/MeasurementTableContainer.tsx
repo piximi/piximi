@@ -19,6 +19,7 @@ import { MeasurementTable } from "./MeasurementTable";
 import { capitalize } from "utils/stringUtils";
 
 import { GroupedMeasurementDisplayTable } from "store/measurements/types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const MeasurementTableContainer = ({
   table,
@@ -65,6 +66,7 @@ export const MeasurementTableContainer = ({
         <Collapse in={expanded}>
           <Box minHeight={"500px"} height={`400px`}>
             <CustomTabs
+              tabHelp={{ tabBar: HelpItem.MeasurementGroupTabs }}
               transition="sliding"
               childClassName="measurement-tabs"
               labels={["Data Grid", "Plots"]}

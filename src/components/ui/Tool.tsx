@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 
 import {
   Box,

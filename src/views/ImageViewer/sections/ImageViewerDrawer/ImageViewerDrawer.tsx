@@ -25,6 +25,7 @@ import {
 
 import { HotkeyContext } from "utils/enums";
 import { Category, Kind } from "store/data/types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ImageViewerDrawer = () => {
   const dispatch = useDispatch();
@@ -42,7 +43,7 @@ export const ImageViewerDrawer = () => {
       annotatorSlice.actions.addKind({
         kind,
         unknownCategory: newUnknownCategory,
-      }),
+      })
     );
   };
 
@@ -72,7 +73,10 @@ export const ImageViewerDrawer = () => {
         <FunctionalDivider
           headerText="Kinds"
           actions={
-            <IconButton onClick={handleOpenCreateKindDialog}>
+            <IconButton
+              data-help={HelpItem.CreateKind}
+              onClick={handleOpenCreateKindDialog}
+            >
               <Add fontSize="small" />
             </IconButton>
           }
