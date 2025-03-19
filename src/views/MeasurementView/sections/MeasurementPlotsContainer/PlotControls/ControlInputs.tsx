@@ -22,10 +22,11 @@ import { CustomNumberTextField } from "components/inputs";
 
 import { capitalize } from "utils/common/helpers";
 
-import { KeysWithValuesOfType } from "utils/common/types";
+import { HTMLDataAttributes, KeysWithValuesOfType } from "utils/common/types";
 import { ChartConfig, ChartItem, ChartType, SplitType } from "../../../types";
 
 import { nivoColorSpaces } from "themes/nivoTheme";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 const splitTypes = ["partition", "category"];
 
@@ -42,7 +43,7 @@ export const ColorThemeSelect = () => {
           elementArray.push(
             <ListSubheader key={`color-space-${space.name}`}>
               {space.name}
-            </ListSubheader>,
+            </ListSubheader>
           );
           Object.values(space.themes).forEach((theme) => {
             elementArray.push(
@@ -61,21 +62,21 @@ export const ColorThemeSelect = () => {
                     ></span>
                   );
                 })}
-              </MenuItem>,
+              </MenuItem>
             );
           });
           return elementArray;
         },
-        [],
+        []
       ),
-    [],
+    []
   );
 
   const defaultValue = useMemo(() => "Select color theme", []);
 
   const inputValue = useMemo(
     () => selectedPlot.chartConfig.colorTheme ?? "",
-    [selectedPlot.chartConfig],
+    [selectedPlot.chartConfig]
   );
 
   const renderValue = useCallback((value: string) => {
@@ -84,6 +85,7 @@ export const ColorThemeSelect = () => {
 
   return (
     <ChartControlSelect
+      data-help={HelpItem.MeasurementPlotColorMap}
       label="Color Theme"
       id="color-theme-select"
       defaultValue={defaultValue}
@@ -110,14 +112,14 @@ export const PlotSelect = () => {
           </MenuItem>
         );
       }),
-    [],
+    []
   );
 
   const defaultValue = useMemo(() => "Select plot type", []);
 
   const inputValue = useMemo(
     () => selectedPlot.chartConfig.chart ?? "",
-    [selectedPlot.chartConfig],
+    [selectedPlot.chartConfig]
   );
   const renderValue = useCallback(
     (value: string) => {
@@ -127,11 +129,12 @@ export const PlotSelect = () => {
         return value;
       }
     },
-    [defaultValue],
+    [defaultValue]
   );
 
   return (
     <ChartControlSelect
+      data-help={HelpItem.MeasurementPlotType}
       label="plot"
       id="plot-select"
       defaultValue={defaultValue}
@@ -157,6 +160,19 @@ export const ChartMeasurementSelect = ({
     updateChartConfig(type, measurementPlotOptions[event.target.value]);
   };
 
+  const helpType = useMemo(() => {
+    switch (type) {
+      case "x-axis":
+        return HelpItem.MeasurementPlotXAxis;
+      case "y-axis":
+        return HelpItem.MeasurementPlotYAxis;
+      case "size":
+        return HelpItem.MeasurementPlotSize;
+      default:
+        return undefined;
+    }
+  }, [type]);
+
   const selectOptions = useMemo(
     () =>
       (nullable
@@ -169,17 +185,17 @@ export const ChartMeasurementSelect = ({
           </MenuItem>
         );
       }),
-    [measurementPlotOptions, nullable],
+    [measurementPlotOptions, nullable]
   );
 
   const defaultValue = useMemo(
     () => (nullable ? "--" : `Select ${type} measurement`),
-    [nullable, type],
+    [nullable, type]
   );
 
   const inputValue = useMemo(
     () => selectedPlot.chartConfig[type]?.measurementType ?? "",
-    [type, selectedPlot.chartConfig],
+    [type, selectedPlot.chartConfig]
   );
 
   const renderValue = useCallback(
@@ -190,10 +206,11 @@ export const ChartMeasurementSelect = ({
         return value;
       }
     },
-    [defaultValue],
+    [defaultValue]
   );
   return (
     <ChartControlSelect
+      data-help={helpType}
       label={type}
       id={`${type}-select`}
       defaultValue={defaultValue}
@@ -226,17 +243,17 @@ export const ChartSplitSelect = ({
           </MenuItem>
         );
       }),
-    [nullable],
+    [nullable]
   );
 
   const defaultValue = useMemo(
     () => (nullable ? "--" : `Select ${type} split`),
-    [nullable, type],
+    [nullable, type]
   );
 
   const inputValue = useMemo(
     () => selectedPlot.chartConfig[type] ?? "",
-    [type, selectedPlot.chartConfig],
+    [type, selectedPlot.chartConfig]
   );
 
   const renderValue = useCallback(
@@ -247,11 +264,12 @@ export const ChartSplitSelect = ({
         return value;
       }
     },
-    [defaultValue],
+    [defaultValue]
   );
 
   return (
     <ChartControlSelect
+      data-help={HelpItem.MeasurementPlotColor}
       label={type}
       id={`${type}-select`}
       defaultValue={defaultValue}
@@ -271,7 +289,8 @@ const ChartControlSelect = ({
   handleChange,
   selectOptions,
   renderValue,
-}: {
+  ...attrs
+}: HTMLDataAttributes & {
   label: string;
   id: string;
   inputValue: string;
@@ -283,6 +302,7 @@ const ChartControlSelect = ({
   return (
     <FormControl fullWidth sx={{ pb: 1, mt: 1 }}>
       <InputLabel
+        data-help={attrs["data-help"]}
         variant="standard"
         htmlFor={id}
         sx={(theme) => ({
@@ -369,7 +389,7 @@ const BoxPlotHelpTooltip = () => {
 
   const helpTextColor = useMemo(
     () => muiTheme.palette.getContrastText(muiTheme.palette.background.paper),
-    [muiTheme],
+    [muiTheme]
   );
   return (
     <svg

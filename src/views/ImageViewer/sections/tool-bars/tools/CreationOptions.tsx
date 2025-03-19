@@ -24,6 +24,7 @@ import {
   SubtractAnnotationsIcon,
 } from "icons";
 import { SvgIcon, useTheme } from "@mui/material";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const CreationOptions = () => {
   const dispatch = useDispatch();
@@ -39,7 +40,7 @@ export const CreationOptions = () => {
       dispatch(
         annotatorSlice.actions.setAnnotationMode({
           annotationMode: mode,
-        }),
+        })
       );
   };
 
@@ -57,7 +58,7 @@ export const CreationOptions = () => {
       }
       return theme.palette.action.disabled;
     },
-    [theme, workingAnnotationEntity.saved, annotationMode],
+    [theme, workingAnnotationEntity.saved, annotationMode]
   );
 
   //TODO: not working, but will fix after annotation handling refector
@@ -73,7 +74,7 @@ export const CreationOptions = () => {
       workingAnnotation.decodedMask,
       workingAnnotation.boundingBox,
       image.shape.width,
-      image.shape.height,
+      image.shape.height
     );
 
     dispatch(
@@ -82,12 +83,12 @@ export const CreationOptions = () => {
           boundingBox: invertedBoundingBox,
           decodedMask: invertedMask,
         },
-      }),
+      })
     );
   };
 
   return (
-    <FlexColumnBox>
+    <FlexColumnBox data-help={HelpItem.ObjectManipulationTools}>
       <Tool
         name={t("New Annotation")}
         onClick={() => handleModeSelection(AnnotationMode.New)}

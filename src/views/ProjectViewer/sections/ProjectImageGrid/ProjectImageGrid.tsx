@@ -45,10 +45,10 @@ export const ProjectImageGrid = () => {
       dispatch(
         dataSlice.actions.deleteKind({
           deletedKindId: item,
-        }),
+        })
       );
     },
-    [dispatch],
+    [dispatch]
   );
 
   const handleTabMinimize = useCallback(
@@ -59,7 +59,7 @@ export const ProjectImageGrid = () => {
 
       dispatch(projectSlice.actions.addKindTabFilter({ kindId: item }));
     },
-    [dispatch],
+    [dispatch]
   );
 
   const handleTabChange = (tab: string) => {
@@ -67,25 +67,25 @@ export const ProjectImageGrid = () => {
     dispatch(
       projectSlice.actions.updateHighlightedCategory({
         categoryId: kinds[tab]!.unknownCategoryId,
-      }),
+      })
     );
   };
 
   const handleKindEdit = (kindId: string, newDisplayName: string) => {
     dispatch(
-      dataSlice.actions.updateKindName({ kindId, displayName: newDisplayName }),
+      dataSlice.actions.updateKindName({ kindId, displayName: newDisplayName })
     );
   };
 
   const renderTabLabel = useCallback(
     (label: string) => kinds[label].displayName,
-    [kinds],
+    [kinds]
   );
 
   useEffect(() => {
     if (isMobile) {
       const minimizeOnResize = visibleKinds.filter(
-        (kind) => kind !== activeKind,
+        (kind) => kind !== activeKind
       );
       minimizeOnResize.forEach((kind) => handleTabMinimize(kind));
     }
@@ -113,7 +113,7 @@ export const ProjectImageGrid = () => {
       <CustomTabs
         tabHelp={{
           tabBar: HelpItem.KindTabs,
-          create: HelpItem.CreateKind,
+          create: HelpItem.AddKindTab,
         }}
         extendable
         transition="sliding"

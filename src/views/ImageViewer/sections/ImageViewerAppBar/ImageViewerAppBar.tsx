@@ -18,6 +18,7 @@ import {
 } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { HotkeyContext } from "utils/common/enums";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ImageViewerAppBar = () => {
   const navigate = useNavigate();
@@ -40,19 +41,19 @@ export const ImageViewerAppBar = () => {
           imageViewerSlice.actions.setActiveImageId({
             imageId: undefined,
             prevImageId: activeImageId,
-          }),
+          })
         );
         dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
         dispatch(
           annotatorSlice.actions.setSelectedAnnotationIds({
             annotationIds: [],
             workingAnnotationId: undefined,
-          }),
+          })
         );
         dispatch(
           annotatorSlice.actions.setWorkingAnnotation({
             annotation: undefined,
-          }),
+          })
         );
       });
       navigate("/project");
@@ -69,6 +70,7 @@ export const ImageViewerAppBar = () => {
       <CustomAppBar>
         <Tooltip title="Save and return to project" placement="bottom">
           <IconButton
+            data-help={HelpItem.NavigateProjectView}
             edge="start"
             onClick={() => handleReturnToMainProject()}
             aria-label="Exit Annotator"

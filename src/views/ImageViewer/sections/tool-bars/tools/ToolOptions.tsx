@@ -31,6 +31,7 @@ import {
   ThresholdToolSizeControls,
 } from "views/ImageViewer/utils/consts";
 import { FlexColumnBox } from "components/ui";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 type ToolMap = Record<
   string,
@@ -94,7 +95,7 @@ export const ToolOptions = () => {
       dispatch(
         annotatorSlice.actions.setToolType({
           operation: toolMap[toolName].operation,
-        }),
+        })
       );
   };
 
@@ -104,28 +105,28 @@ export const ToolOptions = () => {
         dispatch(
           annotatorSlice.actions.setPenSelectionBrushSize({
             penSelectionBrushSize: value,
-          }),
+          })
         );
         break;
       case ToolType.QuickAnnotation:
         dispatch(
           annotatorSlice.actions.setQuickSelectionRegionSize({
             quickSelectionRegionSize: value,
-          }),
+          })
         );
         break;
       case ToolType.ThresholdAnnotation:
         dispatch(
           annotatorSlice.actions.setThresholdAnnotationValue({
             thresholdAnnotationValue: value,
-          }),
+          })
         );
         break;
     }
   };
 
   return (
-    <FlexColumnBox>
+    <FlexColumnBox data-help={HelpItem.ObjectCreationTools}>
       {Object.keys(toolMap).map((name, idx) => {
         const tool = toolMap[name];
 
@@ -142,7 +143,7 @@ export const ToolOptions = () => {
             {tool.icon(
               activeTool === tool.operation
                 ? theme.palette.primary.dark
-                : theme.palette.action.active,
+                : theme.palette.action.active
             )}
           </ResizableTool>
         ) : (
@@ -155,7 +156,7 @@ export const ToolOptions = () => {
             {tool.icon(
               activeTool === tool.operation
                 ? theme.palette.primary.dark
-                : theme.palette.action.active,
+                : theme.palette.action.active
             )}
           </Tool>
         );

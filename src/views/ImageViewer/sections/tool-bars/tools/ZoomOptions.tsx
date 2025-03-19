@@ -23,6 +23,7 @@ import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
 import { ToolType } from "views/ImageViewer/utils/enums";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { FlexRowBox } from "components/ui";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ZoomOptions = () => {
   const stageRef = useContext(StageContext);
@@ -51,7 +52,7 @@ export const ZoomOptions = () => {
     const imageHeight = image.shape.height;
     const newScale = Math.min(
       stageHeight / imageHeight,
-      stageWidth / imageWidth,
+      stageWidth / imageWidth
     );
 
     dispatch(imageViewerSlice.actions.setZoomToolOptions(payload));
@@ -62,7 +63,7 @@ export const ZoomOptions = () => {
       dispatch(
         annotatorSlice.actions.setToolType({
           operation: ToolType.Zoom,
-        }),
+        })
       );
   };
 
@@ -89,7 +90,7 @@ export const ZoomOptions = () => {
           x: ((1 - stageRef.current.scaleX()!) * stageWidth) / 2,
           y: ((1 - stageRef.current.scaleX()!) * stageHeight) / 2,
         },
-      }),
+      })
     );
   };
   const handleSetCenteringOption = () => {
@@ -103,12 +104,12 @@ export const ZoomOptions = () => {
     dispatch(imageViewerSlice.actions.setZoomToolOptions(payload));
   };
   return (
-    <FlexRowBox>
+    <FlexRowBox data-help={HelpItem.ZoomAndPosition}>
       <Tool
         name={t(
           `Toggle Zoom Center: ${
             options.automaticCentering ? "Image" : "Cursor"
-          }`,
+          }`
         )}
         onClick={handleSetCenteringOption}
       >

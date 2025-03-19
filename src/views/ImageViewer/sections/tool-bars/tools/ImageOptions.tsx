@@ -21,6 +21,7 @@ import { selectActiveImageRenderedSrcs } from "views/ImageViewer/state/imageView
 
 import { ColorAdjustment } from "icons";
 import { generateDefaultColors } from "utils/common/tensorHelpers";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ImageOptions = () => {
   const dispatch = useDispatch();
@@ -39,7 +40,7 @@ export const ImageOptions = () => {
     dispatch(
       annotatorSlice.actions.editThings({
         updates: [{ id: activeImage.id!, colors: defaultColors }],
-      }),
+      })
     );
   };
 
@@ -63,13 +64,13 @@ export const ImageOptions = () => {
               src: renderedSrcs[newValue],
             },
           ],
-        }),
+        })
       );
     }
   };
 
   return (
-    <FlexRowBox>
+    <FlexRowBox data-help={HelpItem.ImageTools}>
       <PopoverTool
         name={t("Channel Adjustment")}
         popoverElement={

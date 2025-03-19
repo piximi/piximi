@@ -27,6 +27,7 @@ import { PopoverTool } from "components/ui/Tool/Tool";
 import { groupBy } from "lodash";
 import { CustomListItemButton, DividerHeader } from "components/ui";
 import { Category } from "store/data/types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const SelectionOptions = () => {
   const dispatch = useDispatch();
@@ -40,7 +41,7 @@ export const SelectionOptions = () => {
 
   const groupedCategories = useMemo(() => {
     const objectCategories = annotationCategories.filter(
-      (cat) => cat.kind !== "Image",
+      (cat) => cat.kind !== "Image"
     );
     return Object.entries(groupBy(objectCategories, "kind"));
   }, [annotationCategories]);
@@ -53,19 +54,19 @@ export const SelectionOptions = () => {
         }
         return ids;
       },
-      [],
+      []
     );
     batch(() => {
       dispatch(
         annotatorSlice.actions.setSelectedAnnotationIds({
           annotationIds: annotationIds,
           workingAnnotationId: annotationIds[0],
-        }),
+        })
       );
       dispatch(
         annotatorSlice.actions.setWorkingAnnotation({
           annotation: annotationIds[0],
-        }),
+        })
       );
     });
   };
@@ -75,7 +76,7 @@ export const SelectionOptions = () => {
       dispatch(
         annotatorSlice.actions.setToolType({
           operation: ToolType.Pointer,
-        }),
+        })
       );
   };
 
@@ -84,12 +85,12 @@ export const SelectionOptions = () => {
       annotatorSlice.actions.setSelectedAnnotationIds({
         annotationIds: activeAnnotations.map((annotation) => annotation.id),
         workingAnnotationId: activeAnnotations[0].id,
-      }),
+      })
     );
     dispatch(
       annotatorSlice.actions.setWorkingAnnotation({
         annotation: activeAnnotations[0],
-      }),
+      })
     );
   };
   const handleDeselectAll = () => {
@@ -97,15 +98,15 @@ export const SelectionOptions = () => {
       annotatorSlice.actions.setSelectedAnnotationIds({
         annotationIds: [],
         workingAnnotationId: undefined,
-      }),
+      })
     );
     dispatch(
-      annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
+      annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined })
     );
   };
 
   return (
-    <FlexRowBox>
+    <FlexRowBox data-help={HelpItem.SelectionTools}>
       <PopoverTool
         name={t("Select By...")}
         popoverElement={

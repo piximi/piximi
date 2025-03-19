@@ -10,6 +10,7 @@ import {
   KeyboardArrowRight as KeyboardArrowRightIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
 } from "@mui/icons-material";
+import { HTMLDataAttributes } from "utils/common/types";
 
 const heights = {
   sm: "1.5rem",
@@ -19,7 +20,7 @@ const heights = {
 
 //TODO: generic way to indent items in list
 
-type GenericCollapsibleListItemProps = {
+type GenericCollapsibleListItemProps = HTMLDataAttributes & {
   children?: any;
   primaryText: ReactNode;
   divider?: boolean;
@@ -45,6 +46,7 @@ export const CollapsibleListItem = ({
   disabledCollapse,
   enforceHeight,
   indentSpacing = 4,
+  ...attrs
 }: GenericCollapsibleListItemProps) => {
   const [collapsed, setCollapsed] = React.useState(beginCollapsed);
 
@@ -55,6 +57,7 @@ export const CollapsibleListItem = ({
   return (
     <>
       <ListItemButton
+        data-help={attrs["data-help"]}
         onClick={handleCollapse}
         disabled={disabled}
         sx={{
