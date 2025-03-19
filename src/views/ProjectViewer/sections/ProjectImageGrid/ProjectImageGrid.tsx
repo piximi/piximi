@@ -113,7 +113,7 @@ export const ProjectImageGrid = () => {
       <CustomTabs
         tabHelp={{
           tabBar: HelpItem.KindTabs,
-          create: HelpItem.CreateKind,
+          create: HelpItem.AddKindTab,
         }}
         extendable
         transition="sliding"

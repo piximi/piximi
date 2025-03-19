@@ -18,6 +18,7 @@ import {
 } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { HotkeyContext } from "utils/enums";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ImageViewerAppBar = () => {
   const navigate = useNavigate();
@@ -69,6 +70,7 @@ export const ImageViewerAppBar = () => {
       <CustomAppBar>
         <Tooltip title="Save and return to project" placement="bottom">
           <IconButton
+            data-help={HelpItem.NavigateProjectView}
             edge="start"
             onClick={() => handleReturnToMainProject()}
             aria-label="Exit Annotator"

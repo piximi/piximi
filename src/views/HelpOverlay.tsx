@@ -5,19 +5,25 @@ import {
   CardContent,
   CardHeader,
   GlobalStyles,
+  List,
   Snackbar,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { Lock as LockIcon } from "@mui/icons-material";
 import { useHelp } from "contexts";
 import React, { useEffect, useMemo, useState } from "react";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   helpContent,
   HelpItem,
 } from "components/layout/HelpDrawer/HelpContent";
 import { formatString, logger } from "utils/common/helpers";
+import { MuiMarkdown, getOverrides } from "mui-markdown";
 
 const HelpOverlay = () => {
+  const muiTheme = useTheme();
   const { helpMode, setHelpMode } = useHelp()!;
   const [helpText, setHelpText] = useState<string | null>(null);
   const [lastTarget, setLastTarget] = useState<HTMLElement | null>(null);
@@ -121,7 +127,7 @@ const HelpOverlay = () => {
         })}
       />
     ),
-    [helpMode, priorityHelp],
+    [helpMode, priorityHelp]
   );
 
   return (
@@ -166,9 +172,32 @@ const HelpOverlay = () => {
                 />
               )}
             </Typography>
-            <Typography variant="body2" whiteSpace={"pre-line"}>
+            {/* <Typography variant="body2" whiteSpace={"pre-line"}>
               {helpText}
-            </Typography>
+            </Typography> */}
+            {/* <Markdown remarkPlugins={[remarkGfm]} components={{"ul":List}}>{helpText}</Markdown> */}
+            <MuiMarkdown
+              overrides={{
+                ...getOverrides({}),
+                p: {
+                  props: {
+                    style: { fontSize: muiTheme.typography.body2.fontSize },
+                  },
+                },
+                span: {
+                  props: {
+                    style: { fontSize: muiTheme.typography.body2.fontSize },
+                  },
+                },
+                li: {
+                  props: {
+                    style: { fontSize: muiTheme.typography.body2.fontSize },
+                  },
+                },
+              }}
+            >
+              {helpText}
+            </MuiMarkdown>
           </CardContent>
           <CardActions>
             <Button
