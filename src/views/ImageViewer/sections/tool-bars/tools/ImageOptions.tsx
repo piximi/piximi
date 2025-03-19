@@ -17,6 +17,7 @@ import { selectActiveImageRenderedSrcs } from "views/ImageViewer/state/imageView
 
 import { ColorAdjustment } from "icons";
 import { generateDefaultColors } from "utils/tensorUtils";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ImageOptions = () => {
   const dispatch = useDispatch();
@@ -65,7 +66,7 @@ export const ImageOptions = () => {
   };
 
   return (
-    <Stack direction="row">
+    <Stack data-help={HelpItem.ImageTools} direction="row">
       <PopoverTool
         name={t("Channel Adjustment")}
         popoverElement={

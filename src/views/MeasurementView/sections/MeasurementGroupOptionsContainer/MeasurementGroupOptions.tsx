@@ -24,6 +24,7 @@ import { measurementsSlice } from "store/measurements";
 
 import { MeasurementGroup } from "store/measurements/types";
 import { LoadStatus } from "utils/types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const MeasurementGroupOptions = ({
   table,
@@ -91,11 +92,16 @@ export const MeasurementGroupOptions = ({
             typographyVariant="body2"
             sx={{ py: 1 }}
             textAlign="left"
+            data-help={HelpItem.MeasurementSplits}
           >
             Splits
           </DividerHeader>
           <SplitTree group={table} measurementStatus={status} />
-          <DividerWithLoading title="Measurements" loadStatus={status} />
+          <DividerWithLoading
+            data-help={HelpItem.MeasurementsTree}
+            title="Measurements"
+            loadStatus={status}
+          />
           <MeasurementsTree
             group={table}
             measurementStatus={status}

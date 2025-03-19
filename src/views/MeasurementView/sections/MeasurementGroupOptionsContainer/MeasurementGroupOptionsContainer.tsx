@@ -10,6 +10,7 @@ import { MeasurementGroupOptions } from "./MeasurementGroupOptions";
 
 import { selectMeasurementGroups } from "store/measurements/selectors";
 import { CreateMeasurementGroupDialog } from "views/MeasurementView/components/dialogs";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const MeasurementGroupOptionsContainer = () => {
   const tables = useSelector(selectMeasurementGroups);
@@ -38,6 +39,7 @@ export const MeasurementGroupOptionsContainer = () => {
         loadedStateIcon={
           <>
             <IconButton
+              data-help={HelpItem.NewMeasurementTable}
               disableRipple
               sx={(theme) => ({
                 p: 0,
