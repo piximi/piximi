@@ -52,7 +52,7 @@ export const OptimizerSettingsGrid = ({
       <Grid container spacing={2}>
         <Grid item xs={4}>
           <CustomFormSelectField
-            helpContext={HelpItem.OptimizationAlgorithm}
+            data-help={HelpItem.OptimizationAlgorithm}
             keySource={OptimizationAlgorithm}
             value={compileOptions.optimizationAlgorithm as string}
             onChange={onOptimizationAlgorithmChange}
@@ -64,7 +64,7 @@ export const OptimizerSettingsGrid = ({
       <Grid container spacing={2}>
         <Grid item xs={4}>
           <CustomNumberTextField
-            helpContext={HelpItem.LearningRate}
+            data-help={HelpItem.LearningRate}
             id="learning-rate"
             label="Learning rate"
             value={compileOptions.learningRate}
@@ -78,7 +78,7 @@ export const OptimizerSettingsGrid = ({
       <Grid container spacing={2}>
         <Grid item xs={4}>
           <CustomFormSelectField
-            helpContext={HelpItem.LossFunction}
+            data-help={HelpItem.LossFunction}
             keySource={LossFunction}
             value={compileOptions.lossFunction as string}
             onChange={onLossFunctionChange}
@@ -90,7 +90,7 @@ export const OptimizerSettingsGrid = ({
       <Grid container direction={"row"} spacing={2}>
         <Grid item xs={12} md={4} lg={4}>
           <CustomNumberTextField
-            helpContext={HelpItem.BatchSize}
+            data-help={HelpItem.BatchSize}
             id="batch-size"
             label="Batch size"
             value={fitOptions.batchSize}
@@ -102,7 +102,7 @@ export const OptimizerSettingsGrid = ({
 
         <Grid item xs={12} md={4} lg={4}>
           <CustomNumberTextField
-            helpContext={HelpItem.Epochs}
+            data-help={HelpItem.Epochs}
             id="epochs"
             label="Epochs"
             value={fitOptions.epochs}

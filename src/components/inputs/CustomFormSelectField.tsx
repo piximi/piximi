@@ -8,16 +8,15 @@ import {
 } from "@mui/material";
 
 import { enumKeys } from "utils/common/helpers";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { HTMLDataAttributes } from "utils/common/types";
 
-type CustomFormSelectFieldProps = {
+type CustomFormSelectFieldProps = HTMLDataAttributes & {
   keySource: object;
   value: string;
   onChange: (event: SelectChangeEvent) => void;
   disabled?: boolean;
   size?: "small" | "medium";
   helperText?: string;
-  helpContext?: HelpItem;
 };
 export const CustomFormSelectField = ({
   keySource,
@@ -26,12 +25,14 @@ export const CustomFormSelectField = ({
   disabled = false,
   helperText,
   size = "small",
-  helpContext,
+  ...attrs
 }: CustomFormSelectFieldProps) => {
   return (
     <FormControl size={size}>
       {helperText && (
-        <FormHelperText data-help={helpContext ? helpContext : undefined}>
+        <FormHelperText
+          data-help={attrs["data-help"] ? attrs["data-help"] : undefined}
+        >
           {helperText}
         </FormHelperText>
       )}

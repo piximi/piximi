@@ -15,6 +15,7 @@ import {
 import { CropSchema } from "utils/models/enums";
 
 import { CropOptions, RescaleOptions } from "utils/models/types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 type PreprocessingSettingsProps = {
   cropOptions: CropOptions;
@@ -66,6 +67,7 @@ export const PreprocessingSettings = ({
     <Grid container spacing={2}>
       <Grid item xs={4} md={4} lg={4}>
         <CustomFormSelectField
+          data-help={HelpItem.CropOptions}
           keySource={CropSchema}
           value={cropOptions.cropSchema}
           onChange={onCropSchemaChange}
@@ -82,6 +84,7 @@ export const PreprocessingSettings = ({
 
         <FormControl size="small">
           <FormControlLabel
+            data-help={HelpItem.PixelIntensityRescale}
             control={
               <Checkbox
                 checked={rescaleOptions.rescale}

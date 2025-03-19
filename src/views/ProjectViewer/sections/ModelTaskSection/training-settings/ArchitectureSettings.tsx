@@ -18,6 +18,7 @@ import { ConfirmationDialog } from "components/dialogs";
 import { HotkeyContext } from "utils/common/enums";
 
 import { Shape } from "store/data/types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 type SelectedModelType = {
   name: string;
@@ -103,7 +104,9 @@ export const ArchitectureSettings = ({
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <FormControl size="small">
-            <FormHelperText>Model architecture</FormHelperText>
+            <FormHelperText data-help={HelpItem.ModelArchitecture}>
+              Model architecture
+            </FormHelperText>
             <Select
               value={selectedModel.idx + ""}
               onChange={handleSelectedModelChange}

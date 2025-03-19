@@ -1,7 +1,14 @@
 import React from "react";
-import { Checkbox, FormControlLabel, Stack, Typography } from "@mui/material";
+import {
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 import { CustomNumberTextField } from "components/inputs";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const DatasetSettings = ({
   trainingPercentage,
@@ -23,6 +30,7 @@ export const DatasetSettings = ({
         rest is used for validation)
       </Typography>
       <CustomNumberTextField
+        data-help={HelpItem.TrainPercentage}
         id="test-split"
         label="Train percentage"
         value={trainingPercentage}
@@ -37,17 +45,20 @@ export const DatasetSettings = ({
         Training/Validation Data Shuffling
       </Typography>
 
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={shuffleOptions}
-            onChange={toggleShuffleOptions}
-            color="primary"
-            disabled={!isModelTrainable}
-          />
-        }
-        label="Shuffle on Split"
-      />
+      <FormControl size="small">
+        <FormControlLabel
+          data-help={HelpItem.DataShuffling}
+          control={
+            <Checkbox
+              checked={shuffleOptions}
+              onChange={toggleShuffleOptions}
+              color="primary"
+              disabled={!isModelTrainable}
+            />
+          }
+          label="Shuffle on Split"
+        />
+      </FormControl>
     </Stack>
   );
 };

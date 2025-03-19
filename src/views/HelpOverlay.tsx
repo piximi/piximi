@@ -15,8 +15,7 @@ import {
   helpContent,
   HelpItem,
 } from "components/layout/HelpDrawer/HelpContent";
-import { ThemeMode } from "themes/enums";
-import { formatString } from "utils/common/helpers";
+import { formatString, logger } from "utils/common/helpers";
 
 const HelpOverlay = () => {
   const { helpMode, setHelpMode } = useHelp()!;
@@ -28,7 +27,7 @@ const HelpOverlay = () => {
   const helpToggle = (event: KeyboardEvent) => {
     if (event.key === "H" && event.shiftKey) {
       setHelpMode((helpMode) => {
-        console.log(helpMode ? "Help mode off" : "Help mode on");
+        logger(helpMode ? "Help mode off" : "Help mode on");
         return !helpMode;
       });
     }
@@ -122,7 +121,7 @@ const HelpOverlay = () => {
         })}
       />
     ),
-    [helpMode, priorityHelp]
+    [helpMode, priorityHelp],
   );
 
   return (
@@ -135,8 +134,8 @@ const HelpOverlay = () => {
       >
         <Card
           sx={(theme) => ({
-            minWidth: 275,
-            maxWidth: 275,
+            minWidth: 325,
+            maxWidth: 325,
             boxShadow: theme.shadows[15],
           })}
         >
@@ -167,7 +166,9 @@ const HelpOverlay = () => {
                 />
               )}
             </Typography>
-            <Typography variant="body2">{helpText}</Typography>
+            <Typography variant="body2" whiteSpace={"pre-line"}>
+              {helpText}
+            </Typography>
           </CardContent>
           <CardActions>
             <Button

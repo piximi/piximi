@@ -4,25 +4,21 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  IconButton,
   List,
   ListItem,
   Palette,
-  Snackbar,
-  SnackbarCloseReason,
   Stack,
   Typography,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import { Theme } from "@nivo/core";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { CollapsibleList } from "components/ui";
 import { Logo } from "components/ui/Logo";
 import { useDialog, useDialogHotkey, usePreferredMuiTheme } from "hooks";
 import React from "react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { HotkeyContext } from "utils/common/enums";
+import { logger } from "utils/common/helpers";
 import { ExampleProjectDialog } from "views/ProjectViewer/components/dialogs";
 
 export const WelcomeScreen = () => {
@@ -57,8 +53,8 @@ export const WelcomeScreen = () => {
             <CollapsibleList primary={group} dense disablePadding>
               {Object.entries(theme.palette[group])
                 .filter((entry) => typeof entry[1] === "string")
-                .map((item) => (
-                  <ListItem>
+                .map((item, idx) => (
+                  <ListItem key={idx}>
                     <Typography>{item[0]}</Typography>
                     <Box
                       marginLeft={2}
@@ -95,7 +91,7 @@ export const WelcomeScreen = () => {
 
   const handleCloseDialog = (
     event?: object,
-    reason?: "backdropClick" | "escapeKeyDown"
+    reason?: "backdropClick" | "escapeKeyDown",
   ) => {
     handleCloseCloseExampleProjectDialog();
     if (!reason) {
@@ -151,26 +147,30 @@ export const WelcomeScreen = () => {
           >
             Documentation
           </Button>
-          <Button
-            onClick={() => {
-              console.log(theme);
-              onOpen();
-            }}
-            variant="outlined"
-            color="primary"
-          >
-            Show Palette
-          </Button>
+          {import.meta.env.DEV && (
+            <Button
+              onClick={() => {
+                logger(theme);
+                onOpen();
+              }}
+              variant="outlined"
+              color="primary"
+            >
+              Show Palette
+            </Button>
+          )}
         </Stack>
       </Box>
       <ExampleProjectDialog
         open={ExampleProjectOpen}
         onClose={handleCloseDialog}
       />
-      <Dialog open={open} onClose={onClose}>
-        <DialogTitle>Palette</DialogTitle>
-        <DialogContent>{palette}</DialogContent>
-      </Dialog>
+      {import.meta.env.Dev && (
+        <Dialog open={open} onClose={onClose}>
+          <DialogTitle>Palette</DialogTitle>
+          <DialogContent>{palette}</DialogContent>
+        </Dialog>
+      )}
     </Box>
   );
 };
