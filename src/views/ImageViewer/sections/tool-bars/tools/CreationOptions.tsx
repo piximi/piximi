@@ -23,6 +23,7 @@ import {
   SubtractAnnotationsIcon,
 } from "icons";
 import { Stack, SvgIcon, useTheme } from "@mui/material";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const CreationOptions = () => {
   const dispatch = useDispatch();
@@ -86,7 +87,7 @@ export const CreationOptions = () => {
   };
 
   return (
-    <Stack>
+    <Stack data-help={HelpItem.ObjectManipulationTools}>
       <Tool
         name={t("New Annotation")}
         onClick={() => handleModeSelection(AnnotationMode.New)}

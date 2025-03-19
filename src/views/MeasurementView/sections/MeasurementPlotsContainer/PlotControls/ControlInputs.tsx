@@ -22,9 +22,10 @@ import { useMeasurementParameters, usePlotControl } from "../../../hooks";
 import { TextFieldWithBlur } from "components/inputs";
 
 import { capitalize } from "utils/stringUtils";
-import { KeysWithValuesOfType } from "utils/types";
+import { HTMLDataAttributes, KeysWithValuesOfType } from "utils/types";
 import { nivoColorSpaces } from "themes/nivoTheme";
 import { ChartConfig, ChartItem, ChartType, SplitType } from "../../../types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 const splitTypes = ["partition", "category"];
 
@@ -83,6 +84,7 @@ export const ColorThemeSelect = () => {
 
   return (
     <ChartControlSelect
+      data-help={HelpItem.MeasurementPlotColorMap}
       label="Color Theme"
       id="color-theme-select"
       defaultValue={defaultValue}
@@ -131,6 +133,7 @@ export const PlotSelect = () => {
 
   return (
     <ChartControlSelect
+      data-help={HelpItem.MeasurementPlotType}
       label="plot"
       id="plot-select"
       defaultValue={defaultValue}
@@ -155,6 +158,19 @@ export const ChartMeasurementSelect = ({
   const handleChange = (event: SelectChangeEvent<string>) => {
     updateChartConfig(type, measurementPlotOptions[event.target.value]);
   };
+
+  const helpType = useMemo(() => {
+    switch (type) {
+      case "x-axis":
+        return HelpItem.MeasurementPlotXAxis;
+      case "y-axis":
+        return HelpItem.MeasurementPlotYAxis;
+      case "size":
+        return HelpItem.MeasurementPlotSize;
+      default:
+        return undefined;
+    }
+  }, [type]);
 
   const selectOptions = useMemo(
     () =>
@@ -193,6 +209,7 @@ export const ChartMeasurementSelect = ({
   );
   return (
     <ChartControlSelect
+      data-help={helpType}
       label={type}
       id={`${type}-select`}
       defaultValue={defaultValue}
@@ -251,6 +268,7 @@ export const ChartSplitSelect = ({
 
   return (
     <ChartControlSelect
+      data-help={HelpItem.MeasurementPlotColor}
       label={type}
       id={`${type}-select`}
       defaultValue={defaultValue}
@@ -270,7 +288,8 @@ const ChartControlSelect = ({
   handleChange,
   selectOptions,
   renderValue,
-}: {
+  ...attrs
+}: HTMLDataAttributes & {
   label: string;
   id: string;
   inputValue: string;
@@ -282,6 +301,7 @@ const ChartControlSelect = ({
   return (
     <FormControl fullWidth sx={{ pb: 1, mt: 1 }}>
       <InputLabel
+        data-help={attrs["data-help"]}
         variant="standard"
         htmlFor={id}
         sx={(theme) => ({

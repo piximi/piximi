@@ -6,6 +6,7 @@ import { ArrowBack } from "@mui/icons-material";
 
 import { LogoLoader } from "components/ui/logo";
 import { CustomAppBar } from "components/layout";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const MeasurementsAppBar = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export const MeasurementsAppBar = () => {
     <CustomAppBar>
       <Tooltip title="Return to project" placement="bottom">
         <IconButton
+          data-help={HelpItem.NavigateProjectView}
           edge="start"
           onClick={onReturnToMainProject}
           aria-label="Exit Measurements"
