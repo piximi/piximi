@@ -39,8 +39,294 @@ export enum HelpItem {
   TrainPercentage = "train-percentage",
   DataShuffling = "data-shuffling",
   ModelArchitecture = "model-architecture",
+  AddKindTab = "add-kind-tab",
+  ExportAnnotation = "export-annotations",
+  ImageViewerKindSection = "image-viewer-kind-section",
+  NavigateProjectView = "navigate-to-projectviewer",
+  ZoomAndPosition = "zoom-and-position",
+  ImageTools = "image-tools",
+  SelectionTools = "selection-tools",
+  ObjectManipulationTools = "object-manipulation-tools",
+  ObjectCreationTools = "object-creation-tools",
+  NewMeasurementTable = "new-measurement-table",
+  MeasurementSplits = "measurement-splits",
+  MeasurementsTree = "measurement-options",
+  IntensityMeasurements = "intensity-measurements",
+  ObjectMeasurements = "object-measurements",
+  MeasurementGroupTabs = "measurement-group-tabs",
+  MeasurementDataTable = "measurements-data-table",
+  MeasurementPlotType = "measurement-plot-type",
+  MeasurementPlotColorMap = "measurement-plot-color-map",
+  MeasurementPlotXAxis = "measurement-plot-x-axis",
+  MeasurementPlotYAxis = "measurement-plot-y-axis",
+  MeasurementPlotSize = "measurement-plot-mark-size",
+  MeasurementPlotColor = "measurement-plot-mark-color",
 }
 export type HelpItemContent = { desc: string; brief: string };
+
+const AddKindTab = `
+Create a new **Kind** or re-open one that was previously minimized.`;
+
+const BatchSize = `
+Batch size defines how many images the model will look at before updating its internal parameters.\n
+A batch size of 1 would mean that the model will:
+* Look at one image
+* Update its internal parameters on what links an image to a class
+* Repeat this with the next image until all images have been analyzed.
+`;
+
+const Categorize = `
+To label an image (i.e. assign a category to an image) simply select the image, click "Categorize" in the selection bar and choose the correct category.\n
+If the desired category does not exist, click "Create category" to make a new category.`;
+
+const CreateCategory = `
+Create a new category belonging to the active *Kind* by clicking on the "Create Category" button.
+`;
+const CreateKind = `
+Create a new *Kind*`;
+
+const CropOptions = `
+Cropping effectively creates multiple training samples from a single image.\n
+This can be particularly useful when the original dataset is limited.\n\n
+A **CropSchema** of **Match** will add padding to the crops to maintain a uniform size.`;
+
+const DataShuffling = `
+Shuffling the data can help reduce bias during training and improve model accuracy.\n
+This is expecially true when cropping the images prior to training.
+`;
+
+const DeleteAllCategories = `
+Delete all categories belinging to the active *Kind*.\n
+*Associated objects well be recategorized as 'Unknown'*`;
+
+const DeleteKind = `
+Delete this *Kind*, associated objects and categories will also be deleted`;
+
+const DeleteObject = `
+Images can be deleted from the workspace at any time by selecting them and clicking "delete" on the top right.\n
+Selected images can also be deleted by using the "delete" hotkey.`;
+
+const Documentation = `
+Open the Piximi Documentation in a new tab
+`;
+
+const EditKind = `
+Edit the display name of the *Kind*`;
+
+const Epochs = `
+An epoch is a measure of how many times the entire training subset is studied by the deep learning model.\n
+However, increasing the number of epochs does not necessarily lead to better results and can instead result in overfitting.`;
+
+const ExportAnnotations = `
+Save annotations locally. Choose from a list of formats.`;
+
+const FilterImageGrid = `
+Filter the images in the image grid by 'Category' or Training 'Partition'.`;
+
+const GridItemInfo = `
+View details of selected items in the Image Grid`;
+
+const GridZoom = `
+Adjust the size of the displayed imaages`;
+
+const ImageViewerKindGroup = `
+Contains the categories which belong the the specified **Kind**.\n
+
+Item Functions
+* menu > Edit: Update the display name of the **Kind**.
+* menu > Delete: Delete the **Kind** along with associated categories and objects.
+* menu > Clear Objects: Delete all the objects belonging to this kind.
+* Eyeball: Toggle displaying objects of this kind.`;
+
+const KindTabs = `
+Click on the tabs to view the different **Kinds** of objects in your project.\n
+**Tab Functions**
+* Edit: Change the display name of the **Kind**.
+* Minimize: Hide this **Kind**. (Re-open from *Add Kind* button)
+* Delete: Delete the **Kind (excluding Image)** from the project. (***Associated images, objects, and categpries will also be deleted***)`;
+
+const LearningRate = `
+The learning rate is a value that determines by how much the model updates its internal parameters in response to the loss function.`;
+
+const LearningTask = `
+Select the type of DL task you would like to perform.\n
+**Classification**:  Categorize the images belonging to the active *Kind*\n
+**Segmentation**: Find the objects within the images selected.
+`;
+
+const LoadClassificationModel = `
+Upload a previusoly trained classification model from the ***.json** and ***.weights.bin** files.`;
+
+const LossFunction = `
+The loss function calculates how well a model has performed by comparing the prediction made by the model and what was expected.\n
+In essence, a well performing model will output a lower number for the loss function, whereas a poor model will output a higher number.\n
+The loss function therefore tells us how well our model is performing at making predictions for a particular set of model parameters. \n
+The optimization algorithms work to reduce the loss function and in turn lead to a better performing model.
+`;
+
+const ModelArchitecture = `
+Model architecture refers to the algorithm will our model use to compute its answers.`;
+
+const NavigateImageViewer = `
+Navigate to the Image Viewer to inspect and work with the selected images and objects.`;
+
+const NavigateMeasurements = `
+Navigate to the Measurements view to perform measurements on the project data and visualize results.`;
+
+const NavigateProjectView = `
+Navigate back to the Project Viewer.`;
+
+const OpenExampleProject = `
+Take a look at a example project by clicking "Open example project" in the "Open" menu and selecting a project image of choice!\n 
+This gives you an example of a collection of labeled images.
+`;
+
+const OpenImage = `
+In the left menu, select "Open image" to upload images from your local machine. 
+Select one or multiple image files to open.
+        
+Alternatively, drag and drop the desired image files directly onto the gallery.`;
+
+const OpenMenu = `
+From the **Open** Menu you can open=
+
+* Previously saved projects ('*.zip' or '*.zarr')
+* One of our Example Projects
+* Individual images
+`;
+
+const OpenProject = `
+To open a saved project click 'Open project' in the Open menu on the left toolbar.
+Select a .zip or .zarr file that was downloaded when saving an earlier project.
+`;
+
+const OptimizationAlgorithm = `
+Optimization algorithms are what update the internal parameters of the model automatically in response to its own performance.\n
+These algorithms will compare a prediction made by the model to the expected output and adjust model parameters to bring the predictions closer to the expected output.
+`;
+
+const PixelIntensityRescale = `
+Neural networks often use small weight values, and large pixel values (which can range from 0 to 255 in 8-bit images) can disrupt or slow down the learning process.\n
+Normalizing pixel values to a smaller range, like 0-1, helps the network learn more stably and efficiently.`;
+const ProjectName = `
+Change the project name
+`;
+
+const SaveClassificationModel = `
+Save the configuration and weight of the current classification model.
+This will output two files=
+
+**'model-name'.json**: Contains the model information.
+
+**'model-name'.weights.bin**: Contains the model weights.
+`;
+
+const SaveProject = `
+Save all images and assigned categories by clicking on "Save project file" in the Save menu on the left toolbar.
+This will download a .json file that encodes the image data.
+`;
+
+const SendFeedback = `
+Report issues or send feedback about Piximi to the Github Repository`;
+
+const Settings = `
+Open the application settings.`;
+
+const StartNewProject = `
+Begin a new project in PIXIMI.
+`;
+
+const TrainPercentage = `
+Whaen training  classifier, the data is split into training and validation sets.\n
+The model forms a means of predicting a category, checks the prediction on the validation set, then makes adjustments to its predictions.
+`;
+
+const ZoomAndPosition = `
+This set of tools alow you to manipulate the stage zoom and position.\n
+**Zoom Center**: Toggles whether zooming is centered on the cursor or center of the image when zoom on scroll or double-click.\n
+**Zoom to Region**: Click and drag the cursor to select a region to zoom in to.\n
+**Actual Size**: Resized the image to its defualt size.\n
+**Fit Screen**: Resizes the image such that its largest dimension matches the window dimension.\n
+**Reset Position**: Resets the position to the origin and the zoom scale to 1.`;
+
+const ImageTools = `
+This set of tools allows you to manipulate the image.\n
+**Channel Adjustment**: Adjust the brightness and contrast, toggle on/off, or update the color of the individual channels.\n
+**Z-Stack**: Use the slider to view the different slices of the image. `;
+
+const SelectionTools = `
+This set of tools allows you to make selections on the objects.\n
+**By Category**: Select a subset of objects based on their category.\n
+**Select All**: Select all of the objects.\n
+**Deselect All**: Deselect all of the objects.\n
+**Selection Tool**: Click on individual objects to select. Hold down shift when selecting to select multiple. Click and drag cursor to select by region.`;
+
+const ObjectManipulationTools = `
+This set of tools are used to manipulate selected or newly-created objects.\n
+**New**: Simply creates a new object.\n
+**Combine**: Merges two or more objects into a single one.\n
+**Subtract**: Selecting an object along with this option will subtract the shape of a newly-created object from the selected object. New objects not created.\n
+**Intersection**: Creates an object from the intersection of two selected objects.\n
+**Invert**: Inverts the currently selected object.`;
+
+const ObjectCreationTools = `
+This set of tools is used for creating new objects.\n
+**Rectangular Tool**: Click and drag, or click where the location of two opposing corners of the object to create a rectangular object.\n
+**Ellipse Tool**: Click and drag or click twice to create an elliptical object.\n
+**Polygon Tool**: Click where you want each corner of a polygon to be. Click the first anchor to complene the polygon object.\n
+**Pen Tool**: Use the Pen tool to free-draw objects. Open the slider attached to the tool to adjust the size of the tool.\n
+**Lasso Tool**: Create an object from an outline created with this tool.\n
+**Magnetic Tool**: The tool attempts to follow the border of objects to quickly annotate objects.\n
+**Fill Tool**: Click on the center of an object you would like to create, then drag to adjust the threshold and create an annotation.\n
+**Quick Annotation Tool**: Hover over regions of the image while the tool predicts objects. Use the slider attached to this tool to adjust sizing.\n
+**Threshold Tool**: Select a region to threshold. Use the slider attached to the tool to adjust the threshold sensitivity.`;
+
+const NewMeasurementTable = `
+Create a new measurements table based off of the **Kinds** existong in the project`;
+
+const MeasurementSplits = `
+Define splits which you would like to make measurements on:\n
+**Category**: Measurement statistics over each category.\n
+**Partition**: Measurement statistics over each partition`;
+
+const MeasurementsTree = `
+Select the measurements you would like to perform on the data:\n
+**Intensity**: Contains several intensity related measurements to be calculated on each image.\n
+**Object**:(**Not available for whole images**) Contains several object based measurements.`;
+
+const IntensityMeasurements = `
+Intensity related measurements.
+`;
+
+const ObjectMeasurements = `
+Object related measurements.
+`;
+
+const MeasurementGroupTabs = `
+Switch between two representation of your measurements:\n
+**Data Grid**: Measurement data presented in a tabular format. Includes mean, median, and standard deviation of measurements made on each split for the measurements selected in the left drawer.\n
+**Plots**: Measurement data for all objects belonging to the **Kind** presented in graph format. You can select the plot type and axes.`;
+
+const MeasurementDataTable = `
+Tabular representation of the data with five columns:\n
+**Measurement**: The name of the measurement selected from the left drawer.\n
+**Split**: The split on which the statistics were calculated.\n
+**Mean**: The mean value of the measurement perfomred on the object in this split.\n
+**Median**: The median value of the measurement perfomred on the object in this split.\n
+**Standard Deviation**: The standard deviation of the measurement perfomred on the object in this split.
+`;
+
+const MeasurementPlotType = `
+Select the type of plot you would like to use.`;
+
+const MeasurementPlotColorMap = `Choose from several color themes for mapping.`;
+
+const MeasurementPlotXAxis = `Select a measurement to use for the x-axis.`;
+
+const MeasurementPlotYAxis = `Select a measurement to use for the y-axis.`;
+
+const MeasurementPlotSize = `Select a measurement to use for the size of the mark (**Scatter Only**)`;
+const MeasurementPlotColor = `Select a split to use for coloring each mark (**Scatter Only**)`;
 
 export const helpContent: {
   contexts: Record<HelpContext, { items: Array<HelpItem> }>;
@@ -60,174 +346,238 @@ export const helpContent: {
   },
   "help-items": {
     [HelpItem.StartNewProject]: {
-      desc: "",
-      brief: "Opens Piximi in an empty project",
+      desc: StartNewProject,
+      brief: StartNewProject,
     },
     [HelpItem.OpenExampleProject]: {
-      desc: 'Take a look at a example project by clicking "Open example project" in the "Open" menu and selecting a project image of choice!\n This gives you an example of a collection of labeled images.',
-      brief: "Choose from a list of example projects to open",
+      desc: OpenExampleProject,
+      brief: OpenExampleProject,
     },
     [HelpItem.Documentation]: {
-      desc: "",
-      brief: "Open the Piximi Documentation in a new tab",
+      desc: Documentation,
+      brief: Documentation,
     },
     [HelpItem.ProjectName]: {
-      desc: "",
-      brief: "Change the project name",
+      desc: ProjectName,
+      brief: ProjectName,
     },
     [HelpItem.Categorize]: {
-      desc: 'To label an image (i.e. assign a category to an image) simply select the image, click "Categorize" in the selection bar and choose the correct category.\n If the desired category does not exist, click "Create category" to make a new category.',
-      brief: "Categorize selected objects",
+      desc: Categorize,
+      brief: Categorize,
     },
     [HelpItem.GridZoom]: {
-      desc: "",
-      brief: "Adjust the size of the displayed imaages",
+      desc: GridZoom,
+      brief: GridZoom,
     },
     [HelpItem.OpenProject]: {
-      desc: 'To open a saved project click "Open project" in the Open menu on the left toolbar.\n Select a .json file that was downloaded when saving an earlier project.',
-      brief:
-        'To open a saved project click "Open project" in the Open menu on the left toolbar.\n Select a .json file that was downloaded when saving an earlier project.',
+      desc: OpenProject,
+
+      brief: OpenProject,
     },
     [HelpItem.SaveProject]: {
-      desc: 'Save all images and assigned categories by clicking on "Save project file" in the Save menu on the left toolbar.\n This will download a .json file that encodes the image data.',
-      brief:
-        'Save all images and assigned categories by clicking on "Save project file" in the Save menu on the left toolbar.\n This will download a .json file that encodes the image data.',
+      desc: SaveProject,
+
+      brief: SaveProject,
     },
     [HelpItem.CreateCategory]: {
-      desc: 'Create a new category by clicking on the "Create category" button.\n Once a category is created, its name and color can be changed at any time by selecting its "Edit category" menu on the right of the category icon.',
-      brief:
-        'Create a new category by clicking on the "Create category" button.\n Once a category is created, its name and color can be changed at any time by selecting its "Edit category" menu on the right of the category icon.',
+      desc: CreateCategory,
+      brief: CreateCategory,
     },
     [HelpItem.DeleteObject]: {
-      desc: 'Images can be deleted from the workspace at any time by selecting them and clicking "delete" on the top right.\n Selected images can also be deleted by using the "delete" hotkey.',
-      brief:
-        'Images can be deleted from the workspace at any time by selecting them and clicking "delete" on the top right.\n Selected images can also be deleted by using the "delete" hotkey.',
+      desc: DeleteObject,
+      brief: DeleteObject,
     },
     [HelpItem.OpenImage]: {
-      desc:
-        'In the left menu, select "Open image" to upload images from your local machine. Select one or multiple image files to open.' +
-        "\nAlternatively, drag and drop the desired image files directly onto the gallery.",
-      brief: "Upload images from your local machine",
+      desc: OpenImage,
+      brief: OpenImage,
     },
     [HelpItem.OpenMenu]: {
-      desc: "Open project or image",
-      brief: "Open project or image",
+      desc: OpenMenu,
+      brief: OpenMenu,
     },
     [HelpItem.KindTabs]: {
-      desc: "Click on the tabs to view the different 'Kinds' of objects in your project",
-      brief:
-        "Click on the tabs to view the different 'Kinds' of objects in your project",
+      desc: KindTabs,
+      brief: KindTabs,
+    },
+    [HelpItem.AddKindTab]: {
+      desc: AddKindTab,
+      brief: AddKindTab,
     },
     [HelpItem.EditKind]: {
-      desc: "Edit the display name of the 'Kind'",
-      brief: "Edit the display name of the 'Kind'",
+      desc: EditKind,
+      brief: EditKind,
     },
     [HelpItem.DeleteKind]: {
-      desc: "Delete this 'Kind', associated objects and categories will also be deleted",
-      brief:
-        "Delete this 'Kind', associated objects and categories will also be deleted",
+      desc: DeleteKind,
+      brief: DeleteKind,
     },
     [HelpItem.CreateKind]: {
-      desc: "Create a new 'Kind'",
-      brief: "Create a new 'Kind'",
+      desc: CreateKind,
+      brief: CreateKind,
     },
     [HelpItem.LearningTask]: {
-      desc: "Select Select the type of DL task you would like to perform.\nIf you want to categorize the images choose Classification.\nIf you would like to idendify the objects within the images choose Segmentation.",
-      brief:
-        "Select Select the type of DL task you would like to perform.\nIf you want to categorize the images choose Classification.\nIf you would like to idendify the objects within the images choose Segmentation.",
+      desc: LearningTask,
+      brief: LearningTask,
     },
     [HelpItem.SaveClassificationModel]: {
-      desc: "Save the configuration and weight of the current classification model as 'model-name'.json and 'model-name'.weights.bin",
-      brief:
-        "Save the configuration and weight of the current classification model as 'model-name'.json and 'model-name'.weights.bin",
+      desc: SaveClassificationModel,
+      brief: SaveClassificationModel,
     },
     [HelpItem.LoadClassificationModel]: {
-      desc: "Upload a previusoly trained classification model from the '*.json' and '*.weights.bin' files.",
-      brief:
-        "Upload a previusoly trained classification model from the '*.json' and '*.weights.bin' files.",
+      desc: LoadClassificationModel,
+      brief: LoadClassificationModel,
     },
     [HelpItem.BatchSize]: {
-      desc: "Batch size defines how many images the model will look at before updating its internal parameters.\n A batch size of 1 would mean that the model will look at one image, update its internal parameters on what links an image to a class, and then repeat this with the next image until all images have been analyzed.",
-      brief:
-        "Batch size defines how many images the model will look at before updating its internal parameters.\n A batch size of 1 would mean that the model will look at one image, update its internal parameters on what links an image to a class, and then repeat this with the next image until all images have been analyzed.",
+      desc: BatchSize,
+      brief: BatchSize,
     },
     [HelpItem.LearningRate]: {
-      desc: "The learning rate is a value that determines by how much the model updates its internal parameters in response to the loss function.",
-      brief:
-        "The learning rate is a value that determines by how much the model updates its internal parameters in response to the loss function.",
+      desc: LearningRate,
+      brief: LearningRate,
     },
     [HelpItem.LossFunction]: {
-      desc: "The loss function calculates how well a model has performed by comparing the prediction made by the model and what was expected.\n In essence, a well performing model will output a lower number for the loss function, whereas a poor model will output a higher number.\n The loss function therefore tells us how well our model is performing at making predictions for a particular set of model parameters. The optimization algorithms work to reduce the loss function and in turn lead to a better performing model.",
-      brief:
-        "The loss function calculates how well a model has performed by comparing the prediction made by the model and what was expected.\n In essence, a well performing model will output a lower number for the loss function, whereas a poor model will output a higher number.\n The loss function therefore tells us how well our model is performing at making predictions for a particular set of model parameters. The optimization algorithms work to reduce the loss function and in turn lead to a better performing model.",
+      desc: LossFunction,
+      brief: LossFunction,
     },
     [HelpItem.Epochs]: {
-      desc: "An epoch is a measure of how many times the entire training subset is studied by the deep learning model.\n However, increasing the number of epochs does not necessarily lead to better results and can instead result in overfitting.",
-      brief:
-        "An epoch is a measure of how many times the entire training subset is studied by the deep learning model.\n However, increasing the number of epochs does not necessarily lead to better results and can instead result in overfitting.",
+      desc: Epochs,
+      brief: Epochs,
     },
     [HelpItem.OptimizationAlgorithm]: {
-      desc: "Optimization algorithms are what update the internal parameters of the model automatically in response to its own performance.\n These algorithms will compare a prediction made by the model to the expected output and adjust model parameters to bring the predictions closer to the expected output.",
-      brief:
-        "Optimization algorithms are what update the internal parameters of the model automatically in response to its own performance.\n These algorithms will compare a prediction made by the model to the expected output and adjust model parameters to bring the predictions closer to the expected output.",
+      desc: OptimizationAlgorithm,
+      brief: OptimizationAlgorithm,
     },
     [HelpItem.DeleteAllCategories]: {
-      desc: "Delete all categories belinging to the active 'Kind'.\n Associated onjects well be recategorized as 'Unknown'.",
-      brief:
-        "Delete all categories belinging to the active 'Kind'.\n Associated onjects well be recategorized as 'Unknown'.",
+      desc: DeleteAllCategories,
+      brief: DeleteAllCategories,
     },
     [HelpItem.Settings]: {
-      desc: "Open the application settings.",
-      brief: "Open the application settings.",
+      desc: Settings,
+      brief: Settings,
     },
     [HelpItem.SendFeedback]: {
-      desc: "Report issues or send feedback about Piximi to the Github Repository",
-      brief:
-        "Report issues or send feedback about Piximi to the Github Repository",
+      desc: SendFeedback,
+      brief: SendFeedback,
     },
     [HelpItem.FilterImageGrid]: {
-      desc: "Filter the images in the image grid by 'Category' or Training 'Partition'.",
-      brief:
-        "Filter the images in the image grid by 'Category' or Training 'Partition'.",
+      desc: FilterImageGrid,
+      brief: FilterImageGrid,
     },
     [HelpItem.GridItemInfo]: {
-      desc: "View details of selected items in the 'Image Grid",
-      brief: "View details of selected items in the 'Image Grid",
+      desc: GridItemInfo,
+      brief: GridItemInfo,
     },
     [HelpItem.NavigateImageViewer]: {
-      desc: "Navigate to the Image Viewer to inspect and work with the selected images and objects.",
-      brief:
-        "Navigate to the Image Viewer to inspect and work with the selected images and objects.",
+      desc: NavigateImageViewer,
+      brief: NavigateImageViewer,
     },
     [HelpItem.NavigateMeasurements]: {
-      desc: "Navigate to the Measurements view to perform measurements on the project data and visualize results.",
-      brief:
-        "Navigate to the Measurements view to perform measurements on the project data and visualize results.",
+      desc: NavigateMeasurements,
+      brief: NavigateMeasurements,
     },
     [HelpItem.CropOptions]: {
-      desc: "Cropping effectively creates multiple training samples from a single image, which can be particularly useful when the original dataset is limited.",
-      brief:
-        "Cropping effectively creates multiple training samples from a single image, which can be particularly useful when the original dataset is limited.",
+      desc: CropOptions,
+      brief: CropOptions,
     },
     [HelpItem.PixelIntensityRescale]: {
-      desc: "Neural networks often use small weight values, and large pixel values (which can range from 0 to 255 in 8-bit images) can disrupt or slow down the learning process.\n Normalizing pixel values to a smaller range, like 0-1, helps the network learn more stably and efficiently.",
-      brief:
-        "Neural networks often use small weight values, and large pixel values (which can range from 0 to 255 in 8-bit images) can disrupt or slow down the learning process.\n Normalizing pixel values to a smaller range, like 0-1, helps the network learn more stably and efficiently.",
+      desc: PixelIntensityRescale,
+      brief: PixelIntensityRescale,
     },
     [HelpItem.TrainPercentage]: {
-      desc: "Whaen training  classifier, the data is split into training and validation sets.\n The model forms a means of predicting a category, checks the prediction on the validation set, then makes adjustments to its predictions.",
-      brief:
-        "Whaen training  classifier, the data is split into training and validation sets.\n The model forms a means of predicting a category, checks the prediction on the validation set, then makes adjustments to its predictions.",
+      desc: TrainPercentage,
+      brief: TrainPercentage,
     },
     [HelpItem.DataShuffling]: {
-      desc: "Shuffling the data can help reduce bias during training and improve model accuracy.\n This is expecially true when cropping the images prior to training.",
-      brief:
-        "Shuffling the data can help reduce bias during training and improve model accuracy.\n This is expecially true when cropping the images prior to training.",
+      desc: DataShuffling,
+      brief: DataShuffling,
     },
     [HelpItem.ModelArchitecture]: {
-      desc: "Model architecture refers to the algorithm will our model use to compute its answers.",
-      brief:
-        "Model architecture refers to the algorithm will our model use to compute its answers.",
+      desc: ModelArchitecture,
+      brief: ModelArchitecture,
+    },
+    [HelpItem.ExportAnnotation]: {
+      desc: ExportAnnotations,
+      brief: ExportAnnotations,
+    },
+    [HelpItem.NavigateProjectView]: {
+      desc: NavigateProjectView,
+      brief: NavigateProjectView,
+    },
+    [HelpItem.ImageViewerKindSection]: {
+      desc: ImageViewerKindGroup,
+      brief: ImageViewerKindGroup,
+    },
+    [HelpItem.ZoomAndPosition]: {
+      desc: ZoomAndPosition,
+      brief: ZoomAndPosition,
+    },
+    [HelpItem.ImageTools]: {
+      desc: ImageTools,
+      brief: ImageTools,
+    },
+    [HelpItem.SelectionTools]: {
+      desc: SelectionTools,
+      brief: SelectionTools,
+    },
+    [HelpItem.ObjectManipulationTools]: {
+      desc: ObjectManipulationTools,
+      brief: ObjectManipulationTools,
+    },
+    [HelpItem.ObjectCreationTools]: {
+      desc: ObjectCreationTools,
+      brief: ObjectCreationTools,
+    },
+    [HelpItem.NewMeasurementTable]: {
+      desc: NewMeasurementTable,
+      brief: NewMeasurementTable,
+    },
+    [HelpItem.MeasurementSplits]: {
+      desc: MeasurementSplits,
+      brief: MeasurementSplits,
+    },
+    [HelpItem.MeasurementsTree]: {
+      desc: MeasurementsTree,
+      brief: MeasurementsTree,
+    },
+    [HelpItem.IntensityMeasurements]: {
+      desc: IntensityMeasurements,
+      brief: IntensityMeasurements,
+    },
+    [HelpItem.ObjectMeasurements]: {
+      desc: ObjectMeasurements,
+      brief: ObjectMeasurements,
+    },
+    [HelpItem.MeasurementGroupTabs]: {
+      desc: MeasurementGroupTabs,
+      brief: MeasurementGroupTabs,
+    },
+    [HelpItem.MeasurementDataTable]: {
+      desc: MeasurementDataTable,
+      brief: MeasurementDataTable,
+    },
+    [HelpItem.MeasurementPlotType]: {
+      desc: MeasurementPlotType,
+      brief: MeasurementPlotType,
+    },
+    [HelpItem.MeasurementPlotColorMap]: {
+      desc: MeasurementPlotColorMap,
+      brief: MeasurementPlotColorMap,
+    },
+    [HelpItem.MeasurementPlotXAxis]: {
+      desc: MeasurementPlotXAxis,
+      brief: MeasurementPlotXAxis,
+    },
+    [HelpItem.MeasurementPlotYAxis]: {
+      desc: MeasurementPlotYAxis,
+      brief: MeasurementPlotYAxis,
+    },
+    [HelpItem.MeasurementPlotSize]: {
+      desc: MeasurementPlotSize,
+      brief: MeasurementPlotSize,
+    },
+    [HelpItem.MeasurementPlotColor]: {
+      desc: MeasurementPlotColor,
+      brief: MeasurementPlotColor,
     },
   },
 };

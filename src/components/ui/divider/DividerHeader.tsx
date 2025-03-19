@@ -5,18 +5,22 @@ import {
   DividerProps,
   TypographyProps,
 } from "@mui/material";
+import { HTMLDataAttributes } from "utils/types";
 
-type DividerHeaderProps = Pick<
-  DividerProps,
-  "sx" | "textAlign" | "variant" | "children"
-> & {
-  typographyVariant: TypographyProps["variant"];
-  textTransform?: TypographyProps["textTransform"];
-};
+type DividerHeaderProps = HTMLDataAttributes &
+  Pick<DividerProps, "sx" | "textAlign" | "variant" | "children"> & {
+    typographyVariant: TypographyProps["variant"];
+    textTransform?: TypographyProps["textTransform"];
+  };
 
 export const DividerHeader = (props: DividerHeaderProps) => {
   return (
-    <Divider sx={props.sx} textAlign={props.textAlign} variant={props.variant}>
+    <Divider
+      data-help={props["data-help"]}
+      sx={props.sx}
+      textAlign={props.textAlign}
+      variant={props.variant}
+    >
       <Typography
         variant={props.typographyVariant}
         textTransform={props.textTransform ? props.textTransform : "capitalize"}
