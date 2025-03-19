@@ -17,6 +17,7 @@ import { Logo } from "components/ui";
 import { useDialog, useDialogHotkey, usePreferredMuiTheme } from "hooks";
 import { useNavigate } from "react-router-dom";
 import { HotkeyContext } from "utils/enums";
+import { logger } from "utils/logUtils";
 import { ExampleProjectDialog } from "views/ProjectViewer/components/dialogs";
 
 export const WelcomeScreen = () => {
@@ -52,7 +53,7 @@ export const WelcomeScreen = () => {
               {Object.entries(theme.palette[group])
                 .filter((entry) => typeof entry[1] === "string")
                 .map((item, idx) => (
-                  <ListItem key={`${item[1] - idx}`}>
+                  <ListItem key={idx}>
                     <Typography>{item[0]}</Typography>
                     <Box
                       marginLeft={2}
@@ -145,26 +146,30 @@ export const WelcomeScreen = () => {
           >
             Documentation
           </Button>
-          <Button
-            onClick={() => {
-              console.log(theme);
-              onOpen();
-            }}
-            variant="outlined"
-            color="primary"
-          >
-            Show Palette
-          </Button>
+          {import.meta.env.DEV && (
+            <Button
+              onClick={() => {
+                logger(theme);
+                onOpen();
+              }}
+              variant="outlined"
+              color="primary"
+            >
+              Show Palette
+            </Button>
+          )}
         </Stack>
       </Box>
       <ExampleProjectDialog
         open={ExampleProjectOpen}
         onClose={handleCloseDialog}
       />
-      <Dialog open={open} onClose={onClose}>
-        <DialogTitle>Palette</DialogTitle>
-        <DialogContent>{palette}</DialogContent>
-      </Dialog>
+      {import.meta.env.Dev && (
+        <Dialog open={open} onClose={onClose}>
+          <DialogTitle>Palette</DialogTitle>
+          <DialogContent>{palette}</DialogContent>
+        </Dialog>
+      )}
     </Box>
   );
 };
