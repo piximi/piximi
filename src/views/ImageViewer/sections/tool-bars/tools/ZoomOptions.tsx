@@ -22,6 +22,7 @@ import { CursorZoom, StageZoom } from "icons";
 import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
 import { ToolType } from "views/ImageViewer/utils/enums";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ZoomOptions = () => {
   const stageRef = useContext(StageContext);
@@ -102,7 +103,7 @@ export const ZoomOptions = () => {
     dispatch(imageViewerSlice.actions.setZoomToolOptions(payload));
   };
   return (
-    <Stack direction="row">
+    <Stack data-help={HelpItem.ZoomAndPosition} direction="row">
       <Tool
         name={t(
           `Toggle Zoom Center: ${

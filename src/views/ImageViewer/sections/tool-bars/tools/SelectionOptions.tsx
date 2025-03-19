@@ -27,6 +27,7 @@ import { PopoverTool } from "components/ui/Tool";
 import { groupBy } from "lodash";
 import { CustomListItemButton, DividerHeader } from "components/ui";
 import { Category } from "store/data/types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const SelectionOptions = () => {
   const dispatch = useDispatch();
@@ -105,7 +106,7 @@ export const SelectionOptions = () => {
   };
 
   return (
-    <Stack direction="row">
+    <Stack direction="row" data-help={HelpItem.SelectionTools}>
       <PopoverTool
         name={t("Select By...")}
         popoverElement={
