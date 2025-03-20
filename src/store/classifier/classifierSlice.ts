@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   kindClassifierModelDict,
   deleteClassifierModels,
-  availableClassifierModels,
+  availableClassifierArchitectures,
   getDefaultModelInfo,
 } from "utils/models/availableClassificationModels";
 
@@ -26,7 +26,9 @@ export const initialState: ClassifierState = {
       selectedModelIdx: 0,
       modelInfoDict: Object.fromEntries(
         Object.entries(
-          availableClassifierModels.map((_model) => getDefaultModelInfo()),
+          availableClassifierArchitectures.map((_model) =>
+            getDefaultModelInfo(),
+          ),
         ),
       ),
     },
@@ -63,7 +65,9 @@ export const classifierSlice = createSlice({
           selectedModelIdx: 0,
           modelInfoDict: Object.fromEntries(
             Object.entries(
-              availableClassifierModels.map((_model) => getDefaultModelInfo()),
+              availableClassifierArchitectures.map((_model) =>
+                getDefaultModelInfo(),
+              ),
             ),
           ),
         },
@@ -83,7 +87,7 @@ export const classifierSlice = createSlice({
               selectedModelIdx: 0,
               modelInfoDict: Object.fromEntries(
                 Object.entries(
-                  availableClassifierModels.map((_model) =>
+                  availableClassifierArchitectures.map((_model) =>
                     getDefaultModelInfo(),
                   ),
                 ),

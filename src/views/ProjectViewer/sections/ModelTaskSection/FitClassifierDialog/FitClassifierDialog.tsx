@@ -1,4 +1,21 @@
-import { Box, Button, Dialog, DialogContent, List, Tabs } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  FormHelperText,
+  FormLabel,
+  List,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  Tabs,
+  Typography,
+} from "@mui/material";
 
 import { useFitClassificationModel } from "hooks";
 
@@ -13,11 +30,12 @@ import { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
 import { ClassifierPreprocessingListItem } from "./ClassifierPreprocessingListItem";
 import { ClassifierArchitectureListItem } from "./ClassifierArchitectureListItem";
 import { ClassifierOptimizerListItem } from "./ClassifierOptimizerListItem";
-import { ClassifierDatasetListItem } from "./ClassifierDatasetListItem";
 
 import { ModelStatus } from "utils/models/enums";
 import { ToolTipTab } from "components/layout";
 import { useEffect, useRef, useState } from "react";
+import { DividerHeader, FlexRowBox } from "components/ui";
+import { ClassifierPreprocessingSettings } from "../training-settings/ClassifierPreprocessingSettings";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -122,23 +140,173 @@ export const FitClassifierDialog = ({
         </Tabs>
         <Box
           sx={(theme) => ({
-            height: dialogHeight,
+            height: "60%",
             transition: `height ${theme.transitions.duration.standard}ms ${theme.transitions.easing.easeInOut}`,
           })}
         >
           <DialogContent ref={contentRef}>
             <Box hidden={tabVal !== "1"}>
+              <FlexRowBox>
+                <FormControl fullWidth>
+                  <RadioGroup
+                    row
+                    defaultValue={0}
+                    sx={{ width: "100%", justifyContent: "space-evenly" }}
+                  >
+                    <FormControlLabel
+                      control={<Radio size="small" />}
+                      value={0}
+                      label={
+                        <FormControl
+                          size="small"
+                          sx={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <FormLabel
+                            sx={(theme) => ({
+                              fontSize: theme.typography.body2.fontSize,
+                              mr: "1rem",
+                            })}
+                          >
+                            New Model:
+                          </FormLabel>
+                          <FormGroup>
+                            <FormHelperText>Model architecture</FormHelperText>
+                            <Select
+                              MenuProps={{
+                                sx: {
+                                  py: 0,
+                                  "& .MuiList-root-MuiMenu-list": { py: 0 },
+                                  "& ul": {
+                                    py: 0,
+                                  },
+                                },
+                                slotProps: {
+                                  list: {
+                                    sx: {
+                                      py: 0,
+                                      backgroundColor: "red",
+                                      display: "none",
+                                    },
+                                  },
+                                  paper: {
+                                    sx: {
+                                      borderRadius: "0 0 4px 4px",
+                                    },
+                                  },
+                                },
+                              }}
+                              sx={(theme) => ({
+                                fontSize: theme.typography.body2.fontSize,
+                                minHeight: "1rem",
+                              })}
+                              defaultValue={0}
+                            >
+                              <MenuItem
+                                dense
+                                value={0}
+                                sx={{
+                                  borderRadius: 0,
+                                  minHeight: "1rem",
+                                }}
+                              >
+                                Simple CNN
+                              </MenuItem>
+                              <MenuItem
+                                dense
+                                value={1}
+                                sx={{ borderRadius: 0, minHeight: "1rem" }}
+                              >
+                                MobileNet
+                              </MenuItem>
+                            </Select>
+                          </FormGroup>
+                        </FormControl>
+                      }
+                    />
+                    <FormControlLabel
+                      control={<Radio size="small" />}
+                      value={1}
+                      label={
+                        <FormControl
+                          size="small"
+                          sx={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <FormLabel
+                            sx={(theme) => ({
+                              fontSize: theme.typography.body2.fontSize,
+                              mr: "1rem",
+                            })}
+                          >
+                            Pre-Trained Model:
+                          </FormLabel>
+                          <FormGroup>
+                            <FormHelperText>Available Models</FormHelperText>
+                            <Select
+                              MenuProps={{
+                                sx: {
+                                  py: 0,
+                                  "& .MuiList-root-MuiMenu-list": { py: 0 },
+                                  "& ul": {
+                                    py: 0,
+                                  },
+                                },
+                                slotProps: {
+                                  list: {
+                                    sx: {
+                                      py: 0,
+                                      backgroundColor: "red",
+                                      display: "none",
+                                    },
+                                  },
+                                  paper: {
+                                    sx: {
+                                      borderRadius: "0 0 4px 4px",
+                                    },
+                                  },
+                                },
+                              }}
+                              sx={(theme) => ({
+                                fontSize: theme.typography.body2.fontSize,
+                                minHeight: "1rem",
+                              })}
+                              defaultValue={0}
+                            >
+                              <MenuItem
+                                dense
+                                value={0}
+                                sx={{
+                                  borderRadius: 0,
+                                  minHeight: "1rem",
+                                }}
+                              >
+                                Simple CNN
+                              </MenuItem>
+                              <MenuItem
+                                dense
+                                value={1}
+                                sx={{ borderRadius: 0, minHeight: "1rem" }}
+                              >
+                                MobileNet
+                              </MenuItem>
+                            </Select>
+                          </FormGroup>
+                        </FormControl>
+                      }
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </FlexRowBox>
               <List dense>
-                <ClassifierPreprocessingListItem />
-
-                <ClassifierArchitectureListItem />
+                <DividerHeader typographyVariant="body2" textAlign="left">
+                  Data Preprocessing Settings
+                </DividerHeader>
+                <ClassifierPreprocessingSettings
+                  trainingPercentage={trainingPercentage}
+                  trainable={selectedModel.trainable}
+                />
 
                 <ClassifierOptimizerListItem
                   fitOptions={fitOptions}
-                  trainable={selectedModel.trainable}
-                />
-                <ClassifierDatasetListItem
-                  trainingPercentage={trainingPercentage}
                   trainable={selectedModel.trainable}
                 />
               </List>

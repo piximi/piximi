@@ -1,5 +1,5 @@
 import {
-  availableClassifierModels,
+  availableClassifierArchitectures,
   getDefaultModelInfo,
 } from "utils/models/availableClassificationModels";
 import { ClassifierStateV01_02 } from "../types";
@@ -33,7 +33,7 @@ export const classifierConverterv1_v11 = (
 
   kindIds.forEach((kindId) => {
     kindClassifiers[kindId] = { selectedModelIdx: 0, modelInfoDict: {} };
-    for (const i in availableClassifierModels)
+    for (const i in availableClassifierArchitectures)
       kindClassifiers[kindId].modelInfoDict[i] = {
         ...getDefaultModelInfo(),
         params: modelParams,
