@@ -6,9 +6,9 @@ import { LoadModelArgs } from "../../types";
 import { ModelTask } from "../../enums";
 
 export class SimpleCNN extends SequentialClassifier {
-  constructor() {
+  constructor(name?: string) {
     super({
-      name: "SimpleCNN",
+      name: name ?? "SimpleCNN",
       task: ModelTask.Classification,
       graph: false,
       pretrained: false,
