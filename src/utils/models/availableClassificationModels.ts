@@ -13,7 +13,28 @@ import {
 import { ModelInfo, ModelParams } from "store/types";
 import { ClassifierEvaluationResultType } from "./types";
 
-export const availableClassifierModels = [SimpleCNN, MobileNet];
+export const availableClassifierArchitectures = [SimpleCNN, MobileNet];
+
+export const availableClassificationModels: Record<
+  string,
+  SequentialClassifier
+> = {};
+
+export const removeModel = (modelName: string) => {
+  const model = availableClassificationModels[modelName];
+  if (!model) throw new Error(`Model with name "${modelName}" does not existi`);
+  model.dispose();
+  delete availableClassificationModels[modelName];
+};
+
+export const createNewModel = (modelName: string, architecture: 0 | 1) => {
+  try {
+    const model = new availableClassifierArchitectures[architecture](modelName);
+    availableClassificationModels[modelName] = model;
+  } catch (err: any) {
+    throw new Error("Failed to create Model.", err as Error);
+  }
+};
 
 export const getDefaultModelParams = (): ModelParams => ({
   inputShape: {
@@ -62,7 +83,7 @@ export const kindClassifierModelDict: Record<
   Kind["id"],
   Array<SequentialClassifier>
 > = {
-  [DEFAULT_KIND]: availableClassifierModels.map((model) => new model()),
+  [DEFAULT_KIND]: availableClassifierArchitectures.map((model) => new model()),
 };
 // prevent deleting DEFAULT_KIND
 Object.defineProperty(kindClassifierModelDict, DEFAULT_KIND, {
@@ -77,7 +98,7 @@ export const addClassifierModels = (kindIds: Array<Kind["id"]>) => {
       );
     }
 
-    kindClassifierModelDict[id] = availableClassifierModels.map(
+    kindClassifierModelDict[id] = availableClassifierArchitectures.map(
       (model) => new model(),
     );
   }

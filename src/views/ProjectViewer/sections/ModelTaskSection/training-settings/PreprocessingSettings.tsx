@@ -5,6 +5,8 @@ import {
   FormControlLabel,
   Grid,
   SelectChangeEvent,
+  Stack,
+  Typography,
 } from "@mui/material";
 
 import {
@@ -21,6 +23,11 @@ type PreprocessingSettingsProps = {
   rescaleOptions: RescaleOptions;
   updateCropOptions: (cropOptions: CropOptions) => void;
   updateRescaleOptions: (rescaleOptions: RescaleOptions) => void;
+  trainingPercentage: number;
+  dispatchTrainingPercentage: (trainingPercentage: number) => void;
+  isModelTrainable: boolean;
+  shuffleOptions: boolean;
+  toggleShuffleOptions: () => void;
 };
 
 export const PreprocessingSettings = ({
@@ -28,6 +35,11 @@ export const PreprocessingSettings = ({
   rescaleOptions,
   updateCropOptions,
   updateRescaleOptions,
+  trainingPercentage,
+  dispatchTrainingPercentage,
+  isModelTrainable,
+  shuffleOptions,
+  toggleShuffleOptions,
 }: PreprocessingSettingsProps) => {
   const [disabled, setDisabled] = React.useState<boolean>(
     !rescaleOptions.rescale,
@@ -94,6 +106,38 @@ export const PreprocessingSettings = ({
             disableTypography
           />
         </FormControl>
+        <Stack>
+          <Typography variant="body2" gutterBottom>
+            What fraction of the labeled images should be used for training?
+            (The rest is used for validation)
+          </Typography>
+          <CustomNumberTextField
+            id="test-split"
+            label="Train percentage"
+            value={trainingPercentage}
+            dispatchCallBack={dispatchTrainingPercentage}
+            min={0}
+            max={1}
+            enableFloat={true}
+            disabled={!isModelTrainable}
+            width="15ch"
+          />
+          <Typography variant="body2" gutterBottom>
+            Training/Validation Data Shuffling
+          </Typography>
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={shuffleOptions}
+                onChange={toggleShuffleOptions}
+                color="primary"
+                disabled={!isModelTrainable}
+              />
+            }
+            label="Shuffle on Split"
+          />
+        </Stack>
       </Grid>
     </Grid>
   );

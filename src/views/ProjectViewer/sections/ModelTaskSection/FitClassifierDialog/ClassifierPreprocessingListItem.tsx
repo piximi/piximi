@@ -8,17 +8,42 @@ import { classifierSlice } from "store/classifier";
 import {
   selectActiveClassifierCropOptions,
   selectActiveClassifierRescaleOptions,
+  selectActiveClassifierShuffleOptions,
 } from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 
 import { CropOptions, RescaleOptions } from "utils/models/types";
 
-export const ClassifierPreprocessingListItem = () => {
+export const ClassifierPreprocessingListItem = ({
+  trainingPercentage,
+  trainable,
+}: {
+  trainingPercentage: number;
+  trainable: boolean;
+}) => {
+  const dispatch = useDispatch();
   const cropOptions = useSelector(selectActiveClassifierCropOptions);
   const rescaleOptions = useSelector(selectActiveClassifierRescaleOptions);
   const activeKindId = useSelector(selectActiveKindId);
+  const shuffle = useSelector(selectActiveClassifierShuffleOptions);
 
-  const dispatch = useDispatch();
+  const dispatchTrainingPercentage = (trainingPercentage: number) => {
+    dispatch(
+      classifierSlice.actions.updateModelPreprocessOptions({
+        settings: { trainingPercentage },
+        kindId: activeKindId,
+      }),
+    );
+  };
+
+  const toggleShuffle = () => {
+    dispatch(
+      classifierSlice.actions.updateModelPreprocessOptions({
+        settings: { shuffle },
+        kindId: activeKindId,
+      }),
+    );
+  };
 
   const updateCropOptions = (cropOptions: CropOptions) => {
     dispatch(
@@ -50,6 +75,11 @@ export const ClassifierPreprocessingListItem = () => {
         rescaleOptions={rescaleOptions}
         updateCropOptions={updateCropOptions}
         updateRescaleOptions={updateRescaleOptions}
+        dispatchTrainingPercentage={dispatchTrainingPercentage}
+        trainingPercentage={trainingPercentage}
+        isModelTrainable={trainable}
+        shuffleOptions={shuffle}
+        toggleShuffleOptions={toggleShuffle}
       />
     </CollapsibleListItem>
   );

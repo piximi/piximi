@@ -5,9 +5,9 @@ import { LoadModelArgs } from "../../types";
 import { ModelTask } from "../../enums";
 
 export class MobileNet extends SequentialClassifier {
-  constructor() {
+  constructor(name?: string) {
     super({
-      name: "MobileNet",
+      name: name ?? "MobileNet",
       task: ModelTask.Classification,
       graph: false,
       pretrained: false,
