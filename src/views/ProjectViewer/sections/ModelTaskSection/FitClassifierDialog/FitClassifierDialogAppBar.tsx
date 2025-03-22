@@ -23,6 +23,7 @@ import { classifierSlice } from "store/classifier";
 import { dataSlice } from "store/data";
 import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
 import {
+  selectActiveClassifierFitOptions,
   selectActiveClassifierModel,
   selectActiveClassifierModelStatus,
 } from "store/classifier/reselectors";
@@ -37,9 +38,9 @@ type FitClassifierDialogAppBarProps = {
   fit: any;
   noLabels: boolean;
   hasLabeledInference: boolean;
-  noTrain: boolean;
-  epochs: number;
+  trainable: boolean;
   currentEpoch: number;
+  modelNameOrArch: string | number;
 };
 
 export const FitClassifierDialogAppBar = ({
@@ -47,9 +48,9 @@ export const FitClassifierDialogAppBar = ({
   fit,
   noLabels,
   hasLabeledInference,
-  noTrain,
-  epochs,
+  trainable,
   currentEpoch,
+  modelNameOrArch,
 }: FitClassifierDialogAppBarProps) => {
   const dispatch = useDispatch();
   const activeKindId = useSelector(selectActiveKindId);
@@ -58,6 +59,7 @@ export const FitClassifierDialogAppBar = ({
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
+  const epochs = useSelector(selectActiveClassifierFitOptions).epochs;
 
   const {
     open: warningDialogOpen,
@@ -66,7 +68,7 @@ export const FitClassifierDialogAppBar = ({
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const onStopFitting = () => {
-    if (modelStatus !== ModelStatus.Training) return;
+    if (modelStatus !== ModelStatus.Training || !selectedModel) return;
 
     selectedModel.stopTraining();
 
@@ -74,16 +76,19 @@ export const FitClassifierDialogAppBar = ({
       classifierSlice.actions.updateModelStatus({
         kindId: activeKindId,
         modelStatus: ModelStatus.Trained,
+        nameOrArch: modelNameOrArch,
       }),
     );
   };
 
   const handleDisposeModel = () => {
+    if (!selectedModel) return;
     selectedModel.dispose();
     dispatch(
       classifierSlice.actions.updateModelStatus({
         kindId: activeKindId,
         modelStatus: ModelStatus.Uninitialized,
+        nameOrArch: modelNameOrArch,
       }),
     );
   };
@@ -142,7 +147,7 @@ export const FitClassifierDialogAppBar = ({
             title={
               noLabels
                 ? "Please label images before fitting a model."
-                : noTrain
+                : !trainable
                   ? "Model not trainable"
                   : "Fit the model"
             }
@@ -152,7 +157,7 @@ export const FitClassifierDialogAppBar = ({
               <Button
                 variant="outlined"
                 onClick={handleFit}
-                disabled={noLabels || noTrain}
+                disabled={noLabels || !trainable}
                 startIcon={<PlayCircleOutline />}
                 sx={{ mr: 1 }}
               >
