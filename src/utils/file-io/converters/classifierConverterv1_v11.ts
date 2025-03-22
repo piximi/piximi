@@ -32,7 +32,7 @@ export const classifierConverterv1_v11 = (
   };
 
   kindIds.forEach((kindId) => {
-    kindClassifiers[kindId] = { selectedModelIdx: 0, modelInfoDict: {} };
+    kindClassifiers[kindId] = { modelNameOrArch: 0, modelInfoDict: {} };
     for (const i in availableClassifierArchitectures)
       kindClassifiers[kindId].modelInfoDict[i] = {
         ...getDefaultModelInfo(),

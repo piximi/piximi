@@ -4,34 +4,34 @@ import {
   CustomNumberTextField,
   CustomFormSelectField,
 } from "components/inputs";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "store/classifier";
-import { selectActiveClassifierOptimizerSettings } from "store/classifier/reselectors";
+import {
+  selectActiveClassifierFitOptions,
+  selectActiveClassifierOptimizerSettings,
+  selectActiveClassifierTrainingPercentage,
+} from "store/classifier/reselectors";
+import { selectActiveLabeledThingsCount } from "store/project/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
+import { logger } from "utils/common/helpers";
 
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
 
-import { SegmenterCompileSettings, FitOptions } from "utils/models/types";
-
-type OptimizerSettingsGridProps = {
-  compileOptions: SegmenterCompileSettings;
-  dispatchLossFunctionCallback: (lossFunction: LossFunction) => void;
-  dispatchOptimizationAlgorithmCallback: (
-    optimizationAlgorithm: OptimizationAlgorithm,
-  ) => void;
-  dispatchLearningRateCallback: (learningRate: number) => void;
-  fitOptions: FitOptions;
-  dispatchBatchSizeCallback: (batchSize: number) => void;
-  dispatchEpochsCallback: (epochs: number) => void;
-  isModelTrainable: boolean;
+type OptimizerSettingsProps = {
+  trainable: boolean;
 };
 
-export const ClassifierOptimizerSettingsGrid = ({
-  fitOptions,
-  isModelTrainable,
-}: OptimizerSettingsGridProps) => {
+export const ClassifierOptimizerSettings = ({
+  trainable,
+}: OptimizerSettingsProps) => {
   const compileOptions = useSelector(selectActiveClassifierOptimizerSettings);
   const activeKindId = useSelector(selectActiveKindId);
+  const trainingPercentage = useSelector(
+    selectActiveClassifierTrainingPercentage,
+  );
+  const labeledThingsCount = useSelector(selectActiveLabeledThingsCount);
+  const fitOptions = useSelector(selectActiveClassifierFitOptions);
   const dispatch = useDispatch();
 
   const dispatchBatchSizeCallback = (batchSize: number) => {
@@ -93,6 +93,38 @@ export const ClassifierOptimizerSettingsGrid = ({
 
     dispatchLossFunctionCallback(lossFunction);
   };
+  useEffect(() => {
+    if (
+      import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+      labeledThingsCount > 0
+    ) {
+      const trainingSize = Math.round(labeledThingsCount * trainingPercentage);
+      const validationSize = labeledThingsCount - trainingSize;
+
+      logger(
+        `Set training size to Round[${labeledThingsCount} * ${trainingPercentage}] = ${trainingSize}
+        ; val size to ${labeledThingsCount} - ${trainingSize} = ${validationSize}`,
+      );
+
+      logger(
+        `Set training batches per epoch to RoundUp[${trainingSize} / ${
+          fitOptions.batchSize
+        }] = ${Math.ceil(trainingSize / fitOptions.batchSize)}`,
+      );
+
+      logger(
+        `Set validation batches per epoch to RoundUp[${validationSize} / ${
+          fitOptions.batchSize
+        }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`,
+      );
+
+      logger(
+        `Training last batch size is ${trainingSize % fitOptions.batchSize}
+        ; validation is ${validationSize % fitOptions.batchSize}`,
+      );
+    }
+  }, [fitOptions.batchSize, trainingPercentage, labeledThingsCount]);
 
   return (
     <>
@@ -102,7 +134,7 @@ export const ClassifierOptimizerSettingsGrid = ({
             keySource={OptimizationAlgorithm}
             value={compileOptions.optimizationAlgorithm as string}
             onChange={onOptimizationAlgorithmChange}
-            disabled={!isModelTrainable}
+            disabled={!trainable}
             helperText="OptimizationAlgorithm"
           />
         </Grid>
@@ -116,7 +148,7 @@ export const ClassifierOptimizerSettingsGrid = ({
             dispatchCallBack={dispatchLearningRateCallback}
             min={0}
             enableFloat={true}
-            disabled={!isModelTrainable}
+            disabled={!trainable}
           />
         </Grid>
       </Grid>
@@ -126,7 +158,7 @@ export const ClassifierOptimizerSettingsGrid = ({
             keySource={LossFunction}
             value={compileOptions.lossFunction as string}
             onChange={onLossFunctionChange}
-            disabled={!isModelTrainable}
+            disabled={!trainable}
             helperText="Loss Function"
           />
         </Grid>
@@ -139,7 +171,7 @@ export const ClassifierOptimizerSettingsGrid = ({
             value={fitOptions.batchSize}
             dispatchCallBack={dispatchBatchSizeCallback}
             min={1}
-            disabled={!isModelTrainable}
+            disabled={!trainable}
           />
         </Grid>
 
@@ -150,7 +182,7 @@ export const ClassifierOptimizerSettingsGrid = ({
             value={fitOptions.epochs}
             dispatchCallBack={dispatchEpochsCallback}
             min={1}
-            disabled={!isModelTrainable}
+            disabled={!trainable}
           />
         </Grid>
       </Grid>

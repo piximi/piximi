@@ -3,11 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { classifierSlice } from "store/classifier";
 import { selectAlertState } from "store/applicationSettings/selectors";
-import { selectActiveKindId, selectProjectName } from "store/project/selectors";
+import { selectActiveKindId } from "store/project/selectors";
 import {
-  selectActiveClassifierFitOptions,
-  selectActiveClassifierHyperparameters,
-  selectActiveClassifierTrainingPercentage,
   selectActiveClassifierModel,
   selectActiveClassifierModelStatus,
 } from "store/classifier/reselectors";
@@ -16,7 +13,6 @@ import {
   selectActiveLabeledThingsCount,
 } from "store/project/reselectors";
 
-import { logger } from "utils/common/helpers";
 import { isUnknownCategory } from "store/data/helpers";
 
 import { ModelStatus, Partition } from "utils/models/enums";
@@ -24,7 +20,6 @@ import { AlertType } from "utils/common/enums";
 
 import { AlertState } from "utils/common/types";
 import { TrainingCallbacks } from "utils/models/types";
-import saveAs from "file-saver";
 
 type PlotData = { x: number; y: number }[];
 const historyItems = [
@@ -59,12 +54,6 @@ export const useFitClassificationModel = () => {
   const selectedModel = useSelector(selectActiveClassifierModel);
   const modelStatus = useSelector(selectActiveClassifierModelStatus);
   const alertState = useSelector(selectAlertState);
-  const fitOptions = useSelector(selectActiveClassifierFitOptions);
-  const hyperparameters = useSelector(selectActiveClassifierHyperparameters);
-  const projectName = useSelector(selectProjectName);
-  const trainingPercentage = useSelector(
-    selectActiveClassifierTrainingPercentage,
-  );
 
   const hasLabeledInference = useMemo(() => {
     return activeLabeledThings.some(
@@ -80,6 +69,7 @@ export const useFitClassificationModel = () => {
   );
 
   const modelHistory = useMemo(() => {
+    if (!selectedModel) return {};
     const fullHistory = selectedModel.history.history;
     const selectedHistory: { [key: string]: number[] } = {};
     for (const k of historyItems) {
@@ -99,7 +89,12 @@ export const useFitClassificationModel = () => {
     epoch,
     logs,
   ) => {
-    const nextEpoch = selectedModel.numEpochs + epoch + 1;
+    let nextEpoch: number;
+    if (!selectedModel) {
+      nextEpoch = epoch + 1;
+    } else {
+      nextEpoch = selectedModel.numEpochs + epoch + 1;
+    }
     const trainingEpochIndicator = nextEpoch - 0.5;
 
     setCurrentEpoch((currentEpoch) => currentEpoch + 1);
@@ -136,7 +131,7 @@ export const useFitClassificationModel = () => {
     setShowPlots(true);
   };
 
-  const handleFit = async () => {
+  const handleFit = async (nameOrArch: string | number) => {
     setCurrentEpoch(0);
     if (modelStatus === ModelStatus.Uninitialized) {
       dispatch(
@@ -144,6 +139,7 @@ export const useFitClassificationModel = () => {
           kindId: activeKindId,
           modelStatus: ModelStatus.InitFit,
           onEpochEnd: trainingHistoryCallback,
+          nameOrArch,
         }),
       );
     } else {
@@ -152,26 +148,20 @@ export const useFitClassificationModel = () => {
           kindId: activeKindId,
           modelStatus: ModelStatus.Training,
           onEpochEnd: trainingHistoryCallback,
+          nameOrArch,
         }),
       );
     }
   };
 
-  const handleExportHyperparameters = () => {
-    const data = new Blob([JSON.stringify(hyperparameters)], {
-      type: "application/json;charset=utf-8",
-    });
-
-    saveAs(data, `${projectName}-model_hyperparameters.json`);
-  };
-
   useEffect(() => {
-    if (!noLabeledThings && selectedModel.trainable) {
+    if (!noLabeledThings && selectedModel && selectedModel.trainable) {
       setShowWarning(true);
     }
-  }, [noLabeledThings, selectedModel.trainable]);
+  }, [noLabeledThings, selectedModel, selectedModel?.trainable]);
 
   useEffect(() => {
+    if (!modelHistory.categoricalAccuracy) return;
     setTrainingAccuracy(
       modelHistory.categoricalAccuracy.map((y, i) => ({ x: i + 0.5, y })),
     );
@@ -190,39 +180,6 @@ export const useFitClassificationModel = () => {
 
     setCurrentEpoch(0);
   }, [modelHistory]);
-
-  useEffect(() => {
-    if (
-      import.meta.env.NODE_ENV !== "production" &&
-      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-      labeledThingsCount > 0
-    ) {
-      const trainingSize = Math.round(labeledThingsCount * trainingPercentage);
-      const validationSize = labeledThingsCount - trainingSize;
-
-      logger(
-        `Set training size to Round[${labeledThingsCount} * ${trainingPercentage}] = ${trainingSize}
-        ; val size to ${labeledThingsCount} - ${trainingSize} = ${validationSize}`,
-      );
-
-      logger(
-        `Set training batches per epoch to RoundUp[${trainingSize} / ${
-          fitOptions.batchSize
-        }] = ${Math.ceil(trainingSize / fitOptions.batchSize)}`,
-      );
-
-      logger(
-        `Set validation batches per epoch to RoundUp[${validationSize} / ${
-          fitOptions.batchSize
-        }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`,
-      );
-
-      logger(
-        `Training last batch size is ${trainingSize % fitOptions.batchSize}
-        ; validation is ${validationSize % fitOptions.batchSize}`,
-      );
-    }
-  }, [fitOptions.batchSize, trainingPercentage, labeledThingsCount]);
 
   useEffect(() => {
     if (modelStatus === ModelStatus.Uninitialized) {
@@ -246,11 +203,8 @@ export const useFitClassificationModel = () => {
     selectedModel,
     modelStatus,
     alertState,
-    fitOptions,
-    trainingPercentage,
     noLabeledThingsAlert,
     handleFit,
     hasLabeledInference,
-    handleExportHyperparameters,
   };
 };
