@@ -3,7 +3,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   kindClassifierModelDict,
   deleteClassifierModels,
-  availableClassifierArchitectures,
   getDefaultModelInfo,
 } from "utils/models/availableClassificationModels";
 
@@ -19,18 +18,13 @@ import { DEFAULT_KIND } from "store/data/constants";
 import { getSelectedModelInfo } from "./utils";
 import { RecursivePartial } from "utils/common/types";
 import { recursiveAssign } from "utils/common/helpers";
+import { cloneDeep } from "lodash";
 
 export const initialState: ClassifierState = {
   kindClassifiers: {
     [DEFAULT_KIND]: {
-      selectedModelIdx: 0,
-      modelInfoDict: Object.fromEntries(
-        Object.entries(
-          availableClassifierArchitectures.map((_model) =>
-            getDefaultModelInfo(),
-          ),
-        ),
-      ),
+      modelNameOrArch: 0,
+      modelInfoDict: { "base-model": getDefaultModelInfo() },
     },
   },
 
@@ -62,14 +56,8 @@ export const classifierSlice = createSlice({
 
       state.kindClassifiers = {
         [DEFAULT_KIND]: {
-          selectedModelIdx: 0,
-          modelInfoDict: Object.fromEntries(
-            Object.entries(
-              availableClassifierArchitectures.map((_model) =>
-                getDefaultModelInfo(),
-              ),
-            ),
-          ),
+          modelNameOrArch: 0,
+          modelInfoDict: { "base-model": getDefaultModelInfo() },
         },
       };
     },
@@ -84,14 +72,8 @@ export const classifierSlice = createSlice({
         changes.add.forEach(
           (kindId) =>
             (state.kindClassifiers[kindId] = {
-              selectedModelIdx: 0,
-              modelInfoDict: Object.fromEntries(
-                Object.entries(
-                  availableClassifierArchitectures.map((_model) =>
-                    getDefaultModelInfo(),
-                  ),
-                ),
-              ),
+              modelNameOrArch: 0,
+              modelInfoDict: { "base-model": getDefaultModelInfo() },
             }),
         );
       }
@@ -105,13 +87,16 @@ export const classifierSlice = createSlice({
         modelStatus: ModelStatus;
         kindId: Kind["id"];
         onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
+        nameOrArch: string | number;
       }>,
     ) {
       const { kindId, modelStatus } = action.payload;
-      const selectedModelIdx = state.kindClassifiers[kindId].selectedModelIdx;
-      const selectedModel =
-        state.kindClassifiers[kindId].modelInfoDict[selectedModelIdx];
-      selectedModel.status = modelStatus;
+      const selectedModelName = state.kindClassifiers[kindId].modelNameOrArch;
+      if (selectedModelName) {
+        const selectedModel =
+          state.kindClassifiers[kindId].modelInfoDict[selectedModelName];
+        selectedModel.status = modelStatus;
+      }
     },
 
     updateModelOptimizerSettings(
@@ -153,32 +138,21 @@ export const classifierSlice = createSlice({
       );
       selectedModelInfo.params.inputShape = inputShape;
     },
-    updateSelectedModelIdx(
+    updateSelectedModelNameOrArch(
       state,
       action: PayloadAction<{
-        modelIdx: number;
+        modelName: string | number;
         kindId: Kind["id"];
-        disposePrevious: boolean;
       }>,
     ) {
-      const { modelIdx, kindId, disposePrevious } = action.payload;
-      const kindClassifier = state.kindClassifiers[kindId];
-      if (disposePrevious) {
-        kindClassifierModelDict[kindId][
-          kindClassifier.selectedModelIdx
-        ].dispose();
-      }
-
-      kindClassifier.selectedModelIdx = modelIdx;
-      const newSelectedModel = kindClassifierModelDict[kindId][modelIdx];
-      const newSelectedModelInfo = kindClassifier.modelInfoDict[modelIdx];
-      if (
-        newSelectedModel.history.epochs.length > 0 ||
-        newSelectedModel.pretrained
-      ) {
-        newSelectedModelInfo.status = ModelStatus.Trained;
-      } else {
-        newSelectedModelInfo.status = ModelStatus.Uninitialized;
+      const { modelName, kindId } = action.payload;
+      const classifier = state.kindClassifiers[kindId];
+      classifier.modelNameOrArch = modelName;
+      if (!modelName) return;
+      if (!(modelName in classifier.modelInfoDict)) {
+        classifier.modelInfoDict[modelName] = cloneDeep(
+          classifier.modelInfoDict["base-model"],
+        );
       }
     },
     loadUserSelectedModel(
@@ -197,7 +171,7 @@ export const classifierSlice = createSlice({
       const kindClassifier = state.kindClassifiers[kindId];
       const newModelIdx = kindClassifierModelDict[kindId].length - 1;
 
-      kindClassifier.selectedModelIdx = newModelIdx;
+      kindClassifier.modelNameOrArch = newModelIdx;
       const uploadedModelInfo = getDefaultModelInfo();
       uploadedModelInfo.params.inputShape = inputShape;
 

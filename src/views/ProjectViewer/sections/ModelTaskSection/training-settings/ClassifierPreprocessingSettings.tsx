@@ -26,17 +26,16 @@ import {
   selectActiveClassifierModelWithIdx,
   selectActiveClassifierRescaleOptions,
   selectActiveClassifierShuffleOptions,
+  selectActiveClassifierTrainingPercentage,
 } from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 import { classifierSlice } from "store/classifier";
 
 type PreprocessingSettingsProps = {
-  trainingPercentage: number;
   trainable: boolean;
 };
 
 export const ClassifierPreprocessingSettings = ({
-  trainingPercentage,
   trainable,
 }: PreprocessingSettingsProps) => {
   const dispatch = useDispatch();
@@ -46,6 +45,9 @@ export const ClassifierPreprocessingSettings = ({
   const shuffleOptions = useSelector(selectActiveClassifierShuffleOptions);
   const inputShape = useSelector(selectActiveClassifierInputShape);
   const selectedModel = useSelector(selectActiveClassifierModelWithIdx);
+  const trainingPercentage = useSelector(
+    selectActiveClassifierTrainingPercentage,
+  );
 
   const [fixedNumberOfChannels, setFixedNumberOfChannels] =
     React.useState<boolean>(false);
@@ -149,7 +151,7 @@ export const ClassifierPreprocessingSettings = ({
   };
 
   useEffect(() => {
-    if (selectedModel.model.requiredChannels) {
+    if (selectedModel.model && selectedModel.model.requiredChannels) {
       setFixedNumberOfChannels(true);
       setFixedNumberOfChannelsHelperText(
         `${selectedModel.model.name} requires ${selectedModel.model.requiredChannels} channels!`,
@@ -163,12 +165,10 @@ export const ClassifierPreprocessingSettings = ({
   return (
     <Grid container spacing={2} padding={2}>
       <Grid
-        size={4}
-        sx={(theme) => ({
-          border: `1px solid ${theme.palette.divider}`,
-          borderRadius: theme.shape.borderRadius,
-          padding: 2,
-        })}
+        size={12}
+        sx={{
+          px: 2,
+        }}
       >
         <Typography variant="body2">Cropping</Typography>
         <Stack>
@@ -190,12 +190,10 @@ export const ClassifierPreprocessingSettings = ({
       </Grid>
 
       <Grid
-        size={4}
-        sx={(theme) => ({
-          border: `1px solid ${theme.palette.divider}`,
-          borderRadius: theme.shape.borderRadius,
-          padding: 2,
-        })}
+        size={12}
+        sx={{
+          px: 2,
+        }}
       >
         <Typography variant="body2">Split Training/Validation</Typography>
         <CustomNumberTextField
@@ -211,12 +209,10 @@ export const ClassifierPreprocessingSettings = ({
         />
       </Grid>
       <Grid
-        size={4}
-        sx={(theme) => ({
-          border: `1px solid ${theme.palette.divider}`,
-          borderRadius: theme.shape.borderRadius,
-          padding: 2,
-        })}
+        size={12}
+        sx={{
+          px: 2,
+        }}
       >
         <Stack>
           <Typography variant="body2">Input Shape</Typography>
@@ -231,8 +227,8 @@ export const ClassifierPreprocessingSettings = ({
               value={inputShape.height}
               dispatchCallBack={(number) => dispatchShape(number, "shape-rows")}
               min={1}
-              disabled={!selectedModel.model.trainable}
-              width="9ch"
+              disabled={selectedModel.model && !selectedModel.model.trainable}
+              width="12ch"
             />
             <CustomNumberTextField
               id="shape-cols"
@@ -240,8 +236,8 @@ export const ClassifierPreprocessingSettings = ({
               value={inputShape.width}
               dispatchCallBack={(number) => dispatchShape(number, "shape-cols")}
               min={1}
-              disabled={!selectedModel.model.trainable}
-              width="9ch"
+              disabled={selectedModel.model && !selectedModel.model.trainable}
+              width="12ch"
             />
             <CustomNumberTextField
               id="shape-channels"
@@ -251,8 +247,11 @@ export const ClassifierPreprocessingSettings = ({
                 dispatchShape(number, "shape-channels")
               }
               min={1}
-              disabled={fixedNumberOfChannels || !selectedModel.model.trainable}
-              width="9ch"
+              disabled={
+                fixedNumberOfChannels ||
+                (selectedModel.model && !selectedModel.model.trainable)
+              }
+              width="12ch"
             />
           </Box>
 
@@ -263,11 +262,9 @@ export const ClassifierPreprocessingSettings = ({
       </Grid>
       <Grid
         size={12}
-        sx={(theme) => ({
-          border: `1px solid ${theme.palette.divider}`,
-          borderRadius: theme.shape.borderRadius,
-          padding: 2,
-        })}
+        sx={{
+          px: 2,
+        }}
       >
         <FormControl
           fullWidth

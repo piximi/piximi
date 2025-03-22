@@ -69,6 +69,7 @@ export const ClassifierSection = () => {
         gap={1}
       >
         <ModelIOButtonGroup
+          hasTrainedModel={!!selectedModel}
           handleImportModel={handleOpenImportClassifierDialog}
           handleSaveModel={handleOpenSaveClassifierDialog}
         />
@@ -84,7 +85,7 @@ export const ClassifierSection = () => {
             })}
           >
             <Typography variant="caption" noWrap>
-              {`Selected Model:  ${selectedModel.name}`}
+              {`Selected Model:  ${selectedModel ? selectedModel.name : "N/A"}`}
             </Typography>
           </Stack>
         )}
@@ -93,7 +94,7 @@ export const ClassifierSection = () => {
           handleEvaluate={handleEvaluate}
           handleFit={handleOpenFitClassifierDialog}
           handlePredict={handlePredict}
-          modelTrainable={selectedModel.trainable}
+          modelTrainable={!selectedModel || selectedModel.trainable}
           helperText={helperText}
         />
       </Box>
@@ -102,12 +103,14 @@ export const ClassifierSection = () => {
         open={ImportClassifierDialogOpen}
         dispatchFunction={handleImportModel}
       />
-      <SaveFittedModelDialog
-        model={selectedModel}
-        modelStatus={modelStatus}
-        onClose={handleCloseSaveClassifierDialog}
-        open={SaveClassifierDialogOpen}
-      />
+      {/* {selectedModel && (
+        <SaveFittedModelDialog
+          model={selectedModel}
+          modelStatus={modelStatus}
+          onClose={handleCloseSaveClassifierDialog}
+          open={SaveClassifierDialogOpen}
+        />
+      )} */}
       <FitClassifierDialog
         openedDialog={fitClassifierDialogOpen}
         closeDialog={handleCloseFitClassifierDialog}
