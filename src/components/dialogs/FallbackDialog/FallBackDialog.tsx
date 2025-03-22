@@ -243,12 +243,12 @@ export const FallBackDialog = (props: any) => {
           open={openSaveProjectDialog}
         />
 
-        <SaveFittedModelDialog
+        {/* <SaveFittedModelDialog
           model={selectedClassifierModel}
           modelStatus={classifierModelStatus}
           onClose={onSaveClassifierDialogClose}
           open={openSaveClassifierDialog}
-        />
+        /> */}
 
         <SaveFittedModelDialog
           model={selectedSegmenterModel}

@@ -87,8 +87,8 @@ export type ModelInfo = {
   evalResults: ClassifierEvaluationResultType;
 };
 export type KindClassifier = {
-  selectedModelIdx: number;
-  modelInfoDict: Record<string | number, ModelInfo>;
+  modelNameOrArch: string | number;
+  modelInfoDict: Record<string, ModelInfo>;
 };
 
 export type KindClassifierDict = Record<Kind["id"], KindClassifier>;

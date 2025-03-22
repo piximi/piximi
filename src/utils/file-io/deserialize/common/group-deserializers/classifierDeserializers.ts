@@ -293,7 +293,7 @@ export const deserializeClassifierGroupV11 = async (
       "model_keys",
     )) as string[];
     kindClassifiers[kindId] = {
-      selectedModelIdx: 0,
+      modelNameOrArch: 0,
       modelInfoDict: {},
     };
 
