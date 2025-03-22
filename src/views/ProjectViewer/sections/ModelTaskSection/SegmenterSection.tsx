@@ -60,6 +60,7 @@ export const SegmenterSection = () => {
         px={1}
       >
         <ModelIOButtonGroup
+          hasTrainedModel={!!selectedModel}
           handleImportModel={onOpenImportSegmenterDialog}
           handleSaveModel={onOpenSaveSegmenterDialog}
         />
@@ -103,12 +104,12 @@ export const SegmenterSection = () => {
         open={importSegmenterDialogOpen}
         dispatchFunction={handleImportModel}
       />
-      <SaveFittedModelDialog
+      {/* <SaveFittedModelDialog
         model={selectedModel}
         modelStatus={modelStatus}
         onClose={onCloseSaveSegmenterDialog}
         open={openSaveSegmenterDialog}
-      />
+      /> */}
       <FitSegmenterDialog
         openedDialog={fittingOpen}
         closeDialog={handleCloseFitModelDialog}
