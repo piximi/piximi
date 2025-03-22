@@ -13,9 +13,11 @@ import {
 } from "utils/common/helpers";
 import { isUnknownCategory } from "store/data/helpers";
 
-import { SimpleCNN, MobileNet } from "utils/models/classification";
-
-import { kindClassifierModelDict } from "utils/models/availableClassificationModels";
+import {
+  SimpleCNN,
+  MobileNet,
+  SequentialClassifier,
+} from "utils/models/classification";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/common/enums";
 
@@ -27,6 +29,10 @@ import {
 } from "utils/models/types";
 import { AlertState } from "utils/common/types";
 import { Category, Kind, Thing } from "store/data/types";
+import {
+  availableClassificationModels,
+  availableClassifierArchitectures,
+} from "utils/models/availableClassificationModels";
 
 export const classifierMiddleware = createListenerMiddleware();
 
@@ -66,6 +72,7 @@ const handleError = async (
       classifierSlice.actions.updateModelStatus({
         kindId,
         modelStatus: ModelStatus.Uninitialized,
+        nameOrArch: name,
       }),
     );
   }
@@ -85,13 +92,17 @@ startAppListening({
     switch (action.payload.modelStatus) {
       case ModelStatus.InitFit:
       case ModelStatus.Training:
-        await fitListener(action.payload.onEpochEnd, listenerAPI);
+        await fitListener(
+          action.payload.onEpochEnd,
+          action.payload.nameOrArch,
+          listenerAPI,
+        );
         break;
       case ModelStatus.Predicting:
-        await predictListener(listenerAPI);
+        await predictListener(listenerAPI, action.payload.nameOrArch);
         break;
       case ModelStatus.Evaluating:
-        await evaluateListener(listenerAPI);
+        await evaluateListener(listenerAPI, action.payload.nameOrArch);
         break;
       default:
     }
@@ -101,6 +112,7 @@ startAppListening({
 
 const fitListener = async (
   onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
+  nameOrArch: string | number,
   listenerAPI: StoreListemerAPI,
 ) => {
   import.meta.env.NODE_ENV !== "production" &&
@@ -123,8 +135,17 @@ const fitListener = async (
   if (!activeKind) return;
   /* CLASSIFIER  */
   const activeClassifier = classifierState.kindClassifiers[activeKindId];
-  const modelIdx = activeClassifier.selectedModelIdx;
-  const model = kindClassifierModelDict[activeKindId][modelIdx];
+  const modelIdx = activeClassifier.modelNameOrArch;
+  let model: SequentialClassifier;
+  if (typeof nameOrArch === "string") {
+    model = availableClassificationModels[nameOrArch];
+  } else {
+    const modelName = `${activeKindId}_${["SimpleCNN", "MobileNet"][nameOrArch]}`;
+    model = new availableClassifierArchitectures[nameOrArch](
+      `${activeKindId}_${modelName}`,
+    );
+    availableClassificationModels[modelName] = model;
+  }
   const modelInfo = activeClassifier.modelInfoDict[modelIdx];
   const modelStatus = modelInfo.status;
   const { optimizerSettings, preprocessSettings, inputShape } =
@@ -193,6 +214,7 @@ const fitListener = async (
     classifierSlice.actions.updateModelStatus({
       kindId: activeKindId,
       modelStatus: ModelStatus.Loading,
+      nameOrArch: model.name,
     }),
   );
 
@@ -318,6 +340,7 @@ const fitListener = async (
     classifierSlice.actions.updateModelStatus({
       kindId: activeKindId,
       modelStatus: ModelStatus.Training,
+      nameOrArch: model.name,
     }),
   );
 
@@ -352,11 +375,15 @@ const fitListener = async (
     classifierSlice.actions.updateModelStatus({
       kindId: activeKindId,
       modelStatus: ModelStatus.Trained,
+      nameOrArch: model.name,
     }),
   );
 };
 
-const predictListener = async (listenerAPI: StoreListemerAPI) => {
+const predictListener = async (
+  listenerAPI: StoreListemerAPI,
+  modelName: string | number,
+) => {
   const {
     data: dataState,
     classifier: classifierState,
@@ -388,8 +415,9 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   /* CLASSIFIER */
 
   const activeClassifier = classifierState.kindClassifiers[activeKindId];
-  const modelIdx = activeClassifier.selectedModelIdx;
-  const model = kindClassifierModelDict[activeKindId][modelIdx];
+  const modelIdx = activeClassifier.modelNameOrArch;
+
+  const model = availableClassificationModels[modelName];
   const modelInfo = activeClassifier.modelInfoDict[modelIdx];
 
   const {
@@ -470,16 +498,16 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     classifierSlice.actions.updateModelStatus({
       kindId: activeKindId,
       modelStatus: finalModelStatus,
+      nameOrArch: model.name,
     }),
   );
 };
 
-const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
-  const {
-    data: dataState,
-    classifier: classifierState,
-    project: projectState,
-  } = listenerAPI.getState();
+const evaluateListener = async (
+  listenerAPI: StoreListemerAPI,
+  modelName: string | number,
+) => {
+  const { data: dataState, project: projectState } = listenerAPI.getState();
 
   listenerAPI.dispatch(applicationSettingsSlice.actions.hideAlertState());
 
@@ -497,9 +525,7 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
   }, 0);
 
   /* CLASSIFIER*/
-  const modelIdx =
-    classifierState.kindClassifiers[activeKindId].selectedModelIdx;
-  const model = kindClassifierModelDict[activeKindId][modelIdx];
+  const model = availableClassificationModels[modelName];
 
   /* EVALUATE */
 
@@ -546,6 +572,7 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
     classifierSlice.actions.updateModelStatus({
       kindId: activeKindId,
       modelStatus: ModelStatus.Trained,
+      nameOrArch: model.name,
     }),
   );
 };
