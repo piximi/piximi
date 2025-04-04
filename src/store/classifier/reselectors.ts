@@ -15,7 +15,7 @@ import { Shape } from "store/data/types";
 import { availableClassificationModels } from "utils/models/availableClassificationModels";
 import { getSelectedModelInfo } from "./utils";
 
-const selectActiveClassifier = createSelector(
+const selectClassifier = createSelector(
   selectKindClassifiers,
   selectActiveKindId,
   (classifiers, activeKindId): KindClassifier => {
@@ -23,43 +23,47 @@ const selectActiveClassifier = createSelector(
   },
 );
 
-export const selectActiveClassifierSelectedModelNameOrArch = createSelector(
-  selectActiveClassifier,
+export const selectClassifierModelNameOrArch = createSelector(
+  selectClassifier,
   (classifier): string | number => {
     return classifier.modelNameOrArch;
   },
 );
-export const selectActiveClassifierModel = createSelector(
-  selectActiveClassifierSelectedModelNameOrArch,
+export const selectClassifierModel = createSelector(
+  selectClassifierModelNameOrArch,
   (selectedActiveKindModelNameOrArch) => {
     return selectedActiveKindModelNameOrArch
       ? availableClassificationModels[selectedActiveKindModelNameOrArch]
       : undefined;
   },
 );
-export const selectActiveClassifierModelInfoDict = createSelector(
-  selectActiveClassifier,
+export const selectEveryClassifierModelInfo = createSelector(
+  selectClassifier,
   (classifier): Record<string, ModelInfo> => {
     return classifier.modelInfoDict;
   },
 );
 
-export const selectActiveClassifierModelInfo = createSelector(
-  selectActiveClassifier,
+export const selectAvailibleClassifierNames = createSelector(
+  selectEveryClassifierModelInfo,
+  (infoDict) => Object.keys(infoDict),
+);
+export const selectClassifierModelInfo = createSelector(
+  selectClassifier,
   (classifier): ModelInfo => {
     return getSelectedModelInfo(classifier);
   },
 );
 
-export const selectActiveClassifierModelStatus = createSelector(
-  selectActiveClassifierModelInfo,
+export const selectClassifierStatus = createSelector(
+  selectClassifierModelInfo,
   (modelInfo): ModelStatus => {
     return modelInfo.status;
   },
 );
 
-export const selectActiveClassifierHistory = createSelector(
-  [selectActiveClassifierModel, (state, items: string[]) => items],
+export const selectClassifierHistory = createSelector(
+  [selectClassifierModel, (state, items: string[]) => items],
   (
     model,
     items,
@@ -82,44 +86,44 @@ export const selectActiveClassifierHistory = createSelector(
   },
 );
 
-export const selectActiveClassifierModelWithIdx = createSelector(
-  selectActiveClassifierSelectedModelNameOrArch,
-  selectActiveClassifierModel,
+export const selectClassifierModelWithIdx = createSelector(
+  selectClassifierModelNameOrArch,
+  selectClassifierModel,
   (modelIdx, model) => ({
     idx: modelIdx,
     model,
   }),
 );
 
-export const selectActiveClassifierOptimizerSettings = createSelector(
-  selectActiveClassifierModelInfo,
+export const selectClassifierOptimizerSettings = createSelector(
+  selectClassifierModelInfo,
   (modelInfo): OptimizerSettings => {
     return modelInfo.params.optimizerSettings;
   },
 );
 
-export const selectActiveClassifierPreprocessOptions = createSelector(
-  selectActiveClassifierModelInfo,
+export const selectClassifierPreprocessOptions = createSelector(
+  selectClassifierModelInfo,
   (modelInfo): PreprocessSettings => {
     return modelInfo.params.preprocessSettings;
   },
 );
 
-export const selectActiveClassifierRescaleOptions = createSelector(
-  selectActiveClassifierPreprocessOptions,
+export const selectClassifierRescaleOptions = createSelector(
+  selectClassifierPreprocessOptions,
   (settings): RescaleOptions => {
     return settings.rescaleOptions;
   },
 );
-export const selectActiveClassifierCropOptions = createSelector(
-  selectActiveClassifierPreprocessOptions,
+export const selectClassifierCropOptions = createSelector(
+  selectClassifierPreprocessOptions,
   (settings): CropOptions => {
     return settings.cropOptions;
   },
 );
 
-export const selectActiveClassifierFitOptions = createSelector(
-  selectActiveClassifierOptimizerSettings,
+export const selectClassifierFitOptions = createSelector(
+  selectClassifierOptimizerSettings,
   (settings): FitOptions => {
     return {
       epochs: settings.epochs,
@@ -127,45 +131,45 @@ export const selectActiveClassifierFitOptions = createSelector(
     };
   },
 );
-export const selectActiveClassifierEpochs = createSelector(
-  selectActiveClassifierFitOptions,
+export const selectClassifierEpochs = createSelector(
+  selectClassifierFitOptions,
   (settings): number => {
     return settings.epochs;
   },
 );
 
-export const selectActiveClassifierInputShape = createSelector(
-  selectActiveClassifierModelInfo,
+export const selectClassifierInputShape = createSelector(
+  selectClassifierModelInfo,
   (modelInfo): Shape => {
     return modelInfo.params.inputShape;
   },
 );
 
-export const selectActiveClassifierEvaluationResult = createSelector(
-  selectActiveClassifierModelInfo,
+export const selectClassifierEvaluationResult = createSelector(
+  selectClassifierModelInfo,
   (modelInfo): ClassifierEvaluationResultType => {
     return modelInfo.evalResults;
   },
 );
 
-export const selectActiveClassifierShuffleOptions = createSelector(
-  selectActiveClassifierPreprocessOptions,
+export const selectClassifierShuffleOptions = createSelector(
+  selectClassifierPreprocessOptions,
   (settings): boolean => {
     return settings.shuffle;
   },
 );
 
-export const selectActiveClassifierTrainingPercentage = createSelector(
-  selectActiveClassifierPreprocessOptions,
+export const selectClassifierTrainingPercentage = createSelector(
+  selectClassifierPreprocessOptions,
   (settings): number => {
     return settings.trainingPercentage;
   },
 );
 
-export const selectActiveClassifierHyperparameters = createSelector(
-  selectActiveClassifierPreprocessOptions,
-  selectActiveClassifierOptimizerSettings,
-  selectActiveClassifierFitOptions,
+export const selectClassifierHyperparameters = createSelector(
+  selectClassifierPreprocessOptions,
+  selectClassifierOptimizerSettings,
+  selectClassifierFitOptions,
   (preprocessOptions, compileOptions, fitOptions) => {
     return {
       preprocessOptions,
