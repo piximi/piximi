@@ -1,6 +1,5 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { ENV, enableDebugMode, History } from "@tensorflow/tfjs";
-import { shuffle, take, takeRight } from "lodash";
+import { ENV, enableDebugMode } from "@tensorflow/tfjs";
 
 import { classifierSlice } from "./classifierSlice";
 import { applicationSettingsSlice } from "store/applicationSettings";
@@ -13,11 +12,7 @@ import {
 } from "utils/common/helpers";
 import { isUnknownCategory } from "store/data/helpers";
 
-import {
-  SimpleCNN,
-  MobileNet,
-  SequentialClassifier,
-} from "utils/models/classification";
+import { SequentialClassifier } from "utils/models/classification";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/common/enums";
 
@@ -28,11 +23,17 @@ import {
   TrainingCallbacks,
 } from "utils/models/types";
 import { AlertState } from "utils/common/types";
-import { Category, Kind, Thing } from "store/data/types";
+import { Kind, Thing } from "store/data/types";
 import {
   availableClassificationModels,
-  availableClassifierArchitectures,
+  createNewModel,
 } from "utils/models/availableClassificationModels";
+import {
+  prepareClasses,
+  prepareModel,
+  prepareTrainingData,
+  trainModel,
+} from "./fit";
 
 export const classifierMiddleware = createListenerMiddleware();
 
@@ -92,11 +93,7 @@ startAppListening({
     switch (action.payload.modelStatus) {
       case ModelStatus.InitFit:
       case ModelStatus.Training:
-        await fitListener(
-          action.payload.onEpochEnd,
-          action.payload.nameOrArch,
-          listenerAPI,
-        );
+        await fitListener(action.payload.onEpochEnd, listenerAPI);
         break;
       case ModelStatus.Predicting:
         await predictListener(listenerAPI, action.payload.nameOrArch);
@@ -112,7 +109,6 @@ startAppListening({
 
 const fitListener = async (
   onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
-  nameOrArch: string | number,
   listenerAPI: StoreListemerAPI,
 ) => {
   import.meta.env.NODE_ENV !== "production" &&
@@ -131,22 +127,25 @@ const fitListener = async (
 
   /* ACTIVE KIND */
   const activeKindId = projectState.activeKind;
-  const activeKind = dataState.kinds.entities[activeKindId]!;
-  if (!activeKind) return;
+  const { containing: activeThingIds, categories: activeCategories } =
+    dataState.kinds.entities[activeKindId]!;
+
   /* CLASSIFIER  */
-  const activeClassifier = classifierState.kindClassifiers[activeKindId];
-  const modelIdx = activeClassifier.modelNameOrArch;
+  const { modelInfoDict, modelNameOrArch } =
+    classifierState.kindClassifiers[activeKindId];
+
   let model: SequentialClassifier;
-  if (typeof nameOrArch === "string") {
-    model = availableClassificationModels[nameOrArch];
+  if (typeof modelNameOrArch === "string") {
+    model = availableClassificationModels[modelNameOrArch];
   } else {
-    const modelName = `${activeKindId}_${["SimpleCNN", "MobileNet"][nameOrArch]}`;
-    model = new availableClassifierArchitectures[nameOrArch](
-      `${activeKindId}_${modelName}`,
-    );
-    availableClassificationModels[modelName] = model;
+    const modelName = `${activeKindId}_${["SimpleCNN", "MobileNet"][modelNameOrArch]}`;
+    model = await createNewModel(modelName, modelNameOrArch as 0 | 1);
   }
-  const modelInfo = activeClassifier.modelInfoDict[modelIdx];
+
+  const modelInfo =
+    modelInfoDict[
+      typeof modelNameOrArch === "string" ? modelNameOrArch : "base-model"
+    ];
   const modelStatus = modelInfo.status;
   const { optimizerSettings, preprocessSettings, inputShape } =
     modelInfo.params;
@@ -164,51 +163,23 @@ const fitListener = async (
 
   /* DATA */
 
-  const activeThingIds = activeKind.containing;
-
   const {
     unlabeledThings,
-    labeledTraining,
-    labeledValidation,
     labeledUnassigned,
-  } = activeThingIds.reduce(
-    (
-      groupedThings: {
-        unlabeledThings: Thing[];
-        labeledTraining: Thing[];
-        labeledValidation: Thing[];
-        labeledUnassigned: Thing[];
-      },
-      id,
-    ) => {
-      const thing = dataState.things.entities[id];
-      if (!thing) return groupedThings;
-      if (isUnknownCategory(thing.categoryId)) {
-        groupedThings.unlabeledThings.push(thing);
-      } else if (thing.partition === Partition.Unassigned) {
-        groupedThings.labeledUnassigned.push(thing);
-      } else if (thing.partition === Partition.Training) {
-        groupedThings.labeledTraining.push(thing);
-      } else if (thing.partition === Partition.Validation) {
-        groupedThings.labeledValidation.push(thing);
-      }
-      return groupedThings;
-    },
-    {
-      unlabeledThings: [],
-      labeledTraining: [],
-      labeledValidation: [],
-      labeledUnassigned: [],
-    },
+    splitLabeledTraining,
+    splitLabeledValidation,
+  } = prepareTrainingData(
+    dataState.things.entities,
+    activeThingIds,
+    preprocessSettings.shuffle,
+    preprocessSettings.trainingPercentage,
+    modelStatus === ModelStatus.InitFit,
   );
 
-  const categories: Array<Category> = [];
-  const numClasses = activeKind.categories.reduce((count, id) => {
-    const category = dataState.categories.entities[id];
-    if (isUnknownCategory(id) || !category) return count;
-    categories.push(category);
-    return ++count;
-  }, 0);
+  const { categories, numClasses } = prepareClasses(
+    dataState.categories.entities,
+    activeCategories,
+  );
 
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
@@ -220,27 +191,7 @@ const fitListener = async (
 
   /* SEPARATE LABELED DATA INTO TRAINING AND VALIDATION */
 
-  let splitLabeledTraining: Thing[] = [];
-  let splitLabeledValidation: Thing[] = [];
   if (modelStatus === ModelStatus.InitFit) {
-    const trainingThingsLength = Math.round(
-      preprocessSettings.trainingPercentage * labeledUnassigned.length,
-    );
-    const validationThingsLength =
-      labeledUnassigned.length - trainingThingsLength;
-
-    const preparedLabeledUnassigned = preprocessSettings.shuffle
-      ? shuffle(labeledUnassigned)
-      : labeledUnassigned;
-
-    splitLabeledTraining = take(
-      preparedLabeledUnassigned,
-      trainingThingsLength,
-    );
-    splitLabeledValidation = takeRight(
-      preparedLabeledUnassigned,
-      validationThingsLength,
-    );
     listenerAPI.dispatch(
       dataSlice.actions.updateThings({
         updates: [
@@ -260,7 +211,6 @@ const fitListener = async (
       }),
     );
   } else {
-    splitLabeledTraining = labeledUnassigned;
     listenerAPI.dispatch(
       dataSlice.actions.updateThings({
         updates: labeledUnassigned.map((thing) => ({
@@ -273,68 +223,17 @@ const fitListener = async (
 
   /* LOAD CLASSIFIER MODEL */
 
-  try {
-    if (model instanceof SimpleCNN) {
-      (model as SimpleCNN).loadModel({
-        inputShape,
-        numClasses,
-        randomizeWeights: preprocessSettings.shuffle,
-        compileOptions,
-      });
-    } else if (model instanceof MobileNet) {
-      await (model as MobileNet).loadModel({
-        inputShape,
-        numClasses,
-        compileOptions,
-        freeze: false,
-        useCustomTopLayer: true,
-      });
-    } else {
-      import.meta.env.NODE_ENV !== "production" &&
-        import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-        console.warn("Unhandled architecture", model.name);
-      return;
-    }
-  } catch (error) {
-    handleError(
-      listenerAPI,
-      error as Error,
-      "Failed to create tensorflow model",
-      activeKindId,
-      { fittingError: true },
-    );
-    return;
-  }
-
-  /* INJECT TRAINING AND VALIDATION DATA INTO MODEL */
-
-  try {
-    const loadDataArgs = {
-      categories,
-      inputShape,
-      preprocessOptions: preprocessSettings,
-      fitOptions,
-    };
-    model.loadTraining(
-      [...labeledTraining, ...splitLabeledTraining],
-      loadDataArgs,
-    );
-    model.loadValidation(
-      [...labeledValidation, ...splitLabeledValidation],
-      loadDataArgs,
-    );
-  } catch (error) {
-    handleError(
-      listenerAPI,
-      error as Error,
-      "Error in preprocessing",
-      activeKindId,
-      {
-        fittingError: true,
-      },
-    );
-    return;
-  }
+  await prepareModel(
+    model,
+    splitLabeledTraining,
+    splitLabeledValidation,
+    numClasses,
+    categories,
+    preprocessSettings,
+    inputShape,
+    compileOptions,
+    fitOptions,
+  );
 
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
@@ -346,30 +245,7 @@ const fitListener = async (
 
   /* TRAIN MODEL */
 
-  try {
-    if (!onEpochEnd) {
-      if (import.meta.env.NODE_ENV !== "production") {
-        console.warn("Epoch end callback not provided");
-      }
-      onEpochEnd = async (epoch: number, logs: any) => {
-        logger(`Epcoch: ${epoch}`);
-        logger(logs);
-      };
-    }
-
-    const history: History = await model.train(fitOptions, { onEpochEnd });
-    import.meta.env.NODE_ENV !== "production" &&
-      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-      logger(history);
-  } catch (error) {
-    handleError(
-      listenerAPI,
-      error as Error,
-      "Error training the model",
-      activeKindId,
-    );
-    return;
-  }
+  await trainModel(model, onEpochEnd, fitOptions);
 
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({

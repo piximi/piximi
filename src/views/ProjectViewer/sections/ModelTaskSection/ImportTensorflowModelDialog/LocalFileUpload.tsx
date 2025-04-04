@@ -41,7 +41,6 @@ export const LocalFileUpload = ({
 
     if (modelTask === ModelTask.Classification) {
       const model = new UploadedClassifier({
-        TFHub: false,
         descFile,
         weightsFiles,
         name: modelName,

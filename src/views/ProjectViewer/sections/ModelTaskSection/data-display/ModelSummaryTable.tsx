@@ -11,7 +11,7 @@ import {
 import saveAs from "file-saver";
 import { useSelector } from "react-redux";
 import { selectProjectName } from "store/project/selectors";
-import { Model } from "utils/models/Model/Model";
+import { ModelLayerData } from "utils/models/types";
 
 interface Column {
   id: "layerName" | "outputShape" | "parameters" | "trainable";
@@ -35,16 +35,15 @@ const columns: readonly Column[] = [
 ];
 
 type ModelSummaryTableProps = {
-  model: Model;
+  modelSummary: ModelLayerData[];
 };
 
-export const ModelSummaryTable = (props: ModelSummaryTableProps) => {
-  const { model } = props;
+export const ModelSummaryTable = ({ modelSummary }: ModelSummaryTableProps) => {
   const projectName = useSelector(selectProjectName);
 
   const handleExportModelSummary = () => {
     const headers = columns.map((column) => column.label).join(",") + "\n";
-    const rows = model.modelSummary
+    const rows = modelSummary
       .map((row) =>
         columns
           .map((column) => {
@@ -77,7 +76,7 @@ export const ModelSummaryTable = (props: ModelSummaryTableProps) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {model.modelSummary.map((row, idx) => {
+            {modelSummary.map((row, idx) => {
               return (
                 <TableRow hover role="checkbox" tabIndex={-1} key={idx}>
                   {columns.map((column) => {
