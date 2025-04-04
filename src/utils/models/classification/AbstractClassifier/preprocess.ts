@@ -22,13 +22,7 @@ import { FitOptions, PreprocessSettings } from "../../types";
 import { CropSchema, Partition } from "../../enums";
 import { denormalizeTensor, getImageSlice } from "utils/common/tensorHelpers";
 import { BitDepth } from "utils/file-io/types";
-import {
-  OldCategory,
-  OldImageType,
-  ImageObject,
-  Shape,
-  Thing,
-} from "store/data/types";
+import { OldCategory, OldImageType, Shape, Thing } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 import { logger } from "utils/common/helpers";
 
@@ -73,7 +67,7 @@ const sampleGenerator = <T extends Omit<Thing, "kind">, K extends OldCategory>(
       let activePlane = 0;
 
       if ("activePlane" in image) {
-        activePlane = image.activePlane as ImageObject["activePlane"];
+        activePlane = image.activePlane;
       }
       const dataPlane = getImageSlice(image.data, activePlane);
 

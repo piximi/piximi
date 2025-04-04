@@ -86,8 +86,8 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{
         modelStatus: ModelStatus;
         kindId: Kind["id"];
-        onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
         nameOrArch: string | number;
+        onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
       }>,
     ) {
       const { kindId, modelStatus } = action.payload;

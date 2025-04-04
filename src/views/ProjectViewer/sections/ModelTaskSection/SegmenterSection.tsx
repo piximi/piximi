@@ -2,13 +2,11 @@ import React, { useEffect } from "react";
 
 import { Box, Stack, Typography } from "@mui/material";
 
-import { useDialog, useDialogHotkey, useSegmentationModel } from "hooks";
+import { useDialogHotkey, useSegmentationModel } from "hooks";
 
-import { SaveFittedModelDialog } from "components/dialogs";
 import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
 import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
 import { ImportTensorflowSegmentationModelDialog } from "./ImportTensorflowModelDialog";
-import { FitSegmenterDialog } from "./FitSegmenterDialog";
 
 import { HotkeyContext } from "utils/common/enums";
 import { ModelStatus } from "utils/models/enums";
@@ -31,18 +29,6 @@ export const SegmenterSection = () => {
     open: importSegmenterDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
-  const {
-    onClose: onCloseSaveSegmenterDialog,
-    onOpen: onOpenSaveSegmenterDialog,
-    open: openSaveSegmenterDialog,
-  } = useDialog();
-
-  const {
-    onClose: handleCloseFitModelDialog,
-    onOpen: handleOpenFitModelDialog,
-    open: fittingOpen,
-  } = useDialogHotkey(HotkeyContext.SegmenterDialog, false);
-
   useEffect(() => {
     if (modelStatus === ModelStatus.Trained && waitingForResults) {
       setWaitingForResults(false);
@@ -60,9 +46,9 @@ export const SegmenterSection = () => {
         px={1}
       >
         <ModelIOButtonGroup
-          hasTrainedModel={!!selectedModel}
+          hasTrainedModel={false}
           handleImportModel={onOpenImportSegmenterDialog}
-          handleSaveModel={onOpenSaveSegmenterDialog}
+          handleSaveModel={() => {}}
         />
 
         {selectedModel && (
@@ -87,7 +73,7 @@ export const SegmenterSection = () => {
         <ModelExecButtonGroup
           modelStatus={modelStatus}
           handleEvaluate={handleEvaluate}
-          handleFit={handleOpenFitModelDialog}
+          handleFit={() => {}}
           handlePredict={handlePredict}
           modelTrainable={false} //until trainable segmenter available
           helperText={helperText}
@@ -103,16 +89,6 @@ export const SegmenterSection = () => {
         onClose={onCloseImportSegmenterDialog}
         open={importSegmenterDialogOpen}
         dispatchFunction={handleImportModel}
-      />
-      {/* <SaveFittedModelDialog
-        model={selectedModel}
-        modelStatus={modelStatus}
-        onClose={onCloseSaveSegmenterDialog}
-        open={openSaveSegmenterDialog}
-      /> */}
-      <FitSegmenterDialog
-        openedDialog={fittingOpen}
-        closeDialog={handleCloseFitModelDialog}
       />
     </>
   );

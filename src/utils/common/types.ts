@@ -146,3 +146,5 @@ export type SliderOptions = {
   step: number;
   initial: number;
 };
+
+export type Points = Array<{ x: number; y: number }>;
