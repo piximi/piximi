@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -6,15 +7,14 @@ import {
   Button,
   IconButton,
   Toolbar,
-  Tooltip,
   Checkbox,
   FormGroup,
   FormControlLabel,
 } from "@mui/material";
 
-import { Close, PlayCircleOutline, Stop, Delete } from "@mui/icons-material";
+import { Close, PlayCircleOutline, Stop } from "@mui/icons-material";
 
-import { useDialogHotkey } from "hooks";
+import { useDialog } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
@@ -23,49 +23,75 @@ import { classifierSlice } from "store/classifier";
 import { dataSlice } from "store/data";
 import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
 import {
-  selectActiveClassifierFitOptions,
-  selectActiveClassifierModel,
-  selectActiveClassifierModelStatus,
+  selectClassifierFitOptions,
+  selectClassifierModel,
+  selectClassifierModelNameOrArch,
+  selectClassifierStatus,
 } from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 
 import { APPLICATION_COLORS } from "utils/common/constants";
 import { ModelStatus } from "utils/models/enums";
-import { HotkeyContext } from "utils/common/enums";
+import { AlertType } from "utils/common/enums";
+import { AlertBar } from "components/ui";
+import { AlertState } from "utils/common/types";
+import { selectAlertState } from "store/applicationSettings/selectors";
+import { useClassifierHistory } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
+import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
-  fit: any;
-  noLabels: boolean;
-  hasLabeledInference: boolean;
-  trainable: boolean;
-  currentEpoch: number;
-  modelNameOrArch: string | number;
+};
+
+const noLabeledThingsAlert: AlertState = {
+  alertType: AlertType.Info,
+  name: "No labeled images",
+  description: "Please label images to train a model.",
 };
 
 export const FitClassifierDialogAppBar = ({
   closeDialog,
-  fit,
-  noLabels,
-  hasLabeledInference,
-  trainable,
-  currentEpoch,
-  modelNameOrArch,
 }: FitClassifierDialogAppBarProps) => {
   const dispatch = useDispatch();
   const activeKindId = useSelector(selectActiveKindId);
-  const selectedModel = useSelector(selectActiveClassifierModel);
-  const modelStatus = useSelector(selectActiveClassifierModelStatus);
+  const selectedModel = useSelector(selectClassifierModel);
+  const modelStatus = useSelector(selectClassifierStatus);
+  const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
-  const epochs = useSelector(selectActiveClassifierFitOptions).epochs;
+  const epochs = useSelector(selectClassifierFitOptions).epochs;
+  const alertState = useSelector(selectAlertState);
+  const [showWarning, setShowWarning] = useState<boolean>(true);
+  const { currentEpoch, setCurrentEpoch, epochEndCallback } =
+    useClassifierHistory();
+  const { isReady, isTraining, shouldClearPredictions, error, newModelName } =
+    useClassifierStatus();
 
-  const {
-    open: warningDialogOpen,
-    onClose: handleCloseWarningDialog,
-    onOpen: handleOpenWarningDialog,
-  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
+  const { onClose, onOpen, open } = useDialog();
+  const _handleFit = async (nameOrArch: string | number) => {
+    setCurrentEpoch(0);
+    if (modelStatus === ModelStatus.Uninitialized) {
+      dispatch(
+        classifierSlice.actions.updateModelStatus({
+          kindId: activeKindId,
+          modelStatus: ModelStatus.InitFit,
+          onEpochEnd: epochEndCallback,
+          nameOrArch,
+        }),
+      );
+    } else {
+      dispatch(
+        classifierSlice.actions.updateModelStatus({
+          kindId: activeKindId,
+          modelStatus: ModelStatus.Training,
+          onEpochEnd: epochEndCallback,
+          nameOrArch,
+        }),
+      );
+    }
+  };
 
   const onStopFitting = () => {
     if (modelStatus !== ModelStatus.Training || !selectedModel) return;
@@ -81,29 +107,17 @@ export const FitClassifierDialogAppBar = ({
     );
   };
 
-  const handleDisposeModel = () => {
-    if (!selectedModel) return;
-    selectedModel.dispose();
-    dispatch(
-      classifierSlice.actions.updateModelStatus({
-        kindId: activeKindId,
-        modelStatus: ModelStatus.Uninitialized,
-        nameOrArch: modelNameOrArch,
-      }),
-    );
-  };
-
   const clearAndFit = () => {
     dispatch(
       dataSlice.actions.clearPredictions({
         kind: activeKindId,
       }),
     );
-    fit();
+    _handleFit(newModelName);
   };
   const handleFit = async () => {
-    if (hasLabeledInference && showClearPredictionsWarning) {
-      handleOpenWarningDialog();
+    if (!shouldClearPredictions) {
+      onOpen();
     } else {
       clearAndFit();
     }
@@ -119,89 +133,52 @@ export const FitClassifierDialogAppBar = ({
       }}
     >
       <Toolbar>
-        <Tooltip title="Close Dialog" placement="bottom">
-          <IconButton
-            edge="start"
-            color="primary"
-            onClick={closeDialog}
-            aria-label="Close"
-          >
-            <Close />
-          </IconButton>
-        </Tooltip>
+        <IconButton
+          edge="start"
+          color="primary"
+          onClick={closeDialog}
+          aria-label="Close"
+        >
+          <Close />
+        </IconButton>
 
         <Box sx={{ flexGrow: 1 }} />
 
-        {(modelStatus === ModelStatus.InitFit ||
-          modelStatus === ModelStatus.Loading ||
-          modelStatus === ModelStatus.Training) && (
+        {isTraining ? (
           <FitClassifierProgressBar
             epochs={epochs}
             currentEpoch={currentEpoch}
           />
-        )}
-
-        {(modelStatus === ModelStatus.Uninitialized ||
-          modelStatus >= ModelStatus.Trained) && (
-          <Tooltip
-            title={
-              noLabels
-                ? "Please label images before fitting a model."
-                : !trainable
-                  ? "Model not trainable"
-                  : "Fit the model"
-            }
+        ) : (
+          <TooltipWithDisable
+            title={error?.message ?? "Fit the model"}
             placement="bottom"
           >
-            <span>
-              <Button
-                variant="outlined"
-                onClick={handleFit}
-                disabled={noLabels || !trainable}
-                startIcon={<PlayCircleOutline />}
-                sx={{ mr: 1 }}
-              >
-                Fit Classifier
-              </Button>
-            </span>
-          </Tooltip>
+            <Button
+              variant="outlined"
+              onClick={handleFit}
+              disabled={!isReady}
+              startIcon={<PlayCircleOutline />}
+              sx={{ mr: 1 }}
+            >
+              Fit Classifier
+            </Button>
+          </TooltipWithDisable>
         )}
 
-        <Tooltip title="Stop fitting the model" placement="bottom">
-          <span>
-            <IconButton
-              onClick={onStopFitting}
-              disabled={modelStatus !== ModelStatus.Training}
-              color="primary"
-            >
-              <Stop />
-            </IconButton>
-          </span>
-        </Tooltip>
-        <Tooltip
-          title={
-            hasLabeledInference
-              ? "Clear or accept predictions before clearing"
-              : "Clear the current model"
-          }
-          placement="bottom"
-        >
-          <span>
-            <IconButton
-              onClick={handleDisposeModel}
-              disabled={
-                modelStatus !== ModelStatus.Trained || hasLabeledInference
-              }
-              color="primary"
-            >
-              <Delete />
-            </IconButton>
-          </span>
-        </Tooltip>
+        <TooltipWithDisable title="Stop fitting the model" placement="bottom">
+          <IconButton
+            onClick={onStopFitting}
+            disabled={modelStatus !== ModelStatus.Training}
+            color="primary"
+          >
+            <Stop />
+          </IconButton>
+        </TooltipWithDisable>
       </Toolbar>
       <ConfirmationDialog
-        isOpen={warningDialogOpen}
-        onClose={handleCloseWarningDialog}
+        isOpen={open}
+        onClose={onClose}
         title="Current predictions will be lost"
         content={
           <Box>
@@ -229,9 +206,19 @@ export const FitClassifierDialogAppBar = ({
         }
         onConfirm={() => {
           clearAndFit();
-          handleCloseWarningDialog();
+          onClose();
         }}
       />
+      {showWarning &&
+        noLabeledThingsAlert &&
+        (!selectedModel || selectedModel.trainable) && (
+          <AlertBar
+            setShowAlertBar={setShowWarning}
+            alertState={noLabeledThingsAlert}
+          />
+        )}
+
+      {alertState.visible && <AlertBar alertState={alertState} />}
     </AppBar>
   );
 };

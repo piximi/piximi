@@ -8,10 +8,12 @@ import {
   LossFunction,
   Metric,
   ModelStatus,
+  ModelTask,
   OptimizationAlgorithm,
 } from "./enums";
 import { ModelInfo, ModelParams } from "store/types";
 import { ClassifierEvaluationResultType } from "./types";
+import { ClonedClassifier } from "./classification/UploadedClassifier";
 
 export const availableClassifierArchitectures = [SimpleCNN, MobileNet];
 
@@ -22,19 +24,48 @@ export const availableClassificationModels: Record<
 
 export const removeModel = (modelName: string) => {
   const model = availableClassificationModels[modelName];
-  if (!model) throw new Error(`Model with name "${modelName}" does not existi`);
+  if (!model) throw new Error(`Model with name "${modelName}" does not exist`);
   model.dispose();
   delete availableClassificationModels[modelName];
 };
 
-export const createNewModel = (modelName: string, architecture: 0 | 1) => {
+export const cloneModel = async (
+  baseModel: SequentialClassifier,
+  newModelName: string,
+): Promise<SequentialClassifier> => {
+  try {
+    const modelArtifacts = await baseModel.getModelArtifacts();
+    const newModel = new ClonedClassifier({
+      modelArtifacts,
+      name: newModelName,
+      pretrained: true,
+      trainable: true,
+      task: ModelTask.Classification,
+      graph: false,
+    });
+    await newModel.loadModel();
+    availableClassificationModels[newModelName] = newModel;
+    return newModel;
+  } catch (err) {
+    throw new Error(
+      `Could not clone classifier: ${baseModel.name}`,
+      err as Error,
+    );
+  }
+};
+
+export async function createNewModel(
+  modelName: string,
+  architecture: 0 | 1,
+): Promise<SequentialClassifier> {
   try {
     const model = new availableClassifierArchitectures[architecture](modelName);
     availableClassificationModels[modelName] = model;
+    return model;
   } catch (err: any) {
     throw new Error("Failed to create Model.", err as Error);
   }
-};
+}
 
 export const getDefaultModelParams = (): ModelParams => ({
   inputShape: {

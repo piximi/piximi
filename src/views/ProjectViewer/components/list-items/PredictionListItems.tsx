@@ -19,11 +19,12 @@ import { dataSlice } from "store/data/dataSlice";
 import { selectActiveKindId } from "store/project/selectors";
 
 import { ModelStatus, Partition } from "utils/models/enums";
+import { selectClassifierModelNameOrArch } from "store/classifier/reselectors";
 
 export const PredictionListItems = () => {
   const dispatch = useDispatch();
   const activeKindId = useSelector(selectActiveKindId);
-
+  const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
   const [labeledImagesVisible, setLabeledImagesVisible] = React.useState(true);
 
   const t = useTranslation();
@@ -70,6 +71,7 @@ export const PredictionListItems = () => {
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Trained,
         kindId: activeKindId,
+        nameOrArch: modelNameOrArch,
       }),
     );
   };
@@ -83,6 +85,7 @@ export const PredictionListItems = () => {
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Trained,
         kindId: activeKindId,
+        nameOrArch: modelNameOrArch,
       }),
     );
     dispatch(

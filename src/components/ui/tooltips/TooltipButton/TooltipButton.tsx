@@ -14,7 +14,7 @@ export const TooltipButton = ({
     <Tooltip
       // can't use "sx" prop directly to access tooltip
       // see: https://github.com/mui-org/material-ui/issues/28679
-      componentsProps={{
+      slotProps={{
         tooltip: {
           sx: { backgroundColor: "#565656", fontSize: "0.85rem" },
         },
