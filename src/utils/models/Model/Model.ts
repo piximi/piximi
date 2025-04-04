@@ -189,6 +189,28 @@ export abstract class Model {
     await this._model.save(`downloads://${this.name}`);
   }
 
+  public async getModelArtifacts() {
+    if (!this._model) throw Error(`Model ${this.name} not loaded`);
+    try {
+      const returnArtifactsHandler = async (artifacts: io.ModelArtifacts) => ({
+        modelArtifactsInfo: io.getModelArtifactsInfoForJSON(artifacts),
+        artifacts,
+      });
+      const { artifacts } = (await this._model.save(
+        io.withSaveHandler(returnArtifactsHandler),
+      )) as {
+        modelArtifactsInfo: io.ModelArtifactsInfo;
+        artifacts: io.ModelArtifacts;
+      };
+      return artifacts;
+    } catch (err) {
+      throw new Error(
+        `Could not get artifacts for model: ${this.name}.`,
+        err as Error,
+      );
+    }
+  }
+
   public abstract get modelLoaded(): boolean;
   public abstract get trainingLoaded(): boolean;
   public abstract get validationLoaded(): boolean;

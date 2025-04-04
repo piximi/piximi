@@ -17,8 +17,6 @@ export const ClassifierSection = () => {
   const {
     modelStatus,
     selectedModel,
-    handlePredict,
-    handleEvaluate,
     helperText,
     waitingForResults,
     setWaitingForResults,
@@ -91,9 +89,7 @@ export const ClassifierSection = () => {
         )}
         <ModelExecButtonGroup
           modelStatus={modelStatus}
-          handleEvaluate={handleEvaluate}
           handleFit={handleOpenFitClassifierDialog}
-          handlePredict={handlePredict}
           modelTrainable={!selectedModel || selectedModel.trainable}
           helperText={helperText}
         />
@@ -103,14 +99,14 @@ export const ClassifierSection = () => {
         open={ImportClassifierDialogOpen}
         dispatchFunction={handleImportModel}
       />
-      {/* {selectedModel && (
+      {selectedModel && (
         <SaveFittedModelDialog
           model={selectedModel}
           modelStatus={modelStatus}
           onClose={handleCloseSaveClassifierDialog}
           open={SaveClassifierDialogOpen}
         />
-      )} */}
+      )}
       <FitClassifierDialog
         openedDialog={fitClassifierDialogOpen}
         closeDialog={handleCloseFitClassifierDialog}

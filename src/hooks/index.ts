@@ -14,7 +14,6 @@ export { useMobileView } from "./useMobileView";
 export { useCategoryValidation } from "./useCategoryValidation";
 export {
   useClassificationModel,
-  useFitClassificationModel,
   useSegmentationModel,
   useSegmentationModelAgain,
 } from "./useLearningModel";

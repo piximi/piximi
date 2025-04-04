@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { classifierSlice } from "store/classifier";
 import {
-  selectActiveClassifierModelStatus,
-  selectActiveClassifierModel,
+  selectClassifierStatus,
+  selectClassifierModel,
 } from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 
@@ -18,32 +18,13 @@ import { Shape } from "store/data/types";
 export const useClassificationModel = () => {
   const dispatch = useDispatch();
 
-  const modelStatus = useSelector(selectActiveClassifierModelStatus);
-  const selectedModel = useSelector(selectActiveClassifierModel);
+  const modelStatus = useSelector(selectClassifierStatus);
+  const selectedModel = useSelector(selectClassifierModel);
   const activeKindId = useSelector(selectActiveKindId);
   const [waitingForResults, setWaitingForResults] = React.useState(false);
   const [helperText, setHelperText] =
     React.useState<string>("No trained model");
 
-  const handlePredict = () => {
-    dispatch(
-      classifierSlice.actions.updateModelStatus({
-        kindId: activeKindId,
-        modelStatus: ModelStatus.Predicting,
-      }),
-    );
-  };
-
-  const handleEvaluate = async () => {
-    setWaitingForResults(true);
-
-    dispatch(
-      classifierSlice.actions.updateModelStatus({
-        kindId: activeKindId,
-        modelStatus: ModelStatus.Evaluating,
-      }),
-    );
-  };
   const handleImportModel = async (model: Model, inputShape: Shape) => {
     if (model instanceof SequentialClassifier) {
       dispatch(
@@ -89,8 +70,6 @@ export const useClassificationModel = () => {
   return {
     modelStatus,
     selectedModel,
-    handlePredict,
-    handleEvaluate,
     helperText,
     waitingForResults,
     setWaitingForResults,
