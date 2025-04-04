@@ -33,7 +33,7 @@ export enum OptimizationAlgorithm {
 
 export enum LossFunction {
   AbsoluteDifference = "Absolute difference",
-  CategoricalCrossEntropy = "Categorical (softmax) cross entropy",
+  CategoricalCrossEntropy = "Categorical cross entropy",
   /*
    * Disabled CosineDistance - see comment in
    * store/common/coroutines/compile.ts

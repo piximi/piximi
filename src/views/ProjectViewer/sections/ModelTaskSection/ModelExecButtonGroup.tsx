@@ -11,20 +11,18 @@ import { TooltipButton } from "components/ui/tooltips/TooltipButton/TooltipButto
 import { ModelStatus } from "utils/models/enums";
 
 export const ModelExecButtonGroup = ({
-  handlePredict,
-  handleEvaluate,
   handleFit,
   modelStatus,
   modelTrainable,
   helperText,
 }: {
-  handlePredict: () => void;
-  handleEvaluate: () => void;
   handleFit: () => void;
   modelStatus: ModelStatus;
   modelTrainable: boolean;
   helperText: string;
 }) => {
+  const handlePredict = () => {};
+  const handleEvaluate = () => {};
   return (
     <Box width="100%" display="flex" justifyContent={"space-evenly"}>
       <TooltipButton

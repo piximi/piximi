@@ -13,7 +13,7 @@ import { Language as LanguageIcon } from "@mui/icons-material";
 
 import { useDebounce } from "hooks";
 
-import { UploadedClassifier } from "utils/models/classification";
+import { RemoteClassifier } from "utils/models/classification/UploadedClassifier";
 import { Model } from "utils/models/Model";
 
 import { ModelTask } from "utils/models/enums";
@@ -37,7 +37,7 @@ export const CloudUpload = ({
   const [isFromTFHub, setIsFromTFHub] = useState(false);
 
   const verifySourceMatch = (url: string, isFromTFHub: boolean) => {
-    if (isFromTFHub && !UploadedClassifier.verifyTFHubUrl(url)) {
+    if (isFromTFHub && !RemoteClassifier.verifyTFHubUrl(url)) {
       setErrMessage("URL must point to TFHub");
       return;
     }
@@ -63,7 +63,7 @@ export const CloudUpload = ({
     setSuccessMessage("");
 
     if (modelTask === ModelTask.Classification) {
-      const model = new UploadedClassifier({
+      const model = new RemoteClassifier({
         name: "User Uploaded Classifier",
         task: modelTask,
         pretrained: true,

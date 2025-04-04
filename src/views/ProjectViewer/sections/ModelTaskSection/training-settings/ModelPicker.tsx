@@ -1,177 +1,284 @@
 import {
   Box,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormLabel,
+  Button,
+  ButtonGroup,
+  Grid2 as Grid,
   MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
-  SelectProps,
+  SelectChangeEvent,
+  Stack,
   Typography,
 } from "@mui/material";
+import { StyledSelect } from "../../../components/StyledSelect";
+import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { classifierSlice } from "store/classifier";
+import {
+  selectAvailibleClassifierNames,
+  selectClassifierModel,
+  selectClassifierModelNameOrArch,
+} from "store/classifier/reselectors";
+import { selectActiveKindObject } from "store/project/reselectors";
+import { selectActiveKindId } from "store/project/selectors";
 import { availableClassificationModels } from "utils/models/availableClassificationModels";
+import { ModelStatus } from "utils/models/enums";
+import { TextFieldWithBlur } from "views/ProjectViewer/components/TextFieldWithBlur";
+import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { WithLabel } from "views/ProjectViewer/components/WithLabel";
 
-export const ModelPicker = ({
-  trainingType,
-  setTrainingType,
-  archOrName,
-  setArchOrName,
-}: {
-  trainingType: "new" | "existing";
-  setTrainingType: React.Dispatch<React.SetStateAction<"new" | "existing">>;
-  archOrName: string | number;
-  setArchOrName: React.Dispatch<React.SetStateAction<string | number>>;
-}) => {
+export const ModelPicker = () => {
+  const dispatch = useDispatch();
+  const activeKindId = useSelector(selectActiveKindId);
+  const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
+  const handleModelTypeChange = (nameOrArch: number | string) => {
+    console.log("modelArchitectureChange: ", nameOrArch); //LOG:
+    dispatch(
+      classifierSlice.actions.updateSelectedModelNameOrArch({
+        kindId: activeKindId,
+        modelName: nameOrArch,
+      }),
+    );
+  };
+
   return (
     <Box py={2}>
-      <Typography gutterBottom>
+      <Typography gutterBottom align="left">
         Train a new model with selected architecture or continue training an
         existing model
       </Typography>
-      <FormControl fullWidth>
-        <RadioGroup
-          row
-          value={trainingType}
-          onChange={(event) => {
-            const type = event.target.value as "new" | "existing";
-            setTrainingType(type);
-          }}
-          sx={{ width: "100%", justifyContent: "space-evenly" }}
-        >
-          <FormControlLabel
-            control={<Radio size="small" />}
-            value={"new"}
-            label={
-              <FormControl
-                size="small"
-                sx={{ flexDirection: "row", alignItems: "center" }}
-                disabled={trainingType !== "new"}
-              >
-                <FormLabel
-                  sx={(theme) => ({
-                    fontSize: theme.typography.body2.fontSize,
-                    mr: "1rem",
-                  })}
-                >
-                  New Model Architecture:
-                </FormLabel>
-                <FormGroup>
-                  <StyledSelect
-                    value={typeof archOrName === "number" ? archOrName : ""}
-                    onChange={(event) => {
-                      const ind = event.target.value as 0 | 1;
-                      setArchOrName(ind);
-                    }}
-                  >
-                    <MenuItem
-                      dense
-                      value={0}
-                      sx={{
-                        borderRadius: 0,
-                        minHeight: "1rem",
-                      }}
-                    >
-                      Simple CNN
-                    </MenuItem>
-                    <MenuItem
-                      dense
-                      value={1}
-                      sx={{ borderRadius: 0, minHeight: "1rem" }}
-                    >
-                      MobileNet
-                    </MenuItem>
-                  </StyledSelect>
-                </FormGroup>
-              </FormControl>
-            }
+      <Grid container spacing={2} p={2}>
+        <Grid size={6}>
+          <ModelArchiitectureOptions
+            modelNameOrArch={modelNameOrArch}
+            onArchitectureChange={handleModelTypeChange}
           />
-          <FormControlLabel
-            control={<Radio size="small" />}
-            value={"existing"}
-            disabled={Object.keys(availableClassificationModels).length === 0}
-            label={
-              <FormControl
-                size="small"
-                sx={{ flexDirection: "row", alignItems: "center" }}
-                disabled={trainingType !== "existing"}
-              >
-                <FormLabel
-                  sx={(theme) => ({
-                    fontSize: theme.typography.body2.fontSize,
-                    mr: "1rem",
-                  })}
-                >
-                  Pre-Trained Model:
-                </FormLabel>
-                <FormGroup>
-                  <StyledSelect
-                    value={typeof archOrName === "string" ? archOrName : ""}
-                    onChange={(event) => {
-                      const name = event.target.value as string;
-                      setArchOrName(name);
-                    }}
-                  >
-                    {Object.keys(availableClassificationModels).map(
-                      (modelName, idx) => (
-                        <MenuItem
-                          key={modelName + idx}
-                          dense
-                          value={modelName}
-                          sx={{
-                            borderRadius: 0,
-                            minHeight: "1rem",
-                          }}
-                        >
-                          {modelName}
-                        </MenuItem>
-                      ),
-                    )}
-                  </StyledSelect>
-                </FormGroup>
-              </FormControl>
-            }
+        </Grid>
+        <Grid size={6}>
+          <PretrainedModelOptions
+            modelNameOrArch={modelNameOrArch}
+            onModelChange={handleModelTypeChange}
           />
-        </RadioGroup>
-      </FormControl>
+        </Grid>
+      </Grid>
     </Box>
   );
 };
 
-const StyledSelect = (props: SelectProps) => {
+const ModelArchiitectureOptions = ({
+  modelNameOrArch,
+  onArchitectureChange,
+}: {
+  modelNameOrArch: string | number;
+  onArchitectureChange: (arch: number) => void;
+}) => {
+  const selectedModel = useSelector(selectClassifierModel);
+  const availableClassifierNames = useSelector(selectAvailibleClassifierNames);
+  const activeKind = useSelector(selectActiveKindObject);
+  const [userHasUpdated, setUsrHasUpdated] = useState(false);
+  const { setNewModelName: setConfirmedName } = useClassifierStatus();
+  const [modelName, setModelName] = useState("");
+
+  const handleArchitectureChange = (event: SelectChangeEvent<unknown>) => {
+    const value = event.target.value as number;
+    onArchitectureChange(value);
+  };
+  const handleNameChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const value = event.target.value;
+    console.log("onChange value: ", value);
+    if (!userHasUpdated) setUsrHasUpdated(true);
+    setModelName(value);
+  };
+
+  const handleConfirmName = () => {
+    setConfirmedName(modelName);
+  };
+
+  useEffect(() => {
+    if (userHasUpdated || !!selectedModel) return;
+    const candidateName = `${activeKind.displayName}_${modelNameOrArch === 0 ? "simple-cnn" : "mobilenet"}`;
+    const availabbleNames = availableClassifierNames.join(", ");
+    const replicates = availabbleNames.match(new RegExp(candidateName, "g"));
+    console.log("candidateName: ", candidateName);
+    console.log("replicates: ", replicates);
+    if (!replicates) {
+      setModelName(candidateName);
+      setConfirmedName(candidateName);
+      return;
+    }
+    setModelName(candidateName + replicates.length);
+    setConfirmedName(candidateName + replicates.length);
+  }, [
+    userHasUpdated,
+    availableClassifierNames,
+    selectedModel,
+    modelNameOrArch,
+  ]);
+
+  useEffect(() => {
+    console.log("modelName: ", modelName);
+  }, [modelName]);
+
   return (
-    <Select
-      {...props}
-      MenuProps={{
-        sx: {
-          py: 0,
-          "& .MuiList-root-MuiMenu-list": { py: 0 },
-          "& ul": {
-            py: 0,
-          },
-        },
-        slotProps: {
-          list: {
-            sx: {
-              py: 0,
-              backgroundColor: "red",
-              display: "none",
+    <Stack width="80%" spacing={2}>
+      <WithLabel
+        label="New Model Architecture:"
+        labelProps={{
+          variant: "body2",
+          sx: { mr: "1rem", whiteSpace: "nowrap" },
+        }}
+      >
+        <StyledSelect
+          value={typeof modelNameOrArch === "number" ? modelNameOrArch : -1}
+          onChange={handleArchitectureChange}
+          fullWidth
+        >
+          <MenuItem
+            dense
+            value={0}
+            sx={{
+              borderRadius: 0,
+              minHeight: "1rem",
+            }}
+          >
+            Simple CNN
+          </MenuItem>
+          <MenuItem dense value={1} sx={{ borderRadius: 0, minHeight: "1rem" }}>
+            MobileNet
+          </MenuItem>
+        </StyledSelect>
+      </WithLabel>
+      <WithLabel
+        label="Model Name:"
+        labelProps={{
+          variant: "body2",
+          sx: { mr: "1rem", whiteSpace: "nowrap" },
+        }}
+      >
+        <TextFieldWithBlur
+          size="small"
+          onChange={handleNameChange}
+          value={modelName}
+          fullWidth
+          onBlur={handleConfirmName}
+          sx={(theme) => ({
+            input: {
+              py: 0.5,
+              fontSize: theme.typography.body2.fontSize,
+              minHeight: "1rem",
             },
-          },
-          paper: {
-            sx: {
-              borderRadius: "0 0 4px 4px",
-            },
-          },
-        },
-      }}
-      sx={(theme) => ({
-        fontSize: theme.typography.body2.fontSize,
-        minHeight: "1rem",
-      })}
-    >
-      {props.children}
-    </Select>
+          })}
+        />
+      </WithLabel>
+    </Stack>
+  );
+};
+
+const PretrainedModelOptions = ({
+  modelNameOrArch,
+  onModelChange,
+}: {
+  modelNameOrArch: string | number;
+  onModelChange: (modelName: string) => void;
+}) => {
+  const { shouldClearPredictions, isReady } = useClassifierStatus();
+  const dispatch = useDispatch();
+  const selectedModel = useSelector(selectClassifierModel);
+  const activeKindId = useSelector(selectActiveKindId);
+  const handleModelChange = (event: SelectChangeEvent<unknown>) => {
+    const value = event.target.value as string;
+    onModelChange(value);
+  };
+  const handleDisposeModel = () => {
+    if (!selectedModel) return;
+    selectedModel.dispose();
+    dispatch(
+      classifierSlice.actions.updateModelStatus({
+        kindId: activeKindId,
+        modelStatus: ModelStatus.Uninitialized,
+        nameOrArch: selectedModel.name,
+      }),
+    );
+  };
+  return (
+    <Stack spacing={2} width="80%">
+      <WithLabel
+        label="Pre-Trained Model:"
+        labelProps={{
+          variant: "body2",
+          sx: { mr: "1rem", whiteSpace: "nowrap" },
+        }}
+      >
+        <StyledSelect
+          value={typeof modelNameOrArch === "string" ? modelNameOrArch : ""}
+          onChange={handleModelChange}
+          fullWidth
+        >
+          {Object.keys(availableClassificationModels).map((modelName, idx) => (
+            <MenuItem
+              key={modelName + idx}
+              dense
+              value={modelName}
+              sx={{
+                borderRadius: 0,
+                minHeight: "1rem",
+              }}
+            >
+              {modelName}
+            </MenuItem>
+          ))}
+        </StyledSelect>
+      </WithLabel>
+      <ButtonGroup sx={{ width: "100%", justifyContent: "space-evenly" }}>
+        <TooltipWithDisable
+          title={
+            shouldClearPredictions
+              ? "Clear or accept predictions before clearing"
+              : "Clear the current model"
+          }
+          placement="bottom"
+        >
+          <Button
+            onClick={handleDisposeModel}
+            disableFocusRipple
+            disabled={!isReady}
+            color="primary"
+            variant="text"
+            sx={(theme) => ({
+              py: 1,
+              pl: 0,
+              fontSize: theme.typography.caption.fontSize,
+              backgroundColor: "transparent",
+            })}
+          >
+            Delete Model
+          </Button>
+        </TooltipWithDisable>
+        <TooltipWithDisable
+          title={
+            shouldClearPredictions
+              ? "Clear or accept predictions before clearing"
+              : "Clear the current model"
+          }
+          placement="bottom"
+        >
+          <Button
+            onClick={handleDisposeModel}
+            disableFocusRipple
+            disabled={!isReady}
+            color="primary"
+            variant="text"
+            sx={(theme) => ({
+              p: 1,
+              fontSize: theme.typography.caption.fontSize,
+              backgroundColor: "transparent",
+            })}
+          >
+            Clone Model
+          </Button>
+        </TooltipWithDisable>
+      </ButtonGroup>
+    </Stack>
   );
 };
