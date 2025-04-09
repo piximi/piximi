@@ -84,7 +84,7 @@ export const TrainingStrategySettings = () => {
               onChange={handleNumEpochsChange}
               value={numEpochs}
               onBlur={dispatchNumEpochs}
-              disabled={trainable}
+              disabled={!trainable}
               slotProps={{
                 inputLabel: { sx: { top: "-2px" } },
               }}
@@ -112,7 +112,7 @@ export const TrainingStrategySettings = () => {
                 onChange={handleBatchSizeChange}
                 value={batchSize}
                 onBlur={dispatchBatchSize}
-                disabled={trainable}
+                disabled={!trainable}
                 slotProps={{
                   inputLabel: { sx: { top: "-2px" } },
                 }}

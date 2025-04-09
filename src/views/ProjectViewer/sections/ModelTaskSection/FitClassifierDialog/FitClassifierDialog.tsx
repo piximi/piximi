@@ -5,18 +5,14 @@ import { DialogTransitionSlide } from "components/dialogs";
 
 import { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
 
-import { ModelStatus } from "utils/models/enums";
 import { ToolTipTab } from "components/layout";
 import { useEffect, useMemo, useState } from "react";
 import { TrainingSettings } from "../training-settings/TrainingSettings";
 import TrainingPlots from "./TrainingPlots";
 import { useClassifierHistory } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
-import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+
 import { useSelector } from "react-redux";
-import {
-  selectClassifierModel,
-  selectClassifierModelInfo,
-} from "store/classifier/reselectors";
+import { selectClassifierModel } from "store/classifier/reselectors";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
