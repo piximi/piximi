@@ -32,12 +32,10 @@ export const classifierConverterv1_v11 = (
   };
 
   kindIds.forEach((kindId) => {
-    kindClassifiers[kindId] = { modelNameOrArch: 0, modelInfoDict: {} };
-    for (const i in availableClassifierArchitectures)
-      kindClassifiers[kindId].modelInfoDict[i] = {
-        ...getDefaultModelInfo(),
-        params: modelParams,
-      };
+    kindClassifiers[kindId] = {
+      modelNameOrArch: 0,
+      modelInfoDict: { "base-model": getDefaultModelInfo() },
+    };
   });
   return {
     showClearPredictionsWarning: true,
