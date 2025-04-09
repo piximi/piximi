@@ -36,7 +36,7 @@ export const ModelPicker = () => {
       classifierSlice.actions.updateSelectedModelNameOrArch({
         kindId: activeKindId,
         modelName: nameOrArch,
-      }),
+      })
     );
   };
 
@@ -83,7 +83,7 @@ const ModelArchiitectureOptions = ({
     onArchitectureChange(value);
   };
   const handleNameChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const value = event.target.value;
     console.log("onChange value: ", value);
@@ -97,11 +97,10 @@ const ModelArchiitectureOptions = ({
 
   useEffect(() => {
     if (userHasUpdated || !!selectedModel) return;
-    const candidateName = `${activeKind.displayName}_${modelNameOrArch === 0 ? "simple-cnn" : "mobilenet"}`;
+    const candidateName = `${activeKind.displayName}_${modelNameOrArch === 0 ? "Simple-CNN" : "Mobilenet"}`;
     const availabbleNames = availableClassifierNames.join(", ");
     const replicates = availabbleNames.match(new RegExp(candidateName, "g"));
-    console.log("candidateName: ", candidateName);
-    console.log("replicates: ", replicates);
+
     if (!replicates) {
       setModelName(candidateName);
       setConfirmedName(candidateName);
@@ -116,10 +115,6 @@ const ModelArchiitectureOptions = ({
     modelNameOrArch,
   ]);
 
-  useEffect(() => {
-    console.log("modelName: ", modelName);
-  }, [modelName]);
-
   return (
     <Stack width="80%" spacing={2}>
       <WithLabel
@@ -130,7 +125,7 @@ const ModelArchiitectureOptions = ({
         }}
       >
         <StyledSelect
-          value={typeof modelNameOrArch === "number" ? modelNameOrArch : -1}
+          value={typeof modelNameOrArch === "number" ? modelNameOrArch : ""}
           onChange={handleArchitectureChange}
           fullWidth
         >
@@ -161,6 +156,7 @@ const ModelArchiitectureOptions = ({
           onChange={handleNameChange}
           value={modelName}
           fullWidth
+          disabled={typeof modelNameOrArch === "string"}
           onBlur={handleConfirmName}
           sx={(theme) => ({
             input: {
@@ -198,7 +194,7 @@ const PretrainedModelOptions = ({
         kindId: activeKindId,
         modelStatus: ModelStatus.Uninitialized,
         nameOrArch: selectedModel.name,
-      }),
+      })
     );
   };
   return (
@@ -242,7 +238,7 @@ const PretrainedModelOptions = ({
           <Button
             onClick={handleDisposeModel}
             disableFocusRipple
-            disabled={!isReady}
+            disabled={typeof modelNameOrArch === "number"}
             color="primary"
             variant="text"
             sx={(theme) => ({
@@ -266,7 +262,7 @@ const PretrainedModelOptions = ({
           <Button
             onClick={handleDisposeModel}
             disableFocusRipple
-            disabled={!isReady}
+            disabled={typeof modelNameOrArch === "number"}
             color="primary"
             variant="text"
             sx={(theme) => ({
