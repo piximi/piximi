@@ -10,9 +10,16 @@ import {
   Checkbox,
   FormGroup,
   FormControlLabel,
+  Tooltip,
+  Icon,
+  Typography,
 } from "@mui/material";
-
-import { Close, PlayCircleOutline, Stop } from "@mui/icons-material";
+import {
+  Close,
+  PlayCircleOutline,
+  Stop,
+  WarningAmber,
+} from "@mui/icons-material";
 
 import { useDialog } from "hooks";
 
@@ -143,6 +150,27 @@ export const FitClassifierDialogAppBar = ({
         </IconButton>
 
         <Box sx={{ flexGrow: 1 }} />
+        {!!error && (
+          <Tooltip
+            slotProps={{
+              tooltip: {
+                sx: (theme) => ({
+                  backgroundColor: theme.palette.warning.main,
+                  fontSize: theme.typography.body2.fontSize,
+                  color: theme.palette.getContrastText(
+                    theme.palette.warning.main,
+                  ),
+                  maxWidth: "none",
+                }),
+              },
+            }}
+            title={error.message}
+          >
+            <Icon>
+              <WarningAmber color="warning" />
+            </Icon>
+          </Tooltip>
+        )}
 
         {isTraining ? (
           <FitClassifierProgressBar
@@ -150,20 +178,15 @@ export const FitClassifierDialogAppBar = ({
             currentEpoch={currentEpoch}
           />
         ) : (
-          <TooltipWithDisable
-            title={error?.message ?? "Fit the model"}
-            placement="bottom"
+          <Button
+            variant="outlined"
+            onClick={handleFit}
+            disabled={!isReady}
+            startIcon={<PlayCircleOutline />}
+            sx={{ mx: 1 }}
           >
-            <Button
-              variant="outlined"
-              onClick={handleFit}
-              disabled={!isReady}
-              startIcon={<PlayCircleOutline />}
-              sx={{ mr: 1 }}
-            >
-              Fit Classifier
-            </Button>
-          </TooltipWithDisable>
+            Fit Classifier
+          </Button>
         )}
 
         <TooltipWithDisable title="Stop fitting the model" placement="bottom">
@@ -209,16 +232,6 @@ export const FitClassifierDialogAppBar = ({
           onClose();
         }}
       />
-      {showWarning &&
-        noLabeledThingsAlert &&
-        (!selectedModel || selectedModel.trainable) && (
-          <AlertBar
-            setShowAlertBar={setShowWarning}
-            alertState={noLabeledThingsAlert}
-          />
-        )}
-
-      {alertState.visible && <AlertBar alertState={alertState} />}
     </AppBar>
   );
 };
