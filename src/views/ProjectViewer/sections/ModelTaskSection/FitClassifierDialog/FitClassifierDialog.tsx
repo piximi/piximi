@@ -25,10 +25,11 @@ export const FitClassifierDialog = ({
 }: FitClassifierDialogProps) => {
   const [tabVal, setTabVal] = useState("1");
   const { modelHistory } = useClassifierHistory();
+  const selectedModel = useSelector(selectClassifierModel);
+
   const showPlots = useMemo(() => {
     return modelHistory.categoricalAccuracy.length > 0;
   }, [modelHistory]);
-  const selectedModel = useSelector(selectClassifierModel);
   const onTabSelect = (_event: React.SyntheticEvent, newValue: string) => {
     setTabVal(newValue);
   };
