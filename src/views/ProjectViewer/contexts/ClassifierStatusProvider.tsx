@@ -98,6 +98,8 @@ export const ClassifierStatusProvider = ({
   );
 
   useEffect(() => {
+    console.log("trainable: ", trainable);
+    console.log("noLabeledThings: ", noLabeledThings);
     if (!trainable) {
       setIsReady(false);
       setError({
@@ -111,11 +113,7 @@ export const ClassifierStatusProvider = ({
         message: "Please label images to train a model.",
       });
     }
-  }, [selectedModel]);
-
-  useEffect(() => {
-    console.log("newModelName:", newModelName); //LOG:
-  }, [newModelName]);
+  }, [selectedModel, trainable, noLabeledThings]);
 
   return (
     <ClassifierStatusContext.Provider
