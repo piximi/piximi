@@ -86,15 +86,15 @@ export abstract class Model {
   public abstract loadModel(loadModelArgs?: any): void | Promise<void>;
   public abstract loadTraining(
     images: ImageObject[],
-    preprocessingArgs: any,
+    preprocessingArgs: any
   ): void;
   public abstract loadValidation(
     images: ImageObject[],
-    preprocessingArgs: any,
+    preprocessingArgs: any
   ): void;
   public abstract loadInference(
     images: ImageObject[],
-    preprocessingArgs: any,
+    preprocessingArgs: any
   ): void;
 
   public abstract train(options: any, callbacks: any): Promise<History>;
@@ -115,7 +115,7 @@ export abstract class Model {
       if (modelArtifacts.modelTopology instanceof ArrayBuffer) {
         throw new Error(
           "BrowserDownloads.save() does not support saving model topology " +
-            "in binary formats yet.",
+            "in binary formats yet."
         );
       } else {
         const weightsManifest = [
@@ -170,7 +170,7 @@ export abstract class Model {
     };
     if (!this._model) throw Error(`Model ${this.name} not loaded`);
     const output = (await this._model.save(
-      io.withSaveHandler(saveHandler),
+      io.withSaveHandler(saveHandler)
     )) as {
       modelArtifactsInfo: io.ModelArtifactsInfo;
       modelJsonBlob: Blob;
@@ -197,7 +197,7 @@ export abstract class Model {
         artifacts,
       });
       const { artifacts } = (await this._model.save(
-        io.withSaveHandler(returnArtifactsHandler),
+        io.withSaveHandler(returnArtifactsHandler)
       )) as {
         modelArtifactsInfo: io.ModelArtifactsInfo;
         artifacts: io.ModelArtifacts;
@@ -206,7 +206,7 @@ export abstract class Model {
     } catch (err) {
       throw new Error(
         `Could not get artifacts for model: ${this.name}.`,
-        err as Error,
+        err as Error
       );
     }
   }
@@ -219,7 +219,7 @@ export abstract class Model {
   public abstract get defaultInputShape(): number[];
   public abstract get defaultOutputShape(): number[] | undefined;
 
-  public abstract get modelSummary(): Array<ModelLayerData>;
+  public abstract get modelSummary(): Array<ModelLayerData> | undefined;
 
   //abstract onEpochEnd: TrainingCallbacks["onEpochEnd"];
 

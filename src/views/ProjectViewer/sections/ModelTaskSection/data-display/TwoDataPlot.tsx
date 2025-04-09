@@ -73,7 +73,7 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
       </Typography>
       <ResponsiveLine
         data={data}
-        theme={nivoTheme}
+        theme={{ ...nivoTheme, background: "transparent" }}
         lineWidth={3}
         margin={{ top: 10, right: matchesBP ? 10 : 170, bottom: 80, left: 70 }}
         xScale={{ type: "linear" }}
