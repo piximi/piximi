@@ -1,4 +1,5 @@
 import { Box, LinearProgress, Typography } from "@mui/material";
+import { useEffect } from "react";
 
 type FitClassifierProgressBarProps = {
   epochs: number;

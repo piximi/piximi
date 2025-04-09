@@ -15,7 +15,7 @@ const validateInput = (
     min: 0,
     max: 100,
     float: false,
-  },
+  }
 ): ValidationError => {
   const rangeAssertion: string = ` between ${options.min} and ${options.max}`;
 
@@ -24,6 +24,7 @@ const validateInput = (
   } ${rangeAssertion}`;
 
   const regExp = options.float ? floatRegExpr : intRegExpr;
+
   if (!regExp.test(input) || input === "") {
     return {
       error: true,
@@ -57,7 +58,7 @@ export const useNumberField = (
     min: Number.MIN_SAFE_INTEGER,
     max: Number.MAX_SAFE_INTEGER,
     enableFloat: false,
-  },
+  }
 ) => {
   const [inputValue, setInputValue] = useState<number>(initialValue);
   const [error, setError] = useState<ValidationError>({
@@ -65,14 +66,12 @@ export const useNumberField = (
   });
 
   const handleOnChangeValidation = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const inputString = event.target.value;
 
-    const validationResults = validateInput(inputString, options);
-    if (validationResults.error) return;
     setInputValue(Number(inputString));
-
+    const validationResults = validateInput(inputString, options);
     setError(validationResults);
   };
 
