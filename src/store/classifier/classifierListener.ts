@@ -16,7 +16,11 @@ import { SequentialClassifier } from "utils/models/classification";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/common/enums";
 
-import { StoreListemerAPI, TypedAppStartListening } from "store/types";
+import {
+  ModelInfo,
+  StoreListemerAPI,
+  TypedAppStartListening,
+} from "store/types";
 import {
   FitOptions,
   OptimizerSettings,
@@ -34,6 +38,7 @@ import {
   prepareTrainingData,
   trainModel,
 } from "./fit";
+import { deepClone } from "@mui/x-data-grid/internals";
 
 export const classifierMiddleware = createListenerMiddleware();
 
@@ -45,7 +50,7 @@ const handleError = async (
   error: Error,
   name: string,
   kindId: Kind["id"],
-  errorType?: { fittingError: boolean },
+  errorType?: { fittingError: boolean }
 ) => {
   const stackTrace = await getStackTraceFromError(error);
   const alertState: AlertState = {
@@ -60,13 +65,13 @@ const handleError = async (
       "\n",
       alertState.description,
       "\n",
-      alertState.stackTrace,
+      alertState.stackTrace
     );
   }
   listenerAPI.dispatch(
     applicationSettingsSlice.actions.updateAlertState({
       alertState: alertState,
-    }),
+    })
   );
   if (errorType && errorType.fittingError) {
     listenerAPI.dispatch(
@@ -74,7 +79,7 @@ const handleError = async (
         kindId,
         modelStatus: ModelStatus.Uninitialized,
         nameOrArch: name,
-      }),
+      })
     );
   }
 };
@@ -93,7 +98,11 @@ startAppListening({
     switch (action.payload.modelStatus) {
       case ModelStatus.InitFit:
       case ModelStatus.Training:
-        await fitListener(action.payload.onEpochEnd, listenerAPI);
+        await fitListener(
+          action.payload.onEpochEnd,
+          listenerAPI,
+          action.payload.nameOrArch as string
+        );
         break;
       case ModelStatus.Predicting:
         await predictListener(listenerAPI, action.payload.nameOrArch);
@@ -110,6 +119,7 @@ startAppListening({
 const fitListener = async (
   onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
   listenerAPI: StoreListemerAPI,
+  newModelName: string
 ) => {
   import.meta.env.NODE_ENV !== "production" &&
     import.meta.env.VITE_APP_LOG_LEVEL === "3" &&
@@ -135,17 +145,25 @@ const fitListener = async (
     classifierState.kindClassifiers[activeKindId];
 
   let model: SequentialClassifier;
+  let modelInfo: ModelInfo;
+  let willUpdateSelectedModel = false;
   if (typeof modelNameOrArch === "string") {
     model = availableClassificationModels[modelNameOrArch];
+    modelInfo = modelInfoDict[modelNameOrArch];
   } else {
-    const modelName = `${activeKindId}_${["SimpleCNN", "MobileNet"][modelNameOrArch]}`;
-    model = await createNewModel(modelName, modelNameOrArch as 0 | 1);
+    model = await createNewModel(newModelName, modelNameOrArch as 0 | 1);
+    console.log(availableClassificationModels);
+    modelInfo = deepClone(modelInfoDict["base-model"]);
+    listenerAPI.dispatch(
+      classifierSlice.actions.addModelInfo({
+        kindId: activeKindId,
+        modelName: newModelName,
+        modelInfo: modelInfo,
+      })
+    );
+    willUpdateSelectedModel = true;
   }
 
-  const modelInfo =
-    modelInfoDict[
-      typeof modelNameOrArch === "string" ? modelNameOrArch : "base-model"
-    ];
   const modelStatus = modelInfo.status;
   const { optimizerSettings, preprocessSettings, inputShape } =
     modelInfo.params;
@@ -173,12 +191,12 @@ const fitListener = async (
     activeThingIds,
     preprocessSettings.shuffle,
     preprocessSettings.trainingPercentage,
-    modelStatus === ModelStatus.InitFit,
+    modelStatus === ModelStatus.Uninitialized
   );
 
   const { categories, numClasses } = prepareClasses(
     dataState.categories.entities,
-    activeCategories,
+    activeCategories
   );
 
   listenerAPI.dispatch(
@@ -186,7 +204,7 @@ const fitListener = async (
       kindId: activeKindId,
       modelStatus: ModelStatus.Loading,
       nameOrArch: model.name,
-    }),
+    })
   );
 
   /* SEPARATE LABELED DATA INTO TRAINING AND VALIDATION */
@@ -208,7 +226,7 @@ const fitListener = async (
             partition: Partition.Inference,
           })),
         ],
-      }),
+      })
     );
   } else {
     listenerAPI.dispatch(
@@ -217,7 +235,7 @@ const fitListener = async (
           id: thing.id,
           partition: Partition.Training,
         })),
-      }),
+      })
     );
   }
 
@@ -232,33 +250,44 @@ const fitListener = async (
     preprocessSettings,
     inputShape,
     compileOptions,
-    fitOptions,
+    fitOptions
   );
+
+  willUpdateSelectedModel &&
+    listenerAPI.dispatch(
+      classifierSlice.actions.updateSelectedModelNameOrArch({
+        modelName: newModelName,
+        kindId: activeKindId,
+      })
+    );
 
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
       kindId: activeKindId,
       modelStatus: ModelStatus.Training,
       nameOrArch: model.name,
-    }),
+    })
   );
 
   /* TRAIN MODEL */
-
-  await trainModel(model, onEpochEnd, fitOptions);
+  try {
+    await trainModel(model, onEpochEnd, fitOptions);
+  } catch (error) {
+    handleError(listenerAPI, error as Error, "training Error", activeKindId);
+  }
 
   listenerAPI.dispatch(
     classifierSlice.actions.updateModelStatus({
       kindId: activeKindId,
       modelStatus: ModelStatus.Trained,
       nameOrArch: model.name,
-    }),
+    })
   );
 };
 
 const predictListener = async (
   listenerAPI: StoreListemerAPI,
-  modelName: string | number,
+  modelName: string | number
 ) => {
   const {
     data: dataState,
@@ -274,10 +303,10 @@ const predictListener = async (
   if (!activeKind) return;
   const activeThingIds = activeKind.containing;
   const activeCategoryIds = activeKind.categories.filter(
-    (id) => !isUnknownCategory(id),
+    (id) => !isUnknownCategory(id)
   );
   const activeCategories = activeCategoryIds.map(
-    (id) => dataState.categories.entities[id]!,
+    (id) => dataState.categories.entities[id]!
   );
   const inferenceThings = activeThingIds.reduce((things: Array<Thing>, id) => {
     const thing = dataState.things.entities[id];
@@ -327,7 +356,7 @@ const predictListener = async (
       listenerAPI,
       new Error("No selectable model in store"),
       "Failed to get tensorflow model",
-      activeKindId,
+      activeKindId
     );
   }
 
@@ -335,7 +364,7 @@ const predictListener = async (
 
   if (alertState) {
     listenerAPI.dispatch(
-      applicationSettingsSlice.actions.updateAlertState({ alertState }),
+      applicationSettingsSlice.actions.updateAlertState({ alertState })
     );
   } else {
     try {
@@ -356,7 +385,7 @@ const predictListener = async (
               id: thingId,
               categoryId: categoryIds[idx],
             })),
-          }),
+          })
         );
       }
       finalModelStatus = ModelStatus.Suggesting;
@@ -365,7 +394,7 @@ const predictListener = async (
         listenerAPI,
         error as Error,
         "Error in preprocessing the inference data",
-        activeKindId,
+        activeKindId
       );
     }
   }
@@ -375,13 +404,13 @@ const predictListener = async (
       kindId: activeKindId,
       modelStatus: finalModelStatus,
       nameOrArch: model.name,
-    }),
+    })
   );
 };
 
 const evaluateListener = async (
   listenerAPI: StoreListemerAPI,
-  modelName: string | number,
+  modelName: string | number
 ) => {
   const { data: dataState, project: projectState } = listenerAPI.getState();
 
@@ -413,7 +442,7 @@ const evaluateListener = async (
           name: "Validation set is empty",
           description: "Cannot evaluate model on empty validation set.",
         },
-      }),
+      })
     );
   } else if (model.numClasses !== activeKnownCategoryCount) {
     listenerAPI.dispatch(
@@ -423,7 +452,7 @@ const evaluateListener = async (
           name: "The output shape of your model does not correspond to the number of categories!",
           description: `The trained model has an output shape of ${model.numClasses} but there are ${activeKnownCategoryCount} categories in  the project.\nMake sure these numbers match by retraining the model with the given setup or upload a corresponding new model.`,
         },
-      }),
+      })
     );
   } else {
     try {
@@ -432,14 +461,14 @@ const evaluateListener = async (
         classifierSlice.actions.updateEvaluationResult({
           evaluationResult,
           kindId: activeKindId,
-        }),
+        })
       );
     } catch (error) {
       handleError(
         listenerAPI,
         error as Error,
         "Error computing the evaluation results",
-        activeKindId,
+        activeKindId
       );
       return;
     }
@@ -449,6 +478,6 @@ const evaluateListener = async (
       kindId: activeKindId,
       modelStatus: ModelStatus.Trained,
       nameOrArch: model.name,
-    }),
+    })
   );
 };
