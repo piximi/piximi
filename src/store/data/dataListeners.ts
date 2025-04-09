@@ -162,12 +162,6 @@ startAppListening({
       previousDataStateKinds,
     );
 
-    if (deletedKinds.length) {
-      deleteClassifierModels(deletedKinds);
-    }
-    if (addedKinds.length) {
-      addClassifierModels(addedKinds);
-    }
     listenerAPI.dispatch(
       classifierSlice.actions.updateKindClassifiers({
         changes: { del: deletedKinds, add: addedKinds },
