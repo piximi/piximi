@@ -31,7 +31,7 @@ startAppListening({
     const { data: oldData } = listenerApi.getOriginalState();
     const deletedCategories = difference(
       oldData.categories.ids,
-      data.categories.ids,
+      data.categories.ids
     ) as string[];
     const filters = project.thingFilters;
     for (const kind in filters) {
@@ -42,7 +42,7 @@ startAppListening({
           projectSlice.actions.removeThingCategoryFilters({
             categoryIds: deletedFilters,
             kinds: [kind],
-          }),
+          })
         );
       }
     }
@@ -56,20 +56,20 @@ startAppListening({
     const { data: oldData } = listenerApi.getOriginalState();
     const deletedKinds = difference(
       oldData.kinds.ids,
-      data.kinds.ids,
+      data.kinds.ids
     ) as string[];
 
     listenerApi.dispatch(
       projectSlice.actions.removeThingCategoryFilters({
         categoryIds: "all",
         kinds: deletedKinds,
-      }),
+      })
     );
     listenerApi.dispatch(
       projectSlice.actions.removeThingPartitionFilters({
         partitions: "all",
         kinds: deletedKinds,
-      }),
+      })
     );
   },
 });
@@ -87,12 +87,10 @@ startAppListening({
       listenerApi.dispatch(
         classifierSlice.actions.updateInputShape({
           inputShape: {
-            ...classifier.kindClassifiers[project.activeKind].modelInfoDict[0]
-              .params.inputShape,
             channels: project.imageChannels,
           },
           kindId: project.activeKind,
-        }),
+        })
       );
   },
 });
@@ -115,11 +113,11 @@ startAppListening({
       }
       const deletedThingsToDeselect = intersection(
         [...thingIds, ...implicitThingIds],
-        selectedThings,
+        selectedThings
       );
 
       listenerAPI.dispatch(
-        projectSlice.actions.deselectThings({ ids: deletedThingsToDeselect }),
+        projectSlice.actions.deselectThings({ ids: deletedThingsToDeselect })
       );
     }
 

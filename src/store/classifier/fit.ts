@@ -17,7 +17,7 @@ import {
 
 export const prepareClasses = (
   allCategories: Record<string, Category>,
-  activeCategoryIds: string[],
+  activeCategoryIds: string[]
 ) => {
   return activeCategoryIds.reduce(
     (categoryInfo: { categories: Array<Category>; numClasses: number }, id) => {
@@ -27,7 +27,7 @@ export const prepareClasses = (
       categoryInfo.numClasses++;
       return categoryInfo;
     },
-    { categories: [], numClasses: 0 },
+    { categories: [], numClasses: 0 }
   );
 };
 export const prepareTrainingData = (
@@ -35,7 +35,7 @@ export const prepareTrainingData = (
   activeThingIds: string[],
   shuffleData: boolean,
   trainingPercentage: number,
-  init: boolean,
+  init: boolean
 ) => {
   const {
     unlabeledThings,
@@ -50,7 +50,7 @@ export const prepareTrainingData = (
         labeledValidation: Thing[];
         labeledUnassigned: Thing[];
       },
-      id,
+      id
     ) => {
       const thing = allThings[id];
       if (!thing) return groupedThings;
@@ -70,13 +70,13 @@ export const prepareTrainingData = (
       labeledTraining: [],
       labeledValidation: [],
       labeledUnassigned: [],
-    },
+    }
   );
   let splitLabeledTraining: Thing[] = [];
   let splitLabeledValidation: Thing[] = [];
   if (init) {
     const trainingThingsLength = Math.round(
-      trainingPercentage * labeledUnassigned.length,
+      trainingPercentage * labeledUnassigned.length
     );
     const validationThingsLength =
       labeledUnassigned.length - trainingThingsLength;
@@ -87,11 +87,11 @@ export const prepareTrainingData = (
 
     splitLabeledTraining = take(
       preparedLabeledUnassigned,
-      trainingThingsLength,
+      trainingThingsLength
     );
     splitLabeledValidation = takeRight(
       preparedLabeledUnassigned,
-      validationThingsLength,
+      validationThingsLength
     );
   } else {
     splitLabeledTraining = labeledUnassigned;
@@ -115,7 +115,7 @@ export const prepareModel = async (
   preprocessSettings: PreprocessSettings,
   inputShape: Shape,
   compileOptions: OptimizerSettings,
-  fitOptions: FitOptions,
+  fitOptions: FitOptions
 ) => {
   /* LOAD CLASSIFIER MODEL */
 
@@ -179,31 +179,46 @@ export const prepareModel = async (
 export const trainModel = async (
   model: SequentialClassifier,
   onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
-  fitOptions: FitOptions,
+  fitOptions: FitOptions
 ) => {
-  try {
-    if (!onEpochEnd) {
-      if (import.meta.env.NODE_ENV !== "production") {
-        console.warn("Epoch end callback not provided");
-      }
-      onEpochEnd = async (epoch: number, logs: any) => {
-        logger(`Epcoch: ${epoch}`);
-        logger(logs);
-      };
+  if (!onEpochEnd) {
+    if (import.meta.env.NODE_ENV !== "production") {
+      console.warn("Epoch end callback not provided");
     }
-
-    const history = await model.train(fitOptions, { onEpochEnd });
-    import.meta.env.NODE_ENV !== "production" &&
-      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-      logger(history);
-  } catch (error) {
-    throw new Error("Error training the model", error as Error);
-    // handleError(
-    //   listenerAPI,
-    //   error as Error,
-    //   "Error training the model",
-    //   activeKindId,
-    // );
-    return;
+    onEpochEnd = async (epoch: number, logs: any) => {
+      logger(`Epcoch: ${epoch}`);
+      logger(logs);
+    };
   }
+
+  const history = await model.train(fitOptions, { onEpochEnd });
+  import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+    logger(history);
+  // try {
+  //   if (!onEpochEnd) {
+  //     if (import.meta.env.NODE_ENV !== "production") {
+  //       console.warn("Epoch end callback not provided");
+  //     }
+  //     onEpochEnd = async (epoch: number, logs: any) => {
+  //       logger(`Epcoch: ${epoch}`);
+  //       logger(logs);
+  //     };
+  //   }
+
+  //   const history = await model.train(fitOptions, { onEpochEnd });
+  //   import.meta.env.NODE_ENV !== "production" &&
+  //     import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+  //     logger(history);
+  // } catch (error) {
+  //   console.log(error);
+  //   throw new Error("Error training the model", error as Error);
+  //   // handleError(
+  //   //   listenerAPI,
+  //   //   error as Error,
+  //   //   "Error training the model",
+  //   //   activeKindId,
+  //   // );
+  //   return;
+  // }
 };
