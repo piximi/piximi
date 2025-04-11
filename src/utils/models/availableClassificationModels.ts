@@ -96,19 +96,9 @@ export const getDefaultModelParams = (): ModelParams => ({
   },
 });
 
-export const getDefaultEvalResults = (): ClassifierEvaluationResultType => ({
-  confusionMatrix: [],
-  accuracy: -1,
-  crossEntropy: -1,
-  precision: -1,
-  recall: -1,
-  f1Score: -1,
-});
-
 export const getDefaultModelInfo = (): ModelInfo => ({
   status: ModelStatus.Uninitialized,
   params: getDefaultModelParams(),
-  evalResults: getDefaultEvalResults(),
 });
 export const kindClassifierModelDict: Record<
   Kind["id"],
