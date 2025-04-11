@@ -66,7 +66,7 @@ export const FitClassifierDialogAppBar = ({
   const modelStatus = useSelector(selectClassifierStatus);
   const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
   const showClearPredictionsWarning = useSelector(
-    selectShowClearPredictionsWarning
+    selectShowClearPredictionsWarning,
   );
   const epochs = useSelector(selectClassifierFitOptions).epochs;
   const alertState = useSelector(selectAlertState);
@@ -86,7 +86,7 @@ export const FitClassifierDialogAppBar = ({
           modelStatus: ModelStatus.InitFit,
           onEpochEnd: epochEndCallback,
           nameOrArch,
-        })
+        }),
       );
     } else {
       dispatch(
@@ -95,7 +95,7 @@ export const FitClassifierDialogAppBar = ({
           modelStatus: ModelStatus.Training,
           onEpochEnd: epochEndCallback,
           nameOrArch,
-        })
+        }),
       );
     }
   };
@@ -110,7 +110,7 @@ export const FitClassifierDialogAppBar = ({
         kindId: activeKindId,
         modelStatus: ModelStatus.Trained,
         nameOrArch: modelNameOrArch,
-      })
+      }),
     );
   };
 
@@ -118,7 +118,7 @@ export const FitClassifierDialogAppBar = ({
     dispatch(
       dataSlice.actions.clearPredictions({
         kind: activeKindId,
-      })
+      }),
     );
     _handleFit(newModelName);
   };
@@ -158,7 +158,7 @@ export const FitClassifierDialogAppBar = ({
                   backgroundColor: theme.palette.warning.main,
                   fontSize: theme.typography.body2.fontSize,
                   color: theme.palette.getContrastText(
-                    theme.palette.warning.main
+                    theme.palette.warning.main,
                   ),
                   maxWidth: "none",
                 }),
@@ -216,8 +216,8 @@ export const FitClassifierDialogAppBar = ({
                           {
                             showClearPredictionsWarning:
                               !showClearPredictionsWarning,
-                          }
-                        )
+                          },
+                        ),
                       )
                     }
                   />
