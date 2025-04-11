@@ -43,7 +43,7 @@ export abstract class SequentialClassifier extends Model {
 
   public loadTraining<T extends Thing>(
     images: T[],
-    preprocessingArgs: LoadDataArgs
+    preprocessingArgs: LoadDataArgs,
   ) {
     this._trainingDataset = preprocessClassifier({
       images,
@@ -53,7 +53,7 @@ export abstract class SequentialClassifier extends Model {
 
   public loadValidation<T extends Thing>(
     images: T[],
-    preprocessingArgs: LoadDataArgs
+    preprocessingArgs: LoadDataArgs,
   ) {
     this._validationDataset = preprocessClassifier({
       images,
@@ -63,7 +63,7 @@ export abstract class SequentialClassifier extends Model {
 
   public loadInference<T extends Thing>(
     images: T[],
-    preprocessingArgs: LoadDataArgs
+    preprocessingArgs: LoadDataArgs,
   ) {
     this._inferenceDataset = preprocessClassifier({
       images,
@@ -73,7 +73,7 @@ export abstract class SequentialClassifier extends Model {
 
   public async train(
     options: FitOptions,
-    callbacks: TrainingCallbacks
+    callbacks: TrainingCallbacks,
   ): Promise<History> {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
@@ -100,7 +100,7 @@ export abstract class SequentialClassifier extends Model {
 
       const history = await (this._model as LayersModel).fitDataset(
         this._trainingDataset,
-        args
+        args,
       );
 
       this.appendHistory(history);
@@ -227,7 +227,7 @@ export abstract class SequentialClassifier extends Model {
       .confusionMatrix(
         inferredTensors.labels,
         inferredTensors.preds,
-        numClasses
+        numClasses,
       )
       .array();
 
@@ -244,20 +244,20 @@ export abstract class SequentialClassifier extends Model {
       accuracy = (await metrics
         .categoricalAccuracy(
           inferredTensors.ys,
-          inferredTensors.probs as Tensor
+          inferredTensors.probs as Tensor,
         )
         .array()) as number[];
       crossEntropy = (await metrics
         .categoricalCrossentropy(
           inferredTensors.ys,
-          inferredTensors.probs as Tensor
+          inferredTensors.probs as Tensor,
         )
         .array()) as number[];
     }
 
     const { precision, recall, f1Score } = evaluateConfusionMatrix(
       numClasses,
-      confusionMatrix
+      confusionMatrix,
     );
 
     inferredTensors.probs.dispose();
@@ -358,6 +358,6 @@ export abstract class SequentialClassifier extends Model {
 
   public onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (
     _epochs,
-    _logs
+    _logs,
   ) => {};
 }

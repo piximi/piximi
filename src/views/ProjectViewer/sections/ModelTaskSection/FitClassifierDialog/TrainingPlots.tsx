@@ -2,10 +2,6 @@ import React from "react";
 import { useClassifierHistory } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
 import { TwoDataPlot } from "../data-display";
 
-const y: {
-  x: number;
-  y: number;
-}[] = [];
 const TrainingPlots = () => {
   const { modelHistory } = useClassifierHistory();
   return (
