@@ -16,8 +16,6 @@ import {
   selectActiveLabeledThings,
   selectActiveLabeledThingsCount,
 } from "store/project/reselectors";
-import { AlertType } from "utils/common/enums";
-import { AlertState } from "utils/common/types";
 import { ModelStatus, Partition } from "utils/models/enums";
 
 enum ErrorReason {
@@ -27,12 +25,6 @@ enum ErrorReason {
 }
 
 type ErrorContext = { reason: ErrorReason; message: string };
-
-const noLabeledThingsAlert: AlertState = {
-  alertType: AlertType.Info,
-  name: "No labeled images",
-  description: "Please label images to train a model.",
-};
 
 const ClassifierStatusContext = createContext<{
   isReady: boolean;
@@ -61,7 +53,7 @@ export const ClassifierStatusProvider = ({
   const selectedModel = useSelector(selectClassifierModel);
   const labeledThingsCount = useSelector(selectActiveLabeledThingsCount);
   const showClearPredictionsWarning = useSelector(
-    selectShowClearPredictionsWarning
+    selectShowClearPredictionsWarning,
   );
   const activeLabeledThings = useSelector(selectActiveLabeledThings);
   const modelStatus = useSelector(selectClassifierStatus);
@@ -73,14 +65,14 @@ export const ClassifierStatusProvider = ({
       modelStatus === ModelStatus.InitFit ||
       modelStatus === ModelStatus.Loading ||
       modelStatus === ModelStatus.Training,
-    [modelStatus]
+    [modelStatus],
   );
 
   const hasLabeledInference = useMemo(() => {
     return activeLabeledThings.some(
       (thing) =>
         !isUnknownCategory(thing.categoryId) &&
-        thing.partition === Partition.Inference
+        thing.partition === Partition.Inference,
     );
   }, [activeLabeledThings]);
 
@@ -90,11 +82,11 @@ export const ClassifierStatusProvider = ({
 
   const trainable = useMemo(
     () => !selectedModel || selectedModel.trainable,
-    [selectedModel]
+    [selectedModel],
   );
   const noLabeledThings = useMemo(
     () => labeledThingsCount === 0,
-    [labeledThingsCount]
+    [labeledThingsCount],
   );
 
   useEffect(() => {

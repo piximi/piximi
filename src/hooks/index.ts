@@ -13,7 +13,6 @@ export { useBreakpointObserver } from "./useBreakpointObserver";
 export { useMobileView } from "./useMobileView";
 export { useCategoryValidation } from "./useCategoryValidation";
 export {
-  useClassificationModel,
   useSegmentationModel,
   useSegmentationModelAgain,
 } from "./useLearningModel";
