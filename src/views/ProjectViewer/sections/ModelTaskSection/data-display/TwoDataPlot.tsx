@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import range from "lodash/range";
 import { ResponsiveLine } from "@nivo/line";
 
@@ -7,6 +7,7 @@ import { Container, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { usePreferredNivoTheme } from "hooks";
 
 import { APPLICATION_COLORS } from "utils/common/constants";
+import { Point } from "views/ImageViewer/utils/types";
 
 type TwoDataPlotProps = {
   title: string;
@@ -31,6 +32,7 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
     dynamicYRange = false,
   } = props;
   const theme = useTheme();
+  const nivoTheme = usePreferredNivoTheme();
   const matchesBP = useMediaQuery(theme.breakpoints.down("md"));
 
   const [data, setData] = useState<
@@ -45,10 +47,27 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
   const xRange = range(0, yData1.length + 1, stepSize);
   const pointSizeAdjustment = Math.floor(yData1.length / 20);
 
-  const min = dynamicYRange ? "auto" : 0;
-  const max = dynamicYRange ? "auto" : 1;
+  const min = useMemo(() => {
+    if (!dynamicYRange) return 0;
+    const y1Min = yData1.reduce((min: number, val: Point) => {
+      return val.y < min ? val.y : min;
+    }, Infinity);
+    const y2Min = yData2.reduce((min: number, val: Point) => {
+      return val.y < min ? val.y : min;
+    }, Infinity);
+    return Math.min(y1Min, y2Min) - 0.1;
+  }, [dynamicYRange, yData1, yData2]);
 
-  const nivoTheme = usePreferredNivoTheme();
+  const max = useMemo(() => {
+    if (!dynamicYRange) return 1;
+    const y1Max = yData1.reduce((max: number, val: Point) => {
+      return val.y > max ? val.y : max;
+    }, 0);
+    const y2Max = yData2.reduce((max: number, val: Point) => {
+      return val.y > max ? val.y : max;
+    }, 0);
+    return Math.max(y1Max, y2Max) + 0.1;
+  }, [dynamicYRange, yData1, yData2]);
 
   useEffect(() => {
     const data1 = {
@@ -66,6 +85,12 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
     setData([data1, data2]);
   }, [id1, id2, yData1, yData2]);
 
+  useEffect(() => {
+    if (dynamicYRange) {
+      console.log("min: ", min, "-- max: ", max);
+    }
+  });
+
   return (
     <Container sx={{ height: 350, mb: 5 }}>
       <Typography align={"center"} variant="body1">
@@ -73,7 +98,11 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
       </Typography>
       <ResponsiveLine
         data={data}
-        theme={{ ...nivoTheme, background: "transparent" }}
+        theme={{
+          ...nivoTheme,
+          background: "transparent",
+          grid: { line: { strokeWidth: "0.5px" } },
+        }}
         lineWidth={3}
         margin={{ top: 10, right: matchesBP ? 10 : 170, bottom: 80, left: 70 }}
         xScale={{ type: "linear" }}
