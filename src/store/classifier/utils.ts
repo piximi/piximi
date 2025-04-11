@@ -18,6 +18,7 @@ export function getSelectedModelInfo(
     classifier = kindClassifiersDictOrItem as KindClassifier;
   }
   const selectedModelName = kindClassifiersDictOrItem.modelNameOrArch;
+  console.log(selectedModelName);
   if (typeof selectedModelName === "string")
     return classifier.modelInfoDict[selectedModelName];
   return classifier.modelInfoDict["base-model"];

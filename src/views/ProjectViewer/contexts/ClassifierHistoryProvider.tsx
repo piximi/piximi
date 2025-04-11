@@ -58,7 +58,7 @@ export const ClassifierHistoryProvider = ({
   const selectedModel = useSelector(selectClassifierModel);
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
   const [modelHistory, setModelHistory] = useState<HistoryData>(
-    initialModelHistory()
+    initialModelHistory(),
   );
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export const ClassifierHistoryProvider = ({
           const cycleData = epoch[key];
 
           data[key as keyof HistoryData].push(
-            ...generatePlotData(cycleData, key as keyof HistoryData)
+            ...generatePlotData(cycleData, key as keyof HistoryData),
           );
         }
         return data;
@@ -83,7 +83,7 @@ export const ClassifierHistoryProvider = ({
         val_categoricalAccuracy: [],
         loss: [],
         val_loss: [],
-      }
+      },
     );
     setModelHistory(data);
 
@@ -118,7 +118,7 @@ export const ClassifierHistoryProvider = ({
           y: logs.categoricalAccuracy as number,
         }),
         val_categoricalAccuracy: prevState.val_categoricalAccuracy.concat({
-          x: trainingEpochIndicator,
+          x: nextEpoch,
           y: logs.val_categoricalAccuracy as number,
         }),
         loss: prevState.loss.concat({
@@ -126,12 +126,12 @@ export const ClassifierHistoryProvider = ({
           y: logs.loss as number,
         }),
         val_loss: prevState.val_loss.concat({
-          x: trainingEpochIndicator,
+          x: nextEpoch,
           y: logs.val_loss as number,
         }),
       }));
     },
-    []
+    [],
   );
   useEffect(() => {
     if (modelStatus === ModelStatus.Uninitialized) {
