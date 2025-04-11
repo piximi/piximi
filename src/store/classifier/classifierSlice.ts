@@ -42,7 +42,7 @@ export const classifierSlice = createSlice({
     },
     setClassifier(
       state,
-      action: PayloadAction<{ classifier: ClassifierState }>
+      action: PayloadAction<{ classifier: ClassifierState }>,
     ) {
       // WARNING, don't do below (overwrites draft object)
       // state = action.payload.classifier;
@@ -67,7 +67,7 @@ export const classifierSlice = createSlice({
         changes:
           | { add: Array<Kind["id"]>; presetInfo?: Array<KindClassifier> }
           | { del: Array<Kind["id"]> };
-      }>
+      }>,
     ) {
       const changes = action.payload.changes;
       if ("add" in changes) {
@@ -81,7 +81,7 @@ export const classifierSlice = createSlice({
                 : {
                     modelNameOrArch: 0,
                     modelInfoDict: { "base-model": getDefaultModelInfo() },
-                  })
+                  }),
         );
       } else {
         changes.del.forEach((kindId) => delete state.kindClassifiers[kindId]);
@@ -93,12 +93,12 @@ export const classifierSlice = createSlice({
         kindId: Kind["id"];
         modelName: string;
         modelInfo: ModelInfo;
-      }>
+      }>,
     ) {
       const { kindId, modelName, modelInfo } = action.payload;
       if (modelName in state.kindClassifiers[kindId].modelInfoDict) {
         throw new Error(
-          `Info for model with name "${modelName}" already exists`
+          `Info for model with name "${modelName}" already exists`,
         );
       }
       state.kindClassifiers[kindId].modelInfoDict[modelName] = modelInfo;
@@ -108,12 +108,12 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{
         kindId: Kind["id"];
         modelName: string;
-      }>
+      }>,
     ) {
       const { kindId, modelName } = action.payload;
       if (!(modelName in state.kindClassifiers[kindId].modelInfoDict)) {
         throw new Error(
-          `Info for model with name "${modelName}" does not exists`
+          `Info for model with name "${modelName}" does not exists`,
         );
       }
       delete state.kindClassifiers[kindId].modelInfoDict[modelName];
@@ -125,7 +125,7 @@ export const classifierSlice = createSlice({
         kindId: Kind["id"];
         nameOrArch: string | number;
         onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
-      }>
+      }>,
     ) {
       const { kindId, modelStatus } = action.payload;
       const selectedModelName = state.kindClassifiers[kindId].modelNameOrArch;
@@ -141,12 +141,12 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{
         settings: Partial<ModelInfo["params"]["optimizerSettings"]>;
         kindId: Kind["id"];
-      }>
+      }>,
     ) {
       const { settings, kindId } = action.payload;
       const selectedModelInfo = getSelectedModelInfo(
         state.kindClassifiers,
-        kindId
+        kindId,
       );
       Object.assign(selectedModelInfo.params.optimizerSettings, settings);
     },
@@ -155,23 +155,23 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{
         settings: RecursivePartial<ModelInfo["params"]["preprocessSettings"]>;
         kindId: Kind["id"];
-      }>
+      }>,
     ) {
       const { settings, kindId } = action.payload;
       const selectedModelInfo = getSelectedModelInfo(
         state.kindClassifiers,
-        kindId
+        kindId,
       );
       recursiveAssign(selectedModelInfo.params.preprocessSettings, settings);
     },
     updateInputShape(
       state,
-      action: PayloadAction<{ inputShape: Partial<Shape>; kindId: Kind["id"] }>
+      action: PayloadAction<{ inputShape: Partial<Shape>; kindId: Kind["id"] }>,
     ) {
       const { kindId, inputShape } = action.payload;
       const selectedModelInfo = getSelectedModelInfo(
         state.kindClassifiers,
-        kindId
+        kindId,
       );
       console.log(inputShape);
       selectedModelInfo.params.inputShape = {
@@ -184,7 +184,7 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{
         modelName: string | number;
         kindId: Kind["id"];
-      }>
+      }>,
     ) {
       const { modelName, kindId } = action.payload;
       const classifier = state.kindClassifiers[kindId];
@@ -192,7 +192,7 @@ export const classifierSlice = createSlice({
       if (!modelName) return;
       if (!(modelName in classifier.modelInfoDict)) {
         classifier.modelInfoDict[modelName] = cloneDeep(
-          classifier.modelInfoDict["base-model"]
+          classifier.modelInfoDict["base-model"],
         );
       }
     },
@@ -202,7 +202,7 @@ export const classifierSlice = createSlice({
         inputShape: Shape;
         kindId: Kind["id"];
         model: (typeof kindClassifierModelDict)[string][number];
-      }>
+      }>,
     ) {
       const { inputShape, kindId, model } = action.payload;
 
@@ -226,19 +226,20 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{
         evaluationResult: ClassifierEvaluationResultType;
         kindId: Kind["id"];
-      }>
+      }>,
     ) {
       const { evaluationResult, kindId } = action.payload;
-      const selectedModelInfo = getSelectedModelInfo(
-        state.kindClassifiers,
-        kindId
-      );
+      const selectedModel = state.kindClassifiers[kindId];
 
-      selectedModelInfo.evalResults = evaluationResult;
+      selectedModel.modelInfoDict[
+        typeof selectedModel.modelNameOrArch === "string"
+          ? selectedModel.modelNameOrArch
+          : "base-model"
+      ].evalResults = evaluationResult;
     },
     updateShowClearPredictionsWarning(
       state,
-      action: PayloadAction<{ showClearPredictionsWarning: boolean }>
+      action: PayloadAction<{ showClearPredictionsWarning: boolean }>,
     ) {
       state.showClearPredictionsWarning =
         action.payload.showClearPredictionsWarning;

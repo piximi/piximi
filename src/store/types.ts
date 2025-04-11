@@ -84,7 +84,7 @@ export type ModelParams = {
 export type ModelInfo = {
   status: ModelStatus;
   params: ModelParams;
-  evalResults: ClassifierEvaluationResultType;
+  evalResults?: ClassifierEvaluationResultType;
 };
 export type KindClassifier = {
   modelNameOrArch: string | number;
