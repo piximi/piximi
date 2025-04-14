@@ -15,68 +15,117 @@ import {
   TrainingCallbacks,
 } from "utils/models/types";
 
-export const prepareClasses = (
-  allCategories: Record<string, Category>,
-  activeCategoryIds: string[]
-) => {
-  return activeCategoryIds.reduce(
-    (categoryInfo: { categories: Array<Category>; numClasses: number }, id) => {
-      const category = allCategories[id];
-      if (isUnknownCategory(id) || !category) return categoryInfo;
-      categoryInfo.categories.push(category);
-      categoryInfo.numClasses++;
-      return categoryInfo;
-    },
-    { categories: [], numClasses: 0 }
-  );
+export function prepareClasses(allCategories: Category[]): {
+  categories: Category[];
+  numClasses: number;
 };
-export const prepareTrainingData = (
-  allThings: Record<string, Thing>,
-  activeThingIds: string[],
+export function prepareClasses(
+  allCategories: Record<string, Category>,
+  activeCategoryIds: string[],
+): { categories: Category[]; numClasses: number };
+export function prepareClasses(
+  allCategories: Record<string, Category> | Category[],
+  activeCategoryIds?: string[],
+) {
+  if (activeCategoryIds) {
+    return activeCategoryIds.reduce(
+      (
+        categoryInfo: { categories: Array<Category>; numClasses: number },
+        id,
+      ) => {
+        const category = (allCategories as Record<string, Category>)[id];
+        if (isUnknownCategory(id) || !category) return categoryInfo;
+        categoryInfo.categories.push(category);
+        categoryInfo.numClasses++;
+        return categoryInfo;
+      },
+      { categories: [], numClasses: 0 },
+    );
+  } else {
+    return (allCategories as Category[]).reduce(
+      (
+        categoryInfo: { categories: Array<Category>; numClasses: number },
+        category,
+      ) => {
+        if (isUnknownCategory(category.id)) return categoryInfo;
+        categoryInfo.categories.push(category);
+        categoryInfo.numClasses++;
+        return categoryInfo;
+      },
+      { categories: [], numClasses: 0 },
+    );
+  }
+}
+export function prepareTrainingData(
   shuffleData: boolean,
   trainingPercentage: number,
-  init: boolean
-) => {
-  const {
-    unlabeledThings,
-    labeledTraining,
-    labeledValidation,
-    labeledUnassigned,
-  } = activeThingIds.reduce(
-    (
-      groupedThings: {
-        unlabeledThings: Thing[];
-        labeledTraining: Thing[];
-        labeledValidation: Thing[];
-        labeledUnassigned: Thing[];
-      },
-      id
-    ) => {
-      const thing = allThings[id];
-      if (!thing) return groupedThings;
+  init: boolean,
+  allThings: Record<string, Thing>,
+  activeThingIds: string[],
+): {
+  unlabeledThings: Thing[];
+  labeledTraining: Thing[];
+  labeledUnassigned: Thing[];
+  labeledValidation: Thing[];
+  splitLabeledTraining: Thing[];
+  splitLabeledValidation: Thing[];
+};
+export function prepareTrainingData(
+  shuffleData: boolean,
+  trainingPercentage: number,
+  init: boolean,
+  allThings: Thing[],
+): {
+  unlabeledThings: Thing[];
+  labeledTraining: Thing[];
+  labeledUnassigned: Thing[];
+  labeledValidation: Thing[];
+  splitLabeledTraining: Thing[];
+  splitLabeledValidation: Thing[];
+};
+export function prepareTrainingData(
+  shuffleData: boolean,
+  trainingPercentage: number,
+  init: boolean,
+  allThings: Record<string, Thing> | Thing[],
+  activeThingIds?: string[],
+) {
+  const unlabeledThings: Thing[] = [];
+  const labeledTraining: Thing[] = [];
+  const labeledValidation: Thing[] = [];
+  const labeledUnassigned: Thing[] = [];
+  if (activeThingIds) {
+    activeThingIds.forEach((id) => {
+      const thing = (allThings as Record<string, Thing>)[id];
+      if (!thing) throw new Error("Active Thing Ids not in synce with things");
       if (isUnknownCategory(thing.categoryId)) {
-        groupedThings.unlabeledThings.push(thing);
+        unlabeledThings.push(thing);
       } else if (thing.partition === Partition.Unassigned) {
-        groupedThings.labeledUnassigned.push(thing);
+        labeledUnassigned.push(thing);
       } else if (thing.partition === Partition.Training) {
-        groupedThings.labeledTraining.push(thing);
+        labeledTraining.push(thing);
       } else if (thing.partition === Partition.Validation) {
-        groupedThings.labeledValidation.push(thing);
+        labeledValidation.push(thing);
       }
-      return groupedThings;
-    },
-    {
-      unlabeledThings: [],
-      labeledTraining: [],
-      labeledValidation: [],
-      labeledUnassigned: [],
-    }
-  );
+    });
+  } else {
+    (allThings as Thing[]).forEach((thing) => {
+      if (isUnknownCategory(thing.categoryId)) {
+        unlabeledThings.push(thing);
+      } else if (thing.partition === Partition.Unassigned) {
+        labeledUnassigned.push(thing);
+      } else if (thing.partition === Partition.Training) {
+        labeledTraining.push(thing);
+      } else if (thing.partition === Partition.Validation) {
+        labeledValidation.push(thing);
+      }
+    });
+  }
   let splitLabeledTraining: Thing[] = [];
   let splitLabeledValidation: Thing[] = [];
   if (init) {
     const trainingThingsLength = Math.round(
-      trainingPercentage * labeledUnassigned.length
+      trainingPercentage * labeledUnassigned.length,
     );
     const validationThingsLength =
       labeledUnassigned.length - trainingThingsLength;
@@ -87,11 +136,11 @@ export const prepareTrainingData = (
 
     splitLabeledTraining = take(
       preparedLabeledUnassigned,
-      trainingThingsLength
+      trainingThingsLength,
     );
     splitLabeledValidation = takeRight(
       preparedLabeledUnassigned,
-      validationThingsLength
+      validationThingsLength,
     );
   } else {
     splitLabeledTraining = labeledUnassigned;
@@ -105,7 +154,7 @@ export const prepareTrainingData = (
     splitLabeledTraining,
     splitLabeledValidation,
   };
-};
+}
 export const prepareModel = async (
   model: SequentialClassifier,
   trainingData: Thing[],
@@ -115,7 +164,7 @@ export const prepareModel = async (
   preprocessSettings: PreprocessSettings,
   inputShape: Shape,
   compileOptions: OptimizerSettings,
-  fitOptions: FitOptions
+  fitOptions: FitOptions,
 ) => {
   /* LOAD CLASSIFIER MODEL */
 
@@ -179,7 +228,7 @@ export const prepareModel = async (
 export const trainModel = async (
   model: SequentialClassifier,
   onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
-  fitOptions: FitOptions
+  fitOptions: FitOptions,
 ) => {
   if (!onEpochEnd) {
     if (import.meta.env.NODE_ENV !== "production") {
