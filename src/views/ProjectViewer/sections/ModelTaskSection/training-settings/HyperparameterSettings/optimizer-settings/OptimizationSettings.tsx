@@ -15,8 +15,8 @@ import { selectClassifierOptimizerSettings } from "store/classifier/reselectors"
 import { selectActiveKindId } from "store/project/selectors";
 import { enumKeys } from "utils/common/helpers";
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
+import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSettingsTextField";
 import { StyledSelect } from "views/ProjectViewer/components/StyledSelect";
-import { TextFieldWithBlur } from "views/ProjectViewer/components/TextFieldWithBlur";
 import { WithLabel } from "views/ProjectViewer/components/WithLabel";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { useNumberField } from "views/ProjectViewer/hooks/useNumberField";
@@ -30,6 +30,8 @@ export const OptimizationSettings = () => {
 
   const {
     inputValue: learningRate,
+    inputString: learningRateDisplay,
+    setLastValidInput: setLastValidLearningRate,
     resetInputValue: resetLearningRate,
     handleOnChangeValidation: handleLearningRateChange,
     error: learningRateInputError,
@@ -62,6 +64,8 @@ export const OptimizationSettings = () => {
       resetLearningRate();
       return;
     }
+    if (learningRate === compileOptions.learningRate) return;
+    setLastValidLearningRate(learningRate);
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { learningRate },
@@ -134,24 +138,13 @@ export const OptimizationSettings = () => {
               sx: { mr: "1rem", whiteSpace: "nowrap" },
             }}
           >
-            <TextFieldWithBlur
+            <ModelSettingsTextField
               id="learning-rate"
               size="small"
               onChange={handleLearningRateChange}
-              value={learningRate}
+              value={learningRateDisplay}
               onBlur={dispatchLearningRate}
-              disabled={trainable}
-              slotProps={{
-                inputLabel: { sx: { top: "-2px" } },
-              }}
-              sx={(theme) => ({
-                width: "7ch",
-                input: {
-                  py: 0.5,
-                  fontSize: theme.typography.body2.fontSize,
-                  minHeight: "1rem",
-                },
-              })}
+              disabled={!trainable}
             />
           </WithLabel>
         </Stack>
