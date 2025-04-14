@@ -17,7 +17,7 @@ import {
   selectClassifierTrainingPercentage,
 } from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
-import { TextFieldWithBlur } from "views/ProjectViewer/components/TextFieldWithBlur";
+import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSettingsTextField";
 import { WithLabel } from "views/ProjectViewer/components/WithLabel";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { useNumberField } from "views/ProjectViewer/hooks/useNumberField";
@@ -35,14 +35,23 @@ export const DataPartitioningSettings = () => {
     [],
   );
   const {
-    inputValue: trainPercInput,
-    handleOnChangeValidation: handleTrainPercInputChange,
-    error: trainPercInputError,
+    inputValue: trainPercent,
+    inputString: trainPercentDisplay,
+    setLastValidInput: setLastValidTrainPercent,
+    resetInputValue: resetTrainPercent,
+    handleOnChangeValidation: handleTrainPercentChange,
+    error: trainPercentError,
   } = useNumberField(trainingPercentage, trainingFieldValidationOptions);
   const dispatchTrainingPercentage = () => {
+    if (trainPercentError.error) {
+      resetTrainPercent();
+      return;
+    }
+    if (trainPercent === trainingPercentage) return;
+    setLastValidTrainPercent(trainPercent);
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
-        settings: { trainingPercentage: trainPercInput },
+        settings: { trainingPercentage: trainPercent },
         kindId: activeKindId,
       }),
     );
@@ -78,21 +87,13 @@ export const DataPartitioningSettings = () => {
             sx: { mr: "1rem", whiteSpace: "nowrap" },
           }}
         >
-          <TextFieldWithBlur
+          <ModelSettingsTextField
             size="small"
-            onChange={handleTrainPercInputChange}
-            value={trainPercInput}
+            onChange={handleTrainPercentChange}
+            value={trainPercentDisplay}
             fullWidth
             onBlur={dispatchTrainingPercentage}
             disabled={!trainable}
-            sx={(theme) => ({
-              width: "15ch",
-              input: {
-                py: 0.5,
-                fontSize: theme.typography.body2.fontSize,
-                minHeight: "1rem",
-              },
-            })}
           />
         </WithLabel>
         <Collapse in={showAdvanced}>
