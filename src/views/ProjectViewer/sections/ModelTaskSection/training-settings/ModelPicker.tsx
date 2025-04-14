@@ -36,7 +36,7 @@ export const ModelPicker = () => {
       classifierSlice.actions.updateSelectedModelNameOrArch({
         kindId: activeKindId,
         modelName: nameOrArch,
-      })
+      }),
     );
   };
 
@@ -83,7 +83,7 @@ const ModelArchiitectureOptions = ({
     onArchitectureChange(value);
   };
   const handleNameChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const value = event.target.value;
     console.log("onChange value: ", value);
@@ -194,7 +194,7 @@ const PretrainedModelOptions = ({
         kindId: activeKindId,
         modelStatus: ModelStatus.Uninitialized,
         nameOrArch: selectedModel.name,
-      })
+      }),
     );
   };
   return (
