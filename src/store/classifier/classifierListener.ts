@@ -91,30 +91,30 @@ startAppListening({
   },
 });
 
-startAppListening({
-  actionCreator: classifierSlice.actions.updateModelStatus,
-  effect: async (action, listenerAPI) => {
-    listenerAPI.unsubscribe();
-    switch (action.payload.modelStatus) {
-      case ModelStatus.InitFit:
-      case ModelStatus.Training:
-        await fitListener(
-          action.payload.onEpochEnd,
-          listenerAPI,
-          action.payload.nameOrArch as string,
-        );
-        break;
-      case ModelStatus.Predicting:
-        await predictListener(listenerAPI, action.payload.nameOrArch);
-        break;
-      case ModelStatus.Evaluating:
-        await evaluateListener(listenerAPI, action.payload.nameOrArch);
-        break;
-      default:
-    }
-    listenerAPI.subscribe();
-  },
-});
+// startAppListening({
+//   actionCreator: classifierSlice.actions.updateModelStatus,
+//   effect: async (action, listenerAPI) => {
+//     listenerAPI.unsubscribe();
+//     switch (action.payload.modelStatus) {
+//       case ModelStatus.InitFit:
+//       case ModelStatus.Training:
+//         await fitListener(
+//           action.payload.onEpochEnd,
+//           listenerAPI,
+//           action.payload.nameOrArch as string,
+//         );
+//         break;
+//       case ModelStatus.Predicting:
+//         await predictListener(listenerAPI, action.payload.nameOrArch);
+//         break;
+//       case ModelStatus.Evaluating:
+//         await evaluateListener(listenerAPI, action.payload.nameOrArch);
+//         break;
+//       default:
+//     }
+//     listenerAPI.subscribe();
+//   },
+// });
 
 const fitListener = async (
   onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
@@ -187,11 +187,11 @@ const fitListener = async (
     splitLabeledTraining,
     splitLabeledValidation,
   } = prepareTrainingData(
-    dataState.things.entities,
-    activeThingIds,
     preprocessSettings.shuffle,
     preprocessSettings.trainingPercentage,
     modelStatus === ModelStatus.Uninitialized,
+    dataState.things.entities,
+    activeThingIds,
   );
 
   const { categories, numClasses } = prepareClasses(
