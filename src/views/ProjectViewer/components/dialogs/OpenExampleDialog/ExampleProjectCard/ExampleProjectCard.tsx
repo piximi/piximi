@@ -53,7 +53,7 @@ export const ExampleProjectCard = ({
       applicationSettingsSlice.actions.sendLoadPercent({
         loadPercent,
         loadMessage,
-      })
+      }),
     );
   };
 
@@ -64,7 +64,7 @@ export const ExampleProjectCard = ({
       applicationSettingsSlice.actions.setLoadPercent({
         loadPercent: -1,
         loadMessage: "loading example project...",
-      })
+      }),
     );
 
     let exampleProjectFilePath: string;
@@ -110,7 +110,7 @@ export const ExampleProjectCard = ({
       .then((res) => res.blob())
       .then(
         (blob) =>
-          new PseudoFileList([new File([blob], exampleProject.name, blob)])
+          new PseudoFileList([new File([blob], exampleProject.name, blob)]),
       )
       .catch((err: any) => {
         import.meta.env.PROD &&
@@ -124,7 +124,7 @@ export const ExampleProjectCard = ({
     try {
       const deserializedProject = await deserializeProject(
         fileStore,
-        onLoadProgress
+        onLoadProgress,
       );
       if (!deserializedProject) return;
 
@@ -138,7 +138,7 @@ export const ExampleProjectCard = ({
         dispatch(
           classifierSlice.actions.setClassifier({
             classifier,
-          })
+          }),
         );
         dispatch(projectSlice.actions.setProject({ project }));
       });
@@ -158,12 +158,12 @@ export const ExampleProjectCard = ({
       dispatch(
         applicationSettingsSlice.actions.updateAlertState({
           alertState: warning,
-        })
+        }),
       );
     }
 
     dispatch(
-      applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 })
+      applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 }),
     );
   };
   return (

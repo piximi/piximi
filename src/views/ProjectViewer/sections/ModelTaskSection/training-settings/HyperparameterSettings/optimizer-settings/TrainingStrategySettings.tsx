@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "store/classifier";
 import { selectClassifierFitOptions } from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
-import { TextFieldWithBlur } from "views/ProjectViewer/components/TextFieldWithBlur";
+import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSettingsTextField";
 import { WithLabel } from "views/ProjectViewer/components/WithLabel";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { useNumberField } from "views/ProjectViewer/hooks/useNumberField";
@@ -20,21 +20,28 @@ export const TrainingStrategySettings = () => {
 
   const {
     inputValue: batchSize,
+    inputString: batchSizeDisplay,
     resetInputValue: resetBatchSize,
+    setLastValidInput: setLastValidBatchSize,
     handleOnChangeValidation: handleBatchSizeChange,
     error: batchSizeInputError,
   } = useNumberField(fitOptions.batchSize);
   const {
     inputValue: numEpochs,
+    inputString: numEpochsDisplay,
     resetInputValue: resetNumEpochs,
+    setLastValidInput: setLastValidEpoch,
     handleOnChangeValidation: handleNumEpochsChange,
     error: numEpochsInputError,
-  } = useNumberField(fitOptions.batchSize);
+  } = useNumberField(fitOptions.epochs);
+
   const dispatchBatchSize = () => {
     if (batchSizeInputError.error) {
       resetBatchSize();
       return;
     }
+    if (batchSize === fitOptions.batchSize) return;
+    setLastValidBatchSize(batchSize);
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { batchSize },
@@ -47,6 +54,8 @@ export const TrainingStrategySettings = () => {
       resetNumEpochs();
       return;
     }
+    if (numEpochs === fitOptions.epochs) return;
+    setLastValidEpoch(numEpochs);
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { epochs: numEpochs },
@@ -78,24 +87,13 @@ export const TrainingStrategySettings = () => {
               sx: { mr: "1rem", whiteSpace: "nowrap" },
             }}
           >
-            <TextFieldWithBlur
+            <ModelSettingsTextField
               id="epochs"
               size="small"
               onChange={handleNumEpochsChange}
-              value={numEpochs}
+              value={numEpochsDisplay}
               onBlur={dispatchNumEpochs}
               disabled={!trainable}
-              slotProps={{
-                inputLabel: { sx: { top: "-2px" } },
-              }}
-              sx={(theme) => ({
-                width: "7ch",
-                input: {
-                  py: 0.5,
-                  fontSize: theme.typography.body2.fontSize,
-                  minHeight: "1rem",
-                },
-              })}
             />
           </WithLabel>
           <Collapse in={showAdvanced}>
@@ -106,24 +104,13 @@ export const TrainingStrategySettings = () => {
                 sx: { mr: "1rem", whiteSpace: "nowrap" },
               }}
             >
-              <TextFieldWithBlur
+              <ModelSettingsTextField
                 id="batch-size"
                 size="small"
                 onChange={handleBatchSizeChange}
-                value={batchSize}
+                value={batchSizeDisplay}
                 onBlur={dispatchBatchSize}
                 disabled={!trainable}
-                slotProps={{
-                  inputLabel: { sx: { top: "-2px" } },
-                }}
-                sx={(theme) => ({
-                  width: "7ch",
-                  input: {
-                    py: 0.5,
-                    fontSize: theme.typography.body2.fontSize,
-                    minHeight: "1rem",
-                  },
-                })}
               />
             </WithLabel>
           </Collapse>

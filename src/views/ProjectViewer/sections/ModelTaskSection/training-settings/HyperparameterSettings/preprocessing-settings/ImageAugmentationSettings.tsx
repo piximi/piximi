@@ -12,7 +12,7 @@ import {
   Stack,
 } from "@mui/material";
 import { FunctionalDivider } from "components/ui";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "store/classifier";
 import {
@@ -25,8 +25,8 @@ import { selectActiveKindId } from "store/project/selectors";
 import { enumKeys } from "utils/common/helpers";
 import { CropSchema } from "utils/models/enums";
 import { CropOptions, RescaleOptions } from "utils/models/types";
+import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSettingsTextField";
 import { StyledSelect } from "views/ProjectViewer/components/StyledSelect";
-import { TextFieldWithBlur } from "views/ProjectViewer/components/TextFieldWithBlur";
 import { WithLabel } from "views/ProjectViewer/components/WithLabel";
 import { useNumberField } from "views/ProjectViewer/hooks/useNumberField";
 
@@ -37,26 +37,34 @@ const InputShapeField = () => {
   const selectedModel = useSelector(selectClassifierModelWithIdx);
 
   const {
-    inputValue: colsInput,
-    resetInputValue: resetColsInput,
-    handleOnChangeValidation: handleColsInputChange,
-    error: colsInputError,
+    inputValue: inputCols,
+    inputString: inputColsDisplay,
+    setLastValidInput: setLastValidInputCols,
+    resetInputValue: resetInputcols,
+    handleOnChangeValidation: handleInputColsChange,
+    error: inputColsError,
   } = useNumberField(inputShape.width);
   const {
-    inputValue: rowsInput,
-    resetInputValue: resetRowsInput,
-    handleOnChangeValidation: handleRowsInputChange,
-    error: rowsInputError,
+    inputValue: inputRows,
+    inputString: inputRowsDisplay,
+    setLastValidInput: setLastValidInputRows,
+    resetInputValue: resetInputRows,
+    handleOnChangeValidation: handleInputRowsChange,
+    error: inputRowsError,
   } = useNumberField(inputShape.height);
   const {
-    inputValue: channelsInput,
-    resetInputValue: resetChannelsInput,
-    handleOnChangeValidation: handleChannelsInputChange,
-    error: channelsInputError,
+    inputValue: inputChannels,
+    inputString: inputChannelsDisplay,
+    setLastValidInput: setLastValidInputChannels,
+    resetInputValue: resetInputChannels,
+    handleOnChangeValidation: handleInputChannelsChange,
+    error: inputChannelsError,
   } = useNumberField(inputShape.channels);
 
-  const [fixedNumberOfChannels, setFixedNumberOfChannels] =
-    useState<boolean>(false);
+  const fixedChannels = useMemo(
+    () => selectedModel && !!selectedModel.model?.requiredChannels,
+    [selectedModel],
+  );
   const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
     useState<string>("");
 
@@ -66,37 +74,43 @@ const InputShapeField = () => {
     const inputID = event.target.id;
     switch (inputID) {
       case "shape-rows":
-        if (rowsInputError.error) {
-          resetRowsInput();
+        if (inputRowsError.error) {
+          resetInputRows();
           return;
         }
+        if (inputRows === inputShape.height) return;
+        setLastValidInputRows(inputRows);
         dispatch(
           classifierSlice.actions.updateInputShape({
-            inputShape: { ...inputShape, height: rowsInput },
+            inputShape: { ...inputShape, height: inputRows },
             kindId: activeKindId,
           }),
         );
         return;
       case "shape-cols":
-        if (colsInputError.error) {
-          resetColsInput();
+        if (inputColsError.error) {
+          resetInputcols();
           return;
         }
+        if (inputCols === inputShape.width) return;
+        setLastValidInputCols(inputCols);
         dispatch(
           classifierSlice.actions.updateInputShape({
-            inputShape: { ...inputShape, width: colsInput },
+            inputShape: { ...inputShape, width: inputCols },
             kindId: activeKindId,
           }),
         );
         return;
       case "shape-channels":
-        if (channelsInputError.error) {
-          resetChannelsInput();
+        if (inputChannelsError.error) {
+          resetInputChannels();
           return;
         }
+        if (inputChannels === inputShape.channels) return;
+        setLastValidInputChannels(inputChannels);
         dispatch(
           classifierSlice.actions.updateInputShape({
-            inputShape: { ...inputShape, channels: channelsInput },
+            inputShape: { ...inputShape, channels: inputChannels },
             kindId: activeKindId,
           }),
         );
@@ -105,12 +119,10 @@ const InputShapeField = () => {
 
   useEffect(() => {
     if (selectedModel.model && selectedModel.model.requiredChannels) {
-      setFixedNumberOfChannels(true);
       setFixedNumberOfChannelsHelperText(
         `${selectedModel.model.name} requires ${selectedModel.model.requiredChannels} channels!`,
       );
     } else {
-      setFixedNumberOfChannels(false);
       setFixedNumberOfChannelsHelperText("");
     }
   }, [selectedModel]);
@@ -130,65 +142,35 @@ const InputShapeField = () => {
         Input Shape:
       </FormLabel>
       <Stack direction="row" gap={2}>
-        <TextFieldWithBlur
+        <ModelSettingsTextField
           id="shape-cols"
           size="small"
           label="Col"
-          onChange={handleColsInputChange}
-          value={colsInput}
+          onChange={handleInputColsChange}
+          value={inputColsDisplay}
           onBlur={handleBlurDispatch}
           disabled={selectedModel.model && !selectedModel.model.trainable}
-          slotProps={{
-            inputLabel: { sx: { top: "-2px" } },
-          }}
-          sx={(theme) => ({
-            width: "7ch",
-            input: {
-              py: 0.5,
-              fontSize: theme.typography.body2.fontSize,
-              minHeight: "1rem",
-            },
-          })}
         />
-        <TextFieldWithBlur
+        <ModelSettingsTextField
           id="shape-rows"
           size="small"
           label="Row"
-          onChange={handleRowsInputChange}
-          value={rowsInput}
+          onChange={handleInputRowsChange}
+          value={inputRowsDisplay}
           onBlur={handleBlurDispatch}
           disabled={selectedModel.model && !selectedModel.model.trainable}
-          slotProps={{
-            inputLabel: { sx: { top: "-2px" } },
-          }}
-          sx={(theme) => ({
-            width: "7ch",
-            input: {
-              py: 0.5,
-              fontSize: theme.typography.body2.fontSize,
-              minHeight: "1rem",
-            },
-          })}
         />
-        <TextFieldWithBlur
+        <ModelSettingsTextField
           id="shape-channels"
           size="small"
           label="Ch."
-          onChange={handleChannelsInputChange}
-          value={channelsInput}
+          onChange={handleInputChannelsChange}
+          value={inputChannelsDisplay}
           onBlur={handleBlurDispatch}
-          disabled={selectedModel.model && !selectedModel.model.trainable}
-          slotProps={{
-            inputLabel: { sx: { top: "-2px" } },
-          }}
-          sx={(theme) => ({
-            width: "7ch",
-            input: {
-              py: 0.5,
-              fontSize: theme.typography.body2.fontSize,
-              minHeight: "1rem",
-            },
-          })}
+          disabled={
+            (selectedModel.model && !selectedModel.model.trainable) ||
+            fixedChannels
+          }
         />
       </Stack>
     </FormControl>
@@ -204,6 +186,9 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
   );
   const {
     inputValue: numCrops,
+    inputString: numCropsDisplay,
+    resetInputValue: resetNumCrops,
+    setLastValidInput: setLastValidCrops,
     handleOnChangeValidation: handleNumCropsChange,
     error: cropsInputError,
   } = useNumberField(cropOptions.numCrops);
@@ -216,6 +201,12 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
     );
   };
   const dispatchNumCrops = () => {
+    if (cropsInputError.error) {
+      resetNumCrops();
+      return;
+    }
+    if (numCrops === cropOptions.numCrops) return;
+    setLastValidCrops(numCrops);
     updateCropOptions({ ...cropOptions, numCrops });
   };
   const onCropSchemaChange = (event: SelectChangeEvent<unknown>) => {
@@ -262,19 +253,12 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
           sx: { mr: "1rem", whiteSpace: "nowrap" },
         }}
       >
-        <TextFieldWithBlur
+        <ModelSettingsTextField
           size="small"
           onChange={handleNumCropsChange}
-          value={numCrops}
+          value={numCropsDisplay}
           onBlur={dispatchNumCrops}
-          sx={(theme) => ({
-            width: "6ch",
-            input: {
-              py: 0.5,
-              fontSize: theme.typography.body2.fontSize,
-              minHeight: "1rem",
-            },
-          })}
+          disabled={cropDisabled}
         />
       </WithLabel>
     </Stack>
