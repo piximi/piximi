@@ -11,6 +11,7 @@ export enum ModelTask {
 }
 
 export enum ModelStatus {
+  Idle,
   Uninitialized,
   InitFit,
   Loading,
