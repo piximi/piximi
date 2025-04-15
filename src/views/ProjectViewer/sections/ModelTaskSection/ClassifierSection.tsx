@@ -176,12 +176,11 @@ export const ClassifierSection = () => {
         openedDialog={fitClassifierDialogOpen}
         closeDialog={handleCloseFitClassifierDialog}
       />
-      {evaluationResults && (
-        <EvaluateClassifierDialog
-          openedDialog={evaluateClassifierDialogOpen}
-          closeDialog={handleCloseEvaluateClassifierDialog}
-        />
-      )}
+
+      <EvaluateClassifierDialog
+        openedDialog={evaluateClassifierDialogOpen}
+        closeDialog={handleCloseEvaluateClassifierDialog}
+      />
     </>
   );
 };
