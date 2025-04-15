@@ -1,6 +1,6 @@
 import { deepClone } from "@mui/x-data-grid/internals";
 import React, { useCallback } from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "store/classifier";
 import {
   selectClassifierModel,
@@ -23,7 +23,7 @@ import {
   prepareTrainingData,
   trainModel,
 } from "store/classifier/fit";
-import { getSubset } from "utils/common/helpers";
+import { getStackTraceFromError, getSubset } from "utils/common/helpers";
 import {
   FitOptions,
   OptimizerSettings,
@@ -31,18 +31,13 @@ import {
 } from "utils/models/types";
 import { dataSlice } from "store/data";
 import { ModelStatus, Partition } from "utils/models/enums";
+import { AlertState } from "utils/common/types";
+import { AlertType } from "utils/common/enums";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
+import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 
-type TrainingPreperationReturnType = {
-  partitionedData: {
-    unlabeledThings: Thing[];
-    labeledUnassigned: Thing[];
-    splitLabeledTraining: Thing[];
-    splitLabeledValidation: Thing[];
-  };
-  model: SequentialClassifier;
-  fitOptions: FitOptions;
-};
-const generateNewModel = async (
+export const getClassificationModel = async (
   newModelName: string,
   modelArchitecture: 0 | 1,
   baseModelInfo: ModelInfo,
@@ -61,7 +56,8 @@ const generateNewModel = async (
   return newModel;
 };
 export async function prepareTrainingCB(
-  selectedModelOrArch: SequentialClassifier,
+  model: SequentialClassifier,
+  initFit: boolean,
   modelInfo: ModelInfo,
   onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
   onErrorCallback: (
@@ -73,62 +69,7 @@ export async function prepareTrainingCB(
   data: Thing[],
   allCategories: Category[],
   kindId: Kind["id"],
-): Promise<void>;
-export async function prepareTrainingCB(
-  selectedModelOrArch: 0 | 1,
-  modelInfo: ModelInfo,
-  onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
-  onErrorCallback: (
-    error: Error,
-    name: string,
-    kindId: Kind["id"],
-    errorType?: { fittingError: boolean },
-  ) => Promise<void>,
-  data: Thing[],
-  allCategories: Category[],
-  kindId: Kind["id"],
-  newModelName: string,
-): Promise<void>;
-export async function prepareTrainingCB(
-  selectedModelOrArch: SequentialClassifier | 0 | 1,
-  modelInfo: ModelInfo,
-  onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
-  onErrorCallback: (
-    error: Error,
-    name: string,
-    kindId: Kind["id"],
-    errorType?: { fittingError: boolean },
-  ) => Promise<void>,
-  data: Thing[],
-  allCategories: Category[],
-  kindId: Kind["id"],
-  newModelName?: string,
 ) {
-  let initFit: boolean = false;
-  let model: SequentialClassifier;
-  try {
-    if (typeof selectedModelOrArch === "number") {
-      model = await generateNewModel(
-        newModelName!,
-        selectedModelOrArch,
-        modelInfo,
-        kindId,
-      );
-      initFit = true;
-    } else {
-      model = selectedModelOrArch;
-    }
-  } catch (error) {
-    onErrorCallback(error as Error, "Model Generation Error", kindId);
-    return;
-  }
-  productionStore.dispatch(
-    classifierSlice.actions.updateModelStatus({
-      kindId,
-      modelStatus: ModelStatus.Loading,
-      nameOrArch: model.name,
-    }),
-  );
   let partitionedData: {
     unlabeledThings: Thing[];
     labeledUnassigned: Thing[];
@@ -229,37 +170,171 @@ export async function prepareTrainingCB(
   );
 }
 
-const useFitClassifier = () => {
+export const useFitClassifier = () => {
   const dispatch = useDispatch();
-  const trainingData = useSelector(selectActiveLabeledThings);
+  const activeData = useSelector(selectActiveLabeledThings);
   const modelInfo = useSelector(selectClassifierModelInfo);
   const activeKindId = useSelector(selectActiveKindId);
-  const categories = useSelector(selectActiveCategories);
+  const activeCategories = useSelector(selectActiveCategories);
   const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
   const selectedModel = useSelector(selectClassifierModel);
+  const { setCurrentEpoch, epochEndCallback } = useClassifierHistory();
+  const { newModelName, setModelStatus } = useClassifierStatus();
 
-  const generateNewModel = useCallback(
-    async (
-      newModelName: string,
-      modelArchitecture: 0 | 1,
-      baseModelInfo: ModelInfo,
-    ) => {
-      const newModel = await createNewModel(newModelName, modelArchitecture);
-      const newModelInfo = deepClone(baseModelInfo);
-
+  const handleError = useCallback(
+    async (error: Error, name: string) => {
+      const stackTrace = await getStackTraceFromError(error);
+      const alertState: AlertState = {
+        alertType: AlertType.Error,
+        name: name,
+        description: `${error.name}:\n${error.message}`,
+        stackTrace: stackTrace,
+      };
+      if (import.meta.env.NODE_ENV !== "production") {
+        console.error(
+          alertState.name,
+          "\n",
+          alertState.description,
+          "\n",
+          alertState.stackTrace,
+        );
+      }
       dispatch(
-        classifierSlice.actions.addModelInfo({
-          kindId: activeKindId,
-          modelName: newModelName,
-          modelInfo: newModelInfo,
+        applicationSettingsSlice.actions.updateAlertState({
+          alertState: alertState,
         }),
       );
-      return newModel;
+      setModelStatus(ModelStatus.Idle);
     },
-    [],
+    [dispatch],
   );
+  const fitClassifier = useCallback(async () => {
+    setCurrentEpoch(0);
+    let initFit: boolean = false;
+    let model: SequentialClassifier;
+    try {
+      if (typeof modelNameOrArch === "number") {
+        model = await getClassificationModel(
+          newModelName!,
+          modelNameOrArch as 0 | 1,
+          modelInfo,
+          activeKindId,
+        );
+        initFit = true;
+      } else {
+        model = selectedModel!;
+      }
+    } catch (error) {
+      handleError(error as Error, "Model Generation Error");
+      return;
+    }
+    setModelStatus(ModelStatus.Loading);
+    let partitionedData: {
+      unlabeledThings: Thing[];
+      labeledUnassigned: Thing[];
+      splitLabeledTraining: Thing[];
+      splitLabeledValidation: Thing[];
+    };
+    let categoryInfo: { categories: Category[]; numClasses: number };
+    try {
+      partitionedData = prepareTrainingData(
+        modelInfo.params.preprocessSettings.shuffle,
+        modelInfo.params.preprocessSettings.trainingPercentage,
+        initFit,
+        activeData,
+      );
 
-  const prepareTraining = useCallback(prepareTrainingCB, []);
+      categoryInfo = prepareClasses(activeCategories);
+    } catch (error) {
+      handleError(error as Error, "Data Partitioning Error");
+      return;
+    }
+
+    const compileOptions = getSubset(modelInfo.params.optimizerSettings, [
+      "learningRate",
+      "lossFunction",
+      "metrics",
+      "optimizationAlgorithm",
+    ]) as OptimizerSettings;
+    const fitOptions = getSubset(modelInfo.params.optimizerSettings, [
+      "batchSize",
+      "epochs",
+    ]) as FitOptions;
+
+    try {
+      await prepareModel(
+        model,
+        partitionedData.splitLabeledTraining,
+        partitionedData.splitLabeledValidation,
+        categoryInfo.numClasses,
+        categoryInfo.categories,
+        modelInfo.params.preprocessSettings,
+        modelInfo.params.inputShape,
+        compileOptions,
+        fitOptions,
+      );
+    } catch (error) {
+      handleError(error as Error, "Model Preparation Error");
+      return;
+    }
+
+    if (initFit) {
+      dispatch(
+        dataSlice.actions.updateThings({
+          updates: [
+            ...partitionedData.splitLabeledTraining.map((thing) => ({
+              id: thing.id,
+              partition: Partition.Training,
+            })),
+            ...partitionedData.splitLabeledValidation.map((thing) => ({
+              id: thing.id,
+              partition: Partition.Validation,
+            })),
+            ...partitionedData.unlabeledThings.map((thing) => ({
+              id: thing.id,
+              partition: Partition.Inference,
+            })),
+          ],
+        }),
+      );
+    } else {
+      dispatch(
+        dataSlice.actions.updateThings({
+          updates: partitionedData.labeledUnassigned.map((thing) => ({
+            id: thing.id,
+            partition: Partition.Training,
+          })),
+        }),
+      );
+    }
+
+    setModelStatus(ModelStatus.Training);
+    try {
+      await trainModel(model, epochEndCallback, fitOptions);
+    } catch (error) {
+      handleError(error as Error, "Model Training Error");
+      return;
+    }
+    setModelStatus(ModelStatus.Idle);
+    dispatch(
+      classifierSlice.actions.updateSelectedModelNameOrArch({
+        modelName: model.name,
+        kindId: activeKindId,
+      }),
+    );
+  }, [
+    modelNameOrArch,
+    selectedModel,
+    newModelName,
+    activeKindId,
+    activeData,
+    activeCategories,
+    modelInfo,
+    handleError,
+    dispatch,
+  ]);
+
+  return fitClassifier;
 };
 
 export default useFitClassifier;
