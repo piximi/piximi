@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -32,6 +32,7 @@ import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
 import {
   selectClassifierFitOptions,
   selectClassifierModel,
+  selectClassifierModelInfo,
   selectClassifierModelNameOrArch,
   selectClassifierStatus,
 } from "store/classifier/reselectors";
@@ -46,6 +47,19 @@ import { selectAlertState } from "store/applicationSettings/selectors";
 import { useClassifierHistory } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
+import { Kind } from "store/data/types";
+import { getStackTraceFromError } from "utils/common/helpers";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import useFitClassifier, {
+  getClassificationModel,
+  prepareTrainingCB,
+} from "views/ProjectViewer/hooks/useFitClassifier";
+import { SequentialClassifier } from "utils/models/classification";
+import { ModelInfo } from "store/types";
+import {
+  selectActiveCategories,
+  selectActiveThings,
+} from "store/project/reselectors";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
@@ -63,42 +77,19 @@ export const FitClassifierDialogAppBar = ({
   const dispatch = useDispatch();
   const activeKindId = useSelector(selectActiveKindId);
   const selectedModel = useSelector(selectClassifierModel);
-  const modelStatus = useSelector(selectClassifierStatus);
   const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
   const epochs = useSelector(selectClassifierFitOptions).epochs;
-  const alertState = useSelector(selectAlertState);
   const [showWarning, setShowWarning] = useState<boolean>(true);
-  const { currentEpoch, setCurrentEpoch, epochEndCallback } =
-    useClassifierHistory();
-  const { isReady, isTraining, shouldClearPredictions, error, newModelName } =
+  const { currentEpoch } = useClassifierHistory();
+  const { isReady, modelStatus, shouldClearPredictions, error } =
     useClassifierStatus();
 
   const { onClose, onOpen, open } = useDialog();
-  const _handleFit = async (nameOrArch: string | number) => {
-    setCurrentEpoch(0);
-    if (modelStatus === ModelStatus.Uninitialized) {
-      dispatch(
-        classifierSlice.actions.updateModelStatus({
-          kindId: activeKindId,
-          modelStatus: ModelStatus.InitFit,
-          onEpochEnd: epochEndCallback,
-          nameOrArch,
-        }),
-      );
-    } else {
-      dispatch(
-        classifierSlice.actions.updateModelStatus({
-          kindId: activeKindId,
-          modelStatus: ModelStatus.Training,
-          onEpochEnd: epochEndCallback,
-          nameOrArch,
-        }),
-      );
-    }
-  };
+
+  const fitClassifier = useFitClassifier();
 
   const onStopFitting = () => {
     if (modelStatus !== ModelStatus.Training || !selectedModel) return;
@@ -120,7 +111,7 @@ export const FitClassifierDialogAppBar = ({
         kind: activeKindId,
       }),
     );
-    _handleFit(newModelName);
+    fitClassifier();
   };
   const handleFit = async () => {
     if (!shouldClearPredictions) {
@@ -172,12 +163,7 @@ export const FitClassifierDialogAppBar = ({
           </Tooltip>
         )}
 
-        {isTraining ? (
-          <FitClassifierProgressBar
-            epochs={epochs}
-            currentEpoch={currentEpoch}
-          />
-        ) : (
+        {modelStatus === ModelStatus.Idle ? (
           <Button
             variant="outlined"
             onClick={handleFit}
@@ -187,6 +173,11 @@ export const FitClassifierDialogAppBar = ({
           >
             Fit Classifier
           </Button>
+        ) : (
+          <FitClassifierProgressBar
+            epochs={epochs}
+            currentEpoch={currentEpoch}
+          />
         )}
 
         <TooltipWithDisable title="Stop fitting the model" placement="bottom">

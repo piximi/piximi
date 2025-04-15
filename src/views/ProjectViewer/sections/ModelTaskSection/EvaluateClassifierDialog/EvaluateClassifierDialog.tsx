@@ -23,13 +23,13 @@ export const EvaluateClassifierDialog = ({
   const evaluationResults = useSelector(selectClassifierEvaluationResult);
   const categories = useSelector(selectActiveKnownCategories);
 
-  return (
+  return !evaluationResults ? null : (
     <Dialog
       onClose={closeDialog}
       open={openedDialog}
       fullWidth
       maxWidth="md"
-      TransitionComponent={DialogTransitionSlide}
+      slots={{ transition: DialogTransitionSlide }}
       sx={{ zIndex: 1203, height: "100%" }}
     >
       <EvaluateClassifierDialogAppBar closeDialog={closeDialog} />

@@ -29,7 +29,8 @@ type ErrorContext = { reason: ErrorReason; message: string };
 const ClassifierStatusContext = createContext<{
   isReady: boolean;
   trainable: boolean;
-  isTraining: boolean;
+  modelStatus: ModelStatus;
+  setModelStatus: React.Dispatch<React.SetStateAction<ModelStatus>>;
   shouldClearPredictions: boolean;
   error?: ErrorContext;
   newModelName: string;
@@ -37,7 +38,8 @@ const ClassifierStatusContext = createContext<{
 }>({
   isReady: true,
   trainable: true,
-  isTraining: false,
+  modelStatus: ModelStatus.Idle,
+  setModelStatus: (_value: React.SetStateAction<ModelStatus>) => {},
   shouldClearPredictions: false,
   newModelName: "",
   setNewModelName: (_value: React.SetStateAction<string>) => {},
@@ -56,17 +58,9 @@ export const ClassifierStatusProvider = ({
     selectShowClearPredictionsWarning,
   );
   const activeLabeledThings = useSelector(selectActiveLabeledThings);
-  const modelStatus = useSelector(selectClassifierStatus);
+  const [modelStatus, setModelStatus] = useState<ModelStatus>(ModelStatus.Idle);
 
   const [newModelName, setNewModelName] = useState("");
-
-  const isTraining = useMemo(
-    () =>
-      modelStatus === ModelStatus.InitFit ||
-      modelStatus === ModelStatus.Loading ||
-      modelStatus === ModelStatus.Training,
-    [modelStatus],
-  );
 
   const hasLabeledInference = useMemo(() => {
     return activeLabeledThings.some(
@@ -113,7 +107,8 @@ export const ClassifierStatusProvider = ({
       value={{
         isReady,
         trainable,
-        isTraining,
+        modelStatus,
+        setModelStatus,
         shouldClearPredictions,
         error,
         newModelName,
