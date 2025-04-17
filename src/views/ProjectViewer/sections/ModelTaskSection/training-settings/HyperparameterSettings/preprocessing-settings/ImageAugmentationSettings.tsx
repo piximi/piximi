@@ -30,6 +30,7 @@ import { StyledSelect } from "views/ProjectViewer/components/StyledSelect";
 import { WithLabel } from "views/ProjectViewer/components/WithLabel";
 import { useNumberField } from "views/ProjectViewer/hooks/useNumberField";
 
+const RowColInputOptions = { min: 20 };
 const InputShapeField = () => {
   const dispatch = useDispatch();
   const inputShape = useSelector(selectClassifierInputShape);
@@ -43,7 +44,7 @@ const InputShapeField = () => {
     resetInputValue: resetInputcols,
     handleOnChangeValidation: handleInputColsChange,
     error: inputColsError,
-  } = useNumberField(inputShape.width);
+  } = useNumberField(inputShape.width, RowColInputOptions);
   const {
     inputValue: inputRows,
     inputString: inputRowsDisplay,
@@ -51,7 +52,7 @@ const InputShapeField = () => {
     resetInputValue: resetInputRows,
     handleOnChangeValidation: handleInputRowsChange,
     error: inputRowsError,
-  } = useNumberField(inputShape.height);
+  } = useNumberField(inputShape.height, RowColInputOptions);
   const {
     inputValue: inputChannels,
     inputString: inputChannelsDisplay,

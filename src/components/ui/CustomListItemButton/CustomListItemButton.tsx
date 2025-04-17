@@ -7,9 +7,9 @@ import {
   ListItemText,
   Tooltip,
   ListItemButtonProps,
-  ListItemTextProps,
   IconButton,
   TooltipProps,
+  TypographyProps,
 } from "@mui/material";
 
 type TooltipType = Omit<TooltipProps, "children" | "title">;
@@ -24,17 +24,17 @@ type CustomListItemButtonProps = Pick<
   | "selected"
   | "disableRipple"
   | "sx"
-> &
-  Pick<ListItemTextProps, "primaryTypographyProps"> & {
-    primaryText: string | ReactElement;
-    onClick: React.MouseEventHandler<HTMLDivElement> | undefined;
-    icon?: ReactElement;
-    secondaryIcon?: ReactElement;
-    onSecondary?: React.MouseEventHandler<HTMLButtonElement> | undefined;
-    additionalComponent?: ReactElement;
-    tooltipText?: string;
-    tooltipProps?: TooltipType;
-  };
+> & {
+  primaryTypographyProps?: TypographyProps;
+  primaryText: string | ReactElement;
+  onClick: React.MouseEventHandler<HTMLDivElement> | undefined;
+  icon?: ReactElement;
+  secondaryIcon?: ReactElement;
+  onSecondary?: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  additionalComponent?: ReactElement;
+  tooltipText?: string;
+  tooltipProps?: TooltipType;
+};
 
 export const CustomListItemButton = ({
   primaryText,
@@ -97,7 +97,7 @@ export const CustomListItemButton = ({
 
             <ListItemText
               primary={primaryText}
-              primaryTypographyProps={primaryTypographyProps}
+              slotProps={{ primary: primaryTypographyProps }}
             />
             {additionalComponent}
           </ListItemButton>

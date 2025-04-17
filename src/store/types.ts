@@ -83,6 +83,8 @@ export type ModelParams = {
 
 export type ModelInfo = {
   status: ModelStatus;
+  trainingSet?: string[];
+  validationDet?: string[];
   params: ModelParams;
   evalResults?: ClassifierEvaluationResultType;
 };

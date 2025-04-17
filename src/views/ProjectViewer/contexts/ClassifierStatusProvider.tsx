@@ -6,10 +6,7 @@ import React, {
   useState,
 } from "react";
 import { useSelector } from "react-redux";
-import {
-  selectClassifierModel,
-  selectClassifierStatus,
-} from "store/classifier/reselectors";
+import { selectClassifierModel } from "store/classifier/reselectors";
 import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
 import { isUnknownCategory } from "store/data/helpers";
 import {
