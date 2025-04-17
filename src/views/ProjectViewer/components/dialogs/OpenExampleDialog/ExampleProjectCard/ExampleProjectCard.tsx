@@ -27,10 +27,10 @@ type ExampleProjectType = {
   description: string;
   enum: ExampleProject;
   icon: string;
-  source: {
+  sources: {
     sourceName: string;
     sourceUrl: string;
-  };
+  }[];
   license?: {
     licenseName: string;
     licenseUrl: string;
@@ -172,7 +172,7 @@ export const ExampleProjectCard = ({
       image={exampleProject.icon}
       action={openExampleProject}
       description={exampleProject.description}
-      source={exampleProject.source}
+      sources={exampleProject.sources}
       license={exampleProject.license}
     />
   );
