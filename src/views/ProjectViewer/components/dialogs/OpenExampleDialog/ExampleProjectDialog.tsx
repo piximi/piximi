@@ -3,12 +3,64 @@ import { Stack } from "@mui/material";
 import { BaseExampleDialog } from "./BaseExampleDialog";
 import { ExampleProjectCard } from "./ExampleProjectCard";
 
+import malaria from "images/malaria.png";
+import cellPainting from "images/cell-painting.png";
+import {
+  malariaAnnotations,
+  cellPaintingAnnotations,
+} from "data/exampleImages";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import mnistExampleIcon from "data/exampleProjects/mnistExampleProjectIcon.png";
 import cElegansExampleIcon from "data/exampleProjects/cElegansExampleProjectIcon.png";
 import humanU2OSCellsExampleIcon from "data/exampleProjects/humanU2OSCellsExampleProjectIcon.png";
 import BBBC013ExampleIcon from "data/exampleProjects/BBBC013ExampleProjectIcon.png";
 import PLP1ExampleIcon from "data/exampleProjects/PLP1ExampleProjectIcon.png";
+import { SerializedFileType } from "utils/file-io/types";
+import { CustomTabs } from "components/layout";
+import { ExampleImageCard } from "./ExampleImageCard";
+
+const exampleImages = [
+  {
+    name: "Malaria infected human blood smears",
+    imageName: "malaria.png",
+    imageData: malaria,
+    description:
+      "Blood cells infected by P. vivax (malaria) and stained with Giemsa reagent.",
+    annotationsFile: malariaAnnotations as SerializedFileType,
+    sources: [
+      {
+        sourceName: "BBBC041v1",
+        sourceUrl: "https://bbbc.broadinstitute.org/BBBC041",
+      },
+    ],
+    license: {
+      licenseName: "CC-BY-NC-SA-3",
+      licenseUrl: "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+    },
+  },
+  {
+    name: "U2OS cell-painting experiment",
+    imageName: "cell-painting.png",
+    imageData: cellPainting,
+    description:
+      "U2OS cells treated with an RNAi reagent and stained." +
+      " Channel 1 (red): Actin, Golgi, and Plasma membrane stained via phalloidin and wheat germ agglutinin; " +
+      " Channel 2 (blue): DNA stained via Hoechst; Channel 3 (green): mitochondria stained via MitoTracker",
+    annotationsFile: cellPaintingAnnotations as SerializedFileType,
+    sources: [
+      {
+        sourceName: "Boivin2021.06.22.449195",
+        sourceUrl:
+          "https://www.biorxiv.org/content/10.1101/2021.06.22.449195v1.full.pdf+html",
+      },
+      {
+        sourceName: "GPP",
+        sourceUrl:
+          "https://portals.broadinstitute.org/gpp/public/clone/details?cloneId=TRCN0000195467",
+      },
+    ],
+  },
+];
 
 const exampleProjects = [
   {
@@ -16,10 +68,12 @@ const exampleProjects = [
     description: "Small subset of the MNIST database of handwritten digits.",
     enum: ExampleProject.Mnist,
     icon: mnistExampleIcon,
-    source: {
-      sourceName: "MNIST",
-      sourceUrl: "http://yann.lecun.com/exdb/mnist/",
-    },
+    sources: [
+      {
+        sourceName: "MNIST",
+        sourceUrl: "http://yann.lecun.com/exdb/mnist/",
+      },
+    ],
     license: {
       licenseName: "CC-BY-SA-3",
       licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/",
@@ -33,10 +87,12 @@ const exampleProjects = [
       "Channel 1: GFP; Channel 2: mCherry",
     enum: ExampleProject.CElegans,
     icon: cElegansExampleIcon,
-    source: {
-      sourceName: "BBBC012",
-      sourceUrl: "https://bbbc.broadinstitute.org/BBBC012",
-    },
+    sources: [
+      {
+        sourceName: "BBBC012",
+        sourceUrl: "https://bbbc.broadinstitute.org/BBBC012",
+      },
+    ],
   },
   {
     name: "Human U2OS-cells example project",
@@ -46,10 +102,12 @@ const exampleProjects = [
       "Channel 1: GFP; Channel 2: DNA",
     enum: ExampleProject.HumanU2OSCells,
     icon: humanU2OSCellsExampleIcon,
-    source: {
-      sourceName: "BBBC016",
-      sourceUrl: "https://bbbc.broadinstitute.org/BBBC016",
-    },
+    sources: [
+      {
+        sourceName: "BBBC016",
+        sourceUrl: "https://bbbc.broadinstitute.org/BBBC016",
+      },
+    ],
     license: {
       licenseName: "CC-BY-3",
       licenseUrl: "https://creativecommons.org/licenses/by/3.0/",
@@ -63,10 +121,12 @@ const exampleProjects = [
       "Channel 1: FKHR-GFP; Channel 2: DNA",
     enum: ExampleProject.BBBC013,
     icon: BBBC013ExampleIcon,
-    source: {
-      sourceName: "BBBC013",
-      sourceUrl: "https://bbbc.broadinstitute.org/BBBC013",
-    },
+    sources: [
+      {
+        sourceName: "BBBC013",
+        sourceUrl: "https://bbbc.broadinstitute.org/BBBC013",
+      },
+    ],
     license: {
       licenseName: "CC-BY-3",
       licenseUrl: "https://creativecommons.org/licenses/by/3.0/",
@@ -79,10 +139,12 @@ const exampleProjects = [
       "Channel 1: artifacts; Channel 2: tagged protein (PLP1); Channel 3: DNA",
     enum: ExampleProject.PLP1,
     icon: PLP1ExampleIcon,
-    source: {
-      sourceName: "Jessica Lacoste, Mikko Taipale lab, University of Toronto",
-      sourceUrl: "http://taipalelab.org/?page_id=56",
-    },
+    sources: [
+      {
+        sourceName: "Jessica Lacoste, Mikko Taipale lab, University of Toronto",
+        sourceUrl: "http://taipalelab.org/?page_id=56",
+      },
+    ],
     license: {
       licenseName: "CC0",
       licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/",
@@ -104,17 +166,33 @@ export const ExampleProjectDialog = (props: ExampleProjectDialogProps) => {
       open={open}
       onClose={onClose}
     >
-      <Stack>
-        {exampleProjects.map((exampleProject, index) => {
-          return (
-            <ExampleProjectCard
-              key={`${exampleProject.name}-${index}`}
-              exampleProject={exampleProject}
-              onClose={onClose}
-            />
-          );
-        })}
-      </Stack>
+      <CustomTabs
+        labels={["Images", "Images with Objects"]}
+        childClassName="example-project-tabs"
+      >
+        <Stack sx={{ overflow: "scroll" }}>
+          {exampleProjects.map((exampleProject, index) => {
+            return (
+              <ExampleProjectCard
+                key={`${exampleProject.name}-${index}`}
+                exampleProject={exampleProject}
+                onClose={onClose}
+              />
+            );
+          })}
+        </Stack>
+        <Stack sx={{ overflow: "scroll" }}>
+          {exampleImages.map((exampleImage, index) => {
+            return (
+              <ExampleImageCard
+                key={`${exampleImage.name}-${index}`}
+                exampleImage={exampleImage}
+                onClose={onClose}
+              />
+            );
+          })}
+        </Stack>
+      </CustomTabs>
     </BaseExampleDialog>
   );
 };
