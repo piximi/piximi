@@ -2,7 +2,6 @@ import React from "react";
 
 import { BaseMenu } from "components/ui/BaseMenu";
 import { OpenImageMenuItem } from "./OpenImageMenuItem";
-import { OpenExampleImageMenuItem } from "./OpenExampleImageMenuItem";
 
 type OpenImageMenuProps = {
   anchorEl: HTMLElement | null;
@@ -30,8 +29,6 @@ export const OpenImageMenu = ({
       }}
     >
       <OpenImageMenuItem onCloseMenu={onCloseMenu} />
-
-      <OpenExampleImageMenuItem onCloseMenu={onCloseMenu} />
     </BaseMenu>
   );
 };
