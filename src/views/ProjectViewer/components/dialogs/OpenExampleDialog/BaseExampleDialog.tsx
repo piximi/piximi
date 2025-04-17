@@ -55,7 +55,7 @@ export const BaseExampleDialog = ({
         sx={{
           borderTop: (theme) => `1px solid ${theme.palette.divider}`,
           margin: 0,
-          padding: (theme) => theme.spacing(1),
+          padding: 0,
         }}
       >
         <Box
@@ -63,7 +63,6 @@ export const BaseExampleDialog = ({
           flexDirection="row"
           flexWrap="wrap"
           justifyContent="space-evenly"
-          padding={theme.spacing(2)}
           gap={theme.spacing(2)}
         >
           {children}
