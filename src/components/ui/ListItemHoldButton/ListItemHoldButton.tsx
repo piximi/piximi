@@ -7,6 +7,7 @@ import {
   ListItemIcon,
   ListItemText,
   ListItemTextProps,
+  TypographyProps,
 } from "@mui/material";
 
 export const ListItemHoldButton = ({
@@ -20,6 +21,7 @@ export const ListItemHoldButton = ({
   holdDuration: number;
   primaryText: string | ReactElement;
   icon?: ReactElement;
+  primaryTypographyProps?: TypographyProps;
 } & Pick<ListItemTextProps, "primaryTypographyProps">) => {
   const [holdElapsed, setHoldElapsed] = useState<number>(0);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout>();
@@ -49,27 +51,28 @@ export const ListItemHoldButton = ({
   }, [holdElapsed, intervalId, holdDuration, onHoldComplete]);
 
   return (
-    <ListItem
-      disablePadding
-      sx={(theme) => ({
-        backgroundImage: `linear-gradient(to right, ${alpha(
-          theme.palette.primary.main,
-          0.3,
-        )} ${loadPercent}%, rgba(255,255,255,0) 1%)`,
-      })}
-    >
+    <ListItem disablePadding>
       <ListItemButton
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         onTouchStart={handleMouseDown}
         onTouchEnd={handleMouseUp}
+        sx={(theme) => ({
+          backgroundImage:
+            loadPercent > 0
+              ? `linear-gradient(to right, ${alpha(
+                  theme.palette.primary.main,
+                  0.3,
+                )} ${loadPercent}%, rgba(255,255,255,0) 1%)`
+              : "inherit",
+        })}
       >
         {icon && <ListItemIcon>{icon}</ListItemIcon>}
 
         <ListItemText
           primary={primaryText}
-          primaryTypographyProps={primaryTypographyProps}
+          slotProps={{ primary: primaryTypographyProps }}
         />
       </ListItemButton>
     </ListItem>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import {
   ScatterPlot as ScatterPlotIcon,
@@ -9,11 +9,15 @@ import {
 import { TooltipButton } from "components/ui/tooltips/TooltipButton/TooltipButton";
 
 import { ModelStatus } from "utils/models/enums";
+import { usePredictClassifier } from "views/ProjectViewer/hooks/usePredictClassifier";
+import { useSelector } from "react-redux";
+import { selectClassifierModel } from "store/classifier/reselectors";
+import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { selectActiveUnlabeledThingsIds } from "store/project/reselectors";
 
 export const ModelExecButtonGroup = ({
   handleFit,
   handleEvaluate,
-  modelStatus,
   modelTrainable,
   helperText,
 }: {
@@ -23,7 +27,14 @@ export const ModelExecButtonGroup = ({
   modelTrainable: boolean;
   helperText: string;
 }) => {
-  const handlePredict = () => {};
+  const predictClassifier = usePredictClassifier();
+  const selectedModel = useSelector(selectClassifierModel);
+  const unlabeledThings = useSelector(selectActiveUnlabeledThingsIds);
+  const { modelStatus } = useClassifierStatus();
+
+  useEffect(() => {
+    console.log(unlabeledThings);
+  }, [unlabeledThings]);
   return (
     <Box width="100%" display="flex" justifyContent={"space-evenly"}>
       <TooltipButton
@@ -40,12 +51,16 @@ export const ModelExecButtonGroup = ({
         tooltipTitle={
           modelStatus === ModelStatus.Predicting
             ? "...predicting"
-            : modelStatus !== ModelStatus.Trained
+            : modelStatus === ModelStatus.Idle
               ? helperText
               : "Predict Model"
         }
-        onClick={handlePredict}
-        disabled={modelStatus !== ModelStatus.Trained}
+        onClick={predictClassifier}
+        disabled={
+          !selectedModel ||
+          modelStatus !== ModelStatus.Idle ||
+          unlabeledThings.length === 0
+        }
       >
         {modelStatus === ModelStatus.Predicting ? (
           <CircularProgress
