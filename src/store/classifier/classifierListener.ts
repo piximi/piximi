@@ -1,5 +1,4 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { ENV, enableDebugMode } from "@tensorflow/tfjs";
 
 import { classifierSlice } from "./classifierSlice";
 import { applicationSettingsSlice } from "store/applicationSettings";
@@ -12,33 +11,14 @@ import {
 } from "utils/common/helpers";
 import { isUnknownCategory } from "store/data/helpers";
 
-import { SequentialClassifier } from "utils/models/classification";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/common/enums";
 
-import {
-  ModelInfo,
-  StoreListemerAPI,
-  TypedAppStartListening,
-} from "store/types";
-import {
-  FitOptions,
-  OptimizerSettings,
-  TrainingCallbacks,
-} from "utils/models/types";
+import { StoreListemerAPI, TypedAppStartListening } from "store/types";
+import { FitOptions } from "utils/models/types";
 import { AlertState } from "utils/common/types";
 import { Kind, Thing } from "store/data/types";
-import {
-  availableClassificationModels,
-  createNewModel,
-} from "utils/models/availableClassificationModels";
-import {
-  prepareClasses,
-  prepareModel,
-  prepareTrainingData,
-  trainModel,
-} from "./fit";
-import { deepClone } from "@mui/x-data-grid/internals";
+import { availableClassificationModels } from "utils/models/availableClassificationModels";
 
 export const classifierMiddleware = createListenerMiddleware();
 
@@ -116,184 +96,11 @@ startAppListening({
 //   },
 // });
 
-const fitListener = async (
-  onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
-  listenerAPI: StoreListemerAPI,
-  newModelName: string,
-) => {
-  import.meta.env.NODE_ENV !== "production" &&
-    import.meta.env.VITE_APP_LOG_LEVEL === "3" &&
-    enableDebugMode();
-
-  import.meta.env.NODE_ENV !== "production" &&
-    import.meta.env.VITE_APP_LOG_LEVEL === "2" &&
-    logger(["tensorflow flags:", ENV.features]);
-
-  const {
-    classifier: classifierState,
-    project: projectState,
-    data: dataState,
-  } = listenerAPI.getState();
-
-  /* ACTIVE KIND */
-  const activeKindId = projectState.activeKind;
-  const { containing: activeThingIds, categories: activeCategories } =
-    dataState.kinds.entities[activeKindId]!;
-
-  /* CLASSIFIER  */
-  const { modelInfoDict, modelNameOrArch } =
-    classifierState.kindClassifiers[activeKindId];
-
-  let model: SequentialClassifier;
-  let modelInfo: ModelInfo;
-  let willUpdateSelectedModel = false;
-  if (typeof modelNameOrArch === "string") {
-    model = availableClassificationModels[modelNameOrArch];
-    modelInfo = modelInfoDict[modelNameOrArch];
-  } else {
-    model = await createNewModel(newModelName, modelNameOrArch as 0 | 1);
-    console.log(availableClassificationModels);
-    modelInfo = deepClone(modelInfoDict["base-model"]);
-    listenerAPI.dispatch(
-      classifierSlice.actions.addModelInfo({
-        kindId: activeKindId,
-        modelName: newModelName,
-        modelInfo: modelInfo,
-      }),
-    );
-    willUpdateSelectedModel = true;
-  }
-
-  const modelStatus = modelInfo.status;
-  const { optimizerSettings, preprocessSettings, inputShape } =
-    modelInfo.params;
-
-  const compileOptions = getSubset(optimizerSettings, [
-    "learningRate",
-    "lossFunction",
-    "metrics",
-    "optimizationAlgorithm",
-  ]) as OptimizerSettings;
-  const fitOptions = getSubset(optimizerSettings, [
-    "batchSize",
-    "epochs",
-  ]) as FitOptions;
-
-  /* DATA */
-
-  const {
-    unlabeledThings,
-    labeledUnassigned,
-    splitLabeledTraining,
-    splitLabeledValidation,
-  } = prepareTrainingData(
-    preprocessSettings.shuffle,
-    preprocessSettings.trainingPercentage,
-    modelStatus === ModelStatus.Uninitialized,
-    dataState.things.entities,
-    activeThingIds,
-  );
-
-  const { categories, numClasses } = prepareClasses(
-    dataState.categories.entities,
-    activeCategories,
-  );
-
-  listenerAPI.dispatch(
-    classifierSlice.actions.updateModelStatus({
-      kindId: activeKindId,
-      modelStatus: ModelStatus.Loading,
-      nameOrArch: model.name,
-    }),
-  );
-
-  /* SEPARATE LABELED DATA INTO TRAINING AND VALIDATION */
-
-  if (modelStatus === ModelStatus.InitFit) {
-    listenerAPI.dispatch(
-      dataSlice.actions.updateThings({
-        updates: [
-          ...splitLabeledTraining.map((thing) => ({
-            id: thing.id,
-            partition: Partition.Training,
-          })),
-          ...splitLabeledValidation.map((thing) => ({
-            id: thing.id,
-            partition: Partition.Validation,
-          })),
-          ...unlabeledThings.map((thing) => ({
-            id: thing.id,
-            partition: Partition.Inference,
-          })),
-        ],
-      }),
-    );
-  } else {
-    listenerAPI.dispatch(
-      dataSlice.actions.updateThings({
-        updates: labeledUnassigned.map((thing) => ({
-          id: thing.id,
-          partition: Partition.Training,
-        })),
-      }),
-    );
-  }
-
-  /* LOAD CLASSIFIER MODEL */
-
-  await prepareModel(
-    model,
-    splitLabeledTraining,
-    splitLabeledValidation,
-    numClasses,
-    categories,
-    preprocessSettings,
-    inputShape,
-    compileOptions,
-    fitOptions,
-  );
-
-  willUpdateSelectedModel &&
-    listenerAPI.dispatch(
-      classifierSlice.actions.updateSelectedModelNameOrArch({
-        modelName: newModelName,
-        kindId: activeKindId,
-      }),
-    );
-
-  listenerAPI.dispatch(
-    classifierSlice.actions.updateModelStatus({
-      kindId: activeKindId,
-      modelStatus: ModelStatus.Training,
-      nameOrArch: model.name,
-    }),
-  );
-
-  /* TRAIN MODEL */
-  try {
-    await trainModel(model, onEpochEnd, fitOptions);
-  } catch (error) {
-    handleError(listenerAPI, error as Error, "training Error", activeKindId);
-  }
-
-  listenerAPI.dispatch(
-    classifierSlice.actions.updateModelStatus({
-      kindId: activeKindId,
-      modelStatus: ModelStatus.Trained,
-      nameOrArch: model.name,
-    }),
-  );
-};
-
 const predictListener = async (
   listenerAPI: StoreListemerAPI,
   modelName: string | number,
 ) => {
-  const {
-    data: dataState,
-    classifier: classifierState,
-    project: projectData,
-  } = listenerAPI.getState();
+  const { data: dataState, project: projectData } = listenerAPI.getState();
 
   /* ACTIVE KIND */
   const activeKindId = projectData.activeKind;
@@ -319,21 +126,8 @@ const predictListener = async (
 
   /* CLASSIFIER */
 
-  const activeClassifier = classifierState.kindClassifiers[activeKindId];
-  const modelIdx = activeClassifier.modelNameOrArch;
-
   const model = availableClassificationModels[modelName];
-  const modelInfo = activeClassifier.modelInfoDict[modelIdx];
 
-  const {
-    preprocessSettings: preprocessOptions,
-    optimizerSettings,
-    inputShape,
-  } = modelInfo.params;
-  const fitOptions = getSubset(optimizerSettings, [
-    "batchSize",
-    "epochs",
-  ]) as FitOptions;
   let finalModelStatus = ModelStatus.Trained;
 
   /* CHECK FOR SIMPLE ERRORS */
@@ -368,12 +162,7 @@ const predictListener = async (
     );
   } else {
     try {
-      model.loadInference(inferenceThings, {
-        categories: activeCategories,
-        inputShape,
-        preprocessOptions,
-        fitOptions,
-      });
+      model.loadInference(inferenceThings, activeCategories);
       const thingIds = inferenceThings.map((thing) => thing.id);
       logger("before predict");
       const categoryIds = await model.predict(activeCategories);

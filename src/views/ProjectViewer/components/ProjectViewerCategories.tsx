@@ -9,7 +9,6 @@ import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { CategoryItemMenu } from "components/categories/CategoryItemMenu";
 import { CategoryItem } from "./list-items/CategoryItem";
-import { PredictionListItems } from "./list-items/PredictionListItems";
 
 import { projectSlice } from "store/project";
 import { selectHighlightedCategory } from "store/project/selectors";
@@ -19,11 +18,10 @@ import {
   selectActiveSelectedThingIds,
 } from "store/project/reselectors";
 import { dataSlice } from "store/data/dataSlice";
-import { selectClassifierStatus } from "store/classifier/reselectors";
 
 import { isUnknownCategory } from "store/data/helpers";
 
-import { ModelStatus, Partition } from "utils/models/enums";
+import { Partition } from "utils/models/enums";
 import { HotkeyContext } from "utils/common/enums";
 
 import { Category } from "store/data/types";
@@ -39,7 +37,6 @@ export const ProjectViewerCategories = () => {
 
   const highlightedCategory = useSelector(selectHighlightedCategory);
 
-  const modelStatus = useSelector(selectClassifierStatus);
   const selectedImageIds = useSelector(selectActiveSelectedThingIds);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
@@ -272,7 +269,6 @@ export const ProjectViewerCategories = () => {
           })}
         </List>
 
-        {modelStatus === ModelStatus.Suggesting && <PredictionListItems />}
         <CustomListItemButton
           icon={<AddIcon />}
           primaryText="Create Category"

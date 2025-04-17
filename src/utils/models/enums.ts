@@ -20,6 +20,7 @@ export enum ModelStatus {
   Predicting,
   Suggesting,
   Evaluating,
+  Pending,
 }
 
 export enum OptimizationAlgorithm {
