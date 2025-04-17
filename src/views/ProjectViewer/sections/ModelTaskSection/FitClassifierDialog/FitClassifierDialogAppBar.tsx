@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -12,7 +12,6 @@ import {
   FormControlLabel,
   Tooltip,
   Icon,
-  Typography,
 } from "@mui/material";
 import {
   Close,
@@ -32,43 +31,19 @@ import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
 import {
   selectClassifierFitOptions,
   selectClassifierModel,
-  selectClassifierModelInfo,
   selectClassifierModelNameOrArch,
-  selectClassifierStatus,
 } from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 
 import { APPLICATION_COLORS } from "utils/common/constants";
 import { ModelStatus } from "utils/models/enums";
-import { AlertType } from "utils/common/enums";
-import { AlertBar } from "components/ui";
-import { AlertState } from "utils/common/types";
-import { selectAlertState } from "store/applicationSettings/selectors";
 import { useClassifierHistory } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
-import { Kind } from "store/data/types";
-import { getStackTraceFromError } from "utils/common/helpers";
-import { applicationSettingsSlice } from "store/applicationSettings";
-import useFitClassifier, {
-  getClassificationModel,
-  prepareTrainingCB,
-} from "views/ProjectViewer/hooks/useFitClassifier";
-import { SequentialClassifier } from "utils/models/classification";
-import { ModelInfo } from "store/types";
-import {
-  selectActiveCategories,
-  selectActiveThings,
-} from "store/project/reselectors";
+import useFitClassifier from "views/ProjectViewer/hooks/useFitClassifier";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
-};
-
-const noLabeledThingsAlert: AlertState = {
-  alertType: AlertType.Info,
-  name: "No labeled images",
-  description: "Please label images to train a model.",
 };
 
 export const FitClassifierDialogAppBar = ({
@@ -82,7 +57,6 @@ export const FitClassifierDialogAppBar = ({
     selectShowClearPredictionsWarning,
   );
   const epochs = useSelector(selectClassifierFitOptions).epochs;
-  const [showWarning, setShowWarning] = useState<boolean>(true);
   const { currentEpoch } = useClassifierHistory();
   const { isReady, modelStatus, shouldClearPredictions, error } =
     useClassifierStatus();
@@ -120,7 +94,9 @@ export const FitClassifierDialogAppBar = ({
       clearAndFit();
     }
   };
-
+  useEffect(() => {
+    console.log(ModelStatus[modelStatus]);
+  }, [modelStatus]);
   return (
     <AppBar
       sx={{
