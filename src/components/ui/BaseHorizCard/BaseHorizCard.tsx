@@ -4,10 +4,8 @@ import {
   CardActionArea,
   CardActions,
   CardContent,
-  CardHeader,
   CardMedia,
   Divider,
-  Grid,
   Link,
   Tooltip,
   Typography,
@@ -18,14 +16,14 @@ export const BaseHorizCard = ({
   action,
   image,
   description,
-  source,
+  sources,
   license,
 }: {
   title: string;
   action: any;
   image?: string;
   description: string;
-  source: { sourceUrl: string; sourceName: string };
+  sources: { sourceUrl: string; sourceName: string }[];
   license?: { licenseUrl?: string; licenseName?: string };
 }) => {
   return (
@@ -35,50 +33,53 @@ export const BaseHorizCard = ({
         width: "95%",
         mx: "auto",
         my: 2,
-        height: "fit-content",
+        height: "120px",
+        backgroundColor: "transparent",
+        backgroundImage: "none",
+        boxShadow: "none",
+        overflow: "visible",
       }}
     >
-      <CardActionArea onClick={action} sx={{ width: "100%" }}>
-        <Grid container gap={1} paddingX={1}>
-          {image && (
-            <Grid
-              item
-              sm={2}
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-            >
-              <CardMedia
-                component="img"
-                //height="100%"
-                image={image}
-                alt={title}
-                sx={{ my: "auto" }}
-              />
-            </Grid>
-          )}
-          <Grid
-            item
-            sm={image ? 9 : 12}
-            display="flex"
-            flexDirection="column"
-            justifyContent="space-between"
+      <CardActionArea
+        onClick={action}
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "flex-start",
+          alignItems: "flex-start",
+          backgroundColor: "transparent",
+          p: 1,
+        }}
+      >
+        {image && (
+          <CardMedia
+            component="img"
+            image={image}
+            alt={title}
+            sx={{
+              width: "120px",
+              height: "120px",
+              borderRadius: "4px",
+            }}
+          />
+        )}
+        <Box>
+          <CardContent
+            //sx={(theme) => ({ ":last-child": { pb: theme.spacing(1) } })}
+            sx={{ py: 0 }}
           >
-            <Box>
-              <CardHeader title={title} />
-              <Divider variant="middle" />
-              <CardContent
-                sx={(theme) => ({ ":last-child": { pb: theme.spacing(1) } })}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  {description}
-                </Typography>
-              </CardContent>
-            </Box>
+            <Typography variant="h5">{title}</Typography>
+            <Divider variant="middle" />
+            <Typography variant="body2" color="text.secondary">
+              {description}
+            </Typography>
+          </CardContent>
 
-            <CardActions sx={(theme) => ({ pl: theme.spacing(2) })}>
+          <CardActions sx={(theme) => ({ pl: theme.spacing(2), pb: 0 })}>
+            {sources.map((source) => (
               <Tooltip
-                title={source.sourceName}
+                key={source.sourceUrl}
+                title={source.sourceUrl}
                 disableInteractive
                 enterDelay={50}
               >
@@ -94,34 +95,34 @@ export const BaseHorizCard = ({
                     event.stopPropagation();
                   }}
                 >
-                  Source
+                  {source.sourceName}
                 </Link>
               </Tooltip>
-              {license && (
-                <Tooltip
-                  title={license.licenseName}
-                  disableInteractive
-                  enterDelay={50}
+            ))}
+            {license && (
+              <Tooltip
+                title={license.licenseName}
+                disableInteractive
+                enterDelay={50}
+              >
+                <Link
+                  color="primary"
+                  href={license.licenseUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  underline="always"
+                  variant="body2"
+                  onClick={(event) => {
+                    event.ctrlKey = true;
+                    event.stopPropagation();
+                  }}
                 >
-                  <Link
-                    color="primary"
-                    href={license.licenseUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    underline="always"
-                    variant="body2"
-                    onClick={(event) => {
-                      event.ctrlKey = true;
-                      event.stopPropagation();
-                    }}
-                  >
-                    License
-                  </Link>
-                </Tooltip>
-              )}
-            </CardActions>
-          </Grid>
-        </Grid>
+                  License
+                </Link>
+              </Tooltip>
+            )}
+          </CardActions>
+        </Box>
       </CardActionArea>
     </Card>
   );

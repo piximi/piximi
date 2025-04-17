@@ -53,7 +53,7 @@ export function CustomTabs(
     disabledTabs,
     secondaryEffect,
     activeLabel,
-    transition,
+    transition = "basic",
     extendable,
     handleTabClose,
     handleNew,
