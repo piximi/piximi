@@ -97,7 +97,7 @@ export function prepareTrainingData(
   if (activeThingIds) {
     activeThingIds.forEach((id) => {
       const thing = (allThings as Record<string, Thing>)[id];
-      if (!thing) throw new Error("Active Thing Ids not in synce with things");
+      if (!thing) throw new Error("Active Thing Ids not in sync with things");
       if (isUnknownCategory(thing.categoryId)) {
         unlabeledThings.push(thing);
       } else if (thing.partition === Partition.Unassigned) {
@@ -161,26 +161,26 @@ export const prepareModel = async (
   validationData: Thing[],
   numClasses: number,
   categories: Category[],
-  preprocessSettings: PreprocessSettings,
+  preprocessOptions: PreprocessSettings,
   inputShape: Shape,
   compileOptions: OptimizerSettings,
-  fitOptions: FitOptions,
 ) => {
   /* LOAD CLASSIFIER MODEL */
-
   try {
     if (model instanceof SimpleCNN) {
       (model as SimpleCNN).loadModel({
         inputShape,
         numClasses,
-        randomizeWeights: preprocessSettings.shuffle,
+        randomizeWeights: preprocessOptions.shuffle,
         compileOptions,
+        preprocessOptions,
       });
     } else if (model instanceof MobileNet) {
       await (model as MobileNet).loadModel({
         inputShape,
         numClasses,
         compileOptions,
+        preprocessOptions,
         freeze: false,
         useCustomTopLayer: true,
       });
@@ -191,37 +191,16 @@ export const prepareModel = async (
       return;
     }
   } catch (error) {
-    throw new Error("Failed to create tensorflow model", error as Error);
-    // handleError(
-    //   listenerAPI,
-    //   error as Error,
-    //   "Failed to create tensorflow model",
-    //   activeKindId,
-    //   { fittingError: true },
-    // );
-    return;
+    throw new Error("Failed to create tensorflow model", {
+      cause: error as Error,
+    });
   }
   try {
-    const loadDataArgs = {
-      categories,
-      inputShape,
-      preprocessOptions: preprocessSettings,
-      fitOptions,
-    };
-    model.loadTraining(trainingData, loadDataArgs);
-    model.loadValidation(validationData, loadDataArgs);
+    model.loadTraining(trainingData, categories);
+    model.loadValidation(validationData, categories);
   } catch (error) {
-    throw new Error("Error in preprocessing", error as Error);
-    // handleError(
-    //   listenerAPI,
-    //   error as Error,
-    //   "Error in preprocessing",
-    //   activeKindId,
-    //   {
-    //     fittingError: true,
-    //   },
-    // );
-    return;
+    console.log(error);
+    throw new Error("Error in preprocessing", { cause: error as Error });
   }
 };
 
@@ -262,12 +241,7 @@ export const trainModel = async (
   // } catch (error) {
   //   console.log(error);
   //   throw new Error("Error training the model", error as Error);
-  //   // handleError(
-  //   //   listenerAPI,
-  //   //   error as Error,
-  //   //   "Error training the model",
-  //   //   activeKindId,
-  //   // );
+
   //   return;
   // }
 };

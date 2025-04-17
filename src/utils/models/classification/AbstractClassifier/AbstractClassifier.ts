@@ -14,24 +14,32 @@ import {
   zeros,
 } from "@tensorflow/tfjs";
 
-import { preprocessClassifier } from "./preprocess";
+import { preprocessData } from "./preprocess";
 import { Model } from "../../Model";
 
 import {
   ClassifierEvaluationResultType,
   FitOptions,
-  LoadDataArgs,
   TrainingCallbacks,
 } from "../../types";
 import { evaluateConfusionMatrix, getLayersModelSummary } from "../../helpers";
-import { OldCategory, Thing } from "store/data/types";
+import { Category, Shape, Thing } from "store/data/types";
 import { logger } from "utils/common/helpers";
+import { CropSchema } from "utils/models/enums";
 
 export abstract class SequentialClassifier extends Model {
   protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  protected _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  protected _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D }>;
   private _cachedOutputShape?: number[];
+  protected _preprocessingOptions?: {
+    cropSchema: CropSchema;
+    numCrops: number;
+    inputShape: Shape;
+    shuffle: boolean;
+    rescale: boolean;
+    batchSize: number;
+  };
 
   public override dispose() {
     this._trainingDataset = undefined;
@@ -41,33 +49,33 @@ export abstract class SequentialClassifier extends Model {
     super.dispose();
   }
 
-  public loadTraining<T extends Thing>(
-    images: T[],
-    preprocessingArgs: LoadDataArgs,
-  ) {
-    this._trainingDataset = preprocessClassifier({
+  public loadTraining<T extends Thing>(images: T[], categories: Category[]) {
+    if (!this._preprocessingOptions) return;
+    this._trainingDataset = preprocessData({
       images,
-      ...preprocessingArgs,
+      categories,
+      preprocessOptions: this._preprocessingOptions,
+      inference: false,
     });
   }
 
-  public loadValidation<T extends Thing>(
-    images: T[],
-    preprocessingArgs: LoadDataArgs,
-  ) {
-    this._validationDataset = preprocessClassifier({
+  public loadValidation<T extends Thing>(images: T[], categories: Category[]) {
+    if (!this._preprocessingOptions) return;
+    this._validationDataset = preprocessData({
       images,
-      ...preprocessingArgs,
+      categories,
+      preprocessOptions: this._preprocessingOptions,
+      inference: false,
     });
   }
 
-  public loadInference<T extends Thing>(
-    images: T[],
-    preprocessingArgs: LoadDataArgs,
-  ) {
-    this._inferenceDataset = preprocessClassifier({
+  public loadInference<T extends Thing>(images: T[], categories: Category[]) {
+    if (!this._preprocessingOptions) return;
+    this._inferenceDataset = preprocessData({
       images,
-      ...preprocessingArgs,
+      categories,
+      preprocessOptions: this._preprocessingOptions,
+      inference: true,
     });
   }
 
@@ -111,7 +119,7 @@ export abstract class SequentialClassifier extends Model {
     }
   }
 
-  public async predict(categories: Array<OldCategory>): Promise<string[]> {
+  public async predict(categories: Array<Category>): Promise<string[]> {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }

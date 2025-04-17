@@ -55,120 +55,6 @@ export const getClassificationModel = async (
   );
   return newModel;
 };
-export async function prepareTrainingCB(
-  model: SequentialClassifier,
-  initFit: boolean,
-  modelInfo: ModelInfo,
-  onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
-  onErrorCallback: (
-    error: Error,
-    name: string,
-    kindId: Kind["id"],
-    errorType?: { fittingError: boolean },
-  ) => Promise<void>,
-  data: Thing[],
-  allCategories: Category[],
-  kindId: Kind["id"],
-) {
-  let partitionedData: {
-    unlabeledThings: Thing[];
-    labeledUnassigned: Thing[];
-    splitLabeledTraining: Thing[];
-    splitLabeledValidation: Thing[];
-  };
-  let categoryInfo: { categories: Category[]; numClasses: number };
-  try {
-    partitionedData = prepareTrainingData(
-      modelInfo.params.preprocessSettings.shuffle,
-      modelInfo.params.preprocessSettings.trainingPercentage,
-      initFit,
-      data,
-    );
-
-    categoryInfo = prepareClasses(allCategories);
-  } catch (error) {
-    onErrorCallback(error as Error, "Data Partitioning Error", kindId);
-    return;
-  }
-
-  const compileOptions = getSubset(modelInfo.params.optimizerSettings, [
-    "learningRate",
-    "lossFunction",
-    "metrics",
-    "optimizationAlgorithm",
-  ]) as OptimizerSettings;
-  const fitOptions = getSubset(modelInfo.params.optimizerSettings, [
-    "batchSize",
-    "epochs",
-  ]) as FitOptions;
-
-  try {
-    await prepareModel(
-      model,
-      partitionedData.splitLabeledTraining,
-      partitionedData.splitLabeledValidation,
-      categoryInfo.numClasses,
-      categoryInfo.categories,
-      modelInfo.params.preprocessSettings,
-      modelInfo.params.inputShape,
-      compileOptions,
-      fitOptions,
-    );
-  } catch (error) {
-    onErrorCallback(error as Error, "Model Preparation Error", kindId);
-    return;
-  }
-
-  if (initFit) {
-    productionStore.dispatch(
-      dataSlice.actions.updateThings({
-        updates: [
-          ...partitionedData.splitLabeledTraining.map((thing) => ({
-            id: thing.id,
-            partition: Partition.Training,
-          })),
-          ...partitionedData.splitLabeledValidation.map((thing) => ({
-            id: thing.id,
-            partition: Partition.Validation,
-          })),
-          ...partitionedData.unlabeledThings.map((thing) => ({
-            id: thing.id,
-            partition: Partition.Inference,
-          })),
-        ],
-      }),
-    );
-  } else {
-    productionStore.dispatch(
-      dataSlice.actions.updateThings({
-        updates: partitionedData.labeledUnassigned.map((thing) => ({
-          id: thing.id,
-          partition: Partition.Training,
-        })),
-      }),
-    );
-  }
-  productionStore.dispatch(
-    classifierSlice.actions.updateModelStatus({
-      kindId,
-      modelStatus: ModelStatus.Training,
-      nameOrArch: model.name,
-    }),
-  );
-  try {
-    await trainModel(model, onEpochEnd, fitOptions);
-  } catch (error) {
-    onErrorCallback(error as Error, "Model Training Error", kindId);
-    return;
-  }
-  productionStore.dispatch(
-    classifierSlice.actions.updateModelStatus({
-      kindId,
-      modelStatus: ModelStatus.Trained,
-      nameOrArch: model.name,
-    }),
-  );
-}
 
 export const useFitClassifier = () => {
   const dispatch = useDispatch();
@@ -255,6 +141,7 @@ export const useFitClassifier = () => {
       "lossFunction",
       "metrics",
       "optimizationAlgorithm",
+      "batchSize",
     ]) as OptimizerSettings;
     const fitOptions = getSubset(modelInfo.params.optimizerSettings, [
       "batchSize",
@@ -271,7 +158,6 @@ export const useFitClassifier = () => {
         modelInfo.params.preprocessSettings,
         modelInfo.params.inputShape,
         compileOptions,
-        fitOptions,
       );
     } catch (error) {
       handleError(error as Error, "Model Preparation Error");

@@ -6,7 +6,7 @@ import {
   ModelTask,
   OptimizationAlgorithm,
 } from "./enums";
-import { Kind, Category, Shape } from "store/data/types";
+import { Kind, Shape } from "store/data/types";
 
 export interface ModelLayerData {
   layerName: string;
@@ -73,17 +73,11 @@ export type SegmenterCompileSettings = {
 
 export type FitOptions = Pick<OptimizerSettings, "epochs" | "batchSize">;
 
-export type LoadDataArgs = {
-  categories: Array<Category>;
-  inputShape: Shape;
-  preprocessOptions: PreprocessSettings;
-  fitOptions: FitOptions;
-};
-
 export type LoadModelArgs = {
   inputShape: Shape;
   numClasses: number;
   compileOptions: OptimizerSettings;
+  preprocessOptions: PreprocessSettings;
   freeze?: boolean;
   useCustomTopLayer?: boolean;
   randomizeWeights?: boolean;
