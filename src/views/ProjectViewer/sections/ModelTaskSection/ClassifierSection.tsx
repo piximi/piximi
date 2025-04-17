@@ -13,25 +13,22 @@ import { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";
 
 import { HotkeyContext } from "utils/common/enums";
 import { ModelStatus, ModelTask } from "utils/models/enums";
-import {
-  selectClassifierEvaluationResult,
-  selectClassifierModel,
-  selectClassifierStatus,
-} from "store/classifier/reselectors";
+import { selectClassifierModel } from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 import { Model } from "utils/models/Model";
 import { Shape } from "store/data/types";
 import { SequentialClassifier } from "utils/models/classification";
 import { classifierSlice } from "store/classifier";
+import { PredictionListItems } from "views/ProjectViewer/components/list-items";
+import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 
 export const ClassifierSection = () => {
   const dispatch = useDispatch();
-  const evaluationResults = useSelector(selectClassifierEvaluationResult);
-  const modelStatus = useSelector(selectClassifierStatus);
   const selectedModel = useSelector(selectClassifierModel);
   const activeKindId = useSelector(selectActiveKindId);
   const [waitingForResults, setWaitingForResults] = useState(false);
   const [helperText, setHelperText] = useState<string>("No trained model");
+  const { modelStatus } = useClassifierStatus();
 
   const handleImportModel = async (model: Model, inputShape: Shape) => {
     if (model instanceof SequentialClassifier) {
@@ -159,6 +156,7 @@ export const ClassifierSection = () => {
           helperText={helperText}
         />
       </Box>
+      {modelStatus === ModelStatus.Pending && <PredictionListItems />}
       <ImportTensorflowClassificationModelDialog
         onClose={handleCloseImportClassifierDialog}
         open={ImportClassifierDialogOpen}

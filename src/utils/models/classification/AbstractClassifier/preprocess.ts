@@ -18,11 +18,10 @@ import {
 } from "@tensorflow/tfjs";
 
 import { matchedCropPad, padToMatch } from "../../helpers";
-import { FitOptions, PreprocessSettings } from "../../types";
 import { CropSchema, Partition } from "../../enums";
 import { denormalizeTensor, getImageSlice } from "utils/common/tensorHelpers";
 import { BitDepth } from "utils/file-io/types";
-import { OldCategory, OldImageType, Shape, Thing } from "store/data/types";
+import { Category, Shape, Thing } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 import { logger } from "utils/common/helpers";
 
@@ -40,7 +39,7 @@ const createClassificationIdxs = <
       if (cat.id !== UNKNOWN_IMAGE_CATEGORY_ID) {
         return cat.id === im.categoryId;
       } else {
-        throw Error(
+        throw new Error(
           `image "${im.name}" has an unrecognized category id of "${im.categoryId}"`,
         );
       }
@@ -52,82 +51,123 @@ const createClassificationIdxs = <
   return categoryIdxs;
 };
 
-const sampleGenerator = <T extends Omit<Thing, "kind">, K extends OldCategory>(
+const sampleGenerator = <
+  T extends Omit<Thing, "kind">,
+  K extends Category,
+  B extends boolean,
+>(
   images: Array<T>,
   categories: Array<K>,
-) => {
+  inference: B,
+): B extends true
+  ? () => Generator<
+      {
+        xs: Tensor3D;
+      },
+      void,
+      unknown
+    >
+  : () => Generator<
+      {
+        xs: Tensor3D;
+        ys: Tensor1D;
+      },
+      void,
+      unknown
+    > => {
   const count = images.length;
-  const categoryIdxs = createClassificationIdxs(images, categories);
+  if (inference) {
+    return function* () {
+      let index = 0;
 
-  return function* () {
-    let index = 0;
+      while (index < count) {
+        const image = images[index];
+        let activePlane = 0;
 
-    while (index < count) {
-      const image = images[index];
-      let activePlane = 0;
+        if ("activePlane" in image) {
+          activePlane = image.activePlane;
+        }
+        const dataPlane = getImageSlice(image.data, activePlane);
 
-      if ("activePlane" in image) {
-        activePlane = image.activePlane;
-      }
-      const dataPlane = getImageSlice(image.data, activePlane);
-
-      const label = categoryIdxs[index];
-      const oneHotLabel = oneHot(label, categories.length) as Tensor1D;
-
-      /*
-       dataPlane and oneHotLabel will be disposed by TF after passing it to fit/evaluate/predict
+        /*
+       dataPlane will be disposed by TF after passing it to fit/evaluate/predict
  
        we don't clone the "dataPlane" tensor because "getImageSlice" is already giving
        us a new, disposable, tensor derived from "image"
       */
 
-      yield {
-        xs: dataPlane,
-        ys: oneHotLabel,
-      };
+        yield {
+          xs: dataPlane,
+        };
 
-      index++;
-    }
-  };
+        index++;
+      }
+    } as any;
+  } else {
+    const categoryIdxs = createClassificationIdxs(images, categories);
+
+    return function* () {
+      let index = 0;
+
+      while (index < count) {
+        const image = images[index];
+        let activePlane = 0;
+
+        if ("activePlane" in image) {
+          activePlane = image.activePlane;
+        }
+        const dataPlane = getImageSlice(image.data, activePlane);
+
+        const label = categoryIdxs[index];
+        const oneHotLabel = oneHot(label, categories.length) as Tensor1D;
+
+        /*
+         dataPlane and oneHotLabel will be disposed by TF after passing it to fit/evaluate/predict
+
+         we don't clone the "dataPlane" tensor because "getImageSlice" is already giving
+         us a new, disposable, tensor derived from "image"
+        */
+
+        yield {
+          xs: dataPlane,
+          ys: oneHotLabel,
+        };
+
+        index++;
+      }
+    } as any;
+  }
 };
 
-const cropResize = (
+const cropResize = <B extends boolean>(
   inputShape: Shape,
-  preprocessOptions: PreprocessSettings,
-  training: boolean,
-  item: {
-    xs: Tensor3D;
-    ys: Tensor1D;
-  },
-): {
-  xs: Tensor3D;
-  ys: Tensor1D;
-} => {
+  cropSchema: CropSchema,
+  numCrops: number,
+  inference: B,
+  item: { xs: Tensor3D; ys?: Tensor2D },
+): B extends true
+  ? { xs: Tensor3D }
+  : {
+      xs: Tensor3D;
+      ys: Tensor1D;
+    } => {
   const cropSize: [number, number] = [inputShape.height, inputShape.width];
 
   // [y1, x1, y2, x2]
   let cropCoords: [number, number, number, number];
-  switch (preprocessOptions.cropOptions.cropSchema) {
+  switch (cropSchema) {
     case CropSchema.Match:
       cropCoords = matchedCropPad({
         sampleWidth: item.xs.shape[1],
         sampleHeight: item.xs.shape[0],
         cropWidth: cropSize[1],
         cropHeight: cropSize[0],
-        randomCrop: training && preprocessOptions.cropOptions.numCrops > 1,
+        randomCrop: !inference && numCrops > 1,
       });
       break;
     case CropSchema.None:
       cropCoords = [0.0, 0.0, 1.0, 1.0];
       break;
-    default:
-      if (import.meta.env.NODE_ENV !== "production") {
-        console.error(
-          "No case for CropSchema:",
-          preprocessOptions.cropOptions.cropSchema,
-        );
-      }
-      throw Error("CropSchema has unknown value");
   }
 
   const crop = tidy(() => {
@@ -136,7 +176,7 @@ const cropResize = (
     const boxInd = tensor1d([0], "int32");
 
     const xs =
-      preprocessOptions.cropOptions.cropSchema === CropSchema.Match
+      cropSchema === CropSchema.Match
         ? padToMatch(
             item.xs,
             { width: cropSize[1], height: cropSize[0] },
@@ -164,16 +204,10 @@ const cropResize = (
   return {
     ...item,
     xs: crop,
-  };
+  } as any;
 };
 
-const scale = (
-  bitDepth: BitDepth,
-  items: {
-    xs: Tensor3D;
-    ys: Tensor1D;
-  },
-) => {
+const scale = <T extends { xs: Tensor3D }>(bitDepth: BitDepth, items: T) => {
   const scaleddXs = denormalizeTensor(items.xs, bitDepth);
 
   return {
@@ -290,77 +324,72 @@ const doShow = (
 //#endregion Debug stuff
 
 type PreprocessArgs = {
-  images: Array<Omit<OldImageType, "colors">>;
-  categories: Array<OldCategory>;
-  inputShape: Shape;
-  preprocessOptions: PreprocessSettings;
-  fitOptions: FitOptions;
+  images: Array<Thing>;
+  categories: Array<Category>;
+  preprocessOptions: {
+    cropSchema: CropSchema;
+    numCrops: number;
+    inputShape: Shape;
+    shuffle: boolean;
+    rescale: boolean;
+    batchSize: number;
+  };
 };
 
-export const preprocessClassifier = ({
+export const preprocessData = <B extends boolean>({
   images,
   categories,
-  inputShape,
   preprocessOptions,
-  fitOptions,
-}: PreprocessArgs): tfdata.Dataset<{
-  xs: Tensor4D;
-  ys: Tensor2D;
-}> => {
+  inference,
+}: PreprocessArgs & { inference: B }): B extends true
+  ? tfdata.Dataset<{
+      xs: Tensor4D;
+    }>
+  : tfdata.Dataset<{
+      xs: Tensor4D;
+      ys: Tensor2D;
+    }> => {
   let imageSet: typeof images;
-  let catSet: typeof categories;
-
-  if (
-    preprocessOptions.cropOptions.numCrops > 1 &&
-    images[0].partition === Partition.Training
-  ) {
+  const catSet = categories;
+  console.log(preprocessOptions);
+  if (preprocessOptions.numCrops > 1 && !inference) {
     // no need to copy the tensors here
     imageSet = images.flatMap((im) =>
-      Array(preprocessOptions.cropOptions.numCrops).fill(im),
-    );
-    catSet = categories.flatMap((cat) =>
-      Array(preprocessOptions.cropOptions.numCrops).fill(cat),
+      Array(preprocessOptions.numCrops).fill(im),
     );
   } else {
     imageSet = images;
-    catSet = categories;
   }
 
   let imageData = tfdata
-    .generator(sampleGenerator(imageSet, catSet))
+    .generator(sampleGenerator(imageSet, catSet, !!inference))
     .map(
       cropResize.bind(
         null,
-        inputShape,
-        preprocessOptions,
-        images[0].partition === Partition.Training,
+        preprocessOptions.inputShape,
+        preprocessOptions.cropSchema,
+        preprocessOptions.numCrops,
+        !!inference,
       ),
     );
 
   // If we took crops, the crops from each sample will be sequentially arranged
   // ideally we want to shuffle the partition itslef to avoid biasing the model
   // TODO: warn user against cropping without shuffling
-  if (preprocessOptions.cropOptions.numCrops > 1 && preprocessOptions.shuffle) {
-    imageData = imageData.shuffle(fitOptions.batchSize);
+  if (preprocessOptions.numCrops > 1 && preprocessOptions.shuffle) {
+    imageData = imageData.shuffle(preprocessOptions.batchSize);
   }
 
   // rescaled (in range [0, 1]) by default, scale up if rescale is off
-  if (!preprocessOptions.rescaleOptions.rescale) {
+  if (!preprocessOptions.rescale) {
     imageData = imageData.map(scale.bind(null, images[0].bitDepth));
   }
 
   if (import.meta.env.VITE_APP_LOG_LEVEL === "4") {
     imageData.forEachAsync(
-      doShow.bind(
-        null,
-        images[0].partition,
-        preprocessOptions.rescaleOptions.rescale,
-      ),
+      doShow.bind(null, images[0].partition, preprocessOptions.rescale),
     );
   }
 
-  return imageData.batch(fitOptions.batchSize) as tfdata.Dataset<{
-    xs: Tensor4D;
-    ys: Tensor2D;
-  }>;
+  return imageData.batch(preprocessOptions.batchSize) as any;
 };

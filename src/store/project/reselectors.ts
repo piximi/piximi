@@ -174,6 +174,7 @@ export const selectActiveUnlabeledThingsIds = createSelector(
     const thingsInKind = activeKind.containing;
     const unknownCategoryId = activeKind.unknownCategoryId;
     const unknownThings = catDict[unknownCategoryId]!.containing;
+    console.log(unknownThings);
     return intersection(thingsInKind, unknownThings);
   },
 );
