@@ -16,10 +16,10 @@ type ExampleImageType = {
   description: string;
   imageData: string;
   annotationsFile: SerializedFileType;
-  source: {
+  sources: {
     sourceName: string;
     sourceUrl: string;
-  };
+  }[];
   license?: {
     licenseName: string;
     licenseUrl: string;
@@ -69,7 +69,7 @@ export const ExampleImageCard = ({
       image={exampleImage.imageData}
       action={openExampleImage}
       description={exampleImage.description}
-      source={exampleImage.source}
+      sources={exampleImage.sources}
       license={exampleImage.license}
     />
   );
