@@ -173,7 +173,6 @@ export const classifierSlice = createSlice({
         state.kindClassifiers,
         kindId,
       );
-      console.log(inputShape);
       selectedModelInfo.params.inputShape = {
         ...selectedModelInfo.params.inputShape,
         ...inputShape,
@@ -235,7 +234,7 @@ export const classifierSlice = createSlice({
         typeof selectedModel.modelNameOrArch === "string"
           ? selectedModel.modelNameOrArch
           : "base-model"
-      ].evalResults = evaluationResult;
+      ].evalResults.push(evaluationResult);
     },
     updateShowClearPredictionsWarning(
       state,
