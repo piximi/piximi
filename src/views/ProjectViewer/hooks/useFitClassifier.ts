@@ -24,11 +24,7 @@ import {
   trainModel,
 } from "store/classifier/fit";
 import { getStackTraceFromError, getSubset } from "utils/common/helpers";
-import {
-  FitOptions,
-  OptimizerSettings,
-  TrainingCallbacks,
-} from "utils/models/types";
+import { FitOptions, OptimizerSettings } from "utils/models/types";
 import { dataSlice } from "store/data";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertState } from "utils/common/types";
@@ -64,7 +60,7 @@ export const useFitClassifier = () => {
   const activeCategories = useSelector(selectActiveCategories);
   const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
   const selectedModel = useSelector(selectClassifierModel);
-  const { setCurrentEpoch, epochEndCallback } = useClassifierHistory();
+  const { setTotalEpochs, epochEndCallback } = useClassifierHistory();
   const { newModelName, setModelStatus } = useClassifierStatus();
 
   const handleError = useCallback(
@@ -95,7 +91,9 @@ export const useFitClassifier = () => {
     [dispatch],
   );
   const fitClassifier = useCallback(async () => {
-    setCurrentEpoch(0);
+    setTotalEpochs(
+      (totalEpochs) => totalEpochs + modelInfo.params.optimizerSettings.epochs,
+    );
     let initFit: boolean = false;
     let model: SequentialClassifier;
     try {
@@ -118,6 +116,7 @@ export const useFitClassifier = () => {
     let partitionedData: {
       unlabeledThings: Thing[];
       labeledUnassigned: Thing[];
+      labeledTraining: Thing[];
       splitLabeledTraining: Thing[];
       splitLabeledValidation: Thing[];
     };
@@ -135,7 +134,6 @@ export const useFitClassifier = () => {
       handleError(error as Error, "Data Partitioning Error");
       return;
     }
-
     const compileOptions = getSubset(modelInfo.params.optimizerSettings, [
       "learningRate",
       "lossFunction",
@@ -148,50 +146,62 @@ export const useFitClassifier = () => {
       "epochs",
     ]) as FitOptions;
 
-    try {
-      await prepareModel(
-        model,
-        partitionedData.splitLabeledTraining,
-        partitionedData.splitLabeledValidation,
-        categoryInfo.numClasses,
-        categoryInfo.categories,
-        modelInfo.params.preprocessSettings,
-        modelInfo.params.inputShape,
-        compileOptions,
-      );
-    } catch (error) {
-      handleError(error as Error, "Model Preparation Error");
-      return;
-    }
-
     if (initFit) {
-      dispatch(
-        dataSlice.actions.updateThings({
-          updates: [
-            ...partitionedData.splitLabeledTraining.map((thing) => ({
+      try {
+        await prepareModel(
+          model,
+          partitionedData.splitLabeledTraining,
+          partitionedData.splitLabeledValidation,
+          categoryInfo.numClasses,
+          categoryInfo.categories,
+          modelInfo.params.preprocessSettings,
+          modelInfo.params.inputShape,
+          compileOptions,
+        );
+        dispatch(
+          dataSlice.actions.updateThings({
+            updates: [
+              ...partitionedData.splitLabeledTraining.map((thing) => ({
+                id: thing.id,
+                partition: Partition.Training,
+              })),
+              ...partitionedData.splitLabeledValidation.map((thing) => ({
+                id: thing.id,
+                partition: Partition.Validation,
+              })),
+              ...partitionedData.unlabeledThings.map((thing) => ({
+                id: thing.id,
+                partition: Partition.Inference,
+              })),
+            ],
+          }),
+        );
+      } catch (error) {
+        handleError(error as Error, "Model Preparation Error");
+        return;
+      }
+    } else {
+      if (
+        partitionedData.splitLabeledTraining.length > 0 ||
+        partitionedData.splitLabeledValidation.length > 0
+      ) {
+        model.loadTraining(
+          [
+            ...partitionedData.labeledTraining,
+            ...partitionedData.splitLabeledTraining,
+          ],
+          categoryInfo.categories,
+        );
+
+        dispatch(
+          dataSlice.actions.updateThings({
+            updates: partitionedData.labeledUnassigned.map((thing) => ({
               id: thing.id,
               partition: Partition.Training,
             })),
-            ...partitionedData.splitLabeledValidation.map((thing) => ({
-              id: thing.id,
-              partition: Partition.Validation,
-            })),
-            ...partitionedData.unlabeledThings.map((thing) => ({
-              id: thing.id,
-              partition: Partition.Inference,
-            })),
-          ],
-        }),
-      );
-    } else {
-      dispatch(
-        dataSlice.actions.updateThings({
-          updates: partitionedData.labeledUnassigned.map((thing) => ({
-            id: thing.id,
-            partition: Partition.Training,
-          })),
-        }),
-      );
+          }),
+        );
+      }
     }
 
     setModelStatus(ModelStatus.Training);

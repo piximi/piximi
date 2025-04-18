@@ -16,6 +16,7 @@ import { ModelStatus } from "utils/models/enums";
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { dataSlice } from "store/data";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
+import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
 
 export const usePredictClassifier = () => {
   const dispatch = useDispatch();
@@ -24,6 +25,7 @@ export const usePredictClassifier = () => {
   const activeCategories = useSelector(selectActiveKnownCategories);
   const selectedModel = useSelector(selectClassifierModel);
   const { setModelStatus } = useClassifierStatus();
+  const { setPredictedProbabilities } = useClassifierHistory();
 
   const handleError = useCallback(
     async (error: Error, name: string) => {
@@ -56,36 +58,39 @@ export const usePredictClassifier = () => {
   const predictClassifier = useCallback(async () => {
     if (!selectedModel) return;
     setModelStatus(ModelStatus.Predicting);
-    console.log(
-      activeUnlabeledData.findIndex(
-        (thing) => thing.categoryId === UNKNOWN_IMAGE_CATEGORY_ID,
-      ),
-    );
+
     try {
       selectedModel?.loadInference(activeUnlabeledData, activeCategories);
     } catch (error) {
       handleError(error as Error, "Data Preparation Error");
     }
     const thingIds = activeUnlabeledData.map((thing) => thing.id);
-    let categoryIds: string[] = [];
+    let results: { categoryIds: string[]; probabilities: number[] } = {
+      categoryIds: [],
+      probabilities: [],
+    };
     logger("before predict");
     try {
-      categoryIds = await selectedModel.predict(activeCategories);
+      results = await selectedModel.predict(activeCategories);
       logger("after predict");
     } catch (error) {
       handleError(error as Error, "Error during prediction");
     }
-    console.log(categoryIds);
-    if (thingIds.length === categoryIds.length) {
+    const dataCatProbs: Record<string, number> = {};
+    if (thingIds.length === results.categoryIds.length) {
       dispatch(
         dataSlice.actions.updateThings({
-          updates: thingIds.map((thingId, idx) => ({
-            id: thingId,
-            categoryId: categoryIds[idx],
-          })),
+          updates: thingIds.map((thingId, idx) => {
+            dataCatProbs[thingId] = results.probabilities[idx];
+            return {
+              id: thingId,
+              categoryId: results.categoryIds[idx],
+            };
+          }),
         }),
       );
     }
+    setPredictedProbabilities(dataCatProbs);
     setModelStatus(ModelStatus.Pending);
   }, [dispatch, handleError, activeUnlabeledData, modelInfo, selectedModel]);
 
