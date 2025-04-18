@@ -12,7 +12,6 @@ import {
   OptimizationAlgorithm,
 } from "./enums";
 import { ModelInfo, ModelParams } from "store/types";
-import { ClassifierEvaluationResultType } from "./types";
 import { ClonedClassifier } from "./classification/UploadedClassifier";
 
 export const availableClassifierArchitectures = [SimpleCNN, MobileNet];
@@ -99,6 +98,7 @@ export const getDefaultModelParams = (): ModelParams => ({
 export const getDefaultModelInfo = (): ModelInfo => ({
   status: ModelStatus.Uninitialized,
   params: getDefaultModelParams(),
+  evalResults: [],
 });
 export const kindClassifierModelDict: Record<
   Kind["id"],

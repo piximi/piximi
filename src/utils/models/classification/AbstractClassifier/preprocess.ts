@@ -351,7 +351,6 @@ export const preprocessData = <B extends boolean>({
     }> => {
   let imageSet: typeof images;
   const catSet = categories;
-  console.log(preprocessOptions);
   if (preprocessOptions.numCrops > 1 && !inference) {
     // no need to copy the tensors here
     imageSet = images.flatMap((im) =>

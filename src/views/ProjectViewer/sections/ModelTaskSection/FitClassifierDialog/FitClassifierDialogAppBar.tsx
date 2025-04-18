@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -29,7 +28,6 @@ import { classifierSlice } from "store/classifier";
 import { dataSlice } from "store/data";
 import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
 import {
-  selectClassifierFitOptions,
   selectClassifierModel,
   selectClassifierModelNameOrArch,
 } from "store/classifier/reselectors";
@@ -56,8 +54,7 @@ export const FitClassifierDialogAppBar = ({
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
-  const epochs = useSelector(selectClassifierFitOptions).epochs;
-  const { currentEpoch } = useClassifierHistory();
+  const { currentEpoch, totalEpochs } = useClassifierHistory();
   const { isReady, modelStatus, shouldClearPredictions, error } =
     useClassifierStatus();
 
@@ -94,9 +91,6 @@ export const FitClassifierDialogAppBar = ({
       clearAndFit();
     }
   };
-  useEffect(() => {
-    console.log(ModelStatus[modelStatus]);
-  }, [modelStatus]);
   return (
     <AppBar
       sx={{
@@ -151,7 +145,7 @@ export const FitClassifierDialogAppBar = ({
           </Button>
         ) : (
           <FitClassifierProgressBar
-            epochs={epochs}
+            epochs={totalEpochs}
             currentEpoch={currentEpoch}
           />
         )}

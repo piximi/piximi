@@ -85,12 +85,6 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
     setData([data1, data2]);
   }, [id1, id2, yData1, yData2]);
 
-  useEffect(() => {
-    if (dynamicYRange) {
-      console.log("min: ", min, "-- max: ", max);
-    }
-  });
-
   return (
     <Container sx={{ height: 350, mb: 5 }}>
       <Typography align={"center"} variant="body1">

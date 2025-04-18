@@ -8,6 +8,7 @@ import {
   History,
   tidy,
   argMax,
+  max,
   oneHot,
   math,
   metrics,
@@ -105,21 +106,20 @@ export abstract class SequentialClassifier extends Model {
         epochs: options.epochs,
         validationData: this._validationDataset,
       };
-
       const history = await (this._model as LayersModel).fitDataset(
         this._trainingDataset,
         args,
       );
-
       this.appendHistory(history);
-
       return history;
     } else {
       throw Error(`"${this.name}" Graph Model training not implemented`);
     }
   }
 
-  public async predict(categories: Array<Category>): Promise<string[]> {
+  public async predict(
+    categories: Array<Category>,
+  ): Promise<{ categoryIds: string[]; probabilities: number[] }> {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -133,37 +133,40 @@ export abstract class SequentialClassifier extends Model {
 
     const inferredBatchTensors = await this._inferenceDataset
       .map((items) => {
-        const batchPred = tidy(() => {
-          // we're mapping over batches already, but predict also
-          // takes a batch size option which defaults at 32
-          const batchProbs = model.predict(items.xs) as Tensor2D;
-          return argMax(batchProbs, 1) as Tensor1D;
-        });
+        const batchProbs = model.predict(items.xs) as Tensor2D;
+        const batchPred = argMax(batchProbs, 1) as Tensor1D;
+        const batchMaxProb = max(batchProbs, 1) as Tensor1D;
+        batchProbs.dispose();
 
         return {
           preds: batchPred,
+          probs: batchMaxProb,
         };
       })
       .toArray();
 
     const inferredTensors = inferredBatchTensors.reduce((prev, curr) => {
-      const res = prev.preds.concat(curr.preds);
-
+      const predRes = prev.preds.concat(curr.preds);
+      const probRes = prev.probs.concat(curr.probs);
       prev.preds.dispose();
+      prev.probs.dispose();
       curr.preds.dispose();
+      curr.probs.dispose();
 
       return {
-        preds: res,
+        preds: predRes,
+        probs: probRes,
       };
     });
 
     const predictions = await inferredTensors.preds.array();
-
+    const probabilities = await inferredTensors.probs.array();
     const categoryIds = predictions.map((idx) => categories[idx].id);
 
     inferredTensors.preds.dispose();
+    inferredTensors.probs.dispose();
 
-    return categoryIds;
+    return { categoryIds, probabilities };
   }
 
   public async evaluate(): Promise<ClassifierEvaluationResultType> {
