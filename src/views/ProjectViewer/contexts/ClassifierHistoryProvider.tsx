@@ -39,6 +39,12 @@ const ClassifierHistoryContext = createContext<{
   epochEndCallback: TrainingCallbacks["onEpochEnd"];
   currentEpoch: number;
   setCurrentEpoch: React.Dispatch<React.SetStateAction<number>>;
+  totalEpochs: number;
+  setTotalEpochs: React.Dispatch<React.SetStateAction<number>>;
+  predictedProbabilities: Record<string, number>;
+  setPredictedProbabilities: React.Dispatch<
+    React.SetStateAction<Record<string, number>>
+  >;
 }>({
   modelHistory: initialModelHistory(),
   epochEndCallback: async (epoch: number, logs: any) => {
@@ -47,6 +53,12 @@ const ClassifierHistoryContext = createContext<{
   },
   currentEpoch: 0,
   setCurrentEpoch: (_value: React.SetStateAction<number>) => {},
+  totalEpochs: 0,
+  setTotalEpochs: (_value: React.SetStateAction<number>) => {},
+  predictedProbabilities: {},
+  setPredictedProbabilities: (
+    _value: React.SetStateAction<Record<string, number>>,
+  ) => {},
 });
 
 export const ClassifierHistoryProvider = ({
@@ -57,9 +69,13 @@ export const ClassifierHistoryProvider = ({
   const modelStatus = useSelector(selectClassifierStatus);
   const selectedModel = useSelector(selectClassifierModel);
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
+  const [totalEpochs, setTotalEpochs] = useState<number>(0);
   const [modelHistory, setModelHistory] = useState<HistoryData>(
     initialModelHistory(),
   );
+  const [predictedProbabilities, setPredictedProbabilities] = useState<
+    Record<string, number>
+  >({});
 
   useEffect(() => {
     if (!selectedModel) {
@@ -86,13 +102,17 @@ export const ClassifierHistoryProvider = ({
       },
     );
     setModelHistory(data);
+    if (fullHistory.length > 1) {
+      setTotalEpochs(fullHistory.length);
 
-    setCurrentEpoch(0);
+      setCurrentEpoch(fullHistory.length);
+    }
   }, [selectedModel]);
 
   const epochEndCallback: TrainingCallbacks["onEpochEnd"] = useCallback(
     async (epoch, logs) => {
       let nextEpoch: number;
+
       if (!selectedModel) {
         nextEpoch = epoch + 1;
       } else {
@@ -131,16 +151,13 @@ export const ClassifierHistoryProvider = ({
         }),
       }));
     },
-    [],
+    [selectedModel],
   );
   useEffect(() => {
     if (modelStatus === ModelStatus.Uninitialized) {
       setModelHistory(initialModelHistory());
     }
   }, [modelStatus]);
-  useEffect(() => {
-    console.log("currentEpoch:", currentEpoch);
-  }, [modelHistory]);
 
   return (
     <ClassifierHistoryContext.Provider
@@ -149,6 +166,10 @@ export const ClassifierHistoryProvider = ({
         epochEndCallback,
         currentEpoch,
         setCurrentEpoch,
+        totalEpochs,
+        setTotalEpochs,
+        predictedProbabilities,
+        setPredictedProbabilities,
       }}
     >
       {children}

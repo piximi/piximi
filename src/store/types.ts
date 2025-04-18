@@ -86,7 +86,7 @@ export type ModelInfo = {
   trainingSet?: string[];
   validationDet?: string[];
   params: ModelParams;
-  evalResults?: ClassifierEvaluationResultType;
+  evalResults: ClassifierEvaluationResultType[];
 };
 export type KindClassifier = {
   modelNameOrArch: string | number;

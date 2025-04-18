@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Box, CircularProgress } from "@mui/material";
 import {
   ScatterPlot as ScatterPlotIcon,
@@ -9,7 +9,6 @@ import {
 import { TooltipButton } from "components/ui/tooltips/TooltipButton/TooltipButton";
 
 import { ModelStatus } from "utils/models/enums";
-import { usePredictClassifier } from "views/ProjectViewer/hooks/usePredictClassifier";
 import { useSelector } from "react-redux";
 import { selectClassifierModel } from "store/classifier/reselectors";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
@@ -18,23 +17,21 @@ import { selectActiveUnlabeledThingsIds } from "store/project/reselectors";
 export const ModelExecButtonGroup = ({
   handleFit,
   handleEvaluate,
+  handlePredict,
   modelTrainable,
   helperText,
 }: {
   handleFit: () => void;
   handleEvaluate: () => void;
+  handlePredict: () => Promise<void>;
   modelStatus: ModelStatus;
   modelTrainable: boolean;
   helperText: string;
 }) => {
-  const predictClassifier = usePredictClassifier();
   const selectedModel = useSelector(selectClassifierModel);
   const unlabeledThings = useSelector(selectActiveUnlabeledThingsIds);
   const { modelStatus } = useClassifierStatus();
 
-  useEffect(() => {
-    console.log(unlabeledThings);
-  }, [unlabeledThings]);
   return (
     <Box width="100%" display="flex" justifyContent={"space-evenly"}>
       <TooltipButton
@@ -55,7 +52,7 @@ export const ModelExecButtonGroup = ({
               ? helperText
               : "Predict Model"
         }
-        onClick={predictClassifier}
+        onClick={handlePredict}
         disabled={
           !selectedModel ||
           modelStatus !== ModelStatus.Idle ||
@@ -84,7 +81,7 @@ export const ModelExecButtonGroup = ({
         }
         disableRipple
         onClick={handleEvaluate}
-        disabled={modelStatus !== ModelStatus.Trained || !modelTrainable}
+        disabled={!selectedModel}
       >
         {modelStatus === ModelStatus.Evaluating ? (
           <CircularProgress
