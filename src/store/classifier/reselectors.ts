@@ -147,7 +147,7 @@ export const selectClassifierInputShape = createSelector(
 
 export const selectClassifierEvaluationResult = createSelector(
   selectClassifierModelInfo,
-  (modelInfo): ClassifierEvaluationResultType | undefined => {
+  (modelInfo): ClassifierEvaluationResultType[] => {
     return modelInfo.evalResults;
   },
 );
