@@ -38,5 +38,6 @@ export class SimpleCNN extends SequentialClassifier {
       rescale: preprocessOptions.rescaleOptions.rescale,
       batchSize: compileOptions.batchSize,
     };
+    this._optimizerSettings = compileOptions;
   }
 }

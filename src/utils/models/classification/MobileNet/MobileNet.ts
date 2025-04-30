@@ -44,6 +44,7 @@ export class MobileNet extends SequentialClassifier {
       rescale: preprocessOptions.rescaleOptions.rescale,
       batchSize: compileOptions.batchSize,
     };
+    this._optimizerSettings = compileOptions;
   }
 
   public override dispose() {
