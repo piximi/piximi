@@ -199,7 +199,6 @@ export const prepareModel = async (
     model.loadTraining(trainingData, categories);
     model.loadValidation(validationData, categories);
   } catch (error) {
-    console.log(error);
     throw new Error("Error in preprocessing", { cause: error as Error });
   }
 };
@@ -219,13 +218,11 @@ export const trainModel = async (
         logger(logs);
       };
     }
-
     const history = await model.train(fitOptions, { onEpochEnd });
     import.meta.env.NODE_ENV !== "production" &&
       import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
       logger(history);
   } catch (error) {
-    console.log(error);
     throw new Error("Error training the model", { cause: error as Error });
 
     return;
