@@ -1,7 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { selectActiveKindId } from "../project/selectors";
 import { selectKindClassifiers } from "./selectors";
-import { ModelStatus } from "utils/models/enums";
 import { KindClassifier, ModelInfo } from "store/types";
 import {
   ClassifierEvaluationResultType,
@@ -55,13 +54,6 @@ export const selectClassifierModelInfo = createSelector(
   },
 );
 
-export const selectClassifierStatus = createSelector(
-  selectClassifierModelInfo,
-  (modelInfo): ModelStatus => {
-    return modelInfo.status;
-  },
-);
-
 export const selectClassifierHistory = createSelector(
   [selectClassifierModel, (state, items: string[]) => items],
   (
@@ -98,14 +90,14 @@ export const selectClassifierModelWithIdx = createSelector(
 export const selectClassifierOptimizerSettings = createSelector(
   selectClassifierModelInfo,
   (modelInfo): OptimizerSettings => {
-    return modelInfo.params.optimizerSettings;
+    return modelInfo.optimizerSettings;
   },
 );
 
 export const selectClassifierPreprocessOptions = createSelector(
   selectClassifierModelInfo,
   (modelInfo): PreprocessSettings => {
-    return modelInfo.params.preprocessSettings;
+    return modelInfo.preprocessSettings;
   },
 );
 
@@ -141,7 +133,7 @@ export const selectClassifierEpochs = createSelector(
 export const selectClassifierInputShape = createSelector(
   selectClassifierModelInfo,
   (modelInfo): Shape => {
-    return modelInfo.params.inputShape;
+    return modelInfo.preprocessSettings.inputShape;
   },
 );
 

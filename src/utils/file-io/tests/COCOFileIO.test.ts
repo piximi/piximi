@@ -29,7 +29,6 @@ import { deserializeCOCOFile } from "../deserialize/deserializeCOCO";
 
 import { Partition } from "utils/models/enums";
 import { SerializedCOCOFileType } from "../types";
-import { CATEGORY_COLORS } from "utils/common/constants";
 import {
   Kind,
   AnnotationObject,
@@ -37,6 +36,7 @@ import {
   ImageObject,
 } from "store/data/types";
 import { EntityState } from "@reduxjs/toolkit";
+import { CATEGORY_COLORS } from "store/data/constants";
 
 tfSetBackend("cpu");
 const imDataMap: Record<string, string> = {

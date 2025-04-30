@@ -12,7 +12,7 @@ import {
   Stack,
 } from "@mui/material";
 import { FunctionalDivider } from "components/ui";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "store/classifier";
 import {
@@ -66,8 +66,6 @@ const InputShapeField = () => {
     () => selectedModel && !!selectedModel.model?.requiredChannels,
     [selectedModel],
   );
-  const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
-    useState<string>("");
 
   const handleBlurDispatch = (
     event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
@@ -118,15 +116,6 @@ const InputShapeField = () => {
     }
   };
 
-  useEffect(() => {
-    if (selectedModel.model && selectedModel.model.requiredChannels) {
-      setFixedNumberOfChannelsHelperText(
-        `${selectedModel.model.name} requires ${selectedModel.model.requiredChannels} channels!`,
-      );
-    } else {
-      setFixedNumberOfChannelsHelperText("");
-    }
-  }, [selectedModel]);
   return (
     <FormControl
       size="small"

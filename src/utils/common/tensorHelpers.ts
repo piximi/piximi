@@ -19,10 +19,12 @@ import IJSImage, {
 import { generateUUID } from "store/data/helpers";
 import { Partition } from "utils/models/enums";
 import { BitDepth } from "utils/file-io/types";
-import { DEFAULT_COLORS } from "./constants";
 import { Colors } from "./types";
 import { ImageObject } from "store/data/types";
-import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
+import {
+  DEFAULT_COLORS,
+  UNKNOWN_IMAGE_CATEGORY_ID,
+} from "store/data/constants";
 
 /*
  ========================================

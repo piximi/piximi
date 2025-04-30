@@ -9,12 +9,10 @@ import { createRenderedTensor } from "utils/common/tensorHelpers";
 
 import { ImageObject } from "./types";
 import { TypedAppStartListening } from "store/types";
-import {
-  addClassifierModels,
-  deleteClassifierModels,
-} from "utils/models/availableClassificationModels";
 import _ from "lodash";
 import { classifierSlice } from "store/classifier/classifierSlice";
+import { getDefaultModelInfo } from "utils/models/availableClassificationModels";
+import { recursiveAssign } from "utils/common/helpers";
 
 export const dataMiddleware = createListenerMiddleware();
 
@@ -148,7 +146,8 @@ startAppListening({
     return currentState.data.kinds.ids !== previousState.data.kinds.ids;
   },
   effect: async (action, listenerAPI) => {
-    const currentDataStateKinds = listenerAPI.getState().data.kinds.ids;
+    const { data: dataState, project: projectState } = listenerAPI.getState();
+    const currentDataStateKinds = dataState.kinds.ids;
 
     const previousDataStateKinds =
       listenerAPI.getOriginalState().data.kinds.ids;
@@ -161,10 +160,27 @@ startAppListening({
       currentDataStateKinds,
       previousDataStateKinds,
     );
-
+    const defaultModelInfo = getDefaultModelInfo();
+    recursiveAssign(defaultModelInfo, {
+      preprocessSettings: {
+        inputShape: { channels: projectState.imageChannels },
+      },
+    });
     listenerAPI.dispatch(
       classifierSlice.actions.updateKindClassifiers({
-        changes: { del: deletedKinds, add: addedKinds },
+        changes: {
+          del: deletedKinds,
+          add: addedKinds,
+          presetInfo: addedKinds.map(() => {
+            const defaultModelInfo = getDefaultModelInfo();
+            defaultModelInfo.preprocessSettings.inputShape.channels =
+              projectState.imageChannels ?? 1;
+            return {
+              modelNameOrArch: 0,
+              modelInfoDict: { "base-model": defaultModelInfo },
+            };
+          }),
+        },
       }),
     );
   },

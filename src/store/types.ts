@@ -75,17 +75,13 @@ export type SegmenterState = {
   modelStatus: ModelStatus;
 };
 
-export type ModelParams = {
-  inputShape: Shape;
-  preprocessSettings: PreprocessSettings;
-  optimizerSettings: OptimizerSettings;
-};
-
+export type ModelClassMap = Record<number, Category["id"]>;
 export type ModelInfo = {
-  status: ModelStatus;
   trainingSet?: string[];
   validationDet?: string[];
-  params: ModelParams;
+  classMap?: ModelClassMap;
+  preprocessSettings: PreprocessSettings;
+  optimizerSettings: OptimizerSettings;
   evalResults: ClassifierEvaluationResultType[];
 };
 export type KindClassifier = {
