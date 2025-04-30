@@ -5,15 +5,22 @@ export const WithLabel = ({
   label,
   labelProps,
   children,
+  fullWidth,
 }: {
   label: string;
   labelProps: Omit<TypographyProps, "children">;
   children: React.ReactChild;
+  fullWidth?: boolean;
 }) => {
   return (
-    <Stack direction="row" sx={{ alignItems: "center" }}>
+    <Stack
+      direction="row"
+      sx={{ alignItems: "center", width: fullWidth ? "100%" : undefined }}
+    >
       <Typography {...labelProps}>{label}</Typography>
-      <FormControl sx={{ width: "auto" }}>{children}</FormControl>
+      <FormControl sx={{ width: "auto" }} fullWidth>
+        {children}
+      </FormControl>
     </Stack>
   );
 };
