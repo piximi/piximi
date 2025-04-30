@@ -13,6 +13,7 @@ import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "store/classifier";
 import {
+  selectClassifierModel,
   selectClassifierShuffleOptions,
   selectClassifierTrainingPercentage,
 } from "store/classifier/reselectors";
@@ -29,6 +30,7 @@ export const DataPartitioningSettings = () => {
   const shuffleOptions = useSelector(selectClassifierShuffleOptions);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const { trainable } = useClassifierStatus();
+  const selectedModel = useSelector(selectClassifierModel);
 
   const trainingFieldValidationOptions = useMemo(
     () => ({ min: 0.1, max: 0.99, enableFloat: true }),
@@ -93,7 +95,7 @@ export const DataPartitioningSettings = () => {
             value={trainPercentDisplay}
             fullWidth
             onBlur={dispatchTrainingPercentage}
-            disabled={!trainable}
+            disabled={!!selectedModel || !trainable}
           />
         </WithLabel>
         <Collapse in={showAdvanced}>
@@ -115,6 +117,7 @@ export const DataPartitioningSettings = () => {
               label="Shuffle on Split"
               labelPlacement="start"
               disableTypography
+              disabled={!!selectedModel}
             />
           </FormControl>
         </Collapse>
