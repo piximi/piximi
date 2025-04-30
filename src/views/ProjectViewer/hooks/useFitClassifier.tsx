@@ -34,9 +34,7 @@ import {
 import { Thing, Kind, Category } from "store/data/types";
 import { AlertState } from "utils/common/types";
 import { ModelClassMap, ModelInfo } from "store/types";
-import { isUnknownCategory } from "store/data/helpers";
 import { useClassMapDialog } from "./useClassMapDialog";
-import { createCompileArgs } from "utils/models/helpers";
 
 export const useFitClassifier = () => {
   const dispatch = useDispatch();
@@ -170,6 +168,7 @@ export const useFitClassifier = () => {
       unlabeledThings: Thing[];
       labeledUnassigned: Thing[];
       labeledTraining: Thing[];
+      labeledValidation: Thing[];
       splitLabeledTraining: Thing[];
       splitLabeledValidation: Thing[];
     };
@@ -185,14 +184,19 @@ export const useFitClassifier = () => {
       handleError(error as Error, "Data Partitioning Error");
       return;
     }
-    console.log(selectedModel?.trainingLoaded);
     if (initFit) {
       try {
         categoryInfo = prepareClasses(knownCategories);
         await prepareModel(
           model,
-          partitionedData.splitLabeledTraining,
-          partitionedData.splitLabeledValidation,
+          [
+            ...partitionedData.labeledTraining,
+            ...partitionedData.splitLabeledTraining,
+          ],
+          [
+            ...partitionedData.labeledValidation,
+            ...partitionedData.splitLabeledValidation,
+          ],
           categoryInfo.numClasses,
           categoryInfo.categories,
           modelInfo.preprocessSettings,
@@ -239,14 +243,18 @@ export const useFitClassifier = () => {
           ],
         }),
       );
-      const compileArgs = createCompileArgs(modelInfo.optimizerSettings);
-      //model.model.compile(compileArgs);
       model.loadTraining(
-        partitionedData.splitLabeledTraining,
+        [
+          ...partitionedData.labeledTraining,
+          ...partitionedData.splitLabeledTraining,
+        ],
         Object.values(classMap).map((id) => ({ id })),
       );
       model.loadValidation(
-        partitionedData.splitLabeledValidation,
+        [
+          ...partitionedData.labeledValidation,
+          ...partitionedData.splitLabeledValidation,
+        ],
         Object.values(classMap).map((id) => ({ id })),
       );
     } else {

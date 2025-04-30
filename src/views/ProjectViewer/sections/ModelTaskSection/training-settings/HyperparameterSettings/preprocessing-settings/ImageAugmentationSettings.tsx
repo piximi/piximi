@@ -18,6 +18,7 @@ import { classifierSlice } from "store/classifier";
 import {
   selectClassifierCropOptions,
   selectClassifierInputShape,
+  selectClassifierModel,
   selectClassifierModelWithIdx,
   selectClassifierRescaleOptions,
 } from "store/classifier/reselectors";
@@ -31,7 +32,7 @@ import { WithLabel } from "views/ProjectViewer/components/WithLabel";
 import { useNumberField } from "views/ProjectViewer/hooks/useNumberField";
 
 const RowColInputOptions = { min: 20 };
-const InputShapeField = () => {
+const InputShapeField = ({ disabled }: { disabled: boolean }) => {
   const dispatch = useDispatch();
   const inputShape = useSelector(selectClassifierInputShape);
   const activeKindId = useSelector(selectActiveKindId);
@@ -139,7 +140,7 @@ const InputShapeField = () => {
           onChange={handleInputColsChange}
           value={inputColsDisplay}
           onBlur={handleBlurDispatch}
-          disabled={selectedModel.model && !selectedModel.model.trainable}
+          disabled={disabled}
         />
         <ModelSettingsTextField
           id="shape-rows"
@@ -148,7 +149,7 @@ const InputShapeField = () => {
           onChange={handleInputRowsChange}
           value={inputRowsDisplay}
           onBlur={handleBlurDispatch}
-          disabled={selectedModel.model && !selectedModel.model.trainable}
+          disabled={disabled}
         />
         <ModelSettingsTextField
           id="shape-channels"
@@ -157,10 +158,7 @@ const InputShapeField = () => {
           onChange={handleInputChannelsChange}
           value={inputChannelsDisplay}
           onBlur={handleBlurDispatch}
-          disabled={
-            (selectedModel.model && !selectedModel.model.trainable) ||
-            fixedChannels
-          }
+          disabled={disabled || fixedChannels}
         />
       </Stack>
     </FormControl>
@@ -248,7 +246,7 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
           onChange={handleNumCropsChange}
           value={numCropsDisplay}
           onBlur={dispatchNumCrops}
-          disabled={cropDisabled}
+          disabled={cropDisabled || disabled}
         />
       </WithLabel>
     </Stack>
@@ -260,6 +258,7 @@ export const ImageAugmentationSettings = () => {
   const rescaleOptions = useSelector(selectClassifierRescaleOptions);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [rescalable, setRescalable] = useState<boolean>(rescaleOptions.rescale);
+  const selectedModel = useSelector(selectClassifierModel);
 
   const updateRescaleOptions = (rescaleOptions: RescaleOptions) => {
     dispatch(
@@ -294,10 +293,10 @@ export const ImageAugmentationSettings = () => {
       />
 
       <Stack sx={{ pl: 2 }} spacing={4}>
-        <InputShapeField />
+        <InputShapeField disabled={!!selectedModel} />
         <Collapse in={showAdvanced} style={{ marginTop: 0 }}>
           <Stack spacing={4} sx={{ mt: 4 }}>
-            <CropSection disabled={!rescalable} />
+            <CropSection disabled={!rescalable || !!selectedModel} />
             <FormControl size="small">
               <FormControlLabel
                 sx={(theme) => ({
@@ -317,6 +316,7 @@ export const ImageAugmentationSettings = () => {
                 label="Rescale pixel intensities:"
                 labelPlacement="start"
                 disableTypography
+                disabled={!!selectedModel}
               />
             </FormControl>
           </Stack>
