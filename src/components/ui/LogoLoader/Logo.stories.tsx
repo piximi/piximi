@@ -3,11 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import { LogoLoader } from "./LogoLoader";
 import { Box, Button, Slider } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "store/classifier";
-import { ModelStatus } from "utils/models/enums";
-import { selectClassifierStatus } from "store/classifier/reselectors";
-import { selectActiveKindId } from "store/project/selectors";
 
 const Controller = ({
   width,
@@ -18,19 +13,11 @@ const Controller = ({
   height: number;
   fullLogo: boolean;
 }) => {
-  const dispatch = useDispatch();
-  const modelStatus = useSelector(selectClassifierStatus);
-  const activeKindId = useSelector(selectActiveKindId);
+  const [loading, setLoading] = useState<boolean>(false);
   const [sliderVal, setSliderVal] = useState(100);
 
-  const flipLoad = (newStatus: ModelStatus) => {
-    dispatch(
-      classifierSlice.actions.updateModelStatus({
-        kindId: activeKindId,
-        modelStatus: newStatus,
-        nameOrArch: 0,
-      }),
-    );
+  const flipLoad = () => {
+    setLoading((modelStatus) => !modelStatus);
   };
 
   const handleSlider = (event: Event, newValue: number | number[]) => {
@@ -42,25 +29,13 @@ const Controller = ({
       <LogoLoader
         width={width}
         height={height}
-        loadPercent={
-          modelStatus === ModelStatus.Predicting ? -1 : sliderVal / 100
-        }
+        loadPercent={!loading ? -1 : sliderVal / 100}
         fullLogo={fullLogo}
       />
       <div>{sliderVal < 100 ? `Task ${sliderVal} / 100` : ""}</div>
       <Box sx={{ width: 200 }}>
         <div style={{ width: "100%" }}>
-          <Button
-            onClick={() =>
-              flipLoad(
-                modelStatus === ModelStatus.Predicting
-                  ? ModelStatus.Trained
-                  : ModelStatus.Predicting,
-              )
-            }
-          >
-            Flip Load
-          </Button>
+          <Button onClick={flipLoad}>Flip Load</Button>
         </div>
         <Slider value={sliderVal} onChange={handleSlider} />
       </Box>

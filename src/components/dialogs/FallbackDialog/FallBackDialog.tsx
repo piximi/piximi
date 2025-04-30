@@ -27,10 +27,6 @@ import { useDialogHotkey } from "hooks";
 import { SaveFittedModelDialog, SaveProjectDialog } from "components/dialogs";
 
 import {
-  selectClassifierModel,
-  selectClassifierStatus,
-} from "store/classifier/reselectors";
-import {
   selectSegmenterModel,
   selectSegmenterModelStatus,
 } from "store/segmenter/selectors";
@@ -43,6 +39,7 @@ import { AlertType } from "utils/common/enums";
 import { ModelStatus } from "utils/models/enums";
 
 import { AlertState } from "utils/common/types";
+import { availableClassificationModels } from "utils/models/availableClassificationModels";
 
 export const FallBackDialog = (props: any) => {
   const error = props.error as Error;
@@ -91,9 +88,6 @@ export const FallBackDialog = (props: any) => {
     onOpen: onSaveSegmenterDialogOpen,
     open: openSaveSegmenterDialog,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
-
-  const selectedClassifierModel = useSelector(selectClassifierModel);
-  const classifierModelStatus = useSelector(selectClassifierStatus);
 
   const selectedSegmenterModel = useSelector(selectSegmenterModel);
   const segmenterModelStatus = useSelector(selectSegmenterModelStatus);
@@ -226,7 +220,7 @@ export const FallBackDialog = (props: any) => {
           <Button variant="outlined" onClick={onSaveProjectDialogOpen}>
             Save project
           </Button>
-          {classifierModelStatus === ModelStatus.Trained && (
+          {Object.keys(availableClassificationModels).length > 0 && (
             <Button variant="outlined" onClick={onSaveClassifierDialogOpen}>
               Save classifier
             </Button>

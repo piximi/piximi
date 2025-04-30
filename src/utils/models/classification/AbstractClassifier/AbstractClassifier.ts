@@ -24,23 +24,16 @@ import {
   TrainingCallbacks,
 } from "../../types";
 import { evaluateConfusionMatrix, getLayersModelSummary } from "../../helpers";
-import { Category, Shape, Thing } from "store/data/types";
+import { Category, Thing } from "store/data/types";
 import { logger } from "utils/common/helpers";
-import { CropSchema } from "utils/models/enums";
+import { RequireOnly } from "utils/common/types";
 
 export abstract class SequentialClassifier extends Model {
   protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   protected _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D }>;
   private _cachedOutputShape?: number[];
-  protected _preprocessingOptions?: {
-    cropSchema: CropSchema;
-    numCrops: number;
-    inputShape: Shape;
-    shuffle: boolean;
-    rescale: boolean;
-    batchSize: number;
-  };
+  protected override _classes: string[] = [];
 
   public override dispose() {
     this._trainingDataset = undefined;
@@ -50,7 +43,10 @@ export abstract class SequentialClassifier extends Model {
     super.dispose();
   }
 
-  public loadTraining<T extends Thing>(images: T[], categories: Category[]) {
+  public loadTraining<T extends Thing>(
+    images: T[],
+    categories: RequireOnly<Category, "id">[],
+  ) {
     if (!this._preprocessingOptions) return;
     this._trainingDataset = preprocessData({
       images,
@@ -60,7 +56,10 @@ export abstract class SequentialClassifier extends Model {
     });
   }
 
-  public loadValidation<T extends Thing>(images: T[], categories: Category[]) {
+  public loadValidation<T extends Thing>(
+    images: T[],
+    categories: RequireOnly<Category, "id">[],
+  ) {
     if (!this._preprocessingOptions) return;
     this._validationDataset = preprocessData({
       images,
@@ -70,7 +69,10 @@ export abstract class SequentialClassifier extends Model {
     });
   }
 
-  public loadInference<T extends Thing>(images: T[], categories: Category[]) {
+  public loadInference<T extends Thing>(
+    images: T[],
+    categories: RequireOnly<Category, "id">[],
+  ) {
     if (!this._preprocessingOptions) return;
     this._inferenceDataset = preprocessData({
       images,
@@ -111,6 +113,7 @@ export abstract class SequentialClassifier extends Model {
         args,
       );
       this.appendHistory(history);
+      this.setPretrained();
       return history;
     } else {
       throw Error(`"${this.name}" Graph Model training not implemented`);
@@ -118,7 +121,7 @@ export abstract class SequentialClassifier extends Model {
   }
 
   public async predict(
-    categories: Array<Category>,
+    categories: Array<RequireOnly<Category, "id">>,
   ): Promise<{ categoryIds: string[]; probabilities: number[] }> {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
@@ -307,6 +310,13 @@ export abstract class SequentialClassifier extends Model {
     return this.defaultOutputShape[0];
   }
 
+  public set classes(classes: string[]) {
+    this._classes = classes;
+  }
+
+  public get classes() {
+    return this._classes!;
+  }
   public get defaultInputShape() {
     return this._model?.inputs[0].shape!.slice(1) as number[];
   }

@@ -1,6 +1,6 @@
 import { shuffle, take, takeRight } from "lodash";
 import { isUnknownCategory } from "store/data/helpers";
-import { Category, Shape, Thing } from "store/data/types";
+import { Category, Thing } from "store/data/types";
 import { logger } from "utils/common/helpers";
 import {
   MobileNet,
@@ -161,26 +161,25 @@ export const prepareModel = async (
   validationData: Thing[],
   numClasses: number,
   categories: Category[],
-  preprocessOptions: PreprocessSettings,
-  inputShape: Shape,
-  compileOptions: OptimizerSettings,
+  preprocessSettings: PreprocessSettings,
+  optimizerSettings: OptimizerSettings,
 ) => {
   /* LOAD CLASSIFIER MODEL */
   try {
     if (model instanceof SimpleCNN) {
       (model as SimpleCNN).loadModel({
-        inputShape,
+        inputShape: preprocessSettings.inputShape,
         numClasses,
-        randomizeWeights: preprocessOptions.shuffle,
-        compileOptions,
-        preprocessOptions,
+        randomizeWeights: preprocessSettings.shuffle,
+        compileOptions: optimizerSettings,
+        preprocessOptions: preprocessSettings,
       });
     } else if (model instanceof MobileNet) {
       await (model as MobileNet).loadModel({
-        inputShape,
+        inputShape: preprocessSettings.inputShape,
         numClasses,
-        compileOptions,
-        preprocessOptions,
+        compileOptions: optimizerSettings,
+        preprocessOptions: preprocessSettings,
         freeze: false,
         useCustomTopLayer: true,
       });
@@ -196,6 +195,7 @@ export const prepareModel = async (
     });
   }
   try {
+    model.classes = categories.map((cat) => cat.name);
     model.loadTraining(trainingData, categories);
     model.loadValidation(validationData, categories);
   } catch (error) {
@@ -209,39 +209,25 @@ export const trainModel = async (
   onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
   fitOptions: FitOptions,
 ) => {
-  if (!onEpochEnd) {
-    if (import.meta.env.NODE_ENV !== "production") {
-      console.warn("Epoch end callback not provided");
+  try {
+    if (!onEpochEnd) {
+      if (import.meta.env.NODE_ENV !== "production") {
+        console.warn("Epoch end callback not provided");
+      }
+      onEpochEnd = async (epoch: number, logs: any) => {
+        logger(`Epcoch: ${epoch}`);
+        logger(logs);
+      };
     }
-    onEpochEnd = async (epoch: number, logs: any) => {
-      logger(`Epcoch: ${epoch}`);
-      logger(logs);
-    };
+
+    const history = await model.train(fitOptions, { onEpochEnd });
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+      logger(history);
+  } catch (error) {
+    console.log(error);
+    throw new Error("Error training the model", { cause: error as Error });
+
+    return;
   }
-
-  const history = await model.train(fitOptions, { onEpochEnd });
-  import.meta.env.NODE_ENV !== "production" &&
-    import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-    logger(history);
-  // try {
-  //   if (!onEpochEnd) {
-  //     if (import.meta.env.NODE_ENV !== "production") {
-  //       console.warn("Epoch end callback not provided");
-  //     }
-  //     onEpochEnd = async (epoch: number, logs: any) => {
-  //       logger(`Epcoch: ${epoch}`);
-  //       logger(logs);
-  //     };
-  //   }
-
-  //   const history = await model.train(fitOptions, { onEpochEnd });
-  //   import.meta.env.NODE_ENV !== "production" &&
-  //     import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-  //     logger(history);
-  // } catch (error) {
-  //   console.log(error);
-  //   throw new Error("Error training the model", error as Error);
-
-  //   return;
-  // }
 };

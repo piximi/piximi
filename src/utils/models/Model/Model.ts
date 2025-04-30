@@ -1,21 +1,31 @@
 import { GraphModel, History, LayersModel, Tensor, io } from "@tensorflow/tfjs";
 
 import { ModelArgs, ModelHistory, ModelLayerData } from "../types";
-import { ModelTask } from "../enums";
-import { ImageObject } from "store/data/types";
+import { CropSchema, ModelTask } from "../enums";
+import { ImageObject, Shape } from "store/data/types";
 
 export abstract class Model {
   readonly name: string;
   readonly task: ModelTask;
   readonly graph: boolean;
-  readonly pretrained: boolean;
   readonly trainable: boolean;
   readonly kind?: string;
   readonly src?: string;
   readonly requiredChannels?: number;
 
+  private _pretrained: boolean;
+
   protected _model?: LayersModel | GraphModel;
   protected _history: ModelHistory;
+  protected _preprocessingOptions?: {
+    cropSchema: CropSchema;
+    numCrops: number;
+    inputShape: Omit<Shape, "planes">;
+    shuffle: boolean;
+    rescale: boolean;
+    batchSize: number;
+  };
+  protected _classes?: string[];
 
   constructor({
     name,
@@ -31,7 +41,7 @@ export abstract class Model {
     this.task = task;
     this.kind = kind;
     this.graph = graph;
-    this.pretrained = pretrained;
+    this._pretrained = pretrained;
     this.trainable = trainable;
     this.src = src;
     this.requiredChannels = requiredChannels;
@@ -81,6 +91,14 @@ export abstract class Model {
 
   public get history() {
     return this._history;
+  }
+
+  public get pretrained() {
+    return this._pretrained;
+  }
+
+  public setPretrained() {
+    this._pretrained = true;
   }
 
   public abstract loadModel(loadModelArgs?: any): void | Promise<void>;
@@ -135,6 +153,15 @@ export abstract class Model {
           modelInitializer?: typeof modelArtifacts.modelInitializer;
           initializerSignature?: typeof modelArtifacts.initializerSignature;
           trainingConfig?: typeof modelArtifacts.trainingConfig;
+          preprocessSettings?: {
+            cropSchema: CropSchema;
+            numCrops: number;
+            inputShape: Omit<Shape, "planes">;
+            shuffle: boolean;
+            rescale: boolean;
+            batchSize: number;
+          };
+          classes?: string[];
         } = {
           modelTopology: modelArtifacts.modelTopology,
           format: modelArtifacts.format,
@@ -156,6 +183,12 @@ export abstract class Model {
         }
         if (modelArtifacts.trainingConfig != null) {
           modelJSON.trainingConfig = modelArtifacts.trainingConfig;
+        }
+        if (this._preprocessingOptions) {
+          modelJSON.preprocessSettings = this._preprocessingOptions;
+        }
+        if (this._classes) {
+          modelJSON.classes = this._classes;
         }
         modelJsonBlob = new Blob([JSON.stringify(modelJSON)], {
           type: "application/json",

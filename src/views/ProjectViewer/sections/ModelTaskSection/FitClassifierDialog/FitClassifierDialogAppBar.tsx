@@ -25,13 +25,8 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
 import { classifierSlice } from "store/classifier";
-import { dataSlice } from "store/data";
 import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
-import {
-  selectClassifierModel,
-  selectClassifierModelNameOrArch,
-} from "store/classifier/reselectors";
-import { selectActiveKindId } from "store/project/selectors";
+import { selectClassifierModel } from "store/classifier/reselectors";
 
 import { APPLICATION_COLORS } from "utils/common/constants";
 import { ModelStatus } from "utils/models/enums";
@@ -39,6 +34,7 @@ import { useClassifierHistory } from "views/ProjectViewer/contexts/ClassifierHis
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 import useFitClassifier from "views/ProjectViewer/hooks/useFitClassifier";
+import { useMemo } from "react";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
@@ -48,44 +44,48 @@ export const FitClassifierDialogAppBar = ({
   closeDialog,
 }: FitClassifierDialogAppBarProps) => {
   const dispatch = useDispatch();
-  const activeKindId = useSelector(selectActiveKindId);
   const selectedModel = useSelector(selectClassifierModel);
-  const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
   const { currentEpoch, totalEpochs } = useClassifierHistory();
-  const { isReady, modelStatus, shouldClearPredictions, error } =
-    useClassifierStatus();
+  const {
+    isReady,
+    modelStatus,
+    setModelStatus,
+    shouldWarnClearPredictions,
+    clearPredictions,
+    error,
+  } = useClassifierStatus();
 
   const { onClose, onOpen, open } = useDialog();
 
   const fitClassifier = useFitClassifier();
+
+  const showProgressBar = useMemo(() => {
+    switch (modelStatus) {
+      case ModelStatus.Loading:
+      case ModelStatus.Training:
+        return true;
+      default:
+        return false;
+    }
+  }, [modelStatus]);
 
   const onStopFitting = () => {
     if (modelStatus !== ModelStatus.Training || !selectedModel) return;
 
     selectedModel.stopTraining();
 
-    dispatch(
-      classifierSlice.actions.updateModelStatus({
-        kindId: activeKindId,
-        modelStatus: ModelStatus.Trained,
-        nameOrArch: modelNameOrArch,
-      }),
-    );
+    setModelStatus(ModelStatus.Idle);
   };
 
   const clearAndFit = () => {
-    dispatch(
-      dataSlice.actions.clearPredictions({
-        kind: activeKindId,
-      }),
-    );
+    clearPredictions();
     fitClassifier();
   };
   const handleFit = async () => {
-    if (!shouldClearPredictions) {
+    if (shouldWarnClearPredictions) {
       onOpen();
     } else {
       clearAndFit();
@@ -133,7 +133,12 @@ export const FitClassifierDialogAppBar = ({
           </Tooltip>
         )}
 
-        {modelStatus === ModelStatus.Idle ? (
+        {showProgressBar ? (
+          <FitClassifierProgressBar
+            epochs={totalEpochs}
+            currentEpoch={currentEpoch}
+          />
+        ) : (
           <Button
             variant="outlined"
             onClick={handleFit}
@@ -143,11 +148,6 @@ export const FitClassifierDialogAppBar = ({
           >
             Fit Classifier
           </Button>
-        ) : (
-          <FitClassifierProgressBar
-            epochs={totalEpochs}
-            currentEpoch={currentEpoch}
-          />
         )}
 
         <TooltipWithDisable title="Stop fitting the model" placement="bottom">

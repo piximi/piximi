@@ -11,7 +11,6 @@ import {
   SerializedCOCOImageType,
 } from "../../types";
 import { Point } from "views/ImageViewer/utils/types";
-import { UNKNOWN_ANNOTATION_CATEGORY_COLOR } from "utils/common/constants";
 import { RequireOnly } from "utils/common/types";
 import {
   Kind,
@@ -20,7 +19,10 @@ import {
   ImageObject,
   Shape,
 } from "store/data/types";
-import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
+import {
+  UNKNOWN_ANNOTATION_CATEGORY_COLOR,
+  UNKNOWN_CATEGORY_NAME,
+} from "store/data/constants";
 
 type KindMap = Record<
   string,

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import {
   Dialog,
@@ -20,7 +21,6 @@ import {
 } from "store/classifier/reselectors";
 
 import { Category } from "store/data/types";
-import { useState } from "react";
 
 type EvaluateClassifierDialogProps = {
   closeDialog: () => void;
@@ -34,10 +34,13 @@ export const EvaluateClassifierDialog = ({
   const evaluationResults = useSelector(selectClassifierEvaluationResult);
   const categories = useSelector(selectActiveKnownCategories);
   const selectedModel = useSelector(selectClassifierModel);
-  const [trainingRun, setTrainingRun] = useState(0);
+  const [evalResult, setEvalResult] = useState(0);
 
-  const handleRunChange = (event: React.ChangeEvent<unknown>, page: number) => {
-    setTrainingRun(page - 1);
+  const handleEvalResultChange = (
+    _event: React.ChangeEvent<unknown>,
+    page: number,
+  ) => {
+    setEvalResult(page - 1);
   };
 
   return evaluationResults.length === 0 ? null : (
@@ -65,11 +68,11 @@ export const EvaluateClassifierDialog = ({
       >
         <Typography variant="body2">{selectedModel?.name}</Typography>
         <Box display="flex" flexDirection="row" alignItems="center">
-          <Typography variant="body2"> Training Run</Typography>
+          <Typography variant="body2">Evaluation Result</Typography>
           <Pagination
             count={evaluationResults.length}
-            page={trainingRun + 1}
-            onChange={handleRunChange}
+            page={evalResult + 1}
+            onChange={handleEvalResultChange}
           />
         </Box>
       </Box>
@@ -82,7 +85,7 @@ export const EvaluateClassifierDialog = ({
         >
           <ConfusionMatrix
             classNames={categories.map((c: Category) => c.name)}
-            confusionMatrix={evaluationResults[trainingRun].confusionMatrix}
+            confusionMatrix={evaluationResults[evalResult].confusionMatrix}
           />
 
           <div>
@@ -92,30 +95,30 @@ export const EvaluateClassifierDialog = ({
             <Stack spacing={1} direction="row">
               <EvaluationMetricsInfoBox
                 metric={"Accuracy"}
-                value={evaluationResults[trainingRun].accuracy}
+                value={evaluationResults[evalResult].accuracy}
                 link="https://en.wikipedia.org/wiki/Accuracy_and_precision"
               />
               <EvaluationMetricsInfoBox
                 metric={"Cross entropy"}
-                value={evaluationResults[trainingRun].crossEntropy}
+                value={evaluationResults[evalResult].crossEntropy}
                 link="https://en.wikipedia.org/wiki/Cross_entropy"
               />
             </Stack>
             <Stack spacing={1} direction="row">
               <EvaluationMetricsInfoBox
                 metric={"Precision"}
-                value={evaluationResults[trainingRun].precision}
+                value={evaluationResults[evalResult].precision}
                 link="https://en.wikipedia.org/wiki/Precision_and_recall"
               />
               <EvaluationMetricsInfoBox
                 metric={"Recall"}
-                value={evaluationResults[trainingRun].recall}
+                value={evaluationResults[evalResult].recall}
                 link="https://en.wikipedia.org/wiki/Precision_and_recall"
               />
             </Stack>
             <EvaluationMetricsInfoBox
               metric={"F1-score"}
-              value={evaluationResults[trainingRun].f1Score}
+              value={evaluationResults[evalResult].f1Score}
               link="https://en.wikipedia.org/wiki/F-score"
             />
           </div>

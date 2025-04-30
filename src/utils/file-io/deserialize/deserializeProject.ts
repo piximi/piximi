@@ -8,7 +8,7 @@ import { dataConverter_v01v02 } from "utils/file-io/converters/dataConverter_v01
 import { deserializeProject_v02 } from "./v02/deserializeProject_v02";
 import { LoadCB } from "../types";
 import { deserializeProject_v11 } from "./v110/deserializeProject_v11";
-import { classifierConverterv1_v11 } from "../converters/classifierConverterv1_v11";
+import { projectConverterv1_v11 } from "../converters/classifierConverterv1_v11";
 
 export const deserializeProject = async (
   fileStore: CustomStore,
@@ -40,7 +40,7 @@ export const deserializeProject = async (
       annotationCategories: data.annotationCategories,
       oldCategories: data.categories,
     });
-    const classifier = classifierConverterv1_v11(oldClassifier, kinds.ids);
+    const classifier = projectConverterv1_v11(oldClassifier, kinds.ids);
     return {
       project,
       classifier,
@@ -54,7 +54,7 @@ export const deserializeProject = async (
       data,
       segmenter,
     } = await deserializeProject_v02(fileStore, loadCb);
-    const classifier = classifierConverterv1_v11(oldClassifier, data.kinds.ids);
+    const classifier = projectConverterv1_v11(oldClassifier, data.kinds.ids);
 
     return {
       project,

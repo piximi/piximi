@@ -24,7 +24,22 @@ import { BitDepth } from "utils/file-io/types";
 import { Category, Shape, Thing } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 import { logger } from "utils/common/helpers";
+import { RequireOnly } from "utils/common/types";
 
+type FitData = {
+  xs: Tensor3D;
+  ys: Tensor1D;
+};
+type InferenceData = {
+  xs: Tensor3D;
+};
+type BatchedFitData = {
+  xs: Tensor4D;
+  ys: Tensor2D;
+};
+type BatchedInferenceData = {
+  xs: Tensor4D;
+};
 const createClassificationIdxs = <
   T extends { id: string; categoryId: string; name: string },
   K extends { id: string },
@@ -51,30 +66,17 @@ const createClassificationIdxs = <
   return categoryIdxs;
 };
 
-const sampleGenerator = <
+const sampleGeneratorCreator = <
   T extends Omit<Thing, "kind">,
-  K extends Category,
+  K extends { id: string },
   B extends boolean,
 >(
   images: Array<T>,
   categories: Array<K>,
   inference: B,
 ): B extends true
-  ? () => Generator<
-      {
-        xs: Tensor3D;
-      },
-      void,
-      unknown
-    >
-  : () => Generator<
-      {
-        xs: Tensor3D;
-        ys: Tensor1D;
-      },
-      void,
-      unknown
-    > => {
+  ? () => Generator<InferenceData, void, unknown>
+  : () => Generator<FitData, void, unknown> => {
   const count = images.length;
   if (inference) {
     return function* () {
@@ -140,7 +142,7 @@ const sampleGenerator = <
 };
 
 const cropResize = <B extends boolean>(
-  inputShape: Shape,
+  inputShape: Omit<Shape, "planes">,
   cropSchema: CropSchema,
   numCrops: number,
   inference: B,
@@ -325,11 +327,11 @@ const doShow = (
 
 type PreprocessArgs = {
   images: Array<Thing>;
-  categories: Array<Category>;
+  categories: Array<RequireOnly<Category, "id">>;
   preprocessOptions: {
     cropSchema: CropSchema;
     numCrops: number;
-    inputShape: Shape;
+    inputShape: Omit<Shape, "planes">;
     shuffle: boolean;
     rescale: boolean;
     batchSize: number;
@@ -342,13 +344,8 @@ export const preprocessData = <B extends boolean>({
   preprocessOptions,
   inference,
 }: PreprocessArgs & { inference: B }): B extends true
-  ? tfdata.Dataset<{
-      xs: Tensor4D;
-    }>
-  : tfdata.Dataset<{
-      xs: Tensor4D;
-      ys: Tensor2D;
-    }> => {
+  ? tfdata.Dataset<BatchedInferenceData>
+  : tfdata.Dataset<BatchedFitData> => {
   let imageSet: typeof images;
   const catSet = categories;
   if (preprocessOptions.numCrops > 1 && !inference) {
@@ -361,7 +358,7 @@ export const preprocessData = <B extends boolean>({
   }
 
   let imageData = tfdata
-    .generator(sampleGenerator(imageSet, catSet, !!inference))
+    .generator(sampleGeneratorCreator(imageSet, catSet, !!inference))
     .map(
       cropResize.bind(
         null,

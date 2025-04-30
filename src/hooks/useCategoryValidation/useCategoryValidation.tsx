@@ -4,7 +4,7 @@ import { sample } from "lodash";
 import { ColorResult } from "react-color";
 
 import {
-  selectActiveCategoryColors,
+  selectAvaliableCategoryColors,
   selectActiveCategoryNames,
 } from "store/project/reselectors";
 
@@ -16,7 +16,7 @@ export function useCategoryValidation({
   initColor?: string;
 }) {
   const unavailableNames = useSelector(selectActiveCategoryNames);
-  const availableColors = useSelector(selectActiveCategoryColors);
+  const availableColors = useSelector(selectAvaliableCategoryColors);
   const [color, setColor] = useState<string>(
     initColor ?? "", //sample(availableColors)!
   );
