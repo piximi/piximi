@@ -1,4 +1,9 @@
-import { io, loadGraphModel, loadLayersModel } from "@tensorflow/tfjs";
+import {
+  io,
+  LayersModel,
+  loadGraphModel,
+  loadLayersModel,
+} from "@tensorflow/tfjs";
 
 import { Model } from "../Model";
 import { SequentialClassifier } from "./AbstractClassifier";
@@ -8,6 +13,8 @@ import { Shape, ShapeArray } from "store/data/types";
 import { getDefaultModelInfo } from "../availableClassificationModels";
 import { arrayRange, convertArrayToShape, logger } from "utils/common/helpers";
 import { validateModelMetadata } from "utils/file-io/runtimeTypes";
+import { OptimizerSettings } from "../types";
+import { createCompileArgs } from "../helpers";
 
 enum LoadState {
   Unloaded,
@@ -65,10 +72,10 @@ export class UploadedClassifier extends SequentialClassifier {
             batchSize: number;
           };
           classes: string[];
+          optimizerSettings: OptimizerSettings;
         }
       | undefined;
     if (this._descFile) {
-      console.log("here");
       const descContents = await this._descFile.text();
       try {
         metadata = validateModelMetadata(descContents);
@@ -76,12 +83,10 @@ export class UploadedClassifier extends SequentialClassifier {
         logger(err, { level: "warn" });
       }
     }
-    console.log(metadata);
     if (metadata) {
-      console.log(metadata.preprocessSettings.inputShape);
       this._preprocessingOptions = metadata.preprocessSettings;
       this.classes = metadata.classes;
-      const modelSummary = this.modelSummary;
+      this._optimizerSettings = metadata.optimizerSettings;
     } else {
       const defaultModelInfo = getDefaultModelInfo();
       this._preprocessingOptions = {
@@ -94,6 +99,7 @@ export class UploadedClassifier extends SequentialClassifier {
         rescale: defaultModelInfo.preprocessSettings.rescaleOptions.rescale,
         batchSize: defaultModelInfo.optimizerSettings.batchSize,
       };
+      this._optimizerSettings = defaultModelInfo.optimizerSettings;
       const modelSummary = this.modelSummary;
       if (
         modelSummary &&
@@ -102,9 +108,15 @@ export class UploadedClassifier extends SequentialClassifier {
       ) {
         const numClasses = modelSummary.at(-1)?.outputShape.split(",");
         if (numClasses && numClasses.length === 1) {
+          if (+numClasses > 100)
+            throw new Error("Unable to upload backbones at this time");
           this.classes = arrayRange(+numClasses[0]).map((i) => i.toString());
         }
       }
+    }
+    if (!this.graph) {
+      const compileArgs = createCompileArgs(this._optimizerSettings);
+      (this._model as LayersModel).compile(compileArgs);
     }
     this._loadState = LoadState.Uploaded;
   }

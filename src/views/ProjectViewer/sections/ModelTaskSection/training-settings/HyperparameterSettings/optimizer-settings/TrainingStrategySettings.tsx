@@ -4,7 +4,10 @@ import { FunctionalDivider } from "components/ui";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "store/classifier";
-import { selectClassifierFitOptions } from "store/classifier/reselectors";
+import {
+  selectClassifierFitOptions,
+  selectClassifierModel,
+} from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSettingsTextField";
 import { WithLabel } from "views/ProjectViewer/components/WithLabel";
@@ -17,6 +20,7 @@ export const TrainingStrategySettings = () => {
   const { trainable } = useClassifierStatus();
   const fitOptions = useSelector(selectClassifierFitOptions);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const selectedModel = useSelector(selectClassifierModel);
 
   const {
     inputValue: batchSize,
@@ -93,7 +97,7 @@ export const TrainingStrategySettings = () => {
               onChange={handleNumEpochsChange}
               value={numEpochsDisplay}
               onBlur={dispatchNumEpochs}
-              disabled={!trainable}
+              disabled={!!selectedModel || !trainable}
             />
           </WithLabel>
           <Collapse in={showAdvanced}>
@@ -110,7 +114,7 @@ export const TrainingStrategySettings = () => {
                 onChange={handleBatchSizeChange}
                 value={batchSizeDisplay}
                 onBlur={dispatchBatchSize}
-                disabled={!trainable}
+                disabled={!!selectedModel || !trainable}
               />
             </WithLabel>
           </Collapse>
