@@ -11,7 +11,10 @@ import { FunctionalDivider } from "components/ui";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "store/classifier";
-import { selectClassifierOptimizerSettings } from "store/classifier/reselectors";
+import {
+  selectClassifierModel,
+  selectClassifierOptimizerSettings,
+} from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 import { enumKeys } from "utils/common/helpers";
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
@@ -26,6 +29,7 @@ export const OptimizationSettings = () => {
   const activeKindId = useSelector(selectActiveKindId);
   const compileOptions = useSelector(selectClassifierOptimizerSettings);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const selectedModel = useSelector(selectClassifierModel);
   const { trainable } = useClassifierStatus();
 
   const {
@@ -100,6 +104,7 @@ export const OptimizationSettings = () => {
               value={compileOptions.optimizationAlgorithm}
               onChange={handleOptimizationAlgorithmChange}
               fullWidth
+              disabled={!!selectedModel}
             >
               {enumKeys(OptimizationAlgorithm).map((k) => {
                 return (
@@ -121,6 +126,7 @@ export const OptimizationSettings = () => {
               value={compileOptions.lossFunction}
               onChange={handleLossFunctionChange}
               sx={{ maxWidth: "max-content" }}
+              disabled={!!selectedModel}
             >
               {enumKeys(LossFunction).map((k) => {
                 return (
@@ -144,7 +150,7 @@ export const OptimizationSettings = () => {
               onChange={handleLearningRateChange}
               value={learningRateDisplay}
               onBlur={dispatchLearningRate}
-              disabled={!trainable}
+              disabled={!!selectedModel || !trainable}
             />
           </WithLabel>
         </Stack>

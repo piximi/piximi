@@ -8,14 +8,19 @@ import {
   union as IOTSUnion,
   literal as IOTSLiteral,
   boolean as IOTSBoolean,
-  UnknownRecord as IOTSUnknownRecord,
+  record as IOTSRecord,
   KeyofC as IOTSKeyofC,
   keyof as IOTSKeyof,
 } from "io-ts";
 import { getOrElseW } from "fp-ts/Either";
 import { failure } from "io-ts/PathReporter";
 import { logger } from "utils/common/helpers";
-import { CropSchema } from "utils/models/enums";
+import {
+  CropSchema,
+  LossFunction,
+  Metric,
+  OptimizationAlgorithm,
+} from "utils/models/enums";
 
 //#region COCO Serialization Type
 
@@ -159,8 +164,30 @@ export const SerializedModelMetadataRType = IOTSType({
     batchSize: IOTSNumber,
   }),
   classes: IOTSArray(IOTSString),
+  optimizerSettings: IOTSType({
+    learningRate: IOTSNumber,
+    lossFunction: IOTSUnion([
+      enumToCodec(LossFunction),
+      IOTSArray(enumToCodec(LossFunction)),
+      IOTSRecord(IOTSString, enumToCodec(LossFunction)),
+    ]),
+    metrics: IOTSArray(enumToCodec(Metric)),
+    optimizationAlgorithm: enumToCodec(OptimizationAlgorithm),
+    epochs: IOTSNumber,
+    batchSize: IOTSNumber,
+  }),
 });
-
+export type OptimizerSettings = {
+  learningRate: number;
+  lossFunction:
+    | LossFunction
+    | Array<LossFunction>
+    | { [outputName: string]: LossFunction };
+  metrics: Array<Metric>;
+  optimizationAlgorithm: OptimizationAlgorithm;
+  epochs: number;
+  batchSize: number;
+};
 //#endregion Basic Serialization Type
 
 const toError = (errors: any) => {
@@ -201,6 +228,5 @@ export const validateFileType = (
 
 export const validateModelMetadata = (encodedFileContents: string) => {
   const metadata = JSON.parse(encodedFileContents);
-  console.log(metadata);
   return getOrElseW(toError)(SerializedModelMetadataRType.decode(metadata));
 };

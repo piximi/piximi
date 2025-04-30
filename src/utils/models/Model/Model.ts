@@ -1,6 +1,11 @@
 import { GraphModel, History, LayersModel, Tensor, io } from "@tensorflow/tfjs";
 
-import { ModelArgs, ModelHistory, ModelLayerData } from "../types";
+import {
+  ModelArgs,
+  ModelHistory,
+  ModelLayerData,
+  OptimizerSettings,
+} from "../types";
 import { CropSchema, ModelTask } from "../enums";
 import { ImageObject, Shape } from "store/data/types";
 
@@ -26,6 +31,7 @@ export abstract class Model {
     batchSize: number;
   };
   protected _classes?: string[];
+  protected _optimizerSettings?: OptimizerSettings;
 
   constructor({
     name,
@@ -162,6 +168,7 @@ export abstract class Model {
             batchSize: number;
           };
           classes?: string[];
+          optimizerSettings?: OptimizerSettings;
         } = {
           modelTopology: modelArtifacts.modelTopology,
           format: modelArtifacts.format,
@@ -189,6 +196,9 @@ export abstract class Model {
         }
         if (this._classes) {
           modelJSON.classes = this._classes;
+        }
+        if (this._optimizerSettings) {
+          modelJSON.optimizerSettings = this._optimizerSettings;
         }
         modelJsonBlob = new Blob([JSON.stringify(modelJSON)], {
           type: "application/json",
