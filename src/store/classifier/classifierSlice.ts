@@ -98,17 +98,13 @@ export const classifierSlice = createSlice({
     removeModelInfo(
       state,
       action: PayloadAction<{
-        kindId: Kind["id"];
         modelName: string;
       }>,
     ) {
-      const { kindId, modelName } = action.payload;
-      if (!(modelName in state.kindClassifiers[kindId].modelInfoDict)) {
-        throw new Error(
-          `Info for model with name "${modelName}" does not exists`,
-        );
-      }
-      delete state.kindClassifiers[kindId].modelInfoDict[modelName];
+      const { modelName } = action.payload;
+      Object.keys(state.kindClassifiers).forEach((kindId) => {
+        delete state.kindClassifiers[kindId].modelInfoDict[modelName];
+      });
     },
     addModelClassMapping(
       state,

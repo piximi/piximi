@@ -1,26 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   alpha,
-  AppBar,
   Box,
+  Button,
+  Collapse,
   Container,
-  Dialog,
-  DialogContent,
-  IconButton,
   ImageList,
   ImageListItem,
   ImageListItemBar,
+  MenuItem,
+  SelectChangeEvent,
   Stack,
-  Toolbar,
-  Typography,
 } from "@mui/material";
 import { useDialog, useDialogHotkey } from "hooks";
-import { Close } from "@mui/icons-material";
-import {
-  DialogTransitionSlide,
-  SaveFittedModelDialog,
-} from "components/dialogs";
+import { SaveFittedModelDialog } from "components/dialogs";
 import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
 import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
 import { ImportTensorflowClassificationModelDialog } from "./ImportTensorflowModelDialog";
@@ -38,25 +32,33 @@ import { Shape, Thing } from "store/data/types";
 import { SequentialClassifier } from "utils/models/classification";
 import { PredictionListItems } from "views/ProjectViewer/components/list-items";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
-import { selectActiveThings } from "store/project/reselectors";
-import { APPLICATION_COLORS } from "utils/common/constants";
-import { useClassifierHistory } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
-import { orderBy } from "lodash";
 import { usePredictClassifier } from "views/ProjectViewer/hooks/usePredictClassifier";
 import { selectCategoriesDictionary } from "store/data/selectors";
 import { useEvaluateClassifier } from "views/ProjectViewer/hooks/useEvaluateClassifier";
+import { WithLabel } from "views/ProjectViewer/components/WithLabel";
+import {
+  addModel,
+  availableClassificationModels,
+  removeModel,
+} from "utils/models/availableClassificationModels";
+import { classifierSlice } from "store/classifier";
+import { selectActiveKindId } from "store/project/selectors";
+import { StyledSelect } from "views/ProjectViewer/components/StyledSelect";
+import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 
 export const ClassifierSection = () => {
+  const dispatch = useDispatch();
   const selectedModel = useSelector(selectClassifierModel);
   const [waitingForResults, setWaitingForResults] = useState(false);
   const { modelStatus } = useClassifierStatus();
   const predictClassifier = usePredictClassifier();
   const evaluateClassifier = useEvaluateClassifier();
   const evaluationResults = useSelector(selectClassifierEvaluationResult);
-
-  const handleImportModel = async (model: Model, inputShape: Shape) => {
+  const activeKindId = useSelector(selectActiveKindId);
+  const [selectedModelName, setSelectedModelName] = useState<string>("new");
+  const handleImportModel = async (model: Model, _inputShape: Shape) => {
     if (model instanceof SequentialClassifier) {
-      // Add Model to available classifiers
+      addModel(model);
     } else if (import.meta.env.NODE_ENV !== "production") {
       console.warn(
         `Attempting to dispatch a model with task ${
@@ -70,11 +72,11 @@ export const ClassifierSection = () => {
     onOpen: handleOpenEvaluateClassifierDialog,
     open: evaluateClassifierDialogOpen,
   } = useDialog();
-  const {
-    onClose: handleCloseHTLDialog,
-    onOpen: handleOpenHTLDialog,
-    open: htlDialogOpen,
-  } = useDialog();
+  // const {
+  //   onClose: handleCloseHTLDialog,
+  //   onOpen: handleOpenHTLDialog,
+  //   open: htlDialogOpen,
+  // } = useDialog();
 
   const {
     onClose: handleCloseImportClassifierDialog,
@@ -96,7 +98,16 @@ export const ClassifierSection = () => {
     await predictClassifier();
     //handleOpenHTLDialog();
   };
-
+  const handleDisposeModel = () => {
+    if (!selectedModel) return;
+    removeModel(selectedModel.name);
+    dispatch(
+      classifierSlice.actions.removeModelInfo({
+        modelName: selectedModel.name,
+      }),
+    );
+    setSelectedModelName("new");
+  };
   const handleEvaluate = async () => {
     if (!selectedModel) return;
     if (selectedModel?.history.history.length > evaluationResults.length)
@@ -104,7 +115,18 @@ export const ClassifierSection = () => {
 
     handleOpenEvaluateClassifierDialog();
   };
+  const handleModelChange = (event: SelectChangeEvent<unknown>) => {
+    let value: string | number = event.target.value as string;
+    setSelectedModelName(value);
+    if (value === "new") value = 0;
 
+    dispatch(
+      classifierSlice.actions.updateSelectedModelNameOrArch({
+        kindId: activeKindId,
+        modelName: value,
+      }),
+    );
+  };
   useEffect(() => {
     if (modelStatus === ModelStatus.Trained && waitingForResults) {
       setWaitingForResults(false);
@@ -135,17 +157,75 @@ export const ClassifierSection = () => {
 
         <Stack
           width="100%"
-          py={0.5}
-          borderTop={"1px solid white"}
-          borderBottom={"1px solid white"}
           sx={(theme) => ({
+            width: "100%",
+            py: 1,
+            px: 0.5,
             borderTop: `1px solid ${theme.palette.divider}`,
             borderBottom: `1px solid ${theme.palette.divider}`,
           })}
         >
-          <Typography variant="caption" noWrap>
-            {`Selected Model:  ${selectedModel ? selectedModel.name : "N/A"}`}
-          </Typography>
+          <WithLabel
+            label="Model:"
+            labelProps={{
+              variant: "body2",
+              sx: { mr: "1rem", whiteSpace: "nowrap" },
+            }}
+            fullWidth={true}
+          >
+            <StyledSelect
+              value={selectedModelName}
+              onChange={handleModelChange}
+              fullWidth
+            >
+              <MenuItem
+                dense
+                value="new"
+                sx={{
+                  borderRadius: 0,
+                  minHeight: "1rem",
+                }}
+              >
+                New Model
+              </MenuItem>
+              {Object.keys(availableClassificationModels).map(
+                (modelName, idx) => (
+                  <MenuItem
+                    key={modelName + idx}
+                    dense
+                    value={modelName}
+                    sx={{
+                      borderRadius: 0,
+                      minHeight: "1rem",
+                    }}
+                  >
+                    {modelName}
+                  </MenuItem>
+                ),
+              )}
+            </StyledSelect>
+          </WithLabel>
+          <Collapse in={!!selectedModel}>
+            <Stack direction="row-reverse" width="100%">
+              <TooltipWithDisable
+                title={"Delete the current model"}
+                placement="bottom"
+              >
+                <Button
+                  onClick={handleDisposeModel}
+                  disableFocusRipple
+                  color="primary"
+                  variant="text"
+                  sx={(theme) => ({
+                    fontSize: theme.typography.caption.fontSize,
+                    backgroundColor: "transparent",
+                  })}
+                >
+                  Delete Model
+                </Button>
+              </TooltipWithDisable>
+            </Stack>
+          </Collapse>
         </Stack>
 
         <ModelExecButtonGroup
@@ -174,10 +254,10 @@ export const ClassifierSection = () => {
         openedDialog={fitClassifierDialogOpen}
         closeDialog={handleCloseFitClassifierDialog}
       />
-      <HTLDialog
+      {/* <HTLDialog
         openedDialog={htlDialogOpen}
         closeDialog={handleCloseHTLDialog}
-      />
+      /> */}
 
       <EvaluateClassifierDialog
         openedDialog={evaluateClassifierDialogOpen}
@@ -221,71 +301,71 @@ export const ImageGrid = ({
   );
 };
 
-type EvaluateClassifierDialogProps = {
-  closeDialog: () => void;
-  openedDialog: boolean;
-};
+// type EvaluateClassifierDialogProps = {
+//   closeDialog: () => void;
+//   openedDialog: boolean;
+// };
 
-const HTLDialog = ({
-  closeDialog,
-  openedDialog,
-}: EvaluateClassifierDialogProps) => {
-  const things = useSelector(selectActiveThings);
-  const { predictedProbabilities } = useClassifierHistory();
+// const HTLDialog = ({
+//   closeDialog,
+//   openedDialog,
+// }: EvaluateClassifierDialogProps) => {
+//   const things = useSelector(selectActiveThings);
+//   const { predictedProbabilities } = useClassifierHistory();
 
-  const predictedThings = useMemo(() => {
-    const predicted = things
-      .filter((thing) => Object.keys(predictedProbabilities).includes(thing.id))
-      .map((thing) => ({
-        ...thing,
-        probability: predictedProbabilities[thing.id],
-      }));
-    return orderBy(predicted, ["probability"], ["asc"]);
-  }, [predictedProbabilities, things]);
-  return (
-    <Dialog
-      onClose={closeDialog}
-      open={openedDialog}
-      fullWidth
-      maxWidth="md"
-      slots={{ transition: DialogTransitionSlide }}
-      sx={{ zIndex: 1203, height: "100%" }}
-    >
-      <AppBar
-        sx={{
-          position: "sticky",
-          backgroundColor: "transparent",
-          boxShadow: "none",
-          borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
-        }}
-      >
-        <Toolbar
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          <IconButton
-            edge="start"
-            color="primary"
-            onClick={closeDialog}
-            aria-label="Close"
-            sx={{
-              position: "absolute",
-              right: 8,
-              my: "auto",
-            }}
-          >
-            <Close />
-          </IconButton>
+//   const predictedThings = useMemo(() => {
+//     const predicted = things
+//       .filter((thing) => Object.keys(predictedProbabilities).includes(thing.id))
+//       .map((thing) => ({
+//         ...thing,
+//         probability: predictedProbabilities[thing.id],
+//       }));
+//     return orderBy(predicted, ["probability"], ["asc"]);
+//   }, [predictedProbabilities, things]);
+//   return (
+//     <Dialog
+//       onClose={closeDialog}
+//       open={openedDialog}
+//       fullWidth
+//       maxWidth="md"
+//       slots={{ transition: DialogTransitionSlide }}
+//       sx={{ zIndex: 1203, height: "100%" }}
+//     >
+//       <AppBar
+//         sx={{
+//           position: "sticky",
+//           backgroundColor: "transparent",
+//           boxShadow: "none",
+//           borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
+//         }}
+//       >
+//         <Toolbar
+//           sx={{
+//             display: "flex",
+//             justifyContent: "center",
+//           }}
+//         >
+//           <IconButton
+//             edge="start"
+//             color="primary"
+//             onClick={closeDialog}
+//             aria-label="Close"
+//             sx={{
+//               position: "absolute",
+//               right: 8,
+//               my: "auto",
+//             }}
+//           >
+//             <Close />
+//           </IconButton>
 
-          <Typography variant="h4">Predictions</Typography>
-        </Toolbar>
-      </AppBar>
+//           <Typography variant="h4">Predictions</Typography>
+//         </Toolbar>
+//       </AppBar>
 
-      <DialogContent>
-        <ImageGrid things={predictedThings} />
-      </DialogContent>
-    </Dialog>
-  );
-};
+//       <DialogContent>
+//         <ImageGrid things={predictedThings} />
+//       </DialogContent>
+//     </Dialog>
+//   );
+// };
