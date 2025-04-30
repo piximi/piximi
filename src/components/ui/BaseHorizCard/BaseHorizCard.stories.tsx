@@ -19,7 +19,9 @@ export const Default: Story = {
     action: () => {
       console.log("I was clicked");
     },
-    source: { sourceUrl: "piximiisgreat.biz", sourceName: "Piximi is Great" },
+    sources: [
+      { sourceUrl: "piximiisgreat.biz", sourceName: "Piximi is Great" },
+    ],
     license: {
       licenseUrl: "Licence.com",
       licenseName: "License",

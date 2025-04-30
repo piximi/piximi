@@ -8,10 +8,14 @@ import {
   union as IOTSUnion,
   literal as IOTSLiteral,
   boolean as IOTSBoolean,
+  UnknownRecord as IOTSUnknownRecord,
+  KeyofC as IOTSKeyofC,
+  keyof as IOTSKeyof,
 } from "io-ts";
 import { getOrElseW } from "fp-ts/Either";
 import { failure } from "io-ts/PathReporter";
 import { logger } from "utils/common/helpers";
+import { CropSchema } from "utils/models/enums";
 
 //#region COCO Serialization Type
 
@@ -141,6 +145,22 @@ export const SerializedFileRTypeV02 = IOTSType({
   version: IOTSString,
 });
 
+export const SerializedModelMetadataRType = IOTSType({
+  preprocessSettings: IOTSType({
+    cropSchema: enumToCodec(CropSchema),
+    numCrops: IOTSNumber,
+    inputShape: IOTSType({
+      width: IOTSNumber,
+      height: IOTSNumber,
+      channels: IOTSNumber,
+    }),
+    shuffle: IOTSBoolean,
+    rescale: IOTSBoolean,
+    batchSize: IOTSNumber,
+  }),
+  classes: IOTSArray(IOTSString),
+});
+
 //#endregion Basic Serialization Type
 
 const toError = (errors: any) => {
@@ -148,6 +168,17 @@ const toError = (errors: any) => {
   throw new Error(failure(errors).join("\n"));
 };
 
+function enumToCodec<E extends Record<string, string>>(
+  e: E,
+): IOTSKeyofC<Record<E[keyof E], null>> {
+  const values = Object.values(e);
+  return IOTSKeyof(
+    values.reduce<Record<string, null>>((acc, value) => {
+      acc[value] = null;
+      return acc;
+    }, {}),
+  );
+}
 export enum ProjectFileType {
   COCO,
   PIXIMI,
@@ -166,4 +197,10 @@ export const validateFileType = (
     default:
       throw new Error("Unrecognized project type", projectType);
   }
+};
+
+export const validateModelMetadata = (encodedFileContents: string) => {
+  const metadata = JSON.parse(encodedFileContents);
+  console.log(metadata);
+  return getOrElseW(toError)(SerializedModelMetadataRType.decode(metadata));
 };

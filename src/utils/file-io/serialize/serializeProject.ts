@@ -3,13 +3,12 @@ import { Group, NestedArray, group } from "zarr";
 
 import { Tensor } from "@tensorflow/tfjs";
 import { OptimizerSettings, PreprocessSettings } from "utils/models/types";
-import { kindClassifierModelDict } from "utils/models/availableClassificationModels";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import { PiximiStore, SerializedModels } from "../zarrStores";
 import { LoadCB } from "../types";
 import {
   ClassifierState,
-  ModelParams,
+  ModelInfo,
   ProjectState,
   SegmenterState,
 } from "store/types";
@@ -20,7 +19,7 @@ import {
   Category,
   ImageObject,
 } from "store/data/types";
-import { updateRecordArray } from "utils/common/helpers";
+import { availableClassificationModels } from "utils/models/availableClassificationModels";
 
 /* 
    =====================
@@ -192,6 +191,12 @@ const serializePreprocessOptions = async (
   preprocessOptionsGroup: Group,
   preprocessSettings: PreprocessSettings,
 ) => {
+  const { planes, height, width, channels } = preprocessSettings.inputShape;
+  await writeArray(
+    preprocessOptionsGroup,
+    "input_shape",
+    new Uint8Array([planes, height, width, channels]),
+  );
   await preprocessOptionsGroup.attrs.setItem(
     "shuffle_B",
     Number(preprocessSettings.shuffle),
@@ -260,25 +265,31 @@ const serializeOptimizerSettings = async (
   );
 };
 
-const serializeModalParams = async (paramGroup: Group, params: ModelParams) => {
-  const { planes, height, width, channels } = params.inputShape;
-  await writeArray(
-    paramGroup,
-    "input_shape",
-    new Uint8Array([planes, height, width, channels]),
-  );
-  const preprocessSetingsGroup = await paramGroup.createGroup(
+const serializeModelInfo = async (infoGroup: Group, modelInfo: ModelInfo) => {
+  const preprocessSetingsGroup = await infoGroup.createGroup(
     "preprocessing_settings",
   );
+  const optimizerSettingsGroup =
+    await infoGroup.createGroup("optimizer_settings");
+
+  await infoGroup.attrs.setItem("eval_results", modelInfo.evalResults);
+
+  let classMapArray: [number, string][] = [];
+  if (modelInfo.classMap) {
+    classMapArray = Object.entries(modelInfo.classMap).map(([key, value]) => [
+      +key,
+      value,
+    ]);
+  }
+  await infoGroup.attrs.setItem("class_map", classMapArray);
+
   await serializePreprocessOptions(
     preprocessSetingsGroup,
-    params.preprocessSettings,
+    modelInfo.preprocessSettings,
   );
-  const optimizerSettingsGroup =
-    await paramGroup.createGroup("optimizer_settings");
   await serializeOptimizerSettings(
     optimizerSettingsGroup,
-    params.optimizerSettings,
+    modelInfo.optimizerSettings,
   );
 };
 
@@ -287,36 +298,40 @@ const serializeClassifier = async (
   classifier: ClassifierState,
 ) => {
   const kindClassifiers = classifier.kindClassifiers;
-  const classifierKinds = Object.keys(kindClassifiers);
-  await classifierGroup.attrs.setItem("classifier_kinds", classifierKinds);
-  const userModels: SerializedModels = {};
+  const classifierKindIds = Object.keys(kindClassifiers);
+  await classifierGroup.attrs.setItem("classifier_kinds", classifierKindIds);
 
-  for await (const kindId of classifierKinds) {
-    const kindModels = kindClassifiers[kindId];
+  for await (const kindId of classifierKindIds) {
+    const kindClassifiersInfo = kindClassifiers[kindId];
     const kindClassifierGroup = await classifierGroup.createGroup(kindId);
-    const kindModelIdxs = Object.keys(kindModels.modelInfoDict);
-    await kindClassifierGroup.attrs.setItem("model_keys", kindModelIdxs);
-    for await (const idx of kindModelIdxs) {
-      const modelInfo = kindModels.modelInfoDict[idx];
-      const classifierModel = kindClassifierModelDict[kindId][+idx];
-      const modelGroup = await kindClassifierGroup.createGroup(idx);
-      await modelGroup.attrs.setItem("name", classifierModel.name);
-      if (+idx > 1) {
-        const savedModelInfo = await classifierModel.getSavedModelFiles();
-        updateRecordArray(userModels, kindId, {
-          modelJson: {
-            blob: savedModelInfo.modelJsonBlob,
-            fileName: savedModelInfo.modelJsonFileName,
-          },
-          modelWeights: {
-            blob: savedModelInfo.weightsBlob,
-            fileName: savedModelInfo.weightsFileName,
-          },
-        });
-      }
-      const paramGroup = await modelGroup.createGroup("params");
-      await serializeModalParams(paramGroup, modelInfo.params);
+    const kindModels = Object.keys(kindClassifiersInfo.modelInfoDict);
+
+    await kindClassifierGroup.attrs.setItem("models", kindModels);
+
+    for await (const modelName of kindModels) {
+      const modelInfo = kindClassifiersInfo.modelInfoDict[modelName];
+      const modelGroup = await kindClassifierGroup.createGroup(modelName);
+
+      await modelGroup.attrs.setItem("name", modelName);
+
+      const modelInfoGroup = await modelGroup.createGroup("model_info");
+      await serializeModelInfo(modelInfoGroup, modelInfo);
     }
+  }
+  const userModels: SerializedModels = {};
+  for await (const modelName of Object.keys(availableClassificationModels)) {
+    const model = availableClassificationModels[modelName];
+    const savedModelInfo = await model.getSavedModelFiles();
+    userModels[modelName] = {
+      modelJson: {
+        blob: savedModelInfo.modelJsonBlob,
+        fileName: savedModelInfo.modelJsonFileName,
+      },
+      modelWeights: {
+        blob: savedModelInfo.weightsBlob,
+        fileName: savedModelInfo.weightsFileName,
+      },
+    };
   }
   return userModels;
 };

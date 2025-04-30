@@ -1,15 +1,18 @@
 import JSZip from "jszip";
+import fs from "fs";
+import { logger, recursiveAssign } from "utils/common/helpers";
+import { addModel } from "utils/models/availableClassificationModels";
+import { UploadedClassifier } from "utils/models/classification";
+import { CropSchema, ModelTask } from "utils/models/enums";
 import { KeyError } from "zarr";
 import { AsyncStore, ValidStoreType } from "zarr/types/storage/types";
-import { Kind } from "store/data/types";
+import { Shape } from "store/data/types";
 
-export type SerializedModels = Record<
-  Kind["id"],
-  Array<{
-    modelJson: { blob: Blob; fileName: string };
-    modelWeights: { blob: Blob; fileName: string };
-  }>
->;
+export type ModelData = {
+  modelJson: { blob: Blob; fileName: string };
+  modelWeights: { blob: Blob; fileName: string };
+};
+export type SerializedModels = Record<string, ModelData>;
 
 /**
  * Preserves (double) slashes earlier in the path, so this works better
@@ -154,12 +157,10 @@ export class PiximiStore extends ZipStore {
   constructor(name: string, zip?: JSZip) {
     super(name, zip);
   }
-  attachModels(modelsByKind: SerializedModels) {
-    Object.values(modelsByKind).forEach((models) => {
-      models.forEach((model) => {
-        this._zip.file(model.modelJson.fileName, model.modelJson.blob);
-        this._zip.file(model.modelWeights.fileName, model.modelWeights.blob);
-      });
+  attachModels(modelsByName: SerializedModels) {
+    Object.values(modelsByName).forEach((model) => {
+      this._zip.file(model.modelJson.fileName, model.modelJson.blob);
+      this._zip.file(model.modelWeights.fileName, model.modelWeights.blob);
     });
   }
 }
@@ -173,6 +174,8 @@ export const fListToStore = async (
   if (zipFile) {
     const file = files[0];
     const zip = await new JSZip().loadAsync(file);
+
+    unzipModels(zip);
     // find folder of pattern "projectName.zarr/"
     const rootFile = zip.folder(/.*\.zarr\/$/);
 
@@ -241,3 +244,77 @@ export class PseudoFileList {
     return this._files[Symbol.iterator]();
   }
 }
+
+const unzipModels = async (zip: JSZip) => {
+  const modelFileRegEx = new RegExp(".json$|.weights.bin$");
+  const models: Record<
+    string,
+    {
+      modelJson?: File;
+      modelWeights?: File;
+    }
+  > = {};
+  const failedModels: Record<string, { reason: string; err?: Error }> = {};
+
+  for await (const [fileName, file] of Object.entries(zip.files)) {
+    if (!modelFileRegEx.test(fileName)) continue;
+
+    const parsedFileName = fileName.split(".");
+    const modelName = parsedFileName[0];
+    const extension = parsedFileName.at(1);
+
+    const fileBuffer = await file.async("arraybuffer");
+    if (extension === "json") {
+      if (modelName in models && "modelJson" in models[modelName]) {
+        logger(`Duplicate '.${extension}' file for ${modelName}`, {
+          level: "warn",
+        });
+      }
+      const modelFile = new File([fileBuffer], fileName, {
+        type: "application/json",
+      });
+      recursiveAssign(models, {
+        [modelName]: { modelJson: modelFile },
+      });
+    } else {
+      const modelFile = new File([fileBuffer], fileName, {
+        type: "application.octet-stream",
+      });
+      recursiveAssign(models, { [modelName]: { modelWeights: modelFile } });
+    }
+  }
+
+  for await (const modelName of Object.keys(models)) {
+    const { modelJson, modelWeights } = models[modelName];
+    if (!modelJson) {
+      failedModels[modelName] = {
+        reason: "Missing '.json' description file.",
+      };
+    } else if (!modelWeights) {
+      failedModels[modelName] = {
+        reason: "Missing '.bin' weights file.",
+      };
+    } else {
+      const model = new UploadedClassifier({
+        descFile: modelJson,
+        weightsFiles: [modelWeights],
+        name: modelName,
+        task: ModelTask.Classification,
+        graph: false,
+        pretrained: true,
+        trainable: true,
+      });
+
+      try {
+        await model.upload();
+        addModel(model);
+      } catch (err) {
+        failedModels[modelName] = {
+          reason: "Model upload failed",
+          err: err as Error,
+        };
+        continue;
+      }
+    }
+  }
+};

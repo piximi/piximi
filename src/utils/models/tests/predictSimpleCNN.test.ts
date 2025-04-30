@@ -126,6 +126,7 @@ const cropOptions: CropOptions = {
 };
 
 const preprocessOptions: PreprocessSettings = {
+  inputShape,
   shuffle: false,
   rescaleOptions,
   cropOptions,
@@ -209,7 +210,6 @@ it("predict", async () => {
   );
 
   const model = new UploadedClassifier({
-    TFHub: false,
     descFile: jsonFile,
     weightsFiles: [weightsFile],
     name: "SimpleCNN",
@@ -220,12 +220,7 @@ it("predict", async () => {
   });
 
   await model.loadModel();
-  model.loadInference(inferrenceImages, {
-    categories,
-    inputShape,
-    preprocessOptions,
-    fitOptions,
-  });
+  model.loadInference(inferrenceImages, categories);
 
   // console.log("weights file:", tfmemory().numTensors, tfmemory().numBytes);
 

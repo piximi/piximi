@@ -100,6 +100,11 @@ export const logger = (
   ARRAY / OBJECT HELPERS
 */
 
+// Given a length, return an array of numbers from 0 to length - 1
+// An iterable with length property set the the passed value is used to create an array
+export const arrayRange = (length: number): number[] => {
+  return Array.from({ length }, (_, i) => i);
+};
 export const isObjectEmpty = <T extends object>(obj: T) => {
   return Object.keys(obj).length === 0;
 };
@@ -178,6 +183,10 @@ export const recursiveAssign = <T extends object>(
         existingObject[key as keyof T] as object,
         updates[key as keyof T]!,
       );
+    } else if (!existingObject[key as keyof T]) {
+      Object.assign(existingObject as object, {
+        [key as keyof T]: updates[key as keyof T]!,
+      });
     } else {
       Object.assign(
         existingObject[key as keyof T] as object,
@@ -303,6 +312,18 @@ export const pluralize = (word: string, count: number) => {
  General Utility Methods
  =======================
  */
+
+/**
+ * Generates a random integer between two values.
+ * @param min - The minimum possible returned value (inclusive)
+ * @param max - The maximum number (exclusive)
+ * @returns The largest integer less than or equal to the given maximum value.
+ */
+export const getRandomInt = (min: number, max: number) => {
+  const minCeiled = Math.ceil(min);
+  const maxFloored = Math.floor(max);
+  return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
+};
 
 export const getInnerElementWidth = (el: HTMLElement) => {
   const {

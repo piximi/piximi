@@ -1,17 +1,14 @@
-import { Kind } from "store/data/types";
 import { SequentialClassifier } from "./classification/AbstractClassifier/AbstractClassifier";
 import { MobileNet } from "./classification/MobileNet/MobileNet";
 import { SimpleCNN } from "./classification/SimpleCNN/SimpleCNN";
-import { DEFAULT_KIND } from "store/data/constants";
 import {
   CropSchema,
   LossFunction,
   Metric,
-  ModelStatus,
   ModelTask,
   OptimizationAlgorithm,
 } from "./enums";
-import { ModelInfo, ModelParams } from "store/types";
+import { ModelInfo } from "store/types";
 import { ClonedClassifier } from "./classification/UploadedClassifier";
 
 export const availableClassifierArchitectures = [SimpleCNN, MobileNet];
@@ -66,13 +63,17 @@ export async function createNewModel(
   }
 }
 
-export const getDefaultModelParams = (): ModelParams => ({
-  inputShape: {
-    planes: 1,
-    height: 64,
-    width: 64,
-    channels: 3,
-  },
+export function addModel(model: SequentialClassifier) {
+  if (Object.keys(availableClassificationModels).includes(model.name))
+    throw new Error(`Model with name: '${model.name}' already exists`);
+
+  availableClassificationModels[model.name] = model;
+}
+
+export const getDefaultModelParams = (): Pick<
+  ModelInfo,
+  "optimizerSettings" | "preprocessSettings"
+> => ({
   optimizerSettings: {
     epochs: 10,
     batchSize: 32,
@@ -82,6 +83,12 @@ export const getDefaultModelParams = (): ModelParams => ({
     optimizationAlgorithm: OptimizationAlgorithm.Adam,
   },
   preprocessSettings: {
+    inputShape: {
+      planes: 1,
+      height: 20,
+      width: 20,
+      channels: 1,
+    },
     shuffle: true,
     rescaleOptions: {
       rescale: true,
@@ -96,50 +103,6 @@ export const getDefaultModelParams = (): ModelParams => ({
 });
 
 export const getDefaultModelInfo = (): ModelInfo => ({
-  status: ModelStatus.Uninitialized,
-  params: getDefaultModelParams(),
+  ...getDefaultModelParams(),
   evalResults: [],
 });
-export const kindClassifierModelDict: Record<
-  Kind["id"],
-  Array<SequentialClassifier>
-> = {
-  [DEFAULT_KIND]: availableClassifierArchitectures.map((model) => new model()),
-};
-// prevent deleting DEFAULT_KIND
-Object.defineProperty(kindClassifierModelDict, DEFAULT_KIND, {
-  configurable: false,
-});
-
-export const addClassifierModels = (kindIds: Array<Kind["id"]>) => {
-  for (const id of kindIds) {
-    if (id in kindClassifierModelDict) {
-      throw new Error(
-        `Trying to add classifier models for an already existing kind id: ${id}`,
-      );
-    }
-
-    kindClassifierModelDict[id] = availableClassifierArchitectures.map(
-      (model) => new model(),
-    );
-  }
-};
-
-export const deleteClassifierModels = (kindIds: Array<Kind["id"]>) => {
-  for (const id of kindIds) {
-    if (!(id in kindClassifierModelDict)) {
-      throw new Error(
-        `Trying to delete classifier models for an non-existant kind id: ${id}`,
-      );
-    }
-
-    for (const model of kindClassifierModelDict[id]) {
-      model.dispose();
-    }
-    try {
-      delete kindClassifierModelDict[id];
-    } catch {
-      // do nothing; we expect this when "delete" called on DEFAULT_KIND
-    }
-  }
-};

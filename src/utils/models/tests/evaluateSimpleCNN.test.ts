@@ -128,6 +128,7 @@ const cropOptions: CropOptions = {
 };
 
 const preprocessOptions: PreprocessSettings = {
+  inputShape,
   shuffle: true,
   rescaleOptions,
   cropOptions,
@@ -194,7 +195,6 @@ it("evaluateClassifier", async () => {
   );
 
   const model = new UploadedClassifier({
-    TFHub: false,
     descFile: jsonFile,
     weightsFiles: [weightsFile],
     name: "SimpleCNN",
@@ -206,12 +206,7 @@ it("evaluateClassifier", async () => {
 
   await model.loadModel();
 
-  model.loadValidation(validationImages, {
-    categories,
-    inputShape,
-    preprocessOptions,
-    fitOptions,
-  });
+  model.loadValidation(validationImages, categories);
 
   // console.log("weights file:", tfmemory().numTensors, tfmemory().numBytes);
 

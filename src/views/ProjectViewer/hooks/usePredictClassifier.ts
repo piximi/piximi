@@ -1,6 +1,8 @@
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import { applicationSettingsSlice } from "store/applicationSettings";
+import { dataSlice } from "store/data";
 import {
   selectClassifierModel,
   selectClassifierModelInfo,
@@ -9,23 +11,27 @@ import {
   selectActiveKnownCategories,
   selectActiveUnlabeledThings,
 } from "store/project/reselectors";
-import { AlertType } from "utils/common/enums";
-import { getStackTraceFromError, logger } from "utils/common/helpers";
-import { AlertState } from "utils/common/types";
-import { ModelStatus } from "utils/models/enums";
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
-import { dataSlice } from "store/data";
-import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
+
+import { getStackTraceFromError, logger } from "utils/common/helpers";
+import { AlertType } from "utils/common/enums";
+import { ModelStatus } from "utils/models/enums";
+import { AlertState } from "utils/common/types";
+import { useClassMapDialog } from "./useClassMapDialog";
+import { classifierSlice } from "store/classifier";
+import { selectActiveKindId } from "store/project/selectors";
 
 export const usePredictClassifier = () => {
   const dispatch = useDispatch();
   const activeUnlabeledData = useSelector(selectActiveUnlabeledThings);
   const modelInfo = useSelector(selectClassifierModelInfo);
   const activeCategories = useSelector(selectActiveKnownCategories);
+  const activeKindId = useSelector(selectActiveKindId);
   const selectedModel = useSelector(selectClassifierModel);
   const { setModelStatus } = useClassifierStatus();
   const { setPredictedProbabilities } = useClassifierHistory();
+  const { getClassMap } = useClassMapDialog();
 
   const handleError = useCallback(
     async (error: Error, name: string) => {
@@ -57,10 +63,33 @@ export const usePredictClassifier = () => {
 
   const predictClassifier = useCallback(async () => {
     if (!selectedModel) return;
+
+    let classMap = modelInfo.classMap;
+
+    if (!classMap) {
+      if (!selectedModel.classes) return;
+      console.log("selectedModel.classes:", selectedModel.classes); //LOG:
+      const setMapping = await getClassMap({
+        projectCategories: activeCategories,
+        modelClasses: selectedModel.classes,
+      });
+      if (!setMapping) {
+        return;
+      }
+      classMap = setMapping;
+      dispatch(
+        classifierSlice.actions.addModelClassMapping({
+          kindId: activeKindId,
+          modelName: selectedModel.name,
+          classMapping: classMap,
+        }),
+      );
+    }
+
     setModelStatus(ModelStatus.Predicting);
 
     try {
-      selectedModel?.loadInference(activeUnlabeledData, activeCategories);
+      selectedModel.loadInference(activeUnlabeledData, []);
     } catch (error) {
       handleError(error as Error, "Data Preparation Error");
     }
@@ -71,7 +100,11 @@ export const usePredictClassifier = () => {
     };
     logger("before predict");
     try {
-      results = await selectedModel.predict(activeCategories);
+      results = await selectedModel.predict(
+        Object.values(classMap).map((id) => ({
+          id,
+        })),
+      );
       logger("after predict");
     } catch (error) {
       handleError(error as Error, "Error during prediction");

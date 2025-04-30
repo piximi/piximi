@@ -22,7 +22,6 @@ import { serializePiximiAnnotations } from "../serialize/serializePiximiAnnotati
 import { deserializePiximiAnnotations } from "../deserialize";
 
 import { SerializedFileTypeV02 } from "../types";
-import { CATEGORY_COLORS } from "utils/common/constants";
 import {
   Kind,
   AnnotationObject,
@@ -30,6 +29,7 @@ import {
   ImageObject,
 } from "store/data/types";
 import { EntityState } from "@reduxjs/toolkit";
+import { CATEGORY_COLORS } from "store/data/constants";
 tfSetBackend("cpu");
 
 //below image fields not needed for serializing annotations file so fake it
