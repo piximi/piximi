@@ -1,18 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import {
-  kindClassifierModelDict,
-  deleteClassifierModels,
-  getDefaultModelInfo,
-} from "utils/models/availableClassificationModels";
+import { getDefaultModelInfo } from "utils/models/availableClassificationModels";
 
-import { ModelStatus } from "utils/models/enums";
-
+import { ClassifierEvaluationResultType } from "utils/models/types";
 import {
-  ClassifierEvaluationResultType,
-  TrainingCallbacks,
-} from "utils/models/types";
-import { ClassifierState, KindClassifier, ModelInfo } from "store/types";
+  ClassifierState,
+  KindClassifier,
+  ModelClassMap,
+  ModelInfo,
+} from "store/types";
 import { Kind, Shape } from "store/data/types";
 import { DEFAULT_KIND } from "store/data/constants";
 import { getSelectedModelInfo } from "./utils";
@@ -35,9 +31,7 @@ export const classifierSlice = createSlice({
   name: "classifier",
   initialState: initialState,
   reducers: {
-    resetClassifiers: (state) => {
-      const kindsToDelete = Object.keys(state.kindClassifiers);
-      deleteClassifierModels(kindsToDelete);
+    resetClassifiers: () => {
       return initialState;
     },
     setClassifier(
@@ -49,11 +43,6 @@ export const classifierSlice = createSlice({
       return action.payload.classifier;
     },
     setDefaults(state) {
-      // TODO - segmenter: dispose() and state.selectedModel = SimpleCNN(), or whatever
-
-      const kindsToDelete = Object.keys(state.kindClassifiers);
-      deleteClassifierModels(kindsToDelete);
-
       state.kindClassifiers = {
         [DEFAULT_KIND]: {
           modelNameOrArch: 0,
@@ -65,7 +54,10 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         changes:
-          | { add: Array<Kind["id"]>; presetInfo?: Array<KindClassifier> }
+          | {
+              add: Array<Kind["id"]>;
+              presetInfo?: Array<KindClassifier>;
+            }
           | { del: Array<Kind["id"]> };
       }>,
     ) {
@@ -118,28 +110,27 @@ export const classifierSlice = createSlice({
       }
       delete state.kindClassifiers[kindId].modelInfoDict[modelName];
     },
-    updateModelStatus(
+    addModelClassMapping(
       state,
       action: PayloadAction<{
-        modelStatus: ModelStatus;
         kindId: Kind["id"];
-        nameOrArch: string | number;
-        onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
+        modelName: string;
+        classMapping: ModelClassMap;
       }>,
     ) {
-      const { kindId, modelStatus } = action.payload;
-      const selectedModelName = state.kindClassifiers[kindId].modelNameOrArch;
-      if (selectedModelName) {
-        const selectedModel =
-          state.kindClassifiers[kindId].modelInfoDict[selectedModelName];
-        selectedModel.status = modelStatus;
+      const { kindId, modelName, classMapping } = action.payload;
+      if (!(modelName in state.kindClassifiers[kindId].modelInfoDict)) {
+        throw new Error(
+          `Info for model with name "${modelName}" does not exists`,
+        );
       }
+      state.kindClassifiers[kindId].modelInfoDict[modelName].classMap =
+        classMapping;
     },
-
     updateModelOptimizerSettings(
       state,
       action: PayloadAction<{
-        settings: Partial<ModelInfo["params"]["optimizerSettings"]>;
+        settings: Partial<ModelInfo["optimizerSettings"]>;
         kindId: Kind["id"];
       }>,
     ) {
@@ -148,12 +139,12 @@ export const classifierSlice = createSlice({
         state.kindClassifiers,
         kindId,
       );
-      Object.assign(selectedModelInfo.params.optimizerSettings, settings);
+      Object.assign(selectedModelInfo.optimizerSettings, settings);
     },
     updateModelPreprocessOptions(
       state,
       action: PayloadAction<{
-        settings: RecursivePartial<ModelInfo["params"]["preprocessSettings"]>;
+        settings: RecursivePartial<ModelInfo["preprocessSettings"]>;
         kindId: Kind["id"];
       }>,
     ) {
@@ -162,7 +153,7 @@ export const classifierSlice = createSlice({
         state.kindClassifiers,
         kindId,
       );
-      recursiveAssign(selectedModelInfo.params.preprocessSettings, settings);
+      recursiveAssign(selectedModelInfo.preprocessSettings, settings);
     },
     updateInputShape(
       state,
@@ -173,10 +164,21 @@ export const classifierSlice = createSlice({
         state.kindClassifiers,
         kindId,
       );
-      selectedModelInfo.params.inputShape = {
-        ...selectedModelInfo.params.inputShape,
+      selectedModelInfo.preprocessSettings.inputShape = {
+        ...selectedModelInfo.preprocessSettings.inputShape,
         ...inputShape,
       };
+    },
+    updateChannelsGlobally(
+      state,
+      action: PayloadAction<{ globalChannels: number }>,
+    ) {
+      Object.keys(state.kindClassifiers).forEach((kind) => {
+        state.kindClassifiers[kind].modelInfoDict[
+          "base-model"
+        ].preprocessSettings.inputShape.channels =
+          action.payload.globalChannels;
+      });
     },
     updateSelectedModelNameOrArch(
       state,
@@ -194,31 +196,6 @@ export const classifierSlice = createSlice({
           classifier.modelInfoDict["base-model"],
         );
       }
-    },
-    loadUserSelectedModel(
-      state,
-      action: PayloadAction<{
-        inputShape: Shape;
-        kindId: Kind["id"];
-        model: (typeof kindClassifierModelDict)[string][number];
-      }>,
-    ) {
-      const { inputShape, kindId, model } = action.payload;
-
-      for (const kindId of Object.keys(kindClassifierModelDict)) {
-        kindClassifierModelDict[kindId].push(model);
-      }
-      const kindClassifier = state.kindClassifiers[kindId];
-      const newModelIdx = kindClassifierModelDict[kindId].length - 1;
-
-      kindClassifier.modelNameOrArch = newModelIdx;
-      const uploadedModelInfo = getDefaultModelInfo();
-      uploadedModelInfo.params.inputShape = inputShape;
-
-      if (model.pretrained || model.history.epochs.length > 0) {
-        uploadedModelInfo.status = ModelStatus.Trained;
-      }
-      kindClassifier.modelInfoDict[newModelIdx] = uploadedModelInfo;
     },
     updateEvaluationResult(
       state,

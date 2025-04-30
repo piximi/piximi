@@ -6,7 +6,7 @@ type ValidationError = { error: false } | { error: true; message: string };
 type ValidationOptions = {
   min?: number;
   max?: number;
-  float?: boolean;
+  enableFloat?: boolean;
   extraValidation?: (value: string) => ValidationError;
 };
 const validateInput = (
@@ -14,16 +14,16 @@ const validateInput = (
   options: ValidationOptions = {
     min: 0,
     max: 100,
-    float: false,
+    enableFloat: false,
   },
 ): ValidationError => {
   const rangeAssertion: string = ` between ${options.min} and ${options.max}`;
 
   const defaultErrorMessage = `Must be a${
-    options.float ? " floating point" : "n integer"
+    options.enableFloat ? " floating point" : "n integer"
   } ${rangeAssertion}`;
 
-  const regExp = options.float ? floatRegExpr : intRegExpr;
+  const regExp = options.enableFloat ? floatRegExpr : intRegExpr;
 
   if (!regExp.test(input) || input === "") {
     return {

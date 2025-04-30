@@ -22,6 +22,7 @@ export class MobileNet extends SequentialClassifier {
     compileOptions,
     freeze = false,
     useCustomTopLayer = true,
+    preprocessOptions,
   }: LoadModelArgs) {
     if (this._model) return;
 
@@ -36,6 +37,13 @@ export class MobileNet extends SequentialClassifier {
     });
     const compileArgs = createCompileArgs(compileOptions);
     this._model.compile(compileArgs);
+    this._preprocessingOptions = {
+      inputShape: inputShape,
+      ...preprocessOptions.cropOptions,
+      shuffle: preprocessOptions.shuffle,
+      rescale: preprocessOptions.rescaleOptions.rescale,
+      batchSize: compileOptions.batchSize,
+    };
   }
 
   public override dispose() {

@@ -38,18 +38,19 @@ export type CropOptions = {
   cropSchema: CropSchema;
 };
 
-export type PreprocessSettings = {
-  shuffle: boolean;
-  rescaleOptions: RescaleOptions; // normalization
-  cropOptions: CropOptions;
-  trainingPercentage: number;
-};
 export type SegmenterPreprocessSettings = {
   shuffle: boolean;
   rescaleOptions: RescaleOptions; // normalization
   cropOptions: CropOptions;
 };
 
+export type PreprocessSettings = {
+  shuffle: boolean;
+  inputShape: Shape;
+  rescaleOptions: RescaleOptions; // normalization
+  cropOptions: CropOptions;
+  trainingPercentage: number;
+};
 export type OptimizerSettings = {
   learningRate: number;
   lossFunction:

@@ -5,6 +5,7 @@ import { ClassifierSection } from "./ClassifierSection";
 import { SegmenterSection } from "./SegmenterSection";
 import { ClassifierStatusProvider } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { ClassifierHistoryProvider } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
+import { ClassMapDialogProvider } from "views/ProjectViewer/hooks/useClassMapDialog";
 
 export const ModelTaskSection = () => {
   const [learningTask, setLearningTask] = useState<
@@ -45,7 +46,9 @@ export const ModelTaskSection = () => {
       {learningTask === "Classification" ? (
         <ClassifierStatusProvider>
           <ClassifierHistoryProvider>
-            <ClassifierSection />
+            <ClassMapDialogProvider>
+              <ClassifierSection />
+            </ClassMapDialogProvider>
           </ClassifierHistoryProvider>
         </ClassifierStatusProvider>
       ) : (

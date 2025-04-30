@@ -49,12 +49,19 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
 
   const min = useMemo(() => {
     if (!dynamicYRange) return 0;
-    const y1Min = yData1.reduce((min: number, val: Point) => {
-      return val.y < min ? val.y : min;
-    }, Infinity);
-    const y2Min = yData2.reduce((min: number, val: Point) => {
-      return val.y < min ? val.y : min;
-    }, Infinity);
+    const y1Min =
+      yData1.length > 0
+        ? yData1.reduce((min: number, val: Point) => {
+            return val.y < min ? val.y : min;
+          }, Infinity)
+        : 0;
+    const y2Min =
+      yData2.length > 0
+        ? yData2.reduce((min: number, val: Point) => {
+            return val.y < min ? val.y : min;
+          }, Infinity)
+        : 0;
+    if (y1Min === 0 && y2Min === 0) return 0;
     return Math.min(y1Min, y2Min) - 0.1;
   }, [dynamicYRange, yData1, yData2]);
 
@@ -85,6 +92,10 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
     setData([data1, data2]);
   }, [id1, id2, yData1, yData2]);
 
+  useEffect(() => {
+    console.log(min, max);
+  }, [min, max]);
+
   return (
     <Container sx={{ height: 350, mb: 5 }}>
       <Typography align={"center"} variant="body1">
@@ -107,7 +118,7 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
         }}
         enableGridX={false}
         enableGridY
-        //gridXValues={xRange}
+        gridXValues={xRange}
         yFormat=">-.3f"
         enableSlices={"x"}
         sliceTooltip={({ slice }) => {

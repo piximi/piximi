@@ -1,4 +1,5 @@
 import {
+  ClassifierEvaluationResultType,
   CropOptions,
   FitOptions,
   OptimizerSettings,
@@ -18,7 +19,12 @@ import {
   PreprocessOptionsV01_02,
 } from "utils/file-io/types";
 import { initialClassifierStateV01_02 } from "utils/file-io/constants";
-import { ClassifierState, KindClassifierDict, ModelParams } from "store/types";
+import {
+  ClassifierState,
+  KindClassifierDict,
+  ModelClassMap,
+  ModelInfo,
+} from "store/types";
 import { Kind } from "store/data/types";
 import { getDefaultModelInfo } from "utils/models/availableClassificationModels";
 
@@ -184,6 +190,12 @@ export const deserializeClassifierGroupV01_1 = async (
 const deserializePreprocessSettingsGroupV11 = async (
   preprocessSettingsGroup: Group,
 ): Promise<PreprocessSettings> => {
+  const inputShape = await getDatasetSelection(
+    preprocessSettingsGroup,
+    "input_shape",
+    [null],
+  );
+  const [planes, height, width, channels] = inputShape.data;
   const shuffleRaw = (await getAttr(
     preprocessSettingsGroup,
     "shuffle_B",
@@ -207,7 +219,13 @@ const deserializePreprocessSettingsGroupV11 = async (
     "training_percent",
   )) as number;
   const trainingPercentage = +trainingPercentageRaw.toFixed(2);
-  return { cropOptions, rescaleOptions, shuffle, trainingPercentage };
+  return {
+    inputShape: { planes, height, width, channels },
+    cropOptions,
+    rescaleOptions,
+    shuffle,
+    trainingPercentage,
+  };
 };
 
 const deserializeOptimizerSettingsGroupV11 = async (
@@ -249,31 +267,43 @@ const deserializeOptimizerSettingsGroupV11 = async (
     metrics,
   };
 };
-const deserializeModelParams = async (
-  paramsGroup: Group,
-): Promise<ModelParams> => {
-  const inputShape = await getDatasetSelection(paramsGroup, "input_shape", [
-    null,
-  ]);
-  const [planes, height, width, channels] = inputShape.data;
+const deserializeModelInfo = async (infoGroup: Group): Promise<ModelInfo> => {
   const optimizerSettingsGroup = await getGroup(
-    paramsGroup,
+    infoGroup,
     "optimizer_settings",
   );
+  const preprocessSetingsGroup = await getGroup(
+    infoGroup,
+    "preprocessing_settings",
+  );
+  const classMapArray = (await getAttr(infoGroup, "class_map")) as [
+    number,
+    string,
+  ][];
+  let classMap: ModelClassMap | undefined;
+  if (classMapArray.length > 0) {
+    classMap = classMapArray.reduce((mapDict: ModelClassMap, mapItem) => {
+      mapDict[mapItem[0]] = mapItem[1];
+      return mapDict;
+    }, {});
+  }
   const optimizerSettings = await deserializeOptimizerSettingsGroupV11(
     optimizerSettingsGroup,
-  );
-  const preprocessSetingsGroup = await getGroup(
-    paramsGroup,
-    "preprocessing_settings",
   );
   const preprocessSettings = await deserializePreprocessSettingsGroupV11(
     preprocessSetingsGroup,
   );
+
+  const evalResults = (await getAttr(
+    infoGroup,
+    "eval_results",
+  )) as ClassifierEvaluationResultType[];
+
   return {
-    inputShape: { planes, height, width, channels },
-    preprocessSettings: preprocessSettings,
+    preprocessSettings,
     optimizerSettings,
+    classMap,
+    evalResults,
   };
 };
 
@@ -288,22 +318,19 @@ export const deserializeClassifierGroupV11 = async (
 
   for await (const kindId of classifierKinds) {
     const kindModelsGroup = await getGroup(classifierGroup, kindId);
-    const kindModelIdxs = (await getAttr(
-      kindModelsGroup,
-      "model_keys",
-    )) as string[];
+    const kindModels = (await getAttr(kindModelsGroup, "models")) as string[];
     kindClassifiers[kindId] = {
       modelNameOrArch: 0,
       modelInfoDict: {},
     };
 
-    for await (const idx of kindModelIdxs) {
-      const modelGroup = await getGroup(kindModelsGroup, idx);
-      const paramsGroup = await getGroup(modelGroup, "params");
-      const modelParams = await deserializeModelParams(paramsGroup);
-      kindClassifiers[kindId].modelInfoDict[idx] = {
+    for await (const name of kindModels) {
+      const modelGroup = await getGroup(kindModelsGroup, name);
+      const infoGroup = await getGroup(modelGroup, "model_info");
+      const modelInfo = await deserializeModelInfo(infoGroup);
+      kindClassifiers[kindId].modelInfoDict[name] = {
         ...getDefaultModelInfo(),
-        params: modelParams,
+        ...modelInfo,
       };
     }
   }

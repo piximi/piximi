@@ -22,7 +22,7 @@ export const useSegmentationModel = () => {
   const [helperText, setHelperText] =
     React.useState<string>("No trained model");
 
-  const handlePredict = () => {
+  const handlePredict = async () => {
     dispatch(
       segmenterSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Predicting,
