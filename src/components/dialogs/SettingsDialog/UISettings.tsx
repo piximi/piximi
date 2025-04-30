@@ -31,7 +31,7 @@ import {
   selectTextOnScroll,
   selectThemeMode,
 } from "store/applicationSettings/selectors";
-import { selectActiveCategoryColors } from "store/project/reselectors";
+import { selectAvaliableCategoryColors } from "store/project/reselectors";
 
 import { ThemeMode } from "themes/enums";
 
@@ -163,7 +163,7 @@ const BorderWidthSetting = () => {
 
 const BorderColorSetting = () => {
   const initialSelectionColor = useSelector(selectImageSelectionColor);
-  const availableColors = useSelector(selectActiveCategoryColors);
+  const availableColors = useSelector(selectAvaliableCategoryColors);
   const [selectionColor, setSelectionColor] = useState<string>(
     initialSelectionColor,
   );

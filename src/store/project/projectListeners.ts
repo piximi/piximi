@@ -81,15 +81,12 @@ startAppListening({
     );
   },
   effect: async (action, listenerApi) => {
-    const { classifier, project } = listenerApi.getState();
+    const { project } = listenerApi.getState();
 
     if (project.imageChannels)
       listenerApi.dispatch(
-        classifierSlice.actions.updateInputShape({
-          inputShape: {
-            channels: project.imageChannels,
-          },
-          kindId: project.activeKind,
+        classifierSlice.actions.updateChannelsGlobally({
+          globalChannels: project.imageChannels,
         }),
       );
   },

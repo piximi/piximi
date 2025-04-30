@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import {
   Clear as ClearIcon,
@@ -14,8 +14,6 @@ import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { ListItemHoldButton } from "components/ui/ListItemHoldButton";
 
 import { projectSlice } from "store/project";
-import { dataSlice } from "store/data/dataSlice";
-import { selectActiveKindId } from "store/project/selectors";
 
 import { ModelStatus, Partition } from "utils/models/enums";
 import { List } from "@mui/material";
@@ -23,9 +21,9 @@ import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStat
 
 export const PredictionListItems = () => {
   const dispatch = useDispatch();
-  const activeKindId = useSelector(selectActiveKindId);
   const [labeledImagesVisible, setLabeledImagesVisible] = React.useState(true);
-  const { setModelStatus } = useClassifierStatus();
+  const { setModelStatus, clearPredictions, acceptPredictions } =
+    useClassifierStatus();
 
   const t = useTranslation();
 
@@ -50,12 +48,8 @@ export const PredictionListItems = () => {
     setLabeledImagesVisible((isShown) => !isShown);
   };
 
-  const clearPredictions = () => {
-    dispatch(
-      dataSlice.actions.clearPredictions({
-        kind: activeKindId,
-      }),
-    );
+  const handleClearPredictions = () => {
+    clearPredictions();
 
     if (!labeledImagesVisible) {
       setLabeledImagesVisible(true);
@@ -69,12 +63,8 @@ export const PredictionListItems = () => {
 
     setModelStatus(ModelStatus.Idle);
   };
-  const acceptPredictions = () => {
-    dispatch(
-      dataSlice.actions.acceptPredictions({
-        kind: activeKindId,
-      }),
-    );
+  const handleAcceptPredictions = () => {
+    acceptPredictions();
     setModelStatus(ModelStatus.Idle);
     dispatch(
       projectSlice.actions.removeThingPartitionFilters({
@@ -105,7 +95,7 @@ export const PredictionListItems = () => {
       />
       <CustomListItemButton
         primaryText={t("Clear predictions")}
-        onClick={clearPredictions}
+        onClick={handleClearPredictions}
         icon={
           <ClearIcon
             sx={(theme) => ({ fontSize: theme.typography.body1.fontSize })}
@@ -114,7 +104,7 @@ export const PredictionListItems = () => {
         primaryTypographyProps={{ variant: "body2" }}
       />
       <ListItemHoldButton
-        onHoldComplete={acceptPredictions}
+        onHoldComplete={handleAcceptPredictions}
         primaryText="Accept Predictions (Hold)"
         icon={
           <CheckIcon

@@ -6,13 +6,9 @@ import React, {
   useState,
 } from "react";
 import { useSelector } from "react-redux";
-import {
-  selectClassifierModel,
-  selectClassifierStatus,
-} from "store/classifier/reselectors";
+import { selectClassifierModel } from "store/classifier/reselectors";
 import { logger } from "utils/common/helpers";
 import { Points } from "utils/common/types";
-import { ModelStatus } from "utils/models/enums";
 import { TrainingCallbacks } from "utils/models/types";
 
 type HistoryData = {
@@ -66,7 +62,6 @@ export const ClassifierHistoryProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const modelStatus = useSelector(selectClassifierStatus);
   const selectedModel = useSelector(selectClassifierModel);
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
   const [totalEpochs, setTotalEpochs] = useState<number>(0);
@@ -80,6 +75,8 @@ export const ClassifierHistoryProvider = ({
   useEffect(() => {
     if (!selectedModel) {
       setModelHistory(initialModelHistory());
+      setCurrentEpoch(0);
+      setTotalEpochs(0);
       return;
     }
     const fullHistory = selectedModel.history.history;
@@ -120,7 +117,10 @@ export const ClassifierHistoryProvider = ({
       }
       const trainingEpochIndicator = nextEpoch - 0.5;
 
-      setCurrentEpoch((currentEpoch) => currentEpoch + 1);
+      setCurrentEpoch((currentEpoch) => {
+        console.log(currentEpoch);
+        return currentEpoch + 1;
+      });
 
       if (
         !logs ||
@@ -153,11 +153,6 @@ export const ClassifierHistoryProvider = ({
     },
     [selectedModel],
   );
-  useEffect(() => {
-    if (modelStatus === ModelStatus.Uninitialized) {
-      setModelHistory(initialModelHistory());
-    }
-  }, [modelStatus]);
 
   return (
     <ClassifierHistoryContext.Provider

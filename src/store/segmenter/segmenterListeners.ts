@@ -12,9 +12,11 @@ import {
 } from "utils/common/helpers";
 
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
-import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
 import { AlertType } from "utils/common/enums";
-import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
+import {
+  UNKNOWN_CATEGORY_NAME,
+  UNKNOWN_IMAGE_CATEGORY_COLOR,
+} from "store/data/constants";
 import { ModelStatus } from "utils/models/enums";
 
 import { OrphanedAnnotationObject } from "utils/models/segmentation/AbstractSegmenter";

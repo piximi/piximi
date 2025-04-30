@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   alpha,
   AppBar,
@@ -33,11 +33,9 @@ import {
   selectClassifierEvaluationResult,
   selectClassifierModel,
 } from "store/classifier/reselectors";
-import { selectActiveKindId } from "store/project/selectors";
 import { Model } from "utils/models/Model";
 import { Shape, Thing } from "store/data/types";
 import { SequentialClassifier } from "utils/models/classification";
-import { classifierSlice } from "store/classifier";
 import { PredictionListItems } from "views/ProjectViewer/components/list-items";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { selectActiveThings } from "store/project/reselectors";
@@ -49,24 +47,16 @@ import { selectCategoriesDictionary } from "store/data/selectors";
 import { useEvaluateClassifier } from "views/ProjectViewer/hooks/useEvaluateClassifier";
 
 export const ClassifierSection = () => {
-  const dispatch = useDispatch();
   const selectedModel = useSelector(selectClassifierModel);
-  const activeKindId = useSelector(selectActiveKindId);
   const [waitingForResults, setWaitingForResults] = useState(false);
-  const [helperText, setHelperText] = useState<string>("No trained model");
   const { modelStatus } = useClassifierStatus();
   const predictClassifier = usePredictClassifier();
   const evaluateClassifier = useEvaluateClassifier();
   const evaluationResults = useSelector(selectClassifierEvaluationResult);
+
   const handleImportModel = async (model: Model, inputShape: Shape) => {
     if (model instanceof SequentialClassifier) {
-      dispatch(
-        classifierSlice.actions.loadUserSelectedModel({
-          inputShape: inputShape,
-          kindId: activeKindId,
-          model,
-        }),
-      );
+      // Add Model to available classifiers
     } else if (import.meta.env.NODE_ENV !== "production") {
       console.warn(
         `Attempting to dispatch a model with task ${
@@ -82,7 +72,7 @@ export const ClassifierSection = () => {
   } = useDialog();
   const {
     onClose: handleCloseHTLDialog,
-    //onOpen: handleOpenHTLDialog,
+    onOpen: handleOpenHTLDialog,
     open: htlDialogOpen,
   } = useDialog();
 
@@ -104,6 +94,7 @@ export const ClassifierSection = () => {
 
   const handlePredict = async () => {
     await predictClassifier();
+    //handleOpenHTLDialog();
   };
 
   const handleEvaluate = async () => {
@@ -117,7 +108,7 @@ export const ClassifierSection = () => {
   useEffect(() => {
     if (modelStatus === ModelStatus.Trained && waitingForResults) {
       setWaitingForResults(false);
-      //handleOpenEvaluateClassifierDialog();
+      handleOpenEvaluateClassifierDialog();
     }
   }, [
     modelStatus,
@@ -125,30 +116,6 @@ export const ClassifierSection = () => {
     handleOpenEvaluateClassifierDialog,
     setWaitingForResults,
   ]);
-  useEffect(() => {
-    if (modelStatus === ModelStatus.Trained) {
-      return;
-    }
-
-    switch (modelStatus) {
-      case ModelStatus.InitFit:
-      case ModelStatus.Loading:
-      case ModelStatus.Training:
-        setHelperText("Disabled during training");
-        break;
-      case ModelStatus.Evaluating:
-        // setHelperText("Evaluating...");
-        break;
-      case ModelStatus.Predicting:
-        setHelperText("Predcting...");
-        break;
-      case ModelStatus.Suggesting:
-        setHelperText("Accept/Reject suggested predictions first");
-        break;
-      default:
-      //setHelperText("No Trained Model");
-    }
-  }, [modelStatus]);
 
   return (
     <>
@@ -165,29 +132,28 @@ export const ClassifierSection = () => {
           handleImportModel={handleOpenImportClassifierDialog}
           handleSaveModel={handleOpenSaveClassifierDialog}
         />
-        {selectedModel && (
-          <Stack
-            width="100%"
-            py={0.5}
-            borderTop={"1px solid white"}
-            borderBottom={"1px solid white"}
-            sx={(theme) => ({
-              borderTop: `1px solid ${theme.palette.divider}`,
-              borderBottom: `1px solid ${theme.palette.divider}`,
-            })}
-          >
-            <Typography variant="caption" noWrap>
-              {`Selected Model:  ${selectedModel ? selectedModel.name : "N/A"}`}
-            </Typography>
-          </Stack>
-        )}
+
+        <Stack
+          width="100%"
+          py={0.5}
+          borderTop={"1px solid white"}
+          borderBottom={"1px solid white"}
+          sx={(theme) => ({
+            borderTop: `1px solid ${theme.palette.divider}`,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          })}
+        >
+          <Typography variant="caption" noWrap>
+            {`Selected Model:  ${selectedModel ? selectedModel.name : "N/A"}`}
+          </Typography>
+        </Stack>
+
         <ModelExecButtonGroup
           modelStatus={modelStatus}
           handleFit={handleOpenFitClassifierDialog}
           handlePredict={handlePredict}
           handleEvaluate={handleEvaluate}
           modelTrainable={!selectedModel || selectedModel.trainable}
-          helperText={helperText}
         />
       </Box>
       {modelStatus === ModelStatus.Pending && <PredictionListItems />}
