@@ -13,6 +13,9 @@ import { useClassifierHistory } from "views/ProjectViewer/contexts/ClassifierHis
 
 import { useSelector } from "react-redux";
 import { selectClassifierModel } from "store/classifier/reselectors";
+import { ClassMapDialogProvider } from "views/ProjectViewer/hooks/useClassMapDialog";
+import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { ModelStatus } from "utils/models/enums";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -25,6 +28,7 @@ export const FitClassifierDialog = ({
 }: FitClassifierDialogProps) => {
   const [tabVal, setTabVal] = useState("1");
   const { modelHistory } = useClassifierHistory();
+  const { modelStatus } = useClassifierStatus();
   const selectedModel = useSelector(selectClassifierModel);
 
   const showPlots = useMemo(() => {
@@ -35,10 +39,10 @@ export const FitClassifierDialog = ({
   };
 
   useEffect(() => {
-    if (showPlots) {
+    if (modelStatus === ModelStatus.Training) {
       setTabVal("2");
     }
-  }, [showPlots]);
+  }, [modelStatus]);
 
   return (
     <Dialog
@@ -53,7 +57,9 @@ export const FitClassifierDialog = ({
         pb: 1,
       }}
     >
-      <FitClassifierDialogAppBar closeDialog={closeDialog} />
+      <ClassMapDialogProvider>
+        <FitClassifierDialogAppBar closeDialog={closeDialog} />
+      </ClassMapDialogProvider>
 
       <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
         <ToolTipTab label="HyperParameters" value="1" placement="top" />

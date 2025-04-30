@@ -3,6 +3,11 @@ import { io, loadGraphModel, loadLayersModel } from "@tensorflow/tfjs";
 import { Model } from "../Model";
 import { SequentialClassifier } from "./AbstractClassifier";
 import { RequireOnly } from "utils/common/types";
+import { CropSchema } from "../enums";
+import { Shape, ShapeArray } from "store/data/types";
+import { getDefaultModelInfo } from "../availableClassificationModels";
+import { arrayRange, convertArrayToShape, logger } from "utils/common/helpers";
+import { validateModelMetadata } from "utils/file-io/runtimeTypes";
 
 enum LoadState {
   Unloaded,
@@ -13,6 +18,7 @@ enum LoadState {
 export class UploadedClassifier extends SequentialClassifier {
   protected _ioHandler: ReturnType<typeof io.browserFiles>;
   protected _loadState: LoadState;
+  private _descFile?: File;
 
   /*
    * whether from src, or the descFile, the JSON file should contain 'modelTopology' and 'weightsManifest
@@ -39,6 +45,7 @@ export class UploadedClassifier extends SequentialClassifier {
     this._loadState = LoadState.Unloaded;
 
     this._ioHandler = io.browserFiles([descFile, ...weightsFiles]);
+    this._descFile = descFile;
   }
 
   public async upload(): Promise<void> {
@@ -47,14 +54,65 @@ export class UploadedClassifier extends SequentialClassifier {
     } else {
       this._model = await loadLayersModel(this._ioHandler);
     }
-
+    let metadata:
+      | {
+          preprocessSettings: {
+            cropSchema: CropSchema;
+            numCrops: number;
+            inputShape: Omit<Shape, "planes">;
+            shuffle: boolean;
+            rescale: boolean;
+            batchSize: number;
+          };
+          classes: string[];
+        }
+      | undefined;
+    if (this._descFile) {
+      console.log("here");
+      const descContents = await this._descFile.text();
+      try {
+        metadata = validateModelMetadata(descContents);
+      } catch (err) {
+        logger(err, { level: "warn" });
+      }
+    }
+    console.log(metadata);
+    if (metadata) {
+      console.log(metadata.preprocessSettings.inputShape);
+      this._preprocessingOptions = metadata.preprocessSettings;
+      this.classes = metadata.classes;
+      const modelSummary = this.modelSummary;
+    } else {
+      const defaultModelInfo = getDefaultModelInfo();
+      this._preprocessingOptions = {
+        inputShape: {
+          ...convertArrayToShape(this.defaultInputShape as ShapeArray),
+          channels: this.requiredChannels ?? this.defaultInputShape[3],
+        },
+        ...defaultModelInfo.preprocessSettings.cropOptions,
+        shuffle: defaultModelInfo.preprocessSettings.shuffle,
+        rescale: defaultModelInfo.preprocessSettings.rescaleOptions.rescale,
+        batchSize: defaultModelInfo.optimizerSettings.batchSize,
+      };
+      const modelSummary = this.modelSummary;
+      if (
+        modelSummary &&
+        modelSummary.length > 0 &&
+        modelSummary.at(-1)?.layerName.includes("dense")
+      ) {
+        const numClasses = modelSummary.at(-1)?.outputShape.split(",");
+        if (numClasses && numClasses.length === 1) {
+          this.classes = arrayRange(+numClasses[0]).map((i) => i.toString());
+        }
+      }
+    }
     this._loadState = LoadState.Uploaded;
   }
 
   public async loadModel() {
-    if (this._loadState === LoadState.Unloaded) {
-      await this.upload();
-    }
+    if (this._loadState !== LoadState.Unloaded) return;
+
+    await this.upload();
 
     this._loadState = LoadState.Loaded;
   }

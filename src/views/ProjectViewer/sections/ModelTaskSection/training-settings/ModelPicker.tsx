@@ -21,7 +21,6 @@ import {
 import { selectActiveKindObject } from "store/project/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 import { availableClassificationModels } from "utils/models/availableClassificationModels";
-import { ModelStatus } from "utils/models/enums";
 import { TextFieldWithBlur } from "views/ProjectViewer/components/TextFieldWithBlur";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { WithLabel } from "views/ProjectViewer/components/WithLabel";
@@ -31,7 +30,6 @@ export const ModelPicker = () => {
   const activeKindId = useSelector(selectActiveKindId);
   const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
   const handleModelTypeChange = (nameOrArch: number | string) => {
-    console.log("modelArchitectureChange: ", nameOrArch); //LOG:
     dispatch(
       classifierSlice.actions.updateSelectedModelNameOrArch({
         kindId: activeKindId,
@@ -178,10 +176,8 @@ const PretrainedModelOptions = ({
   modelNameOrArch: string | number;
   onModelChange: (modelName: string) => void;
 }) => {
-  const { shouldClearPredictions, isReady } = useClassifierStatus();
-  const dispatch = useDispatch();
+  const { shouldWarnClearPredictions } = useClassifierStatus();
   const selectedModel = useSelector(selectClassifierModel);
-  const activeKindId = useSelector(selectActiveKindId);
   const handleModelChange = (event: SelectChangeEvent<unknown>) => {
     const value = event.target.value as string;
     onModelChange(value);
@@ -189,18 +185,11 @@ const PretrainedModelOptions = ({
   const handleDisposeModel = () => {
     if (!selectedModel) return;
     selectedModel.dispose();
-    dispatch(
-      classifierSlice.actions.updateModelStatus({
-        kindId: activeKindId,
-        modelStatus: ModelStatus.Uninitialized,
-        nameOrArch: selectedModel.name,
-      }),
-    );
   };
   return (
     <Stack spacing={2} width="80%">
       <WithLabel
-        label="Pre-Trained Model:"
+        label="Trained Model:"
         labelProps={{
           variant: "body2",
           sx: { mr: "1rem", whiteSpace: "nowrap" },
@@ -229,7 +218,7 @@ const PretrainedModelOptions = ({
       <ButtonGroup sx={{ width: "100%", justifyContent: "space-evenly" }}>
         <TooltipWithDisable
           title={
-            shouldClearPredictions
+            shouldWarnClearPredictions
               ? "Clear or accept predictions before clearing"
               : "Clear the current model"
           }
@@ -253,7 +242,7 @@ const PretrainedModelOptions = ({
         </TooltipWithDisable>
         <TooltipWithDisable
           title={
-            shouldClearPredictions
+            shouldWarnClearPredictions
               ? "Clear or accept predictions before clearing"
               : "Clear the current model"
           }

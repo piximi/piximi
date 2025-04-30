@@ -56,6 +56,7 @@ const cropOptions: CropOptions = {
 };
 
 const preprocessOptions: PreprocessSettings = {
+  inputShape,
   shuffle: true,
   rescaleOptions,
   cropOptions,
@@ -120,12 +121,7 @@ it("preprocessClassifier", async () => {
   }
 
   const model = new GenericClassifier();
-  model.loadTraining(images, {
-    categories,
-    inputShape,
-    preprocessOptions,
-    fitOptions,
-  });
+  model.loadTraining(images, categories);
 
   expect(model.trainingLoaded).toBeTruthy();
 

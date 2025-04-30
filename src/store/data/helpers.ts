@@ -1,8 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 import { union } from "lodash";
 
-import { UNKNOWN_CATEGORY_NAME } from "./constants";
-import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
+import {
+  UNKNOWN_CATEGORY_NAME,
+  UNKNOWN_IMAGE_CATEGORY_COLOR,
+} from "./constants";
 
 import { Category, Kind } from "./types";
 
@@ -32,6 +34,22 @@ export const generateUnknownCategory = (kind: string) => {
     visible: true,
   };
   return unknownCategory;
+};
+
+export const generateCategory = (
+  name: string,
+  kindId: string,
+  color: string,
+) => {
+  const id = generateUUID();
+  return {
+    name,
+    id,
+    kind: kindId,
+    color,
+    containing: [],
+    visible: true,
+  } as Category;
 };
 
 export const generateKind = (kindName: string, useUUID?: boolean) => {
