@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   ButtonGroup,
-  Grid2 as Grid,
   MenuItem,
   SelectChangeEvent,
   Stack,
@@ -19,56 +18,32 @@ import {
   selectClassifierModelNameOrArch,
 } from "store/classifier/reselectors";
 import { selectActiveKindObject } from "store/project/reselectors";
-import { selectActiveKindId } from "store/project/selectors";
-import { availableClassificationModels } from "utils/models/availableClassificationModels";
 import { TextFieldWithBlur } from "views/ProjectViewer/components/TextFieldWithBlur";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { WithLabel } from "views/ProjectViewer/components/WithLabel";
 
 export const ModelPicker = () => {
-  const dispatch = useDispatch();
-  const activeKindId = useSelector(selectActiveKindId);
-  const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
-  const handleModelTypeChange = (nameOrArch: number | string) => {
-    dispatch(
-      classifierSlice.actions.updateSelectedModelNameOrArch({
-        kindId: activeKindId,
-        modelName: nameOrArch,
-      }),
-    );
-  };
+  const selectedModel = useSelector(selectClassifierModel);
 
   return (
     <Box py={2}>
       <Typography gutterBottom align="left">
-        Train a new model with selected architecture or continue training an
-        existing model
+        {selectedModel
+          ? "Continue training, clone, or delete the selected model"
+          : "Choose a model architecture and set the model hyperparameters."}
       </Typography>
-      <Grid container spacing={2} p={2}>
-        <Grid size={6}>
-          <ModelArchiitectureOptions
-            modelNameOrArch={modelNameOrArch}
-            onArchitectureChange={handleModelTypeChange}
-          />
-        </Grid>
-        <Grid size={6}>
-          <PretrainedModelOptions
-            modelNameOrArch={modelNameOrArch}
-            onModelChange={handleModelTypeChange}
-          />
-        </Grid>
-      </Grid>
+      {!selectedModel ? (
+        <ModelArchiitectureOptions />
+      ) : (
+        <PretrainedModelOptions />
+      )}
     </Box>
   );
 };
 
-const ModelArchiitectureOptions = ({
-  modelNameOrArch,
-  onArchitectureChange,
-}: {
-  modelNameOrArch: string | number;
-  onArchitectureChange: (arch: number) => void;
-}) => {
+const ModelArchiitectureOptions = () => {
+  const dispatch = useDispatch();
+  const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
   const selectedModel = useSelector(selectClassifierModel);
   const availableClassifierNames = useSelector(selectAvailibleClassifierNames);
   const activeKind = useSelector(selectActiveKindObject);
@@ -78,13 +53,17 @@ const ModelArchiitectureOptions = ({
 
   const handleArchitectureChange = (event: SelectChangeEvent<unknown>) => {
     const value = event.target.value as number;
-    onArchitectureChange(value);
+    dispatch(
+      classifierSlice.actions.updateSelectedModelNameOrArch({
+        kindId: activeKind.id,
+        modelName: value,
+      }),
+    );
   };
   const handleNameChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const value = event.target.value;
-    console.log("onChange value: ", value);
     if (!userHasUpdated) setUsrHasUpdated(true);
     setModelName(value);
   };
@@ -114,9 +93,9 @@ const ModelArchiitectureOptions = ({
   ]);
 
   return (
-    <Stack width="80%" spacing={2}>
+    <Stack direction="row" spacing={2} py={1} justifyContent="space-evenly">
       <WithLabel
-        label="New Model Architecture:"
+        label="Model Architecture:"
         labelProps={{
           variant: "body2",
           sx: { mr: "1rem", whiteSpace: "nowrap" },
@@ -169,53 +148,29 @@ const ModelArchiitectureOptions = ({
   );
 };
 
-const PretrainedModelOptions = ({
-  modelNameOrArch,
-  onModelChange,
-}: {
-  modelNameOrArch: string | number;
-  onModelChange: (modelName: string) => void;
-}) => {
+const PretrainedModelOptions = () => {
+  const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
   const { shouldWarnClearPredictions } = useClassifierStatus();
   const selectedModel = useSelector(selectClassifierModel);
-  const handleModelChange = (event: SelectChangeEvent<unknown>) => {
-    const value = event.target.value as string;
-    onModelChange(value);
-  };
+
   const handleDisposeModel = () => {
     if (!selectedModel) return;
     selectedModel.dispose();
   };
   return (
-    <Stack spacing={2} width="80%">
-      <WithLabel
-        label="Trained Model:"
-        labelProps={{
-          variant: "body2",
-          sx: { mr: "1rem", whiteSpace: "nowrap" },
-        }}
-      >
-        <StyledSelect
-          value={typeof modelNameOrArch === "string" ? modelNameOrArch : ""}
-          onChange={handleModelChange}
-          fullWidth
-        >
-          {Object.keys(availableClassificationModels).map((modelName, idx) => (
-            <MenuItem
-              key={modelName + idx}
-              dense
-              value={modelName}
-              sx={{
-                borderRadius: 0,
-                minHeight: "1rem",
-              }}
-            >
-              {modelName}
-            </MenuItem>
-          ))}
-        </StyledSelect>
-      </WithLabel>
-      <ButtonGroup sx={{ width: "100%", justifyContent: "space-evenly" }}>
+    <Stack
+      direction="row"
+      spacing={2}
+      py={1}
+      px={1}
+      justifyContent="space-between"
+      alignContent="center"
+      alignItems="center"
+    >
+      <Typography variant="body2" noWrap>
+        {`Selected Model:  ${selectedModel!.name}`}
+      </Typography>
+      <ButtonGroup sx={{ justifyContent: "space-evenly" }}>
         <TooltipWithDisable
           title={
             shouldWarnClearPredictions
