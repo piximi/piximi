@@ -4,8 +4,8 @@ import { deserializeAnnotations_v01 } from "utils/file-io/deserialize/v01/deseri
 
 import { SerializedFileType } from "utils/file-io/types";
 import { fileFromPath, loadImageFileAsStack } from "./helpers";
-import { convertToImage } from "utils/common/tensorUtils";
-import { getPropertiesFromImageSync } from "utils/common/helpers";
+import { convertToImage } from "utils/tensorUtils";
+import { getPropertiesFromImageSync } from "utils/helpers";
 import { Category, OldAnnotationType } from "store/data/types";
 
 export const loadExampleImage = async (

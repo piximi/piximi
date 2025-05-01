@@ -13,7 +13,7 @@ import {
 import { CropSchema, Partition } from "../enums";
 import { MIMEType } from "utils/file-io/types";
 import { loadImageFileAsStack } from "utils/file-io/helpers";
-import { convertToImage } from "utils/common/tensorUtils";
+import { convertToImage } from "utils/tensorUtils";
 import {
   Category,
   ImageObject,

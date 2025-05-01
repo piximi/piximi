@@ -12,7 +12,7 @@ import { projectSlice } from "store/project";
 import { selectActiveKindId } from "store/project/selectors";
 import { selectAllKindIds } from "store/data/selectors";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 import { Category, Kind } from "store/data/types";
 
 export const AddKindMenu = ({

@@ -6,7 +6,7 @@ import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { projectSlice } from "store/project";
 import { selectSortType } from "store/project/selectors";
 
-import { ThingSortKey } from "utils/common/enums";
+import { ThingSortKey } from "utils/enums";
 
 export const SortSelection = () => {
   const dispatch = useDispatch();

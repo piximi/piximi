@@ -8,7 +8,7 @@ import {
   MeasurementDisplayTable,
   MeasurementOptions,
 } from "store/measurements/types";
-import { RecursivePartial } from "utils/common/types";
+import { RecursivePartial } from "utils/types";
 import { ChartValues } from "./types";
 
 export const format = (value: string | number, sf: number = 2) => {

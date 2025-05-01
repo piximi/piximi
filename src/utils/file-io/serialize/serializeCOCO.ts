@@ -5,7 +5,7 @@ import {
   simplifyPolygon,
 } from "views/ImageViewer/utils";
 
-import { logger } from "utils/common/logUtils";
+import { logger } from "utils/logUtils";
 import {
   SerializedCOCOAnnotationType,
   SerializedCOCOCategoryType,

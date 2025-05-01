@@ -23,7 +23,7 @@ import { MeasurementsTree } from "./MeasurementTree";
 import { measurementsSlice } from "store/measurements";
 
 import { MeasurementGroup } from "store/measurements/types";
-import { LoadStatus } from "utils/common/types";
+import { LoadStatus } from "utils/types";
 
 export const MeasurementGroupOptions = ({
   table,

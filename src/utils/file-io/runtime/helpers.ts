@@ -1,6 +1,6 @@
 import { failure } from "io-ts/lib/PathReporter";
 import { KeyofC as IOTSKeyofC, keyof as IOTSKeyof } from "io-ts";
-import { logger } from "utils/common/logUtils";
+import { logger } from "utils/logUtils";
 
 export const toError = (errors: any) => {
   import.meta.env.NODE_ENV !== "production" && logger(errors);

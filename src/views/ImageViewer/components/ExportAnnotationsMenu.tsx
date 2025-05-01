@@ -31,7 +31,7 @@ import {
   serializePiximiAnnotations,
 } from "utils/file-io/serialize";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 import { AnnotationExportType } from "utils/file-io/enums";
 import { exportAnnotationMasks } from "utils/file-io/export/annotationExporters";
 import { AnnotationObject, ImageObject } from "store/data/types";
