@@ -20,7 +20,7 @@ import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectActiveImageRenderedSrcs } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { ColorAdjustment } from "icons";
-import { generateDefaultColors } from "utils/common/tensorUtils";
+import { generateDefaultColors } from "utils/tensorUtils";
 
 export const ImageOptions = () => {
   const dispatch = useDispatch();

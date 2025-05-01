@@ -20,9 +20,9 @@ import { useMeasurementParameters, usePlotControl } from "../../../hooks";
 
 import { CustomNumberTextField } from "components/inputs";
 
-import { capitalize } from "utils/common/stringUtils";
+import { capitalize } from "utils/stringUtils";
 
-import { KeysWithValuesOfType } from "utils/common/types";
+import { KeysWithValuesOfType } from "utils/types";
 import { ChartConfig, ChartItem, ChartType, SplitType } from "../../../types";
 
 import { nivoColorSpaces } from "themes/nivoTheme";

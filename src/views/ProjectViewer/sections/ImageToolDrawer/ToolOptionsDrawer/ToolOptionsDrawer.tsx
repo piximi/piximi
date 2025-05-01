@@ -4,7 +4,7 @@ import { Box, Drawer, Typography } from "@mui/material";
 import { useTranslation } from "hooks";
 
 import { AppBarOffset } from "components/ui/AppBarOffset";
-import { dimensions } from "utils/common/constants";
+import { dimensions } from "utils/constants";
 
 export type OperationType = {
   icon: (color: string) => ReactElement;

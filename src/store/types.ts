@@ -7,11 +7,11 @@ import {
   UnknownAction,
 } from "@reduxjs/toolkit";
 
-import { HotkeyContext, Languages, ThingSortKey } from "utils/common/enums";
+import { HotkeyContext, Languages, ThingSortKey } from "utils/enums";
 import { ThemeMode } from "themes/enums";
 import { ModelStatus } from "utils/models/enums";
 
-import { AlertState, FilterType } from "utils/common/types";
+import { AlertState, FilterType } from "utils/types";
 import {
   ClassifierEvaluationResultType,
   FitOptions,

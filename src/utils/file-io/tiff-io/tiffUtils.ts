@@ -1,4 +1,4 @@
-import { RequireField } from "utils/common/types";
+import { RequireField } from "utils/types";
 
 export type TiffTag = string[] | number[];
 export type IFDTag = TiffTag | Uint8Array | IFD | number[][];

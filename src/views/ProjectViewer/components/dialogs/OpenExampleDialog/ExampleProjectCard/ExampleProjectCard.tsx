@@ -11,10 +11,10 @@ import { dataSlice } from "store/data";
 import { PseudoFileList, fListToStore } from "utils/file-io/zarr/stores";
 import { deserializeProject } from "utils/file-io/deserialize";
 
-import { AlertType } from "utils/common/enums";
+import { AlertType } from "utils/enums";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 
-import { AlertState } from "utils/common/types";
+import { AlertState } from "utils/types";
 
 // CloudFront distribution domain
 const DOMAIN = "https://dw9hr7pc3ofrm.cloudfront.net";

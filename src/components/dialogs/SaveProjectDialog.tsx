@@ -13,11 +13,11 @@ import { selectSegmenter } from "store/segmenter/selectors";
 import { selectDataProject } from "store/data/selectors";
 
 import { serializeProject } from "utils/file-io/serialize";
-import { logger } from "utils/common/logUtils";
+import { logger } from "utils/logUtils";
 
-import { AlertType } from "utils/common/enums";
+import { AlertType } from "utils/enums";
 
-import { AlertState } from "utils/common/types";
+import { AlertState } from "utils/types";
 
 type SaveProjectDialogProps = {
   onClose: () => void;

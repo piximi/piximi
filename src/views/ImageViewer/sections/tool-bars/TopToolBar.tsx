@@ -3,7 +3,7 @@ import { Divider, Box } from "@mui/material";
 
 import { useAnnotatorToolShortcuts } from "../../hooks";
 
-import { dimensions } from "utils/common/constants";
+import { dimensions } from "utils/constants";
 import { ColorOptions, SelectionOptions, ZoomOptions } from "./tools";
 
 export const TopToolBar = () => {

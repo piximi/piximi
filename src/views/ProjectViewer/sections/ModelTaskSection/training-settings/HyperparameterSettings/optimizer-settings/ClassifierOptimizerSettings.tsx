@@ -7,7 +7,7 @@ import {
   selectClassifierTrainingPercentage,
 } from "store/classifier/reselectors";
 import { selectActiveLabeledThingsCount } from "store/project/reselectors";
-import { logger } from "utils/common/logUtils";
+import { logger } from "utils/logUtils";
 
 import { OptimizationSettings } from "./OptimizationSettings";
 import { TrainingStrategySettings } from "./TrainingStrategySettings";

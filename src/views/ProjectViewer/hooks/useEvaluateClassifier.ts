@@ -1,9 +1,9 @@
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { AlertType } from "utils/common/enums";
-import { getStackTraceFromError } from "utils/common/logUtils";
-import { AlertState } from "utils/common/types";
+import { AlertType } from "utils/enums";
+import { getStackTraceFromError } from "utils/logUtils";
+import { AlertState } from "utils/types";
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { ModelStatus } from "utils/models/enums";
 import { selectActiveKnownCategories } from "store/project/reselectors";

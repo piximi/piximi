@@ -1,4 +1,4 @@
-import { FilterType, RequireOnly } from "utils/common/types";
+import { FilterType, RequireOnly } from "utils/types";
 import { AnnotationMode, AnnotationState, ToolType, ZoomMode } from "./enums";
 import {
   AnnotationObject,

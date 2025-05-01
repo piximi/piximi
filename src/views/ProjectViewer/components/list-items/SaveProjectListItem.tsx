@@ -6,7 +6,7 @@ import { useDialogHotkey } from "hooks";
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { SaveProjectDialog } from "components/dialogs";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 export const SaveProjectListItem = () => {
   const {

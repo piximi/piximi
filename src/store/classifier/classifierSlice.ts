@@ -12,8 +12,8 @@ import {
 import { Kind, Shape } from "store/data/types";
 import { DEFAULT_KIND } from "store/data/constants";
 import { getSelectedModelInfo } from "./utils";
-import { RecursivePartial } from "utils/common/types";
-import { recursiveAssign } from "utils/common/objectUtils";
+import { RecursivePartial } from "utils/types";
+import { recursiveAssign } from "utils/objectUtils";
 import { cloneDeep } from "lodash";
 
 const initialState: ClassifierState = {

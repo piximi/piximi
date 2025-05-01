@@ -20,7 +20,7 @@ import {
   selectImageViewerObjects,
 } from "../state/annotator/reselectors";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 import { generateUUID } from "store/data/helpers";
 import { KindMenu } from "./KindMenu";
 import { DecodedAnnotationObject } from "store/data/types";

@@ -9,7 +9,7 @@ import {
   ToolType,
 } from "views/ImageViewer/utils/enums";
 
-import { mutatingFilter } from "utils/common/arrayUtils";
+import { mutatingFilter } from "utils/arrayUtils";
 import {
   AnnotatorState,
   ProtoAnnotationObject,

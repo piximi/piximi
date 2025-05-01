@@ -7,16 +7,16 @@ import {
 
 import { Model } from "../Model";
 import { SequentialClassifier } from "./AbstractClassifier";
-import { convertArrayToShape } from "utils/common/helpers";
-import { logger } from "utils/common/logUtils";
-import { arrayRange } from "utils/common/arrayUtils";
+import { convertArrayToShape } from "utils/helpers";
+import { logger } from "utils/logUtils";
+import { arrayRange } from "utils/arrayUtils";
 import { validateModelMetadata } from "utils/file-io/runtime/validators";
 import { getDefaultModelInfo } from "./utils";
 import { createCompileArgs } from "../helpers";
 
 import { CropSchema } from "../enums";
 import { OptimizerSettings } from "../types";
-import { RequireOnly } from "utils/common/types";
+import { RequireOnly } from "utils/types";
 import { Shape, ShapeArray } from "store/data/types";
 
 enum LoadState {

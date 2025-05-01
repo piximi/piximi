@@ -1,7 +1,7 @@
 import { Draft } from "immer";
 import { difference, merge } from "lodash";
 import { AnnotationObject, Category, Kind } from "store/data/types";
-import { RequireOnly } from "utils/common/types";
+import { RequireOnly } from "utils/types";
 import {
   AnnotatorState,
   CategoryEdits,

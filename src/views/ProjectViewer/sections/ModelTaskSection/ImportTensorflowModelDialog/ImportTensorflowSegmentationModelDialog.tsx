@@ -25,7 +25,7 @@ import { Model } from "utils/models/Model";
 import { Cellpose } from "utils/models/segmentation";
 
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 import { Shape } from "store/data/types";
 import { ToolTipTab } from "components/layout";

@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 
 import { Stage } from "../Stage";
 
-import { dimensions } from "utils/common/constants";
+import { dimensions } from "utils/constants";
 import { useMobileView } from "hooks";
 import { SideToolBar, TopToolBar } from "../tool-bars";
 

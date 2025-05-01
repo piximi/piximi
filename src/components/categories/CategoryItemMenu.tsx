@@ -9,7 +9,7 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { selectActiveKindId } from "store/project/selectors";
 
 import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 import { Category } from "store/data/types";
 import { CategoryDialog } from "components/dialogs/CategoryDialog/CategoryDialog";

@@ -7,7 +7,7 @@ import { imageViewerSlice } from "../imageViewer";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { decodeAnnotation } from "views/ImageViewer/utils/rle";
-import { createRenderedTensor } from "utils/common/tensorUtils";
+import { createRenderedTensor } from "utils/tensorUtils";
 
 import { ToolType } from "views/ImageViewer/utils/enums";
 

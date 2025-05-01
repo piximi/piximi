@@ -20,8 +20,8 @@ import {
 } from "../imageViewer/selectors";
 
 import { decodeAnnotation } from "views/ImageViewer/utils/rle";
-import { generateBlankColors } from "utils/common/tensorUtils";
-import { getCompleteEntity } from "utils/common/helpers";
+import { generateBlankColors } from "utils/tensorUtils";
+import { getCompleteEntity } from "utils/helpers";
 
 import {
   AnnotationObject,
@@ -30,7 +30,7 @@ import {
   Kind,
   Shape,
 } from "store/data/types";
-import { Colors, ColorsRaw } from "utils/common/types";
+import { Colors, ColorsRaw } from "utils/types";
 import { ProtoAnnotationObject } from "views/ImageViewer/utils/types";
 
 export const selectImageViewerImages = createSelector(
