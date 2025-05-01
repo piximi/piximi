@@ -17,7 +17,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectAlertState } from "store/applicationSettings/selectors";
 
 import { APPLICATION_COLORS } from "utils/common/constants";
-import { getStackTraceFromError } from "utils/common/helpers";
+import { getStackTraceFromError } from "utils/common/logUtils";
 import { AlertType, HotkeyContext } from "utils/common/enums";
 
 export const ImageViewer = () => {

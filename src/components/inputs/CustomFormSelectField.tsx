@@ -7,7 +7,7 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 
-import { enumKeys } from "utils/common/helpers";
+import { enumKeys } from "utils/common/objectUtils";
 
 type CustomFormSelectFieldProps = {
   keySource: object;

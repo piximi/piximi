@@ -15,7 +15,7 @@ import {
   selectToolType,
 } from "views/ImageViewer/state/annotator/selectors";
 
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/common/logUtils";
 import {
   AnnotationTool,
   ObjectAnnotationTool,

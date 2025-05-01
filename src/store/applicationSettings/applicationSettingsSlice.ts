@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/common/logUtils";
 
 import { defaultAlert } from "utils/common/constants";
 import { HotkeyContext, Languages } from "utils/common/enums";

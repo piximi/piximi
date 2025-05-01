@@ -9,9 +9,9 @@ import {
   MIMEType,
 } from "./types";
 import { MIMETYPES } from "./constants";
-import { convertToImage } from "utils/common/tensorHelpers";
+import { convertToImage } from "utils/common/tensorUtils";
 import { ImageShapeEnum } from "./enums";
-import { getStackTraceFromError } from "utils/common/helpers";
+import { getStackTraceFromError } from "utils/common/logUtils";
 import { AlertState } from "utils/common/types";
 import { AlertType } from "utils/common/enums";
 import { ImageObject } from "store/data/types";

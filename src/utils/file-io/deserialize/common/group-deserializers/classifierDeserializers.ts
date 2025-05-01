@@ -7,7 +7,8 @@ import {
   RescaleOptions,
 } from "utils/models/types";
 import { Group } from "zarr";
-import { getAttr, getDatasetSelection, getGroup } from "../../helpers";
+import { getAttr, getDatasetSelection, getGroup } from "../../../zarr/helpers";
+import { getDefaultModelInfo } from "utils/models/classification/utils";
 import {
   CropSchema,
   LossFunction,
@@ -26,7 +27,6 @@ import {
   ModelInfo,
 } from "store/types";
 import { Kind } from "store/data/types";
-import { getDefaultModelInfo } from "utils/models/availableClassificationModels";
 
 // COMMON
 const deserializeFitOptionsGroup = async (

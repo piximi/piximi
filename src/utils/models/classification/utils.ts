@@ -1,19 +1,143 @@
+import JSZip from "jszip";
 import { shuffle, take, takeRight } from "lodash";
+
+import classifierHandler from "./classifierHandler";
 import { isUnknownCategory } from "store/data/helpers";
 import { Category, Thing } from "store/data/types";
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/common/logUtils";
+import { recursiveAssign } from "utils/common/objectUtils";
 import {
   MobileNet,
   SequentialClassifier,
   SimpleCNN,
+  UploadedClassifier,
 } from "utils/models/classification";
-import { Partition } from "utils/models/enums";
+import {
+  CropSchema,
+  LossFunction,
+  Metric,
+  ModelTask,
+  OptimizationAlgorithm,
+  Partition,
+} from "utils/models/enums";
 import {
   FitOptions,
   OptimizerSettings,
   PreprocessSettings,
   TrainingCallbacks,
 } from "utils/models/types";
+import { ModelInfo } from "store/types";
+
+export const getDefaultModelParams = (): Pick<
+  ModelInfo,
+  "optimizerSettings" | "preprocessSettings"
+> => ({
+  optimizerSettings: {
+    epochs: 10,
+    batchSize: 32,
+    learningRate: 0.01,
+    lossFunction: LossFunction.CategoricalCrossEntropy,
+    metrics: [Metric.CategoricalAccuracy],
+    optimizationAlgorithm: OptimizationAlgorithm.Adam,
+  },
+  preprocessSettings: {
+    inputShape: {
+      planes: 1,
+      height: 20,
+      width: 20,
+      channels: 1,
+    },
+    shuffle: true,
+    rescaleOptions: {
+      rescale: true,
+      center: false,
+    },
+    cropOptions: {
+      numCrops: 1,
+      cropSchema: CropSchema.None,
+    },
+    trainingPercentage: 0.75,
+  },
+});
+
+export const getDefaultModelInfo = (): ModelInfo => ({
+  ...getDefaultModelParams(),
+  evalResults: [],
+});
+
+export const unzipModels = async (zip: JSZip) => {
+  const modelFileRegEx = new RegExp(".json$|.weights.bin$");
+  const models: Record<
+    string,
+    {
+      modelJson?: File;
+      modelWeights?: File;
+    }
+  > = {};
+  const failedModels: Record<string, { reason: string; err?: Error }> = {};
+
+  for await (const [fileName, file] of Object.entries(zip.files)) {
+    if (!modelFileRegEx.test(fileName)) continue;
+
+    const parsedFileName = fileName.split(".");
+    const modelName = parsedFileName[0];
+    const extension = parsedFileName.at(1);
+
+    const fileBuffer = await file.async("arraybuffer");
+    if (extension === "json") {
+      if (modelName in models && "modelJson" in models[modelName]) {
+        logger(`Duplicate '.${extension}' file for ${modelName}`, {
+          level: "warn",
+        });
+      }
+      const modelFile = new File([fileBuffer], fileName, {
+        type: "application/json",
+      });
+      recursiveAssign(models, {
+        [modelName]: { modelJson: modelFile },
+      });
+    } else {
+      const modelFile = new File([fileBuffer], fileName, {
+        type: "application.octet-stream",
+      });
+      recursiveAssign(models, { [modelName]: { modelWeights: modelFile } });
+    }
+  }
+
+  for await (const modelName of Object.keys(models)) {
+    const { modelJson, modelWeights } = models[modelName];
+    if (!modelJson) {
+      failedModels[modelName] = {
+        reason: "Missing '.json' description file.",
+      };
+    } else if (!modelWeights) {
+      failedModels[modelName] = {
+        reason: "Missing '.bin' weights file.",
+      };
+    } else {
+      const model = new UploadedClassifier({
+        descFile: modelJson,
+        weightsFiles: [modelWeights],
+        name: modelName,
+        task: ModelTask.Classification,
+        graph: false,
+        pretrained: true,
+        trainable: true,
+      });
+
+      try {
+        await model.upload();
+        classifierHandler.addModel(model);
+      } catch (err) {
+        failedModels[modelName] = {
+          reason: "Model upload failed",
+          err: err as Error,
+        };
+        continue;
+      }
+    }
+  }
+};
 
 export function prepareClasses(allCategories: Category[]): {
   categories: Category[];

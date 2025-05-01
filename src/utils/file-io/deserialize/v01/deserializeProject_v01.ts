@@ -4,15 +4,20 @@ import { openGroup, Group } from "zarr";
 import { initialState as initialProjectState } from "store/project/projectSlice";
 
 import { RawArray } from "zarr/types/rawArray";
-import { logger } from "utils/common/helpers";
-import { getAttr, getDataset, getDatasetSelection, getGroup } from "../helpers";
+import { logger } from "utils/common/logUtils";
+import {
+  getAttr,
+  getDataset,
+  getDatasetSelection,
+  getGroup,
+} from "../../zarr/helpers";
 import { deserializeClassifierGroupV01_1 } from "../common/group-deserializers/classifierDeserializers";
 import { deserializeColorsGroup } from "../common/group-deserializers/dataDeserializers";
 import { deserializeSegmenterGroup } from "../common/group-deserializers/segmenterDeserializers";
 import { Partition } from "utils/models/enums";
-import { createRenderedTensor } from "utils/common/tensorHelpers";
+import { createRenderedTensor } from "utils/common/tensorUtils";
 import { BitDepth, LoadCB } from "utils/file-io/types";
-import { CustomStore } from "utils/file-io/zarrStores";
+import { CustomStore } from "utils/file-io/zarr/stores";
 import { ProjectState } from "store/types";
 import { OldAnnotationType, OldCategory, OldImageType } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
