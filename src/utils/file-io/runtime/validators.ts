@@ -1,4 +1,4 @@
-import { toError } from "./helpers";
+import { toError } from "./runtimeUtils";
 import { getOrElseW } from "fp-ts/Either";
 import {
   SerializedCOCOFileRType,

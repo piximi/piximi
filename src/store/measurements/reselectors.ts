@@ -7,7 +7,7 @@ import {
 } from "store/data/selectors";
 
 import { capitalize } from "utils/stringUtils";
-import { getStatistics } from "utils/measurements/helpers";
+import { getStatistics } from "utils/measurements/utils";
 
 import { Partition } from "utils/models/enums";
 

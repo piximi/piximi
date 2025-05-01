@@ -10,7 +10,7 @@ import {
   getDataset,
   getDatasetSelection,
   getGroup,
-} from "../../zarr/helpers";
+} from "../../zarr/zarrUtils";
 import { deserializeClassifierGroupV01_1 } from "../common/group-deserializers/classifierDeserializers";
 import { deserializeColorsGroup } from "../common/group-deserializers/dataDeserializers";
 import { deserializeSegmenterGroup } from "../common/group-deserializers/segmenterDeserializers";

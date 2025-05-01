@@ -15,7 +15,7 @@ import { findContours } from "views/ImageViewer/utils";
 import { DataArray } from "utils/file-io/types";
 
 //TODO: Write tests
-export const sortTensor = (tensor: Tensor1D): Tensor1D => {
+const sortTensor = (tensor: Tensor1D): Tensor1D => {
   return tidy(() => {
     const negativeTensor = tensor.mul(-1);
     const negativeOrdered = topk(negativeTensor, negativeTensor.size).values;
@@ -24,10 +24,7 @@ export const sortTensor = (tensor: Tensor1D): Tensor1D => {
   });
 };
 
-export const getTensorMedian = (
-  tensor: Tensor1D,
-  sorted?: boolean,
-): Tensor1D => {
+const getTensorMedian = (tensor: Tensor1D, sorted?: boolean): Tensor1D => {
   return tidy(() => {
     if (!sorted) tensor = sortTensor(tensor);
     const middle = tensor.size / 2;
@@ -41,7 +38,7 @@ export const getTensorMedian = (
   });
 };
 
-export const getTensorPercentile = (
+const getTensorPercentile = (
   tensor: Tensor1D,
   percentile: number,
   sorted?: boolean,
@@ -54,14 +51,14 @@ export const getTensorPercentile = (
   });
 };
 
-export const getTensorStdDev = (tensor: Tensor1D): Tensor1D => {
+const getTensorStdDev = (tensor: Tensor1D): Tensor1D => {
   return tidy(() => {
     const variance = moments(tensor).variance;
     return variance.sqrt() as Tensor1D;
   });
 };
 
-export const getTensorMAD = (tensor: Tensor1D, sorted?: boolean): Tensor1D => {
+const getTensorMAD = (tensor: Tensor1D, sorted?: boolean): Tensor1D => {
   return tidy(() => {
     const median = getTensorMedian(tensor, sorted);
     const subtractedTensor = tensor.sub(median) as Tensor1D;
@@ -205,7 +202,7 @@ export const getPerimeterFromMask = (
   }, 0);
 };
 
-export const getPerimeter = (vertices: Array<Array<number>>) => {
+const getPerimeter = (vertices: Array<Array<number>>) => {
   let total = 0;
   for (let i = 0; i < vertices.length; i++) {
     const fromX = vertices[i][0];
@@ -219,7 +216,7 @@ export const getPerimeter = (vertices: Array<Array<number>>) => {
 export const getEQPC = (area: number) => {
   return 2 * Math.sqrt(area / Math.PI);
 };
-export const getPEQPC = (area: number) => {
+const getPEQPC = (area: number) => {
   return 2 * Math.sqrt(area * Math.PI);
 };
 
@@ -233,14 +230,6 @@ export const getObjectFormFactor = (
   const per = getPerimeterFromMask(maskData, maskShape);
 
   return peqpc / per;
-};
-
-export const getPE = (
-  mask: DataArray,
-  maskShape: { width: number; height: number },
-) => {
-  const perimeter = getPerimeterFromMask(mask, maskShape);
-  return perimeter / Math.PI;
 };
 
 export const findSelected = (
@@ -270,7 +259,7 @@ export const getMean = (values: number[]) => {
   );
 };
 
-export const getMedian = (values: number[]) => {
+const getMedian = (values: number[]) => {
   const middleIndex = values.length / 2;
   const flooredIndex = Math.floor(middleIndex);
   let median: number;
@@ -282,7 +271,7 @@ export const getMedian = (values: number[]) => {
   return { median, index: flooredIndex };
 };
 
-export const getSTD = (values: number[], mean: number) => {
+const getSTD = (values: number[], mean: number) => {
   const _std =
     values.reduce((sqsum: number, value) => {
       return sqsum + (value - mean) ** 2;
