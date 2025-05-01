@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { mutatingFilter, toUnique } from "utils/common/helpers";
+import { mutatingFilter, toUnique } from "utils/common/arrayUtils";
 
 import { ThingSortKey } from "utils/common/enums";
 import { Partition } from "utils/models/enums";

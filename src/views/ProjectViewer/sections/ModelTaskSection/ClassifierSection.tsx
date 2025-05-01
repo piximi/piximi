@@ -36,11 +36,7 @@ import { usePredictClassifier } from "views/ProjectViewer/hooks/usePredictClassi
 import { selectCategoriesDictionary } from "store/data/selectors";
 import { useEvaluateClassifier } from "views/ProjectViewer/hooks/useEvaluateClassifier";
 import { WithLabel } from "views/ProjectViewer/components/WithLabel";
-import {
-  addModel,
-  availableClassificationModels,
-  removeModel,
-} from "utils/models/availableClassificationModels";
+import classifierHandler from "utils/models/classification/classifierHandler";
 import { classifierSlice } from "store/classifier";
 import { selectActiveKindId } from "store/project/selectors";
 import { StyledSelect } from "views/ProjectViewer/components/StyledSelect";
@@ -58,7 +54,7 @@ export const ClassifierSection = () => {
   const [selectedModelName, setSelectedModelName] = useState<string>("new");
   const handleImportModel = async (model: Model, _inputShape: Shape) => {
     if (model instanceof SequentialClassifier) {
-      addModel(model);
+      classifierHandler.addModel(model);
     } else if (import.meta.env.NODE_ENV !== "production") {
       console.warn(
         `Attempting to dispatch a model with task ${
@@ -100,7 +96,7 @@ export const ClassifierSection = () => {
   };
   const handleDisposeModel = () => {
     if (!selectedModel) return;
-    removeModel(selectedModel.name);
+    classifierHandler.removeModel(selectedModel.name);
     dispatch(
       classifierSlice.actions.removeModelInfo({
         modelName: selectedModel.name,
@@ -188,21 +184,19 @@ export const ClassifierSection = () => {
               >
                 New Model
               </MenuItem>
-              {Object.keys(availableClassificationModels).map(
-                (modelName, idx) => (
-                  <MenuItem
-                    key={modelName + idx}
-                    dense
-                    value={modelName}
-                    sx={{
-                      borderRadius: 0,
-                      minHeight: "1rem",
-                    }}
-                  >
-                    {modelName}
-                  </MenuItem>
-                ),
-              )}
+              {classifierHandler.getModelNames().map((modelName, idx) => (
+                <MenuItem
+                  key={modelName + idx}
+                  dense
+                  value={modelName}
+                  sx={{
+                    borderRadius: 0,
+                    minHeight: "1rem",
+                  }}
+                >
+                  {modelName}
+                </MenuItem>
+              ))}
             </StyledSelect>
           </WithLabel>
           <Collapse in={!!selectedModel}>

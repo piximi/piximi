@@ -1,4 +1,4 @@
-import { getDefaultModelInfo } from "utils/models/availableClassificationModels";
+import { getDefaultModelInfo } from "utils/models/classification/utils";
 import { ClassifierStateV01_02 } from "../types";
 import { OptimizerSettings, PreprocessSettings } from "utils/models/types";
 import { Kind } from "store/data/types";

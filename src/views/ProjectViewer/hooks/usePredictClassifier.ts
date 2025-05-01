@@ -14,7 +14,7 @@ import {
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
 
-import { getStackTraceFromError, logger } from "utils/common/helpers";
+import { getStackTraceFromError, logger } from "utils/common/logUtils";
 import { AlertType } from "utils/common/enums";
 import { ModelStatus } from "utils/models/enums";
 import { AlertState } from "utils/common/types";
@@ -68,7 +68,6 @@ export const usePredictClassifier = () => {
 
     if (!classMap) {
       if (!selectedModel.classes) return;
-      console.log("selectedModel.classes:", selectedModel.classes); //LOG:
       const setMapping = await getClassMap({
         projectCategories: activeCategories,
         modelClasses: selectedModel.classes,

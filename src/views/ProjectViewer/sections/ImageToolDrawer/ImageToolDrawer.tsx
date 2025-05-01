@@ -27,7 +27,7 @@ import { OperationType, ToolOptionsDrawer } from "./ToolOptionsDrawer";
 import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
 
 import { dimensions } from "utils/common/constants";
-import { capitalize } from "utils/common/helpers";
+import { capitalize } from "utils/common/stringUtils";
 
 const imageTools: Record<string, OperationType> = {
   fileIO: {
