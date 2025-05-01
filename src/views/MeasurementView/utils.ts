@@ -1,7 +1,7 @@
 import { DataArray } from "image-js";
 import { Tensor2D, Tensor4D } from "@tensorflow/tfjs";
 
-import { getObjectMaskData, prepareChannels } from "utils/measurements/helpers";
+import { getObjectMaskData, prepareChannels } from "utils/measurements/utils";
 import { decode } from "views/ImageViewer/utils";
 
 import {

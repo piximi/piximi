@@ -10,7 +10,7 @@ import {
   RescaleOptions,
 } from "../types";
 import { CropSchema, ModelTask } from "../enums";
-import { loadImageFileAsStack } from "utils/file-io/helpers";
+import { loadImageFileAsStack } from "utils/file-io/utils";
 import { convertToImage } from "utils/tensorUtils";
 import { MIMEType } from "utils/file-io/types";
 import { Category, ImageObject, Shape } from "store/data/types";
