@@ -8,7 +8,7 @@ import { ScaleLinear } from "@nivo/scales";
 
 import { usePreferredNivoTheme } from "hooks";
 
-import { getMean, getStatistics } from "utils/measurements/helpers";
+import { getMean, getStatistics } from "utils/measurements/utils";
 
 import { ParsedMeasurementData } from "store/measurements/types";
 import { ChartConfig, NodeGroupRecord, SwarmData, SwarmDatum } from "../types";

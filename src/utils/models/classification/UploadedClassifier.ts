@@ -7,12 +7,12 @@ import {
 
 import { Model } from "../Model";
 import { SequentialClassifier } from "./AbstractClassifier";
-import { convertArrayToShape } from "utils/helpers";
 import { logger } from "utils/logUtils";
 import { arrayRange } from "utils/arrayUtils";
 import { validateModelMetadata } from "utils/file-io/runtime/validators";
 import { getDefaultModelInfo } from "./utils";
-import { createCompileArgs } from "../helpers";
+import { createCompileArgs } from "../utils";
+import { convertArrayToShape } from "../utils";
 
 import { CropSchema } from "../enums";
 import { OptimizerSettings } from "../types";
