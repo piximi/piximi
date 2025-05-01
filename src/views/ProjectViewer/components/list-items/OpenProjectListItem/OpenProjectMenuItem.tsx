@@ -9,7 +9,7 @@ import { segmenterSlice } from "store/segmenter";
 import { dataSlice } from "store/data/dataSlice";
 
 import { deserializeProject } from "utils/file-io/deserialize";
-import { fListToStore } from "utils/file-io/zarrStores";
+import { fListToStore } from "utils/file-io/zarr/stores";
 
 import { AlertType } from "utils/common/enums";
 

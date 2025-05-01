@@ -23,7 +23,7 @@ import {
   selectClassifierRescaleOptions,
 } from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
-import { enumKeys } from "utils/common/helpers";
+import { enumKeys } from "utils/common/objectUtils";
 import { CropSchema } from "utils/models/enums";
 import { CropOptions, RescaleOptions } from "utils/models/types";
 import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSettingsTextField";

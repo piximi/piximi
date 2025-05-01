@@ -6,10 +6,8 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data/dataSlice";
 import { segmenterSlice } from "./segmenterSlice";
 
-import {
-  getPropertiesFromImageSync,
-  getStackTraceFromError,
-} from "utils/common/helpers";
+import { getPropertiesFromImageSync } from "utils/common/helpers";
+import { getStackTraceFromError } from "utils/common/logUtils";
 
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import { AlertType } from "utils/common/enums";

@@ -51,7 +51,7 @@ import {
   selectLoadMessage,
 } from "store/applicationSettings/selectors";
 
-import { pluralize } from "utils/common/helpers";
+import { pluralize } from "utils/common/stringUtils";
 import { isUnknownCategory } from "store/data/helpers";
 
 import { HotkeyContext } from "utils/common/enums";

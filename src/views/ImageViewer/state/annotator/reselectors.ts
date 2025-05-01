@@ -20,7 +20,7 @@ import {
 } from "../imageViewer/selectors";
 
 import { decodeAnnotation } from "views/ImageViewer/utils/rle";
-import { generateBlankColors } from "utils/common/tensorHelpers";
+import { generateBlankColors } from "utils/common/tensorUtils";
 import { getCompleteEntity } from "utils/common/helpers";
 
 import {

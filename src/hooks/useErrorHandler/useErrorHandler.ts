@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { getStackTraceFromError } from "utils/common/helpers";
+import { getStackTraceFromError } from "utils/common/logUtils";
 
 import { AlertType } from "utils/common/enums";
 

@@ -20,8 +20,8 @@ import {
 import {
   convertArrayToShape,
   getPropertiesFromImageSync,
-  logger,
 } from "utils/common/helpers";
+import { logger } from "utils/common/logUtils";
 import { Partition } from "utils/models/enums";
 
 export const dataConverter_v01v02 = (data: {

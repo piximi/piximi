@@ -2,7 +2,7 @@ import semver from "semver";
 import { deserializePiximiAnnotations_v01 } from "./v01/deserializePiximiAnnotations_v01";
 import { deserializePiximiAnnotations_v02 } from "./v02/deserializePiximiAnnotations_v02";
 import { convertAnnotationsWithExistingProject_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/common/logUtils";
 import { SerializedFileType, SerializedFileTypeV02 } from "../types";
 import { Kind, Category, ImageObject } from "store/data/types";
 

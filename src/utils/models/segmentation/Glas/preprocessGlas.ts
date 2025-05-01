@@ -1,5 +1,5 @@
 import { Tensor4D, data as tfdata } from "@tensorflow/tfjs";
-import { getImageSlice } from "utils/common/tensorHelpers";
+import { getImageSlice } from "utils/common/tensorUtils";
 import { OldImageType, ImageObject } from "store/data/types";
 
 const sampleGenerator = (images: Array<OldImageType>) => {

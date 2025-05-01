@@ -1,6 +1,6 @@
 import { Group } from "zarr";
 import { tensor2d } from "@tensorflow/tfjs";
-import { getDatasetSelection } from "../../helpers";
+import { getDatasetSelection } from "../../../zarr/helpers";
 import { Colors } from "utils/common/types";
 
 export const deserializeColorsGroup = async (
