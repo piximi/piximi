@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { useSelector } from "react-redux";
 import { selectClassifierModel } from "store/classifier/reselectors";
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/common/logUtils";
 import { Points } from "utils/common/types";
 import { TrainingCallbacks } from "utils/models/types";
 
@@ -118,7 +118,6 @@ export const ClassifierHistoryProvider = ({
       const trainingEpochIndicator = nextEpoch - 0.5;
 
       setCurrentEpoch((currentEpoch) => {
-        console.log(currentEpoch);
         return currentEpoch + 1;
       });
 

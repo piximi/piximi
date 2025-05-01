@@ -7,14 +7,17 @@ import {
 
 import { Model } from "../Model";
 import { SequentialClassifier } from "./AbstractClassifier";
-import { RequireOnly } from "utils/common/types";
-import { CropSchema } from "../enums";
-import { Shape, ShapeArray } from "store/data/types";
-import { getDefaultModelInfo } from "../availableClassificationModels";
-import { arrayRange, convertArrayToShape, logger } from "utils/common/helpers";
-import { validateModelMetadata } from "utils/file-io/runtimeTypes";
-import { OptimizerSettings } from "../types";
+import { convertArrayToShape } from "utils/common/helpers";
+import { logger } from "utils/common/logUtils";
+import { arrayRange } from "utils/common/arrayUtils";
+import { validateModelMetadata } from "utils/file-io/runtime/validators";
+import { getDefaultModelInfo } from "./utils";
 import { createCompileArgs } from "../helpers";
+
+import { CropSchema } from "../enums";
+import { OptimizerSettings } from "../types";
+import { RequireOnly } from "utils/common/types";
+import { Shape, ShapeArray } from "store/data/types";
 
 enum LoadState {
   Unloaded,

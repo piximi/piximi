@@ -9,18 +9,15 @@ import {
   literal as IOTSLiteral,
   boolean as IOTSBoolean,
   record as IOTSRecord,
-  KeyofC as IOTSKeyofC,
-  keyof as IOTSKeyof,
 } from "io-ts";
-import { getOrElseW } from "fp-ts/Either";
-import { failure } from "io-ts/PathReporter";
-import { logger } from "utils/common/helpers";
+
 import {
   CropSchema,
   LossFunction,
   Metric,
   OptimizationAlgorithm,
 } from "utils/models/enums";
+import { enumToCodec } from "./helpers";
 
 //#region COCO Serialization Type
 
@@ -177,56 +174,5 @@ export const SerializedModelMetadataRType = IOTSType({
     batchSize: IOTSNumber,
   }),
 });
-export type OptimizerSettings = {
-  learningRate: number;
-  lossFunction:
-    | LossFunction
-    | Array<LossFunction>
-    | { [outputName: string]: LossFunction };
-  metrics: Array<Metric>;
-  optimizationAlgorithm: OptimizationAlgorithm;
-  epochs: number;
-  batchSize: number;
-};
+
 //#endregion Basic Serialization Type
-
-const toError = (errors: any) => {
-  import.meta.env.NODE_ENV !== "production" && logger(errors);
-  throw new Error(failure(errors).join("\n"));
-};
-
-function enumToCodec<E extends Record<string, string>>(
-  e: E,
-): IOTSKeyofC<Record<E[keyof E], null>> {
-  const values = Object.values(e);
-  return IOTSKeyof(
-    values.reduce<Record<string, null>>((acc, value) => {
-      acc[value] = null;
-      return acc;
-    }, {}),
-  );
-}
-export enum ProjectFileType {
-  COCO,
-  PIXIMI,
-}
-
-export const validateFileType = (
-  encodedFileContents: string,
-  projectType: ProjectFileType = ProjectFileType.PIXIMI,
-) => {
-  const annotations = JSON.parse(encodedFileContents);
-  switch (projectType) {
-    case ProjectFileType.PIXIMI:
-      return getOrElseW(toError)(SerializedFileRType.decode(annotations));
-    case ProjectFileType.COCO:
-      return getOrElseW(toError)(SerializedCOCOFileRType.decode(annotations));
-    default:
-      throw new Error("Unrecognized project type", projectType);
-  }
-};
-
-export const validateModelMetadata = (encodedFileContents: string) => {
-  const metadata = JSON.parse(encodedFileContents);
-  return getOrElseW(toError)(SerializedModelMetadataRType.decode(metadata));
-};

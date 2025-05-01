@@ -20,7 +20,8 @@ import { selectThingFilters } from "store/project/selectors";
 import { selectActiveSelectedThingIds } from "store/project/reselectors";
 import { selectTileSize } from "store/applicationSettings/selectors";
 
-import { getInnerElementWidth, isFiltered } from "utils/common/helpers";
+import { getInnerElementWidth } from "utils/common/helpers";
+import { isFiltered } from "utils/common/arrayUtils";
 
 type Things = ReturnType<ReturnType<typeof selectThingsOfKind>>;
 type SelectHandler = (id: string, selected: boolean) => void;

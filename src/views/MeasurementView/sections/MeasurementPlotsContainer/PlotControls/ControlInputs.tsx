@@ -20,7 +20,7 @@ import { useMeasurementParameters, usePlotControl } from "../../../hooks";
 
 import { CustomNumberTextField } from "components/inputs";
 
-import { capitalize } from "utils/common/helpers";
+import { capitalize } from "utils/common/stringUtils";
 
 import { KeysWithValuesOfType } from "utils/common/types";
 import { ChartConfig, ChartItem, ChartType, SplitType } from "../../../types";

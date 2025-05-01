@@ -5,18 +5,18 @@ import { dataSlice } from "./dataSlice";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { createRenderedTensor } from "utils/common/tensorHelpers";
+import { createRenderedTensor } from "utils/common/tensorUtils";
 
 import { ImageObject } from "./types";
 import { TypedAppStartListening } from "store/types";
 import _ from "lodash";
 import { classifierSlice } from "store/classifier/classifierSlice";
-import { getDefaultModelInfo } from "utils/models/availableClassificationModels";
-import { recursiveAssign } from "utils/common/helpers";
+import { getDefaultModelInfo } from "utils/models/classification/utils";
+import { recursiveAssign } from "utils/common/objectUtils";
 
 export const dataMiddleware = createListenerMiddleware();
 
-export const startAppListening =
+const startAppListening =
   dataMiddleware.startListening as TypedAppStartListening;
 
 startAppListening({

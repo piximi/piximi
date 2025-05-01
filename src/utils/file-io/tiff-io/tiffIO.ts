@@ -1,4 +1,4 @@
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/common/logUtils";
 import {
   BaseIFD,
   IFD,

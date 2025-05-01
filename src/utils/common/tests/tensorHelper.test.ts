@@ -31,7 +31,7 @@ import {
   scaleImageTensor,
   sliceVisibleChannels,
   sliceVisibleColors,
-} from "utils/common/tensorHelpers";
+} from "utils/common/tensorUtils";
 
 // https://stackoverflow.com/questions/71365891/property-closeto-does-not-exist-on-type-expect
 interface CustomMatchers<R = unknown> {
