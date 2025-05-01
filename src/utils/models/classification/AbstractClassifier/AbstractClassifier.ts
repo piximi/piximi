@@ -25,8 +25,8 @@ import {
 } from "../../types";
 import { evaluateConfusionMatrix, getLayersModelSummary } from "../../helpers";
 import { Category, Thing } from "store/data/types";
-import { logger } from "utils/common/logUtils";
-import { RequireOnly } from "utils/common/types";
+import { logger } from "utils/logUtils";
+import { RequireOnly } from "utils/types";
 
 export abstract class SequentialClassifier extends Model {
   protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;

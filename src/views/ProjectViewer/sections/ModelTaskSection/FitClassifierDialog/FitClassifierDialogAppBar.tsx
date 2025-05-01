@@ -28,7 +28,7 @@ import { classifierSlice } from "store/classifier";
 import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
 import { selectClassifierModel } from "store/classifier/reselectors";
 
-import { APPLICATION_COLORS } from "utils/common/constants";
+import { APPLICATION_COLORS } from "utils/constants";
 import { ModelStatus } from "utils/models/enums";
 import { useClassifierHistory } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";

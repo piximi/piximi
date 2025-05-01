@@ -8,7 +8,7 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
 import { renderImageViewerKindName } from "../state/annotator/reselectors";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 type KindMenuProps = {
   anchorEl: any;

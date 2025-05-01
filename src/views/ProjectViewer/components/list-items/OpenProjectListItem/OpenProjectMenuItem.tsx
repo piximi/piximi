@@ -11,9 +11,9 @@ import { dataSlice } from "store/data/dataSlice";
 import { deserializeProject } from "utils/file-io/deserialize";
 import { fListToStore } from "utils/file-io/zarr/stores";
 
-import { AlertType } from "utils/common/enums";
+import { AlertType } from "utils/enums";
 
-import { AlertState } from "utils/common/types";
+import { AlertState } from "utils/types";
 
 //TODO: MenuItem??
 

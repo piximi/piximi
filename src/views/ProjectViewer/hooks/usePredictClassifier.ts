@@ -14,10 +14,10 @@ import {
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
 
-import { getStackTraceFromError, logger } from "utils/common/logUtils";
-import { AlertType } from "utils/common/enums";
+import { getStackTraceFromError, logger } from "utils/logUtils";
+import { AlertType } from "utils/enums";
 import { ModelStatus } from "utils/models/enums";
-import { AlertState } from "utils/common/types";
+import { AlertState } from "utils/types";
 import { useClassMapDialog } from "./useClassMapDialog";
 import { classifierSlice } from "store/classifier";
 import { selectActiveKindId } from "store/project/selectors";

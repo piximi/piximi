@@ -7,7 +7,7 @@ import { useDialogHotkey } from "hooks";
 import { SettingsDialog } from "components/dialogs";
 import { CustomListItemButton } from "../CustomListItemButton";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 export const SettingsListItem = () => {
   const { onClose, onOpen, open } = useDialogHotkey(

@@ -22,7 +22,7 @@ import { dataSlice } from "store/data/dataSlice";
 import { isUnknownCategory } from "store/data/helpers";
 
 import { Partition } from "utils/models/enums";
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 import { Category } from "store/data/types";
 

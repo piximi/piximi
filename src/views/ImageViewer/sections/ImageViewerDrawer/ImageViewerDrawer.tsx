@@ -23,7 +23,7 @@ import {
   selectKindsArray,
 } from "views/ImageViewer/state/annotator/reselectors";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 import { Category, Kind } from "store/data/types";
 
 export const ImageViewerDrawer = () => {

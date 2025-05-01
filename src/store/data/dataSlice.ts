@@ -8,7 +8,7 @@ import {
 import { dispose, TensorContainer } from "@tensorflow/tfjs";
 import { difference, intersection } from "lodash";
 
-import { updateRecordArray } from "utils/common/objectUtils";
+import { updateRecordArray } from "utils/objectUtils";
 import { generateUUID, generateKind, isUnknownCategory } from "./helpers";
 import { encode } from "views/ImageViewer/utils/rle";
 import { updateContents } from "./helpers";
@@ -18,10 +18,10 @@ import {
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "./constants";
 
-import { newReplaceDuplicateName } from "utils/common/stringUtils";
-import { mutatingFilter } from "utils/common/arrayUtils";
+import { newReplaceDuplicateName } from "utils/stringUtils";
+import { mutatingFilter } from "utils/arrayUtils";
 
-import { PartialBy } from "utils/common/types";
+import { PartialBy } from "utils/types";
 import { DataState } from "store/types";
 import {
   Kind,

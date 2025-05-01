@@ -18,7 +18,7 @@ import {
 } from "../types";
 import { CropSchema, ModelTask, Partition } from "../enums";
 import { loadDataUrlAsStack } from "utils/file-io/helpers";
-import { convertToImage } from "utils/common/tensorUtils";
+import { convertToImage } from "utils/tensorUtils";
 import { Category, ImageObject, Shape } from "store/data/types";
 
 const categories: Array<Category> = [

@@ -4,7 +4,7 @@ import { openGroup, Group } from "zarr";
 import { initialState as initialProjectState } from "store/project/projectSlice";
 
 import { RawArray } from "zarr/types/rawArray";
-import { logger } from "utils/common/logUtils";
+import { logger } from "utils/logUtils";
 import {
   getAttr,
   getDataset,
@@ -15,7 +15,7 @@ import { deserializeClassifierGroupV01_1 } from "../common/group-deserializers/c
 import { deserializeColorsGroup } from "../common/group-deserializers/dataDeserializers";
 import { deserializeSegmenterGroup } from "../common/group-deserializers/segmenterDeserializers";
 import { Partition } from "utils/models/enums";
-import { createRenderedTensor } from "utils/common/tensorUtils";
+import { createRenderedTensor } from "utils/tensorUtils";
 import { BitDepth, LoadCB } from "utils/file-io/types";
 import { CustomStore } from "utils/file-io/zarr/stores";
 import { ProjectState } from "store/types";

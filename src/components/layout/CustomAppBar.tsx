@@ -1,7 +1,7 @@
 import React from "react";
 import { AppBar, Toolbar, ToolbarProps } from "@mui/material";
 
-import { APPLICATION_COLORS } from "utils/common/constants";
+import { APPLICATION_COLORS } from "utils/constants";
 
 export const CustomAppBar = ({
   children,

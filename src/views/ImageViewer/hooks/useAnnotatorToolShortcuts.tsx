@@ -8,7 +8,7 @@ import { selectImagesArray } from "views/ImageViewer/state/annotator/reselectors
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
 import { ToolType } from "views/ImageViewer/utils/enums";
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 export const useAnnotatorToolShortcuts = () => {
   const dispatch = useDispatch();
