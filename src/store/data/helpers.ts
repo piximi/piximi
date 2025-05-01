@@ -23,7 +23,7 @@ export const isUnknownCategory = (categoryId: string) => {
   return categoryId[0] === "0";
 };
 
-export const generateUnknownCategory = (kind: string) => {
+const generateUnknownCategory = (kind: string) => {
   const unknownCategoryId = generateUUID({ definesUnknown: true });
   const unknownCategory: Category = {
     id: unknownCategoryId,

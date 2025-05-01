@@ -24,14 +24,15 @@ import {
 
 import { useDialogHotkey } from "hooks";
 
-import { SaveFittedModelDialog, SaveProjectDialog } from "components/dialogs";
+import { SaveProjectDialog } from "../SaveProjectDialog";
+import { SaveFittedModelDialog } from "../SaveFittedModelDialog";
 
 import {
   selectSegmenterModel,
   selectSegmenterModelStatus,
 } from "store/segmenter/selectors";
 
-import { createGitHubIssue } from "utils/common/helpers";
+import { createGitHubIssue } from "utils/common/logUtils";
 
 import { APPLICATION_COLORS } from "utils/common/constants";
 import { HotkeyContext } from "utils/common/enums";
@@ -39,7 +40,7 @@ import { AlertType } from "utils/common/enums";
 import { ModelStatus } from "utils/models/enums";
 
 import { AlertState } from "utils/common/types";
-import { availableClassificationModels } from "utils/models/availableClassificationModels";
+import classifierHandler from "utils/models/classification/classifierHandler";
 
 export const FallBackDialog = (props: any) => {
   const error = props.error as Error;
@@ -220,7 +221,7 @@ export const FallBackDialog = (props: any) => {
           <Button variant="outlined" onClick={onSaveProjectDialogOpen}>
             Save project
           </Button>
-          {Object.keys(availableClassificationModels).length > 0 && (
+          {classifierHandler.getModelNames().length > 0 && (
             <Button variant="outlined" onClick={onSaveClassifierDialogOpen}>
               Save classifier
             </Button>

@@ -12,7 +12,7 @@ import {
   selectSegmenterTrainingPercentage,
 } from "store/segmenter/selectors";
 
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/common/logUtils";
 
 import { AlertType } from "utils/common/enums";
 import { ModelStatus } from "utils/models/enums";

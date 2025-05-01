@@ -11,7 +11,7 @@ import {
   selectSelectedGroupMeasurements,
 } from "store/measurements/selectors";
 
-import { isObjectEmpty } from "utils/common/helpers";
+import { isObjectEmpty } from "utils/common/objectUtils";
 import { selectTreeItemChildren } from "../../utils";
 
 import { LoadStatus, RecursivePartial } from "utils/common/types";

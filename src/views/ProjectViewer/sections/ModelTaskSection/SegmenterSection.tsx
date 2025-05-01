@@ -17,7 +17,6 @@ export const SegmenterSection = () => {
     selectedModel,
     handlePredict,
     handleEvaluate,
-    helperText,
     waitingForResults,
     setWaitingForResults,
     handleImportModel,
@@ -76,7 +75,6 @@ export const SegmenterSection = () => {
           handleFit={() => {}}
           handlePredict={handlePredict}
           modelTrainable={false} //until trainable segmenter available
-          helperText={helperText}
         />
       </Box>
 
