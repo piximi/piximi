@@ -8,11 +8,7 @@ import {
 import { dispose, TensorContainer } from "@tensorflow/tfjs";
 import { difference, intersection } from "lodash";
 
-import {
-  mutatingFilter,
-  newReplaceDuplicateName,
-  updateRecordArray,
-} from "utils/common/helpers";
+import { updateRecordArray } from "utils/common/objectUtils";
 import { generateUUID, generateKind, isUnknownCategory } from "./helpers";
 import { encode } from "views/ImageViewer/utils/rle";
 import { updateContents } from "./helpers";
@@ -21,6 +17,9 @@ import {
   UNKNOWN_CATEGORY_NAME,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "./constants";
+
+import { newReplaceDuplicateName } from "utils/common/stringUtils";
+import { mutatingFilter } from "utils/common/arrayUtils";
 
 import { PartialBy } from "utils/common/types";
 import { DataState } from "store/types";
@@ -41,7 +40,7 @@ export const thingsAdapter = createEntityAdapter<
   ImageObject | AnnotationObject
 >();
 
-export const initialState = (): DataState => {
+const initialState = (): DataState => {
   return {
     kinds: kindsAdapter.getInitialState({
       ids: [imageKind.id],

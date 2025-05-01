@@ -6,7 +6,7 @@ import {
   selectThingsDictionary,
 } from "store/data/selectors";
 
-import { capitalize } from "utils/common/helpers";
+import { capitalize } from "utils/common/stringUtils";
 import { getStatistics } from "utils/measurements/helpers";
 
 import { Partition } from "utils/models/enums";

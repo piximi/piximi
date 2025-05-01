@@ -25,7 +25,7 @@ import {
 } from "../../types";
 import { evaluateConfusionMatrix, getLayersModelSummary } from "../../helpers";
 import { Category, Thing } from "store/data/types";
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/common/logUtils";
 import { RequireOnly } from "utils/common/types";
 
 export abstract class SequentialClassifier extends Model {

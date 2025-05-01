@@ -16,7 +16,7 @@ import { CustomTabs } from "components/layout";
 import { MeasurementPlotsContainer } from "../MeasurementPlotsContainer";
 import { MeasurementTable } from "./MeasurementTable";
 
-import { capitalize } from "utils/common/helpers";
+import { capitalize } from "utils/common/stringUtils";
 
 import { GroupedMeasurementDisplayTable } from "store/measurements/types";
 

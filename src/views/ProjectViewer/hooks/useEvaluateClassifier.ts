@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { AlertType } from "utils/common/enums";
-import { getStackTraceFromError } from "utils/common/helpers";
+import { getStackTraceFromError } from "utils/common/logUtils";
 import { AlertState } from "utils/common/types";
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { ModelStatus } from "utils/models/enums";

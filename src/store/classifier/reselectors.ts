@@ -11,7 +11,7 @@ import {
   RescaleOptions,
 } from "utils/models/types";
 import { Shape } from "store/data/types";
-import { availableClassificationModels } from "utils/models/availableClassificationModels";
+import classifierHandler from "utils/models/classification/classifierHandler";
 import { getSelectedModelInfo } from "./utils";
 
 const selectClassifier = createSelector(
@@ -30,13 +30,14 @@ export const selectClassifierModelNameOrArch = createSelector(
 );
 export const selectClassifierModel = createSelector(
   selectClassifierModelNameOrArch,
-  (selectedActiveKindModelNameOrArch) => {
-    return selectedActiveKindModelNameOrArch
-      ? availableClassificationModels[selectedActiveKindModelNameOrArch]
+  (selectedModelNameOrArch) => {
+    return typeof selectedModelNameOrArch === "string"
+      ? classifierHandler.getModel(selectedModelNameOrArch)
       : undefined;
   },
 );
-export const selectEveryClassifierModelInfo = createSelector(
+
+const selectEveryClassifierModelInfo = createSelector(
   selectClassifier,
   (classifier): Record<string, ModelInfo> => {
     return classifier.modelInfoDict;
@@ -94,7 +95,7 @@ export const selectClassifierOptimizerSettings = createSelector(
   },
 );
 
-export const selectClassifierPreprocessOptions = createSelector(
+const selectClassifierPreprocessOptions = createSelector(
   selectClassifierModelInfo,
   (modelInfo): PreprocessSettings => {
     return modelInfo.preprocessSettings;
@@ -121,12 +122,6 @@ export const selectClassifierFitOptions = createSelector(
       epochs: settings.epochs,
       batchSize: settings.batchSize,
     };
-  },
-);
-export const selectClassifierEpochs = createSelector(
-  selectClassifierFitOptions,
-  (settings): number => {
-    return settings.epochs;
   },
 );
 

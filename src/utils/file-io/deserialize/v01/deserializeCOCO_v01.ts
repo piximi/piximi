@@ -1,7 +1,7 @@
 import { encode, maskFromPoints } from "views/ImageViewer/utils";
 
 import { generateUUID } from "store/data/helpers";
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/common/logUtils";
 import {
   SerializedCOCOAnnotationType,
   SerializedCOCOCategoryType,
