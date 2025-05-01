@@ -3,9 +3,9 @@ import { useDispatch } from "react-redux";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { getStackTraceFromError } from "utils/common/logUtils";
+import { getStackTraceFromError } from "utils/logUtils";
 
-import { AlertType } from "utils/common/enums";
+import { AlertType } from "utils/enums";
 
 export const useErrorHandler = () => {
   const dispatch = useDispatch();

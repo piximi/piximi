@@ -16,7 +16,7 @@ import IJSImage, {
   BitDepth as IJSBitDepth,
 } from "image-js";
 
-import { fileFromPath } from "../../file-io/nodeImageHelper";
+import { fileFromPath } from "../file-io/nodeImageHelper";
 import { MIMEType } from "utils/file-io/types";
 import { loadImageFileAsStack } from "utils/file-io/helpers";
 import {
@@ -31,7 +31,7 @@ import {
   scaleImageTensor,
   sliceVisibleChannels,
   sliceVisibleColors,
-} from "utils/common/tensorUtils";
+} from "utils/tensorUtils";
 
 // https://stackoverflow.com/questions/71365891/property-closeto-does-not-exist-on-type-expect
 interface CustomMatchers<R = unknown> {

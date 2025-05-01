@@ -7,8 +7,8 @@ import React, {
 } from "react";
 import { useSelector } from "react-redux";
 import { selectClassifierModel } from "store/classifier/reselectors";
-import { logger } from "utils/common/logUtils";
-import { Points } from "utils/common/types";
+import { logger } from "utils/logUtils";
+import { Points } from "utils/types";
 import { TrainingCallbacks } from "utils/models/types";
 
 type HistoryData = {

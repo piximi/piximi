@@ -1,5 +1,5 @@
 import { generateUUID } from "store/data/helpers";
-import { logger } from "utils/common/logUtils";
+import { logger } from "utils/logUtils";
 import {
   SerializedAnnotationType,
   SerializedAnnotatorImageType,

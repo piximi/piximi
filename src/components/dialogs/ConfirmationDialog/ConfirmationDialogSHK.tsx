@@ -2,7 +2,7 @@ import { useHotkeys } from "hooks";
 
 import { ConfirmationDialog } from "./ConfirmationDialog";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 type ConfirmationDialogProps = {
   title: string;

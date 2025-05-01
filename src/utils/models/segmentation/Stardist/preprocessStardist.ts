@@ -1,6 +1,6 @@
 import { Tensor3D, Tensor4D, data as tfdata, tidy } from "@tensorflow/tfjs";
 import { padToMatch } from "../../helpers";
-import { getImageSlice } from "utils/common/tensorUtils";
+import { getImageSlice } from "utils/tensorUtils";
 import { OldImageType, ImageObject } from "store/data/types";
 
 const sampleGenerator = (

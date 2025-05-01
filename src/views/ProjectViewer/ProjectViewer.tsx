@@ -16,7 +16,7 @@ import {
 import { projectSlice } from "store/project";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 export const ProjectViewer = () => {
   const dispatch = useDispatch();

@@ -12,7 +12,7 @@ import { getOverlappingAnnotations } from "views/ImageViewer/utils";
 import { getAnnotationsInBox } from "views/ImageViewer/utils/imageHelper";
 
 import { ToolType } from "views/ImageViewer/utils/enums";
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 import { Point, ProtoAnnotationObject } from "views/ImageViewer/utils/types";
 

@@ -5,9 +5,9 @@ import { useTranslation } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { createGitHubIssue } from "utils/common/logUtils";
+import { createGitHubIssue } from "utils/logUtils";
 
-import { AlertType } from "utils/common/enums";
+import { AlertType } from "utils/enums";
 
 type SendFeedbackDialogProps = {
   onClose: () => void;

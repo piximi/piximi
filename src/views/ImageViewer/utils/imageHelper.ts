@@ -1,7 +1,7 @@
 import IJSImage from "image-js";
 import { pointsAreEqual } from "./point-operations";
 
-import { logger } from "utils/common/logUtils";
+import { logger } from "utils/logUtils";
 import { Point, ProtoAnnotationObject } from "./types";
 import { DataArray } from "utils/file-io/types";
 
