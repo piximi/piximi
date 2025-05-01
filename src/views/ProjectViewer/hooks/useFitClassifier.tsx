@@ -20,10 +20,10 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 
-import { getStackTraceFromError } from "utils/common/logUtils";
+import { getStackTraceFromError } from "utils/logUtils";
 import classifierHandler from "utils/models/classification/classifierHandler";
 import { ModelStatus, Partition } from "utils/models/enums";
-import { AlertType } from "utils/common/enums";
+import { AlertType } from "utils/enums";
 import {
   SequentialClassifier,
   prepareClasses,
@@ -32,7 +32,7 @@ import {
   trainModel,
 } from "utils/models/classification";
 import { Thing, Kind, Category } from "store/data/types";
-import { AlertState } from "utils/common/types";
+import { AlertState } from "utils/types";
 import { ModelClassMap, ModelInfo } from "store/types";
 import { useClassMapDialog } from "./useClassMapDialog";
 

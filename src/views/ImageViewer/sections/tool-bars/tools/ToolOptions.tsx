@@ -24,7 +24,7 @@ import {
 
 import { ToolType } from "views/ImageViewer/utils/enums";
 import { ResizableTool } from "components/ui/Tool/Tool";
-import { SliderOptions } from "utils/common/types";
+import { SliderOptions } from "utils/types";
 import {
   penToolSizeControls,
   QuickToolSizeControls,

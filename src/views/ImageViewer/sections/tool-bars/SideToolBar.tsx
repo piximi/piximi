@@ -2,7 +2,7 @@ import React from "react";
 import { Divider, useTheme, Box } from "@mui/material";
 
 import { CreationOptions, ToolOptions } from "./tools";
-import { dimensions } from "utils/common/constants";
+import { dimensions } from "utils/constants";
 
 export const SideToolBar = () => {
   const theme = useTheme();

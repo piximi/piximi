@@ -1,7 +1,7 @@
 import { encode, maskFromPoints } from "views/ImageViewer/utils";
 import { generateUUID } from "store/data/helpers";
-import { getPropertiesFromImage } from "utils/common/helpers";
-import { logger } from "utils/common/logUtils";
+import { getPropertiesFromImage } from "utils/helpers";
+import { logger } from "utils/logUtils";
 
 import { Partition } from "utils/models/enums";
 import {
@@ -11,7 +11,7 @@ import {
   SerializedCOCOImageType,
 } from "../../types";
 import { Point } from "views/ImageViewer/utils/types";
-import { RequireOnly } from "utils/common/types";
+import { RequireOnly } from "utils/types";
 import {
   Kind,
   AnnotationObject,

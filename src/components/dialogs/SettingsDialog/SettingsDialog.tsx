@@ -6,7 +6,7 @@ import { useHotkeys } from "hooks";
 
 import { UISettings } from "./UISettings";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 type SettingsDialogProps = {
   onClose: () => void;

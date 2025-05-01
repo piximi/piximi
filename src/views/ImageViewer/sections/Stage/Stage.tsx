@@ -46,9 +46,9 @@ import {
 import { generateKind, generateUUID } from "store/data/helpers";
 
 import { CATEGORY_COLORS } from "store/data/constants";
-import { dimensions } from "utils/common/constants";
+import { dimensions } from "utils/constants";
 import { AnnotationState, ToolType } from "views/ImageViewer/utils/enums";
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 import { Category } from "store/data/types";
 import { createProtoAnnotation } from "views/ImageViewer/utils/annotationUtils";

@@ -6,7 +6,7 @@ import { Container, Typography, useMediaQuery, useTheme } from "@mui/material";
 
 import { usePreferredNivoTheme } from "hooks";
 
-import { APPLICATION_COLORS } from "utils/common/constants";
+import { APPLICATION_COLORS } from "utils/constants";
 import { Point } from "views/ImageViewer/utils/types";
 
 type TwoDataPlotProps = {
@@ -91,10 +91,6 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
 
     setData([data1, data2]);
   }, [id1, id2, yData1, yData2]);
-
-  useEffect(() => {
-    console.log(min, max);
-  }, [min, max]);
 
   return (
     <Container sx={{ height: 350, mb: 5 }}>

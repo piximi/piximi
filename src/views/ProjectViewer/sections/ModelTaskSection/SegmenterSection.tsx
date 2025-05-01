@@ -8,7 +8,7 @@ import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
 import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
 import { ImportTensorflowSegmentationModelDialog } from "./ImportTensorflowModelDialog";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 import { ModelStatus } from "utils/models/enums";
 
 export const SegmenterSection = () => {

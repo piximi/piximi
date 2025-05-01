@@ -51,10 +51,10 @@ import {
   selectLoadMessage,
 } from "store/applicationSettings/selectors";
 
-import { pluralize } from "utils/common/stringUtils";
+import { pluralize } from "utils/stringUtils";
 import { isUnknownCategory } from "store/data/helpers";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 import { Partition } from "utils/models/enums";
 
 const minZoom = 0.6;

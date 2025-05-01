@@ -4,8 +4,8 @@ import { shuffle, take, takeRight } from "lodash";
 import classifierHandler from "./classifierHandler";
 import { isUnknownCategory } from "store/data/helpers";
 import { Category, Thing } from "store/data/types";
-import { logger } from "utils/common/logUtils";
-import { recursiveAssign } from "utils/common/objectUtils";
+import { logger } from "utils/logUtils";
+import { recursiveAssign } from "utils/objectUtils";
 import {
   MobileNet,
   SequentialClassifier,

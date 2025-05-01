@@ -18,10 +18,10 @@ import {
   selectThingsDictionary,
 } from "store/data/selectors";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 import { MeasurementGroup, ThingData } from "store/measurements/types";
-import { LoadStatus } from "utils/common/types";
+import { LoadStatus } from "utils/types";
 import { ChartConfig } from "./types";
 
 export const useMeasurementParameters = () => {

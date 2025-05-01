@@ -1,8 +1,8 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { AlertBar } from "./AlertBar";
-import { AlertState } from "utils/common/types";
-import { AlertType } from "utils/common/enums";
+import { AlertState } from "utils/types";
+import { AlertType } from "utils/enums";
 
 const meta: Meta<typeof AlertBar> = {
   title: "Common/AlertBar",

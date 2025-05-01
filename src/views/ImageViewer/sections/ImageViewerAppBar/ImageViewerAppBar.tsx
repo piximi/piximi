@@ -17,7 +17,7 @@ import {
   selectHasUnsavedChanges,
 } from "views/ImageViewer/state/imageViewer/selectors";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 export const ImageViewerAppBar = () => {
   const navigate = useNavigate();

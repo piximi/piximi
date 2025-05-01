@@ -14,7 +14,7 @@ import {
   ProjectState,
   SegmenterState,
 } from "store/types";
-import { Colors } from "utils/common/types";
+import { Colors } from "utils/types";
 import {
   Kind,
   AnnotationObject,

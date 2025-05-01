@@ -19,12 +19,12 @@ import {
 
 import { matchedCropPad, padToMatch } from "../../helpers";
 import { CropSchema, Partition } from "../../enums";
-import { denormalizeTensor, getImageSlice } from "utils/common/tensorUtils";
+import { denormalizeTensor, getImageSlice } from "utils/tensorUtils";
 import { BitDepth } from "utils/file-io/types";
 import { Category, Shape, Thing } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
-import { logger } from "utils/common/logUtils";
-import { RequireOnly } from "utils/common/types";
+import { logger } from "utils/logUtils";
+import { RequireOnly } from "utils/types";
 
 type FitData = {
   xs: Tensor3D;

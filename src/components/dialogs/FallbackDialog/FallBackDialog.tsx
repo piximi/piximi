@@ -32,14 +32,14 @@ import {
   selectSegmenterModelStatus,
 } from "store/segmenter/selectors";
 
-import { createGitHubIssue } from "utils/common/logUtils";
+import { createGitHubIssue } from "utils/logUtils";
 
-import { APPLICATION_COLORS } from "utils/common/constants";
-import { HotkeyContext } from "utils/common/enums";
-import { AlertType } from "utils/common/enums";
+import { APPLICATION_COLORS } from "utils/constants";
+import { HotkeyContext } from "utils/enums";
+import { AlertType } from "utils/enums";
 import { ModelStatus } from "utils/models/enums";
 
-import { AlertState } from "utils/common/types";
+import { AlertState } from "utils/types";
 import classifierHandler from "utils/models/classification/classifierHandler";
 
 export const FallBackDialog = (props: any) => {

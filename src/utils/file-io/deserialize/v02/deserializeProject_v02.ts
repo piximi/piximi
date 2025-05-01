@@ -1,6 +1,6 @@
 import { Group, openGroup } from "zarr";
 
-import { logger } from "utils/common/logUtils";
+import { logger } from "utils/logUtils";
 import { initialState as initialProjectState } from "store/project/projectSlice";
 import { deserializeClassifierGroupV01_1 } from "../common/group-deserializers/classifierDeserializers";
 import { deserializeColorsGroup } from "../common/group-deserializers/dataDeserializers";
@@ -9,10 +9,7 @@ import { getAttr, getDataset, getGroup } from "../../zarr/helpers";
 import { RawArray } from "zarr/types/rawArray";
 import { tensor4d } from "@tensorflow/tfjs";
 import { Partition } from "utils/models/enums";
-import {
-  createRenderedTensor,
-  generateBlankColors,
-} from "utils/common/tensorUtils";
+import { createRenderedTensor, generateBlankColors } from "utils/tensorUtils";
 import { BitDepth, LoadCB } from "utils/file-io/types";
 import { CustomStore } from "utils/file-io/zarr/stores";
 import { ProjectState } from "store/types";

@@ -13,7 +13,7 @@ import { HelpContent, HelpContentType } from "./HelpContent";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { AlertType } from "utils/common/enums";
+import { AlertType } from "utils/enums";
 import AnnotatorHelpContent from "./AnnotatorHelpContent.json";
 import ClassifierHelpContent from "./ClassifierHelpContent.json";
 
