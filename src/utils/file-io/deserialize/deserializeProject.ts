@@ -1,4 +1,4 @@
-import { logger } from "utils/common/logUtils";
+import { logger } from "utils/logUtils";
 import { CustomStore } from "../zarr/stores";
 import { openGroup } from "zarr";
 import { getAttr } from "../zarr/helpers";

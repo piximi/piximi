@@ -1,7 +1,4 @@
-import {
-  convertArrayToShape,
-  getPropertiesFromImage,
-} from "utils/common/helpers";
+import { convertArrayToShape, getPropertiesFromImage } from "utils/helpers";
 import { generateUUID } from "store/data/helpers";
 import { Partition } from "utils/models/enums";
 import {
@@ -9,7 +6,7 @@ import {
   SerializedAnnotatorImageType,
   SerializedFileTypeV02,
 } from "../../types";
-import { PartialBy } from "utils/common/types";
+import { PartialBy } from "utils/types";
 import {
   Kind,
   AnnotationObject,

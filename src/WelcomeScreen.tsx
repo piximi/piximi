@@ -2,7 +2,7 @@ import { Box, Button, Stack } from "@mui/material";
 import { Logo } from "components/ui/Logo";
 import { useDialogHotkey } from "hooks";
 import { useNavigate } from "react-router-dom";
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 import { ExampleProjectDialog } from "views/ProjectViewer/components/dialogs";
 
 export const WelcomeScreen = () => {

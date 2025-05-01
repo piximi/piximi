@@ -7,7 +7,7 @@ import { baseMeasurementOptions } from "./constants";
 import { Partition } from "utils/models/enums";
 
 import { Category } from "store/data/types";
-import { RecursivePartial } from "utils/common/types";
+import { RecursivePartial } from "utils/types";
 import {
   MeasurementsState,
   MeasurementGroup,

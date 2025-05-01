@@ -12,12 +12,12 @@ import {
   selectSegmenterTrainingPercentage,
 } from "store/segmenter/selectors";
 
-import { logger } from "utils/common/logUtils";
+import { logger } from "utils/logUtils";
 
-import { AlertType } from "utils/common/enums";
+import { AlertType } from "utils/enums";
 import { ModelStatus } from "utils/models/enums";
 
-import { AlertState } from "utils/common/types";
+import { AlertState } from "utils/types";
 import { TrainingCallbacks } from "utils/models/types";
 
 const items = [

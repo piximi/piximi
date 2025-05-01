@@ -13,7 +13,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import { useHotkeys } from "hooks";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 type ConfirmationDialogProps = Omit<
   DialogProps,

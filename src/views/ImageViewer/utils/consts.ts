@@ -1,4 +1,4 @@
-import { SliderOptions } from "utils/common/types";
+import { SliderOptions } from "utils/types";
 
 export const penToolSizeControls: SliderOptions = {
   min: 1,

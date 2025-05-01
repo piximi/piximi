@@ -13,8 +13,8 @@ import { selectProjectImageChannels } from "store/project/selectors";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
 
-import { dimensions } from "utils/common/constants";
-import { HotkeyContext } from "utils/common/enums";
+import { dimensions } from "utils/constants";
+import { HotkeyContext } from "utils/enums";
 
 export const MeasurementView = () => {
   const dispatch = useDispatch();

@@ -17,7 +17,7 @@ import {
 import { selectKindDictionary } from "store/data/selectors";
 import { selectVisibleKinds } from "store/project/reselectors";
 
-import { dimensions } from "utils/common/constants";
+import { dimensions } from "utils/constants";
 
 export const ProjectImageGrid = () => {
   const dispatch = useDispatch();

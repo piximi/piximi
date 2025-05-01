@@ -18,7 +18,7 @@ import {
   selectSelectedActiveAnnotations,
 } from "views/ImageViewer/state/annotator/reselectors";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 type DeleteType = "ALL" | "SELECTED";
 export const ClearAnnotationsGroup = () => {
