@@ -11,7 +11,7 @@
  * @author Nodari Gogoberidze
  */
 
-import { logger } from "utils/common/logUtils";
+import { logger } from "utils/logUtils";
 import { Point } from "./types";
 
 // this can be extended with other types, eg. number[], Int32Array, Float32Array

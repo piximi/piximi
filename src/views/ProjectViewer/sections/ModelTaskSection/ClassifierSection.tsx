@@ -21,7 +21,7 @@ import { ImportTensorflowClassificationModelDialog } from "./ImportTensorflowMod
 import { FitClassifierDialog } from "./FitClassifierDialog";
 import { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 import { ModelStatus, ModelTask } from "utils/models/enums";
 import {
   selectClassifierEvaluationResult,

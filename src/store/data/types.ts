@@ -4,7 +4,7 @@ import { BitDepth } from "image-js";
 import { Partition } from "utils/models/enums";
 
 import { DataArray } from "utils/file-io/types";
-import { Colors, PartialBy, RequireOnly } from "utils/common/types";
+import { Colors, PartialBy, RequireOnly } from "utils/types";
 
 export type Thing = {
   id: string;

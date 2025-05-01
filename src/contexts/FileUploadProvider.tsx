@@ -37,13 +37,13 @@ import {
   forceStack,
   getImageInformation,
 } from "utils/file-io/helpers";
-import { updateRecordArray } from "utils/common/objectUtils";
-import { convertToImage } from "utils/common/tensorUtils";
+import { updateRecordArray } from "utils/objectUtils";
+import { convertToImage } from "utils/tensorUtils";
 import { isUnknownCategory } from "store/data/helpers";
 
 import { MIMETYPES } from "utils/file-io/constants";
 import { ImageShapeEnum } from "utils/file-io/enums";
-import { AlertType } from "utils/common/enums";
+import { AlertType } from "utils/enums";
 import { Partition } from "utils/models/enums";
 
 import { ImageObject } from "store/data/types";

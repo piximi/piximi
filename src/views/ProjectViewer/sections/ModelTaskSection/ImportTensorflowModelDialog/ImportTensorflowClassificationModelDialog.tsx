@@ -19,7 +19,7 @@ import { ModelFormatSelection } from "./ModelFormatSelection";
 import { Model } from "utils/models/Model";
 
 import { ModelTask } from "utils/models/enums";
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 import { Shape } from "store/data/types";
 import { ToolTipTab } from "components/layout";

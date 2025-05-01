@@ -1,4 +1,4 @@
-import { HotkeyHandlerItem } from "./types";
+import { HotkeyHandlerItem } from "../types";
 
 const isff =
   typeof navigator !== "undefined"

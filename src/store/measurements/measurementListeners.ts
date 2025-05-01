@@ -8,7 +8,7 @@ import { prepareThingData } from "views/MeasurementView/utils";
 
 import { Category } from "store/data/types";
 import { TypedAppStartListening } from "store/types";
-import { RecursivePartial } from "utils/common/types";
+import { RecursivePartial } from "utils/types";
 import { MeasurementOptions, ThingData } from "./types";
 
 export const measurementsMiddleware = createListenerMiddleware();

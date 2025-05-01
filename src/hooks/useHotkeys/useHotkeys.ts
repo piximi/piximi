@@ -1,18 +1,18 @@
 //@ts-nocheck TODO
-import hotkeys from "utils/common/hotkeys"; //{ HotkeysEvent, KeyHandler }
+import hotkeys from "utils/hotkeys/hotkeys"; //{ HotkeysEvent, KeyHandler }
 import { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 import { selectHotkeyContext } from "store/applicationSettings/selectors";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
 
 import {
   HotkeyAvailableTags,
   HotkeyOptions,
   HotkeysEvent,
   HotkeyKeyHandler,
-} from "utils/common/types";
+} from "utils/types";
 
 // We implement our own custom filter system.
 

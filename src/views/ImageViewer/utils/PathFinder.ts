@@ -3,7 +3,7 @@ import { Node } from "ngraph.graph";
 import { fromIdxToCoord, PiximiGraph, PiximiNode } from "./graphHelper";
 import { NodeHeap } from "./NodeHeap";
 import { Point } from "./types";
-import { logger } from "utils/common/logUtils";
+import { logger } from "utils/logUtils";
 
 /**
  * Performs a uni-directional A Star search on graph.

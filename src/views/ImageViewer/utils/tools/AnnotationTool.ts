@@ -6,7 +6,7 @@ import {
   computeBoundingBoxFromContours as _computeBoundingBoxFromContours,
   maskFromPoints,
 } from "views/ImageViewer/utils";
-import { convertToDataArray } from "utils/common/dataUtils";
+import { convertToDataArray } from "utils/dataUtils";
 import { generateUUID } from "store/data/helpers";
 
 import { Partition } from "utils/models/enums";
