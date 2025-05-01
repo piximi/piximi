@@ -13,7 +13,7 @@ import { selectSegmenter } from "store/segmenter/selectors";
 import { selectDataProject } from "store/data/selectors";
 
 import { serializeProject } from "utils/file-io/serialize";
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/common/logUtils";
 
 import { AlertType } from "utils/common/enums";
 

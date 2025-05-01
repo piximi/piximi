@@ -5,7 +5,7 @@ import { useTranslation } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { createGitHubIssue } from "utils/common/helpers";
+import { createGitHubIssue } from "utils/common/logUtils";
 
 import { AlertType } from "utils/common/enums";
 

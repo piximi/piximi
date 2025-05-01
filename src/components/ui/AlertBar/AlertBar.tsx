@@ -25,7 +25,7 @@ import {
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { createGitHubIssue } from "utils/common/helpers";
+import { createGitHubIssue } from "utils/common/logUtils";
 
 import { AlertType } from "utils/common/enums";
 

@@ -37,8 +37,8 @@ import {
   forceStack,
   getImageInformation,
 } from "utils/file-io/helpers";
-import { updateRecordArray } from "utils/common/helpers";
-import { convertToImage } from "utils/common/tensorHelpers";
+import { updateRecordArray } from "utils/common/objectUtils";
+import { convertToImage } from "utils/common/tensorUtils";
 import { isUnknownCategory } from "store/data/helpers";
 
 import { MIMETYPES } from "utils/file-io/constants";

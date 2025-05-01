@@ -15,7 +15,10 @@ import {
   deserializePiximiAnnotations,
 } from "utils/file-io/deserialize";
 
-import { ProjectFileType, validateFileType } from "utils/file-io/runtimeTypes";
+import {
+  ProjectFileType,
+  validateFileType,
+} from "utils/file-io/runtime/validators";
 import {
   SerializedCOCOFileType,
   SerializedFileType,

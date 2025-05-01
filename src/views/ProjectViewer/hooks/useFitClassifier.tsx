@@ -20,8 +20,8 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 
-import { getStackTraceFromError } from "utils/common/helpers";
-import { createNewModel } from "utils/models/availableClassificationModels";
+import { getStackTraceFromError } from "utils/common/logUtils";
+import classifierHandler from "utils/models/classification/classifierHandler";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/common/enums";
 import {
@@ -56,7 +56,10 @@ export const useFitClassifier = () => {
       baseModelInfo: ModelInfo,
       kindId: Kind["id"],
     ) => {
-      const newModel = await createNewModel(newModelName, modelArchitecture);
+      const newModel = await classifierHandler.createNewModel(
+        newModelName,
+        modelArchitecture,
+      );
       const newModelInfo = deepClone(baseModelInfo);
 
       dispatch(

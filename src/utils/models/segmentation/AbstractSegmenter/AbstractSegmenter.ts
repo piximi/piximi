@@ -10,7 +10,7 @@ import {
 } from "@tensorflow/tfjs";
 import { TrainingCallbacks } from "../../types";
 import { OldCategory, Kind, AnnotationObject } from "store/data/types";
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/common/logUtils";
 import { LoadCB } from "utils/file-io/types";
 
 export type OrphanedAnnotationObject = Omit<

@@ -14,7 +14,7 @@ import {
   SerializedFileRType,
   SerializedFileRTypeV02,
   SerializedImageRType,
-} from "./runtimeTypes";
+} from "./runtime/runtimeTypes";
 import { MIMETYPES } from "./constants";
 import { ImageShapeEnum } from "./enums";
 import {

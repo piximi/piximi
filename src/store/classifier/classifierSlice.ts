@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { getDefaultModelInfo } from "utils/models/availableClassificationModels";
+import { getDefaultModelInfo } from "utils/models/classification/utils";
 
 import { ClassifierEvaluationResultType } from "utils/models/types";
 import {
@@ -13,10 +13,10 @@ import { Kind, Shape } from "store/data/types";
 import { DEFAULT_KIND } from "store/data/constants";
 import { getSelectedModelInfo } from "./utils";
 import { RecursivePartial } from "utils/common/types";
-import { recursiveAssign } from "utils/common/helpers";
+import { recursiveAssign } from "utils/common/objectUtils";
 import { cloneDeep } from "lodash";
 
-export const initialState: ClassifierState = {
+const initialState: ClassifierState = {
   kindClassifiers: {
     [DEFAULT_KIND]: {
       modelNameOrArch: 0,
@@ -46,7 +46,9 @@ export const classifierSlice = createSlice({
       state.kindClassifiers = {
         [DEFAULT_KIND]: {
           modelNameOrArch: 0,
-          modelInfoDict: { "base-model": getDefaultModelInfo() },
+          modelInfoDict: {
+            "base-model": getDefaultModelInfo(),
+          },
         },
       };
     },
@@ -72,7 +74,9 @@ export const classifierSlice = createSlice({
                 ? changes.presetInfo[idx]
                 : {
                     modelNameOrArch: 0,
-                    modelInfoDict: { "base-model": getDefaultModelInfo() },
+                    modelInfoDict: {
+                      "base-model": getDefaultModelInfo(),
+                    },
                   }),
         );
       } else {

@@ -104,13 +104,6 @@ export type OldAnnotationType = {
   // TODO serialize: these should not be undefineable
 };
 
-export type OldDecodedAnnotationType = Omit<
-  OldAnnotationType & {
-    decodedMask: DataArray;
-  },
-  "encodedMask"
->;
-
 export type CategoryUpdates = {
   id: string;
   changes: Partial<Omit<Category, "id" | "containing">>;
