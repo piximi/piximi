@@ -138,6 +138,7 @@ function isImageShapeValid(
   }
 }
 
+//QUESTION: Is this used?
 export const uploadImages = async (
   files: FileList,
   channels: number,
@@ -344,6 +345,7 @@ export const getImageInformation = (
   }
 };
 
+//QUESTION: Is this used?
 export const getImageFileInformation = async (
   file: File,
 ): Promise<ImageFileShapeInfo> => {

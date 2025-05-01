@@ -7,7 +7,11 @@ import {
   RescaleOptions,
 } from "utils/models/types";
 import { Group } from "zarr";
-import { getAttr, getDatasetSelection, getGroup } from "../../../zarr/helpers";
+import {
+  getAttr,
+  getDatasetSelection,
+  getGroup,
+} from "../../../zarr/zarrUtils";
 import { getDefaultModelInfo } from "utils/models/classification/utils";
 import {
   CropSchema,

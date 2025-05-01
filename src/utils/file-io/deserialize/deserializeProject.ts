@@ -1,7 +1,7 @@
 import { logger } from "utils/logUtils";
 import { CustomStore } from "../zarr/stores";
 import { openGroup } from "zarr";
-import { getAttr } from "../zarr/helpers";
+import { getAttr } from "../zarr/zarrUtils";
 import semver from "semver";
 import { deserializeProject_v01 } from "./v01/deserializeProject_v01";
 import { dataConverter_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";

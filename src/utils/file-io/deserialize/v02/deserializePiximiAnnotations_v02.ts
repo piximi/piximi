@@ -1,4 +1,5 @@
-import { convertArrayToShape, getPropertiesFromImage } from "utils/helpers";
+import { getPropertiesFromImage } from "store/data/helpers";
+import { convertArrayToShape } from "utils/models/utils";
 import { generateUUID } from "store/data/helpers";
 import { Partition } from "utils/models/enums";
 import {

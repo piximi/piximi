@@ -36,7 +36,7 @@ import {
   decodeDicomImage,
   forceStack,
   getImageInformation,
-} from "utils/file-io/helpers";
+} from "utils/file-io/utils";
 import { updateRecordArray } from "utils/objectUtils";
 import { convertToImage } from "utils/tensorUtils";
 import { isUnknownCategory } from "store/data/helpers";
