@@ -23,7 +23,7 @@ import {
   FitOptions,
   TrainingCallbacks,
 } from "../../types";
-import { evaluateConfusionMatrix, getLayersModelSummary } from "../../helpers";
+import { evaluateConfusionMatrix, getLayersModelSummary } from "../../utils";
 import { Category, Thing } from "store/data/types";
 import { logger } from "utils/logUtils";
 import { RequireOnly } from "utils/types";

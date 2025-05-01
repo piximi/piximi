@@ -1,7 +1,7 @@
 import { MeasurementsState } from "./types";
 import { createSelector } from "@reduxjs/toolkit";
 
-import { findSelected } from "utils/measurements/helpers";
+import { findSelected } from "utils/measurements/utils";
 
 export const selectMeasurementData = ({
   measurements,

@@ -1,5 +1,5 @@
 import { createMobileNet } from "./loadMobileNet";
-import { createCompileArgs } from "../../helpers";
+import { createCompileArgs } from "../../utils";
 import { SequentialClassifier } from "../AbstractClassifier/AbstractClassifier";
 import { LoadModelArgs } from "../../types";
 import { ModelTask } from "../../enums";

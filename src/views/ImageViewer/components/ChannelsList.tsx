@@ -22,7 +22,7 @@ import {
   selectActiveImageRawColor,
 } from "views/ImageViewer/state/annotator/reselectors";
 
-import { rgbToHex } from "utils/helpers";
+import { rgbToHex } from "utils/colorUtils";
 import { scaleDownRange, scaleUpRange } from "utils/dataUtils";
 
 import { BitDepth } from "utils/file-io/types";

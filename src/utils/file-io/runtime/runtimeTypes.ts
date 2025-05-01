@@ -17,7 +17,7 @@ import {
   Metric,
   OptimizationAlgorithm,
 } from "utils/models/enums";
-import { enumToCodec } from "./helpers";
+import { enumToCodec } from "./runtimeUtils";
 
 //#region COCO Serialization Type
 

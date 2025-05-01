@@ -1,5 +1,5 @@
 import { Tensor3D, Tensor4D, data as tfdata, tidy } from "@tensorflow/tfjs";
-import { padToMatch } from "../../helpers";
+import { padToMatch } from "../../utils";
 import { getImageSlice } from "utils/tensorUtils";
 import { OldImageType, ImageObject } from "store/data/types";
 
