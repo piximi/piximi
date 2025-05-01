@@ -20,7 +20,7 @@ import { selectThingFilters } from "store/project/selectors";
 import { selectActiveSelectedThingIds } from "store/project/reselectors";
 import { selectTileSize } from "store/applicationSettings/selectors";
 
-import { getInnerElementWidth } from "utils/helpers";
+import { getInnerElementWidth } from "utils/domUtils";
 import { isFiltered } from "utils/arrayUtils";
 
 type Things = ReturnType<ReturnType<typeof selectThingsOfKind>>;

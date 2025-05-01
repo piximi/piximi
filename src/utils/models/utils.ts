@@ -5,6 +5,8 @@ import { random } from "lodash";
 import { LayersModel } from "@tensorflow/tfjs";
 import { OptimizerSettings, ModelLayerData } from "./types";
 import { LossFunction, Metric, OptimizationAlgorithm } from "./enums";
+import { ShapeArray } from "store/data/types";
+import { Shape } from "store/data/types";
 
 export const createCompileArgs = (options: OptimizerSettings) => {
   const loss = (): ModelCompileArgs["loss"] => {
@@ -245,4 +247,13 @@ export const getLayersModelSummary = (model: LayersModel): ModelLayerData[] => {
     modelSummary.push(layerSummary);
   }
   return modelSummary;
+};
+
+export const convertArrayToShape = (array: ShapeArray): Shape => {
+  return {
+    planes: array[0],
+    height: array[1],
+    width: array[2],
+    channels: array[3],
+  };
 };

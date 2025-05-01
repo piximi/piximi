@@ -18,7 +18,8 @@ import {
 import initialState from "data/test-data/COCO/labels_internal.json";
 
 import { fileFromPath } from "utils/file-io/nodeImageHelper";
-import { convertArrayToShape, getPropertiesFromImageSync } from "utils/helpers";
+import { getPropertiesFromImageSync } from "store/data/helpers";
+import { convertArrayToShape } from "utils/models/utils";
 import { generateUUID } from "store/data/helpers";
 
 import { serializeCOCOFile } from "../serialize/serializeCOCO";

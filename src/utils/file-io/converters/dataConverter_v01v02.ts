@@ -17,8 +17,9 @@ import {
   Shape,
   ShapeArray,
 } from "store/data/types";
-import { convertArrayToShape, getPropertiesFromImageSync } from "utils/helpers";
+import { getPropertiesFromImageSync } from "store/data/helpers";
 import { logger } from "utils/logUtils";
+import { convertArrayToShape } from "utils/models/utils";
 import { Partition } from "utils/models/enums";
 
 export const dataConverter_v01v02 = (data: {

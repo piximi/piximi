@@ -1,6 +1,6 @@
 import { DataArray } from "utils/file-io/types";
 import IJSImage from "image-js";
-import { getPropertiesFromImage } from "utils/helpers";
+import { getPropertiesFromImage } from "store/data/helpers";
 import { convertToDataArray } from "utils/dataUtils";
 import {
   AnnotationObject,

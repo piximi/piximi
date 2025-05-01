@@ -1,6 +1,6 @@
 import { Group } from "zarr";
 import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
-import { getAttr } from "../../../zarr/helpers";
+import { getAttr } from "../../../zarr/zarrUtils";
 
 export const deserializeSegmenterGroup = async (segmenterGroup: Group) => {
   // present, but not used currently

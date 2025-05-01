@@ -5,7 +5,7 @@ import {
   Tensor3D,
 } from "@tensorflow/tfjs-node";
 
-import { matchedCropPad, padToMatch } from "../helpers";
+import { matchedCropPad, padToMatch } from "../utils";
 
 it("padToMatch", async () => {
   const sample = tensor3d([
