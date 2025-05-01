@@ -5,7 +5,7 @@ import { initialState as initialProjectState } from "store/project/projectSlice"
 import { deserializeClassifierGroupV11 } from "../common/group-deserializers/classifierDeserializers";
 import { deserializeColorsGroup } from "../common/group-deserializers/dataDeserializers";
 import { deserializeSegmenterGroup } from "../common/group-deserializers/segmenterDeserializers";
-import { getAttr, getDataset, getGroup } from "../../zarr/helpers";
+import { getAttr, getDataset, getGroup } from "../../zarr/zarrUtils";
 import { RawArray } from "zarr/types/rawArray";
 import { tensor4d } from "@tensorflow/tfjs";
 import { Partition } from "utils/models/enums";

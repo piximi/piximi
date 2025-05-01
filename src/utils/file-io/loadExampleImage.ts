@@ -3,9 +3,9 @@ import { ColorModel, Image as ImageJS } from "image-js";
 import { deserializeAnnotations_v01 } from "utils/file-io/deserialize/v01/deserializePiximiAnnotations_v01";
 
 import { SerializedFileType } from "utils/file-io/types";
-import { fileFromPath, loadImageFileAsStack } from "./helpers";
+import { fileFromPath, loadImageFileAsStack } from "./utils";
 import { convertToImage } from "utils/tensorUtils";
-import { getPropertiesFromImageSync } from "utils/helpers";
+import { getPropertiesFromImageSync } from "store/data/helpers";
 import { Category, OldAnnotationType } from "store/data/types";
 
 export const loadExampleImage = async (

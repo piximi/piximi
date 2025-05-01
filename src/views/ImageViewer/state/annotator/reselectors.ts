@@ -21,7 +21,7 @@ import {
 
 import { decodeAnnotation } from "views/ImageViewer/utils/rle";
 import { generateBlankColors } from "utils/tensorUtils";
-import { getCompleteEntity } from "utils/helpers";
+import { getCompleteEntity } from "./utils";
 
 import {
   AnnotationObject,

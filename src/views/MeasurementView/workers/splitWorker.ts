@@ -5,7 +5,7 @@ import {
   getIntensityMeasurement,
   getObjectFormFactor,
   getPerimeterFromMask,
-} from "utils/measurements/helpers";
+} from "utils/measurements/utils";
 
 import { MeasurementsData } from "store/measurements/types";
 

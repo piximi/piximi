@@ -16,7 +16,7 @@ import {
   RescaleOptions,
 } from "../types";
 import { CropSchema, ModelTask, Partition } from "../enums";
-import { loadDataUrlAsStack } from "utils/file-io/helpers";
+import { loadDataUrlAsStack } from "utils/file-io/utils";
 import { convertToImage } from "utils/tensorUtils";
 import { Category, ImageObject, Shape } from "store/data/types";
 
