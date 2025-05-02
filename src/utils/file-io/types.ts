@@ -1,9 +1,5 @@
 import { TypeOf as IOTSTypeOf } from "io-ts";
-import {
-  Stack as IJSStack,
-  BitDepth as IJSBitDepth,
-  DataArray as IJSDataArray,
-} from "image-js";
+import { Stack as IJSStack } from "image-js";
 import {
   SerializedAnnotationRType,
   SerializedAnnotationRTypeV02,
@@ -15,7 +11,7 @@ import {
   SerializedFileRTypeV02,
   SerializedImageRType,
 } from "./runtime/runtimeTypes";
-import { MIMETYPES } from "./constants";
+import { MIMETYPES } from "./enums";
 import { ImageShapeEnum } from "./enums";
 import {
   LossFunction,
@@ -23,7 +19,7 @@ import {
   ModelStatus,
   OptimizationAlgorithm,
 } from "utils/models/enums";
-import { Shape } from "store/data/types";
+import { BitDepth, Shape } from "store/data/types";
 import {
   ClassifierEvaluationResultType,
   CropOptions,
@@ -68,11 +64,7 @@ export type ImageFileError = {
   error: string;
 };
 
-export type MIMEType = (typeof MIMETYPES)[number];
-
-export type BitDepth = IJSBitDepth;
-
-export type DataArray = IJSDataArray;
+export type MIMEType = (typeof MIMETYPES)[keyof typeof MIMETYPES];
 
 export interface ImageShapeInfo {
   shape: ImageShapeEnum;

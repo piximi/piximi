@@ -4,7 +4,7 @@ import { Box, TextField } from "@mui/material";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
 import { Category, Kind } from "store/data/types";
-import { generateKind } from "store/data/helpers";
+import { generateKind } from "store/data/utils";
 
 type CreateCategoriesDialogProps = {
   onClose: () => void;

@@ -37,24 +37,6 @@ export const isFiltered = <T extends object>(
   });
 };
 
-export const filterObjects = <T extends object>(
-  objectArr: T[],
-  filters: FilterType<T>,
-): T[] => {
-  return objectArr.filter((item) => {
-    return Object.keys(item).every((key) => {
-      const itemValue = item[key as keyof T];
-      const filterValues = filters[key as keyof T];
-
-      if (Array.isArray(filterValues)) {
-        return !(filterValues as Array<typeof itemValue>).includes(itemValue);
-      }
-
-      // If the key is not present in the record, include the item
-      return true;
-    });
-  });
-};
 export const distinctFilter = <T>(value: T, index: number, self: T[]) => {
   return self.indexOf(value) === index;
 };

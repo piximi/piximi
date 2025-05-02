@@ -9,16 +9,16 @@ import { dispose, TensorContainer } from "@tensorflow/tfjs";
 import { difference, intersection } from "lodash";
 
 import { updateRecordArray } from "utils/objectUtils";
-import { generateUUID, generateKind, isUnknownCategory } from "./helpers";
+import { generateUUID, generateKind, isUnknownCategory } from "./utils";
 import { encode } from "views/ImageViewer/utils/rle";
-import { updateContents } from "./helpers";
+import { updateContents } from "./utils";
 
 import {
   UNKNOWN_CATEGORY_NAME,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "./constants";
 
-import { newReplaceDuplicateName } from "utils/stringUtils";
+import { replaceDuplicateName } from "utils/stringUtils";
 import { mutatingFilter } from "utils/arrayUtils";
 
 import { PartialBy } from "utils/types";
@@ -640,7 +640,7 @@ export const dataSlice = createSlice({
           (id) => (state.things.entities[id]!.name as string).split(".")[0],
         );
 
-        let updatedNamePrefix = newReplaceDuplicateName(name, existingPrefixes);
+        let updatedNamePrefix = replaceDuplicateName(name, existingPrefixes);
 
         if (ext) {
           updatedNamePrefix += `.${ext}`;

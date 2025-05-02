@@ -1,6 +1,6 @@
-import { DataArray } from "utils/file-io/types";
+import { DataArray } from "store/data/types";
 import IJSImage from "image-js";
-import { getPropertiesFromImage } from "store/data/helpers";
+import { getPropertiesFromImage } from "store/data/utils";
 import { convertToDataArray } from "utils/dataUtils";
 import {
   AnnotationObject,
@@ -13,7 +13,7 @@ import {
 import { encode, encodeAnnotation } from "./rle";
 import { AnnotationMode } from "./enums";
 import { AnnotationTool } from "./tools";
-import { generateUUID } from "store/data/helpers";
+import { generateUUID } from "store/data/utils";
 import {
   AnnotatorChanges,
   CategoryEdits,

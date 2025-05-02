@@ -5,21 +5,8 @@ export const pluralize = (word: string, count: number) => {
 /*
  * Method to rename a cateogry/image if a category/image with this name already exists
  */
-export const replaceDuplicateName = (
-  newName: string,
-  existingNames: Array<string>,
-) => {
-  let currentName = newName;
-  let i = 1;
-  while (existingNames.includes(currentName)) {
-    currentName = newName + `_${i}`;
-    i += 1;
-  }
-  return currentName;
-};
 
-//HACK: new
-export const newReplaceDuplicateName = (
+export const replaceDuplicateName = (
   newName: string,
   existingNames: Array<string>,
 ) => {

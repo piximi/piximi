@@ -6,18 +6,6 @@ import {
 } from "utils/models/enums";
 import { ClassifierStateV01_02 } from "./types";
 
-export const MIMETYPES = [
-  "image/png",
-  "image/jpeg",
-  "image/tiff",
-  "image/tif",
-  "application/tiff",
-  "application/tif",
-  "image/dicom",
-  "image/bmp",
-  "application/dicom",
-] as const;
-
 export const initialClassifierStateV01_02: ClassifierStateV01_02 = {
   modelStatus: 0,
   inputShape: {

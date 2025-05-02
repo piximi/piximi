@@ -20,8 +20,7 @@ import {
 import { matchedCropPad, padToMatch } from "../../utils";
 import { CropSchema, Partition } from "../../enums";
 import { denormalizeTensor, getImageSlice } from "utils/tensorUtils";
-import { BitDepth } from "utils/file-io/types";
-import { Category, Shape, Thing } from "store/data/types";
+import { Category, Shape, Thing, BitDepth } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 import { logger } from "utils/logUtils";
 import { RequireOnly } from "utils/types";
