@@ -12,7 +12,7 @@ import {
 import { intersection } from "lodash";
 import { MeasurementOption } from "store/measurements/types";
 import { findContours } from "views/ImageViewer/utils";
-import { DataArray } from "utils/file-io/types";
+import { DataArray } from "store/data/types";
 
 //TODO: Write tests
 const sortTensor = (tensor: Tensor1D): Tensor1D => {

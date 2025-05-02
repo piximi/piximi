@@ -32,6 +32,7 @@ import {
   sliceVisibleChannels,
   sliceVisibleColors,
 } from "utils/tensorUtils";
+import { MIMETYPES } from "utils/file-io/enums";
 
 // https://stackoverflow.com/questions/71365891/property-closeto-does-not-exist-on-type-expect
 interface CustomMatchers<R = unknown> {
@@ -238,7 +239,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
       frames: 1,
       channels: 1,
       slices: 1,
-      mimetype: "image/tiff",
+      mimetype: MIMETYPES.TIFF,
       data: undefined,
     },
     rgb: {
@@ -249,7 +250,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
       frames: 3,
       channels: 3,
       slices: 1,
-      mimetype: "image/tiff",
+      mimetype: MIMETYPES.TIFF,
       data: undefined,
     },
     rgbComposite: {
@@ -260,7 +261,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
       frames: 3,
       channels: 3,
       slices: 1,
-      mimetype: "image/tiff",
+      mimetype: MIMETYPES.TIFF,
       data: undefined,
     },
     rgba: {
@@ -271,7 +272,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
       frames: 3,
       channels: 3,
       slices: 1,
-      mimetype: "image/jpeg",
+      mimetype: MIMETYPES.JPEG,
       data: undefined,
     },
     hyperStack2c: {
@@ -282,7 +283,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
       frames: 2,
       channels: 2,
       slices: 1,
-      mimetype: "image/tiff",
+      mimetype: MIMETYPES.TIFF,
       data: undefined,
     },
     hyperStack5c: {
@@ -293,7 +294,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
       frames: 5,
       channels: 5,
       slices: 1,
-      mimetype: "image/tiff",
+      mimetype: MIMETYPES.TIFF,
       data: undefined,
     },
     hyperStack9z: {
@@ -304,7 +305,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
       frames: 9,
       channels: 1,
       slices: 9,
-      mimetype: "image/tiff",
+      mimetype: MIMETYPES.TIFF,
       data: undefined,
     },
     hyperStack60z3c: {
@@ -315,7 +316,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
       frames: 180,
       channels: 3,
       slices: 60,
-      mimetype: "image/tiff",
+      mimetype: MIMETYPES.TIFF,
       data: undefined,
     },
     // 16 bit images
@@ -327,7 +328,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
       frames: 1,
       channels: 1,
       slices: 1,
-      mimetype: "image/tiff",
+      mimetype: MIMETYPES.TIFF,
       data: undefined,
     },
     rgbComposite16b: {
@@ -338,7 +339,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
       frames: 3,
       channels: 3,
       slices: 1,
-      mimetype: "image/tiff",
+      mimetype: MIMETYPES.TIFF,
       data: undefined,
     },
     hyperStack60z3c16b: {
@@ -349,7 +350,7 @@ describe("ImageJS Images -> Stacks -> Tensors", () => {
       frames: 180,
       channels: 3,
       slices: 60,
-      mimetype: "image/tiff",
+      mimetype: MIMETYPES.TIFF,
       data: undefined,
     },
     // 32 bit float images

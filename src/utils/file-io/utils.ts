@@ -8,13 +8,13 @@ import {
   ImageShapeInfo,
   MIMEType,
 } from "./types";
-import { MIMETYPES } from "./constants";
 import { convertToImage } from "utils/tensorUtils";
-import { ImageShapeEnum } from "./enums";
+import { ImageShapeEnum, MIMETYPES } from "./enums";
 import { getStackTraceFromError } from "utils/logUtils";
 import { AlertState } from "utils/types";
 import { AlertType } from "utils/enums";
 import { ImageObject } from "store/data/types";
+import { isEnumValue } from "utils/objectUtils";
 
 async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   let imageStack: IJSStack;
@@ -352,14 +352,14 @@ export const getImageFileInformation = async (
   const ext = file.type as MIMEType;
   try {
     // https://stackoverflow.com/questions/56565528/typescript-const-assertions-how-to-use-array-prototype-includes
-    if (!(MIMETYPES as ReadonlyArray<string>).includes(file.type)) {
+    if (!isEnumValue(MIMETYPES, file.type)) {
       import.meta.env.NODE_ENV !== "production" &&
         console.error("Invalid MIME Type:", ext);
       return { shape: ImageShapeEnum.InvalidImage, ext };
     }
 
     if (file.name.endsWith("dcm") || file.name.endsWith("DICOM")) {
-      return { shape: ImageShapeEnum.DicomImage, ext: "image/dicom" };
+      return { shape: ImageShapeEnum.DicomImage, ext: MIMETYPES.DICOM };
     }
 
     const buffer = await file.arrayBuffer();

@@ -12,7 +12,7 @@ import { hyphaWebsocketClient } from "imjoy-rpc";
 
 import { encode } from "views/ImageViewer/utils";
 import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
-import { generateUUID } from "store/data/helpers";
+import { generateUUID } from "store/data/utils";
 import { Partition } from "../../enums";
 
 const labelToAnnotation = async (

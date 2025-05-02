@@ -14,7 +14,7 @@ import {
   Add as AddIcon,
 } from "@mui/icons-material";
 
-import { BlurActionTextField } from "../../inputs";
+import { BlurActionTextField } from "../../inputs/BlurActionTextField";
 import {
   BasicTabPanel,
   ControlledTabPanel,

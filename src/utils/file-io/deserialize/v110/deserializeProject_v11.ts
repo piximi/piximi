@@ -10,9 +10,10 @@ import { RawArray } from "zarr/types/rawArray";
 import { tensor4d } from "@tensorflow/tfjs";
 import { Partition } from "utils/models/enums";
 import { createRenderedTensor, generateBlankColors } from "utils/tensorUtils";
-import { BitDepth, LoadCB } from "utils/file-io/types";
+import { LoadCB } from "utils/file-io/types";
 import { CustomStore } from "utils/file-io/zarr/stores";
 import { ProjectState } from "store/types";
+import { BitDepth } from "store/data/types";
 import {
   Kind,
   AnnotationObject,

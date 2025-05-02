@@ -4,7 +4,7 @@ import { Settings as SettingsIcon } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 
-import { SettingsDialog } from "components/dialogs";
+import { SettingsDialog } from "components/dialogs/SettingsDialog";
 import { CustomListItemButton } from "../CustomListItemButton";
 
 import { HotkeyContext } from "utils/enums";

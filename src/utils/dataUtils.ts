@@ -1,6 +1,4 @@
-import { DataArray } from "utils/file-io/types";
-
-import { BitDepth } from "utils/file-io/types";
+import { DataArray, BitDepth } from "store/data/types";
 
 /**
  * Generates a random integer between two values.
