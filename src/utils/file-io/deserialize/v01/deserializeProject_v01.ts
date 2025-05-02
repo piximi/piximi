@@ -16,10 +16,15 @@ import { deserializeColorsGroup } from "../common/group-deserializers/dataDeseri
 import { deserializeSegmenterGroup } from "../common/group-deserializers/segmenterDeserializers";
 import { Partition } from "utils/models/enums";
 import { createRenderedTensor } from "utils/tensorUtils";
-import { BitDepth, LoadCB } from "utils/file-io/types";
+import { LoadCB } from "utils/file-io/types";
 import { CustomStore } from "utils/file-io/zarr/stores";
 import { ProjectState } from "store/types";
-import { OldAnnotationType, OldCategory, OldImageType } from "store/data/types";
+import {
+  BitDepth,
+  OldAnnotationType,
+  OldCategory,
+  OldImageType,
+} from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 /*

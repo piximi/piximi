@@ -4,7 +4,7 @@ import { Feedback as FeedbackIcon } from "@mui/icons-material";
 
 import { useDialog } from "hooks";
 
-import { SendFeedbackDialog } from "components/dialogs";
+import { SendFeedbackDialog } from "components/dialogs/SendFeedbackDialog";
 import { CustomListItemButton } from "../CustomListItemButton";
 
 export const SendFeedbackListItem = () => {

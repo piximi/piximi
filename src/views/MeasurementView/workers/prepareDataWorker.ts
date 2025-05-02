@@ -3,7 +3,7 @@ import { tensor4d } from "@tensorflow/tfjs";
 import { prepareThingData } from "../utils";
 
 import { ThingData } from "store/measurements/types";
-import { DataArray } from "utils/file-io/types";
+import { DataArray } from "store/data/types";
 
 self.onmessage = async (
   e: MessageEvent<{

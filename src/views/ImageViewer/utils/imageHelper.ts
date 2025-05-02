@@ -3,7 +3,7 @@ import { pointsAreEqual } from "./point-operations";
 
 import { logger } from "utils/logUtils";
 import { Point, ProtoAnnotationObject } from "./types";
-import { DataArray } from "utils/file-io/types";
+import { DataArray } from "store/data/types";
 
 export const generatePoints = (buffer: Array<number> | undefined) => {
   if (!buffer) return undefined;

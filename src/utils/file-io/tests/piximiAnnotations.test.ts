@@ -16,7 +16,7 @@ import {
 
 import { data } from "data/test-data/annotatorToolsTestData.json";
 
-import { generateUUID, isUnknownCategory } from "store/data/helpers";
+import { generateUUID, isUnknownCategory } from "store/data/utils";
 
 import { serializePiximiAnnotations } from "../serialize/serializePiximiAnnotations";
 import { deserializePiximiAnnotations } from "../deserialize";

@@ -20,7 +20,7 @@ import { selectAnnotationMode } from "../state/annotator/selectors";
 import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
 import { AnnotationMode, AnnotationState } from "views/ImageViewer/utils/enums";
-import { isUnknownCategory } from "store/data/helpers";
+import { isUnknownCategory } from "store/data/utils";
 import {
   createProtoAnnotation,
   editProtoAnnotation,

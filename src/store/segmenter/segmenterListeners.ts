@@ -6,7 +6,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data/dataSlice";
 import { segmenterSlice } from "./segmenterSlice";
 
-import { getPropertiesFromImageSync } from "store/data/helpers";
+import { getPropertiesFromImageSync } from "store/data/utils";
 import { getStackTraceFromError } from "utils/logUtils";
 
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";

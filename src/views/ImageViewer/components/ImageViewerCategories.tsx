@@ -21,7 +21,7 @@ import {
 } from "../state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/enums";
-import { generateUUID } from "store/data/helpers";
+import { generateUUID } from "store/data/utils";
 import { KindMenu } from "./KindMenu";
 import { DecodedAnnotationObject } from "store/data/types";
 

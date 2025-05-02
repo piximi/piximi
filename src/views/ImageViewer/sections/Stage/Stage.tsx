@@ -43,7 +43,7 @@ import {
   selectStagePosition,
 } from "../../state/imageViewer/selectors";
 
-import { generateKind, generateUUID } from "store/data/helpers";
+import { generateKind, generateUUID } from "store/data/utils";
 
 import { CATEGORY_COLORS } from "store/data/constants";
 import { dimensions } from "utils/constants";
