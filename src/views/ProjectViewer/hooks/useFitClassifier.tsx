@@ -24,17 +24,17 @@ import { getStackTraceFromError } from "utils/logUtils";
 import classifierHandler from "utils/models/classification/classifierHandler";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/enums";
-import {
-  SequentialClassifier,
-  prepareClasses,
-  prepareModel,
-  prepareTrainingData,
-  trainModel,
-} from "utils/models/classification";
+import { SequentialClassifier } from "utils/models/classification";
 import { Thing, Kind, Category } from "store/data/types";
 import { AlertState } from "utils/types";
 import { ModelClassMap, ModelInfo } from "store/types";
 import { useClassMapDialog } from "./useClassMapDialog";
+import {
+  prepareClasses,
+  prepareModel,
+  prepareTrainingData,
+  trainModel,
+} from "utils/models/classification/utils";
 
 export const useFitClassifier = () => {
   const dispatch = useDispatch();

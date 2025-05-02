@@ -66,3 +66,12 @@ export const enumKeys = <O extends object, K extends keyof O = keyof O>(
 ): K[] => {
   return Object.keys(obj).filter((k) => Number.isNaN(+k)) as K[];
 };
+
+export const isEnumValue = <E extends Record<string, string | number>>(
+  enumObj: E,
+  value: unknown,
+): value is E[keyof E] => {
+  return Object.values(enumObj)
+    .filter((v) => typeof v === typeof value)
+    .includes(value as E[keyof E]);
+};

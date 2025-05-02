@@ -5,7 +5,7 @@ import {
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   UNKNOWN_IMAGE_CATEGORY_ID,
 } from "store/data/constants";
-import { generateKind, isUnknownCategory } from "store/data/helpers";
+import { generateKind, isUnknownCategory } from "store/data/utils";
 import {
   OldAnnotationType,
   OldCategory,
@@ -17,7 +17,7 @@ import {
   Shape,
   ShapeArray,
 } from "store/data/types";
-import { getPropertiesFromImageSync } from "store/data/helpers";
+import { getPropertiesFromImageSync } from "store/data/utils";
 import { logger } from "utils/logUtils";
 import { convertArrayToShape } from "utils/models/utils";
 import { Partition } from "utils/models/enums";

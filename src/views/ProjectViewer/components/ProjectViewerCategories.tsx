@@ -19,7 +19,7 @@ import {
 } from "store/project/reselectors";
 import { dataSlice } from "store/data/dataSlice";
 
-import { isUnknownCategory } from "store/data/helpers";
+import { isUnknownCategory } from "store/data/utils";
 
 import { Partition } from "utils/models/enums";
 import { HotkeyContext } from "utils/enums";

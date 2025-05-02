@@ -14,7 +14,7 @@ import {
   selectSelectedThingIds,
 } from "./selectors";
 
-import { isUnknownCategory } from "store/data/helpers";
+import { isUnknownCategory } from "store/data/utils";
 
 import { Partition } from "utils/models/enums";
 

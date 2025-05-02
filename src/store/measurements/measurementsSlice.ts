@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { isArray, merge, mergeWith } from "lodash";
 
-import { generateUUID } from "store/data/helpers";
+import { generateUUID } from "store/data/utils";
 
 import { baseMeasurementOptions } from "./constants";
 import { Partition } from "utils/models/enums";

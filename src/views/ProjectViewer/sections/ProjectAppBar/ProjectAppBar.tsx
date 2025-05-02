@@ -52,7 +52,7 @@ import {
 } from "store/applicationSettings/selectors";
 
 import { pluralize } from "utils/stringUtils";
-import { isUnknownCategory } from "store/data/helpers";
+import { isUnknownCategory } from "store/data/utils";
 
 import { HotkeyContext } from "utils/enums";
 import { Partition } from "utils/models/enums";

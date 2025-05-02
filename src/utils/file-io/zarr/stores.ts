@@ -1,6 +1,6 @@
 import JSZip from "jszip";
 import { KeyError } from "zarr";
-import { unzipModels } from "utils/models/classification/utils";
+import classifierHandler from "utils/models/classification/classifierHandler";
 import { AsyncStore, ValidStoreType } from "zarr/types/storage/types";
 
 export type ModelData = {
@@ -170,7 +170,7 @@ export const fListToStore = async (
     const file = files[0];
     const zip = await new JSZip().loadAsync(file);
 
-    unzipModels(zip);
+    classifierHandler.unzipModels(zip);
     // find folder of pattern "projectName.zarr/"
     const rootFile = zip.folder(/.*\.zarr\/$/);
 

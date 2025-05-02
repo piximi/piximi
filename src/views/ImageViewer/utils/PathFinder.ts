@@ -1,9 +1,9 @@
 import { Node } from "ngraph.graph";
 
-import { fromIdxToCoord, PiximiGraph, PiximiNode } from "./graphHelper";
-import { NodeHeap } from "./NodeHeap";
+import { NodeHeap, PiximiGraph, PiximiNode } from "./NodeHeap";
 import { Point } from "./types";
 import { logger } from "utils/logUtils";
+import { fromIdxToCoord } from "./point-operations";
 
 /**
  * Performs a uni-directional A Star search on graph.
