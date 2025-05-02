@@ -6,7 +6,7 @@ import {
 } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
-import { generateKind } from "store/data/helpers";
+import { generateKind } from "store/data/utils";
 import { LoadInferenceDataArgs } from "../../types";
 import { Kind, ImageObject } from "store/data/types";
 import { LoadCB } from "utils/file-io/types";

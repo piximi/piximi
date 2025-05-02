@@ -7,13 +7,16 @@ import {
   maskFromPoints,
 } from "views/ImageViewer/utils";
 import { convertToDataArray } from "utils/dataUtils";
-import { generateUUID } from "store/data/helpers";
+import { generateUUID } from "store/data/utils";
 
 import { Partition } from "utils/models/enums";
 import { AnnotationState } from "../enums";
 
-import { DataArray } from "utils/file-io/types";
-import { Category, PartialDecodedAnnotationObject } from "store/data/types";
+import {
+  DataArray,
+  Category,
+  PartialDecodedAnnotationObject,
+} from "store/data/types";
 import { Point } from "../types";
 
 export abstract class AnnotationTool extends Tool {

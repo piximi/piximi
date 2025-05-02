@@ -1,6 +1,6 @@
 import { encode, maskFromPoints } from "views/ImageViewer/utils";
-import { generateUUID } from "store/data/helpers";
-import { getPropertiesFromImage } from "store/data/helpers";
+import { generateUUID } from "store/data/utils";
+import { getPropertiesFromImage } from "store/data/utils";
 import { logger } from "utils/logUtils";
 
 import { Partition } from "utils/models/enums";

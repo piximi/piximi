@@ -1,6 +1,6 @@
 export { makeGraph, createPathFinder } from "./graphHelper";
 
-export type { PiximiGraph, PiximiNode } from "./graphHelper";
+export type { PiximiGraph, PiximiNode } from "./NodeHeap";
 
 export { scanline } from "./scanline";
 
@@ -10,12 +10,8 @@ export { decode, encode } from "./rle";
 
 export { slic } from "./slic";
 
-export {
-  pointsAreEqual,
-  getDistance,
-  computeBoundingBoxFromContours,
-  maskFromPoints,
-} from "./point-operations";
+export { pointsAreEqual, getDistance } from "./point-operations";
+export { computeBoundingBoxFromContours, maskFromPoints } from "./mask";
 export { findContours, padMask } from "./find-contours";
 
 export {

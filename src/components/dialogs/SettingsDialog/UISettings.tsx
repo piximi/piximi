@@ -19,8 +19,8 @@ import {
   Image as ImageIcon,
 } from "@mui/icons-material";
 
-import { CustomSwitch } from "components/inputs";
-import { DividerHeader } from "components/ui";
+import { CustomSwitch } from "components/inputs/CustomSwitch";
+import { DividerHeader } from "components/ui/divider/DividerHeader";
 import { SettingsItem } from "./SettingsItem";
 
 import { applicationSettingsSlice } from "store/applicationSettings";

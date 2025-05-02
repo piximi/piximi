@@ -15,7 +15,7 @@ import { Category } from "store/data/types";
 import { StyledSelect } from "../components/StyledSelect";
 import { selectActiveKindId } from "store/project/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import { generateCategory } from "store/data/helpers";
+import { generateCategory } from "store/data/utils";
 import { selectAvaliableCategoryColors } from "store/project/reselectors";
 import { getRandomInt } from "utils/dataUtils";
 import { isObjectEmpty } from "utils/objectUtils";
