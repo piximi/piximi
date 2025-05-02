@@ -1,8 +1,7 @@
 import { Tensor2D } from "@tensorflow/tfjs";
-import { AlertType, ImageSortKey } from "./enums";
-import { OldCategory } from "store/data/types";
+import { AlertType } from "./enums";
 
-export type Deferred<T> = Partial<T> & {
+type Deferred<T> = Partial<T> & {
   deleted?: boolean;
   added?: boolean;
 };
@@ -121,20 +120,6 @@ export type RecursivePartial<T> = {
 export type KeysWithValuesOfType<T, V> = {
   [K in keyof T]-?: T[K] extends V | undefined ? K : never;
 }[keyof T];
-
-/*
-SORTING
-*/
-
-export type ImageSortKeyType = {
-  imageSortKeyName: string;
-  imageSortKey: ImageSortKey;
-  comparerFunction: (
-    a: { name: string; category: OldCategory },
-    b: { name: string; category: OldCategory },
-  ) => number;
-  objectType: string;
-};
 
 /*
 GENERAL

@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectClassifierModel } from "store/classifier/reselectors";
 import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
 import { dataSlice } from "store/data";
-import { isUnknownCategory } from "store/data/helpers";
+import { isUnknownCategory } from "store/data/utils";
 import {
   selectActiveLabeledThings,
   selectActiveLabeledThingsCount,

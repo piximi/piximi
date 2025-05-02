@@ -16,9 +16,9 @@ import IJSImage, {
   ImageKind as IJSImageKind,
   ColorModel as IJSColorModel,
 } from "image-js";
-import { generateUUID } from "store/data/helpers";
+import { generateUUID } from "store/data/utils";
 import { Partition } from "utils/models/enums";
-import { BitDepth } from "utils/file-io/types";
+import { BitDepth } from "store/data/types";
 import { Colors } from "./types";
 import { ImageObject } from "store/data/types";
 import {

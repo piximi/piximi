@@ -1,6 +1,6 @@
-import { getPropertiesFromImage } from "store/data/helpers";
+import { getPropertiesFromImage } from "store/data/utils";
 import { convertArrayToShape } from "utils/models/utils";
-import { generateUUID } from "store/data/helpers";
+import { generateUUID } from "store/data/utils";
 import { Partition } from "utils/models/enums";
 import {
   NewSerializedAnnotationType,

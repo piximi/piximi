@@ -1,4 +1,4 @@
-import { DataArray } from "utils/file-io/types";
+import { DataArray } from "store/data/types";
 import { Partition } from "utils/models/enums";
 
 export type MeasurementsState = {
