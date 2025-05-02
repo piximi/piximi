@@ -11,8 +11,7 @@ import { logger } from "utils/logUtils";
 import { arrayRange } from "utils/arrayUtils";
 import { validateModelMetadata } from "utils/file-io/runtime/validators";
 import { getDefaultModelInfo } from "./utils";
-import { createCompileArgs } from "../utils";
-import { convertArrayToShape } from "../utils";
+import { createCompileArgs, convertArrayToShape } from "../utils";
 
 import { CropSchema } from "../enums";
 import { OptimizerSettings } from "../types";

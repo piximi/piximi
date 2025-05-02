@@ -14,6 +14,7 @@ import { loadImageFileAsStack } from "utils/file-io/utils";
 import { convertToImage } from "utils/tensorUtils";
 import { MIMEType } from "utils/file-io/types";
 import { Category, ImageObject, Shape } from "store/data/types";
+import { MIMETYPES } from "utils/file-io/enums";
 
 class GenericClassifier extends SequentialClassifier {
   constructor() {
@@ -95,7 +96,7 @@ const preloadedImages: Array<{
   {
     src: "https://picsum.photos/seed/piximi/224",
     name: "224.jpg",
-    mimetype: "image/jpeg",
+    mimetype: MIMETYPES.JPEG,
   },
 ];
 

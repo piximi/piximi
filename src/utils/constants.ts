@@ -1,5 +1,5 @@
-import { AlertType, ImageSortKey } from "./enums";
-import { AlertState, ImageSortKeyType } from "./types";
+import { AlertType } from "./enums";
+import { AlertState } from "./types";
 
 export const APPLICATION_COLORS = {
   classifierList: "#DCF3F450",
@@ -21,40 +21,5 @@ export const defaultAlert: AlertState = {
   description: "default state",
   visible: false,
 };
-
-export const defaultImageSortKey: ImageSortKeyType = {
-  imageSortKeyName: "None",
-  imageSortKey: ImageSortKey.None,
-  comparerFunction: (_a, _b) => 0,
-  objectType: "All",
-};
-
-export const availableImageSortKeys: ImageSortKeyType[] = [
-  {
-    imageSortKeyName: "File name",
-    imageSortKey: ImageSortKey.FileName,
-    comparerFunction: (a, b) => a.name.localeCompare(b.name),
-    objectType: "Images",
-  },
-  {
-    imageSortKeyName: "Category",
-    imageSortKey: ImageSortKey.Category,
-    comparerFunction: (a, b) => a.category.name.localeCompare(b.category.name),
-    objectType: "All",
-  },
-  {
-    imageSortKeyName: "Random",
-    imageSortKey: ImageSortKey.Random,
-    comparerFunction: (_a, _b) =>
-      Math.round(Math.random() * 10) >= 5 ? 1 : -1,
-    objectType: "All",
-  },
-  {
-    imageSortKeyName: "Image",
-    imageSortKey: ImageSortKey.Image,
-    comparerFunction: (a, b) => a.name.localeCompare(b.name),
-    objectType: "Annotations",
-  },
-];
 
 export const mobileBreakpoints = ["xs", "sm"];

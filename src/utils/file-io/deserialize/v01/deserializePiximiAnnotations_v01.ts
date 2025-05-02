@@ -1,4 +1,4 @@
-import { generateUUID } from "store/data/helpers";
+import { generateUUID } from "store/data/utils";
 import { logger } from "utils/logUtils";
 import {
   SerializedAnnotationType,

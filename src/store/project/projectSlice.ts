@@ -63,7 +63,7 @@ export const projectSlice = createSlice({
         (id: string) => !ids.includes(id),
       );
     },
-    setSortType_new(state, action: PayloadAction<{ sortType: ThingSortKey }>) {
+    setSortType(state, action: PayloadAction<{ sortType: ThingSortKey }>) {
       state.sortType = action.payload.sortType;
     },
     setProjectName(state, action: PayloadAction<{ name: string }>) {

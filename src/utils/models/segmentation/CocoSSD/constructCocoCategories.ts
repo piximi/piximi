@@ -1,6 +1,6 @@
 import COCO_CLASSES from "data/model-data/cocossd-classes";
 import { OldCategory, Kind } from "store/data/types";
-import { generateKind, generateUUID } from "store/data/helpers";
+import { generateKind, generateUUID } from "store/data/utils";
 import { CATEGORY_COLORS } from "store/data/constants";
 
 export const constructCocoCategories = () => {

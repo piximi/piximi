@@ -17,7 +17,7 @@ export const SortSelection = () => {
   const onSortKeyChange = (event: SelectChangeEvent<unknown>) => {
     setSelectedKey(event.target.value as ThingSortKey);
     dispatch(
-      projectSlice.actions.setSortType_new({
+      projectSlice.actions.setSortType({
         sortType: event.target.value as ThingSortKey,
       }),
     );
