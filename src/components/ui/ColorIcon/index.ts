@@ -1,1 +1,0 @@
-export { ColorIcon } from "./ColorIcon";

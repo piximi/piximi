@@ -16,16 +16,15 @@ import {
 import { HelpOutlineOutlined as HelpOutlineOutlinedIcon } from "@mui/icons-material";
 import type { ColorSchemeId } from "@nivo/colors";
 
+import { useNumberField } from "hooks";
 import { useMeasurementParameters, usePlotControl } from "../../../hooks";
 
-import { CustomNumberTextField } from "components/inputs";
+import { TextFieldWithBlur } from "components/inputs";
 
 import { capitalize } from "utils/stringUtils";
-
 import { KeysWithValuesOfType } from "utils/types";
-import { ChartConfig, ChartItem, ChartType, SplitType } from "../../../types";
-
 import { nivoColorSpaces } from "themes/nivoTheme";
+import { ChartConfig, ChartItem, ChartType, SplitType } from "../../../types";
 
 const splitTypes = ["partition", "category"];
 
@@ -347,19 +346,37 @@ export const SwarmStatisticsCheckbox = () => {
 
 export const HistogramBinTextField = () => {
   const { selectedPlot, updateChartConfig } = usePlotControl();
-  const handleChange = (numBins: number) => {
+
+  const {
+    inputValue: numBins,
+    inputString: numBinsDisplay,
+    setLastValidInput: setLastValidNumBins,
+    resetInputValue: resetNumBins,
+    handleOnChangeValidation: handleNumBinsChange,
+    error: numBinsError,
+  } = useNumberField(selectedPlot.chartConfig.numBins!);
+
+  const handleSubmit = (numBins: number) => {
+    if (numBinsError.error) {
+      resetNumBins();
+      return;
+    }
+    if (numBins === selectedPlot.chartConfig.numBins) return;
+    setLastValidNumBins(numBins);
     updateChartConfig("numBins", numBins);
   };
+
   return (
-    <CustomNumberTextField
+    <TextFieldWithBlur
       id="bin-size-text-field"
       label="Number of Bins"
-      value={selectedPlot.chartConfig.numBins!}
-      dispatchCallBack={handleChange}
+      value={numBinsDisplay}
+      onChange={handleNumBinsChange}
+      onBlur={() => handleSubmit(numBins)}
       size="small"
       variant="standard"
-      formControlFullWidth
-      formControlProps={{ sx: { pb: 1, mt: 1 }, fullWidth: true }}
+      fullWidth
+      sx={{ pb: 1, mt: 1 }}
     />
   );
 };

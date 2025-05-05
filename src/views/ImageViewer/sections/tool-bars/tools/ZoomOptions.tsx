@@ -5,8 +5,8 @@ import {
   ControlCamera as ControlCameraIcon,
   CropFree as CropFreeIcon,
 } from "@mui/icons-material";
-import { useTheme } from "@mui/material";
-import { Tool } from "components/ui/Tool/Tool";
+import { Stack, useTheme } from "@mui/material";
+import { Tool } from "components/ui/Tool";
 import { useTranslation } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -22,7 +22,6 @@ import { CursorZoom, StageZoom } from "icons";
 import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
 import { ToolType } from "views/ImageViewer/utils/enums";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { FlexRowBox } from "components/ui";
 
 export const ZoomOptions = () => {
   const stageRef = useContext(StageContext);
@@ -103,7 +102,7 @@ export const ZoomOptions = () => {
     dispatch(imageViewerSlice.actions.setZoomToolOptions(payload));
   };
   return (
-    <FlexRowBox>
+    <Stack direction="row">
       <Tool
         name={t(
           `Toggle Zoom Center: ${
@@ -141,6 +140,6 @@ export const ZoomOptions = () => {
       <Tool name={t("ResetPosition")} onClick={handleResetPosition}>
         <ControlCameraIcon />
       </Tool>
-    </FlexRowBox>
+    </Stack>
   );
 };

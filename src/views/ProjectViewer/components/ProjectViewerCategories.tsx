@@ -7,7 +7,7 @@ import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
-import { CategoryItemMenu } from "components/categories/CategoryItemMenu";
+import { CategoryItemMenu } from "components/ui/CategoryItemMenu";
 import { CategoryItem } from "./list-items/CategoryItem";
 
 import { projectSlice } from "store/project";

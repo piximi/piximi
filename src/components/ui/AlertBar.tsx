@@ -26,9 +26,7 @@ import {
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { createGitHubIssue } from "utils/logUtils";
-
 import { AlertType } from "utils/enums";
-
 import { AlertState } from "utils/types";
 
 type AlertBarProps = {
