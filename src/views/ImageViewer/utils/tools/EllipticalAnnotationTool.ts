@@ -1,5 +1,5 @@
 import { AnnotationState } from "../enums";
-import { Point } from "../types";
+import { Point } from "utils/types";
 import { AnnotationTool } from "./AnnotationTool";
 
 export class EllipticalAnnotationTool extends AnnotationTool {

@@ -15,7 +15,7 @@ import { connectPoints } from "views/ImageViewer/utils";
 import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
 import { generateUUID } from "store/data/utils";
 import { Partition } from "../../enums";
-import { Point } from "views/ImageViewer/utils/types";
+import { Point } from "utils/types";
 
 const computeAnnotationMaskFromPoints = (
   cropDims: { x: number; y: number; width: number; height: number },

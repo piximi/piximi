@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { MenuItem, SelectChangeEvent } from "@mui/material";
 
-import { StyledSelect, StyledSelectProps } from "./StyledSelect";
-
 import { selectActiveCategories } from "store/project/reselectors";
+import { StyledSelect } from "components/inputs";
+import { StyledSelectProps } from "components/inputs/StyledSelect";
 
 export const ThingCategorySelect = ({
   currentCategory,

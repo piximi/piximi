@@ -27,7 +27,7 @@ import {
   ToolType,
 } from "views/ImageViewer/utils/enums";
 
-import { Point } from "views/ImageViewer/utils/types";
+import { Point } from "utils/types";
 
 const transformerClassName = "Transformer";
 const transformerButtonAttrNAme = "transformer-button";

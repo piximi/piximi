@@ -24,8 +24,8 @@ import {
 
 import { useDialogHotkey } from "hooks";
 
-import { SaveProjectDialog } from "../SaveProjectDialog";
-import { SaveFittedModelDialog } from "../SaveFittedModelDialog";
+import { SaveProjectDialog } from "./SaveProjectDialog";
+import { SaveFittedModelDialog } from "./SaveFittedModelDialog";
 
 import {
   selectSegmenterModel,
@@ -42,7 +42,7 @@ import { ModelStatus } from "utils/models/enums";
 import { AlertState } from "utils/types";
 import classifierHandler from "utils/models/classification/classifierHandler";
 
-export const FallBackDialog = (props: any) => {
+export const FallbackDialog = (props: any) => {
   const error = props.error as Error;
 
   const [expanded, setExpanded] = React.useState(false);
