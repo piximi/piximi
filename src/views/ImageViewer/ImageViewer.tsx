@@ -8,7 +8,7 @@ import { AppBar, Box } from "@mui/material";
 import { useMobileView, useUnloadConfirmation } from "hooks";
 import { AlertBar } from "components/ui/AlertBar";
 
-import { FallBackDialog } from "components/dialogs";
+import { FallbackDialog } from "components/dialogs";
 import { ImageViewerDrawer, StageWrapper } from "./sections";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
@@ -97,7 +97,7 @@ export const ImageViewer = () => {
 
   return (
     <StageContext.Provider value={stageRef}>
-      <ErrorBoundary FallbackComponent={FallBackDialog}>
+      <ErrorBoundary FallbackComponent={FallbackDialog}>
         <Box sx={{ display: "flex" }}>
           {alertState.visible && (
             <AppBar

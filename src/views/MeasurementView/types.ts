@@ -9,7 +9,7 @@ export type MeasurementDisplayParameters = {
   groupThingIds: string[];
 };
 
-export type PlotDetail = {
+type PlotDetail = {
   id: string;
   name: string;
   chartConfig: ChartConfig;
@@ -20,14 +20,14 @@ export type PlotDetails = {
   plots: Record<string, PlotDetail>;
 };
 
-export type AddActionProps = { type: "add" };
-export type EditActionProps = { type: "edit"; id: string; name: string };
-export type UpdateActionProps = {
+type AddActionProps = { type: "add" };
+type EditActionProps = { type: "edit"; id: string; name: string };
+type UpdateActionProps = {
   type: "update";
   id: string;
   chartConfig: ChartConfig;
 };
-export type RemoveOrSelectActionProps = {
+type RemoveOrSelectActionProps = {
   type: "remove" | "select";
   id: string;
   newId?: string;
@@ -70,9 +70,6 @@ export type ChartConfig = {
   swarmStatistics?: boolean;
 };
 
-export type HistDatum = { value: string; count: number };
-export type HistData = Array<HistDatum>;
-
 export type SwarmDatum = {
   id: string;
   index: number;
@@ -81,7 +78,7 @@ export type SwarmDatum = {
   z?: number;
 };
 
-export type StatData = {
+type StatData = {
   mean: number;
   median: number;
   std: number;
@@ -91,7 +88,7 @@ export type StatData = {
   upperQuartile: number;
 };
 
-export type NodeGroup = {
+type NodeGroup = {
   nodes: ComputedDatum<SwarmDatum>[];
   stats?: StatData;
   x?: number;

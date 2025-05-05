@@ -1,7 +1,7 @@
 import { test, expect } from "vitest";
 
 import { padMask, findContours } from "views/ImageViewer/utils";
-import { Point } from "../types";
+import { Point } from "utils/types";
 
 const p = (y: number, x: number) => ({ y, x });
 

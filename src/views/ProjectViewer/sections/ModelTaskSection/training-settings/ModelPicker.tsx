@@ -7,7 +7,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { StyledSelect } from "../../../components/StyledSelect";
+import { StyledSelect } from "components/inputs/StyledSelect";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,9 +18,9 @@ import {
   selectClassifierModelNameOrArch,
 } from "store/classifier/reselectors";
 import { selectActiveKindObject } from "store/project/reselectors";
-import { TextFieldWithBlur } from "views/ProjectViewer/components/TextFieldWithBlur";
+import { TextFieldWithBlur } from "components/inputs/TextFieldWithBlur";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
-import { WithLabel } from "views/ProjectViewer/components/WithLabel";
+import { WithLabel } from "components/inputs";
 
 export const ModelPicker = () => {
   const selectedModel = useSelector(selectClassifierModel);

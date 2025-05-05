@@ -17,7 +17,7 @@ import {
   Category,
   PartialDecodedAnnotationObject,
 } from "store/data/types";
-import { Point } from "../types";
+import { Point } from "utils/types";
 
 export abstract class AnnotationTool extends Tool {
   /**
