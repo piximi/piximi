@@ -59,9 +59,6 @@ export type Kind = {
   categories: string[];
   unknownCategoryId: string;
 };
-export type KindWithCategories = Omit<Kind, "categories"> & {
-  categories: Category[];
-};
 
 export type Shape = {
   planes: number;

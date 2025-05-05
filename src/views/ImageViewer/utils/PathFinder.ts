@@ -1,7 +1,7 @@
 import { Node } from "ngraph.graph";
 
 import { NodeHeap, PiximiGraph, PiximiNode } from "./NodeHeap";
-import { Point } from "./types";
+import { Point } from "utils/types";
 import { logger } from "utils/logUtils";
 import { fromIdxToCoord } from "./point-operations";
 

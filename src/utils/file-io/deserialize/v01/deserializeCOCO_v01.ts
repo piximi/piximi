@@ -8,7 +8,7 @@ import {
   SerializedCOCOFileType,
   SerializedCOCOImageType,
 } from "../../types";
-import { Point } from "views/ImageViewer/utils/types";
+import { Point } from "utils/types";
 import { OldAnnotationType, OldCategory, OldImageType } from "store/data/types";
 
 /*

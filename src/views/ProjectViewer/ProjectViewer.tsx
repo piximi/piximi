@@ -5,7 +5,7 @@ import { Box } from "@mui/material";
 
 import { useErrorHandler, useUnloadConfirmation } from "hooks";
 
-import { FallBackDialog } from "components/dialogs";
+import { FallbackDialog } from "components/dialogs";
 import {
   ProjectDrawer,
   ImageToolDrawer,
@@ -42,7 +42,7 @@ export const ProjectViewer = () => {
 
   return (
     <div>
-      <ErrorBoundary FallbackComponent={FallBackDialog}>
+      <ErrorBoundary FallbackComponent={FallbackDialog}>
         <div tabIndex={-1}>
           <Box sx={{ height: "100vh" }}>
             <ProjectAppBar />

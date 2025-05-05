@@ -27,9 +27,9 @@ import { enumKeys } from "utils/objectUtils";
 import { CropSchema } from "utils/models/enums";
 import { CropOptions, RescaleOptions } from "utils/models/types";
 import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSettingsTextField";
-import { StyledSelect } from "views/ProjectViewer/components/StyledSelect";
-import { WithLabel } from "views/ProjectViewer/components/WithLabel";
-import { useNumberField } from "views/ProjectViewer/hooks/useNumberField";
+import { StyledSelect } from "components/inputs";
+import { WithLabel } from "components/inputs";
+import { useNumberField } from "hooks";
 
 const RowColInputOptions = { min: 20 };
 const InputShapeField = ({ disabled }: { disabled: boolean }) => {

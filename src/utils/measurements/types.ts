@@ -1,4 +1,4 @@
-export interface TreeItemData {
+interface TreeItemData {
   id: string;
   name: string;
   children?: readonly string[];

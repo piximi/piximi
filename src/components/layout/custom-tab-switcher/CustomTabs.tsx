@@ -14,7 +14,7 @@ import {
   Add as AddIcon,
 } from "@mui/icons-material";
 
-import { BlurActionTextField } from "../../inputs/BlurActionTextField";
+import { TextFieldWithBlur } from "components/inputs";
 import {
   BasicTabPanel,
   ControlledTabPanel,
@@ -141,16 +141,18 @@ export function CustomTabs(
           }}
         >
           {isEditing && labels.findIndex((l) => l === label) === tabIndex ? (
-            <BlurActionTextField
-              currentText={renderLabel ? renderLabel(label) : label}
-              callback={(newLabel: string) => {
-                handleTabEdit!(label, newLabel);
-                setIsEditing(false);
+            <TextFieldWithBlur
+              value={renderLabel ? renderLabel(label) : label}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                handleTabEdit!(label, event.target.value);
+                //setIsEditing(false);
               }}
-              blurCallback={() => setIsEditing(false)}
+              onBlur={() => setIsEditing(false)}
               size="small"
               autoFocus
-              inputProps={{ style: { paddingBlock: 0 } }}
+              slotProps={{
+                htmlInput: { style: { paddingBlock: 0 } },
+              }}
             />
           ) : (
             <Typography variant="body2">
