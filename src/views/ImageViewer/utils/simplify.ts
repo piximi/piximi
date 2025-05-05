@@ -4,7 +4,7 @@
  mourner.github.io/simplify-js
 */
 
-import { Point } from "./types";
+import { Point } from "utils/types";
 
 // square distance between 2 points
 function getSqDist(p1: Point, p2: Point) {

@@ -18,7 +18,7 @@ import { getDistance } from "views/ImageViewer/utils";
 
 import { ToolType, ZoomMode } from "views/ImageViewer/utils/enums";
 
-import { Point } from "views/ImageViewer/utils/types";
+import { Point } from "utils/types";
 
 const delta = 10;
 export const useZoom = (stage?: Konva.Stage | null) => {

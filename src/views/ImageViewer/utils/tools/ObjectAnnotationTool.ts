@@ -13,7 +13,7 @@ import {
 import IJSImage from "image-js";
 
 import { RectangularAnnotationTool } from "./RectangularAnnotationTool";
-import { Point } from "../types";
+import { Point } from "utils/types";
 import { AnnotationState } from "../enums";
 
 export class ObjectAnnotationTool extends RectangularAnnotationTool {

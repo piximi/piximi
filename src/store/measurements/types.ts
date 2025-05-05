@@ -29,7 +29,7 @@ export type MeasurementGroup = {
   upToDate: boolean;
 };
 
-export type ThingMeasurementsDatum = {
+type ThingMeasurementsDatum = {
   channelData: number[][];
   maskData?: DataArray;
   maskShape?: { width: number; height: number };

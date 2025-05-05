@@ -1,1 +1,0 @@
-export { TooltipCard } from "./TooltipCard";

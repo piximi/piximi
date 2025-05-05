@@ -3,7 +3,7 @@ import { min, max } from "lodash";
 import { connectPoints } from "./imageHelper";
 import { scanline } from "./scanline";
 import { simplifyPolygon } from "./simplify";
-import { Point } from "./types";
+import { Point } from "utils/types";
 export function computeBoundingBoxFromContours(
   contour: Array<Point>,
 ): [number, number, number, number] {

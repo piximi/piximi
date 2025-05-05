@@ -2,7 +2,6 @@ import { History } from "@tensorflow/tfjs";
 import {
   Dispatch,
   EntityState,
-  ListenerEffectAPI,
   TypedStartListening,
   UnknownAction,
 } from "@reduxjs/toolkit";
@@ -110,7 +109,7 @@ export type ProjectState = {
   imageChannels: number | undefined;
 };
 
-export type AppState = {
+type AppState = {
   classifier: ClassifierState;
   segmenter: SegmenterState;
   imageViewer: ImageViewerState;
@@ -124,17 +123,3 @@ export type AppState = {
 export type AppDispatch = Dispatch<UnknownAction>;
 
 export type TypedAppStartListening = TypedStartListening<AppState, AppDispatch>;
-
-export type StoreListemerAPI = ListenerEffectAPI<
-  {
-    classifier: ClassifierState;
-    segmenter: SegmenterState;
-    imageViewer: ImageViewerState;
-    project: ProjectState;
-    applicationSettings: AppSettingsState;
-    annotator: AnnotatorState;
-    data: DataState;
-  },
-  AppDispatch,
-  unknown
->;

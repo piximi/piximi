@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { TextField, TextFieldProps } from "@mui/material";
 import { RequireField } from "utils/types";
+
 export type TextFieldWithBlurProps = RequireField<TextFieldProps, "onBlur">;
 
 export const TextFieldWithBlur = (props: TextFieldWithBlurProps) => {

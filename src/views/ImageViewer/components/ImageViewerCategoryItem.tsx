@@ -9,7 +9,7 @@ import {
 import { useImageViewerCategoryItemState } from "../hooks";
 
 import { CustomListItemButton, CountChip } from "components/ui/";
-import { CategoryItemMenu } from "components/categories/CategoryItemMenu";
+import { CategoryItemMenu } from "components/ui/CategoryItemMenu";
 
 import { APPLICATION_COLORS } from "utils/constants";
 

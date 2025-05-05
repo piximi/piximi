@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import Konva from "konva";
 import IJSImage from "image-js";
 
-import { Point } from "views/ImageViewer/utils/types";
+import { Point } from "utils/types";
 
 export const usePointerLocation = (
   imageRef: React.MutableRefObject<Konva.Image | null>,

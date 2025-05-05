@@ -1,5 +1,5 @@
 import { Box, Button, Stack } from "@mui/material";
-import { Logo } from "components/ui/Logo";
+import { Logo } from "components/ui/logo";
 import { useDialogHotkey } from "hooks";
 import { useNavigate } from "react-router-dom";
 import { HotkeyContext } from "utils/enums";
