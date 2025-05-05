@@ -7,7 +7,7 @@ import { Container, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { usePreferredNivoTheme } from "hooks";
 
 import { APPLICATION_COLORS } from "utils/constants";
-import { Point } from "views/ImageViewer/utils/types";
+import { Point } from "utils/types";
 
 type TwoDataPlotProps = {
   title: string;

@@ -1,17 +1,13 @@
 import React, { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Box, Divider, List, useTheme } from "@mui/material";
+import { Box, Divider, List, Stack, useTheme } from "@mui/material";
 import { Layers as LayersIcon } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
 
-import {
-  CustomListItem,
-  CustomListItemButton,
-  FlexRowBox,
-} from "components/ui";
+import { CustomListItem, CustomListItemButton } from "components/ui";
 import { IncrementalSlider } from "components/inputs";
-import { PopoverTool } from "components/ui/Tool/Tool";
+import { PopoverTool } from "components/ui/Tool";
 import { ChannelsList, ApplyColorsButton } from "views/ImageViewer/components";
 
 import { selectLoadMessage } from "store/applicationSettings/selectors";
@@ -69,7 +65,7 @@ export const ImageOptions = () => {
   };
 
   return (
-    <FlexRowBox>
+    <Stack direction="row">
       <PopoverTool
         name={t("Channel Adjustment")}
         popoverElement={
@@ -124,6 +120,6 @@ export const ImageOptions = () => {
       >
         <LayersIcon />
       </PopoverTool>
-    </FlexRowBox>
+    </Stack>
   );
 };

@@ -12,7 +12,7 @@ import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 import { HotkeyContext } from "utils/enums";
 
 import { Category } from "store/data/types";
-import { CategoryDialog } from "components/dialogs/CategoryDialog/CategoryDialog";
+import { CategoryDialog } from "components/dialogs/CategoryDialog";
 
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;

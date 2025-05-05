@@ -132,4 +132,13 @@ export type SliderOptions = {
   initial: number;
 };
 
-export type Points = Array<{ x: number; y: number }>;
+export type Point = {
+  x: number;
+  y: number;
+};
+export type Edge = {
+  p1: Point;
+  p2: Point;
+};
+
+export type Points = Array<Point>;

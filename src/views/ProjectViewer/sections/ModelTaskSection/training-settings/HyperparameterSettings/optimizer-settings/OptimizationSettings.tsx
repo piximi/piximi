@@ -19,10 +19,10 @@ import { selectActiveKindId } from "store/project/selectors";
 import { enumKeys } from "utils/objectUtils";
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
 import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSettingsTextField";
-import { StyledSelect } from "views/ProjectViewer/components/StyledSelect";
-import { WithLabel } from "views/ProjectViewer/components/WithLabel";
+import { StyledSelect } from "components/inputs";
+import { WithLabel } from "components/inputs";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
-import { useNumberField } from "views/ProjectViewer/hooks/useNumberField";
+import { useNumberField } from "hooks";
 
 export const OptimizationSettings = () => {
   const dispatch = useDispatch();

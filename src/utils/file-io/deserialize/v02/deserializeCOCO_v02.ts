@@ -10,7 +10,7 @@ import {
   SerializedCOCOFileType,
   SerializedCOCOImageType,
 } from "../../types";
-import { Point } from "views/ImageViewer/utils/types";
+import { Point } from "utils/types";
 import { RequireOnly } from "utils/types";
 import {
   Kind,

@@ -35,11 +35,11 @@ import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStat
 import { usePredictClassifier } from "views/ProjectViewer/hooks/usePredictClassifier";
 import { selectCategoriesDictionary } from "store/data/selectors";
 import { useEvaluateClassifier } from "views/ProjectViewer/hooks/useEvaluateClassifier";
-import { WithLabel } from "views/ProjectViewer/components/WithLabel";
+import { WithLabel } from "components/inputs";
 import classifierHandler from "utils/models/classification/classifierHandler";
 import { classifierSlice } from "store/classifier";
 import { selectActiveKindId } from "store/project/selectors";
-import { StyledSelect } from "views/ProjectViewer/components/StyledSelect";
+import { StyledSelect } from "components/inputs";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 
 export const ClassifierSection = () => {
