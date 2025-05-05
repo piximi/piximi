@@ -8,7 +8,7 @@ import {
   interpolateX,
   pointsToEdges,
 } from "./point-operations";
-import { Edge, Point } from "./types";
+import { Edge, Point } from "utils/types";
 
 /**
  * Scan Line Polygon Fill (SLPF) algorithm to fill the annotation polygon.

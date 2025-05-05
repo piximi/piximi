@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const intRegExpr = new RegExp("^[0-9]+(.0*)?$");
+const intRegExpr = new RegExp("^[0-9]+$");
 const floatRegExpr = new RegExp("-*^[0-9]*(.[0-9]*)?$");
 type ValidationError = { error: false } | { error: true; message: string };
 type ValidationOptions = {

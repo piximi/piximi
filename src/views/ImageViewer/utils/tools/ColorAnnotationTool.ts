@@ -2,7 +2,7 @@ import IJSImage, { RoiManager as IJSRoiManager } from "image-js";
 import PriorityQueue from "ts-priority-queue";
 
 import { AnnotationTool } from "./AnnotationTool";
-import { Point } from "../types";
+import { Point } from "utils/types";
 import { AnnotationState } from "../enums";
 
 export class ColorAnnotationTool extends AnnotationTool {

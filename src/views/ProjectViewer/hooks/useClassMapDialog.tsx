@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import React, { ReactElement, useEffect, useState } from "react";
 import { Category } from "store/data/types";
-import { StyledSelect } from "../components/StyledSelect";
+import { StyledSelect } from "components/inputs/StyledSelect";
 import { selectActiveKindId } from "store/project/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { generateCategory } from "store/data/utils";

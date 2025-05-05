@@ -4,7 +4,7 @@ import { NodeHeap, PiximiGraph } from "./NodeHeap";
 import { cachedAStarPathSearch } from "./PathFinder";
 
 import { getIdx } from "views/ImageViewer/utils/imageHelper";
-import { Point } from "./types";
+import { Point } from "utils/types";
 import { DataArray } from "store/data/types";
 
 const validNeighbours = (

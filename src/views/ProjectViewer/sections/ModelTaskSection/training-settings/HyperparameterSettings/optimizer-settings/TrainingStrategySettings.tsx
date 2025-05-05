@@ -10,9 +10,9 @@ import {
 } from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSettingsTextField";
-import { WithLabel } from "views/ProjectViewer/components/WithLabel";
+import { WithLabel } from "components/inputs";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
-import { useNumberField } from "views/ProjectViewer/hooks/useNumberField";
+import { useNumberField } from "hooks";
 
 export const TrainingStrategySettings = () => {
   const dispatch = useDispatch();

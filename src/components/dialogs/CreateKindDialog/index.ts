@@ -1,1 +1,0 @@
-export { CreateKindDialog } from "./CreateKindDialog";

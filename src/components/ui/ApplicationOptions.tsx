@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BlockPicker, ColorResult } from "react-color";
 import {
@@ -8,8 +8,19 @@ import {
   Popover,
   Stack,
   Typography,
+  Divider,
+  List,
+  Dialog,
+  DialogContent,
+  IconButton,
+  DialogTitle,
+  DialogContentText,
+  TextField,
 } from "@mui/material";
 import {
+  Close as CloseIcon,
+  Feedback as FeedbackIcon,
+  Settings as SettingsIcon,
   Palette as PaletteIcon,
   DarkMode as DarkModeIcon,
   LightMode as LightModeIcon,
@@ -19,9 +30,15 @@ import {
   Image as ImageIcon,
 } from "@mui/icons-material";
 
-import { CustomSwitch } from "components/inputs/CustomSwitch";
+import { useHotkeys, useTranslation } from "hooks";
+import { useDialogHotkey } from "hooks";
+import { useDialog } from "hooks";
+
+import { HelpDrawer } from "../layout/HelpDrawer";
 import { DividerHeader } from "components/ui/divider/DividerHeader";
-import { SettingsItem } from "./SettingsItem";
+import { CustomSwitch } from "components/inputs/CustomSwitch";
+import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
+import { CustomListItemButton } from "./CustomListItemButton";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import {
@@ -33,9 +50,11 @@ import {
 } from "store/applicationSettings/selectors";
 import { selectAvaliableCategoryColors } from "store/project/reselectors";
 
+import { AlertType, HotkeyContext } from "utils/enums";
 import { ThemeMode } from "themes/enums";
+import { createGitHubIssue } from "utils/logUtils";
 
-export const UISettings = () => {
+const UISettings = () => {
   return (
     <>
       <DividerHeader
@@ -340,3 +359,185 @@ const TextOnScrollSetting = () => {
 //     </Grid>
 //   );
 // };
+
+type SettingsDialogProps = {
+  onClose: () => void;
+  open: boolean;
+};
+const SettingsItem = ({
+  title,
+  children,
+}: {
+  title: string | ReactNode;
+  children: ReactNode;
+}) => {
+  return (
+    <Box
+      display="flex"
+      flexDirection="row"
+      justifyContent="space-between"
+      alignItems="flex-end"
+      height="40px"
+    >
+      {typeof title === "string" ? <Typography>{title}</Typography> : title}
+
+      {children}
+    </Box>
+  );
+};
+
+const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
+  useHotkeys(
+    "enter",
+    () => {
+      onClose();
+    },
+    HotkeyContext.AppSettingsDialog,
+    { enableOnTags: ["INPUT"], enabled: open },
+    [onClose],
+  );
+
+  return (
+    <Dialog onClose={onClose} open={open} fullWidth maxWidth="xs">
+      <DialogTitle sx={{ m: 0, p: 2 }}>Settings</DialogTitle>
+
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={(theme) => ({
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: theme.palette.grey[500],
+        })}
+      >
+        <CloseIcon />
+      </IconButton>
+
+      <DialogContent sx={{ px: 0, pb: 2.5, pt: 1 }}>
+        <UISettings />
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+type SendFeedbackDialogProps = {
+  onClose: () => void;
+  open: boolean;
+};
+
+const SendFeedbackDialog = ({ onClose, open }: SendFeedbackDialogProps) => {
+  const t = useTranslation();
+
+  const [issueTitle, setIssueTitle] = useState("");
+  const [issueComment, setIssueComment] = useState("");
+
+  const openGitHubIssue = () => {
+    createGitHubIssue(issueTitle, issueComment, AlertType.Warning);
+    setIssueTitle("");
+    setIssueComment("");
+
+    onClose();
+  };
+
+  return (
+    <ConfirmationDialog
+      isOpen={open}
+      onClose={onClose}
+      title={t("Send feedback")}
+      content={
+        <>
+          <DialogContentText
+            sx={{
+              "& a": { color: "deepskyblue" },
+            }}
+          >
+            {t(
+              "Use this form to report issues with Piximi via our GitHub page, or visit",
+            )}{" "}
+            <a
+              href="https://forum.image.sc/tag/piximi"
+              target="_blank"
+              rel="noreferrer"
+            >
+              forum.image.sc/tag/piximi
+            </a>
+            .
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Title"
+            id="issue-title"
+            value={issueTitle}
+            onChange={(e) => setIssueTitle(e.target.value)}
+            rows={1}
+            fullWidth
+            size="small"
+          />
+          <TextField
+            margin="dense"
+            label="Description"
+            id="issue-comment"
+            value={issueComment}
+            onChange={(e) => setIssueComment(e.target.value)}
+            multiline
+            rows={10}
+            fullWidth
+            size="small"
+          />
+        </>
+      }
+      onConfirm={openGitHubIssue}
+      confirmText="Create Github Issue"
+      confirmDisabled={issueTitle.length === 0 || issueComment.length === 0}
+    />
+  );
+};
+
+const SendFeedbackListItem = () => {
+  const { onClose, onOpen, open } = useDialog();
+
+  return (
+    <>
+      <CustomListItemButton
+        primaryText="Send Feedback"
+        onClick={onOpen}
+        icon={<FeedbackIcon />}
+      />
+
+      <SendFeedbackDialog onClose={onClose} open={open} />
+    </>
+  );
+};
+
+const SettingsListItem = () => {
+  const { onClose, onOpen, open } = useDialogHotkey(
+    HotkeyContext.AppSettingsDialog,
+  );
+
+  return (
+    <>
+      <CustomListItemButton
+        primaryText="Settings"
+        onClick={onOpen}
+        icon={<SettingsIcon />}
+      />
+
+      <SettingsDialog onClose={onClose} open={open} />
+    </>
+  );
+};
+
+export const ApplicationOptions = () => {
+  return (
+    <List dense sx={{ mt: "auto" }}>
+      <Divider />
+      <SettingsListItem />
+
+      <SendFeedbackListItem />
+
+      <HelpDrawer />
+    </List>
+  );
+};

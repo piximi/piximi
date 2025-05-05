@@ -1,11 +1,9 @@
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  BlurActionTextField,
-  ImageCategorySelect,
-  ImagePartitionSelect,
-} from "components/inputs";
+import { TextFieldWithBlur } from "components/inputs";
+import { ThingCategorySelect } from "./ThingCategorySelect";
+import { ImagePartitionSelect } from "./ImagePartitionSelect";
 
 import { dataSlice } from "store/data/dataSlice";
 
@@ -15,6 +13,7 @@ import { Thing } from "store/data/types";
 import { DataTable } from "./DataTable";
 import { DataTableRow } from "./DataTableRow";
 import { selectRenderKindName } from "store/data/selectors";
+import { useTheme } from "@mui/material";
 
 export const ThingInformationTable = ({
   thing,
@@ -24,22 +23,28 @@ export const ThingInformationTable = ({
   collapsible: boolean;
 }) => {
   const dispatch = useDispatch();
+  const theme = useTheme();
   const [tableData, setTableData] = useState<
     Array<Array<string | number | ReactElement>>
   >([]);
   const renderedKindName = useSelector(selectRenderKindName);
+  const [newImageName, setNewImageName] = useState<string>(thing.name);
 
   const handleImageNameChange = useCallback(
-    (name: string) => {
-      dispatch(
-        dataSlice.actions.updateThingName({
-          id: thing.id,
-          name,
-        }),
-      );
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setNewImageName(event.target.value);
     },
-    [dispatch, thing],
+    [],
   );
+
+  const handleImageNameBlur = useCallback(() => {
+    dispatch(
+      dataSlice.actions.updateThingName({
+        id: thing.id,
+        name: newImageName,
+      }),
+    );
+  }, [dispatch, newImageName, thing.id]);
 
   const handleCategorySelect = useCallback(
     (categoryId: string) => {
@@ -79,14 +84,21 @@ export const ThingInformationTable = ({
         case "name":
           editableData[0] = [
             "Name",
-            <BlurActionTextField
+            <TextFieldWithBlur
               hiddenLabel
-              currentText={thing.name}
-              callback={handleImageNameChange}
+              value={thing.name}
+              onChange={handleImageNameChange}
+              onBlur={handleImageNameBlur}
               size="small"
               variant="standard"
-              fontSize={"inherit"}
-              textAlign="right"
+              slotProps={{
+                htmlInput: {
+                  style: {
+                    textAlign: "right",
+                    fontSize: theme.typography.body2.fontSize,
+                  },
+                },
+              }}
               key={key}
             />,
           ];
@@ -94,7 +106,7 @@ export const ThingInformationTable = ({
         case "categoryId":
           editableData[1] = [
             "Category",
-            <ImageCategorySelect
+            <ThingCategorySelect
               currentCategory={thing.categoryId}
               callback={handleCategorySelect}
               size="small"

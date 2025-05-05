@@ -12,7 +12,7 @@
  */
 
 import { logger } from "utils/logUtils";
-import { Point } from "./types";
+import { Point } from "utils/types";
 
 // this can be extended with other types, eg. number[], Int32Array, Float32Array
 // but must be data array that can hold negative numbers

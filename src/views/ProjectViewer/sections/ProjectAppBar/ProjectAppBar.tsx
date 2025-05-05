@@ -6,7 +6,6 @@ import {
   Slider,
   Box,
   Typography,
-  TextField,
   FormControl,
   Menu,
   Tooltip,
@@ -30,20 +29,20 @@ import {
 import { useDialogHotkey, useHotkeys, useMenu, useMobileView } from "hooks";
 import { useThingSelection } from "../../hooks";
 
-import { LogoLoader } from "components/ui/LogoLoader";
-import { SortSelection } from "views/ProjectViewer/sections/SortSelection";
+import { LogoLoader } from "components/ui/logo";
 import { TooltipTitle } from "components/ui/tooltips";
 import { CustomAppBar } from "components/layout";
 import { AlertBar } from "components/ui/AlertBar";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { TooltipButton } from "components/ui/tooltips/TooltipButton/TooltipButton";
+import { TooltipButton } from "components/ui/tooltips/TooltipButton";
+import { SortSelection } from "views/ProjectViewer/sections/SortSelection";
+import { TextFieldWithBlur } from "components/inputs";
 import { ImageCategoryMenu } from "./ImageCategoryMenu";
 
 import { projectSlice } from "store/project";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data";
 import { selectActiveKindId, selectProjectName } from "store/project/selectors";
-
 import { selectActiveCategories } from "store/project/reselectors";
 import {
   selectAlertState,
@@ -53,7 +52,6 @@ import {
 
 import { pluralize } from "utils/stringUtils";
 import { isUnknownCategory } from "store/data/utils";
-
 import { HotkeyContext } from "utils/enums";
 import { Partition } from "utils/models/enums";
 
@@ -390,14 +388,6 @@ const ProjectTextField = () => {
     setNewProjectName(event.target.value);
   };
 
-  const handleTextFieldEnter = (
-    event: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (event.key === "Enter") {
-      inputRef.current?.blur();
-    }
-  };
-
   useEffect(() => {
     setNewProjectName(projectName);
   }, [projectName]);
@@ -410,16 +400,17 @@ const ProjectTextField = () => {
         </Typography>
       ) : (
         <FormControl>
-          <TextField
+          <TextFieldWithBlur
             onChange={handleTextFieldChange}
             onBlur={handleTextFieldBlur}
-            onKeyDown={handleTextFieldEnter}
             value={newProjectName}
             inputRef={inputRef}
             size="small"
             sx={{ ml: 5 }}
             variant="standard"
-            inputProps={{ min: 0, style: { textAlign: "center" } }}
+            slotProps={{
+              htmlInput: { min: 0, style: { textAlign: "center" } },
+            }}
           />
         </FormControl>
       )}
