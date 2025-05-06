@@ -41,9 +41,12 @@ import { ModelStatus } from "utils/models/enums";
 
 import { AlertState } from "utils/types";
 import classifierHandler from "utils/models/classification/classifierHandler";
+import { saveAs } from "file-saver";
+import { selectProjectName } from "store/project/selectors";
 
 export const FallbackDialog = (props: any) => {
   const error = props.error as Error;
+  const projectName = useSelector(selectProjectName);
 
   const [expanded, setExpanded] = React.useState(false);
 
@@ -79,12 +82,6 @@ export const FallbackDialog = (props: any) => {
   // const inAnnotator = routePath === "/annotator";
 
   const {
-    onClose: onSaveClassifierDialogClose,
-    onOpen: onSaveClassifierDialogOpen,
-    open: openSaveClassifierDialog,
-  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
-
-  const {
     onClose: onSaveSegmenterDialogClose,
     onOpen: onSaveSegmenterDialogOpen,
     open: openSaveSegmenterDialog,
@@ -113,6 +110,13 @@ export const FallbackDialog = (props: any) => {
     "bug" +
     "&body=" +
     encodeURIComponent(issueDescription);
+
+  const handleSaveClassifiers = async () => {
+    const modelsZip = classifierHandler.zipModels();
+    modelsZip.generateAsync({ type: "blob" }).then((blob) => {
+      saveAs(blob, `${projectName}-classifiers.zip`);
+    });
+  };
 
   return (
     <Dialog
@@ -219,11 +223,11 @@ export const FallbackDialog = (props: any) => {
 
         <Stack direction="row" spacing={2}>
           <Button variant="outlined" onClick={onSaveProjectDialogOpen}>
-            Save project
+            Save Project
           </Button>
           {classifierHandler.getModelNames().length > 0 && (
-            <Button variant="outlined" onClick={onSaveClassifierDialogOpen}>
-              Save classifier
+            <Button variant="outlined" onClick={handleSaveClassifiers}>
+              Save Classifier
             </Button>
           )}
           {segmenterModelStatus === ModelStatus.Trained && (
@@ -238,16 +242,8 @@ export const FallbackDialog = (props: any) => {
           open={openSaveProjectDialog}
         />
 
-        {/* <SaveFittedModelDialog
-          model={selectedClassifierModel}
-          modelStatus={classifierModelStatus}
-          onClose={onSaveClassifierDialogClose}
-          open={openSaveClassifierDialog}
-        /> */}
-
         <SaveFittedModelDialog
           model={selectedSegmenterModel}
-          modelStatus={segmenterModelStatus}
           onClose={onSaveSegmenterDialogClose}
           open={openSaveSegmenterDialog}
         />

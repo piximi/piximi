@@ -110,6 +110,7 @@ export const ThingInformationTable = ({
               currentCategory={thing.categoryId}
               callback={handleCategorySelect}
               size="small"
+              fullWidth
               variant="standard"
               fontSize="inherit"
               key={key}
@@ -125,6 +126,7 @@ export const ThingInformationTable = ({
               size="small"
               variant="standard"
               fontSize="inherit"
+              fullWidth
               key={key}
             />,
           ];

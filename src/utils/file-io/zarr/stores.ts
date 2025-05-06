@@ -2,12 +2,7 @@ import JSZip from "jszip";
 import { KeyError } from "zarr";
 import classifierHandler from "utils/models/classification/classifierHandler";
 import { AsyncStore, ValidStoreType } from "zarr/types/storage/types";
-
-export type ModelData = {
-  modelJson: { blob: Blob; fileName: string };
-  modelWeights: { blob: Blob; fileName: string };
-};
-export type SerializedModels = Record<string, ModelData>;
+import { SerializedModels } from "utils/models/types";
 
 /**
  * Preserves (double) slashes earlier in the path, so this works better
@@ -170,7 +165,7 @@ export const fListToStore = async (
     const file = files[0];
     const zip = await new JSZip().loadAsync(file);
 
-    classifierHandler.unzipModels(zip);
+    classifierHandler.addFromZip(zip);
     // find folder of pattern "projectName.zarr/"
     const rootFile = zip.folder(/.*\.zarr\/$/);
 
