@@ -18,7 +18,7 @@ export const WithLabel = ({
       sx={{ alignItems: "center", width: fullWidth ? "100%" : undefined }}
     >
       <Typography {...labelProps}>{label}</Typography>
-      <FormControl sx={{ width: "auto" }} fullWidth>
+      <FormControl sx={fullWidth ? {} : { width: "auto" }} fullWidth>
         {children}
       </FormControl>
     </Stack>
