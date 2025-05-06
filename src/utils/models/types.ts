@@ -124,3 +124,9 @@ export type SegmenterEvaluationResultType = {
   IoUScore: number;
   diceScore: number;
 };
+
+export type ModelData = {
+  modelJson: { blob: Blob; fileName: string };
+  modelWeights: { blob: Blob; fileName: string };
+};
+export type SerializedModels = Record<string, ModelData>;
