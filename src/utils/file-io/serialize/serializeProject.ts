@@ -3,10 +3,14 @@ import { Tensor } from "@tensorflow/tfjs";
 //import { Blosc } from "numcodecs";
 
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
-import { PiximiStore, SerializedModels } from "../zarr/stores";
+import { PiximiStore } from "../zarr/stores";
 import classifierHandler from "utils/models/classification/classifierHandler";
 
-import { OptimizerSettings, PreprocessSettings } from "utils/models/types";
+import {
+  OptimizerSettings,
+  PreprocessSettings,
+  SerializedModels,
+} from "utils/models/types";
 import { LoadCB } from "../types";
 import {
   ClassifierState,

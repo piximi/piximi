@@ -1,11 +1,13 @@
 import JSZip from "jszip";
 import { SequentialClassifier } from "./AbstractClassifier";
+import { RemoteClassifier, UploadedClassifier } from "./UploadedClassifier";
 import { MobileNet } from "./MobileNet";
 import { SimpleCNN } from "./SimpleCNN";
 import { logger } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
 import { ModelTask } from "../enums";
-import { UploadedClassifier } from "./UploadedClassifier";
+import { replaceDuplicateName } from "utils/stringUtils";
+import { SerializedModels } from "../types";
 
 class ClassifierHandler {
   readonly _availableClassifierArchitectures: [
@@ -53,6 +55,7 @@ class ClassifierHandler {
     modelName: string,
     architecture: 0 | 1,
   ): Promise<SequentialClassifier> {
+    modelName = replaceDuplicateName(modelName, this.getModelNames());
     try {
       const model = new this._availableClassifierArchitectures[architecture](
         modelName,
@@ -72,7 +75,72 @@ class ClassifierHandler {
     model.dispose();
     delete this.availableClassificationModels[modelName];
   }
-  public async unzipModels(zip: JSZip) {
+  public async addFromFiles(
+    descFile: File,
+    weightsFiles: File[],
+    isGraph?: boolean,
+    modelName?: string,
+  ) {
+    const failedModels: Record<string, { reason: string; err?: Error }> = {};
+    const loadedModels: SequentialClassifier[] = [];
+    modelName = modelName ?? descFile.name.replace(/\..+$/, "");
+    const deDupedName = replaceDuplicateName(modelName, this.getModelNames());
+
+    const model = new UploadedClassifier({
+      descFile,
+      weightsFiles,
+      name: deDupedName,
+      task: ModelTask.Classification,
+      graph: !!isGraph,
+      pretrained: true,
+      trainable: true,
+    });
+    try {
+      await model.upload();
+      classifierHandler.addModel(model);
+      loadedModels.push(model);
+    } catch (err) {
+      failedModels[modelName] = {
+        reason: "Model upload failed",
+        err: err as Error,
+      };
+    }
+    return { loadedModels, failedModels };
+  }
+
+  public async addFromUrl(
+    modelUrl: string,
+    fromTFHub: boolean,
+    isGraph: boolean,
+  ) {
+    const failedModels: Record<string, { reason: string; err?: Error }> = {};
+    const loadedModels: SequentialClassifier[] = [];
+    const modelName = replaceDuplicateName(
+      "Remote-Classifier",
+      this.getModelNames(),
+    );
+    const model = new RemoteClassifier({
+      name: modelName,
+      task: ModelTask.Classification,
+      pretrained: true,
+      trainable: isGraph,
+      TFHub: fromTFHub,
+      graph: isGraph,
+      src: modelUrl,
+    });
+
+    try {
+      await model.upload();
+      loadedModels.push(model);
+    } catch (err) {
+      failedModels[modelName] = {
+        reason: `Failed to load model: ${err}`,
+        err: err as Error,
+      };
+    }
+    return { loadedModels, failedModels };
+  }
+  public async addFromZip(zip: JSZip) {
     const modelFileRegEx = new RegExp(".json$|.weights.bin$");
     const models: Record<
       string,
@@ -82,6 +150,7 @@ class ClassifierHandler {
       }
     > = {};
     const failedModels: Record<string, { reason: string; err?: Error }> = {};
+    const loadedModels: SequentialClassifier[] = [];
 
     for await (const [fileName, file] of Object.entries(zip.files)) {
       if (!modelFileRegEx.test(fileName)) continue;
@@ -122,28 +191,39 @@ class ClassifierHandler {
           reason: "Missing '.bin' weights file.",
         };
       } else {
-        const model = new UploadedClassifier({
-          descFile: modelJson,
-          weightsFiles: [modelWeights],
-          name: modelName,
-          task: ModelTask.Classification,
-          graph: false,
-          pretrained: true,
-          trainable: true,
-        });
-
-        try {
-          await model.upload();
-          classifierHandler.addModel(model);
-        } catch (err) {
-          failedModels[modelName] = {
-            reason: "Model upload failed",
-            err: err as Error,
-          };
-          continue;
-        }
+        const result = await this.addFromFiles(modelJson, [modelWeights]);
+        loadedModels.push(...result.loadedModels);
+        Object.assign(failedModels, result.failedModels);
       }
     }
+    return { loadedModels, failedModels };
+  }
+  public async getSavedModelData() {
+    const userModels: SerializedModels = {};
+    for await (const modelName of this.getModelNames()) {
+      const model = classifierHandler.getModel(modelName);
+      const savedModelInfo = await model.getSavedModelFiles();
+      userModels[modelName] = {
+        modelJson: {
+          blob: savedModelInfo.modelJsonBlob,
+          fileName: savedModelInfo.modelJsonFileName,
+        },
+        modelWeights: {
+          blob: savedModelInfo.weightsBlob,
+          fileName: savedModelInfo.weightsFileName,
+        },
+      };
+    }
+    return userModels;
+  }
+  public zipModels() {
+    const zip = new JSZip();
+    const savedModelData = this.getSavedModelData();
+    Object.values(savedModelData).forEach((model) => {
+      zip.file(model.modelJson.fileName, model.modelJson.blob);
+      zip.file(model.modelWeights.fileName, model.modelWeights.blob);
+    });
+    return zip;
   }
 }
 

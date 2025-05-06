@@ -5,25 +5,29 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
 import { Model } from "utils/models/Model";
 
-import { ModelStatus } from "utils/models/enums";
+import JSZip from "jszip";
+import saveAs from "file-saver";
 
 type SaveFittedModelDialogProps = {
   model: Model;
-  modelStatus: ModelStatus;
   onClose: () => void;
   open: boolean;
 };
 
 export const SaveFittedModelDialog = ({
   model,
-  modelStatus,
   onClose,
   open,
 }: SaveFittedModelDialogProps) => {
   const [name, setName] = useState<string>(model.name);
-
+  const noNameError = name.length === 0;
   const onSaveClassifierClick = async () => {
-    await model.saveModel();
+    const modelBlobs = await model.getSavedModelFiles();
+    const zip = new JSZip();
+    zip.file(modelBlobs.modelJsonFileName, modelBlobs.modelJsonBlob);
+    zip.file(modelBlobs.weightsFileName, modelBlobs.weightsBlob);
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    saveAs(zipBlob, `${noNameError ? model.name : name}.zip`);
 
     onClose();
   };
@@ -46,23 +50,21 @@ export const SaveFittedModelDialog = ({
               id="name"
               label="Model Name"
               value={name}
-              defaultValue={model?.name}
               margin="dense"
               variant="standard"
               onChange={onNameChange}
               helperText={
-                modelStatus !== ModelStatus.Trained
-                  ? "There is no trained model that could be saved."
+                noNameError
+                  ? `No name given. Default name ${model.name} will be used.`
                   : ""
               }
-              error={modelStatus !== ModelStatus.Trained}
+              error={noNameError}
             />
           </Grid>
         </Grid>
       }
       onConfirm={onSaveClassifierClick}
       confirmText="Save"
-      confirmDisabled={modelStatus !== ModelStatus.Trained}
     />
   );
 };

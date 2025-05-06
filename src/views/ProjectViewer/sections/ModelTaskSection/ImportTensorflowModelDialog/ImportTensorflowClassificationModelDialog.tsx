@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 
 import {
   Box,
@@ -12,67 +12,58 @@ import {
 
 import { useHotkeys } from "hooks";
 
-import { LocalFileUpload } from "./LocalFileUpload";
-import { CloudUpload } from "./CloudUpload";
+import { LocalClassifierUpload } from "./LocalFileUpload";
+import { RemoteClassifierUpload } from "./CloudUpload";
 import { ModelFormatSelection } from "./ModelFormatSelection";
 
-import { Model } from "utils/models/Model";
-
-import { ModelTask } from "utils/models/enums";
 import { HotkeyContext } from "utils/enums";
 
-import { Shape } from "store/data/types";
 import { ToolTipTab } from "components/layout";
+import classifierHandler from "utils/models/classification/classifierHandler";
+import { SequentialClassifier } from "utils/models/classification";
+import { useDispatch, useSelector } from "react-redux";
+import { classifierSlice } from "store/classifier";
+import { selectActiveKindId } from "store/project/selectors";
 
 type ImportTensorflowClassificationModelDialogProps = {
   onClose: () => void;
-  loadedModel?: Model;
   open: boolean;
-  dispatchFunction: (model: Model, inputShape: Shape) => Promise<void>;
 };
 
 export const ImportTensorflowClassificationModelDialog = ({
   onClose,
-  loadedModel,
   open,
-  dispatchFunction,
 }: ImportTensorflowClassificationModelDialogProps) => {
-  const [selectedModel, setSelectedModel] = useState<Model | undefined>(
-    loadedModel?.name === "Fully Convolutional Network"
-      ? undefined
-      : loadedModel,
+  const dispatch = useDispatch();
+  const activeKindId = useSelector(selectActiveKindId);
+  const [uploadedModels, setUploadedModels] = useState<SequentialClassifier[]>(
+    [],
   );
-  const [inputShape, setInputShape] = useState<Shape>({
-    height: 256,
-    width: 256,
-    channels: 3,
-    planes: 1,
-  });
+
   const [isGraph, setIsGraph] = useState(false);
 
   const [tabVal, setTabVal] = useState("1");
   const [invalidModel, setInvalidModel] = useState(false);
 
-  const onModelChange = useCallback((model: Model | undefined) => {
-    setSelectedModel(model);
-  }, []);
-
-  const dispatchModelToStore = async () => {
-    if (!selectedModel) {
-      import.meta.env.NODE_ENV !== "production" &&
-        console.warn("Attempting to dispatch undefined model");
-      return;
+  const confirmUpload = async () => {
+    if (uploadedModels.length > 0) {
+      dispatch(
+        classifierSlice.actions.updateSelectedModelNameOrArch({
+          modelName: uploadedModels[0].name,
+          kindId: activeKindId,
+        }),
+      );
     }
-
-    await dispatchFunction(selectedModel, inputShape);
 
     setInvalidModel(false);
     onClose();
   };
 
-  const closeDialog = () => {
+  const cancelUpload = () => {
     setInvalidModel(false);
-    setSelectedModel(loadedModel);
+    uploadedModels.forEach((model) => {
+      classifierHandler.removeModel(model.name);
+    });
     onClose();
   };
 
@@ -83,15 +74,15 @@ export const ImportTensorflowClassificationModelDialog = ({
   useHotkeys(
     "enter",
     () => {
-      selectedModel && !invalidModel && dispatchModelToStore();
+      uploadedModels.length > 0 && !invalidModel && confirmUpload();
     },
     HotkeyContext.ConfirmationDialog,
 
-    [dispatchModelToStore, selectedModel, invalidModel],
+    [confirmUpload, uploadedModels, invalidModel],
   );
 
   return (
-    <Dialog fullWidth maxWidth="sm" onClose={closeDialog} open={open}>
+    <Dialog fullWidth maxWidth="sm" onClose={cancelUpload} open={open}>
       <DialogTitle>Load Classification model</DialogTitle>
 
       <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
@@ -105,32 +96,28 @@ export const ImportTensorflowClassificationModelDialog = ({
         </Box>
 
         <Box hidden={tabVal !== "1"}>
-          <LocalFileUpload
-            modelTask={ModelTask.Classification}
+          <LocalClassifierUpload
             isGraph={isGraph}
-            setModel={onModelChange}
-            setInputShape={setInputShape}
+            setUploadedModels={setUploadedModels}
           />
         </Box>
 
         <Box hidden={tabVal !== "2"}>
-          <CloudUpload
-            modelTask={ModelTask.Classification}
+          <RemoteClassifierUpload
             isGraph={isGraph}
-            setModel={onModelChange}
-            setInputShape={setInputShape}
+            setUploadedModels={setUploadedModels}
           />
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={closeDialog} color="primary">
+        <Button onClick={cancelUpload} color="primary">
           Cancel
         </Button>
 
         <Button
-          onClick={dispatchModelToStore}
+          onClick={confirmUpload}
           color="primary"
-          disabled={!selectedModel || invalidModel}
+          disabled={uploadedModels.length === 0 || invalidModel}
         >
           Open Classification model
         </Button>
