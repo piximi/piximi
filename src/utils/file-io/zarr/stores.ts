@@ -3,6 +3,7 @@ import { KeyError } from "zarr";
 import classifierHandler from "utils/models/classification/classifierHandler";
 import { AsyncStore, ValidStoreType } from "zarr/types/storage/types";
 import { SerializedModels } from "utils/models/types";
+import { SequentialClassifier } from "utils/models/classification";
 
 /**
  * Preserves (double) slashes earlier in the path, so this works better
@@ -160,12 +161,15 @@ export type CustomStore = FileStore | ZipStore;
 export const fListToStore = async (
   files: FileList | PseudoFileList,
   zipFile: boolean,
-): Promise<CustomStore> => {
+): Promise<{
+  fileStore: CustomStore;
+  loadedClassifiers: SequentialClassifier[];
+}> => {
   if (zipFile) {
     const file = files[0];
     const zip = await new JSZip().loadAsync(file);
 
-    classifierHandler.addFromZip(zip);
+    const classifiersResult = await classifierHandler.modelsFromZip(zip);
     // find folder of pattern "projectName.zarr/"
     const rootFile = zip.folder(/.*\.zarr\/$/);
 
@@ -176,7 +180,10 @@ export const fListToStore = async (
     // "projectName.zarr/" -> "projectName"
     const fileName = rootFile[0].name.split(".")[0];
 
-    return new ZipStore(fileName, zip);
+    return {
+      fileStore: new ZipStore(fileName, zip),
+      loadedClassifiers: classifiersResult.loadedModels,
+    };
   } else {
     const rootName = files[0].webkitRelativePath.split("/")[0];
 
@@ -196,7 +203,10 @@ export const fListToStore = async (
       fMap.set(file.webkitRelativePath, file);
     }
 
-    return new FileStore(fMap, rootName);
+    return {
+      fileStore: new FileStore(fMap, rootName),
+      loadedClassifiers: [],
+    };
   }
 };
 

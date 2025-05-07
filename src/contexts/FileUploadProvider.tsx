@@ -151,6 +151,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
     async (errors: string[]) => {
       delete fileInfo[ImageShapeEnum.InvalidImage];
       const uploadedFiles = Object.values(fileInfo).flat();
+      console.log(uploadedFiles);
 
       const convertedImages: ImageObject[] = [];
       for await (const fileInfo of uploadedFiles) {
