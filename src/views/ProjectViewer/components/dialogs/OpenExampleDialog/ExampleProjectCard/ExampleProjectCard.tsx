@@ -15,6 +15,7 @@ import { AlertType } from "utils/enums";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 
 import { AlertState } from "utils/types";
+import classifierHandler from "utils/models/classification/classifierHandler";
 
 // CloudFront distribution domain
 const DOMAIN = "https://dw9hr7pc3ofrm.cloudfront.net";
@@ -119,7 +120,10 @@ export const ExampleProjectCard = ({
         throw err;
       });
 
-    const fileStore = await fListToStore(exampleProjectFileList, true);
+    const { fileStore, loadedClassifiers } = await fListToStore(
+      exampleProjectFileList,
+      true,
+    );
 
     try {
       const deserializedProject = await deserializeProject(
@@ -132,7 +136,8 @@ export const ExampleProjectCard = ({
 
       batch(() => {
         // loadPercent will be set to 1 here
-
+        dispatch(projectSlice.actions.resetProject());
+        classifierHandler.addModels(loadedClassifiers);
         dispatch(dataSlice.actions.initializeState({ data }));
         dispatch(classifierSlice.actions.setDefaults());
         dispatch(

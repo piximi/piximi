@@ -6,8 +6,19 @@ import { SimpleCNN } from "./SimpleCNN";
 import { logger } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
 import { ModelTask } from "../enums";
-import { replaceDuplicateName } from "utils/stringUtils";
+import { getUniqueName } from "utils/stringUtils";
 import { SerializedModels } from "../types";
+
+export type ModelUploadResults = {
+  loadedModels: SequentialClassifier[];
+  failedModels: Record<
+    string,
+    {
+      reason: string;
+      err?: Error;
+    }
+  >;
+};
 
 class ClassifierHandler {
   readonly _availableClassifierArchitectures: [
@@ -55,7 +66,7 @@ class ClassifierHandler {
     modelName: string,
     architecture: 0 | 1,
   ): Promise<SequentialClassifier> {
-    modelName = replaceDuplicateName(modelName, this.getModelNames());
+    modelName = getUniqueName(modelName, this.getModelNames());
     try {
       const model = new this._availableClassifierArchitectures[architecture](
         modelName,
@@ -66,8 +77,18 @@ class ClassifierHandler {
       throw new Error("Failed to create Model.", { cause: err as Error });
     }
   }
-  public addModel(model: SequentialClassifier) {
-    this._availableClassificationModels[model.name] = model;
+  public addModels(
+    models: Record<string, SequentialClassifier> | Array<SequentialClassifier>,
+  ) {
+    if (Array.isArray(models)) {
+      models.forEach((model) => {
+        this._availableClassificationModels[model.name] = model;
+      });
+    } else {
+      Object.entries(models).forEach(([name, model]) => {
+        this._availableClassificationModels[name] = model;
+      });
+    }
   }
 
   public removeModel(modelName: string) {
@@ -75,7 +96,13 @@ class ClassifierHandler {
     model.dispose();
     delete this.availableClassificationModels[modelName];
   }
-  public async addFromFiles(
+  public removeAllModels() {
+    Object.values(this.availableClassificationModels).forEach((model) => {
+      model.dispose();
+    });
+    this._availableClassificationModels = {};
+  }
+  public async modelFromFiles(
     descFile: File,
     weightsFiles: File[],
     isGraph?: boolean,
@@ -84,12 +111,12 @@ class ClassifierHandler {
     const failedModels: Record<string, { reason: string; err?: Error }> = {};
     const loadedModels: SequentialClassifier[] = [];
     modelName = modelName ?? descFile.name.replace(/\..+$/, "");
-    const deDupedName = replaceDuplicateName(modelName, this.getModelNames());
+    const uniqueName = getUniqueName(modelName, this.getModelNames());
 
     const model = new UploadedClassifier({
       descFile,
       weightsFiles,
-      name: deDupedName,
+      name: uniqueName,
       task: ModelTask.Classification,
       graph: !!isGraph,
       pretrained: true,
@@ -97,7 +124,6 @@ class ClassifierHandler {
     });
     try {
       await model.upload();
-      classifierHandler.addModel(model);
       loadedModels.push(model);
     } catch (err) {
       failedModels[modelName] = {
@@ -108,17 +134,14 @@ class ClassifierHandler {
     return { loadedModels, failedModels };
   }
 
-  public async addFromUrl(
+  public async modelFromUrl(
     modelUrl: string,
     fromTFHub: boolean,
     isGraph: boolean,
   ) {
     const failedModels: Record<string, { reason: string; err?: Error }> = {};
     const loadedModels: SequentialClassifier[] = [];
-    const modelName = replaceDuplicateName(
-      "Remote-Classifier",
-      this.getModelNames(),
-    );
+    const modelName = getUniqueName("Remote-Classifier", this.getModelNames());
     const model = new RemoteClassifier({
       name: modelName,
       task: ModelTask.Classification,
@@ -140,7 +163,7 @@ class ClassifierHandler {
     }
     return { loadedModels, failedModels };
   }
-  public async addFromZip(zip: JSZip) {
+  public async modelsFromZip(zip: JSZip) {
     const modelFileRegEx = new RegExp(".json$|.weights.bin$");
     const models: Record<
       string,
@@ -191,7 +214,7 @@ class ClassifierHandler {
           reason: "Missing '.bin' weights file.",
         };
       } else {
-        const result = await this.addFromFiles(modelJson, [modelWeights]);
+        const result = await this.modelFromFiles(modelJson, [modelWeights]);
         loadedModels.push(...result.loadedModels);
         Object.assign(failedModels, result.failedModels);
       }
