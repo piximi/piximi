@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
-  Button,
-  Collapse,
+  IconButton,
   MenuItem,
   SelectChangeEvent,
   Stack,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useDialog, useDialogHotkey } from "hooks";
 import { SaveFittedModelDialog } from "components/dialogs";
 import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
@@ -87,6 +87,10 @@ export const ClassifierSection = () => {
     handleOpenEvaluateClassifierDialog,
     setWaitingForResults,
   ]);
+
+  useEffect(() => {
+    console.log(selectedModel);
+  }, [selectedModel]);
 
   return (
     <>
@@ -174,10 +178,11 @@ const ModelSelection = ({
   };
   return (
     <Stack
+      direction="row"
       width="100%"
       sx={(theme) => ({
         width: "100%",
-        py: 1,
+        py: 1.5,
         px: 0.5,
         borderTop: `1px solid ${theme.palette.divider}`,
         borderBottom: `1px solid ${theme.palette.divider}`,
@@ -187,7 +192,7 @@ const ModelSelection = ({
         label="Model:"
         labelProps={{
           variant: "body2",
-          sx: { mr: "1rem", whiteSpace: "nowrap" },
+          sx: { mr: "0.5rem", whiteSpace: "nowrap" },
         }}
         fullWidth={true}
       >
@@ -196,6 +201,7 @@ const ModelSelection = ({
           onChange={handleModelChange}
           fullWidth
           variant="standard"
+          disabled={classifierHandler.getModelNames().length === 0}
         >
           <MenuItem
             dense
@@ -222,27 +228,16 @@ const ModelSelection = ({
           ))}
         </StyledSelect>
       </WithLabel>
-      <Collapse in={!!selectedModel}>
-        <Stack direction="row-reverse" width="100%">
-          <TooltipWithDisable
-            title={"Delete the current model"}
-            placement="bottom"
-          >
-            <Button
-              onClick={handleDisposeModel}
-              disableFocusRipple
-              color="primary"
-              variant="text"
-              sx={(theme) => ({
-                fontSize: theme.typography.caption.fontSize,
-                backgroundColor: "transparent",
-              })}
-            >
-              Delete Model
-            </Button>
-          </TooltipWithDisable>
-        </Stack>
-      </Collapse>
+      <TooltipWithDisable title={"Delete the current model"} placement="bottom">
+        <IconButton
+          size="small"
+          sx={{ pr: 0 }}
+          onClick={handleDisposeModel}
+          disabled={!selectedModel}
+        >
+          <DeleteIcon sx={{ fontSize: "1.15rem" }} />
+        </IconButton>
+      </TooltipWithDisable>
     </Stack>
   );
 };

@@ -11,6 +11,8 @@ import { dataSlice } from "store/data/dataSlice";
 import { deserializeProject } from "utils/file-io/deserialize";
 import { fListToStore } from "utils/file-io/zarr/stores";
 
+import classifierHandler from "utils/models/classification/classifierHandler";
+
 import { AlertType } from "utils/enums";
 
 import { AlertState } from "utils/types";
@@ -53,7 +55,10 @@ export const OpenProjectMenuItem = ({
 
     const files = event.currentTarget.files;
 
-    const zarrStore = await fListToStore(files, zip);
+    const { fileStore: zarrStore, loadedClassifiers } = await fListToStore(
+      files,
+      zip,
+    );
 
     deserializeProject(zarrStore, onLoadProgress)
       .then((res) => {
@@ -73,7 +78,7 @@ export const OpenProjectMenuItem = ({
               project: res.project,
             }),
           );
-
+          classifierHandler.addModels(loadedClassifiers);
           dispatch(
             classifierSlice.actions.setClassifier({
               classifier: res.classifier,

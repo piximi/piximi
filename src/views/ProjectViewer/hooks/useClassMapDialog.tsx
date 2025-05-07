@@ -1,5 +1,7 @@
 import {
+  Autocomplete,
   Button,
+  createFilterOptions,
   Dialog,
   DialogActions,
   DialogContent,
@@ -8,6 +10,7 @@ import {
   MenuItem,
   SelectChangeEvent,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import React, { ReactElement, useEffect, useState } from "react";
@@ -22,6 +25,90 @@ import { isObjectEmpty } from "utils/objectUtils";
 import { CATEGORY_COLORS } from "store/data/constants";
 import { dataSlice } from "store/data";
 import { ModelClassMap } from "store/types";
+
+interface FilmOptionType {
+  inputValue?: string;
+  displayName: string;
+  id?: number;
+}
+const filter = createFilterOptions<FilmOptionType>();
+
+const FreeSoloCreateOption = ({
+  categories,
+}: {
+  categories: FilmOptionType[];
+}) => {
+  const [value, setValue] = React.useState<FilmOptionType | null>(null);
+
+  console.log(value);
+
+  return (
+    <Autocomplete
+      value={value}
+      onChange={(event, newValue) => {
+        if (typeof newValue === "string") {
+          setValue({
+            displayName: newValue,
+          });
+        } else if (newValue && newValue.inputValue) {
+          // Create a new value from the user input
+          setValue({
+            displayName: newValue.inputValue,
+          });
+        } else {
+          setValue(newValue);
+        }
+      }}
+      filterOptions={(options, params) => {
+        const filtered = filter(options, params);
+
+        const { inputValue } = params;
+        // Suggest the creation of a new value
+        const isExisting = options.some(
+          (option) => inputValue === option.displayName,
+        );
+        if (inputValue !== "" && !isExisting) {
+          filtered.push({
+            inputValue,
+            displayName: `Add "${inputValue}"`,
+          });
+        }
+
+        return filtered;
+      }}
+      selectOnFocus
+      clearOnBlur
+      handleHomeEndKeys
+      id="free-solo-with-text-demo"
+      options={categories}
+      getOptionLabel={(option) => {
+        // Value selected with enter, right from the input
+        if (typeof option === "string") {
+          return option;
+        }
+        // Add "xxx" option created dynamically
+        if (option.inputValue) {
+          return option.inputValue;
+        }
+        // Regular option
+        return option.displayName;
+      }}
+      renderOption={(props, option) => {
+        const { key, ...optionProps } = props;
+        return (
+          <li key={key} {...optionProps}>
+            {option.displayName}
+          </li>
+        );
+      }}
+      sx={{ width: 300 }}
+      freeSolo
+      renderInput={(params) => (
+        <TextField {...params} label="Free solo with text demo" />
+      )}
+    />
+  );
+};
 
 const ClassMapDialog = ({
   open,
@@ -137,6 +224,11 @@ const ClassMapDialog = ({
             Create from Model Classes
           </Button>
         </Stack>
+        <FreeSoloCreateOption
+          categories={projectCategories.map((cat, idx) => {
+            return { displayName: cat.name, id: idx } as FilmOptionType;
+          })}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={onDismiss}>Cancel</Button>

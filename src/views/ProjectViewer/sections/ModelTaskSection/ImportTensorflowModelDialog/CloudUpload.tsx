@@ -59,7 +59,7 @@ export const RemoteClassifierUpload = ({
     setErrMessage("");
     setSuccessMessage("");
 
-    const result = await classifierHandler.addFromUrl(
+    const result = await classifierHandler.modelFromUrl(
       modelUrl,
       isFromTFHub,
       isGraph,
@@ -71,6 +71,7 @@ export const RemoteClassifierUpload = ({
       );
     }
     if (result.loadedModels.length > 0) {
+      classifierHandler.addModels(result.loadedModels);
       setUploadedModels(result.loadedModels);
       setSuccessMessage(
         `Successfully uploaded Classification ${

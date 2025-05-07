@@ -18,7 +18,7 @@ import {
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "./constants";
 
-import { replaceDuplicateName } from "utils/stringUtils";
+import { getUniqueName } from "utils/stringUtils";
 import { mutatingFilter } from "utils/arrayUtils";
 
 import { PartialBy } from "utils/types";
@@ -640,7 +640,7 @@ export const dataSlice = createSlice({
           (id) => (state.things.entities[id]!.name as string).split(".")[0],
         );
 
-        let updatedNamePrefix = replaceDuplicateName(name, existingPrefixes);
+        let updatedNamePrefix = getUniqueName(name, existingPrefixes);
 
         if (ext) {
           updatedNamePrefix += `.${ext}`;
