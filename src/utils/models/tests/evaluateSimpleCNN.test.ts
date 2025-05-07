@@ -12,15 +12,23 @@ import {
 import { UploadedClassifier } from "../classification";
 import {
   ClassifierEvaluationResultType,
-  CropOptions,
-  FitOptions,
-  PreprocessSettings,
-  RescaleOptions,
+  // CropOptions,
+  // FitOptions,
+  // PreprocessSettings,
+  // RescaleOptions,
 } from "../types";
-import { CropSchema, ModelTask, Partition } from "../enums";
+import {
+  //CropSchema,
+  ModelTask,
+  Partition,
+} from "../enums";
 import { loadDataUrlAsStack } from "utils/file-io/utils";
 import { convertToImage } from "utils/tensorUtils";
-import { Category, ImageObject, Shape } from "store/data/types";
+import {
+  Category,
+  ImageObject,
+  // Shape
+} from "store/data/types";
 
 const categories: Array<Category> = [
   // {
@@ -111,35 +119,35 @@ const categories: Array<Category> = [
   },
 ];
 
-const inputShape: Shape = {
-  planes: 1,
-  height: 28,
-  width: 28,
-  channels: 1,
-};
+// const inputShape: Shape = {
+//   planes: 1,
+//   height: 28,
+//   width: 28,
+//   channels: 1,
+// };
 
-const rescaleOptions: RescaleOptions = {
-  rescale: true,
-  center: false,
-};
+// const rescaleOptions: RescaleOptions = {
+//   rescale: true,
+//   center: false,
+// };
 
-const cropOptions: CropOptions = {
-  numCrops: 1,
-  cropSchema: CropSchema.None,
-};
+// const cropOptions: CropOptions = {
+//   numCrops: 1,
+//   cropSchema: CropSchema.None,
+// };
 
-const preprocessOptions: PreprocessSettings = {
-  inputShape,
-  shuffle: true,
-  rescaleOptions,
-  cropOptions,
-  trainingPercentage: 100,
-};
+// const preprocessOptions: PreprocessSettings = {
+//   inputShape,
+//   shuffle: true,
+//   rescaleOptions,
+//   cropOptions,
+//   trainingPercentage: 100,
+// };
 
-const fitOptions: FitOptions = {
-  epochs: 2,
-  batchSize: 3,
-};
+// const fitOptions: FitOptions = {
+//   epochs: 2,
+//   batchSize: 3,
+// };
 
 const validationImagesUnloaded = [
   {

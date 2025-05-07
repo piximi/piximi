@@ -31,20 +31,20 @@ const TabContext = createContext<number>(0);
 
 export function CustomTabs(props: CommonTabsProps): JSX.Element;
 export function CustomTabs(
-  props: CommonTabsProps & ExtendableTabsProps
+  props: CommonTabsProps & ExtendableTabsProps,
 ): JSX.Element;
 
 export function CustomTabs(
-  props: CommonTabsProps & EditableTabsProps
+  props: CommonTabsProps & EditableTabsProps,
 ): JSX.Element;
 export function CustomTabs(
-  props: CommonTabsProps & EditableTabsProps & ExtendableTabsProps
+  props: CommonTabsProps & EditableTabsProps & ExtendableTabsProps,
 ): JSX.Element;
 
 export function CustomTabs(
   props: CommonTabsProps &
     Partial<ExtendableTabsProps> &
-    Partial<EditableTabsProps>
+    Partial<EditableTabsProps>,
 ): JSX.Element {
   const {
     children,
@@ -68,7 +68,7 @@ export function CustomTabs(
 
   const handleTabChange = (
     event: React.SyntheticEvent<Element, Event>,
-    newValue: number
+    newValue: number,
   ) => {
     setTabIndex(newValue);
     secondaryEffect && secondaryEffect(labels[newValue]);
@@ -105,7 +105,7 @@ export function CustomTabs(
             : handleTabClose(label);
         }
       },
-    [handleTabClose, labels, tabIndex, handleTabMin]
+    [handleTabClose, labels, tabIndex, handleTabMin],
   );
 
   const addClass = (children: JSX.Element[]) => {
@@ -217,7 +217,7 @@ export function CustomTabs(
       renderLabel,
       handleTabMin,
       persistentTabs,
-    ]
+    ],
   );
 
   useEffect(() => {
