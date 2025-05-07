@@ -88,10 +88,6 @@ export const ClassifierSection = () => {
     setWaitingForResults,
   ]);
 
-  useEffect(() => {
-    console.log(selectedModel);
-  }, [selectedModel]);
-
   return (
     <>
       <Box
@@ -192,9 +188,12 @@ const ModelSelection = ({
         label="Model:"
         labelProps={{
           variant: "body2",
-          sx: { mr: "0.5rem", whiteSpace: "nowrap" },
+          sx: {
+            mr: "0.5rem",
+            whiteSpace: "nowrap",
+          },
         }}
-        fullWidth={true}
+        sx={{ maxWidth: "calc(100% - 20px)" }}
       >
         <StyledSelect
           value={selectedModelName}
