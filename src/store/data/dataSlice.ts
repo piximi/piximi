@@ -535,8 +535,9 @@ export const dataSlice = createSlice({
     ) {
       const { things, isPermanent } = action.payload;
       for (const thing of things) {
-        const [name, ext] = thing.name!.split(".");
-
+        const splitName = thing.name!.split(".");
+        const ext = splitName.at(-1);
+        const name = splitName.slice(0, splitName.length - 1).join(".");
         const existingImageIds =
           state.kinds.entities[thing.kind]?.saved.containing ?? [];
 
