@@ -3,17 +3,24 @@ import "@tensorflow/tfjs-node";
 import { SequentialClassifier } from "../classification/AbstractClassifier/AbstractClassifier";
 
 import { fileFromPath } from "utils/file-io/nodeImageHelper";
+// import {
+//   CropOptions,
+//   FitOptions,
+//   PreprocessSettings,
+//   RescaleOptions,
+// } from "../types";
 import {
-  CropOptions,
-  FitOptions,
-  PreprocessSettings,
-  RescaleOptions,
-} from "../types";
-import { CropSchema, ModelTask } from "../enums";
+  //CropSchema,
+  ModelTask,
+} from "../enums";
 import { loadImageFileAsStack } from "utils/file-io/utils";
 import { convertToImage } from "utils/tensorUtils";
 import { MIMEType } from "utils/file-io/types";
-import { Category, ImageObject, Shape } from "store/data/types";
+import {
+  Category,
+  ImageObject,
+  // Shape
+} from "store/data/types";
 import { MIMETYPES } from "utils/file-io/enums";
 
 class GenericClassifier extends SequentialClassifier {
@@ -39,35 +46,35 @@ class GenericClassifier extends SequentialClassifier {
   }
 }
 
-const inputShape: Shape = {
-  planes: 1,
-  height: 224,
-  width: 224,
-  channels: 3,
-};
+// const inputShape: Shape = {
+//   planes: 1,
+//   height: 224,
+//   width: 224,
+//   channels: 3,
+// };
 
-const rescaleOptions: RescaleOptions = {
-  rescale: true,
-  center: false,
-};
+// const rescaleOptions: RescaleOptions = {
+//   rescale: true,
+//   center: false,
+// };
 
-const cropOptions: CropOptions = {
-  numCrops: 1,
-  cropSchema: CropSchema.None,
-};
+// const cropOptions: CropOptions = {
+//   numCrops: 1,
+//   cropSchema: CropSchema.None,
+// };
 
-const preprocessOptions: PreprocessSettings = {
-  inputShape,
-  shuffle: true,
-  rescaleOptions,
-  cropOptions,
-  trainingPercentage: 100,
-};
+// const preprocessOptions: PreprocessSettings = {
+//   inputShape,
+//   shuffle: true,
+//   rescaleOptions,
+//   cropOptions,
+//   trainingPercentage: 100,
+// };
 
-const fitOptions: FitOptions = {
-  epochs: 10,
-  batchSize: 32,
-};
+// const fitOptions: FitOptions = {
+//   epochs: 10,
+//   batchSize: 32,
+// };
 
 const categories: Array<Category> = [
   {

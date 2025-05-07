@@ -41,3 +41,25 @@ export const capitalize = (input: string) => {
   });
   return capitalized.join(" ");
 };
+
+export const formatString = (
+  string: string,
+  splitKey: string,
+  capitalize?: "first-word" | "every-word" | "every-letter",
+) => {
+  const splitString = string.split(splitKey);
+  if (!capitalize) return splitString.join(" ");
+  switch (capitalize) {
+    case "first-word":
+      splitString[0] =
+        splitString[0][0].toLocaleUpperCase() +
+        splitString[0].slice(1, splitString[0].length);
+      return splitString.join(" ");
+    case "every-word":
+      return splitString
+        .map((word) => word[0].toLocaleUpperCase() + word.slice(1, word.length))
+        .join(" ");
+    case "every-letter":
+      return splitString.join(" ").toLocaleUpperCase();
+  }
+};
