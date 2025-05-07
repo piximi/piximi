@@ -1,12 +1,15 @@
 import {
   Autocomplete,
   Button,
+  Checkbox,
   createFilterOptions,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControl,
+  FormControlLabel,
   MenuItem,
   SelectChangeEvent,
   Stack,
@@ -26,90 +29,6 @@ import { CATEGORY_COLORS } from "store/data/constants";
 import { dataSlice } from "store/data";
 import { ModelClassMap } from "store/types";
 
-interface FilmOptionType {
-  inputValue?: string;
-  displayName: string;
-  id?: number;
-}
-const filter = createFilterOptions<FilmOptionType>();
-
-const FreeSoloCreateOption = ({
-  categories,
-}: {
-  categories: FilmOptionType[];
-}) => {
-  const [value, setValue] = React.useState<FilmOptionType | null>(null);
-
-  console.log(value);
-
-  return (
-    <Autocomplete
-      value={value}
-      onChange={(event, newValue) => {
-        if (typeof newValue === "string") {
-          setValue({
-            displayName: newValue,
-          });
-        } else if (newValue && newValue.inputValue) {
-          // Create a new value from the user input
-          setValue({
-            displayName: newValue.inputValue,
-          });
-        } else {
-          setValue(newValue);
-        }
-      }}
-      filterOptions={(options, params) => {
-        const filtered = filter(options, params);
-
-        const { inputValue } = params;
-        // Suggest the creation of a new value
-        const isExisting = options.some(
-          (option) => inputValue === option.displayName,
-        );
-        if (inputValue !== "" && !isExisting) {
-          filtered.push({
-            inputValue,
-            displayName: `Add "${inputValue}"`,
-          });
-        }
-
-        return filtered;
-      }}
-      selectOnFocus
-      clearOnBlur
-      handleHomeEndKeys
-      id="free-solo-with-text-demo"
-      options={categories}
-      getOptionLabel={(option) => {
-        // Value selected with enter, right from the input
-        if (typeof option === "string") {
-          return option;
-        }
-        // Add "xxx" option created dynamically
-        if (option.inputValue) {
-          return option.inputValue;
-        }
-        // Regular option
-        return option.displayName;
-      }}
-      renderOption={(props, option) => {
-        const { key, ...optionProps } = props;
-        return (
-          <li key={key} {...optionProps}>
-            {option.displayName}
-          </li>
-        );
-      }}
-      sx={{ width: 300 }}
-      freeSolo
-      renderInput={(params) => (
-        <TextField {...params} label="Free solo with text demo" />
-      )}
-    />
-  );
-};
-
 const ClassMapDialog = ({
   open,
   modelClasses,
@@ -126,25 +45,31 @@ const ClassMapDialog = ({
   const dispatch = useDispatch();
   const [catMap, setCatMap] = useState<ModelClassMap>({});
   const [assignedClasses, setAssignedClasses] = useState<string[]>([]);
+  const [shouldCreateCategories, setShouldCreateCategories] = useState<boolean>(
+    projectCategories.length === 0,
+  );
   const activeKindId = useSelector(selectActiveKindId);
   const availableCategoryColors = useSelector(selectAvaliableCategoryColors);
 
-  const createNewCategories = () => {
-    const newCategories: Category[] = [];
-    const classMap: ModelClassMap = {};
-    modelClasses.forEach((className, idx) => {
-      let color = availableCategoryColors.pop();
-      if (!color) {
-        const choices = Object.values(CATEGORY_COLORS);
-        color = choices[getRandomInt(0, choices.length)] as string;
-      }
-      const cat = generateCategory(className, activeKindId, color);
-      newCategories.push(cat);
-      classMap[idx] = cat.id;
-    });
-
-    dispatch(dataSlice.actions.addCategories({ categories: newCategories }));
-    onConfirm(classMap);
+  const handleConfirmation = () => {
+    if (shouldCreateCategories) {
+      const newCategories: Category[] = [];
+      const confirmedCatMap: ModelClassMap = {};
+      modelClasses.forEach((className, idx) => {
+        let color = availableCategoryColors.pop();
+        if (!color) {
+          const choices = Object.values(CATEGORY_COLORS);
+          color = choices[getRandomInt(0, choices.length)] as string;
+        }
+        const cat = generateCategory(className, activeKindId, color);
+        newCategories.push(cat);
+        confirmedCatMap[idx] = cat.id;
+      });
+      dispatch(dataSlice.actions.addCategories({ categories: newCategories }));
+      onConfirm(confirmedCatMap);
+    } else {
+      onConfirm(catMap);
+    }
   };
 
   const handleSelectChange = (
@@ -177,7 +102,7 @@ const ClassMapDialog = ({
         </DialogContentText>
         <Stack sx={{ maxHeight: "400px", overflowY: "scroll", px: 2, py: 2 }}>
           {modelClasses.length > 0 ? (
-            Object.keys(modelClasses).map((idx) => (
+            Object.values(modelClasses).map((idx) => (
               <Stack
                 key={`model-class-${idx}`}
                 direction="row"
@@ -188,6 +113,7 @@ const ClassMapDialog = ({
                 <StyledSelect
                   value={catMap[+idx]}
                   onChange={(event) => handleSelectChange(event, +idx)}
+                  disabled={shouldCreateCategories}
                 >
                   {projectCategories.map((category) => (
                     <MenuItem
@@ -217,26 +143,34 @@ const ClassMapDialog = ({
           )}
         </Stack>
         <Stack direction="row" justifyContent="center">
-          <Button
-            onClick={createNewCategories}
-            sx={{ fontSize: (theme) => theme.typography.body2.fontSize }}
-          >
-            Create from Model Classes
-          </Button>
+          <FormControl size="small">
+            <FormControlLabel
+              sx={(theme) => ({
+                fontSize: theme.typography.body2.fontSize,
+                width: "max-content",
+                ml: 0,
+              })}
+              control={
+                <Checkbox
+                  checked={shouldCreateCategories}
+                  onChange={() => setShouldCreateCategories((value) => !value)}
+                  color="primary"
+                />
+              }
+              label="Create new categories from model classes?"
+              disableTypography
+              disabled={projectCategories.length === 0}
+            />
+          </FormControl>
         </Stack>
-        <FreeSoloCreateOption
-          categories={projectCategories.map((cat, idx) => {
-            return { displayName: cat.name, id: idx } as FilmOptionType;
-          })}
-        />
       </DialogContent>
       <DialogActions>
         <Button onClick={onDismiss}>Cancel</Button>
         <Button
           color="primary"
           variant="contained"
-          onClick={() => onConfirm(catMap)}
-          disabled={isObjectEmpty(catMap)}
+          onClick={handleConfirmation}
+          disabled={!shouldCreateCategories && isObjectEmpty(catMap)}
         >
           Confirm
         </Button>
