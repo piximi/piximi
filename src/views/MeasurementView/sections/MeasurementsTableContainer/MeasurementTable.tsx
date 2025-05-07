@@ -88,7 +88,7 @@ export const MeasurementTable = ({
         });
         return measurementRows;
       },
-      []
+      [],
     );
   }, [tableMeasurements]);
 
