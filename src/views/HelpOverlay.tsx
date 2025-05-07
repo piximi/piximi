@@ -1,3 +1,4 @@
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Card,
@@ -5,22 +6,22 @@ import {
   CardContent,
   CardHeader,
   GlobalStyles,
-  List,
+  //List,
   Snackbar,
   Typography,
   useTheme,
 } from "@mui/material";
+import { MuiMarkdown, getOverrides } from "mui-markdown";
 import { Lock as LockIcon } from "@mui/icons-material";
 import { useHelp } from "contexts";
-import React, { useEffect, useMemo, useState } from "react";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+//import Markdown from "react-markdown";
+//import remarkGfm from "remark-gfm";
 import {
   helpContent,
   HelpItem,
 } from "components/layout/HelpDrawer/HelpContent";
-import { formatString, logger } from "utils/common/helpers";
-import { MuiMarkdown, getOverrides } from "mui-markdown";
+import { logger } from "utils/logUtils";
+import { formatString } from "utils/stringUtils";
 
 const HelpOverlay = () => {
   const muiTheme = useTheme();
@@ -127,7 +128,7 @@ const HelpOverlay = () => {
         })}
       />
     ),
-    [helpMode, priorityHelp]
+    [helpMode, priorityHelp],
   );
 
   return (
