@@ -6,6 +6,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data";
 import { projectSlice } from "./projectSlice";
 
+import classifierHandler from "utils/models/classification/classifierHandler";
 import { TypedAppStartListening } from "store/types";
 
 export const projectMiddleware = createListenerMiddleware();
@@ -16,6 +17,13 @@ startAppListening({
   actionCreator: applicationSettingsSlice.actions.resetApplicationState,
   effect: (action, listenerAPI) => {
     listenerAPI.dispatch(projectSlice.actions.resetProject());
+  },
+});
+
+startAppListening({
+  actionCreator: projectSlice.actions.resetProject,
+  effect: () => {
+    classifierHandler.removeAllModels();
   },
 });
 

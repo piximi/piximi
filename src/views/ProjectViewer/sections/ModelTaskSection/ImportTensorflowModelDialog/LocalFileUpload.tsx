@@ -12,7 +12,9 @@ import { FileOpen as FileOpenIcon } from "@mui/icons-material";
 import { SequentialClassifier } from "utils/models/classification";
 
 import JSZip from "jszip";
-import classifierHandler from "utils/models/classification/classifierHandler";
+import classifierHandler, {
+  ModelUploadResults,
+} from "utils/models/classification/classifierHandler";
 import { isObjectEmpty } from "utils/objectUtils";
 
 //TODO: MenuItem??
@@ -29,47 +31,6 @@ export const LocalClassifierUpload = ({
   const [errMessage, setErrMessage] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
 
-  const loadZip = async (zip: JSZip) => {
-    const result = await classifierHandler.addFromZip(zip);
-    if (!isObjectEmpty(result.failedModels)) {
-      setErrMessage(
-        `Failed to upload models: ${Object.keys(result.failedModels!).join(", ")}`,
-      );
-    }
-    if (result.loadedModels.length > 0) {
-      setUploadedModels(result.loadedModels);
-      setSuccessMessage(
-        `Successfully uploaded Classification ${
-          isGraph ? "Graph" : "Layers"
-        } Models: "${result.loadedModels.map((model) => model.name).join(", ")}"`,
-      );
-    }
-  };
-
-  const loadModel = async (descFile: File, weightsFiles: Array<File>) => {
-    setErrMessage("");
-    setSuccessMessage("");
-
-    const result = await classifierHandler.addFromFiles(
-      descFile,
-      weightsFiles,
-      isGraph,
-    );
-    if (!isObjectEmpty(result.failedModels)) {
-      setErrMessage(
-        `Failed to upload models: ${Object.keys(result.failedModels!).join(", ")}`,
-      );
-    }
-    if (result.loadedModels.length > 0) {
-      setUploadedModels(result.loadedModels);
-      setSuccessMessage(
-        `Successfully uploaded Classification ${
-          isGraph ? "Graph" : "Layers"
-        } Models: "${result.loadedModels.map((model) => model.name).join(", ")}"`,
-      );
-    }
-  };
-
   const handleFilesSelected = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -77,13 +38,16 @@ export const LocalClassifierUpload = ({
     const files = event.currentTarget.files;
     if (!files) {
       return;
-    } else if (files.length === 1 && files[0].type === "application/zip") {
+    }
+    let results: ModelUploadResults;
+
+    if (files.length === 1 && files[0].type === "application/zip") {
       const file = files[0];
       const zipFile = await new JSZip().loadAsync(file);
-      await loadZip(zipFile);
-    } else if (files.length >= 2) {
+      results = await classifierHandler.modelsFromZip(zipFile);
+    } else {
       const weightsFiles: Array<File> = [];
-      let jsonFile = files[0];
+      let jsonFile: File | undefined;
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         if (file.name.endsWith(".json")) {
@@ -93,13 +57,33 @@ export const LocalClassifierUpload = ({
         }
       }
 
-      await loadModel(jsonFile, weightsFiles);
-      setErrMessage("");
-    } else {
-      setErrMessage(
-        "Must include model description (.json) and at least one weights file (.bin)",
+      if (!jsonFile || weightsFiles.length === 0) {
+        setErrMessage(
+          "Must include model description (.json) and at least one weights file (.bin)",
+        );
+        return;
+      }
+
+      results = await classifierHandler.modelFromFiles(
+        jsonFile,
+        weightsFiles,
+        isGraph,
       );
-      return;
+      setErrMessage("");
+    }
+    if (!isObjectEmpty(results.failedModels)) {
+      setErrMessage(
+        `Failed to upload models: ${Object.keys(results.failedModels!).join(", ")}`,
+      );
+    }
+    if (results.loadedModels.length > 0) {
+      classifierHandler.addModels(results.loadedModels);
+      setUploadedModels(results.loadedModels);
+      setSuccessMessage(
+        `Successfully uploaded Classification ${
+          isGraph ? "Graph" : "Layers"
+        } Models: "${results.loadedModels.map((model) => model.name).join(", ")}"`,
+      );
     }
   };
 
