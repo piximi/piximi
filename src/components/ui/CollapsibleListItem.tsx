@@ -10,7 +10,7 @@ import {
   KeyboardArrowRight as KeyboardArrowRightIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
 } from "@mui/icons-material";
-import { HTMLDataAttributes } from "utils/common/types";
+import { HTMLDataAttributes } from "utils/types";
 
 const heights = {
   sm: "1.5rem",

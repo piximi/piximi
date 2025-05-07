@@ -31,7 +31,7 @@ export const ImageViewerCategories = () => {
   const categoriesByKind = useSelector(selectCategoriesByKind);
   const categoriesByKindArray = useMemo(
     () => Object.values(categoriesByKind),
-    [categoriesByKind]
+    [categoriesByKind],
   );
   const kindDict = useSelector(selectImageViewerKinds);
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);
@@ -64,33 +64,33 @@ export const ImageViewerCategories = () => {
 
   const handleToggleKindVisibility = (
     event: React.MouseEvent,
-    kindId: string
+    kindId: string,
   ) => {
     event.stopPropagation();
     const categories = categoriesByKind[kindId].categories;
     if (filteredKinds.includes(kindId)) {
       setFilteredKinds(
-        filteredKinds.filter((hiddenKind) => hiddenKind !== kindId)
+        filteredKinds.filter((hiddenKind) => hiddenKind !== kindId),
       );
 
       dispatch(
         imageViewerSlice.actions.removeFilters({
           categoryIds: categories.map((category) => category.id),
-        })
+        }),
       );
     } else {
       setFilteredKinds([...filteredKinds, kindId]);
       dispatch(
         imageViewerSlice.actions.addFilters({
           categoryIds: categories.map((category) => category.id),
-        })
+        }),
       );
     }
   };
 
   const handleOpenCreateCategoryOfKind = (
     event: React.MouseEvent,
-    kind: string
+    kind: string,
   ) => {
     event.stopPropagation();
     setSelectedKind(kind);
@@ -109,7 +109,7 @@ export const ImageViewerCategories = () => {
           containing: [],
           visible: true,
         },
-      })
+      }),
     );
   };
 
@@ -122,7 +122,7 @@ export const ImageViewerCategories = () => {
       annotatorSlice.actions.editKindName({
         kindId,
         displayName: newDisplayName,
-      })
+      }),
     );
   };
 
@@ -144,9 +144,9 @@ export const ImageViewerCategories = () => {
     dispatch(
       annotatorSlice.actions.deleteThings({
         things: kindDict[kindId].containing.map(
-          (thingId) => things[thingId] as DecodedAnnotationObject
+          (thingId) => things[thingId] as DecodedAnnotationObject,
         ),
-      })
+      }),
     );
   };
 

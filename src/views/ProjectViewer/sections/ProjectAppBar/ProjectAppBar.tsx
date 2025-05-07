@@ -29,12 +29,10 @@ import {
 import { useDialogHotkey, useHotkeys, useMenu, useMobileView } from "hooks";
 import { useThingSelection } from "../../hooks";
 
-import { LogoLoader } from "components/ui/logo";
-import { TooltipTitle } from "components/ui/tooltips";
+import { LogoLoader, AlertBar } from "components/ui";
+import { TooltipTitle, TooltipButton } from "components/ui/tooltips";
 import { CustomAppBar } from "components/layout";
-import { AlertBar } from "components/ui/AlertBar";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { TooltipButton } from "components/ui/tooltips/TooltipButton";
 import { SortSelection } from "views/ProjectViewer/sections/SortSelection";
 import { TextFieldWithBlur } from "components/inputs";
 import { ImageCategoryMenu } from "./ImageCategoryMenu";
