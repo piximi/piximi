@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { IconButton, Tooltip, Typography } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 
-import { LogoLoader } from "components/ui/logo";
+import { LogoLoader } from "components/ui";
 import { CustomAppBar } from "components/layout";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
