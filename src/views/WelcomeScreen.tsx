@@ -5,10 +5,12 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  Input,
   List,
   ListItem,
   Palette,
   Stack,
+  styled,
   Typography,
 } from "@mui/material";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
@@ -16,12 +18,35 @@ import { CollapsibleList } from "components/ui";
 import { Logo } from "components/ui";
 import { useDialog, useDialogHotkey, usePreferredMuiTheme } from "hooks";
 import { useNavigate } from "react-router-dom";
-import { HotkeyContext } from "utils/enums";
+import { AlertType, HotkeyContext } from "utils/enums";
 import { logger } from "utils/logUtils";
 import { ExampleProjectDialog } from "views/ProjectViewer/components/dialogs";
+import { batch, useDispatch } from "react-redux";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { fListToStore } from "utils/file-io/zarr/stores";
+import { deserializeProject } from "utils/file-io/deserialize";
+import { projectSlice } from "store/project";
+import { dataSlice } from "store/data";
+import classifierHandler from "utils/models/classification/classifierHandler";
+import { classifierSlice } from "store/classifier";
+import { segmenterSlice } from "store/segmenter";
+import { AlertState } from "utils/types";
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
 
 export const WelcomeScreen = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const theme = usePreferredMuiTheme();
   const {
     onClose: handleCloseCloseExampleProjectDialog,
@@ -49,7 +74,7 @@ export const WelcomeScreen = () => {
       <List>
         {groups.map((group) => {
           return typeof theme.palette[group] === "object" ? (
-            <CollapsibleList primary={group} dense disablePadding>
+            <CollapsibleList key={group} primary={group} dense disablePadding>
               {Object.entries(theme.palette[group])
                 .filter((entry) => typeof entry[1] === "string")
                 .map((item, idx) => (
@@ -69,7 +94,7 @@ export const WelcomeScreen = () => {
                 ))}
             </CollapsibleList>
           ) : (
-            <ListItem>
+            <ListItem key={group}>
               <Typography>{group}</Typography>
               <Box
                 marginLeft={2}
@@ -100,6 +125,89 @@ export const WelcomeScreen = () => {
   const handleNewProject = () => {
     navigate("/project", { state: { init: true } });
   };
+  const handleOpenProject = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    event.persist();
+    navigate("/project", { state: { init: true } });
+    if (!event.currentTarget.files) return;
+    const files = event.currentTarget.files;
+
+    // set indefinite loading
+    dispatch(
+      applicationSettingsSlice.actions.setLoadPercent({
+        loadPercent: -1,
+        loadMessage: "deserializing project...",
+      }),
+    );
+
+    const { fileStore: zarrStore, loadedClassifiers } = await fListToStore(
+      files,
+      files.length === 1 && files[0].type === "application/zip",
+    );
+    const onLoadProgress = (loadPercent: number, loadMessage: string) => {
+      dispatch(
+        applicationSettingsSlice.actions.sendLoadPercent({
+          loadPercent,
+          loadMessage,
+        }),
+      );
+    };
+    deserializeProject(zarrStore, onLoadProgress)
+      .then((res) => {
+        if (!res) return;
+        batch(() => {
+          // indefinite load until dispatches complete
+          dispatch(
+            applicationSettingsSlice.actions.setLoadPercent({
+              loadPercent: -1,
+            }),
+          );
+          dispatch(projectSlice.actions.resetProject());
+          dispatch(dataSlice.actions.initializeState({ data: res.data }));
+          // loadPerecnt set to 1 here
+          dispatch(
+            projectSlice.actions.setProject({
+              project: res.project,
+            }),
+          );
+          classifierHandler.addModels(loadedClassifiers);
+          dispatch(
+            classifierSlice.actions.setClassifier({
+              classifier: res.classifier,
+            }),
+          );
+
+          dispatch(
+            segmenterSlice.actions.setSegmenter({
+              segmenter: res.segmenter,
+            }),
+          );
+          dispatch(
+            applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 }),
+          );
+        });
+      })
+      .catch((err: Error) => {
+        import.meta.env.NODE_ENV !== "production" &&
+          import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+          console.error(err);
+
+        const warning: AlertState = {
+          alertType: AlertType.Warning,
+          name: "Could not parse project file",
+          description: `Error while parsing the project file: ${err.name}\n${err.message}`,
+        };
+
+        dispatch(
+          applicationSettingsSlice.actions.updateAlertState({
+            alertState: warning,
+          }),
+        );
+      });
+
+    event.target.value = "";
+  };
 
   return (
     <Box
@@ -119,22 +227,47 @@ export const WelcomeScreen = () => {
       >
         <Logo width={500} height={100} />
         <Stack spacing={2} sx={{ mt: 4 }}>
-          <Button
-            data-help={HelpItem.StartNewProject}
-            onClick={handleNewProject}
-            variant="outlined"
-            color="primary"
-          >
-            Start New Project
-          </Button>
-          <Button
-            data-help={HelpItem.OpenExampleProject}
-            onClick={handleOpenExampleProjectDialog}
-            variant="outlined"
-            color="primary"
-          >
-            Open Example Project
-          </Button>
+          <Stack direction="row" spacing={2}>
+            <Button
+              data-help={HelpItem.StartNewProject}
+              onClick={handleNewProject}
+              variant="outlined"
+              color="primary"
+            >
+              Start New Project
+            </Button>
+            <Button
+              component="label"
+              role={undefined}
+              variant="outlined"
+              tabIndex={-1}
+            >
+              Upload Project
+              <VisuallyHiddenInput
+                type="file"
+                accept=".zarr, application/zip"
+                onChange={handleOpenProject}
+                multiple
+              />
+            </Button>
+
+            <Button
+              data-help={HelpItem.OpenProject}
+              onClick={handleOpenExampleProjectDialog}
+              variant="outlined"
+              color="primary"
+            >
+              Open Example Project
+            </Button>
+            <Button
+              data-help={HelpItem.OpenExampleProject}
+              onClick={handleOpenExampleProjectDialog}
+              variant="outlined"
+              color="primary"
+            >
+              Open Example Project
+            </Button>
+          </Stack>
           <Button
             data-help={HelpItem.Documentation}
             component="a"
