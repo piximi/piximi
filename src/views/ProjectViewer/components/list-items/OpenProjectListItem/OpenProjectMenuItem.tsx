@@ -28,15 +28,6 @@ export const OpenProjectMenuItem = ({
 }: OpenProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onLoadProgress = (loadPercent: number, loadMessage: string) => {
-    dispatch(
-      applicationSettingsSlice.actions.sendLoadPercent({
-        loadPercent,
-        loadMessage,
-      }),
-    );
-  };
-
   const onOpenProject = async (
     event: React.ChangeEvent<HTMLInputElement>,
     zip: boolean,
@@ -44,6 +35,7 @@ export const OpenProjectMenuItem = ({
     event.persist();
 
     if (!event.currentTarget.files) return;
+    const files = event.currentTarget.files;
 
     // set indefinite loading
     dispatch(
@@ -53,13 +45,18 @@ export const OpenProjectMenuItem = ({
       }),
     );
 
-    const files = event.currentTarget.files;
-
     const { fileStore: zarrStore, loadedClassifiers } = await fListToStore(
       files,
       zip,
     );
-
+    const onLoadProgress = (loadPercent: number, loadMessage: string) => {
+      dispatch(
+        applicationSettingsSlice.actions.sendLoadPercent({
+          loadPercent,
+          loadMessage,
+        }),
+      );
+    };
     deserializeProject(zarrStore, onLoadProgress)
       .then((res) => {
         if (!res) return;
