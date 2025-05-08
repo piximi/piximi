@@ -7,6 +7,7 @@ import { ExampleProjectDialog } from "../../dialogs";
 import { OpenProjectMenuItem } from "./OpenProjectMenuItem";
 
 import { HotkeyContext } from "utils/enums";
+import { useConfirmReplaceDialog } from "views/ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 
 type OpenProjectMenuProps = {
   anchorEl: HTMLElement | null;
@@ -24,10 +25,17 @@ export const OpenProjectMenu = ({
     onOpen: handleOpenExampleProjectDialog,
     open: ExampleProjectOpen,
   } = useDialogHotkey(HotkeyContext.ExampleProjectDialog);
+  const { getConfirmation } = useConfirmReplaceDialog();
 
   const handleCloseDialog = () => {
     handleCloseCloseExampleProjectDialog();
     onClose();
+  };
+
+  const handleConfirmedOpenExampleProjectDialog = async () => {
+    const confirmation = await getConfirmation({});
+    if (!confirmation) return;
+    handleOpenExampleProjectDialog();
   };
 
   return (
@@ -46,7 +54,7 @@ export const OpenProjectMenu = ({
         }}
       >
         <OpenProjectMenuItem onMenuClose={onClose} />
-        <MenuItem onClick={handleOpenExampleProjectDialog} dense>
+        <MenuItem onClick={handleConfirmedOpenExampleProjectDialog} dense>
           Example Project
         </MenuItem>
       </Menu>
