@@ -30,6 +30,7 @@ import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSett
 import { StyledSelect } from "components/inputs";
 import { WithLabel } from "components/inputs";
 import { useNumberField } from "hooks";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 const RowColInputOptions = { min: 20 };
 const InputShapeField = ({ disabled }: { disabled: boolean }) => {
@@ -124,6 +125,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
       fullWidth
     >
       <FormLabel
+        data-help={HelpItem.InputShape}
         sx={(theme) => ({
           fontSize: theme.typography.body2.fontSize,
           mr: "1rem",
@@ -211,6 +213,7 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
   return (
     <Stack direction="row" gap={2}>
       <WithLabel
+        data-help={HelpItem.CropOptions}
         label="Crop Type:"
         labelProps={{
           variant: "body2",
@@ -299,6 +302,7 @@ export const ImageAugmentationSettings = () => {
             <CropSection disabled={!rescalable || !!selectedModel} />
             <FormControl size="small">
               <FormControlLabel
+                data-help={HelpItem.PixelIntensityRescale}
                 sx={(theme) => ({
                   fontSize: theme.typography.body2.fontSize,
                   width: "max-content",
