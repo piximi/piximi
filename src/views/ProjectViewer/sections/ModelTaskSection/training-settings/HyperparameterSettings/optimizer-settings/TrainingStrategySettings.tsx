@@ -13,6 +13,7 @@ import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSett
 import { WithLabel } from "components/inputs";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { useNumberField } from "hooks";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const TrainingStrategySettings = () => {
   const dispatch = useDispatch();
@@ -85,6 +86,7 @@ export const TrainingStrategySettings = () => {
       <Stack sx={{ pl: 2 }}>
         <Stack direction="row" gap={2} sx={{ pt: 1 }}>
           <WithLabel
+            data-help={HelpItem.Epochs}
             label="Epochs:"
             labelProps={{
               variant: "body2",
@@ -102,6 +104,7 @@ export const TrainingStrategySettings = () => {
           </WithLabel>
           <Collapse in={showAdvanced}>
             <WithLabel
+              data-help={HelpItem.BatchSize}
               label="Batch Size:"
               labelProps={{
                 variant: "body2",
