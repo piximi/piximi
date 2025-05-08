@@ -121,7 +121,7 @@
     "no-console-logs": "./scripts/checkConsoleLogs.sh",
     "bump": "node ./scripts/bump.js",
     "lint": "./scripts/lint.sh",
-    "format-check": "prettier --cache --check 'src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'",
+    "format-check": "prettier --cache --check 'src/**/*.{js,jsx,ts,tsx,json,scss,md}'",
     "format-write": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'"
   },
   "browserslist": {
