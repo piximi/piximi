@@ -11,7 +11,10 @@ import { TooltipButton } from "components/ui/tooltips/TooltipButton";
 import { ModelStatus } from "utils/models/enums";
 import { useSelector } from "react-redux";
 import { selectClassifierModel } from "store/classifier/reselectors";
-import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import {
+  ErrorReason,
+  useClassifierStatus,
+} from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { selectActiveUnlabeledThingsIds } from "store/project/reselectors";
 
 export const ModelExecButtonGroup = ({
@@ -28,7 +31,7 @@ export const ModelExecButtonGroup = ({
 }) => {
   const selectedModel = useSelector(selectClassifierModel);
   const unlabeledThings = useSelector(selectActiveUnlabeledThingsIds);
-  const { modelStatus } = useClassifierStatus();
+  const { modelStatus, error } = useClassifierStatus();
 
   const predictHelperText = useMemo(() => {
     switch (modelStatus) {
@@ -69,9 +72,10 @@ export const ModelExecButtonGroup = ({
       !selectedModel ||
       !selectedModel.pretrained ||
       modelStatus !== ModelStatus.Idle ||
-      unlabeledThings.length === 0
+      unlabeledThings.length === 0 ||
+      error?.reason === ErrorReason.ChannelMismatch
     );
-  }, [selectedModel, modelStatus, unlabeledThings]);
+  }, [selectedModel, modelStatus, unlabeledThings, error]);
 
   return (
     <Box width="100%" display="flex" justifyContent={"space-evenly"}>
