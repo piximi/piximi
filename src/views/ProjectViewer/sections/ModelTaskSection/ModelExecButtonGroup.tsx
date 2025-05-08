@@ -10,7 +10,10 @@ import { TooltipButton } from "components/ui/tooltips/TooltipButton";
 
 import { ModelStatus } from "utils/models/enums";
 import { useSelector } from "react-redux";
-import { selectClassifierModel } from "store/classifier/reselectors";
+import {
+  selectClassifierEvaluationResult,
+  selectClassifierModel,
+} from "store/classifier/reselectors";
 import {
   ErrorReason,
   useClassifierStatus,
@@ -31,6 +34,7 @@ export const ModelExecButtonGroup = ({
 }) => {
   const selectedModel = useSelector(selectClassifierModel);
   const unlabeledThings = useSelector(selectActiveUnlabeledThingsIds);
+  const evaluationResults = useSelector(selectClassifierEvaluationResult);
   const { modelStatus, error } = useClassifierStatus();
 
   const predictHelperText = useMemo(() => {
@@ -109,7 +113,11 @@ export const ModelExecButtonGroup = ({
         tooltipTitle={evaluateHelperText}
         disableRipple
         onClick={handleEvaluate}
-        disabled={!selectedModel || !selectedModel.pretrained}
+        disabled={
+          !selectedModel ||
+          !selectedModel.pretrained ||
+          !evaluationResults.length
+        }
       >
         {modelStatus === ModelStatus.Evaluating ? (
           <CircularProgress
