@@ -6,15 +6,18 @@ import {
   OpenProjectListItem,
   SaveProjectListItem,
 } from "./list-items";
+import { ConfirmReplaceDialogProvider } from "../hooks/useConfirmReplaceProjectDialog";
 
 export const FileIO = () => {
   return (
-    <List dense>
-      <NewProjectListItem />
+    <ConfirmReplaceDialogProvider>
+      <List dense>
+        <NewProjectListItem />
 
-      <OpenProjectListItem />
+        <OpenProjectListItem />
 
-      <SaveProjectListItem />
-    </List>
+        <SaveProjectListItem />
+      </List>
+    </ConfirmReplaceDialogProvider>
   );
 };
