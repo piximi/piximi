@@ -178,6 +178,7 @@ const ModelSelection = ({
       width="100%"
       sx={(theme) => ({
         width: "100%",
+        justifyContent: "space-between",
         py: 1.5,
         px: 0.5,
         borderTop: `1px solid ${theme.palette.divider}`,
@@ -193,7 +194,7 @@ const ModelSelection = ({
             whiteSpace: "nowrap",
           },
         }}
-        sx={{ maxWidth: "calc(100% - 20px)" }}
+        sx={{ maxWidth: "calc(100% - 23px)" }}
       >
         <StyledSelect
           value={selectedModelName}
