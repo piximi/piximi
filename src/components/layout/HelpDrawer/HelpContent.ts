@@ -3,56 +3,67 @@ export enum HelpContext {
   ProjectView = "project-view",
 }
 export enum HelpItem {
-  StartNewProject = "start-new-project",
-  OpenProject = "open-project",
-  OpenExampleProject = "open-example-project",
   Documentation = "documentation",
+  // Project Viewer -- Top-bar
   ProjectName = "project-name",
   Categorize = "categorize",
   GridZoom = "grid-zoom",
-  SaveProject = "save-project",
-  CreateCategory = "create-category",
   DeleteObject = "delete-object",
+  NavigateImageViewer = "navigate-to-imageviewer",
+  NavigateMeasurements = "navigate-to-measurements",
+  // Project Viewer -- Drawer
+  StartNewProject = "start-new-project",
+  OpenProject = "open-project",
+  OpenExampleProject = "open-example-project",
   OpenImage = "open-image",
   OpenMenu = "open-menu",
-  KindTabs = "kind-tabs",
-  EditKind = "edit-kind",
-  DeleteKind = "delete-kind",
-  CreateKind = "create-kind",
+  SaveProject = "save-project",
   LearningTask = "learning-task",
   SaveClassificationModel = "save-classification-model",
   LoadClassificationModel = "load-classification-model",
   OptimizationAlgorithm = "optimization-algorithm",
+  CreateCategory = "create-category",
+  DeleteAllCategories = "delete-all-categories",
+  Settings = "settings",
+  SendFeedback = "send-feedback",
+  // Project Viewer -- Classification Dialog
+  InputShape = "input-shape",
   LearningRate = "learning-rate",
   LossFunction = "loss-function",
   BatchSize = "batch-size",
   Epochs = "epochs",
-  DeleteAllCategories = "delete-all-categories",
-  Settings = "settings",
-  SendFeedback = "send-feedback",
-  FilterImageGrid = "filter-image-grid",
-  GridItemInfo = "grid-item-info",
-  NavigateImageViewer = "navigate-to-imageviewer",
-  NavigateMeasurements = "navigate-to-measurements",
   CropOptions = "crop-options",
   PixelIntensityRescale = "pixel-intensity-rescale",
   TrainPercentage = "train-percentage",
   DataShuffling = "data-shuffling",
   ModelArchitecture = "model-architecture",
+  // Project Viewer -- Right-Bar
+  FilterImageGrid = "filter-image-grid",
+  GridItemInfo = "grid-item-info",
+  // Project Viewer -- Main
   AddKindTab = "add-kind-tab",
+  KindTabs = "kind-tabs",
+  EditKind = "edit-kind",
+  DeleteKind = "delete-kind",
+  CreateKind = "create-kind",
+  // Image Viewer -- Left Drawer
+  NavigateProjectView = "navigate-to-projectviewer",
   ExportAnnotation = "export-annotations",
   ImageViewerKindSection = "image-viewer-kind-section",
-  NavigateProjectView = "navigate-to-projectviewer",
+  // Image Viewer -- Top Bar
   ZoomAndPosition = "zoom-and-position",
   ImageTools = "image-tools",
   SelectionTools = "selection-tools",
+  // Image Viewer -- Right Bar
   ObjectManipulationTools = "object-manipulation-tools",
   ObjectCreationTools = "object-creation-tools",
+  // Measurement Viewer -- Left Drawer
   NewMeasurementTable = "new-measurement-table",
   MeasurementSplits = "measurement-splits",
   MeasurementsTree = "measurement-options",
   IntensityMeasurements = "intensity-measurements",
   ObjectMeasurements = "object-measurements",
+  // Measurement Viewer -- Measurement Group
   MeasurementGroupTabs = "measurement-group-tabs",
   MeasurementDataTable = "measurements-data-table",
   MeasurementPlotType = "measurement-plot-type",
@@ -144,6 +155,11 @@ Click on the tabs to view the different **Kinds** of objects in your project.\n
 * Edit: Change the display name of the **Kind**.
 * Minimize: Hide this **Kind**. (Re-open from *Add Kind* button)
 * Delete: Delete the **Kind (excluding Image)** from the project. (***Associated images, objects, and categpries will also be deleted***)`;
+
+const InputShape = `
+Input shape describes the shape of the images that the model consumes for training and inference.\n
+* The images in you project will be cropped, scaled, or padded to obtain the shape.
+* **Once a model is trained with a specific shape, images used for futer training and inference will need to conform to this shape as well**.`;
 
 const LearningRate = `
 The learning rate is a value that determines by how much the model updates its internal parameters in response to the loss function.`;
@@ -474,6 +490,10 @@ export const helpContent: {
     [HelpItem.NavigateMeasurements]: {
       desc: NavigateMeasurements,
       brief: NavigateMeasurements,
+    },
+    [HelpItem.InputShape]: {
+      desc: InputShape,
+      brief: InputShape,
     },
     [HelpItem.CropOptions]: {
       desc: CropOptions,
