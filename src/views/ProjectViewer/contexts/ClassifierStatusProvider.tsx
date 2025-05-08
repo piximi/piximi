@@ -16,15 +16,21 @@ import {
   selectActiveThingsByPartition,
   selectActiveUnknownCategoryId,
 } from "store/project/reselectors";
+import { selectProjectImageChannels } from "store/project/selectors";
 import { ModelStatus, Partition } from "utils/models/enums";
 
-enum ErrorReason {
+export enum ErrorReason {
   NotTrainable,
   NoLabeledImages,
   ExistingPredictions,
+  ChannelMismatch,
 }
 
-type ErrorContext = { reason: ErrorReason; message: string };
+export type ErrorContext = {
+  reason: ErrorReason;
+  message: string;
+  severity: number;
+};
 
 const ClassifierStatusContext = createContext<{
   isReady: boolean;
@@ -55,18 +61,19 @@ export const ClassifierStatusProvider = ({
   children: React.ReactNode;
 }) => {
   const dispatch = useDispatch();
-  const [isReady, setIsReady] = useState(true);
-  const [error, setError] = useState<ErrorContext>();
   const selectedModel = useSelector(selectClassifierModel);
   const labeledThingsCount = useSelector(selectActiveLabeledThingsCount);
   const thingsByPartition = useSelector(selectActiveThingsByPartition);
+  const unknowCatId = useSelector(selectActiveUnknownCategoryId);
+  const activeLabeledThings = useSelector(selectActiveLabeledThings);
+  const projectChannels = useSelector(selectProjectImageChannels);
+
+  const [isReady, setIsReady] = useState(true);
+  const [error, setError] = useState<ErrorContext>();
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
-  const unknowCatId = useSelector(selectActiveUnknownCategoryId);
-  const activeLabeledThings = useSelector(selectActiveLabeledThings);
   const [modelStatus, setModelStatus] = useState<ModelStatus>(ModelStatus.Idle);
-
   const [newModelName, setNewModelName] = useState("");
 
   const hasLabeledInference = useMemo(() => {
@@ -124,23 +131,46 @@ export const ClassifierStatusProvider = ({
   };
 
   useEffect(() => {
+    let newError: ErrorContext | undefined;
+    let newIsReady = true;
+
     if (!trainable) {
-      setIsReady(false);
-      setError({
-        reason: ErrorReason.NotTrainable,
-        message: "Selected model is not trainable.",
-      });
-    } else if (noLabeledThings) {
-      setIsReady(false);
-      setError({
-        reason: ErrorReason.NoLabeledImages,
-        message: "Please label images to train a model.",
-      });
-    } else {
-      setIsReady(true);
-      setError(undefined);
+      newIsReady = false;
+      if (!error || error.severity > 1) {
+        newError = {
+          reason: ErrorReason.NotTrainable,
+          message: "Selected model is not trainable.",
+          severity: 1,
+        };
+      }
     }
-  }, [selectedModel, trainable, noLabeledThings]);
+    if (noLabeledThings) {
+      newIsReady = false;
+      if (!error) {
+        newError = {
+          reason: ErrorReason.NoLabeledImages,
+          message: "Please label images to train a model.",
+          severity: 3,
+        };
+      }
+    }
+    if (
+      selectedModel?.preprocessingOptions &&
+      projectChannels &&
+      projectChannels !== selectedModel.preprocessingOptions.inputShape.channels
+    ) {
+      newIsReady = false;
+      if (!error || error.severity > 2) {
+        newError = {
+          reason: ErrorReason.ChannelMismatch,
+          message: `The model requires ${selectedModel?.preprocessingOptions.inputShape.channels}-channel images, but the project images have ${projectChannels}`,
+          severity: 2,
+        };
+      }
+    }
+    setIsReady(newIsReady);
+    setError(newError);
+  }, [selectedModel, trainable, noLabeledThings, projectChannels]);
 
   return (
     <ClassifierStatusContext.Provider
