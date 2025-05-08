@@ -16,6 +16,7 @@ import classifierHandler from "utils/models/classification/classifierHandler";
 import { AlertType } from "utils/enums";
 
 import { AlertState } from "utils/types";
+import { useConfirmReplaceDialog } from "views/ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 
 //TODO: MenuItem??
 
@@ -27,15 +28,16 @@ export const OpenProjectMenuItem = ({
   onMenuClose,
 }: OpenProjectMenuItemProps) => {
   const dispatch = useDispatch();
-
+  const { getConfirmation } = useConfirmReplaceDialog();
   const onOpenProject = async (
     event: React.ChangeEvent<HTMLInputElement>,
     zip: boolean,
   ) => {
     event.persist();
-
     if (!event.currentTarget.files) return;
     const files = event.currentTarget.files;
+    const confirmation = await getConfirmation({});
+    if (!confirmation) return;
 
     // set indefinite loading
     dispatch(
