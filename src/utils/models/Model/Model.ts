@@ -16,8 +16,8 @@ export abstract class Model {
   readonly trainable: boolean;
   readonly kind?: string;
   readonly src?: string;
-  readonly requiredChannels?: number;
 
+  private _requiredChannels?: number;
   private _pretrained: boolean;
 
   protected _model?: LayersModel | GraphModel;
@@ -50,7 +50,7 @@ export abstract class Model {
     this._pretrained = pretrained;
     this.trainable = trainable;
     this.src = src;
-    this.requiredChannels = requiredChannels;
+    this._requiredChannels = requiredChannels;
     // set defaults
     this._model = undefined;
     this._history = { epochs: [], history: [] };
@@ -87,6 +87,9 @@ export abstract class Model {
     this._history.history.push(numberOnlyHistory);
   }
 
+  public get requiredChannels() {
+    return this._requiredChannels;
+  }
   public get numEpochs() {
     return this._history.epochs.length;
   }
@@ -101,6 +104,10 @@ export abstract class Model {
 
   public get pretrained() {
     return this._pretrained;
+  }
+
+  public get preprocessingOptions() {
+    return this._preprocessingOptions;
   }
 
   public setPretrained() {

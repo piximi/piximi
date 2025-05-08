@@ -83,7 +83,7 @@ export const TrainingStrategySettings = () => {
       />
 
       <Stack sx={{ pl: 2 }}>
-        <Stack direction="row" gap={2}>
+        <Stack direction="row" gap={2} sx={{ pt: 1 }}>
           <WithLabel
             label="Epochs:"
             labelProps={{
