@@ -23,6 +23,7 @@ import { StyledSelect } from "components/inputs";
 import { WithLabel } from "components/inputs";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { useNumberField } from "hooks";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const OptimizationSettings = () => {
   const dispatch = useDispatch();
@@ -94,6 +95,7 @@ export const OptimizationSettings = () => {
       <Collapse in={showAdvanced}>
         <Stack sx={{ pl: 2 }} spacing={2}>
           <WithLabel
+            data-help={HelpItem.OptimizationAlgorithm}
             label="Optimization Algorithm:"
             labelProps={{
               variant: "body2",
@@ -116,6 +118,7 @@ export const OptimizationSettings = () => {
             </StyledSelect>
           </WithLabel>
           <WithLabel
+            data-help={HelpItem.LossFunction}
             label="Loss Function:"
             labelProps={{
               variant: "body2",
@@ -138,6 +141,7 @@ export const OptimizationSettings = () => {
             </StyledSelect>
           </WithLabel>
           <WithLabel
+            data-help={HelpItem.LearningRate}
             label="Learning Rate :"
             labelProps={{
               variant: "body2",

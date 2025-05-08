@@ -1,5 +1,6 @@
-import { Typography, TypographyProps, Stack, FormControl } from "@mui/material";
 import React, { CSSProperties } from "react";
+import { Typography, TypographyProps, Stack, FormControl } from "@mui/material";
+import { HTMLDataAttributes } from "utils/types";
 
 export const WithLabel = ({
   label,
@@ -7,7 +8,8 @@ export const WithLabel = ({
   children,
   fullWidth,
   sx,
-}: {
+  ...attributes
+}: HTMLDataAttributes & {
   label: string;
   labelProps: Omit<TypographyProps, "children">;
   children: React.ReactChild;
@@ -22,7 +24,9 @@ export const WithLabel = ({
         ...sx,
       }}
     >
-      <Typography {...labelProps}>{label}</Typography>
+      <Typography {...attributes} {...labelProps}>
+        {label}
+      </Typography>
       <FormControl sx={fullWidth ? {} : { width: "auto" }} fullWidth>
         {children}
       </FormControl>
