@@ -38,16 +38,15 @@ export const SaveProjectDialog = ({
 
   const [projectName, setProjectName] = useState<string>(project.name);
 
-  const onLoadProgress = (loadPercent: number, loadMessage: string) => {
-    dispatch(
-      applicationSettingsSlice.actions.sendLoadPercent({
-        loadPercent,
-        loadMessage,
-      }),
-    );
-  };
-
   const onSaveProjectClick = async () => {
+    const onLoadProgress = (loadPercent: number, loadMessage: string) => {
+      dispatch(
+        applicationSettingsSlice.actions.sendLoadPercent({
+          loadPercent,
+          loadMessage,
+        }),
+      );
+    };
     serializeProject(
       projectName,
       project,
