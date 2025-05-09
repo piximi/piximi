@@ -23,7 +23,7 @@ jobs:
           cache: "pnpm"
 
       - name: Install Packages
-        run: pnpm install
+        run: pnpm install --allow-build=@tensorflow/tfjs-node --alow-build=canvas --allow-build=core-js --allow-build=esbuild
 
       - name: Lint code
         run: |
