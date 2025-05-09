@@ -9,11 +9,14 @@ import { segmenterSlice } from "store/segmenter";
 import { dataSlice } from "store/data/dataSlice";
 
 import { deserializeProject } from "utils/file-io/deserialize";
-import { fListToStore } from "utils/file-io/zarrStores";
+import { fListToStore } from "utils/file-io/zarr/stores";
 
-import { AlertType } from "utils/common/enums";
+import classifierHandler from "utils/models/classification/classifierHandler";
 
-import { AlertState } from "utils/common/types";
+import { AlertType } from "utils/enums";
+
+import { AlertState } from "utils/types";
+import { useConfirmReplaceDialog } from "views/ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 
 //TODO: MenuItem??
 
@@ -25,23 +28,16 @@ export const OpenProjectMenuItem = ({
   onMenuClose,
 }: OpenProjectMenuItemProps) => {
   const dispatch = useDispatch();
-
-  const onLoadProgress = (loadPercent: number, loadMessage: string) => {
-    dispatch(
-      applicationSettingsSlice.actions.sendLoadPercent({
-        loadPercent,
-        loadMessage,
-      }),
-    );
-  };
-
+  const { getConfirmation } = useConfirmReplaceDialog();
   const onOpenProject = async (
     event: React.ChangeEvent<HTMLInputElement>,
     zip: boolean,
   ) => {
     event.persist();
-
     if (!event.currentTarget.files) return;
+    const files = event.currentTarget.files;
+    const confirmation = await getConfirmation({});
+    if (!confirmation) return;
 
     // set indefinite loading
     dispatch(
@@ -51,10 +47,18 @@ export const OpenProjectMenuItem = ({
       }),
     );
 
-    const files = event.currentTarget.files;
-
-    const zarrStore = await fListToStore(files, zip);
-
+    const { fileStore: zarrStore, loadedClassifiers } = await fListToStore(
+      files,
+      zip,
+    );
+    const onLoadProgress = (loadPercent: number, loadMessage: string) => {
+      dispatch(
+        applicationSettingsSlice.actions.sendLoadPercent({
+          loadPercent,
+          loadMessage,
+        }),
+      );
+    };
     deserializeProject(zarrStore, onLoadProgress)
       .then((res) => {
         if (!res) return;
@@ -73,7 +77,7 @@ export const OpenProjectMenuItem = ({
               project: res.project,
             }),
           );
-
+          classifierHandler.addModels(loadedClassifiers);
           dispatch(
             classifierSlice.actions.setClassifier({
               classifier: res.classifier,

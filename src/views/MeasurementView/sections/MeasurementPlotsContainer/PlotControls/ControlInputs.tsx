@@ -16,16 +16,16 @@ import {
 import { HelpOutlineOutlined as HelpOutlineOutlinedIcon } from "@mui/icons-material";
 import type { ColorSchemeId } from "@nivo/colors";
 
+import { useNumberField } from "hooks";
 import { useMeasurementParameters, usePlotControl } from "../../../hooks";
 
-import { CustomNumberTextField } from "components/inputs";
+import { TextFieldWithBlur } from "components/inputs";
 
-import { capitalize } from "utils/common/helpers";
-
-import { KeysWithValuesOfType } from "utils/common/types";
-import { ChartConfig, ChartItem, ChartType, SplitType } from "../../../types";
-
+import { capitalize } from "utils/stringUtils";
+import { HTMLDataAttributes, KeysWithValuesOfType } from "utils/types";
 import { nivoColorSpaces } from "themes/nivoTheme";
+import { ChartConfig, ChartItem, ChartType, SplitType } from "../../../types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 const splitTypes = ["partition", "category"];
 
@@ -84,6 +84,7 @@ export const ColorThemeSelect = () => {
 
   return (
     <ChartControlSelect
+      data-help={HelpItem.MeasurementPlotColorMap}
       label="Color Theme"
       id="color-theme-select"
       defaultValue={defaultValue}
@@ -132,6 +133,7 @@ export const PlotSelect = () => {
 
   return (
     <ChartControlSelect
+      data-help={HelpItem.MeasurementPlotType}
       label="plot"
       id="plot-select"
       defaultValue={defaultValue}
@@ -156,6 +158,19 @@ export const ChartMeasurementSelect = ({
   const handleChange = (event: SelectChangeEvent<string>) => {
     updateChartConfig(type, measurementPlotOptions[event.target.value]);
   };
+
+  const helpType = useMemo(() => {
+    switch (type) {
+      case "x-axis":
+        return HelpItem.MeasurementPlotXAxis;
+      case "y-axis":
+        return HelpItem.MeasurementPlotYAxis;
+      case "size":
+        return HelpItem.MeasurementPlotSize;
+      default:
+        return undefined;
+    }
+  }, [type]);
 
   const selectOptions = useMemo(
     () =>
@@ -194,6 +209,7 @@ export const ChartMeasurementSelect = ({
   );
   return (
     <ChartControlSelect
+      data-help={helpType}
       label={type}
       id={`${type}-select`}
       defaultValue={defaultValue}
@@ -252,6 +268,7 @@ export const ChartSplitSelect = ({
 
   return (
     <ChartControlSelect
+      data-help={HelpItem.MeasurementPlotColor}
       label={type}
       id={`${type}-select`}
       defaultValue={defaultValue}
@@ -271,7 +288,8 @@ const ChartControlSelect = ({
   handleChange,
   selectOptions,
   renderValue,
-}: {
+  ...attrs
+}: HTMLDataAttributes & {
   label: string;
   id: string;
   inputValue: string;
@@ -283,6 +301,7 @@ const ChartControlSelect = ({
   return (
     <FormControl fullWidth sx={{ pb: 1, mt: 1 }}>
       <InputLabel
+        data-help={attrs["data-help"]}
         variant="standard"
         htmlFor={id}
         sx={(theme) => ({
@@ -347,19 +366,37 @@ export const SwarmStatisticsCheckbox = () => {
 
 export const HistogramBinTextField = () => {
   const { selectedPlot, updateChartConfig } = usePlotControl();
-  const handleChange = (numBins: number) => {
+
+  const {
+    inputValue: numBins,
+    inputString: numBinsDisplay,
+    setLastValidInput: setLastValidNumBins,
+    resetInputValue: resetNumBins,
+    handleOnChangeValidation: handleNumBinsChange,
+    error: numBinsError,
+  } = useNumberField(selectedPlot.chartConfig.numBins!);
+
+  const handleSubmit = (numBins: number) => {
+    if (numBinsError.error) {
+      resetNumBins();
+      return;
+    }
+    if (numBins === selectedPlot.chartConfig.numBins) return;
+    setLastValidNumBins(numBins);
     updateChartConfig("numBins", numBins);
   };
+
   return (
-    <CustomNumberTextField
+    <TextFieldWithBlur
       id="bin-size-text-field"
       label="Number of Bins"
-      value={selectedPlot.chartConfig.numBins!}
-      dispatchCallBack={handleChange}
+      value={numBinsDisplay}
+      onChange={handleNumBinsChange}
+      onBlur={() => handleSubmit(numBins)}
       size="small"
       variant="standard"
-      formControlFullWidth
-      formControlProps={{ sx: { pb: 1, mt: 1 }, fullWidth: true }}
+      fullWidth
+      sx={{ pb: 1, mt: 1 }}
     />
   );
 };

@@ -6,6 +6,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data";
 import { projectSlice } from "./projectSlice";
 
+import classifierHandler from "utils/models/classification/classifierHandler";
 import { TypedAppStartListening } from "store/types";
 
 export const projectMiddleware = createListenerMiddleware();
@@ -16,6 +17,13 @@ startAppListening({
   actionCreator: applicationSettingsSlice.actions.resetApplicationState,
   effect: (action, listenerAPI) => {
     listenerAPI.dispatch(projectSlice.actions.resetProject());
+  },
+});
+
+startAppListening({
+  actionCreator: projectSlice.actions.resetProject,
+  effect: () => {
+    classifierHandler.removeAllModels();
   },
 });
 
@@ -81,15 +89,12 @@ startAppListening({
     );
   },
   effect: async (action, listenerApi) => {
-    const { classifier, project } = listenerApi.getState();
+    const { project } = listenerApi.getState();
 
     if (project.imageChannels)
       listenerApi.dispatch(
-        classifierSlice.actions.updateInputShape({
-          inputShape: {
-            ...classifier.inputShape,
-            channels: project.imageChannels,
-          },
+        classifierSlice.actions.updateChannelsGlobally({
+          globalChannels: project.imageChannels,
         }),
       );
   },

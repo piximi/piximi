@@ -9,7 +9,7 @@ import { selectSelectedGroupSplits } from "store/measurements/selectors";
 
 import { selectTreeItemChildren } from "../../utils";
 
-import { LoadStatus, RecursivePartial } from "utils/common/types";
+import { LoadStatus, RecursivePartial } from "utils/types";
 import { MeasurementOptions, MeasurementGroup } from "store/measurements/types";
 
 export const SplitTree = ({

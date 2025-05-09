@@ -2,16 +2,14 @@ import React, { useEffect } from "react";
 
 import { Box, Stack, Typography } from "@mui/material";
 
-import { useDialog, useDialogHotkey, useSegmentationModel } from "hooks";
+import { useDialogHotkey, useSegmentationModel } from "hooks";
 
-import { SaveFittedModelDialog } from "components/dialogs";
 import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
 import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
-import { ImportTensorflowModelDialog } from "./ImportTensorflowModelDialog";
-import { FitSegmenterDialog } from "./FitSegmenterDialog";
+import { ImportTensorflowSegmentationModelDialog } from "./ImportTensorflowModelDialog";
 
-import { HotkeyContext } from "utils/common/enums";
-import { ModelStatus, ModelTask } from "utils/models/enums";
+import { HotkeyContext } from "utils/enums";
+import { ModelStatus } from "utils/models/enums";
 
 export const SegmenterSection = () => {
   const {
@@ -19,7 +17,6 @@ export const SegmenterSection = () => {
     selectedModel,
     handlePredict,
     handleEvaluate,
-    helperText,
     waitingForResults,
     setWaitingForResults,
     handleImportModel,
@@ -30,18 +27,6 @@ export const SegmenterSection = () => {
     onOpen: onOpenImportSegmenterDialog,
     open: importSegmenterDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
-
-  const {
-    onClose: onCloseSaveSegmenterDialog,
-    onOpen: onOpenSaveSegmenterDialog,
-    open: openSaveSegmenterDialog,
-  } = useDialog();
-
-  const {
-    onClose: handleCloseFitModelDialog,
-    onOpen: handleOpenFitModelDialog,
-    open: fittingOpen,
-  } = useDialogHotkey(HotkeyContext.SegmenterDialog, false);
 
   useEffect(() => {
     if (modelStatus === ModelStatus.Trained && waitingForResults) {
@@ -60,8 +45,9 @@ export const SegmenterSection = () => {
         px={1}
       >
         <ModelIOButtonGroup
+          hasTrainedModel={false}
           handleImportModel={onOpenImportSegmenterDialog}
-          handleSaveModel={onOpenSaveSegmenterDialog}
+          handleSaveModel={() => {}}
         />
 
         {selectedModel && (
@@ -86,14 +72,13 @@ export const SegmenterSection = () => {
         <ModelExecButtonGroup
           modelStatus={modelStatus}
           handleEvaluate={handleEvaluate}
-          handleFit={handleOpenFitModelDialog}
+          handleFit={() => {}}
           handlePredict={handlePredict}
           modelTrainable={false} //until trainable segmenter available
-          helperText={helperText}
         />
       </Box>
 
-      <ImportTensorflowModelDialog
+      <ImportTensorflowSegmentationModelDialog
         loadedModel={
           selectedModel?.name === "Fully Convolutional Network"
             ? undefined
@@ -101,18 +86,7 @@ export const SegmenterSection = () => {
         }
         onClose={onCloseImportSegmenterDialog}
         open={importSegmenterDialogOpen}
-        modelTask={ModelTask.Segmentation}
         dispatchFunction={handleImportModel}
-      />
-      <SaveFittedModelDialog
-        model={selectedModel}
-        modelStatus={modelStatus}
-        onClose={onCloseSaveSegmenterDialog}
-        open={openSaveSegmenterDialog}
-      />
-      <FitSegmenterDialog
-        openedDialog={fittingOpen}
-        closeDialog={handleCloseFitModelDialog}
       />
     </>
   );

@@ -1,7 +1,7 @@
 import { Draft } from "immer";
 import { difference, merge } from "lodash";
 import { AnnotationObject, Category, Kind } from "store/data/types";
-import { RequireOnly } from "utils/common/types";
+import { DeferredEntity, RequireOnly } from "utils/types";
 import {
   AnnotatorState,
   CategoryEdits,
@@ -309,3 +309,15 @@ export const updateThing = (
     state.changes.things.edited[thing.id] = thing;
   }
 };
+export function getCompleteEntity<T>(entity: DeferredEntity<T>): T | undefined {
+  if (entity.changes.deleted) return;
+  const {
+    added: _added,
+    deleted: _deleted,
+    ...completeEntity
+  } = {
+    ...entity.saved,
+    ...entity.changes,
+  };
+  return completeEntity as T;
+}

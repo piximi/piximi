@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import {
   ScatterPlot as ScatterPlotIcon,
@@ -6,29 +6,81 @@ import {
   Assessment as AssessmentIcon,
 } from "@mui/icons-material";
 
-import { TooltipButton } from "components/ui/tooltips/TooltipButton/TooltipButton";
+import { TooltipButton } from "components/ui/tooltips/TooltipButton";
 
 import { ModelStatus } from "utils/models/enums";
+import { useSelector } from "react-redux";
+import { selectClassifierModel } from "store/classifier/reselectors";
+import {
+  ErrorReason,
+  useClassifierStatus,
+} from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { selectActiveUnlabeledThingsIds } from "store/project/reselectors";
 
 export const ModelExecButtonGroup = ({
-  handlePredict,
-  handleEvaluate,
   handleFit,
-  modelStatus,
+  handleEvaluate,
+  handlePredict,
   modelTrainable,
-  helperText,
 }: {
-  handlePredict: () => void;
-  handleEvaluate: () => void;
   handleFit: () => void;
+  handleEvaluate: () => void;
+  handlePredict: () => Promise<void>;
   modelStatus: ModelStatus;
   modelTrainable: boolean;
-  helperText: string;
 }) => {
+  const selectedModel = useSelector(selectClassifierModel);
+  const unlabeledThings = useSelector(selectActiveUnlabeledThingsIds);
+  const { modelStatus, error } = useClassifierStatus();
+
+  const predictHelperText = useMemo(() => {
+    switch (modelStatus) {
+      case ModelStatus.Idle:
+        return selectedModel ? "Predict Model" : "No Trained Model";
+      case ModelStatus.Predicting:
+        return "...Predicting";
+      default:
+        return "...Pending";
+    }
+  }, [selectedModel, modelStatus]);
+
+  const fitHelperText = useMemo(() => {
+    switch (modelStatus) {
+      case ModelStatus.Idle:
+      case ModelStatus.Pending:
+        return modelTrainable ? "Fit Model" : "Model is inference only";
+      default:
+        return "...busy";
+    }
+  }, [modelStatus, modelTrainable]);
+
+  const evaluateHelperText = useMemo(() => {
+    if (selectedModel) {
+      return modelTrainable
+        ? modelStatus === ModelStatus.Idle ||
+          modelStatus === ModelStatus.Pending
+          ? "Evaluate Model"
+          : "...Pending"
+        : "Cannot evaluate non-trainable models";
+    } else {
+      return "No Trained Model";
+    }
+  }, [modelStatus, modelTrainable, selectedModel]);
+
+  const predictionDisabled = useMemo(() => {
+    return (
+      !selectedModel ||
+      !selectedModel.pretrained ||
+      modelStatus !== ModelStatus.Idle ||
+      unlabeledThings.length === 0 ||
+      error?.reason === ErrorReason.ChannelMismatch
+    );
+  }, [selectedModel, modelStatus, unlabeledThings, error]);
+
   return (
     <Box width="100%" display="flex" justifyContent={"space-evenly"}>
       <TooltipButton
-        tooltipTitle={modelTrainable ? "Fit Model" : "Model is inference only"}
+        tooltipTitle={fitHelperText}
         disableRipple
         onClick={handleFit}
         disabled={!modelTrainable}
@@ -38,15 +90,9 @@ export const ModelExecButtonGroup = ({
 
       <TooltipButton
         disableRipple
-        tooltipTitle={
-          modelStatus === ModelStatus.Predicting
-            ? "...predicting"
-            : modelStatus !== ModelStatus.Trained
-              ? helperText
-              : "Predict Model"
-        }
+        tooltipTitle={predictHelperText}
         onClick={handlePredict}
-        disabled={modelStatus !== ModelStatus.Trained}
+        disabled={predictionDisabled}
       >
         {modelStatus === ModelStatus.Predicting ? (
           <CircularProgress
@@ -60,17 +106,10 @@ export const ModelExecButtonGroup = ({
       </TooltipButton>
 
       <TooltipButton
-        tooltipTitle={
-          !modelTrainable
-            ? "Can't evaluate non-trainable models"
-            : modelStatus !== ModelStatus.Trained &&
-                modelStatus !== ModelStatus.Evaluating
-              ? helperText
-              : "Evaluate Model"
-        }
+        tooltipTitle={evaluateHelperText}
         disableRipple
         onClick={handleEvaluate}
-        disabled={modelStatus !== ModelStatus.Trained || !modelTrainable}
+        disabled={!selectedModel || !selectedModel.pretrained}
       >
         {modelStatus === ModelStatus.Evaluating ? (
           <CircularProgress

@@ -1,28 +1,11 @@
-import createGraph, { Graph, Node } from "ngraph.graph";
+import createGraph from "ngraph.graph";
 
-import { NodeHeap } from "./NodeHeap";
+import { NodeHeap, PiximiGraph } from "./NodeHeap";
 import { cachedAStarPathSearch } from "./PathFinder";
 
 import { getIdx } from "views/ImageViewer/utils/imageHelper";
-import { Point } from "./types";
-import { DataArray } from "utils/file-io/types";
-
-export interface PiximiGraph extends Graph {
-  fromId: number;
-  openSet: NodeHeap;
-}
-
-export interface PiximiNode extends Node {
-  fromId: number;
-  trace: Array<Point>;
-
-  parentId: number | null;
-  closed: boolean;
-  open: number;
-  distanceToSource: number;
-  fScore: number;
-  heapIndex: number;
-}
+import { Point } from "utils/types";
+import { DataArray } from "store/data/types";
 
 const validNeighbours = (
   x: number,
@@ -54,12 +37,6 @@ const validNeighbours = (
     }
   }
   return output;
-};
-
-export const fromIdxToCoord = (idx: number, width: number) => {
-  const row = Math.floor(idx / width);
-  const col = idx - row * width;
-  return { x: col, y: row };
 };
 
 export const makeGraph = (

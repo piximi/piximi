@@ -1,22 +1,18 @@
 import { Group, openGroup } from "zarr";
 
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/logUtils";
 import { initialState as initialProjectState } from "store/project/projectSlice";
-import {
-  deserializeClassifierGroup,
-  deserializeColorsGroup,
-  deserializeSegmenterGroup,
-} from "../common/groupDeserializers";
-import { getAttr, getDataset, getGroup } from "../helpers";
+import { deserializeClassifierGroupV01_1 } from "../common/group-deserializers/classifierDeserializers";
+import { deserializeColorsGroup } from "../common/group-deserializers/dataDeserializers";
+import { deserializeSegmenterGroup } from "../common/group-deserializers/segmenterDeserializers";
+import { getAttr, getDataset, getGroup } from "../../zarr/zarrUtils";
 import { RawArray } from "zarr/types/rawArray";
 import { tensor4d } from "@tensorflow/tfjs";
 import { Partition } from "utils/models/enums";
-import {
-  createRenderedTensor,
-  generateBlankColors,
-} from "utils/common/tensorHelpers";
-import { BitDepth, LoadCB } from "utils/file-io/types";
-import { CustomStore } from "utils/file-io/zarrStores";
+import { createRenderedTensor, generateBlankColors } from "utils/tensorUtils";
+import { LoadCB } from "utils/file-io/types";
+import { BitDepth } from "store/data/types";
+import { CustomStore } from "utils/file-io/zarr/stores";
 import { ProjectState } from "store/types";
 import {
   Kind,
@@ -250,7 +246,7 @@ export const deserializeProject_v02 = async (
   const projectGroup = await getGroup(rootGroup, "project");
   const { project, data } = await deserializeProjectGroup(projectGroup, loadCb);
   const classifierGroup = await getGroup(rootGroup, "classifier");
-  const classifier = await deserializeClassifierGroup(classifierGroup);
+  const classifier = await deserializeClassifierGroupV01_1(classifierGroup);
 
   const segmenterGroup = await getGroup(rootGroup, "segmenter");
   const segmenter = await deserializeSegmenterGroup(segmenterGroup);

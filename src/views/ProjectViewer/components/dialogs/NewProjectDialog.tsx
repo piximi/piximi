@@ -7,6 +7,7 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { projectSlice } from "store/project";
 import { dataSlice } from "store/data/dataSlice";
 import { applicationSettingsSlice } from "store/applicationSettings";
+import { useConfirmReplaceDialog } from "views/ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 
 type NewProjectDialogProps = {
   onClose: () => void;
@@ -16,16 +17,19 @@ type NewProjectDialogProps = {
 // TODO: Should alert since data will be deleted
 export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
   const dispatch = useDispatch();
+  const { getConfirmation } = useConfirmReplaceDialog();
 
   const [projectName, setProjectName] =
     React.useState<string>("Untitled project");
   const [invalidProjectName, setInvalidProjectName] =
     React.useState<boolean>(false);
 
-  const onCreateNewProject = () => {
+  const onCreateNewProject = async () => {
     if (invalidProjectName) {
       return;
     }
+    const confirmation = await getConfirmation({});
+    if (!confirmation) return;
     dispatch(applicationSettingsSlice.actions.resetApplicationState());
 
     dispatch(

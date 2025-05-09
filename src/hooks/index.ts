@@ -13,11 +13,10 @@ export { useBreakpointObserver } from "./useBreakpointObserver";
 export { useMobileView } from "./useMobileView";
 export { useCategoryValidation } from "./useCategoryValidation";
 export {
-  useClassificationModel,
-  useFitClassificationModel,
   useSegmentationModel,
   useSegmentationModelAgain,
 } from "./useLearningModel";
+export { useNumberField } from "./useNumberField";
 
 // useDefaultImage not included to encourage use of
 // import {useDefaultImage, DispatchLocation} from "hooks/useDefaultImage"

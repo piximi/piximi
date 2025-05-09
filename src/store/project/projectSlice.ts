@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { mutatingFilter, toUnique } from "utils/common/helpers";
+import { mutatingFilter, toUnique } from "utils/arrayUtils";
 
-import { ThingSortKey } from "utils/common/enums";
+import { ThingSortKey } from "utils/enums";
 import { Partition } from "utils/models/enums";
 
 import { ProjectState } from "store/types";
@@ -63,7 +63,7 @@ export const projectSlice = createSlice({
         (id: string) => !ids.includes(id),
       );
     },
-    setSortType_new(state, action: PayloadAction<{ sortType: ThingSortKey }>) {
+    setSortType(state, action: PayloadAction<{ sortType: ThingSortKey }>) {
       state.sortType = action.payload.sortType;
     },
     setProjectName(state, action: PayloadAction<{ name: string }>) {

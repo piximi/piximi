@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { distinctFilter, mutatingFilter } from "utils/common/helpers";
+import { distinctFilter, mutatingFilter } from "utils/arrayUtils";
 
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 import { ZoomMode } from "views/ImageViewer/utils/enums";

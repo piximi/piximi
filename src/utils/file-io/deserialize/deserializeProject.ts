@@ -1,12 +1,14 @@
-import { logger } from "utils/common/helpers";
-import { CustomStore } from "../zarrStores";
+import { logger } from "utils/logUtils";
+import { CustomStore } from "../zarr/stores";
 import { openGroup } from "zarr";
-import { getAttr } from "./helpers";
+import { getAttr } from "../zarr/zarrUtils";
 import semver from "semver";
 import { deserializeProject_v01 } from "./v01/deserializeProject_v01";
 import { dataConverter_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";
 import { deserializeProject_v02 } from "./v02/deserializeProject_v02";
 import { LoadCB } from "../types";
+import { deserializeProject_v11 } from "./v110/deserializeProject_v11";
+import { projectConverterv1_v11 } from "../converters/classifierConverterv1_v11";
 
 export const deserializeProject = async (
   fileStore: CustomStore,
@@ -22,27 +24,46 @@ export const deserializeProject = async (
     throw Error("No version field found.");
   }
   const piximiVersion = semver.clean(piximiVersionRaw);
-
   if (!semver.valid(piximiVersion) || semver.lt(piximiVersion!, "0.1.0")) {
     throw Error(`File version ${piximiVersion} is unsupported.`);
   } else if (semver.eq(piximiVersion!, "0.1.0")) {
-    const { project, classifier, data, segmenter } =
-      await deserializeProject_v01(fileStore, loadCb);
+    const {
+      project,
+      classifier: oldClassifier,
+      data,
+      segmenter,
+    } = await deserializeProject_v01(fileStore, loadCb);
     const { kinds, categories, things } = dataConverter_v01v02({
       images: data.images,
       annotations: data.annotations,
       annotationCategories: data.annotationCategories,
       oldCategories: data.categories,
     });
+    const classifier = projectConverterv1_v11(oldClassifier, kinds.ids);
     return {
       project,
       classifier,
       segmenter,
       data: { kinds, categories, things },
     };
-  } else if (semver.gte(piximiVersion!, "0.2.0")) {
+  } else if (semver.lte(piximiVersion!, "1.0.0")) {
+    const {
+      project,
+      classifier: oldClassifier,
+      data,
+      segmenter,
+    } = await deserializeProject_v02(fileStore, loadCb);
+    const classifier = projectConverterv1_v11(oldClassifier, data.kinds.ids);
+
+    return {
+      project,
+      classifier,
+      segmenter,
+      data,
+    };
+  } else if (semver.gte(piximiVersion!, "1.1.0")) {
     const { project, classifier, data, segmenter } =
-      await deserializeProject_v02(fileStore, loadCb);
+      await deserializeProject_v11(fileStore, loadCb);
 
     return {
       project,

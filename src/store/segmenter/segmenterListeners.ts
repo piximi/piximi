@@ -6,20 +6,20 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data/dataSlice";
 import { segmenterSlice } from "./segmenterSlice";
 
-import {
-  getPropertiesFromImageSync,
-  getStackTraceFromError,
-} from "utils/common/helpers";
+import { getPropertiesFromImageSync } from "store/data/utils";
+import { getStackTraceFromError } from "utils/logUtils";
 
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
-import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
-import { AlertType } from "utils/common/enums";
-import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
+import { AlertType } from "utils/enums";
+import {
+  UNKNOWN_CATEGORY_NAME,
+  UNKNOWN_IMAGE_CATEGORY_COLOR,
+} from "store/data/constants";
 import { ModelStatus } from "utils/models/enums";
 
 import { OrphanedAnnotationObject } from "utils/models/segmentation/AbstractSegmenter";
 import { TrainingCallbacks } from "utils/models/types";
-import { AlertState } from "utils/common/types";
+import { AlertState } from "utils/types";
 import {
   Kind,
   AnnotationObject,

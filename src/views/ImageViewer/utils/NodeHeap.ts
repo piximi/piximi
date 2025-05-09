@@ -1,3 +1,6 @@
+import { Graph, Node } from "ngraph.graph";
+import { Point } from "utils/types";
+
 /**
  * Based on https://github.com/mourner/tinyqueue
  * Copyright (c) 2017, Vladimir Agafonkin https://github.com/mourner/tinyqueue/blob/master/LICENSE
@@ -7,7 +10,22 @@
  *
  * Further adapted for Piximi
  */
-import { PiximiNode } from ".";
+export interface PiximiGraph extends Graph {
+  fromId: number;
+  openSet: NodeHeap;
+}
+
+export interface PiximiNode extends Node {
+  fromId: number;
+  trace: Array<Point>;
+
+  parentId: number | null;
+  closed: boolean;
+  open: number;
+  distanceToSource: number;
+  fScore: number;
+  heapIndex: number;
+}
 
 export class NodeHeap {
   public data: Array<any> = [];

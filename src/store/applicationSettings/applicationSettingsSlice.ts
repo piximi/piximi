@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/logUtils";
 
-import { defaultAlert } from "utils/common/constants";
-import { HotkeyContext, Languages } from "utils/common/enums";
+import { defaultAlert } from "utils/constants";
+import { HotkeyContext, Languages } from "utils/enums";
 import { ThemeMode } from "themes/enums";
 
-import { AlertState } from "utils/common/types";
+import { AlertState } from "utils/types";
 import { AppSettingsState } from "store/types";
 
 const initialState: AppSettingsState = {

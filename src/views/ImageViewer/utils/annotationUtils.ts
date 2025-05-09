@@ -1,9 +1,7 @@
-import { DataArray } from "utils/file-io/types";
+import { DataArray } from "store/data/types";
 import IJSImage from "image-js";
-import {
-  convertToDataArray,
-  getPropertiesFromImage,
-} from "utils/common/helpers";
+import { getPropertiesFromImage } from "store/data/utils";
+import { convertToDataArray } from "utils/dataUtils";
 import {
   AnnotationObject,
   Category,
@@ -15,7 +13,7 @@ import {
 import { encode, encodeAnnotation } from "./rle";
 import { AnnotationMode } from "./enums";
 import { AnnotationTool } from "./tools";
-import { generateUUID } from "store/data/helpers";
+import { generateUUID } from "store/data/utils";
 import {
   AnnotatorChanges,
   CategoryEdits,
@@ -25,7 +23,7 @@ import {
 import { productionStore } from "store";
 import { DataState } from "store/types";
 import { difference } from "lodash";
-import { RequireOnly } from "utils/common/types";
+import { RequireOnly } from "utils/types";
 import { batch } from "react-redux";
 import { dataSlice } from "store/data";
 import { annotatorSlice } from "../state/annotator";

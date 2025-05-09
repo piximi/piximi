@@ -11,10 +11,10 @@ import {
   selectSelectedGroupMeasurements,
 } from "store/measurements/selectors";
 
-import { isObjectEmpty } from "utils/common/helpers";
+import { isObjectEmpty } from "utils/objectUtils";
 import { selectTreeItemChildren } from "../../utils";
 
-import { LoadStatus, RecursivePartial } from "utils/common/types";
+import { LoadStatus, RecursivePartial } from "utils/types";
 import { MeasurementOptions, MeasurementGroup } from "store/measurements/types";
 
 export const MeasurementsTree = ({

@@ -6,7 +6,7 @@ import {
   ModelTask,
   OptimizationAlgorithm,
 } from "./enums";
-import { Kind, Category, Shape } from "store/data/types";
+import { Kind, Shape } from "store/data/types";
 
 export interface ModelLayerData {
   layerName: string;
@@ -28,10 +28,6 @@ export type TrainingCallbacks = {
   onEpochEnd: CallbackList["onEpochEnd"];
 };
 
-export type FitOptions = {
-  epochs: number;
-  batchSize: number;
-};
 export type RescaleOptions = {
   rescale: boolean;
   center: boolean;
@@ -42,29 +38,20 @@ export type CropOptions = {
   cropSchema: CropSchema;
 };
 
-export type PreprocessOptions = {
+export type SegmenterPreprocessSettings = {
   shuffle: boolean;
   rescaleOptions: RescaleOptions; // normalization
   cropOptions: CropOptions;
 };
 
-export type LoadDataArgs = {
-  categories: Array<Category>;
+export type PreprocessSettings = {
+  shuffle: boolean;
   inputShape: Shape;
-  preprocessOptions: PreprocessOptions;
-  fitOptions: FitOptions;
+  rescaleOptions: RescaleOptions; // normalization
+  cropOptions: CropOptions;
+  trainingPercentage: number;
 };
-
-export type LoadModelArgs = {
-  inputShape: Shape;
-  numClasses: number;
-  compileOptions: CompileOptions;
-  freeze?: boolean;
-  useCustomTopLayer?: boolean;
-  randomizeWeights?: boolean;
-};
-
-export type CompileOptions = {
+export type OptimizerSettings = {
   learningRate: number;
   lossFunction:
     | LossFunction
@@ -72,6 +59,29 @@ export type CompileOptions = {
     | { [outputName: string]: LossFunction };
   metrics: Array<Metric>;
   optimizationAlgorithm: OptimizationAlgorithm;
+  epochs: number;
+  batchSize: number;
+};
+export type SegmenterCompileSettings = {
+  learningRate: number;
+  lossFunction:
+    | LossFunction
+    | Array<LossFunction>
+    | { [outputName: string]: LossFunction };
+  metrics: Array<Metric>;
+  optimizationAlgorithm: OptimizationAlgorithm;
+};
+
+export type FitOptions = Pick<OptimizerSettings, "epochs" | "batchSize">;
+
+export type LoadModelArgs = {
+  inputShape: Shape;
+  numClasses: number;
+  compileOptions: OptimizerSettings;
+  preprocessOptions: PreprocessSettings;
+  freeze?: boolean;
+  useCustomTopLayer?: boolean;
+  randomizeWeights?: boolean;
 };
 
 export type LoadInferenceDataArgs = {
@@ -114,3 +124,9 @@ export type SegmenterEvaluationResultType = {
   IoUScore: number;
   diceScore: number;
 };
+
+export type ModelData = {
+  modelJson: { blob: Blob; fileName: string };
+  modelWeights: { blob: Blob; fileName: string };
+};
+export type SerializedModels = Record<string, ModelData>;

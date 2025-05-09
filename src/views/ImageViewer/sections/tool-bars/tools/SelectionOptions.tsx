@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { useTheme, Box, List } from "@mui/material";
+import { useTheme, Box, List, Stack } from "@mui/material";
 
 import { useTranslation } from "hooks";
 import { useAnnotatorToolShortcuts } from "../../../hooks";
 
-import { FlexRowBox, Tool } from "components/ui";
+import { Tool } from "components/ui";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
@@ -23,10 +23,11 @@ import {
   selectActiveAnnotationsArray,
   selectCategoriesArray,
 } from "views/ImageViewer/state/annotator/reselectors";
-import { PopoverTool } from "components/ui/Tool/Tool";
+import { PopoverTool } from "components/ui/Tool";
 import { groupBy } from "lodash";
 import { CustomListItemButton, DividerHeader } from "components/ui";
 import { Category } from "store/data/types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const SelectionOptions = () => {
   const dispatch = useDispatch();
@@ -105,7 +106,7 @@ export const SelectionOptions = () => {
   };
 
   return (
-    <FlexRowBox>
+    <Stack direction="row" data-help={HelpItem.SelectionTools}>
       <PopoverTool
         name={t("Select By...")}
         popoverElement={
@@ -169,6 +170,6 @@ export const SelectionOptions = () => {
           }
         />
       </Tool>
-    </FlexRowBox>
+    </Stack>
   );
 };

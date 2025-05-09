@@ -14,7 +14,6 @@ import {
 } from "views/ImageViewer/state/annotator/selectors";
 
 import { AnnotationMode } from "views/ImageViewer/utils/enums";
-import { FlexColumnBox } from "components/ui";
 import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 import { invert } from "views/ImageViewer/utils/annotationUtils";
 import {
@@ -23,7 +22,8 @@ import {
   NewAnnotationIcon,
   SubtractAnnotationsIcon,
 } from "icons";
-import { SvgIcon, useTheme } from "@mui/material";
+import { Stack, SvgIcon, useTheme } from "@mui/material";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const CreationOptions = () => {
   const dispatch = useDispatch();
@@ -87,7 +87,7 @@ export const CreationOptions = () => {
   };
 
   return (
-    <FlexColumnBox>
+    <Stack data-help={HelpItem.ObjectManipulationTools}>
       <Tool
         name={t("New Annotation")}
         onClick={() => handleModeSelection(AnnotationMode.New)}
@@ -141,6 +141,6 @@ export const CreationOptions = () => {
           <FilterBAndW />
         </SvgIcon>
       </Tool>
-    </FlexColumnBox>
+    </Stack>
   );
 };

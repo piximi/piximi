@@ -1,14 +1,14 @@
 import { createSimpleCNN } from "./loadSimpleCNN";
-import { createCompileArgs } from "../../helpers";
+import { createCompileArgs } from "../../utils";
 import { SequentialClassifier } from "../AbstractClassifier/AbstractClassifier";
 
 import { LoadModelArgs } from "../../types";
 import { ModelTask } from "../../enums";
 
 export class SimpleCNN extends SequentialClassifier {
-  constructor() {
+  constructor(name?: string) {
     super({
-      name: "SimpleCNN",
+      name: name ?? "SimpleCNN",
       task: ModelTask.Classification,
       graph: false,
       pretrained: false,
@@ -25,10 +25,19 @@ export class SimpleCNN extends SequentialClassifier {
     numClasses,
     randomizeWeights,
     compileOptions,
+    preprocessOptions,
   }: LoadModelArgs) {
     if (this._model) return;
     this._model = createSimpleCNN(inputShape, numClasses, randomizeWeights!);
     const compileArgs = createCompileArgs(compileOptions);
     this._model.compile(compileArgs);
+    this._preprocessingOptions = {
+      inputShape: inputShape,
+      ...preprocessOptions.cropOptions,
+      shuffle: preprocessOptions.shuffle,
+      rescale: preprocessOptions.rescaleOptions.rescale,
+      batchSize: compileOptions.batchSize,
+    };
+    this._optimizerSettings = compileOptions;
   }
 }

@@ -14,13 +14,12 @@ import {
   selectSelectedThingIds,
 } from "./selectors";
 
-import { updateRecordArray } from "utils/common/helpers";
-import { isUnknownCategory } from "store/data/helpers";
+import { isUnknownCategory } from "store/data/utils";
 
-import { CATEGORY_COLORS } from "utils/common/constants";
 import { Partition } from "utils/models/enums";
 
 import { AnnotationObject, ImageObject, Thing } from "store/data/types";
+import { CATEGORY_COLORS } from "store/data/constants";
 
 export const selectVisibleKinds = createSelector(
   selectKindTabFilters,
@@ -93,9 +92,9 @@ export const selectActiveCategoryNames = createSelector(
   },
 );
 
-export const selectActiveCategoryColors = createSelector(
+export const selectAvaliableCategoryColors = createSelector(
   selectActiveCategories,
-  (activeCategories) => {
+  (activeCategories): string[] => {
     const activeColors = activeCategories.map((cat) => cat.color.toUpperCase());
     const allCategoryColors = Object.values(CATEGORY_COLORS).map((color) =>
       color.toUpperCase(),
@@ -224,26 +223,31 @@ export const selectActiveThingsByPartition = createSelector(
   (activeThings) => {
     const thingsByPartition = activeThings.reduce(
       (
-        byPartition: Record<string, Array<ImageObject | ImageObject>>,
+        byPartition: Record<Partition, Array<AnnotationObject | ImageObject>>,
         thing,
       ) => {
         switch (thing.partition) {
           case Partition.Inference:
-            updateRecordArray(byPartition, Partition.Inference, thing);
+            byPartition[Partition.Inference].push(thing);
             break;
           case Partition.Training:
-            updateRecordArray(byPartition, Partition.Training, thing);
+            byPartition[Partition.Training].push(thing);
             break;
           case Partition.Unassigned:
-            updateRecordArray(byPartition, Partition.Unassigned, thing);
+            byPartition[Partition.Unassigned].push(thing);
             break;
           case Partition.Validation:
-            updateRecordArray(byPartition, Partition.Validation, thing);
+            byPartition[Partition.Validation].push(thing);
             break;
         }
         return byPartition;
       },
-      {},
+      {
+        [Partition.Inference]: [],
+        [Partition.Training]: [],
+        [Partition.Validation]: [],
+        [Partition.Unassigned]: [],
+      },
     );
     return thingsByPartition;
   },

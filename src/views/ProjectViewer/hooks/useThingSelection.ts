@@ -10,7 +10,7 @@ import {
   selectSelectedThingIds,
 } from "store/project/selectors";
 
-import { isFiltered } from "utils/common/helpers";
+import { isFiltered } from "utils/arrayUtils";
 
 export const useThingSelection = () => {
   const dispatch = useDispatch();

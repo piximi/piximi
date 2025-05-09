@@ -1,21 +1,37 @@
-import { GraphModel, History, LayersModel, Tensor } from "@tensorflow/tfjs";
+import { GraphModel, History, LayersModel, Tensor, io } from "@tensorflow/tfjs";
 
-import { ModelArgs, ModelHistory, ModelLayerData } from "../types";
-import { ModelTask } from "../enums";
-import { ImageObject } from "store/data/types";
+import {
+  ModelArgs,
+  ModelHistory,
+  ModelLayerData,
+  OptimizerSettings,
+} from "../types";
+import { CropSchema, ModelTask } from "../enums";
+import { ImageObject, Shape } from "store/data/types";
 
 export abstract class Model {
   readonly name: string;
   readonly task: ModelTask;
   readonly graph: boolean;
-  readonly pretrained: boolean;
   readonly trainable: boolean;
   readonly kind?: string;
   readonly src?: string;
-  readonly requiredChannels?: number;
+
+  private _requiredChannels?: number;
+  private _pretrained: boolean;
 
   protected _model?: LayersModel | GraphModel;
   protected _history: ModelHistory;
+  protected _preprocessingOptions?: {
+    cropSchema: CropSchema;
+    numCrops: number;
+    inputShape: Omit<Shape, "planes">;
+    shuffle: boolean;
+    rescale: boolean;
+    batchSize: number;
+  };
+  protected _classes?: string[];
+  protected _optimizerSettings?: OptimizerSettings;
 
   constructor({
     name,
@@ -31,10 +47,10 @@ export abstract class Model {
     this.task = task;
     this.kind = kind;
     this.graph = graph;
-    this.pretrained = pretrained;
+    this._pretrained = pretrained;
     this.trainable = trainable;
     this.src = src;
-    this.requiredChannels = requiredChannels;
+    this._requiredChannels = requiredChannels;
     // set defaults
     this._model = undefined;
     this._history = { epochs: [], history: [] };
@@ -71,6 +87,9 @@ export abstract class Model {
     this._history.history.push(numberOnlyHistory);
   }
 
+  public get requiredChannels() {
+    return this._requiredChannels;
+  }
   public get numEpochs() {
     return this._history.epochs.length;
   }
@@ -81,6 +100,18 @@ export abstract class Model {
 
   public get history() {
     return this._history;
+  }
+
+  public get pretrained() {
+    return this._pretrained;
+  }
+
+  public get preprocessingOptions() {
+    return this._preprocessingOptions;
+  }
+
+  public setPretrained() {
+    this._pretrained = true;
   }
 
   public abstract loadModel(loadModelArgs?: any): void | Promise<void>;
@@ -103,9 +134,132 @@ export abstract class Model {
 
   public abstract stopTraining(): void;
 
+  public async getSavedModelFiles(modelName?: string) {
+    const savedName = modelName ?? this.name;
+    let weightsBlob: Blob | undefined = undefined;
+    let modelJsonBlob: Blob | undefined = undefined;
+    const weightsFileName = savedName + ".weights.bin";
+    const modelJsonFileName = savedName + ".json";
+    const saveHandler = async (modelArtifacts: io.ModelArtifacts) => {
+      weightsBlob = new Blob([modelArtifacts.weightData!], {
+        type: "application/octet-stream",
+      });
+      if (modelArtifacts.modelTopology instanceof ArrayBuffer) {
+        throw new Error(
+          "BrowserDownloads.save() does not support saving model topology " +
+            "in binary formats yet.",
+        );
+      } else {
+        const weightsManifest = [
+          {
+            paths: ["./" + weightsFileName],
+            weights: modelArtifacts.weightSpecs,
+          },
+        ];
+        const modelJSON: {
+          modelTopology: typeof modelArtifacts.modelTopology;
+          format: typeof modelArtifacts.format;
+          generatedBy: typeof modelArtifacts.generatedBy;
+          convertedBy: typeof modelArtifacts.convertedBy;
+          weightsManifest: typeof weightsManifest;
+          signature?: typeof modelArtifacts.signature;
+          userDefinedMetadata?: typeof modelArtifacts.userDefinedMetadata;
+          modelInitializer?: typeof modelArtifacts.modelInitializer;
+          initializerSignature?: typeof modelArtifacts.initializerSignature;
+          trainingConfig?: typeof modelArtifacts.trainingConfig;
+          preprocessSettings?: {
+            cropSchema: CropSchema;
+            numCrops: number;
+            inputShape: Omit<Shape, "planes">;
+            shuffle: boolean;
+            rescale: boolean;
+            batchSize: number;
+          };
+          classes?: string[];
+          optimizerSettings?: OptimizerSettings;
+        } = {
+          modelTopology: modelArtifacts.modelTopology,
+          format: modelArtifacts.format,
+          generatedBy: modelArtifacts.generatedBy,
+          convertedBy: modelArtifacts.convertedBy,
+          weightsManifest: weightsManifest,
+        };
+        if (modelArtifacts.signature != null) {
+          modelJSON.signature = modelArtifacts.signature;
+        }
+        if (modelArtifacts.userDefinedMetadata != null) {
+          modelJSON.userDefinedMetadata = modelArtifacts.userDefinedMetadata;
+        }
+        if (modelArtifacts.modelInitializer != null) {
+          modelJSON.modelInitializer = modelArtifacts.modelInitializer;
+        }
+        if (modelArtifacts.initializerSignature != null) {
+          modelJSON.initializerSignature = modelArtifacts.initializerSignature;
+        }
+        if (modelArtifacts.trainingConfig != null) {
+          modelJSON.trainingConfig = modelArtifacts.trainingConfig;
+        }
+        if (this._preprocessingOptions) {
+          modelJSON.preprocessSettings = this._preprocessingOptions;
+        }
+        if (this._classes) {
+          modelJSON.classes = this._classes;
+        }
+        if (this._optimizerSettings) {
+          modelJSON.optimizerSettings = this._optimizerSettings;
+        }
+        modelJsonBlob = new Blob([JSON.stringify(modelJSON)], {
+          type: "application/json",
+        });
+
+        return {
+          modelArtifactsInfo: io.getModelArtifactsInfoForJSON(modelArtifacts),
+          modelJsonBlob,
+          weightsBlob,
+        };
+      }
+    };
+    if (!this._model) throw Error(`Model ${this.name} not loaded`);
+    const output = (await this._model.save(
+      io.withSaveHandler(saveHandler),
+    )) as {
+      modelArtifactsInfo: io.ModelArtifactsInfo;
+      modelJsonBlob: Blob;
+      weightsBlob: Blob;
+    };
+    return {
+      weightsBlob: output.weightsBlob,
+      modelJsonBlob: output.modelJsonBlob,
+      weightsFileName,
+      modelJsonFileName,
+    };
+  }
   public async saveModel() {
     if (!this._model) throw Error(`Model ${this.name} not loaded`);
+
     await this._model.save(`downloads://${this.name}`);
+  }
+
+  public async getModelArtifacts() {
+    if (!this._model) throw Error(`Model ${this.name} not loaded`);
+    try {
+      const returnArtifactsHandler = async (artifacts: io.ModelArtifacts) => ({
+        modelArtifactsInfo: io.getModelArtifactsInfoForJSON(artifacts),
+        artifacts,
+      });
+      const { artifacts } = (await this._model.save(
+        io.withSaveHandler(returnArtifactsHandler),
+      )) as {
+        modelArtifactsInfo: io.ModelArtifactsInfo;
+        artifacts: io.ModelArtifacts;
+      };
+      return artifacts;
+    } catch (err) {
+      throw new Error(
+        `Could not get artifacts for model: ${this.name}.`,
+        err as Error,
+      );
+    }
   }
 
   public abstract get modelLoaded(): boolean;
@@ -116,7 +270,7 @@ export abstract class Model {
   public abstract get defaultInputShape(): number[];
   public abstract get defaultOutputShape(): number[] | undefined;
 
-  public abstract get modelSummary(): Array<ModelLayerData>;
+  public abstract get modelSummary(): Array<ModelLayerData> | undefined;
 
   //abstract onEpochEnd: TrainingCallbacks["onEpochEnd"];
 

@@ -3,7 +3,7 @@ import React, { ReactElement } from "react";
 import { useTranslation } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 
-import { useTheme } from "@mui/material";
+import { Stack, useTheme } from "@mui/material";
 import { Margin } from "@mui/icons-material";
 
 import { Tool } from "components/ui";
@@ -23,14 +23,14 @@ import {
 } from "icons";
 
 import { ToolType } from "views/ImageViewer/utils/enums";
-import { ResizableTool } from "components/ui/Tool/Tool";
-import { SliderOptions } from "utils/common/types";
+import { ResizableTool } from "components/ui/Tool";
+import { SliderOptions } from "utils/types";
 import {
   penToolSizeControls,
   QuickToolSizeControls,
   ThresholdToolSizeControls,
 } from "views/ImageViewer/utils/consts";
-import { FlexColumnBox } from "components/ui";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 type ToolMap = Record<
   string,
@@ -125,7 +125,7 @@ export const ToolOptions = () => {
   };
 
   return (
-    <FlexColumnBox>
+    <Stack data-help={HelpItem.ObjectCreationTools}>
       {Object.keys(toolMap).map((name, idx) => {
         const tool = toolMap[name];
 
@@ -160,6 +160,6 @@ export const ToolOptions = () => {
           </Tool>
         );
       })}
-    </FlexColumnBox>
+    </Stack>
   );
 };

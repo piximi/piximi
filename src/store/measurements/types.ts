@@ -1,4 +1,4 @@
-import { DataArray } from "utils/file-io/types";
+import { DataArray } from "store/data/types";
 import { Partition } from "utils/models/enums";
 
 export type MeasurementsState = {
@@ -29,7 +29,7 @@ export type MeasurementGroup = {
   upToDate: boolean;
 };
 
-export type ThingMeasurementsDatum = {
+type ThingMeasurementsDatum = {
   channelData: number[][];
   maskData?: DataArray;
   maskShape?: { width: number; height: number };

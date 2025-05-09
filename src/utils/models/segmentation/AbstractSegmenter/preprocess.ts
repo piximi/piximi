@@ -1,6 +1,6 @@
 import { Tensor4D, data as tfdata } from "@tensorflow/tfjs";
 import { FitOptions } from "../../types";
-import { denormalizeTensor, getImageSlice } from "utils/common/tensorHelpers";
+import { denormalizeTensor, getImageSlice } from "utils/tensorUtils";
 import { ImageObject } from "store/data/types";
 
 const inferenceGenerator = (images: Array<ImageObject>) => {

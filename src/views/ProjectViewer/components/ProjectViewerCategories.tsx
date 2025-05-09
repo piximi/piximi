@@ -7,9 +7,8 @@ import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
-import { CategoryItemMenu } from "components/categories/CategoryItemMenu";
+import { CategoryItemMenu } from "components/ui/CategoryItemMenu";
 import { CategoryItem } from "./list-items/CategoryItem";
-import { PredictionListItems } from "./list-items/PredictionListItems";
 
 import { projectSlice } from "store/project";
 import { selectHighlightedCategory } from "store/project/selectors";
@@ -19,14 +18,14 @@ import {
   selectActiveSelectedThingIds,
 } from "store/project/reselectors";
 import { dataSlice } from "store/data/dataSlice";
-import { selectClassifierModelStatus } from "store/classifier/selectors";
 
-import { isUnknownCategory } from "store/data/helpers";
+import { isUnknownCategory } from "store/data/utils";
 
-import { ModelStatus, Partition } from "utils/models/enums";
-import { HotkeyContext } from "utils/common/enums";
+import { Partition } from "utils/models/enums";
+import { HotkeyContext } from "utils/enums";
 
 import { Category } from "store/data/types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ProjectViewerCategories = () => {
   const dispatch = useDispatch();
@@ -39,7 +38,6 @@ export const ProjectViewerCategories = () => {
 
   const highlightedCategory = useSelector(selectHighlightedCategory);
 
-  const modelStatus = useSelector(selectClassifierModelStatus);
   const selectedImageIds = useSelector(selectActiveSelectedThingIds);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
@@ -237,14 +235,15 @@ export const ProjectViewerCategories = () => {
           })}
         </List>
 
-        {modelStatus === ModelStatus.Suggesting && <PredictionListItems />}
         <CustomListItemButton
+          data-help={HelpItem.CreateCategory}
           icon={<AddIcon />}
           primaryText="Create Category"
           onClick={handleOpenCreateCategoryDialog}
           dense
         />
         <CustomListItemButton
+          data-help={HelpItem.DeleteAllCategories}
           icon={
             <DeleteIcon
               color={categories.length > 0 ? "inherit" : "disabled"}

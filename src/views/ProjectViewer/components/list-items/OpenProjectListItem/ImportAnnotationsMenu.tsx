@@ -3,7 +3,7 @@ import { Menu } from "@mui/material";
 
 import { ImportAnnotationsFileMenuItem } from "./ImportAnnotationsFileMenuItem";
 
-import { ProjectFileType } from "utils/file-io/runtimeTypes";
+import { ProjectFileType } from "utils/file-io/runtime/validators";
 
 type ImportAnnotationsMenuProps = {
   anchorEl: HTMLElement | null;

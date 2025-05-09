@@ -17,7 +17,8 @@ import {
 import { selectKindDictionary } from "store/data/selectors";
 import { selectVisibleKinds } from "store/project/reselectors";
 
-import { dimensions } from "utils/common/constants";
+import { dimensions } from "utils/constants";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ProjectImageGrid = () => {
   const dispatch = useDispatch();
@@ -110,6 +111,10 @@ export const ProjectImageGrid = () => {
       })}
     >
       <CustomTabs
+        tabHelp={{
+          tabBar: HelpItem.KindTabs,
+          create: HelpItem.AddKindTab,
+        }}
         extendable
         transition="sliding"
         childClassName="grid-tabs"

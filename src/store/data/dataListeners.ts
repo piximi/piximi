@@ -5,14 +5,18 @@ import { dataSlice } from "./dataSlice";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { createRenderedTensor } from "utils/common/tensorHelpers";
+import { createRenderedTensor } from "utils/tensorUtils";
 
 import { ImageObject } from "./types";
 import { TypedAppStartListening } from "store/types";
+import _ from "lodash";
+import { classifierSlice } from "store/classifier/classifierSlice";
+import { getDefaultModelInfo } from "utils/models/classification/utils";
+import { recursiveAssign } from "utils/objectUtils";
 
 export const dataMiddleware = createListenerMiddleware();
 
-export const startAppListening =
+const startAppListening =
   dataMiddleware.startListening as TypedAppStartListening;
 
 startAppListening({
@@ -132,6 +136,51 @@ startAppListening({
     listenerAPI.dispatch(
       applicationSettingsSlice.actions.setLoadMessage({
         message: "",
+      }),
+    );
+  },
+});
+
+startAppListening({
+  predicate: (action, currentState, previousState) => {
+    return currentState.data.kinds.ids !== previousState.data.kinds.ids;
+  },
+  effect: async (action, listenerAPI) => {
+    const { data: dataState, project: projectState } = listenerAPI.getState();
+    const currentDataStateKinds = dataState.kinds.ids;
+
+    const previousDataStateKinds =
+      listenerAPI.getOriginalState().data.kinds.ids;
+
+    const deletedKinds = _.difference(
+      previousDataStateKinds,
+      currentDataStateKinds,
+    );
+    const addedKinds = _.difference(
+      currentDataStateKinds,
+      previousDataStateKinds,
+    );
+    const defaultModelInfo = getDefaultModelInfo();
+    recursiveAssign(defaultModelInfo, {
+      preprocessSettings: {
+        inputShape: { channels: projectState.imageChannels },
+      },
+    });
+    listenerAPI.dispatch(
+      classifierSlice.actions.updateKindClassifiers({
+        changes: {
+          del: deletedKinds,
+          add: addedKinds,
+          presetInfo: addedKinds.map(() => {
+            const defaultModelInfo = getDefaultModelInfo();
+            defaultModelInfo.preprocessSettings.inputShape.channels =
+              projectState.imageChannels ?? 1;
+            return {
+              modelNameOrArch: 0,
+              modelInfoDict: { "base-model": defaultModelInfo },
+            };
+          }),
+        },
       }),
     );
   },

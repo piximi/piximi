@@ -3,23 +3,24 @@ import { expect, it } from "vitest";
 import "@tensorflow/tfjs-node";
 import { preprocessSegmentationImages } from "../segmentation/FullyConvolutionalSegmenter/preprocessSegmenter";
 import { fileFromPath } from "utils/file-io/nodeImageHelper";
-import { generateUUID } from "store/data/helpers";
+import { generateUUID } from "store/data/utils";
 import {
   CropOptions,
   FitOptions,
-  PreprocessOptions,
+  SegmenterPreprocessSettings,
   RescaleOptions,
 } from "../types";
 import { CropSchema, Partition } from "../enums";
 import { MIMEType } from "utils/file-io/types";
-import { loadImageFileAsStack } from "utils/file-io/helpers";
-import { convertToImage } from "utils/common/tensorHelpers";
+import { loadImageFileAsStack } from "utils/file-io/utils";
+import { convertToImage } from "utils/tensorUtils";
 import {
   Category,
   ImageObject,
   OldAnnotationType,
   Shape,
 } from "store/data/types";
+import { MIMETYPES } from "utils/file-io/enums";
 
 //jest.setTimeout(50000);
 
@@ -40,7 +41,7 @@ const cropOptions: CropOptions = {
   cropSchema: CropSchema.None,
 };
 
-const preprocessingOptions: PreprocessOptions = {
+const preprocessingOptions: SegmenterPreprocessSettings = {
   shuffle: true,
   rescaleOptions,
   cropOptions,
@@ -80,7 +81,7 @@ const preloadedImages: Array<{
   id: imId,
   src: "/static/media/cell-painting.f118ef087853056f08e6.png",
   name: "cell-painting.png",
-  mimetype: "image/png",
+  mimetype: MIMETYPES.PNG,
   annotations: [
     {
       boundingBox: [86, 149, 217, 240],

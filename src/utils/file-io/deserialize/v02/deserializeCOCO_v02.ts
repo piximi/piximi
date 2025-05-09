@@ -1,7 +1,7 @@
 import { encode, maskFromPoints } from "views/ImageViewer/utils";
-import { generateUUID } from "store/data/helpers";
-import { getPropertiesFromImage } from "utils/common/helpers";
-import { logger } from "utils/common/helpers";
+import { generateUUID } from "store/data/utils";
+import { getPropertiesFromImage } from "store/data/utils";
+import { logger } from "utils/logUtils";
 
 import { Partition } from "utils/models/enums";
 import {
@@ -10,9 +10,8 @@ import {
   SerializedCOCOFileType,
   SerializedCOCOImageType,
 } from "../../types";
-import { Point } from "views/ImageViewer/utils/types";
-import { UNKNOWN_ANNOTATION_CATEGORY_COLOR } from "utils/common/constants";
-import { RequireOnly } from "utils/common/types";
+import { Point } from "utils/types";
+import { RequireOnly } from "utils/types";
 import {
   Kind,
   AnnotationObject,
@@ -20,7 +19,10 @@ import {
   ImageObject,
   Shape,
 } from "store/data/types";
-import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
+import {
+  UNKNOWN_ANNOTATION_CATEGORY_COLOR,
+  UNKNOWN_CATEGORY_NAME,
+} from "store/data/constants";
 
 type KindMap = Record<
   string,

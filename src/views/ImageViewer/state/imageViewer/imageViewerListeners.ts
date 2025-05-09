@@ -6,7 +6,7 @@ import { dataSlice } from "store/data";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { imageViewerSlice } from "./imageViewerSlice";
 
-import { createRenderedTensor } from "utils/common/tensorHelpers";
+import { createRenderedTensor } from "utils/tensorUtils";
 
 import { AnnotationObject, ImageObject } from "store/data/types";
 import { TypedAppStartListening } from "store/types";

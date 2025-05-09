@@ -1,14 +1,14 @@
 import { encode, maskFromPoints } from "views/ImageViewer/utils";
 
-import { generateUUID } from "store/data/helpers";
-import { logger } from "utils/common/helpers";
+import { generateUUID } from "store/data/utils";
+import { logger } from "utils/logUtils";
 import {
   SerializedCOCOAnnotationType,
   SerializedCOCOCategoryType,
   SerializedCOCOFileType,
   SerializedCOCOImageType,
 } from "../../types";
-import { Point } from "views/ImageViewer/utils/types";
+import { Point } from "utils/types";
 import { OldAnnotationType, OldCategory, OldImageType } from "store/data/types";
 
 /*

@@ -36,14 +36,14 @@ import {
   decodeDicomImage,
   forceStack,
   getImageInformation,
-} from "utils/file-io/helpers";
-import { updateRecordArray } from "utils/common/helpers";
-import { convertToImage } from "utils/common/tensorHelpers";
-import { isUnknownCategory } from "store/data/helpers";
+} from "utils/file-io/utils";
+import { isEnumValue, updateRecordArray } from "utils/objectUtils";
+import { convertToImage } from "utils/tensorUtils";
+import { isUnknownCategory } from "store/data/utils";
 
-import { MIMETYPES } from "utils/file-io/constants";
+import { MIMETYPES } from "utils/file-io/enums";
 import { ImageShapeEnum } from "utils/file-io/enums";
-import { AlertType } from "utils/common/enums";
+import { AlertType } from "utils/enums";
 import { Partition } from "utils/models/enums";
 
 import { ImageObject } from "store/data/types";
@@ -71,7 +71,7 @@ const getUploadedFileTypes = async (files: FileList) => {
     const ext = file.type as MIMEType;
     try {
       // https://stackoverflow.com/questions/56565528/typescript-const-assertions-how-to-use-array-prototype-includes
-      if (!(MIMETYPES as ReadonlyArray<string>).includes(file.type)) {
+      if (!isEnumValue(MIMETYPES, file.type)) {
         import.meta.env.NODE_ENV !== "production" &&
           console.error("Invalid MIME Type:", ext);
         updateRecordArray(images, ImageShapeEnum.InvalidImage, {
@@ -93,7 +93,7 @@ const getUploadedFileTypes = async (files: FileList) => {
           shape: ImageShapeEnum.DicomImage,
           components: image.length,
           fileName: file.name,
-          ext: "image/dicom",
+          ext: MIMETYPES.DICOM,
           image,
         });
       } else {
@@ -151,6 +151,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
     async (errors: string[]) => {
       delete fileInfo[ImageShapeEnum.InvalidImage];
       const uploadedFiles = Object.values(fileInfo).flat();
+      console.log(uploadedFiles);
 
       const convertedImages: ImageObject[] = [];
       for await (const fileInfo of uploadedFiles) {

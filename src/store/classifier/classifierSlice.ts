@@ -1,61 +1,29 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { availableClassifierModels } from "utils/models/availableClassificationModels";
+import { getDefaultModelInfo } from "utils/models/classification/utils";
 
+import { ClassifierEvaluationResultType } from "utils/models/types";
 import {
-  CropSchema,
-  LossFunction,
-  Metric,
-  ModelStatus,
-  OptimizationAlgorithm,
-} from "utils/models/enums";
+  ClassifierState,
+  KindClassifier,
+  ModelClassMap,
+  ModelInfo,
+} from "store/types";
+import { Kind, Shape } from "store/data/types";
+import { DEFAULT_KIND } from "store/data/constants";
+import { getSelectedModelInfo } from "./utils";
+import { RecursivePartial } from "utils/types";
+import { recursiveAssign } from "utils/objectUtils";
+import { cloneDeep } from "lodash";
 
-import {
-  ClassifierEvaluationResultType,
-  CropOptions,
-  RescaleOptions,
-  TrainingCallbacks,
-} from "utils/models/types";
-import { ClassifierState } from "store/types";
-import { Shape } from "store/data/types";
-
-export const initialState: ClassifierState = {
-  modelStatus: ModelStatus.Uninitialized,
-  inputShape: {
-    planes: 1,
-    height: 64,
-    width: 64,
-    channels: 3,
-  },
-  fitOptions: {
-    epochs: 10,
-    batchSize: 32,
-  },
-  learningRate: 0.01,
-  lossFunction: LossFunction.CategoricalCrossEntropy,
-  selectedModelIdx: 0,
-  metrics: [Metric.CategoricalAccuracy],
-  optimizationAlgorithm: OptimizationAlgorithm.Adam,
-  preprocessOptions: {
-    shuffle: true,
-    rescaleOptions: {
-      rescale: true,
-      center: false,
-    },
-    cropOptions: {
-      numCrops: 1,
-      cropSchema: CropSchema.None,
+const initialState: ClassifierState = {
+  kindClassifiers: {
+    [DEFAULT_KIND]: {
+      modelNameOrArch: 0,
+      modelInfoDict: { "base-model": getDefaultModelInfo() },
     },
   },
-  trainingPercentage: 0.75,
-  evaluationResult: {
-    confusionMatrix: [],
-    accuracy: -1,
-    crossEntropy: -1,
-    precision: -1,
-    recall: -1,
-    f1Score: -1,
-  },
+
   showClearPredictionsWarning: true,
 };
 
@@ -63,8 +31,7 @@ export const classifierSlice = createSlice({
   name: "classifier",
   initialState: initialState,
   reducers: {
-    resetClassifier: (state) => {
-      availableClassifierModels[state.selectedModelIdx].dispose();
+    resetClassifiers: () => {
       return initialState;
     },
     setClassifier(
@@ -76,141 +43,175 @@ export const classifierSlice = createSlice({
       return action.payload.classifier;
     },
     setDefaults(state) {
-      // TODO - segmenter: dispose() and state.selectedModel = SimpleCNN(), or whatever
-
-      availableClassifierModels[state.selectedModelIdx].dispose();
-
-      state.modelStatus = ModelStatus.Uninitialized;
-      state.evaluationResult = {
-        confusionMatrix: [],
-        accuracy: -1,
-        crossEntropy: -1,
-        precision: -1,
-        recall: -1,
-        f1Score: -1,
+      state.kindClassifiers = {
+        [DEFAULT_KIND]: {
+          modelNameOrArch: 0,
+          modelInfoDict: {
+            "base-model": getDefaultModelInfo(),
+          },
+        },
       };
     },
-
-    updateModelStatus(
+    updateKindClassifiers(
       state,
       action: PayloadAction<{
-        modelStatus: ModelStatus;
-        onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
+        changes:
+          | {
+              add: Array<Kind["id"]>;
+              presetInfo?: Array<KindClassifier>;
+            }
+          | { del: Array<Kind["id"]> };
       }>,
     ) {
-      state.modelStatus = action.payload.modelStatus;
-    },
-
-    updateBatchSize(state, action: PayloadAction<{ batchSize: number }>) {
-      const { batchSize } = action.payload;
-
-      state.fitOptions.batchSize = batchSize;
-    },
-    updateEpochs(state, action: PayloadAction<{ epochs: number }>) {
-      const { epochs } = action.payload;
-
-      state.fitOptions.epochs = epochs;
-    },
-    updateInputShape(state, action: PayloadAction<{ inputShape: Shape }>) {
-      state.inputShape = action.payload.inputShape;
-    },
-    updateLearningRate(state, action: PayloadAction<{ learningRate: number }>) {
-      const { learningRate } = action.payload;
-
-      state.learningRate = learningRate;
-    },
-    updateLossFunction(
-      state,
-      action: PayloadAction<{ lossFunction: LossFunction }>,
-    ) {
-      const { lossFunction } = action.payload;
-
-      state.lossFunction = lossFunction;
-    },
-    updateMetrics(state, action: PayloadAction<{ metrics: Array<Metric> }>) {
-      const { metrics } = action.payload;
-
-      state.metrics = metrics;
-    },
-    updateSelectedModelIdx(
-      state,
-      action: PayloadAction<{ modelIdx: number; disposePrevious: boolean }>,
-    ) {
-      const { modelIdx, disposePrevious } = action.payload;
-
-      if (disposePrevious) {
-        availableClassifierModels[state.selectedModelIdx].dispose();
-      }
-
-      state.selectedModelIdx = modelIdx;
-      const selectedModel = availableClassifierModels[modelIdx];
-
-      if (selectedModel.history.epochs.length > 0 || selectedModel.pretrained) {
-        state.modelStatus = ModelStatus.Trained;
+      const changes = action.payload.changes;
+      if ("add" in changes) {
+        changes.add.forEach(
+          (kindId, idx) =>
+            (state.kindClassifiers[kindId] =
+              idx < changes.add.length &&
+              changes.presetInfo &&
+              changes.presetInfo[idx]
+                ? changes.presetInfo[idx]
+                : {
+                    modelNameOrArch: 0,
+                    modelInfoDict: {
+                      "base-model": getDefaultModelInfo(),
+                    },
+                  }),
+        );
       } else {
-        state.modelStatus = ModelStatus.Uninitialized;
+        changes.del.forEach((kindId) => delete state.kindClassifiers[kindId]);
       }
     },
-    loadUserSelectedModel(
+    addModelInfo(
       state,
       action: PayloadAction<{
-        inputShape: Shape;
-        model: (typeof availableClassifierModels)[number];
+        kindId: Kind["id"];
+        modelName: string;
+        modelInfo: ModelInfo;
       }>,
     ) {
-      const { inputShape, model } = action.payload;
-
-      availableClassifierModels.push(model);
-      state.selectedModelIdx = availableClassifierModels.length - 1;
-
-      state.inputShape = inputShape;
-
-      if (model.pretrained || model.history.epochs.length > 0) {
-        state.modelStatus = ModelStatus.Trained;
-      } else {
-        state.modelStatus = ModelStatus.Uninitialized;
+      const { kindId, modelName, modelInfo } = action.payload;
+      if (modelName in state.kindClassifiers[kindId].modelInfoDict) {
+        throw new Error(
+          `Info for model with name "${modelName}" already exists`,
+        );
       }
+      state.kindClassifiers[kindId].modelInfoDict[modelName] = modelInfo;
     },
-    updateOptimizationAlgorithm(
+    removeModelInfo(
       state,
-      action: PayloadAction<{ optimizationAlgorithm: OptimizationAlgorithm }>,
+      action: PayloadAction<{
+        modelName: string;
+      }>,
     ) {
-      const { optimizationAlgorithm } = action.payload;
-
-      state.optimizationAlgorithm = optimizationAlgorithm;
+      const { modelName } = action.payload;
+      Object.keys(state.kindClassifiers).forEach((kindId) => {
+        delete state.kindClassifiers[kindId].modelInfoDict[modelName];
+      });
     },
-    updateRescaleOptions(
+    addModelClassMapping(
       state,
-      action: PayloadAction<{ rescaleOptions: RescaleOptions }>,
+      action: PayloadAction<{
+        kindId: Kind["id"];
+        modelName: string;
+        classMapping: ModelClassMap;
+      }>,
     ) {
-      state.preprocessOptions.rescaleOptions = action.payload.rescaleOptions;
+      const { kindId, modelName, classMapping } = action.payload;
+      if (!(modelName in state.kindClassifiers[kindId].modelInfoDict)) {
+        throw new Error(
+          `Info for model with name "${modelName}" does not exists`,
+        );
+      }
+      state.kindClassifiers[kindId].modelInfoDict[modelName].classMap =
+        classMapping;
     },
-    updateShuffleOptions(state, action: PayloadAction<{ shuffle: boolean }>) {
-      state.preprocessOptions.shuffle = action.payload.shuffle;
-    },
-    updateCropOptions(
+    updateModelOptimizerSettings(
       state,
-      action: PayloadAction<{ cropOptions: CropOptions }>,
+      action: PayloadAction<{
+        settings: Partial<ModelInfo["optimizerSettings"]>;
+        kindId: Kind["id"];
+      }>,
     ) {
-      state.preprocessOptions.cropOptions = action.payload.cropOptions;
+      const { settings, kindId } = action.payload;
+      const selectedModelInfo = getSelectedModelInfo(
+        state.kindClassifiers,
+        kindId,
+      );
+      Object.assign(selectedModelInfo.optimizerSettings, settings);
     },
-    updateTrainingPercentage(
+    updateModelPreprocessOptions(
       state,
-      action: PayloadAction<{ trainingPercentage: number }>,
+      action: PayloadAction<{
+        settings: RecursivePartial<ModelInfo["preprocessSettings"]>;
+        kindId: Kind["id"];
+      }>,
     ) {
-      const { trainingPercentage } = action.payload;
-
-      state.trainingPercentage = trainingPercentage;
+      const { settings, kindId } = action.payload;
+      const selectedModelInfo = getSelectedModelInfo(
+        state.kindClassifiers,
+        kindId,
+      );
+      recursiveAssign(selectedModelInfo.preprocessSettings, settings);
+    },
+    updateInputShape(
+      state,
+      action: PayloadAction<{ inputShape: Partial<Shape>; kindId: Kind["id"] }>,
+    ) {
+      const { kindId, inputShape } = action.payload;
+      const selectedModelInfo = getSelectedModelInfo(
+        state.kindClassifiers,
+        kindId,
+      );
+      selectedModelInfo.preprocessSettings.inputShape = {
+        ...selectedModelInfo.preprocessSettings.inputShape,
+        ...inputShape,
+      };
+    },
+    updateChannelsGlobally(
+      state,
+      action: PayloadAction<{ globalChannels: number }>,
+    ) {
+      Object.keys(state.kindClassifiers).forEach((kind) => {
+        state.kindClassifiers[kind].modelInfoDict[
+          "base-model"
+        ].preprocessSettings.inputShape.channels =
+          action.payload.globalChannels;
+      });
+    },
+    updateSelectedModelNameOrArch(
+      state,
+      action: PayloadAction<{
+        modelName: string | number;
+        kindId: Kind["id"];
+      }>,
+    ) {
+      const { modelName, kindId } = action.payload;
+      const classifier = state.kindClassifiers[kindId];
+      classifier.modelNameOrArch = modelName;
+      if (!modelName) return;
+      if (!(modelName in classifier.modelInfoDict)) {
+        classifier.modelInfoDict[modelName] = cloneDeep(
+          classifier.modelInfoDict["base-model"],
+        );
+      }
     },
     updateEvaluationResult(
       state,
       action: PayloadAction<{
         evaluationResult: ClassifierEvaluationResultType;
+        kindId: Kind["id"];
       }>,
     ) {
-      const { evaluationResult } = action.payload;
+      const { evaluationResult, kindId } = action.payload;
+      const selectedModel = state.kindClassifiers[kindId];
 
-      state.evaluationResult = evaluationResult;
+      selectedModel.modelInfoDict[
+        typeof selectedModel.modelNameOrArch === "string"
+          ? selectedModel.modelNameOrArch
+          : "base-model"
+      ].evalResults.push(evaluationResult);
     },
     updateShowClearPredictionsWarning(
       state,

@@ -3,17 +3,22 @@ import "@tensorflow/tfjs-node";
 import { SequentialClassifier } from "../classification/AbstractClassifier/AbstractClassifier";
 
 import { fileFromPath } from "utils/file-io/nodeImageHelper";
+// import {
+//   CropOptions,
+//   FitOptions,
+//   PreprocessSettings,
+//   RescaleOptions,
+// } from "../types";
 import {
-  CropOptions,
-  FitOptions,
-  PreprocessOptions,
-  RescaleOptions,
-} from "../types";
-import { CropSchema, ModelTask } from "../enums";
-import { loadImageFileAsStack } from "utils/file-io/helpers";
-import { convertToImage } from "utils/common/tensorHelpers";
+  //CropSchema,
+  ModelTask,
+} from "../enums";
+import { loadImageFileAsStack } from "utils/file-io/utils";
+import { convertToImage } from "utils/tensorUtils";
 import { MIMEType } from "utils/file-io/types";
-import { Category, ImageObject, Shape } from "store/data/types";
+import { Category, ImageObject } from "store/data/types";
+import { MIMETYPES } from "utils/file-io/enums";
+import { getDefaultModelInfo } from "../classification/utils";
 
 class GenericClassifier extends SequentialClassifier {
   constructor() {
@@ -26,7 +31,21 @@ class GenericClassifier extends SequentialClassifier {
     });
   }
 
-  loadModel() {}
+  loadModel() {
+    const defaultModelInfo = getDefaultModelInfo();
+    this._preprocessingOptions = {
+      inputShape: {
+        height: 224,
+        width: 224,
+        channels: 3,
+      },
+      ...defaultModelInfo.preprocessSettings.cropOptions,
+      shuffle: defaultModelInfo.preprocessSettings.shuffle,
+      rescale: defaultModelInfo.preprocessSettings.rescaleOptions.rescale,
+      batchSize: defaultModelInfo.optimizerSettings.batchSize,
+    };
+    this._optimizerSettings = defaultModelInfo.optimizerSettings;
+  }
 
   get testTrainingDataArray() {
     if (!this._trainingDataset) {
@@ -37,34 +56,6 @@ class GenericClassifier extends SequentialClassifier {
     return this._trainingDataset.toArrayForTest();
   }
 }
-
-const inputShape: Shape = {
-  planes: 1,
-  height: 224,
-  width: 224,
-  channels: 3,
-};
-
-const rescaleOptions: RescaleOptions = {
-  rescale: true,
-  center: false,
-};
-
-const cropOptions: CropOptions = {
-  numCrops: 1,
-  cropSchema: CropSchema.None,
-};
-
-const preprocessOptions: PreprocessOptions = {
-  shuffle: true,
-  rescaleOptions,
-  cropOptions,
-};
-
-const fitOptions: FitOptions = {
-  epochs: 10,
-  batchSize: 32,
-};
 
 const categories: Array<Category> = [
   {
@@ -93,7 +84,7 @@ const preloadedImages: Array<{
   {
     src: "https://picsum.photos/seed/piximi/224",
     name: "224.jpg",
-    mimetype: "image/jpeg",
+    mimetype: MIMETYPES.JPEG,
   },
 ];
 
@@ -119,12 +110,9 @@ it("preprocessClassifier", async () => {
   }
 
   const model = new GenericClassifier();
-  model.loadTraining(images, {
-    categories,
-    inputShape,
-    preprocessOptions,
-    fitOptions,
-  });
+  model.loadModel();
+  expect(model.preprocessingOptions).toBeDefined();
+  model.loadTraining(images, categories);
 
   expect(model.trainingLoaded).toBeTruthy();
 

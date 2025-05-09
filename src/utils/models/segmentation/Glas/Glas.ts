@@ -6,7 +6,7 @@ import { LoadInferenceDataArgs } from "../../types";
 import { ModelTask } from "../../enums";
 import { Kind, ImageObject } from "store/data/types";
 import { loadGlas } from "./loadGlas";
-import { generateKind } from "store/data/helpers";
+import { generateKind } from "store/data/utils";
 
 const KIND_NAME = "glas_glands";
 /*

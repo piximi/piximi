@@ -12,10 +12,10 @@ import {
 import { predictCellpose } from "./predictCellpose";
 import { FitOptions } from "../../types";
 import { ModelTask } from "../../enums";
-import { getImageSlice } from "utils/common/tensorHelpers";
+import { getImageSlice } from "utils/tensorUtils";
 import { Kind, ImageObject } from "store/data/types";
 import { LoadCB } from "utils/file-io/types";
-import { generateKind } from "store/data/helpers";
+import { generateKind } from "store/data/utils";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;

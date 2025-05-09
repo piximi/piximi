@@ -20,10 +20,11 @@ import {
   selectImageViewerObjects,
 } from "../state/annotator/reselectors";
 
-import { HotkeyContext } from "utils/common/enums";
-import { generateUUID } from "store/data/helpers";
+import { HotkeyContext } from "utils/enums";
+import { generateUUID } from "store/data/utils";
 import { KindMenu } from "./KindMenu";
 import { DecodedAnnotationObject } from "store/data/types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ImageViewerCategories = () => {
   const dispatch = useDispatch();
@@ -158,9 +159,12 @@ export const ImageViewerCategories = () => {
   return (
     <>
       <List dense sx={{ py: 0 }}>
-        {categoriesByKindArray.map(({ kindId, categories }) => {
+        {categoriesByKindArray.map(({ kindId, categories }, idx) => {
           return (
             <CollapsibleListItem
+              data-help={
+                idx === 0 ? HelpItem.ImageViewerKindSection : undefined
+              }
               disabledCollapse={editingKind === kindId}
               primaryText={
                 <EditableKindField

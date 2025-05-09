@@ -8,7 +8,7 @@ import {
   pointsAreEqual,
   getIdx,
 } from "views/ImageViewer/utils";
-import { Point } from "../types";
+import { Point } from "utils/types";
 import { AnnotationState } from "../enums";
 
 export class MagneticAnnotationTool extends AnnotationTool {

@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import {
   Clear as ClearIcon,
@@ -13,18 +13,17 @@ import { useTranslation } from "hooks";
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { ListItemHoldButton } from "components/ui/ListItemHoldButton";
 
-import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
-import { dataSlice } from "store/data/dataSlice";
-import { selectActiveKindId } from "store/project/selectors";
 
 import { ModelStatus, Partition } from "utils/models/enums";
+import { List } from "@mui/material";
+import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 
 export const PredictionListItems = () => {
   const dispatch = useDispatch();
-  const activeKind = useSelector(selectActiveKindId);
-
   const [labeledImagesVisible, setLabeledImagesVisible] = React.useState(true);
+  const { setModelStatus, clearPredictions, acceptPredictions } =
+    useClassifierStatus();
 
   const t = useTranslation();
 
@@ -49,12 +48,8 @@ export const PredictionListItems = () => {
     setLabeledImagesVisible((isShown) => !isShown);
   };
 
-  const clearPredictions = () => {
-    dispatch(
-      dataSlice.actions.clearPredictions({
-        kind: activeKind,
-      }),
-    );
+  const handleClearPredictions = () => {
+    clearPredictions();
 
     if (!labeledImagesVisible) {
       setLabeledImagesVisible(true);
@@ -66,23 +61,11 @@ export const PredictionListItems = () => {
       );
     }
 
-    dispatch(
-      classifierSlice.actions.updateModelStatus({
-        modelStatus: ModelStatus.Trained,
-      }),
-    );
+    setModelStatus(ModelStatus.Idle);
   };
-  const acceptPredictions = () => {
-    dispatch(
-      dataSlice.actions.acceptPredictions({
-        kind: activeKind,
-      }),
-    );
-    dispatch(
-      classifierSlice.actions.updateModelStatus({
-        modelStatus: ModelStatus.Trained,
-      }),
-    );
+  const handleAcceptPredictions = () => {
+    acceptPredictions();
+    setModelStatus(ModelStatus.Idle);
     dispatch(
       projectSlice.actions.removeThingPartitionFilters({
         partitions: "all",
@@ -91,25 +74,46 @@ export const PredictionListItems = () => {
   };
 
   return (
-    <>
+    <List dense>
       <CustomListItemButton
         primaryText={t(
           `${labeledImagesVisible ? "Hide" : "Show"} labeled images`,
         )}
         onClick={toggleShowLabeledImages}
-        icon={labeledImagesVisible ? <VisibilityOffIcon /> : <VisibilityIcon />}
+        icon={
+          labeledImagesVisible ? (
+            <VisibilityOffIcon
+              sx={(theme) => ({ fontSize: theme.typography.body1.fontSize })}
+            />
+          ) : (
+            <VisibilityIcon
+              sx={(theme) => ({ fontSize: theme.typography.body1.fontSize })}
+            />
+          )
+        }
+        primaryTypographyProps={{ variant: "body2" }}
       />
       <CustomListItemButton
         primaryText={t("Clear predictions")}
-        onClick={clearPredictions}
-        icon={<ClearIcon />}
+        onClick={handleClearPredictions}
+        icon={
+          <ClearIcon
+            sx={(theme) => ({ fontSize: theme.typography.body1.fontSize })}
+          />
+        }
+        primaryTypographyProps={{ variant: "body2" }}
       />
       <ListItemHoldButton
-        onHoldComplete={acceptPredictions}
+        onHoldComplete={handleAcceptPredictions}
         primaryText="Accept Predictions (Hold)"
-        icon={<CheckIcon />}
+        icon={
+          <CheckIcon
+            sx={(theme) => ({ fontSize: theme.typography.body1.fontSize })}
+          />
+        }
         holdDuration={100}
+        primaryTypographyProps={{ variant: "body2" }}
       />
-    </>
+    </List>
   );
 };

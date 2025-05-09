@@ -22,9 +22,10 @@ import {
   selectActiveImageRawColor,
 } from "views/ImageViewer/state/annotator/reselectors";
 
-import { rgbToHex, scaleDownRange, scaleUpRange } from "utils/common/helpers";
+import { rgbToHex } from "utils/colorUtils";
+import { scaleDownRange, scaleUpRange } from "utils/dataUtils";
 
-import { BitDepth } from "utils/file-io/types";
+import { BitDepth } from "store/data/types";
 
 //TODO: Slider Components
 

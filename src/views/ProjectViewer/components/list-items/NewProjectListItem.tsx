@@ -6,7 +6,8 @@ import { useDialogHotkey } from "hooks";
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { NewProjectDialog } from "../dialogs";
 
-import { HotkeyContext } from "utils/common/enums";
+import { HotkeyContext } from "utils/enums";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const NewProjectListItem = () => {
   const { onClose, onOpen, open } = useDialogHotkey(
@@ -16,6 +17,7 @@ export const NewProjectListItem = () => {
   return (
     <>
       <CustomListItemButton
+        data-help={HelpItem.StartNewProject}
         primaryText="New"
         onClick={onOpen}
         icon={<AddIcon />}

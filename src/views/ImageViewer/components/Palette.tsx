@@ -12,9 +12,8 @@ import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
 import { selectActiveImageRawColor } from "views/ImageViewer/state/annotator/reselectors";
 
-import { rgbToHex } from "utils/common/helpers";
-
-import { DEFAULT_COLORS } from "utils/common/constants";
+import { rgbToHex } from "utils/colorUtils";
+import { DEFAULT_COLORS } from "store/data/constants";
 
 type PaletteProps = {
   channelIdx: number;

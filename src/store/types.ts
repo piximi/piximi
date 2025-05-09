@@ -2,27 +2,23 @@ import { History } from "@tensorflow/tfjs";
 import {
   Dispatch,
   EntityState,
-  ListenerEffectAPI,
   TypedStartListening,
   UnknownAction,
 } from "@reduxjs/toolkit";
 
-import { HotkeyContext, Languages, ThingSortKey } from "utils/common/enums";
+import { HotkeyContext, Languages, ThingSortKey } from "utils/enums";
 import { ThemeMode } from "themes/enums";
-import {
-  LossFunction,
-  Metric,
-  ModelStatus,
-  OptimizationAlgorithm,
-} from "utils/models/enums";
+import { ModelStatus } from "utils/models/enums";
 
-import { AlertState, FilterType } from "utils/common/types";
+import { AlertState, FilterType } from "utils/types";
 import {
   ClassifierEvaluationResultType,
   FitOptions,
-  PreprocessOptions,
-  CompileOptions,
+  PreprocessSettings,
+  OptimizerSettings,
   SegmenterEvaluationResultType,
+  SegmenterPreprocessSettings,
+  SegmenterCompileSettings,
 } from "utils/models/types";
 import {
   Kind,
@@ -66,10 +62,10 @@ export type SegmenterState = {
   // pre-fit state
   selectedModelIdx: number;
   inputShape: Shape;
-  preprocessOptions: PreprocessOptions;
+  preprocessOptions: SegmenterPreprocessSettings;
   fitOptions: FitOptions;
 
-  compileOptions: CompileOptions;
+  compileOptions: SegmenterCompileSettings;
 
   trainingPercentage: number;
   trainingHistory?: History;
@@ -78,23 +74,23 @@ export type SegmenterState = {
   modelStatus: ModelStatus;
 };
 
+export type ModelClassMap = Record<number, Category["id"]>;
+export type ModelInfo = {
+  trainingSet?: string[];
+  validationDet?: string[];
+  classMap?: ModelClassMap;
+  preprocessSettings: PreprocessSettings;
+  optimizerSettings: OptimizerSettings;
+  evalResults: ClassifierEvaluationResultType[];
+};
+export type KindClassifier = {
+  modelNameOrArch: string | number;
+  modelInfoDict: Record<string, ModelInfo>;
+};
+
+export type KindClassifierDict = Record<Kind["id"], KindClassifier>;
 export type ClassifierState = {
-  // pre-fit state
-  selectedModelIdx: number;
-  inputShape: Shape;
-  preprocessOptions: PreprocessOptions;
-  fitOptions: FitOptions;
-
-  learningRate: number;
-  lossFunction: LossFunction;
-  optimizationAlgorithm: OptimizationAlgorithm;
-  metrics: Array<Metric>;
-
-  trainingPercentage: number;
-  // post-evaluation results
-  evaluationResult: ClassifierEvaluationResultType;
-  // status flags
-  modelStatus: ModelStatus;
+  kindClassifiers: KindClassifierDict;
   showClearPredictionsWarning: boolean;
 };
 
@@ -113,7 +109,7 @@ export type ProjectState = {
   imageChannels: number | undefined;
 };
 
-export type AppState = {
+type AppState = {
   classifier: ClassifierState;
   segmenter: SegmenterState;
   imageViewer: ImageViewerState;
@@ -127,17 +123,3 @@ export type AppState = {
 export type AppDispatch = Dispatch<UnknownAction>;
 
 export type TypedAppStartListening = TypedStartListening<AppState, AppDispatch>;
-
-export type StoreListemerAPI = ListenerEffectAPI<
-  {
-    classifier: ClassifierState;
-    segmenter: SegmenterState;
-    imageViewer: ImageViewerState;
-    project: ProjectState;
-    applicationSettings: AppSettingsState;
-    annotator: AnnotatorState;
-    data: DataState;
-  },
-  AppDispatch,
-  unknown
->;

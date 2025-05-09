@@ -5,7 +5,7 @@ import { Box, CssBaseline } from "@mui/material";
 
 import { useUnloadConfirmation } from "hooks";
 
-import { FallBackDialog } from "components/dialogs";
+import { FallbackDialog } from "components/dialogs";
 
 import { MeasurementDashboard, MeasurementsDrawer } from "./sections";
 
@@ -13,8 +13,8 @@ import { selectProjectImageChannels } from "store/project/selectors";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
 
-import { dimensions } from "utils/common/constants";
-import { HotkeyContext } from "utils/common/enums";
+import { dimensions } from "utils/constants";
+import { HotkeyContext } from "utils/enums";
 
 export const MeasurementView = () => {
   const dispatch = useDispatch();
@@ -49,7 +49,7 @@ export const MeasurementView = () => {
   }, [projectImageChannels, dispatch]);
 
   return (
-    <ErrorBoundary FallbackComponent={FallBackDialog}>
+    <ErrorBoundary FallbackComponent={FallbackDialog}>
       <Box
         sx={(theme) => ({
           height: "100vh",

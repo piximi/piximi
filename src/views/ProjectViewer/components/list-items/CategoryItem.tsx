@@ -12,7 +12,7 @@ import { CountChip } from "components/ui/CountChip";
 import { selectNumThingsByCatAndKind } from "store/data/selectors";
 import { selectActiveKindId } from "store/project/selectors";
 
-import { APPLICATION_COLORS } from "utils/common/constants";
+import { APPLICATION_COLORS } from "utils/constants";
 
 import { Category } from "store/data/types";
 

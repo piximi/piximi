@@ -6,7 +6,7 @@ import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { projectSlice } from "store/project";
 import { selectSortType } from "store/project/selectors";
 
-import { ThingSortKey } from "utils/common/enums";
+import { ThingSortKey } from "utils/enums";
 
 export const SortSelection = () => {
   const dispatch = useDispatch();
@@ -17,7 +17,7 @@ export const SortSelection = () => {
   const onSortKeyChange = (event: SelectChangeEvent<unknown>) => {
     setSelectedKey(event.target.value as ThingSortKey);
     dispatch(
-      projectSlice.actions.setSortType_new({
+      projectSlice.actions.setSortType({
         sortType: event.target.value as ThingSortKey,
       }),
     );

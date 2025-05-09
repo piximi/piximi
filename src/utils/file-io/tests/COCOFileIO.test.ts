@@ -18,18 +18,15 @@ import {
 import initialState from "data/test-data/COCO/labels_internal.json";
 
 import { fileFromPath } from "utils/file-io/nodeImageHelper";
-import {
-  convertArrayToShape,
-  getPropertiesFromImageSync,
-} from "utils/common/helpers";
-import { generateUUID } from "store/data/helpers";
+import { getPropertiesFromImageSync } from "store/data/utils";
+import { convertArrayToShape } from "utils/models/utils";
+import { generateUUID } from "store/data/utils";
 
 import { serializeCOCOFile } from "../serialize/serializeCOCO";
 import { deserializeCOCOFile } from "../deserialize/deserializeCOCO";
 
 import { Partition } from "utils/models/enums";
 import { SerializedCOCOFileType } from "../types";
-import { CATEGORY_COLORS } from "utils/common/constants";
 import {
   Kind,
   AnnotationObject,
@@ -37,6 +34,8 @@ import {
   ImageObject,
 } from "store/data/types";
 import { EntityState } from "@reduxjs/toolkit";
+import { CATEGORY_COLORS } from "store/data/constants";
+import { MIMETYPES } from "../enums";
 
 tfSetBackend("cpu");
 const imDataMap: Record<string, string> = {
@@ -61,7 +60,7 @@ beforeAll(async () => {
       ...buildImage
     } = image;
     const imPath = imDataMap[image.name];
-    const imFile = await fileFromPath(imPath, "image/jpeg");
+    const imFile = await fileFromPath(imPath, MIMETYPES.JPEG);
     const imBuffer = await imFile.arrayBuffer();
     const rawImage = await Image.load(imBuffer);
     const imSrc = rawImage.toDataURL();

@@ -6,7 +6,6 @@ import {
   Slider,
   Box,
   Typography,
-  TextField,
   FormControl,
   Menu,
   Tooltip,
@@ -30,20 +29,18 @@ import {
 import { useDialogHotkey, useHotkeys, useMenu, useMobileView } from "hooks";
 import { useThingSelection } from "../../hooks";
 
-import { LogoLoader } from "components/ui/LogoLoader";
-import { SortSelection } from "views/ProjectViewer/sections/SortSelection";
-import { TooltipTitle } from "components/ui/tooltips";
+import { LogoLoader, AlertBar } from "components/ui";
+import { TooltipTitle, TooltipButton } from "components/ui/tooltips";
 import { CustomAppBar } from "components/layout";
-import { AlertBar } from "components/ui/AlertBar";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { TooltipButton } from "components/ui/tooltips/TooltipButton/TooltipButton";
+import { SortSelection } from "views/ProjectViewer/sections/SortSelection";
+import { TextFieldWithBlur } from "components/inputs";
 import { ImageCategoryMenu } from "./ImageCategoryMenu";
 
 import { projectSlice } from "store/project";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data";
 import { selectActiveKindId, selectProjectName } from "store/project/selectors";
-
 import { selectActiveCategories } from "store/project/reselectors";
 import {
   selectAlertState,
@@ -51,11 +48,11 @@ import {
   selectLoadMessage,
 } from "store/applicationSettings/selectors";
 
-import { pluralize } from "utils/common/helpers";
-import { isUnknownCategory } from "store/data/helpers";
-
-import { HotkeyContext } from "utils/common/enums";
+import { pluralize } from "utils/stringUtils";
+import { isUnknownCategory } from "store/data/utils";
+import { HotkeyContext } from "utils/enums";
 import { Partition } from "utils/models/enums";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 const minZoom = 0.6;
 const maxZoom = 4;
@@ -208,6 +205,7 @@ export const ProjectAppBar = () => {
               >
                 <span>
                   <Chip
+                    data-help={HelpItem.NavigateImageViewer}
                     avatar={<GestureIcon color="inherit" />}
                     label="Annotate"
                     onClick={handleNavigateImageViewer}
@@ -220,6 +218,7 @@ export const ProjectAppBar = () => {
               <Tooltip title="Go to Measurements">
                 <span>
                   <Chip
+                    data-help={HelpItem.NavigateMeasurements}
                     avatar={<StraightenIcon color="inherit" />}
                     label="Measurements"
                     onClick={handleNavigateMeasurements}
@@ -286,7 +285,11 @@ const ZoomControl = () => {
 
   return (
     <>
-      <IconButton color="inherit" onClick={onOpen}>
+      <IconButton
+        data-help={HelpItem.GridZoom}
+        color="inherit"
+        onClick={onOpen}
+      >
         <ZoomInIcon />
       </IconButton>
       <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
@@ -349,6 +352,7 @@ const CategorizeChip = ({
       >
         <span>
           <Chip
+            data-help={HelpItem.Categorize}
             avatar={<LabelOutlinedIcon color="inherit" />}
             label="Categorize"
             onClick={onOpenCategoriesMenu}
@@ -390,14 +394,6 @@ const ProjectTextField = () => {
     setNewProjectName(event.target.value);
   };
 
-  const handleTextFieldEnter = (
-    event: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (event.key === "Enter") {
-      inputRef.current?.blur();
-    }
-  };
-
   useEffect(() => {
     setNewProjectName(projectName);
   }, [projectName]);
@@ -410,16 +406,23 @@ const ProjectTextField = () => {
         </Typography>
       ) : (
         <FormControl>
-          <TextField
+          <TextFieldWithBlur
+            data-help={HelpItem.ProjectName}
             onChange={handleTextFieldChange}
             onBlur={handleTextFieldBlur}
-            onKeyDown={handleTextFieldEnter}
             value={newProjectName}
             inputRef={inputRef}
             size="small"
             sx={{ ml: 5 }}
             variant="standard"
-            inputProps={{ min: 0, style: { textAlign: "center" } }}
+            slotProps={{
+              htmlInput: { min: 0, style: { textAlign: "center" } },
+              input: {
+                slotProps: {
+                  input: { min: 0, style: { textAlign: "center" } },
+                },
+              },
+            }}
           />
         </FormControl>
       )}

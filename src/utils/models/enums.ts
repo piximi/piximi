@@ -11,6 +11,7 @@ export enum ModelTask {
 }
 
 export enum ModelStatus {
+  Idle,
   Uninitialized,
   InitFit,
   Loading,
@@ -19,6 +20,7 @@ export enum ModelStatus {
   Predicting,
   Suggesting,
   Evaluating,
+  Pending,
 }
 
 export enum OptimizationAlgorithm {

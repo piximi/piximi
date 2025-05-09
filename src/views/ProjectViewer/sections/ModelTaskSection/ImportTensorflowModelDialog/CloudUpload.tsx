@@ -13,23 +13,20 @@ import { Language as LanguageIcon } from "@mui/icons-material";
 
 import { useDebounce } from "hooks";
 
-import { UploadedClassifier } from "utils/models/classification";
-import { Model } from "utils/models/Model";
+import { RemoteClassifier } from "utils/models/classification/UploadedClassifier";
 
-import { ModelTask } from "utils/models/enums";
+import classifierHandler from "utils/models/classification/classifierHandler";
+import { isObjectEmpty } from "utils/objectUtils";
+import { SequentialClassifier } from "utils/models/classification";
 
-import { Shape } from "store/data/types";
-
-export const CloudUpload = ({
-  modelTask,
+export const RemoteClassifierUpload = ({
   isGraph,
-  setModel,
-  setInputShape,
+  setUploadedModels,
 }: {
-  modelTask: ModelTask;
   isGraph: boolean;
-  setModel: (model: Model) => void;
-  setInputShape: React.Dispatch<React.SetStateAction<Shape>>;
+  setUploadedModels: React.Dispatch<
+    React.SetStateAction<SequentialClassifier[]>
+  >;
 }) => {
   const [errMessage, setErrMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -37,7 +34,7 @@ export const CloudUpload = ({
   const [isFromTFHub, setIsFromTFHub] = useState(false);
 
   const verifySourceMatch = (url: string, isFromTFHub: boolean) => {
-    if (isFromTFHub && !UploadedClassifier.verifyTFHubUrl(url)) {
+    if (isFromTFHub && !RemoteClassifier.verifyTFHubUrl(url)) {
       setErrMessage("URL must point to TFHub");
       return;
     }
@@ -62,43 +59,25 @@ export const CloudUpload = ({
     setErrMessage("");
     setSuccessMessage("");
 
-    if (modelTask === ModelTask.Classification) {
-      const model = new UploadedClassifier({
-        name: "User Uploaded Classifier",
-        task: modelTask,
-        pretrained: true,
-        trainable: isGraph,
-        TFHub: isFromTFHub,
-        graph: isGraph,
-        src: modelUrl,
-      });
+    const result = await classifierHandler.modelFromUrl(
+      modelUrl,
+      isFromTFHub,
+      isGraph,
+    );
 
-      try {
-        await model.upload();
-      } catch (err) {
-        setErrMessage(`Failed to download model: ${err}`);
-        return;
-      }
-
-      const inputShape = model.defaultInputShape;
-
-      setInputShape((prevShape) => ({
-        ...prevShape,
-        height: inputShape[0],
-        width: inputShape[1],
-        channels: inputShape[2],
-      }));
-
-      setModel(model);
-
+    if (!isObjectEmpty(result.failedModels)) {
+      setErrMessage(
+        `Failed to upload models: ${Object.keys(result.failedModels!).join(", ")}`,
+      );
+    }
+    if (result.loadedModels.length > 0) {
+      classifierHandler.addModels(result.loadedModels);
+      setUploadedModels(result.loadedModels);
       setSuccessMessage(
         `Successfully uploaded Classification ${
           isGraph ? "Graph" : "Layers"
-        } Model ("${model.name}")`,
+        } Models: "${result.loadedModels.map((model) => model.name).join(", ")}"`,
       );
-    } else {
-      // TODO - segmenter
-      setErrMessage("Segmenter loading by url not yet supported");
     }
   };
 

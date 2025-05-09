@@ -12,15 +12,23 @@ import {
 import { UploadedClassifier } from "../classification";
 import {
   ClassifierEvaluationResultType,
-  CropOptions,
-  FitOptions,
-  PreprocessOptions,
-  RescaleOptions,
+  // CropOptions,
+  // FitOptions,
+  // PreprocessSettings,
+  // RescaleOptions,
 } from "../types";
-import { CropSchema, ModelTask, Partition } from "../enums";
-import { loadDataUrlAsStack } from "utils/file-io/helpers";
-import { convertToImage } from "utils/common/tensorHelpers";
-import { Category, ImageObject, Shape } from "store/data/types";
+import {
+  //CropSchema,
+  ModelTask,
+  Partition,
+} from "../enums";
+import { loadDataUrlAsStack } from "utils/file-io/utils";
+import { convertToImage } from "utils/tensorUtils";
+import {
+  Category,
+  ImageObject,
+  // Shape
+} from "store/data/types";
 
 const categories: Array<Category> = [
   // {
@@ -111,33 +119,35 @@ const categories: Array<Category> = [
   },
 ];
 
-const inputShape: Shape = {
-  planes: 1,
-  height: 28,
-  width: 28,
-  channels: 1,
-};
+// const inputShape: Shape = {
+//   planes: 1,
+//   height: 28,
+//   width: 28,
+//   channels: 1,
+// };
 
-const rescaleOptions: RescaleOptions = {
-  rescale: true,
-  center: false,
-};
+// const rescaleOptions: RescaleOptions = {
+//   rescale: true,
+//   center: false,
+// };
 
-const cropOptions: CropOptions = {
-  numCrops: 1,
-  cropSchema: CropSchema.None,
-};
+// const cropOptions: CropOptions = {
+//   numCrops: 1,
+//   cropSchema: CropSchema.None,
+// };
 
-const preprocessOptions: PreprocessOptions = {
-  shuffle: true,
-  rescaleOptions,
-  cropOptions,
-};
+// const preprocessOptions: PreprocessSettings = {
+//   inputShape,
+//   shuffle: true,
+//   rescaleOptions,
+//   cropOptions,
+//   trainingPercentage: 100,
+// };
 
-const fitOptions: FitOptions = {
-  epochs: 2,
-  batchSize: 3,
-};
+// const fitOptions: FitOptions = {
+//   epochs: 2,
+//   batchSize: 3,
+// };
 
 const validationImagesUnloaded = [
   {
@@ -174,11 +184,11 @@ it("evaluateClassifier", async () => {
   }
 
   const jsonFileBuffer = fs.readFileSync(
-    path.join(__dirname, "mnist_classifier.json"),
+    path.join(__dirname, "data/mnist_classifier/mnist_classifier.json"),
   );
 
   const weightsFileBuffer = fs.readFileSync(
-    path.join(__dirname, "mnist_classifier.weights.bin"),
+    path.join(__dirname, "data/mnist_classifier/mnist_classifier.weights.bin"),
   );
 
   const jsonFile = new File(
@@ -191,7 +201,6 @@ it("evaluateClassifier", async () => {
   );
 
   const model = new UploadedClassifier({
-    TFHub: false,
     descFile: jsonFile,
     weightsFiles: [weightsFile],
     name: "SimpleCNN",
@@ -203,12 +212,7 @@ it("evaluateClassifier", async () => {
 
   await model.loadModel();
 
-  model.loadValidation(validationImages, {
-    categories,
-    inputShape,
-    preprocessOptions,
-    fitOptions,
-  });
+  model.loadValidation(validationImages, categories);
 
   // console.log("weights file:", tfmemory().numTensors, tfmemory().numBytes);
 
@@ -266,7 +270,7 @@ it("evaluateClassifier", async () => {
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ],
     accuracy: 0.6666666666666666,
-    crossEntropy: 1.4029693743335276,
+    crossEntropy: 5.372701168070918,
     precision: 0.6666666865348816,
     recall: 0.6666666865348816,
     f1Score: 0.6666666865348816,

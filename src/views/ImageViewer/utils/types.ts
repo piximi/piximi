@@ -1,4 +1,4 @@
-import { FilterType, RequireOnly } from "utils/common/types";
+import { FilterType, RequireOnly } from "utils/types";
 import { AnnotationMode, AnnotationState, ToolType, ZoomMode } from "./enums";
 import {
   AnnotationObject,
@@ -94,14 +94,7 @@ export type AnnotatorChanges = {
     edited: Record<string, RequireOnly<ProtoAnnotationObject, "id">>;
   };
 };
-export type Point = {
-  x: number;
-  y: number;
-};
-export type Edge = {
-  p1: Point;
-  p2: Point;
-};
+
 export type ColorAdjustmentOptionsType = {
   blackPoint: number;
   brightness: number;
@@ -120,9 +113,4 @@ export type ZoomToolOptionsType = {
   scale: number;
   toActualSize: boolean;
   toFit: boolean;
-};
-
-export type ToolOptionsStateType = {
-  colorAdjustment: ColorAdjustmentOptionsType;
-  zoom: ZoomToolOptionsType;
 };

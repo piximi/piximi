@@ -15,13 +15,15 @@ import {
   deserializePiximiAnnotations,
 } from "utils/file-io/deserialize";
 
-import { CATEGORY_COLORS } from "utils/common/constants";
-
-import { ProjectFileType, validateFileType } from "utils/file-io/runtimeTypes";
+import {
+  ProjectFileType,
+  validateFileType,
+} from "utils/file-io/runtime/validators";
 import {
   SerializedCOCOFileType,
   SerializedFileType,
 } from "utils/file-io/types";
+import { CATEGORY_COLORS } from "store/data/constants";
 
 //TODO: MenuItem??
 

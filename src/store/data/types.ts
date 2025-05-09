@@ -1,10 +1,11 @@
 import { Tensor4D } from "@tensorflow/tfjs";
-import { BitDepth } from "image-js";
 
 import { Partition } from "utils/models/enums";
+import { BitDepth as IJSBitDepth, DataArray as IJSDataArray } from "image-js";
+import { Colors, PartialBy, RequireOnly } from "utils/types";
 
-import { DataArray } from "utils/file-io/types";
-import { Colors, PartialBy, RequireOnly } from "utils/common/types";
+export type BitDepth = IJSBitDepth;
+export type DataArray = IJSDataArray;
 
 export type Thing = {
   id: string;
@@ -58,9 +59,6 @@ export type Kind = {
   categories: string[];
   unknownCategoryId: string;
 };
-export type KindWithCategories = Omit<Kind, "categories"> & {
-  categories: Category[];
-};
 
 export type Shape = {
   planes: number;
@@ -103,13 +101,6 @@ export type OldAnnotationType = {
   imageId: string;
   // TODO serialize: these should not be undefineable
 };
-
-export type OldDecodedAnnotationType = Omit<
-  OldAnnotationType & {
-    decodedMask: DataArray;
-  },
-  "encodedMask"
->;
 
 export type CategoryUpdates = {
   id: string;

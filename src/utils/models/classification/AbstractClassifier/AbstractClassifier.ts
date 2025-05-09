@@ -8,29 +8,32 @@ import {
   History,
   tidy,
   argMax,
+  max,
   oneHot,
   math,
   metrics,
   zeros,
 } from "@tensorflow/tfjs";
 
-import { preprocessClassifier } from "./preprocess";
+import { preprocessData } from "./preprocess";
 import { Model } from "../../Model";
 
 import {
   ClassifierEvaluationResultType,
   FitOptions,
-  LoadDataArgs,
   TrainingCallbacks,
 } from "../../types";
-import { evaluateConfusionMatrix, getLayersModelSummary } from "../../helpers";
-import { OldCategory, Thing } from "store/data/types";
+import { evaluateConfusionMatrix, getLayersModelSummary } from "../../utils";
+import { Category, Thing } from "store/data/types";
+import { logger } from "utils/logUtils";
+import { RequireOnly } from "utils/types";
 
 export abstract class SequentialClassifier extends Model {
   protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  protected _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  protected _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D }>;
   private _cachedOutputShape?: number[];
+  protected override _classes: string[] = [];
 
   public override dispose() {
     this._trainingDataset = undefined;
@@ -42,31 +45,40 @@ export abstract class SequentialClassifier extends Model {
 
   public loadTraining<T extends Thing>(
     images: T[],
-    preprocessingArgs: LoadDataArgs,
+    categories: RequireOnly<Category, "id">[],
   ) {
-    this._trainingDataset = preprocessClassifier({
+    if (!this._preprocessingOptions) return;
+    this._trainingDataset = preprocessData({
       images,
-      ...preprocessingArgs,
+      categories,
+      preprocessOptions: this._preprocessingOptions,
+      inference: false,
     });
   }
 
   public loadValidation<T extends Thing>(
     images: T[],
-    preprocessingArgs: LoadDataArgs,
+    categories: RequireOnly<Category, "id">[],
   ) {
-    this._validationDataset = preprocessClassifier({
+    if (!this._preprocessingOptions) return;
+    this._validationDataset = preprocessData({
       images,
-      ...preprocessingArgs,
+      categories,
+      preprocessOptions: this._preprocessingOptions,
+      inference: false,
     });
   }
 
   public loadInference<T extends Thing>(
     images: T[],
-    preprocessingArgs: LoadDataArgs,
+    categories: RequireOnly<Category, "id">[],
   ) {
-    this._inferenceDataset = preprocessClassifier({
+    if (!this._preprocessingOptions) return;
+    this._inferenceDataset = preprocessData({
       images,
-      ...preprocessingArgs,
+      categories,
+      preprocessOptions: this._preprocessingOptions,
+      inference: true,
     });
   }
 
@@ -96,21 +108,21 @@ export abstract class SequentialClassifier extends Model {
         epochs: options.epochs,
         validationData: this._validationDataset,
       };
-
       const history = await (this._model as LayersModel).fitDataset(
         this._trainingDataset,
         args,
       );
-
       this.appendHistory(history);
-
+      this.setPretrained();
       return history;
     } else {
       throw Error(`"${this.name}" Graph Model training not implemented`);
     }
   }
 
-  public async predict(categories: Array<OldCategory>): Promise<string[]> {
+  public async predict(
+    categories: Array<RequireOnly<Category, "id">>,
+  ): Promise<{ categoryIds: string[]; probabilities: number[] }> {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -124,37 +136,40 @@ export abstract class SequentialClassifier extends Model {
 
     const inferredBatchTensors = await this._inferenceDataset
       .map((items) => {
-        const batchPred = tidy(() => {
-          // we're mapping over batches already, but predict also
-          // takes a batch size option which defaults at 32
-          const batchProbs = model.predict(items.xs) as Tensor2D;
-          return argMax(batchProbs, 1) as Tensor1D;
-        });
+        const batchProbs = model.predict(items.xs) as Tensor2D;
+        const batchPred = argMax(batchProbs, 1) as Tensor1D;
+        const batchMaxProb = max(batchProbs, 1) as Tensor1D;
+        batchProbs.dispose();
 
         return {
           preds: batchPred,
+          probs: batchMaxProb,
         };
       })
       .toArray();
 
     const inferredTensors = inferredBatchTensors.reduce((prev, curr) => {
-      const res = prev.preds.concat(curr.preds);
-
+      const predRes = prev.preds.concat(curr.preds);
+      const probRes = prev.probs.concat(curr.probs);
       prev.preds.dispose();
+      prev.probs.dispose();
       curr.preds.dispose();
+      curr.probs.dispose();
 
       return {
-        preds: res,
+        preds: predRes,
+        probs: probRes,
       };
     });
 
     const predictions = await inferredTensors.preds.array();
-
+    const probabilities = await inferredTensors.probs.array();
     const categoryIds = predictions.map((idx) => categories[idx].id);
 
     inferredTensors.preds.dispose();
+    inferredTensors.probs.dispose();
 
-    return categoryIds;
+    return { categoryIds, probabilities };
   }
 
   public async evaluate(): Promise<ClassifierEvaluationResultType> {
@@ -295,6 +310,13 @@ export abstract class SequentialClassifier extends Model {
     return this.defaultOutputShape[0];
   }
 
+  public set classes(classes: string[]) {
+    this._classes = classes;
+  }
+
+  public get classes() {
+    return this._classes!;
+  }
   public get defaultInputShape() {
     return this._model?.inputs[0].shape!.slice(1) as number[];
   }
@@ -343,11 +365,13 @@ export abstract class SequentialClassifier extends Model {
   public get modelSummary() {
     // TODO: implent summary for graph models
     if (this.graph) {
-      throw Error("Graph model summaries unavailale");
+      logger("Graph model summaries unavailale", { level: "warn" });
+      return;
     }
 
     if (!this._model) {
-      throw Error(`Model ${this.name}not loaded`);
+      logger(`Model ${this.name} is not loaded`, { level: "warn" });
+      return;
     }
 
     return getLayersModelSummary(this._model as LayersModel);

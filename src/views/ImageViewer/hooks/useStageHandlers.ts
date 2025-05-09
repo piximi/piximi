@@ -15,7 +15,7 @@ import {
   selectToolType,
 } from "views/ImageViewer/state/annotator/selectors";
 
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/logUtils";
 import {
   AnnotationTool,
   ObjectAnnotationTool,
@@ -27,7 +27,7 @@ import {
   ToolType,
 } from "views/ImageViewer/utils/enums";
 
-import { Point } from "views/ImageViewer/utils/types";
+import { Point } from "utils/types";
 
 const transformerClassName = "Transformer";
 const transformerButtonAttrNAme = "transformer-button";

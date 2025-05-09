@@ -1,18 +1,23 @@
 import React from "react";
 import { List } from "@mui/material";
 
-import { NewProjectListItem } from "./list-items";
-import { OpenProjectListItem } from "./list-items";
-import { SaveProjectListItem } from "./list-items";
+import {
+  NewProjectListItem,
+  OpenProjectListItem,
+  SaveProjectListItem,
+} from "./list-items";
+import { ConfirmReplaceDialogProvider } from "../hooks/useConfirmReplaceProjectDialog";
 
 export const FileIO = () => {
   return (
-    <List dense>
-      <NewProjectListItem />
+    <ConfirmReplaceDialogProvider>
+      <List dense>
+        <NewProjectListItem />
 
-      <OpenProjectListItem />
+        <OpenProjectListItem />
 
-      <SaveProjectListItem />
-    </List>
+        <SaveProjectListItem />
+      </List>
+    </ConfirmReplaceDialogProvider>
   );
 };

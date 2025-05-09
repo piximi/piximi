@@ -1,9 +1,10 @@
 import IJSImage from "image-js";
 import { pointsAreEqual } from "./point-operations";
 
-import { logger } from "utils/common/helpers";
-import { Point, ProtoAnnotationObject } from "./types";
-import { DataArray } from "utils/file-io/types";
+import { logger } from "utils/logUtils";
+import { ProtoAnnotationObject } from "./types";
+import { DataArray } from "store/data/types";
+import { Point } from "utils/types";
 
 export const generatePoints = (buffer: Array<number> | undefined) => {
   if (!buffer) return undefined;

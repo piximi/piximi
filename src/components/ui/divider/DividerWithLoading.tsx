@@ -1,13 +1,14 @@
 import { ReactNode } from "react";
 import { Box, CircularProgress, Typography } from "@mui/material";
 
-import { LoadStatus } from "utils/common/types";
+import { HTMLDataAttributes, LoadStatus } from "utils/types";
 
 export const DividerWithLoading = ({
   title,
   loadStatus,
   loadedStateIcon,
-}: {
+  ...attrs
+}: HTMLDataAttributes & {
   title: string;
   loadStatus: LoadStatus;
   loadedStateIcon?: ReactNode;
@@ -22,6 +23,7 @@ export const DividerWithLoading = ({
         })}
       />
       <Typography
+        data-help={attrs["data-help"]}
         sx={{
           //reapply formatting of DividerHeader
           margin: 0,

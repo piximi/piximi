@@ -8,20 +8,20 @@ import {
 import { dispose, TensorContainer } from "@tensorflow/tfjs";
 import { difference, intersection } from "lodash";
 
-import {
-  mutatingFilter,
-  newReplaceDuplicateName,
-  updateRecordArray,
-} from "utils/common/helpers";
-import { generateUUID, generateKind, isUnknownCategory } from "./helpers";
+import { updateRecordArray } from "utils/objectUtils";
+import { generateUUID, generateKind, isUnknownCategory } from "./utils";
 import { encode } from "views/ImageViewer/utils/rle";
-import { updateContents } from "./helpers";
+import { updateContents } from "./utils";
 
-import { Partition } from "utils/models/enums";
-import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/constants";
-import { UNKNOWN_CATEGORY_NAME } from "./constants";
+import {
+  UNKNOWN_CATEGORY_NAME,
+  UNKNOWN_IMAGE_CATEGORY_COLOR,
+} from "./constants";
 
-import { PartialBy } from "utils/common/types";
+import { getUniqueName } from "utils/stringUtils";
+import { mutatingFilter } from "utils/arrayUtils";
+
+import { PartialBy } from "utils/types";
 import { DataState } from "store/types";
 import {
   Kind,
@@ -40,7 +40,7 @@ export const thingsAdapter = createEntityAdapter<
   ImageObject | AnnotationObject
 >();
 
-export const initialState = (): DataState => {
+const initialState = (): DataState => {
   return {
     kinds: kindsAdapter.getInitialState({
       ids: [imageKind.id],
@@ -634,6 +634,7 @@ export const dataSlice = createSlice({
         const splitName = thing.name!.split(".");
         const ext = splitName.at(-1);
         const name = splitName.slice(0, splitName.length - 1).join(".");
+
         const existingImageIds =
           state.kinds.entities[thing.kind]?.containing ?? [];
 
@@ -641,7 +642,7 @@ export const dataSlice = createSlice({
           (id) => (state.things.entities[id]!.name as string).split(".")[0],
         );
 
-        let updatedNamePrefix = newReplaceDuplicateName(name, existingPrefixes);
+        let updatedNamePrefix = getUniqueName(name, existingPrefixes);
 
         if (ext) {
           updatedNamePrefix += `.${ext}`;
@@ -758,70 +759,6 @@ export const dataSlice = createSlice({
       dataSlice.caseReducers.addThings(state, {
         type: "addThings",
         payload: { things: encodedAnnotations },
-      });
-    },
-    // Sets the category for the inference images back to Unknown
-    clearPredictions(
-      state,
-      action: PayloadAction<{ kind: string; isPermanent?: boolean }>,
-    ) {
-      const { kind } = action.payload;
-      if (!(kind in state.kinds.entities)) return;
-
-      const updates: Array<
-        { id: string } & (Partial<ImageObject> | Partial<AnnotationObject>)
-      > = [];
-
-      const thingIds = state.kinds.entities[kind]!.containing;
-
-      thingIds.forEach((id) => {
-        const thing = state.things.entities[id];
-        if (!thing) return;
-        if (thing.partition === Partition.Inference) {
-          updates.push({
-            id: id as string,
-            categoryId: state.kinds.entities[kind]!.unknownCategoryId,
-          });
-        }
-      });
-
-      dataSlice.caseReducers.updateThings(state, {
-        type: "updateThings",
-        payload: {
-          updates: updates,
-        },
-      });
-    },
-    acceptPredictions(
-      state,
-      action: PayloadAction<{ kind: string; isPermanent?: boolean }>,
-    ) {
-      const { kind } = action.payload;
-      if (!state.kinds.entities[kind]) return;
-      const thingIds = state.kinds.entities[kind]!.containing;
-      const updates: Array<
-        { id: string } & (Partial<ImageObject> | Partial<AnnotationObject>)
-      > = [];
-      thingIds.forEach((id) => {
-        const thing = state.things.entities[id];
-        if (!thing) return;
-        const imagePartition = thing.partition;
-        const categoryId = thing.categoryId;
-        if (
-          imagePartition === Partition.Inference &&
-          !isUnknownCategory(categoryId)
-        ) {
-          updates.push({
-            id: id as string,
-            partition: Partition.Unassigned,
-          });
-        }
-      });
-      dataSlice.caseReducers.updateThings(state, {
-        type: "updateThings",
-        payload: {
-          updates: updates,
-        },
       });
     },
     // Exclusively updates things in store. Unsafe because it does not:

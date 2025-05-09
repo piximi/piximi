@@ -5,6 +5,7 @@ import {
   DisplayTableRow,
   MeasurementDisplayTable,
 } from "store/measurements/types";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 type ExtendedDisplayTableRow = {
   id: number;
@@ -93,6 +94,7 @@ export const MeasurementTable = ({
 
   return (
     <DataGrid
+      data-help={HelpItem.MeasurementDataTable}
       rowSpacingType="border"
       autosizeOnMount
       autosizeOptions={{ expand: true, includeHeaders: true }}

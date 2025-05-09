@@ -13,11 +13,11 @@ import { selectSegmenter } from "store/segmenter/selectors";
 import { selectDataProject } from "store/data/selectors";
 
 import { serializeProject } from "utils/file-io/serialize";
-import { logger } from "utils/common/helpers";
+import { logger } from "utils/logUtils";
 
-import { AlertType } from "utils/common/enums";
+import { AlertType } from "utils/enums";
 
-import { AlertState } from "utils/common/types";
+import { AlertState } from "utils/types";
 
 type SaveProjectDialogProps = {
   onClose: () => void;
@@ -38,16 +38,15 @@ export const SaveProjectDialog = ({
 
   const [projectName, setProjectName] = useState<string>(project.name);
 
-  const onLoadProgress = (loadPercent: number, loadMessage: string) => {
-    dispatch(
-      applicationSettingsSlice.actions.sendLoadPercent({
-        loadPercent,
-        loadMessage,
-      }),
-    );
-  };
-
   const onSaveProjectClick = async () => {
+    const onLoadProgress = (loadPercent: number, loadMessage: string) => {
+      dispatch(
+        applicationSettingsSlice.actions.sendLoadPercent({
+          loadPercent,
+          loadMessage,
+        }),
+      );
+    };
     serializeProject(
       projectName,
       project,

@@ -3,6 +3,10 @@ import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 import { ClassifierSection } from "./ClassifierSection";
 import { SegmenterSection } from "./SegmenterSection";
+import { ClassifierStatusProvider } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { ClassifierHistoryProvider } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
+import { ClassMapDialogProvider } from "views/ProjectViewer/hooks/useClassMapDialog";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ModelTaskSection = () => {
   const [learningTask, setLearningTask] = useState<
@@ -26,6 +30,7 @@ export const ModelTaskSection = () => {
       gap={1}
     >
       <ToggleButtonGroup
+        data-help={HelpItem.LearningTask}
         value={learningTask}
         size="small"
         color="primary"
@@ -41,7 +46,13 @@ export const ModelTaskSection = () => {
         </ToggleButton>
       </ToggleButtonGroup>
       {learningTask === "Classification" ? (
-        <ClassifierSection />
+        <ClassifierStatusProvider>
+          <ClassifierHistoryProvider>
+            <ClassMapDialogProvider>
+              <ClassifierSection />
+            </ClassMapDialogProvider>
+          </ClassifierHistoryProvider>
+        </ClassifierStatusProvider>
       ) : (
         <SegmenterSection />
       )}

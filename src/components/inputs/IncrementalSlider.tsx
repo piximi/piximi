@@ -1,7 +1,7 @@
 import { Box, Divider, IconButton, Slider } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 
-import { dimensions } from "utils/common/constants";
+import { dimensions } from "utils/constants";
 import { CSSProperties, useMemo, useRef, useState } from "react";
 
 export const IncrementalSlider = ({

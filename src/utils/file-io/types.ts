@@ -1,9 +1,5 @@
 import { TypeOf as IOTSTypeOf } from "io-ts";
-import {
-  Stack as IJSStack,
-  BitDepth as IJSBitDepth,
-  DataArray as IJSDataArray,
-} from "image-js";
+import { Stack as IJSStack } from "image-js";
 import {
   SerializedAnnotationRType,
   SerializedAnnotationRTypeV02,
@@ -14,9 +10,22 @@ import {
   SerializedFileRType,
   SerializedFileRTypeV02,
   SerializedImageRType,
-} from "./runtimeTypes";
-import { MIMETYPES } from "./constants";
+} from "./runtime/runtimeTypes";
+import { MIMETYPES } from "./enums";
 import { ImageShapeEnum } from "./enums";
+import {
+  LossFunction,
+  Metric,
+  ModelStatus,
+  OptimizationAlgorithm,
+} from "utils/models/enums";
+import { BitDepth, Shape } from "store/data/types";
+import {
+  ClassifierEvaluationResultType,
+  CropOptions,
+  FitOptions,
+  RescaleOptions,
+} from "utils/models/types";
 
 export type SerializedCOCOAnnotationType = IOTSTypeOf<
   typeof SerializedCOCOAnnotationRType
@@ -55,11 +64,7 @@ export type ImageFileError = {
   error: string;
 };
 
-export type MIMEType = (typeof MIMETYPES)[number];
-
-export type BitDepth = IJSBitDepth;
-
-export type DataArray = IJSDataArray;
+export type MIMEType = (typeof MIMETYPES)[keyof typeof MIMETYPES];
 
 export interface ImageShapeInfo {
   shape: ImageShapeEnum;
@@ -73,3 +78,29 @@ export interface ImageFileShapeInfo extends ImageShapeInfo {
 }
 
 export type LoadCB = (loadPercent: number, loadMessage: string) => void;
+
+export type PreprocessOptionsV01_02 = {
+  shuffle: boolean;
+  rescaleOptions: RescaleOptions;
+  cropOptions: CropOptions;
+};
+
+export type ClassifierStateV01_02 = {
+  // pre-fit state
+  selectedModelIdx: number;
+  inputShape: Shape;
+  preprocessOptions: PreprocessOptionsV01_02;
+  fitOptions: FitOptions;
+
+  learningRate: number;
+  lossFunction: LossFunction;
+  optimizationAlgorithm: OptimizationAlgorithm;
+  metrics: Array<Metric>;
+
+  trainingPercentage: number;
+  // post-evaluation results
+  evaluationResult: ClassifierEvaluationResultType;
+  // status flags
+  modelStatus: ModelStatus;
+  showClearPredictionsWarning: boolean;
+};

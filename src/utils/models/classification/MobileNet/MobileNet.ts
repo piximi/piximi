@@ -1,13 +1,13 @@
 import { createMobileNet } from "./loadMobileNet";
-import { createCompileArgs } from "../../helpers";
+import { createCompileArgs } from "../../utils";
 import { SequentialClassifier } from "../AbstractClassifier/AbstractClassifier";
 import { LoadModelArgs } from "../../types";
 import { ModelTask } from "../../enums";
 
 export class MobileNet extends SequentialClassifier {
-  constructor() {
+  constructor(name?: string) {
     super({
-      name: "MobileNet",
+      name: name ?? "MobileNet",
       task: ModelTask.Classification,
       graph: false,
       pretrained: false,
@@ -22,6 +22,7 @@ export class MobileNet extends SequentialClassifier {
     compileOptions,
     freeze = false,
     useCustomTopLayer = true,
+    preprocessOptions,
   }: LoadModelArgs) {
     if (this._model) return;
 
@@ -36,6 +37,14 @@ export class MobileNet extends SequentialClassifier {
     });
     const compileArgs = createCompileArgs(compileOptions);
     this._model.compile(compileArgs);
+    this._preprocessingOptions = {
+      inputShape: inputShape,
+      ...preprocessOptions.cropOptions,
+      shuffle: preprocessOptions.shuffle,
+      rescale: preprocessOptions.rescaleOptions.rescale,
+      batchSize: compileOptions.batchSize,
+    };
+    this._optimizerSettings = compileOptions;
   }
 
   public override dispose() {

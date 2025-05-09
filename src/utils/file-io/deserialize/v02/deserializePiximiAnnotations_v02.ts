@@ -1,15 +1,13 @@
-import {
-  convertArrayToShape,
-  getPropertiesFromImage,
-} from "utils/common/helpers";
-import { generateUUID } from "store/data/helpers";
+import { getPropertiesFromImage } from "store/data/utils";
+import { convertArrayToShape } from "utils/models/utils";
+import { generateUUID } from "store/data/utils";
 import { Partition } from "utils/models/enums";
 import {
   NewSerializedAnnotationType,
   SerializedAnnotatorImageType,
   SerializedFileTypeV02,
 } from "../../types";
-import { PartialBy } from "utils/common/types";
+import { PartialBy } from "utils/types";
 import {
   Kind,
   AnnotationObject,

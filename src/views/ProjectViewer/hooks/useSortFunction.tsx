@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { selectCategoriesDictionary } from "store/data/selectors";
 import { selectSortType } from "store/project/selectors";
 
-import { ThingSortKey } from "utils/common/enums";
+import { ThingSortKey } from "utils/enums";
 
 import { Thing } from "store/data/types";
 
