@@ -1,28 +1,29 @@
 name: Test
+
 on:
   pull_request:
     types: [opened, synchronize]
   workflow_dispatch:
+
 jobs:
   test_job:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.x]
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20.x
           cache: "pnpm"
+
       - name: Install Packages
         run: pnpm install
+
       - name: Lint code
         run: pnpm run --silent prettier --check --loglevel log "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}" && pnpm run eslint --max-warnings 0 "src/**/*.{js,jsx,ts,tsx}"
+
       - name: Run Tests
         run: pnpm test --silent
         env:
           CI: true
-      # - name: Build page
-      #   run: pnpm build
