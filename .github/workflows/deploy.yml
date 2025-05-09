@@ -28,7 +28,7 @@ jobs:
         run: pnpm install
 
       - name: Lint code
-        run: pnpm run --silent prettier --write --loglevel log "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}"
+        run: pnpm run lint
 
       - name: Build page
         run: pnpm build
