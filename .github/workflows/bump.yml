@@ -22,7 +22,7 @@ jobs:
 
       - name: Install semver globally
         run: |
-          pnpm install -g semver
+          pnpm add -g semver
           pnpm ls -g
           # enusre globally installed semver is available as a script
           # to be run locally
