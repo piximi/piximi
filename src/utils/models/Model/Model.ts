@@ -134,11 +134,12 @@ export abstract class Model {
 
   public abstract stopTraining(): void;
 
-  public async getSavedModelFiles() {
+  public async getSavedModelFiles(modelName?: string) {
+    const savedName = modelName ?? this.name;
     let weightsBlob: Blob | undefined = undefined;
     let modelJsonBlob: Blob | undefined = undefined;
-    const weightsFileName = this.name + ".weights.bin";
-    const modelJsonFileName = this.name + ".json";
+    const weightsFileName = savedName + ".weights.bin";
+    const modelJsonFileName = savedName + ".json";
     const saveHandler = async (modelArtifacts: io.ModelArtifacts) => {
       weightsBlob = new Blob([modelArtifacts.weightData!], {
         type: "application/octet-stream",

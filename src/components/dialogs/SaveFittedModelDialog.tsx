@@ -22,13 +22,12 @@ export const SaveFittedModelDialog = ({
   const [name, setName] = useState<string>(model.name);
   const noNameError = name.length === 0;
   const onSaveClassifierClick = async () => {
-    const modelBlobs = await model.getSavedModelFiles();
+    const modelBlobs = await model.getSavedModelFiles(name);
     const zip = new JSZip();
     zip.file(modelBlobs.modelJsonFileName, modelBlobs.modelJsonBlob);
     zip.file(modelBlobs.weightsFileName, modelBlobs.weightsBlob);
     const zipBlob = await zip.generateAsync({ type: "blob" });
     saveAs(zipBlob, `${noNameError ? model.name : name}.zip`);
-
     onClose();
   };
 
