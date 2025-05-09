@@ -26,7 +26,9 @@ jobs:
         run: pnpm install
 
       - name: Lint code
-        run: pnpm run --silent prettier --check --loglevel log "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}" && pnpm run eslint --max-warnings 0 "src/**/*.{js,jsx,ts,tsx}"
+        run:
+          pnpm run format-check
+          pnpm run lint
 
       - name: Run Tests
         run: pnpm test --silent
