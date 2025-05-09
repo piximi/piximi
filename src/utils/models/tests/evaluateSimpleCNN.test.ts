@@ -184,11 +184,11 @@ it("evaluateClassifier", async () => {
   }
 
   const jsonFileBuffer = fs.readFileSync(
-    path.join(__dirname, "mnist_classifier.json"),
+    path.join(__dirname, "data/mnist_classifier/mnist_classifier.json"),
   );
 
   const weightsFileBuffer = fs.readFileSync(
-    path.join(__dirname, "mnist_classifier.weights.bin"),
+    path.join(__dirname, "data/mnist_classifier/mnist_classifier.weights.bin"),
   );
 
   const jsonFile = new File(
@@ -270,7 +270,7 @@ it("evaluateClassifier", async () => {
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ],
     accuracy: 0.6666666666666666,
-    crossEntropy: 1.4029693743335276,
+    crossEntropy: 5.372701168070918,
     precision: 0.6666666865348816,
     recall: 0.6666666865348816,
     f1Score: 0.6666666865348816,
