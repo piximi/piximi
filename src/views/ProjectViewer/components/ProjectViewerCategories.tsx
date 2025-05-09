@@ -103,41 +103,6 @@ export const ProjectViewerCategories = () => {
     );
   };
 
-  const createCategory = (kind: string, name: string, color: string) => {
-    dispatch(
-      dataSlice.actions.createCategory({
-        name,
-        color,
-        kind: kind,
-      }),
-    );
-  };
-
-  const editCategory = (id: string, name: string, color: string) => {
-    dispatch(
-      dataSlice.actions.updateCategory({
-        updates: { id, changes: { name, color } },
-      }),
-    );
-  };
-  const deleteCategory = (category: Category, kindId: string) => {
-    dispatch(
-      dataSlice.actions.removeCategoriesFromKind({
-        categoryIds: [category.id],
-        kind: kindId ?? activeKind,
-      }),
-    );
-  };
-  const deleteObjects = (category: Category) => {
-    dispatch(
-      dataSlice.actions.deleteThings({
-        thingIds: category.containing,
-        activeKind: activeKind,
-        disposeColorTensors: true,
-      }),
-    );
-  };
-
   const onOpenCategoryMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
     category: Category,
