@@ -26,7 +26,7 @@ jobs:
         run: pnpm install
 
       - name: Lint code
-        run:
+        run: |
           pnpm run format-check
           pnpm run lint
 
