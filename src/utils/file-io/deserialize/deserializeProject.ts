@@ -24,7 +24,6 @@ export const deserializeProject = async (
     throw Error("No version field found.");
   }
   const piximiVersion = semver.clean(piximiVersionRaw);
-
   if (!semver.valid(piximiVersion) || semver.lt(piximiVersion!, "0.1.0")) {
     throw Error(`File version ${piximiVersion} is unsupported.`);
   } else if (semver.eq(piximiVersion!, "0.1.0")) {

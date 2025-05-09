@@ -3,26 +3,16 @@ import path from "path";
 import { expect, it } from "vitest";
 
 import {
-  memory as tfmemory, //eslint-disable-line @typescript-eslint/no-unused-vars
-  time as tftime, //eslint-disable-line @typescript-eslint/no-unused-vars
+  // memory as tfmemory,
+  //time as tftime,
   profile as tfprofile,
 } from "@tensorflow/tfjs-node";
 
-import { UploadedClassifier } from "../classification/";
-// import {
-//   CropOptions,
-//   FitOptions,
-//   PreprocessSettings,
-//   RescaleOptions,
-// } from "../types";
-import {
-  //CropSchema,
-  ModelTask,
-  Partition,
-} from "../enums";
+import { Partition } from "../enums";
 import { loadDataUrlAsStack } from "utils/file-io/utils";
 import { convertToImage } from "utils/tensorUtils";
 import { Category, ImageObject, Shape } from "store/data/types";
+import classifierHandler from "../classification/classifierHandler";
 
 const categories: Array<Category> = [
   // {
@@ -120,29 +110,6 @@ const inputShape: Shape = {
   channels: 1,
 };
 
-// const rescaleOptions: RescaleOptions = {
-//   rescale: true,
-//   center: false,
-// };
-
-// const cropOptions: CropOptions = {
-//   numCrops: 1,
-//   cropSchema: CropSchema.None,
-// };
-
-// const preprocessOptions: PreprocessSettings = {
-//   inputShape,
-//   shuffle: false,
-//   rescaleOptions,
-//   cropOptions,
-//   trainingPercentage: 100,
-// };
-
-// const fitOptions: FitOptions = {
-//   epochs: 1,
-//   batchSize: 3,
-// };
-
 const inferrenceImagesUnloaded = [
   {
     categoryId: "10000000-0000-0000-0000-000000000003", // 3
@@ -195,11 +162,11 @@ it("predict", async () => {
   }
 
   const jsonFileBuffer = fs.readFileSync(
-    path.join(__dirname, "mnist_classifier.json"),
+    path.join(__dirname, "data/mnist_classifier/mnist_classifier.json"),
   );
 
   const weightsFileBuffer = fs.readFileSync(
-    path.join(__dirname, "mnist_classifier.weights.bin"),
+    path.join(__dirname, "data/mnist_classifier/mnist_classifier.weights.bin"),
   );
 
   const jsonFile = new File(
@@ -211,24 +178,20 @@ it("predict", async () => {
     "mnist_classifier.weights.bin",
   );
 
-  const model = new UploadedClassifier({
-    descFile: jsonFile,
-    weightsFiles: [weightsFile],
-    name: "SimpleCNN",
-    task: ModelTask.Classification,
-    graph: false,
-    pretrained: true,
-    trainable: true,
-  });
-
-  await model.loadModel();
+  const modelResults = await classifierHandler.modelFromFiles(
+    jsonFile,
+    [weightsFile],
+    false,
+  );
+  const model = modelResults.loadedModels[0];
+  expect(model).toBeDefined();
   model.loadInference(inferrenceImages, categories);
 
   // console.log("weights file:", tfmemory().numTensors, tfmemory().numBytes);
 
   const profile = await tfprofile(async () => {
     const res = await model.predict(categories);
-    return res;
+    return res.categoryIds;
   });
 
   model.dispose();

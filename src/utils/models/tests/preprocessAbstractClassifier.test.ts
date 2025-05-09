@@ -16,12 +16,9 @@ import {
 import { loadImageFileAsStack } from "utils/file-io/utils";
 import { convertToImage } from "utils/tensorUtils";
 import { MIMEType } from "utils/file-io/types";
-import {
-  Category,
-  ImageObject,
-  // Shape
-} from "store/data/types";
+import { Category, ImageObject } from "store/data/types";
 import { MIMETYPES } from "utils/file-io/enums";
+import { getDefaultModelInfo } from "../classification/utils";
 
 class GenericClassifier extends SequentialClassifier {
   constructor() {
@@ -34,7 +31,21 @@ class GenericClassifier extends SequentialClassifier {
     });
   }
 
-  loadModel() {}
+  loadModel() {
+    const defaultModelInfo = getDefaultModelInfo();
+    this._preprocessingOptions = {
+      inputShape: {
+        height: 224,
+        width: 224,
+        channels: 3,
+      },
+      ...defaultModelInfo.preprocessSettings.cropOptions,
+      shuffle: defaultModelInfo.preprocessSettings.shuffle,
+      rescale: defaultModelInfo.preprocessSettings.rescaleOptions.rescale,
+      batchSize: defaultModelInfo.optimizerSettings.batchSize,
+    };
+    this._optimizerSettings = defaultModelInfo.optimizerSettings;
+  }
 
   get testTrainingDataArray() {
     if (!this._trainingDataset) {
@@ -45,36 +56,6 @@ class GenericClassifier extends SequentialClassifier {
     return this._trainingDataset.toArrayForTest();
   }
 }
-
-// const inputShape: Shape = {
-//   planes: 1,
-//   height: 224,
-//   width: 224,
-//   channels: 3,
-// };
-
-// const rescaleOptions: RescaleOptions = {
-//   rescale: true,
-//   center: false,
-// };
-
-// const cropOptions: CropOptions = {
-//   numCrops: 1,
-//   cropSchema: CropSchema.None,
-// };
-
-// const preprocessOptions: PreprocessSettings = {
-//   inputShape,
-//   shuffle: true,
-//   rescaleOptions,
-//   cropOptions,
-//   trainingPercentage: 100,
-// };
-
-// const fitOptions: FitOptions = {
-//   epochs: 10,
-//   batchSize: 32,
-// };
 
 const categories: Array<Category> = [
   {
@@ -129,6 +110,8 @@ it("preprocessClassifier", async () => {
   }
 
   const model = new GenericClassifier();
+  model.loadModel();
+  expect(model.preprocessingOptions).toBeDefined();
   model.loadTraining(images, categories);
 
   expect(model.trainingLoaded).toBeTruthy();
