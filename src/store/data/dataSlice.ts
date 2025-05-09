@@ -631,7 +631,9 @@ export const dataSlice = createSlice({
       const { things } = action.payload;
       for (const readOnlyThing of things) {
         const thing = { ...readOnlyThing };
-        const [name, ext] = thing.name!.split(".");
+        const splitName = thing.name!.split(".");
+        const ext = splitName.at(-1);
+        const name = splitName.slice(0, splitName.length - 1).join(".");
 
         const existingImageIds =
           state.kinds.entities[thing.kind]?.containing ?? [];
@@ -904,7 +906,6 @@ export const dataSlice = createSlice({
           changes: { containing: newContents },
         });
       }
-      thingsAdapter.removeMany(state.things, explicitThingIds);
     },
     // Exclusively removes things from store. Unsafe because it does not:
     // - Update kind's containing list
