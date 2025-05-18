@@ -1,61 +1,76 @@
-import { useSelector } from "react-redux";
-import { Box, useTheme } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
 
-import { DividerHeader } from "components/ui";
-import { FilterChip } from "./FilterChip";
-
-import { selectUnfilteredActivePartitions } from "store/project/selectors";
+import { selectActiveThingFilters } from "store/project/selectors";
 
 import { Partition } from "utils/models/enums";
+import { projectSlice } from "store/project";
+import { useCallback, useMemo } from "react";
+import { FilterList } from "./FilterList";
 
-export const PartitionFilterList = ({
-  header,
-  filteredPartitions,
-  toggleFilter,
-}: {
-  header: string;
-  filteredPartitions: Partition[];
-  toggleFilter: (partition: Partition) => void;
-}) => {
-  const theme = useTheme();
-  const unfilteredPartitions = useSelector(selectUnfilteredActivePartitions);
+export const PartitionFilterList = () => {
+  const dispatch = useDispatch();
+  const thingFilters = useSelector(selectActiveThingFilters);
+
+  const filteredPartitions = useMemo(
+    () => thingFilters.partition ?? [],
+    [thingFilters.partition],
+  );
+
+  const toggleThingPartition = useCallback(
+    (partition: Partition) => {
+      if (
+        thingFilters.partition &&
+        thingFilters.partition.includes(partition)
+      ) {
+        dispatch(
+          projectSlice.actions.removeThingPartitionFilters({
+            partitions: [partition],
+          }),
+        );
+      } else {
+        dispatch(
+          projectSlice.actions.addThingPartitionFilters({
+            partitions: [partition],
+          }),
+        );
+      }
+    },
+    [dispatch, thingFilters.partition],
+  );
+  const toggleAllPartitonFilter = useCallback(
+    (filtered: boolean) => {
+      if (filtered) {
+        dispatch(
+          projectSlice.actions.addThingPartitionFilters({
+            partitions: "all",
+          }),
+        );
+      } else {
+        dispatch(
+          projectSlice.actions.removeThingPartitionFilters({
+            partitions: "all",
+          }),
+        );
+      }
+    },
+    [dispatch],
+  );
 
   return (
-    <Box maxWidth="100%">
-      <DividerHeader typographyVariant="caption" textAlign="left">
-        {header}
-      </DividerHeader>
-      <Box
-        display="flex"
-        maxWidth="100%"
-        flexDirection="row"
-        flexWrap="wrap"
-        gap={theme.spacing(0.5)}
-        padding={theme.spacing(1)}
-      >
-        {filteredPartitions.map((partition) => {
-          return (
-            <FilterChip
-              key={`cat-filter-chip-${partition}`}
-              label={partition}
-              color={theme.palette.primary.main as string}
-              toggleFilter={() => toggleFilter(partition)}
-              isFiltered={true}
-            />
-          );
-        })}
-        {unfilteredPartitions.map((partition) => {
-          return (
-            <FilterChip
-              key={`cat-filter-chip-${partition}`}
-              label={partition}
-              color={theme.palette.primary.main as string}
-              toggleFilter={() => toggleFilter(partition)}
-              isFiltered={false}
-            />
-          );
-        })}
-      </Box>
-    </Box>
+    <FilterList
+      title="Filter Partition"
+      tooltipContent="partitions"
+      items={Object.keys(Partition).map((partition) => partition as Partition)}
+      onToggle={toggleThingPartition}
+      onToggleAll={toggleAllPartitonFilter}
+      isFiltered={(partition) => {
+        if (partition === "all") {
+          return filteredPartitions.length === Object.keys(Partition).length;
+        } else if (partition === "any") {
+          return filteredPartitions.length === 0;
+        }
+        return filteredPartitions.includes(partition as Partition);
+      }}
+    />
   );
 };

@@ -1,61 +1,77 @@
-import { useSelector } from "react-redux";
-import { Box, useTheme } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
 
-import { DividerHeader } from "components/ui";
-import { FilterChip } from "./FilterChip";
+import { selectActiveCategories } from "store/project/reselectors";
+import { selectActiveThingFilters } from "store/project/selectors";
+import { useCallback, useMemo } from "react";
+import { projectSlice } from "store/project";
+import { Category } from "store/data/types";
+import { FilterList } from "./FilterList";
 
-import { selectUnfilteredActiveCategoryIds } from "store/project/reselectors";
-import { selectCategoriesDictionary } from "store/data/selectors";
+export const CategoryFilterList = () => {
+  const dispatch = useDispatch();
+  const thingFilters = useSelector(selectActiveThingFilters);
+  const activeCategories = useSelector(selectActiveCategories);
+  const filteredCategories = useMemo(
+    () => thingFilters.categoryId ?? [],
+    [thingFilters.categoryId],
+  );
 
-export const CategoryFilterList = ({
-  header,
-  filteredCategories,
-  toggleFilter,
-}: {
-  header: string;
-  filteredCategories: string[];
-  toggleFilter: (categoryId: string) => void;
-}) => {
-  const theme = useTheme();
-  const unfilteredCategories = useSelector(selectUnfilteredActiveCategoryIds);
-  const categories = useSelector(selectCategoriesDictionary);
+  const toggleImageCategoryFilter = useCallback(
+    (category: Category) => {
+      if (
+        thingFilters.categoryId &&
+        thingFilters.categoryId.includes(category.id)
+      ) {
+        dispatch(
+          projectSlice.actions.removeThingCategoryFilters({
+            categoryIds: [category.id],
+          }),
+        );
+      } else {
+        dispatch(
+          projectSlice.actions.addThingCategoryFilters({
+            categoryIds: [category.id],
+          }),
+        );
+      }
+    },
+    [dispatch, thingFilters.categoryId],
+  );
+
+  const toggleAllImageCategoryFilter = useCallback(
+    (filtered: boolean) => {
+      if (filtered) {
+        dispatch(
+          projectSlice.actions.addThingCategoryFilters({
+            categoryIds: activeCategories.map((category) => category.id),
+          }),
+        );
+      } else {
+        dispatch(
+          projectSlice.actions.removeThingCategoryFilters({
+            categoryIds: activeCategories.map((category) => category.id),
+          }),
+        );
+      }
+    },
+    [dispatch, filteredCategories, activeCategories],
+  );
 
   return (
-    <Box maxWidth="100%">
-      <DividerHeader typographyVariant="caption" textAlign="left">
-        {header}
-      </DividerHeader>
-      <Box
-        display="flex"
-        maxWidth="100%"
-        flexDirection="row"
-        flexWrap="wrap"
-        gap={theme.spacing(0.5)}
-        padding={theme.spacing(1)}
-      >
-        {filteredCategories.map((catId) => {
-          return (
-            <FilterChip
-              key={`cat-filter-chip-${catId}`}
-              label={categories[catId]!.name}
-              color={categories[catId]!.color}
-              toggleFilter={() => toggleFilter(catId)}
-              isFiltered={true}
-            />
-          );
-        })}
-        {unfilteredCategories.map((catId) => {
-          return (
-            <FilterChip
-              key={`cat-filter-chip-${catId}`}
-              label={categories[catId]!.name}
-              color={categories[catId]!.color}
-              toggleFilter={() => toggleFilter(catId)}
-              isFiltered={false}
-            />
-          );
-        })}
-      </Box>
-    </Box>
+    <FilterList
+      title="Filter Category"
+      tooltipContent="categories"
+      items={activeCategories}
+      onToggle={toggleImageCategoryFilter}
+      onToggleAll={toggleAllImageCategoryFilter}
+      isFiltered={(category) => {
+        if (category === "all") {
+          return filteredCategories.length === activeCategories.length;
+        } else if (category === "any") {
+          return filteredCategories.length === 0;
+        }
+        return filteredCategories.includes(category.id);
+      }}
+    />
   );
 };
