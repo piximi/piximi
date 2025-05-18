@@ -12,31 +12,29 @@ export const FilterChip = ({
   isFiltered,
 }: {
   label: string;
-  color?: string;
+  color: string;
   toggleFilter: () => void;
   isFiltered: boolean;
 }) => {
   return (
     <Chip
       size="small"
-      sx={(theme) => {
-        return color
-          ? {
-              backgroundColor: isFiltered ? "transparent" : color,
-              borderColor: color ?? theme.palette.background.paper,
-              borderWidth: "1px",
-              borderStyle: "solid",
-              color: isFiltered
-                ? "inherit"
-                : theme.palette.getContrastText(color),
-              "& .MuiChip-deleteIcon": {
-                color: isFiltered
-                  ? "inherit"
-                  : theme.palette.getContrastText(color),
-              },
-            }
-          : {};
-      }}
+      sx={(theme) => ({
+        backgroundColor: isFiltered ? "transparent" : color,
+        borderColor: color,
+        borderWidth: "2px",
+        borderStyle: "solid",
+        color: isFiltered ? "inherit" : theme.palette.getContrastText(color),
+        transition: "all 0.2s ease-in-out",
+        "&:hover": {
+          backgroundColor: isFiltered ? "transparent" : color,
+          borderColor: theme.palette.text.primary,
+        },
+        "& .MuiChip-deleteIcon": {
+          color: isFiltered ? "inherit" : theme.palette.getContrastText(color),
+          transition: "all 0.2s ease-in-out",
+        },
+      })}
       label={label}
       onClick={toggleFilter}
       onDelete={toggleFilter}
