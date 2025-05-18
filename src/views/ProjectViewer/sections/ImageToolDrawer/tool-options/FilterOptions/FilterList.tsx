@@ -40,7 +40,7 @@ export const FilterList = ({
                   <VisibilityOutlinedIcon fontSize="small" />
                 </IconButton>
               </TooltipWithDisable>
-              <TooltipWithDisable title="Hide all categories">
+              <TooltipWithDisable title={`Hide all ${tooltipContent}`}>
                 <IconButton
                   onClick={() => onToggleAll(true)}
                   disabled={isFiltered("all")}
