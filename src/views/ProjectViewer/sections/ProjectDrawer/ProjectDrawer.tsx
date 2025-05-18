@@ -21,9 +21,6 @@ export const ProjectDrawer = () => {
       </DividerHeader>
       <ModelTaskSection />
 
-      <DividerHeader sx={{ my: 1 }} textAlign="left" typographyVariant="body2">
-        Categories
-      </DividerHeader>
       <ProjectViewerCategories />
     </BaseAppDrawer>
   );
