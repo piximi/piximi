@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { List } from "@mui/material";
+import { IconButton, List, Stack } from "@mui/material";
 import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 
 import { useDialogHotkey, useHotkeys } from "hooks";
@@ -26,6 +26,8 @@ import { HotkeyContext } from "utils/enums";
 
 import { Category } from "store/data/types";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { FunctionalDivider } from "components/ui";
+import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 
 export const ProjectViewerCategories = () => {
   const dispatch = useDispatch();
@@ -213,51 +215,60 @@ export const ProjectViewerCategories = () => {
 
   return (
     <>
-      <List dense>
-        <List dense sx={{ maxHeight: "20rem", overflowY: "scroll" }}>
-          {categories.map((category: Category, idx) => {
-            return (
-              <CategoryItem
-                showHK={showHK}
-                HKIndex={idx}
-                category={category}
-                key={category.id}
-                isSelected={
-                  selectedCategory
-                    ? selectedCategory.id === category.id
-                    : isUnknownCategory(category.id)
-                }
-                selectCategory={selectCategory}
-                isHighlighted={highlightedCategory === category.id}
-                handleOpenCategoryMenu={onOpenCategoryMenu}
-              />
-            );
-          })}
-        </List>
+      <FunctionalDivider
+        headerText="Categories"
+        containerStyle={{ marginTop: 1 }}
+        typographyVariant="body2"
+        actions={
+          <Stack direction="row">
+            <TooltipWithDisable title="New Category">
+              <IconButton
+                data-help={HelpItem.CreateCategory}
+                onClick={handleOpenCreateCategoryDialog}
+              >
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </TooltipWithDisable>
+            <TooltipWithDisable
+              title={
+                categories.length === 1
+                  ? "No user created categories"
+                  : "Delete all categories"
+              }
+            >
+              <IconButton
+                data-help={HelpItem.DeleteAllCategories}
+                onClick={handleOpenDeleteCategoryDialog}
+                disabled={categories.length === 1}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </TooltipWithDisable>
+          </Stack>
+        }
+      />
 
-        <CustomListItemButton
-          data-help={HelpItem.CreateCategory}
-          icon={<AddIcon />}
-          primaryText="Create Category"
-          onClick={handleOpenCreateCategoryDialog}
-          dense
-        />
-        <CustomListItemButton
-          data-help={HelpItem.DeleteAllCategories}
-          icon={
-            <DeleteIcon
-              color={categories.length > 0 ? "inherit" : "disabled"}
+      <List dense sx={{ maxHeight: "20rem", overflowY: "scroll", pt: 0 }}>
+        {categories.map((category: Category, idx) => {
+          return (
+            <CategoryItem
+              showHK={showHK}
+              HKIndex={idx}
+              category={category}
+              key={category.id}
+              isSelected={
+                selectedCategory
+                  ? selectedCategory.id === category.id
+                  : isUnknownCategory(category.id)
+              }
+              selectCategory={selectCategory}
+              isHighlighted={highlightedCategory === category.id}
+              handleOpenCategoryMenu={onOpenCategoryMenu}
             />
-          }
-          primaryText="Delete all categories"
-          onClick={handleOpenDeleteCategoryDialog}
-          dense
-          disabled={categories.length === 0}
-          tooltipText={
-            categories.length === 0 ? "No user created categories" : undefined
-          }
-        />
+          );
+        })}
       </List>
+
       {selectedCategory && (
         <CategoryItemMenu
           anchorElCategoryMenu={categoryMenuAnchorEl}
@@ -280,7 +291,7 @@ export const ProjectViewerCategories = () => {
 
       <ConfirmationDialog
         title="Delete All Categories"
-        content={`Affected objects will NOT be deleted, and instead be labelled as "Unknown"`}
+        content={`Associated objects will NOT be deleted, and instead be labelled as "Unknown"`}
         onConfirm={handleRemoveAllCategories}
         onClose={handleCloseDeleteCategoryDialog}
         isOpen={isDeleteCategoryDialogOpen}
