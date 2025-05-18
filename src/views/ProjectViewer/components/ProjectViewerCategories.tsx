@@ -6,7 +6,6 @@ import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { CategoryItemMenu } from "components/ui/CategoryItemMenu";
 import { CategoryItem } from "./list-items/CategoryItem";
 
