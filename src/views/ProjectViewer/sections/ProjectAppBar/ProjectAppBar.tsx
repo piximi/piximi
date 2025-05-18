@@ -33,7 +33,6 @@ import { LogoLoader, AlertBar } from "components/ui";
 import { TooltipTitle, TooltipButton } from "components/ui/tooltips";
 import { CustomAppBar } from "components/layout";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { SortSelection } from "views/ProjectViewer/sections/SortSelection";
 import { TextFieldWithBlur } from "components/inputs";
 import { ImageCategoryMenu } from "./ImageCategoryMenu";
 
@@ -126,7 +125,7 @@ export const ProjectAppBar = () => {
   return (
     <>
       <Box>
-        <CustomAppBar>
+        <CustomAppBar toolbarProps={{ sx: { height: 44, minHeight: 44 } }}>
           <LogoLoader width={250} height={50} loadPercent={loadPercent} />
 
           <ProjectTextField />
@@ -137,13 +136,6 @@ export const ProjectAppBar = () => {
             <ZoomControl />
           ) : (
             <>
-              <SortSelection />
-              <Divider
-                variant="middle"
-                orientation="vertical"
-                flexItem
-                sx={{ ml: 2 }}
-              />
               <ZoomControl />
 
               <TooltipButton
@@ -416,10 +408,10 @@ const ProjectTextField = () => {
             sx={{ ml: 5 }}
             variant="standard"
             slotProps={{
-              htmlInput: { min: 0, style: { textAlign: "center" } },
+              htmlInput: { min: 0 },
               input: {
                 slotProps: {
-                  input: { min: 0, style: { textAlign: "center" } },
+                  input: { min: 0 },
                 },
               },
             }}
