@@ -9,18 +9,18 @@ import {
   Stack,
   Typography,
   Divider,
-  List,
   Dialog,
   DialogContent,
   IconButton,
   DialogTitle,
   DialogContentText,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import {
   Close as CloseIcon,
-  Feedback as FeedbackIcon,
-  Settings as SettingsIcon,
+  FeedbackOutlined as FeedbackIcon,
+  SettingsOutlined as SettingsIcon,
   Palette as PaletteIcon,
   DarkMode as DarkModeIcon,
   LightMode as LightModeIcon,
@@ -28,17 +28,16 @@ import {
   VolumeOff as VolumeOffIcon,
   Notes as NotesIcon,
   Image as ImageIcon,
+  HelpOutline as HelpIcon,
 } from "@mui/icons-material";
 
 import { useHotkeys, useTranslation } from "hooks";
 import { useDialogHotkey } from "hooks";
 import { useDialog } from "hooks";
 
-import { HelpDrawer } from "../layout/HelpDrawer";
 import { DividerHeader } from "components/ui/divider/DividerHeader";
 import { CustomSwitch } from "components/inputs/CustomSwitch";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { CustomListItemButton } from "./CustomListItemButton";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import {
@@ -53,6 +52,7 @@ import { selectAvaliableCategoryColors } from "store/project/reselectors";
 import { AlertType, HotkeyContext } from "utils/enums";
 import { ThemeMode } from "themes/enums";
 import { createGitHubIssue } from "utils/logUtils";
+import { useHelp } from "contexts";
 
 const UISettings = () => {
   return (
@@ -495,49 +495,71 @@ const SendFeedbackDialog = ({ onClose, open }: SendFeedbackDialogProps) => {
   );
 };
 
-const SendFeedbackListItem = () => {
+const SendFeedbackButton = () => {
   const { onClose, onOpen, open } = useDialog();
 
   return (
     <>
-      <CustomListItemButton
-        primaryText="Send Feedback"
-        onClick={onOpen}
-        icon={<FeedbackIcon />}
-      />
+      <Tooltip title="Send Feedback">
+        <IconButton onClick={onOpen} size="small">
+          <FeedbackIcon />
+        </IconButton>
+      </Tooltip>
 
       <SendFeedbackDialog onClose={onClose} open={open} />
     </>
   );
 };
 
-const SettingsListItem = () => {
+const SettingsButton = () => {
   const { onClose, onOpen, open } = useDialogHotkey(
     HotkeyContext.AppSettingsDialog,
   );
 
   return (
     <>
-      <CustomListItemButton
-        primaryText="Settings"
-        onClick={onOpen}
-        icon={<SettingsIcon />}
-      />
+      <Tooltip title="Settings">
+        <IconButton onClick={onOpen} size="small">
+          <SettingsIcon />
+        </IconButton>
+      </Tooltip>
 
       <SettingsDialog onClose={onClose} open={open} />
+    </>
+  );
+};
+const HelpButton = () => {
+  const { setHelpMode } = useHelp()!;
+
+  return (
+    <>
+      <Tooltip title="Toggle Help Mode">
+        <IconButton
+          onClick={() => setHelpMode((helpMode) => !helpMode)}
+          size="small"
+        >
+          <HelpIcon />
+        </IconButton>
+      </Tooltip>
     </>
   );
 };
 
 export const ApplicationOptions = () => {
   return (
-    <List dense sx={{ mt: "auto" }}>
+    <>
       <Divider />
-      <SettingsListItem />
+      <Stack
+        direction="row"
+        justifyContent="space-evenly"
+        sx={{ py: 0.5, px: 2 }}
+      >
+        <SettingsButton />
 
-      <SendFeedbackListItem />
+        <SendFeedbackButton />
 
-      <HelpDrawer />
-    </List>
+        <HelpButton />
+      </Stack>
+    </>
   );
 };
