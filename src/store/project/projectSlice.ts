@@ -131,15 +131,14 @@ export const projectSlice = createSlice({
     addThingPartitionFilters(
       state,
       action: PayloadAction<{
-        partitions: Partition[];
+        partitions: Partition[] | "all";
         kinds?: string[];
       }>,
     ) {
-      const { partitions, kinds } = {
-        kinds: [state.activeKind],
-        ...action.payload,
-      };
+      let partitions = action.payload.partitions;
+      const kinds = action.payload.kinds ?? [state.activeKind];
 
+      partitions = partitions === "all" ? Object.values(Partition) : partitions;
       for (const kind of kinds) {
         if (kind in state.thingFilters) {
           const existingFilters = state.thingFilters[kind].partition ?? [];
