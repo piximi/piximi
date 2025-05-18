@@ -5,7 +5,6 @@ import {
   FilterAltOutlined as FilterAltOutlinedIcon,
   InfoOutlined as InfoOutlinedIcon,
   FolderOpen as FolderOpenIcon,
-  Sort as SortIcon,
   Straighten as StraightenIcon,
   ScatterPlot as ScatterPlotIcon,
   Label as LabelIcon,
@@ -14,7 +13,6 @@ import {
 import { useMobileView, useTranslation } from "hooks";
 
 import { AppBarOffset, Tool } from "components/ui";
-import { SortSelection } from "views/ProjectViewer/sections/SortSelection";
 import { ProjectViewerCategories, FileIO } from "../../components";
 import { ModelTaskSection } from "../ModelTaskSection";
 import {
@@ -39,19 +37,12 @@ const imageTools: Record<string, OperationType> = {
     hotkey: "O",
     mobile: true,
   },
-  sort: {
-    icon: (color) => <SortIcon fontSize="small" sx={{ color }} />,
-    name: "sort",
-    description: "-",
-    options: <SortSelection />,
-    hotkey: "S",
-    mobile: true,
-  },
+
   filters: {
     icon: (color) => (
       <FilterAltOutlinedIcon fontSize="small" sx={{ color: color }} />
     ),
-    name: "filters",
+    name: "filter / sort",
     description: "-",
     options: <FilterOptions />,
     hotkey: "F",
@@ -96,33 +87,30 @@ const imageTools: Record<string, OperationType> = {
 //TODO: Icon button
 export const ImageToolDrawer = () => {
   const theme = useTheme();
-  const [activeTool, setActiveTool] = useState<string>();
+  const [activeTool, setActiveTool] = useState<OperationType>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const filtersExist = useSelector(selectActiveFilteredStateHasFilters);
   const t = useTranslation();
   const isMobile = useMobileView();
 
-  const handleSelectTool = (toolName: string) => {
+  const handleSelectTool = (tool: OperationType) => {
     if (activeTool === undefined) {
-      setActiveTool(toolName);
+      setActiveTool(tool);
       setIsOpen(true);
     } else {
-      if (toolName === activeTool) {
+      if (tool === activeTool) {
         setActiveTool(undefined);
         setIsOpen(false);
       } else {
-        setActiveTool(toolName);
+        setActiveTool(tool);
       }
     }
   };
 
   return (
     <>
-      {activeTool && (!imageTools[activeTool].mobile || isMobile) && (
-        <ToolOptionsDrawer
-          optionsVisibility={isOpen}
-          toolType={imageTools[activeTool]}
-        />
+      {activeTool && (!activeTool.mobile || isMobile) && (
+        <ToolOptionsDrawer optionsVisibility={isOpen} toolType={activeTool} />
       )}
 
       <Drawer
@@ -149,7 +137,7 @@ export const ImageToolDrawer = () => {
               data-help={tool.helpContext}
               name={t(capitalize(tool.name))}
               onClick={() => {
-                handleSelectTool(tool.name);
+                handleSelectTool(tool);
               }}
               key={`tool-drawer-${tool.name}`}
               tooltipLocation="left"
@@ -157,14 +145,14 @@ export const ImageToolDrawer = () => {
               {tool.name === "filters" ? (
                 <Badge color="primary" variant="dot" invisible={!filtersExist}>
                   {tool.icon(
-                    activeTool === tool.name
+                    activeTool === tool
                       ? theme.palette.primary.dark
                       : theme.palette.grey[400],
                   )}
                 </Badge>
               ) : (
                 tool.icon(
-                  activeTool === tool.name
+                  activeTool === tool
                     ? theme.palette.primary.dark
                     : theme.palette.grey[400],
                 )
