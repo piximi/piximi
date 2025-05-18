@@ -232,6 +232,7 @@ export const WelcomeScreen = () => {
               onClick={handleNewProject}
               variant="outlined"
               color="primary"
+              sx={{ width: "210px" }}
             >
               Start New Project
             </Button>
@@ -240,6 +241,7 @@ export const WelcomeScreen = () => {
               role={undefined}
               variant="outlined"
               tabIndex={-1}
+              sx={{ width: "210px" }}
             >
               Upload Project
               <VisuallyHiddenInput
@@ -255,30 +257,26 @@ export const WelcomeScreen = () => {
               onClick={handleOpenExampleProjectDialog}
               variant="outlined"
               color="primary"
-            >
-              Open Example Project
-            </Button>
-            <Button
-              data-help={HelpItem.OpenExampleProject}
-              onClick={handleOpenExampleProjectDialog}
-              variant="outlined"
-              color="primary"
+              sx={{ width: "210px" }}
             >
               Open Example Project
             </Button>
           </Stack>
-          <Button
-            data-help={HelpItem.Documentation}
-            component="a"
-            href="https://documentation.piximi.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="outlined"
-            color="primary"
-          >
-            Documentation
-          </Button>
-          {import.meta.env.DEV && (
+          <Stack justifyContent={"center"} alignItems="center">
+            <Button
+              data-help={HelpItem.Documentation}
+              component="a"
+              href="https://documentation.piximi.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="outlined"
+              color="primary"
+              sx={{ width: "210px" }}
+            >
+              Documentation
+            </Button>
+          </Stack>
+          {/* {import.meta.env.DEV && (
             <Button
               onClick={() => {
                 logger(theme);
@@ -289,7 +287,7 @@ export const WelcomeScreen = () => {
             >
               Show Palette
             </Button>
-          )}
+          )} */}
         </Stack>
       </Box>
       <ExampleProjectDialog

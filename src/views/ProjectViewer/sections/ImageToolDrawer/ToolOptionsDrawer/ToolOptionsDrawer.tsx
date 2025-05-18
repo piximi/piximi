@@ -11,7 +11,8 @@ export type OperationType = {
   icon: (color: string) => ReactElement;
   name: string;
   description: string;
-  options: ReactElement;
+  options?: ReactElement;
+  action?: () => void;
   hotkey: string;
   mobile?: boolean;
   helpContext?: HelpItem;
@@ -59,7 +60,7 @@ export const ToolOptionsDrawer = ({
               }}
               gutterBottom
             >
-              {t(toolType?.name)}
+              {t(toolType.name)}
             </Typography>
           </Box>
           {toolType!.options}
