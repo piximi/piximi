@@ -6,7 +6,6 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
 import { projectSlice } from "store/project";
 import { dataSlice } from "store/data/dataSlice";
-import { applicationSettingsSlice } from "store/applicationSettings";
 import { useConfirmReplaceDialog } from "views/ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 
 type NewProjectDialogProps = {
@@ -30,7 +29,7 @@ export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
     }
     const confirmation = await getConfirmation({});
     if (!confirmation) return;
-    dispatch(applicationSettingsSlice.actions.resetApplicationState());
+    dispatch(projectSlice.actions.resetProject());
 
     dispatch(
       projectSlice.actions.createNewProject({

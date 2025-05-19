@@ -3,7 +3,6 @@ import { difference, intersection } from "lodash";
 
 import { annotatorSlice } from "../annotator";
 import { dataSlice } from "store/data";
-import { applicationSettingsSlice } from "store/applicationSettings";
 import { imageViewerSlice } from "./imageViewerSlice";
 
 import { createRenderedTensor } from "utils/tensorUtils";
@@ -14,13 +13,6 @@ import { TypedAppStartListening } from "store/types";
 export const imageViewerMiddleware = createListenerMiddleware();
 const startAppListening =
   imageViewerMiddleware.startListening as TypedAppStartListening;
-
-startAppListening({
-  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
-  effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(imageViewerSlice.actions.resetImageViewer());
-  },
-});
 
 startAppListening({
   actionCreator: imageViewerSlice.actions.prepareImageViewer,

@@ -1,7 +1,7 @@
 import React from "react";
-import { Box, Drawer } from "@mui/material";
+import { Box, Drawer, Stack } from "@mui/material";
 
-import { ApplicationOptions } from "components/ui/ApplicationOptions";
+import { ApplicationOptions } from "components/layout/app-drawer/ApplicationOptions";
 
 export const BaseAppDrawer = ({
   children,
@@ -28,9 +28,14 @@ export const BaseAppDrawer = ({
       open
       variant="persistent"
     >
-      <Box sx={{ overflowY: "scroll", overflowX: "hidden" }}>{children}</Box>
+      <Stack
+        sx={{ position: "relative", height: "100%" }}
+        justifyContent={"space-between"}
+      >
+        <Box sx={{ overflowY: "scroll", overflowX: "hidden" }}>{children}</Box>
 
-      <ApplicationOptions />
+        <ApplicationOptions />
+      </Stack>
     </Drawer>
   );
 };
