@@ -2,21 +2,27 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
 import { classifierSlice } from "store/classifier";
-import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data";
 import { projectSlice } from "./projectSlice";
 
 import classifierHandler from "utils/models/classification/classifierHandler";
 import { TypedAppStartListening } from "store/types";
+import { segmenterSlice } from "store/segmenter";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { measurementsSlice } from "store/measurements";
 
 export const projectMiddleware = createListenerMiddleware();
 const startAppListening =
   projectMiddleware.startListening as TypedAppStartListening;
 
 startAppListening({
-  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
+  actionCreator: projectSlice.actions.resetProject,
   effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(projectSlice.actions.resetProject());
+    listenerAPI.dispatch(dataSlice.actions.resetData());
+    listenerAPI.dispatch(classifierSlice.actions.resetClassifiers());
+    listenerAPI.dispatch(segmenterSlice.actions.resetSegmenter());
+    listenerAPI.dispatch(imageViewerSlice.actions.resetImageViewer());
+    listenerAPI.dispatch(measurementsSlice.actions.resetMeasurements());
   },
 });
 

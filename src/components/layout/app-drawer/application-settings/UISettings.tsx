@@ -1,6 +1,4 @@
-import React, { ReactNode, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { BlockPicker, ColorResult } from "react-color";
 import {
   Box,
   Button,
@@ -8,19 +6,9 @@ import {
   Popover,
   Stack,
   Typography,
-  Divider,
-  Dialog,
-  DialogContent,
-  IconButton,
-  DialogTitle,
-  DialogContentText,
-  TextField,
-  Tooltip,
+  useTheme,
 } from "@mui/material";
 import {
-  Close as CloseIcon,
-  FeedbackOutlined as FeedbackIcon,
-  SettingsOutlined as SettingsIcon,
   Palette as PaletteIcon,
   DarkMode as DarkModeIcon,
   LightMode as LightModeIcon,
@@ -28,17 +16,8 @@ import {
   VolumeOff as VolumeOffIcon,
   Notes as NotesIcon,
   Image as ImageIcon,
-  HelpOutline as HelpIcon,
 } from "@mui/icons-material";
-
-import { useHotkeys, useTranslation } from "hooks";
-import { useDialogHotkey } from "hooks";
-import { useDialog } from "hooks";
-
-import { DividerHeader } from "components/ui/divider/DividerHeader";
-import { CustomSwitch } from "components/inputs/CustomSwitch";
-import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-
+import { DividerHeader } from "components/ui";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import {
   selectImageSelectionColor,
@@ -47,16 +26,15 @@ import {
   selectTextOnScroll,
   selectThemeMode,
 } from "store/applicationSettings/selectors";
-import { selectAvaliableCategoryColors } from "store/project/reselectors";
-
-import { AlertType, HotkeyContext } from "utils/enums";
 import { ThemeMode } from "themes/enums";
-import { createGitHubIssue } from "utils/logUtils";
-import { useHelp } from "contexts";
+import { SettingsItem } from "./SettingsItem";
+import { selectAvaliableCategoryColors } from "store/project/reselectors";
+import { useState } from "react";
+import { BlockPicker, ColorResult } from "react-color";
 
-const UISettings = () => {
+export const UISettings = () => {
   return (
-    <>
+    <Box>
       <DividerHeader
         typographyVariant="body1"
         textAlign="left"
@@ -78,12 +56,13 @@ const UISettings = () => {
         <TextOnScrollSetting />
         {/* <LanguageSettings /> */}
       </Stack>
-    </>
+    </Box>
   );
 };
 
 const ThemeSetting = () => {
   const themeMode = useSelector(selectThemeMode);
+  const theme = useTheme();
   const dispatch = useDispatch();
   const onToggleTheme = (mode: ThemeMode) => {
     dispatch(applicationSettingsSlice.actions.setThemeMode({ mode }));
@@ -92,25 +71,56 @@ const ThemeSetting = () => {
     <SettingsItem
       title={
         <Box display="flex">
-          <Typography>{"Theme: "}</Typography>
-          {themeMode === ThemeMode.Dark ? (
-            <DarkModeIcon sx={{ ml: 1 }} />
-          ) : (
-            <LightModeIcon sx={{ ml: 1 }} />
-          )}
+          <Typography>{"Theme Mode"}</Typography>
         </Box>
       }
     >
-      <CustomSwitch
-        checked={themeMode === ThemeMode.Light}
-        onChange={() =>
-          onToggleTheme(
-            themeMode === ThemeMode.Dark ? ThemeMode.Light : ThemeMode.Dark,
-          )
-        }
-        height={24}
-        width={62}
-      />
+      <ButtonGroup
+        sx={{
+          height: 28,
+          "& .MuiButtonGroup-grouped": { minWidth: 32 },
+          "& .MuiButton-root": {
+            p: 0,
+          },
+        }}
+      >
+        <Button
+          onClick={() => onToggleTheme(ThemeMode.Dark)}
+          variant="outlined"
+          size="small"
+          sx={{
+            backgroundColor:
+              themeMode === ThemeMode.Dark ? "primary.main" : "inherit",
+          }}
+        >
+          <DarkModeIcon
+            sx={{
+              color:
+                themeMode === ThemeMode.Dark
+                  ? theme.palette.background.paper
+                  : theme.palette.primary.main,
+            }}
+          />
+        </Button>
+        <Button
+          onClick={() => onToggleTheme(ThemeMode.Light)}
+          variant="outlined"
+          size="small"
+          sx={{
+            backgroundColor:
+              themeMode === ThemeMode.Light ? "primary.main" : "inherit",
+          }}
+        >
+          <LightModeIcon
+            sx={{
+              color:
+                themeMode === ThemeMode.Light
+                  ? theme.palette.background.paper
+                  : theme.palette.primary.main,
+            }}
+          />
+        </Button>
+      </ButtonGroup>
     </SettingsItem>
   );
 };
@@ -118,6 +128,7 @@ const ThemeSetting = () => {
 const BorderWidthSetting = () => {
   const dispatch = useDispatch();
   const selectedBorderWidth = useSelector(selectSelectedImageBorderWidth);
+  const selectionBorderColor = useSelector(selectImageSelectionColor);
 
   const updateSelectionBorderWidth = (op: "inc" | "dec") => {
     const newWidth =
@@ -144,7 +155,7 @@ const BorderWidthSetting = () => {
               alignSelf: "center",
               width: 64,
               height: selectedBorderWidth + "px",
-              backgroundColor: theme.palette.text.primary,
+              backgroundColor: selectionBorderColor,
               borderRadius: theme.shape.borderRadius,
               marginLeft: 1,
             })}
@@ -187,7 +198,7 @@ const BorderColorSetting = () => {
     initialSelectionColor,
   );
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
-    React.useState<null | HTMLButtonElement>(null);
+    useState<null | HTMLButtonElement>(null);
   const colorPopupOpen = Boolean(colorMenuAnchorEl);
   const onOpenColorPicker = (event: React.MouseEvent<HTMLButtonElement>) => {
     setColorMenuAnchorEl(event.currentTarget);
@@ -255,11 +266,12 @@ const BorderColorSetting = () => {
 
 const SoundSetting = () => {
   const dispatch = useDispatch();
+  const theme = useTheme();
   const soundEnabled = useSelector(selectSoundEnabled);
-  const toggleSoundEnabled = () => {
+  const setSoundEnabled = (on: boolean) => {
     dispatch(
       applicationSettingsSlice.actions.setSoundEnabled({
-        soundEnabled: !soundEnabled,
+        soundEnabled: on,
       }),
     );
   };
@@ -267,32 +279,64 @@ const SoundSetting = () => {
     <SettingsItem
       title={
         <Box display="flex">
-          <Typography display="inline">{"Sound Effects: "}</Typography>
-          {soundEnabled ? (
-            <VolumeUpIcon sx={{ ml: 1 }} />
-          ) : (
-            <VolumeOffIcon sx={{ ml: 1 }} />
-          )}
+          <Typography display="inline">{"Sound Effects"}</Typography>
         </Box>
       }
     >
-      <CustomSwitch
-        checked={soundEnabled}
-        onChange={toggleSoundEnabled}
-        height={24}
-        width={62}
-      />
+      <ButtonGroup
+        sx={{
+          height: 28,
+          "& .MuiButtonGroup-grouped": { minWidth: 32 },
+          "& .MuiButton-root": {
+            p: 0,
+          },
+        }}
+      >
+        <Button
+          onClick={() => setSoundEnabled(false)}
+          variant="outlined"
+          size="small"
+          sx={{
+            backgroundColor: !soundEnabled ? "primary.main" : "inherit",
+          }}
+        >
+          <VolumeOffIcon
+            sx={{
+              color: !soundEnabled
+                ? theme.palette.background.paper
+                : theme.palette.primary.main,
+            }}
+          />
+        </Button>
+        <Button
+          onClick={() => setSoundEnabled(true)}
+          variant="outlined"
+          size="small"
+          sx={{
+            backgroundColor: soundEnabled ? "primary.main" : "inherit",
+          }}
+        >
+          <VolumeUpIcon
+            sx={{
+              color: soundEnabled
+                ? theme.palette.background.paper
+                : theme.palette.primary.main,
+            }}
+          />
+        </Button>
+      </ButtonGroup>
     </SettingsItem>
   );
 };
 
 const TextOnScrollSetting = () => {
   const dispatch = useDispatch();
+  const theme = useTheme();
   const textOnScrollEnabled = useSelector(selectTextOnScroll);
-  const toggletextOnScroll = () => {
+  const setTextOnScroll = (on: boolean) => {
     dispatch(
       applicationSettingsSlice.actions.setTextOnScroll({
-        textOnScroll: !textOnScrollEnabled,
+        textOnScroll: on,
       }),
     );
   };
@@ -300,21 +344,54 @@ const TextOnScrollSetting = () => {
     <SettingsItem
       title={
         <Box display="flex">
-          <Typography display="inline">{"Show Text on Scroll: "}</Typography>
-          {textOnScrollEnabled ? (
-            <NotesIcon sx={{ ml: 1 }} />
-          ) : (
-            <ImageIcon sx={{ ml: 1 }} />
-          )}
+          <Typography display="inline">
+            {"Hide Image/Show Text on Scroll"}
+          </Typography>
         </Box>
       }
     >
-      <CustomSwitch
-        checked={textOnScrollEnabled}
-        onChange={toggletextOnScroll}
-        height={24}
-        width={62}
-      />
+      <ButtonGroup
+        sx={{
+          height: 28,
+          "& .MuiButtonGroup-grouped": { minWidth: 32 },
+          "& .MuiButton-root": {
+            p: 0,
+          },
+        }}
+      >
+        <Button
+          onClick={() => setTextOnScroll(false)}
+          variant="outlined"
+          size="small"
+          sx={{
+            backgroundColor: !textOnScrollEnabled ? "primary.main" : "inherit",
+          }}
+        >
+          <ImageIcon
+            sx={{
+              color: !textOnScrollEnabled
+                ? theme.palette.background.paper
+                : theme.palette.primary.main,
+            }}
+          />
+        </Button>
+        <Button
+          onClick={() => setTextOnScroll(true)}
+          variant="outlined"
+          size="small"
+          sx={{
+            backgroundColor: textOnScrollEnabled ? "primary.main" : "inherit",
+          }}
+        >
+          <NotesIcon
+            sx={{
+              color: textOnScrollEnabled
+                ? theme.palette.background.paper
+                : theme.palette.primary.main,
+            }}
+          />
+        </Button>
+      </ButtonGroup>
     </SettingsItem>
   );
 };
@@ -359,207 +436,3 @@ const TextOnScrollSetting = () => {
 //     </Grid>
 //   );
 // };
-
-type SettingsDialogProps = {
-  onClose: () => void;
-  open: boolean;
-};
-const SettingsItem = ({
-  title,
-  children,
-}: {
-  title: string | ReactNode;
-  children: ReactNode;
-}) => {
-  return (
-    <Box
-      display="flex"
-      flexDirection="row"
-      justifyContent="space-between"
-      alignItems="flex-end"
-      height="40px"
-    >
-      {typeof title === "string" ? <Typography>{title}</Typography> : title}
-
-      {children}
-    </Box>
-  );
-};
-
-const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
-  useHotkeys(
-    "enter",
-    () => {
-      onClose();
-    },
-    HotkeyContext.AppSettingsDialog,
-    { enableOnTags: ["INPUT"], enabled: open },
-    [onClose],
-  );
-
-  return (
-    <Dialog onClose={onClose} open={open} fullWidth maxWidth="xs">
-      <DialogTitle sx={{ m: 0, p: 2 }}>Settings</DialogTitle>
-
-      <IconButton
-        aria-label="close"
-        onClick={onClose}
-        sx={(theme) => ({
-          position: "absolute",
-          right: 8,
-          top: 8,
-          color: theme.palette.grey[500],
-        })}
-      >
-        <CloseIcon />
-      </IconButton>
-
-      <DialogContent sx={{ px: 0, pb: 2.5, pt: 1 }}>
-        <UISettings />
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-type SendFeedbackDialogProps = {
-  onClose: () => void;
-  open: boolean;
-};
-
-const SendFeedbackDialog = ({ onClose, open }: SendFeedbackDialogProps) => {
-  const t = useTranslation();
-
-  const [issueTitle, setIssueTitle] = useState("");
-  const [issueComment, setIssueComment] = useState("");
-
-  const openGitHubIssue = () => {
-    createGitHubIssue(issueTitle, issueComment, AlertType.Warning);
-    setIssueTitle("");
-    setIssueComment("");
-
-    onClose();
-  };
-
-  return (
-    <ConfirmationDialog
-      isOpen={open}
-      onClose={onClose}
-      title={t("Send feedback")}
-      content={
-        <>
-          <DialogContentText
-            sx={{
-              "& a": { color: "deepskyblue" },
-            }}
-          >
-            {t(
-              "Use this form to report issues with Piximi via our GitHub page, or visit",
-            )}{" "}
-            <a
-              href="https://forum.image.sc/tag/piximi"
-              target="_blank"
-              rel="noreferrer"
-            >
-              forum.image.sc/tag/piximi
-            </a>
-            .
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Title"
-            id="issue-title"
-            value={issueTitle}
-            onChange={(e) => setIssueTitle(e.target.value)}
-            rows={1}
-            fullWidth
-            size="small"
-          />
-          <TextField
-            margin="dense"
-            label="Description"
-            id="issue-comment"
-            value={issueComment}
-            onChange={(e) => setIssueComment(e.target.value)}
-            multiline
-            rows={10}
-            fullWidth
-            size="small"
-          />
-        </>
-      }
-      onConfirm={openGitHubIssue}
-      confirmText="Create Github Issue"
-      confirmDisabled={issueTitle.length === 0 || issueComment.length === 0}
-    />
-  );
-};
-
-const SendFeedbackButton = () => {
-  const { onClose, onOpen, open } = useDialog();
-
-  return (
-    <>
-      <Tooltip title="Send Feedback">
-        <IconButton onClick={onOpen} size="small">
-          <FeedbackIcon />
-        </IconButton>
-      </Tooltip>
-
-      <SendFeedbackDialog onClose={onClose} open={open} />
-    </>
-  );
-};
-
-const SettingsButton = () => {
-  const { onClose, onOpen, open } = useDialogHotkey(
-    HotkeyContext.AppSettingsDialog,
-  );
-
-  return (
-    <>
-      <Tooltip title="Settings">
-        <IconButton onClick={onOpen} size="small">
-          <SettingsIcon />
-        </IconButton>
-      </Tooltip>
-
-      <SettingsDialog onClose={onClose} open={open} />
-    </>
-  );
-};
-const HelpButton = () => {
-  const { setHelpMode } = useHelp()!;
-
-  return (
-    <>
-      <Tooltip title="Toggle Help Mode">
-        <IconButton
-          onClick={() => setHelpMode((helpMode) => !helpMode)}
-          size="small"
-        >
-          <HelpIcon />
-        </IconButton>
-      </Tooltip>
-    </>
-  );
-};
-
-export const ApplicationOptions = () => {
-  return (
-    <>
-      <Divider />
-      <Stack
-        direction="row"
-        justifyContent="space-evenly"
-        sx={{ py: 0.5, px: 2 }}
-      >
-        <SettingsButton />
-
-        <SendFeedbackButton />
-
-        <HelpButton />
-      </Stack>
-    </>
-  );
-};
