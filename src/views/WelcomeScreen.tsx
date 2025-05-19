@@ -18,7 +18,6 @@ import { Logo } from "components/ui";
 import { useDialog, useDialogHotkey, usePreferredMuiTheme } from "hooks";
 import { useNavigate } from "react-router-dom";
 import { AlertType, HotkeyContext } from "utils/enums";
-import { logger } from "utils/logUtils";
 import { ExampleProjectDialog } from "views/ProjectViewer/components/dialogs";
 import { batch, useDispatch } from "react-redux";
 import { applicationSettingsSlice } from "store/applicationSettings";

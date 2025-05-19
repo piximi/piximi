@@ -99,3 +99,10 @@ export const selectLoadMessage = ({
 }) => {
   return applicationSettings.loadMessage;
 };
+export const selectShowSaveProjectDialog = ({
+  applicationSettings,
+}: {
+  applicationSettings: AppSettingsState;
+}) => {
+  return applicationSettings.showSaveProjectDialog;
+};
