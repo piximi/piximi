@@ -62,13 +62,6 @@ type StoreListemerAPI = ListenerEffectAPI<
 >;
 
 startAppListening({
-  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
-  effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(segmenterSlice.actions.resetSegmenter());
-  },
-});
-
-startAppListening({
   actionCreator: segmenterSlice.actions.updateModelStatus,
   effect: async (action, listenerAPI) => {
     listenerAPI.unsubscribe();
