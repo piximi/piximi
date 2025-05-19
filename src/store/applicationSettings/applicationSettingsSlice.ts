@@ -22,6 +22,7 @@ const initialState: AppSettingsState = {
   textOnScroll: false,
   loadPercent: 1,
   loadMessage: "",
+  showSaveProjectDialog: true,
 };
 
 export const applicationSettingsSlice = createSlice({
@@ -125,6 +126,8 @@ export const applicationSettingsSlice = createSlice({
     setLoadMessage(state, action: PayloadAction<{ message: string }>) {
       state.loadMessage = action.payload.message;
     },
-    resetApplicationState() {},
+    setShowSaveProjectDialog(state, action: PayloadAction<{ show: boolean }>) {
+      state.showSaveProjectDialog = action.payload.show;
+    },
   },
 });
