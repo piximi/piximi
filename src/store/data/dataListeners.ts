@@ -20,13 +20,6 @@ const startAppListening =
   dataMiddleware.startListening as TypedAppStartListening;
 
 startAppListening({
-  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
-  effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(dataSlice.actions.resetData());
-  },
-});
-
-startAppListening({
   actionCreator: dataSlice.actions.deleteThings,
   effect: (action, listenerAPI) => {
     const state = listenerAPI.getState();

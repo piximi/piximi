@@ -25,13 +25,6 @@ const startAppListening =
   annotatorMiddleware.startListening as TypedAppStartListening;
 
 startAppListening({
-  actionCreator: applicationSettingsSlice.actions.resetApplicationState,
-  effect: (action, listenerAPI) => {
-    listenerAPI.dispatch(annotatorSlice.actions.resetAnnotator());
-  },
-});
-
-startAppListening({
   actionCreator: annotatorSlice.actions.setWorkingAnnotation,
   effect: async (action, listenerAPI) => {
     const dataState = listenerAPI.getState().data;
