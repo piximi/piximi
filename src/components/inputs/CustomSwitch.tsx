@@ -57,12 +57,14 @@ type CustomSwitchProps = {
   enable_icon?: string;
   width?: number;
   height?: number;
+  persistColor?: boolean;
 };
 
 export const CustomSwitch = styled(Switch)<CustomSwitchProps>(({
   theme,
   width = 62,
   height = 34,
+  persistColor = false,
 }) => {
   const thumbWidth = height - 2;
   const padding = Math.round(height / 4);
@@ -78,32 +80,24 @@ export const CustomSwitch = styled(Switch)<CustomSwitchProps>(({
       padding: 0,
       transform: "translateX(0px)",
       "&.Mui-checked": {
-        color: "#fff",
         transform: `translateX(${maxX}px)`,
 
         "& + .MuiSwitch-track": {
           opacity: 0.5,
-          backgroundColor:
-            theme.palette.mode === "dark"
-              ? theme.palette.primary.main
-              : theme.palette.primary.main,
+          backgroundColor: persistColor
+            ? theme.palette.primary.main
+            : undefined,
         },
       },
     },
     "& .MuiSwitch-thumb": {
-      backgroundColor:
-        theme.palette.mode === "dark"
-          ? theme.palette.primary.main
-          : theme.palette.primary.main,
+      backgroundColor: persistColor ? theme.palette.primary.main : undefined,
       width: thumbWidth,
       height: thumbWidth,
     },
     "& .MuiSwitch-track": {
       opacity: 0.5,
-      backgroundColor:
-        theme.palette.mode === "dark"
-          ? theme.palette.primary.main
-          : theme.palette.primary.main,
+      backgroundColor: persistColor ? theme.palette.primary.main : undefined,
       borderRadius: radius,
     },
   };

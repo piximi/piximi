@@ -50,6 +50,7 @@ export type AppSettingsState = {
   textOnScroll: boolean;
   loadPercent: number;
   loadMessage: string;
+  showSaveProjectDialog: boolean;
 };
 
 export type DataState = {
