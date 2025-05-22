@@ -345,7 +345,10 @@ const serializeSegmenter = async (
   segmenterGroup: Group,
   segmenter: SegmenterState,
 ) => {
-  const segmenterModel = availableSegmenterModels[segmenter.selectedModelIdx];
+  const segmenterModel =
+    segmenter.selectedModelIdx === undefined
+      ? { name: "undefined" }
+      : availableSegmenterModels[segmenter.selectedModelIdx];
 
   await segmenterGroup.attrs.setItem("name", segmenterModel.name);
 };
