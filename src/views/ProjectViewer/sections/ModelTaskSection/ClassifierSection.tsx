@@ -39,13 +39,13 @@ import { SequentialClassifier } from "utils/models/classification";
 import { selectActiveUnlabeledThingsIds } from "store/project/reselectors";
 
 export const ClassifierSection = () => {
-  const selectedModel = useSelector(selectClassifierModel);
   const [waitingForResults, setWaitingForResults] = useState(false);
+  const selectedModel = useSelector(selectClassifierModel);
+  const evaluationResults = useSelector(selectClassifierEvaluationResult);
+  const unlabeledThings = useSelector(selectActiveUnlabeledThingsIds);
   const { modelStatus, error } = useClassifierStatus();
   const predictClassifier = usePredictClassifier();
   const evaluateClassifier = useEvaluateClassifier();
-  const evaluationResults = useSelector(selectClassifierEvaluationResult);
-  const unlabeledThings = useSelector(selectActiveUnlabeledThingsIds);
 
   const {
     onClose: handleCloseEvaluateClassifierDialog,

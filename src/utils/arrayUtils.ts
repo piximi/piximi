@@ -1,5 +1,6 @@
 // Given a length, return an array of numbers from 0 to length - 1
 
+import { difference } from "lodash";
 import { FilterType } from "./types";
 
 // An iterable with length property set the the passed value is used to create an array
@@ -39,4 +40,11 @@ export const isFiltered = <T extends object>(
 
 export const distinctFilter = <T>(value: T, index: number, self: T[]) => {
   return self.indexOf(value) === index;
+};
+
+export const getDifferences = <T>(original: T[], next: T[]) => {
+  return {
+    added: difference(next, original),
+    removed: difference(original, next),
+  };
 };
