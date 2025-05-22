@@ -42,9 +42,8 @@ export const segmenterSlice = createSlice({
         const selectedModelIdx = availableSegmenterModels.findIndex(
           (m) => m.name === model.name,
         );
-        state.selectedModelIdx = selectedModelIdx
-          ? selectedModelIdx
-          : undefined;
+        state.selectedModelIdx =
+          selectedModelIdx !== -1 ? selectedModelIdx : undefined;
       } else {
         availableSegmenterModels.push(model);
         state.selectedModelIdx = availableSegmenterModels.length - 1;
