@@ -1,4 +1,3 @@
-import { History } from "@tensorflow/tfjs";
 import {
   Dispatch,
   EntityState,
@@ -8,7 +7,6 @@ import {
 
 import { HotkeyContext, Languages, ThingSortKey } from "utils/enums";
 import { ThemeMode } from "themes/enums";
-import { ModelStatus } from "utils/models/enums";
 
 import { AlertState, FilterType } from "utils/types";
 import {
@@ -16,16 +14,12 @@ import {
   FitOptions,
   PreprocessSettings,
   OptimizerSettings,
-  SegmenterEvaluationResultType,
-  SegmenterPreprocessSettings,
-  SegmenterCompileSettings,
 } from "utils/models/types";
 import {
   Kind,
   AnnotationObject,
   Category,
   ImageObject,
-  Shape,
   Thing,
 } from "./data/types";
 import { MeasurementsState } from "./measurements/types";
@@ -61,18 +55,8 @@ export type DataState = {
 
 export type SegmenterState = {
   // pre-fit state
-  selectedModelIdx: number;
-  inputShape: Shape;
-  preprocessOptions: SegmenterPreprocessSettings;
-  fitOptions: FitOptions;
-
-  compileOptions: SegmenterCompileSettings;
-
-  trainingPercentage: number;
-  trainingHistory?: History;
-  evaluationResult: SegmenterEvaluationResultType;
-
-  modelStatus: ModelStatus;
+  selectedModelIdx?: number;
+  inferenceOptions: FitOptions;
 };
 
 export type ModelClassMap = Record<number, Category["id"]>;
