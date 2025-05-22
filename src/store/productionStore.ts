@@ -20,7 +20,6 @@ import { applicationSettingsSlice } from "./applicationSettings";
 import { dataSlice } from "./data/dataSlice";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
-import { segmenterMiddleware } from "./segmenter/segmenterListeners";
 import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
@@ -36,7 +35,6 @@ const listenerMiddlewares: Middleware[] = [
   imageViewerMiddleware.middleware,
   projectMiddleware.middleware,
   dataMiddleware.middleware,
-  segmenterMiddleware.middleware,
   measurementsMiddleware.middleware,
   applicationMiddleware.middleware,
 ];
