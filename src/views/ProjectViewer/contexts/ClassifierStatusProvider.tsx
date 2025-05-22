@@ -1,5 +1,6 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -9,6 +10,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectClassifierModel } from "store/classifier/reselectors";
 import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
 import { dataSlice } from "store/data";
+import { selectAllKindIds } from "store/data/selectors";
+import { Kind } from "store/data/types";
 import { isUnknownCategory } from "store/data/utils";
 import {
   selectActiveLabeledThings,
@@ -16,7 +19,11 @@ import {
   selectActiveThingsByPartition,
   selectActiveUnknownCategoryId,
 } from "store/project/reselectors";
-import { selectProjectImageChannels } from "store/project/selectors";
+import {
+  selectActiveKindId,
+  selectProjectImageChannels,
+} from "store/project/selectors";
+import { getDifferences } from "utils/arrayUtils";
 import { ModelStatus, Partition } from "utils/models/enums";
 
 export enum ErrorReason {
@@ -36,7 +43,7 @@ const ClassifierStatusContext = createContext<{
   isReady: boolean;
   trainable: boolean;
   modelStatus: ModelStatus;
-  setModelStatus: React.Dispatch<React.SetStateAction<ModelStatus>>;
+  setModelStatus: (status: ModelStatus) => void;
   shouldWarnClearPredictions: boolean;
   error?: ErrorContext;
   newModelName: string;
@@ -47,7 +54,7 @@ const ClassifierStatusContext = createContext<{
   isReady: true,
   trainable: true,
   modelStatus: ModelStatus.Idle,
-  setModelStatus: (_value: React.SetStateAction<ModelStatus>) => {},
+  setModelStatus: (_status) => {},
   shouldWarnClearPredictions: false,
   newModelName: "",
   setNewModelName: (_value: React.SetStateAction<string>) => {},
@@ -62,19 +69,45 @@ export const ClassifierStatusProvider = ({
 }) => {
   const dispatch = useDispatch();
   const selectedModel = useSelector(selectClassifierModel);
+  const activeKindId = useSelector(selectActiveKindId);
+  const projectKinds = useSelector(selectAllKindIds);
   const labeledThingsCount = useSelector(selectActiveLabeledThingsCount);
   const thingsByPartition = useSelector(selectActiveThingsByPartition);
   const unknowCatId = useSelector(selectActiveUnknownCategoryId);
   const activeLabeledThings = useSelector(selectActiveLabeledThings);
   const projectChannels = useSelector(selectProjectImageChannels);
-
-  const [isReady, setIsReady] = useState(true);
-  const [error, setError] = useState<ErrorContext>();
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
-  const [modelStatus, setModelStatus] = useState<ModelStatus>(ModelStatus.Idle);
+
+  const [isReady, setIsReady] = useState(true);
   const [newModelName, setNewModelName] = useState("");
+  const [error, setError] = useState<ErrorContext>();
+  const [modelStatusDict, setModelStatusDict] = useState<
+    Record<Kind["id"], ModelStatus>
+  >({ Image: ModelStatus.Idle });
+
+  useEffect(() => {
+    const classifierKinds = Object.keys(modelStatusDict);
+
+    const kindChanges = getDifferences(classifierKinds, projectKinds);
+
+    const nextStatusDict = { ...modelStatusDict };
+
+    kindChanges.added.forEach(
+      (newKind) => (nextStatusDict[newKind] = ModelStatus.Idle),
+    );
+    kindChanges.removed.forEach(
+      (removedKind) => delete nextStatusDict[removedKind],
+    );
+    setModelStatusDict(nextStatusDict);
+  }, [projectKinds]);
+  const modelStatus = useMemo(() => {
+    return modelStatusDict?.[activeKindId] ?? ModelStatus.Idle;
+  }, [activeKindId, modelStatusDict]);
+  const setModelStatus = useCallback((status: ModelStatus) => {
+    setModelStatusDict((dict) => ({ ...dict, [activeKindId]: status }));
+  }, []);
 
   const hasLabeledInference = useMemo(() => {
     return activeLabeledThings.some(
@@ -179,7 +212,7 @@ export const ClassifierStatusProvider = ({
         trainable,
         modelStatus,
         setModelStatus,
-        shouldWarnClearPredictions: shouldWarnClearPredictions,
+        shouldWarnClearPredictions,
         error,
         newModelName,
         setNewModelName,
