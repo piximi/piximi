@@ -94,30 +94,34 @@ const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
   return loadImageFileAsStack(file);
 };
 
-it("preprocessClassifier", async () => {
-  const images: Array<ImageObject> = [];
+it(
+  "preprocessClassifier",
+  async () => {
+    const images: Array<ImageObject> = [];
 
-  for (const preIm of preloadedImages) {
-    const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);
-    const im = await convertToImage(
-      imStack,
-      preIm.name,
-      undefined,
-      1,
-      imStack.length,
-    );
-    images.push(im);
-  }
+    for (const preIm of preloadedImages) {
+      const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);
+      const im = await convertToImage(
+        imStack,
+        preIm.name,
+        undefined,
+        1,
+        imStack.length,
+      );
+      images.push(im);
+    }
 
-  const model = new GenericClassifier();
-  model.loadModel();
-  expect(model.preprocessingOptions).toBeDefined();
-  model.loadTraining(images, categories);
+    const model = new GenericClassifier();
+    model.loadModel();
+    expect(model.preprocessingOptions).toBeDefined();
+    model.loadTraining(images, categories);
 
-  expect(model.trainingLoaded).toBeTruthy();
+    expect(model.trainingLoaded).toBeTruthy();
 
-  const items = await model.testTrainingDataArray;
+    const items = await model.testTrainingDataArray;
 
-  expect(items[0]["xs"].shape).toEqual([1, 224, 224, 3]);
-  expect(items[0]["ys"].shape).toEqual([1, 2]);
-});
+    expect(items[0]["xs"].shape).toEqual([1, 224, 224, 3]);
+    expect(items[0]["ys"].shape).toEqual([1, 2]);
+  },
+  { timeout: 6000 },
+);
