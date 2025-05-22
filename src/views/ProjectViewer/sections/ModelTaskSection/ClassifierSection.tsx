@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -23,7 +23,10 @@ import {
   selectClassifierModel,
 } from "store/classifier/reselectors";
 import { PredictionListItems } from "views/ProjectViewer/components/list-items";
-import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import {
+  ErrorReason,
+  useClassifierStatus,
+} from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { usePredictClassifier } from "views/ProjectViewer/hooks/usePredictClassifier";
 import { useEvaluateClassifier } from "views/ProjectViewer/hooks/useEvaluateClassifier";
 import { WithLabel } from "components/inputs";
@@ -33,14 +36,16 @@ import { selectActiveKindId } from "store/project/selectors";
 import { StyledSelect } from "components/inputs";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 import { SequentialClassifier } from "utils/models/classification";
+import { selectActiveUnlabeledThingsIds } from "store/project/reselectors";
 
 export const ClassifierSection = () => {
   const selectedModel = useSelector(selectClassifierModel);
   const [waitingForResults, setWaitingForResults] = useState(false);
-  const { modelStatus } = useClassifierStatus();
+  const { modelStatus, error } = useClassifierStatus();
   const predictClassifier = usePredictClassifier();
   const evaluateClassifier = useEvaluateClassifier();
   const evaluationResults = useSelector(selectClassifierEvaluationResult);
+  const unlabeledThings = useSelector(selectActiveUnlabeledThingsIds);
 
   const {
     onClose: handleCloseEvaluateClassifierDialog,
@@ -76,6 +81,59 @@ export const ClassifierSection = () => {
     handleOpenEvaluateClassifierDialog();
   };
 
+  const execConfig = useMemo(() => {
+    const fitText = (() => {
+      switch (modelStatus) {
+        case ModelStatus.Idle:
+        case ModelStatus.Pending:
+          return !selectedModel || selectedModel.trainable
+            ? "Fit Model"
+            : "Model is inference only";
+        default:
+          return "...busy";
+      }
+    })();
+    const predictText = (() => {
+      switch (modelStatus) {
+        case ModelStatus.Idle:
+          return selectedModel ? "Predict Model" : "No Trained Model";
+        case ModelStatus.Predicting:
+          return "...Predicting";
+        default:
+          return "...Pending";
+      }
+    })();
+    const predictionDisabled =
+      !selectedModel ||
+      !selectedModel.pretrained ||
+      modelStatus !== ModelStatus.Idle ||
+      unlabeledThings.length === 0 ||
+      error?.reason === ErrorReason.ChannelMismatch;
+    const evaluateText = (() => {
+      if (selectedModel) {
+        return !selectedModel || selectedModel.trainable
+          ? modelStatus === ModelStatus.Idle ||
+            modelStatus === ModelStatus.Pending
+            ? "Evaluate Model"
+            : "...Pending"
+          : "Cannot evaluate non-trainable models";
+      } else {
+        return "No Trained Model";
+      }
+    })();
+    return {
+      fit: {
+        helperText: fitText,
+        disabled: !(!selectedModel || selectedModel.trainable),
+      },
+      predict: { helperText: predictText, disabled: predictionDisabled },
+      evaluate: {
+        helperText: evaluateText,
+        disabled: !selectedModel || !selectedModel.pretrained,
+      },
+    };
+  }, [modelStatus, selectedModel, error]);
+
   useEffect(() => {
     if (modelStatus === ModelStatus.Trained && waitingForResults) {
       setWaitingForResults(false);
@@ -109,7 +167,7 @@ export const ClassifierSection = () => {
           handleFit={handleOpenFitClassifierDialog}
           handlePredict={handlePredict}
           handleEvaluate={handleEvaluate}
-          modelTrainable={!selectedModel || selectedModel.trainable}
+          execConfig={execConfig}
         />
       </Box>
       {modelStatus === ModelStatus.Pending && <PredictionListItems />}

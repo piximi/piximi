@@ -25,19 +25,12 @@ import {
 import { useDialogHotkey } from "hooks";
 
 import { SaveProjectDialog } from "./SaveProjectDialog";
-import { SaveFittedModelDialog } from "./SaveFittedModelDialog";
-
-import {
-  selectSegmenterModel,
-  selectSegmenterModelStatus,
-} from "store/segmenter/selectors";
 
 import { createGitHubIssue } from "utils/logUtils";
 
 import { APPLICATION_COLORS } from "utils/constants";
 import { HotkeyContext } from "utils/enums";
 import { AlertType } from "utils/enums";
-import { ModelStatus } from "utils/models/enums";
 
 import { AlertState } from "utils/types";
 import classifierHandler from "utils/models/classification/classifierHandler";
@@ -80,15 +73,6 @@ export const FallbackDialog = (props: any) => {
 
   // const routePath = useLocation().pathname;
   // const inAnnotator = routePath === "/annotator";
-
-  const {
-    onClose: onSaveSegmenterDialogClose,
-    onOpen: onSaveSegmenterDialogOpen,
-    open: openSaveSegmenterDialog,
-  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
-
-  const selectedSegmenterModel = useSelector(selectSegmenterModel);
-  const segmenterModelStatus = useSelector(selectSegmenterModelStatus);
 
   const errorState: AlertState = {
     alertType: AlertType.Error,
@@ -230,22 +214,11 @@ export const FallbackDialog = (props: any) => {
               Save Classifier
             </Button>
           )}
-          {segmenterModelStatus === ModelStatus.Trained && (
-            <Button variant="outlined" onClick={onSaveSegmenterDialogOpen}>
-              Save segmenter
-            </Button>
-          )}
         </Stack>
 
         <SaveProjectDialog
           onClose={onSaveProjectDialogClose}
           open={openSaveProjectDialog}
-        />
-
-        <SaveFittedModelDialog
-          model={selectedSegmenterModel}
-          onClose={onSaveSegmenterDialogClose}
-          open={openSaveSegmenterDialog}
         />
       </DialogContent>
     </Dialog>
