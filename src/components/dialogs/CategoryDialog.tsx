@@ -4,6 +4,7 @@ import { useCategoryValidation } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { ColorIcon } from "components/ui/ColorIcon";
+import { formatString } from "utils/stringUtils";
 
 type BaseCategoryDialogProps = {
   onClose: () => void;
@@ -61,7 +62,7 @@ export const CategoryDialog = (
     <ConfirmationDialog
       onClose={handleClose}
       isOpen={open}
-      title={`${action} Category`}
+      title={formatString(`${action} Category`, " ", "every-word")}
       content={
         <Box
           display="flex"
