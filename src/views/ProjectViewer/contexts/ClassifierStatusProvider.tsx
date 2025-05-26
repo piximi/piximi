@@ -167,28 +167,26 @@ export const ClassifierStatusProvider = ({
   };
 
   useEffect(() => {
-    let newError: ErrorContext | undefined;
+    const newErrors: ErrorContext[] = [];
     let newIsReady = true;
 
     if (!trainable) {
       newIsReady = false;
-      if (!error || error.severity > 1) {
-        newError = {
-          reason: ErrorReason.NotTrainable,
-          message: "Selected model is not trainable.",
-          severity: 1,
-        };
-      }
+
+      newErrors.push({
+        reason: ErrorReason.NotTrainable,
+        message: "Selected model is not trainable.",
+        severity: 1,
+      });
     }
     if (noLabeledThings) {
       newIsReady = false;
-      if (!error) {
-        newError = {
-          reason: ErrorReason.NoLabeledImages,
-          message: "Please label images to train a model.",
-          severity: 3,
-        };
-      }
+
+      newErrors.push({
+        reason: ErrorReason.NoLabeledImages,
+        message: "Please label images to train a model.",
+        severity: 3,
+      });
     }
     if (
       selectedModel?.preprocessingOptions &&
@@ -196,17 +194,29 @@ export const ClassifierStatusProvider = ({
       projectChannels !== selectedModel.preprocessingOptions.inputShape.channels
     ) {
       newIsReady = false;
-      if (!error || error.severity > 2) {
-        newError = {
-          reason: ErrorReason.ChannelMismatch,
-          message: `The model requires ${selectedModel?.preprocessingOptions.inputShape.channels}-channel images, but the project images have ${projectChannels}`,
-          severity: 2,
-        };
-      }
+
+      newErrors.push({
+        reason: ErrorReason.ChannelMismatch,
+        message: `The model requires ${selectedModel?.preprocessingOptions.inputShape.channels}-channel images, but the project images have ${projectChannels}`,
+        severity: 2,
+      });
     }
+
+    const mostSevere: undefined | ErrorContext =
+      newErrors.length === 0
+        ? undefined
+        : newErrors.reduce((prev, curr) =>
+            curr.severity < prev.severity ? curr : prev,
+          );
     setIsReady(newIsReady);
-    setError(newError);
-  }, [selectedModel, trainable, noLabeledThings, projectChannels]);
+    setError(mostSevere);
+  }, [
+    selectedModel,
+    trainable,
+    noLabeledThings,
+    projectChannels,
+    activeKindId,
+  ]);
 
   return (
     <ClassifierStatusContext.Provider
