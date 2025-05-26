@@ -105,9 +105,12 @@ export const ClassifierStatusProvider = ({
   const modelStatus = useMemo(() => {
     return modelStatusDict?.[activeKindId] ?? ModelStatus.Idle;
   }, [activeKindId, modelStatusDict]);
-  const setModelStatus = useCallback((status: ModelStatus) => {
-    setModelStatusDict((dict) => ({ ...dict, [activeKindId]: status }));
-  }, []);
+  const setModelStatus = useCallback(
+    (status: ModelStatus) => {
+      setModelStatusDict((dict) => ({ ...dict, [activeKindId]: status }));
+    },
+    [activeKindId],
+  );
 
   const hasLabeledInference = useMemo(() => {
     return activeLabeledThings.some(

@@ -109,6 +109,7 @@ export const ClassifierSection = () => {
       modelStatus !== ModelStatus.Idle ||
       unlabeledThings.length === 0 ||
       error?.reason === ErrorReason.ChannelMismatch;
+
     const evaluateText = (() => {
       if (selectedModel) {
         return !selectedModel || selectedModel.trainable
