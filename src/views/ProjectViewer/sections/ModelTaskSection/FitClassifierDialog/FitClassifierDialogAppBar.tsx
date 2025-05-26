@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -34,7 +35,6 @@ import { useClassifierHistory } from "views/ProjectViewer/contexts/ClassifierHis
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 import useFitClassifier from "views/ProjectViewer/hooks/useFitClassifier";
-import { useMemo } from "react";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
@@ -91,6 +91,7 @@ export const FitClassifierDialogAppBar = ({
       clearAndFit();
     }
   };
+
   return (
     <AppBar
       sx={{
