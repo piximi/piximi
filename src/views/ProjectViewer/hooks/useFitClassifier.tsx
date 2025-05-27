@@ -12,7 +12,7 @@ import {
 
 import {
   selectActiveKnownCategories,
-  selectActiveLabeledThings,
+  selectActiveThings,
 } from "store/project/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 
@@ -38,7 +38,7 @@ import {
 
 export const useFitClassifier = () => {
   const dispatch = useDispatch();
-  const activeData = useSelector(selectActiveLabeledThings);
+  const activeData = useSelector(selectActiveThings);
   const modelInfo = useSelector(selectClassifierModelInfo);
   const activeKindId = useSelector(selectActiveKindId);
   const knownCategories = useSelector(selectActiveKnownCategories);
