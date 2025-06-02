@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { merge } from "lodash";
 
 import { AnnotationTool } from "views/ImageViewer/utils/tools/AnnotationTool";
 
@@ -288,15 +287,15 @@ export const annotatorSlice = createSlice({
       for (const update of updates) {
         const { id, ...changes } = update;
         if (id in state.changes.things.added) {
-          state.changes.things.added[id] = merge(
-            state.changes.things.added[id],
-            changes,
-          );
+          Object.entries(changes).forEach((change) => {
+            //@ts-ignore typescript doesnt know that "changes" contains valid entried for ProtoAnnotationObject
+            state.changes.things.added[id][change[0]] = change[1];
+          });
         } else if (id in state.changes.things.edited) {
-          state.changes.things.edited[id] = merge(
-            state.changes.things.edited[id],
-            changes,
-          );
+          Object.entries(changes).forEach((change) => {
+            //@ts-ignore typescript doesnt know that "changes" contains valid entried for ProtoAnnotationObject
+            state.changes.things.edited[id][change[0]] = change[1];
+          });
         } else {
           state.changes.things.edited[id] = { id, ...changes };
         }
