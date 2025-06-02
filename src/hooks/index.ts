@@ -3,7 +3,7 @@ export { useDebounce } from "./useDebounce";
 export { useDialog, useDialogHotkey } from "./useDialog";
 export { useDndFileDrop } from "./useDndFileDrop";
 export { useMenu } from "./useMenu";
-export { usePreferredMuiTheme, usePreferredNivoTheme } from "./useTheme";
+export { usePreferredMuiTheme, usePreferredNivoTheme } from "./use-theme";
 export { useTranslation } from "./useTranslation";
 export { useLocalGlobalState } from "./useLocalGlobalState";
 export { useHotkeys } from "./useHotkeys";
