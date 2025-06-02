@@ -275,10 +275,9 @@ export const WelcomeScreen = () => {
               Documentation
             </Button>
           </Stack>
-          {/* {import.meta.env.DEV && (
+          {import.meta.env.DEV && (
             <Button
               onClick={() => {
-                logger(theme);
                 onOpen();
               }}
               variant="outlined"
@@ -286,14 +285,14 @@ export const WelcomeScreen = () => {
             >
               Show Palette
             </Button>
-          )} */}
+          )}
         </Stack>
       </Box>
       <ExampleProjectDialog
         open={ExampleProjectOpen}
         onClose={handleCloseDialog}
       />
-      {import.meta.env.Dev && (
+      {import.meta.env.DEV && (
         <Dialog open={open} onClose={onClose}>
           <DialogTitle>Palette</DialogTitle>
           <DialogContent>{palette}</DialogContent>
