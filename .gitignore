@@ -25,4 +25,5 @@ src/data/exampleProjects/*.zip
 .vim
 .vimspector.json
 .cursorignore
+pnpm-lock.yaml
 
