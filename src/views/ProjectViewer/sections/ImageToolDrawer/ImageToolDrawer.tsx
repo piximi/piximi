@@ -8,6 +8,7 @@ import {
   Straighten as StraightenIcon,
   ScatterPlot as ScatterPlotIcon,
   Label as LabelIcon,
+  Gesture as GestureIcon,
 } from "@mui/icons-material";
 
 import { useMobileView, useTranslation } from "hooks";
@@ -61,6 +62,14 @@ const imageTools: Record<string, OperationType> = {
   measurements: {
     icon: (color) => <StraightenIcon fontSize="small" sx={{ color: color }} />,
     name: "measurements",
+    description: "-",
+    options: <MeasurementOptions />,
+    hotkey: "M",
+    mobile: true,
+  },
+  imageViewer: {
+    icon: (color) => <GestureIcon fontSize="small" sx={{ color: color }} />,
+    name: "image viewer",
     description: "-",
     options: <MeasurementOptions />,
     hotkey: "M",
