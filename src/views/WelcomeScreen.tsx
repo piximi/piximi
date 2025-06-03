@@ -15,7 +15,13 @@ import {
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { CollapsibleList } from "components/ui";
 import { Logo } from "components/ui";
-import { useDialog, useDialogHotkey, usePreferredMuiTheme } from "hooks";
+import {
+  useDialog,
+  useDialogHotkey,
+  useMobileView,
+  usePreferredMuiTheme,
+  useWindowSize,
+} from "hooks";
 import { useNavigate } from "react-router-dom";
 import { AlertType, HotkeyContext } from "utils/enums";
 import { ExampleProjectDialog } from "views/ProjectViewer/components/dialogs";
@@ -52,6 +58,9 @@ export const WelcomeScreen = () => {
     open: ExampleProjectOpen,
   } = useDialogHotkey(HotkeyContext.ExampleProjectDialog);
   const { open, onClose } = useDialog();
+
+  const windowSize = useWindowSize();
+  const mobileView = useMobileView();
 
   const palette = useMemo(() => {
     const groups: Array<keyof Palette> = [
@@ -211,6 +220,7 @@ export const WelcomeScreen = () => {
     <Box
       sx={{
         height: "100vh",
+        width: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -218,14 +228,15 @@ export const WelcomeScreen = () => {
     >
       <Box
         sx={{
+          maxWidth: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
         }}
       >
-        <Logo width={500} height={100} />
+        <Logo width={windowSize.width * 0.8} height={100} />
         <Stack spacing={2} sx={{ mt: 4 }}>
-          <Stack direction="row" spacing={2}>
+          <Stack direction={mobileView ? "column" : "row"} spacing={2}>
             <Button
               data-help={HelpItem.StartNewProject}
               onClick={handleNewProject}
@@ -283,7 +294,7 @@ export const WelcomeScreen = () => {
               variant="outlined"
               color="primary"
             >
-              Show Palette
+              {windowSize.width}
             </Button>
           )}
         </Stack>
