@@ -20,15 +20,13 @@ jobs:
         with:
           version: 10
 
-      - name: Install semver globally
+      - name: Install semver
         run: |
-          pnpm add -g semver
-          pnpm ls -g
-          NODE_PATH="$(pnpm root -g)"
-          # enusre globally installed semver is available as a script
-          # to be run locally
-          echo "NODE_PATH=$NODE_PATH" >> "$GITHUB_ENV"
-          pnpm link semver
+          mv package.json package.json.bak
+          echo '{}' > package.json
+          pnpm add semver@7.7.2
+          mv package.json.bak package.json
+          pnpm run bump
 
       - name: Analyze PR labels
         id: analyze_labels
@@ -62,8 +60,6 @@ jobs:
           echo ${LABELS[@]}
           echo "Label(s) matched:"
           echo ${FOUND_LABELS[@]}
-          echo "NODE PATH IS:"
-          echo ${NODE_PATH}
 
           # Output result based on found labels
           if [[ ${#FOUND_LABELS[@]} -eq 0 ]]; then
