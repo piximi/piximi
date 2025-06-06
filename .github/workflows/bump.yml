@@ -26,7 +26,6 @@ jobs:
           echo '{}' > package.json
           pnpm add semver@7.7.2
           mv package.json.bak package.json
-          pnpm run bump
 
       - name: Analyze PR labels
         id: analyze_labels
