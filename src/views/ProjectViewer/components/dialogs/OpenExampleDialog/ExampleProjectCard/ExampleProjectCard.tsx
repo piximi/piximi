@@ -112,6 +112,24 @@ export const ExampleProjectCard = ({
               )
             ).default;
         break;
+      case ExampleProject.MALARIA:
+        exampleProjectFilePath = import.meta.env.PROD
+          ? `${DOMAIN}/${ROOT_PATH}/MalariaInfectedHumanBloodSmears.${EXT}`
+          : (
+              await import(
+                "data/exampleProjects/MalariaInfectedHumanBloodSmears.zip"
+              )
+            ).default;
+        break;
+      case ExampleProject.TRANSLOCATION:
+        exampleProjectFilePath = import.meta.env.PROD
+          ? `${DOMAIN}/${ROOT_PATH}/Piximi_Translocation_Tutorial_RGB.${EXT}`
+          : (
+              await import(
+                "data/exampleProjects/Piximi_Translocation_Tutorial_RGB.zip"
+              )
+            ).default;
+        break;
       default:
         return;
     }
