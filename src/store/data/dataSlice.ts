@@ -827,6 +827,34 @@ export const dataSlice = createSlice({
             },
           });
         }
+        if ("kind" in changes) {
+          const oldKind = state.things.entities[id]!.kind;
+
+          dataSlice.caseReducers.updateKindContents(state, {
+            type: "updateKindContents",
+            payload: {
+              changes: [
+                {
+                  kindId: oldKind,
+                  updateType: "remove",
+                  contents: [id],
+                },
+              ],
+            },
+          });
+          dataSlice.caseReducers.updateKindContents(state, {
+            type: "updateKindContents",
+            payload: {
+              changes: [
+                {
+                  kindId: changes.kind!,
+                  updateType: "add",
+                  contents: [id],
+                },
+              ],
+            },
+          });
+        }
 
         // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
         thingsAdapter.updateOne(state.things, { id, changes });

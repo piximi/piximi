@@ -1,5 +1,5 @@
 import { ReactElement, useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch } from "react-redux";
 
 import { TextFieldWithBlur } from "components/inputs";
 import { ThingCategorySelect } from "./ThingCategorySelect";
@@ -9,11 +9,11 @@ import { dataSlice } from "store/data/dataSlice";
 
 import { Partition } from "utils/models/enums";
 
-import { Thing } from "store/data/types";
+import { Kind, Thing } from "store/data/types";
 import { DataTable } from "./DataTable";
 import { DataTableRow } from "./DataTableRow";
-import { selectRenderKindName } from "store/data/selectors";
 import { useTheme } from "@mui/material";
+import { ThingKindSelect } from "./ThingKindSelect";
 
 export const ThingInformationTable = ({
   thing,
@@ -27,7 +27,6 @@ export const ThingInformationTable = ({
   const [tableData, setTableData] = useState<
     Array<Array<string | number | ReactElement>>
   >([]);
-  const renderedKindName = useSelector(selectRenderKindName);
   const [newImageName, setNewImageName] = useState<string>(thing.name);
 
   const handleImageNameChange = useCallback(
@@ -74,9 +73,24 @@ export const ThingInformationTable = ({
     [dispatch, thing],
   );
 
+  const handleKindSelect = useCallback(
+    (kindId: Kind["id"], newCategoryId: string) => {
+      batch(() => {
+        dispatch(
+          dataSlice.actions.updateThings({
+            updates: [
+              { id: thing.id, kind: kindId, categoryId: newCategoryId },
+            ],
+          }),
+        );
+      });
+    },
+    [dispatch, thing],
+  );
+
   useEffect(() => {
     const data: Array<Array<string | number>> = [];
-    const editableData: Array<Array<string | ReactElement>> = [[], [], []];
+    const editableData: Array<Array<string | ReactElement>> = [[], [], [], []];
     Object.entries(thing).forEach((entry) => {
       const [key, value] = entry;
 
@@ -132,7 +146,18 @@ export const ThingInformationTable = ({
           ];
           break;
         case "kind":
-          data.push(["Kind", renderedKindName(thing.kind)]);
+          editableData[3] = [
+            "Kind",
+            <ThingKindSelect
+              currentKind={thing.kind}
+              callback={handleKindSelect}
+              size="small"
+              variant="standard"
+              fontSize="inherit"
+              fullWidth
+              key={key}
+            />,
+          ];
           break;
         case "shape":
           Object.entries(value).forEach((shapeEntry) => {
