@@ -1,17 +1,33 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
+import { useSelector } from "react-redux";
+import { selectSelectedThingIds } from "store/project/selectors";
 
 export const ImageViewerOptions = () => {
   const navigate = useNavigate();
-  const handleNavigateMeasurements = () => {
-    navigate("/measurements");
+  const selectedThingIds = useSelector(selectSelectedThingIds);
+  const handleNavigateImageViewer = () => {
+    navigate("/imageviewer", {
+      state: {
+        initialThingIds: selectedThingIds,
+      },
+    });
   };
   return (
-    <Box display="flex" justifyContent="center">
-      <Button variant="text" onClick={handleNavigateMeasurements}>
+    <Stack justifyContent="center" alignItems="center">
+      {selectedThingIds.length === 0 && (
+        <Typography variant="body2">
+          Select images or objects to view.
+        </Typography>
+      )}
+      <Button
+        variant="text"
+        disabled={selectedThingIds.length === 0}
+        onClick={handleNavigateImageViewer}
+      >
         Go to ImageViewer
       </Button>
-    </Box>
+    </Stack>
   );
 };

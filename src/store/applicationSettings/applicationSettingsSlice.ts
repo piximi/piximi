@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { logger } from "utils/logUtils";
 
-import { defaultAlert } from "utils/constants";
+import { DEFAULT_ALERT } from "utils/constants";
 import { HotkeyContext, Languages } from "utils/enums";
 import { ThemeMode } from "themes/enums";
 
@@ -17,7 +17,7 @@ const initialState: AppSettingsState = {
   soundEnabled: true,
   imageSelectionColor: "#FF6DB6",
   selectedImageBorderWidth: 5,
-  alertState: defaultAlert,
+  alertState: DEFAULT_ALERT,
   hotkeyStack: [],
   textOnScroll: false,
   loadPercent: 1,

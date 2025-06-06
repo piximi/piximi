@@ -1,16 +1,15 @@
 import React from "react";
 
-import { AppBarOffset } from "components/ui/AppBarOffset";
 import { BaseAppDrawer } from "components/layout";
 import { MeasurementGroupOptionsContainer } from "../MeasurementGroupOptionsContainer";
-import { MeasurementsAppBar } from "../MeasurementsAppBar";
+import { Box } from "@mui/material";
 
 export const MeasurementsDrawer = () => {
   return (
-    <BaseAppDrawer>
-      <MeasurementsAppBar />
-      <AppBarOffset />
-      <MeasurementGroupOptionsContainer />
-    </BaseAppDrawer>
+    <Box sx={{ display: "flex", flexGrow: 1, gridArea: "action-drawer" }}>
+      <BaseAppDrawer>
+        <MeasurementGroupOptionsContainer />
+      </BaseAppDrawer>
+    </Box>
   );
 };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Box, IconButton, Menu, Slider } from "@mui/material";
 import {
@@ -6,17 +6,35 @@ import {
   Add as AddIcon,
   Remove as RemoveIcon,
 } from "@mui/icons-material";
-import { useMenu } from "hooks";
+import { useMenu, useMobileView } from "hooks";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { DEFAULT_GRID_ITEM_WIDTH, DIMENSIONS, GRID_GAP } from "utils/constants";
 
 const minZoom = 0.6;
-const maxZoom = 4;
 
 export const ZoomControl = () => {
   const dispatch = useDispatch();
   const [value, setValue] = useState<number>(1);
+  const [maxZoom, setMaxZoom] = useState<number>(4);
   const { onOpen, onClose, open, anchorEl } = useMenu();
+  const isMobile = useMobileView();
+
+  useLayoutEffect(() => {
+    const resizeHandler = () => {
+      const gridWidth = !isMobile
+        ? window.innerWidth -
+          DIMENSIONS.leftDrawerWidth -
+          DIMENSIONS.toolDrawerWidth -
+          GRID_GAP
+        : window.innerWidth - DIMENSIONS.toolDrawerWidth - GRID_GAP;
+      setMaxZoom(gridWidth / DEFAULT_GRID_ITEM_WIDTH);
+    };
+    window.addEventListener("resize", resizeHandler);
+    return () => {
+      window.removeEventListener("resize", resizeHandler);
+    };
+  }, [isMobile]);
 
   const handleSizeChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number);

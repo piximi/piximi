@@ -1,34 +1,47 @@
 import React from "react";
-import { Divider, Box } from "@mui/material";
+import { Divider, Box, Stack } from "@mui/material";
 
 import { useAnnotatorToolShortcuts } from "../../hooks";
 
-import { dimensions } from "utils/constants";
+import { DIMENSIONS } from "utils/constants";
 import { ColorOptions, SelectionOptions, ZoomOptions } from "./tools";
+import { ImageViewerLogo } from "../ImageViewerAppBar/ImageViewerAppBar";
 
 export const TopToolBar = () => {
   useAnnotatorToolShortcuts();
 
   return (
-    <Box
+    <Stack
+      direction="row"
+      justifyContent="space-between"
       sx={(theme) => ({
         backgroundColor: theme.palette.background.paper,
         position: "relative",
         gridArea: "top-tools",
-        display: "flex",
-        justifyContent: "flex-end",
-        justifyItems: "flex-end",
-        height: dimensions.toolDrawerWidth,
+        height: DIMENSIONS.toolDrawerWidth,
         overflowY: "visible",
         zIndex: 1002,
-        borderBottom: `1px solid ${theme.palette.divider}`,
       })}
     >
-      <ZoomOptions />
-      <Divider orientation="vertical" flexItem />
-      <ColorOptions />
-      <Divider orientation="vertical" flexItem />
-      <SelectionOptions />
-    </Box>
+      <ImageViewerLogo />
+      <Box
+        sx={(theme) => ({
+          backgroundColor: theme.palette.background.paper,
+          position: "relative",
+          display: "flex",
+          justifyContent: "flex-end",
+          justifyItems: "flex-end",
+          height: DIMENSIONS.toolDrawerWidth,
+          overflowY: "visible",
+          zIndex: 1002,
+        })}
+      >
+        <ZoomOptions />
+        <Divider orientation="vertical" flexItem />
+        <ColorOptions />
+        <Divider orientation="vertical" flexItem />
+        <SelectionOptions />
+      </Box>
+    </Stack>
   );
 };

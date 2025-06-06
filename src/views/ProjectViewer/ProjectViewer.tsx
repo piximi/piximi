@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 import { Box } from "@mui/material";
 
-import { useErrorHandler, useUnloadConfirmation } from "hooks";
+import { useErrorHandler, useMobileView, useUnloadConfirmation } from "hooks";
 
 import { FallbackDialog } from "components/dialogs";
 import {
@@ -17,9 +17,11 @@ import { projectSlice } from "store/project";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { HotkeyContext } from "utils/enums";
+import { DIMENSIONS } from "utils/constants";
 
 export const ProjectViewer = () => {
   const dispatch = useDispatch();
+  const isMobile = useMobileView();
 
   useErrorHandler();
   useUnloadConfirmation();
@@ -44,10 +46,21 @@ export const ProjectViewer = () => {
     <div>
       <ErrorBoundary FallbackComponent={FallbackDialog}>
         <div tabIndex={-1}>
-          <Box sx={{ height: "100vh" }}>
+          <Box
+            sx={{
+              height: "100vh",
+              display: "grid",
+              gridTemplateColumns: !isMobile
+                ? `${DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`
+                : `1fr ${DIMENSIONS.toolDrawerWidth}px`,
+              gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
+              gridTemplateAreas: !isMobile
+                ? '"top-tools top-tools top-tools"  "action-drawer image-grid side-tools"'
+                : '"top-tools top-tools" "image-grid side-tools"',
+            }}
+          >
             <ProjectAppBar />
-
-            <ProjectDrawer />
+            {!isMobile && <ProjectDrawer />}
 
             <ProjectImageGrid />
             <ImageToolDrawer />

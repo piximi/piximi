@@ -21,6 +21,7 @@ import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { ImageObject } from "store/data/types";
+import { selectImagesArray } from "views/ImageViewer/state/annotator/reselectors";
 
 const NUM_BUFFERED_IMS = 20;
 const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 4);
@@ -32,7 +33,8 @@ interface ImageListItemProps {
   onSecondaryClick: (target: HTMLElement) => void;
 }
 
-export const ImageList = ({ images }: { images: Array<ImageObject> }) => {
+export const ImageList = () => {
+  const images = useSelector(selectImagesArray);
   const dispatch = useDispatch();
 
   const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(

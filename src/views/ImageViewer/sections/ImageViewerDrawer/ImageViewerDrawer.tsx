@@ -1,27 +1,23 @@
 import React, { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Divider, IconButton, List } from "@mui/material";
+import { Box, Divider, IconButton, List } from "@mui/material";
 import { Add } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 
-import { AppBarOffset, DividerHeader, FunctionalDivider } from "components/ui";
+import { DividerHeader, FunctionalDivider } from "components/ui";
 import { BaseAppDrawer } from "components/layout";
 import { CreateKindDialog } from "components/dialogs";
 import {
   ImageViewerCategories,
   ExportAnnotationsListItem,
 } from "../../components";
-import { ImageViewerAppBar } from "../ImageViewerAppBar";
 import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
 import { ImageList } from "./ImageList";
 
 //import { selectCreatedAnnotationCategories } from "store/slices/data";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import {
-  selectImagesArray,
-  selectKindsArray,
-} from "views/ImageViewer/state/annotator/reselectors";
+import { selectKindsArray } from "views/ImageViewer/state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/enums";
 import { Category, Kind } from "store/data/types";
@@ -29,7 +25,7 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ImageViewerDrawer = () => {
   const dispatch = useDispatch();
-  const imageViewerImages = useSelector(selectImagesArray);
+
   const kinds = useSelector(selectKindsArray);
   const existingKindIds = useMemo(() => kinds.map((kind) => kind.id), [kinds]);
   const {
@@ -48,14 +44,8 @@ export const ImageViewerDrawer = () => {
   };
 
   return (
-    <>
+    <Box sx={{ display: "flex", flexGrow: 1, gridArea: "action-drawer" }}>
       <BaseAppDrawer>
-        <ImageViewerAppBar />
-
-        <AppBarOffset />
-
-        <Divider />
-
         <List dense>
           <ExportAnnotationsListItem />
         </List>
@@ -68,7 +58,7 @@ export const ImageViewerDrawer = () => {
           Images
         </DividerHeader>
 
-        <ImageList images={imageViewerImages} />
+        <ImageList />
 
         <FunctionalDivider
           headerText="Kinds"
@@ -95,6 +85,6 @@ export const ImageViewerDrawer = () => {
         storeDispatch={addKind}
         existingKinds={existingKindIds}
       />
-    </>
+    </Box>
   );
 };
