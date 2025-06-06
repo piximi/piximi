@@ -4,17 +4,14 @@ import { BaseExampleDialog } from "./BaseExampleDialog";
 import { ExampleProjectCard } from "./ExampleProjectCard";
 
 import malaria from "images/malaria.png";
-import cellPainting from "images/cell-painting.png";
-import {
-  malariaAnnotations,
-  cellPaintingAnnotations,
-} from "data/exampleImages";
+import { malariaAnnotations } from "data/exampleImages";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import mnistExampleIcon from "data/exampleProjects/mnistExampleProjectIcon.png";
 import cElegansExampleIcon from "data/exampleProjects/cElegansExampleProjectIcon.png";
 import humanU2OSCellsExampleIcon from "data/exampleProjects/humanU2OSCellsExampleProjectIcon.png";
 import BBBC013ExampleIcon from "data/exampleProjects/BBBC013ExampleProjectIcon.png";
 import PLP1ExampleIcon from "data/exampleProjects/PLP1ExampleProjectIcon.png";
+import U2OSCellPaintingIcon from "data/exampleProjects/U2OSCellPaintingExampleProjectIcon.png";
 import { SerializedFileType } from "utils/file-io/types";
 import { CustomTabs } from "components/layout";
 import { ExampleImageCard } from "./ExampleImageCard";
@@ -37,28 +34,6 @@ const exampleImages = [
       licenseName: "CC-BY-NC-SA-3",
       licenseUrl: "https://creativecommons.org/licenses/by-nc-sa/3.0/",
     },
-  },
-  {
-    name: "U2OS cell-painting experiment",
-    imageName: "cell-painting.png",
-    imageData: cellPainting,
-    description:
-      "U2OS cells treated with an RNAi reagent and stained." +
-      " Channel 1 (red): Actin, Golgi, and Plasma membrane stained via phalloidin and wheat germ agglutinin; " +
-      " Channel 2 (blue): DNA stained via Hoechst; Channel 3 (green): mitochondria stained via MitoTracker",
-    annotationsFile: cellPaintingAnnotations as SerializedFileType,
-    sources: [
-      {
-        sourceName: "Boivin2021.06.22.449195",
-        sourceUrl:
-          "https://www.biorxiv.org/content/10.1101/2021.06.22.449195v1.full.pdf+html",
-      },
-      {
-        sourceName: "GPP",
-        sourceUrl:
-          "https://portals.broadinstitute.org/gpp/public/clone/details?cloneId=TRCN0000195467",
-      },
-    ],
   },
 ];
 
@@ -148,6 +123,31 @@ const exampleProjects = [
     license: {
       licenseName: "CC0",
       licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/",
+    },
+  },
+  {
+    name: "U2OS cell-painting experiment",
+    description:
+      "U2OS cells treated with an RNAi reagent and stained.\n" +
+      " Channel 1 (red): Actin, Golgi, and Plasma membrane stained via phalloidin and wheat germ agglutinin; " +
+      " Channel 2 (blue): DNA stained via Hoechst; Channel 3 (green): mitochondria stained via MitoTracker",
+    enum: ExampleProject.U2OSPAINTEXP,
+    icon: U2OSCellPaintingIcon,
+    sources: [
+      {
+        sourceName: "Boivin2021.06.22.449195",
+        sourceUrl:
+          "https://www.biorxiv.org/content/10.1101/2021.06.22.449195v1.full.pdf+html",
+      },
+      {
+        sourceName: "GPP",
+        sourceUrl:
+          "https://portals.broadinstitute.org/gpp/public/clone/details?cloneId=TRCN0000195467",
+      },
+    ],
+    license: {
+      licenseName: "CC-BY-4",
+      licenseUrl: "https://creativecommons.org/publicdomain/zero/4.0/",
     },
   },
 ];

@@ -103,6 +103,15 @@ export const ExampleProjectCard = ({
           : (await import("data/exampleProjects/PLP1ExampleProject.zip"))
               .default;
         break;
+      case ExampleProject.U2OSPAINTEXP:
+        exampleProjectFilePath = import.meta.env.PROD
+          ? `${DOMAIN}/${ROOT_PATH}/U2OSCellPaintingExampleProject.${EXT}`
+          : (
+              await import(
+                "data/exampleProjects/U2OSCellPaintingExampleProject.zip"
+              )
+            ).default;
+        break;
       default:
         return;
     }
