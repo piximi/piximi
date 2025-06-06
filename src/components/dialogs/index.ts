@@ -5,5 +5,4 @@ export { CreateKindDialog } from "./CreateKindDialog";
 export { CategoryDialog } from "./CategoryDialog";
 export { DialogTransitionSlide } from "./DialogTransitionSlide";
 export { ConfirmationDialog } from "./ConfirmationDialog";
-export { SelectDialog } from "./SelectDialog";
 export { SaveProjectDialog } from "./SaveProjectDialog";

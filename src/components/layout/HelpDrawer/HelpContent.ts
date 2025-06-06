@@ -1,4 +1,4 @@
-export enum HelpContext {
+enum HelpContext {
   WelcomeView = "welcome-view",
   ProjectView = "project-view",
 }
@@ -73,7 +73,7 @@ export enum HelpItem {
   MeasurementPlotSize = "measurement-plot-mark-size",
   MeasurementPlotColor = "measurement-plot-mark-color",
 }
-export type HelpItemContent = { desc: string; brief: string };
+type HelpItemContent = { desc: string; brief: string };
 
 const AddKindTab = `
 Create a new **Kind** or re-open one that was previously minimized.`;

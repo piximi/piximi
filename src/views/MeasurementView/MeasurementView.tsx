@@ -10,7 +10,7 @@ import {
   useTheme,
 } from "@mui/material";
 
-import { useMobileView, useUnloadConfirmation } from "hooks";
+import { useUnloadConfirmation } from "hooks";
 
 import { FallbackDialog } from "components/dialogs";
 
@@ -30,7 +30,6 @@ import { useNavigate } from "react-router-dom";
 export const MeasurementView = () => {
   const dispatch = useDispatch();
   const projectImageChannels = useSelector(selectProjectImageChannels);
-  const isMobile = useMobileView();
 
   useErrorHandler();
   useUnloadConfirmation();
@@ -66,13 +65,10 @@ export const MeasurementView = () => {
         sx={{
           height: "100vh",
           display: "grid",
-          gridTemplateColumns: !isMobile
-            ? `${DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`
-            : `1fr ${DIMENSIONS.toolDrawerWidth}px`,
+          gridTemplateColumns: `${DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`,
           gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
-          gridTemplateAreas: !isMobile
-            ? '"top-bar top-bar top-bar"  "action-drawer dashboard side-bar"'
-            : '"top-bar top-bar" "dashboard side-bar"',
+          gridTemplateAreas:
+            '"top-bar top-bar top-bar"  "action-drawer dashboard side-bar"',
         }}
       >
         <TempTopBar />
