@@ -5,7 +5,7 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { ExportAnnotationsMenu } from "../../components/ExportAnnotationsMenu";
+import { ExportAnnotationsMenu } from "../../components/";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";

@@ -5,7 +5,6 @@ export {
 } from "./divider";
 export { CustomListItemButton } from "./CustomListItemButton";
 export { AlertBar } from "./AlertBar";
-export { AppBarOffset } from "./AppBarOffset";
 export { ApplicationOptions } from "../layout/app-drawer/ApplicationOptions";
 export { BaseHorizCard } from "./BaseHorizCard";
 export { BaseMenu } from "./BaseMenu";
