@@ -51,7 +51,7 @@ export const WelcomeScreen = () => {
     onOpen: handleOpenExampleProjectDialog,
     open: ExampleProjectOpen,
   } = useDialogHotkey(HotkeyContext.ExampleProjectDialog);
-  const { open, onClose, onOpen } = useDialog();
+  const { open, onClose } = useDialog();
 
   const palette = useMemo(() => {
     const groups: Array<keyof Palette> = [

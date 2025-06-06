@@ -147,7 +147,7 @@ export const ChannelsList = () => {
       {Array(localActiveImageColors.color.length)
         .fill(0)
         .map((_, i) => {
-          return colorAdjustmentSlider(i, `Ch. ${i}`);
+          return colorAdjustmentSlider(i, `Ch. ${i + 1}`);
         })}
     </List>
   );

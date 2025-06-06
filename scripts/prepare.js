@@ -10,6 +10,8 @@ const projectNames = [
   "HumanU2OSCellsExampleProject",
   "PLP1ExampleProject",
   "U2OSCellPaintingExampleProject",
+  "Piximi_Translocation_Tutorial_RGB",
+  "MalariaInfectedHumanBloodSmears",
 ];
 
 // CloudFront distribution domain
