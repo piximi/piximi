@@ -9,6 +9,7 @@ const projectNames = [
   "cElegansExampleProject",
   "HumanU2OSCellsExampleProject",
   "PLP1ExampleProject",
+  "U2OSCellPaintingExampleProject",
 ];
 
 // CloudFront distribution domain
