@@ -24,9 +24,11 @@ jobs:
         run: |
           pnpm add -g semver
           pnpm ls -g
+          NODE_PATH="$(pnpm root -g)"
           # enusre globally installed semver is available as a script
           # to be run locally
-          echo "NODE_PATH=$(pnpm root -g)" >> $GITHUB_ENV
+          echo "NODE_PATH=$NODE_PATH" >> "$GITHUB_ENV"
+          pnpm link semver
 
       - name: Analyze PR labels
         id: analyze_labels
