@@ -33,7 +33,7 @@ export const DataTable = ({
     <Box maxWidth="100%">
       <Toolbar
         sx={(theme) => ({
-          backgroundColor: theme.palette.background.default,
+          backgroundColor: theme.palette.background.paper,
           borderBottom: "1px solid rgba(23, 23, 23, 1)",
           borderRadius: "4px 4px 0 0",
           pl: { sm: 2 },

@@ -6,6 +6,8 @@ import {
   DecodedAnnotationObject,
   Kind,
 } from "store/data/types";
+import { ReactElement } from "react";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export type ImageViewerState = {
   imageStack: string[];
@@ -113,4 +115,14 @@ export type ZoomToolOptionsType = {
   scale: number;
   toActualSize: boolean;
   toFit: boolean;
+};
+export type OperationType = {
+  icon: (color: string) => ReactElement;
+  name: string;
+  description: string;
+  options?: ReactElement;
+  action?: () => void;
+  hotkey: string;
+  mobile?: boolean;
+  helpContext?: HelpItem;
 };

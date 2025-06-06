@@ -3,8 +3,7 @@ import { Box, Drawer, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { AppBarOffset } from "components/ui/AppBarOffset";
-import { dimensions } from "utils/constants";
+import { DIMENSIONS } from "utils/constants";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export type OperationType = {
@@ -29,19 +28,19 @@ export const ToolOptionsDrawer = ({
   return (
     <Drawer
       anchor="right"
-      sx={(theme) => ({
+      sx={{
+        position: "absolute",
         flexShrink: 0,
         "& .MuiDrawer-paper": {
           width: 240,
-          right: dimensions.toolDrawerWidth,
+          right: DIMENSIONS.toolDrawerWidth,
           zIndex: 99,
-          pt: theme.spacing(1),
+          pt: DIMENSIONS.toolDrawerWidth + "px",
         },
-      })}
+      }}
       variant="persistent"
       open={optionsVisibility}
     >
-      <AppBarOffset />
       {toolType && (
         <>
           <Box

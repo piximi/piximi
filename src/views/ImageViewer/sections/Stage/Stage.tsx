@@ -46,7 +46,7 @@ import {
 import { generateKind, generateUUID } from "store/data/utils";
 
 import { CATEGORY_COLORS } from "store/data/constants";
-import { dimensions } from "utils/constants";
+import { DIMENSIONS } from "utils/constants";
 import { AnnotationState, ToolType } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/enums";
 
@@ -256,7 +256,7 @@ export const Stage = ({
   );
 
   return (
-    <Box sx={{ gridArea: "stage", zIndex: 999 }}>
+    <Box sx={{ zIndex: 999 }}>
       <KonvaStage
         draggable={draggable}
         height={stageHeight}
@@ -312,14 +312,16 @@ export const Stage = ({
         </Provider>
       </KonvaStage>
       <Box
-        sx={{
-          width: stageWidth - 24,
-          height: dimensions.stageInfoHeight,
+        sx={(theme) => ({
+          backgroundColor: theme.palette.background.paper,
+          // -2 because of border overlap, dont know why the global border-box sizing is being respected here though
+          width: stageWidth - 2,
+          height: DIMENSIONS.stageInfoHeight,
           justifyContent: "space-between",
           alignItems: "center",
           display: "flex",
-          pr: "1.5rem",
-        }}
+          px: "1.5rem",
+        })}
       >
         {!outOfBounds && absolutePosition && (
           <>

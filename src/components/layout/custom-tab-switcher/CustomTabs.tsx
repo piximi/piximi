@@ -26,6 +26,7 @@ import {
   EditableTabsProps,
   ExtendableTabsProps,
 } from "./props";
+import { useMobileView } from "hooks";
 
 const TabContext = createContext<number>(0);
 
@@ -65,6 +66,7 @@ export function CustomTabs(
   } = props;
   const [tabIndex, setTabIndex] = useState(0);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const isMobile = useMobileView();
 
   const handleTabChange = (
     event: React.SyntheticEvent<Element, Event>,
@@ -225,6 +227,11 @@ export function CustomTabs(
       setTabIndex(labels.findIndex((label) => label === activeLabel));
     }
   }, [labels, activeLabel]);
+  useEffect(() => {
+    if (isMobile) {
+      setTabIndex(0);
+    }
+  }, [isMobile]);
 
   return (
     <TabContext.Provider value={tabIndex}>

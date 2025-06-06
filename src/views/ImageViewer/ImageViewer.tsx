@@ -16,9 +16,11 @@ import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectAlertState } from "store/applicationSettings/selectors";
 
-import { APPLICATION_COLORS } from "utils/constants";
+import { APPLICATION_COLORS, DIMENSIONS } from "utils/constants";
 import { getStackTraceFromError } from "utils/logUtils";
 import { AlertType, HotkeyContext } from "utils/enums";
+import { SideToolBar, TopToolBar } from "./sections/tool-bars";
+import { MobileActionBar } from "./sections/tool-bars/MobileActionBar";
 
 export const ImageViewer = () => {
   const dispatch = useDispatch();
@@ -98,7 +100,14 @@ export const ImageViewer = () => {
   return (
     <StageContext.Provider value={stageRef}>
       <ErrorBoundary FallbackComponent={FallbackDialog}>
-        <Box sx={{ display: "flex" }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: `${isMobile ? DIMENSIONS.toolDrawerWidth : DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`,
+            gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
+            gridTemplateAreas: `"top-tools top-tools top-tools" "${isMobile ? "mobile-action-bar" : "action-drawer"} stage side-tools"`,
+          }}
+        >
           {alertState.visible && (
             <AppBar
               sx={{
@@ -112,10 +121,11 @@ export const ImageViewer = () => {
               <AlertBar alertState={alertState} />
             </AppBar>
           )}
-
-          {isMobile ? <></> : <ImageViewerDrawer />}
+          <TopToolBar />
+          {isMobile ? <MobileActionBar /> : <ImageViewerDrawer />}
 
           <StageWrapper />
+          <SideToolBar />
         </Box>
       </ErrorBoundary>
     </StageContext.Provider>

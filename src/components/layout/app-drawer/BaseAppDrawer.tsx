@@ -21,8 +21,9 @@ export const BaseAppDrawer = ({
         "& > 	.MuiDrawer-paper": {
           zIndex: 99,
           width: (theme) => theme.spacing(32),
-          height: "100vh",
+          height: "100%",
           overflow: "hidden",
+          position: "relative",
         },
       }}
       open

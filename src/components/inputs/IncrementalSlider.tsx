@@ -1,7 +1,7 @@
 import { Box, Divider, IconButton, Slider } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 
-import { dimensions } from "utils/constants";
+import { DIMENSIONS } from "utils/constants";
 import { CSSProperties, useMemo, useRef, useState } from "react";
 
 export const IncrementalSlider = ({
@@ -39,12 +39,12 @@ export const IncrementalSlider = ({
       ? {
           flexDirection: "row",
           alignItems: "center",
-          height: dimensions.toolDrawerWidth,
+          height: DIMENSIONS.toolDrawerWidth,
         }
       : {
           flexDirection: "column",
           alignItems: "center",
-          width: dimensions.toolDrawerWidth,
+          width: DIMENSIONS.toolDrawerWidth,
         };
   }, [orientation]);
   const sliderStyle: CSSProperties = useMemo(() => {

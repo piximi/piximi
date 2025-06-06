@@ -1,4 +1,9 @@
-import React, { useCallback, useEffect } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box } from "@mui/material";
 
@@ -17,8 +22,8 @@ import {
 import { selectKindDictionary } from "store/data/selectors";
 import { selectVisibleKinds } from "store/project/reselectors";
 
-import { dimensions } from "utils/constants";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { DIMENSIONS } from "utils/constants";
 
 export const ProjectImageGrid = () => {
   const dispatch = useDispatch();
@@ -29,6 +34,32 @@ export const ProjectImageGrid = () => {
   const visibleKinds = useSelector(selectVisibleKinds) as string[];
   const isMobile = useMobileView();
 
+  const [width, setWidth] = useState<number>(
+    window.innerWidth - DIMENSIONS.leftDrawerWidth - DIMENSIONS.toolDrawerWidth,
+  );
+  const [height, setHeight] = useState<number>(
+    window.innerHeight -
+      DIMENSIONS.stageInfoHeight -
+      DIMENSIONS.toolDrawerWidth,
+  );
+
+  //useDefaultImage(DispatchLocation.ImageViewer);
+  useLayoutEffect(() => {
+    const resizeHandler = () => {
+      const width = !isMobile
+        ? window.innerWidth -
+          DIMENSIONS.leftDrawerWidth -
+          DIMENSIONS.toolDrawerWidth
+        : window.innerWidth - DIMENSIONS.toolDrawerWidth;
+
+      setWidth(width);
+      setHeight(window.innerHeight - DIMENSIONS.toolDrawerWidth);
+    };
+    window.addEventListener("resize", resizeHandler);
+    return () => {
+      window.removeEventListener("resize", resizeHandler);
+    };
+  }, [isMobile]);
   const {
     onOpen: handleOpenAddKindMenu,
     onClose: handleCloseAddKindMenu,
@@ -100,14 +131,13 @@ export const ProjectImageGrid = () => {
   return (
     <Box
       sx={(theme) => ({
-        maxWidth: `calc(100%  ${
-          isMobile ? "" : "- " + dimensions.leftDrawerWidth + "px"
-        } - ${dimensions.toolDrawerWidth}px)`, // magic number draw width
+        width: width,
+        height: height,
+        gridArea: "image-grid",
+        border: `1px solid ${theme.palette.divider}`,
         overflow: "hidden",
         flexGrow: 1,
-        height: "100%",
-        paddingTop: theme.spacing(8),
-        marginLeft: isMobile ? 0 : theme.spacing(32),
+        borderRadius: "4px 4px 0 0",
       })}
     >
       <CustomTabs

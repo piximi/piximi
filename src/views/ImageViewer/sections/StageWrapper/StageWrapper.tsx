@@ -3,20 +3,18 @@ import { Box } from "@mui/material";
 
 import { Stage } from "../Stage";
 
-import { dimensions } from "utils/constants";
+import { DIMENSIONS } from "utils/constants";
 import { useMobileView } from "hooks";
-import { SideToolBar, TopToolBar } from "../tool-bars";
 
 export const StageWrapper = () => {
   const [width, setWidth] = useState<number>(
-    window.innerWidth - dimensions.leftDrawerWidth - dimensions.toolDrawerWidth,
+    window.innerWidth - DIMENSIONS.leftDrawerWidth - DIMENSIONS.toolDrawerWidth,
   );
   const [height, setHeight] = useState<number>(
     window.innerHeight -
-      dimensions.stageInfoHeight -
-      dimensions.toolDrawerWidth,
+      DIMENSIONS.stageInfoHeight -
+      DIMENSIONS.toolDrawerWidth,
   );
-
   const isMobile = useMobileView();
 
   //useDefaultImage(DispatchLocation.ImageViewer);
@@ -24,20 +22,16 @@ export const StageWrapper = () => {
     const resizeHandler = () => {
       setWidth(
         window.innerWidth -
-          dimensions.leftDrawerWidth -
-          dimensions.toolDrawerWidth,
+          (isMobile ? DIMENSIONS.toolDrawerWidth : DIMENSIONS.leftDrawerWidth) -
+          DIMENSIONS.toolDrawerWidth,
       );
-      setHeight(
-        window.innerHeight -
-          dimensions.stageInfoHeight -
-          dimensions.toolDrawerWidth,
-      );
+      setHeight(window.innerHeight - DIMENSIONS.toolDrawerWidth);
     };
     window.addEventListener("resize", resizeHandler);
     return () => {
       window.removeEventListener("resize", resizeHandler);
     };
-  });
+  }, [isMobile]);
 
   return (
     <Box
@@ -45,17 +39,16 @@ export const StageWrapper = () => {
         backgroundColor: theme.palette.background.default,
         width: width,
         height: height,
-        display: "grid",
-        gridTemplateColumns: `1fr ${dimensions.toolDrawerWidth}px`,
-        gridTemplateRows: `${dimensions.toolDrawerWidth}px 1fr`,
-        gridTemplateAreas: `"top-tools top-tools" "stage side-tools"`,
-        transition: "width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+        gridArea: "stage",
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: "4px 4px 0 0",
         overflow: "visible",
       })}
     >
-      <TopToolBar />
-      <Stage stageWidth={width} stageHeight={height} />
-      {isMobile ? <></> : <SideToolBar />}
+      <Stage
+        stageWidth={width}
+        stageHeight={height - DIMENSIONS.stageInfoHeight}
+      />
     </Box>
   );
 };
