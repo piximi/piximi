@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Chip, Tooltip } from "@mui/material";
+import { Chip, Tooltip, useMediaQuery, useTheme } from "@mui/material";
 import { Gesture as GestureIcon } from "@mui/icons-material";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
@@ -10,6 +10,8 @@ export const ImageViewerButton = ({
   selectedThings: string[];
 }) => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const smOrXsBreakpoint = useMediaQuery(theme.breakpoints.down("md"));
   const handleNavigateImageViewer = () => {
     navigate("/imageviewer", {
       state: {
@@ -29,11 +31,12 @@ export const ImageViewerButton = ({
         <Chip
           data-help={HelpItem.NavigateImageViewer}
           avatar={<GestureIcon color="inherit" />}
-          label="Annotate"
+          label={smOrXsBreakpoint ? "" : "Annotate"}
           onClick={handleNavigateImageViewer}
           variant="outlined"
-          sx={{ marginRight: 1 }}
+          sx={{ marginRight: 1, pl: smOrXsBreakpoint ? 1 : 0 }}
           disabled={selectedThings.length === 0}
+          size="small"
         />
       </span>
     </Tooltip>

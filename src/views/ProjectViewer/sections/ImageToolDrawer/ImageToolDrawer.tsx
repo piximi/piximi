@@ -1,6 +1,16 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { Badge, Drawer, useTheme } from "@mui/material";
+import {
+  Badge,
+  Box,
+  Drawer,
+  IconButton,
+  Popper,
+  Stack,
+  Tooltip,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import {
   FilterAltOutlined as FilterAltOutlinedIcon,
   InfoOutlined as InfoOutlinedIcon,
@@ -11,9 +21,9 @@ import {
   Gesture as GestureIcon,
 } from "@mui/icons-material";
 
-import { useMobileView, useTranslation } from "hooks";
+import { useMenu, useMobileView, useTranslation, useWindowSize } from "hooks";
 
-import { AppBarOffset, Tool } from "components/ui";
+import { ToolHotkeyTitle } from "components/ui";
 import { ProjectViewerCategories, FileIO } from "../../components";
 import { ModelTaskSection } from "../ModelTaskSection";
 import {
@@ -21,13 +31,18 @@ import {
   InformationOptions,
   MeasurementOptions,
 } from "./tool-options";
-import { OperationType, ToolOptionsDrawer } from "./ToolOptionsDrawer";
+import { OperationType } from "./ToolOptionsDrawer";
 
 import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
 
-import { dimensions } from "utils/constants";
+import { DIMENSIONS } from "utils/constants";
 import { capitalize } from "utils/stringUtils";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { ImageViewerOptions } from "./tool-options/ImageViewerOptions";
+import { HTMLDataAttributes } from "utils/types";
+import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
+import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
+import { HelpButton } from "components/layout/app-drawer/HelpButton";
 
 const imageTools: Record<string, OperationType> = {
   fileIO: {
@@ -71,8 +86,8 @@ const imageTools: Record<string, OperationType> = {
     icon: (color) => <GestureIcon fontSize="small" sx={{ color: color }} />,
     name: "image viewer",
     description: "-",
-    options: <MeasurementOptions />,
-    hotkey: "M",
+    options: <ImageViewerOptions />,
+    hotkey: "A",
     mobile: true,
   },
   learning: {
@@ -101,16 +116,23 @@ export const ImageToolDrawer = () => {
   const filtersExist = useSelector(selectActiveFilteredStateHasFilters);
   const t = useTranslation();
   const isMobile = useMobileView();
+  const { anchorEl, onOpen: setPopperAnchor } = useMenu();
+  const { height: windowHeight } = useWindowSize();
 
-  const handleSelectTool = (tool: OperationType) => {
+  const handleSelectTool = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    tool: OperationType,
+  ) => {
     if (activeTool === undefined) {
       setActiveTool(tool);
+      setPopperAnchor(event);
       setIsOpen(true);
     } else {
       if (tool === activeTool) {
         setActiveTool(undefined);
         setIsOpen(false);
       } else {
+        setPopperAnchor(event);
         setActiveTool(tool);
       }
     }
@@ -118,10 +140,6 @@ export const ImageToolDrawer = () => {
 
   return (
     <>
-      {activeTool && (!activeTool.mobile || isMobile) && (
-        <ToolOptionsDrawer optionsVisibility={isOpen} toolType={activeTool} />
-      )}
-
       <Drawer
         anchor="right"
         sx={(theme) => ({
@@ -129,49 +147,171 @@ export const ImageToolDrawer = () => {
           whiteSpace: "nowrap",
           "& > .MuiDrawer-paper": {
             zIndex: 99,
-            width: dimensions.toolDrawerWidth + "px",
+            width: DIMENSIONS.toolDrawerWidth + "px",
             pt: theme.spacing(1),
             display: "flex",
             flexDirection: "column",
+            justifyContent: "space-between",
             alignItems: "center",
+            position: "relative",
           },
         })}
         variant="permanent"
         open={isOpen}
       >
-        <AppBarOffset />
-        {Object.values(imageTools).map((tool) => {
-          return !tool.mobile || isMobile ? (
-            <Tool
-              data-help={tool.helpContext}
-              name={t(capitalize(tool.name))}
-              onClick={() => {
-                handleSelectTool(tool);
-              }}
-              key={`tool-drawer-${tool.name}`}
-              tooltipLocation="left"
+        <Popper
+          anchorEl={anchorEl}
+          open={!!activeTool && isOpen}
+          //onClose={onClose}
+          placement="left-start"
+          modifiers={[
+            { name: "preventOverflow", options: { boundary: "viewport" } },
+          ]}
+          sx={(theme) => ({
+            minWidth: DIMENSIONS.leftDrawerWidth,
+            width: DIMENSIONS.leftDrawerWidth,
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: 1,
+            zIndex: 100,
+          })}
+        >
+          <Box
+            sx={(theme) => ({
+              display: "grid",
+              gridTemplateColumns: "1fr",
+              gridTemplateRows: `${theme.spacing(8)} 1fr`,
+              gap: theme.spacing(1),
+              pb: theme.spacing(1),
+            })}
+          >
+            <Box
+              width={"100%"}
+              sx={(theme) => ({
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                borderBottom: "1px solid " + theme.palette.text.primary,
+              })}
             >
-              {tool.name === "filters" ? (
-                <Badge color="primary" variant="dot" invisible={!filtersExist}>
-                  {tool.icon(
+              <Typography
+                variant="h5"
+                sx={{
+                  textTransform: "capitalize",
+                  marginInline: "auto",
+                  maxWidth: "fit-content",
+                }}
+              >
+                {activeTool?.name}
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                maxHeight: `calc(${(windowHeight - DIMENSIONS.toolDrawerWidth) * 0.9 - (anchorEl?.offsetTop ?? 0)}px - ${theme.spacing(9)})`,
+                overflowY: "scroll",
+              }}
+            >
+              {activeTool?.options}
+            </Box>
+          </Box>
+        </Popper>
+        <Stack>
+          {Object.values(imageTools).map((tool) => {
+            return !tool.mobile || isMobile ? (
+              <Tool
+                data-help={tool.helpContext}
+                options={tool.options}
+                name={t(capitalize(tool.name))}
+                onClick={(event) => {
+                  handleSelectTool(event, tool);
+                }}
+                key={`tool-drawer-${tool.name}`}
+                tooltipLocation="left"
+              >
+                {tool.name === "filters" ? (
+                  <Badge
+                    color="primary"
+                    variant="dot"
+                    invisible={!filtersExist}
+                  >
+                    {tool.icon(
+                      activeTool === tool
+                        ? theme.palette.primary.dark
+                        : theme.palette.grey[400],
+                    )}
+                  </Badge>
+                ) : (
+                  tool.icon(
                     activeTool === tool
                       ? theme.palette.primary.dark
                       : theme.palette.grey[400],
-                  )}
-                </Badge>
-              ) : (
-                tool.icon(
-                  activeTool === tool
-                    ? theme.palette.primary.dark
-                    : theme.palette.grey[400],
-                )
-              )}
-            </Tool>
-          ) : (
-            <React.Fragment key={`tool-drawer-${tool.name}`}></React.Fragment>
-          );
-        })}
+                  )
+                )}
+              </Tool>
+            ) : (
+              <React.Fragment key={`tool-drawer-${tool.name}`}></React.Fragment>
+            );
+          })}
+        </Stack>
+        {isMobile && (
+          <Stack sx={{ py: 0.5, px: 2 }}>
+            <SettingsButton />
+
+            <SendFeedbackButton />
+
+            <HelpButton />
+          </Stack>
+        )}
       </Drawer>
     </>
+  );
+};
+
+type ToolProps = HTMLDataAttributes & {
+  children: React.ReactNode;
+  options?: React.ReactElement;
+  name: string;
+  onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  disabled?: boolean;
+  tooltipLocation?: "top" | "bottom" | "left" | "right";
+  selected?: boolean;
+};
+
+//TODO: tool buttons
+
+export const Tool = ({
+  children,
+  options,
+  name,
+  onClick: handleClick,
+  disabled = false,
+  tooltipLocation = "bottom",
+  ...attributes
+}: ToolProps) => {
+  const description = useMemo(
+    () => <ToolHotkeyTitle toolName={name} />,
+    [name],
+  );
+
+  return (
+    <Box
+      sx={(theme) => ({
+        zIndex: "inherit",
+        backgroundColor: theme.palette.background.paper,
+      })}
+    >
+      <Tooltip title={description} placement={tooltipLocation}>
+        <span>
+          <IconButton
+            size="small"
+            disabled={disabled}
+            onClick={handleClick}
+            {...attributes}
+          >
+            {children}
+          </IconButton>
+        </span>
+      </Tooltip>
+    </Box>
   );
 };

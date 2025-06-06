@@ -13,7 +13,6 @@ export const CustomAppBar = ({
   return (
     <AppBar
       color="default"
-      position="absolute"
       sx={{
         borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
         boxShadow: "none",

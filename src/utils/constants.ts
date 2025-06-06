@@ -8,18 +8,21 @@ export const APPLICATION_COLORS = {
   highlightColor: "#0000000a",
 };
 
-export const dimensions = {
+export const DIMENSIONS = {
   leftDrawerWidth: 256,
   toolDrawerWidth: 36,
   stagePaddingX: 50,
   stageInfoHeight: 21,
 };
 
-export const defaultAlert: AlertState = {
+export const DEFAULT_ALERT: AlertState = {
   alertType: AlertType.Info,
   name: "None",
   description: "default state",
   visible: false,
 };
 
-export const mobileBreakpoints = ["xs", "sm"];
+export const MOBILE_BREAKPOINTS = ["xs", "sm"];
+
+export const DEFAULT_GRID_ITEM_WIDTH = 220;
+export const GRID_GAP = 18;

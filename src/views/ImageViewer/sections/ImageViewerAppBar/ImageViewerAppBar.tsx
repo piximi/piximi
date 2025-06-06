@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ArrowBack } from "@mui/icons-material";
-import { IconButton, Tooltip, Typography } from "@mui/material";
+import { IconButton, Stack, Tooltip, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
 import { LogoLoader } from "components/ui";
-import { CustomAppBar } from "components/layout";
 import { ExitAnnotatorDialog } from "../../components/dialogs";
 
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
@@ -20,7 +19,7 @@ import {
 import { HotkeyContext } from "utils/enums";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-export const ImageViewerAppBar = () => {
+export const ImageViewerLogo = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [returnToProject, setReturnToProject] = useState(false);
@@ -67,7 +66,12 @@ export const ImageViewerAppBar = () => {
 
   return (
     <>
-      <CustomAppBar>
+      <Stack
+        direction="row"
+        justifyContent="flex-start"
+        alignItems="center"
+        pl={2}
+      >
         <Tooltip title="Save and return to project" placement="bottom">
           <IconButton
             data-help={HelpItem.NavigateProjectView}
@@ -79,11 +83,11 @@ export const ImageViewerAppBar = () => {
             <ArrowBack />
           </IconButton>
         </Tooltip>
-        <LogoLoader width={30} height={30} loadPercent={1} fullLogo={false} />
-        <Typography variant="h5" color={"#02aec5"}>
-          Annotator
+        <LogoLoader width={30} height={20} loadPercent={1} fullLogo={false} />
+        <Typography variant="h6" color={"#02aec5"}>
+          Image Viewer
         </Typography>
-      </CustomAppBar>
+      </Stack>
 
       <ExitAnnotatorDialog
         returnToProject={() => setReturnToProject(true)}

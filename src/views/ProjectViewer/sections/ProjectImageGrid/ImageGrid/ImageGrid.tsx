@@ -22,6 +22,7 @@ import { selectTileSize } from "store/applicationSettings/selectors";
 
 import { getInnerElementWidth } from "utils/domUtils";
 import { isFiltered } from "utils/arrayUtils";
+import { DEFAULT_GRID_ITEM_WIDTH, GRID_GAP } from "utils/constants";
 
 type Things = ReturnType<ReturnType<typeof selectThingsOfKind>>;
 type SelectHandler = (id: string, selected: boolean) => void;
@@ -33,8 +34,6 @@ type CellData = {
   numColumns: number;
 };
 
-const GRID_GAP = 18;
-const DEFAULT_ITEM_WIDTH = 220;
 const createItemData = memoize(
   (
     things: Things,
@@ -129,12 +128,20 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
   useEffect(() => {
     const numVisible = visibleThings.length;
 
-    const calculatedColumnWidth = DEFAULT_ITEM_WIDTH * scaleFactor + GRID_GAP;
+    let calculatedColumnWidth =
+      DEFAULT_GRID_ITEM_WIDTH * scaleFactor + GRID_GAP;
+    if (calculatedColumnWidth > gridWidth) {
+      calculatedColumnWidth = gridWidth;
+    }
+
     const maxNumColumns = Math.floor(gridWidth / calculatedColumnWidth);
 
     const numColumns = numVisible > maxNumColumns ? maxNumColumns : numVisible;
+
     const columnWidth = numColumns > 0 ? gridWidth / numColumns : 0;
+
     const rowHeight = numColumns > 0 ? calculatedColumnWidth : 0;
+
     const numVirtualRows =
       numColumns > 0 ? Math.ceil(numVisible / numColumns) : 0;
 
@@ -143,8 +150,6 @@ export const ImageGrid = ({ kind }: { kind: string }) => {
     setNumColumns(numColumns);
     setNumRows(numVirtualRows);
   }, [gridWidth, gridHeight, scaleFactor, visibleThings.length]);
-
-  //const { contextMenu, handleContextMenu, closeContextMenu } = useContextMenu();
 
   const handleSelectThing = useCallback(
     (id: string, selected: boolean) => {
