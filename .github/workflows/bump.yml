@@ -60,6 +60,8 @@ jobs:
           echo ${LABELS[@]}
           echo "Label(s) matched:"
           echo ${FOUND_LABELS[@]}
+          echo "NODE PATH IS:"
+          echo ${NODE_PATH}
 
           # Output result based on found labels
           if [[ ${#FOUND_LABELS[@]} -eq 0 ]]; then
