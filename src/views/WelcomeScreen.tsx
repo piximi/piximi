@@ -57,7 +57,7 @@ export const WelcomeScreen = () => {
     onOpen: handleOpenExampleProjectDialog,
     open: ExampleProjectOpen,
   } = useDialogHotkey(HotkeyContext.ExampleProjectDialog);
-  const { open, onClose } = useDialog();
+  const { open, onClose, onOpen } = useDialog();
 
   const windowSize = useWindowSize();
   const mobileView = useMobileView();
