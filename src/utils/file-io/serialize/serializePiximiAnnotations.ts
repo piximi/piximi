@@ -4,7 +4,7 @@ import {
   Category,
   ImageObject,
 } from "store/data/types";
-import { NewSerializedAnnotationType } from "../types";
+import { V02_SerializedAnnotationType } from "../types";
 
 export const serializePiximiAnnotations = (
   images: Array<ImageObject>,
@@ -37,7 +37,7 @@ export const serializePiximiAnnotations = (
     unknownCategoryId: kind.unknownCategoryId,
   }));
 
-  const serializedAnnotations: Array<NewSerializedAnnotationType> = [];
+  const serializedAnnotations: Array<V02_SerializedAnnotationType> = [];
 
   for (const ann of annotations) {
     serializedAnnotations.push({

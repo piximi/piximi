@@ -9,7 +9,7 @@ import {
   zeros,
 } from "@tensorflow/tfjs";
 import { TrainingCallbacks } from "../../types";
-import { OldCategory, Kind, AnnotationObject } from "store/data/types";
+import { Category, Kind, AnnotationObject } from "store/data/types";
 import { logger } from "utils/logUtils";
 import { LoadCB } from "utils/file-io/types";
 
@@ -44,7 +44,7 @@ export abstract class Segmenter extends Model {
    * associated with categoryIds in the annotations returned by `predict`), and
    * returns the corresponding `Category` objects.
    */
-  public abstract inferenceCategoriesById(catIds: Array<string>): OldCategory[];
+  public abstract inferenceCategoriesById(catIds: Array<string>): Category[];
   public abstract inferenceKindsById(kind: Array<string>): Kind[];
 
   public evaluate() {

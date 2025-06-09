@@ -19,7 +19,6 @@ import {
   Category,
   DecodedAnnotationObject,
   ImageObject,
-  OldImageType,
   Shape,
 } from "store/data/types";
 import { FitOptions, PreprocessOptions, RescaleOptions } from "../types";
@@ -152,7 +151,7 @@ const decodeImage = async (
       );
 };
 
-const sampleGenerator = (images: Array<OldImageType>, channels: number) => {
+const sampleGenerator = (images: Array<ImageObject>, channels: number) => {
   const count = images.length;
 
   return function* () {

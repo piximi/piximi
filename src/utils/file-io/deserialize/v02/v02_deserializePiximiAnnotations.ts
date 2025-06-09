@@ -3,18 +3,13 @@ import { convertArrayToShape } from "utils/models/utils";
 import { generateUUID } from "store/data/utils";
 import { Partition } from "utils/models/enums";
 import {
-  NewSerializedAnnotationType,
+  V02_SerializedAnnotationType,
   SerializedAnnotatorImageType,
   SerializedFileTypeV02,
+  V02AnnotationObject,
 } from "../../types";
 import { PartialBy } from "utils/types";
-import {
-  Kind,
-  AnnotationObject,
-  Category,
-  ImageObject,
-  ShapeArray,
-} from "store/data/types";
+import { Kind, Category, ImageObject, ShapeArray } from "store/data/types";
 
 type KindMap = Record<string, { new: Kind; existing?: Kind }>;
 type CategoryMap = Record<string, { new: Category; existing?: Category }>;
@@ -23,12 +18,12 @@ type ImageMap = Record<
   { new: SerializedAnnotatorImageType; existing?: ImageObject }
 >;
 
-export const deserializeAnnotations_v02 = (
-  serializedAnnotations: Array<NewSerializedAnnotationType>,
+export const v02_deserializeAnnotations = (
+  serializedAnnotations: Array<V02_SerializedAnnotationType>,
   imageId: string,
 ) => {
   const annotations: Array<
-    PartialBy<AnnotationObject, "bitDepth" | "data" | "src">
+    PartialBy<V02AnnotationObject, "bitDepth" | "data" | "src">
   > = [];
 
   for (const annotation of serializedAnnotations) {
@@ -98,7 +93,7 @@ const reconcileImages = (
   return imageMap;
 };
 
-export const deserializePiximiAnnotations_v02 = async (
+export const v02_deserializePiximiAnnotations = async (
   serializedProject: SerializedFileTypeV02,
   existingImages: Array<ImageObject>,
   existingCategories: Array<Category>,
@@ -114,7 +109,7 @@ export const deserializePiximiAnnotations_v02 = async (
     serializedProject.categories,
   );
 
-  const reconciledAnnotations: AnnotationObject[] = [];
+  const reconciledAnnotations: V02AnnotationObject[] = [];
   const kindsToReconcile: Record<string, Kind> = {};
   const categoriesToReconcile: Record<string, Category> = {};
 
@@ -173,7 +168,7 @@ export const deserializePiximiAnnotations_v02 = async (
       shape: annotationShape,
       encodedMask: annotationEncoding,
     };
-    reconciledAnnotations.push(deserializedAnnotation as AnnotationObject);
+    reconciledAnnotations.push(deserializedAnnotation as V02AnnotationObject);
   }
 
   return {

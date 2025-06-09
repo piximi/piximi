@@ -3,12 +3,13 @@ import { CustomStore } from "../zarr/stores";
 import { openGroup } from "zarr";
 import { getAttr } from "../zarr/zarrUtils";
 import semver from "semver";
-import { deserializeProject_v01 } from "./v01/deserializeProject_v01";
-import { dataConverter_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";
-import { deserializeProject_v02 } from "./v02/deserializeProject_v02";
-import { LoadCB } from "../types";
-import { deserializeProject_v11 } from "./v110/deserializeProject_v11";
-import { projectConverterv1_v11 } from "../converters/classifierConverterv1_v11";
+import { v01_deserializeProject } from "./v01/v01_deserializeProject";
+import { v02_deserializeProject } from "./v02/v02_deserializeProject";
+import { CurrentProject, LoadCB } from "../types";
+import { v11_deserializeProject } from "./v110/v11_deserializeProject";
+import { v01_02_projectConverter } from "../converters/v01_02_projectConverter";
+import { v02_11_projectConverter } from "../converters/v02_11_projectConverter";
+import { v11_12_projectConverter } from "../converters/v11_12_projectConverter";
 
 export const deserializeProject = async (
   fileStore: CustomStore,
@@ -24,52 +25,21 @@ export const deserializeProject = async (
     throw Error("No version field found.");
   }
   const piximiVersion = semver.clean(piximiVersionRaw);
+  let currentProject: CurrentProject | undefined;
   if (!semver.valid(piximiVersion) || semver.lt(piximiVersion!, "0.1.0")) {
     throw Error(`File version ${piximiVersion} is unsupported.`);
   } else if (semver.eq(piximiVersion!, "0.1.0")) {
-    const {
-      project,
-      classifier: oldClassifier,
-      data,
-      segmenter,
-    } = await deserializeProject_v01(fileStore, loadCb);
-    const { kinds, categories, things } = dataConverter_v01v02({
-      images: data.images,
-      annotations: data.annotations,
-      annotationCategories: data.annotationCategories,
-      oldCategories: data.categories,
-    });
-    const classifier = projectConverterv1_v11(oldClassifier, kinds.ids);
-    return {
-      project,
-      classifier,
-      segmenter,
-      data: { kinds, categories, things },
-    };
+    const v01Project = await v01_deserializeProject(fileStore, loadCb);
+    const v02Project = v01_02_projectConverter(v01Project);
+    const v11Project = v02_11_projectConverter(v02Project);
+    currentProject = v11_12_projectConverter(v11Project);
   } else if (semver.lte(piximiVersion!, "1.0.0")) {
-    const {
-      project,
-      classifier: oldClassifier,
-      data,
-      segmenter,
-    } = await deserializeProject_v02(fileStore, loadCb);
-    const classifier = projectConverterv1_v11(oldClassifier, data.kinds.ids);
-
-    return {
-      project,
-      classifier,
-      segmenter,
-      data,
-    };
+    const v02Project = await v02_deserializeProject(fileStore, loadCb);
+    const v11Project = v02_11_projectConverter(v02Project);
+    currentProject = v11_12_projectConverter(v11Project);
   } else if (semver.gte(piximiVersion!, "1.1.0")) {
-    const { project, classifier, data, segmenter } =
-      await deserializeProject_v11(fileStore, loadCb);
-
-    return {
-      project,
-      classifier,
-      segmenter,
-      data,
-    };
+    const v11Project = await v11_deserializeProject(fileStore, loadCb);
+    currentProject = v11_12_projectConverter(v11Project);
   }
+  return currentProject;
 };

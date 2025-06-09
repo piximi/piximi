@@ -86,6 +86,7 @@ beforeAll(async () => {
         shape: convertArrayToShape(imageProperties.data.shape),
         encodedMask: mask,
         activePlane: 0,
+        timePoint: 0,
         bitDepth: image.bitDepth,
         partition: Partition.Unassigned,
         boundingBox: boundingBox as [number, number, number, number],

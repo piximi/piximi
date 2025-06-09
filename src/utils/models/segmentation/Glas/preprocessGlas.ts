@@ -1,8 +1,8 @@
 import { Tensor4D, data as tfdata } from "@tensorflow/tfjs";
 import { getImageSlice } from "utils/tensorUtils";
-import { OldImageType, ImageObject } from "store/data/types";
+import { ImageObject } from "store/data/types";
 
-const sampleGenerator = (images: Array<OldImageType>) => {
+const sampleGenerator = (images: Array<ImageObject>) => {
   const count = images.length;
 
   return function* () {

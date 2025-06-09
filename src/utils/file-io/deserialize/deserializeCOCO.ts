@@ -1,4 +1,4 @@
-import { deserializeCOCOFile_v02 } from "./v02/deserializeCOCO_v02";
+import { v02_deserializeCOCOFile } from "./v02/v02_deserializeCOCO";
 import { SerializedCOCOFileType } from "../types";
 import { Kind, Category, ImageObject } from "store/data/types";
 
@@ -9,7 +9,7 @@ export const deserializeCOCOFile = async (
   existingKinds: Array<Kind>,
   availableColors: Array<string> = [],
 ) => {
-  return deserializeCOCOFile_v02(
+  return v02_deserializeCOCOFile(
     cocoFile,
     existingImages,
     existingCategories,

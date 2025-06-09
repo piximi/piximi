@@ -1,32 +1,31 @@
+import React from "react";
+import {
+  V01_AnnotationObject,
+  V01_Category,
+  V01_ImageObject,
+  V01Project,
+  V02Project,
+} from "../types";
 import { EntityState } from "@reduxjs/toolkit";
-import Image from "image-js";
-import { intersection } from "lodash";
+import {
+  AnnotationObject,
+  Category,
+  ImageObject,
+  Kind,
+  Shape,
+} from "store/data/types";
+import { generateKind, isUnknownCategory } from "store/data/utils";
 import {
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   UNKNOWN_IMAGE_CATEGORY_ID,
 } from "store/data/constants";
-import { generateKind, isUnknownCategory } from "store/data/utils";
-import {
-  OldAnnotationType,
-  OldCategory,
-  OldImageType,
-  Kind,
-  AnnotationObject,
-  Category,
-  ImageObject,
-  Shape,
-  ShapeArray,
-} from "store/data/types";
-import { getPropertiesFromImageSync } from "store/data/utils";
-import { logger } from "utils/logUtils";
-import { convertArrayToShape } from "utils/models/utils";
 import { Partition } from "utils/models/enums";
 
-export const dataConverter_v01v02 = (data: {
-  images: OldImageType[];
-  oldCategories: OldCategory[];
-  annotationCategories: OldCategory[];
-  annotations: OldAnnotationType[];
+export const v01_02_dataConverter = (data: {
+  images: V01_ImageObject[];
+  oldCategories: V01_Category[];
+  annotationCategories: V01_Category[];
+  annotations: V01_AnnotationObject[];
 }) => {
   const { images, oldCategories, annotationCategories, annotations } = data;
   const categories: EntityState<Category, string> = {
@@ -172,71 +171,17 @@ export const dataConverter_v01v02 = (data: {
   return { kinds, categories, things };
 };
 
-export const convertAnnotationsWithExistingProject_v01v02 = async (
-  existingImages: Record<string, ImageObject>,
-  existingKinds: Record<string, Kind>,
-  oldAnnotations: OldAnnotationType[],
-  oldAnnotationCategories: OldCategory[],
-) => {
-  const catId2Name: Record<string, string> = {};
-  const newKinds: Record<string, Kind> = {};
-  const newCategories: Record<string, Category> = {};
-  const newAnnotations: AnnotationObject[] = [];
-  const imageMap: Record<string, Image> = {};
-
-  oldAnnotationCategories.forEach((anCat) => {
-    catId2Name[anCat.id] = anCat.name;
-    if (!(anCat.name in existingKinds) && !(anCat.name in newKinds)) {
-      const { kind: anKind, unknownCategory: newUnknownCategory } =
-        generateKind(anCat.name);
-      newCategories[newUnknownCategory.id] = newUnknownCategory;
-
-      newKinds[anKind.id] = anKind;
-    }
+export const v01_02_projectConverter = (v01Project: V01Project): V02Project => {
+  const { kinds, categories, things } = v01_02_dataConverter({
+    images: v01Project.data.images,
+    annotations: v01Project.data.annotations,
+    annotationCategories: v01Project.data.annotationCategories,
+    oldCategories: v01Project.data.categories,
   });
-  for await (const ann of oldAnnotations) {
-    const newAnn: Partial<AnnotationObject> = { ...ann };
-    const existingImage = existingImages[ann.imageId];
-    if (!existingImage) {
-      logger(`No image found for annotation: ${ann.id}\nskipping`);
-      continue;
-    }
-    const newKindName = catId2Name[ann.categoryId];
-    if (!newKindName) {
-      logger(`No category found for annotation: ${ann.id}\nskipping`);
-      continue;
-    }
-    const kind = existingKinds[newKindName] ?? newKinds[newKindName];
-    if (!kind) {
-      logger(`No kind found for annotation: ${ann.id}\nskipping`);
-      continue;
-    }
-    newAnn.kind = kind.id;
-    newAnn.categoryId = kind.unknownCategoryId;
-    const numAnns = intersection(
-      existingImage.containing,
-      kind.containing,
-    ).length;
-    newAnn.name = `${existingImage.name}-${kind.id}_${numAnns}`;
-    let renderedIm: Image;
-    if (imageMap[existingImage.id]) {
-      renderedIm = imageMap[existingImage.id];
-    } else {
-      renderedIm = await Image.load(existingImage.src);
-      imageMap[existingImage.id] = renderedIm;
-    }
-    const imageProperties = getPropertiesFromImageSync(
-      renderedIm,
-      existingImage,
-      ann,
-    );
-    Object.assign(newAnn, imageProperties);
-    newAnn.shape = convertArrayToShape(newAnn.data!.shape as ShapeArray);
-    newAnnotations.push(newAnn as AnnotationObject);
-  }
   return {
-    newAnnotations,
-    newCategories: Object.values(newCategories),
-    newKinds: Object.values(newKinds),
+    project: v01Project.project,
+    classifier: v01Project.classifier,
+    segmenter: v01Project.segmenter,
+    data: { kinds, categories, things },
   };
 };

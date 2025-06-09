@@ -1,7 +1,7 @@
 import semver from "semver";
-import { deserializePiximiAnnotations_v01 } from "./v01/deserializePiximiAnnotations_v01";
-import { deserializePiximiAnnotations_v02 } from "./v02/deserializePiximiAnnotations_v02";
-import { convertAnnotationsWithExistingProject_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";
+import { v01_deserializePiximiAnnotations } from "./v01/v01_deserializePiximiAnnotations";
+import { v02_deserializePiximiAnnotations } from "./v02/v02_deserializePiximiAnnotations";
+import { v01_02_convertAnnotationsWithExistingProject } from "utils/file-io/converters/v01_02_convertAnnotationsWithExistingProject";
 import { logger } from "utils/logUtils";
 import { SerializedFileType, SerializedFileTypeV02 } from "../types";
 import { Kind, Category, ImageObject } from "store/data/types";
@@ -14,12 +14,12 @@ export const deserializePiximiAnnotations = async (
 ) => {
   if (!("version" in serializedAnnotations)) {
     // pre 0.2.0
-    const { annotations, newCategories } = deserializePiximiAnnotations_v01(
+    const { annotations, newCategories } = v01_deserializePiximiAnnotations(
       serializedAnnotations as SerializedFileType,
       Object.values(existingImages),
       Object.values(existingCategories),
     );
-    const convertedData = await convertAnnotationsWithExistingProject_v01v02(
+    const convertedData = await v01_02_convertAnnotationsWithExistingProject(
       existingImages,
       existingKinds,
       annotations,
@@ -29,7 +29,7 @@ export const deserializePiximiAnnotations = async (
   }
   if (semver.gte(serializedAnnotations.version, "0.2.0")) {
     const { annotations, newCategories, newKinds } =
-      await deserializePiximiAnnotations_v02(
+      await v02_deserializePiximiAnnotations(
         serializedAnnotations as SerializedFileTypeV02,
         Object.values(existingImages),
         Object.values(existingCategories),
