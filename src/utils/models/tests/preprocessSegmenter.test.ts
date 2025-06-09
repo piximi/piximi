@@ -17,7 +17,7 @@ import { convertToImage } from "utils/tensorUtils";
 import {
   Category,
   ImageObject,
-  OldAnnotationType,
+  AnnotationObject,
   Shape,
 } from "store/data/types";
 import { MIMETYPES } from "utils/file-io/enums";
@@ -76,7 +76,12 @@ const preloadedImages: Array<{
   src: string;
   name: string;
   mimetype: MIMEType;
-  annotations: Array<OldAnnotationType>;
+  annotations: Array<
+    Omit<
+      AnnotationObject,
+      "kind" | "data" | "shape" | "bitDepth" | "name" | "src" | "partition"
+    >
+  >;
 }> = [generateUUID()].map((imId) => ({
   id: imId,
   src: "/static/media/cell-painting.f118ef087853056f08e6.png",
@@ -88,8 +93,9 @@ const preloadedImages: Array<{
       categoryId: "1dca6ba0-c53b-435d-a43f-d4a2bb4042a5",
       id: "59b919c0-f052-4df6-b947-bb8f3c9359a7",
       encodedMask: [0, 11921],
-      plane: 0,
+      activePlane: 0,
       imageId: imId,
+      timePoint: 0,
     },
   ],
 }));

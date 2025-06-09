@@ -120,6 +120,7 @@ const im1AnnotationsT1: Array<AnnotationObject> = [
       5, 8, 4, 8, 4, 6, 7, 5, 5,
     ],
     activePlane: 0,
+    timePoint: 0,
     boundingBox: [255, 287, 268, 303],
     shape: {
       width: 268 - 255,
@@ -143,6 +144,7 @@ const im1AnnotationsT1: Array<AnnotationObject> = [
       5, 8, 4, 8, 4, 6, 7, 5, 5,
     ],
     activePlane: 0,
+    timePoint: 0,
     boundingBox: [255, 287, 268, 303],
     shape: {
       width: 268 - 255,

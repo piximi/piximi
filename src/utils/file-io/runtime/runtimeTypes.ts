@@ -91,7 +91,7 @@ const SerializedCategoryRType = IOTSType({
   name: IOTSString,
   visible: IOTSBoolean,
 });
-const SerializedCategoryRTypeV02 = IOTSType({
+const V02_SerializedCategoryRType = IOTSType({
   id: IOTSString,
   color: IOTSString, // 3 byte hex, eg "#a08cd2"
   name: IOTSString,
@@ -121,7 +121,7 @@ export const SerializedAnnotationRType = IOTSType({
   boundingBox: IOTSArray(IOTSNumber), // [x1, y1, x2, y2]
 });
 
-export const SerializedAnnotationRTypeV02 = IOTSType({
+export const V02_SerializedAnnotationRType = IOTSType({
   categoryId: IOTSString, // category id, matching id of a SerializedCategory
   imageId: IOTSString, // image id, matching id of SerializedImage
   name: IOTSString,
@@ -139,9 +139,9 @@ export const SerializedFileRType = IOTSType({
   annotations: IOTSArray(SerializedAnnotationRType),
   images: IOTSArray(SerializedImageRType),
 });
-export const SerializedFileRTypeV02 = IOTSType({
-  categories: IOTSArray(SerializedCategoryRTypeV02),
-  annotations: IOTSArray(SerializedAnnotationRTypeV02),
+export const V02_SerializedFileRType = IOTSType({
+  categories: IOTSArray(V02_SerializedCategoryRType),
+  annotations: IOTSArray(V02_SerializedAnnotationRType),
   images: IOTSArray(SerializedImageRType),
   kinds: IOTSArray(SerializedKindRType),
   version: IOTSString,

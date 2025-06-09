@@ -1,11 +1,12 @@
-import { getDefaultModelInfo } from "utils/models/classification/utils";
-import { ClassifierStateV01_02 } from "../types";
-import { OptimizerSettings, PreprocessSettings } from "utils/models/types";
+import React from "react";
+import { V01_ClassifierState, V02Project, V11Project } from "../types";
 import { Kind } from "store/data/types";
 import { ClassifierState, KindClassifierDict } from "store/types";
+import { OptimizerSettings, PreprocessSettings } from "utils/models/types";
+import { getDefaultModelInfo } from "utils/models/classification/utils";
 
-export const projectConverterv1_v11 = (
-  classifier: ClassifierStateV01_02,
+export const v01_11_classifierConverter = (
+  classifier: V01_ClassifierState,
   kindIds: Array<Kind["id"]>,
 ): ClassifierState => {
   const kindClassifiers: KindClassifierDict = {};
@@ -38,5 +39,16 @@ export const projectConverterv1_v11 = (
   return {
     showClearPredictionsWarning: true,
     kindClassifiers,
+  };
+};
+
+export const v02_11_projectConverter = (v02Project: V02Project): V11Project => {
+  const { classifier: oldClassifier, data } = v02Project;
+  const classifier = v01_11_classifierConverter(oldClassifier, data.kinds.ids);
+  return {
+    project: v02Project.project,
+    data: v02Project.data,
+    segmenter: v02Project.segmenter,
+    classifier,
   };
 };

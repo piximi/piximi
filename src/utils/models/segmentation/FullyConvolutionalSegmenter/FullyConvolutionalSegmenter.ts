@@ -2,7 +2,7 @@ import { History } from "@tensorflow/tfjs";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { ModelTask } from "../../enums";
-import { OldCategory, OldImageType, Kind } from "store/data/types";
+import { Category, ImageObject, Kind } from "store/data/types";
 
 type LoadModelArgs = {
   simple: boolean;
@@ -21,15 +21,12 @@ export class FullyConvolutionalSegmenter extends Segmenter {
 
   public loadModel({ simple: _simple }: LoadModelArgs) {}
 
-  public loadTraining(_images: OldImageType[], _preprocessingArgs: any): void {}
+  public loadTraining(_images: ImageObject[], _preprocessingArgs: any): void {}
   public loadValidation(
-    _images: OldImageType[],
+    _images: ImageObject[],
     _preprocessingArgs: any,
   ): void {}
-  public loadInference(
-    _images: OldImageType[],
-    _preprocessingArgs: any,
-  ): void {}
+  public loadInference(_images: ImageObject[], _preprocessingArgs: any): void {}
 
   public async train(_options: any, _callbacks: any): Promise<History> {
     if (!this.trainable) {
@@ -43,7 +40,7 @@ export class FullyConvolutionalSegmenter extends Segmenter {
     return [];
   }
 
-  public inferenceCategoriesById(_catIds: string[]): OldCategory[] {
+  public inferenceCategoriesById(_catIds: string[]): Category[] {
     return [];
   }
   public inferenceKindsById(_kinds: string[]): Kind[] {

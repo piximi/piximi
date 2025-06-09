@@ -2,30 +2,30 @@ import { Group, openGroup } from "zarr";
 
 import { logger } from "utils/logUtils";
 import { initialState as initialProjectState } from "store/project/projectSlice";
-import { deserializeClassifierGroupV01_1 } from "../common/group-deserializers/classifierDeserializers";
-import { deserializeColorsGroup } from "../common/group-deserializers/dataDeserializers";
-import { deserializeSegmenterGroup } from "../common/group-deserializers/segmenterDeserializers";
+import { deserializeColorsGroup } from "../common/group-deserializers/deserializeColorsGroup";
+import { deserializeSegmenterGroup } from "../common/group-deserializers/deserializeSegmenterGroup";
 import { getAttr, getDataset, getGroup } from "../../zarr/zarrUtils";
 import { RawArray } from "zarr/types/rawArray";
 import { tensor4d } from "@tensorflow/tfjs";
 import { Partition } from "utils/models/enums";
 import { createRenderedTensor, generateBlankColors } from "utils/tensorUtils";
-import { LoadCB } from "utils/file-io/types";
+import {
+  LoadCB,
+  V02AnnotationObject,
+  V02ImageObject,
+  V02Project,
+} from "utils/file-io/types";
 import { BitDepth } from "store/data/types";
 import { CustomStore } from "utils/file-io/zarr/stores";
 import { ProjectState } from "store/types";
-import {
-  Kind,
-  AnnotationObject,
-  Category,
-  ImageObject,
-} from "store/data/types";
+import { Kind, Category } from "store/data/types";
 import { EntityState } from "@reduxjs/toolkit";
+import { v01_deserializeClassifierGroup } from "../v01/v01_deserializeClassifierGroup";
 
 const deserializeThingGroup = async (
   name: string,
   thingGroup: Group,
-): Promise<ImageObject | AnnotationObject> => {
+): Promise<V02ImageObject | V02AnnotationObject> => {
   const id = (await getAttr(thingGroup, "thing_id")) as string;
   const activePlane = (await getAttr(thingGroup, "active_plane")) as number;
   const categoryId = (await getAttr(thingGroup, "class_category_id")) as string;
@@ -79,7 +79,7 @@ const deserializeThingGroup = async (
     );
     const contents = (await getAttr(thingGroup, "contents")) as string[];
 
-    return { ...thing, colors, src, containing: contents } as ImageObject;
+    return { ...thing, colors, src, containing: contents } as V02ImageObject;
   } else {
     const boundingBox = (await getAttr(thingGroup, "bbox")) as [
       number,
@@ -88,7 +88,7 @@ const deserializeThingGroup = async (
       number,
     ];
     const encodedMask = (await getAttr(thingGroup, "mask")) as number[];
-
+    const plane = (await getAttr(thingGroup, "activePlane")) as number;
     const imageId = (await getAttr(thingGroup, "image_id")) as string;
     const colors = await generateBlankColors(thing.shape.channels);
     const src = await createRenderedTensor(
@@ -104,14 +104,15 @@ const deserializeThingGroup = async (
       encodedMask,
       imageId,
       src,
-    } as AnnotationObject;
+      plane,
+    } as V02AnnotationObject;
   }
 };
 
 const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
   const thingNames = (await getAttr(thingsGroup, "thing_names")) as string[];
 
-  const things: EntityState<ImageObject | AnnotationObject, string> = {
+  const things: EntityState<V02ImageObject | V02AnnotationObject, string> = {
     ids: [],
     entities: {},
   };
@@ -211,7 +212,7 @@ const deserializeProjectGroup = async (
 ): Promise<{
   project: ProjectState;
   data: {
-    things: EntityState<ImageObject | AnnotationObject, string>;
+    things: EntityState<V02ImageObject | V02AnnotationObject, string>;
     categories: EntityState<Category, string>;
     kinds: EntityState<Kind, string>;
   };
@@ -238,15 +239,15 @@ const deserializeProjectGroup = async (
   };
 };
 
-export const deserializeProject_v02 = async (
+export const v02_deserializeProject = async (
   fileStore: CustomStore,
   loadCb: LoadCB,
-) => {
+): Promise<V02Project> => {
   const rootGroup = await openGroup(fileStore, fileStore.rootName, "r");
   const projectGroup = await getGroup(rootGroup, "project");
   const { project, data } = await deserializeProjectGroup(projectGroup, loadCb);
   const classifierGroup = await getGroup(rootGroup, "classifier");
-  const classifier = await deserializeClassifierGroupV01_1(classifierGroup);
+  const classifier = await v01_deserializeClassifierGroup(classifierGroup);
 
   const segmenterGroup = await getGroup(rootGroup, "segmenter");
   const segmenter = await deserializeSegmenterGroup(segmenterGroup);

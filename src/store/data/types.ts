@@ -10,28 +10,38 @@ export type DataArray = IJSDataArray;
 export type Thing = {
   id: string;
   name: string;
+  kind: string;
+  bitDepth: BitDepth;
+};
+
+export type ImageTimePoint = {
+  colors: Colors;
+  containing: string[];
   src: string;
   partition: Partition;
-  kind: string;
   data: Tensor4D;
   shape: Shape;
-  bitDepth: BitDepth;
   categoryId: string;
   activePlane: number;
 };
-
 export type ImageObject = Thing & {
-  colors: Colors;
-  containing: string[];
+  timePoints: Record<number, ImageTimePoint>;
 };
 
-export type AnnotationObject = Thing & {
+export type AnnotationDetails = {
+  src: string;
   boundingBox: [number, number, number, number];
   encodedMask: Array<number>;
   decodedMask?: DataArray;
-  plane?: number;
+  plane: number;
   imageId: string;
+  globalId?: string;
+  timePoint: number;
+  categoryId: string;
+  shape: Shape;
+  data: Tensor4D;
 };
+export type AnnotationObject = Thing & AnnotationDetails;
 export type DecodedAnnotationObject = Omit<
   AnnotationObject & {
     decodedMask: DataArray;
@@ -68,39 +78,6 @@ export type Shape = {
 };
 
 export type ShapeArray = [number, number, number, number];
-
-/*
-OLD TYPES
-*/
-export type OldImageType = {
-  activePlane: number;
-  categoryId: string;
-  colors: Colors;
-  bitDepth: BitDepth;
-  id: string;
-  name: string;
-  shape: Shape;
-  data: Tensor4D; // [Z, H, W, C]
-  partition: Partition;
-  src: string;
-  kind?: string;
-  containing?: string[]; // The URI to be displayed on the canvas
-};
-
-export type OldCategory = PartialBy<Category, "containing" | "kind">;
-
-export type OldAnnotationType = {
-  id: string;
-  src?: string;
-  data?: Tensor4D;
-  categoryId: string;
-  boundingBox: [number, number, number, number]; // x1, y1, x_2, y_2
-  encodedMask: Array<number>;
-  decodedMask?: DataArray;
-  plane: number;
-  imageId: string;
-  // TODO serialize: these should not be undefineable
-};
 
 export type CategoryUpdates = {
   id: string;

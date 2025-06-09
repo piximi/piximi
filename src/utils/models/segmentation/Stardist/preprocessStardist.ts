@@ -1,10 +1,10 @@
 import { Tensor3D, Tensor4D, data as tfdata, tidy } from "@tensorflow/tfjs";
 import { padToMatch } from "../../utils";
 import { getImageSlice } from "utils/tensorUtils";
-import { OldImageType, ImageObject } from "store/data/types";
+import { ImageObject } from "store/data/types";
 
 const sampleGenerator = (
-  images: Array<OldImageType>,
+  images: Array<ImageObject>,
   padVals: Array<{ padX: number; padY: number }>,
 ) => {
   const count = images.length;
@@ -30,7 +30,7 @@ const sampleGenerator = (
 
 const padImage = (image: {
   data: Tensor3D;
-  bitDepth: OldImageType["bitDepth"];
+  bitDepth: ImageObject["bitDepth"];
   padX: number;
   padY: number;
 }) => {

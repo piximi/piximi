@@ -4,9 +4,9 @@ import {
   Metric,
   OptimizationAlgorithm,
 } from "utils/models/enums";
-import { ClassifierStateV01_02 } from "./types";
+import { V01_ClassifierState } from "./types";
 
-export const initialClassifierStateV01_02: ClassifierStateV01_02 = {
+export const initialClassifierStateV01_02: V01_ClassifierState = {
   modelStatus: 0,
   inputShape: {
     planes: 1,
