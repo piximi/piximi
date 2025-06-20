@@ -309,5 +309,3 @@ export const useFitClassifier = () => {
 
   return fitClassifier;
 };
-
-export default useFitClassifier;

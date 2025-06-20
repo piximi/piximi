@@ -25,19 +25,7 @@ import {
 } from "store/project/selectors";
 import { getDifferences } from "utils/arrayUtils";
 import { ModelStatus, Partition } from "utils/models/enums";
-
-export enum ErrorReason {
-  NotTrainable,
-  NoLabeledImages,
-  ExistingPredictions,
-  ChannelMismatch,
-}
-
-export type ErrorContext = {
-  reason: ErrorReason;
-  message: string;
-  severity: number;
-};
+import { ErrorContext, ClassifierErrorReason } from "./types";
 
 const ClassifierStatusContext = createContext<{
   isReady: boolean;
@@ -174,7 +162,7 @@ export const ClassifierStatusProvider = ({
       newIsReady = false;
 
       newErrors.push({
-        reason: ErrorReason.NotTrainable,
+        reason: ClassifierErrorReason.NotTrainable,
         message: "Selected model is not trainable.",
         severity: 1,
       });
@@ -183,7 +171,7 @@ export const ClassifierStatusProvider = ({
       newIsReady = false;
 
       newErrors.push({
-        reason: ErrorReason.NoLabeledImages,
+        reason: ClassifierErrorReason.NoLabeledImages,
         message: "Please label images to train a model.",
         severity: 3,
       });
@@ -196,7 +184,7 @@ export const ClassifierStatusProvider = ({
       newIsReady = false;
 
       newErrors.push({
-        reason: ErrorReason.ChannelMismatch,
+        reason: ClassifierErrorReason.ChannelMismatch,
         message: `The model requires ${selectedModel?.preprocessingOptions.inputShape.channels}-channel images, but the project images have ${projectChannels}`,
         severity: 2,
       });

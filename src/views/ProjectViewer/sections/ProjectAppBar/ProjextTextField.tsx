@@ -36,11 +36,14 @@ export const ProjectTextField = () => {
   return (
     <>
       {loadMessage ? (
-        <Typography ml={5} sx={{ flexGrow: 1 }}>
+        <Typography
+          ml={5}
+          sx={{ maxWidth: "fit-content", width: "fit-content" }}
+        >
           {loadMessage}
         </Typography>
       ) : (
-        <FormControl>
+        <FormControl sx={{ flexGrow: 1 }}>
           <TextFieldWithBlur
             data-help={HelpItem.ProjectName}
             onChange={handleTextFieldChange}
@@ -48,15 +51,10 @@ export const ProjectTextField = () => {
             value={newProjectName}
             inputRef={inputRef}
             size="small"
-            sx={{ ml: 5 }}
+            sx={{ maxWidth: "fit-content", width: "fit-content" }}
             variant="standard"
             slotProps={{
-              htmlInput: { min: 0 },
-              input: {
-                slotProps: {
-                  input: { min: 0 },
-                },
-              },
+              htmlInput: { min: 0, size: newProjectName.length },
             }}
           />
         </FormControl>

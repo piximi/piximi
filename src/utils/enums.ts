@@ -37,7 +37,7 @@ export enum ImageSortKey {
   Image,
 }
 
-export enum ThingSortKey {
+export enum GridSortKey {
   None = "None",
   FileName = "File Name",
   Category = "Category",

@@ -1,9 +1,10 @@
 import { memo } from "react";
 import { useSelector } from "react-redux";
+import { areEqual, GridChildComponentProps } from "react-window";
 
 import { Box } from "@mui/material";
 
-import { ThingDetailContainer } from "./ThingDetailContainer";
+import { AnnotationDetailContainer } from "./GridItemDetailContainer";
 
 import { selectCategoryProperty } from "store/data/selectors";
 import {
@@ -17,12 +18,53 @@ import { isUnknownCategory } from "store/data/utils";
 
 import { Partition } from "utils/models/enums";
 
-import { AnnotationObject, ImageObject } from "store/data/types";
+import { TSAnnotationObject } from "store/data/types";
 
-type ProjectGridItemProps = {
+type SelectHandler = (id: string, selected: boolean) => void;
+type SelectedAnnotationIds = string[];
+type CellData = {
+  annotations: TSAnnotationObject[];
+  handleSelectAnnotation: SelectHandler;
+  selectedAnnotationIds: SelectedAnnotationIds;
+  numColumns: number;
+};
+
+export const AnnotationGridCell = memo(
+  ({
+    columnIndex,
+    rowIndex,
+    style,
+    isScrolling,
+    data,
+  }: GridChildComponentProps<CellData>) => {
+    const annotationIdx = rowIndex * data.numColumns + columnIndex;
+    // grid is fixed number of rows x number of columns
+    // so there will always be numRows x numCols cells in the grid
+    // unless things.length is exactly numRows x numCols
+    // there will be empty cells in the grid
+    if (annotationIdx >= data.annotations.length) return <></>;
+
+    const annotation = data.annotations[annotationIdx];
+
+    return (
+      <div style={style}>
+        <AnnotationGridItem
+          key={annotation.id}
+          annotation={annotation}
+          handleClick={data.handleSelectAnnotation}
+          selected={data.selectedAnnotationIds.includes(annotation.id)}
+          isScrolling={isScrolling}
+        />
+      </div>
+    );
+  },
+  areEqual,
+);
+
+type AnnotationGridItemProps = {
   selected: boolean;
   handleClick: (id: string, selected: boolean) => void;
-  thing: ImageObject | AnnotationObject;
+  annotation: TSAnnotationObject;
   isScrolling?: boolean;
 };
 
@@ -48,8 +90,13 @@ const printSize = (scale: number) => {
   return (220 * scale).toString() + "px";
 };
 
-export const ProjectGridItem = memo(
-  ({ selected, handleClick, thing, isScrolling }: ProjectGridItemProps) => {
+const AnnotationGridItem = memo(
+  ({
+    selected,
+    handleClick,
+    annotation,
+    isScrolling,
+  }: AnnotationGridItemProps) => {
     const imageSelectionColor = useSelector(selectImageSelectionColor);
     const selectedImageBorderWidth = useSelector(
       selectSelectedImageBorderWidth,
@@ -58,14 +105,16 @@ export const ProjectGridItem = memo(
     const textOnScroll = useSelector(selectTextOnScroll);
 
     const getCategoryProperty = useSelector(selectCategoryProperty);
-    const categoryName = getCategoryProperty(thing.categoryId, "name") ?? "";
-    const categoryColor = getCategoryProperty(thing.categoryId, "color") ?? "";
+    const categoryName =
+      getCategoryProperty(annotation.categoryId, "name") ?? "";
+    const categoryColor =
+      getCategoryProperty(annotation.categoryId, "color") ?? "";
 
     const handleSelect = (
       evt: React.MouseEvent<HTMLDivElement, MouseEvent>,
     ) => {
       evt.stopPropagation();
-      handleClick(thing.id, selected);
+      handleClick(annotation.id, selected);
     };
 
     return isScrolling ? (
@@ -84,27 +133,27 @@ export const ProjectGridItem = memo(
       >
         {textOnScroll ? (
           <>
-            Name: {thing.name}
+            Name: {annotation.name}
             <br />
             <span style={{ color: categoryColor }}>
               Category: {categoryName}
             </span>
             <br />
-            Width: {thing.shape.width}
+            Width: {annotation.shape.width}
             <br />
-            Height: {thing.shape.height}
+            Height: {annotation.shape.height}
             <br />
-            Channels: {thing.shape.channels}
+            Channels: {annotation.shape.channels}
             <br />
-            Planes: {thing.shape.planes}
+            Planes: {annotation.shape.planes}
             <br />
-            Partition: {thing.partition}
+            Partition: {annotation.partition}
           </>
         ) : (
           <Box
             component="img"
             alt=""
-            src={thing.src}
+            src={annotation.src}
             sx={{
               width: "100%",
               height: "100%",
@@ -134,7 +183,7 @@ export const ProjectGridItem = memo(
         <Box
           component="img"
           alt=""
-          src={thing.src}
+          src={annotation.src}
           sx={{
             width: "100%",
             height: "100%",
@@ -144,18 +193,18 @@ export const ProjectGridItem = memo(
           }}
           draggable={false}
         />
-        <ThingDetailContainer
+        <AnnotationDetailContainer
           backgroundColor={categoryColor}
           categoryName={categoryName}
           usePredictedStyle={
-            thing.partition === Partition.Inference &&
-            !isUnknownCategory(thing.categoryId)
+            annotation.partition === Partition.Inference &&
+            !isUnknownCategory(annotation.categoryId)
           }
-          thing={thing}
+          annotation={annotation}
           position={getIconPosition(
             scaleFactor,
-            thing.shape.height,
-            thing.shape.width,
+            annotation.shape.height,
+            annotation.shape.width,
           )}
         />
       </Box>

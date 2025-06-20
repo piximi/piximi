@@ -21,12 +21,14 @@ import {
   Partition,
 } from "utils/models/enums";
 import {
-  AnnotationObject,
+  TSAnnotationObject,
   BitDepth,
   Category,
-  ImageObject,
+  TSImageObject,
   Kind,
   Shape,
+  ImageObject,
+  AnnotationObject,
 } from "store/data/types";
 import {
   ClassifierEvaluationResultType,
@@ -154,15 +156,22 @@ export type V01_AnnotationObject = {
   boundingBox: [number, number, number, number]; // x1, y1, x_2, y_2
   encodedMask: Array<number>;
   decodedMask?: DataArray;
-  plane: number;
+  plane?: number;
   imageId: string;
   // TODO serialize: these should not be undefineable
 };
 
-export type V02AnnotationObject = Omit<
-  AnnotationObject,
-  "globalId" | "timePoint"
->;
+export type V02AnnotationObject = Required<
+  Omit<V01_AnnotationObject, "decodedMask">
+> & {
+  kind: string;
+  name: string;
+  bitDepth: BitDepth;
+  shape: Shape;
+  partition: Partition;
+  decodedMask?: DataArray;
+  activePlane: number;
+};
 
 export type V02ImageObject = Required<V01_ImageObject>;
 
@@ -196,6 +205,8 @@ export type CurrentProject = {
   classifier: ClassifierState;
   data: {
     things: EntityState<ImageObject | AnnotationObject, string>;
+    images: EntityState<TSImageObject, string>;
+    annotations: EntityState<TSAnnotationObject, string>;
     categories: EntityState<Category, string>;
     kinds: EntityState<Kind, string>;
   };

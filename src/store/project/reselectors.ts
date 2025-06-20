@@ -3,23 +3,34 @@ import { difference, intersection } from "lodash";
 
 import {
   selectAllKindIds,
+  selectAnnotationsByKind,
   selectCategoriesDictionary,
+  selectImageGridImages,
   selectKindDictionary,
   selectThingsDictionary,
 } from "store/data/selectors";
 import {
   selectActiveKindId,
-  selectActiveThingFilters,
   selectKindTabFilters,
+  selectSelectedAnnotations,
+  selectSelectedImages,
   selectSelectedThingIds,
+  selectThingFilters,
 } from "./selectors";
 
 import { isUnknownCategory } from "store/data/utils";
 
 import { Partition } from "utils/models/enums";
 
-import { AnnotationObject, ImageObject, Thing } from "store/data/types";
+import {
+  AnnotationObject,
+  ImageGridObject,
+  ImageObject,
+  Thing,
+  TSAnnotationObject,
+} from "store/data/types";
 import { CATEGORY_COLORS } from "store/data/constants";
+import { isFiltered } from "utils/arrayUtils";
 
 export const selectVisibleKinds = createSelector(
   selectKindTabFilters,
@@ -62,29 +73,6 @@ export const selectActiveKnownCategories = createSelector(
   },
 );
 
-export const selectActiveUnknownCategory = createSelector(
-  selectActiveUnknownCategoryId,
-  selectCategoriesDictionary,
-  (unknownCatId, catDict) => {
-    if (!unknownCatId) return;
-    return catDict[unknownCatId]!;
-  },
-);
-
-export const selectActiveCategoryCount = createSelector(
-  selectActiveCategories,
-  (activeCategories) => {
-    return activeCategories.length;
-  },
-);
-
-export const selectActiveKnownCategoryCount = createSelector(
-  selectActiveKnownCategories,
-  (activeKnownCategories) => {
-    return activeKnownCategories.length;
-  },
-);
-
 export const selectActiveCategoryNames = createSelector(
   selectActiveCategories,
   (activeCategories) => {
@@ -104,26 +92,10 @@ export const selectAvaliableCategoryColors = createSelector(
   },
 );
 
-export const selectUnfilteredActiveCategoryIds = createSelector(
-  selectActiveThingFilters,
-  selectActiveCategories,
-  (thingFilters, activeCategories) => {
-    const filteredCategories = thingFilters.categoryId;
-    const unfilteredCategories = difference(
-      activeCategories.map((cat) => cat.id),
-      filteredCategories,
-    );
-    return unfilteredCategories;
-  },
-);
-
-export const selectActiveThingIds = createSelector(
-  selectActiveKindObject,
-  (kind) => {
-    if (!kind) return [];
-    return kind.containing;
-  },
-);
+const selectActiveThingIds = createSelector(selectActiveKindObject, (kind) => {
+  if (!kind) return [];
+  return kind.containing;
+});
 
 export const selectActiveThings = createSelector(
   [selectActiveThingIds, selectThingsDictionary],
@@ -132,7 +104,7 @@ export const selectActiveThings = createSelector(
   },
 );
 
-export const selectActiveLabeledThingsIds = createSelector(
+const selectActiveLabeledThingsIds = createSelector(
   selectActiveKindObject,
   selectCategoriesDictionary,
   (activeKind, catDict) => {
@@ -250,5 +222,77 @@ export const selectActiveThingsByPartition = createSelector(
       },
     );
     return thingsByPartition;
+  },
+);
+
+export const selectFilteredGridImages = createSelector(
+  selectImageGridImages,
+  selectThingFilters,
+  (allImages, filters) => {
+    return allImages.filter((image) => !isFiltered(image, filters ?? {}));
+  },
+);
+
+export const selectSelectedGridImages = createSelector(
+  selectSelectedImages,
+  selectFilteredGridImages,
+  (selectedImages, filteredImages) => {
+    return Object.entries(selectedImages).reduce(
+      (visible: ImageGridObject[], [id, timepoints]) => {
+        timepoints.forEach((tp) => {
+          const imageIndex = filteredImages.findIndex(
+            (image) => image.id === id && image.timepoint === tp,
+          );
+          if (imageIndex > -1) {
+            visible.push(filteredImages[imageIndex]);
+          }
+        });
+        console.log(visible);
+        return visible;
+      },
+      [],
+    );
+  },
+);
+
+export const selectActiveAnnotations = createSelector(
+  selectActiveKindId,
+  selectAnnotationsByKind,
+  (activeKind, annotationsByKind): TSAnnotationObject[] => {
+    const activeAnnotations = annotationsByKind[activeKind];
+    if (!activeAnnotations) return [];
+    return activeAnnotations;
+  },
+);
+
+export const selectFilteredAnnotationsByKind = createSelector(
+  selectAnnotationsByKind,
+  selectThingFilters,
+  (annotationsByKind, filters) =>
+    (kind: string): TSAnnotationObject[] => {
+      const activeAnnotations = annotationsByKind[kind] ?? [];
+      return activeAnnotations.filter(
+        (image) => !isFiltered(image, filters ?? {}),
+      );
+    },
+);
+
+export const selectActiveFilteredGridAnnotations = createSelector(
+  selectActiveAnnotations,
+  selectThingFilters,
+  (activeAnnotations, filters): TSAnnotationObject[] => {
+    return activeAnnotations.filter(
+      (image) => !isFiltered(image, filters ?? {}),
+    );
+  },
+);
+
+export const selectActiveSelectedGridAnnotations = createSelector(
+  selectSelectedAnnotations,
+  selectActiveFilteredGridAnnotations,
+  (selectedAnnotations, filteredAnnotations) => {
+    return filteredAnnotations.filter((ann) =>
+      selectedAnnotations.includes(ann.id),
+    );
   },
 );

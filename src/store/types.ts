@@ -5,7 +5,7 @@ import {
   UnknownAction,
 } from "@reduxjs/toolkit";
 
-import { HotkeyContext, Languages, ThingSortKey } from "utils/enums";
+import { HotkeyContext, Languages, GridSortKey } from "utils/enums";
 import { ThemeMode } from "themes/enums";
 
 import { AlertState, FilterType } from "utils/types";
@@ -21,6 +21,8 @@ import {
   Category,
   ImageObject,
   Thing,
+  TSImageObject,
+  TSAnnotationObject,
 } from "./data/types";
 import { MeasurementsState } from "./measurements/types";
 import {
@@ -51,6 +53,8 @@ export type DataState = {
   kinds: EntityState<Kind, string>;
   categories: EntityState<Category, string>;
   things: EntityState<AnnotationObject | ImageObject, string>;
+  images: EntityState<TSImageObject, string>;
+  annotations: EntityState<TSAnnotationObject, string>;
 };
 
 export type SegmenterState = {
@@ -83,7 +87,9 @@ export type ProjectState = {
   name: string;
 
   selectedThingIds: Array<string>;
-  sortType: ThingSortKey;
+  selectedImages: Record<string, Array<number>>;
+  selectedAnnotations: Array<string>;
+  sortType: GridSortKey;
   thingFilters: Record<
     string, // kind
     Required<Pick<FilterType<Thing>, "categoryId" | "partition">>

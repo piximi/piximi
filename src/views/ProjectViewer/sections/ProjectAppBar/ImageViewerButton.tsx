@@ -3,26 +3,26 @@ import { useNavigate } from "react-router-dom";
 import { Chip, Tooltip, useMediaQuery, useTheme } from "@mui/material";
 import { Gesture as GestureIcon } from "@mui/icons-material";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { useSelector } from "react-redux";
+import { selectAllSelectedGridItems } from "store/project/selectors";
 
-export const ImageViewerButton = ({
-  selectedThings,
-}: {
-  selectedThings: string[];
-}) => {
+export const ImageViewerButton = () => {
+  const selectedGridItems = useSelector(selectAllSelectedGridItems);
   const navigate = useNavigate();
   const theme = useTheme();
   const smOrXsBreakpoint = useMediaQuery(theme.breakpoints.down("md"));
   const handleNavigateImageViewer = () => {
     navigate("/imageviewer", {
       state: {
-        initialThingIds: selectedThings,
+        initialThingIds: selectedGridItems,
       },
     });
   };
   return (
     <Tooltip
       title={
-        selectedThings.length === 0
+        selectedGridItems.images.length === 0 &&
+        selectedGridItems.annotations.length === 0
           ? "Select Objects to Annotate"
           : "Annotate Selection"
       }
@@ -35,7 +35,10 @@ export const ImageViewerButton = ({
           onClick={handleNavigateImageViewer}
           variant="outlined"
           sx={{ marginRight: 1, pl: smOrXsBreakpoint ? 1 : 0 }}
-          disabled={selectedThings.length === 0}
+          disabled={
+            selectedGridItems.images.length === 0 &&
+            selectedGridItems.annotations.length === 0
+          }
           size="small"
         />
       </span>

@@ -1,40 +1,60 @@
 import { EntityState } from "@reduxjs/toolkit";
-import { CurrentProject, V11Project } from "../types";
 import {
-  AnnotationDetails,
-  AnnotationObject,
-  ImageObject,
-  ImageTimePoint,
-} from "store/data/types";
+  CurrentProject,
+  V11AnnotationObject,
+  V11ImageObject,
+  V11Project,
+} from "../types";
+import { TSAnnotationObject, TSImageObject } from "store/data/types";
 
 export const v11_12_projectConverter = (
   v11Project: V11Project,
 ): CurrentProject => {
   const { things } = v11Project.data;
-  const currentThings: EntityState<ImageObject | AnnotationObject, string> = {
+
+  const currentImages: EntityState<TSImageObject, string> = {
+    ids: [],
+    entities: {},
+  };
+  const currentAnnotations: EntityState<TSAnnotationObject, string> = {
     ids: [],
     entities: {},
   };
   Object.values(things.entities).forEach((thing) => {
-    const { id, name, kind, bitDepth, ...rest } = thing;
-    currentThings.ids.push(id);
-
     if (thing.kind === "Image") {
-      currentThings.entities[id] = {
+      const {
         id,
         name,
         kind,
         bitDepth,
-        timePoints: { 0: rest as ImageTimePoint },
+        containing,
+        shape,
+        partition,
+        ...rest
+      } = thing as V11ImageObject;
+      currentImages.ids.push(id);
+      currentImages.entities[id] = {
+        id,
+        name,
+        kind,
+        bitDepth,
+        containing,
+        shape,
+        partition,
+        timepoints: { 0: rest },
       };
     } else {
-      currentThings.entities[id] = {
+      const { id, name, kind, bitDepth, ...rest } =
+        thing as V11AnnotationObject;
+      currentAnnotations.ids.push(id);
+      currentAnnotations.entities[id] = {
         id,
         name,
         kind,
         bitDepth,
-        ...(rest as AnnotationDetails),
-        timePoint: 0,
+        ...rest,
+        plane: 0,
+        timepoint: 0,
       };
     }
   });
@@ -45,7 +65,9 @@ export const v11_12_projectConverter = (
     data: {
       kinds: v11Project.data.kinds,
       categories: v11Project.data.categories,
-      things: currentThings,
+      things: things,
+      images: currentImages,
+      annotations: currentAnnotations,
     },
   };
 };

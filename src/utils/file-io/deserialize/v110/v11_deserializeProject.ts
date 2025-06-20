@@ -87,7 +87,7 @@ const deserializeThingGroup = async (
       number,
     ];
     const encodedMask = (await getAttr(thingGroup, "mask")) as number[];
-    const plane = (await getAttr(thingGroup, "activePlane")) as number;
+    const plane = activePlane;
     const imageId = (await getAttr(thingGroup, "image_id")) as string;
     const colors = generateBlankColors(thing.shape.channels);
     const src = await createRenderedTensor(

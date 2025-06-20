@@ -1,11 +1,25 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { intersection } from "lodash";
 
-import { kindsAdapter, categoriesAdapter, thingsAdapter } from "./dataSlice";
+import {
+  kindsAdapter,
+  categoriesAdapter,
+  thingsAdapter,
+  imagesAdapter,
+  annotationsAdapter,
+} from "./dataSlice";
 import { RootState } from "store/rootReducer";
 
-import { AnnotationObject, Category, ImageObject, Kind } from "./types";
+import {
+  AnnotationObject,
+  Category,
+  ImageGridObject,
+  ImageObject,
+  Kind,
+  TSAnnotationObject,
+} from "./types";
 import { DataState } from "store/types";
+import { updateRecordArray } from "utils/objectUtils";
 
 const kindsSelectors = kindsAdapter.getSelectors(
   (state: RootState) => state.data.kinds,
@@ -16,22 +30,32 @@ const categorySelectors = categoriesAdapter.getSelectors(
 const thingsSelectors = thingsAdapter.getSelectors(
   (state: RootState) => state.data.things,
 );
+const imageSelectors = imagesAdapter.getSelectors(
+  (state: RootState) => state.data.images,
+);
+const annotationSelectors = annotationsAdapter.getSelectors(
+  (state: RootState) => state.data.annotations,
+);
 
 export const selectKindDictionary = kindsSelectors.selectEntities; // returns kinds dict
 export const selectAllKinds = kindsSelectors.selectAll; // returns an array
 export const selectAllKindIds = kindsSelectors.selectIds;
-export const selectTotalKindCount = kindsSelectors.selectTotal;
 
+const selectAllCategories = categorySelectors.selectAll; // returns an array
 export const selectCategoriesDictionary = categorySelectors.selectEntities; // returns dict
-export const selectAllCategories = categorySelectors.selectAll; // returns an array
-export const selectAllCategoryIds = categorySelectors.selectIds;
-export const selectTotalCategoryCount = categorySelectors.selectTotal;
-export const selectCategoryById = categorySelectors.selectById;
 
+const selectAllThings = thingsSelectors.selectAll; // returns an array
 export const selectThingsDictionary = thingsSelectors.selectEntities; // returns dict
-export const selectAllThings = thingsSelectors.selectAll; // returns an array
-export const selectAllThingIds = thingsSelectors.selectIds;
-export const selectTotalThingCount = thingsSelectors.selectTotal;
+
+//export const selectImageDictionary = imageSelectors.selectEntities; // returns dict
+export const selectImageArray = imageSelectors.selectAll; // returns an array
+//export const selectImageIds = imageSelectors.selectIds;
+//export const selectImageCount = imageSelectors.selectTotal;
+
+//export const selectAnnotationDictionary = annotationSelectors.selectEntities; // returns dict
+const selectAnnotationArray = annotationSelectors.selectAll; // returns an array
+//export const selectAnotationIds = annotationSelectors.selectIds;
+//export const selectAnnotationCount = annotationSelectors.selectTotal;
 
 export const selectDataState = ({ data }: { data: DataState }) => data;
 
@@ -62,6 +86,20 @@ export const selectObjectKindDict = createSelector(
   },
 );
 
+const selectAllObjects = createSelector(selectAllThings, (things) => {
+  return things.filter((thing) => thing.kind !== "Image") as AnnotationObject[];
+});
+
+export const selectObjectDict = createSelector(
+  selectAllObjects,
+  (objects): Record<string, AnnotationObject> => {
+    return objects.reduce((objDict: Record<string, AnnotationObject>, obj) => {
+      objDict[obj.id] = obj;
+      return objDict;
+    }, {});
+  },
+);
+
 export const selectRenderKindName = createSelector(
   selectKindDictionary,
   (kinds) => (kindId: string) => kinds[kindId].displayName,
@@ -74,19 +112,6 @@ export const selectRenderKindName = createSelector(
 export const selectAllImages = createSelector(selectAllThings, (things) => {
   return things.filter((thing) => thing.kind === "Image") as ImageObject[];
 });
-
-export const selectAllObjects = createSelector(selectAllThings, (things) => {
-  return things.filter((thing) => thing.kind !== "Image") as AnnotationObject[];
-});
-export const selectObjectDict = createSelector(
-  selectAllObjects,
-  (objects): Record<string, AnnotationObject> => {
-    return objects.reduce((objDict: Record<string, AnnotationObject>, obj) => {
-      objDict[obj.id] = obj;
-      return objDict;
-    }, {});
-  },
-);
 
 export const selectSplitThingDict = createSelector(
   selectAllThings,
@@ -132,33 +157,9 @@ export const selectNumThingsByCatAndKind = createSelector(
   },
 );
 
-export const selectAnnotatedImages = createSelector(
-  selectThingsOfKind,
-  (thingsByKind) => {
-    const images = thingsByKind("Image");
-    return images.filter((image) => {
-      if ("containing" in image) {
-        return image.containing.length > 0;
-      }
-      return false;
-    }) as ImageObject[];
-  },
-);
-
 /*
   CATEGORIES
 */
-
-export const selectUnknownCategoryByKind = createSelector(
-  selectKindDictionary,
-  selectCategoriesDictionary,
-  (kindDict, catDict) => {
-    return (kind: string) => {
-      const unknownCatId = kindDict[kind]!.unknownCategoryId;
-      return catDict[unknownCatId]!;
-    };
-  },
-);
 
 export const selectCategoriesByKind = createSelector(
   [selectKindDictionary, selectCategoriesDictionary],
@@ -167,13 +168,6 @@ export const selectCategoriesByKind = createSelector(
       const categoriesOfKind = kindDict[kind]!.categories;
       return categoriesOfKind.map((catId) => categoriesDict[catId]!);
     };
-  },
-);
-
-export const selectAllImageCategories = createSelector(
-  selectAllCategories,
-  (categories) => {
-    return categories.filter((category) => category.kind !== "Image");
   },
 );
 
@@ -209,4 +203,102 @@ export const selectCategoryProperty = createSelector(
       if (!category) return;
       return category[property];
     },
+);
+
+export const selectImageByCategoryRecord = createSelector(
+  selectImageArray,
+  (images) => {
+    const imageByCategoryReference: Record<
+      string,
+      Array<{ id: string; timePoint: number }>
+    > = {};
+    images.forEach((image) => {
+      Object.entries(image.timepoints).forEach((timePoint) => {
+        const category = timePoint[1].categoryId;
+        updateRecordArray(imageByCategoryReference, category, {
+          id: image.id,
+          timePoint: +timePoint[0],
+        });
+      });
+    });
+    return imageByCategoryReference;
+  },
+);
+
+export const selectAnnotationsByKind = createSelector(
+  selectAnnotationArray,
+  (annotations) => {
+    const kindRecord: Record<string, TSAnnotationObject[]> = {};
+
+    annotations.forEach((annotation) => {
+      updateRecordArray(kindRecord, annotation.kind, annotation);
+    });
+    return kindRecord;
+  },
+);
+// export const selectAnnotationsKindCategoryRecord = createSelector(
+//   selectAnnotationArray,
+//   (annotations) => {
+//     const kindCategoryRecord: Record<string, Record<string, string[]>> = {};
+
+//     annotations.forEach((annotation) => {
+//       if (!(annotation.kind in kindCategoryRecord)) {
+//         kindCategoryRecord[annotation.kind] = {
+//           [annotation.categoryId]: [annotation.id],
+//         };
+//       } else if (
+//         !(annotation.categoryId in kindCategoryRecord[annotation.kind])
+//       ) {
+//         kindCategoryRecord[annotation.kind][annotation.categoryId] = [
+//           annotation.id,
+//         ];
+//       } else {
+//         kindCategoryRecord[annotation.kind][annotation.categoryId].push(
+//           annotation.id,
+//         );
+//       }
+//     });
+//     return kindCategoryRecord;
+//   },
+// );
+
+// export const selectAnnotationsByImageTimePoint = createSelector(
+//   selectAnnotationArray,
+//   (annotations) => {
+//     const byImageTimePoint: Record<string, Record<number, string[]>> = {};
+
+//     annotations.forEach((annotation) => {
+//       if (!(annotation.imageId in byImageTimePoint)) {
+//         byImageTimePoint[annotation.imageId] = {
+//           [annotation.timepoint]: [annotation.id],
+//         };
+//       } else if (
+//         !(annotation.timepoint in byImageTimePoint[annotation.imageId])
+//       ) {
+//         byImageTimePoint[annotation.imageId][annotation.timepoint] = [
+//           annotation.id,
+//         ];
+//       } else {
+//         byImageTimePoint[annotation.imageId][annotation.timepoint].push(
+//           annotation.id,
+//         );
+//       }
+//     });
+//     return byImageTimePoint;
+//   },
+// );
+
+export const selectImageGridImages = createSelector(
+  selectImageArray,
+  (images) => {
+    return images.reduce((images: ImageGridObject[], tsImage) => {
+      const { timepoints, ...base } = tsImage;
+      images.push({
+        ...base,
+        ...timepoints[0],
+        timepoint: 0,
+      } as ImageGridObject);
+      return images;
+    }, []);
+  },
 );

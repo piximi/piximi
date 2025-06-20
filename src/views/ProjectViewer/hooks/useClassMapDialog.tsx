@@ -260,5 +260,4 @@ const useClassMapDialog = () => {
   return { getClassMap };
 };
 
-export default ClassMapDialog;
 export { ClassMapDialogProvider, useClassMapDialog };

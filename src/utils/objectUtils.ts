@@ -1,11 +1,12 @@
 import { RecursivePartial } from "./types";
 
-export const isEmpty = (obj: object) => {
-  return !!Object.keys(obj).length;
-};
+// Checks if an object has no properties
 export const isObjectEmpty = <T extends object>(obj: T) => {
   return Object.keys(obj).length === 0;
 };
+
+// Used to update an arrayed property of a Record. Encapsulates the logic required to add to an existing array or to add a new one
+
 export const updateRecordArray = <T extends string | number | symbol, K>(
   record: Record<T, K[]>,
   key: T,
@@ -30,13 +31,10 @@ export const getSubset = <T, K extends keyof T>(object: T, keys: K[]) => {
   return subset;
 };
 
-export const copyValues = <T extends object>(
-  existingObject: T,
-  updates: Partial<T>,
-) => {
-  Object.entries(updates).forEach(([key, value]) => {
-    existingObject[key as keyof T] = value as T[keyof T];
-  });
+export const typedObjectEntries = <T extends object>(
+  obj: T,
+): { [K in keyof T]: [K, T[K]] }[keyof T][] => {
+  return Object.entries(obj) as any;
 };
 
 export const recursiveAssign = <T extends object>(

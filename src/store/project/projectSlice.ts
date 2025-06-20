@@ -2,15 +2,18 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { mutatingFilter, toUnique } from "utils/arrayUtils";
 
-import { ThingSortKey } from "utils/enums";
+import { GridSortKey } from "utils/enums";
 import { Partition } from "utils/models/enums";
 
 import { ProjectState } from "store/types";
+import { updateRecordArray } from "utils/objectUtils";
 
 export const initialState: ProjectState = {
   name: "Untitled project",
   selectedThingIds: [],
-  sortType: ThingSortKey.None,
+  selectedImages: {},
+  selectedAnnotations: [],
+  sortType: GridSortKey.None,
   activeKind: "Image",
   thingFilters: {},
 
@@ -51,6 +54,78 @@ export const projectSlice = createSlice({
 
       state.selectedThingIds = allSelectedThings;
     },
+    selectAnnotations(
+      state,
+      action: PayloadAction<{ ids: Array<string> | string }>,
+    ) {
+      const ids =
+        typeof action.payload.ids === "string"
+          ? [action.payload.ids]
+          : action.payload.ids;
+      const allSelectedAnnotations = [
+        ...new Set([...state.selectedAnnotations, ...ids]),
+      ];
+
+      state.selectedAnnotations = allSelectedAnnotations;
+    },
+    deselectAnnotations(
+      state,
+      action: PayloadAction<{ ids: Array<string> | string }>,
+    ) {
+      const ids =
+        typeof action.payload.ids === "string"
+          ? [action.payload.ids]
+          : action.payload.ids;
+      mutatingFilter(state.selectedAnnotations, (id) => !ids.includes(id));
+    },
+    resetAnnotationSelection(state) {
+      state.selectedAnnotations = [];
+    },
+    selectImages(
+      state,
+      action: PayloadAction<{
+        selection:
+          | Array<{ id: string; timepoint: number }>
+          | { id: string; timepoint: number };
+      }>,
+    ) {
+      const selectionArray = Array.isArray(action.payload.selection)
+        ? action.payload.selection
+        : [action.payload.selection];
+
+      selectionArray.forEach((image) => {
+        updateRecordArray(state.selectedImages, image.id, image.timepoint);
+      });
+    },
+    deselectImages(
+      state,
+      action: PayloadAction<{
+        selection:
+          | Array<{ id: string; timepoint: number }>
+          | { id: string; timepoint: number };
+      }>,
+    ) {
+      const selectionArray = Array.isArray(action.payload.selection)
+        ? action.payload.selection
+        : [action.payload.selection];
+
+      selectionArray.forEach((image) => {
+        const selectedTimepoints = state.selectedImages[image.id];
+        if (!selectedTimepoints)
+          throw new Error(
+            `Image with id "${image.id}" not previously selected`,
+          );
+        mutatingFilter(
+          state.selectedImages[image.id],
+          (timepoint) => timepoint !== image.timepoint,
+        );
+        if (state.selectedImages[image.id].length === 0)
+          delete state.selectedImages[image.id];
+      });
+    },
+    resetImageSelection(state) {
+      state.selectedImages = {};
+    },
     deselectThings(
       state,
       action: PayloadAction<{ ids: Array<string> | string }>,
@@ -63,7 +138,7 @@ export const projectSlice = createSlice({
         (id: string) => !ids.includes(id),
       );
     },
-    setSortType(state, action: PayloadAction<{ sortType: ThingSortKey }>) {
+    setSortType(state, action: PayloadAction<{ sortType: GridSortKey }>) {
       state.sortType = action.payload.sortType;
     },
     setProjectName(state, action: PayloadAction<{ name: string }>) {
