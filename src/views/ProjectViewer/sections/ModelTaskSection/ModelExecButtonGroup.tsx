@@ -9,7 +9,7 @@ import {
 import { TooltipButton } from "components/ui/tooltips/TooltipButton";
 
 import { ModelStatus } from "utils/models/enums";
-import { ErrorReason } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { ClassifierErrorReason } from "views/ProjectViewer/contexts/types";
 
 export const ModelExecButtonGroup = ({
   handleFit,
@@ -27,7 +27,7 @@ export const ModelExecButtonGroup = ({
     predict: { helperText: string; disabled: boolean };
     evaluate: { helperText: string; disabled: boolean };
   };
-  error?: ErrorReason;
+  error?: ClassifierErrorReason;
 }) => {
   return (
     <Box width="100%" display="flex" justifyContent={"space-evenly"}>

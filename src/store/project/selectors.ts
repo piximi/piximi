@@ -1,8 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { difference } from "lodash";
 
-import { ThingSortKey } from "utils/enums";
-import { Partition } from "utils/models/enums";
+import { GridSortKey } from "utils/enums";
 
 import { ProjectState } from "store/types";
 
@@ -26,20 +24,28 @@ export const selectProjectName = ({ project }: { project: ProjectState }) => {
 SELECTED THINGS
 */
 
+export const selectSelectedImages = ({
+  project,
+}: {
+  project: ProjectState;
+}): Record<string, number[]> => {
+  return project.selectedImages;
+};
+
+export const selectSelectedAnnotations = ({
+  project,
+}: {
+  project: ProjectState;
+}): Array<string> => {
+  return project.selectedAnnotations;
+};
+
 export const selectSelectedThingIds = ({
   project,
 }: {
   project: ProjectState;
 }): Array<string> => {
   return project.selectedThingIds;
-};
-
-export const selectSelectedThingIdsLength = ({
-  project,
-}: {
-  project: ProjectState;
-}) => {
-  return project.selectedThingIds.length;
 };
 
 /*
@@ -50,7 +56,7 @@ export const selectSortType = ({
   project,
 }: {
   project: ProjectState;
-}): ThingSortKey => {
+}): GridSortKey => {
   return project.sortType;
 };
 
@@ -104,16 +110,6 @@ export const selectActiveFilteredStateHasFilters = ({
   return hasFilters;
 };
 
-export const selectUnfilteredActivePartitions = createSelector(
-  selectActiveThingFilters,
-  (thingFilters) => {
-    const filteredPartitions = thingFilters.partition;
-    const allPartitions = Object.values(Partition);
-    const unfilteredPartitions = difference(allPartitions, filteredPartitions);
-    return unfilteredPartitions;
-  },
-);
-
 export const selectKindTabFilters = ({
   project,
 }: {
@@ -129,3 +125,14 @@ export const selectProjectImageChannels = ({
 }) => {
   return project.imageChannels;
 };
+
+export const selectAllSelectedGridItems = createSelector(
+  selectSelectedAnnotations,
+  selectSelectedImages,
+  (selectedAnnotations, selectedImages) => {
+    return {
+      images: Object.keys(selectedImages),
+      annotations: selectedAnnotations,
+    };
+  },
+);

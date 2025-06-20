@@ -4,16 +4,12 @@ import {
   V01_Category,
   V01_ImageObject,
   V01Project,
+  V02AnnotationObject,
+  V02ImageObject,
   V02Project,
 } from "../types";
 import { EntityState } from "@reduxjs/toolkit";
-import {
-  AnnotationObject,
-  Category,
-  ImageObject,
-  Kind,
-  Shape,
-} from "store/data/types";
+import { Category, Kind, Shape } from "store/data/types";
 import { generateKind, isUnknownCategory } from "store/data/utils";
 import {
   UNKNOWN_ANNOTATION_CATEGORY_ID,
@@ -21,31 +17,41 @@ import {
 } from "store/data/constants";
 import { Partition } from "utils/models/enums";
 
-export const v01_02_dataConverter = (data: {
+const v01_02_dataConverter = (data: {
   images: V01_ImageObject[];
   oldCategories: V01_Category[];
   annotationCategories: V01_Category[];
   annotations: V01_AnnotationObject[];
-}) => {
+}): {
+  kinds: EntityState<Kind, string>;
+  categories: EntityState<Category, string>;
+  things: EntityState<V02AnnotationObject | V02ImageObject, string>;
+} => {
   const { images, oldCategories, annotationCategories, annotations } = data;
+
+  const things: EntityState<V02ImageObject | V02AnnotationObject, string> = {
+    ids: [],
+    entities: {},
+  };
+
+  // Create Kind Entity State
+  const kinds: EntityState<Kind, string> = { ids: [], entities: {} };
+  // Add "Image" Kind
+  const { kind: imageKind, unknownCategory: unknownImageCategory } =
+    generateKind("Image");
+  kinds.ids.push(imageKind.id);
+  kinds.entities[imageKind.id] = imageKind;
+
+  // Create Categories Entity State
   const categories: EntityState<Category, string> = {
     ids: [],
     entities: {},
   };
-  const things: EntityState<ImageObject | AnnotationObject, string> = {
-    ids: [],
-    entities: {},
-  };
-  const kinds: EntityState<Kind, string> = { ids: [], entities: {} };
 
-  const { kind: imageKind, unknownCategory } = generateKind("Image");
-  kinds.ids.push(imageKind.id);
-
-  kinds.entities[imageKind.id] = imageKind;
-
-  categories.ids.push(unknownCategory.id);
-  categories.entities[unknownCategory.id] = {
-    ...unknownCategory,
+  // Add new "Unknown" image category
+  categories.ids.push(unknownImageCategory.id);
+  categories.entities[unknownImageCategory.id] = {
+    ...unknownImageCategory,
     containing: [],
   };
 
@@ -55,10 +61,14 @@ export const v01_02_dataConverter = (data: {
       continue;
     } else {
       let catId: string = category.id;
+      // Check if id starts with "0", which indicates an unknown category in the new project version
+      // If it does, replace with "1" and add to the mapping
       if (isUnknownCategory(catId)) {
         catId = "1" + category.id.slice(1);
         nonUnknownCategoryMap[category.id] = catId;
       }
+
+      // create and add category to Entity State
       categories.ids.push(catId);
       categories.entities[catId] = {
         ...category,
@@ -76,7 +86,7 @@ export const v01_02_dataConverter = (data: {
     kinds.entities[imageKind.id].containing.push(image.id);
     let cat: string;
     if (image.categoryId === UNKNOWN_IMAGE_CATEGORY_ID) {
-      cat = unknownCategory.id;
+      cat = unknownImageCategory.id;
     } else {
       cat = nonUnknownCategoryMap[image.categoryId] ?? image.categoryId;
     }
@@ -85,7 +95,7 @@ export const v01_02_dataConverter = (data: {
 
     things.ids.push(image.id);
 
-    things.entities[image.id] = image as ImageObject;
+    things.entities[image.id] = image as V02ImageObject;
     if (cat in categories.entities) {
       categories.entities[cat]!.containing.push(image.id);
     }
@@ -109,8 +119,8 @@ export const v01_02_dataConverter = (data: {
 
   const numAnnotationsOfKindPerImage: Record<string, number> = {};
 
-  for (const annotation of annotations as AnnotationObject[]) {
-    const { plane: _plane, ..._annotation } = {
+  for (const annotation of annotations as V02AnnotationObject[]) {
+    const _annotation = {
       ...annotation,
       activePlane: annotation.plane,
     };
@@ -121,7 +131,7 @@ export const v01_02_dataConverter = (data: {
       annotationName = `${things.entities[_annotation.imageId]!.name}-${
         _annotation.kind
       }`;
-      (things.entities[_annotation.imageId] as ImageObject).containing.push(
+      (things.entities[_annotation.imageId] as V02ImageObject).containing.push(
         _annotation.id,
       );
     } else {
@@ -159,9 +169,10 @@ export const v01_02_dataConverter = (data: {
     );
     _annotation.partition = Partition.Unassigned;
     _annotation.bitDepth = things.entities[_annotation.imageId]!.bitDepth;
+
     things.ids.push(_annotation.id);
 
-    things.entities[_annotation.id] = _annotation as AnnotationObject;
+    things.entities[_annotation.id] = _annotation as V02AnnotationObject;
 
     kinds.entities[_annotation.kind]!.containing.push(_annotation.id);
 

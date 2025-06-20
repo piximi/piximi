@@ -7,7 +7,7 @@ import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
 import { CategoryItemMenu } from "components/ui/CategoryItemMenu";
-import { CategoryItem } from "./list-items/CategoryItem";
+import { CategoryItem } from "./list-items";
 
 import { projectSlice } from "store/project";
 import { selectHighlightedCategory } from "store/project/selectors";

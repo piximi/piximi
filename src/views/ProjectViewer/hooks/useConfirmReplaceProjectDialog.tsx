@@ -145,5 +145,4 @@ const useConfirmReplaceDialog = () => {
   return { getConfirmation };
 };
 
-export default ConfirmReplaceDialog;
 export { ConfirmReplaceDialogProvider, useConfirmReplaceDialog };

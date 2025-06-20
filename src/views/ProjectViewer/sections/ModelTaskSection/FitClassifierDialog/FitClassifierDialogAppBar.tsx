@@ -21,7 +21,7 @@ import {
 } from "@mui/icons-material";
 
 import { useDialog } from "hooks";
-
+import { useFitClassifier } from "../../../hooks";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
@@ -34,7 +34,6 @@ import { ModelStatus } from "utils/models/enums";
 import { useClassifierHistory } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
-import useFitClassifier from "views/ProjectViewer/hooks/useFitClassifier";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;

@@ -23,10 +23,7 @@ import {
   selectClassifierModel,
 } from "store/classifier/reselectors";
 import { PredictionListItems } from "views/ProjectViewer/components/list-items";
-import {
-  ErrorReason,
-  useClassifierStatus,
-} from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
 import { usePredictClassifier } from "views/ProjectViewer/hooks/usePredictClassifier";
 import { useEvaluateClassifier } from "views/ProjectViewer/hooks/useEvaluateClassifier";
 import { WithLabel } from "components/inputs";
@@ -37,6 +34,7 @@ import { StyledSelect } from "components/inputs";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 import { SequentialClassifier } from "utils/models/classification";
 import { selectActiveUnlabeledThingsIds } from "store/project/reselectors";
+import { ClassifierErrorReason } from "views/ProjectViewer/contexts/types";
 
 export const ClassifierSection = () => {
   const [waitingForResults, setWaitingForResults] = useState(false);
@@ -108,7 +106,7 @@ export const ClassifierSection = () => {
       !selectedModel.pretrained ||
       modelStatus !== ModelStatus.Idle ||
       unlabeledThings.length === 0 ||
-      error?.reason === ErrorReason.ChannelMismatch;
+      error?.reason === ClassifierErrorReason.ChannelMismatch;
 
     const evaluateText = (() => {
       if (selectedModel) {

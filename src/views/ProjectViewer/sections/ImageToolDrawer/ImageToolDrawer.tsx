@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { ReactElement, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import {
   Badge,
@@ -31,7 +31,6 @@ import {
   InformationOptions,
   MeasurementOptions,
 } from "./tool-options";
-import { OperationType } from "./ToolOptionsDrawer";
 
 import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
 
@@ -43,6 +42,17 @@ import { HTMLDataAttributes } from "utils/types";
 import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
 import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/layout/app-drawer/HelpButton";
+
+type OperationType = {
+  icon: (color: string) => ReactElement;
+  name: string;
+  description: string;
+  options?: ReactElement;
+  action?: () => void;
+  hotkey: string;
+  mobile?: boolean;
+  helpContext?: HelpItem;
+};
 
 const imageTools: Record<string, OperationType> = {
   fileIO: {
@@ -279,7 +289,7 @@ type ToolProps = HTMLDataAttributes & {
 
 //TODO: tool buttons
 
-export const Tool = ({
+const Tool = ({
   children,
   options,
   name,

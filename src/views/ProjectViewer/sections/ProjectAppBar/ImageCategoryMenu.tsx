@@ -6,7 +6,6 @@ import { Category } from "store/data/types";
 
 type ImageCategoryMenuProps = {
   anchorEl?: HTMLElement;
-  selectedIds: Array<string>;
   onClose: () => void;
   anchorReference?: PopoverReference;
   anchorPosition?: { top: number; left: number };

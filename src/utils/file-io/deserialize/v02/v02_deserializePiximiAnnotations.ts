@@ -32,6 +32,7 @@ export const v02_deserializeAnnotations = (
       kind: annotation.kind,
       name: annotation.name,
       encodedMask: annotation.mask.split(" ").map((e) => Number(e)),
+      plane: annotation.activePlane,
       activePlane: annotation.activePlane,
       boundingBox: annotation.boundingBox as [number, number, number, number],
       shape: convertArrayToShape(annotation.shape as ShapeArray),
@@ -113,7 +114,7 @@ export const v02_deserializePiximiAnnotations = async (
   const kindsToReconcile: Record<string, Kind> = {};
   const categoriesToReconcile: Record<string, Category> = {};
 
-  for await (let annotation of serializedProject.annotations) {
+  for await (const annotation of serializedProject.annotations) {
     const annImage = imageMap[annotation.imageId];
     const category = catMap[annotation.categoryId];
     const kind = kindMap[annotation.kind];
@@ -128,7 +129,7 @@ export const v02_deserializePiximiAnnotations = async (
     const annPropsFromIm = await getPropertiesFromImage(image, {
       boundingBox: annotation.boundingBox as [number, number, number, number],
     });
-    annotation = { ...annotation, ...annPropsFromIm };
+    const expandedAnnotation = { ...annotation, ...annPropsFromIm };
 
     /*
       HANDLE KIND
@@ -136,8 +137,8 @@ export const v02_deserializePiximiAnnotations = async (
 
     if (kind.existing) {
       const existingKind = kind.existing;
-      if (annotation.categoryId === kind.new.unknownCategoryId) {
-        annotation.categoryId = existingKind.unknownCategoryId;
+      if (expandedAnnotation.categoryId === kind.new.unknownCategoryId) {
+        expandedAnnotation.categoryId = existingKind.unknownCategoryId;
         appliedUnknownCategory = true;
       }
     } else {
@@ -153,7 +154,7 @@ export const v02_deserializePiximiAnnotations = async (
     if (!appliedUnknownCategory) {
       if (category.existing) {
         const existingCat = category.existing;
-        annotation.categoryId = existingCat.id;
+        expandedAnnotation.categoryId = existingCat.id;
       } else {
         const newCategory = category.new;
         if (!(newCategory.id in categoriesToReconcile))
@@ -161,12 +162,18 @@ export const v02_deserializePiximiAnnotations = async (
       }
     }
 
-    const annotationShape = convertArrayToShape(annotation.shape as ShapeArray);
-    const annotationEncoding = annotation.mask.split(" ").map((e) => +e);
+    const annotationShape = convertArrayToShape(
+      expandedAnnotation.shape as ShapeArray,
+    );
+    const annotationEncoding = expandedAnnotation.mask
+      .split(" ")
+      .map((e) => +e);
     const { mask: _mask, ...deserializedAnnotation } = {
-      ...annotation,
+      ...expandedAnnotation,
       shape: annotationShape,
       encodedMask: annotationEncoding,
+      plane: expandedAnnotation.activePlane,
+      bitDepth: image.bitDepth,
     };
     reconciledAnnotations.push(deserializedAnnotation as V02AnnotationObject);
   }

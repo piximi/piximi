@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { selectCategoriesDictionary } from "store/data/selectors";
 import { selectSortType } from "store/project/selectors";
 
-import { ThingSortKey } from "utils/enums";
+import { GridSortKey } from "utils/enums";
 
 import { Thing } from "store/data/types";
 
@@ -39,54 +39,57 @@ const splitmix32 = (seed: number) => {
 // number. 2**31 because its signed, and we want a positive number
 const generateSeed = () => Math.floor(Math.random() * (2 ** 31 - 1));
 
+type FilteredObject = { id: string; name: string; categoryId: string };
 export const useSortFunction = () => {
   const sortType = useSelector(selectSortType);
-  const [previousSortType, setPreviousSortType] = useState<ThingSortKey>(
-    ThingSortKey.None,
+  const [previousSortType, setPreviousSortType] = useState<GridSortKey>(
+    GridSortKey.None,
   );
   const categories = useSelector(selectCategoriesDictionary);
-  const theSortFunction = function (_a: Thing, _b: Thing) {
+  const theSortFunction = function (_a: FilteredObject, _b: FilteredObject) {
     return 0;
   };
   const [sortFunction, setSortFunction] = useState<
-    (a: Thing, b: Thing) => number
+    (a: FilteredObject, b: FilteredObject) => number
   >(() => theSortFunction);
 
   useEffect(() => {
-    if (sortType !== previousSortType && sortType !== ThingSortKey.Category) {
+    if (sortType !== previousSortType && sortType !== GridSortKey.Category) {
       const randomSeed = generateSeed();
       setPreviousSortType(sortType);
       switch (sortType) {
-        case ThingSortKey.FileName:
+        case GridSortKey.FileName:
           setSortFunction(
-            () => (a: Thing, b: Thing) => a.name.localeCompare(b.name),
+            () => (a: FilteredObject, b: FilteredObject) =>
+              a.name.localeCompare(b.name),
           );
           break;
 
-        case ThingSortKey.Random:
-          setSortFunction(() => (a: Thing, b: Thing) => {
+        case GridSortKey.Random:
+          setSortFunction(() => (a: FilteredObject, b: FilteredObject) => {
             const aVal = splitmix32(hash(a.id) + randomSeed);
             const bVal = splitmix32(hash(b.id) + randomSeed);
             return aVal - bVal;
           });
           break;
-        case ThingSortKey.Name:
+        case GridSortKey.Name:
           setSortFunction(
-            () => (a: Thing, b: Thing) => a.name.localeCompare(b.name),
+            () => (a: FilteredObject, b: FilteredObject) =>
+              a.name.localeCompare(b.name),
           );
           break;
-        case ThingSortKey.None:
+        case GridSortKey.None:
         default:
-          setSortFunction(() => (_a: Thing, _b: Thing) => 0);
+          setSortFunction(() => (_a: FilteredObject, _b: FilteredObject) => 0);
       }
     }
   }, [sortType, categories, previousSortType]);
 
   useEffect(() => {
-    if (sortType === ThingSortKey.Category) {
+    if (sortType === GridSortKey.Category) {
       setPreviousSortType(sortType);
       setSortFunction(
-        () => (a: Thing, b: Thing) =>
+        () => (a: FilteredObject, b: FilteredObject) =>
           categories[a.categoryId]!.name.localeCompare(
             categories[b.categoryId]!.name,
           ),

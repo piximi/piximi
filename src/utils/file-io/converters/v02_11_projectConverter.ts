@@ -5,7 +5,7 @@ import { ClassifierState, KindClassifierDict } from "store/types";
 import { OptimizerSettings, PreprocessSettings } from "utils/models/types";
 import { getDefaultModelInfo } from "utils/models/classification/utils";
 
-export const v01_11_classifierConverter = (
+const v02_11_classifierConverter = (
   classifier: V01_ClassifierState,
   kindIds: Array<Kind["id"]>,
 ): ClassifierState => {
@@ -44,7 +44,7 @@ export const v01_11_classifierConverter = (
 
 export const v02_11_projectConverter = (v02Project: V02Project): V11Project => {
   const { classifier: oldClassifier, data } = v02Project;
-  const classifier = v01_11_classifierConverter(oldClassifier, data.kinds.ids);
+  const classifier = v02_11_classifierConverter(oldClassifier, data.kinds.ids);
   return {
     project: v02Project.project,
     data: v02Project.data,

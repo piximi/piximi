@@ -24,8 +24,9 @@ import { selectVisibleKinds } from "store/project/reselectors";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { DIMENSIONS } from "utils/constants";
+import { AnnotationGrid } from "./ImageGrid/AnnotationGrid";
 
-export const ProjectImageGrid = () => {
+export const ProjectGrid = () => {
   const dispatch = useDispatch();
   const filteredKinds = useSelector(selectKindTabFilters) as string[];
   const kinds = useSelector(selectKindDictionary);
@@ -156,9 +157,13 @@ export const ProjectImageGrid = () => {
         handleTabEdit={handleKindEdit}
         renderLabel={renderTabLabel}
       >
-        {visibleKinds.map((kind) => (
-          <ImageGrid key={`${kind}-imageGrid`} kind={kind} />
-        ))}
+        {visibleKinds.map((kind) =>
+          kind === "Image" ? (
+            <ImageGrid key={`${kind}-imageGrid`} />
+          ) : (
+            <AnnotationGrid key={`${kind}-imageGrid`} kind={kind} />
+          ),
+        )}
       </CustomTabs>
       <AddKindMenu
         anchor={addKindMenuAnchor}

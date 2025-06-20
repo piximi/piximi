@@ -3,18 +3,7 @@ import { useSelector } from "react-redux";
 import { selectAllImages } from "store/data/selectors";
 import { selectSegmenterModel } from "store/segmenter/selectors";
 import { ModelStatus } from "utils/models/enums";
-
-export enum ErrorReason {
-  NotConfigured,
-  NoInferenceImages,
-  ExistingKind,
-}
-
-export type ErrorContext = {
-  reason: ErrorReason;
-  message: string;
-  severity: number;
-};
+import { ErrorContext, SegmenterErrorReason } from "./types";
 
 const SegmenterStatusContext = createContext<{
   isReady: boolean;
@@ -45,7 +34,7 @@ export const SegmenterStatusProvider = ({
     let newIsReady = true;
     if (!selectedModel?.pretrained) {
       newError = {
-        reason: ErrorReason.NotConfigured,
+        reason: SegmenterErrorReason.NotConfigured,
         message: "Model is not configured for inference",
         severity: 1,
       };
@@ -55,7 +44,7 @@ export const SegmenterStatusProvider = ({
       newIsReady = false;
       if (!error || error.severity > 1) {
         newError = {
-          reason: ErrorReason.NoInferenceImages,
+          reason: SegmenterErrorReason.NoInferenceImages,
           message: "No images available for inference",
           severity: 2,
         };

@@ -7,19 +7,19 @@ import { StyledSelect, WithLabel } from "components/inputs";
 import { projectSlice } from "store/project";
 import { selectSortType } from "store/project/selectors";
 
-import { ThingSortKey } from "utils/enums";
+import { GridSortKey } from "utils/enums";
 
 export const SortSelect = () => {
   const dispatch = useDispatch();
 
   const selectedSortKey = useSelector(selectSortType);
-  const [selectedKey, setSelectedKey] = useState<ThingSortKey>(selectedSortKey);
+  const [selectedKey, setSelectedKey] = useState<GridSortKey>(selectedSortKey);
 
   const onSortKeyChange = (event: SelectChangeEvent<unknown>) => {
-    setSelectedKey(event.target.value as ThingSortKey);
+    setSelectedKey(event.target.value as GridSortKey);
     dispatch(
       projectSlice.actions.setSortType({
-        sortType: event.target.value as ThingSortKey,
+        sortType: event.target.value as GridSortKey,
       }),
     );
   };
@@ -42,7 +42,7 @@ export const SortSelect = () => {
           fullWidth
           variant="standard"
         >
-          {Object.values(ThingSortKey).map((sortType) => (
+          {Object.values(GridSortKey).map((sortType) => (
             <MenuItem
               key={sortType}
               value={sortType}

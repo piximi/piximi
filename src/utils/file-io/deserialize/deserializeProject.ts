@@ -25,6 +25,7 @@ export const deserializeProject = async (
     throw Error("No version field found.");
   }
   const piximiVersion = semver.clean(piximiVersionRaw);
+  console.log(piximiVersion);
   let currentProject: CurrentProject | undefined;
   if (!semver.valid(piximiVersion) || semver.lt(piximiVersion!, "0.1.0")) {
     throw Error(`File version ${piximiVersion} is unsupported.`);
@@ -41,5 +42,5 @@ export const deserializeProject = async (
     const v11Project = await v11_deserializeProject(fileStore, loadCb);
     currentProject = v11_12_projectConverter(v11Project);
   }
-  return currentProject;
+  return currentProject!;
 };

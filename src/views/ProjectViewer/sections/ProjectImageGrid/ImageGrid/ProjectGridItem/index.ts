@@ -1,1 +1,0 @@
-export { ProjectGridItem } from "./ProjectGridItem";
