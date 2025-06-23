@@ -11,7 +11,7 @@ import {
 import { useDialogHotkey, useHotkeys, useMobileView } from "hooks";
 import { useThingSelection } from "../../hooks";
 
-import { LogoLoader, AlertBar } from "components/ui";
+import { LogoLoader } from "components/ui";
 import { TooltipTitle, TooltipButton } from "components/ui/tooltips";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { ZoomControl } from "./ZoomControl";
@@ -20,10 +20,7 @@ import { CategorizeChip } from "./CategorizeChip";
 
 import { dataSlice } from "store/data";
 import { selectActiveKindId } from "store/project/selectors";
-import {
-  selectAlertState,
-  selectLoadPercent,
-} from "store/applicationSettings/selectors";
+import { selectLoadPercent } from "store/applicationSettings/selectors";
 
 import { pluralize } from "utils/stringUtils";
 import { HotkeyContext } from "utils/enums";
@@ -35,7 +32,6 @@ export const ProjectAppBar = () => {
   const dispatch = useDispatch();
   const activeKind = useSelector(selectActiveKindId);
   const loadPercent = useSelector(selectLoadPercent);
-  const alertState = useSelector(selectAlertState);
   const isMobile = useMobileView();
 
   const {
@@ -184,7 +180,7 @@ export const ProjectAppBar = () => {
           <MeasurementsButton />
         </>
       )}
-      {alertState.visible && <AlertBar alertState={alertState} />}
+
       <ConfirmationDialog
         title={`Delete ${pluralize(
           "Object",
