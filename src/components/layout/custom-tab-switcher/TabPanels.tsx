@@ -50,7 +50,7 @@ export function BasicTabPanel(props: CommonTabPanelProps) {
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
       {...other}
-      style={{ height: "calc(100% - 49px)" }}
+      style={{ height: "calc(100% - 49px)", overflowY: "hidden" }}
     >
       {value === index && (
         <Box
