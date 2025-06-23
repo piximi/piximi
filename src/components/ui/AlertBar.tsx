@@ -98,7 +98,7 @@ export const AlertBar = ({
   };
 
   return (
-    <div style={{ position: "absolute", width: "100%", zIndex: 5000 }}>
+    <div style={{ position: "absolute", width: "100%", top: 0, zIndex: 5000 }}>
       <StyledToolbar>
         {errorStateIcon}
 

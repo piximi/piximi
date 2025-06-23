@@ -12,9 +12,13 @@ import { WelcomeScreen } from "./views/WelcomeScreen";
 
 import { FileUploadProvider, HelpProvider } from "contexts";
 import HelpOverlay from "views/HelpOverlay";
+import { useSelector } from "react-redux";
+import { selectAlertState } from "store/applicationSettings/selectors";
+import { AlertBar } from "components/ui";
 
 export const Application = () => {
   const theme = usePreferredMuiTheme();
+  const alertState = useSelector(selectAlertState);
 
   return (
     <StyledEngineProvider injectFirst>
@@ -23,6 +27,7 @@ export const Application = () => {
         <FileUploadProvider>
           <HelpProvider>
             <HelpOverlay />
+            {alertState.visible && <AlertBar alertState={alertState} />}
             <BrowserRouter basename={"/"}>
               <Routes>
                 <Route path="/" element={<WelcomeScreen />} />
