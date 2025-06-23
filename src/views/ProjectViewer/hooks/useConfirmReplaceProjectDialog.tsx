@@ -33,7 +33,7 @@ const ConfirmReplaceDialog = ({
     );
   };
   return (
-    <Dialog open={open} onClose={onDismiss}>
+    <Dialog open={open} onClose={onDismiss} data-testid="confirm-replace-dialog">
       <DialogTitle>{"Current Project will be lost"}</DialogTitle>
       <DialogContent>
         <DialogContentText>
