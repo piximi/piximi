@@ -131,6 +131,11 @@ export const ImageViewerCategories = () => {
     setSelectedKind(undefined);
   };
 
+  const handleDialogCloseAndDeselectKind = () => {
+    handleCloseCreateCategoryDialog();
+    setSelectedKind(undefined);
+  };
+
   const handleEditKind = () => {
     handleCloseKindMenu();
     setEditingKind(selectedKind);
@@ -237,7 +242,7 @@ export const ImageViewerCategories = () => {
         <>
           <CategoryDialog
             kind={selectedKind}
-            onClose={handleCloseCreateCategoryDialog}
+            onClose={handleDialogCloseAndDeselectKind}
             open={isCreateCategoryDialogOpen}
             action="create"
             onConfirm={handleCreateCategory}
