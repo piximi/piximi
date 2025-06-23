@@ -243,6 +243,7 @@ export const WelcomeScreen = () => {
               variant="outlined"
               color="primary"
               sx={{ width: "210px" }}
+              data-testid="start-new-project"
             >
               Start New Project
             </Button>
@@ -252,6 +253,7 @@ export const WelcomeScreen = () => {
               variant="outlined"
               tabIndex={-1}
               sx={{ width: "210px" }}
+              data-testid="upload-project"
             >
               Upload Project
               <VisuallyHiddenInput
@@ -268,6 +270,7 @@ export const WelcomeScreen = () => {
               variant="outlined"
               color="primary"
               sx={{ width: "210px" }}
+              data-testid="open-example-project"
             >
               Open Example Project
             </Button>
@@ -282,6 +285,7 @@ export const WelcomeScreen = () => {
               variant="outlined"
               color="primary"
               sx={{ width: "210px" }}
+                data-testid="documentation"
             >
               Documentation
             </Button>
