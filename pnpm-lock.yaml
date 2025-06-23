@@ -95,12 +95,15 @@ importers:
       lodash:
         specifier: ^4.17.20
         version: 4.17.21
+      markdown-to-jsx:
+        specifier: ^7.7.8
+        version: 7.7.8(react@17.0.2)
       memoize-one:
         specifier: ^6.0.0
         version: 6.0.0
       mui-markdown:
         specifier: ^1.2.5
-        version: 1.2.6(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react@17.0.2))(@mui/material@6.4.11(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(markdown-to-jsx@7.7.6(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 1.2.6(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react@17.0.2))(@mui/material@6.4.11(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(markdown-to-jsx@7.7.8(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       ngraph.graph:
         specifier: ^19.1.0
         version: 19.1.0
@@ -3122,8 +3125,8 @@ packages:
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
 
-  markdown-to-jsx@7.7.6:
-    resolution: {integrity: sha512-/PWFFoKKMidk4Ut06F5hs5sluq1aJ0CGvUJWsnCK6hx/LPM8vlhvKAxtGHJ+U+V2Il2wmnfO6r81ICD3xZRVaw==}
+  markdown-to-jsx@7.7.8:
+    resolution: {integrity: sha512-e+5bQJ30iIyJUV4tH/3wuBjpE5muLXsuBBi30N9t3B9O+UomC1Ocdqu7uD3X4YqtPrNLz+6QwHJaD7CXURBi+w==}
     engines: {node: '>= 10'}
     peerDependencies:
       react: '>= 0.14.0'
@@ -7985,7 +7988,7 @@ snapshots:
 
   markdown-table@3.0.4: {}
 
-  markdown-to-jsx@7.7.6(react@17.0.2):
+  markdown-to-jsx@7.7.8(react@17.0.2):
     dependencies:
       react: 17.0.2
 
@@ -8539,12 +8542,12 @@ snapshots:
 
   ms@2.1.3: {}
 
-  mui-markdown@1.2.6(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react@17.0.2))(@mui/material@6.4.11(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(markdown-to-jsx@7.7.6(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
+  mui-markdown@1.2.6(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react@17.0.2))(@mui/material@6.4.11(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(markdown-to-jsx@7.7.8(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
     dependencies:
       '@emotion/react': 11.14.0(@types/react@17.0.85)(react@17.0.2)
       '@emotion/styled': 11.14.0(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react@17.0.2)
       '@mui/material': 6.4.11(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react@17.0.2))(@types/react@17.0.85)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
-      markdown-to-jsx: 7.7.6(react@17.0.2)
+      markdown-to-jsx: 7.7.8(react@17.0.2)
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
     optionalDependencies:
