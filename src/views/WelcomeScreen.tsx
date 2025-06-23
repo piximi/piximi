@@ -285,7 +285,7 @@ export const WelcomeScreen = () => {
               variant="outlined"
               color="primary"
               sx={{ width: "210px" }}
-                data-testid="documentation"
+              data-testid="documentation"
             >
               Documentation
             </Button>
