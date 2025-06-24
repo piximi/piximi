@@ -38,9 +38,7 @@ export const ProjectImageGrid = () => {
     window.innerWidth - DIMENSIONS.leftDrawerWidth - DIMENSIONS.toolDrawerWidth,
   );
   const [height, setHeight] = useState<number>(
-    window.innerHeight -
-      DIMENSIONS.stageInfoHeight -
-      DIMENSIONS.toolDrawerWidth,
+    window.innerHeight - DIMENSIONS.toolDrawerWidth,
   );
 
   //useDefaultImage(DispatchLocation.ImageViewer);
