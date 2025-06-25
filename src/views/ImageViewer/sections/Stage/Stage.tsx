@@ -216,6 +216,7 @@ export const Stage = ({
   }, [draggable, stageRef, dispatch, stageHeight, stageWidth]);
 
   useEffect(() => {
+    console.log(activeImage);
     if (!activeImage?.shape) return;
     dispatch(
       imageViewerSlice.actions.setImageOrigin({

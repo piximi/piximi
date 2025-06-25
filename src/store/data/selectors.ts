@@ -47,12 +47,12 @@ export const selectCategoriesDictionary = categorySelectors.selectEntities; // r
 const selectAllThings = thingsSelectors.selectAll; // returns an array
 export const selectThingsDictionary = thingsSelectors.selectEntities; // returns dict
 
-//export const selectImageDictionary = imageSelectors.selectEntities; // returns dict
+export const selectImageDictionary = imageSelectors.selectEntities; // returns dict
 export const selectImageArray = imageSelectors.selectAll; // returns an array
 //export const selectImageIds = imageSelectors.selectIds;
 //export const selectImageCount = imageSelectors.selectTotal;
 
-//export const selectAnnotationDictionary = annotationSelectors.selectEntities; // returns dict
+export const selectAnnotationDictionary = annotationSelectors.selectEntities; // returns dict
 const selectAnnotationArray = annotationSelectors.selectAll; // returns an array
 //export const selectAnotationIds = annotationSelectors.selectIds;
 //export const selectAnnotationCount = annotationSelectors.selectTotal;

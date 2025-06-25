@@ -2,7 +2,6 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 
 import { dataSlice } from "./dataSlice";
 
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { createRenderedTensor } from "utils/tensorUtils";
@@ -75,8 +74,7 @@ startAppListening({
   actionCreator: dataSlice.actions.updateThings,
   effect: async (action, listenerAPI) => {
     const { updates } = action.payload;
-    const { data: dataState, imageViewer: imageViewerState } =
-      listenerAPI.getState();
+    const { data: dataState } = listenerAPI.getState();
 
     const srcUpdates: Array<{ id: string } & Partial<ImageObject>> = [];
     let renderedSrcs: string[] = [];
@@ -101,13 +99,7 @@ startAppListening({
         );
 
         srcUpdates.push({ id: imageId, src: renderedSrcs[image.activePlane] });
-        if (imageId === imageViewerState.activeImageId) {
-          listenerAPI.dispatch(
-            imageViewerSlice.actions.setActiveImageRenderedSrcs({
-              renderedSrcs,
-            }),
-          );
-        }
+
         listenerAPI.dispatch(
           applicationSettingsSlice.actions.setLoadMessage({
             message: `Updating image ${imageNumber} of ${numImages}`,

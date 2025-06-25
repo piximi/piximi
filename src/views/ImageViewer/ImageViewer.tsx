@@ -64,6 +64,7 @@ export const ImageViewer = () => {
   );
 
   useEffect(() => {
+    console.log(routerLocation.state);
     dispatch(
       imageViewerSlice.actions.prepareImageViewer({
         selectedThingIds: routerLocation.state?.initialThingIds

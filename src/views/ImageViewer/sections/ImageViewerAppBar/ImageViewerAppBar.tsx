@@ -42,7 +42,7 @@ export const ImageViewerLogo = () => {
             prevImageId: activeImageId,
           }),
         );
-        dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
+        dispatch(imageViewerSlice.actions.setImageStack({ images: [] }));
         dispatch(
           annotatorSlice.actions.setSelectedAnnotationIds({
             annotationIds: [],
