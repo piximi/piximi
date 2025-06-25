@@ -7,7 +7,6 @@ import { imageViewerSlice } from "./imageViewerSlice";
 
 import { createRenderedTensor } from "utils/tensorUtils";
 
-import { AnnotationObject, ImageObject } from "store/data/types";
 import { TypedAppStartListening } from "store/types";
 
 export const imageViewerMiddleware = createListenerMiddleware();
@@ -17,33 +16,52 @@ const startAppListening =
 startAppListening({
   actionCreator: imageViewerSlice.actions.prepareImageViewer,
   effect: (action, listenerAPI) => {
-    const selectedThingIds = action.payload.selectedThingIds;
+    const { images: initialImageIds, annotations: annotationIds } =
+      action.payload.selectedThingIds;
     const dataState = listenerAPI.getState().data;
-    if (selectedThingIds.length === 0) return;
-    let imageIds: string[] = [];
-    const annotationIds: string[] = [];
+    if (initialImageIds.length === 0 && annotationIds.length === 0) return;
+
     let activeImageId: string | undefined = undefined;
-    selectedThingIds.forEach((thingId) => {
-      const thing = dataState.things.entities[thingId];
-      if (thing) {
-        if (thing.kind === "Image") {
-          imageIds.push(thingId);
-          if (!activeImageId) {
-            activeImageId = thing.id;
-          }
-        } else {
-          annotationIds.push(thingId);
-          imageIds.push((thing as AnnotationObject).imageId);
-        }
+    const imageIdsFromAnn: string[] = [];
+    annotationIds.forEach((annotationId) => {
+      const annotation = dataState.annotations.entities[annotationId];
+      if (annotation) {
+        imageIdsFromAnn.push(annotation.imageId);
       }
     });
 
-    imageIds = [...new Set(imageIds)];
+    // imageIdsFromAnn is first to ensure that initial visible image contains the working annotation, if any
+    const imageIds = [...new Set([...imageIdsFromAnn, ...initialImageIds])];
     if (imageIds.length > 0 && !activeImageId) {
       activeImageId = imageIds[0];
     }
 
-    listenerAPI.dispatch(imageViewerSlice.actions.setImageStack({ imageIds }));
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setImageStack({
+        images: imageIds.reduce(
+          (
+            images: Record<
+              string,
+              {
+                activePlane: number;
+                activeTimepoint: number;
+                renderedSrcs: Record<number, string[]>;
+              }
+            >,
+            id,
+          ) => {
+            images[id] = {
+              activePlane: 0,
+              activeTimepoint: 0,
+              renderedSrcs: {},
+            };
+            return images;
+          },
+          {},
+        ),
+      }),
+    );
+
     listenerAPI.dispatch(
       annotatorSlice.actions.setSelectedAnnotationIds({
         annotationIds,
@@ -69,9 +87,10 @@ startAppListening({
     listenerAPI.dispatch(
       imageViewerSlice.actions.setImageIsLoading({ isLoading: true }),
     );
-    const newActiveImageId = action.payload.imageId;
-    const dataState = listenerAPI.getState().data;
-    if (!newActiveImageId) {
+    const activeImageSeriesId = action.payload.imageId;
+    const { data: dataState, imageViewer: imageViewerState } =
+      listenerAPI.getState();
+    if (!activeImageSeriesId) {
       listenerAPI.dispatch(
         imageViewerSlice.actions.setActiveImageRenderedSrcs({
           renderedSrcs: [],
@@ -82,19 +101,29 @@ startAppListening({
       );
       return;
     }
-    const activeImage = dataState.things.entities[
-      newActiveImageId
-    ]! as ImageObject;
+    const activeTimepoint =
+      imageViewerState.imageStack[activeImageSeriesId].activeTimepoint;
+    const activeImageSeries = dataState.images.entities[activeImageSeriesId];
+    const activeImage = activeImageSeries.timepoints[activeTimepoint];
+
+    const activeAnnotationIds = activeImageSeries.containing.reduce(
+      (annIds: string[], id) => {
+        const annotation = dataState.annotations.entities[id];
+        if (annotation.timepoint === activeTimepoint) annIds.push(id);
+        return annIds;
+      },
+      [],
+    );
 
     listenerAPI.dispatch(
       imageViewerSlice.actions.setActiveAnnotationIds({
-        annotationIds: activeImage.containing,
+        annotationIds: activeAnnotationIds,
       }),
     );
     const renderedSrcs = await createRenderedTensor(
       activeImage.data,
       activeImage.colors,
-      activeImage.bitDepth,
+      activeImageSeries.bitDepth,
       undefined,
     );
 

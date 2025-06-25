@@ -101,3 +101,19 @@ export const selectThingChanges = ({
 }) => {
   return annotator.changes.things;
 };
+
+export const selectImageChanges = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}) => {
+  return annotator.changes.images;
+};
+
+export const selectAnnotationChanges = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}) => {
+  return annotator.changes.annotations;
+};

@@ -6,13 +6,17 @@ import {
   selectKindChanges,
   selectSelectedAnnotationIds,
   selectThingChanges,
+  selectImageChanges,
   selectWorkingAnnotationEntity,
+  selectAnnotationChanges,
 } from "./selectors";
 import {
   selectObjectCategoryDict,
   selectObjectDict,
   selectObjectKindDict,
   selectThingsDictionary,
+  selectImageDictionary,
+  selectAnnotationDictionary,
 } from "store/data/selectors";
 import {
   selectActiveImageId,
@@ -29,47 +33,39 @@ import {
   ImageObject,
   Kind,
   Shape,
+  TSImageObject,
 } from "store/data/types";
 import { Colors, ColorsRaw } from "utils/types";
 import { ProtoAnnotationObject } from "views/ImageViewer/utils/types";
 
 export const selectImageViewerImages = createSelector(
   selectImageStackImageIds,
-  selectThingsDictionary,
-  selectThingChanges,
-  (imageIds, things, thingChanges) => {
-    const images: Record<string, ImageObject> = {};
-    const newObjectsByImage = Object.values(thingChanges.added).reduce(
-      (byImage: Record<string, string[]>, change) => {
-        byImage[change.imageId] = [
-          ...(byImage[change.imageId] ?? []),
-          change.id,
-        ];
-        return byImage;
-      },
-      {},
-    );
-    for (const imageId of imageIds) {
-      const image = things[imageId] as ImageObject;
+  selectImageDictionary,
+  selectAnnotationChanges,
+  selectImageChanges,
+  (imageIds, images, imageChanges) => {
+    const updatedImages: Record<string, ImageObject> = {};
+
+    for (const imageId of Object.keys(imageIds)) {
+      const image = images[imageId] as TSImageObject;
       let finalImage = { ...image };
-      if (thingChanges.deleted.includes(imageId)) {
-        continue;
-      } else if (thingChanges.edited[imageId]) {
-        const { id: _id, ...imageChanges } = thingChanges.edited[imageId];
+      if (imageChanges.edited[imageId]) {
+        const { id: _id, ...imageChanges } = imageChanges.edited[imageId];
 
         finalImage = { ...finalImage, ...imageChanges };
       }
       finalImage.containing = difference(
         finalImage.containing,
-        thingChanges.deleted,
+        imageChanges.deleted,
       );
       finalImage.containing.push(...(newObjectsByImage[imageId] ?? []));
-      images[imageId] = finalImage;
+      updatedImages[imageId] = finalImage;
     }
 
-    return images;
+    return updatedImages;
   },
 );
+
 export const selectImagesArray = createSelector(
   selectImageViewerImages,
   (images) => Object.values(images),

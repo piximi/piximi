@@ -36,6 +36,8 @@ export const initialState: AnnotatorState = {
     kinds: { added: {}, deleted: [], edited: {} },
     categories: { added: {}, deleted: [], edited: {} },
     things: { added: {}, deleted: [], edited: {} },
+    images: { added: {}, deleted: [], edited: {} },
+    annotations: { added: {}, deleted: [], edited: {} },
   },
   annotationState: AnnotationState.Blank,
   penSelectionBrushSize: 10,

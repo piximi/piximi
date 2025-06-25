@@ -12,7 +12,7 @@ import {
 } from "views/ImageViewer/utils/types";
 
 const initialState: ImageViewerState = {
-  imageStack: [],
+  imageStack: {},
   colorAdjustment: {
     blackPoint: 0,
     brightness: 0,
@@ -61,10 +61,24 @@ export const imageViewerSlice = createSlice({
     resetImageViewer: () => initialState,
     prepareImageViewer: (
       _state,
-      _action: PayloadAction<{ selectedThingIds: string[] }>,
+      _action: PayloadAction<{
+        selectedThingIds: { images: string[]; annotations: string[] };
+      }>,
     ) => {},
-    setImageStack(state, action: PayloadAction<{ imageIds: string[] }>) {
-      state.imageStack = action.payload.imageIds;
+    setImageStack(
+      state,
+      action: PayloadAction<{
+        images: Record<
+          string,
+          {
+            activePlane: number;
+            activeTimepoint: number;
+            renderedSrcs: Record<number, string[]>;
+          }
+        >;
+      }>,
+    ) {
+      state.imageStack = action.payload.images;
     },
     setHasUnsavedChanges(
       state,
@@ -147,7 +161,13 @@ export const imageViewerSlice = createSlice({
         renderedSrcs: Array<string>;
       }>,
     ) {
-      state.activeImageRenderedSrcs = action.payload.renderedSrcs;
+      const activeImageId = state.activeImageId;
+      if (!activeImageId)
+        throw new Error("Set rendered sources failed: No active image");
+
+      const activeImageDetails = state.imageStack[activeImageId];
+      activeImageDetails.renderedSrcs[activeImageDetails.activeTimepoint] =
+        action.payload.renderedSrcs;
     },
     setImageOrigin(
       state,

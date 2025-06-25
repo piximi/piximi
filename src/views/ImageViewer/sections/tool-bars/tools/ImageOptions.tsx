@@ -20,13 +20,21 @@ import { generateDefaultColors } from "utils/tensorUtils";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ImageOptions = () => {
+  return (
+    <Stack data-help={HelpItem.ImageTools} direction="row">
+      <ChannelAdjustment />
+      <ZStackSlider />
+    </Stack>
+  );
+};
+
+const ChannelAdjustment = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const t = useTranslation();
 
   const activeImage = useSelector(selectActiveImage);
   const progressMessage = useSelector(selectLoadMessage);
-  const renderedSrcs = useSelector(selectActiveImageRenderedSrcs);
 
   const handleResetChannelsClick = async () => {
     if (!activeImage) return;
@@ -39,6 +47,45 @@ export const ImageOptions = () => {
       }),
     );
   };
+
+  return (
+    <PopoverTool
+      name={t("Channel Adjustment")}
+      popoverElement={
+        <Box
+          sx={{
+            bgcolor: "background.paper",
+            minWidth: "200px",
+            borderRadius: "8px",
+          }}
+        >
+          <ChannelsList />
+
+          <Divider />
+
+          <List dense>
+            <CustomListItemButton
+              primaryText={t("Reset colors")}
+              onClick={handleResetChannelsClick}
+            />
+            <ApplyColorsButton />
+            {progressMessage && (
+              <CustomListItem primaryText={progressMessage} />
+            )}
+          </List>
+        </Box>
+      }
+    >
+      <ColorAdjustment color={theme.palette.action.active} />
+    </PopoverTool>
+  );
+};
+
+const ZStackSlider = () => {
+  const dispatch = useDispatch();
+  const t = useTranslation();
+  const activeImage = useSelector(selectActiveImage);
+  const renderedSrcs = useSelector(selectActiveImageRenderedSrcs);
 
   const zStackLimits = useMemo(() => {
     if (!activeImage) return { min: 0, max: 0, step: 1, initial: 0 };
@@ -66,61 +113,30 @@ export const ImageOptions = () => {
   };
 
   return (
-    <Stack data-help={HelpItem.ImageTools} direction="row">
-      <PopoverTool
-        name={t("Channel Adjustment")}
-        popoverElement={
-          <Box
-            sx={{
-              bgcolor: "background.paper",
-              minWidth: "200px",
-              borderRadius: "8px",
-            }}
-          >
-            <ChannelsList />
-
-            <Divider />
-
-            <List dense>
-              <CustomListItemButton
-                primaryText={t("Reset colors")}
-                onClick={handleResetChannelsClick}
-              />
-              <ApplyColorsButton />
-              {progressMessage && (
-                <CustomListItem primaryText={progressMessage} />
-              )}
-            </List>
-          </Box>
-        }
-      >
-        <ColorAdjustment color={theme.palette.action.active} />
-      </PopoverTool>
-      <PopoverTool
-        name={t("Z-Stack")}
-        disabled={zStackLimits.max === 0}
-        popoverElement={
-          <Box
-            sx={{
-              bgcolor: "background.paper",
-              borderRadius: "8px",
-            }}
-          >
-            <IncrementalSlider
-              min={zStackLimits.min}
-              max={zStackLimits.max}
-              step={zStackLimits.step}
-              initialValue={zStackLimits.initial}
-              callback={zStackCallback}
-              orientation="vertical"
-              length="100px"
-              callbackOnSlide={true}
-            />
-          </Box>
-        }
-      >
-        <LayersIcon />
-      </PopoverTool>
-    </Stack>
+    <PopoverTool
+      name={t("Z-Stack")}
+      disabled={zStackLimits.max === 0}
+      popoverElement={
+        <Box
+          sx={{
+            bgcolor: "background.paper",
+            borderRadius: "8px",
+          }}
+        >
+          <IncrementalSlider
+            min={zStackLimits.min}
+            max={zStackLimits.max}
+            step={zStackLimits.step}
+            initialValue={zStackLimits.initial}
+            callback={zStackCallback}
+            orientation="vertical"
+            length="100px"
+            callbackOnSlide={true}
+          />
+        </Box>
+      }
+    >
+      <LayersIcon />
+    </PopoverTool>
   );
 };
