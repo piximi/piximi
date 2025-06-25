@@ -36,7 +36,7 @@ export const initialState: AnnotatorState = {
     kinds: { added: {}, deleted: [], edited: {} },
     categories: { added: {}, deleted: [], edited: {} },
     things: { added: {}, deleted: [], edited: {} },
-    images: { added: {}, deleted: [], edited: {} },
+    images: {},
     annotations: { added: {}, deleted: [], edited: {} },
   },
   annotationState: AnnotationState.Blank,

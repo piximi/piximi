@@ -17,6 +17,7 @@ import {
   selectThingsDictionary,
   selectImageDictionary,
   selectAnnotationDictionary,
+  selectAnnotationIdsByImageTimepoint,
 } from "store/data/selectors";
 import {
   selectActiveImageId,
@@ -35,30 +36,44 @@ import {
   Shape,
   TSImageObject,
 } from "store/data/types";
+import { getFullTimepointImage } from "store/data/utils";
 import { Colors, ColorsRaw } from "utils/types";
 import { ProtoAnnotationObject } from "views/ImageViewer/utils/types";
 
 export const selectImageViewerImages = createSelector(
   selectImageStackImageIds,
   selectImageDictionary,
-  selectAnnotationChanges,
   selectImageChanges,
-  (imageIds, images, imageChanges) => {
-    const updatedImages: Record<string, ImageObject> = {};
-
+  selectAnnotationChanges,
+  (imageIds, images, imageChanges, annotationChanges) => {
+    const updatedImages: Record<string, TSImageObject> = {};
+    const neaAnnotationsByImage = Object.values(annotationChanges.added).reduce(
+      (annByIm: Record<string, string[]>, ann) => {
+        const imageId = ann.imageId;
+        if (!annByIm[imageId]) {
+          annByIm[imageId] = [];
+        }
+        annByIm[imageId].push(ann.id);
+        return annByIm;
+      },
+      {},
+    );
     for (const imageId of Object.keys(imageIds)) {
-      const image = images[imageId] as TSImageObject;
-      let finalImage = { ...image };
-      if (imageChanges.edited[imageId]) {
-        const { id: _id, ...imageChanges } = imageChanges.edited[imageId];
-
-        finalImage = { ...finalImage, ...imageChanges };
+      const image = { ...images[imageId] } as TSImageObject;
+      const finalImage = { ...image };
+      if (imageChanges[imageId]) {
+        Object.keys(imageChanges[imageId].timepoints).forEach((key) => {
+          finalImage.timepoints[+key] = {
+            ...finalImage.timepoints[+key],
+            ...imageChanges[imageId].timepoints[+key],
+          };
+        });
       }
       finalImage.containing = difference(
         finalImage.containing,
-        imageChanges.deleted,
+        annotationChanges.deleted,
       );
-      finalImage.containing.push(...(newObjectsByImage[imageId] ?? []));
+      finalImage.containing.push(...(neaAnnotationsByImage[imageId] ?? []));
       updatedImages[imageId] = finalImage;
     }
 
@@ -72,10 +87,16 @@ export const selectImagesArray = createSelector(
 );
 
 export const selectActiveImage = createSelector(
+  selectImageStackImageIds,
   selectActiveImageId,
   selectImageViewerImages,
-  (activeImageId, images) =>
-    activeImageId ? images[activeImageId] : undefined,
+  (imageDetails, activeImageId, images) =>
+    activeImageId
+      ? getFullTimepointImage(
+          images[activeImageId],
+          imageDetails[activeImageId].activeTimepoint,
+        )
+      : undefined,
 );
 export const selectActiveImageRawColor = createSelector(
   selectActiveImage,

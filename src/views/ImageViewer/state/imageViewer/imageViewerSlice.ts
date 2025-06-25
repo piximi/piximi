@@ -9,6 +9,7 @@ import { ImageViewerState } from "../../utils/types";
 import {
   ColorAdjustmentOptionsType,
   ZoomToolOptionsType,
+  ImageViewerImageDetails,
 } from "views/ImageViewer/utils/types";
 
 const initialState: ImageViewerState = {
@@ -68,14 +69,7 @@ export const imageViewerSlice = createSlice({
     setImageStack(
       state,
       action: PayloadAction<{
-        images: Record<
-          string,
-          {
-            activePlane: number;
-            activeTimepoint: number;
-            renderedSrcs: Record<number, string[]>;
-          }
-        >;
+        images: Record<string, ImageViewerImageDetails>;
       }>,
     ) {
       state.imageStack = action.payload.images;

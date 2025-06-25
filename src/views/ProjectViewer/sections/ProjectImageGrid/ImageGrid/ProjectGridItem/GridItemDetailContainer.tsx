@@ -8,7 +8,7 @@ import {
 import { ItemDetailTooltip } from "./ItemDetailTooltip";
 import { AnnotationDetailList, ImageDetailList } from "./GridDetailList";
 
-import { ImageGridObject, TSAnnotationObject } from "store/data/types";
+import { FullTimepointImage, TSAnnotationObject } from "store/data/types";
 
 export const ImageDetailContainer = ({
   position,
@@ -20,7 +20,7 @@ export const ImageDetailContainer = ({
   position: { top: number; left: number };
   backgroundColor: string;
   categoryName: string;
-  image: ImageGridObject;
+  image: FullTimepointImage;
   usePredictedStyle: boolean;
 }) => {
   const theme = useTheme();

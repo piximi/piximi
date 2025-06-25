@@ -209,9 +209,34 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
         }
       }
       if (convertedImages.length > 0) {
+        const tsConversion = convertedImages.map((im) => {
+          return {
+            id: im.id,
+            name: im.name,
+            kind: im.kind,
+            bitDepth: im.bitDepth,
+            containing: im.containing,
+            partition: im.partition,
+            shape: im.shape,
+            timepoints: {
+              0: {
+                colors: im.colors,
+                src: im.src,
+                data: im.data,
+                categoryId: im.categoryId,
+                activePlane: im.activePlane,
+              },
+            },
+          };
+        });
         dispatch(
           dataSlice.actions.addThings({
             things: convertedImages,
+          }),
+        );
+        dispatch(
+          dataSlice.actions.addTSImage({
+            images: tsConversion,
           }),
         );
         dispatch(
