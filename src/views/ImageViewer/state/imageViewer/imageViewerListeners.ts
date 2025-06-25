@@ -8,6 +8,7 @@ import { imageViewerSlice } from "./imageViewerSlice";
 import { createRenderedTensor } from "utils/tensorUtils";
 
 import { TypedAppStartListening } from "store/types";
+import { ImageViewerImageDetails } from "views/ImageViewer/utils/types";
 
 export const imageViewerMiddleware = createListenerMiddleware();
 const startAppListening =
@@ -39,21 +40,17 @@ startAppListening({
     listenerAPI.dispatch(
       imageViewerSlice.actions.setImageStack({
         images: imageIds.reduce(
-          (
-            images: Record<
-              string,
-              {
-                activePlane: number;
-                activeTimepoint: number;
-                renderedSrcs: Record<number, string[]>;
-              }
-            >,
-            id,
-          ) => {
+          (images: Record<string, ImageViewerImageDetails>, id) => {
             images[id] = {
+              id,
               activePlane: 0,
               activeTimepoint: 0,
-              renderedSrcs: {},
+              renderedSrcs: Object.keys(
+                dataState.images.entities[id].timepoints,
+              ).reduce((srcsByTps: Record<number, string[]>, tp) => {
+                srcsByTps[+tp] = [];
+                return srcsByTps;
+              }, {}),
             };
             return images;
           },

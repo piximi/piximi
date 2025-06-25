@@ -33,7 +33,7 @@ export type AnnotationObject = Thing & {
   imageId: string;
 };
 
-export type ImageTimePoint = {
+export type ImageTimepointData = {
   colors: Colors;
   src: string;
   data: Tensor4D;
@@ -48,11 +48,11 @@ export type TSImageObject = {
   containing: string[];
   partition: Partition;
   shape: Shape;
-  timepoints: Record<number, ImageTimePoint>;
+  timepoints: Record<number, ImageTimepointData>;
 };
 
-export type ImageGridObject = Omit<TSImageObject, "timePoints"> &
-  ImageTimePoint & { timepoint: number };
+export type FullTimepointImage = Omit<TSImageObject, "timepoints"> &
+  ImageTimepointData & { timepoint: number };
 
 export type TSAnnotationObject = {
   id: string;
@@ -132,7 +132,7 @@ export type ThingsUpdates = Array<
 export type ImageUpdates = Array<
   Partial<Omit<TSImageObject, "id" | "containing" | "timePoints">> & {
     id: string;
-    timePoints?: Record<number, Partial<ImageTimePoint>>;
+    timePoints?: Record<number, Partial<ImageTimepointData>>;
   }
 >;
 

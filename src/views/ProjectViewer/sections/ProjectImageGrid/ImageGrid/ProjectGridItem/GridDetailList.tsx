@@ -1,13 +1,13 @@
 import React from "react";
 import { List, ListItem, ListItemText } from "@mui/material";
 
-import { ImageGridObject, TSAnnotationObject } from "store/data/types";
+import { FullTimepointImage, TSAnnotationObject } from "store/data/types";
 
 export const ImageDetailList = ({
   image: image,
   color,
 }: {
-  image: ImageGridObject;
+  image: FullTimepointImage;
   color: string;
 }) => {
   return (

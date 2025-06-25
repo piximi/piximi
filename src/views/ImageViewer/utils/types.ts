@@ -1,25 +1,24 @@
-import { FilterType, RecursivePartial, RequireOnly } from "utils/types";
+import { FilterType, RecursivePartial, RequireOnly, Colors } from "utils/types";
 import { AnnotationMode, AnnotationState, ToolType, ZoomMode } from "./enums";
 import {
   AnnotationObject,
   Category,
   DecodedAnnotationObject,
-  ImageTimePoint,
+  ImageTimepointData,
   Kind,
   TSImageObject,
 } from "store/data/types";
 import { ReactElement } from "react";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
+export type ImageViewerImageDetails = {
+  id: string;
+  activePlane: number;
+  activeTimepoint: number;
+  renderedSrcs: Record<number, string[]>;
+};
 export type ImageViewerState = {
-  imageStack: Record<
-    string,
-    {
-      activePlane: number;
-      activeTimepoint: number;
-      renderedSrcs: Record<number, string[]>;
-    }
-  >;
+  imageStack: Record<string, ImageViewerImageDetails>;
   hasUnsavedChanges: boolean;
   colorAdjustment: ColorAdjustmentOptionsType;
   cursor: string;
@@ -99,9 +98,8 @@ export type AnnotatorChanges = {
     deleted: string[];
     edited: Record<string, CategoryEdits>;
   };
-  images: {
-    edited: Record<string, RecursivePartial<TSImageObject>>;
-  };
+  images: Record<string, { timepoints: Record<number, { colors: Colors }> }>;
+
   annotations: {
     added: Record<string, ProtoAnnotationObject>;
     deleted: string[];

@@ -19,10 +19,10 @@ import {
 } from "../../hooks";
 
 import { NewKindDialog } from "views/ImageViewer/components/dialogs/NewKindDialog";
-import { Cursor } from "./Cursor";
+//import { Cursor } from "./Cursor";
 import { Layer } from "./Layer";
-import { Selection } from "./Selection";
-import { Annotations } from "./Annotations";
+//import { Selection } from "./Selection";
+//import { Annotations } from "./Annotations";
 import { Image } from "./Image";
 
 import { StageContext } from "../../state/StageContext";
@@ -30,15 +30,15 @@ import { imageViewerSlice } from "../../state/imageViewer";
 import { annotatorSlice } from "../../state/annotator";
 import {
   selectAnnotationState,
-  selectToolType,
+  //selectToolType,
 } from "../../state/annotator/selectors";
 import {
   selectActiveImage,
   selectImageViewerObjectsArray,
 } from "../../state/annotator/reselectors";
 import {
-  selectActiveImageId,
-  selectActiveImageRenderedSrcs,
+  //selectActiveImageId,
+  //selectActiveImageRenderedSrcs,
   selectImageIsloading,
   selectStagePosition,
 } from "../../state/imageViewer/selectors";
@@ -47,12 +47,13 @@ import { generateKind, generateUUID } from "store/data/utils";
 
 import { CATEGORY_COLORS } from "store/data/constants";
 import { DIMENSIONS } from "utils/constants";
-import { AnnotationState, ToolType } from "views/ImageViewer/utils/enums";
+import { AnnotationState /*ToolType*/ } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/enums";
 
 import { Category } from "store/data/types";
 import { createProtoAnnotation } from "views/ImageViewer/utils/annotationUtils";
 import { Partition } from "utils/models/enums";
+import { selectActiveImageDetails } from "views/ImageViewer/state/imageViewer/newSelectors";
 
 export const Stage = ({
   stageWidth,
@@ -66,19 +67,23 @@ export const Stage = ({
 
   const [draggable, setDraggable] = useState<boolean>(false);
   const [htmlImages, setHtmlImages] = useState<HTMLImageElement[]>([]);
+
   // useRef
   const imageRef = useRef<Konva.Image | null>(null);
   const stageRef = useContext(StageContext);
 
-  // useSelector
-  const toolType = useSelector(selectToolType);
-  const stagePosition = useSelector(selectStagePosition);
-  const imageIsLoading = useSelector(selectImageIsloading);
-  const annotationState = useSelector(selectAnnotationState);
-  const renderedSrcs = useSelector(selectActiveImageRenderedSrcs);
-  const activeImageId = useSelector(selectActiveImageId);
+  // data Selectors
+  const activeImageDetails = useSelector(selectActiveImageDetails);
   const activeImage = useSelector(selectActiveImage);
   const existingObjects = useSelector(selectImageViewerObjectsArray);
+
+  // tool selectors
+  //const toolType = useSelector(selectToolType);
+  const imageIsLoading = useSelector(selectImageIsloading);
+  const annotationState = useSelector(selectAnnotationState);
+
+  // stage selectors
+  const stagePosition = useSelector(selectStagePosition);
 
   const { annotationTool } = useAnnotationTool();
   const { noKindAvailable, setNoKindAvailable } =
@@ -229,14 +234,17 @@ export const Stage = ({
   }, [stageWidth, stageHeight, activeImage?.shape, dispatch]);
 
   useEffect(() => {
+    if (!activeImageDetails || !activeImageDetails.renderedSrcs) return;
     setHtmlImages(
-      renderedSrcs.map((src: string) => {
-        const imgElem = document.createElement("img");
-        imgElem.src = src;
-        return imgElem;
-      }),
+      activeImageDetails.renderedSrcs[activeImageDetails.activeTimepoint].map(
+        (src: string) => {
+          const imgElem = document.createElement("img");
+          imgElem.src = src;
+          return imgElem;
+        },
+      ),
     );
-  }, [renderedSrcs, stageRef, dispatch]);
+  }, [activeImageDetails, stageRef, dispatch]);
 
   useEffect(() => {
     stageRef?.current?.scale({ x: 1, y: 1 });
@@ -245,7 +253,7 @@ export const Stage = ({
         stagePosition: { x: 0, y: 0 },
       }),
     );
-  }, [activeImageId, stageRef, dispatch]);
+  }, [activeImageDetails, stageRef, dispatch]);
 
   useHotkeys(
     "alt",
@@ -293,7 +301,7 @@ export const Stage = ({
               ) : (
                 <></>
               )}
-              {(annotationState === AnnotationState.Annotating ||
+              {/* {(annotationState === AnnotationState.Annotating ||
                 toolType === ToolType.QuickAnnotation) && ( //TODO: remind myself why quick annotation special
                 <Selection tool={annotationTool} toolType={toolType} />
               )}
@@ -307,7 +315,7 @@ export const Stage = ({
               />
               {!imageIsLoading && (
                 <Annotations annotationTool={annotationTool} />
-              )}
+              )} */}
             </Layer>
           </StageContext.Provider>
         </Provider>

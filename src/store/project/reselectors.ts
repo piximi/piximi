@@ -5,7 +5,7 @@ import {
   selectAllKindIds,
   selectAnnotationsByKind,
   selectCategoriesDictionary,
-  selectImageGridImages,
+  selectFullTimepointImages,
   selectKindDictionary,
   selectThingsDictionary,
 } from "store/data/selectors";
@@ -24,7 +24,7 @@ import { Partition } from "utils/models/enums";
 
 import {
   AnnotationObject,
-  ImageGridObject,
+  FullTimepointImage,
   ImageObject,
   Thing,
   TSAnnotationObject,
@@ -226,10 +226,12 @@ export const selectActiveThingsByPartition = createSelector(
 );
 
 export const selectFilteredGridImages = createSelector(
-  selectImageGridImages,
+  selectFullTimepointImages,
   selectThingFilters,
-  (allImages, filters) => {
-    return allImages.filter((image) => !isFiltered(image, filters ?? {}));
+  (fullTimePointImages, filters) => {
+    return fullTimePointImages(0).filter(
+      (image) => !isFiltered(image, filters ?? {}),
+    );
   },
 );
 
@@ -238,7 +240,7 @@ export const selectSelectedGridImages = createSelector(
   selectFilteredGridImages,
   (selectedImages, filteredImages) => {
     return Object.entries(selectedImages).reduce(
-      (visible: ImageGridObject[], [id, timepoints]) => {
+      (visible: FullTimepointImage[], [id, timepoints]) => {
         timepoints.forEach((tp) => {
           const imageIndex = filteredImages.findIndex(
             (image) => image.id === id && image.timepoint === tp,

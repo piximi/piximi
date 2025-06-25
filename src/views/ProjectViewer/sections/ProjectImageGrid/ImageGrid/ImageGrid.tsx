@@ -13,14 +13,14 @@ import { projectSlice } from "store/project";
 import { selectSelectedImages } from "store/project/selectors";
 
 import { GRID_GAP } from "utils/constants";
-import { ImageGridObject } from "store/data/types";
+import { FullTimepointImage } from "store/data/types";
 import { useWindowGrid } from "views/ProjectViewer/hooks/useWindowGrid";
 import { ImageGridCell } from "./ProjectGridItem/ImageGridItem";
 import { selectFilteredGridImages } from "store/project/reselectors";
 
 const createItemData = memoize(
   (
-    images: ImageGridObject[],
+    images: FullTimepointImage[],
     handleSelectImage: (
       id: string,
       timepoint: number,
@@ -47,7 +47,7 @@ export const ImageGrid = () => {
   //const [visibleThings, setVisibleThings] = useState<Things>([]);
 
   const sortedImages = useMemo(
-    () => filteredImages.sort(sortFunction) as ImageGridObject[],
+    () => filteredImages.sort(sortFunction) as FullTimepointImage[],
     [filteredImages, sortFunction],
   );
 

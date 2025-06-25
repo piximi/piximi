@@ -13,13 +13,14 @@ import { RootState } from "store/rootReducer";
 import {
   AnnotationObject,
   Category,
-  ImageGridObject,
+  FullTimepointImage,
   ImageObject,
   Kind,
   TSAnnotationObject,
 } from "./types";
 import { DataState } from "store/types";
 import { updateRecordArray } from "utils/objectUtils";
+import { getFullTimepointImage } from "./utils";
 
 const kindsSelectors = kindsAdapter.getSelectors(
   (state: RootState) => state.data.kinds,
@@ -288,17 +289,52 @@ export const selectAnnotationsByKind = createSelector(
 //   },
 // );
 
-export const selectImageGridImages = createSelector(
+export const selectFullTimepointImages = createSelector(
   selectImageArray,
-  (images) => {
-    return images.reduce((images: ImageGridObject[], tsImage) => {
-      const { timepoints, ...base } = tsImage;
-      images.push({
-        ...base,
-        ...timepoints[0],
-        timepoint: 0,
-      } as ImageGridObject);
-      return images;
-    }, []);
+  (images) =>
+    (timepoint?: number): FullTimepointImage[] => {
+      if (timepoint !== undefined) {
+        return images.reduce((images: FullTimepointImage[], tsImage) => {
+          images.push(getFullTimepointImage(tsImage, timepoint));
+          return images;
+        }, []);
+      }
+
+      return images.reduce((images: FullTimepointImage[], tsImage) => {
+        Object.entries(tsImage.timepoints).forEach(([tp, data]) => {
+          images.push({
+            ...tsImage,
+            ...data,
+            timepoint: +tp,
+          });
+        });
+        return images;
+      }, []);
+    },
+);
+
+export const selectAnnotationIdsByImageTimepoint = createSelector(
+  selectAnnotationArray,
+  (annotations) => {
+    const byImageTimepoint: Record<string, Record<number, string[]>> = {};
+
+    annotations.forEach((annotation) => {
+      if (!(annotation.imageId in byImageTimepoint)) {
+        byImageTimepoint[annotation.imageId] = {
+          [annotation.timepoint]: [annotation.id],
+        };
+      } else if (
+        !(annotation.timepoint in byImageTimepoint[annotation.imageId])
+      ) {
+        byImageTimepoint[annotation.imageId][annotation.timepoint] = [
+          annotation.id,
+        ];
+      } else {
+        byImageTimepoint[annotation.imageId][annotation.timepoint].push(
+          annotation.id,
+        );
+      }
+    });
+    return byImageTimepoint;
   },
 );

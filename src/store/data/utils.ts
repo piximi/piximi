@@ -3,7 +3,11 @@ import { union } from "lodash";
 import IJSImage from "image-js";
 import { tensor2d, image as tfImage } from "@tensorflow/tfjs";
 
-import { ImageObject } from "store/data/types";
+import {
+  ImageObject,
+  TSImageObject,
+  FullTimepointImage,
+} from "store/data/types";
 import {
   UNKNOWN_CATEGORY_NAME,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
@@ -151,5 +155,32 @@ export const getPropertiesFromImageSync = (
     imageId: image.id,
     boundingBox: bbox as [number, number, number, number],
     bitDepth: image.bitDepth,
+  };
+};
+
+export const getFullTimepointImage = (
+  timeSeriesImage: TSImageObject,
+  timePoint: number,
+): FullTimepointImage => {
+  const timePointData = timeSeriesImage.timepoints[timePoint];
+  if (!timePointData) {
+    throw new Error(
+      `Time point ${timePoint} does not exist in image ${timeSeriesImage.id}`,
+    );
+  }
+  return {
+    id: timeSeriesImage.id,
+    name: timeSeriesImage.name,
+    kind: timeSeriesImage.kind,
+    bitDepth: timeSeriesImage.bitDepth,
+    containing: timeSeriesImage.containing,
+    partition: timeSeriesImage.partition,
+    shape: timeSeriesImage.shape,
+    src: timePointData.src,
+    data: timePointData.data,
+    colors: timePointData.colors,
+    categoryId: timePointData.categoryId,
+    activePlane: timePointData.activePlane,
+    timepoint: timePoint,
   };
 };

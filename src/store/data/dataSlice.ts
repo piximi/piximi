@@ -35,7 +35,7 @@ import {
   DecodedTSAnnotationObject,
   ImageUpdates,
   AnnotationUpdates,
-  ImageTimePoint,
+  ImageTimepointData,
 } from "./types";
 
 const { kind: imageKind, unknownCategory } = generateKind("Image");
@@ -893,11 +893,11 @@ export const dataSlice = createSlice({
           //@ts-ignore typescript doesnt know that "changes" contains valid entried for TSImageObject
           image[change[0]] = change[1];
         });
-        const updatedTimePoints: Record<number, ImageTimePoint> = {};
+        const updatedTimePoints: Record<number, ImageTimepointData> = {};
 
         if (timePoints) {
           Object.entries(timePoints).forEach(
-            (change: [string, Partial<ImageTimePoint>]) => {
+            (change: [string, Partial<ImageTimepointData>]) => {
               // @ts-ignore : Error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
               updatedTimePoints[+change[0]] = {
                 ...image.timepoints[+change[0]],
