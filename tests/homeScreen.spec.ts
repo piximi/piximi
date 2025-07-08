@@ -9,7 +9,6 @@ test('Start New Project', async ({ page }) => {
   await expect(page ).toHaveURL(/\/project/);
 });
 
-
 test('Documenation', async ({ page }) => {
   await page.goto('http://localhost:3000/');
 
@@ -26,10 +25,8 @@ test('Documenation', async ({ page }) => {
     documentationButton.click(),
   ]);
 
-
   await newTab.waitForLoadState();
   await expect(newTab).toHaveURL('https://documentation.piximi.app/intro.html');
-
 
 });
 

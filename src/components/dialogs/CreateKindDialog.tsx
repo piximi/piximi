@@ -84,6 +84,7 @@ export const CreateKindDialog = ({
           gap={2}
         >
           <TextField
+            data-testid="create-kind-name-input"
             error={isInvalidName && name !== ""}
             autoComplete="off"
             autoFocus

@@ -13,6 +13,7 @@ export const OpenProjectListItem = () => {
     <>
       <CustomListItemButton
         data-help={HelpItem.OpenMenu}
+        data-testid="open-project-button"
         primaryText="Open"
         onClick={onOpen}
         icon={<FolderOpenIcon />}

@@ -126,10 +126,12 @@ export const ProjectAppBar = () => {
             onClick={handleSelectAll}
             disabled={allSelected}
             icon={true}
+            data-testid="select-all-button"
           >
             <Badge
               badgeContent={unfilteredSelectedThings.length}
               color="primary"
+              data-testid="select-all-badge"
               sx={(theme) => ({
                 "& .MuiBadge-badge": {
                   top: 8,

@@ -35,3 +35,29 @@ test('Start New Project Flow', async ({ page }) => {
     // console.log("the value is: " + value);
 
 });
+
+
+test('should open menu when Open button is clicked', async ({ page }) => {
+    await page.goto('http://localhost:3000/project');
+    const openButton = page.getByRole('button', { name: /open/i });
+
+    await expect(openButton).toBeVisible();
+    await expect(openButton).toBeEnabled();
+
+    const menu = page.locator('[role="menu"]').first();
+    await expect(menu).not.toBeVisible();
+
+    await openButton.click();
+
+    await expect(menu).toBeVisible();
+
+    const projectMenuItem = page.getByRole('menuitem', { name: /project/i });
+    const imageMenuItem = page.getByRole('menuitem', { name: /image/i });
+    const annotationMenuItem = page.getByRole('menuitem', { name: /annotation/i });
+
+    await expect(projectMenuItem).toBeVisible();
+    await expect(imageMenuItem).toBeVisible();
+    await expect(annotationMenuItem).toBeVisible();
+
+});
+

@@ -66,7 +66,7 @@ const Cell = memo(
     const thing = data.things[thingIdx];
 
     return (
-      <div style={style}>
+      <div style={style} data-testid={`grid-image-${thing.id}`}>
         <ProjectGridItem
           key={thing.id}
           thing={thing}
