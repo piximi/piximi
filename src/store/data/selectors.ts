@@ -16,6 +16,7 @@ import {
   FullTimepointImage,
   ImageObject,
   Kind,
+  TPKey,
   TSAnnotationObject,
 } from "./types";
 import { DataState } from "store/types";
@@ -292,7 +293,7 @@ export const selectAnnotationsByKind = createSelector(
 export const selectFullTimepointImages = createSelector(
   selectImageArray,
   (images) =>
-    (timepoint?: number): FullTimepointImage[] => {
+    (timepoint?: TPKey): FullTimepointImage[] => {
       if (timepoint !== undefined) {
         return images.reduce((images: FullTimepointImage[], tsImage) => {
           images.push(getFullTimepointImage(tsImage, timepoint));
@@ -305,7 +306,7 @@ export const selectFullTimepointImages = createSelector(
           images.push({
             ...tsImage,
             ...data,
-            timepoint: +tp,
+            timepoint: tp,
           });
         });
         return images;
@@ -316,7 +317,7 @@ export const selectFullTimepointImages = createSelector(
 export const selectAnnotationIdsByImageTimepoint = createSelector(
   selectAnnotationArray,
   (annotations) => {
-    const byImageTimepoint: Record<string, Record<number, string[]>> = {};
+    const byImageTimepoint: Record<string, Record<TPKey, string[]>> = {};
 
     annotations.forEach((annotation) => {
       if (!(annotation.imageId in byImageTimepoint)) {

@@ -120,6 +120,7 @@
     "prepare": "husky install; node scripts/prepare.js",
     "prune-dead": "ts-prune",
     "no-console-logs": "./scripts/checkConsoleLogs.sh",
+    "no-unresolved-fixes": "./scripts/checkUnresolvedFixes.sh",
     "bump": "node ./scripts/bump.js",
     "lint": "./scripts/lint.sh",
     "format-check": "prettier --cache --check 'src/**/*.{js,jsx,ts,tsx,json,scss,md}'",

@@ -87,7 +87,7 @@ export type ProjectState = {
   name: string;
 
   selectedThingIds: Array<string>;
-  selectedImages: Record<string, Array<number>>;
+  selectedImages: Record<string, Array<string>>;
   selectedAnnotations: Array<string>;
   sortType: GridSortKey;
   thingFilters: Record<

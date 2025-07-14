@@ -7,6 +7,7 @@ import {
   ImageObject,
   TSImageObject,
   FullTimepointImage,
+  TPKey,
 } from "store/data/types";
 import {
   UNKNOWN_CATEGORY_NAME,
@@ -160,7 +161,7 @@ export const getPropertiesFromImageSync = (
 
 export const getFullTimepointImage = (
   timeSeriesImage: TSImageObject,
-  timePoint: number,
+  timePoint: TPKey,
 ): FullTimepointImage => {
   const timePointData = timeSeriesImage.timepoints[timePoint];
   if (!timePointData) {

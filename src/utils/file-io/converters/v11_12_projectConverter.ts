@@ -54,7 +54,7 @@ export const v11_12_projectConverter = (
         bitDepth,
         ...rest,
         plane: 0,
-        timepoint: 0,
+        timepoint: "0",
       };
     }
   });

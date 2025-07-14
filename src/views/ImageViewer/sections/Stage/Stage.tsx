@@ -6,9 +6,10 @@ import {
   useSelector,
   useStore,
 } from "react-redux";
+
 import Konva from "konva";
 import { Stage as KonvaStage } from "react-konva";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 
 import { useHotkeys } from "hooks";
 import {
@@ -17,7 +18,6 @@ import {
   useAnnotationState,
   useAnnotationTool,
 } from "../../hooks";
-
 import { NewKindDialog } from "views/ImageViewer/components/dialogs/NewKindDialog";
 //import { Cursor } from "./Cursor";
 import { Layer } from "./Layer";
@@ -32,10 +32,7 @@ import {
   selectAnnotationState,
   //selectToolType,
 } from "../../state/annotator/selectors";
-import {
-  selectActiveImage,
-  selectImageViewerObjectsArray,
-} from "../../state/annotator/reselectors";
+import { selectImageViewerObjectsArray } from "../../state/annotator/reselectors";
 import {
   //selectActiveImageId,
   //selectActiveImageRenderedSrcs,
@@ -46,14 +43,16 @@ import {
 import { generateKind, generateUUID } from "store/data/utils";
 
 import { CATEGORY_COLORS } from "store/data/constants";
-import { DIMENSIONS } from "utils/constants";
 import { AnnotationState /*ToolType*/ } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/enums";
 
 import { Category } from "store/data/types";
 import { createProtoAnnotation } from "views/ImageViewer/utils/annotationUtils";
 import { Partition } from "utils/models/enums";
-import { selectActiveImageDetails } from "views/ImageViewer/state/imageViewer/newSelectors";
+import { selectActiveImageSeries } from "views/ImageViewer/state/imageViewer/selectors";
+import { CursorLocationContainer } from "./CursorLocationContainer";
+import { ImageViewModeDrawer } from "./image-view-mode-drawer/ImageViewModeDrawer";
+import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
 export const Stage = ({
   stageWidth,
@@ -73,7 +72,7 @@ export const Stage = ({
   const stageRef = useContext(StageContext);
 
   // data Selectors
-  const activeImageDetails = useSelector(selectActiveImageDetails);
+  const activeImageDetails = useSelector(selectActiveImageSeries);
   const activeImage = useSelector(selectActiveImage);
   const existingObjects = useSelector(selectImageViewerObjectsArray);
 
@@ -164,7 +163,7 @@ export const Stage = ({
     if (!annotationTool.decodedMask) throw new Error("No mask found");
     if (!annotationTool.boundingBox) throw new Error("No bounding box found");
 
-    const newAnnotation = await createProtoAnnotation(
+    const newAnnotation = createProtoAnnotation(
       {
         boundingBox: annotationTool.boundingBox,
         categoryId: (newCategory ?? unknownCategory).id,
@@ -221,7 +220,6 @@ export const Stage = ({
   }, [draggable, stageRef, dispatch, stageHeight, stageWidth]);
 
   useEffect(() => {
-    console.log(activeImage);
     if (!activeImage?.shape) return;
     dispatch(
       imageViewerSlice.actions.setImageOrigin({
@@ -234,15 +232,13 @@ export const Stage = ({
   }, [stageWidth, stageHeight, activeImage?.shape, dispatch]);
 
   useEffect(() => {
-    if (!activeImageDetails || !activeImageDetails.renderedSrcs) return;
+    if (!activeImageDetails || !activeImageDetails.activeSrcs) return;
     setHtmlImages(
-      activeImageDetails.renderedSrcs[activeImageDetails.activeTimepoint].map(
-        (src: string) => {
-          const imgElem = document.createElement("img");
-          imgElem.src = src;
-          return imgElem;
-        },
-      ),
+      activeImageDetails.activeSrcs.map((src: string) => {
+        const imgElem = document.createElement("img");
+        imgElem.src = src;
+        return imgElem;
+      }),
     );
   }, [activeImageDetails, stageRef, dispatch]);
 
@@ -265,7 +261,7 @@ export const Stage = ({
   );
 
   return (
-    <Box sx={{ zIndex: 999 }}>
+    <Box sx={{ zIndex: 999, position: "relative", overflow: "hidden" }}>
       <KonvaStage
         draggable={draggable}
         height={stageHeight}
@@ -320,25 +316,15 @@ export const Stage = ({
           </StageContext.Provider>
         </Provider>
       </KonvaStage>
-      <Box
-        sx={(theme) => ({
-          backgroundColor: theme.palette.background.paper,
-          // -2 because of border overlap, dont know why the global border-box sizing is being respected here though
-          width: stageWidth - 2,
-          height: DIMENSIONS.stageInfoHeight,
-          justifyContent: "space-between",
-          alignItems: "center",
-          display: "flex",
-          px: "1.5rem",
-        })}
-      >
-        {!outOfBounds && absolutePosition && (
-          <>
-            <Typography>{`x: ${absolutePosition.x} y: ${absolutePosition.y} `}</Typography>
-            <Typography>{pixelColor}</Typography>
-          </>
-        )}
-      </Box>
+
+      <ImageViewModeDrawer />
+
+      <CursorLocationContainer
+        absolutePosition={absolutePosition}
+        pixelColor={pixelColor}
+        width={stageWidth}
+        show={!outOfBounds}
+      />
       {noKindAvailable && (
         <NewKindDialog
           open={noKindAvailable}

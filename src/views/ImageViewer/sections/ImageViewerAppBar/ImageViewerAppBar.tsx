@@ -37,12 +37,12 @@ export const ImageViewerLogo = () => {
     } else {
       batch(() => {
         dispatch(
-          imageViewerSlice.actions.setActiveImageId({
+          imageViewerSlice.actions.setActiveImageSeriesId({
             imageId: undefined,
             prevImageId: activeImageId,
           }),
         );
-        dispatch(imageViewerSlice.actions.setImageStack({ images: [] }));
+        dispatch(imageViewerSlice.actions.setImageStack({ images: {} }));
         dispatch(
           annotatorSlice.actions.setSelectedAnnotationIds({
             annotationIds: [],

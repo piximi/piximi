@@ -14,11 +14,11 @@ import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectSelectedAnnotationIds } from "views/ImageViewer/state/annotator/selectors";
 import {
   selectActiveAnnotationsArray,
-  selectActiveImageObjectIds,
   selectSelectedActiveAnnotations,
 } from "views/ImageViewer/state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/enums";
+import { selectActiveImageObjectIds } from "views/ImageViewer/state/imageViewer/reselectors";
 
 type DeleteType = "ALL" | "SELECTED";
 export const ClearAnnotationsGroup = () => {

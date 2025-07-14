@@ -99,7 +99,7 @@ startAppListening({
         );
 
         srcUpdates.push({ id: imageId, src: renderedSrcs[image.activePlane] });
-        if (imageId === imageViewerState.activeImageId) {
+        if (imageId === imageViewerState.activeImageSeriesId) {
           listenerAPI.dispatch(
             imageViewerSlice.actions.setActiveImageRenderedSrcs({
               renderedSrcs,

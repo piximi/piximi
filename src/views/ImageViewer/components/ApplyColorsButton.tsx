@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { selectActiveImageRawColor } from "views/ImageViewer/state/annotator/reselectors";
+import { selectActiveImageRawColor } from "views/ImageViewer/state/imageViewer/reselectors";
 import { selectImageStackImageIds } from "views/ImageViewer/state/imageViewer/selectors";
 
 export const ApplyColorsButton = () => {
@@ -14,7 +14,7 @@ export const ApplyColorsButton = () => {
   const dispatch = useDispatch();
 
   const handleApplyColorsClick = async () => {
-    const updates = imageIds.map((id) => {
+    const updates = Object.keys(imageIds).map((id) => {
       return {
         id,
         colors: {

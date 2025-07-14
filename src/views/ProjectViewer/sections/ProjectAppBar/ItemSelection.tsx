@@ -33,7 +33,6 @@ export const ItemSelection = () => {
   const selectedImages = useSelector(selectSelectedGridImages);
 
   const selectedItems = useMemo(() => {
-    console.log(selectedImages);
     return activeKind === "Image" ? selectedImages : activeSelectedAnnotations;
   }, [activeKind, selectedImages, activeSelectedAnnotations]);
 

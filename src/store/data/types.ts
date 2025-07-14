@@ -7,6 +7,8 @@ import { Colors, PartialBy, RequireOnly } from "utils/types";
 export type BitDepth = IJSBitDepth;
 export type DataArray = IJSDataArray;
 
+export type TPKey = string;
+
 export type Thing = {
   id: string;
   name: string;
@@ -48,11 +50,11 @@ export type TSImageObject = {
   containing: string[];
   partition: Partition;
   shape: Shape;
-  timepoints: Record<number, ImageTimepointData>;
+  timepoints: Record<TPKey, ImageTimepointData>;
 };
 
 export type FullTimepointImage = Omit<TSImageObject, "timepoints"> &
-  ImageTimepointData & { timepoint: number };
+  ImageTimepointData & { timepoint: TPKey };
 
 export type TSAnnotationObject = {
   id: string;
@@ -67,7 +69,7 @@ export type TSAnnotationObject = {
   plane: number;
   imageId: string;
   globalId?: string;
-  timepoint: number;
+  timepoint: TPKey;
   categoryId: string;
   shape: Shape;
   data: Tensor4D;
@@ -132,7 +134,7 @@ export type ThingsUpdates = Array<
 export type ImageUpdates = Array<
   Partial<Omit<TSImageObject, "id" | "containing" | "timePoints">> & {
     id: string;
-    timePoints?: Record<number, Partial<ImageTimepointData>>;
+    timePoints?: Record<TPKey, Partial<ImageTimepointData>>;
   }
 >;
 

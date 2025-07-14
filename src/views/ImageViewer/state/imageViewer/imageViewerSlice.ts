@@ -11,6 +11,8 @@ import {
   ZoomToolOptionsType,
   ImageViewerImageDetails,
 } from "views/ImageViewer/utils/types";
+import { Colors } from "utils/types";
+import { TPKey } from "store/data/types";
 
 const initialState: ImageViewerState = {
   imageStack: {},
@@ -26,9 +28,8 @@ const initialState: ImageViewerState = {
     vibrance: 0,
   },
   cursor: "default",
-  activeImageId: undefined,
+  activeImageSeriesId: undefined,
   activeAnnotationIds: [],
-  activeImageRenderedSrcs: [],
   imageOrigin: { x: 0, y: 0 },
   filters: { categoryId: [] },
   selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
@@ -139,29 +140,86 @@ export const imageViewerSlice = createSlice({
     ) {
       state.selectedCategoryId = action.payload.selectedCategoryId;
     },
-    setActiveImageId(
+    setActiveImageSeriesId(
       state,
       action: PayloadAction<{
         imageId: string | undefined;
         prevImageId: string | undefined;
       }>,
     ) {
-      state.activeImageId = action.payload.imageId;
+      state.activeImageSeriesId = action.payload.imageId;
       // reset selected annotations
     },
+
     setActiveImageRenderedSrcs(
       state,
       action: PayloadAction<{
         renderedSrcs: Array<string>;
       }>,
     ) {
-      const activeImageId = state.activeImageId;
+      const activeImageId = state.activeImageSeriesId;
+      if (!activeImageId)
+        throw new Error("Set rendered sources failed: No active image");
+
+      state.imageStack[activeImageId].activeSrcs = action.payload.renderedSrcs;
+    },
+    setActiveSeriesTZPreviews(
+      state,
+      action: PayloadAction<{
+        previews: Record<TPKey, string>;
+      }>,
+    ) {
+      const activeImageId = state.activeImageSeriesId;
+      const previews = action.payload.previews;
       if (!activeImageId)
         throw new Error("Set rendered sources failed: No active image");
 
       const activeImageDetails = state.imageStack[activeImageId];
-      activeImageDetails.renderedSrcs[activeImageDetails.activeTimepoint] =
-        action.payload.renderedSrcs;
+      Object.entries(previews).forEach(([tp, src]) => {
+        activeImageDetails.timepoints[+tp].ZTPreview = src;
+      });
+    },
+    updateActiveImageColors(state, action: PayloadAction<{ colors: Colors }>) {
+      if (!state.activeImageSeriesId) return;
+      const { colors } = action.payload;
+      const activeImageSeries = state.imageStack[state.activeImageSeriesId];
+      activeImageSeries.timepoints[activeImageSeries.activeTimepoint].ZTColors =
+        colors;
+    },
+    updateActiveImageSeriesColors(
+      state,
+      action: PayloadAction<{ colors: Colors }>,
+    ) {
+      if (!state.activeImageSeriesId) return;
+      const { colors } = action.payload;
+      const activeImageSeries = state.imageStack[state.activeImageSeriesId];
+      activeImageSeries.timepoints[activeImageSeries.activeTimepoint].ZTColors =
+        colors;
+    },
+    setActiveImageTimepoint(
+      state,
+      action: PayloadAction<{
+        tp: TPKey;
+      }>,
+    ) {
+      const activeImageId = state.activeImageSeriesId;
+      if (!activeImageId)
+        throw new Error("Set rendered sources failed: No active image");
+
+      state.imageStack[activeImageId].activeTimepoint = action.payload.tp;
+    },
+    setActiveImageActivePlane(
+      state,
+      action: PayloadAction<{
+        plane: number;
+      }>,
+    ) {
+      const activeImageId = state.activeImageSeriesId;
+      if (!activeImageId)
+        throw new Error("Set rendered sources failed: No active image");
+
+      const activeImageDetails = state.imageStack[activeImageId];
+      activeImageDetails.activePlane = action.payload.plane;
     },
     setImageOrigin(
       state,

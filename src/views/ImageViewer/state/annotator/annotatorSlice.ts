@@ -26,6 +26,7 @@ import {
   updateKind,
   updateThing,
 } from "./utils";
+import { Colors } from "utils/types";
 
 export const initialState: AnnotatorState = {
   workingAnnotationId: undefined,
@@ -36,7 +37,6 @@ export const initialState: AnnotatorState = {
     kinds: { added: {}, deleted: [], edited: {} },
     categories: { added: {}, deleted: [], edited: {} },
     things: { added: {}, deleted: [], edited: {} },
-    images: {},
     annotations: { added: {}, deleted: [], edited: {} },
   },
   annotationState: AnnotationState.Blank,

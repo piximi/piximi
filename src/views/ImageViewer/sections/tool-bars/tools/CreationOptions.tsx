@@ -14,7 +14,7 @@ import {
 } from "views/ImageViewer/state/annotator/selectors";
 
 import { AnnotationMode } from "views/ImageViewer/utils/enums";
-import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
+import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 import { invert } from "views/ImageViewer/utils/annotationUtils";
 import {
   CombineAnnotationsIcon,

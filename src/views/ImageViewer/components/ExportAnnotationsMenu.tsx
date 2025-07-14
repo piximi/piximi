@@ -22,9 +22,9 @@ import {
   selectImageViewerObjectsArray,
 } from "views/ImageViewer/state/annotator/reselectors";
 import {
-  selectImageViewerImages,
-  selectImagesArray,
-} from "../state/annotator/reselectors";
+  selectUpdatedImages,
+  selectImageSeriesArray,
+} from "../state/imageViewer/reselectors";
 
 import {
   serializeCOCOFile,
@@ -87,8 +87,9 @@ export const ExportAnnotationsMenu = ({
 }: ExportAnnotationsMenuProps) => {
   const dataState = useSelector(selectDataState);
   const annotatorChanges = useSelector(selectChanges);
-  const images = useSelector(selectImagesArray);
-  const imageDict = useSelector(selectImageViewerImages);
+  const images = useSelector(selectImageSeriesArray);
+  //FIX_NOW
+  //const imageDict = useSelector(selectUpdatedImages);
   const annotations = useSelector(selectImageViewerObjectsArray);
   const annotationDict = useSelector(selectImageViewerObjects);
   const annotationCategories = useSelector(selectAllObjectCategories);
@@ -148,48 +149,51 @@ export const ExportAnnotationsMenu = ({
         }
         switch (exportType) {
           case AnnotationExportType.PIXIMI:
-            const piximiSerializedProject = serializePiximiAnnotations(
-              images,
-              annotations,
-              annotationCategories,
-              objectKinds,
-            );
+            //FIX_NOW
+            // const piximiSerializedProject = serializePiximiAnnotations(
+            //   images,
+            //   annotations,
+            //   annotationCategories,
+            //   objectKinds,
+            // );
 
-            const data = new Blob([JSON.stringify(piximiSerializedProject)], {
-              type: "application/json;charset=utf-8",
-            });
+            // const data = new Blob([JSON.stringify(piximiSerializedProject)], {
+            //   type: "application/json;charset=utf-8",
+            // });
 
-            saveAs(data, `${userProjectName}.json`);
+            // saveAs(data, `${userProjectName}.json`);
 
             break;
 
           case AnnotationExportType.COCO:
-            const cocoSerializedProject = serializeCOCOFile(
-              images,
-              annotations,
-              annotationCategories,
-            );
+            //FIX_NOW
+            // const cocoSerializedProject = serializeCOCOFile(
+            //   images,
+            //   annotations,
+            //   annotationCategories,
+            // );
 
-            const blob = new Blob([JSON.stringify(cocoSerializedProject)], {
-              type: "application/json;charset=utf-8",
-            });
+            // const blob = new Blob([JSON.stringify(cocoSerializedProject)], {
+            //   type: "application/json;charset=utf-8",
+            // });
 
-            saveAs(blob, `${userProjectName}.json`);
+            // saveAs(blob, `${userProjectName}.json`);
 
             break;
 
           default:
-            exportAnnotationMasks(
-              imageDict,
-              exportedAnnotations,
-              annotationCategoryDict,
-              userProjectName,
-              zip,
-              exportType,
-            );
-            zip.generateAsync({ type: "blob" }).then((blob) => {
-              saveAs(blob, `${userProjectName}.zip`);
-            });
+            //FIX_NOW
+            // exportAnnotationMasks(
+            //   imageDict,
+            //   exportedAnnotations,
+            //   annotationCategoryDict,
+            //   userProjectName,
+            //   zip,
+            //   exportType,
+            // );
+            // zip.generateAsync({ type: "blob" }).then((blob) => {
+            //   saveAs(blob, `${userProjectName}.zip`);
+            // });
 
             break;
         }
@@ -210,7 +214,8 @@ export const ExportAnnotationsMenu = ({
       images,
       objectKinds,
       annotations,
-      imageDict,
+      //FIX_NOW
+      //imageDict,
       annotationDict,
       annotationCategoryDict,
       hasUnsavedChanges,

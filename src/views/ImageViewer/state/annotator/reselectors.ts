@@ -6,121 +6,23 @@ import {
   selectKindChanges,
   selectSelectedAnnotationIds,
   selectThingChanges,
-  selectImageChanges,
   selectWorkingAnnotationEntity,
-  selectAnnotationChanges,
 } from "./selectors";
 import {
   selectObjectCategoryDict,
   selectObjectDict,
   selectObjectKindDict,
-  selectThingsDictionary,
-  selectImageDictionary,
-  selectAnnotationDictionary,
-  selectAnnotationIdsByImageTimepoint,
 } from "store/data/selectors";
-import {
-  selectActiveImageId,
-  selectImageStackImageIds,
-} from "../imageViewer/selectors";
 
 import { decodeAnnotation } from "views/ImageViewer/utils/rle";
-import { generateBlankColors } from "utils/tensorUtils";
 import { getCompleteEntity } from "./utils";
 
-import {
-  AnnotationObject,
-  Category,
-  ImageObject,
-  Kind,
-  Shape,
-  TSImageObject,
-} from "store/data/types";
-import { getFullTimepointImage } from "store/data/utils";
-import { Colors, ColorsRaw } from "utils/types";
+import { AnnotationObject, Category, Kind, Shape } from "store/data/types";
 import { ProtoAnnotationObject } from "views/ImageViewer/utils/types";
-
-export const selectImageViewerImages = createSelector(
-  selectImageStackImageIds,
-  selectImageDictionary,
-  selectImageChanges,
-  selectAnnotationChanges,
-  (imageIds, images, imageChanges, annotationChanges) => {
-    const updatedImages: Record<string, TSImageObject> = {};
-    const neaAnnotationsByImage = Object.values(annotationChanges.added).reduce(
-      (annByIm: Record<string, string[]>, ann) => {
-        const imageId = ann.imageId;
-        if (!annByIm[imageId]) {
-          annByIm[imageId] = [];
-        }
-        annByIm[imageId].push(ann.id);
-        return annByIm;
-      },
-      {},
-    );
-    for (const imageId of Object.keys(imageIds)) {
-      const image = { ...images[imageId] } as TSImageObject;
-      const finalImage = { ...image };
-      if (imageChanges[imageId]) {
-        Object.keys(imageChanges[imageId].timepoints).forEach((key) => {
-          finalImage.timepoints[+key] = {
-            ...finalImage.timepoints[+key],
-            ...imageChanges[imageId].timepoints[+key],
-          };
-        });
-      }
-      finalImage.containing = difference(
-        finalImage.containing,
-        annotationChanges.deleted,
-      );
-      finalImage.containing.push(...(neaAnnotationsByImage[imageId] ?? []));
-      updatedImages[imageId] = finalImage;
-    }
-
-    return updatedImages;
-  },
-);
-
-export const selectImagesArray = createSelector(
-  selectImageViewerImages,
-  (images) => Object.values(images),
-);
-
-export const selectActiveImage = createSelector(
-  selectImageStackImageIds,
-  selectActiveImageId,
-  selectImageViewerImages,
-  (imageDetails, activeImageId, images) =>
-    activeImageId
-      ? getFullTimepointImage(
-          images[activeImageId],
-          imageDetails[activeImageId].activeTimepoint,
-        )
-      : undefined,
-);
-export const selectActiveImageRawColor = createSelector(
+import {
   selectActiveImage,
-  (image): ColorsRaw => {
-    let colors: Colors;
-    if (!image) {
-      colors = generateBlankColors(3);
-    } else {
-      colors = image.colors;
-    }
-
-    return {
-      // is sync appropriate? if so we may need to dispose??
-      color: colors.color.arraySync() as [number, number, number][],
-      range: colors.range,
-      visible: colors.visible,
-    };
-  },
-);
-
-export const selectActiveImageObjectIds = createSelector(
-  selectActiveImage,
-  (activeImage) => activeImage?.containing ?? [],
-);
+  selectImageSeriesArray,
+} from "../imageViewer/reselectors";
 
 export const selectImageViewerKinds = createSelector(
   selectObjectKindDict,
@@ -267,7 +169,7 @@ export const selectUpdatedObjects = createSelector(
 );
 
 export const selectImageViewerObjects = createSelector(
-  selectImagesArray,
+  selectImageSeriesArray,
   selectUpdatedObjects,
   (images, objects) => {
     const annotationObjects: Record<string, AnnotationObject> = {};

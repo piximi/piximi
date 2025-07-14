@@ -11,9 +11,7 @@ export const StageWrapper = () => {
     window.innerWidth - DIMENSIONS.leftDrawerWidth - DIMENSIONS.toolDrawerWidth,
   );
   const [height, setHeight] = useState<number>(
-    window.innerHeight -
-      DIMENSIONS.stageInfoHeight -
-      DIMENSIONS.toolDrawerWidth,
+    window.innerHeight - DIMENSIONS.toolDrawerWidth,
   );
   const isMobile = useMobileView();
 
@@ -45,10 +43,7 @@ export const StageWrapper = () => {
         overflow: "visible",
       })}
     >
-      <Stage
-        stageWidth={width}
-        stageHeight={height - DIMENSIONS.stageInfoHeight}
-      />
+      <Stage stageWidth={width} stageHeight={height} />
     </Box>
   );
 };

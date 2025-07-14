@@ -46,7 +46,11 @@ import { ImageShapeEnum } from "utils/file-io/enums";
 import { AlertType } from "utils/enums";
 import { Partition } from "utils/models/enums";
 
-import { ImageObject } from "store/data/types";
+import {
+  ImageObject,
+  ImageTimepointData,
+  TSImageObject,
+} from "store/data/types";
 import {
   ImageFileShapeInfo,
   ImageShapeInfo,
@@ -60,7 +64,11 @@ type ImageShapeInfoImage = ImageFileShapeInfo & {
 };
 
 const FileUploadContext = createContext<
-  ((files: FileList) => Promise<void>) | null
+  | ((
+      files: FileList,
+      options?: { timeSeriesDelimeter: string },
+    ) => Promise<void>)
+  | null
 >(null);
 
 const minChannels = 1;
@@ -132,6 +140,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
   const projectChannels = useSelector(selectProjectImageChannels);
   const selectedCategory = useSelector(selectHighlightedCategory);
   const unknownCategory = useSelector(selectUnknownImageCategory);
+  const [timeSeries, setTimeSeries] = useState<boolean>(false);
 
   const [fileInfo, setFileInfo] = useState<
     Record<number, ImageShapeInfoImage[]>
@@ -151,7 +160,6 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
     async (errors: string[]) => {
       delete fileInfo[ImageShapeEnum.InvalidImage];
       const uploadedFiles = Object.values(fileInfo).flat();
-      console.log(uploadedFiles);
 
       const convertedImages: ImageObject[] = [];
       for await (const fileInfo of uploadedFiles) {
@@ -209,26 +217,55 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
         }
       }
       if (convertedImages.length > 0) {
-        const tsConversion = convertedImages.map((im) => {
-          return {
-            id: im.id,
-            name: im.name,
-            kind: im.kind,
-            bitDepth: im.bitDepth,
-            containing: im.containing,
-            partition: im.partition,
-            shape: im.shape,
-            timepoints: {
-              0: {
-                colors: im.colors,
-                src: im.src,
-                data: im.data,
-                categoryId: im.categoryId,
-                activePlane: im.activePlane,
+        let tsConversion: TSImageObject[] = [];
+        if (!timeSeries) {
+          tsConversion = convertedImages.map((im) => {
+            return {
+              id: im.id,
+              name: im.name,
+              kind: im.kind,
+              bitDepth: im.bitDepth,
+              containing: im.containing,
+              partition: im.partition,
+              shape: im.shape,
+              timepoints: {
+                0: {
+                  colors: im.colors,
+                  src: im.src,
+                  data: im.data,
+                  categoryId: im.categoryId,
+                  activePlane: im.activePlane,
+                },
               },
+            };
+          });
+        } else {
+          const initImage = convertedImages[0];
+          tsConversion = [
+            {
+              id: initImage.id,
+              name: initImage.name,
+              kind: initImage.kind,
+              bitDepth: initImage.bitDepth,
+              containing: initImage.containing,
+              partition: initImage.partition,
+              shape: initImage.shape,
+              timepoints: convertedImages.reduce(
+                (acc: Record<number, ImageTimepointData>, im, idx) => {
+                  acc[idx] = {
+                    colors: im.colors,
+                    src: im.src,
+                    data: im.data,
+                    categoryId: im.categoryId,
+                    activePlane: im.activePlane,
+                  };
+                  return acc;
+                },
+                {},
+              ),
             },
-          };
-        });
+          ];
+        }
         dispatch(
           dataSlice.actions.addThings({
             things: convertedImages,
@@ -269,9 +306,11 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
     [dispatch],
   );
   const uploadFiles = useCallback(
-    async (files: FileList) => {
+    async (files: FileList, options?: { timeSeriesDelimeter: string }) => {
       setChannelOptions(undefined);
-
+      if (options) {
+        setTimeSeries(true);
+      }
       const imageInfo = await getUploadedFileTypes(files);
 
       setFileInfo(imageInfo);

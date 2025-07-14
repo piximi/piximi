@@ -20,10 +20,8 @@ import {
 } from "views/ImageViewer/state/imageViewer/selectors";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
 import { selectWorkingAnnotationEntity } from "views/ImageViewer/state/annotator/selectors";
-import {
-  selectSelectedAnnotations,
-  selectActiveImage,
-} from "views/ImageViewer/state/annotator/reselectors";
+import { selectSelectedAnnotations } from "views/ImageViewer/state/annotator/reselectors";
+import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
