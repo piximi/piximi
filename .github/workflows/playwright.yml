@@ -1,4 +1,5 @@
 name: Playwright Tests
+
 on:
   pull_request:
     types: [opened, synchronize]
@@ -19,11 +20,12 @@ jobs:
         with:
           version: 8
 
-      - run: yarn install
-      - run: yarn start
+      - run: corepack enable && corepack prepare pnpm@8 --activate
+
+      - run: pnpm install
+      - run: pnpm start &
       - run: npx wait-on http://localhost:3000
       - run: pnpm exec playwright install --with-deps
-
       - run: pnpm exec playwright test
 
       - if: always()
