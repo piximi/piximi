@@ -8,6 +8,7 @@ test('Image Selection', async ({ page }) => {
     const documentationButton = page.getByTestId('open-example-project');
     await documentationButton.click();
 
+    await expect(page.getByText('Images with Objects')).toBeVisible({ timeout: 10000 });
     await page.getByText('Images with Objects').click();
     await page.getByText('Malaria infected human blood smears').click();
 
@@ -25,6 +26,7 @@ test('Kind Switching', async ({ page }) => {
     const documentationButton = page.getByTestId('open-example-project');
     await documentationButton.click();
 
+    await expect(page.getByText('Images with Objects')).toBeVisible({ timeout: 10000 });
     await page.getByText('Images with Objects').click();
     await page.getByText('Malaria infected human blood smears').click();
 
@@ -44,6 +46,7 @@ test('Adding New Kind', async ({ page }) => {
     const documentationButton = page.getByTestId('open-example-project');
     await documentationButton.click();
 
+    await expect(page.getByText('Images with Objects')).toBeVisible({ timeout: 10000 });
     await page.getByText('Images with Objects').click();
     await page.getByText('Malaria infected human blood smears').click();
 
@@ -68,6 +71,7 @@ test('Select All', async ({ page }) => {
     const documentationButton = page.getByTestId('open-example-project');
     await documentationButton.click();
 
+    await expect(page.getByText('Images with Objects')).toBeVisible({ timeout: 10000 });
     await page.getByText('Images with Objects').click();
     await page.getByText('Malaria infected human blood smears').click();
 
