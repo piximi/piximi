@@ -1,4 +1,4 @@
-import React, { memo, useRef } from "react";
+import React, { memo, useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Avatar,
@@ -19,9 +19,10 @@ import { ImageMenu } from "./ImageMenu";
 
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectImageSeriesArray } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { ImageObject } from "store/data/types";
-import { selectImagesArray } from "views/ImageViewer/state/annotator/reselectors";
+import { getFullTimepointImage } from "store/data/utils";
 
 const NUM_BUFFERED_IMS = 20;
 const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 4);
@@ -34,9 +35,16 @@ interface ImageListItemProps {
 }
 
 export const ImageList = () => {
-  const images = useSelector(selectImagesArray);
   const dispatch = useDispatch();
+  const imageSeriesArray = useSelector(selectImageSeriesArray);
+  const activeImageId = useSelector(selectActiveImageId);
 
+  const imageListImages = useMemo(() => {
+    console.log(imageSeriesArray);
+    return imageSeriesArray.map((imageSeries) => {
+      return getFullTimepointImage(imageSeries, "0");
+    });
+  }, [imageSeriesArray]);
   const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
     null,
   );
@@ -47,13 +55,11 @@ export const ImageList = () => {
   const [scrollProgress, setScrollProgress] = React.useState(0);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
 
-  const activeImageId = useSelector(selectActiveImageId);
-
   const handleImageItemClick = React.useCallback(
     (image: ImageObject) => {
       if (image.id !== activeImageId!) {
         dispatch(
-          imageViewerSlice.actions.setActiveImageId({
+          imageViewerSlice.actions.setActiveImageSeriesId({
             imageId: image.id,
             prevImageId: activeImageId,
           }),
@@ -80,9 +86,9 @@ export const ImageList = () => {
 
     if (
       target.scrollHeight - target.scrollTop === target.clientHeight &&
-      bufferRange.end < images.length
+      bufferRange.end < imageSeriesArray.length
     ) {
-      const numToLoad = images.length - bufferRange.end;
+      const numToLoad = imageSeriesArray.length - bufferRange.end;
       const numHidden = NUM_BUFFERED_IMS - NUM_VIEW_IMS;
       const newStart =
         numToLoad < numHidden
@@ -96,7 +102,7 @@ export const ImageList = () => {
         end: newEnd,
       });
 
-      setScrollProgress((newEnd / images.length) * 100);
+      setScrollProgress((newEnd / imageSeriesArray.length) * 100);
 
       target.scrollTop = 1;
     } else if (target.scrollTop === 0 && bufferRange.start !== 0) {
@@ -108,12 +114,15 @@ export const ImageList = () => {
         end: newEnd,
       });
 
-      setScrollProgress((newEnd / images.length) * 100);
+      setScrollProgress((newEnd / imageSeriesArray.length) * 100);
 
       target.scrollTop = target.scrollHeight - target.clientHeight - 1;
     }
   };
 
+  useEffect(() => {
+    console.log(imageListImages);
+  }, [imageListImages]);
   return (
     <>
       <Box
@@ -135,7 +144,7 @@ export const ImageList = () => {
             })}
             onScroll={handleScroll}
           >
-            {images
+            {imageListImages
               .slice(bufferRange.start, bufferRange.end)
               .map((image, idx) => {
                 return (
@@ -153,7 +162,7 @@ export const ImageList = () => {
           </List>
         </Box>
         <Box gridColumn="12 / 13" gridRow=" 1 / 2" justifyItems="flex-end">
-          {images.length > NUM_BUFFERED_IMS && (
+          {imageSeriesArray.length > NUM_BUFFERED_IMS && (
             <LinearProgress
               sx={{
                 width: 4,
@@ -173,7 +182,7 @@ export const ImageList = () => {
 
       <ImageMenu
         anchorElImageMenu={imageAnchorEl}
-        selectedImage={images[selectedImageIndex]}
+        selectedImage={imageListImages[selectedImageIndex]}
         onCloseImageMenu={onImageMenuClose}
         openImageMenu={Boolean(imageAnchorEl)}
       />

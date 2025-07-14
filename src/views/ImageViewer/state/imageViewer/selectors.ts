@@ -1,8 +1,34 @@
+import { createSelector } from "@reduxjs/toolkit";
 import { ImageViewerState } from "../../utils/types";
 import {
   ColorAdjustmentOptionsType,
   ZoomToolOptionsType,
 } from "views/ImageViewer/utils/types";
+
+export const selectActiveImageSeries = ({
+  imageViewer,
+}: {
+  imageViewer: ImageViewerState;
+}) => {
+  if (imageViewer.activeImageSeriesId === undefined) {
+    return undefined;
+  }
+  return imageViewer.imageStack[imageViewer.activeImageSeriesId];
+};
+
+export const selectActivePlane = createSelector(
+  selectActiveImageSeries,
+  (activeImageSeries) => {
+    return activeImageSeries?.activePlane;
+  },
+);
+
+export const selectActiveTimepoint = createSelector(
+  selectActiveImageSeries,
+  (activeImageSeries) => {
+    return activeImageSeries?.activeTimepoint;
+  },
+);
 
 export const selectZoomToolOptions = ({
   imageViewer,
@@ -130,20 +156,12 @@ export const selectColorAdjustments = ({
   return imageViewer.colorAdjustment;
 };
 
-export const selectActiveImageRenderedSrcs = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}): Array<string> => {
-  return imageViewer.activeImageRenderedSrcs;
-};
-
 export const selectActiveImageId = ({
   imageViewer,
 }: {
   imageViewer: ImageViewerState;
 }): string | undefined => {
-  return imageViewer.activeImageId;
+  return imageViewer.activeImageSeriesId;
 };
 
 export const selectActiveAnnotationIds = ({

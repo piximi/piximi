@@ -64,7 +64,6 @@ export const ImageViewer = () => {
   );
 
   useEffect(() => {
-    console.log(routerLocation.state);
     dispatch(
       imageViewerSlice.actions.prepareImageViewer({
         selectedThingIds: routerLocation.state?.initialThingIds
@@ -104,6 +103,8 @@ export const ImageViewer = () => {
             gridTemplateColumns: `${isMobile ? DIMENSIONS.toolDrawerWidth : DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`,
             gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
             gridTemplateAreas: `"top-tools top-tools top-tools" "${isMobile ? "mobile-action-bar" : "action-drawer"} stage side-tools"`,
+            overflow: "hidden",
+            maxHeight: "100vh",
           }}
         >
           <TopToolBar />

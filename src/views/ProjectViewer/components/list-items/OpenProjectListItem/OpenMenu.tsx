@@ -3,13 +3,13 @@ import React, { useState } from "react";
 import { MenuItem, Typography } from "@mui/material";
 import { KeyboardArrowRight as KeyboardArrowRightIcon } from "@mui/icons-material";
 
-import { useMenu } from "hooks";
+import { useDialog, useMenu } from "hooks";
 
 import { BaseMenu } from "components/ui/BaseMenu";
 import { OpenProjectMenu } from "./OpenProjectMenu";
-import { OpenImageMenu } from "./OpenImageMenu";
 import { ImportAnnotationsMenu } from "./ImportAnnotationsMenu";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { OpenImageOptionsDialog } from "../../dialogs/OpenImageOptionsDialog";
 
 type OpenMenuProps = {
   anchorEl: HTMLElement | null;
@@ -39,12 +39,6 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
     handleCloseProjectMenu();
     onClose();
   };
-  const {
-    anchorEl: imageMenuAnchorEl,
-    onClose: handleCloseImageMenu,
-    open: imageMenuOpen,
-    onOpen: handleOpenImageMenu,
-  } = useMenu();
 
   const {
     anchorEl: annotationsMenuAnchorEl,
@@ -52,17 +46,21 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
     open: annotationMenuOpen,
     onOpen: handleOpenAnnotationMenu,
   } = useMenu();
+  const {
+    onClose: onCloseOpenImageDialog,
+    onOpen: onOpenOpenImageDialog,
+    open: OpenImageDialogIsOpen,
+  } = useDialog();
 
-  const handleSelectImageMenu = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>,
+  const handleCloseAndDeselectImageMenu = (
+    event?: object,
+    reason?: "backdropClick" | "escapeKeyDown" | "completed",
   ) => {
-    setSelectedMenu("image");
-    handleOpenImageMenu(event);
-  };
-  const handleCloseAndDeselectImageMenu = () => {
-    setSelectedMenu(undefined);
-    handleCloseImageMenu();
-    onClose();
+    onCloseOpenImageDialog();
+    if (reason === "completed") {
+      setSelectedMenu(undefined);
+      onClose();
+    }
   };
 
   return (
@@ -82,7 +80,7 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
       </MenuItem>
       <MenuItem
         data-help={HelpItem.OpenImage}
-        onClick={handleSelectImageMenu}
+        onClick={onOpenOpenImageDialog}
         sx={(theme) => ({
           display: "flex",
           justifyContent: "space-between",
@@ -91,7 +89,6 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
         selected={selectedMenu === "image"}
       >
         <Typography variant="body2">Image</Typography>
-        <KeyboardArrowRightIcon />
       </MenuItem>
       <MenuItem
         onClick={handleOpenAnnotationMenu}
@@ -111,10 +108,9 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
         onClose={handleCloseAndDeselectProjectMenu}
         open={projectMenuOpen}
       />
-      <OpenImageMenu
-        anchorEl={imageMenuAnchorEl}
-        onCloseMenu={handleCloseAndDeselectImageMenu}
-        open={imageMenuOpen}
+      <OpenImageOptionsDialog
+        open={OpenImageDialogIsOpen}
+        onClose={handleCloseAndDeselectImageMenu}
       />
       <ImportAnnotationsMenu
         anchorEl={annotationsMenuAnchorEl}

@@ -31,12 +31,12 @@ export const ExitAnnotatorDialog = ({
 
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.setActiveImageId({
+        imageViewerSlice.actions.setActiveImageSeriesId({
           imageId: undefined,
           prevImageId: activeImageId,
         }),
       );
-      dispatch(imageViewerSlice.actions.setImageStack({ images: [] }));
+      dispatch(imageViewerSlice.actions.setImageStack({ images: {} }));
       dispatch(
         annotatorSlice.actions.setSelectedAnnotationIds({
           annotationIds: [],
@@ -54,7 +54,7 @@ export const ExitAnnotatorDialog = ({
   const handleDiscardChanges = () => {
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.setActiveImageId({
+        imageViewerSlice.actions.setActiveImageSeriesId({
           imageId: undefined,
           prevImageId: activeImageId,
         }),

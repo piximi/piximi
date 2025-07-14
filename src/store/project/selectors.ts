@@ -3,6 +3,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { GridSortKey } from "utils/enums";
 
 import { ProjectState } from "store/types";
+import { TPKey } from "store/data/types";
 
 export const selectProject = ({
   project,
@@ -28,7 +29,7 @@ export const selectSelectedImages = ({
   project,
 }: {
   project: ProjectState;
-}): Record<string, number[]> => {
+}): Record<string, TPKey[]> => {
   return project.selectedImages;
 };
 

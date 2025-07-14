@@ -229,7 +229,7 @@ export const selectFilteredGridImages = createSelector(
   selectFullTimepointImages,
   selectThingFilters,
   (fullTimePointImages, filters) => {
-    return fullTimePointImages(0).filter(
+    return fullTimePointImages("0").filter(
       (image) => !isFiltered(image, filters ?? {}),
     );
   },
@@ -249,7 +249,6 @@ export const selectSelectedGridImages = createSelector(
             visible.push(filteredImages[imageIndex]);
           }
         });
-        console.log(visible);
         return visible;
       },
       [],

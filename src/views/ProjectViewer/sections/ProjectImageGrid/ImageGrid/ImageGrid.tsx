@@ -13,7 +13,7 @@ import { projectSlice } from "store/project";
 import { selectSelectedImages } from "store/project/selectors";
 
 import { GRID_GAP } from "utils/constants";
-import { FullTimepointImage } from "store/data/types";
+import { FullTimepointImage, TPKey } from "store/data/types";
 import { useWindowGrid } from "views/ProjectViewer/hooks/useWindowGrid";
 import { ImageGridCell } from "./ProjectGridItem/ImageGridItem";
 import { selectFilteredGridImages } from "store/project/reselectors";
@@ -23,7 +23,7 @@ const createItemData = memoize(
     images: FullTimepointImage[],
     handleSelectImage: (
       id: string,
-      timepoint: number,
+      timepoint: TPKey,
       selected: boolean,
     ) => void,
     selectedImages: ReturnType<typeof selectSelectedImages>,
@@ -62,7 +62,7 @@ export const ImageGrid = () => {
   } = useWindowGrid(sortedImages);
 
   const handleSelectImage = useCallback(
-    (id: string, timepoint: number, selected: boolean) => {
+    (id: string, timepoint: TPKey, selected: boolean) => {
       if (selected) {
         dispatch(
           projectSlice.actions.deselectImages({ selection: { id, timepoint } }),

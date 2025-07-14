@@ -5,7 +5,7 @@ import Konva from "konva";
 import { MemoizedKonvaImage } from "./MemoizedKonvaImage";
 
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
+import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
 export const Image = React.forwardRef<
   Konva.Image,
@@ -14,6 +14,7 @@ export const Image = React.forwardRef<
   const activeImage = useSelector(selectActiveImage);
   const [filters] = useState<Array<any>>();
   const imagePosition = useSelector(selectImageOrigin);
+
   return (
     <>
       {images.map((image, idx) => (

@@ -4,7 +4,7 @@ import { Divider, Box, Stack } from "@mui/material";
 import { useAnnotatorToolShortcuts } from "../../hooks";
 
 import { DIMENSIONS } from "utils/constants";
-import { ImageOptions, SelectionOptions, ZoomOptions } from "./tools";
+import { SelectionOptions, ZoomOptions } from "./tools";
 import { ImageViewerLogo } from "../ImageViewerAppBar/ImageViewerAppBar";
 
 export const TopToolBar = () => {
@@ -37,8 +37,6 @@ export const TopToolBar = () => {
         })}
       >
         <ZoomOptions />
-        <Divider orientation="vertical" flexItem />
-        <ImageOptions />
         <Divider orientation="vertical" flexItem />
         <SelectionOptions />
       </Box>

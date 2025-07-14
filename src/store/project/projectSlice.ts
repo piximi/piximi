@@ -7,6 +7,7 @@ import { Partition } from "utils/models/enums";
 
 import { ProjectState } from "store/types";
 import { updateRecordArray } from "utils/objectUtils";
+import { TPKey } from "store/data/types";
 
 export const initialState: ProjectState = {
   name: "Untitled project",
@@ -85,8 +86,8 @@ export const projectSlice = createSlice({
       state,
       action: PayloadAction<{
         selection:
-          | Array<{ id: string; timepoint: number }>
-          | { id: string; timepoint: number };
+          | Array<{ id: string; timepoint: TPKey }>
+          | { id: string; timepoint: TPKey };
       }>,
     ) {
       const selectionArray = Array.isArray(action.payload.selection)
@@ -101,8 +102,8 @@ export const projectSlice = createSlice({
       state,
       action: PayloadAction<{
         selection:
-          | Array<{ id: string; timepoint: number }>
-          | { id: string; timepoint: number };
+          | Array<{ id: string; timepoint: TPKey }>
+          | { id: string; timepoint: TPKey };
       }>,
     ) {
       const selectionArray = Array.isArray(action.payload.selection)

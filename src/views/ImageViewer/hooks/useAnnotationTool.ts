@@ -9,7 +9,7 @@ import {
   selectToolType,
   selectThresholdAnnotationValue,
 } from "views/ImageViewer/state/annotator/selectors";
-import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
+import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import {
   AnnotationTool,
@@ -43,7 +43,7 @@ export const useAnnotationTool = () => {
   const threshold = useSelector(selectThresholdAnnotationValue);
 
   useEffect(() => {
-    if (!activeImage) return;
+    if (!activeImage?.src) return;
     const loadImage = async () => {
       const image = await IJSImage.load(activeImage.src, {
         ignorePalette: true,

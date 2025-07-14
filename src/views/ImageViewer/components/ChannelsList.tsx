@@ -1,7 +1,7 @@
+import { useMemo } from "react";
 import { tensor2d } from "@tensorflow/tfjs";
 import { produce } from "immer";
 import { debounce } from "lodash";
-import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Checkbox,
@@ -20,7 +20,7 @@ import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
   selectActiveImage,
   selectActiveImageRawColor,
-} from "views/ImageViewer/state/annotator/reselectors";
+} from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { rgbToHex } from "utils/colorUtils";
 import { scaleDownRange, scaleUpRange } from "utils/dataUtils";
@@ -94,8 +94,6 @@ export const ChannelsList = () => {
   const colorAdjustmentSlider = (index: number, name: string) => {
     const isVisible = localActiveImageColors.visible[index];
 
-    if (!activeImage) return <></>;
-
     return (
       <ListItem dense key={index}>
         <ListItemIcon>
@@ -122,14 +120,14 @@ export const ChannelsList = () => {
           }}
           value={scaleUpRange(
             localActiveImageColors.range[index],
-            activeImage.bitDepth,
+            activeImage!.bitDepth,
           )}
-          max={2 ** activeImage.bitDepth - 1}
+          max={2 ** activeImage!.bitDepth - 1}
           onChange={(event, value: number | number[]) =>
             handleSliderChange(
               index,
               value as [number, number],
-              activeImage.bitDepth,
+              activeImage!.bitDepth,
             )
           }
           onChangeCommitted={handleSliderChangeCommitted}
@@ -141,8 +139,7 @@ export const ChannelsList = () => {
       </ListItem>
     );
   };
-
-  return (
+  return activeImage ? (
     <List dense>
       {Array(localActiveImageColors.color.length)
         .fill(0)
@@ -150,5 +147,7 @@ export const ChannelsList = () => {
           return colorAdjustmentSlider(i, `Ch. ${i + 1}`);
         })}
     </List>
+  ) : (
+    <></>
   );
 };

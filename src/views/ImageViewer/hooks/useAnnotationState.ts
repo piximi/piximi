@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
 import {
-  selectActiveImage,
   selectImageViewerCategories,
   selectCategoriesByKindArray,
   selectFullWorkingAnnotation,
@@ -15,6 +14,7 @@ import {
   selectActiveImageId,
   selectSelectedIVCategoryId,
 } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 import { selectAnnotationMode } from "../state/annotator/selectors";
 
 import { AnnotationTool } from "views/ImageViewer/utils/tools";

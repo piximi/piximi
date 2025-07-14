@@ -17,13 +17,13 @@ import { isUnknownCategory } from "store/data/utils";
 
 import { Partition } from "utils/models/enums";
 
-import { FullTimepointImage } from "store/data/types";
+import { FullTimepointImage, TPKey } from "store/data/types";
 import { areEqual, GridChildComponentProps } from "react-window";
 import { selectSelectedImages } from "store/project/selectors";
 
 type CellData = {
   images: FullTimepointImage[];
-  handleSelectImage: (id: string, timepoint: number, selected: boolean) => void;
+  handleSelectImage: (id: string, timepoint: TPKey, selected: boolean) => void;
   selectedImages: ReturnType<typeof selectSelectedImages>;
   numColumns: number;
 };
@@ -61,7 +61,7 @@ export const ImageGridCell = memo(
 );
 type ImageGridItem = {
   selected: boolean;
-  handleClick: (id: string, timepoint: number, selected: boolean) => void;
+  handleClick: (id: string, timepoint: TPKey, selected: boolean) => void;
   image: FullTimepointImage;
   isScrolling?: boolean;
 };

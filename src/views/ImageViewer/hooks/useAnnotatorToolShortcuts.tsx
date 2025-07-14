@@ -3,7 +3,7 @@ import { useHotkeys } from "hooks";
 
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectImagesArray } from "views/ImageViewer/state/annotator/reselectors";
+import { selectImageSeriesArray } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
@@ -13,7 +13,7 @@ import { HotkeyContext } from "utils/enums";
 export const useAnnotatorToolShortcuts = () => {
   const dispatch = useDispatch();
 
-  const images = useSelector(selectImagesArray);
+  const images = useSelector(selectImageSeriesArray);
   const activeImageId = useSelector(selectActiveImageId);
 
   /*
@@ -129,7 +129,7 @@ export const useAnnotatorToolShortcuts = () => {
 
       const newActiveImageId = images[activeImageIdx - 1].id;
       dispatch(
-        imageViewerSlice.actions.setActiveImageId({
+        imageViewerSlice.actions.setActiveImageSeriesId({
           imageId: newActiveImageId,
           prevImageId: activeImageId,
         }),
@@ -155,7 +155,7 @@ export const useAnnotatorToolShortcuts = () => {
 
       const newActiveImageId = images[activeImageIdx + 1].id;
       dispatch(
-        imageViewerSlice.actions.setActiveImageId({
+        imageViewerSlice.actions.setActiveImageSeriesId({
           imageId: newActiveImageId,
           prevImageId: activeImageId,
         }),
