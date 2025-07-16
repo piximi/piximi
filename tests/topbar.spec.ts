@@ -1,6 +1,12 @@
-import {expect, test} from "@playwright/test";
+import { chromium } from 'playwright';
+import { test } from 'vitest';
+import {  expect } from 'playwright/test';
 
-test('Image Selection', async ({ page }) => {
+test('Image Selection', async () => {
+
+    const browser = await chromium.launch();
+    const context = await browser.newContext();
+    const page = await context.newPage();
 
     await page.goto('http://localhost:3000');
 
@@ -20,7 +26,10 @@ test('Image Selection', async ({ page }) => {
 
 });
 
-test('Kind Switching', async ({ page }) => {
+test('Kind Switching', async () => {
+    const browser = await chromium.launch();
+    const context = await browser.newContext();
+    const page = await context.newPage();
 
     await page.goto('http://localhost:3000/');
     const documentationButton = page.getByTestId('open-example-project');
@@ -40,7 +49,11 @@ test('Kind Switching', async ({ page }) => {
 
 });
 
-test('Adding New Kind', async ({ page }) => {
+test('Adding New Kind', async () => {
+
+    const browser = await chromium.launch();
+    const context = await browser.newContext();
+    const page = await context.newPage();
 
     await page.goto('http://localhost:3000/');
     const documentationButton = page.getByTestId('open-example-project');
@@ -65,7 +78,10 @@ test('Adding New Kind', async ({ page }) => {
 });
 
 
-test('Select All', async ({ page }) => {
+test('Select All', async () => {
+    const browser = await chromium.launch();
+    const context = await browser.newContext();
+    const page = await context.newPage();
 
     await page.goto('http://localhost:3000/');
     const documentationButton = page.getByTestId('open-example-project');
@@ -90,7 +106,11 @@ test('Select All', async ({ page }) => {
 });
 
 
-test('switch between count', async ({ page }) => {
+test('switch between count', async () => {
+
+    const browser = await chromium.launch();
+    const context = await browser.newContext();
+    const page = await context.newPage();
 
     await page.goto('http://localhost:3000/');
     const documentationButton = page.getByTestId('open-example-project');

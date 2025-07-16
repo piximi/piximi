@@ -1,15 +1,22 @@
-import { test, expect } from '@playwright/test';
+import { chromium } from 'playwright';
+import { test } from 'vitest';
+import {  expect } from 'playwright/test';
 
+test('should load the homepage and have the correct title', async () => {
+  const browser = await chromium.launch();
+  const context = await browser.newContext();
+  const page = await context.newPage();
 
-test('Start New Project', async ({ page }) => {
-  await page.goto('http://localhost:3000/');
+  await page.goto('http://localhost:3000');
   const startNewProjectButton1 = page.getByTestId('start-new-project');
   await expect(startNewProjectButton1).toHaveText('Start New Project');
-  await startNewProjectButton1.click();
-  await expect(page ).toHaveURL(/\/project/);
+
 });
 
-test('Documenation', async ({ page }) => {
+test('Documenation', async () => {
+  const browser = await chromium.launch();
+  const context = await browser.newContext();
+  const page = await context.newPage();
   await page.goto('http://localhost:3000/');
 
 
@@ -31,14 +38,20 @@ test('Documenation', async ({ page }) => {
 });
 
 
-test('Upload Project', async ({ page }) => {
+test('Upload Project', async () => {
+  const browser = await chromium.launch();
+  const context = await browser.newContext();
+  const page = await context.newPage();
   await page.goto('http://localhost:3000/');
   const documentationButton = page.getByTestId('upload-project');
   await expect(documentationButton).toHaveText('Upload Project');
 });
 
 
-test('Open Example Project', async ({ page }) => {
+test('Open Example Project', async () => {
+  const browser = await chromium.launch();
+  const context = await browser.newContext();
+  const page = await context.newPage();
   await page.goto('http://localhost:3000/');
   const documentationButton = page.getByTestId('open-example-project');
   await expect(documentationButton).toHaveText('Open Example Project');

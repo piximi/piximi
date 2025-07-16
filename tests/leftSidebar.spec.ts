@@ -1,7 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { chromium } from 'playwright';
+import { test } from 'vitest';
+import {  expect } from 'playwright/test';
 
-
-test('Start New Project Flow', async ({ page }) => {
+test('Start New Project Flow', async () => {
+    const browser = await chromium.launch();
+    const context = await browser.newContext();
+    const page = await context.newPage();
 
     await page.goto('http://localhost:3000/project');
     const newButton = page.getByRole('button', { name: 'New' });
@@ -37,7 +41,11 @@ test('Start New Project Flow', async ({ page }) => {
 });
 
 
-test('should open menu when Open button is clicked', async ({ page }) => {
+test('should open menu when Open button is clicked', async () => {
+    const browser = await chromium.launch();
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
     await page.goto('http://localhost:3000/project');
     const openButton = page.getByRole('button', { name: /open/i });
 

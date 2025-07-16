@@ -37,6 +37,6 @@ export default defineConfig({
   test: {
     setupFiles: ["./test-setup.ts"],
     environment: "happy-dom",
-    exclude : [ '**/*.spec.ts']
+    //exclude : [ '**/*.spec.ts']
   },
 });
