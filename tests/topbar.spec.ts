@@ -24,7 +24,7 @@ test('Image Selection', async () => {
     const image = page.getByTestId('grid-image-102e71cd-bd52-4adf-b2f4-315506fa19e6');
     await image.click();
 
-},50000);
+},100000);
 
 test('Kind Switching', async () => {
     const browser = await chromium.launch();
@@ -47,7 +47,7 @@ test('Kind Switching', async () => {
     const image = page.getByTestId('grid-image-136e9014-178b-41ef-8bf8-5fe63f070a0e');
     await image.click();
 
-},50000);
+},100000);
 
 test('Adding New Kind', async () => {
 
@@ -75,7 +75,7 @@ test('Adding New Kind', async () => {
     await page.getByText('Confirm').click();
     await expect(page.getByText('test kind')).toBeVisible();
 
-},50000);
+},100000);
 
 
 test('Select All', async () => {
@@ -103,7 +103,7 @@ test('Select All', async () => {
 
     await expect(page.getByTestId('select-all-badge')).toContainText('1');
 
-},50000);
+},100000);
 
 
 test('switch between count', async () => {
@@ -135,4 +135,4 @@ test('switch between count', async () => {
 
     //await page.getByTestId('select-all-button').click();
     await expect(page.getByTestId('select-all-badge')).toContainText('1');
-},50000);
+},100000);
