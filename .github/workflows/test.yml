@@ -26,6 +26,9 @@ jobs:
         # @tensorflow/tfjs-node canvas core-js esbuild
         run: pnpm install --dangerously-allow-all-builds
 
+      - name: Ensure Playwright Test is installed
+        run: pnpm add -D @playwright/test playwright
+
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
 
