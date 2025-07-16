@@ -35,7 +35,7 @@ jobs:
           pnpm run lint
 
       - name: Start App Server
-        run: pnpm run dev &
+        run: pnpm start &
         env:
           NODE_ENV: test
 
