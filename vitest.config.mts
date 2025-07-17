@@ -1,11 +1,8 @@
-/// <reference types="vitest" />
-import { defineConfig } from "vite";
+import path from "path";
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import viteTsconfigPaths from "vite-tsconfig-paths";
-import path from "path";
-
 export default defineConfig({
-  // depending on your application, base can also be "/"
   base: "",
   plugins: [react(), viteTsconfigPaths()],
   // vite in dev mode works without this
@@ -26,25 +23,15 @@ export default defineConfig({
       translations: path.resolve("src/translations"),
     },
   },
-
-  server: {
-    // this ensures that the browser opens upon server start
-    open: true,
-    // this sets a default port to 3000
-    port: 3000,
-  },
   assetsInclude: ["**/*.bin", "**/*.svg", "**/*.zip"],
-  // test: {
-  //   setupFiles: ["./test-setup.ts"],
-  //   environment: "happy-dom",
-  //   //exclude : [ '**/*.spec.ts']
-  //       browser: {
-  //     provider: 'playwright', // or 'webdriverio'
-  //     enabled: true,
-  //     // at least one instance is required
-  //     instances: [
-  //       { browser: 'chromium' },
-  //     ],
-  //   },
-  // },
+  test: {
+    include: ["./tests/*"],
+    browser: {
+      provider: "playwright", // or 'webdriverio'
+      enabled: true,
+
+      // at least one instance is required
+      instances: [{ browser: "chromium" }],
+    },
+  },
 });

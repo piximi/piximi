@@ -87,6 +87,7 @@
     "@typescript-eslint/eslint-plugin": "^8.20.0",
     "@typescript-eslint/parser": "^8.20.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/browser": "^3.2.4",
     "canvas": "^2.9.1",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
@@ -99,6 +100,7 @@
     "husky": "^8.0.0",
     "install": "^0.13.0",
     "jiti": "^2.4.2",
+    "playwright": "^1.54.1",
     "pnpm": "^10.10.0",
     "prettier": "^3.4.2",
     "storybook": "^8.5.2",
@@ -109,7 +111,8 @@
     "typescript-eslint": "^8.20.0",
     "vite": "^6.0.11",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.0.4"
+    "vitest": "^3.2.4",
+    "vitest-browser-react": "^1.0.0"
   },
   "scripts": {
     "build": "NODE_OPTIONS=\"--max-old-space-size=6192\" VITE_APP_VERSION=$npm_package_version vite build",

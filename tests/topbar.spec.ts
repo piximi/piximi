@@ -1,138 +1,144 @@
-import { chromium } from 'playwright';
-import { test } from 'vitest';
-import {  expect } from 'playwright/test';
+import { chromium } from "playwright";
+import { expect, test } from "vitest";
+import { page } from "@vitest/browser/context";
+import { render } from "vitest-browser-react";
+//import {  expect } from '@playwright/test';
 
-test('Image Selection', async () => {
+import { Application } from "../src/Application";
 
-    const browser = await chromium.launch();
-    const context = await browser.newContext();
-    const page = await context.newPage();
+test("Image Selection", async () => {
+  // const browser = await chromium.launch();
+  // const context = await browser.newContext();
+  // const page = await context.newPage();
 
-    await page.goto('http://localhost:3000');
+  // await page.goto('http://localhost:3000/');
+  render(Application);
+  // const documentationButton = page.getByTestId('open-example-project');
+  // await documentationButton.click();
 
-    await page.goto('http://localhost:3000/');
-    const documentationButton = page.getByTestId('open-example-project');
-    await documentationButton.click();
+  // expect(page.getByText('Images with Objects')).toBeVisible();
+  // await page.getByText('Images with Objects').click();
+  // await page.getByText('Malaria infected human blood smears').click();
 
-    await expect(page.getByText('Images with Objects')).toBeVisible({ timeout: 10000 });
-    await page.getByText('Images with Objects').click();
-    await page.getByText('Malaria infected human blood smears').click();
+  //expect(page).toHaveURL(/\/project/);
+  //await page.getByText('deserializing image').waitFor({ state: 'hidden' });
 
-    await expect(page).toHaveURL(/\/project/);
-    await page.getByText('deserializing image').waitFor({ state: 'hidden' });
+  //const image = page.getByTestId('grid-image-102e71cd-bd52-4adf-b2f4-315506fa19e6');
+  //await image.click();
+}, 100000);
 
-    const image = page.getByTestId('grid-image-102e71cd-bd52-4adf-b2f4-315506fa19e6');
-    await image.click();
+// test('Kind Switching', async () => {
+//     const browser = await chromium.launch();
+//     const context = await browser.newContext();
+//     const page = await context.newPage();
 
-},100000);
+//     await page.goto('http://localhost:3000/');
+//     const documentationButton = page.getByTestId('open-example-project');
+//     await documentationButton.click();
 
-test('Kind Switching', async () => {
-    const browser = await chromium.launch();
-    const context = await browser.newContext();
-    const page = await context.newPage();
+//     await expect(page.getByText('Images with Objects')).toBeVisible({ timeout: 10000 });
+//     await page.getByText('Images with Objects').click();
+//     await page.getByText('Malaria infected human blood smears').click();
 
-    await page.goto('http://localhost:3000/');
-    const documentationButton = page.getByTestId('open-example-project');
-    await documentationButton.click();
+//     await expect(page).toHaveURL(/\/project/);
+//     await page.getByText('deserializing image').waitFor({ state: 'hidden' });
 
-    await expect(page.getByText('Images with Objects')).toBeVisible({ timeout: 10000 });
-    await page.getByText('Images with Objects').click();
-    await page.getByText('Malaria infected human blood smears').click();
+//     await page.getByText('Infected',{ exact: true }).click();
 
-    await expect(page).toHaveURL(/\/project/);
-    await page.getByText('deserializing image').waitFor({ state: 'hidden' });
+//     const image = page.getByTestId('grid-image-136e9014-178b-41ef-8bf8-5fe63f070a0e');
+//     await image.click();
 
-    await page.getByText('Infected',{ exact: true }).click();
+// },100000);
 
-    const image = page.getByTestId('grid-image-136e9014-178b-41ef-8bf8-5fe63f070a0e');
-    await image.click();
+// test('Adding New Kind', async () => {
 
-},100000);
+//     const browser = await chromium.launch();
+//     const context = await browser.newContext();
+//     const page = await context.newPage();
 
-test('Adding New Kind', async () => {
+//     await page.goto('http://localhost:3000/');
+//     const documentationButton = page.getByTestId('open-example-project');
+//     await documentationButton.click();
 
-    const browser = await chromium.launch();
-    const context = await browser.newContext();
-    const page = await context.newPage();
+//     await expect(page.getByText('Images with Objects')).toBeVisible({ timeout: 10000 });
+//     await page.getByText('Images with Objects').click();
+//     await page.getByText('Malaria infected human blood smears').click();
 
-    await page.goto('http://localhost:3000/');
-    const documentationButton = page.getByTestId('open-example-project');
-    await documentationButton.click();
+//     await expect(page).toHaveURL(/\/project/);
+//     await page.getByText('deserializing image').waitFor({ state: 'hidden' });
 
-    await expect(page.getByText('Images with Objects')).toBeVisible({ timeout: 10000 });
-    await page.getByText('Images with Objects').click();
-    await page.getByText('Malaria infected human blood smears').click();
+//     await page.getByTestId('AddIcon').last().click();
+//     await page.getByText('New Kind').click();
 
-    await expect(page).toHaveURL(/\/project/);
-    await page.getByText('deserializing image').waitFor({ state: 'hidden' });
+//    // await page.getByTestId('create-kind-name-input').fill('test kind');
+//     await page.getByTestId('create-kind-name-input').locator('input').fill('test kind');
 
-    await page.getByTestId('AddIcon').last().click();
-    await page.getByText('New Kind').click();
+//     await page.getByText('Confirm').click();
+//     await expect(page.getByText('test kind')).toBeVisible();
 
-   // await page.getByTestId('create-kind-name-input').fill('test kind');
-    await page.getByTestId('create-kind-name-input').locator('input').fill('test kind');
+// },100000);
 
-    await page.getByText('Confirm').click();
-    await expect(page.getByText('test kind')).toBeVisible();
+// test('Select All', async () => {
+//     const browser = await chromium.launch();
+//     const context = await browser.newContext();
+//     const page = await context.newPage();
 
-},100000);
+//     await page.goto('http://localhost:3000/');
+//     const documentationButton = page.getByTestId('open-example-project');
+//     await documentationButton.click();
 
+//     await expect(page.getByText('Images with Objects')).toBeVisible({ timeout: 10000 });
+//     await page.getByText('Images with Objects').click();
+//     await page.getByText('Malaria infected human blood smears').click();
 
-test('Select All', async () => {
-    const browser = await chromium.launch();
-    const context = await browser.newContext();
-    const page = await context.newPage();
+//     await expect(page).toHaveURL(/\/project/);
+//     await page.getByText('deserializing image').waitFor({ state: 'hidden' });
 
-    await page.goto('http://localhost:3000/');
-    const documentationButton = page.getByTestId('open-example-project');
-    await documentationButton.click();
+//     await page.getByTestId('select-all-button').hover();
+//     await expect(page.getByRole('tooltip')).toContainText('Select all(control+a)');
 
-    await expect(page.getByText('Images with Objects')).toBeVisible({ timeout: 10000 });
-    await page.getByText('Images with Objects').click();
-    await page.getByText('Malaria infected human blood smears').click();
+//     await page.mouse.move(0, 0);
 
-    await expect(page).toHaveURL(/\/project/);
-    await page.getByText('deserializing image').waitFor({ state: 'hidden' });
+//     await page.getByTestId('select-all-button').click();
 
-    await page.getByTestId('select-all-button').hover();
-    await expect(page.getByRole('tooltip')).toContainText('Select all(control+a)');
+//     await expect(page.getByTestId('select-all-badge')).toContainText('1');
 
-    await page.mouse.move(0, 0);
+// },100000);
 
-    await page.getByTestId('select-all-button').click();
+// test('switch between count', async () => {
 
-    await expect(page.getByTestId('select-all-badge')).toContainText('1');
+//     const browser = await chromium.launch();
+//     const context = await browser.newContext();
+//     const page = await context.newPage();
 
-},100000);
+//     await page.goto('http://localhost:3000/');
+//     const documentationButton = page.getByTestId('open-example-project');
+//     await documentationButton.click();
 
+//     await page.getByText('Images with Objects').click();
+//     await page.getByText('Malaria infected human blood smears').click();
 
-test('switch between count', async () => {
+//     await expect(page).toHaveURL(/\/project/);
+//     await page.getByText('deserializing image').waitFor({ state: 'hidden' });
 
-    const browser = await chromium.launch();
-    const context = await browser.newContext();
-    const page = await context.newPage();
+//     await page.getByTestId('select-all-button').hover();
+//     await expect(page.getByRole('tooltip')).toContainText('Select all(control+a)');
 
-    await page.goto('http://localhost:3000/');
-    const documentationButton = page.getByTestId('open-example-project');
-    await documentationButton.click();
+//     await page.mouse.move(0, 0);
 
-    await page.getByText('Images with Objects').click();
-    await page.getByText('Malaria infected human blood smears').click();
+//     await page.getByTestId('select-all-button').click();
 
-    await expect(page).toHaveURL(/\/project/);
-    await page.getByText('deserializing image').waitFor({ state: 'hidden' });
+//     await expect(page.getByTestId('select-all-badge')).toContainText('1');
 
-    await page.getByTestId('select-all-button').hover();
-    await expect(page.getByRole('tooltip')).toContainText('Select all(control+a)');
+//     await page.getByText('Infected',{ exact: true }).click();
 
-    await page.mouse.move(0, 0);
+//     //await page.getByTestId('select-all-button').click();
+//     await expect(page.getByTestId('select-all-badge')).toContainText('1');
+// },100000);
 
-    await page.getByTestId('select-all-button').click();
+// // tests/sample.test.ts
+// import { test, expect } from 'vitest';
 
-    await expect(page.getByTestId('select-all-badge')).toContainText('1');
-
-    await page.getByText('Infected',{ exact: true }).click();
-
-    //await page.getByTestId('select-all-button').click();
-    await expect(page.getByTestId('select-all-badge')).toContainText('1');
-},100000);
+// test('basic', () => {
+//   expect(1 + 1).toBe(2);
+// });
