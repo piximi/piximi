@@ -111,7 +111,7 @@ export const useStageHandlers = (
 
     if (
       !event.target.getParent() ||
-      event.target.getParent().className === transformerClassName ||
+      event.target.getParent()?.className === transformerClassName ||
       event.target.attrs.name === transformerButtonAttrNAme
     )
       return;
@@ -246,7 +246,7 @@ export const useStageHandlers = (
 
     if (
       !event.target.getParent() ||
-      event.target.getParent().className === transformerClassName ||
+      event.target.getParent()?.className === transformerClassName ||
       event.target.attrs.name === transformerButtonAttrNAme
     )
       return;
