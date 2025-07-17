@@ -32,6 +32,7 @@ export type AnnotationObject = Thing & {
   encodedMask: Array<number>;
   decodedMask?: DataArray;
   plane?: number;
+  timepoint?: string;
   imageId: string;
 };
 
@@ -73,6 +74,7 @@ export type TSAnnotationObject = {
   categoryId: string;
   shape: Shape;
   data: Tensor4D;
+  activePlane?: number;
 };
 export type DecodedAnnotationObject = Omit<
   AnnotationObject & {

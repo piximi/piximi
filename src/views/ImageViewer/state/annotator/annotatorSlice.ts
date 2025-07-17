@@ -17,12 +17,14 @@ import { Category, Kind, ThingsUpdates } from "store/data/types";
 import {
   addCategoryContents,
   addKindContents,
+  deleteAnnotationEntry,
   deleteCategoryEntry,
   deleteKindEntry,
   deleteThingEntry,
   editCategory,
   removeCategoryContents,
   removeKindContents,
+  updateAnnotation,
   updateKind,
   updateThing,
 } from "./utils";
@@ -224,6 +226,7 @@ export const annotatorSlice = createSlice({
 
       for (const thingId of affectedThings) {
         deleteThingEntry(state, thingId);
+        deleteAnnotationEntry(state, thingId);
       }
     },
 
@@ -266,6 +269,10 @@ export const annotatorSlice = createSlice({
       addCategoryContents(state, associatedUnknownKind, associatedThings);
       associatedThings.forEach((thingId) => {
         updateThing(state, { id: thingId, categoryId: associatedUnknownKind });
+        updateAnnotation(state, {
+          id: thingId,
+          categoryId: associatedUnknownKind,
+        });
       });
     },
     addThing(
@@ -278,6 +285,21 @@ export const annotatorSlice = createSlice({
       state.changes.things.added[thing.id] = thing;
       addKindContents(state, { id: thing.kind, containing: [thing.id] });
       addCategoryContents(state, thing.categoryId, [thing.id]);
+    },
+    addAnnotation(
+      state,
+      action: PayloadAction<{
+        annotation: ProtoAnnotationObject;
+      }>,
+    ) {
+      const { annotation } = action.payload;
+      state.changes.things.added[annotation.id] = annotation;
+      state.changes.annotations.added[annotation.id] = annotation;
+      addKindContents(state, {
+        id: annotation.kind,
+        containing: [annotation.id],
+      });
+      addCategoryContents(state, annotation.categoryId, [annotation.id]);
     },
     editThings(
       state,
@@ -303,6 +325,30 @@ export const annotatorSlice = createSlice({
         }
       }
     },
+    editAnnotations(
+      state,
+      action: PayloadAction<{
+        updates: ThingsUpdates;
+      }>,
+    ) {
+      const { updates } = action.payload;
+      for (const update of updates) {
+        const { id, ...changes } = update;
+        if (id in state.changes.annotations.added) {
+          Object.entries(changes).forEach((change) => {
+            //@ts-ignore typescript doesnt know that "changes" contains valid entried for ProtoAnnotationObject
+            state.changes.annotations.added[id][change[0]] = change[1];
+          });
+        } else if (id in state.changes.annotations.edited) {
+          Object.entries(changes).forEach((change) => {
+            //@ts-ignore typescript doesnt know that "changes" contains valid entried for ProtoAnnotationObject
+            state.changes.annotations.edited[id][change[0]] = change[1];
+          });
+        } else {
+          state.changes.annotations.edited[id] = { id, ...changes };
+        }
+      }
+    },
     deleteThings(
       state,
       action: PayloadAction<{
@@ -314,6 +360,22 @@ export const annotatorSlice = createSlice({
         deleteThingEntry(state, thing.id);
         removeKindContents(state, { id: thing.kind, containing: [thing.id] });
         removeCategoryContents(state, thing.categoryId, [thing.id]);
+      }
+    },
+    deleteAnnotations(
+      state,
+      action: PayloadAction<{
+        annotations: Array<ProtoAnnotationObject>;
+      }>,
+    ) {
+      const { annotations } = action.payload;
+      for (const annotation of annotations) {
+        deleteAnnotationEntry(state, annotation.id);
+        removeKindContents(state, {
+          id: annotation.kind,
+          containing: [annotation.id],
+        });
+        removeCategoryContents(state, annotation.categoryId, [annotation.id]);
       }
     },
   },

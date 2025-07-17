@@ -236,6 +236,36 @@ startAppListening({
     );
   },
 });
+startAppListening({
+  actionCreator: imageViewerSlice.actions.setActiveImageActivePlane,
+  effect: async (action, listenerAPI) => {
+    const pl = action.payload.plane;
+    const { data: dataState, imageViewer: imageViewerState } =
+      listenerAPI.getState();
+
+    const activeImageSeriesId = imageViewerState.activeImageSeriesId;
+    if (!activeImageSeriesId) return;
+
+    const activeImageSeriesDisplayProperties =
+      imageViewerState.imageStack[activeImageSeriesId];
+
+    const activeImageSeriesData =
+      dataState.images.entities[activeImageSeriesId];
+
+    const res = await getRenderedSources(
+      activeImageSeriesData,
+      pl,
+      activeImageSeriesDisplayProperties.activeTimepoint,
+      activeImageSeriesDisplayProperties.timepoints,
+    );
+
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setActiveSeriesTZPreviews({
+        previews: res.ZTPreviews,
+      }),
+    );
+  },
+});
 
 startAppListening({
   actionCreator: imageViewerSlice.actions.updateActiveImageColors,

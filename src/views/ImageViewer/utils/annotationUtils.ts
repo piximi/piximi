@@ -1,4 +1,4 @@
-import { DataArray } from "store/data/types";
+import { DataArray, TSAnnotationObject } from "store/data/types";
 import IJSImage from "image-js";
 import { getPropertiesFromImage } from "store/data/utils";
 import { convertToDataArray } from "utils/dataUtils";
@@ -397,7 +397,7 @@ const reconcileThings = async (
     string,
     { added: string[]; deleted: string[] }
   > = {};
-  const newAnnotations: AnnotationObject[] = [];
+  const newAnnotations: Array<AnnotationObject | TSAnnotationObject> = [];
   if (Object.keys(thingChanges.added).length > 0) {
     for await (const thing of Object.values(thingChanges.added)) {
       const imageId = thing.imageId;
@@ -534,7 +534,9 @@ export const reconcileChanges = async (
       );
     if (newAnnotations)
       productionStore.dispatch(
-        dataSlice.actions.addThings_unsafe({ things: newAnnotations }),
+        dataSlice.actions.addTSAnnotations_unsafe({
+          annotations: newAnnotations as TSAnnotationObject[],
+        }),
       );
     if (updatedAnnotations)
       productionStore.dispatch(

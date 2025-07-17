@@ -20,7 +20,7 @@ import { Selection } from "icons";
 
 import { ToolType } from "views/ImageViewer/utils/enums";
 import {
-  selectActiveAnnotationsArray,
+  selectUpdatedActiveAnnotations,
   selectCategoriesArray,
 } from "views/ImageViewer/state/annotator/reselectors";
 import { PopoverTool } from "components/ui/Tool";
@@ -33,7 +33,7 @@ export const SelectionOptions = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const activeTool = useSelector(selectToolType);
-  const activeAnnotations = useSelector(selectActiveAnnotationsArray);
+  const activeAnnotations = useSelector(selectUpdatedActiveAnnotations);
   const annotationCategories = useSelector(selectCategoriesArray);
   const t = useTranslation();
 

@@ -13,7 +13,7 @@ import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectSelectedAnnotationIds } from "views/ImageViewer/state/annotator/selectors";
 import {
-  selectActiveAnnotationsArray,
+  selectUpdatedActiveAnnotations,
   selectSelectedActiveAnnotations,
 } from "views/ImageViewer/state/annotator/reselectors";
 
@@ -28,7 +28,7 @@ export const ClearAnnotationsGroup = () => {
     selectSelectedActiveAnnotations,
   );
   const activeAnnotationsIds = useSelector(selectActiveImageObjectIds);
-  const activeAnnotations = useSelector(selectActiveAnnotationsArray);
+  const activeAnnotations = useSelector(selectUpdatedActiveAnnotations);
   const [deleteOp, setDeleteOp] = useState<DeleteType>();
 
   const selectedActiveAnnotationIds = useMemo(() => {

@@ -4,7 +4,10 @@ import Konva from "konva";
 
 import { MemoizedKonvaImage } from "./MemoizedKonvaImage";
 
-import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
+import {
+  selectActivePlane,
+  selectImageOrigin,
+} from "views/ImageViewer/state/imageViewer/selectors";
 import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
 export const Image = React.forwardRef<
@@ -12,6 +15,7 @@ export const Image = React.forwardRef<
   { stageWidth: number; stageHeight: number; images: HTMLImageElement[] }
 >(({ stageWidth: _stageWidth, stageHeight: _stageHeight, images }, ref) => {
   const activeImage = useSelector(selectActiveImage);
+  const activePlane = useSelector(selectActivePlane);
   const [filters] = useState<Array<any>>();
   const imagePosition = useSelector(selectImageOrigin);
 
@@ -24,7 +28,7 @@ export const Image = React.forwardRef<
           height={activeImage?.shape.height || 100}
           width={activeImage?.shape.width || 100}
           imagePosition={imagePosition!}
-          activePlane={activeImage?.activePlane || 0}
+          activePlane={activePlane || 0}
           filters={filters!}
           idx={idx}
           key={idx}

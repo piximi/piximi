@@ -13,6 +13,8 @@ export const selectActiveImageSeries = ({
   if (imageViewer.activeImageSeriesId === undefined) {
     return undefined;
   }
+  //console.log("selectActiveImageSeries fired");
+  //console.log(imageViewer.imageStack[imageViewer.activeImageSeriesId]);
   return imageViewer.imageStack[imageViewer.activeImageSeriesId];
 };
 

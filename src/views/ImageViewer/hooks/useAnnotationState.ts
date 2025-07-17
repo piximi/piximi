@@ -12,6 +12,7 @@ import {
 } from "views/ImageViewer/state/annotator/reselectors";
 import {
   selectActiveImageId,
+  selectActiveImageSeries,
   selectSelectedIVCategoryId,
 } from "views/ImageViewer/state/imageViewer/selectors";
 import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
@@ -38,6 +39,7 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const annotationMode = useSelector(selectAnnotationMode);
   const objects = useSelector(selectImageViewerObjectsArray);
   const workingAnnotation = useSelector(selectFullWorkingAnnotation);
+  const activeImageSeries = useSelector(selectActiveImageSeries);
 
   const objectNames = useMemo(() => {
     return objects.map((obj) => obj.name);
@@ -87,7 +89,9 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
             categoryId: annotationCategory.id,
             imageId: activeImage.id,
             decodedMask: annotationTool.decodedMask,
-            activePlane: activeImage.activePlane,
+            plane: activeImageSeries?.activePlane ?? 0,
+            activePlane: activeImageSeries?.activePlane ?? 0,
+            timepoint: activeImageSeries?.activeTimepoint ?? "0",
             partition: Partition.Unassigned,
           },
           activeImage!,

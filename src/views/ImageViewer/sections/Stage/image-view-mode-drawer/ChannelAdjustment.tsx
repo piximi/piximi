@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { produce } from "immer";
 import { tensor2d } from "@tensorflow/tfjs";
@@ -133,18 +133,10 @@ const ChannelsList = () => {
         colors: newColors,
       }),
     );
-    // dispatch(
-    //   annotatorSlice.actions.editThings({
-    //     updates: [{ id: activeImage!.id, colors: newColors }],
-    //   }),
-    // );
   };
 
-  useEffect(() => {}, [selectedChannelIndex]);
   const colorAdjustmentSlider = (index: number, name: string) => {
     const isVisible = localActiveImageColors.visible[index];
-
-    if (!activeImage) return <></>;
 
     return (
       <ListItem dense disableGutters disablePadding key={index}>
@@ -176,7 +168,7 @@ const ChannelsList = () => {
     );
   };
 
-  return (
+  return activeImage ? (
     <Box
       sx={{ display: "grid", gridTemplateColumns: "200px 1fr", width: "100%" }}
     >
@@ -237,5 +229,7 @@ const ChannelsList = () => {
         )}
       </Box>
     </Box>
+  ) : (
+    <></>
   );
 };

@@ -4,6 +4,7 @@ import {
   AnnotationObject,
   Category,
   DecodedAnnotationObject,
+  DecodedTSAnnotationObject,
   Kind,
   TPKey,
 } from "store/data/types";
@@ -50,10 +51,9 @@ export type ImageViewerState = {
   highlightedCategory?: string;
 };
 
-export type ProtoAnnotationObject = Omit<
-  DecodedAnnotationObject,
-  "src" | "data"
->;
+export type ProtoAnnotationObject =
+  | Omit<DecodedAnnotationObject, "src" | "data">
+  | Omit<DecodedTSAnnotationObject, "src" | "data">;
 export type AnnotatorState = {
   workingAnnotationId: string | undefined;
   workingAnnotation: {

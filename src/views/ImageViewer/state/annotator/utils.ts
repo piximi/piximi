@@ -297,6 +297,20 @@ export const deleteThingEntry = (
   state.changes.things.deleted.push(thingId);
 };
 
+export const deleteAnnotationEntry = (
+  state: Draft<AnnotatorState>,
+  annId: string,
+) => {
+  if (annId in state.changes.annotations.added) {
+    delete state.changes.annotations.added[annId];
+    return;
+  }
+  if (annId in state.changes.annotations.edited)
+    delete state.changes.annotations.edited[annId];
+
+  state.changes.annotations.deleted.push(annId);
+};
+
 export const updateThing = (
   state: Draft<AnnotatorState>,
   thing: RequireOnly<AnnotationObject, "id">,
@@ -309,6 +323,20 @@ export const updateThing = (
     state.changes.things.edited[thing.id] = thing;
   }
 };
+
+export const updateAnnotation = (
+  state: Draft<AnnotatorState>,
+  annotation: RequireOnly<AnnotationObject, "id">,
+) => {
+  if (annotation.id in state.changes.annotations.added) {
+    merge(state.changes.annotations.added[annotation.id], annotation);
+  } else if (annotation.id in state.changes.annotations.edited) {
+    merge(state.changes.annotations.edited[annotation.id], annotation);
+  } else {
+    state.changes.annotations.edited[annotation.id] = annotation;
+  }
+};
+
 export function getCompleteEntity<T>(entity: DeferredEntity<T>): T | undefined {
   if (entity.changes.deleted) return;
   const {

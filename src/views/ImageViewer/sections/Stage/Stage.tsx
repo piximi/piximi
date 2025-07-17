@@ -19,10 +19,10 @@ import {
   useAnnotationTool,
 } from "../../hooks";
 import { NewKindDialog } from "views/ImageViewer/components/dialogs/NewKindDialog";
-//import { Cursor } from "./Cursor";
+import { Cursor } from "./Cursor";
 import { Layer } from "./Layer";
-//import { Selection } from "./Selection";
-//import { Annotations } from "./Annotations";
+import { Selection } from "./Selection";
+import { Annotations } from "./Annotations";
 import { Image } from "./Image";
 
 import { StageContext } from "../../state/StageContext";
@@ -30,7 +30,7 @@ import { imageViewerSlice } from "../../state/imageViewer";
 import { annotatorSlice } from "../../state/annotator";
 import {
   selectAnnotationState,
-  //selectToolType,
+  selectToolType,
 } from "../../state/annotator/selectors";
 import { selectImageViewerObjectsArray } from "../../state/annotator/reselectors";
 import {
@@ -43,7 +43,7 @@ import {
 import { generateKind, generateUUID } from "store/data/utils";
 
 import { CATEGORY_COLORS } from "store/data/constants";
-import { AnnotationState /*ToolType*/ } from "views/ImageViewer/utils/enums";
+import { AnnotationState, ToolType } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/enums";
 
 import { Category } from "store/data/types";
@@ -72,12 +72,12 @@ export const Stage = ({
   const stageRef = useContext(StageContext);
 
   // data Selectors
-  const activeImageDetails = useSelector(selectActiveImageSeries);
+  const activeImageSeries = useSelector(selectActiveImageSeries);
   const activeImage = useSelector(selectActiveImage);
   const existingObjects = useSelector(selectImageViewerObjectsArray);
 
   // tool selectors
-  //const toolType = useSelector(selectToolType);
+  const toolType = useSelector(selectToolType);
   const imageIsLoading = useSelector(selectImageIsloading);
   const annotationState = useSelector(selectAnnotationState);
 
@@ -159,7 +159,8 @@ export const Stage = ({
         }),
       );
     });
-    if (!activeImage) throw new Error("Active image not found");
+    if (!activeImage || !activeImageSeries)
+      throw new Error("Active image not found");
     if (!annotationTool.decodedMask) throw new Error("No mask found");
     if (!annotationTool.boundingBox) throw new Error("No bounding box found");
 
@@ -167,9 +168,11 @@ export const Stage = ({
       {
         boundingBox: annotationTool.boundingBox,
         categoryId: (newCategory ?? unknownCategory).id,
-        imageId: activeImage.id,
+        imageId: activeImageSeries.id,
         decodedMask: annotationTool.decodedMask,
-        activePlane: activeImage.activePlane,
+        activePlane: activeImageSeries.activePlane,
+        plane: activeImageSeries.activePlane,
+        timepoint: activeImageSeries.activeTimepoint,
         partition: Partition.Unassigned,
       },
       activeImage,
@@ -189,7 +192,7 @@ export const Stage = ({
       }),
     );
 
-    //setNoKindAvailable(false);
+    setNoKindAvailable(false);
     handleClose();
   };
 
@@ -232,15 +235,15 @@ export const Stage = ({
   }, [stageWidth, stageHeight, activeImage?.shape, dispatch]);
 
   useEffect(() => {
-    if (!activeImageDetails || !activeImageDetails.activeSrcs) return;
+    if (!activeImageSeries || !activeImageSeries.activeSrcs) return;
     setHtmlImages(
-      activeImageDetails.activeSrcs.map((src: string) => {
+      activeImageSeries.activeSrcs.map((src: string) => {
         const imgElem = document.createElement("img");
         imgElem.src = src;
         return imgElem;
       }),
     );
-  }, [activeImageDetails, stageRef, dispatch]);
+  }, [activeImageSeries, stageRef, dispatch]);
 
   useEffect(() => {
     stageRef?.current?.scale({ x: 1, y: 1 });
@@ -249,7 +252,7 @@ export const Stage = ({
         stagePosition: { x: 0, y: 0 },
       }),
     );
-  }, [activeImageDetails, stageRef, dispatch]);
+  }, [activeImageSeries, stageRef, dispatch]);
 
   useHotkeys(
     "alt",
@@ -285,20 +288,18 @@ export const Stage = ({
         <Provider store={store}>
           <StageContext.Provider value={stageRef}>
             <Layer>
-              {!(htmlImages && htmlImages.length) ? (
+              {!(htmlImages && htmlImages.length) || imageIsLoading ? (
                 <></>
-              ) : !imageIsLoading ? (
+              ) : (
                 <Image
                   ref={imageRef}
                   images={htmlImages}
                   stageHeight={stageHeight}
                   stageWidth={stageWidth}
                 />
-              ) : (
-                <></>
               )}
-              {/* {(annotationState === AnnotationState.Annotating ||
-                toolType === ToolType.QuickAnnotation) && ( //TODO: remind myself why quick annotation special
+              {(annotationState === AnnotationState.Annotating ||
+                toolType === ToolType.QuickAnnotation) && (
                 <Selection tool={annotationTool} toolType={toolType} />
               )}
               <Cursor
@@ -309,9 +310,10 @@ export const Stage = ({
                 draggable={draggable}
                 toolType={toolType}
               />
+
               {!imageIsLoading && (
                 <Annotations annotationTool={annotationTool} />
-              )} */}
+              )}
             </Layer>
           </StageContext.Provider>
         </Provider>

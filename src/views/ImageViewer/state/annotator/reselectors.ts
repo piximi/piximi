@@ -2,6 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { difference } from "lodash";
 
 import {
+  selectAnnotationChanges,
   selectCategoryChanges,
   selectKindChanges,
   selectSelectedAnnotationIds,
@@ -9,6 +10,8 @@ import {
   selectWorkingAnnotationEntity,
 } from "./selectors";
 import {
+  selectAnnotationDictionary,
+  selectLocalizedAnnotationDict,
   selectObjectCategoryDict,
   selectObjectDict,
   selectObjectKindDict,
@@ -17,12 +20,19 @@ import {
 import { decodeAnnotation } from "views/ImageViewer/utils/rle";
 import { getCompleteEntity } from "./utils";
 
-import { AnnotationObject, Category, Kind, Shape } from "store/data/types";
+import {
+  AnnotationObject,
+  Category,
+  Kind,
+  Shape,
+  TSAnnotationObject,
+} from "store/data/types";
 import { ProtoAnnotationObject } from "views/ImageViewer/utils/types";
 import {
   selectActiveImage,
   selectImageSeriesArray,
 } from "../imageViewer/reselectors";
+import { selectActiveImageSeries } from "../imageViewer/selectors";
 
 export const selectImageViewerKinds = createSelector(
   selectObjectKindDict,
@@ -168,6 +178,60 @@ export const selectUpdatedObjects = createSelector(
   },
 );
 
+export const selectUpdatedActiveAnnotationDict = createSelector(
+  selectActiveImageSeries,
+  selectLocalizedAnnotationDict,
+  selectAnnotationChanges,
+  (activeImageSeries, getLocalAnnotationsDict, annotationChanges) => {
+    if (!activeImageSeries) return {};
+    const finalAnnotations = Object.values(annotationChanges.added).reduce(
+      (
+        finalLocalAnnotations: Record<string, ProtoAnnotationObject>,
+        annotation,
+      ) => {
+        if (
+          annotation.plane === activeImageSeries.activePlane &&
+          annotation.timepoint === activeImageSeries.activeTimepoint &&
+          annotation.imageId === activeImageSeries.id
+        )
+          finalLocalAnnotations[annotation.id] = annotation;
+        return finalLocalAnnotations;
+      },
+      {},
+    );
+
+    const localAnnotations = getLocalAnnotationsDict(
+      activeImageSeries.id,
+      activeImageSeries.activePlane,
+      activeImageSeries.activeTimepoint,
+    );
+    const remainingAnnotations = difference(
+      Object.keys(localAnnotations),
+      annotationChanges.deleted,
+    );
+
+    for (const annotationId of remainingAnnotations) {
+      const annotation = decodeAnnotation(localAnnotations[annotationId]);
+
+      if (annotationChanges.edited[annotationId]) {
+        finalAnnotations[annotationId] = {
+          ...(annotation as ProtoAnnotationObject),
+          ...annotationChanges.edited[annotationId],
+        };
+      } else {
+        finalAnnotations[annotationId] = annotation as ProtoAnnotationObject;
+      }
+    }
+
+    return finalAnnotations;
+  },
+);
+
+export const selectUpdatedActiveAnnotations = createSelector(
+  selectUpdatedActiveAnnotationDict,
+  (annotationDict) => Object.values(annotationDict),
+);
+
 export const selectImageViewerObjects = createSelector(
   selectImageSeriesArray,
   selectUpdatedObjects,
@@ -202,54 +266,26 @@ export const selectFullWorkingAnnotation = createSelector(
   },
 );
 
-export const selectActiveAnnotations = createSelector(
-  [selectActiveImage, selectUpdatedObjects],
-  (activeImage, objects): Record<string, ProtoAnnotationObject> => {
-    const activeAnnotationDict: Record<string, ProtoAnnotationObject> = {};
-    if (!activeImage) return activeAnnotationDict;
-    activeImage.containing.forEach((annotationId) => {
-      activeAnnotationDict[annotationId] = objects[annotationId];
-    });
-
-    return activeAnnotationDict;
-  },
-);
-
-export const selectActiveAnnotationsArray = createSelector(
-  selectActiveAnnotations,
-  (activeAnnotationDict): Array<ProtoAnnotationObject> => {
-    return Object.values(activeAnnotationDict);
-  },
-);
-
 export const selectActiveAnnotationsViews = createSelector(
   selectActiveImage,
-  selectUpdatedObjects,
+  selectUpdatedActiveAnnotations,
   selectImageViewerCategories,
-  (activeImage, objects, catDict) => {
+  (activeImage, annotations, catDict) => {
     if (!activeImage) return [];
     const imageShape = activeImage.shape;
-    const activePlane = activeImage.activePlane;
     const annotationObjects: Array<{
       annotation: ProtoAnnotationObject;
       fillColor: string;
       imageShape: Shape;
     }> = [];
 
-    for (const annotationId of activeImage.containing) {
-      const annotation = objects[annotationId];
-
-      if (
-        annotation.plane === activePlane ||
-        annotation.activePlane === activePlane
-      ) {
-        const fillColor = catDict[annotation.categoryId].color;
-        annotationObjects.push({
-          annotation: annotation,
-          fillColor,
-          imageShape: imageShape,
-        });
-      }
+    for (const annotation of annotations) {
+      const fillColor = catDict[annotation.categoryId].color;
+      annotationObjects.push({
+        annotation: annotation,
+        fillColor,
+        imageShape: imageShape,
+      });
     }
     return annotationObjects;
   },

@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo, useRef } from "react";
+import React, { memo, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Avatar,
@@ -40,7 +40,6 @@ export const ImageList = () => {
   const activeImageId = useSelector(selectActiveImageId);
 
   const imageListImages = useMemo(() => {
-    console.log(imageSeriesArray);
     return imageSeriesArray.map((imageSeries) => {
       return getFullTimepointImage(imageSeries, "0");
     });
@@ -120,9 +119,6 @@ export const ImageList = () => {
     }
   };
 
-  useEffect(() => {
-    console.log(imageListImages);
-  }, [imageListImages]);
   return (
     <>
       <Box

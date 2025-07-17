@@ -119,9 +119,19 @@ export const AnnotationTransformer = ({
             things: selectedAnnotations,
           }),
         );
+        dispatch(
+          annotatorSlice.actions.deleteAnnotations({
+            annotations: selectedAnnotations,
+          }),
+        );
       } else {
         dispatch(
           annotatorSlice.actions.editThings({
+            updates: [{ id: annotationId, ...workingAnnotation.changes }],
+          }),
+        );
+        dispatch(
+          annotatorSlice.actions.editAnnotations({
             updates: [{ id: annotationId, ...workingAnnotation.changes }],
           }),
         );
@@ -132,6 +142,11 @@ export const AnnotationTransformer = ({
       dispatch(
         annotatorSlice.actions.addThing({
           thing: completeWorkingAnnotation,
+        }),
+      );
+      dispatch(
+        annotatorSlice.actions.addAnnotation({
+          annotation: completeWorkingAnnotation,
         }),
       );
       if (soundEnabled) playCreateAnnotationSoundEffect();

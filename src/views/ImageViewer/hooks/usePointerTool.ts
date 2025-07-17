@@ -6,7 +6,7 @@ import { useHotkeys } from "hooks/useHotkeys";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectActiveAnnotationsArray } from "views/ImageViewer/state/annotator/reselectors";
+import { selectUpdatedActiveAnnotations } from "views/ImageViewer/state/annotator/reselectors";
 
 import { getOverlappingAnnotations } from "views/ImageViewer/utils";
 import { getAnnotationsInBox } from "views/ImageViewer/utils/imageHelper";
@@ -27,7 +27,7 @@ export const usePointerTool = (
 ) => {
   const dispatch = useDispatch();
   const activeImageId = useSelector(selectActiveImageId);
-  const activeAnnotations = useSelector(selectActiveAnnotationsArray);
+  const activeAnnotations = useSelector(selectUpdatedActiveAnnotations);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shift, setShift] = useState<boolean>(false);
   const [dragging, setDragging] = useState<boolean>(false);

@@ -339,3 +339,26 @@ export const selectAnnotationIdsByImageTimepoint = createSelector(
     return byImageTimepoint;
   },
 );
+
+export const selectLocalizedAnnotationDict = createSelector(
+  selectImageDictionary,
+  selectAnnotationDictionary,
+  (imageDict, AnnDict) =>
+    (imageId: string, plane: number, timepoint: string) => {
+      const seriesAnnotations = imageDict[imageId].containing;
+      return seriesAnnotations.reduce(
+        (localizedAnns: Record<string, TSAnnotationObject>, annId) => {
+          const seriesAnn = AnnDict[annId];
+          if (seriesAnn.plane === plane && seriesAnn.timepoint === timepoint)
+            localizedAnns[annId] = seriesAnn;
+          return localizedAnns;
+        },
+        {},
+      );
+    },
+);
+
+export const selectLocalizedAnnotations = createSelector(
+  selectLocalizedAnnotationDict,
+  (localAnnDict) => Object.values(localAnnDict),
+);
