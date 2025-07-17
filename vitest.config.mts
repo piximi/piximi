@@ -4,6 +4,9 @@ import react from "@vitejs/plugin-react";
 import viteTsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   base: "",
+  optimizeDeps: {
+    exclude: ["fsevents", "chromium-bidi"],
+  },
   plugins: [react(), viteTsconfigPaths()],
   // vite in dev mode works without this
   // but on build rollup fails to resolve these

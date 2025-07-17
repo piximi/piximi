@@ -3,8 +3,10 @@ import { expect, test } from "vitest";
 import { page } from "@vitest/browser/context";
 import { render } from "vitest-browser-react";
 //import {  expect } from '@playwright/test';
+import { productionStore } from "../src/store";
 
 import { Application } from "../src/Application";
+import { Provider } from "react-redux";
 
 test("Image Selection", async () => {
   // const browser = await chromium.launch();
@@ -12,9 +14,13 @@ test("Image Selection", async () => {
   // const page = await context.newPage();
 
   // await page.goto('http://localhost:3000/');
-  render(Application);
-  // const documentationButton = page.getByTestId('open-example-project');
-  // await documentationButton.click();
+  render(
+    <Provider store={productionStore}>
+      <Application />
+    </Provider>,
+  );
+  const documentationButton = page.getByTestId("open-example-project");
+  await documentationButton.click();
 
   // expect(page.getByText('Images with Objects')).toBeVisible();
   // await page.getByText('Images with Objects').click();
