@@ -99,6 +99,7 @@
     "husky": "^8.0.0",
     "install": "^0.13.0",
     "jiti": "^2.4.2",
+    "playwright": "^1.54.1",
     "pnpm": "^10.10.0",
     "prettier": "^3.4.2",
     "storybook": "^8.5.2",
