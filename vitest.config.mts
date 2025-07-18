@@ -28,13 +28,19 @@ export default defineConfig({
   },
   assetsInclude: ["**/*.bin", "**/*.svg", "**/*.zip"],
   test: {
+    pool: "forks",
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
     include: ["./tests/*"],
     browser: {
       provider: "playwright", // or 'webdriverio'
       enabled: true,
-
       // at least one instance is required
       instances: [{ browser: "chromium" }],
+      viewport: { width: 1280, height: 800 }, // <-- desktop size
     },
   },
 });
