@@ -12,6 +12,7 @@ export const OpenProjectListItem = () => {
   return (
     <>
       <CustomListItemButton
+        data-testid="open-project-button"
         data-help={HelpItem.OpenMenu}
         primaryText="Open"
         onClick={onOpen}
