@@ -29,11 +29,15 @@ const ConfirmReplaceDialog = ({
     dispatch(
       applicationSettingsSlice.actions.setShowSaveProjectDialog({
         show: !showSaveProjectDialog,
-      }),
+      })
     );
   };
   return (
-    <Dialog open={open} onClose={onDismiss}>
+    <Dialog
+      open={open}
+      onClose={onDismiss}
+      data-testid="confirm-replace-dialog"
+    >
       <DialogTitle>{"Current Project will be lost"}</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -133,7 +137,7 @@ const useConfirmReplaceDialog = () => {
   const { openDialog } = React.useContext(ConfirmReplaceDialogContext);
 
   const getConfirmation = (
-    options: Omit<Parameters<typeof openDialog>[0], "actionCallback">,
+    options: Omit<Parameters<typeof openDialog>[0], "actionCallback">
   ): Promise<boolean> =>
     new Promise((res) => {
       openDialog({

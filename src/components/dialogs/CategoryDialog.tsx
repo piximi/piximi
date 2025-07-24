@@ -25,7 +25,7 @@ type UpdateCategoryDialogProps = BaseCategoryDialogProps & {
 };
 
 export const CategoryDialog = (
-  props: CreateCategoryDialogProps | UpdateCategoryDialogProps,
+  props: CreateCategoryDialogProps | UpdateCategoryDialogProps
 ) => {
   const { onClose, onConfirm, action, open } = props;
   const isEditMode = action === "edit";
@@ -77,6 +77,7 @@ export const CategoryDialog = (
             onColorChange={handleColorChange}
           />
           <TextField
+            data-testid="category-name-input"
             error={isInvalidName && name !== ""}
             autoComplete="off"
             autoFocus

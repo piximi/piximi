@@ -122,7 +122,7 @@ export const WelcomeScreen = () => {
 
   const handleCloseDialog = (
     event?: object,
-    reason?: "backdropClick" | "escapeKeyDown",
+    reason?: "backdropClick" | "escapeKeyDown"
   ) => {
     handleCloseCloseExampleProjectDialog();
     if (!reason) {
@@ -133,7 +133,7 @@ export const WelcomeScreen = () => {
     navigate("/project", { state: { init: true } });
   };
   const handleOpenProject = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     event.persist();
     navigate("/project", { state: { init: true } });
@@ -145,19 +145,19 @@ export const WelcomeScreen = () => {
       applicationSettingsSlice.actions.setLoadPercent({
         loadPercent: -1,
         loadMessage: "deserializing project...",
-      }),
+      })
     );
 
     const { fileStore: zarrStore, loadedClassifiers } = await fListToStore(
       files,
-      files.length === 1 && files[0].type === "application/zip",
+      files.length === 1 && files[0].type === "application/zip"
     );
     const onLoadProgress = (loadPercent: number, loadMessage: string) => {
       dispatch(
         applicationSettingsSlice.actions.sendLoadPercent({
           loadPercent,
           loadMessage,
-        }),
+        })
       );
     };
     deserializeProject(zarrStore, onLoadProgress)
@@ -168,7 +168,7 @@ export const WelcomeScreen = () => {
           dispatch(
             applicationSettingsSlice.actions.setLoadPercent({
               loadPercent: -1,
-            }),
+            })
           );
           dispatch(projectSlice.actions.resetProject());
           dispatch(dataSlice.actions.initializeState({ data: res.data }));
@@ -176,22 +176,22 @@ export const WelcomeScreen = () => {
           dispatch(
             projectSlice.actions.setProject({
               project: res.project,
-            }),
+            })
           );
           classifierHandler.addModels(loadedClassifiers);
           dispatch(
             classifierSlice.actions.setClassifier({
               classifier: res.classifier,
-            }),
+            })
           );
 
           dispatch(
             segmenterSlice.actions.setSegmenter({
               segmenter: res.segmenter,
-            }),
+            })
           );
           dispatch(
-            applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 }),
+            applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 })
           );
         });
       })
@@ -209,7 +209,7 @@ export const WelcomeScreen = () => {
         dispatch(
           applicationSettingsSlice.actions.updateAlertState({
             alertState: warning,
-          }),
+          })
         );
       });
 
@@ -243,6 +243,7 @@ export const WelcomeScreen = () => {
               variant="outlined"
               color="primary"
               sx={{ width: "210px" }}
+              data-testid="start-new-project"
             >
               Start New Project
             </Button>
@@ -252,6 +253,7 @@ export const WelcomeScreen = () => {
               variant="outlined"
               tabIndex={-1}
               sx={{ width: "210px" }}
+              data-testid="upload-project"
             >
               Upload Project
               <VisuallyHiddenInput
@@ -268,6 +270,7 @@ export const WelcomeScreen = () => {
               variant="outlined"
               color="primary"
               sx={{ width: "210px" }}
+              data-testid="open-example-project"
             >
               Open Example Project
             </Button>
@@ -282,6 +285,7 @@ export const WelcomeScreen = () => {
               variant="outlined"
               color="primary"
               sx={{ width: "210px" }}
+              data-testid="documentation"
             >
               Documentation
             </Button>

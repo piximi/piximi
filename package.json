@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
+    "@playwright/test": "^1.54.1",
     "@storybook/addon-essentials": "^8.5.2",
     "@storybook/addon-interactions": "^8.5.2",
     "@storybook/addon-links": "^8.5.2",
@@ -97,6 +98,7 @@
     "husky": "^8.0.0",
     "install": "^0.13.0",
     "jiti": "^2.4.2",
+    "playwright": "^1.54.1",
     "pnpm": "^10.10.0",
     "prettier": "^3.4.2",
     "storybook": "^8.5.2",

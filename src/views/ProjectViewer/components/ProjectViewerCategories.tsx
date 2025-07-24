@@ -63,10 +63,10 @@ export const ProjectViewerCategories = () => {
       dispatch(
         projectSlice.actions.updateHighlightedCategory({
           categoryId: category.id,
-        }),
+        })
       );
     },
-    [dispatch],
+    [dispatch]
   );
 
   const createCategory = (kind: string, name: string, color: string) => {
@@ -75,7 +75,7 @@ export const ProjectViewerCategories = () => {
         name,
         color,
         kind: kind,
-      }),
+      })
     );
   };
 
@@ -83,7 +83,7 @@ export const ProjectViewerCategories = () => {
     dispatch(
       dataSlice.actions.updateCategory({
         updates: { id, changes: { name, color } },
-      }),
+      })
     );
   };
   const deleteCategory = (category: Category, kindId: string) => {
@@ -91,7 +91,7 @@ export const ProjectViewerCategories = () => {
       dataSlice.actions.removeCategoriesFromKind({
         categoryIds: [category.id],
         kind: kindId ?? activeKind,
-      }),
+      })
     );
   };
   const deleteObjects = (category: Category) => {
@@ -100,13 +100,13 @@ export const ProjectViewerCategories = () => {
         thingIds: category.containing,
         activeKind: activeKind,
         disposeColorTensors: true,
-      }),
+      })
     );
   };
 
   const onOpenCategoryMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
-    category: Category,
+    category: Category
   ) => {
     selectCategory(category);
     setCategoryMenuAnchorEl(event.currentTarget);
@@ -120,7 +120,7 @@ export const ProjectViewerCategories = () => {
       dataSlice.actions.removeCategoriesFromKind({
         categoryIds: "all",
         kind: activeKind,
-      }),
+      })
     );
   };
 
@@ -135,7 +135,7 @@ export const ProjectViewerCategories = () => {
     },
     [HotkeyContext.ProjectView],
 
-    [],
+    []
   );
 
   useHotkeys(
@@ -148,7 +148,7 @@ export const ProjectViewerCategories = () => {
       }
     },
     [HotkeyContext.ProjectView],
-    [],
+    []
   );
 
   useHotkeys(
@@ -163,7 +163,7 @@ export const ProjectViewerCategories = () => {
         dispatch(
           projectSlice.actions.updateHighlightedCategory({
             categoryId: categories[+categoryIndex].id,
-          }),
+          })
         );
         setSelectedCategory(categories[+categoryIndex]);
         if (selectedImageIds.length > 0) {
@@ -174,7 +174,7 @@ export const ProjectViewerCategories = () => {
                 categoryId: highlightedCategory,
                 partition: Partition.Unassigned,
               })),
-            }),
+            })
           );
         }
       }
@@ -183,7 +183,7 @@ export const ProjectViewerCategories = () => {
     },
     [HotkeyContext.ProjectView],
     { keyup: true, enabled: true },
-    [dispatch, selectedImageIds],
+    [dispatch, selectedImageIds]
   );
 
   useHotkeys(
@@ -193,7 +193,7 @@ export const ProjectViewerCategories = () => {
     },
     [HotkeyContext.ProjectView],
     { enabled: true },
-    [dispatch, selectedImageIds],
+    [dispatch, selectedImageIds]
   );
 
   useEffect(() => {
@@ -206,7 +206,7 @@ export const ProjectViewerCategories = () => {
       dispatch(
         projectSlice.actions.updateHighlightedCategory({
           categoryId: allCategories[+categoryIndex].id,
-        }),
+        })
       );
     }
   }, [dispatch, categoryIndex, categories]);
@@ -220,7 +220,10 @@ export const ProjectViewerCategories = () => {
         typographyVariant="body2"
         actions={
           <Stack direction="row">
-            <TooltipWithDisable title="New Category">
+            <TooltipWithDisable
+              title="New Category"
+              data-testid="new-category-create-button"
+            >
               <IconButton
                 data-help={HelpItem.CreateCategory}
                 onClick={handleOpenCreateCategoryDialog}
