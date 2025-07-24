@@ -53,7 +53,7 @@ export const ProjectAppBar = () => {
       dataSlice.actions.deleteThings({
         thingIds: unfilteredSelectedThings,
         disposeColorTensors: true,
-      })
+      }),
     );
   };
 
@@ -63,7 +63,7 @@ export const ProjectAppBar = () => {
       unfilteredSelectedThings.length > 0 && handleDeselectAll();
     },
     HotkeyContext.ProjectView,
-    [handleDeselectAll, unfilteredSelectedThings]
+    [handleDeselectAll, unfilteredSelectedThings],
   );
   useHotkeys(
     "delete, backspace",
@@ -71,13 +71,13 @@ export const ProjectAppBar = () => {
       unfilteredSelectedThings.length > 0 && onOpenDeleteImagesDialog();
     },
     HotkeyContext.ProjectView,
-    [unfilteredSelectedThings]
+    [unfilteredSelectedThings],
   );
   useHotkeys(
     "control+a",
     () => !allSelected && handleSelectAll(),
     HotkeyContext.ProjectView,
-    [handleSelectAll]
+    [handleSelectAll],
   );
 
   return (
@@ -186,7 +186,7 @@ export const ProjectAppBar = () => {
       <ConfirmationDialog
         title={`Delete ${pluralize(
           "Object",
-          unfilteredSelectedThings.length
+          unfilteredSelectedThings.length,
         )}?`}
         content={`Objects will be deleted from the project. ${
           activeKind === "Image"

@@ -25,7 +25,7 @@ type UpdateCategoryDialogProps = BaseCategoryDialogProps & {
 };
 
 export const CategoryDialog = (
-  props: CreateCategoryDialogProps | UpdateCategoryDialogProps
+  props: CreateCategoryDialogProps | UpdateCategoryDialogProps,
 ) => {
   const { onClose, onConfirm, action, open } = props;
   const isEditMode = action === "edit";
