@@ -29,7 +29,7 @@ const ConfirmReplaceDialog = ({
     dispatch(
       applicationSettingsSlice.actions.setShowSaveProjectDialog({
         show: !showSaveProjectDialog,
-      })
+      }),
     );
   };
   return (
@@ -137,7 +137,7 @@ const useConfirmReplaceDialog = () => {
   const { openDialog } = React.useContext(ConfirmReplaceDialogContext);
 
   const getConfirmation = (
-    options: Omit<Parameters<typeof openDialog>[0], "actionCallback">
+    options: Omit<Parameters<typeof openDialog>[0], "actionCallback">,
   ): Promise<boolean> =>
     new Promise((res) => {
       openDialog({
