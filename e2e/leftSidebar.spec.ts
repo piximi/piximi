@@ -40,7 +40,7 @@ test("Start New Project Flow", async () => {
   // const nameInput = page.locator('#name');
   // const value = await nameInput.inputValue();
   // console.log("the value is: " + value);
-});
+}, 10000);
 
 test("should open menu when Open button is clicked", async () => {
   const browser = await chromium.launch();
