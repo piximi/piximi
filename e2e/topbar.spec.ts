@@ -240,8 +240,37 @@ test("Opening Image Viewer", async (pagea) => {
 
   const annotateButton = page.getByTestId("annotate-button");
   await expect(annotateButton).toBeVisible();
-
   await annotateButton.click();
-
   await expect(page).toHaveURL(/\/imageviewer/);
+
+  await page.getByTestId("AddIcon").first().click();
+  await page
+    .getByTestId("create-kind-name-input")
+    .locator("input")
+    .fill("test kind");
+  await page.getByText("Confirm").click();
+  await expect(page.locator('input[value="test kind"]')).toBeVisible();
+
+  const menuButton = page.getByTestId("MoreHorizIcon").nth(1);
+  await menuButton.click();
+  const editItem = page.getByText("Edit");
+  await editItem.click();
+  await page.locator('input[value="test kind"]').fill("new test kind value");
+  await page.click("body");
+  await expect(
+    page.locator('input[value="new test kind value"]')
+  ).toBeVisible();
+
+  //const navigateToHomePage = page.getByTestId("ArrowBackIcon");
+  //await navigateToHomePage.click();
+  //await page.getByText("SAVE", { exact: true }).click();
+  //await expect(page).toHaveURL(/\/project/);
+
+  await menuButton.click();
+  const deleteItem = page.getByText("Delete");
+  await deleteItem.click();
+  await page.getByText("Confirm").click();
+  await expect(
+    page.locator('input[value="new test kind value"]')
+  ).not.toBeVisible();
 });
