@@ -5,7 +5,9 @@ import {
   Category,
   DecodedAnnotationObject,
   DecodedTSAnnotationObject,
+  GlobalAnnotation,
   Kind,
+  LinkNode,
   TPKey,
 } from "store/data/types";
 import { ReactElement } from "react";
@@ -54,6 +56,7 @@ export type ImageViewerState = {
 export type ProtoAnnotationObject =
   | Omit<DecodedAnnotationObject, "src" | "data">
   | Omit<DecodedTSAnnotationObject, "src" | "data">;
+
 export type AnnotatorState = {
   workingAnnotationId: string | undefined;
   workingAnnotation: {
@@ -68,6 +71,14 @@ export type AnnotatorState = {
   thresholdAnnotationValue: number;
   annotationMode: AnnotationMode;
   toolType: ToolType;
+  linkGraph: Record<string, LinkNode>;
+  globalAnnotations: Record<string, GlobalAnnotation>;
+  tLinking: {
+    active: boolean;
+    annIds: Record<string, string>;
+    globalId?: string;
+  };
+  zLinking: { active: boolean; annIds: Record<string, string> };
 };
 
 export type KindEdits = Omit<

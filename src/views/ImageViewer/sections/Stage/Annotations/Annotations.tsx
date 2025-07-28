@@ -5,7 +5,11 @@ import { Annotation } from "./Annotation";
 import { AnnotationTransformer } from "./AnnotationTransformer";
 
 import { selectImageViewerFilters } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectSelectedAnnotationIds } from "views/ImageViewer/state/annotator/selectors";
+import {
+  selectSelectedAnnotationIds,
+  selectTimeLinkingAnnIds,
+  selectTimeLinkingState,
+} from "views/ImageViewer/state/annotator/selectors";
 import {
   selectActiveAnnotationsViews,
   selectWorkingAnnotationView,
@@ -19,9 +23,14 @@ type AnnotationsProps = {
 export const Annotations = React.memo(
   ({ annotationTool }: AnnotationsProps) => {
     const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
+    const tLinkedAnnIds = useSelector(selectTimeLinkingAnnIds);
+    const tLinkingActive = useSelector(selectTimeLinkingState);
     const annotationObjects = useSelector(selectActiveAnnotationsViews);
     const workingAnnotationObject = useSelector(selectWorkingAnnotationView);
     const imageViewerFilters = useSelector(selectImageViewerFilters);
+    const tLinkedAnnArray = useMemo(() => {
+      return Object.values(tLinkedAnnIds);
+    }, [tLinkedAnnIds]);
 
     const nonWorkingAnnotationObjects = useMemo(
       () =>
@@ -48,7 +57,13 @@ export const Annotations = React.memo(
             key={annotationObject.annotation.id}
             annotation={annotationObject.annotation}
             imageShape={annotationObject.imageShape}
-            fillColor={annotationObject.fillColor}
+            fillColor={
+              !tLinkingActive
+                ? annotationObject.fillColor
+                : tLinkedAnnArray.includes(annotationObject.annotation.id)
+                  ? "#AAAAAAFF"
+                  : "#77777710"
+            }
             selected={true}
             isFiltered={imageViewerFilters.categoryId.includes(
               annotationObject.annotation.categoryId,

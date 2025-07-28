@@ -234,6 +234,9 @@ startAppListening({
         renderedSrcs,
       }),
     );
+    listenerAPI.dispatch(
+      annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
+    );
   },
 });
 startAppListening({

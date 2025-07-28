@@ -11,6 +11,7 @@ import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
   selectAnnotationMode,
   selectWorkingAnnotationEntity,
+  selectTimeLinkingState,
 } from "views/ImageViewer/state/annotator/selectors";
 
 import { AnnotationMode } from "views/ImageViewer/utils/enums";
@@ -31,6 +32,7 @@ export const CreationOptions = () => {
   const theme = useTheme();
 
   const annotationMode = useSelector(selectAnnotationMode);
+  const tLinkingActive = useSelector(selectTimeLinkingState);
   const workingAnnotationEntity = useSelector(selectWorkingAnnotationEntity);
   const image = useSelector(selectActiveImage);
 
@@ -91,7 +93,7 @@ export const CreationOptions = () => {
       <Tool
         name={t("New Annotation")}
         onClick={() => handleModeSelection(AnnotationMode.New)}
-        disabled={!workingAnnotationEntity.saved}
+        disabled={!workingAnnotationEntity.saved || tLinkingActive}
         selected={annotationMode === AnnotationMode.New}
         tooltipLocation="left"
       >
@@ -100,7 +102,7 @@ export const CreationOptions = () => {
       <Tool
         name={t("Combine Annotations")}
         onClick={() => handleModeSelection(AnnotationMode.Add)}
-        disabled={!workingAnnotationEntity.saved}
+        disabled={!workingAnnotationEntity.saved || tLinkingActive}
         selected={annotationMode === AnnotationMode.Add}
         tooltipLocation="left"
       >
@@ -110,7 +112,7 @@ export const CreationOptions = () => {
       <Tool
         name={t("Subtract Annotations")}
         onClick={() => handleModeSelection(AnnotationMode.Subtract)}
-        disabled={!workingAnnotationEntity.saved}
+        disabled={!workingAnnotationEntity.saved || tLinkingActive}
         selected={annotationMode === AnnotationMode.Subtract}
         tooltipLocation="left"
       >
@@ -121,7 +123,7 @@ export const CreationOptions = () => {
       <Tool
         name={t("Annotation Intersection")}
         onClick={() => handleModeSelection(AnnotationMode.Intersect)}
-        disabled={!workingAnnotationEntity.saved}
+        disabled={!workingAnnotationEntity.saved || tLinkingActive}
         selected={annotationMode === AnnotationMode.Intersect}
         tooltipLocation="left"
       >
@@ -134,7 +136,7 @@ export const CreationOptions = () => {
         onClick={() => {
           handleInvertAnnotation();
         }}
-        disabled={!workingAnnotationEntity.saved}
+        disabled={!workingAnnotationEntity.saved || tLinkingActive}
         tooltipLocation="left"
       >
         <SvgIcon>

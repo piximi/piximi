@@ -65,6 +65,8 @@ const initialState = (): DataState => {
     things: thingsAdapter.getInitialState(),
     images: imagesAdapter.getInitialState(),
     annotations: annotationsAdapter.getInitialState(),
+    linkGraph: {},
+    globalAnnotations: {},
   };
 };
 

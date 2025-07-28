@@ -29,6 +29,7 @@ import {
   updateThing,
 } from "./utils";
 import { Colors } from "utils/types";
+import { generateUUID } from "store/data/utils";
 
 export const initialState: AnnotatorState = {
   workingAnnotationId: undefined,
@@ -47,6 +48,11 @@ export const initialState: AnnotatorState = {
   thresholdAnnotationValue: 150,
   annotationMode: AnnotationMode.New,
   toolType: ToolType.RectangularAnnotation,
+
+  tLinking: { active: false, annIds: {} },
+  zLinking: { active: false, annIds: {} },
+  linkGraph: {},
+  globalAnnotations: {},
 };
 
 export const annotatorSlice = createSlice({
@@ -377,6 +383,32 @@ export const annotatorSlice = createSlice({
         });
         removeCategoryContents(state, annotation.categoryId, [annotation.id]);
       }
+    },
+    toggleTimeLinking(
+      state,
+      action: PayloadAction<{
+        active: boolean;
+      }>,
+    ) {
+      const active = action.payload.active;
+      const globalId = active ? generateUUID() : undefined;
+      state.tLinking.active = action.payload.active;
+      state.tLinking.globalId = globalId;
+    },
+    toggleZLinking(
+      state,
+      action: PayloadAction<{
+        active: boolean;
+      }>,
+    ) {
+      state.zLinking.active = action.payload.active;
+    },
+    addTLinkedAnnotation(
+      state,
+      action: PayloadAction<{ id: string; tp: string }>,
+    ) {
+      const { id, tp } = action.payload;
+      state.tLinking.annIds[tp] = id;
     },
   },
 });

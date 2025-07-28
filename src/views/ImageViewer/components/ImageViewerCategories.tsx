@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Box, IconButton, List } from "@mui/material";
+import { Box, Button, IconButton, List } from "@mui/material";
 import { Visibility, VisibilityOff, Add, MoreHoriz } from "@mui/icons-material";
 
 import { useDialogHotkey, useMenu } from "hooks";
@@ -167,6 +167,8 @@ export const ImageViewerCategories = () => {
         {categoriesByKindArray.map(({ kindId, categories }, idx) => {
           return (
             <CollapsibleListItem
+              dense={true}
+              indentSpacing={0}
               data-help={
                 idx === 0 ? HelpItem.ImageViewerKindSection : undefined
               }
@@ -227,13 +229,16 @@ export const ImageViewerCategories = () => {
                   />
                 );
               })}
-              <CustomListItemButton
-                primaryText="Add Category"
-                icon={<Add fontSize="small" />}
+              <Button
+                variant="text"
+                size="small"
+                sx={{ width: "100%" }}
                 onClick={(event) =>
                   handleOpenCreateCategoryOfKind(event, kindId)
                 }
-              />
+              >
+                Add Category
+              </Button>
             </CollapsibleListItem>
           );
         })}

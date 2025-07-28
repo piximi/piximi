@@ -73,6 +73,7 @@ export const ImageViewerCategoryItem = ({
         }
         sx={{
           backgroundColor: isHighlighted ? category.color + "33" : "inherit",
+          pl: 2,
         }}
         onClick={handleSelect}
         secondaryIcon={<MoreHorizIcon />} //TODO: Fix Display -- on load buttons offset, then move after interaction

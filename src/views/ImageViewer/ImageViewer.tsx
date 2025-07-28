@@ -100,7 +100,7 @@ export const ImageViewer = () => {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: `${isMobile ? DIMENSIONS.toolDrawerWidth : DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`,
+            gridTemplateColumns: `${isMobile ? DIMENSIONS.toolDrawerWidth : DIMENSIONS.toolDrawerWidth + DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`,
             gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
             gridTemplateAreas: `"top-tools top-tools top-tools" "${isMobile ? "mobile-action-bar" : "action-drawer"} stage side-tools"`,
             overflow: "hidden",

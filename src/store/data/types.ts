@@ -69,12 +69,25 @@ export type TSAnnotationObject = {
   decodedMask?: DataArray;
   plane: number;
   imageId: string;
-  globalId?: string;
+  childIds?: string[];
   timepoint: TPKey;
   categoryId: string;
   shape: Shape;
   data: Tensor4D;
   activePlane?: number;
+};
+export type LinkNode = {
+  id: string;
+  time: number;
+  globalId: string;
+  parentIds: string[]; // to handle merges
+  childIds: string[]; // to handle splits
+};
+export type LinkGraph = Record<string, LinkNode>;
+
+export type GlobalAnnotation = {
+  globalId: string;
+  linkedIds: Set<string>;
 };
 export type DecodedAnnotationObject = Omit<
   AnnotationObject & {

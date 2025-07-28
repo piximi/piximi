@@ -31,6 +31,7 @@ import {
   ThresholdToolSizeControls,
 } from "views/ImageViewer/utils/consts";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { selectTimeLinkingState } from "views/ImageViewer/state/annotator/selectors";
 
 type ToolMap = Record<
   string,
@@ -86,7 +87,7 @@ export const ToolOptions = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const t = useTranslation();
-
+  const tLinkingActive = useSelector(selectTimeLinkingState);
   const activeTool = useSelector(selectToolType);
 
   const handleToolClick = (toolName: string) => {
@@ -138,6 +139,7 @@ export const ToolOptions = () => {
             callback={sliderCallback}
             toolLimits={tool.options}
             tooltipLocation="left"
+            disabled={tLinkingActive}
           >
             {tool.icon(
               activeTool === tool.operation
@@ -151,6 +153,7 @@ export const ToolOptions = () => {
             name={t(name)}
             onClick={() => handleToolClick(name)}
             tooltipLocation="left"
+            disabled={tLinkingActive}
           >
             {tool.icon(
               activeTool === tool.operation

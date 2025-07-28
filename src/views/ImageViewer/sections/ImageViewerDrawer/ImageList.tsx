@@ -11,7 +11,9 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Stack,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
@@ -120,7 +122,18 @@ export const ImageList = () => {
   };
 
   return (
-    <>
+    <Stack>
+      <Typography
+        sx={(theme) => ({
+          width: "90%",
+          textAlign: "center",
+          mx: "auto",
+          py: 1,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        })}
+      >
+        Images
+      </Typography>
       <Box
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
@@ -182,7 +195,7 @@ export const ImageList = () => {
         onCloseImageMenu={onImageMenuClose}
         openImageMenu={Boolean(imageAnchorEl)}
       />
-    </>
+    </Stack>
   );
 };
 const ImageListItem = memo(

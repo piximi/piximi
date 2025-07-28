@@ -5,7 +5,11 @@ import { useHotkeys } from "hooks/useHotkeys";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
+import {
+  selectActiveImageId,
+  selectActiveTimepoint,
+} from "views/ImageViewer/state/imageViewer/selectors";
+import { selectTimeLinkingState } from "views/ImageViewer/state/annotator/selectors";
 import { selectUpdatedActiveAnnotations } from "views/ImageViewer/state/annotator/reselectors";
 
 import { getOverlappingAnnotations } from "views/ImageViewer/utils";
@@ -28,6 +32,8 @@ export const usePointerTool = (
   const dispatch = useDispatch();
   const activeImageId = useSelector(selectActiveImageId);
   const activeAnnotations = useSelector(selectUpdatedActiveAnnotations);
+  const tLinkingActive = useSelector(selectTimeLinkingState);
+  const activeTP = useSelector(selectActiveTimepoint);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shift, setShift] = useState<boolean>(false);
   const [dragging, setDragging] = useState<boolean>(false);
@@ -47,29 +53,6 @@ export const usePointerTool = (
     HotkeyContext.AnnotatorView,
     { keyup: true, keydown: true },
     [],
-  );
-
-  /*
-   * * HANDLE POINTER FUNCTIONS * *
-   */
-
-  const onPointerMouseDown = useCallback(
-    (position: { x: number; y: number }) => {
-      setDragging(false);
-      setMinimum(position);
-      setSelecting(true);
-    },
-    [],
-  );
-
-  const handlePointerMouseMove = useCallback(
-    (position: { x: number; y: number }) => {
-      if (!position || !selecting || !minimum) return;
-
-      setDragging(Math.abs(position.x - minimum.x) >= delta);
-      setMaximum(position);
-    },
-    [minimum, selecting],
   );
 
   const selectEnclosedAnnotations = useCallback(
@@ -146,6 +129,29 @@ export const usePointerTool = (
       shift,
     ],
   );
+  /*
+   * * HANDLE POINTER FUNCTIONS * *
+   */
+
+  const onPointerMouseDown = useCallback(
+    (position: { x: number; y: number }) => {
+      if (tLinkingActive) return;
+      setDragging(false);
+      setMinimum(position);
+      setSelecting(true);
+    },
+    [],
+  );
+
+  const handlePointerMouseMove = useCallback(
+    (position: { x: number; y: number }) => {
+      if (!position || !selecting || !minimum) return;
+
+      setDragging(Math.abs(position.x - minimum.x) >= delta);
+      setMaximum(position);
+    },
+    [minimum, selecting],
+  );
 
   const handleClick = useCallback(() => {
     if (
@@ -193,41 +199,49 @@ export const usePointerTool = (
     }
 
     if (!currentAnnotation) return;
+    if (tLinkingActive) {
+      dispatch(
+        annotatorSlice.actions.addTLinkedAnnotation({
+          id: currentAnnotation.id,
+          tp: activeTP!,
+        }),
+      );
+    } else {
+      if (!shift) {
+        batch(() => {
+          dispatch(
+            annotatorSlice.actions.setSelectedAnnotationIds({
+              annotationIds: [currentAnnotation.id],
+              workingAnnotationId: currentAnnotation.id,
+            }),
+          );
+          dispatch(
+            annotatorSlice.actions.setWorkingAnnotation({
+              annotation: currentAnnotation,
+            }),
+          );
+          dispatch(
+            imageViewerSlice.actions.setSelectedCategoryId({
+              selectedCategoryId: currentAnnotation.categoryId,
+            }),
+          );
+        });
+      }
 
-    if (!shift) {
-      batch(() => {
+      if (shift && !selectedAnnotationsIds.includes(currentAnnotation.id)) {
+        //include newly selected annotation if not already selected
         dispatch(
           annotatorSlice.actions.setSelectedAnnotationIds({
-            annotationIds: [currentAnnotation!.id],
-            workingAnnotationId: currentAnnotation?.id,
+            annotationIds: [...selectedAnnotationsIds, currentAnnotation.id],
+            workingAnnotationId: currentAnnotation.id,
           }),
         );
         dispatch(
           annotatorSlice.actions.setWorkingAnnotation({
-            annotation: currentAnnotation!,
+            annotation: currentAnnotation,
           }),
         );
-        dispatch(
-          imageViewerSlice.actions.setSelectedCategoryId({
-            selectedCategoryId: currentAnnotation!.categoryId,
-          }),
-        );
-      });
-    }
-
-    if (shift && !selectedAnnotationsIds.includes(currentAnnotation.id)) {
-      //include newly selected annotation if not already selected
-      dispatch(
-        annotatorSlice.actions.setSelectedAnnotationIds({
-          annotationIds: [...selectedAnnotationsIds, currentAnnotation.id],
-          workingAnnotationId: currentAnnotation.id,
-        }),
-      );
-      dispatch(
-        annotatorSlice.actions.setWorkingAnnotation({
-          annotation: currentAnnotation,
-        }),
-      );
+      }
     }
   }, [
     activeAnnotations,

@@ -13,6 +13,7 @@ import {
 } from "views/ImageViewer/utils/types";
 import { Colors } from "utils/types";
 import { TPKey } from "store/data/types";
+import { generateUUID } from "store/data/utils";
 
 const initialState: ImageViewerState = {
   imageStack: {},

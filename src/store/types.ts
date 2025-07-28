@@ -23,6 +23,8 @@ import {
   Thing,
   TSImageObject,
   TSAnnotationObject,
+  LinkNode,
+  GlobalAnnotation,
 } from "./data/types";
 import { MeasurementsState } from "./measurements/types";
 import {
@@ -55,6 +57,8 @@ export type DataState = {
   things: EntityState<AnnotationObject | ImageObject, string>;
   images: EntityState<TSImageObject, string>;
   annotations: EntityState<TSAnnotationObject, string>;
+  linkGraph: Record<string, LinkNode>;
+  globalAnnotations: Record<string, GlobalAnnotation>;
 };
 
 export type SegmenterState = {

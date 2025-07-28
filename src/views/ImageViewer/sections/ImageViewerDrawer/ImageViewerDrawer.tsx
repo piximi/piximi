@@ -1,90 +1,92 @@
-import React, { useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Box, Divider, IconButton, List } from "@mui/material";
-import { Add } from "@mui/icons-material";
-
-import { useDialogHotkey } from "hooks";
-
-import { DividerHeader, FunctionalDivider } from "components/ui";
-import { BaseAppDrawer } from "components/layout";
-import { CreateKindDialog } from "components/dialogs";
+import React, { useMemo, useState } from "react";
+import { Box, IconButton, Stack } from "@mui/material";
 import {
-  ImageViewerCategories,
-  ExportAnnotationsListItem,
-} from "../../components";
-import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
-import { ImageList } from "./ImageList";
+  DownloadOutlined as DownloadIcon,
+  LabelOutlined as LabelIcon,
+  ImageOutlined as ImageIcon,
+  FormatShapes as FormatShapesIcon,
+} from "@mui/icons-material";
+
+import { BaseAppDrawer } from "components/layout";
 
 //import { selectCreatedAnnotationCategories } from "store/slices/data";
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { selectKindsArray } from "views/ImageViewer/state/annotator/reselectors";
+import { AnnotationSection } from "./annotation-section/AnnotationSection";
+import { DIMENSIONS } from "utils/constants";
+import { ExportAnnotationsSection } from "./ExportAnnotationsSection";
+import { KindCategorySection } from "./KindCategorySection";
+import { ImageList } from "./ImageList";
+import { ApplicationOptions } from "components/ui";
+import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
+import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
+import { HelpButton } from "components/layout/app-drawer/HelpButton";
 
-import { HotkeyContext } from "utils/enums";
-import { Category, Kind } from "store/data/types";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-
+type DrawerContextType = "export" | "images" | "categories" | "annotations";
 export const ImageViewerDrawer = () => {
-  const dispatch = useDispatch();
+  const [drawerContext, setDrawerContext] =
+    useState<DrawerContextType>("images");
 
-  const kinds = useSelector(selectKindsArray);
-  const existingKindIds = useMemo(() => kinds.map((kind) => kind.id), [kinds]);
-  const {
-    onClose: handleCloseCreateKindDialog,
-    onOpen: handleOpenCreateKindDialog,
-    open: isCreateKindDialogOpen,
-  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
-
-  const addKind = (kind: Kind, newUnknownCategory: Category) => {
-    dispatch(
-      annotatorSlice.actions.addKind({
-        kind,
-        unknownCategory: newUnknownCategory,
-      }),
-    );
-  };
+  const DrawerContextComponent = useMemo(() => {
+    switch (drawerContext) {
+      case "export":
+        return <ExportAnnotationsSection />;
+      case "images":
+        return <ImageList />;
+      case "categories":
+        return <KindCategorySection />;
+      case "annotations":
+        return <AnnotationSection />;
+    }
+  }, [drawerContext]);
 
   return (
-    <Box sx={{ display: "flex", flexGrow: 1, gridArea: "action-drawer" }}>
-      <BaseAppDrawer>
-        <List dense>
-          <ExportAnnotationsListItem />
-        </List>
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
+        flexGrow: 1,
+        gridArea: "action-drawer",
+      }}
+    >
+      <Stack
+        sx={(theme) => ({
+          bgcolor: theme.palette.background.paper,
+          //borderRight: `1px solid ${theme.palette.divider}`,
+          height: "100%",
+          justifyContent: "space-between",
+        })}
+      >
+        <Stack>
+          <IconButton onClick={() => setDrawerContext("export")}>
+            <DownloadIcon />
+          </IconButton>
+          <IconButton onClick={() => setDrawerContext("images")}>
+            <ImageIcon />
+          </IconButton>
+          <IconButton onClick={() => setDrawerContext("categories")}>
+            <LabelIcon />
+          </IconButton>
+          <IconButton onClick={() => setDrawerContext("annotations")}>
+            <FormatShapesIcon />
+          </IconButton>
+        </Stack>
 
-        <DividerHeader
-          textAlign="left"
-          typographyVariant="body2"
-          sx={{ my: 1 }}
+        <Stack
+          sx={{ position: "relative", bottom: 0 }}
+          direction="column"
+          justifyContent="space-evenly"
         >
-          Images
-        </DividerHeader>
+          <SettingsButton />
 
-        <ImageList />
+          <SendFeedbackButton />
 
-        <FunctionalDivider
-          headerText="Kinds"
-          actions={
-            <IconButton
-              data-help={HelpItem.CreateKind}
-              onClick={handleOpenCreateKindDialog}
-            >
-              <Add fontSize="small" />
-            </IconButton>
-          }
-          containerStyle={{ marginTop: 1, marginBottom: 0 }}
-        />
-
-        <ImageViewerCategories />
-
-        <Divider sx={{ mt: 1 }} />
-
-        <ClearAnnotationsGroup />
-      </BaseAppDrawer>
-      <CreateKindDialog
-        onClose={handleCloseCreateKindDialog}
-        open={isCreateKindDialogOpen}
-        storeDispatch={addKind}
-        existingKinds={existingKindIds}
-      />
+          <HelpButton />
+        </Stack>
+      </Stack>
+      <Box sx={{ display: "flex", flexGrow: 1 }}>
+        <BaseAppDrawer hideSettings={true}>
+          {DrawerContextComponent}
+        </BaseAppDrawer>
+      </Box>
     </Box>
   );
 };

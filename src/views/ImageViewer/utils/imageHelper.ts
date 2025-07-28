@@ -251,7 +251,12 @@ export const colorOverlayROI = (
         if (checkNeighbors(croppedImage, i, j)) {
           colorROIImage.setPixelXY(i, j, [color[0], color[1], color[2], 255]);
         } else {
-          colorROIImage.setPixelXY(i, j, [color[0], color[1], color[2], 128]);
+          colorROIImage.setPixelXY(i, j, [
+            color[0],
+            color[1],
+            color[2],
+            color[3] ?? 128,
+          ]);
         }
       } else {
         colorROIImage.setPixelXY(i, j, [0, 0, 0, 0]);

@@ -109,3 +109,38 @@ export const selectAnnotationChanges = ({
 }) => {
   return annotator.changes.annotations;
 };
+export const selectTimeLinkingState = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}) => {
+  return annotator.tLinking.active;
+};
+export const selectTimeLinkingAnnIds = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}) => {
+  return annotator.tLinking.annIds;
+};
+export const selectTimeLinkingGlobalId = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}) => {
+  return annotator.tLinking.globalId;
+};
+export const selectZLinkingState = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}) => {
+  return annotator.zLinking.active;
+};
+export const selectZLinkingAnnIds = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}) => {
+  return annotator.zLinking.annIds;
+};

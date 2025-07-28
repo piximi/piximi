@@ -8,7 +8,9 @@ import { useMobileView } from "hooks";
 
 export const StageWrapper = () => {
   const [width, setWidth] = useState<number>(
-    window.innerWidth - DIMENSIONS.leftDrawerWidth - DIMENSIONS.toolDrawerWidth,
+    window.innerWidth -
+      DIMENSIONS.leftDrawerWidth -
+      DIMENSIONS.toolDrawerWidth * 2,
   );
   const [height, setHeight] = useState<number>(
     window.innerHeight - DIMENSIONS.toolDrawerWidth,
@@ -20,7 +22,9 @@ export const StageWrapper = () => {
     const resizeHandler = () => {
       setWidth(
         window.innerWidth -
-          (isMobile ? DIMENSIONS.toolDrawerWidth : DIMENSIONS.leftDrawerWidth) -
+          (isMobile
+            ? DIMENSIONS.toolDrawerWidth
+            : DIMENSIONS.toolDrawerWidth + DIMENSIONS.leftDrawerWidth) -
           DIMENSIONS.toolDrawerWidth,
       );
       setHeight(window.innerHeight - DIMENSIONS.toolDrawerWidth);
