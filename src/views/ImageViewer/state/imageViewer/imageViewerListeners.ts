@@ -70,7 +70,8 @@ startAppListening({
       imageViewerSlice.actions.setImageIsLoading({ isLoading: true }),
     );
     const newActiveImageId = action.payload.imageId;
-    const dataState = listenerAPI.getState().data;
+    const { data: dataState, annotator: annotatorState } =
+      listenerAPI.getState();
     if (!newActiveImageId) {
       listenerAPI.dispatch(
         imageViewerSlice.actions.setActiveImageRenderedSrcs({
@@ -82,9 +83,17 @@ startAppListening({
       );
       return;
     }
-    const activeImage = dataState.things.entities[
+    const activeImage = {
+      ...(dataState.things.entities[newActiveImageId]! as ImageObject),
+    };
+    const imageChanges = annotatorState.changes.things.edited[
       newActiveImageId
-    ]! as ImageObject;
+    ] as Partial<ImageObject>;
+
+    if (imageChanges) {
+      if ("colors" in imageChanges) activeImage.colors = imageChanges.colors!;
+      if ("src" in imageChanges) activeImage.src = imageChanges.src!;
+    }
 
     listenerAPI.dispatch(
       imageViewerSlice.actions.setActiveAnnotationIds({
