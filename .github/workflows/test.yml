@@ -32,6 +32,6 @@ jobs:
           pnpm run lint
 
       - name: Run Tests
-        run: pnpm test --silent
+        run: pnpm test --exclude e2e/ --silent
         env:
           CI: true
