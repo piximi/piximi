@@ -22,6 +22,9 @@ jobs:
           node-version: 20.x
           cache: "pnpm"
 
+      - name: Install Packages
+        run: pnpm install --dangerously-allow-all-builds
+
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
 
@@ -34,6 +37,6 @@ jobs:
         run: npx wait-on http://localhost:3000
 
       - name: Run Tests
-        run: pnpm test --silent
+        run: pnpm test  e2e/ --silent
         env:
           CI: true
