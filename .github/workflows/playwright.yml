@@ -22,14 +22,16 @@ jobs:
           node-version: 20.x
           cache: "pnpm"
 
-      - name: Install Packages
-        # @tensorflow/tfjs-node canvas core-js esbuild
-        run: pnpm install --dangerously-allow-all-builds
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
 
-      - name: Lint code
-        run: |
-          pnpm run format-check
-          pnpm run lint
+      - name: Start App Server
+        run: pnpm start &
+        env:
+          NODE_ENV: test
+
+      - name: Wait for Server to Start
+        run: npx wait-on http://localhost:3000
 
       - name: Run Tests
         run: pnpm test --silent
