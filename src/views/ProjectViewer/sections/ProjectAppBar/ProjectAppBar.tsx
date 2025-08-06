@@ -16,10 +16,12 @@ import { ImageViewerButton } from "./ImageViewerButton";
 import { MeasurementsButton } from "./MeasurementsButton";
 import { DIMENSIONS } from "utils/constants";
 import { ItemSelection } from "./ItemSelection";
+import { useWorker } from "contexts/WorkerProvider";
 
 export const ProjectAppBar = () => {
   const loadPercent = useSelector(selectLoadPercent);
   const isMobile = useMobileView();
+  const worker = useWorker()?.workerRef.current;
 
   return (
     <Stack
@@ -52,6 +54,27 @@ export const ProjectAppBar = () => {
       </Box>
 
       <ProjectTextField />
+      <button
+        onClick={async () => {
+          if (worker) {
+            console.log("trying worker");
+            try {
+              console.log(worker);
+              const current = await (worker as any).counter;
+              console.log(current);
+              alert(`Counter on load: ${current}`);
+              await (worker as any).inc();
+              const updated = await (worker as any).counter;
+              alert(`Counter after increment: ${updated}`);
+            } catch (error) {
+              console.error("Error communicating with worker:", error);
+            }
+          }
+        }}
+      >
+        {" "}
+        worker button
+      </button>
 
       <Box sx={{ flexGrow: 1 }} />
 

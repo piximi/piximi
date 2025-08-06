@@ -35,6 +35,7 @@ import classifierHandler from "utils/models/classification/classifierHandler";
 import { classifierSlice } from "store/classifier";
 import { segmenterSlice } from "store/segmenter";
 import { AlertState } from "utils/types";
+import { useWorker } from "contexts/WorkerProvider";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -61,6 +62,7 @@ export const WelcomeScreen = () => {
 
   const windowSize = useWindowSize();
   const mobileView = useMobileView();
+  const worker = useWorker()?.workerRef.current;
 
   const palette = useMemo(() => {
     const groups: Array<keyof Palette> = [
@@ -120,6 +122,22 @@ export const WelcomeScreen = () => {
     );
   }, [theme]);
 
+  const checkWorker = async () => {
+    if (worker) {
+      console.log("trying worker");
+      try {
+        console.log(worker);
+        const current = await (worker as any).counter;
+        console.log(current);
+        alert(`Counter on load: ${current}`);
+        await (worker as any).inc();
+        const updated = await (worker as any).counter;
+        alert(`Counter after increment: ${updated}`);
+      } catch (error) {
+        console.error("Error communicating with worker:", error);
+      }
+    }
+  };
   const handleCloseDialog = (
     event?: object,
     reason?: "backdropClick" | "escapeKeyDown",
@@ -289,6 +307,7 @@ export const WelcomeScreen = () => {
           {import.meta.env.DEV && (
             <Button
               onClick={() => {
+                checkWorker();
                 onOpen();
               }}
               variant="outlined"
