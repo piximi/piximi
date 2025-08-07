@@ -9,6 +9,7 @@ import {
   selectFullWorkingAnnotation,
   selectImageViewerObjectsArray,
   selectImageViewerKinds,
+  selectUpdatedActiveAnnotations,
 } from "views/ImageViewer/state/annotator/reselectors";
 import {
   selectActiveImageId,
@@ -37,7 +38,7 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const categoriesByKindArray = useSelector(selectCategoriesByKindArray);
   const kinds = useSelector(selectImageViewerKinds);
   const annotationMode = useSelector(selectAnnotationMode);
-  const objects = useSelector(selectImageViewerObjectsArray);
+  const objects = useSelector(selectUpdatedActiveAnnotations);
   const workingAnnotation = useSelector(selectFullWorkingAnnotation);
   const activeImageSeries = useSelector(selectActiveImageSeries);
 

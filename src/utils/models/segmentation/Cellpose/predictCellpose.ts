@@ -8,7 +8,6 @@ import {
   whereAsync,
 } from "@tensorflow/tfjs";
 import { ColorModel, Image as ImageJS } from "image-js";
-import { hyphaWebsocketClient } from "imjoy-rpc";
 
 import { encode } from "views/ImageViewer/utils";
 import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
@@ -133,8 +132,7 @@ export const predictCellpose = async (
   imTensor: Tensor4D,
   fgKindId: string,
   unknownCategoryId: string,
-  service: string,
-  serverConfig: { name: string; server_url: string; passive: boolean },
+  triton: any,
 ) => {
   const reshapedIm = tidy(() =>
     imTensor
@@ -154,10 +152,6 @@ export const predictCellpose = async (
     _rshape: reshapedIm.shape,
     _rdtype: reshapedIm.dtype,
   };
-
-  const api = await hyphaWebsocketClient.connectToServer(serverConfig);
-
-  const triton = await api.getService(service);
 
   const res = await triton.execute({
     inputs: [bObject, { diameter: 30 }],

@@ -110,6 +110,7 @@ export abstract class Stardist extends Segmenter {
     const graphModel = this._model as GraphModel;
 
     const infT = await this._inferenceDataset.toArray();
+
     const annotations: Array<OrphanedAnnotationObject[]> = [];
     // imTensor disposed in `predictStardist`
     for await (const [idx, imTensor] of infT.entries()) {

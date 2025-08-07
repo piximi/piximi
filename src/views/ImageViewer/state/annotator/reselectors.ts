@@ -10,7 +10,6 @@ import {
   selectWorkingAnnotationEntity,
 } from "./selectors";
 import {
-  selectAnnotationDictionary,
   selectLocalizedAnnotationDict,
   selectObjectCategoryDict,
   selectObjectDict,
@@ -152,7 +151,7 @@ export const selectCategoriesByKindArray = createSelector(
 export const selectUpdatedObjects = createSelector(
   selectObjectDict,
   selectThingChanges,
-  (thingsDict, thingChanges) => {
+  (thingsDict, thingChanges): Record<string, ProtoAnnotationObject> => {
     const finalThings: Record<string, ProtoAnnotationObject> = {
       ...thingChanges.added,
     };
@@ -182,7 +181,11 @@ export const selectUpdatedActiveAnnotationDict = createSelector(
   selectActiveImageSeries,
   selectLocalizedAnnotationDict,
   selectAnnotationChanges,
-  (activeImageSeries, getLocalAnnotationsDict, annotationChanges) => {
+  (
+    activeImageSeries,
+    getLocalAnnotationsDict,
+    annotationChanges,
+  ): Record<string, ProtoAnnotationObject> => {
     if (!activeImageSeries) return {};
     const finalAnnotations = Object.values(annotationChanges.added).reduce(
       (
@@ -234,13 +237,13 @@ export const selectUpdatedActiveAnnotations = createSelector(
 
 export const selectImageViewerObjects = createSelector(
   selectImageSeriesArray,
-  selectUpdatedObjects,
+  selectUpdatedActiveAnnotationDict,
   (images, objects) => {
-    const annotationObjects: Record<string, AnnotationObject> = {};
+    const annotationObjects: Record<string, TSAnnotationObject> = {};
     for (const im of images) {
       const annIds = im.containing;
       for (const annId of annIds) {
-        annotationObjects[annId] = objects[annId] as AnnotationObject;
+        annotationObjects[annId] = objects[annId] as TSAnnotationObject;
       }
     }
     return annotationObjects;
@@ -312,7 +315,7 @@ export const selectWorkingAnnotationView = createSelector(
 );
 
 export const selectSelectedActiveAnnotations = createSelector(
-  [selectSelectedAnnotationIds, selectUpdatedObjects],
+  [selectSelectedAnnotationIds, selectUpdatedActiveAnnotationDict],
   (annotationIds, objects): Array<ProtoAnnotationObject> => {
     if (!annotationIds.length) return [];
 

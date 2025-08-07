@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, MenuItem, Stack, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
@@ -18,12 +18,17 @@ import { Shape } from "store/data/types";
 import { segmenterSlice } from "store/segmenter";
 import { Segmenter } from "utils/models/segmentation";
 import { ModelStatus, ModelTask } from "utils/models/enums";
+import { selectProjectImageChannels } from "store/project/selectors";
+import { StyledSelect, WithLabel } from "components/inputs";
+import { arrayRange } from "utils/arrayUtils";
 
 export const SegmenterSection = () => {
   const dispatch = useDispatch();
   const selectedModel = useSelector(selectSegmenterModel);
+  const projectChannels = useSelector(selectProjectImageChannels);
 
-  const { modelStatus, error } = useSegmenterStatus();
+  const { modelStatus, error, selectedChannel, setSelectedChannel } =
+    useSegmenterStatus();
   const predictSegmenter = usePredictSegmenter();
   const {
     onClose: onCloseImportSegmenterDialog,
@@ -115,6 +120,54 @@ export const SegmenterSection = () => {
           <Typography variant="caption" noWrap>
             {`Model Kind:  ${selectedModel?.kind ?? "N/A"}`}
           </Typography>
+          <WithLabel
+            label="Channel:"
+            labelProps={{
+              variant: "body2",
+              sx: {
+                mr: "0.5rem",
+                whiteSpace: "nowrap",
+              },
+            }}
+            sx={{ maxWidth: "calc(100% - 23px)" }}
+          >
+            <StyledSelect
+              value={selectedChannel}
+              onChange={(event) => {
+                const value = event.target.value as number;
+
+                setSelectedChannel(value);
+              }}
+              fullWidth
+              variant="standard"
+              disabled={projectChannels === 1}
+            >
+              <MenuItem
+                dense
+                value={-1}
+                sx={{
+                  borderRadius: 0,
+                  minHeight: "1rem",
+                }}
+              >
+                --
+              </MenuItem>
+              {projectChannels &&
+                arrayRange(projectChannels).map((channel) => (
+                  <MenuItem
+                    key={`channel-${channel}`}
+                    dense
+                    value={channel}
+                    sx={{
+                      borderRadius: 0,
+                      minHeight: "1rem",
+                    }}
+                  >
+                    {channel + 1}
+                  </MenuItem>
+                ))}
+            </StyledSelect>
+          </WithLabel>
         </Stack>
 
         <ModelExecButtonGroup

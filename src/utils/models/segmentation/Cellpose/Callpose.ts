@@ -16,6 +16,7 @@ import { getImageSlice } from "utils/tensorUtils";
 import { Kind, ImageObject } from "store/data/types";
 import { LoadCB } from "utils/file-io/types";
 import { generateKind } from "store/data/utils";
+import { hyphaWebsocketClient } from "imjoy-rpc";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
@@ -130,14 +131,16 @@ export class Cellpose extends Segmenter {
     const infT = await this._inferenceDataset.toArray();
 
     const annotations: Array<OrphanedAnnotationObject[]> = [];
+    const api = await hyphaWebsocketClient.connectToServer(this._config);
+
+    const triton = await api.getService(this._service);
     for await (const [idx, imTensor] of infT.entries()) {
       // imTensor disposed in predictCellpose
       const annotObj = await predictCellpose(
         imTensor,
         this._fgKind!.id,
         this._fgKind!.unknownCategoryId,
-        this._service,
-        this._config,
+        triton,
       );
       annotations.push(annotObj);
       if (loadCb) {

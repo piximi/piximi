@@ -65,7 +65,7 @@ export const Stage = ({
   const dispatch = useDispatch();
 
   const [draggable, setDraggable] = useState<boolean>(false);
-  const [htmlImages, setHtmlImages] = useState<HTMLImageElement[]>([]);
+  //const [htmlImages, setHtmlImages] = useState<HTMLImageElement[]>([]);
 
   // useRef
   const imageRef = useRef<Konva.Image | null>(null);
@@ -234,16 +234,18 @@ export const Stage = ({
     );
   }, [stageWidth, stageHeight, activeImage?.shape, dispatch]);
 
-  useEffect(() => {
-    if (!activeImageSeries || !activeImageSeries.activeSrcs) return;
-    setHtmlImages(
-      activeImageSeries.activeSrcs.map((src: string) => {
-        const imgElem = document.createElement("img");
-        imgElem.src = src;
-        return imgElem;
-      }),
-    );
-  }, [activeImageSeries, stageRef, dispatch]);
+  // useEffect(() => {
+  //   if (!activeImageSeries || !activeImageSeries.activeSrcs) return;
+  //   if (!activeImageSeries.activeSrcs) {
+  //   }
+  //   setHtmlImages(
+  //     activeImageSeries.activeSrcs.map((src: string) => {
+  //       const imgElem = document.createElement("img");
+  //       imgElem.src = src;
+  //       return imgElem;
+  //     }),
+  //   );
+  // }, [activeImageSeries, stageRef, dispatch]);
 
   useEffect(() => {
     stageRef?.current?.scale({ x: 1, y: 1 });
@@ -288,16 +290,18 @@ export const Stage = ({
         <Provider store={store}>
           <StageContext.Provider value={stageRef}>
             <Layer>
-              {!(htmlImages && htmlImages.length) || imageIsLoading ? (
-                <></>
-              ) : (
-                <Image
-                  ref={imageRef}
-                  images={htmlImages}
-                  stageHeight={stageHeight}
-                  stageWidth={stageWidth}
-                />
-              )}
+              {
+                /*!(htmlImages && htmlImages.length) ||*/ imageIsLoading ? (
+                  <></>
+                ) : (
+                  <Image
+                    ref={imageRef}
+                    //images={htmlImages}
+                    stageHeight={stageHeight}
+                    stageWidth={stageWidth}
+                  />
+                )
+              }
               {(annotationState === AnnotationState.Annotating ||
                 toolType === ToolType.QuickAnnotation) && (
                 <Selection tool={annotationTool} toolType={toolType} />

@@ -28,7 +28,6 @@ import {
   updateKind,
   updateThing,
 } from "./utils";
-import { Colors } from "utils/types";
 import { generateUUID } from "store/data/utils";
 
 export const initialState: AnnotatorState = {

@@ -13,7 +13,6 @@ import {
 } from "views/ImageViewer/utils/types";
 import { Colors } from "utils/types";
 import { TPKey } from "store/data/types";
-import { generateUUID } from "store/data/utils";
 
 const initialState: ImageViewerState = {
   imageStack: {},
@@ -208,6 +207,9 @@ export const imageViewerSlice = createSlice({
         throw new Error("Set rendered sources failed: No active image");
 
       state.imageStack[activeImageId].activeTimepoint = action.payload.tp;
+      state.imageStack[activeImageId].activeSrcs = [
+        state.imageStack[activeImageId].timepoints[action.payload.tp].ZTPreview,
+      ];
     },
     setActiveImageActivePlane(
       state,

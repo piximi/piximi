@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { union } from "lodash";
 import IJSImage from "image-js";
-import { tensor2d, image as tfImage } from "@tensorflow/tfjs";
+import { tensor2d, image as tfImage, gather, Tensor4D } from "@tensorflow/tfjs";
 
 import {
   ImageObject,
@@ -94,7 +94,7 @@ export const updateContents = (
 };
 
 export const getPropertiesFromImage = async (
-  image: ImageObject,
+  image: ImageObject | FullTimepointImage,
   annotation: { boundingBox: [number, number, number, number] },
 ) => {
   const renderedIm = await IJSImage.load(image.src);
@@ -127,7 +127,7 @@ export const getPropertiesFromImage = async (
 
 export const getPropertiesFromImageSync = (
   renderedIm: IJSImage,
-  image: ImageObject,
+  image: ImageObject | FullTimepointImage,
   annotation: { boundingBox: number[] },
 ) => {
   const normalizingWidth = image.shape.width - 1;
@@ -159,14 +159,14 @@ export const getPropertiesFromImageSync = (
   };
 };
 
-export const getFullTimepointImage = (
+export const extractTimepoint = (
   timeSeriesImage: TSImageObject,
-  timePoint: TPKey,
+  timepoint: TPKey,
 ): FullTimepointImage => {
-  const timePointData = timeSeriesImage.timepoints[timePoint];
+  const timePointData = timeSeriesImage.timepoints[timepoint];
   if (!timePointData) {
     throw new Error(
-      `Time point ${timePoint} does not exist in image ${timeSeriesImage.id}`,
+      `Time point ${timepoint} does not exist in image ${timeSeriesImage.id}`,
     );
   }
   return {
@@ -182,6 +182,171 @@ export const getFullTimepointImage = (
     colors: timePointData.colors,
     categoryId: timePointData.categoryId,
     activePlane: timePointData.activePlane,
-    timepoint: timePoint,
+    timepoint: timepoint,
+  };
+};
+
+export const extractAllTimepoints = (
+  imageSeries: TSImageObject,
+): FullTimepointImage[] => {
+  const tpImages = Object.keys(imageSeries.timepoints).reduce(
+    (tpImages: FullTimepointImage[], tp) => {
+      tpImages.push(extractTimepoint(imageSeries, tp));
+      return tpImages;
+    },
+    [],
+  );
+  return tpImages;
+};
+export const extractZPlane = (
+  image: FullTimepointImage,
+  plane: number,
+): FullTimepointImage | FullTimepointImage => {
+  if (image.shape.planes === 1) return image;
+  const planeData = gather(image.data, plane, 0).expandDims(0);
+
+  return {
+    id: image.id,
+    name: image.name,
+    kind: image.kind,
+    bitDepth: image.bitDepth,
+    containing: image.containing,
+    partition: image.partition,
+    shape: { ...image.shape, planes: 1 },
+    src: image.src, //necessary to generate new source?
+    data: planeData as Tensor4D,
+    colors: image.colors,
+    categoryId: image.categoryId,
+    activePlane: plane,
+    timepoint: image.timepoint,
+  };
+};
+// export const extractAllZPlanes = (
+//   image: FullTimepointImage,
+// ): FullTimepointImage[] => {
+//   const planes = image.shape.planes;
+//   if (planes === 1) return [image];
+//   const planeData = tfsplit(image.data, planes, 0);
+
+//   const tzReducedImages = planeData.map((data, idx) => {
+//     return {
+//       id: image.id,
+//       name: image.name,
+//       kind: image.kind,
+//       bitDepth: image.bitDepth,
+//       containing: image.containing,
+//       partition: image.partition,
+//       shape: { ...image.shape, planes: 1 },
+//       src: image.src, //necessary to generate new source?
+//       data: data as Tensor4D,
+//       colors: image.colors,
+//       categoryId: image.categoryId,
+//       activePlane: idx,
+//       timepoint: image.timepoint,
+//     };
+//   });
+
+//   return tzReducedImages;
+// };
+
+/**
+ * Extracts all z-planes from a 3D image into separate `FullTimepointImage` objects,
+ * each representing a single plane. If the image contains only one plane,
+ * returns the original image in an array. Doesnt actually extract plane since
+ * extraction is done in the segmentation preprocessing.
+ *
+ * @param {FullTimepointImage} image - The source image containing multiple z-planes.
+ * @returns {FullTimepointImage[]} An array of images, each with one plane extracted
+ *                                  and `activePlane` set accordingly.
+ */
+export const extractAllZPlanes = (
+  image: FullTimepointImage,
+): FullTimepointImage[] => {
+  const planes = image.shape.planes;
+  if (planes === 1) return [image];
+
+  const extractedPlanes: FullTimepointImage[] = [];
+
+  for (let i = 0; i < planes; i++) {
+    extractedPlanes.push({
+      id: image.id,
+      name: image.name,
+      kind: image.kind,
+      bitDepth: image.bitDepth,
+      containing: image.containing,
+      partition: image.partition,
+      shape: { ...image.shape, planes: 1 },
+      src: image.src, //necessary to generate new source?
+      data: image.data,
+      colors: image.colors,
+      categoryId: image.categoryId,
+      activePlane: i,
+      timepoint: image.timepoint,
+    });
+  }
+
+  return extractedPlanes;
+};
+
+export const getTZReducedImage = (
+  timeSeriesImage: TSImageObject,
+  timepoint: TPKey,
+  plane?: number,
+): FullTimepointImage | FullTimepointImage => {
+  const timePointData = timeSeriesImage.timepoints[timepoint];
+  if (!timePointData) {
+    throw new Error(
+      `Time point ${timepoint} does not exist in image ${timeSeriesImage.id}`,
+    );
+  }
+  const tzReducedImage = {
+    id: timeSeriesImage.id,
+    name: timeSeriesImage.name,
+    kind: timeSeriesImage.kind,
+    bitDepth: timeSeriesImage.bitDepth,
+    containing: timeSeriesImage.containing,
+    partition: timeSeriesImage.partition,
+    shape: timeSeriesImage.shape,
+    src: timePointData.src,
+    data: timePointData.data,
+    colors: timePointData.colors,
+    categoryId: timePointData.categoryId,
+    activePlane: timePointData.activePlane,
+    timepoint: timepoint,
+  };
+
+  if (plane) {
+    const planeData = gather(tzReducedImage.data, plane, 0);
+    tzReducedImage.data = planeData;
+  }
+
+  return tzReducedImage;
+};
+
+export const extractChannel = (
+  image: FullTimepointImage,
+  channel: number,
+): FullTimepointImage => {
+  const numChannels = image.shape.channels;
+  if (channel >= numChannels)
+    throw new Error(
+      `Provided channel "${channel}" is larger than the number of channels in the image (${numChannels})`,
+    );
+  const channelData = gather(image.data, channel, 3).expandDims(-1);
+
+  return {
+    id: image.id,
+    name: image.name,
+    kind: image.kind,
+    bitDepth: image.bitDepth,
+    containing: image.containing,
+    partition: image.partition,
+    shape: { ...image.shape, channels: 1 },
+    src: image.src, //necessary to generate new source?
+    data: channelData as Tensor4D,
+    colors: image.colors,
+    categoryId: image.categoryId,
+    activePlane: image.activePlane,
+    timepoint: image.timepoint,
   };
 };

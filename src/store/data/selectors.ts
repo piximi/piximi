@@ -21,7 +21,7 @@ import {
 } from "./types";
 import { DataState } from "store/types";
 import { updateRecordArray } from "utils/objectUtils";
-import { getFullTimepointImage } from "./utils";
+import { extractTimepoint } from "./utils";
 
 const kindsSelectors = kindsAdapter.getSelectors(
   (state: RootState) => state.data.kinds,
@@ -296,7 +296,7 @@ export const selectFullTimepointImages = createSelector(
     (timepoint?: TPKey): FullTimepointImage[] => {
       if (timepoint !== undefined) {
         return images.reduce((images: FullTimepointImage[], tsImage) => {
-          images.push(getFullTimepointImage(tsImage, timepoint));
+          images.push(extractTimepoint(tsImage, timepoint));
           return images;
         }, []);
       }

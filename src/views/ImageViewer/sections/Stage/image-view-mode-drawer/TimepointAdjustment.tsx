@@ -12,11 +12,15 @@ import {
 } from "views/ImageViewer/state/imageViewer/selectors";
 import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 import { ImageViewerTimepointProperties } from "views/ImageViewer/utils/types";
+import { selectImageDictionary } from "store/data/selectors";
+import { createRenderedTensor } from "utils/tensorUtils";
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
 export const TimepointAdjustment = () => {
   const dispatch = useDispatch();
   const activeImage = useSelector(selectActiveImage);
   const activeImageSeriesDetails = useSelector(selectActiveImageSeries);
+  const imageSeries = useSelector(selectImageDictionary);
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLImageElement | null)[]>([]);
 
@@ -25,15 +29,6 @@ export const TimepointAdjustment = () => {
     activeImageSeriesDetails?.activeTimepoint ?? "0",
   );
 
-  const handleSliderChange = (newValue: number | number[]) => {
-    setSliderValue(newValue + "");
-    scrollToItem(newValue as number);
-    dispatch(
-      imageViewerSlice.actions.setActiveImageTimepoint({
-        tp: newValue + "",
-      }),
-    );
-  };
   const tsPreviewProportions = useMemo(() => {
     const targetHeight = 75;
     return (activeImage?.shape.height ?? 75) / targetHeight;
@@ -46,9 +41,7 @@ export const TimepointAdjustment = () => {
 
   const sliderWidth = useMemo(() => {
     const tpWidth = numTimepoints * 16 + 80; // 80 is width of both side buttons;
-    console.log("tpWidth: ", tpWidth);
     const containerWidth = containerRef.current?.clientWidth ?? 0;
-    console.log("containerWidth: ", containerWidth);
 
     if (tpWidth > containerWidth && containerWidth > 0) return "100%";
     return tpWidth + "px";
@@ -64,19 +57,30 @@ export const TimepointAdjustment = () => {
       });
     }
   };
+  const updateTimepointImage = (nextTimepoint: number) => {
+    scrollToItem(nextTimepoint);
+    setSliderValue(nextTimepoint + "");
+    dispatch(
+      imageViewerSlice.actions.setActiveImageTimepoint({
+        tp: nextTimepoint + "",
+      }),
+    );
+    dispatch(
+      annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
+    );
+  };
+
+  const handleSliderChange = (newValue: number | number[]) => {
+    updateTimepointImage(newValue as number);
+  };
+
   const handleDecrementTimepoint = () => {
     if (!activeImageSeriesDetails) return;
     const activeTimepoint = +activeImageSeriesDetails.activeTimepoint;
     const nextTimepoint = activeTimepoint !== 0 ? activeTimepoint - 1 : -1;
 
     if (nextTimepoint >= 0) {
-      scrollToItem(nextTimepoint);
-      setSliderValue(nextTimepoint + "");
-      dispatch(
-        imageViewerSlice.actions.setActiveImageTimepoint({
-          tp: nextTimepoint + "",
-        }),
-      );
+      updateTimepointImage(nextTimepoint);
     }
   };
   const handleIncrementTimepoint = () => {
@@ -87,13 +91,7 @@ export const TimepointAdjustment = () => {
     const nextTimepoint =
       activeTimepoint < maxTimepoints ? activeTimepoint + 1 : undefined;
     if (nextTimepoint) {
-      scrollToItem(nextTimepoint);
-      setSliderValue(nextTimepoint + "");
-      dispatch(
-        imageViewerSlice.actions.setActiveImageTimepoint({
-          tp: nextTimepoint + "",
-        }),
-      );
+      updateTimepointImage(nextTimepoint);
     }
   };
 
@@ -107,11 +105,6 @@ export const TimepointAdjustment = () => {
       );
     setTPHtmlImages(srcs);
   }, [activeImageSeriesDetails]);
-
-  useEffect(() => console.log(sliderValue), [sliderValue]);
-  useEffect(() => {
-    console.log("sliderWidth: ", sliderWidth);
-  }, [sliderWidth]);
 
   return activeImage && activeImageSeriesDetails ? ( // For cleaner typescript, shouldnt be able to focus on if values undefined
     <Box

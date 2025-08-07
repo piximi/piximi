@@ -25,9 +25,7 @@ export const ZStackSlider = () => {
 
   const sliderWidth = useMemo(() => {
     const tpWidth = (maxPlanes + 1) * 16 + 100; // 80 is width of both side buttons;
-    console.log("tpWidth: ", tpWidth);
     const containerWidth = containerRef.current?.clientWidth ?? 0;
-    console.log("containerWidth: ", containerWidth);
 
     if (tpWidth > containerWidth && containerWidth > 0) return "100%";
     return tpWidth;
@@ -81,7 +79,7 @@ export const ZStackSlider = () => {
         sx={{
           display: "grid",
           gridTemplateColumns: `50px 1fr 50px`,
-          // width: sliderWidth + "px",
+          width: sliderWidth + "px",
           //maxWidth: sliderWidth + "px",
           justifyItems: "center",
         }}

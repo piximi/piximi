@@ -24,7 +24,7 @@ import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selecto
 import { selectImageSeriesArray } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { ImageObject } from "store/data/types";
-import { getFullTimepointImage } from "store/data/utils";
+import { extractTimepoint } from "store/data/utils";
 
 const NUM_BUFFERED_IMS = 20;
 const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 4);
@@ -43,7 +43,7 @@ export const ImageList = () => {
 
   const imageListImages = useMemo(() => {
     return imageSeriesArray.map((imageSeries) => {
-      return getFullTimepointImage(imageSeries, "0");
+      return extractTimepoint(imageSeries, "0");
     });
   }, [imageSeriesArray]);
   const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(

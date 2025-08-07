@@ -204,28 +204,34 @@ startAppListening({
   },
 });
 
+// Updates the active souce with all of the planes in the current timepoint.
+// Begins by cancelling all other running instances of this listener so stale computation doesnt hog resources
+// Waits for 1 second before begining, only during this time is the listener able to be cancelled
 startAppListening({
   actionCreator: imageViewerSlice.actions.setActiveImageTimepoint,
   effect: async (action, listenerAPI) => {
-    const tp = action.payload.tp;
+    listenerAPI.cancelActiveListeners();
+    await listenerAPI.delay(1000);
+
     const { data: dataState, imageViewer: imageViewerState } =
       listenerAPI.getState();
 
     const activeImageSeriesId = imageViewerState.activeImageSeriesId;
+
     if (!activeImageSeriesId) return;
 
-    const activeSeriesDisplayDetails =
+    const { activeTimepoint, timepoints: viewerTimepoints } =
       imageViewerState.imageStack[activeImageSeriesId];
 
-    const activeImageSeriesData =
+    const { bitDepth, timepoints: seriesTimepoints } =
       dataState.images.entities[activeImageSeriesId];
 
-    const activeImage = activeImageSeriesData.timepoints[tp];
+    const imageTensorData = seriesTimepoints[activeTimepoint].data;
 
     const renderedSrcs = await createRenderedTensor(
-      activeImage.data,
-      activeSeriesDisplayDetails.timepoints[tp].ZTColors,
-      activeImageSeriesData.bitDepth,
+      imageTensorData,
+      viewerTimepoints[activeTimepoint].ZTColors,
+      bitDepth,
       undefined,
     );
 
@@ -234,37 +240,43 @@ startAppListening({
         renderedSrcs,
       }),
     );
-    listenerAPI.dispatch(
-      annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
-    );
   },
 });
+
+// Updates the preview images for the current activeImage when the z-plane changes.
+// Begins by cancelling all other running instances of this listener so stale computation doesnt hog resources
+// Waits for 1 second before begining, only during this time is the listener able to be cancelled
 startAppListening({
   actionCreator: imageViewerSlice.actions.setActiveImageActivePlane,
   effect: async (action, listenerAPI) => {
-    const pl = action.payload.plane;
-    const { data: dataState, imageViewer: imageViewerState } =
+    listenerAPI.cancelActiveListeners();
+    await listenerAPI.delay(1000);
+    const { imageViewer: imageViewerState, data: dataState } =
       listenerAPI.getState();
 
     const activeImageSeriesId = imageViewerState.activeImageSeriesId;
     if (!activeImageSeriesId) return;
 
-    const activeImageSeriesDisplayProperties =
+    const { bitDepth, timepoints: seriesTimepoints } =
+      dataState.images.entities[activeImageSeriesId];
+    const { timepoints: viewerTimepoints, activePlane } =
       imageViewerState.imageStack[activeImageSeriesId];
 
-    const activeImageSeriesData =
-      dataState.images.entities[activeImageSeriesId];
-
-    const res = await getRenderedSources(
-      activeImageSeriesData,
-      pl,
-      activeImageSeriesDisplayProperties.activeTimepoint,
-      activeImageSeriesDisplayProperties.timepoints,
-    );
-
+    const ZTPreviews: Record<string, string> = {};
+    for await (const entry of Object.entries(seriesTimepoints)) {
+      const [tp, info] = entry;
+      const colors = viewerTimepoints[tp].ZTColors;
+      const ZTPreview = await createRenderedTensor(
+        info.data,
+        colors,
+        bitDepth,
+        activePlane,
+      );
+      ZTPreviews[tp] = ZTPreview;
+    }
     listenerAPI.dispatch(
       imageViewerSlice.actions.setActiveSeriesTZPreviews({
-        previews: res.ZTPreviews,
+        previews: ZTPreviews,
       }),
     );
   },

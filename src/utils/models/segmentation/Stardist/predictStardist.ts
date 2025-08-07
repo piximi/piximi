@@ -199,6 +199,8 @@ export const predictStardist = async (
     NMS_scoreThresh,
   );
 
+  if (generatedAnnotations.length === 0) return [];
+
   const indexTensor = tidy(() => {
     const bboxTensor = tensor2d(generatedBboxes);
     const scoresTensor = tensor1d(scores);

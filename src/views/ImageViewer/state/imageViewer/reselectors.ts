@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { selectActiveImageId, selectImageStackImageIds } from "./selectors";
 import { selectImageDictionary } from "store/data/selectors";
-import { getFullTimepointImage } from "store/data/utils";
+import { extractTimepoint } from "store/data/utils";
 import { generateBlankColors } from "utils/tensorUtils";
 import { Colors, ColorsRaw } from "utils/types";
 import { TSImageObject } from "store/data/types";
@@ -50,7 +50,7 @@ export const selectActiveImage = createSelector(
   selectUpdatedImages,
   (imageDetails, activeImageId, images) => {
     return activeImageId
-      ? getFullTimepointImage(
+      ? extractTimepoint(
           images[activeImageId],
           imageDetails[activeImageId].activeTimepoint,
         )

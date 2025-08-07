@@ -9,11 +9,15 @@ const SegmenterStatusContext = createContext<{
   isReady: boolean;
   modelStatus: ModelStatus;
   setModelStatus: React.Dispatch<React.SetStateAction<ModelStatus>>;
+  selectedChannel: number;
+  setSelectedChannel: React.Dispatch<React.SetStateAction<number>>;
   error?: ErrorContext;
 }>({
   isReady: true,
   modelStatus: ModelStatus.Idle,
   setModelStatus: (_value: React.SetStateAction<ModelStatus>) => {},
+  selectedChannel: -1,
+  setSelectedChannel: (_value: React.SetStateAction<number>) => {},
 });
 
 export const SegmenterStatusProvider = ({
@@ -23,6 +27,7 @@ export const SegmenterStatusProvider = ({
 }) => {
   const selectedModel = useSelector(selectSegmenterModel);
   const projectImages = useSelector(selectAllImages);
+  const [selectedChannel, setSelectedChannel] = useState<number>(-1);
 
   const [isReady, setIsReady] = useState(true);
   const [error, setError] = useState<ErrorContext>();
@@ -60,6 +65,8 @@ export const SegmenterStatusProvider = ({
         isReady,
         modelStatus,
         setModelStatus,
+        selectedChannel,
+        setSelectedChannel,
         error,
       }}
     >
