@@ -23,6 +23,7 @@ export const ProjectAppBar = () => {
   const isMobile = useMobileView();
   const worker = useWorker()?.workerRef.current;
 
+  console.log(worker);
   return (
     <Stack
       direction="row"

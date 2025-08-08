@@ -45,6 +45,7 @@ import { MIMETYPES } from "utils/file-io/enums";
 import { ImageShapeEnum } from "utils/file-io/enums";
 import { AlertType } from "utils/enums";
 import { Partition } from "utils/models/enums";
+import { useWorker } from "contexts/WorkerProvider";
 
 import {
   ImageObject,
@@ -141,6 +142,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
   const selectedCategory = useSelector(selectHighlightedCategory);
   const unknownCategory = useSelector(selectUnknownImageCategory);
   const [timeSeries, setTimeSeries] = useState<boolean>(false);
+  const worker = useWorker()?.workerRef.current;
 
   const [fileInfo, setFileInfo] = useState<
     Record<number, ImageShapeInfoImage[]>
@@ -269,9 +271,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
         dispatch(
           dataSlice.actions.addThings({
             things: convertedImages,
-          }),
-
-          globalWorker
+          })
         );
         dispatch(
           dataSlice.actions.addTSImage({
@@ -283,6 +283,17 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
             ids: convertedImages.map((im) => im.id),
           })
         );
+        await (worker as any).storeImage(
+          convertedImages.map((im) => ({
+            id: im.id,
+            data: im.data,
+          }))
+        );
+
+        const firstId = convertedImages[0].id;
+        const imageData = await (worker as any).getImage(firstId);
+
+        console.log("image is:", firstId, imageData);
       }
       if (errors.length > 0) {
         dispatch(
