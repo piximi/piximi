@@ -43,7 +43,7 @@ import {
 import { HotkeyContext } from "utils/enums";
 import { AnnotationExportType } from "utils/file-io/enums";
 import { exportAnnotationMasks } from "utils/file-io/export/annotationExporters";
-import { AnnotationObject, ImageObject } from "store/data/types";
+import { ImageObject, TSAnnotationObject } from "store/data/types";
 import { selectChanges } from "../../state/annotator/selectors";
 import { reconcileChanges } from "../../utils/annotationUtils";
 
@@ -140,7 +140,7 @@ export const ExportAnnotationsSection = ({
     (exportType: AnnotationExportType) => {
       setOnProjectName(() => (userProjectName: string) => {
         const zip = new JSZip();
-        let exportedAnnotations: Record<string, AnnotationObject> = {};
+        let exportedAnnotations: Record<string, TSAnnotationObject> = {};
         if (selectedImage) {
           for (const annId of selectedImage.containing) {
             exportedAnnotations[annId] = annotationDict[annId];

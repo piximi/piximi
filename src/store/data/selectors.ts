@@ -64,9 +64,10 @@ export const selectDataState = ({ data }: { data: DataState }) => data;
 export const selectDataProject = createSelector(
   selectAllKinds,
   selectAllCategories,
-  selectAllThings,
-  (kinds, categories, things) => {
-    return { kinds, categories, things };
+  selectAnnotationArray,
+  selectImageArray,
+  (kinds, categories, annotations, images) => {
+    return { kinds, categories, annotations, images };
   },
 );
 
