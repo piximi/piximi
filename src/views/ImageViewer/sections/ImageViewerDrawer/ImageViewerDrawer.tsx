@@ -15,7 +15,6 @@ import { DIMENSIONS } from "utils/constants";
 import { ExportAnnotationsSection } from "./ExportAnnotationsSection";
 import { KindCategorySection } from "./KindCategorySection";
 import { ImageList } from "./ImageList";
-import { ApplicationOptions } from "components/ui";
 import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
 import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/layout/app-drawer/HelpButton";

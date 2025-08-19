@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ArrowBack } from "@mui/icons-material";
 import { IconButton, Stack, Tooltip, Typography } from "@mui/material";
@@ -11,10 +11,7 @@ import { ExitAnnotatorDialog } from "../../components/dialogs";
 
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import {
-  selectActiveImageId,
-  selectHasUnsavedChanges,
-} from "views/ImageViewer/state/imageViewer/selectors";
+import { selectHasUnsavedChanges } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { HotkeyContext } from "utils/enums";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
@@ -23,7 +20,6 @@ export const ImageViewerLogo = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [returnToProject, setReturnToProject] = useState(false);
-  const activeImageId = useSelector(selectActiveImageId);
   const hasUnsavedChanges = useSelector(selectHasUnsavedChanges);
   const {
     onClose: onCloseExitAnnotatorDialog,
@@ -35,26 +31,8 @@ export const ImageViewerLogo = () => {
     if (hasUnsavedChanges) {
       onOpenExitAnnotatorDialog();
     } else {
-      batch(() => {
-        dispatch(
-          imageViewerSlice.actions.setActiveImageSeriesId({
-            imageId: undefined,
-            prevImageId: activeImageId,
-          }),
-        );
-        dispatch(imageViewerSlice.actions.setImageStack({ images: {} }));
-        dispatch(
-          annotatorSlice.actions.setSelectedAnnotationIds({
-            annotationIds: [],
-            workingAnnotationId: undefined,
-          }),
-        );
-        dispatch(
-          annotatorSlice.actions.setWorkingAnnotation({
-            annotation: undefined,
-          }),
-        );
-      });
+      dispatch(imageViewerSlice.actions.resetImageViewer());
+      dispatch(annotatorSlice.actions.resetAnnotator());
       navigate("/project");
     }
   };
