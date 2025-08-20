@@ -4,7 +4,7 @@ import saveAs from "file-saver";
 import { DataArray } from "image-js";
 
 import { useDialogHotkey } from "hooks";
-
+import { wrap } from "comlink";
 import {
   MeasurementsContext,
   PlotViewContext,
@@ -23,6 +23,8 @@ import { HotkeyContext } from "utils/enums";
 import { MeasurementGroup, ThingData } from "store/measurements/types";
 import { LoadStatus } from "utils/types";
 import { ChartConfig } from "./types";
+import * as Comlink from "comlink";
+import { cons } from "fp-ts/lib/ReadonlyNonEmptyArray";
 
 export const useMeasurementParameters = () => {
   return useContext(MeasurementsContext)!;
@@ -42,7 +44,7 @@ export const usePlotControl = () => {
     (label: string) => {
       return plotDetails.plots[label].name;
     },
-    [plotDetails.plots],
+    [plotDetails.plots]
   );
   const addPlot = useCallback(() => {
     dispatch({ type: "add" });
@@ -51,7 +53,7 @@ export const usePlotControl = () => {
     (id: string, name: string) => {
       dispatch({ type: "edit", id, name });
     },
-    [dispatch],
+    [dispatch]
   );
   type NewType = ChartConfig;
 
@@ -65,17 +67,17 @@ export const usePlotControl = () => {
         chartConfig: newConfig,
       });
     },
-    [plotDetails, dispatch],
+    [plotDetails, dispatch]
   );
   const removePlot = useCallback(
     (id: string, newId?: string) => {
       dispatch({ type: "remove", id, newId });
     },
-    [dispatch],
+    [dispatch]
   );
   const setActiveLabel = useCallback(
     (plotId: string) => dispatch({ type: "select", id: plotId }),
-    [dispatch],
+    [dispatch]
   );
 
   return {
@@ -124,7 +126,7 @@ export const useTableExport = () => {
       const objUrl = URL.createObjectURL(blob);
       saveAs(objUrl, `${table.kind}-measurements.csv`);
     },
-    [categories, measurementData, thingDetails],
+    [categories, measurementData, thingDetails]
   );
 
   return handleExportTable;
@@ -136,13 +138,31 @@ export const useCreateMeasurementTable = () => {
   const thingData = useSelector(selectThingsDictionary);
   const dispatch = useDispatch();
   const [status, setStatus] = useState<LoadStatus>({ loading: false });
-  const worker: Worker = useMemo(
-    () =>
-      new Worker(new URL("./workers/prepareDataWorker.ts", import.meta.url), {
+
+  // const worker = useMemo(
+  //   () =>
+  //     new Worker(new URL("./workers/prepareDataWorker.ts", import.meta.url), {
+  //       type: "module",
+  //     }),
+  //   []
+  // );
+
+  const workerApi = useMemo(() => {
+    const worker = new Worker(
+      new URL("./workers/prepareDataWorker.ts", import.meta.url),
+      {
         type: "module",
-      }),
-    [],
-  );
+      }
+    );
+    return Comlink.wrap<{
+      prepare: (
+        kind: string,
+        things: any[],
+        onProgress: (value: number) => void
+      ) => Promise<{ kind: string; data: any }>;
+    }>(worker);
+  }, []);
+
   const kindOptions = useMemo(
     () =>
       Object.values(kinds).reduce(
@@ -150,9 +170,9 @@ export const useCreateMeasurementTable = () => {
           optionsArray.push({ kindId: kind.id, displayName: kind.displayName });
           return optionsArray;
         },
-        [],
+        []
       ),
-    [kinds],
+    [kinds]
   );
   const {
     onClose: handleCloseTableDialog,
@@ -160,7 +180,7 @@ export const useCreateMeasurementTable = () => {
     open: isTableDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
-  const handleCreateTable = (kind: string) => {
+  const handleCreateTable = async (kind: string) => {
     const thingIds = kinds[kind]!.containing;
     const convertedThingData: {
       id: string;
@@ -183,50 +203,56 @@ export const useCreateMeasurementTable = () => {
       }
     });
 
-    if (window.Worker) {
-      setStatus({ loading: true });
-      worker.postMessage({ kind: kind, things: convertedThingData });
+    setStatus({ loading: true });
+
+    const onProgress = (value: number) => {
+      setStatus({ loading: true, value });
+    };
+
+    try {
+      const progressCallback = Comlink.proxy((progress: number) => {
+        setStatus({ loading: true, value: progress });
+        console.log("progress " + progress);
+      });
+
+      const result = await workerApi.prepare(
+        kind,
+        convertedThingData,
+        progressCallback
+      );
+
+      if (result.data && result.kind) {
+        const numChannels = (
+          Object.values(result.data as Record<string, any>)[0] as any
+        ).channels.length;
+
+        console.log("result " + result);
+        console.log("number of channels" + numChannels);
+        batch(() => {
+          dispatch(
+            measurementsSlice.actions.createGroup({
+              kindId: result.kind,
+              displayName: kinds[result.kind].displayName,
+              categories: categoriesByKind(result.kind),
+              thingIds: Object.keys(result.data),
+              numChannels,
+            })
+          );
+
+          dispatch(
+            measurementsSlice.actions.updateMeasurements({
+              dataDict: result.data,
+            })
+          );
+        });
+
+        setStatus({ loading: false });
+      }
+    } catch (error) {
+      console.error("Worker failed:" + error);
+      setStatus({ loading: false });
     }
   };
-
-  useEffect(() => {
-    if (window.Worker) {
-      worker.onmessage = (
-        e: MessageEvent<
-          | {
-              kind: string;
-              data: ThingData;
-              loadValue?: number;
-            }
-          | { loadValue: number; kind?: string; data?: ThingData }
-        >,
-      ) => {
-        if (e.data.loadValue) {
-          setStatus({ loading: true, value: e.data.loadValue });
-        }
-        if (e.data.data && e.data.kind) {
-          const numChannels = Object.values(e.data.data)[0].channels.length;
-          batch(() => {
-            dispatch(
-              measurementsSlice.actions.createGroup({
-                kindId: e.data.kind!,
-                displayName: kinds[e.data.kind!].displayName,
-                categories: categoriesByKind(e.data.kind!),
-                thingIds: Object.keys(e.data.data!),
-                numChannels,
-              }),
-            );
-            dispatch(
-              measurementsSlice.actions.updateMeasurements({
-                dataDict: e.data.data,
-              }),
-            );
-          });
-          setStatus({ loading: false });
-        }
-      };
-    }
-  }, [worker, dispatch, categoriesByKind]);
 
   return {
     status,
