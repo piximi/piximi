@@ -16,6 +16,7 @@ import { selectTreeItemChildren } from "../../utils";
 
 import { LoadStatus, RecursivePartial } from "utils/types";
 import { MeasurementOptions, MeasurementGroup } from "store/measurements/types";
+import * as Comlink from "comlink";
 
 export const MeasurementsTree = ({
   group,
@@ -31,14 +32,22 @@ export const MeasurementsTree = ({
     group.id
   );
   const measurementData = useSelector(selectMeasurementData);
-  const measurementWorker: Worker = useMemo(
-    () =>
-      new Worker(
-        new URL("../../workers/measurementWorker.ts", import.meta.url),
-        { type: "module" }
-      ),
-    []
-  );
+  // const measurementWorker: Worker = useMemo(
+  //   () =>
+  //     new Worker(
+  //       new URL("../../workers/measurementWorker.ts", import.meta.url),
+  //       { type: "module" }
+  //     ),
+  //   []
+  // );
+
+  const measurementWorker = useMemo(() => {
+    const worker = new Worker(
+      new URL("../../workers/measurementWorker.ts", import.meta.url),
+      { type: "module" }
+    );
+    return Comlink.wrap(worker) as any;
+  }, []);
 
   const handleSelect = (event: React.SyntheticEvent, itemIds: string[]) => {
     if (measurementStatus.loading) return;
@@ -57,15 +66,36 @@ export const MeasurementsTree = ({
 
     const activeMeasurements = prepareActiveMeasurements(updates);
 
-    if (window.Worker) {
-      console.log("post message");
-      setMeasurementStatus({ loading: true });
-      measurementWorker.postMessage({
+    // if (window.Worker) {
+    //   console.log("post message");
+    //   setMeasurementStatus({ loading: true });
+    //   measurementWorker.postMessage({
+    //     currentMeasurements: measurementData,
+    //     activeMeasurements,
+    //     thingIds: group.thingIds,
+    //   });
+    // }
+
+    measurementWorker
+      .runMeasurement({
         currentMeasurements: measurementData,
         activeMeasurements,
         thingIds: group.thingIds,
+        onProgress: (value: number) => {
+          setMeasurementStatus({ loading: true, value });
+        },
+      })
+      .then((data: Record<string, Record<string, number>>) => {
+        setMeasurementStatus({ loading: false });
+        if (!isObjectEmpty(data)) {
+          dispatch(
+            measurementsSlice.actions.updateMeasurements({
+              measurementsDict: data,
+            })
+          );
+        }
       });
-    }
+
     dispatch(
       measurementsSlice.actions.updateGroupMeasurementState({
         groupId: group.id,
@@ -74,30 +104,30 @@ export const MeasurementsTree = ({
     );
   };
 
-  useEffect(() => {
-    if (window.Worker) {
-      measurementWorker.onmessage = (
-        e: MessageEvent<
-          | { data: Record<string, Record<string, number>>; loadValue?: number }
-          | { loadValue: number; data?: Record<string, Record<string, number>> }
-        >
-      ) => {
-        if (e.data.loadValue) {
-          setMeasurementStatus({ loading: true, value: e.data.loadValue });
-        }
-        if (e.data.data) {
-          setMeasurementStatus({ loading: false });
-          if (!isObjectEmpty(e.data.data)) {
-            dispatch(
-              measurementsSlice.actions.updateMeasurements({
-                measurementsDict: e.data.data,
-              })
-            );
-          }
-        }
-      };
-    }
-  }, [measurementWorker, dispatch, setMeasurementStatus]);
+  // useEffect(() => {
+  //   if (window.Worker) {
+  //     measurementWorker.onmessage = (
+  //       e: MessageEvent<
+  //         | { data: Record<string, Record<string, number>>; loadValue?: number }
+  //         | { loadValue: number; data?: Record<string, Record<string, number>> }
+  //       >
+  //     ) => {
+  //       if (e.data.loadValue) {
+  //         setMeasurementStatus({ loading: true, value: e.data.loadValue });
+  //       }
+  //       if (e.data.data) {
+  //         setMeasurementStatus({ loading: false });
+  //         if (!isObjectEmpty(e.data.data)) {
+  //           dispatch(
+  //             measurementsSlice.actions.updateMeasurements({
+  //               measurementsDict: e.data.data,
+  //             })
+  //           );
+  //         }
+  //       }
+  //     };
+  //   }
+  // }, [measurementWorker, dispatch, setMeasurementStatus]);
 
   return (
     <Box>
