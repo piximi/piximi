@@ -154,13 +154,14 @@ export const useCreateMeasurementTable = () => {
         type: "module",
       }
     );
-    return Comlink.wrap<{
-      prepare: (
-        kind: string,
-        things: any[],
-        onProgress: (value: number) => void
-      ) => Promise<{ kind: string; data: any }>;
-    }>(worker);
+    // return Comlink.wrap<{
+    //   prepare: (
+    //     kind: string,
+    //     things: any[],
+    //     onProgress: (value: number) => void
+    //   ) => Promise<{ kind: string; data: any }>;
+    // }>(worker);
+    return Comlink.wrap(worker) as any;
   }, []);
 
   const kindOptions = useMemo(
@@ -205,9 +206,9 @@ export const useCreateMeasurementTable = () => {
 
     setStatus({ loading: true });
 
-    const onProgress = (value: number) => {
-      setStatus({ loading: true, value });
-    };
+    // const onProgress = (value: number) => {
+    //   setStatus({ loading: true, value });
+    // };
 
     try {
       const progressCallback = Comlink.proxy((progress: number) => {
