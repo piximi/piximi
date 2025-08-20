@@ -14,8 +14,9 @@ self.onmessage = async (
     currentMeasurements: MeasurementsData;
     activeMeasurements: string[];
     thingIds: string[];
-  }>,
+  }>
 ) => {
+  console.log("split message");
   const { currentMeasurements, activeMeasurements, thingIds } = e.data;
   const newMeasurements: Record<string, Record<string, number>> = {};
   activeMeasurements.forEach((measurement) => {
@@ -41,11 +42,11 @@ self.onmessage = async (
 
           const result = getIntensityMeasurement(
             measuredChannel,
-            measurementName,
+            measurementName
           );
           if (result === undefined)
             throw new Error(
-              `Error calculating ${measurementName} on channel ${channel}`,
+              `Error calculating ${measurementName} on channel ${channel}`
             );
           if (thingId in newMeasurements) {
             newMeasurements[thingId][measurement] = result;
@@ -87,7 +88,7 @@ self.onmessage = async (
           } else {
             const result = getPerimeterFromMask(
               currentMeasurements[thingId].maskData!,
-              currentMeasurements[thingId].maskShape!,
+              currentMeasurements[thingId].maskShape!
             );
             if (result === undefined)
               throw new Error(`Error calculating area `);
@@ -152,7 +153,7 @@ self.onmessage = async (
             return;
           } else {
             const result = getEQPC(
-              currentMeasurements[thingId].channelData![0].length,
+              currentMeasurements[thingId].channelData![0].length
             );
 
             if (result === undefined)
@@ -176,7 +177,7 @@ self.onmessage = async (
           } else {
             const per = getPerimeterFromMask(
               currentMeasurements[thingId].maskData!,
-              currentMeasurements[thingId].maskShape!,
+              currentMeasurements[thingId].maskShape!
             );
 
             const result = per / Math.PI;
@@ -202,7 +203,7 @@ self.onmessage = async (
             const result = getObjectFormFactor(
               currentMeasurements[thingId].channelData![0].length,
               currentMeasurements[thingId].maskData!,
-              currentMeasurements[thingId].maskShape!,
+              currentMeasurements[thingId].maskShape!
             );
             if (result === undefined)
               throw new Error(`Error calculating area `);
@@ -225,7 +226,7 @@ self.onmessage = async (
             const formFactor = getObjectFormFactor(
               currentMeasurements[thingId].channelData![0].length,
               currentMeasurements[thingId].maskData!,
-              currentMeasurements[thingId].maskShape!,
+              currentMeasurements[thingId].maskShape!
             );
 
             const result = 1 / formFactor;

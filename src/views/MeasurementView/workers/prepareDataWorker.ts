@@ -4,36 +4,39 @@ import { prepareThingData } from "../utils";
 
 import { ThingData } from "store/measurements/types";
 import { DataArray } from "store/data/types";
+import { expose } from "comlink";
 
-self.onmessage = async (
-  e: MessageEvent<{
-    kind: string;
+const workerAPI = {
+  async prepare(
+    kind: string,
     things: {
       id: string;
       kind: string;
       data: number[][][][];
       encodedMask?: number[];
       decodedMask?: DataArray;
-    }[];
-  }>,
-) => {
-  const thingInfo: ThingData = {};
-  const thingCount = e.data.things.length;
-  let i = 0;
-  for await (const thingData of e.data.things) {
-    const { id, data: rawData, encodedMask, decodedMask } = thingData;
+    }[],
+    onProgress: (value: number) => void
+  ): Promise<{ kind: string; data: ThingData }> {
+    const thingInfo: ThingData = {};
+    const thingCount = things.length;
+    let i = 0;
+    for await (const thingData of things) {
+      const { id, data: rawData, encodedMask, decodedMask } = thingData;
 
-    const data = tensor4d(rawData);
-    const preparedThing = await prepareThingData({
-      data,
-      encodedMask,
-      decodedMask,
-    });
-    thingInfo[id] = preparedThing;
-    self.postMessage({ loadValue: Math.floor((i / thingCount) * 100) });
-    i++;
-  }
-  self.postMessage({ kind: e.data.kind, data: thingInfo });
+      const data = tensor4d(rawData);
+      const preparedThing = await prepareThingData({
+        data,
+        encodedMask,
+        decodedMask,
+      });
+      thingInfo[id] = preparedThing;
+      onProgress(Math.floor((i / thingCount) * 100));
+
+      i++;
+    }
+    return { kind, data: thingInfo };
+  },
 };
 
-export {};
+expose(workerAPI);
