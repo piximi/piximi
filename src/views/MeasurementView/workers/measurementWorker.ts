@@ -11,17 +11,18 @@ import {
 import { MeasurementsData } from "store/measurements/types";
 
 const measurementWorker = {
-  async runMeasurement({
-    currentMeasurements,
-    activeMeasurements,
-    thingIds,
-    onProgress,
-  }: {
-    currentMeasurements: MeasurementsData;
-    activeMeasurements: string[];
-    thingIds: string[];
-    onProgress: (progress: number) => void;
-  }) {
+  async runMeasurement(
+    {
+      currentMeasurements,
+      activeMeasurements,
+      thingIds,
+    }: {
+      currentMeasurements: MeasurementsData;
+      activeMeasurements: string[];
+      thingIds: string[];
+    },
+    onProgress: (progress: number) => void
+  ) {
     console.log("split message");
     // const { currentMeasurements, activeMeasurements, thingIds } = e.data;
     const newMeasurements: Record<string, Record<string, number>> = {};
@@ -273,6 +274,7 @@ const measurementWorker = {
       }
     });
     //self.postMessage({ data: newMeasurements });
+
     return newMeasurements;
   },
 };

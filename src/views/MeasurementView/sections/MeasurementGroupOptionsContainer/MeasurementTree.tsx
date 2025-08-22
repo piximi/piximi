@@ -49,7 +49,10 @@ export const MeasurementsTree = ({
     return Comlink.wrap(worker) as any;
   }, []);
 
-  const handleSelect = (event: React.SyntheticEvent, itemIds: string[]) => {
+  const handleSelect = async (
+    event: React.SyntheticEvent,
+    itemIds: string[]
+  ) => {
     if (measurementStatus.loading) return;
 
     const itemId = xor(itemIds, selectedMeasurements)[0];
@@ -76,25 +79,39 @@ export const MeasurementsTree = ({
     //   });
     // }
 
-    measurementWorker
-      .runMeasurement({
+    const progressCallback = Comlink.proxy((progress: number) => {
+      setMeasurementStatus({ loading: true, value: progress });
+    });
+
+    const data: Record<
+      string,
+      Record<string, number>
+    > = await measurementWorker.runMeasurement(
+      {
         currentMeasurements: measurementData,
         activeMeasurements,
         thingIds: group.thingIds,
-        onProgress: (value: number) => {
-          setMeasurementStatus({ loading: true, value });
-        },
-      })
-      .then((data: Record<string, Record<string, number>>) => {
-        setMeasurementStatus({ loading: false });
-        if (!isObjectEmpty(data)) {
-          dispatch(
-            measurementsSlice.actions.updateMeasurements({
-              measurementsDict: data,
-            })
-          );
-        }
-      });
+      },
+      progressCallback
+    );
+
+    //   setMeasurementStatus({ loading: false });
+    //   if (!isObjectEmpty(data)) {
+    //     dispatch(
+    //       measurementsSlice.actions.updateMeasurements({
+    //         measurementsDict: data,
+    //       })
+    //     );
+    //   }
+    // );
+    setMeasurementStatus({ loading: false });
+    if (!isObjectEmpty(data)) {
+      dispatch(
+        measurementsSlice.actions.updateMeasurements({
+          measurementsDict: data,
+        })
+      );
+    }
 
     dispatch(
       measurementsSlice.actions.updateGroupMeasurementState({
