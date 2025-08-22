@@ -77,6 +77,7 @@ export const CategoryDialog = (
             onColorChange={handleColorChange}
           />
           <TextField
+            data-testid="category-name-input"
             error={isInvalidName && name !== ""}
             autoComplete="off"
             autoFocus

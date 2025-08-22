@@ -73,11 +73,13 @@ export const CategoryItemMenu = ({
               <CategoryMenuItem
                 onClick={handleOpenDeleteCategoryDialog}
                 label="Delete"
+                data-testid="delete-category-button"
               />
 
               <CategoryMenuItem
                 onClick={handleOpenEditCategoryDialog}
                 label="Edit"
+                data-testid="edit-category-button"
               />
             </>
           )}
@@ -103,6 +105,7 @@ export const CategoryItemMenu = ({
         onConfirm={() => deleteCategory(category, kind ?? activeKind)}
         onClose={() => handleMenuCloseWith(handleCloseDeleteCategoryDialog)}
         isOpen={isDeleteCategoryDialogOpen}
+        data-testid="delete-category-confirm-dialog"
       />
       <ConfirmationDialog
         title={`Delete All "${category.name}" Objects`}
@@ -122,12 +125,14 @@ export const CategoryItemMenu = ({
 const CategoryMenuItem = ({
   label,
   onClick: handleClick,
+  ...props
 }: {
   label: string;
   onClick: () => void;
+  [key: string]: any;
 }) => {
   return (
-    <MenuItem onClick={handleClick} dense>
+    <MenuItem onClick={handleClick} dense {...props}>
       <Typography variant="inherit">{label}</Typography>
     </MenuItem>
   );

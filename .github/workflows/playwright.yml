@@ -1,4 +1,4 @@
-name: Test
+name: e2e Test
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test_job:
+  e2e_test_job:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,15 +23,20 @@ jobs:
           cache: "pnpm"
 
       - name: Install Packages
-        # @tensorflow/tfjs-node canvas core-js esbuild
         run: pnpm install --dangerously-allow-all-builds
 
-      - name: Lint code
-        run: |
-          pnpm run format-check
-          pnpm run lint
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Start App Server
+        run: pnpm start &
+        env:
+          NODE_ENV: test
+
+      - name: Wait for Server to Start
+        run: npx wait-on http://localhost:3000
 
       - name: Run Tests
-        run: pnpm test --exclude e2e/ --silent
+        run: pnpm test  e2e/ --silent
         env:
           CI: true

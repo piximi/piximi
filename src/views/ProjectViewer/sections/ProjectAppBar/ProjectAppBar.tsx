@@ -126,8 +126,10 @@ export const ProjectAppBar = () => {
             onClick={handleSelectAll}
             disabled={allSelected}
             icon={true}
+            data-testid="select-all-button"
           >
             <Badge
+              data-testid="select-all-badge"
               badgeContent={unfilteredSelectedThings.length}
               color="primary"
               sx={(theme) => ({

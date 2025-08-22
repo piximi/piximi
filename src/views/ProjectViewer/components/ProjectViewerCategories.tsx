@@ -220,7 +220,10 @@ export const ProjectViewerCategories = () => {
         typographyVariant="body2"
         actions={
           <Stack direction="row">
-            <TooltipWithDisable title="New Category">
+            <TooltipWithDisable
+              title="New Category"
+              data-testid="new-category-create-button"
+            >
               <IconButton
                 data-help={HelpItem.CreateCategory}
                 onClick={handleOpenCreateCategoryDialog}

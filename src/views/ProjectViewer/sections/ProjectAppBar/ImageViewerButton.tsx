@@ -29,6 +29,7 @@ export const ImageViewerButton = ({
     >
       <span>
         <Chip
+          data-testid="annotate-button"
           data-help={HelpItem.NavigateImageViewer}
           avatar={<GestureIcon color="inherit" />}
           label={smOrXsBreakpoint ? "" : "Annotate"}
