@@ -19,7 +19,7 @@ import { MIMEType } from "utils/file-io/types";
 import { Category, ImageObject } from "store/data/types";
 import { MIMETYPES } from "utils/file-io/enums";
 import { getDefaultModelInfo } from "../classification/utils";
-
+import path from "path";
 class GenericClassifier extends SequentialClassifier {
   constructor() {
     super({
@@ -82,46 +82,42 @@ const preloadedImages: Array<{
   mimetype: MIMEType;
 }> = [
   {
-    src: "https://picsum.photos/seed/piximi/224",
-    name: "224.jpg",
-    mimetype: MIMETYPES.JPEG,
+    src: path.resolve("src/images/cell-painting.png"),
+    name: "cell-painting.png",
+    mimetype: MIMETYPES.PNG,
   },
 ];
 
 const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
-  const file = await fileFromPath(src, mimetype, true, name);
+  const file = await fileFromPath(src, mimetype, false, name);
 
   return loadImageFileAsStack(file);
 };
 
-it(
-  "preprocessClassifier",
-  async () => {
-    const images: Array<ImageObject> = [];
+it("preprocessClassifier", async () => {
+  const images: Array<ImageObject> = [];
 
-    for (const preIm of preloadedImages) {
-      const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);
-      const im = await convertToImage(
-        imStack,
-        preIm.name,
-        undefined,
-        1,
-        imStack.length,
-      );
-      images.push(im);
-    }
+  for (const preIm of preloadedImages) {
+    const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);
+    const im = await convertToImage(
+      imStack,
+      preIm.name,
+      undefined,
+      1,
+      imStack.length
+    );
+    images.push(im);
+  }
 
-    const model = new GenericClassifier();
-    model.loadModel();
-    expect(model.preprocessingOptions).toBeDefined();
-    model.loadTraining(images, categories);
+  const model = new GenericClassifier();
+  model.loadModel();
+  expect(model.preprocessingOptions).toBeDefined();
+  model.loadTraining(images, categories);
 
-    expect(model.trainingLoaded).toBeTruthy();
+  expect(model.trainingLoaded).toBeTruthy();
 
-    const items = await model.testTrainingDataArray;
+  const items = await model.testTrainingDataArray;
 
-    expect(items[0]["xs"].shape).toEqual([1, 224, 224, 3]);
-    expect(items[0]["ys"].shape).toEqual([1, 2]);
-  },
-  { timeout: 6000 },
-);
+  expect(items[0]["xs"].shape).toEqual([1, 224, 224, 3]);
+  expect(items[0]["ys"].shape).toEqual([1, 2]);
+});
