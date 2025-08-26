@@ -32,18 +32,10 @@ export const MeasurementsTree = ({
     group.id
   );
   const measurementData = useSelector(selectMeasurementData);
-  // const measurementWorker: Worker = useMemo(
-  //   () =>
-  //     new Worker(
-  //       new URL("../../workers/measurementWorker.ts", import.meta.url),
-  //       { type: "module" }
-  //     ),
-  //   []
-  // );
 
   const measurementWorker = useMemo(() => {
     const worker = new Worker(
-      new URL("../../workers/measurementWorker.ts", import.meta.url),
+      new URL("../../workers/globalWorker.ts", import.meta.url),
       { type: "module" }
     );
     return Comlink.wrap(worker) as any;

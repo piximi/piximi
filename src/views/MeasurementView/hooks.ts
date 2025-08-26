@@ -139,28 +139,14 @@ export const useCreateMeasurementTable = () => {
   const dispatch = useDispatch();
   const [status, setStatus] = useState<LoadStatus>({ loading: false });
 
-  // const worker = useMemo(
-  //   () =>
-  //     new Worker(new URL("./workers/prepareDataWorker.ts", import.meta.url), {
-  //       type: "module",
-  //     }),
-  //   []
-  // );
-
   const workerApi = useMemo(() => {
     const worker = new Worker(
-      new URL("./workers/prepareDataWorker.ts", import.meta.url),
+      new URL("./workers/globalWorker.ts", import.meta.url),
       {
         type: "module",
       }
     );
-    // return Comlink.wrap<{
-    //   prepare: (
-    //     kind: string,
-    //     things: any[],
-    //     onProgress: (value: number) => void
-    //   ) => Promise<{ kind: string; data: any }>;
-    // }>(worker);
+
     return Comlink.wrap(worker) as any;
   }, []);
 
