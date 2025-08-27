@@ -15,7 +15,7 @@ import HelpOverlay from "views/HelpOverlay";
 import { useSelector } from "react-redux";
 import { selectAlertState } from "store/applicationSettings/selectors";
 import { AlertBar } from "components/ui";
-//To be removed
+
 export const Application = () => {
   const theme = usePreferredMuiTheme();
   const alertState = useSelector(selectAlertState);
