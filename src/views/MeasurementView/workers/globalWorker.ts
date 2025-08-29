@@ -29,7 +29,6 @@ const measurementWorker = {
     },
     onProgress: (progress: number) => void
   ) {
-    console.log("split message");
     // const { currentMeasurements, activeMeasurements, thingIds } = e.data;
     const newMeasurements: Record<string, Record<string, number>> = {};
     const measurementCount = activeMeasurements.length;
@@ -279,7 +278,6 @@ const measurementWorker = {
         }
       }
     });
-    //self.postMessage({ data: newMeasurements });
 
     return newMeasurements;
   },
@@ -295,7 +293,6 @@ const measurementWorker = {
     }[],
     onProgress: (value: number) => void
   ): Promise<{ kind: string; data: ThingData }> {
-    console.log("prpare data worker");
     const thingInfo: ThingData = {};
     const thingCount = things.length;
     let i = 0;

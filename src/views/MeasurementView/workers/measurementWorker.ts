@@ -273,7 +273,6 @@ const measurementWorker = {
         }
       }
     });
-    //self.postMessage({ data: newMeasurements });
 
     return newMeasurements;
   },

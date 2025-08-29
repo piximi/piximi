@@ -201,7 +201,6 @@ export const useCreateMeasurementTable = () => {
     try {
       const progressCallback = Comlink.proxy((progress: number) => {
         setStatus({ loading: true, value: progress });
-        console.log("progress " + progress);
       });
 
       const result = await (workerApi as any).prepare(
@@ -215,8 +214,6 @@ export const useCreateMeasurementTable = () => {
           Object.values(result.data as Record<string, any>)[0] as any
         ).channels.length;
 
-        console.log("result " + result);
-        console.log("number of channels" + numChannels);
         batch(() => {
           dispatch(
             measurementsSlice.actions.createGroup({

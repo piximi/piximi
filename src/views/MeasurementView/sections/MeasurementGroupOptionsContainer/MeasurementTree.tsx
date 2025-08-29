@@ -64,16 +64,6 @@ export const MeasurementsTree = ({
 
     const activeMeasurements = prepareActiveMeasurements(updates);
 
-    // if (window.Worker) {
-    //   console.log("post message");
-    //   setMeasurementStatus({ loading: true });
-    //   measurementWorker.postMessage({
-    //     currentMeasurements: measurementData,
-    //     activeMeasurements,
-    //     thingIds: group.thingIds,
-    //   });
-    // }
-
     const progressCallback = Comlink.proxy((progress: number) => {
       setMeasurementStatus({ loading: true, value: progress });
     });

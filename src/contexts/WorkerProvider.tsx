@@ -17,12 +17,6 @@ export const WorkerProvider = ({ children }: { children: React.ReactNode }) => {
         type: "module",
       }
     );
-    console.log("launching global");
-    // const obj = Comlink.wrap(globalWorker) as any;
-    // workerRef.current = obj;
-
-    // workerRef.current = obj;
-
     globalWorker.port.start();
     const obj = Comlink.wrap(globalWorker.port) as any;
     workerRef.current = obj;

@@ -16,7 +16,6 @@ self.onmessage = async (
     thingIds: string[];
   }>
 ) => {
-  console.log("split message");
   const { currentMeasurements, activeMeasurements, thingIds } = e.data;
   const newMeasurements: Record<string, Record<string, number>> = {};
   activeMeasurements.forEach((measurement) => {

@@ -18,7 +18,6 @@ const workerAPI = {
     }[],
     onProgress: (value: number) => void
   ): Promise<{ kind: string; data: ThingData }> {
-    console.log("prpare data worker");
     const thingInfo: ThingData = {};
     const thingCount = things.length;
     let i = 0;
