@@ -1,6 +1,8 @@
 import { tidy, tensor2d, Tensor1D } from "@tensorflow/tfjs";
 import { expose } from "comlink";
 
+import * as Comlink from "comlink";
+
 import {
   getEQPC,
   getIntensityMeasurement,
@@ -315,4 +317,9 @@ const measurementWorker = {
   },
 };
 
-expose(measurementWorker);
+(self as any).onconnect = function (event: MessageEvent) {
+  const port = (event as MessageEvent).ports[0];
+  Comlink.expose(measurementWorker, port);
+};
+
+//expose(measurementWorker);

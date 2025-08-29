@@ -25,7 +25,7 @@ import { LoadStatus } from "utils/types";
 import { ChartConfig } from "./types";
 import * as Comlink from "comlink";
 import { cons } from "fp-ts/lib/ReadonlyNonEmptyArray";
-
+import { useWorker } from "contexts/WorkerProvider";
 export const useMeasurementParameters = () => {
   return useContext(MeasurementsContext)!;
 };
@@ -139,16 +139,18 @@ export const useCreateMeasurementTable = () => {
   const dispatch = useDispatch();
   const [status, setStatus] = useState<LoadStatus>({ loading: false });
 
-  const workerApi = useMemo(() => {
-    const worker = new Worker(
-      new URL("./workers/globalWorker.ts", import.meta.url),
-      {
-        type: "module",
-      }
-    );
+  // const workerApi = useMemo(() => {
+  //   const worker = new Worker(
+  //     new URL("./workers/globalWorker.ts", import.meta.url),
+  //     {
+  //       type: "module",
+  //     }
+  //   );
 
-    return Comlink.wrap(worker) as any;
-  }, []);
+  //   return Comlink.wrap(worker) as any;
+  // }, []);
+
+  const workerApi = useWorker()?.workerRef.current;
 
   const kindOptions = useMemo(
     () =>
@@ -202,7 +204,7 @@ export const useCreateMeasurementTable = () => {
         console.log("progress " + progress);
       });
 
-      const result = await workerApi.prepare(
+      const result = await (workerApi as any).prepare(
         kind,
         convertedThingData,
         progressCallback

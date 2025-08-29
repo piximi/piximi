@@ -17,6 +17,7 @@ import { selectTreeItemChildren } from "../../utils";
 import { LoadStatus, RecursivePartial } from "utils/types";
 import { MeasurementOptions, MeasurementGroup } from "store/measurements/types";
 import * as Comlink from "comlink";
+import { useWorker } from "contexts/WorkerProvider";
 
 export const MeasurementsTree = ({
   group,
@@ -33,13 +34,15 @@ export const MeasurementsTree = ({
   );
   const measurementData = useSelector(selectMeasurementData);
 
-  const measurementWorker = useMemo(() => {
-    const worker = new Worker(
-      new URL("../../workers/globalWorker.ts", import.meta.url),
-      { type: "module" }
-    );
-    return Comlink.wrap(worker) as any;
-  }, []);
+  // const measurementWorker = useMemo(() => {
+  //   const worker = new Worker(
+  //     new URL("../../workers/globalWorker.ts", import.meta.url),
+  //     { type: "module" }
+  //   );
+  //   return Comlink.wrap(worker) as any;
+  // }, []);
+
+  const measurementWorker = useWorker()?.workerRef.current;
 
   const handleSelect = async (
     event: React.SyntheticEvent,
@@ -75,10 +78,9 @@ export const MeasurementsTree = ({
       setMeasurementStatus({ loading: true, value: progress });
     });
 
-    const data: Record<
-      string,
-      Record<string, number>
-    > = await measurementWorker.runMeasurement(
+    const data: Record<string, Record<string, number>> = await (
+      measurementWorker as any
+    ).runMeasurement(
       {
         currentMeasurements: measurementData,
         activeMeasurements,
