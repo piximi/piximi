@@ -141,7 +141,7 @@ export const V12_SerializedAnnotationRType = IOTSType({
   id: IOTSString,
   mask: IOTSString, // e.g. "114 1 66 1 66 2 ..."
   plane: IOTSNumber,
-  timepoint: IOTSString,
+  timepoint: IOTSNumber,
   boundingBox: IOTSArray(IOTSNumber), // [x1, y1, x2, y2]
   kind: IOTSString,
   partition: IOTSString,

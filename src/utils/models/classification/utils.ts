@@ -10,7 +10,7 @@ import {
   OptimizationAlgorithm,
   Partition,
 } from "utils/models/enums";
-import { Category, Thing } from "store/data/types";
+import { Category, GeneralizedKindItem } from "store/data/types";
 import {
   FitOptions,
   OptimizerSettings,
@@ -104,43 +104,43 @@ export function prepareTrainingData(
   shuffleData: boolean,
   trainingPercentage: number,
   init: boolean,
-  allThings: Record<string, Thing>,
+  allThings: Record<string, GeneralizedKindItem>,
   activeThingIds: string[],
 ): {
-  unlabeledThings: Thing[];
-  labeledTraining: Thing[];
-  labeledUnassigned: Thing[];
-  labeledValidation: Thing[];
-  splitLabeledTraining: Thing[];
-  splitLabeledValidation: Thing[];
+  unlabeledThings: GeneralizedKindItem[];
+  labeledTraining: GeneralizedKindItem[];
+  labeledUnassigned: GeneralizedKindItem[];
+  labeledValidation: GeneralizedKindItem[];
+  splitLabeledTraining: GeneralizedKindItem[];
+  splitLabeledValidation: GeneralizedKindItem[];
 };
 export function prepareTrainingData(
   shuffleData: boolean,
   trainingPercentage: number,
   init: boolean,
-  allThings: Thing[],
+  allThings: GeneralizedKindItem[],
 ): {
-  unlabeledThings: Thing[];
-  labeledTraining: Thing[];
-  labeledUnassigned: Thing[];
-  labeledValidation: Thing[];
-  splitLabeledTraining: Thing[];
-  splitLabeledValidation: Thing[];
+  unlabeledThings: GeneralizedKindItem[];
+  labeledTraining: GeneralizedKindItem[];
+  labeledUnassigned: GeneralizedKindItem[];
+  labeledValidation: GeneralizedKindItem[];
+  splitLabeledTraining: GeneralizedKindItem[];
+  splitLabeledValidation: GeneralizedKindItem[];
 };
 export function prepareTrainingData(
   shuffleData: boolean,
   trainingPercentage: number,
   init: boolean,
-  allThings: Record<string, Thing> | Thing[],
+  allThings: Record<string, GeneralizedKindItem> | GeneralizedKindItem[],
   activeThingIds?: string[],
 ) {
-  const unlabeledThings: Thing[] = [];
-  const labeledTraining: Thing[] = [];
-  const labeledValidation: Thing[] = [];
-  const labeledUnassigned: Thing[] = [];
+  const unlabeledThings: GeneralizedKindItem[] = [];
+  const labeledTraining: GeneralizedKindItem[] = [];
+  const labeledValidation: GeneralizedKindItem[] = [];
+  const labeledUnassigned: GeneralizedKindItem[] = [];
   if (activeThingIds) {
     activeThingIds.forEach((id) => {
-      const thing = (allThings as Record<string, Thing>)[id];
+      const thing = (allThings as Record<string, GeneralizedKindItem>)[id];
       if (!thing) throw new Error("Active Thing Ids not in sync with things");
       if (isUnknownCategory(thing.categoryId)) {
         unlabeledThings.push(thing);
@@ -153,7 +153,7 @@ export function prepareTrainingData(
       }
     });
   } else {
-    (allThings as Thing[]).forEach((thing) => {
+    (allThings as GeneralizedKindItem[]).forEach((thing) => {
       if (isUnknownCategory(thing.categoryId)) {
         unlabeledThings.push(thing);
       } else if (thing.partition === Partition.Unassigned) {
@@ -165,8 +165,8 @@ export function prepareTrainingData(
       }
     });
   }
-  let splitLabeledTraining: Thing[] = [];
-  let splitLabeledValidation: Thing[] = [];
+  let splitLabeledTraining: GeneralizedKindItem[] = [];
+  let splitLabeledValidation: GeneralizedKindItem[] = [];
   if (init) {
     const trainingThingsLength = Math.round(
       trainingPercentage * labeledUnassigned.length,
@@ -201,8 +201,8 @@ export function prepareTrainingData(
 }
 export const prepareModel = async (
   model: SequentialClassifier,
-  trainingData: Thing[],
-  validationData: Thing[],
+  trainingData: GeneralizedKindItem[],
+  validationData: GeneralizedKindItem[],
   numClasses: number,
   categories: Category[],
   preprocessSettings: PreprocessSettings,

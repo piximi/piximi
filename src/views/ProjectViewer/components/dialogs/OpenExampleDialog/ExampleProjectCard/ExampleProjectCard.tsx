@@ -164,6 +164,7 @@ export const ExampleProjectCard = ({
       batch(() => {
         // loadPercent will be set to 1 here
         dispatch(projectSlice.actions.resetProject());
+        dispatch(projectSlice.actions.setProject({ project }));
         classifierHandler.addModels(loadedClassifiers);
         dispatch(dataSlice.actions.initializeLoadedState(data));
         dispatch(classifierSlice.actions.setDefaults());
@@ -172,7 +173,6 @@ export const ExampleProjectCard = ({
             classifier,
           }),
         );
-        dispatch(projectSlice.actions.setProject({ project }));
       });
     } catch (err) {
       const error: Error = err as Error;

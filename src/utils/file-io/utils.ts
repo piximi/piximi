@@ -8,6 +8,9 @@ import {
   ImageShapeInfo,
   ImageShapeInfoImage,
   MIMEType,
+  V02Category,
+  V02Kind,
+  V11ModelInfo,
 } from "./types";
 import { extractImageFileDetails } from "utils/tensorUtils";
 import { ImageShapeEnum, MIMETYPES } from "./enums";
@@ -16,6 +19,17 @@ import { AlertState } from "utils/types";
 import { AlertType } from "utils/enums";
 import { ImageMetadata, ImageData } from "store/data/types";
 import { isEnumValue, updateRecordArray } from "utils/objectUtils";
+import { generateUUID } from "store/data/utils";
+import {
+  UNKNOWN_CATEGORY_NAME,
+  UNKNOWN_IMAGE_CATEGORY_COLOR,
+} from "store/data/constants";
+import {
+  CropSchema,
+  LossFunction,
+  Metric,
+  OptimizationAlgorithm,
+} from "utils/models/enums";
 
 async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   let imageStack: IJSStack;
@@ -438,3 +452,65 @@ export const getUploadedFileTypes = async (files: FileList) => {
   }
   return images;
 };
+
+export const v02GenerateUnknownCategory = (kind: string) => {
+  const unknownCategoryId = generateUUID({ definesUnknown: true });
+  const unknownCategory: V02Category = {
+    id: unknownCategoryId,
+    name: UNKNOWN_CATEGORY_NAME,
+    color: UNKNOWN_IMAGE_CATEGORY_COLOR,
+    kind: kind,
+    visible: true,
+    containing: [],
+  };
+  return unknownCategory;
+};
+export const v02GenerateKind = (kindName: string, useUUID?: boolean) => {
+  const kindId = useUUID ? generateUUID() : kindName;
+  const unknownCategory = v02GenerateUnknownCategory(kindId);
+  const kind: V02Kind = {
+    id: kindId,
+    displayName: kindName,
+    unknownCategoryId: unknownCategory.id,
+    categories: [unknownCategory.id],
+    containing: [],
+  };
+  return { kind, unknownCategory };
+};
+
+export const v11GetDefaultModelParams = (): Pick<
+  V11ModelInfo,
+  "optimizerSettings" | "preprocessSettings"
+> => ({
+  optimizerSettings: {
+    epochs: 10,
+    batchSize: 32,
+    learningRate: 0.01,
+    lossFunction: LossFunction.CategoricalCrossEntropy,
+    metrics: [Metric.CategoricalAccuracy],
+    optimizationAlgorithm: OptimizationAlgorithm.Adam,
+  },
+  preprocessSettings: {
+    inputShape: {
+      planes: 1,
+      height: 20,
+      width: 20,
+      channels: 1,
+    },
+    shuffle: true,
+    rescaleOptions: {
+      rescale: true,
+      center: false,
+    },
+    cropOptions: {
+      numCrops: 1,
+      cropSchema: CropSchema.None,
+    },
+    trainingPercentage: 0.75,
+  },
+});
+
+export const v11GetDefaultModelInfo = (): V11ModelInfo => ({
+  ...v11GetDefaultModelParams(),
+  evalResults: [],
+});

@@ -5,7 +5,7 @@ import { getAttr } from "../zarr/zarrUtils";
 import semver from "semver";
 import { v01_deserializeProject } from "./v01/v01_deserializeProject";
 import { v02_deserializeProject } from "./v02/v02_deserializeProject";
-import { CurrentProject, LoadCB } from "../types";
+import { LoadCB } from "../types";
 import { v11_deserializeProject } from "./v110/v11_deserializeProject";
 import { v01_02_projectConverter } from "../converters/v01_02_projectConverter";
 import { v02_11_projectConverter } from "../converters/v02_11_projectConverter";

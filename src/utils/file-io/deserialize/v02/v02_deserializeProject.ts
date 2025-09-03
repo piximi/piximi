@@ -12,13 +12,14 @@ import { createRenderedTensor, generateBlankColors } from "utils/tensorUtils";
 import {
   LoadCB,
   V02AnnotationObject,
+  V02Category,
   V02ImageObject,
+  V02Kind,
   V02Project,
 } from "utils/file-io/types";
 import { BitDepth } from "store/data/types";
 import { CustomStore } from "utils/file-io/zarr/stores";
 import { ProjectState } from "store/types";
-import { Kind, Category } from "store/data/types";
 import { EntityState } from "@reduxjs/toolkit";
 import { v01_deserializeClassifierGroup } from "../v01/v01_deserializeClassifierGroup";
 import { IMAGE_KIND } from "store/data/constants";
@@ -140,7 +141,7 @@ const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
 };
 const deserializeCategoriesGroup = async (
   categoriesGroup: Group,
-): Promise<EntityState<Category, string>> => {
+): Promise<EntityState<V02Category, string>> => {
   const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
   const colors = (await getAttr(categoriesGroup, "color")) as string[];
   const names = (await getAttr(categoriesGroup, "name")) as string[];
@@ -153,7 +154,7 @@ const deserializeCategoriesGroup = async (
     );
   }
 
-  const categories: EntityState<Category, string> = {
+  const categories: EntityState<V02Category, string> = {
     ids: [],
     entities: {},
   };
@@ -166,33 +167,33 @@ const deserializeCategoriesGroup = async (
       kind: kinds[i],
       containing: contents[i],
       visible: true,
-    } as Category;
+    } as V02Category;
   }
 
   return categories;
 };
 
-const deserializeKindsGroup = async (
+const deserializeV02KindsGroup = async (
   kindsGroup: Group,
-): Promise<EntityState<Kind, string>> => {
+): Promise<EntityState<V02Kind, string>> => {
   const ids = (await getAttr(kindsGroup, "kind_id")) as string[];
   const contents = (await getAttr(kindsGroup, "contents")) as string[][];
   const categories = (await getAttr(kindsGroup, "categories")) as string[][];
-  const unknownCategoryIds = (await getAttr(
+  const unknownV02CategoryIds = (await getAttr(
     kindsGroup,
     "unknown_category_id",
   )) as string[];
 
   if (
     ids.length !== contents.length ||
-    ids.length !== unknownCategoryIds.length
+    ids.length !== unknownV02CategoryIds.length
   ) {
     throw Error(
       `Expected categories group "${kindsGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`,
     );
   }
 
-  const kinds: EntityState<Kind, string> = { ids: [], entities: {} };
+  const kinds: EntityState<V02Kind, string> = { ids: [], entities: {} };
   for (let i = 0; i < ids.length; i++) {
     kinds.ids.push(ids[i]);
     kinds.entities[ids[i]] = {
@@ -200,7 +201,7 @@ const deserializeKindsGroup = async (
       displayName: ids[i],
       containing: contents[i],
       categories: categories[i],
-      unknownCategoryId: unknownCategoryIds[i],
+      unknownCategoryId: unknownV02CategoryIds[i],
     };
   }
 
@@ -214,8 +215,8 @@ const deserializeProjectGroup = async (
   project: ProjectState;
   data: {
     things: EntityState<V02ImageObject | V02AnnotationObject, string>;
-    categories: EntityState<Category, string>;
-    kinds: EntityState<Kind, string>;
+    categories: EntityState<V02Category, string>;
+    kinds: EntityState<V02Kind, string>;
   };
 }> => {
   const name = (await getAttr(projectGroup, "name")) as string;
@@ -226,7 +227,7 @@ const deserializeProjectGroup = async (
   const thingsGroup = await getGroup(projectGroup, "things");
   const things = await deserializeThingsGroup(thingsGroup, loadCb);
   const kindsGroup = await getGroup(projectGroup, "kinds");
-  const kinds = await deserializeKindsGroup(kindsGroup);
+  const kinds = await deserializeV02KindsGroup(kindsGroup);
   const categoriesGroup = await getGroup(projectGroup, "categories");
   const categories = await deserializeCategoriesGroup(categoriesGroup);
 

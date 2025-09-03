@@ -1,7 +1,6 @@
 import Image from "image-js";
 import { intersection } from "lodash";
-import { generateKind } from "store/data/utils";
-import { Kind, Category, ImageMetadata, ShapeArray } from "store/data/types";
+import { ShapeArray } from "store/data/types";
 import { getPropertiesFromImageSync } from "store/data/utils";
 import { logger } from "utils/logUtils";
 import { convertArrayToShape } from "utils/models/utils";
@@ -10,17 +9,21 @@ import {
   V01_AnnotationObject,
   V01_Category,
   V02AnnotationObject,
+  V02Category,
+  V02ImageObject,
+  V02Kind,
 } from "../types";
+import { v02GenerateKind } from "../utils";
 
 export const v01_02_convertAnnotationsWithExistingProject = async (
-  existingImages: Record<string, ImageMetadata>,
-  existingKinds: Record<string, Kind>,
+  existingImages: Record<string, V02ImageObject>,
+  existingKinds: Record<string, V02Kind>,
   oldAnnotations: V01_AnnotationObject[],
   oldAnnotationCategories: V01_Category[],
 ) => {
   const catId2Name: Record<string, string> = {};
-  const newKinds: Record<string, Kind> = {};
-  const newCategories: Record<string, Category> = {};
+  const newKinds: Record<string, V02Kind> = {};
+  const newCategories: Record<string, V02Category> = {};
   const newAnnotations: V02AnnotationObject[] = [];
   const imageMap: Record<string, Image> = {};
 
@@ -28,7 +31,7 @@ export const v01_02_convertAnnotationsWithExistingProject = async (
     catId2Name[anCat.id] = anCat.name;
     if (!(anCat.name in existingKinds) && !(anCat.name in newKinds)) {
       const { kind: anKind, unknownCategory: newUnknownCategory } =
-        generateKind(anCat.name);
+        v02GenerateKind(anCat.name);
       newCategories[newUnknownCategory.id] = newUnknownCategory;
 
       newKinds[anKind.id] = anKind;

@@ -22,21 +22,14 @@ import {
   OptimizationAlgorithm,
   Partition,
 } from "utils/models/enums";
-import {
-  BitDepth,
-  Category,
-  ImageMetadata,
-  Kind,
-  Shape,
-  AnnotationObject,
-} from "store/data/types";
+import { BitDepth, Shape } from "store/data/types";
 import {
   ClassifierEvaluationResultType,
   CropOptions,
   FitOptions,
   RescaleOptions,
 } from "utils/models/types";
-import { Colors, PartialBy } from "utils/types";
+import { Colors, PartialBy, RequireField } from "utils/types";
 import { Tensor4D } from "@tensorflow/tfjs";
 import {
   ClassifierState,
@@ -110,7 +103,7 @@ export interface ImageFileShapeInfo extends ImageShapeInfo {
 export type LoadCB = (loadPercent: number, loadMessage: string) => void;
 
 /*
-OLD TYPES
+V01 Types
 */
 export type V01_PreprocessOptions = {
   shuffle: boolean;
@@ -162,7 +155,13 @@ export type V01_ImageObject = {
   kind?: string;
   containing?: string[]; // The URI to be displayed on the canvas
 };
-export type V01_Category = PartialBy<Category, "kind">;
+export type V01_Category = {
+  color: string;
+  id: string;
+  name: string;
+  visible: boolean;
+  kind?: string;
+};
 
 export type V01_AnnotationObject = {
   id: string;
@@ -177,6 +176,19 @@ export type V01_AnnotationObject = {
   // TODO serialize: these should not be undefineable
 };
 
+// V02 Types
+
+export type V02ClassifierState = V01_ClassifierState;
+export type V02Kind = {
+  id: string;
+  displayName: string;
+  unknownCategoryId: string;
+  containing: string[];
+  categories: string[];
+};
+export type V02Category = RequireField<V01_Category, "kind"> & {
+  containing: string[];
+};
 export type V02AnnotationObject = Required<
   Omit<V01_AnnotationObject, "decodedMask">
 > & {
@@ -188,11 +200,6 @@ export type V02AnnotationObject = Required<
   decodedMask?: DataArray;
   activePlane: number;
 };
-
-export type V12AnnotationObject = Omit<V02AnnotationObject, "activePlane"> & {
-  timepoint: string;
-};
-
 export type V02ImageObject = Required<V01_ImageObject>;
 
 export type V02Project = {
@@ -200,20 +207,71 @@ export type V02Project = {
   classifier: V01_ClassifierState;
   data: {
     things: EntityState<V02ImageObject | V02AnnotationObject, string>;
-    categories: EntityState<Category, string>;
-    kinds: EntityState<Kind, string>;
+    categories: EntityState<V02Category, string>;
+    kinds: EntityState<V02Kind, string>;
   };
   segmenter: SegmenterState;
 };
 
+export type V02DataState = {
+  kinds: EntityState<V02Kind, string>;
+  categories: EntityState<V02Category, string>;
+  things: EntityState<V02AnnotationObject | V02ImageObject, string>;
+};
+
+// V11 Types
+
 export type V11ImageObject = V02ImageObject;
 export type V11AnnotationObject = V02AnnotationObject;
-export type V11Category = Category & { containing: string[] };
-export type V11Kind = Kind & { containing: string[]; categories: string[] };
+export type V11Category = V02Category;
+export type V11Kind = V02Kind;
+
+export type V11DataState = {
+  things: EntityState<V11ImageObject | V11AnnotationObject, string>;
+  categories: EntityState<V11Category, string>;
+  kinds: EntityState<V11Kind, string>;
+};
+
+export type V11PreprocessSettings = {
+  shuffle: boolean;
+  inputShape: Shape;
+  rescaleOptions: RescaleOptions; // normalization
+  cropOptions: CropOptions;
+  trainingPercentage: number;
+};
+export type V11OptimizerSettings = {
+  learningRate: number;
+  lossFunction:
+    | LossFunction
+    | Array<LossFunction>
+    | { [outputName: string]: LossFunction };
+  metrics: Array<Metric>;
+  optimizationAlgorithm: OptimizationAlgorithm;
+  epochs: number;
+  batchSize: number;
+};
+export type V11ModelClassMap = Record<number, V11Category["id"]>;
+export type V11ModelInfo = {
+  trainingSet?: string[];
+  validationDet?: string[];
+  classMap?: V11ModelClassMap;
+  preprocessSettings: V11PreprocessSettings;
+  optimizerSettings: V11OptimizerSettings;
+  evalResults: ClassifierEvaluationResultType[];
+};
+export type V11KindClassifier = {
+  modelNameOrArch: string | number;
+  modelInfoDict: Record<string, V11ModelInfo>;
+};
+export type V11KindClassifierDict = Record<V11Kind["id"], V11KindClassifier>;
+export type V11ClassifierState = {
+  kindClassifiers: V11KindClassifierDict;
+  showClearPredictionsWarning: boolean;
+};
 
 export type V11Project = {
   project: ProjectState;
-  classifier: ClassifierState;
+  classifier: V11ClassifierState;
   data: {
     things: EntityState<V11ImageObject | V11AnnotationObject, string>;
     categories: EntityState<V11Category, string>;
@@ -222,7 +280,83 @@ export type V11Project = {
   segmenter: SegmenterState;
 };
 
-export type CurrentProject = {
+// V12 Types
+export type V12Category = Omit<V11Category, "containing">;
+export type V12Kind = Omit<V11Kind, "categories" | "containing">;
+export type V12AnnotationObject = PartialBy<
+  V11AnnotationObject,
+  "activePlane"
+> & {
+  timepoint: number;
+  childIds?: string[];
+};
+export type V12ImageData = {
+  id: string;
+  name: string;
+  metadataId: string;
+  colors: Colors;
+  src: string;
+  data: Tensor4D;
+  categoryId: string;
+  activePlane: number;
+  partition: Partition;
+  timepoint?: number;
+};
+
+export type V12BaseExtractedImageData = {
+  id: string;
+  bitDepth: number;
+  shape: Shape;
+  colors: Colors;
+  data: Tensor4D;
+  src: string;
+};
+export type V12ImageMetadata = {
+  id: string;
+  name: string;
+  kind: string;
+  bitDepth: BitDepth;
+  shape: Shape;
+  timeSeries: boolean;
+  imageDataIds: string[];
+  defaultImageId: string;
+};
+
+export type V12GeneralizedKindItem = {
+  id: string;
+  name: string;
+  categoryId: string;
+  selected?: boolean; // UI state for bulk operations
+  kind: string;
+
+  // Spatial/display info (common to both)
+  boundingBox?: [number, number, number, number];
+  plane?: number;
+  activePlane: number;
+
+  // Time series info
+  timepoint?: number;
+
+  // Visual representation
+  src: string;
+  colors?: Colors;
+  data: Tensor4D;
+
+  // Metadata for operations
+  metadataId?: string;
+  shape: Shape;
+  bitDepth: BitDepth;
+  partition: Partition;
+
+  // Optional fields that might only apply to one type
+  childIds?: string[]; // for annotations with hierarchical relationships
+  containing?: string[]; // for images
+
+  // For displaying timeseries
+  grouped?: boolean;
+};
+
+export type V12Project = {
   project: ProjectState;
   classifier: ClassifierState;
   data: DataState;

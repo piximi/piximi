@@ -7,15 +7,21 @@ import {
   SerializedFileTypeV12,
   V12_SerializedAnnotationType,
   V12AnnotationObject,
+  V12Category,
+  V12GeneralizedKindItem,
+  V12Kind,
 } from "../../types";
 import { PartialBy } from "utils/types";
-import { Kind, Category, ImageMetadata, ShapeArray } from "store/data/types";
+import { ShapeArray } from "store/data/types";
 
-type KindMap = Record<string, { new: Kind; existing?: Kind }>;
-type CategoryMap = Record<string, { new: Category; existing?: Category }>;
+type V12KindMap = Record<string, { new: V12Kind; existing?: V12Kind }>;
+type V12CategoryMap = Record<
+  string,
+  { new: V12Category; existing?: V12Category }
+>;
 type ImageMap = Record<
   string,
-  { new: SerializedAnnotatorImageType; existing?: ImageMetadata }
+  { new: SerializedAnnotatorImageType; existing?: V12GeneralizedKindItem }
 >;
 
 export const v12_deserializeAnnotations = (
@@ -33,7 +39,7 @@ export const v12_deserializeAnnotations = (
       name: annotation.name,
       encodedMask: annotation.mask.split(" ").map((e) => Number(e)),
       plane: annotation.plane,
-      timepoint: annotation.timepoint,
+      timepoint: +annotation.timepoint,
       boundingBox: annotation.boundingBox as [number, number, number, number],
       shape: convertArrayToShape(annotation.shape as ShapeArray),
       categoryId: annotation.categoryId,
@@ -45,17 +51,17 @@ export const v12_deserializeAnnotations = (
   return annotations;
 };
 
-const reconcileKinds = (
-  existingKinds: Array<Kind>,
-  serializedKinds: Array<Kind>,
+const reconcileV12Kinds = (
+  existingV12Kinds: Array<V12Kind>,
+  serializedV12Kinds: Array<V12Kind>,
 ) => {
-  const kindMap: KindMap = {};
+  const kindMap: V12KindMap = {};
 
-  serializedKinds.forEach((kind) => {
-    const existingKind = existingKinds.find((k) => kind.id === k.id);
+  serializedV12Kinds.forEach((kind) => {
+    const existingV12Kind = existingV12Kinds.find((k) => kind.id === k.id);
     kindMap[kind.id] = { new: kind };
-    if (existingKind) {
-      kindMap[kind.id].existing = existingKind;
+    if (existingV12Kind) {
+      kindMap[kind.id].existing = existingV12Kind;
     }
   });
 
@@ -63,24 +69,24 @@ const reconcileKinds = (
 };
 
 const reconcileCategories = (
-  existingCategories: Array<Category>,
-  serializedCategories: Array<Category>,
+  existingCategories: Array<V12Category>,
+  serializedCategories: Array<V12Category>,
 ) => {
-  const categoryMap: CategoryMap = {};
+  const categoryMap: V12CategoryMap = {};
   serializedCategories.forEach((category) => {
-    const existingCategory = existingCategories.find(
+    const existingV12Category = existingCategories.find(
       (c) => category.name === c.name && category.kind === c.kind,
     );
     categoryMap[category.id] = { new: category };
-    if (existingCategory) {
-      categoryMap[category.id].existing = existingCategory;
+    if (existingV12Category) {
+      categoryMap[category.id].existing = existingV12Category;
     }
   });
   return categoryMap;
 };
 
 const reconcileImages = (
-  existingImages: Array<ImageMetadata>,
+  existingImages: Array<V12GeneralizedKindItem>,
   serializedImages: Array<SerializedAnnotatorImageType>,
 ) => {
   const imageMap: ImageMap = {};
@@ -96,14 +102,14 @@ const reconcileImages = (
 
 export const v12_deserializePiximiAnnotations = async (
   serializedProject: SerializedFileTypeV12,
-  existingImages: Array<ImageMetadata>,
-  existingCategories: Array<Category>,
-  existingKinds: Array<Kind>,
+  existingImages: Array<V12GeneralizedKindItem>,
+  existingCategories: Array<V12Category>,
+  existingV12Kinds: Array<V12Kind>,
 ) => {
   // this must come first
   const imageMap = reconcileImages(existingImages, serializedProject.images);
 
-  const kindMap = reconcileKinds(existingKinds, serializedProject.kinds);
+  const kindMap = reconcileV12Kinds(existingV12Kinds, serializedProject.kinds);
 
   const catMap = reconcileCategories(
     existingCategories,
@@ -111,14 +117,14 @@ export const v12_deserializePiximiAnnotations = async (
   );
 
   const reconciledAnnotations: V12AnnotationObject[] = [];
-  const kindsToReconcile: Record<string, Kind> = {};
-  const categoriesToReconcile: Record<string, Category> = {};
+  const kindsToReconcile: Record<string, V12Kind> = {};
+  const categoriesToReconcile: Record<string, V12Category> = {};
 
   for await (const annotation of serializedProject.annotations) {
     const annImage = imageMap[annotation.imageId];
     const category = catMap[annotation.categoryId];
     const kind = kindMap[annotation.kind];
-    let appliedUnknownCategory = false;
+    let appliedUnknownV12Category = false;
 
     /*
       HANDLE IMAGE
@@ -136,29 +142,29 @@ export const v12_deserializePiximiAnnotations = async (
     */
 
     if (kind.existing) {
-      const existingKind = kind.existing;
+      const existingV12Kind = kind.existing;
       if (expandedAnnotation.categoryId === kind.new.unknownCategoryId) {
-        expandedAnnotation.categoryId = existingKind.unknownCategoryId;
-        appliedUnknownCategory = true;
+        expandedAnnotation.categoryId = existingV12Kind.unknownCategoryId;
+        appliedUnknownV12Category = true;
       }
     } else {
-      const newKind = kind.new;
-      if (!(newKind.id in kindsToReconcile)) {
-        kindsToReconcile[newKind.id] = newKind;
+      const newV12Kind = kind.new;
+      if (!(newV12Kind.id in kindsToReconcile)) {
+        kindsToReconcile[newV12Kind.id] = newV12Kind;
       }
     }
 
     /*
       HANDLE CATEGORY
     */
-    if (!appliedUnknownCategory) {
+    if (!appliedUnknownV12Category) {
       if (category.existing) {
         const existingCat = category.existing;
         expandedAnnotation.categoryId = existingCat.id;
       } else {
-        const newCategory = category.new;
-        if (!(newCategory.id in categoriesToReconcile))
-          categoriesToReconcile[newCategory.id] = newCategory;
+        const newV12Category = category.new;
+        if (!(newV12Category.id in categoriesToReconcile))
+          categoriesToReconcile[newV12Category.id] = newV12Category;
       }
     }
 
@@ -180,7 +186,7 @@ export const v12_deserializePiximiAnnotations = async (
 
   return {
     annotations: reconciledAnnotations,
-    newKinds: Object.values(kindsToReconcile),
+    newV12Kinds: Object.values(kindsToReconcile),
     newCategories: Object.values(categoriesToReconcile),
   };
 };

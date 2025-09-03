@@ -5,11 +5,7 @@ import {
   getDatasetSelection,
   getGroup,
 } from "utils/file-io/zarr/zarrUtils";
-import {
-  ClassifierEvaluationResultType,
-  OptimizerSettings,
-  PreprocessSettings,
-} from "utils/models/types";
+import { ClassifierEvaluationResultType } from "utils/models/types";
 import { Group } from "zarr";
 import {
   deserializeCropOptionsGroup,
@@ -22,17 +18,19 @@ import {
   OptimizationAlgorithm,
 } from "utils/models/enums";
 import {
-  ClassifierState,
-  KindClassifierDict,
-  ModelClassMap,
-  ModelInfo,
-} from "store/types";
-import { getDefaultModelInfo } from "utils/models/classification/utils";
-import { Kind } from "store/data/types";
+  V11ClassifierState,
+  V11Kind,
+  V11KindClassifierDict,
+  V11ModelClassMap,
+  V11ModelInfo,
+  V11OptimizerSettings,
+  V11PreprocessSettings,
+} from "utils/file-io/types";
+import { v11GetDefaultModelInfo } from "utils/file-io/utils";
 
 const deserializePreprocessSettingsGroup = async (
   preprocessSettingsGroup: Group,
-): Promise<PreprocessSettings> => {
+): Promise<V11PreprocessSettings> => {
   const inputShape = await getDatasetSelection(
     preprocessSettingsGroup,
     "input_shape",
@@ -73,7 +71,7 @@ const deserializePreprocessSettingsGroup = async (
 
 const deserializeOptimizerSettingsGroup = async (
   optimizerSettingsGroup: Group,
-): Promise<OptimizerSettings> => {
+): Promise<V11OptimizerSettings> => {
   const { epochs, batchSize } = await deserializeFitOptionsGroup(
     optimizerSettingsGroup,
   );
@@ -110,7 +108,9 @@ const deserializeOptimizerSettingsGroup = async (
     metrics,
   };
 };
-const deserializeModelInfo = async (infoGroup: Group): Promise<ModelInfo> => {
+const deserializeModelInfo = async (
+  infoGroup: Group,
+): Promise<V11ModelInfo> => {
   const optimizerSettingsGroup = await getGroup(
     infoGroup,
     "optimizer_settings",
@@ -123,9 +123,11 @@ const deserializeModelInfo = async (infoGroup: Group): Promise<ModelInfo> => {
     number,
     string,
   ][];
-  let classMap: ModelClassMap | undefined;
+  let classMap: V11ModelClassMap | undefined;
   if (classMapArray.length > 0) {
-    classMap = classMapArray.reduce((mapDict: ModelClassMap, mapItem) => {
+    type NewType = V11ModelClassMap;
+
+    classMap = classMapArray.reduce((mapDict: NewType, mapItem) => {
       mapDict[mapItem[0]] = mapItem[1];
       return mapDict;
     }, {});
@@ -152,12 +154,12 @@ const deserializeModelInfo = async (infoGroup: Group): Promise<ModelInfo> => {
 
 export const v11_deserializeClassifierGroup = async (
   classifierGroup: Group,
-): Promise<ClassifierState> => {
-  const kindClassifiers: KindClassifierDict = {};
+): Promise<V11ClassifierState> => {
+  const kindClassifiers: V11KindClassifierDict = {};
   const classifierKinds = (await getAttr(
     classifierGroup,
     "classifier_kinds",
-  )) as Kind["id"][];
+  )) as V11Kind["id"][];
 
   for await (const kindId of classifierKinds) {
     const kindModelsGroup = await getGroup(classifierGroup, kindId);
@@ -172,7 +174,7 @@ export const v11_deserializeClassifierGroup = async (
       const infoGroup = await getGroup(modelGroup, "model_info");
       const modelInfo = await deserializeModelInfo(infoGroup);
       kindClassifiers[kindId].modelInfoDict[name] = {
-        ...getDefaultModelInfo(),
+        ...v11GetDefaultModelInfo(),
         ...modelInfo,
       };
     }
