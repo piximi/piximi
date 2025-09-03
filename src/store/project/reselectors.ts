@@ -28,7 +28,6 @@ import {
 
 import { Category, GeneralizedKindItem, Kind } from "store/data/types";
 import { CATEGORY_COLORS, IMAGE_KIND } from "store/data/constants";
-import { RequireField } from "utils/types";
 
 // Kind Selectors
 export const selectVisibleKinds = createSelector(
