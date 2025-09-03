@@ -35,6 +35,7 @@ import {
   prepareTrainingData,
   trainModel,
 } from "utils/models/classification/utils";
+import { IMAGE_KIND } from "store/data/constants";
 
 export const useFitClassifier = () => {
   const dispatch = useDispatch();
@@ -205,47 +206,83 @@ export const useFitClassifier = () => {
           modelInfo.preprocessSettings,
           modelInfo.optimizerSettings,
         );
-        dispatch(
-          dataSlice.actions.updateThings({
-            updates: [
-              ...partitionedData.splitLabeledTraining.map((thing) => ({
-                id: thing.id,
-                partition: Partition.Training,
+
+        if (activeKindId === IMAGE_KIND) {
+          dispatch(
+            dataSlice.actions.batchUpdateImageData([
+              ...partitionedData.splitLabeledTraining.map((kindItem) => ({
+                id: kindItem.id,
+                changes: { partition: Partition.Training },
               })),
-              ...partitionedData.splitLabeledValidation.map((thing) => ({
-                id: thing.id,
-                partition: Partition.Validation,
+              ...partitionedData.splitLabeledValidation.map((kindItem) => ({
+                id: kindItem.id,
+                changes: { partition: Partition.Validation },
               })),
-              ...partitionedData.unlabeledThings.map((thing) => ({
-                id: thing.id,
-                partition: Partition.Inference,
+              ...partitionedData.unlabeledThings.map((kindItem) => ({
+                id: kindItem.id,
+                changes: { partition: Partition.Inference },
               })),
-            ],
-          }),
-        );
+            ]),
+          );
+        } else {
+          dispatch(
+            dataSlice.actions.batchUpdateAnnotation([
+              ...partitionedData.splitLabeledTraining.map((kindItem) => ({
+                id: kindItem.id,
+                changes: { partition: Partition.Training },
+              })),
+              ...partitionedData.splitLabeledValidation.map((kindItem) => ({
+                id: kindItem.id,
+                changes: { partition: Partition.Validation },
+              })),
+              ...partitionedData.unlabeledThings.map((kindItem) => ({
+                id: kindItem.id,
+                changes: { partition: Partition.Inference },
+              })),
+            ]),
+          );
+        }
       } catch (error) {
         handleError(error as Error, "Model Preparation Error");
         return;
       }
     } else if (!selectedModel?.trainingLoaded) {
-      dispatch(
-        dataSlice.actions.updateThings({
-          updates: [
-            ...partitionedData.splitLabeledTraining.map((thing) => ({
-              id: thing.id,
-              partition: Partition.Training,
+      if (activeKindId === IMAGE_KIND) {
+        dispatch(
+          dataSlice.actions.batchUpdateImageData([
+            ...partitionedData.splitLabeledTraining.map((kindItem) => ({
+              id: kindItem.id,
+              changes: { partition: Partition.Training },
             })),
-            ...partitionedData.splitLabeledValidation.map((thing) => ({
-              id: thing.id,
-              partition: Partition.Validation,
+            ...partitionedData.splitLabeledValidation.map((kindItem) => ({
+              id: kindItem.id,
+              changes: { partition: Partition.Validation },
             })),
-            ...partitionedData.unlabeledThings.map((thing) => ({
-              id: thing.id,
-              partition: Partition.Inference,
+            ...partitionedData.unlabeledThings.map((kindItem) => ({
+              id: kindItem.id,
+              changes: { partition: Partition.Inference },
             })),
-          ],
-        }),
-      );
+          ]),
+        );
+      } else {
+        dispatch(
+          dataSlice.actions.batchUpdateAnnotation([
+            ...partitionedData.splitLabeledTraining.map((kindItem) => ({
+              id: kindItem.id,
+              changes: { partition: Partition.Training },
+            })),
+            ...partitionedData.splitLabeledValidation.map((kindItem) => ({
+              id: kindItem.id,
+              changes: { partition: Partition.Validation },
+            })),
+            ...partitionedData.unlabeledThings.map((kindItem) => ({
+              id: kindItem.id,
+              changes: { partition: Partition.Inference },
+            })),
+          ]),
+        );
+      }
+
       model.loadTraining(
         [
           ...partitionedData.labeledTraining,
@@ -266,15 +303,25 @@ export const useFitClassifier = () => {
           partitionedData.splitLabeledTraining,
           Object.values(classMap).map((id) => ({ id })),
         );
-
-        dispatch(
-          dataSlice.actions.updateThings({
-            updates: partitionedData.labeledUnassigned.map((thing) => ({
-              id: thing.id,
-              partition: Partition.Training,
-            })),
-          }),
-        );
+        if (activeKindId === IMAGE_KIND) {
+          dispatch(
+            dataSlice.actions.batchUpdateImageData(
+              partitionedData.labeledUnassigned.map((kindItem) => ({
+                id: kindItem.id,
+                changes: { partition: Partition.Training },
+              })),
+            ),
+          );
+        } else {
+          dispatch(
+            dataSlice.actions.batchUpdateAnnotation(
+              partitionedData.labeledUnassigned.map((kindItem) => ({
+                id: kindItem.id,
+                changes: { partition: Partition.Training },
+              })),
+            ),
+          );
+        }
       }
     }
 
