@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 import { Box } from "@mui/material";
@@ -18,8 +18,10 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { HotkeyContext } from "utils/enums";
 import { DIMENSIONS } from "utils/constants";
+import { KindItemsProvider } from "contexts/KindItemsProvider";
+import { IMAGE_KIND } from "store/data/constants";
 
-export const ProjectViewer = () => {
+export const ProjectViewer = React.memo(() => {
   const dispatch = useDispatch();
   const isMobile = useMobileView();
 
@@ -32,7 +34,7 @@ export const ProjectViewer = () => {
         context: HotkeyContext.ProjectView,
       }),
     );
-    dispatch(projectSlice.actions.setActiveKind({ kind: "Image" }));
+    dispatch(projectSlice.actions.setActiveKind({ kind: IMAGE_KIND }));
     return () => {
       dispatch(
         applicationSettingsSlice.actions.unregisterHotkeyContext({
@@ -42,31 +44,36 @@ export const ProjectViewer = () => {
     };
   }, [dispatch]);
 
+  const styles = useMemo(
+    () => ({
+      height: "100vh",
+      display: "grid",
+      gridTemplateColumns: !isMobile
+        ? `${DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`
+        : `1fr ${DIMENSIONS.toolDrawerWidth}px`,
+      gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
+      gridTemplateAreas: !isMobile
+        ? '"top-tools top-tools top-tools"  "action-drawer image-grid side-tools"'
+        : '"top-tools top-tools" "image-grid side-tools"',
+    }),
+    [isMobile],
+  );
+
   return (
     <div>
       <ErrorBoundary FallbackComponent={FallbackDialog}>
         <div tabIndex={-1}>
-          <Box
-            sx={{
-              height: "100vh",
-              display: "grid",
-              gridTemplateColumns: !isMobile
-                ? `${DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`
-                : `1fr ${DIMENSIONS.toolDrawerWidth}px`,
-              gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
-              gridTemplateAreas: !isMobile
-                ? '"top-tools top-tools top-tools"  "action-drawer image-grid side-tools"'
-                : '"top-tools top-tools" "image-grid side-tools"',
-            }}
-          >
-            <ProjectAppBar />
-            {!isMobile && <ProjectDrawer />}
+          <Box sx={styles}>
+            <KindItemsProvider>
+              <ProjectAppBar />
+              {!isMobile && <ProjectDrawer />}
 
-            <ProjectImageGrid />
-            <ImageToolDrawer />
+              <ProjectImageGrid />
+              <ImageToolDrawer />
+            </KindItemsProvider>
           </Box>
         </div>
       </ErrorBoundary>
     </div>
   );
-};
+});

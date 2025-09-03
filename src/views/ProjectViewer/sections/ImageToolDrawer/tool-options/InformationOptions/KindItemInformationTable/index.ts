@@ -1,0 +1,1 @@
+export { KindItemInformationTable } from "./KindItemInformationTable";

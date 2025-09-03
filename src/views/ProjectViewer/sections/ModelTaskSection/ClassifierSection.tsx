@@ -33,17 +33,17 @@ import { selectActiveKindId } from "store/project/selectors";
 import { StyledSelect } from "components/inputs";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 import { SequentialClassifier } from "utils/models/classification";
-import { selectActiveUnlabeledThingsIds } from "store/project/reselectors";
 import { ClassifierErrorReason } from "views/ProjectViewer/contexts/types";
+import { selectActiveUnknownKindItems } from "store/project/reselectors";
 
 export const ClassifierSection = () => {
   const [waitingForResults, setWaitingForResults] = useState(false);
   const selectedModel = useSelector(selectClassifierModel);
   const evaluationResults = useSelector(selectClassifierEvaluationResult);
-  const unlabeledThings = useSelector(selectActiveUnlabeledThingsIds);
   const { modelStatus, error } = useClassifierStatus();
   const predictClassifier = usePredictClassifier();
   const evaluateClassifier = useEvaluateClassifier();
+  const unknownItems = useSelector(selectActiveUnknownKindItems);
 
   const {
     onClose: handleCloseEvaluateClassifierDialog,
@@ -105,7 +105,7 @@ export const ClassifierSection = () => {
       !selectedModel ||
       !selectedModel.pretrained ||
       modelStatus !== ModelStatus.Idle ||
-      unlabeledThings.length === 0 ||
+      unknownItems.length === 0 ||
       error?.reason === ClassifierErrorReason.ChannelMismatch;
 
     const evaluateText = (() => {

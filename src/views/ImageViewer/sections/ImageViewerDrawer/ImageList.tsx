@@ -23,16 +23,16 @@ import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
 import { selectImageSeriesArray } from "views/ImageViewer/state/imageViewer/reselectors";
 
-import { ImageObject } from "store/data/types";
+import { ImageMetadata } from "store/data/types";
 import { extractTimepoint } from "store/data/utils";
 
 const NUM_BUFFERED_IMS = 20;
 const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 4);
 
 interface ImageListItemProps {
-  image: ImageObject;
+  image: ImageMetadata;
   isActive: boolean;
-  onItemClick: (image: ImageObject) => void;
+  onItemClick: (image: ImageMetadata) => void;
   onSecondaryClick: (target: HTMLElement) => void;
 }
 
@@ -57,7 +57,7 @@ export const ImageList = () => {
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
 
   const handleImageItemClick = React.useCallback(
-    (image: ImageObject) => {
+    (image: ImageMetadata) => {
       if (image.id !== activeImageId!) {
         dispatch(
           imageViewerSlice.actions.setActiveImageSeriesId({

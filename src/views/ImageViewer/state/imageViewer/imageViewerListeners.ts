@@ -12,7 +12,7 @@ import {
   ImageViewerImageDetails,
   ImageViewerTimepointProperties,
 } from "views/ImageViewer/utils/types";
-import { TPKey, TSImageObject } from "store/data/types";
+import { TPKey, ImageMetadata } from "store/data/types";
 import { Colors } from "utils/types";
 
 export const imageViewerMiddleware = createListenerMiddleware();
@@ -20,7 +20,7 @@ const startAppListening =
   imageViewerMiddleware.startListening as TypedAppStartListening;
 
 const getRenderedSources = async (
-  imageSeries: TSImageObject,
+  imageSeries: ImageMetadata,
   activePlane: number,
   activeTimepoint: TPKey,
   ZTColors: Record<TPKey, { ZTColors: Colors }> | Colors,
@@ -388,9 +388,9 @@ startAppListening({
   },
 });
 startAppListening({
-  actionCreator: dataSlice.actions.addAnnotations,
+  actionCreator: dataSlice.actions.batchAddAnnotations,
   effect: (action, listenerAPI) => {
-    action.payload.annotations.forEach((annotation) => {
+    action.payload.forEach((annotation) => {
       const imageId = annotation.imageId;
       if (imageId === listenerAPI.getState().imageViewer.activeImageSeriesId) {
         listenerAPI.dispatch(

@@ -2,18 +2,18 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Box, Typography } from "@mui/material";
 
-import { ThingInformationTable } from "./ThingInformationTable";
+import { KindItemInformationTable } from "./KindItemInformationTable";
 
-import { selectActiveSelectedThings } from "store/project/reselectors";
+import { selectActiveFilteredSelectedKindItems } from "store/project/reselectors";
 
 export const InformationOptions = () => {
-  const selectedThings = useSelector(selectActiveSelectedThings);
-  return selectedThings.length > 0 ? (
+  const kindItems = useSelector(selectActiveFilteredSelectedKindItems);
+  return kindItems.length > 0 ? (
     <>
-      {selectedThings.map((thing) => (
-        <ThingInformationTable
+      {kindItems.map((thing) => (
+        <KindItemInformationTable
           key={`thing-info-table-${thing.id}`}
-          thing={thing}
+          item={thing}
           collapsible={true}
         />
       ))}

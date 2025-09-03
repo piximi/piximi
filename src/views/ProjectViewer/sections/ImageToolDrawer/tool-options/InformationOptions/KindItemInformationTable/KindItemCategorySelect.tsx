@@ -6,7 +6,7 @@ import { selectActiveCategories } from "store/project/reselectors";
 import { StyledSelect } from "components/inputs";
 import { StyledSelectProps } from "components/inputs/StyledSelect";
 
-export const ThingCategorySelect = ({
+export const KindItemCategorySelect = ({
   currentCategory,
   callback,
   ...rest

@@ -12,14 +12,16 @@ import { createRenderedTensor, generateBlankColors } from "utils/tensorUtils";
 import {
   LoadCB,
   V11AnnotationObject,
+  V11Category,
+  V11Kind,
   V11ImageObject,
 } from "utils/file-io/types";
 import { CustomStore } from "utils/file-io/zarr/stores";
 import { ProjectState } from "store/types";
 import { BitDepth } from "store/data/types";
-import { Kind, Category } from "store/data/types";
 import { EntityState } from "@reduxjs/toolkit";
 import { v11_deserializeClassifierGroup } from "./v11_deserializeClassifierGroup";
+import { IMAGE_KIND } from "store/data/constants";
 
 const deserializeThingGroup = async (
   name: string,
@@ -67,7 +69,7 @@ const deserializeThingGroup = async (
     },
   };
 
-  if (kind === "Image") {
+  if (kind === IMAGE_KIND) {
     const colorsGroup = await getGroup(thingGroup, "colors");
     const colors = await deserializeColorsGroup(colorsGroup);
     const src = await createRenderedTensor(
@@ -138,7 +140,7 @@ const deserializeThingsGroup = async (thingsGroup: Group, loadCb: LoadCB) => {
 };
 const deserializeCategoriesGroup = async (
   categoriesGroup: Group,
-): Promise<EntityState<Category, string>> => {
+): Promise<EntityState<V11Category, string>> => {
   const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
   const colors = (await getAttr(categoriesGroup, "color")) as string[];
   const names = (await getAttr(categoriesGroup, "name")) as string[];
@@ -151,7 +153,7 @@ const deserializeCategoriesGroup = async (
     );
   }
 
-  const categories: EntityState<Category, string> = {
+  const categories: EntityState<V11Category, string> = {
     ids: [],
     entities: {},
   };
@@ -164,7 +166,7 @@ const deserializeCategoriesGroup = async (
       kind: kinds[i],
       containing: contents[i],
       visible: true,
-    } as Category;
+    } as V11Category;
   }
 
   return categories;
@@ -172,7 +174,7 @@ const deserializeCategoriesGroup = async (
 
 const deserializeKindsGroup = async (
   kindsGroup: Group,
-): Promise<EntityState<Kind, string>> => {
+): Promise<EntityState<V11Kind, string>> => {
   const ids = (await getAttr(kindsGroup, "kind_id")) as string[];
   const contents = (await getAttr(kindsGroup, "contents")) as string[][];
   const categories = (await getAttr(kindsGroup, "categories")) as string[][];
@@ -190,7 +192,7 @@ const deserializeKindsGroup = async (
     );
   }
 
-  const kinds: EntityState<Kind, string> = { ids: [], entities: {} };
+  const kinds: EntityState<V11Kind, string> = { ids: [], entities: {} };
   for (let i = 0; i < ids.length; i++) {
     kinds.ids.push(ids[i]);
     kinds.entities[ids[i]] = {
@@ -212,8 +214,8 @@ const deserializeProjectGroup = async (
   project: ProjectState;
   data: {
     things: EntityState<V11ImageObject | V11AnnotationObject, string>;
-    categories: EntityState<Category, string>;
-    kinds: EntityState<Kind, string>;
+    categories: EntityState<V11Category, string>;
+    kinds: EntityState<V11Kind, string>;
   };
 }> => {
   const name = (await getAttr(projectGroup, "name")) as string;

@@ -1,10 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 
 import { selectMeasurementData, selectMeasurementGroups } from "./selectors";
-import {
-  selectCategoriesDictionary,
-  selectThingsDictionary,
-} from "store/data/selectors";
+import { selectCategoryEntities } from "store/data/selectors";
 
 import { capitalize } from "utils/stringUtils";
 import { getStatistics } from "utils/measurements/utils";
@@ -17,12 +14,11 @@ import {
   MeasurementOption,
   ParsedMeasurementData,
 } from "./types";
-import { Thing } from "store/data/types";
 
 export const selectPlotData = createSelector(
   selectMeasurementData,
   selectThingsDictionary,
-  selectCategoriesDictionary,
+  selectCategoryEntities,
   (measurementData, things, categories) => {
     const parsedMeasurementData: ParsedMeasurementData = {};
 

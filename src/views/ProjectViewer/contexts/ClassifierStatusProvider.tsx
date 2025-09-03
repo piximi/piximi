@@ -11,12 +11,10 @@ import { selectClassifierModel } from "store/classifier/reselectors";
 import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
 import { dataSlice } from "store/data";
 import { selectAllKindIds } from "store/data/selectors";
-import { Kind } from "store/data/types";
-import { isUnknownCategory } from "store/data/utils";
+import { GeneralizedKindItem, Kind } from "store/data/types";
+import { groupKindItemsBy, isUnknownCategory } from "store/data/utils";
 import {
-  selectActiveLabeledThings,
-  selectActiveLabeledThingsCount,
-  selectActiveThingsByPartition,
+  selectActiveKindItemArray,
   selectActiveUnknownCategoryId,
 } from "store/project/reselectors";
 import {
@@ -26,6 +24,7 @@ import {
 import { getDifferences } from "utils/arrayUtils";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { ErrorContext, ClassifierErrorReason } from "./types";
+import { IMAGE_KIND } from "store/data/constants";
 
 const ClassifierStatusContext = createContext<{
   isReady: boolean;
@@ -59,10 +58,8 @@ export const ClassifierStatusProvider = ({
   const selectedModel = useSelector(selectClassifierModel);
   const activeKindId = useSelector(selectActiveKindId);
   const projectKinds = useSelector(selectAllKindIds);
-  const labeledThingsCount = useSelector(selectActiveLabeledThingsCount);
-  const thingsByPartition = useSelector(selectActiveThingsByPartition);
+  const kindItems = useSelector(selectActiveKindItemArray);
   const unknowCatId = useSelector(selectActiveUnknownCategoryId);
-  const activeLabeledThings = useSelector(selectActiveLabeledThings);
   const projectChannels = useSelector(selectProjectImageChannels);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
@@ -75,6 +72,32 @@ export const ClassifierStatusProvider = ({
     Record<Kind["id"], ModelStatus>
   >({ Image: ModelStatus.Idle });
 
+  const itemsByPartition = useMemo(
+    () => groupKindItemsBy("partition", kindItems),
+    [kindItems],
+  );
+
+  const itemsByLabel = useMemo(
+    () => groupKindItemsBy("categoryId", kindItems),
+    [kindItems],
+  );
+
+  const activeLabeledItems = useMemo(
+    () =>
+      Object.keys(itemsByLabel).reduce(
+        (labeled: GeneralizedKindItem[], label) => {
+          if (isUnknownCategory(label)) return labeled;
+          return [...labeled, ...itemsByLabel[label]];
+        },
+        [],
+      ),
+    [itemsByLabel],
+  );
+
+  const labeledItemsCount = useMemo(
+    () => activeLabeledItems.length,
+    [activeLabeledItems],
+  );
   useEffect(() => {
     const classifierKinds = Object.keys(modelStatusDict);
 
@@ -101,12 +124,12 @@ export const ClassifierStatusProvider = ({
   );
 
   const hasLabeledInference = useMemo(() => {
-    return activeLabeledThings.some(
+    return activeLabeledItems.some(
       (thing) =>
         !isUnknownCategory(thing.categoryId) &&
         thing.partition === Partition.Inference,
     );
-  }, [activeLabeledThings]);
+  }, [activeLabeledItems]);
 
   const shouldWarnClearPredictions = useMemo(() => {
     return showClearPredictionsWarning && hasLabeledInference;
@@ -117,41 +140,67 @@ export const ClassifierStatusProvider = ({
     [selectedModel],
   );
   const noLabeledThings = useMemo(
-    () => labeledThingsCount === 0,
-    [labeledThingsCount],
+    () => labeledItemsCount === 0,
+    [labeledItemsCount],
   );
 
   const clearPredictions = () => {
     if (!unknowCatId)
       throw new Error(`Invalid Unknown Category Id: ${unknowCatId}.`);
-    const inferenceThings = thingsByPartition[Partition.Inference];
-    const updates = inferenceThings.reduce(
-      (updates, thing) => {
+    const inferenceItems = itemsByPartition[Partition.Inference];
+    const updates = inferenceItems.reduce(
+      (updates: { id: string; changes: { categoryId: string } }[], item) => {
         updates.push({
-          id: thing.id,
-          categoryId: unknowCatId,
+          id: item.id,
+          changes: { categoryId: unknowCatId },
         });
         return updates;
       },
-      [] as { id: string; categoryId: string }[],
+      [],
     );
-    dispatch(dataSlice.actions.updateThings({ updates }));
+    if (activeKindId === IMAGE_KIND) {
+      dispatch(dataSlice.actions.batchUpdateImageData(updates));
+    } else {
+      dispatch(dataSlice.actions.batchUpdateAnnotation(updates));
+    }
   };
 
   const acceptPredictions = () => {
-    const inferenceThings = thingsByPartition[Partition.Inference];
-    const updates = inferenceThings.reduce(
-      (updates, thing) => {
-        if (isUnknownCategory(thing.categoryId)) return updates;
-        updates.push({
-          id: thing.id,
-          partition: Partition.Unassigned,
-        });
-        return updates;
-      },
-      [] as { id: string; partition: Partition }[],
-    );
-    dispatch(dataSlice.actions.updateThings({ updates }));
+    const inferenceItems = itemsByPartition[Partition.Inference];
+
+    if (activeKindId === IMAGE_KIND) {
+      const handledImages: string[] = [];
+      const updates = inferenceItems.reduce(
+        (updates, item) => {
+          if (
+            isUnknownCategory(item.categoryId) ||
+            handledImages.includes(item.id)
+          )
+            return updates;
+          updates.push({
+            id: item.id,
+            changes: { partition: Partition.Unassigned },
+          });
+          handledImages.push(item.id);
+          return updates;
+        },
+        [] as { id: string; changes: { partition: Partition } }[],
+      );
+      dispatch(dataSlice.actions.batchUpdateImageData(updates));
+    } else {
+      const updates = inferenceItems.reduce(
+        (updates, item) => {
+          if (isUnknownCategory(item.categoryId)) return updates;
+          updates.push({
+            id: item.id,
+            changes: { partition: Partition.Unassigned },
+          });
+          return updates;
+        },
+        [] as { id: string; changes: { partition: Partition } }[],
+      );
+      dispatch(dataSlice.actions.batchUpdateAnnotation(updates));
+    }
   };
 
   useEffect(() => {

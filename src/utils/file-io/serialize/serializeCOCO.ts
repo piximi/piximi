@@ -12,10 +12,10 @@ import {
   SerializedCOCOFileType,
   SerializedCOCOImageType,
 } from "../types";
-import { AnnotationObject, Category, ImageObject } from "store/data/types";
+import { AnnotationObject, Category, ImageMetadata } from "store/data/types";
 
 export const serializeCOCOFile = (
-  images: Array<ImageObject>,
+  images: Array<ImageMetadata>,
   annotations: Array<AnnotationObject>,
   categories: Array<Category>,
 ): SerializedCOCOFileType => {

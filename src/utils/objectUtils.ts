@@ -73,3 +73,6 @@ export const isEnumValue = <E extends Record<string, string | number>>(
     .filter((v) => typeof v === typeof value)
     .includes(value as E[keyof E]);
 };
+
+export const excludes = <T extends object>(obj: T, key: PropertyKey): boolean =>
+  !(key in obj);

@@ -7,7 +7,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import IJSImage, { Stack as IJSStack } from "image-js";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -28,40 +27,21 @@ import { selectUnknownImageCategory } from "store/data/selectors";
 import { projectSlice } from "store/project";
 import {
   selectActiveKindId,
-  selectHighlightedCategory,
+  selectActiveCategory,
   selectProjectImageChannels,
 } from "store/project/selectors";
 
-import {
-  decodeDicomImage,
-  forceStack,
-  getImageInformation,
-} from "utils/file-io/utils";
-import { isEnumValue, updateRecordArray } from "utils/objectUtils";
-import { convertToImage } from "utils/tensorUtils";
-import { isUnknownCategory } from "store/data/utils";
+import { getUploadedFileTypes } from "utils/file-io/utils";
+import { extractImageFileDetails } from "utils/tensorUtils";
+import { generateUUID, isUnknownCategory } from "store/data/utils";
 
-import { MIMETYPES } from "utils/file-io/enums";
 import { ImageShapeEnum } from "utils/file-io/enums";
 import { AlertType } from "utils/enums";
 import { Partition } from "utils/models/enums";
 
-import {
-  ImageObject,
-  ImageTimepointData,
-  TSImageObject,
-} from "store/data/types";
-import {
-  ImageFileShapeInfo,
-  ImageShapeInfo,
-  MIMEType,
-} from "utils/file-io/types";
-
-type ImageShapeInfoImage = ImageFileShapeInfo & {
-  fileName: string;
-  image?: IJSStack;
-  error?: string;
-};
+import { ImageData, ImageMetadata } from "store/data/types";
+import { ImageShapeInfo, ImageShapeInfoImage } from "utils/file-io/types";
+import { IMAGE_KIND } from "store/data/constants";
 
 const FileUploadContext = createContext<
   | ((
@@ -73,72 +53,11 @@ const FileUploadContext = createContext<
 
 const minChannels = 1;
 
-const getUploadedFileTypes = async (files: FileList) => {
-  const images: Record<number, Array<ImageShapeInfoImage>> = {};
-  for (const file of files) {
-    const ext = file.type as MIMEType;
-    try {
-      // https://stackoverflow.com/questions/56565528/typescript-const-assertions-how-to-use-array-prototype-includes
-      if (!isEnumValue(MIMETYPES, file.type)) {
-        import.meta.env.NODE_ENV !== "production" &&
-          console.error("Invalid MIME Type:", ext);
-        updateRecordArray(images, ImageShapeEnum.InvalidImage, {
-          shape: ImageShapeEnum.InvalidImage,
-          fileName: file.name,
-          ext,
-          error: `Invalid MIME Type: ${ext}`,
-        });
-      }
-
-      if (
-        file.name.endsWith("dcm") ||
-        file.name.endsWith("DICOM") ||
-        file.name.endsWith("DCM")
-      ) {
-        const image = await decodeDicomImage(file);
-
-        updateRecordArray(images, ImageShapeEnum.DicomImage, {
-          shape: ImageShapeEnum.DicomImage,
-          components: image.length,
-          fileName: file.name,
-          ext: MIMETYPES.DICOM,
-          image,
-        });
-      } else {
-        const buffer = await file.arrayBuffer();
-        const image: IJSImage | IJSStack = await IJSImage.load(buffer, {
-          ignorePalette: true,
-        });
-
-        const imageInfo = getImageInformation(image);
-
-        const imageStack = await forceStack(image);
-
-        updateRecordArray(images, imageInfo.shape, {
-          ...imageInfo,
-          ext,
-          image: imageStack,
-          fileName: file.name,
-        });
-      }
-    } catch (err) {
-      const error = err as Error;
-      updateRecordArray(images, ImageShapeEnum.InvalidImage, {
-        shape: ImageShapeEnum.InvalidImage,
-        fileName: file.name,
-        ext,
-        error: `Could not parse image file. -- ${error.message}`,
-      });
-    }
-  }
-  return images;
-};
-
 export function FileUploadProvider({ children }: { children: ReactNode }) {
   const dispatch = useDispatch();
   const kind = useSelector(selectActiveKindId);
   const projectChannels = useSelector(selectProjectImageChannels);
-  const selectedCategory = useSelector(selectHighlightedCategory);
+  const selectedCategory = useSelector(selectActiveCategory);
   const unknownCategory = useSelector(selectUnknownImageCategory);
   const [timeSeries, setTimeSeries] = useState<boolean>(false);
 
@@ -161,7 +80,11 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
       delete fileInfo[ImageShapeEnum.InvalidImage];
       const uploadedFiles = Object.values(fileInfo).flat();
 
-      const convertedImages: ImageObject[] = [];
+      const generatedMetadataObjects: {
+        metadata: ImageMetadata;
+        images: ImageData[];
+      }[] = [];
+      let i = 0;
       for await (const fileInfo of uploadedFiles) {
         if (
           fileInfo.ext !== "image/dicom" &&
@@ -193,95 +116,61 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
           continue;
         }
         try {
-          const imageToUpload = await convertToImage(
-            fileInfo.image!,
-            fileInfo.fileName,
-            undefined,
-            fileInfo.components! / numChannels!,
-            numChannels!,
-          );
-          imageToUpload.categoryId = selectedCategory ?? unknownCategory;
-          imageToUpload.partition =
-            !selectedCategory ||
-            (selectedCategory && isUnknownCategory(selectedCategory))
-              ? Partition.Inference
-              : Partition.Unassigned;
-          imageToUpload.kind = kind;
-
-          convertedImages.push(imageToUpload);
+          const { shape, bitDepth, ...extractedImageData } =
+            await extractImageFileDetails(
+              fileInfo.image!,
+              fileInfo.fileName,
+              undefined,
+              fileInfo.components! / numChannels!,
+              numChannels!,
+            );
+          const metadata: ImageMetadata = {
+            name: fileInfo.fileName,
+            id: generateUUID(),
+            kind: IMAGE_KIND,
+            shape,
+            bitDepth,
+            imageDataIds: [extractedImageData.id],
+            defaultImageId: extractedImageData.id,
+            timeSeries,
+          };
+          const generatedImageObject: ImageData = {
+            ...extractedImageData,
+            metadataId:
+              !timeSeries || i === 0
+                ? metadata.id
+                : generatedMetadataObjects[0].metadata.id,
+            name: fileInfo.fileName + `_data_${timeSeries ? i : 0}`,
+            partition:
+              !selectedCategory ||
+              (selectedCategory && isUnknownCategory(selectedCategory))
+                ? Partition.Inference
+                : Partition.Unassigned,
+            categoryId: selectedCategory ?? unknownCategory,
+            activePlane: 0,
+            timepoint: timeSeries ? i : undefined,
+          };
+          if (!timeSeries || i === 0) {
+            generatedMetadataObjects.push({
+              metadata,
+              images: [generatedImageObject],
+            });
+          }
+          if (timeSeries && i > 0) {
+            generatedMetadataObjects[0].metadata.imageDataIds.push(
+              generatedImageObject.id,
+            );
+            generatedMetadataObjects[0].images.push(generatedImageObject);
+          }
         } catch (err) {
           const error = err as Error;
           errors.push(
             `Error converting ${fileInfo.fileName}: ${error.message}`,
           );
         }
+        i++;
       }
-      if (convertedImages.length > 0) {
-        let tsConversion: TSImageObject[] = [];
-        if (!timeSeries) {
-          tsConversion = convertedImages.map((im) => {
-            return {
-              id: im.id,
-              name: im.name,
-              kind: im.kind,
-              bitDepth: im.bitDepth,
-              containing: im.containing,
-              partition: im.partition,
-              shape: im.shape,
-              timepoints: {
-                0: {
-                  colors: im.colors,
-                  src: im.src,
-                  data: im.data,
-                  categoryId: im.categoryId,
-                  activePlane: im.activePlane,
-                },
-              },
-            };
-          });
-        } else {
-          const initImage = convertedImages[0];
-          tsConversion = [
-            {
-              id: initImage.id,
-              name: initImage.name,
-              kind: initImage.kind,
-              bitDepth: initImage.bitDepth,
-              containing: initImage.containing,
-              partition: initImage.partition,
-              shape: initImage.shape,
-              timepoints: convertedImages.reduce(
-                (acc: Record<number, ImageTimepointData>, im, idx) => {
-                  acc[idx] = {
-                    colors: im.colors,
-                    src: im.src,
-                    data: im.data,
-                    categoryId: im.categoryId,
-                    activePlane: im.activePlane,
-                  };
-                  return acc;
-                },
-                {},
-              ),
-            },
-          ];
-        }
-        dispatch(
-          dataSlice.actions.addThings({
-            things: convertedImages,
-          }),
-        );
-        dispatch(
-          dataSlice.actions.addTSImage({
-            images: tsConversion,
-          }),
-        );
-        dispatch(
-          projectSlice.actions.selectThings({
-            ids: convertedImages.map((im) => im.id),
-          }),
-        );
-      }
+      dispatch(dataSlice.actions.batchAddMetadata(generatedMetadataObjects));
       if (errors.length > 0) {
         dispatch(
           applicationSettingsSlice.actions.updateAlertState({

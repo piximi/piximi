@@ -1,1421 +1,1077 @@
 import {
-  createEntityAdapter,
   createSlice,
-  Draft,
-  EntityState,
+  createEntityAdapter,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import { dispose, TensorContainer } from "@tensorflow/tfjs";
-import { difference, intersection } from "lodash";
-
-import { generateUUID, generateKind, isUnknownCategory } from "./utils";
-import { encode } from "views/ImageViewer/utils/rle";
-import { updateContents } from "./utils";
-
 import {
+  AnnotationObject,
+  Category,
+  GlobalAnnotation,
+  ImageMetadata,
+  ImageData,
+  Kind,
+  LinkNode,
+} from "./types";
+import { DataState } from "store/types";
+import { mutatingFilter } from "utils/arrayUtils";
+import { generateCategory, generateUUID, isUnknownCategory } from "./utils";
+import { difference } from "lodash";
+import {
+  IMAGE_KIND,
+  UNKNOWN_ANNOTATION_CATEGORY_COLOR,
   UNKNOWN_CATEGORY_NAME,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "./constants";
 
-import { getUniqueName } from "utils/stringUtils";
-import { mutatingFilter } from "utils/arrayUtils";
-
-import { PartialBy } from "utils/types";
-import { DataState } from "store/types";
-import {
-  Kind,
-  AnnotationObject,
-  Category,
-  DecodedAnnotationObject,
-  ImageObject,
-  ThingsUpdates,
-  CategoryUpdates,
-  TSImageObject,
-  TSAnnotationObject,
-  DecodedTSAnnotationObject,
-  ImageUpdates,
-  AnnotationUpdates,
-  ImageTimepointData,
-  TPKey,
-} from "./types";
-
-const { kind: imageKind, unknownCategory } = generateKind("Image");
+// Entity Adapters
+export const metadataAdapter = createEntityAdapter<ImageMetadata>();
+export const imageDataAdapter = createEntityAdapter<ImageData>();
 export const kindsAdapter = createEntityAdapter<Kind>();
 export const categoriesAdapter = createEntityAdapter<Category>();
-export const thingsAdapter = createEntityAdapter<
-  ImageObject | AnnotationObject
->();
-export const imagesAdapter = createEntityAdapter<TSImageObject>();
-export const annotationsAdapter = createEntityAdapter<TSAnnotationObject>();
+export const annotationsAdapter = createEntityAdapter<AnnotationObject>();
 
-const initialState = (): DataState => {
-  return {
-    kinds: kindsAdapter.getInitialState({
-      ids: [imageKind.id],
-      entities: {
-        [imageKind.id]: imageKind,
-      },
-    }),
-    categories: categoriesAdapter.getInitialState({
-      ids: [unknownCategory.id],
-      entities: {
-        [unknownCategory.id]: unknownCategory,
-      },
-    }),
-    things: thingsAdapter.getInitialState(),
-    images: imagesAdapter.getInitialState(),
-    annotations: annotationsAdapter.getInitialState(),
-    linkGraph: {},
-    globalAnnotations: {},
-  };
+const unknownImageCategory = generateCategory(
+  UNKNOWN_CATEGORY_NAME,
+  IMAGE_KIND,
+  UNKNOWN_IMAGE_CATEGORY_COLOR,
+);
+unknownImageCategory.id = generateUUID({ definesUnknown: true });
+const imageKind: Kind = {
+  id: IMAGE_KIND,
+  displayName: IMAGE_KIND,
+  unknownCategoryId: unknownImageCategory.id,
 };
 
-const gatherThings = (
-  state: Draft<DataState>,
-  payload:
-    | {
-        thingIds: Array<string> | "all" | "annotations";
-        activeKind?: string;
-        disposeColorTensors: boolean;
-      }
-    | {
-        ofKinds: Array<string>;
-        activeKind?: string;
-        disposeColorTensors: boolean;
-      }
-    | {
-        ofCategories: Array<string>;
-        activeKind: string;
-        disposeColorTensors: boolean;
-      },
+// Initial state
+const initialState: DataState = {
+  kinds: kindsAdapter.getInitialState({
+    ids: [imageKind.id],
+    entities: { [imageKind.id]: imageKind },
+  }),
+  categories: categoriesAdapter.getInitialState({
+    ids: [unknownImageCategory.id],
+    entities: { [unknownImageCategory.id]: unknownImageCategory },
+  }),
+  metadata: metadataAdapter.getInitialState(),
+  images: imageDataAdapter.getInitialState(),
+  annotations: annotationsAdapter.getInitialState(),
+  relationships: {
+    kindToCategories: { [imageKind.id]: [unknownImageCategory.id] },
+    kindToAnnotations: {},
+    categoryToImages: { [unknownImageCategory.id]: [] },
+    categoryToAnnotations: {},
+    imageToAnnotations: {},
+  },
+  linkGraph: {},
+  globalAnnotations: {},
+};
+
+// Helper functions for relationship management
+const addToSimpleRelationship = (
+  record: Record<string, string[]>,
+  key: string,
+  value: string,
 ) => {
-  let explicitThingIds: string[] = [];
-
-  if ("thingIds" in payload) {
-    if (payload.thingIds === "all") {
-      explicitThingIds = state.things.ids as string[];
-    } else if (payload.thingIds === "annotations") {
-      explicitThingIds = state.kinds.ids.reduce((tIds: string[], kindId) => {
-        if (kindId !== "Image") {
-          tIds.push(...state.kinds.entities[kindId]!.containing);
-        }
-        return tIds;
-      }, []);
-    } else {
-      explicitThingIds = payload.thingIds;
-    }
-  } else if ("ofKinds" in payload) {
-    payload.ofKinds.forEach((kindId) => {
-      if (kindId in state.kinds.entities) {
-        explicitThingIds.push(...state.kinds.entities[kindId]!.containing);
-      }
-    });
-  } else {
-    //"ofCategories" in action.payload
-    payload.ofCategories.forEach((categoryId) => {
-      if (categoryId in state.categories.entities) {
-        const containedThings =
-          state.categories.entities[categoryId]!.containing;
-
-        explicitThingIds.push(...containedThings);
-      }
-    });
+  if (!record[key]) {
+    record[key] = [];
   }
-  return explicitThingIds;
+  if (!record[key].includes(value)) {
+    record[key].push(value);
+  }
+};
+
+const removeFromSimpleRelationship = (
+  record: Record<string, string[]>,
+  key: string,
+  value: string,
+) => {
+  if (record[key]) {
+    record[key] = record[key].filter((id) => id !== value);
+  }
 };
 
 export const dataSlice = createSlice({
   name: "data",
-  initialState: initialState,
+  initialState,
   reducers: {
-    resetData: (state) => {
-      Object.values(state.things.entities).forEach((entity) => {
-        dispose(entity!.data as unknown as TensorContainer);
-        if ("colors" in entity!) {
-          dispose(entity!.colors as unknown as TensorContainer);
+    // ============== KIND OPERATIONS ==============
+    addKind: (
+      state,
+      action: PayloadAction<{ kind: Kind; unknownCategory?: Category }>,
+    ) => {
+      const kind = action.payload.kind;
+      let unknownCategory = action.payload.unknownCategory;
+      // Validation
+
+      // ensure unknown category is given if specified in kind
+      if (kind.unknownCategoryId && !unknownCategory) {
+        console.error("Unknown category specified in kind but not provided");
+        return;
+      }
+      if (unknownCategory) {
+        // ensure correct identifiers between kind and unknown category
+        if (
+          kind.unknownCategoryId !== unknownCategory.id ||
+          unknownCategory.kind !== kind.id
+        ) {
+          console.error("Mismatch between kind and unknown category");
+          return;
         }
-      });
-      Object.values(state.images.entities).forEach((entity) => {
-        Object.values(entity.timepoints).forEach((frame) => {
-          dispose(frame.colors as unknown as TensorContainer);
-          dispose(frame.data as unknown as TensorContainer);
-        });
-      });
-      Object.values(state.annotations.entities).forEach((entity) => {
-        dispose(entity!.data as unknown as TensorContainer);
-        if ("colors" in entity!) {
-          dispose(entity!.colors as unknown as TensorContainer);
-        }
-      });
-      return initialState();
-    },
-    initializeState(
-      state,
-      action: PayloadAction<{
-        data: {
-          kinds: EntityState<Kind, string>;
-          categories: EntityState<Category, string>;
-          things: EntityState<AnnotationObject | ImageObject, string>;
-          images: EntityState<TSImageObject, string>;
-          annotations: EntityState<TSAnnotationObject, string>;
-        };
-      }>,
-    ) {
-      Object.values(state.things.entities).forEach((entity) => {
-        dispose(entity as unknown as TensorContainer);
-      });
-      dataSlice.caseReducers.resetData(state);
-      state.kinds = action.payload.data.kinds;
-      state.categories = action.payload.data.categories;
-      state.things = action.payload.data.things;
-      state.images = action.payload.data.images;
-      state.annotations = action.payload.data.annotations;
-    },
-    addKinds(
-      state,
-      action: PayloadAction<{
-        kinds: Array<PartialBy<Kind, "containing">>;
-      }>,
-    ) {
-      const { kinds } = action.payload;
-      for (const kind of kinds) {
-        if (state.kinds.entities[kind.id]) continue;
-        if (!kind.containing) kind.containing = [];
-
-        kindsAdapter.addOne(state.kinds, kind as Kind);
       }
-    },
-    // Exclusively updates kinds in store. Unsafe because it does not:
-    // - Reconcile existence (or lack thereof) of categories
-    // - Reconcile existence (or lack thereof) of things
-    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
-    updateKinds_unsafe(
-      state,
-      action: PayloadAction<{
-        updates: Array<{ id: string; changes: Omit<Partial<Kind>, "id"> }>;
-      }>,
-    ) {
-      kindsAdapter.updateMany(state.kinds, action.payload.updates);
-    },
-    updateKindContents(
-      state,
-      action: PayloadAction<{
-        changes: Array<{
-          kindId: string;
-          updateType: "add" | "remove" | "replace";
-          contents: string[];
-        }>;
-      }>,
-    ) {
-      const { changes } = action.payload;
-      for (const { kindId, contents, updateType } of changes) {
-        if (!state.kinds.entities[kindId]) continue;
-        const previousContents = state.kinds.entities[kindId]!.containing;
 
-        const newContents = updateContents(
-          previousContents,
-          contents,
-          updateType,
+      // if no unknown category provided, create one
+      if (!unknownCategory) {
+        unknownCategory = generateCategory(
+          UNKNOWN_CATEGORY_NAME,
+          kind.id,
+          UNKNOWN_ANNOTATION_CATEGORY_COLOR,
         );
-
-        kindsAdapter.updateOne(state.kinds, {
-          id: kindId,
-          changes: { containing: newContents },
-        });
+        unknownCategory.id = kind.unknownCategoryId;
       }
+      kindsAdapter.addOne(state.kinds, kind);
+
+      // Initialize relationship entries
+      state.relationships.kindToCategories[action.payload.kind.id] = [
+        unknownCategory.id,
+      ];
+      state.relationships.kindToAnnotations[action.payload.kind.id] = [];
+
+      // Add unknown category
+      categoriesAdapter.addOne(state.categories, unknownCategory);
+
+      // Initialize relationship entries
+      state.relationships.categoryToImages[unknownCategory.id] = [];
+      state.relationships.categoryToAnnotations[unknownCategory.id] = [];
     },
-    updateKindCategories(
+
+    updateKindName: (
       state,
-      action: PayloadAction<{
-        changes: Array<{
-          kindId: string;
-          updateType: "add" | "remove" | "replace";
-          categories: string[];
-        }>;
-      }>,
-    ) {
-      const { changes } = action.payload;
+      action: PayloadAction<{ id: string; newName: string }>,
+    ) => {
+      const { id, newName } = action.payload;
+      const existingKind = state.kinds.entities[id];
 
-      for (const { kindId, categories, updateType } of changes) {
-        if (!state.kinds.entities[kindId]) continue;
-        const previousCategories = state.kinds.entities[kindId]!.categories;
+      if (!existingKind) return;
 
-        const newCategories = updateContents(
-          previousCategories,
-          categories,
-          updateType,
-        );
-
-        kindsAdapter.updateOne(state.kinds, {
-          id: kindId,
-          changes: { categories: newCategories },
-        });
-      }
-    },
-    updateKindName(
-      state,
-      action: PayloadAction<{
-        kindId: string;
-        displayName: string;
-      }>,
-    ) {
-      const { kindId, displayName } = action.payload;
-      const kind = state.kinds.entities[kindId];
-      if (kindId === displayName || !kind) return;
       kindsAdapter.updateOne(state.kinds, {
-        id: kindId,
-        changes: { displayName: displayName },
+        id,
+        changes: { displayName: newName },
       });
     },
-    // Exclusively removes kind. Unsafe because it does not:
-    // - Remove associated categories
-    // - Remove associated things
-    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
-    deleteKind_unsafe(state, action: PayloadAction<{ deletedKindId: string }>) {
-      const { deletedKindId } = action.payload;
-      if (!state.kinds.entities[deletedKindId] || deletedKindId === "Image")
+
+    deleteKind: (state, action: PayloadAction<string>) => {
+      const kindId = action.payload;
+
+      // Delete the kind
+      kindsAdapter.removeOne(state.kinds, kindId);
+
+      // Clean up relationships
+      delete state.relationships.kindToCategories[kindId];
+      delete state.relationships.kindToAnnotations[kindId];
+    },
+
+    deleteKindCascade: (state, action: PayloadAction<string>) => {
+      const kindId = action.payload;
+      if (kindId === "Images") return;
+
+      // Delete all related categories
+      const categoryIds = state.relationships.kindToCategories[kindId] || [];
+      categoriesAdapter.removeMany(state.categories, categoryIds);
+
+      // Clean up category relationships
+      categoryIds.forEach((catId) => {
+        delete state.relationships.categoryToAnnotations[catId];
+      });
+
+      const annotationIds = state.relationships.kindToAnnotations[kindId];
+
+      annotationIds.forEach((annId) => {
+        const { imageId } = state.annotations.entities[annId];
+
+        if (!imageId) return;
+
+        removeFromSimpleRelationship(
+          state.relationships.imageToAnnotations,
+          imageId,
+          annId,
+        );
+      });
+      annotationsAdapter.removeMany(state.annotations, annotationIds);
+
+      // Clean up kind relationships
+      delete state.relationships.kindToCategories[kindId];
+      delete state.relationships.kindToAnnotations[kindId];
+
+      // Finally, delete the kind
+      kindsAdapter.removeOne(state.kinds, kindId);
+    },
+
+    // ============== CATEGORY OPERATIONS ==============
+    addCategory: (state, action: PayloadAction<Category>) => {
+      const category = action.payload;
+      if (isUnknownCategory(category.id)) {
+        console.error("Cannot directly create unknown category.");
         return;
-      kindsAdapter.removeOne(state.kinds, deletedKindId);
-    },
-    // Exclusively removes kinds. Unsafe because it does not:
-    // - Remove associated categories
-    // - Remove associated things
-    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
-    deleteKinds_unsafe(state, action: PayloadAction<{ kindIds: string[] }>) {
-      const { kindIds } = action.payload;
-      if (kindIds.includes("Image")) return;
+      }
+      categoriesAdapter.addOne(state.categories, category);
 
-      kindsAdapter.removeMany(state.kinds, kindIds);
+      // Initialize relationship entries
+      state.relationships.categoryToImages[category.id] = [];
+      state.relationships.categoryToAnnotations[category.id] = [];
+
+      // Update kind relationship
+
+      addToSimpleRelationship(
+        state.relationships.kindToCategories,
+        category.kind,
+        category.id,
+      );
     },
-    deleteKind(
+
+    updateCategory: (
       state,
       action: PayloadAction<{
-        deletedKindId: string;
+        id: string;
+        changes: Partial<Pick<Category, "name" | "color">>;
       }>,
-    ) {
-      const { deletedKindId } = action.payload;
-      if (!state.kinds.entities[deletedKindId] || deletedKindId === "Image")
+    ) => {
+      const { id, changes } = action.payload;
+      const existingCategory = state.categories.entities[id];
+
+      if (!existingCategory) return;
+
+      categoriesAdapter.updateOne(state.categories, { id, changes });
+    },
+
+    deleteCategory: (state, action: PayloadAction<string>) => {
+      const categoryId = action.payload;
+      if (isUnknownCategory(categoryId)) {
+        console.error("Cannot remove unknown Category");
         return;
-      const deletedKind = state.kinds.entities[deletedKindId]!;
-
-      // Delete removed associated categories
-      const associatedCategories = deletedKind.categories;
-      categoriesAdapter.removeMany(state.categories, associatedCategories);
-
-      // Delete Associated annotations
-      const associatedAnnotations = deletedKind.containing;
-
-      for (const annId of associatedAnnotations) {
-        const annotation = state.things.entities[annId] as AnnotationObject;
-        const TSAnnotation = state.annotations.entities[
-          annId
-        ] as TSAnnotationObject;
-        dispose(annotation.data as TensorContainer);
-        dispose(TSAnnotation.data as TensorContainer);
-        thingsAdapter.removeOne(state.things, annId);
-        annotationsAdapter.removeOne(state.annotations, annId);
-        const image = state.things.entities[annotation.imageId] as ImageObject;
-        const TSImage = state.images.entities[annotation.imageId];
-        thingsAdapter.updateOne(state.things, {
-          id: annotation.imageId,
-          changes: {
-            containing: difference(image.containing, [annotation.id]),
-          },
-        });
-        imagesAdapter.updateOne(state.images, {
-          id: annotation.imageId,
-          changes: {
-            containing: difference(TSImage.containing, [annotation.id]),
-          },
-        });
       }
+      const category = state.categories.entities[categoryId];
 
-      kindsAdapter.removeOne(state.kinds, deletedKindId);
+      if (!category) return;
+
+      // Remove from kind relationship
+      removeFromSimpleRelationship(
+        state.relationships.kindToCategories,
+        category.kind,
+        categoryId,
+      );
+
+      // Clean up relationships
+      delete state.relationships.categoryToImages[categoryId];
+      delete state.relationships.categoryToAnnotations[categoryId];
+
+      // Delete the category
+      categoriesAdapter.removeOne(state.categories, categoryId);
     },
-    deleteKinds(state, action: PayloadAction<{ kindIds: string[] }>) {
-      const { kindIds } = action.payload;
-      for (const kindId of kindIds) {
-        dataSlice.caseReducers.deleteKind(state, {
-          type: "deleteKind",
-          payload: { deletedKindId: kindId },
-        });
+
+    deleteCategoryCascade: (state, action: PayloadAction<string>) => {
+      const categoryId = action.payload;
+      if (isUnknownCategory(categoryId)) {
+        console.error("Cannot remove unknown Category");
+        return;
       }
-    },
-    // Exclusively add categories to store. Unsafe because it does not:
-    // - Update kind's category list
-    // - Check for duplicates
-    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
-    addCategories_unsafe(
-      state,
-      action: PayloadAction<{
-        categories: Array<Category>;
-      }>,
-    ) {
-      const { categories } = action.payload;
-      categoriesAdapter.addMany(state.categories, categories);
-    },
-    addCategories(
-      state,
-      action: PayloadAction<{
-        categories: Array<Category>;
-      }>,
-    ) {
-      const { categories } = action.payload;
-      for (const category of categories) {
-        if (state.categories.ids.includes(category.id)) continue;
+      const category = state.categories.entities[categoryId];
 
-        dataSlice.caseReducers.updateKindCategories(state, {
-          type: "updateKindCategories",
-          payload: {
-            changes: [
-              {
-                kindId: category.kind,
-                updateType: "add",
-                categories: [category.id],
-              },
-            ],
-          },
+      if (!category) return;
+
+      // Update all images that use this category to use unknown category
+      const kind = state.kinds.entities[category.kind];
+      const unknownCategoryId = kind.unknownCategoryId;
+      if (kind.id === IMAGE_KIND) {
+        const imageIds = state.relationships.categoryToImages[categoryId] || [];
+        imageIds.forEach((imageId) => {
+          // Update relationships
+          removeFromSimpleRelationship(
+            state.relationships.categoryToImages,
+            categoryId,
+            imageId,
+          );
+          addToSimpleRelationship(
+            state.relationships.categoryToImages,
+            unknownCategoryId,
+            imageId,
+          );
         });
-
-        categoriesAdapter.addOne(state.categories, category);
-      }
-    },
-    createCategory(
-      state,
-      action: PayloadAction<{
-        name: string;
-        color: string;
-        kind: string;
-      }>,
-    ) {
-      const { name, color, kind } = action.payload;
-
-      let kindsToUpdate = [];
-
-      if (kind === "all") {
-        kindsToUpdate = state.kinds.ids;
+        // Clean up relationships
+        delete state.relationships.categoryToImages[categoryId];
       } else {
-        kindsToUpdate.push(kind);
+        const annIds =
+          state.relationships.categoryToAnnotations[categoryId] || [];
+        annIds.forEach((annId) => {
+          // Update relationships
+          removeFromSimpleRelationship(
+            state.relationships.categoryToAnnotations,
+            categoryId,
+            annId,
+          );
+          addToSimpleRelationship(
+            state.relationships.categoryToAnnotations,
+            unknownCategoryId,
+            annId,
+          );
+        });
+        // Clean up relationships
+        delete state.relationships.categoryToAnnotations[categoryId];
       }
 
-      let id = generateUUID();
-      let idIsUnique = !state.categories.ids.includes(id);
+      // Remove from kind relationship
+      removeFromSimpleRelationship(
+        state.relationships.kindToCategories,
+        category.kind,
+        categoryId,
+      );
 
-      while (!idIsUnique) {
-        id = generateUUID();
-        idIsUnique = !state.categories.ids.includes(id);
+      // Delete the category
+      categoriesAdapter.removeOne(state.categories, categoryId);
+    },
+
+    // ============== METADATA OPERATIONS ==============
+    addMetadata: (
+      state,
+      action: PayloadAction<{ metadata: ImageMetadata; images: ImageData[] }>,
+    ) => {
+      const { metadata, images } = action.payload;
+
+      // validate correct number of images
+      if (metadata.imageDataIds.length !== images.length) {
+        throw new Error(
+          `Metadata specifies ${metadata.imageDataIds.length} images but store only supplied ${images.length}.`,
+        );
       }
 
-      categoriesAdapter.addOne(state.categories, {
-        id: id,
-        name: name,
-        color: color,
-        visible: true,
-        containing: [],
-        kind: kind,
-      } as Category);
+      // validate id match
+      if (
+        difference(
+          metadata.imageDataIds,
+          images.map((image) => image.id),
+        ).length !== 0
+      ) {
+        throw new Error(
+          "Image Ids provided in metadata do not match Ids of images provided",
+        );
+      }
 
-      kindsToUpdate.forEach((kind) =>
-        dataSlice.caseReducers.updateKindCategories(state, {
-          type: "updateKindCategories",
-          payload: {
-            changes: [
-              {
-                kindId: kind as string,
-                updateType: "add",
-                categories: [id],
-              },
-            ],
-          },
+      metadataAdapter.addOne(state.metadata, metadata);
+      dataSlice.caseReducers.batchAddImageData(state, {
+        payload: images,
+        type: "batchAddImage",
+      });
+    },
+    updateDefaultMetadataImage: (
+      state,
+      action: PayloadAction<{
+        metadataId: string;
+        defaultImageId: string;
+      }>,
+    ) => {
+      const { metadataId, defaultImageId } = action.payload;
+      const existingMetadata = state.metadata.entities[metadataId];
+      const existingImage = state.images.entities[defaultImageId];
+      if (!existingMetadata) {
+        console.error("No metadata with id: ", metadataId);
+        return;
+      }
+      if (!existingImage) {
+        console.error("No image with id: ", defaultImageId);
+        return;
+      }
+      if (!existingMetadata.imageDataIds.includes(defaultImageId)) {
+        console.error(
+          `Image with id: ${defaultImageId} not described by metadata with id ${metadataId}`,
+        );
+        return;
+      }
+
+      metadataAdapter.updateOne(state.metadata, {
+        id: metadataId,
+        changes: { defaultImageId },
+      });
+    },
+
+    // ============== IMAGE OPERATIONS ==============
+    addImageData: (state, action: PayloadAction<ImageData>) => {
+      const image = action.payload;
+      imageDataAdapter.addOne(state.images, image);
+
+      // Initialize annotation relationship
+      state.relationships.imageToAnnotations[image.id] = [];
+
+      // Update category relationships
+
+      addToSimpleRelationship(
+        state.relationships.categoryToImages,
+        image.categoryId,
+        image.id,
+      );
+    },
+
+    updateImageData: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        changes: Partial<Omit<ImageData, "data">>;
+      }>,
+    ) => {
+      const { id, changes } = action.payload;
+      const existingImageData = state.images.entities[id];
+
+      if (!existingImageData) return;
+
+      // Handle timepoint category changes
+
+      // Remove old category relationships
+
+      if (changes.categoryId) {
+        removeFromSimpleRelationship(
+          state.relationships.categoryToImages,
+          existingImageData.categoryId,
+          id,
+        );
+        addToSimpleRelationship(
+          state.relationships.categoryToImages,
+          changes.categoryId,
+          id,
+        );
+      }
+
+      imageDataAdapter.updateOne(state.images, { id, changes });
+    },
+
+    deleteImageData: (state, action: PayloadAction<string>) => {
+      const imageId = action.payload;
+      const image = state.images.entities[imageId];
+
+      if (!image) return;
+
+      // Remove from category relationships
+      removeFromSimpleRelationship(
+        state.relationships.categoryToImages,
+        image.categoryId,
+        imageId,
+      );
+
+      image.data.dispose();
+      image.colors.color.dispose();
+
+      // Clean up image-annotation relationship
+      delete state.relationships.imageToAnnotations[imageId];
+
+      // Delete the image
+      imageDataAdapter.removeOne(state.images, imageId);
+
+      // Remove from metadata and delete metadata if no images
+      const metadata = state.metadata.entities[image.metadataId];
+      mutatingFilter(metadata.imageDataIds, (id) => id !== imageId);
+      if (metadata.imageDataIds.length === 0) {
+        metadataAdapter.removeOne(state.metadata, metadata.id);
+      } else {
+        if (metadata.defaultImageId === imageId)
+          metadata.defaultImageId = metadata.imageDataIds[0];
+      }
+    },
+    deleteImageCascade: (state, action: PayloadAction<string>) => {
+      const imageId = action.payload;
+      const image = state.images.entities[imageId];
+      if (!image) return;
+      console.log(image.id);
+      // Delete all annotations for this image
+      const annotationIds = state.relationships.imageToAnnotations[imageId];
+      annotationIds.forEach((annId) => {
+        const annotation = state.annotations.entities[annId];
+        if (annotation) {
+          // Remove from category relationship
+          removeFromSimpleRelationship(
+            state.relationships.categoryToAnnotations,
+            annotation.categoryId,
+            annId,
+          );
+          // Remove from kind relationship
+          removeFromSimpleRelationship(
+            state.relationships.kindToAnnotations,
+            annotation.kind,
+            annId,
+          );
+          // Clean up link graph
+          if (state.linkGraph[annId]) {
+            delete state.linkGraph[annId];
+          }
+          annotation.data.dispose();
+        }
+      });
+      annotationsAdapter.removeMany(state.annotations, annotationIds);
+
+      // Remove from category relationships
+      removeFromSimpleRelationship(
+        state.relationships.categoryToImages,
+        image.categoryId,
+        imageId,
+      );
+
+      image.data.dispose();
+      image.colors.color.dispose();
+
+      // Clean up relationships
+      delete state.relationships.imageToAnnotations[imageId];
+
+      // Delete the image
+      imageDataAdapter.removeOne(state.images, imageId);
+
+      // Remove from metadata and delete metadata if no images
+      const metadata = state.metadata.entities[image.metadataId];
+      mutatingFilter(metadata.imageDataIds, (id) => id !== imageId);
+      if (metadata.imageDataIds.length === 0) {
+        metadataAdapter.removeOne(state.metadata, metadata.id);
+      } else {
+        if (metadata.defaultImageId === imageId)
+          metadata.defaultImageId = metadata.imageDataIds[0];
+      }
+      console.log(state.images.ids);
+    },
+
+    // ============== ANNOTATION OPERATIONS ==============
+    addAnnotation: (state, action: PayloadAction<AnnotationObject>) => {
+      const annotation = action.payload;
+      annotationsAdapter.addOne(state.annotations, annotation);
+
+      // Update relationships
+      if (annotation.imageId) {
+        addToSimpleRelationship(
+          state.relationships.imageToAnnotations,
+          annotation.imageId,
+          annotation.id,
+        );
+      }
+      if (annotation.categoryId) {
+        addToSimpleRelationship(
+          state.relationships.categoryToAnnotations,
+          annotation.categoryId,
+          annotation.id,
+        );
+      }
+      if (annotation.kind) {
+        addToSimpleRelationship(
+          state.relationships.kindToAnnotations,
+          annotation.kind,
+          annotation.id,
+        );
+      }
+    },
+
+    updateAnnotation: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        changes: Partial<
+          Omit<
+            AnnotationObject,
+            "id" | "bitDepth" | "plane" | "imageId" | "timepoint"
+          >
+        >;
+      }>,
+    ) => {
+      const { id, changes } = action.payload;
+      const existingAnnotation = state.annotations.entities[id];
+
+      if (!existingAnnotation) return;
+
+      // Handle category change
+      if (
+        changes.categoryId &&
+        changes.categoryId !== existingAnnotation.categoryId
+      ) {
+        removeFromSimpleRelationship(
+          state.relationships.categoryToAnnotations,
+          existingAnnotation.categoryId,
+          id,
+        );
+        addToSimpleRelationship(
+          state.relationships.categoryToAnnotations,
+          changes.categoryId,
+          id,
+        );
+      }
+
+      // Handle kind change
+      if (changes.kind && changes.kind !== existingAnnotation.kind) {
+        removeFromSimpleRelationship(
+          state.relationships.kindToAnnotations,
+          existingAnnotation.kind,
+          id,
+        );
+
+        addToSimpleRelationship(
+          state.relationships.kindToAnnotations,
+          changes.kind,
+          id,
+        );
+      }
+
+      annotationsAdapter.updateOne(state.annotations, { id, changes });
+    },
+
+    deleteAnnotation: (state, action: PayloadAction<string>) => {
+      const annotationId = action.payload;
+      const annotation = state.annotations.entities[annotationId];
+
+      if (!annotation) return;
+
+      // Remove from relationships
+      removeFromSimpleRelationship(
+        state.relationships.imageToAnnotations,
+        annotation.imageId,
+        annotationId,
+      );
+      removeFromSimpleRelationship(
+        state.relationships.categoryToAnnotations,
+        annotation.categoryId,
+        annotationId,
+      );
+      removeFromSimpleRelationship(
+        state.relationships.kindToAnnotations,
+        annotation.kind,
+        annotationId,
+      );
+
+      // Clean up link graph
+      if (state.linkGraph[annotationId]) {
+        const linkNode = state.linkGraph[annotationId];
+
+        // Update parent nodes to remove this child
+        linkNode.parentIds?.forEach((parentId) => {
+          if (state.linkGraph[parentId]) {
+            state.linkGraph[parentId].childIds = state.linkGraph[
+              parentId
+            ].childIds.filter((childId) => childId !== annotationId);
+          }
+        });
+
+        // Update child nodes to remove this parent
+        linkNode.childIds?.forEach((childId) => {
+          if (state.linkGraph[childId]) {
+            state.linkGraph[childId].parentIds = state.linkGraph[
+              childId
+            ].parentIds.filter((parentId) => parentId !== annotationId);
+          }
+        });
+
+        // Remove from global annotations
+        if (linkNode.globalId && state.globalAnnotations[linkNode.globalId]) {
+          mutatingFilter(
+            state.globalAnnotations[linkNode.globalId].linkedIds,
+            (id) => id !== annotationId,
+          );
+
+          if (
+            state.globalAnnotations[linkNode.globalId].linkedIds.length === 0
+          ) {
+            delete state.globalAnnotations[linkNode.globalId];
+          }
+        }
+
+        delete state.linkGraph[annotationId];
+      }
+
+      // Delete the annotation
+      annotationsAdapter.removeOne(state.annotations, annotationId);
+    },
+
+    // ============== LINK GRAPH OPERATIONS ==============
+    addLinkNode: (state, action: PayloadAction<LinkNode>) => {
+      const node = action.payload;
+      state.linkGraph[node.id] = node;
+
+      // Update global annotations
+      if (node.globalId) {
+        if (!state.globalAnnotations[node.globalId]) {
+          state.globalAnnotations[node.globalId] = {
+            globalId: node.globalId,
+            linkedIds: [node.id],
+          };
+        } else {
+          state.globalAnnotations[node.globalId].linkedIds = [
+            ...new Set([
+              ...state.globalAnnotations[node.globalId].linkedIds,
+              node.id,
+            ]),
+          ];
+        }
+      }
+
+      // Update parent nodes
+      node.parentIds?.forEach((parentId) => {
+        if (state.linkGraph[parentId]) {
+          if (!state.linkGraph[parentId].childIds.includes(node.id)) {
+            state.linkGraph[parentId].childIds.push(node.id);
+          }
+        }
+      });
+
+      // Update child nodes
+      node.childIds?.forEach((childId) => {
+        if (state.linkGraph[childId]) {
+          if (!state.linkGraph[childId].parentIds.includes(node.id)) {
+            state.linkGraph[childId].parentIds.push(node.id);
+          }
+        }
+      });
+    },
+
+    updateLinkNode: (
+      state,
+      action: PayloadAction<{ id: string; changes: Partial<LinkNode> }>,
+    ) => {
+      const { id, changes } = action.payload;
+      const existingNode = state.linkGraph[id];
+
+      if (!existingNode) return;
+
+      // Handle globalId change
+      if (changes.globalId && changes.globalId !== existingNode.globalId) {
+        // Remove from old global annotation
+        if (
+          existingNode.globalId &&
+          state.globalAnnotations[existingNode.globalId]
+        ) {
+          mutatingFilter(
+            state.globalAnnotations[existingNode.globalId].linkedIds,
+            (_id) => _id !== id,
+          );
+          if (
+            state.globalAnnotations[existingNode.globalId].linkedIds.length ===
+            0
+          ) {
+            delete state.globalAnnotations[existingNode.globalId];
+          }
+        }
+
+        // Add to new global annotation
+        if (!state.globalAnnotations[changes.globalId]) {
+          state.globalAnnotations[changes.globalId] = {
+            globalId: changes.globalId,
+            linkedIds: [id],
+          };
+        } else {
+          state.globalAnnotations[changes.globalId].linkedIds = [
+            ...new Set([
+              ...state.globalAnnotations[changes.globalId].linkedIds,
+              id,
+            ]),
+          ];
+        }
+      }
+
+      // Update the node
+      state.linkGraph[id] = { ...existingNode, ...changes };
+    },
+
+    deleteLinkNode: (state, action: PayloadAction<string>) => {
+      const nodeId = action.payload;
+      const node = state.linkGraph[nodeId];
+
+      if (!node) return;
+
+      // Update parent nodes
+      node.parentIds?.forEach((parentId) => {
+        if (state.linkGraph[parentId]) {
+          state.linkGraph[parentId].childIds = state.linkGraph[
+            parentId
+          ].childIds.filter((childId) => childId !== nodeId);
+        }
+      });
+
+      // Update child nodes
+      node.childIds?.forEach((childId) => {
+        if (state.linkGraph[childId]) {
+          state.linkGraph[childId].parentIds = state.linkGraph[
+            childId
+          ].parentIds.filter((parentId) => parentId !== nodeId);
+        }
+      });
+
+      // Remove from global annotations
+      if (node.globalId && state.globalAnnotations[node.globalId]) {
+        mutatingFilter(
+          state.globalAnnotations[node.globalId].linkedIds,
+          (id) => id !== nodeId,
+        );
+
+        if (state.globalAnnotations[node.globalId].linkedIds.length === 0) {
+          delete state.globalAnnotations[node.globalId];
+        }
+      }
+
+      delete state.linkGraph[nodeId];
+    },
+
+    // ============== GLOBAL ANNOTATION OPERATIONS ==============
+    addGlobalAnnotation: (state, action: PayloadAction<GlobalAnnotation>) => {
+      const globalAnnotation = action.payload;
+      state.globalAnnotations[globalAnnotation.globalId] = globalAnnotation;
+    },
+
+    deleteGlobalAnnotation: (state, action: PayloadAction<string>) => {
+      const globalId = action.payload;
+
+      // Remove globalId from all link nodes
+      Object.values(state.linkGraph).forEach((node) => {
+        if (node.globalId === globalId) {
+          node.globalId = "";
+        }
+      });
+
+      delete state.globalAnnotations[globalId];
+    },
+
+    // ============== BATCH OPERATIONS ==============
+    batchAddKind: (
+      state,
+      action: PayloadAction<{ kind: Kind; unknownCategory?: Category }[]>,
+    ) => {
+      const kindGroups = action.payload;
+      kindGroups.forEach((kindGroup) =>
+        dataSlice.caseReducers.addKind(state, {
+          payload: kindGroup,
+          type: "addKind",
         }),
       );
     },
-    updateCategories_unsafe(
-      state,
-      action: PayloadAction<{
-        updates: Array<{ id: string; changes: Omit<Partial<Category>, "id"> }>;
-      }>,
-    ) {
-      const { updates } = action.payload;
-      categoriesAdapter.updateMany(state.categories, updates);
-    },
-    updateCategory(
-      state,
-      action: PayloadAction<{
-        updates: CategoryUpdates;
-      }>,
-    ) {
-      const { updates } = action.payload;
-
-      const id = updates.id;
-
-      categoriesAdapter.updateOne(state.categories, {
-        id: id,
-        changes: updates,
-      });
-    },
-    updateCategoryContents(
-      state,
-      action: PayloadAction<{
-        changes: Array<{
-          categoryId: string;
-          updateType: "add" | "remove" | "replace";
-          contents: string[];
-        }>;
-      }>,
-    ) {
-      const { changes } = action.payload;
-      for (const { categoryId, contents, updateType } of changes) {
-        if (!state.categories.entities[categoryId]) continue;
-        const previousContents =
-          state.categories.entities[categoryId]!.containing;
-
-        const newContents = updateContents(
-          previousContents,
-          contents,
-          updateType,
-        );
-
-        categoriesAdapter.updateOne(state.categories, {
-          id: categoryId,
-          changes: { containing: newContents },
-        });
-      }
-    },
-
-    setCategories(
-      state,
-      action: PayloadAction<{
-        categories: Array<Category>;
-      }>,
-    ) {
-      const { categories } = action.payload;
-
-      dataSlice.caseReducers.deleteCategories(state, {
-        type: "deleteCategories",
-        payload: { categoryIds: "all" },
-      });
-      dataSlice.caseReducers.addCategories(state, {
-        type: "addCategories",
-        payload: {
-          categories: categories,
-        },
-      });
-    },
-    // Exclusively removes categories store. Unsafe because it does not:
-    // - Update kind's category list
-    // - Recategorize associated things
-    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
-    deleteCategories_unsafe(
-      state,
-      action: PayloadAction<{
-        categoryIds: string[] | "all";
-      }>,
-    ) {
-      let { categoryIds } = action.payload;
-      if (categoryIds === "all") {
-        categoryIds = state.categories.ids as string[];
-      }
-      const excludingUnknown = categoryIds.filter(
-        (id) => !isUnknownCategory(id),
+    batchAddCategory: (state, action: PayloadAction<Category[]>) => {
+      const categories = action.payload;
+      categories.forEach((category) =>
+        dataSlice.caseReducers.addCategory(state, {
+          payload: category,
+          type: "addCategory",
+        }),
       );
-      categoriesAdapter.removeMany(state.categories, excludingUnknown);
     },
-    deleteCategories(
-      state,
-      action: PayloadAction<{
-        categoryIds: string[] | "all";
-      }>,
-    ) {
-      let { categoryIds } = action.payload;
-      if (categoryIds === "all") {
-        categoryIds = state.categories.ids as string[];
-      }
-      const allAssociatedThingIds: Record<string, string[]> = {};
-      for (const categoryId of categoryIds) {
-        if (isUnknownCategory(categoryId)) continue;
-        const category = state.categories.entities[categoryId];
-        if (!category) continue;
-
-        // Remove Category From Kind
-        const associatedKind = state.kinds.entities[category.kind];
-        if (!associatedKind) {
-          throw new Error(`Unable to find Kind for category ${category.name}`);
-        }
-        const catIndex = associatedKind.categories.indexOf(category.id);
-        if (catIndex !== 1) associatedKind.categories.splice(catIndex, 1);
-
-        // Update Things
-        const kindUnknownCategory = associatedKind.unknownCategoryId;
-        const associatedThings = category.containing;
-        if (allAssociatedThingIds[kindUnknownCategory]) {
-          allAssociatedThingIds[kindUnknownCategory].push(...associatedThings);
-        } else {
-          allAssociatedThingIds[kindUnknownCategory] = associatedThings;
-        }
-
-        const existingThings =
-          state.categories.entities[kindUnknownCategory]!.containing;
-        categoriesAdapter.updateOne(state.categories, {
-          id: kindUnknownCategory,
-          changes: {
-            containing: [...existingThings, ...associatedThings],
-          },
-        });
-
-        //Update Images
-        Object.values(state.images.entities).forEach((image) => {
-          Object.values(image.timepoints).forEach((timePoint) => {
-            if (timePoint.categoryId === category.id) {
-              timePoint.categoryId = kindUnknownCategory;
-            }
-          });
-        });
-
-        //Update Annotations
-        Object.values(state.annotations.entities).forEach((annotation) => {
-          if (annotation.categoryId === category.id) {
-            annotation.categoryId = kindUnknownCategory;
-          }
-        });
-      }
-      Object.entries(allAssociatedThingIds).forEach(([categoryId, things]) => {
-        state.categories.entities[categoryId].containing.push(...things);
-      });
-      categoriesAdapter.removeMany(state.categories, categoryIds);
+    batchDeleteCategoryCascade: (state, action: PayloadAction<string[]>) => {
+      const categoryIds = action.payload;
+      categoryIds.forEach((id) =>
+        dataSlice.caseReducers.deleteCategoryCascade(state, {
+          payload: id,
+          type: "deleteCategoryCascade",
+        }),
+      );
     },
-    removeCategoriesFromKind(
-      state,
-      action: PayloadAction<{
-        categoryIds: string[] | "all";
-        kind: string;
-      }>,
-    ) {
-      //HACK: Should check for empty category. if category empty, delete completely
-      let categoryIds = action.payload.categoryIds;
-      const kindId = action.payload.kind;
-      const kind = state.kinds.entities[kindId]!;
-      if (categoryIds === "all") {
-        categoryIds = state.categories.ids as string[];
-      }
+    batchDeleteCategoriesByKind: (state, action: PayloadAction<string>) => {
+      const kindId = action.payload;
 
-      for (const categoryId of categoryIds) {
-        if (isUnknownCategory(categoryId)) continue;
+      const categories = state.relationships.kindToCategories[kindId].filter(
+        (catId) => !isUnknownCategory(catId),
+      );
 
-        dataSlice.caseReducers.updateKindCategories(state, {
-          type: "updateKindCategories",
-          payload: {
-            changes: [
-              {
-                kindId: kindId,
-                updateType: "remove",
-                categories: [categoryId],
-              },
-            ],
-          },
-        });
-        const thingsOfKind = state.kinds.entities[kindId]!.containing;
-
-        const thingsOfCategory =
-          state.categories.entities[categoryId]!.containing;
-        const thingsToRemove = intersection(thingsOfKind, thingsOfCategory);
-
-        dataSlice.caseReducers.updateCategoryContents(state, {
-          type: "updateCategoryContents",
-          payload: {
-            changes: [
-              {
-                categoryId: categoryId,
-                updateType: "remove",
-                contents: thingsToRemove,
-              },
-              {
-                categoryId: state.kinds.entities[kindId]!.unknownCategoryId,
-                updateType: "add",
-                contents: thingsToRemove,
-              },
-            ],
-          },
-        });
-
-        const thingUpdates = thingsToRemove.map((thing) => ({
-          id: thing,
-          categoryId: state.kinds.entities[kindId]!.unknownCategoryId,
-        }));
-
-        dataSlice.caseReducers.updateThings(state, {
-          type: "updateThings",
-          payload: { updates: thingUpdates },
-        });
-      }
-      //Update Images
-      Object.values(state.images.entities).forEach((image) => {
-        Object.values(image.timepoints).forEach((timePoint) => {
-          if (categoryIds.includes(timePoint.categoryId)) {
-            timePoint.categoryId = kind.unknownCategoryId;
-          }
-        });
-      });
-
-      //Update Annotations
-      Object.values(state.annotations.entities).forEach((annotation) => {
-        if (categoryIds.includes(annotation.categoryId)) {
-          annotation.categoryId = kind.unknownCategoryId;
-        }
+      dataSlice.caseReducers.batchDeleteCategoryCascade(state, {
+        payload: categories,
+        type: "batchDeleteCategoryCascade",
       });
     },
-    // Exclusively add thing to store. Unsafe because it does not:
-    // - Update kind's containing list
-    // - Update category's containing list
-    // - Update image's containing list
-    // - Check for duplicates
-    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
-    addThings_unsafe(
+    batchAddMetadata(
       state,
-      action: PayloadAction<{
-        things: Array<ImageObject | AnnotationObject>;
-      }>,
+      action: PayloadAction<{ metadata: ImageMetadata; images: ImageData[] }[]>,
     ) {
-      const { things } = action.payload;
-      for (const readOnlyThing of things) {
-        const thing = { ...readOnlyThing };
-        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-        thingsAdapter.addOne(state.things, thing);
-      }
+      const metadataGroup = action.payload;
+      metadataGroup.forEach((metadata) =>
+        dataSlice.caseReducers.addMetadata(state, {
+          payload: metadata,
+          type: "addMetadata",
+        }),
+      );
     },
-    addThings(
+    batchAddImageData(state, action: PayloadAction<ImageData[]>) {
+      const images = action.payload;
+      images.forEach((image) =>
+        dataSlice.caseReducers.addImageData(state, {
+          payload: image,
+          type: "addImageData",
+        }),
+      );
+    },
+    batchUpdateImageData: (
       state,
-      action: PayloadAction<{
-        things: Array<ImageObject | AnnotationObject>;
-      }>,
-    ) {
-      const { things } = action.payload;
-      for (const readOnlyThing of things) {
-        const thing = { ...readOnlyThing };
-        const splitName = thing.name!.split(".");
-        const ext = splitName.at(-1);
-        const name = splitName.slice(0, splitName.length - 1).join(".");
-
-        const existingImageIds =
-          state.kinds.entities[thing.kind]?.containing ?? [];
-
-        const existingPrefixes = existingImageIds.map(
-          (id) => (state.things.entities[id]!.name as string).split(".")[0],
-        );
-
-        let updatedNamePrefix = getUniqueName(name, existingPrefixes);
-
-        if (ext) {
-          updatedNamePrefix += `.${ext}`;
-        }
-
-        Object.assign(thing, { name: updatedNamePrefix });
-        if (state.kinds.entities[thing.kind]) {
-          dataSlice.caseReducers.updateKindContents(state, {
-            type: "updateKindContents",
-            payload: {
-              changes: [
-                { kindId: thing.kind, contents: [thing.id], updateType: "add" },
-              ],
-            },
-          });
-        } else {
-          const unknownCategoryId = generateUUID({ definesUnknown: true });
-          const unknownCategory: Category = {
-            id: unknownCategoryId,
-            name: UNKNOWN_CATEGORY_NAME,
-            color: UNKNOWN_IMAGE_CATEGORY_COLOR,
-            containing: [],
-            kind: thing.kind,
-            visible: true,
-          };
-          dataSlice.caseReducers.addCategories(state, {
-            type: "addCategories",
-            payload: { categories: [unknownCategory] },
-          });
-          dataSlice.caseReducers.addKinds(state, {
-            type: "addKinds",
-            payload: {
-              kinds: [
-                {
-                  id: thing.kind,
-                  displayName: thing.kind,
-                  containing: [thing.id],
-                  categories: [unknownCategoryId],
-                  unknownCategoryId,
-                },
-              ],
-            },
-          });
-        }
-        if ("imageId" in thing) {
-          dataSlice.caseReducers.updateThingContents(state, {
-            type: "updateThingContents",
-            payload: {
-              changes: [
-                {
-                  thingId: thing.imageId,
-                  contents: [thing.id],
-                  updateType: "add",
-                },
-              ],
-            },
-          });
-        }
-
-        dataSlice.caseReducers.updateCategoryContents(state, {
-          type: "updateThingContents",
-          payload: {
-            changes: [
-              {
-                categoryId: thing.categoryId,
-                contents: [thing.id],
-                updateType: "add",
-              },
-            ],
-          },
-        });
-        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-        thingsAdapter.addOne(state.things, thing);
-      }
-    },
-    // Exclusively add annotations to store. Unsafe because it does not:
-    // - Update kind's containing list
-    // - Update category's containing list
-    // - Update image's containing list
-    // - Check for duplicates
-    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
-    addAnnotations_unsafe(
-      state,
-      action: PayloadAction<{
-        annotations: Array<AnnotationObject>;
-      }>,
-    ) {
-      const { annotations } = action.payload;
-
-      dataSlice.caseReducers.addThings_unsafe(state, {
-        type: "addThings_unsafe",
-        payload: { things: annotations },
-      });
-    },
-    // Exclusively add annotations to store. Unsafe because it does not:
-    // - Update kind's containing list
-    // - Update category's containing list
-    // - Update image's containing list
-    // - Check for duplicates
-    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
-    addTSAnnotations_unsafe(
-      state,
-      action: PayloadAction<{
-        annotations: Array<TSAnnotationObject>;
-      }>,
-    ) {
-      const { annotations } = action.payload;
-
-      for (const readOnlyAnnotation of annotations) {
-        const annotation = { ...readOnlyAnnotation };
-        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-        annotationsAdapter.addOne(state.annotation, annotation);
-      }
-    },
-    addAnnotations(
-      state,
-      action: PayloadAction<{
-        annotations: Array<AnnotationObject | DecodedAnnotationObject>;
-      }>,
-    ) {
-      const { annotations } = action.payload;
-      const encodedAnnotations: AnnotationObject[] = [];
-      for (const annotation of annotations) {
-        if (state.things.ids.includes(annotation.id)) continue;
-
-        if (annotation.decodedMask) {
-          (annotation as AnnotationObject).encodedMask = encode(
-            annotation.decodedMask,
-          );
-          delete annotation.decodedMask;
-        }
-        encodedAnnotations.push(annotation as AnnotationObject);
-      }
-      dataSlice.caseReducers.addThings(state, {
-        type: "addThings",
-        payload: { things: encodedAnnotations },
-      });
-    },
-    addTSAnnotations(
-      state,
-      action: PayloadAction<{
-        annotations: Array<TSAnnotationObject | DecodedTSAnnotationObject>;
-      }>,
-    ) {
-      const { annotations } = action.payload;
-      const encodedAnnotations: TSAnnotationObject[] = [];
-      for (const annotation of annotations) {
-        if (state.things.ids.includes(annotation.id)) continue;
-
-        // uses "new Set()" to ensure no duplicates
-        state.images.entities[annotation.imageId].containing = [
-          ...new Set([
-            ...state.images.entities[annotation.imageId].containing,
-            annotation.id,
-          ]),
-        ];
-
-        if (annotation.decodedMask) {
-          (annotation as TSAnnotationObject).encodedMask = encode(
-            annotation.decodedMask,
-          );
-          delete annotation.decodedMask;
-        }
-        encodedAnnotations.push(annotation as TSAnnotationObject);
-      }
-      annotationsAdapter.addMany(state.annotations, encodedAnnotations);
-    },
-    addTSImage(
-      state,
-      action: PayloadAction<{
-        images: Array<TSImageObject>;
-      }>,
-    ) {
-      const { images } = action.payload;
-
-      imagesAdapter.addMany(state.images, images);
-    },
-    updateTSImages(state, action: PayloadAction<{ updates: ImageUpdates }>) {
-      const { updates } = action.payload;
-      for (const update of updates) {
-        const { id, timePoints, ...changes } = update;
-        const image = state.images.entities[id];
-        if (!image) {
-          throw new Error(
-            `Error updating images: Image with id ${id} not found.`,
-          );
-        }
-
-        Object.entries(changes).forEach((change) => {
-          //@ts-ignore typescript doesnt know that "changes" contains valid entried for TSImageObject
-          image[change[0]] = change[1];
-        });
-        const updatedTimePoints: Record<TPKey, ImageTimepointData> = {};
-
-        if (timePoints) {
-          Object.entries(timePoints).forEach(
-            (change: [string, Partial<ImageTimepointData>]) => {
-              // @ts-ignore : Error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-              updatedTimePoints[change[0]] = {
-                ...image.timepoints[change[0]],
-                ...change[1],
-              };
-            },
-          );
-        }
-        image.timepoints = { ...image.timepoints, ...updatedTimePoints };
-      }
-    },
-    updateTSAnnotations(
-      state,
-      action: PayloadAction<{ updates: AnnotationUpdates }>,
-    ) {
-      const { updates } = action.payload;
-      for (const update of updates) {
-        const { id, ...changes } = update;
-        const annotation = state.annotations.entities[id];
-        if (!annotation) {
-          throw new Error(
-            `Error updating annotations: Annotation with id ${id} not found.`,
-          );
-        }
-
-        Object.entries(changes).forEach((change) => {
-          //@ts-ignore typescript doesnt know that "changes" contains valid entried for TSAnnotationObject
-          annotation[change[0]] = change[1];
-        });
-      }
-    },
-    // Exclusively updates things in store. Unsafe because it does not:
-    // - Update category's containing list
-    // - Update image's containing list
-    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
-    updateThings_unsafe(
-      state,
-      action: PayloadAction<{
-        updates: Array<{
+      action: PayloadAction<
+        {
           id: string;
-          changes: Omit<Partial<ImageObject | AnnotationObject>, "id">;
-        }>;
-      }>,
-    ) {
-      const { updates } = action.payload;
-
-      for (const update of updates) {
-        const { id, ...changes } = update;
-        if ("data" in changes) {
-          dispose(state.things.entities[id]!.data as TensorContainer);
-        }
-      }
-
-      // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-      thingsAdapter.updateMany(state.things, updates);
+          changes: Partial<Pick<ImageData, "partition" | "categoryId">>;
+        }[]
+      >,
+    ) => {
+      const updates = action.payload;
+      updates.forEach((update) =>
+        dataSlice.caseReducers.updateImageData(state, {
+          payload: update,
+          type: "updateImageData",
+        }),
+      );
     },
-    updateImages(
-      state,
-      action: PayloadAction<{
-        updates: ThingsUpdates;
-      }>,
-    ) {
-      const { updates } = action.payload;
-
-      for (const update of updates) {
-        const { id, ...changes } = update;
-
-        if (!state.things.ids.includes(id)) continue;
-
-        if ("categoryId" in changes) {
-          const oldCategory = state.things.entities[id]!.categoryId;
-
-          dataSlice.caseReducers.updateCategoryContents(state, {
-            type: "updateCategoryContents",
-            payload: {
-              changes: [
-                {
-                  categoryId: oldCategory,
-                  updateType: "remove",
-                  contents: [id],
-                },
-              ],
-            },
-          });
-          dataSlice.caseReducers.updateCategoryContents(state, {
-            type: "updateCategoryContents",
-            payload: {
-              changes: [
-                {
-                  categoryId: changes.categoryId!,
-                  updateType: "add",
-                  contents: [id],
-                },
-              ],
-            },
-          });
-        }
-        if ("kind" in changes) {
-          const oldKind = state.things.entities[id]!.kind;
-
-          dataSlice.caseReducers.updateKindContents(state, {
-            type: "updateKindContents",
-            payload: {
-              changes: [
-                {
-                  kindId: oldKind,
-                  updateType: "remove",
-                  contents: [id],
-                },
-              ],
-            },
-          });
-          dataSlice.caseReducers.updateKindContents(state, {
-            type: "updateKindContents",
-            payload: {
-              changes: [
-                {
-                  kindId: changes.kind!,
-                  updateType: "add",
-                  contents: [id],
-                },
-              ],
-            },
-          });
-        }
-
-        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-        thingsAdapter.updateOne(state.things, { id, changes });
-      }
+    batchDeleteImageData(state, action: PayloadAction<string[]>) {
+      const imageIds = action.payload;
+      imageIds.forEach((id) => {
+        dataSlice.caseReducers.deleteImageData(state, {
+          payload: id,
+          type: "deleteImage",
+        });
+      });
     },
-    updateThings(
-      state,
-      action: PayloadAction<{
-        updates: ThingsUpdates;
-      }>,
-    ) {
-      const { updates } = action.payload;
-
-      for (const update of updates) {
-        const { id, ...changes } = update;
-
-        if (!state.things.ids.includes(id)) continue;
-
-        if ("categoryId" in changes) {
-          const oldCategory = state.things.entities[id]!.categoryId;
-
-          dataSlice.caseReducers.updateCategoryContents(state, {
-            type: "updateCategoryContents",
-            payload: {
-              changes: [
-                {
-                  categoryId: oldCategory,
-                  updateType: "remove",
-                  contents: [id],
-                },
-              ],
-            },
-          });
-          dataSlice.caseReducers.updateCategoryContents(state, {
-            type: "updateCategoryContents",
-            payload: {
-              changes: [
-                {
-                  categoryId: changes.categoryId!,
-                  updateType: "add",
-                  contents: [id],
-                },
-              ],
-            },
-          });
-        }
-        if ("kind" in changes) {
-          const oldKind = state.things.entities[id]!.kind;
-
-          dataSlice.caseReducers.updateKindContents(state, {
-            type: "updateKindContents",
-            payload: {
-              changes: [
-                {
-                  kindId: oldKind,
-                  updateType: "remove",
-                  contents: [id],
-                },
-              ],
-            },
-          });
-          dataSlice.caseReducers.updateKindContents(state, {
-            type: "updateKindContents",
-            payload: {
-              changes: [
-                {
-                  kindId: changes.kind!,
-                  updateType: "add",
-                  contents: [id],
-                },
-              ],
-            },
-          });
-        }
-
-        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-        thingsAdapter.updateOne(state.things, { id, changes });
-      }
+    batchDeleteImageDataCascade(state, action: PayloadAction<string[]>) {
+      const imageIds = action.payload;
+      console.log(imageIds);
+      imageIds.forEach((id) => {
+        console.log(id);
+        dataSlice.caseReducers.deleteImageCascade(state, {
+          payload: id,
+          type: "deleteImageCascade",
+        });
+      });
     },
-    updateThingName(
+    deleteImageDataByCategory: (state, action: PayloadAction<string>) => {
+      const categoryId = action.payload;
+      const imageDataIds =
+        state.relationships.categoryToAnnotations[categoryId];
+      dataSlice.caseReducers.batchDeleteImageDataCascade(state, {
+        payload: imageDataIds,
+        type: "batchDeleteImageDataCascade",
+      });
+    },
+    batchAddAnnotations: (state, action: PayloadAction<AnnotationObject[]>) => {
+      const annotations = action.payload;
+
+      annotationsAdapter.addMany(state.annotations, annotations);
+
+      annotations.forEach((annotation) => {
+        if (annotation.imageId) {
+          addToSimpleRelationship(
+            state.relationships.imageToAnnotations,
+            annotation.imageId,
+            annotation.id,
+          );
+        }
+        if (annotation.categoryId) {
+          addToSimpleRelationship(
+            state.relationships.categoryToAnnotations,
+            annotation.categoryId,
+            annotation.id,
+          );
+        }
+        if (annotation.kind) {
+          addToSimpleRelationship(
+            state.relationships.kindToAnnotations,
+            annotation.kind,
+            annotation.id,
+          );
+        }
+      });
+    },
+    batchUpdateAnnotation(
       state,
-      action: PayloadAction<{ id: string; name: string }>,
+      action: PayloadAction<
+        {
+          id: string;
+          changes: Partial<
+            Omit<
+              AnnotationObject,
+              "id" | "bitDepth" | "plane" | "imageId" | "timepoint"
+            >
+          >;
+        }[]
+      >,
     ) {
-      const { id, name } = action.payload;
-      const changes: Array<{ id: string; name: string }> = [{ id, name }];
-      const thing = state.things.entities[id];
-      if (thing) {
-        if ("containing" in thing) {
-          const containedThingIds = thing.containing;
-          containedThingIds.forEach((containedId) => {
-            const containedThing = state.things.entities[containedId];
-            if (containedThing) {
-              const containedThingName = containedThing.name;
-              if (containedThing.name.includes(thing.name)) {
-                changes.push({
-                  id: containedId,
-                  name: containedThingName.replace(thing.name, name),
-                });
+      const annotationUpdates = action.payload;
+      annotationUpdates.forEach((update) =>
+        dataSlice.caseReducers.updateAnnotation(state, {
+          payload: update,
+          type: "updateAnnotation",
+        }),
+      );
+    },
+    batchDeleteAnnotations: (state, action: PayloadAction<string[]>) => {
+      const annotationIds = action.payload;
+
+      annotationIds.forEach((annotationId) => {
+        const annotation = state.annotations.entities[annotationId];
+        if (annotation) {
+          removeFromSimpleRelationship(
+            state.relationships.imageToAnnotations,
+            annotation.imageId,
+            annotationId,
+          );
+          removeFromSimpleRelationship(
+            state.relationships.categoryToAnnotations,
+            annotation.categoryId,
+            annotationId,
+          );
+          removeFromSimpleRelationship(
+            state.relationships.kindToAnnotations,
+            annotation.kind,
+            annotationId,
+          );
+
+          // Clean up link graph
+          if (state.linkGraph[annotationId]) {
+            const linkNode = state.linkGraph[annotationId];
+
+            // Update parent nodes to remove this child
+            linkNode.parentIds?.forEach((parentId) => {
+              if (state.linkGraph[parentId]) {
+                state.linkGraph[parentId].childIds = state.linkGraph[
+                  parentId
+                ].childIds.filter((childId) => childId !== annotationId);
+              }
+            });
+
+            // Update child nodes to remove this parent
+            linkNode.childIds?.forEach((childId) => {
+              if (state.linkGraph[childId]) {
+                state.linkGraph[childId].parentIds = state.linkGraph[
+                  childId
+                ].parentIds.filter((parentId) => parentId !== annotationId);
+              }
+            });
+
+            // Remove from global annotations
+            if (
+              linkNode.globalId &&
+              state.globalAnnotations[linkNode.globalId]
+            ) {
+              mutatingFilter(
+                state.globalAnnotations[linkNode.globalId].linkedIds,
+                (id) => id !== annotationId,
+              );
+              if (
+                state.globalAnnotations[linkNode.globalId].linkedIds.length ===
+                0
+              ) {
+                delete state.globalAnnotations[linkNode.globalId];
               }
             }
-          });
+
+            delete state.linkGraph[annotationId];
+          }
         }
-      }
-      dataSlice.caseReducers.updateThings(state, {
-        type: "updateThings",
-        payload: { updates: changes },
+      });
+
+      annotationsAdapter.removeMany(state.annotations, annotationIds);
+    },
+    deleteAnnotationsOfCategory: (state, action: PayloadAction<string>) => {
+      const categoryId = action.payload;
+      const annotationIds =
+        state.relationships.categoryToAnnotations[categoryId];
+      dataSlice.caseReducers.batchDeleteAnnotations(state, {
+        payload: annotationIds,
+        type: "batchDeleteAnotations",
       });
     },
-    // Exclusively updates image contents store. Unsafe because it does not:
-    // - Confirm existence (or lack thereof) of annotations
-    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
-    updateImageContents_unsafe(
-      state,
-      action: PayloadAction<{
-        updates: Array<{
-          id: string;
-          changes: Omit<Partial<ImageObject>, "id">;
-        }>;
-      }>,
-    ) {
-      const { updates } = action.payload;
-      thingsAdapter.updateMany(state.things, updates);
+
+    // ============== UTILITY OPERATIONS ==============
+    clearAll: (state) => {
+      return initialState;
     },
-    updateThingContents(
-      state,
-      action: PayloadAction<{
-        changes: Array<{
-          thingId: string;
-          updateType: "add" | "remove" | "replace";
-          contents: string[];
-        }>;
-      }>,
-    ) {
-      const { changes } = action.payload;
-      for (const { thingId, contents, updateType } of changes) {
-        const thing = state.things.entities[thingId] as ImageObject;
-        if (!("containing" in thing)) continue;
-        const previousContents = thing.containing;
-
-        if (!state.things.entities[thingId]) continue;
-
-        const newContents = updateContents(
-          previousContents,
-          contents,
-          updateType,
-        );
-
-        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-        thingsAdapter.updateOne(state.things, {
-          id: thingId,
-          changes: { containing: newContents },
-        });
-      }
-    },
-    // Exclusively removes things from store. Unsafe because it does not:
-    // - Update kind's containing list
-    // - Update category's containing list
-    // - Update image's containing list
-    // - Check for duplicates
-    // Only use when you are sure the rest of the state is/will be updated correctly elsewhere
-    deleteThings_unsafe(
-      state,
-      action: PayloadAction<
-        | {
-            thingIds: Array<string> | "all" | "annotations";
-            activeKind?: string;
-            disposeColorTensors: boolean;
-          }
-        | {
-            ofKinds: Array<string>;
-            activeKind?: string;
-            disposeColorTensors: boolean;
-          }
-        | {
-            ofCategories: Array<string>;
-            activeKind: string;
-            disposeColorTensors: boolean;
-          }
-      >,
-    ) {
-      const explicitThingIds = gatherThings(state, action.payload);
-
-      for (const thingId of explicitThingIds) {
-        const thing = state.things.entities[thingId];
-        if (!thing) continue;
-        dispose(thing.data as TensorContainer);
-
-        if (action.payload.disposeColorTensors && "colors" in thing) {
-          dispose(thing.colors.color as TensorContainer);
-        }
-      }
-      thingsAdapter.removeMany(state.things, explicitThingIds);
-    },
-    deleteThings(
-      state,
-      action: PayloadAction<
-        | {
-            thingIds: Array<string> | "all" | "annotations";
-            activeKind?: string;
-            disposeColorTensors: boolean;
-            preparedByListener?: boolean;
-          }
-        | {
-            ofKinds: Array<string>;
-            activeKind?: string;
-            disposeColorTensors: boolean;
-            preparedByListener?: boolean;
-          }
-        | {
-            ofCategories: Array<string>;
-            activeKind: string;
-            disposeColorTensors: boolean;
-            preparedByListener?: boolean;
-          }
-      >,
-    ) {
-      if (!action.payload.preparedByListener) return;
-      if (!("thingIds" in action.payload)) return;
-      const { thingIds } = action.payload;
-      const imageChanges: Record<
-        string,
-        {
-          thingId: string;
-          updateType: "add" | "remove" | "replace";
-          contents: string[];
-        }
-      > = {};
-      const imageChangesArray: Array<{
-        thingId: string;
-        updateType: "add" | "remove" | "replace";
-        contents: string[];
-      }> = [];
-      for (const thingId of [...thingIds]) {
-        const thing = state.things.entities[thingId];
-
-        if (!thing) continue;
-
-        if ("containing" in thing) {
-          const thingContents = thing.containing;
-
-          if (thingContents) {
-            for (const containedThingId of thingContents) {
-              const containedThing = state.things.entities[containedThingId];
-              if (!containedThing) continue;
-
-              const thingKind = containedThing.kind;
-              const thingCategoryId = containedThing.categoryId;
-              const kind = state.kinds.entities[thingKind];
-              const category = state.categories.entities[thingCategoryId];
-
-              dispose(containedThing.data as TensorContainer);
-
-              /* UPDATE KIND'S CONTAINING LIST */
-              mutatingFilter(
-                kind!.containing,
-                (containedId) => containedId !== containedThingId,
-              );
-
-              /* UPDATE CATEGORY'S CONTAINING LIST */
-              mutatingFilter(
-                category!.containing,
-                (thingId) => thingId !== containedThingId,
-              );
-
-              /* REMOVE THING */
-              delete state.things.entities[containedThingId];
-              mutatingFilter(
-                state.things.ids,
-                (thingId) => thingId !== containedThingId,
-              );
-
-              // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-              thingsAdapter.removeOne(state.things, containedThingId);
-            }
-          }
-        } else {
-          const imageId = thing.imageId;
-
-          if (imageId in imageChanges) {
-            imageChanges[imageId].contents.push(thingId);
-          } else {
-            imageChanges[imageId] = {
-              thingId: imageId,
-              updateType: "remove",
-              contents: [thingId],
-            };
-          }
-        }
-        const thingKind = thing.kind;
-        const thingCategoryId = thing.categoryId;
-
-        const kind = state.kinds.entities[thingKind];
-        const category = state.categories.entities[thingCategoryId];
-
-        dispose(thing.data as TensorContainer);
-
-        /* UPDATE KIND'S CONTAINING LIST */
-
-        mutatingFilter(
-          kind!.containing,
-          (containedId) => containedId !== thingId,
-        );
-
-        /* UPDATE CATEGORY'S CONTAINING LIST */
-        mutatingFilter(
-          category!.containing,
-          (_thingId) => _thingId !== thingId,
-        );
-
-        // @ts-ignore : This is a hack to get the thing to be added to the state.things. error is because of "isDisposedInternally" in the tensor, but we will move away from tensors
-        thingsAdapter.removeOne(state.things, thingId);
-      }
-      for (const [imageId, changes] of Object.entries(imageChanges)) {
-        if (!thingIds.includes(imageId)) {
-          imageChangesArray.push(changes);
-        }
-      }
-      dataSlice.caseReducers.updateThingContents(state, {
-        type: "updateThingContents",
-        payload: { changes: imageChangesArray },
-      });
-    },
-    dangerouslyDeleteAnnotations(
-      state,
-      action: PayloadAction<{ ids: string[] }>,
-    ) {
-      for (const id in action.payload.ids) {
-        const annotation = state.annotations.entities[id];
-        if (!annotation) {
-          throw new Error(
-            `Error deleting annotations: Annotation with the id of ${id} does not exist.`,
-          );
-        }
-        dispose(annotation.data as TensorContainer);
-        annotationsAdapter.removeOne(state.annotations, id);
-      }
-    },
-    deleteAnnotations(state, action: PayloadAction<{ ids: string[] }>) {
-      for (const id in action.payload.ids) {
-        const annotation = state.annotations.entities[id];
-        if (!annotation) {
-          throw new Error(
-            `Error deleting annotations: Annotation with the id of ${id} does not exist.`,
-          );
-        }
-
-        const associatedImageId = annotation.imageId;
-        mutatingFilter(
-          state.images.entities[associatedImageId].containing,
-          (_id) => _id === id,
-        );
-
-        dispose(annotation.data as TensorContainer);
-        annotationsAdapter.removeOne(state.annotations, id);
-      }
-    },
-    deleteImages(
-      state,
-      action: PayloadAction<{ images: { id: string; timePoint?: TPKey }[] }>,
-    ) {
-      const associatedAnnotations: string[] = [];
-      for (const imageDetails of action.payload.images) {
-        const image = state.images.entities[imageDetails.id];
-        if (!image) {
-          throw new Error(
-            `Error deleting annotations: Annotation with the id of ${imageDetails.id} does not exist.`,
-          );
-        }
-        if (!imageDetails.timePoint) {
-          associatedAnnotations.push(...image.containing);
-
-          Object.values(image.timepoints).forEach((timePoint) => {
-            dispose(timePoint.data as TensorContainer);
-            dispose(timePoint.colors as unknown as TensorContainer);
-          });
-
-          imagesAdapter.removeOne(state.images, imageDetails.id);
-        } else {
-          image.containing.forEach((annotationId) => {
-            const annotation = state.annotations.entities[annotationId]!;
-            if (annotation.timepoint === imageDetails.timePoint) {
-              associatedAnnotations.push(annotationId);
-            }
-          });
-        }
-      }
-      dataSlice.caseReducers.dangerouslyDeleteAnnotations(state, {
-        type: "dangerouslyDeleteAnnotations",
-        payload: { ids: associatedAnnotations },
-      });
+    initializeLoadedState: (state, action: PayloadAction<DataState>) => {
+      const loadedState = action.payload;
+      return loadedState;
     },
   },
 });

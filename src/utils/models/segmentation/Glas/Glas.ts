@@ -4,7 +4,7 @@ import { preprocessGlas } from "./preprocessGlas";
 import { predictGlas } from "./predictGlas";
 import { LoadInferenceDataArgs } from "../../types";
 import { ModelTask } from "../../enums";
-import { Kind, ImageObject } from "store/data/types";
+import { Kind, ImageMetadata } from "store/data/types";
 import { loadGlas } from "./loadGlas";
 import { generateKind } from "store/data/utils";
 
@@ -41,15 +41,18 @@ export class Glas extends Segmenter {
     this._model = await loadGlas();
   }
 
-  public loadTraining(_images: ImageObject[], _preprocessingArgs: any): void {}
+  public loadTraining(
+    _images: ImageMetadata[],
+    _preprocessingArgs: any,
+  ): void {}
 
   public loadValidation(
-    _images: ImageObject[],
+    _images: ImageMetadata[],
     _preprocessingArgs: any,
   ): void {}
 
   public loadInference(
-    images: ImageObject[],
+    images: ImageMetadata[],
     preprocessingArgs: LoadInferenceDataArgs,
   ): void {
     this._inferenceDataDims = images.map((im) => {

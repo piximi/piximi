@@ -17,14 +17,14 @@ import IJSImage, {
   ColorModel as IJSColorModel,
 } from "image-js";
 import { generateUUID } from "store/data/utils";
-import { Partition } from "utils/models/enums";
-import { BitDepth } from "store/data/types";
-import { Colors } from "./types";
-import { ImageObject } from "store/data/types";
 import {
-  DEFAULT_COLORS,
-  UNKNOWN_IMAGE_CATEGORY_ID,
-} from "store/data/constants";
+  BaseExtractedImageData,
+  BitDepth,
+  ImageData,
+  Shape,
+} from "store/data/types";
+import { Colors } from "./types";
+import { DEFAULT_COLORS } from "store/data/constants";
 
 /*
  ========================================
@@ -577,20 +577,18 @@ export async function createRenderedTensor(
   return src;
 }
 
-export const convertToImage = async (
+export const extractImageFileDetails = async (
   imageStack: IJSStack,
   filename: string,
   currentColors: Colors | undefined,
   numSlices: number,
   numChannels: number,
-): Promise<ImageObject> => {
+): Promise<BaseExtractedImageData> => {
   if (!imageStack.length) {
     throw Error("Expected image stack");
   }
 
-  const activePlane = 0;
-
-  const { bitDepth } = imageStack[activePlane];
+  const { bitDepth } = imageStack[0];
 
   // image data := create image of dims: [Z, H, W, C]
   const imageTensor = convertToTensor(imageStack, numSlices, numChannels);
@@ -603,26 +601,19 @@ export const convertToImage = async (
     imageTensor,
     colors,
     bitDepth,
-    activePlane,
+    0,
   );
 
   const [planes, height, width, channels] = imageTensor.shape;
 
   return {
-    kind: "Image",
-    activePlane: activePlane,
-    colors: colors,
-    bitDepth,
-    categoryId: UNKNOWN_IMAGE_CATEGORY_ID,
     id: generateUUID(),
-    name: filename,
+    bitDepth,
     shape: { planes, height, width, channels },
-    containing: [],
+    colors: colors,
     data: imageTensor,
-    partition: Partition.Inference,
     src: coloredSliceURL,
-    visible: true,
-  } as ImageObject;
+  };
 };
 
 /*

@@ -10,7 +10,7 @@ import {
   ModelInfo,
 } from "store/types";
 import { Kind, Shape } from "store/data/types";
-import { DEFAULT_KIND } from "store/data/constants";
+import { IMAGE_KIND } from "store/data/constants";
 import { getSelectedModelInfo } from "./utils";
 import { RecursivePartial } from "utils/types";
 import { recursiveAssign } from "utils/objectUtils";
@@ -18,7 +18,7 @@ import { cloneDeep } from "lodash";
 
 const initialState: ClassifierState = {
   kindClassifiers: {
-    [DEFAULT_KIND]: {
+    [IMAGE_KIND]: {
       modelNameOrArch: 0,
       modelInfoDict: { "base-model": getDefaultModelInfo() },
     },
@@ -44,7 +44,7 @@ export const classifierSlice = createSlice({
     },
     setDefaults(state) {
       state.kindClassifiers = {
-        [DEFAULT_KIND]: {
+        [IMAGE_KIND]: {
           modelNameOrArch: 0,
           modelInfoDict: {
             "base-model": getDefaultModelInfo(),

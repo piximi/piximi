@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectActiveCategories } from "store/project/reselectors";
-import { selectActiveThingFilters } from "store/project/selectors";
+import { selectActiveKindItemFilters } from "store/project/selectors";
 import { useCallback, useMemo } from "react";
 import { projectSlice } from "store/project";
 import { Category } from "store/data/types";
@@ -9,7 +9,7 @@ import { FilterList } from "./FilterList";
 
 export const CategoryFilterList = () => {
   const dispatch = useDispatch();
-  const thingFilters = useSelector(selectActiveThingFilters);
+  const thingFilters = useSelector(selectActiveKindItemFilters);
   const activeCategories = useSelector(selectActiveCategories);
   const filteredCategories = useMemo(
     () => thingFilters.categoryId ?? [],
@@ -23,13 +23,13 @@ export const CategoryFilterList = () => {
         thingFilters.categoryId.includes(category.id)
       ) {
         dispatch(
-          projectSlice.actions.removeThingCategoryFilters({
+          projectSlice.actions.removeKindItemCategoryFilters({
             categoryIds: [category.id],
           }),
         );
       } else {
         dispatch(
-          projectSlice.actions.addThingCategoryFilters({
+          projectSlice.actions.addKindItemCategoryFilters({
             categoryIds: [category.id],
           }),
         );
@@ -42,13 +42,13 @@ export const CategoryFilterList = () => {
     (filtered: boolean) => {
       if (filtered) {
         dispatch(
-          projectSlice.actions.addThingCategoryFilters({
+          projectSlice.actions.addKindItemCategoryFilters({
             categoryIds: activeCategories.map((category) => category.id),
           }),
         );
       } else {
         dispatch(
-          projectSlice.actions.removeThingCategoryFilters({
+          projectSlice.actions.removeKindItemCategoryFilters({
             categoryIds: activeCategories.map((category) => category.id),
           }),
         );

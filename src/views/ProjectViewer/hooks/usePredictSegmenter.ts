@@ -11,14 +11,14 @@ import { AlertState } from "utils/types";
 import { AlertType } from "utils/enums";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { ModelStatus } from "utils/models/enums";
-import { selectAllKinds, selectImageDictionary } from "store/data/selectors";
-import { selectSelectedImages } from "store/project/selectors";
+import { selectAllKinds, selectImageDataEntities } from "store/data/selectors";
 import {
   Category,
   FullTimepointImage,
   Shape,
-  TSAnnotationObject,
-  TSImageObject,
+  AnnotationObject,
+  ImageMetadata,
+  GeneralizedKindItem,
 } from "store/data/types";
 import { intersection } from "lodash";
 import { LoadCB } from "utils/file-io/types";
@@ -34,12 +34,13 @@ import {
   extractAllZPlanes,
   extractChannel,
 } from "store/data/utils";
+import { selectActiveFilteredSelectedImages } from "store/project/reselectors";
 
 export const usePredictSegmenter = () => {
   const dispatch = useDispatch();
   const selectedModel = useSelector(selectSegmenterModel);
-  const projectImages = useSelector(selectImageDictionary);
-  const selectedImages = useSelector(selectSelectedImages);
+  const projectImages = useSelector(selectImageDataEntities);
+  const inferenceImages = useSelector(selectActiveFilteredSelectedImages);
   const fitOptions = useSelector(selectSegmenterInferenceOptions);
   const kinds = useSelector(selectAllKinds);
   const { setModelStatus, selectedChannel } = useSegmenterStatus();
@@ -75,40 +76,6 @@ export const usePredictSegmenter = () => {
   const predictSegmenter = useCallback(async () => {
     if (!selectedModel) return;
 
-    const existingObjects: string[] = [];
-
-    let images = Object.keys(selectedImages).reduce(
-      (infIms: TSImageObject[], id) => {
-        const image = projectImages[id];
-        const containedObjects = image.containing;
-
-        if (intersection(containedObjects, existingObjects).length === 0) {
-          infIms.push(image);
-        }
-        return infIms;
-      },
-      [],
-    );
-    if (images.length === 0) images = Object.values(projectImages);
-
-    if (selectedModel.kind) {
-      const fullKind = kinds.find((kind) => kind.id === selectedModel.kind);
-      if (fullKind && fullKind.containing.length > 0) {
-        existingObjects.push(...fullKind.containing);
-      }
-    }
-
-    const inferenceImages = images.reduce((infIms: TSImageObject[], image) => {
-      if (image && "containing" in image) {
-        const containedObjects = image.containing;
-
-        if (intersection(containedObjects, existingObjects).length === 0) {
-          infIms.push(image);
-        }
-      }
-      return infIms;
-    }, []);
-
     if (inferenceImages.length === 0) {
       await handleError(
         new Error("Inference set is empty"),
@@ -118,25 +85,16 @@ export const usePredictSegmenter = () => {
       return;
     }
 
-    const extractedTimepoints = inferenceImages.reduce(
-      (tpImages: FullTimepointImage[], imageSeries) => {
-        const extractedTimepoints = extractAllTimepoints(imageSeries);
-        tpImages.push(...extractedTimepoints);
-        return tpImages;
-      },
-      [],
-    );
-
-    const extractedPlanes = extractedTimepoints.reduce(
-      (imagePlanes: FullTimepointImage[], timepointImage) => {
-        const extractedPlanes = extractAllZPlanes(timepointImage);
+    const extractedPlanes = inferenceImages.reduce(
+      (imagePlanes: GeneralizedKindItem[], inferenceImage) => {
+        const extractedPlanes = extractAllZPlanes(inferenceImage);
         imagePlanes.push(...extractedPlanes);
         return imagePlanes;
       },
       [],
     );
 
-    let extractedImages: FullTimepointImage[];
+    let extractedImages: GeneralizedKindItem[];
     if (selectedChannel > -1) {
       // dispose when done
       extractedImages = extractedPlanes.map((imagePlane) => {
@@ -220,36 +178,32 @@ export const usePredictSegmenter = () => {
           ...kinds.map((kind) => kind.id),
           ...uniquePredictedKinds,
         ]);
-        dispatch(
-          dataSlice.actions.addKinds({
-            kinds: generatedKinds,
-          }),
-        );
 
-        const newUnknownCategories = generatedKinds.map((kind) => {
-          return {
-            id: kind.unknownCategoryId,
-            name: UNKNOWN_CATEGORY_NAME,
-            color: UNKNOWN_IMAGE_CATEGORY_COLOR,
-            containing: [],
-            kind: kind.id,
-            visible: true,
-          } as Category;
-        });
         dispatch(
-          dataSlice.actions.addCategories({
-            categories: newUnknownCategories,
-          }),
+          dataSlice.actions.batchAddKind(
+            generatedKinds.map((kind) => {
+              return {
+                kind,
+                unknownCategory: {
+                  id: kind.unknownCategoryId,
+                  name: UNKNOWN_CATEGORY_NAME,
+                  color: UNKNOWN_IMAGE_CATEGORY_COLOR,
+                  kind: kind.id,
+                  visible: true,
+                },
+              };
+            }),
+          ),
         );
       }
-      const annotations: TSAnnotationObject[] = [];
+      const annotations: AnnotationObject[] = [];
       for await (const [i, _annotations] of predictedAnnotations.entries()) {
         const image = extractedImages[i];
 
         const imageJsImage = await ImageJS.load(image.src);
 
         for (let j = 0; j < _annotations.length; j++) {
-          const ann = _annotations[j] as Partial<TSAnnotationObject>;
+          const ann = _annotations[j] as Partial<AnnotationObject>;
           const bbox = ann.boundingBox!;
           const width = bbox[2] - bbox[0];
           const height = bbox[3] - bbox[1];
@@ -280,10 +234,10 @@ export const usePredictSegmenter = () => {
           ann.bitDepth = image.bitDepth;
           ann.timepoint = image.timepoint;
           ann.plane = image.activePlane;
-          annotations.push(ann as TSAnnotationObject);
+          annotations.push(ann as AnnotationObject);
         }
       }
-      dispatch(dataSlice.actions.addTSAnnotations({ annotations }));
+      dispatch(dataSlice.actions.batchAddAnnotations(annotations));
     } catch (error) {
       await handleError(
         error as Error,
@@ -300,7 +254,7 @@ export const usePredictSegmenter = () => {
     handleError,
     projectImages,
     selectedModel,
-    selectedImages,
+    inferenceImages,
     fitOptions,
     kinds,
   ]);

@@ -9,91 +9,164 @@ import { RawArray } from "zarr/types/rawArray";
 import { tensor4d } from "@tensorflow/tfjs";
 import { Partition } from "utils/models/enums";
 import { createRenderedTensor, generateBlankColors } from "utils/tensorUtils";
-import {
-  LoadCB,
-  V11AnnotationObject,
-  V11ImageObject,
-} from "utils/file-io/types";
+import { LoadCB } from "utils/file-io/types";
 import { CustomStore } from "utils/file-io/zarr/stores";
-import { ProjectState } from "store/types";
+import { DataState, ProjectState } from "store/types";
 import {
   BitDepth,
-  ImageTimepointData,
-  TSAnnotationObject,
-  TSImageObject,
+  ImageData,
+  AnnotationObject,
+  ImageMetadata,
 } from "store/data/types";
 import { Kind, Category } from "store/data/types";
 import { EntityState } from "@reduxjs/toolkit";
 import { v11_deserializeClassifierGroup } from "../v110/v11_deserializeClassifierGroup";
+import { generateDataRelationships } from "store/data/utils";
 
-const deserializeImageGroup = async (
+const deserializeMetadatumGroup = async (
   name: string,
-  imageGroup: Group,
-): Promise<TSImageObject> => {
-  const id = (await getAttr(imageGroup, "image_id")) as string;
-  const partition = (await getAttr(
-    imageGroup,
-    "classifier_partition",
-  )) as Partition;
-  const kind = (await getAttr(imageGroup, "kind")) as string;
-  const containing = (await getAttr(imageGroup, "contents")) as string[];
-
-  const timepoints = (await getAttr(imageGroup, "timepoints")) as string[];
-
-  const tpProperties: Record<string, ImageTimepointData> = {};
-
-  let bitDepth;
-  let shape;
-
-  for await (const tp of timepoints) {
-    const tpGroup = await getGroup(imageGroup, tp);
-    const categoryId = (await getAttr(tpGroup, "class_category_id")) as string;
-    const activePlane = (await getAttr(tpGroup, "active_plane")) as number;
-    const imageDataset = await getDataset(tpGroup, tp);
-    const imageRawArray = (await imageDataset.getRaw()) as RawArray;
-    const imageData = imageRawArray.data as Float32Array;
-    const [planes, height, width, channels] = imageRawArray.shape;
-    shape = { planes, height, width, channels };
-    const bitDepth = (await getAttr(imageDataset, "bit_depth")) as BitDepth;
-
-    const imageTensor = tensor4d(
-      imageData,
-      [planes, height, width, channels],
-      "float32",
-    );
-    const colorsGroup = await getGroup(tpGroup, "colors");
-    const colors = await deserializeColorsGroup(colorsGroup);
-    const src = await createRenderedTensor(
-      imageTensor,
-      colors,
-      bitDepth,
-      activePlane,
-    );
-
-    tpProperties[tp] = {
-      colors,
-      src,
-      data: imageTensor,
-      categoryId,
-      activePlane,
-    };
-  }
+  metadatumGroup: Group,
+): Promise<ImageMetadata> => {
+  const id = (await getAttr(metadatumGroup, "metadata_id")) as string;
+  const imageDataIds = (await getAttr(
+    metadatumGroup,
+    "image_data_ids",
+  )) as string[];
+  const kind = (await getAttr(metadatumGroup, "kind")) as string;
+  const planes = (await getAttr(metadatumGroup, "planes")) as number;
+  const channels = (await getAttr(metadatumGroup, "channels")) as number;
+  const width = (await getAttr(metadatumGroup, "width")) as number;
+  const height = (await getAttr(metadatumGroup, "height")) as number;
+  const shape = { planes, channels, width, height };
+  const bitDepth = (await getAttr(metadatumGroup, "bit_depth")) as BitDepth;
+  const defaultImageId = (await getAttr(
+    metadatumGroup,
+    "default_image_id",
+  )) as string;
+  const timeSeries = (await getAttr(metadatumGroup, "time_series")) as boolean;
 
   return {
     id,
     name,
     kind,
-    partition,
-    containing,
-    bitDepth: bitDepth!,
-    shape: shape!,
-    timepoints: tpProperties,
+    imageDataIds,
+    bitDepth,
+    shape,
+    defaultImageId,
+    timeSeries,
   };
+};
+const deserializeMetadataGroup = async (
+  metadataGroup: Group,
+  loadCb: LoadCB,
+) => {
+  const metadataNames = (await getAttr(
+    metadataGroup,
+    "metadata_names",
+  )) as string[];
+
+  const metadata: EntityState<ImageMetadata, string> = {
+    ids: [],
+    entities: {},
+  };
+
+  for (const [i, name] of Object.entries(metadataNames)) {
+    // import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+    //   logger(`deserializing image ${+i + 1}/${thingNames.length}`);
+
+    loadCb(
+      +i / (metadataNames.length - 1),
+      `deserializing image ${+i + 1}/${metadataNames.length}`,
+    );
+
+    const metadatumGroup = await getGroup(metadataGroup, name);
+    const metadatum = await deserializeMetadatumGroup(name, metadatumGroup);
+    metadata.ids.push(metadatum.id);
+    metadata.entities[metadatum.id] = metadatum;
+  }
+
+  // final image complete
+  loadCb(1, "");
+
+  return metadata;
+};
+
+const deserializeImageGroup = async (
+  name: string,
+  imageGroup: Group,
+  metadata: Record<string, ImageMetadata>,
+): Promise<ImageData> => {
+  const id = (await getAttr(imageGroup, "image_id")) as string;
+  const partition = (await getAttr(
+    imageGroup,
+    "classifier_partition",
+  )) as Partition;
+  const timepoint = (await getAttr(imageGroup, "timepoint")) as number;
+  const categoryId = (await getAttr(imageGroup, "class_category_id")) as string;
+  const activePlane = (await getAttr(imageGroup, "active_plane")) as number;
+  const metadataId = (await getAttr(imageGroup, "metadata_id")) as string;
+  const imageDataset = await getDataset(imageGroup, name);
+  const imageRawArray = (await imageDataset.getRaw()) as RawArray;
+  const imageData = imageRawArray.data as Float32Array;
+  const { shape, bitDepth } = metadata[metadataId];
+  const data = tensor4d(
+    imageData,
+    [shape.planes, shape.height, shape.width, shape.channels],
+    "float32",
+  );
+  const colorsGroup = await getGroup(imageGroup, "colors");
+  const colors = await deserializeColorsGroup(colorsGroup);
+  const src = await createRenderedTensor(data, colors, bitDepth, activePlane);
+
+  return {
+    id,
+    metadataId,
+    activePlane,
+    name,
+    partition,
+    timepoint,
+    categoryId,
+    colors,
+    src,
+    data,
+  };
+};
+const deserializeImagesGroup = async (
+  imagesGroup: Group,
+  loadCb: LoadCB,
+  metadata: Record<string, ImageMetadata>,
+) => {
+  const imageNames = (await getAttr(imagesGroup, "image_names")) as string[];
+
+  const images: EntityState<ImageData, string> = {
+    ids: [],
+    entities: {},
+  };
+
+  for (const [i, name] of Object.entries(imageNames)) {
+    // import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+    //   logger(`deserializing image ${+i + 1}/${thingNames.length}`);
+
+    loadCb(
+      +i / (imageNames.length - 1),
+      `deserializing image ${+i + 1}/${imageNames.length}`,
+    );
+
+    const imageGroup = await getGroup(imagesGroup, name);
+    const image = await deserializeImageGroup(name, imageGroup, metadata);
+    images.ids.push(image.id);
+    images.entities[image.id] = image;
+  }
+
+  // final image complete
+  loadCb(1, "");
+
+  return images;
 };
 const deserializeAnnotationGroup = async (
   name: string,
   annotationGroup: Group,
-): Promise<TSAnnotationObject> => {
+): Promise<AnnotationObject> => {
   const id = (await getAttr(annotationGroup, "annotation_id")) as string;
   const activePlane = (await getAttr(
     annotationGroup,
@@ -108,7 +181,7 @@ const deserializeAnnotationGroup = async (
     "classifier_partition",
   )) as Partition;
   const kind = (await getAttr(annotationGroup, "kind")) as string;
-  const timepoint = (await getAttr(annotationGroup, "timepoint")) as string;
+  const timepoint = (await getAttr(annotationGroup, "timepoint")) as number;
 
   const imageDataset = await getDataset(annotationGroup, name);
   const imageRawArray = (await imageDataset.getRaw()) as RawArray;
@@ -172,7 +245,7 @@ const deserializeAnnotationsGroup = async (
     "annotation_names",
   )) as string[];
 
-  const annotations: EntityState<TSAnnotationObject, string> = {
+  const annotations: EntityState<AnnotationObject, string> = {
     ids: [],
     entities: {},
   };
@@ -197,34 +270,7 @@ const deserializeAnnotationsGroup = async (
 
   return annotations;
 };
-const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
-  const imageNames = (await getAttr(imagesGroup, "image_names")) as string[];
 
-  const images: EntityState<TSImageObject, string> = {
-    ids: [],
-    entities: {},
-  };
-
-  for (const [i, name] of Object.entries(imageNames)) {
-    // import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-    //   logger(`deserializing image ${+i + 1}/${thingNames.length}`);
-
-    loadCb(
-      +i / (imageNames.length - 1),
-      `deserializing image ${+i + 1}/${imageNames.length}`,
-    );
-
-    const imageGroup = await getGroup(imagesGroup, name);
-    const image = await deserializeImageGroup(name, imageGroup);
-    images.ids.push(image.id);
-    images.entities[image.id] = image;
-  }
-
-  // final image complete
-  loadCb(1, "");
-
-  return images;
-};
 const deserializeCategoriesGroup = async (
   categoriesGroup: Group,
 ): Promise<EntityState<Category, string>> => {
@@ -285,8 +331,6 @@ const deserializeKindsGroup = async (
     kinds.entities[ids[i]] = {
       id: ids[i],
       displayName: displayNames[i],
-      containing: contents[i],
-      categories: categories[i],
       unknownCategoryId: unknownCategoryIds[i],
     };
   }
@@ -299,19 +343,20 @@ const deserializeProjectGroup = async (
   loadCb: LoadCB,
 ): Promise<{
   project: ProjectState;
-  data: {
-    images: EntityState<TSImageObject, string>;
-    annotations: EntityState<TSAnnotationObject, string>;
-    categories: EntityState<Category, string>;
-    kinds: EntityState<Kind, string>;
-  };
+  data: DataState;
 }> => {
   const name = (await getAttr(projectGroup, "name")) as string;
   const imageChannels = (await getAttr(projectGroup, "imageChannels")) as
     | number
     | string;
+  const metadataGroup = await getGroup(projectGroup, "metadata");
+  const metadata = await deserializeMetadataGroup(metadataGroup, loadCb);
   const imagesGroup = await getGroup(projectGroup, "images");
-  const images = await deserializeImagesGroup(imagesGroup, loadCb);
+  const images = await deserializeImagesGroup(
+    imagesGroup,
+    loadCb,
+    metadata.entities,
+  );
   const annotationsGroup = await getGroup(projectGroup, "annotations");
   const annotations = await deserializeAnnotationsGroup(
     annotationsGroup,
@@ -322,17 +367,33 @@ const deserializeProjectGroup = async (
   const categoriesGroup = await getGroup(projectGroup, "categories");
   const categories = await deserializeCategoriesGroup(categoriesGroup);
 
+  const relationships = generateDataRelationships(
+    Object.values(kinds.entities),
+    Object.values(categories.entities),
+    Object.values(images.entities),
+    Object.values(annotations.entities),
+  );
+
   return {
     project: {
       ...initialProjectState,
       name,
       imageChannels: imageChannels === "undefined" ? undefined : +imageChannels,
     },
-    data: { images, annotations, kinds, categories },
+    data: {
+      metadata,
+      images,
+      annotations,
+      kinds,
+      categories,
+      relationships,
+      linkGraph: {},
+      globalAnnotations: {},
+    },
   };
 };
 
-export const v11_deserializeProject = async (
+export const v12_deserializeProject = async (
   fileStore: CustomStore,
   loadCb: LoadCB,
 ) => {

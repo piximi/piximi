@@ -30,7 +30,7 @@ export const PredictionListItems = () => {
   const toggleShowLabeledImages = () => {
     if (labeledImagesVisible) {
       dispatch(
-        projectSlice.actions.addThingPartitionFilters({
+        projectSlice.actions.addKindItemPartitionFilters({
           partitions: [
             Partition.Training,
             Partition.Validation,
@@ -40,7 +40,7 @@ export const PredictionListItems = () => {
       );
     } else {
       dispatch(
-        projectSlice.actions.removeThingPartitionFilters({
+        projectSlice.actions.removeKindItemPartitionFilters({
           partitions: "all",
         }),
       );
@@ -55,7 +55,7 @@ export const PredictionListItems = () => {
       setLabeledImagesVisible(true);
 
       dispatch(
-        projectSlice.actions.removeThingPartitionFilters({
+        projectSlice.actions.removeKindItemPartitionFilters({
           partitions: "all",
         }),
       );
@@ -67,7 +67,7 @@ export const PredictionListItems = () => {
     acceptPredictions();
     setModelStatus(ModelStatus.Idle);
     dispatch(
-      projectSlice.actions.removeThingPartitionFilters({
+      projectSlice.actions.removeKindItemPartitionFilters({
         partitions: "all",
       }),
     );

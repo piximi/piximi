@@ -28,6 +28,7 @@ import { groupBy } from "lodash";
 import { CustomListItemButton, DividerHeader } from "components/ui";
 import { Category } from "store/data/types";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { IMAGE_KIND } from "store/data/constants";
 
 export const SelectionOptions = () => {
   const dispatch = useDispatch();
@@ -41,7 +42,7 @@ export const SelectionOptions = () => {
 
   const groupedCategories = useMemo(() => {
     const objectCategories = annotationCategories.filter(
-      (cat) => cat.kind !== "Image",
+      (cat) => cat.kind !== IMAGE_KIND,
     );
     return Object.entries(groupBy(objectCategories, "kind"));
   }, [annotationCategories]);

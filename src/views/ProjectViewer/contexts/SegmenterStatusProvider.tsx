@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { selectAllImages } from "store/data/selectors";
 import { selectSegmenterModel } from "store/segmenter/selectors";
 import { ModelStatus } from "utils/models/enums";
 import { ErrorContext, SegmenterErrorReason } from "./types";
+import { selectAllImageData } from "store/data/selectors";
 
 const SegmenterStatusContext = createContext<{
   isReady: boolean;
@@ -26,7 +26,7 @@ export const SegmenterStatusProvider = ({
   children: React.ReactNode;
 }) => {
   const selectedModel = useSelector(selectSegmenterModel);
-  const projectImages = useSelector(selectAllImages);
+  const projectImages = useSelector(selectAllImageData);
   const [selectedChannel, setSelectedChannel] = useState<number>(-1);
 
   const [isReady, setIsReady] = useState(true);

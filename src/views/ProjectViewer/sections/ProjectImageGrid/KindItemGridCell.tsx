@@ -1,12 +1,9 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { areEqual, GridChildComponentProps } from "react-window";
 
 import { Box } from "@mui/material";
 
-import { AnnotationDetailContainer } from "./GridItemDetailContainer";
-
-import { selectCategoryProperty } from "store/data/selectors";
+import { selectCategoryEntities } from "store/data/selectors";
 import {
   selectImageSelectionColor,
   selectSelectedImageBorderWidth,
@@ -18,54 +15,15 @@ import { isUnknownCategory } from "store/data/utils";
 
 import { Partition } from "utils/models/enums";
 
-import { TSAnnotationObject } from "store/data/types";
+import { GeneralizedKindItem } from "store/data/types";
+import { areEqual, GridChildComponentProps } from "react-window";
+import { KindItemDetailContainer } from "./KindItemDetailContainer";
 
-type SelectHandler = (id: string, selected: boolean) => void;
-type SelectedAnnotationIds = string[];
 type CellData = {
-  annotations: TSAnnotationObject[];
-  handleSelectAnnotation: SelectHandler;
-  selectedAnnotationIds: SelectedAnnotationIds;
+  items: GeneralizedKindItem[];
+  handleSelectItem: (id: string, selected: boolean) => void;
+  selectedItems: string[];
   numColumns: number;
-};
-
-export const AnnotationGridCell = memo(
-  ({
-    columnIndex,
-    rowIndex,
-    style,
-    isScrolling,
-    data,
-  }: GridChildComponentProps<CellData>) => {
-    const annotationIdx = rowIndex * data.numColumns + columnIndex;
-    // grid is fixed number of rows x number of columns
-    // so there will always be numRows x numCols cells in the grid
-    // unless things.length is exactly numRows x numCols
-    // there will be empty cells in the grid
-    if (annotationIdx >= data.annotations.length) return <></>;
-
-    const annotation = data.annotations[annotationIdx];
-
-    return (
-      <div style={style}>
-        <AnnotationGridItem
-          key={annotation.id}
-          annotation={annotation}
-          handleClick={data.handleSelectAnnotation}
-          selected={data.selectedAnnotationIds.includes(annotation.id)}
-          isScrolling={isScrolling}
-        />
-      </div>
-    );
-  },
-  areEqual,
-);
-
-type AnnotationGridItemProps = {
-  selected: boolean;
-  handleClick: (id: string, selected: boolean) => void;
-  annotation: TSAnnotationObject;
-  isScrolling?: boolean;
 };
 
 const getIconPosition = (
@@ -90,31 +48,70 @@ const printSize = (scale: number) => {
   return (220 * scale).toString() + "px";
 };
 
-const AnnotationGridItem = memo(
+export const KindItemGridCell = memo(
   ({
-    selected,
-    handleClick,
-    annotation,
+    columnIndex,
+    rowIndex,
+    style,
     isScrolling,
-  }: AnnotationGridItemProps) => {
+    data,
+  }: GridChildComponentProps<CellData>) => {
+    const itemIdx = rowIndex * data.numColumns + columnIndex;
+    // grid is fixed number of rows x number of columns
+    // so there will always be numRows x numCols cells in the grid
+    // unless things.length is exactly numRows x numCols
+    // there will be empty cells in the grid
+    if (itemIdx >= data.items.length) return <></>;
+
+    const item = data.items[itemIdx];
+
+    return (
+      <div style={style}>
+        <KindItemGridItem
+          key={item.id}
+          item={item}
+          handleClick={data.handleSelectItem}
+          selected={data.selectedItems.includes(item.id)}
+          isScrolling={isScrolling}
+        />
+      </div>
+    );
+  },
+  areEqual,
+);
+type KindItemGridItem = {
+  selected: boolean;
+  handleClick: (id: string, selected: boolean) => void;
+  item: GeneralizedKindItem;
+  isScrolling?: boolean;
+};
+
+const KindItemGridItem = memo(
+  ({ selected, handleClick, item, isScrolling }: KindItemGridItem) => {
     const imageSelectionColor = useSelector(selectImageSelectionColor);
+    const categoryEntities = useSelector(selectCategoryEntities);
     const selectedImageBorderWidth = useSelector(
       selectSelectedImageBorderWidth,
     );
     const scaleFactor = useSelector(selectTileSize);
     const textOnScroll = useSelector(selectTextOnScroll);
 
-    const getCategoryProperty = useSelector(selectCategoryProperty);
-    const categoryName =
-      getCategoryProperty(annotation.categoryId, "name") ?? "";
-    const categoryColor =
-      getCategoryProperty(annotation.categoryId, "color") ?? "";
+    const categoryName = useMemo(
+      () => categoryEntities[item.categoryId].name ?? "",
+
+      [item, categoryEntities],
+    );
+    const categoryColor = useMemo(
+      () => categoryEntities[item.categoryId].color ?? "",
+
+      [item, categoryEntities],
+    );
 
     const handleSelect = (
       evt: React.MouseEvent<HTMLDivElement, MouseEvent>,
     ) => {
       evt.stopPropagation();
-      handleClick(annotation.id, selected);
+      handleClick(item.id, selected);
     };
 
     return isScrolling ? (
@@ -133,27 +130,27 @@ const AnnotationGridItem = memo(
       >
         {textOnScroll ? (
           <>
-            Name: {annotation.name}
+            Name: {item.name}
             <br />
             <span style={{ color: categoryColor }}>
               Category: {categoryName}
             </span>
             <br />
-            Width: {annotation.shape.width}
+            Width: {item.shape.width}
             <br />
-            Height: {annotation.shape.height}
+            Height: {item.shape.height}
             <br />
-            Channels: {annotation.shape.channels}
+            Channels: {item.shape.channels}
             <br />
-            Planes: {annotation.shape.planes}
+            Planes: {item.shape.planes}
             <br />
-            Partition: {annotation.partition}
+            Partition: {item.partition}
           </>
         ) : (
           <Box
             component="img"
             alt=""
-            src={annotation.src}
+            src={item.src}
             sx={{
               width: "100%",
               height: "100%",
@@ -183,7 +180,7 @@ const AnnotationGridItem = memo(
         <Box
           component="img"
           alt=""
-          src={annotation.src}
+          src={item.src}
           sx={{
             width: "100%",
             height: "100%",
@@ -193,18 +190,18 @@ const AnnotationGridItem = memo(
           }}
           draggable={false}
         />
-        <AnnotationDetailContainer
+        <KindItemDetailContainer
           backgroundColor={categoryColor}
           categoryName={categoryName}
           usePredictedStyle={
-            annotation.partition === Partition.Inference &&
-            !isUnknownCategory(annotation.categoryId)
+            item.partition === Partition.Inference &&
+            !isUnknownCategory(item.categoryId)
           }
-          annotation={annotation}
+          item={item}
           position={getIconPosition(
             scaleFactor,
-            annotation.shape.height,
-            annotation.shape.width,
+            item.shape.height,
+            item.shape.width,
           )}
         />
       </Box>

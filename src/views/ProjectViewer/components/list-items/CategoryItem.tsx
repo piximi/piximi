@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Tooltip } from "@mui/material";
 import {
@@ -9,12 +9,16 @@ import {
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { CountChip } from "components/ui/CountChip";
 
-import { selectNumThingsByCatAndKind } from "store/data/selectors";
+import {
+  selectCategoryToAnnotations,
+  selectCategoryToImages,
+} from "store/data/selectors";
 import { selectActiveKindId } from "store/project/selectors";
 
 import { APPLICATION_COLORS } from "utils/constants";
 
 import { Category } from "store/data/types";
+import { IMAGE_KIND } from "store/data/constants";
 
 type CategoryItemProps = {
   showHK?: boolean;
@@ -40,8 +44,16 @@ export const CategoryItem = ({
 }: CategoryItemProps) => {
   const tipRef = React.useRef(null);
   const [inView, setInView] = React.useState(false);
-  const numThings = useSelector(selectNumThingsByCatAndKind);
   const activeKind = useSelector(selectActiveKindId);
+  const categoryToImages = useSelector(selectCategoryToImages);
+  const categoryToAnnotations = useSelector(selectCategoryToAnnotations);
+
+  const numKindItemsInCategory = useMemo(() => {
+    if (activeKind === IMAGE_KIND) {
+      return categoryToImages[category.id].length;
+    }
+    return categoryToAnnotations[category.id].length;
+  }, [categoryToImages, categoryToAnnotations]);
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     handleOpenCategoryMenu(event, category);
@@ -92,7 +104,7 @@ export const CategoryItem = ({
           onSecondary={handleOpenMenu}
           additionalComponent={
             <CountChip
-              count={numThings(category.id, activeKind)}
+              count={numKindItemsInCategory}
               backgroundColor={APPLICATION_COLORS.highlightColor}
             />
           }

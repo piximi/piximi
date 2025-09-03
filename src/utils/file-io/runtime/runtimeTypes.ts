@@ -134,6 +134,20 @@ export const V02_SerializedAnnotationRType = IOTSType({
   shape: IOTSArray(IOTSNumber),
 });
 
+export const V12_SerializedAnnotationRType = IOTSType({
+  categoryId: IOTSString, // category id, matching id of a SerializedCategory
+  imageId: IOTSString, // image id, matching id of SerializedImage
+  name: IOTSString,
+  id: IOTSString,
+  mask: IOTSString, // e.g. "114 1 66 1 66 2 ..."
+  plane: IOTSNumber,
+  timepoint: IOTSString,
+  boundingBox: IOTSArray(IOTSNumber), // [x1, y1, x2, y2]
+  kind: IOTSString,
+  partition: IOTSString,
+  shape: IOTSArray(IOTSNumber),
+});
+
 export const SerializedFileRType = IOTSType({
   categories: IOTSArray(SerializedCategoryRType),
   annotations: IOTSArray(SerializedAnnotationRType),
@@ -142,6 +156,13 @@ export const SerializedFileRType = IOTSType({
 export const V02_SerializedFileRType = IOTSType({
   categories: IOTSArray(V02_SerializedCategoryRType),
   annotations: IOTSArray(V02_SerializedAnnotationRType),
+  images: IOTSArray(SerializedImageRType),
+  kinds: IOTSArray(SerializedKindRType),
+  version: IOTSString,
+});
+export const V12_SerializedFileRType = IOTSType({
+  categories: IOTSArray(V02_SerializedCategoryRType),
+  annotations: IOTSArray(V12_SerializedAnnotationRType),
   images: IOTSArray(SerializedImageRType),
   kinds: IOTSArray(SerializedKindRType),
   version: IOTSString,

@@ -1,37 +1,36 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { difference, intersection } from "lodash";
+import { difference } from "lodash";
 
 import {
   selectAllKindIds,
-  selectAnnotationsByKind,
-  selectCategoriesDictionary,
-  selectFullTimepointImages,
-  selectKindDictionary,
-  selectThingsDictionary,
+  selectAnnotationEntities,
+  selectKindToCategories,
+  selectCategoryEntities,
+  selectImageDataEntities,
+  selectKindEntities,
+  selectKindToAnnotations,
+  selectMetadataEntities,
+  selectCategoryToAllItems,
 } from "store/data/selectors";
 import {
   selectActiveKindId,
+  selectActiveKindItemFilters,
+  selectAllActiveSelectedKindItemIds,
+  selectExpandedTime,
   selectKindTabFilters,
-  selectSelectedAnnotations,
-  selectSelectedImages,
-  selectSelectedThingIds,
-  selectThingFilters,
 } from "./selectors";
 
-import { isUnknownCategory } from "store/data/utils";
-
-import { Partition } from "utils/models/enums";
-
 import {
-  AnnotationObject,
-  FullTimepointImage,
-  ImageObject,
-  Thing,
-  TSAnnotationObject,
-} from "store/data/types";
-import { CATEGORY_COLORS } from "store/data/constants";
-import { isFiltered } from "utils/arrayUtils";
+  getKindItemsFromAnnotations,
+  getKindItemsFromImages,
+  isUnknownCategory,
+} from "store/data/utils";
 
+import { Category, GeneralizedKindItem, Kind } from "store/data/types";
+import { CATEGORY_COLORS, IMAGE_KIND } from "store/data/constants";
+import { RequireField } from "utils/types";
+
+// Kind Selectors
 export const selectVisibleKinds = createSelector(
   selectKindTabFilters,
   selectAllKindIds,
@@ -42,27 +41,24 @@ export const selectVisibleKinds = createSelector(
 
 export const selectActiveKindObject = createSelector(
   selectActiveKindId,
-  selectKindDictionary,
-  (activeKind, kindDict) => {
-    return kindDict[activeKind]!;
+  selectKindEntities,
+  (activeKind, kindDict): Kind => {
+    return kindDict[activeKind];
   },
 );
 
+// Category Selectors
 export const selectActiveUnknownCategoryId = createSelector(
   selectActiveKindObject,
   (activeKind) => {
-    if (!activeKind) return;
     return activeKind.unknownCategoryId;
   },
 );
 
 export const selectActiveCategories = createSelector(
-  [selectKindDictionary, selectCategoriesDictionary, selectActiveKindId],
-  (kindDict, categoriesDict, kind) => {
-    if (!kindDict[kind]) return [];
-    const categoriesOfKind = kindDict[kind]!.categories;
-
-    return categoriesOfKind.map((catId) => categoriesDict[catId]!);
+  [selectActiveKindId, selectKindToCategories, selectCategoryEntities],
+  (kindId, categoriesByKind, catDict): Category[] => {
+    return categoriesByKind[kindId].map((id) => catDict[id]);
   },
 );
 
@@ -92,208 +88,94 @@ export const selectAvaliableCategoryColors = createSelector(
   },
 );
 
-const selectActiveThingIds = createSelector(selectActiveKindObject, (kind) => {
-  if (!kind) return [];
-  return kind.containing;
-});
-
-export const selectActiveThings = createSelector(
-  [selectActiveThingIds, selectThingsDictionary],
-  (activeThingIds, thingDict) => {
-    return activeThingIds.map((thingId) => thingDict[thingId]!);
-  },
-);
-
-const selectActiveLabeledThingsIds = createSelector(
-  selectActiveKindObject,
-  selectCategoriesDictionary,
-  (activeKind, catDict) => {
-    if (!activeKind) return [];
-    const thingsInKind = activeKind.containing;
-    const unknownCategoryId = activeKind.unknownCategoryId;
-    const unknownThings = catDict[unknownCategoryId]!.containing;
-    return difference(thingsInKind, unknownThings);
-  },
-);
-
-export const selectActiveLabeledThingsCount = createSelector(
-  selectActiveLabeledThingsIds,
-  (activeLabeledThings) => {
-    return activeLabeledThings.length;
-  },
-);
-
-export const selectActiveLabeledThings = createSelector(
-  selectActiveLabeledThingsIds,
-  selectThingsDictionary,
-  (activeLabeledThingIds, thingDict) => {
-    const activeLabeledThings: Array<AnnotationObject | ImageObject> = [];
-    for (const thingId of activeLabeledThingIds) {
-      const thing = thingDict[thingId];
-      thing && activeLabeledThings.push(thing);
+export const selectActiveKindItemRecord = createSelector(
+  [
+    selectActiveKindId,
+    selectExpandedTime,
+    selectMetadataEntities,
+    selectImageDataEntities,
+    selectKindToAnnotations,
+    selectAnnotationEntities,
+  ],
+  (
+    activeKindId,
+    expandedTime,
+    metaDict,
+    imageDict,
+    kindToAnnotations,
+    annotationDict,
+  ): Record<string, GeneralizedKindItem> => {
+    if (activeKindId === IMAGE_KIND) {
+      return getKindItemsFromImages(imageDict, metaDict, expandedTime);
     }
-
-    return activeLabeledThings;
+    const activeAnnotationIds = kindToAnnotations[activeKindId] ?? [];
+    const activeAnnotations = activeAnnotationIds.map(
+      (id) => annotationDict[id],
+    );
+    return getKindItemsFromAnnotations(activeAnnotations);
+  },
+);
+export const selectActiveKindItemArray = createSelector(
+  [selectActiveKindItemRecord],
+  (kindItemRecord): GeneralizedKindItem[] => {
+    return Object.values(kindItemRecord);
   },
 );
 
-export const selectActiveUnlabeledThingsIds = createSelector(
+export const selectActiveUnknownKindItems = createSelector(
   selectActiveKindObject,
-  selectCategoriesDictionary,
-  (activeKind, catDict) => {
-    if (!activeKind) return [];
-    const thingsInKind = activeKind.containing;
-    const unknownCategoryId = activeKind.unknownCategoryId;
-    const unknownThings = catDict[unknownCategoryId]!.containing;
-    return intersection(thingsInKind, unknownThings);
+  selectActiveKindItemRecord,
+  selectCategoryToAllItems,
+  (kindObject, activeKindItemRecord, cat2Items) => {
+    const unknownCategoryId = kindObject.unknownCategoryId;
+    const unknownCatItems = cat2Items[unknownCategoryId];
+    return unknownCatItems.map((itemId) => activeKindItemRecord[itemId]);
   },
 );
 
-export const selectActiveUnlabeledThings = createSelector(
-  selectActiveUnlabeledThingsIds,
-  selectThingsDictionary,
-  (activeUnlabeledThingIds, thingDict) => {
-    const activeLabeledThings: Array<AnnotationObject | ImageObject> = [];
-    for (const thingId of activeUnlabeledThingIds) {
-      const thing = thingDict[thingId];
-      thing && activeLabeledThings.push(thing);
+export const selectActiveFilteredKindItems = createSelector(
+  selectActiveKindItemFilters,
+  selectActiveKindItemArray,
+  (itemFilters, items) => {
+    return items.filter(
+      (item) =>
+        !(
+          itemFilters.categoryId.includes(item.categoryId) ||
+          itemFilters.partition.includes(item.partition)
+        ),
+    );
+  },
+);
+export const selectActiveFilteredSelectedKindItems = createSelector(
+  selectActiveKindItemFilters,
+  selectAllActiveSelectedKindItemIds,
+  selectActiveKindItemArray,
+  (itemFilters, selectedItemsIds, items) => {
+    return items.filter(
+      (item) =>
+        !(
+          itemFilters.categoryId.includes(item.categoryId) ||
+          itemFilters.partition.includes(item.partition)
+        ) && selectedItemsIds.includes(item.id),
+    );
+  },
+);
+
+export const selectActiveFilteredSelectedImages = createSelector(
+  selectActiveFilteredSelectedKindItems,
+  selectActiveFilteredKindItems,
+  (selectedItems, items) => {
+    if (selectedItems.length === 0) {
+      if (items.length === 0) {
+        return [];
+      }
+      return items[0]?.kind === IMAGE_KIND ? items : [];
     }
-
-    return activeLabeledThings;
+    return selectedItems[0]?.kind === IMAGE_KIND ? selectedItems : [];
   },
 );
 
-export const selectActiveSelectedThingIds = createSelector(
-  selectSelectedThingIds,
-  selectActiveThingIds,
-  (selectedIds, activeIds) => {
-    return intersection(activeIds, selectedIds);
-  },
-);
-
-export const selectActiveSelectedThings = createSelector(
-  selectActiveSelectedThingIds,
-  selectThingsDictionary,
-  (activeSelectedThingIds, thingDict) => {
-    const activeSelectedThings = activeSelectedThingIds.reduce(
-      (things: Thing[], thingId) => {
-        const thing = thingDict[thingId];
-        if (thing) {
-          things.push(thing);
-        }
-        return things;
-      },
-      [],
-    );
-
-    return activeSelectedThings;
-  },
-);
-
-export const selectActiveThingsByPartition = createSelector(
-  selectActiveThings,
-  (activeThings) => {
-    const thingsByPartition = activeThings.reduce(
-      (
-        byPartition: Record<Partition, Array<AnnotationObject | ImageObject>>,
-        thing,
-      ) => {
-        switch (thing.partition) {
-          case Partition.Inference:
-            byPartition[Partition.Inference].push(thing);
-            break;
-          case Partition.Training:
-            byPartition[Partition.Training].push(thing);
-            break;
-          case Partition.Unassigned:
-            byPartition[Partition.Unassigned].push(thing);
-            break;
-          case Partition.Validation:
-            byPartition[Partition.Validation].push(thing);
-            break;
-        }
-        return byPartition;
-      },
-      {
-        [Partition.Inference]: [],
-        [Partition.Training]: [],
-        [Partition.Validation]: [],
-        [Partition.Unassigned]: [],
-      },
-    );
-    return thingsByPartition;
-  },
-);
-
-export const selectFilteredGridImages = createSelector(
-  selectFullTimepointImages,
-  selectThingFilters,
-  (fullTimePointImages, filters) => {
-    return fullTimePointImages("0").filter(
-      (image) => !isFiltered(image, filters ?? {}),
-    );
-  },
-);
-
-export const selectSelectedGridImages = createSelector(
-  selectSelectedImages,
-  selectFilteredGridImages,
-  (selectedImages, filteredImages) => {
-    return Object.entries(selectedImages).reduce(
-      (visible: FullTimepointImage[], [id, timepoints]) => {
-        timepoints.forEach((tp) => {
-          const imageIndex = filteredImages.findIndex(
-            (image) => image.id === id && image.timepoint === tp,
-          );
-          if (imageIndex > -1) {
-            visible.push(filteredImages[imageIndex]);
-          }
-        });
-        return visible;
-      },
-      [],
-    );
-  },
-);
-
-export const selectActiveAnnotations = createSelector(
-  selectActiveKindId,
-  selectAnnotationsByKind,
-  (activeKind, annotationsByKind): TSAnnotationObject[] => {
-    const activeAnnotations = annotationsByKind[activeKind];
-    if (!activeAnnotations) return [];
-    return activeAnnotations;
-  },
-);
-
-export const selectFilteredAnnotationsByKind = createSelector(
-  selectAnnotationsByKind,
-  selectThingFilters,
-  (annotationsByKind, filters) =>
-    (kind: string): TSAnnotationObject[] => {
-      const activeAnnotations = annotationsByKind[kind] ?? [];
-      return activeAnnotations.filter(
-        (image) => !isFiltered(image, filters ?? {}),
-      );
-    },
-);
-
-export const selectActiveFilteredGridAnnotations = createSelector(
-  selectActiveAnnotations,
-  selectThingFilters,
-  (activeAnnotations, filters): TSAnnotationObject[] => {
-    return activeAnnotations.filter(
-      (image) => !isFiltered(image, filters ?? {}),
-    );
-  },
-);
-
-export const selectActiveSelectedGridAnnotations = createSelector(
-  selectSelectedAnnotations,
-  selectActiveFilteredGridAnnotations,
-  (selectedAnnotations, filteredAnnotations) => {
-    return filteredAnnotations.filter((ann) =>
-      selectedAnnotations.includes(ann.id),
-    );
-  },
+export const selectActiveFilteresSelectedKindItemIds = createSelector(
+  selectActiveFilteredSelectedKindItems,
+  (items) => items.map((item) => item.id),
 );

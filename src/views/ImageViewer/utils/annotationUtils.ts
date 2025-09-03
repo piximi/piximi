@@ -1,4 +1,3 @@
-import { DataArray, TSAnnotationObject } from "store/data/types";
 import IJSImage from "image-js";
 import { getPropertiesFromImage } from "store/data/utils";
 import { convertToDataArray } from "utils/dataUtils";
@@ -6,9 +5,10 @@ import {
   AnnotationObject,
   Category,
   DecodedAnnotationObject,
-  ImageObject,
+  ImageMetadata,
   Kind,
   PartialDecodedAnnotationObject,
+  DataArray,
 } from "store/data/types";
 import { encode, encodeAnnotation } from "./rle";
 import { AnnotationMode } from "./enums";
@@ -49,7 +49,7 @@ export const isInBoundingBox = (
 
 export const createProtoAnnotation = (
   partialAnnotation: Omit<PartialDecodedAnnotationObject, "id">,
-  activeImage: ImageObject,
+  activeImage: ImageMetadata,
   kindObject: Kind,
   existingNames: string[],
 ): ProtoAnnotationObject => {
@@ -84,7 +84,7 @@ export const createProtoAnnotation = (
 
 export const createAnnotation = async (
   partialAnnotation: Omit<PartialDecodedAnnotationObject, "id">,
-  activeImage: ImageObject,
+  activeImage: ImageMetadata,
   kindObject: Kind,
   existingNames: string[],
 ) => {
@@ -125,7 +125,7 @@ export const editProtoAnnotation = async (
   workingAnnotation: ProtoAnnotationObject,
   annotationMode: AnnotationMode,
   annotationTool: AnnotationTool,
-  activeImage: ImageObject,
+  activeImage: ImageMetadata,
 ): Promise<ProtoAnnotationObject> => {
   let combinedMask, combinedBoundingBox;
 
@@ -174,7 +174,7 @@ export const editAnnotation = async (
   workingAnnotation: DecodedAnnotationObject,
   annotationMode: AnnotationMode,
   annotationTool: AnnotationTool,
-  activeImage: ImageObject,
+  activeImage: ImageMetadata,
 ): Promise<AnnotationObject | DecodedAnnotationObject> => {
   let combinedMask, combinedBoundingBox;
 
@@ -397,11 +397,11 @@ const reconcileThings = async (
     string,
     { added: string[]; deleted: string[] }
   > = {};
-  const newAnnotations: Array<AnnotationObject | TSAnnotationObject> = [];
+  const newAnnotations: Array<AnnotationObject | AnnotationObject> = [];
   if (Object.keys(thingChanges.added).length > 0) {
     for await (const thing of Object.values(thingChanges.added)) {
       const imageId = thing.imageId;
-      const image = dataState.things.entities[imageId]! as ImageObject;
+      const image = dataState.things.entities[imageId]! as ImageMetadata;
       const annotationData = await getPropertiesFromImage(image, thing);
       const encodedMask = encode(thing.decodedMask);
       newAnnotations.push({ ...thing, ...annotationData, encodedMask });
@@ -426,7 +426,7 @@ const reconcileThings = async (
         if (!imageId) {
           imageId = thingChanges.added[id].imageId;
         }
-        const image = dataState.things.entities[imageId]! as ImageObject;
+        const image = dataState.things.entities[imageId]! as ImageMetadata;
         if (!image) {
           throw new Error("Image not found");
         }
@@ -474,7 +474,7 @@ const reconcileImages = (
   >,
 ) => {
   const imageChanges = Object.entries(thingChangesPerImage).map((entry) => {
-    const image = dataState.things.entities[entry[0]]! as ImageObject;
+    const image = dataState.things.entities[entry[0]]! as ImageMetadata;
     let updatedthings = [...image.containing];
     updatedthings.push(...entry[1].added);
     updatedthings = difference(updatedthings, entry[1].deleted);
@@ -534,24 +534,27 @@ export const reconcileChanges = async (
       );
     if (newAnnotations)
       productionStore.dispatch(
-        dataSlice.actions.addTSAnnotations_unsafe({
-          annotations: newAnnotations as TSAnnotationObject[],
+        dataSlice.actions.dangerouslyAddTSAnnotations({
+          annotations: newAnnotations as AnnotationObject[],
         }),
       );
     if (updatedAnnotations)
       productionStore.dispatch(
-        dataSlice.actions.updateThings_unsafe({ updates: updatedAnnotations }),
+        dataSlice.actions.dangerouslyUpdateTSAnnotations({
+          updates: updatedAnnotations,
+        }),
       );
     if (deletedAnnotations)
       productionStore.dispatch(
-        dataSlice.actions.deleteThings_unsafe({
-          thingIds: deletedAnnotations,
-          disposeColorTensors: true,
+        dataSlice.actions.dangerouslyDeleteAnnotations({
+          ids: deletedAnnotations,
         }),
       );
     if (imageChanges)
       productionStore.dispatch(
-        dataSlice.actions.updateImageContents_unsafe({ updates: imageChanges }),
+        dataSlice.actions.dangerouslyUpdateImageContents({
+          updates: imageChanges,
+        }),
       );
     productionStore.dispatch(annotatorSlice.actions.resetChanges());
     productionStore.dispatch(

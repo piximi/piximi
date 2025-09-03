@@ -12,10 +12,10 @@ import {
 import { measurementsSlice } from "store/measurements";
 import { selectMeasurementData } from "store/measurements/selectors";
 import {
-  selectCategoriesByKind,
-  selectCategoriesDictionary,
-  selectKindDictionary,
-  selectThingsDictionary,
+  selectKindToCategories,
+  selectCategoryEntities,
+  selectKindEntities,
+  // selectThingsDictionary,
 } from "store/data/selectors";
 
 import { HotkeyContext } from "utils/enums";
@@ -94,7 +94,7 @@ export const usePlotControl = () => {
 export const useTableExport = () => {
   const measurementData = useSelector(selectMeasurementData);
   const thingDetails = useSelector(selectThingsDictionary);
-  const categories = useSelector(selectCategoriesDictionary);
+  const categories = useSelector(selectCategoryEntities);
 
   const handleExportTable = useCallback(
     (table: MeasurementGroup) => {
@@ -132,7 +132,7 @@ export const useTableExport = () => {
 
 export const useCreateMeasurementTable = () => {
   const categoriesByKind = useSelector(selectCategoriesByKind);
-  const kinds = useSelector(selectKindDictionary);
+  const kinds = useSelector(selectKindEntities);
   const thingData = useSelector(selectThingsDictionary);
   const dispatch = useDispatch();
   const [status, setStatus] = useState<LoadStatus>({ loading: false });

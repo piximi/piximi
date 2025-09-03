@@ -21,6 +21,7 @@ import { ProjectState } from "store/types";
 import { Kind, Category } from "store/data/types";
 import { EntityState } from "@reduxjs/toolkit";
 import { v01_deserializeClassifierGroup } from "../v01/v01_deserializeClassifierGroup";
+import { IMAGE_KIND } from "store/data/constants";
 
 const deserializeThingGroup = async (
   name: string,
@@ -68,7 +69,7 @@ const deserializeThingGroup = async (
     },
   };
 
-  if (kind === "Image") {
+  if (kind === IMAGE_KIND) {
     const colorsGroup = await getGroup(thingGroup, "colors");
     const colors = await deserializeColorsGroup(colorsGroup);
     const src = await createRenderedTensor(

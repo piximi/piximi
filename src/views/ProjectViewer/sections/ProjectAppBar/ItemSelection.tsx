@@ -10,41 +10,30 @@ import { TooltipButton, TooltipTitle } from "components/ui/tooltips";
 import { useDialogHotkey, useHotkeys } from "hooks";
 import { HotkeyContext } from "utils/enums";
 import { useDispatch, useSelector } from "react-redux";
-import { dataSlice } from "store/data";
 import { ConfirmationDialog } from "components/dialogs";
 import { pluralize } from "utils/stringUtils";
 import { selectActiveKindId } from "store/project/selectors";
 import {
-  selectActiveFilteredGridAnnotations,
-  selectActiveSelectedGridAnnotations,
-  selectFilteredGridImages,
-  selectSelectedGridImages,
+  selectActiveFilteredKindItems,
+  selectActiveFilteresSelectedKindItemIds,
 } from "store/project/reselectors";
 import { projectSlice } from "store/project";
+import { useKindOperations } from "contexts/KindItemsProvider";
+import { IMAGE_KIND } from "store/data/constants";
 
 export const ItemSelection = () => {
   const dispatch = useDispatch();
   const activeKind = useSelector(selectActiveKindId);
-  const filteredAnnotations = useSelector(selectActiveFilteredGridAnnotations);
-  const activeSelectedAnnotations = useSelector(
-    selectActiveSelectedGridAnnotations,
-  );
-  const filteredImages = useSelector(selectFilteredGridImages);
-  const selectedImages = useSelector(selectSelectedGridImages);
-
-  const selectedItems = useMemo(() => {
-    return activeKind === "Image" ? selectedImages : activeSelectedAnnotations;
-  }, [activeKind, selectedImages, activeSelectedAnnotations]);
-
-  const filteredItems = useMemo(() => {
-    return activeKind === "Image" ? filteredImages : filteredAnnotations;
-  }, [activeKind, filteredImages, filteredAnnotations]);
+  const filteredItems = useSelector(selectActiveFilteredKindItems);
+  const selectedItemIds = useSelector(selectActiveFilteresSelectedKindItemIds);
+  const { deleteSelectedItems } = useKindOperations();
 
   const allSelected = useMemo(() => {
     return (
-      selectedItems.length > 0 && selectedItems.length === filteredItems.length
+      selectedItemIds.length > 0 &&
+      selectedItemIds.length === filteredItems.length
     );
-  }, [filteredItems, selectedItems]);
+  }, [filteredItems, selectedItemIds]);
 
   const {
     onClose: handleCloseDeleteImagesDialog,
@@ -53,57 +42,38 @@ export const ItemSelection = () => {
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const handleSelectAll = () => {
-    if (activeKind === "Image") {
-      dispatch(
-        projectSlice.actions.selectImages({
-          selection: filteredImages.map((image) => ({
-            id: image.id,
-            timepoint: image.timepoint,
-          })),
-        }),
-      );
-    } else {
-      dispatch(
-        projectSlice.actions.selectAnnotations({
-          ids: filteredAnnotations.map((ann) => ann.id),
-        }),
-      );
-    }
+    dispatch(
+      projectSlice.actions.selectKindItems(
+        filteredItems.map((item) => item.id),
+      ),
+    );
   };
   const handleDeselectAll = () => {
-    if (activeKind === "Image") {
-      dispatch(projectSlice.actions.resetImageSelection());
-    } else {
-      dispatch(projectSlice.actions.resetAnnotationSelection());
-    }
+    dispatch(
+      projectSlice.actions.deselectKindItems(
+        filteredItems.map((item) => item.id),
+      ),
+    );
   };
   const handleDeleteSelected = () => {
-    if (activeKind === "Image") {
-      dispatch(dataSlice.actions.deleteImages({ images: selectedItems }));
-    } else {
-      dispatch(
-        dataSlice.actions.deleteAnnotations({
-          ids: selectedItems.map((item) => item.id),
-        }),
-      );
-    }
+    deleteSelectedItems(selectedItemIds);
   };
 
   useHotkeys(
     "esc",
     () => {
-      selectedItems.length > 0 && handleDeselectAll();
+      selectedItemIds.length > 0 && handleDeselectAll();
     },
     HotkeyContext.ProjectView,
-    [handleDeselectAll, selectedItems],
+    [handleDeselectAll, selectedItemIds],
   );
   useHotkeys(
     "delete, backspace",
     () => {
-      selectedItems.length > 0 && onOpenDeleteImagesDialog();
+      selectedItemIds.length > 0 && onOpenDeleteImagesDialog();
     },
     HotkeyContext.ProjectView,
-    [selectedItems],
+    [selectedItemIds],
   );
   useHotkeys(
     "control+a",
@@ -121,7 +91,7 @@ export const ItemSelection = () => {
         icon={true}
       >
         <Badge
-          badgeContent={selectedItems.length}
+          badgeContent={selectedItemIds.length}
           color="primary"
           sx={(theme) => ({
             "& .MuiBadge-badge": {
@@ -140,7 +110,7 @@ export const ItemSelection = () => {
         tooltipTitle={TooltipTitle(`Deselect`, "esc")}
         color="inherit"
         onClick={handleDeselectAll}
-        disabled={selectedItems.length === 0}
+        disabled={selectedItemIds.length === 0}
         icon={true}
       >
         <DeselectIcon />
@@ -149,16 +119,16 @@ export const ItemSelection = () => {
       <TooltipButton
         tooltipTitle={TooltipTitle(`Delete selected`, "delete")}
         color="inherit"
-        disabled={selectedItems.length === 0}
+        disabled={selectedItemIds.length === 0}
         onClick={onOpenDeleteImagesDialog}
         icon={true}
       >
         <DeleteIcon />
       </TooltipButton>
       <ConfirmationDialog
-        title={`Delete ${pluralize("Object", selectedItems.length)}?`}
+        title={`Delete ${pluralize("Object", selectedItemIds.length)}?`}
         content={`Objects will be deleted from the project. ${
-          activeKind === "Image"
+          activeKind === IMAGE_KIND
             ? "Associated annotations will also be removed."
             : ""
         } `}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { selectCategoriesDictionary } from "store/data/selectors";
+import { selectCategoryEntities } from "store/data/selectors";
 import { selectSortType } from "store/project/selectors";
 
 import { GridSortKey } from "utils/enums";
@@ -45,7 +45,7 @@ export const useSortFunction = () => {
   const [previousSortType, setPreviousSortType] = useState<GridSortKey>(
     GridSortKey.None,
   );
-  const categories = useSelector(selectCategoriesDictionary);
+  const categories = useSelector(selectCategoryEntities);
   const theSortFunction = function (_a: FilteredObject, _b: FilteredObject) {
     return 0;
   };

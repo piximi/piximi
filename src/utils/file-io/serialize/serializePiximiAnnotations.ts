@@ -1,13 +1,13 @@
 import {
   Kind,
-  AnnotationObject,
   Category,
-  ImageObject,
+  ImageMetadata,
+  AnnotationObject,
 } from "store/data/types";
-import { V02_SerializedAnnotationType } from "../types";
+import { V12_SerializedAnnotationType } from "../types";
 
 export const serializePiximiAnnotations = (
-  images: Array<ImageObject>,
+  images: Array<ImageMetadata>,
   annotations: Array<AnnotationObject>,
   categories: Array<Category>,
   kinds: Array<Kind>,
@@ -37,7 +37,7 @@ export const serializePiximiAnnotations = (
     unknownCategoryId: kind.unknownCategoryId,
   }));
 
-  const serializedAnnotations: Array<V02_SerializedAnnotationType> = [];
+  const serializedAnnotations: Array<V12_SerializedAnnotationType> = [];
 
   for (const ann of annotations) {
     serializedAnnotations.push({
@@ -46,7 +46,8 @@ export const serializePiximiAnnotations = (
       id: ann.id,
       name: ann.name,
       mask: ann.encodedMask.join(" "),
-      activePlane: ann.activePlane,
+      plane: ann.plane,
+      timepoint: ann.timepoint,
       boundingBox: ann.boundingBox,
       partition: ann.partition,
       kind: ann.kind,

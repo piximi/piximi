@@ -2,7 +2,6 @@ import {
   AnnotationObject,
   DecodedAnnotationObject,
   DecodedTSAnnotationObject,
-  TSAnnotationObject,
 } from "store/data/types";
 
 /**
@@ -27,7 +26,7 @@ export const decode = (encoded: Array<number>): Uint8ClampedArray => {
 };
 
 export const decodeAnnotation = (
-  encodedAnnotation: AnnotationObject | TSAnnotationObject,
+  encodedAnnotation: AnnotationObject | AnnotationObject,
 ): DecodedAnnotationObject | DecodedTSAnnotationObject => {
   if (encodedAnnotation.decodedMask)
     return encodedAnnotation as DecodedAnnotationObject;

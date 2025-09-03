@@ -165,7 +165,7 @@ export const ExampleProjectCard = ({
         // loadPercent will be set to 1 here
         dispatch(projectSlice.actions.resetProject());
         classifierHandler.addModels(loadedClassifiers);
-        dispatch(dataSlice.actions.initializeState({ data }));
+        dispatch(dataSlice.actions.initializeLoadedState(data));
         dispatch(classifierSlice.actions.setDefaults());
         dispatch(
           classifierSlice.actions.setClassifier({

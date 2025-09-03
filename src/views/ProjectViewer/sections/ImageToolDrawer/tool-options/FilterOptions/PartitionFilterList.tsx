@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectActiveThingFilters } from "store/project/selectors";
+import { selectActiveKindItemFilters } from "store/project/selectors";
 
 import { Partition } from "utils/models/enums";
 import { projectSlice } from "store/project";
@@ -9,7 +9,7 @@ import { FilterList } from "./FilterList";
 
 export const PartitionFilterList = () => {
   const dispatch = useDispatch();
-  const thingFilters = useSelector(selectActiveThingFilters);
+  const thingFilters = useSelector(selectActiveKindItemFilters);
 
   const filteredPartitions = useMemo(
     () => thingFilters.partition ?? [],
@@ -23,13 +23,13 @@ export const PartitionFilterList = () => {
         thingFilters.partition.includes(partition)
       ) {
         dispatch(
-          projectSlice.actions.removeThingPartitionFilters({
+          projectSlice.actions.removeKindItemPartitionFilters({
             partitions: [partition],
           }),
         );
       } else {
         dispatch(
-          projectSlice.actions.addThingPartitionFilters({
+          projectSlice.actions.addKindItemPartitionFilters({
             partitions: [partition],
           }),
         );
@@ -41,13 +41,13 @@ export const PartitionFilterList = () => {
     (filtered: boolean) => {
       if (filtered) {
         dispatch(
-          projectSlice.actions.addThingPartitionFilters({
+          projectSlice.actions.addKindItemPartitionFilters({
             partitions: "all",
           }),
         );
       } else {
         dispatch(
-          projectSlice.actions.removeThingPartitionFilters({
+          projectSlice.actions.removeKindItemPartitionFilters({
             partitions: "all",
           }),
         );

@@ -9,7 +9,7 @@ import {
 } from "store/classifier/reselectors";
 import {
   selectActiveKnownCategories,
-  selectActiveUnlabeledThings,
+  selectActiveUnknownKindItems,
 } from "store/project/reselectors";
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
@@ -21,10 +21,11 @@ import { AlertState } from "utils/types";
 import { useClassMapDialog } from "./useClassMapDialog";
 import { classifierSlice } from "store/classifier";
 import { selectActiveKindId } from "store/project/selectors";
+import { IMAGE_KIND } from "store/data/constants";
 
 export const usePredictClassifier = () => {
   const dispatch = useDispatch();
-  const activeUnlabeledData = useSelector(selectActiveUnlabeledThings);
+  const activeUnknownKindItems = useSelector(selectActiveUnknownKindItems);
   const modelInfo = useSelector(selectClassifierModelInfo);
   const activeCategories = useSelector(selectActiveKnownCategories);
   const activeKindId = useSelector(selectActiveKindId);
@@ -88,11 +89,11 @@ export const usePredictClassifier = () => {
     setModelStatus(ModelStatus.Predicting);
 
     try {
-      selectedModel.loadInference(activeUnlabeledData, []);
+      selectedModel.loadInference(activeUnknownKindItems, []);
     } catch (error) {
       handleError(error as Error, "Data Preparation Error");
     }
-    const thingIds = activeUnlabeledData.map((thing) => thing.id);
+    const kindItemIds = activeUnknownKindItems.map((thing) => thing.id);
     let results: { categoryIds: string[]; probabilities: number[] } = {
       categoryIds: [],
       probabilities: [],
@@ -109,22 +110,36 @@ export const usePredictClassifier = () => {
       handleError(error as Error, "Error during prediction");
     }
     const dataCatProbs: Record<string, number> = {};
-    if (thingIds.length === results.categoryIds.length) {
-      dispatch(
-        dataSlice.actions.updateThings({
-          updates: thingIds.map((thingId, idx) => {
-            dataCatProbs[thingId] = results.probabilities[idx];
-            return {
-              id: thingId,
-              categoryId: results.categoryIds[idx],
-            };
-          }),
-        }),
-      );
+    if (kindItemIds.length === results.categoryIds.length) {
+      if (activeKindId === IMAGE_KIND) {
+        dispatch(
+          dataSlice.actions.batchUpdateImageData(
+            kindItemIds.map((thingId, idx) => {
+              dataCatProbs[thingId] = results.probabilities[idx];
+              return {
+                id: thingId,
+                changes: { categoryId: results.categoryIds[idx] },
+              };
+            }),
+          ),
+        );
+      } else {
+        dispatch(
+          dataSlice.actions.batchUpdateAnnotation(
+            kindItemIds.map((thingId, idx) => {
+              dataCatProbs[thingId] = results.probabilities[idx];
+              return {
+                id: thingId,
+                changes: { categoryId: results.categoryIds[idx] },
+              };
+            }),
+          ),
+        );
+      }
     }
     setPredictedProbabilities(dataCatProbs);
     setModelStatus(ModelStatus.Pending);
-  }, [dispatch, handleError, activeUnlabeledData, modelInfo, selectedModel]);
+  }, [dispatch, handleError, activeUnknownKindItems, modelInfo, selectedModel]);
 
   return predictClassifier;
 };

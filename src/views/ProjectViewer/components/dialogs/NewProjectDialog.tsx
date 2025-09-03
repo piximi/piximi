@@ -36,7 +36,7 @@ export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
         name: projectName,
       }),
     );
-    dispatch(dataSlice.actions.resetData());
+    dispatch(dataSlice.actions.clearAll());
   };
 
   const onChangeClassifierName = (event: ChangeEvent<HTMLInputElement>) => {

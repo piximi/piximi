@@ -12,7 +12,7 @@ import {
 
 import {
   selectActiveKnownCategories,
-  selectActiveThings,
+  selectActiveKindItemArray,
 } from "store/project/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
 
@@ -25,7 +25,7 @@ import classifierHandler from "utils/models/classification/classifierHandler";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/enums";
 import { SequentialClassifier } from "utils/models/classification";
-import { Thing, Kind, Category } from "store/data/types";
+import { Kind, Category, GeneralizedKindItem } from "store/data/types";
 import { AlertState } from "utils/types";
 import { ModelClassMap, ModelInfo } from "store/types";
 import { useClassMapDialog } from "./useClassMapDialog";
@@ -38,7 +38,7 @@ import {
 
 export const useFitClassifier = () => {
   const dispatch = useDispatch();
-  const activeData = useSelector(selectActiveThings);
+  const activeData = useSelector(selectActiveKindItemArray);
   const modelInfo = useSelector(selectClassifierModelInfo);
   const activeKindId = useSelector(selectActiveKindId);
   const knownCategories = useSelector(selectActiveKnownCategories);
@@ -168,12 +168,12 @@ export const useFitClassifier = () => {
     setModelStatus(ModelStatus.Loading);
 
     let partitionedData: {
-      unlabeledThings: Thing[];
-      labeledUnassigned: Thing[];
-      labeledTraining: Thing[];
-      labeledValidation: Thing[];
-      splitLabeledTraining: Thing[];
-      splitLabeledValidation: Thing[];
+      unlabeledThings: GeneralizedKindItem[];
+      labeledUnassigned: GeneralizedKindItem[];
+      labeledTraining: GeneralizedKindItem[];
+      labeledValidation: GeneralizedKindItem[];
+      splitLabeledTraining: GeneralizedKindItem[];
+      splitLabeledValidation: GeneralizedKindItem[];
     };
     let categoryInfo: { categories: Category[]; numClasses: number };
     try {

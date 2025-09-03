@@ -10,6 +10,8 @@ import {
   SerializedFileRType,
   V02_SerializedFileRType,
   SerializedImageRType,
+  V12_SerializedAnnotationRType,
+  V12_SerializedFileRType,
 } from "./runtime/runtimeTypes";
 import { MIMETYPES } from "./enums";
 import { ImageShapeEnum } from "./enums";
@@ -21,13 +23,11 @@ import {
   Partition,
 } from "utils/models/enums";
 import {
-  TSAnnotationObject,
   BitDepth,
   Category,
-  TSImageObject,
+  ImageMetadata,
   Kind,
   Shape,
-  ImageObject,
   AnnotationObject,
 } from "store/data/types";
 import {
@@ -38,8 +38,19 @@ import {
 } from "utils/models/types";
 import { Colors, PartialBy } from "utils/types";
 import { Tensor4D } from "@tensorflow/tfjs";
-import { ClassifierState, ProjectState, SegmenterState } from "store/types";
+import {
+  ClassifierState,
+  DataState,
+  ProjectState,
+  SegmenterState,
+} from "store/types";
 import { EntityState } from "@reduxjs/toolkit";
+
+export type ImageShapeInfoImage = ImageFileShapeInfo & {
+  fileName: string;
+  image?: IJSStack;
+  error?: string;
+};
 
 export type SerializedCOCOAnnotationType = IOTSTypeOf<
   typeof SerializedCOCOAnnotationRType
@@ -60,12 +71,17 @@ export type SerializedCOCOFileType = IOTSTypeOf<typeof SerializedCOCOFileRType>;
 
 export type SerializedFileType = IOTSTypeOf<typeof SerializedFileRType>;
 export type SerializedFileTypeV02 = IOTSTypeOf<typeof V02_SerializedFileRType>;
+export type SerializedFileTypeV12 = IOTSTypeOf<typeof V12_SerializedFileRType>;
 export type SerializedAnnotationType = IOTSTypeOf<
   typeof SerializedAnnotationRType
 >;
 
 export type V02_SerializedAnnotationType = IOTSTypeOf<
   typeof V02_SerializedAnnotationRType
+>;
+
+export type V12_SerializedAnnotationType = IOTSTypeOf<
+  typeof V12_SerializedAnnotationRType
 >;
 
 export type ImageFileType = {
@@ -146,7 +162,7 @@ export type V01_ImageObject = {
   kind?: string;
   containing?: string[]; // The URI to be displayed on the canvas
 };
-export type V01_Category = PartialBy<Category, "containing" | "kind">;
+export type V01_Category = PartialBy<Category, "kind">;
 
 export type V01_AnnotationObject = {
   id: string;
@@ -173,6 +189,10 @@ export type V02AnnotationObject = Required<
   activePlane: number;
 };
 
+export type V12AnnotationObject = Omit<V02AnnotationObject, "activePlane"> & {
+  timepoint: string;
+};
+
 export type V02ImageObject = Required<V01_ImageObject>;
 
 export type V02Project = {
@@ -188,14 +208,16 @@ export type V02Project = {
 
 export type V11ImageObject = V02ImageObject;
 export type V11AnnotationObject = V02AnnotationObject;
+export type V11Category = Category & { containing: string[] };
+export type V11Kind = Kind & { containing: string[]; categories: string[] };
 
 export type V11Project = {
   project: ProjectState;
   classifier: ClassifierState;
   data: {
     things: EntityState<V11ImageObject | V11AnnotationObject, string>;
-    categories: EntityState<Category, string>;
-    kinds: EntityState<Kind, string>;
+    categories: EntityState<V11Category, string>;
+    kinds: EntityState<V11Kind, string>;
   };
   segmenter: SegmenterState;
 };
@@ -203,12 +225,6 @@ export type V11Project = {
 export type CurrentProject = {
   project: ProjectState;
   classifier: ClassifierState;
-  data: {
-    things: EntityState<ImageObject | AnnotationObject, string>;
-    images: EntityState<TSImageObject, string>;
-    annotations: EntityState<TSAnnotationObject, string>;
-    categories: EntityState<Category, string>;
-    kinds: EntityState<Kind, string>;
-  };
+  data: DataState;
   segmenter: SegmenterState;
 };

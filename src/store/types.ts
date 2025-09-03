@@ -19,12 +19,11 @@ import {
   Kind,
   AnnotationObject,
   Category,
-  ImageObject,
-  Thing,
-  TSImageObject,
-  TSAnnotationObject,
+  ImageMetadata,
   LinkNode,
   GlobalAnnotation,
+  GeneralizedKindItem,
+  ImageData,
 } from "./data/types";
 import { MeasurementsState } from "./measurements/types";
 import {
@@ -54,9 +53,18 @@ export type AppSettingsState = {
 export type DataState = {
   kinds: EntityState<Kind, string>;
   categories: EntityState<Category, string>;
-  things: EntityState<AnnotationObject | ImageObject, string>;
-  images: EntityState<TSImageObject, string>;
-  annotations: EntityState<TSAnnotationObject, string>;
+  metadata: EntityState<ImageMetadata, string>;
+  images: EntityState<ImageData, string>;
+  annotations: EntityState<AnnotationObject, string>;
+
+  relationships: {
+    kindToCategories: Record<string, string[]>;
+    kindToAnnotations: Record<string, string[]>;
+    categoryToAnnotations: Record<string, string[]>;
+    categoryToImages: Record<string, string[]>;
+    imageToAnnotations: Record<string, string[]>;
+  };
+
   linkGraph: Record<string, LinkNode>;
   globalAnnotations: Record<string, GlobalAnnotation>;
 };
@@ -89,16 +97,16 @@ export type ClassifierState = {
 
 export type ProjectState = {
   name: string;
-
-  selectedThingIds: Array<string>;
+  expandedTime: boolean;
+  selectedKindItems: Record<string, Array<string>>;
   selectedImages: Record<string, Array<string>>;
-  selectedAnnotations: Array<string>;
+  selectedAnnotations: Record<string, Array<string>>;
   sortType: GridSortKey;
-  thingFilters: Record<
+  kindItemFilters: Record<
     string, // kind
-    Required<Pick<FilterType<Thing>, "categoryId" | "partition">>
+    Required<Pick<FilterType<GeneralizedKindItem>, "categoryId" | "partition">>
   >;
-  highlightedCategory: string | undefined;
+  activeCtegory: string | undefined;
   activeKind: string;
   kindTabFilters: string[];
   imageChannels: number | undefined;

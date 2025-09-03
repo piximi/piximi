@@ -1,5 +1,6 @@
 import { DataArray } from "store/data/types";
 import { Partition } from "utils/models/enums";
+import { IMAGE_KIND } from "store/data/constants";
 
 export type MeasurementsState = {
   data: MeasurementsData;
@@ -13,7 +14,7 @@ export interface MeasurementOption {
   state: "on" | "off" | "loading";
   parent?: string;
   hasChannels?: boolean;
-  thingType?: "Image" | "Object" | "all";
+  thingType?: typeof IMAGE_KIND | "Object" | "all";
   includeCategories?: boolean;
 }
 

@@ -3,7 +3,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { GridSortKey } from "utils/enums";
 
 import { ProjectState } from "store/types";
-import { TPKey } from "store/data/types";
+import { IMAGE_KIND } from "store/data/constants";
 
 export const selectProject = ({
   project,
@@ -13,45 +13,19 @@ export const selectProject = ({
   return project;
 };
 
-/*
-NAME
-*/
-
 export const selectProjectName = ({ project }: { project: ProjectState }) => {
   return project.name;
 };
 
-/*
-SELECTED THINGS
-*/
+export const selectActiveKindId = ({ project }: { project: ProjectState }) => {
+  return project.activeKind;
+};
 
-export const selectSelectedImages = ({
+export const selectSelectedKindItems = ({
   project,
 }: {
   project: ProjectState;
-}): Record<string, TPKey[]> => {
-  return project.selectedImages;
-};
-
-export const selectSelectedAnnotations = ({
-  project,
-}: {
-  project: ProjectState;
-}): Array<string> => {
-  return project.selectedAnnotations;
-};
-
-export const selectSelectedThingIds = ({
-  project,
-}: {
-  project: ProjectState;
-}): Array<string> => {
-  return project.selectedThingIds;
-};
-
-/*
-SORT TYPE
-*/
+}): Record<string, Array<string>> => project.selectedKindItems;
 
 export const selectSortType = ({
   project,
@@ -61,54 +35,20 @@ export const selectSortType = ({
   return project.sortType;
 };
 
-/*
-ACTIVE KIND
-*/
-
-export const selectActiveKindId = ({ project }: { project: ProjectState }) => {
-  return project.activeKind;
-};
-
-/*
-HIGHLIGHTED CATEGORY
-*/
-
-export const selectHighlightedCategory = ({
+export const selectActiveCategory = ({
   project,
 }: {
   project: ProjectState;
 }) => {
-  return project.highlightedCategory;
+  return project.activeCtegory;
 };
 
-/*
-THING FILTERS
-*/
-
-export const selectThingFilters = ({ project }: { project: ProjectState }) => {
-  return project.thingFilters;
-};
-
-export const selectActiveThingFilters = createSelector(
-  selectActiveKindId,
-  selectThingFilters,
-  (activeKind, thingFilters) => {
-    return thingFilters[activeKind] ?? {};
-  },
-);
-export const selectActiveFilteredStateHasFilters = ({
+export const selectKindItemFilters = ({
   project,
 }: {
   project: ProjectState;
 }) => {
-  const activeKind = project.activeKind;
-  const thingFilters = project.thingFilters[activeKind];
-  if (!thingFilters) return false;
-  const hasFilters = Object.values(thingFilters).some((filters) => {
-    return filters.length > 0;
-  });
-
-  return hasFilters;
+  return project.kindItemFilters;
 };
 
 export const selectKindTabFilters = ({
@@ -127,13 +67,39 @@ export const selectProjectImageChannels = ({
   return project.imageChannels;
 };
 
-export const selectAllSelectedGridItems = createSelector(
-  selectSelectedAnnotations,
-  selectSelectedImages,
-  (selectedAnnotations, selectedImages) => {
+export const selectExpandedTime = ({ project }: { project: ProjectState }) => {
+  return project.expandedTime;
+};
+
+export const selectActiveKindItemFilters = createSelector(
+  selectActiveKindId,
+  selectKindItemFilters,
+  (activeKind, kindItemFilters) => {
+    return kindItemFilters[activeKind] ?? {};
+  },
+);
+
+export const selectAllActiveSelectedKindItemIds = createSelector(
+  selectActiveKindId,
+  selectSelectedKindItems,
+  (activeKindId, selectedKindItems) => {
+    return selectedKindItems[activeKindId] ?? [];
+  },
+);
+
+export const selectAllSelectedKindItems = createSelector(
+  selectSelectedKindItems,
+  (selectedKindItems) => {
     return {
-      images: Object.keys(selectedImages),
-      annotations: selectedAnnotations,
+      images: selectedKindItems[IMAGE_KIND] ?? [],
+      annotations: Object.keys(selectedKindItems).reduce(
+        (annIds: string[], kind) => {
+          if (kind === IMAGE_KIND) return annIds;
+          annIds.push(...selectedKindItems[kind]);
+          return annIds;
+        },
+        [],
+      ),
     };
   },
 );

@@ -9,13 +9,13 @@ import {
   V02AnnotationObject,
 } from "../../types";
 import { PartialBy } from "utils/types";
-import { Kind, Category, ImageObject, ShapeArray } from "store/data/types";
+import { Kind, Category, ImageMetadata, ShapeArray } from "store/data/types";
 
 type KindMap = Record<string, { new: Kind; existing?: Kind }>;
 type CategoryMap = Record<string, { new: Category; existing?: Category }>;
 type ImageMap = Record<
   string,
-  { new: SerializedAnnotatorImageType; existing?: ImageObject }
+  { new: SerializedAnnotatorImageType; existing?: ImageMetadata }
 >;
 
 export const v02_deserializeAnnotations = (
@@ -80,7 +80,7 @@ const reconcileCategories = (
 };
 
 const reconcileImages = (
-  existingImages: Array<ImageObject>,
+  existingImages: Array<ImageMetadata>,
   serializedImages: Array<SerializedAnnotatorImageType>,
 ) => {
   const imageMap: ImageMap = {};
@@ -96,7 +96,7 @@ const reconcileImages = (
 
 export const v02_deserializePiximiAnnotations = async (
   serializedProject: SerializedFileTypeV02,
-  existingImages: Array<ImageObject>,
+  existingImages: Array<ImageMetadata>,
   existingCategories: Array<Category>,
   existingKinds: Array<Kind>,
 ) => {

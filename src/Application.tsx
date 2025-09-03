@@ -32,8 +32,8 @@ export const Application = () => {
               <Routes>
                 <Route path="/" element={<WelcomeScreen />} />
                 <Route path="project" element={<ProjectViewer />} />
-                <Route path="imageviewer" element={<ImageViewer />} />
-                <Route path="measurements" element={<MeasurementView />} />
+                {/* <Route path="imageviewer" element={<ImageViewer />} />
+                <Route path="measurements" element={<MeasurementView />} /> */}
               </Routes>
             </BrowserRouter>
           </HelpProvider>

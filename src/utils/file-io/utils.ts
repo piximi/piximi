@@ -6,15 +6,16 @@ import {
   ImageFileShapeInfo,
   ImageFileType,
   ImageShapeInfo,
+  ImageShapeInfoImage,
   MIMEType,
 } from "./types";
-import { convertToImage } from "utils/tensorUtils";
+import { extractImageFileDetails } from "utils/tensorUtils";
 import { ImageShapeEnum, MIMETYPES } from "./enums";
 import { getStackTraceFromError } from "utils/logUtils";
 import { AlertState } from "utils/types";
 import { AlertType } from "utils/enums";
-import { ImageObject } from "store/data/types";
-import { isEnumValue } from "utils/objectUtils";
+import { ImageMetadata, ImageData } from "store/data/types";
+import { isEnumValue, updateRecordArray } from "utils/objectUtils";
 
 async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   let imageStack: IJSStack;
@@ -139,88 +140,93 @@ function isImageShapeValid(
 }
 
 //QUESTION: Is this used?
-export const uploadImages = async (
-  files: FileList,
-  channels: number,
-  slices: number,
-  referenceShape: ImageShapeInfo,
-  categoryId: string,
-): Promise<{
-  imagesToUpload: ImageObject[];
-  warning: any;
-  errors: AlertState[];
-}> => {
-  const invalidImageFiles: Array<ImageFileError> = [];
-  const imagesToUpload: Array<ImageObject> = [];
-  const errors: Array<AlertState> = [];
-  let warning: AlertState | undefined;
+// export const uploadImages = async (
+//   files: FileList,
+//   channels: number,
+//   slices: number,
+//   referenceShape: ImageShapeInfo,
+//   categoryId: string,
+// ): Promise<{
+//   imagesToUpload: {
+//     seriesProperties: Omit<ImageMetadata, "timepoints">;
+//     timepointProperties: ImageData;
+//   }[];
+//   warning: any;
+//   errors: AlertState[];
+// }> => {
+//   const invalidImageFiles: Array<ImageFileError> = [];
+//   const imagesToUpload: Array<{
+//     seriesProperties: Omit<ImageMetadata, "timepoints">;
+//     timepointProperties: ImageData;
+//   }> = [];
+//   const errors: Array<AlertState> = [];
+//   let warning: AlertState | undefined;
 
-  for (const file of files) {
-    try {
-      const { imageStack, fileName } = await decodeImageFile(
-        file,
-        referenceShape.shape,
-      );
-      if (
-        !isImageShapeValid(imageStack, channels, slices, referenceShape.shape)
-      ) {
-        invalidImageFiles.push({
-          fileName: fileName,
-          error: `Could not match image to shape ${channels} (c) x ${slices} (z)`,
-        });
-      } else if (
-        !(imageStack[0].bitDepth === 8 || imageStack[0].bitDepth === 16)
-      ) {
-        invalidImageFiles.push({
-          fileName,
-          error: `Unsupported bit depth of ${imageStack[0].bitDepth}`,
-        });
-      } else {
-        try {
-          const imageToUpload = await convertToImage(
-            imageStack,
-            fileName,
-            undefined,
-            slices,
-            channels,
-          );
-          imageToUpload.kind = "Image";
-          imageToUpload.categoryId = categoryId;
-          imageToUpload.containing = [];
+//   for (const file of files) {
+//     try {
+//       const { imageStack, fileName } = await decodeImageFile(
+//         file,
+//         referenceShape.shape,
+//       );
+//       if (
+//         !isImageShapeValid(imageStack, channels, slices, referenceShape.shape)
+//       ) {
+//         invalidImageFiles.push({
+//           fileName: fileName,
+//           error: `Could not match image to shape ${channels} (c) x ${slices} (z)`,
+//         });
+//       } else if (
+//         !(imageStack[0].bitDepth === 8 || imageStack[0].bitDepth === 16)
+//       ) {
+//         invalidImageFiles.push({
+//           fileName,
+//           error: `Unsupported bit depth of ${imageStack[0].bitDepth}`,
+//         });
+//       } else {
+//         try {
+//           const imageToUpload = await convertToImage(
+//             imageStack,
+//             fileName,
+//             undefined,
+//             slices,
+//             channels,
+//           );
+//           imageToUpload.metadata.kind = IMAGE_KIND;
+//           imageToUpload.imageData.categoryId = categoryId;
 
-          imagesToUpload.push(imageToUpload as ImageObject);
-        } catch (err) {
-          const error = err as Error;
-          const stackTrace = await getStackTraceFromError(error);
-          errors.push({
-            alertType: AlertType.Error,
-            name: "Could not convert file to image",
-            description: error.message,
-            stackTrace: stackTrace,
-          });
-        }
-      }
-    } catch (err) {
-      import.meta.env.NODE_ENV !== "production" && console.error(err);
-      invalidImageFiles.push({
-        fileName: file.name,
-        error: "Could not decode",
-      });
-    }
-  }
+//           imagesToUpload.push(imageToUpload);
+//         } catch (err) {
+//           const error = err as Error;
+//           const stackTrace = await getStackTraceFromError(error);
+//           errors.push({
+//             alertType: AlertType.Error,
+//             name: "Could not convert file to image",
+//             description: error.message,
+//             stackTrace: stackTrace,
+//           });
+//         }
+//       }
+//     } catch (err) {
+//       import.meta.env.NODE_ENV !== "production" && console.error(err);
+//       invalidImageFiles.push({
+//         fileName: file.name,
+//         error: "Could not decode",
+//       });
+//     }
+//   }
 
-  if (invalidImageFiles.length) {
-    warning = {
-      alertType: AlertType.Warning,
-      name: "Could not draw image from files",
-      description: `Could not load or resolve images from the following files: ${invalidImageFiles.reduce(
-        (prev, curr) => prev + "\n" + curr.fileName + ": (" + curr.error + ")",
-        "",
-      )}`,
-    };
-  }
-  return { imagesToUpload, warning, errors };
-};
+//   if (invalidImageFiles.length) {
+//     warning = {
+//       alertType: AlertType.Warning,
+//       name: "Could not draw image from files",
+//       description: `Could not load or resolve images from the following files: ${invalidImageFiles.reduce(
+//         (prev, curr) => prev + "\n" + curr.fileName + ": (" + curr.error + ")",
+//         "",
+//       )}`,
+//     };
+//   }
+//   return { imagesToUpload, warning, errors };
+// };
 
 /*
  ----------------------------
@@ -371,4 +377,64 @@ export const getImageFileInformation = async (
   } catch {
     return { shape: ImageShapeEnum.InvalidImage, ext };
   }
+};
+export const getUploadedFileTypes = async (files: FileList) => {
+  const images: Record<number, Array<ImageShapeInfoImage>> = {};
+  for (const file of files) {
+    const ext = file.type as MIMEType;
+    try {
+      // https://stackoverflow.com/questions/56565528/typescript-const-assertions-how-to-use-array-prototype-includes
+      if (!isEnumValue(MIMETYPES, file.type)) {
+        import.meta.env.NODE_ENV !== "production" &&
+          console.error("Invalid MIME Type:", ext);
+        updateRecordArray(images, ImageShapeEnum.InvalidImage, {
+          shape: ImageShapeEnum.InvalidImage,
+          fileName: file.name,
+          ext,
+          error: `Invalid MIME Type: ${ext}`,
+        });
+      }
+
+      if (
+        file.name.endsWith("dcm") ||
+        file.name.endsWith("DICOM") ||
+        file.name.endsWith("DCM")
+      ) {
+        const image = await decodeDicomImage(file);
+
+        updateRecordArray(images, ImageShapeEnum.DicomImage, {
+          shape: ImageShapeEnum.DicomImage,
+          components: image.length,
+          fileName: file.name,
+          ext: MIMETYPES.DICOM,
+          image,
+        });
+      } else {
+        const buffer = await file.arrayBuffer();
+        const image: IJSImage | IJSStack = await IJSImage.load(buffer, {
+          ignorePalette: true,
+        });
+
+        const imageInfo = getImageInformation(image);
+
+        const imageStack = await forceStack(image);
+
+        updateRecordArray(images, imageInfo.shape, {
+          ...imageInfo,
+          ext,
+          image: imageStack,
+          fileName: file.name,
+        });
+      }
+    } catch (err) {
+      const error = err as Error;
+      updateRecordArray(images, ImageShapeEnum.InvalidImage, {
+        shape: ImageShapeEnum.InvalidImage,
+        fileName: file.name,
+        ext,
+        error: `Could not parse image file. -- ${error.message}`,
+      });
+    }
+  }
+  return images;
 };
