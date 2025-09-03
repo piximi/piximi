@@ -9,16 +9,17 @@ import { RawArray } from "zarr/types/rawArray";
 import { tensor4d } from "@tensorflow/tfjs";
 import { Partition } from "utils/models/enums";
 import { createRenderedTensor, generateBlankColors } from "utils/tensorUtils";
-import { LoadCB } from "utils/file-io/types";
+import {
+  LoadCB,
+  V12AnnotationObject,
+  V12Category,
+  V12ImageData,
+  V12ImageMetadata,
+  V12Kind,
+} from "utils/file-io/types";
 import { CustomStore } from "utils/file-io/zarr/stores";
 import { DataState, ProjectState } from "store/types";
-import {
-  BitDepth,
-  ImageData,
-  AnnotationObject,
-  ImageMetadata,
-} from "store/data/types";
-import { Kind, Category } from "store/data/types";
+import { BitDepth } from "store/data/types";
 import { EntityState } from "@reduxjs/toolkit";
 import { v11_deserializeClassifierGroup } from "../v110/v11_deserializeClassifierGroup";
 import { generateDataRelationships } from "store/data/utils";
@@ -26,7 +27,7 @@ import { generateDataRelationships } from "store/data/utils";
 const deserializeMetadatumGroup = async (
   name: string,
   metadatumGroup: Group,
-): Promise<ImageMetadata> => {
+): Promise<V12ImageMetadata> => {
   const id = (await getAttr(metadatumGroup, "metadata_id")) as string;
   const imageDataIds = (await getAttr(
     metadatumGroup,
@@ -65,7 +66,7 @@ const deserializeMetadataGroup = async (
     "metadata_names",
   )) as string[];
 
-  const metadata: EntityState<ImageMetadata, string> = {
+  const metadata: EntityState<V12ImageMetadata, string> = {
     ids: [],
     entities: {},
   };
@@ -94,8 +95,8 @@ const deserializeMetadataGroup = async (
 const deserializeImageGroup = async (
   name: string,
   imageGroup: Group,
-  metadata: Record<string, ImageMetadata>,
-): Promise<ImageData> => {
+  metadata: Record<string, V12ImageMetadata>,
+): Promise<V12ImageData> => {
   const id = (await getAttr(imageGroup, "image_id")) as string;
   const partition = (await getAttr(
     imageGroup,
@@ -134,11 +135,11 @@ const deserializeImageGroup = async (
 const deserializeImagesGroup = async (
   imagesGroup: Group,
   loadCb: LoadCB,
-  metadata: Record<string, ImageMetadata>,
+  metadata: Record<string, V12ImageMetadata>,
 ) => {
   const imageNames = (await getAttr(imagesGroup, "image_names")) as string[];
 
-  const images: EntityState<ImageData, string> = {
+  const images: EntityState<V12ImageData, string> = {
     ids: [],
     entities: {},
   };
@@ -166,7 +167,7 @@ const deserializeImagesGroup = async (
 const deserializeAnnotationGroup = async (
   name: string,
   annotationGroup: Group,
-): Promise<AnnotationObject> => {
+): Promise<V12AnnotationObject> => {
   const id = (await getAttr(annotationGroup, "annotation_id")) as string;
   const activePlane = (await getAttr(
     annotationGroup,
@@ -245,7 +246,7 @@ const deserializeAnnotationsGroup = async (
     "annotation_names",
   )) as string[];
 
-  const annotations: EntityState<AnnotationObject, string> = {
+  const annotations: EntityState<V12AnnotationObject, string> = {
     ids: [],
     entities: {},
   };
@@ -273,12 +274,11 @@ const deserializeAnnotationsGroup = async (
 
 const deserializeCategoriesGroup = async (
   categoriesGroup: Group,
-): Promise<EntityState<Category, string>> => {
+): Promise<EntityState<V12Category, string>> => {
   const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
   const colors = (await getAttr(categoriesGroup, "color")) as string[];
   const names = (await getAttr(categoriesGroup, "name")) as string[];
   const kinds = (await getAttr(categoriesGroup, "kind")) as string[];
-  const contents = (await getAttr(categoriesGroup, "contents")) as string[][];
 
   if (ids.length !== colors.length || ids.length !== names.length) {
     throw Error(
@@ -286,7 +286,7 @@ const deserializeCategoriesGroup = async (
     );
   }
 
-  const categories: EntityState<Category, string> = {
+  const categories: EntityState<V12Category, string> = {
     ids: [],
     entities: {},
   };
@@ -297,9 +297,8 @@ const deserializeCategoriesGroup = async (
       color: colors[i],
       name: names[i],
       kind: kinds[i],
-      containing: contents[i],
       visible: true,
-    } as Category;
+    };
   }
 
   return categories;
@@ -307,25 +306,20 @@ const deserializeCategoriesGroup = async (
 
 const deserializeKindsGroup = async (
   kindsGroup: Group,
-): Promise<EntityState<Kind, string>> => {
+): Promise<EntityState<V12Kind, string>> => {
   const ids = (await getAttr(kindsGroup, "kind_id")) as string[];
-  const contents = (await getAttr(kindsGroup, "contents")) as string[][];
-  const categories = (await getAttr(kindsGroup, "categories")) as string[][];
   const unknownCategoryIds = (await getAttr(
     kindsGroup,
     "unknown_category_id",
   )) as string[];
   const displayNames = (await getAttr(kindsGroup, "display_name")) as string[];
-  if (
-    ids.length !== contents.length ||
-    ids.length !== unknownCategoryIds.length
-  ) {
+  if (ids.length !== unknownCategoryIds.length) {
     throw Error(
       `Expected categories group "${kindsGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`,
     );
   }
 
-  const kinds: EntityState<Kind, string> = { ids: [], entities: {} };
+  const kinds: EntityState<V12Kind, string> = { ids: [], entities: {} };
   for (let i = 0; i < ids.length; i++) {
     kinds.ids.push(ids[i]);
     kinds.entities[ids[i]] = {

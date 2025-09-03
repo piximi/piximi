@@ -45,6 +45,7 @@ export const KindItemsProvider = ({
   const activeKindId = useSelector(selectActiveKindId);
   const categoryToItems = useSelector(selectCategoryToAllItems);
   const isExpandedTime = useSelector(selectExpandedTime);
+
   const [showCategoryRestriction, setShowCategoryRestriction] =
     useState<boolean>(false);
 

@@ -122,6 +122,25 @@ export const selectActiveKindItemArray = createSelector(
   },
 );
 
+export const selectItemsContainTimeSeries = createSelector(
+  selectActiveKindId,
+  selectActiveKindItemArray,
+  selectMetadataEntities,
+  (activeKindId, items, metadataEntities) => {
+    let hasTimeSeries = false;
+    if (activeKindId !== IMAGE_KIND) return hasTimeSeries;
+    for (const item of items) {
+      if (item.metadataId) {
+        if (metadataEntities[item.metadataId].timeSeries) {
+          hasTimeSeries = true;
+          break;
+        }
+      }
+    }
+    return hasTimeSeries;
+  },
+);
+
 export const selectActiveUnknownKindItems = createSelector(
   selectActiveKindObject,
   selectActiveKindItemRecord,

@@ -7,6 +7,6 @@ export const v02_v12_convertAnnotation = (
   return v02Annotations.map((ann) => ({
     ...ann,
     plane: ann.activePlane,
-    timepoint: "0",
+    timepoint: 0,
   }));
 };

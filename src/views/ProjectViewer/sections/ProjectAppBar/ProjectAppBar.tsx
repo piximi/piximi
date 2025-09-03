@@ -1,7 +1,15 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Box, Button, Divider, Stack } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  Stack,
+  Tooltip,
+  useTheme,
+} from "@mui/material";
 
 import { useMobileView } from "hooks";
 
@@ -18,12 +26,16 @@ import { DIMENSIONS } from "utils/constants";
 import { ItemSelection } from "./ItemSelection";
 import { selectExpandedTime } from "store/project/selectors";
 import { projectSlice } from "store/project";
+import { selectItemsContainTimeSeries } from "store/project/reselectors";
+import { CollapsedClockIcon, ExpandedClockIcon } from "icons/ClockIcon";
 
 export const ProjectAppBar = () => {
   const loadPercent = useSelector(selectLoadPercent);
   const isMobile = useMobileView();
   const dispatch = useDispatch();
+  const theme = useTheme();
   const timeExpanded = useSelector(selectExpandedTime);
+  const containsTimeSeries = useSelector(selectItemsContainTimeSeries);
 
   return (
     <Stack
@@ -58,12 +70,30 @@ export const ProjectAppBar = () => {
       <ProjectTextField />
 
       <Box sx={{ flexGrow: 1 }} />
-      <Button
-        variant="text"
-        onClick={() => dispatch(projectSlice.actions.toggleTimeExpansion())}
-      >
-        {timeExpanded ? "gropu" : "expand"}
-      </Button>
+      <Tooltip title={`${timeExpanded ? "Collaps" : "Expand"} time-series`}>
+        <IconButton
+          onClick={() => dispatch(projectSlice.actions.toggleTimeExpansion())}
+          disabled={!containsTimeSeries}
+        >
+          {timeExpanded ? (
+            <ExpandedClockIcon
+              color={
+                containsTimeSeries
+                  ? theme.palette.text.primary
+                  : theme.palette.action.disabled
+              }
+            />
+          ) : (
+            <CollapsedClockIcon
+              color={
+                containsTimeSeries
+                  ? theme.palette.text.primary
+                  : theme.palette.action.disabled
+              }
+            />
+          )}
+        </IconButton>
+      </Tooltip>
       <ItemSelection />
       {isMobile ? (
         <ZoomControl />

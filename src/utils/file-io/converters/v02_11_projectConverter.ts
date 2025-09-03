@@ -1,21 +1,27 @@
 import React from "react";
-import { V01_ClassifierState, V02Project, V11Project } from "../types";
-import { Kind } from "store/data/types";
-import { ClassifierState, KindClassifierDict } from "store/types";
-import { OptimizerSettings, PreprocessSettings } from "utils/models/types";
-import { getDefaultModelInfo } from "utils/models/classification/utils";
+import {
+  V02ClassifierState,
+  V02Kind,
+  V02Project,
+  V11ClassifierState,
+  V11KindClassifierDict,
+  V11OptimizerSettings,
+  V11PreprocessSettings,
+  V11Project,
+} from "../types";
+import { v11GetDefaultModelInfo } from "../utils";
 
 const v02_11_classifierConverter = (
-  classifier: V01_ClassifierState,
-  kindIds: Array<Kind["id"]>,
-): ClassifierState => {
-  const kindClassifiers: KindClassifierDict = {};
-  const preprocessSettings: PreprocessSettings = {
+  classifier: V02ClassifierState,
+  kindIds: Array<V02Kind["id"]>,
+): V11ClassifierState => {
+  const kindClassifiers: V11KindClassifierDict = {};
+  const preprocessSettings: V11PreprocessSettings = {
     ...classifier.preprocessOptions,
     inputShape: classifier.inputShape,
     trainingPercentage: classifier.trainingPercentage,
   };
-  const optimizerSettings: OptimizerSettings = {
+  const optimizerSettings: V11OptimizerSettings = {
     learningRate: classifier.learningRate,
     lossFunction: classifier.lossFunction,
     metrics: classifier.metrics,
@@ -29,7 +35,7 @@ const v02_11_classifierConverter = (
       modelNameOrArch: 0,
       modelInfoDict: {
         "base-model": {
-          ...getDefaultModelInfo(),
+          ...v11GetDefaultModelInfo(),
           preprocessSettings,
           optimizerSettings,
         },

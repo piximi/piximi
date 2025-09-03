@@ -7,15 +7,21 @@ import {
   SerializedAnnotatorImageType,
   SerializedFileTypeV02,
   V02AnnotationObject,
+  V02Kind,
+  V02Category,
+  V02ImageObject,
 } from "../../types";
 import { PartialBy } from "utils/types";
-import { Kind, Category, ImageMetadata, ShapeArray } from "store/data/types";
+import { ShapeArray } from "store/data/types";
 
-type KindMap = Record<string, { new: Kind; existing?: Kind }>;
-type CategoryMap = Record<string, { new: Category; existing?: Category }>;
+type V02KindMap = Record<string, { new: V02Kind; existing?: V02Kind }>;
+type V02CategoryMap = Record<
+  string,
+  { new: V02Category; existing?: V02Category }
+>;
 type ImageMap = Record<
   string,
-  { new: SerializedAnnotatorImageType; existing?: ImageMetadata }
+  { new: SerializedAnnotatorImageType; existing?: V02ImageObject }
 >;
 
 export const v02_deserializeAnnotations = (
@@ -45,17 +51,17 @@ export const v02_deserializeAnnotations = (
   return annotations;
 };
 
-const reconcileKinds = (
-  existingKinds: Array<Kind>,
-  serializedKinds: Array<Kind>,
+const reconcileV02Kinds = (
+  existingV02Kinds: Array<V02Kind>,
+  serializedV02Kinds: Array<V02Kind>,
 ) => {
-  const kindMap: KindMap = {};
+  const kindMap: V02KindMap = {};
 
-  serializedKinds.forEach((kind) => {
-    const existingKind = existingKinds.find((k) => kind.id === k.id);
+  serializedV02Kinds.forEach((kind) => {
+    const existingV02Kind = existingV02Kinds.find((k) => kind.id === k.id);
     kindMap[kind.id] = { new: kind };
-    if (existingKind) {
-      kindMap[kind.id].existing = existingKind;
+    if (existingV02Kind) {
+      kindMap[kind.id].existing = existingV02Kind;
     }
   });
 
@@ -63,10 +69,10 @@ const reconcileKinds = (
 };
 
 const reconcileCategories = (
-  existingCategories: Array<Category>,
-  serializedCategories: Array<Category>,
+  existingCategories: Array<V02Category>,
+  serializedCategories: Array<V02Category>,
 ) => {
-  const categoryMap: CategoryMap = {};
+  const categoryMap: V02CategoryMap = {};
   serializedCategories.forEach((category) => {
     const existingCategory = existingCategories.find(
       (c) => category.name === c.name && category.kind === c.kind,
@@ -80,7 +86,7 @@ const reconcileCategories = (
 };
 
 const reconcileImages = (
-  existingImages: Array<ImageMetadata>,
+  existingImages: Array<V02ImageObject>,
   serializedImages: Array<SerializedAnnotatorImageType>,
 ) => {
   const imageMap: ImageMap = {};
@@ -96,14 +102,14 @@ const reconcileImages = (
 
 export const v02_deserializePiximiAnnotations = async (
   serializedProject: SerializedFileTypeV02,
-  existingImages: Array<ImageMetadata>,
-  existingCategories: Array<Category>,
-  existingKinds: Array<Kind>,
+  existingImages: Array<V02ImageObject>,
+  existingCategories: Array<V02Category>,
+  existingV02Kinds: Array<V02Kind>,
 ) => {
   // this must come first
   const imageMap = reconcileImages(existingImages, serializedProject.images);
 
-  const kindMap = reconcileKinds(existingKinds, serializedProject.kinds);
+  const kindMap = reconcileV02Kinds(existingV02Kinds, serializedProject.kinds);
 
   const catMap = reconcileCategories(
     existingCategories,
@@ -111,8 +117,8 @@ export const v02_deserializePiximiAnnotations = async (
   );
 
   const reconciledAnnotations: V02AnnotationObject[] = [];
-  const kindsToReconcile: Record<string, Kind> = {};
-  const categoriesToReconcile: Record<string, Category> = {};
+  const kindsToReconcile: Record<string, V02Kind> = {};
+  const categoriesToReconcile: Record<string, V02Category> = {};
 
   for await (const annotation of serializedProject.annotations) {
     const annImage = imageMap[annotation.imageId];
@@ -136,15 +142,15 @@ export const v02_deserializePiximiAnnotations = async (
     */
 
     if (kind.existing) {
-      const existingKind = kind.existing;
+      const existingV02Kind = kind.existing;
       if (expandedAnnotation.categoryId === kind.new.unknownCategoryId) {
-        expandedAnnotation.categoryId = existingKind.unknownCategoryId;
+        expandedAnnotation.categoryId = existingV02Kind.unknownCategoryId;
         appliedUnknownCategory = true;
       }
     } else {
-      const newKind = kind.new;
-      if (!(newKind.id in kindsToReconcile)) {
-        kindsToReconcile[newKind.id] = newKind;
+      const newV02Kind = kind.new;
+      if (!(newV02Kind.id in kindsToReconcile)) {
+        kindsToReconcile[newV02Kind.id] = newV02Kind;
       }
     }
 
@@ -180,7 +186,7 @@ export const v02_deserializePiximiAnnotations = async (
 
   return {
     annotations: reconciledAnnotations,
-    newKinds: Object.values(kindsToReconcile),
+    newV02Kinds: Object.values(kindsToReconcile),
     newCategories: Object.values(categoriesToReconcile),
   };
 };
