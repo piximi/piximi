@@ -1,1 +1,0 @@
-export { ThingInformationTable } from "./ThingInformationTable";

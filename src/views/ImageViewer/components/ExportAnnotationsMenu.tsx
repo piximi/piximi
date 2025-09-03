@@ -10,10 +10,10 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { ExportAnnotationsDialog } from "components/dialogs";
 
 import {
-  selectAllObjectCategories,
-  selectAllObjectKinds,
+  selectAllCategories,
+  selectAllKinds,
   selectDataState,
-  selectObjectCategoryDict,
+  selectCategoryEntities,
 } from "store/data/selectors";
 import { selectProjectName } from "store/project/selectors";
 import { selectHasUnsavedChanges } from "views/ImageViewer/state/imageViewer/selectors";
@@ -34,7 +34,7 @@ import {
 import { HotkeyContext } from "utils/enums";
 import { AnnotationExportType } from "utils/file-io/enums";
 import { exportAnnotationMasks } from "utils/file-io/export/annotationExporters";
-import { ImageObject, TSAnnotationObject } from "store/data/types";
+import { ImageMetadata, AnnotationObject } from "store/data/types";
 import { selectChanges } from "../state/annotator/selectors";
 import { reconcileChanges } from "../utils/annotationUtils";
 
@@ -44,7 +44,7 @@ type ExportAnnotationsMenuProps = {
   anchorEl: HTMLElement | null;
   onClose: () => void;
   open: boolean;
-  selectedImage?: ImageObject;
+  selectedImage?: ImageMetadata;
 };
 
 const exportOptions = [
@@ -139,7 +139,7 @@ export const ExportAnnotationsMenu = ({
     (exportType: AnnotationExportType) => {
       setOnProjectName(() => (userProjectName: string) => {
         const zip = new JSZip();
-        let exportedAnnotations: Record<string, TSAnnotationObject> = {};
+        let exportedAnnotations: Record<string, AnnotationObject> = {};
         if (selectedImage) {
           for (const annId of selectedImage.containing) {
             exportedAnnotations[annId] = annotationDict[annId];

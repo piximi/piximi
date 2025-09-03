@@ -15,6 +15,7 @@ import {
   ThingData,
   ThingMeasurements,
 } from "./types";
+import { IMAGE_KIND } from "store/data/constants";
 
 const initialState: MeasurementsState = {
   data: {},
@@ -116,7 +117,7 @@ export const measurementsSlice = createSlice({
         if (
           option.thingType === "all" ||
           option.thingType === kindId ||
-          (option.thingType !== "Image" && kindId !== "Image")
+          (option.thingType !== IMAGE_KIND && kindId !== IMAGE_KIND)
         ) {
           if (option.hasChannels) {
             option.children = [];

@@ -1,21 +1,19 @@
 import Image from "image-js";
 import { intersection } from "lodash";
 import { generateKind } from "store/data/utils";
-import {
-  Kind,
-  AnnotationObject,
-  Category,
-  ImageObject,
-  ShapeArray,
-} from "store/data/types";
+import { Kind, Category, ImageMetadata, ShapeArray } from "store/data/types";
 import { getPropertiesFromImageSync } from "store/data/utils";
 import { logger } from "utils/logUtils";
 import { convertArrayToShape } from "utils/models/utils";
 
-import { V01_AnnotationObject, V01_Category } from "../types";
+import {
+  V01_AnnotationObject,
+  V01_Category,
+  V02AnnotationObject,
+} from "../types";
 
 export const v01_02_convertAnnotationsWithExistingProject = async (
-  existingImages: Record<string, ImageObject>,
+  existingImages: Record<string, ImageMetadata>,
   existingKinds: Record<string, Kind>,
   oldAnnotations: V01_AnnotationObject[],
   oldAnnotationCategories: V01_Category[],
@@ -23,7 +21,7 @@ export const v01_02_convertAnnotationsWithExistingProject = async (
   const catId2Name: Record<string, string> = {};
   const newKinds: Record<string, Kind> = {};
   const newCategories: Record<string, Category> = {};
-  const newAnnotations: AnnotationObject[] = [];
+  const newAnnotations: V02AnnotationObject[] = [];
   const imageMap: Record<string, Image> = {};
 
   oldAnnotationCategories.forEach((anCat) => {
@@ -37,7 +35,7 @@ export const v01_02_convertAnnotationsWithExistingProject = async (
     }
   });
   for await (const ann of oldAnnotations) {
-    const newAnn: Partial<AnnotationObject> = { ...ann };
+    const newAnn: Partial<V02AnnotationObject> = { ...ann };
     const existingImage = existingImages[ann.imageId];
     if (!existingImage) {
       logger(`No image found for annotation: ${ann.id}\nskipping`);
@@ -74,7 +72,7 @@ export const v01_02_convertAnnotationsWithExistingProject = async (
     );
     Object.assign(newAnn, imageProperties);
     newAnn.shape = convertArrayToShape(newAnn.data!.shape as ShapeArray);
-    newAnnotations.push(newAnn as AnnotationObject);
+    newAnnotations.push(newAnn as V02AnnotationObject);
   }
   return {
     newAnnotations,

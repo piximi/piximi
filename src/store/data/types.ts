@@ -9,55 +9,42 @@ export type DataArray = IJSDataArray;
 
 export type TPKey = string;
 
-export type Thing = {
+export type ImageData = {
   id: string;
   name: string;
-  src: string;
-  partition: Partition;
-  kind: string;
-  data: Tensor4D;
-  shape: Shape;
-  bitDepth: BitDepth;
-  categoryId: string;
-  activePlane: number;
-};
-
-export type ImageObject = Thing & {
-  colors: Colors;
-  containing: string[];
-};
-
-export type AnnotationObject = Thing & {
-  boundingBox: [number, number, number, number];
-  encodedMask: Array<number>;
-  decodedMask?: DataArray;
-  plane?: number;
-  timepoint?: string;
-  imageId: string;
-};
-
-export type ImageTimepointData = {
+  metadataId: string;
   colors: Colors;
   src: string;
   data: Tensor4D;
   categoryId: string;
   activePlane: number;
+  partition: Partition;
+  timepoint?: number;
 };
-export type TSImageObject = {
+
+export type BaseExtractedImageData = {
+  id: string;
+  bitDepth: number;
+  shape: Shape;
+  colors: Colors;
+  data: Tensor4D;
+  src: string;
+};
+export type ImageMetadata = {
   id: string;
   name: string;
   kind: string;
   bitDepth: BitDepth;
-  containing: string[];
-  partition: Partition;
   shape: Shape;
-  timepoints: Record<TPKey, ImageTimepointData>;
+  timeSeries: boolean;
+  imageDataIds: string[];
+  defaultImageId: string;
 };
 
-export type FullTimepointImage = Omit<TSImageObject, "timepoints"> &
-  ImageTimepointData & { timepoint: TPKey };
+export type FullTimepointImage = Omit<ImageMetadata, "timepoints"> &
+  ImageData & { timepoint: TPKey };
 
-export type TSAnnotationObject = {
+export type AnnotationObject = {
   id: string;
   name: string;
   kind: string;
@@ -70,7 +57,7 @@ export type TSAnnotationObject = {
   plane: number;
   imageId: string;
   childIds?: string[];
-  timepoint: TPKey;
+  timepoint: number;
   categoryId: string;
   shape: Shape;
   data: Tensor4D;
@@ -87,7 +74,7 @@ export type LinkGraph = Record<string, LinkNode>;
 
 export type GlobalAnnotation = {
   globalId: string;
-  linkedIds: Set<string>;
+  linkedIds: string[];
 };
 export type DecodedAnnotationObject = Omit<
   AnnotationObject & {
@@ -100,7 +87,7 @@ export type PartialDecodedAnnotationObject = PartialBy<
   "src" | "data" | "name" | "kind" | "bitDepth" | "shape"
 >;
 export type DecodedTSAnnotationObject = Omit<
-  TSAnnotationObject & {
+  AnnotationObject & {
     decodedMask: DataArray;
   },
   "encodedMask"
@@ -115,15 +102,12 @@ export type Category = {
   id: string;
   name: string;
   visible: boolean;
-  containing: string[];
   kind: string;
 };
 
 export type Kind = {
   id: string;
   displayName: string;
-  containing: string[];
-  categories: string[];
   unknownCategoryId: string;
 };
 
@@ -142,17 +126,56 @@ export type CategoryUpdates = {
 };
 
 export type ThingsUpdates = Array<
-  | RequireOnly<Partial<ImageObject>, "id">
+  | RequireOnly<Partial<ImageMetadata>, "id">
   | RequireOnly<Partial<AnnotationObject>, "id">
 >;
 
 export type ImageUpdates = Array<
-  Partial<Omit<TSImageObject, "id" | "containing" | "timePoints">> & {
+  Partial<Omit<ImageMetadata, "id" | "containing" | "timePoints">> & {
     id: string;
-    timePoints?: Record<TPKey, Partial<ImageTimepointData>>;
+    timePoints?: Record<TPKey, Partial<ImageData>>;
   }
 >;
 
 export type AnnotationUpdates = Array<
-  RequireOnly<Partial<TSAnnotationObject>, "id">
+  RequireOnly<Partial<AnnotationObject>, "id">
+>;
+
+export type GeneralizedKindItem = {
+  id: string;
+  name: string;
+  categoryId: string;
+  selected?: boolean; // UI state for bulk operations
+  kind: string;
+
+  // Spatial/display info (common to both)
+  boundingBox?: [number, number, number, number];
+  plane?: number;
+  activePlane: number;
+
+  // Time series info
+  timepoint?: number;
+
+  // Visual representation
+  src: string;
+  colors?: Colors;
+  data: Tensor4D;
+
+  // Metadata for operations
+  metadataId?: string;
+  shape: Shape;
+  bitDepth: BitDepth;
+  partition: Partition;
+
+  // Optional fields that might only apply to one type
+  childIds?: string[]; // for annotations with hierarchical relationships
+  containing?: string[]; // for images
+
+  // For displaying timeseries
+  grouped?: boolean;
+};
+
+export type GeneralizedKindItemEditableProps = Pick<
+  GeneralizedKindItem,
+  "name" | "categoryId" | "partition"
 >;

@@ -12,7 +12,7 @@ import {
 } from "views/ImageViewer/state/imageViewer/selectors";
 import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 import { ImageViewerTimepointProperties } from "views/ImageViewer/utils/types";
-import { selectImageDictionary } from "store/data/selectors";
+import { selectImageDataEntities } from "store/data/selectors";
 import { createRenderedTensor } from "utils/tensorUtils";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
@@ -20,7 +20,7 @@ export const TimepointAdjustment = () => {
   const dispatch = useDispatch();
   const activeImage = useSelector(selectActiveImage);
   const activeImageSeriesDetails = useSelector(selectActiveImageSeries);
-  const imageSeries = useSelector(selectImageDictionary);
+  const imageSeries = useSelector(selectImageDataEntities);
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLImageElement | null)[]>([]);
 

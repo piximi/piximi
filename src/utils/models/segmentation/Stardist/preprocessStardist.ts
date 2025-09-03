@@ -1,10 +1,10 @@
 import { Tensor3D, Tensor4D, data as tfdata, tidy } from "@tensorflow/tfjs";
 import { padToMatch } from "../../utils";
 import { getImageSlice } from "utils/tensorUtils";
-import { ImageObject } from "store/data/types";
+import { ImageMetadata } from "store/data/types";
 
 const sampleGenerator = (
-  images: Array<ImageObject>,
+  images: Array<ImageMetadata>,
   padVals: Array<{ padX: number; padY: number }>,
 ) => {
   const count = images.length;
@@ -30,7 +30,7 @@ const sampleGenerator = (
 
 const padImage = (image: {
   data: Tensor3D;
-  bitDepth: ImageObject["bitDepth"];
+  bitDepth: ImageMetadata["bitDepth"];
   padX: number;
   padY: number;
 }) => {
@@ -57,7 +57,7 @@ const padImage = (image: {
 };
 
 export const preprocessStardist = (
-  images: Array<ImageObject>,
+  images: Array<ImageMetadata>,
   batchSize: number,
   dataDims: Array<{ padX: number; padY: number }>,
 ) => {

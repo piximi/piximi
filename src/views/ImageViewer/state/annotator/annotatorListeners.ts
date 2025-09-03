@@ -15,7 +15,7 @@ import { TypedAppStartListening } from "store/types";
 import {
   AnnotationObject,
   DecodedAnnotationObject,
-  ImageObject,
+  ImageMetadata,
 } from "store/data/types";
 import { isEqual } from "lodash";
 
@@ -76,7 +76,7 @@ startAppListening({
     const { data: dataState, imageViewer: imageViewerState } =
       listenerAPI.getState();
 
-    const srcUpdates: Array<{ id: string } & Partial<ImageObject>> = [];
+    const srcUpdates: Array<{ id: string } & Partial<ImageMetadata>> = [];
     let renderedSrcs: string[] = [];
     const numImages = updates.length;
     let imageNumber = 1;
@@ -84,7 +84,7 @@ startAppListening({
       const { id: imageId, ...changes } = update;
       if ("colors" in changes && changes.colors) {
         const colors = changes.colors;
-        const image = dataState.things.entities[imageId]! as ImageObject;
+        const image = dataState.things.entities[imageId]! as ImageMetadata;
 
         const colorsEditable = {
           range: { ...colors.range },

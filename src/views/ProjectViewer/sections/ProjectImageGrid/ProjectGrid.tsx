@@ -10,7 +10,6 @@ import { Box } from "@mui/material";
 import { useMenu, useMobileView } from "hooks";
 
 import { CustomTabs } from "components/layout";
-import { ImageGrid } from "./ImageGrid";
 import { AddKindMenu } from "./AddKindMenu";
 
 import { projectSlice } from "store/project";
@@ -19,19 +18,19 @@ import {
   selectActiveKindId,
   selectKindTabFilters,
 } from "store/project/selectors";
-import { selectKindDictionary } from "store/data/selectors";
+import { selectKindEntities } from "store/data/selectors";
 import { selectVisibleKinds } from "store/project/reselectors";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { DIMENSIONS } from "utils/constants";
-import { AnnotationGrid } from "./ImageGrid/AnnotationGrid";
+import { KindItemGrid } from "./KindItemGrid";
+import { IMAGE_KIND } from "store/data/constants";
 
 export const ProjectGrid = () => {
   const dispatch = useDispatch();
   const filteredKinds = useSelector(selectKindTabFilters) as string[];
-  const kinds = useSelector(selectKindDictionary);
   const activeKind = useSelector(selectActiveKindId);
-
+  const kinds = useSelector(selectKindEntities);
   const visibleKinds = useSelector(selectVisibleKinds) as string[];
   const isMobile = useMobileView();
 
@@ -72,11 +71,7 @@ export const ProjectGrid = () => {
         dispatch(projectSlice.actions.setActiveKind({ kind: newItem }));
       }
 
-      dispatch(
-        dataSlice.actions.deleteKind({
-          deletedKindId: item,
-        }),
-      );
+      dispatch(dataSlice.actions.deleteKindCascade(item));
     },
     [dispatch],
   );
@@ -95,7 +90,7 @@ export const ProjectGrid = () => {
   const handleTabChange = (tab: string) => {
     dispatch(projectSlice.actions.setActiveKind({ kind: tab }));
     dispatch(
-      projectSlice.actions.updateHighlightedCategory({
+      projectSlice.actions.changeActiveCategory({
         categoryId: kinds[tab]!.unknownCategoryId,
       }),
     );
@@ -103,7 +98,10 @@ export const ProjectGrid = () => {
 
   const handleKindEdit = (kindId: string, newDisplayName: string) => {
     dispatch(
-      dataSlice.actions.updateKindName({ kindId, displayName: newDisplayName }),
+      dataSlice.actions.updateKindName({
+        id: kindId,
+        newName: newDisplayName,
+      }),
     );
   };
 
@@ -152,18 +150,14 @@ export const ProjectGrid = () => {
         handleTabClose={handleTabClose}
         handleNew={handleOpenAddKindMenu}
         handleTabMin={handleTabMinimize}
-        persistentTabs={["Image"]}
+        persistentTabs={[IMAGE_KIND]}
         editable
         handleTabEdit={handleKindEdit}
         renderLabel={renderTabLabel}
       >
-        {visibleKinds.map((kind) =>
-          kind === "Image" ? (
-            <ImageGrid key={`${kind}-imageGrid`} />
-          ) : (
-            <AnnotationGrid key={`${kind}-imageGrid`} kind={kind} />
-          ),
-        )}
+        {visibleKinds.map((kind) => (
+          <KindItemGrid key={`${kind}-itemGrid`} />
+        ))}
       </CustomTabs>
       <AddKindMenu
         anchor={addKindMenuAnchor}

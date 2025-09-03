@@ -4,25 +4,25 @@ import { Chip, Tooltip, useMediaQuery, useTheme } from "@mui/material";
 import { Gesture as GestureIcon } from "@mui/icons-material";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { useSelector } from "react-redux";
-import { selectAllSelectedGridItems } from "store/project/selectors";
+import { selectAllSelectedKindItems } from "store/project/selectors";
 
 export const ImageViewerButton = () => {
-  const selectedGridItems = useSelector(selectAllSelectedGridItems);
+  const selectedKindItems = useSelector(selectAllSelectedKindItems);
   const navigate = useNavigate();
   const theme = useTheme();
   const smOrXsBreakpoint = useMediaQuery(theme.breakpoints.down("md"));
   const handleNavigateImageViewer = () => {
     navigate("/imageviewer", {
       state: {
-        initialThingIds: selectedGridItems,
+        initialThingIds: selectedKindItems,
       },
     });
   };
   return (
     <Tooltip
       title={
-        selectedGridItems.images.length === 0 &&
-        selectedGridItems.annotations.length === 0
+        selectedKindItems.images.length === 0 &&
+        selectedKindItems.annotations.length === 0
           ? "Select Objects to Annotate"
           : "Annotate Selection"
       }
@@ -36,8 +36,8 @@ export const ImageViewerButton = () => {
           variant="outlined"
           sx={{ marginRight: 1, pl: smOrXsBreakpoint ? 1 : 0 }}
           disabled={
-            selectedGridItems.images.length === 0 &&
-            selectedGridItems.annotations.length === 0
+            selectedKindItems.images.length === 0 &&
+            selectedKindItems.annotations.length === 0
           }
           size="small"
         />

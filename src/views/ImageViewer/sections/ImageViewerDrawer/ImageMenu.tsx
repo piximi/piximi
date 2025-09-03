@@ -10,12 +10,12 @@ import { ExportAnnotationsMenu } from "../../components/";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 
-import { DecodedAnnotationObject, ImageObject } from "store/data/types";
+import { DecodedAnnotationObject, ImageMetadata } from "store/data/types";
 import { selectImageViewerObjects } from "views/ImageViewer/state/annotator/reselectors";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
-  selectedImage: ImageObject;
+  selectedImage: ImageMetadata;
   onCloseImageMenu: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   openImageMenu: boolean;
 };

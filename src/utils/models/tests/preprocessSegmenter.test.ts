@@ -13,10 +13,10 @@ import {
 import { CropSchema, Partition } from "../enums";
 import { MIMEType } from "utils/file-io/types";
 import { loadImageFileAsStack } from "utils/file-io/utils";
-import { convertToImage } from "utils/tensorUtils";
+import { extractImageFileDetails } from "utils/tensorUtils";
 import {
   Category,
-  ImageObject,
+  ImageMetadata,
   AnnotationObject,
   Shape,
 } from "store/data/types";
@@ -107,11 +107,11 @@ const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
 };
 
 it.skip("preprocessSegmenter", async () => {
-  const images: Array<ImageObject> = [];
+  const images: Array<ImageMetadata> = [];
 
   for (const preIm of preloadedImages) {
     const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);
-    const im = await convertToImage(
+    const im = await extractImageFileDetails(
       imStack,
       preIm.name,
       undefined,

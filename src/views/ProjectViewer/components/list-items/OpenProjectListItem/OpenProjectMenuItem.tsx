@@ -70,7 +70,7 @@ export const OpenProjectMenuItem = ({
             }),
           );
           dispatch(projectSlice.actions.resetProject());
-          dispatch(dataSlice.actions.initializeState({ data: res.data }));
+          dispatch(dataSlice.actions.initializeLoadedState(res.data));
           // loadPerecnt set to 1 here
           dispatch(
             projectSlice.actions.setProject({
@@ -109,6 +109,9 @@ export const OpenProjectMenuItem = ({
           applicationSettingsSlice.actions.updateAlertState({
             alertState: warning,
           }),
+        );
+        dispatch(
+          applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 }),
         );
       });
 

@@ -10,7 +10,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectProject } from "store/project/selectors";
 import { selectClassifier } from "store/classifier/selectors";
 import { selectSegmenter } from "store/segmenter/selectors";
-import { selectDataProject } from "store/data/selectors";
+import { selectDataEntries } from "store/data/selectors";
 
 import { serializeProject } from "utils/file-io/serialize";
 import { logger } from "utils/logUtils";
@@ -34,7 +34,7 @@ export const SaveProjectDialog = ({
   const segmenter = useSelector(selectSegmenter);
 
   const project = useSelector(selectProject);
-  const data = useSelector(selectDataProject);
+  const data = useSelector(selectDataEntries);
 
   const [projectName, setProjectName] = useState<string>(project.name);
 

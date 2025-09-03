@@ -5,44 +5,60 @@ import {
   V11ImageObject,
   V11Project,
 } from "../types";
-import { TSAnnotationObject, TSImageObject } from "store/data/types";
+import { AnnotationObject, ImageMetadata, ImageData } from "store/data/types";
+import { generateUUID } from "store/data/utils";
+import { IMAGE_KIND } from "store/data/constants";
 
 export const v11_12_projectConverter = (
   v11Project: V11Project,
 ): CurrentProject => {
   const { things } = v11Project.data;
 
-  const currentImages: EntityState<TSImageObject, string> = {
+  const currentMetadata: EntityState<ImageMetadata, string> = {
     ids: [],
     entities: {},
   };
-  const currentAnnotations: EntityState<TSAnnotationObject, string> = {
+  const currentImageData: EntityState<ImageData, string> = {
     ids: [],
     entities: {},
+  };
+  const currentAnnotations: EntityState<AnnotationObject, string> = {
+    ids: [],
+    entities: {},
+  };
+  const relationships: CurrentProject["data"]["relationships"] = {
+    kindToCategories: {},
+    kindToAnnotations: {},
+    categoryToImages: {},
+    categoryToAnnotations: {},
+    imageToAnnotations: {},
   };
   Object.values(things.entities).forEach((thing) => {
-    if (thing.kind === "Image") {
-      const {
-        id,
+    if (thing.kind === IMAGE_KIND) {
+      const { id, name, kind, bitDepth, containing, shape, ...rest } =
+        thing as V11ImageObject;
+      const metadataId = generateUUID();
+      const metadata: ImageMetadata = {
+        id: metadataId,
         name,
         kind,
         bitDepth,
-        containing,
         shape,
-        partition,
-        ...rest
-      } = thing as V11ImageObject;
-      currentImages.ids.push(id);
-      currentImages.entities[id] = {
-        id,
-        name,
-        kind,
-        bitDepth,
-        containing,
-        shape,
-        partition,
-        timepoints: { 0: rest },
+        imageDataIds: [id],
+        defaultImageId: id,
+        timeSeries: false,
       };
+      const imageData: ImageData = {
+        id,
+        metadataId,
+        name,
+        ...rest,
+      };
+      currentMetadata.ids.push(metadataId);
+      currentMetadata.entities[metadataId] = metadata;
+      currentImageData.ids.push(id);
+      currentImageData.entities[id] = imageData;
+      relationships.imageToAnnotations[id] = containing;
     } else {
       const { id, name, kind, bitDepth, ...rest } =
         thing as V11AnnotationObject;
@@ -54,20 +70,58 @@ export const v11_12_projectConverter = (
         bitDepth,
         ...rest,
         plane: 0,
-        timepoint: "0",
+        timepoint: 0,
       };
     }
+  });
+  const currentCategories: CurrentProject["data"]["categories"] = {
+    ids: [],
+    entities: {},
+  };
+  const currentKinds: CurrentProject["data"]["kinds"] = {
+    ids: [],
+    entities: {},
+  };
+  Object.values(v11Project.data.categories.entities).forEach((category) => {
+    currentCategories.ids.push(category.id);
+    currentCategories.entities[category.id] = {
+      id: category.id,
+      color: category.color,
+      visible: category.visible,
+      kind: category.kind,
+      name: category.name,
+    };
+    if (category.kind === IMAGE_KIND)
+      relationships.categoryToImages[category.id] = category.containing;
+    else {
+      relationships.categoryToAnnotations[category.id] = category.containing;
+    }
+  });
+  Object.values(v11Project.data.kinds.entities).forEach((kind) => {
+    currentKinds.ids.push(kind.id);
+    currentKinds.entities[kind.id] = {
+      id: kind.id,
+      displayName: kind.displayName,
+      unknownCategoryId: kind.unknownCategoryId,
+    };
+    if (kind.id !== IMAGE_KIND)
+      relationships.kindToAnnotations[kind.id] = kind.containing;
+
+    relationships.kindToCategories[kind.id] = kind.categories;
   });
   return {
     project: v11Project.project,
     classifier: v11Project.classifier,
     segmenter: v11Project.segmenter,
     data: {
-      kinds: v11Project.data.kinds,
-      categories: v11Project.data.categories,
-      things: things,
-      images: currentImages,
+      kinds: currentKinds,
+      categories: currentCategories,
+      metadata: currentMetadata,
+      images: currentImageData,
       annotations: currentAnnotations,
+      relationships,
+      linkGraph: {},
+      globalAnnotations: {},
     },
   };
 };

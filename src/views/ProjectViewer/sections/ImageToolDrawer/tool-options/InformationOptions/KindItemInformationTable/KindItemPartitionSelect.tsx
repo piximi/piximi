@@ -5,7 +5,7 @@ import { Partition } from "utils/models/enums";
 import { StyledSelect } from "components/inputs";
 import { StyledSelectProps } from "components/inputs/StyledSelect";
 
-export const ImagePartitionSelect = ({
+export const KindItemPartitionSelect = ({
   currentPartition,
   callback,
   ...rest

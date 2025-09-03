@@ -1,25 +1,24 @@
 import { ReactElement, useCallback, useEffect, useState } from "react";
-import { batch, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { TextFieldWithBlur } from "components/inputs";
-import { ThingCategorySelect } from "./ThingCategorySelect";
-import { ImagePartitionSelect } from "./ImagePartitionSelect";
-
-import { dataSlice } from "store/data/dataSlice";
+import { KindItemCategorySelect } from "./KindItemCategorySelect";
+import { KindItemPartitionSelect } from "./KindItemPartitionSelect";
 
 import { Partition } from "utils/models/enums";
 
-import { Kind, Thing } from "store/data/types";
+import { Kind, GeneralizedKindItem } from "store/data/types";
 import { DataTable } from "./DataTable";
 import { DataTableRow } from "./DataTableRow";
 import { useTheme } from "@mui/material";
-import { ThingKindSelect } from "./ThingKindSelect";
+import { KindItemKindSelect } from "./KindItemKindSelect";
+import { useKindOperations } from "contexts/KindItemsProvider";
 
-export const ThingInformationTable = ({
-  thing,
+export const KindItemInformationTable = ({
+  item: item,
   collapsible,
 }: {
-  thing: Thing;
+  item: GeneralizedKindItem;
   collapsible: boolean;
 }) => {
   const dispatch = useDispatch();
@@ -27,8 +26,9 @@ export const ThingInformationTable = ({
   const [tableData, setTableData] = useState<
     Array<Array<string | number | ReactElement>>
   >([]);
-  const [newImageName, setNewImageName] = useState<string>(thing.name);
+  const [newImageName, setNewImageName] = useState<string>(item.name);
 
+  const { updateKindItem, updateKindItemKind } = useKindOperations();
   const handleImageNameChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setNewImageName(event.target.value);
@@ -37,70 +37,48 @@ export const ThingInformationTable = ({
   );
 
   const handleImageNameBlur = useCallback(() => {
-    dispatch(
-      dataSlice.actions.updateThingName({
-        id: thing.id,
-        name: newImageName,
-      }),
-    );
-  }, [dispatch, newImageName, thing.id]);
+    updateKindItem(item.id, { name: newImageName });
+  }, [dispatch, newImageName, item.id]);
 
   const handleCategorySelect = useCallback(
     (categoryId: string) => {
-      dispatch(
-        dataSlice.actions.updateThings({
-          updates: [
-            {
-              id: thing.id,
-              categoryId: categoryId,
-              partition: Partition.Unassigned,
-            },
-          ],
-        }),
-      );
+      updateKindItem(item.id, {
+        categoryId: categoryId,
+        partition: Partition.Unassigned,
+      });
     },
-    [dispatch, thing],
+    [dispatch, item],
   );
 
   const handlePartitionSelect = useCallback(
     (partition: Partition) => {
-      dispatch(
-        dataSlice.actions.updateThings({
-          updates: [{ id: thing.id, partition }],
-        }),
-      );
+      updateKindItem(item.id, {
+        partition,
+      });
     },
-    [dispatch, thing],
+    [dispatch, item],
   );
 
   const handleKindSelect = useCallback(
-    (kindId: Kind["id"], newCategoryId: string) => {
-      batch(() => {
-        dispatch(
-          dataSlice.actions.updateThings({
-            updates: [
-              { id: thing.id, kind: kindId, categoryId: newCategoryId },
-            ],
-          }),
-        );
-      });
+    (kindId: Kind["id"]) => {
+      updateKindItemKind(item.id, kindId);
     },
-    [dispatch, thing],
+    [dispatch, item],
   );
 
   useEffect(() => {
     const data: Array<Array<string | number>> = [];
-    const editableData: Array<Array<string | ReactElement>> = [[], [], [], []];
-    Object.entries(thing).forEach((entry) => {
+    const editableData: Array<Array<string | ReactElement>> = [];
+    Object.entries(item).forEach((entry) => {
       const [key, value] = entry;
 
       switch (key) {
         case "name":
-          editableData[0] = [
+          editableData.push([
             "Name",
             <TextFieldWithBlur
               hiddenLabel
-              value={thing.name}
+              value={item.name}
               onChange={handleImageNameChange}
               onBlur={handleImageNameBlur}
               size="small"
@@ -115,13 +93,13 @@ export const ThingInformationTable = ({
               }}
               key={key}
             />,
-          ];
+          ]);
           break;
         case "categoryId":
-          editableData[1] = [
+          editableData.push([
             "Category",
-            <ThingCategorySelect
-              currentCategory={thing.categoryId}
+            <KindItemCategorySelect
+              currentCategory={item.categoryId}
               callback={handleCategorySelect}
               size="small"
               fullWidth
@@ -129,13 +107,13 @@ export const ThingInformationTable = ({
               fontSize="inherit"
               key={key}
             />,
-          ];
+          ]);
           break;
         case "partition":
-          editableData[2] = [
+          editableData.push([
             "Partition",
-            <ImagePartitionSelect
-              currentPartition={thing.partition}
+            <KindItemPartitionSelect
+              currentPartition={item.partition}
               callback={handlePartitionSelect}
               size="small"
               variant="standard"
@@ -143,13 +121,13 @@ export const ThingInformationTable = ({
               fullWidth
               key={key}
             />,
-          ];
+          ]);
           break;
         case "kind":
-          editableData[3] = [
+          editableData.push([
             "Kind",
-            <ThingKindSelect
-              currentKind={thing.kind}
+            <KindItemKindSelect
+              currentKind={item.kind}
               callback={handleKindSelect}
               size="small"
               variant="standard"
@@ -157,16 +135,23 @@ export const ThingInformationTable = ({
               fullWidth
               key={key}
             />,
-          ];
+          ]);
           break;
         case "shape":
           Object.entries(value).forEach((shapeEntry) => {
             data.push([shapeEntry[0] as string, shapeEntry[1] as string]);
           });
           break;
-        case "containing": {
-          const values = value as unknown;
-          data.push([key as string, (values as any[]).length]);
+        case "timepoint": {
+          item.timepoint && data.push(["Timepoint", item.timepoint]);
+          break;
+        }
+        case "activePlane": {
+          item.activePlane && data.push(["Timepoint", item.activePlane]);
+          break;
+        }
+        case "plane": {
+          item.plane && data.push(["Timepoint", item.plane]);
           break;
         }
         case "colors":
@@ -185,20 +170,20 @@ export const ThingInformationTable = ({
     });
     setTableData([...editableData, ...data]);
   }, [
-    thing,
+    item,
     handleCategorySelect,
     handleImageNameChange,
     handlePartitionSelect,
   ]);
 
   return (
-    <DataTable title={thing.name} collapsible={collapsible}>
+    <DataTable title={item.name} collapsible={collapsible}>
       <>
         {tableData.map((row, idx) => {
           return (
             <DataTableRow
-              key={`thing-info-table-${thing.id}-row-${idx}`}
-              rowId={`thing-info-table-${thing.id}-row-${idx}`}
+              key={`thing-info-table-${item.id}-row-${idx}`}
+              rowId={`thing-info-table-${item.id}-row-${idx}`}
               rowData={row}
             />
           );

@@ -25,22 +25,20 @@ export const Application = () => {
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <WorkerProvider>
-          <FileUploadProvider>
-            <HelpProvider>
-              <HelpOverlay />
-              {alertState.visible && <AlertBar alertState={alertState} />}
-              <BrowserRouter basename={"/"}>
-                <Routes>
-                  <Route path="/" element={<WelcomeScreen />} />
-                  <Route path="project" element={<ProjectViewer />} />
-                  <Route path="imageviewer" element={<ImageViewer />} />
-                  <Route path="measurements" element={<MeasurementView />} />
-                </Routes>
-              </BrowserRouter>
-            </HelpProvider>
-          </FileUploadProvider>
-        </WorkerProvider>
+        <FileUploadProvider>
+          <HelpProvider>
+            <HelpOverlay />
+            {alertState.visible && <AlertBar alertState={alertState} />}
+            <BrowserRouter basename={"/"}>
+              <Routes>
+                <Route path="/" element={<WelcomeScreen />} />
+                <Route path="project" element={<ProjectViewer />} />
+                {/* <Route path="imageviewer" element={<ImageViewer />} />
+                <Route path="measurements" element={<MeasurementView />} /> */}
+              </Routes>
+            </BrowserRouter>
+          </HelpProvider>
+        </FileUploadProvider>
       </ThemeProvider>
     </StyledEngineProvider>
   );

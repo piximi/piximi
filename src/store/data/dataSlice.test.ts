@@ -29,6 +29,7 @@ import { DataState } from "store/types";
 import { Partition } from "utils/models/enums";
 import { selectAllKinds } from "./selectors";
 import { generateUUID } from "./utils";
+import { IMAGE_KIND } from "./constants";
 
 // Mock tensor disposal
 const mockDispose = vi.fn();
@@ -70,7 +71,7 @@ const createMockCategory = (overrides = {}): Category => ({
 const createMockImageMetadata = (overrides = {}): ImageMetadata => ({
   id: "meta1",
   name: "Test Metadata",
-  kind: "Image",
+  kind: IMAGE_KIND,
   bitDepth: 8,
   timeSeries: true,
   shape: { width: 100, height: 100, planes: 1, channels: 1 },
@@ -81,6 +82,7 @@ const createMockImageMetadata = (overrides = {}): ImageMetadata => ({
 
 const createMockImageData = (overrides = {}): ImageData => ({
   id: "img1",
+  name: "img1",
   metadataId: "meta1",
   timepoint: 0,
   partition: Partition.Inference,
@@ -142,7 +144,7 @@ describe("Data Slice", () => {
 
   const getState = () => store.getState() as DataState;
 
-  describe.skip("Kind Operations", () => {
+  describe("Kind Operations", () => {
     it("should add a kind", () => {
       const kindAndCat = createMockKind();
       store.dispatch(dataSlice.actions.addKind(kindAndCat));
@@ -238,7 +240,7 @@ describe("Data Slice", () => {
     });
   });
 
-  describe.skip("Category Operations", () => {
+  describe("Category Operations", () => {
     beforeEach(() => {
       // Most category tests need a kind
       const kind = createMockKind();
@@ -333,10 +335,10 @@ describe("Data Slice", () => {
 
     it("should cascade delete category and reassign to unknown for images", () => {
       const { kind: imageKind, unknownCategory } = createMockKind({
-        id: "Image",
+        id: IMAGE_KIND,
       });
 
-      const category = createMockCategory({ id: "cat1", kind: "Image" });
+      const category = createMockCategory({ id: "cat1", kind: IMAGE_KIND });
       const metadata = createMockImageMetadata();
       const image = createMockImageData({
         categoryId: "cat1",
@@ -448,7 +450,7 @@ describe("Data Slice", () => {
     });
   });
 
-  describe.skip("Metadata and Image Operations", () => {
+  describe("Metadata and Image Operations", () => {
     it("should add metadata with images", () => {
       const metadata = createMockImageMetadata();
       const image = createMockImageData();
@@ -462,6 +464,32 @@ describe("Data Slice", () => {
       expect(state.images.entities["img1"]).toEqual(image);
       expect(state.relationships.imageToAnnotations["img1"]).toEqual([]);
       expect(state.relationships.categoryToImages["cat1"]).toContain("img1");
+    });
+    it("should batch add metadata", () => {
+      const metadataGroup = [
+        {
+          metadata: createMockImageMetadata({
+            id: "meta1",
+            imageDataIds: ["img1"],
+          }),
+          images: [createMockImageData({ id: "img1", metadataId: "meta1" })],
+        },
+        {
+          metadata: createMockImageMetadata({
+            id: "meta2",
+            imageDataIds: ["img2"],
+          }),
+          images: [createMockImageData({ id: "img2", metadataId: "meta2" })],
+        },
+      ];
+
+      store.dispatch(dataSlice.actions.batchAddMetadata(metadataGroup));
+
+      const state = getState();
+      expect(state.metadata.entities["meta1"]).toBeDefined();
+      expect(state.metadata.entities["meta2"]).toBeDefined();
+      expect(state.images.entities["img1"]).toBeDefined();
+      expect(state.images.entities["img2"]).toBeDefined();
     });
 
     it("should throw error when metadata and images count mismatch", () => {
@@ -529,24 +557,6 @@ describe("Data Slice", () => {
         "invalid",
       );
       consoleError.mockRestore();
-    });
-
-    it("should delete metadata and cascade delete images", () => {
-      const metadata = createMockImageMetadata({
-        imageDataIds: ["img1", "img2"],
-      });
-      const image1 = createMockImageData({ id: "img1" });
-      const image2 = createMockImageData({ id: "img2" });
-
-      store.dispatch(
-        dataSlice.actions.addMetadata({ metadata, images: [image1, image2] }),
-      );
-      store.dispatch(dataSlice.actions.deleteMetadata("meta1"));
-
-      const state = getState();
-      expect(state.metadata.entities["meta1"]).toBeUndefined();
-      expect(state.images.entities["img1"]).toBeUndefined();
-      expect(state.images.entities["img2"]).toBeUndefined();
     });
 
     it("should add image data", () => {
@@ -628,33 +638,6 @@ describe("Data Slice", () => {
       expect(state.relationships.imageToAnnotations["img1"]).toBeUndefined();
     });
 
-    it("should batch add metadata", () => {
-      const metadataGroup = [
-        {
-          metadata: createMockImageMetadata({
-            id: "meta1",
-            imageDataIds: ["img1"],
-          }),
-          images: [createMockImageData({ id: "img1", metadataId: "meta1" })],
-        },
-        {
-          metadata: createMockImageMetadata({
-            id: "meta2",
-            imageDataIds: ["img2"],
-          }),
-          images: [createMockImageData({ id: "img2", metadataId: "meta2" })],
-        },
-      ];
-
-      store.dispatch(dataSlice.actions.batchAddMetadata(metadataGroup));
-
-      const state = getState();
-      expect(state.metadata.entities["meta1"]).toBeDefined();
-      expect(state.metadata.entities["meta2"]).toBeDefined();
-      expect(state.images.entities["img1"]).toBeDefined();
-      expect(state.images.entities["img2"]).toBeDefined();
-    });
-
     it("should batch update image data", () => {
       const metadata = createMockImageMetadata({
         imageDataIds: ["img1", "img2"],
@@ -721,6 +704,23 @@ describe("Data Slice", () => {
       expect(state.images.entities["img2"]).toBeUndefined();
       expect(state.annotations.entities["ann1"]).toBeUndefined();
       expect(state.annotations.entities["ann2"]).toBeUndefined();
+    });
+    it("should delete metadata if all images deleted", () => {
+      const metadata = createMockImageMetadata({
+        imageDataIds: ["img1", "img2"],
+      });
+      const image1 = createMockImageData({ id: "img1" });
+      const image2 = createMockImageData({ id: "img2" });
+
+      store.dispatch(
+        dataSlice.actions.addMetadata({ metadata, images: [image1, image2] }),
+      );
+      store.dispatch(dataSlice.actions.batchDeleteImageData(["img1", "img2"]));
+
+      const state = getState();
+      expect(state.metadata.entities["meta1"]).toBeUndefined();
+      expect(state.images.entities["img1"]).toBeUndefined();
+      expect(state.images.entities["img2"]).toBeUndefined();
     });
   });
 
@@ -954,7 +954,7 @@ describe("Data Slice", () => {
     });
   });
 
-  describe.skip("Utility Operations", () => {
+  describe("Utility Operations", () => {
     it("should clear all data", () => {
       const kind = createMockKind();
       const category = createMockCategory();
@@ -989,7 +989,7 @@ describe("Data Slice", () => {
     });
   });
 
-  describe.skip("Complex Relationship Scenarios", () => {
+  describe("Complex Relationship Scenarios", () => {
     it("should maintain consistency when deleting annotation with complex relationships", () => {
       const kind = createMockKind({ id: "kind1" });
       const category = createMockCategory({ id: "cat1" });
@@ -1035,14 +1035,14 @@ describe("Data Slice", () => {
       // Create a complex scenario with multiple relationships
       const { kind: imageKind, unknownCategory: unknownImgCat } =
         createMockKind({
-          id: "Image",
+          id: IMAGE_KIND,
         });
       const { kind: annotationKind, unknownCategory: unknownAnnCat } =
         createMockKind({
           id: "Annotation",
         });
 
-      const imgCat = createMockCategory({ id: "img-cat", kind: "Image" });
+      const imgCat = createMockCategory({ id: "img-cat", kind: IMAGE_KIND });
       const annCat = createMockCategory({ id: "ann-cat", kind: "Annotation" });
 
       const metadata = createMockImageMetadata({
@@ -1115,47 +1115,6 @@ describe("Data Slice", () => {
       expect(state.relationships.imageToAnnotations["img2"]).toEqual([]);
     });
 
-    it("should handle metadata deletion with multiple images and annotations", () => {
-      const metadata = createMockImageMetadata({
-        id: "meta1",
-        imageDataIds: ["img1", "img2", "img3"],
-        defaultImageId: "img1",
-      });
-
-      const images = [
-        createMockImageData({ id: "img1", metadataId: "meta1" }),
-        createMockImageData({ id: "img2", metadataId: "meta1" }),
-        createMockImageData({ id: "img3", metadataId: "meta1" }),
-      ];
-
-      const annotations = [
-        createMockAnnotation({ id: "ann1", imageId: "img1" }),
-        createMockAnnotation({ id: "ann2", imageId: "img1" }),
-        createMockAnnotation({ id: "ann3", imageId: "img2" }),
-        createMockAnnotation({ id: "ann4", imageId: "img3" }),
-      ];
-
-      store.dispatch(dataSlice.actions.addMetadata({ metadata, images }));
-      store.dispatch(dataSlice.actions.batchAddAnnotations(annotations));
-
-      // Verify setup
-      let state = getState();
-      expect(state.metadata.entities["meta1"]).toBeDefined();
-      expect(Object.keys(state.images.entities)).toHaveLength(3);
-      expect(Object.keys(state.annotations.entities)).toHaveLength(4);
-
-      // Delete metadata (should cascade to all images and their annotations)
-      store.dispatch(dataSlice.actions.deleteMetadata("meta1"));
-
-      state = getState();
-      expect(state.metadata.entities["meta1"]).toBeUndefined();
-      expect(Object.keys(state.images.entities)).toHaveLength(0);
-      expect(Object.keys(state.annotations.entities)).toHaveLength(0);
-      expect(state.relationships.imageToAnnotations["img1"]).toBeUndefined();
-      expect(state.relationships.imageToAnnotations["img2"]).toBeUndefined();
-      expect(state.relationships.imageToAnnotations["img3"]).toBeUndefined();
-    });
-
     it("should properly update default image when deleting images", () => {
       const metadata = createMockImageMetadata({
         imageDataIds: ["img1", "img2", "img3"],
@@ -1183,17 +1142,10 @@ describe("Data Slice", () => {
       state = getState();
       // Should update to the last remaining image
       expect(state.metadata.entities["meta1"]?.defaultImageId).toBe("img3");
-
-      // Delete the last image
-      store.dispatch(dataSlice.actions.deleteImageData("img3"));
-
-      state = getState();
-      // Should be empty string when no images left
-      expect(state.metadata.entities["meta1"]?.defaultImageId).toBe("");
     });
   });
 
-  describe.skip("Error Handling", () => {
+  describe("Error Handling", () => {
     it("should handle operations on non-existent entities gracefully", () => {
       // Try to update non-existent kind
       store.dispatch(

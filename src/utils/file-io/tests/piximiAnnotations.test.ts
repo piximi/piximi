@@ -38,7 +38,7 @@
 //   activePlane: 0,
 //   colors: undefined as unknown as ImageObject["colors"],
 //   src: data.image,
-//   kind: "Image",
+//   kind: IMAGE_KIND,
 //   data: undefined as unknown as ImageObject["data"],
 //   // full image props, also not needed so fake it
 //   categoryId: "",

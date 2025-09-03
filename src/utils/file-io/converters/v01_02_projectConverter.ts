@@ -12,6 +12,7 @@ import { EntityState } from "@reduxjs/toolkit";
 import { Category, Kind, Shape } from "store/data/types";
 import { generateKind, isUnknownCategory } from "store/data/utils";
 import {
+  IMAGE_KIND,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   UNKNOWN_IMAGE_CATEGORY_ID,
 } from "store/data/constants";
@@ -36,9 +37,9 @@ const v01_02_dataConverter = (data: {
 
   // Create Kind Entity State
   const kinds: EntityState<Kind, string> = { ids: [], entities: {} };
-  // Add "Image" Kind
+  // Add IMAGE_KIND Kind
   const { kind: imageKind, unknownCategory: unknownImageCategory } =
-    generateKind("Image");
+    generateKind(IMAGE_KIND);
   kinds.ids.push(imageKind.id);
   kinds.entities[imageKind.id] = imageKind;
 
@@ -73,11 +74,11 @@ const v01_02_dataConverter = (data: {
       categories.entities[catId] = {
         ...category,
         id: catId,
-        kind: "Image",
+        kind: IMAGE_KIND,
         containing: [],
       } as Category;
 
-      kinds.entities["Image"].categories.push(catId);
+      kinds.entities[IMAGE_KIND].categories.push(catId);
     }
   }
 

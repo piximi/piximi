@@ -1,6 +1,6 @@
 import { decode } from "views/ImageViewer/utils";
 import JSZip from "jszip";
-import { AnnotationObject, Category, ImageObject } from "store/data/types";
+import { AnnotationObject, Category, ImageMetadata } from "store/data/types";
 import { merge } from "lodash";
 import { TiffIO, BaseIFD } from "../tiff-io";
 import { AnnotationExportType } from "../enums";
@@ -29,7 +29,7 @@ type LMasksTiff = Record<
 
 const processAnnotation = (
   ann: AnnotationObject,
-  images: Record<string, ImageObject>,
+  images: Record<string, ImageMetadata>,
   categories: Record<string, Category>,
 ) => {
   const image = images[ann.imageId];
@@ -75,7 +75,7 @@ const updateColors = (
 
 // image id -> image
 export const exportAnnotationMasks = (
-  images: Record<string, ImageObject>,
+  images: Record<string, ImageMetadata>,
   annotations: Record<string, AnnotationObject>,
   categories: Record<string, Category>,
   projectName: string,

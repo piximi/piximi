@@ -8,7 +8,7 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
 import { selectActiveKindId } from "store/project/selectors";
 
-import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
+import { IMAGE_KIND, UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 import { HotkeyContext } from "utils/enums";
 
 import { Category } from "store/data/types";
@@ -22,7 +22,7 @@ type CategoryItemMenuProps = {
   kind?: string;
   editCategory: (kindOrId: string, name: string, color: string) => void;
   deleteCategory: (category: Category, kindId: string) => void;
-  clearObjects: (category: Category) => void;
+  clearObjects: (categoryId: string) => void;
 };
 
 export const CategoryItemMenu = ({
@@ -107,11 +107,11 @@ export const CategoryItemMenu = ({
       <ConfirmationDialog
         title={`Delete All "${category.name}" Objects`}
         content={`Objects categorized as "${category.name}" will be deleted. ${
-          activeKind === "Image"
+          activeKind === IMAGE_KIND
             ? "Associated annotations will also be removed."
             : ""
         } `}
-        onConfirm={() => clearObjects(category)}
+        onConfirm={() => clearObjects(category.id)}
         onClose={() => handleMenuCloseWith(handleCloseDeleteObjectsDialog)}
         isOpen={isDeleteObjectsDialogOpen}
       />

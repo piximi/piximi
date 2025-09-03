@@ -23,10 +23,10 @@ import {
   Partition,
 } from "../enums";
 import { loadDataUrlAsStack } from "utils/file-io/utils";
-import { convertToImage } from "utils/tensorUtils";
+import { extractImageFileDetails } from "utils/tensorUtils";
 import {
   Category,
-  ImageObject,
+  ImageMetadata,
   // Shape
 } from "store/data/types";
 
@@ -175,11 +175,17 @@ const validationImagesUnloaded = [
 it("evaluateClassifier", async () => {
   // await setBackend("tensorflow");
 
-  const validationImages: ImageObject[] = [];
+  const validationImages: ImageMetadata[] = [];
 
   for (const im of validationImagesUnloaded) {
     const imStack = await loadDataUrlAsStack(im.src);
-    const loadedIm = await convertToImage(imStack, "mnist", undefined, 1, 1);
+    const loadedIm = await extractImageFileDetails(
+      imStack,
+      "mnist",
+      undefined,
+      1,
+      1,
+    );
     validationImages.push({ ...loadedIm, ...im });
   }
 

@@ -13,7 +13,7 @@ import { predictCellpose } from "./predictCellpose";
 import { FitOptions } from "../../types";
 import { ModelTask } from "../../enums";
 import { getImageSlice } from "utils/tensorUtils";
-import { Kind, ImageObject } from "store/data/types";
+import { Kind, ImageMetadata, GeneralizedKindItem } from "store/data/types";
 import { LoadCB } from "utils/file-io/types";
 import { generateKind } from "store/data/utils";
 import { hyphaWebsocketClient } from "imjoy-rpc";
@@ -63,14 +63,17 @@ export class Cellpose extends Segmenter {
     this._model = { dispose: () => {} } as GraphModel;
   }
 
-  public loadTraining(_images: ImageObject[], _preprocessingArgs: any): void {}
-
-  public loadValidation(
-    _images: ImageObject[],
+  public loadTraining(
+    _images: GeneralizedKindItem[],
     _preprocessingArgs: any,
   ): void {}
 
-  private _sampleGenerator(images: Array<ImageObject>) {
+  public loadValidation(
+    _images: GeneralizedKindItem[],
+    _preprocessingArgs: any,
+  ): void {}
+
+  private _sampleGenerator(images: Array<GeneralizedKindItem>) {
     const count = images.length;
 
     return function* () {
@@ -88,7 +91,7 @@ export class Cellpose extends Segmenter {
   }
 
   public loadInference(
-    images: ImageObject[],
+    images: GeneralizedKindItem[],
     preprocessingArgs: LoadInferenceDataArgs,
   ): void {
     this._inferenceDataset = tfdata

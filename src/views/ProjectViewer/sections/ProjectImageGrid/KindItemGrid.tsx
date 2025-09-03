@@ -5,51 +5,47 @@ import { Container } from "@mui/material";
 import { FixedSizeGrid as Grid } from "react-window";
 import memoize from "memoize-one";
 
-import { useSortFunction } from "../../../hooks";
+import { useSortFunction } from "views/ProjectViewer/hooks";
 
 import { DropBox } from "components/layout";
 
 import { projectSlice } from "store/project";
-import { selectSelectedAnnotations } from "store/project/selectors";
-import {
-  selectActiveSelectedThingIds,
-  selectFilteredAnnotationsByKind,
-} from "store/project/reselectors";
+
 import { GRID_GAP } from "utils/constants";
-import { TSAnnotationObject } from "store/data/types";
-import { AnnotationGridCell } from "./ProjectGridItem/AnnotationGridItem";
+import { GeneralizedKindItem } from "store/data/types";
 import { useWindowGrid } from "views/ProjectViewer/hooks/useWindowGrid";
+import {
+  selectActiveFilteredKindItems,
+  selectActiveFilteresSelectedKindItemIds,
+} from "store/project/reselectors";
+import { KindItemGridCell } from "./KindItemGridCell";
 
 const createItemData = memoize(
   (
-    annotations: TSAnnotationObject[],
-    handleSelectAnnotation: (id: string, selected: boolean) => void,
-    selectedAnnotationIds: ReturnType<typeof selectActiveSelectedThingIds>,
+    items: GeneralizedKindItem[],
+    handleSelectItem: (id: string, selected: boolean) => void,
+    selectedItems: string[],
     numColumns: number,
   ) => ({
-    annotations,
-    handleSelectAnnotation,
-    selectedAnnotationIds,
+    items,
+    handleSelectItem,
+    selectedItems,
     numColumns,
   }),
 );
 
-//NOTE: kind is passed as a prop and used internally instead of the kind returned
-// by the active kind selector to keep from rerendering the grid items when switching tabs
-export const AnnotationGrid = ({ kind }: { kind: string }) => {
+export const KindItemGrid = () => {
   const dispatch = useDispatch();
-  const filteredAnnotations = useSelector(selectFilteredAnnotationsByKind)(
-    kind,
-  );
-  const selectedAnnotationIds = useSelector(selectSelectedAnnotations);
+  const activeKindItems = useSelector(selectActiveFilteredKindItems);
+  const selectedItems = useSelector(selectActiveFilteresSelectedKindItemIds);
   const sortFunction = useSortFunction();
 
   //const [visibleThings, setVisibleThings] = useState<Things>([]);
 
-  const sortedAnnotations = useMemo(
-    () => filteredAnnotations.sort(sortFunction),
-    [filteredAnnotations, sortFunction],
-  );
+  // const sortedImages = useMemo(
+  //   () => filteredImages.sort(sortFunction) as FullTimepointImage[],
+  //   [filteredImages, sortFunction],
+  // );
 
   const {
     gridRef,
@@ -59,22 +55,19 @@ export const AnnotationGrid = ({ kind }: { kind: string }) => {
     numColumns,
     rowHeight,
     numRows,
-  } = useWindowGrid(sortedAnnotations);
+  } = useWindowGrid(activeKindItems);
 
-  const handleSelectAnnotation = useCallback(
+  const handleSelectItem = useCallback(
     (id: string, selected: boolean) => {
       if (selected) {
-        dispatch(projectSlice.actions.deselectAnnotations({ ids: id }));
+        dispatch(projectSlice.actions.deselectKindItems(id));
       } else {
-        dispatch(projectSlice.actions.selectAnnotations({ ids: id }));
+        dispatch(projectSlice.actions.selectKindItems(id));
       }
     },
     [dispatch],
   );
 
-  useEffect(() => {
-    //console.log(imageCatDict);
-  });
   return (
     <DropBox>
       <Container
@@ -101,14 +94,14 @@ export const AnnotationGrid = ({ kind }: { kind: string }) => {
             rowHeight={rowHeight}
             width={gridWidth}
             itemData={createItemData(
-              sortedAnnotations,
-              handleSelectAnnotation,
-              selectedAnnotationIds,
+              activeKindItems,
+              handleSelectItem,
+              selectedItems,
               numColumns,
             )}
             style={{ width: gridWidth }}
           >
-            {AnnotationGridCell}
+            {KindItemGridCell}
           </Grid>
         )}
       </Container>

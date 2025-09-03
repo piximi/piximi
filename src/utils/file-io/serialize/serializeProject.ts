@@ -22,8 +22,9 @@ import { Colors } from "utils/types";
 import {
   Kind,
   Category,
-  TSAnnotationObject,
-  TSImageObject,
+  AnnotationObject,
+  ImageMetadata,
+  ImageData,
 } from "store/data/types";
 import { range } from "lodash";
 
@@ -55,9 +56,46 @@ const serializeImageColors = async (colorsGroup: Group, colors: Colors) => {
   ]);
 };
 
-const serializeImages = async (
+const serializeMetadata = async (
+  metadataGroup: Group,
+  metadata: Array<ImageMetadata>,
+  loadCb: LoadCB,
+) => {
+  const metadataNames = metadata.map((metadatum) => metadatum.name);
+
+  metadataGroup.attrs.setItem("metadata_names", metadataNames);
+  loadCb(0, `serializing ${metadata.length} images`);
+
+  for await (const i of range(0, metadata.length)) {
+    const metadatum = metadata[i];
+    const metadatumGroup = await metadataGroup.createGroup(metadataNames[i]);
+    await metadatumGroup.attrs.setItem("metadata_id", metadatum.id);
+    await metadatumGroup.attrs.setItem(
+      "image_data_ids",
+      metadatum.imageDataIds,
+    );
+    await metadatumGroup.attrs.setItem("kind", metadatum.kind);
+    await metadatumGroup.attrs.setItem("planes", metadatum.shape.planes);
+    await metadatumGroup.attrs.setItem("channels", metadatum.shape.channels);
+    await metadatumGroup.attrs.setItem("width", metadatum.shape.width);
+    await metadatumGroup.attrs.setItem("height", metadatum.shape.height);
+    await metadatumGroup.attrs.setItem("bit_depth", metadatum.bitDepth);
+    await metadataGroup.attrs.setItem(
+      "default_image_id",
+      metadatum.defaultImageId,
+    );
+    await metadatumGroup.attrs.setItem("time_series", metadatum.timeSeries);
+
+    loadCb(
+      (i + 1) / metadataNames.length,
+      `serialized image ${i + 1}/${metadataNames.length}`,
+    );
+  }
+};
+
+const serializeImageData = async (
   imagesGroup: Group,
-  images: Array<TSImageObject>,
+  images: Array<ImageData>,
   loadCb: LoadCB,
 ) => {
   const imageNames = images.map((image) => image.name);
@@ -68,33 +106,15 @@ const serializeImages = async (
   for await (const i of range(0, images.length)) {
     const image = images[i];
     const imageGroup = await imagesGroup.createGroup(imageNames[i]);
-    // const bd = await getAttr(data, "bit_depth");
-
     await imageGroup.attrs.setItem("image_id", image.id);
-    await imageGroup.attrs.setItem("contents", image.containing);
-    await imageGroup.attrs.setItem("kind", image.kind);
     await imageGroup.attrs.setItem("classifier_partition", image.partition);
+    await imageGroup.attrs.setItem("timepoint", image.timepoint);
+    await writeFlatTensor(imageGroup, imageNames[i], image.data);
 
-    const tpData = Object.entries(image.timepoints);
-    imageGroup.setItem(
-      "timepoints",
-      tpData.map((entry) => entry[0]),
-    );
-    for await (const [tp, attrs] of Object.entries(image.timepoints)) {
-      const tsGroup = await imageGroup.createGroup(tp);
-      const data = await writeTensor(tsGroup, tp, attrs.data, [
-        image.shape.planes,
-        image.shape.height,
-        image.shape.width,
-        image.shape.channels,
-      ]);
-      await data.attrs.setItem("bit_depth", image.bitDepth);
-      await tsGroup.attrs.setItem("active_plane", attrs.activePlane);
-      await tsGroup.attrs.setItem("class_category_id", attrs.categoryId);
-
-      const colorGroup = await tsGroup.createGroup("colors");
-      await serializeImageColors(colorGroup, attrs.colors);
-    }
+    await imageGroup.attrs.setItem("active_plane", image.activePlane);
+    await imageGroup.attrs.setItem("class_category_id", image.categoryId);
+    const colorGroup = await imageGroup.createGroup("colors");
+    await serializeImageColors(colorGroup, image.colors);
 
     loadCb(
       (i + 1) / imageNames.length,
@@ -104,7 +124,7 @@ const serializeImages = async (
 };
 const serializeAnnotations = async (
   annotationsGroup: Group,
-  annotations: Array<TSAnnotationObject>,
+  annotations: Array<AnnotationObject>,
   loadCb: LoadCB,
 ) => {
   const annotationNames = annotations.map((annotation) => annotation.name);
@@ -176,23 +196,11 @@ const serializeCategories = async (
     "kind",
     categories.map((cat) => cat.kind),
   );
-  await categoryGroup.attrs.setItem(
-    "contents",
-    categories.map((cat) => cat.containing),
-  );
 };
 const serializeKinds = async (kindGroup: Group, kinds: Kind[]) => {
   await kindGroup.attrs.setItem(
     "kind_id",
     kinds.map((k) => k.id),
-  );
-  await kindGroup.attrs.setItem(
-    "contents",
-    kinds.map((k) => k.containing),
-  );
-  await kindGroup.attrs.setItem(
-    "categories",
-    kinds.map((k) => k.categories),
   );
   await kindGroup.attrs.setItem(
     "unknown_category_id",
@@ -210,8 +218,9 @@ const _serializeProject = async (
   data: {
     kinds: Array<Kind>;
     categories: Array<Category>;
-    images: Array<TSImageObject>;
-    annotations: Array<TSAnnotationObject>;
+    metadata: Array<ImageMetadata>;
+    images: Array<ImageData>;
+    annotations: Array<AnnotationObject>;
   },
   loadCb: LoadCB,
 ) => {
@@ -221,8 +230,11 @@ const _serializeProject = async (
     project.imageChannels ?? "undefined",
   );
 
+  const metadataGroup = await projectGroup.createGroup("metadata");
+  await serializeMetadata(metadataGroup, data.metadata, loadCb);
+
   const imagesGroup = await projectGroup.createGroup("images");
-  await serializeImages(imagesGroup, data.images, loadCb);
+  await serializeImageData(imagesGroup, data.images, loadCb);
 
   const annotationsGroup = await projectGroup.createGroup("annotations");
   await serializeAnnotations(annotationsGroup, data.annotations, loadCb);
@@ -413,8 +425,9 @@ export const serializeProject = async (
   data: {
     kinds: Array<Kind>;
     categories: Array<Category>;
-    images: Array<TSImageObject>;
-    annotations: Array<TSAnnotationObject>;
+    metadata: Array<ImageMetadata>;
+    images: Array<ImageData>;
+    annotations: Array<AnnotationObject>;
   },
   classifierSlice: ClassifierState,
   segmenterSlice: SegmenterState,
@@ -500,4 +513,7 @@ const writeTensor = async (
     cleanBuffer(tensor),
     shape ? shape : tensor.shape,
   );
+};
+const writeFlatTensor = async (group: Group, name: string, tensor: Tensor) => {
+  return writeArray(group, name, cleanBuffer(tensor));
 };

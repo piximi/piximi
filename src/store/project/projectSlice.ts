@@ -6,19 +6,18 @@ import { GridSortKey } from "utils/enums";
 import { Partition } from "utils/models/enums";
 
 import { ProjectState } from "store/types";
-import { updateRecordArray } from "utils/objectUtils";
-import { TPKey } from "store/data/types";
+import { IMAGE_KIND } from "store/data/constants";
 
 export const initialState: ProjectState = {
   name: "Untitled project",
-  selectedThingIds: [],
   selectedImages: {},
-  selectedAnnotations: [],
+  selectedAnnotations: {},
+  selectedKindItems: {},
   sortType: GridSortKey.None,
-  activeKind: "Image",
-  thingFilters: {},
-
-  highlightedCategory: undefined,
+  activeKind: IMAGE_KIND,
+  kindItemFilters: { [IMAGE_KIND]: { categoryId: [], partition: [] } },
+  expandedTime: false,
+  activeCtegory: undefined,
 
   kindTabFilters: [],
   imageChannels: undefined,
@@ -41,20 +40,29 @@ export const projectSlice = createSlice({
     setActiveKind(state, action: PayloadAction<{ kind: string }>) {
       state.activeKind = action.payload.kind;
     },
-    selectThings(
-      state,
-      action: PayloadAction<{ ids: Array<string> | string }>,
-    ) {
+
+    selectKindItems(state, action: PayloadAction<Array<string> | string>) {
       const ids =
-        typeof action.payload.ids === "string"
-          ? [action.payload.ids]
-          : action.payload.ids;
-      const allSelectedThings = [
-        ...new Set([...state.selectedThingIds, ...ids]),
+        typeof action.payload === "string" ? [action.payload] : action.payload;
+
+      const allSelectedKindItems = [
+        ...new Set([
+          ...(state.selectedKindItems[state.activeKind] ?? []),
+          ...ids,
+        ]),
       ];
 
-      state.selectedThingIds = allSelectedThings;
+      state.selectedKindItems[state.activeKind] = allSelectedKindItems;
     },
+    deselectKindItems(state, action: PayloadAction<Array<string> | string>) {
+      const ids =
+        typeof action.payload === "string" ? [action.payload] : action.payload;
+      mutatingFilter(
+        state.selectedKindItems[state.activeKind],
+        (id) => !ids.includes(id),
+      );
+    },
+
     selectAnnotations(
       state,
       action: PayloadAction<{ ids: Array<string> | string }>,
@@ -64,10 +72,10 @@ export const projectSlice = createSlice({
           ? [action.payload.ids]
           : action.payload.ids;
       const allSelectedAnnotations = [
-        ...new Set([...state.selectedAnnotations, ...ids]),
+        ...new Set([...state.selectedAnnotations[state.activeKind], ...ids]),
       ];
 
-      state.selectedAnnotations = allSelectedAnnotations;
+      state.selectedAnnotations[state.activeKind] = allSelectedAnnotations;
     },
     deselectAnnotations(
       state,
@@ -77,57 +85,15 @@ export const projectSlice = createSlice({
         typeof action.payload.ids === "string"
           ? [action.payload.ids]
           : action.payload.ids;
-      mutatingFilter(state.selectedAnnotations, (id) => !ids.includes(id));
+      mutatingFilter(
+        state.selectedAnnotations[state.activeKind],
+        (id) => !ids.includes(id),
+      );
     },
     resetAnnotationSelection(state) {
-      state.selectedAnnotations = [];
+      state.selectedAnnotations[state.activeKind] = [];
     },
     selectImages(
-      state,
-      action: PayloadAction<{
-        selection:
-          | Array<{ id: string; timepoint: TPKey }>
-          | { id: string; timepoint: TPKey };
-      }>,
-    ) {
-      const selectionArray = Array.isArray(action.payload.selection)
-        ? action.payload.selection
-        : [action.payload.selection];
-
-      selectionArray.forEach((image) => {
-        updateRecordArray(state.selectedImages, image.id, image.timepoint);
-      });
-    },
-    deselectImages(
-      state,
-      action: PayloadAction<{
-        selection:
-          | Array<{ id: string; timepoint: TPKey }>
-          | { id: string; timepoint: TPKey };
-      }>,
-    ) {
-      const selectionArray = Array.isArray(action.payload.selection)
-        ? action.payload.selection
-        : [action.payload.selection];
-
-      selectionArray.forEach((image) => {
-        const selectedTimepoints = state.selectedImages[image.id];
-        if (!selectedTimepoints)
-          throw new Error(
-            `Image with id "${image.id}" not previously selected`,
-          );
-        mutatingFilter(
-          state.selectedImages[image.id],
-          (timepoint) => timepoint !== image.timepoint,
-        );
-        if (state.selectedImages[image.id].length === 0)
-          delete state.selectedImages[image.id];
-      });
-    },
-    resetImageSelection(state) {
-      state.selectedImages = {};
-    },
-    deselectThings(
       state,
       action: PayloadAction<{ ids: Array<string> | string }>,
     ) {
@@ -135,10 +101,30 @@ export const projectSlice = createSlice({
         typeof action.payload.ids === "string"
           ? [action.payload.ids]
           : action.payload.ids;
-      state.selectedThingIds = state.selectedThingIds.filter(
-        (id: string) => !ids.includes(id),
+      const allSelectedImages = [
+        ...new Set([...state.selectedImages[state.activeKind], ...ids]),
+      ];
+
+      state.selectedAnnotations[state.activeKind] = allSelectedImages;
+    },
+    deselectImages(
+      state,
+      action: PayloadAction<{ ids: Array<string> | string }>,
+    ) {
+      const ids =
+        typeof action.payload.ids === "string"
+          ? [action.payload.ids]
+          : action.payload.ids;
+      mutatingFilter(
+        state.selectedImages[state.activeKind],
+        (id) => !ids.includes(id),
       );
     },
+
+    resetImageSelection(state) {
+      state.selectedImages = {};
+    },
+
     setSortType(state, action: PayloadAction<{ sortType: GridSortKey }>) {
       state.sortType = action.payload.sortType;
     },
@@ -146,13 +132,13 @@ export const projectSlice = createSlice({
       state.name = action.payload.name;
     },
 
-    updateHighlightedCategory(
+    changeActiveCategory(
       state,
       action: PayloadAction<{ categoryId: string | undefined }>,
     ) {
-      state.highlightedCategory = action.payload.categoryId;
+      state.activeCtegory = action.payload.categoryId;
     },
-    addThingCategoryFilters(
+    addKindItemCategoryFilters(
       state,
       action: PayloadAction<{
         categoryIds: string[];
@@ -165,16 +151,19 @@ export const projectSlice = createSlice({
       };
 
       for (const kind of kinds) {
-        if (kind in state.thingFilters) {
-          const existingFilters = state.thingFilters[kind].categoryId ?? [];
+        if (kind in state.kindItemFilters) {
+          const existingFilters = state.kindItemFilters[kind].categoryId ?? [];
           const newFilters = toUnique([...categoryIds, ...existingFilters]);
-          state.thingFilters[kind].categoryId = newFilters;
+          state.kindItemFilters[kind].categoryId = newFilters;
         } else {
-          state.thingFilters[kind] = { categoryId: categoryIds, partition: [] };
+          state.kindItemFilters[kind] = {
+            categoryId: categoryIds,
+            partition: [],
+          };
         }
       }
     },
-    removeThingCategoryFilters(
+    removeKindItemCategoryFilters(
       state,
       action: PayloadAction<{
         categoryIds: string[] | "all";
@@ -187,24 +176,18 @@ export const projectSlice = createSlice({
       };
 
       for (const kind of kinds) {
-        if (!(kind in state.thingFilters)) continue;
+        if (!(kind in state.kindItemFilters)) continue;
         if (categoryIds === "all") {
-          state.thingFilters[kind].categoryId = [];
+          state.kindItemFilters[kind].categoryId = [];
         } else {
           mutatingFilter(
-            state.thingFilters[kind].categoryId,
-            (id) => !categoryIds!.includes(id),
+            state.kindItemFilters[kind].categoryId,
+            (id) => !categoryIds.includes(id as string),
           );
-        }
-        if (
-          state.thingFilters[kind].categoryId.length === 0 &&
-          state.thingFilters[kind].partition.length === 0
-        ) {
-          delete state.thingFilters[kind];
         }
       }
     },
-    addThingPartitionFilters(
+    addKindItemPartitionFilters(
       state,
       action: PayloadAction<{
         partitions: Partition[] | "all";
@@ -216,16 +199,19 @@ export const projectSlice = createSlice({
 
       partitions = partitions === "all" ? Object.values(Partition) : partitions;
       for (const kind of kinds) {
-        if (kind in state.thingFilters) {
-          const existingFilters = state.thingFilters[kind].partition ?? [];
+        if (kind in state.kindItemFilters) {
+          const existingFilters = state.kindItemFilters[kind].partition ?? [];
           const newFilters = toUnique([...partitions, ...existingFilters]);
-          state.thingFilters[kind].partition = newFilters;
+          state.kindItemFilters[kind].partition = newFilters;
         } else {
-          state.thingFilters[kind] = { categoryId: [], partition: partitions };
+          state.kindItemFilters[kind] = {
+            categoryId: [],
+            partition: partitions,
+          };
         }
       }
     },
-    removeThingPartitionFilters(
+    removeKindItemPartitionFilters(
       state,
       action: PayloadAction<{
         partitions: string[] | "all";
@@ -237,22 +223,28 @@ export const projectSlice = createSlice({
         ...action.payload,
       };
       for (const kind of kinds) {
-        if (!(kind in state.thingFilters)) continue;
+        if (!(kind in state.kindItemFilters)) continue;
         if (partitions === "all") {
-          state.thingFilters[kind].partition = [];
+          state.kindItemFilters[kind].partition = [];
         } else {
           mutatingFilter(
-            state.thingFilters[kind].partition,
+            state.kindItemFilters[kind].partition,
             (id) => !partitions.includes(id),
           );
         }
-        if (
-          state.thingFilters[kind].partition.length === 0 &&
-          state.thingFilters[kind].categoryId.length === 0
-        ) {
-          delete state.thingFilters[kind];
-        }
       }
+    },
+    addKindToItemFilters(state, action: PayloadAction<string>) {
+      const kind = action.payload;
+      if (kind in state.kindItemFilters) {
+        console.error(`Kind ${kind} already exists in filters, skipping...`);
+        return;
+      }
+      state.kindItemFilters[kind] = { categoryId: [], partition: [] };
+    },
+    removeKindFromItemFilters(state, action: PayloadAction<string>) {
+      const kind = action.payload;
+      delete state.kindItemFilters[kind];
     },
     addKindTabFilter(state, action: PayloadAction<{ kindId: string }>) {
       state.kindTabFilters.push(action.payload.kindId);
@@ -271,6 +263,9 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ channels: number | undefined }>,
     ) {
       state.imageChannels = action.payload.channels;
+    },
+    toggleTimeExpansion(state) {
+      state.expandedTime = !state.expandedTime;
     },
   },
 });

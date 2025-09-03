@@ -4,11 +4,6 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { MenuItem, ListItemText } from "@mui/material";
 
 import { dataSlice } from "store/data";
-import {
-  selectObjectCategoryDict,
-  selectObjectKindDict,
-  selectSplitThingDict,
-} from "store/data/selectors";
 
 import {
   deserializeCOCOFile,
@@ -36,94 +31,96 @@ export const ImportAnnotationsFileMenuItem = ({
   onCloseMenu,
   projectType,
 }: ImportAnnotationsMenuItemProps) => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  const existingObjectCategories = useSelector(selectObjectCategoryDict);
+  // const existingObjectCategories = useSelector(selectObjectCategoryDict);
 
-  const existingThings = useSelector(selectSplitThingDict);
-  const existingObjectKinds = useSelector(selectObjectKindDict);
+  // const existingThings = useSelector(selectSplitThingDict);
+  // const existingObjectKinds = useSelector(selectObjectKindDict);
 
-  const onImportProjectFile = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>, onClose: () => void) => {
-      onClose();
+  // const onImportProjectFile = useCallback(
+  //   (event: React.ChangeEvent<HTMLInputElement>, onClose: () => void) => {
+  //     onClose();
 
-      event.persist();
+  //     event.persist();
 
-      if (!event.currentTarget.files) return;
+  //     if (!event.currentTarget.files) return;
 
-      const file = event.currentTarget.files[0];
+  //     const file = event.currentTarget.files[0];
 
-      const reader = new FileReader();
+  //     const reader = new FileReader();
 
-      reader.onload = async (event: ProgressEvent<FileReader>) => {
-        if (event.target && event.target.result) {
-          const serializedProject: SerializedCOCOFileType | SerializedFileType =
-            validateFileType(event.target.result as string, projectType);
-          const { newAnnotations, newCategories, newKinds } =
-            projectType === ProjectFileType.PIXIMI
-              ? await deserializePiximiAnnotations(
-                  serializedProject as SerializedFileType,
-                  existingThings.images,
-                  existingObjectCategories,
-                  existingObjectKinds,
-                )
-              : await deserializeCOCOFile(
-                  serializedProject as SerializedCOCOFileType,
-                  Object.values(existingThings.images),
-                  Object.values(existingObjectCategories),
-                  Object.values(existingObjectKinds),
-                  Object.values(CATEGORY_COLORS),
-                );
+  //     reader.onload = async (event: ProgressEvent<FileReader>) => {
+  //       if (event.target && event.target.result) {
+  //         const serializedProject: SerializedCOCOFileType | SerializedFileType =
+  //           validateFileType(event.target.result as string, projectType);
+  //         const { newAnnotations, newCategories, newKinds } =
+  //           projectType === ProjectFileType.PIXIMI
+  //             ? await deserializePiximiAnnotations(
+  //                 serializedProject as SerializedFileType,
+  //                 existingThings.images,
+  //                 existingObjectCategories,
+  //                 existingObjectKinds,
+  //               )
+  //             : await deserializeCOCOFile(
+  //                 serializedProject as SerializedCOCOFileType,
+  //                 Object.values(existingThings.images),
+  //                 Object.values(existingObjectCategories),
+  //                 Object.values(existingObjectKinds),
+  //                 Object.values(CATEGORY_COLORS),
+  //               );
 
-          batch(() => {
-            dispatch(
-              dataSlice.actions.addKinds({
-                kinds: newKinds,
-              }),
-            );
-            dispatch(
-              dataSlice.actions.addCategories({
-                categories: newCategories,
-              }),
-            );
-            dispatch(
-              dataSlice.actions.addThings({
-                things: newAnnotations,
-              }),
-            );
-          });
-        }
-      };
+  //         batch(() => {
+  //           dispatch(
+  //             dataSlice.actions.addKinds({
+  //               kinds: newKinds,
+  //             }),
+  //           );
+  //           dispatch(
+  //             dataSlice.actions.addCategories({
+  //               categories: newCategories,
+  //             }),
+  //           );
+  //           dispatch(
+  //             dataSlice.actions.addTSAnnotations({
+  //               annotations: newAnnotations,
+  //             }),
+  //           );
+  //         });
+  //       }
+  //     };
 
-      reader.readAsText(file);
-    },
-    [
-      dispatch,
-      existingObjectCategories,
-      existingThings.images,
-      existingObjectKinds,
-      projectType,
-    ],
-  );
+  //     reader.readAsText(file);
+  //   },
+  //   [
+  //     dispatch,
+  //     existingObjectCategories,
+  //     existingThings.images,
+  //     existingObjectKinds,
+  //     projectType,
+  //   ],
+  // );
 
-  return (
-    <MenuItem component="label" dense>
-      <ListItemText
-        primary={
-          projectType === ProjectFileType.PIXIMI
-            ? "Import Piximi"
-            : "Import COCO"
-        }
-      />
-      <input
-        accept="application/json"
-        hidden
-        id="import-project-file"
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-          onImportProjectFile(event, onCloseMenu)
-        }
-        type="file"
-      />
-    </MenuItem>
-  );
+  // return (
+  //   <MenuItem component="label" dense>
+  //     <ListItemText
+  //       primary={
+  //         projectType === ProjectFileType.PIXIMI
+  //           ? "Import Piximi"
+  //           : "Import COCO"
+  //       }
+  //     />
+  //     <input
+  //       accept="application/json"
+  //       hidden
+  //       id="import-project-file"
+  //       onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+  //         onImportProjectFile(event, onCloseMenu)
+  //       }
+  //       type="file"
+  //     />
+  //   </MenuItem>
+  // );
+  console.log("TODO");
+  return <></>;
 };

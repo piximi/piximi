@@ -1,7 +1,7 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { Box, Divider, Stack } from "@mui/material";
+import { Box, Button, Divider, Stack } from "@mui/material";
 
 import { useMobileView } from "hooks";
 
@@ -16,10 +16,14 @@ import { ImageViewerButton } from "./ImageViewerButton";
 import { MeasurementsButton } from "./MeasurementsButton";
 import { DIMENSIONS } from "utils/constants";
 import { ItemSelection } from "./ItemSelection";
+import { selectExpandedTime } from "store/project/selectors";
+import { projectSlice } from "store/project";
 
 export const ProjectAppBar = () => {
   const loadPercent = useSelector(selectLoadPercent);
   const isMobile = useMobileView();
+  const dispatch = useDispatch();
+  const timeExpanded = useSelector(selectExpandedTime);
 
   return (
     <Stack
@@ -54,7 +58,12 @@ export const ProjectAppBar = () => {
       <ProjectTextField />
 
       <Box sx={{ flexGrow: 1 }} />
-
+      <Button
+        variant="text"
+        onClick={() => dispatch(projectSlice.actions.toggleTimeExpansion())}
+      >
+        {timeExpanded ? "gropu" : "expand"}
+      </Button>
       <ItemSelection />
       {isMobile ? (
         <ZoomControl />

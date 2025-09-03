@@ -32,7 +32,7 @@ import {
   MeasurementOptions,
 } from "./tool-options";
 
-import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
+import { selectActiveKindItemFilters } from "store/project/selectors";
 
 import { DIMENSIONS } from "utils/constants";
 import { capitalize } from "utils/stringUtils";
@@ -123,11 +123,19 @@ export const ImageToolDrawer = () => {
   const theme = useTheme();
   const [activeTool, setActiveTool] = useState<OperationType>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const filtersExist = useSelector(selectActiveFilteredStateHasFilters);
+  const kindFilters = useSelector(selectActiveKindItemFilters);
   const t = useTranslation();
   const isMobile = useMobileView();
   const { anchorEl, onOpen: setPopperAnchor } = useMenu();
   const { height: windowHeight } = useWindowSize();
+
+  const filteringActive = useMemo(() => {
+    const numFilters = Object.values(kindFilters).reduce(
+      (count: number, filters) => count + filters.length,
+      0,
+    );
+    return Boolean(numFilters);
+  }, [kindFilters]);
 
   const handleSelectTool = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -242,7 +250,7 @@ export const ImageToolDrawer = () => {
                   <Badge
                     color="primary"
                     variant="dot"
-                    invisible={!filtersExist}
+                    invisible={!filteringActive}
                   >
                     {tool.icon(
                       activeTool === tool

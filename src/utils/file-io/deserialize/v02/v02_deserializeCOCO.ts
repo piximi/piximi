@@ -14,10 +14,10 @@ import { Point } from "utils/types";
 import { RequireOnly } from "utils/types";
 import {
   Kind,
-  AnnotationObject,
   Category,
-  ImageObject,
+  ImageMetadata,
   Shape,
+  AnnotationObject,
 } from "store/data/types";
 import {
   UNKNOWN_ANNOTATION_CATEGORY_COLOR,
@@ -35,7 +35,7 @@ type CategoryMap = Record<
 >;
 type ImageMap = Record<
   string,
-  { new: SerializedCOCOImageType; existing?: ImageObject }
+  { new: SerializedCOCOImageType; existing?: ImageMetadata }
 >;
 
 const reconcileCOCOCategories = (
@@ -175,7 +175,7 @@ const reconcileCOCOCategories = (
 };
 
 const reconcileCOCOImages = (
-  existingImages: Array<ImageObject>,
+  existingImages: Array<ImageMetadata>,
   serializedImages: Array<SerializedCOCOImageType>,
 ) => {
   const imageMap: ImageMap = {};
@@ -249,7 +249,7 @@ const deserializeCOCOAnnotation = (
 
 export const v02_deserializeCOCOFile = async (
   cocoFile: SerializedCOCOFileType,
-  existingImages: Array<ImageObject>,
+  existingImages: Array<ImageMetadata>,
   existingCategories: Array<Category>,
   existingKinds: Array<Kind>,
   availableColors: Array<string> = [],
@@ -275,7 +275,8 @@ export const v02_deserializeCOCOFile = async (
     const reconciledAnnotation: Partial<AnnotationObject> = {
       id: generateUUID(),
       partition: Partition.Unassigned,
-      activePlane: 0,
+      plane: 0,
+      timepoint: "0",
     };
     const annImage = imageMap[cocoAnn.image_id];
     const category = categoryMap[cocoAnn.category_id];

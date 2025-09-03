@@ -10,8 +10,8 @@ import {
 
 import { Partition } from "../enums";
 import { loadDataUrlAsStack } from "utils/file-io/utils";
-import { convertToImage } from "utils/tensorUtils";
-import { Category, ImageObject, Shape } from "store/data/types";
+import { extractImageFileDetails } from "utils/tensorUtils";
+import { Category, ImageMetadata, Shape } from "store/data/types";
 import classifierHandler from "../classification/classifierHandler";
 
 const categories: Array<Category> = [
@@ -145,12 +145,12 @@ const inferrenceImagesUnloaded = [
 it("predict", async () => {
   // await setBackend("tensorflow");
 
-  const inferrenceImages: Array<ImageObject> = [];
+  const inferrenceImages: Array<ImageMetadata> = [];
   const imageIds: Array<string> = [];
 
   for (const im of inferrenceImagesUnloaded) {
     const imStack = await loadDataUrlAsStack(im.src);
-    const loadedIm = await convertToImage(
+    const loadedIm = await extractImageFileDetails(
       imStack,
       "mnist",
       undefined,

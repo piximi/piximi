@@ -1,12 +1,14 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { dataSlice } from "store/data";
-import { GeneralizedKindItem } from "store/data/types";
-import { projectSlice } from "store/project";
+import { IMAGE_KIND } from "store/data/constants";
+import { selectCategoryToAllItems } from "store/data/selectors";
 import {
-  selectActiveCategories,
-  selectActiveKindItems,
-} from "store/project/reselectors";
+  GeneralizedKindItem,
+  GeneralizedKindItemEditableProps,
+} from "store/data/types";
+import { isUnknownCategory } from "store/data/utils";
+import { projectSlice } from "store/project";
 import {
   selectActiveKindId,
   selectExpandedTime,
@@ -14,22 +16,23 @@ import {
 import { Partition } from "utils/models/enums";
 
 type KindOperations = {
-  deleteSelectedItems: (itemIds: string[] | Record<string, string[]>) => void;
+  deleteSelectedItems: (itemIds: string[]) => void;
   deleteKindItemsOfCategory: (categoryId: string) => void;
   categorizeKindItem: (itemId: GeneralizedKindItem, categoryId: string) => void;
   categorizeSelectedKindItems: (
-    selectedItems: string[] | Record<string, string[]>,
+    selectedItems: string[],
     categoryId: string,
   ) => void;
   repartitionKindItem: (itemId: string, partition: Partition) => void;
   repartitionSelectedKindItems: (
-    selectedItems: string[] | Record<string, string[]>,
+    selectedItems: string[],
     partition: Partition,
   ) => void;
-  selectKindItem: (item: GeneralizedKindItem) => void;
-  deselectKindItem: (item: GeneralizedKindItem) => void;
-  selectAllKindItems: () => void;
-  deselectAllKindItems: () => void;
+  updateKindItem: (
+    id: string,
+    changes: Partial<GeneralizedKindItemEditableProps>,
+  ) => void;
+  updateKindItemKind: (id: string, kind: string) => void;
 };
 
 const KindItemsContext = createContext<KindOperations | null>(null);
@@ -40,40 +43,37 @@ export const KindItemsProvider = ({
 }) => {
   const dispatch = useDispatch();
   const activeKindId = useSelector(selectActiveKindId);
-  const activeKindItems = useSelector(selectActiveKindItems);
-  const activeCategories = useSelector(selectActiveCategories);
+  const categoryToItems = useSelector(selectCategoryToAllItems);
   const isExpandedTime = useSelector(selectExpandedTime);
   const [showCategoryRestriction, setShowCategoryRestriction] =
     useState<boolean>(false);
 
   const deleteSelectedItems = useCallback(
-    (itemIds: string[] | Record<string, string[]>) => {
-      if (activeKindId === "Image") {
-        if (Array.isArray(itemIds)) {
-          console.error("Cannot handle image ids as string array.");
-          return;
-        }
-        dispatch(dataSlice.actions.batchDeleteImageTimepointCascade(itemIds));
+    (itemIds: string[]) => {
+      if (activeKindId === IMAGE_KIND) {
+        dispatch(dataSlice.actions.batchDeleteImageDataCascade(itemIds));
       } else {
         dispatch(dataSlice.actions.batchDeleteAnnotations(itemIds as string[]));
       }
+      dispatch(projectSlice.actions.deselectKindItems(itemIds));
     },
     [dispatch, activeKindId],
   );
 
   const deleteKindItemsOfCategory = useCallback(
     (categoryId: string) => {
-      if (activeKindId === "Image") {
-        dataSlice.actions.deleteImageTimepointsByCategoryCascade(categoryId);
-        return;
-      }
-      dataSlice.actions.deleteAnnotationsOfCategory(categoryId);
+      if (activeKindId === IMAGE_KIND)
+        dispatch(dataSlice.actions.deleteImageDataByCategory(categoryId));
+      else dispatch(dataSlice.actions.deleteAnnotationsOfCategory(categoryId));
+      dispatch(
+        projectSlice.actions.deselectKindItems(categoryToItems[categoryId]),
+      );
     },
     [activeKindId],
   );
   const categorizeKindItem = useCallback(
     (item: GeneralizedKindItem, categoryId: string) => {
-      if (activeKindId === "Image") {
+      if (activeKindId === IMAGE_KIND) {
         if (!isExpandedTime) {
           setShowCategoryRestriction(true);
           return;
@@ -82,41 +82,63 @@ export const KindItemsProvider = ({
           console.error("No timepoint given for re-categorization");
           return;
         }
-        dataSlice.actions.updateImageData({
-          id: item.id,
-          timepoint: item.timepoint,
-          changes: { categoryId },
-        });
+        dispatch(
+          dataSlice.actions.updateImageData({
+            id: item.id,
+            changes: {
+              categoryId,
+              partition: isUnknownCategory(categoryId)
+                ? Partition.Inference
+                : Partition.Unassigned,
+            },
+          }),
+        );
         return;
       }
-      dataSlice.actions.updateAnnotation({
-        id: item.id,
-        changes: { categoryId },
-      });
+      dispatch(
+        dataSlice.actions.updateAnnotation({
+          id: item.id,
+          changes: {
+            categoryId,
+            partition: isUnknownCategory(categoryId)
+              ? Partition.Inference
+              : Partition.Unassigned,
+          },
+        }),
+      );
     },
     [activeKindId],
   );
   const categorizeSelectedKindItems = useCallback(
-    (
-      selectedItems: string[] | Record<string, string[]>,
-      categoryId: string,
-    ) => {
-      if (activeKindId === "Image") {
-        if (Array.isArray(selectedItems)) {
-          console.error("Cannot handle image ids as string array.");
-          return;
-        }
-        dataSlice.actions.batchUpdateImageTimepoint({
-          imageTimepoints: selectedItems,
-          changes: { categoryId },
-        });
+    (selectedItems: string[], categoryId: string) => {
+      if (activeKindId === IMAGE_KIND) {
+        dispatch(
+          dataSlice.actions.batchUpdateImageData(
+            selectedItems.map((id) => ({
+              id,
+              changes: {
+                categoryId,
+                partition: isUnknownCategory(categoryId)
+                  ? Partition.Inference
+                  : Partition.Unassigned,
+              },
+            })),
+          ),
+        );
         return;
       }
-      dataSlice.actions.batchUpdateAnnotation(
-        (selectedItems as string[]).map((id) => ({
-          id,
-          changes: { categoryId },
-        })),
+      dispatch(
+        dataSlice.actions.batchUpdateAnnotation(
+          (selectedItems as string[]).map((id) => ({
+            id,
+            changes: {
+              categoryId,
+              partition: isUnknownCategory(categoryId)
+                ? Partition.Inference
+                : Partition.Unassigned,
+            },
+          })),
+        ),
       );
     },
     [activeKindId],
@@ -124,17 +146,21 @@ export const KindItemsProvider = ({
 
   const repartitionKindItem = useCallback(
     (itemId: string, partition: Partition) => {
-      if (activeKindId === "Image") {
-        dataSlice.actions.updateDefaultMetadataImage({
-          id: itemId,
-          changes: { partition },
-        });
+      if (activeKindId === IMAGE_KIND) {
+        dispatch(
+          dataSlice.actions.updateImageData({
+            id: itemId,
+            changes: { partition },
+          }),
+        );
         return;
       }
-      dataSlice.actions.updateAnnotation({
-        id: itemId,
-        changes: { partition },
-      });
+      dispatch(
+        dataSlice.actions.updateAnnotation({
+          id: itemId,
+          changes: { partition },
+        }),
+      );
     },
     [activeKindId],
   );
@@ -143,84 +169,60 @@ export const KindItemsProvider = ({
       selectedItems: string[] | Record<string, string[]>,
       partition: Partition,
     ) => {
-      if (activeKindId === "Image") {
+      if (activeKindId === IMAGE_KIND) {
         if (Array.isArray(selectedItems)) {
           console.error("Cannot handle image ids as string array.");
           return;
         }
-        dataSlice.actions.batchUpdateImageData(
-          Object.keys(selectedItems).map((item) => ({
-            id: item,
-            changes: { partition },
-          })),
+        dispatch(
+          dataSlice.actions.batchUpdateImageData(
+            Object.keys(selectedItems).map((item) => ({
+              id: item,
+              changes: { partition },
+            })),
+          ),
         );
         return;
       }
-      dataSlice.actions.batchUpdateAnnotation(
-        (selectedItems as string[]).map((id) => ({
-          id,
-          changes: { partition },
-        })),
+      dispatch(
+        dataSlice.actions.batchUpdateAnnotation(
+          (selectedItems as string[]).map((id) => ({
+            id,
+            changes: { partition },
+          })),
+        ),
       );
     },
     [activeKindId],
   );
 
-  const selectKindItem = useCallback(
-    (item: GeneralizedKindItem) => {
-      if (activeKindId === "Image") {
-        projectSlice.actions.selectImages({
-          selection: { id: item.id, timepoint: item.timepoint as string },
-        });
-      } else {
-        projectSlice.actions.selectAnnotations({ ids: item.id });
-      }
+  const updateKindItem = useCallback(
+    (id: string, changes: Partial<GeneralizedKindItemEditableProps>) => {
+      if (activeKindId === IMAGE_KIND)
+        dispatch(
+          dataSlice.actions.updateImageData({
+            id,
+            changes,
+          }),
+        );
+      else
+        dispatch(
+          dataSlice.actions.updateAnnotation({
+            id,
+            changes,
+          }),
+        );
     },
     [activeKindId],
   );
 
-  const deselectKindItem = useCallback(
-    (item: GeneralizedKindItem) => {
-      if (activeKindId === "Image") {
-        projectSlice.actions.deselectImages({
-          selection: { id: item.id, timepoint: item.timepoint as string },
-        });
-      } else {
-        projectSlice.actions.deselectAnnotations({ ids: item.id });
-      }
+  const updateKindItemKind = useCallback(
+    (id: string, kind: string) => {
+      if (activeKindId === IMAGE_KIND) return;
+      dispatch(dataSlice.actions.updateAnnotation({ id, changes: { kind } }));
     },
     [activeKindId],
   );
-
-  const selectAllKindItems = useCallback(() => {
-    if (activeKindId === "Image") {
-      projectSlice.actions.selectImages({
-        selection: activeKindItems.map((item) => ({
-          id: item.id,
-          timepoint: item.timepoint as string,
-        })),
-      });
-    } else {
-      projectSlice.actions.selectAnnotations({
-        ids: activeKindItems.map((item) => item.id),
-      });
-    }
-  }, [activeKindId, activeKindItems]);
-
-  const deselectAllKindItems = useCallback(() => {
-    if (activeKindId === "Image") {
-      projectSlice.actions.deselectImages({
-        selection: activeKindItems.map((item) => ({
-          id: item.id,
-          timepoint: item.timepoint as string,
-        })),
-      });
-    } else {
-      projectSlice.actions.deselectAnnotations({
-        ids: activeKindItems.map((item) => item.id),
-      });
-    }
-  }, [activeKindId, activeKindItems]);
 
   const operations: KindOperations = {
     deleteSelectedItems,
@@ -228,11 +230,9 @@ export const KindItemsProvider = ({
     categorizeSelectedKindItems,
     repartitionKindItem,
     repartitionSelectedKindItems,
-    selectKindItem,
-    selectAllKindItems,
-    deselectKindItem,
-    deselectAllKindItems,
     deleteKindItemsOfCategory,
+    updateKindItem,
+    updateKindItemKind,
   };
 
   return (

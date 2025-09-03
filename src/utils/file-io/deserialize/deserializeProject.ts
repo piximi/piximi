@@ -10,6 +10,7 @@ import { v11_deserializeProject } from "./v110/v11_deserializeProject";
 import { v01_02_projectConverter } from "../converters/v01_02_projectConverter";
 import { v02_11_projectConverter } from "../converters/v02_11_projectConverter";
 import { v11_12_projectConverter } from "../converters/v11_12_projectConverter";
+import { v12_deserializeProject } from "./v120/v12_deserializeProject";
 
 export const deserializeProject = async (
   fileStore: CustomStore,
@@ -26,21 +27,23 @@ export const deserializeProject = async (
   }
   const piximiVersion = semver.clean(piximiVersionRaw);
   console.log(piximiVersion);
-  let currentProject: CurrentProject | undefined;
   if (!semver.valid(piximiVersion) || semver.lt(piximiVersion!, "0.1.0")) {
     throw Error(`File version ${piximiVersion} is unsupported.`);
-  } else if (semver.eq(piximiVersion!, "0.1.0")) {
+  }
+  if (semver.eq(piximiVersion!, "0.1.0")) {
     const v01Project = await v01_deserializeProject(fileStore, loadCb);
     const v02Project = v01_02_projectConverter(v01Project);
     const v11Project = v02_11_projectConverter(v02Project);
-    currentProject = v11_12_projectConverter(v11Project);
-  } else if (semver.lte(piximiVersion!, "1.0.0")) {
+    return v11_12_projectConverter(v11Project);
+  }
+  if (semver.lte(piximiVersion!, "1.0.0")) {
     const v02Project = await v02_deserializeProject(fileStore, loadCb);
     const v11Project = v02_11_projectConverter(v02Project);
-    currentProject = v11_12_projectConverter(v11Project);
-  } else if (semver.gte(piximiVersion!, "1.1.0")) {
-    const v11Project = await v11_deserializeProject(fileStore, loadCb);
-    currentProject = v11_12_projectConverter(v11Project);
+    return v11_12_projectConverter(v11Project);
   }
-  return currentProject!;
+  if (semver.lt(piximiVersion!, "1.2.0")) {
+    const v11Project = await v11_deserializeProject(fileStore, loadCb);
+    return v11_12_projectConverter(v11Project);
+  }
+  return await v12_deserializeProject(fileStore, loadCb);
 };

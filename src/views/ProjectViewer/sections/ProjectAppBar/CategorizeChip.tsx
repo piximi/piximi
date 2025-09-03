@@ -1,36 +1,29 @@
-import { useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useCallback, useState } from "react";
+import { useSelector } from "react-redux";
 import { Chip, Tooltip, useMediaQuery, useTheme } from "@mui/material";
 import { LabelOutlined as LabelOutlinedIcon } from "@mui/icons-material";
 
 import { ImageCategoryMenu } from "./ImageCategoryMenu";
 
-import { dataSlice } from "store/data";
-import { isUnknownCategory } from "store/data/utils";
 import {
   selectActiveCategories,
-  selectActiveSelectedGridAnnotations,
-  selectSelectedGridImages,
+  selectActiveFilteresSelectedKindItemIds,
 } from "store/project/reselectors";
 
-import { Partition } from "utils/models/enums";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { selectActiveKindId } from "store/project/selectors";
+import { useKindOperations } from "contexts/KindItemsProvider";
 
 export const CategorizeChip = () => {
-  const dispatch = useDispatch();
-  const categories = useSelector(selectActiveCategories);
-  const selectedImages = useSelector(selectSelectedGridImages);
-  const selectedAnnotations = useSelector(selectActiveSelectedGridAnnotations);
-  const activeKind = useSelector(selectActiveKindId);
-  const selectedItems = useMemo(() => {
-    return activeKind === "Image" ? selectedImages : selectedAnnotations;
-  }, [activeKind, selectedImages, selectedAnnotations]);
   const theme = useTheme();
+  const categories = useSelector(selectActiveCategories);
+  const selectedItems = useSelector(selectActiveFilteresSelectedKindItemIds);
+
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     useState<null | HTMLElement>(null);
 
+  const { categorizeSelectedKindItems } = useKindOperations();
   const smOrXsBreakpoint = useMediaQuery(theme.breakpoints.down("md"));
+
   const onOpenCategoriesMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     setCategoryMenuAnchorEl(event.currentTarget);
   };
@@ -38,20 +31,13 @@ export const CategorizeChip = () => {
   const onCloseCategoryMenu = () => {
     setCategoryMenuAnchorEl(null);
   };
-  const handleUpdateCategories = (categoryId: string) => {
-    const updates = selectedItems.map((item) => ({
-      id: item.id,
-      categoryId: categoryId,
-      partition: isUnknownCategory(categoryId)
-        ? Partition.Inference
-        : Partition.Unassigned,
-    }));
-    dispatch(
-      dataSlice.actions.updateThings({
-        updates,
-      }),
-    );
-  };
+
+  const updateKindItems = useCallback(
+    (categoryId: string) => {
+      categorizeSelectedKindItems(selectedItems, categoryId);
+    },
+    [selectedItems],
+  );
 
   return (
     <>
@@ -79,7 +65,7 @@ export const CategorizeChip = () => {
         anchorEl={categoryMenuAnchorEl as HTMLElement}
         onClose={onCloseCategoryMenu}
         open={Boolean(categoryMenuAnchorEl as HTMLElement)}
-        onUpdateCategories={handleUpdateCategories}
+        onUpdateCategories={updateKindItems}
         categories={categories}
       />
     </>

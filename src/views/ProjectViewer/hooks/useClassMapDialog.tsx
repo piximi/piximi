@@ -62,7 +62,7 @@ const ClassMapDialog = ({
         newCategories.push(cat);
         confirmedCatMap[idx] = cat.id;
       });
-      dispatch(dataSlice.actions.addCategories({ categories: newCategories }));
+      dispatch(dataSlice.actions.batchAddCategory(newCategories));
       onConfirm(confirmedCatMap);
     } else {
       onConfirm(catMap);

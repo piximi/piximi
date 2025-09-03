@@ -7,7 +7,7 @@ import {
   OptimizerSettings,
 } from "../types";
 import { CropSchema, ModelTask } from "../enums";
-import { ImageObject, Shape } from "store/data/types";
+import { GeneralizedKindItem, ImageMetadata, Shape } from "store/data/types";
 
 export abstract class Model {
   readonly name: string;
@@ -116,15 +116,15 @@ export abstract class Model {
 
   public abstract loadModel(loadModelArgs?: any): void | Promise<void>;
   public abstract loadTraining(
-    images: ImageObject[],
+    images: GeneralizedKindItem[],
     preprocessingArgs: any,
   ): void;
   public abstract loadValidation(
-    images: ImageObject[],
+    images: GeneralizedKindItem[],
     preprocessingArgs: any,
   ): void;
   public abstract loadInference(
-    images: ImageObject[],
+    images: GeneralizedKindItem[],
     preprocessingArgs: any,
   ): void;
 

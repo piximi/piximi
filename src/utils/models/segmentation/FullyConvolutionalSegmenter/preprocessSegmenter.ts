@@ -18,7 +18,7 @@ import IJSImage from "image-js";
 import {
   Category,
   DecodedAnnotationObject,
-  ImageObject,
+  ImageMetadata,
   Shape,
 } from "store/data/types";
 import { FitOptions, PreprocessOptions, RescaleOptions } from "../types";
@@ -151,7 +151,7 @@ const decodeImage = async (
       );
 };
 
-const sampleGenerator = (images: Array<ImageObject>, channels: number) => {
+const sampleGenerator = (images: Array<ImageMetadata>, channels: number) => {
   const count = images.length;
 
   return function* () {
@@ -211,7 +211,7 @@ const resize = async (
 };
 
 export const preprocessSegmentationImages = async (
-  images: Array<ImageObject>,
+  images: Array<ImageMetadata>,
   categories: Array<Category>,
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,

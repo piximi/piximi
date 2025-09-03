@@ -10,28 +10,23 @@ import {
   selectWorkingAnnotationEntity,
 } from "./selectors";
 import {
-  selectLocalizedAnnotationDict,
-  selectObjectCategoryDict,
-  selectObjectDict,
-  selectObjectKindDict,
+  //selectLocalizedAnnotationDict,
+  selectCategoryEntities,
+  // selectObjectDict,
+  // selectObjectKindDict,
 } from "store/data/selectors";
 
 import { decodeAnnotation } from "views/ImageViewer/utils/rle";
 import { getCompleteEntity } from "./utils";
 
-import {
-  AnnotationObject,
-  Category,
-  Kind,
-  Shape,
-  TSAnnotationObject,
-} from "store/data/types";
+import { Category, Kind, Shape, AnnotationObject } from "store/data/types";
 import { ProtoAnnotationObject } from "views/ImageViewer/utils/types";
 import {
   selectActiveImage,
   selectImageSeriesArray,
 } from "../imageViewer/reselectors";
 import { selectActiveImageSeries } from "../imageViewer/selectors";
+import { IMAGE_KIND } from "store/data/constants";
 
 export const selectImageViewerKinds = createSelector(
   selectObjectKindDict,
@@ -133,7 +128,7 @@ export const selectCategoriesByKind = createSelector(
       { kindId: string; categories: Category[] }
     > = {};
     allKinds.forEach((kind) => {
-      if (kind.id === "Image") return;
+      if (kind.id === IMAGE_KIND) return;
       catsByKind[kind.id] = {
         kindId: kind.id,
         categories: kind.categories.map((id) => catDict[id]),
@@ -239,11 +234,11 @@ export const selectImageViewerObjects = createSelector(
   selectImageSeriesArray,
   selectUpdatedActiveAnnotationDict,
   (images, objects) => {
-    const annotationObjects: Record<string, TSAnnotationObject> = {};
+    const annotationObjects: Record<string, AnnotationObject> = {};
     for (const im of images) {
       const annIds = im.containing;
       for (const annId of annIds) {
-        annotationObjects[annId] = objects[annId] as TSAnnotationObject;
+        annotationObjects[annId] = objects[annId] as AnnotationObject;
       }
     }
     return annotationObjects;

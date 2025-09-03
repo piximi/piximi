@@ -1,16 +1,16 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { selectActiveImageId, selectImageStackImageIds } from "./selectors";
-import { selectImageDictionary } from "store/data/selectors";
+import { selectImageDataEntities } from "store/data/selectors";
 import { extractTimepoint } from "store/data/utils";
 import { generateBlankColors } from "utils/tensorUtils";
 import { Colors, ColorsRaw } from "utils/types";
-import { TSImageObject } from "store/data/types";
+import { ImageMetadata } from "store/data/types";
 
 export const selectUpdatedImages = createSelector(
   selectImageStackImageIds,
-  selectImageDictionary,
-  (imageSeriesDetails, images): Record<string, TSImageObject> => {
-    const updatedImages: Record<string, TSImageObject> = {};
+  selectImageDataEntities,
+  (imageSeriesDetails, images): Record<string, ImageMetadata> => {
+    const updatedImages: Record<string, ImageMetadata> = {};
 
     for (const imageId of Object.keys(imageSeriesDetails)) {
       const image = images[imageId];
@@ -24,7 +24,7 @@ export const selectUpdatedImages = createSelector(
         partition: image.partition,
         name: image.name,
         timepoints: {},
-      } as TSImageObject;
+      } as ImageMetadata;
 
       Object.keys(imageSeriesDetails[imageId].timepoints).forEach((tp) => {
         finalImage.timepoints[tp] = {

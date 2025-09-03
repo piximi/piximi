@@ -14,9 +14,9 @@ import {
   ModelTask,
 } from "../enums";
 import { loadImageFileAsStack } from "utils/file-io/utils";
-import { convertToImage } from "utils/tensorUtils";
+import { extractImageFileDetails } from "utils/tensorUtils";
 import { MIMEType } from "utils/file-io/types";
-import { Category, ImageObject } from "store/data/types";
+import { Category, ImageMetadata } from "store/data/types";
 import { MIMETYPES } from "utils/file-io/enums";
 import { getDefaultModelInfo } from "../classification/utils";
 
@@ -97,11 +97,11 @@ const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
 it(
   "preprocessClassifier",
   async () => {
-    const images: Array<ImageObject> = [];
+    const images: Array<ImageMetadata> = [];
 
     for (const preIm of preloadedImages) {
       const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);
-      const im = await convertToImage(
+      const im = await extractImageFileDetails(
         imStack,
         preIm.name,
         undefined,
