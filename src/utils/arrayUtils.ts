@@ -2,6 +2,7 @@
 
 import { difference } from "lodash";
 import { FilterType } from "./types";
+import { updateRecordArray } from "./objectUtils";
 
 // An iterable with length property set the the passed value is used to create an array
 export const arrayRange = (length: number): number[] => {
@@ -47,4 +48,13 @@ export const getDifferences = <T>(original: T[], next: T[]) => {
     added: difference(next, original),
     removed: difference(original, next),
   };
+};
+
+export const groupBy = <T extends object>(items: T[], key: keyof T) => {
+  return items.reduce((grouped: Record<string, T[]>, item) => {
+    if (!item[key]) return grouped;
+    const value = item[key];
+    updateRecordArray(grouped, value as string, item);
+    return grouped;
+  }, {});
 };

@@ -2,7 +2,7 @@ import { Group, openGroup } from "zarr";
 
 import { logger } from "utils/logUtils";
 import { initialState as initialProjectState } from "store/project/projectSlice";
-import { deserializeColorsGroup } from "../common/group-deserializers/deserializeColorsGroup";
+import { deserializeRawColorsGroup } from "../common/group-deserializers/deserializeRawColorsGroup";
 import { deserializeSegmenterGroup } from "../common/group-deserializers/deserializeSegmenterGroup";
 import { getAttr, getDataset, getGroup } from "../../zarr/zarrUtils";
 import { RawArray } from "zarr/types/rawArray";
@@ -116,8 +116,14 @@ const deserializeImageGroup = async (
     "float32",
   );
   const colorsGroup = await getGroup(imageGroup, "colors");
-  const colors = await deserializeColorsGroup(colorsGroup);
-  const src = await createRenderedTensor(data, colors, bitDepth, activePlane);
+  const colors = await deserializeRawColorsGroup(colorsGroup);
+  const src = await createRenderedTensor(
+    data,
+    colors,
+    shape.channels,
+    bitDepth,
+    activePlane,
+  );
 
   return {
     id,
@@ -209,6 +215,7 @@ const deserializeAnnotationGroup = async (
   const src = await createRenderedTensor(
     imageTensor,
     colors,
+    channels,
     bitDepth,
     activePlane,
   );

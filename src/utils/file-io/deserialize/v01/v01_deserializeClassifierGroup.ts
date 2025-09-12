@@ -1,9 +1,6 @@
 // Deserializers for v0.1.0 - v1.0.0
 
-import {
-  V01_ClassifierState,
-  V01_PreprocessOptions,
-} from "utils/file-io/types";
+import { V01ClassifierState, V01PreprocessOptions } from "utils/file-io/types";
 import {
   getAttr,
   getDatasetSelection,
@@ -59,7 +56,7 @@ const deserializeOptimizerSettingsGroup = async (
 };
 const deserializePreprocessOptionsGroup = async (
   preprocessOptionsGroup: Group,
-): Promise<V01_PreprocessOptions> => {
+): Promise<V01PreprocessOptions> => {
   const shuffleRaw = (await getAttr(
     preprocessOptionsGroup,
     "shuffle_B",
@@ -84,7 +81,7 @@ const deserializePreprocessOptionsGroup = async (
 
 export const v01_deserializeClassifierGroup = async (
   classifierGroup: Group,
-): Promise<V01_ClassifierState> => {
+): Promise<V01ClassifierState> => {
   const inputShape = await getDatasetSelection(classifierGroup, "input_shape", [
     null,
   ]);

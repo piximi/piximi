@@ -17,35 +17,33 @@ import {
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-import { ImageMenu } from "./ImageMenu";
+import { MetadataMenu } from "./MetadataMenu";
 
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectImageSeriesArray } from "views/ImageViewer/state/imageViewer/reselectors";
-
-import { ImageMetadata } from "store/data/types";
-import { extractTimepoint } from "store/data/utils";
+import { selectMetadataToAnnotationIds } from "store/data/selectors";
+import { ImageViewerMetadataDetails } from "views/ImageViewer/state/image-viewer-data/types";
+import {
+  selectActiveMetadataId,
+  selectMetadataStackArray,
+} from "views/ImageViewer/state/image-viewer-data/selectors";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 
 const NUM_BUFFERED_IMS = 20;
 const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 4);
 
-interface ImageListItemProps {
-  image: ImageMetadata;
+interface MetadataListItemProps {
+  metadataDetails: ImageViewerMetadataDetails;
+  annotationCount: number;
   isActive: boolean;
-  onItemClick: (image: ImageMetadata) => void;
+  onItemClick: (image: ImageViewerMetadataDetails) => void;
   onSecondaryClick: (target: HTMLElement) => void;
 }
 
-export const ImageList = () => {
+export const MetadataList = () => {
   const dispatch = useDispatch();
-  const imageSeriesArray = useSelector(selectImageSeriesArray);
-  const activeImageId = useSelector(selectActiveImageId);
+  const metadataStackArray = useSelector(selectMetadataStackArray);
+  const activeMetadataId = useSelector(selectActiveMetadataId);
+  const metadataToAnnotationIds = useSelector(selectMetadataToAnnotationIds);
 
-  const imageListImages = useMemo(() => {
-    return imageSeriesArray.map((imageSeries) => {
-      return extractTimepoint(imageSeries, "0");
-    });
-  }, [imageSeriesArray]);
   const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
     null,
   );
@@ -54,26 +52,26 @@ export const ImageList = () => {
     end: NUM_BUFFERED_IMS,
   });
   const [scrollProgress, setScrollProgress] = React.useState(0);
-  const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+  const [selectedMetadataIndex, setSelectedMetadataIndex] = React.useState(0);
 
-  const handleImageItemClick = React.useCallback(
-    (image: ImageMetadata) => {
-      if (image.id !== activeImageId!) {
+  const handleMetadataItemClick = React.useCallback(
+    (metadataDetails: ImageViewerMetadataDetails) => {
+      if (metadataDetails.id !== activeMetadataId!) {
         dispatch(
-          imageViewerSlice.actions.setActiveImageSeriesId({
-            imageId: image.id,
-            prevImageId: activeImageId,
+          imageViewerDataSlice.actions.setActiveMetadataId({
+            metadataId: metadataDetails.id,
+            prevMetadataId: activeMetadataId,
           }),
         );
       }
     },
-    [dispatch, activeImageId],
+    [dispatch, activeMetadataId],
   );
 
-  const handleImageMenuOpen = React.useCallback(
+  const handleMetadataMenuOpen = React.useCallback(
     (target: HTMLElement, imageIndex: number) => {
       setImageAnchorEl(target);
-      setSelectedImageIndex(imageIndex);
+      setSelectedMetadataIndex(imageIndex);
     },
     [],
   );
@@ -87,9 +85,9 @@ export const ImageList = () => {
 
     if (
       target.scrollHeight - target.scrollTop === target.clientHeight &&
-      bufferRange.end < imageSeriesArray.length
+      bufferRange.end < metadataStackArray.length
     ) {
-      const numToLoad = imageSeriesArray.length - bufferRange.end;
+      const numToLoad = metadataStackArray.length - bufferRange.end;
       const numHidden = NUM_BUFFERED_IMS - NUM_VIEW_IMS;
       const newStart =
         numToLoad < numHidden
@@ -103,7 +101,7 @@ export const ImageList = () => {
         end: newEnd,
       });
 
-      setScrollProgress((newEnd / imageSeriesArray.length) * 100);
+      setScrollProgress((newEnd / metadataStackArray.length) * 100);
 
       target.scrollTop = 1;
     } else if (target.scrollTop === 0 && bufferRange.start !== 0) {
@@ -115,7 +113,7 @@ export const ImageList = () => {
         end: newEnd,
       });
 
-      setScrollProgress((newEnd / imageSeriesArray.length) * 100);
+      setScrollProgress((newEnd / metadataStackArray.length) * 100);
 
       target.scrollTop = target.scrollHeight - target.clientHeight - 1;
     }
@@ -153,17 +151,20 @@ export const ImageList = () => {
             })}
             onScroll={handleScroll}
           >
-            {imageListImages
+            {metadataStackArray
               .slice(bufferRange.start, bufferRange.end)
-              .map((image, idx) => {
+              .map((metadataDetails, idx) => {
                 return (
-                  <ImageListItem
-                    key={image.id}
-                    image={image}
-                    isActive={image.id === activeImageId}
-                    onItemClick={handleImageItemClick}
+                  <MetadataListItem
+                    key={metadataDetails.id}
+                    metadataDetails={metadataDetails}
+                    annotationCount={
+                      metadataToAnnotationIds[metadataDetails.id].length
+                    }
+                    isActive={metadataDetails.id === activeMetadataId}
+                    onItemClick={handleMetadataItemClick}
                     onSecondaryClick={(event) =>
-                      handleImageMenuOpen(event, bufferRange.start + idx)
+                      handleMetadataMenuOpen(event, bufferRange.start + idx)
                     }
                   />
                 );
@@ -171,7 +172,7 @@ export const ImageList = () => {
           </List>
         </Box>
         <Box gridColumn="12 / 13" gridRow=" 1 / 2" justifyItems="flex-end">
-          {imageSeriesArray.length > NUM_BUFFERED_IMS && (
+          {metadataStackArray.length > NUM_BUFFERED_IMS && (
             <LinearProgress
               sx={{
                 width: 4,
@@ -189,22 +190,39 @@ export const ImageList = () => {
         </Box>
       </Box>
 
-      <ImageMenu
+      <MetadataMenu
         anchorElImageMenu={imageAnchorEl}
-        selectedImage={imageListImages[selectedImageIndex]}
+        selectedMetadata={metadataStackArray[selectedMetadataIndex]}
+        annotationIds={
+          metadataToAnnotationIds[
+            metadataStackArray[selectedMetadataIndex]?.id ?? 0
+          ]
+        }
         onCloseImageMenu={onImageMenuClose}
         openImageMenu={Boolean(imageAnchorEl)}
       />
     </Stack>
   );
 };
-const ImageListItem = memo(
-  ({ image, isActive, onItemClick, onSecondaryClick }: ImageListItemProps) => {
-    const annotationCount = image.containing.length;
+const MetadataListItem = memo(
+  ({
+    metadataDetails,
+    annotationCount,
+    isActive,
+    onItemClick,
+    onSecondaryClick,
+  }: MetadataListItemProps) => {
     const listItemRef = useRef<HTMLLIElement | null>(null);
+
+    const thumbnailImage = useMemo(() => {
+      if (metadataDetails.activeSrcs.length === 1) {
+        return metadataDetails.activeSrcs[0];
+      }
+      return metadataDetails.activeSrcs[metadataDetails.activePlane];
+    }, [metadataDetails]);
     return (
       <Tooltip
-        title={image.name}
+        title={metadataDetails.name}
         placement="bottom"
         disableInteractive={true}
         enterDelay={500}
@@ -247,14 +265,14 @@ const ImageListItem = memo(
             disablePadding
           >
             <ListItemButton
-              onClick={() => onItemClick(image)}
+              onClick={() => onItemClick(metadataDetails)}
               selected={isActive}
             >
               <ListItemIcon>
                 {
                   <Avatar
-                    alt={image.name}
-                    src={image.src}
+                    alt={metadataDetails.name}
+                    src={thumbnailImage}
                     variant={"square"}
                     sx={{ mr: ".5rem" }}
                   />
@@ -262,7 +280,7 @@ const ImageListItem = memo(
               </ListItemIcon>
 
               <ListItemText
-                primary={image.name}
+                primary={metadataDetails.name}
                 primaryTypographyProps={{ noWrap: true }}
               />
               {annotationCount !== 0 ? (

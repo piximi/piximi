@@ -9,7 +9,6 @@ import {
   selectToolType,
   selectThresholdAnnotationValue,
 } from "views/ImageViewer/state/annotator/selectors";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import {
   AnnotationTool,
@@ -28,6 +27,7 @@ import {
 } from "views/ImageViewer/utils/tools";
 
 import { ToolType } from "views/ImageViewer/utils/enums";
+import { selectActiveImage } from "../state/image-viewer-data/reselectors";
 
 export const useAnnotationTool = () => {
   const [image, setImage] = useState<IJSImage>();

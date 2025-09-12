@@ -12,7 +12,7 @@ import {
   V12Kind,
 } from "../../types";
 import { PartialBy } from "utils/types";
-import { ShapeArray } from "store/data/types";
+import { GeneralizedKindItem, ShapeArray } from "store/data/types";
 
 type V12KindMap = Record<string, { new: V12Kind; existing?: V12Kind }>;
 type V12CategoryMap = Record<
@@ -132,9 +132,12 @@ export const v12_deserializePiximiAnnotations = async (
     // If no existing image we cant build the annotation
     if (!annImage.existing) continue;
     const image = annImage.existing;
-    const annPropsFromIm = await getPropertiesFromImage(image, {
-      boundingBox: annotation.boundingBox as [number, number, number, number],
-    });
+    const annPropsFromIm = await getPropertiesFromImage(
+      image as GeneralizedKindItem,
+      {
+        boundingBox: annotation.boundingBox as [number, number, number, number],
+      },
+    );
     const expandedAnnotation = { ...annotation, ...annPropsFromIm };
 
     /*
@@ -186,7 +189,7 @@ export const v12_deserializePiximiAnnotations = async (
 
   return {
     annotations: reconciledAnnotations,
-    newV12Kinds: Object.values(kindsToReconcile),
+    newKinds: Object.values(kindsToReconcile),
     newCategories: Object.values(categoriesToReconcile),
   };
 };

@@ -14,17 +14,9 @@ import {
   selectAllKinds,
   selectDataState,
   selectCategoryEntities,
+  selectMetadataToAnnotationIds,
 } from "store/data/selectors";
 import { selectProjectName } from "store/project/selectors";
-import { selectHasUnsavedChanges } from "views/ImageViewer/state/imageViewer/selectors";
-import {
-  selectImageViewerObjects,
-  selectImageViewerObjectsArray,
-} from "views/ImageViewer/state/annotator/reselectors";
-import {
-  selectUpdatedImages,
-  selectImageSeriesArray,
-} from "../state/imageViewer/reselectors";
 
 import {
   serializeCOCOFile,
@@ -34,9 +26,13 @@ import {
 import { HotkeyContext } from "utils/enums";
 import { AnnotationExportType } from "utils/file-io/enums";
 import { exportAnnotationMasks } from "utils/file-io/export/annotationExporters";
-import { ImageMetadata, AnnotationObject } from "store/data/types";
-import { selectChanges } from "../state/annotator/selectors";
-import { reconcileChanges } from "../utils/annotationUtils";
+import { AnnotationObject, DecodedAnnotationObject } from "store/data/types";
+import { ImageViewerMetadataDetails } from "../state/image-viewer-data/types";
+import {
+  selectActiveImageRecord,
+  selectAllImageViewerAnnotationRecord,
+  selectAllImageViewerAnnotations,
+} from "../state/image-viewer-data/reselectors";
 
 //TODO: MenuItem??
 
@@ -44,7 +40,7 @@ type ExportAnnotationsMenuProps = {
   anchorEl: HTMLElement | null;
   onClose: () => void;
   open: boolean;
-  selectedImage?: ImageMetadata;
+  selectedMetadata?: ImageViewerMetadataDetails;
 };
 
 const exportOptions = [
@@ -83,20 +79,19 @@ export const ExportAnnotationsMenu = ({
   anchorEl,
   onClose,
   open,
-  selectedImage,
+  selectedMetadata,
 }: ExportAnnotationsMenuProps) => {
   const dataState = useSelector(selectDataState);
-  const annotatorChanges = useSelector(selectChanges);
-  const images = useSelector(selectImageSeriesArray);
+  const images = useSelector(selectActiveImageRecord);
   //FIX_NOW
   //const imageDict = useSelector(selectUpdatedImages);
-  const annotations = useSelector(selectImageViewerObjectsArray);
-  const annotationDict = useSelector(selectImageViewerObjects);
-  const annotationCategories = useSelector(selectAllObjectCategories);
-  const annotationCategoryDict = useSelector(selectObjectCategoryDict);
+  const annotations = useSelector(selectAllImageViewerAnnotations);
+  const annotationDict = useSelector(selectAllImageViewerAnnotationRecord);
+  const annotationCategories = useSelector(selectAllCategories);
+  const annotationCategoryDict = useSelector(selectCategoryEntities);
   const projectName = useSelector(selectProjectName);
-  const objectKinds = useSelector(selectAllObjectKinds);
-  const hasUnsavedChanges = useSelector(selectHasUnsavedChanges);
+  const objectKinds = useSelector(selectAllKinds);
+  const metadataToAnnotationIds = useSelector(selectMetadataToAnnotationIds);
 
   const {
     onClose: handleCloseExportAnnotationsDialog,
@@ -115,7 +110,6 @@ export const ExportAnnotationsMenu = ({
   };
 
   const handleSaveChanges = async () => {
-    await reconcileChanges(dataState, annotatorChanges);
     handleOpenExportAnnotationsDialog();
   };
 
@@ -139,9 +133,9 @@ export const ExportAnnotationsMenu = ({
     (exportType: AnnotationExportType) => {
       setOnProjectName(() => (userProjectName: string) => {
         const zip = new JSZip();
-        let exportedAnnotations: Record<string, AnnotationObject> = {};
-        if (selectedImage) {
-          for (const annId of selectedImage.containing) {
+        let exportedAnnotations: Record<string, DecodedAnnotationObject> = {};
+        if (selectedMetadata) {
+          for (const annId of metadataToAnnotationIds[selectedMetadata.id]) {
             exportedAnnotations[annId] = annotationDict[annId];
           }
         } else {
@@ -200,11 +194,8 @@ export const ExportAnnotationsMenu = ({
 
         onClose();
       });
-      if (hasUnsavedChanges) {
-        handleOpenSaveChangesDialog();
-      } else {
-        handleOpenExportAnnotationsDialog();
-      }
+
+      handleOpenExportAnnotationsDialog();
     },
     [
       setOnProjectName,
@@ -218,9 +209,8 @@ export const ExportAnnotationsMenu = ({
       //imageDict,
       annotationDict,
       annotationCategoryDict,
-      hasUnsavedChanges,
       handleOpenSaveChangesDialog,
-      selectedImage,
+      selectedMetadata,
     ],
   );
 

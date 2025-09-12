@@ -2,7 +2,7 @@ import { History } from "@tensorflow/tfjs";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { ModelTask } from "../../enums";
-import { Category, ImageMetadata, Kind } from "store/data/types";
+import { Category, GeneralizedKindItem, Kind } from "store/data/types";
 
 type LoadModelArgs = {
   simple: boolean;
@@ -22,15 +22,15 @@ export class FullyConvolutionalSegmenter extends Segmenter {
   public loadModel({ simple: _simple }: LoadModelArgs) {}
 
   public loadTraining(
-    _images: ImageMetadata[],
+    _images: GeneralizedKindItem[],
     _preprocessingArgs: any,
   ): void {}
   public loadValidation(
-    _images: ImageMetadata[],
+    _images: GeneralizedKindItem[],
     _preprocessingArgs: any,
   ): void {}
   public loadInference(
-    _images: ImageMetadata[],
+    _images: GeneralizedKindItem[],
     _preprocessingArgs: any,
   ): void {}
 

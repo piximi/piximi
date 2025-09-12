@@ -8,11 +8,13 @@ import { segmenterSlice } from "store/segmenter";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { dataSlice } from "./data/dataSlice";
 import { measurementsSlice } from "./measurements/measurementsSlice";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 
 const reducers = {
   classifier: classifierSlice.reducer,
   segmenter: segmenterSlice.reducer,
   imageViewer: imageViewerSlice.reducer,
+  imageViewerData: imageViewerDataSlice.reducer,
   project: projectSlice.reducer,
   applicationSettings: applicationSettingsSlice.reducer,
   annotator: annotatorSlice.reducer,

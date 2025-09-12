@@ -1,36 +1,8 @@
-import { createSelector } from "@reduxjs/toolkit";
-import { ImageViewerState } from "../../utils/types";
 import {
   ColorAdjustmentOptionsType,
+  ImageViewerState,
   ZoomToolOptionsType,
-} from "views/ImageViewer/utils/types";
-
-export const selectActiveImageSeries = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  if (imageViewer.activeImageSeriesId === undefined) {
-    return undefined;
-  }
-  //console.log("selectActiveImageSeries fired");
-  //console.log(imageViewer.imageStack[imageViewer.activeImageSeriesId]);
-  return imageViewer.imageStack[imageViewer.activeImageSeriesId];
-};
-
-export const selectActivePlane = createSelector(
-  selectActiveImageSeries,
-  (activeImageSeries) => {
-    return activeImageSeries?.activePlane;
-  },
-);
-
-export const selectActiveTimepoint = createSelector(
-  selectActiveImageSeries,
-  (activeImageSeries) => {
-    return activeImageSeries?.activeTimepoint;
-  },
-);
+} from "../types";
 
 export const selectZoomToolOptions = ({
   imageViewer,
@@ -86,28 +58,12 @@ export const selectStageHeight = ({
   return imageViewer.stageHeight;
 };
 
-export const selectSelectedIVCategoryId = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.selectedCategoryId;
-};
-
 export const selectImageViewerFilters = ({
   imageViewer,
 }: {
   imageViewer: ImageViewerState;
 }) => {
   return imageViewer.filters;
-};
-
-export const selectImageStackImageIds = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.imageStack;
 };
 
 export const selectImageOrigin = ({
@@ -124,14 +80,6 @@ export const selectImageIsloading = ({
   imageViewer: ImageViewerState;
 }) => {
   return imageViewer.imageIsLoading;
-};
-
-export const selectHighligtedIVCatogory = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.highlightedCategory;
 };
 
 export const selectFilteredImageViewerCategoryIds = ({
@@ -158,30 +106,6 @@ export const selectColorAdjustments = ({
   return imageViewer.colorAdjustment;
 };
 
-export const selectActiveImageId = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}): string | undefined => {
-  return imageViewer.activeImageSeriesId;
-};
-
-export const selectActiveAnnotationIds = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.activeAnnotationIds;
-};
-
 /*
 UNSAVED CHANGES
 */
-
-export const selectHasUnsavedChanges = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.hasUnsavedChanges;
-};

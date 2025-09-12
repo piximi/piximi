@@ -1,10 +1,10 @@
 import { Tensor3D, Tensor4D, data as tfdata, tidy } from "@tensorflow/tfjs";
 import { padToMatch } from "../../utils";
 import { getImageSlice } from "utils/tensorUtils";
-import { ImageMetadata } from "store/data/types";
+import { GeneralizedKindItem, ImageMetadata } from "store/data/types";
 
 const sampleGenerator = (
-  images: Array<ImageMetadata>,
+  images: Array<GeneralizedKindItem>,
   padVals: Array<{ padX: number; padY: number }>,
 ) => {
   const count = images.length;
@@ -57,7 +57,7 @@ const padImage = (image: {
 };
 
 export const preprocessStardist = (
-  images: Array<ImageMetadata>,
+  images: Array<GeneralizedKindItem>,
   batchSize: number,
   dataDims: Array<{ padX: number; padY: number }>,
 ) => {

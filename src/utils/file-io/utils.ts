@@ -8,7 +8,9 @@ import {
   ImageShapeInfo,
   ImageShapeInfoImage,
   MIMEType,
+  V01ImageObject,
   V02Category,
+  V02ImageObject,
   V02Kind,
   V11ModelInfo,
 } from "./types";
@@ -30,6 +32,7 @@ import {
   Metric,
   OptimizationAlgorithm,
 } from "utils/models/enums";
+import { tensor2d, image as tfImage } from "@tensorflow/tfjs";
 
 async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   let imageStack: IJSStack;
@@ -514,3 +517,68 @@ export const v11GetDefaultModelInfo = (): V11ModelInfo => ({
   ...v11GetDefaultModelParams(),
   evalResults: [],
 });
+
+export const v01GetPropertiesFromImageSync = (
+  renderedIm: IJSImage,
+  image: V01ImageObject,
+  annotation: { boundingBox: number[] },
+) => {
+  const normalizingWidth = image.shape.width - 1;
+  const normalizingHeight = image.shape.height - 1;
+  const bbox = annotation.boundingBox;
+  const x1 = bbox[0] / normalizingWidth;
+  const x2 = bbox[2] / normalizingWidth;
+  const y1 = bbox[1] / normalizingHeight;
+  const y2 = bbox[3] / normalizingHeight;
+  const box = tensor2d([[y1, x1, y2, x2]]);
+  const width = bbox[2] - bbox[0];
+  const height = bbox[3] - bbox[1];
+  const objectImage = renderedIm.crop({
+    x: Math.abs(bbox[0]),
+    y: Math.abs(bbox[1]),
+    width: Math.abs(Math.min(image.shape.width, bbox[2]) - bbox[0]),
+    height: Math.abs(Math.min(image.shape.height, bbox[3]) - bbox[1]),
+  });
+  const objSrc = objectImage.getCanvas().toDataURL();
+  const data = tfImage.cropAndResize(image.data, box, [0], [height, width]);
+  box.dispose();
+
+  return {
+    data: data,
+    src: objSrc,
+    imageId: image.id,
+    boundingBox: bbox as [number, number, number, number],
+    bitDepth: image.bitDepth,
+  };
+};
+export const v02GetPropertiesFromImage = async (
+  image: V02ImageObject,
+  annotation: { boundingBox: [number, number, number, number] },
+) => {
+  const renderedIm = await IJSImage.load(image.src);
+  const normalizingWidth = image.shape.width - 1;
+  const normalizingHeight = image.shape.height - 1;
+  const bbox = annotation.boundingBox;
+  const x1 = bbox[0] / normalizingWidth;
+  const x2 = bbox[2] / normalizingWidth;
+  const y1 = bbox[1] / normalizingHeight;
+  const y2 = bbox[3] / normalizingHeight;
+  const box = tensor2d([[y1, x1, y2, x2]]);
+  const width = bbox[2] - bbox[0];
+  const height = bbox[3] - bbox[1];
+  const objectImage = renderedIm.crop({
+    x: Math.abs(bbox[0]),
+    y: Math.abs(bbox[1]),
+    width: Math.abs(Math.min(image.shape.width, bbox[2]) - bbox[0]),
+    height: Math.abs(Math.min(image.shape.height, bbox[3]) - bbox[1]),
+  });
+  const objSrc = objectImage.getCanvas().toDataURL();
+  const data = tfImage.cropAndResize(image.data, box, [0], [height, width]);
+
+  return {
+    data: data,
+    src: objSrc,
+    imageId: image.id,
+    boundingBox: bbox,
+  };
+};

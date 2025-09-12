@@ -1,6 +1,5 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { tensor2d } from "@tensorflow/tfjs";
 
 import { Grid, IconButton, Menu } from "@mui/material";
 import {
@@ -8,12 +7,11 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectActiveImageRawColor } from "views/ImageViewer/state/imageViewer/reselectors";
-
 import { rgbToHex } from "utils/colorUtils";
 import { DEFAULT_COLORS } from "store/data/constants";
+import { selectActiveImageRawColor } from "../state/image-viewer-data/reselectors";
+import { selectActiveMetadataId } from "../state/image-viewer-data/selectors";
+import { dataSlice } from "store/data";
 
 type PaletteProps = {
   channelIdx: number;
@@ -25,7 +23,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
   const open = Boolean(anchorEl);
 
   const colors = useSelector(selectActiveImageRawColor);
-  const activeImageId = useSelector(selectActiveImageId);
+  const activeImageId = useSelector(selectActiveMetadataId);
 
   const dispatch = useDispatch();
 
@@ -48,13 +46,9 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
     });
 
     dispatch(
-      annotatorSlice.actions.editThings({
-        updates: [
-          {
-            id: activeImageId!,
-            colors: { ...colors, color: tensor2d(updatedColors) },
-          },
-        ],
+      dataSlice.actions.updateImageData({
+        id: activeImageId!,
+        changes: { colors: { ...colors, color: updatedColors } },
       }),
     );
 

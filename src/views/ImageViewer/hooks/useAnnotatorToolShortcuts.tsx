@@ -1,20 +1,21 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
 
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectImageSeriesArray } from "views/ImageViewer/state/imageViewer/reselectors";
-
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
 import { ToolType } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/enums";
+import {
+  selectActiveMetadataId,
+  selectMetadataStackArray,
+} from "../state/image-viewer-data/selectors";
+import { imageViewerDataSlice } from "../state/image-viewer-data/ImageViewerDataSlice";
 
 export const useAnnotatorToolShortcuts = () => {
   const dispatch = useDispatch();
 
-  const images = useSelector(selectImageSeriesArray);
-  const activeImageId = useSelector(selectActiveImageId);
+  const activeMetadataId = useSelector(selectActiveMetadataId);
+  const metadataArray = useSelector(selectMetadataStackArray);
 
   /*
    * Select color tool (C)
@@ -116,52 +117,55 @@ export const useAnnotatorToolShortcuts = () => {
   useHotkeys(
     "up",
     () => {
-      if (!activeImageId) {
+      if (!activeMetadataId) {
         return;
       }
 
-      const activeImageIdx = images.findIndex(
-        (image) => image.id === activeImageId,
+      const activeMetadataIdx = metadataArray.findIndex(
+        (metadata) => metadata.id === activeMetadataId,
       );
-      if (activeImageIdx < 1) {
+      if (activeMetadataIdx < 1) {
         return;
       }
 
-      const newActiveImageId = images[activeImageIdx - 1].id;
+      const newActiveImageId = metadataArray[activeMetadataIdx - 1].id;
       dispatch(
-        imageViewerSlice.actions.setActiveImageSeriesId({
-          imageId: newActiveImageId,
-          prevImageId: activeImageId,
+        imageViewerDataSlice.actions.setActiveMetadataId({
+          metadataId: newActiveImageId,
+          prevMetadataId: activeMetadataId,
         }),
       );
     },
     HotkeyContext.AnnotatorView,
-    [images, activeImageId],
+    [metadataArray, activeMetadataId],
   );
 
   useHotkeys(
     "down",
     () => {
-      if (!activeImageId) {
+      if (!activeMetadataId) {
         return;
       }
 
-      const activeImageIdx = images.findIndex(
-        (image) => image.id === activeImageId,
+      const activeMetadataIdx = metadataArray.findIndex(
+        (metadata) => metadata.id === activeMetadataId,
       );
-      if (activeImageIdx === -1 || activeImageIdx === images.length - 1) {
+      if (
+        activeMetadataIdx === -1 ||
+        activeMetadataIdx === metadataArray.length - 1
+      ) {
         return;
       }
 
-      const newActiveImageId = images[activeImageIdx + 1].id;
+      const newActiveMetadataId = metadataArray[activeMetadataIdx + 1].id;
       dispatch(
-        imageViewerSlice.actions.setActiveImageSeriesId({
-          imageId: newActiveImageId,
-          prevImageId: activeImageId,
+        imageViewerDataSlice.actions.setActiveMetadataId({
+          metadataId: newActiveMetadataId,
+          prevMetadataId: activeMetadataId,
         }),
       );
     },
     HotkeyContext.AnnotatorView,
-    [images, activeImageId],
+    [metadataArray, activeMetadataId],
   );
 };

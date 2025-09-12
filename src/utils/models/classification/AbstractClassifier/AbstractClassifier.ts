@@ -24,7 +24,7 @@ import {
   TrainingCallbacks,
 } from "../../types";
 import { evaluateConfusionMatrix, getLayersModelSummary } from "../../utils";
-import { Category, Thing } from "store/data/types";
+import { Category, GeneralizedKindItem } from "store/data/types";
 import { logger } from "utils/logUtils";
 import { RequireOnly } from "utils/types";
 
@@ -43,7 +43,7 @@ export abstract class SequentialClassifier extends Model {
     super.dispose();
   }
 
-  public loadTraining<T extends Thing>(
+  public loadTraining<T extends GeneralizedKindItem>(
     images: T[],
     categories: RequireOnly<Category, "id">[],
   ) {
@@ -56,7 +56,7 @@ export abstract class SequentialClassifier extends Model {
     });
   }
 
-  public loadValidation<T extends Thing>(
+  public loadValidation<T extends GeneralizedKindItem>(
     images: T[],
     categories: RequireOnly<Category, "id">[],
   ) {
@@ -69,7 +69,7 @@ export abstract class SequentialClassifier extends Model {
     });
   }
 
-  public loadInference<T extends Thing>(
+  public loadInference<T extends GeneralizedKindItem>(
     images: T[],
     categories: RequireOnly<Category, "id">[],
   ) {

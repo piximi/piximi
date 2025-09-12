@@ -19,23 +19,23 @@ import {
 import { Selection } from "icons";
 
 import { ToolType } from "views/ImageViewer/utils/enums";
-import {
-  selectUpdatedActiveAnnotations,
-  selectCategoriesArray,
-} from "views/ImageViewer/state/annotator/reselectors";
 import { PopoverTool } from "components/ui/Tool";
 import { groupBy } from "lodash";
 import { CustomListItemButton, DividerHeader } from "components/ui";
 import { Category } from "store/data/types";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { IMAGE_KIND } from "store/data/constants";
+import { selectAllCategories } from "store/data/selectors";
+import { selectActiveAnnotations } from "views/ImageViewer/state/image-viewer-data/reselectors";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
+import { ProtoAnnotationObject } from "views/ImageViewer/state/types";
 
 export const SelectionOptions = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const activeTool = useSelector(selectToolType);
-  const activeAnnotations = useSelector(selectUpdatedActiveAnnotations);
-  const annotationCategories = useSelector(selectCategoriesArray);
+  const activeAnnotations = useSelector(selectActiveAnnotations);
+  const annotationCategories = useSelector(selectAllCategories);
   const t = useTranslation();
 
   useAnnotatorToolShortcuts();
@@ -59,11 +59,9 @@ export const SelectionOptions = () => {
     );
     batch(() => {
       dispatch(
-        annotatorSlice.actions.setSelectedAnnotationIds({
-          annotationIds: annotationIds,
-          workingAnnotationId: annotationIds[0],
-        }),
+        imageViewerDataSlice.actions.setSelectedAnnotationIds(annotationIds),
       );
+
       dispatch(
         annotatorSlice.actions.setWorkingAnnotation({
           annotation: annotationIds[0],
@@ -83,24 +81,18 @@ export const SelectionOptions = () => {
 
   const handleSelectAll = () => {
     dispatch(
-      annotatorSlice.actions.setSelectedAnnotationIds({
-        annotationIds: activeAnnotations.map((annotation) => annotation.id),
-        workingAnnotationId: activeAnnotations[0].id,
-      }),
+      imageViewerDataSlice.actions.setSelectedAnnotationIds(
+        activeAnnotations.map((annotation) => annotation.id),
+      ),
     );
     dispatch(
       annotatorSlice.actions.setWorkingAnnotation({
-        annotation: activeAnnotations[0],
+        annotation: activeAnnotations[0] as ProtoAnnotationObject,
       }),
     );
   };
   const handleDeselectAll = () => {
-    dispatch(
-      annotatorSlice.actions.setSelectedAnnotationIds({
-        annotationIds: [],
-        workingAnnotationId: undefined,
-      }),
-    );
+    dispatch(imageViewerDataSlice.actions.setSelectedAnnotationIds([]));
     dispatch(
       annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
     );

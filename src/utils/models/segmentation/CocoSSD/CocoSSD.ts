@@ -11,7 +11,7 @@ import { preprocessInference } from "../AbstractSegmenter/preprocess";
 import { constructCocoKinds } from "./constructCocoCategories";
 import { FitOptions } from "../../types";
 import { ModelTask } from "../../enums";
-import { Kind, ImageMetadata } from "store/data/types";
+import { Kind, GeneralizedKindItem } from "store/data/types";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
@@ -66,16 +66,16 @@ export class CocoSSD extends Segmenter {
   }
 
   public loadTraining(
-    _images: ImageMetadata[],
+    _images: GeneralizedKindItem[],
     _preprocessingArgs: any,
   ): void {}
   public loadValidation(
-    _images: ImageMetadata[],
+    _images: GeneralizedKindItem[],
     _preprocessingArgs: any,
   ): void {}
 
   public loadInference(
-    images: ImageMetadata[],
+    images: GeneralizedKindItem[],
     preprocessingArgs: LoadInferenceDataArgs,
   ) {
     this._inferenceDataset = preprocessInference(

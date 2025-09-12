@@ -7,6 +7,7 @@ import {
   memory as tfmemory, //eslint-disable-line @typescript-eslint/no-unused-vars
   time as tftime, //eslint-disable-line @typescript-eslint/no-unused-vars
   profile as tfprofile,
+  Tensor4D,
 } from "@tensorflow/tfjs-node";
 
 import { UploadedClassifier } from "../classification";
@@ -26,9 +27,11 @@ import { loadDataUrlAsStack } from "utils/file-io/utils";
 import { extractImageFileDetails } from "utils/tensorUtils";
 import {
   Category,
-  ImageMetadata,
+  GeneralizedKindItem,
+  Shape,
   // Shape
 } from "store/data/types";
+import { ColorsRaw } from "utils/types";
 
 const categories: Array<Category> = [
   // {
@@ -42,7 +45,6 @@ const categories: Array<Category> = [
     id: "10000000-0000-0000-0000-000000000000",
     name: "0",
     kind: "",
-    containing: [],
     visible: true,
   },
   {
@@ -50,7 +52,6 @@ const categories: Array<Category> = [
     id: "10000000-0000-0000-0000-000000000001",
     name: "1",
     kind: "",
-    containing: [],
     visible: true,
   },
   {
@@ -58,7 +59,6 @@ const categories: Array<Category> = [
     id: "10000000-0000-0000-0000-000000000002",
     name: "2",
     kind: "",
-    containing: [],
     visible: true,
   },
   {
@@ -66,7 +66,6 @@ const categories: Array<Category> = [
     id: "10000000-0000-0000-0000-000000000003",
     name: "3",
     kind: "",
-    containing: [],
     visible: true,
   },
   {
@@ -74,7 +73,6 @@ const categories: Array<Category> = [
     id: "10000000-0000-0000-0000-000000000004",
     name: "4",
     kind: "",
-    containing: [],
     visible: true,
   },
   {
@@ -82,7 +80,6 @@ const categories: Array<Category> = [
     id: "10000000-0000-0000-0000-000000000005",
     name: "5",
     kind: "",
-    containing: [],
     visible: true,
   },
   {
@@ -90,7 +87,6 @@ const categories: Array<Category> = [
     id: "10000000-0000-0000-0000-000000000006",
     name: "6",
     kind: "",
-    containing: [],
     visible: true,
   },
   {
@@ -98,7 +94,6 @@ const categories: Array<Category> = [
     id: "10000000-0000-0000-0000-000000000007",
     name: "7",
     kind: "",
-    containing: [],
     visible: true,
   },
   {
@@ -106,7 +101,6 @@ const categories: Array<Category> = [
     id: "10000000-0000-0000-0000-000000000008",
     name: "8",
     kind: "",
-    containing: [],
     visible: true,
   },
   {
@@ -114,7 +108,6 @@ const categories: Array<Category> = [
     id: "10000000-0000-0000-0000-000000000009",
     name: "9",
     kind: "",
-    containing: [],
     visible: true,
   },
 ];
@@ -175,7 +168,14 @@ const validationImagesUnloaded = [
 it("evaluateClassifier", async () => {
   // await setBackend("tensorflow");
 
-  const validationImages: ImageMetadata[] = [];
+  const validationImages: {
+    id: string;
+    bitDepth: number;
+    shape: Shape;
+    colors: ColorsRaw;
+    data: Tensor4D;
+    src: string;
+  }[] = [];
 
   for (const im of validationImagesUnloaded) {
     const imStack = await loadDataUrlAsStack(im.src);
@@ -218,7 +218,7 @@ it("evaluateClassifier", async () => {
 
   await model.loadModel();
 
-  model.loadValidation(validationImages, categories);
+  model.loadValidation(validationImages as GeneralizedKindItem[], categories);
 
   // console.log("weights file:", tfmemory().numTensors, tfmemory().numBytes);
 

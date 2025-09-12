@@ -11,11 +11,9 @@ import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
   selectAnnotationMode,
   selectWorkingAnnotationEntity,
-  selectTimeLinkingState,
 } from "views/ImageViewer/state/annotator/selectors";
 
 import { AnnotationMode } from "views/ImageViewer/utils/enums";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 import { invert } from "views/ImageViewer/utils/annotationUtils";
 import {
   CombineAnnotationsIcon,
@@ -25,6 +23,8 @@ import {
 } from "icons";
 import { Stack, SvgIcon, useTheme } from "@mui/material";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { selectTimeLinkingState } from "views/ImageViewer/state/image-viewer-data/selectors";
+import { selectActiveImage } from "views/ImageViewer/state/image-viewer-data/reselectors";
 
 export const CreationOptions = () => {
   const dispatch = useDispatch();

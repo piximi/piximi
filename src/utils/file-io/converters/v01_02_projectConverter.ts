@@ -1,8 +1,8 @@
 import React from "react";
 import {
-  V01_AnnotationObject,
-  V01_Category,
-  V01_ImageObject,
+  V01AnnotationObject,
+  V01Category,
+  V01ImageObject,
   V01Project,
   V02AnnotationObject,
   V02Category,
@@ -23,10 +23,10 @@ import { Partition } from "utils/models/enums";
 import { v02GenerateKind } from "../utils";
 
 const v01_02_dataConverter = (data: {
-  images: V01_ImageObject[];
-  oldCategories: V01_Category[];
-  annotationCategories: V01_Category[];
-  annotations: V01_AnnotationObject[];
+  images: V01ImageObject[];
+  oldCategories: V01Category[];
+  annotationCategories: V01Category[];
+  annotations: V01AnnotationObject[];
 }): V02DataState => {
   const { images, oldCategories, annotationCategories, annotations } = data;
 

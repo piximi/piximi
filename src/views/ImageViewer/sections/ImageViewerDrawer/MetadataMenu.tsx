@@ -5,46 +5,37 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { ExportAnnotationsMenu } from "../../components/";
+import { ExportAnnotationsMenu } from "../../components";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { ImageViewerMetadataDetails } from "views/ImageViewer/state/image-viewer-data/types";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
+import { dataSlice } from "store/data";
 
-import { DecodedAnnotationObject, ImageMetadata } from "store/data/types";
-import { selectImageViewerObjects } from "views/ImageViewer/state/annotator/reselectors";
-
-type ImageMenuProps = {
+type MetadataMenuProps = {
   anchorElImageMenu: any;
-  selectedImage: ImageMetadata;
+  selectedMetadata: ImageViewerMetadataDetails;
+  annotationIds: string[];
   onCloseImageMenu: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   openImageMenu: boolean;
 };
 
-export const ImageMenu = ({
+export const MetadataMenu = ({
   anchorElImageMenu,
-  selectedImage,
+  annotationIds,
+  selectedMetadata,
   onCloseImageMenu,
   openImageMenu,
-}: ImageMenuProps) => {
+}: MetadataMenuProps) => {
   const dispatch = useDispatch();
-  const annotationDict = useSelector(selectImageViewerObjects);
 
   const handleClearAnnotations = (
     event: React.MouseEvent<HTMLElement, MouseEvent>,
   ) => {
-    if (!selectedImage) return;
+    if (!selectedMetadata) return;
     dispatch(
-      imageViewerSlice.actions.removeActiveAnnotationIds({
-        annotationIds: selectedImage.containing,
-      }),
+      imageViewerDataSlice.actions.removeActiveAnnotationIds(annotationIds),
     );
-    dispatch(
-      annotatorSlice.actions.deleteThings({
-        things: selectedImage.containing.map(
-          (id) => annotationDict[id] as DecodedAnnotationObject,
-        ),
-      }),
-    );
+    dispatch(dataSlice.actions.batchDeleteAnnotations(annotationIds));
 
     onCloseImageMenu(event);
   };
@@ -77,7 +68,7 @@ export const ImageMenu = ({
             anchorEl={anchorEl}
             onClose={handleClose}
             open={Boolean(anchorEl)}
-            selectedImage={selectedImage}
+            selectedMetadata={selectedMetadata}
           />
 
           <Divider />

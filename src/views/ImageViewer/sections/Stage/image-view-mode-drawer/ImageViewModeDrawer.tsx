@@ -7,9 +7,12 @@ import { DIMENSIONS } from "utils/constants";
 import { ChannelAdjustment } from "./ChannelAdjustment";
 import { ZStackSlider } from "./ZAdjustment";
 import { TimepointAdjustment } from "./TimepointAdjustment";
+import { useSelector } from "react-redux";
+import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
 
 export const ImageViewModeDrawer = () => {
   const theme = useTheme();
+  const activeMetadata = useSelector(selectActiveMetadata);
   const [imageViewMode, setImageViewMode] = useState<0 | 1 | 2>(0);
   const [open, setOpen] = useState<boolean>(false);
 
@@ -22,7 +25,7 @@ export const ImageViewModeDrawer = () => {
     }
   };
 
-  return (
+  return activeMetadata ? (
     <Box
       sx={(theme) => ({
         maxWidth: "100%", //`calc(100% - ${DIMENSIONS.toolDrawerWidth}px - ${DIMENSIONS.leftDrawerWidth}px)`,
@@ -60,23 +63,36 @@ export const ImageViewModeDrawer = () => {
               }
             />
           </IconButton>
-          <IconButton onClick={() => handleSelectImageViewMode(1)}>
+          <IconButton
+            onClick={() => handleSelectImageViewMode(1)}
+            disabled={
+              !activeMetadata || Object.keys(activeMetadata.images).length === 1
+            }
+          >
             <AccessTimeIcon
               sx={{
                 color:
-                  imageViewMode === 1 && open
-                    ? theme.palette.primary.dark
-                    : theme.palette.action.active,
+                  !activeMetadata ||
+                  Object.keys(activeMetadata.images).length === 1
+                    ? theme.palette.action.disabled
+                    : imageViewMode === 1 && open
+                      ? theme.palette.primary.dark
+                      : theme.palette.action.active,
               }}
             />
           </IconButton>
-          <IconButton onClick={() => handleSelectImageViewMode(2)}>
+          <IconButton
+            onClick={() => handleSelectImageViewMode(2)}
+            disabled={!activeMetadata || activeMetadata.activeSrcs.length === 1}
+          >
             <LayersIcon
               sx={{
                 color:
-                  imageViewMode === 2 && open
-                    ? theme.palette.primary.dark
-                    : theme.palette.action.active,
+                  !activeMetadata || activeMetadata.activeSrcs.length === 1
+                    ? theme.palette.action.disabled
+                    : imageViewMode === 2 && open
+                      ? theme.palette.primary.main
+                      : theme.palette.action.active,
               }}
             />
           </IconButton>
@@ -91,12 +107,14 @@ export const ImageViewModeDrawer = () => {
           <ChannelAdjustment />
         </Stack>
       )}
-      {imageViewMode === 1 && ( // For cleaner typescript, shouldnt be able to focus on if values undefined
-        <TimepointAdjustment />
-      )}
-      {imageViewMode === 2 && ( // For cleaner typescript, shouldnt be able to focus on if values undefined
-        <ZStackSlider />
-      )}
+      {imageViewMode === 1 &&
+        activeMetadata.timeSeries && ( // For cleaner typescript, shouldnt be able to focus on if values undefined
+          <TimepointAdjustment />
+        )}
+      {imageViewMode === 2 &&
+        activeMetadata.activeSrcs.length > 0 && ( // For cleaner typescript, shouldnt be able to focus on if values undefined
+          <ZStackSlider />
+        )}
     </Box>
-  );
+  ) : null;
 };

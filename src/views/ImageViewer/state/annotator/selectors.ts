@@ -3,8 +3,7 @@ import {
   AnnotationState,
   ToolType,
 } from "views/ImageViewer/utils/enums";
-
-import { AnnotatorState } from "../../utils/types";
+import { AnnotatorState } from "../types";
 
 export const selectAnnotationState = ({
   annotator,
@@ -65,82 +64,4 @@ export const selectWorkingAnnotationEntity = ({
   annotator: AnnotatorState;
 }) => {
   return annotator.workingAnnotation;
-};
-export const selectSelectedAnnotationIds = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}): string[] => {
-  return annotator.selectedAnnotationIds;
-};
-
-export const selectChanges = ({ annotator }: { annotator: AnnotatorState }) => {
-  return annotator.changes;
-};
-
-export const selectKindChanges = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.changes.kinds;
-};
-
-export const selectCategoryChanges = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.changes.categories;
-};
-
-export const selectThingChanges = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.changes.things;
-};
-
-export const selectAnnotationChanges = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.changes.annotations;
-};
-export const selectTimeLinkingState = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.tLinking.active;
-};
-export const selectTimeLinkingAnnIds = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.tLinking.annIds;
-};
-export const selectTimeLinkingGlobalId = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.tLinking.globalId;
-};
-export const selectZLinkingState = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.zLinking.active;
-};
-export const selectZLinkingAnnIds = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.zLinking.annIds;
 };

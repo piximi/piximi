@@ -7,6 +7,13 @@ import {
   SerializedFileType,
   SerializedFileTypeV02,
   SerializedFileTypeV12,
+  V01Category,
+  V01ImageObject,
+  V02Category,
+  V02ImageObject,
+  V02Kind,
+  V12Category,
+  V12Kind,
 } from "../types";
 import {
   Kind,
@@ -22,9 +29,15 @@ export const deserializePiximiAnnotations = async (
     | SerializedFileTypeV12
     | SerializedFileTypeV02
     | SerializedFileType,
-  existingImages: Record<string, ImageMetadata>,
-  existingCategories: Record<string, Category>,
-  existingKinds: Record<string, Kind>,
+  existingImages:
+    | Record<string, V01ImageObject>
+    | Record<string, V02ImageObject>
+    | Record<string, ImageMetadata>,
+  existingCategories:
+    | Record<string, V01Category>
+    | Record<string, V02Category>
+    | Record<string, Category>,
+  existingKinds: Record<string, V02Kind> | Record<string, Kind>,
 ) => {
   if (!("version" in serializedAnnotations)) {
     // pre 0.2.0
@@ -34,26 +47,26 @@ export const deserializePiximiAnnotations = async (
       Object.values(existingCategories),
     );
     const convertedData = await v01_02_convertAnnotationsWithExistingProject(
-      existingImages,
-      existingKinds,
+      existingImages as Record<string, V01ImageObject>,
+      existingKinds as Record<string, V02Kind>,
       annotations,
       newCategories,
     );
-    const tsAnnotations = v02_v12_convertAnnotation(
+    const v12Annotations = v02_v12_convertAnnotation(
       convertedData.newAnnotations,
     );
     return {
       ...convertedData,
-      newAnnotations: tsAnnotations as AnnotationObject[],
+      newAnnotations: v12Annotations as AnnotationObject[],
     };
   }
   if (semver.gte(serializedAnnotations.version, "0.2.0")) {
     const { annotations, newCategories, newKinds } =
       await v02_deserializePiximiAnnotations(
         serializedAnnotations as SerializedFileTypeV02,
-        Object.values(existingImages),
-        Object.values(existingCategories),
-        Object.values(existingKinds),
+        Object.values(existingImages) as V02ImageObject[],
+        Object.values(existingCategories) as V02Category[],
+        Object.values(existingKinds) as V02Kind[],
       );
     const tsAnnotations = v02_v12_convertAnnotation(annotations);
     return {
@@ -67,8 +80,8 @@ export const deserializePiximiAnnotations = async (
       await v12_deserializePiximiAnnotations(
         serializedAnnotations as SerializedFileTypeV12,
         Object.values(existingImages),
-        Object.values(existingCategories),
-        Object.values(existingKinds),
+        Object.values(existingCategories) as V12Category[],
+        Object.values(existingKinds) as V12Kind[],
       );
     return {
       newAnnotations: annotations as AnnotationObject[],

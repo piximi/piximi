@@ -1,11 +1,11 @@
 import { Group } from "zarr";
 import { tensor2d } from "@tensorflow/tfjs";
 import { getDatasetSelection } from "../../../zarr/zarrUtils";
-import { Colors } from "utils/types";
+import { Colors, ColorsRaw } from "utils/types";
 
-export const deserializeColorsGroup = async (
+export const deserializeRawColorsGroup = async (
   colorsGroup: Group,
-): Promise<Colors> => {
+): Promise<ColorsRaw> => {
   const colorsDataset = await getDatasetSelection(colorsGroup, "color", [null]);
   const numChannels = colorsDataset.shape[0];
   const colors = colorsDataset.data as Float32Array;
@@ -39,6 +39,10 @@ export const deserializeColorsGroup = async (
   return {
     range,
     visible,
-    color: tensor2d(colors, [numChannels, 3], "float32"),
+    color: tensor2d(colors, [numChannels, 3], "float32").arraySync() as [
+      number,
+      number,
+      number,
+    ][],
   };
 };

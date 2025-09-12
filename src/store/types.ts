@@ -29,7 +29,8 @@ import { MeasurementsState } from "./measurements/types";
 import {
   AnnotatorState,
   ImageViewerState,
-} from "views/ImageViewer/utils/types";
+} from "views/ImageViewer/state/types";
+import { ImageViewerDataState } from "views/ImageViewer/state/image-viewer-data/types";
 
 export type AppSettingsState = {
   // async work for setting initial states,
@@ -116,6 +117,7 @@ type AppState = {
   classifier: ClassifierState;
   segmenter: SegmenterState;
   imageViewer: ImageViewerState;
+  imageViewerData: ImageViewerDataState;
   annotator: AnnotatorState;
   project: ProjectState;
   applicationSettings: AppSettingsState;

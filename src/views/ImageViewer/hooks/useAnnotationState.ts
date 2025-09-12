@@ -3,44 +3,43 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 
-import {
-  selectImageViewerCategories,
-  selectCategoriesByKindArray,
-  selectFullWorkingAnnotation,
-  selectImageViewerObjectsArray,
-  selectImageViewerKinds,
-  selectUpdatedActiveAnnotations,
-} from "views/ImageViewer/state/annotator/reselectors";
-import {
-  selectActiveImageId,
-  selectActiveImageSeries,
-  selectSelectedIVCategoryId,
-} from "views/ImageViewer/state/imageViewer/selectors";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
+import { selectFullWorkingAnnotation } from "views/ImageViewer/state/annotator/reselectors";
 import { selectAnnotationMode } from "../state/annotator/selectors";
 
 import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
 import { AnnotationMode, AnnotationState } from "views/ImageViewer/utils/enums";
-import { isUnknownCategory } from "store/data/utils";
 import {
   createProtoAnnotation,
   editProtoAnnotation,
 } from "../utils/annotationUtils";
 import { Partition } from "utils/models/enums";
+import {
+  selectCategoryEntities,
+  selectKindEntities,
+} from "store/data/selectors";
+import {
+  selectActiveAnnotations,
+  selectActiveImage,
+} from "../state/image-viewer-data/reselectors";
+import {
+  selectActiveMetadata,
+  selectActiveMetadataId,
+  selectSelectedIVCategoryId,
+} from "../state/image-viewer-data/selectors";
 
 export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();
   const activeImage = useSelector(selectActiveImage);
-  const activeImageId = useSelector(selectActiveImageId);
+  const activeImageId = useSelector(selectActiveMetadataId);
   const selectedCategoryId = useSelector(selectSelectedIVCategoryId);
-  const categories = useSelector(selectImageViewerCategories);
-  const categoriesByKindArray = useSelector(selectCategoriesByKindArray);
-  const kinds = useSelector(selectImageViewerKinds);
+  const categories = useSelector(selectCategoryEntities);
+
+  const kinds = useSelector(selectKindEntities);
   const annotationMode = useSelector(selectAnnotationMode);
-  const objects = useSelector(selectUpdatedActiveAnnotations);
+  const objects = useSelector(selectActiveAnnotations);
   const workingAnnotation = useSelector(selectFullWorkingAnnotation);
-  const activeImageSeries = useSelector(selectActiveImageSeries);
+  const activeImageSeries = useSelector(selectActiveMetadata);
 
   const objectNames = useMemo(() => {
     return objects.map((obj) => obj.name);
@@ -48,16 +47,14 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
 
   const annotationCategory = useMemo(() => {
     if (categories[selectedCategoryId]) return categories[selectedCategoryId];
-    const defaultKindCategories = Object.entries(categoriesByKindArray).find(
-      (k) => k[0] !== selectedCategoryId,
+    const defaultKindCategories = Object.values(kinds).map(
+      (kind) => kind.unknownCategoryId,
     );
     if (!defaultKindCategories) return undefined;
-    const defaultCategory = defaultKindCategories[1].categories.find((c) =>
-      isUnknownCategory(c.id),
-    );
+    const defaultCategory = categories[defaultKindCategories[0]];
 
     return defaultCategory;
-  }, [categories, selectedCategoryId, categoriesByKindArray]);
+  }, [categories, selectedCategoryId]);
 
   const [noKindAvailable, setNoKindAvailable] = useState<boolean>(false);
 
@@ -92,7 +89,7 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
             decodedMask: annotationTool.decodedMask,
             plane: activeImageSeries?.activePlane ?? 0,
             activePlane: activeImageSeries?.activePlane ?? 0,
-            timepoint: activeImageSeries?.activeTimepoint ?? "0",
+            timepoint: activeImage.timepoint ?? 0,
             partition: Partition.Unassigned,
           },
           activeImage!,

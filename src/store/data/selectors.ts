@@ -1,5 +1,4 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { intersection } from "lodash";
 
 import {
   kindsAdapter,
@@ -9,19 +8,11 @@ import {
   annotationsAdapter,
 } from "./dataSlice";
 
-import {
-  Category,
-  FullTimepointImage,
-  ImageMetadata,
-  Kind,
-  TPKey,
-  AnnotationObject,
-} from "./types";
 import { DataState } from "store/types";
-import { updateRecordArray } from "utils/objectUtils";
-import { extractTimepoint } from "./utils";
 import { RootState } from "store/rootReducer";
 import { IMAGE_KIND } from "./constants";
+import { Category, GeneralizedKindItem } from "./types";
+import { getKindItemsFromImages } from "./utils";
 
 const kindSelectors = kindsAdapter.getSelectors(
   (state: RootState) => state.data.kinds,
@@ -87,11 +78,64 @@ export const selectCategoryToAnnotations = ({ data }: { data: DataState }) =>
   data.relationships.categoryToAnnotations;
 export const selectImageToAnnotations = ({ data }: { data: DataState }) =>
   data.relationships.imageToAnnotations;
+
+export const selectImageCategories = createSelector(
+  selectCategoryEntities,
+  selectKindToCategories,
+  (catEntities, k2C) => k2C[IMAGE_KIND].map((id) => catEntities[id]),
+);
 export const selectCategoryToAllItems = createSelector(
   selectCategoryToAnnotations,
   selectCategoryToImages,
   (cat2Ann, cat2Im) => {
     return { ...cat2Ann, ...cat2Im };
+  },
+);
+export const selectKindToCategoryEntities = createSelector(
+  selectKindToCategories,
+  selectCategoryEntities,
+  (kind2Cat, categoryEntities) => {
+    return Object.keys(kind2Cat).reduce(
+      (kind2CatEnt: Record<string, Category[]>, kindId) => {
+        kind2CatEnt[kindId] = kind2Cat[kindId].map(
+          (id) => categoryEntities[id],
+        );
+        return kind2CatEnt;
+      },
+      {},
+    );
+  },
+);
+export const selectKindToAnnotationCategoryEntities = createSelector(
+  selectKindToCategories,
+  selectCategoryEntities,
+  (kind2Cat, categoryEntities) => {
+    return Object.keys(kind2Cat).reduce(
+      (kind2CatEnt: Record<string, Category[]>, kindId) => {
+        if (kindId === IMAGE_KIND) return kind2CatEnt;
+        kind2CatEnt[kindId] = kind2Cat[kindId].map(
+          (id) => categoryEntities[id],
+        );
+        return kind2CatEnt;
+      },
+      {},
+    );
+  },
+);
+export const selectMetadataToAnnotationIds = createSelector(
+  selectMetadataEntities,
+  selectImageToAnnotations,
+  (metadataEntities, im2Anns) => {
+    return Object.values(metadataEntities).reduce(
+      (m2a: Record<string, string[]>, mId) => {
+        m2a[mId.id] = mId.imageDataIds.reduce((annIds: string[], imId) => {
+          annIds.push(...im2Anns[imId]);
+          return annIds;
+        }, []);
+        return m2a;
+      },
+      {},
+    );
   },
 );
 
@@ -100,6 +144,15 @@ export const selectGetKindDisplayName = createSelector(
   (kindEntities) => (kindId: string) => kindEntities[kindId].displayName,
 );
 
-/*
-  KINDS
-*/
+export const selectGeneralizedImagesRecord = createSelector(
+  selectMetadataEntities,
+  selectImageDataEntities,
+  (metadataEntities, imageEntities): Record<string, GeneralizedKindItem> =>
+    getKindItemsFromImages(imageEntities, metadataEntities, true),
+);
+
+export const selectGeneralizedImageArray = createSelector(
+  selectGeneralizedImagesRecord,
+  (generalizedImageRecord): GeneralizedKindItem[] =>
+    Object.values(generalizedImageRecord),
+);

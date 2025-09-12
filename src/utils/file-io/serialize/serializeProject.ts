@@ -27,6 +27,7 @@ import {
   ImageData,
 } from "store/data/types";
 import { range } from "lodash";
+import { createColorsTensor } from "utils/tensorUtils";
 
 /* 
    =====================
@@ -114,7 +115,8 @@ const serializeImageData = async (
     await imageGroup.attrs.setItem("active_plane", image.activePlane);
     await imageGroup.attrs.setItem("class_category_id", image.categoryId);
     const colorGroup = await imageGroup.createGroup("colors");
-    await serializeImageColors(colorGroup, image.colors);
+    const colorTensor = createColorsTensor(image.colors, image.data.shape[3]);
+    await serializeImageColors(colorGroup, colorTensor);
 
     loadCb(
       (i + 1) / imageNames.length,

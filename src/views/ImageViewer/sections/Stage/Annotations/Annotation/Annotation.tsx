@@ -4,13 +4,13 @@ import Konva from "konva";
 import { Image as KonvaImage } from "react-konva";
 import Image from "image-js";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { hexToRGBA, colorOverlayROI, encode } from "views/ImageViewer/utils";
 
-import { ProtoAnnotationObject } from "views/ImageViewer/utils/types";
 import { Shape } from "store/data/types";
+import { ProtoAnnotationObject } from "views/ImageViewer/state/types";
+import { dataSlice } from "store/data";
 
 type AnnotationProps = {
   annotation: ProtoAnnotationObject;
@@ -114,15 +114,19 @@ export const Annotation = React.memo(
       };
 
       dispatch(
-        annotatorSlice.actions.editThings({
-          updates: [tempUpdated],
+        dataSlice.actions.updateAnnotation({
+          id: tempUpdated.id,
+          changes: { ...tempUpdated },
         }),
       );
     };
 
-    return isFiltered ? (
-      <></>
-    ) : (
+    useEffect(() => {
+      console.log(annotation);
+      console.log(!isFiltered);
+    }, [annotation]);
+
+    return (
       <KonvaImage
         ref={annotatorRef}
         id={annotation.id}
@@ -138,6 +142,7 @@ export const Annotation = React.memo(
         onTransformEnd={onTransformEnd}
         strokeWidth={100}
         fillPatternX={20}
+        visible={!isFiltered}
 
         //scale={{ x: stageScale, y: stageScale }}
       />

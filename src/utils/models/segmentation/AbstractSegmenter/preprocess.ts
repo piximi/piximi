@@ -1,9 +1,9 @@
 import { Tensor4D, data as tfdata } from "@tensorflow/tfjs";
 import { FitOptions } from "../../types";
 import { denormalizeTensor, getImageSlice } from "utils/tensorUtils";
-import { ImageMetadata } from "store/data/types";
+import { GeneralizedKindItem } from "store/data/types";
 
-const inferenceGenerator = (images: Array<ImageMetadata>) => {
+const inferenceGenerator = (images: Array<GeneralizedKindItem>) => {
   const count = images.length;
 
   return function* () {
@@ -21,7 +21,7 @@ const inferenceGenerator = (images: Array<ImageMetadata>) => {
 };
 
 export const preprocessInference = (
-  images: Array<ImageMetadata>,
+  images: Array<GeneralizedKindItem>,
   _fitOptions: FitOptions,
 ) => {
   return (

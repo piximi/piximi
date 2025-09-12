@@ -1,69 +1,52 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { annotatorSlice } from "../state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import {
-  selectImageViewerKinds,
-  selectImageViewerObjects,
-} from "../state/annotator/reselectors";
-import {
-  selectFilteredImageViewerCategoryIds,
-  selectHighligtedIVCatogory,
-  selectSelectedIVCategoryId,
-} from "views/ImageViewer/state/imageViewer/selectors";
+import { selectFilteredImageViewerCategoryIds } from "views/ImageViewer/state/imageViewer/selectors";
 
 import { Category } from "store/data/types";
-import { ProtoAnnotationObject } from "../utils/types";
+import { selectCategoryToAnnotations } from "store/data/selectors";
+import { dataSlice } from "store/data";
+import {
+  selectHighligtedIVCatogory,
+  selectSelectedIVCategoryId,
+} from "../state/image-viewer-data/selectors";
+import { imageViewerDataSlice } from "../state/image-viewer-data/ImageViewerDataSlice";
 
 export const useImageViewerCategoryItemState = (category: Category) => {
   const [isSelected, setIsSelected] = useState<boolean>(false);
   const [isHighlighted, setIsHighlighted] = useState<boolean>(false);
   const [isFiltered, setIsFiltered] = useState<boolean>(false);
 
-  const objectCount = useMemo(() => {
-    return category.containing.length;
-  }, [category.containing]);
   const dispatch = useDispatch();
-  const kindDictionary = useSelector(selectImageViewerKinds);
-  const things = useSelector(selectImageViewerObjects);
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);
   const selectedCategory = useSelector(selectSelectedIVCategoryId);
   const highlightedCategory = useSelector(selectHighligtedIVCatogory);
+  const categoryToAnnotations = useSelector(selectCategoryToAnnotations);
+
+  const objectCount = useMemo(() => {
+    return categoryToAnnotations[category.id].length;
+  }, [categoryToAnnotations]);
 
   const handleSelect = useCallback(() => {
-    dispatch(
-      imageViewerSlice.actions.setSelectedCategoryId({
-        selectedCategoryId: category.id,
-      }),
-    );
+    dispatch(imageViewerDataSlice.actions.setSelectedCategoryId(category.id));
   }, [category.id, dispatch]);
 
-  const deleteCategory = (category: Category, kindId: string) => {
-    dispatch(
-      annotatorSlice.actions.deleteCategory({
-        category: category,
-        associatedUnknownKind: kindDictionary[kindId].unknownCategoryId,
-      }),
-    );
+  const deleteCategory = (category: Category) => {
+    dispatch(dataSlice.actions.deleteCategoryCascade(category.id));
   };
 
   const editCategory = (id: string, name: string, color: string) => {
     dispatch(
-      annotatorSlice.actions.updateCategory({
-        category: { id, name, color },
+      dataSlice.actions.updateCategory({
+        id,
+        changes: { name, color },
       }),
     );
   };
 
-  const clearObjects = (category: Category) => {
-    dispatch(
-      annotatorSlice.actions.deleteThings({
-        things: category.containing.map(
-          (thingId) => things[thingId] as ProtoAnnotationObject,
-        ),
-      }),
-    );
+  const clearObjects = (categoryId: string) => {
+    dispatch(dataSlice.actions.deleteAnnotationsOfCategory(categoryId));
   };
 
   const handleToggleCategoryVisibility = useCallback(

@@ -14,12 +14,7 @@ import { CropSchema, Partition } from "../enums";
 import { MIMEType } from "utils/file-io/types";
 import { loadImageFileAsStack } from "utils/file-io/utils";
 import { extractImageFileDetails } from "utils/tensorUtils";
-import {
-  Category,
-  ImageMetadata,
-  AnnotationObject,
-  Shape,
-} from "store/data/types";
+import { Category, AnnotationObject, Shape } from "store/data/types";
 import { MIMETYPES } from "utils/file-io/enums";
 
 //jest.setTimeout(50000);
@@ -58,7 +53,6 @@ const annotationCategories: Array<Category> = [
     id: "00000000-0000-1111-0000-000000000000",
     name: "Unknown",
     kind: "",
-    containing: [],
     visible: true,
   },
   {
@@ -66,7 +60,6 @@ const annotationCategories: Array<Category> = [
     id: "1dca6ba0-c53b-435d-a43f-d4a2bb4042a5",
     name: "Test",
     kind: "",
-    containing: [],
     visible: true,
   },
 ];
@@ -79,7 +72,15 @@ const preloadedImages: Array<{
   annotations: Array<
     Omit<
       AnnotationObject,
-      "kind" | "data" | "shape" | "bitDepth" | "name" | "src" | "partition"
+      | "kind"
+      | "data"
+      | "shape"
+      | "bitDepth"
+      | "name"
+      | "src"
+      | "partition"
+      | "plane"
+      | "timepoint"
     >
   >;
 }> = [generateUUID()].map((imId) => ({
@@ -107,7 +108,7 @@ const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
 };
 
 it.skip("preprocessSegmenter", async () => {
-  const images: Array<ImageMetadata> = [];
+  const images: Array<any> = [];
 
   for (const preIm of preloadedImages) {
     const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);

@@ -5,9 +5,9 @@ import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
-import { selectActivePlane } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectActiveImage } from "views/ImageViewer/state/image-viewer-data/reselectors";
+import { selectActivePlane } from "views/ImageViewer/state/image-viewer-data/selectors";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 
 export const ZStackSlider = () => {
   const dispatch = useDispatch();
@@ -35,9 +35,7 @@ export const ZStackSlider = () => {
     setValue(newValue as number);
     if (typeof newValue === "number") {
       dispatch(
-        imageViewerSlice.actions.setActiveImageActivePlane({
-          plane: newValue,
-        }),
+        imageViewerDataSlice.actions.setActiveMetadataActivePlane(newValue),
       );
     }
   };
@@ -46,9 +44,7 @@ export const ZStackSlider = () => {
     const newValue = Math.max(0, value - 1);
     setValue(newValue);
     dispatch(
-      imageViewerSlice.actions.setActiveImageActivePlane({
-        plane: newValue,
-      }),
+      imageViewerDataSlice.actions.setActiveMetadataActivePlane(newValue),
     );
   };
 
@@ -56,9 +52,7 @@ export const ZStackSlider = () => {
     const newValue = Math.min(maxPlanes, value + 1);
     setValue(newValue);
     dispatch(
-      imageViewerSlice.actions.setActiveImageActivePlane({
-        plane: newValue,
-      }),
+      imageViewerDataSlice.actions.setActiveMetadataActivePlane(newValue),
     );
   };
 

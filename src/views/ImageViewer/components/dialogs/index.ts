@@ -1,1 +1,1 @@
-export { ExitAnnotatorDialog } from "./ExitAnnotatorDialog";
+export { ConfirmImageViewerChangesDialog } from "./ConfirmImageViewerChangesDialog";

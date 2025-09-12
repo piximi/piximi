@@ -11,8 +11,6 @@ import {
 
 import {
   ImageMetadata,
-  FullTimepointImage,
-  TPKey,
   GeneralizedKindItem,
   AnnotationObject,
   Category,
@@ -27,6 +25,13 @@ import {
 
 import { DataState } from "store/types";
 import { updateRecordArray } from "utils/objectUtils";
+import {
+  V12AnnotationObject,
+  V12Category,
+  V12ImageData,
+  V12Kind,
+} from "utils/file-io/types";
+import { EntityState } from "@reduxjs/toolkit";
 
 export const generateUUID = (options?: { definesUnknown: boolean }) => {
   const id = uuidv4();
@@ -167,44 +172,6 @@ export const getPropertiesFromImageSync = (
   };
 };
 
-export const extractTimepoint = (
-  timeSeriesImage: ImageMetadata,
-  timepoint: TPKey,
-): FullTimepointImage => {
-  const timePointData = timeSeriesImage.timepoints[timepoint];
-  if (!timePointData) {
-    throw new Error(
-      `Time point ${timepoint} does not exist in image ${timeSeriesImage.id}`,
-    );
-  }
-  return {
-    id: timeSeriesImage.id,
-    name: timeSeriesImage.name,
-    kind: timeSeriesImage.kind,
-    bitDepth: timeSeriesImage.bitDepth,
-    partition: timeSeriesImage.partition,
-    shape: timeSeriesImage.shape,
-    src: timePointData.src,
-    data: timePointData.data,
-    colors: timePointData.colors,
-    categoryId: timePointData.categoryId,
-    activePlane: timePointData.activePlane,
-    timepoint: timepoint,
-  };
-};
-
-export const extractAllTimepoints = (
-  imageSeries: ImageMetadata,
-): FullTimepointImage[] => {
-  const tpImages = Object.keys(imageSeries.timepoints).reduce(
-    (tpImages: FullTimepointImage[], tp) => {
-      tpImages.push(extractTimepoint(imageSeries, tp));
-      return tpImages;
-    },
-    [],
-  );
-  return tpImages;
-};
 export const extractZPlane = (
   image: GeneralizedKindItem,
   plane: number,
@@ -293,40 +260,6 @@ export const extractAllZPlanes = (
 //   return extractedPlanes;
 // };
 
-export const getTZReducedImage = (
-  timeSeriesImage: ImageMetadata,
-  timepoint: TPKey,
-  plane?: number,
-): FullTimepointImage | FullTimepointImage => {
-  const timePointData = timeSeriesImage.timepoints[timepoint];
-  if (!timePointData) {
-    throw new Error(
-      `Time point ${timepoint} does not exist in image ${timeSeriesImage.id}`,
-    );
-  }
-  const tzReducedImage = {
-    id: timeSeriesImage.id,
-    name: timeSeriesImage.name,
-    kind: timeSeriesImage.kind,
-    bitDepth: timeSeriesImage.bitDepth,
-    partition: timeSeriesImage.partition,
-    shape: timeSeriesImage.shape,
-    src: timePointData.src,
-    data: timePointData.data,
-    colors: timePointData.colors,
-    categoryId: timePointData.categoryId,
-    activePlane: timePointData.activePlane,
-    timepoint: timepoint,
-  };
-
-  if (plane) {
-    const planeData = gather(tzReducedImage.data, plane, 0);
-    tzReducedImage.data = planeData;
-  }
-
-  return tzReducedImage;
-};
-
 export const extractChannel = (
   image: GeneralizedKindItem,
   channel: number,
@@ -354,10 +287,10 @@ export const extractChannel = (
   };
 };
 
-const normalizeImageToKindItem = (
+export const normalizeImageToKindItem = (
   image: ImageData,
   meta: ImageMetadata,
-  timeExpanded: boolean,
+  timeExpanded?: boolean,
 ): GeneralizedKindItem => {
   return {
     id: image.id,
@@ -414,7 +347,7 @@ export const getKindItemsFromAnnotations = (
 export const getKindItemsFromImages = (
   images: Record<string, ImageData>,
   metadataRecord: Record<string, ImageMetadata>,
-  timeExpanded: boolean,
+  timeExpanded?: boolean,
 ) => {
   if (!timeExpanded) {
     const defaultImages: Record<string, ImageData> = {};
@@ -454,10 +387,10 @@ export const groupKindItemsBy = (
 };
 
 export const generateDataRelationships = (
-  kinds: Array<Kind>,
-  categories: Array<Category>,
-  images: Array<ImageData>,
-  annotations: Array<AnnotationObject>,
+  kinds: Array<V12Kind>,
+  categories: Array<V12Category>,
+  images: Array<V12ImageData>,
+  annotations: Array<V12AnnotationObject>,
 ) => {
   const relationships: DataState["relationships"] = {
     kindToCategories: {},
@@ -494,4 +427,39 @@ export const generateDataRelationships = (
     relationships.imageToAnnotations[annotationImage].push(annotation.id);
   });
   return relationships;
+};
+
+export const freezeState = (dataState: DataState): DataState => {
+  const { images, annotations, ...safeCopy } = dataState;
+  const copiedImages = Object.values(images.entities).reduce(
+    (cImages: EntityState<ImageData, string>, image) => {
+      const { data, ...safeCopy } = image;
+      const copiedImage = {
+        ...structuredClone(safeCopy),
+        data: data.clone(),
+      };
+      cImages.ids.push(image.id);
+      cImages.entities[image.id] = copiedImage;
+      return cImages;
+    },
+    { ids: [], entities: {} },
+  );
+  const copiedAnnotations = Object.values(annotations.entities).reduce(
+    (cAnnotations: EntityState<AnnotationObject, string>, annotation) => {
+      const { data, ...safeCopy } = annotation;
+      const copiedAnnotation = {
+        ...structuredClone(safeCopy),
+        data: data.clone(),
+      };
+      cAnnotations.ids.push(annotation.id);
+      cAnnotations.entities[annotation.id] = copiedAnnotation;
+      return cAnnotations;
+    },
+    { ids: [], entities: {} },
+  );
+  return {
+    ...structuredClone(safeCopy),
+    images: copiedImages,
+    annotations: copiedAnnotations,
+  } as DataState;
 };

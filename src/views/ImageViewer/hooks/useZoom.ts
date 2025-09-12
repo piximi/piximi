@@ -8,7 +8,6 @@ import { useDebounce } from "../../../hooks/useDebounce";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
 import {
-  selectActiveImageId,
   selectStageWidth,
   selectZoomSelection,
   selectZoomToolOptions,
@@ -19,6 +18,7 @@ import { getDistance } from "views/ImageViewer/utils";
 import { ToolType, ZoomMode } from "views/ImageViewer/utils/enums";
 
 import { Point } from "utils/types";
+import { selectActiveMetadataId } from "../state/image-viewer-data/selectors";
 
 const delta = 10;
 export const useZoom = (stage?: Konva.Stage | null) => {
@@ -30,7 +30,7 @@ export const useZoom = (stage?: Konva.Stage | null) => {
   const toolType = useSelector(selectToolType);
   const { automaticCentering, mode } = useSelector(selectZoomToolOptions);
   const zoomSelection = useSelector(selectZoomSelection);
-  const activeImageId = useSelector(selectActiveImageId);
+  const activeImageId = useSelector(selectActiveMetadataId);
   const updateZoomScale = useDebounce((scale: number) => {
     dispatch(
       imageViewerSlice.actions.setZoomToolOptions({ options: { scale } }),

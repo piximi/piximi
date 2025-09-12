@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { selectCategoryEntities } from "store/data/selectors";
+import { GeneralizedKindItem } from "store/data/types";
 import { selectSortType } from "store/project/selectors";
 
 import { GridSortKey } from "utils/enums";
 
-import { Thing } from "store/data/types";
-
 // uuid -> numerical value (determenistic)
-const hash = (id: Thing["id"]) => {
+const hash = (id: GeneralizedKindItem["id"]) => {
   let hashValue = 0;
   for (let i = 0; i < id.length; i++) {
     hashValue = (hashValue << 5) - hashValue + id.charCodeAt(i);

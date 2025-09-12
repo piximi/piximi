@@ -3,9 +3,9 @@ import { encode, maskFromPoints } from "views/ImageViewer/utils";
 import { generateUUID } from "store/data/utils";
 import { logger } from "utils/logUtils";
 import {
-  V01_AnnotationObject,
-  V01_Category,
-  V01_ImageObject,
+  V01AnnotationObject,
+  V01Category,
+  V01ImageObject,
   SerializedCOCOAnnotationType,
   SerializedCOCOCategoryType,
   SerializedCOCOFileType,
@@ -20,7 +20,7 @@ refer to them. Instead we have to ensure incoming categories are given the prope
 change the incoming annotations to refer to the updated incoming category id
 */
 const reconcileCOCOCategories = (
-  existingCategories: Array<V01_Category>,
+  existingCategories: Array<V01Category>,
   serializedCategories: Array<SerializedCOCOCategoryType>,
   serializedAnnotations: Array<SerializedCOCOAnnotationType>,
   availableColors: Array<string> = [],
@@ -90,7 +90,7 @@ change the incoming annotations to refer to the updated incoming image id.
 If the image doesn't exist, then there's nothing to assign the annotation to, and it is discarded.
 */
 const reconcileImages = (
-  existingImages: Array<V01_ImageObject>,
+  existingImages: Array<V01ImageObject>,
   serializedImages: Array<SerializedCOCOImageType>,
   // reconcileCOCOCategories changes 'category_id' type
   serializedAnnotations: Array<
@@ -158,8 +158,8 @@ const reconcileImages = (
 
 export const v01_deserializeCOCOFile = (
   cocoFile: SerializedCOCOFileType,
-  existingImages: Array<V01_ImageObject>,
-  existingCategories: Array<V01_Category>,
+  existingImages: Array<V01ImageObject>,
+  existingCategories: Array<V01Category>,
   availableColors: Array<string> = [],
 ) => {
   // this must come first
@@ -181,7 +181,7 @@ export const v01_deserializeCOCOFile = (
   const multipart: Array<number> = [];
   const malformed: Array<number> = [];
 
-  const encodedAnnotations: Array<V01_AnnotationObject> = [];
+  const encodedAnnotations: Array<V01AnnotationObject> = [];
 
   for (const cocoAnn of imModdedAnnotations) {
     const parentIm = matchedIms.find((im) => im.id === cocoAnn.image_id);
