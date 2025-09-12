@@ -55,14 +55,9 @@ export const AddKindMenu = ({
   const addKind = (kind: Kind, newUnknownCategory: Category) => {
     batch(() => {
       dispatch(
-        dataSlice.actions.addCategories({
-          categories: [newUnknownCategory],
-        }),
-      );
-
-      dispatch(
-        dataSlice.actions.addKinds({
-          kinds: [kind],
+        dataSlice.actions.addKind({
+          kind,
+          unknownCategory: newUnknownCategory,
         }),
       );
     });

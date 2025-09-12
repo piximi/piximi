@@ -11,6 +11,7 @@ import {
   selectKindToAnnotations,
   selectMetadataEntities,
   selectCategoryToAllItems,
+  selectGeneralizedImagesRecord,
 } from "store/data/selectors";
 import {
   selectActiveKindId,
@@ -164,6 +165,7 @@ export const selectActiveFilteredKindItems = createSelector(
     );
   },
 );
+
 export const selectActiveFilteredSelectedKindItems = createSelector(
   selectActiveKindItemFilters,
   selectAllActiveSelectedKindItemIds,
@@ -179,6 +181,13 @@ export const selectActiveFilteredSelectedKindItems = createSelector(
   },
 );
 
+export const selectSelectedImages = createSelector(
+  selectAllActiveSelectedKindItemIds,
+  selectGeneralizedImagesRecord,
+  (selectedItems, itemRecord) => {
+    return selectedItems.map((id) => itemRecord[id]);
+  },
+);
 export const selectActiveFilteredSelectedImages = createSelector(
   selectActiveFilteredSelectedKindItems,
   selectActiveFilteredKindItems,

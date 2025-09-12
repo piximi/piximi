@@ -26,14 +26,11 @@ export const serializePiximiAnnotations = (
     name: cat.name,
     visible: cat.visible,
     kind: cat.kind,
-    containing: cat.containing,
   }));
 
   const serializedKinds = kinds.map((kind) => ({
     id: kind.id,
     displayName: kind.displayName,
-    containing: kind.containing,
-    categories: kind.categories,
     unknownCategoryId: kind.unknownCategoryId,
   }));
 

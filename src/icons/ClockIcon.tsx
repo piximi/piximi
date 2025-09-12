@@ -1,4 +1,7 @@
+import { useTheme } from "@mui/material";
+
 export const CollapsedClockIcon = ({ color }: { color: string }) => {
+  const theme = useTheme();
   return (
     <svg
       width="24"
@@ -13,7 +16,7 @@ export const CollapsedClockIcon = ({ color }: { color: string }) => {
         r="9"
         fill="none"
         stroke={color}
-        strokeWidth="1.5"
+        strokeWidth="2"
       />
 
       {/*-- Center dot --*/}
@@ -26,7 +29,7 @@ export const CollapsedClockIcon = ({ color }: { color: string }) => {
         x2="12"
         y2="6"
         stroke={color}
-        strokeWidth="1.5"
+        strokeWidth="2"
         strokeLinecap="round"
         transform="rotate(-60 12 12)"
       />
@@ -38,17 +41,26 @@ export const CollapsedClockIcon = ({ color }: { color: string }) => {
         x2="12"
         y2="5"
         stroke={color}
-        strokeWidth="1.5"
+        strokeWidth="2"
         strokeLinecap="round"
       />
-      {/*--Left Arrow--*/}
+      {/*--Cross out --*/}
+      <line
+        x1="2"
+        y1="22"
+        x2="22"
+        y2="2"
+        stroke={theme.palette.background.paper}
+        strokeWidth="4.5"
+        strokeLinecap="round"
+      />
       <line
         x1="2"
         y1="22"
         x2="22"
         y2="2"
         stroke={color}
-        strokeWidth="2.5"
+        strokeWidth="2"
         strokeLinecap="round"
       />
     </svg>
@@ -70,7 +82,7 @@ export const ExpandedClockIcon = ({ color }: { color: string }) => {
         r="9"
         fill="none"
         stroke={color}
-        strokeWidth="1.5"
+        strokeWidth="2"
       />
 
       {/*-- Center dot --*/}
@@ -83,7 +95,7 @@ export const ExpandedClockIcon = ({ color }: { color: string }) => {
         x2="12"
         y2="6"
         stroke={color}
-        strokeWidth="1.5"
+        strokeWidth="2"
         strokeLinecap="round"
         transform="rotate(-60 12 12)"
       />
@@ -95,7 +107,7 @@ export const ExpandedClockIcon = ({ color }: { color: string }) => {
         x2="12"
         y2="5"
         stroke={color}
-        strokeWidth="1.5"
+        strokeWidth="2"
         strokeLinecap="round"
       />
     </svg>

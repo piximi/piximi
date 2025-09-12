@@ -11,21 +11,21 @@ import {
   getDatasetSelection,
   getGroup,
 } from "../../zarr/zarrUtils";
-import { deserializeColorsGroup } from "../common/group-deserializers/deserializeColorsGroup";
+import { deserializeTensorColorsGroup } from "../common/group-deserializers/deserializeTensorColorsGroup";
 import { deserializeSegmenterGroup } from "../common/group-deserializers/deserializeSegmenterGroup";
 import { Partition } from "utils/models/enums";
-import { createRenderedTensor } from "utils/tensorUtils";
 import {
   LoadCB,
-  V01_AnnotationObject,
-  V01_Category,
-  V01_ImageObject,
+  V01AnnotationObject,
+  V01Category,
+  V01ImageObject,
 } from "utils/file-io/types";
 import { CustomStore } from "utils/file-io/zarr/stores";
 import { ProjectState } from "store/types";
 import { BitDepth } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 import { v01_deserializeClassifierGroup } from "./v01_deserializeClassifierGroup";
+import { v01CreateRenderedTensor } from "./utils";
 
 /*
   ====================
@@ -35,7 +35,7 @@ import { v01_deserializeClassifierGroup } from "./v01_deserializeClassifierGroup
 
 const deserializeAnnotationsGroup = async (
   annotationsGroup: Group,
-): Promise<Array<V01_AnnotationObject>> => {
+): Promise<Array<V01AnnotationObject>> => {
   const imageIds = (await getAttr(annotationsGroup, "image_id")) as string[];
 
   const categories = (await getAttr(
@@ -63,7 +63,7 @@ const deserializeAnnotationsGroup = async (
     null,
   ]).then((ra) => ra.data as Uint8Array);
 
-  const annotations: Array<V01_AnnotationObject> = [];
+  const annotations: Array<V01AnnotationObject> = [];
   let bboxIdx = 0;
   let maskIdx = 0;
   for (let i = 0; i < ids.length; i++) {
@@ -91,7 +91,7 @@ const deserializeAnnotationsGroup = async (
 const deserializeImageGroup = async (
   name: string,
   imageGroup: Group,
-): Promise<V01_ImageObject> => {
+): Promise<V01ImageObject> => {
   const id = (await getAttr(imageGroup, "image_id")) as string;
   const activePlane = (await getAttr(imageGroup, "active_plane")) as number;
   const categoryId = (await getAttr(imageGroup, "class_category_id")) as string;
@@ -101,7 +101,7 @@ const deserializeImageGroup = async (
   // )) as Partition;
 
   const colorsGroup = await getGroup(imageGroup, "colors");
-  const colors = await deserializeColorsGroup(colorsGroup);
+  const colors = await deserializeTensorColorsGroup(colorsGroup);
 
   const imageDataset = await getDataset(imageGroup, name);
   const imageRawArray = (await imageDataset.getRaw()) as RawArray;
@@ -114,7 +114,7 @@ const deserializeImageGroup = async (
     [planes, height, width, channels],
     "float32",
   );
-  const src = await createRenderedTensor(
+  const src = await v01CreateRenderedTensor(
     imageTensor,
     colors,
     bitDepth,
@@ -146,7 +146,7 @@ const deserializeImageGroup = async (
 const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
   const imageNames = (await getAttr(imagesGroup, "image_names")) as string[];
 
-  const images: Array<V01_ImageObject> = [];
+  const images: Array<V01ImageObject> = [];
 
   for (const [i, name] of Object.entries(imageNames)) {
     // import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
@@ -170,7 +170,7 @@ const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
 
 const deserializeCategoriesGroup = async (
   categoriesGroup: Group,
-): Promise<Array<V01_Category>> => {
+): Promise<Array<V01Category>> => {
   const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
   const colors = (await getAttr(categoriesGroup, "color")) as string[];
   const names = (await getAttr(categoriesGroup, "name")) as string[];
@@ -181,7 +181,7 @@ const deserializeCategoriesGroup = async (
     );
   }
 
-  const categories: Array<V01_Category> = [];
+  const categories: Array<V01Category> = [];
   for (let i = 0; i < ids.length; i++) {
     categories.push({
       id: ids[i],
@@ -200,10 +200,10 @@ const deserializeProjectGroup = async (
 ): Promise<{
   project: ProjectState;
   data: {
-    images: Array<V01_ImageObject>;
-    annotations: Array<V01_AnnotationObject>;
-    categories: Array<V01_Category>;
-    annotationCategories: Array<V01_Category>;
+    images: Array<V01ImageObject>;
+    annotations: Array<V01AnnotationObject>;
+    categories: Array<V01Category>;
+    annotationCategories: Array<V01Category>;
   };
 }> => {
   const name = (await getAttr(projectGroup, "name")) as string;

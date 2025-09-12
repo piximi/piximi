@@ -15,7 +15,14 @@ import { LoadCB } from "utils/file-io/types";
 
 export type OrphanedAnnotationObject = Omit<
   AnnotationObject,
-  "imageId" | "data" | "src" | "bitDepth" | "name" | "shape"
+  | "imageId"
+  | "data"
+  | "src"
+  | "bitDepth"
+  | "name"
+  | "shape"
+  | "plane"
+  | "timepoint"
 >;
 
 export abstract class Segmenter extends Model {

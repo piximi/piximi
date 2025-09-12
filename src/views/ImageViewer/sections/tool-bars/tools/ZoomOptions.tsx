@@ -15,7 +15,6 @@ import {
   selectZoomToolOptions,
 } from "views/ImageViewer/state/imageViewer/selectors";
 import { StageContext } from "views/ImageViewer/state/StageContext";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { useZoom } from "views/ImageViewer/hooks";
 import { CursorZoom, StageZoom } from "icons";
@@ -23,6 +22,7 @@ import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
 import { ToolType } from "views/ImageViewer/utils/enums";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { selectActiveImage } from "views/ImageViewer/state/image-viewer-data/reselectors";
 
 export const ZoomOptions = () => {
   const stageRef = useContext(StageContext);

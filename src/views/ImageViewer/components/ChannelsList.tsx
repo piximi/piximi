@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { tensor2d } from "@tensorflow/tfjs";
 import { produce } from "immer";
 import { debounce } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,16 +15,15 @@ import { useLocalGlobalState } from "hooks";
 
 import { Palette } from "./Palette";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import {
-  selectActiveImage,
-  selectActiveImageRawColor,
-} from "views/ImageViewer/state/imageViewer/reselectors";
-
 import { rgbToHex } from "utils/colorUtils";
 import { scaleDownRange, scaleUpRange } from "utils/dataUtils";
 
 import { BitDepth } from "store/data/types";
+import {
+  selectActiveImage,
+  selectActiveImageRawColor,
+} from "../state/image-viewer-data/reselectors";
+import { dataSlice } from "store/data";
 
 //TODO: Slider Components
 
@@ -39,7 +37,7 @@ export const ChannelsList = () => {
     dispatchState: dispatchActiveImageColors,
   } = useLocalGlobalState(
     selectActiveImageRawColor,
-    annotatorSlice.actions.editThings,
+    dataSlice.actions.updateImageData,
     {
       range: {},
       visible: {},
@@ -64,15 +62,12 @@ export const ChannelsList = () => {
 
   const handleSliderChangeCommitted = async () => {
     dispatchActiveImageColors({
-      updates: [
-        {
-          id: activeImage!.id,
-          colors: {
-            ...localActiveImageColors,
-            color: tensor2d(localActiveImageColors.color),
-          },
+      id: activeImage!.id,
+      changes: {
+        colors: {
+          ...localActiveImageColors,
         },
-      ],
+      },
     });
   };
 
@@ -80,13 +75,14 @@ export const ChannelsList = () => {
     const newColors = {
       visible: { ...localActiveImageColors.visible }, // copy so we can modify
       range: localActiveImageColors.range,
-      color: tensor2d(localActiveImageColors.color),
+      color: localActiveImageColors.color,
     };
     newColors.visible[index] = enabled;
 
     dispatch(
-      annotatorSlice.actions.editThings({
-        updates: [{ id: activeImage!.id, colors: newColors }],
+      dataSlice.actions.updateImageData({
+        id: activeImage!.id,
+        changes: { colors: newColors },
       }),
     );
   };

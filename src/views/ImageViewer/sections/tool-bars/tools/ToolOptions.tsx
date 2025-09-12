@@ -31,7 +31,7 @@ import {
   ThresholdToolSizeControls,
 } from "views/ImageViewer/utils/consts";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { selectTimeLinkingState } from "views/ImageViewer/state/annotator/selectors";
+import { selectTimeLinkingState } from "views/ImageViewer/state/image-viewer-data/selectors";
 
 type ToolMap = Record<
   string,

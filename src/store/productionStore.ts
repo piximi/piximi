@@ -9,7 +9,6 @@ import {
 import logger from "redux-logger";
 
 import { annotatorMiddleware } from "views/ImageViewer/state/annotator/annotatorListeners";
-import { imageViewerMiddleware } from "views/ImageViewer/state/imageViewer/imageViewerListeners";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { rootReducer, RootState } from "./rootReducer";
@@ -23,6 +22,8 @@ import { segmenterSlice } from "./segmenter";
 import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
+import { imageViewerDataMiddleware } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataListeners";
 
 const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&
@@ -32,11 +33,11 @@ const loggingMiddleware: Middleware[] =
 
 const listenerMiddlewares: Middleware[] = [
   annotatorMiddleware.middleware,
-  imageViewerMiddleware.middleware,
   projectMiddleware.middleware,
   dataMiddleware.middleware,
   measurementsMiddleware.middleware,
   applicationMiddleware.middleware,
+  imageViewerDataMiddleware.middleware,
 ];
 
 const preloadedState: RootState = {
@@ -44,6 +45,7 @@ const preloadedState: RootState = {
   annotator: annotatorSlice.getInitialState(),
   applicationSettings: applicationSettingsSlice.getInitialState(),
   imageViewer: imageViewerSlice.getInitialState(),
+  imageViewerData: imageViewerDataSlice.getInitialState(),
   data: dataSlice.getInitialState(),
   project: projectSlice.getInitialState(),
   segmenter: segmenterSlice.getInitialState(),
@@ -57,7 +59,7 @@ const options = {
   reducer: rootReducer,
 };
 
-export const productionStore: EnhancedStore = configureStore(options);
+export const productionStore = configureStore(options);
 
 export const initStore = (loadedData: RootState | undefined) => {
   const options = {
@@ -70,3 +72,6 @@ export const initStore = (loadedData: RootState | undefined) => {
 
   return store;
 };
+
+export type AppState = ReturnType<typeof productionStore.getState>;
+export type AppDispatch = typeof productionStore.dispatch;

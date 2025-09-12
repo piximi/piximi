@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { produce } from "immer";
-import { tensor2d } from "@tensorflow/tfjs";
 import {
   Box,
   Checkbox,
@@ -20,18 +19,17 @@ import { useLocalGlobalState, useTranslation } from "hooks";
 
 import { CustomListItem, CustomListItemButton } from "components/ui";
 import { ApplyColorsButton } from "views/ImageViewer/components";
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectLoadMessage } from "store/applicationSettings/selectors";
-import {
-  selectActiveImage,
-  selectActiveImageRawColor,
-} from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { rgbToHex } from "utils/colorUtils";
 import { scaleDownRange, scaleUpRange } from "utils/dataUtils";
 import { generateDefaultColors } from "utils/tensorUtils";
 import { BitDepth } from "store/data/types";
+import { dataSlice } from "store/data";
+import {
+  selectActiveImage,
+  selectActiveImageRawColor,
+} from "views/ImageViewer/state/image-viewer-data/reselectors";
 
 export const ChannelAdjustment = () => {
   const dispatch = useDispatch();
@@ -46,8 +44,9 @@ export const ChannelAdjustment = () => {
     const defaultColors = await generateDefaultColors(activeImage.data);
 
     dispatch(
-      annotatorSlice.actions.editThings({
-        updates: [{ id: activeImage.id!, colors: defaultColors }],
+      dataSlice.actions.updateImageData({
+        id: activeImage.id!,
+        changes: { colors: defaultColors },
       }),
     );
   };
@@ -87,7 +86,7 @@ const ChannelsList = () => {
     dispatchState: dispatchActiveImageColors,
   } = useLocalGlobalState(
     selectActiveImageRawColor,
-    imageViewerSlice.actions.updateActiveImageColors,
+    dataSlice.actions.updateImageData,
     {
       range: {},
       visible: {},
@@ -113,9 +112,11 @@ const ChannelsList = () => {
   const handleSliderChangeCommitted = async () => {
     if (!activeImage) return;
     dispatchActiveImageColors({
-      colors: {
-        ...localActiveImageColors,
-        color: tensor2d(localActiveImageColors.color),
+      id: activeImage.id,
+      changes: {
+        colors: {
+          ...localActiveImageColors,
+        },
       },
     });
   };
@@ -125,12 +126,13 @@ const ChannelsList = () => {
     const newColors = {
       visible: { ...localActiveImageColors.visible }, // copy so we can modify
       range: localActiveImageColors.range,
-      color: tensor2d(localActiveImageColors.color),
+      color: localActiveImageColors.color,
     };
     newColors.visible[index] = enabled;
     dispatch(
-      imageViewerSlice.actions.updateActiveImageColors({
-        colors: newColors,
+      dataSlice.actions.updateImageData({
+        id: activeImage.id,
+        changes: { colors: newColors },
       }),
     );
   };

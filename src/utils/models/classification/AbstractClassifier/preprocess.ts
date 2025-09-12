@@ -20,7 +20,12 @@ import {
 import { matchedCropPad, padToMatch } from "../../utils";
 import { CropSchema, Partition } from "../../enums";
 import { denormalizeTensor, getImageSlice } from "utils/tensorUtils";
-import { Category, Shape, Thing, BitDepth } from "store/data/types";
+import {
+  Category,
+  Shape,
+  GeneralizedKindItem,
+  BitDepth,
+} from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 import { logger } from "utils/logUtils";
 import { RequireOnly } from "utils/types";
@@ -66,7 +71,7 @@ const createClassificationIdxs = <
 };
 
 const sampleGeneratorCreator = <
-  T extends Omit<Thing, "kind">,
+  T extends Omit<GeneralizedKindItem, "kind">,
   K extends { id: string },
   B extends boolean,
 >(
@@ -325,7 +330,7 @@ const doShow = (
 //#endregion Debug stuff
 
 type PreprocessArgs = {
-  images: Array<Thing>;
+  images: Array<GeneralizedKindItem>;
   categories: Array<RequireOnly<Category, "id">>;
   preprocessOptions: {
     cropSchema: CropSchema;

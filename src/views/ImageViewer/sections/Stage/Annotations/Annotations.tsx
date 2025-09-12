@@ -1,21 +1,19 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 
 import { Annotation } from "./Annotation";
 import { AnnotationTransformer } from "./AnnotationTransformer";
 
 import { selectImageViewerFilters } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectWorkingAnnotationView } from "views/ImageViewer/state/annotator/reselectors";
+
+import { AnnotationTool } from "views/ImageViewer/utils/tools";
 import {
   selectSelectedAnnotationIds,
   selectTimeLinkingAnnIds,
   selectTimeLinkingState,
-} from "views/ImageViewer/state/annotator/selectors";
-import {
-  selectActiveAnnotationsViews,
-  selectWorkingAnnotationView,
-} from "views/ImageViewer/state/annotator/reselectors";
-
-import { AnnotationTool } from "views/ImageViewer/utils/tools";
+} from "views/ImageViewer/state/image-viewer-data/selectors";
+import { selectViewableActiveAnnotations } from "views/ImageViewer/state/image-viewer-data/reselectors";
 
 type AnnotationsProps = {
   annotationTool: AnnotationTool;
@@ -25,7 +23,7 @@ export const Annotations = React.memo(
     const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
     const tLinkedAnnIds = useSelector(selectTimeLinkingAnnIds);
     const tLinkingActive = useSelector(selectTimeLinkingState);
-    const annotationObjects = useSelector(selectActiveAnnotationsViews);
+    const annotations = useSelector(selectViewableActiveAnnotations);
     const workingAnnotationObject = useSelector(selectWorkingAnnotationView);
     const imageViewerFilters = useSelector(selectImageViewerFilters);
     const tLinkedAnnArray = useMemo(() => {
@@ -34,11 +32,11 @@ export const Annotations = React.memo(
 
     const nonWorkingAnnotationObjects = useMemo(
       () =>
-        annotationObjects.filter(
+        annotations.filter(
           (annObj) =>
             annObj.annotation.id !== workingAnnotationObject?.annotation.id,
         ),
-      [annotationObjects, workingAnnotationObject],
+      [annotations, workingAnnotationObject],
     );
 
     const nonWorkingSelectedAnnotationsIds = useMemo(
@@ -50,23 +48,28 @@ export const Annotations = React.memo(
       [selectedAnnotationsIds, workingAnnotationObject],
     );
 
+    useEffect(() => {
+      console.log(annotations);
+      console.log(nonWorkingAnnotationObjects);
+    }, [annotations, nonWorkingAnnotationObjects]);
+
     return (
       <>
-        {nonWorkingAnnotationObjects.map((annotationObject) => (
+        {nonWorkingAnnotationObjects.map((annotation) => (
           <Annotation
-            key={annotationObject.annotation.id}
-            annotation={annotationObject.annotation}
-            imageShape={annotationObject.imageShape}
+            key={annotation.annotation.id}
+            annotation={annotation.annotation}
+            imageShape={annotation.imageShape}
             fillColor={
               !tLinkingActive
-                ? annotationObject.fillColor
-                : tLinkedAnnArray.includes(annotationObject.annotation.id)
+                ? annotation.fillColor
+                : tLinkedAnnArray.includes(annotation.annotation.id)
                   ? "#AAAAAAFF"
                   : "#77777710"
             }
             selected={true}
             isFiltered={imageViewerFilters.categoryId.includes(
-              annotationObject.annotation.categoryId,
+              annotation.annotation.categoryId,
             )}
           />
         ))}

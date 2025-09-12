@@ -5,6 +5,7 @@ import { Gesture as GestureIcon } from "@mui/icons-material";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { useSelector } from "react-redux";
 import { selectAllSelectedKindItems } from "store/project/selectors";
+import { memory } from "@tensorflow/tfjs";
 
 export const ImageViewerButton = () => {
   const selectedKindItems = useSelector(selectAllSelectedKindItems);
@@ -12,6 +13,7 @@ export const ImageViewerButton = () => {
   const theme = useTheme();
   const smOrXsBreakpoint = useMediaQuery(theme.breakpoints.down("md"));
   const handleNavigateImageViewer = () => {
+    console.log("beforeNavigating: ", memory().numTensors);
     navigate("/imageviewer", {
       state: {
         initialThingIds: selectedKindItems,

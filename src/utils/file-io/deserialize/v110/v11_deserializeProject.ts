@@ -2,7 +2,6 @@ import { Group, openGroup } from "zarr";
 
 import { logger } from "utils/logUtils";
 import { initialState as initialProjectState } from "store/project/projectSlice";
-import { deserializeColorsGroup } from "../common/group-deserializers/deserializeColorsGroup";
 import { deserializeSegmenterGroup } from "../common/group-deserializers/deserializeSegmenterGroup";
 import { getAttr, getDataset, getGroup } from "../../zarr/zarrUtils";
 import { RawArray } from "zarr/types/rawArray";
@@ -22,6 +21,8 @@ import { BitDepth } from "store/data/types";
 import { EntityState } from "@reduxjs/toolkit";
 import { v11_deserializeClassifierGroup } from "./v11_deserializeClassifierGroup";
 import { IMAGE_KIND } from "store/data/constants";
+import { deserializeTensorColorsGroup } from "../common/group-deserializers/deserializeTensorColorsGroup";
+import { v01CreateRenderedTensor } from "../v01/utils";
 
 const deserializeThingGroup = async (
   name: string,
@@ -71,8 +72,8 @@ const deserializeThingGroup = async (
 
   if (kind === IMAGE_KIND) {
     const colorsGroup = await getGroup(thingGroup, "colors");
-    const colors = await deserializeColorsGroup(colorsGroup);
-    const src = await createRenderedTensor(
+    const colors = await deserializeTensorColorsGroup(colorsGroup);
+    const src = await v01CreateRenderedTensor(
       imageTensor,
       colors,
       bitDepth,
@@ -95,6 +96,7 @@ const deserializeThingGroup = async (
     const src = await createRenderedTensor(
       thing.data,
       colors,
+      channels,
       bitDepth,
       activePlane,
     );

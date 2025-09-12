@@ -5,39 +5,42 @@ import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import {
-  selectActiveImageSeries,
-  selectStageWidth,
-} from "views/ImageViewer/state/imageViewer/selectors";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
-import { ImageViewerTimepointProperties } from "views/ImageViewer/utils/types";
-import { selectImageDataEntities } from "store/data/selectors";
-import { createRenderedTensor } from "utils/tensorUtils";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { selectActiveImage } from "views/ImageViewer/state/image-viewer-data/reselectors";
+import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
+import { ImageViewerMetadataDetails } from "views/ImageViewer/state/image-viewer-data/types";
+import { RequireField } from "utils/types";
+import { GeneralizedKindItem } from "store/data/types";
+
+// The containing draw does not render if activeMetadata is undefined,
+// and the Timepoint adjustment does not render if the metadata does not contain a timeseries
+// Using these types to avoid excessive optional chaining
+type TimeSeriesMetadata = Required<ImageViewerMetadataDetails>;
+type TimeSeriesKindItem = RequireField<GeneralizedKindItem, "timepoint">;
 
 export const TimepointAdjustment = () => {
   const dispatch = useDispatch();
-  const activeImage = useSelector(selectActiveImage);
-  const activeImageSeriesDetails = useSelector(selectActiveImageSeries);
-  const imageSeries = useSelector(selectImageDataEntities);
+  const activeImage = useSelector(selectActiveImage) as TimeSeriesKindItem;
+  const activeMetadata = useSelector(
+    selectActiveMetadata,
+  ) as TimeSeriesMetadata;
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLImageElement | null)[]>([]);
 
-  const [tpHtmlImages, setTPHtmlImages] = useState<string[]>([]);
-  const [sliderValue, setSliderValue] = useState<string>(
-    activeImageSeriesDetails?.activeTimepoint ?? "0",
-  );
+  const [tpHtmlImages, setTPHtmlImages] = useState<
+    { id: string; src: string; timepoint: number }[]
+  >([]);
+  const [sliderValue, setSliderValue] = useState<number>(activeImage.timepoint);
 
   const tsPreviewProportions = useMemo(() => {
     const targetHeight = 75;
-    return (activeImage?.shape.height ?? 75) / targetHeight;
+    return activeImage.shape.height / targetHeight;
   }, [activeImage]);
 
   const numTimepoints = useMemo(() => {
-    if (!activeImageSeriesDetails) return 0;
-    return Object.keys(activeImageSeriesDetails?.timepoints).length - 1;
-  }, [activeImageSeriesDetails?.timepoints]);
+    return Object.keys(activeMetadata.images).length - 1;
+  }, [activeMetadata.images]);
 
   const sliderWidth = useMemo(() => {
     const tpWidth = numTimepoints * 16 + 80; // 80 is width of both side buttons;
@@ -57,26 +60,27 @@ export const TimepointAdjustment = () => {
       });
     }
   };
-  const updateTimepointImage = (nextTimepoint: number) => {
-    scrollToItem(nextTimepoint);
-    setSliderValue(nextTimepoint + "");
-    dispatch(
-      imageViewerSlice.actions.setActiveImageTimepoint({
-        tp: nextTimepoint + "",
-      }),
-    );
+
+  const setTimepointImage = (id: string) => {
+    dispatch(imageViewerDataSlice.actions.setActiveImage(id));
     dispatch(
       annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
     );
   };
+  const updateTimepointImage = (nextTimepoint: number) => {
+    scrollToItem(nextTimepoint);
+    setSliderValue(nextTimepoint);
+    setTimepointImage(tpHtmlImages[nextTimepoint].id);
+  };
 
   const handleSliderChange = (newValue: number | number[]) => {
-    updateTimepointImage(newValue as number);
+    newValue = newValue as number;
+
+    updateTimepointImage(newValue);
   };
 
   const handleDecrementTimepoint = () => {
-    if (!activeImageSeriesDetails) return;
-    const activeTimepoint = +activeImageSeriesDetails.activeTimepoint;
+    const activeTimepoint = activeImage.timepoint;
     const nextTimepoint = activeTimepoint !== 0 ? activeTimepoint - 1 : -1;
 
     if (nextTimepoint >= 0) {
@@ -84,10 +88,8 @@ export const TimepointAdjustment = () => {
     }
   };
   const handleIncrementTimepoint = () => {
-    if (!activeImageSeriesDetails) return;
-    const activeTimepoint = +activeImageSeriesDetails.activeTimepoint;
-    const maxTimepoints =
-      Object.keys(activeImageSeriesDetails.timepoints).length - 1;
+    const activeTimepoint = +activeMetadata.activeImageId;
+    const maxTimepoints = Object.keys(activeMetadata.images).length - 1;
     const nextTimepoint =
       activeTimepoint < maxTimepoints ? activeTimepoint + 1 : undefined;
     if (nextTimepoint) {
@@ -96,17 +98,17 @@ export const TimepointAdjustment = () => {
   };
 
   useEffect(() => {
-    let srcs: string[] = [];
-    if (activeImageSeriesDetails)
-      srcs = Object.values(activeImageSeriesDetails.timepoints).map(
-        (timepoint: ImageViewerTimepointProperties) => {
-          return timepoint.ZTPreview;
-        },
-      );
+    const srcs = Object.values(activeMetadata.images).map((image) => {
+      return {
+        id: image.id,
+        src: image.ZTPreview,
+        timepoint: image.timepoint!,
+      };
+    });
     setTPHtmlImages(srcs);
-  }, [activeImageSeriesDetails]);
+  }, [activeMetadata]);
 
-  return activeImage && activeImageSeriesDetails ? ( // For cleaner typescript, shouldnt be able to focus on if values undefined
+  return (
     <Box
       sx={{
         display: "grid",
@@ -138,7 +140,7 @@ export const TimepointAdjustment = () => {
         </IconButton>
         <Slider
           orientation="horizontal"
-          value={+sliderValue}
+          value={sliderValue}
           min={0}
           max={numTimepoints}
           step={1}
@@ -172,34 +174,28 @@ export const TimepointAdjustment = () => {
         }}
         gap={1}
       >
-        {Object.values(tpHtmlImages ?? []).map((timepointSrcs: string, idx) => {
+        {Object.values(tpHtmlImages ?? []).map((image, idx) => {
           return (
             <img
               key={`tp-${idx}`}
               ref={(el) => (itemRefs.current[idx] = el)}
               style={{
                 border:
-                  +activeImageSeriesDetails?.activeTimepoint === idx
+                  activeMetadata.activeImageId === image.id
                     ? "2px solid pink"
                     : "2px solid transparent",
               }}
-              src={timepointSrcs}
+              src={image.src}
               width={`${activeImage.shape.width / tsPreviewProportions}px`}
               height={`${activeImage.shape.height / tsPreviewProportions}px`}
               onClick={() => {
-                setSliderValue(idx + "");
-                dispatch(
-                  imageViewerSlice.actions.setActiveImageTimepoint({
-                    tp: idx + "",
-                  }),
-                );
+                setSliderValue(idx);
+                setTimepointImage(image.id);
               }}
             />
           );
         })}
       </Stack>
     </Box>
-  ) : (
-    <></>
   );
 };

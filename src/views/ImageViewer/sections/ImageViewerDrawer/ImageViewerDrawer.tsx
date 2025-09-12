@@ -14,10 +14,11 @@ import { AnnotationSection } from "./annotation-section/AnnotationSection";
 import { DIMENSIONS } from "utils/constants";
 import { ExportAnnotationsSection } from "./ExportAnnotationsSection";
 import { KindCategorySection } from "./KindCategorySection";
-import { ImageList } from "./ImageList";
+import { MetadataList } from "./MetadataList";
 import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
 import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/layout/app-drawer/HelpButton";
+import { ReturnToProjectButton } from "./ReturnToProjectButton";
 
 type DrawerContextType = "export" | "images" | "categories" | "annotations";
 export const ImageViewerDrawer = () => {
@@ -29,7 +30,7 @@ export const ImageViewerDrawer = () => {
       case "export":
         return <ExportAnnotationsSection />;
       case "images":
-        return <ImageList />;
+        return <MetadataList />;
       case "categories":
         return <KindCategorySection />;
       case "annotations":
@@ -54,7 +55,8 @@ export const ImageViewerDrawer = () => {
           justifyContent: "space-between",
         })}
       >
-        <Stack>
+        <Stack sx={{ width: DIMENSIONS.toolDrawerWidth + "px" }}>
+          <ReturnToProjectButton />
           <IconButton onClick={() => setDrawerContext("export")}>
             <DownloadIcon />
           </IconButton>

@@ -2,20 +2,15 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { distinctFilter, mutatingFilter } from "utils/arrayUtils";
 
-import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 import { ZoomMode } from "views/ImageViewer/utils/enums";
 
-import { ImageViewerState } from "../../utils/types";
 import {
   ColorAdjustmentOptionsType,
+  ImageViewerState,
   ZoomToolOptionsType,
-  ImageViewerImageDetails,
-} from "views/ImageViewer/utils/types";
-import { Colors } from "utils/types";
-import { TPKey } from "store/data/types";
+} from "../types";
 
 const initialState: ImageViewerState = {
-  imageStack: {},
   colorAdjustment: {
     blackPoint: 0,
     brightness: 0,
@@ -28,11 +23,8 @@ const initialState: ImageViewerState = {
     vibrance: 0,
   },
   cursor: "default",
-  activeImageSeriesId: undefined,
-  activeAnnotationIds: [],
   imageOrigin: { x: 0, y: 0 },
   filters: { categoryId: [] },
-  selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
   stageHeight: 1000,
   stageScale: 1,
   stageWidth: 1000,
@@ -52,8 +44,6 @@ const initialState: ImageViewerState = {
     toFit: false,
   },
   imageIsLoading: false,
-  highlightedCategory: undefined,
-  hasUnsavedChanges: false,
 };
 
 export const imageViewerSlice = createSlice({
@@ -61,169 +51,7 @@ export const imageViewerSlice = createSlice({
   name: "image-viewer",
   reducers: {
     resetImageViewer: () => initialState,
-    prepareImageViewer: (
-      _state,
-      _action: PayloadAction<{
-        selectedThingIds: { images: string[]; annotations: string[] };
-      }>,
-    ) => {},
-    setImageStack(
-      state,
-      action: PayloadAction<{
-        images: Record<string, ImageViewerImageDetails>;
-      }>,
-    ) {
-      state.imageStack = action.payload.images;
-    },
-    setHasUnsavedChanges(
-      state,
-      action: PayloadAction<{ hasUnsavedChanges: boolean }>,
-    ) {
-      state.hasUnsavedChanges = action.payload.hasUnsavedChanges;
-    },
-    addActiveAnnotationId(
-      state,
-      action: PayloadAction<{ annotationId: string }>,
-    ) {
-      state.activeAnnotationIds.push(action.payload.annotationId);
-    },
-    addActiveAnnotationIds(
-      state,
-      action: PayloadAction<{ annotationIds: Array<string> }>,
-    ) {
-      for (const annotationId of action.payload.annotationIds) {
-        imageViewerSlice.caseReducers.addActiveAnnotationId(state, {
-          type: "addActiveAnnotationId",
-          payload: { annotationId },
-        });
-      }
-    },
-    setActiveAnnotationIds(
-      state,
-      action: PayloadAction<{
-        annotationIds: Array<string>;
-      }>,
-    ) {
-      state.activeAnnotationIds = [];
-      imageViewerSlice.caseReducers.addActiveAnnotationIds(state, {
-        type: "addActiveAnnotationIds",
-        payload: { annotationIds: action.payload.annotationIds },
-      });
-    },
-    removeActiveAnnotationId(
-      state,
-      action: PayloadAction<{
-        annotationId: string;
-      }>,
-    ) {
-      mutatingFilter(
-        state.activeAnnotationIds,
-        (annotationId) => annotationId !== action.payload.annotationId,
-      );
-    },
-    removeActiveAnnotationIds(
-      state,
-      action: PayloadAction<{
-        annotationIds: Array<string>;
-      }>,
-    ) {
-      for (const annotationId of action.payload.annotationIds) {
-        imageViewerSlice.caseReducers.removeActiveAnnotationId(state, {
-          type: "removeActiveAnnotationId",
-          payload: { annotationId },
-        });
-      }
-    },
-    setSelectedCategoryId(
-      state,
-      action: PayloadAction<{ selectedCategoryId: string }>,
-    ) {
-      state.selectedCategoryId = action.payload.selectedCategoryId;
-    },
-    setActiveImageSeriesId(
-      state,
-      action: PayloadAction<{
-        imageId: string | undefined;
-        prevImageId: string | undefined;
-      }>,
-    ) {
-      state.activeImageSeriesId = action.payload.imageId;
-      // reset selected annotations
-    },
 
-    setActiveImageRenderedSrcs(
-      state,
-      action: PayloadAction<{
-        renderedSrcs: Array<string>;
-      }>,
-    ) {
-      const activeImageId = state.activeImageSeriesId;
-      if (!activeImageId)
-        throw new Error("Set rendered sources failed: No active image");
-
-      state.imageStack[activeImageId].activeSrcs = action.payload.renderedSrcs;
-    },
-    setActiveSeriesTZPreviews(
-      state,
-      action: PayloadAction<{
-        previews: Record<TPKey, string>;
-      }>,
-    ) {
-      const activeImageId = state.activeImageSeriesId;
-      const previews = action.payload.previews;
-      if (!activeImageId)
-        throw new Error("Set rendered sources failed: No active image");
-
-      const activeImageDetails = state.imageStack[activeImageId];
-      Object.entries(previews).forEach(([tp, src]) => {
-        activeImageDetails.timepoints[+tp].ZTPreview = src;
-      });
-    },
-    updateActiveImageColors(state, action: PayloadAction<{ colors: Colors }>) {
-      if (!state.activeImageSeriesId) return;
-      const { colors } = action.payload;
-      const activeImageSeries = state.imageStack[state.activeImageSeriesId];
-      activeImageSeries.timepoints[activeImageSeries.activeTimepoint].ZTColors =
-        colors;
-    },
-    updateActiveImageSeriesColors(
-      state,
-      action: PayloadAction<{ colors: Colors }>,
-    ) {
-      if (!state.activeImageSeriesId) return;
-      const { colors } = action.payload;
-      const activeImageSeries = state.imageStack[state.activeImageSeriesId];
-      activeImageSeries.timepoints[activeImageSeries.activeTimepoint].ZTColors =
-        colors;
-    },
-    setActiveImageTimepoint(
-      state,
-      action: PayloadAction<{
-        tp: TPKey;
-      }>,
-    ) {
-      const activeImageId = state.activeImageSeriesId;
-      if (!activeImageId)
-        throw new Error("Set rendered sources failed: No active image");
-
-      state.imageStack[activeImageId].activeTimepoint = action.payload.tp;
-      state.imageStack[activeImageId].activeSrcs = [
-        state.imageStack[activeImageId].timepoints[action.payload.tp].ZTPreview,
-      ];
-    },
-    setActiveImageActivePlane(
-      state,
-      action: PayloadAction<{
-        plane: number;
-      }>,
-    ) {
-      const activeImageId = state.activeImageSeriesId;
-      if (!activeImageId)
-        throw new Error("Set rendered sources failed: No active image");
-
-      const activeImageDetails = state.imageStack[activeImageId];
-      activeImageDetails.activePlane = action.payload.plane;
-    },
     setImageOrigin(
       state,
       action: PayloadAction<{ origin: { x: number; y: number } }>,
@@ -295,15 +123,7 @@ export const imageViewerSlice = createSlice({
     ) {
       state.zoomOptions = { ...state.zoomOptions, ...action.payload.options };
     },
-    setImageIsLoading(state, action: PayloadAction<{ isLoading: boolean }>) {
-      state.imageIsLoading = action.payload.isLoading;
-    },
-    updateHighlightedAnnotationCategory(
-      state,
-      action: PayloadAction<{ categoryId: string | undefined }>,
-    ) {
-      state.highlightedCategory = action.payload.categoryId;
-    },
+
     addFilters(
       state,
       action: PayloadAction<{

@@ -32,7 +32,6 @@ import {
   selectAnnotationState,
   selectToolType,
 } from "../../state/annotator/selectors";
-import { selectImageViewerObjectsArray } from "../../state/annotator/reselectors";
 import {
   //selectActiveImageId,
   //selectActiveImageRenderedSrcs,
@@ -49,10 +48,13 @@ import { HotkeyContext } from "utils/enums";
 import { Category } from "store/data/types";
 import { createProtoAnnotation } from "views/ImageViewer/utils/annotationUtils";
 import { Partition } from "utils/models/enums";
-import { selectActiveImageSeries } from "views/ImageViewer/state/imageViewer/selectors";
-import { CursorLocationContainer } from "./CursorLocationContainer";
+import { ActiveImageInfoContainer } from "./ActiveImageInfoContainer";
 import { ImageViewModeDrawer } from "./image-view-mode-drawer/ImageViewModeDrawer";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
+import { dataSlice } from "store/data";
+import { selectAllAnnotations } from "store/data/selectors";
+import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
+import { selectActiveImage } from "views/ImageViewer/state/image-viewer-data/reselectors";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 
 export const Stage = ({
   stageWidth,
@@ -72,9 +74,9 @@ export const Stage = ({
   const stageRef = useContext(StageContext);
 
   // data Selectors
-  const activeImageSeries = useSelector(selectActiveImageSeries);
+  const activeMetadata = useSelector(selectActiveMetadata);
   const activeImage = useSelector(selectActiveImage);
-  const existingObjects = useSelector(selectImageViewerObjectsArray);
+  const existingAnnotations = useSelector(selectAllAnnotations);
 
   // tool selectors
   const toolType = useSelector(selectToolType);
@@ -132,7 +134,6 @@ export const Stage = ({
       newCategory = {
         id: newId,
         name: catName,
-        containing: [],
         color: CATEGORY_COLORS.darkcyan,
         visible: true,
         kind: newKind.id,
@@ -141,25 +142,21 @@ export const Stage = ({
 
     batch(() => {
       dispatch(
-        annotatorSlice.actions.addKind({
+        dataSlice.actions.addKind({
           kind: newKind,
           unknownCategory: unknownCategory,
         }),
       );
       if (newCategory) {
-        dispatch(
-          annotatorSlice.actions.addCategory({
-            category: newCategory,
-          }),
-        );
+        dispatch(dataSlice.actions.addCategory(newCategory));
       }
       dispatch(
-        imageViewerSlice.actions.setSelectedCategoryId({
-          selectedCategoryId: newCategory ? newCategory.id : unknownCategory.id,
-        }),
+        imageViewerDataSlice.actions.setSelectedCategoryId(
+          newCategory ? newCategory.id : unknownCategory.id,
+        ),
       );
     });
-    if (!activeImage || !activeImageSeries)
+    if (!activeImage || !activeMetadata)
       throw new Error("Active image not found");
     if (!annotationTool.decodedMask) throw new Error("No mask found");
     if (!annotationTool.boundingBox) throw new Error("No bounding box found");
@@ -168,16 +165,16 @@ export const Stage = ({
       {
         boundingBox: annotationTool.boundingBox,
         categoryId: (newCategory ?? unknownCategory).id,
-        imageId: activeImageSeries.id,
+        imageId: activeMetadata.id,
         decodedMask: annotationTool.decodedMask,
-        activePlane: activeImageSeries.activePlane,
-        plane: activeImageSeries.activePlane,
-        timepoint: activeImageSeries.activeTimepoint,
+        activePlane: activeMetadata.activePlane,
+        plane: activeMetadata.activePlane,
+        timepoint: activeImage.timepoint ?? 0,
         partition: Partition.Unassigned,
       },
       activeImage,
       newKind,
-      existingObjects.map((obj) => obj.name),
+      existingAnnotations.map((obj) => obj.name),
     );
     dispatch(
       annotatorSlice.actions.setWorkingAnnotation({
@@ -234,19 +231,6 @@ export const Stage = ({
     );
   }, [stageWidth, stageHeight, activeImage?.shape, dispatch]);
 
-  // useEffect(() => {
-  //   if (!activeImageSeries || !activeImageSeries.activeSrcs) return;
-  //   if (!activeImageSeries.activeSrcs) {
-  //   }
-  //   setHtmlImages(
-  //     activeImageSeries.activeSrcs.map((src: string) => {
-  //       const imgElem = document.createElement("img");
-  //       imgElem.src = src;
-  //       return imgElem;
-  //     }),
-  //   );
-  // }, [activeImageSeries, stageRef, dispatch]);
-
   useEffect(() => {
     stageRef?.current?.scale({ x: 1, y: 1 });
     dispatch(
@@ -254,7 +238,7 @@ export const Stage = ({
         stagePosition: { x: 0, y: 0 },
       }),
     );
-  }, [activeImageSeries, stageRef, dispatch]);
+  }, [activeMetadata, stageRef, dispatch]);
 
   useHotkeys(
     "alt",
@@ -290,22 +274,21 @@ export const Stage = ({
         <Provider store={store}>
           <StageContext.Provider value={stageRef}>
             <Layer>
-              {
-                /*!(htmlImages && htmlImages.length) ||*/ imageIsLoading ? (
-                  <></>
-                ) : (
-                  <Image
-                    ref={imageRef}
-                    //images={htmlImages}
-                    stageHeight={stageHeight}
-                    stageWidth={stageWidth}
-                  />
-                )
-              }
+              {imageIsLoading || !activeImage ? (
+                <></>
+              ) : (
+                <Image
+                  ref={imageRef}
+                  stageHeight={stageHeight}
+                  stageWidth={stageWidth}
+                />
+              )}
               {(annotationState === AnnotationState.Annotating ||
                 toolType === ToolType.QuickAnnotation) && (
                 <Selection tool={annotationTool} toolType={toolType} />
               )}
+            </Layer>
+            <Layer>
               <Cursor
                 positionByStage={relativePositionByStage}
                 absolutePosition={absolutePosition}
@@ -314,7 +297,8 @@ export const Stage = ({
                 draggable={draggable}
                 toolType={toolType}
               />
-
+            </Layer>
+            <Layer>
               {!imageIsLoading && (
                 <Annotations annotationTool={annotationTool} />
               )}
@@ -325,7 +309,7 @@ export const Stage = ({
 
       <ImageViewModeDrawer />
 
-      <CursorLocationContainer
+      <ActiveImageInfoContainer
         absolutePosition={absolutePosition}
         pixelColor={pixelColor}
         width={stageWidth}

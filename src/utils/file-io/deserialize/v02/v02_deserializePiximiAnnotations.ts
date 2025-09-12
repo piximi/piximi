@@ -1,4 +1,3 @@
-import { getPropertiesFromImage } from "store/data/utils";
 import { convertArrayToShape } from "utils/models/utils";
 import { generateUUID } from "store/data/utils";
 import { Partition } from "utils/models/enums";
@@ -13,6 +12,7 @@ import {
 } from "../../types";
 import { PartialBy } from "utils/types";
 import { ShapeArray } from "store/data/types";
+import { v02GetPropertiesFromImage } from "utils/file-io/utils";
 
 type V02KindMap = Record<string, { new: V02Kind; existing?: V02Kind }>;
 type V02CategoryMap = Record<
@@ -132,7 +132,7 @@ export const v02_deserializePiximiAnnotations = async (
     // If no existing image we cant build the annotation
     if (!annImage.existing) continue;
     const image = annImage.existing;
-    const annPropsFromIm = await getPropertiesFromImage(image, {
+    const annPropsFromIm = await v02GetPropertiesFromImage(image, {
       boundingBox: annotation.boundingBox as [number, number, number, number],
     });
     const expandedAnnotation = { ...annotation, ...annPropsFromIm };
@@ -186,7 +186,7 @@ export const v02_deserializePiximiAnnotations = async (
 
   return {
     annotations: reconciledAnnotations,
-    newV02Kinds: Object.values(kindsToReconcile),
+    newKinds: Object.values(kindsToReconcile),
     newCategories: Object.values(categoriesToReconcile),
   };
 };

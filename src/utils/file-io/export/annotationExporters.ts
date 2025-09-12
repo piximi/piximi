@@ -45,7 +45,7 @@ const processAnnotation = (
       width: bbox[2] - bbox[0],
       height: bbox[3] - bbox[1],
     },
-    plane: ann.activePlane,
+    plane: ann.activePlane ?? ann.plane,
     decodedMask: ann.decodedMask ?? decode(ann.encodedMask),
     categoryName: categories[ann.categoryId].name,
     kind: ann.kind,

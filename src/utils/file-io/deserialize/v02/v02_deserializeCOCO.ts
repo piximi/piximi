@@ -1,6 +1,5 @@
 import { encode, maskFromPoints } from "views/ImageViewer/utils";
 import { generateUUID } from "store/data/utils";
-import { getPropertiesFromImage } from "store/data/utils";
 import { logger } from "utils/logUtils";
 
 import { Partition } from "utils/models/enums";
@@ -21,6 +20,7 @@ import {
   UNKNOWN_ANNOTATION_CATEGORY_COLOR,
   UNKNOWN_CATEGORY_NAME,
 } from "store/data/constants";
+import { v02GetPropertiesFromImage } from "utils/file-io/utils";
 
 type V02KindMap = Record<
   string,
@@ -305,7 +305,7 @@ export const v02_deserializeCOCOFile = async (
       encodedMask,
     });
 
-    const annPropsFromIm = await getPropertiesFromImage(
+    const annPropsFromIm = await v02GetPropertiesFromImage(
       image,
       reconciledAnnotation as RequireOnly<V02AnnotationObject, "boundingBox">,
     );

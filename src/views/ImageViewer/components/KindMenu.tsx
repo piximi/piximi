@@ -6,9 +6,8 @@ import { useDialogHotkey } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { renderImageViewerKindName } from "../state/annotator/reselectors";
-
 import { HotkeyContext } from "utils/enums";
+import { selectGetKindDisplayName } from "store/data/selectors";
 
 type KindMenuProps = {
   anchorEl: any;
@@ -29,7 +28,7 @@ export const KindMenu = ({
   deleteKind,
   clearObjects,
 }: KindMenuProps) => {
-  const renderKindName = useSelector(renderImageViewerKindName);
+  const renderKindName = useSelector(selectGetKindDisplayName);
   const {
     onClose: handleCloseDeleteKindDialog,
     onOpen: handleOpenDeleteKindDialog,

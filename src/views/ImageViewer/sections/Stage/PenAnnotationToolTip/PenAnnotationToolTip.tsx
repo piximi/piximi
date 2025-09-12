@@ -7,9 +7,9 @@ import {
   selectPenSelectionBrushSize,
   selectToolType,
 } from "views/ImageViewer/state/annotator/selectors";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { ToolType } from "views/ImageViewer/utils/enums";
+import { selectActiveImage } from "views/ImageViewer/state/image-viewer-data/reselectors";
 
 type PenAnnotationToolTipProps = {
   currentPosition?: { x: number; y: number };

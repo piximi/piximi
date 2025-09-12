@@ -5,22 +5,17 @@ import {
   selectSegmenterInferenceOptions,
   selectSegmenterModel,
 } from "store/segmenter/selectors";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { getStackTraceFromError } from "utils/logUtils";
 import { AlertState } from "utils/types";
 import { AlertType } from "utils/enums";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { ModelStatus } from "utils/models/enums";
-import { selectAllKinds, selectImageDataEntities } from "store/data/selectors";
 import {
-  Category,
-  FullTimepointImage,
-  Shape,
-  AnnotationObject,
-  ImageMetadata,
-  GeneralizedKindItem,
-} from "store/data/types";
-import { intersection } from "lodash";
+  selectAllKinds,
+  selectGeneralizedImageArray,
+} from "store/data/selectors";
+import { Shape, AnnotationObject, GeneralizedKindItem } from "store/data/types";
 import { LoadCB } from "utils/file-io/types";
 import { OrphanedAnnotationObject } from "utils/models/segmentation";
 import { dataSlice } from "store/data";
@@ -30,20 +25,24 @@ import {
 } from "store/data/constants";
 import {
   getPropertiesFromImageSync,
-  extractAllTimepoints,
   extractAllZPlanes,
   extractChannel,
 } from "store/data/utils";
-import { selectActiveFilteredSelectedImages } from "store/project/reselectors";
+import { selectSelectedImages } from "store/project/reselectors";
 
 export const usePredictSegmenter = () => {
   const dispatch = useDispatch();
   const selectedModel = useSelector(selectSegmenterModel);
-  const projectImages = useSelector(selectImageDataEntities);
-  const inferenceImages = useSelector(selectActiveFilteredSelectedImages);
+  const activeImages = useSelector(selectGeneralizedImageArray);
+  const selectedImages = useSelector(selectSelectedImages);
   const fitOptions = useSelector(selectSegmenterInferenceOptions);
   const kinds = useSelector(selectAllKinds);
   const { setModelStatus, selectedChannel } = useSegmenterStatus();
+
+  const inferenceImages = useMemo(
+    () => (selectedImages.length > 0 ? selectedImages : activeImages),
+    [selectedImages, activeImages],
+  );
 
   const handleError = useCallback(
     async (error: Error, name: string) => {
@@ -250,14 +249,7 @@ export const usePredictSegmenter = () => {
 
     progressCb(1, "");
     setModelStatus(ModelStatus.Idle);
-  }, [
-    handleError,
-    projectImages,
-    selectedModel,
-    inferenceImages,
-    fitOptions,
-    kinds,
-  ]);
+  }, [handleError, selectedModel, inferenceImages, fitOptions, kinds]);
 
   return predictSegmenter;
 };

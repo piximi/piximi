@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import { useSelector } from "react-redux";
 import {
   Badge,
   Box,
@@ -26,8 +25,6 @@ import {
   ImageViewerCategories,
 } from "../../components";
 
-import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
-
 import { DIMENSIONS } from "utils/constants";
 import { capitalize } from "utils/stringUtils";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
@@ -36,7 +33,7 @@ import { SettingsButton } from "components/layout/app-drawer/application-setting
 import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/layout/app-drawer/HelpButton";
 import { OperationType } from "views/ImageViewer/utils/types";
-import { ImageList } from "../ImageViewerDrawer/ImageList";
+import { MetadataList } from "../ImageViewerDrawer/MetadataList";
 
 const imageTools: Record<string, OperationType> = {
   fileIO: {
@@ -56,7 +53,7 @@ const imageTools: Record<string, OperationType> = {
     icon: (color) => <ImageIcon fontSize="small" sx={{ color: color }} />,
     name: "images",
     description: "-",
-    options: <ImageList />,
+    options: <MetadataList />,
     hotkey: "F",
     helpContext: HelpItem.FilterImageGrid,
   },
@@ -76,7 +73,7 @@ export const MobileActionBar = () => {
   const theme = useTheme();
   const [activeTool, setActiveTool] = useState<OperationType>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const filtersExist = useSelector(selectActiveFilteredStateHasFilters);
+  const filtersExist = false;
   const t = useTranslation();
   const isMobile = useMobileView();
   const { anchorEl, onOpen: setPopperAnchor } = useMenu();

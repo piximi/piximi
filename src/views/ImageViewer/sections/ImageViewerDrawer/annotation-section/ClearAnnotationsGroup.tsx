@@ -1,5 +1,4 @@
-import { useMemo, useState } from "react";
-import { intersection } from "lodash";
+import { useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { List } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
@@ -9,33 +8,24 @@ import { useDialogHotkey, useTranslation } from "hooks";
 import { ConfirmationDialog } from "components/dialogs";
 import { CustomListItemButton } from "components/ui";
 
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { selectSelectedAnnotationIds } from "views/ImageViewer/state/annotator/selectors";
-import {
-  selectUpdatedActiveAnnotations,
-  selectSelectedActiveAnnotations,
-} from "views/ImageViewer/state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/enums";
-import { selectActiveImageObjectIds } from "views/ImageViewer/state/imageViewer/reselectors";
+import {
+  selectActiveAnnotationIds,
+  selectSelectedActiveAnnotationIds,
+} from "views/ImageViewer/state/image-viewer-data/reselectors";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
+import { dataSlice } from "store/data";
 
 type DeleteType = "ALL" | "SELECTED";
 export const ClearAnnotationsGroup = () => {
   const dispatch = useDispatch();
-  const selectedAnnotationIds = useSelector(selectSelectedAnnotationIds);
-  const activeSelectedAnnotations = useSelector(
-    selectSelectedActiveAnnotations,
+  const activeSelectedAnnotationIds = useSelector(
+    selectSelectedActiveAnnotationIds,
   );
-  const activeAnnotationsIds = useSelector(selectActiveImageObjectIds);
-  const activeAnnotations = useSelector(selectUpdatedActiveAnnotations);
+  const activeAnnotationIds = useSelector(selectActiveAnnotationIds);
   const [deleteOp, setDeleteOp] = useState<DeleteType>();
-
-  const selectedActiveAnnotationIds = useMemo(() => {
-    if (selectedAnnotationIds.length === 0 || activeAnnotationsIds.length === 0)
-      return [];
-    return intersection(activeAnnotationsIds, selectedAnnotationIds);
-  }, [selectedAnnotationIds, activeAnnotationsIds]);
 
   const {
     onClose: handleCloseDeleteAnnotationsDialog,
@@ -51,38 +41,22 @@ export const ClearAnnotationsGroup = () => {
   const handleDeleteAnnotations = () => {
     batch(() => {
       if (deleteOp === "ALL") {
+        dispatch(imageViewerDataSlice.actions.setSelectedAnnotationIds([]));
         dispatch(
-          annotatorSlice.actions.setSelectedAnnotationIds({
-            annotationIds: [],
-            workingAnnotationId: undefined,
-          }),
+          imageViewerDataSlice.actions.removeActiveAnnotationIds(
+            activeAnnotationIds,
+          ),
         );
-        dispatch(
-          imageViewerSlice.actions.removeActiveAnnotationIds({
-            annotationIds: activeAnnotationsIds,
-          }),
-        );
-        dispatch(
-          annotatorSlice.actions.deleteThings({
-            things: activeAnnotations,
-          }),
-        );
+        dispatch(dataSlice.actions.batchDeleteAnnotations(activeAnnotationIds));
       } else {
         dispatch(
-          imageViewerSlice.actions.removeActiveAnnotationIds({
-            annotationIds: selectedAnnotationIds,
-          }),
+          imageViewerDataSlice.actions.removeActiveAnnotationIds(
+            activeSelectedAnnotationIds,
+          ),
         );
+        dispatch(imageViewerDataSlice.actions.setSelectedAnnotationIds([]));
         dispatch(
-          annotatorSlice.actions.setSelectedAnnotationIds({
-            annotationIds: [],
-            workingAnnotationId: undefined,
-          }),
-        );
-        dispatch(
-          annotatorSlice.actions.deleteThings({
-            things: activeSelectedAnnotations,
-          }),
+          dataSlice.actions.batchDeleteAnnotations(activeSelectedAnnotationIds),
         );
       }
       dispatch(
@@ -100,7 +74,7 @@ export const ClearAnnotationsGroup = () => {
       <CustomListItemButton
         primaryText={t("Clear all annotations")}
         onClick={() => handleOpenAndTrack("ALL")}
-        disabled={activeAnnotationsIds.length === 0}
+        disabled={activeAnnotationIds.length === 0}
         icon={<DeleteIcon color="disabled" />}
       />
 
@@ -108,8 +82,8 @@ export const ClearAnnotationsGroup = () => {
         title={`Delete ${deleteOp}  annotations`}
         content={`${
           deleteOp === "ALL"
-            ? activeAnnotationsIds.length
-            : selectedActiveAnnotationIds.length
+            ? activeAnnotationIds.length
+            : activeSelectedAnnotationIds.length
         } annotations will be deleted`}
         onConfirm={handleDeleteAnnotations}
         onClose={handleCloseDeleteAnnotationsDialog}
@@ -119,7 +93,7 @@ export const ClearAnnotationsGroup = () => {
       <CustomListItemButton
         primaryText={t("Clear selected annotations")}
         onClick={() => handleOpenAndTrack("SELECTED")}
-        disabled={selectedAnnotationIds.length === 0}
+        disabled={activeSelectedAnnotationIds.length === 0}
         icon={<DeleteIcon color="disabled" />}
       />
     </List>

@@ -1,6 +1,6 @@
 // ignore-no-logs
 import { useCallback, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { KonvaEventObject } from "konva/lib/Node";
 import Konva from "konva";
 import { throttle } from "lodash";
@@ -11,7 +11,6 @@ import { usePointerTool } from "./usePointerTool";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
   selectAnnotationMode,
-  selectSelectedAnnotationIds,
   selectToolType,
 } from "views/ImageViewer/state/annotator/selectors";
 
@@ -28,6 +27,8 @@ import {
 } from "views/ImageViewer/utils/enums";
 
 import { Point } from "utils/types";
+import { selectSelectedAnnotationIds } from "../state/image-viewer-data/selectors";
+import { imageViewerDataSlice } from "../state/image-viewer-data/ImageViewerDataSlice";
 
 const transformerClassName = "Transformer";
 const transformerButtonAttrNAme = "transformer-button";
@@ -77,18 +78,16 @@ export const useStageHandlers = (
   //   ) => {};
 
   const deselectAllAnnotations = useCallback(() => {
-    dispatch(
-      annotatorSlice.actions.setSelectedAnnotationIds({
-        annotationIds: [],
-        workingAnnotationId: undefined,
-      }),
-    );
-    dispatch(
-      annotatorSlice.actions.setAnnotationState({
-        annotationState: AnnotationState.Blank,
-        annotationTool,
-      }),
-    );
+    batch(() => {
+      dispatch(imageViewerDataSlice.actions.setSelectedAnnotationIds([]));
+      annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined });
+      dispatch(
+        annotatorSlice.actions.setAnnotationState({
+          annotationState: AnnotationState.Blank,
+          annotationTool,
+        }),
+      );
+    });
   }, [dispatch, annotationTool]);
   const { onPointerMouseDown, handlePointerMouseMove, handlePointerMouseUp } =
     usePointerTool(

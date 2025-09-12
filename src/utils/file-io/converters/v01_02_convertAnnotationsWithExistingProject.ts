@@ -1,26 +1,29 @@
 import Image from "image-js";
 import { intersection } from "lodash";
 import { ShapeArray } from "store/data/types";
-import { getPropertiesFromImageSync } from "store/data/utils";
 import { logger } from "utils/logUtils";
 import { convertArrayToShape } from "utils/models/utils";
 
 import {
-  V01_AnnotationObject,
-  V01_Category,
+  V01AnnotationObject,
+  V01Category,
+  V01ImageObject,
   V02AnnotationObject,
   V02Category,
-  V02ImageObject,
   V02Kind,
 } from "../types";
-import { v02GenerateKind } from "../utils";
+import { v01GetPropertiesFromImageSync, v02GenerateKind } from "../utils";
 
 export const v01_02_convertAnnotationsWithExistingProject = async (
-  existingImages: Record<string, V02ImageObject>,
+  existingImages: Record<string, V01ImageObject>,
   existingKinds: Record<string, V02Kind>,
-  oldAnnotations: V01_AnnotationObject[],
-  oldAnnotationCategories: V01_Category[],
-) => {
+  oldAnnotations: V01AnnotationObject[],
+  oldAnnotationCategories: V01Category[],
+): Promise<{
+  newAnnotations: V02AnnotationObject[];
+  newCategories: V02Category[];
+  newKinds: V02Kind[];
+}> => {
   const catId2Name: Record<string, string> = {};
   const newKinds: Record<string, V02Kind> = {};
   const newCategories: Record<string, V02Category> = {};
@@ -68,7 +71,7 @@ export const v01_02_convertAnnotationsWithExistingProject = async (
       renderedIm = await Image.load(existingImage.src);
       imageMap[existingImage.id] = renderedIm;
     }
-    const imageProperties = getPropertiesFromImageSync(
+    const imageProperties = v01GetPropertiesFromImageSync(
       renderedIm,
       existingImage,
       ann,

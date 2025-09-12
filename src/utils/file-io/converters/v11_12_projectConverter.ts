@@ -1,6 +1,6 @@
 import { EntityState } from "@reduxjs/toolkit";
 import {
-  CurrentProject,
+  V12Project,
   V11AnnotationObject,
   V11ImageObject,
   V11Project,
@@ -8,10 +8,9 @@ import {
 import { AnnotationObject, ImageMetadata, ImageData } from "store/data/types";
 import { generateUUID } from "store/data/utils";
 import { IMAGE_KIND } from "store/data/constants";
+import { ColorsRaw } from "utils/types";
 
-export const v11_12_projectConverter = (
-  v11Project: V11Project,
-): CurrentProject => {
+export const v11_12_projectConverter = (v11Project: V11Project): V12Project => {
   const { things } = v11Project.data;
 
   const currentMetadata: EntityState<ImageMetadata, string> = {
@@ -26,7 +25,7 @@ export const v11_12_projectConverter = (
     ids: [],
     entities: {},
   };
-  const relationships: CurrentProject["data"]["relationships"] = {
+  const relationships: V12Project["data"]["relationships"] = {
     kindToCategories: {},
     kindToAnnotations: {},
     categoryToImages: {},
@@ -35,7 +34,7 @@ export const v11_12_projectConverter = (
   };
   Object.values(things.entities).forEach((thing) => {
     if (thing.kind === IMAGE_KIND) {
-      const { id, name, kind, bitDepth, containing, shape, ...rest } =
+      const { id, name, kind, bitDepth, containing, shape, colors, ...rest } =
         thing as V11ImageObject;
       const metadataId = generateUUID();
       const metadata: ImageMetadata = {
@@ -48,10 +47,16 @@ export const v11_12_projectConverter = (
         defaultImageId: id,
         timeSeries: false,
       };
+      const rawColors: ColorsRaw = {
+        range: colors.range,
+        visible: colors.visible,
+        color: colors.color.arraySync() as [number, number, number][],
+      };
       const imageData: ImageData = {
         id,
         metadataId,
         name,
+        colors: rawColors,
         ...rest,
       };
       currentMetadata.ids.push(metadataId);
@@ -74,11 +79,11 @@ export const v11_12_projectConverter = (
       };
     }
   });
-  const currentCategories: CurrentProject["data"]["categories"] = {
+  const currentCategories: V12Project["data"]["categories"] = {
     ids: [],
     entities: {},
   };
-  const currentKinds: CurrentProject["data"]["kinds"] = {
+  const currentKinds: V12Project["data"]["kinds"] = {
     ids: [],
     entities: {},
   };

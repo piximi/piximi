@@ -17,13 +17,8 @@ import IJSImage, {
   ColorModel as IJSColorModel,
 } from "image-js";
 import { generateUUID } from "store/data/utils";
-import {
-  BaseExtractedImageData,
-  BitDepth,
-  ImageData,
-  Shape,
-} from "store/data/types";
-import { Colors } from "./types";
+import { BaseExtractedImageData, BitDepth } from "store/data/types";
+import { Colors, ColorsRaw } from "./types";
 import { DEFAULT_COLORS } from "store/data/constants";
 
 /*
@@ -524,14 +519,16 @@ export async function renderTensor(
  */
 export async function createRenderedTensor<T extends number | undefined>(
   imageTensor: Tensor4D,
-  colors: Colors,
+  colors: ColorsRaw,
+  channels: number,
   bitDepth: BitDepth,
   plane: T,
 ): Promise<T extends number ? string : string[]>;
 
 export async function createRenderedTensor(
   imageTensor: Tensor4D,
-  colors: Colors,
+  colors: ColorsRaw,
+  channels: number,
   bitDepth: BitDepth,
   plane: number | undefined,
 ) {
@@ -548,13 +545,15 @@ export async function createRenderedTensor(
       disposeOperandTensor = true;
     }
 
+    const colorTensor = createColorsTensor(colors, channels);
+
     // scale each channel by its range
-    const scaledImageSlice = scaleImageTensor(operandTensor, colors, {
+    const scaledImageSlice = scaleImageTensor(operandTensor, colorTensor, {
       disposeImageTensor: disposeOperandTensor,
     });
 
     // get indices of visible channels, VC
-    const visibleChannels = filterVisibleChannels(colors);
+    const visibleChannels = filterVisibleChannels(colorTensor);
 
     // image slice filtered by visible channels: [H, W, VC] or [Z, H, W, VC]
     const filteredSlice = sliceVisibleChannels(
@@ -563,7 +562,7 @@ export async function createRenderedTensor(
     );
 
     // color matrix filtered by visible channels: [VC, 3]
-    const filteredColors = sliceVisibleColors(colors, visibleChannels);
+    const filteredColors = sliceVisibleColors(colorTensor, visibleChannels);
 
     // composite image slice: [H, W, 3] or [Z, H, W, 3]
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
@@ -580,7 +579,7 @@ export async function createRenderedTensor(
 export const extractImageFileDetails = async (
   imageStack: IJSStack,
   filename: string,
-  currentColors: Colors | undefined,
+  currentColors: ColorsRaw | undefined,
   numSlices: number,
   numChannels: number,
 ): Promise<BaseExtractedImageData> => {
@@ -600,6 +599,7 @@ export const extractImageFileDetails = async (
   const coloredSliceURL = await createRenderedTensor(
     imageTensor,
     colors,
+    numChannels,
     bitDepth,
     0,
   );
@@ -624,7 +624,7 @@ export const extractImageFileDetails = async (
 
 export const generateDefaultColors = async <T extends Tensor3D | Tensor4D>(
   imageTensor: T,
-): Promise<Colors> => {
+): Promise<ColorsRaw> => {
   const range: { [channel: number]: [number, number] } = {};
   const visible: { [channel: number]: boolean } = {};
   const color: Array<[number, number, number]> = [];
@@ -660,11 +660,11 @@ export const generateDefaultColors = async <T extends Tensor3D | Tensor4D>(
   return {
     range,
     visible,
-    color: tensor2d(color, [numChannels, 3], "float32"),
+    color: color,
   };
 };
 
-export const generateBlankColors = (numChannels: number): Colors => {
+export const generateBlankColors = (numChannels: number): ColorsRaw => {
   const range: { [channel: number]: [number, number] } = {};
   const visible: { [channel: number]: boolean } = {};
   const color: Array<[number, number, number]> = [];
@@ -687,7 +687,17 @@ export const generateBlankColors = (numChannels: number): Colors => {
   return {
     range,
     visible,
-    color: tensor2d(color, [numChannels, 3], "float32"),
+    color,
+  };
+};
+export const createColorsTensor = (
+  colors: ColorsRaw,
+  channels: number,
+): Colors => {
+  return {
+    color: tensor2d(colors.color, [channels, 3], "float32"),
+    range: colors.range,
+    visible: colors.visible,
   };
 };
 

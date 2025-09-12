@@ -1,42 +1,34 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Button, IconButton, List } from "@mui/material";
-import { Visibility, VisibilityOff, Add, MoreHoriz } from "@mui/icons-material";
+import { Visibility, VisibilityOff, MoreHoriz } from "@mui/icons-material";
 
 import { useDialogHotkey, useMenu } from "hooks";
 
-import { CustomListItemButton, CollapsibleListItem } from "components/ui";
+import { CollapsibleListItem } from "components/ui";
 import { CategoryDialog } from "components/dialogs";
 import { ImageViewerCategoryItem } from "./ImageViewerCategoryItem";
 import { EditableKindField } from "./EditableKindField";
 
 import { imageViewerSlice } from "../state/imageViewer";
 import { selectFilteredImageViewerCategoryIds } from "../state/imageViewer/selectors";
-import { annotatorSlice } from "../state/annotator";
-import {
-  selectCategoriesByKind,
-  selectImageViewerKinds,
-  renderImageViewerKindName,
-  selectImageViewerObjects,
-} from "../state/annotator/reselectors";
 
 import { HotkeyContext } from "utils/enums";
-import { generateUUID } from "store/data/utils";
+import { generateCategory } from "store/data/utils";
 import { KindMenu } from "./KindMenu";
-import { DecodedAnnotationObject } from "store/data/types";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import {
+  selectGetKindDisplayName,
+  selectKindToAnnotationCategoryEntities,
+} from "store/data/selectors";
+import { dataSlice } from "store/data";
 
 export const ImageViewerCategories = () => {
   const dispatch = useDispatch();
-  const categoriesByKind = useSelector(selectCategoriesByKind);
-  const categoriesByKindArray = useMemo(
-    () => Object.values(categoriesByKind),
-    [categoriesByKind],
-  );
-  const kindDict = useSelector(selectImageViewerKinds);
+  const categoriesByKind = useSelector(selectKindToAnnotationCategoryEntities);
+
   const filteredCategoryIds = useSelector(selectFilteredImageViewerCategoryIds);
-  const things = useSelector(selectImageViewerObjects);
-  const renderKindName = useSelector(renderImageViewerKindName);
+  const renderKindName = useSelector(selectGetKindDisplayName);
   // NOTE: keep for quick checking if kind is hidden
   const [filteredKinds, setFilteredKinds] = useState<Array<string>>([]);
   const [selectedKind, setSelectedKind] = useState<string>();
@@ -57,7 +49,7 @@ export const ImageViewerCategories = () => {
 
   const isKindFiltered = (kindId: string) => {
     //HACK: refactor -- O(n*m)
-    return categoriesByKind[kindId].categories.every((cat) => {
+    return categoriesByKind[kindId].every((cat) => {
       return filteredCategoryIds.includes(cat.id);
     });
   };
@@ -67,7 +59,7 @@ export const ImageViewerCategories = () => {
     kindId: string,
   ) => {
     event.stopPropagation();
-    const categories = categoriesByKind[kindId].categories;
+    const categories = categoriesByKind[kindId];
     if (filteredKinds.includes(kindId)) {
       setFilteredKinds(
         filteredKinds.filter((hiddenKind) => hiddenKind !== kindId),
@@ -98,18 +90,8 @@ export const ImageViewerCategories = () => {
   };
 
   const handleCreateCategory = (kind: string, name: string, color: string) => {
-    const newId = generateUUID();
     dispatch(
-      annotatorSlice.actions.addCategory({
-        category: {
-          id: newId,
-          name,
-          color,
-          kind: kind,
-          containing: [],
-          visible: true,
-        },
-      }),
+      dataSlice.actions.addCategory(generateCategory(name, kind, color)),
     );
   };
 
@@ -119,9 +101,9 @@ export const ImageViewerCategories = () => {
       return;
     }
     dispatch(
-      annotatorSlice.actions.editKindName({
-        kindId,
-        displayName: newDisplayName,
+      dataSlice.actions.updateKindName({
+        id: kindId,
+        newName: newDisplayName,
       }),
     );
   };
@@ -142,17 +124,11 @@ export const ImageViewerCategories = () => {
   };
 
   const handleDeleteKind = (kindId: string) => {
-    dispatch(annotatorSlice.actions.deleteKind({ kind: kindDict[kindId] }));
+    dispatch(dataSlice.actions.deleteKindCascade(kindId));
   };
 
   const handleClearKindObjects = (kindId: string) => {
-    dispatch(
-      annotatorSlice.actions.deleteThings({
-        things: kindDict[kindId].containing.map(
-          (thingId) => things[thingId] as DecodedAnnotationObject,
-        ),
-      }),
-    );
+    dispatch(dataSlice.actions.deleteAnnotationsOfKind(kindId));
   };
 
   useEffect(() => {
@@ -164,7 +140,7 @@ export const ImageViewerCategories = () => {
   return (
     <>
       <List dense sx={{ py: 0 }}>
-        {categoriesByKindArray.map(({ kindId, categories }, idx) => {
+        {Object.entries(categoriesByKind).map(([kindId, categories], idx) => {
           return (
             <CollapsibleListItem
               dense={true}

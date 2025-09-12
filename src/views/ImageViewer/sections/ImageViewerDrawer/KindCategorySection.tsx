@@ -1,20 +1,18 @@
-import { Button, IconButton, Stack, Typography } from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
+import { Button, Stack, Typography } from "@mui/material";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { FunctionalDivider } from "components/ui";
 import React, { useMemo } from "react";
 import { ImageViewerCategories } from "views/ImageViewer/components";
 import { useDialogHotkey } from "hooks";
 import { HotkeyContext } from "utils/enums";
 import { useDispatch, useSelector } from "react-redux";
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { Category, Kind } from "store/data/types";
 import { CreateKindDialog } from "components/dialogs";
-import { selectKindsArray } from "views/ImageViewer/state/annotator/reselectors";
+import { selectAllKinds } from "store/data/selectors";
+import { dataSlice } from "store/data";
 
 export const KindCategorySection = () => {
   const dispatch = useDispatch();
-  const kinds = useSelector(selectKindsArray);
+  const kinds = useSelector(selectAllKinds);
   const existingKindIds = useMemo(() => kinds.map((kind) => kind.id), [kinds]);
   const {
     onClose: handleCloseCreateKindDialog,
@@ -24,7 +22,7 @@ export const KindCategorySection = () => {
 
   const addKind = (kind: Kind, newUnknownCategory: Category) => {
     dispatch(
-      annotatorSlice.actions.addKind({
+      dataSlice.actions.addKind({
         kind,
         unknownCategory: newUnknownCategory,
       }),

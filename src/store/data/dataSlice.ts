@@ -455,7 +455,6 @@ export const dataSlice = createSlice({
       );
 
       image.data.dispose();
-      image.colors.color.dispose();
 
       // Clean up image-annotation relationship
       delete state.relationships.imageToAnnotations[imageId];
@@ -512,7 +511,6 @@ export const dataSlice = createSlice({
       );
 
       image.data.dispose();
-      image.colors.color.dispose();
 
       // Clean up relationships
       delete state.relationships.imageToAnnotations[imageId];
@@ -895,7 +893,9 @@ export const dataSlice = createSlice({
       action: PayloadAction<
         {
           id: string;
-          changes: Partial<Pick<ImageData, "partition" | "categoryId">>;
+          changes: Partial<
+            Pick<ImageData, "partition" | "categoryId" | "colors">
+          >;
         }[]
       >,
     ) => {
@@ -1064,13 +1064,27 @@ export const dataSlice = createSlice({
         type: "batchDeleteAnotations",
       });
     },
+    deleteAnnotationsOfKind: (state, action: PayloadAction<string>) => {
+      const kindId = action.payload;
+      const annotationIds = state.relationships.kindToAnnotations[kindId];
+      dataSlice.caseReducers.batchDeleteAnnotations(state, {
+        payload: annotationIds,
+        type: "batchDeleteAnotations",
+      });
+    },
 
     // ============== UTILITY OPERATIONS ==============
-    clearAll: (state) => {
+    clearAll: () => {
       return initialState;
     },
     initializeLoadedState: (state, action: PayloadAction<DataState>) => {
       const loadedState = action.payload;
+      Object.values(state.images.entities).forEach((image) =>
+        image.data.dispose(),
+      );
+      Object.values(state.annotations.entities).forEach((annotation) =>
+        annotation.data.dispose(),
+      );
       return loadedState;
     },
   },

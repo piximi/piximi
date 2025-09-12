@@ -111,11 +111,10 @@ test("select", async () => {
     color: "#0000FF",
     id: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
     name: "foo",
-    containing: [],
     kind: "",
     visible: true,
   };
-  operator.annotate(category, 1, "");
+  operator.annotate(category, 1, 0, "");
 
   expect(operator.annotationState).toBe(AnnotationState.Annotated);
 
@@ -152,11 +151,10 @@ test("deselect", async () => {
     color: "#0000FF",
     id: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
     name: "foo",
-    containing: [],
     kind: "",
     visible: true,
   };
-  operator.annotate(category, 1, "");
+  operator.annotate(category, 1, 0, "");
   operator.deselect();
 
   expect(operator.annotationState).toBe(AnnotationState.Blank);

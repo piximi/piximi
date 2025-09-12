@@ -8,7 +8,7 @@ import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
 import { generateKind } from "store/data/utils";
 import { LoadInferenceDataArgs } from "../../types";
-import { Kind, ImageMetadata } from "store/data/types";
+import { Kind, GeneralizedKindItem } from "store/data/types";
 import { LoadCB } from "utils/file-io/types";
 
 export const KIND_NAME = "stardist_nucleus";
@@ -27,12 +27,12 @@ export abstract class Stardist extends Segmenter {
   public abstract loadModel(): Promise<void>;
 
   public loadTraining(
-    _images: ImageMetadata[],
+    _images: GeneralizedKindItem[],
     _preprocessingArgs: any,
   ): void {}
 
   public loadValidation(
-    _images: ImageMetadata[],
+    _images: GeneralizedKindItem[],
     _preprocessingArgs: any,
   ): void {}
 
@@ -52,7 +52,7 @@ export abstract class Stardist extends Segmenter {
   }
 
   public loadInference(
-    images: ImageMetadata[],
+    images: GeneralizedKindItem[],
     preprocessingArgs: LoadInferenceDataArgs,
   ): void {
     this._inferenceDataDims = images.map((im) => {

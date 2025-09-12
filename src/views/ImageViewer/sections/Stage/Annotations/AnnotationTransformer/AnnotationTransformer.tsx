@@ -20,8 +20,6 @@ import {
 } from "views/ImageViewer/state/imageViewer/selectors";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
 import { selectWorkingAnnotationEntity } from "views/ImageViewer/state/annotator/selectors";
-import { selectSelectedAnnotations } from "views/ImageViewer/state/annotator/reselectors";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
 
 import { AnnotationTool } from "views/ImageViewer/utils/tools";
 
@@ -32,6 +30,14 @@ import { HotkeyContext } from "utils/enums";
 
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
+import {
+  selectActiveImage,
+  selectSelectedAnnotations,
+} from "views/ImageViewer/state/image-viewer-data/reselectors";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
+import { selectImageToAnnotations } from "store/data/selectors";
+import { dataSlice } from "store/data";
+import { AnnotationObject } from "store/data/types";
 
 const buttonWidth = 65;
 const buttonHeight = 26;
@@ -61,6 +67,7 @@ export const AnnotationTransformer = ({
   const activeImage = useSelector(selectActiveImage)!;
   const workingAnnotation = useSelector(selectWorkingAnnotationEntity);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
+  const imageToAnnotations = useSelector(selectImageToAnnotations);
   const cursor = useSelector(selectCursor);
   const soundEnabled = useSelector(selectSoundEnabled);
   const imageOrigin = useSelector(selectImageOrigin);
@@ -93,12 +100,7 @@ export const AnnotationTransformer = ({
         }),
       );
 
-      dispatch(
-        annotatorSlice.actions.setSelectedAnnotationIds({
-          annotationIds: [],
-          workingAnnotationId: undefined,
-        }),
-      );
+      dispatch(imageViewerDataSlice.actions.setSelectedAnnotationIds([]));
     });
   };
 
@@ -112,27 +114,23 @@ export const AnnotationTransformer = ({
     trRef.current!.detach();
     trRef.current!.getLayer()?.batchDraw();
 
-    if (activeImage.containing.includes(annotationId)) {
+    if (imageToAnnotations[activeImage.id].includes(annotationId)) {
       if (Object.keys(workingAnnotation.changes).length === 0) {
         dispatch(
-          annotatorSlice.actions.deleteThings({
-            things: selectedAnnotations,
-          }),
+          dataSlice.actions.batchDeleteAnnotations(
+            selectedAnnotations.map((ann) => ann.id),
+          ),
         );
         dispatch(
-          annotatorSlice.actions.deleteAnnotations({
-            annotations: selectedAnnotations,
-          }),
+          dataSlice.actions.batchDeleteAnnotations(
+            selectedAnnotations.map((ann) => ann.id),
+          ),
         );
       } else {
         dispatch(
-          annotatorSlice.actions.editThings({
-            updates: [{ id: annotationId, ...workingAnnotation.changes }],
-          }),
-        );
-        dispatch(
-          annotatorSlice.actions.editAnnotations({
-            updates: [{ id: annotationId, ...workingAnnotation.changes }],
+          dataSlice.actions.updateAnnotation({
+            id: annotationId,
+            changes: { ...workingAnnotation.changes },
           }),
         );
       }
@@ -140,15 +138,11 @@ export const AnnotationTransformer = ({
     } else {
       const completeWorkingAnnotation = getCompleteEntity(workingAnnotation)!;
       dispatch(
-        annotatorSlice.actions.addThing({
-          thing: completeWorkingAnnotation,
-        }),
+        dataSlice.actions.addAnnotation(
+          completeWorkingAnnotation as AnnotationObject,
+        ),
       );
-      dispatch(
-        annotatorSlice.actions.addAnnotation({
-          annotation: completeWorkingAnnotation,
-        }),
-      );
+
       if (soundEnabled) playCreateAnnotationSoundEffect();
     }
     clearAnnotation();
@@ -282,7 +276,7 @@ export const AnnotationTransformer = ({
             handleMouseEnter={handleMouseEnter}
             handleMouseLeave={handleMouseLeave}
             text={
-              activeImage.containing.includes(annotationId) &&
+              imageToAnnotations[activeImage.id].includes(annotationId) &&
               Object.keys(workingAnnotation.changes).length === 0
                 ? "Delete"
                 : "Confirm"

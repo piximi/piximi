@@ -29,7 +29,7 @@ import {
   FitOptions,
   RescaleOptions,
 } from "utils/models/types";
-import { Colors, PartialBy, RequireField } from "utils/types";
+import { Colors, ColorsRaw, PartialBy, RequireField } from "utils/types";
 import { Tensor4D } from "@tensorflow/tfjs";
 import {
   ClassifierState,
@@ -105,17 +105,17 @@ export type LoadCB = (loadPercent: number, loadMessage: string) => void;
 /*
 V01 Types
 */
-export type V01_PreprocessOptions = {
+export type V01PreprocessOptions = {
   shuffle: boolean;
   rescaleOptions: RescaleOptions;
   cropOptions: CropOptions;
 };
 
-export type V01_ClassifierState = {
+export type V01ClassifierState = {
   // pre-fit state
   selectedModelIdx: number;
   inputShape: Shape;
-  preprocessOptions: V01_PreprocessOptions;
+  preprocessOptions: V01PreprocessOptions;
   fitOptions: FitOptions;
 
   learningRate: number;
@@ -132,16 +132,16 @@ export type V01_ClassifierState = {
 };
 export type V01Project = {
   project: ProjectState;
-  classifier: V01_ClassifierState;
+  classifier: V01ClassifierState;
   data: {
-    images: Array<V01_ImageObject>;
-    annotations: Array<V01_AnnotationObject>;
-    categories: Array<V01_Category>;
-    annotationCategories: Array<V01_Category>;
+    images: Array<V01ImageObject>;
+    annotations: Array<V01AnnotationObject>;
+    categories: Array<V01Category>;
+    annotationCategories: Array<V01Category>;
   };
   segmenter: SegmenterState;
 };
-export type V01_ImageObject = {
+export type V01ImageObject = {
   activePlane: number;
   categoryId: string;
   colors: Colors;
@@ -155,7 +155,7 @@ export type V01_ImageObject = {
   kind?: string;
   containing?: string[]; // The URI to be displayed on the canvas
 };
-export type V01_Category = {
+export type V01Category = {
   color: string;
   id: string;
   name: string;
@@ -163,7 +163,7 @@ export type V01_Category = {
   kind?: string;
 };
 
-export type V01_AnnotationObject = {
+export type V01AnnotationObject = {
   id: string;
   src?: string;
   data?: Tensor4D;
@@ -178,7 +178,7 @@ export type V01_AnnotationObject = {
 
 // V02 Types
 
-export type V02ClassifierState = V01_ClassifierState;
+export type V02ClassifierState = V01ClassifierState;
 export type V02Kind = {
   id: string;
   displayName: string;
@@ -186,11 +186,11 @@ export type V02Kind = {
   containing: string[];
   categories: string[];
 };
-export type V02Category = RequireField<V01_Category, "kind"> & {
+export type V02Category = RequireField<V01Category, "kind"> & {
   containing: string[];
 };
 export type V02AnnotationObject = Required<
-  Omit<V01_AnnotationObject, "decodedMask">
+  Omit<V01AnnotationObject, "decodedMask">
 > & {
   kind: string;
   name: string;
@@ -200,11 +200,11 @@ export type V02AnnotationObject = Required<
   decodedMask?: DataArray;
   activePlane: number;
 };
-export type V02ImageObject = Required<V01_ImageObject>;
+export type V02ImageObject = Required<V01ImageObject>;
 
 export type V02Project = {
   project: ProjectState;
-  classifier: V01_ClassifierState;
+  classifier: V01ClassifierState;
   data: {
     things: EntityState<V02ImageObject | V02AnnotationObject, string>;
     categories: EntityState<V02Category, string>;
@@ -294,7 +294,7 @@ export type V12ImageData = {
   id: string;
   name: string;
   metadataId: string;
-  colors: Colors;
+  colors: ColorsRaw;
   src: string;
   data: Tensor4D;
   categoryId: string;
@@ -307,7 +307,7 @@ export type V12BaseExtractedImageData = {
   id: string;
   bitDepth: number;
   shape: Shape;
-  colors: Colors;
+  colors: ColorsRaw;
   data: Tensor4D;
   src: string;
 };

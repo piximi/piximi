@@ -1,8 +1,4 @@
-import {
-  AnnotationObject,
-  DecodedAnnotationObject,
-  DecodedTSAnnotationObject,
-} from "store/data/types";
+import { AnnotationObject, DecodedAnnotationObject } from "store/data/types";
 
 /**
  * Decode a Run-length encoded input array.
@@ -26,8 +22,8 @@ export const decode = (encoded: Array<number>): Uint8ClampedArray => {
 };
 
 export const decodeAnnotation = (
-  encodedAnnotation: AnnotationObject | AnnotationObject,
-): DecodedAnnotationObject | DecodedTSAnnotationObject => {
+  encodedAnnotation: AnnotationObject,
+): DecodedAnnotationObject => {
   if (encodedAnnotation.decodedMask)
     return encodedAnnotation as DecodedAnnotationObject;
   // TODO - serializtion: temporary measure, remove when done

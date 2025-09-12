@@ -5,7 +5,7 @@ import { useAnnotatorToolShortcuts } from "../../hooks";
 
 import { DIMENSIONS } from "utils/constants";
 import { SelectionOptions, ZoomOptions } from "./tools";
-import { ImageViewerLogo } from "../ImageViewerAppBar/ImageViewerAppBar";
+import { ImageViewerLogo } from "../ImageViewerLogo/ImageViewerLogo";
 
 export const TopToolBar = () => {
   useAnnotatorToolShortcuts();
@@ -24,6 +24,7 @@ export const TopToolBar = () => {
       })}
     >
       <ImageViewerLogo />
+
       <Box
         sx={(theme) => ({
           backgroundColor: theme.palette.background.paper,

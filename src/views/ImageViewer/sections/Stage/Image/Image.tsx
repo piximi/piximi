@@ -1,8 +1,8 @@
 import React, {
   forwardRef,
   memo,
-  useContext,
   useEffect,
+  useLayoutEffect,
   useState,
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,13 +11,9 @@ import { Image as KonvaImage } from "react-konva";
 
 import { Point } from "utils/types";
 
-import {
-  selectActiveImageSeries,
-  selectActivePlane,
-  selectImageOrigin,
-} from "views/ImageViewer/state/imageViewer/selectors";
-import { selectActiveImage } from "views/ImageViewer/state/imageViewer/reselectors";
-import { StageContext } from "views/ImageViewer/state/StageContext";
+import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
+import { selectActiveImage } from "views/ImageViewer/state/image-viewer-data/reselectors";
 
 export const Image = React.forwardRef<
   Konva.Image,
@@ -27,34 +23,32 @@ export const Image = React.forwardRef<
     { stageWidth: _stageWidth, stageHeight: _stageHeight /*, images*/ },
     ref,
   ) => {
-    const activeImage = useSelector(selectActiveImage);
-    const activePlane = useSelector(selectActivePlane);
-    const activeImageSeries = useSelector(selectActiveImageSeries);
-    //const stageRef = useContext(StageContext);
+    const activeMetadata = useSelector(selectActiveMetadata)!;
+    const activeImage = useSelector(selectActiveImage)!;
     const dispatch = useDispatch();
     const [htmlImages, setHtmlImages] = useState<HTMLImageElement[]>([]);
 
     const [filters] = useState<Array<any>>();
     const imagePosition = useSelector(selectImageOrigin);
     useEffect(() => {
-      if (!activeImageSeries || !activeImageSeries.activeSrcs) return;
-      if (activeImageSeries.activeSrcs.length === 1) {
+      console.log(activeImage);
+    }, [activeImage]);
+    useLayoutEffect(() => {
+      if (!activeMetadata || !activeMetadata.activeSrcs) return;
+      if (activeMetadata.activeSrcs.length === 1) {
         const imgElem = document.createElement("img");
-        imgElem.src =
-          activeImageSeries.timepoints[
-            activeImageSeries.activeTimepoint
-          ].ZTPreview;
+        imgElem.src = activeMetadata.activeSrcs[0];
         setHtmlImages([imgElem]);
       } else {
         setHtmlImages(
-          activeImageSeries.activeSrcs.map((src: string) => {
+          activeMetadata!.activeSrcs.map((src: string) => {
             const imgElem = document.createElement("img");
             imgElem.src = src;
             return imgElem;
           }),
         );
       }
-    }, [activeImageSeries, /*stageRef,*/ dispatch]);
+    }, [activeMetadata, /*stageRef,*/ dispatch]);
 
     return (
       <>
@@ -65,12 +59,10 @@ export const Image = React.forwardRef<
             height={activeImage?.shape.height || 100}
             width={activeImage?.shape.width || 100}
             imagePosition={imagePosition!}
-            activePlane={
-              activeImageSeries?.activeSrcs &&
-              activeImageSeries?.activeSrcs.length > 1 &&
-              activePlane
-                ? activePlane
-                : 0
+            visible={
+              activeMetadata.activeSrcs.length === 1
+                ? true
+                : activeMetadata.activePlane === idx
             }
             filters={filters!}
             idx={idx}
@@ -88,7 +80,7 @@ interface KonvaImageProps {
   height: number;
   width: number;
   imagePosition: Point;
-  activePlane: number;
+  visible: boolean;
   filters: any[];
   idx: number;
 }
@@ -102,7 +94,7 @@ export const MemoizedKonvaImage = memo(
         ref={ref}
         width={props.width}
         filters={props.filters}
-        visible={props.idx === props.activePlane}
+        visible={props.visible}
         position={props.imagePosition}
         key={props.idx}
       />

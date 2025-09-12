@@ -1,8 +1,8 @@
 import { Tensor4D, data as tfdata } from "@tensorflow/tfjs";
 import { getImageSlice } from "utils/tensorUtils";
-import { ImageMetadata } from "store/data/types";
+import { GeneralizedKindItem } from "store/data/types";
 
-const sampleGenerator = (images: Array<ImageMetadata>) => {
+const sampleGenerator = (images: Array<GeneralizedKindItem>) => {
   const count = images.length;
 
   return function* () {
@@ -19,7 +19,7 @@ const sampleGenerator = (images: Array<ImageMetadata>) => {
 };
 
 export const preprocessGlas = (
-  images: Array<ImageMetadata>,
+  images: Array<GeneralizedKindItem>,
   batchSize: number,
 ) => {
   return tfdata

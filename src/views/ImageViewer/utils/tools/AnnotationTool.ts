@@ -159,6 +159,7 @@ export abstract class AnnotationTool extends Tool {
   public annotate(
     category: Category,
     plane: number,
+    timepoint: number,
     imageId: string,
     id?: string,
   ): void {
@@ -172,6 +173,8 @@ export abstract class AnnotationTool extends Tool {
       imageId,
       decodedMask: this.decodedMask,
       activePlane: plane,
+      plane,
+      timepoint,
       partition: Partition.Unassigned,
     };
   }

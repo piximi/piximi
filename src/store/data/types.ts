@@ -2,7 +2,7 @@ import { Tensor4D } from "@tensorflow/tfjs";
 
 import { Partition } from "utils/models/enums";
 import { BitDepth as IJSBitDepth, DataArray as IJSDataArray } from "image-js";
-import { Colors, PartialBy, RequireOnly } from "utils/types";
+import { Colors, ColorsRaw, PartialBy, RequireOnly } from "utils/types";
 
 export type BitDepth = IJSBitDepth;
 export type DataArray = IJSDataArray;
@@ -13,7 +13,7 @@ export type ImageData = {
   id: string;
   name: string;
   metadataId: string;
-  colors: Colors;
+  colors: ColorsRaw;
   src: string;
   data: Tensor4D;
   categoryId: string;
@@ -26,7 +26,7 @@ export type BaseExtractedImageData = {
   id: string;
   bitDepth: number;
   shape: Shape;
-  colors: Colors;
+  colors: ColorsRaw;
   data: Tensor4D;
   src: string;
 };
@@ -158,7 +158,7 @@ export type GeneralizedKindItem = {
 
   // Visual representation
   src: string;
-  colors?: Colors;
+  colors?: ColorsRaw;
   data: Tensor4D;
 
   // Metadata for operations

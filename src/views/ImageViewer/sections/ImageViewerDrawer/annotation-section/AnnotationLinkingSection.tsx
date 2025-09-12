@@ -12,25 +12,25 @@ import { DividerHeader } from "components/ui";
 import React, { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { selectActiveImageSeries } from "views/ImageViewer/state/imageViewer/selectors";
+import { ToolType } from "views/ImageViewer/utils/enums";
 import {
+  selectActiveMetadata,
   selectTimeLinkingAnnIds,
   selectTimeLinkingGlobalId,
   selectTimeLinkingState,
   selectZLinkingState,
-} from "views/ImageViewer/state/annotator/selectors";
-import { ToolType } from "views/ImageViewer/utils/enums";
-import { ImageViewerImageDetails } from "views/ImageViewer/utils/types";
+} from "views/ImageViewer/state/image-viewer-data/selectors";
+import { ImageViewerMetadataDetails } from "views/ImageViewer/state/image-viewer-data/types";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 
 export const AnnotationLinkingSection = () => {
-  const dispatch = useDispatch();
-  const activeImageSeries = useSelector(selectActiveImageSeries);
+  const activeMetadata = useSelector(selectActiveMetadata);
 
   return (
     <Stack gap={1}>
-      <TLinkingControl activeImageSeries={activeImageSeries} />
+      <TLinkingControl activeMetadata={activeMetadata} />
 
-      <ZLinkingControl activeImageSeries={activeImageSeries} />
+      <ZLinkingControl activeMetadata={activeMetadata} />
     </Stack>
   );
 };
@@ -107,9 +107,9 @@ export const ManualLinkingControl = ({
 };
 
 export const TLinkingControl = ({
-  activeImageSeries,
+  activeMetadata,
 }: {
-  activeImageSeries: ImageViewerImageDetails | undefined;
+  activeMetadata: ImageViewerMetadataDetails | undefined;
 }) => {
   const dispatch = useDispatch();
   const linkingActive = useSelector(selectTimeLinkingState);
@@ -119,23 +119,21 @@ export const TLinkingControl = ({
     return Object.keys(linkedAnnIds).length;
   }, [linkedAnnIds]);
   const maxLinked = useMemo(() => {
-    return activeImageSeries
-      ? Object.keys(activeImageSeries.timepoints).length
-      : 0;
-  }, [activeImageSeries]);
+    return activeMetadata ? Object.keys(activeMetadata.images).length : 0;
+  }, [activeMetadata]);
   const handleEnableLinking = () => {
     dispatch(
       annotatorSlice.actions.setToolType({
         operation: ToolType.Pointer,
       }),
     );
-    dispatch(annotatorSlice.actions.toggleTimeLinking({ active: true }));
+    dispatch(imageViewerDataSlice.actions.toggleTimeLinking(true));
   };
   const handleCancelLinking = () => {
-    dispatch(annotatorSlice.actions.toggleTimeLinking({ active: false }));
+    dispatch(imageViewerDataSlice.actions.toggleTimeLinking(false));
   };
   const handleConfirmLinking = () => {
-    dispatch(annotatorSlice.actions.toggleTimeLinking({ active: false }));
+    dispatch(imageViewerDataSlice.actions.toggleTimeLinking(false));
   };
   return (
     <Stack gap={1}>
@@ -171,9 +169,9 @@ export const TLinkingControl = ({
 };
 
 export const ZLinkingControl = ({
-  activeImageSeries,
+  activeMetadata,
 }: {
-  activeImageSeries: ImageViewerImageDetails | undefined;
+  activeMetadata: ImageViewerMetadataDetails | undefined;
 }) => {
   const dispatch = useDispatch();
   const linkingActive = useSelector(selectZLinkingState);
@@ -181,21 +179,21 @@ export const ZLinkingControl = ({
     return 0;
   }, []);
   const maxLinked = useMemo(() => {
-    return 0;
-  }, []);
+    return activeMetadata ? activeMetadata.activeSrcs.length : 0;
+  }, [activeMetadata]);
   const handleEnableLinking = () => {
     dispatch(
       annotatorSlice.actions.setToolType({
         operation: ToolType.Pointer,
       }),
     );
-    dispatch(annotatorSlice.actions.toggleZLinking({ active: true }));
+    dispatch(imageViewerDataSlice.actions.toggleZLinking(true));
   };
   const handleCancelLinking = () => {
-    dispatch(annotatorSlice.actions.toggleZLinking({ active: false }));
+    dispatch(imageViewerDataSlice.actions.toggleZLinking(false));
   };
   const handleConfirmLinking = () => {
-    dispatch(annotatorSlice.actions.toggleZLinking({ active: false }));
+    dispatch(imageViewerDataSlice.actions.toggleZLinking(false));
   };
   return (
     <Stack gap={1}>

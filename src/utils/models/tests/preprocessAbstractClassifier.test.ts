@@ -16,9 +16,11 @@ import {
 import { loadImageFileAsStack } from "utils/file-io/utils";
 import { extractImageFileDetails } from "utils/tensorUtils";
 import { MIMEType } from "utils/file-io/types";
-import { Category, ImageMetadata } from "store/data/types";
+import { Category, GeneralizedKindItem, Shape } from "store/data/types";
 import { MIMETYPES } from "utils/file-io/enums";
 import { getDefaultModelInfo } from "../classification/utils";
+import { ColorsRaw } from "utils/types";
+import { Tensor4D } from "@tensorflow/tfjs-node";
 
 class GenericClassifier extends SequentialClassifier {
   constructor() {
@@ -62,7 +64,6 @@ const categories: Array<Category> = [
     color: "",
     id: "00000000-0000-0000-0000-00000000001",
     kind: "",
-    containing: [],
     name: "",
     visible: true,
   },
@@ -70,7 +71,6 @@ const categories: Array<Category> = [
     color: "",
     id: "00000000-0000-0000-0000-00000000002",
     kind: "",
-    containing: [],
     name: "",
     visible: true,
   },
@@ -97,7 +97,14 @@ const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
 it(
   "preprocessClassifier",
   async () => {
-    const images: Array<ImageMetadata> = [];
+    const images: Array<{
+      id: string;
+      bitDepth: number;
+      shape: Shape;
+      colors: ColorsRaw;
+      data: Tensor4D;
+      src: string;
+    }> = [];
 
     for (const preIm of preloadedImages) {
       const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);
@@ -114,7 +121,7 @@ it(
     const model = new GenericClassifier();
     model.loadModel();
     expect(model.preprocessingOptions).toBeDefined();
-    model.loadTraining(images, categories);
+    model.loadTraining(images as GeneralizedKindItem[], categories);
 
     expect(model.trainingLoaded).toBeTruthy();
 

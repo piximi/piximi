@@ -70,28 +70,30 @@ export const ProjectAppBar = () => {
 
       <Box sx={{ flexGrow: 1 }} />
       <Tooltip title={`${timeExpanded ? "Collaps" : "Expand"} time-series`}>
-        <IconButton
-          onClick={() => dispatch(projectSlice.actions.toggleTimeExpansion())}
-          disabled={!containsTimeSeries}
-        >
-          {timeExpanded ? (
-            <ExpandedClockIcon
-              color={
-                containsTimeSeries
-                  ? theme.palette.text.primary
-                  : theme.palette.action.disabled
-              }
-            />
-          ) : (
-            <CollapsedClockIcon
-              color={
-                containsTimeSeries
-                  ? theme.palette.text.primary
-                  : theme.palette.action.disabled
-              }
-            />
-          )}
-        </IconButton>
+        <span>
+          <IconButton
+            onClick={() => dispatch(projectSlice.actions.toggleTimeExpansion())}
+            disabled={!containsTimeSeries}
+          >
+            {timeExpanded ? (
+              <ExpandedClockIcon
+                color={
+                  containsTimeSeries
+                    ? theme.palette.text.primary
+                    : theme.palette.action.disabled
+                }
+              />
+            ) : (
+              <CollapsedClockIcon
+                color={
+                  containsTimeSeries
+                    ? theme.palette.text.primary
+                    : theme.palette.action.disabled
+                }
+              />
+            )}
+          </IconButton>
+        </span>
       </Tooltip>
       <ItemSelection />
       {isMobile ? (
