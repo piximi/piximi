@@ -1,10 +1,4 @@
-import React, {
-  forwardRef,
-  memo,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from "react";
+import React, { forwardRef, memo, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
 import { Image as KonvaImage } from "react-konva";
@@ -30,9 +24,7 @@ export const Image = React.forwardRef<
 
     const [filters] = useState<Array<any>>();
     const imagePosition = useSelector(selectImageOrigin);
-    useEffect(() => {
-      console.log(activeImage);
-    }, [activeImage]);
+
     useLayoutEffect(() => {
       if (!activeMetadata || !activeMetadata.activeSrcs) return;
       if (activeMetadata.activeSrcs.length === 1) {
