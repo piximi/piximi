@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 import { Annotation } from "./Annotation";
@@ -47,11 +47,6 @@ export const Annotations = React.memo(
         ),
       [selectedAnnotationsIds, workingAnnotationObject],
     );
-
-    useEffect(() => {
-      console.log(annotations);
-      console.log(nonWorkingAnnotationObjects);
-    }, [annotations, nonWorkingAnnotationObjects]);
 
     return (
       <>
