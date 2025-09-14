@@ -32,7 +32,7 @@ export const selectActivePlane = createSelector(
   },
 );
 
-export const selectActiveTimepoint = createSelector(
+export const selectActiveImageId = createSelector(
   selectActiveMetadata,
   (activeImageSeries) => {
     return activeImageSeries?.activeImageId;

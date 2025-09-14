@@ -32,12 +32,7 @@ import {
   selectAnnotationState,
   selectToolType,
 } from "../../state/annotator/selectors";
-import {
-  //selectActiveImageId,
-  //selectActiveImageRenderedSrcs,
-  selectImageIsloading,
-  selectStagePosition,
-} from "../../state/imageViewer/selectors";
+import { selectStagePosition } from "../../state/imageViewer/selectors";
 
 import { generateKind, generateUUID } from "store/data/utils";
 
@@ -82,7 +77,6 @@ export const Stage = React.memo(
 
     // tool selectors
     const toolType = useSelector(selectToolType);
-    const imageIsLoading = useSelector(selectImageIsloading);
     const annotationState = useSelector(selectAnnotationState);
 
     // stage selectors
@@ -276,7 +270,7 @@ export const Stage = React.memo(
           <Provider store={store}>
             <StageContext.Provider value={stageRef}>
               <Layer>
-                {imageIsLoading || !activeImage ? (
+                {!activeImage || !activeMetadata ? (
                   <></>
                 ) : (
                   <Image
@@ -301,9 +295,7 @@ export const Stage = React.memo(
                 />
               </Layer>
               <Layer>
-                {!imageIsLoading && (
-                  <Annotations annotationTool={annotationTool} />
-                )}
+                {activeImage && <Annotations annotationTool={annotationTool} />}
               </Layer>
             </StageContext.Provider>
           </Provider>

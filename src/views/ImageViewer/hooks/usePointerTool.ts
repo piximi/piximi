@@ -14,7 +14,7 @@ import { HotkeyContext } from "utils/enums";
 import { Point } from "utils/types";
 import {
   selectActiveMetadataId,
-  selectActiveTimepoint,
+  selectActiveImageId,
   selectTimeLinkingState,
 } from "../state/image-viewer-data/selectors";
 import { selectActiveAnnotations } from "../state/image-viewer-data/reselectors";
@@ -31,10 +31,10 @@ export const usePointerTool = (
   toolType: any,
 ) => {
   const dispatch = useDispatch();
-  const activeImageId = useSelector(selectActiveMetadataId);
+  const activeMetadataId = useSelector(selectActiveMetadataId);
   const activeAnnotations = useSelector(selectActiveAnnotations);
   const tLinkingActive = useSelector(selectTimeLinkingState);
-  const activeTP = useSelector(selectActiveTimepoint);
+  const activeImageId = useSelector(selectActiveImageId);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shift, setShift] = useState<boolean>(false);
   const [dragging, setDragging] = useState<boolean>(false);
@@ -158,7 +158,7 @@ export const usePointerTool = (
       toolType !== ToolType.Pointer ||
       !absolutePosition ||
       !activeAnnotations.length ||
-      !activeImageId
+      !activeMetadataId
     )
       return;
     let currentAnnotation: ProtoAnnotationObject | undefined;
@@ -203,7 +203,7 @@ export const usePointerTool = (
       dispatch(
         imageViewerDataSlice.actions.addTLinkedAnnotation({
           id: currentAnnotation.id,
-          tp: activeTP!,
+          tp: activeImageId!,
         }),
       );
     } else {
@@ -246,7 +246,7 @@ export const usePointerTool = (
     activeAnnotations,
     currentIndex,
     dispatch,
-    activeImageId,
+    activeMetadataId,
     selectedAnnotationsIds,
     shift,
     toolType,
