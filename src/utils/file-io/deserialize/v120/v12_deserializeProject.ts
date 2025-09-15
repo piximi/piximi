@@ -1,6 +1,13 @@
 import { Group, openGroup } from "zarr";
 
 import { logger } from "utils/logUtils";
+import {
+  METADATA_GROUP_ATTRS,
+  IMAGE_GROUP_ATTRS,
+  ANNOTATION_GROUP_ATTRS,
+  CATEGORY_GROUP_ATTRS,
+  KIND_GROUP_ATTRS,
+} from "../../enums";
 import { initialState as initialProjectState } from "store/project/projectSlice";
 import { deserializeRawColorsGroup } from "../common/group-deserializers/deserializeRawColorsGroup";
 import { deserializeSegmenterGroup } from "../common/group-deserializers/deserializeSegmenterGroup";
@@ -28,23 +35,44 @@ const deserializeMetadatumGroup = async (
   name: string,
   metadatumGroup: Group,
 ): Promise<V12ImageMetadata> => {
-  const id = (await getAttr(metadatumGroup, "metadata_id")) as string;
+  const id = (await getAttr(metadatumGroup, METADATA_GROUP_ATTRS.Id)) as string;
   const imageDataIds = (await getAttr(
     metadatumGroup,
-    "image_data_ids",
+    METADATA_GROUP_ATTRS.ImageDataIds,
   )) as string[];
-  const kind = (await getAttr(metadatumGroup, "kind")) as string;
-  const planes = (await getAttr(metadatumGroup, "planes")) as number;
-  const channels = (await getAttr(metadatumGroup, "channels")) as number;
-  const width = (await getAttr(metadatumGroup, "width")) as number;
-  const height = (await getAttr(metadatumGroup, "height")) as number;
+  const kind = (await getAttr(
+    metadatumGroup,
+    METADATA_GROUP_ATTRS.Kinds,
+  )) as string;
+  const planes = (await getAttr(
+    metadatumGroup,
+    METADATA_GROUP_ATTRS.Planes,
+  )) as number;
+  const channels = (await getAttr(
+    metadatumGroup,
+    METADATA_GROUP_ATTRS.Channels,
+  )) as number;
+  const width = (await getAttr(
+    metadatumGroup,
+    METADATA_GROUP_ATTRS.Width,
+  )) as number;
+  const height = (await getAttr(
+    metadatumGroup,
+    METADATA_GROUP_ATTRS.Height,
+  )) as number;
   const shape = { planes, channels, width, height };
-  const bitDepth = (await getAttr(metadatumGroup, "bit_depth")) as BitDepth;
+  const bitDepth = (await getAttr(
+    metadatumGroup,
+    METADATA_GROUP_ATTRS.BitDepth,
+  )) as BitDepth;
   const defaultImageId = (await getAttr(
     metadatumGroup,
-    "default_image_id",
+    METADATA_GROUP_ATTRS.DefaultImageId,
   )) as string;
-  const timeSeries = (await getAttr(metadatumGroup, "time_series")) as boolean;
+  const timeSeries = (await getAttr(
+    metadatumGroup,
+    METADATA_GROUP_ATTRS.TimeSeries,
+  )) as boolean;
 
   return {
     id,
@@ -63,7 +91,7 @@ const deserializeMetadataGroup = async (
 ) => {
   const metadataNames = (await getAttr(
     metadataGroup,
-    "metadata_names",
+    METADATA_GROUP_ATTRS.MetadataNames,
   )) as string[];
 
   const metadata: EntityState<V12ImageMetadata, string> = {
@@ -97,15 +125,27 @@ const deserializeImageGroup = async (
   imageGroup: Group,
   metadata: Record<string, V12ImageMetadata>,
 ): Promise<V12ImageData> => {
-  const id = (await getAttr(imageGroup, "image_id")) as string;
+  const id = (await getAttr(imageGroup, IMAGE_GROUP_ATTRS.Id)) as string;
   const partition = (await getAttr(
     imageGroup,
-    "classifier_partition",
+    IMAGE_GROUP_ATTRS.ClassifierPartition,
   )) as Partition;
-  const timepoint = (await getAttr(imageGroup, "timepoint")) as number;
-  const categoryId = (await getAttr(imageGroup, "class_category_id")) as string;
-  const activePlane = (await getAttr(imageGroup, "active_plane")) as number;
-  const metadataId = (await getAttr(imageGroup, "metadata_id")) as string;
+  const timepoint = (await getAttr(
+    imageGroup,
+    IMAGE_GROUP_ATTRS.Timepoint,
+  )) as number;
+  const categoryId = (await getAttr(
+    imageGroup,
+    IMAGE_GROUP_ATTRS.ClassCategoryId,
+  )) as string;
+  const activePlane = (await getAttr(
+    imageGroup,
+    IMAGE_GROUP_ATTRS.ActivePlane,
+  )) as number;
+  const metadataId = (await getAttr(
+    imageGroup,
+    IMAGE_GROUP_ATTRS.MetadataId,
+  )) as string;
   const imageDataset = await getDataset(imageGroup, name);
   const imageRawArray = (await imageDataset.getRaw()) as RawArray;
   const imageData = imageRawArray.data as Float32Array;
@@ -143,7 +183,10 @@ const deserializeImagesGroup = async (
   loadCb: LoadCB,
   metadata: Record<string, V12ImageMetadata>,
 ) => {
-  const imageNames = (await getAttr(imagesGroup, "image_names")) as string[];
+  const imageNames = (await getAttr(
+    imagesGroup,
+    IMAGE_GROUP_ATTRS.ImageNames,
+  )) as string[];
 
   const images: EntityState<V12ImageData, string> = {
     ids: [],
@@ -174,21 +217,30 @@ const deserializeAnnotationGroup = async (
   name: string,
   annotationGroup: Group,
 ): Promise<V12AnnotationObject> => {
-  const id = (await getAttr(annotationGroup, "annotation_id")) as string;
+  const id = (await getAttr(
+    annotationGroup,
+    ANNOTATION_GROUP_ATTRS.Id,
+  )) as string;
   const activePlane = (await getAttr(
     annotationGroup,
-    "active_plane",
+    ANNOTATION_GROUP_ATTRS.ActivePlane,
   )) as number;
   const categoryId = (await getAttr(
     annotationGroup,
-    "class_category_id",
+    ANNOTATION_GROUP_ATTRS.ClassCategoryId,
   )) as string;
   const partition = (await getAttr(
     annotationGroup,
-    "classifier_partition",
+    ANNOTATION_GROUP_ATTRS.ClassifierPartition,
   )) as Partition;
-  const kind = (await getAttr(annotationGroup, "kind")) as string;
-  const timepoint = (await getAttr(annotationGroup, "timepoint")) as number;
+  const kind = (await getAttr(
+    annotationGroup,
+    ANNOTATION_GROUP_ATTRS.Kind,
+  )) as string;
+  const timepoint = (await getAttr(
+    annotationGroup,
+    ANNOTATION_GROUP_ATTRS.Timepoint,
+  )) as number;
 
   const imageDataset = await getDataset(annotationGroup, name);
   const imageRawArray = (await imageDataset.getRaw()) as RawArray;
@@ -202,15 +254,19 @@ const deserializeAnnotationGroup = async (
     "float32",
   );
 
-  const boundingBox = (await getAttr(annotationGroup, "bbox")) as [
-    number,
-    number,
-    number,
-    number,
-  ];
-  const encodedMask = (await getAttr(annotationGroup, "mask")) as number[];
+  const boundingBox = (await getAttr(
+    annotationGroup,
+    ANNOTATION_GROUP_ATTRS.Bbox,
+  )) as [number, number, number, number];
+  const encodedMask = (await getAttr(
+    annotationGroup,
+    ANNOTATION_GROUP_ATTRS.Mask,
+  )) as number[];
   const plane = activePlane;
-  const imageId = (await getAttr(annotationGroup, "image_id")) as string;
+  const imageId = (await getAttr(
+    annotationGroup,
+    ANNOTATION_GROUP_ATTRS.ImageId,
+  )) as string;
   const colors = generateBlankColors(channels);
   const src = await createRenderedTensor(
     imageTensor,
@@ -250,7 +306,7 @@ const deserializeAnnotationsGroup = async (
 ) => {
   const annotationNames = (await getAttr(
     annotationsGroup,
-    "annotation_names",
+    ANNOTATION_GROUP_ATTRS.AnnotationNames,
   )) as string[];
 
   const annotations: EntityState<V12AnnotationObject, string> = {
@@ -282,10 +338,22 @@ const deserializeAnnotationsGroup = async (
 const deserializeCategoriesGroup = async (
   categoriesGroup: Group,
 ): Promise<EntityState<V12Category, string>> => {
-  const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
-  const colors = (await getAttr(categoriesGroup, "color")) as string[];
-  const names = (await getAttr(categoriesGroup, "name")) as string[];
-  const kinds = (await getAttr(categoriesGroup, "kind")) as string[];
+  const ids = (await getAttr(
+    categoriesGroup,
+    CATEGORY_GROUP_ATTRS.CategoryId,
+  )) as string[];
+  const colors = (await getAttr(
+    categoriesGroup,
+    CATEGORY_GROUP_ATTRS.Color,
+  )) as string[];
+  const names = (await getAttr(
+    categoriesGroup,
+    CATEGORY_GROUP_ATTRS.Name,
+  )) as string[];
+  const kinds = (await getAttr(
+    categoriesGroup,
+    CATEGORY_GROUP_ATTRS.Kind,
+  )) as string[];
 
   if (ids.length !== colors.length || ids.length !== names.length) {
     throw Error(
@@ -314,12 +382,15 @@ const deserializeCategoriesGroup = async (
 const deserializeKindsGroup = async (
   kindsGroup: Group,
 ): Promise<EntityState<V12Kind, string>> => {
-  const ids = (await getAttr(kindsGroup, "kind_id")) as string[];
+  const ids = (await getAttr(kindsGroup, KIND_GROUP_ATTRS.KindId)) as string[];
   const unknownCategoryIds = (await getAttr(
     kindsGroup,
-    "unknown_category_id",
+    KIND_GROUP_ATTRS.UnknownCategoryId,
   )) as string[];
-  const displayNames = (await getAttr(kindsGroup, "display_name")) as string[];
+  const displayNames = (await getAttr(
+    kindsGroup,
+    KIND_GROUP_ATTRS.DisplayName,
+  )) as string[];
   if (ids.length !== unknownCategoryIds.length) {
     throw Error(
       `Expected categories group "${kindsGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`,

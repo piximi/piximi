@@ -28,6 +28,15 @@ import {
 } from "store/data/types";
 import { range } from "lodash";
 import { createColorsTensor } from "utils/tensorUtils";
+import {
+  METADATA_GROUP_ATTRS,
+  IMAGE_GROUP_ATTRS,
+  ANNOTATION_GROUP_ATTRS,
+  CATEGORY_GROUP_ATTRS,
+  KIND_GROUP_ATTRS,
+  CLASSIFIER_GROUP_ATTRS,
+  SEGMENTER_GROUP_ATTRS,
+} from "../enums";
 
 /* 
    =====================
@@ -64,28 +73,52 @@ const serializeMetadata = async (
 ) => {
   const metadataNames = metadata.map((metadatum) => metadatum.name);
 
-  metadataGroup.attrs.setItem("metadata_names", metadataNames);
+  metadataGroup.attrs.setItem(
+    METADATA_GROUP_ATTRS.MetadataNames,
+    metadataNames,
+  );
   loadCb(0, `serializing ${metadata.length} images`);
 
   for await (const i of range(0, metadata.length)) {
     const metadatum = metadata[i];
     const metadatumGroup = await metadataGroup.createGroup(metadataNames[i]);
-    await metadatumGroup.attrs.setItem("metadata_id", metadatum.id);
+    await metadatumGroup.attrs.setItem(METADATA_GROUP_ATTRS.Id, metadatum.id);
     await metadatumGroup.attrs.setItem(
-      "image_data_ids",
+      METADATA_GROUP_ATTRS.ImageDataIds,
       metadatum.imageDataIds,
     );
-    await metadatumGroup.attrs.setItem("kind", metadatum.kind);
-    await metadatumGroup.attrs.setItem("planes", metadatum.shape.planes);
-    await metadatumGroup.attrs.setItem("channels", metadatum.shape.channels);
-    await metadatumGroup.attrs.setItem("width", metadatum.shape.width);
-    await metadatumGroup.attrs.setItem("height", metadatum.shape.height);
-    await metadatumGroup.attrs.setItem("bit_depth", metadatum.bitDepth);
-    await metadataGroup.attrs.setItem(
-      "default_image_id",
+    await metadatumGroup.attrs.setItem(
+      METADATA_GROUP_ATTRS.Kinds,
+      metadatum.kind,
+    );
+    await metadatumGroup.attrs.setItem(
+      METADATA_GROUP_ATTRS.Planes,
+      metadatum.shape.planes,
+    );
+    await metadatumGroup.attrs.setItem(
+      METADATA_GROUP_ATTRS.Channels,
+      metadatum.shape.channels,
+    );
+    await metadatumGroup.attrs.setItem(
+      METADATA_GROUP_ATTRS.Width,
+      metadatum.shape.width,
+    );
+    await metadatumGroup.attrs.setItem(
+      METADATA_GROUP_ATTRS.Height,
+      metadatum.shape.height,
+    );
+    await metadatumGroup.attrs.setItem(
+      METADATA_GROUP_ATTRS.BitDepth,
+      metadatum.bitDepth,
+    );
+    await metadatumGroup.attrs.setItem(
+      METADATA_GROUP_ATTRS.DefaultImageId,
       metadatum.defaultImageId,
     );
-    await metadatumGroup.attrs.setItem("time_series", metadatum.timeSeries);
+    await metadatumGroup.attrs.setItem(
+      METADATA_GROUP_ATTRS.TimeSeries,
+      metadatum.timeSeries,
+    );
 
     loadCb(
       (i + 1) / metadataNames.length,
@@ -101,19 +134,35 @@ const serializeImageData = async (
 ) => {
   const imageNames = images.map((image) => image.name);
 
-  imagesGroup.attrs.setItem("image_names", imageNames);
+  imagesGroup.attrs.setItem(IMAGE_GROUP_ATTRS.ImageNames, imageNames);
   loadCb(0, `serializing ${images.length} images`);
 
   for await (const i of range(0, images.length)) {
     const image = images[i];
     const imageGroup = await imagesGroup.createGroup(imageNames[i]);
-    await imageGroup.attrs.setItem("image_id", image.id);
-    await imageGroup.attrs.setItem("classifier_partition", image.partition);
-    await imageGroup.attrs.setItem("timepoint", image.timepoint);
+    await imageGroup.attrs.setItem(IMAGE_GROUP_ATTRS.Id, image.id);
+    await imageGroup.attrs.setItem(
+      IMAGE_GROUP_ATTRS.MetadataId,
+      image.metadataId,
+    );
+    await imageGroup.attrs.setItem(
+      IMAGE_GROUP_ATTRS.ClassifierPartition,
+      image.partition,
+    );
+    await imageGroup.attrs.setItem(
+      IMAGE_GROUP_ATTRS.Timepoint,
+      image.timepoint,
+    );
     await writeFlatTensor(imageGroup, imageNames[i], image.data);
 
-    await imageGroup.attrs.setItem("active_plane", image.activePlane);
-    await imageGroup.attrs.setItem("class_category_id", image.categoryId);
+    await imageGroup.attrs.setItem(
+      IMAGE_GROUP_ATTRS.ActivePlane,
+      image.activePlane,
+    );
+    await imageGroup.attrs.setItem(
+      IMAGE_GROUP_ATTRS.ClassCategoryId,
+      image.categoryId,
+    );
     const colorGroup = await imageGroup.createGroup("colors");
     const colorTensor = createColorsTensor(image.colors, image.data.shape[3]);
     await serializeImageColors(colorGroup, colorTensor);
@@ -131,7 +180,10 @@ const serializeAnnotations = async (
 ) => {
   const annotationNames = annotations.map((annotation) => annotation.name);
 
-  annotationsGroup.attrs.setItem("annotation_names", annotationNames);
+  annotationsGroup.attrs.setItem(
+    ANNOTATION_GROUP_ATTRS.AnnotationNames,
+    annotationNames,
+  );
   loadCb(0, `serializing ${annotations.length} images`);
 
   for (let i = 0; i < annotations.length; i++) {
@@ -153,23 +205,47 @@ const serializeAnnotations = async (
     await data.attrs.setItem("bit_depth", annotation.bitDepth);
     // const bd = await getAttr(data, "bit_depth");
 
-    await annotationGroup.attrs.setItem("annotation_id", annotation.id);
-    await annotationGroup.attrs.setItem("active_plane", annotation.activePlane);
     await annotationGroup.attrs.setItem(
-      "class_category_id",
+      ANNOTATION_GROUP_ATTRS.Id,
+      annotation.id,
+    );
+    await annotationGroup.attrs.setItem(
+      ANNOTATION_GROUP_ATTRS.ActivePlane,
+      annotation.activePlane,
+    );
+    await annotationGroup.attrs.setItem(
+      ANNOTATION_GROUP_ATTRS.ClassCategoryId,
       annotation.categoryId,
     );
     await annotationGroup.attrs.setItem(
-      "classifier_partition",
+      ANNOTATION_GROUP_ATTRS.ClassifierPartition,
       annotation.partition,
     );
-    await annotationGroup.attrs.setItem("kind", annotation.kind);
+    await annotationGroup.attrs.setItem(
+      ANNOTATION_GROUP_ATTRS.Kind,
+      annotation.kind,
+    );
 
-    await annotationGroup.attrs.setItem("bbox", annotation.boundingBox);
-    await annotationGroup.attrs.setItem("mask", annotation.encodedMask);
-    await annotationGroup.attrs.setItem("image_id", annotation.imageId);
-    await annotationGroup.attrs.setItem("plane", annotation.encodedMask);
-    await annotationGroup.attrs.setItem("timepoint", annotation.imageId);
+    await annotationGroup.attrs.setItem(
+      ANNOTATION_GROUP_ATTRS.Bbox,
+      annotation.boundingBox,
+    );
+    await annotationGroup.attrs.setItem(
+      ANNOTATION_GROUP_ATTRS.Mask,
+      annotation.encodedMask,
+    );
+    await annotationGroup.attrs.setItem(
+      ANNOTATION_GROUP_ATTRS.ImageId,
+      annotation.imageId,
+    );
+    await annotationGroup.attrs.setItem(
+      ANNOTATION_GROUP_ATTRS.Plane,
+      annotation.encodedMask,
+    );
+    await annotationGroup.attrs.setItem(
+      ANNOTATION_GROUP_ATTRS.Timepoint,
+      annotation.imageId,
+    );
 
     loadCb(
       (i + 1) / annotationNames.length,
@@ -183,33 +259,33 @@ const serializeCategories = async (
   categories: Category[],
 ) => {
   await categoryGroup.attrs.setItem(
-    "category_id",
+    CATEGORY_GROUP_ATTRS.CategoryId,
     categories.map((cat) => cat.id),
   );
   await categoryGroup.attrs.setItem(
-    "color",
+    CATEGORY_GROUP_ATTRS.Color,
     categories.map((cat) => cat.color),
   );
   await categoryGroup.attrs.setItem(
-    "name",
+    CATEGORY_GROUP_ATTRS.Name,
     categories.map((cat) => cat.name),
   );
   await categoryGroup.attrs.setItem(
-    "kind",
+    CATEGORY_GROUP_ATTRS.Kind,
     categories.map((cat) => cat.kind),
   );
 };
 const serializeKinds = async (kindGroup: Group, kinds: Kind[]) => {
   await kindGroup.attrs.setItem(
-    "kind_id",
+    KIND_GROUP_ATTRS.KindId,
     kinds.map((k) => k.id),
   );
   await kindGroup.attrs.setItem(
-    "unknown_category_id",
+    KIND_GROUP_ATTRS.UnknownCategoryId,
     kinds.map((k) => k.unknownCategoryId),
   );
   await kindGroup.attrs.setItem(
-    "display_name",
+    KIND_GROUP_ATTRS.DisplayName,
     kinds.map((k) => k.displayName),
   );
 };
@@ -233,6 +309,7 @@ const _serializeProject = async (
   );
 
   const metadataGroup = await projectGroup.createGroup("metadata");
+  console.log(data.metadata);
   await serializeMetadata(metadataGroup, data.metadata, loadCb);
 
   const imagesGroup = await projectGroup.createGroup("images");
@@ -366,20 +443,26 @@ const serializeClassifier = async (
 ) => {
   const kindClassifiers = classifier.kindClassifiers;
   const classifierKindIds = Object.keys(kindClassifiers);
-  await classifierGroup.attrs.setItem("classifier_kinds", classifierKindIds);
+  await classifierGroup.attrs.setItem(
+    CLASSIFIER_GROUP_ATTRS.ClassifierKinds,
+    classifierKindIds,
+  );
 
   for await (const kindId of classifierKindIds) {
     const kindClassifiersInfo = kindClassifiers[kindId];
     const kindClassifierGroup = await classifierGroup.createGroup(kindId);
     const kindModels = Object.keys(kindClassifiersInfo.modelInfoDict);
 
-    await kindClassifierGroup.attrs.setItem("models", kindModels);
+    await kindClassifierGroup.attrs.setItem(
+      CLASSIFIER_GROUP_ATTRS.Models,
+      kindModels,
+    );
 
     for await (const modelName of kindModels) {
       const modelInfo = kindClassifiersInfo.modelInfoDict[modelName];
       const modelGroup = await kindClassifierGroup.createGroup(modelName);
 
-      await modelGroup.attrs.setItem("name", modelName);
+      await modelGroup.attrs.setItem(CLASSIFIER_GROUP_ATTRS.Name, modelName);
 
       const modelInfoGroup = await modelGroup.createGroup("model_info");
       await serializeModelInfo(modelInfoGroup, modelInfo);
@@ -412,7 +495,10 @@ const serializeSegmenter = async (
       ? { name: "undefined" }
       : availableSegmenterModels[segmenter.selectedModelIdx];
 
-  await segmenterGroup.attrs.setItem("name", segmenterModel.name);
+  await segmenterGroup.attrs.setItem(
+    SEGMENTER_GROUP_ATTRS.Name,
+    segmenterModel.name,
+  );
 };
 
 /*

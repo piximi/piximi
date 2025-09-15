@@ -11,7 +11,14 @@ import {
 import { DataState } from "store/types";
 import { RootState } from "store/rootReducer";
 import { IMAGE_KIND } from "./constants";
-import { Category, GeneralizedKindItem } from "./types";
+import {
+  AnnotationObject,
+  Category,
+  GeneralizedKindItem,
+  ImageData,
+  ImageMetadata,
+  Kind,
+} from "./types";
 import { getKindItemsFromImages } from "./utils";
 
 const kindSelectors = kindsAdapter.getSelectors(
@@ -57,13 +64,24 @@ export const selectAnotationIds = annotationSelectors.selectIds;
 export const selectAnnotationCount = annotationSelectors.selectTotal;
 
 export const selectDataState = ({ data }: { data: DataState }) => data;
-export const selectDataEntries = createSelector(selectDataState, (data) => ({
-  kinds: Object.values(data.kinds),
-  categories: Object.values(data.categories),
-  images: Object.values(data.images),
-  metadata: Object.values(data.metadata),
-  annotations: Object.values(data.annotations),
-}));
+
+type DataEntityArray = {
+  kinds: Kind[];
+  categories: Category[];
+  metadata: ImageMetadata[];
+  images: ImageData[];
+  annotations: AnnotationObject[];
+};
+export const selectDataArrays = createSelector(
+  selectDataState,
+  (data): DataEntityArray => ({
+    kinds: Object.values(data.kinds.entities),
+    categories: Object.values(data.categories.entities),
+    images: Object.values(data.images.entities),
+    metadata: Object.values(data.metadata.entities),
+    annotations: Object.values(data.annotations.entities),
+  }),
+);
 
 export const selectUnknownImageCategory = ({ data }: { data: DataState }) =>
   data.kinds.entities[IMAGE_KIND]?.unknownCategoryId;

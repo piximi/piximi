@@ -2,9 +2,7 @@ import IJSImage, { Stack as IJSStack } from "image-js";
 import { parseDicom } from "dicom-parser";
 
 import {
-  ImageFileError,
   ImageFileShapeInfo,
-  ImageFileType,
   ImageShapeInfo,
   ImageShapeInfoImage,
   MIMEType,
@@ -14,12 +12,7 @@ import {
   V02Kind,
   V11ModelInfo,
 } from "./types";
-import { extractImageFileDetails } from "utils/tensorUtils";
 import { ImageShapeEnum, MIMETYPES } from "./enums";
-import { getStackTraceFromError } from "utils/logUtils";
-import { AlertState } from "utils/types";
-import { AlertType } from "utils/enums";
-import { ImageMetadata, ImageData } from "store/data/types";
 import { isEnumValue, updateRecordArray } from "utils/objectUtils";
 import { generateUUID } from "store/data/utils";
 import {
@@ -33,20 +26,6 @@ import {
   OptimizationAlgorithm,
 } from "utils/models/enums";
 import { tensor2d, image as tfImage } from "@tensorflow/tfjs";
-
-async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
-  let imageStack: IJSStack;
-  if (imageTypeEnum === ImageShapeEnum.DicomImage) {
-    imageStack = await decodeDicomImage(imageFile);
-  } else {
-    imageStack = await loadImageFileAsStack(imageFile);
-  }
-
-  return {
-    imageStack,
-    fileName: imageFile.name,
-  } as ImageFileType;
-}
 
 export const decodeDicomImage = async (imageFile: File) => {
   const imgArrayBuffer = await imageFile.arrayBuffer();
@@ -141,109 +120,6 @@ export const loadImageFileAsStack = async (file: File) => {
     throw err;
   }
 };
-function isImageShapeValid(
-  imageStack: Array<IJSImage>,
-  channels: number,
-  slices: number,
-  imageShape: ImageShapeEnum,
-) {
-  if (imageShape === ImageShapeEnum.GreyScale) {
-    return channels === 1 && imageStack.length === 1;
-  } else if (imageShape === ImageShapeEnum.SingleRGBImage) {
-    return channels === 3 && imageStack.length === 3;
-  } else {
-    return channels * slices === imageStack.length;
-  }
-}
-
-//QUESTION: Is this used?
-// export const uploadImages = async (
-//   files: FileList,
-//   channels: number,
-//   slices: number,
-//   referenceShape: ImageShapeInfo,
-//   categoryId: string,
-// ): Promise<{
-//   imagesToUpload: {
-//     seriesProperties: Omit<ImageMetadata, "timepoints">;
-//     timepointProperties: ImageData;
-//   }[];
-//   warning: any;
-//   errors: AlertState[];
-// }> => {
-//   const invalidImageFiles: Array<ImageFileError> = [];
-//   const imagesToUpload: Array<{
-//     seriesProperties: Omit<ImageMetadata, "timepoints">;
-//     timepointProperties: ImageData;
-//   }> = [];
-//   const errors: Array<AlertState> = [];
-//   let warning: AlertState | undefined;
-
-//   for (const file of files) {
-//     try {
-//       const { imageStack, fileName } = await decodeImageFile(
-//         file,
-//         referenceShape.shape,
-//       );
-//       if (
-//         !isImageShapeValid(imageStack, channels, slices, referenceShape.shape)
-//       ) {
-//         invalidImageFiles.push({
-//           fileName: fileName,
-//           error: `Could not match image to shape ${channels} (c) x ${slices} (z)`,
-//         });
-//       } else if (
-//         !(imageStack[0].bitDepth === 8 || imageStack[0].bitDepth === 16)
-//       ) {
-//         invalidImageFiles.push({
-//           fileName,
-//           error: `Unsupported bit depth of ${imageStack[0].bitDepth}`,
-//         });
-//       } else {
-//         try {
-//           const imageToUpload = await convertToImage(
-//             imageStack,
-//             fileName,
-//             undefined,
-//             slices,
-//             channels,
-//           );
-//           imageToUpload.metadata.kind = IMAGE_KIND;
-//           imageToUpload.imageData.categoryId = categoryId;
-
-//           imagesToUpload.push(imageToUpload);
-//         } catch (err) {
-//           const error = err as Error;
-//           const stackTrace = await getStackTraceFromError(error);
-//           errors.push({
-//             alertType: AlertType.Error,
-//             name: "Could not convert file to image",
-//             description: error.message,
-//             stackTrace: stackTrace,
-//           });
-//         }
-//       }
-//     } catch (err) {
-//       import.meta.env.NODE_ENV !== "production" && console.error(err);
-//       invalidImageFiles.push({
-//         fileName: file.name,
-//         error: "Could not decode",
-//       });
-//     }
-//   }
-
-//   if (invalidImageFiles.length) {
-//     warning = {
-//       alertType: AlertType.Warning,
-//       name: "Could not draw image from files",
-//       description: `Could not load or resolve images from the following files: ${invalidImageFiles.reduce(
-//         (prev, curr) => prev + "\n" + curr.fileName + ": (" + curr.error + ")",
-//         "",
-//       )}`,
-//     };
-//   }
-//   return { imagesToUpload, warning, errors };
-// };
 
 /*
  ----------------------------
