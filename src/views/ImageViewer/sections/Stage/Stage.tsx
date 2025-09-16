@@ -234,7 +234,7 @@ export const Stage = React.memo(
           stagePosition: { x: 0, y: 0 },
         }),
       );
-    }, [activeMetadata, stageRef, dispatch]);
+    }, [activeMetadata?.id, stageRef, dispatch]);
 
     useHotkeys(
       "alt",
