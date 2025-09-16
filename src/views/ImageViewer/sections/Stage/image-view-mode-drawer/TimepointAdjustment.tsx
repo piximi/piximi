@@ -88,7 +88,7 @@ export const TimepointAdjustment = () => {
     }
   };
   const handleIncrementTimepoint = () => {
-    const activeTimepoint = +activeMetadata.activeImageId;
+    const activeTimepoint = activeImage.timepoint;
     const maxTimepoints = Object.keys(activeMetadata.images).length - 1;
     const nextTimepoint =
       activeTimepoint < maxTimepoints ? activeTimepoint + 1 : undefined;
