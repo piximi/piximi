@@ -70,13 +70,13 @@ export const OpenProjectMenuItem = ({
             }),
           );
           dispatch(projectSlice.actions.resetProject());
-          dispatch(dataSlice.actions.initializeLoadedState(res.data));
-          // loadPerecnt set to 1 here
           dispatch(
             projectSlice.actions.setProject({
               project: res.project,
             }),
           );
+          dispatch(dataSlice.actions.initializeLoadedState(res.data));
+          // loadPerecnt set to 1 here
           classifierHandler.addModels(loadedClassifiers);
           dispatch(
             classifierSlice.actions.setClassifier({

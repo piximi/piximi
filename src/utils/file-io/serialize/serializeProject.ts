@@ -244,7 +244,7 @@ const serializeAnnotations = async (
     );
     await annotationGroup.attrs.setItem(
       ANNOTATION_GROUP_ATTRS.Timepoint,
-      annotation.imageId,
+      annotation.timepoint,
     );
 
     loadCb(
