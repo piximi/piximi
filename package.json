@@ -138,5 +138,13 @@
       "last 1 safari version"
     ]
   },
-  "private": true
+  "private": true,
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@tensorflow/tfjs-node",
+      "canvas",
+      "core-js",
+      "esbuild"
+    ]
+  }
 }
