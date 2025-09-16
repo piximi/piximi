@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Container } from "@mui/material";
@@ -40,12 +40,10 @@ export const KindItemGrid = () => {
   const selectedItems = useSelector(selectActiveFilteresSelectedKindItemIds);
   const sortFunction = useSortFunction();
 
-  //const [visibleThings, setVisibleThings] = useState<Things>([]);
-
-  // const sortedImages = useMemo(
-  //   () => filteredImages.sort(sortFunction) as FullTimepointImage[],
-  //   [filteredImages, sortFunction],
-  // );
+  const sortedImages = useMemo(
+    () => activeKindItems.sort(sortFunction),
+    [activeKindItems, sortFunction],
+  );
 
   const {
     gridRef,
@@ -55,7 +53,7 @@ export const KindItemGrid = () => {
     numColumns,
     rowHeight,
     numRows,
-  } = useWindowGrid(activeKindItems);
+  } = useWindowGrid(sortedImages);
 
   const handleSelectItem = useCallback(
     (id: string, selected: boolean) => {
@@ -94,7 +92,7 @@ export const KindItemGrid = () => {
             rowHeight={rowHeight}
             width={gridWidth}
             itemData={createItemData(
-              activeKindItems,
+              sortedImages,
               handleSelectItem,
               selectedItems,
               numColumns,
