@@ -2,7 +2,7 @@ import { Tensor4D } from "@tensorflow/tfjs";
 
 import { Partition } from "utils/models/enums";
 import { BitDepth as IJSBitDepth, DataArray as IJSDataArray } from "image-js";
-import { Colors, ColorsRaw, PartialBy, RequireOnly } from "utils/types";
+import { ColorsRaw, PartialBy, RequireOnly } from "utils/types";
 
 export type BitDepth = IJSBitDepth;
 export type DataArray = IJSDataArray;
@@ -45,6 +45,8 @@ export type FullTimepointImage = Omit<ImageMetadata, "timepoints"> &
   ImageData & { timepoint: TPKey };
 
 export type AnnotationObject = {
+  globalId?: string;
+  trackId?: string;
   id: string;
   name: string;
   kind: string;
@@ -72,8 +74,13 @@ export type LinkNode = {
 };
 export type LinkGraph = Record<string, LinkNode>;
 
-export type GlobalAnnotation = {
-  globalId: string;
+export type Tracklet = {
+  trackId: string;
+  color: string;
+  start?: number;
+  end?: number;
+  children?: string[];
+  parents?: string[];
   linkedIds: string[];
 };
 export type DecodedAnnotationObject = Omit<

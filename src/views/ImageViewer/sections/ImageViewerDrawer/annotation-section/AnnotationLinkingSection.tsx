@@ -3,25 +3,41 @@ import {
   Button,
   Collapse,
   IconButton,
+  Popover,
   Stack,
   Switch,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from "@mui/material";
 import { Check as CheckIcon, Close as CloseIcon } from "@mui/icons-material";
 import { DividerHeader } from "components/ui";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { ToolType } from "views/ImageViewer/utils/enums";
 import {
+  selectActiveTrackId,
   selectActiveMetadata,
-  selectTimeLinkingAnnIds,
-  selectTimeLinkingGlobalId,
+  selectTimeTrackingRecord,
   selectTimeLinkingState,
   selectZLinkingState,
 } from "views/ImageViewer/state/image-viewer-data/selectors";
 import { ImageViewerMetadataDetails } from "views/ImageViewer/state/image-viewer-data/types";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
+import { selectTrackletRecord } from "store/data/selectors";
+import { dataSlice } from "store/data";
+import { generateUUID } from "store/data/utils";
+import { ChromePicker, ColorResult } from "react-color";
+
+function getRandomColor() {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
 
 export const AnnotationLinkingSection = () => {
   const activeMetadata = useSelector(selectActiveMetadata);
@@ -35,23 +51,82 @@ export const AnnotationLinkingSection = () => {
   );
 };
 
-export const ManualLinkingControl = ({
-  onStart,
-  onConfirm,
-  onCancel,
-  numLinked,
-  maxLinked,
-  globalId,
-  active,
-}: {
-  onStart: () => void;
-  onConfirm: () => void;
-  onCancel: () => void;
-  numLinked: number;
-  maxLinked: number;
-  globalId: string | undefined;
-  active: boolean;
-}) => {
+export const ManualLinkingControl = ({ active }: { active: boolean }) => {
+  const dispatch = useDispatch();
+  const activeTrackId = useSelector(selectActiveTrackId);
+  const trackletRecord = useSelector(selectTrackletRecord);
+
+  const [trackletEditingId, setTrackEditingId] = useState<string>();
+  const [colorMenuAnchorEl, setColorMenuAnchorEl] =
+    useState<null | HTMLButtonElement>(null);
+  const [editedColor, setEditedColor] = useState<string>();
+  const trackletIds = useMemo(
+    () => Object.keys(trackletRecord),
+    [trackletRecord],
+  );
+  const colorPopupOpen = useMemo(
+    () => Boolean(colorMenuAnchorEl),
+    [colorMenuAnchorEl],
+  );
+
+  const handleEnableLinking = () => {
+    dispatch(
+      annotatorSlice.actions.setToolType({
+        operation: ToolType.Pointer,
+      }),
+    );
+    const newTrackletId = generateUUID();
+    dispatch(imageViewerDataSlice.actions.startNewTrack(newTrackletId));
+    dispatch(
+      dataSlice.actions.addTracklet({
+        trackId: newTrackletId,
+        color: getRandomColor(),
+        linkedIds: [],
+      }),
+    );
+  };
+  const handleCancelLinking = () => {
+    dispatch(imageViewerDataSlice.actions.removeActiveTrack());
+    activeTrackId && dispatch(dataSlice.actions.deleteTracklet(activeTrackId));
+  };
+  const handleConfirmLinking = () => {
+    dispatch(imageViewerDataSlice.actions.toggleTimeLinking(false));
+  };
+  const handleSelectTrack = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>,
+    value: string,
+  ) => {
+    dispatch(imageViewerDataSlice.actions.setTLinkingTrackId(value));
+  };
+
+  const onOpenColorPicker = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    id: string,
+  ) => {
+    event.stopPropagation();
+    setTrackEditingId(id);
+    setColorMenuAnchorEl(event.currentTarget);
+  };
+  const onCloseColorPicker = () => {
+    if (trackletEditingId && editedColor)
+      dispatch(
+        dataSlice.actions.updateTracklet({
+          id: trackletEditingId,
+          changes: { color: editedColor },
+        }),
+      );
+    setTrackEditingId(undefined);
+    setEditedColor(undefined);
+    setColorMenuAnchorEl(null);
+  };
+
+  useEffect(() => {
+    if (!trackletEditingId || !trackletRecord[trackletEditingId])
+      setEditedColor("black");
+    else {
+      setEditedColor(trackletRecord[trackletEditingId].color);
+    }
+  }, [trackletRecord, trackletEditingId]);
   return (
     <Stack>
       <Box
@@ -63,45 +138,97 @@ export const ManualLinkingControl = ({
           alignItems: "center",
         }}
       >
-        <Typography variant="body2">Manual Linking:</Typography>
+        <Button
+          variant="text"
+          size="small"
+          onClick={handleEnableLinking}
+          disabled={active}
+        >
+          New Track
+        </Button>
 
         <Box sx={{ display: "flex", flexDirection: "row" }}>
-          <Button variant="text" onClick={onStart} disabled={active}>
-            Start
+          <Button
+            variant="text"
+            size="small"
+            onClick={handleConfirmLinking}
+            disabled={!active}
+          >
+            Confirm
           </Button>
-          <IconButton size="small" onClick={onConfirm} disabled={!active}>
-            <CheckIcon />
-          </IconButton>
-          <IconButton size="small" onClick={onCancel} disabled={!active}>
-            <CloseIcon />
-          </IconButton>
+          <Button
+            size="small"
+            variant="text"
+            onClick={handleCancelLinking}
+            disabled={!active}
+          >
+            Delete
+          </Button>
         </Box>
       </Box>
-      {globalId && (
-        <Collapse in={active}>
-          <Stack sx={{ width: "100%" }} gap={1}>
-            <Typography variant="body2" textOverflow="ellipsis" noWrap={true}>
-              Global Id: {globalId}
-            </Typography>
 
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
+      <Typography variant="body2">Tracks:</Typography>
+      <ToggleButtonGroup
+        orientation="vertical"
+        value={activeTrackId}
+        exclusive
+        onChange={() => {}}
+        sx={{ px: 0.5, maxHeight: "200px", overflowY: "scroll" }}
+      >
+        {trackletIds.map((id) => (
+          <ToggleButton
+            key={`track-id_${id}`}
+            value={id}
+            aria-label="list"
+            onClick={handleSelectTrack}
+            sx={{ display: "flex" }}
+          >
+            <Typography
+              variant="body2"
+              textOverflow="ellipsis"
+              noWrap={true}
+              sx={{ flexShrink: 1 }}
             >
-              <Typography variant="body2">Linked:</Typography>
-              <Typography
-                variant="body2"
-                sx={{ px: 2 }}
-              >{`${numLinked}/${maxLinked}`}</Typography>
-            </Box>
-          </Stack>
-        </Collapse>
-      )}
+              {id}
+            </Typography>
+            <Button
+              sx={{
+                minWidth: "16px",
+                height: "16px",
+                borderRadius: 1,
+                ml: 1,
+                bgcolor:
+                  id === trackletEditingId
+                    ? editedColor
+                    : trackletRecord[id].color,
+              }}
+              onClick={(event) => onOpenColorPicker(event, id)}
+            />
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
+      <Popover
+        id="image-color-selection-menu"
+        open={colorPopupOpen}
+        anchorEl={colorMenuAnchorEl}
+        onClose={onCloseColorPicker}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <ChromePicker
+          color={editedColor}
+          onChangeComplete={(color: ColorResult) => {
+            if (!trackletEditingId) return;
+            setEditedColor(color.hex);
+          }}
+        />
+      </Popover>
     </Stack>
   );
 };
@@ -111,44 +238,14 @@ export const TLinkingControl = ({
 }: {
   activeMetadata: ImageViewerMetadataDetails | undefined;
 }) => {
-  const dispatch = useDispatch();
   const linkingActive = useSelector(selectTimeLinkingState);
-  const globalId = useSelector(selectTimeLinkingGlobalId);
-  const linkedAnnIds = useSelector(selectTimeLinkingAnnIds);
-  const numLinked = useMemo(() => {
-    return Object.keys(linkedAnnIds).length;
-  }, [linkedAnnIds]);
-  const maxLinked = useMemo(() => {
-    return activeMetadata ? Object.keys(activeMetadata.images).length : 0;
-  }, [activeMetadata]);
-  const handleEnableLinking = () => {
-    dispatch(
-      annotatorSlice.actions.setToolType({
-        operation: ToolType.Pointer,
-      }),
-    );
-    dispatch(imageViewerDataSlice.actions.toggleTimeLinking(true));
-  };
-  const handleCancelLinking = () => {
-    dispatch(imageViewerDataSlice.actions.toggleTimeLinking(false));
-  };
-  const handleConfirmLinking = () => {
-    dispatch(imageViewerDataSlice.actions.toggleTimeLinking(false));
-  };
+
   return (
     <Stack gap={1}>
       <DividerHeader typographyVariant="body2" textAlign="left" sx={{ mt: 2 }}>
         Time Linking
       </DividerHeader>
-      <ManualLinkingControl
-        onStart={handleEnableLinking}
-        onConfirm={handleConfirmLinking}
-        onCancel={handleCancelLinking}
-        globalId={globalId}
-        numLinked={numLinked}
-        maxLinked={maxLinked}
-        active={linkingActive}
-      />
+      <ManualLinkingControl active={linkingActive} />
 
       <Box
         sx={{
@@ -200,15 +297,15 @@ export const ZLinkingControl = ({
       <DividerHeader typographyVariant="body2" textAlign="left" sx={{ mt: 2 }}>
         Z Linking
       </DividerHeader>
-      <ManualLinkingControl
+      {/* <ManualLinkingControl
         onStart={handleEnableLinking}
         onConfirm={handleConfirmLinking}
         onCancel={handleCancelLinking}
-        globalId={""}
+        trackId={""}
         numLinked={numLinked}
         maxLinked={maxLinked}
         active={linkingActive}
-      />
+      /> */}
 
       <Box
         sx={{

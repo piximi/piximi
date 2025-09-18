@@ -83,6 +83,8 @@ export const selectSelectedAnnotationIds = ({
   return imageViewerData.selectedAnnotationIds;
 };
 
+// Time Linking Selectors
+
 export const selectTimeLinkingState = ({
   imageViewerData,
 }: {
@@ -90,20 +92,24 @@ export const selectTimeLinkingState = ({
 }) => {
   return imageViewerData.tLinking.active;
 };
-export const selectTimeLinkingAnnIds = ({
+
+export const selectActiveTrackId = ({
   imageViewerData,
 }: {
   imageViewerData: ImageViewerDataState;
 }) => {
-  return imageViewerData.tLinking.annIds;
+  return imageViewerData.tLinking.trackId;
 };
-export const selectTimeLinkingGlobalId = ({
+export const selectTimeTrackingRecord = ({
   imageViewerData,
 }: {
   imageViewerData: ImageViewerDataState;
 }) => {
-  return imageViewerData.tLinking.globalId;
+  return imageViewerData.tLinking.tracks;
 };
+
+// Z Linking Selectors
+
 export const selectZLinkingState = ({
   imageViewerData,
 }: {

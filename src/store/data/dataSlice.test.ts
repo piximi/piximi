@@ -936,8 +936,8 @@ describe("Data Slice", () => {
         }),
       );
       store.dispatch(
-        dataSlice.actions.addGlobalAnnotation({
-          globalId: "global1",
+        dataSlice.actions.addTracklet({
+          trackId: "global1",
           linkedIds: ["ann1", "parent1", "child1"],
         }),
       );
@@ -948,9 +948,7 @@ describe("Data Slice", () => {
       expect(state.linkGraph["ann1"]).toBeUndefined();
       expect(state.linkGraph["parent1"]?.childIds).not.toContain("ann1");
       expect(state.linkGraph["child1"]?.parentIds).not.toContain("ann1");
-      expect(state.globalAnnotations["global1"]?.linkedIds).not.toContain(
-        "ann1",
-      );
+      expect(state.tracklets["global1"]?.linkedIds).not.toContain("ann1");
     });
   });
 
@@ -985,7 +983,7 @@ describe("Data Slice", () => {
       expect(allAnnotations).toHaveLength(0);
       expect(Object.keys(state.relationships.kindToCategories)).toHaveLength(0);
       expect(Object.keys(state.linkGraph)).toHaveLength(0);
-      expect(Object.keys(state.globalAnnotations)).toHaveLength(0);
+      expect(Object.keys(state.tracklets)).toHaveLength(0);
     });
   });
 

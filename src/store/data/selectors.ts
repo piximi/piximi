@@ -174,3 +174,6 @@ export const selectGeneralizedImageArray = createSelector(
   (generalizedImageRecord): GeneralizedKindItem[] =>
     Object.values(generalizedImageRecord),
 );
+
+export const selectTrackletRecord = ({ data }: { data: DataState }) =>
+  data.tracklets;

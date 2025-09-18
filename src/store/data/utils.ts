@@ -24,7 +24,7 @@ import {
 } from "./constants";
 
 import { DataState } from "store/types";
-import { updateRecordArray } from "utils/objectUtils";
+import { addToSimpleRelationship } from "utils/objectUtils";
 import {
   V12AnnotationObject,
   V12Category,
@@ -379,7 +379,7 @@ export const groupKindItemsBy = (
     (grouped: Record<string, GeneralizedKindItem[]>, kindItem) => {
       if (!kindItem[key]) return grouped;
       const value = kindItem[key];
-      updateRecordArray(grouped, value as string, kindItem);
+      addToSimpleRelationship(grouped, value as string, kindItem);
       return grouped;
     },
     {},

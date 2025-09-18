@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Box, IconButton, Slider, Stack } from "@mui/material";
+import {
+  Box,
+  Button,
+  Collapse,
+  IconButton,
+  Slider,
+  Stack,
+} from "@mui/material";
 import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
@@ -12,6 +19,9 @@ import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/
 import { ImageViewerMetadataDetails } from "views/ImageViewer/state/image-viewer-data/types";
 import { RequireField } from "utils/types";
 import { GeneralizedKindItem } from "store/data/types";
+import { selectTrackletRecord } from "store/data/selectors";
+import { isObjectEmpty } from "utils/objectUtils";
+import { TrackletContainer } from "./TrackletContainer";
 
 // The containing draw does not render if activeMetadata is undefined,
 // and the Timepoint adjustment does not render if the metadata does not contain a timeseries
@@ -25,8 +35,10 @@ export const TimepointAdjustment = () => {
   const activeMetadata = useSelector(
     selectActiveMetadata,
   ) as TimeSeriesMetadata;
+  const tracklets = useSelector(selectTrackletRecord);
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLImageElement | null)[]>([]);
+  const [showTracks, setShowTracks] = useState(false);
 
   const [tpHtmlImages, setTPHtmlImages] = useState<
     { id: string; src: string; timepoint: number }[]
@@ -113,11 +125,10 @@ export const TimepointAdjustment = () => {
       sx={{
         display: "grid",
         gridTemplateColumns: "1fr",
-        gridTemplateRows: "25px 75px",
+        gridTemplateRows: "25px 1fr",
         width: "100%",
         maxWidth: "100%",
         justifyItems: "center",
-        maxHeight: "100px",
       }}
       gap={1}
     >
@@ -169,8 +180,8 @@ export const TimepointAdjustment = () => {
           overflowX: "scroll",
           flexGrow: 1,
           maxWidth: "100%",
-
           alignItems: "center",
+          pb: 1,
         }}
         gap={1}
       >
@@ -196,6 +207,16 @@ export const TimepointAdjustment = () => {
           );
         })}
       </Stack>
+      <Button
+        variant="text"
+        onClick={() => setShowTracks((showTracks) => !showTracks)}
+        disabled={isObjectEmpty(tracklets)}
+      >
+        Show Tracks
+      </Button>
+      <Collapse in={showTracks} sx={{ width: "100%" }}>
+        <TrackletContainer />
+      </Collapse>
     </Box>
   );
 };

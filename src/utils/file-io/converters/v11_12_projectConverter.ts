@@ -126,7 +126,7 @@ export const v11_12_projectConverter = (v11Project: V11Project): V12Project => {
       annotations: currentAnnotations,
       relationships,
       linkGraph: {},
-      globalAnnotations: {},
+      tracklets: {},
     },
   };
 };

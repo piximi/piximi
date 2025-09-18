@@ -1,4 +1,11 @@
-import { Box, ButtonGroup, IconButton, Stack, useTheme } from "@mui/material";
+import {
+  Box,
+  ButtonGroup,
+  Collapse,
+  IconButton,
+  Stack,
+  useTheme,
+} from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { Layers as LayersIcon } from "@mui/icons-material";
 import { ColorAdjustment } from "icons";
@@ -30,12 +37,9 @@ export const ImageViewModeDrawer = () => {
       sx={(theme) => ({
         maxWidth: "100%", //`calc(100% - ${DIMENSIONS.toolDrawerWidth}px - ${DIMENSIONS.leftDrawerWidth}px)`,
         width: "100%", //`calc(100% - ${DIMENSIONS.toolDrawerWidth}px - ${DIMENSIONS.leftDrawerWidth}px)`,
-        height: "150px",
+        height: "max-content",
         position: "absolute",
-        bottom:
-          DIMENSIONS.stageInfoHeight -
-          (open ? 0 : 150 - DIMENSIONS.toolDrawerWidth) +
-          "px",
+        bottom: DIMENSIONS.stageInfoHeight + "px",
         bgcolor: theme.palette.background.paper,
         borderBlock: `1px solid ${theme.palette.divider}`,
         zIndex: 999,
@@ -98,23 +102,25 @@ export const ImageViewModeDrawer = () => {
           </IconButton>
         </ButtonGroup>
       </Stack>
-      {imageViewMode === 0 && (
-        <Stack
-          direction="row"
-          sx={{ flexGrow: 1, maxWidth: "100%", width: "100%" }}
-          gap={1}
-        >
-          <ChannelAdjustment />
-        </Stack>
-      )}
-      {imageViewMode === 1 &&
-        activeMetadata.timeSeries && ( // For cleaner typescript, shouldnt be able to focus on if values undefined
-          <TimepointAdjustment />
+      <Collapse in={open}>
+        {imageViewMode === 0 && (
+          <Stack
+            direction="row"
+            sx={{ flexGrow: 1, maxWidth: "100%", width: "100%" }}
+            gap={1}
+          >
+            <ChannelAdjustment />
+          </Stack>
         )}
-      {imageViewMode === 2 &&
-        activeMetadata.activeSrcs.length > 0 && ( // For cleaner typescript, shouldnt be able to focus on if values undefined
-          <ZStackSlider />
-        )}
+        {imageViewMode === 1 &&
+          activeMetadata.timeSeries && ( // For cleaner typescript, shouldnt be able to focus on if values undefined
+            <TimepointAdjustment />
+          )}
+        {imageViewMode === 2 &&
+          activeMetadata.activeSrcs.length > 0 && ( // For cleaner typescript, shouldnt be able to focus on if values undefined
+            <ZStackSlider />
+          )}
+      </Collapse>
     </Box>
   ) : null;
 };

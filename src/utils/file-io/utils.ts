@@ -13,7 +13,7 @@ import {
   V11ModelInfo,
 } from "./types";
 import { ImageShapeEnum, MIMETYPES } from "./enums";
-import { isEnumValue, updateRecordArray } from "utils/objectUtils";
+import { isEnumValue, addToSimpleRelationship } from "utils/objectUtils";
 import { generateUUID } from "store/data/utils";
 import {
   UNKNOWN_CATEGORY_NAME,
@@ -280,7 +280,7 @@ export const getUploadedFileTypes = async (files: FileList) => {
       if (!isEnumValue(MIMETYPES, file.type)) {
         import.meta.env.NODE_ENV !== "production" &&
           console.error("Invalid MIME Type:", ext);
-        updateRecordArray(images, ImageShapeEnum.InvalidImage, {
+        addToSimpleRelationship(images, ImageShapeEnum.InvalidImage, {
           shape: ImageShapeEnum.InvalidImage,
           fileName: file.name,
           ext,
@@ -295,7 +295,7 @@ export const getUploadedFileTypes = async (files: FileList) => {
       ) {
         const image = await decodeDicomImage(file);
 
-        updateRecordArray(images, ImageShapeEnum.DicomImage, {
+        addToSimpleRelationship(images, ImageShapeEnum.DicomImage, {
           shape: ImageShapeEnum.DicomImage,
           components: image.length,
           fileName: file.name,
@@ -312,7 +312,7 @@ export const getUploadedFileTypes = async (files: FileList) => {
 
         const imageStack = await forceStack(image);
 
-        updateRecordArray(images, imageInfo.shape, {
+        addToSimpleRelationship(images, imageInfo.shape, {
           ...imageInfo,
           ext,
           image: imageStack,
@@ -321,7 +321,7 @@ export const getUploadedFileTypes = async (files: FileList) => {
       }
     } catch (err) {
       const error = err as Error;
-      updateRecordArray(images, ImageShapeEnum.InvalidImage, {
+      addToSimpleRelationship(images, ImageShapeEnum.InvalidImage, {
         shape: ImageShapeEnum.InvalidImage,
         fileName: file.name,
         ext,
