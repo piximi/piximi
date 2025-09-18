@@ -1,4 +1,4 @@
-import { GlobalAnnotation, LinkNode } from "store/data/types";
+import { Tracklet, LinkNode } from "store/data/types";
 
 export type ImageViewerMetadataDetails = {
   id: string;
@@ -25,12 +25,18 @@ export type ImageViewerDataState = {
   activeAnnotationIds: Array<string>;
   selectedAnnotationIds: Array<string>;
   linkGraph: Record<string, LinkNode>;
-  globalAnnotations: Record<string, GlobalAnnotation>;
-  tLinking: {
-    active: boolean;
-    annIds: Record<string, string>;
-    globalId?: string;
-  };
+  globalAnnotations: Record<string, Tracklet>;
+  tLinking:
+    | {
+        active: false;
+        tracks: Record<string, Record<string, string>>; // annIds -- Record<trackId, Record<imageId, annotationId>>
+        trackId: undefined;
+      }
+    | {
+        active: true;
+        tracks: Record<string, Record<string, string>>; // annIds -- Record<trackId, Record<imageId, annotationId>>
+        trackId: string;
+      };
   zLinking: { active: boolean; annIds: Record<string, string> };
   hasUnsavedChanges?: boolean;
   imageIsLoading?: boolean;

@@ -21,7 +21,7 @@ import {
   Category,
   ImageMetadata,
   LinkNode,
-  GlobalAnnotation,
+  Tracklet,
   GeneralizedKindItem,
   ImageData,
 } from "./data/types";
@@ -67,7 +67,7 @@ export type DataState = {
   };
 
   linkGraph: Record<string, LinkNode>;
-  globalAnnotations: Record<string, GlobalAnnotation>;
+  tracklets: Record<string, Tracklet>;
 };
 
 export type SegmenterState = {

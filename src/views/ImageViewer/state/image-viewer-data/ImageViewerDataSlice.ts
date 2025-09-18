@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ImageViewerDataState, ImageViewerMetadataDetails } from "./types";
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 import { difference } from "lodash";
-import { generateUUID } from "store/data/utils";
 
 const initialState: ImageViewerDataState = {
   metadataStack: {},
@@ -15,7 +14,7 @@ const initialState: ImageViewerDataState = {
   highlightedCategory: undefined,
   hasUnsavedChanges: false,
   selectedAnnotationIds: [],
-  tLinking: { active: false, annIds: {} },
+  tLinking: { active: false, trackId: undefined, tracks: {} },
   zLinking: { active: false, annIds: {} },
   linkGraph: {},
   globalAnnotations: {},
@@ -161,21 +160,53 @@ export const imageViewerDataSlice = createSlice({
         ids,
       );
     },
+    startNewTrack(state, action: PayloadAction<string>) {
+      state.tLinking.active = true;
+      state.tLinking.trackId = action.payload;
+      state.tLinking.tracks[action.payload] = {};
+    },
     toggleTimeLinking(state, action: PayloadAction<boolean>) {
       const active = action.payload;
-      const globalId = active ? generateUUID() : undefined;
       state.tLinking.active = active;
-      state.tLinking.globalId = globalId;
+      state.tLinking.trackId = undefined;
     },
     toggleZLinking(state, action: PayloadAction<boolean>) {
       state.zLinking.active = action.payload;
     },
-    addTLinkedAnnotation(
-      state,
-      action: PayloadAction<{ id: string; tp: string }>,
-    ) {
-      const { id, tp } = action.payload;
-      state.tLinking.annIds[tp] = id;
+    addTLinkedAnnotation(state, action: PayloadAction<string>) {
+      const annId = action.payload;
+      const activeTrack = state.tLinking.trackId!;
+      const activeImageId =
+        state.metadataStack[state.activeMetdataId!].activeImageId!;
+      state.tLinking.tracks[activeTrack][activeImageId] = annId;
+    },
+    removeActiveTLinkedFrame(state) {
+      const activeImageId =
+        state.metadataStack[state.activeMetdataId!].activeImageId!;
+      const activeTrack = state.tLinking.trackId!;
+      delete state.tLinking.tracks[activeTrack][activeImageId];
+    },
+    removeActiveTrack(state) {
+      const trackId = state.tLinking.trackId;
+      if (!trackId) return;
+      Object.assign(state.tLinking, { active: false, trackId: undefined });
+
+      delete state.tLinking.tracks[trackId];
+    },
+    toggleTLinkedAnnotation(state, action: PayloadAction<string>) {
+      const annId = action.payload;
+      const activeTrack = state.tLinking.trackId!;
+      const activeImageId =
+        state.metadataStack[state.activeMetdataId!].activeImageId!;
+      const linkedId = state.tLinking.tracks[activeTrack][activeImageId];
+      if (linkedId === annId)
+        delete state.tLinking.tracks[activeTrack][activeImageId];
+      else state.tLinking.tracks[activeTrack][activeImageId] = annId;
+    },
+
+    setTLinkingTrackId(state, action: PayloadAction<string>) {
+      state.tLinking.trackId = action.payload;
+      state.tLinking.active = true;
     },
   },
 });

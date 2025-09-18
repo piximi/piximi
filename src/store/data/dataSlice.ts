@@ -6,7 +6,7 @@ import {
 import {
   AnnotationObject,
   Category,
-  GlobalAnnotation,
+  Tracklet,
   ImageMetadata,
   ImageData,
   Kind,
@@ -22,6 +22,11 @@ import {
   UNKNOWN_CATEGORY_NAME,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "./constants";
+import {
+  addToSimpleRelationship,
+  excludes,
+  removeFromSimpleRelationship,
+} from "utils/objectUtils";
 
 // Entity Adapters
 export const metadataAdapter = createEntityAdapter<ImageMetadata>();
@@ -63,31 +68,7 @@ const initialState: DataState = {
     imageToAnnotations: {},
   },
   linkGraph: {},
-  globalAnnotations: {},
-};
-
-// Helper functions for relationship management
-const addToSimpleRelationship = (
-  record: Record<string, string[]>,
-  key: string,
-  value: string,
-) => {
-  if (!record[key]) {
-    record[key] = [];
-  }
-  if (!record[key].includes(value)) {
-    record[key].push(value);
-  }
-};
-
-const removeFromSimpleRelationship = (
-  record: Record<string, string[]>,
-  key: string,
-  value: string,
-) => {
-  if (record[key]) {
-    record[key] = record[key].filter((id) => id !== value);
-  }
+  tracklets: {},
 };
 
 export const dataSlice = createSlice({
@@ -657,16 +638,14 @@ export const dataSlice = createSlice({
         });
 
         // Remove from global annotations
-        if (linkNode.globalId && state.globalAnnotations[linkNode.globalId]) {
+        if (linkNode.globalId && state.tracklets[linkNode.globalId]) {
           mutatingFilter(
-            state.globalAnnotations[linkNode.globalId].linkedIds,
+            state.tracklets[linkNode.globalId].linkedIds,
             (id) => id !== annotationId,
           );
 
-          if (
-            state.globalAnnotations[linkNode.globalId].linkedIds.length === 0
-          ) {
-            delete state.globalAnnotations[linkNode.globalId];
+          if (state.tracklets[linkNode.globalId].linkedIds.length === 0) {
+            delete state.tracklets[linkNode.globalId];
           }
         }
 
@@ -684,17 +663,15 @@ export const dataSlice = createSlice({
 
       // Update global annotations
       if (node.globalId) {
-        if (!state.globalAnnotations[node.globalId]) {
-          state.globalAnnotations[node.globalId] = {
-            globalId: node.globalId,
+        if (!state.tracklets[node.globalId]) {
+          state.tracklets[node.globalId] = {
+            trackId: node.globalId,
+            color: "",
             linkedIds: [node.id],
           };
         } else {
-          state.globalAnnotations[node.globalId].linkedIds = [
-            ...new Set([
-              ...state.globalAnnotations[node.globalId].linkedIds,
-              node.id,
-            ]),
+          state.tracklets[node.globalId].linkedIds = [
+            ...new Set([...state.tracklets[node.globalId].linkedIds, node.id]),
           ];
         }
       }
@@ -730,34 +707,26 @@ export const dataSlice = createSlice({
       // Handle globalId change
       if (changes.globalId && changes.globalId !== existingNode.globalId) {
         // Remove from old global annotation
-        if (
-          existingNode.globalId &&
-          state.globalAnnotations[existingNode.globalId]
-        ) {
+        if (existingNode.globalId && state.tracklets[existingNode.globalId]) {
           mutatingFilter(
-            state.globalAnnotations[existingNode.globalId].linkedIds,
+            state.tracklets[existingNode.globalId].linkedIds,
             (_id) => _id !== id,
           );
-          if (
-            state.globalAnnotations[existingNode.globalId].linkedIds.length ===
-            0
-          ) {
-            delete state.globalAnnotations[existingNode.globalId];
+          if (state.tracklets[existingNode.globalId].linkedIds.length === 0) {
+            delete state.tracklets[existingNode.globalId];
           }
         }
 
         // Add to new global annotation
-        if (!state.globalAnnotations[changes.globalId]) {
-          state.globalAnnotations[changes.globalId] = {
-            globalId: changes.globalId,
+        if (!state.tracklets[changes.globalId]) {
+          state.tracklets[changes.globalId] = {
+            trackId: changes.globalId,
+            color: "",
             linkedIds: [id],
           };
         } else {
-          state.globalAnnotations[changes.globalId].linkedIds = [
-            ...new Set([
-              ...state.globalAnnotations[changes.globalId].linkedIds,
-              id,
-            ]),
+          state.tracklets[changes.globalId].linkedIds = [
+            ...new Set([...state.tracklets[changes.globalId].linkedIds, id]),
           ];
         }
       }
@@ -791,14 +760,14 @@ export const dataSlice = createSlice({
       });
 
       // Remove from global annotations
-      if (node.globalId && state.globalAnnotations[node.globalId]) {
+      if (node.globalId && state.tracklets[node.globalId]) {
         mutatingFilter(
-          state.globalAnnotations[node.globalId].linkedIds,
+          state.tracklets[node.globalId].linkedIds,
           (id) => id !== nodeId,
         );
 
-        if (state.globalAnnotations[node.globalId].linkedIds.length === 0) {
-          delete state.globalAnnotations[node.globalId];
+        if (state.tracklets[node.globalId].linkedIds.length === 0) {
+          delete state.tracklets[node.globalId];
         }
       }
 
@@ -806,22 +775,215 @@ export const dataSlice = createSlice({
     },
 
     // ============== GLOBAL ANNOTATION OPERATIONS ==============
-    addGlobalAnnotation: (state, action: PayloadAction<GlobalAnnotation>) => {
-      const globalAnnotation = action.payload;
-      state.globalAnnotations[globalAnnotation.globalId] = globalAnnotation;
+    addTracklet: (state, action: PayloadAction<Tracklet>) => {
+      const tracklet = action.payload;
+      state.tracklets[tracklet.trackId] = tracklet;
     },
 
-    deleteGlobalAnnotation: (state, action: PayloadAction<string>) => {
-      const globalId = action.payload;
+    deleteTracklet: (state, action: PayloadAction<string>) => {
+      const trackId = action.payload;
 
       // Remove globalId from all link nodes
       Object.values(state.linkGraph).forEach((node) => {
-        if (node.globalId === globalId) {
+        if (node.globalId === trackId) {
           node.globalId = "";
         }
       });
 
-      delete state.globalAnnotations[globalId];
+      delete state.tracklets[trackId];
+    },
+    updateTracklet: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        changes: Partial<Pick<Tracklet, "color">>;
+      }>,
+    ) => {
+      const { id, changes } = action.payload;
+      Object.assign(state.tracklets[id], changes);
+    },
+    addAnnotationToTrackletRecord: (
+      state,
+      action: PayloadAction<{ trackId: string; annId: string }>,
+    ) => {
+      const { trackId, annId } = action.payload;
+      const annotation = state.annotations.entities[annId];
+      if (trackId in state.tracklets) {
+        const tracklet = state.tracklets[trackId];
+
+        if (!tracklet.linkedIds.includes(annId)) {
+          tracklet.linkedIds.push(annId);
+          if (
+            tracklet.start === undefined ||
+            tracklet.start > annotation.timepoint
+          )
+            tracklet.start = annotation.timepoint;
+          if (tracklet.end === undefined || tracklet.end < annotation.timepoint)
+            tracklet.end = annotation.timepoint;
+        }
+        return;
+      }
+      state.tracklets[trackId] = {
+        trackId: trackId,
+        start: annotation.timepoint,
+        end: annotation.timepoint,
+        color: "",
+        linkedIds: [annId],
+      };
+    },
+    removeAnnotationFromTrackletRecord: (
+      state,
+      action: PayloadAction<{ trackId: string; annId: string }>,
+    ) => {
+      const { trackId, annId } = action.payload;
+      if (trackId in state.tracklets) {
+        const tracklet = state.tracklets[trackId];
+        const removedTP = state.annotations.entities[annId].timepoint;
+        if (tracklet.start === removedTP) {
+          let candidate: number | null = null;
+          for (const id of tracklet.linkedIds) {
+            const tp = state.annotations.entities[id].timepoint;
+            if (tp > removedTP && (candidate === null || tp < candidate)) {
+              candidate = tp;
+            }
+          }
+          tracklet.start = candidate ? candidate : undefined;
+        }
+        if (tracklet.end === removedTP) {
+          let candidate: number | null = null;
+          for (const id of tracklet.linkedIds) {
+            const tp = state.annotations.entities[id].timepoint;
+            if (tp < removedTP && (candidate === null || tp > candidate)) {
+              candidate = tp;
+            }
+          }
+          tracklet.end = candidate ? candidate : undefined;
+        }
+        mutatingFilter(
+          state.tracklets[trackId].linkedIds,
+          (id) => id !== annId,
+        );
+      }
+    },
+
+    toggleAnnotationInTrackletRecord: (
+      state,
+      action: PayloadAction<{ trackId: string; annId: string }>,
+    ) => {
+      const { trackId, annId } = action.payload;
+      if (excludes(state.tracklets, trackId)) {
+        dataSlice.caseReducers.addAnnotationToTrackletRecord(state, {
+          type: "addAnnotationToTrackletRecord",
+          payload: action.payload,
+        });
+        return;
+      }
+      const idExists = state.tracklets[trackId].linkedIds.includes(annId);
+      if (idExists) {
+        dataSlice.caseReducers.removeAnnotationFromTrackletRecord(state, {
+          type: "removeAnnotationFromTrackletRecord",
+          payload: action.payload,
+        });
+      } else {
+        dataSlice.caseReducers.addAnnotationToTrackletRecord(state, {
+          type: "addAnnotationToTrackletRecord",
+          payload: action.payload,
+        });
+      }
+    },
+    addChildToTrack: (
+      state,
+      action: PayloadAction<{ parentId: string; childId: string }>,
+    ) => {
+      const { parentId, childId } = action.payload;
+      const parentTracklet = state.tracklets[parentId];
+      const childTracklet = state.tracklets[childId];
+      parentTracklet.children
+        ? parentTracklet.children.push(childId)
+        : (parentTracklet.children = [childId]);
+      childTracklet.parents
+        ? childTracklet.parents.push(parentId)
+        : (childTracklet.parents = [parentId]);
+    },
+
+    addChildrenToTrack: (
+      state,
+      action: PayloadAction<{ parentId: string; childIds: string[] }>,
+    ) => {
+      const { parentId, childIds } = action.payload;
+      const parentTracklet = state.tracklets[parentId];
+      parentTracklet.children
+        ? parentTracklet.children.push(...childIds)
+        : (parentTracklet.children = childIds);
+
+      childIds.forEach((id) => {
+        const childTracklet = state.tracklets[id];
+        childTracklet.parents
+          ? childTracklet.parents.push(parentId)
+          : (childTracklet.parents = [parentId]);
+      });
+    },
+    removeChildFromTrack: (
+      state,
+      action: PayloadAction<{ parentId: string; childId: string }>,
+    ) => {
+      const { parentId, childId } = action.payload;
+      const parentTracklet = state.tracklets[parentId];
+      const childTracklet = state.tracklets[childId];
+      parentTracklet.children &&
+        mutatingFilter(parentTracklet.children, (id) => id !== childId);
+      childTracklet.parents &&
+        mutatingFilter(childTracklet.parents, (id) => id !== parentId);
+    },
+
+    removeChildrenFromTrack: (
+      state,
+      action: PayloadAction<{ parentId: string; childIds: string[] }>,
+    ) => {
+      const { parentId, childIds } = action.payload;
+      const parentTracklet = state.tracklets[parentId];
+      parentTracklet.children &&
+        mutatingFilter(parentTracklet.children, (id) => !childIds.includes(id));
+
+      childIds.forEach((id) => {
+        const childTracklet = state.tracklets[id];
+        childTracklet.parents &&
+          mutatingFilter(childTracklet.parents, (id) => id !== parentId);
+      });
+    },
+
+    addParentsToTrack: (
+      state,
+      action: PayloadAction<{ childId: string; parentIds: string[] }>,
+    ) => {
+      const { childId, parentIds } = action.payload;
+      const childTracklet = state.tracklets[childId];
+      childTracklet.parents
+        ? childTracklet.parents.push(...parentIds)
+        : (childTracklet.parents = parentIds);
+
+      parentIds.forEach((id) => {
+        const parentTracklet = state.tracklets[id];
+        parentTracklet.children
+          ? parentTracklet.children.push(childId)
+          : (parentTracklet.children = [childId]);
+      });
+    },
+
+    removeParentsFromTrack: (
+      state,
+      action: PayloadAction<{ parentIds: string[]; childId: string }>,
+    ) => {
+      const { parentIds, childId } = action.payload;
+      const childTracklet = state.tracklets[childId];
+      childTracklet.parents &&
+        mutatingFilter(childTracklet.parents, (id) => !parentIds.includes(id));
+
+      parentIds.forEach((id) => {
+        const parentTracklet = state.tracklets[id];
+        parentTracklet.children &&
+          mutatingFilter(parentTracklet.children, (id) => id !== childId);
+      });
     },
 
     // ============== BATCH OPERATIONS ==============
@@ -1032,19 +1194,13 @@ export const dataSlice = createSlice({
             });
 
             // Remove from global annotations
-            if (
-              linkNode.globalId &&
-              state.globalAnnotations[linkNode.globalId]
-            ) {
+            if (linkNode.globalId && state.tracklets[linkNode.globalId]) {
               mutatingFilter(
-                state.globalAnnotations[linkNode.globalId].linkedIds,
+                state.tracklets[linkNode.globalId].linkedIds,
                 (id) => id !== annotationId,
               );
-              if (
-                state.globalAnnotations[linkNode.globalId].linkedIds.length ===
-                0
-              ) {
-                delete state.globalAnnotations[linkNode.globalId];
+              if (state.tracklets[linkNode.globalId].linkedIds.length === 0) {
+                delete state.tracklets[linkNode.globalId];
               }
             }
 

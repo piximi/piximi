@@ -460,7 +460,7 @@ const deserializeProjectGroup = async (
       categories,
       relationships,
       linkGraph: {},
-      globalAnnotations: {},
+      tracklets: {},
     },
   };
 };

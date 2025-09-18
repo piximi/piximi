@@ -40,10 +40,9 @@ export const Annotation = React.memo(
       const boxHeight = annotation.boundingBox[3] - annotation.boundingBox[1];
       if (!boxWidth || !boxHeight || !annotation.decodedMask) return;
       if (Math.round(boxWidth) <= 0 || Math.round(boxHeight) <= 0) return;
-      console.log(fillColor);
 
       const color = hexToRGBA(fillColor, 0);
-      console.log(color);
+
       setImageMask(
         colorOverlayROI(
           annotation.decodedMask,
@@ -120,11 +119,6 @@ export const Annotation = React.memo(
         }),
       );
     };
-
-    useEffect(() => {
-      console.log(annotation);
-      console.log(!isFiltered);
-    }, [annotation]);
 
     return (
       <KonvaImage
