@@ -168,18 +168,22 @@ export const useCreateMeasurementTable = () => {
       data: number[][][][];
       encodedMask?: number[];
       decodedMask?: DataArray;
-    }[] = thingIds.map((thingId) => {
+    }[] = thingIds.map((thingId, idx) => {
       const thing = thingData[thingId]!;
       if ("encodedMask" in thing) {
+        const dataArray = thing.data.arraySync();
+        console.log(`converted item ${idx} of ${thingIds.length}`);
         return {
           id: thing.id,
           kind: kind,
-          data: thing.data.arraySync(),
+          data: dataArray,
           encodedMask: thing.encodedMask,
           decodedMask: thing.decodedMask,
         };
       } else {
-        return { id: thing.id, kind: kind, data: thing.data.arraySync() };
+        const dataArray = thing.data.arraySync();
+        console.log(`converted item ${idx} of ${thingIds.length}`);
+        return { id: thing.id, kind: kind, data: dataArray };
       }
     });
 
