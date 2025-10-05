@@ -1,20 +1,29 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import { Box } from "@mui/material";
 
 import { Stage } from "../Stage";
 
 import { DIMENSIONS } from "utils/constants";
 import { useMobileView } from "hooks";
+import { useShouldShowTracklets } from "views/ImageViewer/state/TrackletContext";
+import { TrackView } from "../track-viewer/TrackView";
 
 export const StageWrapper = () => {
+  const showTracklets = useShouldShowTracklets();
   const [width, setWidth] = useState<number>(
     window.innerWidth -
       DIMENSIONS.leftDrawerWidth -
       DIMENSIONS.toolDrawerWidth * 2,
   );
-  const [height, setHeight] = useState<number>(
+  const [wrapperHeight, setWrapperHeight] = useState<number>(
     window.innerHeight - DIMENSIONS.toolDrawerWidth,
   );
+
+  const stageHeight = useMemo(
+    () => wrapperHeight - DIMENSIONS.stageInfoHeight,
+    [wrapperHeight],
+  );
+
   const isMobile = useMobileView();
 
   //useDefaultImage(DispatchLocation.ImageViewer);
@@ -27,7 +36,7 @@ export const StageWrapper = () => {
             : DIMENSIONS.toolDrawerWidth + DIMENSIONS.leftDrawerWidth) -
           DIMENSIONS.toolDrawerWidth,
       );
-      setHeight(window.innerHeight - DIMENSIONS.toolDrawerWidth);
+      setWrapperHeight(window.innerHeight - DIMENSIONS.toolDrawerWidth);
     };
     window.addEventListener("resize", resizeHandler);
     return () => {
@@ -40,14 +49,16 @@ export const StageWrapper = () => {
       sx={(theme) => ({
         backgroundColor: theme.palette.background.default,
         width: width,
-        height: height,
+        height: wrapperHeight,
         gridArea: "stage",
-        border: `1px solid ${theme.palette.divider}`,
-        borderRadius: "4px 4px 0 0",
         overflow: "visible",
       })}
     >
-      <Stage stageWidth={width} stageHeight={height} />
+      {showTracklets ? (
+        <TrackView width={width} height={wrapperHeight} />
+      ) : (
+        <Stage stageWidth={width} stageHeight={stageHeight} />
+      )}
     </Box>
   );
 };

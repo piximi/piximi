@@ -1,270 +1,180 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useTheme } from "@mui/material";
+import { difference } from "lodash";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Tracklet } from "store/data/types";
 import { RequireField } from "utils/types";
+import { TrackVisualizerProps, ValidTracklet } from "./types";
+import { generateRelationships } from "./utils";
 
-interface TrackVisualizerProps {
-  tracks: Tracklet[];
-  numFrames: number;
-  width?: number;
-  height?: number;
-  trackHeight?: number;
-  trackSpacing?: number;
-  primaryTrack: string | undefined;
-  setPrimaryTrack: (trackId: string) => void;
-  secondaryTracks: string[];
-  setSecondaryTracks: (tracks: string[]) => void;
-  onTrackClick?: (id: string) => void;
-}
-
-type ValidTracklet = RequireField<Tracklet, "start" | "end">;
-
-interface PositionedTrack extends ValidTracklet {
-  y: number;
-  level: number;
-}
+const TRACKS = [
+  {
+    trackId: "A",
+    color: "#9C7BB0",
+    linkedIds: [
+      "1a50f392-11d7-415d-9f75-421095b1adf5",
+      "145385fa-df77-42f6-88f6-0fee2c2cb901",
+      "11264e96-16ba-4438-9faf-c01f2c009359",
+      "15684d55-8a45-47b5-a359-bf26858f48d2",
+    ],
+    start: 0,
+    end: 3,
+    children: ["B", "C"],
+  },
+  {
+    trackId: "B",
+    color: "#655649",
+    linkedIds: [
+      "1269216e-158d-49ea-be20-841bb9a3cc3f",
+      "1bbc6496-c3eb-4aaf-a573-521bd582cc56",
+      "1bffff63-209d-4f5d-a797-31010c74a597",
+      "1409c11f-e876-4b4b-9737-1dfd490c1b09",
+      "1d108145-bb47-49d9-8c5c-f2af5700afef",
+      "1ef8bebd-18f3-438b-b9c3-e8391e5d6518",
+    ],
+    start: 4,
+    end: 9,
+    parents: ["A"],
+    children: ["G", "H", "I"],
+    //children: ["G", "H"],
+  },
+  {
+    trackId: "C",
+    color: "#074B41",
+    linkedIds: [
+      "1907f9df-3bab-441f-b9db-bf21a4372f8c",
+      "1e10dc19-1c21-4493-8543-ad012b676723",
+      "12b72cc9-b9ea-4e26-a450-51a66b422222",
+      "10efa85a-c27a-454b-8dac-5c7a94bdbf29",
+      "1151d57c-748e-4ddd-8241-10f79ad58d9e",
+      "15af02c5-bd39-4db0-b9c6-963b8cf8c612",
+    ],
+    start: 4,
+    end: 9,
+    parents: ["A"],
+    children: ["D", "E"],
+  },
+  {
+    trackId: "D",
+    color: "#CFC80F",
+    linkedIds: [
+      "17d0debe-9dea-4f7d-8748-e8f452cc9c99",
+      "1db3fea6-e291-457a-bb9b-90274d205b1a",
+      "18ea2761-58ca-453d-9d5c-7a1addbfae9b",
+      "16017361-e1bb-4820-962e-190461d6d9ee",
+      "16ab0135-16d9-450c-9487-93f2e53f6006",
+    ],
+    start: 10,
+    end: 14,
+    parents: ["C"],
+    children: ["F"],
+  },
+  {
+    trackId: "E",
+    color: "#D2B5CF",
+    linkedIds: [
+      "1c9b79c1-d632-4300-8a40-f21e1603ceda",
+      "14852c4e-8802-4f75-afd8-3b83ceec5a20",
+      "16ac923e-c1d8-47e7-8eae-ec2f877c316d",
+      "11253005-defb-4209-a061-163f96b658c0",
+      "17a709d4-1335-4678-9efe-9fff85fc3e7a",
+    ],
+    start: 10,
+    end: 14,
+    parents: ["C"],
+    children: ["F"],
+  },
+  {
+    trackId: "F",
+    color: "#3DE1F0",
+    linkedIds: [
+      "1419cdea-f2a0-49d8-94af-b40b2d873aa1",
+      "1b9a3241-a630-4c24-8935-1ea8c86d9bb1",
+      "19da2356-8c49-4ea7-badb-3258a8c03423",
+      "196f0302-6116-424a-a339-328fcf515a3a",
+    ],
+    start: 15,
+    end: 18,
+    parents: ["D", "E"],
+    //children: ["J", "K"],
+    //children: ["J"],
+  },
+  {
+    trackId: "G",
+    color: "#CFC80F",
+    linkedIds: [
+      "17d0debe-9dea-4f7d-8748-e8f452cc9c99",
+      "1db3fea6-e291-457a-bb9b-90274d205b1a",
+      "18ea2761-58ca-453d-9d5c-7a1addbfae9b",
+      "16017361-e1bb-4820-962e-190461d6d9ee",
+      "16ab0135-16d9-450c-9487-93f2e53f6006",
+    ],
+    start: 10,
+    end: 14,
+    parents: ["B"],
+  },
+  {
+    trackId: "H",
+    color: "#D2B5CF",
+    linkedIds: [
+      "1c9b79c1-d632-4300-8a40-f21e1603ceda",
+      "14852c4e-8802-4f75-afd8-3b83ceec5a20",
+      "16ac923e-c1d8-47e7-8eae-ec2f877c316d",
+      "11253005-defb-4209-a061-163f96b658c0",
+      "17a709d4-1335-4678-9efe-9fff85fc3e7a",
+    ],
+    start: 10,
+    end: 14,
+    parents: ["B"],
+  },
+  {
+    trackId: "I",
+    color: "#D2B5CF",
+    linkedIds: [
+      "1c9b79c1-d632-4300-8a40-f21e1603ceda",
+      "14852c4e-8802-4f75-afd8-3b83ceec5a20",
+      "16ac923e-c1d8-47e7-8eae-ec2f877c316d",
+      "11253005-defb-4209-a061-163f96b658c0",
+      "17a709d4-1335-4678-9efe-9fff85fc3e7a",
+    ],
+    start: 10,
+    end: 14,
+    parents: ["B"],
+  },
+  // {
+  //   trackId: "J",
+  //   color: "#D2B5CF",
+  //   linkedIds: [
+  //     "1c9b79c1-d632-4300-8a40-f21e1603ceda",
+  //     "14852c4e-8802-4f75-afd8-3b83ceec5a20",
+  //     "16ac923e-c1d8-47e7-8eae-ec2f877c316d",
+  //     "11253005-defb-4209-a061-163f96b658c0",
+  //     "17a709d4-1335-4678-9efe-9fff85fc3e7a",
+  //   ],
+  //   start: 19,
+  //   end: 21,
+  //   parents: ["F"],
+  // },
+  // {
+  //   trackId: "K",
+  //   color: "#D2B5CF",
+  //   linkedIds: [
+  //     "1c9b79c1-d632-4300-8a40-f21e1603ceda",
+  //     "14852c4e-8802-4f75-afd8-3b83ceec5a20",
+  //     "16ac923e-c1d8-47e7-8eae-ec2f877c316d",
+  //     "11253005-defb-4209-a061-163f96b658c0",
+  //     "17a709d4-1335-4678-9efe-9fff85fc3e7a",
+  //   ],
+  //   start: 19,
+  //   end: 21,
+  //   parents: ["F"],
+  // },
+];
 
 const HOVERED_TRACK_HEIGHT = 6;
 const CLICKED_TRACK_HEIGHT = 8;
 
-const generateRelationships = (
-  validTracks: ValidTracklet[],
-  width: number,
-  trackSpacing: number,
-  numFrames: number,
-) => {
-  // Build parent-child relationships
-  const trackMap = new Map<string, ValidTracklet>();
-  validTracks.forEach((track) => {
-    trackMap.set(track.trackId, track);
-    // Add children references
-    if (track.parents) {
-      track.parents.forEach((parentId) => {
-        const parent = trackMap.get(parentId);
-        if (parent) {
-          if (!parent.children) parent.children = [];
-          if (!parent.children.includes(track.trackId)) {
-            parent.children.push(track.trackId);
-          }
-        }
-      });
-    }
-  });
-
-  // Find connected components (groups of related tracks)
-  const visited = new Set<string>();
-  const components: string[][] = [];
-
-  function dfs(trackId: string, component: string[]) {
-    if (visited.has(trackId)) return;
-    visited.add(trackId);
-    component.push(trackId);
-
-    const track = trackMap.get(trackId);
-    if (track) {
-      // Visit parents
-      track.parents?.forEach((parentId) => {
-        if (!visited.has(parentId)) {
-          dfs(parentId, component);
-        }
-      });
-      // Visit children
-      track.children?.forEach((childId) => {
-        if (!visited.has(childId)) {
-          dfs(childId, component);
-        }
-      });
-    }
-  }
-
-  // Find all connected components
-  validTracks.forEach((track) => {
-    if (!visited.has(track.trackId)) {
-      const component: string[] = [];
-      dfs(track.trackId, component);
-      components.push(component);
-    }
-  });
-
-  // Calculate scale based on the range of start/end values
-
-  const padding = 40;
-  const scale = (width - 2 * padding) / numFrames;
-
-  const positioned: PositionedTrack[] = [];
-  const positionedMap = new Map<string, PositionedTrack>();
-  let currentY = trackSpacing;
-
-  // Sort components by their earliest start time
-  components.sort((a, b) => {
-    const aMinStart = Math.min(...a.map((id) => trackMap.get(id)!.start));
-    const bMinStart = Math.min(...b.map((id) => trackMap.get(id)!.start));
-    return aMinStart - bMinStart;
-  });
-
-  // Helper function to position a track and its children symmetrically
-  function positionTrackWithChildren(
-    trackId: string,
-    baseY: number,
-    componentIndex: number,
-  ): number {
-    const track = trackMap.get(trackId)!;
-    const children = track.children || [];
-
-    if (children.length === 0) {
-      // No children, just position the track
-      const positionedTrack = {
-        ...track,
-        y: baseY,
-        level: componentIndex,
-      };
-      positioned.push(positionedTrack);
-      positionedMap.set(trackId, positionedTrack);
-      return baseY + trackSpacing;
-    }
-
-    // Calculate positions for symmetrical arrangement
-    const totalHeight = children.length * trackSpacing;
-    const isOdd = children.length % 2 === 1;
-
-    if (isOdd) {
-      // Odd number of children: middle child at same level as parent
-      const middleIndex = Math.floor(children.length / 2);
-      const parentY = baseY + middleIndex * trackSpacing;
-
-      // Position parent
-      const positionedTrack = {
-        ...track,
-        y: parentY,
-        level: componentIndex,
-      };
-      positioned.push(positionedTrack);
-      positionedMap.set(trackId, positionedTrack);
-
-      // Position children symmetrically
-      children.forEach((childId, index) => {
-        const childY = baseY + index * trackSpacing;
-        const childTrack = trackMap.get(childId)!;
-        const positionedChild = {
-          ...childTrack,
-          y: childY,
-          level: componentIndex,
-        };
-        positioned.push(positionedChild);
-        positionedMap.set(childId, positionedChild);
-      });
-
-      return baseY + totalHeight + trackSpacing;
-    } else {
-      // Even number of children: parent between middle two children
-      const parentY = baseY + (children.length / 2 - 0.5) * trackSpacing;
-
-      // Position parent
-      const positionedTrack = {
-        ...track,
-        y: parentY,
-        level: componentIndex,
-      };
-      positioned.push(positionedTrack);
-      positionedMap.set(trackId, positionedTrack);
-
-      // Position children symmetrically
-      children.forEach((childId, index) => {
-        const childY = baseY + index * trackSpacing;
-        const childTrack = trackMap.get(childId)!;
-        const positionedChild = {
-          ...childTrack,
-          y: childY,
-          level: componentIndex,
-        };
-        positioned.push(positionedChild);
-        positionedMap.set(childId, positionedChild);
-      });
-
-      return baseY + totalHeight + trackSpacing;
-    }
-  }
-
-  components.forEach((component, componentIndex) => {
-    // Find root tracks (tracks with no parents in this component)
-    const rootTracks = component.filter((trackId) => {
-      const track = trackMap.get(trackId)!;
-      return (
-        !track.parents ||
-        track.parents.length === 0 ||
-        !track.parents.some((parentId) => component.includes(parentId))
-      );
-    });
-
-    // Sort root tracks by start time
-    rootTracks.sort((a, b) => {
-      const trackA = trackMap.get(a)!;
-      const trackB = trackMap.get(b)!;
-      return trackA.start - trackB.start;
-    });
-
-    // Position each root track and its descendants
-    rootTracks.forEach((rootTrackId) => {
-      currentY = positionTrackWithChildren(
-        rootTrackId,
-        currentY,
-        componentIndex,
-      );
-    });
-
-    // Handle any remaining tracks in the component that weren't positioned
-    component.forEach((trackId) => {
-      if (!positionedMap.has(trackId)) {
-        const track = trackMap.get(trackId)!;
-        const positionedTrack = {
-          ...track,
-          y: currentY,
-          level: componentIndex,
-        };
-        positioned.push(positionedTrack);
-        positionedMap.set(trackId, positionedTrack);
-        currentY += trackSpacing;
-      }
-    });
-
-    // Add extra spacing between components
-    currentY += trackSpacing * 0.5;
-  });
-
-  // Generate connections
-  const connections: Array<{
-    from: { x: number; y: number };
-    to: { x: number; y: number };
-  }> = [];
-
-  positioned.forEach((track) => {
-    if (track.parents) {
-      track.parents.forEach((parentId) => {
-        const parent = positioned.find((p) => p.trackId === parentId);
-        if (parent) {
-          connections.push({
-            from: {
-              x: padding + parent.end * scale,
-              y: parent.y,
-            },
-            to: {
-              x: padding + track.start * scale,
-              y: track.y,
-            },
-          });
-        }
-      });
-    }
-  });
-
-  return {
-    positionedTracks: positioned,
-    connections,
-    scale,
-    padding,
-  };
-};
 export function TrackVisualizer({
   tracks,
   numFrames,
@@ -277,19 +187,14 @@ export function TrackVisualizer({
   secondaryTracks,
   setSecondaryTracks,
 }: TrackVisualizerProps) {
+  const theme = useTheme();
   const [tooltip, setTooltip] = useState<{
     x: number;
     y: number;
     trackId: string;
   } | null>(null);
 
-  const validTracks = useMemo(
-    () =>
-      tracks.filter(
-        (track) => track.start !== undefined && track.end !== undefined,
-      ) as ValidTracklet[],
-    [tracks],
-  );
+  const validTracks = useMemo(() => tracks as ValidTracklet[], [tracks]);
   const { positionedTracks, connections, scale, padding } = useMemo(() => {
     return generateRelationships(validTracks, width, trackSpacing, numFrames);
   }, [validTracks, width, height, trackSpacing, numFrames]);
@@ -385,13 +290,21 @@ export function TrackVisualizer({
   );
 
   return (
-    <div style={{ width: width, overflow: "auto", position: "relative" }}>
+    <div
+      style={{
+        width: width,
+        height: height,
+        overflow: "auto",
+        position: "relative",
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: "4px",
+      }}
+    >
       <svg
         width={width}
         height={svgHeight}
         style={{
-          border: "1px solid #e5e7eb",
-          borderRadius: "8px",
+          backgroundColor: theme.palette.background.default,
         }}
         onMouseMove={handleMouseMove}
       >

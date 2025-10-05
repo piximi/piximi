@@ -208,6 +208,14 @@ export const selectSelectedAnnotations = createSelector(
   },
 );
 
+export const selectActiveTrackImageToAnnotation = createSelector(
+  selectActiveTrackId,
+  selectTimeTrackingRecord,
+  (activeTrackId, linkedIdRecord) => {
+    if (!activeTrackId) return {};
+    return linkedIdRecord[activeTrackId];
+  },
+);
 export const selectActiveTimeLinkedAnnId = createSelector(
   selectActiveImageId,
   selectActiveTrackId,

@@ -136,6 +136,7 @@ export const MetadataList = () => {
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
         gridTemplateRows="1fr"
+        sx={{ pt: 1 }}
       >
         <Box gridColumn="1 / 13" gridRow="1 / 2">
           <List
@@ -148,6 +149,7 @@ export const MetadataList = () => {
               "::-webkit-scrollbar": { display: "none" },
               width: "calc(100% - 5px)",
               backgroundColor: theme.palette.background.paper,
+              pl: "5px",
             })}
             onScroll={handleScroll}
           >

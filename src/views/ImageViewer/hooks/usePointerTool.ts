@@ -204,93 +204,40 @@ export const usePointerTool = (
     }
 
     if (!currentAnnotation) return;
-    if (tLinkingActive) {
-      let annTrackId = currentAnnotation.trackId;
-      // If the current annotation belongs to a track, check to see if it is the active track
-      // if not, do nothing
-      if (annTrackId && annTrackId !== activeTrackId) return;
 
-      // Assign a track ID to annotation if one doesnt exist
-      if (!annTrackId) {
-        annTrackId = activeTrackId!; // Can assert Truthy since tLinkingActive is true
+    if (!shift) {
+      batch(() => {
         dispatch(
-          dataSlice.actions.updateAnnotation({
-            id: currentAnnotation.id,
-            changes: { trackId: annTrackId },
-          }),
-        );
-        dispatch(
-          dataSlice.actions.addAnnotationToTrackletRecord({
-            trackId: annTrackId,
-            annId: currentAnnotation.id,
-          }),
-        );
-        if (activeTimeLinkedAnnId) {
-          dispatch(
-            dataSlice.actions.removeAnnotationFromTrackletRecord({
-              trackId: annTrackId,
-              annId: activeTimeLinkedAnnId,
-            }),
-          );
-        }
-      } else {
-        if (activeTimeLinkedAnnId) {
-          dispatch(
-            dataSlice.actions.removeAnnotationFromTrackletRecord({
-              trackId: annTrackId,
-              annId: activeTimeLinkedAnnId,
-            }),
-          );
-        }
-        if (activeTimeLinkedAnnId !== currentAnnotation.id) {
-          dispatch(
-            dataSlice.actions.addAnnotationToTrackletRecord({
-              trackId: annTrackId,
-              annId: currentAnnotation.id,
-            }),
-          );
-        }
-      }
-      dispatch(
-        imageViewerDataSlice.actions.toggleTLinkedAnnotation(
-          currentAnnotation.id,
-        ),
-      );
-    } else {
-      if (!shift) {
-        batch(() => {
-          dispatch(
-            imageViewerDataSlice.actions.setSelectedAnnotationIds(
-              currentAnnotation.id,
-            ),
-          );
-          dispatch(
-            annotatorSlice.actions.setWorkingAnnotation({
-              annotation: currentAnnotation,
-            }),
-          );
-          dispatch(
-            imageViewerDataSlice.actions.setSelectedCategoryId(
-              currentAnnotation.categoryId,
-            ),
-          );
-        });
-      }
-
-      if (shift && !selectedAnnotationsIds.includes(currentAnnotation.id)) {
-        //include newly selected annotation if not already selected
-        dispatch(
-          imageViewerDataSlice.actions.setSelectedAnnotationIds([
-            ...selectedAnnotationsIds,
+          imageViewerDataSlice.actions.setSelectedAnnotationIds(
             currentAnnotation.id,
-          ]),
+          ),
         );
         dispatch(
           annotatorSlice.actions.setWorkingAnnotation({
             annotation: currentAnnotation,
           }),
         );
-      }
+        dispatch(
+          imageViewerDataSlice.actions.setSelectedCategoryId(
+            currentAnnotation.categoryId,
+          ),
+        );
+      });
+    }
+
+    if (shift && !selectedAnnotationsIds.includes(currentAnnotation.id)) {
+      //include newly selected annotation if not already selected
+      dispatch(
+        imageViewerDataSlice.actions.setSelectedAnnotationIds([
+          ...selectedAnnotationsIds,
+          currentAnnotation.id,
+        ]),
+      );
+      dispatch(
+        annotatorSlice.actions.setWorkingAnnotation({
+          annotation: currentAnnotation,
+        }),
+      );
     }
   }, [
     activeAnnotations,
@@ -302,8 +249,7 @@ export const usePointerTool = (
     toolType,
     deselectAllAnnotations,
     absolutePosition,
-    activeTrackId,
-    activeTimeLinkedAnnId,
+    tLinkingActive,
   ]);
 
   const handlePointerMouseUp = useCallback(

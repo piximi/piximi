@@ -101,6 +101,7 @@
     "pnpm": "^10.10.0",
     "prettier": "^3.4.2",
     "storybook": "^8.5.2",
+    "ts-key-enum": "^3.0.13",
     "ts-node": "^10.9.1",
     "ts-prune": "^0.10.3",
     "tslib": "^2.4.0",
