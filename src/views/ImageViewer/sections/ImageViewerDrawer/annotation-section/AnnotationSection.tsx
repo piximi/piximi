@@ -1,7 +1,6 @@
 import { Stack, Typography } from "@mui/material";
 import React from "react";
 import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
-import { AnnotationLinkingSection } from "./AnnotationLinkingSection";
 
 export const AnnotationSection = () => {
   return (
@@ -18,7 +17,6 @@ export const AnnotationSection = () => {
         Annotations
       </Typography>
       <ClearAnnotationsGroup />
-      <AnnotationLinkingSection />
     </Stack>
   );
 };

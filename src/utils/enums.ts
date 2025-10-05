@@ -14,6 +14,9 @@ export enum HotkeyContext {
   ImportTensorflowModelDialog,
   ConfirmationDialog,
   AppSettingsDialog,
+  ColorAdjustment,
+  TimepointAdjustment,
+  ZAdjustment,
 }
 
 export enum Languages {

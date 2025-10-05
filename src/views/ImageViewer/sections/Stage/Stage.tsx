@@ -9,7 +9,7 @@ import {
 
 import Konva from "konva";
 import { Stage as KonvaStage } from "react-konva";
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 
 import { useHotkeys } from "hooks";
 import {
@@ -44,7 +44,7 @@ import { Category } from "store/data/types";
 import { createProtoAnnotation } from "views/ImageViewer/utils/annotationUtils";
 import { Partition } from "utils/models/enums";
 import { ActiveImageInfoContainer } from "./ActiveImageInfoContainer";
-import { ImageViewModeDrawer } from "./image-view-mode-drawer/ImageViewModeDrawer";
+import { ImageViewModeDrawer } from "../image-view-mode-drawer/ImageViewModeDrawer";
 import { dataSlice } from "store/data";
 import { selectAllAnnotations } from "store/data/selectors";
 import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
@@ -61,6 +61,7 @@ export const Stage = React.memo(
     stageHeight: number;
   }) => {
     const store = useStore();
+    const theme = useTheme();
     const dispatch = useDispatch();
 
     const [draggable, setDraggable] = useState<boolean>(false);
@@ -246,7 +247,13 @@ export const Stage = React.memo(
     );
 
     return (
-      <Box sx={{ zIndex: 999, position: "relative", overflow: "hidden" }}>
+      <Box
+        sx={{
+          zIndex: 999,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
         <KonvaStage
           draggable={draggable}
           height={stageHeight}
@@ -266,6 +273,10 @@ export const Stage = React.memo(
           position={stagePosition}
           ref={stageRef}
           width={stageWidth}
+          style={{
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: "4px",
+          }}
         >
           <Provider store={store}>
             <StageContext.Provider value={stageRef}>

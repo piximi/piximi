@@ -1,13 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Key } from "ts-key-enum";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Box,
-  Button,
-  Collapse,
-  IconButton,
-  Slider,
-  Stack,
-} from "@mui/material";
+import { Box, IconButton, Slider, Stack } from "@mui/material";
 import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
@@ -19,9 +13,8 @@ import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/
 import { ImageViewerMetadataDetails } from "views/ImageViewer/state/image-viewer-data/types";
 import { RequireField } from "utils/types";
 import { GeneralizedKindItem } from "store/data/types";
-import { selectTrackletRecord } from "store/data/selectors";
-import { isObjectEmpty } from "utils/objectUtils";
-import { TrackletContainer } from "./TrackletContainer";
+import { useHotkeys } from "hooks";
+import { HotkeyContext } from "utils/enums";
 
 // The containing draw does not render if activeMetadata is undefined,
 // and the Timepoint adjustment does not render if the metadata does not contain a timeseries
@@ -35,10 +28,8 @@ export const TimepointAdjustment = () => {
   const activeMetadata = useSelector(
     selectActiveMetadata,
   ) as TimeSeriesMetadata;
-  const tracklets = useSelector(selectTrackletRecord);
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLImageElement | null)[]>([]);
-  const [showTracks, setShowTracks] = useState(false);
 
   const [tpHtmlImages, setTPHtmlImages] = useState<
     { id: string; src: string; timepoint: number }[]
@@ -82,6 +73,7 @@ export const TimepointAdjustment = () => {
   const updateTimepointImage = (nextTimepoint: number) => {
     scrollToItem(nextTimepoint);
     setSliderValue(nextTimepoint);
+    console.log(tpHtmlImages);
     setTimepointImage(tpHtmlImages[nextTimepoint].id);
   };
 
@@ -91,23 +83,24 @@ export const TimepointAdjustment = () => {
     updateTimepointImage(newValue);
   };
 
-  const handleDecrementTimepoint = () => {
+  const handleDecrementTimepoint = useCallback(() => {
     const activeTimepoint = activeImage.timepoint;
     const nextTimepoint = activeTimepoint !== 0 ? activeTimepoint - 1 : -1;
 
     if (nextTimepoint >= 0) {
       updateTimepointImage(nextTimepoint);
     }
-  };
-  const handleIncrementTimepoint = () => {
+  }, [activeImage, updateTimepointImage]);
+  const handleIncrementTimepoint = useCallback(() => {
     const activeTimepoint = activeImage.timepoint;
     const maxTimepoints = Object.keys(activeMetadata.images).length - 1;
     const nextTimepoint =
       activeTimepoint < maxTimepoints ? activeTimepoint + 1 : undefined;
+
     if (nextTimepoint) {
       updateTimepointImage(nextTimepoint);
     }
-  };
+  }, [activeImage, updateTimepointImage]);
 
   useEffect(() => {
     const srcs = Object.values(activeMetadata.images).map((image) => {
@@ -120,18 +113,72 @@ export const TimepointAdjustment = () => {
     setTPHtmlImages(srcs);
   }, [activeMetadata]);
 
+  useHotkeys(
+    "shift+s",
+    (event) => {
+      handleIncrementTimepoint();
+    },
+    HotkeyContext.TimepointAdjustment,
+    { keydown: true },
+    [handleIncrementTimepoint],
+  );
+
+  useHotkeys(
+    "shift+a",
+    (event) => {
+      handleDecrementTimepoint();
+    },
+    HotkeyContext.TimepointAdjustment,
+    { keydown: true },
+    [handleDecrementTimepoint],
+  );
+
   return (
     <Box
       sx={{
         display: "grid",
         gridTemplateColumns: "1fr",
-        gridTemplateRows: "25px 1fr",
+        gridTemplateRows: "1fr 25px",
         width: "100%",
         maxWidth: "100%",
         justifyItems: "center",
+        pb: 1,
       }}
-      gap={1}
     >
+      <Stack
+        ref={containerRef}
+        direction="row"
+        sx={{
+          overflowX: "scroll",
+          flexGrow: 1,
+          maxWidth: "100%",
+          alignItems: "center",
+          pb: 1,
+        }}
+        gap={1}
+      >
+        {Object.values(tpHtmlImages ?? []).map((image, idx) => {
+          return (
+            <img
+              key={`tp-${idx}`}
+              ref={(el) => (itemRefs.current[idx] = el)}
+              style={{
+                border:
+                  activeMetadata.activeImageId === image.id
+                    ? "2px solid pink"
+                    : "2px solid transparent",
+              }}
+              src={image.src}
+              width={`${activeImage.shape.width / tsPreviewProportions}px`}
+              height={`${activeImage.shape.height / tsPreviewProportions}px`}
+              onClick={() => {
+                setSliderValue(idx);
+                setTimepointImage(image.id);
+              }}
+            />
+          );
+        })}
+      </Stack>
       <Box
         sx={{
           display: "grid",
@@ -172,51 +219,6 @@ export const TimepointAdjustment = () => {
           <ChevronRightIcon />
         </IconButton>
       </Box>
-
-      <Stack
-        ref={containerRef}
-        direction="row"
-        sx={{
-          overflowX: "scroll",
-          flexGrow: 1,
-          maxWidth: "100%",
-          alignItems: "center",
-          pb: 1,
-        }}
-        gap={1}
-      >
-        {Object.values(tpHtmlImages ?? []).map((image, idx) => {
-          return (
-            <img
-              key={`tp-${idx}`}
-              ref={(el) => (itemRefs.current[idx] = el)}
-              style={{
-                border:
-                  activeMetadata.activeImageId === image.id
-                    ? "2px solid pink"
-                    : "2px solid transparent",
-              }}
-              src={image.src}
-              width={`${activeImage.shape.width / tsPreviewProportions}px`}
-              height={`${activeImage.shape.height / tsPreviewProportions}px`}
-              onClick={() => {
-                setSliderValue(idx);
-                setTimepointImage(image.id);
-              }}
-            />
-          );
-        })}
-      </Stack>
-      <Button
-        variant="text"
-        onClick={() => setShowTracks((showTracks) => !showTracks)}
-        disabled={isObjectEmpty(tracklets)}
-      >
-        Show Tracks
-      </Button>
-      <Collapse in={showTracks} sx={{ width: "100%" }}>
-        <TrackletContainer />
-      </Collapse>
     </Box>
   );
 };

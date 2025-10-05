@@ -193,15 +193,15 @@ export const imageViewerDataSlice = createSlice({
 
       delete state.tLinking.tracks[trackId];
     },
-    toggleTLinkedAnnotation(state, action: PayloadAction<string>) {
-      const annId = action.payload;
+    toggleTLinkedAnnotation(
+      state,
+      action: PayloadAction<{ annId: string; imId: string }>,
+    ) {
+      const { annId, imId } = action.payload;
       const activeTrack = state.tLinking.trackId!;
-      const activeImageId =
-        state.metadataStack[state.activeMetdataId!].activeImageId!;
-      const linkedId = state.tLinking.tracks[activeTrack][activeImageId];
-      if (linkedId === annId)
-        delete state.tLinking.tracks[activeTrack][activeImageId];
-      else state.tLinking.tracks[activeTrack][activeImageId] = annId;
+      const linkedId = state.tLinking.tracks[activeTrack][imId];
+      if (linkedId === annId) delete state.tLinking.tracks[activeTrack][imId];
+      else state.tLinking.tracks[activeTrack][imId] = annId;
     },
 
     setTLinkingTrackId(state, action: PayloadAction<string>) {

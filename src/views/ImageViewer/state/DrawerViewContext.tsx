@@ -3,12 +3,14 @@ import { ExportAnnotationsSection } from "../sections/ImageViewerDrawer/ExportAn
 import { MetadataList } from "../sections/ImageViewerDrawer/MetadataList";
 import { KindCategorySection } from "../sections/ImageViewerDrawer/KindCategorySection";
 import { AnnotationSection } from "../sections/ImageViewerDrawer/annotation-section/AnnotationSection";
+import { AnnotationTrackingSection } from "../sections/ImageViewerDrawer/annotation-tracking-section/AnnotationTrackingSection";
 
 export type DrawerContextType =
   | "export"
   | "images"
   | "categories"
-  | "annotations";
+  | "annotations"
+  | "tracking";
 export const DrawerViewContext = createContext<{
   drawerViewComponent: JSX.Element;
   setDrawerContext: React.Dispatch<React.SetStateAction<DrawerContextType>>;
@@ -31,6 +33,8 @@ export const DrawerViewProvider = ({ children }: { children: ReactNode }) => {
         return <KindCategorySection />;
       case "annotations":
         return <AnnotationSection />;
+      case "tracking":
+        return <AnnotationTrackingSection />;
     }
   }, [drawerContext]);
 

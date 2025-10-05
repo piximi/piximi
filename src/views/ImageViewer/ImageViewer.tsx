@@ -20,6 +20,7 @@ import { MobileActionBar } from "./sections/tool-bars/MobileActionBar";
 import { DataProvider } from "./state/DataContext";
 import { DrawerActionSelection } from "./sections/ImageViewerDrawer/DrawerActionSelection";
 import { DrawerViewProvider } from "./state/DrawerViewContext";
+import { TrackletProvider } from "./state/TrackletContext";
 
 export const ImageViewer = () => {
   const dispatch = useDispatch();
@@ -89,42 +90,44 @@ export const ImageViewer = () => {
   }, [handleError, handleUncaughtRejection]);
 
   return (
-    <DataProvider>
-      <DrawerViewProvider>
-        <StageContext.Provider value={stageRef}>
-          <ErrorBoundary FallbackComponent={FallbackDialog}>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
-                gridTemplateRows: "1fr",
-                gridTemplateAreas: `"drawer-action-selection viewer-grid"`,
-                maxHeight: "100vh",
-                minWidth: "100%",
-              }}
-            >
-              <DrawerActionSelection />
+    <ErrorBoundary FallbackComponent={FallbackDialog}>
+      <DataProvider>
+        <TrackletProvider>
+          <DrawerViewProvider>
+            <StageContext.Provider value={stageRef}>
               <Box
                 sx={{
                   display: "grid",
-                  gridTemplateColumns: `${isMobile ? DIMENSIONS.toolDrawerWidth + "px" : ` ${DIMENSIONS.leftDrawerWidth}px`} 1fr ${DIMENSIONS.toolDrawerWidth}px`,
-                  gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
-                  gridTemplateAreas: `"top-tools top-tools top-tools" "${isMobile ? "mobile-action-bar" : "action-drawer"} stage side-tools"`,
-                  overflow: "hidden",
+                  gridTemplateColumns: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
+                  gridTemplateRows: "1fr",
+                  gridTemplateAreas: `"drawer-action-selection viewer-grid"`,
                   maxHeight: "100vh",
-                  gridArea: "viewer-grid",
+                  minWidth: "100%",
                 }}
               >
-                <TopToolBar />
-                {isMobile ? <MobileActionBar /> : <ImageViewerDrawer />}
+                <DrawerActionSelection />
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: `${isMobile ? DIMENSIONS.toolDrawerWidth + "px" : ` ${DIMENSIONS.leftDrawerWidth}px`} 1fr ${DIMENSIONS.toolDrawerWidth}px`,
+                    gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
+                    gridTemplateAreas: `"top-tools top-tools top-tools" "${isMobile ? "mobile-action-bar" : "action-drawer"} stage side-tools"`,
+                    overflow: "hidden",
+                    maxHeight: "100vh",
+                    gridArea: "viewer-grid",
+                  }}
+                >
+                  <TopToolBar />
+                  {isMobile ? <MobileActionBar /> : <ImageViewerDrawer />}
 
-                <StageWrapper />
-                <SideToolBar />
+                  <StageWrapper />
+                  <SideToolBar />
+                </Box>
               </Box>
-            </Box>
-          </ErrorBoundary>
-        </StageContext.Provider>
-      </DrawerViewProvider>
-    </DataProvider>
+            </StageContext.Provider>
+          </DrawerViewProvider>
+        </TrackletProvider>
+      </DataProvider>
+    </ErrorBoundary>
   );
 };

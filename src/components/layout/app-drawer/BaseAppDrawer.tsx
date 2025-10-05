@@ -17,6 +17,7 @@ export const BaseAppDrawer = ({
       anchor="left"
       sx={{
         display: mobile ? "none" : "block",
+
         flexShrink: 0,
         width: (theme) => theme.spacing(32),
         overflow: "hidden",
@@ -26,6 +27,7 @@ export const BaseAppDrawer = ({
           height: "100%",
           overflow: "hidden",
           position: "relative",
+          border: "none",
         },
       }}
       open

@@ -76,14 +76,11 @@ export const ActiveImageInfoContainer = ({
     <Box
       sx={(theme) => ({
         backgroundColor: theme.palette.background.paper,
-        width: width - 2 + "px",
+        width: width + "px",
         height: DIMENSIONS.stageInfoHeight,
         justifyContent: "space-between",
         alignItems: "center",
         display: "flex",
-        position: "absolute",
-        bottom: 0,
-        zIndex: 1000,
       })}
     >
       <Box sx={{ width: "50%" }}>
