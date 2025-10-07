@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { IconButton } from "@mui/material";
 import { Add } from "@mui/icons-material";
 
-import { useCreateMeasurementTable } from "../../hooks";
+import { useCreateMeasurementTable } from "views/MeasurementView/hooks/useCreateMeasurementTable";
 
 import { DividerWithLoading } from "components/ui";
 import { MeasurementGroupOptions } from "./MeasurementGroupOptions";

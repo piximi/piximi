@@ -142,23 +142,17 @@ export const prepareThingData = async (thingData: {
   let channelData: Tensor2D;
   let maskData: DataArray | undefined = undefined;
   let maskShape: { width: number; height: number } | undefined;
-  let prep_t0 = 0;
-  let prep_tf = 0;
-  let mask_t0 = 0;
-  let mask_tf = 0;
-  let dec_t0 = 0;
-  let dec_tf = 0;
+
   if (thingData.decodedMask) {
     // Use pre-decoded mask to filter pixels
-    prep_t0 = performance.now();
+
     const fullChannelData = prepareChannels(thingData.data);
-    prep_tf = performance.now();
-    mask_t0 = performance.now();
+
     channelData = await getObjectMaskData(
       fullChannelData,
       thingData.decodedMask,
     );
-    mask_tf = performance.now();
+
     fullChannelData.dispose();
     maskData = thingData.decodedMask;
     maskShape = {
@@ -167,15 +161,13 @@ export const prepareThingData = async (thingData: {
     };
   } else if (thingData.encodedMask) {
     // Decode mask first, then filter pixels
-    dec_t0 = performance.now();
+
     const decodedMask = Uint8Array.from(decode(thingData.encodedMask));
-    dec_tf = performance.now();
-    prep_t0 = performance.now();
+
     const fullChannelData = prepareChannels(thingData.data);
-    prep_tf = performance.now();
-    mask_t0 = performance.now();
+
     channelData = await getObjectMaskData(fullChannelData, decodedMask);
-    mask_tf = performance.now();
+
     fullChannelData.dispose();
     maskData = decodedMask;
     maskShape = {
@@ -184,9 +176,8 @@ export const prepareThingData = async (thingData: {
     };
   } else {
     // No mask - use all pixels
-    prep_t0 = performance.now();
+
     channelData = prepareChannels(thingData.data);
-    prep_tf = performance.now();
   }
   const thingInfo = {
     channels: channelData.arraySync(),
@@ -195,12 +186,5 @@ export const prepareThingData = async (thingData: {
   };
   channelData.dispose();
 
-  return {
-    thingInfo,
-    perf: {
-      prep: prep_tf - prep_t0,
-      mask: mask_tf - mask_t0,
-      dec: dec_tf - dec_t0,
-    },
-  };
+  return thingInfo;
 };

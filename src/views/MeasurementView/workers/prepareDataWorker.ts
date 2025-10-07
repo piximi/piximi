@@ -1,57 +1,68 @@
-import { tensor4d } from "@tensorflow/tfjs";
+import { setBackend, tensor4d } from "@tensorflow/tfjs";
+import { expose } from "comlink";
 
 import { prepareThingData } from "../utils";
 
 import { ThingData } from "store/measurements/types";
 import { DataArray } from "store/data/types";
 
+await setBackend("cpu");
+
 /**
- * Web Worker that processes image/object data for measurements.
+ * Web Worker API exposed via Comlink that processes image/object data for measurements.
  * Receives a collection of "things" (images/objects), converts their raw data to tensors,
  * applies masks if present, and prepares channel data for measurement calculations.
- * Reports progress as a percentage during processing.
+ * Reports progress as a percentage during processing via callback.
  */
-self.onmessage = async (
-  e: MessageEvent<{
+
+/**
+ * Processes thing data and prepares it for measurements.
+ * @param kind - The kind/type of things being processed
+ * @param things - Array of thing data to process
+ * @param onProgress - Optional callback to report processing progress (0-100)
+ * @returns Object containing the kind and processed thing data
+ */
+async function processPrepareData(
+  kind: string,
+  things: {
+    id: string;
     kind: string;
-    things: {
-      id: string;
-      kind: string;
-      data: number[][][][];
-      encodedMask?: number[];
-      decodedMask?: DataArray;
-    }[];
-  }>,
-) => {
+    data: number[][][][];
+    encodedMask?: number[];
+    decodedMask?: DataArray;
+  }[],
+  onProgress?: (progress: number) => void,
+) {
   const thingInfo: ThingData = {};
-  const thingCount = e.data.things.length;
-  let i = 0;
-  const perf_total = { transfer: 0, prepChan: 0, getMaskData: 0, dec: 0 };
+  const thingCount = things.length;
+
   // Process each thing sequentially, preparing its data for measurements
-  for await (const thingData of e.data.things) {
+  for (let i = 0; i < things.length; i++) {
+    const thingData = things[i];
     const { id, data: rawData, encodedMask, decodedMask } = thingData;
 
     // Convert raw 4D array to TensorFlow tensor (planes, height, width, channels)
-    const trans_t0 = performance.now();
     const data = tensor4d(rawData);
-    const trans_tf = performance.now();
-    const { thingInfo: preparedThing, perf } = await prepareThingData({
+    const preparedThing = await prepareThingData({
       data,
       encodedMask,
       decodedMask,
     });
-    perf_total.prepChan += perf.prep;
-    perf_total.getMaskData += perf.mask;
-    perf_total.dec += perf.dec;
-    perf_total.transfer += trans_tf - trans_t0;
+
     thingInfo[id] = preparedThing;
-    // Report progress to main thread
-    self.postMessage({ loadValue: Math.floor((i / thingCount) * 100) });
-    i++;
+
+    // Report progress via callback if provided
+    if (onProgress) {
+      onProgress(Math.floor((i / thingCount) * 100));
+    }
   }
-  console.log(perf_total);
-  // Send final processed data back to main thread
-  self.postMessage({ kind: e.data.kind, data: thingInfo });
+
+  // Return final processed data
+  return { kind, data: thingInfo };
+}
+
+const api = {
+  processPrepareData,
 };
 
-export {};
+expose(api);

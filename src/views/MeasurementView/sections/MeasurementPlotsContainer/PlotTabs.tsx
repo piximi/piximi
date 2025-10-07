@@ -2,7 +2,8 @@ import { useCallback } from "react";
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 
-import { useMeasurementParameters, usePlotControl } from "../../hooks";
+import { useMeasurementParameters } from "views/MeasurementView/hooks/useMeasurementParameters";
+import { usePlotControl } from "views/MeasurementView/hooks/usePlotControl";
 
 import { CustomTabs } from "components/layout";
 import {

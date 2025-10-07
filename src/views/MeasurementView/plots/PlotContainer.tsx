@@ -3,7 +3,7 @@ import saveAs from "file-saver";
 import { Box, Button } from "@mui/material";
 
 import { usePreferredNivoTheme } from "hooks";
-import { usePlotControl } from "../hooks";
+import { usePlotControl } from "../hooks/usePlotControl";
 
 export const PlotContainer = ({ children }: { children: ReactNode }) => {
   const plotRef = useRef<HTMLDivElement | null>(null);

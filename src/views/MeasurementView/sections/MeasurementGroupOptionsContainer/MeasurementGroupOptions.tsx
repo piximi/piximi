@@ -14,7 +14,7 @@ import {
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
 
-import { useTableExport } from "../../hooks";
+import { useTableExport } from "views/MeasurementView/hooks/useTableExport";
 
 import { DividerHeader, DividerWithLoading } from "components/ui";
 import { SplitTree } from "./SplitTree";
