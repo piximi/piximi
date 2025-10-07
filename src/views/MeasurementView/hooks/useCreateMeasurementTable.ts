@@ -40,7 +40,7 @@ export const useCreateMeasurementTable = () => {
   const workerApis = useMemo(() => {
     return Array.from({ length: NUM_WORKERS }, () => {
       const worker = new Worker(
-        new URL("./workers/prepareDataWorker.ts", import.meta.url),
+        new URL("../workers/prepareDataWorker.ts", import.meta.url),
         { type: "module" },
       );
       return wrap<PrepareDataWorkerAPI>(worker);
@@ -74,7 +74,7 @@ export const useCreateMeasurementTable = () => {
         data: number[][][][];
         encodedMask?: number[];
         decodedMask?: DataArray;
-      }[] = thingIds.map((thingId, idx) => {
+      }[] = thingIds.map((thingId) => {
         const thing = thingData[thingId]!;
         if ("encodedMask" in thing) {
           const dataArray = thing.data.arraySync();
@@ -109,7 +109,13 @@ export const useCreateMeasurementTable = () => {
             const avgProgress =
               progressTrackers.reduce((sum, p) => sum + p, 0) /
               progressTrackers.length;
-            setStatus({ loading: true, value: Math.floor(avgProgress) });
+            const newStatus = Math.floor(avgProgress);
+            setStatus((prev) => {
+              if (prev.value !== newStatus) {
+                return { loading: true, value: newStatus };
+              }
+              return prev;
+            });
           };
 
           // Process chunks in parallel
