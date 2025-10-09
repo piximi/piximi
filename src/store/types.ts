@@ -67,7 +67,6 @@ export type DataState = {
     metadataToTracklets: Record<string, string[]>;
   };
 
-  linkGraph: Record<string, LinkNode>;
   tracklets: Record<string, Tracklet>;
 };
 

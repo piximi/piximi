@@ -1,17 +1,9 @@
-import {
-  tensor2d,
-  Tensor2D,
-  tensor4d,
-  Tensor4D,
-  setBackend,
-} from "@tensorflow/tfjs";
+import { tensor4d, setBackend } from "@tensorflow/tfjs";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { configureStore } from "@reduxjs/toolkit";
 import { dataSlice } from "./dataSlice";
 import {
   categorySelectors,
-  imageDataSelectors,
-  annotationSelectors,
   selectAllCategories,
   selectAllMetadata,
   selectAllImageData,
@@ -25,14 +17,12 @@ import {
   ImageData,
   AnnotationObject,
 } from "./types";
-import { DataState } from "store/types";
 import { Partition } from "utils/models/enums";
 import { selectAllKinds } from "./selectors";
 import { generateUUID } from "./utils";
 import { IMAGE_KIND } from "./constants";
+import { RootState } from "store/rootReducer";
 
-// Mock tensor disposal
-const mockDispose = vi.fn();
 setBackend("cpu");
 
 // Mock data factories
@@ -90,10 +80,10 @@ const createMockImageData = (overrides = {}): ImageData => ({
   src: "test.png",
   activePlane: 0,
   colors: {
-    color: tensor2d([
-      [1, 2],
-      [3, 4],
-    ]),
+    color: [
+      [0, 0, 0],
+      [1, 1, 1],
+    ],
     range: { 0: [0, 1] },
     visible: { 0: true },
   },
@@ -134,7 +124,7 @@ describe("Data Slice", () => {
 
   beforeEach(() => {
     store = configureStore({
-      reducer: dataSlice.reducer,
+      reducer: { data: dataSlice.reducer },
       middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
           serializableCheck: false,
@@ -142,21 +132,22 @@ describe("Data Slice", () => {
     });
   });
 
-  const getState = () => store.getState() as DataState;
+  const getState = () => store.getState() as RootState;
 
   describe("Kind Operations", () => {
     it("should add a kind", () => {
       const kindAndCat = createMockKind();
       store.dispatch(dataSlice.actions.addKind(kindAndCat));
       const state = getState();
+      const dataState = state.data;
       const allKinds = kindSelectors.selectAll(state);
       const allCategories = categorySelectors.selectAll(state);
       expect(allKinds).toContainEqual(kindAndCat.kind);
       expect(allCategories).toContainEqual(kindAndCat.unknownCategory);
-      expect(state.relationships.kindToCategories["kind1"]).toEqual([
+      expect(dataState.relationships.kindToCategories["kind1"]).toEqual([
         kindAndCat.unknownCategory.id,
       ]);
-      expect(state.relationships.kindToAnnotations["kind1"]).toEqual([]);
+      expect(dataState.relationships.kindToAnnotations["kind1"]).toEqual([]);
     });
 
     it("should update a kind name", () => {
@@ -169,7 +160,7 @@ describe("Data Slice", () => {
         }),
       );
 
-      const state = getState();
+      const state = getState().data;
       const updatedKind = state.kinds.entities["kind1"];
       expect(updatedKind?.displayName).toBe("Updated Kind");
     });
@@ -179,7 +170,7 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.addKind(kind));
       store.dispatch(dataSlice.actions.deleteKind("kind1"));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.kinds.entities["kind1"]).toBeUndefined();
       expect(state.relationships.kindToCategories["kind1"]).toBeUndefined();
       expect(state.relationships.kindToAnnotations["kind1"]).toBeUndefined();
@@ -190,7 +181,7 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.addKind(kind));
       store.dispatch(dataSlice.actions.deleteKindCascade("Images"));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.kinds.entities["Images"]).toBeDefined();
     });
 
@@ -205,7 +196,7 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.addAnnotation(annotation));
 
       // Verify setup
-      let state = getState();
+      let state = getState().data;
       expect(state.kinds.entities["kind1"]).toBeDefined();
       expect(state.categories.entities["cat1"]).toBeDefined();
       expect(state.annotations.entities["ann1"]).toBeDefined();
@@ -216,7 +207,7 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.deleteKindCascade("kind1"));
 
       // Verify all entities are deleted
-      state = getState();
+      state = getState().data;
       expect(state.kinds.entities["kind1"]).toBeUndefined();
       expect(state.categories.entities["cat1"]).toBeUndefined();
       expect(state.annotations.entities["ann1"]).toBeUndefined();
@@ -233,7 +224,7 @@ describe("Data Slice", () => {
 
       store.dispatch(dataSlice.actions.batchAddKind(kinds));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.kinds.entities["kind1"]).toBeDefined();
       expect(state.kinds.entities["kind2"]).toBeDefined();
       expect(state.kinds.entities["kind3"]).toBeDefined();
@@ -257,7 +248,7 @@ describe("Data Slice", () => {
       });
       store.dispatch(dataSlice.actions.addCategory(category));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.categories.entities[category.name]).toBeUndefined();
       expect(
         state.relationships.kindToCategories[category.kind],
@@ -277,7 +268,7 @@ describe("Data Slice", () => {
       const category = createMockCategory();
       store.dispatch(dataSlice.actions.addCategory(category));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.categories.entities["cat1"]).toEqual(category);
       expect(state.relationships.kindToCategories["kind1"]).toContain("cat1");
       expect(state.relationships.categoryToImages["cat1"]).toEqual([]);
@@ -295,7 +286,7 @@ describe("Data Slice", () => {
         }),
       );
 
-      const state = getState();
+      const state = getState().data;
       const updated = state.categories.entities["cat1"];
       expect(updated?.name).toBe("Updated Category");
       expect(updated?.color).toBe("#00FF00");
@@ -306,11 +297,11 @@ describe("Data Slice", () => {
         .spyOn(console, "error")
         .mockImplementation(() => {});
 
-      let state = getState();
+      let state = getState().data;
       const unknownCategoryId = state.kinds.entities["kind1"].unknownCategoryId;
       expect(unknownCategoryId).toBeDefined();
       store.dispatch(dataSlice.actions.deleteCategory(unknownCategoryId));
-      state = getState();
+      state = getState().data;
       expect(state.categories.entities[unknownCategoryId]).toBeDefined();
       expect(consoleError).toHaveBeenCalledWith(
         "Cannot remove unknown Category",
@@ -324,7 +315,7 @@ describe("Data Slice", () => {
 
       store.dispatch(dataSlice.actions.deleteCategory("cat1"));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.categories.entities["cat1"]).toBeUndefined();
       expect(state.relationships.kindToCategories["kind1"]).not.toContain(
         "cat1",
@@ -334,28 +325,24 @@ describe("Data Slice", () => {
     });
 
     it("should cascade delete category and reassign to unknown for images", () => {
-      const { kind: imageKind, unknownCategory } = createMockKind({
-        id: IMAGE_KIND,
-      });
-
       const category = createMockCategory({ id: "cat1", kind: IMAGE_KIND });
+
       const metadata = createMockImageMetadata();
       const image = createMockImageData({
         categoryId: "cat1",
         metadataId: "meta1",
       });
 
-      store.dispatch(
-        dataSlice.actions.addKind({ kind: imageKind, unknownCategory }),
-      );
       store.dispatch(dataSlice.actions.addCategory(category));
       store.dispatch(
         dataSlice.actions.addMetadata({ metadata, images: [image] }),
       );
 
       store.dispatch(dataSlice.actions.deleteCategoryCascade("cat1"));
-
-      const state = getState();
+      const state = getState().data;
+      const imageKind = state.kinds.entities[IMAGE_KIND];
+      const unknownCategory =
+        state.categories.entities[imageKind.unknownCategoryId];
       expect(state.categories.entities["cat1"]).toBeUndefined();
       expect(
         state.relationships.categoryToImages[unknownCategory.id],
@@ -385,7 +372,7 @@ describe("Data Slice", () => {
 
       store.dispatch(dataSlice.actions.deleteCategoryCascade("cat2"));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.categories.entities["cat2"]).toBeUndefined();
       expect(
         state.relationships.categoryToAnnotations[unknownCategory.id],
@@ -402,7 +389,7 @@ describe("Data Slice", () => {
 
       store.dispatch(dataSlice.actions.batchAddCategory(categories));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.categories.entities["cat1"]).toBeDefined();
       expect(state.categories.entities["cat2"]).toBeDefined();
       expect(state.categories.entities["cat3"]).toBeDefined();
@@ -420,7 +407,7 @@ describe("Data Slice", () => {
         dataSlice.actions.batchDeleteCategoryCascade(["cat1", "cat3"]),
       );
 
-      const state = getState();
+      const state = getState().data;
       expect(state.categories.entities["cat1"]).toBeUndefined();
       expect(state.categories.entities["cat2"]).toBeDefined();
       expect(state.categories.entities["cat3"]).toBeUndefined();
@@ -441,7 +428,7 @@ describe("Data Slice", () => {
 
       store.dispatch(dataSlice.actions.batchDeleteCategoriesByKind("kind2"));
 
-      const state = getState();
+      const state = getState().data;
       // Regular categories should be deleted
       expect(state.categories.entities["cat1"]).toBeUndefined();
       expect(state.categories.entities["cat2"]).toBeUndefined();
@@ -459,7 +446,7 @@ describe("Data Slice", () => {
         dataSlice.actions.addMetadata({ metadata, images: [image] }),
       );
 
-      const state = getState();
+      const state = getState().data;
       expect(state.metadata.entities["meta1"]).toEqual(metadata);
       expect(state.images.entities["img1"]).toEqual(image);
       expect(state.relationships.imageToAnnotations["img1"]).toEqual([]);
@@ -485,7 +472,7 @@ describe("Data Slice", () => {
 
       store.dispatch(dataSlice.actions.batchAddMetadata(metadataGroup));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.metadata.entities["meta1"]).toBeDefined();
       expect(state.metadata.entities["meta2"]).toBeDefined();
       expect(state.images.entities["img1"]).toBeDefined();
@@ -536,7 +523,7 @@ describe("Data Slice", () => {
         }),
       );
 
-      const state = getState();
+      const state = getState().data;
       expect(state.metadata.entities["meta1"]?.defaultImageId).toBe("img2");
     });
 
@@ -563,7 +550,7 @@ describe("Data Slice", () => {
       const image = createMockImageData();
       store.dispatch(dataSlice.actions.addImageData(image));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.images.entities["img1"]).toEqual(image);
       expect(state.relationships.imageToAnnotations["img1"]).toEqual([]);
       expect(state.relationships.categoryToImages["cat1"]).toContain("img1");
@@ -586,7 +573,7 @@ describe("Data Slice", () => {
         }),
       );
 
-      const state = getState();
+      const state = getState().data;
       const updated = state.images.entities["img1"];
       expect(updated?.categoryId).toBe("cat2");
       expect(updated?.partition).toBe("validation");
@@ -609,7 +596,7 @@ describe("Data Slice", () => {
       );
       store.dispatch(dataSlice.actions.deleteImageData("img1"));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.images.entities["img1"]).toBeUndefined();
       expect(state.metadata.entities["meta1"]?.imageDataIds).not.toContain(
         "img1",
@@ -631,7 +618,7 @@ describe("Data Slice", () => {
 
       store.dispatch(dataSlice.actions.deleteImageCascade("img1"));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.images.entities["img1"]).toBeUndefined();
       expect(state.annotations.entities["ann1"]).toBeUndefined();
       expect(state.annotations.entities["ann2"]).toBeUndefined();
@@ -656,7 +643,7 @@ describe("Data Slice", () => {
 
       store.dispatch(dataSlice.actions.batchUpdateImageData(updates));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.images.entities["img1"]?.partition).toBe("validation");
       expect(state.images.entities["img2"]?.categoryId).toBe("cat2");
     });
@@ -674,7 +661,7 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.addMetadata({ metadata, images }));
       store.dispatch(dataSlice.actions.batchDeleteImageData(["img1", "img3"]));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.images.entities["img1"]).toBeUndefined();
       expect(state.images.entities["img2"]).toBeDefined();
       expect(state.images.entities["img3"]).toBeUndefined();
@@ -699,7 +686,7 @@ describe("Data Slice", () => {
         dataSlice.actions.batchDeleteImageDataCascade(["img1", "img2"]),
       );
 
-      const state = getState();
+      const state = getState().data;
       expect(state.images.entities["img1"]).toBeUndefined();
       expect(state.images.entities["img2"]).toBeUndefined();
       expect(state.annotations.entities["ann1"]).toBeUndefined();
@@ -717,7 +704,7 @@ describe("Data Slice", () => {
       );
       store.dispatch(dataSlice.actions.batchDeleteImageData(["img1", "img2"]));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.metadata.entities["meta1"]).toBeUndefined();
       expect(state.images.entities["img1"]).toBeUndefined();
       expect(state.images.entities["img2"]).toBeUndefined();
@@ -737,7 +724,7 @@ describe("Data Slice", () => {
       const annotation = createMockAnnotation();
       store.dispatch(dataSlice.actions.addAnnotation(annotation));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.annotations.entities["ann1"]).toEqual(annotation);
       expect(state.relationships.imageToAnnotations["img1"]).toContain("ann1");
       expect(state.relationships.categoryToAnnotations["cat1"]).toContain(
@@ -765,7 +752,7 @@ describe("Data Slice", () => {
         }),
       );
 
-      const state = getState();
+      const state = getState().data;
       const updated = state.annotations.entities["ann1"];
       expect(updated?.categoryId).toBe("cat2");
       expect(updated?.name).toBe("Updated Annotation");
@@ -791,7 +778,7 @@ describe("Data Slice", () => {
         }),
       );
 
-      const state = getState();
+      const state = getState().data;
       expect(state.annotations.entities["ann1"]?.kind).toBe("new-kind");
       expect(
         state.relationships.kindToAnnotations["annotation-kind"],
@@ -807,7 +794,7 @@ describe("Data Slice", () => {
 
       store.dispatch(dataSlice.actions.deleteAnnotation("ann1"));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.annotations.entities["ann1"]).toBeUndefined();
       expect(state.relationships.imageToAnnotations["img1"]).not.toContain(
         "ann1",
@@ -829,7 +816,7 @@ describe("Data Slice", () => {
 
       store.dispatch(dataSlice.actions.batchAddAnnotations(annotations));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.annotations.entities["ann1"]).toBeDefined();
       expect(state.annotations.entities["ann2"]).toBeDefined();
       expect(state.annotations.entities["ann3"]).toBeDefined();
@@ -855,7 +842,7 @@ describe("Data Slice", () => {
 
       store.dispatch(dataSlice.actions.batchUpdateAnnotation(updates));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.annotations.entities["ann1"]?.name).toBe("Updated 1");
       expect(state.annotations.entities["ann2"]?.name).toBe("Updated 2");
     });
@@ -872,7 +859,7 @@ describe("Data Slice", () => {
         dataSlice.actions.batchDeleteAnnotations(["ann1", "ann3"]),
       );
 
-      const state = getState();
+      const state = getState().data;
       expect(state.annotations.entities["ann1"]).toBeUndefined();
       expect(state.annotations.entities["ann2"]).toBeDefined();
       expect(state.annotations.entities["ann3"]).toBeUndefined();
@@ -891,7 +878,7 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.batchAddAnnotations(annotations));
       store.dispatch(dataSlice.actions.deleteAnnotationsOfCategory("cat2"));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.annotations.entities["ann1"]).toBeDefined();
       expect(state.annotations.entities["ann2"]).toBeUndefined();
       expect(state.annotations.entities["ann3"]).toBeUndefined();
@@ -909,45 +896,17 @@ describe("Data Slice", () => {
       );
 
       store.dispatch(
-        dataSlice.actions.addLinkNode({
-          id: "ann1",
-          time: 0,
-          globalId: "global1",
-          parentIds: ["parent1"],
-          childIds: ["child1"],
-        }),
-      );
-      store.dispatch(
-        dataSlice.actions.addLinkNode({
-          id: "parent1",
-          time: 0,
-          globalId: "global1",
-          parentIds: [],
-          childIds: ["ann1"],
-        }),
-      );
-      store.dispatch(
-        dataSlice.actions.addLinkNode({
-          id: "child1",
-          time: 0,
-          globalId: "global1",
-          parentIds: ["ann1"],
-          childIds: [],
-        }),
-      );
-      store.dispatch(
         dataSlice.actions.addTracklet({
+          metadataId: "metaId",
           trackId: "global1",
+          color: "",
           linkedIds: ["ann1", "parent1", "child1"],
         }),
       );
       store.dispatch(dataSlice.actions.deleteAnnotation("ann1"));
 
-      const state = getState();
+      const state = getState().data;
       expect(state.annotations.entities["ann1"]).toBeUndefined();
-      expect(state.linkGraph["ann1"]).toBeUndefined();
-      expect(state.linkGraph["parent1"]?.childIds).not.toContain("ann1");
-      expect(state.linkGraph["child1"]?.parentIds).not.toContain("ann1");
       expect(state.tracklets["global1"]?.linkedIds).not.toContain("ann1");
     });
   });
@@ -970,20 +929,26 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.clearAll());
 
       const state = getState();
+
       const allKinds = selectAllKinds(state);
       const allCategories = selectAllCategories(state);
       const allMetadata = selectAllMetadata(state);
       const allImages = selectAllImageData(state);
       const allAnnotations = selectAllAnnotations(state);
 
-      expect(allKinds).toHaveLength(0);
-      expect(allCategories).toHaveLength(0);
+      expect(allKinds).toHaveLength(1); // IMAGE_KIND
+      expect(allKinds[0].id).toBe(IMAGE_KIND);
+      expect(allCategories).toHaveLength(1); // Unknown image category
+      expect(allCategories[0].name).toBe("Unknown");
       expect(allMetadata).toHaveLength(0);
       expect(allImages).toHaveLength(0);
       expect(allAnnotations).toHaveLength(0);
-      expect(Object.keys(state.relationships.kindToCategories)).toHaveLength(0);
-      expect(Object.keys(state.linkGraph)).toHaveLength(0);
-      expect(Object.keys(state.tracklets)).toHaveLength(0);
+
+      const dataState = state.data;
+      expect(
+        Object.keys(dataState.relationships.kindToCategories),
+      ).toHaveLength(1);
+      expect(Object.keys(dataState.tracklets)).toHaveLength(0);
     });
   });
 
@@ -1007,7 +972,7 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.addAnnotation(annotation));
 
       // Verify relationships are set up
-      let state = getState();
+      let state = getState().data;
       expect(state.relationships.kindToAnnotations["kind1"]).toContain("ann1");
       expect(state.relationships.categoryToAnnotations["cat1"]).toContain(
         "ann1",
@@ -1017,7 +982,7 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.deleteAnnotation("ann1"));
 
       // Verify all relationships are cleaned up
-      state = getState();
+      state = getState().data;
       expect(state.relationships.kindToAnnotations["kind1"]).not.toContain(
         "ann1",
       );
@@ -1093,7 +1058,7 @@ describe("Data Slice", () => {
       // Delete annotation kind cascade
       store.dispatch(dataSlice.actions.deleteKindCascade("Annotation"));
 
-      const state = getState();
+      const state = getState().data;
 
       // Annotation kind and its categories should be gone (except unknown)
       expect(state.kinds.entities["Annotation"]).toBeUndefined();
@@ -1130,14 +1095,14 @@ describe("Data Slice", () => {
       // Delete the default image
       store.dispatch(dataSlice.actions.deleteImageData("img2"));
 
-      let state = getState();
+      let state = getState().data;
       // Should update to first available image
       expect(state.metadata.entities["meta1"]?.defaultImageId).toBe("img1");
 
       // Delete img1
       store.dispatch(dataSlice.actions.deleteImageData("img1"));
 
-      state = getState();
+      state = getState().data;
       // Should update to the last remaining image
       expect(state.metadata.entities["meta1"]?.defaultImageId).toBe("img3");
     });
@@ -1178,7 +1143,7 @@ describe("Data Slice", () => {
       );
 
       // None of these should throw or cause issues
-      const state = getState();
+      const state = getState().data;
       expect(state).toBeDefined();
     });
 
@@ -1190,7 +1155,7 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.deleteAnnotation("non-existent"));
 
       // None of these should throw
-      const state = getState();
+      const state = getState().data;
       expect(state).toBeDefined();
     });
   });

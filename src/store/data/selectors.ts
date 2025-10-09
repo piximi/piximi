@@ -22,10 +22,10 @@ import {
 } from "./types";
 import { getKindItemsFromImages } from "./utils";
 
-const kindSelectors = kindsAdapter.getSelectors(
+export const kindSelectors = kindsAdapter.getSelectors(
   (state: RootState) => state.data.kinds,
 );
-const categorySelectors = categoriesAdapter.getSelectors(
+export const categorySelectors = categoriesAdapter.getSelectors(
   (state: RootState) => state.data.categories,
 );
 

@@ -68,7 +68,6 @@ const initialState: DataState = {
     imageToAnnotations: {},
     metadataToTracklets: {},
   },
-  linkGraph: {},
   tracklets: {},
 };
 
@@ -82,6 +81,11 @@ export const dataSlice = createSlice({
       action: PayloadAction<{ kind: Kind; unknownCategory?: Category }>,
     ) => {
       const kind = action.payload.kind;
+      // Prevent overwriting IMAGE_KIND
+      if (kind.id === IMAGE_KIND && state.kinds.entities[IMAGE_KIND]) {
+        console.error("Cannot recreate IMAGE_KIND - it already exists");
+        return;
+      }
       let unknownCategory = action.payload.unknownCategory;
       // Validation
 
@@ -266,6 +270,11 @@ export const dataSlice = createSlice({
       if (kind.id === IMAGE_KIND) {
         const imageIds = state.relationships.categoryToImages[categoryId] || [];
         imageIds.forEach((imageId) => {
+          // Update image entity
+          imageDataAdapter.updateOne(state.images, {
+            id: imageId,
+            changes: { categoryId: unknownCategoryId },
+          });
           // Update relationships
           removeFromSimpleRelationship(
             state.relationships.categoryToImages,
@@ -284,6 +293,11 @@ export const dataSlice = createSlice({
         const annIds =
           state.relationships.categoryToAnnotations[categoryId] || [];
         annIds.forEach((annId) => {
+          // Update annotation entity
+          annotationsAdapter.updateOne(state.annotations, {
+            id: annId,
+            changes: { categoryId: unknownCategoryId },
+          });
           // Update relationships
           removeFromSimpleRelationship(
             state.relationships.categoryToAnnotations,
@@ -477,8 +491,11 @@ export const dataSlice = createSlice({
             annId,
           );
           // Clean up link graph
-          if (state.linkGraph[annId]) {
-            delete state.linkGraph[annId];
+          if (annotation.trackId) {
+            dataSlice.caseReducers.removeAnnotationFromTrackletRecord(state, {
+              payload: { trackId: annotation.trackId, annId },
+              type: "removeAnnotationFromTrackletRecord",
+            });
           }
           annotation.data.dispose();
         }
@@ -616,40 +633,11 @@ export const dataSlice = createSlice({
       );
 
       // Clean up link graph
-      if (state.linkGraph[annotationId]) {
-        const linkNode = state.linkGraph[annotationId];
-
-        // Update parent nodes to remove this child
-        linkNode.parentIds?.forEach((parentId) => {
-          if (state.linkGraph[parentId]) {
-            state.linkGraph[parentId].childIds = state.linkGraph[
-              parentId
-            ].childIds.filter((childId) => childId !== annotationId);
-          }
+      if (annotation.trackId) {
+        dataSlice.caseReducers.removeAnnotationFromTrackletRecord(state, {
+          payload: { trackId: annotation.trackId, annId: annotation.id },
+          type: "removeAnnotationFromTrackletRecord",
         });
-
-        // Update child nodes to remove this parent
-        linkNode.childIds?.forEach((childId) => {
-          if (state.linkGraph[childId]) {
-            state.linkGraph[childId].parentIds = state.linkGraph[
-              childId
-            ].parentIds.filter((parentId) => parentId !== annotationId);
-          }
-        });
-
-        // Remove from global annotations
-        if (linkNode.globalId && state.tracklets[linkNode.globalId]) {
-          mutatingFilter(
-            state.tracklets[linkNode.globalId].linkedIds,
-            (id) => id !== annotationId,
-          );
-
-          if (state.tracklets[linkNode.globalId].linkedIds.length === 0) {
-            delete state.tracklets[linkNode.globalId];
-          }
-        }
-
-        delete state.linkGraph[annotationId];
       }
 
       // Delete the annotation
@@ -660,21 +648,56 @@ export const dataSlice = createSlice({
     addTracklet: (state, action: PayloadAction<Tracklet>) => {
       const tracklet = action.payload;
       state.tracklets[tracklet.trackId] = tracklet;
+      // Initialize array if it doesn't exist
+      if (!state.relationships.metadataToTracklets[tracklet.metadataId]) {
+        state.relationships.metadataToTracklets[tracklet.metadataId] = [];
+      }
       state.relationships.metadataToTracklets[tracklet.metadataId].push(
         tracklet.trackId,
       );
+
+      // Update all linked annotations with trackId
+      if (tracklet.linkedIds && tracklet.linkedIds.length > 0) {
+        annotationsAdapter.updateMany(
+          state.annotations,
+          tracklet.linkedIds.map((annId) => ({
+            id: annId,
+            changes: { trackId: tracklet.trackId },
+          })),
+        );
+      }
     },
 
     deleteTracklet: (state, action: PayloadAction<string>) => {
       const trackId = action.payload;
-      const trackletMetadataId = state.tracklets[trackId].metadataId;
+      const tracklet = state.tracklets[trackId];
+      const trackletMetadataId = tracklet.metadataId;
+      const linkedAnnotations = tracklet.linkedIds;
+      const children = tracklet.children;
+      const parents = tracklet.parents;
 
-      // Remove globalId from all link nodes
-      Object.values(state.linkGraph).forEach((node) => {
-        if (node.globalId === trackId) {
-          node.globalId = "";
-        }
-      });
+      annotationsAdapter.updateMany(
+        state.annotations,
+        linkedAnnotations.map((annId) => ({
+          id: annId,
+          changes: { trackId: undefined },
+        })),
+      );
+      if (children)
+        children.forEach((childId) =>
+          mutatingFilter(
+            state.tracklets[childId].parents!,
+            (id) => id !== trackId,
+          ),
+        );
+
+      if (parents)
+        parents.forEach((parentId) =>
+          mutatingFilter(
+            state.tracklets[parentId].children!,
+            (id) => id !== trackId,
+          ),
+        );
 
       delete state.tracklets[trackId];
       removeFromSimpleRelationship(
@@ -1079,39 +1102,11 @@ export const dataSlice = createSlice({
           );
 
           // Clean up link graph
-          if (state.linkGraph[annotationId]) {
-            const linkNode = state.linkGraph[annotationId];
-
-            // Update parent nodes to remove this child
-            linkNode.parentIds?.forEach((parentId) => {
-              if (state.linkGraph[parentId]) {
-                state.linkGraph[parentId].childIds = state.linkGraph[
-                  parentId
-                ].childIds.filter((childId) => childId !== annotationId);
-              }
+          if (annotation.trackId) {
+            dataSlice.caseReducers.removeAnnotationFromTrackletRecord(state, {
+              payload: { trackId: annotation.trackId, annId: annotation.id },
+              type: "removeAnnotationFromTrackletRecord",
             });
-
-            // Update child nodes to remove this parent
-            linkNode.childIds?.forEach((childId) => {
-              if (state.linkGraph[childId]) {
-                state.linkGraph[childId].parentIds = state.linkGraph[
-                  childId
-                ].parentIds.filter((parentId) => parentId !== annotationId);
-              }
-            });
-
-            // Remove from global annotations
-            if (linkNode.globalId && state.tracklets[linkNode.globalId]) {
-              mutatingFilter(
-                state.tracklets[linkNode.globalId].linkedIds,
-                (id) => id !== annotationId,
-              );
-              if (state.tracklets[linkNode.globalId].linkedIds.length === 0) {
-                delete state.tracklets[linkNode.globalId];
-              }
-            }
-
-            delete state.linkGraph[annotationId];
           }
         }
       });
