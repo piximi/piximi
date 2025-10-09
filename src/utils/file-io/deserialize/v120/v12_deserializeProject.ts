@@ -444,6 +444,7 @@ const deserializeProjectGroup = async (
     Object.values(categories.entities),
     Object.values(images.entities),
     Object.values(annotations.entities),
+    metadata.ids,
   );
 
   return {

@@ -65,6 +65,9 @@ importers:
       '@types/path-parse':
         specifier: ^1.0.22
         version: 1.0.22
+      '@types/react-transition-group':
+        specifier: ^4.4.12
+        version: 4.4.12(@types/react@17.0.85)
       dicom-parser:
         specifier: ^1.8.13
         version: 1.8.21
@@ -140,6 +143,9 @@ importers:
       react-router-dom:
         specifier: 6.4.0
         version: 6.4.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+      react-transition-group:
+        specifier: ^4.4.5
+        version: 4.4.5(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react-window:
         specifier: ^1.8.10
         version: 1.8.11(react-dom@17.0.2(react@17.0.2))(react@17.0.2)

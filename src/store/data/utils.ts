@@ -391,6 +391,7 @@ export const generateDataRelationships = (
   categories: Array<V12Category>,
   images: Array<V12ImageData>,
   annotations: Array<V12AnnotationObject>,
+  metadata: Array<string>,
 ) => {
   const relationships: DataState["relationships"] = {
     kindToCategories: {},
@@ -398,6 +399,7 @@ export const generateDataRelationships = (
     categoryToImages: {},
     categoryToAnnotations: {},
     imageToAnnotations: {},
+    metadataToTracklets: {},
   };
   kinds.forEach((kind) => {
     relationships.kindToCategories[kind.id] = [];
@@ -426,6 +428,7 @@ export const generateDataRelationships = (
     relationships.kindToAnnotations[annotationKind].push(annotation.id);
     relationships.imageToAnnotations[annotationImage].push(annotation.id);
   });
+  metadata.forEach((id) => (relationships.metadataToTracklets[id] = []));
   return relationships;
 };
 

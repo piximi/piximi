@@ -1,16 +1,26 @@
-import React, { CSSProperties, ReactNode } from "react";
-import { Box, Typography, TypographyProps } from "@mui/material";
+import React, { CSSProperties } from "react";
+import {
+  Box,
+  Typography,
+  TypographyProps,
+  SxProps,
+  Theme,
+} from "@mui/material";
 
-export const HalfDivider = ({
+export const PartialDivider = ({
   headerText,
   containerStyle,
   typographyVariant,
   textTransform,
+  indentPercentage = 7,
+  color,
 }: {
   headerText: string;
-  containerStyle?: CSSProperties;
+  containerStyle?: SxProps<Theme>;
   typographyVariant?: TypographyProps["variant"];
   textTransform?: TypographyProps["textTransform"];
+  indentPercentage?: number;
+  color?: CSSProperties["color"];
 }) => {
   return (
     <Box
@@ -20,7 +30,7 @@ export const HalfDivider = ({
         sx={(theme) => ({
           height: 0,
           borderBottom: `thin solid ${theme.palette.divider}`,
-          width: "7%",
+          width: `${indentPercentage}%`,
         })}
       />
       <Typography
@@ -35,15 +45,16 @@ export const HalfDivider = ({
           fontWeight: "400",
           lineHeight: "1.43",
           letterSpacing: "0.01071em",
+          color: color,
         }}
       >
         {headerText}
       </Typography>
       <Box
-        sx={(theme) => ({
+        sx={{
           height: 0,
           flexGrow: 1,
-        })}
+        }}
       />
     </Box>
   );
