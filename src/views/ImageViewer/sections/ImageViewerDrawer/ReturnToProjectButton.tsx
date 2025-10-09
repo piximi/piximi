@@ -32,7 +32,6 @@ export const ReturnToProjectButton = () => {
   const handleReturnToMainProject = () => {
     if (!hasUnsavedChanged) {
       if (savedData) {
-        console.log(savedData);
         Object.values(savedData.images.entities).forEach((image) =>
           image.data.dispose(),
         );
