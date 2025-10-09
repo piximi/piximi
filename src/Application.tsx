@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import { selectAlertState } from "store/applicationSettings/selectors";
 import { AlertBar } from "components/ui";
 import { WorkerProvider } from "contexts/WorkerProvider";
+import { AppErrorBoundary } from "components/errors/AppErrorBoundary";
 
 export const Application = () => {
   const theme = usePreferredMuiTheme();
@@ -25,20 +26,22 @@ export const Application = () => {
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <FileUploadProvider>
-          <HelpProvider>
-            <HelpOverlay />
-            {alertState.visible && <AlertBar alertState={alertState} />}
-            <BrowserRouter basename={"/"}>
-              <Routes>
-                <Route path="/" element={<WelcomeScreen />} />
-                <Route path="project" element={<ProjectViewer />} />
-                <Route path="imageviewer" element={<ImageViewer />} />
-                {/*<Route path="measurements" element={<MeasurementView />} /> */}
-              </Routes>
-            </BrowserRouter>
-          </HelpProvider>
-        </FileUploadProvider>
+        <AppErrorBoundary>
+          <FileUploadProvider>
+            <HelpProvider>
+              <HelpOverlay />
+              {alertState.visible && <AlertBar alertState={alertState} />}
+              <BrowserRouter basename={"/"}>
+                <Routes>
+                  <Route path="/" element={<WelcomeScreen />} />
+                  <Route path="project" element={<ProjectViewer />} />
+                  <Route path="imageviewer" element={<ImageViewer />} />
+                  {/*<Route path="measurements" element={<MeasurementView />} /> */}
+                </Routes>
+              </BrowserRouter>
+            </HelpProvider>
+          </FileUploadProvider>
+        </AppErrorBoundary>
       </ThemeProvider>
     </StyledEngineProvider>
   );

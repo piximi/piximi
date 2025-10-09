@@ -17,8 +17,8 @@ export const Image = React.forwardRef<
     { stageWidth: _stageWidth, stageHeight: _stageHeight /*, images*/ },
     ref,
   ) => {
-    const activeMetadata = useSelector(selectActiveMetadata)!;
-    const activeImage = useSelector(selectActiveImage)!;
+    const activeMetadata = useSelector(selectActiveMetadata);
+    const activeImage = useSelector(selectActiveImage);
     const dispatch = useDispatch();
     const [htmlImages, setHtmlImages] = useState<HTMLImageElement[]>([]);
 
@@ -42,7 +42,9 @@ export const Image = React.forwardRef<
       }
     }, [activeMetadata, /*stageRef,*/ dispatch]);
 
-    return (
+    return !activeImage ||
+      !activeMetadata ||
+      !activeMetadata.activeSrcs ? null : (
       <>
         {htmlImages.map((image, idx) => (
           <MemoizedKonvaImage
