@@ -1,26 +1,24 @@
-import React, { useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import Konva from "konva";
 import { useDispatch } from "react-redux";
-import { ErrorBoundary } from "react-error-boundary";
 import { Box } from "@mui/material";
 
-import { useMobileView, useUnloadConfirmation } from "hooks";
+import { useErrorHandler, useMobileView, useUnloadConfirmation } from "hooks";
 
-import { FallbackDialog } from "components/dialogs";
 import { ImageViewerDrawer, StageWrapper } from "./sections";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { DIMENSIONS } from "utils/constants";
-import { getStackTraceFromError } from "utils/logUtils";
-import { AlertType, HotkeyContext } from "utils/enums";
+import { HotkeyContext } from "utils/enums";
 import { SideToolBar, TopToolBar } from "./sections/tool-bars";
 import { MobileActionBar } from "./sections/tool-bars/MobileActionBar";
 import { DataProvider } from "./state/DataContext";
 import { DrawerActionSelection } from "./sections/ImageViewerDrawer/DrawerActionSelection";
 import { DrawerViewProvider } from "./state/DrawerViewContext";
 import { TrackletProvider } from "./state/TrackletContext";
+import { ViewErrorBoundary } from "components/errors";
 
 export const ImageViewer = () => {
   const dispatch = useDispatch();
@@ -28,42 +26,7 @@ export const ImageViewer = () => {
   const stageRef = useRef<Konva.Stage>(null);
   const isMobile = useMobileView();
   useUnloadConfirmation();
-
-  const handleError = useCallback(
-    async (e: any) => {
-      e.preventDefault();
-      const error = e.error as Error;
-      const stackTrace = await getStackTraceFromError(error);
-      dispatch(
-        applicationSettingsSlice.actions.updateAlertState({
-          alertState: {
-            alertType: AlertType.Error,
-            name: error.name,
-            description: error.message,
-            stackTrace: stackTrace,
-          },
-        }),
-      );
-    },
-    [dispatch],
-  );
-
-  const handleUncaughtRejection = useCallback(
-    async (e: any) => {
-      e.preventDefault();
-      dispatch(
-        applicationSettingsSlice.actions.updateAlertState({
-          alertState: {
-            alertType: AlertType.Error,
-            name: "Uncaught promise rejection",
-            description: String(e.reason.message),
-            stackTrace: String(e.reason.stack),
-          },
-        }),
-      );
-    },
-    [dispatch],
-  );
+  useErrorHandler();
 
   useEffect(() => {
     dispatch(
@@ -80,17 +43,8 @@ export const ImageViewer = () => {
     };
   }, [dispatch]);
 
-  useEffect(() => {
-    window.addEventListener("error", handleError);
-    window.addEventListener("unhandledrejection", handleUncaughtRejection);
-    return () => {
-      window.removeEventListener("error", handleError);
-      window.removeEventListener("unhandledrejection", handleUncaughtRejection);
-    };
-  }, [handleError, handleUncaughtRejection]);
-
   return (
-    <ErrorBoundary FallbackComponent={FallbackDialog}>
+    <ViewErrorBoundary viewName="ImageViewer">
       <DataProvider>
         <TrackletProvider>
           <DrawerViewProvider>
@@ -128,6 +82,6 @@ export const ImageViewer = () => {
           </DrawerViewProvider>
         </TrackletProvider>
       </DataProvider>
-    </ErrorBoundary>
+    </ViewErrorBoundary>
   );
 };
