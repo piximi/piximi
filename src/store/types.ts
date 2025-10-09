@@ -64,6 +64,7 @@ export type DataState = {
     categoryToAnnotations: Record<string, string[]>;
     categoryToImages: Record<string, string[]>;
     imageToAnnotations: Record<string, string[]>;
+    metadataToTracklets: Record<string, string[]>;
   };
 
   linkGraph: Record<string, LinkNode>;

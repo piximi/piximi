@@ -1,11 +1,6 @@
 import { useTheme } from "@mui/material";
 import { KonvaEventObject } from "konva/lib/Node";
-import {
-  Stage as KonvaStage,
-  Image as KonvaImage,
-  Layer,
-  Line,
-} from "react-konva";
+import { Stage as KonvaStage, Image as KonvaImage, Layer } from "react-konva";
 import {
   useCallback,
   useContext,
@@ -40,19 +35,14 @@ import {
   AnnotationProps,
   AnnotationsProps,
   AnnotationWithImOff,
-  AnnotationWithTrackId,
 } from "./types";
 import {
-  selectActiveTimeLinkedAnnId,
   selectActiveTrackImageToAnnotation,
   selectAllImageViewerAnnotationRecord,
 } from "views/ImageViewer/state/image-viewer-data/reselectors";
 import { colorOverlayROI, hexToRGBA } from "views/ImageViewer/utils";
 import { ProtoAnnotationObject } from "views/ImageViewer/state/types";
-import {
-  UNKNOWN_ANNOTATION_CATEGORY_COLOR,
-  UNKNOWN_IMAGE_CATEGORY_COLOR,
-} from "store/data/constants";
+import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "store/data/constants";
 import { dataSlice } from "store/data";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 
@@ -126,11 +116,8 @@ export const TrackStage = ({
       x: (stage.width() / 2) * stage.scaleX() + stage.x(),
       y: (stage.height() / 2) * stage.scaleX() + stage.y(),
     };
-    // console.log("stageHeight prop: ", stageHeight);
-    // console.log("event.stage.height: ", stage.height());
-    // console.log("imageHeight: ", globalShape.height);
-    //const heightScale = globalShape.height / stageHeight;
-    const heightScale = (stageHeight - 80) / globalShape.height;
+
+    const heightScale = (0.9 * globalShape.height) / stageHeight;
     const stageX = stage.x();
     const stageY = stage.y();
     const stageScale = stage.scaleX();
@@ -138,21 +125,14 @@ export const TrackStage = ({
       x: (center.x - stageX!) / stageScale,
       y: (center.y - stageY!) / stageScale,
     };
-    // console.log("heightScale: ", heightScale);
-    // console.log("centerY: ", center.y);
-    // console.log("mousePointTo: ", mousePointTo.y);
-    // console.log(
-    //   "center.y - mousePointTo.y * heightScale: ",
-    //   `${center.y} - ${mousePointTo.y} * ${heightScale} = ${center.y} - ${mousePointTo.y * heightScale} = ${center.y - mousePointTo.y * heightScale}`,
-    // );
 
     const newPos = {
       x: 0,
-      y: 0, //center.y - mousePointTo.y * heightScale,
+      y: center.y - mousePointTo.y * heightScale,
     };
-    // stage.scale({ x: heightScale, y: heightScale });
-    // stage.position(newPos);
-    // setstagePosition(newPos);
+    stage.scale({ x: heightScale, y: heightScale });
+    stage.position(newPos);
+    setstagePosition(newPos);
   }, [globalShape, stageHeight]);
   const handleTracking = useCallback(
     (currentAnnotation: ProtoAnnotationObject) => {
@@ -261,10 +241,6 @@ export const TrackStage = ({
     if (!primaryTrack) return [];
     return [primaryTrack, ...secondaryTracks];
   }, [primaryTrack, secondaryTracks]);
-
-  useEffect(() => {
-    console.log("stage: ", stageWidth);
-  }, [stageWidth]);
 
   return (
     <KonvaStage

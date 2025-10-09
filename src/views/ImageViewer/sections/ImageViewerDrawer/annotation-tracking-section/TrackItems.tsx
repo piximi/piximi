@@ -1,32 +1,100 @@
 import {
-  Box,
+  Button,
   Collapse,
+  List,
+  ListItem,
+  ListItemText,
   Popover,
   Stack,
   ToggleButton,
   ToggleButtonGroup,
-  Typography,
 } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { TransitionGroup } from "react-transition-group";
+import {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { ChromePicker, ColorResult } from "react-color";
 import { useDispatch, useSelector } from "react-redux";
 import { dataSlice } from "store/data";
-import { selectTrackletRecord } from "store/data/selectors";
+import {
+  selectTrackletRecord,
+  // selectTrackletRecordByMetadata,
+} from "store/data/selectors";
 import { OperationButton } from "views/ImageViewer/components/OperationButton";
-import { selectActiveTrackId } from "views/ImageViewer/state/image-viewer-data/selectors";
+
 import {
   useSelectedTracklets,
   useTrackOperations,
 } from "views/ImageViewer/state/TrackletContext";
 
+interface RenderItemOptions {
+  id: string;
+  handleColorChange: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    id: string,
+  ) => void;
+  bgColor: string;
+  getHighlightColor: (id: string) => CSSProperties;
+}
+
+function renderItem({
+  id,
+  handleColorChange,
+  bgColor,
+  getHighlightColor,
+}: RenderItemOptions) {
+  return (
+    <ListItem
+      sx={(theme) => ({
+        ...getHighlightColor(id),
+        display: "flex",
+        flexDirection: "row",
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        bgcolor: theme.palette.background.paper,
+        "&:hover": {
+          bgcolor: theme.palette.background.default,
+        },
+      })}
+      secondaryAction={
+        <Button
+          //edge="end"
+          sx={{
+            minWidth: "16px",
+            height: "16px",
+            borderRadius: 1,
+            ml: 1,
+            bgcolor: bgColor,
+          }}
+          onClick={(event) => handleColorChange(event, id)}
+        />
+      }
+    >
+      <ListItemText
+        primary={id}
+        slotProps={{
+          primary: {
+            variant: "body2",
+            textOverflow: "ellipsis",
+            noWrap: true,
+            flexShrink: 1,
+          },
+        }}
+      />
+    </ListItem>
+  );
+}
 export const TrackItems = () => {
   const dispatch = useDispatch();
-  const activeTrackId = useSelector(selectActiveTrackId);
   const trackletRecord = useSelector(selectTrackletRecord);
+  //const metadataToTrackletRecord = useSelector(selectTrackletRecordByMetadata);
   const { clearSelectedTracks } = useTrackOperations();
   const { primaryTrack, secondaryTracks } = useSelectedTracklets();
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
-    useState<null | HTMLDivElement>(null);
+    useState<null | HTMLButtonElement>(null);
   const [trackletEditingId, setTrackEditingId] = useState<string>();
   const [showTracks, setShowTracks] = useState<"all" | "selected">("all");
   const [editedColor, setEditedColor] = useState<string>();
@@ -41,6 +109,14 @@ export const TrackItems = () => {
     () => Object.keys(trackletRecord),
     [trackletRecord],
   );
+
+  const renderedTracks = useMemo(() => {
+    if (showTracks === "selected") {
+      return selectedTrackIds;
+    } else {
+      return trackletIds;
+    }
+  }, [trackletIds, selectedTrackIds, showTracks]);
 
   const colorPopupOpen = useMemo(
     () => Boolean(colorMenuAnchorEl),
@@ -60,14 +136,7 @@ export const TrackItems = () => {
     setColorMenuAnchorEl(null);
   };
 
-  const shouldShowItem = useCallback(
-    (trackId: string) => {
-      return showTracks === "all" ? true : selectedTrackIds.includes(trackId);
-    },
-    [showTracks, selectedTrackIds],
-  );
-
-  const highlightColor = useCallback(
+  const getHighlightColor = useCallback(
     (trackId: string) => {
       let borderColor: string;
       if (trackId === primaryTrack) borderColor = "#00d9ff";
@@ -78,8 +147,8 @@ export const TrackItems = () => {
     [primaryTrack, secondaryTracks],
   );
 
-  const onOpenColorPicker = (
-    event: React.MouseEvent<HTMLDivElement>,
+  const handleOpenColorPicker = (
+    event: React.MouseEvent<HTMLButtonElement>,
     id: string,
   ) => {
     event.stopPropagation();
@@ -119,59 +188,35 @@ export const TrackItems = () => {
           Selected
         </ToggleButton>
       </ToggleButtonGroup>
-      <ToggleButtonGroup
-        orientation="vertical"
-        value={activeTrackId}
-        exclusive
-        onChange={() => {}}
-        sx={{
-          px: 0.5,
+      <List
+        disablePadding={true}
+        sx={(theme) => ({
           maxHeight: "200px",
+          height: "200px",
           overflowY: "scroll",
-          maxWidth: "100%",
-        }}
+          width: "100%",
+          bgcolor: theme.palette.background.paper,
+          borderRadius: 1,
+          border: `1px solid ${theme.palette.divider}`,
+        })}
       >
-        {trackletIds.map((id) => (
-          <Collapse
-            key={`track-id_${id}`}
-            in={shouldShowItem(id)}
-            timeout={300}
-            sx={{ maxWidth: "100%" }}
-          >
-            <ToggleButton
-              value={id}
-              aria-label="list"
-              sx={{
-                display: "flex",
-                maxWidth: "100%",
-                ...highlightColor(id),
-              }}
-            >
-              <Typography
-                variant="body2"
-                textOverflow="ellipsis"
-                noWrap={true}
-                sx={{ flexShrink: 1 }}
-              >
-                {id}
-              </Typography>
-              <Box
-                sx={{
-                  minWidth: "16px",
-                  height: "16px",
-                  borderRadius: 1,
-                  ml: 1,
-                  bgcolor:
-                    id === trackletEditingId
-                      ? editedColor
-                      : trackletRecord[id].color,
-                }}
-                onClick={(event) => onOpenColorPicker(event, id)}
-              />
-            </ToggleButton>
-          </Collapse>
-        ))}
-      </ToggleButtonGroup>
+        <TransitionGroup>
+          {renderedTracks.map((id) => (
+            <Collapse key={`track-id_${id}`}>
+              {renderItem({
+                id,
+                handleColorChange: handleOpenColorPicker,
+                bgColor:
+                  id === trackletEditingId
+                    ? (editedColor ?? "")
+                    : trackletRecord[id].color,
+                getHighlightColor,
+              })}
+            </Collapse>
+          ))}
+        </TransitionGroup>
+      </List>
+
       <Popover
         id="image-color-selection-menu"
         open={colorPopupOpen}

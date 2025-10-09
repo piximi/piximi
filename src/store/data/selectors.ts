@@ -18,6 +18,7 @@ import {
   ImageData,
   ImageMetadata,
   Kind,
+  Tracklet,
 } from "./types";
 import { getKindItemsFromImages } from "./utils";
 
@@ -96,6 +97,8 @@ export const selectCategoryToAnnotations = ({ data }: { data: DataState }) =>
   data.relationships.categoryToAnnotations;
 export const selectImageToAnnotations = ({ data }: { data: DataState }) =>
   data.relationships.imageToAnnotations;
+export const selectMetadataToTracklets = ({ data }: { data: DataState }) =>
+  data.relationships.metadataToTracklets;
 
 export const selectImageCategories = createSelector(
   selectCategoryEntities,
@@ -177,3 +180,21 @@ export const selectGeneralizedImageArray = createSelector(
 
 export const selectTrackletRecord = ({ data }: { data: DataState }) =>
   data.tracklets;
+
+export const selectTrackletRecordByMetadata = createSelector(
+  selectMetadataToTracklets,
+  selectTrackletRecord,
+  (meta2Tracklet, trackletRecord) => {
+    return Object.entries(meta2Tracklet).reduce(
+      (
+        m2t: Record<string, Record<string, Tracklet>>,
+        [metadataId, trackletIds],
+      ) => {
+        m2t[metadataId] = {};
+        trackletIds.forEach((id) => (m2t[metadataId][id] = trackletRecord[id]));
+        return m2t;
+      },
+      {},
+    );
+  },
+);

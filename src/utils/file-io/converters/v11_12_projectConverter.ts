@@ -31,6 +31,7 @@ export const v11_12_projectConverter = (v11Project: V11Project): V12Project => {
     categoryToImages: {},
     categoryToAnnotations: {},
     imageToAnnotations: {},
+    metadataToTracklets: {},
   };
   Object.values(things.entities).forEach((thing) => {
     if (thing.kind === IMAGE_KIND) {
@@ -113,6 +114,9 @@ export const v11_12_projectConverter = (v11Project: V11Project): V12Project => {
       relationships.kindToAnnotations[kind.id] = kind.containing;
 
     relationships.kindToCategories[kind.id] = kind.categories;
+  });
+  currentMetadata.ids.forEach((id) => {
+    relationships.metadataToTracklets[id] = [];
   });
   return {
     project: v11Project.project,
