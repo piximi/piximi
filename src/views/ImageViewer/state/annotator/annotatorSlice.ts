@@ -18,7 +18,7 @@ export const initialState: AnnotatorState = {
   quickSelectionRegionSize: 40,
   thresholdAnnotationValue: 150,
   annotationMode: AnnotationMode.New,
-  toolType: ToolType.RectangularAnnotation,
+  toolType: ToolType.Pointer,
 };
 
 export const annotatorSlice = createSlice({
