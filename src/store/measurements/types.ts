@@ -1,11 +1,17 @@
 import { DataArray } from "store/data/types";
 import { Partition } from "utils/models/enums";
 import { IMAGE_KIND } from "store/data/constants";
+import { Point } from "utils/types";
 
 export type MeasurementsState = {
   data: MeasurementsData;
   state: MeasurementOptions;
   groups: Record<string, MeasurementGroup>;
+};
+
+export type MeasurementDataState = {
+  annotationMeasurements: Record<string, AnnotationMeasurements>;
+  imageMeasurements: Record<string, ImageMeasurements>;
 };
 export interface MeasurementOption {
   id: string;
@@ -82,3 +88,38 @@ export type ThingData = Record<
 >;
 
 export type ThingMeasurements = Record<string, Record<string, number>>;
+
+export type AnnotationIntensityMeasurements = {
+  "intensity-total"?: Record<string, number>;
+  "intensity-mean"?: Record<string, number>;
+  "intensity-std"?: Record<string, number>;
+  "intensity-MAD"?: Record<string, number>;
+  "intensity-min"?: Record<string, number>;
+  "intensity-max"?: Record<string, number>;
+  "intensity-lower-quartile"?: Record<string, number>;
+  "intensity-upper-quartile"?: Record<string, number>;
+};
+export type AnnotationObjectMeasurements = {
+  "object-geometry-area"?: number;
+  "object-geometry-perimeter"?: number;
+  "object-geometry-extent"?: number;
+  "object-geometry-bbox-area"?: number;
+  "object-geometry-eqpc"?: number;
+  "object-geometry-ped"?: number;
+  "object-geometry-sphericity"?: number;
+  "object-geometry-compactness"?: number;
+  "object-geometry-com"?: Point;
+};
+export type AnnotationMeasurements = AnnotationIntensityMeasurements &
+  AnnotationObjectMeasurements;
+
+export type ImageMeasurements = {
+  "intensity-total"?: Record<string, number>;
+  "intensity-mean"?: Record<string, number>;
+  "intensity-std"?: Record<string, number>;
+  "intensity-MAD"?: Record<string, number>;
+  "intensity-min"?: Record<string, number>;
+  "intensity-max"?: Record<string, number>;
+  "intensity-lower-quartile"?: Record<string, number>;
+  "intensity-upper-quartile"?: Record<string, number>;
+};

@@ -9,7 +9,7 @@ const SectionDivider = ({ text }: { text: string }) => {
   return (
     <PartialDivider
       containerStyle={{ width: "100%" }}
-      typographyVariant="caption"
+      typographyVariant="body2"
       headerText={text}
       textTransform="uppercase"
       indentPercentage={12}
@@ -23,10 +23,12 @@ export const AnnotationTrackingSection = () => {
       sx={{
         height: `calc(100vh - ${DIMENSIONS.toolDrawerWidth}px)`,
         px: 1,
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Typography
-        variant="body1"
+        variant="h6"
         sx={{
           mx: "auto",
           py: 1,
@@ -34,7 +36,15 @@ export const AnnotationTrackingSection = () => {
       >
         Annotation Tracking
       </Typography>
-      <Box sx={{ overflowY: "scroll" }}>
+      <Box
+        sx={{
+          overflowY: "scroll",
+          flexGrow: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <SectionDivider text="Track Creation" />
 
         <TrackCreationControls />

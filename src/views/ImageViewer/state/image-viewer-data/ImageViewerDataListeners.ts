@@ -290,3 +290,37 @@ startAppListening({
 //     );
 //   },
 // });
+
+startAppListening({
+  predicate: (action, currentState, previousState) => {
+    return (
+      currentState.data.annotations.ids.length <
+      previousState.data.annotations.ids.length
+    );
+  },
+  effect: (action, listenerAPI) => {
+    const prevAnnotationIds =
+      listenerAPI.getOriginalState().data.annotations.ids;
+    const currAnnotationIds = listenerAPI.getState().data.annotations.ids;
+
+    const removedAnns = difference(prevAnnotationIds, currAnnotationIds);
+
+    const selectedAnns =
+      listenerAPI.getState().imageViewerData.selectedAnnotationIds;
+
+    const activeAnns =
+      listenerAPI.getState().imageViewerData.activeAnnotationIds;
+
+    listenerAPI.dispatch(
+      imageViewerDataSlice.actions.setSelectedAnnotationIds(
+        selectedAnns.filter((id) => !removedAnns.includes(id)),
+      ),
+    );
+
+    listenerAPI.dispatch(
+      imageViewerDataSlice.actions.setActiveAnnotationIds(
+        activeAnns.filter((id) => !removedAnns.includes(id)),
+      ),
+    );
+  },
+});

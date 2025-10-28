@@ -5,20 +5,21 @@ import { Box } from "@mui/material";
 
 import { useErrorHandler, useMobileView, useUnloadConfirmation } from "hooks";
 
-import { ImageViewerDrawer, StageWrapper } from "./sections";
+import { ViewErrorBoundary } from "components/errors";
 
-import { StageContext } from "views/ImageViewer/state/StageContext";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { DIMENSIONS } from "utils/constants";
 import { HotkeyContext } from "utils/enums";
+
+import { ImageViewerDrawer, StageWrapper } from "./sections";
 import { SideToolBar, TopToolBar } from "./sections/tool-bars";
 import { MobileActionBar } from "./sections/tool-bars/MobileActionBar";
-import { DataProvider } from "./state/DataContext";
 import { DrawerActionSelection } from "./sections/ImageViewerDrawer/DrawerActionSelection";
+import { StageContext } from "views/ImageViewer/state/StageContext";
+import { DataProvider } from "./state/DataContext";
 import { DrawerViewProvider } from "./state/DrawerViewContext";
-import { TrackletProvider } from "./state/TrackletContext";
-import { ViewErrorBoundary } from "components/errors";
+import { TrackProvider } from "./state/TrackContext";
 
 export const ImageViewer = () => {
   const dispatch = useDispatch();
@@ -46,7 +47,7 @@ export const ImageViewer = () => {
   return (
     <ViewErrorBoundary viewName="ImageViewer">
       <DataProvider>
-        <TrackletProvider>
+        <TrackProvider>
           <DrawerViewProvider>
             <StageContext.Provider value={stageRef}>
               <Box
@@ -80,7 +81,7 @@ export const ImageViewer = () => {
               </Box>
             </StageContext.Provider>
           </DrawerViewProvider>
-        </TrackletProvider>
+        </TrackProvider>
       </DataProvider>
     </ViewErrorBoundary>
   );

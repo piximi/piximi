@@ -3,6 +3,10 @@ import {
   createEntityAdapter,
   PayloadAction,
 } from "@reduxjs/toolkit";
+import { difference } from "lodash";
+
+import { DataState } from "store/types";
+
 import {
   AnnotationObject,
   Category,
@@ -11,22 +15,26 @@ import {
   ImageData,
   Kind,
 } from "./types";
-import { DataState } from "store/types";
-import { mutatingFilter } from "utils/arrayUtils";
-import { generateCategory, generateUUID, isUnknownCategory } from "./utils";
-import { difference } from "lodash";
+import {
+  generateCategory,
+  generateUUID,
+  isPopulatedTracklet,
+  isUnknownCategory,
+} from "./utils";
 import {
   IMAGE_KIND,
   UNKNOWN_ANNOTATION_CATEGORY_COLOR,
   UNKNOWN_CATEGORY_NAME,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "./constants";
+
+import { mutatingFilter } from "utils/arrayUtils";
+import { getRandomHexColor } from "utils/colorUtils";
 import {
   addToSimpleRelationship,
   excludes,
   removeFromSimpleRelationship,
 } from "utils/objectUtils";
-import { getRandomColor } from "utils/colorUtils";
 
 // Entity Adapters
 export const metadataAdapter = createEntityAdapter<ImageMetadata>();
@@ -729,7 +737,7 @@ export const dataSlice = createSlice({
           trackId: trackId,
           start: annotation.timepoint,
           end: annotation.timepoint,
-          color: getRandomColor(),
+          color: getRandomHexColor(),
           linkedIds: [annId],
         };
         state.relationships.metadataToTracklets[metadataId].push(trackId);
@@ -748,21 +756,7 @@ export const dataSlice = createSlice({
           tracklet.end = annotation.timepoint;
       }
     },
-    batchAddAnnotationToTracklet: (
-      state,
-      action: PayloadAction<{ trackId: string; annIds: string[] }[]>,
-    ) => {
-      const tracks = action.payload;
 
-      tracks.forEach((track) => {
-        track.annIds.forEach((annId) => {
-          dataSlice.caseReducers.addAnnotationToTrackletRecord(state, {
-            type: "addAnnotationToTrackletRecord",
-            payload: { trackId: track.trackId, annId },
-          });
-        });
-      });
-    },
     removeAnnotationFromTrackletRecord: (
       state,
       action: PayloadAction<{ trackId: string; annId: string }>,
@@ -823,61 +817,40 @@ export const dataSlice = createSlice({
         });
       }
     },
-    addChildToTrack: (
-      state,
-      action: PayloadAction<{ parentId: string; childId: string }>,
-    ) => {
-      const { parentId, childId } = action.payload;
-      const parentTracklet = state.tracklets[parentId];
-      const childTracklet = state.tracklets[childId];
-      parentTracklet.children
-        ? parentTracklet.children.push(childId)
-        : (parentTracklet.children = [childId]);
-      childTracklet.parents
-        ? childTracklet.parents.push(parentId)
-        : (childTracklet.parents = [parentId]);
-    },
 
     addChildrenToTrack: (
       state,
-      action: PayloadAction<{ parentId: string; childIds: string[] }>,
+      action: PayloadAction<{ parentId: string; childIds: string[] | string }>,
     ) => {
       const { parentId, childIds } = action.payload;
+      const childIdArr = Array.isArray(childIds) ? childIds : [childIds];
       const parentTracklet = state.tracklets[parentId];
       parentTracklet.children
-        ? parentTracklet.children.push(...childIds)
-        : (parentTracklet.children = childIds);
+        ? parentTracklet.children.push(...childIdArr)
+        : (parentTracklet.children = childIdArr);
 
-      childIds.forEach((id) => {
+      childIdArr.forEach((id) => {
         const childTracklet = state.tracklets[id];
         childTracklet.parents
           ? childTracklet.parents.push(parentId)
           : (childTracklet.parents = [parentId]);
       });
     },
-    removeChildFromTrack: (
-      state,
-      action: PayloadAction<{ parentId: string; childId: string }>,
-    ) => {
-      const { parentId, childId } = action.payload;
-      const parentTracklet = state.tracklets[parentId];
-      const childTracklet = state.tracklets[childId];
-      parentTracklet.children &&
-        mutatingFilter(parentTracklet.children, (id) => id !== childId);
-      childTracklet.parents &&
-        mutatingFilter(childTracklet.parents, (id) => id !== parentId);
-    },
 
     removeChildrenFromTrack: (
       state,
-      action: PayloadAction<{ parentId: string; childIds: string[] }>,
+      action: PayloadAction<{ parentId: string; childIds: string[] | string }>,
     ) => {
       const { parentId, childIds } = action.payload;
+      const childIdArr = Array.isArray(childIds) ? childIds : [childIds];
       const parentTracklet = state.tracklets[parentId];
       parentTracklet.children &&
-        mutatingFilter(parentTracklet.children, (id) => !childIds.includes(id));
+        mutatingFilter(
+          parentTracklet.children,
+          (id) => !childIdArr.includes(id),
+        );
 
-      childIds.forEach((id) => {
+      childIdArr.forEach((id) => {
         const childTracklet = state.tracklets[id];
         childTracklet.parents &&
           mutatingFilter(childTracklet.parents, (id) => id !== parentId);
@@ -916,6 +889,114 @@ export const dataSlice = createSlice({
         parentTracklet.children &&
           mutatingFilter(parentTracklet.children, (id) => id !== childId);
       });
+    },
+
+    joinTracks: (
+      state,
+      action: PayloadAction<{ id1: string; id2: string }>,
+    ) => {
+      const tracklet1 = state.tracklets[action.payload.id1];
+      const tracklet2 = state.tracklets[action.payload.id2];
+      if (
+        !tracklet1 ||
+        !tracklet2 ||
+        !tracklet1.end ||
+        !tracklet1.start ||
+        !tracklet2.start ||
+        !tracklet2.end
+      ) {
+        console.error("One or more fo the selected tracklets were not found.");
+        return;
+      }
+
+      if (tracklet1.end < tracklet2.start) {
+        const tracklet2Annotations = tracklet2.linkedIds;
+        tracklet1.linkedIds.push(...tracklet2Annotations);
+        dataSlice.caseReducers.deleteTracklet(state, {
+          type: "deleteTracklet",
+          payload: tracklet2.trackId,
+        });
+        dataSlice.caseReducers.batchUpdateAnnotation(state, {
+          type: "batchUpdateAnnotations",
+          payload: tracklet2Annotations.map((id) => ({
+            id,
+            changes: { trackId: tracklet1.trackId },
+          })),
+        });
+      } else if (tracklet2.end < tracklet1.end) {
+        const tracklet1Annotations = tracklet1.linkedIds;
+        tracklet2.linkedIds.push(...tracklet1Annotations);
+        dataSlice.caseReducers.deleteTracklet(state, {
+          type: "deleteTracklet",
+          payload: tracklet1.trackId,
+        });
+        dataSlice.caseReducers.batchUpdateAnnotation(state, {
+          type: "batchUpdateAnnotations",
+          payload: tracklet1Annotations.map((id) => ({
+            id,
+            changes: { trackId: tracklet2.trackId },
+          })),
+        });
+      }
+    },
+
+    severTracklet: (
+      state,
+      action: PayloadAction<{ id: string; timepoint: number }>,
+    ) => {
+      const { id: severedTrackId, timepoint } = action.payload;
+      const tracklet = state.tracklets[severedTrackId];
+      if (!tracklet || !isPopulatedTracklet(tracklet)) {
+        console.error(
+          `tracklet with id '${severedTrackId} could not be found.`,
+        );
+        return;
+      }
+      if (timepoint <= tracklet.start || timepoint >= tracklet.end) return;
+      const preservedAnns: string[] = [];
+      const severedAnns: string[] = [];
+      tracklet.linkedIds.forEach((id) => {
+        const ann = state.annotations.entities[id];
+        if (!ann) {
+          console.error(`could not find annotation with id '${id}'`);
+          return;
+        }
+        if (ann.timepoint < timepoint) preservedAnns.push(ann.id);
+        else severedAnns.push(ann.id);
+      });
+      tracklet.linkedIds = preservedAnns;
+      const prevEnd = tracklet.end;
+      tracklet.end = timepoint - 1;
+      const children = tracklet.children ? [...tracklet.children] : undefined;
+      tracklet.children = undefined;
+      const newTrackId = generateUUID();
+      const newTracklet: Tracklet = {
+        trackId: newTrackId,
+        metadataId: tracklet.metadataId,
+        start: timepoint,
+        end: prevEnd,
+        children,
+        parents: undefined,
+        linkedIds: severedAnns,
+        color: getRandomHexColor(),
+      };
+      dataSlice.caseReducers.addTracklet(state, {
+        type: "addTracklet",
+        payload: newTracklet,
+      });
+      if (children)
+        children.forEach((id) => {
+          const childTrack = state.tracklets[id];
+          if (!childTrack) {
+            console.error(`could not find child track with id '${id}`);
+            return;
+          }
+          mutatingFilter(
+            childTrack.parents!,
+            (parentId) => parentId !== severedTrackId,
+          );
+          childTrack.parents!.push(newTrackId);
+        });
     },
 
     // ============== BATCH OPERATIONS ==============
@@ -1112,6 +1193,37 @@ export const dataSlice = createSlice({
       });
 
       annotationsAdapter.removeMany(state.annotations, annotationIds);
+    },
+    batchAddTracklet: (state, action: PayloadAction<Tracklet[]>) => {
+      action.payload.forEach((tracklet) =>
+        dataSlice.caseReducers.addTracklet(state, {
+          type: "addTracklet",
+          payload: tracklet,
+        }),
+      );
+    },
+    batchDeleteTracklet: (state, action: PayloadAction<string[]>) => {
+      action.payload.forEach((trackletId) => {
+        dataSlice.caseReducers.deleteTracklet(state, {
+          type: "deleteTracklet",
+          payload: trackletId,
+        });
+      });
+    },
+    batchAddAnnotationToTracklet: (
+      state,
+      action: PayloadAction<{ trackId: string; annIds: string[] }[]>,
+    ) => {
+      const tracks = action.payload;
+
+      tracks.forEach((track) => {
+        track.annIds.forEach((annId) => {
+          dataSlice.caseReducers.addAnnotationToTrackletRecord(state, {
+            type: "addAnnotationToTrackletRecord",
+            payload: { trackId: track.trackId, annId },
+          });
+        });
+      });
     },
     deleteAnnotationsOfCategory: (state, action: PayloadAction<string>) => {
       const categoryId = action.payload;

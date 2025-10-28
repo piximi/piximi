@@ -1,6 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-import { union } from "lodash";
-import IJSImage from "image-js";
 import {
   tensor2d,
   image as tfImage,
@@ -8,7 +5,12 @@ import {
   Tensor4D,
   split as tfsplit,
 } from "@tensorflow/tfjs";
+import { EntityState } from "@reduxjs/toolkit";
+import { union } from "lodash";
+import { v4 as uuidv4 } from "uuid";
+import IJSImage from "image-js";
 
+import { DataState } from "store/types";
 import {
   ImageMetadata,
   GeneralizedKindItem,
@@ -16,6 +18,7 @@ import {
   Category,
   Kind,
   ImageData,
+  Tracklet,
 } from "store/data/types";
 import {
   IMAGE_KIND,
@@ -23,7 +26,7 @@ import {
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "./constants";
 
-import { DataState } from "store/types";
+import { RequireField } from "utils/types";
 import { addToSimpleRelationship } from "utils/objectUtils";
 import {
   V12AnnotationObject,
@@ -31,7 +34,6 @@ import {
   V12ImageData,
   V12Kind,
 } from "utils/file-io/types";
-import { EntityState } from "@reduxjs/toolkit";
 
 export const generateUUID = (options?: { definesUnknown: boolean }) => {
   const id = uuidv4();
@@ -465,4 +467,10 @@ export const freezeState = (dataState: DataState): DataState => {
     images: copiedImages,
     annotations: copiedAnnotations,
   } as DataState;
+};
+
+export const isPopulatedTracklet = (
+  tracklet: Tracklet,
+): tracklet is RequireField<Tracklet, "start" | "end"> => {
+  return tracklet.end !== undefined && tracklet.start !== undefined;
 };
