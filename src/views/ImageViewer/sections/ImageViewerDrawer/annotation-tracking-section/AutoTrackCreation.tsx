@@ -114,7 +114,6 @@ export const AutoTrackCreation = () => {
   const handleAutoTracking = () => {
     if (!tracker || !activeMetadata) return;
     const { tracks, coms } = tracker.computeTracks(annotations, annCOMs);
-    console.log(coms);
     if (tracks.length > 0) {
       dispatch(
         measurementDataSlice.actions.batchAddAnnotationObjectMeasurement(

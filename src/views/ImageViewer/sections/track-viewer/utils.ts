@@ -102,7 +102,6 @@ export const getNewWheelPos = (
   event.evt.preventDefault();
   const stage = event.target.getStage()!;
   const { deltaX, deltaY, ctrlKey, metaKey } = event.evt;
-  console.log(event.evt.ctrlKey, event.evt.metaKey);
   // Gesture detection
   const isZoomGesture = ctrlKey || metaKey;
 
