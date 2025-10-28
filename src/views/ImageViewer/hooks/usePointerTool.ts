@@ -15,16 +15,11 @@ import { Point } from "utils/types";
 import {
   selectActiveMetadataId,
   selectTimeLinkingState,
-  selectActiveTrackId,
 } from "../state/image-viewer-data/selectors";
-import {
-  selectActiveAnnotations,
-  selectActiveTimeLinkedAnnId,
-} from "../state/image-viewer-data/reselectors";
+import { selectActiveAnnotations } from "../state/image-viewer-data/reselectors";
 import { imageViewerDataSlice } from "../state/image-viewer-data/ImageViewerDataSlice";
 import { ProtoAnnotationObject } from "../state/types";
 import { DecodedAnnotationObject } from "store/data/types";
-import { dataSlice } from "store/data";
 
 const delta = 10;
 
@@ -38,8 +33,6 @@ export const usePointerTool = (
   const activeMetadataId = useSelector(selectActiveMetadataId);
   const activeAnnotations = useSelector(selectActiveAnnotations);
   const tLinkingActive = useSelector(selectTimeLinkingState);
-  const activeTrackId = useSelector(selectActiveTrackId);
-  const activeTimeLinkedAnnId = useSelector(selectActiveTimeLinkedAnnId);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shift, setShift] = useState<boolean>(false);
   const [dragging, setDragging] = useState<boolean>(false);

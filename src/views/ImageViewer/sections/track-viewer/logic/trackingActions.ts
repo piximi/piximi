@@ -1,4 +1,5 @@
-import { batch, Dispatch } from "react-redux";
+import { Dispatch } from "@reduxjs/toolkit";
+import { batch } from "react-redux";
 
 import { dataSlice } from "store/data";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
