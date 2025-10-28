@@ -21,7 +21,6 @@ export const TrackView = ({
   const [stageHeight, setStageHeight] = useState((height - 48) / 2);
   useLayoutEffect(() => {
     if (containerRef.current) {
-      console.log("fired");
       const { width: containerWidth, height: containerHeight } =
         containerRef.current.getBoundingClientRect();
       const { paddingLeft, paddingRight, paddingTop, paddingBottom } =
