@@ -1,11 +1,5 @@
 import { Box } from "@mui/material";
-import React, {
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { TrackletContainer } from "./TrackletContainer";
 import { TrackStage } from "./TrackStage";
 
