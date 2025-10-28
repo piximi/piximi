@@ -1,4 +1,12 @@
 import {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
   Button,
   Collapse,
   List,
@@ -9,30 +17,22 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
-import { TransitionGroup } from "react-transition-group";
-import {
-  CSSProperties,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
 import { ChromePicker, ColorResult } from "react-color";
-import { useDispatch, useSelector } from "react-redux";
+import { TransitionGroup } from "react-transition-group";
+
 import { dataSlice } from "store/data";
 import {
   selectTrackletRecord,
   // selectTrackletRecordByMetadata,
 } from "store/data/selectors";
-import { OperationButton } from "views/ImageViewer/components/OperationButton";
 
-import {
-  useSelectedTracklets,
-  useTrackOperations,
-} from "views/ImageViewer/state/TrackletContext";
+import { OperationButton } from "views/ImageViewer/components/OperationButton";
+import { selectSelectedTracklets } from "views/ImageViewer/state/image-viewer-data/selectors";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 
 interface RenderItemOptions {
   id: string;
+  name?: string;
   handleColorChange: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     id: string,
@@ -43,6 +43,7 @@ interface RenderItemOptions {
 
 function renderItem({
   id,
+  name,
   handleColorChange,
   bgColor,
   getHighlightColor,
@@ -74,7 +75,7 @@ function renderItem({
       }
     >
       <ListItemText
-        primary={id}
+        primary={name ?? id}
         slotProps={{
           primary: {
             variant: "body2",
@@ -91,19 +92,13 @@ export const TrackItems = () => {
   const dispatch = useDispatch();
   const trackletRecord = useSelector(selectTrackletRecord);
   //const metadataToTrackletRecord = useSelector(selectTrackletRecordByMetadata);
-  const { clearSelectedTracks } = useTrackOperations();
-  const { primaryTrack, secondaryTracks } = useSelectedTracklets();
+  const selectedTrackIds = useSelector(selectSelectedTracklets);
+
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
     useState<null | HTMLButtonElement>(null);
   const [trackletEditingId, setTrackEditingId] = useState<string>();
   const [showTracks, setShowTracks] = useState<"all" | "selected">("all");
   const [editedColor, setEditedColor] = useState<string>();
-
-  const selectedTrackIds = useMemo(() => {
-    const selectedTracks = primaryTrack ? [primaryTrack] : [];
-    selectedTracks.push(...secondaryTracks);
-    return selectedTracks;
-  }, [primaryTrack, secondaryTracks, trackletRecord]);
 
   const trackletIds = useMemo(
     () => Object.keys(trackletRecord),
@@ -139,12 +134,11 @@ export const TrackItems = () => {
   const getHighlightColor = useCallback(
     (trackId: string) => {
       let borderColor: string;
-      if (trackId === primaryTrack) borderColor = "#00d9ff";
-      else if (secondaryTracks.includes(trackId)) borderColor = "#bb37f9";
+      if (selectedTrackIds.includes(trackId)) borderColor = "#bb37f9";
       else return {};
       return { borderLeft: `2px solid ${borderColor}` };
     },
-    [primaryTrack, secondaryTracks],
+    [selectedTrackIds],
   );
 
   const handleOpenColorPicker = (
@@ -165,7 +159,16 @@ export const TrackItems = () => {
   }, [trackletRecord, trackletEditingId]);
 
   return (
-    <Stack sx={{ maxWidth: "100%", alignItems: "center", gap: 1 }}>
+    <Stack
+      sx={{
+        maxWidth: "100%",
+        alignItems: "center",
+        gap: 1.5,
+        height: "100%",
+        minHeight: 0,
+        pt: 1,
+      }}
+    >
       <ToggleButtonGroup
         value={showTracks}
         exclusive
@@ -191,8 +194,7 @@ export const TrackItems = () => {
       <List
         disablePadding={true}
         sx={(theme) => ({
-          maxHeight: "200px",
-          height: "200px",
+          flexGrow: 1,
           overflowY: "scroll",
           width: "100%",
           bgcolor: theme.palette.background.paper,
@@ -205,6 +207,7 @@ export const TrackItems = () => {
             <Collapse key={`track-id_${id}`}>
               {renderItem({
                 id,
+                name: trackletRecord[id].name,
                 handleColorChange: handleOpenColorPicker,
                 bgColor:
                   id === trackletEditingId
@@ -241,8 +244,11 @@ export const TrackItems = () => {
       </Popover>
       <OperationButton
         variant="text"
-        onClick={clearSelectedTracks}
-        disabled={!primaryTrack}
+        onClick={() =>
+          dispatch(imageViewerDataSlice.actions.clearTrackSelection())
+        }
+        disabled={selectedTrackIds.length === 0}
+        sx={{ pb: 2 }}
       >
         Clear Selection
       </OperationButton>

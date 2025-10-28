@@ -1,7 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ImageViewerDataState, ImageViewerMetadataDetails } from "./types";
-import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 import { difference } from "lodash";
+
+import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
+
+import { ImageViewerDataState, ImageViewerMetadataDetails } from "./types";
+import { mutatingFilter } from "utils/arrayUtils";
 
 const initialState: ImageViewerDataState = {
   metadataStack: {},
@@ -14,10 +17,12 @@ const initialState: ImageViewerDataState = {
   highlightedCategory: undefined,
   hasUnsavedChanges: false,
   selectedAnnotationIds: [],
+  trackingUI: {
+    showTracklets: false,
+    selectedTracklets: [],
+  },
   tLinking: { active: false, trackId: undefined, tracks: {} },
   zLinking: { active: false, annIds: {} },
-  linkGraph: {},
-  globalAnnotations: {},
 };
 
 export const imageViewerDataSlice = createSlice({
@@ -207,6 +212,45 @@ export const imageViewerDataSlice = createSlice({
     setTLinkingTrackId(state, action: PayloadAction<string>) {
       state.tLinking.trackId = action.payload;
       state.tLinking.active = true;
+    },
+    setShowTracklets: (state, action: PayloadAction<boolean>) => {
+      state.trackingUI.showTracklets = action.payload;
+    },
+
+    setSelectedTracklets: (state, action: PayloadAction<string[]>) => {
+      state.trackingUI.selectedTracklets = action.payload;
+    },
+    selectTracklet: (state, action: PayloadAction<string>) => {
+      const { selectedTracklets: selectedTracklets } = state.trackingUI;
+      if (!selectedTracklets.includes(action.payload)) {
+        selectedTracklets.push(action.payload);
+      }
+    },
+
+    deselectTracklet: (state, action: PayloadAction<string>) => {
+      const { selectedTracklets } = state.trackingUI;
+      mutatingFilter(selectedTracklets, (id) => id !== action.payload);
+    },
+
+    toggleSelectedTrack: (state, action: PayloadAction<string>) => {
+      const { selectedTracklets } = state.trackingUI;
+      const index = selectedTracklets.indexOf(action.payload);
+      if (index !== -1) {
+        mutatingFilter(selectedTracklets, (id) => id !== action.payload);
+      } else {
+        selectedTracklets.push(action.payload);
+      }
+    },
+
+    clearTrackSelection: (state) => {
+      state.trackingUI.selectedTracklets = [];
+    },
+
+    resetTrackingUI: (state) => {
+      state.trackingUI = {
+        showTracklets: false,
+        selectedTracklets: [],
+      };
     },
   },
 });

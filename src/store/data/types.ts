@@ -76,6 +76,7 @@ export type LinkGraph = Record<string, LinkNode>;
 
 export type Tracklet = {
   metadataId: string;
+  name?: string;
   trackId: string;
   color: string;
   start?: number;

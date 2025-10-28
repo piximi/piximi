@@ -9,10 +9,8 @@ export interface TrackVisualizerProps {
   height?: number;
   trackHeight?: number;
   trackSpacing?: number;
-  primaryTrack: string | undefined;
-  setPrimaryTrack: (trackId: string) => void;
-  secondaryTracks: string[];
-  setSecondaryTracks: (tracks: string[]) => void;
+  selectedTracks: string[];
+  toggleSelectedTrack: (trackId: string) => void;
   onTrackClick?: (id: string) => void;
 }
 
@@ -47,4 +45,11 @@ export type AnnotationProps = {
   selected?: boolean;
   isFiltered?: boolean;
   onSelect: () => void;
+};
+
+export type TooltipProps = {
+  visible: boolean;
+  x: number;
+  y: number;
+  text: string;
 };

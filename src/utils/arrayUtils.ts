@@ -102,3 +102,8 @@ export const groupBy = <T extends object>(items: T[], key: keyof T) => {
     return grouped;
   }, {});
 };
+
+export const getLast = <T>(arr: T[]) => {
+  if (arr.length < 0) return;
+  return arr[arr.length - 1];
+};

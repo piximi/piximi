@@ -20,6 +20,7 @@ import { dataSlice } from "./data/dataSlice";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
 import { measurementsSlice } from "./measurements/measurementsSlice";
+import { measurementDataSlice } from "./measurements/measurementDataSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
@@ -50,6 +51,7 @@ const preloadedState: RootState = {
   project: projectSlice.getInitialState(),
   segmenter: segmenterSlice.getInitialState(),
   measurements: measurementsSlice.getInitialState(),
+  measurementData: measurementDataSlice.getInitialState(),
 };
 
 const options = {

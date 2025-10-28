@@ -1,15 +1,17 @@
 import React, { useLayoutEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 
-import { Stage } from "../Stage";
+import { useMobileView } from "hooks";
 
 import { DIMENSIONS } from "utils/constants";
-import { useMobileView } from "hooks";
-import { useShouldShowTracklets } from "views/ImageViewer/state/TrackletContext";
+
+import { Stage } from "../Stage";
 import { TrackView } from "../track-viewer/TrackView";
+import { selectShowTracklets } from "views/ImageViewer/state/image-viewer-data/selectors";
 
 export const StageWrapper = () => {
-  const showTracklets = useShouldShowTracklets();
+  const showTracklets = useSelector(selectShowTracklets);
   const [width, setWidth] = useState<number>(
     window.innerWidth -
       DIMENSIONS.leftDrawerWidth -

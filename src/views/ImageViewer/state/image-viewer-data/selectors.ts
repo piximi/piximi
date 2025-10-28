@@ -1,6 +1,24 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { ImageViewerDataState, ImageViewerMetadataDetails } from "./types";
 
+export const selectTrackingUI = ({
+  imageViewerData,
+}: {
+  imageViewerData: ImageViewerDataState;
+}) => imageViewerData.trackingUI;
+
+export const selectShowTracklets = ({
+  imageViewerData,
+}: {
+  imageViewerData: ImageViewerDataState;
+}) => imageViewerData.trackingUI.showTracklets;
+
+export const selectSelectedTracklets = ({
+  imageViewerData,
+}: {
+  imageViewerData: ImageViewerDataState;
+}) => imageViewerData.trackingUI.selectedTracklets;
+
 export const selectActiveMetadataId = ({
   imageViewerData,
 }: {
@@ -25,19 +43,6 @@ export const selectActiveAnnotationIds = ({
 }) => {
   return imageViewerData.activeAnnotationIds;
 };
-export const selectActivePlane = createSelector(
-  selectActiveMetadata,
-  (activeImageSeries) => {
-    return activeImageSeries?.activePlane;
-  },
-);
-
-export const selectActiveImageId = createSelector(
-  selectActiveMetadata,
-  (activeImageSeries) => {
-    return activeImageSeries?.activeImageId;
-  },
-);
 
 export const selectSelectedIVCategoryId = ({
   imageViewerData,
@@ -54,11 +59,6 @@ export const selectMetadataStack = ({
 }) => {
   return imageViewerData.metadataStack;
 };
-
-export const selectMetadataStackArray = createSelector(
-  selectMetadataStack,
-  (stack) => Object.values(stack),
-);
 
 export const selectHighligtedIVCatogory = ({
   imageViewerData,
@@ -124,3 +124,22 @@ export const selectZLinkingAnnIds = ({
 }) => {
   return imageViewerData.zLinking.annIds;
 };
+
+export const selectActivePlane = createSelector(
+  selectActiveMetadata,
+  (activeImageSeries) => {
+    return activeImageSeries?.activePlane;
+  },
+);
+
+export const selectActiveImageId = createSelector(
+  selectActiveMetadata,
+  (activeImageSeries) => {
+    return activeImageSeries?.activeImageId;
+  },
+);
+
+export const selectMetadataStackArray = createSelector(
+  selectMetadataStack,
+  (stack) => Object.values(stack),
+);

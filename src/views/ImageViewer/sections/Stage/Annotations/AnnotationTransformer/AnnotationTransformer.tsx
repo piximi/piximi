@@ -121,11 +121,6 @@ export const AnnotationTransformer = ({
             selectedAnnotations.map((ann) => ann.id),
           ),
         );
-        dispatch(
-          dataSlice.actions.batchDeleteAnnotations(
-            selectedAnnotations.map((ann) => ann.id),
-          ),
-        );
       } else {
         dispatch(
           dataSlice.actions.updateAnnotation({

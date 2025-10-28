@@ -1,4 +1,5 @@
-import { Divider, IconButton, Stack, useTheme } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { Divider, IconButton, Stack } from "@mui/material";
 import {
   DownloadOutlined as DownloadIcon,
   LabelOutlined as LabelIcon,
@@ -6,24 +7,24 @@ import {
   FormatShapes as FormatShapesIcon,
   AltRoute as AltRouteIcon,
 } from "@mui/icons-material";
-import React from "react";
-import { useSetDrawerView } from "views/ImageViewer/state/DrawerViewContext";
-import { ReturnToProjectButton } from "./ReturnToProjectButton";
+
 import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
 import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/layout/app-drawer/HelpButton";
+
 import { DIMENSIONS } from "utils/constants";
-import { useSetShowTracklets } from "views/ImageViewer/state/TrackletContext";
+
+import { ReturnToProjectButton } from "./ReturnToProjectButton";
+import { useSetDrawerView } from "views/ImageViewer/state/DrawerViewContext";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 
 export const DrawerActionSelection = () => {
+  const dispatch = useDispatch();
   const setDrawerView = useSetDrawerView();
-  const setShowTracks = useSetShowTracklets();
-  const theme = useTheme();
   return (
     <Stack
       sx={(theme) => ({
         bgcolor: theme.palette.background.paper,
-        //borderRight: `1px solid ${theme.palette.divider}`,
         height: "100%",
         justifyContent: "space-between",
         gridArea: "drawer-action-selection",
@@ -34,7 +35,7 @@ export const DrawerActionSelection = () => {
         <ReturnToProjectButton />
         <IconButton
           onClick={() => {
-            setShowTracks(false);
+            dispatch(imageViewerDataSlice.actions.setShowTracklets(false));
             setDrawerView("export");
           }}
           size="small"
@@ -43,7 +44,7 @@ export const DrawerActionSelection = () => {
         </IconButton>
         <IconButton
           onClick={() => {
-            setShowTracks(false);
+            dispatch(imageViewerDataSlice.actions.setShowTracklets(false));
             setDrawerView("images");
           }}
           size="small"
@@ -52,7 +53,7 @@ export const DrawerActionSelection = () => {
         </IconButton>
         <IconButton
           onClick={() => {
-            setShowTracks(false);
+            dispatch(imageViewerDataSlice.actions.setShowTracklets(false));
             setDrawerView("categories");
           }}
           size="small"
@@ -61,7 +62,7 @@ export const DrawerActionSelection = () => {
         </IconButton>
         <IconButton
           onClick={() => {
-            setShowTracks(false);
+            dispatch(imageViewerDataSlice.actions.setShowTracklets(false));
             setDrawerView("annotations");
           }}
           size="small"
@@ -71,30 +72,12 @@ export const DrawerActionSelection = () => {
         <Divider />
         <IconButton
           onClick={() => {
-            setShowTracks(true);
+            dispatch(imageViewerDataSlice.actions.setShowTracklets(true));
             setDrawerView("tracking");
           }}
           size="small"
         >
           <AltRouteIcon />
-          {/* <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-          >
-            <path
-              d="M 4 20 Q 8 8, 12 12 T 20 4"
-              fill="none"
-              stroke={theme.palette.text.primary}
-              strokeWidth="2"
-              strokeDasharray="2,3"
-              strokeLinecap="round"
-            />
-
-            <circle cx="4" cy="20" r="4" fill={theme.palette.text.primary} />
-            <circle cx="20" cy="4" r="4" fill={theme.palette.text.primary} />
-          </svg> */}
         </IconButton>
       </Stack>
 

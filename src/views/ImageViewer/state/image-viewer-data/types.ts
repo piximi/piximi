@@ -1,5 +1,3 @@
-import { Tracklet, LinkNode } from "store/data/types";
-
 export type ImageViewerMetadataDetails = {
   id: string;
   name: string;
@@ -16,6 +14,11 @@ export type ImageViewerImageProperties = {
   categoryId: string;
   ZTPreview: string;
 };
+
+export type TrackingUIState = {
+  showTracklets: boolean;
+  selectedTracklets: string[];
+};
 export type ImageViewerDataState = {
   metadataStack: Record<string, ImageViewerMetadataDetails>;
   activeMetdataId?: string;
@@ -24,8 +27,7 @@ export type ImageViewerDataState = {
   highlightedCategory?: string;
   activeAnnotationIds: Array<string>;
   selectedAnnotationIds: Array<string>;
-  linkGraph: Record<string, LinkNode>;
-  globalAnnotations: Record<string, Tracklet>;
+  trackingUI: TrackingUIState;
   tLinking:
     | {
         active: false;
