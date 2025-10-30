@@ -48,7 +48,7 @@ export const useAutoScroll = (
     if (!tracklet || tracklet.start === undefined) return;
 
     const stage = stageRef.current;
-    const currentStagePosition = stage.getPosition();
+    const { x: currentX, y: currentY } = stage.getPosition();
     const stageScale = stage.scaleX();
 
     // Calculate the x position of the image at the track's start frame
@@ -73,12 +73,16 @@ export const useAutoScroll = (
     // Clamp the position to valid scroll bounds
     const clampedX = Math.max(maxScrollLeft, Math.min(maxScrollRight, centerX));
 
+    // Maintain a constant scroll speed (1s duration max) t = d/v, v = scaled_W/max_t
+    const scaledDuration =
+      Math.abs(clampedX - currentX) / Math.abs(maxScrollLeft);
+
     stage.to({
       x: clampedX,
-      y: currentStagePosition.y,
-      duration: 0.25,
+      y: currentY,
+      duration: scaledDuration,
       onFinish: () => {
-        setStagePosition({ x: clampedX, y: currentStagePosition.y });
+        setStagePosition({ x: clampedX, y: currentY });
       },
     });
   }, [

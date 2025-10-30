@@ -79,12 +79,14 @@ export type Tracklet = {
   name?: string;
   trackId: string;
   color: string;
-  start?: number;
-  end?: number;
+  start: number;
+  end: number;
   children?: string[];
   parents?: string[];
   linkedIds: string[];
 };
+
+export type PendingTracklet = PartialBy<Tracklet, "start" | "end">;
 export type DecodedAnnotationObject = Omit<
   AnnotationObject & {
     decodedMask: DataArray;

@@ -11,6 +11,7 @@ import {
   Collapse,
   List,
   ListItem,
+  ListItemButton,
   ListItemText,
   Popover,
   Stack,
@@ -38,6 +39,7 @@ interface RenderItemOptions {
     id: string,
   ) => void;
   bgColor: string;
+  handleClick: (id: string) => void;
   getHighlightColor: (id: string) => CSSProperties;
 }
 
@@ -46,6 +48,7 @@ function renderItem({
   name,
   handleColorChange,
   bgColor,
+  handleClick,
   getHighlightColor,
 }: RenderItemOptions) {
   return (
@@ -74,21 +77,23 @@ function renderItem({
         />
       }
     >
-      <ListItemText
-        primary={name ?? id}
-        slotProps={{
-          primary: {
-            variant: "body2",
-            textOverflow: "ellipsis",
-            noWrap: true,
-            flexShrink: 1,
-          },
-        }}
-      />
+      <ListItemButton onClick={() => handleClick(id)} dense>
+        <ListItemText
+          primary={name ?? id}
+          slotProps={{
+            primary: {
+              variant: "body2",
+              textOverflow: "ellipsis",
+              noWrap: true,
+              flexShrink: 1,
+            },
+          }}
+        />
+      </ListItemButton>
     </ListItem>
   );
 }
-export const TrackItems = () => {
+export const TrackList = () => {
   const dispatch = useDispatch();
   const trackletRecord = useSelector(selectTrackletRecord);
   //const metadataToTrackletRecord = useSelector(selectTrackletRecordByMetadata);
@@ -100,18 +105,31 @@ export const TrackItems = () => {
   const [showTracks, setShowTracks] = useState<"all" | "selected">("all");
   const [editedColor, setEditedColor] = useState<string>();
 
-  const trackletIds = useMemo(
-    () => Object.keys(trackletRecord),
-    [trackletRecord],
-  );
+  const sortedTrackletIds = useMemo(() => {
+    const sortedIds = new Set(
+      Object.keys(trackletRecord).sort(
+        (a, b) => trackletRecord[a].start! - trackletRecord[b].start!,
+      ),
+    );
+    const orderedIds: string[] = [];
+    for (const id of sortedIds) {
+      orderedIds.push(id);
+      if (trackletRecord[id].children)
+        trackletRecord[id].children.forEach((id) => {
+          orderedIds.push(id);
+          sortedIds.delete(id);
+        });
+    }
+    return orderedIds;
+  }, [trackletRecord]);
 
   const renderedTracks = useMemo(() => {
     if (showTracks === "selected") {
       return selectedTrackIds;
     } else {
-      return trackletIds;
+      return sortedTrackletIds;
     }
-  }, [trackletIds, selectedTrackIds, showTracks]);
+  }, [sortedTrackletIds, selectedTrackIds, showTracks]);
 
   const colorPopupOpen = useMemo(
     () => Boolean(colorMenuAnchorEl),
@@ -150,6 +168,10 @@ export const TrackItems = () => {
     setColorMenuAnchorEl(event.currentTarget);
   };
 
+  const handleSelectTracklet = (id: string) => {
+    dispatch(imageViewerDataSlice.actions.toggleSelectedTrack(id));
+  };
+
   useEffect(() => {
     if (!trackletEditingId || !trackletRecord[trackletEditingId])
       setEditedColor("black");
@@ -174,7 +196,7 @@ export const TrackItems = () => {
         exclusive
         size="small"
         sx={{ "& > button": { py: "3px", px: "9px", fontSize: "0.75rem" } }}
-        disabled={trackletIds.length === 0}
+        disabled={sortedTrackletIds.length === 0}
       >
         <ToggleButton
           value="all"
@@ -209,6 +231,7 @@ export const TrackItems = () => {
                 id,
                 name: trackletRecord[id].name,
                 handleColorChange: handleOpenColorPicker,
+                handleClick: handleSelectTracklet,
                 bgColor:
                   id === trackletEditingId
                     ? (editedColor ?? "")

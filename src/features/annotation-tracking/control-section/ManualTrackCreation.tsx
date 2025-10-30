@@ -15,7 +15,7 @@ import {
 
 export const ManualTrackCreation = () => {
   const dispatch = useDispatch();
-  const active = useSelector(selectTimeLinkingState);
+  const tLinkingState = useSelector(selectTimeLinkingState);
   const activeTrackId = useSelector(selectActiveTrackId);
   const activeMetadataId = useSelector(selectActiveMetadataId);
   const selectedTracks = useSelector(selectSelectedTracklets);
@@ -23,13 +23,13 @@ export const ManualTrackCreation = () => {
   const handleNewTrack = () => {
     if (!activeMetadataId) return;
     const newTrackletId = generateUUID();
-    dispatch(imageViewerDataSlice.actions.startNewTrack(newTrackletId));
+
     dispatch(
-      dataSlice.actions.addTracklet({
-        metadataId: activeMetadataId,
+      imageViewerDataSlice.actions.startNewTrack({
         trackId: newTrackletId,
         color: getRandomHexColor(),
         linkedIds: [],
+        metadataId: activeMetadataId,
       }),
     );
   };
@@ -47,7 +47,6 @@ export const ManualTrackCreation = () => {
         imageViewerDataSlice.actions.setTLinkingTrackId(selectedTracks[0]),
       );
     }
-    dispatch(imageViewerDataSlice.actions.clearTrackSelection());
   };
   return (
     <Stack alignItems="flex-start" sx={{ width: "100%" }}>
@@ -61,7 +60,10 @@ export const ManualTrackCreation = () => {
             px: 2,
           }}
         >
-          <OperationButton onClick={handleNewTrack} disabled={active}>
+          <OperationButton
+            onClick={handleNewTrack}
+            disabled={tLinkingState.active}
+          >
             New Track
           </OperationButton>
           <OperationButton
@@ -82,11 +84,17 @@ export const ManualTrackCreation = () => {
           px: 2,
         }}
       >
-        <OperationButton onClick={handleConfirmTrack} disabled={!active}>
+        <OperationButton
+          onClick={handleConfirmTrack}
+          disabled={!tLinkingState.active}
+        >
           Confirm
         </OperationButton>
 
-        <OperationButton onClick={handleDeleteTrack} disabled={!active}>
+        <OperationButton
+          onClick={handleDeleteTrack}
+          disabled={!tLinkingState.active}
+        >
           Delete
         </OperationButton>
       </Box>

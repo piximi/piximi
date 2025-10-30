@@ -1,11 +1,8 @@
 import { createSelector } from "@reduxjs/toolkit";
 import {
-  selectActiveTrackId,
-  selectActiveImageId,
   selectActiveMetadata,
   selectMetadataStack,
   selectSelectedAnnotationIds,
-  selectTimeTrackingRecord,
 } from "./selectors";
 import {
   selectAnnotationEntities,
@@ -205,23 +202,5 @@ export const selectSelectedAnnotations = createSelector(
       }
       return anns;
     }, []);
-  },
-);
-
-export const selectActiveTrackImageToAnnotation = createSelector(
-  selectActiveTrackId,
-  selectTimeTrackingRecord,
-  (activeTrackId, linkedIdRecord) => {
-    if (!activeTrackId) return {};
-    return linkedIdRecord[activeTrackId];
-  },
-);
-export const selectActiveTimeLinkedAnnId = createSelector(
-  selectActiveImageId,
-  selectActiveTrackId,
-  selectTimeTrackingRecord,
-  (activeImageId, activeTrackId, linkedIdRecord) => {
-    if (!activeImageId || !activeTrackId) return undefined;
-    return linkedIdRecord[activeTrackId][activeImageId];
   },
 );

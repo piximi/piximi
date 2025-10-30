@@ -2,9 +2,10 @@
 
 import { useTheme } from "@mui/material";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { TrackVisualizerProps, ValidTracklet } from "./types";
-import { generateRelationships } from "./utils";
+
 import { getLast } from "utils/arrayUtils";
+import { TrackVisualizerProps, ValidTracklet } from "../utils/types";
+import { generateRelationships } from "../utils/graphUtils";
 
 const HIGHLIGHT_COLOR = "#00d9ff55";
 const HOVER_COLOR = "#ffffff55";
@@ -20,21 +21,24 @@ export function TrackVisualizer({
   toggleSelectedTrack,
 }: TrackVisualizerProps) {
   const theme = useTheme();
-  const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<{
     x: number;
     y: number;
     trackId: string;
   } | null>(null);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const lastScrolledId = useRef<string | undefined>(undefined);
+
   const validTracks = useMemo(() => tracks as ValidTracklet[], [tracks]);
+
   const { positionedTracks, connections, scale, padding } = useMemo(() => {
     return generateRelationships(validTracks, width, trackSpacing, numFrames);
   }, [validTracks, width, height, trackSpacing, numFrames]);
-  const lastScrolledId = useRef<string | undefined>(undefined);
-  const svgHeight = Math.max(
-    height,
-    positionedTracks.length * trackSpacing * 1.5 + 50,
+
+  const svgHeight = useMemo(
+    () => Math.max(height, positionedTracks.length * trackSpacing * 1.5 + 50),
+    [height, positionedTracks],
   );
 
   // Scroll to show selected track in the middle when primaryTrack changes

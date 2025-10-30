@@ -1,3 +1,5 @@
+import { useMemo, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
   Button,
@@ -9,21 +11,17 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useMemo, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+
 import { dataSlice } from "store/data";
 import { selectMetadataToTracklets } from "store/data/selectors";
 import { selectAnnotationMeasurements } from "store/measurements/measurementDataSelectors";
 import { measurementDataSlice } from "store/measurements/measurementDataSlice";
 import { AnnotationObjectMeasurements } from "store/measurements/types";
-import {
-  BBoxTracker,
-  CenterOfMass,
-  CenterOfMassTracker,
-  TrackerType,
-} from "utils/tracking";
+
 import { selectAllImageViewerAnnotationRecord } from "views/ImageViewer/state/image-viewer-data/reselectors";
 import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
+import { CenterOfMass, TrackerType } from "../utils/types";
+import { BBoxTracker, CenterOfMassTracker } from "../utils";
 
 export const AutoTrackCreation = () => {
   const dispatch = useDispatch();

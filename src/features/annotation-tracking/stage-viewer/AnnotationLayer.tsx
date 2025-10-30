@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { useSelector } from "react-redux";
+import React, { useCallback, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Layer, Line } from "react-konva";
 
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "store/data/constants";
@@ -10,11 +10,19 @@ import {
 
 import { hexAlpha } from "utils/colorUtils";
 import { selectAllImageViewerAnnotationRecord } from "views/ImageViewer/state/image-viewer-data/reselectors";
-import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
+import {
+  selectActiveMetadata,
+  selectActiveTrackId,
+  selectTimeLinkingState,
+} from "views/ImageViewer/state/image-viewer-data/selectors";
 
-import { AnnotationsProps, AnnotationWithImOff } from "../types";
-import { AnnotationShape } from "./AnnotationShape";
 import { selectAnnotationMeasurements } from "store/measurements/measurementDataSelectors";
+import { ProtoAnnotationObject } from "views/ImageViewer/state/types";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
+
+import { handleAnnotationTracking } from "../utils/trackingActions";
+import { AnnotationShape } from "./AnnotationShape";
+import { AnnotationsProps, AnnotationWithImOff } from "../utils/types";
 
 /**
  * A Konva layer that renders all visible annotations with track coloring.
@@ -25,13 +33,16 @@ export const AnnotationLayer: React.FC<AnnotationsProps> = ({
   imageShape,
   images,
   selectedTracks,
-  onClick,
 }) => {
+  const dispatch = useDispatch();
   const tracklets = useSelector(selectTrackletRecord);
   const annotations = useSelector(selectAllImageViewerAnnotationRecord);
   const imageToAnnotations = useSelector(selectImageToAnnotations);
   const activeMetadata = useSelector(selectActiveMetadata);
   const annotationMeasurements = useSelector(selectAnnotationMeasurements);
+  const activeTrackId = useSelector(selectActiveTrackId);
+
+  const manualLinkingState = useSelector(selectTimeLinkingState);
 
   const trackCOMs = useMemo(() => {
     const trackCOMs: Record<string, Array<number>> = {};
@@ -78,14 +89,35 @@ export const AnnotationLayer: React.FC<AnnotationsProps> = ({
     return visibleAnnotations;
   }, [annotations, activeMetadata, imageToAnnotations, images]);
 
-  const getFillColor = (trackId: string | undefined) => {
-    if (!trackId) return UNKNOWN_IMAGE_CATEGORY_COLOR;
-    const trackColor = tracklets[trackId].color;
-    if (selectedTracks.includes(trackId)) return hexAlpha(trackColor, 1);
-    return selectedTracks.length < 0
-      ? hexAlpha(trackColor, 0.2)
-      : hexAlpha(trackColor, 0.5);
-  };
+  // Handle annotation click (tracking or selection)
+  const handleAnnotationClick = useCallback(
+    (annotation: ProtoAnnotationObject) => {
+      if (manualLinkingState.active) {
+        handleAnnotationTracking(
+          annotation,
+          manualLinkingState.trackId,
+          dispatch,
+        );
+      } else {
+        if (!annotation.trackId) return;
+        dispatch(
+          imageViewerDataSlice.actions.toggleSelectedTrack(annotation.trackId),
+        );
+      }
+    },
+    [manualLinkingState, activeTrackId, dispatch],
+  );
+  const getFillColor = useCallback(
+    (trackId: string | undefined) => {
+      if (!trackId) return UNKNOWN_IMAGE_CATEGORY_COLOR;
+      const trackColor = tracklets[trackId].color;
+      if (selectedTracks.includes(trackId)) return hexAlpha(trackColor, 1);
+      return selectedTracks.length < 0
+        ? hexAlpha(trackColor, 0.2)
+        : hexAlpha(trackColor, 0.5);
+    },
+    [selectedTracks, tracklets],
+  );
 
   return images ? (
     <Layer>
@@ -99,7 +131,7 @@ export const AnnotationLayer: React.FC<AnnotationsProps> = ({
           selected={true}
           isFiltered={false}
           onSelect={() => {
-            onClick(annotation);
+            handleAnnotationClick(annotation);
           }}
         />
       ))}

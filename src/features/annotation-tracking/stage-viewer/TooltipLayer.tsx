@@ -20,13 +20,7 @@ export const TooltipLayer: React.FC<TooltipLayerProps> = ({
 }) => {
   return (
     <Layer>
-      <Label
-        opacity={0.85}
-        visible={visible}
-        listening={false}
-        x={x}
-        y={y}
-      >
+      <Label opacity={0.85} visible={visible} listening={false} x={x} y={y}>
         <Tag
           fill="black"
           pointerDirection="down"

@@ -19,7 +19,6 @@ import { DrawerActionSelection } from "./sections/ImageViewerDrawer/DrawerAction
 import { StageContext } from "views/ImageViewer/state/StageContext";
 import { DataProvider } from "./state/DataContext";
 import { DrawerViewProvider } from "./state/DrawerViewContext";
-import { TrackProvider } from "./state/TrackContext";
 
 export const ImageViewer = () => {
   const dispatch = useDispatch();
@@ -47,41 +46,39 @@ export const ImageViewer = () => {
   return (
     <ViewErrorBoundary viewName="ImageViewer">
       <DataProvider>
-        <TrackProvider>
-          <DrawerViewProvider>
-            <StageContext.Provider value={stageRef}>
+        <DrawerViewProvider>
+          <StageContext.Provider value={stageRef}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
+                gridTemplateRows: "1fr",
+                gridTemplateAreas: `"drawer-action-selection viewer-grid"`,
+                maxHeight: "100vh",
+                minWidth: "100%",
+              }}
+            >
+              <DrawerActionSelection />
               <Box
                 sx={{
                   display: "grid",
-                  gridTemplateColumns: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
-                  gridTemplateRows: "1fr",
-                  gridTemplateAreas: `"drawer-action-selection viewer-grid"`,
+                  gridTemplateColumns: `${isMobile ? DIMENSIONS.toolDrawerWidth + "px" : ` ${DIMENSIONS.leftDrawerWidth}px`} 1fr ${DIMENSIONS.toolDrawerWidth}px`,
+                  gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
+                  gridTemplateAreas: `"top-tools top-tools top-tools" "${isMobile ? "mobile-action-bar" : "action-drawer"} stage side-tools"`,
+                  overflow: "hidden",
                   maxHeight: "100vh",
-                  minWidth: "100%",
+                  gridArea: "viewer-grid",
                 }}
               >
-                <DrawerActionSelection />
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: `${isMobile ? DIMENSIONS.toolDrawerWidth + "px" : ` ${DIMENSIONS.leftDrawerWidth}px`} 1fr ${DIMENSIONS.toolDrawerWidth}px`,
-                    gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
-                    gridTemplateAreas: `"top-tools top-tools top-tools" "${isMobile ? "mobile-action-bar" : "action-drawer"} stage side-tools"`,
-                    overflow: "hidden",
-                    maxHeight: "100vh",
-                    gridArea: "viewer-grid",
-                  }}
-                >
-                  <TopToolBar />
-                  {isMobile ? <MobileActionBar /> : <ImageViewerDrawer />}
+                <TopToolBar />
+                {isMobile ? <MobileActionBar /> : <ImageViewerDrawer />}
 
-                  <StageWrapper />
-                  <SideToolBar />
-                </Box>
+                <StageWrapper />
+                <SideToolBar />
               </Box>
-            </StageContext.Provider>
-          </DrawerViewProvider>
-        </TrackProvider>
+            </Box>
+          </StageContext.Provider>
+        </DrawerViewProvider>
       </DataProvider>
     </ViewErrorBoundary>
   );

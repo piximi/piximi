@@ -1,23 +1,11 @@
 import { Box, Typography } from "@mui/material";
-import { DIMENSIONS } from "utils/constants";
-import { PartialDivider } from "components/ui/divider/PartialDivider";
+import { SectionDivider } from "components/ui/divider/SectionDivider";
 import { TrackCreationControls } from "./TrackCreation";
 import { TrackControls } from "./TrackLinking";
-import { TrackItems } from "./TrackItems";
+import { TrackList } from "./TrackList";
+import { DIMENSIONS } from "utils/constants";
 
-const SectionDivider = ({ text }: { text: string }) => {
-  return (
-    <PartialDivider
-      containerStyle={{ width: "100%" }}
-      typographyVariant="body2"
-      headerText={text}
-      textTransform="uppercase"
-      indentPercentage={12}
-    />
-  );
-};
-
-export const AnnotationTrackingSection = () => {
+export const TrackingControlsContainer = () => {
   return (
     <Box
       sx={{
@@ -53,7 +41,7 @@ export const AnnotationTrackingSection = () => {
         <TrackControls />
         <SectionDivider text="Tracks" />
 
-        <TrackItems />
+        <TrackList />
       </Box>
     </Box>
   );

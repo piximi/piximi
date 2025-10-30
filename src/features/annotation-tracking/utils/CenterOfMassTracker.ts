@@ -10,7 +10,11 @@ import type {
   CenterOfMass,
   NearestNeighborResult,
 } from "./types";
-import { DecodedAnnotationObject, Tracklet } from "store/data/types";
+import {
+  DecodedAnnotationObject,
+  PendingTracklet,
+  Tracklet,
+} from "store/data/types";
 import { mutatingFilter } from "utils/arrayUtils";
 
 /**
@@ -25,10 +29,16 @@ export class CenterOfMassTracker {
   /**
    * Validates bidirectional parent-child relationships in the track graph
    */
-  _validateTracks(tracks: Record<string, Tracklet>) {
+  _validateTracks(tracks: Record<string, PendingTracklet>) {
     const recordedChildren: string[] = [];
     let isValid = true;
     Object.values(tracks).forEach((tracklet) => {
+      if (tracklet.start === undefined || tracklet.end === undefined) {
+        console.error(`Tracklet with id "${tracklet.trackId}" not complete:`);
+        console.error(tracklet);
+
+        isValid = false;
+      }
       if (tracklet.children) {
         recordedChildren.push(...tracklet.children);
 
@@ -54,8 +64,8 @@ export class CenterOfMassTracker {
   /**
    * Filters out single-frame tracklets (start === end) and cleans up their parent-child relationships
    */
-  filterIsolated(tracks: Record<string, Tracklet>): Tracklet[] {
-    const tracksDupe = { ...tracks };
+  filterIsolated(tracks: Record<string, PendingTracklet>): Tracklet[] {
+    const tracksDupe = { ...tracks } as Record<string, Tracklet>;
 
     Object.values(tracks).forEach((track) => {
       if (track.start === track.end) {
@@ -84,7 +94,7 @@ export class CenterOfMassTracker {
     return Object.values(tracksDupe);
   }
 
-  _consolidateTracklets(tracklets: Record<string, Tracklet>) {
+  _consolidateTracklets(tracklets: Record<string, PendingTracklet>) {
     const removedTracklets: string[] = [];
     const trackletIdSet = new Set(Object.keys(tracklets));
 
@@ -123,14 +133,17 @@ export class CenterOfMassTracker {
   computeTracks(
     annotations: Record<string, DecodedAnnotationObject>,
     annotationCOMs?: Record<string, CenterOfMass>,
-  ) {
+  ): {
+    tracks: Array<Tracklet>;
+    coms: Record<string, CenterOfMass>;
+  } {
     const orderedAnnotations = createOrderedAnnotationRecord(
       annotations,
       this.config.numFrames,
     );
-    const tracks: Record<string, Tracklet> = {};
+    const tracks: Record<string, PendingTracklet> = {};
     const ann2TrackId: Record<string, string> = {};
-    const initializedChildren: Record<string, Tracklet> = {};
+    const initializedChildren: Record<string, PendingTracklet> = {};
 
     // Pre-compute centers of mass for all annotations
     const centersOfMassRecord: Record<string, CenterOfMass> = {};
@@ -194,7 +207,7 @@ export class CenterOfMassTracker {
     let i = 0;
     let trackNumber = 1;
     let nextTimepoint;
-    let currentTracklet: Tracklet | undefined;
+    let currentTracklet: PendingTracklet | undefined;
     while (i < orderedAnnotations.length - 1) {
       nextTimepoint = i + 1;
 
@@ -367,7 +380,10 @@ export class CenterOfMassTracker {
     const isValid = this._validateTracks(tracks);
 
     return isValid
-      ? { tracks: Object.values(tracks), coms: centersOfMassRecord }
+      ? {
+          tracks: Object.values(tracks) as Array<Tracklet>,
+          coms: centersOfMassRecord,
+        }
       : {
           tracks: [] as Array<Tracklet>,
           coms: {} as Record<string, CenterOfMass>,

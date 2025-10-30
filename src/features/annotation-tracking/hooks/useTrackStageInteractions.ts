@@ -3,8 +3,8 @@ import { KonvaEventObject } from "konva/lib/Node";
 
 import { useThrottledCallback } from "hooks/useThrottledCallback";
 
-import { getNewWheelPos } from "../utils";
 import { Point } from "utils/types";
+import { getNewWheelPos } from "../utils/stageUtils";
 
 const IMAGE_SPACING = 20;
 

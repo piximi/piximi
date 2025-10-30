@@ -1,11 +1,5 @@
-import React, {
-  useCallback,
-  useContext,
-  useLayoutEffect,
-  useMemo,
-  useState,
-} from "react";
-import { Provider, useDispatch, useSelector, useStore } from "react-redux";
+import React, { useContext, useLayoutEffect, useMemo, useState } from "react";
+import { Provider, useSelector, useStore } from "react-redux";
 import { useTheme } from "@mui/material";
 import { Stage as KonvaStage } from "react-konva";
 
@@ -15,24 +9,17 @@ import {
 } from "store/data/selectors";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
-import { ProtoAnnotationObject } from "views/ImageViewer/state/types";
-import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
-import { selectActiveTrackImageToAnnotation } from "views/ImageViewer/state/image-viewer-data/reselectors";
 import {
   selectActiveMetadata,
-  selectActiveTrackId,
   selectSelectedTracklets,
-  selectTimeLinkingState,
 } from "views/ImageViewer/state/image-viewer-data/selectors";
 
-import { useImageLoader } from "./hooks/useImageLoader";
-import { useAutoScroll } from "./hooks/useAutoScroll";
-import { useTrackStageInteractions } from "./hooks/useTrackStageInteractions";
-import { handleAnnotationTracking } from "./logic/trackingActions";
-import { TooltipLayer } from "./components/TooltipLayer";
-import { ImageLayer } from "./components/ImageLayer";
-import { AnnotationLayer } from "./components/AnnotationLayer";
-import { TrackProvider } from "views/ImageViewer/state/TrackContext";
+import { useImageLoader } from "../hooks/useImageLoader";
+import { useTrackStageInteractions } from "../hooks/useTrackStageInteractions";
+import { useAutoScroll } from "../hooks/useAutoScroll";
+import { ImageLayer } from "./ImageLayer";
+import { AnnotationLayer } from "./AnnotationLayer";
+import { TooltipLayer } from "./TooltipLayer";
 
 /**
  * TrackStage is the main canvas component for visualizing time-series annotations.
@@ -48,15 +35,13 @@ export const TrackStage = ({
 }) => {
   const store = useStore();
   const theme = useTheme();
-  const dispatch = useDispatch();
+
   const stageRef = useContext(StageContext);
 
   // Redux selectors
   const activeMetadata = useSelector(selectActiveMetadata);
   const metadataEntities = useSelector(selectMetadataEntities);
-  const activeTrackId = useSelector(selectActiveTrackId);
-  const activeTraclIm2Ann = useSelector(selectActiveTrackImageToAnnotation);
-  const manualLinkingActive = useSelector(selectTimeLinkingState);
+
   const tracklets = useSelector(selectTrackletRecord);
   const selectedTracks = useSelector(selectSelectedTracklets);
 
@@ -93,26 +78,6 @@ export const TrackStage = ({
     stageRef,
     activeMetadata,
     setStagePosition,
-  );
-
-  // Handle annotation click (tracking or selection)
-  const handleMouseClick = useCallback(
-    (annotation: ProtoAnnotationObject) => {
-      if (manualLinkingActive) {
-        handleAnnotationTracking(
-          annotation,
-          activeTrackId,
-          activeTraclIm2Ann,
-          dispatch,
-        );
-      } else {
-        if (!annotation.trackId) return;
-        dispatch(
-          imageViewerDataSlice.actions.toggleSelectedTrack(annotation.trackId),
-        );
-      }
-    },
-    [manualLinkingActive, activeTrackId, activeTraclIm2Ann, dispatch],
   );
 
   // Initial scale and position setup
@@ -163,14 +128,11 @@ export const TrackStage = ({
       <Provider store={store}>
         <StageContext.Provider value={stageRef}>
           <ImageLayer htmlImages={htmlImages} globalShape={globalShape} />
-          <TrackProvider>
-            <AnnotationLayer
-              imageShape={globalShape}
-              images={htmlImages}
-              onClick={handleMouseClick}
-              selectedTracks={selectedTracks}
-            />
-          </TrackProvider>
+          <AnnotationLayer
+            imageShape={globalShape}
+            images={htmlImages}
+            selectedTracks={selectedTracks}
+          />
           <TooltipLayer
             visible={tooltipProps.visible}
             x={tooltipProps.x}
