@@ -730,31 +730,51 @@ export const dataSlice = createSlice({
     ) => {
       const { trackId, annId } = action.payload;
       const annotation = state.annotations.entities[annId];
+      let tracklet: Tracklet | undefined = undefined;
+
+      // if no existing tracklet, create one
       if (!(trackId in state.tracklets)) {
         const metadataId = state.images.entities[annotation.imageId].metadataId;
-        state.tracklets[trackId] = {
+        tracklet = state.tracklets[trackId] = {
           metadataId,
           trackId: trackId,
           start: annotation.timepoint,
           end: annotation.timepoint,
           color: getRandomHexColor(),
-          linkedIds: [annId],
+          linkedIds: [],
         };
         state.relationships.metadataToTracklets[metadataId].push(trackId);
+      } else tracklet = state.tracklets[trackId];
+
+      // return if annotation already part of tracklet
+      if (tracklet.linkedIds.includes(annId)) {
+        console.error(`Annotation with id "${annId}" already part of track`);
         return;
       }
-      const tracklet = state.tracklets[trackId];
 
-      if (!tracklet.linkedIds.includes(annId)) {
-        tracklet.linkedIds.push(annId);
-        if (
-          tracklet.start === undefined ||
-          tracklet.start > annotation.timepoint
-        )
-          tracklet.start = annotation.timepoint;
-        if (tracklet.end === undefined || tracklet.end < annotation.timepoint)
-          tracklet.end = annotation.timepoint;
+      // Check to see if there is already an annotation at the same timepoint in the tracklet
+      // if there is, remove it
+      const existingAnnAtTimepoint = tracklet.linkedIds.find((annId) => {
+        const ann = state.annotations.entities[annId];
+        return ann.timepoint === annotation.timepoint;
+      });
+
+      if (existingAnnAtTimepoint) {
+        dataSlice.caseReducers.removeAnnotationFromTrackletRecord(state, {
+          type: "removeAnnotationFromTrackletRecord",
+          payload: { trackId, annId: existingAnnAtTimepoint },
+        });
       }
+
+      // add annotation to tracklet and update start/end if necessary
+      tracklet.linkedIds.push(annId);
+      if (tracklet.start === undefined || tracklet.start > annotation.timepoint)
+        tracklet.start = annotation.timepoint;
+      if (tracklet.end === undefined || tracklet.end < annotation.timepoint)
+        tracklet.end = annotation.timepoint;
+
+      //update trackId of annotation
+      annotation.trackId = trackId;
     },
 
     removeAnnotationFromTrackletRecord: (
@@ -762,33 +782,37 @@ export const dataSlice = createSlice({
       action: PayloadAction<{ trackId: string; annId: string }>,
     ) => {
       const { trackId, annId } = action.payload;
-      if (trackId in state.tracklets) {
-        const tracklet = state.tracklets[trackId];
-        const removedTP = state.annotations.entities[annId].timepoint;
-        if (tracklet.start === removedTP) {
-          let candidate: number | null = null;
-          for (const id of tracklet.linkedIds) {
-            const tp = state.annotations.entities[id].timepoint;
-            if (tp > removedTP && (candidate === null || tp < candidate)) {
-              candidate = tp;
-            }
-          }
-          tracklet.start = candidate ? candidate : undefined;
-        }
-        if (tracklet.end === removedTP) {
-          let candidate: number | null = null;
-          for (const id of tracklet.linkedIds) {
-            const tp = state.annotations.entities[id].timepoint;
-            if (tp < removedTP && (candidate === null || tp > candidate)) {
-              candidate = tp;
-            }
-          }
-          tracklet.end = candidate ? candidate : undefined;
-        }
-        mutatingFilter(
-          state.tracklets[trackId].linkedIds,
-          (id) => id !== annId,
+      const tracklet = state.tracklets[trackId];
+      if (!tracklet) {
+        console.error(`tracklet with id "${trackId}" does not exist`);
+        return;
+      }
+
+      mutatingFilter(state.tracklets[trackId].linkedIds, (id) => id !== annId);
+      const annotation = state.annotations.entities[annId];
+      const removedTP = annotation.timepoint;
+      annotation.trackId = undefined;
+
+      if (tracklet.linkedIds.length === 0) {
+        dataSlice.caseReducers.deleteTracklet(state, {
+          type: "deleteTracklet",
+          payload: trackId,
+        });
+        return;
+      }
+
+      if (tracklet.start === removedTP || tracklet.end === removedTP) {
+        const newLimits = tracklet.linkedIds.reduce(
+          (newLimits: { start: number; end: number }, annId) => {
+            const tp = state.annotations.entities[annId].timepoint;
+            if (tp < newLimits.start) newLimits.start = tp;
+            if (tp > newLimits.end) newLimits.end = tp;
+            return newLimits;
+          },
+          { start: tracklet.start, end: tracklet.end },
         );
+        tracklet.start = newLimits.start;
+        tracklet.end = newLimits.end;
       }
     },
 

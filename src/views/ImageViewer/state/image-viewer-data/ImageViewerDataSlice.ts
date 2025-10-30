@@ -5,6 +5,7 @@ import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 
 import { ImageViewerDataState, ImageViewerMetadataDetails } from "./types";
 import { mutatingFilter } from "utils/arrayUtils";
+import { PendingTracklet } from "store/data/types";
 
 const initialState: ImageViewerDataState = {
   metadataStack: {},
@@ -21,7 +22,7 @@ const initialState: ImageViewerDataState = {
     showTracklets: false,
     selectedTracklets: [],
   },
-  tLinking: { active: false, trackId: undefined, tracks: {} },
+  tLinking: { active: false, trackId: undefined },
   zLinking: { active: false, annIds: {} },
 };
 
@@ -165,10 +166,12 @@ export const imageViewerDataSlice = createSlice({
         ids,
       );
     },
-    startNewTrack(state, action: PayloadAction<string>) {
-      state.tLinking.active = true;
-      state.tLinking.trackId = action.payload;
-      state.tLinking.tracks[action.payload] = {};
+    startNewTrack(state, action: PayloadAction<PendingTracklet>) {
+      state.tLinking = {
+        active: true,
+        trackId: action.payload.trackId,
+        pendingTracklet: action.payload,
+      };
     },
     toggleTimeLinking(state, action: PayloadAction<boolean>) {
       const active = action.payload;
@@ -178,35 +181,10 @@ export const imageViewerDataSlice = createSlice({
     toggleZLinking(state, action: PayloadAction<boolean>) {
       state.zLinking.active = action.payload;
     },
-    addTLinkedAnnotation(state, action: PayloadAction<string>) {
-      const annId = action.payload;
-      const activeTrack = state.tLinking.trackId!;
-      const activeImageId =
-        state.metadataStack[state.activeMetdataId!].activeImageId!;
-      state.tLinking.tracks[activeTrack][activeImageId] = annId;
-    },
-    removeActiveTLinkedFrame(state) {
-      const activeImageId =
-        state.metadataStack[state.activeMetdataId!].activeImageId!;
-      const activeTrack = state.tLinking.trackId!;
-      delete state.tLinking.tracks[activeTrack][activeImageId];
-    },
     removeActiveTrack(state) {
       const trackId = state.tLinking.trackId;
       if (!trackId) return;
       Object.assign(state.tLinking, { active: false, trackId: undefined });
-
-      delete state.tLinking.tracks[trackId];
-    },
-    toggleTLinkedAnnotation(
-      state,
-      action: PayloadAction<{ annId: string; imId: string }>,
-    ) {
-      const { annId, imId } = action.payload;
-      const activeTrack = state.tLinking.trackId!;
-      const linkedId = state.tLinking.tracks[activeTrack][imId];
-      if (linkedId === annId) delete state.tLinking.tracks[activeTrack][imId];
-      else state.tLinking.tracks[activeTrack][imId] = annId;
     },
 
     setTLinkingTrackId(state, action: PayloadAction<string>) {

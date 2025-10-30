@@ -2,7 +2,11 @@ import { getRandomHexColor } from "utils/colorUtils";
 import { createOrderedAnnotationRecord, findOverlappingBoxes } from "./utils";
 import { generateUUID } from "store/data/utils";
 import type { BBoxTrackingConfig, CenterOfMass } from "./types";
-import { DecodedAnnotationObject, Tracklet } from "store/data/types";
+import {
+  DecodedAnnotationObject,
+  PendingTracklet,
+  Tracklet,
+} from "store/data/types";
 
 /**
  * Tracks objects across timepoints using bounding box overlap (IOU)
@@ -21,12 +25,15 @@ export class BBoxTracker {
   /**
    * Compute tracks for a set of annotations
    */
-  computeTracks(annotations: Record<string, DecodedAnnotationObject>) {
+  computeTracks(annotations: Record<string, DecodedAnnotationObject>): {
+    tracks: Array<Tracklet>;
+    coms: Record<string, CenterOfMass>;
+  } {
     const orderedAnnotations = createOrderedAnnotationRecord(
       annotations,
       this.config.numFrames,
     );
-    const tracks: Record<string, Tracklet> = {};
+    const tracks: Record<string, PendingTracklet> = {};
     const ann2TrackId: Record<string, string> = {};
 
     let i = 0;
@@ -104,7 +111,7 @@ export class BBoxTracker {
     }
 
     return {
-      tracks: Object.values(tracks),
+      tracks: Object.values(tracks) as Array<Tracklet>,
       coms: Object.values(annotations).reduce(
         (coms: Record<string, CenterOfMass>, ann) => {
           coms[ann.id] = {

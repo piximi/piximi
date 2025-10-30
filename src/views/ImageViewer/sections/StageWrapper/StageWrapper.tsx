@@ -7,8 +7,8 @@ import { useMobileView } from "hooks";
 import { DIMENSIONS } from "utils/constants";
 
 import { Stage } from "../Stage";
-import { TrackView } from "../track-viewer/TrackView";
 import { selectShowTracklets } from "views/ImageViewer/state/image-viewer-data/selectors";
+import { TrackViewContainer } from "features/annotation-tracking/TrackingViewContainer";
 
 export const StageWrapper = () => {
   const showTracklets = useSelector(selectShowTracklets);
@@ -57,7 +57,7 @@ export const StageWrapper = () => {
       })}
     >
       {showTracklets ? (
-        <TrackView width={width} height={wrapperHeight} />
+        <TrackViewContainer width={width} height={wrapperHeight} />
       ) : (
         <Stage stageWidth={width} stageHeight={stageHeight} />
       )}

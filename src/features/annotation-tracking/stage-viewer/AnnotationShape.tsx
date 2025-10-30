@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Image as KonvaImage } from "react-konva";
 
 import { colorOverlayROI, hexToRGBA } from "views/ImageViewer/utils";
-import { AnnotationProps } from "../types";
+import { AnnotationProps } from "../utils/types";
 
 /**
  * Renders a single annotation as a Konva image with colored overlay.

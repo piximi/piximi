@@ -1,9 +1,9 @@
 import { Box } from "@mui/material";
 import React, { useLayoutEffect, useRef, useState } from "react";
-import { TrackletContainer } from "./TrackletContainer";
-import { TrackStage } from "./TrackStage";
+import { TrackStage } from "./stage-viewer/TrackStage";
+import { TrackletContainer } from "./tracklet-viewer/TrackletContainer";
 
-export const TrackView = ({
+export const TrackViewContainer = ({
   width,
   height,
 }: {

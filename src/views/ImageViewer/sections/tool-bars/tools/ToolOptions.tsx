@@ -87,7 +87,7 @@ export const ToolOptions = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const t = useTranslation();
-  const tLinkingActive = useSelector(selectTimeLinkingState);
+  const tLinkingState = useSelector(selectTimeLinkingState);
   const activeTool = useSelector(selectToolType);
 
   const handleToolClick = (toolName: string) => {
@@ -139,7 +139,7 @@ export const ToolOptions = () => {
             callback={sliderCallback}
             toolLimits={tool.options}
             tooltipLocation="left"
-            disabled={tLinkingActive}
+            disabled={tLinkingState.active}
           >
             {tool.icon(
               activeTool === tool.operation
@@ -153,7 +153,7 @@ export const ToolOptions = () => {
             name={t(name)}
             onClick={() => handleToolClick(name)}
             tooltipLocation="left"
-            disabled={tLinkingActive}
+            disabled={tLinkingState.active}
           >
             {tool.icon(
               activeTool === tool.operation

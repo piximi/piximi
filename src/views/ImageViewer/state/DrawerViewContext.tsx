@@ -3,7 +3,7 @@ import { ExportAnnotationsSection } from "../sections/ImageViewerDrawer/ExportAn
 import { MetadataList } from "../sections/ImageViewerDrawer/MetadataList";
 import { KindCategorySection } from "../sections/ImageViewerDrawer/KindCategorySection";
 import { AnnotationSection } from "../sections/ImageViewerDrawer/annotation-section/AnnotationSection";
-import { AnnotationTrackingSection } from "../sections/ImageViewerDrawer/annotation-tracking-section/AnnotationTrackingSection";
+import { TrackingControlsContainer } from "features/annotation-tracking/control-section/TrackingControlsContainer";
 
 export type DrawerContextType =
   | "export"
@@ -34,7 +34,7 @@ export const DrawerViewProvider = ({ children }: { children: ReactNode }) => {
       case "annotations":
         return <AnnotationSection />;
       case "tracking":
-        return <AnnotationTrackingSection />;
+        return <TrackingControlsContainer />;
     }
   }, [drawerContext]);
 

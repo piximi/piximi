@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { selectTrackletRecord } from "store/data/selectors";
 
-import { TrackVisualizer } from "views/ImageViewer/sections/track-viewer/TrackVizualizer";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 import {
   selectActiveMetadata,
   selectSelectedTracklets,
 } from "views/ImageViewer/state/image-viewer-data/selectors";
+import { TrackVisualizer } from "./TrackVizualizer";
 
 export const TrackletContainer = ({
   height,

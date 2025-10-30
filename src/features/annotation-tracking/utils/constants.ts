@@ -1,0 +1,2 @@
+export const TRACKLET_SPACING = 40;
+export const TRACKLET_SPACING_MULTIPLIER = 0.5;

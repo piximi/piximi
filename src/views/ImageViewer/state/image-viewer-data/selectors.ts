@@ -90,7 +90,7 @@ export const selectTimeLinkingState = ({
 }: {
   imageViewerData: ImageViewerDataState;
 }) => {
-  return imageViewerData.tLinking.active;
+  return imageViewerData.tLinking;
 };
 
 export const selectActiveTrackId = ({
@@ -99,13 +99,6 @@ export const selectActiveTrackId = ({
   imageViewerData: ImageViewerDataState;
 }) => {
   return imageViewerData.tLinking.trackId;
-};
-export const selectTimeTrackingRecord = ({
-  imageViewerData,
-}: {
-  imageViewerData: ImageViewerDataState;
-}) => {
-  return imageViewerData.tLinking.tracks;
 };
 
 // Z Linking Selectors

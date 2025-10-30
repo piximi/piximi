@@ -1,141 +1,6 @@
-import Konva from "konva";
-import { KonvaEventObject } from "konva/lib/Node";
-import { Point } from "utils/types";
+import { TRACKLET_SPACING_MULTIPLIER, TRACKLET_SPACING } from "./constants";
 import { PositionedTrack, ValidTracklet } from "./types";
 import { difference } from "lodash";
-
-const PADDING = 40;
-
-const COMPONENT_SPACING_MULTIPLIER = 0.5;
-
-export const zoomAndOffset = (
-  stage: Konva.Stage,
-  newScale: number,
-  center: Point,
-  maxScrollRight?: number,
-  maxScrollLeft?: number,
-) => {
-  if (!center || !stage) return;
-
-  const stageX = stage.x();
-  const stageY = stage.y();
-  const stageScale = stage.scaleX();
-  const stageWidth = stage.width();
-
-  const mousePointTo = {
-    x: (center.x - stageX!) / stageScale,
-    y: (center.y - stageY!) / stageScale,
-  };
-
-  const newPos = {
-    x: center.x - mousePointTo.x * newScale,
-    y: center.y - mousePointTo.y * newScale,
-  };
-
-  if (maxScrollRight && newPos.x > maxScrollRight) {
-    newPos.x = maxScrollRight;
-  }
-
-  if (maxScrollLeft) {
-    // Recalculate maxScrollLeft for the new scale
-    // Original formula: -(totalContentWidth * scale - stageWidth + spacing)
-    // We need to scale the content width from old scale to new scale
-    const contentWidthAtUnitScale =
-      (-1 * maxScrollLeft + stageWidth - 20) / stageScale;
-    const newMaxScrollLeft = -(
-      contentWidthAtUnitScale * newScale -
-      stageWidth +
-      20
-    );
-
-    if (newPos.x < newMaxScrollLeft) {
-      newPos.x = newMaxScrollLeft;
-    }
-  }
-
-  stage.position(newPos);
-  stage.scale({ x: newScale, y: newScale });
-};
-
-export const handlePinchZoom = (
-  event: KonvaEventObject<WheelEvent>,
-  maxScrollRight?: number,
-  maxScrollLeft?: number,
-) => {
-  const stage = event.target.getStage()!;
-  const stageWidth = stage.width();
-  const contentWidthAtUnitScale = maxScrollLeft! * -1 + stageWidth - 20;
-
-  const { deltaY, ctrlKey } = event.evt;
-
-  const oldScale = stage.scaleX();
-  const direction = deltaY > 0 ? -1 : 1;
-
-  // Use different scaling factors for different input types
-  let scaleBy = 1.1; // Default for mouse wheel
-
-  // Trackpad gestures often have smaller deltaY values and ctrlKey
-  if (ctrlKey || Math.abs(deltaY) < 10) {
-    scaleBy = 1.05; // More sensitive for trackpad
-  }
-
-  const newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-
-  // if the total content width is less than the width of the stage, dont zoom out further
-  if (contentWidthAtUnitScale < stageWidth && newScale < oldScale) {
-    console.log("min list width reached");
-    return;
-  }
-  const center = {
-    x: stage.getPointerPosition()!.x,
-    y: (stage.height() / 2) * stage.scaleX() + stage.y(),
-  };
-
-  zoomAndOffset(stage, newScale, center, maxScrollRight, maxScrollLeft);
-};
-
-export const getNewWheelPos = (
-  event: KonvaEventObject<WheelEvent>,
-  maxScrollRight?: number,
-  maxScrollLeft?: number,
-) => {
-  event.evt.preventDefault();
-  const stage = event.target.getStage()!;
-  const { deltaX, deltaY, ctrlKey, metaKey } = event.evt;
-  // Gesture detection
-  const isZoomGesture = ctrlKey || metaKey;
-
-  const isHorizontalPan =
-    Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 0;
-  const isVerticalPan =
-    Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 0;
-  const isBothAxisPan =
-    Math.abs(deltaX) > 0 && Math.abs(deltaY) > 0 && !isZoomGesture;
-
-  if (isZoomGesture) {
-    // Zoom logic (same as above)
-    handlePinchZoom(event, maxScrollRight, maxScrollLeft);
-  } else if (isHorizontalPan || isVerticalPan || isBothAxisPan) {
-    // Pan logic
-    const currentPos = { x: stage.x(), y: stage.y() };
-
-    // Adjust sensitivity based on zoom level
-    const panSensitivity = 1 / stage.scaleX();
-
-    const newX = currentPos.x - deltaX * panSensitivity;
-
-    // Prevents panning past content limits
-    if (maxScrollRight && newX > maxScrollRight) return;
-    if (maxScrollLeft && newX < maxScrollLeft) return;
-
-    const newPos = {
-      x: currentPos.x - deltaX * panSensitivity,
-      y: currentPos.y,
-    };
-
-    return newPos;
-  }
-};
 
 /**
  * Generates positioned tracks and their visual connections for the track visualizer.
@@ -186,9 +51,8 @@ export const generateRelationships = (
     }
   });
 
-  //console.log(trackMap);
   /**
-   * PHASE 2: Find connected components using depth-first search
+   * Find connected components using depth-first search
    * Groups tracks that are related through parent-child relationships into components.
    * This allows for proper spacing between unrelated track families.
    */
@@ -244,11 +108,11 @@ export const generateRelationships = (
   });
 
   /**
-   * PHASE 3: Calculate scale for time-to-pixel conversion
+   * Calculate scale for time-to-pixel conversion
    * Make padding configurable, consider adaptive scaling based on
    * track density and duration distribution.
    */
-  const scale = (width - 2 * PADDING) / numFrames;
+  const scale = (width - 2 * TRACKLET_SPACING) / numFrames;
 
   // Initialize positioning state
   const positioned: PositionedTrack[] = [];
@@ -334,10 +198,8 @@ export const generateRelationships = (
 
     // Calculate space needed for each child subtree
     const childHeights = children.map((childId) => {
-      //console.log("---", childId, "---");
       return calculateSubtreeHeight(childId, new Set());
     });
-    //console.log("childHeights: ", childHeights);
     const totalChildrenHeight = childHeights.reduce(
       (sum, height) => sum + height,
       0,
@@ -392,7 +254,6 @@ export const generateRelationships = (
   }
 
   /**
-   * PHASE 4: Position tracks with symmetric child arrangement
    * Positions a parent track and its immediate children in a visually balanced way.
    */
 
@@ -421,7 +282,7 @@ export const generateRelationships = (
   }
 
   /**
-   * PHASE 5: Process each component and position its tracks
+   * Process each component and position its tracks
    */
   components.forEach((component, componentIndex) => {
     // Use dedicated function for finding root tracks
@@ -437,7 +298,6 @@ export const generateRelationships = (
       }
       return trackA.start - trackB.start;
     });
-    //console.log("------\n");
     // Position each root track and its descendants recursively
     rootTracks.forEach((rootTrackId) => {
       currentY = positionTrackWithChildren(
@@ -447,13 +307,9 @@ export const generateRelationships = (
         new Set(), // Fresh visited set for each root track
       );
     });
-    //console.log("------\n");
 
     /**
      * Safety net: handle any tracks that weren't positioned above
-     * CRITIQUE: This suggests the algorithm above is incomplete. If tracks need
-     * to be handled here, it indicates a flaw in the hierarchy processing.
-     * IMPROVEMENT: Fix the root cause rather than having a safety net.
      */
     component.forEach((trackId) => {
       if (!positionedMap.has(trackId)) {
@@ -476,16 +332,12 @@ export const generateRelationships = (
     });
 
     // Add visual separation between components
-    // IMPROVED: Using named constant instead of magic number
-    currentY += trackSpacing * COMPONENT_SPACING_MULTIPLIER;
+    currentY += trackSpacing * TRACKLET_SPACING_MULTIPLIER;
   });
 
   /**
-   * PHASE 6: Generate visual connections between parent and child tracks
+   * Generate visual connections between parent and child tracks
    * Creates line coordinates for drawing connections from parent end to child start.
-   *
-   * Using positionedMap for O(1) lookups instead of O(n) Array.find()
-   * This reduces complexity from O(n³) to O(n²) for connection generation.
    */
   const connections: Array<{
     from: { x: number; y: number };
@@ -494,16 +346,15 @@ export const generateRelationships = (
   positioned.forEach((track) => {
     if (track.parents) {
       track.parents.forEach((parentId) => {
-        // IMPROVED: O(1) lookup using positionedMap instead of Array.find()
         const parent = positionedMap.get(parentId);
         if (parent) {
           connections.push({
             from: {
-              x: PADDING + parent.end * scale,
+              x: TRACKLET_SPACING + parent.end * scale,
               y: parent.y,
             },
             to: {
-              x: PADDING + track.start * scale,
+              x: TRACKLET_SPACING + track.start * scale,
               y: track.y,
             },
           });
@@ -520,6 +371,6 @@ export const generateRelationships = (
     positionedTracks: positioned,
     connections,
     scale,
-    padding: PADDING,
+    padding: TRACKLET_SPACING,
   };
 };
