@@ -27,4 +27,5 @@ src/data/exampleProjects/*.zip
 .cursorignore
 pnpm-lock.yaml
 .claude/*
+.worktrees/
 
