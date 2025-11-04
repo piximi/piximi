@@ -1,7 +1,15 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-pnpm run lint
+# Get staged files that should be linted
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|jsx|ts|tsx)$' || true)
+
+if [ -n "$STAGED_FILES" ]; then
+  echo "Linting staged files..."
+  pnpm run lint $STAGED_FILES
+else
+  echo "No lintable files staged, skipping lint"
+fi
 
 pnpm run no-console-logs
 
