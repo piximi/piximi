@@ -41,7 +41,7 @@ export interface TrackerConfig {
   imageMetadataId: string;
   numFrames: number; // max number of timpoints
   includeIsolatedAnnotations?: boolean;
-  gap?: number;
+  gapClosingDist?: number;
   calculateTrackletRelationships?: boolean;
 }
 /**

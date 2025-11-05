@@ -270,25 +270,25 @@ export class CenterOfMassTracker {
           continue;
         }
 
-        let gappedCounter = 0;
-        const gap = this.config.gap ?? 0;
+        let gapClosingCounter = 0;
+        const gapClosingDist = this.config.gapClosingDist ?? 0;
         let nearestNeighbor: NearestNeighborResult | undefined = undefined;
         let nextAnnotations: Record<string, DecodedAnnotationObject> = {};
         while (
-          gappedCounter <= gap &&
+          gapClosingCounter <= gapClosingDist &&
           nearestNeighbor === undefined &&
-          nextTimepoint + gappedCounter < orderedAnnotations.length
+          nextTimepoint + gapClosingCounter < orderedAnnotations.length
         ) {
-          const gappedTimepoint = nextTimepoint + gappedCounter;
+          const gapTimepoint = nextTimepoint + gapClosingCounter;
           // Create a list of potential linked anns excluding those already in a tracklet or those which will become child tracklets
-          nextAnnotations = orderedAnnotations[gappedTimepoint];
+          nextAnnotations = orderedAnnotations[gapTimepoint];
           const candidateAnns = Object.values(nextAnnotations).filter(
             (ann) => !ann2TrackId[ann.id] && !(ann.id in initializedChildren),
           );
 
           // EARLY EXIT CASE: No potential annotations for linking in next timepoint
           if (candidateAnns.length === 0) {
-            gappedCounter++;
+            gapClosingCounter++;
 
             continue;
           }
@@ -302,7 +302,7 @@ export class CenterOfMassTracker {
             candidateCenters,
             this.config.maxDistance,
           );
-          gappedCounter++;
+          gapClosingCounter++;
         }
 
         if (nearestNeighbor) {

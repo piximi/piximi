@@ -30,9 +30,9 @@ export const AutoTrackCreation = () => {
   const [threshold, setThreshold] = useState("75");
   const [finalValue, setFinalValue] = useState("75");
   const [includeIsolated, setIncludeIsolated] = useState(false);
-  const [includeGap, setIncludeGap] = useState(false);
-  const [gap, setGap] = useState("1");
-  const [finalGap, setFinalGap] = useState("75");
+  const [includeGapClosing, setIncludeGapClosing] = useState(false);
+  const [gapClosingDist, setGapClosingDist] = useState("1");
+  const [finalGapClosingDist, setFinalGapClosingDist] = useState("75");
   const [calculateRelationships, setCalculateRelationships] = useState(false);
   const [trackerType] = useState<TrackerType>("center-of-mass");
   const metadata2Tracklets = useSelector(selectMetadataToTracklets);
@@ -60,7 +60,7 @@ export const AutoTrackCreation = () => {
           imageMetadataId: activeMetadata.id,
           numFrames: Object.keys(activeMetadata.images).length,
           includeIsolatedAnnotations: includeIsolated,
-          gap: includeGap ? +gap : undefined,
+          gapClosingDist: includeGapClosing ? +gapClosingDist : undefined,
           calculateTrackletRelationships: calculateRelationships,
         });
       case "bbox":
@@ -69,7 +69,7 @@ export const AutoTrackCreation = () => {
           imageMetadataId: activeMetadata.id,
           numFrames: Object.keys(activeMetadata.images).length,
           includeIsolatedAnnotations: includeIsolated,
-          gap: includeGap ? +gap : undefined,
+          gapClosingDist: includeGapClosing ? +gapClosingDist : undefined,
           calculateTrackletRelationships: calculateRelationships,
         });
     }
@@ -78,8 +78,8 @@ export const AutoTrackCreation = () => {
     activeMetadata,
     threshold,
     includeIsolated,
-    includeGap,
-    gap,
+    includeGapClosing,
+    gapClosingDist,
     calculateRelationships,
   ]);
 
@@ -106,7 +106,7 @@ export const AutoTrackCreation = () => {
       (Number.isNaN(numValue) || numValue <= 0 || numValue > 100)
     )
       return;
-    setGap(value);
+    setGapClosingDist(value);
   };
 
   const handleAutoTracking = () => {
@@ -227,17 +227,17 @@ export const AutoTrackCreation = () => {
         }}
       >
         <Typography variant="body2" sx={{ flexGrow: 1 }}>
-          Gap Bridging:
+          Gap Closing:
         </Typography>
 
         <Checkbox
-          checked={includeGap}
-          onChange={() => setIncludeGap((val) => !val)}
+          checked={includeGapClosing}
+          onChange={() => setIncludeGapClosing((val) => !val)}
           size="small"
           sx={{ px: 0, py: 0.5 }}
         />
       </Box>
-      <Collapse in={includeGap} sx={{ width: "100%" }}>
+      <Collapse in={includeGapClosing} sx={{ width: "100%" }}>
         <Box
           sx={{
             display: "flex",
@@ -253,7 +253,7 @@ export const AutoTrackCreation = () => {
           </Typography>
           <FormControl size="small" variant="standard" sx={{ width: "3ch" }}>
             <Input
-              value={gap}
+              value={gapClosingDist}
               margin="dense"
               inputProps={{ style: { textAlign: "end" } }}
               sx={(theme) => ({
@@ -261,8 +261,9 @@ export const AutoTrackCreation = () => {
               })}
               onChange={handleGapChange}
               onBlur={(event) => {
-                if (event.target.value === "") setGap(finalGap);
-                else setFinalGap(event.target.value);
+                if (event.target.value === "")
+                  setGapClosingDist(finalGapClosingDist);
+                else setFinalGapClosingDist(event.target.value);
               }}
             />
           </FormControl>
