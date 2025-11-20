@@ -161,7 +161,7 @@ export const ClassifierStatusProvider = ({
     if (activeKindId === IMAGE_KIND) {
       dispatch(dataSlice.actions.batchUpdateImageData(updates));
     } else {
-      dispatch(dataSlice.actions.batchUpdateAnnotation(updates));
+      dispatch(dataSlice.actions.batchUpdateAnnotations(updates));
     }
   };
 
@@ -199,7 +199,7 @@ export const ClassifierStatusProvider = ({
         },
         [] as { id: string; changes: { partition: Partition } }[],
       );
-      dispatch(dataSlice.actions.batchUpdateAnnotation(updates));
+      dispatch(dataSlice.actions.batchUpdateAnnotations(updates));
     }
   };
 

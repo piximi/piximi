@@ -26,7 +26,7 @@ export const ManualTrackCreation = () => {
 
     dispatch(
       imageViewerDataSlice.actions.startNewTrack({
-        trackId: newTrackletId,
+        id: newTrackletId,
         color: getRandomHexColor(),
         linkedIds: [],
         metadataId: activeMetadataId,

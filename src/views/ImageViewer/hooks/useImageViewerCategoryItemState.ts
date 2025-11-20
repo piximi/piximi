@@ -33,7 +33,7 @@ export const useImageViewerCategoryItemState = (category: Category) => {
   }, [category.id, dispatch]);
 
   const deleteCategory = (category: Category) => {
-    dispatch(dataSlice.actions.deleteCategoryCascade(category.id));
+    dispatch(dataSlice.actions.deleteCategory(category.id));
   };
 
   const editCategory = (id: string, name: string, color: string) => {

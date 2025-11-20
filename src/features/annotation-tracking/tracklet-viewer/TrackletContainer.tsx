@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectTrackletRecord } from "store/data/selectors";
+import { selectTrackletEntities } from "store/data/selectors";
 
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 import {
@@ -18,7 +18,7 @@ export const TrackletContainer = ({
   width: number;
 }) => {
   const dispatch = useDispatch();
-  const tracklets = useSelector(selectTrackletRecord);
+  const tracklets = useSelector(selectTrackletEntities);
   const activeMetadata = useSelector(selectActiveMetadata);
   const secondaryTracks = useSelector(selectSelectedTracklets);
 

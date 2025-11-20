@@ -99,7 +99,7 @@ export const ProjectViewerCategories = () => {
     );
   };
   const deleteCategory = (category: Category) => {
-    dispatch(dataSlice.actions.deleteCategoryCascade(category.id));
+    dispatch(dataSlice.actions.deleteCategory(category.id));
   };
 
   const onOpenCategoryMenu = (

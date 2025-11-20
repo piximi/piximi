@@ -15,26 +15,42 @@ import {
   ImageData,
   Kind,
 } from "./types";
-import {
-  generateCategory,
-  generateUUID,
-  isPopulatedTracklet,
-  isUnknownCategory,
-} from "./utils";
+import { generateCategory, generateUUID, isUnknownCategory } from "./utils";
 import {
   IMAGE_KIND,
-  UNKNOWN_ANNOTATION_CATEGORY_COLOR,
   UNKNOWN_CATEGORY_NAME,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "./constants";
-
-import { mutatingFilter } from "utils/arrayUtils";
-import { getRandomHexColor } from "utils/colorUtils";
 import {
-  addToSimpleRelationship,
-  excludes,
-  removeFromSimpleRelationship,
-} from "utils/objectUtils";
+  deleteTrackletCascade,
+  removeAnnotationFromTrackletCascade,
+  addAnnotationToTrackletCascade,
+  joinTrackletsCascade,
+  severTrackletCascade,
+  deleteAnnotationCascade,
+  updateAnnotationCascde,
+  addCategoryCascade,
+  deleteCategoryCascade,
+  deleteImageCascade,
+  updateImageCascade,
+  addKindCascade,
+  deleteKindCascade,
+  addTrackletCascade,
+} from "./cascade-operations";
+import {
+  addAnnotationBatch,
+  deleteAnnotationBatch,
+  updateAnnotationBatch,
+  deleteImageDataBatch,
+  updateImageDataBatch,
+  deleteCategoryBatch,
+} from "./batch-operations";
+import {
+  addAnnotationToAllRelationships,
+  addImageToCategoryRelationship,
+  addTrackletRelationship,
+  removeTrackletRelationship,
+} from "./relationship-operations";
 
 // Entity Adapters
 export const metadataAdapter = createEntityAdapter<ImageMetadata>();
@@ -42,6 +58,7 @@ export const imageDataAdapter = createEntityAdapter<ImageData>();
 export const kindsAdapter = createEntityAdapter<Kind>();
 export const categoriesAdapter = createEntityAdapter<Category>();
 export const annotationsAdapter = createEntityAdapter<AnnotationObject>();
+export const trackletAdapter = createEntityAdapter<Tracklet>();
 
 const unknownImageCategory = generateCategory(
   UNKNOWN_CATEGORY_NAME,
@@ -68,6 +85,7 @@ const initialState: DataState = {
   metadata: metadataAdapter.getInitialState(),
   images: imageDataAdapter.getInitialState(),
   annotations: annotationsAdapter.getInitialState(),
+  tracklets: trackletAdapter.getInitialState(),
   relationships: {
     kindToCategories: { [imageKind.id]: [unknownImageCategory.id] },
     kindToAnnotations: {},
@@ -76,7 +94,6 @@ const initialState: DataState = {
     imageToAnnotations: {},
     metadataToTracklets: {},
   },
-  tracklets: {},
 };
 
 export const dataSlice = createSlice({
@@ -84,60 +101,18 @@ export const dataSlice = createSlice({
   initialState,
   reducers: {
     // ============== KIND OPERATIONS ==============
+    // -- Create
     addKind: (
       state,
       action: PayloadAction<{ kind: Kind; unknownCategory?: Category }>,
     ) => {
-      const kind = action.payload.kind;
-      // Prevent overwriting IMAGE_KIND
-      if (kind.id === IMAGE_KIND && state.kinds.entities[IMAGE_KIND]) {
-        console.error("Cannot recreate IMAGE_KIND - it already exists");
-        return;
-      }
-      let unknownCategory = action.payload.unknownCategory;
-      // Validation
-
-      // ensure unknown category is given if specified in kind
-      if (kind.unknownCategoryId && !unknownCategory) {
-        console.error("Unknown category specified in kind but not provided");
-        return;
-      }
-      if (unknownCategory) {
-        // ensure correct identifiers between kind and unknown category
-        if (
-          kind.unknownCategoryId !== unknownCategory.id ||
-          unknownCategory.kind !== kind.id
-        ) {
-          console.error("Mismatch between kind and unknown category");
-          return;
-        }
-      }
-
-      // if no unknown category provided, create one
-      if (!unknownCategory) {
-        unknownCategory = generateCategory(
-          UNKNOWN_CATEGORY_NAME,
-          kind.id,
-          UNKNOWN_ANNOTATION_CATEGORY_COLOR,
-        );
-        unknownCategory.id = kind.unknownCategoryId;
-      }
-      kindsAdapter.addOne(state.kinds, kind);
-
-      // Initialize relationship entries
-      state.relationships.kindToCategories[action.payload.kind.id] = [
-        unknownCategory.id,
-      ];
-      state.relationships.kindToAnnotations[action.payload.kind.id] = [];
-
-      // Add unknown category
-      categoriesAdapter.addOne(state.categories, unknownCategory);
-
-      // Initialize relationship entries
-      state.relationships.categoryToImages[unknownCategory.id] = [];
-      state.relationships.categoryToAnnotations[unknownCategory.id] = [];
+      addKindCascade(
+        state,
+        action.payload.kind,
+        action.payload.unknownCategory,
+      );
     },
-
+    // -- Update
     updateKindName: (
       state,
       action: PayloadAction<{ id: string; newName: string }>,
@@ -152,76 +127,17 @@ export const dataSlice = createSlice({
         changes: { displayName: newName },
       });
     },
-
+    // -- Delete
     deleteKind: (state, action: PayloadAction<string>) => {
-      const kindId = action.payload;
-
-      // Delete the kind
-      kindsAdapter.removeOne(state.kinds, kindId);
-
-      // Clean up relationships
-      delete state.relationships.kindToCategories[kindId];
-      delete state.relationships.kindToAnnotations[kindId];
-    },
-
-    deleteKindCascade: (state, action: PayloadAction<string>) => {
-      const kindId = action.payload;
-      if (kindId === "Images") return;
-
-      // Delete all related categories
-      const categoryIds = state.relationships.kindToCategories[kindId] || [];
-      categoriesAdapter.removeMany(state.categories, categoryIds);
-
-      // Clean up category relationships
-      categoryIds.forEach((catId) => {
-        delete state.relationships.categoryToAnnotations[catId];
-      });
-
-      const annotationIds = state.relationships.kindToAnnotations[kindId];
-
-      annotationIds.forEach((annId) => {
-        const { imageId } = state.annotations.entities[annId];
-
-        if (!imageId) return;
-
-        removeFromSimpleRelationship(
-          state.relationships.imageToAnnotations,
-          imageId,
-          annId,
-        );
-      });
-      annotationsAdapter.removeMany(state.annotations, annotationIds);
-
-      // Clean up kind relationships
-      delete state.relationships.kindToCategories[kindId];
-      delete state.relationships.kindToAnnotations[kindId];
-
-      // Finally, delete the kind
-      kindsAdapter.removeOne(state.kinds, kindId);
+      deleteKindCascade(state, action.payload);
     },
 
     // ============== CATEGORY OPERATIONS ==============
+    // -- Create
     addCategory: (state, action: PayloadAction<Category>) => {
-      const category = action.payload;
-      if (isUnknownCategory(category.id)) {
-        console.error("Cannot directly create unknown category.");
-        return;
-      }
-      categoriesAdapter.addOne(state.categories, category);
-
-      // Initialize relationship entries
-      state.relationships.categoryToImages[category.id] = [];
-      state.relationships.categoryToAnnotations[category.id] = [];
-
-      // Update kind relationship
-
-      addToSimpleRelationship(
-        state.relationships.kindToCategories,
-        category.kind,
-        category.id,
-      );
+      addCategoryCascade(state, action.payload);
     },
-
+    // -- Update
     updateCategory: (
       state,
       action: PayloadAction<{
@@ -236,104 +152,13 @@ export const dataSlice = createSlice({
 
       categoriesAdapter.updateOne(state.categories, { id, changes });
     },
-
+    // -- Delete
     deleteCategory: (state, action: PayloadAction<string>) => {
-      const categoryId = action.payload;
-      if (isUnknownCategory(categoryId)) {
-        console.error("Cannot remove unknown Category");
-        return;
-      }
-      const category = state.categories.entities[categoryId];
-
-      if (!category) return;
-
-      // Remove from kind relationship
-      removeFromSimpleRelationship(
-        state.relationships.kindToCategories,
-        category.kind,
-        categoryId,
-      );
-
-      // Clean up relationships
-      delete state.relationships.categoryToImages[categoryId];
-      delete state.relationships.categoryToAnnotations[categoryId];
-
-      // Delete the category
-      categoriesAdapter.removeOne(state.categories, categoryId);
-    },
-
-    deleteCategoryCascade: (state, action: PayloadAction<string>) => {
-      const categoryId = action.payload;
-      if (isUnknownCategory(categoryId)) {
-        console.error("Cannot remove unknown Category");
-        return;
-      }
-      const category = state.categories.entities[categoryId];
-
-      if (!category) return;
-
-      // Update all images that use this category to use unknown category
-      const kind = state.kinds.entities[category.kind];
-      const unknownCategoryId = kind.unknownCategoryId;
-      if (kind.id === IMAGE_KIND) {
-        const imageIds = state.relationships.categoryToImages[categoryId] || [];
-        imageIds.forEach((imageId) => {
-          // Update image entity
-          imageDataAdapter.updateOne(state.images, {
-            id: imageId,
-            changes: { categoryId: unknownCategoryId },
-          });
-          // Update relationships
-          removeFromSimpleRelationship(
-            state.relationships.categoryToImages,
-            categoryId,
-            imageId,
-          );
-          addToSimpleRelationship(
-            state.relationships.categoryToImages,
-            unknownCategoryId,
-            imageId,
-          );
-        });
-        // Clean up relationships
-        delete state.relationships.categoryToImages[categoryId];
-      } else {
-        const annIds =
-          state.relationships.categoryToAnnotations[categoryId] || [];
-        annIds.forEach((annId) => {
-          // Update annotation entity
-          annotationsAdapter.updateOne(state.annotations, {
-            id: annId,
-            changes: { categoryId: unknownCategoryId },
-          });
-          // Update relationships
-          removeFromSimpleRelationship(
-            state.relationships.categoryToAnnotations,
-            categoryId,
-            annId,
-          );
-          addToSimpleRelationship(
-            state.relationships.categoryToAnnotations,
-            unknownCategoryId,
-            annId,
-          );
-        });
-        // Clean up relationships
-        delete state.relationships.categoryToAnnotations[categoryId];
-      }
-
-      // Remove from kind relationship
-      removeFromSimpleRelationship(
-        state.relationships.kindToCategories,
-        category.kind,
-        categoryId,
-      );
-
-      // Delete the category
-      categoriesAdapter.removeOne(state.categories, categoryId);
+      deleteCategoryCascade(state, action.payload);
     },
 
     // ============== METADATA OPERATIONS ==============
+    // -- Create
     addMetadata: (
       state,
       action: PayloadAction<{ metadata: ImageMetadata; images: ImageData[] }>,
@@ -366,6 +191,7 @@ export const dataSlice = createSlice({
       });
       state.relationships.metadataToTracklets[metadata.id] = [];
     },
+    // -- Update
     updateDefaultMetadataImage: (
       state,
       action: PayloadAction<{
@@ -398,6 +224,7 @@ export const dataSlice = createSlice({
     },
 
     // ============== IMAGE OPERATIONS ==============
+    // -- Create
     addImageData: (state, action: PayloadAction<ImageData>) => {
       const image = action.payload;
       imageDataAdapter.addOne(state.images, image);
@@ -406,14 +233,9 @@ export const dataSlice = createSlice({
       state.relationships.imageToAnnotations[image.id] = [];
 
       // Update category relationships
-
-      addToSimpleRelationship(
-        state.relationships.categoryToImages,
-        image.categoryId,
-        image.id,
-      );
+      addImageToCategoryRelationship(state, image.id, image.categoryId);
     },
-
+    // -- Update
     updateImageData: (
       state,
       action: PayloadAction<{
@@ -421,150 +243,27 @@ export const dataSlice = createSlice({
         changes: Partial<Omit<ImageData, "data">>;
       }>,
     ) => {
-      const { id, changes } = action.payload;
-      const existingImageData = state.images.entities[id];
-
-      if (!existingImageData) return;
-
-      // Handle timepoint category changes
-
-      // Remove old category relationships
-
-      if (changes.categoryId) {
-        removeFromSimpleRelationship(
-          state.relationships.categoryToImages,
-          existingImageData.categoryId,
-          id,
-        );
-        addToSimpleRelationship(
-          state.relationships.categoryToImages,
-          changes.categoryId,
-          id,
-        );
-      }
-
-      imageDataAdapter.updateOne(state.images, { id, changes });
+      updateImageCascade(state, action.payload.id, action.payload.changes);
     },
-
+    // -- Delete
     deleteImageData: (state, action: PayloadAction<string>) => {
-      const imageId = action.payload;
-      const image = state.images.entities[imageId];
-
-      if (!image) return;
-
-      // Remove from category relationships
-      removeFromSimpleRelationship(
-        state.relationships.categoryToImages,
-        image.categoryId,
-        imageId,
-      );
-
-      image.data.dispose();
-
-      // Clean up image-annotation relationship
-      delete state.relationships.imageToAnnotations[imageId];
-
-      // Delete the image
-      imageDataAdapter.removeOne(state.images, imageId);
-
-      // Remove from metadata and delete metadata if no images
-      const metadata = state.metadata.entities[image.metadataId];
-      mutatingFilter(metadata.imageDataIds, (id) => id !== imageId);
-      if (metadata.imageDataIds.length === 0) {
-        metadataAdapter.removeOne(state.metadata, metadata.id);
-      } else {
-        if (metadata.defaultImageId === imageId)
-          metadata.defaultImageId = metadata.imageDataIds[0];
-      }
-    },
-    deleteImageCascade: (state, action: PayloadAction<string>) => {
-      const imageId = action.payload;
-      const image = state.images.entities[imageId];
-      if (!image) return;
-      // Delete all annotations for this image
-      const annotationIds = state.relationships.imageToAnnotations[imageId];
-      annotationIds.forEach((annId) => {
-        const annotation = state.annotations.entities[annId];
-        if (annotation) {
-          // Remove from category relationship
-          removeFromSimpleRelationship(
-            state.relationships.categoryToAnnotations,
-            annotation.categoryId,
-            annId,
-          );
-          // Remove from kind relationship
-          removeFromSimpleRelationship(
-            state.relationships.kindToAnnotations,
-            annotation.kind,
-            annId,
-          );
-          // Clean up link graph
-          if (annotation.trackId) {
-            dataSlice.caseReducers.removeAnnotationFromTrackletRecord(state, {
-              payload: { trackId: annotation.trackId, annId },
-              type: "removeAnnotationFromTrackletRecord",
-            });
-          }
-          annotation.data.dispose();
-        }
-      });
-      annotationsAdapter.removeMany(state.annotations, annotationIds);
-
-      // Remove from category relationships
-      removeFromSimpleRelationship(
-        state.relationships.categoryToImages,
-        image.categoryId,
-        imageId,
-      );
-
-      image.data.dispose();
-
-      // Clean up relationships
-      delete state.relationships.imageToAnnotations[imageId];
-
-      // Delete the image
-      imageDataAdapter.removeOne(state.images, imageId);
-
-      // Remove from metadata and delete metadata if no images
-      const metadata = state.metadata.entities[image.metadataId];
-      mutatingFilter(metadata.imageDataIds, (id) => id !== imageId);
-      if (metadata.imageDataIds.length === 0) {
-        metadataAdapter.removeOne(state.metadata, metadata.id);
-      } else {
-        if (metadata.defaultImageId === imageId)
-          metadata.defaultImageId = metadata.imageDataIds[0];
-      }
+      deleteImageCascade(state, action.payload);
     },
 
     // ============== ANNOTATION OPERATIONS ==============
+    // -- Create
     addAnnotation: (state, action: PayloadAction<AnnotationObject>) => {
       const annotation = action.payload;
       annotationsAdapter.addOne(state.annotations, annotation);
 
       // Update relationships
-      if (annotation.imageId) {
-        addToSimpleRelationship(
-          state.relationships.imageToAnnotations,
-          annotation.imageId,
-          annotation.id,
-        );
-      }
-      if (annotation.categoryId) {
-        addToSimpleRelationship(
-          state.relationships.categoryToAnnotations,
-          annotation.categoryId,
-          annotation.id,
-        );
-      }
-      if (annotation.kind) {
-        addToSimpleRelationship(
-          state.relationships.kindToAnnotations,
-          annotation.kind,
-          annotation.id,
-        );
-      }
+      addAnnotationToAllRelationships(state, annotation.id, {
+        kindId: annotation.kind,
+        categoryId: annotation.categoryId,
+        imageId: annotation.imageId,
+      });
     },
-
+    // -- Update
     updateAnnotation: (
       state,
       action: PayloadAction<{
@@ -577,453 +276,106 @@ export const dataSlice = createSlice({
         >;
       }>,
     ) => {
-      const { id, changes } = action.payload;
-      const existingAnnotation = state.annotations.entities[id];
-
-      if (!existingAnnotation) return;
-
-      // Handle category change
-      if (
-        changes.categoryId &&
-        changes.categoryId !== existingAnnotation.categoryId
-      ) {
-        removeFromSimpleRelationship(
-          state.relationships.categoryToAnnotations,
-          existingAnnotation.categoryId,
-          id,
-        );
-        addToSimpleRelationship(
-          state.relationships.categoryToAnnotations,
-          changes.categoryId,
-          id,
-        );
-      }
-
-      // Handle kind change
-      if (changes.kind && changes.kind !== existingAnnotation.kind) {
-        removeFromSimpleRelationship(
-          state.relationships.kindToAnnotations,
-          existingAnnotation.kind,
-          id,
-        );
-
-        addToSimpleRelationship(
-          state.relationships.kindToAnnotations,
-          changes.kind,
-          id,
-        );
-      }
-
-      annotationsAdapter.updateOne(state.annotations, { id, changes });
+      updateAnnotationCascde(state, action.payload.id, action.payload.changes);
     },
-
+    // -- Delete
     deleteAnnotation: (state, action: PayloadAction<string>) => {
-      const annotationId = action.payload;
-      const annotation = state.annotations.entities[annotationId];
-
-      if (!annotation) return;
-
-      // Remove from relationships
-      removeFromSimpleRelationship(
-        state.relationships.imageToAnnotations,
-        annotation.imageId,
-        annotationId,
-      );
-      removeFromSimpleRelationship(
-        state.relationships.categoryToAnnotations,
-        annotation.categoryId,
-        annotationId,
-      );
-      removeFromSimpleRelationship(
-        state.relationships.kindToAnnotations,
-        annotation.kind,
-        annotationId,
-      );
-
-      // Clean up link graph
-      if (annotation.trackId) {
-        dataSlice.caseReducers.removeAnnotationFromTrackletRecord(state, {
-          payload: { trackId: annotation.trackId, annId: annotation.id },
-          type: "removeAnnotationFromTrackletRecord",
-        });
-      }
-
-      // Delete the annotation
-      annotationsAdapter.removeOne(state.annotations, annotationId);
+      deleteAnnotationCascade(state, action.payload);
     },
 
     // ============== GLOBAL ANNOTATION OPERATIONS ==============
+    // -- Create
     addTracklet: (state, action: PayloadAction<Tracklet>) => {
-      const tracklet = action.payload;
-      state.tracklets[tracklet.trackId] = tracklet;
-      // Initialize array if it doesn't exist
-      if (!state.relationships.metadataToTracklets[tracklet.metadataId]) {
-        state.relationships.metadataToTracklets[tracklet.metadataId] = [];
-      }
-      state.relationships.metadataToTracklets[tracklet.metadataId].push(
-        tracklet.trackId,
-      );
-
-      // Update all linked annotations with trackId
-      if (tracklet.linkedIds && tracklet.linkedIds.length > 0) {
-        annotationsAdapter.updateMany(
-          state.annotations,
-          tracklet.linkedIds.map((annId) => ({
-            id: annId,
-            changes: { trackId: tracklet.trackId },
-          })),
-        );
-      }
+      addTrackletCascade(state, action.payload);
     },
-
-    deleteTracklet: (state, action: PayloadAction<string>) => {
-      const trackId = action.payload;
-      const tracklet = state.tracklets[trackId];
-      const trackletMetadataId = tracklet.metadataId;
-      const linkedAnnotations = tracklet.linkedIds;
-      const children = tracklet.children;
-      const parents = tracklet.parents;
-
-      annotationsAdapter.updateMany(
-        state.annotations,
-        linkedAnnotations.map((annId) => ({
-          id: annId,
-          changes: { trackId: undefined },
-        })),
-      );
-      if (children)
-        children.forEach((childId) =>
-          mutatingFilter(
-            state.tracklets[childId].parents!,
-            (id) => id !== trackId,
-          ),
-        );
-
-      if (parents)
-        parents.forEach((parentId) =>
-          mutatingFilter(
-            state.tracklets[parentId].children!,
-            (id) => id !== trackId,
-          ),
-        );
-
-      delete state.tracklets[trackId];
-      removeFromSimpleRelationship(
-        state.relationships.metadataToTracklets,
-        trackletMetadataId,
-        trackId,
-      );
-    },
-    updateTracklet: (
+    // -- Update
+    updateTrackletColor: (
       state,
       action: PayloadAction<{
         id: string;
-        changes: Partial<Pick<Tracklet, "color">>;
+        color: string;
       }>,
     ) => {
-      const { id, changes } = action.payload;
-      Object.assign(state.tracklets[id], changes);
+      const { id, color } = action.payload;
+      trackletAdapter.updateOne(state.tracklets, { id, changes: { color } });
     },
-    addAnnotationToTrackletRecord: (
+    addAnnotationToTracklet: (
       state,
       action: PayloadAction<{ trackId: string; annId: string }>,
     ) => {
-      const { trackId, annId } = action.payload;
-      const annotation = state.annotations.entities[annId];
-      let tracklet: Tracklet | undefined = undefined;
-
-      // if no existing tracklet, create one
-      if (!(trackId in state.tracklets)) {
-        const metadataId = state.images.entities[annotation.imageId].metadataId;
-        tracklet = state.tracklets[trackId] = {
-          metadataId,
-          trackId: trackId,
-          start: annotation.timepoint,
-          end: annotation.timepoint,
-          color: getRandomHexColor(),
-          linkedIds: [],
-        };
-        state.relationships.metadataToTracklets[metadataId].push(trackId);
-      } else tracklet = state.tracklets[trackId];
-
-      // return if annotation already part of tracklet
-      if (tracklet.linkedIds.includes(annId)) {
-        console.error(`Annotation with id "${annId}" already part of track`);
-        return;
-      }
-
-      // Check to see if there is already an annotation at the same timepoint in the tracklet
-      // if there is, remove it
-      const existingAnnAtTimepoint = tracklet.linkedIds.find((annId) => {
-        const ann = state.annotations.entities[annId];
-        return ann.timepoint === annotation.timepoint;
-      });
-
-      if (existingAnnAtTimepoint) {
-        dataSlice.caseReducers.removeAnnotationFromTrackletRecord(state, {
-          type: "removeAnnotationFromTrackletRecord",
-          payload: { trackId, annId: existingAnnAtTimepoint },
-        });
-      }
-
-      // add annotation to tracklet and update start/end if necessary
-      tracklet.linkedIds.push(annId);
-      if (tracklet.start === undefined || tracklet.start > annotation.timepoint)
-        tracklet.start = annotation.timepoint;
-      if (tracklet.end === undefined || tracklet.end < annotation.timepoint)
-        tracklet.end = annotation.timepoint;
-
-      //update trackId of annotation
-      annotation.trackId = trackId;
+      addAnnotationToTrackletCascade(
+        state,
+        action.payload.trackId,
+        action.payload.annId,
+      );
     },
-
-    removeAnnotationFromTrackletRecord: (
+    removeAnnotationFromTracklet: (
       state,
       action: PayloadAction<{ trackId: string; annId: string }>,
     ) => {
-      const { trackId, annId } = action.payload;
-      const tracklet = state.tracklets[trackId];
-      if (!tracklet) {
-        console.error(`tracklet with id "${trackId}" does not exist`);
-        return;
-      }
-
-      mutatingFilter(state.tracklets[trackId].linkedIds, (id) => id !== annId);
-      const annotation = state.annotations.entities[annId];
-      const removedTP = annotation.timepoint;
-      annotation.trackId = undefined;
-
-      if (tracklet.linkedIds.length === 0) {
-        dataSlice.caseReducers.deleteTracklet(state, {
-          type: "deleteTracklet",
-          payload: trackId,
-        });
-        return;
-      }
-
-      if (tracklet.start === removedTP || tracklet.end === removedTP) {
-        const newLimits = tracklet.linkedIds.reduce(
-          (newLimits: { start: number; end: number }, annId) => {
-            const tp = state.annotations.entities[annId].timepoint;
-            if (tp < newLimits.start) newLimits.start = tp;
-            if (tp > newLimits.end) newLimits.end = tp;
-            return newLimits;
-          },
-          { start: tracklet.start, end: tracklet.end },
-        );
-        tracklet.start = newLimits.start;
-        tracklet.end = newLimits.end;
-      }
+      removeAnnotationFromTrackletCascade(
+        state,
+        action.payload.trackId,
+        action.payload.annId,
+      );
     },
 
-    toggleAnnotationInTrackletRecord: (
-      state,
-      action: PayloadAction<{ trackId: string; annId: string }>,
-    ) => {
-      const { trackId, annId } = action.payload;
-      if (excludes(state.tracklets, trackId)) {
-        dataSlice.caseReducers.addAnnotationToTrackletRecord(state, {
-          type: "addAnnotationToTrackletRecord",
-          payload: action.payload,
-        });
-        return;
-      }
-      const idExists = state.tracklets[trackId].linkedIds.includes(annId);
-      if (idExists) {
-        dataSlice.caseReducers.removeAnnotationFromTrackletRecord(state, {
-          type: "removeAnnotationFromTrackletRecord",
-          payload: action.payload,
-        });
-      } else {
-        dataSlice.caseReducers.addAnnotationToTrackletRecord(state, {
-          type: "addAnnotationToTrackletRecord",
-          payload: action.payload,
-        });
-      }
-    },
-
-    addChildrenToTrack: (
+    addChildrenToTracklet: (
       state,
       action: PayloadAction<{ parentId: string; childIds: string[] | string }>,
     ) => {
       const { parentId, childIds } = action.payload;
       const childIdArr = Array.isArray(childIds) ? childIds : [childIds];
-      const parentTracklet = state.tracklets[parentId];
-      parentTracklet.children
-        ? parentTracklet.children.push(...childIdArr)
-        : (parentTracklet.children = childIdArr);
-
-      childIdArr.forEach((id) => {
-        const childTracklet = state.tracklets[id];
-        childTracklet.parents
-          ? childTracklet.parents.push(parentId)
-          : (childTracklet.parents = [parentId]);
-      });
+      childIdArr.forEach((childId) =>
+        addTrackletRelationship(state, parentId, childId),
+      );
     },
-
-    removeChildrenFromTrack: (
+    removeChildrenFromTracklet: (
       state,
       action: PayloadAction<{ parentId: string; childIds: string[] | string }>,
     ) => {
       const { parentId, childIds } = action.payload;
       const childIdArr = Array.isArray(childIds) ? childIds : [childIds];
-      const parentTracklet = state.tracklets[parentId];
-      parentTracklet.children &&
-        mutatingFilter(
-          parentTracklet.children,
-          (id) => !childIdArr.includes(id),
-        );
-
-      childIdArr.forEach((id) => {
-        const childTracklet = state.tracklets[id];
-        childTracklet.parents &&
-          mutatingFilter(childTracklet.parents, (id) => id !== parentId);
-      });
+      childIdArr.forEach((childId) =>
+        removeTrackletRelationship(state, parentId, childId),
+      );
     },
-
-    addParentsToTrack: (
+    addParentsToTracklet: (
       state,
       action: PayloadAction<{ childId: string; parentIds: string[] }>,
     ) => {
       const { childId, parentIds } = action.payload;
-      const childTracklet = state.tracklets[childId];
-      childTracklet.parents
-        ? childTracklet.parents.push(...parentIds)
-        : (childTracklet.parents = parentIds);
-
-      parentIds.forEach((id) => {
-        const parentTracklet = state.tracklets[id];
-        parentTracklet.children
-          ? parentTracklet.children.push(childId)
-          : (parentTracklet.children = [childId]);
-      });
+      parentIds.forEach((parentId) =>
+        addTrackletRelationship(state, parentId, childId),
+      );
     },
-
-    removeParentsFromTrack: (
+    removeParentsFromTracklet: (
       state,
       action: PayloadAction<{ parentIds: string[]; childId: string }>,
     ) => {
       const { parentIds, childId } = action.payload;
-      const childTracklet = state.tracklets[childId];
-      childTracklet.parents &&
-        mutatingFilter(childTracklet.parents, (id) => !parentIds.includes(id));
-
-      parentIds.forEach((id) => {
-        const parentTracklet = state.tracklets[id];
-        parentTracklet.children &&
-          mutatingFilter(parentTracklet.children, (id) => id !== childId);
-      });
+      const parentIdArr = Array.isArray(parentIds) ? parentIds : [parentIds];
+      parentIdArr.forEach((parentId) =>
+        removeTrackletRelationship(state, parentId, childId),
+      );
     },
-
-    joinTracks: (
-      state,
-      action: PayloadAction<{ id1: string; id2: string }>,
-    ) => {
-      const tracklet1 = state.tracklets[action.payload.id1];
-      const tracklet2 = state.tracklets[action.payload.id2];
-      if (
-        !tracklet1 ||
-        !tracklet2 ||
-        !tracklet1.end ||
-        !tracklet1.start ||
-        !tracklet2.start ||
-        !tracklet2.end
-      ) {
-        console.error("One or more fo the selected tracklets were not found.");
-        return;
-      }
-
-      if (tracklet1.end < tracklet2.start) {
-        const tracklet2Annotations = tracklet2.linkedIds;
-        tracklet1.linkedIds.push(...tracklet2Annotations);
-        dataSlice.caseReducers.deleteTracklet(state, {
-          type: "deleteTracklet",
-          payload: tracklet2.trackId,
-        });
-        dataSlice.caseReducers.batchUpdateAnnotation(state, {
-          type: "batchUpdateAnnotations",
-          payload: tracklet2Annotations.map((id) => ({
-            id,
-            changes: { trackId: tracklet1.trackId },
-          })),
-        });
-      } else if (tracklet2.end < tracklet1.end) {
-        const tracklet1Annotations = tracklet1.linkedIds;
-        tracklet2.linkedIds.push(...tracklet1Annotations);
-        dataSlice.caseReducers.deleteTracklet(state, {
-          type: "deleteTracklet",
-          payload: tracklet1.trackId,
-        });
-        dataSlice.caseReducers.batchUpdateAnnotation(state, {
-          type: "batchUpdateAnnotations",
-          payload: tracklet1Annotations.map((id) => ({
-            id,
-            changes: { trackId: tracklet2.trackId },
-          })),
-        });
-      }
+    joinTracklets: (state, action: PayloadAction<string[]>) => {
+      joinTrackletsCascade(state, action.payload);
     },
-
     severTracklet: (
       state,
       action: PayloadAction<{ id: string; timepoint: number }>,
     ) => {
-      const { id: severedTrackId, timepoint } = action.payload;
-      const tracklet = state.tracklets[severedTrackId];
-      if (!tracklet || !isPopulatedTracklet(tracklet)) {
-        console.error(
-          `tracklet with id '${severedTrackId} could not be found.`,
-        );
-        return;
-      }
-      if (timepoint <= tracklet.start || timepoint >= tracklet.end) return;
-      const preservedAnns: string[] = [];
-      const severedAnns: string[] = [];
-      tracklet.linkedIds.forEach((id) => {
-        const ann = state.annotations.entities[id];
-        if (!ann) {
-          console.error(`could not find annotation with id '${id}'`);
-          return;
-        }
-        if (ann.timepoint < timepoint) preservedAnns.push(ann.id);
-        else severedAnns.push(ann.id);
-      });
-      tracklet.linkedIds = preservedAnns;
-      const prevEnd = tracklet.end;
-      tracklet.end = timepoint - 1;
-      const children = tracklet.children ? [...tracklet.children] : undefined;
-      tracklet.children = undefined;
-      const newTrackId = generateUUID();
-      const newTracklet: Tracklet = {
-        trackId: newTrackId,
-        metadataId: tracklet.metadataId,
-        start: timepoint,
-        end: prevEnd,
-        children,
-        parents: undefined,
-        linkedIds: severedAnns,
-        color: getRandomHexColor(),
-      };
-      dataSlice.caseReducers.addTracklet(state, {
-        type: "addTracklet",
-        payload: newTracklet,
-      });
-      if (children)
-        children.forEach((id) => {
-          const childTrack = state.tracklets[id];
-          if (!childTrack) {
-            console.error(`could not find child track with id '${id}`);
-            return;
-          }
-          mutatingFilter(
-            childTrack.parents!,
-            (parentId) => parentId !== severedTrackId,
-          );
-          childTrack.parents!.push(newTrackId);
-        });
+      severTrackletCascade(state, action.payload.id, action.payload.timepoint);
+    },
+    // -- Delete
+    deleteTracklet: (state, action: PayloadAction<string>) => {
+      deleteTrackletCascade(state, action.payload);
     },
 
     // ============== BATCH OPERATIONS ==============
+
+    // -- Kind -- Create
     batchAddKind: (
       state,
       action: PayloadAction<{ kind: Kind; unknownCategory?: Category }[]>,
@@ -1036,6 +388,7 @@ export const dataSlice = createSlice({
         }),
       );
     },
+    // -- Category -- Create
     batchAddCategory: (state, action: PayloadAction<Category[]>) => {
       const categories = action.payload;
       categories.forEach((category) =>
@@ -1045,27 +398,19 @@ export const dataSlice = createSlice({
         }),
       );
     },
+    // -- Category -- Delete
     batchDeleteCategoryCascade: (state, action: PayloadAction<string[]>) => {
-      const categoryIds = action.payload;
-      categoryIds.forEach((id) =>
-        dataSlice.caseReducers.deleteCategoryCascade(state, {
-          payload: id,
-          type: "deleteCategoryCascade",
-        }),
-      );
+      deleteCategoryBatch(state, action.payload);
     },
     batchDeleteCategoriesByKind: (state, action: PayloadAction<string>) => {
       const kindId = action.payload;
 
-      const categories = state.relationships.kindToCategories[kindId].filter(
+      const categoryIds = state.relationships.kindToCategories[kindId].filter(
         (catId) => !isUnknownCategory(catId),
       );
-
-      dataSlice.caseReducers.batchDeleteCategoryCascade(state, {
-        payload: categories,
-        type: "batchDeleteCategoryCascade",
-      });
+      deleteCategoryBatch(state, categoryIds);
     },
+    // -- Metadata -- Create
     batchAddMetadata(
       state,
       action: PayloadAction<{ metadata: ImageMetadata; images: ImageData[] }[]>,
@@ -1078,6 +423,7 @@ export const dataSlice = createSlice({
         }),
       );
     },
+    // -- Image -- Create
     batchAddImageData(state, action: PayloadAction<ImageData[]>) {
       const images = action.payload;
       images.forEach((image) =>
@@ -1087,6 +433,7 @@ export const dataSlice = createSlice({
         }),
       );
     },
+    // -- Image -- Update
     batchUpdateImageData: (
       state,
       action: PayloadAction<
@@ -1098,71 +445,25 @@ export const dataSlice = createSlice({
         }[]
       >,
     ) => {
-      const updates = action.payload;
-      updates.forEach((update) =>
-        dataSlice.caseReducers.updateImageData(state, {
-          payload: update,
-          type: "updateImageData",
-        }),
-      );
+      updateImageDataBatch(state, action.payload);
     },
+    // -- Image -- Delete
+
     batchDeleteImageData(state, action: PayloadAction<string[]>) {
-      const imageIds = action.payload;
-      imageIds.forEach((id) => {
-        dataSlice.caseReducers.deleteImageData(state, {
-          payload: id,
-          type: "deleteImage",
-        });
-      });
-    },
-    batchDeleteImageDataCascade(state, action: PayloadAction<string[]>) {
-      const imageIds = action.payload;
-      imageIds.forEach((id) => {
-        dataSlice.caseReducers.deleteImageCascade(state, {
-          payload: id,
-          type: "deleteImageCascade",
-        });
-      });
+      deleteImageDataBatch(state, action.payload);
     },
     deleteImageDataByCategory: (state, action: PayloadAction<string>) => {
       const categoryId = action.payload;
       const imageDataIds =
         state.relationships.categoryToAnnotations[categoryId];
-      dataSlice.caseReducers.batchDeleteImageDataCascade(state, {
-        payload: imageDataIds,
-        type: "batchDeleteImageDataCascade",
-      });
+      deleteImageDataBatch(state, imageDataIds);
     },
+    // -- Annotation -- Create
     batchAddAnnotations: (state, action: PayloadAction<AnnotationObject[]>) => {
-      const annotations = action.payload;
-
-      annotationsAdapter.addMany(state.annotations, annotations);
-
-      annotations.forEach((annotation) => {
-        if (annotation.imageId) {
-          addToSimpleRelationship(
-            state.relationships.imageToAnnotations,
-            annotation.imageId,
-            annotation.id,
-          );
-        }
-        if (annotation.categoryId) {
-          addToSimpleRelationship(
-            state.relationships.categoryToAnnotations,
-            annotation.categoryId,
-            annotation.id,
-          );
-        }
-        if (annotation.kind) {
-          addToSimpleRelationship(
-            state.relationships.kindToAnnotations,
-            annotation.kind,
-            annotation.id,
-          );
-        }
-      });
+      addAnnotationBatch(state, action.payload);
     },
-    batchUpdateAnnotation(
+    // -- Annotation -- Update
+    batchUpdateAnnotations(
       state,
       action: PayloadAction<
         {
@@ -1176,48 +477,26 @@ export const dataSlice = createSlice({
         }[]
       >,
     ) {
-      const annotationUpdates = action.payload;
-      annotationUpdates.forEach((update) =>
-        dataSlice.caseReducers.updateAnnotation(state, {
-          payload: update,
-          type: "updateAnnotation",
-        }),
-      );
+      updateAnnotationBatch(state, action.payload);
     },
+    // -- Annotation -- Delete
     batchDeleteAnnotations: (state, action: PayloadAction<string[]>) => {
       const annotationIds = action.payload;
 
-      annotationIds.forEach((annotationId) => {
-        const annotation = state.annotations.entities[annotationId];
-        if (annotation) {
-          removeFromSimpleRelationship(
-            state.relationships.imageToAnnotations,
-            annotation.imageId,
-            annotationId,
-          );
-          removeFromSimpleRelationship(
-            state.relationships.categoryToAnnotations,
-            annotation.categoryId,
-            annotationId,
-          );
-          removeFromSimpleRelationship(
-            state.relationships.kindToAnnotations,
-            annotation.kind,
-            annotationId,
-          );
-
-          // Clean up link graph
-          if (annotation.trackId) {
-            dataSlice.caseReducers.removeAnnotationFromTrackletRecord(state, {
-              payload: { trackId: annotation.trackId, annId: annotation.id },
-              type: "removeAnnotationFromTrackletRecord",
-            });
-          }
-        }
-      });
-
-      annotationsAdapter.removeMany(state.annotations, annotationIds);
+      deleteAnnotationBatch(state, annotationIds);
     },
+    deleteAnnotationsOfCategory: (state, action: PayloadAction<string>) => {
+      const categoryId = action.payload;
+      const annotationIds =
+        state.relationships.categoryToAnnotations[categoryId];
+      deleteAnnotationBatch(state, annotationIds);
+    },
+    deleteAnnotationsOfKind: (state, action: PayloadAction<string>) => {
+      const kindId = action.payload;
+      const annotationIds = state.relationships.kindToAnnotations[kindId];
+      deleteAnnotationBatch(state, annotationIds);
+    },
+    // -- Tracklet -- Create
     batchAddTracklet: (state, action: PayloadAction<Tracklet[]>) => {
       action.payload.forEach((tracklet) =>
         dataSlice.caseReducers.addTracklet(state, {
@@ -1226,14 +505,7 @@ export const dataSlice = createSlice({
         }),
       );
     },
-    batchDeleteTracklet: (state, action: PayloadAction<string[]>) => {
-      action.payload.forEach((trackletId) => {
-        dataSlice.caseReducers.deleteTracklet(state, {
-          type: "deleteTracklet",
-          payload: trackletId,
-        });
-      });
-    },
+    // -- Tracklet -- Update
     batchAddAnnotationToTracklet: (
       state,
       action: PayloadAction<{ trackId: string; annIds: string[] }[]>,
@@ -1242,28 +514,20 @@ export const dataSlice = createSlice({
 
       tracks.forEach((track) => {
         track.annIds.forEach((annId) => {
-          dataSlice.caseReducers.addAnnotationToTrackletRecord(state, {
+          dataSlice.caseReducers.addAnnotationToTracklet(state, {
             type: "addAnnotationToTrackletRecord",
             payload: { trackId: track.trackId, annId },
           });
         });
       });
     },
-    deleteAnnotationsOfCategory: (state, action: PayloadAction<string>) => {
-      const categoryId = action.payload;
-      const annotationIds =
-        state.relationships.categoryToAnnotations[categoryId];
-      dataSlice.caseReducers.batchDeleteAnnotations(state, {
-        payload: annotationIds,
-        type: "batchDeleteAnotations",
-      });
-    },
-    deleteAnnotationsOfKind: (state, action: PayloadAction<string>) => {
-      const kindId = action.payload;
-      const annotationIds = state.relationships.kindToAnnotations[kindId];
-      dataSlice.caseReducers.batchDeleteAnnotations(state, {
-        payload: annotationIds,
-        type: "batchDeleteAnotations",
+    // -- Tracklet -- Delete
+    batchDeleteTracklet: (state, action: PayloadAction<string[]>) => {
+      action.payload.forEach((trackletId) => {
+        dataSlice.caseReducers.deleteTracklet(state, {
+          type: "deleteTracklet",
+          payload: trackletId,
+        });
       });
     },
 

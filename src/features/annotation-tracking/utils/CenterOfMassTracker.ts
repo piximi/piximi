@@ -34,7 +34,7 @@ export class CenterOfMassTracker {
     let isValid = true;
     Object.values(tracks).forEach((tracklet) => {
       if (tracklet.start === undefined || tracklet.end === undefined) {
-        console.error(`Tracklet with id "${tracklet.trackId}" not complete:`);
+        console.error(`Tracklet with id "${tracklet.id}" not complete:`);
         console.error(tracklet);
 
         isValid = false;
@@ -46,14 +46,14 @@ export class CenterOfMassTracker {
           const childTracklet = tracks[childId];
           if (!childTracklet) {
             isValid = false;
-            console.log("ERROR: child tracklet not found");
-            console.log(tracklet);
+            console.error("ERROR: child tracklet not found");
+            console.error(tracklet);
           } else if (
             !childTracklet.parents ||
             childTracklet.parents.length === 0
           ) {
             isValid = false;
-            console.log("ERROR: child track has no parent");
+            console.error("ERROR: child track has no parent");
           }
         });
       }
@@ -73,7 +73,7 @@ export class CenterOfMassTracker {
           track.children.forEach((childId) => {
             if (tracksDupe[childId])
               tracksDupe[childId].parents = tracksDupe[childId].parents?.filter(
-                (id) => id !== track.trackId,
+                (id) => id !== track.id,
               );
           });
         }
@@ -83,11 +83,11 @@ export class CenterOfMassTracker {
             if (tracksDupe[parentId])
               tracksDupe[parentId].children = tracksDupe[
                 parentId
-              ].children?.filter((id) => id !== track.trackId);
+              ].children?.filter((id) => id !== track.id);
           });
         }
 
-        delete tracksDupe[track.trackId];
+        delete tracksDupe[track.id];
       }
     });
 
@@ -104,7 +104,7 @@ export class CenterOfMassTracker {
         const child = tracklets[track.children[0]];
         if (child.parents && child.parents.length === 1) {
           // add linkedIds to root tracklet
-          mutatingFilter(track.children, (id) => id !== child.trackId);
+          mutatingFilter(track.children, (id) => id !== child.id);
           track.linkedIds.push(...child.linkedIds);
           if (child.children) {
             // add the grandchildren to the parents children array
@@ -113,13 +113,13 @@ export class CenterOfMassTracker {
               const grandchild = tracklets[grandchildId];
               // replace the parent with the grandparent
 
-              mutatingFilter(grandchild.parents!, (id) => id !== child.trackId);
-              grandchild.parents!.push(track.trackId);
+              mutatingFilter(grandchild.parents!, (id) => id !== child.id);
+              grandchild.parents!.push(track.id);
             });
           }
-          trackletIdSet.delete(child.trackId);
-          delete tracklets[child.trackId];
-          removedTracklets.push(child.trackId);
+          trackletIdSet.delete(child.id);
+          delete tracklets[child.id];
+          removedTracklets.push(child.id);
         }
       }
     });
@@ -174,7 +174,7 @@ export class CenterOfMassTracker {
         if (currentTracklet.children) {
           currentTracklet.children.forEach((childId) => {
             const initChildEntry = Object.entries(initializedChildren).find(
-              (initChildEntry) => initChildEntry[1].trackId === childId,
+              (initChildEntry) => initChildEntry[1].id === childId,
             );
             if (!initChildEntry) {
               console.error("No child found in initialized record");
@@ -192,13 +192,13 @@ export class CenterOfMassTracker {
               console.error("Parent has no children");
             } else {
               parent.children = parent.children?.filter(
-                (id) => id !== currentTracklet?.trackId,
+                (id) => id !== currentTracklet?.id,
               );
             }
           });
         }
       } else {
-        tracks[currentTracklet.trackId] = currentTracklet;
+        tracks[currentTracklet.id] = currentTracklet;
       }
       currentTracklet = undefined;
     };
@@ -236,7 +236,7 @@ export class CenterOfMassTracker {
             delete initializedChildren[currentAnnotation.id];
           } else {
             currentTracklet = {
-              trackId: generateUUID(),
+              id: generateUUID(),
               name: `Tracklet-${trackNumber++}`,
               metadataId: this.config.imageMetadataId,
               start: currentAnnotation.timepoint,
@@ -247,14 +247,14 @@ export class CenterOfMassTracker {
             };
 
             // Add annotation -> trackId to mapping
-            ann2TrackId[currentAnnotation.id] = currentTracklet.trackId;
+            ann2TrackId[currentAnnotation.id] = currentTracklet.id;
           }
         } else {
           // if the annotation is marked as belonging to a preinitialized child track, do not add it to the current track
           if (currentAnnotation.id in initializedChildren) continue;
 
           // Add annotation -> trackId to mapping, add annotation to tracklet linkedIds
-          ann2TrackId[currentAnnotation.id] = currentTracklet.trackId;
+          ann2TrackId[currentAnnotation.id] = currentTracklet.id;
           currentTracklet.linkedIds.push(currentAnnotation.id);
         }
 
@@ -319,12 +319,12 @@ export class CenterOfMassTracker {
 
                 // create child tracklet
                 const childTracklet = {
-                  trackId: generateUUID(),
+                  id: generateUUID(),
                   name: currentTracklet.name + `.${childIndex}`,
                   metadataId: this.config.imageMetadataId,
                   start: childAnn.timepoint,
                   linkedIds: [id],
-                  parents: [currentTracklet.trackId],
+                  parents: [currentTracklet.id],
                   color: getRestrictedRandomHexColor({
                     similarity: { baseColor: "#FBB904", minDifference: 20 },
                   }),
@@ -333,9 +333,9 @@ export class CenterOfMassTracker {
 
                 //update current tracklets children array
                 if (currentTracklet.children) {
-                  currentTracklet.children.push(childTracklet.trackId);
+                  currentTracklet.children.push(childTracklet.id);
                 } else {
-                  currentTracklet.children = [childTracklet.trackId];
+                  currentTracklet.children = [childTracklet.id];
                 }
                 childIndex++;
               }
@@ -362,13 +362,13 @@ export class CenterOfMassTracker {
     if (Object.keys(initializedChildren).length > 0) {
       Object.values(initializedChildren).forEach((child) => {
         if (this.config.includeIsolatedAnnotations) {
-          tracks[child.trackId] = { ...child, end: child.start };
+          tracks[child.id] = { ...child, end: child.start };
         } else {
           const parentIds = child.parents;
           if (parentIds) {
             parentIds.forEach((id) => {
               tracks[id].children = tracks[id].children?.filter(
-                (childId) => childId !== child.trackId,
+                (childId) => childId !== child.id,
               );
             });
           }

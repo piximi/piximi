@@ -52,7 +52,7 @@ export const KindItemsProvider = ({
   const deleteSelectedItems = useCallback(
     (itemIds: string[]) => {
       if (activeKindId === IMAGE_KIND) {
-        dispatch(dataSlice.actions.batchDeleteImageDataCascade(itemIds));
+        dispatch(dataSlice.actions.batchDeleteImageData(itemIds));
       } else {
         dispatch(dataSlice.actions.batchDeleteAnnotations(itemIds as string[]));
       }
@@ -129,7 +129,7 @@ export const KindItemsProvider = ({
         return;
       }
       dispatch(
-        dataSlice.actions.batchUpdateAnnotation(
+        dataSlice.actions.batchUpdateAnnotations(
           (selectedItems as string[]).map((id) => ({
             id,
             changes: {
@@ -186,7 +186,7 @@ export const KindItemsProvider = ({
         return;
       }
       dispatch(
-        dataSlice.actions.batchUpdateAnnotation(
+        dataSlice.actions.batchUpdateAnnotations(
           (selectedItems as string[]).map((id) => ({
             id,
             changes: { partition },

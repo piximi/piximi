@@ -71,7 +71,7 @@ export const ProjectGrid = () => {
         dispatch(projectSlice.actions.setActiveKind({ kind: newItem }));
       }
 
-      dispatch(dataSlice.actions.deleteKindCascade(item));
+      dispatch(dataSlice.actions.deleteKind(item));
     },
     [dispatch],
   );

@@ -125,7 +125,7 @@ export const usePredictClassifier = () => {
         );
       } else {
         dispatch(
-          dataSlice.actions.batchUpdateAnnotation(
+          dataSlice.actions.batchUpdateAnnotations(
             kindItemIds.map((thingId, idx) => {
               dataCatProbs[thingId] = results.probabilities[idx];
               return {

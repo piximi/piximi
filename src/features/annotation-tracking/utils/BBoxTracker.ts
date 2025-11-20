@@ -53,7 +53,7 @@ export class BBoxTracker {
         if (!currentTrackId) {
           currentTrackId = generateUUID();
           tracks[currentTrackId] = {
-            trackId: currentTrackId,
+            id: currentTrackId,
             metadataId: this.config.imageMetadataId,
             start: currentAnnotation.timepoint,
             linkedIds: [currentAnnotation.id],

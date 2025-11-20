@@ -169,7 +169,7 @@ export const imageViewerDataSlice = createSlice({
     startNewTrack(state, action: PayloadAction<PendingTracklet>) {
       state.tLinking = {
         active: true,
-        trackId: action.payload.trackId,
+        trackId: action.payload.id,
         pendingTracklet: action.payload,
       };
     },

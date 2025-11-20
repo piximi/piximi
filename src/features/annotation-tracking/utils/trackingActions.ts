@@ -25,14 +25,14 @@ export const handleAnnotationTracking = (
   // Assign a track ID to annotation if one doesn't exist
   if (!isTrackedAnnotation) {
     dispatch(
-      dataSlice.actions.addAnnotationToTrackletRecord({
+      dataSlice.actions.addAnnotationToTracklet({
         trackId: activeTrackId,
         annId: currentAnnotation.id,
       }),
     );
   } else if (isTrackedAnnotation && annotationInActiveTracklet) {
     dispatch(
-      dataSlice.actions.removeAnnotationFromTrackletRecord({
+      dataSlice.actions.removeAnnotationFromTracklet({
         trackId: annTrackId,
         annId: currentAnnotation.id,
       }),

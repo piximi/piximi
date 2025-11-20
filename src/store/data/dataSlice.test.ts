@@ -8,6 +8,8 @@ import {
   selectAllMetadata,
   selectAllImageData,
   selectAllAnnotations,
+  selectAllKinds,
+  selectAllTracklets,
   kindSelectors,
 } from "./selectors";
 import {
@@ -16,9 +18,9 @@ import {
   ImageMetadata,
   ImageData,
   AnnotationObject,
+  Tracklet,
 } from "./types";
 import { Partition } from "utils/models/enums";
-import { selectAllKinds } from "./selectors";
 import { generateUUID } from "./utils";
 import { IMAGE_KIND } from "./constants";
 import { RootState } from "store/rootReducer";
@@ -70,7 +72,9 @@ const createMockImageMetadata = (overrides = {}): ImageMetadata => ({
   ...overrides,
 });
 
-const createMockImageData = (overrides = {}): ImageData => ({
+const createMockImageData = (
+  overrides: Partial<ImageData> = {},
+): ImageData => ({
   id: "img1",
   name: "img1",
   metadataId: "meta1",
@@ -96,7 +100,9 @@ const createMockImageData = (overrides = {}): ImageData => ({
   ...overrides,
 });
 
-const createMockAnnotation = (overrides = {}): AnnotationObject => ({
+const createMockAnnotation = (
+  overrides: Partial<AnnotationObject> = {},
+): AnnotationObject => ({
   id: "ann1",
   name: "Test Annotation",
   kind: "annotation-kind",
@@ -119,6 +125,16 @@ const createMockAnnotation = (overrides = {}): AnnotationObject => ({
   ...overrides,
 });
 
+const createMockTracklet = (overrides: Partial<Tracklet> = {}): Tracklet => ({
+  id: "tracklet1",
+  metadataId: "meta1",
+  color: "#FF0000",
+  start: 0,
+  end: 2,
+  linkedIds: [],
+  ...overrides,
+});
+
 describe("Data Slice", () => {
   let store: ReturnType<typeof configureStore>;
 
@@ -133,6 +149,8 @@ describe("Data Slice", () => {
   });
 
   const getState = () => store.getState() as RootState;
+  const getUnknownImageCategoryId = () =>
+    getState().data.kinds.entities[IMAGE_KIND].unknownCategoryId;
 
   describe("Kind Operations", () => {
     it("should add a kind", () => {
@@ -179,7 +197,7 @@ describe("Data Slice", () => {
     it("should not delete Images kind on cascade delete", () => {
       const kind = createMockKind({ id: "Images" });
       store.dispatch(dataSlice.actions.addKind(kind));
-      store.dispatch(dataSlice.actions.deleteKindCascade("Images"));
+      store.dispatch(dataSlice.actions.deleteKind("Images"));
 
       const state = getState().data;
       expect(state.kinds.entities["Images"]).toBeDefined();
@@ -204,7 +222,7 @@ describe("Data Slice", () => {
       expect(state.relationships.kindToAnnotations["kind1"]).toContain("ann1");
 
       // Cascade delete
-      store.dispatch(dataSlice.actions.deleteKindCascade("kind1"));
+      store.dispatch(dataSlice.actions.deleteKind("kind1"));
 
       // Verify all entities are deleted
       state = getState().data;
@@ -266,13 +284,21 @@ describe("Data Slice", () => {
     });
     it("should add a category and update relationships", () => {
       const category = createMockCategory();
+      const imageCategory = createMockCategory({
+        id: "imCat",
+        kind: IMAGE_KIND,
+      });
       store.dispatch(dataSlice.actions.addCategory(category));
-
+      store.dispatch(dataSlice.actions.addCategory(imageCategory));
       const state = getState().data;
       expect(state.categories.entities["cat1"]).toEqual(category);
       expect(state.relationships.kindToCategories["kind1"]).toContain("cat1");
-      expect(state.relationships.categoryToImages["cat1"]).toEqual([]);
       expect(state.relationships.categoryToAnnotations["cat1"]).toEqual([]);
+      expect(state.categories.entities["imCat"]).toEqual(imageCategory);
+      expect(state.relationships.kindToCategories[IMAGE_KIND]).toContain(
+        "imCat",
+      );
+      expect(state.relationships.categoryToImages["imCat"]).toEqual([]);
     });
 
     it("should update a category", () => {
@@ -311,8 +337,9 @@ describe("Data Slice", () => {
 
     it("should delete a category", () => {
       const category = createMockCategory();
+      const kind = createMockKind();
+      store.dispatch(dataSlice.actions.addKind(kind));
       store.dispatch(dataSlice.actions.addCategory(category));
-
       store.dispatch(dataSlice.actions.deleteCategory("cat1"));
 
       const state = getState().data;
@@ -338,7 +365,7 @@ describe("Data Slice", () => {
         dataSlice.actions.addMetadata({ metadata, images: [image] }),
       );
 
-      store.dispatch(dataSlice.actions.deleteCategoryCascade("cat1"));
+      store.dispatch(dataSlice.actions.deleteCategory("cat1"));
       const state = getState().data;
       const imageKind = state.kinds.entities[IMAGE_KIND];
       const unknownCategory =
@@ -370,7 +397,7 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.addCategory(category));
       store.dispatch(dataSlice.actions.addAnnotation(annotation));
 
-      store.dispatch(dataSlice.actions.deleteCategoryCascade("cat2"));
+      store.dispatch(dataSlice.actions.deleteCategory("cat2"));
 
       const state = getState().data;
       expect(state.categories.entities["cat2"]).toBeUndefined();
@@ -439,8 +466,11 @@ describe("Data Slice", () => {
 
   describe("Metadata and Image Operations", () => {
     it("should add metadata with images", () => {
+      const unknownImageCategoryId = getUnknownImageCategoryId();
       const metadata = createMockImageMetadata();
-      const image = createMockImageData();
+      const image = createMockImageData({
+        categoryId: unknownImageCategoryId,
+      });
 
       store.dispatch(
         dataSlice.actions.addMetadata({ metadata, images: [image] }),
@@ -450,7 +480,9 @@ describe("Data Slice", () => {
       expect(state.metadata.entities["meta1"]).toEqual(metadata);
       expect(state.images.entities["img1"]).toEqual(image);
       expect(state.relationships.imageToAnnotations["img1"]).toEqual([]);
-      expect(state.relationships.categoryToImages["cat1"]).toContain("img1");
+      expect(
+        state.relationships.categoryToImages[unknownImageCategoryId],
+      ).toContain("img1");
     });
     it("should batch add metadata", () => {
       const metadataGroup = [
@@ -547,27 +579,33 @@ describe("Data Slice", () => {
     });
 
     it("should add image data", () => {
-      const image = createMockImageData();
+      const unknowImageCategoryId = getUnknownImageCategoryId();
+      const image = createMockImageData({ categoryId: unknowImageCategoryId });
       store.dispatch(dataSlice.actions.addImageData(image));
 
       const state = getState().data;
       expect(state.images.entities["img1"]).toEqual(image);
       expect(state.relationships.imageToAnnotations["img1"]).toEqual([]);
-      expect(state.relationships.categoryToImages["cat1"]).toContain("img1");
+      expect(
+        state.relationships.categoryToImages[unknowImageCategoryId],
+      ).toContain("img1");
     });
 
     it("should update image data", () => {
       const metadata = createMockImageMetadata();
-      const image = createMockImageData();
+      const unknownImageCategoryId = getUnknownImageCategoryId();
+      const image = createMockImageData({ categoryId: unknownImageCategoryId });
+      const category1 = createMockCategory();
 
       store.dispatch(
         dataSlice.actions.addMetadata({ metadata, images: [image] }),
       );
+      store.dispatch(dataSlice.actions.addCategory(category1));
       store.dispatch(
         dataSlice.actions.updateImageData({
           id: "img1",
           changes: {
-            categoryId: "cat2",
+            categoryId: "cat1",
             partition: "validation" as Partition,
           },
         }),
@@ -575,12 +613,12 @@ describe("Data Slice", () => {
 
       const state = getState().data;
       const updated = state.images.entities["img1"];
-      expect(updated?.categoryId).toBe("cat2");
+      expect(updated?.categoryId).toBe("cat1");
       expect(updated?.partition).toBe("validation");
-      expect(state.relationships.categoryToImages["cat1"]).not.toContain(
-        "img1",
-      );
-      expect(state.relationships.categoryToImages["cat2"]).toContain("img1");
+      expect(
+        state.relationships.categoryToImages[unknownImageCategoryId],
+      ).not.toContain("img1");
+      expect(state.relationships.categoryToImages["cat1"]).toContain("img1");
     });
 
     it("should delete image and update metadata", () => {
@@ -616,7 +654,7 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.addAnnotation(annotation1));
       store.dispatch(dataSlice.actions.addAnnotation(annotation2));
 
-      store.dispatch(dataSlice.actions.deleteImageCascade("img1"));
+      store.dispatch(dataSlice.actions.deleteImageData("img1"));
 
       const state = getState().data;
       expect(state.images.entities["img1"]).toBeUndefined();
@@ -682,9 +720,7 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.addAnnotation(ann1));
       store.dispatch(dataSlice.actions.addAnnotation(ann2));
 
-      store.dispatch(
-        dataSlice.actions.batchDeleteImageDataCascade(["img1", "img2"]),
-      );
+      store.dispatch(dataSlice.actions.batchDeleteImageData(["img1", "img2"]));
 
       const state = getState().data;
       expect(state.images.entities["img1"]).toBeUndefined();
@@ -722,6 +758,12 @@ describe("Data Slice", () => {
 
     it("should add annotation with relationships", () => {
       const annotation = createMockAnnotation();
+      const image = createMockImageData();
+      const category = createMockCategory();
+      const kind = createMockKind({ id: "annotation-kind" });
+      store.dispatch(dataSlice.actions.addKind(kind));
+      store.dispatch(dataSlice.actions.addImageData(image));
+      store.dispatch(dataSlice.actions.addCategory(category));
       store.dispatch(dataSlice.actions.addAnnotation(annotation));
 
       const state = getState().data;
@@ -737,8 +779,9 @@ describe("Data Slice", () => {
 
     it("should update annotation relationships correctly", () => {
       const annotation = createMockAnnotation();
+      const category1 = createMockCategory();
       const newCategory = createMockCategory({ id: "cat2" });
-
+      store.dispatch(dataSlice.actions.addCategory(category1));
       store.dispatch(dataSlice.actions.addCategory(newCategory));
       store.dispatch(dataSlice.actions.addAnnotation(annotation));
 
@@ -767,7 +810,8 @@ describe("Data Slice", () => {
     it("should update annotation kind correctly", () => {
       const annotation = createMockAnnotation();
       const newKind = createMockKind({ id: "new-kind" });
-
+      const kind = createMockKind({ id: "annotation-kind" });
+      store.dispatch(dataSlice.actions.addKind(kind));
       store.dispatch(dataSlice.actions.addKind(newKind));
       store.dispatch(dataSlice.actions.addAnnotation(annotation));
 
@@ -790,6 +834,12 @@ describe("Data Slice", () => {
 
     it("should delete annotation and clean up relationships", () => {
       const annotation = createMockAnnotation();
+      const image = createMockImageData();
+      const category = createMockCategory();
+      const kind = createMockKind({ id: "annotation-kind" });
+      store.dispatch(dataSlice.actions.addKind(kind));
+      store.dispatch(dataSlice.actions.addImageData(image));
+      store.dispatch(dataSlice.actions.addCategory(category));
       store.dispatch(dataSlice.actions.addAnnotation(annotation));
 
       store.dispatch(dataSlice.actions.deleteAnnotation("ann1"));
@@ -840,7 +890,7 @@ describe("Data Slice", () => {
         { id: "ann2", changes: { name: "Updated 2" } },
       ];
 
-      store.dispatch(dataSlice.actions.batchUpdateAnnotation(updates));
+      store.dispatch(dataSlice.actions.batchUpdateAnnotations(updates));
 
       const state = getState().data;
       expect(state.annotations.entities["ann1"]?.name).toBe("Updated 1");
@@ -886,9 +936,9 @@ describe("Data Slice", () => {
     });
 
     it("should handle deletion with link graph cleanup", () => {
-      const ann1 = createMockAnnotation({ id: "ann1" });
-      const parent1 = createMockAnnotation({ id: "parent1" });
-      const child1 = createMockAnnotation({ id: "child1" });
+      const ann1 = createMockAnnotation({ id: "ann1", timepoint: 0 });
+      const parent1 = createMockAnnotation({ id: "parent1", timepoint: 1 });
+      const child1 = createMockAnnotation({ id: "child1", timepoint: 2 });
 
       // Add annotation with link graph entry
       store.dispatch(
@@ -898,7 +948,9 @@ describe("Data Slice", () => {
       store.dispatch(
         dataSlice.actions.addTracklet({
           metadataId: "metaId",
-          trackId: "global1",
+          id: "global1",
+          start: 0,
+          end: 2,
           color: "",
           linkedIds: ["ann1", "parent1", "child1"],
         }),
@@ -907,7 +959,1583 @@ describe("Data Slice", () => {
 
       const state = getState().data;
       expect(state.annotations.entities["ann1"]).toBeUndefined();
-      expect(state.tracklets["global1"]?.linkedIds).not.toContain("ann1");
+      expect(state.tracklets.entities["global1"]?.linkedIds).not.toContain(
+        "ann1",
+      );
+    });
+  });
+
+  describe("Tracklet Operations", () => {
+    beforeEach(() => {
+      // Create annotation kind
+      const { kind: annotationKind, unknownCategory } = createMockKind({
+        id: "annotation-kind",
+      });
+      store.dispatch(
+        dataSlice.actions.addKind({ kind: annotationKind, unknownCategory }),
+      );
+
+      // Create time-series metadata with multiple timepoint images
+      const metadata = createMockImageMetadata({
+        id: "meta1",
+        timeSeries: true,
+        imageDataIds: ["img0", "img1", "img2", "img3", "img4"],
+        defaultImageId: "img0",
+      });
+      const images = [
+        createMockImageData({
+          id: "img0",
+          timepoint: 0,
+          metadataId: "meta1",
+        }),
+        createMockImageData({
+          id: "img1",
+          timepoint: 1,
+          metadataId: "meta1",
+        }),
+        createMockImageData({
+          id: "img2",
+          timepoint: 2,
+          metadataId: "meta1",
+        }),
+        createMockImageData({
+          id: "img3",
+          timepoint: 3,
+          metadataId: "meta1",
+        }),
+        createMockImageData({
+          id: "img4",
+          timepoint: 4,
+          metadataId: "meta1",
+        }),
+      ];
+      store.dispatch(dataSlice.actions.addMetadata({ metadata, images }));
+    });
+
+    describe("Basic CRUD", () => {
+      it("should add a tracklet", () => {
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        store.dispatch(dataSlice.actions.batchAddAnnotations([ann1, ann2]));
+
+        const tracklet = createMockTracklet({
+          id: "track1",
+          metadataId: "meta1",
+          linkedIds: ["ann1", "ann2"],
+          start: 0,
+          end: 1,
+        });
+
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        const state = getState().data;
+        expect(state.tracklets.entities["track1"]).toEqual(tracklet);
+        expect(state.relationships.metadataToTracklets["meta1"]).toContain(
+          "track1",
+        );
+        expect(state.annotations.entities["ann1"]?.trackId).toBe("track1");
+        expect(state.annotations.entities["ann2"]?.trackId).toBe("track1");
+      });
+
+      it("should update tracklet color", () => {
+        const tracklet = createMockTracklet({
+          color: "#FF0000",
+        });
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        store.dispatch(
+          dataSlice.actions.updateTrackletColor({
+            id: "tracklet1",
+            color: "#00FF00",
+          }),
+        );
+
+        const state = getState().data;
+        expect(state.tracklets.entities["tracklet1"]?.color).toBe("#00FF00");
+      });
+
+      it("should delete a tracklet", () => {
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        store.dispatch(dataSlice.actions.batchAddAnnotations([ann1, ann2]));
+
+        const tracklet = createMockTracklet({
+          id: "track1",
+          linkedIds: ["ann1", "ann2"],
+        });
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        store.dispatch(dataSlice.actions.deleteTracklet("track1"));
+
+        const state = getState().data;
+        expect(state.tracklets.entities["track1"]).toBeUndefined();
+        expect(state.annotations.entities["ann1"]?.trackId).toBeUndefined();
+        expect(state.annotations.entities["ann2"]?.trackId).toBeUndefined();
+        expect(state.relationships.metadataToTracklets["meta1"]).not.toContain(
+          "track1",
+        );
+      });
+
+      it("should delete tracklet with parent/child relationships", () => {
+        const parent = createMockTracklet({
+          id: "parent1",
+          start: 0,
+          end: 1,
+        });
+        const child = createMockTracklet({
+          id: "child1",
+          start: 2,
+          end: 3,
+        });
+        const middle = createMockTracklet({
+          id: "middle1",
+          start: 1,
+          end: 2,
+        });
+
+        store.dispatch(dataSlice.actions.addTracklet(parent));
+        store.dispatch(dataSlice.actions.addTracklet(middle));
+        store.dispatch(dataSlice.actions.addTracklet(child));
+
+        store.dispatch(
+          dataSlice.actions.addChildrenToTracklet({
+            parentId: "parent1",
+            childIds: ["middle1"],
+          }),
+        );
+        store.dispatch(
+          dataSlice.actions.addChildrenToTracklet({
+            parentId: "middle1",
+            childIds: ["child1"],
+          }),
+        );
+
+        store.dispatch(dataSlice.actions.deleteTracklet("middle1"));
+
+        const state = getState().data;
+        expect(state.tracklets.entities["middle1"]).toBeUndefined();
+        expect(state.tracklets.entities["parent1"]?.children).not.toContain(
+          "middle1",
+        );
+        expect(state.tracklets.entities["child1"]?.parents).not.toContain(
+          "middle1",
+        );
+      });
+
+      it("should handle deletion of non-existent tracklet gracefully", () => {
+        const consoleError = vi
+          .spyOn(console, "error")
+          .mockImplementation(() => {});
+
+        store.dispatch(dataSlice.actions.deleteTracklet("non-existent"));
+
+        const state = getState().data;
+        expect(state).toBeDefined();
+        expect(consoleError).toHaveBeenCalledWith(
+          'Tracklet with id "non-existent" does not exist',
+        );
+
+        consoleError.mockRestore();
+      });
+    });
+
+    describe("Annotation Linking", () => {
+      it("should add annotation to tracklet", () => {
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        const ann3 = createMockAnnotation({
+          id: "ann3",
+          imageId: "img2",
+          timepoint: 2,
+          kind: "annotation-kind",
+        });
+        store.dispatch(
+          dataSlice.actions.batchAddAnnotations([ann1, ann2, ann3]),
+        );
+
+        const tracklet = createMockTracklet({
+          id: "track1",
+          linkedIds: ["ann1", "ann2"],
+          start: 0,
+          end: 1,
+        });
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        store.dispatch(
+          dataSlice.actions.addAnnotationToTracklet({
+            trackId: "track1",
+            annId: "ann3",
+          }),
+        );
+
+        const state = getState().data;
+        const updatedTracklet = state.tracklets.entities["track1"];
+        expect(updatedTracklet?.linkedIds).toContain("ann3");
+        expect(updatedTracklet?.start).toBe(0);
+        expect(updatedTracklet?.end).toBe(2);
+        expect(state.annotations.entities["ann3"]?.trackId).toBe("track1");
+      });
+
+      it("should not add annotation at duplicate timepoint", () => {
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        store.dispatch(dataSlice.actions.batchAddAnnotations([ann1, ann2]));
+
+        const tracklet = createMockTracklet({
+          id: "track1",
+          linkedIds: ["ann1"],
+          start: 1,
+          end: 1,
+        });
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        store.dispatch(
+          dataSlice.actions.addAnnotationToTracklet({
+            trackId: "track1",
+            annId: "ann2",
+          }),
+        );
+
+        const state = getState().data;
+        expect(state.tracklets.entities["track1"]?.linkedIds).toHaveLength(1);
+        expect(state.tracklets.entities["track1"]?.linkedIds).not.toContain(
+          "ann2",
+        );
+      });
+
+      it("should not add annotation already in tracklet", () => {
+        const consoleError = vi
+          .spyOn(console, "error")
+          .mockImplementation(() => {});
+
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        store.dispatch(dataSlice.actions.addAnnotation(ann1));
+
+        const tracklet = createMockTracklet({
+          id: "track1",
+          linkedIds: ["ann1"],
+        });
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        store.dispatch(
+          dataSlice.actions.addAnnotationToTracklet({
+            trackId: "track1",
+            annId: "ann1",
+          }),
+        );
+
+        const state = getState().data;
+        expect(state.tracklets.entities["track1"]?.linkedIds).toHaveLength(1);
+        expect(consoleError).toHaveBeenCalledWith(
+          'Annotation with id "ann1" already part of track',
+        );
+
+        consoleError.mockRestore();
+      });
+
+      it("should remove annotation from tracklet", () => {
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        const ann3 = createMockAnnotation({
+          id: "ann3",
+          imageId: "img2",
+          timepoint: 2,
+          kind: "annotation-kind",
+        });
+        store.dispatch(
+          dataSlice.actions.batchAddAnnotations([ann1, ann2, ann3]),
+        );
+
+        const tracklet = createMockTracklet({
+          id: "track1",
+          linkedIds: ["ann1", "ann2", "ann3"],
+          start: 0,
+          end: 2,
+        });
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        store.dispatch(
+          dataSlice.actions.removeAnnotationFromTracklet({
+            trackId: "track1",
+            annId: "ann2",
+          }),
+        );
+
+        const state = getState().data;
+        const updatedTracklet = state.tracklets.entities["track1"];
+        expect(updatedTracklet?.linkedIds).not.toContain("ann2");
+        expect(updatedTracklet?.linkedIds).toHaveLength(2);
+        expect(updatedTracklet?.start).toBe(0);
+        expect(updatedTracklet?.end).toBe(2);
+        expect(state.annotations.entities["ann2"]?.trackId).toBeUndefined();
+      });
+
+      it("should delete tracklet when removing last annotation", () => {
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        store.dispatch(dataSlice.actions.addAnnotation(ann1));
+
+        const tracklet = createMockTracklet({
+          id: "track1",
+          linkedIds: ["ann1"],
+          start: 0,
+          end: 0,
+        });
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        store.dispatch(
+          dataSlice.actions.removeAnnotationFromTracklet({
+            trackId: "track1",
+            annId: "ann1",
+          }),
+        );
+
+        const state = getState().data;
+        expect(state.tracklets.entities["track1"]).toBeUndefined();
+        expect(state.annotations.entities["ann1"]?.trackId).toBeUndefined();
+      });
+
+      it("should recalculate boundaries when annotation extends beyond old range", () => {
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img2",
+          timepoint: 2,
+          kind: "annotation-kind",
+        });
+        const ann3 = createMockAnnotation({
+          id: "ann3",
+          imageId: "img3",
+          timepoint: 3,
+          kind: "annotation-kind",
+        });
+        store.dispatch(
+          dataSlice.actions.batchAddAnnotations([ann1, ann2, ann3]),
+        );
+
+        // Create tracklet with narrower initial range than actual annotations
+        const tracklet = createMockTracklet({
+          id: "track1",
+          linkedIds: ["ann1", "ann2", "ann3"],
+          start: 1,
+          end: 2,
+        });
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        // Remove ann1 (at start boundary)
+        store.dispatch(
+          dataSlice.actions.removeAnnotationFromTracklet({
+            trackId: "track1",
+            annId: "ann1",
+          }),
+        );
+
+        const state = getState().data;
+        // After removing ann1, only ann2 and ann3 remain
+        // End should be recalculated to 3 because ann3.timepoint (3) > old end (2)
+        expect(state.tracklets.entities["track1"]?.linkedIds).toHaveLength(2);
+        expect(state.tracklets.entities["track1"]?.linkedIds).toContain("ann2");
+        expect(state.tracklets.entities["track1"]?.linkedIds).toContain("ann3");
+        expect(state.tracklets.entities["track1"]?.start).toBe(1);
+        expect(state.tracklets.entities["track1"]?.end).toBe(3);
+      });
+
+      it("should recalculate boundaries when annotation extends before old range", () => {
+        const ann0 = createMockAnnotation({
+          id: "ann0",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img2",
+          timepoint: 2,
+          kind: "annotation-kind",
+        });
+        store.dispatch(
+          dataSlice.actions.batchAddAnnotations([ann0, ann1, ann2]),
+        );
+
+        // Create tracklet with narrower initial range than actual annotations
+        const tracklet = createMockTracklet({
+          id: "track1",
+          linkedIds: ["ann0", "ann1", "ann2"],
+          start: 1,
+          end: 2,
+        });
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        // Remove ann2 (at end boundary)
+        store.dispatch(
+          dataSlice.actions.removeAnnotationFromTracklet({
+            trackId: "track1",
+            annId: "ann2",
+          }),
+        );
+
+        const state = getState().data;
+        // After removing ann2, only ann0 and ann1 remain
+        // Start should be recalculated to 0 because ann0.timepoint (0) < old start (1)
+        expect(state.tracklets.entities["track1"]?.linkedIds).toHaveLength(2);
+        expect(state.tracklets.entities["track1"]?.linkedIds).toContain("ann0");
+        expect(state.tracklets.entities["track1"]?.linkedIds).toContain("ann1");
+        expect(state.tracklets.entities["track1"]?.start).toBe(0);
+        expect(state.tracklets.entities["track1"]?.end).toBe(2);
+      });
+    });
+
+    describe("Parent/Child Relationships", () => {
+      it("should add children to tracklet", () => {
+        const parent = createMockTracklet({ id: "parent1" });
+        const child1 = createMockTracklet({ id: "child1" });
+        const child2 = createMockTracklet({ id: "child2" });
+
+        store.dispatch(dataSlice.actions.addTracklet(parent));
+        store.dispatch(dataSlice.actions.addTracklet(child1));
+        store.dispatch(dataSlice.actions.addTracklet(child2));
+
+        store.dispatch(
+          dataSlice.actions.addChildrenToTracklet({
+            parentId: "parent1",
+            childIds: ["child1", "child2"],
+          }),
+        );
+
+        const state = getState().data;
+        expect(state.tracklets.entities["parent1"]?.children).toContain(
+          "child1",
+        );
+        expect(state.tracklets.entities["parent1"]?.children).toContain(
+          "child2",
+        );
+        expect(state.tracklets.entities["child1"]?.parents).toContain(
+          "parent1",
+        );
+        expect(state.tracklets.entities["child2"]?.parents).toContain(
+          "parent1",
+        );
+      });
+
+      it("should add single child to tracklet", () => {
+        const parent = createMockTracklet({ id: "parent1" });
+        const child = createMockTracklet({ id: "child1" });
+
+        store.dispatch(dataSlice.actions.addTracklet(parent));
+        store.dispatch(dataSlice.actions.addTracklet(child));
+
+        store.dispatch(
+          dataSlice.actions.addChildrenToTracklet({
+            parentId: "parent1",
+            childIds: "child1",
+          }),
+        );
+
+        const state = getState().data;
+        expect(state.tracklets.entities["parent1"]?.children).toContain(
+          "child1",
+        );
+        expect(state.tracklets.entities["child1"]?.parents).toContain(
+          "parent1",
+        );
+      });
+
+      it("should remove children from tracklet", () => {
+        const parent = createMockTracklet({
+          id: "parent1",
+          children: ["child1", "child2", "child3"],
+        });
+        const child1 = createMockTracklet({
+          id: "child1",
+          parents: ["parent1"],
+        });
+        const child2 = createMockTracklet({
+          id: "child2",
+          parents: ["parent1"],
+        });
+        const child3 = createMockTracklet({
+          id: "child3",
+          parents: ["parent1"],
+        });
+
+        store.dispatch(dataSlice.actions.addTracklet(parent));
+        store.dispatch(dataSlice.actions.addTracklet(child1));
+        store.dispatch(dataSlice.actions.addTracklet(child2));
+        store.dispatch(dataSlice.actions.addTracklet(child3));
+
+        store.dispatch(
+          dataSlice.actions.removeChildrenFromTracklet({
+            parentId: "parent1",
+            childIds: ["child1", "child2"],
+          }),
+        );
+
+        const state = getState().data;
+        expect(state.tracklets.entities["parent1"]?.children).not.toContain(
+          "child1",
+        );
+        expect(state.tracklets.entities["parent1"]?.children).not.toContain(
+          "child2",
+        );
+        expect(state.tracklets.entities["parent1"]?.children).toContain(
+          "child3",
+        );
+        expect(state.tracklets.entities["child1"]?.parents).not.toContain(
+          "parent1",
+        );
+        expect(state.tracklets.entities["child2"]?.parents).not.toContain(
+          "parent1",
+        );
+      });
+
+      it("should add parents to tracklet", () => {
+        const parent1 = createMockTracklet({ id: "parent1" });
+        const parent2 = createMockTracklet({ id: "parent2" });
+        const child = createMockTracklet({ id: "child1" });
+
+        store.dispatch(dataSlice.actions.addTracklet(parent1));
+        store.dispatch(dataSlice.actions.addTracklet(parent2));
+        store.dispatch(dataSlice.actions.addTracklet(child));
+
+        store.dispatch(
+          dataSlice.actions.addParentsToTracklet({
+            childId: "child1",
+            parentIds: ["parent1", "parent2"],
+          }),
+        );
+
+        const state = getState().data;
+        expect(state.tracklets.entities["child1"]?.parents).toContain(
+          "parent1",
+        );
+        expect(state.tracklets.entities["child1"]?.parents).toContain(
+          "parent2",
+        );
+        expect(state.tracklets.entities["parent1"]?.children).toContain(
+          "child1",
+        );
+        expect(state.tracklets.entities["parent2"]?.children).toContain(
+          "child1",
+        );
+      });
+
+      it("should remove parents from tracklet", () => {
+        const parent1 = createMockTracklet({
+          id: "parent1",
+          children: ["child1"],
+        });
+        const parent2 = createMockTracklet({
+          id: "parent2",
+          children: ["child1"],
+        });
+        const parent3 = createMockTracklet({
+          id: "parent3",
+          children: ["child1"],
+        });
+        const child = createMockTracklet({
+          id: "child1",
+          parents: ["parent1", "parent2", "parent3"],
+        });
+
+        store.dispatch(dataSlice.actions.addTracklet(parent1));
+        store.dispatch(dataSlice.actions.addTracklet(parent2));
+        store.dispatch(dataSlice.actions.addTracklet(parent3));
+        store.dispatch(dataSlice.actions.addTracklet(child));
+
+        store.dispatch(
+          dataSlice.actions.removeParentsFromTracklet({
+            childId: "child1",
+            parentIds: ["parent1", "parent2"],
+          }),
+        );
+
+        const state = getState().data;
+        expect(state.tracklets.entities["child1"]?.parents).not.toContain(
+          "parent1",
+        );
+        expect(state.tracklets.entities["child1"]?.parents).not.toContain(
+          "parent2",
+        );
+        expect(state.tracklets.entities["child1"]?.parents).toContain(
+          "parent3",
+        );
+        expect(state.tracklets.entities["parent1"]?.children).not.toContain(
+          "child1",
+        );
+        expect(state.tracklets.entities["parent2"]?.children).not.toContain(
+          "child1",
+        );
+      });
+    });
+
+    describe("Complex Operations", () => {
+      it("should join tracklets into single tracklet", () => {
+        const ann0 = createMockAnnotation({
+          id: "ann0",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img2",
+          timepoint: 2,
+          kind: "annotation-kind",
+        });
+        const ann3 = createMockAnnotation({
+          id: "ann3",
+          imageId: "img3",
+          timepoint: 3,
+          kind: "annotation-kind",
+        });
+        store.dispatch(
+          dataSlice.actions.batchAddAnnotations([ann0, ann1, ann2, ann3]),
+        );
+
+        const trackletA = createMockTracklet({
+          id: "trackA",
+          linkedIds: ["ann0"],
+          start: 0,
+          end: 0,
+        });
+        const trackletB = createMockTracklet({
+          id: "trackB",
+          linkedIds: ["ann1", "ann2"],
+          start: 1,
+          end: 2,
+        });
+        const trackletC = createMockTracklet({
+          id: "trackC",
+          linkedIds: ["ann3"],
+          start: 3,
+          end: 3,
+        });
+
+        store.dispatch(dataSlice.actions.addTracklet(trackletA));
+        store.dispatch(dataSlice.actions.addTracklet(trackletB));
+        store.dispatch(dataSlice.actions.addTracklet(trackletC));
+
+        const initialState = getState().data;
+        const initialTrackletIds = Object.keys(initialState.tracklets.entities);
+
+        store.dispatch(
+          dataSlice.actions.joinTracklets(["trackA", "trackB", "trackC"]),
+        );
+
+        const state = getState().data;
+
+        // Original tracklets should be deleted
+        expect(state.tracklets.entities["trackA"]).toBeUndefined();
+        expect(state.tracklets.entities["trackB"]).toBeUndefined();
+        expect(state.tracklets.entities["trackC"]).toBeUndefined();
+
+        // Find the new tracklet (should be only one tracklet now)
+        const newTrackletId = Object.keys(state.tracklets.entities).find(
+          (id) => !initialTrackletIds.includes(id),
+        );
+        expect(newTrackletId).toBeDefined();
+
+        const newTracklet = state.tracklets.entities[newTrackletId!];
+        expect(newTracklet?.linkedIds).toHaveLength(4);
+        expect(newTracklet?.linkedIds).toContain("ann0");
+        expect(newTracklet?.linkedIds).toContain("ann1");
+        expect(newTracklet?.linkedIds).toContain("ann2");
+        expect(newTracklet?.linkedIds).toContain("ann3");
+        expect(newTracklet?.start).toBe(0);
+        expect(newTracklet?.end).toBe(3);
+
+        // All annotations should have new tracklet ID
+        expect(state.annotations.entities["ann0"]?.trackId).toBe(newTrackletId);
+        expect(state.annotations.entities["ann1"]?.trackId).toBe(newTrackletId);
+        expect(state.annotations.entities["ann2"]?.trackId).toBe(newTrackletId);
+        expect(state.annotations.entities["ann3"]?.trackId).toBe(newTrackletId);
+      });
+
+      it("should preserve parent relationships when joining tracklets", () => {
+        const ann0 = createMockAnnotation({
+          id: "ann0",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img2",
+          timepoint: 2,
+          kind: "annotation-kind",
+        });
+        store.dispatch(
+          dataSlice.actions.batchAddAnnotations([ann0, ann1, ann2]),
+        );
+
+        const parent = createMockTracklet({
+          id: "parent1",
+          linkedIds: ["ann0"],
+          start: 0,
+          end: 0,
+        });
+        const childA = createMockTracklet({
+          id: "childA",
+          linkedIds: ["ann1"],
+          start: 1,
+          end: 1,
+        });
+        const childB = createMockTracklet({
+          id: "childB",
+          linkedIds: ["ann2"],
+          start: 2,
+          end: 2,
+        });
+
+        store.dispatch(dataSlice.actions.addTracklet(parent));
+        store.dispatch(dataSlice.actions.addTracklet(childA));
+        store.dispatch(dataSlice.actions.addTracklet(childB));
+
+        store.dispatch(
+          dataSlice.actions.addChildrenToTracklet({
+            parentId: "parent1",
+            childIds: ["childA", "childB"],
+          }),
+        );
+
+        const initialState = getState().data;
+        const initialTrackletIds = Object.keys(initialState.tracklets.entities);
+
+        store.dispatch(dataSlice.actions.joinTracklets(["childA", "childB"]));
+
+        const state = getState().data;
+
+        // Find new joined tracklet
+        const newTrackletId = Object.keys(state.tracklets.entities).find(
+          (id) => !initialTrackletIds.includes(id),
+        );
+
+        // New tracklet should be child of parent
+        expect(state.tracklets.entities["parent1"]?.children).toContain(
+          newTrackletId,
+        );
+        expect(state.tracklets.entities[newTrackletId!]?.parents).toContain(
+          "parent1",
+        );
+      });
+
+      it("should preserve child relationships when joining tracklets", () => {
+        const ann0 = createMockAnnotation({
+          id: "ann0",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img2",
+          timepoint: 2,
+          kind: "annotation-kind",
+        });
+        store.dispatch(
+          dataSlice.actions.batchAddAnnotations([ann0, ann1, ann2]),
+        );
+
+        const parentA = createMockTracklet({
+          id: "parentA",
+          linkedIds: ["ann0"],
+          start: 0,
+          end: 0,
+        });
+        const parentB = createMockTracklet({
+          id: "parentB",
+          linkedIds: ["ann1"],
+          start: 1,
+          end: 1,
+        });
+        const child = createMockTracklet({
+          id: "child1",
+          linkedIds: ["ann2"],
+          start: 2,
+          end: 2,
+        });
+
+        store.dispatch(dataSlice.actions.addTracklet(parentA));
+        store.dispatch(dataSlice.actions.addTracklet(parentB));
+        store.dispatch(dataSlice.actions.addTracklet(child));
+
+        store.dispatch(
+          dataSlice.actions.addChildrenToTracklet({
+            parentId: "parentA",
+            childIds: ["child1"],
+          }),
+        );
+        store.dispatch(
+          dataSlice.actions.addChildrenToTracklet({
+            parentId: "parentB",
+            childIds: ["child1"],
+          }),
+        );
+
+        const initialState = getState().data;
+        const initialTrackletIds = Object.keys(initialState.tracklets.entities);
+
+        store.dispatch(dataSlice.actions.joinTracklets(["parentA", "parentB"]));
+
+        const state = getState().data;
+
+        // Find new joined tracklet
+        const newTrackletId = Object.keys(state.tracklets.entities).find(
+          (id) => !initialTrackletIds.includes(id),
+        );
+
+        // New tracklet should be parent of child
+        expect(state.tracklets.entities[newTrackletId!]?.children).toContain(
+          "child1",
+        );
+        expect(state.tracklets.entities["child1"]?.parents).toContain(
+          newTrackletId,
+        );
+      });
+
+      it("should sever tracklet at timepoint", () => {
+        const annotations = [0, 1, 2, 3, 4].map((tp) =>
+          createMockAnnotation({
+            id: `ann${tp}`,
+            imageId: `img${tp}`,
+            timepoint: tp,
+            kind: "annotation-kind",
+          }),
+        );
+        store.dispatch(dataSlice.actions.batchAddAnnotations(annotations));
+
+        const tracklet = createMockTracklet({
+          id: "track1",
+          linkedIds: ["ann0", "ann1", "ann2", "ann3", "ann4"],
+          start: 0,
+          end: 4,
+        });
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        const initialState = getState().data;
+        const initialTrackletIds = Object.keys(initialState.tracklets.entities);
+
+        store.dispatch(
+          dataSlice.actions.severTracklet({ id: "track1", timepoint: 2 }),
+        );
+
+        const state = getState().data;
+
+        // Original tracklet should be deleted
+        expect(state.tracklets.entities["track1"]).toBeUndefined();
+
+        // Find the two new tracklets
+        const newTrackletIds = Object.keys(state.tracklets.entities).filter(
+          (id) => !initialTrackletIds.includes(id),
+        );
+        expect(newTrackletIds).toHaveLength(2);
+
+        const tracklets = newTrackletIds.map(
+          (id) => state.tracklets.entities[id]!,
+        );
+
+        // Find left and right tracklets by their start times
+        const leftTracklet = tracklets.find((t) => t.start === 0);
+        const rightTracklet = tracklets.find((t) => t.start === 2);
+
+        expect(leftTracklet).toBeDefined();
+        expect(rightTracklet).toBeDefined();
+
+        // Left tracklet should have timepoints 0, 1
+        expect(leftTracklet?.end).toBe(1);
+        expect(leftTracklet?.linkedIds).toContain("ann0");
+        expect(leftTracklet?.linkedIds).toContain("ann1");
+        expect(leftTracklet?.linkedIds).not.toContain("ann2");
+
+        // Right tracklet should have timepoints 2, 3, 4
+        expect(rightTracklet?.end).toBe(4);
+        expect(rightTracklet?.linkedIds).toContain("ann2");
+        expect(rightTracklet?.linkedIds).toContain("ann3");
+        expect(rightTracklet?.linkedIds).toContain("ann4");
+        expect(rightTracklet?.linkedIds).not.toContain("ann1");
+      });
+
+      it("should not sever at boundary timepoints", () => {
+        const ann0 = createMockAnnotation({
+          id: "ann0",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img2",
+          timepoint: 2,
+          kind: "annotation-kind",
+        });
+        store.dispatch(
+          dataSlice.actions.batchAddAnnotations([ann0, ann1, ann2]),
+        );
+
+        const tracklet = createMockTracklet({
+          id: "track1",
+          linkedIds: ["ann0", "ann1", "ann2"],
+          start: 0,
+          end: 2,
+        });
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        // Try to sever at start boundary
+        store.dispatch(
+          dataSlice.actions.severTracklet({ id: "track1", timepoint: 0 }),
+        );
+
+        let state = getState().data;
+        expect(state.tracklets.entities["track1"]).toBeDefined();
+        expect(state.tracklets.entities["track1"]?.linkedIds).toHaveLength(3);
+
+        // Try to sever at end boundary
+        store.dispatch(
+          dataSlice.actions.severTracklet({ id: "track1", timepoint: 2 }),
+        );
+
+        state = getState().data;
+        expect(state.tracklets.entities["track1"]).toBeDefined();
+        expect(state.tracklets.entities["track1"]?.linkedIds).toHaveLength(3);
+      });
+
+      it("should transfer parent/child relationships when severing", () => {
+        const annotations = [0, 1, 2, 3].map((tp) =>
+          createMockAnnotation({
+            id: `ann${tp}`,
+            imageId: `img${tp}`,
+            timepoint: tp,
+            kind: "annotation-kind",
+          }),
+        );
+        store.dispatch(dataSlice.actions.batchAddAnnotations(annotations));
+
+        const parent = createMockTracklet({
+          id: "parent1",
+          linkedIds: [],
+          start: 0,
+          end: 0,
+        });
+        const child = createMockTracklet({
+          id: "child1",
+          linkedIds: [],
+          start: 3,
+          end: 3,
+        });
+        const middle = createMockTracklet({
+          id: "middle1",
+          linkedIds: ["ann0", "ann1", "ann2", "ann3"],
+          start: 0,
+          end: 3,
+        });
+
+        store.dispatch(dataSlice.actions.addTracklet(parent));
+        store.dispatch(dataSlice.actions.addTracklet(child));
+        store.dispatch(dataSlice.actions.addTracklet(middle));
+
+        store.dispatch(
+          dataSlice.actions.addChildrenToTracklet({
+            parentId: "parent1",
+            childIds: ["middle1"],
+          }),
+        );
+        store.dispatch(
+          dataSlice.actions.addChildrenToTracklet({
+            parentId: "middle1",
+            childIds: ["child1"],
+          }),
+        );
+
+        const initialState = getState().data;
+        const initialTrackletIds = Object.keys(initialState.tracklets.entities);
+
+        store.dispatch(
+          dataSlice.actions.severTracklet({ id: "middle1", timepoint: 2 }),
+        );
+
+        const state = getState().data;
+
+        // Find the two new tracklets
+        const newTrackletIds = Object.keys(state.tracklets.entities).filter(
+          (id) => !initialTrackletIds.includes(id),
+        );
+
+        const tracklets = newTrackletIds.map(
+          (id) => state.tracklets.entities[id]!,
+        );
+
+        const leftTracklet = tracklets.find((t) => t.start === 0);
+        const rightTracklet = tracklets.find((t) => t.start === 2);
+
+        // Left tracklet should inherit parent relationship
+        expect(leftTracklet?.parents).toContain("parent1");
+        expect(state.tracklets.entities["parent1"]?.children).toContain(
+          leftTracklet?.id,
+        );
+
+        // Right tracklet should inherit child relationship
+        expect(rightTracklet?.children).toContain("child1");
+        expect(state.tracklets.entities["child1"]?.parents).toContain(
+          rightTracklet?.id,
+        );
+      });
+    });
+
+    describe("Batch Operations", () => {
+      it("should batch add tracklets", () => {
+        const tracklets = [
+          createMockTracklet({ id: "track1" }),
+          createMockTracklet({ id: "track2" }),
+          createMockTracklet({ id: "track3" }),
+        ];
+
+        store.dispatch(dataSlice.actions.batchAddTracklet(tracklets));
+
+        const state = getState().data;
+        expect(state.tracklets.entities["track1"]).toBeDefined();
+        expect(state.tracklets.entities["track2"]).toBeDefined();
+        expect(state.tracklets.entities["track3"]).toBeDefined();
+        expect(state.relationships.metadataToTracklets["meta1"]).toHaveLength(
+          3,
+        );
+      });
+
+      it("should batch add annotations to tracklet", () => {
+        const annotations = [0, 1, 2, 3, 4].map((tp) =>
+          createMockAnnotation({
+            id: `ann${tp}`,
+            imageId: `img${tp}`,
+            timepoint: tp,
+            kind: "annotation-kind",
+          }),
+        );
+        store.dispatch(dataSlice.actions.batchAddAnnotations(annotations));
+
+        const tracklet = createMockTracklet({
+          id: "track1",
+          linkedIds: [],
+        });
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        store.dispatch(
+          dataSlice.actions.batchAddAnnotationToTracklet([
+            {
+              trackId: "track1",
+              annIds: ["ann0", "ann1", "ann2", "ann3", "ann4"],
+            },
+          ]),
+        );
+
+        const state = getState().data;
+        const updatedTracklet = state.tracklets.entities["track1"];
+        expect(updatedTracklet?.linkedIds).toHaveLength(5);
+        expect(updatedTracklet?.start).toBe(0);
+        expect(updatedTracklet?.end).toBe(4);
+        expect(state.annotations.entities["ann0"]?.trackId).toBe("track1");
+        expect(state.annotations.entities["ann4"]?.trackId).toBe("track1");
+      });
+
+      it("should batch add annotations to multiple tracklets", () => {
+        const annotations = [0, 1, 2, 3].map((tp) =>
+          createMockAnnotation({
+            id: `ann${tp}`,
+            imageId: `img${tp}`,
+            timepoint: tp,
+            kind: "annotation-kind",
+          }),
+        );
+        store.dispatch(dataSlice.actions.batchAddAnnotations(annotations));
+
+        const track1 = createMockTracklet({ id: "track1", linkedIds: [] });
+        const track2 = createMockTracklet({ id: "track2", linkedIds: [] });
+        store.dispatch(dataSlice.actions.addTracklet(track1));
+        store.dispatch(dataSlice.actions.addTracklet(track2));
+
+        store.dispatch(
+          dataSlice.actions.batchAddAnnotationToTracklet([
+            { trackId: "track1", annIds: ["ann0", "ann1"] },
+            { trackId: "track2", annIds: ["ann2", "ann3"] },
+          ]),
+        );
+
+        const state = getState().data;
+        expect(state.tracklets.entities["track1"]?.linkedIds).toEqual([
+          "ann0",
+          "ann1",
+        ]);
+        expect(state.tracklets.entities["track2"]?.linkedIds).toEqual([
+          "ann2",
+          "ann3",
+        ]);
+        expect(state.annotations.entities["ann0"]?.trackId).toBe("track1");
+        expect(state.annotations.entities["ann2"]?.trackId).toBe("track2");
+      });
+
+      it("should batch delete tracklets", () => {
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        const ann3 = createMockAnnotation({
+          id: "ann3",
+          imageId: "img2",
+          timepoint: 2,
+          kind: "annotation-kind",
+        });
+        store.dispatch(
+          dataSlice.actions.batchAddAnnotations([ann1, ann2, ann3]),
+        );
+
+        const tracklets = [
+          createMockTracklet({ id: "track1", linkedIds: ["ann1"] }),
+          createMockTracklet({ id: "track2", linkedIds: ["ann2"] }),
+          createMockTracklet({ id: "track3", linkedIds: ["ann3"] }),
+        ];
+        store.dispatch(dataSlice.actions.batchAddTracklet(tracklets));
+
+        store.dispatch(
+          dataSlice.actions.batchDeleteTracklet(["track1", "track3"]),
+        );
+
+        const state = getState().data;
+        expect(state.tracklets.entities["track1"]).toBeUndefined();
+        expect(state.tracklets.entities["track2"]).toBeDefined();
+        expect(state.tracklets.entities["track3"]).toBeUndefined();
+        expect(state.annotations.entities["ann1"]?.trackId).toBeUndefined();
+        expect(state.annotations.entities["ann2"]?.trackId).toBe("track2");
+        expect(state.annotations.entities["ann3"]?.trackId).toBeUndefined();
+      });
+    });
+
+    describe("Edge Cases & Error Handling", () => {
+      it("should handle operations on non-existent tracklet gracefully", () => {
+        const consoleError = vi
+          .spyOn(console, "error")
+          .mockImplementation(() => {});
+
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        store.dispatch(dataSlice.actions.addAnnotation(ann1));
+
+        // Try updateTrackletColor on non-existent ID
+        store.dispatch(
+          dataSlice.actions.updateTrackletColor({
+            id: "non-existent",
+            color: "#00FF00",
+          }),
+        );
+
+        // Try addAnnotationToTracklet on non-existent ID
+        store.dispatch(
+          dataSlice.actions.addAnnotationToTracklet({
+            trackId: "non-existent",
+            annId: "ann1",
+          }),
+        );
+
+        // Try removeAnnotationFromTracklet on non-existent ID
+        store.dispatch(
+          dataSlice.actions.removeAnnotationFromTracklet({
+            trackId: "non-existent",
+            annId: "ann1",
+          }),
+        );
+
+        // Verify no errors thrown and state unchanged
+        const state = getState().data;
+        expect(state).toBeDefined();
+        expect(state.annotations.entities["ann1"]?.trackId).toBeUndefined();
+
+        consoleError.mockRestore();
+      });
+
+      it("should handle empty tracklet after all annotations removed", () => {
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        const ann3 = createMockAnnotation({
+          id: "ann3",
+          imageId: "img2",
+          timepoint: 2,
+          kind: "annotation-kind",
+        });
+        store.dispatch(
+          dataSlice.actions.batchAddAnnotations([ann1, ann2, ann3]),
+        );
+
+        // Create tracklet with 3 annotations
+        const tracklet = createMockTracklet({
+          id: "track1",
+          linkedIds: ["ann1", "ann2", "ann3"],
+          start: 0,
+          end: 2,
+        });
+        store.dispatch(dataSlice.actions.addTracklet(tracklet));
+
+        // Verify tracklet exists
+        let state = getState().data;
+        expect(state.tracklets.entities["track1"]).toBeDefined();
+        expect(state.relationships.metadataToTracklets["meta1"]).toContain(
+          "track1",
+        );
+
+        // Remove first annotation
+        store.dispatch(
+          dataSlice.actions.removeAnnotationFromTracklet({
+            trackId: "track1",
+            annId: "ann1",
+          }),
+        );
+
+        state = getState().data;
+        expect(state.tracklets.entities["track1"]).toBeDefined();
+        expect(state.tracklets.entities["track1"]?.linkedIds).toHaveLength(2);
+
+        // Remove second annotation
+        store.dispatch(
+          dataSlice.actions.removeAnnotationFromTracklet({
+            trackId: "track1",
+            annId: "ann2",
+          }),
+        );
+
+        state = getState().data;
+        expect(state.tracklets.entities["track1"]).toBeDefined();
+        expect(state.tracklets.entities["track1"]?.linkedIds).toHaveLength(1);
+
+        // Remove last annotation - tracklet should auto-delete
+        store.dispatch(
+          dataSlice.actions.removeAnnotationFromTracklet({
+            trackId: "track1",
+            annId: "ann3",
+          }),
+        );
+
+        state = getState().data;
+        // Verify tracklet auto-deleted after last removal
+        expect(state.tracklets.entities["track1"]).toBeUndefined();
+        // Verify metadata relationship cleaned up
+        expect(state.relationships.metadataToTracklets["meta1"]).not.toContain(
+          "track1",
+        );
+        // Verify all annotations' trackId cleared
+        expect(state.annotations.entities["ann1"]?.trackId).toBeUndefined();
+        expect(state.annotations.entities["ann2"]?.trackId).toBeUndefined();
+        expect(state.annotations.entities["ann3"]?.trackId).toBeUndefined();
+      });
+
+      it("should maintain relationship consistency during complex cascade", () => {
+        const ann1 = createMockAnnotation({
+          id: "ann1",
+          imageId: "img0",
+          timepoint: 0,
+          kind: "annotation-kind",
+        });
+        const ann2 = createMockAnnotation({
+          id: "ann2",
+          imageId: "img1",
+          timepoint: 1,
+          kind: "annotation-kind",
+        });
+        store.dispatch(dataSlice.actions.batchAddAnnotations([ann1, ann2]));
+
+        // Create graph: parent → middle (with annotations) → child
+        const parent = createMockTracklet({
+          id: "parent1",
+          linkedIds: [],
+          start: 0,
+          end: 0,
+        });
+        const middle = createMockTracklet({
+          id: "middle1",
+          linkedIds: ["ann1", "ann2"],
+          start: 0,
+          end: 1,
+        });
+        const child = createMockTracklet({
+          id: "child1",
+          linkedIds: [],
+          start: 2,
+          end: 2,
+        });
+
+        store.dispatch(dataSlice.actions.addTracklet(parent));
+        store.dispatch(dataSlice.actions.addTracklet(middle));
+        store.dispatch(dataSlice.actions.addTracklet(child));
+
+        // Set up relationships
+        store.dispatch(
+          dataSlice.actions.addChildrenToTracklet({
+            parentId: "parent1",
+            childIds: ["middle1"],
+          }),
+        );
+        store.dispatch(
+          dataSlice.actions.addChildrenToTracklet({
+            parentId: "middle1",
+            childIds: ["child1"],
+          }),
+        );
+
+        // Verify initial state
+        let state = getState().data;
+        expect(state.tracklets.entities["parent1"]?.children).toContain(
+          "middle1",
+        );
+        expect(state.tracklets.entities["middle1"]?.parents).toContain(
+          "parent1",
+        );
+        expect(state.tracklets.entities["middle1"]?.children).toContain(
+          "child1",
+        );
+        expect(state.tracklets.entities["child1"]?.parents).toContain(
+          "middle1",
+        );
+
+        // Delete middle tracklet
+        store.dispatch(dataSlice.actions.deleteTracklet("middle1"));
+
+        state = getState().data;
+        // Verify tracklet deleted
+        expect(state.tracklets.entities["middle1"]).toBeUndefined();
+
+        // Verify parent's children updated
+        expect(state.tracklets.entities["parent1"]?.children).not.toContain(
+          "middle1",
+        );
+
+        // Verify child's parents updated
+        expect(state.tracklets.entities["child1"]?.parents).not.toContain(
+          "middle1",
+        );
+
+        // Verify annotations' trackId cleared
+        expect(state.annotations.entities["ann1"]?.trackId).toBeUndefined();
+        expect(state.annotations.entities["ann2"]?.trackId).toBeUndefined();
+
+        // Verify metadata relationship cleaned up
+        expect(state.relationships.metadataToTracklets["meta1"]).not.toContain(
+          "middle1",
+        );
+      });
+
+      it("should handle join with non-contiguous tracklets", () => {
+        // Create annotations at timepoints 0-2, 5-7, 10-12 (gaps between)
+        const annotations = [
+          ...[0, 1, 2].map((tp) =>
+            createMockAnnotation({
+              id: `ann${tp}`,
+              imageId: `img${tp}`,
+              timepoint: tp,
+              kind: "annotation-kind",
+            }),
+          ),
+          // Gap from 3-4
+          ...[0, 1, 2].map((i) =>
+            createMockAnnotation({
+              id: `ann${5 + i}`,
+              imageId: `img${i}`,
+              timepoint: 5 + i,
+              kind: "annotation-kind",
+            }),
+          ),
+          // Gap from 8-9
+          ...[0, 1, 2].map((i) =>
+            createMockAnnotation({
+              id: `ann${10 + i}`,
+              imageId: `img${i}`,
+              timepoint: 10 + i,
+              kind: "annotation-kind",
+            }),
+          ),
+        ];
+        store.dispatch(dataSlice.actions.batchAddAnnotations(annotations));
+
+        // Create tracklets at non-contiguous timepoints
+        const trackletA = createMockTracklet({
+          id: "trackA",
+          linkedIds: ["ann0", "ann1", "ann2"],
+          start: 0,
+          end: 2,
+        });
+        const trackletB = createMockTracklet({
+          id: "trackB",
+          linkedIds: ["ann5", "ann6", "ann7"],
+          start: 5,
+          end: 7,
+        });
+        const trackletC = createMockTracklet({
+          id: "trackC",
+          linkedIds: ["ann10", "ann11", "ann12"],
+          start: 10,
+          end: 12,
+        });
+
+        store.dispatch(dataSlice.actions.addTracklet(trackletA));
+        store.dispatch(dataSlice.actions.addTracklet(trackletB));
+        store.dispatch(dataSlice.actions.addTracklet(trackletC));
+
+        const initialState = getState().data;
+        const initialTrackletIds = Object.keys(initialState.tracklets.entities);
+
+        // Join all three tracklets
+        store.dispatch(
+          dataSlice.actions.joinTracklets(["trackA", "trackB", "trackC"]),
+        );
+
+        const state = getState().data;
+
+        // Original tracklets should be deleted
+        expect(state.tracklets.entities["trackA"]).toBeUndefined();
+        expect(state.tracklets.entities["trackB"]).toBeUndefined();
+        expect(state.tracklets.entities["trackC"]).toBeUndefined();
+
+        // Find the new tracklet
+        const newTrackletId = Object.keys(state.tracklets.entities).find(
+          (id) => !initialTrackletIds.includes(id),
+        );
+        expect(newTrackletId).toBeDefined();
+
+        const newTracklet = state.tracklets.entities[newTrackletId!];
+
+        // Verify single tracklet spanning 0-12
+        expect(newTracklet?.start).toBe(0);
+        expect(newTracklet?.end).toBe(12);
+
+        // Verify all annotations transferred
+        expect(newTracklet?.linkedIds).toHaveLength(9);
+        expect(newTracklet?.linkedIds).toContain("ann0");
+        expect(newTracklet?.linkedIds).toContain("ann1");
+        expect(newTracklet?.linkedIds).toContain("ann2");
+        expect(newTracklet?.linkedIds).toContain("ann5");
+        expect(newTracklet?.linkedIds).toContain("ann6");
+        expect(newTracklet?.linkedIds).toContain("ann7");
+        expect(newTracklet?.linkedIds).toContain("ann10");
+        expect(newTracklet?.linkedIds).toContain("ann11");
+        expect(newTracklet?.linkedIds).toContain("ann12");
+
+        // Verify all annotations have new tracklet ID
+        for (const annId of newTracklet!.linkedIds) {
+          expect(state.annotations.entities[annId]?.trackId).toBe(
+            newTrackletId,
+          );
+        }
+      });
     });
   });
 
@@ -935,6 +2563,7 @@ describe("Data Slice", () => {
       const allMetadata = selectAllMetadata(state);
       const allImages = selectAllImageData(state);
       const allAnnotations = selectAllAnnotations(state);
+      const allTracklets = selectAllTracklets(state);
 
       expect(allKinds).toHaveLength(1); // IMAGE_KIND
       expect(allKinds[0].id).toBe(IMAGE_KIND);
@@ -943,12 +2572,12 @@ describe("Data Slice", () => {
       expect(allMetadata).toHaveLength(0);
       expect(allImages).toHaveLength(0);
       expect(allAnnotations).toHaveLength(0);
+      expect(allTracklets).toHaveLength(0);
 
       const dataState = state.data;
       expect(
         Object.keys(dataState.relationships.kindToCategories),
       ).toHaveLength(1);
-      expect(Object.keys(dataState.tracklets)).toHaveLength(0);
     });
   });
 
@@ -1056,7 +2685,7 @@ describe("Data Slice", () => {
       store.dispatch(dataSlice.actions.batchAddAnnotations([ann1, ann2, ann3]));
 
       // Delete annotation kind cascade
-      store.dispatch(dataSlice.actions.deleteKindCascade("Annotation"));
+      store.dispatch(dataSlice.actions.deleteKind("Annotation"));
 
       const state = getState().data;
 
