@@ -5,7 +5,7 @@ import { Stage as KonvaStage } from "react-konva";
 
 import {
   selectMetadataEntities,
-  selectTrackletRecord,
+  selectTrackletEntities,
 } from "store/data/selectors";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
@@ -42,7 +42,7 @@ export const TrackStage = ({
   const activeMetadata = useSelector(selectActiveMetadata);
   const metadataEntities = useSelector(selectMetadataEntities);
 
-  const tracklets = useSelector(selectTrackletRecord);
+  const tracklets = useSelector(selectTrackletEntities);
   const selectedTracks = useSelector(selectSelectedTracklets);
 
   // Local state

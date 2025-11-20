@@ -27,8 +27,8 @@ export const generateRelationships = (
   validTracks.forEach((track) => {
     // Create immutable copy to prevent side effects
     const trackCopy = { ...track };
-    trackMap.set(track.trackId, trackCopy);
-    childrenMap.set(track.trackId, []);
+    trackMap.set(track.id, trackCopy);
+    childrenMap.set(track.id, []);
   });
 
   // Second pass: build parent-child relationships efficiently
@@ -36,8 +36,8 @@ export const generateRelationships = (
     if (track.parents) {
       track.parents.forEach((parentId) => {
         const parentChildren = childrenMap.get(parentId);
-        if (parentChildren && !parentChildren.includes(track.trackId)) {
-          parentChildren.push(track.trackId);
+        if (parentChildren && !parentChildren.includes(track.id)) {
+          parentChildren.push(track.id);
         }
       });
     }
@@ -101,8 +101,8 @@ export const generateRelationships = (
 
   // Find all connected components using iterative depth-first search
   validTracks.forEach((track) => {
-    if (!visited.has(track.trackId)) {
-      const component = dfsIterative(track.trackId);
+    if (!visited.has(track.id)) {
+      const component = dfsIterative(track.id);
       components.push(component);
     }
   });
@@ -228,7 +228,7 @@ export const generateRelationships = (
 
       const missingParents = difference(
         parents,
-        positioned.map((track) => track.trackId),
+        positioned.map((track) => track.id),
       );
       if (missingParents.length > 0) return;
 

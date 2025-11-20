@@ -5,7 +5,7 @@ import { Layer, Line } from "react-konva";
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "store/data/constants";
 import {
   selectImageToAnnotations,
-  selectTrackletRecord,
+  selectTrackletEntities,
 } from "store/data/selectors";
 
 import { hexAlpha } from "utils/colorUtils";
@@ -35,7 +35,7 @@ export const AnnotationLayer: React.FC<AnnotationsProps> = ({
   selectedTracks,
 }) => {
   const dispatch = useDispatch();
-  const tracklets = useSelector(selectTrackletRecord);
+  const tracklets = useSelector(selectTrackletEntities);
   const annotations = useSelector(selectAllImageViewerAnnotationRecord);
   const imageToAnnotations = useSelector(selectImageToAnnotations);
   const activeMetadata = useSelector(selectActiveMetadata);

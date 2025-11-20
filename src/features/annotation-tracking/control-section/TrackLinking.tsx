@@ -16,7 +16,7 @@ export const TrackControls = () => {
   const handleSplit = useCallback(() => {
     if (selectedTracks.length < 2) return;
     dispatch(
-      dataSlice.actions.addChildrenToTrack({
+      dataSlice.actions.addChildrenToTracklet({
         parentId: selectedTracks[0],
         childIds: selectedTracks.slice(1),
       }),
@@ -27,7 +27,7 @@ export const TrackControls = () => {
   const handleUndoSplit = useCallback(() => {
     if (selectedTracks.length < 2) return;
     dispatch(
-      dataSlice.actions.removeChildrenFromTrack({
+      dataSlice.actions.removeChildrenFromTracklet({
         parentId: selectedTracks[0],
         childIds: selectedTracks.slice(1),
       }),
@@ -38,7 +38,7 @@ export const TrackControls = () => {
   const handleMerge = useCallback(() => {
     if (selectedTracks.length < 2) return;
     dispatch(
-      dataSlice.actions.addParentsToTrack({
+      dataSlice.actions.addParentsToTracklet({
         parentIds: selectedTracks.slice(1),
         childId: selectedTracks[0],
       }),
@@ -49,7 +49,7 @@ export const TrackControls = () => {
   const handleUndoMerge = useCallback(() => {
     if (selectedTracks.length < 2) return;
     dispatch(
-      dataSlice.actions.removeParentsFromTrack({
+      dataSlice.actions.removeParentsFromTracklet({
         parentIds: selectedTracks.slice(1),
         childId: selectedTracks[0],
       }),

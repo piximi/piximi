@@ -20,7 +20,6 @@ import {
   AnnotationObject,
   Category,
   ImageMetadata,
-  LinkNode,
   Tracklet,
   GeneralizedKindItem,
   ImageData,
@@ -67,7 +66,7 @@ export type DataState = {
     metadataToTracklets: Record<string, string[]>;
   };
 
-  tracklets: Record<string, Tracklet>;
+  tracklets: EntityState<Tracklet, string>;
 };
 
 export type SegmenterState = {

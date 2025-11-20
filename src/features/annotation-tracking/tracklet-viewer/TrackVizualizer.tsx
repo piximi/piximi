@@ -50,7 +50,7 @@ export function TrackVisualizer({
     if (candidateTrackId === lastScrolledId.current) return;
     lastScrolledId.current = candidateTrackId;
     const selectedTrack = positionedTracks.find(
-      (track) => track.trackId === candidateTrackId,
+      (track) => track.id === candidateTrackId,
     );
     if (!selectedTrack) return;
 
@@ -192,14 +192,14 @@ export function TrackVisualizer({
           const endX = padding + track.end * scale;
 
           return (
-            <g key={track.trackId}>
+            <g key={track.id}>
               {/* Track selection highlight */}
               <rect
                 x={startX - 8}
                 y={track.y - 8}
                 width={endX - startX + 16}
                 height={trackHeight + 12}
-                fill={getTrackFillColor(track.trackId)}
+                fill={getTrackFillColor(track.id)}
                 rx={8}
                 ry={8}
                 strokeLinecap="round"
@@ -208,10 +208,10 @@ export function TrackVisualizer({
                   transition: "fill 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
-                  handleMouseEnter(e, track.trackId);
+                  handleMouseEnter(e, track.id);
                 }}
-                onMouseLeave={(e) => handleMouseLeave(e, track.trackId)}
-                onClick={(e) => handleMouseClick(e, track.trackId)}
+                onMouseLeave={(e) => handleMouseLeave(e, track.id)}
+                onClick={(e) => handleMouseClick(e, track.id)}
               />
               {/* Track line */}
               <rect

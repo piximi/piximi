@@ -23,7 +23,7 @@ import { TransitionGroup } from "react-transition-group";
 
 import { dataSlice } from "store/data";
 import {
-  selectTrackletRecord,
+  selectTrackletEntities,
   // selectTrackletRecordByMetadata,
 } from "store/data/selectors";
 
@@ -95,7 +95,7 @@ function renderItem({
 }
 export const TrackList = () => {
   const dispatch = useDispatch();
-  const trackletRecord = useSelector(selectTrackletRecord);
+  const trackletRecord = useSelector(selectTrackletEntities);
   //const metadataToTrackletRecord = useSelector(selectTrackletRecordByMetadata);
   const selectedTrackIds = useSelector(selectSelectedTracklets);
 
@@ -139,9 +139,9 @@ export const TrackList = () => {
   const onCloseColorPicker = () => {
     if (trackletEditingId && editedColor)
       dispatch(
-        dataSlice.actions.updateTracklet({
+        dataSlice.actions.updateTrackletColor({
           id: trackletEditingId,
-          changes: { color: editedColor },
+          color: editedColor,
         }),
       );
     setTrackEditingId(undefined);

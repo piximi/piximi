@@ -226,7 +226,7 @@ export const useFitClassifier = () => {
           );
         } else {
           dispatch(
-            dataSlice.actions.batchUpdateAnnotation([
+            dataSlice.actions.batchUpdateAnnotations([
               ...partitionedData.splitLabeledTraining.map((kindItem) => ({
                 id: kindItem.id,
                 changes: { partition: Partition.Training },
@@ -266,7 +266,7 @@ export const useFitClassifier = () => {
         );
       } else {
         dispatch(
-          dataSlice.actions.batchUpdateAnnotation([
+          dataSlice.actions.batchUpdateAnnotations([
             ...partitionedData.splitLabeledTraining.map((kindItem) => ({
               id: kindItem.id,
               changes: { partition: Partition.Training },
@@ -314,7 +314,7 @@ export const useFitClassifier = () => {
           );
         } else {
           dispatch(
-            dataSlice.actions.batchUpdateAnnotation(
+            dataSlice.actions.batchUpdateAnnotations(
               partitionedData.labeledUnassigned.map((kindItem) => ({
                 id: kindItem.id,
                 changes: { partition: Partition.Training },

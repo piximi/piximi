@@ -124,7 +124,7 @@ export const ImageViewerCategories = () => {
   };
 
   const handleDeleteKind = (kindId: string) => {
-    dispatch(dataSlice.actions.deleteKindCascade(kindId));
+    dispatch(dataSlice.actions.deleteKind(kindId));
   };
 
   const handleClearKindObjects = (kindId: string) => {

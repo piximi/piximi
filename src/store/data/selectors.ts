@@ -6,6 +6,7 @@ import {
   imageDataAdapter,
   metadataAdapter,
   annotationsAdapter,
+  trackletAdapter,
 } from "./dataSlice";
 
 import { DataState } from "store/types";
@@ -38,6 +39,9 @@ export const imageDataSelectors = imageDataAdapter.getSelectors(
 export const annotationSelectors = annotationsAdapter.getSelectors(
   (state: RootState) => state.data.annotations,
 );
+export const trackletSelectors = trackletAdapter.getSelectors(
+  (state: RootState) => state.data.tracklets,
+);
 
 export const selectKindEntities = kindSelectors.selectEntities; // returns kinds dict
 export const selectAllKinds = kindSelectors.selectAll; // returns an array
@@ -63,6 +67,11 @@ export const selectAnnotationEntities = annotationSelectors.selectEntities;
 export const selectAllAnnotations = annotationSelectors.selectAll;
 export const selectAnotationIds = annotationSelectors.selectIds;
 export const selectAnnotationCount = annotationSelectors.selectTotal;
+
+export const selectTrackletEntities = trackletSelectors.selectEntities;
+export const selectAllTracklets = trackletSelectors.selectAll;
+export const selectTrackletIds = trackletSelectors.selectIds;
+export const selectTrackletCount = trackletSelectors.selectTotal;
 
 export const selectDataState = ({ data }: { data: DataState }) => data;
 
@@ -178,12 +187,9 @@ export const selectGeneralizedImageArray = createSelector(
     Object.values(generalizedImageRecord),
 );
 
-export const selectTrackletRecord = ({ data }: { data: DataState }) =>
-  data.tracklets;
-
 export const selectTrackletRecordByMetadata = createSelector(
   selectMetadataToTracklets,
-  selectTrackletRecord,
+  selectTrackletEntities,
   (meta2Tracklet, trackletRecord) => {
     return Object.entries(meta2Tracklet).reduce(
       (
