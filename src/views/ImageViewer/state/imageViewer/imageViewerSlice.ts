@@ -44,6 +44,7 @@ const initialState: ImageViewerState = {
     toFit: false,
   },
   imageIsLoading: false,
+  trackletView: false,
 };
 
 export const imageViewerSlice = createSlice({
@@ -153,6 +154,9 @@ export const imageViewerSlice = createSlice({
           (id) => !action.payload.categoryIds!.includes(id),
         );
       }
+    },
+    setTrackletView(state, action: PayloadAction<boolean>) {
+      state.trackletView = action.payload;
     },
   },
 });

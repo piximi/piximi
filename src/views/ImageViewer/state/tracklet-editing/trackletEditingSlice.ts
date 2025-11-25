@@ -3,6 +3,8 @@ import { TrackletEditingState } from "./types";
 import { Tracklet } from "store/data/types";
 import { generateUUID } from "store/data/utils";
 import { getRestrictedRandomHexColor } from "utils/colorUtils";
+import { mutatingFilter } from "utils/arrayUtils";
+import { dataSlice } from "store/data";
 
 const initialState: TrackletEditingState = {
   selectedTracklets: [],
@@ -11,27 +13,27 @@ const initialState: TrackletEditingState = {
   },
 };
 
-export const imageViewerDataSlice = createSlice({
-  name: "imageViewerData",
+export const trackEditingSlice = createSlice({
+  name: "trackEditing",
   initialState,
   reducers: {
     resetState() {
       return initialState;
     },
-    selectTrack: (state, action: PayloadAction<string>) => {
+    selectTracklet: (state, action: PayloadAction<string>) => {
       if (!state.selectedTracklets.includes(action.payload)) {
         state.selectedTracklets.push(action.payload);
       }
     },
 
-    deselectTrack: (state, action: PayloadAction<string>) => {
+    deselectTracklet: (state, action: PayloadAction<string>) => {
       const index = state.selectedTracklets.indexOf(action.payload);
       if (index !== -1) {
         state.selectedTracklets.splice(index, 1);
       }
     },
 
-    toggleTrackSelection: (state, action: PayloadAction<string>) => {
+    toggleSelectedTracklet: (state, action: PayloadAction<string>) => {
       const index = state.selectedTracklets.indexOf(action.payload);
       if (index !== -1) {
         state.selectedTracklets.splice(index, 1);
@@ -40,17 +42,14 @@ export const imageViewerDataSlice = createSlice({
       }
     },
 
-    setSelectedTracks: (state, action: PayloadAction<string[]>) => {
+    setSelectedTracklets: (state, action: PayloadAction<string[]>) => {
       state.selectedTracklets = action.payload;
     },
 
-    clearTrackSelection: (state) => {
+    clearTrackletSelection: (state) => {
       state.selectedTracklets = [];
     },
-    beginCreateTrack: (
-      state,
-      action: PayloadAction<{ metadataId: string; categoryId: string }>,
-    ) => {
+    beginCreateTracklet: (state, action: PayloadAction<string>) => {
       if (state.editSession.mode !== null) {
         console.error("Cannot start track - edit session already active");
         return;
@@ -59,68 +58,87 @@ export const imageViewerDataSlice = createSlice({
       const id = generateUUID();
       state.editSession = {
         mode: "create",
-        metadataId: action.payload.metadataId,
+        metadataId: action.payload,
         trackletId: id,
         pendingTracklet: {
           id,
-          metadataId: action.payload.metadataId,
+          metadataId: action.payload,
           linkedIds: [],
           color: getRestrictedRandomHexColor({
             similarity: { baseColor: "#FBB904", minDifference: 20 },
           }),
         },
+        frames: [],
       };
     },
 
-    addAnnotationToPendingTrack: (
+    addAnnotationToPendingTracklet: (
       state,
       action: PayloadAction<{
         annId: string;
         timepoint: number;
       }>,
     ) => {
+      const mode = state.editSession.mode;
+      if (mode === null) return;
+      const { annId, timepoint } = action.payload;
       const pending = state.editSession.pendingTracklet;
-      if (!pending) return;
-
       // Don't add if already in track
-      if (pending.linkedIds.includes(action.payload.annId)) return;
+      if (pending.linkedIds.includes(annId)) return;
 
-      pending.linkedIds.push(action.payload.annId);
+      pending.linkedIds.push(annId);
+      state.editSession.frames
+        ? (state.editSession.frames[timepoint] = annId)
+        : (state.editSession.frames = { [timepoint]: annId });
 
       // Update start/end
-      if (
-        pending.start === undefined ||
-        action.payload.timepoint < pending.start
-      ) {
-        pending.start = action.payload.timepoint;
+      if (pending.start === undefined || timepoint < pending.start) {
+        pending.start = timepoint;
       }
-      if (pending.end === undefined || action.payload.timepoint > pending.end) {
-        pending.end = action.payload.timepoint;
+      if (pending.end === undefined || timepoint > pending.end) {
+        pending.end = timepoint;
       }
     },
 
-    removeAnnotationFromPendingTrack: (
+    removeAnnotationFromPendingTracklet: (
       state,
-      action: PayloadAction<string>,
+      action: PayloadAction<{
+        annId: string;
+        timepoint: number;
+      }>,
     ) => {
+      const mode = state.editSession.mode;
+      if (mode === null) return;
+      const { annId, timepoint } = action.payload;
       const pending = state.editSession.pendingTracklet;
-      if (!pending) return;
 
-      pending.linkedIds = pending.linkedIds.filter(
-        (id) => id !== action.payload,
+      pending.linkedIds = pending.linkedIds.filter((id) => id !== annId);
+      delete state.editSession.frames[timepoint];
+      const frames = Object.keys(state.editSession.frames).map(
+        (frame) => +frame,
       );
-
-      // TODO: Recalculate start/end based on remaining annotations
+      const sortedFrames = [...frames].sort((a, b) => a - b);
+      if (pending.start === timepoint) {
+        pending.start = sortedFrames[0];
+      }
+      if (pending.end === timepoint) {
+        pending.end = sortedFrames.at(-1);
+      }
     },
 
-    cancelPendingTrack: (state) => {
-      // Listener will handle annotation cleanup
+    exitEditSession: (state) => {
       state.editSession = { mode: null };
     },
 
     // === EDIT WORKFLOW ===
-    beginEditTrack: (state, action: PayloadAction<Tracklet>) => {
-      const tracklet = action.payload;
+    beginEditTracklet: (
+      state,
+      action: PayloadAction<{
+        tracklet: Tracklet;
+        frames: Record<number, string>;
+      }>,
+    ) => {
+      const { tracklet, frames } = action.payload;
       if (state.editSession.mode !== null) {
         console.error("Cannot edit track - edit session already active");
         return;
@@ -132,12 +150,24 @@ export const imageViewerDataSlice = createSlice({
         trackletId: tracklet.id,
         pendingTracklet: { ...tracklet }, // Working copy
         snapshot: { ...tracklet }, // Original for rollback
+        frames,
       };
     },
-
-    cancelTrackEdit: (state) => {
-      // Listener will handle rollback
-      state.editSession = { mode: null };
-    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(dataSlice.actions.deleteTracklet, (state, action) => {
+      const deletedTracklet = action.payload;
+      mutatingFilter(
+        state.selectedTracklets,
+        (tracklet) => tracklet !== deletedTracklet,
+      );
+    });
+    builder.addCase(dataSlice.actions.batchDeleteTracklet, (state, action) => {
+      const deletedTracklets = action.payload;
+      mutatingFilter(
+        state.selectedTracklets,
+        (tracklet) => !deletedTracklets.includes(tracklet),
+      );
+    });
   },
 });

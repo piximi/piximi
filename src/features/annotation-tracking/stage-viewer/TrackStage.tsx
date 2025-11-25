@@ -9,10 +9,7 @@ import {
 } from "store/data/selectors";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
-import {
-  selectActiveMetadata,
-  selectSelectedTracklets,
-} from "views/ImageViewer/state/image-viewer-data/selectors";
+import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
 
 import { useImageLoader } from "../hooks/useImageLoader";
 import { useTrackStageInteractions } from "../hooks/useTrackStageInteractions";
@@ -20,6 +17,7 @@ import { useAutoScroll } from "../hooks/useAutoScroll";
 import { ImageLayer } from "./ImageLayer";
 import { AnnotationLayer } from "./AnnotationLayer";
 import { TooltipLayer } from "./TooltipLayer";
+import { selectSelectedTrackletIds } from "views/ImageViewer/state/tracklet-editing/selectors";
 
 /**
  * TrackStage is the main canvas component for visualizing time-series annotations.
@@ -43,7 +41,7 @@ export const TrackStage = ({
   const metadataEntities = useSelector(selectMetadataEntities);
 
   const tracklets = useSelector(selectTrackletEntities);
-  const selectedTracks = useSelector(selectSelectedTracklets);
+  const selectedTracks = useSelector(selectSelectedTrackletIds);
 
   // Local state
   const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
@@ -128,11 +126,7 @@ export const TrackStage = ({
       <Provider store={store}>
         <StageContext.Provider value={stageRef}>
           <ImageLayer htmlImages={htmlImages} globalShape={globalShape} />
-          <AnnotationLayer
-            imageShape={globalShape}
-            images={htmlImages}
-            selectedTracks={selectedTracks}
-          />
+          <AnnotationLayer imageShape={globalShape} images={htmlImages} />
           <TooltipLayer
             visible={tooltipProps.visible}
             x={tooltipProps.x}

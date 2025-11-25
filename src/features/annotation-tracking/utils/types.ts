@@ -77,16 +77,10 @@ export interface PositionedTrack extends ValidTracklet {
   level: number;
 }
 
-export type AnnotationsProps = {
+export type AnnotationLayerProps = {
   imageShape: { width: number; height: number };
   images: Record<string, { image: HTMLImageElement; pos: Point }>;
-  selectedTracks: string[];
 };
-
-export type AnnotationWithTrackId = RequireField<
-  ProtoAnnotationObject,
-  "trackId"
-> & { imageOffset: Point };
 
 export type AnnotationWithImOff = ProtoAnnotationObject & {
   imageOffset: Point;
@@ -99,7 +93,7 @@ export type AnnotationProps = {
   fillColor: string;
   selected?: boolean;
   isFiltered?: boolean;
-  onSelect: () => void;
+  onSelect: (annotationId: string) => void;
 };
 
 export type TooltipProps = {

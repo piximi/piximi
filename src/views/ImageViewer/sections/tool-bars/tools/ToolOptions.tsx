@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, useCallback } from "react";
 
 import { useTranslation } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,7 +31,6 @@ import {
   ThresholdToolSizeControls,
 } from "views/ImageViewer/utils/consts";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { selectTimeLinkingState } from "views/ImageViewer/state/image-viewer-data/selectors";
 
 type ToolMap = Record<
   string,
@@ -87,7 +86,6 @@ export const ToolOptions = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const t = useTranslation();
-  const tLinkingState = useSelector(selectTimeLinkingState);
   const activeTool = useSelector(selectToolType);
 
   const handleToolClick = (toolName: string) => {
@@ -98,6 +96,14 @@ export const ToolOptions = () => {
         }),
       );
   };
+
+  const toolIconColor = useCallback(
+    (toolOperation: ToolType) => {
+      if (activeTool === toolOperation) return theme.palette.primary.dark;
+      else return theme.palette.action.active;
+    },
+    [activeTool],
+  );
 
   const sliderCallback = (value: number) => {
     switch (activeTool) {
@@ -139,13 +145,8 @@ export const ToolOptions = () => {
             callback={sliderCallback}
             toolLimits={tool.options}
             tooltipLocation="left"
-            disabled={tLinkingState.active}
           >
-            {tool.icon(
-              activeTool === tool.operation
-                ? theme.palette.primary.dark
-                : theme.palette.action.active,
-            )}
+            {tool.icon(toolIconColor(tool.operation))}
           </ResizableTool>
         ) : (
           <Tool
@@ -153,13 +154,8 @@ export const ToolOptions = () => {
             name={t(name)}
             onClick={() => handleToolClick(name)}
             tooltipLocation="left"
-            disabled={tLinkingState.active}
           >
-            {tool.icon(
-              activeTool === tool.operation
-                ? theme.palette.primary.dark
-                : theme.palette.action.active,
-            )}
+            {tool.icon(toolIconColor(tool.operation))}
           </Tool>
         );
       })}

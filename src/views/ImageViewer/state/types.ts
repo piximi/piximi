@@ -52,6 +52,7 @@ export type ImageViewerState = {
   };
   zoomOptions: ZoomToolOptionsType;
   imageIsLoading: boolean;
+  trackletView: boolean;
 };
 
 export type ProtoAnnotationObject =

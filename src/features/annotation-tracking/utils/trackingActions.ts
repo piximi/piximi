@@ -1,6 +1,6 @@
 import { Dispatch } from "@reduxjs/toolkit";
 
-import { dataSlice } from "store/data";
+import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
 import { ProtoAnnotationObject } from "views/ImageViewer/state/types";
 
 /**
@@ -16,25 +16,32 @@ import { ProtoAnnotationObject } from "views/ImageViewer/state/types";
 export const handleAnnotationTracking = (
   currentAnnotation: ProtoAnnotationObject,
   activeTrackId: string,
+  activeTrackAnnotations: string[],
   dispatch: Dispatch,
 ) => {
   const annTrackId = currentAnnotation.trackId;
   const isTrackedAnnotation = !!annTrackId;
-  const annotationInActiveTracklet = annTrackId === activeTrackId;
+  const annotationInActiveTracklet = activeTrackAnnotations.includes(
+    currentAnnotation.id,
+  );
 
-  // Assign a track ID to annotation if one doesn't exist
-  if (!isTrackedAnnotation) {
+  // Ensure only untracked annotations or annotations in the current edit session are operated on
+  if (isTrackedAnnotation && currentAnnotation.trackId !== activeTrackId)
+    return;
+
+  if (!annotationInActiveTracklet) {
+    // Assign a track ID to annotation if one doesn't exist
     dispatch(
-      dataSlice.actions.addAnnotationToTracklet({
-        trackId: activeTrackId,
+      trackEditingSlice.actions.addAnnotationToPendingTracklet({
         annId: currentAnnotation.id,
+        timepoint: currentAnnotation.timepoint,
       }),
     );
-  } else if (isTrackedAnnotation && annotationInActiveTracklet) {
+  } else {
     dispatch(
-      dataSlice.actions.removeAnnotationFromTracklet({
-        trackId: annTrackId,
+      trackEditingSlice.actions.removeAnnotationFromPendingTracklet({
         annId: currentAnnotation.id,
+        timepoint: currentAnnotation.timepoint,
       }),
     );
   }

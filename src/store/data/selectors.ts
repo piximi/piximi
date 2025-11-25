@@ -168,6 +168,26 @@ export const selectMetadataToAnnotationIds = createSelector(
     );
   },
 );
+export const selectMetadataToAnnotationEntities = createSelector(
+  selectMetadataEntities,
+  selectImageToAnnotations,
+  selectAnnotationEntities,
+  (metadataEntities, im2Anns, annEntities) => {
+    return Object.values(metadataEntities).reduce(
+      (m2a: Record<string, AnnotationObject[]>, mId) => {
+        m2a[mId.id] = mId.imageDataIds.reduce(
+          (anns: AnnotationObject[], imId) => {
+            anns.push(...im2Anns[imId].map((annId) => annEntities[annId]));
+            return anns;
+          },
+          [],
+        );
+        return m2a;
+      },
+      {},
+    );
+  },
+);
 
 export const selectGetKindDisplayName = createSelector(
   selectKindEntities,
@@ -202,5 +222,19 @@ export const selectTrackletRecordByMetadata = createSelector(
       },
       {},
     );
+  },
+);
+
+export const selectAnnotationEntitiesByTracklet = createSelector(
+  selectTrackletEntities,
+  selectAnnotationEntities,
+  (trackletEntities, annEntities) => (trackletId: string) => {
+    const tracklet = trackletEntities[trackletId];
+    if (!tracklet) {
+      console.error(`No tracklet with id "${trackletId}".`);
+      return [];
+    }
+    const annIds = tracklet.linkedIds;
+    return annIds.map((annId) => annEntities[annId]);
   },
 );

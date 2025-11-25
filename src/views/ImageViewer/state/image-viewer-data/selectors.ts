@@ -1,24 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { ImageViewerDataState, ImageViewerMetadataDetails } from "./types";
 
-export const selectTrackingUI = ({
-  imageViewerData,
-}: {
-  imageViewerData: ImageViewerDataState;
-}) => imageViewerData.trackingUI;
-
-export const selectShowTracklets = ({
-  imageViewerData,
-}: {
-  imageViewerData: ImageViewerDataState;
-}) => imageViewerData.trackingUI.showTracklets;
-
-export const selectSelectedTracklets = ({
-  imageViewerData,
-}: {
-  imageViewerData: ImageViewerDataState;
-}) => imageViewerData.trackingUI.selectedTracklets;
-
 export const selectActiveMetadataId = ({
   imageViewerData,
 }: {
@@ -81,24 +63,6 @@ export const selectSelectedAnnotationIds = ({
   imageViewerData: ImageViewerDataState;
 }): string[] => {
   return imageViewerData.selectedAnnotationIds;
-};
-
-// Time Linking Selectors
-
-export const selectTimeLinkingState = ({
-  imageViewerData,
-}: {
-  imageViewerData: ImageViewerDataState;
-}) => {
-  return imageViewerData.tLinking;
-};
-
-export const selectActiveTrackId = ({
-  imageViewerData,
-}: {
-  imageViewerData: ImageViewerDataState;
-}) => {
-  return imageViewerData.tLinking.trackId;
 };
 
 // Z Linking Selectors

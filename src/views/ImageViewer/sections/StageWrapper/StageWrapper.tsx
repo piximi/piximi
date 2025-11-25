@@ -7,11 +7,11 @@ import { useMobileView } from "hooks";
 import { DIMENSIONS } from "utils/constants";
 
 import { Stage } from "../Stage";
-import { selectShowTracklets } from "views/ImageViewer/state/image-viewer-data/selectors";
 import { TrackViewContainer } from "features/annotation-tracking/TrackingViewContainer";
+import { selectTrackletView } from "views/ImageViewer/state/imageViewer/selectors";
 
 export const StageWrapper = () => {
-  const showTracklets = useSelector(selectShowTracklets);
+  const showTracklets = useSelector(selectTrackletView);
   const [width, setWidth] = useState<number>(
     window.innerWidth -
       DIMENSIONS.leftDrawerWidth -

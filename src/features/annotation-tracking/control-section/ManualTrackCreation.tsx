@@ -1,50 +1,63 @@
 import { Box, Stack } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { dataSlice } from "store/data";
-import { generateUUID } from "store/data/utils";
-import { getRandomHexColor } from "utils/colorUtils";
+import {
+  selectAnnotationEntitiesByTracklet,
+  selectTrackletEntities,
+} from "store/data/selectors";
+import { isPopulatedTracklet } from "store/data/utils";
 import { ButtonContainer } from "views/ImageViewer/components/ButtonContainer";
 import { OperationButton } from "views/ImageViewer/components/OperationButton";
-import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
+import { selectActiveMetadataId } from "views/ImageViewer/state/image-viewer-data/selectors";
 import {
-  selectActiveMetadataId,
-  selectActiveTrackId,
-  selectSelectedTracklets,
-  selectTimeLinkingState,
-} from "views/ImageViewer/state/image-viewer-data/selectors";
+  selectEditSession,
+  selectSelectedTrackletIds,
+} from "views/ImageViewer/state/tracklet-editing/selectors";
+import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
 
 export const ManualTrackCreation = () => {
   const dispatch = useDispatch();
-  const tLinkingState = useSelector(selectTimeLinkingState);
-  const activeTrackId = useSelector(selectActiveTrackId);
   const activeMetadataId = useSelector(selectActiveMetadataId);
-  const selectedTracks = useSelector(selectSelectedTracklets);
+  const selectedTracks = useSelector(selectSelectedTrackletIds);
+  const tracklets = useSelector(selectTrackletEntities);
+  const getAnnsByTracklet = useSelector(selectAnnotationEntitiesByTracklet);
+  const editSession = useSelector(selectEditSession);
 
   const handleNewTrack = () => {
     if (!activeMetadataId) return;
-    const newTrackletId = generateUUID();
-
-    dispatch(
-      imageViewerDataSlice.actions.startNewTrack({
-        id: newTrackletId,
-        color: getRandomHexColor(),
-        linkedIds: [],
-        metadataId: activeMetadataId,
-      }),
-    );
+    dispatch(trackEditingSlice.actions.beginCreateTracklet(activeMetadataId));
+  };
+  const handleCancelEdits = () => {
+    dispatch(trackEditingSlice.actions.exitEditSession());
   };
   const handleDeleteTrack = () => {
-    dispatch(imageViewerDataSlice.actions.removeActiveTrack());
-    activeTrackId && dispatch(dataSlice.actions.deleteTracklet(activeTrackId));
+    if (editSession.mode !== null) return;
+    dispatch(dataSlice.actions.batchDeleteTracklet(selectedTracks));
   };
   const handleConfirmTrack = () => {
-    dispatch(imageViewerDataSlice.actions.toggleTimeLinking(false));
+    if (editSession.mode === null) return;
+    const pendingTracklet = editSession.pendingTracklet;
+    if (pendingTracklet && isPopulatedTracklet(pendingTracklet))
+      batch(() => {
+        dispatch(dataSlice.actions.addTracklet(pendingTracklet));
+        dispatch(trackEditingSlice.actions.exitEditSession());
+      });
   };
 
   const handleEditTrack = () => {
     if (selectedTracks.length === 1) {
+      const selectedTracklet = tracklets[selectedTracks[0]];
+      const frames = Object.fromEntries(
+        getAnnsByTracklet(selectedTracklet.id).map((ann) => [
+          ann.timepoint,
+          ann.id,
+        ]),
+      );
       dispatch(
-        imageViewerDataSlice.actions.setTLinkingTrackId(selectedTracks[0]),
+        trackEditingSlice.actions.beginEditTracklet({
+          tracklet: selectedTracklet,
+          frames,
+        }),
       );
     }
   };
@@ -62,7 +75,7 @@ export const ManualTrackCreation = () => {
         >
           <OperationButton
             onClick={handleNewTrack}
-            disabled={tLinkingState.active}
+            disabled={editSession.mode !== null}
           >
             New Track
           </OperationButton>
@@ -73,31 +86,46 @@ export const ManualTrackCreation = () => {
             Edit Track
           </OperationButton>
         </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: "100%",
+            px: 2,
+          }}
+        >
+          <OperationButton
+            onClick={handleConfirmTrack}
+            disabled={editSession.mode === null}
+          >
+            Confirm
+          </OperationButton>
+          <OperationButton
+            onClick={handleCancelEdits}
+            disabled={editSession.mode === null}
+          >
+            Cancel
+          </OperationButton>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: "100%",
+            px: 2,
+          }}
+        >
+          <OperationButton
+            onClick={handleDeleteTrack}
+            disabled={selectedTracks.length === 0}
+          >
+            Delete
+          </OperationButton>
+        </Box>
       </ButtonContainer>
-
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          width: "100%",
-          px: 2,
-        }}
-      >
-        <OperationButton
-          onClick={handleConfirmTrack}
-          disabled={!tLinkingState.active}
-        >
-          Confirm
-        </OperationButton>
-
-        <OperationButton
-          onClick={handleDeleteTrack}
-          disabled={!tLinkingState.active}
-        >
-          Delete
-        </OperationButton>
-      </Box>
     </Stack>
   );
 };

@@ -59,7 +59,7 @@ export const AnnotationShape = React.memo(
         strokeWidth={100}
         fillPatternX={20}
         visible={!isFiltered}
-        onClick={onSelect}
+        onClick={() => onSelect(annotation.id)}
         name="annotation"
       />
     );

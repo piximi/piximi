@@ -1,14 +1,11 @@
 import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectTrackletEntities } from "store/data/selectors";
-
-import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
-import {
-  selectActiveMetadata,
-  selectSelectedTracklets,
-} from "views/ImageViewer/state/image-viewer-data/selectors";
+import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
 import { TrackVisualizer } from "./TrackVizualizer";
+import { selectPendingTrackletEntities } from "views/ImageViewer/state/tracklet-editing/reselectors";
+import { selectSelectedTrackletIds } from "views/ImageViewer/state/tracklet-editing/selectors";
+import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
 
 export const TrackletContainer = ({
   height,
@@ -18,13 +15,13 @@ export const TrackletContainer = ({
   width: number;
 }) => {
   const dispatch = useDispatch();
-  const tracklets = useSelector(selectTrackletEntities);
+  const tracklets = useSelector(selectPendingTrackletEntities);
   const activeMetadata = useSelector(selectActiveMetadata);
-  const secondaryTracks = useSelector(selectSelectedTracklets);
+  const secondaryTracks = useSelector(selectSelectedTrackletIds);
 
   const handleToggleSelectedTrack = useCallback(
     (trackId: string) =>
-      dispatch(imageViewerDataSlice.actions.toggleSelectedTrack(trackId)),
+      dispatch(trackEditingSlice.actions.toggleSelectedTracklet(trackId)),
     [],
   );
 

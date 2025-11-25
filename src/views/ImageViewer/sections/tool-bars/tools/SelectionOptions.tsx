@@ -26,7 +26,7 @@ import { Category } from "store/data/types";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { IMAGE_KIND } from "store/data/constants";
 import { selectAllCategories } from "store/data/selectors";
-import { selectActiveAnnotations } from "views/ImageViewer/state/image-viewer-data/reselectors";
+import { selectActiveDecodedAnnotations } from "views/ImageViewer/state/image-viewer-data/reselectors";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 import { ProtoAnnotationObject } from "views/ImageViewer/state/types";
 
@@ -34,7 +34,7 @@ export const SelectionOptions = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const activeTool = useSelector(selectToolType);
-  const activeAnnotations = useSelector(selectActiveAnnotations);
+  const activeAnnotations = useSelector(selectActiveDecodedAnnotations);
   const annotationCategories = useSelector(selectAllCategories);
   const t = useTranslation();
 

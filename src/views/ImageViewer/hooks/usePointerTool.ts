@@ -12,11 +12,8 @@ import { ToolType } from "views/ImageViewer/utils/enums";
 import { HotkeyContext } from "utils/enums";
 
 import { Point } from "utils/types";
-import {
-  selectActiveMetadataId,
-  selectTimeLinkingState,
-} from "../state/image-viewer-data/selectors";
-import { selectActiveAnnotations } from "../state/image-viewer-data/reselectors";
+import { selectActiveMetadataId } from "../state/image-viewer-data/selectors";
+import { selectActiveDecodedAnnotations } from "../state/image-viewer-data/reselectors";
 import { imageViewerDataSlice } from "../state/image-viewer-data/ImageViewerDataSlice";
 import { ProtoAnnotationObject } from "../state/types";
 import { DecodedAnnotationObject } from "store/data/types";
@@ -31,8 +28,7 @@ export const usePointerTool = (
 ) => {
   const dispatch = useDispatch();
   const activeMetadataId = useSelector(selectActiveMetadataId);
-  const activeAnnotations = useSelector(selectActiveAnnotations);
-  const tLinkingActive = useSelector(selectTimeLinkingState);
+  const activeAnnotations = useSelector(selectActiveDecodedAnnotations);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shift, setShift] = useState<boolean>(false);
   const [dragging, setDragging] = useState<boolean>(false);
@@ -133,7 +129,6 @@ export const usePointerTool = (
 
   const onPointerMouseDown = useCallback(
     (position: { x: number; y: number }) => {
-      if (tLinkingActive) return;
       setDragging(false);
       setMinimum(position);
       setSelecting(true);
@@ -242,7 +237,6 @@ export const usePointerTool = (
     toolType,
     deselectAllAnnotations,
     absolutePosition,
-    tLinkingActive,
   ]);
 
   const handlePointerMouseUp = useCallback(

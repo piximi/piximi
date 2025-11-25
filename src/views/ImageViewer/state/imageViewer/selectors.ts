@@ -106,6 +106,14 @@ export const selectColorAdjustments = ({
   return imageViewer.colorAdjustment;
 };
 
+export const selectTrackletView = ({
+  imageViewer,
+}: {
+  imageViewer: ImageViewerState;
+}) => {
+  return imageViewer.trackletView;
+};
+
 /*
 UNSAVED CHANGES
 */

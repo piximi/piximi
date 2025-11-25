@@ -1,12 +1,21 @@
 import { PendingTracklet, Tracklet } from "store/data/types";
 
+type TrackletCreationMode = {
+  mode: "create";
+  metadataId: string;
+  trackletId: string;
+  pendingTracklet: PendingTracklet;
+  frames: Record<number, string>;
+};
+type TrackletEditMode = Omit<TrackletCreationMode, "mode"> & {
+  mode: "edit";
+  snapshot: Tracklet;
+};
+export type TrackletEditSession =
+  | { mode: null }
+  | TrackletCreationMode
+  | TrackletEditMode;
 export type TrackletEditingState = {
   selectedTracklets: string[];
-  editSession: {
-    mode: "create" | "edit" | null;
-    metadataId?: string;
-    trackletId?: string;
-    pendingTracklet?: PendingTracklet;
-    snapshot?: Tracklet; // For rollback when editing existing track
-  };
+  editSession: TrackletEditSession;
 };
