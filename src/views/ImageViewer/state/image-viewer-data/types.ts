@@ -1,5 +1,3 @@
-import { PendingTracklet } from "store/data/types";
-
 export type ImageViewerMetadataDetails = {
   id: string;
   name: string;
@@ -29,17 +27,7 @@ export type ImageViewerDataState = {
   highlightedCategory?: string;
   activeAnnotationIds: Array<string>;
   selectedAnnotationIds: Array<string>;
-  trackingUI: TrackingUIState;
-  tLinking:
-    | {
-        active: false;
-        trackId: undefined;
-      }
-    | {
-        active: true;
-        trackId: string;
-        pendingTracklet: PendingTracklet;
-      };
+
   zLinking: { active: boolean; annIds: Record<string, string> };
   hasUnsavedChanges?: boolean;
   imageIsLoading?: boolean;

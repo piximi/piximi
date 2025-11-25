@@ -1,6 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import {
   selectActiveMetadata,
+  selectActiveMetadataId,
   selectMetadataStack,
   selectSelectedAnnotationIds,
 } from "./selectors";
@@ -10,6 +11,7 @@ import {
   selectImageDataEntities,
   selectImageToAnnotations,
   selectMetadataEntities,
+  selectMetadataToAnnotationEntities,
 } from "store/data/selectors";
 import { generateBlankColors } from "utils/tensorUtils";
 import { ColorsRaw } from "utils/types";
@@ -101,13 +103,40 @@ export const selectActiveImageRawColor = createSelector(
   },
 );
 
+export const selectActiveMetadataDecodedAnnotationRecord = createSelector(
+  selectActiveMetadataId,
+  selectMetadataToAnnotationEntities,
+  (metadataId, meta2Anns) => {
+    if (!metadataId) {
+      console.error("No active metadata.");
+      return {};
+    }
+    const annotationObjects: Record<string, DecodedAnnotationObject> = {};
+    meta2Anns[metadataId].forEach((ann) => {
+      if (!ann.decodedMask) {
+        annotationObjects[ann.id] = decodeAnnotation(ann);
+      } else {
+        annotationObjects[ann.id] = ann as DecodedAnnotationObject;
+      }
+    });
+    return annotationObjects;
+  },
+);
+
+export const selectAllActiveMetadataDecodedAnnotations = createSelector(
+  selectActiveMetadataDecodedAnnotationRecord,
+  (objects) => {
+    return Object.values(objects);
+  },
+);
+
 export const selectActiveAnnotationIds = createSelector(
   selectActiveImage,
   selectImageToAnnotations,
   (activeImage, im2Anns) => (activeImage?.id ? im2Anns[activeImage.id] : []),
 );
 
-export const selectActiveAnnotationRecord = createSelector(
+export const selectActiveDecodedAnnotationRecord = createSelector(
   selectActiveAnnotationIds,
   selectAnnotationEntities,
   (activeAnnIds, annotationEntities) => {
@@ -123,38 +152,14 @@ export const selectActiveAnnotationRecord = createSelector(
   },
 );
 
-export const selectActiveAnnotations = createSelector(
-  selectActiveAnnotationRecord,
+export const selectActiveDecodedAnnotations = createSelector(
+  selectActiveDecodedAnnotationRecord,
   (activeAnnotations) => Object.values(activeAnnotations),
-);
-
-export const selectAllImageViewerAnnotationRecord = createSelector(
-  selectMetadataStack,
-  selectImageToAnnotations,
-  selectAnnotationEntities,
-  (metadataStack, im2Ann, annEntities) => {
-    const annotationObjects: Record<string, DecodedAnnotationObject> = {};
-    Object.values(metadataStack).forEach((metadata) => {
-      Object.keys(metadata.images).forEach((imId) => {
-        im2Ann[imId].forEach((annId) => {
-          annotationObjects[annId] = decodeAnnotation(annEntities[annId]);
-        });
-      });
-    });
-    return annotationObjects;
-  },
-);
-
-export const selectAllImageViewerAnnotations = createSelector(
-  selectAllImageViewerAnnotationRecord,
-  (objects) => {
-    return Object.values(objects);
-  },
 );
 
 export const selectViewableActiveAnnotations = createSelector(
   selectActiveImage,
-  selectActiveAnnotations,
+  selectActiveDecodedAnnotations,
   selectCategoryEntities,
   (activeImage, annotations, catDict): Array<ViewableAnnotationObject> => {
     if (!activeImage) return [];
@@ -174,7 +179,7 @@ export const selectViewableActiveAnnotations = createSelector(
 );
 
 export const selectSelectedActiveAnnotations = createSelector(
-  [selectSelectedAnnotationIds, selectActiveAnnotationRecord],
+  [selectSelectedAnnotationIds, selectActiveDecodedAnnotationRecord],
   (annotationIds, annotations): Array<ProtoAnnotationObject> => {
     if (!annotationIds.length) return [];
 

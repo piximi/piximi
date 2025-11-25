@@ -10,6 +10,7 @@ import { dataSlice } from "./data/dataSlice";
 import { measurementsSlice } from "./measurements/measurementsSlice";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 import { measurementDataSlice } from "./measurements/measurementDataSlice";
+import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
 
 const reducers = {
   classifier: classifierSlice.reducer,
@@ -22,6 +23,7 @@ const reducers = {
   data: dataSlice.reducer,
   measurements: measurementsSlice.reducer,
   measurementData: measurementDataSlice.reducer,
+  trackEditing: trackEditingSlice.reducer,
 };
 
 export const rootReducer = combineReducers(reducers);

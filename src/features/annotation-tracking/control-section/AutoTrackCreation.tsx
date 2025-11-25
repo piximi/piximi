@@ -18,14 +18,14 @@ import { selectAnnotationMeasurements } from "store/measurements/measurementData
 import { measurementDataSlice } from "store/measurements/measurementDataSlice";
 import { AnnotationObjectMeasurements } from "store/measurements/types";
 
-import { selectAllImageViewerAnnotationRecord } from "views/ImageViewer/state/image-viewer-data/reselectors";
+import { selectActiveMetadataDecodedAnnotationRecord } from "views/ImageViewer/state/image-viewer-data/reselectors";
 import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
 import { CenterOfMass, TrackerType } from "../utils/types";
 import { BBoxTracker, CenterOfMassTracker } from "../utils";
 
 export const AutoTrackCreation = () => {
   const dispatch = useDispatch();
-  const annotations = useSelector(selectAllImageViewerAnnotationRecord);
+  const annotations = useSelector(selectActiveMetadataDecodedAnnotationRecord);
   const activeMetadata = useSelector(selectActiveMetadata);
   const [threshold, setThreshold] = useState("75");
   const [finalValue, setFinalValue] = useState("75");

@@ -19,7 +19,7 @@ import {
   selectKindEntities,
 } from "store/data/selectors";
 import {
-  selectActiveAnnotations,
+  selectActiveDecodedAnnotations,
   selectActiveImage,
 } from "../state/image-viewer-data/reselectors";
 import {
@@ -37,7 +37,7 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
 
   const kinds = useSelector(selectKindEntities);
   const annotationMode = useSelector(selectAnnotationMode);
-  const objects = useSelector(selectActiveAnnotations);
+  const objects = useSelector(selectActiveDecodedAnnotations);
   const workingAnnotation = useSelector(selectFullWorkingAnnotation);
   const activeImageSeries = useSelector(selectActiveMetadata);
 

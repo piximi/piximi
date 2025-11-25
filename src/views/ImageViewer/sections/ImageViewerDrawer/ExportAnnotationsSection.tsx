@@ -39,8 +39,8 @@ import { exportAnnotationMasks } from "utils/file-io/export/annotationExporters"
 import { ImageMetadata, DecodedAnnotationObject } from "store/data/types";
 import {
   selectActiveImageRecord,
-  selectAllImageViewerAnnotationRecord,
-  selectAllImageViewerAnnotations,
+  selectActiveMetadataDecodedAnnotationRecord,
+  selectAllActiveMetadataDecodedAnnotations,
 } from "views/ImageViewer/state/image-viewer-data/reselectors";
 
 //TODO: MenuItem??
@@ -88,8 +88,10 @@ export const ExportAnnotationsSection = ({
   const images = useSelector(selectActiveImageRecord);
   //FIX_NOW
   //const imageDict = useSelector(selectUpdatedImages);
-  const annotations = useSelector(selectAllImageViewerAnnotations);
-  const annotationDict = useSelector(selectAllImageViewerAnnotationRecord);
+  const annotations = useSelector(selectAllActiveMetadataDecodedAnnotations);
+  const annotationDict = useSelector(
+    selectActiveMetadataDecodedAnnotationRecord,
+  );
   const annotationCategories = useSelector(selectAllCategories);
   const annotationCategoryDict = useSelector(selectAnnotationEntities);
   const imageToAnnotations = useSelector(selectImageToAnnotations);

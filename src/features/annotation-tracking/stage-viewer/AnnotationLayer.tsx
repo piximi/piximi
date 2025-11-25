@@ -3,136 +3,169 @@ import { useDispatch, useSelector } from "react-redux";
 import { Layer, Line } from "react-konva";
 
 import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "store/data/constants";
-import {
-  selectImageToAnnotations,
-  selectTrackletEntities,
-} from "store/data/selectors";
+import { selectImageToAnnotations } from "store/data/selectors";
 
 import { hexAlpha } from "utils/colorUtils";
-import { selectAllImageViewerAnnotationRecord } from "views/ImageViewer/state/image-viewer-data/reselectors";
-import {
-  selectActiveMetadata,
-  selectActiveTrackId,
-  selectTimeLinkingState,
-} from "views/ImageViewer/state/image-viewer-data/selectors";
+import { selectActiveMetadataDecodedAnnotationRecord } from "views/ImageViewer/state/image-viewer-data/reselectors";
+import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
 
 import { selectAnnotationMeasurements } from "store/measurements/measurementDataSelectors";
-import { ProtoAnnotationObject } from "views/ImageViewer/state/types";
-import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 
 import { handleAnnotationTracking } from "../utils/trackingActions";
 import { AnnotationShape } from "./AnnotationShape";
-import { AnnotationsProps, AnnotationWithImOff } from "../utils/types";
+import { AnnotationLayerProps, AnnotationWithImOff } from "../utils/types";
+import {
+  selectEditSession,
+  selectSelectedTrackletIds,
+} from "views/ImageViewer/state/tracklet-editing/selectors";
+import { DecodedAnnotationObject, Tracklet } from "store/data/types";
+import { AnnotationMeasurements } from "store/measurements/types";
+import { Point } from "utils/types";
+import { selectPendingTrackletEntities } from "views/ImageViewer/state/tracklet-editing/reselectors";
+import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
 
 /**
  * A Konva layer that renders all visible annotations with track coloring.
  * Filters annotations by active metadata and applies track-based color styling.
  * Also renders center-of-mass lines for selected tracks.
  */
-export const AnnotationLayer: React.FC<AnnotationsProps> = ({
+
+const getTrackCOMs = (
+  tracklets: Record<string, Tracklet>,
+  annotations: Record<string, DecodedAnnotationObject>,
+  measurements: Record<string, AnnotationMeasurements>,
+  imageLocation: Record<string, { pos: Point }>,
+) => {
+  const trackCOMs: Record<string, Array<number>> = {};
+  for (const trackId of Object.keys(tracklets)) {
+    const tracklet = tracklets[trackId];
+    const trackletAnnotations = tracklet.linkedIds;
+    trackCOMs[trackId] = [];
+    for (const annId of trackletAnnotations) {
+      const annCOM = measurements[annId]?.["object-geometry-com"];
+      const imageId = annotations[annId].imageId;
+      const imOffset = imageLocation[imageId].pos;
+      if (annCOM)
+        trackCOMs[trackId].push(
+          ...[annCOM.x + imOffset.x, annCOM.y + imOffset.y],
+        );
+    }
+  }
+  return trackCOMs;
+};
+
+const getStageAnnotations = (
+  annotations: DecodedAnnotationObject[],
+  imagePositions: Record<string, { pos: Point }>,
+): AnnotationWithImOff[] => {
+  const visibleAnnotations: AnnotationWithImOff[] = [];
+  annotations.forEach((ann) => {
+    if (imagePositions[ann.imageId])
+      visibleAnnotations.push({
+        ...ann,
+        imageOffset: imagePositions[ann.imageId].pos,
+      } as AnnotationWithImOff);
+  });
+
+  return visibleAnnotations;
+};
+export const AnnotationLayer: React.FC<AnnotationLayerProps> = ({
   imageShape,
   images,
-  selectedTracks,
 }) => {
   const dispatch = useDispatch();
-  const tracklets = useSelector(selectTrackletEntities);
-  const annotations = useSelector(selectAllImageViewerAnnotationRecord);
+  const tracklets = useSelector(selectPendingTrackletEntities);
+  const annotations = useSelector(selectActiveMetadataDecodedAnnotationRecord);
   const imageToAnnotations = useSelector(selectImageToAnnotations);
   const activeMetadata = useSelector(selectActiveMetadata);
   const annotationMeasurements = useSelector(selectAnnotationMeasurements);
-  const activeTrackId = useSelector(selectActiveTrackId);
-
-  const manualLinkingState = useSelector(selectTimeLinkingState);
+  const editSession = useSelector(selectEditSession);
+  const selectedTracks = useSelector(selectSelectedTrackletIds);
 
   const trackCOMs = useMemo(() => {
-    const trackCOMs: Record<string, Array<number>> = {};
-    for (const trackId of Object.keys(tracklets)) {
-      const tracklet = tracklets[trackId];
-      const trackletAnnotations = tracklet.linkedIds;
-      trackCOMs[trackId] = [];
-      for (const annId of trackletAnnotations) {
-        const annCOM = annotationMeasurements[annId]?.["object-geometry-com"];
-        const imageId = annotations[annId].imageId;
-        const imOffset = images[imageId].pos;
-        if (annCOM)
-          trackCOMs[trackId].push(
-            ...[annCOM.x + imOffset.x, annCOM.y + imOffset.y],
-          );
-      }
-    }
-    return trackCOMs;
-  }, [tracklets, annotationMeasurements]);
+    return getTrackCOMs(tracklets, annotations, annotationMeasurements, images);
+  }, [tracklets, annotationMeasurements, annotations, images]);
 
   const selectedCOMs = useMemo(() => {
     return selectedTracks.map((trackletId) => ({
       color: tracklets[trackletId].color,
       line: trackCOMs[trackletId],
     }));
-  }, [trackCOMs, selectedTracks]);
+  }, [tracklets, trackCOMs, selectedTracks]);
 
-  const visibleAnnotations = useMemo(() => {
+  const stageAnnotations = useMemo(() => {
     if (!activeMetadata) return [];
-    const visibleAnnotations: AnnotationWithImOff[] = [];
-    Object.keys(activeMetadata.images).forEach((imageId) => {
-      const imAnnotations = imageToAnnotations[imageId];
-      imAnnotations.forEach((annId) => {
-        const ann = annotations[annId];
-        if (ann.decodedMask)
-          if (images[ann.imageId]) {
-            visibleAnnotations.push({
-              ...ann,
-              imageOffset: images[ann.imageId].pos,
-            } as AnnotationWithImOff);
-          }
-      });
-    });
-    return visibleAnnotations;
+    return getStageAnnotations(Object.values(annotations), images);
   }, [annotations, activeMetadata, imageToAnnotations, images]);
 
   // Handle annotation click (tracking or selection)
   const handleAnnotationClick = useCallback(
-    (annotation: ProtoAnnotationObject) => {
-      if (manualLinkingState.active) {
+    (annotationId: string) => {
+      const annotation = annotations[annotationId];
+      if (editSession.mode !== null) {
         handleAnnotationTracking(
           annotation,
-          manualLinkingState.trackId,
+          editSession.trackletId,
+          editSession.pendingTracklet.linkedIds,
           dispatch,
         );
       } else {
         if (!annotation.trackId) return;
         dispatch(
-          imageViewerDataSlice.actions.toggleSelectedTrack(annotation.trackId),
+          trackEditingSlice.actions.toggleSelectedTracklet(annotation.trackId),
         );
       }
     },
-    [manualLinkingState, activeTrackId, dispatch],
+    [editSession, annotations, dispatch],
   );
   const getFillColor = useCallback(
-    (trackId: string | undefined) => {
-      if (!trackId) return UNKNOWN_IMAGE_CATEGORY_COLOR;
+    (annotation: AnnotationWithImOff) => {
+      const trackId = annotation.trackId;
+
+      // If the annotation does not have a trackId, it might still
+      // be part of a pending tracklet
+      if (!trackId) {
+        if (
+          editSession.mode !== null &&
+          editSession.pendingTracklet?.linkedIds &&
+          editSession.pendingTracklet.linkedIds.includes(annotation.id)
+        ) {
+          return hexAlpha(editSession.pendingTracklet.color, 0.5);
+        }
+        return UNKNOWN_IMAGE_CATEGORY_COLOR;
+      }
+
+      // If an annotation has a trackId, it is possible it has been
+      // removed from a pending tracklet
+      if (
+        editSession.mode === "edit" &&
+        annotation.trackId === editSession.trackletId
+      ) {
+        if (!editSession.pendingTracklet.linkedIds.includes(annotation.id))
+          return UNKNOWN_IMAGE_CATEGORY_COLOR;
+        else return hexAlpha(editSession.pendingTracklet.color, 0.5);
+      }
       const trackColor = tracklets[trackId].color;
       if (selectedTracks.includes(trackId)) return hexAlpha(trackColor, 1);
       return selectedTracks.length < 0
         ? hexAlpha(trackColor, 0.2)
         : hexAlpha(trackColor, 0.5);
     },
-    [selectedTracks, tracklets],
+    [editSession, selectedTracks, tracklets],
   );
 
   return images ? (
     <Layer>
-      {visibleAnnotations.map((annotation) => (
+      {stageAnnotations.map((annotation) => (
         <AnnotationShape
           key={annotation.id}
           annotation={annotation}
           imageShape={imageShape}
           imagePosition={annotation.imageOffset}
-          fillColor={getFillColor(annotation.trackId)}
+          fillColor={getFillColor(annotation)}
           selected={true}
           isFiltered={false}
-          onSelect={() => {
-            handleAnnotationClick(annotation);
-          }}
+          onSelect={handleAnnotationClick}
         />
       ))}
       {selectedCOMs.map((coms, idx) => (

@@ -28,8 +28,8 @@ import {
 } from "store/data/selectors";
 
 import { OperationButton } from "views/ImageViewer/components/OperationButton";
-import { selectSelectedTracklets } from "views/ImageViewer/state/image-viewer-data/selectors";
-import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
+import { selectSelectedTrackletIds } from "views/ImageViewer/state/tracklet-editing/selectors";
+import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
 
 interface RenderItemOptions {
   id: string;
@@ -97,7 +97,7 @@ export const TrackList = () => {
   const dispatch = useDispatch();
   const trackletRecord = useSelector(selectTrackletEntities);
   //const metadataToTrackletRecord = useSelector(selectTrackletRecordByMetadata);
-  const selectedTrackIds = useSelector(selectSelectedTracklets);
+  const selectedTrackIds = useSelector(selectSelectedTrackletIds);
 
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
     useState<null | HTMLButtonElement>(null);
@@ -169,7 +169,7 @@ export const TrackList = () => {
   };
 
   const handleSelectTracklet = (id: string) => {
-    dispatch(imageViewerDataSlice.actions.toggleSelectedTrack(id));
+    dispatch(trackEditingSlice.actions.toggleSelectedTracklet(id));
   };
 
   useEffect(() => {
@@ -268,7 +268,7 @@ export const TrackList = () => {
       <OperationButton
         variant="text"
         onClick={() =>
-          dispatch(imageViewerDataSlice.actions.clearTrackSelection())
+          dispatch(trackEditingSlice.actions.clearTrackletSelection())
         }
         disabled={selectedTrackIds.length === 0}
         sx={{ pb: 2 }}

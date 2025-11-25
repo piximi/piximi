@@ -19,6 +19,7 @@ import {
   Kind,
   ImageData,
   Tracklet,
+  PendingTracklet,
 } from "store/data/types";
 import {
   IMAGE_KIND,
@@ -470,7 +471,7 @@ export const freezeState = (dataState: DataState): DataState => {
 };
 
 export const isPopulatedTracklet = (
-  tracklet: Tracklet,
+  tracklet: Tracklet | PendingTracklet,
 ): tracklet is RequireField<Tracklet, "start" | "end"> => {
   return tracklet.end !== undefined && tracklet.start !== undefined;
 };

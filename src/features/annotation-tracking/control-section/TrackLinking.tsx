@@ -6,12 +6,12 @@ import { dataSlice } from "store/data";
 
 import { ButtonContainer } from "views/ImageViewer/components/ButtonContainer";
 import { OperationButton } from "views/ImageViewer/components/OperationButton";
-import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
-import { selectSelectedTracklets } from "views/ImageViewer/state/image-viewer-data/selectors";
+import { selectSelectedTrackletIds } from "views/ImageViewer/state/tracklet-editing/selectors";
+import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
 
 export const TrackControls = () => {
   const dispatch = useDispatch();
-  const selectedTracks = useSelector(selectSelectedTracklets);
+  const selectedTracks = useSelector(selectSelectedTrackletIds);
   const canOperate = selectedTracks.length > 1;
   const handleSplit = useCallback(() => {
     if (selectedTracks.length < 2) return;
@@ -21,7 +21,7 @@ export const TrackControls = () => {
         childIds: selectedTracks.slice(1),
       }),
     );
-    dispatch(imageViewerDataSlice.actions.clearTrackSelection());
+    dispatch(trackEditingSlice.actions.clearTrackletSelection());
   }, [selectedTracks]);
 
   const handleUndoSplit = useCallback(() => {
@@ -32,7 +32,7 @@ export const TrackControls = () => {
         childIds: selectedTracks.slice(1),
       }),
     );
-    dispatch(imageViewerDataSlice.actions.clearTrackSelection());
+    dispatch(trackEditingSlice.actions.clearTrackletSelection());
   }, [selectedTracks]);
 
   const handleMerge = useCallback(() => {
@@ -43,7 +43,7 @@ export const TrackControls = () => {
         childId: selectedTracks[0],
       }),
     );
-    dispatch(imageViewerDataSlice.actions.clearTrackSelection());
+    dispatch(trackEditingSlice.actions.clearTrackletSelection());
   }, [selectedTracks]);
 
   const handleUndoMerge = useCallback(() => {
@@ -54,7 +54,7 @@ export const TrackControls = () => {
         childId: selectedTracks[0],
       }),
     );
-    dispatch(imageViewerDataSlice.actions.clearTrackSelection());
+    dispatch(trackEditingSlice.actions.clearTrackletSelection());
   }, [selectedTracks]);
   return (
     <Stack

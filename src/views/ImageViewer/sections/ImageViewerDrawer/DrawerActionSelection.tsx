@@ -16,7 +16,7 @@ import { DIMENSIONS } from "utils/constants";
 
 import { ReturnToProjectButton } from "./ReturnToProjectButton";
 import { useSetDrawerView } from "views/ImageViewer/state/DrawerViewContext";
-import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 
 export const DrawerActionSelection = () => {
   const dispatch = useDispatch();
@@ -35,7 +35,7 @@ export const DrawerActionSelection = () => {
         <ReturnToProjectButton />
         <IconButton
           onClick={() => {
-            dispatch(imageViewerDataSlice.actions.setShowTracklets(false));
+            dispatch(imageViewerSlice.actions.setTrackletView(false));
             setDrawerView("export");
           }}
           size="small"
@@ -44,7 +44,7 @@ export const DrawerActionSelection = () => {
         </IconButton>
         <IconButton
           onClick={() => {
-            dispatch(imageViewerDataSlice.actions.setShowTracklets(false));
+            dispatch(imageViewerSlice.actions.setTrackletView(false));
             setDrawerView("images");
           }}
           size="small"
@@ -53,7 +53,7 @@ export const DrawerActionSelection = () => {
         </IconButton>
         <IconButton
           onClick={() => {
-            dispatch(imageViewerDataSlice.actions.setShowTracklets(false));
+            dispatch(imageViewerSlice.actions.setTrackletView(false));
             setDrawerView("categories");
           }}
           size="small"
@@ -62,7 +62,7 @@ export const DrawerActionSelection = () => {
         </IconButton>
         <IconButton
           onClick={() => {
-            dispatch(imageViewerDataSlice.actions.setShowTracklets(false));
+            dispatch(imageViewerSlice.actions.setTrackletView(false));
             setDrawerView("annotations");
           }}
           size="small"
@@ -72,7 +72,7 @@ export const DrawerActionSelection = () => {
         <Divider />
         <IconButton
           onClick={() => {
-            dispatch(imageViewerDataSlice.actions.setShowTracklets(true));
+            dispatch(imageViewerSlice.actions.setTrackletView(true));
             setDrawerView("tracking");
           }}
           size="small"

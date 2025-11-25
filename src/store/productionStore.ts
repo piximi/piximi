@@ -25,6 +25,7 @@ import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 import { imageViewerDataMiddleware } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataListeners";
+import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
 
 const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&
@@ -52,6 +53,7 @@ const preloadedState: RootState = {
   segmenter: segmenterSlice.getInitialState(),
   measurements: measurementsSlice.getInitialState(),
   measurementData: measurementDataSlice.getInitialState(),
+  trackEditing: trackEditingSlice.getInitialState(),
 };
 
 const options = {

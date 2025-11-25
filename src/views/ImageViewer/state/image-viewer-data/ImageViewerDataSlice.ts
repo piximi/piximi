@@ -4,25 +4,16 @@ import { difference } from "lodash";
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 
 import { ImageViewerDataState, ImageViewerMetadataDetails } from "./types";
-import { mutatingFilter } from "utils/arrayUtils";
-import { PendingTracklet } from "store/data/types";
 
 const initialState: ImageViewerDataState = {
   metadataStack: {},
   imageIsLoading: true,
   activeMetdataId: undefined,
   activeAnnotationIds: [],
-
   selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
-
   highlightedCategory: undefined,
   hasUnsavedChanges: false,
   selectedAnnotationIds: [],
-  trackingUI: {
-    showTracklets: false,
-    selectedTracklets: [],
-  },
-  tLinking: { active: false, trackId: undefined },
   zLinking: { active: false, annIds: {} },
 };
 
@@ -166,69 +157,9 @@ export const imageViewerDataSlice = createSlice({
         ids,
       );
     },
-    startNewTrack(state, action: PayloadAction<PendingTracklet>) {
-      state.tLinking = {
-        active: true,
-        trackId: action.payload.id,
-        pendingTracklet: action.payload,
-      };
-    },
-    toggleTimeLinking(state, action: PayloadAction<boolean>) {
-      const active = action.payload;
-      state.tLinking.active = active;
-      state.tLinking.trackId = undefined;
-    },
+
     toggleZLinking(state, action: PayloadAction<boolean>) {
       state.zLinking.active = action.payload;
-    },
-    removeActiveTrack(state) {
-      const trackId = state.tLinking.trackId;
-      if (!trackId) return;
-      Object.assign(state.tLinking, { active: false, trackId: undefined });
-    },
-
-    setTLinkingTrackId(state, action: PayloadAction<string>) {
-      state.tLinking.trackId = action.payload;
-      state.tLinking.active = true;
-    },
-    setShowTracklets: (state, action: PayloadAction<boolean>) => {
-      state.trackingUI.showTracklets = action.payload;
-    },
-
-    setSelectedTracklets: (state, action: PayloadAction<string[]>) => {
-      state.trackingUI.selectedTracklets = action.payload;
-    },
-    selectTracklet: (state, action: PayloadAction<string>) => {
-      const { selectedTracklets: selectedTracklets } = state.trackingUI;
-      if (!selectedTracklets.includes(action.payload)) {
-        selectedTracklets.push(action.payload);
-      }
-    },
-
-    deselectTracklet: (state, action: PayloadAction<string>) => {
-      const { selectedTracklets } = state.trackingUI;
-      mutatingFilter(selectedTracklets, (id) => id !== action.payload);
-    },
-
-    toggleSelectedTrack: (state, action: PayloadAction<string>) => {
-      const { selectedTracklets } = state.trackingUI;
-      const index = selectedTracklets.indexOf(action.payload);
-      if (index !== -1) {
-        mutatingFilter(selectedTracklets, (id) => id !== action.payload);
-      } else {
-        selectedTracklets.push(action.payload);
-      }
-    },
-
-    clearTrackSelection: (state) => {
-      state.trackingUI.selectedTracklets = [];
-    },
-
-    resetTrackingUI: (state) => {
-      state.trackingUI = {
-        showTracklets: false,
-        selectedTracklets: [],
-      };
     },
   },
 });

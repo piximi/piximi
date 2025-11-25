@@ -30,8 +30,8 @@ import { AnnotationObject, DecodedAnnotationObject } from "store/data/types";
 import { ImageViewerMetadataDetails } from "../state/image-viewer-data/types";
 import {
   selectActiveImageRecord,
-  selectAllImageViewerAnnotationRecord,
-  selectAllImageViewerAnnotations,
+  selectActiveMetadataDecodedAnnotationRecord,
+  selectAllActiveMetadataDecodedAnnotations,
 } from "../state/image-viewer-data/reselectors";
 
 //TODO: MenuItem??
@@ -85,8 +85,10 @@ export const ExportAnnotationsMenu = ({
   const images = useSelector(selectActiveImageRecord);
   //FIX_NOW
   //const imageDict = useSelector(selectUpdatedImages);
-  const annotations = useSelector(selectAllImageViewerAnnotations);
-  const annotationDict = useSelector(selectAllImageViewerAnnotationRecord);
+  const annotations = useSelector(selectAllActiveMetadataDecodedAnnotations);
+  const annotationDict = useSelector(
+    selectActiveMetadataDecodedAnnotationRecord,
+  );
   const annotationCategories = useSelector(selectAllCategories);
   const annotationCategoryDict = useSelector(selectCategoryEntities);
   const projectName = useSelector(selectProjectName);
