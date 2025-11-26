@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { SectionDivider } from "components/ui/divider/SectionDivider";
 import { TrackCreationControls } from "./TrackCreation";
-import { TrackControls } from "./TrackLinking";
+import { TrackManagement } from "./TrackManagement";
 import { TrackList } from "./TrackList";
 import { DIMENSIONS } from "utils/constants";
 
@@ -33,13 +33,13 @@ export const TrackingControlsContainer = () => {
           flexDirection: "column",
         }}
       >
-        <SectionDivider text="Track Creation" />
+        <SectionDivider text="Tracklet Creation" />
 
         <TrackCreationControls />
-        <SectionDivider text="Track Linking" />
+        <SectionDivider text="Track Management" />
 
-        <TrackControls />
-        <SectionDivider text="Tracks" />
+        <TrackManagement />
+        <SectionDivider text="Tracklets" />
 
         <TrackList />
       </Box>

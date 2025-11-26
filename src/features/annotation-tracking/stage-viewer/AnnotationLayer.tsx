@@ -16,6 +16,7 @@ import { AnnotationShape } from "./AnnotationShape";
 import { AnnotationLayerProps, AnnotationWithImOff } from "../utils/types";
 import {
   selectEditSession,
+  selectManagementActive,
   selectSelectedTrackletIds,
 } from "views/ImageViewer/state/tracklet-editing/selectors";
 import { DecodedAnnotationObject, Tracklet } from "store/data/types";
@@ -81,6 +82,7 @@ export const AnnotationLayer: React.FC<AnnotationLayerProps> = ({
   const annotationMeasurements = useSelector(selectAnnotationMeasurements);
   const editSession = useSelector(selectEditSession);
   const selectedTracks = useSelector(selectSelectedTrackletIds);
+  const managementActive = useSelector(selectManagementActive);
 
   const trackCOMs = useMemo(() => {
     return getTrackCOMs(tracklets, annotations, annotationMeasurements, images);
@@ -101,6 +103,7 @@ export const AnnotationLayer: React.FC<AnnotationLayerProps> = ({
   // Handle annotation click (tracking or selection)
   const handleAnnotationClick = useCallback(
     (annotationId: string) => {
+      if (managementActive) return;
       const annotation = annotations[annotationId];
       if (editSession.mode !== null) {
         handleAnnotationTracking(

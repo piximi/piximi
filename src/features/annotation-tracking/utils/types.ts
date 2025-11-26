@@ -1,6 +1,7 @@
 import { DecodedAnnotationObject } from "store/data/types";
 import { Tracklet } from "store/data/types";
 import { Point, RequireField } from "utils/types";
+import { TrackletManagementSession } from "views/ImageViewer/state/tracklet-editing/types";
 import { ProtoAnnotationObject } from "views/ImageViewer/state/types";
 
 export type TrackerType = "center-of-mass" | "bbox";
@@ -68,6 +69,7 @@ export interface TrackVisualizerProps {
   selectedTracks: string[];
   toggleSelectedTrack: (trackId: string) => void;
   onTrackClick?: (id: string) => void;
+  managementSession: TrackletManagementSession;
 }
 
 export type ValidTracklet = RequireField<Tracklet, "start" | "end">;

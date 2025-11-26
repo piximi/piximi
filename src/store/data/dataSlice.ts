@@ -319,6 +319,30 @@ export const dataSlice = createSlice({
         action.payload.annId,
       );
     },
+    createTrackletRelationship: (
+      state,
+      action: PayloadAction<{ trackletId1: string; trackletId2: string }>,
+    ) => {
+      const { trackletId1, trackletId2 } = action.payload;
+      const tracklet1 = state.tracklets.entities[trackletId1];
+      const tracklet2 = state.tracklets.entities[trackletId2];
+      if (tracklet1.end < tracklet2.start)
+        addTrackletRelationship(state, trackletId1, trackletId2);
+      if (tracklet2.end < tracklet1.start)
+        addTrackletRelationship(state, trackletId2, trackletId1);
+    },
+    removeTrackletRelationship: (
+      state,
+      action: PayloadAction<{ trackletId1: string; trackletId2: string }>,
+    ) => {
+      const { trackletId1, trackletId2 } = action.payload;
+      const tracklet1 = state.tracklets.entities[trackletId1];
+      const tracklet2 = state.tracklets.entities[trackletId2];
+      if (tracklet1.end < tracklet2.start)
+        removeTrackletRelationship(state, trackletId1, trackletId2);
+      if (tracklet2.end < tracklet1.start)
+        removeTrackletRelationship(state, trackletId2, trackletId1);
+    },
 
     addChildrenToTracklet: (
       state,

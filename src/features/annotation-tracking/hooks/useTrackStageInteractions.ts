@@ -32,6 +32,7 @@ export const useTrackStageInteractions = (
   htmlImages: Record<string, { image: HTMLImageElement; pos: Point }>,
   stageWidth: number,
   setStagePosition: (pos: Point) => void,
+  managementActive: boolean,
 ) => {
   const [tooltipProps, setTooltipProps] = useState<TooltipState>({
     visible: false,
@@ -83,7 +84,9 @@ export const useTrackStageInteractions = (
             visible: true,
             x: mousePos.x,
             y: mousePos.y - 5,
-            text: id.slice(0, 8),
+            text: managementActive
+              ? "Manage tracks from viewer below"
+              : id.slice(0, 8),
           });
         }
       }

@@ -3,9 +3,12 @@
 import { useTheme } from "@mui/material";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { getLast } from "utils/arrayUtils";
+import { arrayRange, getLast } from "utils/arrayUtils";
 import { TrackVisualizerProps, ValidTracklet } from "../utils/types";
 import { generateRelationships } from "../utils/graphUtils";
+import { batch, useDispatch } from "react-redux";
+import { dataSlice } from "store/data";
+import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
 
 const HIGHLIGHT_COLOR = "#00d9ff55";
 const HOVER_COLOR = "#ffffff55";
@@ -19,8 +22,10 @@ export function TrackVisualizer({
   trackSpacing = 30,
   selectedTracks,
   toggleSelectedTrack,
+  managementSession,
 }: TrackVisualizerProps) {
   const theme = useTheme();
+  const dispatch = useDispatch();
   const [tooltip, setTooltip] = useState<{
     x: number;
     y: number;
@@ -36,9 +41,18 @@ export function TrackVisualizer({
     return generateRelationships(validTracks, width, trackSpacing, numFrames);
   }, [validTracks, width, height, trackSpacing, numFrames]);
 
+  const maxTrackletY = useMemo(
+    () =>
+      positionedTracks.reduce((maxY: number, tracklet) => {
+        if (tracklet.y > maxY) maxY = tracklet.y;
+        return maxY;
+      }, 0),
+    [positionedTracks],
+  );
+
   const svgHeight = useMemo(
-    () => Math.max(height, positionedTracks.length * trackSpacing * 1.5 + 50),
-    [height, positionedTracks],
+    () => Math.max(height, maxTrackletY + trackSpacing),
+    [height, maxTrackletY],
   );
 
   // Scroll to show selected track in the middle when primaryTrack changes
@@ -76,14 +90,14 @@ export function TrackVisualizer({
   );
 
   const handleMouseEnter = useCallback(
-    (e: React.MouseEvent, trackId: string) => {
+    (e: React.MouseEvent, trackId: string, trackName?: string) => {
       const svgRect = (
         e.currentTarget.closest("svg") as SVGElement
       ).getBoundingClientRect();
       setTooltip({
         x: e.clientX - svgRect.left,
         y: e.clientY - svgRect.top - 10,
-        trackId,
+        trackId: trackName ?? trackId,
       });
       if (!selectedTracks.includes(trackId)) {
         e.currentTarget.setAttribute("fill", HOVER_COLOR);
@@ -100,6 +114,28 @@ export function TrackVisualizer({
     },
     [selectedTracks],
   );
+  const handleSeverHover = useCallback(
+    (e: React.MouseEvent, timepoint: number) => {
+      const svgRect = (
+        e.currentTarget.closest("svg") as SVGElement
+      ).getBoundingClientRect();
+      const severRect = e.currentTarget.getBoundingClientRect();
+      const severCenter = (severRect.right + severRect.left) / 2;
+      setTooltip({
+        x: Math.round(severCenter) - svgRect.left,
+        y: Math.round(severRect.bottom) - svgRect.top,
+        trackId: `${timepoint - 0.5} <-/-> ${timepoint + 0.5}`,
+      });
+
+      e.currentTarget.setAttribute("fill", HOVER_COLOR);
+    },
+    [],
+  );
+
+  const handleSeverLeave = useCallback((e: React.MouseEvent) => {
+    setTooltip(null);
+    e.currentTarget.setAttribute("fill", "transparent");
+  }, []);
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
@@ -123,9 +159,64 @@ export function TrackVisualizer({
 
   const handleMouseClick = useCallback(
     (e: React.MouseEvent, trackId: string) => {
-      toggleSelectedTrack(trackId);
+      if (managementSession.mode === null) {
+        toggleSelectedTrack(trackId);
+        return;
+      }
+      if (["join", "create", "remove"].includes(managementSession.mode)) {
+        if (!managementSession.primaryTracklet) {
+          dispatch(
+            trackEditingSlice.actions.setPrimaryManagementTracklet(
+              tracks.find((track) => track.id === trackId)!,
+            ),
+          );
+          toggleSelectedTrack(trackId);
+          return;
+        } else if (trackId === managementSession.primaryTracklet.id) {
+          dispatch(
+            trackEditingSlice.actions.setPrimaryManagementTracklet(undefined),
+          );
+          toggleSelectedTrack(trackId);
+          return;
+        }
+      }
+
+      switch (managementSession.mode) {
+        case "create":
+          dispatch(
+            dataSlice.actions.createTrackletRelationship({
+              trackletId1: managementSession.primaryTracklet!.id,
+              trackletId2: trackId,
+            }),
+          );
+          break;
+        case "remove":
+          dispatch(
+            dataSlice.actions.removeTrackletRelationship({
+              trackletId1: managementSession.primaryTracklet!.id,
+              trackletId2: trackId,
+            }),
+          );
+          break;
+        case "join":
+          batch(() => {
+            toggleSelectedTrack(managementSession.primaryTracklet!.id);
+            dispatch(
+              dataSlice.actions.joinTracklets([
+                managementSession.primaryTracklet!.id,
+                trackId,
+              ]),
+            );
+            dispatch(
+              trackEditingSlice.actions.setPrimaryManagementTracklet(undefined),
+            );
+          });
+          break;
+        default:
+          break;
+      }
     },
-    [toggleSelectedTrack],
+    [toggleSelectedTrack, managementSession],
   );
 
   useEffect(() => {
@@ -208,7 +299,8 @@ export function TrackVisualizer({
                   transition: "fill 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
-                  handleMouseEnter(e, track.id);
+                  managementSession.mode !== "sever" &&
+                    handleMouseEnter(e, track.id, track.name);
                 }}
                 onMouseLeave={(e) => handleMouseLeave(e, track.id)}
                 onClick={(e) => handleMouseClick(e, track.id)}
@@ -247,6 +339,57 @@ export function TrackVisualizer({
                 strokeWidth={1}
                 style={{ pointerEvents: "none" }}
               />
+              {/* Sever Marks */}
+              {arrayRange(track.end - track.start - 2).map((x) => {
+                const severPoint = track.start + 1 + x + 0.5;
+                const xPlace = padding + severPoint * scale;
+                return (
+                  <g key={`${track.id}-sever-${xPlace}`}>
+                    {/* Invisible larger hit area */}
+                    <rect
+                      x={xPlace - 10}
+                      y={track.y - 12}
+                      width={20}
+                      height={26}
+                      rx={4}
+                      ry={4}
+                      fill="transparent"
+                      style={{
+                        cursor: "crosshair",
+                        pointerEvents:
+                          managementSession.mode === "sever" ? "auto" : "none",
+                      }}
+                      onMouseEnter={(e) => handleSeverHover(e, severPoint)}
+                      onMouseLeave={handleSeverLeave}
+                      onClick={() =>
+                        dispatch(
+                          dataSlice.actions.severTracklet({
+                            id: track.id,
+                            timepoint: severPoint,
+                          }),
+                        )
+                      }
+                    />
+                    {/* Visible red line */}
+                    <line
+                      x1={xPlace + 3}
+                      x2={xPlace - 3}
+                      y1={track.y - 7}
+                      y2={track.y + 9}
+                      stroke="red"
+                      strokeWidth={3}
+                      strokeLinecap="round"
+                      style={{
+                        pointerEvents: "none",
+                        visibility:
+                          managementSession.mode === "sever"
+                            ? "visible"
+                            : "hidden",
+                      }}
+                    />
+                  </g>
+                );
+              })}
             </g>
           );
         })}
@@ -287,6 +430,7 @@ export function TrackVisualizer({
             position: "absolute",
             left: tooltip.x,
             top: tooltip.y,
+            transform: "translateX(-50%)",
             backgroundColor: "rgba(0, 0, 0, 0.8)",
             color: "white",
             padding: "4px 8px",

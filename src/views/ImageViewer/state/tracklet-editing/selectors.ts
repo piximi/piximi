@@ -38,3 +38,27 @@ export const selectEditMode = ({
 }: {
   trackEditing: TrackletEditingState;
 }) => trackEditing.editSession.mode;
+
+export const selectManagementSession = ({
+  trackEditing,
+}: {
+  trackEditing: TrackletEditingState;
+}) => trackEditing.managementSession;
+
+export const selectManagementActive = ({
+  trackEditing,
+}: {
+  trackEditing: TrackletEditingState;
+}) => trackEditing.managementSession.active;
+
+export const selectManagementMode = ({
+  trackEditing,
+}: {
+  trackEditing: TrackletEditingState;
+}) => trackEditing.managementSession.mode;
+
+export const selectManagementPrimaryTracklet = ({
+  trackEditing,
+}: {
+  trackEditing: TrackletEditingState;
+}) => trackEditing.managementSession.primaryTracklet;

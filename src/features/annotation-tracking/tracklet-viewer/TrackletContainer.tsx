@@ -4,7 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
 import { TrackVisualizer } from "./TrackVizualizer";
 import { selectPendingTrackletEntities } from "views/ImageViewer/state/tracklet-editing/reselectors";
-import { selectSelectedTrackletIds } from "views/ImageViewer/state/tracklet-editing/selectors";
+import {
+  selectManagementSession,
+  selectSelectedTrackletIds,
+} from "views/ImageViewer/state/tracklet-editing/selectors";
 import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
 
 export const TrackletContainer = ({
@@ -18,6 +21,7 @@ export const TrackletContainer = ({
   const tracklets = useSelector(selectPendingTrackletEntities);
   const activeMetadata = useSelector(selectActiveMetadata);
   const secondaryTracks = useSelector(selectSelectedTrackletIds);
+  const managementSession = useSelector(selectManagementSession);
 
   const handleToggleSelectedTrack = useCallback(
     (trackId: string) =>
@@ -38,6 +42,7 @@ export const TrackletContainer = ({
       numFrames={numTimepoints}
       selectedTracks={secondaryTracks}
       toggleSelectedTrack={handleToggleSelectedTrack}
+      managementSession={managementSession}
     />
   );
 };
