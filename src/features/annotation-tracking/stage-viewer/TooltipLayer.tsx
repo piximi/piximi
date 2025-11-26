@@ -27,6 +27,7 @@ export const TooltipLayer: React.FC<TooltipLayerProps> = ({
           pointerWidth={10}
           pointerHeight={10}
           lineJoin="round"
+          cornerRadius={8}
         />
         <Text
           text={text}

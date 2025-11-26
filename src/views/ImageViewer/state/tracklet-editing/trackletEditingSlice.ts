@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { TrackletEditingState } from "./types";
+import { TrackletEditingState, TrackletManagementMode } from "./types";
 import { Tracklet } from "store/data/types";
 import { generateUUID } from "store/data/utils";
 import { getRestrictedRandomHexColor } from "utils/colorUtils";
@@ -11,6 +11,7 @@ const initialState: TrackletEditingState = {
   editSession: {
     mode: null,
   },
+  managementSession: { active: false, mode: null },
 };
 
 export const trackEditingSlice = createSlice({
@@ -152,6 +153,34 @@ export const trackEditingSlice = createSlice({
         snapshot: { ...tracklet }, // Original for rollback
         frames,
       };
+    },
+    beginTrackManagement: (state) => {
+      state.managementSession.active = true;
+    },
+    endTrackManagement: (state) => {
+      state.managementSession = { active: false, mode: null };
+    },
+
+    setTrackletManagementMode: (
+      state,
+      action: PayloadAction<TrackletManagementMode>,
+    ) => {
+      state.managementSession.mode = action.payload;
+      if (action.payload === null)
+        state.managementSession.primaryTracklet = undefined;
+    },
+    setPrimaryManagementTracklet: (
+      state,
+      action: PayloadAction<Tracklet | undefined>,
+    ) => {
+      if (action.payload === undefined) {
+        state.managementSession.primaryTracklet = undefined;
+        return;
+      }
+      if (!state.managementSession.primaryTracklet)
+        state.managementSession.primaryTracklet = action.payload;
+      else if (state.managementSession.primaryTracklet.id === action.payload.id)
+        state.managementSession.primaryTracklet = undefined;
     },
   },
   extraReducers: (builder) => {

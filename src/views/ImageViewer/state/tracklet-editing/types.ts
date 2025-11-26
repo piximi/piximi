@@ -15,7 +15,21 @@ export type TrackletEditSession =
   | { mode: null }
   | TrackletCreationMode
   | TrackletEditMode;
+
+export type TrackletManagementMode =
+  | null
+  | "create"
+  | "remove"
+  | "join"
+  | "sever";
+
+export type TrackletManagementSession = {
+  active: boolean;
+  mode: TrackletManagementMode;
+  primaryTracklet?: Tracklet;
+};
 export type TrackletEditingState = {
   selectedTracklets: string[];
   editSession: TrackletEditSession;
+  managementSession: TrackletManagementSession;
 };

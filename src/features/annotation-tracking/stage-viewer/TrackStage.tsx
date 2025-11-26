@@ -17,7 +17,10 @@ import { useAutoScroll } from "../hooks/useAutoScroll";
 import { ImageLayer } from "./ImageLayer";
 import { AnnotationLayer } from "./AnnotationLayer";
 import { TooltipLayer } from "./TooltipLayer";
-import { selectSelectedTrackletIds } from "views/ImageViewer/state/tracklet-editing/selectors";
+import {
+  selectManagementActive,
+  selectSelectedTrackletIds,
+} from "views/ImageViewer/state/tracklet-editing/selectors";
 
 /**
  * TrackStage is the main canvas component for visualizing time-series annotations.
@@ -42,6 +45,7 @@ export const TrackStage = ({
 
   const tracklets = useSelector(selectTrackletEntities);
   const selectedTracks = useSelector(selectSelectedTrackletIds);
+  const managementActive = useSelector(selectManagementActive);
 
   // Local state
   const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
@@ -65,6 +69,7 @@ export const TrackStage = ({
       htmlImages,
       stageWidth,
       setStagePosition,
+      managementActive,
     );
 
   useAutoScroll(
