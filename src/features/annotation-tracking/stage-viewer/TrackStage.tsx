@@ -21,6 +21,7 @@ import {
   selectManagementActive,
   selectSelectedTrackletIds,
 } from "views/ImageViewer/state/tracklet-editing/selectors";
+import { isEmpty } from "lodash";
 
 /**
  * TrackStage is the main canvas component for visualizing time-series annotations.
@@ -131,7 +132,9 @@ export const TrackStage = ({
       <Provider store={store}>
         <StageContext.Provider value={stageRef}>
           <ImageLayer htmlImages={htmlImages} globalShape={globalShape} />
-          <AnnotationLayer imageShape={globalShape} images={htmlImages} />
+          {!isEmpty(htmlImages) && (
+            <AnnotationLayer imageShape={globalShape} images={htmlImages} />
+          )}
           <TooltipLayer
             visible={tooltipProps.visible}
             x={tooltipProps.x}

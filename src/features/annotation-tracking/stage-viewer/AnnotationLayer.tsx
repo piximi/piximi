@@ -24,6 +24,7 @@ import { AnnotationMeasurements } from "store/measurements/types";
 import { Point } from "utils/types";
 import { selectPendingTrackletEntities } from "views/ImageViewer/state/tracklet-editing/reselectors";
 import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
+import { isEmpty } from "lodash";
 
 /**
  * A Konva layer that renders all visible annotations with track coloring.
@@ -36,7 +37,11 @@ const getTrackCOMs = (
   annotations: Record<string, DecodedAnnotationObject>,
   measurements: Record<string, AnnotationMeasurements>,
   imageLocation: Record<string, { pos: Point }>,
-) => {
+): Record<string, Array<number>> | undefined => {
+  if (isEmpty(imageLocation)) {
+    console.error("No image locations for calulating annotation COMs");
+    return {};
+  }
   const trackCOMs: Record<string, Array<number>> = {};
   for (const trackId of Object.keys(tracklets)) {
     const tracklet = tracklets[trackId];
@@ -70,10 +75,10 @@ const getStageAnnotations = (
 
   return visibleAnnotations;
 };
-export const AnnotationLayer: React.FC<AnnotationLayerProps> = ({
+export const AnnotationLayer = ({
   imageShape,
   images,
-}) => {
+}: AnnotationLayerProps) => {
   const dispatch = useDispatch();
   const tracklets = useSelector(selectPendingTrackletEntities);
   const annotations = useSelector(selectActiveMetadataDecodedAnnotationRecord);
@@ -89,6 +94,7 @@ export const AnnotationLayer: React.FC<AnnotationLayerProps> = ({
   }, [tracklets, annotationMeasurements, annotations, images]);
 
   const selectedCOMs = useMemo(() => {
+    if (!trackCOMs) return [];
     return selectedTracks.map((trackletId) => ({
       color: tracklets[trackletId].color,
       line: trackCOMs[trackletId],

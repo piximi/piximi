@@ -1,12 +1,14 @@
-import { Box, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
+import { OperationButtonRow } from "features/components/OperationButtonRow";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { dataSlice } from "store/data";
 import {
   selectAnnotationEntitiesByTracklet,
+  selectMetadataToTracklets,
   selectTrackletEntities,
 } from "store/data/selectors";
 import { isPopulatedTracklet } from "store/data/utils";
-import { ButtonContainer } from "views/ImageViewer/components/ButtonContainer";
+import { ButtonContainer } from "features/components/ButtonContainer";
 import { OperationButton } from "views/ImageViewer/components/OperationButton";
 import { selectActiveMetadataId } from "views/ImageViewer/state/image-viewer-data/selectors";
 import {
@@ -22,6 +24,7 @@ export const ManualTrackCreation = () => {
   const tracklets = useSelector(selectTrackletEntities);
   const getAnnsByTracklet = useSelector(selectAnnotationEntitiesByTracklet);
   const editSession = useSelector(selectEditSession);
+  const metadata2Tracklets = useSelector(selectMetadataToTracklets);
 
   const handleNewTrack = () => {
     if (!activeMetadataId) return;
@@ -33,6 +36,14 @@ export const ManualTrackCreation = () => {
   const handleDeleteTrack = () => {
     if (editSession.mode !== null) return;
     dispatch(dataSlice.actions.batchDeleteTracklet(selectedTracks));
+  };
+  const handleDeleteAllTracks = () => {
+    if (!activeMetadataId) return;
+    dispatch(
+      dataSlice.actions.batchDeleteTracklet(
+        metadata2Tracklets[activeMetadataId],
+      ),
+    );
   };
   const handleConfirmTrack = () => {
     if (editSession.mode === null) return;
@@ -64,15 +75,7 @@ export const ManualTrackCreation = () => {
   return (
     <Stack alignItems="flex-start" sx={{ width: "100%" }}>
       <ButtonContainer>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            width: "100%",
-            px: 2,
-          }}
-        >
+        <OperationButtonRow>
           <OperationButton
             onClick={handleNewTrack}
             disabled={editSession.mode !== null}
@@ -85,17 +88,9 @@ export const ManualTrackCreation = () => {
           >
             Edit Track
           </OperationButton>
-        </Box>
+        </OperationButtonRow>
 
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            width: "100%",
-            px: 2,
-          }}
-        >
+        <OperationButtonRow>
           <OperationButton
             onClick={handleConfirmTrack}
             disabled={editSession.mode === null}
@@ -108,23 +103,27 @@ export const ManualTrackCreation = () => {
           >
             Cancel
           </OperationButton>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            width: "100%",
-            px: 2,
-          }}
-        >
+        </OperationButtonRow>
+        <OperationButtonRow>
           <OperationButton
             onClick={handleDeleteTrack}
             disabled={selectedTracks.length === 0}
           >
             Delete
           </OperationButton>
-        </Box>
+          <OperationButton
+            variant="text"
+            disabled={
+              !activeMetadataId ||
+              !metadata2Tracklets[activeMetadataId] ||
+              metadata2Tracklets[activeMetadataId].length === 0
+            }
+            onClick={handleDeleteAllTracks}
+            size="small"
+          >
+            Delete All
+          </OperationButton>
+        </OperationButtonRow>
       </ButtonContainer>
     </Stack>
   );
