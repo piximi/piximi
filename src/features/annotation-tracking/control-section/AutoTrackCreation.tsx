@@ -1,19 +1,23 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
   Button,
   Checkbox,
   Collapse,
+  Divider,
   FormControl,
+  IconButton,
   Input,
   InputAdornment,
+  MenuItem,
   Stack,
   Typography,
 } from "@mui/material";
+import TuneIcon from "@mui/icons-material/Tune";
 
 import { dataSlice } from "store/data";
-import { selectMetadataToTracklets } from "store/data/selectors";
+import { selectAllKinds } from "store/data/selectors";
 import { selectAnnotationMeasurements } from "store/measurements/measurementDataSelectors";
 import { measurementDataSlice } from "store/measurements/measurementDataSlice";
 import { AnnotationObjectMeasurements } from "store/measurements/types";
@@ -22,11 +26,18 @@ import { selectActiveMetadataDecodedAnnotationRecord } from "views/ImageViewer/s
 import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
 import { CenterOfMass, TrackerType } from "../utils/types";
 import { BBoxTracker, CenterOfMassTracker } from "../utils";
+import { IMAGE_KIND } from "store/data/constants";
+import { OperationButtonRow } from "features/components/OperationButtonRow";
+import { StyledSelect } from "components/inputs";
 
 export const AutoTrackCreation = () => {
   const dispatch = useDispatch();
   const annotations = useSelector(selectActiveMetadataDecodedAnnotationRecord);
   const activeMetadata = useSelector(selectActiveMetadata);
+  const kinds = useSelector(selectAllKinds);
+
+  const annotationMeasurements = useSelector(selectAnnotationMeasurements);
+  const [showSettings, setShowSettings] = useState(false);
   const [threshold, setThreshold] = useState("75");
   const [finalValue, setFinalValue] = useState("75");
   const [includeIsolated, setIncludeIsolated] = useState(false);
@@ -35,9 +46,20 @@ export const AutoTrackCreation = () => {
   const [finalGapClosingDist, setFinalGapClosingDist] = useState("75");
   const [calculateRelationships, setCalculateRelationships] = useState(false);
   const [trackerType] = useState<TrackerType>("center-of-mass");
-  const metadata2Tracklets = useSelector(selectMetadataToTracklets);
-  const annotationMeasurements = useSelector(selectAnnotationMeasurements);
+  const [trackKind, setTrackKind] = useState<string>("All");
   const inputRef = useRef<HTMLInputElement>();
+
+  const kindSelectOptions = useMemo(() => {
+    const options = ["All"];
+    kinds.forEach((kind) => {
+      if (kind.id !== IMAGE_KIND) options.push(kind.displayName);
+    });
+    return options;
+  }, [kinds]);
+  useEffect(() => {
+    if (!kinds.find((kind) => kind.displayName === trackKind))
+      setTrackKind("All");
+  }, [kinds]);
 
   const annCOMs = useMemo(() => {
     return Object.entries(annotationMeasurements).reduce(
@@ -133,168 +155,196 @@ export const AutoTrackCreation = () => {
     }
   };
 
-  const handleDeleteAllTracks = () => {
-    if (!activeMetadata) return;
-    dispatch(
-      dataSlice.actions.batchDeleteTracklet(
-        metadata2Tracklets[activeMetadata.id],
-      ),
-    );
+  const handleShowSettings = () => {
+    setShowSettings((showSettings) => !showSettings);
   };
+
   return (
-    <Stack alignItems="space-between" gap={1} sx={{ width: "100%" }}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          width: "100%",
-          alignItems: "center",
-          justifyContent: "space-between",
-          px: 2,
-        }}
-      >
-        <Typography variant="body2" sx={{ flexGrow: 1 }}>
-          Distance Threshold:
-        </Typography>
-        <FormControl size="small" variant="standard" sx={{ width: "5ch" }}>
-          <Input
-            ref={inputRef}
-            value={threshold}
-            endAdornment={<InputAdornment position="end">px</InputAdornment>}
-            margin="dense"
-            inputProps={{ style: { textAlign: "end" } }}
-            sx={(theme) => ({
-              fontSize: theme.typography.body2.fontSize,
-            })}
-            onChange={handleOverlapThresholdChange}
-            onBlur={(event) => {
-              if (event.target.value === "") setThreshold(finalValue);
-              else setFinalValue(event.target.value);
-            }}
-          />
-        </FormControl>
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          width: "100%",
-          alignItems: "center",
-          justifyContent: "space-between",
-          px: 2,
-        }}
-      >
-        <Typography variant="body2" sx={{ flexGrow: 1 }}>
-          Calculate Tracklet Links:
-        </Typography>
-
-        <Checkbox
-          checked={calculateRelationships}
-          onChange={() => setCalculateRelationships((val) => !val)}
-          size="small"
-          sx={{ px: 0, py: 0.5 }}
-        />
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          width: "100%",
-          alignItems: "center",
-          justifyContent: "space-between",
-          px: 2,
-        }}
-      >
-        <Typography variant="body2" sx={{ flexGrow: 1 }}>
-          Include Isolated:
-        </Typography>
-
-        <Checkbox
-          checked={includeIsolated}
-          onChange={() => setIncludeIsolated((val) => !val)}
-          size="small"
-          sx={{ px: 0, py: 0.5 }}
-        />
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          width: "100%",
-          alignItems: "center",
-          justifyContent: "space-between",
-          px: 2,
-        }}
-      >
-        <Typography variant="body2" sx={{ flexGrow: 1 }}>
-          Gap Closing:
-        </Typography>
-
-        <Checkbox
-          checked={includeGapClosing}
-          onChange={() => setIncludeGapClosing((val) => !val)}
-          size="small"
-          sx={{ px: 0, py: 0.5 }}
-        />
-      </Box>
-      <Collapse in={includeGapClosing} sx={{ width: "100%" }}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            width: "100%",
-            alignItems: "center",
-            justifyContent: "space-between",
-            px: 2,
-          }}
-        >
-          <Typography variant="body2" sx={{ flexGrow: 1 }}>
-            Max Gap:
-          </Typography>
-          <FormControl size="small" variant="standard" sx={{ width: "3ch" }}>
-            <Input
-              value={gapClosingDist}
-              margin="dense"
-              inputProps={{ style: { textAlign: "end" } }}
-              sx={(theme) => ({
-                fontSize: theme.typography.body2.fontSize,
-              })}
-              onChange={handleGapChange}
-              onBlur={(event) => {
-                if (event.target.value === "")
-                  setGapClosingDist(finalGapClosingDist);
-                else setFinalGapClosingDist(event.target.value);
-              }}
-            />
-          </FormControl>
-        </Box>
-      </Collapse>
-
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          width: "100%",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
+    <Stack sx={{ width: "100%", pt: 1, pb: 2 }}>
+      <Divider />
+      <OperationButtonRow>
         <Button variant="text" onClick={handleAutoTracking} size="small">
-          Generate
+          Auto Generate
         </Button>
-        <Button
-          variant="text"
-          disabled={
-            !activeMetadata ||
-            !metadata2Tracklets[activeMetadata.id] ||
-            metadata2Tracklets[activeMetadata.id].length === 0
-          }
-          onClick={handleDeleteAllTracks}
-          size="small"
-        >
-          Delete All
-        </Button>
-      </Box>
+        <IconButton size="small" onClick={handleShowSettings}>
+          <TuneIcon
+            sx={(theme) => ({
+              color: showSettings ? theme.palette.primary.main : undefined,
+            })}
+          />
+        </IconButton>
+      </OperationButtonRow>
+
+      <Collapse
+        in={showSettings}
+        sx={(theme) => ({ bgcolor: theme.palette.background.default })}
+      >
+        <Stack alignItems="space-between" gap={1} sx={{ width: "100%", py: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "space-between",
+              px: 2,
+            }}
+          >
+            <Typography variant="body2" sx={{ flexGrow: 1 }}>
+              Kind:
+            </Typography>
+
+            <StyledSelect
+              value={trackKind}
+              onChange={(event) => {
+                const kind = event.target.value as string;
+                setTrackKind(kind);
+              }}
+              autoWidth
+              variant="standard"
+            >
+              {kindSelectOptions.map((kindId) => (
+                <MenuItem key={kindId} value={kindId}>
+                  {kindId}
+                </MenuItem>
+              ))}
+            </StyledSelect>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "space-between",
+              px: 2,
+            }}
+          >
+            <Typography variant="body2" sx={{ flexGrow: 1 }}>
+              Distance Threshold:
+            </Typography>
+            <FormControl size="small" variant="standard" sx={{ width: "5ch" }}>
+              <Input
+                ref={inputRef}
+                value={threshold}
+                endAdornment={
+                  <InputAdornment position="end">px</InputAdornment>
+                }
+                margin="dense"
+                inputProps={{ style: { textAlign: "end" } }}
+                sx={(theme) => ({
+                  fontSize: theme.typography.body2.fontSize,
+                })}
+                onChange={handleOverlapThresholdChange}
+                onBlur={(event) => {
+                  if (event.target.value === "") setThreshold(finalValue);
+                  else setFinalValue(event.target.value);
+                }}
+              />
+            </FormControl>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "space-between",
+              px: 2,
+            }}
+          >
+            <Typography variant="body2" sx={{ flexGrow: 1 }}>
+              Calculate Lineages:
+            </Typography>
+
+            <Checkbox
+              checked={calculateRelationships}
+              onChange={() => setCalculateRelationships((val) => !val)}
+              size="small"
+              sx={{ px: 0, py: 0.5 }}
+            />
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "space-between",
+              px: 2,
+            }}
+          >
+            <Typography variant="body2" sx={{ flexGrow: 1 }}>
+              Include Isolated:
+            </Typography>
+
+            <Checkbox
+              checked={includeIsolated}
+              onChange={() => setIncludeIsolated((val) => !val)}
+              size="small"
+              sx={{ px: 0, py: 0.5 }}
+            />
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "space-between",
+              px: 2,
+            }}
+          >
+            <Typography variant="body2" sx={{ flexGrow: 1 }}>
+              Gap Closing:
+            </Typography>
+
+            <Checkbox
+              checked={includeGapClosing}
+              onChange={() => setIncludeGapClosing((val) => !val)}
+              size="small"
+              sx={{ px: 0, py: 0.5 }}
+            />
+          </Box>
+          <Collapse in={includeGapClosing} sx={{ width: "100%" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                width: "100%",
+                alignItems: "center",
+                justifyContent: "space-between",
+                px: 2,
+              }}
+            >
+              <Typography variant="body2" sx={{ flexGrow: 1 }}>
+                Max Gap:
+              </Typography>
+              <FormControl
+                size="small"
+                variant="standard"
+                sx={{ width: "3ch" }}
+              >
+                <Input
+                  value={gapClosingDist}
+                  margin="dense"
+                  inputProps={{ style: { textAlign: "end" } }}
+                  sx={(theme) => ({
+                    fontSize: theme.typography.body2.fontSize,
+                  })}
+                  onChange={handleGapChange}
+                  onBlur={(event) => {
+                    if (event.target.value === "")
+                      setGapClosingDist(finalGapClosingDist);
+                    else setFinalGapClosingDist(event.target.value);
+                  }}
+                />
+              </FormControl>
+            </Box>
+          </Collapse>
+        </Stack>
+      </Collapse>
+      <Divider />
     </Stack>
   );
 };

@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Stack, ToggleButton } from "@mui/material";
+import { Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 import { OperationButton } from "views/ImageViewer/components/OperationButton";
 import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
@@ -8,7 +8,6 @@ import {
   selectManagementMode,
 } from "views/ImageViewer/state/tracklet-editing/selectors";
 import { TrackletManagementMode } from "views/ImageViewer/state/tracklet-editing/types";
-import { GappedToggleButtonGroup } from "components/ui";
 
 export const TrackManagement = () => {
   const dispatch = useDispatch();
@@ -39,6 +38,7 @@ export const TrackManagement = () => {
         mx: "auto",
         alignItems: "center",
         gap: 1.5,
+        pb: 2,
       }}
     >
       <Stack
@@ -60,7 +60,7 @@ export const TrackManagement = () => {
           End
         </OperationButton>
       </Stack>
-      <GappedToggleButtonGroup
+      <ToggleButtonGroup
         orientation="vertical"
         color="primary"
         value={managementMode}
@@ -68,14 +68,13 @@ export const TrackManagement = () => {
         onChange={handleManagementModeSelect}
         disabled={!managementActive}
         size="small"
-        gap={"1rem"}
         fullWidth
       >
         <ToggleButton value="create">Create Relationship</ToggleButton>
         <ToggleButton value="remove">Remove Relationship</ToggleButton>
         <ToggleButton value="join">Join Tracks</ToggleButton>
         <ToggleButton value="sever">Sever Tracks</ToggleButton>
-      </GappedToggleButtonGroup>
+      </ToggleButtonGroup>
     </Stack>
   );
 };

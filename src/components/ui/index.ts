@@ -19,4 +19,3 @@ export { Logo, LogoLoader } from "./Logo";
 export { SelectionTree } from "./SelectionTree";
 export { ToolHotkeyTitle, TooltipCard, TooltipTitle } from "./tooltips";
 export { Tool, PopoverTool, ResizableTool } from "./Tool";
-export { GappedToggleButtonGroup } from "./GappedToggleButtonGroup";
