@@ -17,7 +17,7 @@ import {
 import TuneIcon from "@mui/icons-material/Tune";
 
 import { dataSlice } from "store/data";
-import { selectAllKinds } from "store/data/selectors";
+import { selectKindEntities } from "store/data/selectors";
 import { selectAnnotationMeasurements } from "store/measurements/measurementDataSelectors";
 import { measurementDataSlice } from "store/measurements/measurementDataSlice";
 import { AnnotationObjectMeasurements } from "store/measurements/types";
@@ -34,7 +34,7 @@ export const AutoTrackCreation = () => {
   const dispatch = useDispatch();
   const annotations = useSelector(selectActiveMetadataDecodedAnnotationRecord);
   const activeMetadata = useSelector(selectActiveMetadata);
-  const kinds = useSelector(selectAllKinds);
+  const kinds = useSelector(selectKindEntities);
 
   const annotationMeasurements = useSelector(selectAnnotationMeasurements);
   const [showSettings, setShowSettings] = useState(false);
@@ -51,15 +51,15 @@ export const AutoTrackCreation = () => {
 
   const kindSelectOptions = useMemo(() => {
     const options = ["All"];
-    kinds.forEach((kind) => {
-      if (kind.id !== IMAGE_KIND) options.push(kind.displayName);
+    Object.values(kinds).forEach((kind) => {
+      if (kind.id !== IMAGE_KIND) options.push(kind.id);
     });
     return options;
   }, [kinds]);
+
   useEffect(() => {
-    if (!kinds.find((kind) => kind.displayName === trackKind))
-      setTrackKind("All");
-  }, [kinds]);
+    if (!kinds[trackKind]) setTrackKind("All");
+  }, [kinds, trackKind]);
 
   const annCOMs = useMemo(() => {
     return Object.entries(annotationMeasurements).reduce(
@@ -133,7 +133,11 @@ export const AutoTrackCreation = () => {
 
   const handleAutoTracking = () => {
     if (!tracker || !activeMetadata) return;
-    const { tracks, coms } = tracker.computeTracks(annotations, annCOMs);
+    const { tracks, coms } = tracker.computeTracks(
+      annotations,
+      trackKind,
+      annCOMs,
+    );
     if (tracks.length > 0) {
       dispatch(
         measurementDataSlice.actions.batchAddAnnotationObjectMeasurement(
@@ -205,7 +209,7 @@ export const AutoTrackCreation = () => {
             >
               {kindSelectOptions.map((kindId) => (
                 <MenuItem key={kindId} value={kindId}>
-                  {kindId}
+                  {kindId === "All" ? "All" : kinds[kindId].displayName}
                 </MenuItem>
               ))}
             </StyledSelect>
