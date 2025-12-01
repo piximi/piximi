@@ -16,6 +16,7 @@ import {
   selectSelectedTrackletIds,
 } from "views/ImageViewer/state/tracklet-editing/selectors";
 import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
+import { difference } from "lodash";
 
 export const ManualTrackCreation = () => {
   const dispatch = useDispatch();
@@ -50,7 +51,36 @@ export const ManualTrackCreation = () => {
     const pendingTracklet = editSession.pendingTracklet;
     if (pendingTracklet && isPopulatedTracklet(pendingTracklet))
       batch(() => {
-        dispatch(dataSlice.actions.addTracklet(pendingTracklet));
+        if (editSession.mode === "create")
+          dispatch(dataSlice.actions.addTracklet(pendingTracklet));
+        else {
+          const removedAnnotations = difference(
+            editSession.snapshot.linkedIds,
+            editSession.pendingTracklet.linkedIds,
+          );
+          const addedAnnotations = difference(
+            editSession.pendingTracklet.linkedIds,
+            editSession.snapshot.linkedIds,
+          );
+          if (removedAnnotations.length > 0)
+            dispatch(
+              dataSlice.actions.batchRemoveAnnotationFromTracklet(
+                removedAnnotations.map((id) => ({
+                  trackId: editSession.trackletId,
+                  annIds: [id],
+                })),
+              ),
+            );
+          if (addedAnnotations.length > 0)
+            dispatch(
+              dataSlice.actions.batchAddAnnotationToTracklet(
+                addedAnnotations.map((id) => ({
+                  trackId: editSession.trackletId,
+                  annIds: [id],
+                })),
+              ),
+            );
+        }
         dispatch(trackEditingSlice.actions.exitEditSession());
       });
   };

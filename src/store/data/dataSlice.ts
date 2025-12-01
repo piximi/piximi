@@ -545,6 +545,21 @@ export const dataSlice = createSlice({
         });
       });
     },
+    batchRemoveAnnotationFromTracklet: (
+      state,
+      action: PayloadAction<{ trackId: string; annIds: string[] }[]>,
+    ) => {
+      const tracks = action.payload;
+
+      tracks.forEach((track) => {
+        track.annIds.forEach((annId) => {
+          dataSlice.caseReducers.removeAnnotationFromTracklet(state, {
+            type: "removeAnnotationFromTrackletRecord",
+            payload: { trackId: track.trackId, annId },
+          });
+        });
+      });
+    },
     // -- Tracklet -- Delete
     batchDeleteTracklet: (state, action: PayloadAction<string[]>) => {
       action.payload.forEach((trackletId) => {
