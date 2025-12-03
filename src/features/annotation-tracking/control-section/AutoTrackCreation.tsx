@@ -18,9 +18,6 @@ import TuneIcon from "@mui/icons-material/Tune";
 
 import { dataSlice } from "store/data";
 import { selectKindEntities } from "store/data/selectors";
-import { selectAnnotationMeasurements } from "store/measurements/measurementDataSelectors";
-import { measurementDataSlice } from "store/measurements/measurementDataSlice";
-import { AnnotationObjectMeasurements } from "store/measurements/types";
 
 import { selectActiveMetadataDecodedAnnotationRecord } from "views/ImageViewer/state/image-viewer-data/reselectors";
 import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
@@ -36,7 +33,6 @@ export const AutoTrackCreation = () => {
   const activeMetadata = useSelector(selectActiveMetadata);
   const kinds = useSelector(selectKindEntities);
 
-  const annotationMeasurements = useSelector(selectAnnotationMeasurements);
   const [showSettings, setShowSettings] = useState(false);
   const [threshold, setThreshold] = useState("75");
   const [finalValue, setFinalValue] = useState("75");
@@ -62,16 +58,20 @@ export const AutoTrackCreation = () => {
   }, [kinds, trackKind]);
 
   const annCOMs = useMemo(() => {
-    return Object.entries(annotationMeasurements).reduce(
-      (annCOMs: Record<string, CenterOfMass>, [id, measurements]) => {
-        const annCOM = measurements["object-geometry-com"];
+    return Object.values(annotations).reduce(
+      (annCOMs: Record<string, CenterOfMass>, annotation) => {
+        const annCOM = annotation.measurements?.com;
         if (annCOM)
-          annCOMs[id] = { annotationId: id, x: annCOM.x, y: annCOM.y };
+          annCOMs[annotation.id] = {
+            annotationId: annotation.id,
+            x: annCOM.x,
+            y: annCOM.y,
+          };
         return annCOMs;
       },
       {},
     );
-  }, [annotationMeasurements]);
+  }, [annotations]);
 
   const tracker = useMemo(() => {
     if (!activeMetadata) return;
@@ -140,19 +140,13 @@ export const AutoTrackCreation = () => {
     );
     if (tracks.length > 0) {
       dispatch(
-        measurementDataSlice.actions.batchAddAnnotationObjectMeasurement(
-          Object.keys(coms).reduce(
-            (
-              measurements: Record<string, AnnotationObjectMeasurements>,
-              id,
-            ) => {
-              measurements[id] = {
-                "object-geometry-com": { x: coms[id].x, y: coms[id].y },
-              };
-              return measurements;
-            },
-            {},
-          ),
+        dataSlice.actions.batchUpdateAnnotationMeasurements(
+          Object.values(coms).map((com) => {
+            return {
+              annId: com.annotationId,
+              measurements: { com: { x: com.x, y: com.y } },
+            };
+          }),
         ),
       );
       dispatch(dataSlice.actions.batchAddTracklet(tracks));

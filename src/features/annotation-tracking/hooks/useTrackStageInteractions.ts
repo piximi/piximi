@@ -5,8 +5,6 @@ import { useThrottledCallback } from "hooks/useThrottledCallback";
 
 import { Point } from "utils/types";
 import { getNewWheelPos } from "../utils/stageUtils";
-import { useSelector } from "react-redux";
-import { selectAnnotationMeasurements } from "store/measurements/measurementDataSelectors";
 
 const IMAGE_SPACING = 20;
 
@@ -36,7 +34,6 @@ export const useTrackStageInteractions = (
   setStagePosition: (pos: Point) => void,
   managementActive: boolean,
 ) => {
-  const measurements = useSelector(selectAnnotationMeasurements);
   const [tooltipProps, setTooltipProps] = useState<TooltipState>({
     visible: false,
     x: 0,
@@ -83,23 +80,19 @@ export const useTrackStageInteractions = (
 
         if (mousePos) {
           const id = shape.getAttr("id");
-          const annMeas = measurements[id];
-          let com: Point = { x: 0, y: 0 };
-          if (annMeas && annMeas["object-geometry-com"])
-            com = annMeas["object-geometry-com"];
           setTooltipProps({
             visible: true,
             x: mousePos.x + 200,
             y: mousePos.y - 5,
             text: managementActive
               ? "Manage tracks from viewer below"
-              : `${id.slice(0, 8)} - com: x-${Math.round(com.x)} y-${Math.round(com.y)}`,
+              : `${id.slice(0, 8)}`,
           });
         }
       }
     },
     16, // ~60fps throttle for smooth tooltip updates
-    [measurements],
+    [],
   );
 
   const handleMouseOut = useCallback((evt: KonvaEventObject<MouseEvent>) => {

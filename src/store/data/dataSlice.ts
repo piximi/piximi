@@ -14,6 +14,7 @@ import {
   ImageMetadata,
   ImageData,
   Kind,
+  ObjectMeasurements,
 } from "./types";
 import { generateCategory, generateUUID, isUnknownCategory } from "./utils";
 import {
@@ -283,7 +284,29 @@ export const dataSlice = createSlice({
       deleteAnnotationCascade(state, action.payload);
     },
 
-    // ============== GLOBAL ANNOTATION OPERATIONS ==============
+    updateAnnotationMeasurements: (
+      state,
+      action: PayloadAction<{
+        annId: string;
+        measurements: ObjectMeasurements;
+      }>,
+    ) => {
+      const { intensity, ...objectMeasurements } = action.payload.measurements;
+      const annotation = state.annotations.entities[action.payload.annId];
+      if (!annotation.measurements) {
+        annotation.measurements = objectMeasurements;
+        annotation.measurements.intensity = intensity;
+      }
+
+      Object.assign(annotation, objectMeasurements);
+      if (intensity) {
+        if (!annotation.measurements.intensity)
+          annotation.measurements.intensity = intensity;
+        else Object.assign(annotation.measurements.intensity, intensity);
+      }
+    },
+
+    // ============== TRACKLET OPERATIONS ==============
     // -- Create
     addTracklet: (state, action: PayloadAction<Tracklet>) => {
       addTrackletCascade(state, action.payload);
@@ -529,6 +552,20 @@ export const dataSlice = createSlice({
       const kindId = action.payload;
       const annotationIds = state.relationships.kindToAnnotations[kindId];
       deleteAnnotationBatch(state, annotationIds);
+    },
+    // -- Annotation -- Measurements
+    batchUpdateAnnotationMeasurements: (
+      state,
+      action: PayloadAction<
+        { annId: string; measurements: ObjectMeasurements }[]
+      >,
+    ) => {
+      action.payload.forEach((annMeasurements) => {
+        dataSlice.caseReducers.updateAnnotationMeasurements(state, {
+          type: "updateAnnotationMeasurements",
+          payload: annMeasurements,
+        });
+      });
     },
     // -- Tracklet -- Create
     batchAddTracklet: (state, action: PayloadAction<Tracklet[]>) => {

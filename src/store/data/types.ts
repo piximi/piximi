@@ -2,7 +2,7 @@ import { Tensor4D } from "@tensorflow/tfjs";
 
 import { Partition } from "utils/models/enums";
 import { BitDepth as IJSBitDepth, DataArray as IJSDataArray } from "image-js";
-import { ColorsRaw, PartialBy, RequireOnly } from "utils/types";
+import { ColorsRaw, PartialBy, Point, RequireOnly } from "utils/types";
 
 export type BitDepth = IJSBitDepth;
 export type DataArray = IJSDataArray;
@@ -44,6 +44,28 @@ export type ImageMetadata = {
 export type FullTimepointImage = Omit<ImageMetadata, "timepoints"> &
   ImageData & { timepoint: TPKey };
 
+export type ObjectMeasurements = {
+  area?: number;
+  perimeter?: number;
+  extent?: number;
+  bboxArea?: number;
+  eqpc?: number;
+  ped?: number;
+  sphericity?: number;
+  compactness?: number;
+  com?: Point;
+  intensity?: {
+    total?: Record<string, number>;
+    mean?: Record<string, number>;
+    std?: Record<string, number>;
+    mad?: Record<string, number>;
+    min?: Record<string, number>;
+    max?: Record<string, number>;
+    lowerQuartile?: Record<string, number>;
+    upperQuartile?: Record<string, number>;
+  };
+};
+
 export type AnnotationObject = {
   globalId?: string;
   trackId?: string;
@@ -64,6 +86,7 @@ export type AnnotationObject = {
   shape: Shape;
   data: Tensor4D;
   activePlane?: number;
+  measurements?: ObjectMeasurements;
 };
 export type LinkNode = {
   id: string;

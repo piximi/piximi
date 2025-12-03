@@ -9,8 +9,6 @@ import { hexAlpha } from "utils/colorUtils";
 import { selectActiveMetadataDecodedAnnotationRecord } from "views/ImageViewer/state/image-viewer-data/reselectors";
 import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
 
-import { selectAnnotationMeasurements } from "store/measurements/measurementDataSelectors";
-
 import { handleAnnotationTracking } from "../utils/trackingActions";
 import { AnnotationShape } from "./AnnotationShape";
 import { AnnotationLayerProps, AnnotationWithImOff } from "../utils/types";
@@ -20,7 +18,6 @@ import {
   selectSelectedTrackletIds,
 } from "views/ImageViewer/state/tracklet-editing/selectors";
 import { DecodedAnnotationObject, Tracklet } from "store/data/types";
-import { AnnotationMeasurements } from "store/measurements/types";
 import { Point } from "utils/types";
 import { selectPendingTrackletEntities } from "views/ImageViewer/state/tracklet-editing/reselectors";
 import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
@@ -35,7 +32,6 @@ import { isEmpty } from "lodash";
 const getTrackCOMs = (
   tracklets: Record<string, Tracklet>,
   annotations: Record<string, DecodedAnnotationObject>,
-  measurements: Record<string, AnnotationMeasurements>,
   imageLocation: Record<string, { pos: Point }>,
 ): Record<string, Array<number>> | undefined => {
   if (isEmpty(imageLocation)) {
@@ -48,7 +44,7 @@ const getTrackCOMs = (
     const trackletAnnotations = tracklet.linkedIds;
     trackCOMs[trackId] = [];
     for (const annId of trackletAnnotations) {
-      const annCOM = measurements[annId]?.["object-geometry-com"];
+      const annCOM = annotations[annId].measurements?.com;
       const imageId = annotations[annId].imageId;
       const imOffset = imageLocation[imageId].pos;
       if (annCOM)
@@ -84,14 +80,13 @@ export const AnnotationLayer = ({
   const annotations = useSelector(selectActiveMetadataDecodedAnnotationRecord);
   const imageToAnnotations = useSelector(selectImageToAnnotations);
   const activeMetadata = useSelector(selectActiveMetadata);
-  const annotationMeasurements = useSelector(selectAnnotationMeasurements);
   const editSession = useSelector(selectEditSession);
   const selectedTracks = useSelector(selectSelectedTrackletIds);
   const managementActive = useSelector(selectManagementActive);
 
   const trackCOMs = useMemo(() => {
-    return getTrackCOMs(tracklets, annotations, annotationMeasurements, images);
-  }, [tracklets, annotationMeasurements, annotations, images]);
+    return getTrackCOMs(tracklets, annotations, images);
+  }, [tracklets, annotations, images]);
 
   const selectedCOMs = useMemo(() => {
     if (!trackCOMs) return [];
