@@ -160,154 +160,113 @@ export const removeAnnotationFromTrackletCascade = (
 
 export const joinTrackletsCascade = (
   state: WritableDraft<DataState>,
-  trackletIds: string[],
+  primaryTrackletId: string,
+  joinedTrackletId: string,
 ) => {
-  let firstTracklet: Tracklet | undefined;
-  let lastTracklet: Tracklet | undefined;
+  const primaryTracklet = state.tracklets.entities[primaryTrackletId];
+  const joinedTracklet = state.tracklets.entities[joinedTrackletId];
 
-  // Find the earliest and latest tracklets, along with the tracklets in between
-  trackletIds.forEach((trackletId) => {
-    const tracklet = state.tracklets.entities[trackletId];
-    if (!firstTracklet || tracklet.start < firstTracklet.start) {
-      firstTracklet = tracklet;
-    }
-    if (!lastTracklet || tracklet.end > lastTracklet.end) {
-      lastTracklet = tracklet;
-    }
-  });
-  if (!firstTracklet || !lastTracklet) return;
-
-  // create a list of the tracklet entities excluding the first and last
-  const middleTracklets = trackletIds
-    .filter((id) => id !== firstTracklet!.id && id !== lastTracklet!.id)
-    .map((id) => state.tracklets.entities[id]);
-
-  const newTracklet: Tracklet = {
-    id: generateUUID(),
-    metadataId: firstTracklet.metadataId,
-    color: getRandomHexColor(),
-    start: Infinity,
-    end: 0,
-    linkedIds: [] as string[],
-  };
-
-  // Add initial tracklet
-  addTrackletCascade(state, newTracklet);
-
-  //
-  // link Ids from the first tracklet to the new one
-  firstTracklet.linkedIds.forEach((annId) =>
-    addAnnotationToTrackletCascade(state, newTracklet.id, annId),
-  );
-
-  // If the first tracklet has parents, transfer the relationships to the new tracklet
-  if (firstTracklet.parents)
-    firstTracklet.parents.forEach((parentId) => {
-      removeTrackletRelationship(state, parentId, firstTracklet!.id);
-      addTrackletRelationship(state, parentId, newTracklet.id);
-    });
-
-  for (const tracklet of middleTracklets) {
-    // Add each of the middle tracklets linked annotations to the primary tracklet
-    tracklet.linkedIds.forEach((annId) =>
-      addAnnotationToTrackletCascade(state, newTracklet.id, annId),
-    );
-
-    // If any of the middle tracklets have relationships with tracklets other than those selected for joining
-    // remove the relationships (we dont care about relationships with eachother since theyll be deleted)
-    if (tracklet.parents)
-      tracklet.parents.forEach(
-        (parentId) =>
-          !trackletIds.includes(parentId) &&
-          removeTrackletRelationship(state, parentId, tracklet.id),
-      );
-    if (tracklet.id === lastTracklet.id) continue;
-    if (tracklet.children)
-      tracklet.children.forEach(
-        (childId) =>
-          !trackletIds.includes(childId) &&
-          removeTrackletRelationship(state, tracklet.id, childId),
-      );
+  if (!primaryTracklet || !joinedTracklet) {
+    console.error("One or more tracklets do not exist");
+    return;
   }
-  // link Ids from the last tracklet to the new one
-  lastTracklet.linkedIds.forEach((annId) =>
-    addAnnotationToTrackletCascade(state, newTracklet.id, annId),
+  if (primaryTracklet.children) {
+    console.error("Cannot join if primary tracklet has children.");
+  }
+  if (joinedTracklet.parents) {
+    console.error("Cannot join if joining tracklet has parents.");
+  }
+
+  joinedTracklet.linkedIds.forEach(
+    (id) => (state.annotations.entities[id].trackId = primaryTracklet.id),
   );
+  primaryTracklet.linkedIds.push(...joinedTracklet.linkedIds);
+  primaryTracklet.end = joinedTracklet.end;
 
-  // If the last tracklet has children, transfer the relationships to the new tracklet
-  if (lastTracklet.children)
-    lastTracklet.children.forEach((childId) => {
-      removeTrackletRelationship(state, lastTracklet!.id, childId);
-      addTrackletRelationship(state, newTracklet.id, childId);
+  if (joinedTracklet.children) {
+    const joinedTrackletChildren = [...joinedTracklet.children];
+    joinedTrackletChildren.forEach((childId) => {
+      removeTrackletRelationship(state, joinedTracklet.id, childId);
+      addTrackletRelationship(state, primaryTracklet.id, childId);
     });
+  }
 
-  trackletIds.forEach((trackletId) =>
-    removeTrackletFromMetadataRelationship(
-      state,
-      trackletId,
-      state.tracklets.entities[trackletId].metadataId,
-    ),
+  removeTrackletFromMetadataRelationship(
+    state,
+    joinedTrackletId,
+    joinedTracklet.metadataId,
   );
   // Remove all the joined tracklets
-  trackletAdapter.removeMany(state.tracklets, trackletIds);
+  trackletAdapter.removeOne(state.tracklets, joinedTrackletId);
 };
 
 export const severTrackletCascade = (
   state: WritableDraft<DataState>,
   trackletId: string,
-  timepoint: number,
+  severPoint: number,
 ) => {
-  const tracklet = state.tracklets.entities[trackletId];
-  if (!tracklet || !isPopulatedTracklet(tracklet)) {
+  const originalTracklet = state.tracklets.entities[trackletId];
+  if (!originalTracklet || !isPopulatedTracklet(originalTracklet)) {
     console.error(`tracklet with id '${trackletId} could not be found.`);
     return;
   }
-  if (timepoint <= tracklet.start || timepoint >= tracklet.end) return;
-  const leftTracklet: Tracklet = {
+  if (
+    severPoint <= originalTracklet.start ||
+    severPoint >= originalTracklet.end
+  )
+    return;
+
+  const severedTracklet: Tracklet = {
     id: generateUUID(),
-    metadataId: tracklet.metadataId,
+    metadataId: originalTracklet.metadataId,
     color: getRandomHexColor(),
-    start: Infinity,
-    end: 0,
+    start: 0,
+    end: originalTracklet.end,
     linkedIds: [] as string[],
   };
-  addTrackletCascade(state, leftTracklet);
-  const rightTracklet: Tracklet = {
-    id: generateUUID(),
-    metadataId: tracklet.metadataId,
-    color: getRandomHexColor(),
-    start: Infinity,
-    end: 0,
-    linkedIds: [] as string[],
-  };
-  addTrackletCascade(state, rightTracklet);
-  tracklet.linkedIds.forEach((id) => {
+  addTrackletCascade(state, severedTracklet);
+
+  // split annotations and add to the respective tracklets
+  const remainingTrackletAnns: string[] = [];
+  const severedTrackletAnns: string[] = [];
+
+  // need to calculate new starts and ends in case split takes place at gap
+  let remainingEnd = 0;
+  let severedStart = Infinity;
+  let severedEnd = 0;
+
+  originalTracklet.linkedIds.forEach((id) => {
     const ann = state.annotations.entities[id];
     if (!ann) {
       console.error(`could not find annotation with id '${id}'`);
       return;
     }
-    if (ann.timepoint < timepoint)
-      addAnnotationToTrackletCascade(state, leftTracklet.id, id);
-    else addAnnotationToTrackletCascade(state, rightTracklet.id, id);
+
+    if (ann.timepoint < severPoint) {
+      remainingTrackletAnns.push(id);
+      if (ann.timepoint > remainingEnd) remainingEnd = ann.timepoint;
+    } else {
+      severedTrackletAnns.push(id);
+      state.annotations.entities[id].trackId = severedTracklet.id;
+      if (ann.timepoint > severedEnd) severedEnd = ann.timepoint;
+      if (ann.timepoint < severedStart) severedStart = ann.timepoint;
+    }
   });
 
-  if (tracklet.parents)
-    tracklet.parents.forEach((parentId) => {
-      removeTrackletRelationship(state, parentId, tracklet.id);
-      addTrackletRelationship(state, parentId, leftTracklet.id);
-    });
+  originalTracklet.linkedIds = remainingTrackletAnns;
+  originalTracklet.end = remainingEnd;
 
-  if (tracklet.children)
-    tracklet.children.forEach((childId) => {
-      removeTrackletRelationship(state, tracklet.id, childId);
-      addTrackletRelationship(state, rightTracklet.id, childId);
-    });
+  severedTracklet.linkedIds = severedTrackletAnns;
+  severedTracklet.start = severedStart;
+  severedTracklet.end = severedEnd;
 
-  removeTrackletFromMetadataRelationship(
-    state,
-    trackletId,
-    tracklet.metadataId,
-  );
-  trackletAdapter.removeOne(state.tracklets, trackletId);
+  // if the original tracklet has children, remove them from the original and add to the severed
+
+  if (originalTracklet.children) {
+    const originalTrackletChildren = [...originalTracklet.children];
+    originalTrackletChildren.forEach((childId) => {
+      removeTrackletRelationship(state, originalTracklet.id, childId);
+      addTrackletRelationship(state, severedTracklet.id, childId);
+    });
+  }
 };

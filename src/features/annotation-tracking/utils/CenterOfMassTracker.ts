@@ -123,6 +123,7 @@ export class CenterOfMassTracker {
         }
       }
     });
+
     return tracklets;
   }
 
@@ -194,8 +195,12 @@ export class CenterOfMassTracker {
         };
       });
 
-      const finalizeTracklet = (annotation: DecodedAnnotationObject) => {
-        if (!currentTracklet) return;
+      const finalizeTracklet = (
+        annotation: DecodedAnnotationObject,
+      ):
+        | { success: false; trackletId: undefined }
+        | { success: true; trackletId: string } => {
+        if (!currentTracklet) return { success: false, trackletId: undefined };
         nextTimepoint = i + 1;
 
         currentTracklet.end = annotation.timepoint;
@@ -229,10 +234,14 @@ export class CenterOfMassTracker {
               }
             });
           }
+          currentTracklet = undefined;
+          return { success: false, trackletId: undefined };
         } else {
           tracks[currentTracklet.id] = currentTracklet;
+          const trackletId = currentTracklet.id;
+          currentTracklet = undefined;
+          return { success: true, trackletId };
         }
-        currentTracklet = undefined;
       };
 
       // Process timepoints sequentially
@@ -269,7 +278,7 @@ export class CenterOfMassTracker {
             } else {
               currentTracklet = {
                 id: generateUUID(),
-                name: `Tracklet-${trackNumber++}`,
+                name: "Tracklet-" + trackNumber++,
                 metadataId: this.config.imageMetadataId,
                 start: currentAnnotation.timepoint,
                 linkedIds: [currentAnnotation.id],
@@ -306,6 +315,7 @@ export class CenterOfMassTracker {
           const gapClosingDist = this.config.gapClosingDist ?? 0;
           let nearestNeighbor: NearestNeighborResult | undefined = undefined;
           let nextAnnotations: Record<string, DecodedAnnotationObject> = {};
+
           while (
             gapClosingCounter <= gapClosingDist &&
             nearestNeighbor === undefined &&
@@ -315,7 +325,12 @@ export class CenterOfMassTracker {
             // Create a list of potential linked anns excluding those already in a tracklet or those which will become child tracklets
             nextAnnotations = orderedAnnotations[gapTimepoint];
             const candidateAnns = Object.values(nextAnnotations).filter(
-              (ann) => !ann2TrackId[ann.id] && !(ann.id in initializedChildren),
+              (ann) => {
+                if (ann.id in initializedChildren) return false;
+                if (!this.config.calculateTrackletRelationships)
+                  return !ann2TrackId[ann.id];
+                return true;
+              },
             );
 
             // EARLY EXIT CASE: No potential annotations for linking in next timepoint
@@ -337,53 +352,147 @@ export class CenterOfMassTracker {
             gapClosingCounter++;
           }
 
-          if (nearestNeighbor) {
-            // if there are multiple nearest neighbors:
-            // - create child trackletss if specified,
-            // - otherwise do not add to current tracklet
-            if (nearestNeighbor.targetId.length > 1) {
-              // Handle split/division
-              if (this.config.calculateTrackletRelationships) {
-                // create pre-initialized tracklets for children, will be used when associated annotation is visited
-                let childIndex = 1;
-                for (const id of nearestNeighbor.targetId) {
-                  const childAnn = nextAnnotations[id];
+          if (!nearestNeighbor) {
+            finalizeTracklet(currentAnnotation);
+            continue;
+          }
 
-                  // create child tracklet
-                  const childTracklet = {
-                    id: generateUUID(),
-                    name: currentTracklet.name + `.${childIndex}`,
-                    metadataId: this.config.imageMetadataId,
-                    start: childAnn.timepoint,
-                    linkedIds: [id],
-                    parents: [currentTracklet.id],
-                    color: getRestrictedRandomHexColor({
-                      similarity: { baseColor: "#FBB904", minDifference: 20 },
-                    }),
-                  };
-                  initializedChildren[id] = childTracklet;
+          // CASE: Only a single nearest neighbor found
+          // DECISION: Determine if nearest neighbor is tracked or untracked
+          if (nearestNeighbor.targetId.length === 1) {
+            const nn = nearestNeighbor.targetId[0];
 
-                  //update current tracklets children array
-                  if (currentTracklet.children) {
-                    currentTracklet.children.push(childTracklet.id);
+            // CASE: nearest neighbor belongs to another track
+            // DECISION: ensure current track is valid through finilization
+            if (ann2TrackId[nn]) {
+              const result = finalizeTracklet(currentAnnotation);
+
+              // CASE: current tracklet id valid (exists and spans multiple timpoints, or we consider single timepoint tracks)
+              // DECISION: process merge
+              if (result.success === true) {
+                // Prepare variables
+
+                const finalizedTracklet = tracks[result.trackletId];
+                const conflictingTracklet = tracks[ann2TrackId[nn]];
+                const mergeAnnotation = annotations[nn];
+
+                const mergeTracklet: Tracklet = {
+                  id: generateUUID(),
+                  name: "Tracklet-" + trackNumber++,
+                  metadataId: this.config.imageMetadataId,
+                  start: mergeAnnotation.timepoint,
+                  end: conflictingTracklet.end!,
+                  linkedIds: [],
+                  children: [],
+                  parents: [],
+                  color: getRestrictedRandomHexColor({
+                    similarity: { baseColor: "#FBB904", minDifference: 20 },
+                  }),
+                };
+
+                // update linkedIds of conflicting and merged tracklets
+                const conflictingTrackletNewLinkedIds: string[] = [];
+                conflictingTracklet.linkedIds.forEach((id) => {
+                  if (annotations[id].timepoint >= mergeAnnotation.timepoint) {
+                    mergeTracklet.linkedIds.push(id);
                   } else {
-                    currentTracklet.children = [childTracklet.id];
+                    conflictingTrackletNewLinkedIds.push(id);
                   }
-                  childIndex++;
-                }
+                });
+                conflictingTracklet.linkedIds = conflictingTrackletNewLinkedIds;
+                mergeTracklet.linkedIds.forEach((id) => {
+                  ann2TrackId[id] = mergeTracklet.id;
+                });
+
+                // update children
+                mergeTracklet.children = conflictingTracklet.children;
+                finalizedTracklet.children = [mergeTracklet.id];
+                conflictingTracklet.children = [mergeTracklet.id];
+
+                //update merge tracklet parents
+                mergeTracklet.parents = [
+                  finalizedTracklet.id,
+                  conflictingTracklet.id,
+                ];
+
+                // update conflicting tracklet end property
+                conflictingTracklet.end = finalizedTracklet.end;
+
+                // add merged tracklet to tracklet record
+                tracks[mergeTracklet.id] = mergeTracklet;
               }
-            } else {
-              // Add annotation to be visited on next iteration
-              timepointAnnotations.push(
-                nextAnnotations[nearestNeighbor.targetId[0]],
-              );
+
+              // start next tracklet
+              continue;
+            }
+
+            // CASE: nearest neighbor does not belong to a tracklet
+            // DECISION: add annotation to current tracklet and continue building current tracklet
+            timepointAnnotations.push(
+              nextAnnotations[nearestNeighbor.targetId[0]],
+            );
+            nextTimepoint++;
+
+            continue;
+          }
+
+          // CASE: multiple nearest neighbors found
+          // DECISION: identify which are untracked and perform split if necessary
+          if (nearestNeighbor.targetId.length > 1) {
+            // find all of the untracked nearest neighbors
+            const untrackedNNs = nearestNeighbor.targetId.filter(
+              (id) => !ann2TrackId[id],
+            );
+
+            // CASE: every nearest neighbor belongs to a track
+            // DECISION: finalize current track, dont calculate lineages
+            if (untrackedNNs.length === 0) {
+              finalizeTracklet(currentAnnotation);
+              continue;
+            }
+
+            // CASE: single untracked nearest neighbor and 1 or more tracked nearest neighbors
+            // DECISION: add single nearest neighbor to current track and continue building current tracklet
+            if (untrackedNNs.length === 1) {
+              timepointAnnotations.push(nextAnnotations[untrackedNNs[0]]);
               nextTimepoint++;
               continue;
             }
-          }
 
-          // EXIT CASE: 0 NNs or 2+ NNs without child creation
-          finalizeTracklet(currentAnnotation);
+            // CASE: multiple untracked nearest neigbors and 0 or more tracked nearest neighbors
+            // DECISION: process split/division using only the untracked nearest neighbors
+            if (this.config.calculateTrackletRelationships) {
+              // create pre-initialized tracklets for children, will be used when associated annotation is visited
+              let childIndex = 1;
+              for (const id of untrackedNNs) {
+                const childAnn = nextAnnotations[id];
+
+                // create child tracklet
+                const childTracklet = {
+                  id: generateUUID(),
+                  name: currentTracklet.name + `.${childIndex}`,
+                  metadataId: this.config.imageMetadataId,
+                  start: childAnn.timepoint,
+                  linkedIds: [id],
+                  parents: [currentTracklet.id],
+                  color: getRestrictedRandomHexColor({
+                    similarity: { baseColor: "#FBB904", minDifference: 20 },
+                  }),
+                };
+                initializedChildren[id] = childTracklet;
+
+                //update current tracklets children array
+                if (currentTracklet.children) {
+                  currentTracklet.children.push(childTracklet.id);
+                } else {
+                  currentTracklet.children = [childTracklet.id];
+                }
+                childIndex++;
+              }
+            }
+            finalizeTracklet(currentAnnotation);
+            continue;
+          }
         }
 
         i++;

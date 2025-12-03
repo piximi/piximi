@@ -163,7 +163,25 @@ export function TrackVisualizer({
         toggleSelectedTrack(trackId);
         return;
       }
-      if (["join", "create", "remove"].includes(managementSession.mode)) {
+      // if (["join", "create", "remove"].includes(managementSession.mode)) {
+      //   if (!managementSession.primaryTracklet) {
+      //     dispatch(
+      //       trackEditingSlice.actions.setPrimaryManagementTracklet(
+      //         tracks.find((track) => track.id === trackId)!,
+      //       ),
+      //     );
+      //     toggleSelectedTrack(trackId);
+      //     return;
+      //   } else if (trackId === managementSession.primaryTracklet.id) {
+      //     dispatch(
+      //       trackEditingSlice.actions.setPrimaryManagementTracklet(undefined),
+      //     );
+      //     toggleSelectedTrack(trackId);
+      //     return;
+      //   }
+      // }
+
+      const handlePrimarySelection = () => {
         if (!managementSession.primaryTracklet) {
           dispatch(
             trackEditingSlice.actions.setPrimaryManagementTracklet(
@@ -171,46 +189,53 @@ export function TrackVisualizer({
             ),
           );
           toggleSelectedTrack(trackId);
-          return;
+          return true;
         } else if (trackId === managementSession.primaryTracklet.id) {
           dispatch(
             trackEditingSlice.actions.setPrimaryManagementTracklet(undefined),
           );
           toggleSelectedTrack(trackId);
-          return;
+          return true;
         }
-      }
+        return false;
+      };
 
       switch (managementSession.mode) {
         case "create":
-          dispatch(
-            dataSlice.actions.createTrackletRelationship({
-              trackletId1: managementSession.primaryTracklet!.id,
-              trackletId2: trackId,
-            }),
-          );
+          if (!handlePrimarySelection())
+            dispatch(
+              dataSlice.actions.createTrackletRelationship({
+                trackletId1: managementSession.primaryTracklet!.id,
+                trackletId2: trackId,
+              }),
+            );
           break;
         case "remove":
-          dispatch(
-            dataSlice.actions.removeTrackletRelationship({
-              trackletId1: managementSession.primaryTracklet!.id,
-              trackletId2: trackId,
-            }),
-          );
+          if (!handlePrimarySelection())
+            dispatch(
+              dataSlice.actions.removeTrackletRelationship({
+                trackletId1: managementSession.primaryTracklet!.id,
+                trackletId2: trackId,
+              }),
+            );
           break;
         case "join":
-          batch(() => {
+          if (!handlePrimarySelection()) {
             toggleSelectedTrack(managementSession.primaryTracklet!.id);
-            dispatch(
-              dataSlice.actions.joinTracklets([
-                managementSession.primaryTracklet!.id,
-                trackId,
-              ]),
-            );
-            dispatch(
-              trackEditingSlice.actions.setPrimaryManagementTracklet(undefined),
-            );
-          });
+            batch(() => {
+              dispatch(
+                dataSlice.actions.joinTracklets({
+                  primaryTracklet: managementSession.primaryTracklet!.id,
+                  joinedTracklet: trackId,
+                }),
+              );
+              dispatch(
+                trackEditingSlice.actions.setPrimaryManagementTracklet(
+                  undefined,
+                ),
+              );
+            });
+          }
           break;
         default:
           break;

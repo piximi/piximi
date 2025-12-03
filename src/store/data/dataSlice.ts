@@ -383,8 +383,18 @@ export const dataSlice = createSlice({
         removeTrackletRelationship(state, parentId, childId),
       );
     },
-    joinTracklets: (state, action: PayloadAction<string[]>) => {
-      joinTrackletsCascade(state, action.payload);
+    joinTracklets: (
+      state,
+      action: PayloadAction<{
+        primaryTracklet: string;
+        joinedTracklet: string;
+      }>,
+    ) => {
+      joinTrackletsCascade(
+        state,
+        action.payload.primaryTracklet,
+        action.payload.joinedTracklet,
+      );
     },
     severTracklet: (
       state,
