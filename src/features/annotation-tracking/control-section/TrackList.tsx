@@ -222,6 +222,7 @@ export const TrackList = () => {
           bgcolor: theme.palette.background.paper,
           borderRadius: 1,
           border: `1px solid ${theme.palette.divider}`,
+          minHeight: "200px",
         })}
       >
         <TransitionGroup>
