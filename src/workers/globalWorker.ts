@@ -1,5 +1,4 @@
 import { tidy, tensor2d, Tensor1D } from "@tensorflow/tfjs";
-import { expose } from "comlink";
 
 import * as Comlink from "comlink";
 
@@ -12,7 +11,7 @@ import {
 
 import { MeasurementsData } from "store/measurements/types";
 import { tensor4d } from "@tensorflow/tfjs";
-import { prepareThingData } from "../utils";
+import { prepareThingData } from "../views/MeasurementView/utils";
 import { ThingData } from "store/measurements/types";
 import { DataArray } from "store/data/types";
 
@@ -27,7 +26,7 @@ const measurementWorker = {
       activeMeasurements: string[];
       thingIds: string[];
     },
-    onProgress: (progress: number) => void
+    onProgress: (progress: number) => void,
   ) {
     // const { currentMeasurements, activeMeasurements, thingIds } = e.data;
     const newMeasurements: Record<string, Record<string, number>> = {};
@@ -59,11 +58,11 @@ const measurementWorker = {
 
             const result = getIntensityMeasurement(
               measuredChannel,
-              measurementName
+              measurementName,
             );
             if (result === undefined)
               throw new Error(
-                `Error calculating ${measurementName} on channel ${channel}`
+                `Error calculating ${measurementName} on channel ${channel}`,
               );
             if (thingId in newMeasurements) {
               newMeasurements[thingId][measurement] = result;
@@ -110,7 +109,7 @@ const measurementWorker = {
             } else {
               const result = getPerimeterFromMask(
                 currentMeasurements[thingId].maskData!,
-                currentMeasurements[thingId].maskShape!
+                currentMeasurements[thingId].maskShape!,
               );
               if (result === undefined)
                 throw new Error(`Error calculating area `);
@@ -182,7 +181,7 @@ const measurementWorker = {
               return;
             } else {
               const result = getEQPC(
-                currentMeasurements[thingId].channelData![0].length
+                currentMeasurements[thingId].channelData![0].length,
               );
 
               if (result === undefined)
@@ -207,7 +206,7 @@ const measurementWorker = {
             } else {
               const per = getPerimeterFromMask(
                 currentMeasurements[thingId].maskData!,
-                currentMeasurements[thingId].maskShape!
+                currentMeasurements[thingId].maskShape!,
               );
 
               const result = per / Math.PI;
@@ -235,7 +234,7 @@ const measurementWorker = {
               const result = getObjectFormFactor(
                 currentMeasurements[thingId].channelData![0].length,
                 currentMeasurements[thingId].maskData!,
-                currentMeasurements[thingId].maskShape!
+                currentMeasurements[thingId].maskShape!,
               );
               if (result === undefined)
                 throw new Error(`Error calculating area `);
@@ -260,7 +259,7 @@ const measurementWorker = {
               const formFactor = getObjectFormFactor(
                 currentMeasurements[thingId].channelData![0].length,
                 currentMeasurements[thingId].maskData!,
-                currentMeasurements[thingId].maskShape!
+                currentMeasurements[thingId].maskShape!,
               );
 
               const result = 1 / formFactor;
@@ -291,7 +290,7 @@ const measurementWorker = {
       encodedMask?: number[];
       decodedMask?: DataArray;
     }[],
-    onProgress: (value: number) => void
+    onProgress: (value: number) => void,
   ): Promise<{ kind: string; data: ThingData }> {
     const thingInfo: ThingData = {};
     const thingCount = things.length;

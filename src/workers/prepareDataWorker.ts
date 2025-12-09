@@ -1,6 +1,6 @@
 import { tensor4d } from "@tensorflow/tfjs";
 
-import { prepareThingData } from "../utils";
+import { prepareThingData } from "../views/MeasurementView/utils";
 
 import { ThingData } from "store/measurements/types";
 import { DataArray } from "store/data/types";
@@ -16,7 +16,7 @@ const workerAPI = {
       encodedMask?: number[];
       decodedMask?: DataArray;
     }[],
-    onProgress: (value: number) => void
+    onProgress: (value: number) => void,
   ): Promise<{ kind: string; data: ThingData }> {
     const thingInfo: ThingData = {};
     const thingCount = things.length;
