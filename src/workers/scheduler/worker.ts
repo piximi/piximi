@@ -1,5 +1,5 @@
 // src/workers/scheduler/worker.ts
-import { tidy, Tensor1D, tensor1d, tensor4d } from "@tensorflow/tfjs";
+import { Tensor1D, tensor1d, tensor4d } from "@tensorflow/tfjs";
 import * as Comlink from "comlink";
 
 import {
@@ -215,9 +215,7 @@ const workerAPI: WorkerAPI = {
       );
       if (!existingChannel || !existingChannel.channelData) continue;
 
-      const channelTensor = tidy(() => {
-        return tensor1d(existingChannel.channelData!) as Tensor1D;
-      });
+      const channelTensor = tensor1d(existingChannel.channelData!) as Tensor1D;
 
       const measurementResults: ChannelStatistics = {
         channelId: channelInfo.channelId,
@@ -231,6 +229,7 @@ const workerAPI: WorkerAPI = {
         }
       }
 
+      channelTensor.dispose();
       newMeasurements.push(measurementResults);
     }
 
