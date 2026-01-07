@@ -108,11 +108,49 @@ export class WorkerScheduler {
     this.notifyProgressListeners();
 
     // Initialize pool if needed and process queue
-    this.ensurePoolInitialized().then(() => {
+    // Only set up the initialization chain once to avoid race condition
+    if (!this.initialized) {
+      if (!this.initPromise) {
+        this.initPromise = this.initPool().then(() => {
+          this.processQueue();
+        });
+      }
+      // Additional dispatches don't call processQueue again during init
+    } else {
       this.processQueue();
-    });
+    }
 
-    const getStatus = () => this.getTaskStatus(taskId) ?? TaskStatus.PENDING;
+    // Track terminal status for when task is cleaned up from taskStatuses
+    let terminalStatus: TaskStatus | null = null;
+
+    // Capture terminal status when promise settles
+    promise
+      .then(() => {
+        terminalStatus = TaskStatus.COMPLETED;
+      })
+      .catch((error) => {
+        // Check if it was cancelled based on error type
+        if (error instanceof DOMException && error.name === "AbortError") {
+          terminalStatus = TaskStatus.CANCELLED;
+        } else {
+          terminalStatus = TaskStatus.FAILED;
+        }
+      });
+
+    const getStatus = () => {
+      const currentStatus = this.getTaskStatus(taskId);
+      // If task is still tracked, return its status
+      if (currentStatus !== undefined) {
+        return currentStatus;
+      }
+      // If task was cleaned up, return cached terminal status
+      if (terminalStatus !== null) {
+        return terminalStatus;
+      }
+      // Fallback (should not happen in normal flow)
+      return TaskStatus.PENDING;
+    };
+
     const handle: TaskHandle<TResult> = {
       id: taskId,
       get status() {
@@ -171,6 +209,7 @@ export class WorkerScheduler {
       this.activeTasks.delete(taskId);
       this.abortControllers.delete(taskId);
       this.taskProgress.delete(taskId);
+      this.taskStatuses.delete(taskId);
 
       this.notifyProgressListeners();
     }
@@ -243,17 +282,6 @@ export class WorkerScheduler {
 
   private generateTaskId(): string {
     return `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-  }
-
-  private async ensurePoolInitialized(): Promise<void> {
-    if (this.initialized || this.isShutdown) return;
-
-    if (this.initPromise) {
-      return this.initPromise;
-    }
-
-    this.initPromise = this.initPool();
-    await this.initPromise;
   }
 
   private async initPool(): Promise<void> {
@@ -408,6 +436,7 @@ export class WorkerScheduler {
       this.activeTasks.delete(task.id);
       this.abortControllers.delete(task.id);
       this.taskProgress.delete(task.id);
+      this.taskStatuses.delete(task.id);
     } catch (error) {
       this.handleTaskError(task, error);
     } finally {
@@ -438,6 +467,7 @@ export class WorkerScheduler {
     this.activeTasks.delete(task.id);
     this.abortControllers.delete(task.id);
     this.taskProgress.delete(task.id);
+    this.taskStatuses.delete(task.id);
   }
 
   private releaseWorker(workerIndex: number): void {
