@@ -1,6 +1,7 @@
 // src/contexts/SchedulerProvider.test.tsx
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import React, { useEffect } from "react";
+import ReactDOM from "react-dom";
 
 import {
   SchedulerProvider,
@@ -68,7 +69,6 @@ function renderToDOM(element: React.ReactElement): {
   document.body.appendChild(container);
 
   // Use React 17 render API
-  const ReactDOM = require("react-dom");
   ReactDOM.render(element, container);
 
   return {

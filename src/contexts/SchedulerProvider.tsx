@@ -1,5 +1,11 @@
 // src/contexts/SchedulerProvider.tsx
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { WorkerScheduler, AggregateProgress } from "../workers/scheduler";
 
