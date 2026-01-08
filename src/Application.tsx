@@ -7,7 +7,7 @@ import { usePreferredMuiTheme } from "hooks";
 
 import { ProjectViewer } from "views/ProjectViewer";
 import { ImageViewer } from "views/ImageViewer";
-//import { MeasurementView } from "views/MeasurementView";
+import { MeasurementView } from "views/MeasurementView";
 import { WelcomeScreen } from "./views/WelcomeScreen";
 
 import { FileUploadProvider, HelpProvider } from "contexts";
@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import { selectAlertState } from "store/applicationSettings/selectors";
 import { AlertBar } from "components/ui";
 import { WorkerProvider } from "contexts/WorkerProvider";
+import { SchedulerProvider } from "contexts/SchedulerProvider";
 import { AppErrorBoundary } from "components/errors/AppErrorBoundary";
 
 export const Application = () => {
@@ -27,22 +28,27 @@ export const Application = () => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AppErrorBoundary>
-          <WorkerProvider>
-            <FileUploadProvider>
-              <HelpProvider>
-                <HelpOverlay />
-                {alertState.visible && <AlertBar alertState={alertState} />}
-                <BrowserRouter basename={"/"}>
-                  <Routes>
-                    <Route path="/" element={<WelcomeScreen />} />
-                    <Route path="project" element={<ProjectViewer />} />
-                    <Route path="imageviewer" element={<ImageViewer />} />
-                    {/*<Route path="measurements" element={<MeasurementView />} /> */}
-                  </Routes>
-                </BrowserRouter>
-              </HelpProvider>
-            </FileUploadProvider>
-          </WorkerProvider>
+          <SchedulerProvider>
+            <WorkerProvider>
+              <FileUploadProvider>
+                <HelpProvider>
+                  <HelpOverlay />
+                  {alertState.visible && <AlertBar alertState={alertState} />}
+                  <BrowserRouter basename={"/"}>
+                    <Routes>
+                      <Route path="/" element={<WelcomeScreen />} />
+                      <Route path="project" element={<ProjectViewer />} />
+                      <Route path="imageviewer" element={<ImageViewer />} />
+                      <Route
+                        path="measurements"
+                        element={<MeasurementView />}
+                      />
+                    </Routes>
+                  </BrowserRouter>
+                </HelpProvider>
+              </FileUploadProvider>
+            </WorkerProvider>
+          </SchedulerProvider>
         </AppErrorBoundary>
       </ThemeProvider>
     </StyledEngineProvider>
