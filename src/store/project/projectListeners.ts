@@ -9,7 +9,7 @@ import classifierHandler from "utils/models/classification/classifierHandler";
 import { TypedAppStartListening } from "store/types";
 import { segmenterSlice } from "store/segmenter";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { measurementsSlice } from "store/measurements";
+import { measurementsSlice } from "views/MeasurementView2/state/redux/measurementsSlice";
 
 export const projectMiddleware = createListenerMiddleware();
 const startAppListening =
