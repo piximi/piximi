@@ -11,7 +11,7 @@ export const SelectionTree = ({
 }: {
   treeItems: TreeData;
   selectedItems: string[];
-  handleSelect: (event: React.SyntheticEvent, itemIds: string[]) => void;
+  handleSelect: (event: React.SyntheticEvent | null, itemIds: string[]) => void;
   checkboxSize?: "small" | "medium";
 }) => {
   const renderTree = (items: TreeData, initId?: string) => {

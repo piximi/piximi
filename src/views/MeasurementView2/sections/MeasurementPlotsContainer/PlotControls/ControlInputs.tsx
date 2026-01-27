@@ -1,0 +1,523 @@
+import {
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+} from "react";
+import { useDispatch, useSelector } from "react-redux";
+import type { ColorSchemeId } from "@nivo/colors";
+import {
+  Box,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  InputLabel,
+  ListSubheader,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Tooltip,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import { HelpOutlineOutlined as HelpOutlineOutlinedIcon } from "@mui/icons-material";
+
+import { useNumberField } from "hooks";
+
+import { TextFieldWithBlur } from "components/inputs";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { measurementsSlice } from "views/MeasurementView2/state/redux/measurementsSlice";
+import {
+  selectActiveMeasurementGroup,
+  selectActiveSelectedPlot,
+} from "views/MeasurementView2/state/redux/selectors";
+import { ChartConfig, ChartType, PlotDetail, SplitType } from "../../../types";
+
+import { HTMLDataAttributes, KeysWithValuesOfType } from "utils/types";
+import { capitalize } from "utils/stringUtils";
+
+import { nivoColorSpaces } from "themes/nivoTheme";
+
+const splitTypes = ["partition", "category"];
+
+export const ColorThemeSelect = ({
+  selectedPlot,
+}: {
+  selectedPlot: PlotDetail;
+}) => {
+  const dispatch = useDispatch();
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    dispatch(
+      measurementsSlice.actions.updateActiveSelectedPlot({
+        plotId: selectedPlot.id,
+        newConfig: { colorTheme: event.target.value as ColorSchemeId },
+      }),
+    );
+  };
+
+  const selectOptions = useMemo(
+    () =>
+      Object.values(nivoColorSpaces).reduce(
+        (elementArray: ReactElement[], space) => {
+          elementArray.push(
+            <ListSubheader key={`color-space-${space.name}`}>
+              {space.name}
+            </ListSubheader>,
+          );
+          Object.values(space.themes).forEach((theme) => {
+            elementArray.push(
+              <MenuItem key={`color-theme-${theme.name}`} value={theme.name}>
+                {theme.name}
+                {theme.sample.map((color, idx) => {
+                  return (
+                    <span
+                      key={`${theme.name}-span-${idx}`}
+                      style={{
+                        display: "inline-block",
+                        background: color,
+                        width: "18px",
+                        height: "18px",
+                      }}
+                    ></span>
+                  );
+                })}
+              </MenuItem>,
+            );
+          });
+          return elementArray;
+        },
+        [],
+      ),
+    [],
+  );
+
+  const defaultValue = useMemo(() => "Select color theme", []);
+
+  const inputValue = useMemo(
+    () => selectedPlot.chartConfig.colorTheme ?? "",
+    [selectedPlot.chartConfig],
+  );
+
+  const renderValue = useCallback((value: string) => {
+    return value;
+  }, []);
+
+  return (
+    <ChartControlSelect
+      data-help={HelpItem.MeasurementPlotColorMap}
+      label="Color Theme"
+      id="color-theme-select"
+      defaultValue={defaultValue}
+      inputValue={inputValue}
+      handleChange={handleChange}
+      renderValue={renderValue}
+      selectOptions={selectOptions}
+    />
+  );
+};
+
+export const PlotSelect = ({ selectedPlot }: { selectedPlot: PlotDetail }) => {
+  const dispatch = useDispatch();
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    dispatch(
+      measurementsSlice.actions.updateActiveSelectedPlot({
+        plotId: selectedPlot.id,
+        newConfig: { chart: event.target.value as ChartType },
+      }),
+    );
+  };
+
+  const selectOptions = useMemo(
+    () =>
+      Object.keys(ChartType).map((option) => {
+        return (
+          <MenuItem key={option} dense value={option}>
+            {option}
+          </MenuItem>
+        );
+      }),
+    [],
+  );
+
+  const defaultValue = useMemo(() => "Select plot type", []);
+
+  const inputValue = useMemo(
+    () => selectedPlot.chartConfig.chart ?? "",
+    [selectedPlot.chartConfig],
+  );
+  const renderValue = useCallback(
+    (value: string) => {
+      if (value === "") {
+        return defaultValue;
+      } else {
+        return value;
+      }
+    },
+    [defaultValue],
+  );
+
+  return (
+    <ChartControlSelect
+      data-help={HelpItem.MeasurementPlotType}
+      label="plot"
+      id="plot-select"
+      defaultValue={defaultValue}
+      inputValue={inputValue}
+      handleChange={handleChange}
+      renderValue={renderValue}
+      selectOptions={selectOptions}
+    />
+  );
+};
+
+export const ChartMeasurementSelect = ({
+  type,
+  nullable,
+}: {
+  type: KeysWithValuesOfType<ChartConfig, string>;
+  nullable?: boolean;
+}) => {
+  const selectedPlot = useSelector(selectActiveSelectedPlot);
+  const activeGroup = useSelector(selectActiveMeasurementGroup);
+  const dispatch = useDispatch();
+  if (!selectedPlot) return <></>;
+  const measurementOptions = useMemo(() => {
+    if (!activeGroup) return [];
+    return [
+      ...activeGroup.intensityMeasurements,
+      ...activeGroup.computedMeasurements,
+    ];
+  }, [activeGroup]);
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    console.log(type, event.target.value);
+    dispatch(
+      measurementsSlice.actions.updateActiveSelectedPlot({
+        plotId: selectedPlot.id,
+        newConfig: {
+          [type]:
+            event.target.value === "None" ? undefined : event.target.value,
+        },
+      }),
+    );
+  };
+
+  const helpType = useMemo(() => {
+    switch (type) {
+      case "x-axis":
+        return HelpItem.MeasurementPlotXAxis;
+      case "y-axis":
+        return HelpItem.MeasurementPlotYAxis;
+      case "size":
+        return HelpItem.MeasurementPlotSize;
+      default:
+        return undefined;
+    }
+  }, [type]);
+
+  const selectOptions = useMemo(
+    () =>
+      (nullable ? ["None", ...measurementOptions] : measurementOptions).map(
+        (option) => {
+          return (
+            <MenuItem key={option} dense value={option}>
+              {option}
+            </MenuItem>
+          );
+        },
+      ),
+    [measurementOptions, nullable],
+  );
+
+  const defaultValue = useMemo(
+    () => (nullable ? "--" : `Select ${type} measurement`),
+    [nullable, type],
+  );
+
+  const inputValue = useMemo(
+    () => selectedPlot.chartConfig[type] ?? "",
+    [type, selectedPlot.chartConfig],
+  );
+
+  useEffect(() => {
+    console.log(selectedPlot.chartConfig[type]);
+  }, [selectedPlot.chartConfig]);
+  useEffect(() => {
+    console.log(inputValue);
+  }, [inputValue]);
+
+  const renderValue = useCallback(
+    (value: string) => {
+      if (value === "") {
+        return defaultValue;
+      } else {
+        return value;
+      }
+    },
+    [defaultValue],
+  );
+  return (
+    <ChartControlSelect
+      data-help={helpType}
+      label={type}
+      id={`${type}-select`}
+      defaultValue={defaultValue}
+      inputValue={inputValue}
+      handleChange={handleChange}
+      renderValue={renderValue}
+      selectOptions={selectOptions}
+    />
+  );
+};
+
+export const ChartSplitSelect = ({
+  type,
+  nullable,
+}: {
+  type: KeysWithValuesOfType<ChartConfig, SplitType>;
+  nullable?: boolean;
+}) => {
+  const selectedPlot = useSelector(selectActiveSelectedPlot);
+  const dispatch = useDispatch();
+  if (!selectedPlot) return <></>;
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    dispatch(
+      measurementsSlice.actions.updateActiveSelectedPlot({
+        plotId: selectedPlot.id,
+        newConfig: { [type]: event.target.value as SplitType },
+      }),
+    );
+  };
+
+  const selectOptions = useMemo(
+    () =>
+      (nullable ? ["None", ...splitTypes] : splitTypes).map((option) => {
+        return (
+          <MenuItem key={option} dense value={option}>
+            {option}
+          </MenuItem>
+        );
+      }),
+    [nullable],
+  );
+
+  const defaultValue = useMemo(
+    () => (nullable ? "--" : `Select ${type} split`),
+    [nullable, type],
+  );
+
+  const inputValue = useMemo(
+    () => selectedPlot.chartConfig[type] ?? "",
+    [type, selectedPlot.chartConfig],
+  );
+
+  const renderValue = useCallback(
+    (value: string) => {
+      if (value === "") {
+        return defaultValue;
+      } else {
+        return value;
+      }
+    },
+    [defaultValue],
+  );
+
+  return (
+    <ChartControlSelect
+      data-help={HelpItem.MeasurementPlotColor}
+      label={type}
+      id={`${type}-select`}
+      defaultValue={defaultValue}
+      inputValue={inputValue}
+      handleChange={handleChange}
+      renderValue={renderValue}
+      selectOptions={selectOptions}
+    />
+  );
+};
+
+const ChartControlSelect = ({
+  label,
+  id,
+  inputValue,
+  defaultValue,
+  handleChange,
+  selectOptions,
+  renderValue,
+  ...attrs
+}: HTMLDataAttributes & {
+  label: string;
+  id: string;
+  inputValue: string;
+  defaultValue: string;
+  handleChange: (event: SelectChangeEvent<string>) => void;
+  selectOptions: ReactNode;
+  renderValue: (value: string) => string;
+}) => {
+  return (
+    <FormControl fullWidth sx={{ pb: 1, mt: 1 }}>
+      <InputLabel
+        data-help={attrs["data-help"]}
+        variant="standard"
+        htmlFor={id}
+        sx={(theme) => ({
+          "& .MuiInputLabel-root": {
+            fontSize: theme.typography.body2,
+          },
+        })}
+        size="small"
+        shrink={defaultValue || inputValue ? true : false}
+      >
+        {capitalize(label)}
+      </InputLabel>
+      <Select
+        id={id}
+        value={inputValue}
+        displayEmpty={defaultValue ? true : false}
+        size="small"
+        variant="standard"
+        onChange={handleChange}
+        renderValue={renderValue}
+        sx={(theme) => ({
+          fontSize: theme.typography.body2,
+        })}
+      >
+        {selectOptions}
+      </Select>
+    </FormControl>
+  );
+};
+
+export const SwarmStatisticsCheckbox = () => {
+  const selectedPlot = useSelector(selectActiveSelectedPlot);
+  const dispatch = useDispatch();
+  if (!selectedPlot) return <></>;
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(
+      measurementsSlice.actions.updateActiveSelectedPlot({
+        plotId: selectedPlot.id,
+        newConfig: { swarmStatistics: event.target.checked },
+      }),
+    );
+  };
+
+  return (
+    <FormControlLabel
+      control={
+        <Checkbox
+          size="small"
+          checked={selectedPlot.chartConfig.swarmStatistics}
+          onChange={handleChange}
+        />
+      }
+      label={
+        <Box display="flex" flexDirection="row" alignContent="center">
+          <Typography variant="body2">Show Statistics</Typography>
+          <Tooltip
+            title={<BoxPlotHelpTooltip />}
+            placement="top"
+            disableInteractive
+          >
+            <HelpOutlineOutlinedIcon
+              sx={(theme) => ({ fontSize: theme.typography.body2, ml: 1 })}
+            />
+          </Tooltip>
+        </Box>
+      }
+    />
+  );
+};
+
+export const HistogramBinTextField = () => {
+  const selectedPlot = useSelector(selectActiveSelectedPlot);
+  const dispatch = useDispatch();
+  if (!selectedPlot) return <></>;
+
+  const {
+    inputValue: numBins,
+    inputString: numBinsDisplay,
+    setLastValidInput: setLastValidNumBins,
+    resetInputValue: resetNumBins,
+    handleOnChangeValidation: handleNumBinsChange,
+    error: numBinsError,
+  } = useNumberField(selectedPlot.chartConfig.numBins!);
+
+  const handleSubmit = (numBins: number) => {
+    if (numBinsError.error) {
+      resetNumBins();
+      return;
+    }
+    if (numBins === selectedPlot.chartConfig.numBins) return;
+    setLastValidNumBins(numBins);
+    dispatch(
+      measurementsSlice.actions.updateActiveSelectedPlot({
+        plotId: selectedPlot.id,
+        newConfig: { numBins },
+      }),
+    );
+  };
+
+  return (
+    <TextFieldWithBlur
+      id="bin-size-text-field"
+      label="Number of Bins"
+      value={numBinsDisplay}
+      onChange={handleNumBinsChange}
+      onBlur={() => handleSubmit(numBins)}
+      size="small"
+      variant="standard"
+      fullWidth
+      sx={{ pb: 1, mt: 1 }}
+    />
+  );
+};
+
+const BoxPlotHelpTooltip = () => {
+  const muiTheme = useTheme();
+
+  const helpTextColor = useMemo(
+    () => muiTheme.palette.getContrastText(muiTheme.palette.background.paper),
+    [muiTheme],
+  );
+  return (
+    <svg
+      width="200"
+      height="200"
+      viewBox="0 0 200 200"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Box and Median Line */}
+      <rect
+        width="80"
+        height="100"
+        x="25"
+        y="50"
+        fill="#02aec560"
+        stroke="#00acc3"
+        rx="8"
+      />
+      <line x1="25" y1="100" x2="105" y2="100" stroke="#00acc3" />
+      <text x="115" y="55" fontSize="10" fill={helpTextColor}>
+        Upper Quartile
+      </text>
+      <text x="115" y="105" fontSize="10" fill={helpTextColor}>
+        Median
+      </text>
+      <text x="115" y="150" fontSize="10" fill={helpTextColor}>
+        Lower Quartile
+      </text>
+      {/* Max */}
+      <line x1="65" y1="25" x2="65" y2="50" stroke="#00acc3" />
+      <line x1="25" y1="25" x2="105" y2="25" stroke="#00acc3" />
+      <text x="115" y="30" fontSize="10" fill={helpTextColor}>
+        Max
+      </text>
+      {/* Min */}
+      <line x1="65" y1="150" x2="65" y2="175" stroke="#00acc3" />
+      <line x1="25" y1="175" x2="105" y2="175" stroke="#00acc3" />
+      <text x="115" y="180" fontSize="10" fill={helpTextColor}>
+        Min
+      </text>
+    </svg>
+  );
+};

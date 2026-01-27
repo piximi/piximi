@@ -1,5 +1,5 @@
 import { WritableDraft } from "immer";
-import { ImageData } from "../types";
+import { ImageObject } from "../types";
 import {
   deleteImageCascade,
   updateImageCascade,
@@ -17,7 +17,7 @@ export const updateImageDataBatch = (
   state: WritableDraft<DataState>,
   batchChanges: {
     id: string;
-    changes: Partial<Pick<ImageData, "partition" | "categoryId" | "colors">>;
+    changes: Partial<Pick<ImageObject, "partition" | "categoryId" | "colors">>;
   }[],
 ) => {
   batchChanges.forEach(({ id, changes }) => {

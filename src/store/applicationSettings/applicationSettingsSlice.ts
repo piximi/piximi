@@ -26,7 +26,7 @@ const initialState: AppSettingsState = {
 };
 
 export const applicationSettingsSlice = createSlice({
-  name: "application",
+  name: "applicationSettings",
   initialState: initialState,
   reducers: {
     initialized(state: AppSettingsState) {

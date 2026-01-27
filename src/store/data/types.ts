@@ -9,7 +9,35 @@ export type DataArray = IJSDataArray;
 
 export type TPKey = string;
 
-export type ImageData = {
+export type ChannelMeasurements = {
+  total?: number;
+  min?: number;
+  max?: number;
+  mean?: number;
+  median?: number;
+  std?: number;
+  mad?: number;
+  lowerQuartile?: number;
+  upperQuartile?: number;
+};
+
+export type ChannelData = {
+  channelId: string;
+  channelData?: number[];
+  histogram?: number[]; // 256 bins for 8-bit, etc.
+} & ChannelMeasurements;
+
+export type ChannelStatistics = { channels: ChannelData[] };
+
+export type ComputedImageMeasurements = {
+  // Computed features
+  entropy?: number;
+  contrast?: number;
+  snr?: number; // Signal-to-noise ratio
+};
+export type ImageMeasurements = ComputedImageMeasurements & ChannelStatistics;
+
+export type ImageObject = {
   id: string;
   name: string;
   metadataId: string;
@@ -20,6 +48,7 @@ export type ImageData = {
   activePlane: number;
   partition: Partition;
   timepoint?: number;
+  measurements?: ImageMeasurements;
 };
 
 export type BaseExtractedImageData = {
@@ -42,9 +71,9 @@ export type ImageMetadata = {
 };
 
 export type FullTimepointImage = Omit<ImageMetadata, "timepoints"> &
-  ImageData & { timepoint: TPKey };
+  ImageObject & { timepoint: TPKey };
 
-export type ObjectMeasurements = {
+export type ComputedObjectMeasurements = {
   area?: number;
   perimeter?: number;
   extent?: number;
@@ -54,17 +83,9 @@ export type ObjectMeasurements = {
   sphericity?: number;
   compactness?: number;
   com?: Point;
-  intensity?: {
-    total?: Record<string, number>;
-    mean?: Record<string, number>;
-    std?: Record<string, number>;
-    mad?: Record<string, number>;
-    min?: Record<string, number>;
-    max?: Record<string, number>;
-    lowerQuartile?: Record<string, number>;
-    upperQuartile?: Record<string, number>;
-  };
 };
+
+export type ObjectMeasurements = ComputedObjectMeasurements & ChannelStatistics;
 
 export type AnnotationObject = {
   globalId?: string;
@@ -111,11 +132,12 @@ export type Tracklet = {
 
 export type PendingTracklet = PartialBy<Tracklet, "start" | "end">;
 export type DecodedAnnotationObject = Omit<
-  AnnotationObject & {
-    decodedMask: DataArray;
-  },
-  "encodedMask"
->;
+  AnnotationObject,
+  "decodedMask" | "encodedMask"
+> & {
+  decodedMask: DataArray;
+  encodedMask?: number[];
+};
 export type PartialDecodedAnnotationObject = PartialBy<
   DecodedAnnotationObject,
   "src" | "data" | "name" | "kind" | "bitDepth" | "shape"
@@ -167,7 +189,7 @@ export type ThingsUpdates = Array<
 export type ImageUpdates = Array<
   Partial<Omit<ImageMetadata, "id" | "containing" | "timePoints">> & {
     id: string;
-    timePoints?: Record<TPKey, Partial<ImageData>>;
+    timePoints?: Record<TPKey, Partial<ImageObject>>;
   }
 >;
 

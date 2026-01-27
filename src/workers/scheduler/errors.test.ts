@@ -5,7 +5,11 @@ import { TaskError } from "./types";
 
 describe("createTaskError", () => {
   it("should create error from Error object", () => {
-    const error = createTaskError("task-1", "testType", new Error("Test error"));
+    const error = createTaskError(
+      "task-1",
+      "testType",
+      new Error("Test error"),
+    );
 
     expect(error.taskId).toBe("task-1");
     expect(error.type).toBe("testType");

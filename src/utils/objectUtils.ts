@@ -155,3 +155,8 @@ export const isEnumValue = <E extends Record<string, string | number>>(
  */
 export const excludes = <T extends object>(obj: T, key: PropertyKey): boolean =>
   !(key in obj);
+
+// Estimate payload size (rough approximation)
+export const estimateObjectSize = (obj: any): number => {
+  return new Blob([JSON.stringify(obj)]).size;
+};

@@ -33,7 +33,7 @@ export const deleteAnnotationCascade = (
   annotationsAdapter.removeOne(state.annotations, annId);
 };
 
-export const updateAnnotationCascde = (
+export const updateAnnotationCascade = (
   state: WritableDraft<DataState>,
   annId: string,
   changes: Partial<

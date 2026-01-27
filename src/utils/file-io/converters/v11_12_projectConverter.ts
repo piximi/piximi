@@ -5,10 +5,11 @@ import {
   V11ImageObject,
   V11Project,
 } from "../types";
-import { AnnotationObject, ImageMetadata, ImageData } from "store/data/types";
+import { AnnotationObject, ImageMetadata, ImageObject } from "store/data/types";
 import { generateUUID } from "store/data/utils";
 import { IMAGE_KIND } from "store/data/constants";
 import { ColorsRaw } from "utils/types";
+import { arrayRange } from "utils/arrayUtils";
 
 export const v11_12_projectConverter = (v11Project: V11Project): V12Project => {
   const { things } = v11Project.data;
@@ -17,7 +18,7 @@ export const v11_12_projectConverter = (v11Project: V11Project): V12Project => {
     ids: [],
     entities: {},
   };
-  const currentImageData: EntityState<ImageData, string> = {
+  const currentImageData: EntityState<ImageObject, string> = {
     ids: [],
     entities: {},
   };
@@ -53,7 +54,7 @@ export const v11_12_projectConverter = (v11Project: V11Project): V12Project => {
         visible: colors.visible,
         color: colors.color.arraySync() as [number, number, number][],
       };
-      const imageData: ImageData = {
+      const imageData: ImageObject = {
         id,
         metadataId,
         name,
@@ -118,6 +119,18 @@ export const v11_12_projectConverter = (v11Project: V11Project): V12Project => {
   currentMetadata.ids.forEach((id) => {
     relationships.metadataToTracklets[id] = [];
   });
+  const channels = v11Project.project.imageChannels;
+  if (channels) {
+    const channelNames = arrayRange(channels).reduce(
+      (channelDict: Record<number, { id: number; name: string }>, id) => {
+        channelDict[id] = { id, name: `Channel-${id + 1}` };
+        return channelDict;
+      },
+      {},
+    );
+    v11Project.project.projectChannels = channelNames;
+  }
+
   return {
     project: v11Project.project,
     classifier: v11Project.classifier,

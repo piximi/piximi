@@ -6,9 +6,9 @@ import {
   split as tfsplit,
 } from "@tensorflow/tfjs";
 import { EntityState } from "@reduxjs/toolkit";
+import IJSImage from "image-js";
 import { union } from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import IJSImage from "image-js";
 
 import { DataState } from "store/types";
 import {
@@ -17,7 +17,7 @@ import {
   AnnotationObject,
   Category,
   Kind,
-  ImageData,
+  ImageObject,
   Tracklet,
   PendingTracklet,
 } from "store/data/types";
@@ -27,14 +27,14 @@ import {
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "./constants";
 
-import { RequireField } from "utils/types";
-import { addToSimpleRelationship } from "utils/objectUtils";
 import {
   V12AnnotationObject,
   V12Category,
   V12ImageData,
   V12Kind,
 } from "utils/file-io/types";
+import { RequireField } from "utils/types";
+import { addToSimpleRelationship } from "utils/objectUtils";
 
 export const generateUUID = (options?: { definesUnknown: boolean }) => {
   const id = uuidv4();
@@ -291,7 +291,7 @@ export const extractChannel = (
 };
 
 export const normalizeImageToKindItem = (
-  image: ImageData,
+  image: ImageObject,
   meta: ImageMetadata,
   timeExpanded?: boolean,
 ): GeneralizedKindItem => {
@@ -348,12 +348,12 @@ export const getKindItemsFromAnnotations = (
 };
 
 export const getKindItemsFromImages = (
-  images: Record<string, ImageData>,
+  images: Record<string, ImageObject>,
   metadataRecord: Record<string, ImageMetadata>,
   timeExpanded?: boolean,
 ) => {
   if (!timeExpanded) {
-    const defaultImages: Record<string, ImageData> = {};
+    const defaultImages: Record<string, ImageObject> = {};
     const metaGroupedImages = groupKindItemsBy(
       "metadataId",
       Object.values(images) as GeneralizedKindItem[],
@@ -438,7 +438,7 @@ export const generateDataRelationships = (
 export const freezeState = (dataState: DataState): DataState => {
   const { images, annotations, ...safeCopy } = dataState;
   const copiedImages = Object.values(images.entities).reduce(
-    (cImages: EntityState<ImageData, string>, image) => {
+    (cImages: EntityState<ImageObject, string>, image) => {
       const { data, ...safeCopy } = image;
       const copiedImage = {
         ...structuredClone(safeCopy),

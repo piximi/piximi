@@ -22,7 +22,7 @@ import {
   ImageMetadata,
   Tracklet,
   GeneralizedKindItem,
-  ImageData,
+  ImageObject,
 } from "./data/types";
 import { MeasurementsState } from "./measurements/types";
 import {
@@ -54,7 +54,7 @@ export type DataState = {
   kinds: EntityState<Kind, string>;
   categories: EntityState<Category, string>;
   metadata: EntityState<ImageMetadata, string>;
-  images: EntityState<ImageData, string>;
+  images: EntityState<ImageObject, string>;
   annotations: EntityState<AnnotationObject, string>;
 
   relationships: {
@@ -106,10 +106,11 @@ export type ProjectState = {
     string, // kind
     Required<Pick<FilterType<GeneralizedKindItem>, "categoryId" | "partition">>
   >;
-  activeCtegory: string | undefined;
+  activeCategory: string | undefined;
   activeKind: string;
   kindTabFilters: string[];
   imageChannels: number | undefined;
+  projectChannels: Record<number, { id: number; name: string }>;
 };
 
 type AppState = {

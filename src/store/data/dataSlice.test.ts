@@ -16,7 +16,7 @@ import {
   Kind,
   Category,
   ImageMetadata,
-  ImageData,
+  ImageObject,
   AnnotationObject,
   Tracklet,
 } from "./types";
@@ -73,8 +73,8 @@ const createMockImageMetadata = (overrides = {}): ImageMetadata => ({
 });
 
 const createMockImageData = (
-  overrides: Partial<ImageData> = {},
-): ImageData => ({
+  overrides: Partial<ImageObject> = {},
+): ImageObject => ({
   id: "img1",
   name: "img1",
   metadataId: "meta1",
@@ -1680,30 +1680,24 @@ describe("Data Slice", () => {
           start: 1,
           end: 2,
         });
-        const trackletC = createMockTracklet({
-          id: "trackC",
-          linkedIds: ["ann3"],
-          start: 3,
-          end: 3,
-        });
 
         store.dispatch(dataSlice.actions.addTracklet(trackletA));
         store.dispatch(dataSlice.actions.addTracklet(trackletB));
-        store.dispatch(dataSlice.actions.addTracklet(trackletC));
 
         const initialState = getState().data;
         const initialTrackletIds = Object.keys(initialState.tracklets.entities);
 
         store.dispatch(
-          dataSlice.actions.joinTracklets(["trackA", "trackB", "trackC"]),
+          dataSlice.actions.joinTracklets({
+            primaryTracklet: "trackA",
+            joinedTracklet: "trackB",
+          }),
         );
 
         const state = getState().data;
 
         // Original tracklets should be deleted
-        expect(state.tracklets.entities["trackA"]).toBeUndefined();
         expect(state.tracklets.entities["trackB"]).toBeUndefined();
-        expect(state.tracklets.entities["trackC"]).toBeUndefined();
 
         // Find the new tracklet (should be only one tracklet now)
         const newTrackletId = Object.keys(state.tracklets.entities).find(
@@ -1783,7 +1777,12 @@ describe("Data Slice", () => {
         const initialState = getState().data;
         const initialTrackletIds = Object.keys(initialState.tracklets.entities);
 
-        store.dispatch(dataSlice.actions.joinTracklets(["childA", "childB"]));
+        store.dispatch(
+          dataSlice.actions.joinTracklets({
+            primaryTracklet: "childA",
+            joinedTracklet: "childB",
+          }),
+        );
 
         const state = getState().data;
 
@@ -1863,7 +1862,12 @@ describe("Data Slice", () => {
         const initialState = getState().data;
         const initialTrackletIds = Object.keys(initialState.tracklets.entities);
 
-        store.dispatch(dataSlice.actions.joinTracklets(["parentA", "parentB"]));
+        store.dispatch(
+          dataSlice.actions.joinTracklets({
+            primaryTracklet: "parentA",
+            joinedTracklet: "parentB",
+          }),
+        );
 
         const state = getState().data;
 
@@ -2495,7 +2499,10 @@ describe("Data Slice", () => {
 
         // Join all three tracklets
         store.dispatch(
-          dataSlice.actions.joinTracklets(["trackA", "trackB", "trackC"]),
+          dataSlice.actions.joinTracklets({
+            primaryTracklet: "trackA",
+            joinedTracklet: "trackB",
+          }),
         );
 
         const state = getState().data;

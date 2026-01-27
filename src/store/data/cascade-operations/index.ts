@@ -1,6 +1,6 @@
 export {
   deleteAnnotationCascade,
-  updateAnnotationCascde,
+  updateAnnotationCascade,
 } from "./annotationCascades";
 
 export { addCategoryCascade, deleteCategoryCascade } from "./categoryCascades";

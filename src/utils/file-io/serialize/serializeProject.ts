@@ -24,7 +24,7 @@ import {
   Category,
   AnnotationObject,
   ImageMetadata,
-  ImageData,
+  ImageObject,
 } from "store/data/types";
 import { range } from "lodash";
 import { createColorsTensor } from "utils/tensorUtils";
@@ -129,7 +129,7 @@ const serializeMetadata = async (
 
 const serializeImageData = async (
   imagesGroup: Group,
-  images: Array<ImageData>,
+  images: Array<ImageObject>,
   loadCb: LoadCB,
 ) => {
   const imageNames = images.map((image) => image.name);
@@ -297,7 +297,7 @@ const _serializeProject = async (
     kinds: Array<Kind>;
     categories: Array<Category>;
     metadata: Array<ImageMetadata>;
-    images: Array<ImageData>;
+    images: Array<ImageObject>;
     annotations: Array<AnnotationObject>;
   },
   loadCb: LoadCB,
@@ -514,7 +514,7 @@ export const serializeProject = async (
     kinds: Array<Kind>;
     categories: Array<Category>;
     metadata: Array<ImageMetadata>;
-    images: Array<ImageData>;
+    images: Array<ImageObject>;
     annotations: Array<AnnotationObject>;
   },
   classifierSlice: ClassifierState,

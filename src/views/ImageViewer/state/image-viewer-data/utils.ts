@@ -1,5 +1,5 @@
 import { productionStore } from "store";
-import { ImageMetadata, ImageData } from "store/data/types";
+import { ImageMetadata, ImageObject } from "store/data/types";
 import { RootState } from "store/rootReducer";
 import { groupBy } from "utils/arrayUtils";
 import { createRenderedTensor } from "utils/tensorUtils";
@@ -13,7 +13,7 @@ import { annotatorSlice } from "../annotator";
 
 export const getRenderedSources = async (
   metadata: ImageMetadata,
-  imageData: ImageData[],
+  imageData: ImageObject[],
   activePlane: number,
   activeimageId: string,
   ZTColors: Record<string, { colors: ColorsRaw }> | ColorsRaw,
@@ -72,7 +72,7 @@ export const prepareImageViewerData = async (initialData: {
 
   // If both images and annotations are selected, merge the two lists
   // imageIdsFromAnn is first to ensure that initial active image contains the working annotation, if any
-  const imageData: ImageData[] = [];
+  const imageData: ImageObject[] = [];
   new Set([...imageIdsFromAnn, ...initialImageIds]).forEach((id) =>
     imageData.push(dataState.images.entities[id]),
   );
@@ -86,18 +86,18 @@ export const prepareImageViewerData = async (initialData: {
     const imageMetadata = dataState.metadata.entities[metadataId];
     const activeImage = metadataToSelectedImages[metadataId][0];
 
-    const relatedImageData: ImageData[] = [];
+    const relatedImageData: ImageObject[] = [];
 
     // Gather metadata images and colors
     const activeImageDataSet = imageMetadata.imageDataIds.reduce(
-      (set: Record<string, ImageData>, id) => {
+      (set: Record<string, ImageObject>, id) => {
         set[id] = dataState.images.entities[id];
         return set;
       },
       {},
     );
 
-    let timeSortedImageData: ImageData[] | undefined;
+    let timeSortedImageData: ImageObject[] | undefined;
     // if time series, sort by timepoint before storing
     if (imageMetadata.timeSeries)
       timeSortedImageData = Object.values(activeImageDataSet).sort(

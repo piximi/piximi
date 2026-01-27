@@ -7,7 +7,7 @@ import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { dataSlice } from "./data/dataSlice";
-import { measurementsSlice } from "./measurements/measurementsSlice";
+import { measurementsSlice } from "views/MeasurementView2/state/redux/measurementsSlice";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 import { trackEditingSlice } from "views/ImageViewer/state/tracklet-editing/trackletEditingSlice";
 

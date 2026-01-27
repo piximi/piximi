@@ -32,7 +32,11 @@ export interface TaskHandle<TResult = unknown> {
   promise: Promise<TResult>;
 }
 
-export type TaskErrorCode = "CANCELLED" | "WORKER_ERROR" | "TIMEOUT" | "UNKNOWN";
+export type TaskErrorCode =
+  | "CANCELLED"
+  | "WORKER_ERROR"
+  | "TIMEOUT"
+  | "UNKNOWN";
 
 export interface TaskError {
   taskId: string;

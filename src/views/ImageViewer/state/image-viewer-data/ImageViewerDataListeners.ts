@@ -6,7 +6,7 @@ import { dataSlice } from "store/data";
 import { createRenderedTensor } from "utils/tensorUtils";
 
 import { TypedAppStartListening } from "store/types";
-import { ImageData } from "store/data/types";
+import { ImageObject } from "store/data/types";
 
 import { imageViewerDataSlice } from "./ImageViewerDataSlice";
 import { imageViewerSlice } from "../imageViewer";
@@ -40,7 +40,7 @@ startAppListening({
     const activeImageMetadata = dataState.metadata.entities[activeMetadataId];
     const activeImageDataIds = activeImageMetadata.imageDataIds;
     const activeImageDataSet = activeImageDataIds.reduce(
-      (set: Record<string, ImageData>, id) => {
+      (set: Record<string, ImageObject>, id) => {
         set[id] = dataState.images.entities[id];
         return set;
       },

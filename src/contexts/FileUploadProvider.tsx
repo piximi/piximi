@@ -21,9 +21,11 @@ import {
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
-
 import { dataSlice } from "store/data";
+import { IMAGE_KIND } from "store/data/constants";
 import { selectUnknownImageCategory } from "store/data/selectors";
+import { ImageObject, ImageMetadata } from "store/data/types";
+import { generateUUID, isUnknownCategory } from "store/data/utils";
 import { projectSlice } from "store/project";
 import {
   selectActiveKindId,
@@ -31,17 +33,13 @@ import {
   selectProjectImageChannels,
 } from "store/project/selectors";
 
-import { getUploadedFileTypes } from "utils/file-io/utils";
-import { extractImageFileDetails } from "utils/tensorUtils";
-import { generateUUID, isUnknownCategory } from "store/data/utils";
-
+import { ImageShapeInfo, ImageShapeInfoImage } from "utils/file-io/types";
 import { ImageShapeEnum } from "utils/file-io/enums";
+import { getUploadedFileTypes } from "utils/file-io/utils";
 import { AlertType } from "utils/enums";
 import { Partition } from "utils/models/enums";
-
-import { ImageData, ImageMetadata } from "store/data/types";
-import { ImageShapeInfo, ImageShapeInfoImage } from "utils/file-io/types";
-import { IMAGE_KIND } from "store/data/constants";
+import { arrayRange } from "utils/arrayUtils";
+import { extractImageFileDetails } from "utils/tensorUtils";
 
 const FileUploadContext = createContext<
   | ((
@@ -82,7 +80,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
 
       const generatedMetadataObjects: {
         metadata: ImageMetadata;
-        images: ImageData[];
+        images: ImageObject[];
       }[] = [];
       let i = 0;
       for await (const fileInfo of uploadedFiles) {
@@ -134,7 +132,7 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
             defaultImageId: extractedImageData.id,
             timeSeries,
           };
-          const generatedImageObject: ImageData = {
+          const generatedImageObject: ImageObject = {
             ...extractedImageData,
             metadataId:
               !timeSeries || i === 0
@@ -189,6 +187,12 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
   const updateChannels = useCallback(
     (channels: number) => {
       dispatch(projectSlice.actions.setProjectImageChannels({ channels }));
+      //TODO Include info from metadata when accessible
+      dispatch(
+        projectSlice.actions.setProjectChannels(
+          arrayRange(channels).map((index) => `Channel ${index + 1}`),
+        ),
+      );
       setNumChannels(channels);
       setStartUpload(true);
     },

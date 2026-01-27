@@ -7,7 +7,7 @@ import {
 } from "../relationship-operations/imageOperations";
 import { imageDataAdapter, metadataAdapter } from "../dataSlice";
 import { mutatingFilter } from "utils/arrayUtils";
-import { ImageData } from "../types";
+import { ImageObject } from "../types";
 
 export const deleteImageCascade = (
   state: WritableDraft<DataState>,
@@ -46,7 +46,7 @@ export const deleteImageCascade = (
 export const updateImageCascade = (
   state: WritableDraft<DataState>,
   imageId: string,
-  changes: Partial<Omit<ImageData, "data">>,
+  changes: Partial<Omit<ImageObject, "data">>,
 ) => {
   const existingImageData = state.images.entities[imageId];
 

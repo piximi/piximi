@@ -14,6 +14,8 @@ import {
   Add as AddIcon,
 } from "@mui/icons-material";
 
+import { useMobileView } from "hooks";
+
 import { TextFieldWithBlur } from "components/inputs";
 import {
   BasicTabPanel,
@@ -26,7 +28,6 @@ import {
   EditableTabsProps,
   ExtendableTabsProps,
 } from "./props";
-import { useMobileView } from "hooks";
 
 const TabContext = createContext<number>(0);
 
@@ -63,6 +64,7 @@ export function CustomTabs(
     renderLabel,
     handleTabMin,
     persistentTabs,
+    omitAddIcon,
   } = props;
   const [tabIndex, setTabIndex] = useState(0);
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -267,7 +269,7 @@ export function CustomTabs(
               );
             })}
           </Tabs>
-          {extendable && (
+          {extendable && !omitAddIcon && (
             <>
               <Divider orientation="vertical" />
               <Box display="flex" flexShrink={1} justifySelf="flex-end">

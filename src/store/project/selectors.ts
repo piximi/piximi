@@ -40,7 +40,7 @@ export const selectActiveCategory = ({
 }: {
   project: ProjectState;
 }) => {
-  return project.activeCtegory;
+  return project.activeCategory;
 };
 
 export const selectKindItemFilters = ({
@@ -65,6 +65,13 @@ export const selectProjectImageChannels = ({
   project: ProjectState;
 }) => {
   return project.imageChannels;
+};
+export const selectProjectChannels = ({
+  project,
+}: {
+  project: ProjectState;
+}) => {
+  return project.projectChannels;
 };
 
 export const selectExpandedTime = ({ project }: { project: ProjectState }) => {

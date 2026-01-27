@@ -17,10 +17,11 @@ export const initialState: ProjectState = {
   activeKind: IMAGE_KIND,
   kindItemFilters: { [IMAGE_KIND]: { categoryId: [], partition: [] } },
   expandedTime: false,
-  activeCtegory: undefined,
+  activeCategory: undefined,
 
   kindTabFilters: [],
   imageChannels: undefined,
+  projectChannels: {},
 };
 
 export const projectSlice = createSlice({
@@ -105,7 +106,7 @@ export const projectSlice = createSlice({
         ...new Set([...state.selectedImages[state.activeKind], ...ids]),
       ];
 
-      state.selectedAnnotations[state.activeKind] = allSelectedImages;
+      state.selectedImages[state.activeKind] = allSelectedImages;
     },
     deselectImages(
       state,
@@ -136,7 +137,7 @@ export const projectSlice = createSlice({
       state,
       action: PayloadAction<{ categoryId: string | undefined }>,
     ) {
-      state.activeCtegory = action.payload.categoryId;
+      state.activeCategory = action.payload.categoryId;
     },
     addKindItemCategoryFilters(
       state,
@@ -263,6 +264,19 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ channels: number | undefined }>,
     ) {
       state.imageChannels = action.payload.channels;
+    },
+    setProjectChannels(state, action: PayloadAction<string[]>) {
+      state.projectChannels = action.payload.reduce(
+        (
+          channelDict: Record<number, { id: number; name: string }>,
+          id,
+          idx,
+        ) => {
+          channelDict[idx] = { id: idx, name: id };
+          return channelDict;
+        },
+        {},
+      );
     },
     toggleTimeExpansion(state) {
       state.expandedTime = !state.expandedTime;

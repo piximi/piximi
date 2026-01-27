@@ -7,7 +7,7 @@ import {
   removeAnnotationFromAllRelationships,
 } from "../relationship-operations/annotationOperations";
 import { removeAnnotationFromTrackletCascade } from "../cascade-operations/trackletCascades";
-import { updateAnnotationCascde } from "../cascade-operations/annotationCascades";
+import { updateAnnotationCascade } from "../cascade-operations/annotationCascades";
 
 export const addAnnotationBatch = (
   state: WritableDraft<DataState>,
@@ -60,6 +60,6 @@ export const updateAnnotationBatch = (
   }[],
 ) => {
   batchChanges.forEach(({ id, changes }) => {
-    updateAnnotationCascde(state, id, changes);
+    updateAnnotationCascade(state, id, changes);
   });
 };

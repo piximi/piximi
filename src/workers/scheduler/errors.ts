@@ -14,7 +14,7 @@ export function isAbortError(error: unknown): boolean {
 export function createTaskError(
   taskId: string,
   type: string,
-  error: unknown
+  error: unknown,
 ): TaskError {
   let code: TaskErrorCode = "UNKNOWN";
   let message = "Unknown error";

@@ -12,7 +12,7 @@ import {
 import { intersection } from "lodash";
 import { MeasurementOption } from "store/measurements/types";
 import { findContours } from "views/ImageViewer/utils";
-import { DataArray } from "store/data/types";
+import { ChannelMeasurements, DataArray } from "store/data/types";
 
 //TODO: Write tests
 const sortTensor = (tensor: Tensor1D): Tensor1D => {
@@ -85,14 +85,14 @@ export const prepareChannels = (thingData: Tensor4D) => {
 };
 export const getIntensityMeasurement = (
   channelTensor: Tensor1D,
-  measurement: string,
+  measurement: keyof ChannelMeasurements,
 ) => {
   const sortedChannelTensor = sortTensor(channelTensor);
 
   let measurementResults: number | undefined = undefined;
 
   switch (measurement) {
-    case "intensity-total":
+    case "total":
       const total = tidy(() => {
         return channelTensor.sum().arraySync() as number;
       });
@@ -100,7 +100,7 @@ export const getIntensityMeasurement = (
       measurementResults = total;
       break;
 
-    case "intensity-mean":
+    case "mean":
       const mean = tidy(() => {
         return channelTensor.mean().arraySync() as number;
       });
@@ -108,7 +108,7 @@ export const getIntensityMeasurement = (
       measurementResults = mean;
       break;
 
-    case "intensity-median":
+    case "median":
       const median = tidy(() => {
         return getTensorMedian(sortedChannelTensor, true).arraySync();
       });
@@ -116,35 +116,35 @@ export const getIntensityMeasurement = (
       measurementResults = Array.isArray(median) ? median[0] : median;
       break;
 
-    case "intensity-std":
+    case "std":
       const std = tidy(() => {
         return getTensorStdDev(sortedChannelTensor).arraySync();
       });
 
       measurementResults = Array.isArray(std) ? std[0] : std;
       break;
-    case "intensity-MAD":
+    case "mad":
       const mad = tidy(() => {
         return getTensorMAD(sortedChannelTensor, true).arraySync();
       });
 
       measurementResults = Array.isArray(mad) ? mad[0] : mad;
       break;
-    case "intensity-min":
+    case "min":
       const min = tidy(() => {
         return channelTensor.min().arraySync() as number;
       });
 
       measurementResults = min;
       break;
-    case "intensity-max":
+    case "max":
       const max = tidy(() => {
         return channelTensor.max().arraySync() as number;
       });
 
       measurementResults = max;
       break;
-    case "intensity-upper-quartile":
+    case "upperQuartile":
       const upperQuartile = tidy(() => {
         return getTensorPercentile(sortedChannelTensor, 0.25, true).arraySync();
       });
@@ -153,7 +153,7 @@ export const getIntensityMeasurement = (
         ? upperQuartile[0]
         : upperQuartile;
       break;
-    case "intensity-lower-quartile":
+    case "lowerQuartile":
       const lowerQuartile = tidy(() => {
         return getTensorPercentile(sortedChannelTensor, 0.75, true).arraySync();
       });

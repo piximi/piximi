@@ -57,6 +57,7 @@ export const CollapsibleList = ({
           onClick={handleClick}
           disableGutters
           disabled={disabled}
+          dense={dense}
         >
           <ListItemIcon>
             {!collapsed ? (
@@ -66,7 +67,7 @@ export const CollapsibleList = ({
             )}
           </ListItemIcon>
 
-          <ListItemText primary={primary} />
+          <ListItemText>{primary}</ListItemText>
         </ListItemButton>
       </ListItem>
 

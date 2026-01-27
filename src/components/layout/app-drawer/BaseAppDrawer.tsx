@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Drawer, Stack } from "@mui/material";
 
 import { ApplicationOptions } from "components/layout/app-drawer/ApplicationOptions";
+import { DIMENSIONS } from "utils/constants";
 
 export const BaseAppDrawer = ({
   children,
@@ -17,7 +18,8 @@ export const BaseAppDrawer = ({
       anchor="left"
       sx={{
         display: mobile ? "none" : "block",
-
+        height: `calc(100vh - ${DIMENSIONS.toolDrawerWidth}px)`,
+        maxHeight: `calc(100vh - ${DIMENSIONS.toolDrawerWidth}px)`,
         flexShrink: 0,
         width: (theme) => theme.spacing(32),
         overflow: "hidden",
@@ -37,7 +39,16 @@ export const BaseAppDrawer = ({
         sx={{ position: "relative", height: "100%" }}
         justifyContent={"space-between"}
       >
-        <Box sx={{ overflowY: "scroll", overflowX: "hidden" }}>{children}</Box>
+        <Box
+          sx={{
+            overflowY: "scroll",
+            overflowX: "hidden",
+            flex: 1,
+            minHeight: 0,
+          }}
+        >
+          {children}
+        </Box>
         {!hideSettings && <ApplicationOptions />}
       </Stack>
     </Drawer>

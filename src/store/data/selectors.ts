@@ -16,7 +16,7 @@ import {
   AnnotationObject,
   Category,
   GeneralizedKindItem,
-  ImageData,
+  ImageObject,
   ImageMetadata,
   Kind,
   Tracklet,
@@ -79,7 +79,7 @@ type DataEntityArray = {
   kinds: Kind[];
   categories: Category[];
   metadata: ImageMetadata[];
-  images: ImageData[];
+  images: ImageObject[];
   annotations: AnnotationObject[];
 };
 export const selectDataArrays = createSelector(

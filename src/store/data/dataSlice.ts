@@ -12,9 +12,13 @@ import {
   Category,
   Tracklet,
   ImageMetadata,
-  ImageData,
+  ImageObject,
   Kind,
   ObjectMeasurements,
+  ChannelStatistics,
+  ChannelData,
+  ChannelMeasurements,
+  ComputedImageMeasurements,
 } from "./types";
 import { generateCategory, generateUUID, isUnknownCategory } from "./utils";
 import {
@@ -29,7 +33,7 @@ import {
   joinTrackletsCascade,
   severTrackletCascade,
   deleteAnnotationCascade,
-  updateAnnotationCascde,
+  updateAnnotationCascade,
   addCategoryCascade,
   deleteCategoryCascade,
   deleteImageCascade,
@@ -55,7 +59,7 @@ import {
 
 // Entity Adapters
 export const metadataAdapter = createEntityAdapter<ImageMetadata>();
-export const imageDataAdapter = createEntityAdapter<ImageData>();
+export const imageDataAdapter = createEntityAdapter<ImageObject>();
 export const kindsAdapter = createEntityAdapter<Kind>();
 export const categoriesAdapter = createEntityAdapter<Category>();
 export const annotationsAdapter = createEntityAdapter<AnnotationObject>();
@@ -162,7 +166,7 @@ export const dataSlice = createSlice({
     // -- Create
     addMetadata: (
       state,
-      action: PayloadAction<{ metadata: ImageMetadata; images: ImageData[] }>,
+      action: PayloadAction<{ metadata: ImageMetadata; images: ImageObject[] }>,
     ) => {
       const { metadata, images } = action.payload;
 
@@ -226,7 +230,7 @@ export const dataSlice = createSlice({
 
     // ============== IMAGE OPERATIONS ==============
     // -- Create
-    addImageData: (state, action: PayloadAction<ImageData>) => {
+    addImageData: (state, action: PayloadAction<ImageObject>) => {
       const image = action.payload;
       imageDataAdapter.addOne(state.images, image);
 
@@ -241,7 +245,7 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         id: string;
-        changes: Partial<Omit<ImageData, "data">>;
+        changes: Partial<Omit<ImageObject, "data">>;
       }>,
     ) => {
       updateImageCascade(state, action.payload.id, action.payload.changes);
@@ -249,6 +253,74 @@ export const dataSlice = createSlice({
     // -- Delete
     deleteImageData: (state, action: PayloadAction<string>) => {
       deleteImageCascade(state, action.payload);
+    },
+    updateImageComputedMeasurements: (
+      state,
+      action: PayloadAction<{
+        imageId: string;
+        measurements: ComputedImageMeasurements;
+      }>,
+    ) => {
+      const { imageId, measurements } = action.payload;
+      const image = state.images.entities[imageId];
+      if (!image) return;
+      if (image.measurements) Object.assign(image.measurements, measurements);
+      else image.measurements = { channels: [], ...measurements };
+    },
+    updateImageChannelMeasurements: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        channelMeasurements: ChannelData[];
+      }>,
+    ) => {
+      const { id, channelMeasurements } = action.payload;
+      const image = state.images.entities[id];
+
+      if (!image) return;
+
+      let updatedMeasurements: ChannelStatistics;
+
+      if (!image.measurements || image.measurements.channels.length === 0) {
+        updatedMeasurements = { channels: channelMeasurements };
+      } else {
+        const existingChannels = [...image.measurements.channels];
+        channelMeasurements.forEach((incoming) => {
+          const channelIndex = existingChannels.findIndex(
+            (existing) => existing.channelId === incoming.channelId,
+          );
+          if (channelIndex === -1) {
+            existingChannels.push(incoming);
+          } else {
+            existingChannels[channelIndex] = {
+              ...existingChannels[channelIndex],
+              ...incoming,
+            };
+          }
+        });
+        updatedMeasurements = { channels: existingChannels };
+      }
+
+      imageDataAdapter.updateOne(state.images, {
+        id,
+        changes: { measurements: updatedMeasurements },
+      });
+    },
+    updateImageChannelMeasurementValues: (
+      state,
+      action: PayloadAction<Record<string, Record<number, ChannelData>>>,
+    ) => {
+      const updates = action.payload;
+      Object.entries(updates).forEach(([imageId, channels]) => {
+        const image = state.images.entities[imageId];
+        if (!image.measurements?.channels) return;
+        Object.entries(channels).forEach(([channelId, measurements]) => {
+          Object.assign(
+            image.measurements!.channels[+channelId],
+            measurements as Partial<ChannelMeasurements>,
+          );
+        });
+      });
     },
 
     // ============== ANNOTATION OPERATIONS ==============
@@ -277,7 +349,7 @@ export const dataSlice = createSlice({
         >;
       }>,
     ) => {
-      updateAnnotationCascde(state, action.payload.id, action.payload.changes);
+      updateAnnotationCascade(state, action.payload.id, action.payload.changes);
     },
     // -- Delete
     deleteAnnotation: (state, action: PayloadAction<string>) => {
@@ -291,19 +363,77 @@ export const dataSlice = createSlice({
         measurements: ObjectMeasurements;
       }>,
     ) => {
-      const { intensity, ...objectMeasurements } = action.payload.measurements;
+      const { channels, ...objectMeasurements } = action.payload.measurements;
       const annotation = state.annotations.entities[action.payload.annId];
+      if (!annotation) return;
       if (!annotation.measurements) {
-        annotation.measurements = objectMeasurements;
-        annotation.measurements.intensity = intensity;
+        annotation.measurements = { channels, ...objectMeasurements };
       }
 
-      Object.assign(annotation, objectMeasurements);
-      if (intensity) {
-        if (!annotation.measurements.intensity)
-          annotation.measurements.intensity = intensity;
-        else Object.assign(annotation.measurements.intensity, intensity);
+      Object.assign(annotation.measurements, objectMeasurements);
+      if (channels) {
+        if (!annotation.measurements.channels)
+          annotation.measurements.channels = channels;
+        else Object.assign(annotation.measurements.channels, channels);
       }
+    },
+    updateAnnotationChannelMeasurements: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        channelMeasurements: ChannelData[];
+      }>,
+    ) => {
+      const { id, channelMeasurements } = action.payload;
+      const annotation = state.annotations.entities[id];
+
+      if (!annotation) return;
+
+      let updatedMeasurements: ChannelStatistics;
+
+      if (
+        !annotation.measurements ||
+        annotation.measurements.channels.length === 0
+      ) {
+        updatedMeasurements = { channels: channelMeasurements };
+      } else {
+        const existingChannels = [...annotation.measurements.channels];
+        channelMeasurements.forEach((incoming) => {
+          const channelIndex = existingChannels.findIndex(
+            (existing) => existing.channelId === incoming.channelId,
+          );
+          if (channelIndex === -1) {
+            existingChannels.push(incoming);
+          } else {
+            existingChannels[channelIndex] = {
+              ...existingChannels[channelIndex],
+              ...incoming,
+            };
+          }
+        });
+        updatedMeasurements = { channels: existingChannels };
+      }
+
+      annotationsAdapter.updateOne(state.annotations, {
+        id,
+        changes: { measurements: updatedMeasurements },
+      });
+    },
+    updateAnnotationChannelMeasurementValues: (
+      state,
+      action: PayloadAction<Record<string, Record<number, ChannelData>>>,
+    ) => {
+      const updates = action.payload;
+      Object.entries(updates).forEach(([annId, channels]) => {
+        const annotation = state.annotations.entities[annId];
+        if (!annotation.measurements?.channels) return;
+        Object.entries(channels).forEach(([channelId, measurements]) => {
+          Object.assign(
+            annotation.measurements!.channels[+channelId],
+            measurements as Partial<ChannelMeasurements>,
+          );
+        });
+      });
     },
 
     // ============== TRACKLET OPERATIONS ==============
@@ -470,7 +600,9 @@ export const dataSlice = createSlice({
     // -- Metadata -- Create
     batchAddMetadata(
       state,
-      action: PayloadAction<{ metadata: ImageMetadata; images: ImageData[] }[]>,
+      action: PayloadAction<
+        { metadata: ImageMetadata; images: ImageObject[] }[]
+      >,
     ) {
       const metadataGroup = action.payload;
       metadataGroup.forEach((metadata) =>
@@ -481,7 +613,7 @@ export const dataSlice = createSlice({
       );
     },
     // -- Image -- Create
-    batchAddImageData(state, action: PayloadAction<ImageData[]>) {
+    batchAddImageData(state, action: PayloadAction<ImageObject[]>) {
       const images = action.payload;
       images.forEach((image) =>
         dataSlice.caseReducers.addImageData(state, {
@@ -497,12 +629,84 @@ export const dataSlice = createSlice({
         {
           id: string;
           changes: Partial<
-            Pick<ImageData, "partition" | "categoryId" | "colors">
+            Pick<ImageObject, "partition" | "categoryId" | "colors">
           >;
         }[]
       >,
     ) => {
       updateImageDataBatch(state, action.payload);
+    },
+
+    batchUpdateImageComputedMeasurements: (
+      state,
+      action: PayloadAction<
+        { imageId: string; measurements: ComputedImageMeasurements }[]
+      >,
+    ) => {
+      action.payload.forEach((computedMeasurement) => {
+        dataSlice.caseReducers.updateImageComputedMeasurements(state, {
+          type: "updateComputedImageMeasurements",
+          payload: computedMeasurement,
+        });
+      });
+    },
+    batchUpdateImageChannelMeasurements: (
+      state,
+      action: PayloadAction<
+        {
+          id: string;
+          channelMeasurements: ChannelData[];
+        }[]
+      >,
+    ) => {
+      const batchUpdates = action.payload;
+
+      // Build update objects for entity adapter
+      const adapterUpdates = batchUpdates
+        .map(({ id, channelMeasurements }) => {
+          const image = state.images.entities[id];
+          if (!image) return null;
+
+          let updatedMeasurements: ChannelStatistics;
+
+          if (!image.measurements || image.measurements.channels.length === 0) {
+            // Create new measurements object
+            updatedMeasurements = { channels: channelMeasurements };
+          } else {
+            // Merge with existing channels
+            const existingChannels = [...image.measurements.channels];
+            channelMeasurements.forEach((incoming) => {
+              const channelIndex = existingChannels.findIndex(
+                (existing) => existing.channelId === incoming.channelId,
+              );
+              if (channelIndex === -1) {
+                existingChannels.push(incoming);
+              } else {
+                existingChannels[channelIndex] = {
+                  ...existingChannels[channelIndex],
+                  ...incoming,
+                };
+              }
+            });
+            updatedMeasurements = { channels: existingChannels };
+          }
+
+          return {
+            id,
+            changes: { measurements: updatedMeasurements },
+          };
+        })
+        .filter(
+          (
+            update,
+          ): update is {
+            id: string;
+            changes: { measurements: ChannelStatistics };
+          } => update !== null,
+        );
+
+      // Use entity adapter to properly update
+      imageDataAdapter.updateMany(state.images, adapterUpdates);
     },
     // -- Image -- Delete
 
@@ -535,6 +739,67 @@ export const dataSlice = createSlice({
       >,
     ) {
       updateAnnotationBatch(state, action.payload);
+    },
+    batchUpdateAnnotationChannelMeasurements: (
+      state,
+      action: PayloadAction<
+        {
+          id: string;
+          channelMeasurements: ChannelData[];
+        }[]
+      >,
+    ) => {
+      const batchUpdates = action.payload;
+
+      // Build update objects for entity adapter
+      const adapterUpdates = batchUpdates
+        .map(({ id, channelMeasurements }) => {
+          const annotation = state.annotations.entities[id];
+          if (!annotation) return null;
+
+          let updatedMeasurements: ChannelStatistics;
+
+          if (
+            !annotation.measurements ||
+            annotation.measurements.channels.length === 0
+          ) {
+            // Create new measurements object
+            updatedMeasurements = { channels: channelMeasurements };
+          } else {
+            // Merge with existing channels
+            const existingChannels = [...annotation.measurements.channels];
+            channelMeasurements.forEach((incoming) => {
+              const channelIndex = existingChannels.findIndex(
+                (existing) => existing.channelId === incoming.channelId,
+              );
+              if (channelIndex === -1) {
+                existingChannels.push(incoming);
+              } else {
+                existingChannels[channelIndex] = {
+                  ...existingChannels[channelIndex],
+                  ...incoming,
+                };
+              }
+            });
+            updatedMeasurements = { channels: existingChannels };
+          }
+
+          return {
+            id,
+            changes: { measurements: updatedMeasurements },
+          };
+        })
+        .filter(
+          (
+            update,
+          ): update is {
+            id: string;
+            changes: { measurements: ChannelStatistics };
+          } => update !== null,
+        );
+
+      // Use entity adapter to properly update
+      annotationsAdapter.updateMany(state.annotations, adapterUpdates);
     },
     // -- Annotation -- Delete
     batchDeleteAnnotations: (state, action: PayloadAction<string[]>) => {

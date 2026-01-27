@@ -19,8 +19,7 @@ import { applicationSettingsSlice } from "./applicationSettings";
 import { dataSlice } from "./data/dataSlice";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
-import { measurementsSlice } from "./measurements/measurementsSlice";
-import { measurementsMiddleware } from "./measurements/measurementListeners";
+import { measurementsSlice } from "views/MeasurementView2/state/redux/measurementsSlice";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 import { imageViewerDataMiddleware } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataListeners";
@@ -36,7 +35,6 @@ const listenerMiddlewares: Middleware[] = [
   annotatorMiddleware.middleware,
   projectMiddleware.middleware,
   dataMiddleware.middleware,
-  measurementsMiddleware.middleware,
   applicationMiddleware.middleware,
   imageViewerDataMiddleware.middleware,
 ];
@@ -55,7 +53,49 @@ const preloadedState: RootState = {
 };
 
 const options = {
-  devTools: { trace: true, traceLimit: 15 }, // A traceLimit of 11 seems to be the minumum to get the full trace, set to 15 for a buffer
+  devTools: {
+    trace: true,
+    traceLimit: 15, // A traceLimit of 11 seems to be the minumum to get the full trace, set to 15 for a buffer
+    actionsDenylist: [
+      "applicationSettings/sendLoadPercent",
+      "applicationSettings/setLoadPercent",
+    ],
+    actionSanitizer: (action: any) => {
+      // Strip large channelData arrays from DevTools to prevent breaking
+      if (
+        action.type === "data/batchUpdateAnnotationChannelMeasurements" ||
+        action.type === "data/batchUpdateImageChannelMeasurements"
+      ) {
+        return {
+          ...action,
+          payload: action.payload.map((item: any) => ({
+            id: item.id,
+            channelMeasurements: item.channelMeasurements.map(
+              (channel: any) => ({
+                channelId: channel.channelId,
+                // Strip channelData array, keep only statistics
+                channelData: channel.channelData
+                  ? `[${channel.channelData.length} items]`
+                  : undefined,
+                total: channel.total,
+                min: channel.min,
+                max: channel.max,
+                mean: channel.mean,
+                std: channel.std,
+                mad: channel.mad,
+                lowerQuartile: channel.lowerQuartile,
+                upperQuartile: channel.upperQuartile,
+                histogram: channel.histogram
+                  ? `[${channel.histogram.length} items]`
+                  : undefined,
+              }),
+            ),
+          })),
+        };
+      }
+      return action;
+    },
+  },
   middleware: () => new Tuple(...listenerMiddlewares, ...loggingMiddleware),
   preloadedState: preloadedState,
   reducer: rootReducer,
@@ -64,12 +104,8 @@ const options = {
 export const productionStore = configureStore(options);
 
 export const initStore = (loadedData: RootState | undefined) => {
-  const options = {
-    devTools: { trace: true, traceLimit: 15 },
-    middleware: () => new Tuple(...listenerMiddlewares, ...loggingMiddleware),
-    preloadedState: loadedData ?? {},
-    reducer: rootReducer,
-  };
+  options.preloadedState = loadedData ?? preloadedState;
+
   const store = configureStore(options) as EnhancedStore;
 
   return store;

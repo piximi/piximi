@@ -1,5 +1,5 @@
 // src/workers/scheduler/worker.ts
-import { Tensor1D, tensor1d, tensor4d } from "@tensorflow/tfjs";
+import { tensor1d, tensor4d } from "@tensorflow/tfjs";
 import * as Comlink from "comlink";
 
 import {
@@ -8,20 +8,26 @@ import {
   getObjectFormFactor,
   getPerimeterFromMask,
 } from "utils/measurements/utils";
-import { prepareEntityChannelData } from "views/MeasurementView/utils";
+import { prepareEntityChannelData } from "views/MeasurementView2/utils";
 import {
-  ChannelStatistics,
-  OBJECT_MEASUREMENT_KEYS,
+  ChannelData,
+  ChannelMeasurements,
+  ComputedImageMeasurements,
+  ImageObject,
   ObjectMeasurements,
 } from "store/data/types";
 import { calculateCenterOfMass } from "features/annotation-tracking/utils";
 import {
   PreparedAnnotationData,
   PreparedEntityData,
-} from "views/MeasurementView/types";
-import { PreparedEntityChannels } from "store/measurements/types";
+} from "views/MeasurementView2/types";
+import { PreparedEntityChannels } from "views/MeasurementView2/types";
 import { decode } from "views/ImageViewer/utils";
 import { CancelToken } from "./types";
+import {
+  IMAGE_MEASUREMENT_KEYS,
+  OBJECT_MEASUREMENT_KEYS,
+} from "store/data/consts";
 
 const getEncodedMaskArea = (encodedMask: number[]) => {
   return encodedMask.reduce((count: number, value, idx) => {
@@ -37,19 +43,19 @@ export interface WorkerAPI {
     cancelToken: CancelToken,
     onProgress: (progress: number) => void,
   ) => Promise<{ annId: string; measurements: ObjectMeasurements }[]>;
+  imageMeasurements: (
+    images: ImageObject[],
+    selectedMeasurements: (keyof ComputedImageMeasurements)[],
+    cancelToken: CancelToken,
+    onProgress: (progress: number) => void,
+  ) => Promise<{ annId: string; measurements: ObjectMeasurements }[]>;
 
   channelMeasurements: (
-    id: string,
-    existingMeasurements: ChannelStatistics[],
-    channels: {
-      channelId: string;
-      measurements: (keyof Omit<
-        ChannelStatistics,
-        "channelId" | "histogram" | "channelData"
-      >)[];
-    }[],
+    entities: { id: string; measurements: { channels: ChannelData[] } }[],
+    measurements: Partial<Record<keyof ChannelMeasurements, number[]>>,
     cancelToken: CancelToken,
-  ) => Promise<{ id: string; measurements: ChannelStatistics[] }>;
+    onProgress: (progress: number) => void,
+  ) => Promise<Record<string, Record<number, ChannelData>>>;
 
   prepare: (
     kind: string,
@@ -201,39 +207,114 @@ const workerAPI: WorkerAPI = {
 
     return newMeasurements;
   },
+  async imageMeasurements(
+    images,
+    selectedMeasurements,
+    cancelToken,
+    onProgress,
+  ) {
+    let progress = 0;
+    const imageCount = images.length;
 
-  async channelMeasurements(id, existingMeasurements, channels, cancelToken) {
-    const newMeasurements: ChannelStatistics[] = [];
+    const postLoadPercent = (num: number) => {
+      const currentProgress = Math.floor((num / imageCount) * 100);
+      if (currentProgress > progress) {
+        progress = currentProgress;
+        onProgress(currentProgress);
+      }
+    };
 
-    for (const channelInfo of channels) {
+    const measurementsToRun =
+      selectedMeasurements.length > 0
+        ? selectedMeasurements
+        : IMAGE_MEASUREMENT_KEYS;
+
+    const newMeasurements: {
+      annId: string;
+      measurements: ObjectMeasurements;
+    }[] = [];
+
+    let numCounted = 0;
+    for (const image of images) {
       if (cancelToken.cancelled) {
         throw new DOMException("Task cancelled", "AbortError");
       }
-
-      const existingChannel = existingMeasurements.find(
-        (c) => c.channelId === channelInfo.channelId,
-      );
-      if (!existingChannel || !existingChannel.channelData) continue;
-
-      const channelTensor = tensor1d(existingChannel.channelData!) as Tensor1D;
-
-      const measurementResults: ChannelStatistics = {
-        channelId: channelInfo.channelId,
-      };
-
-      for (const measurement of channelInfo.measurements) {
-        if (existingChannel[measurement]) continue;
-        const result = getIntensityMeasurement(channelTensor, measurement);
-        if (result) {
-          measurementResults[measurement] = result;
-        }
-      }
-
-      channelTensor.dispose();
-      newMeasurements.push(measurementResults);
+      //TODO Actually implement measurements
+      console.log(image.id);
+      measurementsToRun.forEach((measurement) => console.log(measurement));
+      postLoadPercent(++numCounted);
     }
 
-    return { id, measurements: newMeasurements };
+    return newMeasurements;
+  },
+
+  async channelMeasurements(entities, measurements, cancelToken, onProgress) {
+    const entityMeasurements: Record<string, Record<number, ChannelData>> = {};
+    const numEntities = entities.length;
+
+    let progress = 0;
+    let completed = 0;
+    const postLoadPercent = (num: number) => {
+      const currentProgress = Math.floor((num / numEntities) * 100);
+      if (currentProgress > progress) {
+        progress = currentProgress;
+        onProgress(currentProgress);
+      }
+    };
+    entities.forEach((entity) => {
+      if (cancelToken.cancelled) {
+        throw new DOMException("Task cancelled", "AbortError");
+      }
+      const existingMeasurementData = entity.measurements.channels;
+      const entityChannelDataTensors = existingMeasurementData.map((data) =>
+        tensor1d(data.channelData!),
+      );
+
+      Object.entries(measurements).forEach(([measurement, channels]) => {
+        if (cancelToken.cancelled) {
+          throw new DOMException("Task cancelled", "AbortError");
+        }
+        channels.forEach((channel) => {
+          if (cancelToken.cancelled) {
+            throw new DOMException("Task cancelled", "AbortError");
+          }
+          const entityChannelData = existingMeasurementData.find(
+            (data) => +data.channelId === channel,
+          );
+          if (!entityChannelData) throw new Error("No channel data found");
+          if (entityChannelData[measurement as keyof ChannelMeasurements])
+            return;
+
+          const value = getIntensityMeasurement(
+            entityChannelDataTensors[channel],
+            measurement as keyof ChannelMeasurements,
+          );
+          if (value)
+            if (entityMeasurements[entity.id]) {
+              if (entityMeasurements[entity.id][channel])
+                entityMeasurements[entity.id][channel][
+                  measurement as keyof ChannelMeasurements
+                ] = value;
+              else
+                entityMeasurements[entity.id][channel] = {
+                  channelId: channel + "",
+                  [measurement as keyof ChannelMeasurements]: value,
+                };
+            } else
+              entityMeasurements[entity.id] = {
+                [channel]: {
+                  channelId: channel + "",
+                  [measurement as keyof ChannelMeasurements]: value,
+                },
+              };
+        });
+      });
+      completed++;
+      postLoadPercent(completed);
+      entityChannelDataTensors.forEach((tensor) => tensor.dispose());
+    });
+
+    return entityMeasurements;
   },
 
   async prepare(kind, entities, cancelToken, onProgress) {
