@@ -12,8 +12,8 @@ import {
 import { GridApiCommunity } from "@mui/x-data-grid/internals";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
-import { useTableExport } from "views/MeasurementView2/hooks";
-import { selectActiveMeasurementGroup } from "views/MeasurementView2/state/redux/selectors";
+import { useTableExport } from "views/MeasurementView/hooks";
+import { selectActiveMeasurementGroup } from "views/MeasurementView/state/redux/selectors";
 
 const CustomMenuItem = styled(MenuItem)(() => ({
   minHeight: "1rem",

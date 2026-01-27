@@ -2,13 +2,13 @@ import React, { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, capitalize } from "@mui/material";
 
-import { StyledRichTreeView } from "views/MeasurementView2/components/StyledRichTreeView";
-import { measurementsSlice } from "views/MeasurementView2/state/redux/measurementsSlice";
+import { StyledRichTreeView } from "views/MeasurementView/components/StyledRichTreeView";
+import { measurementsSlice } from "views/MeasurementView/state/redux/measurementsSlice";
 import {
   ImageMeasurementGroup,
   ObjectMeasurementGroup,
-} from "views/MeasurementView2/types";
-import { values2ChannelMeasurementLabel } from "views/MeasurementView2/utils";
+} from "views/MeasurementView/types";
+import { values2ChannelMeasurementLabel } from "views/MeasurementView/utils";
 import getCustomTreeItem, { CustomTreeViewBaseItem } from "./CustomTreeItem";
 
 import {

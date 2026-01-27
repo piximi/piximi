@@ -14,7 +14,7 @@ import {
 } from "../../types";
 import { mutatingFilter } from "utils/arrayUtils";
 import { IMAGE_KIND } from "store/data/constants";
-import { generateInitialPlot } from "views/MeasurementView2/utils";
+import { generateInitialPlot } from "views/MeasurementView/utils";
 import { getUniqueName } from "utils/stringUtils";
 
 const initialState: MeasurementsState = {

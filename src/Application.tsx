@@ -11,7 +11,7 @@ import { AlertBar } from "components/ui";
 import { FileUploadProvider, HelpProvider, SchedulerProvider } from "contexts";
 import { ProjectViewer } from "views/ProjectViewer";
 import { ImageViewer } from "views/ImageViewer";
-import { MeasurementView } from "views/MeasurementView2";
+import { MeasurementView } from "views/MeasurementView";
 import { WelcomeScreen } from "./views/WelcomeScreen";
 import HelpOverlay from "views/HelpOverlay";
 

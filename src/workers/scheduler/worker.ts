@@ -8,7 +8,7 @@ import {
   getObjectFormFactor,
   getPerimeterFromMask,
 } from "utils/measurements/utils";
-import { prepareEntityChannelData } from "views/MeasurementView2/utils";
+import { prepareEntityChannelData } from "views/MeasurementView/utils";
 import {
   ChannelData,
   ChannelMeasurements,
@@ -20,8 +20,8 @@ import { calculateCenterOfMass } from "features/annotation-tracking/utils";
 import {
   PreparedAnnotationData,
   PreparedEntityData,
-} from "views/MeasurementView2/types";
-import { PreparedEntityChannels } from "views/MeasurementView2/types";
+} from "views/MeasurementView/types";
+import { PreparedEntityChannels } from "views/MeasurementView/types";
 import { decode } from "views/ImageViewer/utils";
 import { CancelToken } from "./types";
 import {

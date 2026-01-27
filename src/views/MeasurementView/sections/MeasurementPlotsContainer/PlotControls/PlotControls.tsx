@@ -9,7 +9,7 @@ import { ColorThemeSelect, PlotSelect } from "./ControlInputs";
 
 import { ChartType } from "../../../types";
 import { useSelector } from "react-redux";
-import { selectActiveSelectedPlot } from "views/MeasurementView2/state/redux/selectors";
+import { selectActiveSelectedPlot } from "views/MeasurementView/state/redux/selectors";
 
 export const PlotControls = () => {
   const selectedPlot = useSelector(selectActiveSelectedPlot);

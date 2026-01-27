@@ -6,8 +6,8 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { GridApiCommunity } from "@mui/x-data-grid/internals";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { channelMeasurementLabel2Values } from "views/MeasurementView2/utils";
-import { selectActiveMeasuredEntitiesGroup } from "views/MeasurementView2/state/redux/reselectors";
+import { channelMeasurementLabel2Values } from "views/MeasurementView/utils";
+import { selectActiveMeasuredEntitiesGroup } from "views/MeasurementView/state/redux/reselectors";
 import { SplitTree } from "./SplitTree";
 import {
   DisplayTableRow,

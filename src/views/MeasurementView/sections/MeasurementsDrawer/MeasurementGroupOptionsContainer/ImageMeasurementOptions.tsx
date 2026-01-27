@@ -5,20 +5,21 @@ import { Box } from "@mui/material";
 import { useScheduler, useSchedulerProgress } from "contexts";
 import { DividerWithLoading } from "components/ui";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { channelMeasurementLabel2Values } from "views/MeasurementView2/utils";
+import { channelMeasurementLabel2Values } from "views/MeasurementView/utils";
 import { measurementsSlice } from "../../../state/redux/measurementsSlice";
-import { ComputedObjectMeasurementOptions } from "./ComputedObjectMeasurements";
+import { ComputedImageMeasurementOptions } from "./ComputedImageMeasurements";
 import { IntensityMeasurementOptions } from "./IntensityMeasurementOptions";
-import { ObjectMeasurementGroup, PreparedAnnotationData } from "../../../types";
+import { ImageMeasurementGroup } from "../../../types";
 
 import { dataSlice } from "store/data";
 import { CHANNEL_MEASUREMENT_KEYS } from "store/data/consts";
-import { selectAnnotationEntities } from "store/data/selectors";
+import { selectImageDataEntities } from "store/data/selectors";
 import {
   ChannelData,
   ChannelMeasurements,
-  ComputedObjectMeasurements,
-  ObjectMeasurements,
+  ComputedImageMeasurements,
+  ImageMeasurements,
+  ImageObject,
 } from "store/data/types";
 
 import { LoadStatus } from "utils/types";
@@ -26,12 +27,12 @@ import { isObjectEmpty } from "utils/objectUtils";
 
 import { TaskPriority, TaskHandle } from "workers/scheduler";
 
-type MeasurementResult = { annId: string; measurements: ObjectMeasurements }[];
+type MeasurementResult = { imageId: string; measurements: ImageMeasurements }[];
 
-export const ObjectMeasurementOptions = ({
+export const ImageMeasurementOptions = ({
   group,
 }: {
-  group: ObjectMeasurementGroup;
+  group: ImageMeasurementGroup;
 }) => {
   const dispatch = useDispatch();
   const scheduler = useScheduler();
@@ -43,7 +44,7 @@ export const ObjectMeasurementOptions = ({
     }),
     [schedulerProgress],
   );
-  const annotations = useSelector(selectAnnotationEntities);
+  const images = useSelector(selectImageDataEntities);
 
   const taskHandleRef = useRef<TaskHandle<
     MeasurementResult | Record<string, Record<number, ChannelData>>
@@ -51,22 +52,22 @@ export const ObjectMeasurementOptions = ({
 
   const measurementEntities = useMemo(() => {
     const measurementEntities = group.entityIds.reduce(
-      (entities: Record<string, PreparedAnnotationData>, id) => {
-        entities[id] = annotations[id];
+      (entities: Record<string, ImageObject>, id) => {
+        entities[id] = images[id];
         return entities;
       },
       {},
     );
 
     return measurementEntities;
-  }, [annotations, group.entityIds]);
+  }, [images, group.entityIds]);
 
   const dispatchComputedMeasurementWorker = (itemIds: string[]) => {
     const handle = scheduler.dispatch<MeasurementResult>({
-      type: "annotationMeasurements",
+      type: "imageMeasurements",
       payload: {
         annotations: measurementEntities,
-        selectedMeasurements: itemIds as (keyof ObjectMeasurements)[],
+        selectedMeasurements: itemIds as (keyof ComputedImageMeasurements)[],
       },
       priority: TaskPriority.HIGH,
 
@@ -75,12 +76,14 @@ export const ObjectMeasurementOptions = ({
           console.log(data);
           batch(() => {
             dispatch(
-              measurementsSlice.actions.addObjectComputedMeasurements({
+              measurementsSlice.actions.addImageComputedMeasurements({
                 groupId: group.id,
-                measurements: itemIds as (keyof ComputedObjectMeasurements)[],
+                measurements: itemIds as (keyof ComputedImageMeasurements)[],
               }),
             );
-            dispatch(dataSlice.actions.batchUpdateAnnotationMeasurements(data));
+            dispatch(
+              dataSlice.actions.batchUpdateImageComputedMeasurements(data),
+            );
           });
         }
       },
@@ -103,6 +106,7 @@ export const ObjectMeasurementOptions = ({
         groupedMeasurements[measurement]!.push(channelId);
       else groupedMeasurements[measurement] = [channelId];
     });
+    console.log(measurementEntities);
 
     const handle = scheduler.dispatch<
       Record<string, Record<number, ChannelData>>
@@ -125,7 +129,7 @@ export const ObjectMeasurementOptions = ({
               }),
             );
             dispatch(
-              dataSlice.actions.updateAnnotationChannelMeasurementValues(data),
+              dataSlice.actions.updateImageChannelMeasurementValues(data),
             );
           });
         }
@@ -139,6 +143,8 @@ export const ObjectMeasurementOptions = ({
     console.log(loadStatus);
     console.log(schedulerProgress);
   });
+
+  useEffect(() => console.log("mounted"), []);
   return (
     <Box
       sx={{
@@ -150,7 +156,7 @@ export const ObjectMeasurementOptions = ({
         title="Measurements"
         loadStatus={loadStatus}
       />
-      <ComputedObjectMeasurementOptions
+      <ComputedImageMeasurementOptions
         group={group}
         onSelect={dispatchComputedMeasurementWorker}
       />

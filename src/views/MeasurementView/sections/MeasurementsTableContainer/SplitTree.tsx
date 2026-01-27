@@ -4,7 +4,7 @@ import { capitalize } from "lodash";
 import { Box, Divider, Typography } from "@mui/material";
 import { TreeViewBaseItem } from "@mui/x-tree-view";
 
-import { StyledRichTreeView } from "views/MeasurementView2/components/StyledRichTreeView";
+import { StyledRichTreeView } from "views/MeasurementView/components/StyledRichTreeView";
 import { measurementsSlice } from "../../state/redux/measurementsSlice";
 import { GroupedMeasurementDisplayTable } from "../../types";
 

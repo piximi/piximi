@@ -27,11 +27,11 @@ import { useNumberField } from "hooks";
 
 import { TextFieldWithBlur } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { measurementsSlice } from "views/MeasurementView2/state/redux/measurementsSlice";
+import { measurementsSlice } from "views/MeasurementView/state/redux/measurementsSlice";
 import {
   selectActiveMeasurementGroup,
   selectActiveSelectedPlot,
-} from "views/MeasurementView2/state/redux/selectors";
+} from "views/MeasurementView/state/redux/selectors";
 import { ChartConfig, ChartType, PlotDetail, SplitType } from "../../../types";
 
 import { HTMLDataAttributes, KeysWithValuesOfType } from "utils/types";

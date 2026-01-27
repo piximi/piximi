@@ -19,7 +19,7 @@ import { applicationSettingsSlice } from "./applicationSettings";
 import { dataSlice } from "./data/dataSlice";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
-import { measurementsSlice } from "views/MeasurementView2/state/redux/measurementsSlice";
+import { measurementsSlice } from "views/MeasurementView/state/redux/measurementsSlice";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 import { imageViewerDataMiddleware } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataListeners";

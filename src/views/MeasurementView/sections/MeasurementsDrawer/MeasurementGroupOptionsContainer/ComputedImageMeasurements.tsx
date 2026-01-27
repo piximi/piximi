@@ -2,13 +2,13 @@ import React, { useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { Box } from "@mui/material";
 
-import { StyledRichTreeView } from "views/MeasurementView2/components/StyledRichTreeView";
+import { StyledRichTreeView } from "views/MeasurementView/components/StyledRichTreeView";
 import { measurementsSlice } from "../../../state/redux/measurementsSlice";
 import getCustomTreeItem, { CustomTreeViewBaseItem } from "./CustomTreeItem";
-import { ObjectMeasurementGroup } from "../../../types";
+import { ImageMeasurementGroup } from "../../../types";
 
-import { OBJ_MEAS_LOOKUP, OBJECT_MEASUREMENT_KEYS } from "store/data/consts";
-import { ComputedObjectMeasurements } from "store/data/types";
+import { IMAGE_MEASUREMENT_KEYS, OBJ_MEAS_LOOKUP } from "store/data/consts";
+import { ComputedImageMeasurements } from "store/data/types";
 
 import { getDifferences } from "utils/arrayUtils";
 import { capitalize } from "utils/stringUtils";
@@ -18,7 +18,7 @@ const computedMeasurementItems: CustomTreeViewBaseItem[] = [
     id: "computed",
     label: "Computed",
 
-    children: OBJECT_MEASUREMENT_KEYS.filter((key) => key !== "channels").map(
+    children: IMAGE_MEASUREMENT_KEYS.filter((key) => key !== "channels").map(
       (key) => ({ id: key, label: capitalize(key), displayName: "abba" }),
     ),
   },
@@ -26,11 +26,11 @@ const computedMeasurementItems: CustomTreeViewBaseItem[] = [
 
 const selectionPropagation = { parents: true, descendants: true };
 
-export const ComputedObjectMeasurementOptions = ({
+export const ComputedImageMeasurementOptions = ({
   group,
   onSelect,
 }: {
-  group: ObjectMeasurementGroup;
+  group: ImageMeasurementGroup;
   onSelect: (itemIds: string[]) => void;
 }) => {
   const dispatch = useDispatch();
@@ -57,9 +57,9 @@ export const ComputedObjectMeasurementOptions = ({
     // Immediately remove deselected measurements
     if (changes.removed.length > 0)
       dispatch(
-        measurementsSlice.actions.removeObjectComputedMeasurements({
+        measurementsSlice.actions.removeImageComputedMeasurements({
           groupId: group.id,
-          measurements: changes.removed as (keyof ComputedObjectMeasurements)[],
+          measurements: changes.removed as (keyof ComputedImageMeasurements)[],
         }),
       );
   };

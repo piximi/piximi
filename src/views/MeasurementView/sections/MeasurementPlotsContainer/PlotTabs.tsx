@@ -9,12 +9,12 @@ import {
   ResponsiveSwarm,
   PlotContainer,
 } from "../../plots";
-import { measurementsSlice } from "views/MeasurementView2/state/redux/measurementsSlice";
+import { measurementsSlice } from "views/MeasurementView/state/redux/measurementsSlice";
 import {
   selectActivePlotIds,
   selectActiveSelectedPlot,
   selectRenderPlotName,
-} from "views/MeasurementView2/state/redux/selectors";
+} from "views/MeasurementView/state/redux/selectors";
 import {
   selectActiveMeasuredEntities,
   selectPlotData,
