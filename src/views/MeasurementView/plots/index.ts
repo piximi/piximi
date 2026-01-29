@@ -1,4 +1,4 @@
-export { ResponsiveHistogram } from "./ResponsiveHistogram";
+export { ResponsiveBarHistogram } from "./ResponsiveBarHistogram";
 export { ResponsiveScatter } from "./ResponsiveScatter";
 export { ResponsiveSwarm } from "./ResponsiveSwarm";
 export { PlotContainer } from "./PlotContainer";

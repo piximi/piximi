@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 
 import { CustomTabs } from "components/layout";
 import {
-  ResponsiveHistogram,
+  ResponsiveBarHistogram,
   ResponsiveScatter,
   ResponsiveSwarm,
   PlotContainer,
@@ -55,7 +55,7 @@ export const PlotTabs = () => {
       switch (config.chart) {
         case ChartType.Histogram:
           plot = (
-            <ResponsiveHistogram
+            <ResponsiveBarHistogram
               measurementData={measurementData}
               chartConfig={config}
               entityIds={activeEntityIds}

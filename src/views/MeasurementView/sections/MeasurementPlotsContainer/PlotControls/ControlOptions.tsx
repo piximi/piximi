@@ -1,4 +1,5 @@
 import {
+  BinLabelCheckbox,
   ChartMeasurementSelect,
   ChartSplitSelect,
   HistogramBinTextField,
@@ -10,6 +11,7 @@ export const HistogramOptions = () => {
     <>
       <ChartMeasurementSelect type="x-axis" />
       <HistogramBinTextField />
+      <BinLabelCheckbox />
     </>
   );
 };

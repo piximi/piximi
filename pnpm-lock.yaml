@@ -47,9 +47,6 @@ importers:
       '@nivo/line':
         specifier: ^0.87.0
         version: 0.87.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
-      '@nivo/marimekko':
-        specifier: ^0.87.0
-        version: 0.87.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       '@nivo/scales':
         specifier: ^0.88.0
         version: 0.88.0
@@ -1027,11 +1024,6 @@ packages:
 
   '@nivo/line@0.87.0':
     resolution: {integrity: sha512-Ki/WDd8ZU8VWScW4ZeKUFCXRdAEg8nrS+F+jdfJDPxyxUMHZJCAbrXrnsExcEQLOaDQ2aU/bijEMiDS8/dJzuA==}
-    peerDependencies:
-      react: '>= 16.14.0 < 19.0.0'
-
-  '@nivo/marimekko@0.87.0':
-    resolution: {integrity: sha512-4xSnxbBXP+zVFyVFoIBcJ9HEm6Ro3cNVyX2KdN0P6qI6EI/mn8d3eXKZdDD0v4GQarR1dDnZlOJ53+9NEnA+Sw==}
     peerDependencies:
       react: '>= 16.14.0 < 19.0.0'
 
@@ -5718,22 +5710,6 @@ snapshots:
       '@nivo/voronoi': 0.87.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       '@react-spring/web': 9.7.5(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       d3-shape: 3.2.0
-      react: 17.0.2
-    transitivePeerDependencies:
-      - react-dom
-
-  '@nivo/marimekko@0.87.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)':
-    dependencies:
-      '@nivo/axes': 0.87.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
-      '@nivo/colors': 0.87.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
-      '@nivo/core': 0.87.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
-      '@nivo/legends': 0.87.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
-      '@nivo/scales': 0.87.0
-      '@nivo/tooltip': 0.87.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
-      '@react-spring/web': 9.7.5(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
-      '@types/d3-shape': 3.1.7
-      d3-shape: 3.2.0
-      lodash: 4.17.21
       react: 17.0.2
     transitivePeerDependencies:
       - react-dom

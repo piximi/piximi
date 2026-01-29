@@ -16,12 +16,62 @@ import { ChannelMeasurements } from "store/data/types";
 
 import { getObjectMaskData, prepareChannels } from "utils/measurements/utils";
 
-export const format = (value: string | number, sf: number = 2) => {
-  if (typeof value === "number") {
-    return value.toFixed(sf);
-  } else {
+/**
+ * Adaptively formats a number based on its magnitude.
+ *
+ * Formatting rules:
+ * - Integers: displayed without decimal places
+ * - Large numbers (≥10000): no decimal places
+ * - Medium numbers (10-9999): up to 2 decimal places
+ * - Small numbers (1-10): up to 3 decimal places
+ * - Very small numbers (<1): uses significant figures
+ * - Removes trailing zeros after decimal point
+ *
+ * @param value - The number or string to format
+ * @param significantFigures - Number of significant figures for very small numbers (default: 3)
+ */
+export const format = (
+  value: string | number,
+  significantFigures: number = 3,
+): string => {
+  if (typeof value === "string") {
     return value;
   }
+
+  // Handle special cases
+  if (!Number.isFinite(value)) {
+    return String(value);
+  }
+
+  // Check if value is effectively an integer
+  if (Number.isInteger(value) || Math.abs(value - Math.round(value)) < 1e-10) {
+    return String(Math.round(value));
+  }
+
+  const absValue = Math.abs(value);
+
+  // Very small numbers: use significant figures
+  if (absValue < 1) {
+    // TODO(human): Implement significant figures formatting for small decimals
+    return value.toPrecision(significantFigures);
+  }
+
+  // Small numbers (1-100): show up to 3 decimal places
+  if (absValue < 100) {
+    return trimTrailingZeros(value.toFixed(2));
+  }
+
+  // Large numbers: no decimal places
+  return Math.round(value).toString();
+};
+
+/**
+ * Removes trailing zeros after the decimal point.
+ * "1.500" -> "1.5", "2.00" -> "2"
+ */
+const trimTrailingZeros = (str: string): string => {
+  if (!str.includes(".")) return str;
+  return str.replace(/\.?0+$/, "");
 };
 
 export const formatChartItems = (
@@ -42,40 +92,6 @@ export const formatChartItems = (
   });
 
   return items;
-};
-
-export const getHistogramData = (
-  rawData: number[],
-  numBins: number,
-):
-  | { data: number[]; xAxis: number[]; binSize: number; min: number }
-  | undefined => {
-  if (rawData.length === 0) return;
-  let min = Infinity;
-  let max = -Infinity;
-
-  for (const item of rawData) {
-    if (item < min) min = item;
-    if (item > max) max = item;
-  }
-
-  const valueRange = max - min > 0 ? max - min : min;
-  const binSize = valueRange / numBins + 1;
-  const data = new Array(numBins).fill(0);
-
-  for (const item of rawData) {
-    const binIndex = Math.floor((item - min) / binSize);
-    data[binIndex]++;
-  }
-
-  let i = 0;
-  const xAxis: number[] = [];
-  while (i < numBins + 1) {
-    xAxis.push(+format(i * binSize));
-    i++;
-  }
-
-  return { data, xAxis, binSize, min };
 };
 
 export const prepareEntityChannelData = async (

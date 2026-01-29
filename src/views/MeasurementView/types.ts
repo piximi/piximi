@@ -74,6 +74,7 @@ export type ChartConfig = {
   size?: string;
   color?: SplitType;
   numBins?: number;
+  binLabel?: boolean;
   swarmGroup?: SplitType;
   swarmStatistics?: boolean;
 };

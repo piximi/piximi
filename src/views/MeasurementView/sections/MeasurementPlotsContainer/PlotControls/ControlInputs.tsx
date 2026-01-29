@@ -1,10 +1,4 @@
-import {
-  ReactElement,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-} from "react";
+import { ReactElement, ReactNode, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { ColorSchemeId } from "@nivo/colors";
 import {
@@ -29,7 +23,7 @@ import { TextFieldWithBlur } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { measurementsSlice } from "views/MeasurementView/state/redux/measurementsSlice";
 import {
-  selectActiveMeasurementGroup,
+  selectActiveMeasurements,
   selectActiveSelectedPlot,
 } from "views/MeasurementView/state/redux/selectors";
 import { ChartConfig, ChartType, PlotDetail, SplitType } from "../../../types";
@@ -179,18 +173,11 @@ export const ChartMeasurementSelect = ({
   nullable?: boolean;
 }) => {
   const selectedPlot = useSelector(selectActiveSelectedPlot);
-  const activeGroup = useSelector(selectActiveMeasurementGroup);
+  const activeMeasurements = useSelector(selectActiveMeasurements);
   const dispatch = useDispatch();
   if (!selectedPlot) return <></>;
-  const measurementOptions = useMemo(() => {
-    if (!activeGroup) return [];
-    return [
-      ...activeGroup.intensityMeasurements,
-      ...activeGroup.computedMeasurements,
-    ];
-  }, [activeGroup]);
+
   const handleChange = (event: SelectChangeEvent<string>) => {
-    console.log(type, event.target.value);
     dispatch(
       measurementsSlice.actions.updateActiveSelectedPlot({
         plotId: selectedPlot.id,
@@ -217,7 +204,7 @@ export const ChartMeasurementSelect = ({
 
   const selectOptions = useMemo(
     () =>
-      (nullable ? ["None", ...measurementOptions] : measurementOptions).map(
+      (nullable ? ["None", ...activeMeasurements] : activeMeasurements).map(
         (option) => {
           return (
             <MenuItem key={option} dense value={option}>
@@ -226,7 +213,7 @@ export const ChartMeasurementSelect = ({
           );
         },
       ),
-    [measurementOptions, nullable],
+    [activeMeasurements, nullable],
   );
 
   const defaultValue = useMemo(
@@ -238,13 +225,6 @@ export const ChartMeasurementSelect = ({
     () => selectedPlot.chartConfig[type] ?? "",
     [type, selectedPlot.chartConfig],
   );
-
-  useEffect(() => {
-    console.log(selectedPlot.chartConfig[type]);
-  }, [selectedPlot.chartConfig]);
-  useEffect(() => {
-    console.log(inputValue);
-  }, [inputValue]);
 
   const renderValue = useCallback(
     (value: string) => {
@@ -468,6 +448,37 @@ export const HistogramBinTextField = () => {
       variant="standard"
       fullWidth
       sx={{ pb: 1, mt: 1 }}
+    />
+  );
+};
+
+export const BinLabelCheckbox = () => {
+  const selectedPlot = useSelector(selectActiveSelectedPlot);
+  const dispatch = useDispatch();
+  if (!selectedPlot) return <></>;
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(
+      measurementsSlice.actions.updateActiveSelectedPlot({
+        plotId: selectedPlot.id,
+        newConfig: { binLabel: event.target.checked },
+      }),
+    );
+  };
+
+  return (
+    <FormControlLabel
+      control={
+        <Checkbox
+          size="small"
+          checked={!!selectedPlot.chartConfig.binLabel}
+          onChange={handleChange}
+        />
+      }
+      label={
+        <Box display="flex" flexDirection="row" alignContent="center">
+          <Typography variant="body2">Show Bin Label</Typography>
+        </Box>
+      }
     />
   );
 };
