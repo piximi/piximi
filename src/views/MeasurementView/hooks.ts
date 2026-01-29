@@ -28,6 +28,7 @@ import { LoadStatus, Point } from "utils/types";
 import { isObjectEmpty } from "utils/objectUtils";
 
 import { TaskPriority, TaskHandle } from "workers/scheduler";
+import { capitalize } from "utils/stringUtils";
 
 export const useTableExport = () => {
   const activeGroup = useSelector(selectActiveMeasurementGroup);
@@ -71,7 +72,7 @@ export const useTableExport = () => {
         if (hasChannelMeasurements) {
           const channelMeasurements = entity.measurements!.channels;
           channelMeasurements.forEach((channel) => {
-            const labelPrefix = channel.channelId + ":Intensity:";
+            const labelPrefix = `-Intensity-Channel_${channel.channelId}`;
             Object.entries(channel).forEach(([measurement, value]) => {
               if (
                 measurement === "channelId" ||
@@ -80,7 +81,7 @@ export const useTableExport = () => {
               )
                 return;
               if (Array.isArray(value)) return;
-              data[labelPrefix + measurement] = value;
+              data[capitalize(measurement) + labelPrefix] = value;
             });
           });
         }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { Box } from "@mui/material";
 
@@ -73,7 +73,6 @@ export const ImageMeasurementOptions = ({
 
       onComplete: (data) => {
         if (!isObjectEmpty(data)) {
-          console.log(data);
           batch(() => {
             dispatch(
               measurementsSlice.actions.addImageComputedMeasurements({
@@ -106,7 +105,6 @@ export const ImageMeasurementOptions = ({
         groupedMeasurements[measurement]!.push(channelId);
       else groupedMeasurements[measurement] = [channelId];
     });
-    console.log(measurementEntities);
 
     const handle = scheduler.dispatch<
       Record<string, Record<number, ChannelData>>
@@ -120,7 +118,6 @@ export const ImageMeasurementOptions = ({
 
       onComplete: (data) => {
         if (!isObjectEmpty(data)) {
-          console.log(data);
           batch(() => {
             dispatch(
               measurementsSlice.actions.addIntensityMeasurements({
@@ -139,12 +136,7 @@ export const ImageMeasurementOptions = ({
 
     taskHandleRef.current = handle;
   };
-  useEffect(() => {
-    console.log(loadStatus);
-    console.log(schedulerProgress);
-  });
 
-  useEffect(() => console.log("mounted"), []);
   return (
     <Box
       sx={{

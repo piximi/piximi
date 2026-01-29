@@ -28,6 +28,7 @@ import {
   IMAGE_MEASUREMENT_KEYS,
   OBJECT_MEASUREMENT_KEYS,
 } from "store/data/consts";
+import { logger } from "utils/logUtils";
 
 const getEncodedMaskArea = (encodedMask: number[]) => {
   return encodedMask.reduce((count: number, value, idx) => {
@@ -240,8 +241,8 @@ const workerAPI: WorkerAPI = {
         throw new DOMException("Task cancelled", "AbortError");
       }
       //TODO Actually implement measurements
-      console.log(image.id);
-      measurementsToRun.forEach((measurement) => console.log(measurement));
+      logger(image.id);
+      measurementsToRun.forEach((measurement) => logger(measurement));
       postLoadPercent(++numCounted);
     }
 
@@ -289,7 +290,7 @@ const workerAPI: WorkerAPI = {
             entityChannelDataTensors[channel],
             measurement as keyof ChannelMeasurements,
           );
-          if (value)
+          if (value !== undefined)
             if (entityMeasurements[entity.id]) {
               if (entityMeasurements[entity.id][channel])
                 entityMeasurements[entity.id][channel][

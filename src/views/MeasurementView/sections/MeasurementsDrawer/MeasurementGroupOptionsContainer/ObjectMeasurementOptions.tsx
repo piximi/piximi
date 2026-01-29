@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { Box } from "@mui/material";
 
@@ -72,7 +72,6 @@ export const ObjectMeasurementOptions = ({
 
       onComplete: (data) => {
         if (!isObjectEmpty(data)) {
-          console.log(data);
           batch(() => {
             dispatch(
               measurementsSlice.actions.addObjectComputedMeasurements({
@@ -116,7 +115,6 @@ export const ObjectMeasurementOptions = ({
 
       onComplete: (data) => {
         if (!isObjectEmpty(data)) {
-          console.log(data);
           batch(() => {
             dispatch(
               measurementsSlice.actions.addIntensityMeasurements({
@@ -135,10 +133,7 @@ export const ObjectMeasurementOptions = ({
 
     taskHandleRef.current = handle;
   };
-  useEffect(() => {
-    console.log(loadStatus);
-    console.log(schedulerProgress);
-  });
+
   return (
     <Box
       sx={{
