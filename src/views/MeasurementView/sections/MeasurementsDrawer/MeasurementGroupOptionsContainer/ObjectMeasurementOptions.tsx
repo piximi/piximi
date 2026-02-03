@@ -25,6 +25,7 @@ import { LoadStatus } from "utils/types";
 import { isObjectEmpty } from "utils/objectUtils";
 
 import { TaskPriority, TaskHandle } from "workers/scheduler";
+import { TrackMeasurementOptions } from "./TrackMeasurementOptions";
 
 type MeasurementResult = { annId: string; measurements: ObjectMeasurements }[];
 
@@ -150,6 +151,10 @@ export const ObjectMeasurementOptions = ({
         onSelect={dispatchComputedMeasurementWorker}
       />
       <IntensityMeasurementOptions
+        group={group}
+        onSelect={dispatchIntensityMeasurementWorker}
+      />
+      <TrackMeasurementOptions
         group={group}
         onSelect={dispatchIntensityMeasurementWorker}
       />

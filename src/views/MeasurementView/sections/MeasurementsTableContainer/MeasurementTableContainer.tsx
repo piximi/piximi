@@ -63,7 +63,7 @@ export const MeasurementTableContainer = ({
           Object.keys(table.measurements).length === 0 ? (
             <Typography textAlign="center">No Measurements Selected</Typography>
           ) : (
-            <MeasurementTable table={table} gridApiRef={gridApiRef} />
+            <MeasurementTable gridApiRef={gridApiRef} />
           )
         ) : (
           <MeasurementPlotsContainer />

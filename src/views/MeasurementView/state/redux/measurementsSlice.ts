@@ -11,6 +11,8 @@ import {
   ObjectMeasurementGroup,
   ImageMeasurementGroup,
   ChartConfig,
+  BaseMeasurementGroup,
+  PivotItem,
 } from "../../types";
 import { mutatingFilter } from "utils/arrayUtils";
 import { IMAGE_KIND } from "store/data/constants";
@@ -106,16 +108,23 @@ export const measurementsSlice = createSlice({
 
     updateSplits(
       state,
-      action: PayloadAction<{
-        groupId: string;
-        categories?: string[];
-        partitions?: string[];
-      }>,
+      action: PayloadAction<
+        {
+          groupId: string;
+        } & Partial<BaseMeasurementGroup["splits"]>
+      >,
     ) {
-      const { groupId, categories, partitions } = action.payload;
+      const { groupId, ...rest } = action.payload;
       const group = state.objectGroups[groupId] ?? state.imageGroups[groupId];
-      if (categories) group.splits.category = categories;
-      if (partitions) group.splits.partition = partitions;
+      Object.assign(group.splits, rest);
+    },
+    updateActivePivotItems(state, action: PayloadAction<PivotItem[]>) {
+      const pivotItems = action.payload;
+      if (!state.activeGroup) return;
+      const group =
+        state.objectGroups[state.activeGroup] ??
+        state.imageGroups[state.activeGroup];
+      group.pivotItems = pivotItems;
     },
     setObjectComputedMeasurements(
       state,

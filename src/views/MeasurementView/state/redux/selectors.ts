@@ -55,6 +55,27 @@ export const selectActiveMeasurements = createSelector(
   },
 );
 
+export const selectActiveSplits = createSelector(
+  selectActiveMeasurementGroup,
+  (group) => {
+    if (!group) return [];
+    return Object.values(group.splits).reduce(
+      (allSplitItems: string[], splitItems) => {
+        allSplitItems.push(...splitItems);
+        return allSplitItems;
+      },
+      [],
+    );
+  },
+);
+export const selectActivePivotItems = createSelector(
+  selectActiveMeasurementGroup,
+  (group) => {
+    if (!group) return [];
+    return group.pivotItems ?? [];
+  },
+);
+
 export const selectObjectMeasurements = createSelector(
   selectObjectMeasurementGroups,
   selectAnnotationEntities,

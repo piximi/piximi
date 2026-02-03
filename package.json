@@ -5,6 +5,9 @@
   "type": "module",
   "homepage": "https://piximi.app",
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@emotion/react": "^11.6.0",
     "@emotion/styled": "^11.6.0",
     "@fontsource/material-icons": "^5.1.1",
@@ -60,6 +63,7 @@
     "stacktrace-js": "^2.0.2",
     "ts-priority-queue": "^0.1.1",
     "use-sound": "^4.0.1",
+    "utilities": "link:@dnd-kit/sortable/@dnd-kit/utilities",
     "uuid": "^8.3.2",
     "web-vitals": "^2.1.2",
     "zarr": "^0.6.1"

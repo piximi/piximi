@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { capitalize } from "lodash";
 import { Box, Divider, Typography } from "@mui/material";
 import { TreeViewBaseItem } from "@mui/x-tree-view";
 
@@ -8,35 +7,8 @@ import { StyledRichTreeView } from "views/MeasurementView/components/StyledRichT
 import { measurementsSlice } from "../../state/redux/measurementsSlice";
 import { GroupedMeasurementDisplayTable } from "../../types";
 
-import { selectKindToCategoryEntities } from "store/data/selectors";
-import { Category } from "store/data/types";
+import { selectTableSplitOptions } from "views/MeasurementView/state/redux/reselectors";
 
-import { Partition } from "utils/models/enums";
-import { enumKeys } from "utils/objectUtils";
-
-const generateTree = (categories: Category[]) => {
-  return [
-    {
-      id: "category",
-      label: "Category",
-
-      children: categories.map((category) => ({
-        id: category.id,
-        label: capitalize(category.name),
-        displayName: category.name,
-      })),
-    },
-    {
-      id: "partition",
-      label: "Partition",
-      children: enumKeys(Partition).map((ptn) => ({
-        id: ptn,
-        label: capitalize(ptn),
-        displayName: capitalize(ptn),
-      })),
-    },
-  ];
-};
 /**
  * Utility function to build a map of itemId to its parent's itemId.
  * This is crucial for looking up the parent of any selected node without re-traversing the tree.
@@ -57,30 +29,41 @@ export const getParentMap = (
 
 export const SplitTree = ({
   table,
-  kind,
 }: {
   table: GroupedMeasurementDisplayTable;
-  kind: string;
 }) => {
   const dispatch = useDispatch();
-  const categoriesByKind = useSelector(selectKindToCategoryEntities);
+
+  const splitOptions = useSelector(selectTableSplitOptions);
   const [selectedCategorySplits, setSelectedCategorySplits] = useState<
     string[]
   >([]);
   const [selectedPartitionSplits, setSelectedPartitionSplits] = useState<
     string[]
   >([]);
-  const splitTree = useMemo(() => {
-    return generateTree(categoriesByKind[kind]);
-  }, [categoriesByKind, kind]);
-  const parentMap = React.useMemo(() => getParentMap(splitTree), []);
+  const [selectedImageIdSplits, setSelectedImageIdSplits] = useState<string[]>(
+    [],
+  );
+  const [selectedTimepointSplits, setSelectedTimepointSplits] = useState<
+    string[]
+  >([]);
+  const [selectedTrackletSplits, setSelectedTrackletSplits] = useState<
+    string[]
+  >([]);
+
+  const parentMap = React.useMemo(() => getParentMap(splitOptions), []);
 
   const handleItemSelectionToggle = (
     event: React.SyntheticEvent | null,
     itemId: string,
     isSelected: boolean,
   ) => {
-    if (itemId === "category" || itemId === "partition") return;
+    if (
+      ["category", "partition", "imageId", "timepoint", "tracklet"].includes(
+        itemId,
+      )
+    )
+      return;
     switch (parentMap[itemId]) {
       case "category":
         setSelectedCategorySplits((selected) => {
@@ -95,6 +78,28 @@ export const SplitTree = ({
             return [...selected, itemId];
           } else return selected.filter((item) => item !== itemId);
         });
+        break;
+      case "imageId":
+        setSelectedImageIdSplits((selected) => {
+          if (isSelected) {
+            return [...selected, itemId];
+          } else return selected.filter((item) => item !== itemId);
+        });
+        break;
+      case "timepoint":
+        setSelectedTimepointSplits((selected) => {
+          if (isSelected) {
+            return [...selected, itemId];
+          } else return selected.filter((item) => item !== itemId);
+        });
+        break;
+      case "tracklet":
+        setSelectedTrackletSplits((selected) => {
+          if (isSelected) {
+            return [...selected, itemId];
+          } else return selected.filter((item) => item !== itemId);
+        });
+        break;
     }
     // onSelect((selected) => {
     //   if (isSelected) {
@@ -107,7 +112,7 @@ export const SplitTree = ({
     dispatch(
       measurementsSlice.actions.updateSplits({
         groupId: table.id,
-        categories: selectedCategorySplits,
+        category: selectedCategorySplits,
       }),
     );
   }, [selectedCategorySplits, table.id]);
@@ -116,10 +121,35 @@ export const SplitTree = ({
     dispatch(
       measurementsSlice.actions.updateSplits({
         groupId: table.id,
-        partitions: selectedPartitionSplits,
+        partition: selectedPartitionSplits,
       }),
     );
   }, [selectedPartitionSplits, table.id]);
+  useEffect(() => {
+    dispatch(
+      measurementsSlice.actions.updateSplits({
+        groupId: table.id,
+        imageId: selectedImageIdSplits,
+      }),
+    );
+  }, [selectedImageIdSplits, table.id]);
+
+  useEffect(() => {
+    dispatch(
+      measurementsSlice.actions.updateSplits({
+        groupId: table.id,
+        timepoint: selectedTimepointSplits,
+      }),
+    );
+  }, [selectedTimepointSplits, table.id]);
+  useEffect(() => {
+    dispatch(
+      measurementsSlice.actions.updateSplits({
+        groupId: table.id,
+        tracklet: selectedTrackletSplits,
+      }),
+    );
+  }, [selectedTrackletSplits, table.id]);
 
   return (
     <Box
@@ -146,7 +176,7 @@ export const SplitTree = ({
         })}
       >
         <StyledRichTreeView
-          items={splitTree}
+          items={splitOptions}
           multiSelect
           checkboxSelection
           onItemSelectionToggle={handleItemSelectionToggle}

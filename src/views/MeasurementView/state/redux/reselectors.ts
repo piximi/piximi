@@ -6,6 +6,7 @@ import {
   selectObjectMeasurementGroups,
 } from "./selectors";
 import {
+  Dimension,
   GroupedMeasurementDisplayTable,
   ImageEntityMeasurementGroup,
   ObjectEntityMeasurementGroup,
@@ -17,8 +18,17 @@ import {
   selectAnnotationEntities,
   selectCategoryEntities,
   selectImageDataEntities,
+  selectTrackletEntities,
 } from "store/data/selectors";
-import { AnnotationObject, ImageObject } from "store/data/types";
+import {
+  AnnotationObject,
+  Category,
+  ImageObject,
+  Tracklet,
+} from "store/data/types";
+import { TreeViewBaseItem } from "@mui/x-tree-view";
+import { capitalize } from "utils/stringUtils";
+import { Partition } from "utils/models/enums";
 
 export const selectActiveMeasuredEntities = createSelector(
   selectActiveMeasurementGroup,
@@ -65,6 +75,187 @@ export const selectActiveMeasuredEntitiesGroup = createSelector(
         ...activeGroup,
         entities: activeGroup.entityIds.map((id) => images[id]),
       };
+  },
+);
+
+export const selectActiveInitialPivotDimensions = createSelector(
+  selectActiveMeasuredEntitiesGroup,
+  selectCategoryEntities,
+  selectImageDataEntities,
+  selectTrackletEntities,
+  (activeGroup, categories, imageData, tracklets) => {
+    const categorySplit: Dimension = {
+      id: "category",
+      label: "Category",
+      values: [],
+    };
+
+    const partitionSplit: Dimension = {
+      id: "partition",
+      label: "Partition",
+      values: [],
+    };
+    const imageSplit: Dimension = {
+      id: "image",
+      label: "Image",
+      values: [],
+    };
+    const trackletSplit: Dimension = {
+      id: "tracklet",
+      label: "Tracklet",
+      values: [],
+    };
+    const timepointSplit: Dimension = {
+      id: "timpoint",
+      label: "Timepoint",
+      values: [],
+    };
+
+    if (!activeGroup) return [categorySplit, partitionSplit];
+
+    const entities = activeGroup.entities;
+    const imageSet = new Set<ImageObject>();
+    const trackSet = new Set<Tracklet>();
+    const timepointSet = new Set<number>();
+    const partitionSet = new Set<Partition>();
+    const categorySet = new Set<Category>();
+    for (const entity of Object.values(entities)) {
+      partitionSet.add(entity.partition);
+      categorySet.add(categories[entity.categoryId]);
+      if ("imageId" in entity) imageSet.add(imageData[entity.imageId]);
+      if ("trackId" in entity)
+        trackSet.add(tracklets[entity.trackId].name ?? entity.trackId);
+      if ("timepoint" in entity) timepointSet.add(entity.timepoint);
+    }
+
+    const splitTree: Dimension[] = [];
+    categorySplit.values = [...categorySet].map((category) => ({
+      id: category.id,
+      label: capitalize(category.name),
+      parentId: "category",
+    }));
+    splitTree.push(categorySplit);
+
+    partitionSplit.values = [...partitionSet].map((ptn) => ({
+      id: ptn,
+      label: capitalize(ptn),
+      parentId: "partition",
+    }));
+    splitTree.push(partitionSplit);
+
+    if (imageSet.size > 0) {
+      imageSplit.values = [...imageSet].map((ptn) => ({
+        id: ptn.id,
+        label: capitalize(ptn.name),
+        parentId: "image",
+      }));
+      splitTree.push(imageSplit);
+    }
+    if (trackSet.size > 0) {
+      trackletSplit.values = [...trackSet].map((ptn) => ({
+        id: ptn.id,
+        label: capitalize(ptn.name ?? ptn.id),
+        parentId: "tracklet",
+      }));
+      splitTree.push(trackletSplit);
+    }
+    if (timepointSet.size > 0) {
+      timepointSplit.values = [...timepointSet].sort().map((ptn) => ({
+        id: ptn + "",
+        label: ptn + "",
+        parentId: "timepoint",
+      }));
+      splitTree.push(timepointSplit);
+    }
+    return splitTree;
+  },
+);
+
+export const selectTableSplitOptions = createSelector(
+  selectActiveMeasuredEntitiesGroup,
+  selectCategoryEntities,
+  selectImageDataEntities,
+  selectTrackletEntities,
+  (activeGroup, categories, imageData, tracklets) => {
+    const categorySplit: TreeViewBaseItem = {
+      id: "category",
+      label: "Category",
+    };
+
+    const partitionSplit: TreeViewBaseItem = {
+      id: "partition",
+      label: "Partition",
+    };
+    const imageSplit: TreeViewBaseItem = {
+      id: "image",
+      label: "Image",
+    };
+    const trackletSplit: TreeViewBaseItem = {
+      id: "tracklet",
+      label: "Tracklet",
+    };
+    const timepointSplit: TreeViewBaseItem = {
+      id: "timpoint",
+      label: "Timepoint",
+    };
+
+    if (!activeGroup) return [categorySplit, partitionSplit];
+
+    const entities = activeGroup.entities;
+    const imageSet = new Set<ImageObject>();
+    const trackSet = new Set<Tracklet>();
+    const timepointSet = new Set<number>();
+    const partitionSet = new Set<Partition>();
+    const categorySet = new Set<Category>();
+    for (const entity of Object.values(entities)) {
+      partitionSet.add(entity.partition);
+      categorySet.add(categories[entity.categoryId]);
+      if ("imageId" in entity) imageSet.add(imageData[entity.imageId]);
+      if ("trackId" in entity)
+        trackSet.add(tracklets[entity.trackId].name ?? entity.trackId);
+      if ("timepoint" in entity) timepointSet.add(entity.timepoint);
+    }
+
+    const splitTree: TreeViewBaseItem[] = [];
+    categorySplit.children = [...categorySet].map((category) => ({
+      id: category.id,
+      label: capitalize(category.name),
+      displayName: category.name,
+    }));
+    splitTree.push(categorySplit);
+
+    partitionSplit.children = [...partitionSet].map((ptn) => ({
+      id: ptn,
+      label: capitalize(ptn),
+      displayName: capitalize(ptn),
+    }));
+    splitTree.push(partitionSplit);
+
+    if (imageSet.size > 0) {
+      imageSplit.children = [...imageSet].map((ptn) => ({
+        id: ptn.id,
+        label: capitalize(ptn.name),
+        displayName: capitalize(ptn.name),
+      }));
+      splitTree.push(imageSplit);
+    }
+    if (trackSet.size > 0) {
+      trackletSplit.children = [...trackSet].map((ptn) => ({
+        id: ptn.id,
+        label: capitalize(ptn.name ?? ptn.id),
+        displayName: capitalize(ptn.name ?? ptn.id),
+      }));
+      splitTree.push(trackletSplit);
+    }
+    if (timepointSet.size > 0) {
+      timepointSplit.children = [...timepointSet].sort().map((ptn) => ({
+        id: ptn + "",
+        label: ptn + "",
+        displayName: ptn + "",
+      }));
+      splitTree.push(timepointSplit);
+    }
+    return splitTree;
   },
 );
 
