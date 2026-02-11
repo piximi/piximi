@@ -6,3 +6,9 @@ export {
   useScheduler,
   useSchedulerProgress,
 } from "./SchedulerProvider";
+export {
+  DataPipelineProvider,
+  useDataPipeline,
+  useIsPipelineProcessing,
+  usePipelineProgress,
+} from "./DataPipelineProvider";
