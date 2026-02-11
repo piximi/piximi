@@ -11,6 +11,32 @@ vi.mock("comlink", () => ({
       .fn()
       .mockResolvedValue({ id: "test", measurements: [] }),
     prepare: vi.fn().mockResolvedValue({ kind: "test", data: {} }),
+    loadImage: vi.fn().mockResolvedValue({
+      id: "test-id",
+      buffer: new ArrayBuffer(8),
+      dtype: "float32",
+      shape: [1, 64, 64, 3],
+      bitDepth: 8,
+      colors: [],
+      renderedSrc: "data:image/png;base64,test",
+    }),
+    loadAndPrepare: vi.fn().mockResolvedValue({
+      id: "test-id",
+      buffer: new ArrayBuffer(8),
+      dtype: "float32",
+      shape: [1, 64, 64, 3],
+      preparedChannels: { data: [[1, 2, 3]] },
+      renderedSrc: "data:image/png;base64,test",
+      bitDepth: 8,
+      colors: [],
+    }),
+    analyzeTiff: vi.fn().mockResolvedValue({
+      frameCount: 1,
+      isMultiFrame: false,
+      suggestedType: "unknown",
+      confidence: 0,
+      metadata: {},
+    }),
   })),
   proxy: vi.fn((fn) => fn),
 }));
@@ -524,6 +550,135 @@ describe("WorkerScheduler", () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
 
       expect(onError).toHaveBeenCalled();
+    });
+  });
+
+  describe("data pipeline task types", () => {
+    it("should route loadImage task and resolve with image data", async () => {
+      scheduler = new WorkerScheduler({ poolSize: 1 });
+
+      const handle = scheduler.dispatch({
+        type: "loadImage",
+        payload: {
+          input: {
+            fileData: new ArrayBuffer(8),
+            fileName: "test.png",
+            mimeType: "image/png",
+          },
+        },
+        priority: TaskPriority.NORMAL,
+      });
+
+      const result = await handle.promise;
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          id: "test-id",
+          dtype: "float32",
+          bitDepth: 8,
+          renderedSrc: "data:image/png;base64,test",
+        }),
+      );
+      expect(handle.status).toBe(TaskStatus.COMPLETED);
+    });
+
+    it("should route loadAndPrepare task and resolve with prepared data", async () => {
+      scheduler = new WorkerScheduler({ poolSize: 1 });
+
+      const handle = scheduler.dispatch({
+        type: "loadAndPrepare",
+        payload: {
+          input: {
+            fileData: new ArrayBuffer(8),
+            fileName: "test.tiff",
+            mimeType: "image/tiff",
+            imageId: "img-1",
+          },
+        },
+        priority: TaskPriority.NORMAL,
+      });
+
+      const result = await handle.promise;
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          id: "test-id",
+          dtype: "float32",
+          preparedChannels: { data: [[1, 2, 3]] },
+        }),
+      );
+      expect(handle.status).toBe(TaskStatus.COMPLETED);
+    });
+
+    it("should route analyzeTiff task and resolve with analysis", async () => {
+      scheduler = new WorkerScheduler({ poolSize: 1 });
+
+      const handle = scheduler.dispatch({
+        type: "analyzeTiff",
+        payload: {
+          input: {
+            fileData: new ArrayBuffer(8),
+          },
+        },
+        priority: TaskPriority.NORMAL,
+      });
+
+      const result = await handle.promise;
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          frameCount: 1,
+          isMultiFrame: false,
+          suggestedType: "unknown",
+        }),
+      );
+      expect(handle.status).toBe(TaskStatus.COMPLETED);
+    });
+
+    it("should call onComplete callback for data pipeline task types", async () => {
+      scheduler = new WorkerScheduler({ poolSize: 1 });
+      const onComplete = vi.fn();
+
+      const handle = scheduler.dispatch({
+        type: "loadImage",
+        payload: {
+          input: {
+            fileData: new ArrayBuffer(8),
+            fileName: "test.png",
+            mimeType: "image/png",
+          },
+        },
+        priority: TaskPriority.NORMAL,
+        onComplete,
+      });
+
+      await handle.promise;
+
+      expect(onComplete).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "test-id" }),
+      );
+    });
+
+    it("should support cancellation for data pipeline task types", async () => {
+      scheduler = new WorkerScheduler({ poolSize: 1 });
+
+      const handle = scheduler.dispatch({
+        type: "loadAndPrepare",
+        payload: {
+          input: {
+            fileData: new ArrayBuffer(8),
+            fileName: "test.png",
+            mimeType: "image/png",
+            imageId: "img-2",
+          },
+        },
+        priority: TaskPriority.NORMAL,
+      });
+
+      handle.cancel();
+
+      await expect(handle.promise).rejects.toThrow();
+      expect(handle.status).toBe(TaskStatus.CANCELLED);
     });
   });
 

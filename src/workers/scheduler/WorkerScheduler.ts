@@ -35,6 +35,7 @@ import { createTaskError, ErrorLogger } from "./errors";
 import {
   AggregateProgress,
   CancelToken,
+  ExtendedWorkerAPI,
   ProgressListener,
   SchedulerOptions,
   Task,
@@ -43,7 +44,6 @@ import {
   TaskHandle,
   TaskStatus,
 } from "./types";
-import { WorkerAPI } from "./worker";
 
 // =============================================================================
 // INTERNAL TYPES
@@ -99,7 +99,8 @@ export class WorkerScheduler {
    * Example: Instead of postMessage/onmessage, we can do:
    *   const result = await proxy.annotationMeasurements(data);
    */
-  private workerProxies: Map<number, Comlink.Remote<WorkerAPI>> = new Map();
+  private workerProxies: Map<number, Comlink.Remote<ExtendedWorkerAPI>> =
+    new Map();
 
   // ---------------------------------------------------------------------------
   // TASK MANAGEMENT STATE
@@ -790,7 +791,7 @@ export class WorkerScheduler {
       // Comlink enables calling worker methods as if they were local:
       //   const result = await proxy.someMethod(arg);
       // Instead of manual postMessage/onmessage handling
-      const proxy = Comlink.wrap<WorkerAPI>(worker);
+      const proxy = Comlink.wrap<ExtendedWorkerAPI>(worker);
       this.workerProxies.set(i, proxy);
     }
 
@@ -933,23 +934,16 @@ export class WorkerScheduler {
         // ANNOTATION MEASUREMENTS
         // Calculates measurements (area, perimeter, etc.) for annotations
         // ---------------------------------------------------------------------
-        case "annotationMeasurements":
+        case "annotationMeasurements": {
           // Extract annotations from payload
-          const annotations = (
-            task.payload as {
-              annotations: Parameters<WorkerAPI["annotationMeasurements"]>[0];
-            }
-          ).annotations;
-
-          // Extract selected measurement types (defaults to empty = all)
-          const selectedMeasurements =
-            (
-              task.payload as {
-                selectedMeasurements?: Parameters<
-                  WorkerAPI["annotationMeasurements"]
-                >[1];
-              }
-            ).selectedMeasurements ?? [];
+          const { annotations, selectedMeasurements } = task.payload as {
+            annotations: Parameters<
+              ExtendedWorkerAPI["annotationMeasurements"]
+            >[0];
+            selectedMeasurements: Parameters<
+              ExtendedWorkerAPI["annotationMeasurements"]
+            >[1];
+          };
 
           // Call worker method via Comlink proxy
           // Comlink.proxy() wraps the callback to work across worker boundary
@@ -960,49 +954,39 @@ export class WorkerScheduler {
             Comlink.proxy(onProgress),
           );
           break;
-        case "imageMeasurements":
+        }
+        case "imageMeasurements": {
           // Extract annotations from payload
-          const images = (
-            task.payload as {
-              annotations: Parameters<WorkerAPI["imageMeasurements"]>[0];
-            }
-          ).annotations;
-
-          // Extract selected measurement types (defaults to empty = all)
-          const selectedImageMeasurements =
-            (
-              task.payload as {
-                selectedMeasurements?: Parameters<
-                  WorkerAPI["imageMeasurements"]
-                >[1];
-              }
-            ).selectedMeasurements ?? [];
+          const { images, selectedMeasurements } = task.payload as {
+            images: Parameters<ExtendedWorkerAPI["imageMeasurements"]>[0];
+            selectedMeasurements?: Parameters<
+              ExtendedWorkerAPI["imageMeasurements"]
+            >[1];
+          };
 
           // Call worker method via Comlink proxy
           // Comlink.proxy() wraps the callback to work across worker boundary
           result = await proxy.imageMeasurements(
             images,
-            selectedImageMeasurements,
+            selectedMeasurements ?? [],
             cancelToken,
             Comlink.proxy(onProgress),
           );
           break;
+        }
 
         // ---------------------------------------------------------------------
         // CHANNEL MEASUREMENTS
         // Calculates measurements for image channels
         // ---------------------------------------------------------------------
-        case "channelMeasurements":
-          const entities = (
-            task.payload as {
-              entities: Parameters<WorkerAPI["channelMeasurements"]>[0];
-            }
-          ).entities;
-          const measurements = (
-            task.payload as {
-              measurements: Parameters<WorkerAPI["channelMeasurements"]>[1];
-            }
-          ).measurements;
+        case "channelMeasurements": {
+          const { entities, measurements } = task.payload as {
+            entities: Parameters<ExtendedWorkerAPI["channelMeasurements"]>[0];
+            measurements: Parameters<
+              ExtendedWorkerAPI["channelMeasurements"]
+            >[1];
+          };
+
           result = await proxy.channelMeasurements(
             entities,
             measurements,
@@ -1010,21 +994,56 @@ export class WorkerScheduler {
             Comlink.proxy(onProgress),
           );
           break;
+        }
 
         // ---------------------------------------------------------------------
         // PREPARE
         // Prepares/transforms data for further processing
         // ---------------------------------------------------------------------
-        case "prepare":
+        case "prepare": {
+          const { kind, entities } = task.payload as {
+            kind: Parameters<ExtendedWorkerAPI["prepare"]>[0];
+            entities: Parameters<ExtendedWorkerAPI["prepare"]>[1];
+          };
+
           result = await proxy.prepare(
-            (task.payload as { kind: string }).kind,
-            (task.payload as { entities: Parameters<WorkerAPI["prepare"]>[1] })
-              .entities,
+            kind,
+            entities,
             cancelToken,
             Comlink.proxy(onProgress),
           );
           break;
+        }
+        case "loadImage": {
+          const { input } = task.payload as {
+            input: Parameters<ExtendedWorkerAPI["loadImage"]>[0];
+          };
+          result = await proxy.loadImage(
+            input,
+            cancelToken,
+            Comlink.proxy(onProgress),
+          );
+          break;
+        }
+        case "loadAndPrepare": {
+          const { input } = task.payload as {
+            input: Parameters<ExtendedWorkerAPI["loadAndPrepare"]>[0];
+          };
 
+          result = await proxy.loadAndPrepare(
+            input,
+            cancelToken,
+            Comlink.proxy(onProgress),
+          );
+          break;
+        }
+        case "analyzeTiff": {
+          const { input } = task.payload as {
+            input: Parameters<ExtendedWorkerAPI["analyzeTiff"]>[0];
+          };
+          result = await proxy.analyzeTiff(input, cancelToken);
+          break;
+        }
         // ---------------------------------------------------------------------
         // DEFAULT / UNKNOWN
         // For testing or extensibility, unknown types just return payload

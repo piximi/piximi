@@ -23,12 +23,26 @@ import {
 } from "views/MeasurementView/types";
 import { PreparedEntityChannels } from "views/MeasurementView/types";
 import { decode } from "views/ImageViewer/utils";
-import { CancelToken } from "./types";
+import {
+  AnalyzeTiffInput,
+  AnalyzeTiffOutput,
+  CancelToken,
+  ExtendedWorkerAPI,
+} from "./types";
 import {
   IMAGE_MEASUREMENT_KEYS,
   OBJECT_MEASUREMENT_KEYS,
 } from "store/data/consts";
 import { logger } from "utils/logUtils";
+import {
+  loadImageFromBuffer,
+  prepareChannels,
+  renderPreview,
+  stackToTensor,
+  tensorToBuffer,
+} from "./imageProcessing";
+import { generateDefaultColors } from "utils/tensorUtils";
+import { generateUUID } from "store/data/utils";
 
 const getEncodedMaskArea = (encodedMask: number[]) => {
   return encodedMask.reduce((count: number, value, idx) => {
@@ -66,7 +80,7 @@ export interface WorkerAPI {
   ) => Promise<{ kind: string; data: PreparedEntityChannels }>;
 }
 
-const workerAPI: WorkerAPI = {
+const workerAPI: ExtendedWorkerAPI = {
   async annotationMeasurements(
     annotations,
     selectedMeasurements,
@@ -342,6 +356,138 @@ const workerAPI: WorkerAPI = {
     }
 
     return { kind, data: entityChannelData };
+  },
+  async loadImage(input, cancelToken, onProgress) {
+    onProgress(0);
+
+    if (cancelToken.cancelled) {
+      throw new DOMException("Task cancelled", "AbortError");
+    }
+
+    // Load image from buffer
+    onProgress(30);
+    const stack = await loadImageFromBuffer(input.fileData);
+
+    if (cancelToken.cancelled) {
+      throw new DOMException("Task cancelled", "AbortError");
+    }
+
+    // Convert to tensor
+    onProgress(50);
+    const { tensor, shape } = stackToTensor(stack);
+
+    // Generate colors
+    onProgress(70);
+    const bitDepth = stack[0].bitDepth;
+    const colors = await generateDefaultColors(tensor);
+
+    // Extract buffer
+    onProgress(80);
+    const { buffer, dtype } = tensorToBuffer(tensor);
+
+    // Render preview
+    onProgress(90);
+    const renderedSrc = await renderPreview(tensor, colors);
+
+    tensor.dispose();
+
+    onProgress(100);
+
+    return {
+      id: generateUUID(),
+      buffer,
+      dtype,
+      shape,
+      bitDepth,
+      colors,
+      renderedSrc,
+    };
+  },
+
+  /**
+   * Load and prepare an image in one operation
+   * This is the most common path - load, convert, prepare, all in worker
+   */
+  async loadAndPrepare(input, cancelToken, onProgress) {
+    onProgress(0);
+
+    if (cancelToken.cancelled) {
+      throw new DOMException("Task cancelled", "AbortError");
+    }
+
+    // Load image
+    onProgress(10);
+    const stack = await loadImageFromBuffer(input.fileData);
+
+    if (cancelToken.cancelled) {
+      throw new DOMException("Task cancelled", "AbortError");
+    }
+
+    // Convert to tensor
+    onProgress(30);
+    const { tensor, shape } = stackToTensor(stack);
+
+    // Generate colors
+    onProgress(40);
+    const bitDepth = stack[0].bitDepth;
+    const colors = await generateDefaultColors(tensor);
+
+    // Prepare channels (this is the expensive operation)
+    onProgress(50);
+    const preparedChannels = prepareChannels(tensor);
+
+    if (cancelToken.cancelled) {
+      tensor.dispose();
+      throw new DOMException("Task cancelled", "AbortError");
+    }
+
+    // Extract buffer
+    onProgress(80);
+    const { buffer, dtype } = tensorToBuffer(tensor);
+
+    // Render preview
+    onProgress(90);
+    const renderedSrc = await renderPreview(tensor, colors);
+
+    // Cleanup
+    tensor.dispose();
+
+    onProgress(100);
+
+    return {
+      id: input.imageId,
+      buffer,
+      dtype,
+      shape,
+      preparedChannels,
+      renderedSrc,
+      bitDepth,
+      colors,
+    };
+  },
+
+  /**
+   * Analyze a TIFF file without fully loading it
+   * Used to detect multi-frame TIFFs and suggest interpretation
+   */
+  async analyzeTiff(
+    input: AnalyzeTiffInput,
+    cancelToken: CancelToken,
+  ): Promise<AnalyzeTiffOutput> {
+    if (cancelToken.cancelled) {
+      throw new DOMException("Task cancelled", "AbortError");
+    }
+
+    // TODO (Phase 2): Implement TIFF header parsing
+    // For now, return placeholder
+
+    return {
+      frameCount: 1,
+      isMultiFrame: false,
+      suggestedType: "unknown",
+      confidence: 0,
+      metadata: {},
+    };
   },
 };
 
