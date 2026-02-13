@@ -271,7 +271,7 @@ export const getImageFileInformation = async (
     return { shape: ImageShapeEnum.InvalidImage, ext };
   }
 };
-export const getUploadedFileTypes = async (files: FileList) => {
+export const groupImagesByFileType = async (files: FileList) => {
   const images: Record<number, Array<ImageShapeInfoImage>> = {};
   for (const file of files) {
     const ext = file.type as MIMEType;

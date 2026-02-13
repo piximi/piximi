@@ -21,3 +21,10 @@ export {
   type FileAnalysisResult,
   type PreparedImageData,
 } from "./dataPipeline";
+
+// TiffAnalyzer exports
+export {
+  TiffAnalyzerService,
+  type TiffIFDEntry,
+  type ParsedTiffStructure,
+} from "./tiffAnalyzer";

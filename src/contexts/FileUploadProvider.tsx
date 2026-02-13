@@ -35,7 +35,7 @@ import {
 
 import { ImageShapeInfo, ImageShapeInfoImage } from "utils/file-io/types";
 import { ImageShapeEnum } from "utils/file-io/enums";
-import { getUploadedFileTypes } from "utils/file-io/utils";
+import { groupImagesByFileType } from "utils/file-io/utils";
 import { AlertType } from "utils/enums";
 import { Partition } from "utils/models/enums";
 import { arrayRange } from "utils/arrayUtils";
@@ -204,39 +204,56 @@ export function FileUploadProvider({ children }: { children: ReactNode }) {
       if (options) {
         setTimeSeries(true);
       }
-      const imageInfo = await getUploadedFileTypes(files);
+      const imagesByFileType = await groupImagesByFileType(files);
 
-      setFileInfo(imageInfo);
+      setFileInfo(imagesByFileType);
       if (!numChannels) {
-        if (
-          (ImageShapeEnum.DicomImage in imageInfo ||
-            ImageShapeEnum.GreyScale in imageInfo) &&
-          ImageShapeEnum.SingleRGBImage in imageInfo
-        ) {
+        const hasGrayscaleImage = ImageShapeEnum.GreyScale in imagesByFileType;
+        const hasDicomImage = ImageShapeEnum.DicomImage in imagesByFileType;
+        const hasRGBImage = ImageShapeEnum.SingleRGBImage in imagesByFileType;
+        const hasMixedFixedChannelImage =
+          hasRGBImage && (hasGrayscaleImage || hasDicomImage);
+        const hasHyperstackImage =
+          ImageShapeEnum.HyperStackImage in imagesByFileType;
+        const hasInvalidImage = ImageShapeEnum.InvalidImage in imagesByFileType;
+
+        // Determine how to set project channels.
+        // 1. Check if files contain images with fixed number of channels (RGB, Grayscale, Dicom)
+        //    Prompt to choose a channel
+        // 2. Check each type starting with lowest channels. If not varied then
+        //    it will be one of (RGB, Grayscale, Dicom)
+        // 3. Checking for hyperstack is last, if no other type is found, prompt for # channels
+        //    Otherwise hyperstack images will conform to whichever other exists
+        // 4. Finally, if only invalid, set error state
+        if (hasMixedFixedChannelImage) {
           setUploadPromptMessage(
             "Your files contain both 3-channel and greyscale images, but channels across images must be uniform. Which would you like to use?",
           );
           setChannelOptions([
-            imageInfo[ImageShapeEnum.GreyScale][0].components!,
-            imageInfo[ImageShapeEnum.SingleRGBImage][0].components!,
+            imagesByFileType[ImageShapeEnum.GreyScale][0].components!,
+            imagesByFileType[ImageShapeEnum.SingleRGBImage][0].components!,
           ]);
           setOpenDimensionsDialogBox(true);
-        } else if (ImageShapeEnum.GreyScale in imageInfo) {
-          updateChannels(imageInfo![ImageShapeEnum.GreyScale]![0].components!);
-        } else if (ImageShapeEnum.DicomImage in imageInfo) {
-          updateChannels(1);
-        } else if (ImageShapeEnum.SingleRGBImage in imageInfo) {
+        } else if (hasGrayscaleImage) {
           updateChannels(
-            imageInfo[ImageShapeEnum.SingleRGBImage][0].components!,
+            imagesByFileType![ImageShapeEnum.GreyScale]![0].components!,
           );
-        } else if (ImageShapeEnum.HyperStackImage in imageInfo) {
+        } else if (hasDicomImage) {
+          updateChannels(1);
+        } else if (hasRGBImage) {
+          updateChannels(
+            imagesByFileType[ImageShapeEnum.SingleRGBImage][0].components!,
+          );
+        } else if (hasHyperstackImage) {
           setUploadPromptMessage(
             "How many channels do your images consist of?",
           );
-          setReferenceHyperStack(imageInfo[ImageShapeEnum.HyperStackImage][0]);
+          setReferenceHyperStack(
+            imagesByFileType[ImageShapeEnum.HyperStackImage][0],
+          );
           setOpenDimensionsDialogBox(true);
-        } else if (ImageShapeEnum.InvalidImage in imageInfo) {
-          const errors = imageInfo[ImageShapeEnum.InvalidImage].map(
+        } else if (hasInvalidImage) {
+          const errors = imagesByFileType[ImageShapeEnum.InvalidImage].map(
             (info) => `${info.fileName} -- ${info.error}`,
           );
 

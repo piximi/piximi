@@ -13,7 +13,7 @@ export const SettingsItem = ({
       display="flex"
       flexDirection="row"
       justifyContent="space-between"
-      alignItems="flex-end"
+      alignItems="center"
       height="40px"
     >
       {typeof title === "string" ? <Typography>{title}</Typography> : title}

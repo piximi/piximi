@@ -8,9 +8,20 @@
  */
 
 import { Image as IJSImage, Stack as IJSStack } from "image-js";
-import { tensor4d, Tensor4D } from "@tensorflow/tfjs";
+import { Tensor3D, tensor4d, Tensor4D, tidy } from "@tensorflow/tfjs";
 import { ColorsRaw } from "utils/types";
-import { forceStack } from "utils/file-io/utils";
+import { forceStack, getImageInformation } from "utils/file-io/utils";
+import { ImageShapeInfo } from "utils/file-io/types";
+import {
+  createColorsTensor,
+  filterVisibleChannels,
+  generateColoredTensor,
+  getImageSlice,
+  renderTensor,
+  scaleImageTensor,
+  sliceVisibleChannels,
+  sliceVisibleColors,
+} from "utils/tensorUtils";
 
 // ============================================================
 // Image Loading
@@ -22,14 +33,17 @@ import { forceStack } from "utils/file-io/utils";
  */
 export async function loadImageFromBuffer(
   buffer: ArrayBuffer,
-): Promise<IJSStack> {
-  const uint8 = new Uint8Array(buffer);
-
-  const image = await IJSImage.load(uint8, {
+): Promise<ImageShapeInfo & { stack: IJSStack }> {
+  const image = await IJSImage.load(buffer, {
     ignorePalette: true,
   });
 
-  return forceStack(image);
+  const imageInfo = getImageInformation(image);
+  const stack = await forceStack(image);
+  return {
+    ...imageInfo,
+    stack,
+  };
 }
 
 /**
@@ -38,10 +52,15 @@ export async function loadImageFromBuffer(
  */
 export function stackToTensor(
   stack: IJSStack,
+  planes: number,
+  channels: number,
   targetDtype: "float32" | "int32" = "float32",
-): { tensor: Tensor4D; shape: [number, number, number, number] } {
-  const planes = stack.length;
-  const { width, height, channels } = stack[0];
+): {
+  tensor: Tensor4D;
+  shape: [number, number, number, number];
+  bitDepth: number;
+} {
+  const { width, height, bitDepth } = stack[0];
 
   // Calculate total size
   const totalSize = planes * height * width * channels;
@@ -85,7 +104,7 @@ export function stackToTensor(
 
   const tensor = tensor4d(data, shape, targetDtype);
 
-  return { tensor, shape };
+  return { tensor, shape, bitDepth };
 }
 
 /**
@@ -128,46 +147,92 @@ export async function renderPreview(
   tensor: Tensor4D,
   colors: ColorsRaw,
   plane: number = 0,
+  bitDepth: number,
+  channels: number,
 ): Promise<string> {
-  const [planes, height, width, channels] = tensor.shape;
-  const data = tensor.dataSync();
+  const compositeImage = tidy(() => {
+    let operandTensor: Tensor4D | Tensor3D;
+    let disposeOperandTensor: boolean;
 
-  // Create canvas
-  const canvas = new OffscreenCanvas(width, height);
-  const ctx = canvas.getContext("2d")!;
-  const imageData = ctx.createImageData(width, height);
-
-  const planeOffset = plane * height * width * channels;
-
-  for (let h = 0; h < height; h++) {
-    for (let w = 0; w < width; w++) {
-      const srcIdx = planeOffset + (h * width + w) * channels;
-      const dstIdx = (h * width + w) * 4;
-
-      if (channels >= 3) {
-        // RGB or more - use first 3 channels
-        imageData.data[dstIdx] = Math.round(data[srcIdx] * 255);
-        imageData.data[dstIdx + 1] = Math.round(data[srcIdx + 1] * 255);
-        imageData.data[dstIdx + 2] = Math.round(data[srcIdx + 2] * 255);
-      } else {
-        // Grayscale - repeat across RGB
-        const val = Math.round(data[srcIdx] * 255);
-        imageData.data[dstIdx] = val;
-        imageData.data[dstIdx + 1] = val;
-        imageData.data[dstIdx + 2] = val;
-      }
-      imageData.data[dstIdx + 3] = 255; // Alpha
+    if (plane === undefined) {
+      operandTensor = tensor;
+      disposeOperandTensor = false;
+    } else {
+      // image slice := get z idx 0 of image with dims: [H, W, C]
+      operandTensor = getImageSlice(tensor, plane);
+      disposeOperandTensor = true;
     }
-  }
 
-  ctx.putImageData(imageData, 0, 0);
+    const colorTensor = createColorsTensor(colors, channels);
 
-  const blob = await canvas.convertToBlob({ type: "image/png" });
-  const reader = new FileReader();
-  return new Promise<string>((resolve) => {
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.readAsDataURL(blob);
+    // scale each channel by its range
+    const scaledImageSlice = scaleImageTensor(operandTensor, colorTensor, {
+      disposeImageTensor: disposeOperandTensor,
+    });
+
+    // get indices of visible channels, VC
+    const visibleChannels = filterVisibleChannels(colorTensor);
+
+    // image slice filtered by visible channels: [H, W, VC] or [Z, H, W, VC]
+    const filteredSlice = sliceVisibleChannels(
+      scaledImageSlice,
+      visibleChannels,
+    );
+
+    // color matrix filtered by visible channels: [VC, 3]
+    const filteredColors = sliceVisibleColors(colorTensor, visibleChannels);
+
+    // composite image slice: [H, W, 3] or [Z, H, W, 3]
+    const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+
+    return compositeImage;
   });
+
+  const src = await renderTensor(compositeImage, bitDepth, {
+    disposeCompositeTensor: true,
+    useCanvas: false,
+  });
+
+  return Array.isArray(src) ? src[0] : src;
+  // const [planes, height, width, channels] = tensor.shape;
+  // const data = tensor.dataSync();
+
+  // // Create canvas
+  // const canvas = new OffscreenCanvas(width, height);
+  // const ctx = canvas.getContext("2d")!;
+  // const imageData = ctx.createImageData(width, height);
+
+  // const planeOffset = plane * height * width * channels;
+
+  // for (let h = 0; h < height; h++) {
+  //   for (let w = 0; w < width; w++) {
+  //     const srcIdx = planeOffset + (h * width + w) * channels;
+  //     const dstIdx = (h * width + w) * 4;
+
+  //     if (channels >= 3) {
+  //       // RGB or more - use first 3 channels
+  //       imageData.data[dstIdx] = Math.round(data[srcIdx] * 255);
+  //       imageData.data[dstIdx + 1] = Math.round(data[srcIdx + 1] * 255);
+  //       imageData.data[dstIdx + 2] = Math.round(data[srcIdx + 2] * 255);
+  //     } else {
+  //       // Grayscale - repeat across RGB
+  //       const val = Math.round(data[srcIdx] * 255);
+  //       imageData.data[dstIdx] = val;
+  //       imageData.data[dstIdx + 1] = val;
+  //       imageData.data[dstIdx + 2] = val;
+  //     }
+  //     imageData.data[dstIdx + 3] = 255; // Alpha
+  //   }
+  // }
+
+  // ctx.putImageData(imageData, 0, 0);
+
+  // const blob = await canvas.convertToBlob({ type: "image/png" });
+  // const reader = new FileReader();
+  // return new Promise<string>((resolve) => {
+  //   reader.onloadend = () => resolve(reader.result as string);
+  //   reader.readAsDataURL(blob);
+  // });
 }
 
 // ============================================================

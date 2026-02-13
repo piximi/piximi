@@ -16,6 +16,7 @@ export const ProjectSettings = () => {
       }),
     );
   };
+
   return (
     <Box>
       <DividerHeader

@@ -8,7 +8,12 @@ import { usePreferredMuiTheme } from "hooks";
 
 import { AppErrorBoundary } from "components/errors/AppErrorBoundary";
 import { AlertBar } from "components/ui";
-import { FileUploadProvider, HelpProvider, SchedulerProvider } from "contexts";
+import {
+  DataPipelineProvider,
+  FileUploadProvider,
+  HelpProvider,
+  SchedulerProvider,
+} from "contexts";
 import { ProjectViewer } from "views/ProjectViewer";
 import { ImageViewer } from "views/ImageViewer";
 import { MeasurementView } from "views/MeasurementView";
@@ -27,20 +32,25 @@ export const Application = () => {
         <CssBaseline />
         <AppErrorBoundary>
           <SchedulerProvider>
-            <FileUploadProvider>
-              <HelpProvider>
-                <HelpOverlay />
-                {alertState.visible && <AlertBar alertState={alertState} />}
-                <BrowserRouter basename={"/"}>
-                  <Routes>
-                    <Route path="/" element={<WelcomeScreen />} />
-                    <Route path="project" element={<ProjectViewer />} />
-                    <Route path="imageviewer" element={<ImageViewer />} />
-                    <Route path="measurements" element={<MeasurementView />} />
-                  </Routes>
-                </BrowserRouter>
-              </HelpProvider>
-            </FileUploadProvider>
+            <DataPipelineProvider>
+              <FileUploadProvider>
+                <HelpProvider>
+                  <HelpOverlay />
+                  {alertState.visible && <AlertBar alertState={alertState} />}
+                  <BrowserRouter basename={"/"}>
+                    <Routes>
+                      <Route path="/" element={<WelcomeScreen />} />
+                      <Route path="project" element={<ProjectViewer />} />
+                      <Route path="imageviewer" element={<ImageViewer />} />
+                      <Route
+                        path="measurements"
+                        element={<MeasurementView />}
+                      />
+                    </Routes>
+                  </BrowserRouter>
+                </HelpProvider>
+              </FileUploadProvider>
+            </DataPipelineProvider>
           </SchedulerProvider>
         </AppErrorBoundary>
       </ThemeProvider>

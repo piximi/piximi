@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -12,6 +12,10 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useFileUploadContext } from "contexts";
+import { useUploadPipeline } from "hooks/useUploadPipeline";
+import { FileAnalysisResult, TiffImportConfig } from "services";
+import { FEATURE_FLAGS } from "utils/featureFlags";
+import { TiffImportDialog } from "components/dialogs/TiffImportDialog";
 
 type OpenImageOptionsDialogProps = {
   open: boolean;
@@ -24,13 +28,43 @@ type OpenImageOptionsDialogProps = {
 export const OpenImageOptionsDialog = (props: OpenImageOptionsDialogProps) => {
   const [importAsTimeSeries, setImportAsTimeSeries] = React.useState(false);
   const uploadFiles = useFileUploadContext();
+  const { upload } = useUploadPipeline();
+
+  // TIFF dialog state
+  const [tiffDialogOpen, setTiffDialogOpen] = useState(false);
+  const [pendingTiffAnalysis, setPendingTiffAnalysis] =
+    useState<FileAnalysisResult | null>(null);
+  const tiffResolverRef = useRef<
+    ((config: TiffImportConfig | null) => void) | null
+  >(null);
+
+  const handleTiffDialog = useCallback(
+    async (analysis: FileAnalysisResult): Promise<TiffImportConfig | null> => {
+      return new Promise((resolve) => {
+        setPendingTiffAnalysis(analysis);
+        tiffResolverRef.current = resolve;
+        setTiffDialogOpen(true);
+      });
+    },
+    [],
+  );
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.currentTarget.files || !uploadFiles) return;
     const files: FileList = Object.assign([], event.currentTarget.files);
-    await uploadFiles(
-      files,
-      importAsTimeSeries ? { timeSeriesDelimeter: "_" } : undefined,
-    );
+
+    if (FEATURE_FLAGS.USE_NEW_PIPELINE) {
+      // New pipeline path
+      await upload(files, {
+        timeSeries: importAsTimeSeries,
+        timeSeriesDelimiter: "_",
+        onTiffDialog: handleTiffDialog,
+      });
+    } else if (uploadFiles) {
+      await uploadFiles(
+        files,
+        importAsTimeSeries ? { timeSeriesDelimeter: "_" } : undefined,
+      );
+    }
     props.onClose();
   };
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -40,85 +74,104 @@ export const OpenImageOptionsDialog = (props: OpenImageOptionsDialogProps) => {
   };
 
   return (
-    <Dialog
-      fullWidth
-      maxWidth="md"
-      open={props.open}
-      onClose={props.onClose}
-      slotProps={{
-        paper: {
-          sx: {
-            maxHeight: "90vh",
+    <>
+      <Dialog
+        fullWidth
+        maxWidth="md"
+        open={props.open}
+        onClose={props.onClose}
+        slotProps={{
+          paper: {
+            sx: {
+              maxHeight: "90vh",
+              display: "flex",
+              flexDirection: "column",
+            },
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+            margin: 0,
+            padding: (theme) => theme.spacing(2),
+          }}
+        >
+          {"Import Images"}
+          <IconButton
+            aria-label="Close"
+            sx={(theme) => ({
+              color: theme.palette.grey[500],
+              position: "absolute",
+              right: theme.spacing(1),
+              top: theme.spacing(1),
+            })}
+            onClick={(event) => props.onClose(event, "escapeKeyDown")}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent
+          sx={{
             display: "flex",
             flexDirection: "column",
-          },
-        },
-      }}
-    >
-      <DialogTitle
-        sx={{
-          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
-          margin: 0,
-          padding: (theme) => theme.spacing(2),
-        }}
-      >
-        {"Import Images"}
-        <IconButton
-          aria-label="Close"
-          sx={(theme) => ({
-            color: theme.palette.grey[500],
-            position: "absolute",
-            right: theme.spacing(1),
-            top: theme.spacing(1),
-          })}
-          onClick={(event) => props.onClose(event, "escapeKeyDown")}
+            flexGrow: 1,
+            overflow: "hidden", // prevent double scroll
+            borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+            margin: 0,
+            padding: 1,
+          }}
         >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-      <DialogContent
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          flexGrow: 1,
-          overflow: "hidden", // prevent double scroll
-          borderTop: (theme) => `1px solid ${theme.palette.divider}`,
-          margin: 0,
-          padding: 1,
-        }}
-      >
-        <FormControl size="small">
-          <FormControlLabel
-            sx={(theme) => ({
-              fontSize: theme.typography.body2.fontSize,
-              width: "max-content",
-              ml: 0,
-            })}
-            control={
-              <Checkbox
-                checked={importAsTimeSeries}
-                onChange={() => setImportAsTimeSeries((prev) => !prev)}
-                color="primary"
-              />
-            }
-            label="Import as Time Series"
-            labelPlacement="start"
-            disableTypography
+          <FormControl size="small">
+            <FormControlLabel
+              sx={(theme) => ({
+                fontSize: theme.typography.body2.fontSize,
+                width: "max-content",
+                ml: 0,
+              })}
+              control={
+                <Checkbox
+                  checked={importAsTimeSeries}
+                  onChange={() => setImportAsTimeSeries((prev) => !prev)}
+                  color="primary"
+                />
+              }
+              label="Import as Time Series"
+              labelPlacement="start"
+              disableTypography
+            />
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <input
+            ref={inputRef}
+            accept="image/*,.dcm"
+            hidden
+            multiple
+            id="open-image"
+            onChange={onOpenImage}
+            type="file"
           />
-        </FormControl>
-      </DialogContent>
-      <DialogActions>
-        <input
-          ref={inputRef}
-          accept="image/*,.dcm"
-          hidden
-          multiple
-          id="open-image"
-          onChange={onOpenImage}
-          type="file"
+          <Button onClick={handleClick}>Choose Images</Button>
+        </DialogActions>
+      </Dialog>
+      {/* TIFF Import Dialog (only shown when new pipeline is active) */}
+      {pendingTiffAnalysis && (
+        <TiffImportDialog
+          open={tiffDialogOpen}
+          analysisResult={pendingTiffAnalysis}
+          onConfirm={(config) => {
+            tiffResolverRef.current?.(config);
+            setTiffDialogOpen(false);
+            setPendingTiffAnalysis(null);
+          }}
+          onCancel={() => {
+            tiffResolverRef.current?.(null);
+            setTiffDialogOpen(false);
+            setPendingTiffAnalysis(null);
+          }}
         />
-        <Button onClick={handleClick}>Choose Images</Button>
-      </DialogActions>
-    </Dialog>
+      )}
+    </>
   );
 };

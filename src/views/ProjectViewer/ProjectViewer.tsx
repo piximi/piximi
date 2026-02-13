@@ -20,6 +20,7 @@ import { HotkeyContext } from "utils/enums";
 import { DIMENSIONS } from "utils/constants";
 import { KindItemsProvider } from "contexts/KindItemsProvider";
 import { IMAGE_KIND } from "store/data/constants";
+import { PipelineProgressIndicator } from "components/ui/PipelineProgressIndicator";
 
 export const ProjectViewer = React.memo(() => {
   const dispatch = useDispatch();
@@ -63,6 +64,7 @@ export const ProjectViewer = React.memo(() => {
     <div>
       <ErrorBoundary FallbackComponent={FallbackDialog}>
         <div tabIndex={-1}>
+          <PipelineProgressIndicator />
           <Box sx={styles}>
             <KindItemsProvider>
               <ProjectAppBar />

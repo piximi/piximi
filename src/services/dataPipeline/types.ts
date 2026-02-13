@@ -1,4 +1,4 @@
-import { ImageMetadata, ImageObject, AnnotationObject } from "store/data/types";
+import { ImageMetadata, ImageObject } from "store/data/types";
 import { TensorReference } from "../tensorStorage/types";
 
 // ============================================================
@@ -8,7 +8,7 @@ import { TensorReference } from "../tensorStorage/types";
 export type PipelineStage =
   | "idle"
   | "loading"
-  | "analysing"
+  | "analyzing"
   | "preparing"
   | "storing"
   | "complete"
@@ -39,7 +39,7 @@ export type PipelineError = {
 export type UploadOptions = {
   // Time series configuration
   timeSeries?: boolean;
-  timeSeriesDelimeter?: string;
+  timeSeriesDelimiter?: string;
 
   // Channel configuration (for ambiguous formats)
   channelConfig?: {
@@ -60,11 +60,16 @@ export type TiffImportConfig = {
 // Pipeline Results
 // ============================================================
 
+export type PipelineImageResult = {
+  imageId: string;
+  fileName: string;
+  tensorRef: TensorReference;
+};
+
 export type PipelineResult = {
   success: boolean;
+  images: PipelineImageResult[];
   metadataIds: string[];
-  imageIds: string[];
-  tensorRefs: TensorReference[];
   errors: PipelineError[];
   warnings: string[];
   stats: {
@@ -152,3 +157,31 @@ export interface IDataPipelineService {
   getStatus(): PipelineStage;
   getProgress(): PipelineProgress;
 }
+
+// ============================================================
+// UI Dialog Integration
+// ============================================================
+
+/**
+ * Callback for requesting user decisions during pipeline execution.
+ * The pipeline pauses and waits for the callback to resolve
+ */
+export type TiffDialogCallback = (
+  analysisResult: FileAnalysisResult,
+) => Promise<TiffImportConfig | null>; //null = cancel
+
+/**
+ * Callback for requesting channel configuration from user.
+ * Used when uploaded files have ambiguous channel counts
+ */
+export type ChannelConfigCallback = (
+  fileInfo: FileAnalysisResult[],
+) => Promise<number | null>; // null = cancel
+
+/**
+ * Extended upload options including dialog callbacks
+ */
+export type UploadOptionswithCallbacks = UploadOptions & {
+  onTiffDialog?: TiffDialogCallback;
+  onChannelConfig?: ChannelConfigCallback;
+};

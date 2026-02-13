@@ -43,6 +43,7 @@ import {
 } from "./imageProcessing";
 import { generateDefaultColors } from "utils/tensorUtils";
 import { generateUUID } from "store/data/utils";
+import { TiffAnalyzerService } from "services/tiffAnalyzer";
 
 const getEncodedMaskArea = (encodedMask: number[]) => {
   return encodedMask.reduce((count: number, value, idx) => {
@@ -366,7 +367,7 @@ const workerAPI: ExtendedWorkerAPI = {
 
     // Load image from buffer
     onProgress(30);
-    const stack = await loadImageFromBuffer(input.fileData);
+    const { stack, components } = await loadImageFromBuffer(input.fileData);
 
     if (cancelToken.cancelled) {
       throw new DOMException("Task cancelled", "AbortError");
@@ -374,7 +375,7 @@ const workerAPI: ExtendedWorkerAPI = {
 
     // Convert to tensor
     onProgress(50);
-    const { tensor, shape } = stackToTensor(stack);
+    const { tensor, shape } = stackToTensor(stack, 1, components!);
 
     // Generate colors
     onProgress(70);
@@ -387,7 +388,13 @@ const workerAPI: ExtendedWorkerAPI = {
 
     // Render preview
     onProgress(90);
-    const renderedSrc = await renderPreview(tensor, colors);
+    const renderedSrc = await renderPreview(
+      tensor,
+      colors,
+      0,
+      bitDepth,
+      components!,
+    );
 
     tensor.dispose();
 
@@ -417,7 +424,7 @@ const workerAPI: ExtendedWorkerAPI = {
 
     // Load image
     onProgress(10);
-    const stack = await loadImageFromBuffer(input.fileData);
+    const { stack, components } = await loadImageFromBuffer(input.fileData);
 
     if (cancelToken.cancelled) {
       throw new DOMException("Task cancelled", "AbortError");
@@ -425,7 +432,7 @@ const workerAPI: ExtendedWorkerAPI = {
 
     // Convert to tensor
     onProgress(30);
-    const { tensor, shape } = stackToTensor(stack);
+    const { tensor, shape } = stackToTensor(stack, 1, components!);
 
     // Generate colors
     onProgress(40);
@@ -447,7 +454,13 @@ const workerAPI: ExtendedWorkerAPI = {
 
     // Render preview
     onProgress(90);
-    const renderedSrc = await renderPreview(tensor, colors);
+    const renderedSrc = await renderPreview(
+      tensor,
+      colors,
+      0,
+      bitDepth,
+      components!,
+    );
 
     // Cleanup
     tensor.dispose();
@@ -478,16 +491,8 @@ const workerAPI: ExtendedWorkerAPI = {
       throw new DOMException("Task cancelled", "AbortError");
     }
 
-    // TODO (Phase 2): Implement TIFF header parsing
-    // For now, return placeholder
-
-    return {
-      frameCount: 1,
-      isMultiFrame: false,
-      suggestedType: "unknown",
-      confidence: 0,
-      metadata: {},
-    };
+    const analyzer = new TiffAnalyzerService();
+    return analyzer.analyze(input.fileData);
   },
 };
 

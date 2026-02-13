@@ -1,4 +1,4 @@
-import { WorkerScheduler } from "workers/scheduler";
+import { TaskHandle, WorkerScheduler } from "workers/scheduler";
 import { TensorStorageService, STORES } from "../tensorStorage";
 import {
   IDataPipelineService,
@@ -6,9 +6,17 @@ import {
   PipelineProgress,
   PipelineResult,
   PipelineError,
-  UploadOptions,
   FileAnalysisResult,
+  UploadOptionswithCallbacks,
+  TiffImportConfig,
 } from "./types";
+import {
+  AnalyzeTiffOutput,
+  LoadAndPrepareOutput,
+  TaskPriority,
+} from "workers/scheduler/types";
+import { generateUUID } from "store/data/utils";
+import { parseError } from "utils/errorUtils";
 
 const INITIAL_PROGRESS: PipelineProgress = {
   stage: "idle",
@@ -91,32 +99,238 @@ export class DataPipelineService implements IDataPipelineService {
 
   async uploadFiles(
     files: FileList,
-    options?: UploadOptions,
+    options?: UploadOptionswithCallbacks,
   ): Promise<PipelineResult> {
-    // Phase 1: Return stub result
-    console.warn("DataPipelineService.uploadFiles() not yet implemented");
+    const startTime = Date.now();
+    this.resetProgress();
 
-    return {
-      success: false,
-      metadataIds: [],
-      imageIds: [],
-      tensorRefs: [],
-      errors: [
-        {
-          fileName: "N/A",
-          error: new Error("Not implemented in Phase 1"),
-          recoverable: false,
+    try {
+      // -- Stage 1: Analyze
+      this.updateProgress({
+        stage: "analyzing",
+        totalCount: files.length,
+        overallProgress: 5,
+      });
+
+      const analysisResult = await this.analyzeFiles(files);
+
+      if (this.abortController?.signal.aborted) {
+        return this.cancelledResult(files.length);
+      }
+
+      // Handle TIFF files needing user input
+      const tiffConfigs = new Map<string, TiffImportConfig>();
+      for (const result of analysisResult) {
+        if (result.tiffInfo?.isMultiFrame && options?.onTiffDialog) {
+          const config = await options.onTiffDialog(result);
+          if (config === null) {
+            // User cancelled this file -- skip it
+            continue;
+          }
+          tiffConfigs.set(result.fileName, config);
+        }
+      }
+
+      // -- Stage 2: Load + Prepare in workers
+
+      this.updateProgress({
+        stage: "loading",
+        overallProgress: 10,
+      });
+
+      const taskHandles: Array<{
+        fileName: string;
+        imageId: string;
+        handle: TaskHandle<LoadAndPrepareOutput>;
+      }> = [];
+
+      const errors: PipelineError[] = [];
+      let totalBytes = 0;
+
+      for (let i = 0; i < files.length; i++) {
+        if (this.abortController?.signal.aborted) break;
+
+        const file = files[i];
+        const imageId = generateUUID();
+
+        try {
+          const fileData = await file.arrayBuffer();
+          totalBytes += fileData.byteLength;
+
+          const mimeType = file.type || this.inferMimeType(file.name);
+
+          const handle = this.scheduler.dispatch<LoadAndPrepareOutput>({
+            type: "loadAndPrepare",
+            payload: {
+              input: {
+                fileData,
+                fileName: file.name,
+                mimeType,
+                imageId,
+              },
+            },
+            priority: TaskPriority.HIGH,
+            onProgress: (progress) => {
+              this.updateProgress({
+                stageProgress: progress,
+                currentFile: file.name,
+                processedCount: i,
+              });
+            },
+          });
+
+          taskHandles.push({
+            fileName: file.name,
+            imageId,
+            handle,
+          });
+        } catch (err) {
+          errors.push({
+            fileName: file.name,
+            error: parseError(err),
+            recoverable: true,
+          });
+        }
+      }
+
+      // --  Await all worker tasks
+      const results: Array<{
+        fileName: string;
+        imageId: string;
+        output: LoadAndPrepareOutput;
+      }> = [];
+
+      for (const { fileName, imageId, handle } of taskHandles) {
+        try {
+          const output = await handle.promise;
+          results.push({ fileName, imageId, output });
+
+          this.updateProgress({
+            processedCount: results.length,
+            overallProgress:
+              10 + Math.floor((results.length / taskHandles.length) * 60),
+          });
+        } catch (err) {
+          if (err instanceof DOMException && err.name === "AbortError") {
+            // Cancelled -- don't count as error
+            continue;
+          }
+          errors.push({
+            fileName,
+            error: parseError(err),
+            recoverable: true,
+          });
+        }
+      }
+
+      if (results.length === 0) {
+        this.updateProgress({ stage: "error" });
+        return {
+          success: false,
+          metadataIds: [],
+          images: [],
+          errors,
+          warnings: [],
+          stats: {
+            totalFiles: files.length,
+            successCount: 0,
+            failedCount: files.length,
+            totalBytes,
+            preparationTimeMs: Date.now() - startTime,
+          },
+        };
+      }
+
+      // -- Stage 3: Store in IndexedDB
+      this.updateProgress({
+        stage: "storing",
+        overallProgress: 75,
+      });
+
+      const storageItems = results.map(({ imageId, output }) => ({
+        id: imageId,
+        data: {
+          buffer: output.buffer,
+          dtype: output.dtype,
+          shape: output.shape,
+          preparedChannels: output.preparedChannels,
+          renderedSrc: output.renderedSrc,
         },
-      ],
-      warnings: ["Using stub implementation"],
-      stats: {
-        totalFiles: files.length,
-        successCount: 0,
-        failedCount: files.length,
-        totalBytes: 0,
-        preparationTimeMs: 0,
-      },
-    };
+        storeName: STORES.IMAGE_TENSORS,
+      }));
+
+      const storageResult = await this.storage.storeBatch(storageItems);
+
+      if (!storageResult.success) {
+        this.updateProgress({ stage: "error" });
+        return {
+          success: false,
+          metadataIds: [],
+          images: [],
+          errors: [
+            ...errors,
+            {
+              fileName: "IndexedDB",
+              error: storageResult.error,
+              recoverable: false,
+            },
+          ],
+          warnings: [],
+          stats: {
+            totalFiles: files.length,
+            successCount: 0,
+            failedCount: files.length,
+            totalBytes,
+            preparationTimeMs: Date.now() - startTime,
+          },
+        };
+      }
+
+      // -- Stage 4: Build Redux-ready payload
+
+      this.updateProgress({
+        stage: "storing",
+        overallProgress: 90,
+      });
+
+      const tensorRefs = storageResult.data;
+
+      // Build per-image result objects (fileName + imageId + tensorRef together)
+      const imageResults = results.map((r, idx) => ({
+        imageId: r.imageId,
+        fileName: r.fileName,
+        tensorRef: tensorRefs[idx],
+      }));
+
+      // Collect results — to be dispatched by the caller
+      // (DataPipelineService does NOT dispatch to Redux directly;
+      //  it returns data that the React component dispatches)
+
+      this.updateProgress({
+        stage: "complete",
+        overallProgress: 100,
+        processedCount: results.length,
+      });
+
+      return {
+        success: true,
+        images: imageResults,
+        metadataIds: [],
+        errors,
+        warnings:
+          errors.length > 0 ? [`${errors.length} file(s) failed to load`] : [],
+        stats: {
+          totalFiles: files.length,
+          successCount: results.length,
+          failedCount: errors.length,
+          totalBytes,
+          preparationTimeMs: Date.now() - startTime,
+        },
+      };
+    } catch (err) {
+      this.updateProgress({ stage: "error" });
+      throw err;
+    }
   }
 
   /**
@@ -137,8 +351,7 @@ export class DataPipelineService implements IDataPipelineService {
     return {
       success: false,
       metadataIds: [],
-      imageIds: [],
-      tensorRefs: [],
+      images: [],
       errors: [
         {
           fileName: file.name,
@@ -171,8 +384,7 @@ export class DataPipelineService implements IDataPipelineService {
     return {
       success: false,
       metadataIds: [],
-      imageIds: [],
-      tensorRefs: [],
+      images: [],
       errors: [
         {
           fileName: exampleId,
@@ -210,12 +422,35 @@ export class DataPipelineService implements IDataPipelineService {
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      results.push({
+      const mimeType = file.type || this.inferImageType(file.name);
+      const imageType = this.inferImageType(file.name);
+
+      const result: FileAnalysisResult = {
         fileName: file.name,
         fileSize: file.size,
-        mimeType: file.type || this.inferMimeType(file.name),
-        imageType: this.inferImageType(file.name),
-      });
+        mimeType,
+        imageType,
+      };
+
+      // For TIFF files, analyze in worker to detect multi-frame
+      if (imageType === "tiff") {
+        try {
+          const fileData = await file.arrayBuffer();
+          const handle = this.scheduler.dispatch<AnalyzeTiffOutput>({
+            type: "analyzeTiff",
+            payload: { input: { fileData } },
+            priority: TaskPriority.HIGH,
+          });
+
+          const tiffResult = await handle.promise;
+          result.tiffInfo = {
+            ...tiffResult,
+          };
+        } catch {
+          //if analysis fails, treat as regular image
+        }
+      }
+      results.push(result);
     }
 
     return results;
@@ -282,6 +517,23 @@ export class DataPipelineService implements IDataPipelineService {
   private resetProgress(): void {
     this.progress = { ...INITIAL_PROGRESS };
     this.abortController = new AbortController();
+  }
+
+  private cancelledResult(totalFiles: number): PipelineResult {
+    return {
+      success: false,
+      metadataIds: [],
+      images: [],
+      errors: [],
+      warnings: ["Upload cancelled by user"],
+      stats: {
+        totalFiles,
+        successCount: 0,
+        failedCount: 0,
+        totalBytes: 0,
+        preparationTimeMs: 0,
+      },
+    };
   }
 
   private inferMimeType(filename: string): string {
