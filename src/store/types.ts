@@ -24,12 +24,12 @@ import {
   GeneralizedKindItem,
   ImageObject,
 } from "./data/types";
-import { MeasurementsState } from "./measurements/types";
 import {
   AnnotatorState,
   ImageViewerState,
 } from "views/ImageViewer/state/types";
 import { ImageViewerDataState } from "views/ImageViewer/state/image-viewer-data/types";
+import { MeasurementsState } from "views/MeasurementView/types";
 
 export type AppSettingsState = {
   // async work for setting initial states,
@@ -48,6 +48,7 @@ export type AppSettingsState = {
   loadPercent: number;
   loadMessage: string;
   showSaveProjectDialog: boolean;
+  persistData: boolean;
 };
 
 export type DataState = {

@@ -12,6 +12,8 @@ import {
   StorageUsage,
   CacheOptions,
   PreparedChannelData,
+  StoreTensorInput,
+  ITensorStorageService,
 } from "./types";
 import { LRUCache } from "./lruCache";
 import { parseError } from "utils/errorUtils";
@@ -80,7 +82,7 @@ const DEFAULT_CACHE_OPTIONS: CacheOptions = {
  * ```
  */
 
-export class TensorStorageService {
+export class TensorStorageService implements ITensorStorageService {
   private static instance: TensorStorageService | null = null;
 
   private db: IDBPDatabase | null = null;
@@ -92,6 +94,10 @@ export class TensorStorageService {
     this.options = { ...DEFAULT_CACHE_OPTIONS, ...options };
     this.cache = new LRUCache<StoredTensorData>(this.options.maxMemoryBytes);
   }
+
+  // ===========================================================================
+  // PUBLIC API: BEGIN
+  // ===========================================================================
 
   /**
    * Get singleton instance
@@ -113,14 +119,6 @@ export class TensorStorageService {
     }
   }
 
-  // ============================================================
-  // Initialization
-  // ============================================================
-
-  /**
-   * Initialize IndexedDB connection
-   * Called automatically on first operation, but can be called explicitly
-   */
   async init(): Promise<void> {
     if (this.db) return;
     if (this.initPromise) {
@@ -147,9 +145,6 @@ export class TensorStorageService {
     });
   }
 
-  /**
-   * Close database connection
-   */
   close(): void {
     if (this.db) {
       this.db.close();
@@ -159,22 +154,11 @@ export class TensorStorageService {
     this.initPromise = null;
   }
 
-  // ============================================================
-  // Core Storage Operations
-  // ============================================================
+  // ── Core Storage ───────────────────────────────────────────────────
 
-  /**
-   * Store tensor data and return a reference for Redux
-   */
   async store(
     id: string,
-    data: {
-      buffer: ArrayBuffer;
-      dtype: "float32" | "int32" | "uint8";
-      shape: [number, number, number, number];
-      preparedChannels?: PreparedChannelData;
-      renderedSrc?: string;
-    },
+    data: StoreTensorInput,
     storeName: StoreName,
   ): Promise<StorageResult<TensorReference>> {
     try {
@@ -216,19 +200,11 @@ export class TensorStorageService {
       };
     }
   }
-  /**
-   * Store multiple tensors in a single transaction
-   */
+
   async storeBatch(
     items: Array<{
       id: string;
-      data: {
-        buffer: ArrayBuffer;
-        dtype: "float32" | "int32" | "uint8";
-        shape: [number, number, number, number];
-        preparedChannels?: PreparedChannelData;
-        renderedSrc?: string;
-      };
+      data: StoreTensorInput;
       storeName: StoreName;
     }>,
   ): Promise<StorageResult<TensorReference[]>> {
@@ -290,9 +266,8 @@ export class TensorStorageService {
     }
   }
 
-  /**
-   * Retrieve raw stored data
-   */
+  // ── Retrieval ──────────────────────────────────────────────────────
+
   async retrieve(
     id: string,
     storeName: StoreName,
@@ -327,13 +302,6 @@ export class TensorStorageService {
     }
   }
 
-  /**
-   * Retrieve and reconstruct as Tensor4D
-   * IMPORTANT: Caller is responsible for disposing the tensor!
-   *
-   * Note: TensorFlow.js doesn't have a native "uint8" dtype - it uses "int32"
-   * for integer types. We store as uint8 for efficiency but reconstruct as int32.
-   */
   async retrieveAsTensor(
     id: string,
     storeName: StoreName,
@@ -366,9 +334,6 @@ export class TensorStorageService {
     }
   }
 
-  /**
-   * Retrieve only prepared channel data (without full tensor)
-   */
   async retrievePreparedChannels(
     id: string,
     storeName: StoreName,
@@ -378,9 +343,8 @@ export class TensorStorageService {
     return result.data.preparedChannels ?? null;
   }
 
-  /**
-   * Delete tensor data
-   */
+  // ── Deletion ───────────────────────────────────────────────────────
+
   async delete(id: string, storeName: StoreName): Promise<StorageResult<void>> {
     try {
       await this.init();
@@ -396,9 +360,6 @@ export class TensorStorageService {
     }
   }
 
-  /**
-   * Delete multiple tensors
-   */
   async deleteBatch(
     items: Array<{ id: string; storeName: StoreName }>,
   ): Promise<StorageResult<void>> {
@@ -430,13 +391,8 @@ export class TensorStorageService {
     }
   }
 
-  // ============================================================
-  // Update Operations
-  // ============================================================
+  // ── Mutation ────────────────────────────────────────────────────────
 
-  /**
-   * Update prepared channels for an existing tensor
-   */
   async updatePreparedChannels(
     id: string,
     storeName: StoreName,
@@ -467,13 +423,9 @@ export class TensorStorageService {
       };
     }
   }
-  // ============================================================
-  // Cache Management
-  // ============================================================
 
-  /**
-   * Preload tensors into memory cache
-   */
+  // ── Cache Management ───────────────────────────────────────────────
+
   async preload(ids: string[], storeName: StoreName): Promise<void> {
     await this.init();
 
@@ -484,37 +436,23 @@ export class TensorStorageService {
     }
   }
 
-  /**
-   * Evict specific items from cache (not from IndexedDB)
-   */
   evictFromCache(ids: string[]): void {
     for (const id of ids) {
       this.cache.delete(id);
     }
   }
 
-  /**
-   * Clear entire memory cache
-   */
   clearCache(): void {
     this.cache.clear();
   }
 
-  /**
-   * Update cache size limit
-   */
   setCacheLimit(maxBytes: number): void {
     this.options.maxMemoryBytes = maxBytes;
     this.cache.setMaxBytes(maxBytes);
   }
 
-  // ============================================================
-  // Storage Management
-  // ============================================================
+  // ── Storage Management ─────────────────────────────────────────────
 
-  /**
-   * Get storage usage statistics
-   */
   async getUsage(): Promise<StorageUsage> {
     await this.init();
 
@@ -549,17 +487,11 @@ export class TensorStorageService {
     };
   }
 
-  /**
-   * Get all stored ids
-   */
   async getStoredIds(storeName: StoreName): Promise<string[]> {
     await this.init();
     return this.db!.getAllKeys(storeName) as Promise<string[]>;
   }
 
-  /**
-   * Clear all stored data
-   */
   async clearAll(): Promise<StorageResult<void>> {
     try {
       await this.init();
@@ -581,9 +513,6 @@ export class TensorStorageService {
     }
   }
 
-  /**
-   * Clear all data older than specified age
-   */
   async clearOlderThan(
     maxAgeMs: number,
     storeName: StoreName,

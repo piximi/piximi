@@ -106,3 +106,10 @@ export const selectShowSaveProjectDialog = ({
 }) => {
   return applicationSettings.showSaveProjectDialog;
 };
+export const selectPersistData = ({
+  applicationSettings,
+}: {
+  applicationSettings: AppSettingsState;
+}) => {
+  return applicationSettings.persistData;
+};

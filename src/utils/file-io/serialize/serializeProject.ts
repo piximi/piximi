@@ -9,7 +9,7 @@ import classifierHandler from "utils/models/classification/classifierHandler";
 import {
   OptimizerSettings,
   PreprocessSettings,
-  SerializedModels,
+  SerializedModelMap,
 } from "utils/models/types";
 import { LoadCB } from "../types";
 import {
@@ -468,7 +468,7 @@ const serializeClassifier = async (
       await serializeModelInfo(modelInfoGroup, modelInfo);
     }
   }
-  const userModels: SerializedModels = {};
+  const userModels: SerializedModelMap = {};
   for await (const modelName of classifierHandler.getModelNames()) {
     const model = classifierHandler.getModel(modelName);
     const savedModelInfo = await model.getSavedModelFiles();

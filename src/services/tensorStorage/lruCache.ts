@@ -1,3 +1,5 @@
+import { CacheStats, ILRUCache } from "./types";
+
 export type CacheEntry<T> = {
   key: string;
   value: T;
@@ -13,7 +15,7 @@ export type CacheEntry<T> = {
  * are evicted.
  */
 
-export class LRUCache<T> {
+export class LRUCache<T> implements ILRUCache<T> {
   private cache: Map<string, CacheEntry<T>> = new Map();
   private currentSize: number = 0;
   private hits: number = 0;
@@ -77,7 +79,7 @@ export class LRUCache<T> {
     this.currentSize = 0;
   }
 
-  getStats(): { size: number; count: number; hitRate: number } {
+  getStats(): CacheStats {
     const total = this.hits + this.misses;
     return {
       size: this.currentSize,

@@ -3,19 +3,22 @@ import { DividerHeader } from "components/ui";
 import { SettingsItem } from "./SettingsItem";
 import { CustomSwitch } from "components/inputs";
 import { TensorStorageService } from "services";
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { selectPersistData } from "store/applicationSettings/selectors";
 
 export const DataSettings = () => {
-  const [persistData, setPersistData] = useState(true);
+  const dispatch = useDispatch();
+  const persistData = useSelector(selectPersistData);
 
   const handleTogglePersistData = () => {
-    setPersistData((value) => !value);
+    dispatch(applicationSettingsSlice.actions.setPersistData(!persistData));
   };
 
-  const handleClearIndexedDB = () => {
+  const handleClearIndexedDB = async () => {
     try {
       const storage = TensorStorageService.getInstance();
-      storage.clearAll();
+      await storage.clearAll();
     } catch (err) {
       console.error(String(err));
     }

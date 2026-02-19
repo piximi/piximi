@@ -139,16 +139,17 @@ export const AutoTrackCreation = () => {
       annCOMs,
     );
     if (tracks.length > 0) {
-      dispatch(
-        dataSlice.actions.batchUpdateAnnotationMeasurements(
-          Object.values(coms).map((com) => {
-            return {
-              annId: com.annotationId,
-              measurements: { com: { x: com.x, y: com.y } },
-            };
-          }),
-        ),
-      );
+      const payload = Object.values(coms).map((com) => {
+        return {
+          annId: com.annotationId,
+          measurements: {
+            com: { x: com.x, y: com.y },
+            channels:
+              annotations[com.annotationId].measurements?.channels ?? [],
+          },
+        };
+      });
+      dispatch(dataSlice.actions.batchUpdateAnnotationMeasurements(payload));
       dispatch(dataSlice.actions.batchAddTracklet(tracks));
     }
   };

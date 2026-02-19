@@ -35,7 +35,7 @@ import { createTaskError, ErrorLogger } from "./errors";
 import {
   AggregateProgress,
   CancelToken,
-  ExtendedWorkerAPI,
+  IWorkerScheduler,
   ProgressListener,
   SchedulerOptions,
   Task,
@@ -43,7 +43,9 @@ import {
   TaskError,
   TaskHandle,
   TaskStatus,
+  WorkerAPI,
 } from "./types";
+import { ProjectDeserializationProgress } from "services/dataPipeline/types";
 
 // =============================================================================
 // INTERNAL TYPES
@@ -70,7 +72,7 @@ type TaskWithInternals<TResult = unknown> = Task<TResult> & {
 // WORKER SCHEDULER CLASS
 // =============================================================================
 
-export class WorkerScheduler {
+export class WorkerScheduler implements IWorkerScheduler {
   // ---------------------------------------------------------------------------
   // WORKER POOL STATE
   // ---------------------------------------------------------------------------
@@ -99,8 +101,7 @@ export class WorkerScheduler {
    * Example: Instead of postMessage/onmessage, we can do:
    *   const result = await proxy.annotationMeasurements(data);
    */
-  private workerProxies: Map<number, Comlink.Remote<ExtendedWorkerAPI>> =
-    new Map();
+  private workerProxies: Map<number, Comlink.Remote<WorkerAPI>> = new Map();
 
   // ---------------------------------------------------------------------------
   // TASK MANAGEMENT STATE
@@ -206,14 +207,11 @@ export class WorkerScheduler {
   // scheduler creation. Unlike taskStatuses which only tracks active tasks,
   // these persist after task cleanup for accurate aggregate progress reporting.
 
-  /** Total number of tasks that have completed successfully */
   private completedCount = 0;
-
-  /** Total number of tasks that have failed (including cancelled) */
   private failedCount = 0;
 
   // ===========================================================================
-  // CONSTRUCTOR
+  // PUBLIC API: BEGIN
   // ===========================================================================
 
   /**
@@ -234,8 +232,6 @@ export class WorkerScheduler {
     this.errorLogger = new ErrorLogger(options?.maxErrorLogSize);
 
     // Initialize priority queue with comparator function
-    // The comparator determines ordering: negative = a before b, positive = b before a
-    // Since lower priority NUMBER means higher priority, we use simple subtraction
     this.taskQueue = new PriorityQueue<TaskWithInternals>((a, b) => {
       // Lower priority number = higher priority (CRITICAL=0 comes before LOW=3)
       // Example: CRITICAL(0) - HIGH(1) = -1, so CRITICAL comes first
@@ -243,74 +239,15 @@ export class WorkerScheduler {
     });
   }
 
-  // ===========================================================================
-  // PRIVATE UTILITY METHODS
-  // ===========================================================================
-
-  /**
-   * Calculates the default worker pool size based on available CPU cores.
-   *
-   * Strategy: Use (cores - 1) to leave one core free for the main thread.
-   * This prevents the UI from becoming unresponsive during heavy worker usage.
-   *
-   * Falls back to 2 workers if hardware info is unavailable (e.g., in tests).
-   *
-   * @returns Number of workers to create
-   */
-  private getDefaultPoolSize(): number {
-    // navigator.hardwareConcurrency returns the number of logical CPU cores
-    // It's available in all modern browsers but may not exist in Node.js/tests
-    if (typeof navigator !== "undefined" && navigator.hardwareConcurrency) {
-      // Reserve one core for main thread, but always have at least 1 worker
-      return Math.max(1, navigator.hardwareConcurrency - 1);
-    }
-    return 2; // Default fallback for environments without hardware info
-  }
-
-  // ===========================================================================
-  // PUBLIC API: TASK DISPATCH
-  // ===========================================================================
-
-  /**
-   * Dispatches a task for execution by a worker.
-   *
-   * This is the main entry point for scheduling work. The task is added to
-   * a priority queue and will be executed when a worker becomes available.
-   *
-   * The returned TaskHandle allows the caller to:
-   * - Check task status (pending/running/completed/cancelled/failed)
-   * - Cancel the task at any time
-   * - Await the result via the promise
-   *
-   * @param taskDef - Task definition (type, payload, priority, callbacks)
-   * @returns TaskHandle for tracking and controlling the task
-   *
-   * @example
-   * const handle = scheduler.dispatch({
-   *   type: 'annotationMeasurements',
-   *   payload: { annotations, selectedMeasurements },
-   *   priority: TaskPriority.HIGH,
-   *   onProgress: (percent) => setProgress(percent),
-   *   onComplete: (result) => dispatch(updateMeasurements(result)),
-   *   onError: (error) => console.error(error),
-   * });
-   *
-   * // Later, if needed:
-   * handle.cancel();
-   *
-   * // Or await the result:
-   * const result = await handle.promise;
-   */
   dispatch<TResult>(taskDef: TaskDefinition<TResult>): TaskHandle<TResult> {
     // Generate a unique ID for this task
     // Format: task_<timestamp>_<random> for easy debugging/logging
     const taskId = this.generateTaskId();
 
-    // -------------------------------------------------------------------------
-    // SHUTDOWN CHECK
-    // -------------------------------------------------------------------------
-    // If the scheduler has been shut down, immediately return a failed handle.
-    // This prevents any work from being queued after shutdown.
+    /** -- Shutdown Check --
+     * If the scheduler has been shut down, immediately return a failed handle.
+     * This prevents any work from being queued after shutdown.
+     */
     if (this.isShutdown) {
       const error = new Error("Scheduler has been shut down");
       const handle: TaskHandle<TResult> = {
@@ -327,12 +264,10 @@ export class WorkerScheduler {
       return handle;
     }
 
-    // -------------------------------------------------------------------------
-    // PROMISE SETUP (DEFERRED PATTERN)
-    // -------------------------------------------------------------------------
-    // Create a promise that we can resolve/reject later when the task completes.
-    // We capture the resolve/reject functions to call them from runTask().
-
+    /** -- Promise Setup (deferred pattern) --
+     * Create a promise that we can resolve/reject later when the task completes.
+     * We capture the resolve/reject functions to call them from runTask().
+     */
     // These will be assigned inside the Promise constructor
     let resolveTask: (value: TResult) => void;
     let rejectTask: (error: Error) => void;
@@ -343,10 +278,9 @@ export class WorkerScheduler {
       rejectTask = reject;
     });
 
-    // -------------------------------------------------------------------------
-    // TASK OBJECT CREATION
-    // -------------------------------------------------------------------------
-    // Combine the task definition with internal fields needed for execution
+    /** -- Task Object Creation --
+     * Combine the task definition with internal fields needed for execution
+     */
 
     const task: TaskWithInternals<TResult> = {
       ...taskDef, // type, payload, priority, onProgress, onComplete, onError
@@ -355,20 +289,16 @@ export class WorkerScheduler {
       reject: rejectTask!, // Non-null assertion: assigned in Promise constructor
     };
 
-    // -------------------------------------------------------------------------
-    // CANCELLATION SETUP
-    // -------------------------------------------------------------------------
-    // Create an AbortController for this task. AbortController is the standard
-    // Web API for cancellation. When cancel() is called, we'll abort this
-    // controller, which sets signal.aborted = true.
+    /** -- Cancellation Setup --
+     * Create an AbortController for this task. AbortController is the standard
+     * Web API for cancellation. When cancel() is called, we'll abort this
+     * controller, which sets signal.aborted = true.
+     */
 
     const abortController = new AbortController();
     this.abortControllers.set(taskId, abortController);
 
-    // -------------------------------------------------------------------------
-    // INITIAL STATE SETUP
-    // -------------------------------------------------------------------------
-    // Initialize task tracking state
+    /** -- Initial State Setup -- */
 
     // Set initial status to PENDING (waiting in queue)
     this.taskStatuses.set(taskId, TaskStatus.PENDING);
@@ -376,11 +306,10 @@ export class WorkerScheduler {
     // Set initial progress to 0%
     this.taskProgress.set(taskId, 0);
 
-    // -------------------------------------------------------------------------
-    // QUEUE THE TASK
-    // -------------------------------------------------------------------------
-    // Add to both the priority queue (for execution ordering) and
-    // activeTasks map (for lookup by ID)
+    /** -- Task Queueing --
+     * Add to both the priority queue (for execution ordering) and
+     * activeTasks map (for lookup by ID)
+     */
 
     this.taskQueue.enqueue(task as TaskWithInternals);
     this.activeTasks.set(taskId, task as TaskWithInternals);
@@ -389,12 +318,10 @@ export class WorkerScheduler {
     // This updates the aggregate progress (pending count increased)
     this.notifyProgressListeners();
 
-    // -------------------------------------------------------------------------
-    // WORKER POOL INITIALIZATION & QUEUE PROCESSING
-    // -------------------------------------------------------------------------
-    // Initialize the worker pool if this is the first dispatch, then process
-    // the queue to start executing tasks.
-
+    /** -- Worker Pool Initialization & Queue Processing --
+     * Initialize the worker pool if this is the first dispatch, then process
+     * the queue to start executing tasks.
+     */
     if (!this.initialized) {
       // Workers haven't been created yet - this is the first dispatch
 
@@ -414,14 +341,12 @@ export class WorkerScheduler {
       this.processQueue();
     }
 
-    // -------------------------------------------------------------------------
-    // TERMINAL STATUS CACHING
-    // -------------------------------------------------------------------------
-    // After a task completes, we clean up its entry from taskStatuses to prevent
-    // memory leaks. But the TaskHandle.status getter should still return the
-    // correct final status. We solve this by caching the terminal status.
+    /** -- Terminal Status Caching --
+     * After a task completes, we clean up its entry from taskStatuses to prevent
+     * memory leaks. But the TaskHandle.status getter should still return the
+     * correct final status. We solve this by caching the terminal status.
+     */
 
-    // This will be set when the promise settles
     let terminalStatus: TaskStatus | null = null;
 
     // When the promise resolves/rejects, capture the final status
@@ -439,12 +364,10 @@ export class WorkerScheduler {
         }
       });
 
-    // -------------------------------------------------------------------------
-    // STATUS GETTER WITH FALLBACK
-    // -------------------------------------------------------------------------
-    // Create a getter function that checks taskStatuses first, then falls back
-    // to the cached terminal status if the task has been cleaned up.
-
+    /** -- Status Getter with Fallback --
+     * Create a getter function that checks taskStatuses first, then falls back
+     * to the cached terminal status if the task has been cleaned up.
+     */
     const getStatus = () => {
       // Try to get status from active tracking
       const currentStatus = this.getTaskStatus(taskId);
@@ -461,11 +384,9 @@ export class WorkerScheduler {
       return TaskStatus.PENDING;
     };
 
-    // -------------------------------------------------------------------------
-    // CREATE AND RETURN TASK HANDLE
-    // -------------------------------------------------------------------------
-    // The TaskHandle is the caller's interface to the scheduled task
-
+    /** -- Create and Return Task Handle --
+     * The TaskHandle is the caller's interface to the scheduled task
+     */
     const handle: TaskHandle<TResult> = {
       /** Unique identifier for this task */
       id: taskId,
@@ -485,24 +406,8 @@ export class WorkerScheduler {
     return handle;
   }
 
-  // ===========================================================================
-  // PUBLIC API: TASK CANCELLATION
-  // ===========================================================================
+  // TASK CANCELLATION
 
-  /**
-   * Cancels a task by its ID.
-   *
-   * Cancellation behavior depends on task state:
-   * - PENDING: Immediately removed from queue, promise rejected
-   * - RUNNING: AbortController signaled, worker should check and stop
-   * - COMPLETED/FAILED/CANCELLED: No effect (already terminal)
-   *
-   * Note: For running tasks, cancellation is cooperative - the worker must
-   * check the CancelToken periodically and stop when cancelled. Long-running
-   * operations that don't check will continue until completion.
-   *
-   * @param taskId - ID of the task to cancel
-   */
   cancel(taskId: string): void {
     // Signal the AbortController (sets signal.aborted = true)
     // This allows running workers to detect cancellation
@@ -527,7 +432,6 @@ export class WorkerScheduler {
       this.updateTaskStatus(taskId, TaskStatus.CANCELLED);
 
       // Remove from queue if it was still pending
-      // This uses a predicate to find and remove the task
       this.taskQueue.remove((t) => t.id === taskId);
 
       // Create a standardized error object for logging and callbacks
@@ -565,12 +469,6 @@ export class WorkerScheduler {
     }
   }
 
-  /**
-   * Cancels all active tasks (pending and running).
-   *
-   * Useful for cleanup when navigating away from a view or shutting down.
-   * Each task's onError callback will be called with a cancellation error.
-   */
   cancelAll(): void {
     // Get all active task IDs
     // We copy to an array because cancel() modifies activeTasks
@@ -582,23 +480,8 @@ export class WorkerScheduler {
     }
   }
 
-  // ===========================================================================
-  // PUBLIC API: PROGRESS TRACKING
-  // ===========================================================================
+  // PROGRESS TRACKING
 
-  /**
-   * Gets the current aggregate progress across all tasks.
-   *
-   * Returns counts of tasks in each state plus an overall percentage.
-   * This is a snapshot - for live updates, use onProgress().
-   *
-   * @returns AggregateProgress object with counts and percentage
-   *
-   * @example
-   * const progress = scheduler.getProgress();
-   * console.log(`${progress.pending} pending, ${progress.running} running`);
-   * console.log(`Overall: ${progress.overallPercent}% complete`);
-   */
   getProgress(): AggregateProgress {
     // Count tasks by status
     let pending = 0;
@@ -613,8 +496,8 @@ export class WorkerScheduler {
     }
 
     const totalActive = pending + running;
-    // Calculate total tasks ever seen
 
+    // Calculate total tasks ever seen
     let totalProgressPercentage = 0;
     for (const [, progress] of this.taskProgress) {
       totalProgressPercentage += progress;
@@ -637,26 +520,6 @@ export class WorkerScheduler {
     };
   }
 
-  /**
-   * Subscribes to aggregate progress updates.
-   *
-   * The listener is called whenever progress changes:
-   * - Task added to queue
-   * - Task starts running
-   * - Task completes or fails
-   * - Running task reports progress
-   *
-   * @param listener - Callback function receiving AggregateProgress
-   * @returns Unsubscribe function - call to stop receiving updates
-   *
-   * @example
-   * const unsubscribe = scheduler.onProgress((progress) => {
-   *   setGlobalProgress(progress.overallPercent);
-   * });
-   *
-   * // Later, when done:
-   * unsubscribe();
-   */
   onProgress(listener: ProgressListener): () => void {
     // Add listener to the set
     this.progressListeners.add(listener);
@@ -668,51 +531,18 @@ export class WorkerScheduler {
     };
   }
 
-  // ===========================================================================
-  // PUBLIC API: ERROR & STATUS INSPECTION
-  // ===========================================================================
+  // ERROR & STATUS INSPECTION
 
-  /**
-   * Gets the error log containing recent task errors.
-   *
-   * The log is bounded (default 100 entries) to prevent memory growth.
-   * Useful for debugging or displaying error history to users.
-   *
-   * @returns Readonly array of TaskError objects
-   */
   getErrorLog(): readonly TaskError[] {
     return this.errorLogger.getErrors();
   }
 
-  /**
-   * Gets the current status of a specific task.
-   *
-   * Note: After a task reaches a terminal state (COMPLETED/FAILED/CANCELLED)
-   * and is cleaned up, this will return undefined. Use TaskHandle.status
-   * instead, which caches the terminal status.
-   *
-   * @param taskId - ID of the task to check
-   * @returns TaskStatus or undefined if task not found/cleaned up
-   */
   getTaskStatus(taskId: string): TaskStatus | undefined {
     return this.taskStatuses.get(taskId);
   }
 
-  // ===========================================================================
-  // PUBLIC API: LIFECYCLE
-  // ===========================================================================
+  // LIFECYCLE
 
-  /**
-   * Shuts down the scheduler, cancelling all tasks and terminating workers.
-   *
-   * After shutdown:
-   * - No new tasks can be dispatched (will return failed handles)
-   * - All pending/running tasks are cancelled
-   * - All workers are terminated
-   * - The scheduler cannot be restarted
-   *
-   * Call this when the scheduler is no longer needed (e.g., app unmount).
-   */
   async shutdown(): Promise<void> {
     // Set shutdown flag to prevent new dispatches
     this.isShutdown = true;
@@ -735,8 +565,32 @@ export class WorkerScheduler {
   }
 
   // ===========================================================================
-  // PRIVATE: ID GENERATION
+  // PUBLIC API -- END
   // ===========================================================================
+
+  // ===========================================================================
+  // PRIVATE -- BEGIN
+  // ===========================================================================
+
+  /**
+   * Calculates the default worker pool size based on available CPU cores.
+   *
+   * Strategy: Use (cores - 1) to leave one core free for the main thread.
+   * This prevents the UI from becoming unresponsive during heavy worker usage.
+   *
+   * Falls back to 2 workers if hardware info is unavailable (e.g., in tests).
+   *
+   * @returns Number of workers to create
+   */
+  private getDefaultPoolSize(): number {
+    // navigator.hardwareConcurrency returns the number of logical CPU cores
+    // It's available in all modern browsers but may not exist in Node.js/tests
+    if (typeof navigator !== "undefined" && navigator.hardwareConcurrency) {
+      // Reserve one core for main thread, but always have at least 1 worker
+      return Math.max(1, navigator.hardwareConcurrency - 1);
+    }
+    return 2; // Default fallback for environments without hardware info
+  }
 
   /**
    * Generates a unique task ID.
@@ -753,10 +607,6 @@ export class WorkerScheduler {
   private generateTaskId(): string {
     return `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
-
-  // ===========================================================================
-  // PRIVATE: WORKER POOL INITIALIZATION
-  // ===========================================================================
 
   /**
    * Initializes the worker pool by creating Web Workers.
@@ -791,16 +641,12 @@ export class WorkerScheduler {
       // Comlink enables calling worker methods as if they were local:
       //   const result = await proxy.someMethod(arg);
       // Instead of manual postMessage/onmessage handling
-      const proxy = Comlink.wrap<ExtendedWorkerAPI>(worker);
+      const proxy = Comlink.wrap<WorkerAPI>(worker);
       this.workerProxies.set(i, proxy);
     }
 
     this.initialized = true;
   }
-
-  // ===========================================================================
-  // PRIVATE: QUEUE PROCESSING
-  // ===========================================================================
 
   /**
    * Processes the task queue, assigning pending tasks to available workers.
@@ -845,10 +691,6 @@ export class WorkerScheduler {
     }
   }
 
-  // ===========================================================================
-  // PRIVATE: TASK EXECUTION
-  // ===========================================================================
-
   /**
    * Executes a task on a specific worker.
    *
@@ -878,12 +720,11 @@ export class WorkerScheduler {
       return;
     }
 
-    // -------------------------------------------------------------------------
-    // CANCELLATION TOKEN SETUP
-    // -------------------------------------------------------------------------
-    // Create a CancelToken that workers can check for cancellation.
-    // This is passed to worker methods which should periodically check
-    // cancelToken.cancelled and stop early if true.
+    /** -- Cancellation Token Setup --
+     * Create a CancelToken that workers can check for cancellation.
+     * This is passed to worker methods which should periodically check
+     * cancelToken.cancelled and stop early if true.
+     */
 
     const abortController = this.abortControllers.get(task.id);
     const cancelToken: CancelToken = {
@@ -894,17 +735,18 @@ export class WorkerScheduler {
       },
     };
 
-    // -------------------------------------------------------------------------
-    // PROGRESS CALLBACK SETUP
-    // -------------------------------------------------------------------------
-    // Create a progress callback that updates our tracking and notifies listeners.
-    // This is passed to worker methods which call it with 0-100 values.
+    /** -- Progress Callback Setup --
+     * Create a progress callback that updates our tracking and notifies listeners.
+     * This is passed to worker methods which call it with 0-100 values.
+     */
 
-    const onProgress = (progress: number) => {
+    const onProgress = (progress: number | ProjectDeserializationProgress) => {
       // Only update if task is still running (not cancelled)
       if (this.taskStatuses.get(task.id) === TaskStatus.RUNNING) {
         // Update our progress tracking
-        this.taskProgress.set(task.id, progress);
+        const numericalProgress =
+          typeof progress === "number" ? progress : progress.percent;
+        this.taskProgress.set(task.id, numericalProgress);
 
         // Call the task's progress callback if provided
         if (task.onProgress) {
@@ -916,9 +758,7 @@ export class WorkerScheduler {
       }
     };
 
-    // -------------------------------------------------------------------------
-    // TASK EXECUTION
-    // -------------------------------------------------------------------------
+    /** -- Task Execution -- */
     try {
       // Check if cancelled before we even start
       if (cancelToken.cancelled) {
@@ -930,18 +770,12 @@ export class WorkerScheduler {
       // Route to appropriate worker method based on task type
       // Each task type has its own payload structure and worker method
       switch (task.type) {
-        // ---------------------------------------------------------------------
-        // ANNOTATION MEASUREMENTS
-        // Calculates measurements (area, perimeter, etc.) for annotations
-        // ---------------------------------------------------------------------
         case "annotationMeasurements": {
           // Extract annotations from payload
           const { annotations, selectedMeasurements } = task.payload as {
-            annotations: Parameters<
-              ExtendedWorkerAPI["annotationMeasurements"]
-            >[0];
+            annotations: Parameters<WorkerAPI["annotationMeasurements"]>[0];
             selectedMeasurements: Parameters<
-              ExtendedWorkerAPI["annotationMeasurements"]
+              WorkerAPI["annotationMeasurements"]
             >[1];
           };
 
@@ -958,9 +792,9 @@ export class WorkerScheduler {
         case "imageMeasurements": {
           // Extract annotations from payload
           const { images, selectedMeasurements } = task.payload as {
-            images: Parameters<ExtendedWorkerAPI["imageMeasurements"]>[0];
+            images: Parameters<WorkerAPI["imageMeasurements"]>[0];
             selectedMeasurements?: Parameters<
-              ExtendedWorkerAPI["imageMeasurements"]
+              WorkerAPI["imageMeasurements"]
             >[1];
           };
 
@@ -975,16 +809,10 @@ export class WorkerScheduler {
           break;
         }
 
-        // ---------------------------------------------------------------------
-        // CHANNEL MEASUREMENTS
-        // Calculates measurements for image channels
-        // ---------------------------------------------------------------------
         case "channelMeasurements": {
           const { entities, measurements } = task.payload as {
-            entities: Parameters<ExtendedWorkerAPI["channelMeasurements"]>[0];
-            measurements: Parameters<
-              ExtendedWorkerAPI["channelMeasurements"]
-            >[1];
+            entities: Parameters<WorkerAPI["channelMeasurements"]>[0];
+            measurements: Parameters<WorkerAPI["channelMeasurements"]>[1];
           };
 
           result = await proxy.channelMeasurements(
@@ -996,14 +824,10 @@ export class WorkerScheduler {
           break;
         }
 
-        // ---------------------------------------------------------------------
-        // PREPARE
-        // Prepares/transforms data for further processing
-        // ---------------------------------------------------------------------
         case "prepare": {
           const { kind, entities } = task.payload as {
-            kind: Parameters<ExtendedWorkerAPI["prepare"]>[0];
-            entities: Parameters<ExtendedWorkerAPI["prepare"]>[1];
+            kind: Parameters<WorkerAPI["prepare"]>[0];
+            entities: Parameters<WorkerAPI["prepare"]>[1];
           };
 
           result = await proxy.prepare(
@@ -1016,7 +840,7 @@ export class WorkerScheduler {
         }
         case "loadImage": {
           const { input } = task.payload as {
-            input: Parameters<ExtendedWorkerAPI["loadImage"]>[0];
+            input: Parameters<WorkerAPI["loadImage"]>[0];
           };
           result = await proxy.loadImage(
             input,
@@ -1027,7 +851,7 @@ export class WorkerScheduler {
         }
         case "loadAndPrepare": {
           const { input } = task.payload as {
-            input: Parameters<ExtendedWorkerAPI["loadAndPrepare"]>[0];
+            input: Parameters<WorkerAPI["loadAndPrepare"]>[0];
           };
 
           result = await proxy.loadAndPrepare(
@@ -1039,9 +863,20 @@ export class WorkerScheduler {
         }
         case "analyzeTiff": {
           const { input } = task.payload as {
-            input: Parameters<ExtendedWorkerAPI["analyzeTiff"]>[0];
+            input: Parameters<WorkerAPI["analyzeTiff"]>[0];
           };
           result = await proxy.analyzeTiff(input, cancelToken);
+          break;
+        }
+        case "deserializeProject": {
+          const { input } = task.payload as {
+            input: Parameters<WorkerAPI["deserializeProject"]>[0];
+          };
+          result = await proxy.deserializeProject(
+            input,
+            cancelToken,
+            Comlink.proxy(onProgress),
+          );
           break;
         }
         // ---------------------------------------------------------------------
@@ -1059,10 +894,6 @@ export class WorkerScheduler {
       if (cancelToken.cancelled) {
         throw new DOMException("Task cancelled", "AbortError");
       }
-
-      // -----------------------------------------------------------------------
-      // SUCCESS HANDLING
-      // -----------------------------------------------------------------------
 
       // Update status to COMPLETED
       this.updateTaskStatus(task.id, TaskStatus.COMPLETED);
@@ -1088,16 +919,9 @@ export class WorkerScheduler {
       this.taskProgress.delete(task.id);
       this.taskStatuses.delete(task.id);
     } catch (error) {
-      // -----------------------------------------------------------------------
-      // ERROR HANDLING
-      // -----------------------------------------------------------------------
       // Delegate to centralized error handler
       this.handleTaskError(task, error);
     } finally {
-      // -----------------------------------------------------------------------
-      // CLEANUP (runs whether success or error)
-      // -----------------------------------------------------------------------
-
       // Release the worker back to the available pool
       this.releaseWorker(workerIndex);
 
@@ -1105,10 +929,6 @@ export class WorkerScheduler {
       this.notifyProgressListeners();
     }
   }
-
-  // ===========================================================================
-  // PRIVATE: ERROR HANDLING
-  // ===========================================================================
 
   /**
    * Handles task errors (including cancellation).
@@ -1157,10 +977,6 @@ export class WorkerScheduler {
     this.taskStatuses.delete(task.id);
   }
 
-  // ===========================================================================
-  // PRIVATE: WORKER MANAGEMENT
-  // ===========================================================================
-
   /**
    * Releases a worker back to the available pool.
    *
@@ -1181,10 +997,6 @@ export class WorkerScheduler {
     }
   }
 
-  // ===========================================================================
-  // PRIVATE: STATUS MANAGEMENT
-  // ===========================================================================
-
   /**
    * Updates the status of a task.
    *
@@ -1199,10 +1011,6 @@ export class WorkerScheduler {
   private updateTaskStatus(taskId: string, status: TaskStatus): void {
     this.taskStatuses.set(taskId, status);
   }
-
-  // ===========================================================================
-  // PRIVATE: PROGRESS NOTIFICATION
-  // ===========================================================================
 
   /**
    * Notifies all registered progress listeners of the current progress.
@@ -1229,4 +1037,7 @@ export class WorkerScheduler {
       }
     }
   }
+  // ===========================================================================
+  // PRIVATE -- END
+  // ===========================================================================
 }

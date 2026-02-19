@@ -8,7 +8,17 @@
  */
 
 import { Image as IJSImage, Stack as IJSStack } from "image-js";
-import { Tensor3D, tensor4d, Tensor4D, tidy } from "@tensorflow/tfjs";
+import {
+  booleanMaskAsync,
+  stack,
+  Tensor1D,
+  tensor1d,
+  Tensor2D,
+  Tensor3D,
+  tensor4d,
+  Tensor4D,
+  tidy,
+} from "@tensorflow/tfjs";
 import { ColorsRaw } from "utils/types";
 import { forceStack, getImageInformation } from "utils/file-io/utils";
 import { ImageShapeInfo } from "utils/file-io/types";
@@ -22,6 +32,8 @@ import {
   sliceVisibleChannels,
   sliceVisibleColors,
 } from "utils/tensorUtils";
+import { DataArray } from "store/data/types";
+import { decode } from "views/ImageViewer/utils";
 
 // ============================================================
 // Image Loading
@@ -243,7 +255,10 @@ export async function renderPreview(
  * Prepare channel data for measurements
  * Extracts per-channel pixel arrays
  */
-export function prepareChannels(tensor: Tensor4D): {
+export function prepareChannels(
+  tensor: Tensor4D,
+  decodedMask?: DataArray,
+): {
   data: number[][];
   histograms: number[][];
 } {
@@ -253,6 +268,11 @@ export function prepareChannels(tensor: Tensor4D): {
   const channelData: number[][] = [];
   const histograms: number[][] = [];
 
+  if (decodedMask) {
+    if (!(decodedMask.length === height * width))
+      throw new Error("Incorrect mask size when preparing channels");
+  }
+
   for (let c = 0; c < channels; c++) {
     const pixels: number[] = [];
     const histogram = new Array(256).fill(0);
@@ -261,6 +281,11 @@ export function prepareChannels(tensor: Tensor4D): {
     for (let z = 0; z < planes; z++) {
       for (let h = 0; h < height; h++) {
         for (let w = 0; w < width; w++) {
+          if (
+            decodedMask &&
+            decodedMask[h * (width * channels) + w * channels] !== 1
+          )
+            continue;
           const idx =
             z * (height * width * channels) +
             h * (width * channels) +
@@ -282,3 +307,56 @@ export function prepareChannels(tensor: Tensor4D): {
 
   return { data: channelData, histograms };
 }
+
+//TODO: Check equivalence to `prepareChannels` then choose one
+export const prepareEntityChannelData = async (
+  data: Tensor4D,
+  encodedMask?: number[],
+  decodedMask?: DataArray,
+) => {
+  let channelData: Tensor2D;
+  const _prepareChannels = (thingData: Tensor4D) => {
+    return tidy(() => {
+      const [planes, height, width, channels] = thingData.shape;
+      const numPixels = planes * width * height;
+      const squashedTensor = thingData.reshape([numPixels, channels]);
+
+      const channelTensors: Array<Tensor1D> = [];
+      for (let i = 0; i < channels; i++) {
+        const gatheredTensor = squashedTensor.gather([i], 1);
+        const channelTensor = gatheredTensor.flatten();
+        channelTensors.push(channelTensor);
+      }
+
+      return stack(channelTensors) as Tensor2D;
+    });
+  };
+  const getObjectMaskData = async (
+    channelData: Tensor2D,
+    objectMask: DataArray,
+  ) => {
+    const maskArray = Array.from(objectMask);
+    const maskTensor = tensor1d(maskArray, "bool");
+
+    const maskedChannels = await booleanMaskAsync(channelData, maskTensor, 1);
+    maskTensor.dispose();
+    return maskedChannels as Tensor2D;
+  };
+  if (decodedMask) {
+    const fullChannelData = _prepareChannels(data);
+    channelData = await getObjectMaskData(fullChannelData, decodedMask);
+    fullChannelData.dispose();
+  } else if (encodedMask) {
+    const decodedMask = Uint8Array.from(decode(encodedMask));
+
+    const fullChannelData = _prepareChannels(data);
+    channelData = await getObjectMaskData(fullChannelData, decodedMask);
+    fullChannelData.dispose();
+  } else {
+    channelData = _prepareChannels(data);
+  }
+  const channelArray = channelData.arraySync();
+  channelData.dispose();
+
+  return channelArray;
+};

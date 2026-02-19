@@ -7,7 +7,7 @@ import { logger } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
 import { ModelTask } from "../enums";
 import { getUniqueName } from "utils/stringUtils";
-import { SerializedModels } from "../types";
+import { ExtractedModelFileMap, SerializedModelMap } from "../types";
 
 export type ModelUploadResults = {
   loadedModels: SequentialClassifier[];
@@ -163,18 +163,12 @@ class ClassifierHandler {
     }
     return { loadedModels, failedModels };
   }
-  public async modelsFromZip(zip: JSZip) {
-    const modelFileRegEx = new RegExp(".json$|.weights.bin$");
-    const models: Record<
-      string,
-      {
-        modelJson?: File;
-        modelWeights?: File;
-      }
-    > = {};
-    const failedModels: Record<string, { reason: string; err?: Error }> = {};
-    const loadedModels: SequentialClassifier[] = [];
 
+  public async extractModelsFromZip(
+    zip: JSZip,
+  ): Promise<ExtractedModelFileMap> {
+    const modelFileRegEx = new RegExp(".json$|.weights.bin$");
+    const models: ExtractedModelFileMap = {};
     for await (const [fileName, file] of Object.entries(zip.files)) {
       if (!modelFileRegEx.test(fileName)) continue;
 
@@ -202,6 +196,13 @@ class ClassifierHandler {
         recursiveAssign(models, { [modelName]: { modelWeights: modelFile } });
       }
     }
+    return models;
+  }
+
+  public async modelsFromZip(zip: JSZip) {
+    const models = await this.extractModelsFromZip(zip);
+    const failedModels: Record<string, { reason: string; err?: Error }> = {};
+    const loadedModels: SequentialClassifier[] = [];
 
     for await (const modelName of Object.keys(models)) {
       const { modelJson, modelWeights } = models[modelName];
@@ -221,8 +222,9 @@ class ClassifierHandler {
     }
     return { loadedModels, failedModels };
   }
+
   public async getSavedModelData() {
-    const userModels: SerializedModels = {};
+    const userModels: SerializedModelMap = {};
     for await (const modelName of this.getModelNames()) {
       const model = classifierHandler.getModel(modelName);
       const savedModelInfo = await model.getSavedModelFiles();

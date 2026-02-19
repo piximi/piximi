@@ -1,4 +1,6 @@
 // src/workers/scheduler/worker.ts
+import "./workerPolyfills"; // Must be first — polyfills `window` for zarr/imjoy-rpc
+
 import { tensor1d, tensor4d } from "@tensorflow/tfjs";
 import * as Comlink from "comlink";
 
@@ -8,26 +10,19 @@ import {
   getObjectFormFactor,
   getPerimeterFromMask,
 } from "utils/measurements/utils";
-import { prepareEntityChannelData } from "views/MeasurementView/utils";
 import {
   ChannelData,
   ChannelMeasurements,
-  ComputedImageMeasurements,
-  ImageObject,
   ObjectMeasurements,
 } from "store/data/types";
 import { calculateCenterOfMass } from "features/annotation-tracking/utils";
-import {
-  PreparedAnnotationData,
-  PreparedEntityData,
-} from "views/MeasurementView/types";
 import { PreparedEntityChannels } from "views/MeasurementView/types";
 import { decode } from "views/ImageViewer/utils";
 import {
   AnalyzeTiffInput,
   AnalyzeTiffOutput,
   CancelToken,
-  ExtendedWorkerAPI,
+  WorkerAPI,
 } from "./types";
 import {
   IMAGE_MEASUREMENT_KEYS,
@@ -37,6 +32,7 @@ import { logger } from "utils/logUtils";
 import {
   loadImageFromBuffer,
   prepareChannels,
+  prepareEntityChannelData,
   renderPreview,
   stackToTensor,
   tensorToBuffer,
@@ -44,6 +40,7 @@ import {
 import { generateDefaultColors } from "utils/tensorUtils";
 import { generateUUID } from "store/data/utils";
 import { TiffAnalyzerService } from "services/tiffAnalyzer";
+import { deserializeProject } from "../tasks";
 
 const getEncodedMaskArea = (encodedMask: number[]) => {
   return encodedMask.reduce((count: number, value, idx) => {
@@ -52,36 +49,7 @@ const getEncodedMaskArea = (encodedMask: number[]) => {
   }, 0);
 };
 
-export interface WorkerAPI {
-  annotationMeasurements: (
-    annotations: Record<string, PreparedAnnotationData>,
-    selectedMeasurements: (keyof ObjectMeasurements)[],
-    cancelToken: CancelToken,
-    onProgress: (progress: number) => void,
-  ) => Promise<{ annId: string; measurements: ObjectMeasurements }[]>;
-  imageMeasurements: (
-    images: ImageObject[],
-    selectedMeasurements: (keyof ComputedImageMeasurements)[],
-    cancelToken: CancelToken,
-    onProgress: (progress: number) => void,
-  ) => Promise<{ annId: string; measurements: ObjectMeasurements }[]>;
-
-  channelMeasurements: (
-    entities: { id: string; measurements: { channels: ChannelData[] } }[],
-    measurements: Partial<Record<keyof ChannelMeasurements, number[]>>,
-    cancelToken: CancelToken,
-    onProgress: (progress: number) => void,
-  ) => Promise<Record<string, Record<number, ChannelData>>>;
-
-  prepare: (
-    kind: string,
-    entities: PreparedEntityData[],
-    cancelToken: CancelToken,
-    onProgress: (value: number) => void,
-  ) => Promise<{ kind: string; data: PreparedEntityChannels }>;
-}
-
-const workerAPI: ExtendedWorkerAPI = {
+const workerAPI: WorkerAPI = {
   async annotationMeasurements(
     annotations,
     selectedMeasurements,
@@ -493,6 +461,13 @@ const workerAPI: ExtendedWorkerAPI = {
 
     const analyzer = new TiffAnalyzerService();
     return analyzer.analyze(input.fileData);
+  },
+
+  /**
+   * Deserialize a piximi project
+   */
+  async deserializeProject(input, cancelToken, onProgress) {
+    return deserializeProject(input, cancelToken, onProgress);
   },
 };
 

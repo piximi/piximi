@@ -23,6 +23,7 @@ const initialState: AppSettingsState = {
   loadPercent: 1,
   loadMessage: "",
   showSaveProjectDialog: true,
+  persistData: false,
 };
 
 export const applicationSettingsSlice = createSlice({
@@ -128,6 +129,9 @@ export const applicationSettingsSlice = createSlice({
     },
     setShowSaveProjectDialog(state, action: PayloadAction<{ show: boolean }>) {
       state.showSaveProjectDialog = action.payload.show;
+    },
+    setPersistData(state, action: PayloadAction<boolean>) {
+      state.persistData = action.payload;
     },
   },
 });

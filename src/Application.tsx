@@ -21,6 +21,7 @@ import { WelcomeScreen } from "./views/WelcomeScreen";
 import HelpOverlay from "views/HelpOverlay";
 
 import { selectAlertState } from "store/applicationSettings/selectors";
+import { PipelineProgressIndicator } from "components/ui/PipelineProgressIndicator";
 
 export const Application = () => {
   const theme = usePreferredMuiTheme();
@@ -36,6 +37,7 @@ export const Application = () => {
               <FileUploadProvider>
                 <HelpProvider>
                   <HelpOverlay />
+                  <PipelineProgressIndicator />
                   {alertState.visible && <AlertBar alertState={alertState} />}
                   <BrowserRouter basename={"/"}>
                     <Routes>

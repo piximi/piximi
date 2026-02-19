@@ -27,12 +27,6 @@ import {
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "./constants";
 
-import {
-  V12AnnotationObject,
-  V12Category,
-  V12ImageData,
-  V12Kind,
-} from "utils/file-io/types";
 import { RequireField } from "utils/types";
 import { addToSimpleRelationship } from "utils/objectUtils";
 
@@ -390,10 +384,12 @@ export const groupKindItemsBy = (
 };
 
 export const generateDataRelationships = (
-  kinds: Array<V12Kind>,
-  categories: Array<V12Category>,
-  images: Array<V12ImageData>,
-  annotations: Array<V12AnnotationObject>,
+  kinds: Array<Pick<Kind, "id">>,
+  categories: Array<Pick<Category, "id" | "kind">>,
+  images: Array<Pick<ImageObject, "id" | "categoryId">>,
+  annotations: Array<
+    Pick<AnnotationObject, "id" | "categoryId" | "kind" | "imageId">
+  >,
   metadata: Array<string>,
 ) => {
   const relationships: DataState["relationships"] = {

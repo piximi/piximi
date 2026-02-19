@@ -35,6 +35,8 @@ import classifierHandler from "utils/models/classification/classifierHandler";
 import { classifierSlice } from "store/classifier";
 import { segmenterSlice } from "store/segmenter";
 import { AlertState } from "utils/types";
+import { FEATURE_FLAGS } from "utils/featureFlags";
+import { useProjectPipeline } from "hooks/useProjectPipeline";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -58,6 +60,7 @@ export const WelcomeScreen = () => {
     open: ExampleProjectOpen,
   } = useDialogHotkey(HotkeyContext.ExampleProjectDialog);
   const { open, onClose, onOpen } = useDialog();
+  const { openProject } = useProjectPipeline();
 
   const windowSize = useWindowSize();
   const mobileView = useMobileView();
@@ -140,78 +143,84 @@ export const WelcomeScreen = () => {
     if (!event.currentTarget.files) return;
     const files = event.currentTarget.files;
 
-    // set indefinite loading
-    dispatch(
-      applicationSettingsSlice.actions.setLoadPercent({
-        loadPercent: -1,
-        loadMessage: "deserializing project...",
-      }),
-    );
-
-    const { fileStore: zarrStore, loadedClassifiers } = await fListToStore(
-      files,
-      files.length === 1 && files[0].type === "application/zip",
-    );
-    const onLoadProgress = (loadPercent: number, loadMessage: string) => {
+    if (FEATURE_FLAGS.USE_NEW_PIPELINE) {
+      await openProject(files);
+    } else {
+      // set indefinite loading
       dispatch(
-        applicationSettingsSlice.actions.sendLoadPercent({
-          loadPercent,
-          loadMessage,
+        applicationSettingsSlice.actions.setLoadPercent({
+          loadPercent: -1,
+          loadMessage: "deserializing project...",
         }),
       );
-    };
-    deserializeProject(zarrStore, onLoadProgress)
-      .then((res) => {
-        if (!res) return;
-        batch(() => {
-          // indefinite load until dispatches complete
-          dispatch(
-            applicationSettingsSlice.actions.setLoadPercent({
-              loadPercent: -1,
-            }),
-          );
-          dispatch(projectSlice.actions.resetProject());
-          dispatch(dataSlice.actions.initializeLoadedState(res.data));
-          // loadPerecnt set to 1 here
-          dispatch(
-            projectSlice.actions.setProject({
-              project: res.project,
-            }),
-          );
-          classifierHandler.addModels(loadedClassifiers);
-          dispatch(
-            classifierSlice.actions.setClassifier({
-              classifier: res.classifier,
-            }),
-          );
 
-          dispatch(
-            segmenterSlice.actions.setSegmenter({
-              segmenter: res.segmenter,
-            }),
-          );
-          dispatch(
-            applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 }),
-          );
-        });
-      })
-      .catch((err: Error) => {
-        import.meta.env.NODE_ENV !== "production" &&
-          import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-          console.error(err);
-
-        const warning: AlertState = {
-          alertType: AlertType.Warning,
-          name: "Could not parse project file",
-          description: `Error while parsing the project file: ${err.name}\n${err.message}`,
-        };
-
+      const { fileStore: zarrStore, loadedClassifiers } = await fListToStore(
+        files,
+        files.length === 1 && files[0].type === "application/zip",
+      );
+      const onLoadProgress = (loadPercent: number, loadMessage: string) => {
         dispatch(
-          applicationSettingsSlice.actions.updateAlertState({
-            alertState: warning,
+          applicationSettingsSlice.actions.sendLoadPercent({
+            loadPercent,
+            loadMessage,
           }),
         );
-      });
+      };
+      deserializeProject(zarrStore, onLoadProgress)
+        .then((res) => {
+          if (!res) return;
+          batch(() => {
+            // indefinite load until dispatches complete
+            dispatch(
+              applicationSettingsSlice.actions.setLoadPercent({
+                loadPercent: -1,
+              }),
+            );
+            dispatch(projectSlice.actions.resetProject());
+            dispatch(dataSlice.actions.initializeLoadedState(res.data));
+            // loadPerecnt set to 1 here
+            dispatch(
+              projectSlice.actions.setProject({
+                project: res.project,
+              }),
+            );
+            classifierHandler.addModels(loadedClassifiers);
+            dispatch(
+              classifierSlice.actions.setClassifier({
+                classifier: res.classifier,
+              }),
+            );
+
+            dispatch(
+              segmenterSlice.actions.setSegmenter({
+                segmenter: res.segmenter,
+              }),
+            );
+            dispatch(
+              applicationSettingsSlice.actions.setLoadPercent({
+                loadPercent: 1,
+              }),
+            );
+          });
+        })
+        .catch((err: Error) => {
+          import.meta.env.NODE_ENV !== "production" &&
+            import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+            console.error(err);
+
+          const warning: AlertState = {
+            alertType: AlertType.Warning,
+            name: "Could not parse project file",
+            description: `Error while parsing the project file: ${err.name}\n${err.message}`,
+          };
+
+          dispatch(
+            applicationSettingsSlice.actions.updateAlertState({
+              alertState: warning,
+            }),
+          );
+        });
+    }
 
     event.target.value = "";
   };

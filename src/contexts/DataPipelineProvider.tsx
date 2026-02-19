@@ -9,6 +9,9 @@ import React, {
 
 import { DataPipelineService, PipelineProgress } from "services/dataPipeline";
 import { useScheduler } from "./SchedulerProvider";
+import { TensorStorageService } from "services";
+import { useSelector } from "react-redux";
+import { selectPersistData } from "store/applicationSettings/selectors";
 
 // ============================================================
 // Context Types
@@ -36,6 +39,8 @@ export const DataPipelineProvider: React.FC<DataPipelineProviderProps> = ({
   children,
 }) => {
   const scheduler = useScheduler();
+  const persistData = useSelector(selectPersistData);
+  const persistDataRef = useRef(persistData);
   const pipelineRef = useRef<DataPipelineService>();
   const [progress, setProgress] = useState<PipelineProgress>({
     stage: "idle",
@@ -46,6 +51,21 @@ export const DataPipelineProvider: React.FC<DataPipelineProviderProps> = ({
     errors: [],
     warnings: [],
   });
+
+  // Keep ref in sync with latest Redux value
+  persistDataRef.current = persistData;
+
+  // Startup cleanup: clear IndexedDB if persistence is disabled
+  useEffect(() => {
+    const maybeCleanup = async () => {
+      if (!persistDataRef.current) {
+        const storage = TensorStorageService.getInstance();
+        await storage.init();
+        await storage.clearAll();
+      }
+    };
+    maybeCleanup();
+  }, []);
 
   useEffect(() => {
     const pipeline = DataPipelineService.getInstance(scheduler);

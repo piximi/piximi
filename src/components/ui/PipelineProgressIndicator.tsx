@@ -20,6 +20,7 @@ export const PipelineProgressIndicator: React.FC = () => {
     loading: "Loading files",
     analyzing: "Analyzing files",
     preparing: "Preparing images",
+    deserializing: "Deserializing project",
     storing: "Saving to storage",
   };
 
@@ -50,12 +51,17 @@ export const PipelineProgressIndicator: React.FC = () => {
       >
         <Typography variant="body2">
           {label}
-          {progress.currentFile ? ` — ${progress.currentFile}` : ""}
+          {progress.currentFile ? ` — ${progress.currentFile} ` : ""}
         </Typography>
         <Typography variant="body2">
           {progress.processedCount}/{progress.totalCount}
         </Typography>
       </Box>
+      <LinearProgress
+        variant="determinate"
+        value={progress.stageProgress}
+        color="inherit"
+      />
       <LinearProgress
         variant="determinate"
         value={progress.overallProgress}

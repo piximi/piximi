@@ -9,9 +9,11 @@ import {
   FileAnalysisResult,
   UploadOptionswithCallbacks,
   TiffImportConfig,
+  ProjectPipelineResult,
 } from "./types";
 import {
   AnalyzeTiffOutput,
+  DeserializeProjectOutput,
   LoadAndPrepareOutput,
   TaskPriority,
 } from "workers/scheduler/types";
@@ -61,6 +63,9 @@ export class DataPipelineService implements IDataPipelineService {
     this.storage = TensorStorageService.getInstance();
   }
 
+  // ============================================================
+  // PUBLIC -- START
+  // ============================================================
   /**
    * Get singleton instance
    * Requires WorkerScheduler to be passed on first call
@@ -83,13 +88,12 @@ export class DataPipelineService implements IDataPipelineService {
   }
 
   // ============================================================
-  // Main Entry Points (Phase 2)
+  // Main Entry Points
   // ============================================================
 
   /**
    * Upload and process files
    *
-   * TODO (Phase 2):
    * 1. Analyze files to detect types
    * 2. Handle time series grouping
    * 3. Dispatch to workers for loading + preparation
@@ -171,11 +175,12 @@ export class DataPipelineService implements IDataPipelineService {
             },
             priority: TaskPriority.HIGH,
             onProgress: (progress) => {
-              this.updateProgress({
-                stageProgress: progress,
-                currentFile: file.name,
-                processedCount: i,
-              });
+              if (typeof progress === "number")
+                this.updateProgress({
+                  stageProgress: progress,
+                  currentFile: file.name,
+                  processedCount: i,
+                });
             },
           });
 
@@ -335,8 +340,7 @@ export class DataPipelineService implements IDataPipelineService {
 
   /**
    * Open and deserialize a project file
-   *
-   * TODO (Phase 3):
+
    * 1. Read file as ArrayBuffer
    * 2. Dispatch to worker for deserialization
    * 3. Check if prepared data exists
@@ -344,74 +348,205 @@ export class DataPipelineService implements IDataPipelineService {
    * 5. Store tensors in IndexedDB
    * 6. Return full project state for Redux
    */
-  async openProject(file: File): Promise<PipelineResult> {
+  async openProject(files: File[]): Promise<ProjectPipelineResult> {
     // Phase 1: Return stub result
-    console.warn("DataPipelineService.openProject() not yet implemented");
+    const startTime = Date.now();
+    this.resetProgress();
 
-    return {
-      success: false,
-      metadataIds: [],
-      images: [],
-      errors: [
-        {
-          fileName: file.name,
-          error: new Error("Not implemented in Phase 1"),
-          recoverable: false,
+    try {
+      // Stage 1: Read file
+      this.updateProgress({
+        stage: "loading",
+        totalCount: 1,
+        overallProgress: 5,
+        currentFile: files.map((file) => file.name).join(", "),
+      });
+
+      if (this.abortController?.signal.aborted) {
+        return this.cancelledProjectResult();
+      }
+
+      // Stage 2: Dispatch to worker (deserializartion + IndexedDB storage happens there)
+      this.updateProgress({
+        stage: "deserializing",
+        currentFile: "unzipping",
+        overallProgress: 10,
+      });
+
+      const handler = this.scheduler.dispatch<DeserializeProjectOutput>({
+        type: "deserializeProject",
+        payload: {
+          input: { files, fileName: files[0].name },
         },
-      ],
-      warnings: ["Using stub implementation"],
-      stats: {
-        totalFiles: 1,
-        successCount: 0,
-        failedCount: 1,
-        totalBytes: 0,
-        preparationTimeMs: 0,
-      },
-    };
+        priority: TaskPriority.CRITICAL,
+        onProgress: (progress) => {
+          if (typeof progress === "number") {
+            this.updateProgress({
+              stageProgress: progress,
+              currentFile: files[0].name,
+              processedCount: 1,
+            });
+          } else {
+            this.updateProgress(progress);
+          }
+        },
+      });
+
+      const output = await handler.promise;
+
+      this.updateProgress({
+        stage: "complete",
+        overallProgress: 100,
+      });
+
+      return {
+        success: true,
+        data: output,
+        errors: [],
+        warnings: [],
+        stats: {
+          totalFiles: 1,
+          successCount: 1,
+          failedCount: 0,
+          totalBytes: 0,
+          preparationTimeMs: Date.now() - startTime,
+        },
+      };
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        return this.cancelledProjectResult();
+      }
+      this.updateProgress({ stage: "error" });
+      return {
+        success: false,
+        data: undefined,
+        errors: [
+          {
+            fileName: files[0].name,
+            error: parseError(err),
+            recoverable: false,
+          },
+        ],
+        warnings: [],
+        stats: {
+          totalFiles: 1,
+          successCount: 0,
+          failedCount: 1,
+          totalBytes: 0,
+          preparationTimeMs: Date.now() - startTime,
+        },
+      };
+    }
   }
 
   /**
    * Load an example project
    *
-   * TODO (Phase 3):
    * 1. Fetch example data from URL or bundled assets
    * 2. Process same as openProject()
    */
-  async loadExample(exampleId: string): Promise<PipelineResult> {
-    // Phase 1: Return stub result
-    console.warn("DataPipelineService.loadExample() not yet implemented");
+  async loadExample(exampleId: string): Promise<ProjectPipelineResult> {
+    const startTime = Date.now();
+    this.resetProgress();
 
-    return {
-      success: false,
-      metadataIds: [],
-      images: [],
-      errors: [
-        {
-          fileName: exampleId,
-          error: new Error("Not implemented in Phase 1"),
-          recoverable: false,
+    try {
+      // Stage 1: Fetch example file
+      this.updateProgress({
+        stage: "loading",
+        totalCount: 1,
+        overallProgress: 5,
+        currentFile: exampleId,
+      });
+
+      const response = await fetch(exampleId);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch example: ${response.statusText}`);
+      }
+      const files = await fetch(exampleId)
+        .then((res) => res.blob())
+        .then((blob) => [new File([blob], exampleId, blob)])
+        .catch((err: any) => {
+          import.meta.env.PROD &&
+            import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+            console.error(err);
+
+          throw parseError(err);
+        });
+      const fileData = await response.arrayBuffer();
+
+      if (this.abortController?.signal.aborted) {
+        return this.cancelledProjectResult();
+      }
+
+      // Stage 2: Same as openProject from here
+      this.updateProgress({ stage: "deserializing", overallProgress: 10 });
+
+      const handle = this.scheduler.dispatch<DeserializeProjectOutput>({
+        type: "deserializeProject",
+        payload: {
+          input: { files, fileName: exampleId },
         },
-      ],
-      warnings: ["Using stub implementation"],
-      stats: {
-        totalFiles: 1,
-        successCount: 0,
-        failedCount: 1,
-        totalBytes: 0,
-        preparationTimeMs: 0,
-      },
-    };
+        priority: TaskPriority.CRITICAL,
+        onProgress: (progress) => {
+          if (typeof progress === "number") {
+            this.updateProgress({
+              stageProgress: progress,
+              overallProgress: 10 + Math.floor(progress * 0.85),
+            });
+          } else {
+            this.updateProgress(progress);
+          }
+        },
+      });
+
+      const output = await handle.promise;
+
+      this.updateProgress({ stage: "complete", overallProgress: 100 });
+
+      return {
+        success: true,
+        data: output,
+        errors: [],
+        warnings: [],
+        stats: {
+          totalFiles: 1,
+          successCount: 1,
+          failedCount: 0,
+          totalBytes: fileData.byteLength,
+          preparationTimeMs: Date.now() - startTime,
+        },
+      };
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        return this.cancelledProjectResult();
+      }
+      this.updateProgress({ stage: "error" });
+      return {
+        success: false,
+        data: undefined,
+        errors: [
+          { fileName: exampleId, error: parseError(err), recoverable: false },
+        ],
+        warnings: [],
+        stats: {
+          totalFiles: 1,
+          successCount: 0,
+          failedCount: 1,
+          totalBytes: 0,
+          preparationTimeMs: Date.now() - startTime,
+        },
+      };
+    }
   }
 
   // ============================================================
-  // File Analysis (Phase 2)
+  // File Analysis
   // ============================================================
 
   /**
    * Analyze files without processing them
    * Used to determine if dialogs are needed (e.g., TIFF frame interpretation)
    *
-   * TODO (Phase 2):
    * 1. Check file types
    * 2. For TIFFs, parse header to detect frames
    * 3. Return analysis results for UI decisions
@@ -500,7 +635,10 @@ export class DataPipelineService implements IDataPipelineService {
   }
 
   // ============================================================
-  // Internal Helpers
+  // PUBLIC -- END
+  // ============================================================
+  // ============================================================
+  // PRIVATE -- START
   // ============================================================
 
   private updateProgress(updates: Partial<PipelineProgress>): void {
@@ -535,6 +673,21 @@ export class DataPipelineService implements IDataPipelineService {
       },
     };
   }
+  private cancelledProjectResult(): ProjectPipelineResult {
+    return {
+      success: false,
+      data: undefined,
+      errors: [],
+      warnings: ["Upload cancelled by user"],
+      stats: {
+        totalFiles: 1,
+        successCount: 0,
+        failedCount: 0,
+        totalBytes: 0,
+        preparationTimeMs: 0,
+      },
+    };
+  }
 
   private inferMimeType(filename: string): string {
     const ext = filename.split(".").pop()?.toLowerCase();
@@ -562,4 +715,7 @@ export class DataPipelineService implements IDataPipelineService {
     if (ext === "dcm") return "dicom";
     return "standard";
   }
+  // ============================================================
+  // PRIVATE -- END
+  // ============================================================
 }

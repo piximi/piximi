@@ -17,6 +17,8 @@ import { AlertType } from "utils/enums";
 
 import { AlertState } from "utils/types";
 import { useConfirmReplaceDialog } from "views/ProjectViewer/hooks/useConfirmReplaceProjectDialog";
+import { FEATURE_FLAGS } from "utils/featureFlags";
+import { useProjectPipeline } from "hooks/useProjectPipeline";
 
 //TODO: MenuItem??
 
@@ -28,6 +30,7 @@ export const OpenProjectMenuItem = ({
   onMenuClose,
 }: OpenProjectMenuItemProps) => {
   const dispatch = useDispatch();
+  const { openProject } = useProjectPipeline();
   const { getConfirmation } = useConfirmReplaceDialog();
   const onOpenProject = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -38,82 +41,87 @@ export const OpenProjectMenuItem = ({
     const files = event.currentTarget.files;
     const confirmation = await getConfirmation({});
     if (!confirmation) return;
-
-    // set indefinite loading
-    dispatch(
-      applicationSettingsSlice.actions.setLoadPercent({
-        loadPercent: -1,
-        loadMessage: "deserializing project...",
-      }),
-    );
-
-    const { fileStore: zarrStore, loadedClassifiers } = await fListToStore(
-      files,
-      zip,
-    );
-    const onLoadProgress = (loadPercent: number, loadMessage: string) => {
+    if (FEATURE_FLAGS.USE_NEW_PIPELINE) {
+      await openProject(files);
+    } else {
+      // set indefinite loading
       dispatch(
-        applicationSettingsSlice.actions.sendLoadPercent({
-          loadPercent,
-          loadMessage,
+        applicationSettingsSlice.actions.setLoadPercent({
+          loadPercent: -1,
+          loadMessage: "deserializing project...",
         }),
       );
-    };
-    deserializeProject(zarrStore, onLoadProgress)
-      .then((res) => {
-        if (!res) return;
-        batch(() => {
-          // indefinite load until dispatches complete
-          dispatch(
-            applicationSettingsSlice.actions.setLoadPercent({
-              loadPercent: -1,
-            }),
-          );
-          dispatch(projectSlice.actions.resetProject());
-          dispatch(
-            projectSlice.actions.setProject({
-              project: res.project,
-            }),
-          );
-          dispatch(dataSlice.actions.initializeLoadedState(res.data));
-          // loadPerecnt set to 1 here
-          classifierHandler.addModels(loadedClassifiers);
-          dispatch(
-            classifierSlice.actions.setClassifier({
-              classifier: res.classifier,
-            }),
-          );
+
+      const { fileStore: zarrStore, loadedClassifiers } = await fListToStore(
+        files,
+        zip,
+      );
+      const onLoadProgress = (loadPercent: number, loadMessage: string) => {
+        dispatch(
+          applicationSettingsSlice.actions.sendLoadPercent({
+            loadPercent,
+            loadMessage,
+          }),
+        );
+      };
+      deserializeProject(zarrStore, onLoadProgress)
+        .then((res) => {
+          if (!res) return;
+          batch(() => {
+            // indefinite load until dispatches complete
+            dispatch(
+              applicationSettingsSlice.actions.setLoadPercent({
+                loadPercent: -1,
+              }),
+            );
+            dispatch(projectSlice.actions.resetProject());
+            dispatch(
+              projectSlice.actions.setProject({
+                project: res.project,
+              }),
+            );
+            dispatch(dataSlice.actions.initializeLoadedState(res.data));
+            // loadPerecnt set to 1 here
+            classifierHandler.addModels(loadedClassifiers);
+            dispatch(
+              classifierSlice.actions.setClassifier({
+                classifier: res.classifier,
+              }),
+            );
+
+            dispatch(
+              segmenterSlice.actions.setSegmenter({
+                segmenter: res.segmenter,
+              }),
+            );
+            dispatch(
+              applicationSettingsSlice.actions.setLoadPercent({
+                loadPercent: 1,
+              }),
+            );
+          });
+        })
+        .catch((err: Error) => {
+          import.meta.env.NODE_ENV !== "production" &&
+            import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+            console.error(err);
+
+          const warning: AlertState = {
+            alertType: AlertType.Warning,
+            name: "Could not parse project file",
+            description: `Error while parsing the project file: ${err.name}\n${err.message}`,
+          };
 
           dispatch(
-            segmenterSlice.actions.setSegmenter({
-              segmenter: res.segmenter,
+            applicationSettingsSlice.actions.updateAlertState({
+              alertState: warning,
             }),
           );
           dispatch(
             applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 }),
           );
         });
-      })
-      .catch((err: Error) => {
-        import.meta.env.NODE_ENV !== "production" &&
-          import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-          console.error(err);
-
-        const warning: AlertState = {
-          alertType: AlertType.Warning,
-          name: "Could not parse project file",
-          description: `Error while parsing the project file: ${err.name}\n${err.message}`,
-        };
-
-        dispatch(
-          applicationSettingsSlice.actions.updateAlertState({
-            alertState: warning,
-          }),
-        );
-        dispatch(
-          applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 }),
-        );
-      });
+    }
 
     event.target.value = "";
   };

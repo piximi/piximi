@@ -28,3 +28,15 @@ export {
   type TiffIFDEntry,
   type ParsedTiffStructure,
 } from "./tiffAnalyzer";
+
+// ProjectSerialization exports
+export {
+  ProjectSerializer as ProjectSerializationService,
+  type RawDeserializedImage,
+  type RawDeserializedAnnotation,
+  type DeserializationCallbacks,
+  type DeserializedProjectResult,
+  type DeserializedImageMeta,
+  type DeserializedAnnotationMeta,
+  type ExtractedModelFile,
+} from "./dataPipeline/projectSerialization";

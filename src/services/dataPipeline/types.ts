@@ -1,5 +1,6 @@
 import { ImageMetadata, ImageObject } from "store/data/types";
 import { TensorReference } from "../tensorStorage/types";
+import { DeserializeProjectOutput } from "workers/scheduler/types";
 
 // ============================================================
 // Pipeline Status & Progress
@@ -9,11 +10,30 @@ export type PipelineStage =
   | "idle"
   | "loading"
   | "analyzing"
-  | "preparing"
+  | "deserializing"
   | "storing"
   | "complete"
   | "error"
   | "cancelled";
+
+// ============================================================
+// Project Deserialization Progress (granular sub-stages)
+// ============================================================
+
+export type ProjectDeserializationStage =
+  | "unzipping"
+  | "detecting-version"
+  | "deserializing-project"
+  | "converting"
+  | "processing-images"
+  | "processing-annotations";
+
+export type ProjectDeserializationProgress = {
+  stage: ProjectDeserializationStage;
+  percent: number; // 0-100 overall
+  processedCount?: number;
+  totalCount?: number;
+};
 
 export type PipelineProgress = {
   stage: PipelineStage;
@@ -81,6 +101,13 @@ export type PipelineResult = {
   };
 };
 
+export type ProjectPipelineResult = Omit<
+  PipelineResult,
+  "images" | "metadataIds"
+> & {
+  data: DeserializeProjectOutput | undefined;
+};
+
 // ============================================================
 // Prepared Data (output from workers)
 // ============================================================
@@ -143,8 +170,8 @@ export interface IDataPipelineService {
     files: FileList,
     options?: UploadOptions,
   ): Promise<PipelineResult>;
-  openProject(file: File): Promise<PipelineResult>;
-  loadExample(exampleId: string): Promise<PipelineResult>;
+  openProject(files: File[]): Promise<ProjectPipelineResult>;
+  loadExample(exampleId: string): Promise<ProjectPipelineResult>;
 
   // Analysis (for UI decisions)
   analyzeFiles(files: FileList): Promise<FileAnalysisResult[]>;

@@ -2,7 +2,7 @@ import JSZip from "jszip";
 import { KeyError } from "zarr";
 import classifierHandler from "utils/models/classification/classifierHandler";
 import { AsyncStore, ValidStoreType } from "zarr/types/storage/types";
-import { SerializedModels } from "utils/models/types";
+import { SerializedModelMap } from "utils/models/types";
 import { SequentialClassifier } from "utils/models/classification";
 
 /**
@@ -148,7 +148,7 @@ export class PiximiStore extends ZipStore {
   constructor(name: string, zip?: JSZip) {
     super(name, zip);
   }
-  attachModels(modelsByName: SerializedModels) {
+  attachModels(modelsByName: SerializedModelMap) {
     Object.values(modelsByName).forEach((model) => {
       this._zip.file(model.modelJson.fileName, model.modelJson.blob);
       this._zip.file(model.modelWeights.fileName, model.modelWeights.blob);
