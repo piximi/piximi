@@ -18,6 +18,7 @@ import { Partition } from "utils/models/enums";
 import { GeneralizedKindItem } from "store/data/types";
 import { areEqual, GridChildComponentProps } from "react-window";
 import { KindItemDetailContainer } from "./KindItemDetailContainer";
+import { useRenderedSrc } from "hooks/useRenderedSrc";
 
 type CellData = {
   items: GeneralizedKindItem[];
@@ -96,6 +97,8 @@ const KindItemGridItem = memo(
     const scaleFactor = useSelector(selectTileSize);
     const textOnScroll = useSelector(selectTextOnScroll);
 
+    const { src } = useRenderedSrc(item);
+
     const categoryName = useMemo(
       () => categoryEntities[item.categoryId].name ?? "",
 
@@ -150,7 +153,7 @@ const KindItemGridItem = memo(
           <Box
             component="img"
             alt=""
-            src={item.src}
+            src={src}
             sx={{
               width: "100%",
               height: "100%",
@@ -180,7 +183,7 @@ const KindItemGridItem = memo(
         <Box
           component="img"
           alt=""
-          src={item.src}
+          src={src}
           sx={{
             width: "100%",
             height: "100%",

@@ -3,11 +3,25 @@ import { Tensor4D } from "@tensorflow/tfjs";
 import { Partition } from "utils/models/enums";
 import { BitDepth as IJSBitDepth, DataArray as IJSDataArray } from "image-js";
 import { ColorsRaw, PartialBy, Point, RequireOnly } from "utils/types";
+import { TensorReference } from "services";
+
+// ─── Primitives & Shapes ───────────────────────────────────────────────────────
 
 export type BitDepth = IJSBitDepth;
 export type DataArray = IJSDataArray;
 
 export type TPKey = string;
+
+export type Shape = {
+  planes: number;
+  height: number;
+  width: number;
+  channels: number;
+};
+
+export type ShapeArray = [number, number, number, number];
+
+// ─── Measurements ──────────────────────────────────────────────────────────────
 
 export type ChannelMeasurements = {
   total?: number;
@@ -30,48 +44,12 @@ export type ChannelData = {
 export type ChannelStatistics = { channels: ChannelData[] };
 
 export type ComputedImageMeasurements = {
-  // Computed features
   entropy?: number;
   contrast?: number;
   snr?: number; // Signal-to-noise ratio
 };
+
 export type ImageMeasurements = ComputedImageMeasurements & ChannelStatistics;
-
-export type ImageObject = {
-  id: string;
-  name: string;
-  metadataId: string;
-  colors: ColorsRaw;
-  src: string;
-  data: Tensor4D;
-  categoryId: string;
-  activePlane: number;
-  partition: Partition;
-  timepoint?: number;
-  measurements?: ImageMeasurements;
-};
-
-export type BaseExtractedImageData = {
-  id: string;
-  bitDepth: number;
-  shape: Shape;
-  colors: ColorsRaw;
-  data: Tensor4D;
-  src: string;
-};
-export type ImageMetadata = {
-  id: string;
-  name: string;
-  kind: string;
-  bitDepth: BitDepth;
-  shape: Shape;
-  timeSeries: boolean;
-  imageDataIds: string[];
-  defaultImageId: string;
-};
-
-export type FullTimepointImage = Omit<ImageMetadata, "timepoints"> &
-  ImageObject & { timepoint: TPKey };
 
 export type ComputedObjectMeasurements = {
   area?: number;
@@ -86,6 +64,49 @@ export type ComputedObjectMeasurements = {
 };
 
 export type ObjectMeasurements = ComputedObjectMeasurements & ChannelStatistics;
+
+// ─── Images ────────────────────────────────────────────────────────────────────
+
+export type ImageObject = {
+  id: string;
+  name: string;
+  metadataId: string;
+  colors: ColorsRaw;
+  src: string;
+  data: Tensor4D;
+  categoryId: string;
+  activePlane: number;
+  partition: Partition;
+  timepoint?: number;
+  measurements?: ImageMeasurements;
+  tensorRef?: TensorReference;
+};
+
+export type BaseExtractedImageData = {
+  id: string;
+  bitDepth: number;
+  shape: Shape;
+  colors: ColorsRaw;
+  data: Tensor4D;
+  src: string;
+  tensorRef?: TensorReference;
+};
+
+export type ImageMetadata = {
+  id: string;
+  name: string;
+  kind: string;
+  bitDepth: BitDepth;
+  shape: Shape;
+  timeSeries: boolean;
+  imageDataIds: string[];
+  defaultImageId: string;
+};
+
+export type FullTimepointImage = Omit<ImageMetadata, "timepoints"> &
+  ImageObject & { timepoint: TPKey };
+
+// ─── Annotations ───────────────────────────────────────────────────────────────
 
 export type AnnotationObject = {
   globalId?: string;
@@ -108,7 +129,36 @@ export type AnnotationObject = {
   data: Tensor4D;
   activePlane?: number;
   measurements?: ObjectMeasurements;
+  tensorRef?: TensorReference;
 };
+
+export type DecodedAnnotationObject = Omit<
+  AnnotationObject,
+  "decodedMask" | "encodedMask"
+> & {
+  decodedMask: DataArray;
+  encodedMask?: number[];
+};
+
+export type PartialDecodedAnnotationObject = PartialBy<
+  DecodedAnnotationObject,
+  "src" | "data" | "name" | "kind" | "bitDepth" | "shape"
+>;
+
+export type DecodedTSAnnotationObject = Omit<
+  AnnotationObject & {
+    decodedMask: DataArray;
+  },
+  "encodedMask"
+>;
+
+export type PartialTSDecodedAnnotationObject = PartialBy<
+  DecodedTSAnnotationObject,
+  "src" | "data" | "name" | "kind" | "bitDepth" | "shape"
+>;
+
+// ─── Tracking ──────────────────────────────────────────────────────────────────
+
 export type LinkNode = {
   id: string;
   time: number;
@@ -116,6 +166,7 @@ export type LinkNode = {
   parentIds: string[]; // to handle merges
   childIds: string[]; // to handle splits
 };
+
 export type LinkGraph = Record<string, LinkNode>;
 
 export type Tracklet = {
@@ -131,27 +182,8 @@ export type Tracklet = {
 };
 
 export type PendingTracklet = PartialBy<Tracklet, "start" | "end">;
-export type DecodedAnnotationObject = Omit<
-  AnnotationObject,
-  "decodedMask" | "encodedMask"
-> & {
-  decodedMask: DataArray;
-  encodedMask?: number[];
-};
-export type PartialDecodedAnnotationObject = PartialBy<
-  DecodedAnnotationObject,
-  "src" | "data" | "name" | "kind" | "bitDepth" | "shape"
->;
-export type DecodedTSAnnotationObject = Omit<
-  AnnotationObject & {
-    decodedMask: DataArray;
-  },
-  "encodedMask"
->;
-export type PartialTSDecodedAnnotationObject = PartialBy<
-  DecodedTSAnnotationObject,
-  "src" | "data" | "name" | "kind" | "bitDepth" | "shape"
->;
+
+// ─── Categories & Kinds ────────────────────────────────────────────────────────
 
 export type Category = {
   color: string; // 3 byte hex, eg. "#a08cd2"
@@ -167,14 +199,7 @@ export type Kind = {
   unknownCategoryId: string;
 };
 
-export type Shape = {
-  planes: number;
-  height: number;
-  width: number;
-  channels: number;
-};
-
-export type ShapeArray = [number, number, number, number];
+// ─── Update Types ──────────────────────────────────────────────────────────────
 
 export type CategoryUpdates = {
   id: string;
@@ -197,6 +222,8 @@ export type AnnotationUpdates = Array<
   RequireOnly<Partial<AnnotationObject>, "id">
 >;
 
+// ─── Generalized UI Types ──────────────────────────────────────────────────────
+
 export type GeneralizedKindItem = {
   id: string;
   name: string;
@@ -216,6 +243,7 @@ export type GeneralizedKindItem = {
   src: string;
   colors?: ColorsRaw;
   data: Tensor4D;
+  tensorRef?: TensorReference;
 
   // Metadata for operations
   metadataId?: string;

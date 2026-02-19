@@ -197,6 +197,7 @@ function buildReduxPayload(
       },
       data: tensor4d([[[[0], [0], [0]]]]),
       metadataId: metadataEntry.metadata.id,
+      tensorRef: image.tensorRef,
     };
     metadataEntry.images.push(imageObject);
   }

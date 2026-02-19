@@ -63,6 +63,7 @@ export function buildProjectPayload(output: DeserializeProjectOutput): {
       // Placeholder — real data in IndexedDB
       src: "",
       data: tensor4d([[[[0], [0], [0]]]]),
+      tensorRef: img.tensorRef,
     }),
   );
 
@@ -86,6 +87,7 @@ export function buildProjectPayload(output: DeserializeProjectOutput): {
       // Placeholder — real data in IndexedDB
       src: "",
       data: tensor4d([[[[0], [0], [0]]]]),
+      tensorRef: ann.tensorRef,
     }),
   );
 

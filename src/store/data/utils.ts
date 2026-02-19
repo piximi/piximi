@@ -29,6 +29,7 @@ import {
 
 import { RequireField } from "utils/types";
 import { addToSimpleRelationship } from "utils/objectUtils";
+import { TensorReference } from "services";
 
 export const generateUUID = (options?: { definesUnknown: boolean }) => {
   const id = uuidv4();
@@ -306,6 +307,7 @@ export const normalizeImageToKindItem = (
     data: image.data,
     metadataId: meta.id,
     grouped: !timeExpanded,
+    tensorRef: image.tensorRef,
   };
 };
 
@@ -326,6 +328,7 @@ const normalizeAnnotationToKindItem = (
   partition: annotation.partition,
   childIds: annotation.childIds,
   data: annotation.data,
+  tensorRef: annotation.tensorRef,
 });
 
 export const getKindItemsFromAnnotations = (
@@ -470,4 +473,16 @@ export const isPopulatedTracklet = (
   tracklet: Tracklet | PendingTracklet,
 ): tracklet is RequireField<Tracklet, "start" | "end"> => {
   return tracklet.end !== undefined && tracklet.start !== undefined;
+};
+
+/**
+ * Type guard: returns true when the entity's real data lives in IndexedDB.
+ * When true, `entity.data` is a disposable placeholder and should NOT be used
+ * for computation — load from IndexedDB via useTensorData() instead.
+ */
+export const hasTensorReference = (entity: {
+  tensorRef?: TensorReference;
+  data: Tensor4D;
+}): entity is typeof entity & { tensorRef: TensorReference } => {
+  return entity.tensorRef !== undefined;
 };
