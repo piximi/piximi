@@ -29,6 +29,8 @@ import { isObjectEmpty } from "utils/objectUtils";
 
 import { TaskPriority, TaskHandle } from "workers/scheduler";
 import { capitalize } from "utils/stringUtils";
+import { hasTensorReference } from "store/data/utils";
+import { PipelineProgress } from "services";
 
 export const useTableExport = () => {
   const activeGroup = useSelector(selectActiveMeasurementGroup);
@@ -136,43 +138,54 @@ export const useCreateMeasurementTable = () => {
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const createTransferableEntities = (kind: string) => {
-    let transferableEntities: {
+    const transferableEntities: {
       id: string;
       kind: string;
       data: number[][][][];
       encodedMask?: number[];
       decodedMask?: DataArray;
-    }[];
+    }[] = [];
+    const prepared: string[] = [];
 
     if (kind === IMAGE_KIND)
-      transferableEntities = Object.values(images).map((image) => ({
-        id: image.id,
-        kind: IMAGE_KIND,
-        data: image.data.arraySync(),
-      }));
+      Object.values(images).forEach((image) => {
+        if (!hasTensorReference(image)) {
+          transferableEntities.push({
+            id: image.id,
+            kind: IMAGE_KIND,
+            data: image.data.arraySync(),
+          });
+        } else {
+          prepared.push(image.id);
+        }
+      });
     else {
-      transferableEntities = annotationsByKind[kind].map((annId) => {
+      annotationsByKind[kind].map((annId) => {
         const annotation = annotations[annId];
-        let decodedMask: DataArray | undefined = undefined;
-        if (!annotation.decodedMask)
-          decodedMask = decodeAnnotation(annotation).decodedMask;
-        return {
-          id: annId,
-          kind: annotation.kind,
-          data: annotation.data.arraySync(),
-          encodedMask: annotation.encodedMask,
-          decodedMask: decodedMask ? decodedMask : annotation.decodedMask,
-        };
+        if (!hasTensorReference(annotation)) {
+          let decodedMask: DataArray | undefined = undefined;
+          if (!annotation.decodedMask)
+            decodedMask = decodeAnnotation(annotation).decodedMask;
+          transferableEntities.push({
+            id: annId,
+            kind: annotation.kind,
+            data: annotation.data.arraySync(),
+            encodedMask: annotation.encodedMask,
+            decodedMask: decodedMask ? decodedMask : annotation.decodedMask,
+          });
+        } else {
+          prepared.push(annId);
+        }
       });
     }
-    return transferableEntities;
+    return { unprepared: transferableEntities, prepared };
   };
 
   const handleCreateTable = async (kind: string) => {
     const transferableEntities = createTransferableEntities(kind);
 
     setStatus({ loading: true });
-
+    const newlyPrepared: string[] = [];
     const handle = scheduler.dispatch<{
       kind: string;
       data: PreparedEntityChannels;
@@ -180,11 +193,11 @@ export const useCreateMeasurementTable = () => {
       type: "prepare",
       payload: {
         kind,
-        entities: transferableEntities,
+        entities: transferableEntities.unprepared,
       },
       priority: TaskPriority.HIGH,
-      onProgress: (progress: number) => {
-        setStatus({ loading: true, value: progress });
+      onProgress: (progress: number | Partial<PipelineProgress>) => {
+        setStatus({ loading: true, value: progress as number });
       },
       onComplete: (result) => {
         if (result.data && result.kind) {
@@ -211,18 +224,18 @@ export const useCreateMeasurementTable = () => {
           // Batch all dispatches to prevent multiple re-renders
           batch(() => {
             dispatch(batchAction(measurementUpdates));
-
-            dispatch(
-              measurementsSlice.actions.createGroup({
-                kindId: result.kind,
-                displayName: kinds[result.kind].displayName,
-                itemIds: Object.keys(result.data),
-              }),
-            );
           });
+          newlyPrepared.push(...Object.keys(result.data));
 
           setStatus({ loading: false });
         }
+        dispatch(
+          measurementsSlice.actions.createGroup({
+            kindId: result.kind,
+            displayName: kinds[result.kind].displayName,
+            itemIds: [...transferableEntities.prepared, ...newlyPrepared],
+          }),
+        );
       },
       onError: (error) => {
         if (error.code !== "CANCELLED") {

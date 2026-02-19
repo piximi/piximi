@@ -41,6 +41,7 @@ import { generateDefaultColors } from "utils/tensorUtils";
 import { generateUUID } from "store/data/utils";
 import { TiffAnalyzerService } from "services/tiffAnalyzer";
 import { deserializeProject } from "../tasks";
+import { TensorStorageService } from "services";
 
 const getEncodedMaskArea = (encodedMask: number[]) => {
   return encodedMask.reduce((count: number, value, idx) => {
@@ -233,9 +234,11 @@ const workerAPI: WorkerAPI = {
   },
 
   async channelMeasurements(entities, measurements, cancelToken, onProgress) {
+    console.log("fired");
     const entityMeasurements: Record<string, Record<number, ChannelData>> = {};
     const numEntities = entities.length;
-
+    const storage = TensorStorageService.getInstance();
+    console.log(storage);
     let progress = 0;
     let completed = 0;
     const postLoadPercent = (num: number) => {
@@ -245,11 +248,19 @@ const workerAPI: WorkerAPI = {
         onProgress(currentProgress);
       }
     };
-    entities.forEach((entity) => {
+    for (const entity of entities) {
+      console.log(entity);
       if (cancelToken.cancelled) {
         throw new DOMException("Task cancelled", "AbortError");
       }
-      const existingMeasurementData = entity.measurements.channels;
+      const existingMeasurementData = entity.measurements?.channels;
+      const preparedChannels = await storage.retrievePreparedChannels(
+        entity.id,
+        entity.tensorRef.storeName,
+      );
+      console.log("preparedChannels: ", preparedChannels);
+      continue;
+
       const entityChannelDataTensors = existingMeasurementData.map((data) =>
         tensor1d(data.channelData!),
       );
@@ -296,7 +307,7 @@ const workerAPI: WorkerAPI = {
       completed++;
       postLoadPercent(completed);
       entityChannelDataTensors.forEach((tensor) => tensor.dispose());
-    });
+    }
 
     return entityMeasurements;
   },

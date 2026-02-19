@@ -12,9 +12,13 @@ import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/ImageViewerDataSlice";
 import { ImageViewerMetadataDetails } from "views/ImageViewer/state/image-viewer-data/types";
 import { RequireField } from "utils/types";
-import { GeneralizedKindItem } from "store/data/types";
+import { GeneralizedKindItem, ImageObject } from "store/data/types";
 import { useHotkeys } from "hooks";
 import { HotkeyContext } from "utils/enums";
+import { hasTensorReference } from "store/data/utils";
+import { useColoredImage } from "hooks/useColoredImage";
+import { imageDataSelectors } from "store/data/selectors";
+import { RootState } from "store/rootReducer";
 
 // The containing draw does not render if activeMetadata is undefined,
 // and the Timepoint adjustment does not render if the metadata does not contain a timeseries
@@ -159,23 +163,34 @@ export const TimepointAdjustment = () => {
       >
         {Object.values(tpHtmlImages ?? []).map((image, idx) => {
           return (
-            <img
+            <ImageThumbnail
               key={`tp-${idx}`}
-              ref={(el) => (itemRefs.current[idx] = el)}
-              style={{
-                border:
-                  activeMetadata.activeImageId === image.id
-                    ? "2px solid pink"
-                    : "2px solid transparent",
-              }}
-              src={image.src}
-              width={`${activeImage.shape.width / tsPreviewProportions}px`}
-              height={`${activeImage.shape.height / tsPreviewProportions}px`}
+              imageId={image.id}
+              width={activeImage.shape.width / tsPreviewProportions}
+              height={activeImage.shape.height / tsPreviewProportions}
               onClick={() => {
                 setSliderValue(idx);
                 setTimepointImage(image.id);
               }}
+              isActive={activeMetadata.activeImageId === image.id}
             />
+            // <img
+            //   key={`tp-${idx}`}
+            //   ref={(el) => (itemRefs.current[idx] = el)}
+            //   style={{
+            //     border:
+            //       activeMetadata.activeImageId === image.id
+            //         ? "2px solid pink"
+            //         : "2px solid transparent",
+            //   }}
+            //   src={image.src}
+            //   width={`${activeImage.shape.width / tsPreviewProportions}px`}
+            //   height={`${activeImage.shape.height / tsPreviewProportions}px`}
+            //   onClick={() => {
+            //     setSliderValue(idx);
+            //     setTimepointImage(image.id);
+            //   }}
+            // />
           );
         })}
       </Stack>
@@ -220,5 +235,48 @@ export const TimepointAdjustment = () => {
         </IconButton>
       </Box>
     </Box>
+  );
+};
+
+const ImageThumbnail = ({
+  imageId,
+  width,
+  height,
+  isActive,
+  onClick,
+}: {
+  imageId: string;
+  width: number;
+  height: number;
+  isActive: boolean;
+  onClick: () => void;
+}) => {
+  const image = useSelector((state: RootState) =>
+    imageDataSelectors.selectById(state, imageId),
+  );
+  if (!hasTensorReference(image)) return null;
+  const { coloredImage, loading } = useColoredImage(image);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // TODO(human): Draw coloredImage onto canvasRef at the thumbnail size,
+  // and return the <canvas> element with the active border style + onClick.
+  // Handle the loading state (coloredImage is null while loading).
+  // Hint: use a useEffect to call canvasRef.current.getContext("2d").drawImage(...)
+  // when coloredImage changes.
+  useEffect(() => {
+    if (!canvasRef.current || !coloredImage) return;
+    const ctx = canvasRef.current.getContext("2d");
+    ctx?.drawImage(coloredImage, 0, 0, width, height);
+  }, [coloredImage]);
+  return (
+    <canvas
+      ref={canvasRef}
+      width={width}
+      height={height}
+      onClick={onClick}
+      style={{
+        border: isActive ? "2px solid pink" : "2px solid transparent",
+      }}
+    />
   );
 };

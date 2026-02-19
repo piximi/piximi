@@ -17,8 +17,6 @@ import { ZoomControl } from "./ZoomControl";
 import { ProjectTextField } from "./ProjextTextField";
 import { CategorizeChip } from "./CategorizeChip";
 
-import { selectLoadPercent } from "store/applicationSettings/selectors";
-
 import { ImageViewerButton } from "./ImageViewerButton";
 import { MeasurementsButton } from "./MeasurementsButton";
 import { DIMENSIONS } from "utils/constants";
@@ -27,14 +25,15 @@ import { selectExpandedTime } from "store/project/selectors";
 import { projectSlice } from "store/project";
 import { selectItemsContainTimeSeries } from "store/project/reselectors";
 import { CollapsedClockIcon, ExpandedClockIcon } from "icons/ClockIcon";
+import { usePipelineProgress } from "contexts";
 
 export const ProjectAppBar = () => {
-  const loadPercent = useSelector(selectLoadPercent);
   const isMobile = useMobileView();
   const dispatch = useDispatch();
   const theme = useTheme();
   const timeExpanded = useSelector(selectExpandedTime);
   const containsTimeSeries = useSelector(selectItemsContainTimeSeries);
+  const pipelineProgress = usePipelineProgress();
 
   return (
     <Stack
@@ -62,7 +61,11 @@ export const ProjectAppBar = () => {
         <LogoLoader
           width={175}
           height={DIMENSIONS.toolDrawerWidth - 8}
-          loadPercent={loadPercent}
+          loadPercent={
+            pipelineProgress.stage === "idle"
+              ? 1
+              : pipelineProgress.overallProgress / 100
+          }
         />
       </Box>
 

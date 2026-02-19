@@ -71,13 +71,13 @@ const DEFAULT_CACHE_OPTIONS: CacheOptions = {
  * ```typescript
  * const storage = TensorStorageService.getInstance();
  *
- * // Store a tensor
+ *  Store a tensor
  * const ref = await storage.store('image-123', tensorData, STORES.IMAGE_TENSORS);
  *
- * // Retrieve as Tensor4D
+ *  Retrieve as Tensor4D
  * const tensor = await storage.retrieveAsTensor('image-123', STORES.IMAGE_TENSORS);
  *
- * // Don't forget to dispose when done!
+ *  Don't forget to dispose when done!
  * tensor?.dispose();
  * ```
  */
@@ -294,6 +294,52 @@ export class TensorStorageService implements ITensorStorageService {
       this.cache.set(id, data, data.byteSize);
 
       return { success: true, data };
+    } catch (error) {
+      return {
+        success: false,
+        error: parseError(error),
+      };
+    }
+  }
+
+  async retrieveBatch(
+    items: { id: string; storeName: StoreName }[],
+  ): Promise<StorageResult<Map<string, StoredTensorData>>> {
+    const tensorDataMap: Map<string, StoredTensorData> = new Map();
+    try {
+      await this.init();
+
+      // Group by store
+      const byStore = new Map<StoreName, string[]>();
+      for (const item of items) {
+        const cached = this.cache.get(item.id);
+        if (cached) {
+          tensorDataMap.set(item.id, cached);
+          continue;
+        }
+        if (!byStore.has(item.storeName)) {
+          byStore.set(item.storeName, []);
+        }
+        byStore.get(item.storeName)!.push(item.id);
+      }
+
+      // retrieve from each store
+      for (const [storeName, ids] of byStore) {
+        const tx = this.db!.transaction(storeName, "readonly");
+        const fetched = await Promise.all(ids.map((id) => tx.store.get(id)));
+        await tx.done;
+
+        for (let i = 0; i < ids.length; i++) {
+          const data = fetched[i] as StoredTensorData | undefined;
+          if (data) {
+            data.lastAccessedAt = Date.now();
+            this.cache.set(data.id, data, data.byteSize);
+            tensorDataMap.set(data.id, data);
+          }
+        }
+      }
+
+      return { success: true, data: tensorDataMap };
     } catch (error) {
       return {
         success: false,

@@ -78,6 +78,7 @@ export const ChannelAdjustment = () => {
 const ChannelsList = () => {
   const dispatch = useDispatch();
   const activeImage = useSelector(selectActiveImage);
+  const activeImageRawColor = useSelector(selectActiveImageRawColor);
   const [selectedChannelIndex, setSelectedChannelIndex] = useState<number>(0);
 
   const {
@@ -98,11 +99,23 @@ const ChannelsList = () => {
     () =>
       debounce(
         (idx: number, newValue: [number, number], bitDepth: BitDepth) => {
-          setLocalActiveImageColors(
-            produce((draftColor) => {
-              draftColor.range[idx] = scaleDownRange(newValue, bitDepth);
+          if (!activeImage) return;
+          const ranges = { ...activeImage.colors!.range };
+          console.log(newValue);
+          console.log(ranges);
+          ranges[idx] = scaleDownRange(newValue, bitDepth);
+          console.log(ranges);
+          dispatch(
+            dataSlice.actions.updateImageData({
+              id: activeImage?.id,
+              changes: { colors: { ...activeImage.colors!, range: ranges } },
             }),
           );
+          // setLocalActiveImageColors(
+          //   produce((draftColor) => {
+          //     draftColor.range[idx] = scaleDownRange(newValue, bitDepth);
+          //   }),
+          // );
         },
         10,
       ),
@@ -110,23 +123,24 @@ const ChannelsList = () => {
   );
 
   const handleSliderChangeCommitted = async () => {
-    if (!activeImage) return;
-    dispatchActiveImageColors({
-      id: activeImage.id,
-      changes: {
-        colors: {
-          ...localActiveImageColors,
-        },
-      },
-    });
+    return;
+    // if (!activeImage) return;
+    // dispatchActiveImageColors({
+    //   id: activeImage.id,
+    //   changes: {
+    //     colors: {
+    //       ...localActiveImageColors,
+    //     },
+    //   },
+    // });
   };
 
   const onCheckboxChanged = (index: number, enabled: boolean) => {
     if (!activeImage) return;
     const newColors = {
-      visible: { ...localActiveImageColors.visible }, // copy so we can modify
-      range: localActiveImageColors.range,
-      color: localActiveImageColors.color,
+      visible: { ...activeImageRawColor.visible }, // copy so we can modify
+      range: activeImageRawColor.range,
+      color: activeImageRawColor.color,
     };
     newColors.visible[index] = enabled;
     dispatch(
@@ -138,7 +152,7 @@ const ChannelsList = () => {
   };
 
   const colorAdjustmentSlider = (index: number, name: string) => {
-    const isVisible = localActiveImageColors.visible[index];
+    const isVisible = activeImageRawColor.visible[index];
 
     return (
       <ListItem dense disableGutters disablePadding key={index}>
@@ -155,9 +169,9 @@ const ChannelsList = () => {
             sx={{
               py: 0,
               px: 1,
-              color: rgbToHex(localActiveImageColors.color[index]),
+              color: rgbToHex(activeImageRawColor.color[index]),
               "&.Mui-checked": {
-                color: rgbToHex(localActiveImageColors.color[index]),
+                color: rgbToHex(activeImageRawColor.color[index]),
               },
             }}
           />
@@ -182,7 +196,7 @@ const ChannelsList = () => {
           pl: 1,
         }}
       >
-        {Array(localActiveImageColors.color.length)
+        {Array(activeImageRawColor.color.length)
           .fill(0)
           .map((_, i) => {
             return colorAdjustmentSlider(i, `Ch. ${i + 1}`);
@@ -197,22 +211,20 @@ const ChannelsList = () => {
           borderLeft: `1px solid ${theme.palette.divider}`,
         })}
       >
-        {activeImage && localActiveImageColors.color.length > 0 && (
+        {activeImage && activeImageRawColor.color.length > 0 && (
           <Slider
-            disabled={!localActiveImageColors.visible[selectedChannelIndex]}
+            disabled={!activeImageRawColor.visible[selectedChannelIndex]}
             sx={{
               width: "50%",
               "& .MuiSlider-track": {
                 color: (theme) =>
-                  localActiveImageColors.visible[selectedChannelIndex]
-                    ? rgbToHex(
-                        localActiveImageColors.color[selectedChannelIndex],
-                      )
+                  activeImageRawColor.visible[selectedChannelIndex]
+                    ? rgbToHex(activeImageRawColor.color[selectedChannelIndex])
                     : theme.palette.action.disabled,
               },
             }}
             value={scaleUpRange(
-              localActiveImageColors.range[selectedChannelIndex],
+              activeImageRawColor.range[selectedChannelIndex],
               activeImage.bitDepth,
             )}
             max={2 ** activeImage.bitDepth - 1}

@@ -1,10 +1,18 @@
+import { useColoredImage } from "hooks/useColoredImage";
 import React from "react";
 import { Layer, Image as KonvaImage } from "react-konva";
+import { useSelector } from "react-redux";
+import { imageDataSelectors } from "store/data/selectors";
+import { hasTensorReference } from "store/data/utils";
+import { RootState } from "store/rootReducer";
 
 import { Point } from "utils/types";
 
 interface ImageLayerProps {
-  htmlImages: Record<string, { image: HTMLImageElement; pos: Point }>;
+  htmlImages: Record<
+    string,
+    { image: HTMLImageElement; pos: Point; id: string }
+  >;
   globalShape: { width: number; height: number };
 }
 
@@ -20,17 +28,44 @@ export const ImageLayer: React.FC<ImageLayerProps> = ({
     <Layer>
       {Object.values(htmlImages).map((image, idx) => {
         return (
-          <KonvaImage
+          <RenderedKonvaImage
             width={globalShape.width}
             height={globalShape.height}
-            image={image.image}
-            position={image.pos}
+            id={image.id}
+            pos={image.pos}
             key={`track-viewer-image-${idx}`}
-            fill="black"
-            opacity={1}
           />
         );
       })}
     </Layer>
+  );
+};
+
+const RenderedKonvaImage = ({
+  id,
+  pos,
+  width,
+  height,
+}: {
+  id: string;
+  pos: Point;
+  width: number;
+  height: number;
+}) => {
+  const image = useSelector((state: RootState) =>
+    imageDataSelectors.selectById(state, id),
+  );
+  if (!hasTensorReference(image)) return null;
+  const { coloredImage, loading } = useColoredImage(image);
+  if (!coloredImage || loading) return null;
+  return (
+    <KonvaImage
+      width={width}
+      height={height}
+      image={coloredImage}
+      position={pos}
+      fill="black"
+      opacity={1}
+    />
   );
 };

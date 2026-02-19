@@ -5,7 +5,10 @@ import { ImageViewerMetadataDetails } from "views/ImageViewer/state/image-viewer
 
 const IMAGE_SPACING = 20;
 
-type HtmlImageRecord = Record<string, { image: HTMLImageElement; pos: Point }>;
+type HtmlImageRecord = Record<
+  string,
+  { image: HTMLImageElement; pos: Point; id: string }
+>;
 
 /**
  * Hook to load and position HTML image elements for the track viewer.
@@ -34,6 +37,7 @@ export const useImageLoader = (
       imgElem.src = image.ZTPreview;
       imageElems[id] = {
         image: imgElem,
+        id,
         pos: {
           x: globalShape.width * idx + IMAGE_SPACING * (idx + 1),
           y: (stageHeight - globalShape.height) / 2,

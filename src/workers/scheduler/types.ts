@@ -240,7 +240,11 @@ export interface WorkerAPI {
   ) => Promise<{ annId: string; measurements: ObjectMeasurements }[]>;
 
   channelMeasurements: (
-    entities: { id: string; measurements: { channels: ChannelData[] } }[],
+    entities: {
+      id: string;
+      measurements: { channels: ChannelData[] };
+      tensorRef: TensorReference;
+    }[],
     measurements: Partial<Record<keyof ChannelMeasurements, number[]>>,
     cancelToken: CancelToken,
     onProgress: (progress: number) => void,
@@ -272,7 +276,7 @@ export interface WorkerAPI {
   deserializeProject: (
     input: DeserializeProjectInput,
     cancelToken: CancelToken,
-    onProgress: (value: number | ProjectDeserializationProgress) => void,
+    onProgress: (value: number | Partial<PipelineProgress>) => void,
   ) => Promise<DeserializeProjectOutput>;
 }
 

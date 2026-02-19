@@ -105,6 +105,7 @@ export const ImageMeasurementOptions = ({
         groupedMeasurements[measurement]!.push(channelId);
       else groupedMeasurements[measurement] = [channelId];
     });
+    console.log("measurement entities: ", measurementEntities);
 
     const handle = scheduler.dispatch<
       Record<string, Record<number, ChannelData>>

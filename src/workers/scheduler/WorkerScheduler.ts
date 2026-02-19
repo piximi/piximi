@@ -45,7 +45,10 @@ import {
   TaskStatus,
   WorkerAPI,
 } from "./types";
-import { ProjectDeserializationProgress } from "services/dataPipeline/types";
+import {
+  PipelineProgress,
+  ProjectDeserializationProgress,
+} from "services/dataPipeline/types";
 
 // =============================================================================
 // INTERNAL TYPES
@@ -740,12 +743,12 @@ export class WorkerScheduler implements IWorkerScheduler {
      * This is passed to worker methods which call it with 0-100 values.
      */
 
-    const onProgress = (progress: number | ProjectDeserializationProgress) => {
+    const onProgress = (progress: number | Partial<PipelineProgress>) => {
       // Only update if task is still running (not cancelled)
       if (this.taskStatuses.get(task.id) === TaskStatus.RUNNING) {
         // Update our progress tracking
         const numericalProgress =
-          typeof progress === "number" ? progress : progress.percent;
+          typeof progress === "number" ? progress : progress.overallProgress!;
         this.taskProgress.set(task.id, numericalProgress);
 
         // Call the task's progress callback if provided

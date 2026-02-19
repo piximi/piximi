@@ -8,6 +8,8 @@ import { Point } from "utils/types";
 import { selectImageOrigin } from "views/ImageViewer/state/imageViewer/selectors";
 import { selectActiveMetadata } from "views/ImageViewer/state/image-viewer-data/selectors";
 import { selectActiveImage } from "views/ImageViewer/state/image-viewer-data/reselectors";
+import { useColoredImage } from "hooks/useColoredImage";
+import { ImageObject } from "store/data/types";
 
 export const Image = React.forwardRef<
   Konva.Image,
@@ -21,7 +23,9 @@ export const Image = React.forwardRef<
     const activeImage = useSelector(selectActiveImage);
     const dispatch = useDispatch();
     const [htmlImages, setHtmlImages] = useState<HTMLImageElement[]>([]);
-
+    const { coloredImage, loading } = useColoredImage(
+      activeImage as ImageObject,
+    );
     const [filters] = useState<Array<any>>();
     const imagePosition = useSelector(selectImageOrigin);
 
@@ -44,9 +48,29 @@ export const Image = React.forwardRef<
 
     return !activeImage ||
       !activeMetadata ||
-      !activeMetadata.activeSrcs ? null : (
+      !activeMetadata.activeSrcs ||
+      loading ||
+      coloredImage === null ? null : (
       <>
-        {htmlImages.map((image, idx) => (
+        <MemoizedKonvaImage
+          image={coloredImage}
+          // 100 for no particular reason; shouldn't happen
+          height={activeImage?.shape.height || 100}
+          width={activeImage?.shape.width || 100}
+          imagePosition={imagePosition!}
+          visible={true}
+          idx={0}
+          // visible={
+          //   activeMetadata.activeSrcs.length === 1
+          //     ? true
+          //     : activeMetadata.activePlane === idx
+          // }
+          filters={filters!}
+          // idx={idx}
+          // key={idx}
+          ref={ref}
+        />
+        {/*htmlImages.map((image, idx) => (
           <MemoizedKonvaImage
             image={image}
             // 100 for no particular reason; shouldn't happen
@@ -63,14 +87,14 @@ export const Image = React.forwardRef<
             key={idx}
             ref={ref}
           />
-        ))}
+        ))*/}
       </>
     );
   },
 );
 
 interface KonvaImageProps {
-  image: HTMLImageElement;
+  image: HTMLCanvasElement;
   height: number;
   width: number;
   imagePosition: Point;

@@ -173,6 +173,14 @@ export interface ITensorStorageService {
     id: string,
     storeName: StoreName,
   ): Promise<StorageResult<StoredTensorData>>;
+  /**
+   * Retrieve the raw {@link StoredTensorData} (ArrayBuffer + metadata)
+   * for the given items.
+   * Checks the LRU cache first, falling back to IndexedDB.
+   */
+  retrieveBatch(
+    items: { id: string; storeName: StoreName }[],
+  ): Promise<StorageResult<Map<string, StoredTensorData>>>;
 
   /**
    * Retrieve and reconstruct a TensorFlow.js `Tensor4D`.
