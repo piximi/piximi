@@ -69,39 +69,6 @@ export type Shape = {
 
 export type ShapeArray = [number, number, number, number];
 
-/*
-OLD TYPES
-*/
-export type OldImageType = {
-  activePlane: number;
-  categoryId: string;
-  colors: Colors;
-  bitDepth: BitDepth;
-  id: string;
-  name: string;
-  shape: Shape;
-  data: Tensor4D; // [Z, H, W, C]
-  partition: Partition;
-  src: string;
-  kind?: string;
-  containing?: string[]; // The URI to be displayed on the canvas
-};
-
-export type OldCategory = PartialBy<Category, "containing" | "kind">;
-
-export type OldAnnotationType = {
-  id: string;
-  src?: string;
-  data?: Tensor4D;
-  categoryId: string;
-  boundingBox: [number, number, number, number]; // x1, y1, x_2, y_2
-  encodedMask: Array<number>;
-  decodedMask?: DataArray;
-  plane: number;
-  imageId: string;
-  // TODO serialize: these should not be undefineable
-};
-
 export type CategoryUpdates = {
   id: string;
   changes: Partial<Omit<Category, "id" | "containing">>;

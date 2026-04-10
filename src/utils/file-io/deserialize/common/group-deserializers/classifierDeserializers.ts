@@ -19,19 +19,15 @@ import {
   Metric,
   OptimizationAlgorithm,
 } from "utils/models/enums";
-import {
-  ClassifierStateV01_02,
-  PreprocessOptionsV01_02,
-} from "utils/file-io/types";
-import { initialClassifierStateV01_02 } from "utils/file-io/constants";
+
+import { initialClassifierStateV01_02 } from "utils/file-io/deserialize/constants";
 import {
   ClassifierState,
   KindClassifierDict,
   ModelClassMap,
   ModelInfo,
 } from "store/types";
-import { Kind } from "store/data/types";
-
+import { ClassifierStateV01_02, PreprocessOptionsV01_02 } from "../../types";
 // COMMON
 const deserializeFitOptionsGroup = async (
   fitOptionsGroup: Group,
@@ -318,7 +314,7 @@ export const deserializeClassifierGroupV11 = async (
   const classifierKinds = (await getAttr(
     classifierGroup,
     "classifier_kinds",
-  )) as Kind["id"][];
+  )) as string[];
 
   for await (const kindId of classifierKinds) {
     const kindModelsGroup = await getGroup(classifierGroup, kindId);

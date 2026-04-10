@@ -13,19 +13,8 @@ import {
 } from "./runtime/runtimeTypes";
 import { MIMETYPES } from "./enums";
 import { ImageShapeEnum } from "./enums";
-import {
-  LossFunction,
-  Metric,
-  ModelStatus,
-  OptimizationAlgorithm,
-} from "utils/models/enums";
-import { BitDepth, Shape } from "store/data/types";
-import {
-  ClassifierEvaluationResultType,
-  CropOptions,
-  FitOptions,
-  RescaleOptions,
-} from "utils/models/types";
+
+import { BitDepth } from "store/data/types";
 
 export type SerializedCOCOAnnotationType = IOTSTypeOf<
   typeof SerializedCOCOAnnotationRType
@@ -76,31 +65,3 @@ export interface ImageShapeInfo {
 export interface ImageFileShapeInfo extends ImageShapeInfo {
   ext: MIMEType;
 }
-
-export type LoadCB = (loadPercent: number, loadMessage: string) => void;
-
-export type PreprocessOptionsV01_02 = {
-  shuffle: boolean;
-  rescaleOptions: RescaleOptions;
-  cropOptions: CropOptions;
-};
-
-export type ClassifierStateV01_02 = {
-  // pre-fit state
-  selectedModelIdx: number;
-  inputShape: Shape;
-  preprocessOptions: PreprocessOptionsV01_02;
-  fitOptions: FitOptions;
-
-  learningRate: number;
-  lossFunction: LossFunction;
-  optimizationAlgorithm: OptimizationAlgorithm;
-  metrics: Array<Metric>;
-
-  trainingPercentage: number;
-  // post-evaluation results
-  evaluationResult: ClassifierEvaluationResultType;
-  // status flags
-  modelStatus: ModelStatus;
-  showClearPredictionsWarning: boolean;
-};

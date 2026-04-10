@@ -17,7 +17,7 @@ import { convertToImage } from "utils/tensorUtils";
 import {
   Category,
   ImageObject,
-  OldAnnotationType,
+  AnnotationObject,
   Shape,
 } from "store/data/types";
 import { MIMETYPES } from "utils/file-io/enums";
@@ -76,7 +76,7 @@ const preloadedImages: Array<{
   src: string;
   name: string;
   mimetype: MIMEType;
-  annotations: Array<OldAnnotationType>;
+  annotations: Array<Partial<AnnotationObject>>;
 }> = [generateUUID()].map((imId) => ({
   id: imId,
   src: "/static/media/cell-painting.f118ef087853056f08e6.png",

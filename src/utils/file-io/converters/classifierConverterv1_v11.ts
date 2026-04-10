@@ -1,12 +1,12 @@
 import { getDefaultModelInfo } from "utils/models/classification/utils";
-import { ClassifierStateV01_02 } from "../types";
+
 import { OptimizerSettings, PreprocessSettings } from "utils/models/types";
-import { Kind } from "store/data/types";
 import { ClassifierState, KindClassifierDict } from "store/types";
+import { ClassifierStateV01_02 } from "../deserialize/types";
 
 export const projectConverterv1_v11 = (
   classifier: ClassifierStateV01_02,
-  kindIds: Array<Kind["id"]>,
+  kindIds: string[],
 ): ClassifierState => {
   const kindClassifiers: KindClassifierDict = {};
   const preprocessSettings: PreprocessSettings = {

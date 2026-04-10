@@ -46,7 +46,7 @@ export type LoadStatus = {
   value?: number;
   message?: string;
 };
-
+export type LoadCB = (loadPercent: number, loadMessage: string) => void;
 /*
 GENERATOR TYPES
 */

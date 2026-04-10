@@ -7,7 +7,7 @@ import {
 } from "store/segmenter/selectors";
 import { useCallback, useMemo } from "react";
 import { getStackTraceFromError } from "utils/logUtils";
-import { AlertState } from "utils/types";
+import { AlertState, LoadCB } from "utils/types";
 import { AlertType } from "utils/enums";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { ModelStatus } from "utils/models/enums";
@@ -20,7 +20,6 @@ import {
   Shape,
 } from "store/data/types";
 import { intersection } from "lodash";
-import { LoadCB } from "utils/file-io/types";
 import { OrphanedAnnotationObject } from "utils/models/segmentation";
 import { dataSlice } from "store/data";
 import {

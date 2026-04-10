@@ -9,7 +9,7 @@ import { predictStardist } from "./predictStardist";
 import { generateKind } from "store/data/utils";
 import { LoadInferenceDataArgs } from "../../types";
 import { Kind, ImageObject } from "store/data/types";
-import { LoadCB } from "utils/file-io/types";
+import { LoadCB } from "utils/types";
 
 export const KIND_NAME = "stardist_nucleus";
 /*

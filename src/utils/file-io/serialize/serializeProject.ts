@@ -11,14 +11,13 @@ import {
   PreprocessSettings,
   SerializedModels,
 } from "utils/models/types";
-import { LoadCB } from "../types";
 import {
   ClassifierState,
   ModelInfo,
   ProjectState,
   SegmenterState,
 } from "store/types";
-import { Colors } from "utils/types";
+import { Colors, LoadCB } from "utils/types";
 import {
   Kind,
   AnnotationObject,

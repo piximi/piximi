@@ -5,13 +5,13 @@ import {
   SerializedAnnotatorImageType,
   SerializedFileType,
 } from "../../types";
-import { OldAnnotationType, OldCategory, OldImageType } from "store/data/types";
+import { AnnotationTypeV01, CategoryV01, ImageTypeV01 } from "./types";
 
 export const deserializeAnnotations_v01 = (
   serializedAnnotations: Array<SerializedAnnotationType>,
   imageId: string,
 ) => {
-  const annotations: Array<OldAnnotationType> = [];
+  const annotations: Array<AnnotationTypeV01> = [];
 
   for (const annotation of serializedAnnotations) {
     annotations.push({
@@ -34,15 +34,15 @@ refer to them. Instead we have to ensure incoming categories are given the prope
 change the incoming annotations to refer to the updated incoming category id
 */
 const reconcileCategories = (
-  existingCategories: Array<OldCategory>,
-  serializedCategories: Array<OldCategory>,
+  existingCategories: Array<CategoryV01>,
+  serializedCategories: Array<CategoryV01>,
   serializedAnnotations: Array<SerializedAnnotationType>,
 ) => {
   // incoming cat id -> existing cat id
   const catIdMap: { [catId: string]: string } = {};
 
-  const matchedCats: Array<OldCategory> = [];
-  const newCats: Array<OldCategory> = [];
+  const matchedCats: Array<CategoryV01> = [];
+  const newCats: Array<CategoryV01> = [];
 
   for (const cat of serializedCategories) {
     const existingCat = existingCategories.find((c) => c.name === cat.name);
@@ -87,7 +87,7 @@ change the incoming annotations to refer to the updated incoming image id.
 If the image doesn't exist, then there's nothing to assign the annotation to, and it is discarded.
 */
 const reconcileImages = (
-  existingImages: Array<OldImageType>,
+  existingImages: Array<ImageTypeV01>,
   serializedImages: Array<SerializedAnnotatorImageType>,
   serializedAnnotations: Array<SerializedAnnotationType>,
 ) => {
@@ -146,8 +146,8 @@ const reconcileImages = (
 
 export const deserializePiximiAnnotations_v01 = (
   serializedProject: SerializedFileType,
-  existingImages: Array<OldImageType>,
-  existingCategories: Array<OldCategory>,
+  existingImages: Array<ImageTypeV01>,
+  existingCategories: Array<CategoryV01>,
 ) => {
   // this must come first
   const { newCats, catModdedAnnotations } = reconcileCategories(

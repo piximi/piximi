@@ -7,37 +7,39 @@ import {
 } from "store/data/constants";
 import { generateKind, isUnknownCategory } from "store/data/utils";
 import {
-  OldAnnotationType,
-  OldCategory,
-  OldImageType,
-  Kind,
-  AnnotationObject,
-  Category,
-  ImageObject,
-  Shape,
-  ShapeArray,
-} from "store/data/types";
+  AnnotationTypeV01,
+  CategoryV01,
+  ImageTypeV01,
+} from "utils/file-io/deserialize/v01/types";
+import {
+  KindV02,
+  AnnotationObjectV02,
+  CategoryV02,
+  ImageObjectV02,
+  ShapeV02,
+  ShapeArrayV02,
+} from "utils/file-io/deserialize/v02/types";
 import { getPropertiesFromImageSync } from "store/data/utils";
 import { logger } from "utils/logUtils";
 import { convertArrayToShape } from "utils/models/utils";
 import { Partition } from "utils/models/enums";
 
 export const dataConverter_v01v02 = (data: {
-  images: OldImageType[];
-  oldCategories: OldCategory[];
-  annotationCategories: OldCategory[];
-  annotations: OldAnnotationType[];
+  images: ImageTypeV01[];
+  oldCategories: CategoryV01[];
+  annotationCategories: CategoryV01[];
+  annotations: AnnotationTypeV01[];
 }) => {
   const { images, oldCategories, annotationCategories, annotations } = data;
-  const categories: EntityState<Category, string> = {
+  const categories: EntityState<CategoryV02, string> = {
     ids: [],
     entities: {},
   };
-  const things: EntityState<ImageObject | AnnotationObject, string> = {
+  const things: EntityState<ImageObjectV02 | AnnotationObjectV02, string> = {
     ids: [],
     entities: {},
   };
-  const kinds: EntityState<Kind, string> = { ids: [], entities: {} };
+  const kinds: EntityState<KindV02, string> = { ids: [], entities: {} };
 
   const { kind: imageKind, unknownCategory } = generateKind("Image");
   kinds.ids.push(imageKind.id);
@@ -66,7 +68,7 @@ export const dataConverter_v01v02 = (data: {
         id: catId,
         kind: "Image",
         containing: [],
-      } as Category;
+      } as CategoryV02;
 
       kinds.entities["Image"].categories.push(catId);
     }
@@ -86,7 +88,7 @@ export const dataConverter_v01v02 = (data: {
 
     things.ids.push(image.id);
 
-    things.entities[image.id] = image as ImageObject;
+    things.entities[image.id] = image as ImageObjectV02;
     if (cat in categories.entities) {
       categories.entities[cat]!.containing.push(image.id);
     }
@@ -110,20 +112,22 @@ export const dataConverter_v01v02 = (data: {
 
   const numAnnotationsOfKindPerImage: Record<string, number> = {};
 
-  for (const annotation of annotations as AnnotationObject[]) {
-    const { plane: _plane, ..._annotation } = {
+  for (const annotation of annotations) {
+    const { plane: _plane, ..._annotationBase } = {
       ...annotation,
       activePlane: annotation.plane,
     };
-    _annotation.kind = anCat2KindNAme[_annotation.categoryId];
-    const unknownCategory = kinds.entities[_annotation.kind]!.unknownCategoryId;
+    const _annotation = _annotationBase as Partial<AnnotationObjectV02>;
+    _annotation.kind = anCat2KindNAme[_annotation.categoryId!];
+    const unknownCategory =
+      kinds.entities[_annotation.kind!]!.unknownCategoryId;
     let annotationName: string;
-    if (_annotation.imageId in things.entities) {
-      annotationName = `${things.entities[_annotation.imageId]!.name}-${
+    if (_annotation.imageId! in things.entities) {
+      annotationName = `${things.entities[_annotation.imageId!]!.name}-${
         _annotation.kind
       }`;
-      (things.entities[_annotation.imageId] as ImageObject).containing.push(
-        _annotation.id,
+      (things.entities[_annotation.imageId!] as ImageObjectV02).containing.push(
+        _annotation.id!,
       );
     } else {
       annotationName = `${_annotation.kind}`;
@@ -136,8 +140,8 @@ export const dataConverter_v01v02 = (data: {
     }
     _annotation.name = annotationName;
     _annotation.categoryId = unknownCategory;
-    _annotation.shape = _annotation.data.shape.reduce(
-      (shape: Shape, value: number, idx) => {
+    _annotation.shape = _annotation.data!.shape.reduce(
+      (shape: ShapeV02, value: number, idx) => {
         switch (idx) {
           case 0:
             shape.planes = value;
@@ -159,29 +163,29 @@ export const dataConverter_v01v02 = (data: {
       { planes: 0, height: 0, width: 0, channels: 0 },
     );
     _annotation.partition = Partition.Unassigned;
-    _annotation.bitDepth = things.entities[_annotation.imageId]!.bitDepth;
-    things.ids.push(_annotation.id);
+    _annotation.bitDepth = things.entities[_annotation.imageId!]!.bitDepth;
+    things.ids.push(_annotation.id!);
 
-    things.entities[_annotation.id] = _annotation as AnnotationObject;
+    things.entities[_annotation.id!] = _annotation as AnnotationObjectV02;
 
-    kinds.entities[_annotation.kind]!.containing.push(_annotation.id);
+    kinds.entities[_annotation.kind!]!.containing.push(_annotation.id!);
 
-    categories.entities[unknownCategory]!.containing.push(_annotation.id);
+    categories.entities[unknownCategory]!.containing.push(_annotation.id!);
   }
 
   return { kinds, categories, things };
 };
 
 export const convertAnnotationsWithExistingProject_v01v02 = async (
-  existingImages: Record<string, ImageObject>,
-  existingKinds: Record<string, Kind>,
-  oldAnnotations: OldAnnotationType[],
-  oldAnnotationCategories: OldCategory[],
+  existingImages: Record<string, ImageObjectV02>,
+  existingKinds: Record<string, KindV02>,
+  oldAnnotations: AnnotationTypeV01[],
+  oldAnnotationCategories: CategoryV01[],
 ) => {
   const catId2Name: Record<string, string> = {};
-  const newKinds: Record<string, Kind> = {};
-  const newCategories: Record<string, Category> = {};
-  const newAnnotations: AnnotationObject[] = [];
+  const newKinds: Record<string, KindV02> = {};
+  const newCategories: Record<string, CategoryV02> = {};
+  const newAnnotations: AnnotationObjectV02[] = [];
   const imageMap: Record<string, Image> = {};
 
   oldAnnotationCategories.forEach((anCat) => {
@@ -195,7 +199,7 @@ export const convertAnnotationsWithExistingProject_v01v02 = async (
     }
   });
   for await (const ann of oldAnnotations) {
-    const newAnn: Partial<AnnotationObject> = { ...ann };
+    const newAnn: Partial<AnnotationObjectV02> = { ...ann };
     const existingImage = existingImages[ann.imageId];
     if (!existingImage) {
       logger(`No image found for annotation: ${ann.id}\nskipping`);
@@ -231,8 +235,8 @@ export const convertAnnotationsWithExistingProject_v01v02 = async (
       ann,
     );
     Object.assign(newAnn, imageProperties);
-    newAnn.shape = convertArrayToShape(newAnn.data!.shape as ShapeArray);
-    newAnnotations.push(newAnn as AnnotationObject);
+    newAnn.shape = convertArrayToShape(newAnn.data!.shape as ShapeArrayV02);
+    newAnnotations.push(newAnn as AnnotationObjectV02);
   }
   return {
     newAnnotations,

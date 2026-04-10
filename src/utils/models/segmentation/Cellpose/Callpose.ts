@@ -14,8 +14,8 @@ import { FitOptions } from "../../types";
 import { ModelTask } from "../../enums";
 import { getImageSlice } from "utils/tensorUtils";
 import { Kind, ImageObject } from "store/data/types";
-import { LoadCB } from "utils/file-io/types";
 import { generateKind } from "store/data/utils";
+import { LoadCB } from "utils/types";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;

@@ -6,9 +6,10 @@ import semver from "semver";
 import { deserializeProject_v01 } from "./v01/deserializeProject_v01";
 import { dataConverter_v01v02 } from "utils/file-io/converters/dataConverter_v01v02";
 import { deserializeProject_v02 } from "./v02/deserializeProject_v02";
-import { LoadCB } from "../types";
+
 import { deserializeProject_v11 } from "./v110/deserializeProject_v11";
 import { projectConverterv1_v11 } from "../converters/classifierConverterv1_v11";
+import { LoadCB } from "utils/types";
 
 export const deserializeProject = async (
   fileStore: CustomStore,

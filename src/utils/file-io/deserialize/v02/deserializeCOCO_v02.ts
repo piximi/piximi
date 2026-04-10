@@ -13,12 +13,12 @@ import {
 import { Point } from "utils/types";
 import { RequireOnly } from "utils/types";
 import {
-  Kind,
-  AnnotationObject,
-  Category,
-  ImageObject,
-  Shape,
-} from "store/data/types";
+  KindV02,
+  AnnotationObjectV02,
+  CategoryV02,
+  ImageObjectV02,
+  ShapeV02,
+} from "./types";
 import {
   UNKNOWN_ANNOTATION_CATEGORY_COLOR,
   UNKNOWN_CATEGORY_NAME,
@@ -26,26 +26,26 @@ import {
 
 type KindMap = Record<
   string,
-  { new: Kind; existing?: Kind } | { new?: Kind; existing: Kind }
+  { new: KindV02; existing?: KindV02 } | { new?: KindV02; existing: KindV02 }
 >;
 type CategoryMap = Record<
   string,
-  | { new: Category; existing?: Category }
-  | { new?: Category; existing: Category }
+  | { new: CategoryV02; existing?: CategoryV02 }
+  | { new?: CategoryV02; existing: CategoryV02 }
 >;
 type ImageMap = Record<
   string,
-  { new: SerializedCOCOImageType; existing?: ImageObject }
+  { new: SerializedCOCOImageType; existing?: ImageObjectV02 }
 >;
 
 const reconcileCOCOCategories = (
-  existingCategories: Array<Category>,
-  existingKinds: Array<Kind>,
+  existingCategories: Array<CategoryV02>,
+  existingKinds: Array<KindV02>,
   serializedCategories: Array<SerializedCOCOCategoryType>,
   availableColors: Array<string> = [],
 ) => {
   const categoryMap: CategoryMap = {};
-  const isolatedUnknownCats: Record<string, Category> = {};
+  const isolatedUnknownCats: Record<string, CategoryV02> = {};
   const kindMap: KindMap = {};
   if (availableColors.length === 0) {
     availableColors = ["#000000"];
@@ -75,14 +75,14 @@ const reconcileCOCOCategories = (
 
       if (existingKind) {
         /*
-          CASE: Category doesnt exist, Kind exists 
+          CASE: Category doesnt exist, Kind exists
           ACTION: Create a new category and add to new categories
           REASON: If the kind exists, then we generate a new category from the coco serialized category.
           We generate a "known" indicated uuid, since we know if the kind exists and the category
           doesnt, it cannot be an "unknown" category
         */
         const newId = generateUUID();
-        const newCat: Category = {
+        const newCat: CategoryV02 = {
           id: newId,
           kind: cocoCat.supercategory,
           name: cocoCat.name,
@@ -108,13 +108,13 @@ const reconcileCOCOCategories = (
           containing: [],
           kind: cocoCat.supercategory,
           visible: true,
-        } as Category;
+        } as CategoryV02;
 
-        let kind: Kind;
+        let kind: KindV02;
         if (cocoCat.supercategory in kindMap) {
           kind = kindMap[cocoCat.supercategory].new!;
         } else {
-          const newKind: Kind = {
+          const newKind: KindV02 = {
             id: cocoCat.supercategory,
             displayName: cocoCat.supercategory,
             categories: [newUnknownCatId],
@@ -150,7 +150,7 @@ const reconcileCOCOCategories = (
              We also need to make sure the new unknown category gets added to the project, event though it will have no associated annotations.
            */
           const newId = generateUUID();
-          const newCategory: Category = {
+          const newCategory: CategoryV02 = {
             id: newId,
             name: cocoCat.name,
             color: newColor,
@@ -175,7 +175,7 @@ const reconcileCOCOCategories = (
 };
 
 const reconcileCOCOImages = (
-  existingImages: Array<ImageObject>,
+  existingImages: Array<ImageObjectV02>,
   serializedImages: Array<SerializedCOCOImageType>,
 ) => {
   const imageMap: ImageMap = {};
@@ -192,7 +192,7 @@ const reconcileCOCOImages = (
 };
 
 const deserializeCOCOAnnotation = (
-  imageShape: Shape,
+  imageShape: ShapeV02,
   cocoAnn: SerializedCOCOAnnotationType,
   crowded: Array<number>,
   multipart: Array<number>,
@@ -249,15 +249,15 @@ const deserializeCOCOAnnotation = (
 
 export const deserializeCOCOFile_v02 = async (
   cocoFile: SerializedCOCOFileType,
-  existingImages: Array<ImageObject>,
-  existingCategories: Array<Category>,
-  existingKinds: Array<Kind>,
+  existingImages: Array<ImageObjectV02>,
+  existingCategories: Array<CategoryV02>,
+  existingKinds: Array<KindV02>,
   availableColors: Array<string> = [],
 ) => {
-  const reconciledAnnotations: AnnotationObject[] = [];
+  const reconciledAnnotations: AnnotationObjectV02[] = [];
   const annotationNames: Record<string, number> = {};
-  const kindsToReconcile: Record<string, Kind> = {};
-  const categoriesToReconcile: Record<string, Category> = {};
+  const kindsToReconcile: Record<string, KindV02> = {};
+  const categoriesToReconcile: Record<string, CategoryV02> = {};
   const crowded: Array<number> = [];
   const multipart: Array<number> = [];
   const malformed: Array<number> = [];
@@ -272,7 +272,7 @@ export const deserializeCOCOFile_v02 = async (
   const imageMap = reconcileCOCOImages(existingImages, cocoFile.images);
 
   for await (const cocoAnn of cocoFile.annotations) {
-    const reconciledAnnotation: Partial<AnnotationObject> = {
+    const reconciledAnnotation: Partial<AnnotationObjectV02> = {
       id: generateUUID(),
       partition: Partition.Unassigned,
       activePlane: 0,
@@ -308,7 +308,7 @@ export const deserializeCOCOFile_v02 = async (
 
     const annPropsFromIm = await getPropertiesFromImage(
       image,
-      reconciledAnnotation as RequireOnly<AnnotationObject, "boundingBox">,
+      reconciledAnnotation as RequireOnly<AnnotationObjectV02, "boundingBox">,
     );
     Object.assign(reconciledAnnotation, annPropsFromIm);
 
@@ -349,7 +349,7 @@ export const deserializeCOCOFile_v02 = async (
 
     reconciledAnnotation.name = name + "_" + annotationNames[name];
 
-    reconciledAnnotations.push(reconciledAnnotation as AnnotationObject);
+    reconciledAnnotations.push(reconciledAnnotation as AnnotationObjectV02);
   }
 
   if (

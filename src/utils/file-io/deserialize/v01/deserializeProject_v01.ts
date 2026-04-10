@@ -16,16 +16,12 @@ import { deserializeColorsGroup } from "../common/group-deserializers/dataDeseri
 import { deserializeSegmenterGroup } from "../common/group-deserializers/segmenterDeserializers";
 import { Partition } from "utils/models/enums";
 import { createRenderedTensor } from "utils/tensorUtils";
-import { LoadCB } from "utils/file-io/types";
 import { CustomStore } from "utils/file-io/zarr/stores";
 import { ProjectState } from "store/types";
-import {
-  BitDepth,
-  OldAnnotationType,
-  OldCategory,
-  OldImageType,
-} from "store/data/types";
+import { BitDepth } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
+import { AnnotationTypeV01, CategoryV01, ImageTypeV01 } from "./types";
+import { LoadCB } from "utils/types";
 
 /*
   ====================
@@ -35,7 +31,7 @@ import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 const deserializeAnnotationsGroup = async (
   annotationsGroup: Group,
-): Promise<Array<OldAnnotationType>> => {
+): Promise<Array<AnnotationTypeV01>> => {
   const imageIds = (await getAttr(annotationsGroup, "image_id")) as string[];
 
   const categories = (await getAttr(
@@ -63,7 +59,7 @@ const deserializeAnnotationsGroup = async (
     null,
   ]).then((ra) => ra.data as Uint8Array);
 
-  const annotations: Array<OldAnnotationType> = [];
+  const annotations: Array<AnnotationTypeV01> = [];
   let bboxIdx = 0;
   let maskIdx = 0;
   for (let i = 0; i < ids.length; i++) {
@@ -91,7 +87,7 @@ const deserializeAnnotationsGroup = async (
 const deserializeImageGroup = async (
   name: string,
   imageGroup: Group,
-): Promise<OldImageType> => {
+): Promise<ImageTypeV01> => {
   const id = (await getAttr(imageGroup, "image_id")) as string;
   const activePlane = (await getAttr(imageGroup, "active_plane")) as number;
   const categoryId = (await getAttr(imageGroup, "class_category_id")) as string;
@@ -146,7 +142,7 @@ const deserializeImageGroup = async (
 const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
   const imageNames = (await getAttr(imagesGroup, "image_names")) as string[];
 
-  const images: Array<OldImageType> = [];
+  const images: Array<ImageTypeV01> = [];
 
   for (const [i, name] of Object.entries(imageNames)) {
     // import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
@@ -170,7 +166,7 @@ const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
 
 const deserializeCategoriesGroup = async (
   categoriesGroup: Group,
-): Promise<Array<OldCategory>> => {
+): Promise<Array<CategoryV01>> => {
   const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
   const colors = (await getAttr(categoriesGroup, "color")) as string[];
   const names = (await getAttr(categoriesGroup, "name")) as string[];
@@ -181,7 +177,7 @@ const deserializeCategoriesGroup = async (
     );
   }
 
-  const categories: Array<OldCategory> = [];
+  const categories: Array<CategoryV01> = [];
   for (let i = 0; i < ids.length; i++) {
     categories.push({
       id: ids[i],
@@ -200,10 +196,10 @@ const deserializeProjectGroup = async (
 ): Promise<{
   project: ProjectState;
   data: {
-    images: Array<OldImageType>;
-    annotations: Array<OldAnnotationType>;
-    categories: Array<OldCategory>;
-    annotationCategories: Array<OldCategory>;
+    images: Array<ImageTypeV01>;
+    annotations: Array<AnnotationTypeV01>;
+    categories: Array<CategoryV01>;
+    annotationCategories: Array<CategoryV01>;
   };
 }> => {
   const name = (await getAttr(projectGroup, "name")) as string;
