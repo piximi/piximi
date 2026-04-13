@@ -56,7 +56,7 @@ function makeKind(id: string, unknownCategoryId: string): Kind {
 function makeAnnotationCategory(
   id: string,
   kindId: string,
-  isUnknown = false
+  isUnknown = false,
 ): Category {
   return {
     id,
@@ -82,7 +82,7 @@ function makeAnnotationVolume(
   id: string,
   imageId: string,
   kindId: string,
-  categoryId: string
+  categoryId: string,
 ): AnnotationVolume {
   return { id, imageId, kindId, categoryId };
 }
@@ -91,7 +91,7 @@ function makeAnnotation(
   id: string,
   planeId: string,
   imageId: string,
-  volumeId: string
+  volumeId: string,
 ): AnnotationObject {
   return {
     id,
@@ -145,7 +145,7 @@ describe("addImages", () => {
         planes: [],
         channels: [],
         channelMetas: [],
-      })
+      }),
     );
 
     // Add an image with a duplicate name
@@ -153,7 +153,7 @@ describe("addImages", () => {
     const originalName = incoming.name;
     state = dataSliceV2.reducer(
       state,
-      addImages({ seriesId: "series-1", images: [incoming] })
+      addImages({ seriesId: "series-1", images: [incoming] }),
     );
 
     // The original object must not have been mutated
@@ -177,7 +177,7 @@ describe("newExperiment", () => {
     // unknown image category and unknown annotation category should be present
     expect(state.categories.ids).toHaveLength(2);
     const catTypes = Object.values(state.categories.entities).map(
-      (c) => c?.type
+      (c) => c?.type,
     );
     expect(catTypes).toContain("image");
     expect(catTypes).toContain("annotation");
@@ -195,14 +195,14 @@ describe("deleteImageSeries", () => {
         planes: [makePlane("plane-1", "img-1")],
         channels: [],
         channelMetas: [],
-      })
+      }),
     );
   }
 
   it("removes the series entity", () => {
     const state = dataSliceV2.reducer(
       buildStateWithSeries(),
-      deleteImageSeries("series-1")
+      deleteImageSeries("series-1"),
     );
     expect(state.imageSeries.ids).not.toContain("series-1");
   });
@@ -210,7 +210,7 @@ describe("deleteImageSeries", () => {
   it("removes all child images", () => {
     const state = dataSliceV2.reducer(
       buildStateWithSeries(),
-      deleteImageSeries("series-1")
+      deleteImageSeries("series-1"),
     );
     expect(state.images.ids).not.toContain("img-1");
   });
@@ -218,7 +218,7 @@ describe("deleteImageSeries", () => {
   it("removes child planes", () => {
     const state = dataSliceV2.reducer(
       buildStateWithSeries(),
-      deleteImageSeries("series-1")
+      deleteImageSeries("series-1"),
     );
     expect(state.planes.ids).not.toContain("plane-1");
   });
@@ -226,7 +226,7 @@ describe("deleteImageSeries", () => {
   it("cleans up the imageSeries relationship entry", () => {
     const state = dataSliceV2.reducer(
       buildStateWithSeries(),
-      deleteImageSeries("series-1")
+      deleteImageSeries("series-1"),
     );
     expect(state.relationships.imageSeries["series-1"]).toBeUndefined();
   });
@@ -234,7 +234,7 @@ describe("deleteImageSeries", () => {
   it("cleans up the images relationship entry", () => {
     const state = dataSliceV2.reducer(
       buildStateWithSeries(),
-      deleteImageSeries("series-1")
+      deleteImageSeries("series-1"),
     );
     expect(state.relationships.images["img-1"]).toBeUndefined();
   });
@@ -259,20 +259,22 @@ describe("deleteImageObject", () => {
         planes: [makePlane("plane-1", "img-1")],
         channels: [],
         channelMetas: [],
-      })
+      }),
     );
     s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
     s = dataSliceV2.reducer(
       s,
-      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true))
+      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
     );
     s = dataSliceV2.reducer(
       s,
-      addAnnotationVolume(makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID))
+      addAnnotationVolume(
+        makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID),
+      ),
     );
     s = dataSliceV2.reducer(
       s,
-      addAnnotation(makeAnnotation("ann-1", "plane-1", "img-1", "vol-1"))
+      addAnnotation(makeAnnotation("ann-1", "plane-1", "img-1", "vol-1")),
     );
     return s;
   }
@@ -280,7 +282,7 @@ describe("deleteImageObject", () => {
   it("removes the image entity", () => {
     const s = dataSliceV2.reducer(
       buildStateWithAnnotation(),
-      deleteImageObject("img-1")
+      deleteImageObject("img-1"),
     );
     expect(s.images.ids).not.toContain("img-1");
   });
@@ -288,7 +290,7 @@ describe("deleteImageObject", () => {
   it("cascade-removes child annotation volumes", () => {
     const s = dataSliceV2.reducer(
       buildStateWithAnnotation(),
-      deleteImageObject("img-1")
+      deleteImageObject("img-1"),
     );
     expect(s.annotationVolumes.ids).not.toContain("vol-1");
   });
@@ -296,7 +298,7 @@ describe("deleteImageObject", () => {
   it("cascade-removes child annotations", () => {
     const s = dataSliceV2.reducer(
       buildStateWithAnnotation(),
-      deleteImageObject("img-1")
+      deleteImageObject("img-1"),
     );
     expect(s.annotations.ids).not.toContain("ann-1");
   });
@@ -304,7 +306,7 @@ describe("deleteImageObject", () => {
   it("cleans up the annotationVolumes relationship entry", () => {
     const s = dataSliceV2.reducer(
       buildStateWithAnnotation(),
-      deleteImageObject("img-1")
+      deleteImageObject("img-1"),
     );
     expect(s.relationships.annotationVolumes["vol-1"]).toBeUndefined();
   });
@@ -312,16 +314,76 @@ describe("deleteImageObject", () => {
   it("removes vol-1 from its kind relationship", () => {
     const s = dataSliceV2.reducer(
       buildStateWithAnnotation(),
-      deleteImageObject("img-1")
+      deleteImageObject("img-1"),
     );
-    expect(
-      s.relationships.kinds[KIND_ID]?.annotationVolumeIds
-    ).not.toContain("vol-1");
+    expect(s.relationships.kinds[KIND_ID]?.annotationVolumeIds).not.toContain(
+      "vol-1",
+    );
   });
 
   it("is a no-op for an unknown imageId", () => {
     const before = buildStateWithAnnotation();
     const after = dataSliceV2.reducer(before, deleteImageObject("no-such-id"));
     expect(after.images.ids).toEqual(before.images.ids);
+  });
+});
+
+describe("deleteKind", () => {
+  const KIND_ID = "kind-del";
+  const KIND_CAT_ID = "kind-cat-del";
+
+  function buildStateWithKind() {
+    let s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("series-1")],
+        images: [makeImage("img-1", "foo")],
+        planes: [],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
+    s = dataSliceV2.reducer(
+      s,
+      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotationVolume(
+        makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID),
+      ),
+    );
+    return s;
+  }
+
+  it("removes the kind entity", () => {
+    const s = dataSliceV2.reducer(buildStateWithKind(), deleteKind(KIND_ID));
+    expect(s.kinds.ids).not.toContain(KIND_ID);
+  });
+
+  it("reassigns annotation volumes to unknown kind", () => {
+    const s = dataSliceV2.reducer(buildStateWithKind(), deleteKind(KIND_ID));
+    expect(s.annotationVolumes.entities["vol-1"]?.kindId).not.toBe(KIND_ID);
+  });
+
+  it("removes the kind's categories", () => {
+    const s = dataSliceV2.reducer(buildStateWithKind(), deleteKind(KIND_ID));
+    expect(s.categories.ids).not.toContain(KIND_CAT_ID);
+  });
+
+  it("cleans up the kinds relationship entry", () => {
+    const s = dataSliceV2.reducer(buildStateWithKind(), deleteKind(KIND_ID));
+    expect(s.relationships.kinds[KIND_ID]).toBeUndefined();
+  });
+
+  it("cannot delete the unknown kind (no-op)", () => {
+    const initial = dataSliceV2.reducer(undefined, { type: "@@INIT" } as any);
+    const unknownKindId = Object.values(initial.kinds.entities).find(
+      (k) => k?.name === "Unknown",
+    )!.id;
+
+    const after = dataSliceV2.reducer(initial, deleteKind(unknownKindId));
+    expect(after.kinds.ids).toContain(unknownKindId);
   });
 });
