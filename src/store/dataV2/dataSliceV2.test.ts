@@ -521,3 +521,131 @@ describe("deleteAnnotationCategory", () => {
     expect(after.categories.ids).toContain(UNKNOWN_KIND_CAT_ID);
   });
 });
+
+describe("updateImageCategory", () => {
+  const OLD_CAT = "img-cat-old";
+  const NEW_CAT = "img-cat-new";
+
+  function buildState() {
+    let s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("series-1")],
+        images: [{ ...makeImage("img-1", "foo"), categoryId: OLD_CAT }],
+        planes: [],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+    s = dataSliceV2.reducer(s, addCategory(makeImageCategory(OLD_CAT)));
+    s = dataSliceV2.reducer(s, addCategory(makeImageCategory(NEW_CAT)));
+    return s;
+  }
+
+  it("updates the image's categoryId", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      updateImageCategory({ imageId: "img-1", categoryId: NEW_CAT }),
+    );
+    expect(s.images.entities["img-1"]?.categoryId).toBe(NEW_CAT);
+  });
+
+  it("removes image from old category's relationship", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      updateImageCategory({ imageId: "img-1", categoryId: NEW_CAT }),
+    );
+    expect(s.relationships.imageCategories[OLD_CAT]?.imageIds).not.toContain(
+      "img-1",
+    );
+  });
+
+  it("adds image to new category's relationship", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      updateImageCategory({ imageId: "img-1", categoryId: NEW_CAT }),
+    );
+    expect(s.relationships.imageCategories[NEW_CAT]?.imageIds).toContain(
+      "img-1",
+    );
+  });
+
+  it("is a no-op when categoryId is unchanged", () => {
+    const before = buildState();
+    const after = dataSliceV2.reducer(
+      before,
+      updateImageCategory({ imageId: "img-1", categoryId: OLD_CAT }),
+    );
+    expect(after.relationships.imageCategories[OLD_CAT]?.imageIds).toContain(
+      "img-1",
+    );
+  });
+});
+
+describe("updateAnnotationVolumeKind", () => {
+  const KIND_A = "kind-a";
+  const KIND_A_UNKNOWN_CAT = "kind-a-unknown";
+  const KIND_B = "kind-b";
+  const KIND_B_UNKNOWN_CAT = "kind-b-unknown";
+
+  function buildState() {
+    let s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("series-1")],
+        images: [makeImage("img-1", "foo")],
+        planes: [],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_A, KIND_A_UNKNOWN_CAT)));
+    s = dataSliceV2.reducer(
+      s,
+      addCategory(makeAnnotationCategory(KIND_A_UNKNOWN_CAT, KIND_A, true)),
+    );
+    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_B, KIND_B_UNKNOWN_CAT)));
+    s = dataSliceV2.reducer(
+      s,
+      addCategory(makeAnnotationCategory(KIND_B_UNKNOWN_CAT, KIND_B, true)),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotationVolume(
+        makeAnnotationVolume("vol-1", "img-1", KIND_A, KIND_A_UNKNOWN_CAT),
+      ),
+    );
+    return s;
+  }
+
+  it("updates the volume's kindId", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      updateAnnotationVolumeKind({ volumeId: "vol-1", kindId: KIND_B }),
+    );
+    expect(s.annotationVolumes.entities["vol-1"]?.kindId).toBe(KIND_B);
+  });
+
+  it("resets categoryId to the new kind's unknown category", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      updateAnnotationVolumeKind({ volumeId: "vol-1", kindId: KIND_B }),
+    );
+    expect(s.annotationVolumes.entities["vol-1"]?.categoryId).toBe(
+      KIND_B_UNKNOWN_CAT,
+    );
+  });
+
+  it("moves volume from old kind to new kind in relationships", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      updateAnnotationVolumeKind({ volumeId: "vol-1", kindId: KIND_B }),
+    );
+    expect(s.relationships.kinds[KIND_A]?.annotationVolumeIds).not.toContain(
+      "vol-1",
+    );
+    expect(s.relationships.kinds[KIND_B]?.annotationVolumeIds).toContain(
+      "vol-1",
+    );
+  });
+});

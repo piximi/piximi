@@ -376,8 +376,18 @@ export const dataSliceV2 = createSlice({
       action: PayloadAction<{ imageId: string; categoryId: string }>,
     ) {
       const image = state.images.entities[action.payload.imageId];
-      if (!image || image.categoryId === action.payload.categoryId) return;
-
+      const targetCategory =
+        state.categories.entities[action.payload.categoryId];
+      if (
+        !image ||
+        image.categoryId === action.payload.categoryId ||
+        !targetCategory
+      )
+        return;
+      if (!state.relationships.imageCategories[targetCategory.id])
+        state.relationships.imageCategories[targetCategory.id] = {
+          imageIds: [],
+        };
       moveRelationship(
         state.relationships.imageCategories,
         "imageIds",
@@ -396,7 +406,13 @@ export const dataSliceV2 = createSlice({
     ) {
       action.payload.forEach(({ imageId, categoryId }) => {
         const image = state.images.entities[imageId];
-        if (!image || image.categoryId === categoryId) return;
+        const targetCategory = state.categories.entities[categoryId];
+        if (!image || image.categoryId === categoryId || !targetCategory)
+          return;
+        if (!state.relationships.imageCategories[targetCategory.id])
+          state.relationships.imageCategories[targetCategory.id] = {
+            imageIds: [],
+          };
         moveRelationship(
           state.relationships.imageCategories,
           "imageIds",
@@ -599,7 +615,19 @@ export const dataSliceV2 = createSlice({
       action: PayloadAction<{ volumeId: string; categoryId: string }>,
     ) {
       const volume = state.annotationVolumes.entities[action.payload.volumeId];
-      if (!volume || volume.categoryId === action.payload.categoryId) return;
+      const targetCategory =
+        state.categories.entities[action.payload.categoryId];
+
+      if (
+        !volume ||
+        volume.categoryId === action.payload.categoryId ||
+        !targetCategory
+      )
+        return;
+      if (!state.relationships.annotationCategories[targetCategory.id])
+        state.relationships.annotationCategories[targetCategory.id] = {
+          annotationVolumeIds: [],
+        };
 
       moveRelationship(
         state.relationships.annotationCategories,
@@ -613,6 +641,35 @@ export const dataSliceV2 = createSlice({
         changes: { categoryId: action.payload.categoryId },
       });
     },
+    batchUpdateAnnotationVolumeCategory(
+      state,
+      action: PayloadAction<Array<{ volumeId: string; categoryId: string }>>,
+    ) {
+      action.payload.forEach(({ volumeId, categoryId }) => {
+        const volume = state.annotationVolumes.entities[volumeId];
+        const targetCategory = state.categories.entities[categoryId];
+        if (!volume || volume.categoryId === categoryId || !targetCategory)
+          return;
+        if (!state.relationships.annotationCategories[targetCategory.id])
+          state.relationships.annotationCategories[targetCategory.id] = {
+            annotationVolumeIds: [],
+          };
+        moveRelationship(
+          state.relationships.annotationCategories,
+          "annotationVolumeIds",
+          volumeId,
+          volume.categoryId,
+          categoryId,
+        );
+      });
+      annotationVolumeAdapter.updateMany(
+        state.annotationVolumes,
+        action.payload.map(({ volumeId, categoryId }) => ({
+          id: volumeId,
+          changes: { categoryId },
+        })),
+      );
+    },
     updateAnnotationVolumeKind(
       state,
       action: PayloadAction<{ volumeId: string; kindId: string }>,
@@ -621,7 +678,15 @@ export const dataSliceV2 = createSlice({
       const newKind = state.kinds.entities[action.payload.kindId];
       if (!volume || volume.kindId === action.payload.kindId || !newKind)
         return;
-
+      if (!state.relationships.kinds[newKind.id])
+        state.relationships.kinds[newKind.id] = {
+          annotationVolumeIds: [],
+          categoryIds: [newKind.unknownCategoryId],
+        };
+      if (!state.relationships.annotationCategories[newKind.unknownCategoryId])
+        state.relationships.annotationCategories[newKind.unknownCategoryId] = {
+          annotationVolumeIds: [],
+        };
       moveRelationship(
         state.relationships.kinds,
         "annotationVolumeIds",
@@ -645,29 +710,7 @@ export const dataSliceV2 = createSlice({
         },
       });
     },
-    batchUpdateAnnotationVolumeCategory(
-      state,
-      action: PayloadAction<Array<{ volumeId: string; categoryId: string }>>,
-    ) {
-      action.payload.forEach(({ volumeId, categoryId }) => {
-        const volume = state.annotationVolumes.entities[volumeId];
-        if (!volume || volume.categoryId === categoryId) return;
-        moveRelationship(
-          state.relationships.annotationCategories,
-          "annotationVolumeIds",
-          volumeId,
-          volume.categoryId,
-          categoryId,
-        );
-      });
-      annotationVolumeAdapter.updateMany(
-        state.annotationVolumes,
-        action.payload.map(({ volumeId, categoryId }) => ({
-          id: volumeId,
-          changes: { categoryId },
-        })),
-      );
-    },
+
     batchUpdateAnnotationVolumeKind(
       state,
       action: PayloadAction<Array<{ volumeId: string; kindId: string }>>,
@@ -680,6 +723,18 @@ export const dataSliceV2 = createSlice({
         const volume = state.annotationVolumes.entities[volumeId];
         const newKind = state.kinds.entities[kindId];
         if (!volume || volume.kindId === kindId || !newKind) return;
+        if (!state.relationships.kinds[newKind.id])
+          state.relationships.kinds[newKind.id] = {
+            annotationVolumeIds: [],
+            categoryIds: [newKind.unknownCategoryId],
+          };
+        if (
+          !state.relationships.annotationCategories[newKind.unknownCategoryId]
+        )
+          state.relationships.annotationCategories[newKind.unknownCategoryId] =
+            {
+              annotationVolumeIds: [],
+            };
         moveRelationship(
           state.relationships.kinds,
           "annotationVolumeIds",
