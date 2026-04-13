@@ -1,9 +1,113 @@
 import { describe, expect, it } from "vitest";
 import { dataSliceV2 } from "./dataSliceV2";
-import type { Experiment, ImageObject } from "./types";
+import type {
+  Experiment,
+  ImageObject,
+  ImageSeries,
+  Kind,
+  Category,
+  AnnotationVolume,
+  AnnotationObject,
+  Plane,
+} from "./types";
 import { Partition } from "utils/models/enums";
 
-const { newExperiment, addImageSeries, addImages } = dataSliceV2.actions;
+const {
+  newExperiment,
+  addImageSeries,
+  addImages,
+  deleteImageSeries,
+  deleteImageObject,
+  batchDeleteImageObject,
+  addAnnotationVolume,
+  deleteAnnotationVolume,
+  batchDeleteAnnotationVolume,
+  addAnnotation,
+  deleteAnnotation,
+  addKind,
+  deleteKind,
+  addCategory,
+  deleteImageCategory,
+  deleteAnnotationCategory,
+  updateImageCategory,
+  batchUpdateImageCategory,
+  updateAnnotationVolumeCategory,
+  updateAnnotationVolumeKind,
+} = dataSliceV2.actions;
+
+// ── Fixture factories ────────────────────────────────────────────────────────
+
+function makeSeries(id: string, name = "S1"): ImageSeries {
+  return {
+    id,
+    experimentId: "e1",
+    name,
+    bitDepth: 8,
+    shape: { planes: 1, height: 10, width: 10, channels: 1 },
+    timeSeries: false,
+    activeImageId: `${id}-img`,
+  };
+}
+
+function makeKind(id: string, unknownCategoryId: string): Kind {
+  return { id, name: "MyKind", unknownCategoryId };
+}
+
+function makeAnnotationCategory(
+  id: string,
+  kindId: string,
+  isUnknown = false
+): Category {
+  return {
+    id,
+    name: isUnknown ? "Unknown" : "Cat",
+    type: "annotation",
+    kindId,
+    color: "#ff0000",
+    isUnknown,
+  };
+}
+
+function makeImageCategory(id: string, isUnknown = false): Category {
+  return {
+    id,
+    name: isUnknown ? "Unknown" : "ImgCat",
+    type: "image",
+    color: "#00ff00",
+    isUnknown,
+  };
+}
+
+function makeAnnotationVolume(
+  id: string,
+  imageId: string,
+  kindId: string,
+  categoryId: string
+): AnnotationVolume {
+  return { id, imageId, kindId, categoryId };
+}
+
+function makeAnnotation(
+  id: string,
+  planeId: string,
+  imageId: string,
+  volumeId: string
+): AnnotationObject {
+  return {
+    id,
+    planeId,
+    imageId,
+    volumeId,
+    partition: Partition.Unassigned,
+    shape: { planes: 1, height: 10, width: 10, channels: 1 },
+    boundingBox: [0, 0, 10, 10],
+    encodedMask: [],
+  };
+}
+
+function makePlane(id: string, imageId: string): Plane {
+  return { id, imageId, zIndex: 0 };
+}
 
 // Helper to build a minimal ImageObject for tests
 function makeImage(id: string, name: string): ImageObject {
