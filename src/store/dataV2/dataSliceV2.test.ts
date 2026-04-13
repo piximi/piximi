@@ -799,3 +799,62 @@ describe("deleteAnnotationVolume", () => {
     ).not.toContain("vol-1");
   });
 });
+
+describe("addImages (extended)", () => {
+  function buildStateWithSeries() {
+    return dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("s1")],
+        images: [],
+        planes: [],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+  }
+
+  it("is a no-op when seriesId does not exist", () => {
+    const before = buildStateWithSeries();
+    const after = dataSliceV2.reducer(
+      before,
+      addImages({
+        seriesId: "no-such-series",
+        images: [makeImage("img-1", "foo", "no-such-series")],
+      }),
+    );
+    expect(after.images.ids).toHaveLength(0);
+  });
+
+  it("adds the image to the series relationship", () => {
+    const s = dataSliceV2.reducer(
+      buildStateWithSeries(),
+      addImages({ seriesId: "s1", images: [makeImage("img-1", "foo", "s1")] }),
+    );
+    expect(s.relationships.imageSeries["s1"]?.imageIds).toContain("img-1");
+  });
+
+  it("deduplicates three images with the same name into distinct names", () => {
+    const base = dataSliceV2.reducer(
+      buildStateWithSeries(),
+      addImages({
+        seriesId: "s1",
+        images: [makeImage("img-a", "dup", "s1")],
+      }),
+    );
+    const s = dataSliceV2.reducer(
+      base,
+      addImages({
+        seriesId: "s1",
+        images: [
+          makeImage("img-b", "dup", "s1"),
+          makeImage("img-c", "dup", "s1"),
+        ],
+      }),
+    );
+    const names = ["img-a", "img-b", "img-c"].map(
+      (id) => s.images.entities[id]?.name,
+    );
+    expect(new Set(names).size).toBe(3);
+  });
+});
