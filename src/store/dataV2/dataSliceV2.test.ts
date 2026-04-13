@@ -245,3 +245,83 @@ describe("deleteImageSeries", () => {
     expect(after.imageSeries.ids).toEqual(before.imageSeries.ids);
   });
 });
+
+describe("deleteImageObject", () => {
+  const KIND_ID = "kind-1";
+  const KIND_CAT_ID = "kind-cat-1";
+
+  function buildStateWithAnnotation() {
+    let s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("series-1")],
+        images: [makeImage("img-1", "foo")],
+        planes: [makePlane("plane-1", "img-1")],
+        channels: [],
+        channelMetas: [],
+      })
+    );
+    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
+    s = dataSliceV2.reducer(
+      s,
+      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true))
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotationVolume(makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID))
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotation(makeAnnotation("ann-1", "plane-1", "img-1", "vol-1"))
+    );
+    return s;
+  }
+
+  it("removes the image entity", () => {
+    const s = dataSliceV2.reducer(
+      buildStateWithAnnotation(),
+      deleteImageObject("img-1")
+    );
+    expect(s.images.ids).not.toContain("img-1");
+  });
+
+  it("cascade-removes child annotation volumes", () => {
+    const s = dataSliceV2.reducer(
+      buildStateWithAnnotation(),
+      deleteImageObject("img-1")
+    );
+    expect(s.annotationVolumes.ids).not.toContain("vol-1");
+  });
+
+  it("cascade-removes child annotations", () => {
+    const s = dataSliceV2.reducer(
+      buildStateWithAnnotation(),
+      deleteImageObject("img-1")
+    );
+    expect(s.annotations.ids).not.toContain("ann-1");
+  });
+
+  it("cleans up the annotationVolumes relationship entry", () => {
+    const s = dataSliceV2.reducer(
+      buildStateWithAnnotation(),
+      deleteImageObject("img-1")
+    );
+    expect(s.relationships.annotationVolumes["vol-1"]).toBeUndefined();
+  });
+
+  it("removes vol-1 from its kind relationship", () => {
+    const s = dataSliceV2.reducer(
+      buildStateWithAnnotation(),
+      deleteImageObject("img-1")
+    );
+    expect(
+      s.relationships.kinds[KIND_ID]?.annotationVolumeIds
+    ).not.toContain("vol-1");
+  });
+
+  it("is a no-op for an unknown imageId", () => {
+    const before = buildStateWithAnnotation();
+    const after = dataSliceV2.reducer(before, deleteImageObject("no-such-id"));
+    expect(after.images.ids).toEqual(before.images.ids);
+  });
+});

@@ -100,12 +100,14 @@ function cascadeDeleteAnnotationVolume(
 ): void {
   const annVolRel = state.relationships.annotationVolumes[annVol.id];
   if (annVolRel) {
+    // snapshot before removeAnnotationRelationships mutates annotationIds in-place
+    const annotationIds = [...annVolRel.annotationIds];
     // cascade: remove all child annotations and their plane/volume relationship entries
-    const annotations = annVolRel.annotationIds
+    const annotations = annotationIds
       .map((id) => state.annotations.entities[id])
       .filter(Boolean) as AnnotationObject[];
     removeAnnotationRelationships(state.relationships, annotations);
-    annotationAdapter.removeMany(state.annotations, annVolRel.annotationIds);
+    annotationAdapter.removeMany(state.annotations, annotationIds);
     delete state.relationships.annotationVolumes[annVol.id];
   }
 }
