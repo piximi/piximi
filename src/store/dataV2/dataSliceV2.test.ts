@@ -183,3 +183,65 @@ describe("newExperiment", () => {
     expect(catTypes).toContain("annotation");
   });
 });
+
+describe("deleteImageSeries", () => {
+  function buildStateWithSeries() {
+    // series-1 has img-1; img-1 has plane-1; plane-1 has no channels
+    return dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("series-1")],
+        images: [makeImage("img-1", "foo")],
+        planes: [makePlane("plane-1", "img-1")],
+        channels: [],
+        channelMetas: [],
+      })
+    );
+  }
+
+  it("removes the series entity", () => {
+    const state = dataSliceV2.reducer(
+      buildStateWithSeries(),
+      deleteImageSeries("series-1")
+    );
+    expect(state.imageSeries.ids).not.toContain("series-1");
+  });
+
+  it("removes all child images", () => {
+    const state = dataSliceV2.reducer(
+      buildStateWithSeries(),
+      deleteImageSeries("series-1")
+    );
+    expect(state.images.ids).not.toContain("img-1");
+  });
+
+  it("removes child planes", () => {
+    const state = dataSliceV2.reducer(
+      buildStateWithSeries(),
+      deleteImageSeries("series-1")
+    );
+    expect(state.planes.ids).not.toContain("plane-1");
+  });
+
+  it("cleans up the imageSeries relationship entry", () => {
+    const state = dataSliceV2.reducer(
+      buildStateWithSeries(),
+      deleteImageSeries("series-1")
+    );
+    expect(state.relationships.imageSeries["series-1"]).toBeUndefined();
+  });
+
+  it("cleans up the images relationship entry", () => {
+    const state = dataSliceV2.reducer(
+      buildStateWithSeries(),
+      deleteImageSeries("series-1")
+    );
+    expect(state.relationships.images["img-1"]).toBeUndefined();
+  });
+
+  it("is a no-op for an unknown seriesId", () => {
+    const before = buildStateWithSeries();
+    const after = dataSliceV2.reducer(before, deleteImageSeries("no-such-id"));
+    expect(after.imageSeries.ids).toEqual(before.imageSeries.ids);
+  });
+});

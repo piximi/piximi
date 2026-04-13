@@ -299,13 +299,15 @@ export const dataSliceV2 = createSlice({
       const seriesRel = state.relationships.imageSeries[series.id];
       if (seriesRel) {
         // cascade: for each image, remove annotation volumes, annotations, planes, and channels
-        const images = seriesRel.imageIds
+        const imageIds = [...seriesRel.imageIds];
+        const images = imageIds
           .map((id) => state.images.entities[id])
           .filter(Boolean) as ImageObject[];
         images.forEach((image) => cascadeDeleteImage(state, image));
         // boundary: remove all images from their parent category entries
         removeImageRelationships(state.relationships, images);
-        imageAdapter.removeMany(state.images, seriesRel.imageIds);
+
+        imageAdapter.removeMany(state.images, imageIds);
         // cascade: remove channelMetas owned by this series
         seriesRel.channelMetaIds.forEach((chMetaId) => {
           delete state.relationships.channelMetas[chMetaId];
