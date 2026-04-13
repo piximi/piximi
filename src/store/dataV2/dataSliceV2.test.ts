@@ -711,3 +711,91 @@ describe("addImageSeries", () => {
     expect(s.relationships.imageSeries["s1"]?.channelMetaIds).toContain("cm1");
   });
 });
+
+describe("deleteAnnotationVolume", () => {
+  const KIND_ID = "kind-dav";
+  const KIND_CAT_ID = "kind-cat-dav";
+
+  function buildState() {
+    let s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("s1")],
+        images: [makeImage("img-1", "foo", "s1")],
+        planes: [makePlane("p1", "img-1")],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
+    s = dataSliceV2.reducer(
+      s,
+      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotationVolume(
+        makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID),
+      ),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotation(makeAnnotation("ann-1", "p1", "img-1", "vol-1")),
+    );
+    return s;
+  }
+
+  it("removes the annotation volume entity", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      deleteAnnotationVolume("vol-1"),
+    );
+    expect(s.annotationVolumes.ids).not.toContain("vol-1");
+  });
+
+  it("cascade-removes child annotations", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      deleteAnnotationVolume("vol-1"),
+    );
+    expect(s.annotations.ids).not.toContain("ann-1");
+  });
+
+  it("cleans up the annotationVolumes relationship entry", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      deleteAnnotationVolume("vol-1"),
+    );
+    expect(s.relationships.annotationVolumes["vol-1"]).toBeUndefined();
+  });
+
+  it("removes vol-1 from the image relationship", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      deleteAnnotationVolume("vol-1"),
+    );
+    expect(s.relationships.images["img-1"]?.annotationVolumeIds).not.toContain(
+      "vol-1",
+    );
+  });
+
+  it("removes vol-1 from the kind relationship", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      deleteAnnotationVolume("vol-1"),
+    );
+    expect(s.relationships.kinds[KIND_ID]?.annotationVolumeIds).not.toContain(
+      "vol-1",
+    );
+  });
+
+  it("removes vol-1 from the annotationCategories relationship", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      deleteAnnotationVolume("vol-1"),
+    );
+    expect(
+      s.relationships.annotationCategories[KIND_CAT_ID]?.annotationVolumeIds,
+    ).not.toContain("vol-1");
+  });
+});
