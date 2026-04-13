@@ -387,3 +387,137 @@ describe("deleteKind", () => {
     expect(after.kinds.ids).toContain(unknownKindId);
   });
 });
+
+describe("deleteImageCategory", () => {
+  const IMG_CAT_ID = "img-cat-custom";
+
+  function buildStateWithImageCategory() {
+    let s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("series-1")],
+        images: [
+          {
+            ...makeImage("img-1", "foo"),
+            categoryId: IMG_CAT_ID,
+          },
+        ],
+        planes: [],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+    s = dataSliceV2.reducer(s, addCategory(makeImageCategory(IMG_CAT_ID)));
+    return s;
+  }
+
+  it("removes the category entity", () => {
+    const s = dataSliceV2.reducer(
+      buildStateWithImageCategory(),
+      deleteImageCategory(IMG_CAT_ID),
+    );
+    expect(s.categories.ids).not.toContain(IMG_CAT_ID);
+  });
+
+  it("reassigns images to the unknown image category", () => {
+    const before = buildStateWithImageCategory();
+    const unknownCatId = Object.values(before.categories.entities).find(
+      (c) => c?.type === "image" && c.isUnknown,
+    )!.id;
+
+    const s = dataSliceV2.reducer(before, deleteImageCategory(IMG_CAT_ID));
+    expect(s.images.entities["img-1"]?.categoryId).toBe(unknownCatId);
+  });
+
+  it("cleans up the imageCategories relationship entry", () => {
+    const s = dataSliceV2.reducer(
+      buildStateWithImageCategory(),
+      deleteImageCategory(IMG_CAT_ID),
+    );
+    expect(s.relationships.imageCategories[IMG_CAT_ID]).toBeUndefined();
+  });
+
+  it("cannot delete the unknown image category (no-op)", () => {
+    const initial = dataSliceV2.reducer(undefined, { type: "@@INIT" } as any);
+    const unknownCatId = Object.values(initial.categories.entities).find(
+      (c) => c?.type === "image" && c.isUnknown,
+    )!.id;
+    const after = dataSliceV2.reducer(
+      initial,
+      deleteImageCategory(unknownCatId),
+    );
+    expect(after.categories.ids).toContain(unknownCatId);
+  });
+});
+
+describe("deleteAnnotationCategory", () => {
+  const KIND_ID = "kind-ac";
+  const UNKNOWN_KIND_CAT_ID = "kind-ac-unknown";
+  const CUSTOM_CAT_ID = "custom-ann-cat";
+
+  function buildStateWithAnnotationCategory() {
+    let s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("series-1")],
+        images: [makeImage("img-1", "foo")],
+        planes: [],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, UNKNOWN_KIND_CAT_ID)));
+    s = dataSliceV2.reducer(
+      s,
+      addCategory(makeAnnotationCategory(UNKNOWN_KIND_CAT_ID, KIND_ID, true)),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addCategory(makeAnnotationCategory(CUSTOM_CAT_ID, KIND_ID)),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotationVolume(
+        makeAnnotationVolume("vol-1", "img-1", KIND_ID, CUSTOM_CAT_ID),
+      ),
+    );
+    return s;
+  }
+
+  it("removes the annotation category", () => {
+    const s = dataSliceV2.reducer(
+      buildStateWithAnnotationCategory(),
+      deleteAnnotationCategory(CUSTOM_CAT_ID),
+    );
+    expect(s.categories.ids).not.toContain(CUSTOM_CAT_ID);
+  });
+
+  it("reassigns annotation volumes to kind's unknown category", () => {
+    const s = dataSliceV2.reducer(
+      buildStateWithAnnotationCategory(),
+      deleteAnnotationCategory(CUSTOM_CAT_ID),
+    );
+    expect(s.annotationVolumes.entities["vol-1"]?.categoryId).toBe(
+      UNKNOWN_KIND_CAT_ID,
+    );
+  });
+
+  it("removes the category from its kind relationship", () => {
+    const s = dataSliceV2.reducer(
+      buildStateWithAnnotationCategory(),
+      deleteAnnotationCategory(CUSTOM_CAT_ID),
+    );
+    expect(s.relationships.kinds[KIND_ID]?.categoryIds).not.toContain(
+      CUSTOM_CAT_ID,
+    );
+  });
+
+  it("cannot delete a kind's unknown annotation category (no-op)", () => {
+    const before = buildStateWithAnnotationCategory();
+    const after = dataSliceV2.reducer(
+      before,
+      deleteAnnotationCategory(UNKNOWN_KIND_CAT_ID),
+    );
+    expect(after.categories.ids).toContain(UNKNOWN_KIND_CAT_ID);
+  });
+});
