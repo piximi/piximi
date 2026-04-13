@@ -1,9 +1,9 @@
 import type { EntityState } from "@reduxjs/toolkit";
-import { BitDepth, DataArray } from "image-js";
+import type { BitDepth, DataArray } from "image-js";
 import { Partition } from "utils/models/enums";
 
 export const STORES = {
-  EXPERIMENT_DATA: "experiment-date",
+  EXPERIMENT_DATA: "experiment-data",
   SERIES_DATA: "series-data",
   IMAGE_DATA: "image-data",
   PLANE_DATA: "plane-data",
@@ -39,34 +39,56 @@ export type Shape = {
 };
 
 export type ColorMap = [number, number, number];
-export type Experiment = { id: string; imageSeriesIds: string[] };
+
+// ######################
+
+export type Experiment = { id: string; name: string };
+
 export type ImageSeries = {
   id: string;
   experimentId: string;
   name: string;
   bitDepth: BitDepth;
   shape: Shape;
-  imageIds: string[];
   timeSeries: boolean;
-  channels: string[];
+  activeImageId: string;
 };
+
+export type Kind = {
+  id: string;
+  name: string;
+  unknownCategoryId: string;
+};
+
+type BaseCategory = {
+  id: string;
+  color: string;
+  name: string;
+  isUnknown: boolean;
+};
+export type ImageCategory = BaseCategory & { type: "image" };
+export type AnnotationCategory = BaseCategory & {
+  type: "annotation";
+  kindId: string;
+};
+export type Category = ImageCategory | AnnotationCategory;
+
 export type ImageObject = {
   id: string;
   name: string;
   seriesId: string;
   shape: Shape;
   categoryId: string;
-  activePlane: number;
+  activePlaneId: string;
   timepoint: number;
-  planeIds: string[];
   bitDepth: BitDepth;
+  partition: Partition;
 };
 
 export type Plane = {
   id: string;
   imageId: string;
   zIndex: number;
-  channelIds: string[];
 };
 
 export type Channel = {
@@ -107,7 +129,8 @@ export type ChannelMeta = {
 export type AnnotationVolume = {
   id: string;
   imageId: string;
-  annotationId: string[];
+  kindId: string;
+  categoryId: string;
 };
 export type AnnotationObject = {
   id: string;
@@ -115,41 +138,36 @@ export type AnnotationObject = {
   imageId: string;
   volumeId: string;
   partition: Partition;
-  kind: string;
   shape: Shape;
-  bitDepth: BitDepth;
-  categoryId: string;
   boundingBox: [number, number, number, number];
   encodedMask: Array<number>;
   decodedMask?: DataArray;
 };
 
-export type Track = {
-  id: string;
-  seriesId: string;
-  trackletIds: string[];
+export type DataRelationships = {
+  imageSeries: Record<string, { imageIds: string[]; channelMetaIds: string[] }>;
+  images: Record<string, { planeIds: string[]; annotationVolumeIds: string[] }>;
+  imageCategories: Record<string, { imageIds: string[] }>;
+  annotationCategories: Record<string, { annotationVolumeIds: string[] }>;
+  kinds: Record<
+    string,
+    { annotationVolumeIds: string[]; categoryIds: string[] }
+  >;
+  planes: Record<string, { channelIds: string[]; annotationIds: string[] }>;
+  channelMetas: Record<string, { channelIds: string[] }>;
+  annotationVolumes: Record<string, { annotationIds: string[] }>;
 };
 
-export type Tracklet = {
-  id: string;
-  trackId: string;
-  annotationIds: string[];
-  parents: string[];
-  children: string[];
-};
-
-export type dataV2State = {
-  experiments: EntityState<Experiment, string>;
+export type DataStateV2 = {
+  experiment: Experiment;
   imageSeries: EntityState<ImageSeries, string>;
   images: EntityState<ImageObject, string>;
   planes: EntityState<Plane, string>;
+  kinds: EntityState<Kind, string>;
+  categories: EntityState<Category, string>;
   channels: EntityState<Channel, string>;
   channelMetas: EntityState<ChannelMeta, string>;
   annotationVolumes: EntityState<AnnotationVolume, string>;
   annotations: EntityState<AnnotationObject, string>;
-  tracks: EntityState<Track, string>;
-  tracklets: EntityState<Tracklet, string>;
-  activeImageId: string | undefined;
-  activePlaneId: string | undefined;
-  activeChannelIds: string[];
+  relationships: DataRelationships;
 };
