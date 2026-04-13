@@ -110,11 +110,15 @@ function makePlane(id: string, imageId: string): Plane {
 }
 
 // Helper to build a minimal ImageObject for tests
-function makeImage(id: string, name: string): ImageObject {
+function makeImage(
+  id: string,
+  name: string,
+  seriesId = "series-1",
+): ImageObject {
   return {
     id,
     name,
-    seriesId: "series-1",
+    seriesId,
     categoryId: "cat-1",
     activePlaneId: "plane-1",
     timepoint: 0,
@@ -647,5 +651,63 @@ describe("updateAnnotationVolumeKind", () => {
     expect(s.relationships.kinds[KIND_B]?.annotationVolumeIds).toContain(
       "vol-1",
     );
+  });
+});
+
+describe("addImageSeries", () => {
+  it("builds imageSeries → image relationship", () => {
+    const s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("s1")],
+        images: [makeImage("img-1", "foo", "s1")],
+        planes: [],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+    expect(s.relationships.imageSeries["s1"]?.imageIds).toContain("img-1");
+  });
+
+  it("builds image → plane relationship", () => {
+    const s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("s1")],
+        images: [makeImage("img-1", "foo", "s1")],
+        planes: [makePlane("p1", "img-1")],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+    expect(s.relationships.images["img-1"]?.planeIds).toContain("p1");
+  });
+
+  it("builds imageSeries → channelMeta relationship", () => {
+    const chMeta = {
+      id: "cm1",
+      name: "C0",
+      seriesId: "s1",
+      bitDepth: 8 as const,
+      colorMap: [255, 0, 0] as [number, number, number],
+      visible: true,
+      minValue: 0,
+      maxValue: 255,
+      rampMin: 0,
+      rampMax: 255,
+      rampMinLimit: 0,
+      rampMaxLimit: 255,
+    };
+    const s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("s1")],
+        images: [],
+        planes: [],
+        channels: [],
+        channelMetas: [chMeta],
+      }),
+    );
+    expect(s.relationships.imageSeries["s1"]?.channelMetaIds).toContain("cm1");
   });
 });
