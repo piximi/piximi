@@ -858,3 +858,324 @@ describe("addImages (extended)", () => {
     expect(new Set(names).size).toBe(3);
   });
 });
+
+describe("batchDeleteImageObject", () => {
+  function buildState() {
+    let s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("s1")],
+        images: [makeImage("img-1", "a", "s1"), makeImage("img-2", "b", "s1")],
+        planes: [makePlane("p1", "img-1"), makePlane("p2", "img-2")],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+    const KIND_ID = "kind-b";
+    const KIND_CAT_ID = "kind-cat-b";
+    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
+    s = dataSliceV2.reducer(
+      s,
+      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotationVolume(
+        makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID),
+      ),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotation(makeAnnotation("ann-1", "p1", "img-1", "vol-1")),
+    );
+    return s;
+  }
+
+  it("removes all specified image entities", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      batchDeleteImageObject(["img-1", "img-2"]),
+    );
+    expect(s.images.ids).not.toContain("img-1");
+    expect(s.images.ids).not.toContain("img-2");
+  });
+
+  it("cascade-removes annotation volumes and annotations", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      batchDeleteImageObject(["img-1"]),
+    );
+    expect(s.annotationVolumes.ids).not.toContain("vol-1");
+    expect(s.annotations.ids).not.toContain("ann-1");
+  });
+
+  it("cleans up relationship entries for all deleted images", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      batchDeleteImageObject(["img-1", "img-2"]),
+    );
+    expect(s.relationships.images["img-1"]).toBeUndefined();
+    expect(s.relationships.images["img-2"]).toBeUndefined();
+  });
+
+  it("skips unknown ids without affecting valid ones", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      batchDeleteImageObject(["img-1", "no-such-id"]),
+    );
+    expect(s.images.ids).not.toContain("img-1");
+    expect(s.images.ids).toContain("img-2");
+  });
+});
+
+describe("batchDeleteAnnotationVolume", () => {
+  const KIND_ID = "kind-bdav";
+  const KIND_CAT_ID = "kind-cat-bdav";
+
+  function buildState() {
+    let s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("s1")],
+        images: [makeImage("img-1", "foo", "s1")],
+        planes: [makePlane("p1", "img-1")],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
+    s = dataSliceV2.reducer(
+      s,
+      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotationVolume(
+        makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID),
+      ),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotationVolume(
+        makeAnnotationVolume("vol-2", "img-1", KIND_ID, KIND_CAT_ID),
+      ),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotation(makeAnnotation("ann-1", "p1", "img-1", "vol-1")),
+    );
+    return s;
+  }
+
+  it("removes all specified volumes", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      batchDeleteAnnotationVolume(["vol-1", "vol-2"]),
+    );
+    expect(s.annotationVolumes.ids).not.toContain("vol-1");
+    expect(s.annotationVolumes.ids).not.toContain("vol-2");
+  });
+
+  it("cascade-removes child annotations", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      batchDeleteAnnotationVolume(["vol-1"]),
+    );
+    expect(s.annotations.ids).not.toContain("ann-1");
+  });
+
+  it("cleans up boundary relationships for all deleted volumes", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      batchDeleteAnnotationVolume(["vol-1", "vol-2"]),
+    );
+    expect(s.relationships.images["img-1"]?.annotationVolumeIds).not.toContain(
+      "vol-1",
+    );
+    expect(s.relationships.images["img-1"]?.annotationVolumeIds).not.toContain(
+      "vol-2",
+    );
+    expect(s.relationships.kinds[KIND_ID]?.annotationVolumeIds).toHaveLength(0);
+  });
+});
+
+describe("deleteAnnotation", () => {
+  function buildState() {
+    let s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("s1")],
+        images: [makeImage("img-1", "foo", "s1")],
+        planes: [makePlane("p1", "img-1")],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+    const KIND_ID = "kind-da";
+    const KIND_CAT_ID = "kind-cat-da";
+    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
+    s = dataSliceV2.reducer(
+      s,
+      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotationVolume(
+        makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID),
+      ),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotation(makeAnnotation("ann-1", "p1", "img-1", "vol-1")),
+    );
+    return s;
+  }
+
+  it("removes the annotation entity", () => {
+    const s = dataSliceV2.reducer(buildState(), deleteAnnotation("ann-1"));
+    expect(s.annotations.ids).not.toContain("ann-1");
+  });
+
+  it("removes annotation from its plane relationship", () => {
+    const s = dataSliceV2.reducer(buildState(), deleteAnnotation("ann-1"));
+    expect(s.relationships.planes["p1"]?.annotationIds).not.toContain("ann-1");
+  });
+
+  it("removes annotation from its volume relationship", () => {
+    const s = dataSliceV2.reducer(buildState(), deleteAnnotation("ann-1"));
+    expect(
+      s.relationships.annotationVolumes["vol-1"]?.annotationIds,
+    ).not.toContain("ann-1");
+  });
+
+  it("is a no-op for an unknown annotationId", () => {
+    const before = buildState();
+    const after = dataSliceV2.reducer(before, deleteAnnotation("no-such-id"));
+    expect(after.annotations.ids).toEqual(before.annotations.ids);
+  });
+});
+
+describe("updateAnnotationVolumeCategory", () => {
+  const KIND_ID = "kind-uavc";
+  const OLD_CAT = "kind-uavc-unknown";
+  const NEW_CAT = "kind-uavc-custom";
+
+  function buildState() {
+    let s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("s1")],
+        images: [makeImage("img-1", "foo", "s1")],
+        planes: [],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, OLD_CAT)));
+    s = dataSliceV2.reducer(
+      s,
+      addCategory(makeAnnotationCategory(OLD_CAT, KIND_ID, true)),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addCategory(makeAnnotationCategory(NEW_CAT, KIND_ID)),
+    );
+    s = dataSliceV2.reducer(
+      s,
+      addAnnotationVolume(
+        makeAnnotationVolume("vol-1", "img-1", KIND_ID, OLD_CAT),
+      ),
+    );
+    return s;
+  }
+
+  it("updates the volume's categoryId", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      updateAnnotationVolumeCategory({
+        volumeId: "vol-1",
+        categoryId: NEW_CAT,
+      }),
+    );
+    expect(s.annotationVolumes.entities["vol-1"]?.categoryId).toBe(NEW_CAT);
+  });
+
+  it("moves volume from old to new annotationCategories relationship", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      updateAnnotationVolumeCategory({
+        volumeId: "vol-1",
+        categoryId: NEW_CAT,
+      }),
+    );
+    expect(
+      s.relationships.annotationCategories[OLD_CAT]?.annotationVolumeIds,
+    ).not.toContain("vol-1");
+    expect(
+      s.relationships.annotationCategories[NEW_CAT]?.annotationVolumeIds,
+    ).toContain("vol-1");
+  });
+
+  it("is a no-op when categoryId is unchanged", () => {
+    const before = buildState();
+    const after = dataSliceV2.reducer(
+      before,
+      updateAnnotationVolumeCategory({
+        volumeId: "vol-1",
+        categoryId: OLD_CAT,
+      }),
+    );
+    expect(
+      after.relationships.annotationCategories[OLD_CAT]?.annotationVolumeIds,
+    ).toContain("vol-1");
+  });
+});
+
+describe("batchUpdateImageCategory", () => {
+  const CAT_A = "img-cat-a";
+  const CAT_B = "img-cat-b";
+
+  function buildState() {
+    let s = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("s1")],
+        images: [
+          { ...makeImage("img-1", "a", "s1"), categoryId: CAT_A },
+          { ...makeImage("img-2", "b", "s1"), categoryId: CAT_A },
+        ],
+        planes: [],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
+    s = dataSliceV2.reducer(s, addCategory(makeImageCategory(CAT_A)));
+    s = dataSliceV2.reducer(s, addCategory(makeImageCategory(CAT_B)));
+    return s;
+  }
+
+  it("updates all images' categoryId", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      batchUpdateImageCategory([
+        { imageId: "img-1", categoryId: CAT_B },
+        { imageId: "img-2", categoryId: CAT_B },
+      ]),
+    );
+    expect(s.images.entities["img-1"]?.categoryId).toBe(CAT_B);
+    expect(s.images.entities["img-2"]?.categoryId).toBe(CAT_B);
+  });
+
+  it("moves all images in the relationship tables", () => {
+    const s = dataSliceV2.reducer(
+      buildState(),
+      batchUpdateImageCategory([
+        { imageId: "img-1", categoryId: CAT_B },
+        { imageId: "img-2", categoryId: CAT_B },
+      ]),
+    );
+    expect(s.relationships.imageCategories[CAT_A]?.imageIds).toHaveLength(0);
+    expect(s.relationships.imageCategories[CAT_B]?.imageIds).toContain("img-1");
+    expect(s.relationships.imageCategories[CAT_B]?.imageIds).toContain("img-2");
+  });
+});
