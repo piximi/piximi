@@ -137,3 +137,54 @@ export const selectChannelMetaByChannelId = createSelector(
     return metaId ? channelMetaDict[metaId] : undefined;
   },
 );
+
+// ── Tier 2: Active-entity selectors ────────────────────────────────────────
+
+export const selectActiveImage = createSelector(
+  [
+    imageSeriesSelectors.selectEntities,
+    imageSelectors.selectEntities,
+    (_: RootState, seriesId: string) => seriesId,
+  ],
+  (seriesDict, imageDict, seriesId) => {
+    const activeImageId = seriesDict[seriesId]?.activeImageId;
+    return activeImageId ? imageDict[activeImageId] : undefined;
+  },
+);
+
+export const selectActivePlane = createSelector(
+  [
+    imageSelectors.selectEntities,
+    planeSelectors.selectEntities,
+    (_: RootState, imageId: string) => imageId,
+  ],
+  (imageDict, planeDict, imageId) => {
+    const activePlaneId = imageDict[imageId]?.activePlaneId;
+    return activePlaneId ? planeDict[activePlaneId] : undefined;
+  },
+);
+
+export const selectActiveChannels = createSelector(
+  [
+    imageSelectors.selectEntities,
+    channelSelectors.selectAll,
+    (_: RootState, imageId: string) => imageId,
+  ],
+  (imageDict, channels, imageId) => {
+    const activePlaneId = imageDict[imageId]?.activePlaneId;
+    return activePlaneId
+      ? channels.filter((ch) => ch.planeId === activePlaneId)
+      : [];
+  },
+);
+
+// ── Tier 2: Grid display selector ──────────────────────────────────────────
+
+export const selectRepresentativeImages = createSelector(
+  [imageSelectors.selectAll, imageSeriesSelectors.selectEntities],
+  (images, seriesDict) =>
+    images.filter((im) => {
+      const series = seriesDict[im.seriesId];
+      return !series?.timeSeries || im.timepoint === 0;
+    }),
+);
