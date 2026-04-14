@@ -162,18 +162,24 @@ export const dataSliceV2 = createSlice({
       } = action.payload;
 
       state.experiment = experiment;
-      imageSeriesAdapter.addMany(state.imageSeries, imageSeries);
-      imageAdapter.addMany(state.images, images);
-      planeAdapter.addMany(state.planes, planes);
-      channelAdapter.addMany(state.channels, channels);
-      channelMetaAdapter.addMany(state.channelMetas, channelMetas);
-      annotationAdapter.addMany(state.annotations, annotations);
-      annotationVolumeAdapter.addMany(
+      imageSeriesAdapter.setAll(state.imageSeries, imageSeries);
+      imageAdapter.setAll(state.images, images);
+      planeAdapter.setAll(state.planes, planes);
+      channelAdapter.setAll(state.channels, channels);
+      channelMetaAdapter.setAll(state.channelMetas, channelMetas);
+      annotationAdapter.setAll(state.annotations, annotations);
+      annotationVolumeAdapter.setAll(
         state.annotationVolumes,
         annotationVolumes,
       );
-      kindAdapter.addMany(state.kinds, kinds);
-      categoryAdapter.addMany(state.categories, categories);
+      kindAdapter.setAll(state.kinds, kinds);
+      kindAdapter.addOne(state.kinds, UNKNOWN_KIND);
+
+      categoryAdapter.setAll(state.categories, categories);
+      categoryAdapter.addMany(state.categories, [
+        UNKNOWN_IMAGE_CATEGORY,
+        UNKNOWN_KIND_CATEGORY,
+      ]);
     },
     newExperiment(state, action: PayloadAction<Experiment>) {
       state.experiment = action.payload;
