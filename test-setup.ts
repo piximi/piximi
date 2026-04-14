@@ -1,5 +1,5 @@
 import { createCanvas, createImageData } from "canvas";
-
+import "fake-indexeddb/auto";
 const origCreateElem = window.document.createElement;
 
 const interceptCreateElem = (
