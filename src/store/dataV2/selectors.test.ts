@@ -16,8 +16,8 @@ import {
 import { Partition } from "utils/models/enums";
 
 function makeState(): RootState {
-  const datav2 = dataSliceV2.reducer(undefined, { type: "" });
-  return { datav2 } as unknown as RootState;
+  const dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+  return { dataV2 } as unknown as RootState;
 }
 
 function makeSeries(id: string): ImageSeries {
@@ -40,11 +40,11 @@ describe("Tier 1 selectors", () => {
 
   it("selectImageSeriesById returns correct series", () => {
     const series = makeSeries("s1");
-    let datav2 = dataSliceV2.reducer(undefined, { type: "" });
-    datav2 = dataSliceV2.reducer(datav2, dataSliceV2.actions.addImageSeries({
+    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+    dataV2 = dataSliceV2.reducer(dataV2, dataSliceV2.actions.addImageSeries({
       imageSeries: [series], images: [], planes: [], channels: [], channelMetas: []
     }));
-    const state = { datav2 } as unknown as RootState;
+    const state = { dataV2 } as unknown as RootState;
     expect(selectImageSeriesById(state, "s1")).toEqual(series);
   });
 

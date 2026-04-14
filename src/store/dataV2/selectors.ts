@@ -15,31 +15,31 @@ import {
 // ── Tier 1: Raw adapter selectors ──────────────────────────────────────────
 
 const imageSeriesSelectors = imageSeriesAdapter.getSelectors(
-  (state: RootState) => state.datav2.imageSeries
+  (state: RootState) => state.dataV2.imageSeries
 );
 const imageSelectors = imageAdapter.getSelectors(
-  (state: RootState) => state.datav2.images
+  (state: RootState) => state.dataV2.images
 );
 const kindSelectors = kindAdapter.getSelectors(
-  (state: RootState) => state.datav2.kinds
+  (state: RootState) => state.dataV2.kinds
 );
 const categorySelectors = categoryAdapter.getSelectors(
-  (state: RootState) => state.datav2.categories
+  (state: RootState) => state.dataV2.categories
 );
 const planeSelectors = planeAdapter.getSelectors(
-  (state: RootState) => state.datav2.planes
+  (state: RootState) => state.dataV2.planes
 );
 const channelSelectors = channelAdapter.getSelectors(
-  (state: RootState) => state.datav2.channels
+  (state: RootState) => state.dataV2.channels
 );
 const channelMetaSelectors = channelMetaAdapter.getSelectors(
-  (state: RootState) => state.datav2.channelMetas
+  (state: RootState) => state.dataV2.channelMetas
 );
 const annotationSelectors = annotationAdapter.getSelectors(
-  (state: RootState) => state.datav2.annotations
+  (state: RootState) => state.dataV2.annotations
 );
 const annotationVolumeSelectors = annotationVolumeAdapter.getSelectors(
-  (state: RootState) => state.datav2.annotationVolumes
+  (state: RootState) => state.dataV2.annotationVolumes
 );
 
 export const selectAllImageSeries = imageSeriesSelectors.selectAll;
