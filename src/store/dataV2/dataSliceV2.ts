@@ -23,15 +23,15 @@ import {
 import { generateUUID } from "store/data/utils";
 import { Partition } from "utils/models/enums";
 
-const imageSeriesAdapter = createEntityAdapter<ImageSeries>();
-const imageAdapter = createEntityAdapter<ImageObject>();
-const kindAdapter = createEntityAdapter<Kind>();
-const categoryAdapter = createEntityAdapter<Category>();
-const planeAdapter = createEntityAdapter<Plane>();
-const channelAdapter = createEntityAdapter<Channel>();
-const channelMetaAdapter = createEntityAdapter<ChannelMeta>();
-const annotationAdapter = createEntityAdapter<AnnotationObject>();
-const annotationVolumeAdapter = createEntityAdapter<AnnotationVolume>();
+export const imageSeriesAdapter = createEntityAdapter<ImageSeries>();
+export const imageAdapter = createEntityAdapter<ImageObject>();
+export const kindAdapter = createEntityAdapter<Kind>();
+export const categoryAdapter = createEntityAdapter<Category>();
+export const planeAdapter = createEntityAdapter<Plane>();
+export const channelAdapter = createEntityAdapter<Channel>();
+export const channelMetaAdapter = createEntityAdapter<ChannelMeta>();
+export const annotationAdapter = createEntityAdapter<AnnotationObject>();
+export const annotationVolumeAdapter = createEntityAdapter<AnnotationVolume>();
 
 const getInitialExperiment = (): Experiment => ({
   id: generateUUID(),
