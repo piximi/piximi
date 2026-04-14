@@ -27,6 +27,7 @@ import {
   AnnotatorState,
   ImageViewerState,
 } from "views/ImageViewer/utils/types";
+import { DataStateV2 } from "./dataV2/types";
 
 export type AppSettingsState = {
   // async work for setting initial states,
@@ -102,6 +103,7 @@ type AppState = {
   project: ProjectState;
   applicationSettings: AppSettingsState;
   data: DataState;
+  dataV2: DataStateV2;
   measurements: MeasurementsState;
 };
 

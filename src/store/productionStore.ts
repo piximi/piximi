@@ -18,6 +18,7 @@ import { dataMiddleware } from "./data/dataListeners";
 import { classifierSlice } from "./classifier";
 import { applicationSettingsSlice } from "./applicationSettings";
 import { dataSlice } from "./data/dataSlice";
+import { dataSliceV2 } from "./dataV2/dataSliceV2";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
 import { measurementsSlice } from "./measurements/measurementsSlice";
@@ -48,6 +49,7 @@ const preloadedState: RootState = {
   project: projectSlice.getInitialState(),
   segmenter: segmenterSlice.getInitialState(),
   measurements: measurementsSlice.getInitialState(),
+  datav2: dataSliceV2.getInitialState(),
 };
 
 const options = {

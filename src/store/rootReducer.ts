@@ -8,6 +8,7 @@ import { segmenterSlice } from "store/segmenter";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { dataSlice } from "./data/dataSlice";
 import { measurementsSlice } from "./measurements/measurementsSlice";
+import { dataSliceV2 } from "./dataV2/dataSliceV2";
 
 const reducers = {
   classifier: classifierSlice.reducer,
@@ -17,6 +18,7 @@ const reducers = {
   applicationSettings: applicationSettingsSlice.reducer,
   annotator: annotatorSlice.reducer,
   data: dataSlice.reducer,
+  datav2: dataSliceV2.reducer,
   measurements: measurementsSlice.reducer,
 };
 
