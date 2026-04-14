@@ -18,7 +18,7 @@ const reducers = {
   applicationSettings: applicationSettingsSlice.reducer,
   annotator: annotatorSlice.reducer,
   data: dataSlice.reducer,
-  datav2: dataSliceV2.reducer,
+  dataV2: dataSliceV2.reducer,
   measurements: measurementsSlice.reducer,
 };
 

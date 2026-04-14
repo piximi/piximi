@@ -49,7 +49,7 @@ const preloadedState: RootState = {
   project: projectSlice.getInitialState(),
   segmenter: segmenterSlice.getInitialState(),
   measurements: measurementsSlice.getInitialState(),
-  datav2: dataSliceV2.getInitialState(),
+  dataV2: dataSliceV2.getInitialState(),
 };
 
 const options = {
