@@ -40,7 +40,7 @@ import {
   type TaskError,
   type TaskHandle,
   TaskStatus,
-  type IWorkerAPI,
+  type IScheduledWorkerAPI,
   type TaskPriority,
 } from "./types";
 import { PriorityQueue } from "./PriorityQueue";
@@ -101,7 +101,8 @@ export class WorkerScheduler implements IWorkerScheduler {
    * Example: Instead of postMessage/onmessage, we can do:
    *   const result = await proxy.annotationMeasurements(data);
    */
-  private workerProxies: Map<number, Comlink.Remote<IWorkerAPI>> = new Map();
+  private workerProxies: Map<number, Comlink.Remote<IScheduledWorkerAPI>> =
+    new Map();
 
   // ---------------------------------------------------------------------------
   // TASK MANAGEMENT STATE
@@ -655,7 +656,7 @@ export class WorkerScheduler implements IWorkerScheduler {
       // Comlink enables calling worker methods as if they were local:
       //   const result = await proxy.someMethod(arg);
       // Instead of manual postMessage/onmessage handling
-      const proxy = Comlink.wrap<IWorkerAPI>(worker);
+      const proxy = Comlink.wrap<IScheduledWorkerAPI>(worker);
       this.workerProxies.set(i, proxy);
     }
 

@@ -47,6 +47,22 @@ export type LoadStatus = {
   message?: string;
 };
 export type LoadCB = (loadPercent: number, loadMessage: string) => void;
+export type TaskError = {
+  source: string;
+  error: Error;
+  recoverable: boolean;
+};
+export type Progress = {
+  stage: string;
+  stageProgress: number; // 0-100 for current stage
+  overallProgress: number; // 0-100 for entire pipeline
+  currentTask?: string;
+  processedCount: number;
+  totalCount: number;
+  errors: Map<string, TaskError[]>;
+  warnings: string[];
+};
+
 /*
 GENERATOR TYPES
 */

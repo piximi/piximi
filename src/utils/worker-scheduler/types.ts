@@ -33,7 +33,13 @@ export interface TaskHandle<TResult = unknown> {
   cancel: () => void;
   promise: Promise<TResult>;
 }
+export type TaskHandler<K extends keyof TaskMap> = (
+  payload: TaskMap[K]["payload"],
+  cancelToken: CancelToken,
+  onProgress: TaskMap[K]["onProgress"],
+) => Promise<TaskMap[K]["result"]>;
 
+export type TaskRegistry = { [K in keyof TaskMap]: TaskHandler<K> };
 export type TaskErrorCode =
   | "CANCELLED"
   | "WORKER_ERROR"
@@ -72,7 +78,7 @@ export interface SchedulerOptions {
  * WorkerAPI
  */
 
-export interface IWorkerAPI {
+export interface IScheduledWorkerAPI {
   execute<T extends keyof TaskMap>(
     type: T,
     payload: TaskMap[T]["payload"],
