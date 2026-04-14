@@ -68,3 +68,63 @@ export const selectAnnotationById = annotationSelectors.selectById;
 
 export const selectAllAnnotationVolumes = annotationVolumeSelectors.selectAll;
 export const selectAnnotationVolumeById = annotationVolumeSelectors.selectById;
+
+// ── Tier 2: FK join selectors ───────────────────────────────────────────────
+
+export const selectImagesBySeriesId = createSelector(
+  [imageSelectors.selectAll, (_: RootState, seriesId: string) => seriesId],
+  (images, seriesId) => images.filter((im) => im.seriesId === seriesId)
+);
+
+export const selectImagesByCategoryId = createSelector(
+  [imageSelectors.selectAll, (_: RootState, categoryId: string) => categoryId],
+  (images, categoryId) => images.filter((im) => im.categoryId === categoryId)
+);
+
+export const selectPlanesByImageId = createSelector(
+  [planeSelectors.selectAll, (_: RootState, imageId: string) => imageId],
+  (planes, imageId) => planes.filter((pl) => pl.imageId === imageId)
+);
+
+export const selectChannelsByPlaneId = createSelector(
+  [channelSelectors.selectAll, (_: RootState, planeId: string) => planeId],
+  (channels, planeId) => channels.filter((ch) => ch.planeId === planeId)
+);
+
+export const selectAnnotationVolumesByImageId = createSelector(
+  [annotationVolumeSelectors.selectAll, (_: RootState, imageId: string) => imageId],
+  (volumes, imageId) => volumes.filter((v) => v.imageId === imageId)
+);
+
+export const selectAnnotationVolumesByKindId = createSelector(
+  [annotationVolumeSelectors.selectAll, (_: RootState, kindId: string) => kindId],
+  (volumes, kindId) => volumes.filter((v) => v.kindId === kindId)
+);
+
+export const selectAnnotationVolumesByCategoryId = createSelector(
+  [annotationVolumeSelectors.selectAll, (_: RootState, categoryId: string) => categoryId],
+  (volumes, categoryId) => volumes.filter((v) => v.categoryId === categoryId)
+);
+
+export const selectAnnotationsByVolumeId = createSelector(
+  [annotationSelectors.selectAll, (_: RootState, volumeId: string) => volumeId],
+  (annotations, volumeId) => annotations.filter((a) => a.volumeId === volumeId)
+);
+
+export const selectCategoriesByKindId = createSelector(
+  [categorySelectors.selectAll, (_: RootState, kindId: string) => kindId],
+  (categories, kindId) =>
+    categories.filter((c) => c.type === "annotation" && c.kindId === kindId)
+);
+
+export const selectChannelMetaByChannelId = createSelector(
+  [
+    channelSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    (_: RootState, channelId: string) => channelId,
+  ],
+  (channelDict, channelMetaDict, channelId) => {
+    const metaId = channelDict[channelId]?.channelMetaId;
+    return metaId ? channelMetaDict[metaId] : undefined;
+  }
+);
