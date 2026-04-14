@@ -27,6 +27,7 @@
     "dicom-parser": "^1.8.13",
     "file-saver": "^2.0.5",
     "fp-ts": "^2.13.1",
+    "idb": "^8.0.3",
     "image-js": "0.35.2",
     "image-js-latest": "npm:image-js@1.5.0",
     "imjoy-rpc": "0.5.48",
