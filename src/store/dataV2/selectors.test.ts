@@ -1,18 +1,34 @@
 import { describe, expect, it } from "vitest";
 import { dataSliceV2 } from "./dataSliceV2";
 import type { RootState } from "store/rootReducer";
-import type { ImageSeries, ImageObject, Kind, Category, AnnotationVolume, AnnotationObject } from "./types";
+import type {
+  ImageSeries,
+  ImageObject,
+  Kind,
+  Category,
+  AnnotationVolume,
+  AnnotationObject,
+} from "./types";
 import { STORES } from "./types";
 import {
-  selectAllImageSeries, selectImageSeriesById,
-  selectAllImages, selectImageById,
-  selectAllPlanes, selectPlaneById,
-  selectAllChannels, selectChannelById,
-  selectAllChannelMetas, selectChannelMetaById,
-  selectAllKinds, selectKindById,
-  selectAllCategories, selectCategoryById,
-  selectAllAnnotationVolumes, selectAnnotationVolumeById,
-  selectAllAnnotations, selectAnnotationById,
+  selectAllImageSeries,
+  selectImageSeriesById,
+  selectAllImages,
+  selectImageById,
+  selectAllPlanes,
+  selectPlaneById,
+  selectAllChannels,
+  selectChannelById,
+  selectAllChannelMetas,
+  selectChannelMetaById,
+  selectAllKinds,
+  selectKindById,
+  selectAllCategories,
+  selectCategoryById,
+  selectAllAnnotationVolumes,
+  selectAnnotationVolumeById,
+  selectAllAnnotations,
+  selectAnnotationById,
   selectImagesBySeriesId,
   selectImagesByCategoryId,
   selectPlanesByImageId,
@@ -32,16 +48,33 @@ function makeState(): RootState {
 }
 
 function makeSeries(id: string): ImageSeries {
-  return { id, experimentId: "e1", name: "S1", bitDepth: 8,
+  return {
+    id,
+    experimentId: "e1",
+    name: "S1",
+    bitDepth: 8,
     shape: { planes: 1, height: 10, width: 10, channels: 1 },
-    timeSeries: false, activeImageId: `${id}-img` };
+    timeSeries: false,
+    activeImageId: `${id}-img`,
+  };
 }
 
-function makeImage(id: string, seriesId: string, categoryId = "cat-img-unknown"): ImageObject {
-  return { id, name: id, seriesId,
+function makeImage(
+  id: string,
+  seriesId: string,
+  categoryId = "cat-img-unknown",
+): ImageObject {
+  return {
+    id,
+    name: id,
+    seriesId,
     shape: { planes: 1, height: 10, width: 10, channels: 1 },
-    categoryId, activePlaneId: `${id}-plane`, timepoint: 0,
-    bitDepth: 8, partition: Partition.Unassigned };
+    categoryId,
+    activePlaneId: `${id}-plane`,
+    timepoint: 0,
+    bitDepth: 8,
+    partition: Partition.Unassigned,
+  };
 }
 
 describe("Tier 1 selectors", () => {
@@ -52,9 +85,16 @@ describe("Tier 1 selectors", () => {
   it("selectImageSeriesById returns correct series", () => {
     const series = makeSeries("s1");
     let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
-    dataV2 = dataSliceV2.reducer(dataV2, dataSliceV2.actions.addImageSeries({
-      imageSeries: [series], images: [], planes: [], channels: [], channelMetas: []
-    }));
+    dataV2 = dataSliceV2.reducer(
+      dataV2,
+      dataSliceV2.actions.addImageSeries({
+        imageSeries: [series],
+        images: [],
+        planes: [],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
     const state = { dataV2 } as unknown as RootState;
     expect(selectImageSeriesById(state, "s1")).toEqual(series);
   });
@@ -77,9 +117,16 @@ function makeStateWithImages() {
   const img1 = makeImage("img1", "s1");
   const img2 = makeImage("img2", "s1");
   let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
-  dataV2 = dataSliceV2.reducer(dataV2, dataSliceV2.actions.addImageSeries({
-    imageSeries: [series], images: [img1, img2], planes: [], channels: [], channelMetas: []
-  }));
+  dataV2 = dataSliceV2.reducer(
+    dataV2,
+    dataSliceV2.actions.addImageSeries({
+      imageSeries: [series],
+      images: [img1, img2],
+      planes: [],
+      channels: [],
+      channelMetas: [],
+    }),
+  );
   return { dataV2 } as unknown as RootState;
 }
 
@@ -100,9 +147,16 @@ describe("Tier 2 FK join selectors", () => {
     const series = makeSeries("s1");
     const img1 = makeImage("img1", "s1", "cat-a");
     const img2 = makeImage("img2", "s1", "cat-b");
-    dataV2 = dataSliceV2.reducer(dataV2, dataSliceV2.actions.addImageSeries({
-      imageSeries: [series], images: [img1, img2], planes: [], channels: [], channelMetas: []
-    }));
+    dataV2 = dataSliceV2.reducer(
+      dataV2,
+      dataSliceV2.actions.addImageSeries({
+        imageSeries: [series],
+        images: [img1, img2],
+        planes: [],
+        channels: [],
+        channelMetas: [],
+      }),
+    );
     const state = { dataV2 } as unknown as RootState;
     expect(selectImagesByCategoryId(state, "cat-a")).toHaveLength(1);
     expect(selectImagesByCategoryId(state, "cat-a")[0].id).toBe("img1");
@@ -110,9 +164,19 @@ describe("Tier 2 FK join selectors", () => {
 
   it("selectCategoriesByKindId returns annotation categories for that kind", () => {
     let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
-    const kind: Kind = { id: "k1", name: "K1", unknownCategoryId: "cat-k1-unk" };
-    const cat: Category = { id: "cat-k1-unk", name: "Unknown", type: "annotation",
-      kindId: "k1", color: "#fff", isUnknown: true };
+    const kind: Kind = {
+      id: "k1",
+      name: "K1",
+      unknownCategoryId: "cat-k1-unk",
+    };
+    const cat: Category = {
+      id: "cat-k1-unk",
+      name: "Unknown",
+      type: "annotation",
+      kindId: "k1",
+      color: "#fff",
+      isUnknown: true,
+    };
     dataV2 = dataSliceV2.reducer(dataV2, dataSliceV2.actions.addKind(kind));
     dataV2 = dataSliceV2.reducer(dataV2, dataSliceV2.actions.addCategory(cat));
     const state = { dataV2 } as unknown as RootState;
@@ -122,9 +186,22 @@ describe("Tier 2 FK join selectors", () => {
 
   it("selectAnnotationVolumesByImageId filters by imageId", () => {
     let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
-    const vol1: AnnotationVolume = { id: "v1", imageId: "img1", kindId: "k1", categoryId: "c1" };
-    const vol2: AnnotationVolume = { id: "v2", imageId: "img2", kindId: "k1", categoryId: "c1" };
-    dataV2 = dataSliceV2.reducer(dataV2, dataSliceV2.actions.batchAddAnnotationVolume([vol1, vol2]));
+    const vol1: AnnotationVolume = {
+      id: "v1",
+      imageId: "img1",
+      kindId: "k1",
+      categoryId: "c1",
+    };
+    const vol2: AnnotationVolume = {
+      id: "v2",
+      imageId: "img2",
+      kindId: "k1",
+      categoryId: "c1",
+    };
+    dataV2 = dataSliceV2.reducer(
+      dataV2,
+      dataSliceV2.actions.batchAddAnnotationVolume([vol1, vol2]),
+    );
     const state = { dataV2 } as unknown as RootState;
     expect(selectAnnotationVolumesByImageId(state, "img1")).toHaveLength(1);
     expect(selectAnnotationVolumesByImageId(state, "img1")[0].id).toBe("v1");
@@ -132,29 +209,65 @@ describe("Tier 2 FK join selectors", () => {
 
   it("selectAnnotationVolumesByKindId filters by kindId", () => {
     let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
-    const vol1: AnnotationVolume = { id: "v1", imageId: "img1", kindId: "k1", categoryId: "c1" };
-    const vol2: AnnotationVolume = { id: "v2", imageId: "img1", kindId: "k2", categoryId: "c2" };
-    dataV2 = dataSliceV2.reducer(dataV2, dataSliceV2.actions.batchAddAnnotationVolume([vol1, vol2]));
+    const vol1: AnnotationVolume = {
+      id: "v1",
+      imageId: "img1",
+      kindId: "k1",
+      categoryId: "c1",
+    };
+    const vol2: AnnotationVolume = {
+      id: "v2",
+      imageId: "img1",
+      kindId: "k2",
+      categoryId: "c2",
+    };
+    dataV2 = dataSliceV2.reducer(
+      dataV2,
+      dataSliceV2.actions.batchAddAnnotationVolume([vol1, vol2]),
+    );
     const state = { dataV2 } as unknown as RootState;
     expect(selectAnnotationVolumesByKindId(state, "k1")).toHaveLength(1);
   });
 
   it("selectAnnotationVolumesByCategoryId filters by categoryId", () => {
     let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
-    const vol1: AnnotationVolume = { id: "v1", imageId: "img1", kindId: "k1", categoryId: "c1" };
-    const vol2: AnnotationVolume = { id: "v2", imageId: "img1", kindId: "k1", categoryId: "c2" };
-    dataV2 = dataSliceV2.reducer(dataV2, dataSliceV2.actions.batchAddAnnotationVolume([vol1, vol2]));
+    const vol1: AnnotationVolume = {
+      id: "v1",
+      imageId: "img1",
+      kindId: "k1",
+      categoryId: "c1",
+    };
+    const vol2: AnnotationVolume = {
+      id: "v2",
+      imageId: "img1",
+      kindId: "k1",
+      categoryId: "c2",
+    };
+    dataV2 = dataSliceV2.reducer(
+      dataV2,
+      dataSliceV2.actions.batchAddAnnotationVolume([vol1, vol2]),
+    );
     const state = { dataV2 } as unknown as RootState;
     expect(selectAnnotationVolumesByCategoryId(state, "c1")).toHaveLength(1);
   });
 
   it("selectAnnotationsByVolumeId filters by volumeId", () => {
     let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
-    const ann1: AnnotationObject = { id: "a1", planeId: "pl1", imageId: "img1", volumeId: "v1",
-      partition: Partition.Unassigned, shape: { planes: 1, height: 10, width: 10, channels: 1 },
-      boundingBox: [0, 0, 10, 10], encodedMask: [] };
+    const ann1: AnnotationObject = {
+      id: "a1",
+      planeId: "pl1",
+      imageId: "img1",
+      volumeId: "v1",
+      partition: Partition.Unassigned,
+      shape: { planes: 1, height: 10, width: 10, channels: 1 },
+      boundingBox: [0, 0, 10, 10],
+      encodedMask: [],
+    };
     const ann2: AnnotationObject = { ...ann1, id: "a2", volumeId: "v2" };
-    dataV2 = dataSliceV2.reducer(dataV2, dataSliceV2.actions.batchAddAnnotation([ann1, ann2]));
+    dataV2 = dataSliceV2.reducer(
+      dataV2,
+      dataSliceV2.actions.batchAddAnnotation([ann1, ann2]),
+    );
     const state = { dataV2 } as unknown as RootState;
     expect(selectAnnotationsByVolumeId(state, "v1")).toHaveLength(1);
     expect(selectAnnotationsByVolumeId(state, "v1")[0].id).toBe("a1");
