@@ -88,18 +88,127 @@ function cascadeDeleteImage(state: DataStateV2, image: ImageObject): void {
     annVols.map((vol) => vol.id),
   );
   // cascade: remove all planes and their child channels
-  const planeIds: string[] = [];
-  const channelIds: string[] = [];
-  Object.values(state.planes.entities).forEach((pl) => {
-    if (pl.imageId === image.id) {
-      planeIds.push(pl.id);
-      Object.values(state.channels.entities).forEach((ch) => {
-        if (ch.planeId === pl.id) channelIds.push(ch.id);
-      });
-    }
-  });
+  const planeIds = Object.values(state.planes.entities)
+    .filter((pl) => pl.imageId === image.id)
+    .map((pl) => pl.id);
+  const planeSet = new Set(planeIds);
+  const channelIds = Object.values(state.channels.entities)
+    .filter((ch) => planeSet.has(ch.planeId))
+    .map((ch) => ch.id);
   planeAdapter.removeMany(state.planes, planeIds);
   channelAdapter.removeMany(state.channels, channelIds);
+}
+
+function cascadeDeleteImageSeries(
+  state: DataStateV2,
+  series: ImageSeries,
+): void {
+  const images = Object.values(state.images.entities).filter(
+    (im) => im.seriesId === series.id,
+  );
+  images.forEach((image) => cascadeDeleteImage(state, image));
+  imageAdapter.removeMany(
+    state.images,
+    images.map((im) => im.id),
+  );
+
+  const channelMetaIds = Object.values(state.channelMetas.entities).reduce(
+    (chMetaIds: string[], chMeta) => {
+      if (chMeta.seriesId === series.id) chMetaIds.push(chMeta.id);
+      return chMetaIds;
+    },
+    [],
+  );
+  channelMetaAdapter.removeMany(state.channelMetas, channelMetaIds);
+}
+
+function cascadeDeleteKind(state: DataStateV2, kind: Kind): void {
+  const annotationVolumeUpdates = Object.values(
+    state.annotationVolumes.entities,
+  ).reduce(
+    (
+      updates: {
+        id: string;
+        changes: { kindId: string; categoryId: string };
+      }[],
+      annVol,
+    ) => {
+      if (annVol.kindId === kind.id)
+        updates.push({
+          id: annVol.id,
+          changes: {
+            kindId: UNKNOWN_KIND_ID,
+            categoryId: UNKNOWN_KIND_CATEGORY_ID,
+          },
+        });
+      return updates;
+    },
+    [],
+  );
+  annotationVolumeAdapter.updateMany(
+    state.annotationVolumes,
+    annotationVolumeUpdates,
+  );
+
+  const categoryIds = Object.values(state.categories.entities).reduce(
+    (catIds: string[], cat) => {
+      if (cat.type === "annotation" && cat.kindId === kind.id)
+        catIds.push(cat.id);
+      return catIds;
+    },
+    [],
+  );
+  categoryAdapter.removeMany(state.categories, categoryIds);
+}
+
+function cascadeDeleteImageCategory(
+  state: DataStateV2,
+  oldCategoryId: string,
+): void {
+  const imageUpdates = Object.values(state.images.entities).reduce(
+    (updates: { id: string; changes: { categoryId: string } }[], im) => {
+      if (im.categoryId === oldCategoryId)
+        updates.push({
+          id: im.id,
+          changes: { categoryId: UNKNOWN_IMAGE_CATEGORY_ID },
+        });
+      return updates;
+    },
+    [],
+  );
+  imageAdapter.updateMany(state.images, imageUpdates);
+}
+
+function cascadeDeleteAnnotationCategory(
+  state: DataStateV2,
+  oldCategoryId: string,
+  unknownCategoryId: string,
+): void {
+  const annotationVolumeUpdates = Object.values(
+    state.annotationVolumes.entities,
+  ).reduce(
+    (
+      updates: {
+        id: string;
+        changes: { categoryId: string };
+      }[],
+      annVol,
+    ) => {
+      if (annVol.categoryId === oldCategoryId)
+        updates.push({
+          id: annVol.id,
+          changes: {
+            categoryId: unknownCategoryId,
+          },
+        });
+      return updates;
+    },
+    [],
+  );
+  annotationVolumeAdapter.updateMany(
+    state.annotationVolumes,
+    annotationVolumeUpdates,
+  );
 }
 
 const initialState: DataStateV2 = {
@@ -237,27 +346,7 @@ export const dataSliceV2 = createSlice({
       const series = state.imageSeries.entities[action.payload];
       if (!series) return;
 
-      // cascade: for each image, remove annotation volumes, annotations, planes, and channels
-
-      const images = Object.values(state.images.entities).filter(
-        (im) => im.seriesId === series.id,
-      );
-      images.forEach((image) => cascadeDeleteImage(state, image));
-
-      imageAdapter.removeMany(
-        state.images,
-        images.map((im) => im.id),
-      );
-      // cascade: remove channelMetas owned by this series
-      const channelMetaIds = Object.values(state.channelMetas.entities).reduce(
-        (chMetaIds: string[], chMeta) => {
-          if (chMeta.seriesId === series.id) chMetaIds.push(chMeta.id);
-          return chMetaIds;
-        },
-        [],
-      );
-      channelMetaAdapter.removeMany(state.channelMetas, channelMetaIds);
-
+      cascadeDeleteImageSeries(state, series);
       imageSeriesAdapter.removeOne(state.imageSeries, series.id);
     },
     addImages(
@@ -376,44 +465,7 @@ export const dataSliceV2 = createSlice({
       if (!kind) return;
       if (kind.id === UNKNOWN_KIND_ID) return;
 
-      const annotationVolumeUpdates = Object.values(
-        state.annotationVolumes.entities,
-      ).reduce(
-        (
-          updates: {
-            id: string;
-            changes: { kindId: string; categoryId: string };
-          }[],
-          annVol,
-        ) => {
-          if (annVol.kindId === kind.id)
-            updates.push({
-              id: annVol.id,
-              changes: {
-                kindId: UNKNOWN_KIND_ID,
-                categoryId: UNKNOWN_KIND_CATEGORY_ID,
-              },
-            });
-          return updates;
-        },
-        [],
-      );
-      annotationVolumeAdapter.updateMany(
-        state.annotationVolumes,
-        annotationVolumeUpdates,
-      );
-
-      const categoryIds = Object.values(state.categories.entities).reduce(
-        (categoryIds: string[], cat) => {
-          if (cat.type === "annotation" && cat.kindId === kind.id)
-            categoryIds.push(cat.id);
-          return categoryIds;
-        },
-        [],
-      );
-
-      categoryAdapter.removeMany(state.categories, categoryIds);
-
+      cascadeDeleteKind(state, kind);
       kindAdapter.removeOne(state.kinds, kind.id);
     },
     addCategory(state, action: PayloadAction<Category>) {
@@ -442,20 +494,7 @@ export const dataSliceV2 = createSlice({
       )
         return;
 
-      // reassign all images in this category to the unknown category
-      const imageUpdates = Object.values(state.images.entities).reduce(
-        (updates: { id: string; changes: { categoryId: string } }[], im) => {
-          if (im.categoryId === categoryId)
-            updates.push({
-              id: im.id,
-              changes: { categoryId: UNKNOWN_IMAGE_CATEGORY_ID },
-            });
-          return updates;
-        },
-        [],
-      );
-      imageAdapter.updateMany(state.images, imageUpdates);
-
+      cascadeDeleteImageCategory(state, categoryId);
       categoryAdapter.removeOne(state.categories, categoryId);
     },
     deleteAnnotationCategory(state, action: PayloadAction<string>) {
@@ -469,30 +508,10 @@ export const dataSliceV2 = createSlice({
       if (!kind || categoryId === kind.unknownCategoryId) return;
 
       // reassign all annotation volumes in this category to the kind's unknown category
-      const annotationVolumeUpdates = Object.values(
-        state.annotationVolumes.entities,
-      ).reduce(
-        (
-          updates: {
-            id: string;
-            changes: { categoryId: string };
-          }[],
-          annVol,
-        ) => {
-          if (annVol.categoryId === categoryId)
-            updates.push({
-              id: annVol.id,
-              changes: {
-                categoryId: kind.unknownCategoryId,
-              },
-            });
-          return updates;
-        },
-        [],
-      );
-      annotationVolumeAdapter.updateMany(
-        state.annotationVolumes,
-        annotationVolumeUpdates,
+      cascadeDeleteAnnotationCategory(
+        state,
+        categoryId,
+        kind.unknownCategoryId,
       );
       categoryAdapter.removeOne(state.categories, categoryId);
     },
