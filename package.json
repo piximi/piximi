@@ -28,6 +28,7 @@
     "file-saver": "^2.0.5",
     "fp-ts": "^2.13.1",
     "image-js": "0.35.2",
+    "image-js-latest": "npm:image-js@1.5.0",
     "imjoy-rpc": "0.5.48",
     "immer": "^10.1.1",
     "io-ts": "^2.2.20",
