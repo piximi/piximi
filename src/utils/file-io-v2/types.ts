@@ -92,6 +92,9 @@ export type UploadStage =
   | "error"
   | "cancelled";
 
+type TotalStage = "analyze" | "load" | "store" | "finalize";
+export type ReadStage = "extract" | "toDims" | "toExperiment";
+export type StageName = TotalStage | ReadStage;
 // ============================================================
 // Upload Options
 // ============================================================
