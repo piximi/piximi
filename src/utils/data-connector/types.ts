@@ -2,7 +2,8 @@
  * Raw tensor data stores in IndexedDB
  * Designed for efficient serialization (no TF.js objects)
  */
-
+export const DB_NAME = "piximi-data";
+export const DB_VERSION = 1;
 import { Channel, DType } from "store/dataV2/types";
 export const STORES = {
   EXPERIMENT_DATA: "experiment-data",
