@@ -227,22 +227,6 @@ describe("deleteImageSeries", () => {
     expect(state.planes.ids).not.toContain("plane-1");
   });
 
-  it("cleans up the imageSeries relationship entry", () => {
-    const state = dataSliceV2.reducer(
-      buildStateWithSeries(),
-      deleteImageSeries("series-1"),
-    );
-    expect(state.relationships.imageSeries["series-1"]).toBeUndefined();
-  });
-
-  it("cleans up the images relationship entry", () => {
-    const state = dataSliceV2.reducer(
-      buildStateWithSeries(),
-      deleteImageSeries("series-1"),
-    );
-    expect(state.relationships.images["img-1"]).toBeUndefined();
-  });
-
   it("is a no-op for an unknown seriesId", () => {
     const before = buildStateWithSeries();
     const after = dataSliceV2.reducer(before, deleteImageSeries("no-such-id"));
@@ -307,24 +291,6 @@ describe("deleteImageObject", () => {
     expect(s.annotations.ids).not.toContain("ann-1");
   });
 
-  it("cleans up the annotationVolumes relationship entry", () => {
-    const s = dataSliceV2.reducer(
-      buildStateWithAnnotation(),
-      deleteImageObject("img-1"),
-    );
-    expect(s.relationships.annotationVolumes["vol-1"]).toBeUndefined();
-  });
-
-  it("removes vol-1 from its kind relationship", () => {
-    const s = dataSliceV2.reducer(
-      buildStateWithAnnotation(),
-      deleteImageObject("img-1"),
-    );
-    expect(s.relationships.kinds[KIND_ID]?.annotationVolumeIds).not.toContain(
-      "vol-1",
-    );
-  });
-
   it("is a no-op for an unknown imageId", () => {
     const before = buildStateWithAnnotation();
     const after = dataSliceV2.reducer(before, deleteImageObject("no-such-id"));
@@ -374,11 +340,6 @@ describe("deleteKind", () => {
   it("removes the kind's categories", () => {
     const s = dataSliceV2.reducer(buildStateWithKind(), deleteKind(KIND_ID));
     expect(s.categories.ids).not.toContain(KIND_CAT_ID);
-  });
-
-  it("cleans up the kinds relationship entry", () => {
-    const s = dataSliceV2.reducer(buildStateWithKind(), deleteKind(KIND_ID));
-    expect(s.relationships.kinds[KIND_ID]).toBeUndefined();
   });
 
   it("cannot delete the unknown kind (no-op)", () => {
@@ -431,14 +392,6 @@ describe("deleteImageCategory", () => {
 
     const s = dataSliceV2.reducer(before, deleteImageCategory(IMG_CAT_ID));
     expect(s.images.entities["img-1"]?.categoryId).toBe(unknownCatId);
-  });
-
-  it("cleans up the imageCategories relationship entry", () => {
-    const s = dataSliceV2.reducer(
-      buildStateWithImageCategory(),
-      deleteImageCategory(IMG_CAT_ID),
-    );
-    expect(s.relationships.imageCategories[IMG_CAT_ID]).toBeUndefined();
   });
 
   it("cannot delete the unknown image category (no-op)", () => {
@@ -506,16 +459,6 @@ describe("deleteAnnotationCategory", () => {
     );
   });
 
-  it("removes the category from its kind relationship", () => {
-    const s = dataSliceV2.reducer(
-      buildStateWithAnnotationCategory(),
-      deleteAnnotationCategory(CUSTOM_CAT_ID),
-    );
-    expect(s.relationships.kinds[KIND_ID]?.categoryIds).not.toContain(
-      CUSTOM_CAT_ID,
-    );
-  });
-
   it("cannot delete a kind's unknown annotation category (no-op)", () => {
     const before = buildStateWithAnnotationCategory();
     const after = dataSliceV2.reducer(
@@ -552,37 +495,6 @@ describe("updateImageCategory", () => {
       updateImageCategory({ imageId: "img-1", categoryId: NEW_CAT }),
     );
     expect(s.images.entities["img-1"]?.categoryId).toBe(NEW_CAT);
-  });
-
-  it("removes image from old category's relationship", () => {
-    const s = dataSliceV2.reducer(
-      buildState(),
-      updateImageCategory({ imageId: "img-1", categoryId: NEW_CAT }),
-    );
-    expect(s.relationships.imageCategories[OLD_CAT]?.imageIds).not.toContain(
-      "img-1",
-    );
-  });
-
-  it("adds image to new category's relationship", () => {
-    const s = dataSliceV2.reducer(
-      buildState(),
-      updateImageCategory({ imageId: "img-1", categoryId: NEW_CAT }),
-    );
-    expect(s.relationships.imageCategories[NEW_CAT]?.imageIds).toContain(
-      "img-1",
-    );
-  });
-
-  it("is a no-op when categoryId is unchanged", () => {
-    const before = buildState();
-    const after = dataSliceV2.reducer(
-      before,
-      updateImageCategory({ imageId: "img-1", categoryId: OLD_CAT }),
-    );
-    expect(after.relationships.imageCategories[OLD_CAT]?.imageIds).toContain(
-      "img-1",
-    );
   });
 });
 
@@ -639,78 +551,9 @@ describe("updateAnnotationVolumeKind", () => {
       KIND_B_UNKNOWN_CAT,
     );
   });
-
-  it("moves volume from old kind to new kind in relationships", () => {
-    const s = dataSliceV2.reducer(
-      buildState(),
-      updateAnnotationVolumeKind({ volumeId: "vol-1", kindId: KIND_B }),
-    );
-    expect(s.relationships.kinds[KIND_A]?.annotationVolumeIds).not.toContain(
-      "vol-1",
-    );
-    expect(s.relationships.kinds[KIND_B]?.annotationVolumeIds).toContain(
-      "vol-1",
-    );
-  });
 });
 
-describe("addImageSeries", () => {
-  it("builds imageSeries → image relationship", () => {
-    const s = dataSliceV2.reducer(
-      undefined,
-      addImageSeries({
-        imageSeries: [makeSeries("s1")],
-        images: [makeImage("img-1", "foo", "s1")],
-        planes: [],
-        channels: [],
-        channelMetas: [],
-      }),
-    );
-    expect(s.relationships.imageSeries["s1"]?.imageIds).toContain("img-1");
-  });
-
-  it("builds image → plane relationship", () => {
-    const s = dataSliceV2.reducer(
-      undefined,
-      addImageSeries({
-        imageSeries: [makeSeries("s1")],
-        images: [makeImage("img-1", "foo", "s1")],
-        planes: [makePlane("p1", "img-1")],
-        channels: [],
-        channelMetas: [],
-      }),
-    );
-    expect(s.relationships.images["img-1"]?.planeIds).toContain("p1");
-  });
-
-  it("builds imageSeries → channelMeta relationship", () => {
-    const chMeta = {
-      id: "cm1",
-      name: "C0",
-      seriesId: "s1",
-      bitDepth: 8 as const,
-      colorMap: [255, 0, 0] as [number, number, number],
-      visible: true,
-      minValue: 0,
-      maxValue: 255,
-      rampMin: 0,
-      rampMax: 255,
-      rampMinLimit: 0,
-      rampMaxLimit: 255,
-    };
-    const s = dataSliceV2.reducer(
-      undefined,
-      addImageSeries({
-        imageSeries: [makeSeries("s1")],
-        images: [],
-        planes: [],
-        channels: [],
-        channelMetas: [chMeta],
-      }),
-    );
-    expect(s.relationships.imageSeries["s1"]?.channelMetaIds).toContain("cm1");
-  });
-});
+describe("addImageSeries", () => {});
 
 describe("deleteAnnotationVolume", () => {
   const KIND_ID = "kind-dav";
@@ -760,44 +603,6 @@ describe("deleteAnnotationVolume", () => {
     );
     expect(s.annotations.ids).not.toContain("ann-1");
   });
-
-  it("cleans up the annotationVolumes relationship entry", () => {
-    const s = dataSliceV2.reducer(
-      buildState(),
-      deleteAnnotationVolume("vol-1"),
-    );
-    expect(s.relationships.annotationVolumes["vol-1"]).toBeUndefined();
-  });
-
-  it("removes vol-1 from the image relationship", () => {
-    const s = dataSliceV2.reducer(
-      buildState(),
-      deleteAnnotationVolume("vol-1"),
-    );
-    expect(s.relationships.images["img-1"]?.annotationVolumeIds).not.toContain(
-      "vol-1",
-    );
-  });
-
-  it("removes vol-1 from the kind relationship", () => {
-    const s = dataSliceV2.reducer(
-      buildState(),
-      deleteAnnotationVolume("vol-1"),
-    );
-    expect(s.relationships.kinds[KIND_ID]?.annotationVolumeIds).not.toContain(
-      "vol-1",
-    );
-  });
-
-  it("removes vol-1 from the annotationCategories relationship", () => {
-    const s = dataSliceV2.reducer(
-      buildState(),
-      deleteAnnotationVolume("vol-1"),
-    );
-    expect(
-      s.relationships.annotationCategories[KIND_CAT_ID]?.annotationVolumeIds,
-    ).not.toContain("vol-1");
-  });
 });
 
 describe("addImages (extended)", () => {
@@ -824,14 +629,6 @@ describe("addImages (extended)", () => {
       }),
     );
     expect(after.images.ids).toHaveLength(0);
-  });
-
-  it("adds the image to the series relationship", () => {
-    const s = dataSliceV2.reducer(
-      buildStateWithSeries(),
-      addImages({ seriesId: "s1", images: [makeImage("img-1", "foo", "s1")] }),
-    );
-    expect(s.relationships.imageSeries["s1"]?.imageIds).toContain("img-1");
   });
 
   it("deduplicates three images with the same name into distinct names", () => {
@@ -909,15 +706,6 @@ describe("batchDeleteImageObject", () => {
     expect(s.annotations.ids).not.toContain("ann-1");
   });
 
-  it("cleans up relationship entries for all deleted images", () => {
-    const s = dataSliceV2.reducer(
-      buildState(),
-      batchDeleteImageObject(["img-1", "img-2"]),
-    );
-    expect(s.relationships.images["img-1"]).toBeUndefined();
-    expect(s.relationships.images["img-2"]).toBeUndefined();
-  });
-
   it("skips unknown ids without affecting valid ones", () => {
     const s = dataSliceV2.reducer(
       buildState(),
@@ -983,20 +771,6 @@ describe("batchDeleteAnnotationVolume", () => {
     );
     expect(s.annotations.ids).not.toContain("ann-1");
   });
-
-  it("cleans up boundary relationships for all deleted volumes", () => {
-    const s = dataSliceV2.reducer(
-      buildState(),
-      batchDeleteAnnotationVolume(["vol-1", "vol-2"]),
-    );
-    expect(s.relationships.images["img-1"]?.annotationVolumeIds).not.toContain(
-      "vol-1",
-    );
-    expect(s.relationships.images["img-1"]?.annotationVolumeIds).not.toContain(
-      "vol-2",
-    );
-    expect(s.relationships.kinds[KIND_ID]?.annotationVolumeIds).toHaveLength(0);
-  });
 });
 
 describe("deleteAnnotation", () => {
@@ -1034,18 +808,6 @@ describe("deleteAnnotation", () => {
   it("removes the annotation entity", () => {
     const s = dataSliceV2.reducer(buildState(), deleteAnnotation("ann-1"));
     expect(s.annotations.ids).not.toContain("ann-1");
-  });
-
-  it("removes annotation from its plane relationship", () => {
-    const s = dataSliceV2.reducer(buildState(), deleteAnnotation("ann-1"));
-    expect(s.relationships.planes["p1"]?.annotationIds).not.toContain("ann-1");
-  });
-
-  it("removes annotation from its volume relationship", () => {
-    const s = dataSliceV2.reducer(buildState(), deleteAnnotation("ann-1"));
-    expect(
-      s.relationships.annotationVolumes["vol-1"]?.annotationIds,
-    ).not.toContain("ann-1");
   });
 
   it("is a no-op for an unknown annotationId", () => {
@@ -1099,36 +861,6 @@ describe("updateAnnotationVolumeCategory", () => {
     );
     expect(s.annotationVolumes.entities["vol-1"]?.categoryId).toBe(NEW_CAT);
   });
-
-  it("moves volume from old to new annotationCategories relationship", () => {
-    const s = dataSliceV2.reducer(
-      buildState(),
-      updateAnnotationVolumeCategory({
-        volumeId: "vol-1",
-        categoryId: NEW_CAT,
-      }),
-    );
-    expect(
-      s.relationships.annotationCategories[OLD_CAT]?.annotationVolumeIds,
-    ).not.toContain("vol-1");
-    expect(
-      s.relationships.annotationCategories[NEW_CAT]?.annotationVolumeIds,
-    ).toContain("vol-1");
-  });
-
-  it("is a no-op when categoryId is unchanged", () => {
-    const before = buildState();
-    const after = dataSliceV2.reducer(
-      before,
-      updateAnnotationVolumeCategory({
-        volumeId: "vol-1",
-        categoryId: OLD_CAT,
-      }),
-    );
-    expect(
-      after.relationships.annotationCategories[OLD_CAT]?.annotationVolumeIds,
-    ).toContain("vol-1");
-  });
 });
 
 describe("batchUpdateImageCategory", () => {
@@ -1164,18 +896,5 @@ describe("batchUpdateImageCategory", () => {
     );
     expect(s.images.entities["img-1"]?.categoryId).toBe(CAT_B);
     expect(s.images.entities["img-2"]?.categoryId).toBe(CAT_B);
-  });
-
-  it("moves all images in the relationship tables", () => {
-    const s = dataSliceV2.reducer(
-      buildState(),
-      batchUpdateImageCategory([
-        { imageId: "img-1", categoryId: CAT_B },
-        { imageId: "img-2", categoryId: CAT_B },
-      ]),
-    );
-    expect(s.relationships.imageCategories[CAT_A]?.imageIds).toHaveLength(0);
-    expect(s.relationships.imageCategories[CAT_B]?.imageIds).toContain("img-1");
-    expect(s.relationships.imageCategories[CAT_B]?.imageIds).toContain("img-2");
   });
 });

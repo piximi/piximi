@@ -13,23 +13,8 @@ import type {
   Category,
   AnnotationObject,
   AnnotationVolume,
-  DataRelationships,
 } from "./types";
-import {
-  moveRelationship,
-  pushRelationship,
-  removeAnnotationRelationships,
-  removeAnnotationVolumeRelationships,
-  removeImageRelationships,
-  removeRelationship,
-  updateAnnotationRelationships,
-  updateAnnotationVolumeRelationships,
-  updateCategoryRelationships,
-  updateChannelMetaRelationships,
-  updateChannelRelationships,
-  updateImageRelationships,
-  updatePlaneRelationships,
-} from "./utils";
+
 import {
   UNKNOWN_ANNOTATION_CATEGORY_COLOR,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
@@ -47,24 +32,6 @@ const channelAdapter = createEntityAdapter<Channel>();
 const channelMetaAdapter = createEntityAdapter<ChannelMeta>();
 const annotationAdapter = createEntityAdapter<AnnotationObject>();
 const annotationVolumeAdapter = createEntityAdapter<AnnotationVolume>();
-
-const getInitialRelationships = (): DataRelationships => ({
-  imageSeries: {},
-  channelMetas: {},
-  images: {},
-  planes: {},
-  kinds: {
-    [UNKNOWN_KIND_ID]: {
-      annotationVolumeIds: [],
-      categoryIds: [UNKNOWN_KIND_CATEGORY_ID],
-    },
-  },
-  imageCategories: { [UNKNOWN_IMAGE_CATEGORY_ID]: { imageIds: [] } },
-  annotationCategories: {
-    [UNKNOWN_KIND_CATEGORY_ID]: { annotationVolumeIds: [] },
-  },
-  annotationVolumes: {},
-});
 
 const getInitialExperiment = (): Experiment => ({
   id: generateUUID(),
@@ -98,58 +65,41 @@ function cascadeDeleteAnnotationVolume(
   state: DataStateV2,
   annVol: AnnotationVolume,
 ): void {
-  const annVolRel = state.relationships.annotationVolumes[annVol.id];
-  if (annVolRel) {
-    // snapshot before removeAnnotationRelationships mutates annotationIds in-place
-    const annotationIds = [...annVolRel.annotationIds];
-    // cascade: remove all child annotations and their plane/volume relationship entries
-    const annotations = annotationIds
-      .map((id) => state.annotations.entities[id])
-      .filter(Boolean) as AnnotationObject[];
-    removeAnnotationRelationships(state.relationships, annotations);
-    annotationAdapter.removeMany(state.annotations, annotationIds);
-    delete state.relationships.annotationVolumes[annVol.id];
-  }
+  const annotationIds = Object.values(state.annotations.entities).reduce(
+    (annIds: string[], ann) => {
+      if (ann.volumeId === annVol.id) annIds.push(ann.id);
+      return annIds;
+    },
+    [],
+  );
+
+  annotationAdapter.removeMany(state.annotations, annotationIds);
 }
 
 function cascadeDeleteImage(state: DataStateV2, image: ImageObject): void {
-  const imageRel = state.relationships.images[image.id];
-  if (imageRel) {
-    // cascade: remove all annotation volumes and their child annotations
-    const annVols = imageRel.annotationVolumeIds
-      .map((id) => state.annotationVolumes.entities[id])
-      .filter(Boolean) as AnnotationVolume[];
-    annVols.forEach((annVol) => cascadeDeleteAnnotationVolume(state, annVol));
-    // boundary: remove each annotation volume from its kind and category entries
-    annVols.forEach((annVol) => {
-      removeRelationship(
-        state.relationships.kinds,
-        annVol.kindId,
-        "annotationVolumeIds",
-        annVol.id,
-      );
-      removeRelationship(
-        state.relationships.annotationCategories,
-        annVol.categoryId,
-        "annotationVolumeIds",
-        annVol.id,
-      );
-    });
-    annotationVolumeAdapter.removeMany(
-      state.annotationVolumes,
-      imageRel.annotationVolumeIds,
-    );
-    // cascade: remove all planes and their child channels
-    imageRel.planeIds.forEach((planeId) => {
-      const planeRel = state.relationships.planes[planeId];
-      if (planeRel) {
-        channelAdapter.removeMany(state.channels, planeRel.channelIds);
-        delete state.relationships.planes[planeId];
-      }
-    });
-    planeAdapter.removeMany(state.planes, imageRel.planeIds);
-    delete state.relationships.images[image.id];
-  }
+  // cascade: remove all annotation volumes and their child annotations
+  const annVols = Object.values(state.annotationVolumes.entities).filter(
+    (annVol) => annVol.imageId === image.id,
+  );
+  annVols.forEach((annVol) => cascadeDeleteAnnotationVolume(state, annVol));
+
+  annotationVolumeAdapter.removeMany(
+    state.annotationVolumes,
+    annVols.map((vol) => vol.id),
+  );
+  // cascade: remove all planes and their child channels
+  const planeIds: string[] = [];
+  const channelIds: string[] = [];
+  Object.values(state.planes.entities).forEach((pl) => {
+    if (pl.imageId === image.id) {
+      planeIds.push(pl.id);
+      Object.values(state.channels.entities).forEach((ch) => {
+        if (ch.planeId === pl.id) channelIds.push(ch.id);
+      });
+    }
+  });
+  planeAdapter.removeMany(state.planes, planeIds);
+  channelAdapter.removeMany(state.channels, channelIds);
 }
 
 const initialState: DataStateV2 = {
@@ -174,7 +124,6 @@ const initialState: DataStateV2 = {
   channelMetas: channelMetaAdapter.getInitialState(),
   annotations: annotationAdapter.getInitialState(),
   annotationVolumes: annotationVolumeAdapter.getInitialState(),
-  relationships: getInitialRelationships(),
 };
 
 export const dataSliceV2 = createSlice({
@@ -212,17 +161,6 @@ export const dataSliceV2 = createSlice({
         categories,
       } = action.payload;
 
-      updateImageRelationships(state.relationships, images);
-      updateChannelMetaRelationships(state.relationships, channelMetas);
-      updatePlaneRelationships(state.relationships, planes);
-      updateAnnotationVolumeRelationships(
-        state.relationships,
-        annotationVolumes,
-      );
-      updateCategoryRelationships(state.relationships, categories);
-      updateChannelRelationships(state.relationships, channels);
-      updateAnnotationRelationships(state.relationships, annotations);
-
       state.experiment = experiment;
       imageSeriesAdapter.addMany(state.imageSeries, imageSeries);
       imageAdapter.addMany(state.images, images);
@@ -239,7 +177,6 @@ export const dataSliceV2 = createSlice({
     },
     newExperiment(state, action: PayloadAction<Experiment>) {
       state.experiment = action.payload;
-      state.relationships = getInitialRelationships();
       imageSeriesAdapter.removeAll(state.imageSeries);
       imageAdapter.removeAll(state.images);
       planeAdapter.removeAll(state.planes);
@@ -265,11 +202,6 @@ export const dataSliceV2 = createSlice({
     ) {
       const { imageSeries, images, planes, channels, channelMetas } =
         action.payload;
-
-      updateImageRelationships(state.relationships, images);
-      updateChannelMetaRelationships(state.relationships, channelMetas);
-      updatePlaneRelationships(state.relationships, planes);
-      updateChannelRelationships(state.relationships, channels);
 
       imageSeriesAdapter.addMany(state.imageSeries, imageSeries);
       imageAdapter.addMany(state.images, images);
@@ -298,28 +230,28 @@ export const dataSliceV2 = createSlice({
     deleteImageSeries(state, action: PayloadAction<string>) {
       const series = state.imageSeries.entities[action.payload];
       if (!series) return;
-      const seriesRel = state.relationships.imageSeries[series.id];
-      if (seriesRel) {
-        // cascade: for each image, remove annotation volumes, annotations, planes, and channels
-        const imageIds = [...seriesRel.imageIds];
-        const images = imageIds
-          .map((id) => state.images.entities[id])
-          .filter(Boolean) as ImageObject[];
-        images.forEach((image) => cascadeDeleteImage(state, image));
-        // boundary: remove all images from their parent category entries
-        removeImageRelationships(state.relationships, images);
 
-        imageAdapter.removeMany(state.images, imageIds);
-        // cascade: remove channelMetas owned by this series
-        seriesRel.channelMetaIds.forEach((chMetaId) => {
-          delete state.relationships.channelMetas[chMetaId];
-        });
-        channelMetaAdapter.removeMany(
-          state.channelMetas,
-          seriesRel.channelMetaIds,
-        );
-        delete state.relationships.imageSeries[series.id];
-      }
+      // cascade: for each image, remove annotation volumes, annotations, planes, and channels
+
+      const images = Object.values(state.images.entities).filter(
+        (im) => im.seriesId === series.id,
+      );
+      images.forEach((image) => cascadeDeleteImage(state, image));
+
+      imageAdapter.removeMany(
+        state.images,
+        images.map((im) => im.id),
+      );
+      // cascade: remove channelMetas owned by this series
+      const channelMetaIds = Object.values(state.channelMetas.entities).reduce(
+        (chMetaIds: string[], chMeta) => {
+          if (chMeta.seriesId === series.id) chMetaIds.push(chMeta.id);
+          return chMetaIds;
+        },
+        [],
+      );
+      channelMetaAdapter.removeMany(state.channelMetas, channelMetaIds);
+
       imageSeriesAdapter.removeOne(state.imageSeries, series.id);
     },
     addImages(
@@ -341,7 +273,6 @@ export const dataSliceV2 = createSlice({
         imageNames.push(imageName);
         return imageName === im.name ? im : { ...im, name: imageName };
       });
-      updateImageRelationships(state.relationships, namedImages);
       imageAdapter.addMany(state.images, namedImages);
     },
     updateImageName(
@@ -384,17 +315,7 @@ export const dataSliceV2 = createSlice({
         !targetCategory
       )
         return;
-      if (!state.relationships.imageCategories[targetCategory.id])
-        state.relationships.imageCategories[targetCategory.id] = {
-          imageIds: [],
-        };
-      moveRelationship(
-        state.relationships.imageCategories,
-        "imageIds",
-        action.payload.imageId,
-        image.categoryId,
-        action.payload.categoryId,
-      );
+
       imageAdapter.updateOne(state.images, {
         id: action.payload.imageId,
         changes: { categoryId: action.payload.categoryId },
@@ -404,37 +325,21 @@ export const dataSliceV2 = createSlice({
       state,
       action: PayloadAction<Array<{ imageId: string; categoryId: string }>>,
     ) {
+      const updates: { id: string; changes: { categoryId: string } }[] = [];
       action.payload.forEach(({ imageId, categoryId }) => {
         const image = state.images.entities[imageId];
         const targetCategory = state.categories.entities[categoryId];
         if (!image || image.categoryId === categoryId || !targetCategory)
           return;
-        if (!state.relationships.imageCategories[targetCategory.id])
-          state.relationships.imageCategories[targetCategory.id] = {
-            imageIds: [],
-          };
-        moveRelationship(
-          state.relationships.imageCategories,
-          "imageIds",
-          imageId,
-          image.categoryId,
-          categoryId,
-        );
+        updates.push({ id: image.id, changes: { categoryId } });
       });
-      imageAdapter.updateMany(
-        state.images,
-        action.payload.map(({ imageId, categoryId }) => ({
-          id: imageId,
-          changes: { categoryId },
-        })),
-      );
+      imageAdapter.updateMany(state.images, updates);
     },
     deleteImageObject(state, action: PayloadAction<string>) {
       const image = state.images.entities[action.payload];
       if (!image) return;
       cascadeDeleteImage(state, image);
-      // boundary: remove this image from its parent series and category entries
-      removeImageRelationships(state.relationships, [image]);
+
       imageAdapter.removeOne(state.images, image.id);
     },
     batchDeleteImageObject(state, action: PayloadAction<Array<string>>) {
@@ -442,8 +347,7 @@ export const dataSliceV2 = createSlice({
         .map((id) => state.images.entities[id])
         .filter(Boolean) as ImageObject[];
       images.forEach((image) => cascadeDeleteImage(state, image));
-      // boundary: remove all images from their parent series and category entries
-      removeImageRelationships(state.relationships, images);
+
       imageAdapter.removeMany(state.images, action.payload);
     },
     addKind(state, action: PayloadAction<Kind>) {
@@ -465,41 +369,51 @@ export const dataSliceV2 = createSlice({
       const kind = state.kinds.entities[action.payload];
       if (!kind) return;
       if (kind.id === UNKNOWN_KIND_ID) return;
-      const kindRel = state.relationships.kinds[kind.id];
-      if (kindRel) {
-        kindRel.annotationVolumeIds.forEach((annVolId) => {
-          const annVol = state.annotationVolumes.entities[annVolId];
-          if (!annVol) return;
-          annVol.kindId = UNKNOWN_KIND_ID;
-          annVol.categoryId = UNKNOWN_KIND_CATEGORY_ID;
-          pushRelationship(
-            state.relationships.kinds as DataRelationships["kinds"],
-            UNKNOWN_KIND_ID,
-            () => ({ annotationVolumeIds: [], categoryIds: [] }),
-            (e) => e.annotationVolumeIds.push(annVolId),
-          );
-          pushRelationship(
-            state.relationships
-              .annotationCategories as DataRelationships["annotationCategories"],
-            UNKNOWN_KIND_CATEGORY_ID,
-            () => ({ annotationVolumeIds: [] }),
-            (e) => e.annotationVolumeIds.push(annVolId),
-          );
-        });
-        kindRel.categoryIds.forEach(
-          (catId) => delete state.relationships.annotationCategories[catId],
-        );
-        categoryAdapter.removeMany(state.categories, kindRel.categoryIds);
-        delete state.relationships.kinds[kind.id];
-      }
+
+      const annotationVolumeUpdates = Object.values(
+        state.annotationVolumes.entities,
+      ).reduce(
+        (
+          updates: {
+            id: string;
+            changes: { kindId: string; categoryId: string };
+          }[],
+          annVol,
+        ) => {
+          if (annVol.kindId === kind.id)
+            updates.push({
+              id: annVol.id,
+              changes: {
+                kindId: UNKNOWN_KIND_ID,
+                categoryId: UNKNOWN_KIND_CATEGORY_ID,
+              },
+            });
+          return updates;
+        },
+        [],
+      );
+      annotationVolumeAdapter.updateMany(
+        state.annotationVolumes,
+        annotationVolumeUpdates,
+      );
+
+      const categoryIds = Object.values(state.categories.entities).reduce(
+        (categoryIds: string[], cat) => {
+          if (cat.type === "annotation" && cat.kindId === kind.id)
+            categoryIds.push(cat.id);
+          return categoryIds;
+        },
+        [],
+      );
+
+      categoryAdapter.removeMany(state.categories, categoryIds);
+
       kindAdapter.removeOne(state.kinds, kind.id);
     },
     addCategory(state, action: PayloadAction<Category>) {
-      updateCategoryRelationships(state.relationships, [action.payload]);
       categoryAdapter.addOne(state.categories, action.payload);
     },
     batchAddCategory(state, action: PayloadAction<Array<Category>>) {
-      updateCategoryRelationships(state.relationships, action.payload);
       categoryAdapter.addMany(state.categories, action.payload);
     },
     updateCategoryName(
@@ -513,24 +427,29 @@ export const dataSliceV2 = createSlice({
     },
     deleteImageCategory(state, action: PayloadAction<string>) {
       const categoryId = action.payload;
+      const category = state.categories.entities[categoryId];
       // unknown category is protected — it cannot be deleted
-      if (categoryId === UNKNOWN_IMAGE_CATEGORY_ID) return;
-      const catRel = state.relationships.imageCategories[categoryId];
-      if (catRel) {
-        // reassign all images in this category to the unknown category
-        catRel.imageIds.forEach((imageId) => {
-          const image = state.images.entities[imageId];
-          if (!image) return;
-          image.categoryId = UNKNOWN_IMAGE_CATEGORY_ID;
-          pushRelationship(
-            state.relationships.imageCategories,
-            UNKNOWN_IMAGE_CATEGORY_ID,
-            () => ({ imageIds: [] as string[] }),
-            (e) => e.imageIds.push(imageId),
-          );
-        });
-        delete state.relationships.imageCategories[categoryId];
-      }
+      if (
+        categoryId === UNKNOWN_IMAGE_CATEGORY_ID ||
+        !category ||
+        category.type !== "image"
+      )
+        return;
+
+      // reassign all images in this category to the unknown category
+      const imageUpdates = Object.values(state.images.entities).reduce(
+        (updates: { id: string; changes: { categoryId: string } }[], im) => {
+          if (im.categoryId === categoryId)
+            updates.push({
+              id: im.id,
+              changes: { categoryId: UNKNOWN_IMAGE_CATEGORY_ID },
+            });
+          return updates;
+        },
+        [],
+      );
+      imageAdapter.updateMany(state.images, imageUpdates);
+
       categoryAdapter.removeOne(state.categories, categoryId);
     },
     deleteAnnotationCategory(state, action: PayloadAction<string>) {
@@ -542,37 +461,39 @@ export const dataSliceV2 = createSlice({
       const kind = state.kinds.entities[category.kindId];
       // unknown category for a kind is protected — it cannot be deleted
       if (!kind || categoryId === kind.unknownCategoryId) return;
-      const catRel = state.relationships.annotationCategories[categoryId];
-      if (catRel) {
-        // reassign all annotation volumes in this category to the kind's unknown category
-        catRel.annotationVolumeIds.forEach((annVolId) => {
-          const annVol = state.annotationVolumes.entities[annVolId];
-          if (!annVol) return;
-          annVol.categoryId = kind.unknownCategoryId;
-          pushRelationship(
-            state.relationships.annotationCategories,
-            kind.unknownCategoryId,
-            () => ({ annotationVolumeIds: [] as string[] }),
-            (e) => e.annotationVolumeIds.push(annVolId),
-          );
-        });
-        delete state.relationships.annotationCategories[categoryId];
-      }
-      // boundary: remove this category from its parent kind entry
-      removeRelationship(
-        state.relationships.kinds,
-        category.kindId,
-        "categoryIds",
-        categoryId,
+
+      // reassign all annotation volumes in this category to the kind's unknown category
+      const annotationVolumeUpdates = Object.values(
+        state.annotationVolumes.entities,
+      ).reduce(
+        (
+          updates: {
+            id: string;
+            changes: { categoryId: string };
+          }[],
+          annVol,
+        ) => {
+          if (annVol.categoryId === categoryId)
+            updates.push({
+              id: annVol.id,
+              changes: {
+                categoryId: kind.unknownCategoryId,
+              },
+            });
+          return updates;
+        },
+        [],
+      );
+      annotationVolumeAdapter.updateMany(
+        state.annotationVolumes,
+        annotationVolumeUpdates,
       );
       categoryAdapter.removeOne(state.categories, categoryId);
     },
     addAnnotation(state, action: PayloadAction<AnnotationObject>) {
-      updateAnnotationRelationships(state.relationships, [action.payload]);
       annotationAdapter.addOne(state.annotations, action.payload);
     },
     batchAddAnnotation(state, action: PayloadAction<Array<AnnotationObject>>) {
-      updateAnnotationRelationships(state.relationships, action.payload);
       annotationAdapter.addMany(state.annotations, action.payload);
     },
     updateAnnotationPartition(
@@ -587,27 +508,18 @@ export const dataSliceV2 = createSlice({
     deleteAnnotation(state, action: PayloadAction<string>) {
       const annotation = state.annotations.entities[action.payload];
       if (!annotation) return;
-      removeAnnotationRelationships(state.relationships, [annotation]);
       annotationAdapter.removeOne(state.annotations, annotation.id);
     },
     batchDeleteAnnotation(state, action: PayloadAction<Array<string>>) {
-      const annotations = action.payload
-        .map((id) => state.annotations.entities[id])
-        .filter(Boolean) as AnnotationObject[];
-      removeAnnotationRelationships(state.relationships, annotations);
       annotationAdapter.removeMany(state.annotations, action.payload);
     },
     addAnnotationVolume(state, action: PayloadAction<AnnotationVolume>) {
-      updateAnnotationVolumeRelationships(state.relationships, [
-        action.payload,
-      ]);
       annotationVolumeAdapter.addOne(state.annotationVolumes, action.payload);
     },
     batchAddAnnotationVolume(
       state,
       action: PayloadAction<Array<AnnotationVolume>>,
     ) {
-      updateAnnotationVolumeRelationships(state.relationships, action.payload);
       annotationVolumeAdapter.addMany(state.annotationVolumes, action.payload);
     },
     updateAnnotationVolumeCategory(
@@ -624,18 +536,7 @@ export const dataSliceV2 = createSlice({
         !targetCategory
       )
         return;
-      if (!state.relationships.annotationCategories[targetCategory.id])
-        state.relationships.annotationCategories[targetCategory.id] = {
-          annotationVolumeIds: [],
-        };
 
-      moveRelationship(
-        state.relationships.annotationCategories,
-        "annotationVolumeIds",
-        action.payload.volumeId,
-        volume.categoryId,
-        action.payload.categoryId,
-      );
       annotationVolumeAdapter.updateOne(state.annotationVolumes, {
         id: action.payload.volumeId,
         changes: { categoryId: action.payload.categoryId },
@@ -645,30 +546,15 @@ export const dataSliceV2 = createSlice({
       state,
       action: PayloadAction<Array<{ volumeId: string; categoryId: string }>>,
     ) {
+      const updates: { id: string; changes: { categoryId: string } }[] = [];
       action.payload.forEach(({ volumeId, categoryId }) => {
         const volume = state.annotationVolumes.entities[volumeId];
         const targetCategory = state.categories.entities[categoryId];
         if (!volume || volume.categoryId === categoryId || !targetCategory)
           return;
-        if (!state.relationships.annotationCategories[targetCategory.id])
-          state.relationships.annotationCategories[targetCategory.id] = {
-            annotationVolumeIds: [],
-          };
-        moveRelationship(
-          state.relationships.annotationCategories,
-          "annotationVolumeIds",
-          volumeId,
-          volume.categoryId,
-          categoryId,
-        );
+        updates.push({ id: volumeId, changes: { categoryId } });
       });
-      annotationVolumeAdapter.updateMany(
-        state.annotationVolumes,
-        action.payload.map(({ volumeId, categoryId }) => ({
-          id: volumeId,
-          changes: { categoryId },
-        })),
-      );
+      annotationVolumeAdapter.updateMany(state.annotationVolumes, updates);
     },
     updateAnnotationVolumeKind(
       state,
@@ -678,30 +564,7 @@ export const dataSliceV2 = createSlice({
       const newKind = state.kinds.entities[action.payload.kindId];
       if (!volume || volume.kindId === action.payload.kindId || !newKind)
         return;
-      if (!state.relationships.kinds[newKind.id])
-        state.relationships.kinds[newKind.id] = {
-          annotationVolumeIds: [],
-          categoryIds: [newKind.unknownCategoryId],
-        };
-      if (!state.relationships.annotationCategories[newKind.unknownCategoryId])
-        state.relationships.annotationCategories[newKind.unknownCategoryId] = {
-          annotationVolumeIds: [],
-        };
-      moveRelationship(
-        state.relationships.kinds,
-        "annotationVolumeIds",
-        action.payload.volumeId,
-        volume.kindId,
-        action.payload.kindId,
-      );
-      // reset category to the new kind's unknown — old category doesn't belong to new kind
-      moveRelationship(
-        state.relationships.annotationCategories,
-        "annotationVolumeIds",
-        action.payload.volumeId,
-        volume.categoryId,
-        newKind.unknownCategoryId,
-      );
+
       annotationVolumeAdapter.updateOne(state.annotationVolumes, {
         id: action.payload.volumeId,
         changes: {
@@ -723,33 +586,7 @@ export const dataSliceV2 = createSlice({
         const volume = state.annotationVolumes.entities[volumeId];
         const newKind = state.kinds.entities[kindId];
         if (!volume || volume.kindId === kindId || !newKind) return;
-        if (!state.relationships.kinds[newKind.id])
-          state.relationships.kinds[newKind.id] = {
-            annotationVolumeIds: [],
-            categoryIds: [newKind.unknownCategoryId],
-          };
-        if (
-          !state.relationships.annotationCategories[newKind.unknownCategoryId]
-        )
-          state.relationships.annotationCategories[newKind.unknownCategoryId] =
-            {
-              annotationVolumeIds: [],
-            };
-        moveRelationship(
-          state.relationships.kinds,
-          "annotationVolumeIds",
-          volumeId,
-          volume.kindId,
-          kindId,
-        );
-        // reset category to the new kind's unknown — old category doesn't belong to new kind
-        moveRelationship(
-          state.relationships.annotationCategories,
-          "annotationVolumeIds",
-          volumeId,
-          volume.categoryId,
-          newKind.unknownCategoryId,
-        );
+
         updates.push({
           id: volume.id,
           changes: {
@@ -764,8 +601,7 @@ export const dataSliceV2 = createSlice({
       const annVol = state.annotationVolumes.entities[action.payload];
       if (!annVol) return;
       cascadeDeleteAnnotationVolume(state, annVol);
-      // boundary: remove this volume from its parent image, kind, and category entries
-      removeAnnotationVolumeRelationships(state.relationships, [annVol]);
+
       annotationVolumeAdapter.removeOne(state.annotationVolumes, annVol.id);
     },
     batchDeleteAnnotationVolume(state, action: PayloadAction<Array<string>>) {
@@ -773,8 +609,7 @@ export const dataSliceV2 = createSlice({
         .map((id) => state.annotationVolumes.entities[id])
         .filter(Boolean) as AnnotationVolume[];
       annVols.forEach((annVol) => cascadeDeleteAnnotationVolume(state, annVol));
-      // boundary: remove all volumes from their parent image, kind, and category entries
-      removeAnnotationVolumeRelationships(state.relationships, annVols);
+
       annotationVolumeAdapter.removeMany(
         state.annotationVolumes,
         action.payload,

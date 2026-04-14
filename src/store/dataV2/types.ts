@@ -144,20 +144,6 @@ export type AnnotationObject = {
   decodedMask?: DataArray;
 };
 
-export type DataRelationships = {
-  imageSeries: Record<string, { imageIds: string[]; channelMetaIds: string[] }>;
-  images: Record<string, { planeIds: string[]; annotationVolumeIds: string[] }>;
-  imageCategories: Record<string, { imageIds: string[] }>;
-  annotationCategories: Record<string, { annotationVolumeIds: string[] }>;
-  kinds: Record<
-    string,
-    { annotationVolumeIds: string[]; categoryIds: string[] }
-  >;
-  planes: Record<string, { channelIds: string[]; annotationIds: string[] }>;
-  channelMetas: Record<string, { channelIds: string[] }>;
-  annotationVolumes: Record<string, { annotationIds: string[] }>;
-};
-
 export type DataStateV2 = {
   experiment: Experiment;
   imageSeries: EntityState<ImageSeries, string>;
@@ -169,5 +155,4 @@ export type DataStateV2 = {
   channelMetas: EntityState<ChannelMeta, string>;
   annotationVolumes: EntityState<AnnotationVolume, string>;
   annotations: EntityState<AnnotationObject, string>;
-  relationships: DataRelationships;
 };
