@@ -26,13 +26,11 @@ export const TiffConfigurator = ({
   updateConfigs,
   updateError,
   index,
-  key,
 }: {
   tiffAnalysis: TiffAnalysisResult;
   updateConfigs: (config: TiffImportConfig) => void;
   updateError: (error: boolean) => void;
   index: number;
-  key: string;
 }) => {
   const tiffInfo = tiffAnalysis;
 
@@ -94,7 +92,7 @@ export const TiffConfigurator = ({
   ]);
 
   return (
-    <Box key={key} sx={{ p: 2, pt: 3 }}>
+    <Box sx={{ p: 2, pt: 3 }}>
       <Accordion
         defaultExpanded={index === 0}
         sx={{ bgcolor: "rgba(0,0,0,0.25)" }}
