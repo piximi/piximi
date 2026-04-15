@@ -2,19 +2,34 @@ import React from "react";
 import { ListItemText, MenuItem } from "@mui/material";
 
 import { useFileUploadContext } from "contexts";
+import { useFileLoader } from "hooks";
+import { TiffConfigDialog } from "components/dialogs";
 
 type OpenImageMenuItemProps = {
   onCloseMenu: () => void;
 };
 
 // TODO: MenuItem??
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
   const uploadFiles = useFileUploadContext();
+  const {
+    upload,
+    tiffDialogOpen,
+    pendingTiffAnalysis,
+    handleTiffDialog,
+    handleConfirmTiffConfig,
+    handleCancelTiffConfig,
+  } = useFileLoader();
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.currentTarget.files || !uploadFiles) return;
     const files: FileList = Object.assign([], event.currentTarget.files);
-    await uploadFiles(files);
+    if (import.meta.env.VITE_USE_NEW_FILE_UPLOAD === "true") {
+      await upload(files, { onTiffDialog: handleTiffDialog });
+    } else {
+      await uploadFiles(files);
+    }
+    onCloseMenu();
   };
 
   return (
@@ -30,6 +45,15 @@ export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
           type="file"
         />
       </MenuItem>
+      {import.meta.env.VITE_USE_NEW_FILE_UPLOAD === "true" &&
+        pendingTiffAnalysis !== null && (
+          <TiffConfigDialog
+            open={tiffDialogOpen}
+            analysisResult={pendingTiffAnalysis}
+            onCancel={handleCancelTiffConfig}
+            onConfirm={handleConfirmTiffConfig}
+          />
+        )}
     </React.Fragment>
   );
 };
