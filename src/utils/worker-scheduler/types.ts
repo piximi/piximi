@@ -36,7 +36,7 @@ export interface TaskHandle<TResult = unknown> {
 export type TaskHandler<K extends keyof TaskMap> = (
   payload: TaskMap[K]["payload"],
   cancelToken: CancelToken,
-  onProgress: TaskMap[K]["onProgress"],
+  onProgress: NonNullable<TaskMap[K]["onProgress"]>,
 ) => Promise<TaskMap[K]["result"]>;
 
 export type TaskRegistry = { [K in keyof TaskMap]: TaskHandler<K> };
@@ -83,7 +83,7 @@ export interface IScheduledWorkerAPI {
     type: T,
     payload: TaskMap[T]["payload"],
     cancelToken: CancelToken,
-    onProgress: TaskMap[T]["onProgress"],
+    onProgress: NonNullable<TaskMap[T]["onProgress"]>,
   ): Promise<TaskMap[T]["result"]>;
 }
 

@@ -7,9 +7,10 @@ import type {
 import "./workerPolyfills"; // Must be first — polyfills `window` for zarr/imjoy-rpc
 
 import * as Comlink from "comlink";
+import { loadImage } from "utils/file-io-v2/loadImage";
 
 const taskRegistry: TaskRegistry = {
-  any: async (_payload, _ct, _prog) => "result",
+  loadImage: async (payload, ct, prog) => loadImage(payload, ct, prog),
 };
 const scheduledWorkerAPI: IScheduledWorkerAPI = {
   async execute(type, payload, cancelToken, onProgress) {
