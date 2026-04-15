@@ -69,6 +69,15 @@ export const selectAnnotationById = annotationSelectors.selectById;
 export const selectAllAnnotationVolumes = annotationVolumeSelectors.selectAll;
 export const selectAnnotationVolumeById = annotationVolumeSelectors.selectById;
 
+// ── Tier 1: Experiment selectors ───────────────────────────────────────────────
+
+export const selectExperiment = ({
+  dataV2,
+}: {
+  dataV2: RootState["dataV2"];
+}) => {
+  return dataV2.experiment;
+};
 // ── Tier 2: FK join selectors ───────────────────────────────────────────────
 
 export const selectImagesBySeriesId = createSelector(
