@@ -19,7 +19,7 @@ import {
   DimensionOrder,
   TiffAnalysisResult,
   TiffImportConfig,
-} from "utils/file-io-v2/types";
+} from "utils/file-io-v2/file-loader/types";
 
 export const TiffConfigurator = ({
   tiffAnalysis,

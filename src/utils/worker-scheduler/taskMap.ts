@@ -2,7 +2,7 @@ import {
   ImportImageInput,
   LoadAndPrepareOutput,
   StageName,
-} from "utils/file-io-v2/types";
+} from "utils/file-io-v2/file-loader/types";
 
 type OnProgressCallback<TExtra = object> = (
   args: { value: number } & TExtra,

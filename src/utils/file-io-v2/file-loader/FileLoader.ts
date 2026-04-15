@@ -12,11 +12,11 @@ import {
   TiffImportConfig,
   UploadOptionswithCallbacks,
   UploadStage,
-} from "../types";
+} from "./types";
 import { WorkerScheduler } from "utils/worker-scheduler";
 import { DataConnector } from "utils/data-connector";
-import { interpretFiles } from "../fileInputUtils";
-import { analyzeTiff } from "../readers";
+import { interpretFiles } from "./fileInputUtils";
+import { analyzeTiff } from "./readers";
 import { TaskHandle, TaskPriority } from "utils/worker-scheduler/types";
 import { parseError } from "utils/logUtils";
 import { Channel, ChannelMeta, Plane, ImageObject } from "store/dataV2/types";

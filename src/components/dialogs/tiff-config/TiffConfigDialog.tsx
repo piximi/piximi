@@ -15,7 +15,7 @@ import {
   TiffAnalysisResult,
   TiffDialogCallbackResult,
   TiffImportConfig,
-} from "utils/file-io-v2/types";
+} from "utils/file-io-v2/file-loader/types";
 
 type TiffConfigDialogProps = {
   open: boolean;

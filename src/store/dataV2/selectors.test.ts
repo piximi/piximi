@@ -11,7 +11,7 @@ import type {
   Plane,
   Channel,
 } from "./types";
-import { STORES, DTYPES } from "./types";
+import { DTYPES } from "./types";
 import {
   selectAllImageSeries,
   selectImageSeriesById,
@@ -47,6 +47,7 @@ import {
   selectRepresentativeImages,
 } from "./selectors";
 import { Partition } from "utils/models/enums";
+import { STORES } from "utils/data-connector/types";
 
 function makeState(): RootState {
   const dataV2 = dataSliceV2.reducer(undefined, { type: "" });

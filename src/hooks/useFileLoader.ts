@@ -7,13 +7,13 @@ import { generateUUID } from "store/data/utils";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import { selectExperiment } from "store/dataV2/selectors";
 import { ImageSeries } from "store/dataV2/types";
-import { FileLoader } from "utils/file-io-v2";
+import { FileLoader } from "utils/file-io-v2/file-loader";
 import {
   FileUploadResult,
   TiffAnalysisResult,
   TiffDialogCallbackResult,
   UploadOptionswithCallbacks,
-} from "utils/file-io-v2/types";
+} from "utils/file-io-v2/file-loader/types";
 
 type UseUploadPipelineReturn = {
   upload: (
