@@ -1,0 +1,106 @@
+import { useScheduler } from "contexts/worker-scheduler";
+import { useCallback, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { appTasksSlice } from "store/appTasks/appTasksSlice";
+import { AppTask } from "store/appTasks/types";
+import { generateUUID } from "store/data/utils";
+import { dataSliceV2 } from "store/dataV2/dataSliceV2";
+import { selectExperiment } from "store/dataV2/selectors";
+import { ImageSeries } from "store/dataV2/types";
+import { FileLoader } from "utils/file-io-v2";
+import {
+  FileUploadResult,
+  UploadOptionswithCallbacks,
+} from "utils/file-io-v2/types";
+
+type UseUploadPipelineReturn = {
+  upload: (
+    files: FileList,
+    options?: UploadOptionswithCallbacks,
+  ) => Promise<FileUploadResult>;
+  isUploading: boolean;
+};
+
+/**
+ * Hook that orchestrates the upload pipeline
+ *
+ * Calls DataPipelineService for worker-based processing,
+ * then dispatches the results to Redux
+ */
+export function useUploadPipeline(): UseUploadPipelineReturn {
+  const dispatch = useDispatch();
+  const scheduler = useScheduler();
+  const experiment = useSelector(selectExperiment);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const upload = useCallback(
+    async (
+      files: FileList,
+      options?: UploadOptionswithCallbacks,
+    ): Promise<FileUploadResult> => {
+      setIsUploading(true);
+      try {
+        // 1. Run the pipeline (workers + IndexDB)
+        const taskId = generateUUID();
+        const newTask: AppTask = {
+          id: taskId,
+          type: "file-upload",
+          status: "running",
+          progress: 0,
+          label: "Uploading Files",
+          startedAt: Date.now(),
+        };
+        dispatch(appTasksSlice.actions.taskRegistered(newTask));
+        const fileLoader = new FileLoader(scheduler);
+        fileLoader.onProgress((progress) => {
+          dispatch(
+            appTasksSlice.actions.taskUpdated({
+              id: taskId,
+              progress: progress.overallProgress,
+            }),
+          );
+        });
+        const result = await fileLoader.uploadFiles(files, options);
+        if (!result.success) {
+          if (result.cancelled) {
+            dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
+          } else {
+            dispatch(
+              appTasksSlice.actions.taskFailed({
+                id: taskId,
+                error: "Failed to upload files",
+              }),
+            );
+          }
+          return result;
+        }
+
+        const { imageSeries, images, planes, channels, channelMetas } =
+          result.data[0];
+
+        const reduxImageSeries: ImageSeries[] = [];
+        imageSeries.forEach((series) => {
+          reduxImageSeries.push({ ...series, experimentId: experiment.id });
+        });
+
+        dispatch(
+          dataSliceV2.actions.addImageSeries({
+            imageSeries: reduxImageSeries,
+            images,
+            planes,
+            channels,
+            channelMetas,
+          }),
+        );
+        dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
+
+        return result;
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [dispatch, scheduler],
+  );
+
+  return { upload, isUploading };
+}
