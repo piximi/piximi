@@ -36,7 +36,7 @@ type UseUploadPipelineReturn = {
  * Calls DataPipelineService for worker-based processing,
  * then dispatches the results to Redux
  */
-export function useUploadPipeline(): UseUploadPipelineReturn {
+export function useFileLoader(): UseUploadPipelineReturn {
   const dispatch = useDispatch();
   const scheduler = useScheduler();
   const experiment = useSelector(selectExperiment);
