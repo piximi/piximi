@@ -19,7 +19,7 @@ import {
   v01_02_deserializeClassifierGroup,
 } from "./common";
 import { Partition } from "utils/models/enums";
-import { RawTensorData } from "../types";
+import { RawData } from "../types";
 
 /**
  * Read a v0.2 project file.
@@ -209,7 +209,7 @@ const deserializeThingGroup = async (
   const [planes, height, width, channels] = rawArray.shape;
   const bitDepth = (await getAttr(thingDataset, "bit_depth")) as BitDepth;
 
-  const tensorData: RawTensorData = {
+  const tensorData: RawData = {
     buffer: data.buffer as ArrayBuffer,
     dtype: "float32",
     shape: rawArray.shape as [number, number, number, number],

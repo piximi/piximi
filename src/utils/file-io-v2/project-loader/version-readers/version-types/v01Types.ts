@@ -14,7 +14,7 @@ import {
   RescaleOptions,
 } from "utils/models/types";
 import { ColorsRaw } from "utils/types";
-import { RawTensorData } from "../../types";
+import { RawData } from "../../types";
 
 // ============================================================
 // V01 Piximi State
@@ -77,7 +77,7 @@ export type V01RawImageObject = {
   partition: Partition;
   kind?: string;
   containing?: string[]; // The URI to be displayed on the canvas
-  tensorData: RawTensorData;
+  tensorData: RawData;
 };
 
 export type V01Category = {

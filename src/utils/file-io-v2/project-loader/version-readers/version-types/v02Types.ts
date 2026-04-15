@@ -3,7 +3,7 @@ import { V01ClassifierState, V01Category, V01RawImageObject } from "./v01Types";
 import { BitDepth, Shape } from "store/data/types";
 import { ProjectState, SegmenterState } from "store/types";
 import { EntityState } from "@reduxjs/toolkit";
-import { RawTensorData } from "../../types";
+import { RawData } from "../../types";
 
 // ============================================================
 // V02 Piximi State
@@ -60,5 +60,5 @@ export type V02RawAnnotationObject = {
   encodedMask: number[];
   imageId: string;
   plane: number;
-  tensorData: RawTensorData;
+  tensorData: RawData;
 };
