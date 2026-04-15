@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { FileLoader } from "./FileLoader";
-import { WorkerScheduler } from "utils/worker-scheduler/WorkerScheduler";
+import { WorkerScheduler } from "utils/worker-scheduler";
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const TEST_IMAGES_DIR = resolve(__dir, "../../../images");

@@ -4,7 +4,7 @@ import type {
   LoadAndPrepareOutput,
   ReadStage,
 } from "./types";
-import { getReader } from "./readers/registry";
+import { getReader } from "./readers";
 import {
   applyDimensionsToStack,
   experimentFromStack,
