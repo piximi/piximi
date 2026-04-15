@@ -4,7 +4,7 @@ import {
   FILE,
   FileInterpretationResult,
   FileUploadResult,
-  IFileUploadService,
+  IFileLoader,
   ImageSeriesResult,
   LoadAndPrepareOutput,
   ReaderResult,
@@ -50,42 +50,16 @@ type TiffPrepResult = {
  * - Progress is reported at each stage
  * - Operations are cancellable
  */
-export class FileLoader implements IFileUploadService {
-  private static instance: FileLoader | null = null;
-
+export class FileLoader implements IFileLoader {
   private scheduler: WorkerScheduler;
   private storage: DataConnector;
   private progress: Progress = { ...INITIAL_PROGRESS };
   private progressListeners: Set<(progress: Progress) => void> = new Set();
   private abortController: AbortController | null = null;
 
-  private constructor(scheduler: WorkerScheduler) {
+  public constructor(scheduler: WorkerScheduler) {
     this.scheduler = scheduler;
     this.storage = DataConnector.getInstance();
-  }
-
-  // ============================================================
-  // PUBLIC -- START
-  // ============================================================
-  /**
-   * Get singleton instance
-   * Requires WorkerScheduler to be passed on first call
-   */
-  static getInstance(scheduler?: WorkerScheduler): FileLoader {
-    if (!FileLoader.instance) {
-      if (!scheduler) {
-        throw new Error("WorkerScheduler required for first initialization");
-      }
-      FileLoader.instance = new FileLoader(scheduler);
-    }
-    return FileLoader.instance;
-  }
-
-  /**
-   * Reset instance (for testing)
-   */
-  static resetInstance(): void {
-    FileLoader.instance = null;
   }
 
   // ============================================================

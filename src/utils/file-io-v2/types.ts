@@ -197,7 +197,7 @@ export type FileAnalysisResult = FileDetails & {
 // Service Interface
 // ============================================================
 
-export interface IFileUploadService {
+export interface IFileLoader {
   // Main entry points
   uploadFiles(
     files: FileList,

@@ -41,9 +41,8 @@ describe("FileUpload", () => {
   let service: FileLoader;
 
   beforeEach(() => {
-    FileLoader.resetInstance();
     const scheduler = new WorkerScheduler();
-    service = FileLoader.getInstance(scheduler);
+    service = new FileLoader(scheduler);
   });
 
   describe("uploadFiles", () => {
