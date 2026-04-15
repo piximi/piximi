@@ -28,6 +28,7 @@ import {
   ImageViewerState,
 } from "views/ImageViewer/utils/types";
 import { DataStateV2 } from "./dataV2/types";
+import { AppTasksState } from "./appTasks/types";
 
 export type AppSettingsState = {
   // async work for setting initial states,
@@ -105,6 +106,7 @@ type AppState = {
   data: DataState;
   dataV2: DataStateV2;
   measurements: MeasurementsState;
+  appTasks: AppTasksState;
 };
 
 export type AppDispatch = Dispatch<UnknownAction>;

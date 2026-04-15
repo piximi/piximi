@@ -24,6 +24,7 @@ import { segmenterSlice } from "./segmenter";
 import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
+import { appTasksSlice } from "./appTasks/appTasksSlice";
 
 const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&
@@ -50,6 +51,7 @@ const preloadedState: RootState = {
   segmenter: segmenterSlice.getInitialState(),
   measurements: measurementsSlice.getInitialState(),
   dataV2: dataSliceV2.getInitialState(),
+  appTasks: appTasksSlice.getInitialState(),
 };
 
 const options = {
