@@ -15,6 +15,7 @@ import { BitDepth } from "store/data/types";
 import { ChannelMeta, Plane } from "store/dataV2/types";
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
 import { Partition } from "utils/models/enums";
+import { generateUUID } from "store/data/utils";
 
 // ============================================================
 // Image Loading
@@ -232,7 +233,7 @@ export const experimentFromStack = (
   const bitDepth = config.bitDepth;
   const name = parseFilename(config.fileName);
   const series: ImageSeriesResult = {
-    id: crypto.randomUUID(),
+    id: generateUUID(),
     name: `${name}-series`,
     bitDepth: config.bitDepth,
     shape: config.shape,
@@ -242,7 +243,7 @@ export const experimentFromStack = (
   const channelMeta: ChannelMeta[] = Array.from(
     { length: config.shape.channels },
     (_v, idx) => ({
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       name: `Channel-${idx}`,
       bitDepth,
       seriesId: series.id,
@@ -265,7 +266,7 @@ export const experimentFromStack = (
   const totalPlanes = imageSeriesMap.size * config.shape.planes;
   imageSeriesMap.forEach((imageMap, imageIDX) => {
     const image: ImageResult = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       name: `${name}-${imageIDX}`,
       seriesId: series.id,
       shape: config.shape,
@@ -282,7 +283,7 @@ export const experimentFromStack = (
       onProgress &&
         onProgress({ stage: "toExperiment", value: planeNum / totalPlanes });
       const plane: Plane = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         imageId: image.id,
         zIndex: planeIDX,
       };
@@ -319,7 +320,7 @@ export const experimentFromStack = (
         }
 
         const channelResult: ChannelResult = {
-          id: crypto.randomUUID(),
+          id: generateUUID(),
           name: `Channel-${channelIDX}`,
           channelMetaId: meta.id,
           dtype: "float32",
