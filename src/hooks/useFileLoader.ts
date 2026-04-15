@@ -1,5 +1,5 @@
 import { useScheduler } from "contexts/worker-scheduler";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { AppTask } from "store/appTasks/types";
@@ -10,6 +10,8 @@ import { ImageSeries } from "store/dataV2/types";
 import { FileLoader } from "utils/file-io-v2";
 import {
   FileUploadResult,
+  TiffAnalysisResult,
+  TiffDialogCallbackResult,
   UploadOptionswithCallbacks,
 } from "utils/file-io-v2/types";
 
@@ -19,6 +21,13 @@ type UseUploadPipelineReturn = {
     options?: UploadOptionswithCallbacks,
   ) => Promise<FileUploadResult>;
   isUploading: boolean;
+  tiffDialogOpen: boolean;
+  pendingTiffAnalysis: TiffAnalysisResult[] | null;
+  handleTiffDialog: (
+    analysis: TiffAnalysisResult[],
+  ) => Promise<TiffDialogCallbackResult | null>;
+  handleConfirmTiffConfig: (config: TiffDialogCallbackResult) => void;
+  handleCancelTiffConfig: () => void;
 };
 
 /**
@@ -32,7 +41,39 @@ export function useUploadPipeline(): UseUploadPipelineReturn {
   const scheduler = useScheduler();
   const experiment = useSelector(selectExperiment);
   const [isUploading, setIsUploading] = useState(false);
+  const [tiffDialogOpen, setTiffDialogOpen] = useState(false);
+  const [pendingTiffAnalysis, setPendingTiffAnalysis] = useState<
+    TiffAnalysisResult[] | null
+  >(null);
+  const tiffResolverRef = useRef<
+    ((config: TiffDialogCallbackResult | null) => void) | null
+  >(null);
 
+  const handleTiffDialog = useCallback(
+    async (
+      analysis: TiffAnalysisResult[],
+    ): Promise<TiffDialogCallbackResult | null> => {
+      return new Promise((resolve) => {
+        setPendingTiffAnalysis(analysis);
+        tiffResolverRef.current = resolve;
+        setTiffDialogOpen(true);
+      });
+    },
+    [],
+  );
+  const handleConfirmTiffConfig = useCallback(
+    (config: TiffDialogCallbackResult) => {
+      tiffResolverRef.current?.(config);
+      setTiffDialogOpen(false);
+      setPendingTiffAnalysis(null);
+    },
+    [],
+  );
+  const handleCancelTiffConfig = useCallback(() => {
+    tiffResolverRef.current?.(null);
+    setTiffDialogOpen(false);
+    setPendingTiffAnalysis(null);
+  }, []);
   const upload = useCallback(
     async (
       files: FileList,
@@ -102,5 +143,13 @@ export function useUploadPipeline(): UseUploadPipelineReturn {
     [dispatch, scheduler],
   );
 
-  return { upload, isUploading };
+  return {
+    upload,
+    isUploading,
+    tiffDialogOpen,
+    pendingTiffAnalysis,
+    handleTiffDialog,
+    handleConfirmTiffConfig,
+    handleCancelTiffConfig,
+  };
 }
