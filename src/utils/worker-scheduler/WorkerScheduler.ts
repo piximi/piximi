@@ -640,7 +640,7 @@ export class WorkerScheduler implements IWorkerScheduler {
       // Create Web Worker using Vite's worker import syntax
       // The URL constructor with import.meta.url enables proper bundling
       const worker = new Worker(
-        new URL("../../workers/worker.ts", import.meta.url),
+        new URL("../workers/scheduledWorker.ts", import.meta.url),
         {
           type: "module", // Required for ES module workers
         },
