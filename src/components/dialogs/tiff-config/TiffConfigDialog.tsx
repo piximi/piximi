@@ -17,19 +17,19 @@ import {
   TiffImportConfig,
 } from "utils/file-io-v2/types";
 
-type TiffImportDialogProps = {
+type TiffConfigDialogProps = {
   open: boolean;
   analysisResult: TiffAnalysisResult[];
   onConfirm: (config: TiffDialogCallbackResult) => void;
   onCancel: () => void;
 };
 
-export const TiffImportDialog = ({
+export const TiffConfigDialog = ({
   open,
   analysisResult,
   onConfirm,
   onCancel,
-}: TiffImportDialogProps) => {
+}: TiffConfigDialogProps) => {
   const [configs, setConfigs] = useState<TiffDialogCallbackResult>({});
   const [errors, setErrors] = useState<Record<string, boolean>>(
     analysisResult.reduce((errors: Record<string, boolean>, analysis) => {
