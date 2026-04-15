@@ -31,8 +31,6 @@ import {
  * - Adds "name", "kind", "shape", "partition", "bitDepth" to annotations
  * - Creates "Unknown" category per kind
  *
- * Mirrors logic from src/utils/file-io/converters/v01_02_projectConverter.ts
- * but operates on V01RawProject → V02RawProject (no Tensor4D).
  */
 export function convertV01ToV02(v01: V01PiximiState): V02PiximiState {
   const v02Data = v01_02_dataConverter(v01.data);

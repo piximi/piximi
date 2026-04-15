@@ -20,7 +20,6 @@ import {
  * - Data section (things, categories, kinds) passes through unchanged
  *   (V11 data types are identical to V02)
  *
- * Mirrors logic from src/utils/file-io/converters/v02_11_projectConverter.ts
  */
 export function convertV02ToV11(v02: V02PiximiState): V11PiximiState {
   const { classifier: oldClassifier, data } = v02;
