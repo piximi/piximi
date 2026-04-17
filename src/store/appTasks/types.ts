@@ -1,7 +1,7 @@
 // types.ts
 export type AppTaskType =
   | "file-upload"
-  | "project-upload"
+  | "project-load"
   | "project-download"
   | "image-classification"
   | "image-segmentation"
