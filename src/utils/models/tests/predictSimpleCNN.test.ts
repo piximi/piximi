@@ -189,8 +189,6 @@ it("predict", async () => {
   expect(model).toBeDefined();
   model.loadInference(inferrenceImages, categories);
 
-  // console.log("weights file:", tfmemory().numTensors, tfmemory().numBytes);
-
   const profile = await tfprofile(async () => {
     const res = await model.predict(categories);
     return res.categoryIds;
@@ -199,36 +197,6 @@ it("predict", async () => {
   model.dispose();
 
   const categoryIds = profile.result as string[];
-
-  // console.log(`newBytes: ${profile.newBytes}`);
-  // console.log(`newTensors: ${profile.newTensors}`);
-  // console.log(`peakBytes: ${profile.peakBytes}`);
-  // console.log(
-  //   `byte usage over all kernels: ${profile.kernels.map(
-  //     (k) => k.totalBytesSnapshot
-  //   )}`
-  // );
-
-  // const time = await tftime(async () => {
-  //   const res = await predictClasses(
-  //     //@ts-ignore
-  //     model,
-  //     inferrenceData,
-  //     categories
-  //   );
-  //   return res;
-  // });
-
-  // console.log(
-  //   `kernelMs: ${time.kernelMs}, wallTimeMs: ${time.wallMs}`
-  // );
-
-  // console.log("---------");
-  // for (const [k, v] of Object.entries(result)) {
-  //   if (k !== "confusionMatrix") {
-  //     console.log(k, v);
-  //   }
-  // }
 
   const expectedImageIds = [
     "00000000-0000-0000-0001-00000000000",
