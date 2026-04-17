@@ -1,11 +1,13 @@
 import {
   AnnotationObject,
   AnnotationVolume,
+  Category,
   Channel,
   ChannelMeta,
   Experiment,
   ImageObject,
   ImageSeries,
+  Kind,
   Plane,
 } from "store/dataV2/types";
 import { ClassifierState, ProjectState, SegmenterState } from "store/types";
@@ -51,7 +53,7 @@ export type ExtractedModelFile = {
   blob: ArrayBuffer;
 };
 
-export type DeserializedProjectResult = {
+export type DeserializedProject = {
   project: ProjectState;
   classifier: ClassifierState;
   segmenter: SegmenterState;
@@ -60,6 +62,8 @@ export type DeserializedProjectResult = {
     imageSeries: ImageSeries[];
     images: ImageObject[];
     channelMetas: ChannelMeta[];
+    kinds: Kind[];
+    categories: Category[];
     annotationVolumes: AnnotationVolume[];
     planes: Plane[];
     channels: Channel[];
@@ -67,6 +71,13 @@ export type DeserializedProjectResult = {
   };
   modelFiles: ExtractedModelFileMap;
 };
+export type DeserializedProjectResult =
+  | {
+      success: true;
+      project: DeserializedProject;
+    }
+  | { success: false; cancelled: true }
+  | { success: false; cancelled: false; error: Error };
 
 // ============================================================
 // Service Interface

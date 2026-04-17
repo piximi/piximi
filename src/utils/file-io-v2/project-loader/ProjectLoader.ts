@@ -1,4 +1,5 @@
 import {
+  DeserializedProject,
   DeserializedProjectResult,
   IProjectLoader,
   LoadProjectOutput,
@@ -11,10 +12,15 @@ import { WorkerScheduler } from "utils/worker-scheduler";
 import { DataConnector } from "utils/data-connector";
 import { TaskHandle, TaskPriority } from "utils/worker-scheduler/types";
 import { StorageInput, STORES } from "utils/data-connector/types";
+import { parseError } from "utils/logUtils";
+import { ExtractedModelFileMap } from "utils/models/types";
+import classifierHandler from "utils/models/classification/classifierHandler";
+import { SequentialClassifier } from "utils/models/classification";
 
 const STAGES = {
-  loadProject: { start: 0.0, end: 0.95 },
-  storeChannels: { start: 0.95, end: 1 },
+  loadProject: { start: 0.0, end: 0.75 },
+  storeChannels: { start: 0.75, end: 0.8 },
+  registerModels: { start: 0.8, end: 1 },
 } as const;
 /**
  * ProjectSerializationService
@@ -49,31 +55,46 @@ export class ProjectLoader implements IProjectLoader {
 
   async uploadProject(files: File[]): Promise<DeserializedProjectResult> {
     const handle = this.dispatchProject(files);
-    const { project: v2Raw, modelFiles } = await handle.promise;
-    this.updateProgress({ stageProgress: 0 });
-    const channels = await this.storeChannels(v2Raw.data.channels.entities);
-    this.updateProgress({
-      overallProgress: STAGES.storeChannels.end,
-      stageProgress: STAGES.storeChannels.end,
-    });
+    try {
+      const { project: v2Raw, modelFiles } = await handle.promise;
 
-    const v2Data = v2Raw.data;
-    const piximiState: DeserializedProjectResult = {
-      ...v2Raw,
-      data: {
-        experiment: v2Data.experiment,
-        imageSeries: Object.values(v2Data.imageSeries),
-        channelMetas: Object.values(v2Data.channelMetas),
-        images: Object.values(v2Data.images),
-        annotationVolumes: Object.values(v2Data.annotationVolumes),
-        planes: Object.values(v2Data.planes),
-        channels,
-        annotations: Object.values(v2Data.annotations),
-      },
-      modelFiles,
-    };
+      this.updateProgress({ stageProgress: 0 });
+      const channels = await this.storeChannels(v2Raw.data.channels.entities);
+      this.updateProgress({
+        overallProgress: STAGES.storeChannels.end,
+        stageProgress: 1,
+      });
+      this.registerClassifiers(modelFiles, (p: number) =>
+        this.updateProgress({
+          overallProgress:
+            STAGES.storeChannels.end +
+            (STAGES.registerModels.end - STAGES.registerModels.start) * p,
+          stageProgress: p,
+        }),
+      );
 
-    return piximiState;
+      const v2Data = v2Raw.data;
+      const piximiState: DeserializedProject = {
+        ...v2Raw,
+        data: {
+          experiment: v2Data.experiment,
+          imageSeries: Object.values(v2Data.imageSeries),
+          channelMetas: Object.values(v2Data.channelMetas),
+          kinds: Object.values(v2Data.kinds),
+          categories: Object.values(v2Data.categories),
+          images: Object.values(v2Data.images),
+          annotationVolumes: Object.values(v2Data.annotationVolumes),
+          planes: Object.values(v2Data.planes),
+          channels,
+          annotations: Object.values(v2Data.annotations),
+        },
+        modelFiles,
+      };
+
+      return { success: true, project: piximiState };
+    } catch (e) {
+      return { success: false, cancelled: false, error: parseError(e) };
+    }
   }
 
   dispatchProject(files: File[]): TaskHandle<LoadProjectOutput> {
@@ -93,7 +114,7 @@ export class ProjectLoader implements IProjectLoader {
 
   private async storeChannels(
     v2Channels: Record<string, V2Channel>,
-  ): Promise<DeserializedProjectResult["data"]["channels"]> {
+  ): Promise<DeserializedProject["data"]["channels"]> {
     const v2ChannelArr = Object.values(v2Channels);
 
     const storageItems: StorageInput[] = v2ChannelArr.map((v2Ch) => ({
@@ -106,7 +127,7 @@ export class ProjectLoader implements IProjectLoader {
       throw new Error("Failed to store data in indexeddb");
     }
 
-    const channels: DeserializedProjectResult["data"]["channels"] =
+    const channels: DeserializedProject["data"]["channels"] =
       storageRes.data.map((res) => {
         const {
           data: _data,
@@ -120,6 +141,32 @@ export class ProjectLoader implements IProjectLoader {
       });
 
     return channels;
+  }
+
+  private async registerClassifiers(
+    modelFileMap: ExtractedModelFileMap,
+    onProgress: (p: number) => void,
+  ): Promise<void> {
+    const modelFileArr = Object.values(modelFileMap);
+    const failedModels: Record<string, { reason: string; err?: Error }> = {};
+    const models: SequentialClassifier[] = [];
+    let modelIdx = 0;
+    for (const modelFiles of modelFileArr) {
+      const uploadResult = await classifierHandler.modelFromFiles({
+        descFile: modelFiles.modelJson!,
+        weightsFiles: [modelFiles.modelWeights!],
+      });
+      if (uploadResult.success) models.push(uploadResult.model);
+      else {
+        /**
+         * TODO: failed models should halt project upload, but there needs to be a way
+         * TODO: to warn the user. Maybe a warning callback passed to the constructor
+         */
+        failedModels[uploadResult.modelName] = uploadResult.error;
+      }
+      onProgress(++modelIdx / modelFileArr.length);
+    }
+    classifierHandler.addModels(models);
   }
 
   // ============================================================
