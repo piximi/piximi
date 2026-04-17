@@ -19,7 +19,13 @@ import {
   V02RawAnnotationObject,
   V02RawImageObject,
 } from "../version-readers/version-types/v02Types";
+import { subProgress } from "../progress";
 
+const STAGES = {
+  labels: { start: 0.0, end: 0.2 },
+  images: { start: 0.2, end: 0.6 },
+  annotations: { start: 0.6, end: 1 },
+} as const;
 /**
  * Convert v0.1 project data to v0.2 format.
  *
@@ -32,8 +38,11 @@ import {
  * - Creates "Unknown" category per kind
  *
  */
-export function convertV01ToV02(v01: V01PiximiState): V02PiximiState {
-  const v02Data = v01_02_dataConverter(v01.data);
+export function convertV01ToV02(
+  v01: V01PiximiState,
+  onProgress: (p: number) => void,
+): V02PiximiState {
+  const v02Data = v01_02_dataConverter(v01.data, onProgress);
   return {
     project: v01.project,
     classifier: v01.classifier,
@@ -44,6 +53,7 @@ export function convertV01ToV02(v01: V01PiximiState): V02PiximiState {
 
 const v01_02_dataConverter = (
   data: V01PiximiState["data"],
+  onProgress: (p: number) => void,
 ): V02PiximiState["data"] => {
   const {
     images,
@@ -86,6 +96,7 @@ const v01_02_dataConverter = (
     categories,
     kinds,
   );
+  onProgress(STAGES.labels.end);
 
   convertImages(
     images,
@@ -94,6 +105,7 @@ const v01_02_dataConverter = (
     nonUnknownCategoryMap,
     things,
     categories,
+    subProgress(onProgress, STAGES.images),
   );
 
   const annCatNameMap = convertAnnotationCategories(
@@ -103,7 +115,8 @@ const v01_02_dataConverter = (
   );
 
   const numAnnotationsOfKindPerImage: Record<string, number> = {};
-
+  const annotationProgress = subProgress(onProgress, STAGES.annotations);
+  let i = 0;
   for (const v01Annotation of annotations) {
     const annotationKind =
       kinds.entities[annCatNameMap[v01Annotation.categoryId]];
@@ -154,6 +167,8 @@ const v01_02_dataConverter = (
     annotationKind.containing.push(v02Annotation.id);
 
     categories.entities[unknownCategoryId]!.containing.push(v02Annotation.id);
+    annotationProgress(i / annotations.length);
+    i++;
   }
 
   return { kinds, categories, things };
@@ -223,7 +238,9 @@ function convertImages(
   nonUnknownCategoryMap: Record<string, string>,
   newThings: V02PiximiState["data"]["things"],
   categories: V02PiximiState["data"]["categories"],
+  onProgress: (p: number) => void,
 ) {
+  let i = 0;
   for (const image of images) {
     image.kind = imageKind.id;
     imageKind.containing.push(image.id);
@@ -242,6 +259,8 @@ function convertImages(
     if (cat in categories.entities) {
       categories.entities[cat]!.containing.push(image.id);
     }
+    onProgress(i / images.length);
+    i++;
   }
 }
 

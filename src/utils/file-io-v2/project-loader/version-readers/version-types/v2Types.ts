@@ -4,7 +4,6 @@ import { ColorMap, DType } from "store/dataV2/types";
 import { ProjectState, SegmenterState } from "store/types";
 import { Partition } from "utils/models/enums";
 import { V11ClassifierState } from "./v11Types";
-import { RawData } from "../../types";
 
 export type V2Experiment = { id: string; name: string };
 

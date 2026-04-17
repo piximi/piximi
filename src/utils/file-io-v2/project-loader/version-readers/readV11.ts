@@ -9,12 +9,12 @@ import { initialState as initialProjectState } from "store/project/projectSlice"
 import { BitDepth } from "store/data/types";
 import { Partition } from "utils/models/enums";
 import { CustomStore } from "utils/file-io/zarr/stores";
-import { ProjectState } from "store/types";
 import { EntityState } from "@reduxjs/toolkit";
 
 import {
   V11Category,
   V11Kind,
+  V11PiximiState,
   V11RawAnnotationObject,
   V11RawImageObject,
 } from "./version-types/v11Types";
@@ -25,7 +25,15 @@ import {
   v11_v2_deserializeClassifierGroup,
 } from "./common";
 import { RawData } from "../types";
+import { subProgress } from "../progress";
 
+const STAGES = {
+  metadata: { start: 0.0, end: 0.05 },
+  things: { start: 0.05, end: 0.7 },
+  kinds: { start: 0.7, end: 0.8 },
+  categories: { start: 0.8, end: 0.9 },
+  models: { start: 0.9, end: 1.0 },
+} as const;
 /**
  * Read a v1.1 project file.
  *
@@ -39,65 +47,51 @@ import { RawData } from "../types";
  */
 export const readV11 = async (
   store: CustomStore,
-  onProgress: (progress: number) => void,
-) => {
+  onProgress: (p: number) => void,
+): Promise<V11PiximiState> => {
   const rootGroup = await openGroup(store, store.rootName, "r");
   const projectGroup = await getGroup(rootGroup, "project");
-  const { project, data } = await deserializeProjectGroup(
-    projectGroup,
-    onProgress,
+  const name = (await getAttr(projectGroup, "name")) as string;
+  const imageChannels = (await getAttr(projectGroup, "imageChannels")) as
+    | number
+    | string;
+  onProgress(STAGES.metadata.end);
+  const thingsGroup = await getGroup(projectGroup, "things");
+  const things = await deserializeThingsGroup(
+    thingsGroup,
+    subProgress(onProgress, STAGES.things),
   );
-  onProgress(90);
+
+  const kindsGroup = await getGroup(projectGroup, "kinds");
+  const kinds = await deserializeKindsGroup(kindsGroup);
+  onProgress(STAGES.kinds.end);
+  const categoriesGroup = await getGroup(projectGroup, "categories");
+  const categories = await deserializeCategoriesGroup(categoriesGroup);
+  onProgress(STAGES.categories.end);
   const classifierGroup = await getGroup(rootGroup, "classifier");
   const classifier = await v11_v2_deserializeClassifierGroup(classifierGroup);
 
   const segmenterGroup = await getGroup(rootGroup, "segmenter");
   const segmenter = await deserializeSegmenterGroup(segmenterGroup);
-  onProgress(100);
+  onProgress(STAGES.models.end);
   import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
     logger(`closed ${store.rootName}`);
 
-  return { project, classifier, segmenter, data };
-};
-
-const deserializeProjectGroup = async (
-  projectGroup: Group,
-  onProgress: (progress: number) => void,
-): Promise<{
-  project: ProjectState;
-  data: {
-    things: EntityState<V11RawImageObject | V11RawAnnotationObject, string>;
-    categories: EntityState<V11Category, string>;
-    kinds: EntityState<V11Kind, string>;
-  };
-}> => {
-  const name = (await getAttr(projectGroup, "name")) as string;
-  const imageChannels = (await getAttr(projectGroup, "imageChannels")) as
-    | number
-    | string;
-  onProgress(15);
-  const thingsGroup = await getGroup(projectGroup, "things");
-  const things = await deserializeThingsGroup(thingsGroup, onProgress);
-  onProgress(80);
-  const kindsGroup = await getGroup(projectGroup, "kinds");
-  const kinds = await deserializeKindsGroup(kindsGroup);
-  onProgress(82);
-  const categoriesGroup = await getGroup(projectGroup, "categories");
-  const categories = await deserializeCategoriesGroup(categoriesGroup);
-  onProgress(85);
   return {
-    project: {
-      ...initialProjectState,
-      name,
-      imageChannels: imageChannels === "undefined" ? undefined : +imageChannels,
+    project: { ...initialProjectState, name, imageChannels: +imageChannels },
+    classifier,
+    segmenter,
+    data: {
+      things,
+      kinds,
+      categories,
     },
-    data: { things, kinds, categories },
   };
 };
 
 const deserializeThingsGroup = async (
   thingsGroup: Group,
-  onProgress: (progress: number) => void,
+  onProgress: (p: number) => void,
 ) => {
   const thingNames = (await getAttr(thingsGroup, "thing_names")) as string[];
 
@@ -110,9 +104,6 @@ const deserializeThingsGroup = async (
   };
 
   for (const [i, name] of Object.entries(thingNames)) {
-    // import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-    //   logger(`deserializing image ${+i + 1}/${thingNames.length}`);
-
     const thingGroup = await getGroup(thingsGroup, name);
     const id = (await getAttr(thingGroup, "thing_id")) as string;
     const activePlane = (await getAttr(thingGroup, "active_plane")) as number;
@@ -177,45 +168,10 @@ const deserializeThingsGroup = async (
     }
     things.ids.push(completedThing.id);
     things.entities[completedThing.id] = completedThing;
-    onProgress(15 + Math.floor((+i / thingNames.length) * 75));
+    onProgress(+i / thingNames.length);
   }
-
-  // final image complete
 
   return things;
-};
-const deserializeCategoriesGroup = async (
-  categoriesGroup: Group,
-): Promise<EntityState<V11Category, string>> => {
-  const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
-  const colors = (await getAttr(categoriesGroup, "color")) as string[];
-  const names = (await getAttr(categoriesGroup, "name")) as string[];
-  const kinds = (await getAttr(categoriesGroup, "kind")) as string[];
-  const contents = (await getAttr(categoriesGroup, "contents")) as string[][];
-
-  if (ids.length !== colors.length || ids.length !== names.length) {
-    throw Error(
-      `Expected categories group "${categoriesGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`,
-    );
-  }
-
-  const categories: EntityState<V11Category, string> = {
-    ids: [],
-    entities: {},
-  };
-  for (let i = 0; i < ids.length; i++) {
-    categories.ids.push(ids[i]);
-    categories.entities[ids[i]] = {
-      id: ids[i],
-      color: colors[i],
-      name: names[i],
-      kind: kinds[i],
-      containing: contents[i],
-      visible: true,
-    } as V11Category;
-  }
-
-  return categories;
 };
 
 const deserializeKindsGroup = async (
@@ -251,4 +207,38 @@ const deserializeKindsGroup = async (
   }
 
   return kinds;
+};
+
+const deserializeCategoriesGroup = async (
+  categoriesGroup: Group,
+): Promise<EntityState<V11Category, string>> => {
+  const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
+  const colors = (await getAttr(categoriesGroup, "color")) as string[];
+  const names = (await getAttr(categoriesGroup, "name")) as string[];
+  const kinds = (await getAttr(categoriesGroup, "kind")) as string[];
+  const contents = (await getAttr(categoriesGroup, "contents")) as string[][];
+
+  if (ids.length !== colors.length || ids.length !== names.length) {
+    throw Error(
+      `Expected categories group "${categoriesGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`,
+    );
+  }
+
+  const categories: EntityState<V11Category, string> = {
+    ids: [],
+    entities: {},
+  };
+  for (let i = 0; i < ids.length; i++) {
+    categories.ids.push(ids[i]);
+    categories.entities[ids[i]] = {
+      id: ids[i],
+      color: colors[i],
+      name: names[i],
+      kind: kinds[i],
+      containing: contents[i],
+      visible: true,
+    } as V11Category;
+  }
+
+  return categories;
 };

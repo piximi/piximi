@@ -25,6 +25,13 @@ import { Image as IJSImage } from "image-js-latest";
 import { processChannel } from "utils/channelUtils";
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
 import { BitDepth } from "store/data/types";
+import { subProgress } from "../progress";
+
+const STAGES = {
+  kinds: { start: 0, end: 0.1 },
+  categories: { start: 0.1, end: 0.2 },
+  things: { start: 0.2, end: 1 },
+} as const;
 
 /**
  * Convert v1.1 project data to v2 format.
@@ -33,21 +40,27 @@ import { BitDepth } from "store/data/types";
  * - Data section (things, categories, kinds) gets split up into ImageSeries, Images, Channels, etc.
  *
  */
-export function convertV11ToV2(v11: V11PiximiState): V2PiximiState {
+export function convertV11ToV2(
+  v11: V11PiximiState,
+  onProgress: (p: number) => void,
+): V2PiximiState {
   const experiment: V2Experiment = {
     id: generateUUID(),
     name: v11.project.name,
   };
   const { things, kinds, categories } = v11.data;
   const v2Kinds = convertKinds(Object.values(kinds.entities));
+  onProgress(STAGES.kinds.end);
   const v2Categories = convertCategories(
     kinds.entities,
     Object.values(categories.entities),
   );
+  onProgress(STAGES.categories.end);
   const v2Data = convertThings(
     experiment.id,
     kinds.entities,
     Object.values(things.entities),
+    subProgress(onProgress, STAGES.things),
   );
   return {
     project: v11.project,
@@ -101,6 +114,7 @@ function convertThings(
   experimentId: string,
   v11Kinds: Record<string, V11Kind>,
   things: Array<V11RawImageObject | V11RawAnnotationObject>,
+  onProgress: (p: number) => void,
 ): Omit<V2DataState, "kinds" | "categories" | "experiment"> {
   const v2ImageSeries: EntityState<V2ImageSeries, string> = {
     ids: [],
@@ -148,6 +162,7 @@ function convertThings(
   });
 
   const planeIdx2planeId: Record<string, Record<number, string>> = {};
+  let imageIdx = 0;
   for (const image of v11Images) {
     const bitDepth = image.bitDepth;
     const { buffer, shape, dtype } = image.tensorData;
@@ -237,8 +252,10 @@ function convertThings(
       }
       planeIdx++;
     }
+    onProgress((0.4 * imageIdx) / v11Images.length);
+    imageIdx++;
   }
-
+  let annIdx = 0;
   for (const ann of v11Annotations) {
     const imageId = ann.imageId;
     const planeId = planeIdx2planeId[imageId][ann.plane];
@@ -260,6 +277,8 @@ function convertThings(
       boundingBox: ann.boundingBox,
       encodedMask: ann.encodedMask,
     });
+    onProgress(0.4 + (0.2 * annIdx) / v11Annotations.length);
+    annIdx++;
   }
   return {
     imageSeries: v2ImageSeries,

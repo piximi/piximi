@@ -25,6 +25,84 @@ import {
   deserializeSegmenterGroup,
   v01_02_deserializeClassifierGroup,
 } from "./common";
+import { subProgress } from "../progress";
+
+const STAGES = {
+  metadata: { start: 0.0, end: 0.05 },
+  images: { start: 0.05, end: 0.425 },
+  annotations: { start: 0.425, end: 0.8 },
+  categories: { start: 0.8, end: 0.9 },
+  models: { start: 0.9, end: 1.0 },
+} as const;
+
+// ============================================================
+// Public reader
+// ============================================================
+
+export async function readV01(
+  store: CustomStore,
+  onProgress: (p: number) => void,
+): Promise<V01PiximiState> {
+  const rootGroup = await openGroup(store, store.rootName, "r");
+  const projectGroup = await getGroup(rootGroup, "project");
+
+  const projectName = (await getAttr(projectGroup, "name")) as string;
+  onProgress(STAGES.metadata.end);
+
+  // --- Images ---
+  const imagesGroup = await getGroup(projectGroup, "images");
+  const imageNames = (await getAttr(
+    imagesGroup,
+    ZARR_V01_IMAGE.ImageNames,
+  )) as string[];
+  const images: V01RawImageObject[] = [];
+
+  const imageProgress = subProgress(onProgress, STAGES.images);
+
+  for (const [i, name] of Object.entries(imageNames)) {
+    const imageGroup = await getGroup(imagesGroup, name);
+    const image = await deserializeImageGroup(name, imageGroup);
+    images.push(image);
+    imageProgress(+i / images.length);
+  }
+
+  // --- Annotations ---
+  const annotationsGroup = await getGroup(projectGroup, "annotations");
+  const annotations = await deserializeAnnotationsGroup(
+    annotationsGroup,
+    subProgress(onProgress, STAGES.annotations),
+  );
+
+  // --- Categories ---
+  const categoriesGroup = await getGroup(projectGroup, "categories");
+  const categories = await deserializeCategoriesGroup(categoriesGroup);
+  const annotationCategoriesGroup = await getGroup(
+    projectGroup,
+    "annotationCategories",
+  );
+
+  const annotationCategories = await deserializeCategoriesGroup(
+    annotationCategoriesGroup,
+  );
+  onProgress(STAGES.categories.end);
+  const classifierGroup = await getGroup(rootGroup, "classifier");
+  const classifier = await v01_02_deserializeClassifierGroup(classifierGroup);
+  const segmenterGroup = await getGroup(rootGroup, "segmenter");
+  const segmenter = await deserializeSegmenterGroup(segmenterGroup);
+
+  onProgress(STAGES.models.end);
+
+  return {
+    project: {
+      ...initialProjectState,
+      name: projectName,
+      imageChannels: images[0]?.shape.channels,
+    },
+    classifier,
+    segmenter,
+    data: { images, annotations, categories, annotationCategories },
+  };
+}
 
 // ============================================================
 // Image deserialization
@@ -94,6 +172,7 @@ async function deserializeImageGroup(
  */
 async function deserializeAnnotationsGroup(
   _annotationsGroup: Group,
+  onProgress: (p: number) => void,
 ): Promise<V01RawAnnotationObject[]> {
   const imageIds = (await getAttr(_annotationsGroup, "image_id")) as string[];
 
@@ -142,6 +221,7 @@ async function deserializeAnnotationsGroup(
 
     bboxIdx += 4;
     maskIdx += maskLengths[i];
+    onProgress(i / ids.length);
   }
 
   return annotations;
@@ -164,70 +244,4 @@ async function deserializeCategoriesGroup(
     name: names[i],
     visible: true,
   }));
-}
-
-// ============================================================
-// Public reader
-// ============================================================
-
-export async function readV01(
-  store: CustomStore,
-  onProgress: (progress: number) => void,
-): Promise<V01PiximiState> {
-  const rootGroup = await openGroup(store, store.rootName, "r");
-  const projectGroup = await getGroup(rootGroup, "project");
-
-  const projectName = (await getAttr(projectGroup, "name")) as string;
-  onProgress(11);
-
-  // --- Images ---
-  const imagesGroup = await getGroup(projectGroup, "images");
-  const imageNames = (await getAttr(
-    imagesGroup,
-    ZARR_V01_IMAGE.ImageNames,
-  )) as string[];
-  const images: V01RawImageObject[] = [];
-
-  for (const [i, name] of Object.entries(imageNames)) {
-    const imageGroup = await getGroup(imagesGroup, name);
-    const image = await deserializeImageGroup(name, imageGroup);
-    images.push(image);
-    onProgress(11 + Math.floor((+i / imageNames.length) * 49));
-  }
-  onProgress(50);
-
-  // --- Annotations ---
-  const annotationsGroup = await getGroup(projectGroup, "annotations");
-  const annotations = await deserializeAnnotationsGroup(annotationsGroup);
-  onProgress(75);
-
-  // --- Categories ---
-  const categoriesGroup = await getGroup(projectGroup, "categories");
-  const categories = await deserializeCategoriesGroup(categoriesGroup);
-  const annotationCategoriesGroup = await getGroup(
-    projectGroup,
-    "annotationCategories",
-  );
-  onProgress(80);
-  const annotationCategories = await deserializeCategoriesGroup(
-    annotationCategoriesGroup,
-  );
-  onProgress(90);
-  const classifierGroup = await getGroup(rootGroup, "classifier");
-  const classifier = await v01_02_deserializeClassifierGroup(classifierGroup);
-  const segmenterGroup = await getGroup(rootGroup, "segmenter");
-  const segmenter = await deserializeSegmenterGroup(segmenterGroup);
-
-  onProgress(100);
-
-  return {
-    project: {
-      ...initialProjectState,
-      name: projectName,
-      imageChannels: images[0]?.shape.channels,
-    },
-    classifier,
-    segmenter,
-    data: { images, annotations, categories, annotationCategories },
-  };
 }

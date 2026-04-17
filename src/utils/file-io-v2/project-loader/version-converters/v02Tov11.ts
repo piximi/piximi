@@ -21,9 +21,13 @@ import {
  *   (V11 data types are identical to V02)
  *
  */
-export function convertV02ToV11(v02: V02PiximiState): V11PiximiState {
+export function convertV02ToV11(
+  v02: V02PiximiState,
+  onProgress: (p: number) => void,
+): V11PiximiState {
   const { classifier: oldClassifier, data } = v02;
   const classifier = v02_11_classifierConverter(oldClassifier, data.kinds.ids);
+  onProgress(1);
   return {
     project: v02.project,
     data: v02.data,

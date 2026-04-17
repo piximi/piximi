@@ -20,7 +20,15 @@ import {
 } from "./common";
 import { Partition } from "utils/models/enums";
 import { RawData } from "../types";
+import { subProgress } from "../progress";
 
+const STAGES = {
+  metadata: { start: 0.0, end: 0.05 },
+  things: { start: 0.05, end: 0.7 },
+  kinds: { start: 0.7, end: 0.8 },
+  categories: { start: 0.8, end: 0.9 },
+  models: { start: 0.9, end: 1.0 },
+} as const;
 /**
  * Read a v0.2 project file.
  *
@@ -36,55 +44,136 @@ import { RawData } from "../types";
  */
 export const readV02 = async (
   fileStore: CustomStore,
-  onProgress: (progress: number) => void,
+  onProgress: (p: number) => void,
 ): Promise<V02PiximiState> => {
   const rootGroup = await openGroup(fileStore, fileStore.rootName, "r");
   const projectGroup = await getGroup(rootGroup, "project");
-  const { project, data } = await deserializeProjectGroup(
-    projectGroup,
-    onProgress,
-  );
-  onProgress(90);
-  const classifierGroup = await getGroup(rootGroup, "classifier");
-  const classifier = await v01_02_deserializeClassifierGroup(classifierGroup);
-
-  const segmenterGroup = await getGroup(rootGroup, "segmenter");
-  const segmenter = await deserializeSegmenterGroup(segmenterGroup);
-  onProgress(100);
-  import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-    logger(`closed ${fileStore.rootName}`);
-
-  return { project, classifier, segmenter, data };
-};
-
-const deserializeProjectGroup = async (
-  projectGroup: Group,
-  onProgress: (value: number) => void,
-): Promise<Omit<V02PiximiState, "classifier" | "segmenter">> => {
   const name = (await getAttr(projectGroup, "name")) as string;
   const imageChannels = (await getAttr(
     projectGroup,
     "imageChannels",
   )) as number;
-  onProgress(15);
+  onProgress(STAGES.metadata.end);
   const thingsGroup = await getGroup(projectGroup, "things");
-  const things = await deserializeThingsGroup(thingsGroup, onProgress);
-  onProgress(80);
+  const things = await deserializeThingsGroup(
+    thingsGroup,
+    subProgress(onProgress, STAGES.things),
+  );
   const kindsGroup = await getGroup(projectGroup, "kinds");
   const kinds = await deserializeKindsGroup(kindsGroup);
-  onProgress(82);
+  onProgress(STAGES.kinds.end);
   const categoriesGroup = await getGroup(projectGroup, "categories");
   const categories = await deserializeCategoriesGroup(categoriesGroup);
-  onProgress(85);
+  onProgress(STAGES.categories.end);
+
+  const classifierGroup = await getGroup(rootGroup, "classifier");
+  const classifier = await v01_02_deserializeClassifierGroup(classifierGroup);
+
+  const segmenterGroup = await getGroup(rootGroup, "segmenter");
+  const segmenter = await deserializeSegmenterGroup(segmenterGroup);
+  onProgress(STAGES.models.end);
+  import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+    logger(`closed ${fileStore.rootName}`);
 
   return {
-    project: {
-      ...initialProjectState,
-      name,
-      imageChannels,
+    project: { ...initialProjectState, name, imageChannels },
+    classifier,
+    segmenter,
+    data: {
+      things,
+      kinds,
+      categories,
     },
-    data: { things, kinds, categories },
   };
+};
+
+const deserializeThingsGroup = async (
+  thingsGroup: Group,
+  onProgress: (p: number) => void,
+) => {
+  const thingNames = (await getAttr(thingsGroup, "thing_names")) as string[];
+
+  const things: EntityState<
+    V02RawImageObject | V02RawAnnotationObject,
+    string
+  > = {
+    ids: [],
+    entities: {},
+  };
+
+  for (const [i, name] of Object.entries(thingNames)) {
+    const thingGroup = await getGroup(thingsGroup, name);
+    const id = (await getAttr(thingGroup, "thing_id")) as string;
+    const activePlane = (await getAttr(thingGroup, "active_plane")) as number;
+    const categoryId = (await getAttr(
+      thingGroup,
+      "class_category_id",
+    )) as string;
+    const partition = (await getAttr(
+      thingGroup,
+      "classifier_partition",
+    )) as Partition;
+    const kind = (await getAttr(thingGroup, "kind")) as string;
+
+    const thingDataset = await getDataset(thingGroup, name);
+    const rawArray = (await thingDataset.getRaw()) as RawArray;
+    const data = rawArray.data as Float32Array;
+    const [planes, height, width, channels] = rawArray.shape;
+    const bitDepth = (await getAttr(thingDataset, "bit_depth")) as BitDepth;
+
+    const tensorData: RawData = {
+      buffer: data.buffer as ArrayBuffer,
+      dtype: "float32",
+      shape: rawArray.shape as [number, number, number, number],
+    };
+    const thing = {
+      id,
+      name,
+      kind,
+      activePlane,
+      categoryId,
+      partition,
+      bitDepth,
+      shape: {
+        planes,
+        height,
+        width,
+        channels,
+      },
+      tensorData,
+    };
+    let completedThing: V02RawImageObject | V02RawAnnotationObject;
+    if (kind === "Image") {
+      const colorsGroup = await getGroup(thingGroup, "colors");
+      const colors = await deserializeColorsRaw(colorsGroup);
+
+      const contents = (await getAttr(thingGroup, "contents")) as string[];
+
+      completedThing = { ...thing, colors, containing: contents };
+    } else {
+      const boundingBox = (await getAttr(thingGroup, "bbox")) as [
+        number,
+        number,
+        number,
+        number,
+      ];
+      const encodedMask = (await getAttr(thingGroup, "mask")) as number[];
+      const plane = (await getAttr(thingGroup, "activePlane")) as number;
+      const imageId = (await getAttr(thingGroup, "image_id")) as string;
+      completedThing = {
+        ...thing,
+        boundingBox,
+        encodedMask,
+        imageId,
+        plane,
+      };
+    }
+    things.ids.push(completedThing.id);
+    things.entities[completedThing.id] = completedThing;
+    onProgress(+i / thingNames.length);
+  }
+
+  return things;
 };
 
 const deserializeKindsGroup = async (
@@ -154,107 +243,4 @@ const deserializeCategoriesGroup = async (
   }
 
   return categories;
-};
-
-const deserializeThingsGroup = async (
-  thingsGroup: Group,
-  onProgress: (value: number) => void,
-) => {
-  const thingNames = (await getAttr(thingsGroup, "thing_names")) as string[];
-
-  const things: EntityState<
-    V02RawImageObject | V02RawAnnotationObject,
-    string
-  > = {
-    ids: [],
-    entities: {},
-  };
-
-  for (const [i, name] of Object.entries(thingNames)) {
-    // import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-    //   logger(`deserializing image ${+i + 1}/${thingNames.length}`);
-
-    const thingGroup = await getGroup(thingsGroup, name);
-    const thing = await deserializeThingGroup(name, thingGroup);
-    onProgress(15 + Math.floor((+i / thingNames.length) * 75));
-    things.ids.push(thing.id);
-    things.entities[thing.id] = thing;
-  }
-
-  // final image complete
-
-  return things;
-};
-
-const deserializeThingGroup = async (
-  name: string,
-  thingGroup: Group,
-): Promise<V02RawImageObject | V02RawAnnotationObject> => {
-  const id = (await getAttr(thingGroup, "thing_id")) as string;
-  const activePlane = (await getAttr(thingGroup, "active_plane")) as number;
-  const categoryId = (await getAttr(thingGroup, "class_category_id")) as string;
-  const partition = (await getAttr(
-    thingGroup,
-    "classifier_partition",
-  )) as Partition;
-  const kind = (await getAttr(thingGroup, "kind")) as string;
-  // const classifierPartition = (await getAttr(
-  //   imageGroup,
-  //   "classifier_partition"
-  // )) as Partition;
-
-  const thingDataset = await getDataset(thingGroup, name);
-  const rawArray = (await thingDataset.getRaw()) as RawArray;
-  const data = rawArray.data as Float32Array;
-  const [planes, height, width, channels] = rawArray.shape;
-  const bitDepth = (await getAttr(thingDataset, "bit_depth")) as BitDepth;
-
-  const tensorData: RawData = {
-    buffer: data.buffer as ArrayBuffer,
-    dtype: "float32",
-    shape: rawArray.shape as [number, number, number, number],
-  };
-  const thing = {
-    id,
-    name,
-    kind,
-    activePlane,
-    categoryId,
-    partition,
-    bitDepth,
-    shape: {
-      planes,
-      height,
-      width,
-      channels,
-    },
-    tensorData,
-  };
-
-  if (kind === "Image") {
-    const colorsGroup = await getGroup(thingGroup, "colors");
-    const colors = await deserializeColorsRaw(colorsGroup);
-
-    const contents = (await getAttr(thingGroup, "contents")) as string[];
-
-    return { ...thing, colors, containing: contents };
-  } else {
-    const boundingBox = (await getAttr(thingGroup, "bbox")) as [
-      number,
-      number,
-      number,
-      number,
-    ];
-    const encodedMask = (await getAttr(thingGroup, "mask")) as number[];
-    const plane = (await getAttr(thingGroup, "activePlane")) as number;
-    const imageId = (await getAttr(thingGroup, "image_id")) as string;
-
-    return {
-      ...thing,
-      boundingBox,
-      encodedMask,
-      imageId,
-      plane,
-    };
-  }
 };
