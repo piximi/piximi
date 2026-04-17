@@ -52,6 +52,16 @@ export type TaskError = {
   error: Error;
   recoverable: boolean;
 };
+
+export const INITIAL_PROGRESS: Progress = {
+  stage: "idle",
+  stageProgress: 0,
+  overallProgress: 0,
+  processedCount: 0,
+  totalCount: 0,
+  errors: new Map<string, TaskError[]>(),
+  warnings: [],
+};
 export type Progress = {
   stage: string;
   stageProgress: number; // 0-100 for current stage
