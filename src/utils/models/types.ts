@@ -125,8 +125,15 @@ export type SegmenterEvaluationResultType = {
   diceScore: number;
 };
 
-export type ModelData = {
+export type ExtractedModelFile = {
+  modelJson?: File;
+  modelWeights?: File;
+};
+
+export type ExtractedModelFileMap = Record<string, ExtractedModelFile>;
+
+export type SerializedModelData = {
   modelJson: { blob: Blob; fileName: string };
   modelWeights: { blob: Blob; fileName: string };
 };
-export type SerializedModels = Record<string, ModelData>;
+export type SerializedModels = Record<string, SerializedModelData>;

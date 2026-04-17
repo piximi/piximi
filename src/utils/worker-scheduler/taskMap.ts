@@ -3,6 +3,10 @@ import {
   LoadAndPrepareOutput,
   StageName,
 } from "utils/file-io-v2/file-loader/types";
+import {
+  LoadProjectInput,
+  LoadProjectOutput,
+} from "utils/file-io-v2/project-loader/types";
 
 type OnProgressCallback<TExtra = object> = (
   args: { value: number } & TExtra,
@@ -13,5 +17,11 @@ export interface TaskMap {
     result: LoadAndPrepareOutput;
     onProgress?: OnProgressCallback<{ stage: StageName }>;
     onComplete?: (result?: LoadAndPrepareOutput) => void;
+  };
+  loadProject: {
+    payload: LoadProjectInput;
+    result: LoadProjectOutput;
+    onProgress?: OnProgressCallback<object>;
+    onComplete?: (result?: LoadProjectOutput) => void;
   };
 }

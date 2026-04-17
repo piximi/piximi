@@ -7,7 +7,7 @@ import { logger } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
 import { ModelTask } from "../enums";
 import { getUniqueName } from "utils/stringUtils";
-import { SerializedModels } from "../types";
+import { ExtractedModelFileMap, SerializedModels } from "../types";
 
 export type ModelUploadResults = {
   loadedModels: SequentialClassifier[];
@@ -162,6 +162,41 @@ class ClassifierHandler {
       };
     }
     return { loadedModels, failedModels };
+  }
+
+  public async extractModelsFromZip(
+    zip: JSZip,
+  ): Promise<ExtractedModelFileMap> {
+    const modelFileRegEx = new RegExp(".json$|.weights.bin$");
+    const models: ExtractedModelFileMap = {};
+    for await (const [fileName, file] of Object.entries(zip.files)) {
+      if (!modelFileRegEx.test(fileName)) continue;
+
+      const parsedFileName = fileName.split(".");
+      const modelName = parsedFileName[0];
+      const extension = parsedFileName.at(1);
+
+      const fileBuffer = await file.async("arraybuffer");
+      if (extension === "json") {
+        if (modelName in models && "modelJson" in models[modelName]) {
+          logger(`Duplicate '.${extension}' file for ${modelName}`, {
+            level: "warn",
+          });
+        }
+        const modelFile = new File([fileBuffer], fileName, {
+          type: "application/json",
+        });
+        recursiveAssign(models, {
+          [modelName]: { modelJson: modelFile },
+        });
+      } else {
+        const modelFile = new File([fileBuffer], fileName, {
+          type: "application.octet-stream",
+        });
+        recursiveAssign(models, { [modelName]: { modelWeights: modelFile } });
+      }
+    }
+    return models;
   }
   public async modelsFromZip(zip: JSZip) {
     const modelFileRegEx = new RegExp(".json$|.weights.bin$");

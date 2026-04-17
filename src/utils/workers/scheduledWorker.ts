@@ -8,9 +8,11 @@ import "./workerPolyfills"; // Must be first — polyfills `window` for zarr/imj
 
 import * as Comlink from "comlink";
 import { loadImage } from "utils/file-io-v2/file-loader/loadImage";
+import { loadProject } from "utils/file-io-v2/project-loader/loadProject";
 
 const taskRegistry: TaskRegistry = {
   loadImage: async (payload, ct, prog) => loadImage(payload, ct, prog),
+  loadProject: async (payload, ct, prog) => loadProject(payload, ct, prog),
 };
 const scheduledWorkerAPI: IScheduledWorkerAPI = {
   async execute(type, payload, cancelToken, onProgress) {
