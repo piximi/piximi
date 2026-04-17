@@ -15,7 +15,7 @@ import {
   UploadOptionswithCallbacks,
 } from "utils/file-io-v2/file-loader/types";
 
-type UseUploadPipelineReturn = {
+type UseFileLoaderReturn = {
   upload: (
     files: FileList,
     options?: UploadOptionswithCallbacks,
@@ -36,7 +36,7 @@ type UseUploadPipelineReturn = {
  * Calls DataPipelineService for worker-based processing,
  * then dispatches the results to Redux
  */
-export function useFileLoader(): UseUploadPipelineReturn {
+export function useFileLoader(): UseFileLoaderReturn {
   const dispatch = useDispatch();
   const scheduler = useScheduler();
   const experiment = useSelector(selectExperiment);
