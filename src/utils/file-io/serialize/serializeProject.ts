@@ -196,6 +196,7 @@ const serializePreprocessOptions = async (
   preprocessSettings: PreprocessSettings,
 ) => {
   const { planes, height, width, channels } = preprocessSettings.inputShape;
+  //TODO: Should be Uint16Array, not Uint8. width and height can be larger than 255x255, idiot
   await writeArray(
     preprocessOptionsGroup,
     "input_shape",
