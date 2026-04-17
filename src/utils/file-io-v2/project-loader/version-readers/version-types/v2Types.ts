@@ -61,7 +61,8 @@ export type V2Channel = {
   channelMetaId: string;
   name: string;
   dtype: DType;
-  data: RawData;
+  histogram: ArrayBuffer;
+  data: ArrayBuffer;
   bitDepth: BitDepth;
   width: number;
   height: number;
