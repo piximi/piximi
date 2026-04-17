@@ -1,6 +1,7 @@
 import { useScheduler } from "contexts/worker-scheduler";
 import { useCallback, useState } from "react";
 import { batch, useDispatch } from "react-redux";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { AppTask } from "store/appTasks/types";
 import { classifierSlice } from "store/classifier";
@@ -8,11 +9,12 @@ import { generateUUID } from "store/data/utils";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";
+import { AlertType } from "utils/enums";
 import { ProjectLoader } from "utils/file-io-v2/project-loader/ProjectLoader";
-import { DeserializedProjectResult } from "utils/file-io-v2/project-loader/types";
+import { AlertState } from "utils/types";
 
 type UseProjectLoaderReturn = {
-  loadProject: (files: FileList) => Promise<DeserializedProjectResult>;
+  loadProject: (files: FileList) => Promise<void>;
   isLoading: boolean;
 };
 
@@ -28,7 +30,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
   const [isLoading, setIsLoading] = useState(false);
 
   const loadProject = useCallback(
-    async (files: FileList): Promise<DeserializedProjectResult> => {
+    async (files: FileList): Promise<void> => {
       setIsLoading(true);
       try {
         // 1. Run the pipeline (workers + IndexDB)
@@ -62,8 +64,19 @@ export function useProjectLoader(): UseProjectLoaderReturn {
                 error: result.error.message,
               }),
             );
+            const warning: AlertState = {
+              alertType: AlertType.Warning,
+              name: "Could not parse project file",
+              description: `Error while parsing the project file: ${result.error.name}\n${result.error.message}`,
+            };
+
+            dispatch(
+              applicationSettingsSlice.actions.updateAlertState({
+                alertState: warning,
+              }),
+            );
           }
-          return result;
+          return;
         }
         const { project, data, classifier, segmenter } = result.project;
 
@@ -88,8 +101,6 @@ export function useProjectLoader(): UseProjectLoaderReturn {
         });
 
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
-
-        return result;
       } finally {
         setIsLoading(false);
       }
