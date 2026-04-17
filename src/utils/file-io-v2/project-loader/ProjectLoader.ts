@@ -88,7 +88,6 @@ export class ProjectLoader implements IProjectLoader {
           channels,
           annotations: Object.values(v2Data.annotations),
         },
-        modelFiles,
       };
 
       return { success: true, project: piximiState };

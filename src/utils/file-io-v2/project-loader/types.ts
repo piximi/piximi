@@ -69,7 +69,6 @@ export type DeserializedProject = {
     channels: Channel[];
     annotations: AnnotationObject[];
   };
-  modelFiles: ExtractedModelFileMap;
 };
 export type DeserializedProjectResult =
   | {
