@@ -47,28 +47,28 @@ export const LocalClassifierUpload = ({
       results = await classifierHandler.modelsFromZip(zipFile);
     } else {
       const weightsFiles: Array<File> = [];
-      let jsonFile: File | undefined;
+      let descFile: File | undefined;
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         if (file.name.endsWith(".json")) {
-          jsonFile = file;
+          descFile = file;
         } else {
           weightsFiles.push(file);
         }
       }
 
-      if (!jsonFile || weightsFiles.length === 0) {
+      if (!descFile || weightsFiles.length === 0) {
         setErrMessage(
           "Must include model description (.json) and at least one weights file (.bin)",
         );
         return;
       }
 
-      results = await classifierHandler.modelFromFiles(
-        jsonFile,
+      results = await classifierHandler.modelFromFiles({
+        descFile,
         weightsFiles,
         isGraph,
-      );
+      });
       setErrMessage("");
     }
     if (!isObjectEmpty(results.failedModels)) {

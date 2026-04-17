@@ -169,20 +169,22 @@ it("predict", async () => {
     path.join(__dirname, "data/mnist_classifier/mnist_classifier.weights.bin"),
   );
 
-  const jsonFile = new File(
+  const descFile = new File(
     [new Blob([new Uint8Array(jsonFileBuffer)])],
     "mnist_classifier.json",
   );
-  const weightsFile = new File(
-    [new Blob([new Uint8Array(weightsFileBuffer)])],
-    "mnist_classifier.weights.bin",
-  );
+  const weightsFiles = [
+    new File(
+      [new Blob([new Uint8Array(weightsFileBuffer)])],
+      "mnist_classifier.weights.bin",
+    ),
+  ];
 
-  const modelResults = await classifierHandler.modelFromFiles(
-    jsonFile,
-    [weightsFile],
-    false,
-  );
+  const modelResults = await classifierHandler.modelFromFiles({
+    descFile,
+    weightsFiles,
+    isGraph: false,
+  });
   const model = modelResults.loadedModels[0];
   expect(model).toBeDefined();
   model.loadInference(inferrenceImages, categories);

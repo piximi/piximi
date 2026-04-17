@@ -102,23 +102,24 @@ class ClassifierHandler {
     });
     this._availableClassificationModels = {};
   }
-  public async modelFromFiles(
-    descFile: File,
-    weightsFiles: File[],
-    isGraph?: boolean,
-    modelName?: string,
-  ) {
+  public async modelFromFiles(input: {
+    descFile: File;
+    weightsFiles: File[];
+    isGraph?: boolean;
+    modelName?: string;
+  }) {
     const failedModels: Record<string, { reason: string; err?: Error }> = {};
     const loadedModels: SequentialClassifier[] = [];
-    modelName = modelName ?? descFile.name.replace(/\..+$/, "");
+    const modelName =
+      input.modelName ?? input.descFile.name.replace(/\..+$/, "");
     const uniqueName = getUniqueName(modelName, this.getModelNames());
 
     const model = new UploadedClassifier({
-      descFile,
-      weightsFiles,
+      descFile: input.descFile,
+      weightsFiles: input.weightsFiles,
       name: uniqueName,
       task: ModelTask.Classification,
-      graph: !!isGraph,
+      graph: !!input.isGraph,
       pretrained: true,
       trainable: true,
     });
@@ -249,7 +250,10 @@ class ClassifierHandler {
           reason: "Missing '.bin' weights file.",
         };
       } else {
-        const result = await this.modelFromFiles(modelJson, [modelWeights]);
+        const result = await this.modelFromFiles({
+          descFile: modelJson,
+          weightsFiles: [modelWeights],
+        });
         loadedModels.push(...result.loadedModels);
         Object.assign(failedModels, result.failedModels);
       }
