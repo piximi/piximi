@@ -3,7 +3,7 @@ import { SequentialClassifier } from "./AbstractClassifier";
 import { RemoteClassifier, UploadedClassifier } from "./UploadedClassifier";
 import { MobileNet } from "./MobileNet";
 import { SimpleCNN } from "./SimpleCNN";
-import { logger } from "utils/logUtils";
+import { logger, parseError } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
 import { ModelTask } from "../enums";
 import { getUniqueName } from "utils/stringUtils";
@@ -107,9 +107,14 @@ class ClassifierHandler {
     weightsFiles: File[];
     isGraph?: boolean;
     modelName?: string;
-  }) {
-    const failedModels: Record<string, { reason: string; err?: Error }> = {};
-    const loadedModels: SequentialClassifier[] = [];
+  }): Promise<
+    | { success: true; model: SequentialClassifier }
+    | {
+        success: false;
+        modelName: string;
+        error: { reason: string; err?: Error };
+      }
+  > {
     const modelName =
       input.modelName ?? input.descFile.name.replace(/\..+$/, "");
     const uniqueName = getUniqueName(modelName, this.getModelNames());
@@ -125,14 +130,14 @@ class ClassifierHandler {
     });
     try {
       await model.upload();
-      loadedModels.push(model);
+      return { success: true, model };
     } catch (err) {
-      failedModels[modelName] = {
-        reason: "Model upload failed",
-        err: err as Error,
+      return {
+        success: false,
+        modelName,
+        error: { reason: "Failed to upload model", err: parseError(err) },
       };
     }
-    return { loadedModels, failedModels };
   }
 
   public async modelFromUrl(
@@ -254,8 +259,11 @@ class ClassifierHandler {
           descFile: modelJson,
           weightsFiles: [modelWeights],
         });
-        loadedModels.push(...result.loadedModels);
-        Object.assign(failedModels, result.failedModels);
+        if (result.success) {
+          loadedModels.push(result.model);
+        } else {
+          failedModels[result.modelName] = result.error;
+        }
       }
     }
     return { loadedModels, failedModels };

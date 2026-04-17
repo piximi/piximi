@@ -180,12 +180,14 @@ it("predict", async () => {
     ),
   ];
 
-  const modelResults = await classifierHandler.modelFromFiles({
+  const modelResult = await classifierHandler.modelFromFiles({
     descFile,
     weightsFiles,
     isGraph: false,
   });
-  const model = modelResults.loadedModels[0];
+  expect(modelResult.success).toBeTruthy();
+  if (!modelResult.success) return;
+  const model = modelResult.model;
   expect(model).toBeDefined();
   model.loadInference(inferrenceImages, categories);
 

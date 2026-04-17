@@ -64,11 +64,22 @@ export const LocalClassifierUpload = ({
         return;
       }
 
-      results = await classifierHandler.modelFromFiles({
+      const uploadResult = await classifierHandler.modelFromFiles({
         descFile,
         weightsFiles,
         isGraph,
       });
+      if (uploadResult.success) {
+        results = { loadedModels: [uploadResult.model], failedModels: {} };
+      } else {
+        results = {
+          loadedModels: [],
+          failedModels: {
+            [uploadResult.modelName]: uploadResult.error,
+          },
+        };
+      }
+
       setErrMessage("");
     }
     if (!isObjectEmpty(results.failedModels)) {
