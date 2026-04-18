@@ -2,7 +2,7 @@ import React from "react";
 import {
   TextFieldWithBlur,
   TextFieldWithBlurProps,
-} from "../../../components/inputs/TextFieldWithBlur";
+} from "components/inputs/TextFieldWithBlur";
 
 export const ModelSettingsTextField = (props: TextFieldWithBlurProps) => {
   return (

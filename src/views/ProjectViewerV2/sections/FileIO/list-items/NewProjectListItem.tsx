@@ -4,7 +4,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useDialogHotkey } from "hooks";
 
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
-import { NewProjectDialog } from "../dialogs";
+import { NewProjectDialog } from "@ProjectViewer/components/dialogs";
 
 import { HotkeyContext } from "utils/enums";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";

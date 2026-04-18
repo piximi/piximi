@@ -1,12 +1,13 @@
 import React from "react";
+import { Box } from "@mui/material";
 
 import { useMobileView } from "hooks";
 
 import { DividerHeader } from "components/ui";
 import { BaseAppDrawer } from "components/layout";
-import { ProjectViewerCategories, FileIO } from "../../components";
 import { ModelTaskSection } from "../ModelTaskSection";
-import { Box } from "@mui/material";
+import { FileIO } from "../FileIO";
+import { ProjectViewerCategories } from "../ProjectViewerCategories";
 
 export const ProjectDrawer = () => {
   const isMobile = useMobileView();

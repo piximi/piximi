@@ -9,7 +9,7 @@ import {
   selectClassifierModel,
 } from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
-import { ModelSettingsTextField } from "@ProjectViewer/components/ModelSettingsTextField";
+import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 import { WithLabel } from "components/inputs";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useNumberField } from "hooks";

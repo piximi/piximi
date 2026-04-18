@@ -22,7 +22,6 @@ import {
   selectClassifierEvaluationResult,
   selectClassifierModel,
 } from "store/classifier/reselectors";
-import { PredictionListItems } from "@ProjectViewer/components/list-items";
 import {
   ErrorReason,
   useClassifierStatus,
@@ -37,6 +36,7 @@ import { StyledSelect } from "components/inputs";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 import { SequentialClassifier } from "utils/models/classification";
 import { selectActiveUnlabeledThingsIds } from "store/project/reselectors";
+import { PredictionListItems } from "./PredictionListItems";
 
 export const ClassifierSection = () => {
   const [waitingForResults, setWaitingForResults] = useState(false);

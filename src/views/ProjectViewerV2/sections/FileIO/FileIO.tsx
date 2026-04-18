@@ -6,7 +6,7 @@ import {
   OpenProjectListItem,
   SaveProjectListItem,
 } from "./list-items";
-import { ConfirmReplaceDialogProvider } from "../hooks/useConfirmReplaceProjectDialog";
+import { ConfirmReplaceDialogProvider } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 
 export const FileIO = () => {
   return (

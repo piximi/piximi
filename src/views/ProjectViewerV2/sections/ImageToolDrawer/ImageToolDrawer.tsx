@@ -24,7 +24,6 @@ import {
 import { useMenu, useMobileView, useTranslation, useWindowSize } from "hooks";
 
 import { ToolHotkeyTitle } from "components/ui";
-import { ProjectViewerCategories, FileIO } from "../../components";
 import { ModelTaskSection } from "../ModelTaskSection";
 import {
   FilterOptions,
@@ -43,6 +42,8 @@ import { HTMLDataAttributes } from "utils/types";
 import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
 import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/layout/app-drawer/HelpButton";
+import { FileIO } from "../FileIO";
+import { ProjectViewerCategories } from "../ProjectViewerCategories";
 
 const imageTools: Record<string, OperationType> = {
   fileIO: {

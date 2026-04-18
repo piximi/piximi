@@ -18,7 +18,7 @@ import {
 import { selectActiveKindId } from "store/project/selectors";
 import { enumKeys } from "utils/objectUtils";
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
-import { ModelSettingsTextField } from "@ProjectViewer/components/ModelSettingsTextField";
+import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 import { StyledSelect } from "components/inputs";
 import { WithLabel } from "components/inputs";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
