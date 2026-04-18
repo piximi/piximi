@@ -8,7 +8,7 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { selectExperiment } from "store/dataV2/selectors";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 
-export const ProjectTextField = () => {
+export const ExperimentNameTextField = () => {
   const dispatch = useDispatch();
   const experiment = useSelector(selectExperiment);
   const [newExperimentName, setNewExperimentName] = useState<string>(
@@ -34,7 +34,7 @@ export const ProjectTextField = () => {
   return (
     <FormControl>
       <TextFieldWithBlur
-        data-help={HelpItem.ProjectName}
+        data-help={HelpItem.ExperimentName}
         onChange={handleTextFieldChange}
         onBlur={handleTextFieldBlur}
         value={newExperimentName}

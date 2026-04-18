@@ -15,7 +15,7 @@ import { LogoLoader } from "components/ui";
 import { TooltipTitle, TooltipButton } from "components/ui/tooltips";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { ZoomControl } from "./ZoomControl";
-import { ProjectTextField } from "./ProjextTextField";
+import { ExperimentNameTextField } from "./ProjextTextField";
 import { CategorizeChip } from "./CategorizeChip";
 
 import { dataSlice } from "store/data";
@@ -110,7 +110,7 @@ export const ProjectAppBar = () => {
         />
       </Box>
 
-      <ProjectTextField />
+      <ExperimentNameTextField />
 
       <Box sx={{ flexGrow: 1 }} />
 

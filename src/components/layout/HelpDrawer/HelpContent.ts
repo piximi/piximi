@@ -5,7 +5,7 @@ enum HelpContext {
 export enum HelpItem {
   Documentation = "documentation",
   // Project Viewer -- Top-bar
-  ProjectName = "project-name",
+  ExperimentName = "experiment-name",
   Categorize = "categorize",
   GridZoom = "grid-zoom",
   DeleteObject = "delete-object",
@@ -224,8 +224,8 @@ These algorithms will compare a prediction made by the model to the expected out
 const PixelIntensityRescale = `
 Neural networks often use small weight values, and large pixel values (which can range from 0 to 255 in 8-bit images) can disrupt or slow down the learning process.\n
 Normalizing pixel values to a smaller range, like 0-1, helps the network learn more stably and efficiently.`;
-const ProjectName = `
-Change the project name
+const ExperimentName = `
+Change the experiment name
 `;
 
 const SaveClassificationModel = `
@@ -357,7 +357,7 @@ export const helpContent: {
       ],
     },
     [HelpContext.ProjectView]: {
-      items: [HelpItem.ProjectName],
+      items: [HelpItem.ExperimentName],
     },
   },
   "help-items": {
@@ -373,9 +373,9 @@ export const helpContent: {
       desc: Documentation,
       brief: Documentation,
     },
-    [HelpItem.ProjectName]: {
-      desc: ProjectName,
-      brief: ProjectName,
+    [HelpItem.ExperimentName]: {
+      desc: ExperimentName,
+      brief: ExperimentName,
     },
     [HelpItem.Categorize]: {
       desc: Categorize,
