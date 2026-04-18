@@ -1,13 +1,13 @@
 import { StageName } from "./types";
 
 const STAGE_WEIGHTS: Record<StageName, { start: number; end: number }> = {
-  analyze: { start: 0, end: 10 },
-  load: { start: 10, end: 70 },
-  store: { start: 70, end: 90 },
-  finalize: { start: 90, end: 100 },
-  extract: { start: 0, end: 10 },
-  toDims: { start: 10, end: 40 },
-  toExperiment: { start: 40, end: 100 },
+  analyze: { start: 0, end: 0.1 },
+  load: { start: 0.1, end: 0.7 },
+  store: { start: 0.7, end: 0.9 },
+  finalize: { start: 0.9, end: 0.1 },
+  extract: { start: 0.0, end: 0.1 },
+  toDims: { start: 0.1, end: 0.4 },
+  toExperiment: { start: 0.4, end: 0.1 },
 };
 
 /**
