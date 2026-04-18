@@ -23,6 +23,7 @@ export default defineConfig({
       images: path.resolve("src/images"),
       store: path.resolve("src/store"),
       themes: path.resolve("src/themes"),
+      "@ProjectViewer": path.resolve("src/views/ProjectViewerV2"),
       translations: path.resolve("src/translations"),
     },
   },
@@ -37,6 +38,6 @@ export default defineConfig({
   test: {
     setupFiles: ["./test-setup.ts"],
     environment: "happy-dom",
-    testTimeout: 50_000, 
+    testTimeout: 50_000,
   },
 });

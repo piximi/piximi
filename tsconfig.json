@@ -18,7 +18,9 @@
     "skipLibCheck": true,
     "strict": true,
     "noErrorTruncation": true,
-    
+    "paths": {
+      "@ProjectViewer/*": ["views/ProjectViewerV2/*"]
+    }
   },
   "include": ["src", "src/icons/svg.d.ts"],
   "sourcemap": true
