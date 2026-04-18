@@ -78,15 +78,15 @@ export class ProjectLoader implements IProjectLoader {
         ...v2Raw,
         data: {
           experiment: v2Data.experiment,
-          imageSeries: Object.values(v2Data.imageSeries),
-          channelMetas: Object.values(v2Data.channelMetas),
-          kinds: Object.values(v2Data.kinds),
-          categories: Object.values(v2Data.categories),
-          images: Object.values(v2Data.images),
-          annotationVolumes: Object.values(v2Data.annotationVolumes),
-          planes: Object.values(v2Data.planes),
+          imageSeries: Object.values(v2Data.imageSeries.entities),
+          channelMetas: Object.values(v2Data.channelMetas.entities),
+          kinds: Object.values(v2Data.kinds.entities),
+          categories: Object.values(v2Data.categories.entities),
+          images: Object.values(v2Data.images.entities),
+          annotationVolumes: Object.values(v2Data.annotationVolumes.entities),
+          planes: Object.values(v2Data.planes.entities),
           channels,
-          annotations: Object.values(v2Data.annotations),
+          annotations: Object.values(v2Data.annotations.entities),
         },
       };
 
