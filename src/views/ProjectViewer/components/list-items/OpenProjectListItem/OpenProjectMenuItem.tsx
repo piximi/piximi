@@ -17,6 +17,7 @@ import { AlertType } from "utils/enums";
 
 import { AlertState } from "utils/types";
 import { useConfirmReplaceDialog } from "views/ProjectViewer/hooks/useConfirmReplaceProjectDialog";
+import { useProjectLoader } from "hooks";
 
 //TODO: MenuItem??
 
@@ -29,6 +30,7 @@ export const OpenProjectMenuItem = ({
 }: OpenProjectMenuItemProps) => {
   const dispatch = useDispatch();
   const { getConfirmation } = useConfirmReplaceDialog();
+  const { loadProject } = useProjectLoader();
   const onOpenProject = async (
     event: React.ChangeEvent<HTMLInputElement>,
     zip: boolean,
@@ -38,7 +40,10 @@ export const OpenProjectMenuItem = ({
     const files = event.currentTarget.files;
     const confirmation = await getConfirmation({});
     if (!confirmation) return;
-
+    if (import.meta.env.VITE_USE_NEW_PROJECT_UPLOAD === "true") {
+      await loadProject(files);
+      return;
+    }
     // set indefinite loading
     dispatch(
       applicationSettingsSlice.actions.setLoadPercent({

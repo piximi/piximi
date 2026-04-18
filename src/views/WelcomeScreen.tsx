@@ -20,6 +20,7 @@ import {
   useDialogHotkey,
   useMobileView,
   usePreferredMuiTheme,
+  useProjectLoader,
   useWindowSize,
 } from "hooks";
 import { useNavigate } from "react-router-dom";
@@ -61,6 +62,8 @@ export const WelcomeScreen = () => {
 
   const windowSize = useWindowSize();
   const mobileView = useMobileView();
+
+  const { loadProject } = useProjectLoader();
 
   const palette = useMemo(() => {
     const groups: Array<keyof Palette> = [
@@ -140,6 +143,10 @@ export const WelcomeScreen = () => {
     if (!event.currentTarget.files) return;
     const files = event.currentTarget.files;
 
+    if (import.meta.env.VITE_USE_NEW_PROJECT_UPLOAD === "true") {
+      await loadProject(files);
+      return;
+    }
     // set indefinite loading
     dispatch(
       applicationSettingsSlice.actions.setLoadPercent({
