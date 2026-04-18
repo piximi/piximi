@@ -24,3 +24,14 @@ export const selectHasRunningTasks = createSelector(
   selectActiveTasks,
   (tasks) => tasks.length > 0,
 );
+
+export const selectOverallTaskProgress = createSelector(
+  selectActiveTasks,
+  (tasks) => {
+    if (tasks.length == 0) return null;
+    let overallPercent: number = 0;
+    tasks.forEach((task) => (overallPercent += task.progress));
+    overallPercent = Math.round((overallPercent / tasks.length) * 100);
+    return overallPercent;
+  },
+);
