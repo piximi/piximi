@@ -305,6 +305,9 @@ export const dataSliceV2 = createSlice({
         UNKNOWN_KIND_CATEGORY,
       ]);
     },
+    updateExperimentName(state, action: PayloadAction<string>) {
+      state.experiment.name = action.payload;
+    },
     addImageSeries(
       state,
       action: PayloadAction<{
