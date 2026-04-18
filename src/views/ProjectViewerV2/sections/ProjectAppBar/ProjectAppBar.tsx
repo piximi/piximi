@@ -20,18 +20,18 @@ import { CategorizeChip } from "./CategorizeChip";
 
 import { dataSlice } from "store/data";
 import { selectActiveKindId } from "store/project/selectors";
-import { selectLoadPercent } from "store/applicationSettings/selectors";
 
 import { pluralize } from "utils/stringUtils";
 import { HotkeyContext } from "utils/enums";
 import { ImageViewerButton } from "./ImageViewerButton";
 import { MeasurementsButton } from "./MeasurementsButton";
 import { DIMENSIONS } from "utils/constants";
+import { selectOverallTaskProgress } from "store/appTasks/selectors";
 
 export const ProjectAppBar = () => {
   const dispatch = useDispatch();
   const activeKind = useSelector(selectActiveKindId);
-  const loadPercent = useSelector(selectLoadPercent);
+  const taskProgress = useSelector(selectOverallTaskProgress);
   const isMobile = useMobileView();
 
   const {
@@ -106,7 +106,7 @@ export const ProjectAppBar = () => {
         <LogoLoader
           width={175}
           height={DIMENSIONS.toolDrawerWidth - 8}
-          loadPercent={loadPercent}
+          loadPercent={taskProgress}
         />
       </Box>
 

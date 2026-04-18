@@ -1,4 +1,4 @@
-const PiximiText = ({ loadPercent }: { loadPercent: number }) => {
+const PiximiText = ({ loadPercent }: { loadPercent: number | null }) => {
   return (
     <>
       {/* Piximi */}
@@ -62,7 +62,7 @@ const PiximiText = ({ loadPercent }: { loadPercent: number }) => {
       />
       {/* TM */}
       <path
-        fill={loadPercent >= 0 && loadPercent < 1 ? "#ffffff" : "#02aec5"}
+        fill={loadPercent !== null ? "#ffffff" : "#02aec5"}
         d="M 201.089 5.48
            h -.883
            V .839
@@ -103,7 +103,7 @@ export const LogoLoader = ({
 }: {
   width: number;
   height: number;
-  loadPercent: number;
+  loadPercent: number | null;
   fullLogo?: boolean;
 }) => {
   return (
@@ -148,7 +148,7 @@ export const LogoLoader = ({
             <stop
               stopColor="#02aec5"
               offset={`${
-                (loadPercent < 0 ? 1 : loadPercent > 1 ? 1 : loadPercent) * 100
+                loadPercent === null || loadPercent > 100 ? 100 : loadPercent
               }%`}
               id="F1gst1"
             />
@@ -168,8 +168,8 @@ export const LogoLoader = ({
 
       {/* cyto */}
       <path
-        fill={loadPercent < 0 ? "#ffffff" : "#02aec5"}
-        filter={loadPercent < 0 ? `url(#indefinite-fill)` : undefined}
+        fill={loadPercent !== null ? "#ffffff" : "#02aec5"}
+        filter={loadPercent === -1 ? `url(#indefinite-fill)` : undefined}
         d="M 24.094 34.955
            H 10.86
            C 4.862 34.955 0 30.092 0 24.094
@@ -182,8 +182,8 @@ export const LogoLoader = ({
       />
       {/* cyto */}
       <path
-        fill={loadPercent < 0 ? "#ffffff" : "#02aec5"}
-        filter={loadPercent < 0 ? `url(#indefinite-fill)` : undefined}
+        fill={loadPercent !== null ? "#ffffff" : "#02aec5"}
+        filter={loadPercent === -1 ? `url(#indefinite-fill)` : undefined}
         d="M 24.094 34.955
              H 10.86
              C 4.862 34.955 0 30.092 0 24.094
