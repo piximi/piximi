@@ -4,32 +4,32 @@ import { FormControl } from "@mui/material";
 
 import { TextFieldWithBlur } from "components/inputs";
 
-import { projectSlice } from "store/project";
-import { selectProjectName } from "store/project/selectors";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { selectExperiment } from "store/dataV2/selectors";
+import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 
 export const ProjectTextField = () => {
   const dispatch = useDispatch();
-
-  const projectName = useSelector(selectProjectName);
-  const [newProjectName, setNewProjectName] = useState<string>(projectName);
+  const experiment = useSelector(selectExperiment);
+  const [newExperimentName, setNewExperimentName] = useState<string>(
+    experiment.name,
+  );
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleTextFieldBlur = () => {
-    if (projectName === newProjectName) return;
-    dispatch(projectSlice.actions.setProjectName({ name: newProjectName }));
-    setNewProjectName("");
+    if (newExperimentName === experiment.name) return;
+    dispatch(dataSliceV2.actions.updateExperimentName(newExperimentName));
   };
 
   const handleTextFieldChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setNewProjectName(event.target.value);
+    setNewExperimentName(event.target.value);
   };
 
   useEffect(() => {
-    setNewProjectName(projectName);
-  }, [projectName]);
+    setNewExperimentName(experiment.name);
+  }, [experiment.name]);
 
   return (
     <FormControl>
@@ -37,7 +37,7 @@ export const ProjectTextField = () => {
         data-help={HelpItem.ProjectName}
         onChange={handleTextFieldChange}
         onBlur={handleTextFieldBlur}
-        value={newProjectName}
+        value={newExperimentName}
         inputRef={inputRef}
         size="small"
         sx={{ ml: 5 }}
