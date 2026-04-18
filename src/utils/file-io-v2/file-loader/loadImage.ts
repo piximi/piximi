@@ -9,6 +9,7 @@ import {
   applyDimensionsToStack,
   experimentFromStack,
 } from "./imageReaderUtils";
+import { BitDepth } from "image-js-latest";
 
 export async function loadImage(
   input: ImportImageInput,
@@ -35,7 +36,7 @@ export async function loadImage(
       {
         fileName: input.fileName,
         shape,
-        bitDepth: stack.bitDepth,
+        bitDepth: stack.bitDepth as BitDepth, // cast needed since Stack.bitDepth typed as fast-png's BitDepth instead of image-js's own BitDepth
       },
       onProgress,
     );
