@@ -1,30 +1,34 @@
 import React from "react";
 import AddIcon from "@mui/icons-material/Add";
 
-import { useDialogHotkey } from "hooks";
-
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
-import { NewProjectDialog } from "@ProjectViewer/components/dialogs";
 
-import { HotkeyContext } from "utils/enums";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { useConfirmReplaceDialog } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
+import { useDispatch } from "react-redux";
+import { projectSlice } from "store/project";
 
 export const NewProjectListItem = () => {
-  const { onClose, onOpen, open } = useDialogHotkey(
-    HotkeyContext.ConfirmationDialog,
-  );
+  const dispatch = useDispatch();
+
+  const { getConfirmation } = useConfirmReplaceDialog();
+
+  const handleStartNewProject = () => {
+    const confirmation = getConfirmation({});
+    if (!confirmation) return;
+    if (!confirmation) return;
+    dispatch(projectSlice.actions.resetProject());
+  };
 
   return (
     <>
       <CustomListItemButton
         data-help={HelpItem.StartNewProject}
         primaryText="New"
-        onClick={onOpen}
+        onClick={handleStartNewProject}
         icon={<AddIcon />}
         tooltipText="New Project"
       />
-
-      <NewProjectDialog onClose={onClose} open={open} />
     </>
   );
 };
