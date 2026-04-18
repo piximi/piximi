@@ -218,7 +218,8 @@ function convertThings(
 
       let channelIdx = 0;
       for (const channel of plane) {
-        const channelJs = toImageJsData(channel, dtype);
+        const channelJs = toImageJsData(channel, dtype, bitDepth);
+
         const channelImage = new IJSImage(width, height, {
           colorModel: "GREY",
           data: channelJs,
@@ -294,14 +295,22 @@ function convertThings(
 function toImageJsData(
   data: Float32Array | Int32Array | Uint8Array,
   dtype: "float32" | "int32" | "uint8",
+  bitDepth: BitDepth,
 ): Uint8Array | Uint16Array {
   switch (dtype) {
     case "uint8":
       return data as Uint8Array; // already compatible, no copy needed
 
     case "float32":
+      if (bitDepth === 8) {
+        return Uint8Array.from(data, (v) => Math.round(v * 255));
+      } else if (bitDepth === 16) {
+        return Uint16Array.from(data, (v) => Math.round(v * 65535));
+      } else {
+        throw new Error(`Unsupported bitDepth: ${bitDepth}`);
+      }
     case "int32":
-      return Uint16Array.from(data, (v) => Math.round(v * 65535));
+      throw new Error('Did not expect "int32" dtype ¯\\_(ツ)_/¯');
   }
 }
 
