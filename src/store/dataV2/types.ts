@@ -1,7 +1,10 @@
 import type { EntityState } from "@reduxjs/toolkit";
-import type { BitDepth, DataArray } from "image-js";
+import type { BitDepth as IJSBitDepth } from "image-js-latest";
 import { StorageReference } from "utils/data-connector/types";
 import { Partition } from "utils/models/enums";
+
+export type BitDepth = IJSBitDepth;
+export type DataArray = Uint8Array | Uint16Array;
 
 export const DTYPES = {
   UINT8: "uint8",

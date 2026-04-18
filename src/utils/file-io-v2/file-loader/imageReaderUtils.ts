@@ -10,7 +10,7 @@ import {
   type ImageSeriesResult,
   type ReadStage,
 } from "./types";
-import { BitDepth } from "store/data/types";
+import { BitDepth } from "store/dataV2/types";
 import { ChannelMeta, Plane } from "store/dataV2/types";
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
 import { Partition } from "utils/models/enums";
