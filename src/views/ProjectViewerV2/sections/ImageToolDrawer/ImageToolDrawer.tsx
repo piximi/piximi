@@ -42,15 +42,15 @@ import { HTMLDataAttributes } from "utils/types";
 import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
 import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/layout/app-drawer/HelpButton";
-import { FileIO } from "../FileIO";
+import { ProjectActions } from "../ProjectActions";
 import { ProjectViewerCategories } from "../ProjectViewerCategories";
 
 const imageTools: Record<string, OperationType> = {
   fileIO: {
     icon: (color) => <FolderOpenIcon fontSize="small" sx={{ color }} />,
-    name: "fileIO",
+    name: "project actions",
     description: "-",
-    options: <FileIO />,
+    options: <ProjectActions />,
     hotkey: "O",
     mobile: true,
   },

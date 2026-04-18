@@ -8,7 +8,7 @@ import {
 } from "./list-items";
 import { ConfirmReplaceDialogProvider } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 
-export const FileIO = () => {
+export const ProjectActions = () => {
   return (
     <ConfirmReplaceDialogProvider>
       <List dense>

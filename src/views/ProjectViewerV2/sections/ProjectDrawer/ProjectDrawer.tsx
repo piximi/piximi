@@ -6,7 +6,7 @@ import { useMobileView } from "hooks";
 import { DividerHeader } from "components/ui";
 import { BaseAppDrawer } from "components/layout";
 import { ModelTaskSection } from "../ModelTaskSection";
-import { FileIO } from "../FileIO";
+import { ProjectActions } from "../ProjectActions";
 import { ProjectViewerCategories } from "../ProjectViewerCategories";
 
 export const ProjectDrawer = () => {
@@ -16,7 +16,7 @@ export const ProjectDrawer = () => {
   ) : (
     <Box sx={{ display: "flex", flexGrow: 1, gridArea: "action-drawer" }}>
       <BaseAppDrawer>
-        <FileIO />
+        <ProjectActions />
         <DividerHeader
           sx={{ my: 1 }}
           textAlign="left"
