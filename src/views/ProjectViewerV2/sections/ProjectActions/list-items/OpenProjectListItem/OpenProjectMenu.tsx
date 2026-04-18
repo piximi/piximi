@@ -3,7 +3,7 @@ import { Menu, MenuItem } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { ExampleProjectDialog } from "@ProjectViewer/components/dialogs";
+import { ExampleProjectDialog } from "components/dialogs";
 import { OpenProjectMenuItem } from "./OpenProjectMenuItem";
 
 import { HotkeyContext } from "utils/enums";

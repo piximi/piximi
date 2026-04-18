@@ -7,3 +7,4 @@ export { DialogTransitionSlide } from "./DialogTransitionSlide";
 export { ConfirmationDialog } from "./ConfirmationDialog";
 export { SaveProjectDialog } from "./SaveProjectDialog";
 export { TiffConfigDialog } from "./tiff-config/TiffConfigDialog";
+export { ExampleProjectDialog } from "./OpenExampleDialog";

@@ -25,7 +25,7 @@ import {
 } from "hooks";
 import { useNavigate } from "react-router-dom";
 import { AlertType, HotkeyContext } from "utils/enums";
-import { ExampleProjectDialog } from "views/ProjectViewer/components/dialogs";
+import { ExampleProjectDialog } from "components/dialogs";
 import { batch, useDispatch } from "react-redux";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { fListToStore } from "utils/file-io/zarr/stores";
