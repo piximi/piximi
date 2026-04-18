@@ -7,7 +7,7 @@ import { ExampleProjectDialog } from "../../dialogs";
 import { OpenProjectMenuItem } from "./OpenProjectMenuItem";
 
 import { HotkeyContext } from "utils/enums";
-import { useConfirmReplaceDialog } from "views/ProjectViewer/hooks/useConfirmReplaceProjectDialog";
+import { useConfirmReplaceDialog } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 
 type OpenProjectMenuProps = {
   anchorEl: HTMLElement | null;

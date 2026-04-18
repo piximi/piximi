@@ -11,8 +11,8 @@ import { ImportTensorflowSegmentationModelDialog } from "./ImportTensorflowModel
 import { HotkeyContext } from "utils/enums";
 import { useDispatch, useSelector } from "react-redux";
 import { selectSegmenterModel } from "store/segmenter/selectors";
-import { useSegmenterStatus } from "views/ProjectViewer/contexts/SegmenterStatusProvider";
-import { usePredictSegmenter } from "views/ProjectViewer/hooks/usePredictSegmenter";
+import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
+import { usePredictSegmenter } from "@ProjectViewer/hooks/usePredictSegmenter";
 import { Model } from "utils/models/Model";
 import { Shape } from "store/data/types";
 import { segmenterSlice } from "store/segmenter";

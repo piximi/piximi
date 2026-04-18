@@ -6,7 +6,7 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
 import { projectSlice } from "store/project";
 import { dataSlice } from "store/data/dataSlice";
-import { useConfirmReplaceDialog } from "views/ProjectViewer/hooks/useConfirmReplaceProjectDialog";
+import { useConfirmReplaceDialog } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 
 type NewProjectDialogProps = {
   onClose: () => void;

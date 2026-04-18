@@ -17,7 +17,7 @@ import { projectSlice } from "store/project";
 
 import { ModelStatus, Partition } from "utils/models/enums";
 import { List } from "@mui/material";
-import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
 export const PredictionListItems = () => {
   const dispatch = useDispatch();

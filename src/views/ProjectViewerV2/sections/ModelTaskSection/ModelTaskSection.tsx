@@ -3,11 +3,11 @@ import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 import { ClassifierSection } from "./ClassifierSection";
 import { SegmenterSection } from "./SegmenterSection";
-import { ClassifierStatusProvider } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
-import { ClassifierHistoryProvider } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
-import { ClassMapDialogProvider } from "views/ProjectViewer/hooks/useClassMapDialog";
+import { ClassifierStatusProvider } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import { ClassifierHistoryProvider } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
+import { ClassMapDialogProvider } from "@ProjectViewer/hooks/useClassMapDialog";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { SegmenterStatusProvider } from "views/ProjectViewer/contexts/SegmenterStatusProvider";
+import { SegmenterStatusProvider } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 
 export const ModelTaskSection = () => {
   const [learningTask, setLearningTask] = useState<

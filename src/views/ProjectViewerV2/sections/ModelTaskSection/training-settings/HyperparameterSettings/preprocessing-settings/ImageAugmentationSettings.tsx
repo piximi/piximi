@@ -26,7 +26,7 @@ import { selectActiveKindId } from "store/project/selectors";
 import { enumKeys } from "utils/objectUtils";
 import { CropSchema } from "utils/models/enums";
 import { CropOptions, RescaleOptions } from "utils/models/types";
-import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSettingsTextField";
+import { ModelSettingsTextField } from "@ProjectViewer/components/ModelSettingsTextField";
 import { StyledSelect } from "components/inputs";
 import { WithLabel } from "components/inputs";
 import { useNumberField } from "hooks";

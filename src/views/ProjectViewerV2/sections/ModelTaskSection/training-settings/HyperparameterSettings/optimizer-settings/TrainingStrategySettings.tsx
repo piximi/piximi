@@ -9,9 +9,9 @@ import {
   selectClassifierModel,
 } from "store/classifier/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
-import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSettingsTextField";
+import { ModelSettingsTextField } from "@ProjectViewer/components/ModelSettingsTextField";
 import { WithLabel } from "components/inputs";
-import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useNumberField } from "hooks";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 

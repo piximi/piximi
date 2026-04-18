@@ -22,13 +22,13 @@ import {
   selectClassifierEvaluationResult,
   selectClassifierModel,
 } from "store/classifier/reselectors";
-import { PredictionListItems } from "views/ProjectViewer/components/list-items";
+import { PredictionListItems } from "@ProjectViewer/components/list-items";
 import {
   ErrorReason,
   useClassifierStatus,
-} from "views/ProjectViewer/contexts/ClassifierStatusProvider";
-import { usePredictClassifier } from "views/ProjectViewer/hooks/usePredictClassifier";
-import { useEvaluateClassifier } from "views/ProjectViewer/hooks/useEvaluateClassifier";
+} from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import { usePredictClassifier } from "@ProjectViewer/hooks/usePredictClassifier";
+import { useEvaluateClassifier } from "@ProjectViewer/hooks/useEvaluateClassifier";
 import { WithLabel } from "components/inputs";
 import classifierHandler from "utils/models/classification/classifierHandler";
 import { classifierSlice } from "store/classifier";

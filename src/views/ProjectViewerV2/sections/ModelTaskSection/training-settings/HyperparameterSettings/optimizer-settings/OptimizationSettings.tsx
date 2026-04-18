@@ -18,10 +18,10 @@ import {
 import { selectActiveKindId } from "store/project/selectors";
 import { enumKeys } from "utils/objectUtils";
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
-import { ModelSettingsTextField } from "views/ProjectViewer/components/ModelSettingsTextField";
+import { ModelSettingsTextField } from "@ProjectViewer/components/ModelSettingsTextField";
 import { StyledSelect } from "components/inputs";
 import { WithLabel } from "components/inputs";
-import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useNumberField } from "hooks";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 

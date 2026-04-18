@@ -1,5 +1,5 @@
 import React from "react";
-import { useClassifierHistory } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
+import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 import { TwoDataPlot } from "../data-display";
 
 const TrainingPlots = () => {

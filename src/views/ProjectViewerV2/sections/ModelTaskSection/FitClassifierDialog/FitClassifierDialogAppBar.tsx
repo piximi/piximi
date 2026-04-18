@@ -31,10 +31,10 @@ import { selectClassifierModel } from "store/classifier/reselectors";
 
 import { APPLICATION_COLORS } from "utils/constants";
 import { ModelStatus } from "utils/models/enums";
-import { useClassifierHistory } from "views/ProjectViewer/contexts/ClassifierHistoryProvider";
-import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
-import useFitClassifier from "views/ProjectViewer/hooks/useFitClassifier";
+import useFitClassifier from "@ProjectViewer/hooks/useFitClassifier";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;

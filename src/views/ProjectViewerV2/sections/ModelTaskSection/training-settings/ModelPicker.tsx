@@ -19,7 +19,7 @@ import {
 } from "store/classifier/reselectors";
 import { selectActiveKindObject } from "store/project/reselectors";
 import { TextFieldWithBlur } from "components/inputs/TextFieldWithBlur";
-import { useClassifierStatus } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { WithLabel } from "components/inputs";
 
 export const ModelPicker = () => {

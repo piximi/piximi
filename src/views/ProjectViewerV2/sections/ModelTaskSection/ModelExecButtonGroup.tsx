@@ -9,7 +9,7 @@ import {
 import { TooltipButton } from "components/ui/tooltips/TooltipButton";
 
 import { ModelStatus } from "utils/models/enums";
-import { ErrorReason } from "views/ProjectViewer/contexts/ClassifierStatusProvider";
+import { ErrorReason } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
 export const ModelExecButtonGroup = ({
   handleFit,

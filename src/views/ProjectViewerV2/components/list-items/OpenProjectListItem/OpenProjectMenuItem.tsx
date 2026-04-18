@@ -16,7 +16,7 @@ import classifierHandler from "utils/models/classification/classifierHandler";
 import { AlertType } from "utils/enums";
 
 import { AlertState } from "utils/types";
-import { useConfirmReplaceDialog } from "views/ProjectViewer/hooks/useConfirmReplaceProjectDialog";
+import { useConfirmReplaceDialog } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 import { useProjectLoader } from "hooks";
 
 //TODO: MenuItem??
