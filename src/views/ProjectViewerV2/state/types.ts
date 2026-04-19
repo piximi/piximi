@@ -18,17 +18,21 @@ export enum AnnotationSortType {
   Image = "Image",
   Random = "Random",
 }
-
+export type ImageFilters = Required<
+  Pick<FilterType<ImageObject>, "categoryId" | "partition">
+>;
 export type ImageGridState = {
   selectedIds: string[];
-  filters: Required<Pick<FilterType<ImageObject>, "categoryId" | "partition">>;
+  filters: ImageFilters;
   sortType: ImageSortType;
 };
+
+export type AnnotationFilters = Required<
+  Pick<FilterType<ExtendedAnnotationObject>, "categoryId" | "partition">
+>;
 export type KindState = {
   selectedIds: string[];
-  filters: Required<
-    Pick<FilterType<ExtendedAnnotationObject>, "categoryId" | "partition">
-  >;
+  filters: AnnotationFilters;
   visible: boolean;
   sortType: AnnotationSortType;
 };
@@ -36,6 +40,7 @@ export type AnnotationGridState = {
   activeKindId: string | null;
   kindStates: Record<string, KindState>;
 };
+
 export type ViewState = "images" | "annotations";
 export type ProjectState = {
   name: string;
