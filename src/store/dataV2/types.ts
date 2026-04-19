@@ -36,12 +36,14 @@ export type ImageSeries = {
   timeSeries: boolean;
   activeImageId: string;
 };
+export type ImageSeriesEntities = Record<string, ImageSeries>;
 
 export type Kind = {
   id: string;
   name: string;
   unknownCategoryId: string;
 };
+export type KindEntities = Record<string, Kind>;
 
 type BaseCategory = {
   id: string;
@@ -55,6 +57,7 @@ export type AnnotationCategory = BaseCategory & {
   kindId: string;
 };
 export type Category = ImageCategory | AnnotationCategory;
+export type CategoryEntities = Record<string, Category>;
 
 export type ImageObject = {
   id: string;
@@ -67,12 +70,14 @@ export type ImageObject = {
   bitDepth: BitDepth;
   partition: Partition;
 };
+export type ImageEntities = Record<string, ImageObject>;
 
 export type Plane = {
   id: string;
   imageId: string;
   zIndex: number;
 };
+export type PlaneEntities = Record<string, Plane>;
 
 export type Channel = {
   id: string;
@@ -94,6 +99,7 @@ export type Channel = {
   lowerQuartile?: number;
   upperQuartile?: number;
 };
+export type ChannelEntities = Record<string, Channel>;
 
 export type ChannelMeta = {
   id: string;
@@ -109,12 +115,16 @@ export type ChannelMeta = {
   rampMinLimit: number;
   rampMaxLimit: number;
 };
+export type ChannelMetaEntities = Record<string, ChannelMeta>;
+
 export type AnnotationVolume = {
   id: string;
   imageId: string;
   kindId: string;
   categoryId: string;
 };
+export type AnnotationVolumeEntities = Record<string, AnnotationVolume>;
+
 export type AnnotationObject = {
   id: string;
   planeId: string;
@@ -126,6 +136,7 @@ export type AnnotationObject = {
   encodedMask: Array<number>;
   decodedMask?: DataArray;
 };
+export type AnnotationEntities = Record<string, AnnotationObject>;
 
 export type DataStateV2 = {
   experiment: Experiment;
