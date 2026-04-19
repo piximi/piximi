@@ -1,136 +1,32 @@
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Box } from "@mui/material";
-
-import { useMenu, useMobileView } from "hooks";
-
-import { CustomTabs } from "components/layout";
-import { ImageGrid } from "./ImageGrid";
-import { AddKindMenu } from "./AddKindMenu";
+import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 import { projectSlice } from "@ProjectViewer/state";
-import { dataSlice } from "store/data";
-import {
-  selectActiveKindId,
-  selectKindTabFilters,
-} from "@ProjectViewer/state/selectors";
-import { selectKindDictionary } from "store/data/selectors";
-import { selectVisibleKinds } from "@ProjectViewer/state/reselectors";
+import { selectActiveView } from "@ProjectViewer/state/selectors";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { DIMENSIONS } from "utils/constants";
+import { ViewState } from "@ProjectViewer/state/types";
 
 export const ProjectImageGrid = () => {
   const dispatch = useDispatch();
-  const filteredKinds = useSelector(selectKindTabFilters) as string[];
-  const kinds = useSelector(selectKindDictionary);
-  const activeKind = useSelector(selectActiveKindId);
+  const activeView = useSelector(selectActiveView);
 
-  const visibleKinds = useSelector(selectVisibleKinds) as string[];
-  const isMobile = useMobileView();
-
-  const [width, setWidth] = useState<number>(
-    window.innerWidth - DIMENSIONS.leftDrawerWidth - DIMENSIONS.toolDrawerWidth,
-  );
-  const [height, setHeight] = useState<number>(
-    window.innerHeight - DIMENSIONS.toolDrawerWidth,
-  );
-
-  //useDefaultImage(DispatchLocation.ImageViewer);
-  useLayoutEffect(() => {
-    const resizeHandler = () => {
-      const width = !isMobile
-        ? window.innerWidth -
-          DIMENSIONS.leftDrawerWidth -
-          DIMENSIONS.toolDrawerWidth
-        : window.innerWidth - DIMENSIONS.toolDrawerWidth;
-
-      setWidth(width);
-      setHeight(window.innerHeight - DIMENSIONS.toolDrawerWidth);
-    };
-    window.addEventListener("resize", resizeHandler);
-    return () => {
-      window.removeEventListener("resize", resizeHandler);
-    };
-  }, [isMobile]);
-  const {
-    onOpen: handleOpenAddKindMenu,
-    onClose: handleCloseAddKindMenu,
-    open: isAddKindMenuOpen,
-    anchorEl: addKindMenuAnchor,
-  } = useMenu();
-
-  const handleTabClose = useCallback(
-    (item: string, newItem?: string) => {
-      if (newItem) {
-        dispatch(projectSlice.actions.setActiveKind({ kind: newItem }));
-      }
-
-      dispatch(
-        dataSlice.actions.deleteKind({
-          deletedKindId: item,
-        }),
-      );
-    },
-    [dispatch],
-  );
-
-  const handleTabMinimize = useCallback(
-    (item: string, newItem?: string) => {
-      if (newItem) {
-        dispatch(projectSlice.actions.setActiveKind({ kind: newItem }));
-      }
-
-      dispatch(projectSlice.actions.addKindTabFilter({ kindId: item }));
-    },
-    [dispatch],
-  );
-
-  const handleTabChange = (tab: string) => {
-    dispatch(projectSlice.actions.setActiveKind({ kind: tab }));
-    dispatch(
-      projectSlice.actions.updateHighlightedCategory({
-        categoryId: kinds[tab]!.unknownCategoryId,
-      }),
-    );
+  const handleActiveViewChange = (
+    _event: React.MouseEvent<HTMLElement>,
+    value: ViewState,
+  ) => {
+    dispatch(projectSlice.actions.setActiveView(value));
   };
-
-  const handleKindEdit = (kindId: string, newDisplayName: string) => {
-    dispatch(
-      dataSlice.actions.updateKindName({ kindId, displayName: newDisplayName }),
-    );
-  };
-
-  const renderTabLabel = useCallback(
-    (label: string) => kinds[label].displayName,
-    [kinds],
-  );
-
-  useEffect(() => {
-    if (isMobile) {
-      const minimizeOnResize = visibleKinds.filter(
-        (kind) => kind !== activeKind,
-      );
-      minimizeOnResize.forEach((kind) => handleTabMinimize(kind));
-    }
-  }, [isMobile, activeKind, handleTabMinimize, visibleKinds]);
-
-  useEffect(() => {
-    if (!isMobile) {
-      dispatch(projectSlice.actions.removeAllKindTabFilters());
-    }
-  }, [isMobile, dispatch]);
 
   return (
     <Box
       sx={(theme) => ({
-        width: width,
-        height: height,
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
         gridArea: "image-grid",
         border: `1px solid ${theme.palette.divider}`,
         overflow: "hidden",
@@ -138,34 +34,84 @@ export const ProjectImageGrid = () => {
         borderRadius: "4px 4px 0 0",
       })}
     >
-      <CustomTabs
-        tabHelp={{
-          tabBar: HelpItem.KindTabs,
-          create: HelpItem.AddKindTab,
-        }}
-        extendable
-        transition="sliding"
-        childClassName="grid-tabs"
-        labels={visibleKinds}
-        secondaryEffect={handleTabChange}
-        handleTabClose={handleTabClose}
-        handleNew={handleOpenAddKindMenu}
-        handleTabMin={handleTabMinimize}
-        persistentTabs={["Image"]}
-        editable
-        handleTabEdit={handleKindEdit}
-        renderLabel={renderTabLabel}
+      <Box
+        sx={(theme) => ({
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          height: DIMENSIONS.toolDrawerWidth,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        })}
       >
-        {visibleKinds.map((kind) => (
-          <ImageGrid key={`${kind}-imageGrid`} kind={kind} />
+        <ToggleButtonGroup
+          data-help={HelpItem.GridView}
+          value={activeView}
+          size="small"
+          color="primary"
+          exclusive
+          onChange={handleActiveViewChange}
+          sx={{ my: 0.5 }}
+        >
+          <ToggleButton value="images">Images</ToggleButton>
+          <ToggleButton value="annotations">Annotations</ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          flexGrow: 1,
+          bgcolor: "white",
+          display: activeView === "images" ? "flex" : "none",
+          gap: 1,
+          flexWrap: "wrap",
+          justifyContent: "space-around",
+          overflowY: "scroll",
+        }}
+      >
+        {Array.from({ length: 100 }).map((_, idx) => (
+          <Box
+            key={`images-${idx}`}
+            sx={{
+              display: "flex",
+              width: "256px",
+              height: "256px",
+              bgcolor: "blue",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {idx}
+          </Box>
         ))}
-      </CustomTabs>
-      <AddKindMenu
-        anchor={addKindMenuAnchor}
-        isOpen={isAddKindMenuOpen}
-        onClose={handleCloseAddKindMenu}
-        filteredKinds={filteredKinds}
-      />
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          flexGrow: 1,
+          bgcolor: "blue",
+          display: activeView === "annotations" ? "flex" : "none",
+          gap: 1,
+          flexWrap: "wrap",
+          justifyContent: "space-around",
+          overflowY: "scroll",
+        }}
+      >
+        {Array.from({ length: 100 }).map((_, idx) => (
+          <Box
+            key={`annotations-${idx}`}
+            sx={{
+              display: "flex",
+              width: "256px",
+              height: "256px",
+              bgcolor: "white",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {idx}
+          </Box>
+        ))}
+      </Box>
     </Box>
   );
 };

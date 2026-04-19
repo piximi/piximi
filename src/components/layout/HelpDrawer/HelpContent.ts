@@ -5,7 +5,6 @@ enum HelpContext {
 export enum HelpItem {
   Documentation = "documentation",
   // Project Viewer -- Top-bar
-  ExperimentName = "experiment-name",
   ProjectName = "project-name", // TODO: remove after refactor
   Categorize = "categorize",
   GridZoom = "grid-zoom",
@@ -73,6 +72,11 @@ export enum HelpItem {
   MeasurementPlotYAxis = "measurement-plot-y-axis",
   MeasurementPlotSize = "measurement-plot-mark-size",
   MeasurementPlotColor = "measurement-plot-mark-color",
+  // ~~ New Helpers ~~
+  // Project Viewer -- Top Bar
+  ExperimentName = "experiment-name",
+  // Project Viewer -- Main
+  GridView = "grid-view",
 }
 type HelpItemContent = { desc: string; brief: string };
 
@@ -226,9 +230,6 @@ const PixelIntensityRescale = `
 Neural networks often use small weight values, and large pixel values (which can range from 0 to 255 in 8-bit images) can disrupt or slow down the learning process.\n
 Normalizing pixel values to a smaller range, like 0-1, helps the network learn more stably and efficiently.`;
 
-const ExperimentName = `
-Change the experiment name
-`;
 const ProjectName = `
 Change the project name
 `;
@@ -349,6 +350,12 @@ const MeasurementPlotYAxis = `Select a measurement to use for the y-axis.`;
 const MeasurementPlotSize = `Select a measurement to use for the size of the mark (**Scatter Only**)`;
 const MeasurementPlotColor = `Select a split to use for coloring each mark (**Scatter Only**)`;
 
+// ~~ New Helpers ~~
+// Project Viewer -- Top Bar
+const ExperimentName = `Change the experiment name`;
+// Project Viewer -- Main
+const GridView = `Switch between image viewing and annotation viewing`;
+
 export const helpContent: {
   contexts: Record<HelpContext, { items: Array<HelpItem> }>;
   "help-items": Record<HelpItem, HelpItemContent>;
@@ -377,10 +384,6 @@ export const helpContent: {
     [HelpItem.Documentation]: {
       desc: Documentation,
       brief: Documentation,
-    },
-    [HelpItem.ExperimentName]: {
-      desc: ExperimentName,
-      brief: ExperimentName,
     },
     //TODO: remove after refactor
     [HelpItem.ProjectName]: {
@@ -608,6 +611,17 @@ export const helpContent: {
     [HelpItem.MeasurementPlotColor]: {
       desc: MeasurementPlotColor,
       brief: MeasurementPlotColor,
+    },
+    // ~~ New Helpers ~~
+    // Project Viewer -- Top Bar
+    [HelpItem.ExperimentName]: {
+      desc: ExperimentName,
+      brief: ExperimentName,
+    },
+    // Project Viewer -- Main
+    [HelpItem.GridView]: {
+      desc: GridView,
+      brief: GridView,
     },
   },
 };
