@@ -139,6 +139,27 @@ export const selectAnnotationsByVolumeId = createSelector(
   (annotations, volumeId) => annotations.filter((a) => a.volumeId === volumeId),
 );
 
+export const selectAnnotationsByKindId = createSelector(
+  [
+    annotationSelectors.selectAll,
+    annotationVolumeSelectors.selectEntities,
+    (_: RootState, kindId: string) => kindId,
+  ],
+  (annotations, volumeDict, kindId) =>
+    annotations.filter((a) => volumeDict[a.volumeId]?.kindId === kindId),
+);
+export const selectAnnotationsByCategoryId = createSelector(
+  [
+    annotationSelectors.selectAll,
+    annotationVolumeSelectors.selectEntities,
+    (_: RootState, categoryId: string) => categoryId,
+  ],
+  (annotations, volumeDict, categoryId) =>
+    annotations.filter(
+      (a) => volumeDict[a.volumeId]?.categoryId === categoryId,
+    ),
+);
+
 export const selectCategoriesByKindId = createSelector(
   [categorySelectors.selectAll, (_: RootState, kindId: string) => kindId],
   (categories, kindId) =>
