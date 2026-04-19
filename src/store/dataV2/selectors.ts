@@ -42,30 +42,40 @@ const annotationVolumeSelectors = annotationVolumeAdapter.getSelectors(
   (state: RootState) => state.dataV2.annotationVolumes,
 );
 
+export const selectImageSeriesEntities = imageSeriesSelectors.selectEntities;
 export const selectAllImageSeries = imageSeriesSelectors.selectAll;
 export const selectImageSeriesById = imageSeriesSelectors.selectById;
 
+export const selectImageEntities = imageSelectors.selectEntities;
 export const selectAllImages = imageSelectors.selectAll;
 export const selectImageById = imageSelectors.selectById;
 
+export const selectKindEntities = kindSelectors.selectEntities;
 export const selectAllKinds = kindSelectors.selectAll;
 export const selectKindById = kindSelectors.selectById;
 
+export const selectCategoryEntities = categorySelectors.selectEntities;
 export const selectAllCategories = categorySelectors.selectAll;
 export const selectCategoryById = categorySelectors.selectById;
 
+export const selectPlaneEntities = planeSelectors.selectEntities;
 export const selectAllPlanes = planeSelectors.selectAll;
 export const selectPlaneById = planeSelectors.selectById;
 
+export const selectChannelEntities = channelSelectors.selectEntities;
 export const selectAllChannels = channelSelectors.selectAll;
 export const selectChannelById = channelSelectors.selectById;
 
+export const selectChannelMetaEntities = channelMetaSelectors.selectEntities;
 export const selectAllChannelMetas = channelMetaSelectors.selectAll;
 export const selectChannelMetaById = channelMetaSelectors.selectById;
 
+export const selectAnnotationEntities = annotationSelectors.selectEntities;
 export const selectAllAnnotations = annotationSelectors.selectAll;
 export const selectAnnotationById = annotationSelectors.selectById;
 
+export const selectAnnotationVolumeEntities =
+  annotationVolumeSelectors.selectEntities;
 export const selectAllAnnotationVolumes = annotationVolumeSelectors.selectAll;
 export const selectAnnotationVolumeById = annotationVolumeSelectors.selectById;
 
