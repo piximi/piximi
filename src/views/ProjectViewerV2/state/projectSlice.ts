@@ -51,7 +51,7 @@ export const projectSlice = createSlice({
     },
     addSelectedImages(state, action: PayloadAction<string[]>) {
       const ids = action.payload;
-      const newIds = difference(state.imageGridState.selectedIds, ids);
+      const newIds = difference(ids, state.imageGridState.selectedIds);
       state.imageGridState.selectedIds.push(...newIds);
     },
     removeSelectedImages(state, action: PayloadAction<string[]>) {
@@ -67,7 +67,7 @@ export const projectSlice = createSlice({
       const { kindId, ids } = action.payload;
       const kindState = state.annotationGridState.kindStates[kindId];
       if (!kindState) return;
-      const newIds = difference(kindState.selectedIds, ids);
+      const newIds = difference(ids, kindState.selectedIds);
       kindState.selectedIds.push(...newIds);
     },
     removeSelectedAnnotations(
@@ -232,7 +232,7 @@ export const projectSlice = createSlice({
     },
     addImageCategoryFilters(state, action: PayloadAction<string[]>) {
       const ids = action.payload;
-      const newIds = difference(state.imageGridState.filters.categoryId, ids);
+      const newIds = difference(ids, state.imageGridState.filters.categoryId);
       state.imageGridState.filters.categoryId.push(...newIds);
     },
     removeImageCategoryFilters(state, action: PayloadAction<string[]>) {
@@ -245,7 +245,7 @@ export const projectSlice = createSlice({
     },
     addImagePartitionFilters(state, action: PayloadAction<Partition[]>) {
       const ids = action.payload;
-      const newIds = difference(state.imageGridState.filters.partition, ids);
+      const newIds = difference(ids, state.imageGridState.filters.partition);
       state.imageGridState.filters.partition.push(...newIds);
     },
     removeImagePartitionFilters(state, action: PayloadAction<Partition[]>) {
@@ -263,7 +263,7 @@ export const projectSlice = createSlice({
       const { kindId, ids } = action.payload;
       const kindState = state.annotationGridState.kindStates[kindId];
       if (!kindState) return;
-      const newIds = difference(kindState.filters.categoryId, ids);
+      const newIds = difference(ids, kindState.filters.categoryId);
       kindState.filters.categoryId.push(...newIds);
     },
     removeAnnotationCategoryFilters(
@@ -283,7 +283,7 @@ export const projectSlice = createSlice({
       const { kindId, ids } = action.payload;
       const kindState = state.annotationGridState.kindStates[kindId];
       if (!kindState) return;
-      const newIds = difference(kindState.filters.partition, ids);
+      const newIds = difference(ids, kindState.filters.partition);
       kindState.filters.partition.push(...newIds);
     },
     removeAnnotationPartitionFilters(
