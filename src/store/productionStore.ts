@@ -25,6 +25,8 @@ import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 import { appTasksSlice } from "./appTasks/appTasksSlice";
+import { projectSlice as projectSliceV2 } from "views/ProjectViewerV2/state/projectSlice";
+import { projectMiddleware as projectMiddlewareV2 } from "views/ProjectViewerV2/state/projectListeners";
 
 const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&
@@ -39,6 +41,7 @@ const listenerMiddlewares: Middleware[] = [
   dataMiddleware.middleware,
   measurementsMiddleware.middleware,
   applicationMiddleware.middleware,
+  projectMiddlewareV2.middleware,
 ];
 
 const preloadedState: RootState = {
@@ -52,6 +55,7 @@ const preloadedState: RootState = {
   measurements: measurementsSlice.getInitialState(),
   dataV2: dataSliceV2.getInitialState(),
   appTasks: appTasksSlice.getInitialState(),
+  projectV2: projectSliceV2.getInitialState(),
 };
 
 const options = {
