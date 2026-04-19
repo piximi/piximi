@@ -138,6 +138,15 @@ export type AnnotationObject = {
 };
 export type AnnotationEntities = Record<string, AnnotationObject>;
 
+export type ExtendedAnnotationObject = AnnotationObject & {
+  kindId: string;
+  categoryId: string;
+};
+export type ExtendedAnnotationEntities = Record<
+  string,
+  ExtendedAnnotationObject
+>;
+
 export type DataStateV2 = {
   experiment: Experiment;
   imageSeries: EntityState<ImageSeries, string>;
