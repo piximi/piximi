@@ -17,7 +17,7 @@ import {
   selectClassifierShuffleOptions,
   selectClassifierTrainingPercentage,
 } from "store/classifier/reselectors";
-import { selectActiveKindId } from "store/project/selectors";
+import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 import { WithLabel } from "components/inputs";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";

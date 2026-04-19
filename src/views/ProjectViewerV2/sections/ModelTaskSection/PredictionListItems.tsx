@@ -13,7 +13,7 @@ import { useTranslation } from "hooks";
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { ListItemHoldButton } from "components/ui/ListItemHoldButton";
 
-import { projectSlice } from "store/project";
+import { projectSlice } from "@ProjectViewer/state";
 
 import { ModelStatus, Partition } from "utils/models/enums";
 import { List } from "@mui/material";

@@ -19,7 +19,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useHotkeys } from "hooks";
 
 import { PretrainedModelSelector } from "./PretrainedModelSelector";
-import { selectProjectImageChannels } from "store/project/selectors";
+import { selectProjectImageChannels } from "@ProjectViewer/state/selectors";
 
 import { Model } from "utils/models/Model";
 import { Cellpose } from "utils/models/segmentation";

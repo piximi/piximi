@@ -13,14 +13,14 @@ import { CustomTabs } from "components/layout";
 import { ImageGrid } from "./ImageGrid";
 import { AddKindMenu } from "./AddKindMenu";
 
-import { projectSlice } from "store/project";
+import { projectSlice } from "@ProjectViewer/state";
 import { dataSlice } from "store/data";
 import {
   selectActiveKindId,
   selectKindTabFilters,
-} from "store/project/selectors";
+} from "@ProjectViewer/state/selectors";
 import { selectKindDictionary } from "store/data/selectors";
-import { selectVisibleKinds } from "store/project/reselectors";
+import { selectVisibleKinds } from "@ProjectViewer/state/reselectors";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { DIMENSIONS } from "utils/constants";

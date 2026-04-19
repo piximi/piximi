@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectActiveCategories } from "store/project/reselectors";
-import { selectActiveThingFilters } from "store/project/selectors";
+import { selectActiveCategories } from "@ProjectViewer/state/reselectors";
+import { selectActiveThingFilters } from "@ProjectViewer/state/selectors";
 import { useCallback, useMemo } from "react";
-import { projectSlice } from "store/project";
+import { projectSlice } from "@ProjectViewer/state";
 import { Category } from "store/data/types";
 import { FilterList } from "./FilterList";
 

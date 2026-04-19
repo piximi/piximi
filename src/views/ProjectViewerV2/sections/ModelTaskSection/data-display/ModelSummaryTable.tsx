@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import saveAs from "file-saver";
 import { useSelector } from "react-redux";
-import { selectProjectName } from "store/project/selectors";
+import { selectProjectName } from "@ProjectViewer/state/selectors";
 import { ModelLayerData } from "utils/models/types";
 
 interface Column {

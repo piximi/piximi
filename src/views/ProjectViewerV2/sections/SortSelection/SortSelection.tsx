@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 
-import { projectSlice } from "store/project";
-import { selectSortType } from "store/project/selectors";
+import { projectSlice } from "@ProjectViewer/state";
+import { selectSortType } from "@ProjectViewer/state/selectors";
 
 import { ThingSortKey } from "utils/enums";
 

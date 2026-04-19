@@ -31,11 +31,11 @@ import { useEvaluateClassifier } from "@ProjectViewer/hooks/useEvaluateClassifie
 import { WithLabel } from "components/inputs";
 import classifierHandler from "utils/models/classification/classifierHandler";
 import { classifierSlice } from "store/classifier";
-import { selectActiveKindId } from "store/project/selectors";
+import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { StyledSelect } from "components/inputs";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 import { SequentialClassifier } from "utils/models/classification";
-import { selectActiveUnlabeledThingsIds } from "store/project/reselectors";
+import { selectActiveUnlabeledThingsIds } from "@ProjectViewer/state/reselectors";
 import { PredictionListItems } from "./PredictionListItems";
 
 export const ClassifierSection = () => {

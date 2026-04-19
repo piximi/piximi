@@ -6,7 +6,7 @@ import {
   selectClassifierFitOptions,
   selectClassifierTrainingPercentage,
 } from "store/classifier/reselectors";
-import { selectActiveLabeledThingsCount } from "store/project/reselectors";
+import { selectActiveLabeledThingsCount } from "@ProjectViewer/state/reselectors";
 import { logger } from "utils/logUtils";
 
 import { OptimizationSettings } from "./OptimizationSettings";

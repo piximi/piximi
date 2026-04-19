@@ -14,7 +14,7 @@ import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
 import { ConfusionMatrix } from "./ConfusionMatrix";
 import { EvaluateClassifierDialogAppBar } from "./EvaluateClassifierAppBar";
 
-import { selectActiveKnownCategories } from "store/project/reselectors";
+import { selectActiveKnownCategories } from "@ProjectViewer/state/reselectors";
 import {
   selectClassifierEvaluationResult,
   selectClassifierModel,

@@ -6,7 +6,7 @@ import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { useConfirmReplaceDialog } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 import { useDispatch } from "react-redux";
-import { projectSlice } from "store/project";
+import { projectSlice } from "@ProjectViewer/state";
 
 export const NewProjectListItem = () => {
   const dispatch = useDispatch();

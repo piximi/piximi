@@ -22,7 +22,7 @@ import {
   selectClassifierModelWithIdx,
   selectClassifierRescaleOptions,
 } from "store/classifier/reselectors";
-import { selectActiveKindId } from "store/project/selectors";
+import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { enumKeys } from "utils/objectUtils";
 import { CropSchema } from "utils/models/enums";
 import { CropOptions, RescaleOptions } from "utils/models/types";

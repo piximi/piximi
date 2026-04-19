@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectActiveThingFilters } from "store/project/selectors";
+import { selectActiveThingFilters } from "@ProjectViewer/state/selectors";
 
 import { Partition } from "utils/models/enums";
-import { projectSlice } from "store/project";
+import { projectSlice } from "@ProjectViewer/state";
 import { useCallback, useMemo } from "react";
 import { FilterList } from "./FilterList";
 

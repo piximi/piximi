@@ -15,7 +15,7 @@ import {
   selectClassifierModel,
   selectClassifierOptimizerSettings,
 } from "store/classifier/reselectors";
-import { selectActiveKindId } from "store/project/selectors";
+import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { enumKeys } from "utils/objectUtils";
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";

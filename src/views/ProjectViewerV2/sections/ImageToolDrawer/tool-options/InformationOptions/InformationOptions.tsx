@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material";
 
 import { ThingInformationTable } from "./ThingInformationTable";
 
-import { selectActiveSelectedThings } from "store/project/reselectors";
+import { selectActiveSelectedThings } from "@ProjectViewer/state/reselectors";
 
 export const InformationOptions = () => {
   const selectedThings = useSelector(selectActiveSelectedThings);

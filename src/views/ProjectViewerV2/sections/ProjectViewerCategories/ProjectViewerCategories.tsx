@@ -9,13 +9,13 @@ import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
 import { CategoryItemMenu } from "components/ui/CategoryItemMenu";
 import { CategoryItem } from "./list-items/CategoryItem";
 
-import { projectSlice } from "store/project";
-import { selectHighlightedCategory } from "store/project/selectors";
-import { selectActiveKindId } from "store/project/selectors";
+import { projectSlice } from "@ProjectViewer/state";
+import { selectHighlightedCategory } from "@ProjectViewer/state/selectors";
+import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import {
   selectActiveCategories,
   selectActiveSelectedThingIds,
-} from "store/project/reselectors";
+} from "@ProjectViewer/state/reselectors";
 import { dataSlice } from "store/data/dataSlice";
 
 import { isUnknownCategory } from "store/data/utils";

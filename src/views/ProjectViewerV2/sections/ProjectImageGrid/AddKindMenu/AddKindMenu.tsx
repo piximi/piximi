@@ -8,8 +8,8 @@ import { BaseMenu } from "components/ui/BaseMenu";
 import { CreateKindDialog } from "components/dialogs";
 
 import { dataSlice } from "store/data";
-import { projectSlice } from "store/project";
-import { selectActiveKindId } from "store/project/selectors";
+import { projectSlice } from "@ProjectViewer/state";
+import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { selectAllKindIds } from "store/data/selectors";
 
 import { HotkeyContext } from "utils/enums";

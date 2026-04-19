@@ -10,7 +10,7 @@ import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { CountChip } from "components/ui/CountChip";
 
 import { selectNumThingsByCatAndKind } from "store/data/selectors";
-import { selectActiveKindId } from "store/project/selectors";
+import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 
 import { APPLICATION_COLORS } from "utils/constants";
 

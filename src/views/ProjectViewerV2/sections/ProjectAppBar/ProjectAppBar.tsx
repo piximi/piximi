@@ -19,7 +19,7 @@ import { ExperimentNameTextField } from "./ExperimentNameTextField";
 import { CategorizeChip } from "./CategorizeChip";
 
 import { dataSlice } from "store/data";
-import { selectActiveKindId } from "store/project/selectors";
+import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 
 import { pluralize } from "utils/stringUtils";
 import { HotkeyContext } from "utils/enums";

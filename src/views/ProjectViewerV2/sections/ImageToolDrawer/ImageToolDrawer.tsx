@@ -32,7 +32,7 @@ import {
 } from "./tool-options";
 import { OperationType } from "./ToolOptionsDrawer";
 
-import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
+import { selectActiveFilteredStateHasFilters } from "@ProjectViewer/state/selectors";
 
 import { DIMENSIONS } from "utils/constants";
 import { capitalize } from "utils/stringUtils";

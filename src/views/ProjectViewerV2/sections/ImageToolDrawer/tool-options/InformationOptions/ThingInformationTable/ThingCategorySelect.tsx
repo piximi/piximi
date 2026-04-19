@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { MenuItem, SelectChangeEvent } from "@mui/material";
 
-import { selectActiveCategories } from "store/project/reselectors";
+import { selectActiveCategories } from "@ProjectViewer/state/reselectors";
 import { StyledSelect } from "components/inputs";
 import { StyledSelectProps } from "components/inputs/StyledSelect";
 

@@ -14,10 +14,10 @@ import { useSortFunction } from "../../../hooks";
 import { DropBox } from "components/layout";
 import { ProjectGridItem } from "./ProjectGridItem";
 
-import { projectSlice } from "store/project";
+import { projectSlice } from "@ProjectViewer/state";
 import { selectThingsOfKind } from "store/data";
-import { selectThingFilters } from "store/project/selectors";
-import { selectActiveSelectedThingIds } from "store/project/reselectors";
+import { selectThingFilters } from "@ProjectViewer/state/selectors";
+import { selectActiveSelectedThingIds } from "@ProjectViewer/state/reselectors";
 import { selectTileSize } from "store/applicationSettings/selectors";
 
 import { getInnerElementWidth } from "utils/domUtils";

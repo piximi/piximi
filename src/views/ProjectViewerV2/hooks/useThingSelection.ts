@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { intersection } from "lodash";
 
-import { projectSlice } from "store/project";
-import { selectActiveThings } from "store/project/reselectors";
+import { projectSlice } from "@ProjectViewer/state";
+import { selectActiveThings } from "@ProjectViewer/state/reselectors";
 import {
   selectActiveKindId,
   selectActiveThingFilters,
   selectSelectedThingIds,
-} from "store/project/selectors";
+} from "@ProjectViewer/state/selectors";
 
 import { isFiltered } from "utils/arrayUtils";
 

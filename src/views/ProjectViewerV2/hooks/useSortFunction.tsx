@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { selectCategoriesDictionary } from "store/data/selectors";
-import { selectSortType } from "store/project/selectors";
+import { selectSortType } from "@ProjectViewer/state/selectors";
 
 import { ThingSortKey } from "utils/enums";
 

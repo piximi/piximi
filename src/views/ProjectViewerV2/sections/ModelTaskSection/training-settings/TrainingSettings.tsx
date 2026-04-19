@@ -3,7 +3,7 @@ import { ModelPicker } from "./ModelPicker";
 import { HyperperameterSettings } from "./HyperparameterSettings";
 import { useSelector } from "react-redux";
 import { selectClassifierHyperparameters } from "store/classifier/reselectors";
-import { selectProjectName } from "store/project/selectors";
+import { selectProjectName } from "@ProjectViewer/state/selectors";
 import saveAs from "file-saver";
 import { Button } from "@mui/material";
 

@@ -7,7 +7,7 @@ import { ImageCategoryMenu } from "./ImageCategoryMenu";
 
 import { dataSlice } from "store/data";
 import { isUnknownCategory } from "store/data/utils";
-import { selectActiveCategories } from "store/project/reselectors";
+import { selectActiveCategories } from "@ProjectViewer/state/reselectors";
 
 import { Partition } from "utils/models/enums";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";

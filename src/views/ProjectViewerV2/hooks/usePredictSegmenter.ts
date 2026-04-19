@@ -12,7 +12,7 @@ import { AlertType } from "utils/enums";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { ModelStatus } from "utils/models/enums";
 import { selectAllImages, selectAllKinds } from "store/data/selectors";
-import { selectActiveSelectedThings } from "store/project/reselectors";
+import { selectActiveSelectedThings } from "@ProjectViewer/state/reselectors";
 import {
   AnnotationObject,
   Category,

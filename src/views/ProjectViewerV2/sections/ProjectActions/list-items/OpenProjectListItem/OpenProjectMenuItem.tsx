@@ -4,7 +4,7 @@ import { ListItemText, MenuItem } from "@mui/material";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { classifierSlice } from "store/classifier";
-import { projectSlice } from "store/project";
+import { projectSlice } from "@ProjectViewer/state";
 import { segmenterSlice } from "store/segmenter";
 import { dataSlice } from "store/data/dataSlice";
 

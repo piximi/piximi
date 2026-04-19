@@ -4,8 +4,8 @@ import { Box, MenuItem, SelectChangeEvent } from "@mui/material";
 
 import { StyledSelect, WithLabel } from "components/inputs";
 
-import { projectSlice } from "store/project";
-import { selectSortType } from "store/project/selectors";
+import { projectSlice } from "@ProjectViewer/state";
+import { selectSortType } from "@ProjectViewer/state/selectors";
 
 import { ThingSortKey } from "utils/enums";
 
