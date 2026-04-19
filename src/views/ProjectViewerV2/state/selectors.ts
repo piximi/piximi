@@ -13,24 +13,24 @@ import {
 } from "./types";
 
 export const selectProject = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }): ProjectState => {
   return project;
 };
 
 export const selectActiveView = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }): ViewState => {
   return project.activeView;
 };
 export const selectAnnotationGridState = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }): AnnotationGridState => {
   return project.annotationGridState;
 };
@@ -39,7 +39,11 @@ export const selectAnnotationGridState = ({
 NAME
 */
 
-export const selectProjectName = ({ project }: { project: ProjectState }) => {
+export const selectProjectName = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}) => {
   return project.name;
 };
 
@@ -47,33 +51,33 @@ export const selectProjectName = ({ project }: { project: ProjectState }) => {
 IMAGES
 */
 export const selectSelectedImageIds = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }): Array<string> => {
   return project.imageGridState.selectedIds;
 };
 
 export const selectNumSelectedImages = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }): number => {
   return project.imageGridState.selectedIds.length;
 };
 
 export const selectImageFilters = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }): ImageFilters => {
   return project.imageGridState.filters;
 };
 
 export const selectImageSortType = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }): ImageSortType => {
   return project.imageGridState.sortType;
 };
@@ -83,17 +87,17 @@ SELECTED THINGS
 */
 
 export const selectSelectedThingIds = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }): Array<string> => {
   return project.selectedThingIds;
 };
 
 export const selectSelectedThingIdsLength = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }) => {
   return project.selectedThingIds.length;
 };
@@ -103,9 +107,9 @@ SORT TYPE
 */
 
 export const selectSortType = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }): ThingSortKey => {
   return project.sortType;
 };
@@ -114,7 +118,11 @@ export const selectSortType = ({
 ACTIVE KIND
 */
 
-export const selectActiveKindId = ({ project }: { project: ProjectState }) => {
+export const selectActiveKindId = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}) => {
   return project.activeKind;
 };
 
@@ -123,9 +131,9 @@ HIGHLIGHTED CATEGORY
 */
 
 export const selectHighlightedCategory = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }) => {
   return project.highlightedCategory;
 };
@@ -134,7 +142,11 @@ export const selectHighlightedCategory = ({
 THING FILTERS
 */
 
-export const selectThingFilters = ({ project }: { project: ProjectState }) => {
+export const selectThingFilters = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}) => {
   return project.thingFilters;
 };
 
@@ -146,9 +158,9 @@ export const selectActiveThingFilters = createSelector(
   },
 );
 export const selectActiveFilteredStateHasFilters = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }) => {
   const activeKind = project.activeKind;
   const thingFilters = project.thingFilters[activeKind];
@@ -171,17 +183,17 @@ export const selectUnfilteredActivePartitions = createSelector(
 );
 
 export const selectKindTabFilters = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }) => {
   return project.kindTabFilters;
 };
 
 export const selectProjectImageChannels = ({
-  project,
+  projectV2: project,
 }: {
-  project: ProjectState;
+  projectV2: ProjectState;
 }) => {
   return project.imageChannels;
 };
