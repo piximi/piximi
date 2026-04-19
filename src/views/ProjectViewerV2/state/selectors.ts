@@ -9,6 +9,7 @@ import {
   ImageFilters,
   ImageSortType,
   ProjectState,
+  ViewState,
 } from "./types";
 
 export const selectProject = ({
@@ -19,6 +20,13 @@ export const selectProject = ({
   return project;
 };
 
+export const selectActiveView = ({
+  project,
+}: {
+  project: ProjectState;
+}): ViewState => {
+  return project.activeView;
+};
 export const selectAnnotationGridState = ({
   project,
 }: {

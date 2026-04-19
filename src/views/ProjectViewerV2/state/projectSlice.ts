@@ -4,7 +4,12 @@ import { mutatingFilter, toUnique } from "utils/arrayUtils";
 
 import { ThingSortKey } from "utils/enums";
 import { Partition } from "utils/models/enums";
-import { AnnotationSortType, ImageSortType, ProjectState } from "./types";
+import {
+  AnnotationSortType,
+  ImageSortType,
+  ProjectState,
+  ViewState,
+} from "./types";
 import { difference } from "lodash";
 
 export const initialState: ProjectState = {
@@ -37,7 +42,9 @@ export const projectSlice = createSlice({
     setProject(state, action: PayloadAction<{ project: ProjectState }>) {
       return action.payload.project;
     },
-
+    setActiveView(state, action: PayloadAction<ViewState>) {
+      state.activeView = action.payload;
+    },
     setActiveKind(state, action: PayloadAction<string>) {
       if (!state.annotationGridState.kindStates[action.payload]) return;
       state.annotationGridState.activeKindId = action.payload;
