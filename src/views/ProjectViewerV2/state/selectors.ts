@@ -4,7 +4,12 @@ import { difference } from "lodash";
 import { ThingSortKey } from "utils/enums";
 import { Partition } from "utils/models/enums";
 
-import { ProjectState } from "store/types";
+import {
+  AnnotationGridState,
+  ImageFilters,
+  ImageSortType,
+  ProjectState,
+} from "./types";
 
 export const selectProject = ({
   project,
@@ -14,12 +19,55 @@ export const selectProject = ({
   return project;
 };
 
+export const selectAnnotationGridState = ({
+  project,
+}: {
+  project: ProjectState;
+}): AnnotationGridState => {
+  return project.annotationGridState;
+};
+
 /*
 NAME
 */
 
 export const selectProjectName = ({ project }: { project: ProjectState }) => {
   return project.name;
+};
+
+/*
+IMAGES
+*/
+export const selectSelectedImageIds = ({
+  project,
+}: {
+  project: ProjectState;
+}): Array<string> => {
+  return project.imageGridState.selectedIds;
+};
+
+export const selectNumSelectedImages = ({
+  project,
+}: {
+  project: ProjectState;
+}): number => {
+  return project.imageGridState.selectedIds.length;
+};
+
+export const selectImageFilters = ({
+  project,
+}: {
+  project: ProjectState;
+}): ImageFilters => {
+  return project.imageGridState.filters;
+};
+
+export const selectImageSortType = ({
+  project,
+}: {
+  project: ProjectState;
+}): ImageSortType => {
+  return project.imageGridState.sortType;
 };
 
 /*
