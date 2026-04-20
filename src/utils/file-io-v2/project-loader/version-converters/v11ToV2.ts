@@ -166,7 +166,7 @@ function convertThings(
   for (const image of v11Images) {
     const bitDepth = image.bitDepth;
     const { buffer, shape, dtype } = image.tensorData;
-    const [planes, width, height, channels] = shape;
+    const [planes, height, width, channels] = shape;
     const v2Series: V2ImageSeries = {
       id: generateUUID(),
       experimentId,
@@ -334,15 +334,13 @@ function parseChannelData(
       { length: channels },
       (_) => new ctor(width * height),
     );
-    const planeOffset = p * width * height * channels;
-    for (let w = 0; w < width; w++) {
-      const widthOffset = planeOffset + w * height * channels;
-      for (let h = 0; h < height; h++) {
-        const heightOffset = widthOffset + h * channels;
+    const planeOffset = p * height * width * channels;
+    for (let h = 0; h < height; h++) {
+      const rowOffset = planeOffset + h * width * channels;
+      for (let w = 0; w < width; w++) {
+        const pixelOffset = rowOffset + w * channels;
         for (let c = 0; c < channels; c++) {
-          const channelOffset = heightOffset + c;
-          const cVal = data[channelOffset];
-          channelData[p][c][w + h * width] = cVal;
+          channelData[p][c][h * width + w] = data[pixelOffset + c];
         }
       }
     }
