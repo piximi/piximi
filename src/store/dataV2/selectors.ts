@@ -11,7 +11,7 @@ import {
   annotationAdapter,
   annotationVolumeAdapter,
 } from "./dataSliceV2";
-import { ExtendedChannel } from "./types";
+import { ExtendedChannel, ExtendedImageObject } from "./types";
 
 // ── Tier 1: Raw adapter selectors ──────────────────────────────────────────
 
@@ -265,7 +265,49 @@ export const selectActiveExtendedChannels = createSelector(
 // ── Tier 2: Grid display selector ──────────────────────────────────────────
 
 export const selectRepresentativeImages = createSelector(
-  [imageSelectors.selectEntities, imageSeriesSelectors.selectAll],
-  (imageDict, series) =>
-    series.map((imSeries) => imageDict[imSeries.activeImageId]),
+  [
+    planeSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    channelSelectors.selectAll,
+    categorySelectors.selectEntities,
+    imageSelectors.selectEntities,
+    imageSeriesSelectors.selectAll,
+  ],
+  (
+    planeDict,
+    chMetaDict,
+    chs,
+    catDict,
+    imageDict,
+    series,
+  ): ExtendedImageObject[] =>
+    series.map((imSeries) => {
+      const image = imageDict[imSeries.activeImageId];
+      const plane = planeDict[image.activePlaneId];
+      const category = catDict[image.categoryId];
+      const channels = chs.reduce((extChs: ExtendedChannel[], ch) => {
+        const meta = chMetaDict[ch.channelMetaId];
+        if (ch.planeId !== plane.id || !meta || !meta.visible) return extChs;
+        extChs.push({
+          ...ch,
+          colorMap: meta.colorMap,
+          rampMin: meta.rampMin,
+          rampMax: meta.rampMax,
+        });
+
+        return extChs;
+      }, []);
+      return {
+        id: image.id,
+        name: image.name,
+        seriesId: image.seriesId,
+        shape: image.shape,
+        category,
+        activePlaneIdx: plane.zIndex,
+        timepoint: image.timepoint,
+        bitDepth: image.bitDepth,
+        partition: image.partition,
+        channels,
+      };
+    }),
 );

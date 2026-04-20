@@ -72,6 +72,18 @@ export type ImageObject = {
 };
 export type ImageEntities = Record<string, ImageObject>;
 
+export type ExtendedImageObject = {
+  id: string;
+  name: string;
+  seriesId: string;
+  shape: Shape;
+  category: Category;
+  activePlaneIdx: number;
+  timepoint: number;
+  bitDepth: BitDepth;
+  partition: Partition;
+  channels: ExtendedChannel[];
+};
 export type Plane = {
   id: string;
   imageId: string;
