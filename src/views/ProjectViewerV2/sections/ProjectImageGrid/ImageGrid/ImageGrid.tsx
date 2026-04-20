@@ -12,7 +12,7 @@ import memoize from "memoize-one";
 import { useImageSort, useReactWindow } from "@ProjectViewer/hooks";
 
 import { DropBox } from "components/layout";
-import { ProjectGridItem } from "./ProjectGridItem";
+import { ImageGridItem } from "./ProjectGridItem";
 
 import { projectSlice } from "@ProjectViewer/state";
 import {

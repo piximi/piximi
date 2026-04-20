@@ -48,7 +48,7 @@ const printSize = (scale: number) => {
   return (220 * scale).toString() + "px";
 };
 
-export const ProjectGridItem = memo(
+export const ImageGridItem = memo(
   ({ selected, handleClick, thing, isScrolling }: ProjectGridItemProps) => {
     const imageSelectionColor = useSelector(selectImageSelectionColor);
     const selectedImageBorderWidth = useSelector(

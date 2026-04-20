@@ -1,1 +1,1 @@
-export { ProjectGridItem } from "./ProjectGridItem";
+export { ImageGridItem as ImageGridItem } from "./ImageGridItem";
