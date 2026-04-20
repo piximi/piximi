@@ -1,3 +1,5 @@
+import { BitDepth } from "store/data/types";
+
 const componentToHex = (c: number) => {
   const hex = (c * 255).toString(16);
   return hex.length === 1 ? "0" + hex : hex;
@@ -32,3 +34,28 @@ export const DEFAULT_COLORS: Array<ColorMap> = [
   CHANNEL_COLOR_MAPS.MAGENTA,
   CHANNEL_COLOR_MAPS.WHITE,
 ];
+
+export const createLUT = (params: {
+  bitDepth: BitDepth;
+  colorMap: ColorMap;
+  min?: number;
+  max?: number;
+}): number[][] => {
+  const { bitDepth, colorMap, min, max } = params;
+  const maxIntensity = 2 ** bitDepth - 1;
+  const scaledMin = min ? min : 0;
+  const scaledMax = max ? max : maxIntensity;
+
+  const range = scaledMax - scaledMin;
+
+  const lut = colorMap.map((w) =>
+    Array.from({ length: maxIntensity + 1 }, (_, v) => {
+      const leveled = Math.max(
+        0,
+        Math.min(maxIntensity, ((v - scaledMin) / range) * maxIntensity),
+      );
+      return Math.min(255, Math.round((leveled / maxIntensity) * 255 * w));
+    }),
+  );
+  return lut;
+};
