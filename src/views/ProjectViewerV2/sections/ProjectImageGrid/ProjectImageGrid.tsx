@@ -10,10 +10,12 @@ import { DIMENSIONS } from "utils/constants";
 import { ViewState } from "@ProjectViewer/state/types";
 import { ImageGrid } from "./ImageGrid";
 import { DropBox } from "components/layout";
+import { selectTotalAnnotations } from "store/dataV2/selectors";
 
 export const ProjectImageGrid = () => {
   const dispatch = useDispatch();
   const activeView = useSelector(selectActiveView);
+  const annotationCount = useSelector(selectTotalAnnotations);
 
   const handleActiveViewChange = (
     _event: React.MouseEvent<HTMLElement>,
@@ -56,7 +58,9 @@ export const ProjectImageGrid = () => {
             sx={{ my: 0.5 }}
           >
             <ToggleButton value="images">Images</ToggleButton>
-            <ToggleButton value="annotations">Annotations</ToggleButton>
+            <ToggleButton value="annotations" disabled={annotationCount === 0}>
+              Annotations
+            </ToggleButton>
           </ToggleButtonGroup>
         </Box>
         <Box
