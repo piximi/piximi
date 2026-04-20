@@ -8,19 +8,19 @@ import {
 import { ItemDetailTooltip } from "./ItemDetailTooltip";
 import { ThingDetailList } from "./ThingDetailList";
 
-import { Thing } from "store/data/types";
+import { ImageObject } from "store/dataV2/types";
 
 export const ThingDetailContainer = ({
   position,
   backgroundColor,
   categoryName,
-  thing,
+  image,
   usePredictedStyle,
 }: {
   position: { top: number; left: number };
   backgroundColor: string;
   categoryName: string;
-  thing: Thing;
+  image: ImageObject;
   usePredictedStyle: boolean;
 }) => {
   const theme = useTheme();
@@ -57,7 +57,7 @@ export const ThingDetailContainer = ({
       <ItemDetailTooltip
         contents={
           <ThingDetailList
-            thing={thing}
+            image={image}
             color={theme.palette.getContrastText(backgroundColor)}
           />
         }

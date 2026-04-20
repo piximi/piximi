@@ -5,25 +5,30 @@ import { Box } from "@mui/material";
 
 import { ThingDetailContainer } from "./ThingDetailContainer";
 
-import { selectCategoryProperty } from "store/data/selectors";
 import {
   selectImageSelectionColor,
   selectSelectedImageBorderWidth,
   selectTextOnScroll,
-  selectTileSize,
 } from "store/applicationSettings/selectors";
 
 import { isUnknownCategory } from "store/data/utils";
 
 import { Partition } from "utils/models/enums";
 
-import { AnnotationObject, ImageObject } from "store/data/types";
+import { ImageObject } from "store/dataV2/types";
+import { useParameterizedSelector } from "store/hooks";
+import {
+  selectActiveExtendedChannels,
+  selectCategoryById,
+} from "store/dataV2/selectors";
+import { useRenderedSrc } from "hooks/useRenderedSrcs";
 
-type ProjectGridItemProps = {
+type ImageGridItemProps = {
   selected: boolean;
   handleClick: (id: string, selected: boolean) => void;
-  thing: ImageObject | AnnotationObject;
+  image: ImageObject;
   isScrolling?: boolean;
+  scale: number;
 };
 
 const getIconPosition = (
@@ -49,23 +54,34 @@ const printSize = (scale: number) => {
 };
 
 export const ImageGridItem = memo(
-  ({ selected, handleClick, thing, isScrolling }: ProjectGridItemProps) => {
+  ({
+    selected,
+    handleClick,
+    image,
+    isScrolling,
+    scale,
+  }: ImageGridItemProps) => {
+    const channels = useParameterizedSelector(
+      selectActiveExtendedChannels,
+      image.id,
+    );
+    const category = useParameterizedSelector(
+      selectCategoryById,
+      image.categoryId,
+    );
     const imageSelectionColor = useSelector(selectImageSelectionColor);
     const selectedImageBorderWidth = useSelector(
       selectSelectedImageBorderWidth,
     );
-    const scaleFactor = useSelector(selectTileSize);
     const textOnScroll = useSelector(selectTextOnScroll);
 
-    const getCategoryProperty = useSelector(selectCategoryProperty);
-    const categoryName = getCategoryProperty(thing.categoryId, "name") ?? "";
-    const categoryColor = getCategoryProperty(thing.categoryId, "color") ?? "";
+    const { src, loading } = useRenderedSrc(channels);
 
     const handleSelect = (
       evt: React.MouseEvent<HTMLDivElement, MouseEvent>,
     ) => {
       evt.stopPropagation();
-      handleClick(thing.id, selected);
+      handleClick(image.id, selected);
     };
 
     return isScrolling ? (
@@ -78,33 +94,33 @@ export const ImageGridItem = memo(
           }`,
           margin: `${10 - selectedImageBorderWidth}px`,
           borderRadius: selectedImageBorderWidth + "px",
-          width: printSize(scaleFactor),
-          height: printSize(scaleFactor),
+          width: printSize(scale),
+          height: printSize(scale),
         }}
       >
         {textOnScroll ? (
           <>
-            Name: {thing.name}
+            Name: {image.name}
             <br />
-            <span style={{ color: categoryColor }}>
-              Category: {categoryName}
+            <span style={{ color: category.color }}>
+              Category: {category.name}
             </span>
             <br />
-            Width: {thing.shape.width}
+            Width: {image.shape.width}
             <br />
-            Height: {thing.shape.height}
+            Height: {image.shape.height}
             <br />
-            Channels: {thing.shape.channels}
+            Channels: {image.shape.channels}
             <br />
-            Planes: {thing.shape.planes}
+            Planes: {image.shape.planes}
             <br />
-            Partition: {thing.partition}
+            Partition: {image.partition}
           </>
         ) : (
           <Box
             component="img"
             alt=""
-            src={thing.src}
+            src={src}
             sx={{
               width: "100%",
               height: "100%",
@@ -127,14 +143,14 @@ export const ImageGridItem = memo(
           }`,
           borderRadius: selectedImageBorderWidth + "px",
           margin: `${10 - selectedImageBorderWidth}px`,
-          width: printSize(scaleFactor),
-          height: printSize(scaleFactor),
+          width: printSize(scale),
+          height: printSize(scale),
         }}
       >
         <Box
           component="img"
           alt=""
-          src={thing.src}
+          src={src}
           sx={{
             width: "100%",
             height: "100%",
@@ -145,17 +161,17 @@ export const ImageGridItem = memo(
           draggable={false}
         />
         <ThingDetailContainer
-          backgroundColor={categoryColor}
-          categoryName={categoryName}
+          backgroundColor={category.color}
+          categoryName={category.name}
           usePredictedStyle={
-            thing.partition === Partition.Inference &&
-            !isUnknownCategory(thing.categoryId)
+            image.partition === Partition.Inference &&
+            !isUnknownCategory(image.categoryId)
           }
-          thing={thing}
+          image={image}
           position={getIconPosition(
-            scaleFactor,
-            thing.shape.height,
-            thing.shape.width,
+            scale,
+            image.shape.height,
+            image.shape.width,
           )}
         />
       </Box>

@@ -4,15 +4,10 @@ import { useSelector } from "react-redux";
 import { selectCategoriesDictionary } from "store/data/selectors";
 import { selectImageSortType } from "@ProjectViewer/state/selectors";
 import { ImageSortType } from "@ProjectViewer/state/types";
+import { ImageObject } from "store/dataV2/types";
 
-type SortableImageObject = {
-  id: string;
-  name: string;
-  fileName: string;
-  categoryId: string;
-};
 // uuid -> numerical value (determenistic)
-const hash = (id: SortableImageObject["id"]) => {
+const hash = (id: ImageObject["id"]) => {
   let hashValue = 0;
   for (let i = 0; i < id.length; i++) {
     hashValue = (hashValue << 5) - hashValue + id.charCodeAt(i);
@@ -48,14 +43,11 @@ export const useImageSort = () => {
     ImageSortType.None,
   );
   const categories = useSelector(selectCategoriesDictionary);
-  const theSortFunction = function (
-    _a: SortableImageObject,
-    _b: SortableImageObject,
-  ) {
+  const theSortFunction = function (_a: ImageObject, _b: ImageObject) {
     return 0;
   };
   const [sortFunction, setSortFunction] = useState<
-    (a: SortableImageObject, b: SortableImageObject) => number
+    (a: ImageObject, b: ImageObject) => number
   >(() => theSortFunction);
 
   useEffect(() => {
@@ -65,31 +57,27 @@ export const useImageSort = () => {
       switch (sortType) {
         case ImageSortType.FileName:
           setSortFunction(
-            () => (a: SortableImageObject, b: SortableImageObject) =>
+            () => (a: ImageObject, b: ImageObject) =>
               a.name.localeCompare(b.name),
           );
           break;
 
         case ImageSortType.Random:
-          setSortFunction(
-            () => (a: SortableImageObject, b: SortableImageObject) => {
-              const aVal = splitmix32(hash(a.id) + randomSeed);
-              const bVal = splitmix32(hash(b.id) + randomSeed);
-              return aVal - bVal;
-            },
-          );
+          setSortFunction(() => (a: ImageObject, b: ImageObject) => {
+            const aVal = splitmix32(hash(a.id) + randomSeed);
+            const bVal = splitmix32(hash(b.id) + randomSeed);
+            return aVal - bVal;
+          });
           break;
         case ImageSortType.Name:
           setSortFunction(
-            () => (a: SortableImageObject, b: SortableImageObject) =>
+            () => (a: ImageObject, b: ImageObject) =>
               a.name.localeCompare(b.name),
           );
           break;
         case ImageSortType.None:
         default:
-          setSortFunction(
-            () => (_a: SortableImageObject, _b: SortableImageObject) => 0,
-          );
+          setSortFunction(() => (_a: ImageObject, _b: ImageObject) => 0);
       }
     }
   }, [sortType, categories, previousSortType]);
@@ -98,7 +86,7 @@ export const useImageSort = () => {
     if (sortType === ImageSortType.Category) {
       setPreviousSortType(sortType);
       setSortFunction(
-        () => (a: SortableImageObject, b: SortableImageObject) =>
+        () => (a: ImageObject, b: ImageObject) =>
           categories[a.categoryId]!.name.localeCompare(
             categories[b.categoryId]!.name,
           ),

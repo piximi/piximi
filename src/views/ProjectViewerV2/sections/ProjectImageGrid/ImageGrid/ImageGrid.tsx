@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Box, Container } from "@mui/material";
+import { Container } from "@mui/material";
 import {
   areEqual,
   FixedSizeGrid as Grid,
@@ -11,7 +11,6 @@ import memoize from "memoize-one";
 
 import { useImageSort, useReactWindow } from "@ProjectViewer/hooks";
 
-import { DropBox } from "components/layout";
 import { ImageGridItem } from "./ProjectGridItem";
 
 import { projectSlice } from "@ProjectViewer/state";
@@ -22,23 +21,14 @@ import {
 import { selectTileSize } from "store/applicationSettings/selectors";
 
 import { isFiltered } from "utils/arrayUtils";
-import { DEFAULT_GRID_ITEM_WIDTH, GRID_GAP } from "utils/constants";
-import { selectAllImages } from "store/dataV2/selectors";
+import { GRID_GAP } from "utils/constants";
+import { selectRepresentativeImages } from "store/dataV2/selectors";
 import { ImageObject } from "store/dataV2/types";
-import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
-import { Partition } from "utils/models/enums";
 
-type MockImageObject = {
-  id: string;
-  name: string;
-  fileName: string;
-  categoryId: string;
-  partition: Partition;
-};
 type SelectHandler = (id: string, selected: boolean) => void;
 type SelectedImageIds = string[];
 type CellData = {
-  images: MockImageObject[];
+  images: ImageObject[];
   handleSelectImage: SelectHandler;
   selectedImageIds: SelectedImageIds;
   numColumns: number;
@@ -47,7 +37,7 @@ type CellData = {
 
 const createItemData = memoize(
   (
-    images: MockImageObject[],
+    images: ImageObject[],
     handleSelectImage: SelectHandler,
     selectedImageIds,
     numColumns: number,
@@ -89,30 +79,14 @@ const Cell = memo(
         }}
         data-testid={`grid-image-${image.id}`}
       >
-        <Box
-          sx={{
-            width: DEFAULT_GRID_ITEM_WIDTH * data.scale + "px",
-            height: DEFAULT_GRID_ITEM_WIDTH * data.scale + "px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            border: `solid 2px ${selected ? "red" : "transparent"}`,
-            bgcolor: "blue",
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            data.handleSelectImage(image.id, selected);
-          }}
-        >
-          {image.id}
-        </Box>
-        {/* <ProjectGridItem
+        <ImageGridItem
           key={image.id}
           image={image}
-          handleClick={data.handleSelectThing}
-          selected={data.selectedThingIds.includes(image.id)}
+          handleClick={data.handleSelectImage}
+          selected={selected}
           isScrolling={isScrolling}
-        /> */}
+          scale={data.scale}
+        />
       </div>
     );
   },
@@ -123,21 +97,7 @@ const Cell = memo(
 // by the active kind selector to keep from rerendering the grid items when switching tabs
 export const ImageGrid = () => {
   const dispatch = useDispatch();
-  const images = useMemo(
-    () =>
-      Array.from(
-        { length: 100 },
-        (_, idx) =>
-          ({
-            id: "" + idx,
-            categoryId: UNKNOWN_IMAGE_CATEGORY_ID,
-            name: `Mock Image ${idx}`,
-            fileName: `mock-image-${idx}.png`,
-            partition: Partition.Unassigned,
-          }) as MockImageObject,
-      ),
-    [],
-  );
+  const images = useSelector(selectRepresentativeImages);
   const imageFilters = useSelector(selectImageFilters);
   const selectedImageIds = useSelector(selectSelectedImageIds);
   const sortFunction = useImageSort();
@@ -172,9 +132,7 @@ export const ImageGrid = () => {
         paddingBottom: `${GRID_GAP}px`,
         pl: `${GRID_GAP}px`,
         pr: 0,
-
         height: "100%",
-        bgcolor: "white",
       })}
       maxWidth={false}
       ref={gridRef}

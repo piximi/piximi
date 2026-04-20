@@ -1,46 +1,46 @@
 import React from "react";
 import { List, ListItem, ListItemText } from "@mui/material";
 
-import { Thing } from "store/data/types";
+import { ImageObject } from "store/dataV2/types";
 
 export const ThingDetailList = ({
-  thing,
+  image,
   color,
 }: {
-  thing: Thing;
+  image: ImageObject;
   color: string;
 }) => {
   return (
     <List dense>
       <ListItem>
         <ListItemText
-          primary={`Name: ${thing.name}`}
+          primary={`Name: ${image.name}`}
           slotProps={{ primary: { sx: { color: color } } }}
         />
       </ListItem>
-      {thing.shape && (
+      {image.shape && (
         <>
           <ListItem>
             <ListItemText
-              primary={`Width: ${thing.shape.width} px`}
+              primary={`Width: ${image.shape.width} px`}
               slotProps={{ primary: { sx: { color: color } } }}
             />
           </ListItem>
           <ListItem>
             <ListItemText
-              primary={`Height: ${thing.shape.height} px`}
+              primary={`Height: ${image.shape.height} px`}
               slotProps={{ primary: { sx: { color: color } } }}
             />
           </ListItem>
           <ListItem>
             <ListItemText
-              primary={`Channels: ${thing.shape.channels}`}
+              primary={`Channels: ${image.shape.channels}`}
               slotProps={{ primary: { sx: { color: color } } }}
             />
           </ListItem>
           <ListItem>
             <ListItemText
-              primary={`Planes: ${thing.shape.planes}`}
+              primary={`Planes: ${image.shape.planes}`}
               slotProps={{ primary: { sx: { color: color } } }}
             />
           </ListItem>
@@ -48,7 +48,7 @@ export const ThingDetailList = ({
       )}
       <ListItem>
         <ListItemText
-          primary={`Partition: ${thing.partition}`}
+          primary={`Partition: ${image.partition}`}
           slotProps={{ primary: { sx: { color: color } } }}
         />
       </ListItem>
