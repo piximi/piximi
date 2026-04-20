@@ -18,7 +18,7 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
   } = useFileLoader();
 
   const handleDrop = async (files: FileList) => {
-    if (import.meta.env.VITE_USE_NEW_FILE_UPLOAD === "true") {
+    if (import.meta.env.VITE_USE_V2 === "true") {
       await upload(files, { onTiffDialog: handleTiffDialog });
     } else {
       if (uploadFiles) {
@@ -43,7 +43,7 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
       >
         {children}
       </Box>
-      {import.meta.env.VITE_USE_NEW_FILE_UPLOAD === "true" &&
+      {import.meta.env.VITE_USE_V2 === "true" &&
         pendingTiffAnalysis !== null && (
           <TiffConfigDialog
             open={tiffDialogOpen}

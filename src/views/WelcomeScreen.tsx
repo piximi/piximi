@@ -143,7 +143,7 @@ export const WelcomeScreen = () => {
     if (!event.currentTarget.files) return;
     const files = event.currentTarget.files;
 
-    if (import.meta.env.VITE_USE_NEW_PROJECT_UPLOAD === "true") {
+    if (import.meta.env.VITE_USE_V2 === "true") {
       await loadProject(files);
       return;
     }
