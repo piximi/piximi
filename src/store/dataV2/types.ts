@@ -117,6 +117,11 @@ export type ChannelMeta = {
 };
 export type ChannelMetaEntities = Record<string, ChannelMeta>;
 
+export type ExtendedChannel = Channel & {
+  colorMap: ColorMap;
+  rampMin: number;
+  rampMax: number;
+};
 export type AnnotationVolume = {
   id: string;
   imageId: string;

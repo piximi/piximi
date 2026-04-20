@@ -11,6 +11,7 @@ import {
   annotationAdapter,
   annotationVolumeAdapter,
 } from "./dataSliceV2";
+import { ExtendedChannel } from "./types";
 
 // ── Tier 1: Raw adapter selectors ──────────────────────────────────────────
 
@@ -215,6 +216,30 @@ export const selectActiveChannels = createSelector(
     return activePlaneId
       ? channels.filter((ch) => ch.planeId === activePlaneId)
       : [];
+  },
+);
+export const selectActiveExtendedChannels = createSelector(
+  [
+    imageSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    channelSelectors.selectAll,
+    (_: RootState, imageId: string) => imageId,
+  ],
+  (imageDict, channelMetas, channels, imageId) => {
+    const activePlaneId = imageDict[imageId]?.activePlaneId;
+    if (!activePlaneId) return [];
+    const extChannels: ExtendedChannel[] = [];
+    channels.forEach((ch) => {
+      const meta = channelMetas[ch.channelMetaId];
+      if (ch.planeId !== activePlaneId || !meta || !meta.visible) return;
+      extChannels.push({
+        ...ch,
+        colorMap: meta.colorMap,
+        rampMin: meta.rampMin,
+        rampMax: meta.rampMax,
+      });
+    });
+    return extChannels;
   },
 );
 
