@@ -16,6 +16,7 @@ import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
 import { Partition } from "utils/models/enums";
 import { generateUUID } from "store/data/utils";
 import { processChannel } from "utils/channelUtils";
+import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 // ============================================================
 // Image Loading
@@ -220,7 +221,7 @@ export const experimentFromStack = (
       name: `${name}-${imageIDX}`,
       seriesId: series.id,
       shape: config.shape,
-      categoryId: "cat",
+      categoryId: UNKNOWN_IMAGE_CATEGORY_ID,
       activePlaneId: "",
       partition: Partition.Unassigned,
       timepoint: series.timeSeries ? imageIDX : 0,
