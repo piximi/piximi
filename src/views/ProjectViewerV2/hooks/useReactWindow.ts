@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { DEFAULT_GRID_ITEM_WIDTH, GRID_GAP } from "utils/constants";
 
 export const useReactWindow = (
@@ -27,7 +27,7 @@ export const useReactWindow = (
     if (gridRef.current) observer.observe(gridRef.current);
     return () => observer.disconnect();
   }, []);
-  useEffect(() => {
+  useLayoutEffect(() => {
     let calculatedColumnWidth =
       DEFAULT_GRID_ITEM_WIDTH * scaleFactor + GRID_GAP;
     if (calculatedColumnWidth > gridLayout.gridWidth) {
@@ -46,7 +46,11 @@ export const useReactWindow = (
 
     const numVirtualRows =
       numColumns > 0 ? Math.ceil(numItems / numColumns) : 0;
-
+    gridRef.current &&
+      gridRef.current?.style.setProperty(
+        "--item-size",
+        `${DEFAULT_GRID_ITEM_WIDTH * scaleFactor}px`,
+      );
     setGridLayout((prev) => ({
       ...prev,
       columnWidth,

@@ -1,13 +1,13 @@
 import React from "react";
 import { List, ListItem, ListItemText } from "@mui/material";
 
-import { ImageObject } from "store/dataV2/types";
+import { ExtendedImageObject } from "store/dataV2/types";
 
 export const ImageDetailList = ({
   image,
   color,
 }: {
-  image: ImageObject;
+  image: ExtendedImageObject;
   color: string;
 }) => {
   return (

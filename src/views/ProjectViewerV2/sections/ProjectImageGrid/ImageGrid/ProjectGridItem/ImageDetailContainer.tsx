@@ -8,7 +8,7 @@ import {
 import { ItemDetailTooltip } from "./ItemDetailTooltip";
 import { ImageDetailList } from "./ImageDetailList";
 
-import { ImageObject } from "store/dataV2/types";
+import { ExtendedImageObject } from "store/dataV2/types";
 
 export const ImageDetailContainer = ({
   position,
@@ -17,10 +17,10 @@ export const ImageDetailContainer = ({
   image,
   usePredictedStyle,
 }: {
-  position: { top: number; left: number };
+  position: { top: string; left: string };
   backgroundColor: string;
   categoryName: string;
-  image: ImageObject;
+  image: ExtendedImageObject;
   usePredictedStyle: boolean;
 }) => {
   const theme = useTheme();
@@ -28,8 +28,8 @@ export const ImageDetailContainer = ({
   return (
     <Box
       position="absolute"
-      top={position.top + "px"}
-      left={position.left + "px"}
+      top={position.top}
+      left={position.left}
       color={theme.palette.getContrastText(backgroundColor)}
     >
       <ItemDetailTooltip

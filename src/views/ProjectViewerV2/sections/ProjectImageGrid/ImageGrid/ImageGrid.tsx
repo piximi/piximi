@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useRef } from "react";
+import { memo, useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Container } from "@mui/material";
@@ -23,31 +23,28 @@ import { selectTileSize } from "store/applicationSettings/selectors";
 import { isFiltered } from "utils/arrayUtils";
 import { GRID_GAP } from "utils/constants";
 import { selectRepresentativeImages } from "store/dataV2/selectors";
-import { ImageObject } from "store/dataV2/types";
+import { ExtendedImageObject } from "store/dataV2/types";
 
 type SelectHandler = (id: string, selected: boolean) => void;
 type SelectedImageIds = string[];
 type CellData = {
-  images: ImageObject[];
+  images: ExtendedImageObject[];
   handleSelectImage: SelectHandler;
   selectedImageIds: SelectedImageIds;
   numColumns: number;
-  scale: number;
 };
 
 const createItemData = memoize(
   (
-    images: ImageObject[],
+    images: ExtendedImageObject[],
     handleSelectImage: SelectHandler,
     selectedImageIds,
     numColumns: number,
-    scale: number,
   ) => ({
     images,
     handleSelectImage,
     selectedImageIds,
     numColumns,
-    scale,
   }),
 );
 
@@ -74,7 +71,7 @@ const Cell = memo(
         style={{
           ...style,
           display: "flex",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           alignItems: "center",
         }}
         data-testid={`grid-image-${image.id}`}
@@ -85,7 +82,6 @@ const Cell = memo(
           handleClick={data.handleSelectImage}
           selected={selected}
           isScrolling={isScrolling}
-          scale={data.scale}
         />
       </div>
     );
@@ -104,6 +100,9 @@ export const ImageGrid = () => {
   const scaleFactor = useSelector(selectTileSize);
 
   const gridRef = useRef<HTMLDivElement | null>(null);
+  useLayoutEffect(() => {
+    gridRef.current?.style.setProperty("--item-size", `${220 * scaleFactor}px`);
+  }, [scaleFactor]);
 
   const visibleThings = useMemo(
     () =>
@@ -151,7 +150,6 @@ export const ImageGrid = () => {
             handleSelectImage,
             selectedImageIds,
             numColumns,
-            scaleFactor,
           )}
           style={{ width: gridWidth }}
         >
