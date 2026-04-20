@@ -43,42 +43,61 @@ const annotationVolumeSelectors = annotationVolumeAdapter.getSelectors(
   (state: RootState) => state.dataV2.annotationVolumes,
 );
 
+export const selectImageSeriesIds = imageSeriesSelectors.selectIds;
 export const selectImageSeriesEntities = imageSeriesSelectors.selectEntities;
 export const selectAllImageSeries = imageSeriesSelectors.selectAll;
 export const selectImageSeriesById = imageSeriesSelectors.selectById;
+export const selectTotalImageSeries = imageSeriesSelectors.selectTotal;
 
+export const selectImageIds = imageSelectors.selectIds;
 export const selectImageEntities = imageSelectors.selectEntities;
 export const selectAllImages = imageSelectors.selectAll;
 export const selectImageById = imageSelectors.selectById;
+export const selectTotalImages = imageSelectors.selectTotal;
 
+export const selectKindIds = kindSelectors.selectIds;
 export const selectKindEntities = kindSelectors.selectEntities;
 export const selectAllKinds = kindSelectors.selectAll;
 export const selectKindById = kindSelectors.selectById;
+export const selectTotalKinds = kindSelectors.selectTotal;
 
+export const selectCategoryIds = categorySelectors.selectIds;
 export const selectCategoryEntities = categorySelectors.selectEntities;
 export const selectAllCategories = categorySelectors.selectAll;
 export const selectCategoryById = categorySelectors.selectById;
+export const selectTotalCategories = categorySelectors.selectTotal;
 
+export const selectPlaneIds = planeSelectors.selectIds;
 export const selectPlaneEntities = planeSelectors.selectEntities;
 export const selectAllPlanes = planeSelectors.selectAll;
 export const selectPlaneById = planeSelectors.selectById;
+export const selectTotalPlanes = planeSelectors.selectTotal;
 
+export const selectChannelIds = channelSelectors.selectIds;
 export const selectChannelEntities = channelSelectors.selectEntities;
 export const selectAllChannels = channelSelectors.selectAll;
 export const selectChannelById = channelSelectors.selectById;
+export const selectTotalChannels = channelSelectors.selectTotal;
 
+export const selectChannelMetaIds = channelMetaSelectors.selectIds;
 export const selectChannelMetaEntities = channelMetaSelectors.selectEntities;
 export const selectAllChannelMetas = channelMetaSelectors.selectAll;
 export const selectChannelMetaById = channelMetaSelectors.selectById;
+export const selectTotalChannelMetas = channelMetaSelectors.selectTotal;
 
+export const selectAnnotationIds = annotationSelectors.selectIds;
 export const selectAnnotationEntities = annotationSelectors.selectEntities;
 export const selectAllAnnotations = annotationSelectors.selectAll;
 export const selectAnnotationById = annotationSelectors.selectById;
+export const selectTotalAnnotations = annotationSelectors.selectTotal;
 
+export const selectAnnotationVolumeIds = annotationVolumeSelectors.selectIds;
 export const selectAnnotationVolumeEntities =
   annotationVolumeSelectors.selectEntities;
 export const selectAllAnnotationVolumes = annotationVolumeSelectors.selectAll;
 export const selectAnnotationVolumeById = annotationVolumeSelectors.selectById;
+export const selectTotalAnnotationVolumes =
+  annotationVolumeSelectors.selectTotal;
 
 // ── Tier 1: Experiment selectors ───────────────────────────────────────────────
 
@@ -246,10 +265,7 @@ export const selectActiveExtendedChannels = createSelector(
 // ── Tier 2: Grid display selector ──────────────────────────────────────────
 
 export const selectRepresentativeImages = createSelector(
-  [imageSelectors.selectAll, imageSeriesSelectors.selectEntities],
-  (images, seriesDict) =>
-    images.filter((im) => {
-      const series = seriesDict[im.seriesId];
-      return !series?.timeSeries || im.timepoint === 0;
-    }),
+  [imageSelectors.selectEntities, imageSeriesSelectors.selectAll],
+  (imageDict, series) =>
+    series.map((imSeries) => imageDict[imSeries.activeImageId]),
 );
