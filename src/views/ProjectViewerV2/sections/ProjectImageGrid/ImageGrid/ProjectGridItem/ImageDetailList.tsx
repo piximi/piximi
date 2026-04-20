@@ -3,7 +3,7 @@ import { List, ListItem, ListItemText } from "@mui/material";
 
 import { ImageObject } from "store/dataV2/types";
 
-export const ThingDetailList = ({
+export const ImageDetailList = ({
   image,
   color,
 }: {

@@ -6,11 +6,11 @@ import {
 } from "@mui/icons-material";
 
 import { ItemDetailTooltip } from "./ItemDetailTooltip";
-import { ThingDetailList } from "./ThingDetailList";
+import { ImageDetailList } from "./ImageDetailList";
 
 import { ImageObject } from "store/dataV2/types";
 
-export const ThingDetailContainer = ({
+export const ImageDetailContainer = ({
   position,
   backgroundColor,
   categoryName,
@@ -56,7 +56,7 @@ export const ThingDetailContainer = ({
 
       <ItemDetailTooltip
         contents={
-          <ThingDetailList
+          <ImageDetailList
             image={image}
             color={theme.palette.getContrastText(backgroundColor)}
           />

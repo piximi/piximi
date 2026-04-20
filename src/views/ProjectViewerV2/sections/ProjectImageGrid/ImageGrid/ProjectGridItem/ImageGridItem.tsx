@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 import { Box } from "@mui/material";
 
-import { ThingDetailContainer } from "./ThingDetailContainer";
+import { ImageDetailContainer } from "./ImageDetailContainer";
 
 import {
   selectImageSelectionColor,
@@ -160,7 +160,7 @@ export const ImageGridItem = memo(
           }}
           draggable={false}
         />
-        <ThingDetailContainer
+        <ImageDetailContainer
           backgroundColor={category.color}
           categoryName={category.name}
           usePredictedStyle={
