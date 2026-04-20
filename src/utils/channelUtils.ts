@@ -158,12 +158,7 @@ export const processChannel = (channel: IJSImage) => {
   const pixels = channel.getRawImage().data;
   const pixelsBuffer = pixels.buffer as ArrayBuffer;
   const numPixels = channel.width * channel.height;
-  const [rampMin, rampMax] = findBinOfPercentiles(
-    histogram,
-    numPixels,
-    0.5,
-    0.98,
-  );
+  const [rampMin, rampMax] = findAutoIJBins(histogram, numPixels);
   const [lowerQuartile, upperQuartile] = findBinOfPercentiles(
     histogram,
     numPixels,
