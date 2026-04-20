@@ -1,7 +1,7 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Container } from "@mui/material";
+import { Box, Container } from "@mui/material";
 import {
   areEqual,
   FixedSizeGrid as Grid,
@@ -9,42 +9,55 @@ import {
 } from "react-window";
 import memoize from "memoize-one";
 
-import { useSortFunction } from "../../../hooks";
+import { useImageSort, useReactWindow } from "@ProjectViewer/hooks";
 
 import { DropBox } from "components/layout";
 import { ProjectGridItem } from "./ProjectGridItem";
 
 import { projectSlice } from "@ProjectViewer/state";
-import { selectThingsOfKind } from "store/data";
-import { selectThingFilters } from "@ProjectViewer/state/selectors";
-import { selectActiveSelectedThingIds } from "@ProjectViewer/state/reselectors";
+import {
+  selectImageFilters,
+  selectSelectedImageIds,
+} from "@ProjectViewer/state/selectors";
 import { selectTileSize } from "store/applicationSettings/selectors";
 
-import { getInnerElementWidth } from "utils/domUtils";
 import { isFiltered } from "utils/arrayUtils";
 import { DEFAULT_GRID_ITEM_WIDTH, GRID_GAP } from "utils/constants";
+import { selectAllImages } from "store/dataV2/selectors";
+import { ImageObject } from "store/dataV2/types";
+import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
+import { Partition } from "utils/models/enums";
 
-type Things = ReturnType<ReturnType<typeof selectThingsOfKind>>;
+type MockImageObject = {
+  id: string;
+  name: string;
+  fileName: string;
+  categoryId: string;
+  partition: Partition;
+};
 type SelectHandler = (id: string, selected: boolean) => void;
-type SelectedThingIds = ReturnType<typeof selectActiveSelectedThingIds>;
+type SelectedImageIds = string[];
 type CellData = {
-  things: Things;
-  handleSelectThing: SelectHandler;
-  selectedThingIds: SelectedThingIds;
+  images: MockImageObject[];
+  handleSelectImage: SelectHandler;
+  selectedImageIds: SelectedImageIds;
   numColumns: number;
+  scale: number;
 };
 
 const createItemData = memoize(
   (
-    things: Things,
-    handleSelectThing: SelectHandler,
-    selectedThingIds: SelectedThingIds,
+    images: MockImageObject[],
+    handleSelectImage: SelectHandler,
+    selectedImageIds,
     numColumns: number,
+    scale: number,
   ) => ({
-    things,
-    handleSelectThing,
-    selectedThingIds,
+    images,
+    handleSelectImage,
+    selectedImageIds,
     numColumns,
+    scale,
   }),
 );
 
@@ -56,24 +69,50 @@ const Cell = memo(
     isScrolling,
     data,
   }: GridChildComponentProps<CellData>) => {
-    const thingIdx = rowIndex * data.numColumns + columnIndex;
+    const imageIdx = rowIndex * data.numColumns + columnIndex;
     // grid is fixed number of rows x number of columns
     // so there will always be numRows x numCols cells in the grid
-    // unless things.length is exactly numRows x numCols
+    // unless images.length is exactly numRows x numCols
     // there will be empty cells in the grid
-    if (thingIdx >= data.things.length) return <></>;
+    if (imageIdx >= data.images.length) return <></>;
 
-    const thing = data.things[thingIdx];
+    const image = data.images[imageIdx];
+    const selected = data.selectedImageIds.includes(image.id);
 
     return (
-      <div style={style} data-testid={`grid-image-${thing.id}`}>
-        <ProjectGridItem
-          key={thing.id}
-          thing={thing}
+      <div
+        style={{
+          ...style,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        data-testid={`grid-image-${image.id}`}
+      >
+        <Box
+          sx={{
+            width: DEFAULT_GRID_ITEM_WIDTH * data.scale + "px",
+            height: DEFAULT_GRID_ITEM_WIDTH * data.scale + "px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            border: `solid 2px ${selected ? "red" : "transparent"}`,
+            bgcolor: "blue",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            data.handleSelectImage(image.id, selected);
+          }}
+        >
+          {image.id}
+        </Box>
+        {/* <ProjectGridItem
+          key={image.id}
+          image={image}
           handleClick={data.handleSelectThing}
-          selected={data.selectedThingIds.includes(thing.id)}
+          selected={data.selectedThingIds.includes(image.id)}
           isScrolling={isScrolling}
-        />
+        /> */}
       </div>
     );
   },
@@ -82,123 +121,85 @@ const Cell = memo(
 
 //NOTE: kind is passed as a prop and used internally instead of the kind returned
 // by the active kind selector to keep from rerendering the grid items when switching tabs
-export const ImageGrid = ({ kind }: { kind: string }) => {
+export const ImageGrid = () => {
   const dispatch = useDispatch();
-  const things = useSelector(selectThingsOfKind)(kind);
-  const thingFilters = useSelector(selectThingFilters)[kind];
-  const selectedThingIds = useSelector(selectActiveSelectedThingIds);
-  const sortFunction = useSortFunction();
+  const images = useMemo(
+    () =>
+      Array.from(
+        { length: 100 },
+        (_, idx) =>
+          ({
+            id: "" + idx,
+            categoryId: UNKNOWN_IMAGE_CATEGORY_ID,
+            name: `Mock Image ${idx}`,
+            fileName: `mock-image-${idx}.png`,
+            partition: Partition.Unassigned,
+          }) as MockImageObject,
+      ),
+    [],
+  );
+  const imageFilters = useSelector(selectImageFilters);
+  const selectedImageIds = useSelector(selectSelectedImageIds);
+  const sortFunction = useImageSort();
   const scaleFactor = useSelector(selectTileSize);
 
   const gridRef = useRef<HTMLDivElement | null>(null);
 
-  //const [visibleThings, setVisibleThings] = useState<Things>([]);
-
-  const [gridWidth, setGridWidth] = useState(0);
-  const [gridHeight, setGridHeight] = useState(0);
-  const [columnWidth, setColumnWidth] = useState(0);
-  const [numColumns, setNumColumns] = useState(0);
-  const [rowHeight, setRowHeight] = useState(0);
-  const [numRows, setNumRows] = useState(0);
-
   const visibleThings = useMemo(
     () =>
-      things
-        .filter((thing) => !isFiltered(thing, thingFilters ?? {}))
+      images
+        .filter((image) => !isFiltered(image, imageFilters ?? {}))
         .sort(sortFunction),
-    [things, thingFilters, sortFunction],
+    [images, imageFilters, sortFunction],
   );
+  const { gridWidth, gridHeight, columnWidth, rowHeight, numColumns, numRows } =
+    useReactWindow(visibleThings.length, gridRef, scaleFactor);
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (gridRef && gridRef.current) {
-        const gridContainerWidth = getInnerElementWidth(gridRef.current);
-        const gridContainerHeight = gridRef.current.offsetHeight;
-
-        setGridWidth(gridContainerWidth);
-        setGridHeight(gridContainerHeight);
-      }
-    };
-    handleResize();
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    const numVisible = visibleThings.length;
-
-    let calculatedColumnWidth =
-      DEFAULT_GRID_ITEM_WIDTH * scaleFactor + GRID_GAP;
-    if (calculatedColumnWidth > gridWidth) {
-      calculatedColumnWidth = gridWidth;
-    }
-
-    const maxNumColumns = Math.floor(gridWidth / calculatedColumnWidth);
-
-    const numColumns = numVisible > maxNumColumns ? maxNumColumns : numVisible;
-
-    const columnWidth = numColumns > 0 ? gridWidth / numColumns : 0;
-
-    const rowHeight = numColumns > 0 ? calculatedColumnWidth : 0;
-
-    const numVirtualRows =
-      numColumns > 0 ? Math.ceil(numVisible / numColumns) : 0;
-
-    setColumnWidth(columnWidth);
-    setRowHeight(rowHeight);
-    setNumColumns(numColumns);
-    setNumRows(numVirtualRows);
-  }, [gridWidth, gridHeight, scaleFactor, visibleThings.length]);
-
-  const handleSelectThing = useCallback(
+  const handleSelectImage = useCallback(
     (id: string, selected: boolean) => {
-      if (selected) {
-        dispatch(projectSlice.actions.deselectThings({ ids: id }));
+      if (!selected) {
+        dispatch(projectSlice.actions.addSelectedImages([id]));
       } else {
-        dispatch(projectSlice.actions.selectThings({ ids: id }));
+        dispatch(projectSlice.actions.removeSelectedImages([id]));
       }
     },
     [dispatch],
   );
 
   return (
-    <DropBox>
-      <Container
-        sx={() => ({
-          paddingBottom: `${GRID_GAP}px`,
-          pl: `${GRID_GAP}px`,
-          pr: 0,
-          "@media (min-width: 600px)": {
-            pl: `${GRID_GAP}px`,
-            pr: 0,
-          },
-          height: "100%",
-        })}
-        maxWidth={false}
-        ref={gridRef}
-      >
-        {gridWidth > 0 && gridHeight > 0 && (
-          <Grid
-            useIsScrolling
-            columnWidth={columnWidth}
-            columnCount={numColumns}
-            height={gridHeight}
-            rowCount={numRows}
-            rowHeight={rowHeight}
-            width={gridWidth}
-            itemData={createItemData(
-              visibleThings,
-              handleSelectThing,
-              selectedThingIds,
-              numColumns,
-            )}
-            style={{ width: gridWidth }}
-          >
-            {Cell}
-          </Grid>
-        )}
-      </Container>
-    </DropBox>
+    <Container
+      sx={() => ({
+        paddingBottom: `${GRID_GAP}px`,
+        pl: `${GRID_GAP}px`,
+        pr: 0,
+
+        height: "100%",
+        bgcolor: "white",
+      })}
+      maxWidth={false}
+      ref={gridRef}
+    >
+      {gridWidth > 0 && gridHeight > 0 && (
+        <Grid
+          useIsScrolling
+          columnWidth={columnWidth}
+          columnCount={numColumns}
+          height={gridHeight}
+          rowCount={numRows}
+          rowHeight={rowHeight}
+          width={gridWidth}
+          itemData={createItemData(
+            visibleThings,
+            handleSelectImage,
+            selectedImageIds,
+            numColumns,
+            scaleFactor,
+          )}
+          style={{ width: gridWidth }}
+        >
+          {Cell}
+        </Grid>
+      )}
+    </Container>
   );
 };

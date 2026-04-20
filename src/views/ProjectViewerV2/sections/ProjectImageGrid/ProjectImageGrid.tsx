@@ -8,6 +8,8 @@ import { selectActiveView } from "@ProjectViewer/state/selectors";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { DIMENSIONS } from "utils/constants";
 import { ViewState } from "@ProjectViewer/state/types";
+import { ImageGrid } from "./ImageGrid";
+import { DropBox } from "components/layout";
 
 export const ProjectImageGrid = () => {
   const dispatch = useDispatch();
@@ -21,97 +23,80 @@ export const ProjectImageGrid = () => {
   };
 
   return (
-    <Box
-      sx={(theme) => ({
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        gridArea: "image-grid",
-        border: `1px solid ${theme.palette.divider}`,
-        overflow: "hidden",
-        flexGrow: 1,
-        borderRadius: "4px 4px 0 0",
-      })}
-    >
+    <DropBox>
       <Box
         sx={(theme) => ({
           width: "100%",
+          height: "100%",
           display: "flex",
-          justifyContent: "center",
-          height: DIMENSIONS.toolDrawerWidth,
-          borderBottom: `1px solid ${theme.palette.divider}`,
+          flexDirection: "column",
+          gridArea: "image-grid",
+          border: `1px solid ${theme.palette.divider}`,
+          overflow: "hidden",
+          flexGrow: 1,
+          borderRadius: "4px 4px 0 0",
         })}
       >
-        <ToggleButtonGroup
-          data-help={HelpItem.GridView}
-          value={activeView}
-          size="small"
-          color="primary"
-          exclusive
-          onChange={handleActiveViewChange}
-          sx={{ my: 0.5 }}
+        <Box
+          sx={(theme) => ({
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            height: DIMENSIONS.toolDrawerWidth,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          })}
         >
-          <ToggleButton value="images">Images</ToggleButton>
-          <ToggleButton value="annotations">Annotations</ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
-      <Box
-        sx={{
-          width: "100%",
-          flexGrow: 1,
-          bgcolor: "white",
-          display: activeView === "images" ? "flex" : "none",
-          gap: 1,
-          flexWrap: "wrap",
-          justifyContent: "space-around",
-          overflowY: "scroll",
-        }}
-      >
-        {Array.from({ length: 100 }).map((_, idx) => (
-          <Box
-            key={`images-${idx}`}
-            sx={{
-              display: "flex",
-              width: "256px",
-              height: "256px",
-              bgcolor: "blue",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+          <ToggleButtonGroup
+            data-help={HelpItem.GridView}
+            value={activeView}
+            size="small"
+            color="primary"
+            exclusive
+            onChange={handleActiveViewChange}
+            sx={{ my: 0.5 }}
           >
-            {idx}
-          </Box>
-        ))}
+            <ToggleButton value="images">Images</ToggleButton>
+            <ToggleButton value="annotations">Annotations</ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+        <Box
+          sx={{
+            width: "100%",
+            flexGrow: 1,
+            display: activeView === "images" ? "block" : "none",
+          }}
+        >
+          <ImageGrid />
+        </Box>
+        <Box
+          sx={{
+            width: "100%",
+            flexGrow: 1,
+            bgcolor: "blue",
+            display: activeView === "annotations" ? "flex" : "none",
+            gap: 1,
+            flexWrap: "wrap",
+            justifyContent: "space-around",
+            overflowY: "scroll",
+          }}
+        >
+          {Array.from({ length: 100 }).map((_, idx) => (
+            <Box
+              key={`annotations-${idx}`}
+              sx={{
+                display: "flex",
+                width: "256px",
+                height: "256px",
+                bgcolor: "white",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {idx}
+            </Box>
+          ))}
+        </Box>
       </Box>
-      <Box
-        sx={{
-          width: "100%",
-          flexGrow: 1,
-          bgcolor: "blue",
-          display: activeView === "annotations" ? "flex" : "none",
-          gap: 1,
-          flexWrap: "wrap",
-          justifyContent: "space-around",
-          overflowY: "scroll",
-        }}
-      >
-        {Array.from({ length: 100 }).map((_, idx) => (
-          <Box
-            key={`annotations-${idx}`}
-            sx={{
-              display: "flex",
-              width: "256px",
-              height: "256px",
-              bgcolor: "white",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            {idx}
-          </Box>
-        ))}
-      </Box>
-    </Box>
+    </DropBox>
   );
 };

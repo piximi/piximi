@@ -38,7 +38,7 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
             easing: theme.transitions.easing.easeOut,
           }),
           border: isOver ? "5px solid blue" : "",
-          height: "calc(100vh - 64px - 49px)",
+          height: "100%",
         })}
       >
         {children}
