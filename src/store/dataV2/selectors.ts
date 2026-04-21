@@ -11,7 +11,11 @@ import {
   annotationAdapter,
   annotationVolumeAdapter,
 } from "./dataSliceV2";
-import { ExtendedChannel, ExtendedImageObject } from "./types";
+import {
+  ExtendedAnnotationObject,
+  ExtendedChannel,
+  ExtendedImageObject,
+} from "./types";
 
 // ── Tier 1: Raw adapter selectors ──────────────────────────────────────────
 
@@ -310,4 +314,57 @@ export const selectRepresentativeImages = createSelector(
         channels,
       };
     }),
+);
+export const selectGridAnnotationsByKindId = createSelector(
+  [
+    annotationSelectors.selectAll,
+    annotationVolumeSelectors.selectEntities,
+    planeSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    channelSelectors.selectAll,
+    categorySelectors.selectEntities,
+    imageSelectors.selectEntities,
+    (_: RootState, kindId: string) => kindId,
+  ],
+  (
+    anns,
+    annVols,
+    planeDict,
+    chMetaDict,
+    chs,
+    catDict,
+    imageDict,
+    kindId,
+  ): ExtendedAnnotationObject[] => {
+    const extAnns: ExtendedAnnotationObject[] = [];
+    anns.forEach((ann) => {
+      const vol = annVols[ann.volumeId];
+      if (!vol || vol.kindId !== kindId) return;
+      const image = imageDict[vol.imageId];
+      const plane = planeDict[ann.planeId];
+      const category = catDict[vol.categoryId];
+      const channels = chs.reduce((extChs: ExtendedChannel[], ch) => {
+        const meta = chMetaDict[ch.channelMetaId];
+        if (ch.planeId !== plane.id || !meta || !meta.visible) return extChs;
+        extChs.push({
+          ...ch,
+          colorMap: meta.colorMap,
+          rampMin: meta.rampMin,
+          rampMax: meta.rampMax,
+        });
+
+        return extChs;
+      }, []);
+      extAnns.push({
+        ...ann,
+        kindId,
+        categoryId: category.id,
+        imageChannels: channels,
+        planeIdx: plane.zIndex,
+        imageId: image.id,
+        imageName: image.name,
+      });
+    });
+    return extAnns;
+  },
 );

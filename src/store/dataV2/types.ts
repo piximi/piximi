@@ -158,6 +158,10 @@ export type AnnotationEntities = Record<string, AnnotationObject>;
 export type ExtendedAnnotationObject = AnnotationObject & {
   kindId: string;
   categoryId: string;
+  imageChannels: ExtendedChannel[];
+  planeIdx: number;
+  imageId: string;
+  imageName: string;
 };
 export type ExtendedAnnotationEntities = Record<
   string,
