@@ -1,1 +1,0 @@
-export { AnnotationGridItem } from "./AnnotationGridItem";

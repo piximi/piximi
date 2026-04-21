@@ -11,9 +11,9 @@ import { Category, ExtendedAnnotationObject } from "store/dataV2/types";
 import { useRenderedSrc } from "hooks/useRenderedSrcs";
 import { selectCategoryById } from "store/dataV2/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { getIconPosition, imageStyle } from "../../gridItemUtils";
-import { useGridItemStyle } from "../../useGridItemStyle";
-import { ItemDetailContainer } from "../../ItemDetailContainer";
+import { getIconPosition, imageStyle } from "../gridItemUtils";
+import { useGridItemStyle } from "../useGridItemStyle";
+import { ItemDetailContainer } from "../ItemDetailContainer";
 import { AnnotationDetailList } from "./AnnotationDetailList";
 
 type AnnotationGridItemProps = {

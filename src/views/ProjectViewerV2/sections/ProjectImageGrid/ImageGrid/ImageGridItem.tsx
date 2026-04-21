@@ -9,9 +9,9 @@ import { Partition } from "utils/models/enums";
 import { ExtendedImageObject } from "store/dataV2/types";
 
 import { useRenderedSrc } from "hooks/useRenderedSrcs";
-import { getIconPosition, imageStyle } from "../../gridItemUtils";
-import { useGridItemStyle } from "../../useGridItemStyle";
-import { ItemDetailContainer } from "../../ItemDetailContainer";
+import { getIconPosition, imageStyle } from "../gridItemUtils";
+import { useGridItemStyle } from "../useGridItemStyle";
+import { ItemDetailContainer } from "../ItemDetailContainer";
 import { ImageDetailList } from "./ImageDetailList";
 
 type ImageGridItemProps = {
