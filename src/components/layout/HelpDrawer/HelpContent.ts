@@ -77,6 +77,7 @@ export enum HelpItem {
   ExperimentName = "experiment-name",
   // Project Viewer -- Main
   GridView = "grid-view",
+  MinimizeKind = "minimize-kind",
 }
 type HelpItemContent = { desc: string; brief: string };
 
@@ -355,6 +356,7 @@ const MeasurementPlotColor = `Select a split to use for coloring each mark (**Sc
 const ExperimentName = `Change the experiment name`;
 // Project Viewer -- Main
 const GridView = `Switch between image viewing and annotation viewing`;
+const MinimizeKind = 'Hide the Kind tab from view. Replace from the "Add" menu';
 
 export const helpContent: {
   contexts: Record<HelpContext, { items: Array<HelpItem> }>;
@@ -622,6 +624,10 @@ export const helpContent: {
     [HelpItem.GridView]: {
       desc: GridView,
       brief: GridView,
+    },
+    [HelpItem.MinimizeKind]: {
+      desc: MinimizeKind,
+      brief: MinimizeKind,
     },
   },
 };
