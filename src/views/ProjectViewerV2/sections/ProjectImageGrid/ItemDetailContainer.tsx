@@ -6,22 +6,21 @@ import {
 } from "@mui/icons-material";
 
 import { ItemDetailTooltip } from "./ItemDetailTooltip";
-import { ImageDetailList } from "./ImageDetailList";
 
-import { ExtendedImageObject } from "store/dataV2/types";
+import { ReactNode } from "react";
 
-export const ImageDetailContainer = ({
+export const ItemDetailContainer = ({
   position,
   backgroundColor,
   categoryName,
-  image,
   usePredictedStyle,
+  renderDetailList,
 }: {
   position: { top: string; left: string };
   backgroundColor: string;
   categoryName: string;
-  image: ExtendedImageObject;
   usePredictedStyle: boolean;
+  renderDetailList: (color: string) => ReactNode;
 }) => {
   const theme = useTheme();
 
@@ -55,12 +54,7 @@ export const ImageDetailContainer = ({
       <Box sx={{ flexGrow: 1 }} />
 
       <ItemDetailTooltip
-        contents={
-          <ImageDetailList
-            image={image}
-            color={theme.palette.getContrastText(backgroundColor)}
-          />
-        }
+        contents={renderDetailList(backgroundColor)}
         backgroundColor={backgroundColor}
       >
         <InfoOutlinedIcon

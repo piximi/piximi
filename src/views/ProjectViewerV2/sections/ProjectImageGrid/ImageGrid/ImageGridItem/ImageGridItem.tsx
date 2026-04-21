@@ -1,15 +1,6 @@
-import { CSSProperties, memo } from "react";
-import { useSelector } from "react-redux";
+import { memo } from "react";
 
 import { Box } from "@mui/material";
-
-import { ImageDetailContainer } from "./ImageDetailContainer";
-
-import {
-  selectImageSelectionColor,
-  selectSelectedImageBorderWidth,
-  selectTextOnScroll,
-} from "store/applicationSettings/selectors";
 
 import { isUnknownCategory } from "store/data/utils";
 
@@ -18,6 +9,10 @@ import { Partition } from "utils/models/enums";
 import { ExtendedImageObject } from "store/dataV2/types";
 
 import { useRenderedSrc } from "hooks/useRenderedSrcs";
+import { getIconPosition, imageStyle } from "../../gridItemUtils";
+import { useGridItemStyle } from "../../useGridItemStyle";
+import { ItemDetailContainer } from "../../ItemDetailContainer";
+import { ImageDetailList } from "./ImageDetailList";
 
 type ImageGridItemProps = {
   selected: boolean;
@@ -26,33 +21,9 @@ type ImageGridItemProps = {
   isScrolling?: boolean;
 };
 
-const getIconPosition = (
-  height: number | undefined,
-  width: number | undefined,
-) => {
-  if (!height || !width) return { top: "0%", left: "0%" };
-  const scaleBy = Math.max(width, height);
-  const offsetY = ((1 - height / scaleBy) / 2) * 100;
-  const offsetX = ((1 - width / scaleBy) / 2) * 100;
-  return { top: offsetY + "%", left: offsetX + "%" };
-};
-
-const imageStyle: CSSProperties = {
-  width: "100%",
-  height: "100%",
-  objectFit: "contain",
-  top: 0,
-  transform: "none",
-};
-
 export const ImageGridItem = memo(
   ({ selected, handleClick, image, isScrolling }: ImageGridItemProps) => {
-    const imageSelectionColor = useSelector(selectImageSelectionColor);
-    const selectedImageBorderWidth = useSelector(
-      selectSelectedImageBorderWidth,
-    );
-    const textOnScroll = useSelector(selectTextOnScroll);
-
+    const { containerStyle, textOnScroll } = useGridItemStyle(selected);
     const { src } = useRenderedSrc(image.channels);
 
     const handleSelect = (
@@ -60,18 +31,6 @@ export const ImageGridItem = memo(
     ) => {
       evt.stopPropagation();
       handleClick(image.id, selected);
-    };
-
-    const containerStyle: CSSProperties = {
-      position: "relative",
-      boxSizing: "content-box",
-      border: `solid ${selectedImageBorderWidth}px ${
-        selected ? imageSelectionColor : "transparent"
-      }`,
-      margin: `${10 - selectedImageBorderWidth}px`,
-      borderRadius: selectedImageBorderWidth + "px",
-      width: "var(--item-size)",
-      height: "var(--item-size)",
     };
 
     const imgElement = (
@@ -89,15 +48,17 @@ export const ImageGridItem = memo(
     return (
       <Box onClick={handleSelect} sx={containerStyle}>
         {imgElement}
-        <ImageDetailContainer
+        <ItemDetailContainer
           backgroundColor={image.category.color}
           categoryName={image.category.name}
           usePredictedStyle={
             image.partition === Partition.Inference &&
             !isUnknownCategory(image.category.id)
           }
-          image={image}
           position={getIconPosition(image.shape.height, image.shape.width)}
+          renderDetailList={(color) => (
+            <ImageDetailList image={image} color={color} />
+          )}
         />
       </Box>
     );

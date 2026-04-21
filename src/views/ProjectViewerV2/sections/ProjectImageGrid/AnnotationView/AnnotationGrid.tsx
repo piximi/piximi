@@ -27,7 +27,7 @@ import { useParameterizedSelector } from "store/hooks";
 type SelectHandler = (id: string, selected: boolean) => void;
 type SelectedImageIds = string[];
 type CellData = {
-  images: ExtendedAnnotationObject[];
+  annotations: ExtendedAnnotationObject[];
   handleSelectImage: SelectHandler;
   selectedImageIds: SelectedImageIds;
   numColumns: number;
@@ -35,12 +35,12 @@ type CellData = {
 
 const createItemData = memoize(
   (
-    images: ExtendedAnnotationObject[],
+    annotations: ExtendedAnnotationObject[],
     handleSelectImage: SelectHandler,
     selectedImageIds,
     numColumns: number,
   ) => ({
-    images,
+    annotations,
     handleSelectImage,
     selectedImageIds,
     numColumns,
@@ -55,15 +55,15 @@ const Cell = memo(
     isScrolling,
     data,
   }: GridChildComponentProps<CellData>) => {
-    const imageIdx = rowIndex * data.numColumns + columnIndex;
+    const annotationIdx = rowIndex * data.numColumns + columnIndex;
     // grid is fixed number of rows x number of columns
     // so there will always be numRows x numCols cells in the grid
     // unless images.length is exactly numRows x numCols
     // there will be empty cells in the grid
-    if (imageIdx >= data.images.length) return <></>;
+    if (annotationIdx >= data.annotations.length) return <></>;
 
-    const image = data.images[imageIdx];
-    const selected = data.selectedImageIds.includes(image.id);
+    const annotation = data.annotations[annotationIdx];
+    const selected = data.selectedImageIds.includes(annotation.id);
 
     return (
       <div
@@ -73,11 +73,11 @@ const Cell = memo(
           justifyContent: "flex-start",
           alignItems: "center",
         }}
-        data-testid={`grid-image-${image.id}`}
+        data-testid={`grid-image-${annotation.id}`}
       >
         <AnnotationGridItem
-          key={image.id}
-          annotation={image}
+          key={annotation.id}
+          annotation={annotation}
           handleClick={data.handleSelectImage}
           selected={selected}
           isScrolling={isScrolling}

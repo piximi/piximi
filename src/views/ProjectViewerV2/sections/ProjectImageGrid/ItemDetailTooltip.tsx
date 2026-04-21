@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Tooltip } from "@mui/material";
 
 export const ItemDetailTooltip = ({
@@ -6,7 +6,7 @@ export const ItemDetailTooltip = ({
   backgroundColor,
   children,
 }: {
-  contents: JSX.Element;
+  contents: ReactNode;
   backgroundColor: string;
   children: JSX.Element;
 }) => {

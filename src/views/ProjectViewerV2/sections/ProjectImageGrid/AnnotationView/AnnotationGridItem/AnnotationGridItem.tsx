@@ -1,15 +1,6 @@
-import { CSSProperties, memo } from "react";
-import { useSelector } from "react-redux";
+import { memo } from "react";
 
 import { Box } from "@mui/material";
-
-import { AnnotationDetailContainer } from "./AnnotationDetailContainer";
-
-import {
-  selectImageSelectionColor,
-  selectSelectedImageBorderWidth,
-  selectTextOnScroll,
-} from "store/applicationSettings/selectors";
 
 import { isUnknownCategory } from "store/data/utils";
 
@@ -20,31 +11,16 @@ import { Category, ExtendedAnnotationObject } from "store/dataV2/types";
 import { useRenderedSrc } from "hooks/useRenderedSrcs";
 import { selectCategoryById } from "store/dataV2/selectors";
 import { useParameterizedSelector } from "store/hooks";
+import { getIconPosition, imageStyle } from "../../gridItemUtils";
+import { useGridItemStyle } from "../../useGridItemStyle";
+import { ItemDetailContainer } from "../../ItemDetailContainer";
+import { AnnotationDetailList } from "./AnnotationDetailList";
 
 type AnnotationGridItemProps = {
   selected: boolean;
   handleClick: (id: string, selected: boolean) => void;
   annotation: ExtendedAnnotationObject;
   isScrolling?: boolean;
-};
-
-const getIconPosition = (
-  height: number | undefined,
-  width: number | undefined,
-) => {
-  if (!height || !width) return { top: "0%", left: "0%" };
-  const scaleBy = Math.max(width, height);
-  const offsetY = ((1 - height / scaleBy) / 2) * 100;
-  const offsetX = ((1 - width / scaleBy) / 2) * 100;
-  return { top: offsetY + "%", left: offsetX + "%" };
-};
-
-const imageStyle: CSSProperties = {
-  width: "100%",
-  height: "100%",
-  objectFit: "contain",
-  top: 0,
-  transform: "none",
 };
 
 export const AnnotationGridItem = memo(
@@ -54,38 +30,23 @@ export const AnnotationGridItem = memo(
     annotation,
     isScrolling,
   }: AnnotationGridItemProps) => {
-    const imageSelectionColor = useSelector(selectImageSelectionColor);
-    const selectedImageBorderWidth = useSelector(
-      selectSelectedImageBorderWidth,
-    );
     const category = useParameterizedSelector(
       selectCategoryById,
       annotation.categoryId,
     );
-    const textOnScroll = useSelector(selectTextOnScroll);
 
     const { src } = useRenderedSrc(
       annotation.imageChannels,
       annotation.boundingBox,
     );
 
+    const { containerStyle, textOnScroll } = useGridItemStyle(selected);
+
     const handleSelect = (
       evt: React.MouseEvent<HTMLDivElement, MouseEvent>,
     ) => {
       evt.stopPropagation();
       handleClick(annotation.id, selected);
-    };
-
-    const containerStyle: CSSProperties = {
-      position: "relative",
-      boxSizing: "content-box",
-      border: `solid ${selectedImageBorderWidth}px ${
-        selected ? imageSelectionColor : "transparent"
-      }`,
-      margin: `${10 - selectedImageBorderWidth}px`,
-      borderRadius: selectedImageBorderWidth + "px",
-      width: "var(--item-size)",
-      height: "var(--item-size)",
     };
 
     const imgElement = (
@@ -107,17 +68,19 @@ export const AnnotationGridItem = memo(
     return (
       <Box onClick={handleSelect} sx={containerStyle}>
         {imgElement}
-        <AnnotationDetailContainer
+        <ItemDetailContainer
           backgroundColor={category.color}
           categoryName={category.name}
           usePredictedStyle={
             annotation.partition === Partition.Inference &&
             !isUnknownCategory(annotation.categoryId)
           }
-          annotation={annotation}
           position={getIconPosition(
             annotation.shape.height,
             annotation.shape.width,
+          )}
+          renderDetailList={(color) => (
+            <AnnotationDetailList annotation={annotation} color={color} />
           )}
         />
       </Box>
