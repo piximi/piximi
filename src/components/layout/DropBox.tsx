@@ -30,7 +30,6 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
   return (
     <>
       <Box
-        component="main"
         ref={dropTarget}
         sx={(theme) => ({
           transition: theme.transitions.create("margin", {

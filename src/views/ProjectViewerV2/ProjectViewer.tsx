@@ -18,6 +18,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { HotkeyContext } from "utils/enums";
 import { DIMENSIONS } from "utils/constants";
+import { DropBox } from "components/layout";
 
 export const ProjectViewer = () => {
   const dispatch = useDispatch();
@@ -45,27 +46,29 @@ export const ProjectViewer = () => {
   return (
     <div>
       <ErrorBoundary FallbackComponent={FallbackDialog}>
-        <div tabIndex={-1}>
-          <Box
-            sx={{
-              height: "100vh",
-              display: "grid",
-              gridTemplateColumns: !isMobile
-                ? `${DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`
-                : `1fr ${DIMENSIONS.toolDrawerWidth}px`,
-              gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
-              gridTemplateAreas: !isMobile
-                ? '"top-tools top-tools top-tools"  "action-drawer image-grid side-tools"'
-                : '"top-tools top-tools" "image-grid side-tools"',
-            }}
-          >
-            <ProjectAppBar />
-            {!isMobile && <ProjectDrawer />}
+        <DropBox>
+          <div tabIndex={-1}>
+            <Box
+              sx={{
+                height: "100vh",
+                display: "grid",
+                gridTemplateColumns: !isMobile
+                  ? `${DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`
+                  : `1fr ${DIMENSIONS.toolDrawerWidth}px`,
+                gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
+                gridTemplateAreas: !isMobile
+                  ? '"top-tools top-tools top-tools"  "action-drawer image-grid side-tools"'
+                  : '"top-tools top-tools" "image-grid side-tools"',
+              }}
+            >
+              <ProjectAppBar />
+              {!isMobile && <ProjectDrawer />}
 
-            <ProjectImageGrid />
-            <ImageToolDrawer />
-          </Box>
-        </div>
+              <ProjectImageGrid />
+              <ImageToolDrawer />
+            </Box>
+          </div>
+        </DropBox>
       </ErrorBoundary>
     </div>
   );

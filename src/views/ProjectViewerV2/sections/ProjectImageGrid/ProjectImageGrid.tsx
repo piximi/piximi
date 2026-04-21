@@ -9,7 +9,6 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { DIMENSIONS } from "utils/constants";
 import { ViewState } from "@ProjectViewer/state/types";
 import { ImageGrid } from "./ImageGrid";
-import { DropBox } from "components/layout";
 import { selectTotalAnnotations } from "store/dataV2/selectors";
 
 export const ProjectImageGrid = () => {
@@ -25,7 +24,6 @@ export const ProjectImageGrid = () => {
   };
 
   return (
-    <DropBox>
       <Box
         sx={(theme) => ({
           width: "100%",
@@ -101,6 +99,6 @@ export const ProjectImageGrid = () => {
           ))}
         </Box>
       </Box>
-    </DropBox>
+    </Box>
   );
 };
