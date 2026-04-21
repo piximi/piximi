@@ -10,7 +10,7 @@ import {
   ProjectDrawer,
   ImageToolDrawer,
   ProjectAppBar,
-  ProjectImageGrid,
+  ProjectGrid,
 } from "./sections";
 
 import { projectSlice } from "store/project";
@@ -64,7 +64,7 @@ export const ProjectViewer = () => {
               <ProjectAppBar />
               {!isMobile && <ProjectDrawer />}
 
-              <ProjectImageGrid />
+              <ProjectGrid />
               <ImageToolDrawer />
             </Box>
           </div>

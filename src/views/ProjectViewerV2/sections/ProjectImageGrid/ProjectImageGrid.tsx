@@ -12,7 +12,7 @@ import { ImageGrid } from "./ImageGrid";
 import { selectTotalAnnotations } from "store/dataV2/selectors";
 import { AnnotationView } from "./AnnotationView";
 
-export const ProjectImageGrid = () => {
+export const ProjectGrid = () => {
   const dispatch = useDispatch();
   const activeView = useSelector(selectActiveView);
   const annotationCount = useSelector(selectTotalAnnotations);
