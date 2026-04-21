@@ -1,1 +1,0 @@
-export { ProjectGrid } from "./ProjectImageGrid";
