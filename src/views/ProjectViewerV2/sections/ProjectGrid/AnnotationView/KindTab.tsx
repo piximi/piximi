@@ -102,14 +102,14 @@ export const KindTab = ({
           data-help={HelpItem.MinimizeKind}
           fontSize="small"
           sx={{ p: 0 }}
-          onClick={(event) => handleMinOrDelete(event, kind.name, "minimize")}
+          onClick={(event) => handleMinOrDelete(event, kind.id, "minimize")}
         />
         {!representsUnknown(kind.id) && (
           <DeleteIcon
             data-help={HelpItem.DeleteKind}
             fontSize="small"
             sx={{ p: 0 }}
-            onClick={(event) => handleMinOrDelete(event, kind.name, "delete")}
+            onClick={(event) => handleMinOrDelete(event, kind.id, "delete")}
           />
         )}
       </Box>
