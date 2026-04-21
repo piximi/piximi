@@ -197,3 +197,29 @@ export const selectProjectImageChannels = ({
 }) => {
   return project.imageChannels;
 };
+
+export const selectKindStates = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}) => {
+  return project.annotationGridState.kindStates;
+};
+
+export const selectKindStateArray = createSelector(selectKindStates, (states) =>
+  Object.values(states),
+);
+
+export const selectVisibleKindStates = createSelector(
+  selectKindStates,
+  (states) => Object.values(states).filter((state) => state.visible === true),
+);
+
+export const selectActiveKindState = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}) => {
+  const activeStateId = project.annotationGridState.activeKindId;
+  return project.annotationGridState.kindStates[activeStateId];
+};
