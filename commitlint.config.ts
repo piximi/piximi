@@ -1,4 +1,4 @@
-const WORK_TYPES = ["types", "state"] as const;
+const WORK_TYPES = ["types", "state", "hook", "component"] as const;
 
 export default {
   extends: ["@commitlint/config-conventional"],
