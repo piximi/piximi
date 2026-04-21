@@ -11,7 +11,7 @@ import memoize from "memoize-one";
 
 import { useImageSort, useReactWindow } from "@ProjectViewer/hooks";
 
-import { ImageGridItem } from "./ProjectGridItem";
+import { ImageGridItem } from "./ImageGridItem";
 
 import { projectSlice } from "@ProjectViewer/state";
 import {
