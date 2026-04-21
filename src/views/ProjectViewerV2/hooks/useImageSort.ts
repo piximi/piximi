@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { selectCategoriesDictionary } from "store/data/selectors";
 import { selectImageSortType } from "@ProjectViewer/state/selectors";
 import { ImageSortType } from "@ProjectViewer/state/types";
 import { ExtendedImageObject } from "store/dataV2/types";
@@ -42,7 +41,6 @@ export const useImageSort = () => {
   const [previousSortType, setPreviousSortType] = useState<ImageSortType>(
     ImageSortType.None,
   );
-  const categories = useSelector(selectCategoriesDictionary);
   const theSortFunction = function (
     _a: ExtendedImageObject,
     _b: ExtendedImageObject,
@@ -87,7 +85,7 @@ export const useImageSort = () => {
           );
       }
     }
-  }, [sortType, categories, previousSortType]);
+  }, [sortType, previousSortType]);
 
   useEffect(() => {
     if (sortType === ImageSortType.Category) {
@@ -97,6 +95,6 @@ export const useImageSort = () => {
           a.category.name.localeCompare(b.category.name),
       );
     }
-  }, [sortType, categories]);
+  }, [sortType]);
   return sortFunction;
 };
