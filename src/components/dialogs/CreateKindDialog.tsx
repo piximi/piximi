@@ -3,14 +3,14 @@ import { Box, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { Category, Kind } from "store/data/types";
-import { generateKind } from "store/data/utils";
+import { generateKind } from "store/dataV2/utils";
+import { AnnotationCategory, Kind } from "store/dataV2/types";
 
 type CreateCategoriesDialogProps = {
   onClose: () => void;
   open: boolean;
   secondaryAction?: () => void;
-  storeDispatch: (kind: Kind, newUnknownCategory: Category) => void;
+  storeDispatch: (kind: Kind, newUnknownCategory: AnnotationCategory) => void;
   existingKinds: string[];
 };
 

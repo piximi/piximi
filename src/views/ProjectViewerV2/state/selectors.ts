@@ -123,7 +123,7 @@ export const selectActiveKindId = ({
 }: {
   projectV2: ProjectState;
 }) => {
-  return project.activeKind;
+  return project.annotationGridState.activeKindId;
 };
 
 /*

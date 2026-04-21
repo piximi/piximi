@@ -1,5 +1,5 @@
 import React from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { MenuItem, Typography } from "@mui/material";
 
 import { useDialogHotkey, useMobileView } from "hooks";
@@ -7,13 +7,13 @@ import { useDialogHotkey, useMobileView } from "hooks";
 import { BaseMenu } from "components/ui/BaseMenu";
 import { CreateKindDialog } from "components/dialogs";
 
-import { dataSlice } from "store/data";
 import { projectSlice } from "@ProjectViewer/state";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
-import { selectAllKindIds } from "store/data/selectors";
+import { selectKindIds } from "store/dataV2/selectors";
 
 import { HotkeyContext } from "utils/enums";
-import { Category, Kind } from "store/data/types";
+import { dataSliceV2 } from "store/dataV2/dataSliceV2";
+import { AnnotationCategory, Kind } from "store/dataV2/types";
 
 export const AddKindMenu = ({
   anchor,
@@ -28,7 +28,7 @@ export const AddKindMenu = ({
 }) => {
   const dispatch = useDispatch();
   const activeKind = useSelector(selectActiveKindId);
-  const existingKinds = useSelector(selectAllKindIds);
+  const existingKinds = useSelector(selectKindIds);
 
   const isMobile = useMobileView();
   const {
@@ -38,10 +38,17 @@ export const AddKindMenu = ({
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const handleUnfilterKind = (kindId: string) => {
-    dispatch(projectSlice.actions.removeKindTabFilter({ kindId }));
-    dispatch(projectSlice.actions.setActiveKind({ kind: kindId }));
+    dispatch(
+      projectSlice.actions.setKindTabVisibility({ kindId, visible: true }),
+    );
+    dispatch(projectSlice.actions.setActiveKind(kindId));
     if (isMobile) {
-      dispatch(projectSlice.actions.addKindTabFilter({ kindId: activeKind }));
+      dispatch(
+        projectSlice.actions.setKindTabVisibility({
+          kindId: activeKind,
+          visible: false,
+        }),
+      );
     }
     onClose();
   };
@@ -52,20 +59,13 @@ export const AddKindMenu = ({
     handleCloseCreateKindDialog();
     onClose();
   };
-  const addKind = (kind: Kind, newUnknownCategory: Category) => {
-    batch(() => {
-      dispatch(
-        dataSlice.actions.addCategories({
-          categories: [newUnknownCategory],
-        }),
-      );
-
-      dispatch(
-        dataSlice.actions.addKinds({
-          kinds: [kind],
-        }),
-      );
-    });
+  const addKind = (kind: Kind, newUnknownCategory: AnnotationCategory) => {
+    dispatch(
+      dataSliceV2.actions.addKind({
+        kind: kind,
+        category: newUnknownCategory,
+      }),
+    );
   };
   return (
     <>
