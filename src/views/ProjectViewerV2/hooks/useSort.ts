@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { selectImageSortType } from "@ProjectViewer/state/selectors";
-import { ImageSortType } from "@ProjectViewer/state/types";
-import { ExtendedImageObject } from "store/dataV2/types";
+import { AnnotationSortType, ImageSortType } from "@ProjectViewer/state/types";
+import {
+  ExtendedAnnotationObject,
+  ExtendedImageObject,
+} from "store/dataV2/types";
+import { selectCategoryEntities } from "store/dataV2/selectors";
 
 // uuid -> numerical value (determenistic)
-const hash = (id: ExtendedImageObject["id"]) => {
+const hash = (id: string) => {
   let hashValue = 0;
   for (let i = 0; i < id.length; i++) {
     hashValue = (hashValue << 5) - hashValue + id.charCodeAt(i);
@@ -96,5 +100,81 @@ export const useImageSort = () => {
       );
     }
   }, [sortType]);
+  return sortFunction;
+};
+
+export const useAnnotationSort = (sortType: AnnotationSortType) => {
+  const categories = useSelector(selectCategoryEntities);
+  const [previousSortType, setPreviousSortType] = useState<AnnotationSortType>(
+    AnnotationSortType.None,
+  );
+  const theSortFunction = function (
+    _a: ExtendedAnnotationObject,
+    _b: ExtendedAnnotationObject,
+  ) {
+    return 0;
+  };
+  const [sortFunction, setSortFunction] = useState<
+    (a: ExtendedAnnotationObject, b: ExtendedAnnotationObject) => number
+  >(() => theSortFunction);
+
+  useEffect(() => {
+    if (
+      sortType !== previousSortType &&
+      sortType !== AnnotationSortType.Category
+    ) {
+      const randomSeed = generateSeed();
+      setPreviousSortType(sortType);
+      switch (sortType) {
+        case AnnotationSortType.Random:
+          setSortFunction(
+            () =>
+              (a: ExtendedAnnotationObject, b: ExtendedAnnotationObject) => {
+                const aVal = splitmix32(hash(a.id) + randomSeed);
+                const bVal = splitmix32(hash(b.id) + randomSeed);
+                return aVal - bVal;
+              },
+          );
+          break;
+        case AnnotationSortType.Volume:
+          setSortFunction(
+            () => (a: ExtendedAnnotationObject, b: ExtendedAnnotationObject) =>
+              a.volumeId.localeCompare(b.volumeId),
+          );
+          break;
+        case AnnotationSortType.Image:
+          setSortFunction(
+            () => (a: ExtendedAnnotationObject, b: ExtendedAnnotationObject) =>
+              a.imageName.localeCompare(b.imageName),
+          );
+          break;
+        case AnnotationSortType.Plane:
+          setSortFunction(
+            () => (a: ExtendedAnnotationObject, b: ExtendedAnnotationObject) =>
+              a.planeIdx - b.planeIdx,
+          );
+          break;
+        case AnnotationSortType.None:
+        default:
+          setSortFunction(
+            () =>
+              (_a: ExtendedAnnotationObject, _b: ExtendedAnnotationObject) =>
+                0,
+          );
+      }
+    }
+  }, [sortType, categories, previousSortType]);
+
+  useEffect(() => {
+    if (sortType === AnnotationSortType.Category) {
+      setPreviousSortType(sortType);
+      setSortFunction(
+        () => (a: ExtendedAnnotationObject, b: ExtendedAnnotationObject) =>
+          categories[a.categoryId].name.localeCompare(
+            categories[b.categoryId].name,
+          ),
+      );
+    }
+  }, [sortType, categories]);
   return sortFunction;
 };
