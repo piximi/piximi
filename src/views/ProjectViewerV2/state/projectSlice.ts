@@ -13,9 +13,11 @@ import {
   ViewState,
 } from "./types";
 import { difference } from "lodash";
-import { UNKNOWN_KIND_ID } from "store/dataV2/constants";
+import { UNKNOWN_KIND, UNKNOWN_KIND_ID } from "store/dataV2/constants";
 
-const emptyKindState = (): KindState => ({
+const emptyKindState = (id: string, name: string): KindState => ({
+  id,
+  name,
   selectedIds: [],
   filters: { categoryId: [], partition: [] },
   visible: true,
@@ -34,8 +36,10 @@ export const initialState: ProjectState = {
     sortType: ImageSortType.None,
   },
   annotationGridState: {
-    activeKindId: UNKNOWN_KIND_ID,
-    kindStates: { UNKNOWN_KIND_ID: emptyKindState() },
+    activeKindId: UNKNOWN_KIND.id,
+    kindStates: {
+      [UNKNOWN_KIND.id]: emptyKindState(UNKNOWN_KIND.id, UNKNOWN_KIND.name),
+    },
   },
   highlightedCategory: undefined,
 
@@ -346,30 +350,42 @@ export const projectSlice = createSlice({
       .addCase(dataSliceV2.actions.setState, (state, action) => {
         const { kinds } = action.payload;
         state.annotationGridState.kindStates = {
-          UNKNOWN_KIND_ID: emptyKindState(),
+          [UNKNOWN_KIND_ID]: emptyKindState(UNKNOWN_KIND.id, UNKNOWN_KIND.name),
         };
         state.annotationGridState.activeKindId = UNKNOWN_KIND_ID;
         state.imageGridState.filters.categoryId = [];
         for (const kind of kinds) {
-          state.annotationGridState.kindStates[kind.id] = emptyKindState();
+          state.annotationGridState.kindStates[kind.id] = emptyKindState(
+            kind.id,
+            kind.name,
+          );
         }
       })
       .addCase(dataSliceV2.actions.newExperiment, (state) => {
         state.annotationGridState.activeKindId = UNKNOWN_KIND_ID;
+        state.annotationGridState.kindStates = {
+          [UNKNOWN_KIND_ID]: emptyKindState(UNKNOWN_KIND.id, UNKNOWN_KIND.name),
+        };
         state.imageGridState.filters.categoryId = [];
         state.imageGridState.filters.categoryId = [];
         state.imageGridState.selectedIds = [];
       })
       .addCase(dataSliceV2.actions.addKind, (state, action) => {
         state.annotationGridState.kindStates[action.payload.id] =
-          emptyKindState();
+          emptyKindState(action.payload.id, action.payload.name);
       })
       .addCase(dataSliceV2.actions.batchAddKind, (state, action) => {
         for (const kind of action.payload) {
-          state.annotationGridState.kindStates[kind.id] = emptyKindState();
+          state.annotationGridState.kindStates[kind.id] = emptyKindState(
+            kind.id,
+            kind.name,
+          );
         }
       })
-
+      .addCase(dataSliceV2.actions.updateKindName, (state, action) => {
+        state.annotationGridState.kindStates[action.payload.kindId].name =
+          action.payload.name;
+      })
       .addCase(dataSliceV2.actions.deleteKind, (state, action) => {
         if (state.annotationGridState.activeKindId === action.payload)
           state.annotationGridState.activeKindId = findAdjacentItem(

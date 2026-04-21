@@ -31,13 +31,15 @@ export type AnnotationFilters = Required<
   Pick<FilterType<ExtendedAnnotationObject>, "categoryId" | "partition">
 >;
 export type KindState = {
+  id: string;
+  name: string;
   selectedIds: string[];
   filters: AnnotationFilters;
   visible: boolean;
   sortType: AnnotationSortType;
 };
 export type AnnotationGridState = {
-  activeKindId: string | null;
+  activeKindId: string;
   kindStates: Record<string, KindState>;
 };
 
