@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Image as IJSImage, encodeDataURL } from "image-js-latest";
-import { ExtendedChannel } from "store/dataV2/types";
+import { BBox, ExtendedChannel } from "store/dataV2/types";
 import { DataConnector } from "utils/data-connector";
 import { createLUT } from "utils/colorUtils";
 
@@ -10,7 +10,10 @@ import { createLUT } from "utils/colorUtils";
  * - Legacy path: returns entity.src directly
  * - New pipeline: loads renderedSrc from IndexedDB StoredTensorData
  */
-export function useRenderedSrc(channels: ExtendedChannel[]): {
+export function useRenderedSrc(
+  channels: ExtendedChannel[],
+  crop?: BBox,
+): {
   src: string;
   loading: boolean;
 } {
@@ -40,8 +43,10 @@ export function useRenderedSrc(channels: ExtendedChannel[]): {
           const { width, height, bitDepth } = result.data.get(
             channels[0].storageReference.storageId,
           )!;
-
-          const pixelCount = width * height;
+          const [x0, y0, x1, y1] = crop ?? [0, 0, width, height];
+          const outW = x1 - x0;
+          const outH = y1 - y0;
+          const pixelCount = outW * outH;
           const rgbBuffer = new Uint8Array(pixelCount * 3);
 
           const luts = [...result.data.values()].map(({ data }, idx) => {
@@ -58,24 +63,25 @@ export function useRenderedSrc(channels: ExtendedChannel[]): {
               lut,
             };
           });
-          for (let i = 0; i < pixelCount; i++) {
-            let r = 0,
-              g = 0,
-              b = 0;
-
-            for (const { buffer, lut } of luts) {
-              const v = buffer[i];
-
-              r += lut[0][v];
-              g += lut[1][v];
-              b += lut[2][v];
+          for (let row = 0; row < outH; row++) {
+            for (let col = 0; col < outW; col++) {
+              const srcIdx = (y0 + row) * width + (x0 + col);
+              const dstIdx = row * outW + col;
+              let r = 0,
+                g = 0,
+                b = 0;
+              for (const { buffer, lut } of luts) {
+                const v = buffer[srcIdx];
+                r += lut[0][v];
+                g += lut[1][v];
+                b += lut[2][v];
+              }
+              rgbBuffer[dstIdx * 3 + 0] = Math.min(255, r);
+              rgbBuffer[dstIdx * 3 + 1] = Math.min(255, g);
+              rgbBuffer[dstIdx * 3 + 2] = Math.min(255, b);
             }
-
-            rgbBuffer[i * 3 + 0] = Math.min(255, r);
-            rgbBuffer[i * 3 + 1] = Math.min(255, g);
-            rgbBuffer[i * 3 + 2] = Math.min(255, b);
           }
-          const colorImage = new IJSImage(width, height, {
+          const colorImage = new IJSImage(outW, outH, {
             data: rgbBuffer,
           });
           const url = encodeDataURL(colorImage);

@@ -142,6 +142,8 @@ export type AnnotationVolume = {
 };
 export type AnnotationVolumeEntities = Record<string, AnnotationVolume>;
 
+// BBox = [x1, y1, x2, y2]
+export type BBox = [number, number, number, number];
 export type AnnotationObject = {
   id: string;
   planeId: string;
@@ -149,7 +151,7 @@ export type AnnotationObject = {
   volumeId: string;
   partition: Partition;
   shape: Shape;
-  boundingBox: [number, number, number, number];
+  boundingBox: BBox;
   encodedMask: Array<number>;
   decodedMask?: DataArray;
 };
