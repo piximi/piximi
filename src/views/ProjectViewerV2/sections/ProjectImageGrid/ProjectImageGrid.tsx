@@ -10,6 +10,7 @@ import { DIMENSIONS } from "utils/constants";
 import { ViewState } from "@ProjectViewer/state/types";
 import { ImageGrid } from "./ImageGrid";
 import { selectTotalAnnotations } from "store/dataV2/selectors";
+import { AnnotationView } from "./AnnotationView";
 
 export const ProjectImageGrid = () => {
   const dispatch = useDispatch();
@@ -24,80 +25,60 @@ export const ProjectImageGrid = () => {
   };
 
   return (
+    <Box
+      sx={(theme) => ({
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        gridArea: "image-grid",
+        border: `1px solid ${theme.palette.divider}`,
+        overflow: "hidden",
+        flexGrow: 1,
+        borderRadius: "4px 4px 0 0",
+      })}
+    >
       <Box
         sx={(theme) => ({
           width: "100%",
-          height: "100%",
           display: "flex",
-          flexDirection: "column",
-          gridArea: "image-grid",
-          border: `1px solid ${theme.palette.divider}`,
-          overflow: "hidden",
-          flexGrow: 1,
-          borderRadius: "4px 4px 0 0",
+          justifyContent: "center",
+          height: DIMENSIONS.toolDrawerWidth,
+          borderBottom: `1px solid ${theme.palette.divider}`,
         })}
       >
-        <Box
-          sx={(theme) => ({
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            height: DIMENSIONS.toolDrawerWidth,
-            borderBottom: `1px solid ${theme.palette.divider}`,
-          })}
+        <ToggleButtonGroup
+          data-help={HelpItem.GridView}
+          value={activeView}
+          size="small"
+          color="primary"
+          exclusive
+          onChange={handleActiveViewChange}
+          sx={{ my: 0.5 }}
         >
-          <ToggleButtonGroup
-            data-help={HelpItem.GridView}
-            value={activeView}
-            size="small"
-            color="primary"
-            exclusive
-            onChange={handleActiveViewChange}
-            sx={{ my: 0.5 }}
-          >
-            <ToggleButton value="images">Images</ToggleButton>
-            <ToggleButton value="annotations" disabled={annotationCount === 0}>
-              Annotations
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
-        <Box
-          sx={{
-            width: "100%",
-            flexGrow: 1,
-            display: activeView === "images" ? "block" : "none",
-          }}
-        >
-          <ImageGrid />
-        </Box>
-        <Box
-          sx={{
-            width: "100%",
-            flexGrow: 1,
-            bgcolor: "blue",
-            display: activeView === "annotations" ? "flex" : "none",
-            gap: 1,
-            flexWrap: "wrap",
-            justifyContent: "space-around",
-            overflowY: "scroll",
-          }}
-        >
-          {Array.from({ length: 100 }).map((_, idx) => (
-            <Box
-              key={`annotations-${idx}`}
-              sx={{
-                display: "flex",
-                width: "256px",
-                height: "256px",
-                bgcolor: "white",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {idx}
-            </Box>
-          ))}
-        </Box>
+          <ToggleButton value="images">Images</ToggleButton>
+          <ToggleButton value="annotations" disabled={annotationCount === 0}>
+            Annotations
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          flexGrow: 1,
+          display: activeView === "images" ? "block" : "none",
+        }}
+      >
+        <ImageGrid />
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          flexGrow: 1,
+          display: activeView === "annotations" ? "flex" : "none",
+        }}
+      >
+        <AnnotationView />
       </Box>
     </Box>
   );
