@@ -16,12 +16,17 @@ import type {
 } from "./types";
 
 import {
-  UNKNOWN_ANNOTATION_CATEGORY_COLOR,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
   UNKNOWN_IMAGE_CATEGORY_ID,
 } from "store/data/constants";
 import { generateUUID } from "store/data/utils";
 import { Partition } from "utils/models/enums";
+import {
+  UNKNOWN_KIND,
+  UNKNOWN_KIND_CATEGORY,
+  UNKNOWN_KIND_CATEGORY_ID,
+  UNKNOWN_KIND_ID,
+} from "./constants";
 
 export const imageSeriesAdapter = createEntityAdapter<ImageSeries>();
 export const imageAdapter = createEntityAdapter<ImageObject>();
@@ -43,22 +48,6 @@ const UNKNOWN_IMAGE_CATEGORY: Category = {
   type: "image",
   color: UNKNOWN_IMAGE_CATEGORY_COLOR,
   isUnknown: true,
-};
-
-const UNKNOWN_KIND_CATEGORY_ID = generateUUID({ definesUnknown: true });
-const UNKNOWN_KIND_ID = generateUUID({ definesUnknown: true });
-const UNKNOWN_KIND: Kind = {
-  id: UNKNOWN_KIND_ID,
-  name: "Unknown",
-  unknownCategoryId: UNKNOWN_KIND_CATEGORY_ID,
-};
-const UNKNOWN_KIND_CATEGORY: Category = {
-  id: UNKNOWN_KIND_CATEGORY_ID,
-  name: "Unknown",
-  type: "annotation",
-  kindId: UNKNOWN_KIND_ID,
-  isUnknown: true,
-  color: UNKNOWN_ANNOTATION_CATEGORY_COLOR,
 };
 
 function cascadeDeleteAnnotationVolume(
