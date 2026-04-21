@@ -17,20 +17,20 @@ import { ImageDetailList } from "./ImageDetailList";
 type ImageGridItemProps = {
   selected: boolean;
   handleClick: (id: string, selected: boolean) => void;
-  image: ExtendedImageObject;
+  item: ExtendedImageObject;
   isScrolling?: boolean;
 };
 
 export const ImageGridItem = memo(
-  ({ selected, handleClick, image, isScrolling }: ImageGridItemProps) => {
+  ({ selected, handleClick, item, isScrolling }: ImageGridItemProps) => {
     const { containerStyle, textOnScroll } = useGridItemStyle(selected);
-    const { src } = useRenderedSrc(image.channels);
+    const { src } = useRenderedSrc(item.channels);
 
     const handleSelect = (
       evt: React.MouseEvent<HTMLDivElement, MouseEvent>,
     ) => {
       evt.stopPropagation();
-      handleClick(image.id, selected);
+      handleClick(item.id, selected);
     };
 
     const imgElement = (
@@ -40,7 +40,7 @@ export const ImageGridItem = memo(
     if (isScrolling) {
       return (
         <Box sx={containerStyle}>
-          {textOnScroll ? <ScrollingTextDetails image={image} /> : imgElement}
+          {textOnScroll ? <ScrollingTextDetails image={item} /> : imgElement}
         </Box>
       );
     }
@@ -49,15 +49,15 @@ export const ImageGridItem = memo(
       <Box onClick={handleSelect} sx={containerStyle}>
         {imgElement}
         <ItemDetailContainer
-          backgroundColor={image.category.color}
-          categoryName={image.category.name}
+          backgroundColor={item.category.color}
+          categoryName={item.category.name}
           usePredictedStyle={
-            image.partition === Partition.Inference &&
-            !isUnknownCategory(image.category.id)
+            item.partition === Partition.Inference &&
+            !isUnknownCategory(item.category.id)
           }
-          position={getIconPosition(image.shape.height, image.shape.width)}
+          position={getIconPosition(item.shape.height, item.shape.width)}
           renderDetailList={(color) => (
-            <ImageDetailList image={image} color={color} />
+            <ImageDetailList image={item} color={color} />
           )}
         />
       </Box>

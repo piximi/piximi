@@ -19,26 +19,18 @@ import { AnnotationDetailList } from "./AnnotationDetailList";
 type AnnotationGridItemProps = {
   selected: boolean;
   handleClick: (id: string, selected: boolean) => void;
-  annotation: ExtendedAnnotationObject;
+  item: ExtendedAnnotationObject;
   isScrolling?: boolean;
 };
 
 export const AnnotationGridItem = memo(
-  ({
-    selected,
-    handleClick,
-    annotation,
-    isScrolling,
-  }: AnnotationGridItemProps) => {
+  ({ selected, handleClick, item, isScrolling }: AnnotationGridItemProps) => {
     const category = useParameterizedSelector(
       selectCategoryById,
-      annotation.categoryId,
+      item.categoryId,
     );
 
-    const { src } = useRenderedSrc(
-      annotation.imageChannels,
-      annotation.boundingBox,
-    );
+    const { src } = useRenderedSrc(item.imageChannels, item.boundingBox);
 
     const { containerStyle, textOnScroll } = useGridItemStyle(selected);
 
@@ -46,7 +38,7 @@ export const AnnotationGridItem = memo(
       evt: React.MouseEvent<HTMLDivElement, MouseEvent>,
     ) => {
       evt.stopPropagation();
-      handleClick(annotation.id, selected);
+      handleClick(item.id, selected);
     };
 
     const imgElement = (
@@ -57,7 +49,7 @@ export const AnnotationGridItem = memo(
       return (
         <Box sx={containerStyle}>
           {textOnScroll ? (
-            <ScrollingTextDetails annotation={annotation} category={category} />
+            <ScrollingTextDetails annotation={item} category={category} />
           ) : (
             imgElement
           )}
@@ -72,15 +64,12 @@ export const AnnotationGridItem = memo(
           backgroundColor={category.color}
           categoryName={category.name}
           usePredictedStyle={
-            annotation.partition === Partition.Inference &&
-            !isUnknownCategory(annotation.categoryId)
+            item.partition === Partition.Inference &&
+            !isUnknownCategory(item.categoryId)
           }
-          position={getIconPosition(
-            annotation.shape.height,
-            annotation.shape.width,
-          )}
+          position={getIconPosition(item.shape.height, item.shape.width)}
           renderDetailList={(color) => (
-            <AnnotationDetailList annotation={annotation} color={color} />
+            <AnnotationDetailList annotation={item} color={color} />
           )}
         />
       </Box>
