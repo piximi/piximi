@@ -48,3 +48,18 @@ export const getDifferences = <T>(original: T[], next: T[]) => {
     removed: difference(original, next),
   };
 };
+
+export const findAdjacentItem = <T>(
+  items: T[],
+  item: T,
+  matcher?: (item: T) => boolean,
+) => {
+  matcher ??= (itm: T) => itm === item;
+  const idx = items.findIndex(matcher);
+  if (idx === -1) throw new Error("Invalid Kind");
+  if (idx === 0) {
+    if (items.length === 1) return "null";
+    return items[1];
+  }
+  return items[idx - 1];
+};

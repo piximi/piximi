@@ -1,17 +1,26 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { mutatingFilter, toUnique } from "utils/arrayUtils";
+import { findAdjacentItem, mutatingFilter, toUnique } from "utils/arrayUtils";
 
+import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import { ThingSortKey } from "utils/enums";
 import { Partition } from "utils/models/enums";
 import {
   AnnotationSortType,
   ImageSortType,
+  KindState,
   ProjectState,
   ViewState,
 } from "./types";
 import { difference } from "lodash";
+import { UNKNOWN_KIND_ID } from "store/dataV2/constants";
 
+const emptyKindState = (): KindState => ({
+  selectedIds: [],
+  filters: { categoryId: [], partition: [] },
+  visible: true,
+  sortType: AnnotationSortType.None,
+});
 export const initialState: ProjectState = {
   name: "Untitled project",
   activeView: "images",
@@ -24,7 +33,10 @@ export const initialState: ProjectState = {
     filters: { categoryId: [], partition: [] },
     sortType: ImageSortType.None,
   },
-  annotationGridState: { activeKindId: null, kindStates: {} },
+  annotationGridState: {
+    activeKindId: UNKNOWN_KIND_ID,
+    kindStates: { UNKNOWN_KIND_ID: emptyKindState() },
+  },
   highlightedCategory: undefined,
 
   kindTabFilters: [],
@@ -328,5 +340,62 @@ export const projectSlice = createSlice({
     ) {
       state.imageChannels = action.payload.channels;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(dataSliceV2.actions.setState, (state, action) => {
+        const { kinds } = action.payload;
+        state.annotationGridState.kindStates = {
+          UNKNOWN_KIND_ID: emptyKindState(),
+        };
+        state.annotationGridState.activeKindId = UNKNOWN_KIND_ID;
+        state.imageGridState.filters.categoryId = [];
+        for (const kind of kinds) {
+          state.annotationGridState.kindStates[kind.id] = emptyKindState();
+        }
+      })
+      .addCase(dataSliceV2.actions.newExperiment, (state) => {
+        state.annotationGridState.activeKindId = UNKNOWN_KIND_ID;
+        state.imageGridState.filters.categoryId = [];
+        state.imageGridState.filters.categoryId = [];
+        state.imageGridState.selectedIds = [];
+      })
+      .addCase(dataSliceV2.actions.addKind, (state, action) => {
+        state.annotationGridState.kindStates[action.payload.id] =
+          emptyKindState();
+      })
+      .addCase(dataSliceV2.actions.batchAddKind, (state, action) => {
+        for (const kind of action.payload) {
+          state.annotationGridState.kindStates[kind.id] = emptyKindState();
+        }
+      })
+
+      .addCase(dataSliceV2.actions.deleteKind, (state, action) => {
+        if (state.annotationGridState.activeKindId === action.payload)
+          state.annotationGridState.activeKindId = findAdjacentItem(
+            Object.keys(state.annotationGridState.kindStates),
+            action.payload,
+          );
+        delete state.annotationGridState.kindStates[action.payload];
+      })
+      .addCase(dataSliceV2.actions.deleteImageCategory, (state, action) => {
+        mutatingFilter(
+          state.imageGridState.filters.categoryId,
+          (id) => id !== action.payload,
+        );
+      })
+      .addCase(
+        dataSliceV2.actions.deleteAnnotationCategory,
+        (state, action) => {
+          for (const kindState of Object.values(
+            state.annotationGridState.kindStates,
+          )) {
+            mutatingFilter(
+              kindState.filters.categoryId,
+              (id) => id !== action.payload,
+            );
+          }
+        },
+      );
   },
 });
