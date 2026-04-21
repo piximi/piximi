@@ -63,3 +63,7 @@ export const formatString = (
       return splitString.join(" ").toLocaleUpperCase();
   }
 };
+
+export const representsUnknown = (id: string) => {
+  return id[0] === "0";
+};
