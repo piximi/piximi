@@ -437,11 +437,27 @@ export const dataSliceV2 = createSlice({
 
       imageAdapter.removeMany(state.images, action.payload);
     },
-    addKind(state, action: PayloadAction<Kind>) {
-      kindAdapter.addOne(state.kinds, action.payload);
+    addKind(
+      state,
+      action: PayloadAction<{ kind: Kind; category: AnnotationCategory }>,
+    ) {
+      kindAdapter.addOne(state.kinds, action.payload.kind);
+      categoryAdapter.addOne(state.categories, action.payload.category);
     },
-    batchAddKind(state, action: PayloadAction<Array<Kind>>) {
-      kindAdapter.addMany(state.kinds, action.payload);
+    batchAddKind(
+      state,
+      action: PayloadAction<
+        Array<{ kind: Kind; category: AnnotationCategory }>
+      >,
+    ) {
+      kindAdapter.addMany(
+        state.kinds,
+        action.payload.map((pd) => pd.kind),
+      );
+      categoryAdapter.addMany(
+        state.categories,
+        action.payload.map((pd) => pd.category),
+      );
     },
     updateKindName(
       state,

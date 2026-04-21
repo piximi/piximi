@@ -371,11 +371,11 @@ export const projectSlice = createSlice({
         state.imageGridState.selectedIds = [];
       })
       .addCase(dataSliceV2.actions.addKind, (state, action) => {
-        state.annotationGridState.kindStates[action.payload.id] =
-          emptyKindState(action.payload.id, action.payload.name);
+        state.annotationGridState.kindStates[action.payload.kind.id] =
+          emptyKindState(action.payload.kind.id, action.payload.kind.name);
       })
       .addCase(dataSliceV2.actions.batchAddKind, (state, action) => {
-        for (const kind of action.payload) {
+        for (const { kind } of action.payload) {
           state.annotationGridState.kindStates[kind.id] = emptyKindState(
             kind.id,
             kind.name,
