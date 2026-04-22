@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CssBaseline } from "@mui/material";
 import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
@@ -17,10 +17,20 @@ import { useSelector } from "react-redux";
 import { selectAlertState } from "store/applicationSettings/selectors";
 import { AlertBar } from "components/ui";
 import { SchedulerProvider } from "contexts/worker-scheduler";
+import { DataConnector } from "utils/data-connector";
 
 export const Application = () => {
   const theme = usePreferredMuiTheme();
   const alertState = useSelector(selectAlertState);
+
+  useEffect(() => {
+    return () => {
+      if (import.meta.env.DEV) {
+        const dataConnector = DataConnector.getInstance();
+        dataConnector.clearAll();
+      }
+    };
+  });
 
   return (
     <StyledEngineProvider injectFirst>

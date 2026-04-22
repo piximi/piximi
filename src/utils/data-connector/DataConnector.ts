@@ -411,7 +411,7 @@ export class DataConnector implements IDataConnector {
     try {
       await this.init();
 
-      for (const storeName of [STORES.IMAGE_DATA, STORES.SERIES_DATA]) {
+      for (const storeName of [STORES.CHANNEL_DATA]) {
         await this.db!.clear(storeName);
       }
       this.cache.clear();
