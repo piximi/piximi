@@ -1,28 +1,34 @@
-import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, MenuItem, SelectChangeEvent } from "@mui/material";
 
 import { StyledSelect, WithLabel } from "components/inputs";
 
 import { projectSlice } from "@ProjectViewer/state";
-import { selectSortType } from "@ProjectViewer/state/selectors";
+import { selectActiveViewState } from "@ProjectViewer/state/selectors";
 
-import { ThingSortKey } from "utils/enums";
+import { AnnotationSortType, ImageSortType } from "@ProjectViewer/state/types";
 
 export const SortSelect = () => {
   const dispatch = useDispatch();
-
-  const selectedSortKey = useSelector(selectSortType);
-  const [selectedKey, setSelectedKey] = useState<ThingSortKey>(selectedSortKey);
+  const activeViewState = useSelector(selectActiveViewState);
 
   const onSortKeyChange = (event: SelectChangeEvent<unknown>) => {
-    setSelectedKey(event.target.value as ThingSortKey);
-    dispatch(
-      projectSlice.actions.setSortType({
-        sortType: event.target.value as ThingSortKey,
-      }),
-    );
+    if (activeViewState.view === "images")
+      dispatch(
+        projectSlice.actions.setImageSortType(
+          event.target.value as ImageSortType,
+        ),
+      );
+    else
+      dispatch(
+        projectSlice.actions.setAnnotationSortType({
+          kindId: activeViewState.id,
+          sortType: event.target.value as AnnotationSortType,
+        }),
+      );
   };
+  const sortTypes =
+    activeViewState.view === "images" ? ImageSortType : AnnotationSortType;
   return (
     <Box sx={(theme) => ({ p: theme.spacing(1) })}>
       <WithLabel
@@ -37,12 +43,12 @@ export const SortSelect = () => {
         fullWidth
       >
         <StyledSelect
-          value={selectedKey}
+          value={activeViewState.sortType}
           onChange={onSortKeyChange}
           fullWidth
           variant="standard"
         >
-          {Object.values(ThingSortKey).map((sortType) => (
+          {Object.values(sortTypes).map((sortType) => (
             <MenuItem
               key={sortType}
               value={sortType}
