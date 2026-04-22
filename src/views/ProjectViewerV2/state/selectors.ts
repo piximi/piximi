@@ -28,17 +28,6 @@ export const selectActiveView = ({
 }): ViewState => {
   return project.activeView;
 };
-export const selectAnnotationGridState = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}): AnnotationGridState => {
-  return project.annotationGridState;
-};
-
-/*
-NAME
-*/
 
 export const selectProjectName = ({
   projectV2: project,
@@ -91,8 +80,55 @@ export const selectImageSortType = ({
 };
 
 /*
+SELECTED ANNOTATIONS
+*/
+
+export const selectAnnotationGridState = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}): AnnotationGridState => {
+  return project.annotationGridState;
+};
+
+export const selectKindStates = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}) => {
+  return project.annotationGridState.kindStates;
+};
+
+export const selectKindStateArray = createSelector(selectKindStates, (states) =>
+  Object.values(states),
+);
+
+export const selectVisibleKindStates = createSelector(
+  selectKindStates,
+  (states) => Object.values(states).filter((state) => state.visible === true),
+);
+
+export const selectActiveKindState = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}) => {
+  const activeStateId = project.annotationGridState.activeKindId;
+  return project.annotationGridState.kindStates[activeStateId];
+};
+
+/*
 SELECTED THINGS
 */
+export const selectActiveViewState = createSelector(
+  selectActiveView,
+  selectImageGridState,
+  selectActiveKindState,
+  (view, imGrid, kindGrid) => {
+    if (view === "images") return { view, ...imGrid };
+    return { view, ...kindGrid };
+  },
+);
 
 export const selectSelectedThingIds = ({
   projectV2: project,
@@ -204,30 +240,4 @@ export const selectProjectImageChannels = ({
   projectV2: ProjectState;
 }) => {
   return project.imageChannels;
-};
-
-export const selectKindStates = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}) => {
-  return project.annotationGridState.kindStates;
-};
-
-export const selectKindStateArray = createSelector(selectKindStates, (states) =>
-  Object.values(states),
-);
-
-export const selectVisibleKindStates = createSelector(
-  selectKindStates,
-  (states) => Object.values(states).filter((state) => state.visible === true),
-);
-
-export const selectActiveKindState = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}) => {
-  const activeStateId = project.annotationGridState.activeKindId;
-  return project.annotationGridState.kindStates[activeStateId];
 };
