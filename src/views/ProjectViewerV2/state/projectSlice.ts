@@ -13,15 +13,25 @@ import {
   ViewState,
 } from "./types";
 import { difference } from "lodash";
-import { UNKNOWN_KIND, UNKNOWN_KIND_ID } from "store/dataV2/constants";
+import {
+  UNKNOWN_KIND,
+  UNKNOWN_KIND_CATEGORY_ID,
+  UNKNOWN_KIND_ID,
+} from "store/dataV2/constants";
+import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
-const emptyKindState = (id: string, name: string): KindState => ({
+const emptyKindState = (
+  id: string,
+  name: string,
+  unknownCategoryId: string,
+): KindState => ({
   id,
   name,
   selectedIds: [],
   filters: { categoryId: [], partition: [] },
   visible: true,
   sortType: AnnotationSortType.None,
+  selectedCategoryId: unknownCategoryId,
 });
 export const initialState: ProjectState = {
   name: "Untitled project",
@@ -34,11 +44,16 @@ export const initialState: ProjectState = {
     selectedIds: [],
     filters: { categoryId: [], partition: [] },
     sortType: ImageSortType.None,
+    selectedCategoryId: UNKNOWN_IMAGE_CATEGORY_ID,
   },
   annotationGridState: {
     activeKindId: UNKNOWN_KIND.id,
     kindStates: {
-      [UNKNOWN_KIND.id]: emptyKindState(UNKNOWN_KIND.id, UNKNOWN_KIND.name),
+      [UNKNOWN_KIND.id]: emptyKindState(
+        UNKNOWN_KIND.id,
+        UNKNOWN_KIND.name,
+        UNKNOWN_KIND_CATEGORY_ID,
+      ),
     },
   },
   highlightedCategory: undefined,
@@ -54,6 +69,12 @@ export const projectSlice = createSlice({
     resetProject() {
       return initialState;
     },
+    setProjectImageChannels(
+      state,
+      action: PayloadAction<{ channels: number | undefined }>,
+    ) {
+      state.imageChannels = action.payload.channels;
+    },
 
     setProject(state, action: PayloadAction<{ project: ProjectState }>) {
       return action.payload.project;
@@ -61,10 +82,8 @@ export const projectSlice = createSlice({
     setActiveView(state, action: PayloadAction<ViewState>) {
       state.activeView = action.payload;
     },
-    setActiveKind(state, action: PayloadAction<string>) {
-      if (!state.annotationGridState.kindStates[action.payload]) return;
-      state.annotationGridState.activeKindId = action.payload;
-    },
+
+    // ~~ Image Grid State
     addSelectedImages(state, action: PayloadAction<string[]>) {
       const ids = action.payload;
       const newIds = difference(ids, state.imageGridState.selectedIds);
@@ -75,6 +94,42 @@ export const projectSlice = createSlice({
         state.imageGridState.selectedIds,
         (id) => !action.payload.includes(id),
       );
+    },
+    setImageSortType(state, action: PayloadAction<ImageSortType>) {
+      state.imageGridState.sortType = action.payload;
+    },
+
+    addImageCategoryFilters(state, action: PayloadAction<string[]>) {
+      const ids = action.payload;
+      const newIds = difference(ids, state.imageGridState.filters.categoryId);
+      state.imageGridState.filters.categoryId.push(...newIds);
+    },
+    removeImageCategoryFilters(state, action: PayloadAction<string[]>) {
+      const ids = action.payload;
+
+      mutatingFilter(
+        state.imageGridState.filters.categoryId,
+        (id) => !ids.includes(id),
+      );
+    },
+    addImagePartitionFilters(state, action: PayloadAction<Partition[]>) {
+      const ids = action.payload;
+      const newIds = difference(ids, state.imageGridState.filters.partition);
+      state.imageGridState.filters.partition.push(...newIds);
+    },
+    removeImagePartitionFilters(state, action: PayloadAction<Partition[]>) {
+      const ids = action.payload;
+
+      mutatingFilter(
+        state.imageGridState.filters.partition,
+        (id) => !ids.includes(id),
+      );
+    },
+
+    // ~~ Annotation Grid State
+    setActiveKind(state, action: PayloadAction<string>) {
+      if (!state.annotationGridState.kindStates[action.payload]) return;
+      state.annotationGridState.activeKindId = action.payload;
     },
     addSelectedAnnotations(
       state,
@@ -95,6 +150,86 @@ export const projectSlice = createSlice({
       if (!kindState) return;
       mutatingFilter(kindState.selectedIds, (id) => !ids.includes(id));
     },
+    setAnnotationSortType(
+      state,
+      action: PayloadAction<{ kindId: string; sortType: AnnotationSortType }>,
+    ) {
+      const { kindId, sortType } = action.payload;
+      const kindState = state.annotationGridState.kindStates[kindId];
+      if (!kindState) return;
+      kindState.sortType = sortType;
+    },
+    setSortType(state, action: PayloadAction<{ sortType: ThingSortKey }>) {
+      state.sortType = action.payload.sortType;
+    },
+
+    addAnnotationCategoryFilters(
+      state,
+      action: PayloadAction<{ kindId: string; ids: string[] }>,
+    ) {
+      const { kindId, ids } = action.payload;
+      const kindState = state.annotationGridState.kindStates[kindId];
+      if (!kindState) return;
+      const newIds = difference(ids, kindState.filters.categoryId);
+      kindState.filters.categoryId.push(...newIds);
+    },
+    removeAnnotationCategoryFilters(
+      state,
+      action: PayloadAction<{ kindId: string; ids: string[] }>,
+    ) {
+      const { kindId, ids } = action.payload;
+      const kindState = state.annotationGridState.kindStates[kindId];
+      if (!kindState) return;
+
+      mutatingFilter(kindState.filters.categoryId, (id) => !ids.includes(id));
+    },
+    addAnnotationPartitionFilters(
+      state,
+      action: PayloadAction<{ kindId: string; ids: Partition[] }>,
+    ) {
+      const { kindId, ids } = action.payload;
+      const kindState = state.annotationGridState.kindStates[kindId];
+      if (!kindState) return;
+      const newIds = difference(ids, kindState.filters.partition);
+      kindState.filters.partition.push(...newIds);
+    },
+    removeAnnotationPartitionFilters(
+      state,
+      action: PayloadAction<{ kindId: string; ids: Partition[] }>,
+    ) {
+      const { kindId, ids } = action.payload;
+      const kindState = state.annotationGridState.kindStates[kindId];
+      if (!kindState) return;
+
+      mutatingFilter(kindState.filters.partition, (id) => !ids.includes(id));
+    },
+    setKindTabVisibility(
+      state,
+      action: PayloadAction<{ kindId: string; visible: boolean }>,
+    ) {
+      const kindState =
+        state.annotationGridState.kindStates[action.payload.kindId];
+      if (kindState) kindState.visible = action.payload.visible;
+    },
+    setAllKindTabVisibility(state, action: PayloadAction<boolean>) {
+      for (const kindId in state.annotationGridState.kindStates) {
+        state.annotationGridState.kindStates[kindId].visible = action.payload;
+      }
+    },
+
+    // ~~ Active Grid State
+
+    setActiveSelectedCategoryId(state, action: PayloadAction<string>) {
+      const activeState =
+        state.activeView === "images"
+          ? state.imageGridState
+          : state.annotationGridState.kindStates[state.activeKind];
+
+      activeState.selectedCategoryId = action.payload;
+    },
+
+    // ~~ OLD
+
     selectThings(
       state,
       action: PayloadAction<{ ids: Array<string> | string }>,
@@ -121,22 +256,7 @@ export const projectSlice = createSlice({
         (id: string) => !ids.includes(id),
       );
     },
-    setImageSortType(state, action: PayloadAction<ImageSortType>) {
-      state.imageGridState.sortType = action.payload;
-    },
-    setAnnotationSortType(
-      state,
-      action: PayloadAction<{ kindId: string; sortType: AnnotationSortType }>,
-    ) {
-      const { kindId, sortType } = action.payload;
-      const kindState = state.annotationGridState.kindStates[kindId];
-      if (!kindState) return;
-      kindState.sortType = sortType;
-    },
-    setSortType(state, action: PayloadAction<{ sortType: ThingSortKey }>) {
-      state.sortType = action.payload.sortType;
-    },
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     addThingCategoryFilters(
       state,
       action: PayloadAction<{
@@ -239,91 +359,11 @@ export const projectSlice = createSlice({
         }
       }
     },
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     updateHighlightedCategory(
       state,
       action: PayloadAction<{ categoryId: string | undefined }>,
     ) {
       state.highlightedCategory = action.payload.categoryId;
-    },
-    addImageCategoryFilters(state, action: PayloadAction<string[]>) {
-      const ids = action.payload;
-      const newIds = difference(ids, state.imageGridState.filters.categoryId);
-      state.imageGridState.filters.categoryId.push(...newIds);
-    },
-    removeImageCategoryFilters(state, action: PayloadAction<string[]>) {
-      const ids = action.payload;
-
-      mutatingFilter(
-        state.imageGridState.filters.categoryId,
-        (id) => !ids.includes(id),
-      );
-    },
-    addImagePartitionFilters(state, action: PayloadAction<Partition[]>) {
-      const ids = action.payload;
-      const newIds = difference(ids, state.imageGridState.filters.partition);
-      state.imageGridState.filters.partition.push(...newIds);
-    },
-    removeImagePartitionFilters(state, action: PayloadAction<Partition[]>) {
-      const ids = action.payload;
-
-      mutatingFilter(
-        state.imageGridState.filters.partition,
-        (id) => !ids.includes(id),
-      );
-    },
-    addAnnotationCategoryFilters(
-      state,
-      action: PayloadAction<{ kindId: string; ids: string[] }>,
-    ) {
-      const { kindId, ids } = action.payload;
-      const kindState = state.annotationGridState.kindStates[kindId];
-      if (!kindState) return;
-      const newIds = difference(ids, kindState.filters.categoryId);
-      kindState.filters.categoryId.push(...newIds);
-    },
-    removeAnnotationCategoryFilters(
-      state,
-      action: PayloadAction<{ kindId: string; ids: string[] }>,
-    ) {
-      const { kindId, ids } = action.payload;
-      const kindState = state.annotationGridState.kindStates[kindId];
-      if (!kindState) return;
-
-      mutatingFilter(kindState.filters.categoryId, (id) => !ids.includes(id));
-    },
-    addAnnotationPartitionFilters(
-      state,
-      action: PayloadAction<{ kindId: string; ids: Partition[] }>,
-    ) {
-      const { kindId, ids } = action.payload;
-      const kindState = state.annotationGridState.kindStates[kindId];
-      if (!kindState) return;
-      const newIds = difference(ids, kindState.filters.partition);
-      kindState.filters.partition.push(...newIds);
-    },
-    removeAnnotationPartitionFilters(
-      state,
-      action: PayloadAction<{ kindId: string; ids: Partition[] }>,
-    ) {
-      const { kindId, ids } = action.payload;
-      const kindState = state.annotationGridState.kindStates[kindId];
-      if (!kindState) return;
-
-      mutatingFilter(kindState.filters.partition, (id) => !ids.includes(id));
-    },
-    setKindTabVisibility(
-      state,
-      action: PayloadAction<{ kindId: string; visible: boolean }>,
-    ) {
-      const kindState =
-        state.annotationGridState.kindStates[action.payload.kindId];
-      if (kindState) kindState.visible = action.payload.visible;
-    },
-    setAllKindTabVisibility(state, action: PayloadAction<boolean>) {
-      for (const kindId in state.annotationGridState.kindStates) {
-        state.annotationGridState.kindStates[kindId].visible = action.payload;
-      }
     },
 
     addKindTabFilter(state, action: PayloadAction<{ kindId: string }>) {
@@ -338,19 +378,17 @@ export const projectSlice = createSlice({
     removeAllKindTabFilters(state) {
       state.kindTabFilters = [];
     },
-    setProjectImageChannels(
-      state,
-      action: PayloadAction<{ channels: number | undefined }>,
-    ) {
-      state.imageChannels = action.payload.channels;
-    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(dataSliceV2.actions.setState, (state, action) => {
         const { kinds } = action.payload;
         state.annotationGridState.kindStates = {
-          [UNKNOWN_KIND_ID]: emptyKindState(UNKNOWN_KIND.id, UNKNOWN_KIND.name),
+          [UNKNOWN_KIND_ID]: emptyKindState(
+            UNKNOWN_KIND.id,
+            UNKNOWN_KIND.name,
+            UNKNOWN_KIND.unknownCategoryId,
+          ),
         };
         state.annotationGridState.activeKindId = UNKNOWN_KIND_ID;
         state.imageGridState.filters.categoryId = [];
@@ -358,13 +396,18 @@ export const projectSlice = createSlice({
           state.annotationGridState.kindStates[kind.id] = emptyKindState(
             kind.id,
             kind.name,
+            kind.unknownCategoryId,
           );
         }
       })
       .addCase(dataSliceV2.actions.newExperiment, (state) => {
         state.annotationGridState.activeKindId = UNKNOWN_KIND_ID;
         state.annotationGridState.kindStates = {
-          [UNKNOWN_KIND_ID]: emptyKindState(UNKNOWN_KIND.id, UNKNOWN_KIND.name),
+          [UNKNOWN_KIND_ID]: emptyKindState(
+            UNKNOWN_KIND.id,
+            UNKNOWN_KIND.name,
+            UNKNOWN_KIND.unknownCategoryId,
+          ),
         };
         state.imageGridState.filters.categoryId = [];
         state.imageGridState.filters.categoryId = [];
@@ -372,13 +415,18 @@ export const projectSlice = createSlice({
       })
       .addCase(dataSliceV2.actions.addKind, (state, action) => {
         state.annotationGridState.kindStates[action.payload.kind.id] =
-          emptyKindState(action.payload.kind.id, action.payload.kind.name);
+          emptyKindState(
+            action.payload.kind.id,
+            action.payload.kind.name,
+            action.payload.kind.unknownCategoryId,
+          );
       })
       .addCase(dataSliceV2.actions.batchAddKind, (state, action) => {
         for (const { kind } of action.payload) {
           state.annotationGridState.kindStates[kind.id] = emptyKindState(
             kind.id,
             kind.name,
+            kind.unknownCategoryId,
           );
         }
       })
