@@ -18,7 +18,7 @@ export const CategoryFilterList = () => {
     return categories.filter(
       (c) => c.type === "annotation" && c.kindId === activeView.id,
     );
-  }, [categories, activeView.view]);
+  }, [categories, activeView]);
   const filteredCategories = useMemo(
     () => activeView.filters.categoryId,
     [activeView.filters.categoryId],
