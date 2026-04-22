@@ -15,6 +15,7 @@ import { DataTableRow } from "./DataTableRow";
 import { useTheme } from "@mui/material";
 import { ThingKindSelect } from "./ThingKindSelect";
 
+//TODO: wire to new state
 export const ThingInformationTable = ({
   thing,
   collapsible,
