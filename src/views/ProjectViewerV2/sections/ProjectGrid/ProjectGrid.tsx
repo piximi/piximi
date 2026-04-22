@@ -11,6 +11,7 @@ import { ViewState } from "@ProjectViewer/state/types";
 import { ImageGrid } from "./ImageGrid";
 import { selectTotalAnnotations } from "store/dataV2/selectors";
 import { AnnotationView } from "./AnnotationView";
+import { GridActions } from "./ImageGrid/GridActions/GridActions";
 
 export const ProjectGrid = () => {
   const dispatch = useDispatch();
@@ -41,8 +42,10 @@ export const ProjectGrid = () => {
       <Box
         sx={(theme) => ({
           width: "100%",
+          position: "relative",
           display: "flex",
           justifyContent: "center",
+          alignItems: "center",
           height: DIMENSIONS.toolDrawerWidth,
           borderBottom: `1px solid ${theme.palette.divider}`,
         })}
@@ -61,6 +64,7 @@ export const ProjectGrid = () => {
             Annotations
           </ToggleButton>
         </ToggleButtonGroup>
+        <GridActions viewState={activeView} />
       </Box>
       <Box
         sx={{
