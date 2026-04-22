@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectActiveThingFilters } from "@ProjectViewer/state/selectors";
+import { selectActiveViewState } from "@ProjectViewer/state/selectors";
 
 import { Partition } from "utils/models/enums";
 import { projectSlice } from "@ProjectViewer/state";
@@ -9,68 +9,82 @@ import { FilterList } from "./FilterList";
 
 export const PartitionFilterList = () => {
   const dispatch = useDispatch();
-  const thingFilters = useSelector(selectActiveThingFilters);
+
+  const activeView = useSelector(selectActiveViewState);
 
   const filteredPartitions = useMemo(
-    () => thingFilters.partition ?? [],
-    [thingFilters.partition],
+    () => activeView.filters.partition,
+    [activeView.filters.partition],
   );
 
-  const toggleThingPartition = useCallback(
-    (partition: Partition) => {
-      if (
-        thingFilters.partition &&
-        thingFilters.partition.includes(partition)
-      ) {
-        dispatch(
-          projectSlice.actions.removeThingPartitionFilters({
-            partitions: [partition],
-          }),
-        );
+  const dispatchOps = useMemo(
+    () =>
+      activeView.view === "images"
+        ? {
+            add: (ptns: Partition[]) =>
+              dispatch(projectSlice.actions.addImagePartitionFilters(ptns)),
+            rem: (ptns: Partition[]) =>
+              dispatch(projectSlice.actions.removeImagePartitionFilters(ptns)),
+          }
+        : {
+            add: (ptns: Partition[]) =>
+              dispatch(
+                projectSlice.actions.addAnnotationPartitionFilters({
+                  kindId: activeView.id,
+                  ids: ptns,
+                }),
+              ),
+            rem: (ptns: Partition[]) =>
+              dispatch(
+                projectSlice.actions.removeAnnotationPartitionFilters({
+                  kindId: activeView.id,
+                  ids: ptns,
+                }),
+              ),
+          },
+    [activeView],
+  );
+
+  const togglePartitionFilter = useCallback(
+    (ptn: Partition) => {
+      if (activeView.filters.partition.includes(ptn)) {
+        dispatchOps.rem([ptn]);
       } else {
-        dispatch(
-          projectSlice.actions.addThingPartitionFilters({
-            partitions: [partition],
-          }),
-        );
+        dispatchOps.add([ptn]);
       }
     },
-    [dispatch, thingFilters.partition],
+    [dispatchOps, activeView.filters.categoryId],
   );
-  const toggleAllPartitonFilter = useCallback(
+
+  const toggleAllPartitionFilter = useCallback(
     (filtered: boolean) => {
       if (filtered) {
-        dispatch(
-          projectSlice.actions.addThingPartitionFilters({
-            partitions: "all",
-          }),
-        );
+        dispatchOps.add(Object.values(Partition));
       } else {
-        dispatch(
-          projectSlice.actions.removeThingPartitionFilters({
-            partitions: "all",
-          }),
-        );
+        dispatchOps.rem(Object.values(Partition));
       }
     },
-    [dispatch],
+    [dispatchOps],
   );
+
+  //TODO: This has something to do with how the chips appear
+  const getFilterState = (partition: any) => {
+    if (partition === "all") {
+      return filteredPartitions.length === Object.keys(Partition).length;
+    } else if (partition === "any") {
+      return filteredPartitions.length === 0;
+    }
+    return filteredPartitions.includes(partition);
+  };
 
   return (
     <FilterList
       title="Filter Partition"
       tooltipContent="partitions"
       items={Object.keys(Partition).map((partition) => partition as Partition)}
-      onToggle={toggleThingPartition}
-      onToggleAll={toggleAllPartitonFilter}
-      isFiltered={(partition) => {
-        if (partition === "all") {
-          return filteredPartitions.length === Object.keys(Partition).length;
-        } else if (partition === "any") {
-          return filteredPartitions.length === 0;
-        }
-        return filteredPartitions.includes(partition as Partition);
-      }}
+      onToggle={togglePartitionFilter}
+      onToggleAll={toggleAllPartitionFilter}
+      isFiltered={getFilterState}
     />
   );
 };

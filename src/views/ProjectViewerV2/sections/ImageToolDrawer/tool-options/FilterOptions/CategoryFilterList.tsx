@@ -1,77 +1,97 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectActiveCategories } from "@ProjectViewer/state/reselectors";
-import { selectActiveThingFilters } from "@ProjectViewer/state/selectors";
+import { selectActiveViewState } from "@ProjectViewer/state/selectors";
 import { useCallback, useMemo } from "react";
 import { projectSlice } from "@ProjectViewer/state";
 import { Category } from "store/data/types";
 import { FilterList } from "./FilterList";
+import { selectAllCategories } from "store/dataV2/selectors";
 
 export const CategoryFilterList = () => {
   const dispatch = useDispatch();
-  const thingFilters = useSelector(selectActiveThingFilters);
-  const activeCategories = useSelector(selectActiveCategories);
+  const activeView = useSelector(selectActiveViewState);
+  const categories = useSelector(selectAllCategories);
+
+  const activeCategories = useMemo(() => {
+    if (activeView.view === "images")
+      return categories.filter((c) => c.type === "image");
+    return categories.filter(
+      (c) => c.type === "annotation" && c.kindId === activeView.id,
+    );
+  }, [categories, activeView.view]);
   const filteredCategories = useMemo(
-    () => thingFilters.categoryId ?? [],
-    [thingFilters.categoryId],
+    () => activeView.filters.categoryId,
+    [activeView.filters.categoryId],
   );
 
-  const toggleImageCategoryFilter = useCallback(
+  const dispatchOps = useMemo(
+    () =>
+      activeView.view === "images"
+        ? {
+            add: (cats: string[]) =>
+              dispatch(projectSlice.actions.addImageCategoryFilters(cats)),
+            rem: (cats: string[]) =>
+              dispatch(projectSlice.actions.removeImageCategoryFilters(cats)),
+          }
+        : {
+            add: (cats: string[]) =>
+              dispatch(
+                projectSlice.actions.addAnnotationCategoryFilters({
+                  kindId: activeView.id,
+                  ids: cats,
+                }),
+              ),
+            rem: (cats: string[]) =>
+              dispatch(
+                projectSlice.actions.removeAnnotationCategoryFilters({
+                  kindId: activeView.id,
+                  ids: cats,
+                }),
+              ),
+          },
+    [activeView],
+  );
+
+  const toggleCategoryFilter = useCallback(
     (category: Category) => {
-      if (
-        thingFilters.categoryId &&
-        thingFilters.categoryId.includes(category.id)
-      ) {
-        dispatch(
-          projectSlice.actions.removeThingCategoryFilters({
-            categoryIds: [category.id],
-          }),
-        );
+      if (activeView.filters.categoryId.includes(category.id)) {
+        dispatchOps.rem([category.id]);
       } else {
-        dispatch(
-          projectSlice.actions.addThingCategoryFilters({
-            categoryIds: [category.id],
-          }),
-        );
+        dispatchOps.add([category.id]);
       }
     },
-    [dispatch, thingFilters.categoryId],
+    [dispatchOps, activeView.filters.categoryId],
   );
 
-  const toggleAllImageCategoryFilter = useCallback(
+  const toggleAllCategoryFilter = useCallback(
     (filtered: boolean) => {
       if (filtered) {
-        dispatch(
-          projectSlice.actions.addThingCategoryFilters({
-            categoryIds: activeCategories.map((category) => category.id),
-          }),
-        );
+        dispatchOps.add(activeCategories.map((category) => category.id));
       } else {
-        dispatch(
-          projectSlice.actions.removeThingCategoryFilters({
-            categoryIds: activeCategories.map((category) => category.id),
-          }),
-        );
+        dispatchOps.rem(activeCategories.map((category) => category.id));
       }
     },
     [dispatch, filteredCategories, activeCategories],
   );
+
+  //TODO: This has something to do with how the chips appear
+  const getFilterState = (category: any) => {
+    if (category === "all") {
+      return filteredCategories.length === activeCategories.length;
+    } else if (category === "any") {
+      return filteredCategories.length === 0;
+    }
+    return filteredCategories.includes(category.id);
+  };
 
   return (
     <FilterList
       title="Filter Category"
       tooltipContent="categories"
       items={activeCategories}
-      onToggle={toggleImageCategoryFilter}
-      onToggleAll={toggleAllImageCategoryFilter}
-      isFiltered={(category) => {
-        if (category === "all") {
-          return filteredCategories.length === activeCategories.length;
-        } else if (category === "any") {
-          return filteredCategories.length === 0;
-        }
-        return filteredCategories.includes(category.id);
-      }}
+      onToggle={toggleCategoryFilter}
+      onToggleAll={toggleAllCategoryFilter}
+      isFiltered={getFilterState}
     />
   );
 };
