@@ -54,7 +54,9 @@ export const ItemDetailContainer = ({
       <Box sx={{ flexGrow: 1 }} />
 
       <ItemDetailTooltip
-        contents={renderDetailList(backgroundColor)}
+        contents={renderDetailList(
+          theme.palette.getContrastText(backgroundColor),
+        )}
         backgroundColor={backgroundColor}
       >
         <InfoOutlinedIcon
