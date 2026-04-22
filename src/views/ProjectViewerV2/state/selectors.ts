@@ -7,6 +7,7 @@ import { Partition } from "utils/models/enums";
 import {
   AnnotationGridState,
   ImageFilters,
+  ImageGridState,
   ImageSortType,
   ProjectState,
   ViewState,
@@ -50,6 +51,13 @@ export const selectProjectName = ({
 /*
 IMAGES
 */
+export const selectImageGridState = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}): ImageGridState => {
+  return project.imageGridState;
+};
 export const selectSelectedImageIds = ({
   projectV2: project,
 }: {
