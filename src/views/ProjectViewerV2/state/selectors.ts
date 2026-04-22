@@ -130,6 +130,26 @@ export const selectActiveViewState = createSelector(
   },
 );
 
+export const selectActiveStateFiltered = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}): boolean => {
+  const viewState = project.activeView;
+  const activeKindId = project.annotationGridState.activeKindId;
+  const activeState =
+    viewState === "images"
+      ? project.imageGridState
+      : project.annotationGridState.kindStates[activeKindId];
+
+  return Boolean(
+    Object.values(activeState.filters).reduce((cnt: number, f) => {
+      cnt += f.length;
+      return cnt;
+    }, 0),
+  );
+};
+
 export const selectSelectedThingIds = ({
   projectV2: project,
 }: {
