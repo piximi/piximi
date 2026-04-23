@@ -9,6 +9,7 @@ import type {
 } from "store/types";
 import type { Kind, Shape } from "store/dataV2/types";
 import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
+import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 
 import { getDefaultModelInfo } from "utils/models/classification/utils";
 import type { ClassifierEvaluationResultType } from "utils/models/types";
@@ -223,5 +224,25 @@ export const classifierSlice = createSlice({
       state.showClearPredictionsWarning =
         action.payload.showClearPredictionsWarning;
     },
+  },
+  extraReducers(builder) {
+    builder
+      .addCase(dataSliceV2.actions.addKind, (state, action) => {
+        state.kindClassifiers[action.payload.kind.id] = {
+          modelNameOrArch: 0,
+          modelInfoDict: { "base-model": getDefaultModelInfo() },
+        };
+      })
+      .addCase(dataSliceV2.actions.batchAddKind, (state, action) => {
+        action.payload.forEach(({ kind }) => {
+          state.kindClassifiers[kind.id] = {
+            modelNameOrArch: 0,
+            modelInfoDict: { "base-model": getDefaultModelInfo() },
+          };
+        });
+      })
+      .addCase(dataSliceV2.actions.deleteKind, (state, action) => {
+        delete state.kindClassifiers[action.payload];
+      });
   },
 });
