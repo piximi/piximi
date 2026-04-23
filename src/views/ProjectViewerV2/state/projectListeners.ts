@@ -9,7 +9,7 @@ import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { measurementsSlice } from "store/measurements";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 
-import classifierHandler from "utils/models/classification/classifierHandler";
+import classifierHandler from "utils/modelsV2/classification/classifierHandler";
 
 import { projectSlice } from "./projectSlice";
 

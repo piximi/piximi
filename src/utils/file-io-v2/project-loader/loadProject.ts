@@ -5,8 +5,8 @@ import semver from "semver";
 import type { CancelToken } from "utils/worker-scheduler/types";
 import type { CustomStore } from "utils/file-io/zarr/stores";
 import { FileStore, ZipStore } from "utils/file-io/zarr/stores";
-import type { ExtractedModelFileMap } from "utils/models/types";
-import classifierHandler from "utils/models/classification/classifierHandler";
+import type { ExtractedModelFileMap } from "utils/modelsV2/types";
+import classifierHandler from "utils/modelsV2/classification/classifierHandler";
 
 import { getAttr } from "./zarr/utils";
 import { readV11 } from "./version-readers/readV11";

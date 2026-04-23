@@ -27,7 +27,7 @@ import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
 import { enumKeys } from "utils/objectUtils";
-import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
+import { LossFunction, OptimizationAlgorithm } from "utils/modelsV2/enums";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 

@@ -7,13 +7,13 @@ import type {
   ModelStatus,
   OptimizationAlgorithm,
   Partition,
-} from "utils/models/enums";
+} from "utils/modelsV2/enums";
 import type {
   ClassifierEvaluationResultType,
   CropOptions,
   FitOptions,
   RescaleOptions,
-} from "utils/models/types";
+} from "utils/modelsV2/types";
 import type { ColorsRaw } from "utils/types";
 
 import type { RawData } from "../../types";

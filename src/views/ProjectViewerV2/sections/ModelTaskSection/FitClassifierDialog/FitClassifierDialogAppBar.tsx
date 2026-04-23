@@ -34,7 +34,7 @@ import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusPro
 import useFitClassifier from "@ProjectViewer/hooks/useFitClassifier";
 
 import { APPLICATION_COLORS } from "utils/constants";
-import { ModelStatus } from "utils/models/enums";
+import { ModelStatus } from "utils/modelsV2/enums";
 
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 

@@ -1,29 +1,22 @@
-import { useDispatch, useSelector } from "react-redux";
-import ImageJS from "image-js";
-import { useSegmenterStatus } from "../contexts/SegmenterStatusProvider";
-import {
-  selectSegmenterInferenceOptions,
-  selectSegmenterModel,
-} from "store/segmenter/selectors";
 import { useCallback, useMemo } from "react";
-import { getStackTraceFromError } from "utils/logUtils";
-import { AlertState, LoadCB } from "utils/types";
-import { AlertType } from "utils/enums";
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { ModelStatus } from "utils/models/enums";
+
+import { useDispatch, useSelector } from "react-redux";
+
+import ImageJS from "image-js";
+import { intersection } from "lodash";
+
 import { selectAllImages, selectAllKinds } from "store/data/selectors";
 import {
   selectActiveSelectedItems,
   selectSelectedImages,
 } from "@ProjectViewer/state/reselectors";
+import type { AnnotationObject, Category, Shape } from "store/data/types";
+import { ImageObject } from "store/data/types";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import {
-  AnnotationObject,
-  Category,
-  ImageObject,
-  Shape,
-} from "store/data/types";
-import { intersection } from "lodash";
-import { OrphanedAnnotationObject } from "utils/models/segmentation";
+  selectSegmenterInferenceOptions,
+  selectSegmenterModel,
+} from "store/segmenter/selectors";
 import { dataSlice } from "store/data";
 import {
   UNKNOWN_NAME,
@@ -31,6 +24,14 @@ import {
 } from "store/dataV2/constants";
 import { getPropertiesFromImageSync } from "store/data/utils";
 import { selectExtendedImages } from "store/dataV2/selectors";
+
+import { ModelStatus } from "utils/modelsV2/enums";
+import type { OrphanedAnnotationObject } from "utils/modelsV2/segmentation";
+import { getStackTraceFromError } from "utils/logUtils";
+import { AlertType } from "utils/enums";
+import type { AlertState, LoadCB } from "utils/types";
+
+import { useSegmenterStatus } from "../contexts/SegmenterStatusProvider";
 
 export const usePredictSegmenter = () => {
   const dispatch = useDispatch();

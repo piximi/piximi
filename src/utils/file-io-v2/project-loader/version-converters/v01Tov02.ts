@@ -6,7 +6,7 @@ import {
 import { generateUUID } from "store/dataV2/utils";
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 import { representsUnknown } from "utils/stringUtils";
 
 import { subProgress } from "../progress";

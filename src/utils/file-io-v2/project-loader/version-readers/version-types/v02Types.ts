@@ -1,7 +1,7 @@
 import type { BitDepth, Shape } from "store/data/types";
 import type { ProjectState, SegmenterState } from "store/types";
 
-import type { Partition } from "utils/models/enums";
+import type { Partition } from "utils/modelsV2/enums";
 
 import type {
   V01ClassifierState,

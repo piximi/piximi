@@ -7,7 +7,7 @@ import { ImagePartitionSelect } from "./ImagePartitionSelect";
 
 import { dataSlice } from "store/data/dataSlice";
 
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 
 import { Kind, Thing } from "store/data/types";
 import { DataTable } from "./DataTable";

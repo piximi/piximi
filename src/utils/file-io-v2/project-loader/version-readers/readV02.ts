@@ -5,7 +5,7 @@ import type { BitDepth } from "store/data/types";
 
 import type { CustomStore } from "utils/file-io/zarr/stores";
 import { logger } from "utils/logUtils";
-import type { Partition } from "utils/models/enums";
+import type { Partition } from "utils/modelsV2/enums";
 
 import { getAttr, getDataset, getGroup } from "../zarr/utils";
 import {

@@ -11,9 +11,9 @@ import {
 } from "@mui/material";
 import { FileOpen as FileOpenIcon } from "@mui/icons-material";
 
-import type { SequentialClassifier } from "utils/models/classification";
-import type { ModelUploadResults } from "utils/models/classification/classifierHandler";
-import classifierHandler from "utils/models/classification/classifierHandler";
+import type { SequentialClassifier } from "utils/modelsV2/classification";
+import type { ModelUploadResults } from "utils/modelsV2/classification/classifierHandler";
+import classifierHandler from "utils/modelsV2/classification/classifierHandler";
 import { isObjectEmpty } from "utils/objectUtils";
 
 //TODO: MenuItem??

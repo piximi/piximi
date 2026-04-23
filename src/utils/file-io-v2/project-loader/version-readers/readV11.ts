@@ -3,7 +3,7 @@ import { openGroup } from "zarr";
 import { initialState as initialProjectState } from "store/project/projectSlice";
 import type { BitDepth } from "store/data/types";
 
-import type { Partition } from "utils/models/enums";
+import type { Partition } from "utils/modelsV2/enums";
 import type { CustomStore } from "utils/file-io/zarr/stores";
 import { logger } from "utils/logUtils";
 

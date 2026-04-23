@@ -7,7 +7,7 @@ import { useRenderedSrc } from "hooks/useRenderedSrcs";
 import { isUnknownCategory } from "store/data/utils";
 import type { ExtendedImageObject } from "store/dataV2/types";
 
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 
 import { getIconPosition, imageStyle } from "../gridItemUtils";
 import { useGridItemStyle } from "../useGridItemStyle";

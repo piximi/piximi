@@ -11,7 +11,7 @@ import { selectActiveKindId } from "store/project/selectors";
 import { AlertType } from "utils/enums";
 import { getStackTraceFromError } from "utils/logUtils";
 import type { AlertState } from "utils/types";
-import { ModelStatus } from "utils/models/enums";
+import { ModelStatus } from "utils/modelsV2/enums";
 
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 

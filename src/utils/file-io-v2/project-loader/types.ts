@@ -16,7 +16,7 @@ import type {
   SegmenterState,
 } from "store/types";
 
-import type { ExtractedModelFileMap } from "utils/models/types";
+import type { ExtractedModelFileMap } from "utils/modelsV2/types";
 import type { Progress } from "utils/types";
 
 import type { V2PiximiState } from "./version-readers/version-types/v2Types";

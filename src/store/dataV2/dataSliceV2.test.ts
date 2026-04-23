@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 
 import { dataSliceV2 } from "./dataSliceV2";
 

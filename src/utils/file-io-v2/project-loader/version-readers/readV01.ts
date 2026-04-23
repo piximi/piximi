@@ -4,7 +4,7 @@ import { initialState as initialProjectState } from "store/project/projectSlice"
 import type { BitDepth } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 import type { CustomStore } from "utils/file-io/zarr/stores";
 
 import { ZARR_V01_IMAGE } from "../zarr/types";

@@ -13,7 +13,7 @@ import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
 
 import { logger } from "utils/logUtils";
 import type { Points } from "utils/types";
-import type { TrainingCallbacks } from "utils/models/types";
+import type { TrainingCallbacks } from "utils/modelsV2/types";
 
 type HistoryData = {
   categoricalAccuracy: Points;

@@ -21,17 +21,17 @@ import type { Thing, Kind, Category } from "store/data/types";
 import type { ModelClassMap, ModelInfo } from "store/types";
 
 import { getStackTraceFromError } from "utils/logUtils";
-import classifierHandler from "utils/models/classification/classifierHandler";
-import { ModelStatus, Partition } from "utils/models/enums";
+import classifierHandler from "utils/modelsV2/classification/classifierHandler";
+import { ModelStatus, Partition } from "utils/modelsV2/enums";
 import { AlertType } from "utils/enums";
-import type { SequentialClassifier } from "utils/models/classification";
+import type { SequentialClassifier } from "utils/modelsV2/classification";
 import type { AlertState } from "utils/types";
 import {
   prepareClasses,
   prepareModel,
   prepareTrainingData,
   trainModel,
-} from "utils/models/classification/utils";
+} from "utils/modelsV2/classification/utils";
 
 import { useClassMapDialog } from "./useClassMapDialog";
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";

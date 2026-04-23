@@ -15,7 +15,7 @@ import {
 
 import { selectProjectName } from "@ProjectViewer/state/selectors";
 
-import type { ModelLayerData } from "utils/models/types";
+import type { ModelLayerData } from "utils/modelsV2/types";
 
 interface Column {
   id: "layerName" | "outputShape" | "parameters" | "trainable";

@@ -14,9 +14,9 @@ import { TaskPriority } from "utils/worker-scheduler/types";
 import type { StorageInput } from "utils/data-connector/types";
 import { STORES } from "utils/data-connector/types";
 import { parseError } from "utils/logUtils";
-import type { ExtractedModelFileMap } from "utils/models/types";
-import classifierHandler from "utils/models/classification/classifierHandler";
-import type { SequentialClassifier } from "utils/models/classification";
+import type { ExtractedModelFileMap } from "utils/modelsV2/types";
+import classifierHandler from "utils/modelsV2/classification/classifierHandler";
+import type { SequentialClassifier } from "utils/modelsV2/classification";
 
 import type { V2Channel } from "./version-readers/version-types/v2Types";
 import type {

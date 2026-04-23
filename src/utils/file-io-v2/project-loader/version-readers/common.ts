@@ -6,13 +6,13 @@ import {
   LossFunction,
   Metric,
   OptimizationAlgorithm,
-} from "utils/models/enums";
+} from "utils/modelsV2/enums";
 import type {
   ClassifierEvaluationResultType,
   CropOptions,
   FitOptions,
   RescaleOptions,
-} from "utils/models/types";
+} from "utils/modelsV2/types";
 
 import { getAttr, getDatasetSelection, getGroup } from "../zarr/utils";
 import { initialClassifierStateV01_02 } from "./constants";

@@ -13,7 +13,7 @@ import {
 import { processChannel } from "utils/channelUtils";
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
 import { representsUnknown } from "utils/stringUtils";
-import { getDefaultModelInfo } from "utils/models/classification/utils";
+import { getDefaultModelInfo } from "utils/modelsV2/classification/utils";
 
 import { subProgress } from "../progress";
 

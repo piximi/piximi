@@ -21,8 +21,8 @@ import { classifierSlice } from "store/classifierV2";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 
 import { HotkeyContext } from "utils/enums";
-import classifierHandler from "utils/models/classification/classifierHandler";
-import type { SequentialClassifier } from "utils/models/classification";
+import classifierHandler from "utils/modelsV2/classification/classifierHandler";
+import type { SequentialClassifier } from "utils/modelsV2/classification";
 
 import { LocalClassifierUpload } from "./LocalFileUpload";
 import { RemoteClassifierUpload } from "./CloudUpload";

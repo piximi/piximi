@@ -5,12 +5,12 @@ import type {
   ClassifierEvaluationResultType,
   CropOptions,
   RescaleOptions,
-} from "utils/models/types";
+} from "utils/modelsV2/types";
 import type {
   LossFunction,
   Metric,
   OptimizationAlgorithm,
-} from "utils/models/enums";
+} from "utils/modelsV2/enums";
 
 import type {
   V02Category,

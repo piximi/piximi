@@ -33,8 +33,8 @@ import {
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 
 import { enumKeys } from "utils/objectUtils";
-import { CropSchema } from "utils/models/enums";
-import type { CropOptions, RescaleOptions } from "utils/models/types";
+import { CropSchema } from "utils/modelsV2/enums";
+import type { CropOptions, RescaleOptions } from "utils/modelsV2/types";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 

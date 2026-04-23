@@ -6,7 +6,7 @@ import { UNKNOWN_KIND } from "store/dataV2/constants";
 
 import { findAdjacentItem, mutatingFilter, toUnique } from "utils/arrayUtils";
 import { ThingSortKey } from "utils/enums";
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 import { representsUnknown } from "utils/stringUtils";
 
 import { AnnotationSortType, ImageSortType } from "./types";

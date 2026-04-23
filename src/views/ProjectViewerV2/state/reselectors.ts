@@ -13,8 +13,8 @@ import type { Shape } from "store/dataV2/types";
 
 import { representsUnknown } from "utils/stringUtils";
 import { isFiltered } from "utils/arrayUtils";
-import classifierHandler from "utils/models/classification/classifierHandler";
-import type { Partition } from "utils/models/enums";
+import classifierHandler from "utils/modelsV2/classification/classifierHandler";
+import type { Partition } from "utils/modelsV2/enums";
 import type {
   ClassifierEvaluationResultType,
   CropOptions,
@@ -22,7 +22,7 @@ import type {
   OptimizerSettings,
   PreprocessSettings,
   RescaleOptions,
-} from "utils/models/types";
+} from "utils/modelsV2/types";
 
 import {
   selectActiveKindId,

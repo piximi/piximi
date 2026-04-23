@@ -13,7 +13,7 @@ import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
 import { ClassMapDialogProvider } from "@ProjectViewer/hooks/useClassMapDialog";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
-import { ModelStatus } from "utils/models/enums";
+import { ModelStatus } from "utils/modelsV2/enums";
 
 import TrainingPlots from "./TrainingPlots";
 import { TrainingSettings } from "../training-settings/TrainingSettings";

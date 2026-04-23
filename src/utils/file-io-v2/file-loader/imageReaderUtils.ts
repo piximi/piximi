@@ -6,16 +6,15 @@ import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
 import { processChannel } from "utils/channelUtils";
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 
-import type { DimensionConfig 
-} from "./types";
 import {
   type ChannelResult,
   type ImageResult,
   type ImageSeriesResult,
-  type ReadStage 
+  type ReadStage,
 } from "./types";
+import type { DimensionConfig } from "./types";
 
 import type { Image as IJSImage } from "image-js-latest";
 

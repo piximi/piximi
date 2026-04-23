@@ -9,7 +9,7 @@ import { isUnknownCategory } from "store/data/utils";
 import { selectCategoryById } from "store/dataV2/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 
 import { getIconPosition, imageStyle } from "../gridItemUtils";
 import { useGridItemStyle } from "../useGridItemStyle";
