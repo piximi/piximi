@@ -230,7 +230,11 @@ export const ImageToolDrawer = () => {
                 tooltipLocation="left"
               >
                 {tool.name === imageTools.filters.name ? (
-                  <Badge color="primary" variant="dot" invisible={filtersExist}>
+                  <Badge
+                    color="primary"
+                    variant="dot"
+                    invisible={!filtersExist}
+                  >
                     {tool.icon(
                       activeTool === tool
                         ? theme.palette.primary.dark
