@@ -78,17 +78,13 @@ export const useGridActions = (viewState: ViewState) => {
   };
 
   const handleCategorize = (categoryId: string) => {
+    const payload = selectedFilteredItemIds.map((item) => ({
+      id: item,
+      categoryId,
+    }));
     if (viewState === "images") {
-      const payload = selectedFilteredItemIds.map((item) => ({
-        imageId: item,
-        categoryId,
-      }));
       dispatch(dataSliceV2.actions.batchUpdateImageCategory(payload));
     } else {
-      const payload = selectedFilteredItemIds.map((item) => ({
-        annotationId: item,
-        categoryId,
-      }));
       dispatch(
         dataSliceV2.actions.batchBubbleUpdateAnnotationCategory(payload),
       );

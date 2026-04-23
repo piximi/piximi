@@ -410,18 +410,30 @@ export const dataSliceV2 = createSlice({
     },
     updateImagePartition(
       state,
-      action: PayloadAction<{ imageId: string; partition: Partition }>,
+      action: PayloadAction<{ id: string; partition: Partition }>,
     ) {
       imageAdapter.updateOne(state.images, {
-        id: action.payload.imageId,
+        id: action.payload.id,
         changes: { partition: action.payload.partition },
       });
     },
+    batchUpdateImagePartition(
+      state,
+      action: PayloadAction<Array<{ id: string; partition: Partition }>>,
+    ) {
+      const updates: { id: string; changes: { partition: Partition } }[] = [];
+      action.payload.forEach(({ id, partition }) => {
+        const image = state.images.entities[id];
+        if (!image || image.categoryId === partition) return;
+        updates.push({ id, changes: { partition } });
+      });
+      imageAdapter.updateMany(state.images, updates);
+    },
     updateImageCategory(
       state,
-      action: PayloadAction<{ imageId: string; categoryId: string }>,
+      action: PayloadAction<{ id: string; categoryId: string }>,
     ) {
-      const image = state.images.entities[action.payload.imageId];
+      const image = state.images.entities[action.payload.id];
       const targetCategory =
         state.categories.entities[action.payload.categoryId];
       if (
@@ -432,21 +444,21 @@ export const dataSliceV2 = createSlice({
         return;
 
       imageAdapter.updateOne(state.images, {
-        id: action.payload.imageId,
+        id: action.payload.id,
         changes: { categoryId: action.payload.categoryId },
       });
     },
     batchUpdateImageCategory(
       state,
-      action: PayloadAction<Array<{ imageId: string; categoryId: string }>>,
+      action: PayloadAction<Array<{ id: string; categoryId: string }>>,
     ) {
       const updates: { id: string; changes: { categoryId: string } }[] = [];
-      action.payload.forEach(({ imageId, categoryId }) => {
-        const image = state.images.entities[imageId];
+      action.payload.forEach(({ id, categoryId }) => {
+        const image = state.images.entities[id];
         const targetCategory = state.categories.entities[categoryId];
         if (!image || image.categoryId === categoryId || !targetCategory)
           return;
-        updates.push({ id: image.id, changes: { categoryId } });
+        updates.push({ id, changes: { categoryId } });
       });
       imageAdapter.updateMany(state.images, updates);
     },
@@ -623,31 +635,30 @@ export const dataSliceV2 = createSlice({
     },
     updateAnnotationPartition(
       state,
-      action: PayloadAction<{ annotationId: string; partition: Partition }>,
+      action: PayloadAction<{ id: string; partition: Partition }>,
     ) {
       annotationAdapter.updateOne(state.annotations, {
-        id: action.payload.annotationId,
+        id: action.payload.id,
         changes: { partition: action.payload.partition },
       });
     },
     batchUpdateAnnotationPartition(
       state,
-      action: PayloadAction<{ annotationId: string; partition: Partition }[]>,
+      action: PayloadAction<{ id: string; partition: Partition }[]>,
     ) {
       annotationAdapter.updateMany(
         state.annotations,
         action.payload.map((changes) => ({
-          id: changes.annotationId,
+          id: changes.id,
           changes: { partition: changes.partition },
         })),
       );
     },
     bubbleUpdateAnnotationCategory(
       state,
-      action: PayloadAction<{ annotationId: string; categoryId: string }>,
+      action: PayloadAction<{ id: string; categoryId: string }>,
     ) {
-      const annotation =
-        state.annotations.entities[action.payload.annotationId];
+      const annotation = state.annotations.entities[action.payload.id];
       if (!annotation) return;
 
       annotationVolumeAdapter.updateOne(state.annotationVolumes, {
@@ -657,11 +668,11 @@ export const dataSliceV2 = createSlice({
     },
     batchBubbleUpdateAnnotationCategory(
       state,
-      action: PayloadAction<{ annotationId: string; categoryId: string }[]>,
+      action: PayloadAction<{ id: string; categoryId: string }[]>,
     ) {
       const volumeChanges: Record<string, string> = {};
-      action.payload.forEach(({ annotationId: annId, categoryId: catId }) => {
-        const ann = state.annotations.entities[annId];
+      action.payload.forEach(({ id, categoryId: catId }) => {
+        const ann = state.annotations.entities[id];
         if (!ann) return;
         volumeChanges[ann.volumeId] = catId;
       });

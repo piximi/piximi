@@ -132,24 +132,16 @@ export const ProjectViewerCategories = () => {
       const currentCategory = categories[+categoryIndex];
       if (currentCategory) {
         if (selectedEntityIds.length > 0) {
+          const updates = selectedEntityIds.map((id) => ({
+            id,
+            categoryId: currentCategory.id,
+          }));
           if (activeView === "images") {
-            dispatch(
-              dataSliceV2.actions.batchUpdateImageCategory(
-                selectedEntityIds.map((imageId) => ({
-                  imageId,
-                  categoryId: currentCategory.id,
-                })),
-              ),
-            );
+            dispatch(dataSliceV2.actions.batchUpdateImageCategory(updates));
             return;
           }
           dispatch(
-            dataSliceV2.actions.batchBubbleUpdateAnnotationCategory(
-              selectedEntityIds.map((annotationId) => ({
-                annotationId,
-                categoryId: currentCategory.id,
-              })),
-            ),
+            dataSliceV2.actions.batchBubbleUpdateAnnotationCategory(updates),
           );
         }
       }
