@@ -24,13 +24,15 @@ export const Application = () => {
   const alertState = useSelector(selectAlertState);
 
   useEffect(() => {
-    return () => {
-      if (import.meta.env.DEV) {
-        const dataConnector = DataConnector.getInstance();
-        dataConnector.clearAll();
+    if (import.meta.env.DEV) {
+      const nav = performance.getEntriesByType(
+        "navigation",
+      )[0] as PerformanceNavigationTiming;
+      if (nav?.type === "reload") {
+        DataConnector.getInstance().clearAll();
       }
-    };
-  });
+    }
+  }, []); // empty deps → runs once on mount
 
   return (
     <StyledEngineProvider injectFirst>
