@@ -1,48 +1,45 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IconButton, List, Stack } from "@mui/material";
 import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 
 import { useDialogHotkey, useHotkeys } from "hooks";
 
-import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
-import { CategoryItemMenu } from "components/ui/CategoryItemMenu";
+import { ConfirmationDialog } from "components/dialogs";
+import { CategoryItemMenu } from "components/ui/CategoryItemMenuV2";
 import { CategoryItem } from "./list-items/CategoryItem";
 
 import { projectSlice } from "@ProjectViewer/state";
-import { selectHighlightedCategory } from "@ProjectViewer/state/selectors";
-import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import {
-  selectActiveCategories,
-  selectActiveSelectedThingIds,
-} from "@ProjectViewer/state/reselectors";
-import { dataSlice } from "store/data/dataSlice";
+  selectActiveSelectedIds,
+  selectActiveView,
+} from "@ProjectViewer/state/selectors";
+import { selectActiveKindId } from "@ProjectViewer/state/selectors";
+import { selectActiveCategories } from "@ProjectViewer/state/reselectors";
 
-import { isUnknownCategory } from "store/data/utils";
-
-import { Partition } from "utils/models/enums";
 import { HotkeyContext } from "utils/enums";
 
-import { Category } from "store/data/types";
+import { Category } from "store/dataV2/types";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { FunctionalDivider } from "components/ui";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
+import { generateCategory } from "store/dataV2/utils";
+import { dataSliceV2 } from "store/dataV2/dataSliceV2";
+import { CategoryDialog } from "components/dialogs/CategoryDialogV2";
 
 export const ProjectViewerCategories = () => {
   const dispatch = useDispatch();
   const categories = useSelector(selectActiveCategories);
-  const activeKind = useSelector(selectActiveKindId);
+  const activeView = useSelector(selectActiveView);
+  const activeKindId = useSelector(selectActiveKindId);
+  const selectedEntityIds = useSelector(selectActiveSelectedIds);
 
-  const [selectedCategory, setSelectedCategory] = useState<Category>();
   const [categoryIndex, setCategoryIndex] = useState("");
   const [showHK, setShowHK] = useState(false);
-
-  const highlightedCategory = useSelector(selectHighlightedCategory);
-
-  const selectedImageIds = useSelector(selectActiveSelectedThingIds);
-
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
+
+  const [menuCategory, setMenuCategory] = useState<Category>();
 
   const {
     onClose: handleCloseCreateCategoryDialog,
@@ -56,71 +53,47 @@ export const ProjectViewerCategories = () => {
     open: isDeleteCategoryDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
-  const selectCategory = useCallback(
-    (category: Category) => {
-      setSelectedCategory(category);
-
-      dispatch(
-        projectSlice.actions.updateHighlightedCategory({
-          categoryId: category.id,
-        }),
-      );
-    },
-    [dispatch],
-  );
-
-  const createCategory = (kind: string, name: string, color: string) => {
-    dispatch(
-      dataSlice.actions.createCategory({
-        name,
-        color,
-        kind: kind,
-      }),
+  const createCategory = (name: string, color: string) => {
+    const category = generateCategory(
+      name,
+      color,
+      activeView === "images"
+        ? { type: "image" }
+        : { type: "annotation", kindId: activeKindId },
     );
+    dispatch(dataSliceV2.actions.addCategory(category));
   };
 
   const editCategory = (id: string, name: string, color: string) => {
     dispatch(
-      dataSlice.actions.updateCategory({
-        updates: { id, changes: { name, color } },
+      dataSliceV2.actions.updateCategoryDisplayProps({
+        id,
+        changes: { name, color },
       }),
     );
   };
-  const deleteCategory = (category: Category, kindId: string) => {
-    dispatch(
-      dataSlice.actions.removeCategoriesFromKind({
-        categoryIds: [category.id],
-        kind: kindId ?? activeKind,
-      }),
-    );
+  const deleteCategory = (category: Category) => {
+    dispatch(dataSliceV2.actions.deleteCategory(category.id));
   };
   const deleteObjects = (category: Category) => {
-    dispatch(
-      dataSlice.actions.deleteThings({
-        thingIds: category.containing,
-        activeKind: activeKind,
-        disposeColorTensors: true,
-      }),
-    );
+    dispatch(dataSliceV2.actions.deleteEntitiesByCatId(category.id));
   };
 
   const onOpenCategoryMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
     category: Category,
   ) => {
-    selectCategory(category);
+    setMenuCategory(category);
     setCategoryMenuAnchorEl(event.currentTarget);
   };
 
   const onCloseCategoryMenu = () => {
+    setMenuCategory(undefined);
     setCategoryMenuAnchorEl(null);
   };
   const handleRemoveAllCategories = () => {
     dispatch(
-      dataSlice.actions.removeCategoriesFromKind({
-        categoryIds: "all",
-        kind: activeKind,
-      }),
+      dataSliceV2.actions.batchDeleteCategory(categories.map((c) => c.id)),
     );
   };
 
@@ -155,26 +128,28 @@ export const ProjectViewerCategories = () => {
     "shift",
     () => {
       setShowHK(false);
-      if (
-        categoryIndex.length !== 0 &&
-        !Number.isNaN(+categoryIndex) &&
-        categories[+categoryIndex]
-      ) {
-        dispatch(
-          projectSlice.actions.updateHighlightedCategory({
-            categoryId: categories[+categoryIndex].id,
-          }),
-        );
-        setSelectedCategory(categories[+categoryIndex]);
-        if (selectedImageIds.length > 0) {
+      if (categoryIndex.length === 0 && Number.isNaN(+categoryIndex)) return;
+      const currentCategory = categories[+categoryIndex];
+      if (currentCategory) {
+        if (selectedEntityIds.length > 0) {
+          if (activeView === "images") {
+            dispatch(
+              dataSliceV2.actions.batchUpdateImageCategory(
+                selectedEntityIds.map((imageId) => ({
+                  imageId,
+                  categoryId: currentCategory.id,
+                })),
+              ),
+            );
+            return;
+          }
           dispatch(
-            dataSlice.actions.updateThings({
-              updates: selectedImageIds.map((imageId) => ({
-                id: imageId,
-                categoryId: highlightedCategory,
-                partition: Partition.Unassigned,
+            dataSliceV2.actions.batchBubbleUpdateAnnotationCategory(
+              selectedEntityIds.map((annotationId) => ({
+                annotationId,
+                categoryId: currentCategory.id,
               })),
-            }),
+            ),
           );
         }
       }
@@ -183,7 +158,7 @@ export const ProjectViewerCategories = () => {
     },
     [HotkeyContext.ProjectView],
     { keyup: true, enabled: true },
-    [dispatch, selectedImageIds],
+    [dispatch, selectedEntityIds],
   );
 
   useHotkeys(
@@ -193,24 +168,22 @@ export const ProjectViewerCategories = () => {
     },
     [HotkeyContext.ProjectView],
     { enabled: true },
-    [dispatch, selectedImageIds],
+    [dispatch, selectedEntityIds],
   );
 
   useEffect(() => {
-    const allCategories = categories;
     if (
       categoryIndex.length !== 0 &&
       !Number.isNaN(+categoryIndex) &&
-      allCategories[+categoryIndex]
+      categories[+categoryIndex]
     ) {
       dispatch(
         projectSlice.actions.updateHighlightedCategory({
-          categoryId: allCategories[+categoryIndex].id,
+          categoryId: categories[+categoryIndex].id,
         }),
       );
     }
   }, [dispatch, categoryIndex, categories]);
-  useEffect(() => {}, [selectedCategory]);
 
   return (
     <>
@@ -258,23 +231,17 @@ export const ProjectViewerCategories = () => {
               HKIndex={idx}
               category={category}
               key={category.id}
-              isSelected={
-                selectedCategory
-                  ? selectedCategory.id === category.id
-                  : isUnknownCategory(category.id)
-              }
-              selectCategory={selectCategory}
-              isHighlighted={highlightedCategory === category.id}
+              isHighlighted={String(idx) === categoryIndex}
               handleOpenCategoryMenu={onOpenCategoryMenu}
             />
           );
         })}
       </List>
 
-      {selectedCategory && (
+      {menuCategory && (
         <CategoryItemMenu
           anchorElCategoryMenu={categoryMenuAnchorEl}
-          category={selectedCategory}
+          category={menuCategory}
           handleCloseCategoryMenu={onCloseCategoryMenu}
           openCategoryMenu={Boolean(categoryMenuAnchorEl)}
           editCategory={editCategory}
@@ -284,7 +251,7 @@ export const ProjectViewerCategories = () => {
       )}
 
       <CategoryDialog
-        kind={activeKind}
+        kind={activeKindId}
         onConfirm={createCategory}
         onClose={handleCloseCreateCategoryDialog}
         open={isCreateCategoryDialogOpen}

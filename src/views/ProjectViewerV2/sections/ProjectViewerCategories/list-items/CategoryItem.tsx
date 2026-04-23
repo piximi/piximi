@@ -1,5 +1,4 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import { Tooltip } from "@mui/material";
 import {
   Label as LabelIcon,
@@ -9,20 +8,17 @@ import {
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { CountChip } from "components/ui/CountChip";
 
-import { selectNumThingsByCatAndKind } from "store/data/selectors";
-import { selectActiveKindId } from "@ProjectViewer/state/selectors";
-
 import { APPLICATION_COLORS } from "utils/constants";
 
-import { Category } from "store/data/types";
+import { Category } from "store/dataV2/types";
+import { useParameterizedSelector } from "store/hooks";
+import { selectEntityCountByCategoryId } from "store/dataV2/selectors";
 
 type CategoryItemProps = {
   showHK?: boolean;
   HKIndex?: number;
   category: Category;
-  isSelected: boolean;
   isHighlighted: boolean;
-  selectCategory: (category: Category) => void;
   handleOpenCategoryMenu: (
     event: React.MouseEvent<HTMLButtonElement>,
     category: Category,
@@ -33,22 +29,20 @@ export const CategoryItem = ({
   showHK,
   HKIndex,
   category,
-  isSelected,
   isHighlighted,
   handleOpenCategoryMenu,
-  selectCategory,
 }: CategoryItemProps) => {
   const tipRef = React.useRef(null);
   const [inView, setInView] = React.useState(false);
-  const numThings = useSelector(selectNumThingsByCatAndKind);
-  const activeKind = useSelector(selectActiveKindId);
+  const numEntities = useParameterizedSelector(
+    selectEntityCountByCategoryId,
+    category.id,
+  );
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     handleOpenCategoryMenu(event, category);
   };
-  const handleSelect = () => {
-    selectCategory(category);
-  };
+
   const cb = (entries: any) => {
     const [entry] = entries;
     entry.isIntersecting ? setInView(true) : setInView(false);
@@ -75,24 +69,22 @@ export const CategoryItem = ({
       open={showHK}
       title={HKIndex}
       placement="right"
-      PopperProps={{
-        sx: { display: inView ? "block" : "none" },
-      }}
+      slotProps={{ popper: { sx: { display: inView ? "block" : "none" } } }}
     >
       <span>
         <CustomListItemButton
-          selected={isSelected}
           primaryText={category.name}
           icon={<LabelIcon sx={{ color: category.color }} />}
           sx={{
-            backgroundColor: isHighlighted ? category.color + "33" : "inherit",
+            bgcolor: isHighlighted ? category.color + "33" : "inherit",
+            cursor: "default",
           }}
-          onClick={handleSelect}
+          onClick={undefined}
           secondaryIcon={<MoreHorizIcon />}
           onSecondary={handleOpenMenu}
           additionalComponent={
             <CountChip
-              count={numThings(category.id, activeKind)}
+              count={numEntities}
               backgroundColor={APPLICATION_COLORS.highlightColor}
             />
           }
