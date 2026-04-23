@@ -11,7 +11,7 @@ import { ViewState } from "@ProjectViewer/state/types";
 import { ImageGrid } from "./ImageGrid";
 import { selectTotalAnnotations } from "store/dataV2/selectors";
 import { AnnotationView } from "./AnnotationView";
-import { GridActions } from "./ImageGrid/GridActions/GridActions";
+import { GridActions } from "./GridActions/GridActions";
 
 export const ProjectGrid = () => {
   const dispatch = useDispatch();
