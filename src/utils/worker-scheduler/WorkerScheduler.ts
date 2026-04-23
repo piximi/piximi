@@ -44,8 +44,9 @@ import {
   type TaskPriority,
 } from "./types";
 import { PriorityQueue } from "./PriorityQueue";
-import { TaskMap } from "./taskMap";
 import { createTaskError, ErrorLogger } from "./errors";
+
+import type { TaskMap } from "./taskMap";
 
 // =============================================================================
 // INTERNAL TYPES
@@ -754,18 +755,17 @@ export class WorkerScheduler implements IWorkerScheduler {
      * Create a progress callback that updates our tracking and notifies listeners.
      * This is passed to worker methods which call it with 0-100 values.
      */
-    const onProgress: NonNullable<TaskMap[K]["onProgress"]> = ({
-      value,
-      ...rest
-    }) => {
+    const onProgress: NonNullable<TaskMap[K]["onProgress"]> = (
+      args: { value: number } & Record<string, unknown>,
+    ) => {
       if (this.taskStatuses.get(task.id) === TaskStatus.RUNNING) {
         // Update our progress tracking
 
-        this.taskProgress.set(task.id, value);
+        this.taskProgress.set(task.id, args.value);
 
         // Call the task's progress callback if provided
 
-        task.onProgress?.({ value, ...rest });
+        (task.onProgress as ((_args: typeof args) => void) | undefined)?.(args);
 
         // Notify aggregate progress listeners
         this.notifyProgressListeners();
@@ -785,7 +785,9 @@ export class WorkerScheduler implements IWorkerScheduler {
         task.type,
         task.payload,
         cancelToken,
-        Comlink.proxy(onProgress),
+        Comlink.proxy(onProgress) as unknown as NonNullable<
+          TaskMap[K]["onProgress"]
+        >,
       );
 
       // Check if cancelled during execution
@@ -805,7 +807,7 @@ export class WorkerScheduler implements IWorkerScheduler {
 
       // Call the task's completion callback if provided
       if (task.onComplete) {
-        task.onComplete(result);
+        (task.onComplete as (result?: TaskMap[K]["result"]) => void)(result);
       }
 
       // Resolve the task's promise with the result
