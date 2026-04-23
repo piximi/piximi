@@ -1,22 +1,33 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { difference, intersection } from "lodash";
-
-import {
-  selectCategoriesDictionary,
-  selectKindDictionary,
-  selectThingsDictionary,
-} from "store/data/selectors";
 import {
   selectActiveKindId,
   selectActiveView,
-  selectSelectedThingIds,
+  selectActiveSelectedIds,
+  selectActiveFilters,
+  selectSelectedImageIds,
 } from "./selectors";
 
-import { isUnknownCategory } from "store/data/utils";
-
-import { Thing } from "store/data/types";
-import { selectAllCategories } from "store/dataV2/selectors";
+import {
+  selectAllCategories,
+  selectExtendedAnnotationsByKindId,
+  selectExtendedImages,
+} from "store/dataV2/selectors";
 import { representsUnknown } from "utils/stringUtils";
+import { RootState } from "store/rootReducer";
+import { isFiltered } from "utils/arrayUtils";
+
+// --- Images ---
+
+export const selectSelectedImages = createSelector(
+  selectSelectedImageIds,
+  selectExtendedImages,
+  (selectedIds, images) => {
+    const selectedSet = new Set(selectedIds);
+    return images.filter((images) => selectedSet.has(images.id));
+  },
+);
+
+// --- Categories ---
 
 export const selectActiveCategories = createSelector(
   selectActiveView,
@@ -32,87 +43,72 @@ export const selectActiveCategories = createSelector(
       .sort((c) => (representsUnknown(c.id) ? -1 : 1)),
 );
 
-/*
-~~ OLD
-*/
-
-export const selectActiveKindObject = createSelector(
-  selectActiveKindId,
-  selectKindDictionary,
-  (activeKind, kindDict) => {
-    return kindDict[activeKind]!;
-  },
-);
-
 export const selectActiveKnownCategories = createSelector(
   selectActiveCategories,
   (activeCategories) => {
-    return activeCategories.filter((cat) => !isUnknownCategory(cat.id));
+    return activeCategories.filter((cat) => !representsUnknown(cat.id));
   },
 );
 
-export const selectActiveThingIds = createSelector(
-  selectActiveKindObject,
-  (kind) => {
-    if (!kind) return [];
-    return kind.containing;
+// --- Items pipeline ---
+
+const selectActiveExtendedAnnotations = (state: RootState) =>
+  selectExtendedAnnotationsByKindId(state, selectActiveKindId(state));
+
+export const selectActiveItems = createSelector(
+  selectActiveView,
+  selectActiveExtendedAnnotations,
+  selectExtendedImages,
+  (view, annotations, images) => {
+    if (view === "images") return images;
+    return annotations;
   },
 );
 
-export const selectActiveLabeledThingsIds = createSelector(
-  selectActiveKindObject,
-  selectCategoriesDictionary,
-  (activeKind, catDict) => {
-    if (!activeKind) return [];
-    const thingsInKind = activeKind.containing;
-    const unknownCategoryId = activeKind.unknownCategoryId;
-    const unknownThings = catDict[unknownCategoryId]!.containing;
-    return difference(thingsInKind, unknownThings);
+export const selectVisibleItems = createSelector(
+  selectActiveFilters,
+  selectActiveItems,
+  (filters, entities) => {
+    return entities.filter((entity) => !isFiltered(entity, filters ?? {}));
   },
 );
 
-export const selectActiveLabeledThingsCount = createSelector(
-  selectActiveLabeledThingsIds,
-  (activeLabeledThings) => {
-    return activeLabeledThings.length;
+export const selectVisibleSelectedItems = createSelector(
+  selectActiveSelectedIds,
+  selectVisibleItems,
+  (selectedIds, entities) => {
+    const selectedSet = new Set(selectedIds);
+    return entities.filter((entity) => selectedSet.has(entity.id));
   },
 );
 
-export const selectActiveUnlabeledThingsIds = createSelector(
-  selectActiveKindObject,
-  selectCategoriesDictionary,
-  (activeKind, catDict) => {
-    if (!activeKind) return [];
-    const thingsInKind = activeKind.containing;
-    const unknownCategoryId = activeKind.unknownCategoryId;
-    const unknownThings = catDict[unknownCategoryId]!.containing;
-    return intersection(thingsInKind, unknownThings);
+export const selectActiveSelectedItems = createSelector(
+  selectActiveSelectedIds,
+  selectActiveItems,
+  (selectedIds, items) => {
+    const selectedSet = new Set(selectedIds);
+    return items.filter((items) => selectedSet.has(items.id));
   },
 );
 
-export const selectActiveSelectedThingIds = createSelector(
-  selectSelectedThingIds,
-  selectActiveThingIds,
-  (selectedIds, activeIds) => {
-    return intersection(activeIds, selectedIds);
+// --- Stats ---
+
+export const selectTotalActiveLabeledItems = createSelector(
+  selectActiveItems,
+  (activeItems) => {
+    return activeItems.reduce((total: number, item) => {
+      if (!representsUnknown(item.categoryId)) total++;
+      return total;
+    }, 0);
   },
 );
 
-export const selectActiveSelectedThings = createSelector(
-  selectActiveSelectedThingIds,
-  selectThingsDictionary,
-  (activeSelectedThingIds, thingDict) => {
-    const activeSelectedThings = activeSelectedThingIds.reduce(
-      (things: Thing[], thingId) => {
-        const thing = thingDict[thingId];
-        if (thing) {
-          things.push(thing);
-        }
-        return things;
-      },
-      [],
-    );
-
-    return activeSelectedThings;
+export const selectTotalActiveUnlabeledItems = createSelector(
+  selectActiveItems,
+  (activeItems) => {
+    return activeItems.reduce((total: number, item) => {
+      if (representsUnknown(item.categoryId)) total++;
+      return total;
+    }, 0);
   },
 );

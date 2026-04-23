@@ -32,7 +32,7 @@ import {
 } from "./tool-options";
 import { OperationType } from "./ToolOptionsDrawer";
 
-import { selectActiveStateFiltered } from "@ProjectViewer/state/selectors";
+import { selectActiveStateFilterCount } from "@ProjectViewer/state/selectors";
 
 import { DIMENSIONS } from "utils/constants";
 import { capitalize } from "utils/stringUtils";
@@ -114,7 +114,7 @@ export const ImageToolDrawer = () => {
   const theme = useTheme();
   const [activeTool, setActiveTool] = useState<OperationType>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const filtersExist = useSelector(selectActiveStateFiltered);
+  const filtersExist = useSelector(selectActiveStateFilterCount);
   const t = useTranslation();
   const isMobile = useMobileView();
   const { anchorEl, onOpen: setPopperAnchor } = useMenu();

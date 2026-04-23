@@ -35,14 +35,14 @@ import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { StyledSelect } from "components/inputs";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 import { SequentialClassifier } from "utils/models/classification";
-import { selectActiveUnlabeledThingsIds } from "@ProjectViewer/state/reselectors";
+import { selectTotalActiveUnlabeledItems } from "@ProjectViewer/state/reselectors";
 import { PredictionListItems } from "./PredictionListItems";
 
 export const ClassifierSection = () => {
   const [waitingForResults, setWaitingForResults] = useState(false);
   const selectedModel = useSelector(selectClassifierModel);
   const evaluationResults = useSelector(selectClassifierEvaluationResult);
-  const unlabeledThings = useSelector(selectActiveUnlabeledThingsIds);
+  const totalUnlabeledItems = useSelector(selectTotalActiveUnlabeledItems);
   const { modelStatus, error } = useClassifierStatus();
   const predictClassifier = usePredictClassifier();
   const evaluateClassifier = useEvaluateClassifier();
@@ -107,7 +107,7 @@ export const ClassifierSection = () => {
       !selectedModel ||
       !selectedModel.pretrained ||
       modelStatus !== ModelStatus.Idle ||
-      unlabeledThings.length === 0 ||
+      totalUnlabeledItems === 0 ||
       error?.reason === ErrorReason.ChannelMismatch;
 
     const evaluateText = (() => {

@@ -8,73 +8,40 @@ import {
 import { projectSlice } from "@ProjectViewer/state";
 import {
   selectActiveKindState,
-  selectImageGridState,
+  selectActiveSelectedIds,
 } from "@ProjectViewer/state/selectors";
 import { ViewState } from "@ProjectViewer/state/types";
-import { useParameterizedSelector } from "store/hooks";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
-import {
-  selectAllCategories,
-  selectAnnotationEntities,
-  selectGridAnnotationsByKindId,
-  selectRepresentativeImages,
-} from "store/dataV2/selectors";
-import { isFiltered } from "utils/arrayUtils";
-import { useMemo } from "react";
 import { TooltipTitle } from "components/ui";
 import { useHotkeys } from "hooks";
 import { HotkeyContext } from "utils/enums";
+import {
+  selectActiveCategories,
+  selectVisibleItems,
+} from "@ProjectViewer/state/reselectors";
 
 export const useGridActions = (viewState: ViewState) => {
   const dispatch = useDispatch();
-  const images = useSelector(selectRepresentativeImages);
-  const categories = useSelector(selectAllCategories);
   const activeKindState = useSelector(selectActiveKindState);
-  const aactiveAnnotations = useParameterizedSelector(
-    selectGridAnnotationsByKindId,
-    activeKindState.id,
-  );
-  const annotationEntities = useSelector(selectAnnotationEntities);
-  const imageGridState = useSelector(selectImageGridState);
+  const activeCategories = useSelector(selectActiveCategories);
+  const selectedItems = useSelector(selectActiveSelectedIds);
+  const filteredItems = useSelector(selectVisibleItems);
 
-  const activeCategories = useMemo(
-    () =>
-      categories.filter((c) => {
-        if (viewState === "images") return c.type === "image";
-        return c.type === "annotation" && c.kindId === activeKindState.id;
-      }),
-    [viewState, activeKindState, categories],
-  );
-
-  const filteredItems =
-    viewState === "images"
-      ? images.filter(
-          (image) => !isFiltered(image, imageGridState.filters ?? {}),
-        )
-      : aactiveAnnotations.filter(
-          (ann) => !isFiltered(ann, activeKindState.filters ?? {}),
-        );
-
-  const selectedItems =
-    viewState === "images"
-      ? imageGridState.selectedIds
-      : activeKindState.selectedIds;
-
-  const selectedFilteredItems = intersection(
+  const selectedFilteredItemIds = intersection(
     selectedItems,
     filteredItems.map((item) => item.id),
   );
 
-  const allSelected = selectedFilteredItems.length === filteredItems.length;
+  const allSelected = selectedFilteredItemIds.length === filteredItems.length;
 
   const handleDelete = () => {
     if (viewState === "images")
       dispatch(
-        dataSliceV2.actions.batchDeleteImageObject(selectedFilteredItems),
+        dataSliceV2.actions.batchDeleteImageObject(selectedFilteredItemIds),
       );
     else
       dispatch(
-        dataSliceV2.actions.batchDeleteAnnotation(selectedFilteredItems),
+        dataSliceV2.actions.batchDeleteAnnotation(selectedFilteredItemIds),
       );
   };
   const handleSelectAll = () => {
@@ -112,18 +79,18 @@ export const useGridActions = (viewState: ViewState) => {
 
   const handleCategorize = (categoryId: string) => {
     if (viewState === "images") {
-      const payload = selectedFilteredItems.map((item) => ({
+      const payload = selectedFilteredItemIds.map((item) => ({
         imageId: item,
         categoryId,
       }));
       dispatch(dataSliceV2.actions.batchUpdateImageCategory(payload));
     } else {
-      const payload = selectedFilteredItems.map((item) => ({
-        volumeId: annotationEntities[item].volumeId,
+      const payload = selectedFilteredItemIds.map((item) => ({
+        annotationId: item,
         categoryId,
       }));
       dispatch(
-        dataSliceV2.actions.batchUpdateAnnotationVolumeCategory(payload),
+        dataSliceV2.actions.batchBubbleUpdateAnnotationCategory(payload),
       );
     }
   };
@@ -142,7 +109,7 @@ export const useGridActions = (viewState: ViewState) => {
           onClick: handleSelectAll,
           dataTestId: "select-all-button",
           icon:
-            selectedFilteredItems.length === 0
+            selectedFilteredItemIds.length === 0
               ? SelectAllEmptyIcon
               : SelectAllIcon,
           disabled: filteredItems.length === 0,
@@ -151,10 +118,10 @@ export const useGridActions = (viewState: ViewState) => {
   useHotkeys(
     "esc",
     () => {
-      selectedFilteredItems.length > 0 && handleDeselectAll();
+      selectedFilteredItemIds.length > 0 && handleDeselectAll();
     },
     HotkeyContext.ProjectView,
-    [handleDeselectAll, selectedFilteredItems],
+    [handleDeselectAll, selectedFilteredItemIds],
   );
 
   useHotkeys(
@@ -166,7 +133,7 @@ export const useGridActions = (viewState: ViewState) => {
 
   return {
     filteredItems,
-    selectedFilteredItems,
+    selectedFilteredItems: selectedFilteredItemIds,
     handleDelete,
     activeCategories,
     handleCategorize,

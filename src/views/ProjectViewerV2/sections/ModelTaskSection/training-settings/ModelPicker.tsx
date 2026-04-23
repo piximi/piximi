@@ -17,10 +17,10 @@ import {
   selectClassifierModel,
   selectClassifierModelNameOrArch,
 } from "store/classifier/reselectors";
-import { selectActiveKindObject } from "@ProjectViewer/state/reselectors";
 import { TextFieldWithBlur } from "components/inputs/TextFieldWithBlur";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { WithLabel } from "components/inputs";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 export const ModelPicker = () => {
   const selectedModel = useSelector(selectClassifierModel);
@@ -46,7 +46,7 @@ const ModelArchiitectureOptions = () => {
   const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
   const selectedModel = useSelector(selectClassifierModel);
   const availableClassifierNames = useSelector(selectAvailibleClassifierNames);
-  const activeKind = useSelector(selectActiveKindObject);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const [userHasUpdated, setUsrHasUpdated] = useState(false);
   const { setNewModelName: setConfirmedName } = useClassifierStatus();
   const [modelName, setModelName] = useState("");
@@ -55,7 +55,7 @@ const ModelArchiitectureOptions = () => {
     const value = event.target.value as number;
     dispatch(
       classifierSlice.actions.updateSelectedModelNameOrArch({
-        kindId: activeKind.id,
+        kindId: modelTarget.id,
         modelName: value,
       }),
     );
@@ -74,7 +74,7 @@ const ModelArchiitectureOptions = () => {
 
   useEffect(() => {
     if (userHasUpdated || !!selectedModel) return;
-    const candidateName = `${activeKind.displayName}_${modelNameOrArch === 0 ? "Simple-CNN" : "Mobilenet"}`;
+    const candidateName = `${modelTarget.name}_${modelNameOrArch === 0 ? "Simple-CNN" : "Mobilenet"}`;
     const availabbleNames = availableClassifierNames.join(", ");
     const replicates = availabbleNames.match(new RegExp(candidateName, "g"));
 

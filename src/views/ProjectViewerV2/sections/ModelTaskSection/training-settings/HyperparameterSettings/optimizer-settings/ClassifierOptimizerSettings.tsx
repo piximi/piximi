@@ -6,7 +6,7 @@ import {
   selectClassifierFitOptions,
   selectClassifierTrainingPercentage,
 } from "store/classifier/reselectors";
-import { selectActiveLabeledThingsCount } from "@ProjectViewer/state/reselectors";
+import { selectTotalActiveLabeledItems } from "@ProjectViewer/state/reselectors";
 import { logger } from "utils/logUtils";
 
 import { OptimizationSettings } from "./OptimizationSettings";
@@ -14,7 +14,7 @@ import { TrainingStrategySettings } from "./TrainingStrategySettings";
 
 export const ClassifierOptimizerSettings = () => {
   const trainingPercentage = useSelector(selectClassifierTrainingPercentage);
-  const labeledThingsCount = useSelector(selectActiveLabeledThingsCount);
+  const labeledThingsCount = useSelector(selectTotalActiveLabeledItems);
   const fitOptions = useSelector(selectClassifierFitOptions);
 
   useEffect(() => {

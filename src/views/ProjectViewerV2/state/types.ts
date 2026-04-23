@@ -1,5 +1,8 @@
 import { Thing } from "store/data/types";
-import { ExtendedAnnotationObject, ImageObject } from "store/dataV2/types";
+import {
+  ExtendedAnnotationObject,
+  ExtendedImageObject,
+} from "store/dataV2/types";
 import { ThingSortKey } from "utils/enums";
 import { FilterType } from "utils/types";
 
@@ -19,7 +22,7 @@ export enum AnnotationSortType {
   Random = "Random",
 }
 export type ImageFilters = Required<
-  Pick<FilterType<ImageObject>, "categoryId" | "partition">
+  Pick<FilterType<ExtendedImageObject>, "categoryId" | "partition">
 >;
 export type ImageGridState = {
   selectedIds: string[];

@@ -8,6 +8,7 @@ import {
   ProjectState,
   ViewState,
 } from "./types";
+import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
 
 export const selectProject = ({
   projectV2: project,
@@ -142,7 +143,22 @@ export const selectActiveViewState = createSelector(
   },
 );
 
-export const selectActiveStateFiltered = ({
+export const selectActiveFilters = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}) => {
+  const viewState = project.activeView;
+  const activeKindId = project.annotationGridState.activeKindId;
+  const activeState =
+    viewState === "images"
+      ? project.imageGridState
+      : project.annotationGridState.kindStates[activeKindId];
+
+  return activeState.filters;
+};
+
+export const selectActiveStateFilterCount = ({
   projectV2: project,
 }: {
   projectV2: ProjectState;
@@ -177,12 +193,27 @@ export const selectActiveSelectedIds = ({
   return activeState.selectedIds;
 };
 
-// ~~ Old
-
-export const selectSelectedThingIds = ({
+export const selectActiveFilteredSelectedIds = ({
   projectV2: project,
 }: {
   projectV2: ProjectState;
-}): Array<string> => {
-  return project.selectedThingIds;
+}): string[] => {
+  const viewState = project.activeView;
+  const activeKindId = project.annotationGridState.activeKindId;
+  const activeState =
+    viewState === "images"
+      ? project.imageGridState
+      : project.annotationGridState.kindStates[activeKindId];
+
+  return activeState.selectedIds;
 };
+
+export const selectActiveClassifierModelTarget = createSelector(
+  selectActiveView,
+  selectActiveKindState,
+  (viewState, activeKindState): { id: string; name: string } => {
+    if (viewState === "images")
+      return { id: IMAGE_CLASSIFIER_ID, name: "Image" };
+    return { id: activeKindState.id, name: activeKindState.name };
+  },
+);

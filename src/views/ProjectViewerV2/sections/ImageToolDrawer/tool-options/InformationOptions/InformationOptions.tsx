@@ -4,10 +4,10 @@ import { Box, Typography } from "@mui/material";
 
 import { ThingInformationTable } from "./ThingInformationTable";
 
-import { selectActiveSelectedThings } from "@ProjectViewer/state/reselectors";
+import { selectActiveSelectedItems } from "@ProjectViewer/state/reselectors";
 
 export const InformationOptions = () => {
-  const selectedThings = useSelector(selectActiveSelectedThings);
+  const selectedThings = useSelector(selectActiveSelectedItems);
   return selectedThings.length > 0 ? (
     <>
       {selectedThings.map((thing) => (

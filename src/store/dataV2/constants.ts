@@ -6,6 +6,8 @@ export const UNKNOWN_KIND_ID: string = "00000000-1111-0000-0000-000000000000";
 export const UNKNOWN_KIND_CATEGORY_ID: string =
   "00000000-0000-1111-0000-000000000000";
 export const UNKNOWN_NAME: string = "Unknown";
+export const IMAGE_CLASSIFIER_ID: string =
+  "11111111-0000-0000-0000-000000000000";
 
 export const CATEGORY_COLORS = {
   black: "#000000",

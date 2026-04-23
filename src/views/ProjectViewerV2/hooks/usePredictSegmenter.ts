@@ -12,7 +12,10 @@ import { AlertType } from "utils/enums";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { ModelStatus } from "utils/models/enums";
 import { selectAllImages, selectAllKinds } from "store/data/selectors";
-import { selectActiveSelectedThings } from "@ProjectViewer/state/reselectors";
+import {
+  selectActiveSelectedItems,
+  selectSelectedImages,
+} from "@ProjectViewer/state/reselectors";
 import {
   AnnotationObject,
   Category,
@@ -27,19 +30,16 @@ import {
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "store/dataV2/constants";
 import { getPropertiesFromImageSync } from "store/data/utils";
+import { selectExtendedImages } from "store/dataV2/selectors";
 
 export const usePredictSegmenter = () => {
   const dispatch = useDispatch();
   const selectedModel = useSelector(selectSegmenterModel);
-  const projectImages = useSelector(selectAllImages);
-  const selectedThings = useSelector(selectActiveSelectedThings);
+  const allImages = useSelector(selectExtendedImages);
+  const selectedImages = useSelector(selectSelectedImages);
   const fitOptions = useSelector(selectSegmenterInferenceOptions);
   const kinds = useSelector(selectAllKinds);
   const { setModelStatus } = useSegmenterStatus();
-
-  const selectedImages = useMemo(() => {
-    return selectedThings.filter((thing) => thing.kind === "Image");
-  }, [selectedThings]);
 
   const handleError = useCallback(
     async (error: Error, name: string) => {
@@ -71,29 +71,10 @@ export const usePredictSegmenter = () => {
 
   const predictSegmenter = useCallback(async () => {
     if (!selectedModel) return;
-    const existingObjects: string[] = [];
-    const images =
-      selectedImages.length > 0
-        ? (selectedImages as ImageObject[])
-        : projectImages;
+    const images = selectedImages.length > 0 ? selectedImages : allImages;
 
-    if (selectedModel.kind) {
-      const fullKind = kinds.find((kind) => kind.id === selectedModel.kind);
-      if (fullKind && fullKind.containing.length > 0) {
-        existingObjects.push(...fullKind.containing);
-      }
-    }
-
-    const inferenceImages = images.reduce((infIms: ImageObject[], image) => {
-      if (image && "containing" in image) {
-        const containedObjects = image.containing;
-
-        if (intersection(containedObjects, existingObjects).length === 0) {
-          infIms.push(image);
-        }
-      }
-      return infIms;
-    }, []);
+    // TODO: determine how to go about resegmenting images and duplicating annotations
+    const inferenceImages = images;
 
     if (inferenceImages.length === 0) {
       await handleError(
@@ -106,11 +87,10 @@ export const usePredictSegmenter = () => {
 
     /* PREDICT */
     setModelStatus(ModelStatus.Predicting);
-    const hasOwnKinds = selectedModel.trainable;
 
     try {
       selectedModel.loadInference(inferenceImages, {
-        kinds: hasOwnKinds ? kinds : undefined,
+        kinds: undefined,
         fitOptions,
       });
     } catch (error) {
@@ -165,41 +145,40 @@ export const usePredictSegmenter = () => {
     }
 
     try {
-      if (!hasOwnKinds) {
-        const uniquePredictedKinds = [
-          ...new Set(
-            predictedAnnotations.flatMap((imAnns) =>
-              imAnns.map((ann) => ann.kind as string),
-            ),
+      const uniquePredictedKinds = [
+        ...new Set(
+          predictedAnnotations.flatMap((imAnns) =>
+            imAnns.map((ann) => ann.kind as string),
           ),
-        ];
+        ),
+      ];
 
-        const generatedKinds = selectedModel.inferenceKindsById([
-          ...kinds.map((kind) => kind.id),
-          ...uniquePredictedKinds,
-        ]);
-        dispatch(
-          dataSlice.actions.addKinds({
-            kinds: generatedKinds,
-          }),
-        );
+      const generatedKinds = selectedModel.inferenceKindsById([
+        ...kinds.map((kind) => kind.id),
+        ...uniquePredictedKinds,
+      ]);
+      dispatch(
+        dataSlice.actions.addKinds({
+          kinds: generatedKinds,
+        }),
+      );
 
-        const newUnknownCategories = generatedKinds.map((kind) => {
-          return {
-            id: kind.unknownCategoryId,
-            name: UNKNOWN_NAME,
-            color: UNKNOWN_IMAGE_CATEGORY_COLOR,
-            containing: [],
-            kind: kind.id,
-            visible: true,
-          } as Category;
-        });
-        dispatch(
-          dataSlice.actions.addCategories({
-            categories: newUnknownCategories,
-          }),
-        );
-      }
+      const newUnknownCategories = generatedKinds.map((kind) => {
+        return {
+          id: kind.unknownCategoryId,
+          name: UNKNOWN_NAME,
+          color: UNKNOWN_IMAGE_CATEGORY_COLOR,
+          containing: [],
+          kind: kind.id,
+          visible: true,
+        } as Category;
+      });
+      dispatch(
+        dataSlice.actions.addCategories({
+          categories: newUnknownCategories,
+        }),
+      );
+
       const annotations: AnnotationObject[] = [];
       for await (const [i, _annotations] of predictedAnnotations.entries()) {
         const image = inferenceImages[i];
@@ -254,7 +233,7 @@ export const usePredictSegmenter = () => {
     setModelStatus(ModelStatus.Idle);
   }, [
     handleError,
-    projectImages,
+    allImages,
     selectedModel,
     selectedImages,
     fitOptions,

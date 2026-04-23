@@ -9,7 +9,7 @@ import { projectSlice } from "@ProjectViewer/state";
 
 import { isFiltered } from "utils/arrayUtils";
 
-import { selectGridAnnotationsByKindId } from "store/dataV2/selectors";
+import { selectExtendedAnnotationsByKindId } from "store/dataV2/selectors";
 
 import { KindState } from "@ProjectViewer/state/types";
 import { useParameterizedSelector } from "store/hooks";
@@ -24,7 +24,7 @@ const Cell = createGridCell(AnnotationGridItem);
 export const AnnotationGrid = ({ kindState }: { kindState: KindState }) => {
   const dispatch = useDispatch();
   const annotations = useParameterizedSelector(
-    selectGridAnnotationsByKindId,
+    selectExtendedAnnotationsByKindId,
     kindState.id,
   );
   const sortFunction = useAnnotationSort(kindState.sortType);
