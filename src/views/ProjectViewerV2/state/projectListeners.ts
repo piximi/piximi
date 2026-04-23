@@ -1,7 +1,7 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
-import { classifierSlice } from "store/classifier";
+import { classifierSlice } from "store/classifierV2";
 import { dataSlice } from "store/data";
 import { projectSlice } from "./projectSlice";
 

@@ -14,14 +14,14 @@ import {
 import { FunctionalDivider } from "components/ui";
 import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "store/classifier";
+import { classifierSlice } from "store/classifierV2";
 import {
   selectClassifierCropOptions,
   selectClassifierInputShape,
-  selectClassifierModel,
+  selectActiveClassifierModel,
   selectClassifierModelWithIdx,
   selectClassifierRescaleOptions,
-} from "store/classifier/reselectors";
+} from "@ProjectViewer/state/reselectors";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { enumKeys } from "utils/objectUtils";
 import { CropSchema } from "utils/models/enums";
@@ -261,7 +261,7 @@ export const ImageAugmentationSettings = () => {
   const rescaleOptions = useSelector(selectClassifierRescaleOptions);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [rescalable, setRescalable] = useState<boolean>(rescaleOptions.rescale);
-  const selectedModel = useSelector(selectClassifierModel);
+  const selectedModel = useSelector(selectActiveClassifierModel);
 
   const updateRescaleOptions = (rescaleOptions: RescaleOptions) => {
     dispatch(

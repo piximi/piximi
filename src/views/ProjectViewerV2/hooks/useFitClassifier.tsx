@@ -3,12 +3,12 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { dataSlice } from "store/data";
-import { classifierSlice } from "store/classifier";
+import { classifierSlice } from "store/classifierV2";
 import {
-  selectClassifierModel,
+  selectActiveClassifierModel,
   selectClassifierModelInfo,
-  selectClassifierModelNameOrArch,
-} from "store/classifier/reselectors";
+  selectActiveClassifierModelNameOrArch,
+} from "@ProjectViewer/state/reselectors";
 
 import {
   selectActiveKnownCategories,
@@ -42,8 +42,8 @@ export const useFitClassifier = () => {
   const modelInfo = useSelector(selectClassifierModelInfo);
   const activeKindId = useSelector(selectActiveKindId);
   const knownCategories = useSelector(selectActiveKnownCategories);
-  const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
-  const selectedModel = useSelector(selectClassifierModel);
+  const modelNameOrArch = useSelector(selectActiveClassifierModelNameOrArch);
+  const selectedModel = useSelector(selectActiveClassifierModel);
 
   const { setTotalEpochs, epochEndCallback } = useClassifierHistory();
   const { newModelName, setModelStatus } = useClassifierStatus();

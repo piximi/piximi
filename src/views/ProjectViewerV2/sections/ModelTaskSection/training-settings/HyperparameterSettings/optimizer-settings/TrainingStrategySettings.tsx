@@ -3,11 +3,11 @@ import { Collapse, Grid2 as Grid, IconButton, Stack } from "@mui/material";
 import { FunctionalDivider } from "components/ui";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "store/classifier";
+import { classifierSlice } from "store/classifierV2";
 import {
   selectClassifierFitOptions,
-  selectClassifierModel,
-} from "store/classifier/reselectors";
+  selectActiveClassifierModel,
+} from "@ProjectViewer/state/reselectors";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 import { WithLabel } from "components/inputs";
@@ -21,7 +21,7 @@ export const TrainingStrategySettings = () => {
   const { trainable } = useClassifierStatus();
   const fitOptions = useSelector(selectClassifierFitOptions);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const selectedModel = useSelector(selectClassifierModel);
+  const selectedModel = useSelector(selectActiveClassifierModel);
 
   const {
     inputValue: batchSize,

@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import {
   selectClassifierFitOptions,
   selectClassifierTrainingPercentage,
-} from "store/classifier/reselectors";
+} from "@ProjectViewer/state/reselectors";
 import { selectTotalActiveLabeledItems } from "@ProjectViewer/state/reselectors";
 import { logger } from "utils/logUtils";
 

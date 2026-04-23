@@ -10,11 +10,11 @@ import {
 import { FunctionalDivider } from "components/ui";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "store/classifier";
+import { classifierSlice } from "store/classifierV2";
 import {
-  selectClassifierModel,
+  selectActiveClassifierModel,
   selectClassifierOptimizerSettings,
-} from "store/classifier/reselectors";
+} from "@ProjectViewer/state/reselectors";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { enumKeys } from "utils/objectUtils";
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
@@ -30,7 +30,7 @@ export const OptimizationSettings = () => {
   const activeKindId = useSelector(selectActiveKindId);
   const compileOptions = useSelector(selectClassifierOptimizerSettings);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const selectedModel = useSelector(selectClassifierModel);
+  const selectedModel = useSelector(selectActiveClassifierModel);
   const { trainable } = useClassifierStatus();
 
   const {

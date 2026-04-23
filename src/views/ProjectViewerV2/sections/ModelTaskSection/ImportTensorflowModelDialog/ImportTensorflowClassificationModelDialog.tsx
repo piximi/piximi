@@ -22,7 +22,7 @@ import { ToolTipTab } from "components/layout";
 import classifierHandler from "utils/models/classification/classifierHandler";
 import { SequentialClassifier } from "utils/models/classification";
 import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "store/classifier";
+import { classifierSlice } from "store/classifierV2";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 
 type ImportTensorflowClassificationModelDialogProps = {

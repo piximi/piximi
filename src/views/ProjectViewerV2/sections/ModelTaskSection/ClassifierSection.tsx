@@ -8,39 +8,47 @@ import {
   Stack,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+
 import { useDialog, useDialogHotkey } from "hooks";
+
 import { SaveFittedModelDialog } from "components/dialogs";
+import { WithLabel, StyledSelect } from "components/inputs";
+import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
+
 import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
 import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
 import { ImportTensorflowClassificationModelDialog } from "./ImportTensorflowModelDialog";
 import { FitClassifierDialog } from "./FitClassifierDialog";
 import { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";
+import { PredictionListItems } from "./PredictionListItems";
 
-import { HotkeyContext } from "utils/enums";
-import { ModelStatus } from "utils/models/enums";
-import {
-  selectClassifierEvaluationResult,
-  selectClassifierModel,
-} from "store/classifier/reselectors";
+import { classifierSlice } from "store/classifierV2";
+
 import {
   ErrorReason,
   useClassifierStatus,
 } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+
 import { usePredictClassifier } from "@ProjectViewer/hooks/usePredictClassifier";
 import { useEvaluateClassifier } from "@ProjectViewer/hooks/useEvaluateClassifier";
-import { WithLabel } from "components/inputs";
-import classifierHandler from "utils/models/classification/classifierHandler";
-import { classifierSlice } from "store/classifier";
+
+import {
+  selectClassifierEvaluationResult,
+  selectActiveClassifierModel,
+} from "@ProjectViewer/state/reselectors";
+
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
-import { StyledSelect } from "components/inputs";
-import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
-import { SequentialClassifier } from "utils/models/classification";
+
 import { selectTotalActiveUnlabeledItems } from "@ProjectViewer/state/reselectors";
-import { PredictionListItems } from "./PredictionListItems";
+
+import { HotkeyContext } from "utils/enums";
+import { ModelStatus } from "utils/models/enums";
+import { SequentialClassifier } from "utils/models/classification";
+import classifierHandler from "utils/models/classification/classifierHandler";
 
 export const ClassifierSection = () => {
   const [waitingForResults, setWaitingForResults] = useState(false);
-  const selectedModel = useSelector(selectClassifierModel);
+  const selectedModel = useSelector(selectActiveClassifierModel);
   const evaluationResults = useSelector(selectClassifierEvaluationResult);
   const totalUnlabeledItems = useSelector(selectTotalActiveUnlabeledItems);
   const { modelStatus, error } = useClassifierStatus();

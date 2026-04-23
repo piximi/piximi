@@ -11,12 +11,12 @@ import {
 import { FunctionalDivider } from "components/ui";
 import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "store/classifier";
+import { classifierSlice } from "store/classifierV2";
 import {
-  selectClassifierModel,
+  selectActiveClassifierModel,
   selectClassifierShuffleOptions,
   selectClassifierTrainingPercentage,
-} from "store/classifier/reselectors";
+} from "@ProjectViewer/state/reselectors";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 import { WithLabel } from "components/inputs";
@@ -31,7 +31,7 @@ export const DataPartitioningSettings = () => {
   const shuffleOptions = useSelector(selectClassifierShuffleOptions);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const { trainable } = useClassifierStatus();
-  const selectedModel = useSelector(selectClassifierModel);
+  const selectedModel = useSelector(selectActiveClassifierModel);
 
   const trainingFieldValidationOptions = useMemo(
     () => ({ min: 0.1, max: 0.99, enableFloat: true }),

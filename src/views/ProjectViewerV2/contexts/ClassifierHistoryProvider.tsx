@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { useSelector } from "react-redux";
-import { selectClassifierModel } from "store/classifier/reselectors";
+import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
 import { logger } from "utils/logUtils";
 import { Points } from "utils/types";
 import { TrainingCallbacks } from "utils/models/types";
@@ -62,7 +62,7 @@ export const ClassifierHistoryProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const selectedModel = useSelector(selectClassifierModel);
+  const selectedModel = useSelector(selectActiveClassifierModel);
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
   const [totalEpochs, setTotalEpochs] = useState<number>(0);
   const [modelHistory, setModelHistory] = useState<HistoryData>(

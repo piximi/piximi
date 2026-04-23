@@ -12,7 +12,7 @@ import TrainingPlots from "./TrainingPlots";
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 
 import { useSelector } from "react-redux";
-import { selectClassifierModel } from "store/classifier/reselectors";
+import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
 import { ClassMapDialogProvider } from "@ProjectViewer/hooks/useClassMapDialog";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { ModelStatus } from "utils/models/enums";
@@ -29,7 +29,7 @@ export const FitClassifierDialog = ({
   const [tabVal, setTabVal] = useState("1");
   const { modelHistory } = useClassifierHistory();
   const { modelStatus } = useClassifierStatus();
-  const selectedModel = useSelector(selectClassifierModel);
+  const selectedModel = useSelector(selectActiveClassifierModel);
 
   const showPlots = useMemo(() => {
     return modelHistory.categoricalAccuracy.length > 0;

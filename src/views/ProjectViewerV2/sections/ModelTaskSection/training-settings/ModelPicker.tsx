@@ -11,19 +11,19 @@ import { StyledSelect } from "components/inputs/StyledSelect";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "store/classifier";
+import { classifierSlice } from "store/classifierV2";
 import {
   selectAvailibleClassifierNames,
-  selectClassifierModel,
-  selectClassifierModelNameOrArch,
-} from "store/classifier/reselectors";
+  selectActiveClassifierModel,
+  selectActiveClassifierModelNameOrArch,
+} from "@ProjectViewer/state/reselectors";
 import { TextFieldWithBlur } from "components/inputs/TextFieldWithBlur";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { WithLabel } from "components/inputs";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 export const ModelPicker = () => {
-  const selectedModel = useSelector(selectClassifierModel);
+  const selectedModel = useSelector(selectActiveClassifierModel);
 
   return (
     <Box py={2}>
@@ -43,8 +43,8 @@ export const ModelPicker = () => {
 
 const ModelArchiitectureOptions = () => {
   const dispatch = useDispatch();
-  const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
-  const selectedModel = useSelector(selectClassifierModel);
+  const modelNameOrArch = useSelector(selectActiveClassifierModelNameOrArch);
+  const selectedModel = useSelector(selectActiveClassifierModel);
   const availableClassifierNames = useSelector(selectAvailibleClassifierNames);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const [userHasUpdated, setUsrHasUpdated] = useState(false);
@@ -149,9 +149,9 @@ const ModelArchiitectureOptions = () => {
 };
 
 const PretrainedModelOptions = () => {
-  const modelNameOrArch = useSelector(selectClassifierModelNameOrArch);
+  const modelNameOrArch = useSelector(selectActiveClassifierModelNameOrArch);
   const { shouldWarnClearPredictions } = useClassifierStatus();
-  const selectedModel = useSelector(selectClassifierModel);
+  const selectedModel = useSelector(selectActiveClassifierModel);
 
   const handleDisposeModel = () => {
     if (!selectedModel) return;

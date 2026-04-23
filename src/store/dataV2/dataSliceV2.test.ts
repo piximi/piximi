@@ -602,7 +602,7 @@ describe("updateImagePartition", () => {
     );
     const s = dataSliceV2.reducer(
       s0,
-      updateImagePartition({ imageId: "img-1", partition: Partition.Training }),
+      updateImagePartition({ id: "img-1", partition: Partition.Training }),
     );
     expect(s.images.entities["img-1"]?.partition).toBe(Partition.Training);
   });
@@ -631,7 +631,7 @@ describe("updateImageCategory", () => {
   it("updates the image's categoryId", () => {
     const s = dataSliceV2.reducer(
       buildState(),
-      updateImageCategory({ imageId: "img-1", categoryId: NEW_CAT }),
+      updateImageCategory({ id: "img-1", categoryId: NEW_CAT }),
     );
     expect(s.images.entities["img-1"]?.categoryId).toBe(NEW_CAT);
   });
@@ -640,7 +640,7 @@ describe("updateImageCategory", () => {
     const before = buildState();
     const after = dataSliceV2.reducer(
       before,
-      updateImageCategory({ imageId: "img-1", categoryId: OLD_CAT }),
+      updateImageCategory({ id: "img-1", categoryId: OLD_CAT }),
     );
     expect(after.images.entities["img-1"]?.categoryId).toBe(OLD_CAT);
   });
@@ -649,7 +649,7 @@ describe("updateImageCategory", () => {
     const before = buildState();
     const after = dataSliceV2.reducer(
       before,
-      updateImageCategory({ imageId: "img-1", categoryId: "no-such-cat" }),
+      updateImageCategory({ id: "img-1", categoryId: "no-such-cat" }),
     );
     expect(after.images.entities["img-1"]?.categoryId).toBe(OLD_CAT);
   });
@@ -682,8 +682,8 @@ describe("batchUpdateImageCategory", () => {
     const s = dataSliceV2.reducer(
       buildState(),
       batchUpdateImageCategory([
-        { imageId: "img-1", categoryId: CAT_B },
-        { imageId: "img-2", categoryId: CAT_B },
+        { id: "img-1", categoryId: CAT_B },
+        { id: "img-2", categoryId: CAT_B },
       ]),
     );
     expect(s.images.entities["img-1"]?.categoryId).toBe(CAT_B);
@@ -1480,7 +1480,7 @@ describe("updateAnnotationPartition", () => {
     const s = dataSliceV2.reducer(
       s0,
       updateAnnotationPartition({
-        annotationId: "ann-1",
+        id: "ann-1",
         partition: Partition.Validation,
       }),
     );

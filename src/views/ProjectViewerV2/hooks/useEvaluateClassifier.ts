@@ -7,8 +7,8 @@ import { AlertState } from "utils/types";
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { ModelStatus } from "utils/models/enums";
 import { selectActiveKnownCategories } from "store/project/reselectors";
-import { selectClassifierModel } from "store/classifier/reselectors";
-import { classifierSlice } from "store/classifier";
+import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
+import { classifierSlice } from "store/classifierV2";
 import { selectActiveKindId } from "store/project/selectors";
 
 export const useEvaluateClassifier = () => {
@@ -16,7 +16,7 @@ export const useEvaluateClassifier = () => {
   const { modelStatus, setModelStatus } = useClassifierStatus();
   const activeCategories = useSelector(selectActiveKnownCategories);
   const activeKindId = useSelector(selectActiveKindId);
-  const selectedModel = useSelector(selectClassifierModel);
+  const selectedModel = useSelector(selectActiveClassifierModel);
   const handleError = useCallback(
     async (error: Error, name: string, initialModelStatus?: ModelStatus) => {
       const stackTrace = await getStackTraceFromError(error);

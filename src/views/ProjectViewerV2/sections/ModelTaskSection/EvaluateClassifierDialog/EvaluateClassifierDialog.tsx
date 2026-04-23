@@ -14,13 +14,13 @@ import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
 import { ConfusionMatrix } from "./ConfusionMatrix";
 import { EvaluateClassifierDialogAppBar } from "./EvaluateClassifierAppBar";
 
-import { selectActiveKnownCategories } from "@ProjectViewer/state/reselectors";
 import {
+  selectActiveKnownCategories,
   selectClassifierEvaluationResult,
-  selectClassifierModel,
-} from "store/classifier/reselectors";
+  selectActiveClassifierModel,
+} from "@ProjectViewer/state/reselectors";
 
-import { Category } from "store/data/types";
+import { Category } from "store/dataV2/types";
 
 type EvaluateClassifierDialogProps = {
   closeDialog: () => void;
@@ -33,7 +33,7 @@ export const EvaluateClassifierDialog = ({
 }: EvaluateClassifierDialogProps) => {
   const evaluationResults = useSelector(selectClassifierEvaluationResult);
   const categories = useSelector(selectActiveKnownCategories);
-  const selectedModel = useSelector(selectClassifierModel);
+  const selectedModel = useSelector(selectActiveClassifierModel);
   const [evalResult, setEvalResult] = useState(0);
 
   const handleEvalResultChange = (

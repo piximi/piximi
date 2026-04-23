@@ -25,9 +25,9 @@ import { useDialog } from "hooks";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
-import { classifierSlice } from "store/classifier";
-import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
-import { selectClassifierModel } from "store/classifier/reselectors";
+import { classifierSlice } from "store/classifierV2";
+import { selectShowClearPredictionsWarning } from "store/classifierV2/selectors";
+import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
 
 import { APPLICATION_COLORS } from "utils/constants";
 import { ModelStatus } from "utils/models/enums";
@@ -44,7 +44,7 @@ export const FitClassifierDialogAppBar = ({
   closeDialog,
 }: FitClassifierDialogAppBarProps) => {
   const dispatch = useDispatch();
-  const selectedModel = useSelector(selectClassifierModel);
+  const selectedModel = useSelector(selectActiveClassifierModel);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );

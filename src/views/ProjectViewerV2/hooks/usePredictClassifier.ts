@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data";
 import {
-  selectClassifierModel,
+  selectActiveClassifierModel,
   selectClassifierModelInfo,
-} from "store/classifier/reselectors";
+} from "@ProjectViewer/state/reselectors";
 import {
   selectActiveKnownCategories,
   selectActiveUnlabeledThings,
@@ -19,7 +19,7 @@ import { AlertType } from "utils/enums";
 import { ModelStatus } from "utils/models/enums";
 import { AlertState } from "utils/types";
 import { useClassMapDialog } from "./useClassMapDialog";
-import { classifierSlice } from "store/classifier";
+import { classifierSlice } from "store/classifierV2";
 import { selectActiveKindId } from "store/project/selectors";
 
 export const usePredictClassifier = () => {
@@ -28,7 +28,7 @@ export const usePredictClassifier = () => {
   const modelInfo = useSelector(selectClassifierModelInfo);
   const activeCategories = useSelector(selectActiveKnownCategories);
   const activeKindId = useSelector(selectActiveKindId);
-  const selectedModel = useSelector(selectClassifierModel);
+  const selectedModel = useSelector(selectActiveClassifierModel);
   const { setModelStatus } = useClassifierStatus();
   const { setPredictedProbabilities } = useClassifierHistory();
   const { getClassMap } = useClassMapDialog();
