@@ -128,9 +128,11 @@ export type V2DataState = {
   annotations: EntityState<V2AnnotationObject, string>;
 };
 
+export type V2ClassifierState = V11ClassifierState;
+
 export type V2PiximiState = {
   project: ProjectState;
-  classifier: V11ClassifierState;
+  classifier: V2ClassifierState;
   data: V2DataState;
   segmenter: SegmenterState;
 };

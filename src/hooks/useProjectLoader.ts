@@ -4,10 +4,10 @@ import { batch, useDispatch } from "react-redux";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { AppTask } from "store/appTasks/types";
-import { classifierSlice } from "store/classifier";
+import { classifierSlice } from "store/classifierV2";
 import { generateUUID } from "store/dataV2/utils";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
-import { projectSlice } from "store/project";
+import { projectSlice } from "@ProjectViewer/state";
 import { segmenterSlice } from "store/segmenter";
 import { AlertType } from "utils/enums";
 import { ProjectLoader } from "utils/file-io-v2/project-loader/ProjectLoader";
@@ -78,21 +78,16 @@ export function useProjectLoader(): UseProjectLoaderReturn {
           }
           return;
         }
-        const { project, data, classifier, segmenter } = result.project;
+        const { data, classifier, segmenter } = result.project;
 
         batch(() => {
           dispatch(projectSlice.actions.resetProject());
-          dispatch(
-            projectSlice.actions.setProject({
-              project: project,
-            }),
-          );
-          dispatch(dataSliceV2.actions.setState(data));
           dispatch(
             classifierSlice.actions.setClassifier({
               classifier: classifier,
             }),
           );
+          dispatch(dataSliceV2.actions.setState(data));
           dispatch(
             segmenterSlice.actions.setSegmenter({
               segmenter: segmenter,

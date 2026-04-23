@@ -3,6 +3,7 @@ import { Image as IJSImage } from "image-js-latest";
 import { generateUUID } from "store/dataV2/utils";
 import type { BitDepth } from "store/dataV2/types";
 import {
+  IMAGE_CLASSIFIER_ID,
   UNKNOWN_KIND,
   UNKNOWN_KIND_CATEGORY,
   UNKNOWN_KIND_CATEGORY_ID,
@@ -12,6 +13,7 @@ import {
 import { processChannel } from "utils/channelUtils";
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
 import { representsUnknown } from "utils/stringUtils";
+import { getDefaultModelInfo } from "utils/models/classification/utils";
 
 import { subProgress } from "../progress";
 
@@ -21,6 +23,7 @@ import type {
   V2Category,
   V2Channel,
   V2ChannelMeta,
+  V2ClassifierState,
   V2DataState,
   V2Experiment,
   V2ImageObject,
@@ -31,6 +34,7 @@ import type {
 } from "../version-readers/version-types/v2Types";
 import type {
   V11Category,
+  V11ClassifierState,
   V11Kind,
   V11PiximiState,
   V11RawAnnotationObject,
@@ -73,12 +77,34 @@ export function convertV11ToV2(
     Object.values(things.entities),
     subProgress(onProgress, STAGES.things),
   );
+  const v2ClassifierState = convertClassifier(v11.classifier);
 
   return {
     project: v11.project,
     data: { experiment, ...v2Data, kinds: v2Kinds, categories: v2Categories },
     segmenter: v11.segmenter,
-    classifier: v11.classifier,
+    classifier: v2ClassifierState,
+  };
+}
+
+function convertClassifier(
+  v11ClassifierState: V11ClassifierState,
+): V2ClassifierState {
+  const v11Classifiers = v11ClassifierState.kindClassifiers;
+  const v2Classifiers: V2ClassifierState["kindClassifiers"] = {};
+  Object.keys(v11Classifiers).forEach((id) => {
+    if (id === "Image") v2Classifiers[IMAGE_CLASSIFIER_ID] = v11Classifiers[id];
+    else {
+      v2Classifiers[id] = v11Classifiers[id];
+    }
+  });
+  v2Classifiers[UNKNOWN_KIND_ID] = {
+    modelNameOrArch: 0,
+    modelInfoDict: { "base-model": getDefaultModelInfo() },
+  };
+  return {
+    kindClassifiers: v2Classifiers,
+    showClearPredictionsWarning: v11ClassifierState.showClearPredictionsWarning,
   };
 }
 
