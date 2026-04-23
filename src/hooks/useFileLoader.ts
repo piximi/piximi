@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { AppTask } from "store/appTasks/types";
-import { generateUUID } from "store/data/utils";
+import { generateUUID } from "store/dataV2/utils";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import { selectExperiment } from "store/dataV2/selectors";
 import { ImageSeries } from "store/dataV2/types";

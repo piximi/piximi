@@ -5,7 +5,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { AppTask } from "store/appTasks/types";
 import { classifierSlice } from "store/classifier";
-import { generateUUID } from "store/data/utils";
+import { generateUUID } from "store/dataV2/utils";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";

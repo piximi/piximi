@@ -23,9 +23,9 @@ import { intersection } from "lodash";
 import { OrphanedAnnotationObject } from "utils/models/segmentation";
 import { dataSlice } from "store/data";
 import {
-  UNKNOWN_CATEGORY_NAME,
+  UNKNOWN_NAME,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
-} from "store/data/constants";
+} from "store/dataV2/constants";
 import { getPropertiesFromImageSync } from "store/data/utils";
 
 export const usePredictSegmenter = () => {
@@ -187,7 +187,7 @@ export const usePredictSegmenter = () => {
         const newUnknownCategories = generatedKinds.map((kind) => {
           return {
             id: kind.unknownCategoryId,
-            name: UNKNOWN_CATEGORY_NAME,
+            name: UNKNOWN_NAME,
             color: UNKNOWN_IMAGE_CATEGORY_COLOR,
             containing: [],
             kind: kind.id,

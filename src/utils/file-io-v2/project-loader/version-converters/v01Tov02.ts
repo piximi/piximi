@@ -1,11 +1,10 @@
 import {
-  UNKNOWN_ANNOTATION_CATEGORY_ID,
-  UNKNOWN_CATEGORY_NAME,
+  UNKNOWN_NAME,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
   UNKNOWN_IMAGE_CATEGORY_ID,
-} from "store/data/constants";
+} from "store/dataV2/constants";
 
-import { generateUUID, isUnknownCategory } from "store/data/utils";
+import { generateUUID } from "store/dataV2/utils";
 import { Partition } from "utils/models/enums";
 import {
   V01Category,
@@ -20,6 +19,8 @@ import {
   V02RawImageObject,
 } from "../version-readers/version-types/v02Types";
 import { subProgress } from "../progress";
+import { representsUnknown } from "utils/stringUtils";
+import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 
 const STAGES = {
   labels: { start: 0.0, end: 0.2 },
@@ -190,7 +191,7 @@ export const v02GenerateUnknownCategory = (kind: string) => {
   const unknownCategoryId = generateUUID({ definesUnknown: true });
   const unknownCategory: V02Category = {
     id: unknownCategoryId,
-    name: UNKNOWN_CATEGORY_NAME,
+    name: UNKNOWN_NAME,
     color: UNKNOWN_IMAGE_CATEGORY_COLOR,
     kind: kind,
     visible: true,
@@ -211,7 +212,7 @@ function convertCategories(
       let catId: string = category.id;
       // Check if id starts with "0", which indicates an unknown category in the new project version
       // If it does, replace with "1" and add to the mapping
-      if (isUnknownCategory(catId)) {
+      if (representsUnknown(catId)) {
         catId = "1" + category.id.slice(1);
         nonUnknownCategoryMap[category.id] = catId;
       }

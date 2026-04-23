@@ -20,12 +20,19 @@ import {
   V2PiximiState,
   V2Plane,
 } from "../version-readers/version-types/v2Types";
-import { generateUUID, isUnknownCategory } from "store/data/utils";
+import { generateUUID } from "store/dataV2/utils";
 import { Image as IJSImage } from "image-js-latest";
 import { processChannel } from "utils/channelUtils";
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
 import { BitDepth } from "store/data/types";
 import { subProgress } from "../progress";
+import {
+  UNKNOWN_KIND,
+  UNKNOWN_KIND_CATEGORY,
+  UNKNOWN_KIND_CATEGORY_ID,
+  UNKNOWN_KIND_ID,
+} from "store/dataV2/constants";
+import { representsUnknown } from "utils/stringUtils";
 
 const STAGES = {
   kinds: { start: 0, end: 0.1 },
@@ -62,6 +69,7 @@ export function convertV11ToV2(
     Object.values(things.entities),
     subProgress(onProgress, STAGES.things),
   );
+
   return {
     project: v11.project,
     data: { experiment, ...v2Data, kinds: v2Kinds, categories: v2Categories },
@@ -71,7 +79,10 @@ export function convertV11ToV2(
 }
 
 function convertKinds(v11Kinds: V11Kind[]): EntityState<V2Kind, string> {
-  const v2Kinds: EntityState<V2Kind, string> = { ids: [], entities: {} };
+  const v2Kinds: EntityState<V2Kind, string> = {
+    ids: [UNKNOWN_KIND_ID],
+    entities: { [UNKNOWN_KIND_ID]: UNKNOWN_KIND },
+  };
   v11Kinds.forEach((v11Kind) => {
     if (v11Kind.displayName !== "Image") {
       v2Kinds.ids.push(v11Kind.id);
@@ -90,8 +101,8 @@ function convertCategories(
   v11Categories: V11Category[],
 ): EntityState<V2Category, string> {
   const v2Categories: EntityState<V2Category, string> = {
-    ids: [],
-    entities: {},
+    ids: [UNKNOWN_KIND_CATEGORY_ID],
+    entities: { [UNKNOWN_KIND_CATEGORY_ID]: UNKNOWN_KIND_CATEGORY },
   };
   v11Categories.forEach((v11Cat) => {
     v2Categories.ids.push(v11Cat.id);
@@ -103,7 +114,7 @@ function convertCategories(
       id: v11Cat.id,
       name: v11Cat.name,
       color: v11Cat.color,
-      isUnknown: isUnknownCategory(v11Cat.id),
+      isUnknown: representsUnknown(v11Cat.id),
       ...scope,
     };
   });

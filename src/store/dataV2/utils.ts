@@ -1,27 +1,44 @@
-import { generateUUID } from "store/data/utils";
-import { AnnotationCategory, ImageCategory, Category, Kind } from "./types";
+import { v4 as uuidv4 } from "uuid";
+import { AnnotationCategory, Category, Kind } from "./types";
 import {
   UNKNOWN_ANNOTATION_CATEGORY_COLOR,
-  UNKNOWN_CATEGORY_NAME,
-  UNKNOWN_IMAGE_CATEGORY_COLOR,
-} from "store/data/constants";
+  UNKNOWN_NAME,
+  UNKNOWN_KIND_CATEGORY_ID,
+  UNKNOWN_IMAGE_CATEGORY_ID,
+  UNKNOWN_KIND_ID,
+} from "./constants";
 
-export const generateUnknownImageCategory = () => {
-  const unknownCategoryId = generateUUID({ definesUnknown: true });
-  const unknownCategory: ImageCategory = {
-    id: unknownCategoryId,
-    name: UNKNOWN_CATEGORY_NAME,
-    color: UNKNOWN_IMAGE_CATEGORY_COLOR,
-    type: "image",
-    isUnknown: true,
-  };
-  return unknownCategory;
+const RESERVED_IDS = new Set([
+  UNKNOWN_IMAGE_CATEGORY_ID,
+  UNKNOWN_KIND_ID,
+  UNKNOWN_KIND_CATEGORY_ID,
+]);
+function* _uuidStream(definesUnknown: boolean) {
+  const flag = definesUnknown ? "0" : "1";
+  while (true) yield flag + uuidv4().slice(1);
+}
+/*
+ * Generates a new UUID whilce preventing collision with predefined IDs
+ * Though chances of collision are astronamically small without the guard,
+ * better safe than sorry!
+ */
+export const generateUUID = (options?: { definesUnknown: boolean }) => {
+  for (const id of _uuidStream(options?.definesUnknown ?? false)) {
+    if (!RESERVED_IDS.has(id)) return id;
+  }
+  /*
+  TypeScript doesn't know the generator is infinite, so it assumes
+  for...of could end without hitting return, resulting in the return
+  type of the function being `string | undefined`. The idiomatic fix 
+  is an unreachable throw after the loop
+  */
+  throw new Error("unreachable");
 };
-export const generateUnknownAnnotationCategory = (kindId: string) => {
+const generateUnknownAnnotationCategory = (kindId: string) => {
   const unknownCategoryId = generateUUID({ definesUnknown: true });
   const unknownCategory: AnnotationCategory = {
     id: unknownCategoryId,
-    name: UNKNOWN_CATEGORY_NAME,
+    name: UNKNOWN_NAME,
     color: UNKNOWN_ANNOTATION_CATEGORY_COLOR,
     type: "annotation",
     kindId,

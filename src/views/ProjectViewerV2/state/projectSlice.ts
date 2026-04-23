@@ -13,11 +13,7 @@ import {
   ViewState,
 } from "./types";
 import { difference } from "lodash";
-import {
-  UNKNOWN_KIND,
-  UNKNOWN_KIND_CATEGORY_ID,
-  UNKNOWN_KIND_ID,
-} from "store/dataV2/constants";
+import { UNKNOWN_KIND, UNKNOWN_KIND_CATEGORY_ID } from "store/dataV2/constants";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 const emptyKindState = (

@@ -15,13 +15,11 @@ import type {
   AnnotationVolume,
 } from "./types";
 
+import { generateUUID } from "store/dataV2/utils";
+import { Partition } from "utils/models/enums";
 import {
   UNKNOWN_IMAGE_CATEGORY_COLOR,
   UNKNOWN_IMAGE_CATEGORY_ID,
-} from "store/data/constants";
-import { generateUUID } from "store/data/utils";
-import { Partition } from "utils/models/enums";
-import {
   UNKNOWN_KIND,
   UNKNOWN_KIND_CATEGORY,
   UNKNOWN_KIND_CATEGORY_ID,
