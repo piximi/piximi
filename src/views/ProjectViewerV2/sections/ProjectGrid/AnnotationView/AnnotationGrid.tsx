@@ -1,21 +1,20 @@
 import { useCallback, useMemo } from "react";
+
 import { useDispatch } from "react-redux";
 
 import { useAnnotationSort } from "@ProjectViewer/hooks";
-
-import { AnnotationGridItem } from "./AnnotationGridItem";
-
 import { projectSlice } from "@ProjectViewer/state";
+import { selectExtendedAnnotationsByKindId } from "store/dataV2/selectors";
+import { useParameterizedSelector } from "store/hooks";
 
 import { isFiltered } from "utils/arrayUtils";
 
-import { selectExtendedAnnotationsByKindId } from "store/dataV2/selectors";
-
-import { KindState } from "@ProjectViewer/state/types";
-import { useParameterizedSelector } from "store/hooks";
+import { AnnotationGridItem } from "./AnnotationGridItem";
 import { createGridCell, createItemData } from "../gridUtils";
 import { useGridLayout } from "../useGridLayout";
 import { VirtualGrid } from "../VirtualGrid";
+
+import type { KindState } from "@ProjectViewer/state/types";
 
 const Cell = createGridCell(AnnotationGridItem);
 

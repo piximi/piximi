@@ -1,4 +1,4 @@
-import {
+import type {
   AnnotationObject,
   AnnotationVolume,
   Category,
@@ -10,10 +10,16 @@ import {
   Kind,
   Plane,
 } from "store/dataV2/types";
-import { ClassifierState, ProjectState, SegmenterState } from "store/types";
-import { ExtractedModelFileMap } from "utils/models/types";
-import { Progress } from "utils/types";
-import { V2PiximiState } from "./version-readers/version-types/v2Types";
+import type {
+  ClassifierState,
+  ProjectState,
+  SegmenterState,
+} from "store/types";
+
+import type { ExtractedModelFileMap } from "utils/models/types";
+import type { Progress } from "utils/types";
+
+import type { V2PiximiState } from "./version-readers/version-types/v2Types";
 
 export type UploadStage =
   | "idle"

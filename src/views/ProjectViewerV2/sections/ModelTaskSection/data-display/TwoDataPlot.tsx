@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+
 import range from "lodash/range";
 import { ResponsiveLine } from "@nivo/line";
 
@@ -7,7 +8,7 @@ import { Container, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { usePreferredNivoTheme } from "hooks";
 
 import { APPLICATION_COLORS } from "utils/constants";
-import { Point } from "utils/types";
+import type { Point } from "utils/types";
 
 type TwoDataPlotProps = {
   title: string;

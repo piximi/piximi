@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 
 import { MenuItem, Typography } from "@mui/material";
 import { KeyboardArrowRight as KeyboardArrowRightIcon } from "@mui/icons-material";
@@ -6,10 +7,11 @@ import { KeyboardArrowRight as KeyboardArrowRightIcon } from "@mui/icons-materia
 import { useMenu } from "hooks";
 
 import { BaseMenu } from "components/ui/BaseMenu";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
 import { OpenProjectMenu } from "./OpenProjectMenu";
 import { OpenImageMenu } from "./OpenImageMenu";
 import { ImportAnnotationsMenu } from "./ImportAnnotationsMenu";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 type OpenMenuProps = {
   anchorEl: HTMLElement | null;

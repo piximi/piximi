@@ -1,5 +1,7 @@
 import { useState } from "react";
+
 import { useSelector } from "react-redux";
+
 import {
   Dialog,
   DialogContent,
@@ -10,17 +12,17 @@ import {
 } from "@mui/material";
 
 import { DialogTransitionSlide } from "components/dialogs";
-import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
-import { ConfusionMatrix } from "./ConfusionMatrix";
-import { EvaluateClassifierDialogAppBar } from "./EvaluateClassifierAppBar";
 
 import {
   selectActiveKnownCategories,
   selectClassifierEvaluationResult,
   selectActiveClassifierModel,
 } from "@ProjectViewer/state/reselectors";
+import type { Category } from "store/dataV2/types";
 
-import { Category } from "store/dataV2/types";
+import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
+import { ConfusionMatrix } from "./ConfusionMatrix";
+import { EvaluateClassifierDialogAppBar } from "./EvaluateClassifierAppBar";
 
 type EvaluateClassifierDialogProps = {
   closeDialog: () => void;

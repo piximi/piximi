@@ -2,9 +2,12 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { FileLoader } from "./FileLoader";
+
 import { WorkerScheduler } from "utils/worker-scheduler";
+
+import { FileLoader } from "./FileLoader";
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const TEST_IMAGES_DIR = resolve(__dir, "../../../images");

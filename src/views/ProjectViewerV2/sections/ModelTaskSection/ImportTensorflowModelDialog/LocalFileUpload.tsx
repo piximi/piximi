@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
+
+import JSZip from "jszip";
 
 import {
   ListItemIcon,
@@ -6,15 +9,11 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-
 import { FileOpen as FileOpenIcon } from "@mui/icons-material";
 
-import { SequentialClassifier } from "utils/models/classification";
-
-import JSZip from "jszip";
-import classifierHandler, {
-  ModelUploadResults,
-} from "utils/models/classification/classifierHandler";
+import type { SequentialClassifier } from "utils/models/classification";
+import type { ModelUploadResults } from "utils/models/classification/classifierHandler";
+import classifierHandler from "utils/models/classification/classifierHandler";
 import { isObjectEmpty } from "utils/objectUtils";
 
 //TODO: MenuItem??

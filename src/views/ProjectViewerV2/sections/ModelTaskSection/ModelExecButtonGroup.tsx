@@ -1,4 +1,5 @@
 import React from "react";
+
 import { Box, CircularProgress } from "@mui/material";
 import {
   ScatterPlot as ScatterPlotIcon,
@@ -9,7 +10,8 @@ import {
 import { TooltipButton } from "components/ui/tooltips/TooltipButton";
 
 import { ModelStatus } from "utils/models/enums";
-import { ErrorReason } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+
+import type { ErrorReason } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
 export const ModelExecButtonGroup = ({
   handleFit,

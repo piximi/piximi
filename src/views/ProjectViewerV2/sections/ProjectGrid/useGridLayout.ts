@@ -1,5 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
+
 import { useSelector } from "react-redux";
+
 import { selectTileSize } from "store/applicationSettings/selectors";
 import { useReactWindow } from "@ProjectViewer/hooks";
 

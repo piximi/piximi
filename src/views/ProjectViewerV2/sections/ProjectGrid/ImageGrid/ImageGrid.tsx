@@ -1,18 +1,18 @@
 import { useCallback, useMemo } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
 
 import { useImageSort } from "@ProjectViewer/hooks";
-
-import { ImageGridItem } from "./ImageGridItem";
-
 import { projectSlice } from "@ProjectViewer/state";
 import {
   selectImageFilters,
   selectSelectedImageIds,
 } from "@ProjectViewer/state/selectors";
+import { selectRepresentativeImages } from "store/dataV2/selectors";
 
 import { isFiltered } from "utils/arrayUtils";
-import { selectRepresentativeImages } from "store/dataV2/selectors";
+
+import { ImageGridItem } from "./ImageGridItem";
 import { createGridCell, createItemData } from "../gridUtils";
 import { useGridLayout } from "../useGridLayout";
 import { VirtualGrid } from "../VirtualGrid";

@@ -1,20 +1,18 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-import { findAdjacentItem, mutatingFilter, toUnique } from "utils/arrayUtils";
+import { createSlice } from "@reduxjs/toolkit";
+import { difference } from "lodash";
 
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
+import { UNKNOWN_KIND } from "store/dataV2/constants";
+
+import { findAdjacentItem, mutatingFilter, toUnique } from "utils/arrayUtils";
 import { ThingSortKey } from "utils/enums";
 import { Partition } from "utils/models/enums";
-import {
-  AnnotationSortType,
-  ImageSortType,
-  KindState,
-  ProjectState,
-  ViewState,
-} from "./types";
-import { difference } from "lodash";
-import { UNKNOWN_KIND } from "store/dataV2/constants";
 import { representsUnknown } from "utils/stringUtils";
+
+import { AnnotationSortType, ImageSortType } from "./types";
+
+import type { KindState, ProjectState, ViewState } from "./types";
+import type { PayloadAction } from "@reduxjs/toolkit";
 
 const emptyKindState = (id: string, name: string): KindState => ({
   id,

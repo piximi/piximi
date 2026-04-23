@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useState } from "react";
+
 import { DEFAULT_GRID_ITEM_WIDTH, GRID_GAP } from "utils/constants";
 
 export const useReactWindow = (

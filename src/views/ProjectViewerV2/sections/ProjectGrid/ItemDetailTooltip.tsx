@@ -1,4 +1,6 @@
-import React, { ReactNode } from "react";
+import type { ReactNode } from "react";
+import React from "react";
+
 import { Tooltip } from "@mui/material";
 
 export const ItemDetailTooltip = ({

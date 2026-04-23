@@ -1,24 +1,27 @@
 import React, { useEffect } from "react";
+
 import { useDispatch } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
+
 import { Box } from "@mui/material";
 
 import { useErrorHandler, useMobileView, useUnloadConfirmation } from "hooks";
 
 import { FallbackDialog } from "components/dialogs";
-import {
-  ProjectDrawer,
-  ImageToolDrawer,
-  ProjectAppBar,
-  ProjectGrid,
-} from "./sections";
+import { DropBox } from "components/layout";
 
 import { projectSlice } from "store/project";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { HotkeyContext } from "utils/enums";
 import { DIMENSIONS } from "utils/constants";
-import { DropBox } from "components/layout";
+
+import {
+  ProjectDrawer,
+  ImageToolDrawer,
+  ProjectAppBar,
+  ProjectGrid,
+} from "./sections";
 
 export const ProjectViewer = () => {
   const dispatch = useDispatch();

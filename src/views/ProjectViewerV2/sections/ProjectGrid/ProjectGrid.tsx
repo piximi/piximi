@@ -1,17 +1,22 @@
-import React from "react";
+import type React from "react";
+
 import { useDispatch, useSelector } from "react-redux";
+
 import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
+
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { projectSlice } from "@ProjectViewer/state";
 import { selectActiveView } from "@ProjectViewer/state/selectors";
-
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { DIMENSIONS } from "utils/constants";
-import { ViewState } from "@ProjectViewer/state/types";
-import { ImageGrid } from "./ImageGrid";
 import { selectTotalAnnotations } from "store/dataV2/selectors";
+
+import { DIMENSIONS } from "utils/constants";
+
+import { ImageGrid } from "./ImageGrid";
 import { AnnotationView } from "./AnnotationView";
 import { GridActions } from "./GridActions/GridActions";
+
+import type { ViewState } from "@ProjectViewer/state/types";
 
 export const ProjectGrid = () => {
   const dispatch = useDispatch();

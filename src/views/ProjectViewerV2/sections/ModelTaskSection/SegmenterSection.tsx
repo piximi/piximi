@@ -1,23 +1,25 @@
 import React, { useMemo } from "react";
 
+import { useDispatch, useSelector } from "react-redux";
+
 import { Box, Stack, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
-import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
-import { ImportTensorflowSegmentationModelDialog } from "./ImportTensorflowModelDialog";
-
-import { HotkeyContext } from "utils/enums";
-import { useDispatch, useSelector } from "react-redux";
 import { selectSegmenterModel } from "store/segmenter/selectors";
 import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 import { usePredictSegmenter } from "@ProjectViewer/hooks/usePredictSegmenter";
-import { Model } from "utils/models/Model";
-import { Shape } from "store/dataV2/types";
+import type { Shape } from "store/dataV2/types";
 import { segmenterSlice } from "store/segmenter";
+
+import { HotkeyContext } from "utils/enums";
+import type { Model } from "utils/models/Model";
 import { Segmenter } from "utils/models/segmentation";
 import { ModelStatus, ModelTask } from "utils/models/enums";
+
+import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
+import { ImportTensorflowSegmentationModelDialog } from "./ImportTensorflowModelDialog";
+import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
 
 export const SegmenterSection = () => {
   const dispatch = useDispatch();

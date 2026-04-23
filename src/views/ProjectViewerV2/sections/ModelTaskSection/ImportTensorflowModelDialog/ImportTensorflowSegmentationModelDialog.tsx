@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
+
 import { useSelector } from "react-redux";
 
 import {
@@ -13,22 +15,21 @@ import {
   IconButton,
   Tabs,
 } from "@mui/material";
-
 import CloseIcon from "@mui/icons-material/Close";
 
 import { useHotkeys } from "hooks";
 
-import { PretrainedModelSelector } from "./PretrainedModelSelector";
+import { ToolTipTab } from "components/layout";
+
 import { selectProjectImageChannels } from "@ProjectViewer/state/selectors";
+import type { Shape } from "store/dataV2/types";
 
-import { Model } from "utils/models/Model";
+import type { Model } from "utils/models/Model";
 import { Cellpose } from "utils/models/segmentation";
-
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import { HotkeyContext } from "utils/enums";
 
-import { Shape } from "store/dataV2/types";
-import { ToolTipTab } from "components/layout";
+import { PretrainedModelSelector } from "./PretrainedModelSelector";
 
 type ImportTensorflowSegmentationModelDialogProps = {
   onClose: () => void;

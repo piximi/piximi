@@ -1,13 +1,16 @@
 import React from "react";
+
 import { Menu, MenuItem } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
 import { ExampleProjectDialog } from "components/dialogs";
-import { OpenProjectMenuItem } from "./OpenProjectMenuItem";
+
+import { useConfirmReplaceDialog } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 
 import { HotkeyContext } from "utils/enums";
-import { useConfirmReplaceDialog } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
+
+import { OpenProjectMenuItem } from "./OpenProjectMenuItem";
 
 type OpenProjectMenuProps = {
   anchorEl: HTMLElement | null;

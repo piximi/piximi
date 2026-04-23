@@ -1,15 +1,19 @@
+import type React from "react";
+import { useState } from "react";
+
 import { Box, Typography } from "@mui/material";
 import {
   Delete as DeleteIcon,
   Minimize as MinimizeIcon,
   Edit as EditIcon,
 } from "@mui/icons-material";
+
 import { TextFieldWithBlur } from "components/inputs";
-import React, { useState } from "react";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { KindState } from "@ProjectViewer/state/types";
 import { representsUnknown } from "utils/stringUtils";
+
+import type { KindState } from "@ProjectViewer/state/types";
 
 export const KindTab = ({
   kind,

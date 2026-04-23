@@ -1,4 +1,5 @@
-import React, {
+import type React from "react";
+import {
   createContext,
   useCallback,
   useContext,
@@ -6,9 +7,10 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { selectShowClearPredictionsWarning } from "store/classifierV2/selectors";
 
+import { useDispatch, useSelector } from "react-redux";
+
+import { selectShowClearPredictionsWarning } from "store/classifierV2/selectors";
 import { selectKindIds } from "store/dataV2/selectors";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import {
@@ -17,13 +19,16 @@ import {
   selectActiveItemsByPartition,
   selectActiveUnknownCategory,
 } from "@ProjectViewer/state/reselectors";
-import { selectProjectImageChannels } from "@ProjectViewer/state/selectors";
+import {
+  selectProjectImageChannels,
+  selectActiveClassifierModelTarget,
+} from "@ProjectViewer/state/selectors";
+import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
+import { useParameterizedSelector } from "store/hooks";
+
 import { getDifferences } from "utils/arrayUtils";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { representsUnknown } from "utils/stringUtils";
-import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import { useParameterizedSelector } from "store/hooks";
 
 export enum ErrorReason {
   NotTrainable,

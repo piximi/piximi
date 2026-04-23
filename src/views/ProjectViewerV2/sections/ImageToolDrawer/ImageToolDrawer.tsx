@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
+
 import { useSelector } from "react-redux";
+
 import {
   Badge,
   Box,
@@ -24,26 +26,28 @@ import {
 import { useMenu, useMobileView, useTranslation, useWindowSize } from "hooks";
 
 import { ToolHotkeyTitle } from "components/ui";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
+import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
+import { HelpButton } from "components/layout/app-drawer/HelpButton";
+
+import { selectActiveStateFilterCount } from "@ProjectViewer/state/selectors";
+
+import { DIMENSIONS } from "utils/constants";
+import { capitalize } from "utils/stringUtils";
+import type { HTMLDataAttributes } from "utils/types";
+
 import { ModelTaskSection } from "../ModelTaskSection";
 import {
   FilterOptions,
   InformationOptions,
   MeasurementOptions,
 } from "./tool-options";
-import { OperationType } from "./ToolOptionsDrawer";
 
-import { selectActiveStateFilterCount } from "@ProjectViewer/state/selectors";
-
-import { DIMENSIONS } from "utils/constants";
-import { capitalize } from "utils/stringUtils";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { ImageViewerOptions } from "./tool-options/ImageViewerOptions";
-import { HTMLDataAttributes } from "utils/types";
-import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
-import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
-import { HelpButton } from "components/layout/app-drawer/HelpButton";
 import { ProjectActions } from "../ProjectActions";
 import { ProjectViewerCategories } from "../ProjectViewerCategories";
+import type { OperationType } from "./ToolOptionsDrawer";
 
 const imageTools: Record<string, OperationType> = {
   fileIO: {

@@ -1,4 +1,6 @@
-import React, { useCallback } from "react";
+import type React from "react";
+import { useCallback } from "react";
+
 import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
@@ -9,21 +11,20 @@ import {
   selectObjectKindDict,
   selectSplitThingDict,
 } from "store/data/selectors";
+import { CATEGORY_COLORS } from "store/data/constants";
 
 import {
   deserializeCOCOFile,
   deserializePiximiAnnotations,
 } from "utils/file-io/deserialize";
-
 import {
   ProjectFileType,
   validateFileType,
 } from "utils/file-io/runtime/validators";
-import {
+import type {
   SerializedCOCOFileType,
   SerializedFileType,
 } from "utils/file-io/types";
-import { CATEGORY_COLORS } from "store/data/constants";
 
 //TODO: MenuItem??
 

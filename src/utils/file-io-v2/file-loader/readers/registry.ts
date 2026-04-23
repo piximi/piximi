@@ -1,7 +1,8 @@
-import { IFileReader, MimeType } from "../types";
 import { basicReader } from "./BasicReader";
 import { dicomReader } from "./DicomReader";
 import { tiffReader } from "./TiffReader";
+
+import type { IFileReader, MimeType } from "../types";
 
 const readers: IFileReader[] = [basicReader, dicomReader, tiffReader];
 

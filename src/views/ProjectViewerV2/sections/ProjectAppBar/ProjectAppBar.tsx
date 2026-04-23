@@ -1,4 +1,5 @@
 import React from "react";
+
 import { useSelector } from "react-redux";
 
 import { Box, Stack } from "@mui/material";
@@ -6,11 +7,14 @@ import { Box, Stack } from "@mui/material";
 import { useMobileView } from "hooks";
 
 import { LogoLoader } from "components/ui";
+
+import { selectOverallTaskProgress } from "store/appTasks/selectors";
+
+import { DIMENSIONS } from "utils/constants";
+
 import { ExperimentNameTextField } from "./ExperimentNameTextField";
 import { ImageViewerButton } from "./ImageViewerButton";
 import { MeasurementsButton } from "./MeasurementsButton";
-import { DIMENSIONS } from "utils/constants";
-import { selectOverallTaskProgress } from "store/appTasks/selectors";
 
 export const ProjectAppBar = () => {
   const taskProgress = useSelector(selectOverallTaskProgress);

@@ -1,3 +1,8 @@
+import type { ReactElement } from "react";
+import React from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   Button,
   Checkbox,
@@ -9,8 +14,7 @@ import {
   FormControl,
   FormControlLabel,
 } from "@mui/material";
-import React, { ReactElement } from "react";
-import { useDispatch, useSelector } from "react-redux";
+
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectShowSaveProjectDialog } from "store/applicationSettings/selectors";
 

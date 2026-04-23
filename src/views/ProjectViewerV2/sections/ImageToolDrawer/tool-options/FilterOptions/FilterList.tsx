@@ -3,9 +3,11 @@ import {
   VisibilityOutlined as VisibilityOutlinedIcon,
   VisibilityOffOutlined as VisibilityOffOutlinedIcon,
 } from "@mui/icons-material";
+
 import { FunctionalDivider } from "components/ui";
-import { FilterChip } from "./FilterChip";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
+
+import { FilterChip } from "./FilterChip";
 
 export const FilterList = ({
   title,

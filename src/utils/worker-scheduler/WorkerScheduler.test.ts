@@ -1,8 +1,10 @@
 // src/workers/scheduler/WorkerScheduler.test.ts
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
 import { WorkerScheduler } from "./WorkerScheduler";
 import { TaskPriority, TaskStatus } from "./types";
-import { TaskMap } from "./taskMap";
+
+import type { TaskMap } from "./taskMap";
 
 // Mock Comlink
 const mockResults: Record<string, unknown> = {

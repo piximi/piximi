@@ -1,5 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
+
 import type { RootState } from "store/rootReducer";
+
 import {
   imageSeriesAdapter,
   imageAdapter,
@@ -11,7 +13,8 @@ import {
   annotationAdapter,
   annotationVolumeAdapter,
 } from "./dataSliceV2";
-import {
+
+import type {
   ExtendedAnnotationObject,
   ExtendedChannel,
   ExtendedImageObject,

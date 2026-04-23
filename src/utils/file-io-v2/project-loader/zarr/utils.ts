@@ -1,5 +1,6 @@
 import { Group, ZarrArray } from "zarr";
-import { RawArray } from "zarr/types/rawArray";
+
+import type { RawArray } from "zarr/types/rawArray";
 
 export const getDataset = async (root: Group, key: string) => {
   const dataset = await root.getItem(key);

@@ -1,3 +1,7 @@
+import { useSelector } from "react-redux";
+
+import saveAs from "file-saver";
+
 import {
   Button,
   Container,
@@ -8,10 +12,10 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import saveAs from "file-saver";
-import { useSelector } from "react-redux";
+
 import { selectProjectName } from "@ProjectViewer/state/selectors";
-import { ModelLayerData } from "utils/models/types";
+
+import type { ModelLayerData } from "utils/models/types";
 
 interface Column {
   id: "layerName" | "outputShape" | "parameters" | "trainable";

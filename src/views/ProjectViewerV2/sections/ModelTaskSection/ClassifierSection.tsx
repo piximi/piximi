@@ -1,12 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Box,
-  IconButton,
-  MenuItem,
-  SelectChangeEvent,
-  Stack,
-} from "@mui/material";
+
+import type { SelectChangeEvent } from "@mui/material";
+import { Box, IconButton, MenuItem, Stack } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import { useDialog, useDialogHotkey } from "hooks";
@@ -15,36 +12,31 @@ import { SaveFittedModelDialog } from "components/dialogs";
 import { WithLabel, StyledSelect } from "components/inputs";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 
-import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
-import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
-import { ImportTensorflowClassificationModelDialog } from "./ImportTensorflowModelDialog";
-import { FitClassifierDialog } from "./FitClassifierDialog";
-import { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";
-import { PredictionListItems } from "./PredictionListItems";
-
 import { classifierSlice } from "store/classifierV2";
-
 import {
   ErrorReason,
   useClassifierStatus,
 } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-
 import { usePredictClassifier } from "@ProjectViewer/hooks/usePredictClassifier";
 import { useEvaluateClassifier } from "@ProjectViewer/hooks/useEvaluateClassifier";
-
 import {
   selectClassifierEvaluationResult,
   selectActiveClassifierModel,
+  selectTotalActiveUnlabeledItems,
 } from "@ProjectViewer/state/reselectors";
-
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
-
-import { selectTotalActiveUnlabeledItems } from "@ProjectViewer/state/reselectors";
 
 import { HotkeyContext } from "utils/enums";
 import { ModelStatus } from "utils/models/enums";
-import { SequentialClassifier } from "utils/models/classification";
+import type { SequentialClassifier } from "utils/models/classification";
 import classifierHandler from "utils/models/classification/classifierHandler";
+
+import { PredictionListItems } from "./PredictionListItems";
+import { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";
+import { FitClassifierDialog } from "./FitClassifierDialog";
+import { ImportTensorflowClassificationModelDialog } from "./ImportTensorflowModelDialog";
+import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
+import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
 
 export const ClassifierSection = () => {
   const [waitingForResults, setWaitingForResults] = useState(false);

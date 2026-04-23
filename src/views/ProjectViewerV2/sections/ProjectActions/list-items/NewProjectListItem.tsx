@@ -1,11 +1,13 @@
 import React from "react";
+
+import { useDispatch } from "react-redux";
+
 import AddIcon from "@mui/icons-material/Add";
 
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
-
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
 import { useConfirmReplaceDialog } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
-import { useDispatch } from "react-redux";
 import { projectSlice } from "@ProjectViewer/state";
 
 export const NewProjectListItem = () => {

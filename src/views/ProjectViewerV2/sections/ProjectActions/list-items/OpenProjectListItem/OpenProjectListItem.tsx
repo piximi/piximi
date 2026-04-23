@@ -3,8 +3,9 @@ import { FolderOpen as FolderOpenIcon } from "@mui/icons-material";
 import { useMenu } from "hooks";
 
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
-import { OpenMenu } from "./OpenMenu";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
+import { OpenMenu } from "./OpenMenu";
 
 export const OpenProjectListItem = () => {
   const { anchorEl, onClose, open, onOpen } = useMenu();

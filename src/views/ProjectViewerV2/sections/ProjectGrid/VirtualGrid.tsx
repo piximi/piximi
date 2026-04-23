@@ -1,8 +1,12 @@
-import { Container } from "@mui/material";
+import type { RefObject } from "react";
+
 import { FixedSizeGrid as Grid } from "react-window";
-import { RefObject } from "react";
+
+import { Container } from "@mui/material";
+
 import { GRID_GAP } from "utils/constants";
-import { GridCellData } from "./gridUtils";
+
+import type { GridCellData } from "./gridUtils";
 
 type VirtualGridProps<T> = {
   gridRef: RefObject<HTMLDivElement>;

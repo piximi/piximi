@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { LabelOutlined as LabelOutlinedIcon } from "@mui/icons-material";
 
-import { ImageCategoryMenu } from "./ImageCategoryMenu";
+import { LabelOutlined as LabelOutlinedIcon } from "@mui/icons-material";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { TooltipButton, TooltipTitle } from "components/ui/tooltips";
-import { Category } from "store/dataV2/types";
+
+import type { Category } from "store/dataV2/types";
+
+import { ImageCategoryMenu } from "./ImageCategoryMenu";
 import { actionButtonStyle } from "./utils";
 
 export const CategorizeChip = ({

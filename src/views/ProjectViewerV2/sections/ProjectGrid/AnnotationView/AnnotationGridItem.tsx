@@ -2,15 +2,15 @@ import { memo } from "react";
 
 import { Box } from "@mui/material";
 
+import { useRenderedSrc } from "hooks/useRenderedSrcs";
+
+import type { Category, ExtendedAnnotationObject } from "store/dataV2/types";
 import { isUnknownCategory } from "store/data/utils";
+import { selectCategoryById } from "store/dataV2/selectors";
+import { useParameterizedSelector } from "store/hooks";
 
 import { Partition } from "utils/models/enums";
 
-import { Category, ExtendedAnnotationObject } from "store/dataV2/types";
-
-import { useRenderedSrc } from "hooks/useRenderedSrcs";
-import { selectCategoryById } from "store/dataV2/selectors";
-import { useParameterizedSelector } from "store/hooks";
 import { getIconPosition, imageStyle } from "../gridItemUtils";
 import { useGridItemStyle } from "../useGridItemStyle";
 import { ItemDetailContainer } from "../ItemDetailContainer";

@@ -1,19 +1,25 @@
+import { useState } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { Collapse, Grid2 as Grid, IconButton, Stack } from "@mui/material";
+
+import { useNumberField } from "hooks";
+
 import { FunctionalDivider } from "components/ui";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { WithLabel } from "components/inputs";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
 import { classifierSlice } from "store/classifierV2";
 import {
   selectClassifierFitOptions,
   selectActiveClassifierModel,
 } from "@ProjectViewer/state/reselectors";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
-import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
-import { WithLabel } from "components/inputs";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import { useNumberField } from "hooks";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
+import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 
 export const TrainingStrategySettings = () => {
   const dispatch = useDispatch();

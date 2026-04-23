@@ -1,20 +1,23 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import { cloneDeep } from "lodash";
 
-import { getDefaultModelInfo } from "utils/models/classification/utils";
-
-import { ClassifierEvaluationResultType } from "utils/models/types";
-import {
+import type {
   ClassifierState,
   KindClassifier,
   ModelClassMap,
   ModelInfo,
 } from "store/types";
-import { Kind, Shape } from "store/dataV2/types";
-import { getSelectedModelInfo } from "./utils";
-import { RecursivePartial } from "utils/types";
-import { recursiveAssign } from "utils/objectUtils";
-import { cloneDeep } from "lodash";
+import type { Kind, Shape } from "store/dataV2/types";
 import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
+
+import { getDefaultModelInfo } from "utils/models/classification/utils";
+import type { ClassifierEvaluationResultType } from "utils/models/types";
+import type { RecursivePartial } from "utils/types";
+import { recursiveAssign } from "utils/objectUtils";
+
+import { getSelectedModelInfo } from "./utils";
+
+import type { PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: ClassifierState = {
   kindClassifiers: {

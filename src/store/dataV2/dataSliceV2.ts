@@ -1,5 +1,19 @@
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
+
+import { generateUUID } from "store/dataV2/utils";
+
+import type { Partition } from "utils/models/enums";
+import type { AtLeastOne } from "utils/types";
+
+import {
+  UNKNOWN_IMAGE_CATEGORY_COLOR,
+  UNKNOWN_IMAGE_CATEGORY_ID,
+  UNKNOWN_KIND,
+  UNKNOWN_KIND_CATEGORY,
+  UNKNOWN_KIND_CATEGORY_ID,
+  UNKNOWN_KIND_ID,
+} from "./constants";
+
 import type {
   AnnotationCategory,
   ChannelMeta,
@@ -14,18 +28,7 @@ import type {
   AnnotationObject,
   AnnotationVolume,
 } from "./types";
-
-import { generateUUID } from "store/dataV2/utils";
-import { Partition } from "utils/models/enums";
-import {
-  UNKNOWN_IMAGE_CATEGORY_COLOR,
-  UNKNOWN_IMAGE_CATEGORY_ID,
-  UNKNOWN_KIND,
-  UNKNOWN_KIND_CATEGORY,
-  UNKNOWN_KIND_CATEGORY_ID,
-  UNKNOWN_KIND_ID,
-} from "./constants";
-import { AtLeastOne } from "utils/types";
+import type { PayloadAction } from "@reduxjs/toolkit";
 
 export const imageSeriesAdapter = createEntityAdapter<ImageSeries>();
 export const imageAdapter = createEntityAdapter<ImageObject>();

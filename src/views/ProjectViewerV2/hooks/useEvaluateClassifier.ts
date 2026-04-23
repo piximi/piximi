@@ -1,15 +1,19 @@
 import React, { useCallback } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
+
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { AlertType } from "utils/enums";
-import { getStackTraceFromError } from "utils/logUtils";
-import { AlertState } from "utils/types";
-import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
-import { ModelStatus } from "utils/models/enums";
 import { selectActiveKnownCategories } from "store/project/reselectors";
 import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
 import { classifierSlice } from "store/classifierV2";
 import { selectActiveKindId } from "store/project/selectors";
+
+import { AlertType } from "utils/enums";
+import { getStackTraceFromError } from "utils/logUtils";
+import type { AlertState } from "utils/types";
+import { ModelStatus } from "utils/models/enums";
+
+import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 
 export const useEvaluateClassifier = () => {
   const dispatch = useDispatch();

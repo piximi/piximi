@@ -1,4 +1,12 @@
-import { fromArrayBuffer, GeoTIFFImage } from "geotiff";
+import { fromArrayBuffer } from "geotiff";
+import { XMLParser } from "fast-xml-parser";
+
+import { parseError } from "utils/logUtils";
+
+import { loadImageFromBuffer } from "../imageReaderUtils";
+import { MIME } from "../types";
+
+import type { GeoTIFFImage } from "geotiff";
 import type {
   OMEDims,
   AnalyzeTiffOutput,
@@ -6,10 +14,6 @@ import type {
   ReaderInput,
   ReaderOutput,
 } from "../types";
-import { XMLParser } from "fast-xml-parser";
-import { loadImageFromBuffer } from "../imageReaderUtils";
-import { MIME } from "../types";
-import { parseError } from "utils/logUtils";
 
 function trimNull(xml: string | undefined): string | undefined {
   // trim trailing unicode zeros?

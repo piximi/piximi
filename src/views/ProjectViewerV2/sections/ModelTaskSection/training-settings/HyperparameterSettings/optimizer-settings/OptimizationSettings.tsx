@@ -1,29 +1,35 @@
+import { useState } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import type { SelectChangeEvent } from "@mui/material";
 import {
   Collapse,
   Grid2 as Grid,
   IconButton,
   MenuItem,
-  SelectChangeEvent,
   Stack,
 } from "@mui/material";
+
+import { useNumberField } from "hooks";
+
 import { FunctionalDivider } from "components/ui";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { StyledSelect, WithLabel } from "components/inputs";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
 import { classifierSlice } from "store/classifierV2";
 import {
   selectActiveClassifierModel,
   selectClassifierOptimizerSettings,
 } from "@ProjectViewer/state/reselectors";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+
 import { enumKeys } from "utils/objectUtils";
 import { LossFunction, OptimizationAlgorithm } from "utils/models/enums";
+
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
-import { StyledSelect } from "components/inputs";
-import { WithLabel } from "components/inputs";
-import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import { useNumberField } from "hooks";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const OptimizationSettings = () => {
   const dispatch = useDispatch();

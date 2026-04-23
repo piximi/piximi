@@ -1,22 +1,24 @@
-import { EntityState } from "@reduxjs/toolkit";
-import {
+import type { ProjectState, SegmenterState } from "store/types";
+import type { Shape } from "store/data/types";
+
+import type {
+  ClassifierEvaluationResultType,
+  CropOptions,
+  RescaleOptions,
+} from "utils/models/types";
+import type {
+  LossFunction,
+  Metric,
+  OptimizationAlgorithm,
+} from "utils/models/enums";
+
+import type {
   V02Category,
   V02Kind,
   V02RawAnnotationObject,
   V02RawImageObject,
 } from "./v02Types";
-import { ProjectState, SegmenterState } from "store/types";
-import { Shape } from "store/data/types";
-import {
-  ClassifierEvaluationResultType,
-  CropOptions,
-  RescaleOptions,
-} from "utils/models/types";
-import {
-  LossFunction,
-  Metric,
-  OptimizationAlgorithm,
-} from "utils/models/enums";
+import type { EntityState } from "@reduxjs/toolkit";
 
 // ============================================================
 // V11 Piximi State

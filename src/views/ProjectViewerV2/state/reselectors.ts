@@ -1,4 +1,29 @@
 import { createSelector } from "@reduxjs/toolkit";
+
+import {
+  selectAllCategories,
+  selectExtendedAnnotationsByKindId,
+  selectExtendedImages,
+} from "store/dataV2/selectors";
+import type { RootState } from "store/rootReducer";
+import { selectKindClassifiers } from "store/classifierV2/selectors";
+import type { KindClassifier, ModelInfo } from "store/types";
+import { getSelectedModelInfo } from "store/classifierV2/utils";
+import type { Shape } from "store/dataV2/types";
+
+import { representsUnknown } from "utils/stringUtils";
+import { isFiltered } from "utils/arrayUtils";
+import classifierHandler from "utils/models/classification/classifierHandler";
+import type { Partition } from "utils/models/enums";
+import type {
+  ClassifierEvaluationResultType,
+  CropOptions,
+  FitOptions,
+  OptimizerSettings,
+  PreprocessSettings,
+  RescaleOptions,
+} from "utils/models/types";
+
 import {
   selectActiveKindId,
   selectActiveView,
@@ -7,29 +32,6 @@ import {
   selectSelectedImageIds,
   selectActiveClassifierModelTarget,
 } from "./selectors";
-
-import {
-  selectAllCategories,
-  selectExtendedAnnotationsByKindId,
-  selectExtendedImages,
-} from "store/dataV2/selectors";
-import { representsUnknown } from "utils/stringUtils";
-import { RootState } from "store/rootReducer";
-import { isFiltered } from "utils/arrayUtils";
-import { selectKindClassifiers } from "store/classifierV2/selectors";
-import { KindClassifier, ModelInfo } from "store/types";
-import classifierHandler from "utils/models/classification/classifierHandler";
-import { Partition } from "utils/models/enums";
-import {
-  ClassifierEvaluationResultType,
-  CropOptions,
-  FitOptions,
-  OptimizerSettings,
-  PreprocessSettings,
-  RescaleOptions,
-} from "utils/models/types";
-import { getSelectedModelInfo } from "store/classifierV2/utils";
-import { Shape } from "store/dataV2/types";
 
 // --- Images ---
 

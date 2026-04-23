@@ -1,7 +1,9 @@
 import { Image as IJSImage, Stack as IJSStack } from "image-js-latest";
 import { parseDicom } from "dicom-parser";
-import type { IFileReader, ReaderInput, ReaderOutput } from "../types";
+
 import { MIME } from "../types";
+
+import type { IFileReader, ReaderInput, ReaderOutput } from "../types";
 
 export const dicomReader: IFileReader = {
   supportedTypes: [MIME.DICOM],

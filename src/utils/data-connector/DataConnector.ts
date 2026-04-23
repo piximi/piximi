@@ -1,6 +1,11 @@
 import { openDB } from "idb";
-import type { IDBPDatabase } from "idb";
 
+import { parseError } from "utils/logUtils";
+
+import { STORES, DB_NAME, DB_VERSION } from "./types";
+import { LRUCache, NullCache } from "./lruCache";
+
+import type { IDBPDatabase } from "idb";
 import type {
   CacheOptions,
   IDataConnector,
@@ -13,9 +18,6 @@ import type {
   StoreName,
   StorageReference,
 } from "./types";
-import { STORES, DB_NAME, DB_VERSION } from "./types";
-import { parseError } from "utils/logUtils";
-import { LRUCache, NullCache } from "./lruCache";
 
 const DEFAULT_CACHE_OPTIONS: CacheOptions = {
   maxMemoryBytes: 500 * 1024 * 1024, // 500MB

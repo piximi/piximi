@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { AnnotationCategory, Category, Kind } from "./types";
+
 import {
   UNKNOWN_ANNOTATION_CATEGORY_COLOR,
   UNKNOWN_NAME,
@@ -7,6 +7,8 @@ import {
   UNKNOWN_IMAGE_CATEGORY_ID,
   UNKNOWN_KIND_ID,
 } from "./constants";
+
+import type { AnnotationCategory, Category, Kind } from "./types";
 
 const RESERVED_IDS = new Set([
   UNKNOWN_IMAGE_CATEGORY_ID,

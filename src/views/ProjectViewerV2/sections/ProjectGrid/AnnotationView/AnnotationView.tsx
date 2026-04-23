@@ -1,18 +1,22 @@
 import React, { useCallback, useEffect, useMemo } from "react";
-import { Add as AddIcon } from "@mui/icons-material";
+
 import { useDispatch, useSelector } from "react-redux";
+
+import { Add as AddIcon } from "@mui/icons-material";
 import { Box, Divider, IconButton } from "@mui/material";
 
 import { useMenu, useMobileView } from "hooks";
 
-import { projectSlice } from "@ProjectViewer/state/projectSlice";
-
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { DIMENSIONS } from "utils/constants";
-import { AddKindMenu } from "../AddKindMenu";
+
+import { projectSlice } from "@ProjectViewer/state/projectSlice";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
-import { findAdjacentItem } from "utils/arrayUtils";
 import { selectAnnotationGridState } from "@ProjectViewer/state/selectors";
+
+import { DIMENSIONS } from "utils/constants";
+import { findAdjacentItem } from "utils/arrayUtils";
+
+import { AddKindMenu } from "../AddKindMenu";
 import { KindTab } from "./KindTab";
 import { AnnotationGrid } from "./AnnotationGrid";
 

@@ -3,14 +3,15 @@ import { difference, intersection } from "lodash";
 
 import { classifierSlice } from "store/classifierV2";
 import { dataSlice } from "store/data";
-import { projectSlice } from "./projectSlice";
-
-import classifierHandler from "utils/models/classification/classifierHandler";
-import { TypedAppStartListening } from "store/types";
+import type { TypedAppStartListening } from "store/types";
 import { segmenterSlice } from "store/segmenter";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { measurementsSlice } from "store/measurements";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
+
+import classifierHandler from "utils/models/classification/classifierHandler";
+
+import { projectSlice } from "./projectSlice";
 
 export const projectMiddleware = createListenerMiddleware();
 const startAppListening =

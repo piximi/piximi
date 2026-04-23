@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
@@ -11,16 +12,17 @@ import {
   selectActiveKnownCategories,
   selectActiveUnlabeledThings,
 } from "store/project/reselectors";
-import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
-import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
+import { classifierSlice } from "store/classifierV2";
+import { selectActiveKindId } from "store/project/selectors";
 
 import { getStackTraceFromError, logger } from "utils/logUtils";
 import { AlertType } from "utils/enums";
 import { ModelStatus } from "utils/models/enums";
-import { AlertState } from "utils/types";
+import type { AlertState } from "utils/types";
+
+import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
+import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassMapDialog } from "./useClassMapDialog";
-import { classifierSlice } from "store/classifierV2";
-import { selectActiveKindId } from "store/project/selectors";
 
 export const usePredictClassifier = () => {
   const dispatch = useDispatch();

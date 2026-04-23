@@ -1,9 +1,15 @@
-import { Partition } from "utils/models/enums";
-import { V01ClassifierState, V01Category, V01RawImageObject } from "./v01Types";
-import { BitDepth, Shape } from "store/data/types";
-import { ProjectState, SegmenterState } from "store/types";
-import { EntityState } from "@reduxjs/toolkit";
-import { RawData } from "../../types";
+import type { BitDepth, Shape } from "store/data/types";
+import type { ProjectState, SegmenterState } from "store/types";
+
+import type { Partition } from "utils/models/enums";
+
+import type {
+  V01ClassifierState,
+  V01Category,
+  V01RawImageObject,
+} from "./v01Types";
+import type { EntityState } from "@reduxjs/toolkit";
+import type { RawData } from "../../types";
 
 // ============================================================
 // V02 Piximi State

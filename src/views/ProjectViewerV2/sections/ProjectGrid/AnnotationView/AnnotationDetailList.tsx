@@ -1,7 +1,8 @@
 import React from "react";
+
 import { List, ListItem, ListItemText } from "@mui/material";
 
-import { ExtendedAnnotationObject } from "store/dataV2/types";
+import type { ExtendedAnnotationObject } from "store/dataV2/types";
 
 export const AnnotationDetailList = ({
   annotation,

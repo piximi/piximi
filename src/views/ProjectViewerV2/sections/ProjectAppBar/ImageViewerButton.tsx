@@ -1,7 +1,10 @@
 import React from "react";
+
 import { useNavigate } from "react-router-dom";
+
 import { Chip, Tooltip, useMediaQuery, useTheme } from "@mui/material";
 import { Gesture as GestureIcon } from "@mui/icons-material";
+
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export const ImageViewerButton = ({

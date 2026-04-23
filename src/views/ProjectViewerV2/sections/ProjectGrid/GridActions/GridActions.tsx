@@ -1,16 +1,22 @@
 import React from "react";
+
 import { Badge, Box, Divider } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
+
 import { useDialogHotkey, useHotkeys, useMobileView } from "hooks";
+
 import { TooltipButton, TooltipTitle } from "components/ui/tooltips";
 import { ConfirmationDialog } from "components/dialogs";
-import { ViewState } from "@ProjectViewer/state/types";
+
 import { HotkeyContext } from "utils/enums";
 import { pluralize } from "utils/stringUtils";
+
 import { ZoomControl } from "./ZoomControl";
 import { CategorizeChip } from "./CategorizeChip";
 import { useGridActions } from "./useGridActions";
 import { actionButtonStyle } from "./utils";
+
+import type { ViewState } from "@ProjectViewer/state/types";
 
 export const GridActions = ({ viewState }: { viewState: ViewState }) => {
   const {

@@ -1,4 +1,4 @@
-import { Category, Kind } from "./types";
+import type { Category, Kind } from "./types";
 
 export const UNKNOWN_IMAGE_CATEGORY_ID: string =
   "00000000-0000-0000-0000-000000000000";

@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
+
+import { Partition } from "utils/models/enums";
+
 import { dataSliceV2 } from "./dataSliceV2";
+
 import type {
   Experiment,
   ImageObject,
@@ -12,7 +16,6 @@ import type {
   Channel,
   ChannelMeta,
 } from "./types";
-import { Partition } from "utils/models/enums";
 
 const {
   clearState,

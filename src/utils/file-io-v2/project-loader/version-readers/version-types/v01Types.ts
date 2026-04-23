@@ -1,20 +1,22 @@
-import { BitDepth, DataArray, Shape } from "store/data/types";
-import { ProjectState, SegmenterState } from "store/types";
-import {
+import type { BitDepth, DataArray, Shape } from "store/data/types";
+import type { ProjectState, SegmenterState } from "store/types";
+
+import type {
   LossFunction,
   Metric,
   ModelStatus,
   OptimizationAlgorithm,
   Partition,
 } from "utils/models/enums";
-import {
+import type {
   ClassifierEvaluationResultType,
   CropOptions,
   FitOptions,
   RescaleOptions,
 } from "utils/models/types";
-import { ColorsRaw } from "utils/types";
-import { RawData } from "../../types";
+import type { ColorsRaw } from "utils/types";
+
+import type { RawData } from "../../types";
 
 // ============================================================
 // V01 Piximi State

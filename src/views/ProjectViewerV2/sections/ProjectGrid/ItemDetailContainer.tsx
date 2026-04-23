@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { Box, Typography, useTheme } from "@mui/material";
 import {
   InfoOutlined as InfoOutlinedIcon,
@@ -6,8 +8,6 @@ import {
 } from "@mui/icons-material";
 
 import { ItemDetailTooltip } from "./ItemDetailTooltip";
-
-import { ReactNode } from "react";
 
 export const ItemDetailContainer = ({
   position,

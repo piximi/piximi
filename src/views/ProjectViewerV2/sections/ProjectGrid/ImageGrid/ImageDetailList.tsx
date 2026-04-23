@@ -1,7 +1,8 @@
 import React from "react";
+
 import { List, ListItem, ListItemText } from "@mui/material";
 
-import { ExtendedImageObject } from "store/dataV2/types";
+import type { ExtendedImageObject } from "store/dataV2/types";
 
 export const ImageDetailList = ({
   image,

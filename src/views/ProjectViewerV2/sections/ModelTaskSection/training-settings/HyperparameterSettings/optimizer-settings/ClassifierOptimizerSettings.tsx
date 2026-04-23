@@ -1,12 +1,15 @@
+import { useEffect } from "react";
+
+import { useSelector } from "react-redux";
+
 import { Grid2 as Grid } from "@mui/material";
 
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
 import {
   selectClassifierFitOptions,
   selectClassifierTrainingPercentage,
+  selectTotalActiveLabeledItems,
 } from "@ProjectViewer/state/reselectors";
-import { selectTotalActiveLabeledItems } from "@ProjectViewer/state/reselectors";
+
 import { logger } from "utils/logUtils";
 
 import { OptimizationSettings } from "./OptimizationSettings";

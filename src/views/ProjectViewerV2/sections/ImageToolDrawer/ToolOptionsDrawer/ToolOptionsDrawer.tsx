@@ -1,10 +1,13 @@
-import React, { ReactElement } from "react";
+import type { ReactElement } from "react";
+import React from "react";
+
 import { Box, Drawer, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
+import type { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
 import { DIMENSIONS } from "utils/constants";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 export type OperationType = {
   icon: (color: string) => ReactElement;

@@ -1,11 +1,9 @@
-import {
-  decodeJpeg,
-  decodePng,
-  Image as IJSImage,
-  Stack as IJSStack,
-} from "image-js-latest";
-import type { IFileReader, ReaderInput, ReaderOutput } from "../types";
+import { decodeJpeg, decodePng, Stack as IJSStack } from "image-js-latest";
+
 import { MIME } from "../types";
+
+import type { Image as IJSImage } from "image-js-latest";
+import type { IFileReader, ReaderInput, ReaderOutput } from "../types";
 
 export const basicReader: IFileReader = {
   supportedTypes: [MIME.PNG, MIME.JPEG],

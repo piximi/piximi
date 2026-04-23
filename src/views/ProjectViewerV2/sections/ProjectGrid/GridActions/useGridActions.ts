@@ -1,24 +1,31 @@
-import { intersection } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
+
+import { intersection } from "lodash";
+
 import {
   Deselect as DeselectIcon,
   HighlightAltOutlined as SelectAllEmptyIcon,
   SelectAll as SelectAllIcon,
 } from "@mui/icons-material";
+
+import { useHotkeys } from "hooks";
+
+import { TooltipTitle } from "components/ui";
+
 import { projectSlice } from "@ProjectViewer/state";
 import {
   selectActiveKindState,
   selectActiveSelectedIds,
 } from "@ProjectViewer/state/selectors";
-import { ViewState } from "@ProjectViewer/state/types";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
-import { TooltipTitle } from "components/ui";
-import { useHotkeys } from "hooks";
-import { HotkeyContext } from "utils/enums";
 import {
   selectActiveCategories,
   selectVisibleItems,
 } from "@ProjectViewer/state/reselectors";
+
+import { HotkeyContext } from "utils/enums";
+
+import type { ViewState } from "@ProjectViewer/state/types";
 
 export const useGridActions = (viewState: ViewState) => {
   const dispatch = useDispatch();

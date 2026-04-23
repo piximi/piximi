@@ -1,20 +1,24 @@
-import { CancelToken } from "utils/worker-scheduler/types";
-import { LoadProjectInput, LoadProjectOutput } from "./types";
-import { CustomStore, FileStore, ZipStore } from "utils/file-io/zarr/stores";
-import { ExtractedModelFileMap } from "utils/models/types";
 import JSZip from "jszip";
-import classifierHandler from "utils/models/classification/classifierHandler";
 import { openGroup } from "zarr";
-import { getAttr } from "./zarr/utils";
 import semver from "semver";
+
+import type { CancelToken } from "utils/worker-scheduler/types";
+import type { CustomStore } from "utils/file-io/zarr/stores";
+import { FileStore, ZipStore } from "utils/file-io/zarr/stores";
+import type { ExtractedModelFileMap } from "utils/models/types";
+import classifierHandler from "utils/models/classification/classifierHandler";
+
+import { getAttr } from "./zarr/utils";
 import { readV11 } from "./version-readers/readV11";
 import { convertV11ToV2 } from "./version-converters/v11ToV2";
 import { readV02 } from "./version-readers/readV02";
 import { convertV02ToV11 } from "./version-converters/v02Tov11";
 import { readV01 } from "./version-readers/readV01";
 import { convertV01ToV02 } from "./version-converters/v01Tov02";
-import { V2PiximiState } from "./version-readers/version-types/v2Types";
 import { subProgress } from "./progress";
+
+import type { LoadProjectInput, LoadProjectOutput } from "./types";
+import type { V2PiximiState } from "./version-readers/version-types/v2Types";
 
 type VersionRange = "0.1.0" | "0.2-1.0" | "1.1" | "2" | "3+";
 

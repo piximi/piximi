@@ -1,9 +1,10 @@
 import React from "react";
+
 import { Menu } from "@mui/material";
 
-import { ImportAnnotationsFileMenuItem } from "./ImportAnnotationsFileMenuItem";
-
 import { ProjectFileType } from "utils/file-io/runtime/validators";
+
+import { ImportAnnotationsFileMenuItem } from "./ImportAnnotationsFileMenuItem";
 
 type ImportAnnotationsMenuProps = {
   anchorEl: HTMLElement | null;

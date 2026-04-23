@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+
 import { useSelector } from "react-redux";
 
 import { selectImageSortType } from "@ProjectViewer/state/selectors";
 import { AnnotationSortType, ImageSortType } from "@ProjectViewer/state/types";
-import {
+import type {
   ExtendedAnnotationObject,
   ExtendedImageObject,
 } from "store/dataV2/types";

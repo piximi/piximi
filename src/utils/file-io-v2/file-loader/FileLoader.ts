@@ -1,7 +1,25 @@
-import { Progress, TaskError } from "utils/types";
-import {
+import type {
+  Channel,
+  ChannelMeta,
+  Plane,
+  ImageObject,
+} from "store/dataV2/types";
+
+import type { Progress, TaskError } from "utils/types";
+import type { WorkerScheduler } from "utils/worker-scheduler";
+import { DataConnector } from "utils/data-connector";
+import type { TaskHandle } from "utils/worker-scheduler/types";
+import { TaskPriority } from "utils/worker-scheduler/types";
+import { parseError } from "utils/logUtils";
+import { STORES } from "utils/data-connector/types";
+
+import { analyzeTiff } from "./readers";
+import { FILE } from "./types";
+import { interpretFiles } from "./fileInputUtils";
+import { overallProgress } from "./progress";
+
+import type {
   ChannelResult,
-  FILE,
   FileInterpretationResult,
   FileUploadResult,
   IFileLoader,
@@ -13,15 +31,6 @@ import {
   UploadOptionswithCallbacks,
   UploadStage,
 } from "./types";
-import { WorkerScheduler } from "utils/worker-scheduler";
-import { DataConnector } from "utils/data-connector";
-import { interpretFiles } from "./fileInputUtils";
-import { analyzeTiff } from "./readers";
-import { TaskHandle, TaskPriority } from "utils/worker-scheduler/types";
-import { parseError } from "utils/logUtils";
-import { Channel, ChannelMeta, Plane, ImageObject } from "store/dataV2/types";
-import { STORES } from "utils/data-connector/types";
-import { overallProgress } from "./progress";
 
 export const INITIAL_PROGRESS: Progress = {
   stage: "idle",

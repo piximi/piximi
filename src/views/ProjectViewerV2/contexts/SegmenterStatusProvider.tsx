@@ -1,7 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import type React from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+
 import { useSelector } from "react-redux";
+
 import { selectAllImages } from "store/data/selectors";
 import { selectSegmenterModel } from "store/segmenter/selectors";
+
 import { ModelStatus } from "utils/models/enums";
 
 export enum ErrorReason {

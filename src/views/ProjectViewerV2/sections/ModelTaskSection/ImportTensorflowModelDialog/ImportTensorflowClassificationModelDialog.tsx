@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   Box,
@@ -12,18 +15,18 @@ import {
 
 import { useHotkeys } from "hooks";
 
+import { ToolTipTab } from "components/layout";
+
+import { classifierSlice } from "store/classifierV2";
+import { selectActiveKindId } from "@ProjectViewer/state/selectors";
+
+import { HotkeyContext } from "utils/enums";
+import classifierHandler from "utils/models/classification/classifierHandler";
+import type { SequentialClassifier } from "utils/models/classification";
+
 import { LocalClassifierUpload } from "./LocalFileUpload";
 import { RemoteClassifierUpload } from "./CloudUpload";
 import { ModelFormatSelection } from "./ModelFormatSelection";
-
-import { HotkeyContext } from "utils/enums";
-
-import { ToolTipTab } from "components/layout";
-import classifierHandler from "utils/models/classification/classifierHandler";
-import { SequentialClassifier } from "utils/models/classification";
-import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "store/classifierV2";
-import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 
 type ImportTensorflowClassificationModelDialogProps = {
   onClose: () => void;

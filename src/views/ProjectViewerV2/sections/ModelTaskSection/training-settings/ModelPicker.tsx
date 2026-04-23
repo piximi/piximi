@@ -1,25 +1,29 @@
+import { useEffect, useState } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+
+import type { SelectChangeEvent } from "@mui/material";
 import {
   Box,
   Button,
   ButtonGroup,
   MenuItem,
-  SelectChangeEvent,
   Stack,
   Typography,
 } from "@mui/material";
+
 import { StyledSelect } from "components/inputs/StyledSelect";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { TextFieldWithBlur } from "components/inputs/TextFieldWithBlur";
+import { WithLabel } from "components/inputs";
+
 import { classifierSlice } from "store/classifierV2";
 import {
   selectAvailibleClassifierNames,
   selectActiveClassifierModel,
   selectActiveClassifierModelNameOrArch,
 } from "@ProjectViewer/state/reselectors";
-import { TextFieldWithBlur } from "components/inputs/TextFieldWithBlur";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import { WithLabel } from "components/inputs";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 export const ModelPicker = () => {

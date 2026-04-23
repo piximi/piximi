@@ -1,8 +1,10 @@
 import React from "react";
-import { Menu, MenuItem, MenuList, PopoverReference } from "@mui/material";
+
+import type { PopoverReference } from "@mui/material";
+import { Menu, MenuItem, MenuList } from "@mui/material";
 import { Label as LabelIcon } from "@mui/icons-material";
 
-import { Category } from "store/dataV2/types";
+import type { Category } from "store/dataV2/types";
 
 type ImageCategoryMenuProps = {
   anchorEl?: HTMLElement;

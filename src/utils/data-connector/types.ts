@@ -4,7 +4,7 @@
  */
 export const DB_NAME = "piximi-data";
 export const DB_VERSION = 1;
-import { Channel, DType } from "store/dataV2/types";
+import type { Channel, DType } from "store/dataV2/types";
 export const STORES = {
   EXPERIMENT_DATA: "experiment-data",
   SERIES_DATA: "series-data",

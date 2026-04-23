@@ -4,7 +4,8 @@ import {
   Metric,
   OptimizationAlgorithm,
 } from "utils/models/enums";
-import { V01ClassifierState } from "./version-types/v01Types";
+
+import type { V01ClassifierState } from "./version-types/v01Types";
 
 export const initialClassifierStateV01_02: V01ClassifierState = {
   modelStatus: 0,

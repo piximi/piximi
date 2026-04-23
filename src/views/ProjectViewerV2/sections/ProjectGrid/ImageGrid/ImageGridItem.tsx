@@ -2,13 +2,13 @@ import { memo } from "react";
 
 import { Box } from "@mui/material";
 
+import { useRenderedSrc } from "hooks/useRenderedSrcs";
+
 import { isUnknownCategory } from "store/data/utils";
+import type { ExtendedImageObject } from "store/dataV2/types";
 
 import { Partition } from "utils/models/enums";
 
-import { ExtendedImageObject } from "store/dataV2/types";
-
-import { useRenderedSrc } from "hooks/useRenderedSrcs";
 import { getIconPosition, imageStyle } from "../gridItemUtils";
 import { useGridItemStyle } from "../useGridItemStyle";
 import { ItemDetailContainer } from "../ItemDetailContainer";

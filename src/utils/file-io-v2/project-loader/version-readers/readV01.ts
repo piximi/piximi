@@ -1,31 +1,34 @@
-import { Group, openGroup } from "zarr";
-import { RawArray } from "zarr/types/rawArray";
+import { openGroup } from "zarr";
 
+import { initialState as initialProjectState } from "store/project/projectSlice";
+import type { BitDepth } from "store/data/types";
+import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
+
+import { Partition } from "utils/models/enums";
+import type { CustomStore } from "utils/file-io/zarr/stores";
+
+import { ZARR_V01_IMAGE } from "../zarr/types";
 import {
   getAttr,
   getDataset,
   getDatasetSelection,
   getGroup,
 } from "../zarr/utils";
-import { ZARR_V01_IMAGE } from "../zarr/types";
-
-import { initialState as initialProjectState } from "store/project/projectSlice";
-import { BitDepth } from "store/data/types";
-import { Partition } from "utils/models/enums";
-import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
-import { CustomStore } from "utils/file-io/zarr/stores";
-import {
-  V01RawAnnotationObject,
-  V01Category,
-  V01RawImageObject,
-  V01PiximiState,
-} from "./version-types/v01Types";
 import {
   deserializeColorsRaw,
   deserializeSegmenterGroup,
   v01_02_deserializeClassifierGroup,
 } from "./common";
 import { subProgress } from "../progress";
+
+import type {
+  V01RawAnnotationObject,
+  V01Category,
+  V01RawImageObject,
+  V01PiximiState,
+} from "./version-types/v01Types";
+import type { RawArray } from "zarr/types/rawArray";
+import type { Group } from "zarr";
 
 const STAGES = {
   metadata: { start: 0.0, end: 0.05 },

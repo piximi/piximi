@@ -1,22 +1,23 @@
+import { decodeStack, Stack as IJSStack } from "image-js-latest";
+
+import type { BitDepth, ChannelMeta, Plane } from "store/dataV2/types";
+import { generateUUID } from "store/dataV2/utils";
+import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
+
+import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
+import { processChannel } from "utils/channelUtils";
+import { Partition } from "utils/models/enums";
+
+import type { DimensionConfig 
+} from "./types";
 import {
-  decodeStack,
-  Stack as IJSStack,
-  Image as IJSImage,
-} from "image-js-latest";
-import {
-  DimensionConfig,
   type ChannelResult,
   type ImageResult,
   type ImageSeriesResult,
-  type ReadStage,
+  type ReadStage 
 } from "./types";
-import { BitDepth } from "store/dataV2/types";
-import { ChannelMeta, Plane } from "store/dataV2/types";
-import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
-import { Partition } from "utils/models/enums";
-import { generateUUID } from "store/dataV2/utils";
-import { processChannel } from "utils/channelUtils";
-import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
+
+import type { Image as IJSImage } from "image-js-latest";
 
 // ============================================================
 // Image Loading

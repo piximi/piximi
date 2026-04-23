@@ -1,21 +1,23 @@
-import { Box, Dialog, DialogContent, Tabs } from "@mui/material";
-
-import { ModelSummaryTable } from "@ProjectViewer/sections/ModelTaskSection/data-display";
-import { DialogTransitionSlide } from "components/dialogs";
-
-import { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
-
-import { ToolTipTab } from "components/layout";
 import { useEffect, useMemo, useState } from "react";
-import { TrainingSettings } from "../training-settings/TrainingSettings";
-import TrainingPlots from "./TrainingPlots";
-import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 
 import { useSelector } from "react-redux";
+
+import { Box, Dialog, DialogContent, Tabs } from "@mui/material";
+
+import { ToolTipTab } from "components/layout";
+import { DialogTransitionSlide } from "components/dialogs";
+
+import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
+import { ModelSummaryTable } from "@ProjectViewer/sections/ModelTaskSection/data-display";
 import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
 import { ClassMapDialogProvider } from "@ProjectViewer/hooks/useClassMapDialog";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+
 import { ModelStatus } from "utils/models/enums";
+
+import TrainingPlots from "./TrainingPlots";
+import { TrainingSettings } from "../training-settings/TrainingSettings";
+import { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;

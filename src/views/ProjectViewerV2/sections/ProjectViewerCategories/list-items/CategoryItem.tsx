@@ -1,4 +1,5 @@
 import React from "react";
+
 import { Tooltip } from "@mui/material";
 import {
   Label as LabelIcon,
@@ -8,11 +9,11 @@ import {
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { CountChip } from "components/ui/CountChip";
 
-import { APPLICATION_COLORS } from "utils/constants";
-
-import { Category } from "store/dataV2/types";
+import type { Category } from "store/dataV2/types";
 import { useParameterizedSelector } from "store/hooks";
 import { selectEntityCountByCategoryId } from "store/dataV2/selectors";
+
+import { APPLICATION_COLORS } from "utils/constants";
 
 type CategoryItemProps = {
   showHK?: boolean;

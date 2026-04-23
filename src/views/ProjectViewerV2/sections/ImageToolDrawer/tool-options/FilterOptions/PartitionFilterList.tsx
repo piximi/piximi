@@ -1,10 +1,12 @@
+import { useCallback, useMemo } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectActiveViewState } from "@ProjectViewer/state/selectors";
+import { projectSlice } from "@ProjectViewer/state";
 
 import { Partition } from "utils/models/enums";
-import { projectSlice } from "@ProjectViewer/state";
-import { useCallback, useMemo } from "react";
+
 import { FilterList } from "./FilterList";
 
 export const PartitionFilterList = () => {

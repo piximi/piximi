@@ -1,12 +1,21 @@
-import { EntityState } from "@reduxjs/toolkit";
+import { Image as IJSImage } from "image-js-latest";
+
+import { generateUUID } from "store/dataV2/utils";
+import type { BitDepth } from "store/dataV2/types";
 import {
-  V11Category,
-  V11Kind,
-  V11PiximiState,
-  V11RawAnnotationObject,
-  V11RawImageObject,
-} from "../version-readers/version-types/v11Types";
-import {
+  UNKNOWN_KIND,
+  UNKNOWN_KIND_CATEGORY,
+  UNKNOWN_KIND_CATEGORY_ID,
+  UNKNOWN_KIND_ID,
+} from "store/dataV2/constants";
+
+import { processChannel } from "utils/channelUtils";
+import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
+import { representsUnknown } from "utils/stringUtils";
+
+import { subProgress } from "../progress";
+
+import type {
   V2AnnotationObject,
   V2AnnotationVolume,
   V2Category,
@@ -20,19 +29,14 @@ import {
   V2PiximiState,
   V2Plane,
 } from "../version-readers/version-types/v2Types";
-import { generateUUID } from "store/dataV2/utils";
-import { Image as IJSImage } from "image-js-latest";
-import { processChannel } from "utils/channelUtils";
-import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
-import { BitDepth } from "store/data/types";
-import { subProgress } from "../progress";
-import {
-  UNKNOWN_KIND,
-  UNKNOWN_KIND_CATEGORY,
-  UNKNOWN_KIND_CATEGORY_ID,
-  UNKNOWN_KIND_ID,
-} from "store/dataV2/constants";
-import { representsUnknown } from "utils/stringUtils";
+import type {
+  V11Category,
+  V11Kind,
+  V11PiximiState,
+  V11RawAnnotationObject,
+  V11RawImageObject,
+} from "../version-readers/version-types/v11Types";
+import type { EntityState } from "@reduxjs/toolkit";
 
 const STAGES = {
   kinds: { start: 0, end: 0.1 },
@@ -175,7 +179,7 @@ function convertThings(
   const planeIdx2planeId: Record<string, Record<number, string>> = {};
   let imageIdx = 0;
   for (const image of v11Images) {
-    const bitDepth = image.bitDepth;
+    const bitDepth = image.bitDepth as BitDepth;
     const { buffer, shape, dtype } = image.tensorData;
     const [planes, height, width, channels] = shape;
     const v2Series: V2ImageSeries = {

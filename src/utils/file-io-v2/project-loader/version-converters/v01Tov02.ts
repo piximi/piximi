@@ -3,24 +3,26 @@ import {
   UNKNOWN_IMAGE_CATEGORY_COLOR,
   UNKNOWN_IMAGE_CATEGORY_ID,
 } from "store/dataV2/constants";
-
 import { generateUUID } from "store/dataV2/utils";
+import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
+
 import { Partition } from "utils/models/enums";
-import {
+import { representsUnknown } from "utils/stringUtils";
+
+import { subProgress } from "../progress";
+
+import type {
   V01Category,
   V01PiximiState,
   V01RawImageObject,
 } from "../version-readers/version-types/v01Types";
-import {
+import type {
   V02Category,
   V02Kind,
   V02PiximiState,
   V02RawAnnotationObject,
   V02RawImageObject,
 } from "../version-readers/version-types/v02Types";
-import { subProgress } from "../progress";
-import { representsUnknown } from "utils/stringUtils";
-import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 
 const STAGES = {
   labels: { start: 0.0, end: 0.2 },

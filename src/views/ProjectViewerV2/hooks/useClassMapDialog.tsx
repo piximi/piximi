@@ -1,3 +1,9 @@
+import type { ReactElement } from "react";
+import React, { useEffect, useState } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+
+import type { SelectChangeEvent } from "@mui/material";
 import {
   Button,
   Checkbox,
@@ -9,22 +15,22 @@ import {
   FormControl,
   FormControlLabel,
   MenuItem,
-  SelectChangeEvent,
   Stack,
   Typography,
 } from "@mui/material";
-import React, { ReactElement, useEffect, useState } from "react";
-import { Category } from "store/data/types";
+
 import { StyledSelect } from "components/inputs/StyledSelect";
+
+import type { Category } from "store/data/types";
 import { selectActiveKindId } from "store/project/selectors";
-import { useDispatch, useSelector } from "react-redux";
 import { generateCategory } from "store/data/utils";
 import { selectAvaliableCategoryColors } from "store/project/reselectors";
-import { getRandomInt } from "utils/dataUtils";
-import { isObjectEmpty } from "utils/objectUtils";
 import { CATEGORY_COLORS } from "store/data/constants";
 import { dataSlice } from "store/data";
-import { ModelClassMap } from "store/types";
+import type { ModelClassMap } from "store/types";
+
+import { getRandomInt } from "utils/dataUtils";
+import { isObjectEmpty } from "utils/objectUtils";
 
 const ClassMapDialog = ({
   open,

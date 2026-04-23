@@ -1,6 +1,7 @@
 import React from "react";
 
 import { BaseMenu } from "components/ui/BaseMenu";
+
 import { OpenImageMenuItem } from "./OpenImageMenuItem";
 
 type OpenImageMenuProps = {

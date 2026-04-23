@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { Model } from "utils/models/Model";
+import type { Model } from "utils/models/Model";
 import { modelInfo } from "utils/models/segmentation";
 
 interface ModelOptionType {

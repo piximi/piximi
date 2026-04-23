@@ -1,16 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { dataSliceV2 } from "./dataSliceV2";
+
 import type { RootState } from "store/rootReducer";
-import type {
-  ImageSeries,
-  ImageObject,
-  Kind,
-  Category,
-  AnnotationVolume,
-  AnnotationObject,
-  Plane,
-  Channel,
-} from "./types";
+
+import { Partition } from "utils/models/enums";
+import { STORES } from "utils/data-connector/types";
+
 import { DTYPES } from "./types";
 import {
   selectAllImageSeries,
@@ -46,8 +40,18 @@ import {
   selectActiveChannels,
   selectRepresentativeImages,
 } from "./selectors";
-import { Partition } from "utils/models/enums";
-import { STORES } from "utils/data-connector/types";
+import { dataSliceV2 } from "./dataSliceV2";
+
+import type {
+  ImageSeries,
+  ImageObject,
+  Kind,
+  Category,
+  AnnotationVolume,
+  AnnotationObject,
+  Plane,
+  Channel,
+} from "./types";
 
 function makeState(): RootState {
   const dataV2 = dataSliceV2.reducer(undefined, { type: "" });

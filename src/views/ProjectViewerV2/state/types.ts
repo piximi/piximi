@@ -1,10 +1,11 @@
-import { Thing } from "store/data/types";
-import {
+import type { Thing } from "store/data/types";
+import type {
   ExtendedAnnotationObject,
   ExtendedImageObject,
 } from "store/dataV2/types";
-import { ThingSortKey } from "utils/enums";
-import { FilterType } from "utils/types";
+
+import type { ThingSortKey } from "utils/enums";
+import type { FilterType } from "utils/types";
 
 export enum ImageSortType {
   None = "None",

@@ -1,31 +1,31 @@
 import { openGroup } from "zarr";
-import { RawArray } from "zarr/types/rawArray";
-
-import { Group } from "zarr";
-
-import { getAttr, getDataset, getGroup } from "../zarr/utils";
 
 import { initialState as initialProjectState } from "store/project/projectSlice";
-import { BitDepth } from "store/data/types";
-import { Partition } from "utils/models/enums";
-import { CustomStore } from "utils/file-io/zarr/stores";
-import { EntityState } from "@reduxjs/toolkit";
+import type { BitDepth } from "store/data/types";
 
+import type { Partition } from "utils/models/enums";
+import type { CustomStore } from "utils/file-io/zarr/stores";
+import { logger } from "utils/logUtils";
+
+import { getAttr, getDataset, getGroup } from "../zarr/utils";
 import {
+  deserializeColorsRaw,
+  deserializeSegmenterGroup,
+  v11_v2_deserializeClassifierGroup,
+} from "./common";
+import { subProgress } from "../progress";
+
+import type {
   V11Category,
   V11Kind,
   V11PiximiState,
   V11RawAnnotationObject,
   V11RawImageObject,
 } from "./version-types/v11Types";
-import { logger } from "utils/logUtils";
-import {
-  deserializeColorsRaw,
-  deserializeSegmenterGroup,
-  v11_v2_deserializeClassifierGroup,
-} from "./common";
-import { RawData } from "../types";
-import { subProgress } from "../progress";
+import type { EntityState } from "@reduxjs/toolkit";
+import type { RawArray } from "zarr/types/rawArray";
+import type { Group } from "zarr";
+import type { RawData } from "../types";
 
 const STAGES = {
   metadata: { start: 0.0, end: 0.05 },

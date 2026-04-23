@@ -1,3 +1,7 @@
+import { useMemo, useState } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import {
   Checkbox,
@@ -8,9 +12,13 @@ import {
   IconButton,
   Stack,
 } from "@mui/material";
+
+import { useNumberField } from "hooks";
+
 import { FunctionalDivider } from "components/ui";
-import { useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { WithLabel } from "components/inputs";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
 import { classifierSlice } from "store/classifierV2";
 import {
   selectActiveClassifierModel,
@@ -18,11 +26,9 @@ import {
   selectClassifierTrainingPercentage,
 } from "@ProjectViewer/state/reselectors";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
-import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
-import { WithLabel } from "components/inputs";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import { useNumberField } from "hooks";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
+import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 
 export const DataPartitioningSettings = () => {
   const dispatch = useDispatch();

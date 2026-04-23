@@ -1,8 +1,7 @@
 import React from "react";
-import {
-  TextFieldWithBlur,
-  TextFieldWithBlurProps,
-} from "components/inputs/TextFieldWithBlur";
+
+import type { TextFieldWithBlurProps } from "components/inputs/TextFieldWithBlur";
+import { TextFieldWithBlur } from "components/inputs/TextFieldWithBlur";
 
 export const ModelSettingsTextField = (props: TextFieldWithBlurProps) => {
   return (

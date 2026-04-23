@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
+
 import { IconButton, List, Stack } from "@mui/material";
 import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 
@@ -7,25 +9,25 @@ import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs";
 import { CategoryItemMenu } from "components/ui/CategoryItemMenuV2";
-import { CategoryItem } from "./list-items/CategoryItem";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { FunctionalDivider } from "components/ui";
+import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
+import { CategoryDialog } from "components/dialogs/CategoryDialogV2";
 
 import { projectSlice } from "@ProjectViewer/state";
 import {
   selectActiveSelectedIds,
   selectActiveView,
+  selectActiveKindId,
 } from "@ProjectViewer/state/selectors";
-import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { selectActiveCategories } from "@ProjectViewer/state/reselectors";
+import type { Category } from "store/dataV2/types";
+import { generateCategory } from "store/dataV2/utils";
+import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 
 import { HotkeyContext } from "utils/enums";
 
-import { Category } from "store/dataV2/types";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { FunctionalDivider } from "components/ui";
-import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
-import { generateCategory } from "store/dataV2/utils";
-import { dataSliceV2 } from "store/dataV2/dataSliceV2";
-import { CategoryDialog } from "components/dialogs/CategoryDialogV2";
+import { CategoryItem } from "./list-items/CategoryItem";
 
 export const ProjectViewerCategories = () => {
   const dispatch = useDispatch();

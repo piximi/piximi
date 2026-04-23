@@ -1,4 +1,5 @@
 import React from "react";
+
 import { useDispatch } from "react-redux";
 
 import {
@@ -7,6 +8,7 @@ import {
   VisibilityOff as VisibilityOffIcon,
   Check as CheckIcon,
 } from "@mui/icons-material";
+import { List } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
@@ -14,10 +16,9 @@ import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { ListItemHoldButton } from "components/ui/ListItemHoldButton";
 
 import { projectSlice } from "@ProjectViewer/state";
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
 import { ModelStatus, Partition } from "utils/models/enums";
-import { List } from "@mui/material";
-import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
 export const PredictionListItems = () => {
   const dispatch = useDispatch();

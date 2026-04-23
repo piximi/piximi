@@ -1,15 +1,22 @@
 import { useLayoutEffect, useState } from "react";
+
 import { useDispatch } from "react-redux";
+
 import { Box, IconButton, Menu, Slider } from "@mui/material";
 import {
   ZoomIn as ZoomInIcon,
   Add as AddIcon,
   Remove as RemoveIcon,
 } from "@mui/icons-material";
+
 import { useMenu, useMobileView } from "hooks";
-import { applicationSettingsSlice } from "store/applicationSettings";
+
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
+import { applicationSettingsSlice } from "store/applicationSettings";
+
 import { DEFAULT_GRID_ITEM_WIDTH, DIMENSIONS, GRID_GAP } from "utils/constants";
+
 import { actionButtonStyle } from "./utils";
 
 const minZoom = 0.6;

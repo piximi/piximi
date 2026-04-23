@@ -1,28 +1,31 @@
-import { ColorsRaw } from "utils/types";
-import { getAttr, getDatasetSelection, getGroup } from "../zarr/utils";
-import { Group } from "zarr";
-import { V01ClassifierState } from "./version-types/v01Types";
+import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
+
+import type { ColorsRaw } from "utils/types";
 import {
   CropSchema,
   LossFunction,
   Metric,
   OptimizationAlgorithm,
 } from "utils/models/enums";
-import {
+import type {
   ClassifierEvaluationResultType,
   CropOptions,
   FitOptions,
   RescaleOptions,
 } from "utils/models/types";
-import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
-import {
+
+import { getAttr, getDatasetSelection, getGroup } from "../zarr/utils";
+import { initialClassifierStateV01_02 } from "./constants";
+
+import type { V01ClassifierState } from "./version-types/v01Types";
+import type {
   V11ClassifierState,
   V11Kind,
   V11KindClassifierDict,
   V11ModelClassMap,
   V11ModelInfo,
 } from "./version-types/v11Types";
-import { initialClassifierStateV01_02 } from "./constants";
+import type { Group } from "zarr";
 // ============================================================
 // Color deserialization (raw arrays, no Tensor)
 // ============================================================

@@ -1,8 +1,10 @@
-import React from "react";
+import type React from "react";
+
 import { ListItemText, MenuItem } from "@mui/material";
 
-import { useConfirmReplaceDialog } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 import { useProjectLoader } from "hooks";
+
+import { useConfirmReplaceDialog } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 
 //TODO: MenuItem??
 

@@ -1,11 +1,13 @@
+import { useCallback, useMemo } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectActiveViewState } from "@ProjectViewer/state/selectors";
-import { useCallback, useMemo } from "react";
 import { projectSlice } from "@ProjectViewer/state";
-import { Category } from "store/data/types";
-import { FilterList } from "./FilterList";
+import type { Category } from "store/data/types";
 import { selectAllCategories } from "store/dataV2/selectors";
+
+import { FilterList } from "./FilterList";
 
 export const CategoryFilterList = () => {
   const dispatch = useDispatch();

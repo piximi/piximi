@@ -1,6 +1,6 @@
 import JSZip from "jszip";
-import { ValidStoreType } from "zarr/types/storage/types";
-import { AsyncStore } from "zarr/types/storage/types";
+
+import type { ValidStoreType, AsyncStore } from "zarr/types/storage/types";
 
 export class ZipStore implements AsyncStore<ValidStoreType> {
   private _rootName: string;

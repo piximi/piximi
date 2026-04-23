@@ -1,9 +1,9 @@
-import {
+import type {
   ImportImageInput,
   LoadAndPrepareOutput,
   StageName,
 } from "utils/file-io-v2/file-loader/types";
-import {
+import type {
   LoadProjectInput,
   LoadProjectOutput,
 } from "utils/file-io-v2/project-loader/types";

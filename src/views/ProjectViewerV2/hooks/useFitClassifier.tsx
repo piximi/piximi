@@ -1,6 +1,8 @@
-import { deepClone } from "@mui/x-data-grid/internals";
 import React, { useCallback } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
+
+import { deepClone } from "@mui/x-data-grid/internals";
 
 import { dataSlice } from "store/data";
 import { classifierSlice } from "store/classifierV2";
@@ -9,32 +11,31 @@ import {
   selectClassifierModelInfo,
   selectActiveClassifierModelNameOrArch,
 } from "@ProjectViewer/state/reselectors";
-
 import {
   selectActiveKnownCategories,
   selectActiveThings,
 } from "store/project/reselectors";
 import { selectActiveKindId } from "store/project/selectors";
-
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
-import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
+import type { Thing, Kind, Category } from "store/data/types";
+import type { ModelClassMap, ModelInfo } from "store/types";
 
 import { getStackTraceFromError } from "utils/logUtils";
 import classifierHandler from "utils/models/classification/classifierHandler";
 import { ModelStatus, Partition } from "utils/models/enums";
 import { AlertType } from "utils/enums";
-import { SequentialClassifier } from "utils/models/classification";
-import { Thing, Kind, Category } from "store/data/types";
-import { AlertState } from "utils/types";
-import { ModelClassMap, ModelInfo } from "store/types";
-import { useClassMapDialog } from "./useClassMapDialog";
+import type { SequentialClassifier } from "utils/models/classification";
+import type { AlertState } from "utils/types";
 import {
   prepareClasses,
   prepareModel,
   prepareTrainingData,
   trainModel,
 } from "utils/models/classification/utils";
+
+import { useClassMapDialog } from "./useClassMapDialog";
+import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
+import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
 
 export const useFitClassifier = () => {
   const dispatch = useDispatch();

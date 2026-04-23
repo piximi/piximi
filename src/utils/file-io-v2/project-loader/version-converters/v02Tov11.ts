@@ -1,10 +1,11 @@
 import { v11_v2_GetDefaultModelInfo } from "../version-readers/common";
-import {
+
+import type {
   V02ClassifierState,
   V02Kind,
   V02PiximiState,
 } from "../version-readers/version-types/v02Types";
-import {
+import type {
   V11ClassifierState,
   V11KindClassifierDict,
   V11OptimizerSettings,

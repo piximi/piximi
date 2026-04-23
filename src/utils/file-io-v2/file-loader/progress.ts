@@ -1,4 +1,4 @@
-import { StageName } from "./types";
+import type { StageName } from "./types";
 
 const STAGE_WEIGHTS: Record<StageName, { start: number; end: number }> = {
   analyze: { start: 0, end: 0.1 },

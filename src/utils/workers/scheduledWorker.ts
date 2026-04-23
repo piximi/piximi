@@ -7,6 +7,7 @@ import type {
 import "./workerPolyfills"; // Must be first — polyfills `window` for zarr/imjoy-rpc
 
 import * as Comlink from "comlink";
+
 import { loadImage } from "utils/file-io-v2/file-loader/loadImage";
 import { loadProject } from "utils/file-io-v2/project-loader/loadProject";
 

@@ -1,21 +1,31 @@
-import {
+import type {
+  AnnotationObject,
+  ChannelMeta,
+  ImageObject,
+  ImageSeries,
+} from "store/dataV2/types";
+
+import type { Progress, TaskError } from "utils/types";
+import { INITIAL_PROGRESS } from "utils/types";
+import type { WorkerScheduler } from "utils/worker-scheduler";
+import { DataConnector } from "utils/data-connector";
+import type { TaskHandle } from "utils/worker-scheduler/types";
+import { TaskPriority } from "utils/worker-scheduler/types";
+import type { StorageInput } from "utils/data-connector/types";
+import { STORES } from "utils/data-connector/types";
+import { parseError } from "utils/logUtils";
+import type { ExtractedModelFileMap } from "utils/models/types";
+import classifierHandler from "utils/models/classification/classifierHandler";
+import type { SequentialClassifier } from "utils/models/classification";
+
+import type { V2Channel } from "./version-readers/version-types/v2Types";
+import type {
   DeserializedProject,
   DeserializedProjectResult,
   IProjectLoader,
   LoadProjectOutput,
   UploadStage,
 } from "./types";
-
-import { INITIAL_PROGRESS, Progress, TaskError } from "utils/types";
-import { V2Channel } from "./version-readers/version-types/v2Types";
-import { WorkerScheduler } from "utils/worker-scheduler";
-import { DataConnector } from "utils/data-connector";
-import { TaskHandle, TaskPriority } from "utils/worker-scheduler/types";
-import { StorageInput, STORES } from "utils/data-connector/types";
-import { parseError } from "utils/logUtils";
-import { ExtractedModelFileMap } from "utils/models/types";
-import classifierHandler from "utils/models/classification/classifierHandler";
-import { SequentialClassifier } from "utils/models/classification";
 
 const STAGES = {
   loadProject: { start: 0.0, end: 0.75 },
@@ -78,15 +88,21 @@ export class ProjectLoader implements IProjectLoader {
         ...v2Raw,
         data: {
           experiment: v2Data.experiment,
-          imageSeries: Object.values(v2Data.imageSeries.entities),
-          channelMetas: Object.values(v2Data.channelMetas.entities),
+          imageSeries: Object.values(
+            v2Data.imageSeries.entities,
+          ) as ImageSeries[],
+          channelMetas: Object.values(
+            v2Data.channelMetas.entities,
+          ) as ChannelMeta[],
           kinds: Object.values(v2Data.kinds.entities),
           categories: Object.values(v2Data.categories.entities),
-          images: Object.values(v2Data.images.entities),
+          images: Object.values(v2Data.images.entities) as ImageObject[],
           annotationVolumes: Object.values(v2Data.annotationVolumes.entities),
           planes: Object.values(v2Data.planes.entities),
           channels,
-          annotations: Object.values(v2Data.annotations.entities),
+          annotations: Object.values(
+            v2Data.annotations.entities,
+          ) as AnnotationObject[],
         },
       };
 

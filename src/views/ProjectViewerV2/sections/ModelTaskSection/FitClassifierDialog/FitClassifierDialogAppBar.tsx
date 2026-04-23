@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -23,18 +24,19 @@ import {
 import { useDialog } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
+import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 
 import { classifierSlice } from "store/classifierV2";
 import { selectShowClearPredictionsWarning } from "store/classifierV2/selectors";
 import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
+import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import useFitClassifier from "@ProjectViewer/hooks/useFitClassifier";
 
 import { APPLICATION_COLORS } from "utils/constants";
 import { ModelStatus } from "utils/models/enums";
-import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
-import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
-import useFitClassifier from "@ProjectViewer/hooks/useFitClassifier";
+
+import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;

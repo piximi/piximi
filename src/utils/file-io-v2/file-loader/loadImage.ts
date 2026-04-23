@@ -1,15 +1,17 @@
-import { CancelToken } from "utils/worker-scheduler/types";
-import type {
-  ImportImageInput,
-  LoadAndPrepareOutput,
-  ReadStage,
-} from "./types";
+import type { CancelToken } from "utils/worker-scheduler/types";
+
 import { getReader } from "./readers";
 import {
   applyDimensionsToStack,
   experimentFromStack,
 } from "./imageReaderUtils";
-import { BitDepth } from "image-js-latest";
+
+import type { BitDepth } from "image-js-latest";
+import type {
+  ImportImageInput,
+  LoadAndPrepareOutput,
+  ReadStage,
+} from "./types";
 
 export async function loadImage(
   input: ImportImageInput,

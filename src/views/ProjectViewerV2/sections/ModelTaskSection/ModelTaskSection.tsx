@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
+
 import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
-import { ClassifierSection } from "./ClassifierSection";
-import { SegmenterSection } from "./SegmenterSection";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
 import { ClassifierStatusProvider } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { ClassifierHistoryProvider } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 import { ClassMapDialogProvider } from "@ProjectViewer/hooks/useClassMapDialog";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { SegmenterStatusProvider } from "@ProjectViewer/contexts/SegmenterStatusProvider";
+
+import { SegmenterSection } from "./SegmenterSection";
+import { ClassifierSection } from "./ClassifierSection";
 
 export const ModelTaskSection = () => {
   const [learningTask, setLearningTask] = useState<

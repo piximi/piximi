@@ -1,5 +1,7 @@
 import React from "react";
+
 import { useDispatch, useSelector } from "react-redux";
+
 import { MenuItem, Typography } from "@mui/material";
 
 import { useDialogHotkey, useMobileView } from "hooks";
@@ -10,10 +12,10 @@ import { CreateKindDialog } from "components/dialogs";
 import { projectSlice } from "@ProjectViewer/state";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { selectKindIds } from "store/dataV2/selectors";
+import { dataSliceV2 } from "store/dataV2/dataSliceV2";
+import type { AnnotationCategory, Kind } from "store/dataV2/types";
 
 import { HotkeyContext } from "utils/enums";
-import { dataSliceV2 } from "store/dataV2/dataSliceV2";
-import { AnnotationCategory, Kind } from "store/dataV2/types";
 
 export const AddKindMenu = ({
   anchor,

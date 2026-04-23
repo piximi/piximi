@@ -1,4 +1,9 @@
+import { useMemo, useState } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import type { SelectChangeEvent } from "@mui/material";
 import {
   Checkbox,
   Collapse,
@@ -8,12 +13,15 @@ import {
   Grid2 as Grid,
   IconButton,
   MenuItem,
-  SelectChangeEvent,
   Stack,
 } from "@mui/material";
+
+import { useNumberField } from "hooks";
+
 import { FunctionalDivider } from "components/ui";
-import { useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { StyledSelect, WithLabel } from "components/inputs";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
 import { classifierSlice } from "store/classifierV2";
 import {
   selectClassifierCropOptions,
@@ -23,14 +31,12 @@ import {
   selectClassifierRescaleOptions,
 } from "@ProjectViewer/state/reselectors";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
+
 import { enumKeys } from "utils/objectUtils";
 import { CropSchema } from "utils/models/enums";
-import { CropOptions, RescaleOptions } from "utils/models/types";
+import type { CropOptions, RescaleOptions } from "utils/models/types";
+
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
-import { StyledSelect } from "components/inputs";
-import { WithLabel } from "components/inputs";
-import { useNumberField } from "hooks";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 const RowColInputOptions = { min: 20 };
 const InputShapeField = ({ disabled }: { disabled: boolean }) => {

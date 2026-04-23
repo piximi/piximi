@@ -1,15 +1,19 @@
-import React, {
+import type React from "react";
+import {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
+
 import { useSelector } from "react-redux";
+
 import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
+
 import { logger } from "utils/logUtils";
-import { Points } from "utils/types";
-import { TrainingCallbacks } from "utils/models/types";
+import type { Points } from "utils/types";
+import type { TrainingCallbacks } from "utils/models/types";
 
 type HistoryData = {
   categoricalAccuracy: Points;

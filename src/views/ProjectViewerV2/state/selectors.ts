@@ -1,6 +1,8 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import {
+import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
+
+import type {
   AnnotationGridState,
   ImageFilters,
   ImageGridState,
@@ -8,7 +10,6 @@ import {
   ProjectState,
   ViewState,
 } from "./types";
-import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
 
 export const selectProject = ({
   projectV2: project,

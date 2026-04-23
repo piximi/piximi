@@ -1,9 +1,12 @@
 import React from "react";
+
 import { ListItemText, MenuItem } from "@mui/material";
 
-import { useFileUploadContext } from "contexts";
 import { useFileLoader } from "hooks";
+
 import { TiffConfigDialog } from "components/dialogs";
+
+import { useFileUploadContext } from "contexts";
 
 type OpenImageMenuItemProps = {
   onCloseMenu: () => void;

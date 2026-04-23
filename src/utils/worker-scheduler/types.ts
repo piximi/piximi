@@ -1,6 +1,6 @@
 // src/workers/scheduler/types.ts
 
-import { TaskMap } from "./taskMap";
+import type { TaskMap } from "./taskMap";
 
 export enum TaskPriority {
   CRITICAL = 0,

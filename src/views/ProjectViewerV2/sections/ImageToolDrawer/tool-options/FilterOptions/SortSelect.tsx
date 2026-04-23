@@ -1,11 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Box, MenuItem, SelectChangeEvent } from "@mui/material";
+
+import type { SelectChangeEvent } from "@mui/material";
+import { Box, MenuItem } from "@mui/material";
 
 import { StyledSelect, WithLabel } from "components/inputs";
 
 import { projectSlice } from "@ProjectViewer/state";
 import { selectActiveViewState } from "@ProjectViewer/state/selectors";
-
 import { AnnotationSortType, ImageSortType } from "@ProjectViewer/state/types";
 
 export const SortSelect = () => {

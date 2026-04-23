@@ -1,4 +1,3 @@
-import type { Stack as IJSStack } from "image-js-latest";
 import type {
   Channel,
   ChannelMeta,
@@ -7,7 +6,10 @@ import type {
   Plane,
   Shape,
 } from "store/dataV2/types";
-import { Progress } from "utils/types";
+
+import type { Progress } from "utils/types";
+
+import type { Stack as IJSStack } from "image-js-latest";
 export type AnalyzeTiffOutput = {
   frameCount: number;
   isMultiFrame: boolean;
