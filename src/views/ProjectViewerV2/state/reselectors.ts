@@ -10,6 +10,7 @@ import {
 import {
   selectActiveKindId,
   selectActiveThingFilters,
+  selectActiveView,
   selectKindTabFilters,
   selectSelectedThingIds,
 } from "./selectors";
@@ -20,7 +21,26 @@ import { Partition } from "utils/models/enums";
 
 import { AnnotationObject, ImageObject, Thing } from "store/data/types";
 import { CATEGORY_COLORS } from "store/data/constants";
+import { selectAllCategories } from "store/dataV2/selectors";
+import { representsUnknown } from "utils/stringUtils";
 
+export const selectActiveCategories = createSelector(
+  selectActiveView,
+  selectActiveKindId,
+  selectAllCategories,
+  (view, kindId, categories) =>
+    categories
+      .filter((c) =>
+        view === "images"
+          ? c.type === "image"
+          : c.type === "annotation" && c.kindId === kindId,
+      )
+      .sort((c) => (representsUnknown(c.id) ? -1 : 1)),
+);
+
+/*
+~~ OLD
+*/
 export const selectVisibleKinds = createSelector(
   selectKindTabFilters,
   selectAllKindIds,
@@ -42,16 +62,6 @@ export const selectActiveUnknownCategoryId = createSelector(
   (activeKind) => {
     if (!activeKind) return;
     return activeKind.unknownCategoryId;
-  },
-);
-
-export const selectActiveCategories = createSelector(
-  [selectKindDictionary, selectCategoriesDictionary, selectActiveKindId],
-  (kindDict, categoriesDict, kind) => {
-    if (!kindDict[kind]) return [];
-    const categoriesOfKind = kindDict[kind]!.categories;
-
-    return categoriesOfKind.map((catId) => categoriesDict[catId]!);
   },
 );
 

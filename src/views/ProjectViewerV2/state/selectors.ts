@@ -29,6 +29,14 @@ export const selectActiveView = ({
   return project.activeView;
 };
 
+export const selectProjectImageChannels = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}) => {
+  return project.imageChannels;
+};
+
 export const selectProjectName = ({
   projectV2: project,
 }: {
@@ -38,7 +46,7 @@ export const selectProjectName = ({
 };
 
 /*
-IMAGES
+~~ IMAGE GRID
 */
 export const selectImageGridState = ({
   projectV2: project,
@@ -80,7 +88,7 @@ export const selectImageSortType = ({
 };
 
 /*
-SELECTED ANNOTATIONS
+~~ ANNOTATION GRID
 */
 
 export const selectAnnotationGridState = ({
@@ -117,8 +125,16 @@ export const selectActiveKindState = ({
   return project.annotationGridState.kindStates[activeStateId];
 };
 
+export const selectActiveKindId = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}) => {
+  return project.annotationGridState.activeKindId;
+};
+
 /*
-SELECTED THINGS
+~~ ACTIVE GRID
 */
 export const selectActiveViewState = createSelector(
   selectActiveView,
@@ -150,6 +166,23 @@ export const selectActiveStateFiltered = ({
   );
 };
 
+export const selectActiveSelectedIds = ({
+  projectV2: project,
+}: {
+  projectV2: ProjectState;
+}): string[] => {
+  const viewState = project.activeView;
+  const activeKindId = project.annotationGridState.activeKindId;
+  const activeState =
+    viewState === "images"
+      ? project.imageGridState
+      : project.annotationGridState.kindStates[activeKindId];
+
+  return activeState.selectedIds;
+};
+
+// ~~ Old
+
 export const selectSelectedThingIds = ({
   projectV2: project,
 }: {
@@ -166,10 +199,6 @@ export const selectSelectedThingIdsLength = ({
   return project.selectedThingIds.length;
 };
 
-/*
-SORT TYPE
-*/
-
 export const selectSortType = ({
   projectV2: project,
 }: {
@@ -178,22 +207,6 @@ export const selectSortType = ({
   return project.sortType;
 };
 
-/*
-ACTIVE KIND
-*/
-
-export const selectActiveKindId = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}) => {
-  return project.annotationGridState.activeKindId;
-};
-
-/*
-HIGHLIGHTED CATEGORY
-*/
-
 export const selectHighlightedCategory = ({
   projectV2: project,
 }: {
@@ -201,10 +214,6 @@ export const selectHighlightedCategory = ({
 }) => {
   return project.highlightedCategory;
 };
-
-/*
-THING FILTERS
-*/
 
 export const selectThingFilters = ({
   projectV2: project,
@@ -252,12 +261,4 @@ export const selectKindTabFilters = ({
   projectV2: ProjectState;
 }) => {
   return project.kindTabFilters;
-};
-
-export const selectProjectImageChannels = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}) => {
-  return project.imageChannels;
 };
