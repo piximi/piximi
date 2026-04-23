@@ -1,8 +1,4 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { difference } from "lodash";
-
-import { ThingSortKey } from "utils/enums";
-import { Partition } from "utils/models/enums";
 
 import {
   AnnotationGridState,
@@ -189,76 +185,4 @@ export const selectSelectedThingIds = ({
   projectV2: ProjectState;
 }): Array<string> => {
   return project.selectedThingIds;
-};
-
-export const selectSelectedThingIdsLength = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}) => {
-  return project.selectedThingIds.length;
-};
-
-export const selectSortType = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}): ThingSortKey => {
-  return project.sortType;
-};
-
-export const selectHighlightedCategory = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}) => {
-  return project.highlightedCategory;
-};
-
-export const selectThingFilters = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}) => {
-  return project.thingFilters;
-};
-
-export const selectActiveThingFilters = createSelector(
-  selectActiveKindId,
-  selectThingFilters,
-  (activeKind, thingFilters) => {
-    return thingFilters[activeKind] ?? {};
-  },
-);
-export const selectActiveFilteredStateHasFilters = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}) => {
-  const activeKind = project.activeKind;
-  const thingFilters = project.thingFilters[activeKind];
-  if (!thingFilters) return false;
-  const hasFilters = Object.values(thingFilters).some((filters) => {
-    return filters.length > 0;
-  });
-
-  return hasFilters;
-};
-
-export const selectUnfilteredActivePartitions = createSelector(
-  selectActiveThingFilters,
-  (thingFilters) => {
-    const filteredPartitions = thingFilters.partition;
-    const allPartitions = Object.values(Partition);
-    const unfilteredPartitions = difference(allPartitions, filteredPartitions);
-    return unfilteredPartitions;
-  },
-);
-
-export const selectKindTabFilters = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}) => {
-  return project.kindTabFilters;
 };

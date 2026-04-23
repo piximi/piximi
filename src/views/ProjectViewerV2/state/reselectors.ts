@@ -2,25 +2,19 @@ import { createSelector } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
 import {
-  selectAllKindIds,
   selectCategoriesDictionary,
   selectKindDictionary,
   selectThingsDictionary,
 } from "store/data/selectors";
 import {
   selectActiveKindId,
-  selectActiveThingFilters,
   selectActiveView,
-  selectKindTabFilters,
   selectSelectedThingIds,
 } from "./selectors";
 
 import { isUnknownCategory } from "store/data/utils";
 
-import { Partition } from "utils/models/enums";
-
-import { AnnotationObject, ImageObject, Thing } from "store/data/types";
-import { CATEGORY_COLORS } from "store/data/constants";
+import { Thing } from "store/data/types";
 import { selectAllCategories } from "store/dataV2/selectors";
 import { representsUnknown } from "utils/stringUtils";
 
@@ -41,27 +35,12 @@ export const selectActiveCategories = createSelector(
 /*
 ~~ OLD
 */
-export const selectVisibleKinds = createSelector(
-  selectKindTabFilters,
-  selectAllKindIds,
-  (filteredKinds, allKinds) => {
-    return difference(allKinds, filteredKinds);
-  },
-);
 
 export const selectActiveKindObject = createSelector(
   selectActiveKindId,
   selectKindDictionary,
   (activeKind, kindDict) => {
     return kindDict[activeKind]!;
-  },
-);
-
-export const selectActiveUnknownCategoryId = createSelector(
-  selectActiveKindObject,
-  (activeKind) => {
-    if (!activeKind) return;
-    return activeKind.unknownCategoryId;
   },
 );
 
@@ -72,73 +51,11 @@ export const selectActiveKnownCategories = createSelector(
   },
 );
 
-export const selectActiveUnknownCategory = createSelector(
-  selectActiveUnknownCategoryId,
-  selectCategoriesDictionary,
-  (unknownCatId, catDict) => {
-    if (!unknownCatId) return;
-    return catDict[unknownCatId]!;
-  },
-);
-
-export const selectActiveCategoryCount = createSelector(
-  selectActiveCategories,
-  (activeCategories) => {
-    return activeCategories.length;
-  },
-);
-
-export const selectActiveKnownCategoryCount = createSelector(
-  selectActiveKnownCategories,
-  (activeKnownCategories) => {
-    return activeKnownCategories.length;
-  },
-);
-
-export const selectActiveCategoryNames = createSelector(
-  selectActiveCategories,
-  (activeCategories) => {
-    return activeCategories.map((cat) => cat.name);
-  },
-);
-
-export const selectAvaliableCategoryColors = createSelector(
-  selectActiveCategories,
-  (activeCategories): string[] => {
-    const activeColors = activeCategories.map((cat) => cat.color.toUpperCase());
-    const allCategoryColors = Object.values(CATEGORY_COLORS).map((color) =>
-      color.toUpperCase(),
-    );
-    const availableColors = difference(allCategoryColors, activeColors);
-    return availableColors;
-  },
-);
-
-export const selectUnfilteredActiveCategoryIds = createSelector(
-  selectActiveThingFilters,
-  selectActiveCategories,
-  (thingFilters, activeCategories) => {
-    const filteredCategories = thingFilters.categoryId;
-    const unfilteredCategories = difference(
-      activeCategories.map((cat) => cat.id),
-      filteredCategories,
-    );
-    return unfilteredCategories;
-  },
-);
-
 export const selectActiveThingIds = createSelector(
   selectActiveKindObject,
   (kind) => {
     if (!kind) return [];
     return kind.containing;
-  },
-);
-
-export const selectActiveThings = createSelector(
-  [selectActiveThingIds, selectThingsDictionary],
-  (activeThingIds, thingDict) => {
-    return activeThingIds.map((thingId) => thingDict[thingId]!);
   },
 );
 
@@ -161,20 +78,6 @@ export const selectActiveLabeledThingsCount = createSelector(
   },
 );
 
-export const selectActiveLabeledThings = createSelector(
-  selectActiveLabeledThingsIds,
-  selectThingsDictionary,
-  (activeLabeledThingIds, thingDict) => {
-    const activeLabeledThings: Array<AnnotationObject | ImageObject> = [];
-    for (const thingId of activeLabeledThingIds) {
-      const thing = thingDict[thingId];
-      thing && activeLabeledThings.push(thing);
-    }
-
-    return activeLabeledThings;
-  },
-);
-
 export const selectActiveUnlabeledThingsIds = createSelector(
   selectActiveKindObject,
   selectCategoriesDictionary,
@@ -184,20 +87,6 @@ export const selectActiveUnlabeledThingsIds = createSelector(
     const unknownCategoryId = activeKind.unknownCategoryId;
     const unknownThings = catDict[unknownCategoryId]!.containing;
     return intersection(thingsInKind, unknownThings);
-  },
-);
-
-export const selectActiveUnlabeledThings = createSelector(
-  selectActiveUnlabeledThingsIds,
-  selectThingsDictionary,
-  (activeUnlabeledThingIds, thingDict) => {
-    const activeLabeledThings: Array<AnnotationObject | ImageObject> = [];
-    for (const thingId of activeUnlabeledThingIds) {
-      const thing = thingDict[thingId];
-      thing && activeLabeledThings.push(thing);
-    }
-
-    return activeLabeledThings;
   },
 );
 
@@ -225,40 +114,5 @@ export const selectActiveSelectedThings = createSelector(
     );
 
     return activeSelectedThings;
-  },
-);
-
-export const selectActiveThingsByPartition = createSelector(
-  selectActiveThings,
-  (activeThings) => {
-    const thingsByPartition = activeThings.reduce(
-      (
-        byPartition: Record<Partition, Array<AnnotationObject | ImageObject>>,
-        thing,
-      ) => {
-        switch (thing.partition) {
-          case Partition.Inference:
-            byPartition[Partition.Inference].push(thing);
-            break;
-          case Partition.Training:
-            byPartition[Partition.Training].push(thing);
-            break;
-          case Partition.Unassigned:
-            byPartition[Partition.Unassigned].push(thing);
-            break;
-          case Partition.Validation:
-            byPartition[Partition.Validation].push(thing);
-            break;
-        }
-        return byPartition;
-      },
-      {
-        [Partition.Inference]: [],
-        [Partition.Training]: [],
-        [Partition.Validation]: [],
-        [Partition.Unassigned]: [],
-      },
-    );
-    return thingsByPartition;
   },
 );
