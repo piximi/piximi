@@ -30,7 +30,7 @@ export const AnnotationGridItem = memo(
       item.categoryId,
     );
 
-    const { src } = useRenderedSrc(item.imageChannels, item.boundingBox);
+    const { src } = useRenderedSrc(item.channelsRef, item.boundingBox);
 
     const { containerStyle, textOnScroll } = useGridItemStyle(selected);
 

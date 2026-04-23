@@ -88,7 +88,7 @@ export type ExtendedImageObject = {
   timepoint: number;
   bitDepth: BitDepth;
   partition: Partition;
-  channels: ExtendedChannel[];
+  channelsRef: ExtendedChannel[];
 };
 export type Plane = {
   id: string;
@@ -171,7 +171,7 @@ export type ExtendedAnnotationObject = AnnotationObject & {
    */
   categoryId: string;
   category: Category;
-  imageChannels: ExtendedChannel[];
+  channelsRef: ExtendedChannel[];
   planeIdx: number;
   imageId: string;
   imageName: string;

@@ -24,7 +24,7 @@ type ImageGridItemProps = {
 export const ImageGridItem = memo(
   ({ selected, handleClick, item, isScrolling }: ImageGridItemProps) => {
     const { containerStyle, textOnScroll } = useGridItemStyle(selected);
-    const { src } = useRenderedSrc(item.channels);
+    const { src } = useRenderedSrc(item.channelsRef);
 
     const handleSelect = (
       evt: React.MouseEvent<HTMLDivElement, MouseEvent>,

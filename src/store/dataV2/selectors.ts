@@ -254,7 +254,7 @@ export const selectExtendedAnnotationsByKindId = createSelector(
         kindId,
         categoryId: category.id,
         category: category,
-        imageChannels: channels,
+        channelsRef: channels,
         planeIdx: plane.zIndex,
         imageId: image.id,
         imageName: image.name,
@@ -384,7 +384,7 @@ export const selectExtendedImages = createSelector(
         timepoint: image.timepoint,
         bitDepth: image.bitDepth,
         partition: image.partition,
-        channels,
+        channelsRef: channels,
       };
     }),
 );
@@ -432,7 +432,7 @@ export const selectRepresentativeImages = createSelector(
         timepoint: image.timepoint,
         bitDepth: image.bitDepth,
         partition: image.partition,
-        channels,
+        channelsRef: channels,
       };
     }),
 );
