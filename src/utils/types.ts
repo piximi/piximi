@@ -1,6 +1,9 @@
 import { Tensor2D } from "@tensorflow/tfjs";
 import { AlertType } from "./enums";
 
+/*
+TYPESCRIPT TYPES
+*/
 type Deferred<T> = Partial<T> & {
   deleted?: boolean;
   added?: boolean;
@@ -10,6 +13,33 @@ export type DeferredEntity<T> = {
   saved: T;
   changes: Deferred<T>;
 };
+
+export type FilterType<T> = {
+  [K in keyof T]?: Array<T[K]>;
+};
+
+// --> PartialField
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<T>;
+
+// --> RequiredField
+export type RequireField<T, K extends keyof T> = Omit<T, K> &
+  Required<Pick<T, K>>;
+
+// --> PartialExcept
+export type RequireOnly<T, K extends keyof T> = Partial<Omit<T, K>> &
+  Required<Pick<T, K>>;
+
+export type RecursivePartial<T> = {
+  [K in keyof T]?: RecursivePartial<T[K]>;
+};
+
+export type KeysWithValuesOfType<T, V> = {
+  [K in keyof T]-?: T[K] extends V | undefined ? K : never;
+}[keyof T];
+
+export type AtLeastOne<T, K extends keyof T = keyof T> = K extends keyof T
+  ? Required<Pick<T, K>> & Partial<Omit<T, K>>
+  : never;
 
 /*
 TENSORFLOW
@@ -120,32 +150,6 @@ export type HotkeyOptions = {
   keyup?: boolean; // Trigger on keyup event? (Default: undefined)
   keydown?: boolean; // Trigger on keydown event? (Default: true)
 };
-
-/*
-TYPESCRIPT TYPES
-*/
-export type FilterType<T> = {
-  [K in keyof T]?: Array<T[K]>;
-};
-
-// --> PartialField
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<T>;
-
-// --> RequiredField
-export type RequireField<T, K extends keyof T> = Omit<T, K> &
-  Required<Pick<T, K>>;
-
-// --> PartialExcept
-export type RequireOnly<T, K extends keyof T> = Partial<Omit<T, K>> &
-  Required<Pick<T, K>>;
-
-export type RecursivePartial<T> = {
-  [K in keyof T]?: RecursivePartial<T[K]>;
-};
-
-export type KeysWithValuesOfType<T, V> = {
-  [K in keyof T]-?: T[K] extends V | undefined ? K : never;
-}[keyof T];
 
 /*
 GENERAL

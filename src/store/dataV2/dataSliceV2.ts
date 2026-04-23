@@ -25,6 +25,7 @@ import {
   UNKNOWN_KIND_CATEGORY_ID,
   UNKNOWN_KIND_ID,
 } from "./constants";
+import { AtLeastOne } from "utils/types";
 
 export const imageSeriesAdapter = createEntityAdapter<ImageSeries>();
 export const imageAdapter = createEntityAdapter<ImageObject>();
@@ -47,6 +48,41 @@ const UNKNOWN_IMAGE_CATEGORY: Category = {
   color: UNKNOWN_IMAGE_CATEGORY_COLOR,
   isUnknown: true,
 };
+
+function batchBubbleDeleteAnnotation(
+  state: DataStateV2,
+  annotations: AnnotationObject[],
+) {
+  const annIds: string[] = [];
+  const volumeIds = new Set<string>();
+  annotations.forEach((ann) => {
+    annIds.push(ann.id);
+    volumeIds.add(ann.volumeId);
+  });
+  annotationAdapter.removeMany(state.annotations, annIds);
+
+  Object.values(state.annotations.entities).forEach((ann) => {
+    if (volumeIds.has(ann.volumeId)) volumeIds.delete(ann.volumeId);
+  });
+
+  if (volumeIds.size > 0) {
+    annotationVolumeAdapter.removeMany(state.annotationVolumes, [...volumeIds]);
+  }
+}
+
+function bubbleDeleteAnnotation(
+  state: DataStateV2,
+  annotation: AnnotationObject,
+) {
+  const { volumeId } = annotation;
+  annotationAdapter.removeOne(state.annotations, annotation.id);
+  const volumeStillHasAnnotations = Object.values(
+    state.annotations.entities,
+  ).some((a) => a?.volumeId === volumeId);
+  if (!volumeStillHasAnnotations) {
+    annotationVolumeAdapter.removeOne(state.annotationVolumes, volumeId);
+  }
+}
 
 function cascadeDeleteAnnotationVolume(
   state: DataStateV2,
@@ -269,13 +305,7 @@ export const dataSliceV2 = createSlice({
         annotationVolumes,
       );
       kindAdapter.setAll(state.kinds, kinds);
-      kindAdapter.addOne(state.kinds, UNKNOWN_KIND);
-
       categoryAdapter.setAll(state.categories, categories);
-      categoryAdapter.addMany(state.categories, [
-        UNKNOWN_IMAGE_CATEGORY,
-        UNKNOWN_KIND_CATEGORY,
-      ]);
     },
     newExperiment(state, action: PayloadAction<Experiment>) {
       state.experiment = action.payload;
@@ -480,15 +510,79 @@ export const dataSliceV2 = createSlice({
     batchAddCategory(state, action: PayloadAction<Array<Category>>) {
       categoryAdapter.addMany(state.categories, action.payload);
     },
-    updateCategoryName(
+    updateCategoryDisplayProps(
       state,
-      action: PayloadAction<{ categoryId: string; name: string }>,
+      action: PayloadAction<{
+        id: string;
+        changes: AtLeastOne<Pick<Category, "name" | "color">>;
+      }>,
     ) {
       categoryAdapter.updateOne(state.categories, {
-        id: action.payload.categoryId,
-        changes: { name: action.payload.name },
+        id: action.payload.id,
+        changes: action.payload.changes,
       });
     },
+    deleteCategory(state, action: PayloadAction<string>) {
+      const catId = action.payload;
+      const category = state.categories.entities[catId];
+      // unknown category is protected — it cannot be deleted
+      if (!category || catId === UNKNOWN_IMAGE_CATEGORY_ID) return;
+      if (category.type === "image") {
+        cascadeDeleteImageCategory(state, catId);
+        categoryAdapter.removeOne(state.categories, catId);
+        return;
+      }
+      const kind = state.kinds.entities[category.kindId];
+      // unknown category for a kind is protected — it cannot be deleted
+      if (!kind || catId === kind.unknownCategoryId) return;
+
+      // reassign all annotation volumes in this category to the kind's unknown category
+      cascadeDeleteAnnotationCategory(state, catId, kind.unknownCategoryId);
+      categoryAdapter.removeOne(state.categories, catId);
+    },
+    batchDeleteCategory(state, action: PayloadAction<string[]>) {
+      action.payload.forEach((catId) => {
+        const category = state.categories.entities[catId];
+        // unknown category is protected — it cannot be deleted
+        if (!category || catId === UNKNOWN_IMAGE_CATEGORY_ID) return;
+        if (category.type === "image") {
+          cascadeDeleteImageCategory(state, catId);
+          categoryAdapter.removeOne(state.categories, catId);
+          return;
+        }
+        const kind = state.kinds.entities[category.kindId];
+        // unknown category for a kind is protected — it cannot be deleted
+        if (!kind || catId === kind.unknownCategoryId) return;
+
+        // reassign all annotation volumes in this category to the kind's unknown category
+        cascadeDeleteAnnotationCategory(state, catId, kind.unknownCategoryId);
+        categoryAdapter.removeOne(state.categories, catId);
+      });
+    },
+    deleteEntitiesByCatId(state, action: PayloadAction<string>) {
+      const catId = action.payload;
+      const category = state.categories.entities[catId];
+      if (category.type === "image") {
+        const categorizedImages = Object.values(state.images.entities).filter(
+          (im) => im.categoryId === catId,
+        );
+        categorizedImages.forEach((image) => cascadeDeleteImage(state, image));
+
+        imageAdapter.removeMany(
+          state.images,
+          categorizedImages.map((im) => im.id),
+        );
+        return;
+      }
+      const categorizedAnnotations = Object.values(
+        state.annotations.entities,
+      ).filter(
+        (ann) =>
+          state.annotationVolumes.entities[ann.volumeId].categoryId === catId,
+      );
+      batchBubbleDeleteAnnotation(state, categorizedAnnotations);
+    },
+
     deleteImageCategory(state, action: PayloadAction<string>) {
       const categoryId = action.payload;
       const category = state.categories.entities[categoryId];
@@ -536,13 +630,60 @@ export const dataSliceV2 = createSlice({
         changes: { partition: action.payload.partition },
       });
     },
+    batchUpdateAnnotationPartition(
+      state,
+      action: PayloadAction<{ annotationId: string; partition: Partition }[]>,
+    ) {
+      annotationAdapter.updateMany(
+        state.annotations,
+        action.payload.map((changes) => ({
+          id: changes.annotationId,
+          changes: { partition: changes.partition },
+        })),
+      );
+    },
+    bubbleUpdateAnnotationCategory(
+      state,
+      action: PayloadAction<{ annotationId: string; categoryId: string }>,
+    ) {
+      const annotation =
+        state.annotations.entities[action.payload.annotationId];
+      if (!annotation) return;
+
+      annotationVolumeAdapter.updateOne(state.annotationVolumes, {
+        id: annotation.volumeId,
+        changes: { categoryId: action.payload.categoryId },
+      });
+    },
+    batchBubbleUpdateAnnotationCategory(
+      state,
+      action: PayloadAction<{ annotationId: string; categoryId: string }[]>,
+    ) {
+      const volumeChanges: Record<string, string> = {};
+      action.payload.forEach(({ annotationId: annId, categoryId: catId }) => {
+        const ann = state.annotations.entities[annId];
+        if (!ann) return;
+        volumeChanges[ann.volumeId] = catId;
+      });
+
+      annotationVolumeAdapter.updateMany(
+        state.annotationVolumes,
+        Object.entries(volumeChanges).map(([id, categoryId]) => ({
+          id,
+          changes: { categoryId },
+        })),
+      );
+    },
     deleteAnnotation(state, action: PayloadAction<string>) {
       const annotation = state.annotations.entities[action.payload];
       if (!annotation) return;
-      annotationAdapter.removeOne(state.annotations, annotation.id);
+      bubbleDeleteAnnotation(state, annotation);
     },
     batchDeleteAnnotation(state, action: PayloadAction<Array<string>>) {
-      annotationAdapter.removeMany(state.annotations, action.payload);
+      const annotations = action.payload.map(
+        (annId) => state.annotations.entities[annId],
+      );
+      batchBubbleDeleteAnnotation(state, annotations);
     },
     addAnnotationVolume(state, action: PayloadAction<AnnotationVolume>) {
       annotationVolumeAdapter.addOne(state.annotationVolumes, action.payload);

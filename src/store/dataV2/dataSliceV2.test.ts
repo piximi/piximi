@@ -43,7 +43,7 @@ const {
   deleteKind,
   addCategory,
   batchAddCategory,
-  updateCategoryName,
+  updateCategoryDisplayProps: updateCategoryName,
   deleteImageCategory,
   deleteAnnotationCategory,
   updateImageCategory,
@@ -940,7 +940,7 @@ describe("updateCategoryName", () => {
     );
     const s = dataSliceV2.reducer(
       s0,
-      updateCategoryName({ categoryId: "ic1", name: "Renamed" }),
+      updateCategoryName({ id: "ic1", name: "Renamed" }),
     );
     expect(s.categories.entities["ic1"]?.name).toBe("Renamed");
   });
