@@ -206,7 +206,7 @@ export const selectCategoriesByKindId = createSelector(
   (categories, kindId) =>
     categories.filter((c) => c.type === "annotation" && c.kindId === kindId),
 );
-export const selectGridAnnotationsByKindId = createSelector(
+export const selectExtendedAnnotationsByKindId = createSelector(
   [
     annotationSelectors.selectAll,
     annotationVolumeSelectors.selectEntities,
@@ -250,6 +250,7 @@ export const selectGridAnnotationsByKindId = createSelector(
         ...ann,
         kindId,
         categoryId: category.id,
+        category: category,
         imageChannels: channels,
         planeIdx: plane.zIndex,
         imageId: image.id,
@@ -345,6 +346,45 @@ export const selectActiveExtendedChannels = createSelector(
 
 // ── Tier 2: Grid display selector ──────────────────────────────────────────
 
+export const selectExtendedImages = createSelector(
+  [
+    planeSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    channelSelectors.selectAll,
+    categorySelectors.selectEntities,
+    imageSelectors.selectAll,
+  ],
+  (planeDict, chMetaDict, chs, catDict, images): ExtendedImageObject[] =>
+    images.map((image) => {
+      const plane = planeDict[image.activePlaneId];
+      const category = catDict[image.categoryId];
+      const channels = chs.reduce((extChs: ExtendedChannel[], ch) => {
+        const meta = chMetaDict[ch.channelMetaId];
+        if (ch.planeId !== plane.id || !meta || !meta.visible) return extChs;
+        extChs.push({
+          ...ch,
+          colorMap: meta.colorMap,
+          rampMin: meta.rampMin,
+          rampMax: meta.rampMax,
+        });
+
+        return extChs;
+      }, []);
+      return {
+        id: image.id,
+        name: image.name,
+        seriesId: image.seriesId,
+        shape: image.shape,
+        categoryId: category.id,
+        category,
+        activePlaneIdx: plane.zIndex,
+        timepoint: image.timepoint,
+        bitDepth: image.bitDepth,
+        partition: image.partition,
+        channels,
+      };
+    }),
+);
 export const selectRepresentativeImages = createSelector(
   [
     planeSelectors.selectEntities,
@@ -383,6 +423,7 @@ export const selectRepresentativeImages = createSelector(
         name: image.name,
         seriesId: image.seriesId,
         shape: image.shape,
+        categoryId: category.id,
         category,
         activePlaneIdx: plane.zIndex,
         timepoint: image.timepoint,

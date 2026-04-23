@@ -77,6 +77,11 @@ export type ExtendedImageObject = {
   name: string;
   seriesId: string;
   shape: Shape;
+  /**
+   * ? Include both category and categoryId for `FilterType` and `isFiltered` usage
+   * ? May change if there if alternative filtering logic is implemented
+   */
+  categoryId: string;
   category: Category;
   activePlaneIdx: number;
   timepoint: number;
@@ -159,7 +164,12 @@ export type AnnotationEntities = Record<string, AnnotationObject>;
 
 export type ExtendedAnnotationObject = AnnotationObject & {
   kindId: string;
+  /**
+   * ? Include both category and categoryId for `FilterType` and `isFiltered` usage
+   * ? May change if there if alternative filtering logic is implemented
+   */
   categoryId: string;
+  category: Category;
   imageChannels: ExtendedChannel[];
   planeIdx: number;
   imageId: string;
