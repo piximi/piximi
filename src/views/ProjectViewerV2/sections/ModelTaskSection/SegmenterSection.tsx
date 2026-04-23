@@ -14,7 +14,7 @@ import { selectSegmenterModel } from "store/segmenter/selectors";
 import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 import { usePredictSegmenter } from "@ProjectViewer/hooks/usePredictSegmenter";
 import { Model } from "utils/models/Model";
-import { Shape } from "store/data/types";
+import { Shape } from "store/dataV2/types";
 import { segmenterSlice } from "store/segmenter";
 import { Segmenter } from "utils/models/segmentation";
 import { ModelStatus, ModelTask } from "utils/models/enums";

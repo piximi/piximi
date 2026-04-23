@@ -27,7 +27,7 @@ import { Cellpose } from "utils/models/segmentation";
 import { availableSegmenterModels } from "utils/models/availableSegmentationModels";
 import { HotkeyContext } from "utils/enums";
 
-import { Shape } from "store/data/types";
+import { Shape } from "store/dataV2/types";
 import { ToolTipTab } from "components/layout";
 
 type ImportTensorflowSegmentationModelDialogProps = {
