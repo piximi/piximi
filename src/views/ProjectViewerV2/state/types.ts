@@ -25,7 +25,6 @@ export type ImageGridState = {
   selectedIds: string[];
   filters: ImageFilters;
   sortType: ImageSortType;
-  selectedCategoryId: string;
 };
 
 export type AnnotationFilters = Required<
@@ -38,7 +37,6 @@ export type KindState = {
   filters: AnnotationFilters;
   visible: boolean;
   sortType: AnnotationSortType;
-  selectedCategoryId: string;
 };
 export type AnnotationGridState = {
   activeKindId: string;

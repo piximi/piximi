@@ -13,21 +13,16 @@ import {
   ViewState,
 } from "./types";
 import { difference } from "lodash";
-import { UNKNOWN_KIND, UNKNOWN_KIND_CATEGORY_ID } from "store/dataV2/constants";
-import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
+import { UNKNOWN_KIND } from "store/dataV2/constants";
+import { representsUnknown } from "utils/stringUtils";
 
-const emptyKindState = (
-  id: string,
-  name: string,
-  unknownCategoryId: string,
-): KindState => ({
+const emptyKindState = (id: string, name: string): KindState => ({
   id,
   name,
   selectedIds: [],
   filters: { categoryId: [], partition: [] },
   visible: true,
   sortType: AnnotationSortType.None,
-  selectedCategoryId: unknownCategoryId,
 });
 export const initialState: ProjectState = {
   name: "Untitled project",
@@ -40,16 +35,11 @@ export const initialState: ProjectState = {
     selectedIds: [],
     filters: { categoryId: [], partition: [] },
     sortType: ImageSortType.None,
-    selectedCategoryId: UNKNOWN_IMAGE_CATEGORY_ID,
   },
   annotationGridState: {
     activeKindId: UNKNOWN_KIND.id,
     kindStates: {
-      [UNKNOWN_KIND.id]: emptyKindState(
-        UNKNOWN_KIND.id,
-        UNKNOWN_KIND.name,
-        UNKNOWN_KIND_CATEGORY_ID,
-      ),
+      [UNKNOWN_KIND.id]: emptyKindState(UNKNOWN_KIND.id, UNKNOWN_KIND.name),
     },
   },
   highlightedCategory: undefined,
@@ -57,6 +47,34 @@ export const initialState: ProjectState = {
   kindTabFilters: [],
   imageChannels: undefined,
 };
+
+function handleImageCategoryDelete(
+  state: ProjectState,
+  categoryId: string,
+): boolean {
+  let handled = false;
+  const imFilters = state.imageGridState.filters.categoryId;
+  const initLen = imFilters.length;
+  mutatingFilter(imFilters, (id) => id !== categoryId);
+  if (imFilters.length !== initLen) {
+    handled = true;
+  }
+
+  return handled;
+}
+
+function handleAnnCategoryDelete(state: ProjectState, categoryId: string) {
+  const kindStates = Object.values(state.annotationGridState.kindStates);
+  for (let i = 0; i < kindStates.length; i++) {
+    const kindState = kindStates[i];
+    const filters = kindState.filters.categoryId;
+    const initLength = filters.length;
+
+    mutatingFilter(filters, (id) => id !== categoryId);
+
+    if (initLength !== filters.length) break;
+  }
+}
 
 export const projectSlice = createSlice({
   name: "projectV2",
@@ -211,17 +229,6 @@ export const projectSlice = createSlice({
       for (const kindId in state.annotationGridState.kindStates) {
         state.annotationGridState.kindStates[kindId].visible = action.payload;
       }
-    },
-
-    // ~~ Active Grid State
-
-    setActiveSelectedCategoryId(state, action: PayloadAction<string>) {
-      const activeState =
-        state.activeView === "images"
-          ? state.imageGridState
-          : state.annotationGridState.kindStates[state.activeKind];
-
-      activeState.selectedCategoryId = action.payload;
     },
 
     // ~~ OLD
@@ -379,50 +386,35 @@ export const projectSlice = createSlice({
     builder
       .addCase(dataSliceV2.actions.setState, (state, action) => {
         const { kinds } = action.payload;
-        state.annotationGridState.kindStates = {
-          [UNKNOWN_KIND_ID]: emptyKindState(
-            UNKNOWN_KIND.id,
-            UNKNOWN_KIND.name,
-            UNKNOWN_KIND.unknownCategoryId,
-          ),
-        };
-        state.annotationGridState.activeKindId = UNKNOWN_KIND_ID;
-        state.imageGridState.filters.categoryId = [];
+        state.imageGridState = { ...initialState.imageGridState };
+
+        state.annotationGridState.kindStates = {};
+        let unknownKindId = "";
         for (const kind of kinds) {
+          if (representsUnknown(kind.id)) unknownKindId = kind.id;
           state.annotationGridState.kindStates[kind.id] = emptyKindState(
             kind.id,
             kind.name,
-            kind.unknownCategoryId,
           );
         }
+        state.annotationGridState.activeKindId = unknownKindId;
+        state.activeView = "images";
       })
       .addCase(dataSliceV2.actions.newExperiment, (state) => {
-        state.annotationGridState.activeKindId = UNKNOWN_KIND_ID;
-        state.annotationGridState.kindStates = {
-          [UNKNOWN_KIND_ID]: emptyKindState(
-            UNKNOWN_KIND.id,
-            UNKNOWN_KIND.name,
-            UNKNOWN_KIND.unknownCategoryId,
-          ),
-        };
+        state.annotationGridState = { ...initialState.annotationGridState };
         state.imageGridState.filters.categoryId = [];
         state.imageGridState.filters.categoryId = [];
         state.imageGridState.selectedIds = [];
       })
       .addCase(dataSliceV2.actions.addKind, (state, action) => {
         state.annotationGridState.kindStates[action.payload.kind.id] =
-          emptyKindState(
-            action.payload.kind.id,
-            action.payload.kind.name,
-            action.payload.kind.unknownCategoryId,
-          );
+          emptyKindState(action.payload.kind.id, action.payload.kind.name);
       })
       .addCase(dataSliceV2.actions.batchAddKind, (state, action) => {
         for (const { kind } of action.payload) {
           state.annotationGridState.kindStates[kind.id] = emptyKindState(
             kind.id,
             kind.name,
-            kind.unknownCategoryId,
           );
         }
       })
@@ -439,23 +431,19 @@ export const projectSlice = createSlice({
         delete state.annotationGridState.kindStates[action.payload];
       })
       .addCase(dataSliceV2.actions.deleteImageCategory, (state, action) => {
-        mutatingFilter(
-          state.imageGridState.filters.categoryId,
-          (id) => id !== action.payload,
-        );
+        handleImageCategoryDelete(state, action.payload);
       })
       .addCase(
         dataSliceV2.actions.deleteAnnotationCategory,
         (state, action) => {
-          for (const kindState of Object.values(
-            state.annotationGridState.kindStates,
-          )) {
-            mutatingFilter(
-              kindState.filters.categoryId,
-              (id) => id !== action.payload,
-            );
-          }
+          handleAnnCategoryDelete(state, action.payload);
         },
-      );
+      )
+      .addCase(dataSliceV2.actions.deleteCategory, (state, action) => {
+        const catId = action.payload;
+        const handled = handleImageCategoryDelete(state, catId);
+        if (handled) return;
+        handleAnnCategoryDelete(state, catId);
+      });
   },
 });
