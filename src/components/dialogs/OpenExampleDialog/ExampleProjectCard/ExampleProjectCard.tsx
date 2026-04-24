@@ -16,6 +16,7 @@ import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 
 import { AlertState } from "utils/types";
 import classifierHandler from "utils/models/classification/classifierHandler";
+import { useProjectLoader } from "hooks";
 
 // CloudFront distribution domain
 const DOMAIN = "https://dw9hr7pc3ofrm.cloudfront.net";
@@ -48,7 +49,7 @@ export const ExampleProjectCard = ({
   onClose,
 }: ExampleProjectCardProps) => {
   const dispatch = useDispatch();
-
+  const { loadExample } = useProjectLoader();
   const onLoadProgress = (loadPercent: number, loadMessage: string) => {
     dispatch(
       applicationSettingsSlice.actions.sendLoadPercent({
@@ -133,7 +134,10 @@ export const ExampleProjectCard = ({
       default:
         return;
     }
-
+    if (import.meta.env.VITE_USE_V2 === "true") {
+      await loadExample(exampleProjectFilePath, exampleProject.name);
+      return;
+    }
     const exampleProjectFileList = await fetch(exampleProjectFilePath)
       .then((res) => res.blob())
       .then(
