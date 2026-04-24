@@ -3,10 +3,20 @@ import { ModelCompileArgs, train, losses } from "@tensorflow/tfjs";
 import { Tensor3D } from "@tensorflow/tfjs";
 import { random } from "lodash";
 import { LayersModel } from "@tensorflow/tfjs";
-import { OptimizerSettings, ModelLayerData } from "./types";
+import {
+  InferenceInput,
+  OptimizerSettings,
+  ModelLayerData,
+  TrainingInput,
+} from "./types";
 import { LossFunction, Metric, OptimizationAlgorithm } from "./enums";
 import { ShapeArray } from "store/data/types";
 import { Shape } from "store/data/types";
+import type {
+  BBox,
+  ExtendedAnnotationObject,
+  ExtendedImageObject,
+} from "store/dataV2/types";
 
 export const createCompileArgs = (options: OptimizerSettings) => {
   const loss = (): ModelCompileArgs["loss"] => {
@@ -257,3 +267,26 @@ export const convertArrayToShape = (array: ShapeArray): Shape => {
     channels: array[3],
   };
 };
+
+export function toTrainingInput(
+  item: ExtendedImageObject | ExtendedAnnotationObject,
+): TrainingInput {
+  const region: BBox =
+    "boundingBox" in item
+      ? item.boundingBox
+      : [0, 0, item.shape.width, item.shape.height];
+  return {
+    id: item.id,
+    partition: item.partition,
+    categoryId: item.categoryId,
+    channelsRef: item.channelsRef,
+    shape: item.shape,
+    region,
+  };
+}
+
+export function toInferenceInput(
+  item: ExtendedImageObject | ExtendedAnnotationObject,
+): InferenceInput {
+  return toTrainingInput(item);
+}

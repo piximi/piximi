@@ -2,7 +2,6 @@ import { useCallback, useMemo } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import ImageJS from "image-js";
 import { intersection } from "lodash";
 
 import { selectAllImages, selectAllKinds } from "store/data/selectors";
@@ -11,22 +10,21 @@ import {
   selectSelectedImages,
 } from "@ProjectViewer/state/reselectors";
 import type { AnnotationObject, Category, Shape } from "store/data/types";
-import { ImageObject } from "store/data/types";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import {
   selectSegmenterInferenceOptions,
-  selectSegmenterModel,
+  selectSegmenterModelV2,
 } from "store/segmenter/selectors";
 import { dataSlice } from "store/data";
 import {
   UNKNOWN_NAME,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
 } from "store/dataV2/constants";
-import { getPropertiesFromImageSync } from "store/data/utils";
 import { selectExtendedImages } from "store/dataV2/selectors";
 
 import { ModelStatus } from "utils/modelsV2/enums";
 import type { OrphanedAnnotationObject } from "utils/modelsV2/segmentation";
+import { toInferenceInput } from "utils/modelsV2/utils";
 import { getStackTraceFromError } from "utils/logUtils";
 import { AlertType } from "utils/enums";
 import type { AlertState, LoadCB } from "utils/types";
@@ -35,7 +33,7 @@ import { useSegmenterStatus } from "../contexts/SegmenterStatusProvider";
 
 export const usePredictSegmenter = () => {
   const dispatch = useDispatch();
-  const selectedModel = useSelector(selectSegmenterModel);
+  const selectedModel = useSelector(selectSegmenterModelV2);
   const allImages = useSelector(selectExtendedImages);
   const selectedImages = useSelector(selectSelectedImages);
   const fitOptions = useSelector(selectSegmenterInferenceOptions);
@@ -90,7 +88,7 @@ export const usePredictSegmenter = () => {
     setModelStatus(ModelStatus.Predicting);
 
     try {
-      selectedModel.loadInference(inferenceImages, {
+      selectedModel.loadInference(inferenceImages.map(toInferenceInput), {
         kinds: undefined,
         fitOptions,
       });
@@ -184,25 +182,16 @@ export const usePredictSegmenter = () => {
       for await (const [i, _annotations] of predictedAnnotations.entries()) {
         const image = inferenceImages[i];
 
-        const imageJsImage = await ImageJS.load(image.src);
-
         for (let j = 0; j < _annotations.length; j++) {
           const ann = _annotations[j] as Partial<AnnotationObject>;
           const bbox = ann.boundingBox!;
           const width = bbox[2] - bbox[0];
           const height = bbox[3] - bbox[1];
 
-          if (bbox[1] + height > imageJsImage.height) {
+          if (bbox[1] + height > image.shape.height) {
             continue;
           }
 
-          const { src, data } = getPropertiesFromImageSync(
-            imageJsImage,
-            image,
-            {
-              boundingBox: bbox,
-            },
-          );
           const shape: Shape = {
             planes: 1,
             channels: image.shape.channels,
@@ -210,8 +199,6 @@ export const usePredictSegmenter = () => {
             height,
           };
 
-          ann.src = src;
-          ann.data = data;
           ann.shape = shape;
           ann.name = `${image.name}-${ann.kind}_${j}`;
           ann.imageId = image.id;

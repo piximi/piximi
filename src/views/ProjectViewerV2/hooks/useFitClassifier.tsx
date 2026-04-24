@@ -26,9 +26,9 @@ import {
   prepareClasses,
   prepareModel,
   prepareTrainingData,
-  toTrainingInput,
   trainModel,
 } from "utils/modelsV2/classification/utils";
+import { toTrainingInput } from "utils/modelsV2/utils";
 import type { TrainingInput } from "utils/modelsV2/types";
 
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";

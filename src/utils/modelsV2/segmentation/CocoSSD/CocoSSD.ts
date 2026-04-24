@@ -9,9 +9,9 @@ import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCoco } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
 import { constructCocoKinds } from "./constructCocoCategories";
-import { FitOptions } from "../../types";
+import { FitOptions, InferenceInput } from "../../types";
 import { ModelTask } from "../../enums";
-import { Kind, ImageObject } from "store/data/types";
+import { Kind } from "store/data/types";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
@@ -65,18 +65,21 @@ export class CocoSSD extends Segmenter {
     this._model = await loadGraphModel(this.src, { fromTFHub: isTFHub });
   }
 
-  public loadTraining(_images: ImageObject[], _preprocessingArgs: any): void {}
+  public loadTraining(
+    _items: InferenceInput[],
+    _preprocessingArgs: any,
+  ): void {}
   public loadValidation(
-    _images: ImageObject[],
+    _items: InferenceInput[],
     _preprocessingArgs: any,
   ): void {}
 
   public loadInference(
-    images: ImageObject[],
+    items: InferenceInput[],
     preprocessingArgs: LoadInferenceDataArgs,
   ) {
     this._inferenceDataset = preprocessInference(
-      images,
+      items,
       preprocessingArgs.fitOptions,
     );
 

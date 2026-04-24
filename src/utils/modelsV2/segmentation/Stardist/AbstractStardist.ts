@@ -7,8 +7,8 @@ import {
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
 import { generateKind } from "store/data/utils";
-import { LoadInferenceDataArgs } from "../../types";
-import { Kind, ImageObject } from "store/data/types";
+import { InferenceInput, LoadInferenceDataArgs } from "../../types";
+import { Kind } from "store/data/types";
 import { LoadCB } from "utils/types";
 
 export const KIND_NAME = "stardist_nucleus";
@@ -26,10 +26,13 @@ export abstract class Stardist extends Segmenter {
 
   public abstract loadModel(): Promise<void>;
 
-  public loadTraining(_images: ImageObject[], _preprocessingArgs: any): void {}
+  public loadTraining(
+    _items: InferenceInput[],
+    _preprocessingArgs: any,
+  ): void {}
 
   public loadValidation(
-    _images: ImageObject[],
+    _items: InferenceInput[],
     _preprocessingArgs: any,
   ): void {}
 
@@ -49,17 +52,17 @@ export abstract class Stardist extends Segmenter {
   }
 
   public loadInference(
-    images: ImageObject[],
+    items: InferenceInput[],
     preprocessingArgs: LoadInferenceDataArgs,
   ): void {
-    this._inferenceDataDims = images.map((im) => {
-      const { height, width } = im.shape;
+    this._inferenceDataDims = items.map((item) => {
+      const { height, width } = item.shape;
       const { padX, padY } = this._getPaddings(height, width);
       return { height, width, padY, padX };
     });
 
     this._inferenceDataset = preprocessStardist(
-      images,
+      items,
       1,
       this._inferenceDataDims,
     );

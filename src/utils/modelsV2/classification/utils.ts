@@ -12,7 +12,6 @@ import {
 } from "utils/modelsV2/enums";
 import {
   FitOptions,
-  InferenceInput,
   OptimizerSettings,
   PreprocessSettings,
   TrainingCallbacks,
@@ -23,12 +22,7 @@ import { SequentialClassifier } from "./AbstractClassifier";
 import { SimpleCNN } from "./SimpleCNN";
 import { MobileNet } from "./MobileNet";
 import { representsUnknown } from "utils/stringUtils";
-import type {
-  BBox,
-  Category,
-  ExtendedAnnotationObject,
-  ExtendedImageObject,
-} from "store/dataV2/types";
+import type { Category } from "store/dataV2/types";
 
 export const getDefaultModelParams = (): Pick<
   ModelInfo,
@@ -239,26 +233,3 @@ export const trainModel = async (
     return;
   }
 };
-
-export function toTrainingInput(
-  item: ExtendedImageObject | ExtendedAnnotationObject,
-): TrainingInput {
-  const region: BBox =
-    "boundingBox" in item
-      ? item.boundingBox
-      : [0, 0, item.shape.width, item.shape.height];
-  return {
-    id: item.id,
-    partition: item.partition,
-    categoryId: item.categoryId,
-    channelsRef: item.channelsRef,
-    shape: item.shape,
-    region,
-  };
-}
-
-export function toInferenceInput(
-  item: ExtendedImageObject | ExtendedAnnotationObject,
-): InferenceInput {
-  return toTrainingInput(item);
-}

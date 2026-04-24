@@ -101,6 +101,7 @@ type AppState = {
   classifier: ClassifierState;
   classifierV2: ClassifierState;
   segmenter: SegmenterState;
+  segmenterV2: SegmenterState;
   imageViewer: ImageViewerState;
   annotator: AnnotatorState;
   project: ProjectState;

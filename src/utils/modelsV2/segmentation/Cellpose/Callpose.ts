@@ -1,8 +1,11 @@
 import {
   GraphModel,
   History,
+  Tensor3D,
   Tensor4D,
   data as tfdata,
+  scalar,
+  tidy,
 } from "@tensorflow/tfjs";
 
 import {
@@ -10,10 +13,10 @@ import {
   OrphanedAnnotationObject,
 } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCellpose } from "./predictCellpose";
-import { FitOptions } from "../../types";
+import { FitOptions, InferenceInput } from "../../types";
 import { ModelTask } from "../../enums";
-import { getImageSlice } from "utils/tensorUtils";
-import { Kind, ImageObject } from "store/data/types";
+import { channelsToTensor } from "../../tensor-assembly";
+import { Kind } from "store/data/types";
 import { generateKind } from "store/data/utils";
 import { LoadCB } from "utils/types";
 
@@ -62,36 +65,40 @@ export class Cellpose extends Segmenter {
     this._model = { dispose: () => {} } as GraphModel;
   }
 
-  public loadTraining(_images: ImageObject[], _preprocessingArgs: any): void {}
-
-  public loadValidation(
-    _images: ImageObject[],
+  public loadTraining(
+    _items: InferenceInput[],
     _preprocessingArgs: any,
   ): void {}
 
-  private _sampleGenerator(images: Array<ImageObject>) {
-    const count = images.length;
-
-    return function* () {
-      let index = 0;
-
-      while (index < count) {
-        const image = images[index];
-        const dataPlane = getImageSlice(image.data, image.activePlane);
-
-        yield dataPlane;
-
-        index++;
-      }
-    };
-  }
+  public loadValidation(
+    _items: InferenceInput[],
+    _preprocessingArgs: any,
+  ): void {}
 
   public loadInference(
-    images: ImageObject[],
+    items: InferenceInput[],
     preprocessingArgs: LoadInferenceDataArgs,
   ): void {
-    this._inferenceDataset = tfdata
-      .generator(this._sampleGenerator(images))
+    const count = items.length;
+    const indices = tfdata.generator(function* () {
+      for (let i = 0; i < count; i++) yield i;
+    });
+
+    this._inferenceDataset = indices
+      .mapAsync(async (value) => {
+        const item = items[value as number];
+        const xs = await channelsToTensor(
+          item.channelsRef,
+          item.shape,
+          item.region,
+        );
+        const bitDepth = item.channelsRef[0].bitDepth;
+        const normalized = tidy(
+          () => xs.div(scalar(2 ** bitDepth - 1)) as Tensor3D,
+        );
+        xs.dispose();
+        return normalized;
+      })
       .batch(1) as tfdata.Dataset<Tensor4D>;
 
     if (preprocessingArgs.kinds) {

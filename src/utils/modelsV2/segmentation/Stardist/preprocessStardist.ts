@@ -1,68 +1,60 @@
-import { Tensor3D, Tensor4D, data as tfdata, tidy } from "@tensorflow/tfjs";
+import {
+  Tensor3D,
+  Tensor4D,
+  data as tfdata,
+  scalar,
+  tidy,
+} from "@tensorflow/tfjs";
 import { padToMatch } from "../../utils";
-import { getImageSlice } from "utils/tensorUtils";
-import { ImageObject } from "store/data/types";
+import { channelsToTensor } from "../../tensor-assembly";
+import { InferenceInput } from "../../types";
 
-const sampleGenerator = (
-  images: Array<ImageObject>,
-  padVals: Array<{ padX: number; padY: number }>,
-) => {
-  const count = images.length;
+const padImage = (
+  image: Tensor3D,
+  padX: number,
+  padY: number,
+): Tensor3D => {
+  if (padX === 0 && padY === 0) {
+    return image;
+  }
 
-  return function* () {
-    let index = 0;
-
-    while (index < count) {
-      const image = images[index];
-      const dataPlane = getImageSlice(image.data, image.activePlane);
-
-      yield {
-        data: dataPlane,
-        bitDepth: image.bitDepth,
-        padX: padVals[index].padX,
-        padY: padVals[index].padY,
-      };
-
-      index++;
-    }
-  };
-};
-
-const padImage = (image: {
-  data: Tensor3D;
-  bitDepth: ImageObject["bitDepth"];
-  padX: number;
-  padY: number;
-}) => {
-  const imageTensor = tidy(() => {
-    if (image.padX !== 0 || image.padY !== 0) {
-      const padded = padToMatch(
-        image.data,
-        {
-          height: image.data.shape[0] + image.padY,
-          width: image.data.shape[1] + image.padX,
-        },
-        "reflect",
-      );
-
-      // image.data disposed by padToMatch, and would be disposed by tf anyway
-      return padded;
-    } else {
-      return image.data;
-    }
-  });
-
-  // no casting, stardist input should be float32
-  return imageTensor as Tensor3D;
+  return tidy(() =>
+    padToMatch(
+      image,
+      {
+        height: image.shape[0] + padY,
+        width: image.shape[1] + padX,
+      },
+      "reflect",
+    ),
+  );
 };
 
 export const preprocessStardist = (
-  images: Array<ImageObject>,
+  items: Array<InferenceInput>,
   batchSize: number,
   dataDims: Array<{ padX: number; padY: number }>,
 ) => {
-  return tfdata
-    .generator(sampleGenerator(images, dataDims))
-    .map((im) => padImage(im))
+  const count = items.length;
+  const indices = tfdata.generator(function* () {
+    for (let i = 0; i < count; i++) yield i;
+  });
+
+  return indices
+    .mapAsync(async (value) => {
+      const index = value as number;
+      const item = items[index];
+      const xs = await channelsToTensor(
+        item.channelsRef,
+        item.shape,
+        item.region,
+      );
+      const bitDepth = item.channelsRef[0].bitDepth;
+      const normalized = tidy(
+        () => xs.div(scalar(2 ** bitDepth - 1)) as Tensor3D,
+      );
+      xs.dispose();
+      return padImage(normalized, dataDims[index].padX, dataDims[index].padY);
+    })
     .batch(batchSize) as tfdata.Dataset<Tensor4D>;
 };

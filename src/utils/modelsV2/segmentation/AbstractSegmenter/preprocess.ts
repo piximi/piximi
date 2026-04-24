@@ -1,34 +1,27 @@
 import { Tensor4D, data as tfdata } from "@tensorflow/tfjs";
-import { FitOptions } from "../../types";
-import { denormalizeTensor, getImageSlice } from "utils/tensorUtils";
-import { ImageObject } from "store/data/types";
-
-const inferenceGenerator = (images: Array<ImageObject>) => {
-  const count = images.length;
-
-  return function* () {
-    let index = 0;
-
-    while (index < count) {
-      const image = images[index];
-      const dataPlane = getImageSlice(image.data, image.activePlane);
-
-      yield { data: dataPlane, bitDepth: image.bitDepth };
-
-      index++;
-    }
-  };
-};
+import { FitOptions, InferenceInput } from "../../types";
+import { channelsToTensor } from "../../tensor-assembly";
 
 export const preprocessInference = (
-  images: Array<ImageObject>,
+  items: Array<InferenceInput>,
   _fitOptions: FitOptions,
 ) => {
-  return (
-    tfdata
-      .generator(inferenceGenerator(images))
-      // pre type converted tensor disposed internally by tf
-      .map((im) => denormalizeTensor(im.data, im.bitDepth).asType("int32"))
-      .batch(1) as tfdata.Dataset<Tensor4D>
-  );
+  const count = items.length;
+  const indices = tfdata.generator(function* () {
+    for (let i = 0; i < count; i++) yield i;
+  });
+
+  return indices
+    .mapAsync(async (value) => {
+      const item = items[value as number];
+      const xs = await channelsToTensor(
+        item.channelsRef,
+        item.shape,
+        item.region,
+      );
+      const cast = xs.asType("int32");
+      xs.dispose();
+      return cast;
+    })
+    .batch(1) as tfdata.Dataset<Tensor4D>;
 };

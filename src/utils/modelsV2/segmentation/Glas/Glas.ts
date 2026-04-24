@@ -2,9 +2,9 @@ import { GraphModel, History, LayersModel } from "@tensorflow/tfjs";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessGlas } from "./preprocessGlas";
 import { predictGlas } from "./predictGlas";
-import { LoadInferenceDataArgs } from "../../types";
+import { InferenceInput, LoadInferenceDataArgs } from "../../types";
 import { ModelTask } from "../../enums";
-import { Kind, ImageObject } from "store/data/types";
+import { Kind } from "store/data/types";
 import { loadGlas } from "./loadGlas";
 import { generateKind } from "store/data/utils";
 
@@ -41,22 +41,25 @@ export class Glas extends Segmenter {
     this._model = await loadGlas();
   }
 
-  public loadTraining(_images: ImageObject[], _preprocessingArgs: any): void {}
+  public loadTraining(
+    _items: InferenceInput[],
+    _preprocessingArgs: any,
+  ): void {}
 
   public loadValidation(
-    _images: ImageObject[],
+    _items: InferenceInput[],
     _preprocessingArgs: any,
   ): void {}
 
   public loadInference(
-    images: ImageObject[],
+    items: InferenceInput[],
     preprocessingArgs: LoadInferenceDataArgs,
   ): void {
-    this._inferenceDataDims = images.map((im) => {
-      const { height, width } = im.shape;
+    this._inferenceDataDims = items.map((item) => {
+      const { height, width } = item.shape;
       return { height, width };
     });
-    this._inferenceDataset = preprocessGlas(images, 1);
+    this._inferenceDataset = preprocessGlas(items, 1);
 
     if (preprocessingArgs.kinds) {
       if (preprocessingArgs.kinds.length !== 1)

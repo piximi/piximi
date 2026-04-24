@@ -6,6 +6,7 @@ import { classifierSlice as classifierSliceV2 } from "store/classifierV2";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";
+import { segmenterSlice as segmenterSliceV2 } from "store/segmenterV2";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { dataSlice } from "./data/dataSlice";
 import { measurementsSlice } from "./measurements/measurementsSlice";
@@ -17,6 +18,7 @@ const reducers = {
   classifier: classifierSlice.reducer,
   classifierV2: classifierSliceV2.reducer,
   segmenter: segmenterSlice.reducer,
+  segmenterV2: segmenterSliceV2.reducer,
   imageViewer: imageViewerSlice.reducer,
   project: projectSlice.reducer,
   projectV2: projectSliceV2.reducer,
