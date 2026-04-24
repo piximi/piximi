@@ -19,11 +19,13 @@ import {
 
 import { matchedCropPad, padToMatch } from "../../utils";
 import { CropSchema, Partition } from "../../enums";
-import { denormalizeTensor, getImageSlice } from "utils/tensorUtils";
-import { Category, Shape, Thing, BitDepth } from "store/data/types";
+import { channelsToTensor } from "utils/modelsV2/tensor-assembly";
+import { Category, Shape } from "store/data/types";
+import { BitDepth } from "store/dataV2/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 import { logger } from "utils/logUtils";
 import { RequireOnly } from "utils/types";
+import { InferenceInput, TrainingInput } from "utils/modelsV2/types";
 
 type FitData = {
   xs: Tensor3D;
@@ -40,21 +42,21 @@ type BatchedInferenceData = {
   xs: Tensor4D;
 };
 const createClassificationIdxs = <
-  T extends { id: string; categoryId: string; name: string },
+  T extends { id: string; categoryId: string },
   K extends { id: string },
 >(
-  images: T[],
+  items: T[],
   categories: K[],
 ) => {
   const categoryIdxs: number[] = [];
 
-  for (const im of images) {
+  for (const item of items) {
     const idx = categories.findIndex((cat: K) => {
       if (cat.id !== UNKNOWN_IMAGE_CATEGORY_ID) {
-        return cat.id === im.categoryId;
+        return cat.id === item.categoryId;
       } else {
         throw new Error(
-          `image "${im.name}" has an unrecognized category id of "${im.categoryId}"`,
+          `item "${item.id}" has an unrecognized category id of "${item.categoryId}"`,
         );
       }
     });
@@ -65,79 +67,49 @@ const createClassificationIdxs = <
   return categoryIdxs;
 };
 
-const sampleGeneratorCreator = <
-  T extends Omit<Thing, "kind">,
+const buildSampleDataset = <
+  T extends TrainingInput | InferenceInput,
   K extends { id: string },
   B extends boolean,
 >(
-  images: Array<T>,
+  items: Array<T>,
   categories: Array<K>,
   inference: B,
-): B extends true
-  ? () => Generator<InferenceData, void, unknown>
-  : () => Generator<FitData, void, unknown> => {
-  const count = images.length;
+): B extends true ? tfdata.Dataset<InferenceData> : tfdata.Dataset<FitData> => {
+  const count = items.length;
+  const indices = tfdata.generator(function* () {
+    for (let i = 0; i < count; i++) yield i;
+  });
+
   if (inference) {
-    return function* () {
-      let index = 0;
-
-      while (index < count) {
-        const image = images[index];
-        let activePlane = 0;
-
-        if ("activePlane" in image) {
-          activePlane = image.activePlane;
-        }
-        const dataPlane = getImageSlice(image.data, activePlane);
-
-        /*
-       dataPlane will be disposed by TF after passing it to fit/evaluate/predict
- 
-       we don't clone the "dataPlane" tensor because "getImageSlice" is already giving
-       us a new, disposable, tensor derived from "image"
-      */
-
-        yield {
-          xs: dataPlane,
-        };
-
-        index++;
-      }
-    } as any;
-  } else {
-    const categoryIdxs = createClassificationIdxs(images, categories);
-
-    return function* () {
-      let index = 0;
-
-      while (index < count) {
-        const image = images[index];
-        let activePlane = 0;
-
-        if ("activePlane" in image) {
-          activePlane = image.activePlane;
-        }
-        const dataPlane = getImageSlice(image.data, activePlane);
-
-        const label = categoryIdxs[index];
-        const oneHotLabel = oneHot(label, categories.length) as Tensor1D;
-
-        /*
-         dataPlane and oneHotLabel will be disposed by TF after passing it to fit/evaluate/predict
-   
-         we don't clone the "dataPlane" tensor because "getImageSlice" is already giving
-         us a new, disposable, tensor derived from "image"
-        */
-
-        yield {
-          xs: dataPlane,
-          ys: oneHotLabel,
-        };
-
-        index++;
-      }
-    } as any;
+    return indices.mapAsync(async (value) => {
+      const index = value as number;
+      const item = items[index];
+      const xs = await channelsToTensor(
+        item.channelsRef,
+        item.shape,
+        item.region,
+      );
+      return { xs };
+    }) as any;
   }
+
+  const categoryIdxs = createClassificationIdxs(
+    items as unknown as Array<{ id: string; categoryId: string }>,
+    categories,
+  );
+  return indices.mapAsync(async (value) => {
+    const index = value as number;
+    const item = items[index];
+    const xs = await channelsToTensor(
+      item.channelsRef,
+      item.shape,
+      item.region,
+    );
+    const label = categoryIdxs[index];
+    const oneHotLabel = oneHot(label, categories.length) as Tensor1D;
+    return { xs, ys: oneHotLabel };
+  }) as any;
 };
 
 const cropResize = <B extends boolean>(
@@ -145,7 +117,7 @@ const cropResize = <B extends boolean>(
   cropSchema: CropSchema,
   numCrops: number,
   inference: B,
-  item: { xs: Tensor3D; ys?: Tensor2D },
+  item: { xs: Tensor3D; ys?: Tensor1D },
 ): B extends true
   ? { xs: Tensor3D }
   : {
@@ -208,13 +180,14 @@ const cropResize = <B extends boolean>(
   } as any;
 };
 
-const scale = <T extends { xs: Tensor3D }>(bitDepth: BitDepth, items: T) => {
-  const scaleddXs = denormalizeTensor(items.xs, bitDepth);
-
-  return {
-    ...items,
-    xs: scaleddXs,
-  };
+const normalize = <T extends { xs: Tensor3D }>(
+  bitDepth: BitDepth,
+  items: T,
+) => {
+  const maxRange = 2 ** bitDepth - 1;
+  const normalizedXs = tidy(() => items.xs.div(scalar(maxRange))) as Tensor3D;
+  items.xs.dispose();
+  return { ...items, xs: normalizedXs };
 };
 
 //#region Debug stuff
@@ -236,7 +209,11 @@ const doShowImages = async (
     canvas.height = refHeight;
 
     const imTensor = tensor3d(xsData, undefined, "int32");
-    const imageDataArr = await browser.toPixels(imTensor);
+    // TF.js 4.2 types `toPixels` as `Uint8ClampedArray` (→ `<ArrayBufferLike>` under TS 5.7),
+    // but `ImageData` requires the buffer to be `ArrayBuffer`. At runtime it always is.
+    const imageDataArr = (await browser.toPixels(
+      imTensor,
+    )) as Uint8ClampedArray<ArrayBuffer>;
     imTensor.dispose();
     const imageData = new ImageData(
       imageDataArr,
@@ -249,21 +226,21 @@ const doShowImages = async (
     if (partition === Partition.Training && trainLimit < 5) {
       trainLimit++;
       logger(
-        `Training, class: 
+        `Training, class:
         ${ysData.findIndex((e) => e === 1)}
         ${canvas.toDataURL()}`,
       );
     } else if (partition === Partition.Validation && valLimit < 5) {
       valLimit++;
       logger(
-        `Validation, class: 
+        `Validation, class:
         ${ysData.findIndex((e) => e === 1)}
         ${canvas.toDataURL()}`,
       );
     } else if (partition === Partition.Inference && infLimit < 5) {
       infLimit++;
       logger(
-        `Inference, class: 
+        `Inference, class:
         ${ysData.findIndex((e) => e === 1)}
         ${canvas.toDataURL()}`,
       );
@@ -275,20 +252,13 @@ const doShowImages = async (
 
 const doShow = (
   partition: Partition,
-  scale: boolean,
+  normalizedInput: boolean,
   value: TensorContainer,
 ) => {
   const items = value as {
     xs: Tensor3D;
     ys: Tensor1D;
   };
-  // logger(
-  //   `perf:
-  //   ${items.xs.shape[0]}
-  //   ${memory().numTensors}
-  //   ${memory().numBytes} // @ts-ignore
-  //   ${memory().numBytesInGPU}`
-  // );
   const numChannels = items.xs.shape[2];
 
   const xsData = tidy(() => {
@@ -310,7 +280,7 @@ const doShow = (
       xsIm = items.xs;
     }
 
-    if (scale) {
+    if (normalizedInput) {
       // don't dispose input tensor, tidy does that for us
       xsIm = xsIm.mul(scalar(255));
     }
@@ -325,64 +295,66 @@ const doShow = (
 //#endregion Debug stuff
 
 type PreprocessArgs = {
-  images: Array<Thing>;
+  items: Array<TrainingInput | InferenceInput>;
   categories: Array<RequireOnly<Category, "id">>;
   preprocessOptions: {
     cropSchema: CropSchema;
     numCrops: number;
     inputShape: Omit<Shape, "planes">;
     shuffle: boolean;
-    rescale: boolean;
+    normalize: boolean;
     batchSize: number;
   };
 };
 
 export const preprocessData = <B extends boolean>({
-  images,
+  items,
   categories,
   preprocessOptions,
   inference,
 }: PreprocessArgs & { inference: B }): B extends true
   ? tfdata.Dataset<BatchedInferenceData>
   : tfdata.Dataset<BatchedFitData> => {
-  let imageSet: typeof images;
+  let itemSet: typeof items;
   const catSet = categories;
   if (preprocessOptions.numCrops > 1 && !inference) {
     // no need to copy the tensors here
-    imageSet = images.flatMap((im) =>
-      Array(preprocessOptions.numCrops).fill(im),
-    );
+    itemSet = items.flatMap((im) => Array(preprocessOptions.numCrops).fill(im));
   } else {
-    imageSet = images;
+    itemSet = items;
   }
 
-  let imageData = tfdata
-    .generator(sampleGeneratorCreator(imageSet, catSet, !!inference))
-    .map(
-      cropResize.bind(
-        null,
-        preprocessOptions.inputShape,
-        preprocessOptions.cropSchema,
-        preprocessOptions.numCrops,
-        !!inference,
-      ),
-    );
+  let imageData = buildSampleDataset(itemSet, catSet, !!inference).map(
+    cropResize.bind(
+      null,
+      preprocessOptions.inputShape,
+      preprocessOptions.cropSchema,
+      preprocessOptions.numCrops,
+      !!inference,
+    ),
+  );
 
   // If we took crops, the crops from each sample will be sequentially arranged
-  // ideally we want to shuffle the partition itslef to avoid biasing the model
+  // ideally we want to shuffle the partition itself to avoid biasing the model
   // TODO: warn user against cropping without shuffling
   if (preprocessOptions.numCrops > 1 && preprocessOptions.shuffle) {
     imageData = imageData.shuffle(preprocessOptions.batchSize);
   }
 
-  // rescaled (in range [0, 1]) by default, scale up if rescale is off
-  if (!preprocessOptions.rescale) {
-    imageData = imageData.map(scale.bind(null, images[0].bitDepth));
+  // channelsToTensor returns raw integer Float32; normalize divides by (2^bitDepth - 1)
+  // Skip entirely on empty items — there's nothing to normalize, and reading bitDepth
+  // from items[0] would throw.
+  if (preprocessOptions.normalize && items.length > 0) {
+    const bitDepth = items[0].channelsRef[0].bitDepth;
+    imageData = imageData.map(normalize.bind(null, bitDepth));
   }
 
   if (import.meta.env.VITE_APP_LOG_LEVEL === "4") {
+    const logPartition = inference
+      ? Partition.Inference
+      : (items[0] as TrainingInput).partition;
     imageData.forEachAsync(
-      doShow.bind(null, images[0].partition, preprocessOptions.rescale),
+      doShow.bind(null, logPartition, preprocessOptions.normalize),
     );
   }
 

@@ -8,7 +8,7 @@ import {
   serialization,
 } from "@tensorflow/tfjs";
 import { isEqual } from "lodash";
-import { Shape } from "store/data/types";
+import { Shape } from "store/dataV2/types";
 
 const copyLayer = (
   fromModel: LayersModel,

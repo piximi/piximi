@@ -28,13 +28,13 @@ import {
   selectClassifierInputShape,
   selectActiveClassifierModel,
   selectClassifierModelWithIdx,
-  selectClassifierRescaleOptions,
+  selectClassifierNormalizeOptions,
 } from "@ProjectViewer/state/reselectors";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 
 import { enumKeys } from "utils/objectUtils";
 import { CropSchema } from "utils/modelsV2/enums";
-import type { CropOptions, RescaleOptions } from "utils/modelsV2/types";
+import type { CropOptions, NormalizeOptions } from "utils/modelsV2/types";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 
@@ -264,15 +264,17 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
 export const ImageAugmentationSettings = () => {
   const dispatch = useDispatch();
   const activeKindId = useSelector(selectActiveKindId);
-  const rescaleOptions = useSelector(selectClassifierRescaleOptions);
+  const normalizeOptions = useSelector(selectClassifierNormalizeOptions);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [rescalable, setRescalable] = useState<boolean>(rescaleOptions.rescale);
+  const [rescalable, setRescalable] = useState<boolean>(
+    normalizeOptions.normalize,
+  );
   const selectedModel = useSelector(selectActiveClassifierModel);
 
-  const updateRescaleOptions = (rescaleOptions: RescaleOptions) => {
+  const updateNormalizeOptions = (normalizeOptions: NormalizeOptions) => {
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
-        settings: { rescaleOptions },
+        settings: { normalizeOptions },
         kindId: activeKindId,
       }),
     );
@@ -280,9 +282,9 @@ export const ImageAugmentationSettings = () => {
 
   const onCheckboxChange = () => {
     setRescalable(!rescalable);
-    updateRescaleOptions({
-      ...rescaleOptions,
-      rescale: !rescaleOptions.rescale,
+    updateNormalizeOptions({
+      ...normalizeOptions,
+      normalize: !normalizeOptions.normalize,
     });
   };
 

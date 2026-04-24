@@ -35,7 +35,7 @@ export class SimpleCNN extends SequentialClassifier {
       inputShape: inputShape,
       ...preprocessOptions.cropOptions,
       shuffle: preprocessOptions.shuffle,
-      rescale: preprocessOptions.rescaleOptions.rescale,
+      normalize: preprocessOptions.normalizeOptions.normalize,
       batchSize: compileOptions.batchSize,
     };
     this._optimizerSettings = compileOptions;

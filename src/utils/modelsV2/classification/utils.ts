@@ -9,18 +9,26 @@ import {
   Metric,
   OptimizationAlgorithm,
   Partition,
-} from "utils/models/enums";
-import { Category, Thing } from "store/data/types";
+} from "utils/modelsV2/enums";
 import {
   FitOptions,
+  InferenceInput,
   OptimizerSettings,
   PreprocessSettings,
   TrainingCallbacks,
-} from "utils/models/types";
+  TrainingInput,
+} from "utils/modelsV2/types";
 import { ModelInfo } from "store/types";
 import { SequentialClassifier } from "./AbstractClassifier";
 import { SimpleCNN } from "./SimpleCNN";
 import { MobileNet } from "./MobileNet";
+import { representsUnknown } from "utils/stringUtils";
+import type {
+  BBox,
+  Category,
+  ExtendedAnnotationObject,
+  ExtendedImageObject,
+} from "store/dataV2/types";
 
 export const getDefaultModelParams = (): Pick<
   ModelInfo,
@@ -42,8 +50,8 @@ export const getDefaultModelParams = (): Pick<
       channels: 1,
     },
     shuffle: true,
-    rescaleOptions: {
-      rescale: true,
+    normalizeOptions: {
+      normalize: true,
       center: false,
     },
     cropOptions: {
@@ -100,73 +108,32 @@ export function prepareClasses(
     );
   }
 }
+
 export function prepareTrainingData(
   shuffleData: boolean,
   trainingPercentage: number,
   init: boolean,
-  allThings: Record<string, Thing>,
-  activeThingIds: string[],
-): {
-  unlabeledThings: Thing[];
-  labeledTraining: Thing[];
-  labeledUnassigned: Thing[];
-  labeledValidation: Thing[];
-  splitLabeledTraining: Thing[];
-  splitLabeledValidation: Thing[];
-};
-export function prepareTrainingData(
-  shuffleData: boolean,
-  trainingPercentage: number,
-  init: boolean,
-  allThings: Thing[],
-): {
-  unlabeledThings: Thing[];
-  labeledTraining: Thing[];
-  labeledUnassigned: Thing[];
-  labeledValidation: Thing[];
-  splitLabeledTraining: Thing[];
-  splitLabeledValidation: Thing[];
-};
-export function prepareTrainingData(
-  shuffleData: boolean,
-  trainingPercentage: number,
-  init: boolean,
-  allThings: Record<string, Thing> | Thing[],
-  activeThingIds?: string[],
+  items: TrainingInput[],
 ) {
-  const unlabeledThings: Thing[] = [];
-  const labeledTraining: Thing[] = [];
-  const labeledValidation: Thing[] = [];
-  const labeledUnassigned: Thing[] = [];
-  if (activeThingIds) {
-    activeThingIds.forEach((id) => {
-      const thing = (allThings as Record<string, Thing>)[id];
-      if (!thing) throw new Error("Active Thing Ids not in sync with things");
-      if (isUnknownCategory(thing.categoryId)) {
-        unlabeledThings.push(thing);
-      } else if (thing.partition === Partition.Unassigned) {
-        labeledUnassigned.push(thing);
-      } else if (thing.partition === Partition.Training) {
-        labeledTraining.push(thing);
-      } else if (thing.partition === Partition.Validation) {
-        labeledValidation.push(thing);
-      }
-    });
-  } else {
-    (allThings as Thing[]).forEach((thing) => {
-      if (isUnknownCategory(thing.categoryId)) {
-        unlabeledThings.push(thing);
-      } else if (thing.partition === Partition.Unassigned) {
-        labeledUnassigned.push(thing);
-      } else if (thing.partition === Partition.Training) {
-        labeledTraining.push(thing);
-      } else if (thing.partition === Partition.Validation) {
-        labeledValidation.push(thing);
-      }
-    });
-  }
-  let splitLabeledTraining: Thing[] = [];
-  let splitLabeledValidation: Thing[] = [];
+  const unlabeledThings: TrainingInput[] = [];
+  const labeledTraining: TrainingInput[] = [];
+  const labeledValidation: TrainingInput[] = [];
+  const labeledUnassigned: TrainingInput[] = [];
+
+  items.forEach((thing) => {
+    if (representsUnknown(thing.categoryId)) {
+      unlabeledThings.push(thing);
+    } else if (thing.partition === Partition.Unassigned) {
+      labeledUnassigned.push(thing);
+    } else if (thing.partition === Partition.Training) {
+      labeledTraining.push(thing);
+    } else if (thing.partition === Partition.Validation) {
+      labeledValidation.push(thing);
+    }
+  });
+
+  let splitLabeledTraining: TrainingInput[] = [];
+  let splitLabeledValidation: TrainingInput[] = [];
   if (init) {
     const trainingThingsLength = Math.round(
       trainingPercentage * labeledUnassigned.length,
@@ -201,8 +168,8 @@ export function prepareTrainingData(
 }
 export const prepareModel = async (
   model: SequentialClassifier,
-  trainingData: Thing[],
-  validationData: Thing[],
+  trainingData: TrainingInput[],
+  validationData: TrainingInput[],
   numClasses: number,
   categories: Category[],
   preprocessSettings: PreprocessSettings,
@@ -272,3 +239,26 @@ export const trainModel = async (
     return;
   }
 };
+
+export function toTrainingInput(
+  item: ExtendedImageObject | ExtendedAnnotationObject,
+): TrainingInput {
+  const region: BBox =
+    "boundingBox" in item
+      ? item.boundingBox
+      : [0, 0, item.shape.width, item.shape.height];
+  return {
+    id: item.id,
+    partition: item.partition,
+    categoryId: item.categoryId,
+    channelsRef: item.channelsRef,
+    shape: item.shape,
+    region,
+  };
+}
+
+export function toInferenceInput(
+  item: ExtendedImageObject | ExtendedAnnotationObject,
+): InferenceInput {
+  return toTrainingInput(item);
+}

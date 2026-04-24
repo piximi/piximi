@@ -24,7 +24,7 @@ import {
   selectActiveClassifierModel,
   selectTotalActiveUnlabeledItems,
 } from "@ProjectViewer/state/reselectors";
-import { selectActiveKindId } from "@ProjectViewer/state/selectors";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 import { HotkeyContext } from "utils/enums";
 import { ModelStatus } from "utils/modelsV2/enums";
@@ -202,16 +202,15 @@ const ModelSelection = ({
   selectedModel: SequentialClassifier | undefined;
 }) => {
   const dispatch = useDispatch();
-  const activeKindId = useSelector(selectActiveKindId);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const selectedModelName = selectedModel?.name ?? "new";
   const handleModelChange = (event: SelectChangeEvent<unknown>) => {
     let value: string | number = event.target.value as string;
-
     if (value === "new") value = 0;
 
     dispatch(
       classifierSlice.actions.updateSelectedModelNameOrArch({
-        kindId: activeKindId,
+        kindId: modelTarget.id,
         modelName: value,
       }),
     );
@@ -221,7 +220,7 @@ const ModelSelection = ({
     classifierHandler.removeModel(selectedModel.name);
     dispatch(
       classifierSlice.actions.updateSelectedModelNameOrArch({
-        kindId: activeKindId,
+        kindId: modelTarget.id,
         modelName: 0,
       }),
     );

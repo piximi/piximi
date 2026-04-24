@@ -70,7 +70,7 @@ export class UploadedClassifier extends SequentialClassifier {
             numCrops: number;
             inputShape: Omit<Shape, "planes">;
             shuffle: boolean;
-            rescale: boolean;
+            normalize: boolean;
             batchSize: number;
           };
           classes: string[];
@@ -80,7 +80,19 @@ export class UploadedClassifier extends SequentialClassifier {
     if (this._descFile) {
       const descContents = await this._descFile.text();
       try {
-        metadata = validateModelMetadata(descContents);
+        const raw = validateModelMetadata(descContents) as {
+          preprocessSettings: Omit<
+            (typeof metadata & {})["preprocessSettings"],
+            "normalize"
+          > & { rescale: boolean };
+          classes: string[];
+          optimizerSettings: OptimizerSettings;
+        };
+        const { rescale, ...rest } = raw.preprocessSettings;
+        metadata = {
+          ...raw,
+          preprocessSettings: { ...rest, normalize: rescale },
+        };
       } catch (err) {
         logger(err, { level: "warn" });
       }
@@ -98,7 +110,7 @@ export class UploadedClassifier extends SequentialClassifier {
         },
         ...defaultModelInfo.preprocessSettings.cropOptions,
         shuffle: defaultModelInfo.preprocessSettings.shuffle,
-        rescale: defaultModelInfo.preprocessSettings.rescaleOptions.rescale,
+        normalize: defaultModelInfo.preprocessSettings.normalizeOptions.normalize,
         batchSize: defaultModelInfo.optimizerSettings.batchSize,
       };
       this._optimizerSettings = defaultModelInfo.optimizerSettings;

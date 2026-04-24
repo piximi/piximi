@@ -29,6 +29,9 @@ import type {
   V2ImageObject,
   V2ImageSeries,
   V2Kind,
+  V2KindClassifier,
+  V2ModelInfo,
+  V2NormalizeOptions,
   V2PiximiState,
   V2Plane,
 } from "../version-readers/version-types/v2Types";
@@ -36,6 +39,7 @@ import type {
   V11Category,
   V11ClassifierState,
   V11Kind,
+  V11KindClassifier,
   V11PiximiState,
   V11RawAnnotationObject,
   V11RawImageObject,
@@ -87,17 +91,41 @@ export function convertV11ToV2(
   };
 }
 
+function convertKindClassifier(
+  v11KClassifier: V11KindClassifier,
+): V2KindClassifier {
+  const { modelNameOrArch, modelInfoDict } = v11KClassifier;
+  const v2ModelInfoDict: Record<string, V2ModelInfo> = {};
+  Object.entries(modelInfoDict).forEach(([id, info]) => {
+    const { preprocessSettings, ...restInfo } = info;
+    const { rescaleOptions, ...restPreProc } = preprocessSettings;
+    const normalizeOptions: V2NormalizeOptions = {
+      normalize: rescaleOptions.rescale,
+      center: rescaleOptions.center,
+    };
+    v2ModelInfoDict[id] = {
+      preprocessSettings: { normalizeOptions, ...restPreProc },
+      ...restInfo,
+    };
+  });
+  return { modelNameOrArch, modelInfoDict: v2ModelInfoDict };
+}
 function convertClassifier(
   v11ClassifierState: V11ClassifierState,
 ): V2ClassifierState {
   const v11Classifiers = v11ClassifierState.kindClassifiers;
   const v2Classifiers: V2ClassifierState["kindClassifiers"] = {};
   Object.keys(v11Classifiers).forEach((id) => {
-    if (id === "Image") v2Classifiers[IMAGE_CLASSIFIER_ID] = v11Classifiers[id];
+    //V1 Used to use kind names as ids, and had an "Image" kind for the images
+    if (id === "Image")
+      v2Classifiers[IMAGE_CLASSIFIER_ID] = convertKindClassifier(
+        v11Classifiers[id],
+      );
     else {
-      v2Classifiers[id] = v11Classifiers[id];
+      v2Classifiers[id] = convertKindClassifier(v11Classifiers[id]);
     }
   });
+  //V2 requires a classifier for the Unknown kind; V1 had no such concept, so seed it with defaults
   v2Classifiers[UNKNOWN_KIND_ID] = {
     modelNameOrArch: 0,
     modelInfoDict: { "base-model": getDefaultModelInfo() },

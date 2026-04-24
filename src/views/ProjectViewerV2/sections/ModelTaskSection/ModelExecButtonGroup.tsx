@@ -33,6 +33,7 @@ export const ModelExecButtonGroup = ({
 }) => {
   return (
     <Box width="100%" display="flex" justifyContent={"space-evenly"}>
+      {/* Fit Button */}
       <TooltipButton
         tooltipTitle={execConfig.fit.helperText}
         disableRipple
@@ -41,7 +42,7 @@ export const ModelExecButtonGroup = ({
       >
         <ScatterPlotIcon />
       </TooltipButton>
-
+      {/* Predict Button */}
       <TooltipButton
         disableRipple
         tooltipTitle={execConfig.predict.helperText}
@@ -58,7 +59,7 @@ export const ModelExecButtonGroup = ({
           <LabelImportantIcon />
         )}
       </TooltipButton>
-
+      {/* Eval Button */}
       <TooltipButton
         tooltipTitle={execConfig.evaluate.helperText}
         disableRipple

@@ -7,7 +7,16 @@ import { logger, parseError } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
 import { ModelTask } from "../enums";
 import { getUniqueName } from "utils/stringUtils";
-import { ExtractedModelFileMap, SerializedModels } from "../types";
+import {
+  ExtractedModelFileMap,
+  FitOptions,
+  InferenceInput,
+  SerializedModels,
+  TrainingCallbacks,
+  TrainingInput,
+} from "../types";
+import type { RequireOnly } from "utils/types";
+import type { Category } from "store/dataV2/types";
 
 export type ModelUploadResults = {
   loadedModels: SequentialClassifier[];
@@ -101,6 +110,56 @@ class ClassifierHandler {
       model.dispose();
     });
     this._availableClassificationModels = {};
+  }
+
+  private resolveModel(modelName: string): SequentialClassifier {
+    const model = this._availableClassificationModels[modelName];
+    if (!model) {
+      throw new Error(
+        `ClassifierHandler: no model registered with name "${modelName}"`,
+      );
+    }
+    return model;
+  }
+
+  public loadTraining(
+    modelName: string,
+    items: TrainingInput[],
+    categories: RequireOnly<Category, "id">[],
+  ) {
+    this.resolveModel(modelName).loadTraining(items, categories);
+  }
+
+  public loadValidation(
+    modelName: string,
+    items: TrainingInput[],
+    categories: RequireOnly<Category, "id">[],
+  ) {
+    this.resolveModel(modelName).loadValidation(items, categories);
+  }
+
+  public loadInference(
+    modelName: string,
+    items: InferenceInput[],
+    categories: RequireOnly<Category, "id">[],
+  ) {
+    this.resolveModel(modelName).loadInference(items, categories);
+  }
+
+  public fit(
+    modelName: string,
+    options: FitOptions,
+    callbacks: TrainingCallbacks,
+  ) {
+    return this.resolveModel(modelName).train(options, callbacks);
+  }
+
+  public predict(modelName: string, categories: RequireOnly<Category, "id">[]) {
+    return this.resolveModel(modelName).predict(categories);
+  }
+
+  public evaluate(modelName: string) {
+    return this.resolveModel(modelName).evaluate();
   }
   public async modelFromFiles(input: {
     descFile: File;

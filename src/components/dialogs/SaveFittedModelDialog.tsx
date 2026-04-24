@@ -3,7 +3,7 @@ import { Grid2 as Grid, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { Model } from "utils/models/Model";
+import { Model } from "utils/modelsV2/Model";
 
 import JSZip from "jszip";
 import saveAs from "file-saver";

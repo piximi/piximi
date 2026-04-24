@@ -1,5 +1,4 @@
-import type { ReactElement } from "react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -21,18 +20,18 @@ import {
 
 import { StyledSelect } from "components/inputs/StyledSelect";
 
-import type { Category } from "store/data/types";
-import { selectActiveKindId } from "store/project/selectors";
-import { generateCategory } from "store/data/utils";
-import { selectAvaliableCategoryColors } from "store/project/reselectors";
-import { CATEGORY_COLORS } from "store/data/constants";
-import { dataSlice } from "store/data";
+import type { Category } from "store/dataV2/types";
+import { generateCategory } from "store/dataV2/utils";
+import { CATEGORY_COLORS, IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
 import type { ModelClassMap } from "store/types";
+import { dataSliceV2 } from "store/dataV2";
+import { selectAvaliableCategoryColors } from "@ProjectViewer/state/reselectors";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 import { getRandomInt } from "utils/dataUtils";
 import { isObjectEmpty } from "utils/objectUtils";
 
-const ClassMapDialog = ({
+export const ClassMapDialog = ({
   open,
   modelClasses,
   projectCategories,
@@ -51,7 +50,7 @@ const ClassMapDialog = ({
   const [shouldCreateCategories, setShouldCreateCategories] = useState<boolean>(
     projectCategories.length === 0,
   );
-  const activeKindId = useSelector(selectActiveKindId);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const availableCategoryColors = useSelector(selectAvaliableCategoryColors);
 
   const handleConfirmation = () => {
@@ -64,11 +63,19 @@ const ClassMapDialog = ({
           const choices = Object.values(CATEGORY_COLORS);
           color = choices[getRandomInt(0, choices.length)] as string;
         }
-        const cat = generateCategory(className, activeKindId, color);
+        let cat: Category;
+        if (modelTarget.id === IMAGE_CLASSIFIER_ID) {
+          cat = generateCategory(className, color, { type: "image" });
+        } else {
+          cat = generateCategory(className, color, {
+            type: "annotation",
+            kindId: modelTarget.id,
+          });
+        }
         newCategories.push(cat);
         confirmedCatMap[idx] = cat.id;
       });
-      dispatch(dataSlice.actions.addCategories({ categories: newCategories }));
+      dispatch(dataSliceV2.actions.batchAddCategory(newCategories));
       onConfirm(confirmedCatMap);
     } else {
       onConfirm(catMap);
@@ -181,89 +188,3 @@ const ClassMapDialog = ({
     </Dialog>
   );
 };
-
-const ClassMapDialogContext = React.createContext<{
-  openDialog: ({
-    projectCategories,
-    modelClasses,
-    actionCallback,
-  }: {
-    projectCategories: Category[];
-    modelClasses: string[];
-    actionCallback: any;
-  }) => void;
-}>({
-  openDialog: (_config) => {},
-});
-
-const ClassMapDialogProvider = ({ children }: { children: ReactElement }) => {
-  const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [dialogConfig, setDialogConfig] = React.useState<{
-    projectCategories: Category[];
-    modelClasses: string[];
-    actionCallback: any;
-  }>({ projectCategories: [], modelClasses: [], actionCallback: undefined });
-
-  const openDialog = ({
-    projectCategories,
-    modelClasses,
-    actionCallback,
-  }: {
-    projectCategories: Category[];
-    modelClasses: string[];
-    actionCallback: any;
-  }) => {
-    setDialogOpen(true);
-    setDialogConfig({ projectCategories, modelClasses, actionCallback });
-  };
-
-  const resetDialog = () => {
-    setDialogOpen(false);
-    setDialogConfig({
-      projectCategories: [],
-      modelClasses: [],
-      actionCallback: undefined,
-    });
-  };
-
-  const onConfirm = (catMap: ModelClassMap) => {
-    resetDialog();
-    dialogConfig.actionCallback(catMap);
-  };
-
-  const onDismiss = () => {
-    resetDialog();
-    dialogConfig.actionCallback(false);
-  };
-
-  return (
-    <ClassMapDialogContext.Provider value={{ openDialog }}>
-      <ClassMapDialog
-        open={dialogOpen}
-        projectCategories={dialogConfig.projectCategories}
-        modelClasses={dialogConfig.modelClasses}
-        onConfirm={onConfirm}
-        onDismiss={onDismiss}
-      />
-      {children}
-    </ClassMapDialogContext.Provider>
-  );
-};
-
-const useClassMapDialog = () => {
-  const { openDialog } = React.useContext(ClassMapDialogContext);
-
-  const getClassMap = (
-    options: Omit<Parameters<typeof openDialog>[0], "actionCallback">,
-  ): Promise<ModelClassMap | false> =>
-    new Promise((res) => {
-      openDialog({
-        actionCallback: res,
-        ...options,
-      });
-    });
-
-  return { getClassMap };
-};
-
-export { ClassMapDialogProvider, useClassMapDialog };

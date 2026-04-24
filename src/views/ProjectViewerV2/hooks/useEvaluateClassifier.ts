@@ -1,55 +1,34 @@
-import React, { useCallback } from "react";
+import React from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { selectActiveKnownCategories } from "store/project/reselectors";
-import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
+import {
+  selectActiveClassifierModel,
+  selectActiveClassifierModelNameOrArch,
+  selectActiveKnownCategories,
+} from "@ProjectViewer/state/reselectors";
 import { classifierSlice } from "store/classifierV2";
-import { selectActiveKindId } from "store/project/selectors";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 import { AlertType } from "utils/enums";
-import { getStackTraceFromError } from "utils/logUtils";
-import type { AlertState } from "utils/types";
+import classifierHandler from "utils/modelsV2/classification/classifierHandler";
 import { ModelStatus } from "utils/modelsV2/enums";
 
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
+import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 
 export const useEvaluateClassifier = () => {
   const dispatch = useDispatch();
   const { modelStatus, setModelStatus } = useClassifierStatus();
   const activeCategories = useSelector(selectActiveKnownCategories);
-  const activeKindId = useSelector(selectActiveKindId);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const selectedModel = useSelector(selectActiveClassifierModel);
-  const handleError = useCallback(
-    async (error: Error, name: string, initialModelStatus?: ModelStatus) => {
-      const stackTrace = await getStackTraceFromError(error);
-      const alertState: AlertState = {
-        alertType: AlertType.Error,
-        name: name,
-        description: `${error.name}:\n${error.message}`,
-        stackTrace: stackTrace,
-      };
-      if (import.meta.env.NODE_ENV !== "production") {
-        console.error(
-          alertState.name,
-          "\n",
-          alertState.description,
-          "\n",
-          alertState.stackTrace,
-        );
-      }
-      dispatch(
-        applicationSettingsSlice.actions.updateAlertState({
-          alertState: alertState,
-        }),
-      );
-      setModelStatus(initialModelStatus ?? ModelStatus.Idle);
-    },
-    [dispatch],
-  );
+  const modelNameOrArch = useSelector(selectActiveClassifierModelNameOrArch);
+  const handleError = useClassifierErrorHandler();
   const evaluateClassifier = async () => {
-    if (!selectedModel) return;
+    if (typeof modelNameOrArch !== "string" || !selectedModel) return;
+    const modelName = modelNameOrArch;
     const initialModelStatus = modelStatus;
     if (!selectedModel.validationLoaded) {
       dispatch(
@@ -74,11 +53,11 @@ export const useEvaluateClassifier = () => {
     } else {
       setModelStatus(ModelStatus.Evaluating);
       try {
-        const evaluationResult = await selectedModel.evaluate();
+        const evaluationResult = await classifierHandler.evaluate(modelName);
         dispatch(
           classifierSlice.actions.updateEvaluationResult({
             evaluationResult,
-            kindId: activeKindId,
+            kindId: modelTarget.id,
           }),
         );
       } catch (error) {

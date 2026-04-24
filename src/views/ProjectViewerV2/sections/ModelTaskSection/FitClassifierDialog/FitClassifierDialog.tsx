@@ -10,7 +10,6 @@ import { DialogTransitionSlide } from "components/dialogs";
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 import { ModelSummaryTable } from "@ProjectViewer/sections/ModelTaskSection/data-display";
 import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
-import { ClassMapDialogProvider } from "@ProjectViewer/hooks/useClassMapDialog";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
 import { ModelStatus } from "utils/modelsV2/enums";
@@ -46,6 +45,17 @@ export const FitClassifierDialog = ({
     }
   }, [modelStatus]);
 
+  // Reset to the HyperParameters tab when the currently selected tab becomes
+  // invalid (e.g. user switched to a new untrained model while the dialog was
+  // closed). Tab 2 needs training history; tab 3 needs a compiled model.
+  // Skip during training — plots are about to populate, and the other effect
+  // above intentionally set tabVal to "2" for live epoch updates.
+  useEffect(() => {
+    if (modelStatus === ModelStatus.Training) return;
+    if (tabVal === "2" && !showPlots) setTabVal("1");
+    if (tabVal === "3" && !selectedModel?.modelSummary) setTabVal("1");
+  }, [tabVal, showPlots, selectedModel?.modelSummary, modelStatus]);
+
   return (
     <Dialog
       fullWidth
@@ -59,9 +69,7 @@ export const FitClassifierDialog = ({
         pb: 1,
       }}
     >
-      <ClassMapDialogProvider>
-        <FitClassifierDialogAppBar closeDialog={closeDialog} />
-      </ClassMapDialogProvider>
+      <FitClassifierDialogAppBar closeDialog={closeDialog} />
 
       <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
         <ToolTipTab label="HyperParameters" value="1" placement="top" />
@@ -88,7 +96,7 @@ export const FitClassifierDialog = ({
           <TrainingSettings />
         </Box>
         <Box hidden={tabVal !== "2"}>
-          <TrainingPlots />
+          <TrainingPlots />{" "}
         </Box>
         <Box hidden={tabVal !== "3"}>
           {/* TODO: implement model summary for graph models */}

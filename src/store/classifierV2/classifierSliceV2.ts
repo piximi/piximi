@@ -7,7 +7,7 @@ import type {
   ModelClassMap,
   ModelInfo,
 } from "store/types";
-import type { Kind, Shape } from "store/dataV2/types";
+import type { Shape } from "store/dataV2/types";
 import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 
@@ -61,10 +61,10 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{
         changes:
           | {
-              add: Array<Kind["id"]>;
+              add: Array<string>;
               presetInfo?: Array<KindClassifier>;
             }
-          | { del: Array<Kind["id"]> };
+          | { del: Array<string> };
       }>,
     ) {
       const changes = action.payload.changes;
@@ -90,7 +90,7 @@ export const classifierSlice = createSlice({
     addModelInfo(
       state,
       action: PayloadAction<{
-        kindId: Kind["id"];
+        kindId: string;
         modelName: string;
         modelInfo: ModelInfo;
       }>,
@@ -117,7 +117,7 @@ export const classifierSlice = createSlice({
     addModelClassMapping(
       state,
       action: PayloadAction<{
-        kindId: Kind["id"];
+        kindId: string;
         modelName: string;
         classMapping: ModelClassMap;
       }>,
@@ -135,7 +135,7 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         settings: Partial<ModelInfo["optimizerSettings"]>;
-        kindId: Kind["id"];
+        kindId: string;
       }>,
     ) {
       const { settings, kindId } = action.payload;
@@ -149,7 +149,7 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         settings: RecursivePartial<ModelInfo["preprocessSettings"]>;
-        kindId: Kind["id"];
+        kindId: string;
       }>,
     ) {
       const { settings, kindId } = action.payload;
@@ -161,7 +161,7 @@ export const classifierSlice = createSlice({
     },
     updateInputShape(
       state,
-      action: PayloadAction<{ inputShape: Partial<Shape>; kindId: Kind["id"] }>,
+      action: PayloadAction<{ inputShape: Partial<Shape>; kindId: string }>,
     ) {
       const { kindId, inputShape } = action.payload;
       const selectedModelInfo = getSelectedModelInfo(
@@ -188,13 +188,13 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         modelName: string | number;
-        kindId: Kind["id"];
+        kindId: string;
       }>,
     ) {
       const { modelName, kindId } = action.payload;
       const classifier = state.kindClassifiers[kindId];
       classifier.modelNameOrArch = modelName;
-      if (!modelName) return;
+      if (typeof modelName === "number") return;
       if (!(modelName in classifier.modelInfoDict)) {
         classifier.modelInfoDict[modelName] = cloneDeep(
           classifier.modelInfoDict["base-model"],
@@ -205,7 +205,7 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         evaluationResult: ClassifierEvaluationResultType;
-        kindId: Kind["id"];
+        kindId: string;
       }>,
     ) {
       const { evaluationResult, kindId } = action.payload;

@@ -4,7 +4,6 @@ import type { Shape } from "store/data/types";
 import type {
   ClassifierEvaluationResultType,
   CropOptions,
-  RescaleOptions,
 } from "utils/modelsV2/types";
 import type {
   LossFunction,
@@ -39,10 +38,15 @@ export type V11PiximiState = {
 // V11 Classifier
 // ============================================================
 
+export type V11RescaleOptions = {
+  rescale: boolean;
+  center: boolean;
+};
+
 export type V11PreprocessSettings = {
   shuffle: boolean;
   inputShape: Shape;
-  rescaleOptions: RescaleOptions; // normalization
+  rescaleOptions: V11RescaleOptions;
   cropOptions: CropOptions;
   trainingPercentage: number;
 };

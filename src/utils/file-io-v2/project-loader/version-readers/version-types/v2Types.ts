@@ -10,7 +10,12 @@ import type { ProjectState, SegmenterState } from "store/types";
 import type { Partition } from "utils/modelsV2/enums";
 
 import type { EntityState } from "@reduxjs/toolkit";
-import type { V11ClassifierState } from "./v11Types";
+import type {
+  V11ClassifierState,
+  V11KindClassifier,
+  V11ModelInfo,
+  V11PreprocessSettings,
+} from "./v11Types";
 
 export type V2Experiment = { id: string; name: string };
 
@@ -128,7 +133,30 @@ export type V2DataState = {
   annotations: EntityState<V2AnnotationObject, string>;
 };
 
-export type V2ClassifierState = V11ClassifierState;
+export type V2NormalizeOptions = {
+  normalize: boolean;
+  center: boolean;
+};
+
+export type V2PreprocessSettings = Omit<
+  V11PreprocessSettings,
+  "rescaleOptions"
+> & {
+  normalizeOptions: V2NormalizeOptions;
+};
+
+// Ripple up ONLY the types that transitively contain PreprocessSettings
+export type V2ModelInfo = Omit<V11ModelInfo, "preprocessSettings"> & {
+  preprocessSettings: V2PreprocessSettings;
+};
+
+export type V2KindClassifier = Omit<V11KindClassifier, "modelInfoDict"> & {
+  modelInfoDict: Record<string, V2ModelInfo>;
+};
+
+export type V2ClassifierState = Omit<V11ClassifierState, "kindClassifiers"> & {
+  kindClassifiers: Record<string, V2KindClassifier>;
+};
 
 export type V2PiximiState = {
   project: ProjectState;

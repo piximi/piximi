@@ -7,7 +7,7 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { ClassifierStatusProvider } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { ClassifierHistoryProvider } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
-import { ClassMapDialogProvider } from "@ProjectViewer/hooks/useClassMapDialog";
+import { ClassMapDialogProvider } from "@ProjectViewer/contexts/class-map";
 import { SegmenterStatusProvider } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 
 import { SegmenterSection } from "./SegmenterSection";

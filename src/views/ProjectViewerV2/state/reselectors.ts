@@ -1,4 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
+import { difference } from "lodash";
 
 import {
   selectAllCategories,
@@ -10,6 +11,7 @@ import { selectKindClassifiers } from "store/classifierV2/selectors";
 import type { KindClassifier, ModelInfo } from "store/types";
 import { getSelectedModelInfo } from "store/classifierV2/utils";
 import type { Shape } from "store/dataV2/types";
+import { CATEGORY_COLORS } from "store/dataV2/constants";
 
 import { representsUnknown } from "utils/stringUtils";
 import { isFiltered } from "utils/arrayUtils";
@@ -19,9 +21,9 @@ import type {
   ClassifierEvaluationResultType,
   CropOptions,
   FitOptions,
+  NormalizeOptions,
   OptimizerSettings,
   PreprocessSettings,
-  RescaleOptions,
 } from "utils/modelsV2/types";
 
 import {
@@ -70,6 +72,17 @@ export const selectActiveUnknownCategory = createSelector(
   selectActiveCategories,
   (activeCategories) => {
     return activeCategories.find((cat) => representsUnknown(cat.id));
+  },
+);
+export const selectAvaliableCategoryColors = createSelector(
+  selectActiveCategories,
+  (activeCategories): string[] => {
+    const activeColors = activeCategories.map((cat) => cat.color.toUpperCase());
+    const allCategoryColors = Object.values(CATEGORY_COLORS).map((color) =>
+      color.toUpperCase(),
+    );
+    const availableColors = difference(allCategoryColors, activeColors);
+    return availableColors;
   },
 );
 
@@ -238,10 +251,10 @@ const selectClassifierPreprocessOptions = createSelector(
   },
 );
 
-export const selectClassifierRescaleOptions = createSelector(
+export const selectClassifierNormalizeOptions = createSelector(
   selectClassifierPreprocessOptions,
-  (settings): RescaleOptions => {
-    return settings.rescaleOptions;
+  (settings): NormalizeOptions => {
+    return settings.normalizeOptions;
   },
 );
 export const selectClassifierCropOptions = createSelector(

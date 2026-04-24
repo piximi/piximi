@@ -21,12 +21,14 @@ import { Model } from "../../Model";
 import {
   ClassifierEvaluationResultType,
   FitOptions,
+  InferenceInput,
   TrainingCallbacks,
+  TrainingInput,
 } from "../../types";
 import { evaluateConfusionMatrix, getLayersModelSummary } from "../../utils";
-import { Category, Thing } from "store/data/types";
-import { logger } from "utils/logUtils";
+
 import { RequireOnly } from "utils/types";
+import { Category } from "store/dataV2/types";
 
 export abstract class SequentialClassifier extends Model {
   protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
@@ -43,39 +45,39 @@ export abstract class SequentialClassifier extends Model {
     super.dispose();
   }
 
-  public loadTraining<T extends Thing>(
-    images: T[],
+  public loadTraining(
+    items: TrainingInput[],
     categories: RequireOnly<Category, "id">[],
   ) {
     if (!this._preprocessingOptions) return;
     this._trainingDataset = preprocessData({
-      images,
+      items,
       categories,
       preprocessOptions: this._preprocessingOptions,
       inference: false,
     });
   }
 
-  public loadValidation<T extends Thing>(
-    images: T[],
+  public loadValidation(
+    items: TrainingInput[],
     categories: RequireOnly<Category, "id">[],
   ) {
     if (!this._preprocessingOptions) return;
     this._validationDataset = preprocessData({
-      images,
+      items,
       categories,
       preprocessOptions: this._preprocessingOptions,
       inference: false,
     });
   }
 
-  public loadInference<T extends Thing>(
-    images: T[],
+  public loadInference(
+    items: InferenceInput[],
     categories: RequireOnly<Category, "id">[],
   ) {
     if (!this._preprocessingOptions) return;
     this._inferenceDataset = preprocessData({
-      images,
+      items,
       categories,
       preprocessOptions: this._preprocessingOptions,
       inference: true,
@@ -363,16 +365,11 @@ export abstract class SequentialClassifier extends Model {
   }
 
   public get modelSummary() {
-    // TODO: implent summary for graph models
-    if (this.graph) {
-      logger("Graph model summaries unavailale", { level: "warn" });
-      return;
-    }
-
-    if (!this._model) {
-      logger(`Model ${this.name} is not loaded`, { level: "warn" });
-      return;
-    }
+    // Called from render-time JSX (e.g. `disabled={!selectedModel?.modelSummary}`),
+    // so stay silent when the model isn't compiled yet — just return undefined.
+    // TODO: implement summary for graph models
+    if (this.graph) return undefined;
+    if (!this._model) return undefined;
 
     return getLayersModelSummary(this._model as LayersModel);
   }

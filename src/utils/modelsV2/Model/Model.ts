@@ -7,7 +7,7 @@ import {
   OptimizerSettings,
 } from "../types";
 import { CropSchema, ModelTask } from "../enums";
-import { ImageObject, Shape } from "store/data/types";
+import { Shape } from "store/data/types";
 
 export abstract class Model {
   readonly name: string;
@@ -27,7 +27,7 @@ export abstract class Model {
     numCrops: number;
     inputShape: Omit<Shape, "planes">;
     shuffle: boolean;
-    rescale: boolean;
+    normalize: boolean;
     batchSize: number;
   };
   protected _classes?: string[];
@@ -57,6 +57,7 @@ export abstract class Model {
   }
 
   public dispose() {
+    console.trace("Model.dispose called on", this.name);
     if (this._model) {
       this._model.dispose();
     }
@@ -115,18 +116,11 @@ export abstract class Model {
   }
 
   public abstract loadModel(loadModelArgs?: any): void | Promise<void>;
-  public abstract loadTraining(
-    images: ImageObject[],
-    preprocessingArgs: any,
-  ): void;
-  public abstract loadValidation(
-    images: ImageObject[],
-    preprocessingArgs: any,
-  ): void;
-  public abstract loadInference(
-    images: ImageObject[],
-    preprocessingArgs: any,
-  ): void;
+  // Concrete models narrow these to their specific input shapes
+  // (e.g. `SequentialClassifier` uses `TrainingInput[]` / `InferenceInput[]`).
+  public abstract loadTraining(items: any[], preprocessingArgs: any): void;
+  public abstract loadValidation(items: any[], preprocessingArgs: any): void;
+  public abstract loadInference(items: any[], preprocessingArgs: any): void;
 
   public abstract train(options: any, callbacks: any): Promise<History>;
   public abstract predict(options: any, callbacks: any): any;
@@ -172,7 +166,7 @@ export abstract class Model {
             numCrops: number;
             inputShape: Omit<Shape, "planes">;
             shuffle: boolean;
-            rescale: boolean;
+            normalize: boolean;
             batchSize: number;
           };
           classes?: string[];

@@ -30,14 +30,25 @@ export const useErrorHandler = () => {
 
   const handleUncaughtRejection = useCallback(
     async (e: any) => {
+      if (import.meta.env.NODE_ENV !== "production") {
+        // Log the raw rejection so DevTools shows the full stack + cause chain.
+        // We preventDefault below, which otherwise silences the browser's
+        // default unhandledrejection logging.
+        console.error("Unhandled promise rejection:", e.reason);
+      }
       e.preventDefault();
+      const reason: unknown = e.reason;
+      const message =
+        reason instanceof Error ? reason.message : String(reason);
+      const stack =
+        reason instanceof Error ? String(reason.stack) : undefined;
       dispatch(
         applicationSettingsSlice.actions.updateAlertState({
           alertState: {
             alertType: AlertType.Error,
             name: "Uncaught promise rejection",
-            description: String(e.reason.message),
-            stackTrace: String(e.reason.stack),
+            description: message,
+            stackTrace: stack,
           },
         }),
       );

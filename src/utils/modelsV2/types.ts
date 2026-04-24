@@ -5,9 +5,21 @@ import {
   Metric,
   ModelTask,
   OptimizationAlgorithm,
+  Partition,
 } from "./enums";
 import { Kind, Shape } from "store/data/types";
+import { BBox, ExtendedChannel } from "store/dataV2/types";
 
+export type TrainingInput = {
+  id: string;
+  partition: Partition;
+  categoryId: string;
+  channelsRef: ExtendedChannel[];
+  shape: Shape;
+  region: BBox;
+};
+
+export type InferenceInput = Omit<TrainingInput, "partition" | "categoryId">;
 export interface ModelLayerData {
   layerName: string;
   outputShape: string;
@@ -28,8 +40,8 @@ export type TrainingCallbacks = {
   onEpochEnd: CallbackList["onEpochEnd"];
 };
 
-export type RescaleOptions = {
-  rescale: boolean;
+export type NormalizeOptions = {
+  normalize: boolean;
   center: boolean;
 };
 
@@ -40,14 +52,14 @@ export type CropOptions = {
 
 export type SegmenterPreprocessSettings = {
   shuffle: boolean;
-  rescaleOptions: RescaleOptions; // normalization
+  normalizeOptions: NormalizeOptions;
   cropOptions: CropOptions;
 };
 
 export type PreprocessSettings = {
   shuffle: boolean;
   inputShape: Shape;
-  rescaleOptions: RescaleOptions; // normalization
+  normalizeOptions: NormalizeOptions;
   cropOptions: CropOptions;
   trainingPercentage: number;
 };

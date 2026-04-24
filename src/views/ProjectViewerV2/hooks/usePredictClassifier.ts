@@ -2,131 +2,148 @@ import React, { useCallback } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { dataSlice } from "store/data";
+import { dataSliceV2 } from "store/dataV2";
+import { classifierSlice } from "store/classifierV2";
 import {
   selectActiveClassifierModel,
+  selectActiveClassifierModelNameOrArch,
+  selectActiveItems,
+  selectActiveKnownCategories,
   selectClassifierModelInfo,
 } from "@ProjectViewer/state/reselectors";
-import {
-  selectActiveKnownCategories,
-  selectActiveUnlabeledThings,
-} from "store/project/reselectors";
-import { classifierSlice } from "store/classifierV2";
-import { selectActiveKindId } from "store/project/selectors";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
+import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
 
-import { getStackTraceFromError, logger } from "utils/logUtils";
-import { AlertType } from "utils/enums";
+import { logger } from "utils/logUtils";
+import { representsUnknown } from "utils/stringUtils";
+import classifierHandler from "utils/modelsV2/classification/classifierHandler";
+import { toInferenceInput } from "utils/modelsV2/classification/utils";
 import { ModelStatus } from "utils/modelsV2/enums";
-import type { AlertState } from "utils/types";
 
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
-import { useClassMapDialog } from "./useClassMapDialog";
+import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 
 export const usePredictClassifier = () => {
   const dispatch = useDispatch();
-  const activeUnlabeledData = useSelector(selectActiveUnlabeledThings);
+  const activeItems = useSelector(selectActiveItems);
   const modelInfo = useSelector(selectClassifierModelInfo);
   const activeCategories = useSelector(selectActiveKnownCategories);
-  const activeKindId = useSelector(selectActiveKindId);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const modelNameOrArch = useSelector(selectActiveClassifierModelNameOrArch);
   const selectedModel = useSelector(selectActiveClassifierModel);
   const { setModelStatus } = useClassifierStatus();
   const { setPredictedProbabilities } = useClassifierHistory();
   const { getClassMap } = useClassMapDialog();
 
-  const handleError = useCallback(
-    async (error: Error, name: string) => {
-      const stackTrace = await getStackTraceFromError(error);
-      const alertState: AlertState = {
-        alertType: AlertType.Error,
-        name: name,
-        description: `${error.name}:\n${error.message}`,
-        stackTrace: stackTrace,
-      };
-      if (import.meta.env.NODE_ENV !== "production") {
-        console.error(
-          alertState.name,
-          "\n",
-          alertState.description,
-          "\n",
-          alertState.stackTrace,
-        );
-      }
-      dispatch(
-        applicationSettingsSlice.actions.updateAlertState({
-          alertState: alertState,
-        }),
-      );
-      setModelStatus(ModelStatus.Idle);
-    },
-    [dispatch],
-  );
+  const handleError = useClassifierErrorHandler();
 
   const predictClassifier = useCallback(async () => {
-    if (!selectedModel) return;
+    if (typeof modelNameOrArch !== "string" || !selectedModel) {
+      handleError(
+        new Error(
+          "Cannot predict: no trained classifier is selected for this kind.",
+        ),
+        "Prediction Error",
+      );
+      return;
+    }
+    const modelName = modelNameOrArch;
 
     let classMap = modelInfo.classMap;
-
     if (!classMap) {
       if (!selectedModel.classes) return;
       const setMapping = await getClassMap({
         projectCategories: activeCategories,
         modelClasses: selectedModel.classes,
       });
-      if (!setMapping) {
-        return;
-      }
+      if (!setMapping) return;
       classMap = setMapping;
       dispatch(
         classifierSlice.actions.addModelClassMapping({
-          kindId: activeKindId,
-          modelName: selectedModel.name,
+          kindId: modelTarget.id,
+          modelName,
           classMapping: classMap,
         }),
       );
     }
 
+    const unlabeledItems = activeItems.filter((item) =>
+      representsUnknown(item.categoryId),
+    );
+
     setModelStatus(ModelStatus.Predicting);
 
     try {
-      selectedModel.loadInference(activeUnlabeledData, []);
+      classifierHandler.loadInference(
+        modelName,
+        unlabeledItems.map(toInferenceInput),
+        [],
+      );
     } catch (error) {
       handleError(error as Error, "Data Preparation Error");
+      return;
     }
-    const thingIds = activeUnlabeledData.map((thing) => thing.id);
+
+    const itemIds = unlabeledItems.map((item) => item.id);
     let results: { categoryIds: string[]; probabilities: number[] } = {
       categoryIds: [],
       probabilities: [],
     };
     logger("before predict");
     try {
-      results = await selectedModel.predict(
-        Object.values(classMap).map((id) => ({
-          id,
-        })),
+      results = await classifierHandler.predict(
+        modelName,
+        Object.values(classMap).map((id) => ({ id })),
       );
       logger("after predict");
     } catch (error) {
       handleError(error as Error, "Error during prediction");
+      return;
     }
-    const dataCatProbs: Record<string, number> = {};
-    if (thingIds.length === results.categoryIds.length) {
-      dispatch(
-        dataSlice.actions.updateThings({
-          updates: thingIds.map((thingId, idx) => {
-            dataCatProbs[thingId] = results.probabilities[idx];
-            return {
-              id: thingId,
-              categoryId: results.categoryIds[idx],
-            };
-          }),
-        }),
-      );
+
+    const probabilitiesById: Record<string, number> = {};
+    if (itemIds.length === results.categoryIds.length) {
+      const updates = itemIds.map((id, idx) => {
+        probabilitiesById[id] = results.probabilities[idx];
+        return { id, categoryId: results.categoryIds[idx] };
+      });
+      if (modelTarget.id === IMAGE_CLASSIFIER_ID) {
+        dispatch(dataSliceV2.actions.batchUpdateImageCategory(updates));
+      } else {
+        // Annotation predictions map to their volume's category.
+        const volumeUpdates = unlabeledItems.reduce<
+          Array<{ volumeId: string; categoryId: string }>
+        >((acc, item, idx) => {
+          const volumeId = (item as { volumeId?: string }).volumeId;
+          if (volumeId) {
+            acc.push({ volumeId, categoryId: results.categoryIds[idx] });
+          }
+          return acc;
+        }, []);
+        dispatch(
+          dataSliceV2.actions.batchUpdateAnnotationVolumeCategory(
+            volumeUpdates,
+          ),
+        );
+      }
     }
-    setPredictedProbabilities(dataCatProbs);
+    setPredictedProbabilities(probabilitiesById);
     setModelStatus(ModelStatus.Pending);
-  }, [dispatch, handleError, activeUnlabeledData, modelInfo, selectedModel]);
+  }, [
+    dispatch,
+    handleError,
+    activeItems,
+    activeCategories,
+    modelTarget,
+    modelInfo,
+    modelNameOrArch,
+    selectedModel,
+    getClassMap,
+    setModelStatus,
+    setPredictedProbabilities,
+  ]);
 
   return predictClassifier;
 };

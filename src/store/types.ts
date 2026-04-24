@@ -14,7 +14,7 @@ import {
   FitOptions,
   PreprocessSettings,
   OptimizerSettings,
-} from "utils/models/types";
+} from "utils/modelsV2/types";
 import {
   Kind,
   AnnotationObject,
