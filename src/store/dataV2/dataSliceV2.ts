@@ -2,8 +2,9 @@ import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 
 import { generateUUID } from "store/dataV2/utils";
 
-import type { Partition } from "utils/modelsV2/enums";
+import { Partition } from "utils/modelsV2/enums";
 import type { AtLeastOne } from "utils/types";
+import { representsUnknown } from "utils/stringUtils";
 
 import {
   UNKNOWN_IMAGE_CATEGORY_COLOR,
@@ -434,34 +435,53 @@ export const dataSliceV2 = createSlice({
     },
     updateImageCategory(
       state,
-      action: PayloadAction<{ id: string; categoryId: string }>,
+      action: PayloadAction<{
+        id: string;
+        categoryId: string;
+        predicted?: boolean;
+      }>,
     ) {
       const image = state.images.entities[action.payload.id];
-      const targetCategory =
-        state.categories.entities[action.payload.categoryId];
-      if (
-        !image ||
-        image.categoryId === action.payload.categoryId ||
-        !targetCategory
-      )
-        return;
+      if (!image) return;
+      const newCatId = action.payload.categoryId;
+      if (image.categoryId === newCatId) return;
+      const targetCategory = state.categories.entities[newCatId];
+      if (!targetCategory) return;
+      const newPartition = action.payload.predicted
+        ? image.partition
+        : representsUnknown(newCatId)
+          ? Partition.Inference
+          : Partition.Unassigned;
 
       imageAdapter.updateOne(state.images, {
         id: action.payload.id,
-        changes: { categoryId: action.payload.categoryId },
+        changes: { categoryId: newCatId, partition: newPartition },
       });
     },
     batchUpdateImageCategory(
       state,
-      action: PayloadAction<Array<{ id: string; categoryId: string }>>,
+      action: PayloadAction<
+        Array<{ id: string; categoryId: string; predicted?: boolean }>
+      >,
     ) {
-      const updates: { id: string; changes: { categoryId: string } }[] = [];
-      action.payload.forEach(({ id, categoryId }) => {
+      const updates: {
+        id: string;
+        changes: { categoryId: string; partition: Partition };
+      }[] = [];
+      action.payload.forEach(({ id, categoryId: catId, predicted }) => {
         const image = state.images.entities[id];
-        const targetCategory = state.categories.entities[categoryId];
-        if (!image || image.categoryId === categoryId || !targetCategory)
-          return;
-        updates.push({ id, changes: { categoryId } });
+        if (!image) return;
+        const targetCategory = state.categories.entities[catId];
+        if (!targetCategory) return;
+        const newPartition = predicted
+          ? image.partition
+          : representsUnknown(catId)
+            ? Partition.Inference
+            : Partition.Unassigned;
+        updates.push({
+          id,
+          changes: { categoryId: catId, partition: newPartition },
+        });
       });
       imageAdapter.updateMany(state.images, updates);
     },
@@ -659,25 +679,73 @@ export const dataSliceV2 = createSlice({
     },
     bubbleUpdateAnnotationCategory(
       state,
-      action: PayloadAction<{ id: string; categoryId: string }>,
+      action: PayloadAction<{
+        id: string;
+        categoryId: string;
+        predicted?: boolean;
+      }>,
     ) {
       const annotation = state.annotations.entities[action.payload.id];
       if (!annotation) return;
+      const volume = state.annotationVolumes.entities[annotation.volumeId];
+      if (!volume) return;
+      const partitionUpdates = Object.values(state.annotations.entities)
+        .filter((ann) => ann.volumeId === annotation.volumeId)
+        .map((ann) => ({
+          id: ann.id,
+          changes: {
+            partition: action.payload.predicted
+              ? ann.partition
+              : representsUnknown(newCatId)
+                ? Partition.Inference
+                : Partition.Unassigned,
+          },
+        }));
+      const newCatId = action.payload.categoryId;
+      if (volume.categoryId === newCatId) return;
+      const targetCategory = state.categories.entities[newCatId];
+      if (!targetCategory) return;
 
       annotationVolumeAdapter.updateOne(state.annotationVolumes, {
         id: annotation.volumeId,
         changes: { categoryId: action.payload.categoryId },
       });
+
+      annotationAdapter.updateMany(state.annotations, partitionUpdates);
     },
     batchBubbleUpdateAnnotationCategory(
       state,
-      action: PayloadAction<{ id: string; categoryId: string }[]>,
+      action: PayloadAction<
+        { id: string; categoryId: string; predicted?: boolean }[]
+      >,
     ) {
       const volumeChanges: Record<string, string> = {};
-      action.payload.forEach(({ id, categoryId: catId }) => {
+      const partitionUpdates: Array<{
+        id: string;
+        changes: { partition: Partition };
+      }> = [];
+      action.payload.forEach(({ id, categoryId: catId, predicted }) => {
         const ann = state.annotations.entities[id];
         if (!ann) return;
+        const volume = state.annotationVolumes.entities[ann.volumeId];
+        if (!volume) return;
+        const volumeAnnUpdates = Object.values(state.annotations.entities)
+          .filter((_ann) => _ann.volumeId === ann.volumeId)
+          .map((ann) => ({
+            id: ann.id,
+            changes: {
+              partition: predicted
+                ? ann.partition
+                : representsUnknown(catId)
+                  ? Partition.Inference
+                  : Partition.Unassigned,
+            },
+          }));
+        if (volume.categoryId === catId) return;
+        const targetCategory = state.categories.entities[catId];
+        if (!targetCategory) return;
         volumeChanges[ann.volumeId] = catId;
+        partitionUpdates.push(...volumeAnnUpdates);
       });
 
       annotationVolumeAdapter.updateMany(
@@ -685,6 +753,49 @@ export const dataSliceV2 = createSlice({
         Object.entries(volumeChanges).map(([id, categoryId]) => ({
           id,
           changes: { categoryId },
+        })),
+      );
+      annotationAdapter.updateMany(state.annotations, partitionUpdates);
+    },
+    bubbleUpdateAnnotationKind(
+      state,
+      action: PayloadAction<{ id: string; kindId: string }>,
+    ) {
+      const annotation = state.annotations.entities[action.payload.id];
+      if (!annotation) return;
+
+      const kind = state.kinds.entities[action.payload.kindId];
+
+      if (!kind) return;
+      annotationVolumeAdapter.updateOne(state.annotationVolumes, {
+        id: annotation.volumeId,
+        changes: { kindId: kind.id, categoryId: kind.unknownCategoryId },
+      });
+    },
+    batchBubbleUpdateAnnotationKind(
+      state,
+      action: PayloadAction<{ id: string; kindId: string }[]>,
+    ) {
+      const volumeChanges: Record<
+        string,
+        { kindId: string; categoryId: string }
+      > = {};
+      action.payload.forEach(({ id, kindId }) => {
+        const ann = state.annotations.entities[id];
+        if (!ann) return;
+        const kind = state.kinds.entities[kindId];
+        if (!kind) return;
+        volumeChanges[ann.volumeId] = {
+          kindId,
+          categoryId: kind.unknownCategoryId,
+        };
+      });
+
+      annotationVolumeAdapter.updateMany(
+        state.annotationVolumes,
+        Object.entries(volumeChanges).map(([id, changes]) => ({
+          id,
+          changes,
         })),
       );
     },
