@@ -10,6 +10,7 @@ import { projectSlice } from "@ProjectViewer/state";
 import {
   selectActiveKindState,
   selectActiveSelectedIds,
+  selectActiveView,
 } from "@ProjectViewer/state/selectors";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import {
@@ -19,10 +20,9 @@ import {
 
 import { HotkeyContext } from "utils/enums";
 
-import type { ViewState } from "@ProjectViewer/state/types";
-
-export const useGridActions = (viewState: ViewState) => {
+export const useGridActions = () => {
   const dispatch = useDispatch();
+  const viewState = useSelector(selectActiveView);
   const activeKindState = useSelector(selectActiveKindState);
   const activeCategories = useSelector(selectActiveCategories);
   const selectedItems = useSelector(selectActiveSelectedIds);

@@ -32,7 +32,7 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
     handleDelete,
     handleCategorize,
     selectProps,
-  } = useGridActions(viewState);
+  } = useGridActions();
 
   const {
     onClose: handleCloseDeleteImagesDialog,
