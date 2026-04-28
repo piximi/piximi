@@ -685,10 +685,14 @@ export const dataSliceV2 = createSlice({
         predicted?: boolean;
       }>,
     ) {
+      const targetCatId = action.payload.categoryId;
       const annotation = state.annotations.entities[action.payload.id];
-      if (!annotation) return;
+
+      if (!annotation || !state.categories.entities[targetCatId]) return;
+
       const volume = state.annotationVolumes.entities[annotation.volumeId];
-      if (!volume) return;
+      if (!volume || volume.categoryId === targetCatId) return;
+
       const partitionUpdates = Object.values(state.annotations.entities)
         .filter((ann) => ann.volumeId === annotation.volumeId)
         .map((ann) => ({
@@ -696,15 +700,11 @@ export const dataSliceV2 = createSlice({
           changes: {
             partition: action.payload.predicted
               ? ann.partition
-              : representsUnknown(newCatId)
+              : representsUnknown(targetCatId)
                 ? Partition.Inference
                 : Partition.Unassigned,
           },
         }));
-      const newCatId = action.payload.categoryId;
-      if (volume.categoryId === newCatId) return;
-      const targetCategory = state.categories.entities[newCatId];
-      if (!targetCategory) return;
 
       annotationVolumeAdapter.updateOne(state.annotationVolumes, {
         id: annotation.volumeId,
@@ -724,11 +724,13 @@ export const dataSliceV2 = createSlice({
         id: string;
         changes: { partition: Partition };
       }> = [];
-      action.payload.forEach(({ id, categoryId: catId, predicted }) => {
+      action.payload.forEach(({ id, categoryId: taargetCatId, predicted }) => {
         const ann = state.annotations.entities[id];
-        if (!ann) return;
+        if (!ann || !state.categories.entities[taargetCatId]) return;
+
         const volume = state.annotationVolumes.entities[ann.volumeId];
-        if (!volume) return;
+        if (!volume || volume.categoryId === taargetCatId) return;
+
         const volumeAnnUpdates = Object.values(state.annotations.entities)
           .filter((_ann) => _ann.volumeId === ann.volumeId)
           .map((ann) => ({
@@ -736,15 +738,13 @@ export const dataSliceV2 = createSlice({
             changes: {
               partition: predicted
                 ? ann.partition
-                : representsUnknown(catId)
+                : representsUnknown(taargetCatId)
                   ? Partition.Inference
                   : Partition.Unassigned,
             },
           }));
-        if (volume.categoryId === catId) return;
-        const targetCategory = state.categories.entities[catId];
-        if (!targetCategory) return;
-        volumeChanges[ann.volumeId] = catId;
+
+        volumeChanges[ann.volumeId] = taargetCatId;
         partitionUpdates.push(...volumeAnnUpdates);
       });
 
@@ -759,17 +759,32 @@ export const dataSliceV2 = createSlice({
     },
     bubbleUpdateAnnotationKind(
       state,
-      action: PayloadAction<{ id: string; kindId: string }>,
+      action: PayloadAction<{
+        id: string;
+        kindId: string;
+        categoryId?: string;
+      }>,
     ) {
-      const annotation = state.annotations.entities[action.payload.id];
+      const { id: annId, kindId, categoryId } = action.payload;
+      const annotation = state.annotations.entities[annId];
       if (!annotation) return;
-
-      const kind = state.kinds.entities[action.payload.kindId];
-
+      const category =
+        categoryId !== undefined
+          ? state.categories.entities[categoryId]
+          : undefined;
+      const kind = state.kinds.entities[kindId];
       if (!kind) return;
+      let updatedCategoryId: string;
+      if (
+        category &&
+        category.type === "annotation" &&
+        category.kindId === kindId
+      )
+        updatedCategoryId = category.id;
+      else updatedCategoryId = kind.unknownCategoryId;
       annotationVolumeAdapter.updateOne(state.annotationVolumes, {
         id: annotation.volumeId,
-        changes: { kindId: kind.id, categoryId: kind.unknownCategoryId },
+        changes: { kindId: kind.id, categoryId: updatedCategoryId },
       });
     },
     batchBubbleUpdateAnnotationKind(
