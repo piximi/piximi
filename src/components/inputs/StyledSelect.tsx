@@ -7,7 +7,6 @@ export const StyledSelect = (props: StyledSelectProps) => {
   const theme = useTheme();
   return (
     <Select
-      {...props}
       SelectDisplayProps={{
         style: {
           fontSize: props.fontSize ?? theme.typography.body2.fontSize,
@@ -36,7 +35,6 @@ export const StyledSelect = (props: StyledSelectProps) => {
             dense: true,
             sx: {
               py: 0,
-              backgroundColor: "red",
               display: "none",
             },
           },
@@ -51,6 +49,7 @@ export const StyledSelect = (props: StyledSelectProps) => {
         fontSize: props.fontSize ?? theme.typography.body2.fontSize,
         minHeight: "1rem",
       })}
+      {...props}
     >
       {props.children}
     </Select>
