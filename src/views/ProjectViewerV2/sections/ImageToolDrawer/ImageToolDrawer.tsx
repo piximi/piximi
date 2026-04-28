@@ -16,10 +16,10 @@ import {
 import {
   FilterAltOutlined as FilterAltOutlinedIcon,
   FolderOpen as FolderOpenIcon,
-  Straighten as StraightenIcon,
+  Straighten as MeasurementIcon,
   ScatterPlot as ScatterPlotIcon,
   Label as LabelIcon,
-  Gesture as GestureIcon,
+  ImageSearch as ImageViewerIcon,
 } from "@mui/icons-material";
 
 import { useMenu, useMobileView, useTranslation, useWindowSize } from "hooks";
@@ -31,14 +31,14 @@ import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackBut
 import { HelpButton } from "components/layout/app-drawer/HelpButton";
 
 import { selectActiveStateFilterCount } from "@ProjectViewer/state/selectors";
+import { ItemFilters } from "@ProjectViewer/components/";
 
 import { DIMENSIONS } from "utils/constants";
 import { capitalize } from "utils/stringUtils";
 import type { HTMLDataAttributes } from "utils/types";
 
 import { ModelTaskSection } from "../ModelTaskSection";
-import { FilterOptions, MeasurementOptions } from "./tool-options";
-import { ImageViewerOptions } from "./tool-options/ImageViewerOptions";
+import { MeasurementOptions, ImageViewerOptions } from "./tool-options";
 import { ProjectActions } from "../ProjectActions";
 import { ProjectViewerCategories } from "../ProjectViewerCategories";
 
@@ -60,12 +60,12 @@ const imageTools: Record<string, OperationType> = {
     ),
     name: "filter / sort",
     description: "-",
-    options: <FilterOptions />,
+    options: <ItemFilters />,
     hotkey: "F",
     helpContext: HelpItem.FilterImageGrid,
   },
   measurements: {
-    icon: (color) => <StraightenIcon fontSize="small" sx={{ color: color }} />,
+    icon: (color) => <MeasurementIcon fontSize="small" sx={{ color: color }} />,
     name: "measurements",
     description: "-",
     options: <MeasurementOptions />,
@@ -73,7 +73,7 @@ const imageTools: Record<string, OperationType> = {
     mobile: true,
   },
   imageViewer: {
-    icon: (color) => <GestureIcon fontSize="small" sx={{ color: color }} />,
+    icon: (color) => <ImageViewerIcon fontSize="small" sx={{ color: color }} />,
     name: "image viewer",
     description: "-",
     options: <ImageViewerOptions />,

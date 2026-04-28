@@ -6,7 +6,7 @@ import { CategoryFilterList } from "./CategoryFilterList";
 import { PartitionFilterList } from "./PartitionFilterList";
 import { SortSelect } from "./SortSelect";
 
-export const FilterOptions = () => {
+export const ItemFilters = () => {
   return (
     <Stack maxWidth="100%">
       <SortSelect />

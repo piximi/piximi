@@ -2,7 +2,7 @@ import React from "react";
 
 import { useSelector } from "react-redux";
 
-import { Box, Stack } from "@mui/material";
+import { Box, Divider, Stack } from "@mui/material";
 
 import { useMobileView } from "hooks";
 
@@ -13,8 +13,7 @@ import { selectOverallTaskProgress } from "store/appTasks/selectors";
 import { DIMENSIONS } from "utils/constants";
 
 import { ExperimentNameTextField } from "./ExperimentNameTextField";
-import { ImageViewerButton } from "./ImageViewerButton";
-import { MeasurementsButton } from "./MeasurementsButton";
+import { ImageViewerButton, MeasurementsButton } from "../../components";
 
 export const ProjectAppBar = () => {
   const taskProgress = useSelector(selectOverallTaskProgress);
@@ -56,11 +55,17 @@ export const ProjectAppBar = () => {
 
       {!isMobile && (
         <>
-          {/**
-           * TODO: selectedThings will be removed during refactor
+          {/*
+            TODO: selectedThings will be removed during refactor
            */}
-          <ImageViewerButton selectedThings={[]} />
-          <MeasurementsButton />
+          <ImageViewerButton selectedThings={[]} mobileAlt={true} />
+          <Divider
+            orientation="vertical"
+            flexItem
+            variant="middle"
+            sx={{ mx: 1 }}
+          />
+          <MeasurementsButton mobileAlt={true} />
         </>
       )}
     </Stack>
