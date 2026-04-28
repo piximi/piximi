@@ -7,7 +7,7 @@ import { TooltipButton, TooltipTitle } from "components/ui/tooltips";
 
 import type { Category } from "store/dataV2/types";
 
-import { ImageCategoryMenu } from "./ImageCategoryMenu";
+import { ItemCategoryMenu } from "./ItemCategoryMenu";
 import { actionButtonStyle } from "./utils";
 
 export const CategorizeChip = ({
@@ -49,7 +49,7 @@ export const CategorizeChip = ({
         <LabelOutlinedIcon color="inherit" />
       </TooltipButton>
 
-      <ImageCategoryMenu
+      <ItemCategoryMenu
         anchorEl={categoryMenuAnchorEl as HTMLElement}
         selectedIds={selectedFilteredItems}
         onClose={onCloseCategoryMenu}

@@ -18,7 +18,7 @@ type ImageCategoryMenuProps = {
   onUpdateCategories: (categoryId: string) => void;
 };
 
-export const ImageCategoryMenu = ({
+export const ItemCategoryMenu = ({
   anchorEl,
   onClose,
   anchorReference,
