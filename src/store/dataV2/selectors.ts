@@ -106,7 +106,11 @@ export const selectAnnotationVolumeById = annotationVolumeSelectors.selectById;
 export const selectTotalAnnotationVolumes =
   annotationVolumeSelectors.selectTotal;
 
-// ── Tier 1: Experiment selectors ───────────────────────────────────────────────
+/*
+ * ───────────────────────────────────────────────────────────────────────
+ * ── Experiment selectors ───────────────────────────────────────────────
+ * ───────────────────────────────────────────────────────────────────────
+ */
 
 export const selectExperiment = ({
   dataV2,
@@ -115,176 +119,19 @@ export const selectExperiment = ({
 }) => {
   return dataV2.experiment;
 };
-// ── Tier 2: FK join selectors ───────────────────────────────────────────────
 
-// By Series
+/*
+ * ───────────────────────────────────────────────────────────────────────
+ * ── Images ─────────────────────────────────────────────────────────────
+ * ───────────────────────────────────────────────────────────────────────
+ */
+
+// -- Base --
+
 export const selectImagesBySeriesId = createSelector(
   [imageSelectors.selectAll, (_: RootState, seriesId: string) => seriesId],
   (images, seriesId) => images.filter((im) => im.seriesId === seriesId),
 );
-
-// By Category
-export const selectImagesByCategoryId = createSelector(
-  [imageSelectors.selectAll, (_: RootState, categoryId: string) => categoryId],
-  (images, categoryId) => images.filter((im) => im.categoryId === categoryId),
-);
-export const selectAnnotationVolumesByCategoryId = createSelector(
-  [
-    annotationVolumeSelectors.selectAll,
-    (_: RootState, categoryId: string) => categoryId,
-  ],
-  (volumes, categoryId) => volumes.filter((v) => v.categoryId === categoryId),
-);
-export const selectAnnotationsByCategoryId = createSelector(
-  [
-    annotationSelectors.selectAll,
-    annotationVolumeSelectors.selectEntities,
-    (_: RootState, categoryId: string) => categoryId,
-  ],
-  (annotations, volumeDict, categoryId) =>
-    annotations.filter(
-      (a) => volumeDict[a.volumeId]?.categoryId === categoryId,
-    ),
-);
-
-export const selectEntityCountByCategoryId = createSelector(
-  imageSelectors.selectAll,
-  annotationVolumeSelectors.selectEntities,
-  annotationSelectors.selectAll,
-  categorySelectors.selectEntities,
-  (_: RootState, categoryId: string) => categoryId,
-  (ims, annVolDict, anns, catDict, catId) => {
-    const cat = catDict[catId];
-    if (!cat) throw new Error("Invalid category id: " + catId);
-    if (cat.type === "image")
-      return ims.reduce((cnt: number, im) => {
-        if (im.categoryId === catId) cnt++;
-        return cnt;
-      }, 0);
-    return anns.reduce((cnt: number, ann) => {
-      if (annVolDict[ann.volumeId].categoryId === catId) cnt++;
-      return cnt;
-    }, 0);
-  },
-);
-
-// By Image
-export const selectPlanesByImageId = createSelector(
-  [planeSelectors.selectAll, (_: RootState, imageId: string) => imageId],
-  (planes, imageId) => planes.filter((pl) => pl.imageId === imageId),
-);
-export const selectAnnotationVolumesByImageId = createSelector(
-  [
-    annotationVolumeSelectors.selectAll,
-    (_: RootState, imageId: string) => imageId,
-  ],
-  (volumes, imageId) => volumes.filter((v) => v.imageId === imageId),
-);
-
-// By Plane
-export const selectChannelsByPlaneId = createSelector(
-  [channelSelectors.selectAll, (_: RootState, planeId: string) => planeId],
-  (channels, planeId) => channels.filter((ch) => ch.planeId === planeId),
-);
-
-// By Kind
-export const selectAnnotationVolumesByKindId = createSelector(
-  [
-    annotationVolumeSelectors.selectAll,
-    (_: RootState, kindId: string) => kindId,
-  ],
-  (volumes, kindId) => volumes.filter((v) => v.kindId === kindId),
-);
-export const selectAnnotationsByKindId = createSelector(
-  [
-    annotationSelectors.selectAll,
-    annotationVolumeSelectors.selectEntities,
-    (_: RootState, kindId: string) => kindId,
-  ],
-  (annotations, volumeDict, kindId) =>
-    annotations.filter((a) => volumeDict[a.volumeId]?.kindId === kindId),
-);
-export const selectCategoriesByKindId = createSelector(
-  [categorySelectors.selectAll, (_: RootState, kindId: string) => kindId],
-  (categories, kindId) =>
-    categories.filter((c) => c.type === "annotation" && c.kindId === kindId),
-);
-export const selectExtendedAnnotationsByKindId = createSelector(
-  [
-    annotationSelectors.selectAll,
-    annotationVolumeSelectors.selectEntities,
-    planeSelectors.selectEntities,
-    channelMetaSelectors.selectEntities,
-    channelSelectors.selectAll,
-    categorySelectors.selectEntities,
-    imageSelectors.selectEntities,
-    (_: RootState, kindId: string) => kindId,
-  ],
-  (
-    anns,
-    annVols,
-    planeDict,
-    chMetaDict,
-    chs,
-    catDict,
-    imageDict,
-    kindId,
-  ): ExtendedAnnotationObject[] => {
-    const extAnns: ExtendedAnnotationObject[] = [];
-    anns.forEach((ann) => {
-      const vol = annVols[ann.volumeId];
-      if (!vol || vol.kindId !== kindId) return;
-      const image = imageDict[vol.imageId];
-      const plane = planeDict[ann.planeId];
-      const category = catDict[vol.categoryId];
-      const channels = chs.reduce((extChs: ExtendedChannel[], ch) => {
-        const meta = chMetaDict[ch.channelMetaId];
-        if (ch.planeId !== plane.id || !meta || !meta.visible) return extChs;
-        extChs.push({
-          ...ch,
-          colorMap: meta.colorMap,
-          rampMin: meta.rampMin,
-          rampMax: meta.rampMax,
-        });
-
-        return extChs;
-      }, []);
-      extAnns.push({
-        ...ann,
-        kindId,
-        categoryId: category.id,
-        category: category,
-        channelsRef: channels,
-        planeIdx: plane.zIndex,
-        imageId: image.id,
-        imageName: image.name,
-      });
-    });
-    return extAnns;
-  },
-);
-
-// By Volume
-export const selectAnnotationsByVolumeId = createSelector(
-  [annotationSelectors.selectAll, (_: RootState, volumeId: string) => volumeId],
-  (annotations, volumeId) => annotations.filter((a) => a.volumeId === volumeId),
-);
-
-// By Channel
-export const selectChannelMetaByChannelId = createSelector(
-  [
-    channelSelectors.selectEntities,
-    channelMetaSelectors.selectEntities,
-    (_: RootState, channelId: string) => channelId,
-  ],
-  (channelDict, channelMetaDict, channelId) => {
-    const metaId = channelDict[channelId]?.channelMetaId;
-    return metaId ? channelMetaDict[metaId] : undefined;
-  },
-);
-
-// ── Tier 2: Active-entity selectors ────────────────────────────────────────
-
 export const selectActiveImage = createSelector(
   [
     imageSeriesSelectors.selectEntities,
@@ -296,59 +143,64 @@ export const selectActiveImage = createSelector(
     return activeImageId ? imageDict[activeImageId] : undefined;
   },
 );
+export const selectImagesByCategoryId = createSelector(
+  [imageSelectors.selectAll, (_: RootState, categoryId: string) => categoryId],
+  (images, categoryId) => images.filter((im) => im.categoryId === categoryId),
+);
 
-export const selectActivePlane = createSelector(
+// -- Extended --
+
+export const selectExtendedImageById = createSelector(
   [
-    imageSelectors.selectEntities,
     planeSelectors.selectEntities,
-    (_: RootState, imageId: string) => imageId,
-  ],
-  (imageDict, planeDict, imageId) => {
-    const activePlaneId = imageDict[imageId]?.activePlaneId;
-    return activePlaneId ? planeDict[activePlaneId] : undefined;
-  },
-);
-
-export const selectActiveChannels = createSelector(
-  [
-    imageSelectors.selectEntities,
-    channelSelectors.selectAll,
-    (_: RootState, imageId: string) => imageId,
-  ],
-  (imageDict, channels, imageId) => {
-    const activePlaneId = imageDict[imageId]?.activePlaneId;
-    return activePlaneId
-      ? channels.filter((ch) => ch.planeId === activePlaneId)
-      : [];
-  },
-);
-export const selectActiveExtendedChannels = createSelector(
-  [
-    imageSelectors.selectEntities,
     channelMetaSelectors.selectEntities,
     channelSelectors.selectAll,
-    (_: RootState, imageId: string) => imageId,
+    categorySelectors.selectEntities,
+    imageSelectors.selectEntities,
+    (_state: RootState, id: string) => id,
   ],
-  (imageDict, channelMetas, channels, imageId) => {
-    const activePlaneId = imageDict[imageId]?.activePlaneId;
-    if (!activePlaneId) return [];
-    const extChannels: ExtendedChannel[] = [];
-    channels.forEach((ch) => {
-      const meta = channelMetas[ch.channelMetaId];
-      if (ch.planeId !== activePlaneId || !meta || !meta.visible) return;
-      extChannels.push({
+  (
+    planeDict,
+    chMetaDict,
+    chs,
+    catDict,
+    imageDict,
+    imageId,
+  ): ExtendedImageObject | null => {
+    const image = imageDict[imageId];
+    if (!image) return null;
+    const category = catDict[image.categoryId];
+    if (!category) return null;
+    const plane = planeDict[image.activePlaneId];
+    if (!plane) return null;
+    const channels = chs.reduce((extChs: ExtendedChannel[], ch) => {
+      const meta = chMetaDict[ch.channelMetaId];
+      if (ch.planeId !== plane.id || !meta || !meta.visible) return extChs;
+      extChs.push({
         ...ch,
         colorMap: meta.colorMap,
         rampMin: meta.rampMin,
         rampMax: meta.rampMax,
       });
-    });
-    return extChannels;
+
+      return extChs;
+    }, []);
+    if (channels.length === 0) return null;
+    return {
+      id: image.id,
+      name: image.name,
+      seriesId: image.seriesId,
+      shape: image.shape,
+      categoryId: category.id,
+      category,
+      activePlaneIdx: plane.zIndex,
+      timepoint: image.timepoint,
+      bitDepth: image.bitDepth,
+      partition: image.partition,
+      channelsRef: channels,
+    };
   },
 );
-
-// ── Tier 2: Grid display selector ──────────────────────────────────────────
-
 export const selectExtendedImages = createSelector(
   [
     planeSelectors.selectEntities,
@@ -435,4 +287,310 @@ export const selectRepresentativeImages = createSelector(
         channelsRef: channels,
       };
     }),
+);
+
+/*
+ * ───────────────────────────────────────────────────────────────────────
+ * ── Annotations ────────────────────────────────────────────────────────
+ * ───────────────────────────────────────────────────────────────────────
+ */
+
+// -- Base --
+
+export const selectAnnotationsByKindId = createSelector(
+  [
+    annotationSelectors.selectAll,
+    annotationVolumeSelectors.selectEntities,
+    (_: RootState, kindId: string) => kindId,
+  ],
+  (annotations, volumeDict, kindId) =>
+    annotations.filter((a) => volumeDict[a.volumeId]?.kindId === kindId),
+);
+export const selectAnnotationsByCategoryId = createSelector(
+  [
+    annotationSelectors.selectAll,
+    annotationVolumeSelectors.selectEntities,
+    (_: RootState, categoryId: string) => categoryId,
+  ],
+  (annotations, volumeDict, categoryId) =>
+    annotations.filter(
+      (a) => volumeDict[a.volumeId]?.categoryId === categoryId,
+    ),
+);
+export const selectAnnotationsByVolumeId = createSelector(
+  [annotationSelectors.selectAll, (_: RootState, volumeId: string) => volumeId],
+  (annotations, volumeId) => annotations.filter((a) => a.volumeId === volumeId),
+);
+
+// -- Extended --
+
+export const selectExtendedAnnotationById = createSelector(
+  [
+    annotationSelectors.selectEntities,
+    annotationVolumeSelectors.selectEntities,
+    planeSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    channelSelectors.selectAll,
+    categorySelectors.selectEntities,
+    imageSelectors.selectEntities,
+    (_: RootState, id: string) => id,
+  ],
+  (
+    annDict,
+    annVols,
+    planeDict,
+    chMetaDict,
+    chs,
+    catDict,
+    imageDict,
+    annId,
+  ): ExtendedAnnotationObject | null => {
+    const ann = annDict[annId];
+    if (!ann) return null;
+    const vol = annVols[ann.volumeId];
+    if (!vol) return null;
+    const image = imageDict[vol.imageId];
+    if (!image) return null;
+    const plane = planeDict[ann.planeId];
+    if (!plane) return null;
+    const category = catDict[vol.categoryId];
+    if (!category) return null;
+    const channels = chs.reduce((extChs: ExtendedChannel[], ch) => {
+      const meta = chMetaDict[ch.channelMetaId];
+      if (ch.planeId !== plane.id || !meta || !meta.visible) return extChs;
+      extChs.push({
+        ...ch,
+        colorMap: meta.colorMap,
+        rampMin: meta.rampMin,
+        rampMax: meta.rampMax,
+      });
+
+      return extChs;
+    }, []);
+    if (channels.length === 0) return null;
+    return {
+      ...ann,
+      kindId: vol.kindId,
+      categoryId: category.id,
+      category: category,
+      channelsRef: channels,
+      planeIdx: plane.zIndex,
+      imageId: image.id,
+      imageName: image.name,
+    };
+  },
+);
+
+export const selectExtendedAnnotationsByKindId = createSelector(
+  [
+    annotationSelectors.selectAll,
+    annotationVolumeSelectors.selectEntities,
+    planeSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    channelSelectors.selectAll,
+    categorySelectors.selectEntities,
+    imageSelectors.selectEntities,
+    (_: RootState, kindId: string) => kindId,
+  ],
+  (
+    anns,
+    annVols,
+    planeDict,
+    chMetaDict,
+    chs,
+    catDict,
+    imageDict,
+    kindId,
+  ): ExtendedAnnotationObject[] => {
+    const extAnns: ExtendedAnnotationObject[] = [];
+    anns.forEach((ann) => {
+      const vol = annVols[ann.volumeId];
+      if (!vol || vol.kindId !== kindId) return;
+      const image = imageDict[vol.imageId];
+      const plane = planeDict[ann.planeId];
+      const category = catDict[vol.categoryId];
+      const channels = chs.reduce((extChs: ExtendedChannel[], ch) => {
+        const meta = chMetaDict[ch.channelMetaId];
+        if (ch.planeId !== plane.id || !meta || !meta.visible) return extChs;
+        extChs.push({
+          ...ch,
+          colorMap: meta.colorMap,
+          rampMin: meta.rampMin,
+          rampMax: meta.rampMax,
+        });
+
+        return extChs;
+      }, []);
+      extAnns.push({
+        ...ann,
+        kindId,
+        categoryId: category.id,
+        category: category,
+        channelsRef: channels,
+        planeIdx: plane.zIndex,
+        imageId: image.id,
+        imageName: image.name,
+      });
+    });
+    return extAnns;
+  },
+);
+
+/*
+ * ───────────────────────────────────────────────────────────────────────
+ * ── Annotation Volumes ─────────────────────────────────────────────────
+ * ───────────────────────────────────────────────────────────────────────
+ */
+
+export const selectAnnotationVolumesByKindId = createSelector(
+  [
+    annotationVolumeSelectors.selectAll,
+    (_: RootState, kindId: string) => kindId,
+  ],
+  (volumes, kindId) => volumes.filter((v) => v.kindId === kindId),
+);
+export const selectAnnotationVolumesByCategoryId = createSelector(
+  [
+    annotationVolumeSelectors.selectAll,
+    (_: RootState, categoryId: string) => categoryId,
+  ],
+  (volumes, categoryId) => volumes.filter((v) => v.categoryId === categoryId),
+);
+export const selectAnnotationVolumesByImageId = createSelector(
+  [
+    annotationVolumeSelectors.selectAll,
+    (_: RootState, imageId: string) => imageId,
+  ],
+  (volumes, imageId) => volumes.filter((v) => v.imageId === imageId),
+);
+
+/*
+ * ───────────────────────────────────────────────────────────────────────
+ * ── Planes ─────────────────────────────────────────────────────────────
+ * ───────────────────────────────────────────────────────────────────────
+ */
+
+export const selectPlanesByImageId = createSelector(
+  [planeSelectors.selectAll, (_: RootState, imageId: string) => imageId],
+  (planes, imageId) => planes.filter((pl) => pl.imageId === imageId),
+);
+export const selectActivePlane = createSelector(
+  [
+    imageSelectors.selectEntities,
+    planeSelectors.selectEntities,
+    (_: RootState, imageId: string) => imageId,
+  ],
+  (imageDict, planeDict, imageId) => {
+    const activePlaneId = imageDict[imageId]?.activePlaneId;
+    return activePlaneId ? planeDict[activePlaneId] : undefined;
+  },
+);
+
+/*
+ * ───────────────────────────────────────────────────────────────────────
+ * ── Channel Metas ──────────────────────────────────────────────────────
+ * ───────────────────────────────────────────────────────────────────────
+ */
+
+export const selectChannelMetaByChannelId = createSelector(
+  [
+    channelSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    (_: RootState, channelId: string) => channelId,
+  ],
+  (channelDict, channelMetaDict, channelId) => {
+    const metaId = channelDict[channelId]?.channelMetaId;
+    return metaId ? channelMetaDict[metaId] : undefined;
+  },
+);
+
+/*
+ * ───────────────────────────────────────────────────────────────────────
+ * ── Categories ─────────────────────────────────────────────────────────
+ * ───────────────────────────────────────────────────────────────────────
+ */
+
+export const selectCategoriesByKindId = createSelector(
+  [categorySelectors.selectAll, (_: RootState, kindId: string) => kindId],
+  (categories, kindId) =>
+    categories.filter((c) => c.type === "annotation" && c.kindId === kindId),
+);
+
+/*
+ * ───────────────────────────────────────────────────────────────────────
+ * ── Channels ───────────────────────────────────────────────────────────
+ * ───────────────────────────────────────────────────────────────────────
+ */
+
+// -- Base --
+
+export const selectChannelsByPlaneId = createSelector(
+  [channelSelectors.selectAll, (_: RootState, planeId: string) => planeId],
+  (channels, planeId) => channels.filter((ch) => ch.planeId === planeId),
+);
+export const selectActiveChannels = createSelector(
+  [
+    imageSelectors.selectEntities,
+    channelSelectors.selectAll,
+    (_: RootState, imageId: string) => imageId,
+  ],
+  (imageDict, channels, imageId) => {
+    const activePlaneId = imageDict[imageId]?.activePlaneId;
+    return activePlaneId
+      ? channels.filter((ch) => ch.planeId === activePlaneId)
+      : [];
+  },
+);
+
+// -- Extended --
+
+export const selectActiveExtendedChannels = createSelector(
+  [
+    imageSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    channelSelectors.selectAll,
+    (_: RootState, imageId: string) => imageId,
+  ],
+  (imageDict, channelMetas, channels, imageId) => {
+    const activePlaneId = imageDict[imageId]?.activePlaneId;
+    if (!activePlaneId) return [];
+    const extChannels: ExtendedChannel[] = [];
+    channels.forEach((ch) => {
+      const meta = channelMetas[ch.channelMetaId];
+      if (ch.planeId !== activePlaneId || !meta || !meta.visible) return;
+      extChannels.push({
+        ...ch,
+        colorMap: meta.colorMap,
+        rampMin: meta.rampMin,
+        rampMax: meta.rampMax,
+      });
+    });
+    return extChannels;
+  },
+);
+
+/*
+ * ───────────────────────────────────────────────────────────────────────
+ * ── Stats ──────────────────────────────────────────────────────────────
+ * ───────────────────────────────────────────────────────────────────────
+ */
+export const selectEntityCountByCategoryId = createSelector(
+  imageSelectors.selectAll,
+  annotationVolumeSelectors.selectEntities,
+  annotationSelectors.selectAll,
+  categorySelectors.selectEntities,
+  (_: RootState, categoryId: string) => categoryId,
+  (ims, annVolDict, anns, catDict, catId) => {
+    const cat = catDict[catId];
+    if (!cat) throw new Error("Invalid category id: " + catId);
+    if (cat.type === "image")
+      return ims.reduce((cnt: number, im) => {
+        if (im.categoryId === catId) cnt++;
+        return cnt;
+      }, 0);
+    return anns.reduce((cnt: number, ann) => {
+      if (annVolDict[ann.volumeId].categoryId === catId) cnt++;
+      return cnt;
+    }, 0);
+  },
 );
