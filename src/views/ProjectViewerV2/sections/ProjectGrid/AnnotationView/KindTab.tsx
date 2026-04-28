@@ -87,11 +87,13 @@ export const KindTab = ({
       )}
 
       <Box
-        display="flex"
-        flexDirection="row"
-        flexShrink={1}
-        position="absolute"
-        right="10px"
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          flexShrink: 1,
+          position: "absolute",
+          right: "10px",
+        }}
       >
         {!representsUnknown(kind.id) && (
           <EditIcon

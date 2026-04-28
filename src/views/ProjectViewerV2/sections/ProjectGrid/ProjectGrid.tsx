@@ -15,6 +15,10 @@ import { DIMENSIONS } from "utils/constants";
 import { ImageGrid } from "./ImageGrid";
 import { AnnotationView } from "./AnnotationView";
 import { GridActions } from "./GridActions/GridActions";
+import {
+  InformationPopoverProvider,
+  InformationPopover,
+} from "./information-popover";
 
 import type { ViewState } from "@ProjectViewer/state/types";
 
@@ -31,64 +35,67 @@ export const ProjectGrid = () => {
   };
 
   return (
-    <Box
-      sx={(theme) => ({
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        gridArea: "image-grid",
-        border: `1px solid ${theme.palette.divider}`,
-        overflow: "hidden",
-        flexGrow: 1,
-        borderRadius: "4px 4px 0 0",
-      })}
-    >
+    <InformationPopoverProvider>
       <Box
         sx={(theme) => ({
           width: "100%",
-          position: "relative",
+          height: "100%",
           display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: DIMENSIONS.toolDrawerWidth,
-          borderBottom: `1px solid ${theme.palette.divider}`,
+          flexDirection: "column",
+          gridArea: "image-grid",
+          border: `1px solid ${theme.palette.divider}`,
+          overflow: "hidden",
+          flexGrow: 1,
+          borderRadius: "4px 4px 0 0",
         })}
       >
-        <ToggleButtonGroup
-          data-help={HelpItem.GridView}
-          value={activeView}
-          size="small"
-          color="primary"
-          exclusive
-          onChange={handleActiveViewChange}
-          sx={{ my: 0.5 }}
+        <Box
+          sx={(theme) => ({
+            width: "100%",
+            position: "relative",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: DIMENSIONS.toolDrawerWidth,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          })}
         >
-          <ToggleButton value="images">Images</ToggleButton>
-          <ToggleButton value="annotations" disabled={annotationCount === 0}>
-            Annotations
-          </ToggleButton>
-        </ToggleButtonGroup>
-        <GridActions viewState={activeView} />
+          <ToggleButtonGroup
+            data-help={HelpItem.GridView}
+            value={activeView}
+            size="small"
+            color="primary"
+            exclusive
+            onChange={handleActiveViewChange}
+            sx={{ my: 0.5 }}
+          >
+            <ToggleButton value="images">Images</ToggleButton>
+            <ToggleButton value="annotations" disabled={annotationCount === 0}>
+              Annotations
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <GridActions viewState={activeView} />
+        </Box>
+        <Box
+          sx={{
+            width: "100%",
+            flexGrow: 1,
+            display: activeView === "images" ? "block" : "none",
+          }}
+        >
+          <ImageGrid />
+        </Box>
+        <Box
+          sx={{
+            width: "100%",
+            flexGrow: 1,
+            display: activeView === "annotations" ? "flex" : "none",
+          }}
+        >
+          <AnnotationView />
+        </Box>
       </Box>
-      <Box
-        sx={{
-          width: "100%",
-          flexGrow: 1,
-          display: activeView === "images" ? "block" : "none",
-        }}
-      >
-        <ImageGrid />
-      </Box>
-      <Box
-        sx={{
-          width: "100%",
-          flexGrow: 1,
-          display: activeView === "annotations" ? "flex" : "none",
-        }}
-      >
-        <AnnotationView />
-      </Box>
-    </Box>
+      <InformationPopover />
+    </InformationPopoverProvider>
   );
 };

@@ -11,8 +11,7 @@ import { Partition } from "utils/modelsV2/enums";
 
 import { getIconPosition, imageStyle } from "../gridItemUtils";
 import { useGridItemStyle } from "../useGridItemStyle";
-import { ItemDetailContainer } from "../ItemDetailContainer";
-import { ImageDetailList } from "./ImageDetailList";
+import { ItemOverlay } from "../ItemOverlay";
 
 type ImageGridItemProps = {
   selected: boolean;
@@ -48,17 +47,16 @@ export const ImageGridItem = memo(
     return (
       <Box onClick={handleSelect} sx={containerStyle}>
         {imgElement}
-        <ItemDetailContainer
-          backgroundColor={item.category.color}
+        <ItemOverlay
+          categoryColor={item.category.color}
           categoryName={item.category.name}
           usePredictedStyle={
             item.partition === Partition.Inference &&
             !isUnknownCategory(item.category.id)
           }
           position={getIconPosition(item.shape.height, item.shape.width)}
-          renderDetailList={(color) => (
-            <ImageDetailList image={item} color={color} />
-          )}
+          itemId={item.id}
+          itemType="image"
         />
       </Box>
     );

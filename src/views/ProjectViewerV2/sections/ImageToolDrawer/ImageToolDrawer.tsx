@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import {
   FilterAltOutlined as FilterAltOutlinedIcon,
-  InfoOutlined as InfoOutlinedIcon,
   FolderOpen as FolderOpenIcon,
   Straighten as StraightenIcon,
   ScatterPlot as ScatterPlotIcon,
@@ -38,15 +37,11 @@ import { capitalize } from "utils/stringUtils";
 import type { HTMLDataAttributes } from "utils/types";
 
 import { ModelTaskSection } from "../ModelTaskSection";
-import {
-  FilterOptions,
-  InformationOptions,
-  MeasurementOptions,
-} from "./tool-options";
-
+import { FilterOptions, MeasurementOptions } from "./tool-options";
 import { ImageViewerOptions } from "./tool-options/ImageViewerOptions";
 import { ProjectActions } from "../ProjectActions";
 import { ProjectViewerCategories } from "../ProjectViewerCategories";
+
 import type { OperationType } from "./ToolOptionsDrawer";
 
 const imageTools: Record<string, OperationType> = {
@@ -68,16 +63,6 @@ const imageTools: Record<string, OperationType> = {
     options: <FilterOptions />,
     hotkey: "F",
     helpContext: HelpItem.FilterImageGrid,
-  },
-  information: {
-    icon: (color) => (
-      <InfoOutlinedIcon fontSize="small" sx={{ color: color }} />
-    ),
-    name: "information",
-    description: "-",
-    options: <InformationOptions />,
-    hotkey: "I",
-    helpContext: HelpItem.GridItemInfo,
   },
   measurements: {
     icon: (color) => <StraightenIcon fontSize="small" sx={{ color: color }} />,
@@ -113,7 +98,6 @@ const imageTools: Record<string, OperationType> = {
   },
 };
 
-//TODO: Icon button
 export const ImageToolDrawer = () => {
   const theme = useTheme();
   const [activeTool, setActiveTool] = useState<OperationType>();

@@ -13,8 +13,7 @@ import { Partition } from "utils/modelsV2/enums";
 
 import { getIconPosition, imageStyle } from "../gridItemUtils";
 import { useGridItemStyle } from "../useGridItemStyle";
-import { ItemDetailContainer } from "../ItemDetailContainer";
-import { AnnotationDetailList } from "./AnnotationDetailList";
+import { ItemOverlay } from "../ItemOverlay";
 
 type AnnotationGridItemProps = {
   selected: boolean;
@@ -60,17 +59,16 @@ export const AnnotationGridItem = memo(
     return (
       <Box onClick={handleSelect} sx={containerStyle}>
         {imgElement}
-        <ItemDetailContainer
-          backgroundColor={category.color}
+        <ItemOverlay
+          categoryColor={category.color}
           categoryName={category.name}
           usePredictedStyle={
             item.partition === Partition.Inference &&
             !isUnknownCategory(item.categoryId)
           }
           position={getIconPosition(item.shape.height, item.shape.width)}
-          renderDetailList={(color) => (
-            <AnnotationDetailList annotation={item} color={color} />
-          )}
+          itemId={item.id}
+          itemType="annotation"
         />
       </Box>
     );

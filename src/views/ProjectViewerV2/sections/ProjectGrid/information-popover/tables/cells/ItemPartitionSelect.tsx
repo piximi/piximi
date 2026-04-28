@@ -4,18 +4,18 @@ import type { SelectChangeEvent } from "@mui/material";
 import { MenuItem } from "@mui/material";
 
 import { StyledSelect } from "components/inputs";
-import type { StyledSelectProps } from "components/inputs/StyledSelect";
 
 import { Partition } from "utils/modelsV2/enums";
 
-export const ImagePartitionSelect = ({
+import { SELECT_PROPS } from "./utils";
+
+export const ItemPartitionSelect = ({
   currentPartition,
   callback,
-  ...rest
 }: {
   currentPartition: Partition;
   callback: (partition: Partition) => void;
-} & StyledSelectProps) => {
+}) => {
   const [selectedPartition, setSelectedPartition] =
     useState<Partition>(currentPartition);
 
@@ -33,10 +33,10 @@ export const ImagePartitionSelect = ({
 
   return (
     <StyledSelect
-      {...rest}
       defaultValue={currentPartition}
       value={selectedPartition}
       onChange={(event) => handleChange(event)}
+      {...SELECT_PROPS}
     >
       {Object.values(Partition).map((partition) => (
         <MenuItem key={`im-cat-select-${partition}`} value={partition} dense>
