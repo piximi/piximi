@@ -4,8 +4,6 @@ import { intersection } from "lodash";
 
 import { useHotkeys } from "hooks";
 
-import { TooltipTitle } from "components/ui";
-
 import { projectSlice } from "@ProjectViewer/state";
 import {
   selectActiveKindState,
@@ -93,19 +91,6 @@ export const useGridActions = () => {
     }
   };
 
-  const selectProps =
-    allSelected === true
-      ? {
-          tooltipTitle: TooltipTitle(`Deselect`, "esc"),
-          onClick: handleDeselectAll,
-          dataTestId: "deselect-all-button",
-        }
-      : {
-          tooltipTitle: TooltipTitle(`Select all`, "control", "a"),
-          onClick: handleSelectAll,
-          dataTestId: "select-all-button",
-        };
-
   useHotkeys(
     "esc",
     () => {
@@ -129,6 +114,7 @@ export const useGridActions = () => {
     handleDelete,
     activeCategories,
     handleCategorize,
-    selectProps,
+    handleDeselectAll,
+    handleSelectAll,
   };
 };

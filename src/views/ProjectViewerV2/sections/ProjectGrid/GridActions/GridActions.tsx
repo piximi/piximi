@@ -31,7 +31,8 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
     activeCategories,
     handleDelete,
     handleCategorize,
-    selectProps,
+    handleSelectAll,
+    handleDeselectAll,
   } = useGridActions();
 
   const {
@@ -65,12 +66,18 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
       {!isMobile && (
         <>
           <TooltipButton
-            tooltipTitle={selectProps.tooltipTitle}
+            tooltipTitle={
+              allSelected
+                ? TooltipTitle(`Deselect`, "esc")
+                : TooltipTitle(`Select all`, "control", "a")
+            }
             color="inherit"
-            onClick={selectProps.onClick}
+            onClick={allSelected ? handleDeselectAll : handleSelectAll}
             disabled={!hasItems}
             icon={true}
-            data-testid={selectProps.dataTestId}
+            data-testid={
+              allSelected ? "deselect-all-button" : "select-all-button"
+            }
             sx={actionButtonStyle}
           >
             <Badge
