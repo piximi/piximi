@@ -182,7 +182,7 @@ export const ImageToolDrawer = () => {
             sx={(theme) => ({
               display: "grid",
               gridTemplateColumns: "1fr",
-              gridTemplateRows: `${theme.spacing(8)} 1fr`,
+              gridTemplateRows: `${theme.spacing(4)} 1fr`,
               gap: theme.spacing(1),
               pb: theme.spacing(1),
             })}
@@ -197,8 +197,9 @@ export const ImageToolDrawer = () => {
               })}
             >
               <Typography
-                variant="h5"
+                variant="h6"
                 sx={{
+                  fontWeight: "normal",
                   textTransform: "capitalize",
                   marginInline: "auto",
                   maxWidth: "fit-content",
