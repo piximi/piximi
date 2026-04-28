@@ -2,12 +2,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { intersection } from "lodash";
 
-import {
-  Deselect as DeselectIcon,
-  HighlightAltOutlined as SelectAllEmptyIcon,
-  SelectAll as SelectAllIcon,
-} from "@mui/icons-material";
-
 import { useHotkeys } from "hooks";
 
 import { TooltipTitle } from "components/ui";
@@ -40,6 +34,7 @@ export const useGridActions = (viewState: ViewState) => {
   );
 
   const allSelected = selectedFilteredItemIds.length === filteredItems.length;
+  const hasItems = !!filteredItems.length;
 
   const handleDelete = () => {
     if (viewState === "images")
@@ -104,18 +99,11 @@ export const useGridActions = (viewState: ViewState) => {
           tooltipTitle: TooltipTitle(`Deselect`, "esc"),
           onClick: handleDeselectAll,
           dataTestId: "deselect-all-button",
-          icon: DeselectIcon,
-          disabled: filteredItems.length === 0,
         }
       : {
           tooltipTitle: TooltipTitle(`Select all`, "control", "a"),
           onClick: handleSelectAll,
           dataTestId: "select-all-button",
-          icon:
-            selectedFilteredItemIds.length === 0
-              ? SelectAllEmptyIcon
-              : SelectAllIcon,
-          disabled: filteredItems.length === 0,
         };
 
   useHotkeys(
@@ -135,8 +123,9 @@ export const useGridActions = (viewState: ViewState) => {
   );
 
   return {
-    filteredItems,
-    selectedFilteredItems: selectedFilteredItemIds,
+    selectedFilteredItemIds,
+    allSelected,
+    hasItems,
     handleDelete,
     activeCategories,
     handleCategorize,

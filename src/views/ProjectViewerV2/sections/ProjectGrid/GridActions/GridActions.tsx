@@ -1,7 +1,12 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 import { Badge, Box, Divider } from "@mui/material";
-import { Delete as DeleteIcon } from "@mui/icons-material";
+import {
+  Delete as DeleteIcon,
+  Deselect as DeselectIcon,
+  HighlightAltOutlined as SelectAllEmptyIcon,
+  SelectAll as SelectAllIcon,
+} from "@mui/icons-material";
 
 import { useDialogHotkey, useHotkeys, useMobileView } from "hooks";
 
@@ -20,7 +25,9 @@ import type { ViewState } from "@ProjectViewer/state/types";
 
 export const GridActions = ({ viewState }: { viewState: ViewState }) => {
   const {
-    selectedFilteredItems,
+    selectedFilteredItemIds,
+    allSelected,
+    hasItems,
     activeCategories,
     handleDelete,
     handleCategorize,
@@ -35,15 +42,23 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
 
   const isMobile = useMobileView();
 
-  const SelectIcon = selectProps.icon;
+  const SelectIcon = useMemo(
+    () =>
+      allSelected && hasItems
+        ? DeselectIcon
+        : selectedFilteredItemIds.length === 0
+          ? SelectAllEmptyIcon
+          : SelectAllIcon,
+    [allSelected, selectedFilteredItemIds],
+  );
 
   useHotkeys(
     "delete, backspace",
     () => {
-      selectedFilteredItems.length > 0 && onOpenDeleteImagesDialog();
+      selectedFilteredItemIds.length > 0 && onOpenDeleteImagesDialog();
     },
     HotkeyContext.ProjectView,
-    [selectedFilteredItems],
+    [selectedFilteredItemIds],
   );
   return (
     <Box sx={{ display: "flex", position: "absolute", right: 0 }}>
@@ -53,14 +68,14 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
             tooltipTitle={selectProps.tooltipTitle}
             color="inherit"
             onClick={selectProps.onClick}
-            disabled={selectProps.disabled}
+            disabled={!hasItems}
             icon={true}
             data-testid={selectProps.dataTestId}
             sx={actionButtonStyle}
           >
             <Badge
               data-testid="select-badge"
-              badgeContent={selectedFilteredItems.length}
+              badgeContent={selectedFilteredItemIds.length}
               color="primary"
               sx={(theme) => ({
                 "& .MuiBadge-badge": {
@@ -75,14 +90,14 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
             </Badge>
           </TooltipButton>
           <CategorizeChip
-            selectedFilteredItems={selectedFilteredItems}
+            selectedFilteredItems={selectedFilteredItemIds}
             activeCategories={activeCategories}
             handleCategorize={handleCategorize}
           />
           <TooltipButton
             tooltipTitle={TooltipTitle(`Delete selected`, "delete")}
             color="inherit"
-            disabled={selectedFilteredItems.length === 0}
+            disabled={selectedFilteredItemIds.length === 0}
             onClick={onOpenDeleteImagesDialog}
             icon={true}
             sx={actionButtonStyle}
@@ -99,7 +114,7 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
       />
       <ZoomControl />
       <ConfirmationDialog
-        title={`Delete ${pluralize("Object", selectedFilteredItems.length)}?`}
+        title={`Delete ${pluralize("Object", selectedFilteredItemIds.length)}?`}
         content={`Objects will be deleted from the project. ${
           viewState === "images"
             ? "Associated annotations will also be removed."
