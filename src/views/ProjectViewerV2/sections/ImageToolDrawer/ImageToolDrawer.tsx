@@ -20,6 +20,7 @@ import {
   ScatterPlot as ScatterPlotIcon,
   Label as LabelIcon,
   ImageSearch as ImageViewerIcon,
+  HighlightAltOutlined as SelectIcon,
 } from "@mui/icons-material";
 
 import { useMenu, useMobileView, useTranslation, useWindowSize } from "hooks";
@@ -38,7 +39,11 @@ import { capitalize } from "utils/stringUtils";
 import type { HTMLDataAttributes } from "utils/types";
 
 import { ModelTaskSection } from "../ModelTaskSection";
-import { MeasurementOptions, ImageViewerOptions } from "./tool-options";
+import {
+  MeasurementOptions,
+  ImageViewerOptions,
+  SelectionOptions,
+} from "./tool-options";
 import { ProjectActions } from "../ProjectActions";
 import { ProjectViewerCategories } from "../ProjectViewerCategories";
 
@@ -94,6 +99,14 @@ const imageTools: Record<string, OperationType> = {
     description: "-",
     options: <ProjectViewerCategories />,
     hotkey: "C",
+    mobile: true,
+  },
+  selection: {
+    icon: (color) => <SelectIcon fontSize="small" sx={{ color }} />,
+    name: "selection",
+    description: "-",
+    options: <SelectionOptions />,
+    hotkey: "S",
     mobile: true,
   },
 };

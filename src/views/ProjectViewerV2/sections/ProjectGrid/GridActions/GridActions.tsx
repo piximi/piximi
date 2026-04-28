@@ -13,12 +13,13 @@ import { useDialogHotkey, useHotkeys, useMobileView } from "hooks";
 import { TooltipButton, TooltipTitle } from "components/ui/tooltips";
 import { ConfirmationDialog } from "components/dialogs";
 
+import { useGridActions } from "@ProjectViewer/hooks";
+
 import { HotkeyContext } from "utils/enums";
 import { pluralize } from "utils/stringUtils";
 
 import { ZoomControl } from "./ZoomControl";
 import { CategorizeChip } from "./CategorizeChip";
-import { useGridActions } from "./useGridActions";
 import { actionButtonStyle } from "./utils";
 
 import type { ViewState } from "@ProjectViewer/state/types";
