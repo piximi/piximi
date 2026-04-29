@@ -31,7 +31,7 @@ export const ProjectGrid = () => {
     _event: React.MouseEvent<HTMLElement>,
     value: ViewState,
   ) => {
-    dispatch(projectSlice.actions.setActiveView(value));
+    if (value !== null) dispatch(projectSlice.actions.setActiveView(value));
   };
 
   return (
