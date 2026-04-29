@@ -1,9 +1,14 @@
-import React from "react";
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Tooltip } from "@mui/material";
+import { useSelector } from "react-redux";
+
+import type { Theme } from "@mui/material";
+import { lighten, darken, Tooltip } from "@mui/material";
 import {
-  Label as LabelIcon,
-  MoreHoriz as MoreHorizIcon,
+  Label as CategoryIcon,
+  LabelOutlined as FilteredCategoryIcon,
+  MoreHoriz as MoreIcon,
 } from "@mui/icons-material";
 
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
@@ -12,8 +17,10 @@ import { CountChip } from "components/ui/CountChip";
 import type { Category } from "store/dataV2/types";
 import { useParameterizedSelector } from "store/hooks";
 import { selectEntityCountByCategoryId } from "store/dataV2/selectors";
+import { selectActiveFilters } from "@ProjectViewer/state/selectors";
 
 import { APPLICATION_COLORS } from "utils/constants";
+import { haloFilter } from "utils/styleUtils";
 
 type CategoryItemProps = {
   showHK?: boolean;
@@ -33,11 +40,17 @@ export const CategoryItem = ({
   isHighlighted,
   handleOpenCategoryMenu,
 }: CategoryItemProps) => {
-  const tipRef = React.useRef(null);
-  const [inView, setInView] = React.useState(false);
+  const tipRef = useRef(null);
+  const [inView, setInView] = useState(false);
   const numEntities = useParameterizedSelector(
     selectEntityCountByCategoryId,
     category.id,
+  );
+  const activeFilters = useSelector(selectActiveFilters);
+
+  const isFiltered = useCallback(
+    (category) => activeFilters.categoryId.includes(category.id),
+    [activeFilters.categoryId, category],
   );
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -49,7 +62,18 @@ export const CategoryItem = ({
     entry.isIntersecting ? setInView(true) : setInView(false);
   };
 
-  React.useEffect(() => {
+  const iconStyle = useCallback(
+    (theme: Theme) => {
+      const augment = theme.palette.mode === "dark" ? lighten : darken;
+      return {
+        color: category.color,
+        filter: haloFilter(augment(category.color, 0.5), 0.5),
+      };
+    },
+    [category],
+  );
+
+  useEffect(() => {
     const options = {
       root: null,
       rootMargin: "0px",
@@ -75,13 +99,19 @@ export const CategoryItem = ({
       <span>
         <CustomListItemButton
           primaryText={category.name}
-          icon={<LabelIcon sx={{ color: category.color }} />}
+          icon={
+            isFiltered(category) ? (
+              <FilteredCategoryIcon sx={iconStyle} />
+            ) : (
+              <CategoryIcon sx={iconStyle} />
+            )
+          }
           sx={{
             bgcolor: isHighlighted ? category.color + "33" : "inherit",
             cursor: "default",
           }}
           onClick={undefined}
-          secondaryIcon={<MoreHorizIcon />}
+          secondaryIcon={<MoreIcon />}
           onSecondary={handleOpenMenu}
           additionalComponent={
             <CountChip
