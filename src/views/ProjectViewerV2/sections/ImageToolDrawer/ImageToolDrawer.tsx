@@ -183,7 +183,6 @@ export const ImageToolDrawer = () => {
               display: "grid",
               gridTemplateColumns: "1fr",
               gridTemplateRows: `${theme.spacing(4)} 1fr`,
-              gap: theme.spacing(1),
               pb: theme.spacing(1),
             })}
           >
