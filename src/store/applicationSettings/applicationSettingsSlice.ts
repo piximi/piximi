@@ -45,9 +45,9 @@ export const applicationSettingsSlice = createSlice({
     },
     setImageSelectionColor(
       state: AppSettingsState,
-      action: PayloadAction<{ selectionColor: string }>,
+      action: PayloadAction<string>,
     ) {
-      state.imageSelectionColor = action.payload.selectionColor;
+      state.imageSelectionColor = action.payload;
     },
     setSelectedImageBorderWidth(
       state: AppSettingsState,

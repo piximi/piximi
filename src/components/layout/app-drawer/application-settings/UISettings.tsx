@@ -192,11 +192,10 @@ const BorderWidthSetting = () => {
 };
 
 const BorderColorSetting = () => {
+  const dispatch = useDispatch();
   const initialSelectionColor = useSelector(selectImageSelectionColor);
   const availableColors = useSelector(selectAvaliableCategoryColors);
-  const [selectionColor, setSelectionColor] = useState<string>(
-    initialSelectionColor,
-  );
+
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
     useState<null | HTMLButtonElement>(null);
   const colorPopupOpen = Boolean(colorMenuAnchorEl);
@@ -205,6 +204,10 @@ const BorderColorSetting = () => {
   };
   const onCloseColorPicker = () => {
     setColorMenuAnchorEl(null);
+  };
+
+  const handleChangeSelectionColor = (color: string) => {
+    dispatch(applicationSettingsSlice.actions.setImageSelectionColor(color));
   };
   return (
     <SettingsItem
@@ -218,7 +221,7 @@ const BorderColorSetting = () => {
               alignSelf: "center",
               width: "1rem",
               height: "1rem",
-              backgroundColor: selectionColor,
+              backgroundColor: initialSelectionColor,
               borderRadius: 1,
               marginLeft: 1,
             })}
@@ -253,9 +256,9 @@ const BorderColorSetting = () => {
         }}
       >
         <BlockPicker
-          color={selectionColor}
+          color={initialSelectionColor}
           onChangeComplete={(color: ColorResult) =>
-            setSelectionColor(color.hex)
+            handleChangeSelectionColor(color.hex)
           }
           colors={availableColors}
         />
