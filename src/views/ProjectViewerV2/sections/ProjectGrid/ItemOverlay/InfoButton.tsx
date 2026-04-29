@@ -1,7 +1,8 @@
 import { IconButton, useTheme } from "@mui/material";
 import { Info as InfoOutlinedIcon } from "@mui/icons-material";
 
-import { haloFilter } from "./halo";
+import { haloFilter } from "utils/styleUtils";
+
 import { useInformationPopover } from "../information-popover";
 
 export const InfoButton = ({

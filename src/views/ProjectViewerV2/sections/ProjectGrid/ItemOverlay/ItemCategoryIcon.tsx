@@ -4,7 +4,7 @@ import {
   LabelImportant as LabelImportantIcon,
 } from "@mui/icons-material";
 
-import { haloFilter } from "./halo";
+import { haloFilter } from "utils/styleUtils";
 
 export const ItemCategoryIcon = ({
   backgroundColor,
