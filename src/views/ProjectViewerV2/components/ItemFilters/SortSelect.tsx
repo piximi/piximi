@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 
 import type { SelectChangeEvent } from "@mui/material";
-import { Box, MenuItem } from "@mui/material";
+import { Box, MenuItem, Typography } from "@mui/material";
 
-import { StyledSelect, WithLabel } from "components/inputs";
+import { StyledSelect } from "components/inputs";
 
 import { projectSlice } from "@ProjectViewer/state";
 import { selectActiveViewState } from "@ProjectViewer/state/selectors";
@@ -31,39 +31,35 @@ export const SortSelect = () => {
   const sortTypes =
     activeViewState.view === "images" ? ImageSortType : AnnotationSortType;
   return (
-    <Box sx={(theme) => ({ p: theme.spacing(1) })}>
-      <WithLabel
-        label="Sort by:"
-        labelProps={{
-          variant: "body2",
-          sx: {
-            mr: "0.5rem",
-            whiteSpace: "nowrap",
-          },
-        }}
-        fullWidth
+    <Box
+      sx={(theme) => ({
+        p: theme.spacing(1),
+        display: "flex",
+        alignItems: "center",
+        width: "100%",
+        justifyContent: "space-between",
+      })}
+    >
+      <Typography variant="body2">Sort Type </Typography>
+      <StyledSelect
+        value={activeViewState.sortType}
+        onChange={onSortKeyChange}
+        variant="standard"
       >
-        <StyledSelect
-          value={activeViewState.sortType}
-          onChange={onSortKeyChange}
-          fullWidth
-          variant="standard"
-        >
-          {Object.values(sortTypes).map((sortType) => (
-            <MenuItem
-              key={sortType}
-              value={sortType}
-              dense
-              sx={{
-                borderRadius: 0,
-                minHeight: "1rem",
-              }}
-            >
-              {sortType}
-            </MenuItem>
-          ))}
-        </StyledSelect>
-      </WithLabel>
+        {Object.values(sortTypes).map((sortType) => (
+          <MenuItem
+            key={sortType}
+            value={sortType}
+            dense
+            sx={{
+              borderRadius: 0,
+              minHeight: "1rem",
+            }}
+          >
+            {sortType}
+          </MenuItem>
+        ))}
+      </StyledSelect>
     </Box>
   );
 };

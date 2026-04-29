@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Stack } from "@mui/material";
+import { Divider, Stack } from "@mui/material";
 
 import { CategoryFilterList } from "./CategoryFilterList";
 import { PartitionFilterList } from "./PartitionFilterList";
@@ -10,6 +10,7 @@ export const ItemFilters = () => {
   return (
     <Stack maxWidth="100%">
       <SortSelect />
+      <Divider />
       <CategoryFilterList />
       <PartitionFilterList />
     </Stack>

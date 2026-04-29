@@ -11,7 +11,6 @@ import { FilterList } from "./FilterList";
 
 export const PartitionFilterList = () => {
   const dispatch = useDispatch();
-
   const activeView = useSelector(selectActiveViewState);
 
   const filteredPartitions = useMemo(
@@ -69,24 +68,25 @@ export const PartitionFilterList = () => {
     [dispatchOps],
   );
 
-  //TODO: This has something to do with how the chips appear
-  const getFilterState = (partition: any) => {
-    if (partition === "all") {
-      return filteredPartitions.length === Object.keys(Partition).length;
-    } else if (partition === "any") {
-      return filteredPartitions.length === 0;
-    }
+  const isItemFiltered = (partition: Partition) => {
     return filteredPartitions.includes(partition);
   };
+  const allFiltered =
+    filteredPartitions.length === Object.keys(Partition).length;
+  const noneFiltered = filteredPartitions.length === 0;
 
   return (
     <FilterList
-      title="Filter Partition"
-      tooltipContent="partitions"
+      title="Partitions"
       items={Object.keys(Partition).map((partition) => partition as Partition)}
       onToggle={togglePartitionFilter}
       onToggleAll={toggleAllPartitionFilter}
-      isFiltered={getFilterState}
+      isFiltered={isItemFiltered}
+      allFiltered={allFiltered}
+      noneFiltered={noneFiltered}
+      getId={(i) => i}
+      getName={(i) => i}
+      getColor={(_i) => undefined}
     />
   );
 };

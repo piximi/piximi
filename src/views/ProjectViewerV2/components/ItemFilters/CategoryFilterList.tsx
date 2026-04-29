@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { selectActiveViewState } from "@ProjectViewer/state/selectors";
 import { projectSlice } from "@ProjectViewer/state";
-import type { Category } from "store/data/types";
+import type { Category } from "store/dataV2/types";
 import { selectAllCategories } from "store/dataV2/selectors";
 
 import { FilterList } from "./FilterList";
@@ -76,24 +76,24 @@ export const CategoryFilterList = () => {
     [dispatch, filteredCategories, activeCategories],
   );
 
-  //TODO: This has something to do with how the chips appear
-  const getFilterState = (category: any) => {
-    if (category === "all") {
-      return filteredCategories.length === activeCategories.length;
-    } else if (category === "any") {
-      return filteredCategories.length === 0;
-    }
+  const isItemFiltered = (category: Category) => {
     return filteredCategories.includes(category.id);
   };
+  const allFiltered = filteredCategories.length === activeCategories.length;
+  const noneFiltered = filteredCategories.length === 0;
 
   return (
     <FilterList
-      title="Filter Category"
-      tooltipContent="categories"
+      title="Categories"
       items={activeCategories}
       onToggle={toggleCategoryFilter}
       onToggleAll={toggleAllCategoryFilter}
-      isFiltered={getFilterState}
+      isFiltered={isItemFiltered}
+      allFiltered={allFiltered}
+      noneFiltered={noneFiltered}
+      getId={(i) => i.id}
+      getName={(i) => i.name}
+      getColor={(i) => i.color}
     />
   );
 };
