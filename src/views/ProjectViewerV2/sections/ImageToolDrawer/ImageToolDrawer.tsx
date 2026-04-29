@@ -68,6 +68,7 @@ const imageTools: Record<string, OperationType> = {
     options: <ItemFilters />,
     hotkey: "F",
     helpContext: HelpItem.FilterImageGrid,
+    mobile: true,
   },
   measurements: {
     icon: (color) => <MeasurementIcon fontSize="small" sx={{ color: color }} />,

@@ -32,6 +32,7 @@ export const ProjectAppBar = () => {
         overflowY: "visible",
         zIndex: 1002,
         px: 1,
+        pr: isMobile ? "default" : `${DIMENSIONS.toolDrawerWidth}px`,
       })}
     >
       <Box

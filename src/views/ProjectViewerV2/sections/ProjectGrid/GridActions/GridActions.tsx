@@ -21,6 +21,7 @@ import { pluralize } from "utils/stringUtils";
 import { ZoomControl } from "./ZoomControl";
 import { CategorizeChip } from "./CategorizeChip";
 import { actionButtonStyle } from "./utils";
+import { SortFilter } from "./SortFilter";
 
 import type { ViewState } from "@ProjectViewer/state/types";
 
@@ -66,6 +67,8 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
     <Box sx={{ display: "flex", position: "absolute", right: 0 }}>
       {!isMobile && (
         <>
+          <SortFilter />
+
           <TooltipButton
             tooltipTitle={
               allSelected
@@ -88,7 +91,7 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
               sx={(theme) => ({
                 "& .MuiBadge-badge": {
                   top: 8,
-                  right: "150%",
+                  right: "100%",
                   border: `2px solid ${theme.palette.background.paper}`,
                   padding: "0 4px",
                 },
