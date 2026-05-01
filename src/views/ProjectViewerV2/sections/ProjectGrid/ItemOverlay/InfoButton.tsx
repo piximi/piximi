@@ -14,7 +14,7 @@ export const InfoButton = ({
 }) => {
   const theme = useTheme();
   const infoHalo = haloFilter(
-    theme.palette.getContrastText(theme.palette.primary.main),
+    theme.palette.getContrastText(theme.palette.grey["300"]),
   );
   const { open } = useInformationPopover();
 
@@ -29,6 +29,7 @@ export const InfoButton = ({
         sx={{
           ml: "8px",
           filter: infoHalo,
+          color: theme.palette.grey["300"],
         }}
       />
     </IconButton>
