@@ -149,6 +149,34 @@ function cascadeDeleteImageSeries(
   channelMetaAdapter.removeMany(state.channelMetas, channelMetaIds);
 }
 
+function pruneSeriesAfterImageDeletion(
+  state: DataStateV2,
+  deletedImages: ImageObject[],
+): void {
+  const bySeriesId = new Map<string, Set<string>>();
+  deletedImages.forEach((im) => {
+    if (!bySeriesId.has(im.seriesId)) bySeriesId.set(im.seriesId, new Set());
+    bySeriesId.get(im.seriesId)!.add(im.id);
+  });
+  bySeriesId.forEach((deletedIds, seriesId) => {
+    const remaining = Object.values(state.images.entities).filter(
+      (im) => im.seriesId === seriesId,
+    );
+    if (remaining.length === 0) {
+      const channelMetas = Object.values(state.channelMetas.entities)
+        .filter((meta) => meta.seriesId === seriesId)
+        .map((meta) => meta.id);
+      channelMetaAdapter.removeMany(state.channelMetas, channelMetas);
+      imageSeriesAdapter.removeOne(state.imageSeries, seriesId);
+    } else {
+      const series = state.imageSeries.entities[seriesId];
+      if (series && deletedIds.has(series.activeImageId)) {
+        series.activeImageId = remaining[0].id;
+      }
+    }
+  });
+}
+
 function cascadeDeleteKind(state: DataStateV2, kind: Kind): void {
   const annotationVolumeUpdates = Object.values(
     state.annotationVolumes.entities,
@@ -491,6 +519,7 @@ export const dataSliceV2 = createSlice({
       cascadeDeleteImage(state, image);
 
       imageAdapter.removeOne(state.images, image.id);
+      pruneSeriesAfterImageDeletion(state, [image]);
     },
     batchDeleteImageObject(state, action: PayloadAction<Array<string>>) {
       const images = action.payload
@@ -499,6 +528,8 @@ export const dataSliceV2 = createSlice({
       images.forEach((image) => cascadeDeleteImage(state, image));
 
       imageAdapter.removeMany(state.images, action.payload);
+
+      pruneSeriesAfterImageDeletion(state, images);
     },
     addKind(
       state,
@@ -597,6 +628,7 @@ export const dataSliceV2 = createSlice({
     deleteEntitiesByCatId(state, action: PayloadAction<string>) {
       const catId = action.payload;
       const category = state.categories.entities[catId];
+      if (!category) return;
       if (category.type === "image") {
         const categorizedImages = Object.values(state.images.entities).filter(
           (im) => im.categoryId === catId,
@@ -607,15 +639,16 @@ export const dataSliceV2 = createSlice({
           state.images,
           categorizedImages.map((im) => im.id),
         );
-        return;
+        pruneSeriesAfterImageDeletion(state, categorizedImages);
+      } else {
+        const categorizedAnnotations = Object.values(
+          state.annotations.entities,
+        ).filter(
+          (ann) =>
+            state.annotationVolumes.entities[ann.volumeId].categoryId === catId,
+        );
+        batchBubbleDeleteAnnotation(state, categorizedAnnotations);
       }
-      const categorizedAnnotations = Object.values(
-        state.annotations.entities,
-      ).filter(
-        (ann) =>
-          state.annotationVolumes.entities[ann.volumeId].categoryId === catId,
-      );
-      batchBubbleDeleteAnnotation(state, categorizedAnnotations);
     },
 
     deleteImageCategory(state, action: PayloadAction<string>) {
