@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -39,7 +40,7 @@ export const ProjectViewerCategories = () => {
   const [categoryIndex, setCategoryIndex] = useState("");
   const [showHK, setShowHK] = useState(false);
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
-    React.useState<null | HTMLElement>(null);
+    useState<null | HTMLElement>(null);
 
   const [menuCategory, setMenuCategory] = useState<Category>();
 
@@ -55,14 +56,15 @@ export const ProjectViewerCategories = () => {
     open: isDeleteCategoryDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
-  const createCategory = (name: string, color: string) => {
-    const category = generateCategory(
-      name,
-      color,
+  const categoryOptions = useMemo(
+    (): { type: "image" } | { type: "annotation"; kindId: string } =>
       activeView === "images"
         ? { type: "image" }
         : { type: "annotation", kindId: activeKindId },
-    );
+    [activeView, activeKindId],
+  );
+  const createCategory = (name: string, color: string) => {
+    const category = generateCategory(name, color, categoryOptions);
     dispatch(dataSliceV2.actions.addCategory(category));
   };
 
@@ -243,14 +245,15 @@ export const ProjectViewerCategories = () => {
           clearObjects={deleteObjects}
         />
       )}
-
-      <CategoryDialog
-        kind={activeKindId}
-        onConfirm={createCategory}
-        onClose={handleCloseCreateCategoryDialog}
-        open={isCreateCategoryDialogOpen}
-        action={"create"}
-      />
+      {isCreateCategoryDialogOpen && (
+        <CategoryDialog
+          onConfirm={createCategory}
+          onClose={handleCloseCreateCategoryDialog}
+          open={isCreateCategoryDialogOpen}
+          action={"create"}
+          options={categoryOptions}
+        />
+      )}
 
       <ConfirmationDialog
         title="Delete All Categories"

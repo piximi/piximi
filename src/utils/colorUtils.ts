@@ -1,4 +1,5 @@
 import { BitDepth } from "store/data/types";
+import { getRandomInt } from "./dataUtils";
 
 const componentToHex = (c: number) => {
   const hex = (c * 255).toString(16);
@@ -12,6 +13,20 @@ export const rgbToHex = (rgb: [number, number, number]) => {
     componentToHex(rgb[1]) +
     componentToHex(rgb[2])
   );
+};
+
+export const getRandomHex = () => {
+  const hexArr = Array.from({ length: 3 }, () =>
+    getRandomInt(0, 255).toString(16),
+  );
+  return "#" + hexArr.join("");
+};
+export const getRestrictedRandomHex = (restrictions: string[]) => {
+  let hex: string;
+  do {
+    hex = getRandomHex();
+  } while (restrictions.includes(hex));
+  return hex;
 };
 
 export type ColorMap = [number, number, number];
