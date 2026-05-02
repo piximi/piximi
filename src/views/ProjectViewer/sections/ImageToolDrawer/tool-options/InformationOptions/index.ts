@@ -1,1 +1,0 @@
-export { InformationOptions } from "./InformationOptions";

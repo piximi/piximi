@@ -1,1 +1,0 @@
-export { AddKindMenu } from "./AddKindMenu";
