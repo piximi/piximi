@@ -3,11 +3,9 @@ import { Box } from "@mui/material";
 
 import { useDndFileDrop, useFileLoader } from "hooks";
 
-import { useFileUploadContext } from "contexts";
 import { TiffConfigDialog } from "components/dialogs";
 
 export const DropBox = ({ children }: { children: ReactElement }) => {
-  const uploadFiles = useFileUploadContext();
   const {
     upload,
     tiffDialogOpen,
@@ -18,13 +16,7 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
   } = useFileLoader();
 
   const handleDrop = async (files: FileList) => {
-    if (import.meta.env.VITE_USE_V2 === "true") {
-      await upload(files, { onTiffDialog: handleTiffDialog });
-    } else {
-      if (uploadFiles) {
-        await uploadFiles(files);
-      }
-    }
+    await upload(files, { onTiffDialog: handleTiffDialog });
   };
   const [{ isOver }, dropTarget] = useDndFileDrop(handleDrop);
   return (

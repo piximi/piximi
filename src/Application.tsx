@@ -10,7 +10,7 @@ import { ImageViewer } from "views/ImageViewer";
 import { MeasurementView } from "views/MeasurementView";
 import { WelcomeScreen } from "./views/WelcomeScreen";
 
-import { FileUploadProvider, HelpProvider } from "contexts";
+import { HelpProvider } from "contexts";
 import HelpOverlay from "views/HelpOverlay";
 import { useSelector } from "react-redux";
 import { selectAlertState } from "store/applicationSettings/selectors";
@@ -38,20 +38,18 @@ export const Application = () => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <SchedulerProvider>
-          <FileUploadProvider>
-            <HelpProvider>
-              <HelpOverlay />
-              {alertState.visible && <AlertBar alertState={alertState} />}
-              <BrowserRouter basename={"/"}>
-                <Routes>
-                  <Route path="/" element={<WelcomeScreen />} />
-                  <Route path="project" element={<ProjectViewer />} />
-                  <Route path="imageviewer" element={<ImageViewer />} />
-                  <Route path="measurements" element={<MeasurementView />} />
-                </Routes>
-              </BrowserRouter>
-            </HelpProvider>
-          </FileUploadProvider>
+          <HelpProvider>
+            <HelpOverlay />
+            {alertState.visible && <AlertBar alertState={alertState} />}
+            <BrowserRouter basename={"/"}>
+              <Routes>
+                <Route path="/" element={<WelcomeScreen />} />
+                <Route path="project" element={<ProjectViewer />} />
+                <Route path="imageviewer" element={<ImageViewer />} />
+                <Route path="measurements" element={<MeasurementView />} />
+              </Routes>
+            </BrowserRouter>
+          </HelpProvider>
         </SchedulerProvider>
       </ThemeProvider>
     </StyledEngineProvider>

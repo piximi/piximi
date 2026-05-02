@@ -6,8 +6,6 @@ import { useFileLoader } from "hooks";
 
 import { TiffConfigDialog } from "components/dialogs";
 
-import { useFileUploadContext } from "contexts";
-
 type OpenImageMenuItemProps = {
   onCloseMenu: () => void;
 };
@@ -15,7 +13,6 @@ type OpenImageMenuItemProps = {
 // TODO: MenuItem??
 
 export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
-  const uploadFiles = useFileUploadContext();
   const {
     upload,
     tiffDialogOpen,
@@ -25,7 +22,7 @@ export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
     handleCancelTiffConfig,
   } = useFileLoader();
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.currentTarget.files || !uploadFiles) return;
+    if (!event.currentTarget.files) return;
     const files: FileList = Object.assign([], event.currentTarget.files);
 
     await upload(files, { onTiffDialog: handleTiffDialog });
