@@ -24,18 +24,8 @@ import {
   useWindowSize,
 } from "hooks";
 import { useNavigate } from "react-router-dom";
-import { AlertType, HotkeyContext } from "utils/enums";
+import { HotkeyContext } from "utils/enums";
 import { ExampleProjectDialog } from "components/dialogs";
-import { batch, useDispatch } from "react-redux";
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { fListToStore } from "utils/file-io/zarr/stores";
-import { deserializeProject } from "utils/file-io/deserialize";
-import { projectSlice } from "store/project";
-import { dataSlice } from "store/data";
-import classifierHandler from "utils/models/classification/classifierHandler";
-import { classifierSlice } from "store/classifier";
-import { segmenterSlice } from "store/segmenter";
-import { AlertState } from "utils/types";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -51,7 +41,6 @@ const VisuallyHiddenInput = styled("input")({
 
 export const WelcomeScreen = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const theme = usePreferredMuiTheme();
   const {
     onClose: handleCloseCloseExampleProjectDialog,
@@ -143,82 +132,7 @@ export const WelcomeScreen = () => {
     if (!event.currentTarget.files) return;
     const files = event.currentTarget.files;
 
-    if (import.meta.env.VITE_USE_V2 === "true") {
-      await loadProject(files);
-      return;
-    }
-    // set indefinite loading
-    dispatch(
-      applicationSettingsSlice.actions.setLoadPercent({
-        loadPercent: -1,
-        loadMessage: "deserializing project...",
-      }),
-    );
-
-    const { fileStore: zarrStore, loadedClassifiers } = await fListToStore(
-      files,
-      files.length === 1 && files[0].type === "application/zip",
-    );
-    const onLoadProgress = (loadPercent: number, loadMessage: string) => {
-      dispatch(
-        applicationSettingsSlice.actions.sendLoadPercent({
-          loadPercent,
-          loadMessage,
-        }),
-      );
-    };
-    deserializeProject(zarrStore, onLoadProgress)
-      .then((res) => {
-        if (!res) return;
-        batch(() => {
-          // indefinite load until dispatches complete
-          dispatch(
-            applicationSettingsSlice.actions.setLoadPercent({
-              loadPercent: -1,
-            }),
-          );
-          dispatch(projectSlice.actions.resetProject());
-          dispatch(dataSlice.actions.initializeState({ data: res.data }));
-          // loadPerecnt set to 1 here
-          dispatch(
-            projectSlice.actions.setProject({
-              project: res.project,
-            }),
-          );
-          classifierHandler.addModels(loadedClassifiers);
-          dispatch(
-            classifierSlice.actions.setClassifier({
-              classifier: res.classifier,
-            }),
-          );
-
-          dispatch(
-            segmenterSlice.actions.setSegmenter({
-              segmenter: res.segmenter,
-            }),
-          );
-          dispatch(
-            applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 }),
-          );
-        });
-      })
-      .catch((err: Error) => {
-        import.meta.env.NODE_ENV !== "production" &&
-          import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-          console.error(err);
-
-        const warning: AlertState = {
-          alertType: AlertType.Warning,
-          name: "Could not parse project file",
-          description: `Error while parsing the project file: ${err.name}\n${err.message}`,
-        };
-
-        dispatch(
-          applicationSettingsSlice.actions.updateAlertState({
-            alertState: warning,
-          }),
-        );
-      });
+    await loadProject(files);
 
     event.target.value = "";
   };

@@ -1,7 +1,6 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { difference, intersection } from "lodash";
 
-import { classifierSlice } from "store/classifier";
 import { dataSlice } from "store/data";
 import { projectSlice } from "./projectSlice";
 
@@ -21,7 +20,6 @@ startAppListening({
   effect: (action, listenerAPI) => {
     listenerAPI.dispatch(dataSlice.actions.resetData());
     listenerAPI.dispatch(dataSliceV2.actions.clearState());
-    listenerAPI.dispatch(classifierSlice.actions.resetClassifiers());
     listenerAPI.dispatch(segmenterSlice.actions.resetSegmenter());
     listenerAPI.dispatch(imageViewerSlice.actions.resetImageViewer());
     listenerAPI.dispatch(measurementsSlice.actions.resetMeasurements());
@@ -87,24 +85,6 @@ startAppListening({
         kinds: deletedKinds,
       }),
     );
-  },
-});
-
-startAppListening({
-  predicate: (action, currentState, previousState) => {
-    return (
-      currentState.project.imageChannels !== previousState.project.imageChannels
-    );
-  },
-  effect: async (action, listenerApi) => {
-    const { project } = listenerApi.getState();
-
-    if (project.imageChannels)
-      listenerApi.dispatch(
-        classifierSlice.actions.updateChannelsGlobally({
-          globalChannels: project.imageChannels,
-        }),
-      );
   },
 });
 

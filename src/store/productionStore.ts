@@ -15,7 +15,6 @@ import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { rootReducer, RootState } from "./rootReducer";
 import { projectMiddleware } from "./project/projectListeners";
 import { dataMiddleware } from "./data/dataListeners";
-import { classifierSlice } from "./classifier";
 import { classifierSlice as classifierSliceV2 } from "store/classifierV2";
 import { applicationSettingsSlice } from "./applicationSettings";
 import { dataSlice } from "./data/dataSlice";
@@ -47,7 +46,6 @@ const listenerMiddlewares: Middleware[] = [
 ];
 
 const preloadedState: RootState = {
-  classifier: classifierSlice.getInitialState(),
   classifierV2: classifierSliceV2.getInitialState(),
   annotator: annotatorSlice.getInitialState(),
   applicationSettings: applicationSettingsSlice.getInitialState(),
