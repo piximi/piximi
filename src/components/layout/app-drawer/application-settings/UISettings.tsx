@@ -28,9 +28,8 @@ import {
 } from "store/applicationSettings/selectors";
 import { ThemeMode } from "themes/enums";
 import { SettingsItem } from "./SettingsItem";
-import { selectAvaliableCategoryColors } from "store/project/reselectors";
 import { useState } from "react";
-import { BlockPicker, ColorResult } from "react-color";
+import { ChromePicker, ColorResult } from "react-color";
 
 export const UISettings = () => {
   return (
@@ -194,7 +193,6 @@ const BorderWidthSetting = () => {
 const BorderColorSetting = () => {
   const dispatch = useDispatch();
   const initialSelectionColor = useSelector(selectImageSelectionColor);
-  const availableColors = useSelector(selectAvaliableCategoryColors);
 
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
     useState<null | HTMLButtonElement>(null);
@@ -255,12 +253,11 @@ const BorderColorSetting = () => {
           horizontal: "center",
         }}
       >
-        <BlockPicker
+        <ChromePicker
           color={initialSelectionColor}
           onChangeComplete={(color: ColorResult) =>
             handleChangeSelectionColor(color.hex)
           }
-          colors={availableColors}
         />
       </Popover>
     </SettingsItem>
