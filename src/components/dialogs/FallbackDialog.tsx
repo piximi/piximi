@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector } from "react-redux";
+//import { useSelector } from "react-redux";
 import { fromError } from "stacktrace-js";
 
 import {
@@ -34,12 +34,10 @@ import { AlertType } from "utils/enums";
 
 import { AlertState } from "utils/types";
 import classifierHandler from "utils/models/classification/classifierHandler";
-import { saveAs } from "file-saver";
-import { selectProjectName } from "store/project/selectors";
+//import { saveAs } from "file-saver";
 
 export const FallbackDialog = (props: any) => {
   const error = props.error as Error;
-  const projectName = useSelector(selectProjectName);
 
   const [expanded, setExpanded] = React.useState(false);
 
@@ -67,7 +65,7 @@ export const FallbackDialog = (props: any) => {
 
   const {
     onClose: onSaveProjectDialogClose,
-    onOpen: onSaveProjectDialogOpen,
+    //onOpen: onSaveProjectDialogOpen,
     open: openSaveProjectDialog,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
@@ -96,10 +94,16 @@ export const FallbackDialog = (props: any) => {
     encodeURIComponent(issueDescription);
 
   const handleSaveClassifiers = async () => {
-    const modelsZip = classifierHandler.zipModels();
-    modelsZip.generateAsync({ type: "blob" }).then((blob) => {
-      saveAs(blob, `${projectName}-classifiers.zip`);
-    });
+    alert("Not Yet Implemented");
+    // const modelsZip = classifierHandler.zipModels();
+    // modelsZip.generateAsync({ type: "blob" }).then((blob) => {
+    //   saveAs(blob, `${"experimentName"}-classifiers.zip`);
+    // });
+  };
+
+  const handleSaveProject = () => {
+    alert("Not Yet Implemented");
+    //onSaveProjectDialogOpen
   };
 
   return (
@@ -206,7 +210,7 @@ export const FallbackDialog = (props: any) => {
         </DialogContentText>
 
         <Stack direction="row" spacing={2}>
-          <Button variant="outlined" onClick={onSaveProjectDialogOpen}>
+          <Button variant="outlined" onClick={handleSaveProject}>
             Save Project
           </Button>
           {classifierHandler.getModelNames().length > 0 && (

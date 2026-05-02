@@ -1,11 +1,8 @@
 // TODO: implement segmenter serialization
-import { ChangeEvent, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { ChangeEvent, useState } from "react";
 import { Grid, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-
-import { selectProject } from "store/project/selectors";
 
 type SaveProjectDialogProps = {
   onClose: () => void;
@@ -16,13 +13,9 @@ export const SaveProjectDialog = ({
   onClose,
   open,
 }: SaveProjectDialogProps) => {
-  const project = useSelector(selectProject);
-
-  const [projectName, setProjectName] = useState<string>(project.name);
+  const [projectName, setProjectName] = useState<string>("");
 
   const onSaveProjectClick = async () => {
-    alert("Not yet implemented");
-
     onClose();
   };
 
@@ -33,9 +26,6 @@ export const SaveProjectDialog = ({
   const onNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setProjectName(event.target.value);
   };
-  useEffect(() => {
-    setProjectName(project.name);
-  }, [project.name]);
 
   return (
     <ConfirmationDialog
