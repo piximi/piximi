@@ -3,7 +3,7 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { dataSliceV2 } from "store/dataV2";
-import { classifierSlice } from "store/classifierV2";
+import { classifierSlice } from "store/classifier";
 import {
   selectActiveClassifierModel,
   selectActiveClassifierModelNameOrArch,

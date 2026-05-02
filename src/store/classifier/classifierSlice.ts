@@ -32,7 +32,7 @@ const initialState: ClassifierState = {
 };
 
 export const classifierSlice = createSlice({
-  name: "classifierV2",
+  name: "classifier",
   initialState: initialState,
   reducers: {
     resetClassifiers: () => {

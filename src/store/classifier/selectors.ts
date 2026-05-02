@@ -1,25 +1,25 @@
 import type { ClassifierState, KindClassifierDict } from "store/types";
 
 export const selectClassifier = ({
-  classifierV2: classifier,
+  classifier,
 }: {
-  classifierV2: ClassifierState;
+  classifier: ClassifierState;
 }): ClassifierState => {
   return classifier;
 };
 
 export const selectKindClassifiers = ({
-  classifierV2: classifier,
+  classifier,
 }: {
-  classifierV2: ClassifierState;
+  classifier: ClassifierState;
 }): KindClassifierDict => {
   return classifier.kindClassifiers;
 };
 
 export const selectShowClearPredictionsWarning = ({
-  classifierV2: classifier,
+  classifier,
 }: {
-  classifierV2: ClassifierState;
+  classifier: ClassifierState;
 }): boolean => {
   return classifier.showClearPredictionsWarning;
 };

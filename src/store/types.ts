@@ -98,7 +98,7 @@ export type ProjectState = {
 };
 
 type AppState = {
-  classifierV2: ClassifierState;
+  classifier: ClassifierState;
   segmenter: SegmenterState;
   segmenterV2: SegmenterState;
   imageViewer: ImageViewerState;

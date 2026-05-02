@@ -17,7 +17,7 @@ import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 import { TextFieldWithBlur } from "components/inputs/TextFieldWithBlur";
 import { WithLabel } from "components/inputs";
 
-import { classifierSlice } from "store/classifierV2";
+import { classifierSlice } from "store/classifier";
 import {
   selectAvailibleClassifierNames,
   selectActiveClassifierModel,

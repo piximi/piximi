@@ -4,7 +4,7 @@ import { batch, useDispatch } from "react-redux";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { AppTask } from "store/appTasks/types";
-import { classifierSlice } from "store/classifierV2";
+import { classifierSlice } from "store/classifier";
 import { generateUUID } from "store/dataV2/utils";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import { projectSlice } from "@ProjectViewer/state";

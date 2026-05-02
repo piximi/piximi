@@ -26,8 +26,8 @@ import { useDialog } from "hooks";
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 
-import { classifierSlice } from "store/classifierV2";
-import { selectShowClearPredictionsWarning } from "store/classifierV2/selectors";
+import { classifierSlice } from "store/classifier";
+import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
 import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";

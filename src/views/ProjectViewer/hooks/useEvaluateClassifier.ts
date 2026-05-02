@@ -8,7 +8,7 @@ import {
   selectActiveClassifierModelNameOrArch,
   selectActiveKnownCategories,
 } from "@ProjectViewer/state/reselectors";
-import { classifierSlice } from "store/classifierV2";
+import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 import { AlertType } from "utils/enums";

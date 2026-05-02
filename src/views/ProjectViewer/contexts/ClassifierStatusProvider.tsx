@@ -10,7 +10,7 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectShowClearPredictionsWarning } from "store/classifierV2/selectors";
+import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
 import { selectKindIds } from "store/dataV2/selectors";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import {

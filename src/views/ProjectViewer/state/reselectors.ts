@@ -7,9 +7,9 @@ import {
   selectExtendedImages,
 } from "store/dataV2/selectors";
 import type { RootState } from "store/rootReducer";
-import { selectKindClassifiers } from "store/classifierV2/selectors";
+import { selectKindClassifiers } from "store/classifier/selectors";
 import type { KindClassifier, ModelInfo } from "store/types";
-import { getSelectedModelInfo } from "store/classifierV2/utils";
+import { getSelectedModelInfo } from "store/classifier/utils";
 import type { Shape } from "store/dataV2/types";
 import { CATEGORY_COLORS } from "store/dataV2/constants";
 

@@ -17,7 +17,7 @@ import { useHotkeys } from "hooks";
 
 import { ToolTipTab } from "components/layout";
 
-import { classifierSlice } from "store/classifierV2";
+import { classifierSlice } from "store/classifier";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 
 import { HotkeyContext } from "utils/enums";

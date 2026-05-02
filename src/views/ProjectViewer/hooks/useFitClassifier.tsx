@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { deepClone } from "@mui/x-data-grid/internals";
 
-import { classifierSlice } from "store/classifierV2";
+import { classifierSlice } from "store/classifier";
 import {
   selectActiveClassifierModel,
   selectClassifierModelInfo,

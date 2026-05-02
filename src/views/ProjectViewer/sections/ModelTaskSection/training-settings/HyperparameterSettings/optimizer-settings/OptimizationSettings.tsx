@@ -18,7 +18,7 @@ import { FunctionalDivider } from "components/ui";
 import { StyledSelect, WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { classifierSlice } from "store/classifierV2";
+import { classifierSlice } from "store/classifier";
 import {
   selectActiveClassifierModel,
   selectClassifierOptimizerSettings,

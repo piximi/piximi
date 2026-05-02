@@ -2,7 +2,7 @@ import { combineReducers } from "redux";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { classifierSlice as classifierSliceV2 } from "store/classifierV2";
+import { classifierSlice } from "store/classifier";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";
@@ -15,7 +15,7 @@ import { appTasksSlice } from "./appTasks/appTasksSlice";
 import { projectSlice as projectSliceV2 } from "views/ProjectViewer/state/projectSlice";
 
 const reducers = {
-  classifierV2: classifierSliceV2.reducer,
+  classifier: classifierSlice.reducer,
   segmenter: segmenterSlice.reducer,
   segmenterV2: segmenterSliceV2.reducer,
   imageViewer: imageViewerSlice.reducer,

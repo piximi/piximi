@@ -12,7 +12,7 @@ import { SaveFittedModelDialog } from "components/dialogs";
 import { WithLabel, StyledSelect } from "components/inputs";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 
-import { classifierSlice } from "store/classifierV2";
+import { classifierSlice } from "store/classifier";
 import {
   ErrorReason,
   useClassifierStatus,
