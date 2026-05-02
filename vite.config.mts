@@ -23,7 +23,7 @@ export default defineConfig({
       images: path.resolve("src/images"),
       store: path.resolve("src/store"),
       themes: path.resolve("src/themes"),
-      "@ProjectViewer": path.resolve("src/views/ProjectViewerV2"),
+      "@ProjectViewer": path.resolve("src/views/ProjectViewer"),
       translations: path.resolve("src/translations"),
     },
   },

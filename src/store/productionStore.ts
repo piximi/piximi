@@ -27,8 +27,8 @@ import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 import { appTasksSlice } from "./appTasks/appTasksSlice";
-import { projectSlice as projectSliceV2 } from "views/ProjectViewerV2/state/projectSlice";
-import { projectMiddleware as projectMiddlewareV2 } from "views/ProjectViewerV2/state/projectListeners";
+import { projectSlice as projectSliceV2 } from "views/ProjectViewer/state/projectSlice";
+import { projectMiddleware as projectMiddlewareV2 } from "views/ProjectViewer/state/projectListeners";
 
 const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&

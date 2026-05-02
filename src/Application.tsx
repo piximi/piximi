@@ -5,7 +5,7 @@ import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 
 import { usePreferredMuiTheme } from "hooks";
 
-import { ProjectViewer } from "views/ProjectViewerV2";
+import { ProjectViewer } from "views/ProjectViewer";
 import { ImageViewer } from "views/ImageViewer";
 import { MeasurementView } from "views/MeasurementView";
 import { WelcomeScreen } from "./views/WelcomeScreen";

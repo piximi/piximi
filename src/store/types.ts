@@ -29,7 +29,7 @@ import {
 } from "views/ImageViewer/utils/types";
 import { DataStateV2 } from "./dataV2/types";
 import { AppTasksState } from "./appTasks/types";
-import { ProjectState as ProjectStateV2 } from "views/ProjectViewerV2/state/types";
+import { ProjectState as ProjectStateV2 } from "views/ProjectViewer/state/types";
 
 export type AppSettingsState = {
   // async work for setting initial states,

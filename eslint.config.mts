@@ -8,7 +8,7 @@ import { importX } from "eslint-plugin-import-x";
 import type { Linter } from "eslint";
 
 const NEW_FILES = [
-  "src/views/ProjectViewerV2/**/*.{js,mjs,jsx,ts,mts,tsx}",
+  "src/views/ProjectViewer/**/*.{js,mjs,jsx,ts,mts,tsx}",
   "src/store/dataV2/*.ts",
   "src/store/classifierV2/*.ts",
   "src/utils/data-connector/**/*.ts",
