@@ -8,7 +8,7 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { HotkeyContext } from "utils/enums";
 
 import { Category } from "store/dataV2/types";
-import { CategoryDialog } from "components/dialogs/CategoryDialog";
+import { CategoryDialog } from "components/dialogs/CategoryDialogV2";
 import { useParameterizedSelector } from "store/hooks";
 import { selectEntityCountByCategoryId } from "store/dataV2/selectors";
 
@@ -20,9 +20,11 @@ type CategoryItemMenuProps = {
   editCategory: (id: string, name: string, color: string) => void;
   deleteCategory: (category: Category) => void;
   clearObjects: (category: Category) => void;
+  options: { type: "image" } | { type: "annotation"; kindId: string };
 };
 
 export const CategoryItemMenu = ({
+  options,
   anchorElCategoryMenu,
   category,
   handleCloseCategoryMenu,
@@ -104,6 +106,7 @@ export const CategoryItemMenu = ({
         id={category.id}
         onClose={() => handleMenuCloseWith(handleCloseEditCategoryDialog)}
         open={isEditCategoryDialogOpen}
+        options={options}
       />
       <ConfirmationDialog
         title={`Delete "${category.name}" Category`}

@@ -243,6 +243,7 @@ export const ProjectViewerCategories = () => {
           editCategory={editCategory}
           deleteCategory={deleteCategory}
           clearObjects={deleteObjects}
+          options={categoryOptions}
         />
       )}
       {isCreateCategoryDialogOpen && (
