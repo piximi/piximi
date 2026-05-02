@@ -1,20 +1,19 @@
 import { TextField, Box } from "@mui/material";
 
-import { useCategoryValidation } from "hooks";
+import { useCategoryValidation } from "hooks/useCategoryValidation";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { ColorIcon } from "components/ui/ColorIcon";
+import { ColorPicker } from "components/ui/ColorPicker";
 import { formatString } from "utils/stringUtils";
 
 type BaseCategoryDialogProps = {
   onClose: () => void;
-  onConfirm: (kindOrId: string, name: string, color: string) => void;
-
   open: boolean;
+  options: { type: "image" } | { type: "annotation"; kindId: string };
 };
 type CreateCategoryDialogProps = BaseCategoryDialogProps & {
   action: "create";
-  kind: string;
+  onConfirm: (name: string, color: string) => void;
 };
 
 type UpdateCategoryDialogProps = BaseCategoryDialogProps & {
@@ -22,12 +21,13 @@ type UpdateCategoryDialogProps = BaseCategoryDialogProps & {
   initName: string;
   initColor: string;
   id: string;
+  onConfirm: (id: string, name: string, color: string) => void;
 };
 
 export const CategoryDialog = (
   props: CreateCategoryDialogProps | UpdateCategoryDialogProps,
 ) => {
-  const { onClose, onConfirm, action, open } = props;
+  const { onClose, onConfirm, action, open, options } = props;
   const isEditMode = action === "edit";
   const {
     name,
@@ -36,11 +36,11 @@ export const CategoryDialog = (
     handleColorChange,
     isInvalidName,
     errorHelperText,
-    availableColors,
     setName,
   } = useCategoryValidation({
     initName: isEditMode ? props.initName : "",
     initColor: isEditMode ? props.initColor : "",
+    options,
   });
 
   const handleConfirm = () => {
@@ -48,7 +48,7 @@ export const CategoryDialog = (
       if (isEditMode) {
         onConfirm(props.id, name, color);
       } else {
-        onConfirm(props.kind, name, color);
+        onConfirm(name, color);
       }
     }
   };
@@ -71,11 +71,7 @@ export const CategoryDialog = (
           alignItems={"center"}
           gap={2}
         >
-          <ColorIcon
-            color={color}
-            unusedColors={availableColors}
-            onColorChange={handleColorChange}
-          />
+          <ColorPicker color={color} onColorChange={handleColorChange} />
           <TextField
             data-testid="category-name-input"
             error={isInvalidName && name !== ""}
@@ -94,6 +90,7 @@ export const CategoryDialog = (
       }
       onConfirm={handleConfirm}
       confirmDisabled={isInvalidName}
+      keepMounted={false}
     />
   );
 };

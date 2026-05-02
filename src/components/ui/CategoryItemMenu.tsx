@@ -1,41 +1,42 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import { Box, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { selectActiveKindId } from "store/project/selectors";
-
-import { UNKNOWN_CATEGORY_NAME } from "store/data/constants";
 import { HotkeyContext } from "utils/enums";
 
-import { Category } from "store/data/types";
+import { Category } from "store/dataV2/types";
 import { CategoryDialog } from "components/dialogs/CategoryDialog";
+import { useParameterizedSelector } from "store/hooks";
+import { selectEntityCountByCategoryId } from "store/dataV2/selectors";
 
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;
   category: Category;
   handleCloseCategoryMenu: () => void;
   openCategoryMenu: boolean;
-  kind?: string;
-  editCategory: (kindOrId: string, name: string, color: string) => void;
-  deleteCategory: (category: Category, kindId: string) => void;
+  editCategory: (id: string, name: string, color: string) => void;
+  deleteCategory: (category: Category) => void;
   clearObjects: (category: Category) => void;
+  options: { type: "image" } | { type: "annotation"; kindId: string };
 };
 
 export const CategoryItemMenu = ({
+  options,
   anchorElCategoryMenu,
   category,
   handleCloseCategoryMenu,
   openCategoryMenu,
-  kind,
   editCategory,
   deleteCategory,
   clearObjects,
 }: CategoryItemMenuProps) => {
-  const activeKind = useSelector(selectActiveKindId);
+  const numEntities = useParameterizedSelector(
+    selectEntityCountByCategoryId,
+    category.id,
+  );
   const {
     onClose: handleCloseEditCategoryDialog,
     onOpen: handleOpenEditCategoryDialog,
@@ -57,6 +58,14 @@ export const CategoryItemMenu = ({
     dialogClose();
     handleCloseCategoryMenu();
   };
+  const handleDelete = () => {
+    if (numEntities === 0) {
+      handleMenuCloseWith(handleCloseDeleteCategoryDialog);
+      deleteCategory(category);
+      return;
+    }
+    handleOpenDeleteCategoryDialog();
+  };
   return (
     <Menu
       anchorEl={anchorElCategoryMenu}
@@ -64,14 +73,14 @@ export const CategoryItemMenu = ({
       onClose={handleCloseCategoryMenu}
       open={openCategoryMenu}
       transformOrigin={{ horizontal: "left", vertical: "top" }}
-      MenuListProps={{ sx: { py: 0 } }}
+      slotProps={{ list: { sx: { py: 0 } } }}
     >
       <MenuList dense variant="menu" sx={{ py: 0 }}>
         <Box>
-          {category.name !== UNKNOWN_CATEGORY_NAME && (
+          {!category.isUnknown && (
             <>
               <CategoryMenuItem
-                onClick={handleOpenDeleteCategoryDialog}
+                onClick={handleDelete}
                 label="Delete"
                 data-testid="delete-category-button"
               />
@@ -97,12 +106,13 @@ export const CategoryItemMenu = ({
         id={category.id}
         onClose={() => handleMenuCloseWith(handleCloseEditCategoryDialog)}
         open={isEditCategoryDialogOpen}
+        options={options}
       />
       <ConfirmationDialog
         title={`Delete "${category.name}" Category`}
         content={`Objects categorized as "${category.name}" will NOT be deleted, and instead will be labeled as
         "Unknown".`}
-        onConfirm={() => deleteCategory(category, kind ?? activeKind)}
+        onConfirm={() => deleteCategory(category)}
         onClose={() => handleMenuCloseWith(handleCloseDeleteCategoryDialog)}
         isOpen={isDeleteCategoryDialogOpen}
         data-testid="delete-category-confirm-dialog"
@@ -110,7 +120,7 @@ export const CategoryItemMenu = ({
       <ConfirmationDialog
         title={`Delete All "${category.name}" Objects`}
         content={`Objects categorized as "${category.name}" will be deleted. ${
-          activeKind === "Image"
+          category.type === "image"
             ? "Associated annotations will also be removed."
             : ""
         } `}

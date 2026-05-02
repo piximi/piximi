@@ -1,27 +1,36 @@
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { sample } from "lodash";
+import { isMatch } from "lodash";
 import { ColorResult } from "react-color";
 
-import {
-  selectAvaliableCategoryColors,
-  selectActiveCategoryNames,
-} from "store/project/reselectors";
+import { selectAllCategories } from "store/dataV2/selectors";
+import { getRestrictedRandomHex } from "utils/colorUtils";
 
 export function useCategoryValidation({
   initName,
   initColor,
+  options,
 }: {
   initName?: string;
   initColor?: string;
+  options: { type: "image" } | { type: "annotation"; kindId: string };
 }) {
-  const unavailableNames = useSelector(selectActiveCategoryNames);
-  const availableColors = useSelector(selectAvaliableCategoryColors);
-  const [color, setColor] = useState<string>(
-    initColor ?? "", //sample(availableColors)!
-  );
-  const [name, setName] = useState<string>(initName ?? "");
-  const [errorHelperText, setErrorHelperText] = useState<string>(" ");
+  const categories = useSelector(selectAllCategories);
+  const { existingNames, existingColors } = useMemo(() => {
+    const existingNames: string[] = [];
+    const existingColors: string[] = [];
+    categories.forEach((cat) => {
+      if (isMatch(cat, options)) {
+        existingNames.push(cat.name);
+        existingColors.push(cat.color);
+      }
+    });
+    return { existingNames, existingColors };
+  }, [categories, options]);
+  const [color, setColor] = useState(initColor ?? "");
+  const [name, setName] = useState(initName ?? "");
+  const [errorHelperText, setErrorHelperText] = useState(" "); // leave space for rendering
+
   const [isInvalidName, setIsInvalidName] = useState<boolean>(false);
 
   const handleColorChange = (color: ColorResult) => {
@@ -42,14 +51,14 @@ export function useCategoryValidation({
         invalidInput = true;
       } else if (
         categoryName !== initName &&
-        unavailableNames.includes(categoryName)
+        existingNames.includes(categoryName)
       ) {
         helperText = "A category with this name already exits.";
         invalidInput = true;
       }
       return { isInvalid: invalidInput, helperText };
     },
-    [initName, unavailableNames],
+    [initName, existingNames],
   );
 
   useEffect(() => {
@@ -59,8 +68,8 @@ export function useCategoryValidation({
   }, [name, validateInput]);
 
   useEffect(() => {
-    if (!initColor) setColor(sample(availableColors)!);
-  }, [availableColors, initColor]);
+    if (!initColor) setColor(getRestrictedRandomHex(existingColors));
+  }, [existingColors, initColor]);
 
   return {
     name,
@@ -69,7 +78,7 @@ export function useCategoryValidation({
     handleColorChange,
     isInvalidName,
     errorHelperText,
-    availableColors,
+    existingColors,
     setName,
   };
 }
