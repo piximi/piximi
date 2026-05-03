@@ -25,7 +25,7 @@ import {
   createProtoAnnotation,
   editProtoAnnotation,
 } from "../utils/annotationUtils";
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 
 export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();

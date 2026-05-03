@@ -2,7 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { difference } from "lodash";
 
 import { ThingSortKey } from "utils/enums";
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 
 import { ProjectState } from "store/types";
 

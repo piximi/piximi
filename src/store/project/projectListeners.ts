@@ -4,7 +4,7 @@ import { difference, intersection } from "lodash";
 import { dataSlice } from "store/data";
 import { projectSlice } from "./projectSlice";
 
-import classifierHandler from "utils/models/classification/classifierHandler";
+import classifierHandler from "utils/modelsV2/classification/classifierHandler";
 import { TypedAppStartListening } from "store/types";
 import { segmenterSlice } from "store/segmenter";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";

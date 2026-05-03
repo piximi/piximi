@@ -15,7 +15,7 @@ import {
 } from "utils/file-io/deserialize/v02/types";
 import { getPropertiesFromImageSync } from "store/data/utils";
 import { logger } from "utils/logUtils";
-import { convertArrayToShape } from "utils/models/utils";
+import { convertArrayToShape } from "utils/modelsV2/utils";
 
 export const convertAnnotationsWithExistingProject_v01v02 = async (
   existingImages: Record<string, ImageObjectV02>,

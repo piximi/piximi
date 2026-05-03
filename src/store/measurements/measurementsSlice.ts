@@ -4,7 +4,7 @@ import { isArray, merge, mergeWith } from "lodash";
 import { generateUUID } from "store/data/utils";
 
 import { baseMeasurementOptions } from "./constants";
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 
 import { Category } from "store/data/types";
 import { RecursivePartial } from "utils/types";

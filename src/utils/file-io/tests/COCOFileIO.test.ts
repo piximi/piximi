@@ -19,13 +19,13 @@ import initialState from "data/test-data/COCO/labels_internal.json";
 
 import { fileFromPath } from "utils/file-io/nodeImageHelper";
 import { getPropertiesFromImageSync } from "store/data/utils";
-import { convertArrayToShape } from "utils/models/utils";
+import { convertArrayToShape } from "utils/modelsV2/utils";
 import { generateUUID } from "store/data/utils";
 
 import { serializeCOCOFile } from "../serialize/serializeCOCO";
 import { deserializeCOCOFile } from "../deserialize/deserializeCOCO";
 
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 import { SerializedCOCOFileType } from "../types";
 import {
   Kind,

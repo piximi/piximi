@@ -1,1 +1,0 @@
-export { FullyConvolutionalSegmenter } from "./FullyConvolutionalSegmenter";

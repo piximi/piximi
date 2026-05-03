@@ -16,7 +16,7 @@ import {
 
 import { isUnknownCategory } from "store/data/utils";
 
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 
 import { AnnotationObject, ImageObject, Thing } from "store/data/types";
 import { CATEGORY_COLORS } from "store/data/constants";

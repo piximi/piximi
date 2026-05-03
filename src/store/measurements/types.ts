@@ -1,5 +1,5 @@
 import { DataArray } from "store/data/types";
-import { Partition } from "utils/models/enums";
+import { Partition } from "utils/modelsV2/enums";
 
 export type MeasurementsState = {
   data: MeasurementsData;

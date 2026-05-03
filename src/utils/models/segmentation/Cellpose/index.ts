@@ -1,1 +1,0 @@
-export { Cellpose } from "./Callpose";
