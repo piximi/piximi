@@ -1,23 +1,23 @@
 import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
 
-import type { ColorsRaw } from "utils/types";
 import {
   CropSchema,
   LossFunction,
   Metric,
   OptimizationAlgorithm,
 } from "utils/modelsV2/enums";
-import type {
-  ClassifierEvaluationResultType,
-  CropOptions,
-  FitOptions,
-  RescaleOptions,
-} from "utils/modelsV2/types";
 
 import { getAttr, getDatasetSelection, getGroup } from "../zarr/utils";
 import { initialClassifierStateV01_02 } from "./constants";
 
-import type { V01ClassifierState } from "./version-types/v01Types";
+import type {
+  V01ClassifierEvaluationResultType,
+  V01ClassifierState,
+  V01ColorsRaw,
+  V01CropOptions,
+  V01FitOptions,
+  V01RescaleOptions,
+} from "./version-types/v01Types";
 import type {
   V11ClassifierState,
   V11Kind,
@@ -32,7 +32,7 @@ import type { Group } from "zarr";
 
 export async function deserializeColorsRaw(
   colorsGroup: Group,
-): Promise<ColorsRaw> {
+): Promise<V01ColorsRaw> {
   const colorsDataset = await getDatasetSelection(colorsGroup, "color", [null]);
   const numChannels = colorsDataset.shape[0];
   const colors = colorsDataset.data as Float32Array;
@@ -46,8 +46,8 @@ export async function deserializeColorsRaw(
     null,
   ]).then((ra) => ra.data as Uint8Array);
 
-  const range: ColorsRaw["range"] = {};
-  const visible: ColorsRaw["visible"] = {};
+  const range: V01ColorsRaw["range"] = {};
+  const visible: V01ColorsRaw["visible"] = {};
   const color: [number, number, number][] = [];
 
   for (let i = 0; i < numChannels; i++) {
@@ -65,7 +65,7 @@ export async function deserializeColorsRaw(
 
 export const deserializeFitOptionsGroup = async (
   fitOptionsGroup: Group,
-): Promise<FitOptions> => {
+): Promise<V01FitOptions> => {
   const epochs = (await getAttr(fitOptionsGroup, "epochs")) as number;
   const batchSize = (await getAttr(fitOptionsGroup, "batch_size")) as number;
 
@@ -77,7 +77,7 @@ export const deserializeFitOptionsGroup = async (
 
 export const deserializeCropOptionsGroup = async (
   cropOptionsGroup: Group,
-): Promise<CropOptions> => {
+): Promise<V01CropOptions> => {
   const cropSchema = (await getAttr(
     cropOptionsGroup,
     "crop_schema",
@@ -90,7 +90,7 @@ export const deserializeCropOptionsGroup = async (
 
 export const deserializeRescaleOptionsGroup = async (
   rescaleOptionsGroup: Group,
-): Promise<RescaleOptions> => {
+): Promise<V01RescaleOptions> => {
   const centerRaw = (await getAttr(rescaleOptionsGroup, "center_B")) as number;
   const center = Boolean(centerRaw);
   const rescaleRaw = (await getAttr(
@@ -174,7 +174,6 @@ export const v01_02_deserializeClassifierGroup = async (
   const preprocessOptions = { cropOptions, rescaleOptions, shuffle };
   return {
     ...initialClassifierStateV01_02,
-    // @ts-ignore : TODO
     fitOptions,
     inputShape: {
       planes,
@@ -303,7 +302,7 @@ export const v11_v2_deserializeClassifierGroup = async (
       const evalResults = (await getAttr(
         infoGroup,
         "eval_results",
-      )) as ClassifierEvaluationResultType[];
+      )) as V01ClassifierEvaluationResultType[];
 
       const classMapArray: [number, string][] = await getAttr(
         infoGroup,

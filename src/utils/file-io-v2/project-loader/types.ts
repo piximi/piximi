@@ -10,15 +10,12 @@ import type {
   Kind,
   Plane,
 } from "store/dataV2/types";
-import type {
-  ClassifierState,
-  ProjectState,
-  SegmenterState,
-} from "store/types";
+import type { ClassifierState, SegmenterState } from "store/types";
 
 import type { ExtractedModelFileMap } from "utils/modelsV2/types";
 import type { Progress } from "utils/types";
 
+import type { ProjectState } from "@ProjectViewer/state/types";
 import type { V2PiximiState } from "./version-readers/version-types/v2Types";
 
 export type UploadStage =

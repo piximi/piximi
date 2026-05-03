@@ -1,9 +1,5 @@
 import { openGroup } from "zarr";
 
-import { initialState as initialProjectState } from "store/project/projectSlice";
-import type { BitDepth } from "store/data/types";
-
-import type { CustomStore } from "utils/file-io/zarr/stores";
 import { logger } from "utils/logUtils";
 import type { Partition } from "utils/modelsV2/enums";
 
@@ -15,7 +11,9 @@ import {
 } from "./common";
 import { subProgress } from "../progress";
 
+import type { CustomStore } from "../zarr/stores";
 import type {
+  V02BitDepth,
   V02Category,
   V02Kind,
   V02PiximiState,
@@ -81,7 +79,7 @@ export const readV02 = async (
     logger(`closed ${fileStore.rootName}`);
 
   return {
-    project: { ...initialProjectState, name, imageChannels },
+    project: { name, imageChannels },
     classifier,
     segmenter,
     data: {
@@ -124,7 +122,7 @@ const deserializeThingsGroup = async (
     const rawArray = (await thingDataset.getRaw()) as RawArray;
     const data = rawArray.data as Float32Array;
     const [planes, height, width, channels] = rawArray.shape;
-    const bitDepth = (await getAttr(thingDataset, "bit_depth")) as BitDepth;
+    const bitDepth = (await getAttr(thingDataset, "bit_depth")) as V02BitDepth;
 
     const tensorData: RawData = {
       buffer: data.buffer as ArrayBuffer,

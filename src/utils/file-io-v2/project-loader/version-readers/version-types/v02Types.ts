@@ -1,12 +1,14 @@
-import type { BitDepth, Shape } from "store/data/types";
-import type { ProjectState, SegmenterState } from "store/types";
+import type { Shape } from "store/dataV2/types";
+import type { SegmenterState } from "store/types";
 
 import type { Partition } from "utils/modelsV2/enums";
 
 import type {
+  V01BitDepth,
   V01ClassifierState,
   V01Category,
   V01RawImageObject,
+  V01ProjectState,
 } from "./v01Types";
 import type { EntityState } from "@reduxjs/toolkit";
 import type { RawData } from "../../types";
@@ -16,7 +18,7 @@ import type { RawData } from "../../types";
 // ============================================================
 
 export type V02PiximiState = {
-  project: ProjectState;
+  project: V02ProjectState;
   classifier: V02ClassifierState;
   data: {
     things: EntityState<V02RawImageObject | V02RawAnnotationObject, string>;
@@ -25,6 +27,12 @@ export type V02PiximiState = {
   };
   segmenter: SegmenterState;
 };
+
+// ============================================================
+// V02 Project
+// ============================================================
+
+export type V02ProjectState = V01ProjectState;
 
 // ============================================================
 // V01 Classifier
@@ -36,6 +44,7 @@ export type V02ClassifierState = V01ClassifierState;
 // V01 Data
 // ============================================================
 
+export type V02BitDepth = V01BitDepth;
 export type V02Kind = {
   id: string;
   displayName: string;
@@ -60,7 +69,7 @@ export type V02RawAnnotationObject = {
   activePlane: number;
   categoryId: string;
   partition: Partition;
-  bitDepth: BitDepth;
+  bitDepth: V01BitDepth;
   shape: Shape;
   boundingBox: [number, number, number, number];
   encodedMask: number[];

@@ -4,12 +4,12 @@ import {
   UNKNOWN_IMAGE_CATEGORY_ID,
 } from "store/dataV2/constants";
 import { generateUUID } from "store/dataV2/utils";
-import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
 
 import { Partition } from "utils/modelsV2/enums";
 import { representsUnknown } from "utils/stringUtils";
 
 import { subProgress } from "../progress";
+import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "../version-readers/constants";
 
 import type {
   V01Category,

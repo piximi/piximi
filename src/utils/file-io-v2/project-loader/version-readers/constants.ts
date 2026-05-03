@@ -46,3 +46,6 @@ export const initialClassifierStateV01_02: V01ClassifierState = {
   },
   showClearPredictionsWarning: true,
 };
+
+export const UNKNOWN_ANNOTATION_CATEGORY_ID: string =
+  "00000000-0000-1111-0000-000000000000";

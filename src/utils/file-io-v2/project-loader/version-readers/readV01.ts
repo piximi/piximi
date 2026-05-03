@@ -1,11 +1,8 @@
 import { openGroup } from "zarr";
 
-import { initialState as initialProjectState } from "store/project/projectSlice";
-import type { BitDepth } from "store/data/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 import { Partition } from "utils/modelsV2/enums";
-import type { CustomStore } from "utils/file-io/zarr/stores";
 
 import { ZARR_V01_IMAGE } from "../zarr/types";
 import {
@@ -21,7 +18,9 @@ import {
 } from "./common";
 import { subProgress } from "../progress";
 
+import type { CustomStore } from "../zarr/stores";
 import type {
+  V01BitDepth,
   V01RawAnnotationObject,
   V01Category,
   V01RawImageObject,
@@ -97,7 +96,6 @@ export async function readV01(
 
   return {
     project: {
-      ...initialProjectState,
       name: projectName,
       imageChannels: images[0]?.shape.channels,
     },
@@ -134,7 +132,7 @@ async function deserializeImageGroup(
   const bitDepth = (await getAttr(
     imageDataset,
     ZARR_V01_IMAGE.BitDepth,
-  )) as BitDepth;
+  )) as V01BitDepth;
 
   return {
     id,

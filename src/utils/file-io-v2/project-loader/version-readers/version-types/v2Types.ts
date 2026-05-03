@@ -5,10 +5,11 @@ import type {
   ColorMap,
   DType,
 } from "store/dataV2/types";
-import type { ProjectState, SegmenterState } from "store/types";
+import type { SegmenterState } from "store/types";
 
 import type { Partition } from "utils/modelsV2/enums";
 
+import type { ProjectState } from "@ProjectViewer/state/types";
 import type { EntityState } from "@reduxjs/toolkit";
 import type {
   V11ClassifierState,

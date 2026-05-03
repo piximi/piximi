@@ -1,5 +1,5 @@
-import type { BitDepth, DataArray, Shape } from "store/data/types";
-import type { ProjectState, SegmenterState } from "store/types";
+import type { Shape } from "store/dataV2/types";
+import type { SegmenterState } from "store/types";
 
 import type {
   LossFunction,
@@ -7,14 +7,8 @@ import type {
   ModelStatus,
   OptimizationAlgorithm,
   Partition,
+  CropSchema,
 } from "utils/modelsV2/enums";
-import type {
-  ClassifierEvaluationResultType,
-  CropOptions,
-  FitOptions,
-  RescaleOptions,
-} from "utils/modelsV2/types";
-import type { ColorsRaw } from "utils/types";
 
 import type { RawData } from "../../types";
 
@@ -23,7 +17,7 @@ import type { RawData } from "../../types";
 // ============================================================
 
 export type V01PiximiState = {
-  project: ProjectState;
+  project: V01ProjectState;
   classifier: V01ClassifierState;
   segmenter: SegmenterState;
   data: {
@@ -38,10 +32,46 @@ export type V01PiximiState = {
 // V01 Classifier
 // ============================================================
 
+export type V01ProjectState = {
+  name: string;
+  imageChannels?: number;
+};
+
+// ============================================================
+// V01 Classifier
+// ============================================================
+export type V01RescaleOptions = {
+  rescale: boolean;
+  center: boolean;
+};
+export type V01OptimizerSettings = {
+  learningRate: number;
+  lossFunction:
+    | LossFunction
+    | Array<LossFunction>
+    | { [outputName: string]: LossFunction };
+  metrics: Array<Metric>;
+  optimizationAlgorithm: OptimizationAlgorithm;
+  epochs: number;
+  batchSize: number;
+};
+export type V01FitOptions = Pick<V01OptimizerSettings, "epochs" | "batchSize">;
+export type V01CropOptions = {
+  numCrops: number;
+  cropSchema: CropSchema;
+};
 export type V01PreprocessOptions = {
   shuffle: boolean;
-  rescaleOptions: RescaleOptions;
-  cropOptions: CropOptions;
+  rescaleOptions: V01RescaleOptions;
+  cropOptions: V01CropOptions;
+};
+export type V01ClassifierEvaluationResultType = {
+  confusionMatrix: number[][];
+  accuracy: number;
+  crossEntropy: number;
+  precision: number;
+  recall: number;
+  f1Score: number;
 };
 
 export type V01ClassifierState = {
@@ -49,7 +79,7 @@ export type V01ClassifierState = {
   selectedModelIdx: number;
   inputShape: Shape;
   preprocessOptions: V01PreprocessOptions;
-  fitOptions: FitOptions;
+  fitOptions: V01FitOptions;
 
   learningRate: number;
   lossFunction: LossFunction;
@@ -58,7 +88,7 @@ export type V01ClassifierState = {
 
   trainingPercentage: number;
   // post-evaluation results
-  evaluationResult: ClassifierEvaluationResultType;
+  evaluationResult: V01ClassifierEvaluationResultType;
   // status flags
   modelStatus: ModelStatus;
   showClearPredictionsWarning: boolean;
@@ -67,12 +97,31 @@ export type V01ClassifierState = {
 // ============================================================
 // V01 Data
 // ============================================================
+type V01ColorsMeta = {
+  range: { [channel: number]: [number, number] };
+  visible: { [channel: number]: boolean };
+};
+
+export type V01ColorsRaw = {
+  color: [number, number, number][];
+} & V01ColorsMeta;
+export enum V01BitDepth {
+  BINARY = 1,
+  UINT8 = 8,
+  UINT16 = 16,
+  FLOAT32 = 32,
+}
+
+export type V01DataArray =
+  | Uint8Array<ArrayBufferLike>
+  | Uint16Array<ArrayBufferLike>
+  | Float32Array<ArrayBufferLike>;
 
 export type V01RawImageObject = {
   activePlane: number;
   categoryId: string;
-  colors: ColorsRaw;
-  bitDepth: BitDepth;
+  colors: V01ColorsRaw;
+  bitDepth: V01BitDepth;
   id: string;
   name: string;
   shape: Shape;
@@ -94,7 +143,7 @@ export type V01RawAnnotationObject = {
   categoryId: string;
   boundingBox: [number, number, number, number]; // x1, y1, x_2, y_2
   encodedMask: Array<number>;
-  decodedMask?: DataArray;
+  decodedMask?: V01DataArray;
   plane?: number;
   imageId: string;
 };

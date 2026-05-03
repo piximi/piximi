@@ -1,13 +1,12 @@
 import JSZip from "jszip";
 import { openGroup } from "zarr";
-import semver from "semver";
+import { clean, eq, lt, lte, valid } from "semver";
 
 import type { CancelToken } from "utils/worker-scheduler/types";
-import type { CustomStore } from "utils/file-io/zarr/stores";
-import { FileStore, ZipStore } from "utils/file-io/zarr/stores";
 import type { ExtractedModelFileMap } from "utils/modelsV2/types";
 import classifierHandler from "utils/modelsV2/classification/classifierHandler";
 
+import { FileStore, ZipStore } from "./zarr/stores";
 import { getAttr } from "./zarr/utils";
 import { readV11 } from "./version-readers/readV11";
 import { convertV11ToV2 } from "./version-converters/v11ToV2";
@@ -17,6 +16,7 @@ import { readV01 } from "./version-readers/readV01";
 import { convertV01ToV02 } from "./version-converters/v01Tov02";
 import { subProgress } from "./progress";
 
+import type { CustomStore } from "./zarr/stores";
 import type { LoadProjectInput, LoadProjectOutput } from "./types";
 import type { V2PiximiState } from "./version-readers/version-types/v2Types";
 
@@ -99,20 +99,20 @@ async function detectVersion(
     throw new Error("No version field found in project file.");
   }
 
-  const cleaned = semver.clean(projectVersionRaw);
-  if (!semver.valid(cleaned) || semver.lt(cleaned!, "0.1.0")) {
+  const cleaned = clean(projectVersionRaw);
+  if (!valid(cleaned) || lt(cleaned!, "0.1.0")) {
     throw new Error(`Unsupported project file version: ${projectVersionRaw}`);
   }
 
   const projectVersion = cleaned!;
   let versionRange: VersionRange;
-  if (semver.eq(projectVersion, "0.1.0")) {
+  if (eq(projectVersion, "0.1.0")) {
     versionRange = "0.1.0";
-  } else if (semver.lte(projectVersion, "1.0.0")) {
+  } else if (lte(projectVersion, "1.0.0")) {
     versionRange = "0.2-1.0";
-  } else if (semver.lt(projectVersion, "1.2.0")) {
+  } else if (lt(projectVersion, "1.2.0")) {
     versionRange = "1.1";
-  } else if (semver.lt(projectVersion, "3.0.0")) {
+  } else if (lt(projectVersion, "3.0.0")) {
     versionRange = "2";
   } else {
     versionRange = "3+";

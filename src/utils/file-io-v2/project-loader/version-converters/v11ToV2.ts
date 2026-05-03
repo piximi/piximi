@@ -1,5 +1,7 @@
 import { Image as IJSImage } from "image-js-latest";
 
+import { deepClone } from "@mui/x-data-grid/internals";
+
 import { generateUUID } from "store/dataV2/utils";
 import type { BitDepth } from "store/dataV2/types";
 import {
@@ -9,6 +11,7 @@ import {
   UNKNOWN_KIND_CATEGORY_ID,
   UNKNOWN_KIND_ID,
 } from "store/dataV2/constants";
+import { initialState } from "@ProjectViewer/state/projectSlice";
 
 import { processChannel } from "utils/channelUtils";
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
@@ -17,6 +20,7 @@ import { getDefaultModelInfo } from "utils/modelsV2/classification/utils";
 
 import { subProgress } from "../progress";
 
+import type { ProjectState } from "@ProjectViewer/state/types";
 import type {
   V2AnnotationObject,
   V2AnnotationVolume,
@@ -82,9 +86,11 @@ export function convertV11ToV2(
     subProgress(onProgress, STAGES.things),
   );
   const v2ClassifierState = convertClassifier(v11.classifier);
-
+  const v2Project: ProjectState = deepClone(initialState);
+  v2Project.name = v11.project.name;
+  v2Project.imageChannels = v11.project.imageChannels;
   return {
-    project: v11.project,
+    project: v2Project,
     data: { experiment, ...v2Data, kinds: v2Kinds, categories: v2Categories },
     segmenter: v11.segmenter,
     classifier: v2ClassifierState,
