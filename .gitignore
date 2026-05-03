@@ -26,6 +26,7 @@ src/data/exampleProjects/*.zip
 .vimspector.json
 .cursorignore
 pnpm-lock.yaml
+knip.json
 
 # Playwright
 node_modules/
