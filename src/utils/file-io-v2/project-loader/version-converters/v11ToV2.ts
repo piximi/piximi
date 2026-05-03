@@ -109,10 +109,11 @@ function convertKindClassifier(
       normalize: rescaleOptions.rescale,
       center: rescaleOptions.center,
     };
-    v2ModelInfoDict[id] = {
-      preprocessSettings: { normalizeOptions, ...restPreProc },
-      ...restInfo,
-    };
+    const defaultModelInfo = getDefaultModelInfo();
+    defaultModelInfo.preprocessSettings = { normalizeOptions, ...restPreProc };
+    defaultModelInfo.classMap = restInfo.classMap;
+    defaultModelInfo.optimizerSettings = restInfo.optimizerSettings;
+    v2ModelInfoDict[id] = defaultModelInfo;
   });
   return { modelNameOrArch, modelInfoDict: v2ModelInfoDict };
 }

@@ -208,14 +208,13 @@ export const classifierSlice = createSlice({
         kindId: string;
       }>,
     ) {
-      const { evaluationResult, kindId } = action.payload;
-      const selectedModel = state.kindClassifiers[kindId];
-
-      selectedModel.modelInfoDict[
-        typeof selectedModel.modelNameOrArch === "string"
-          ? selectedModel.modelNameOrArch
-          : "base-model"
-      ].evalResults.push(evaluationResult);
+      // const { evaluationResult, kindId } = action.payload;
+      // const selectedModel = state.kindClassifiers[kindId];
+      // selectedModel.modelInfoDict[
+      //   typeof selectedModel.modelNameOrArch === "string"
+      //     ? selectedModel.modelNameOrArch
+      //     : "base-model"
+      // ].evalResults.push(evaluationResult);
     },
     updateShowClearPredictionsWarning(
       state,

@@ -6,6 +6,7 @@ import type {
   DType,
 } from "store/dataV2/types";
 import type { SegmenterState } from "store/segmenter/types";
+import type { ModelInfo } from "store/classifier/types";
 
 import type { Partition } from "utils/dl/enums";
 
@@ -14,7 +15,7 @@ import type { EntityState } from "@reduxjs/toolkit";
 import type {
   V11ClassifierState,
   V11KindClassifier,
-  V11ModelInfo,
+  // V11ModelInfo,
   V11PreprocessSettings,
 } from "./v11Types";
 
@@ -147,9 +148,10 @@ export type V2PreprocessSettings = Omit<
 };
 
 // Ripple up ONLY the types that transitively contain PreprocessSettings
-export type V2ModelInfo = Omit<V11ModelInfo, "preprocessSettings"> & {
-  preprocessSettings: V2PreprocessSettings;
-};
+// export type V2ModelInfo = Omit<V11ModelInfo, "preprocessSettings"> & {
+//   preprocessSettings: V2PreprocessSettings;
+// };
+export type V2ModelInfo = ModelInfo;
 
 export type V2KindClassifier = Omit<V11KindClassifier, "modelInfoDict"> & {
   modelInfoDict: Record<string, V2ModelInfo>;

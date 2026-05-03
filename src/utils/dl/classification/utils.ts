@@ -58,7 +58,9 @@ export const getDefaultModelParams = (): Pick<
 
 export const getDefaultModelInfo = (): ModelInfo => ({
   ...getDefaultModelParams(),
-  evalResults: [],
+  status: "idle",
+  confidenceThreshold: 0.5,
+  runs: [],
 });
 
 export function prepareClasses(allCategories: Category[]): {
