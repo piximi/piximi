@@ -17,12 +17,12 @@ import {
   TrainingCallbacks,
   TrainingInput,
 } from "utils/dl/types";
-import { ModelInfo } from "store/types";
 import { SequentialClassifier } from "./AbstractClassifier";
 import { SimpleCNN } from "./SimpleCNN";
 import { MobileNet } from "./MobileNet";
 import { representsUnknown } from "utils/stringUtils";
 import type { Category } from "store/dataV2/types";
+import { ModelInfo } from "store/classifier/types";
 
 export const getDefaultModelParams = (): Pick<
   ModelInfo,

@@ -2,8 +2,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { availableSegmenterModels } from "utils/dl/availableSegmentationModels";
 
-import { SegmenterState } from "store/types";
 import { Shape } from "store/dataV2/types";
+import { SegmenterState } from "./types";
 
 export const initialState: SegmenterState = {
   selectedModelIdx: undefined,

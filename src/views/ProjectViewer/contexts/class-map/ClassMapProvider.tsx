@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { ReactElement } from "react";
 
 import type { Category } from "store/dataV2/types";
-import type { ModelClassMap } from "store/types";
+import type { ModelClassMap } from "store/classifier/types";
 
 import { ClassMapDialogContext } from "./ClassMapContext";
 import { ClassMapDialog } from "./ClassMapDialog";

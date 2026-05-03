@@ -110,7 +110,8 @@ export class UploadedClassifier extends SequentialClassifier {
         },
         ...defaultModelInfo.preprocessSettings.cropOptions,
         shuffle: defaultModelInfo.preprocessSettings.shuffle,
-        normalize: defaultModelInfo.preprocessSettings.normalizeOptions.normalize,
+        normalize:
+          defaultModelInfo.preprocessSettings.normalizeOptions.normalize,
         batchSize: defaultModelInfo.optimizerSettings.batchSize,
       };
       this._optimizerSettings = defaultModelInfo.optimizerSettings;

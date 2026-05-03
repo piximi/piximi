@@ -6,7 +6,7 @@ import type {
   KindClassifier,
   ModelClassMap,
   ModelInfo,
-} from "store/types";
+} from "./types";
 import type { Shape } from "store/dataV2/types";
 import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";

@@ -1,9 +1,6 @@
 import type { Kind } from "store/data/types";
-import type {
-  KindClassifier,
-  KindClassifierDict,
-  ModelInfo,
-} from "store/types";
+import { KindClassifier, KindClassifierDict, ModelInfo } from "./types";
+
 export function getSelectedModelInfo(
   kindClassifierDictOrItem: KindClassifier,
 ): ModelInfo;

@@ -1,8 +1,8 @@
 import { availableSegmenterModels } from "utils/dl/availableSegmentationModels";
 
-import { SegmenterState } from "store/types";
 import { FitOptions } from "utils/dl/types";
 import { Segmenter } from "utils/dl/segmentation";
+import { SegmenterState } from "./types";
 
 export const selectSegmenter = ({
   segmenter,

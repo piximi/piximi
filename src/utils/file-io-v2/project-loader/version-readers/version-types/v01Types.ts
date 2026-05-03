@@ -1,5 +1,5 @@
 import type { Shape } from "store/dataV2/types";
-import type { SegmenterState } from "store/types";
+import type { SegmenterState } from "store/segmenter/types";
 
 import type {
   LossFunction,

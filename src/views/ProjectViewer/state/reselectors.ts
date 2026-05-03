@@ -8,10 +8,10 @@ import {
 } from "store/dataV2/selectors";
 import type { RootState } from "store/rootReducer";
 import { selectKindClassifiers } from "store/classifier/selectors";
-import type { KindClassifier, ModelInfo } from "store/types";
 import { getSelectedModelInfo } from "store/classifier/utils";
 import type { Shape } from "store/dataV2/types";
 import { CATEGORY_COLORS } from "store/dataV2/constants";
+import type { KindClassifier, ModelInfo } from "store/classifier/types";
 
 import { representsUnknown } from "utils/stringUtils";
 import { isFiltered } from "utils/arrayUtils";

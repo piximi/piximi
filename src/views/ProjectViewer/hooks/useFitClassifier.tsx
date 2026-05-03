@@ -13,11 +13,11 @@ import {
   selectActiveKnownCategories,
 } from "@ProjectViewer/state/reselectors";
 import type { Category } from "store/dataV2/types";
-import type { ModelClassMap, ModelInfo } from "store/types";
 import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
 import { dataSliceV2 } from "store/dataV2";
+import type { ModelClassMap, ModelInfo } from "store/classifier/types";
 
 import classifierHandler from "utils/dl/classification/classifierHandler";
 import { ModelStatus, Partition } from "utils/dl/enums";

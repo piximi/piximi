@@ -9,12 +9,7 @@ import { HotkeyContext, Languages } from "utils/enums";
 import { ThemeMode } from "themes/enums";
 
 import { AlertState } from "utils/types";
-import {
-  ClassifierEvaluationResultType,
-  FitOptions,
-  PreprocessSettings,
-  OptimizerSettings,
-} from "utils/dl/types";
+
 import { Kind, AnnotationObject, Category, ImageObject } from "./data/types";
 import { MeasurementsState } from "./measurements/types";
 import {
@@ -24,6 +19,8 @@ import {
 import { DataStateV2 } from "./dataV2/types";
 import { AppTasksState } from "./appTasks/types";
 import { ProjectState } from "views/ProjectViewer/state/types";
+import { SegmenterState } from "./segmenter/types";
+import { ClassifierState } from "./classifier/types";
 
 export type AppSettingsState = {
   // async work for setting initial states,
@@ -48,32 +45,6 @@ export type DataState = {
   kinds: EntityState<Kind, string>;
   categories: EntityState<Category, string>;
   things: EntityState<AnnotationObject | ImageObject, string>;
-};
-
-export type SegmenterState = {
-  // pre-fit state
-  selectedModelIdx?: number;
-  inferenceOptions: FitOptions;
-};
-
-export type ModelClassMap = Record<number, Category["id"]>;
-export type ModelInfo = {
-  trainingSet?: string[];
-  validationDet?: string[];
-  classMap?: ModelClassMap;
-  preprocessSettings: PreprocessSettings;
-  optimizerSettings: OptimizerSettings;
-  evalResults: ClassifierEvaluationResultType[];
-};
-export type KindClassifier = {
-  modelNameOrArch: string | number;
-  modelInfoDict: Record<string, ModelInfo>;
-};
-
-export type KindClassifierDict = Record<Kind["id"], KindClassifier>;
-export type ClassifierState = {
-  kindClassifiers: KindClassifierDict;
-  showClearPredictionsWarning: boolean;
 };
 
 type AppState = {

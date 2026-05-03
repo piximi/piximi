@@ -5,7 +5,7 @@ import type {
   ColorMap,
   DType,
 } from "store/dataV2/types";
-import type { SegmenterState } from "store/types";
+import type { SegmenterState } from "store/segmenter/types";
 
 import type { Partition } from "utils/dl/enums";
 

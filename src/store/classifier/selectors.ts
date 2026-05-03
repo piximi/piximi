@@ -1,4 +1,4 @@
-import type { ClassifierState, KindClassifierDict } from "store/types";
+import type { ClassifierState, KindClassifierDict } from "./types";
 
 export const selectClassifier = ({
   classifier,
