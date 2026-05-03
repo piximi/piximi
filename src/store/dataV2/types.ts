@@ -70,6 +70,8 @@ export type ImageObject = {
   timepoint: number;
   bitDepth: BitDepth;
   partition: Partition;
+  predictionConfidence?: number;
+  predicedAtRunId?: string;
 };
 export type ImageEntities = Record<string, ImageObject>;
 
@@ -89,6 +91,8 @@ export type ExtendedImageObject = {
   bitDepth: BitDepth;
   partition: Partition;
   channelsRef: ExtendedChannel[];
+  predictionConfidence?: number;
+  predicedAtRunId?: string;
 };
 export type Plane = {
   id: string;
@@ -145,6 +149,8 @@ export type AnnotationVolume = {
   imageId: string;
   kindId: string;
   categoryId: string;
+  predictionConfidence?: number;
+  predicedAtRunId?: string;
 };
 export type AnnotationVolumeEntities = Record<string, AnnotationVolume>;
 
@@ -175,6 +181,8 @@ export type ExtendedAnnotationObject = AnnotationObject & {
   planeIdx: number;
   imageId: string;
   imageName: string;
+  predictionConfidence?: number;
+  predicedAtRunId?: string;
 };
 export type ExtendedAnnotationEntities = Record<
   string,
