@@ -174,6 +174,8 @@ export default tseslint.config(
       "src/store/productionStore.ts",
       "src/store/rootReducer.ts",
       "src/store/types.ts",
+      //TODO: Remove after refactor
+      "src/utils/file-io-v2/**/*",
     ],
     rules: {
       "import-x/no-restricted-paths": "off",

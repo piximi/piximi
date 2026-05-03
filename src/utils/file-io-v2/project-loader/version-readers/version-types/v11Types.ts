@@ -1,5 +1,5 @@
-import type { ProjectState, SegmenterState } from "store/types";
-import type { Shape } from "store/data/types";
+import type { SegmenterState } from "store/types";
+import type { Shape } from "store/dataV2/types";
 
 import type {
   ClassifierEvaluationResultType,
@@ -12,8 +12,10 @@ import type {
 } from "utils/modelsV2/enums";
 
 import type {
+  V02BitDepth,
   V02Category,
   V02Kind,
+  V02ProjectState,
   V02RawAnnotationObject,
   V02RawImageObject,
 } from "./v02Types";
@@ -24,7 +26,7 @@ import type { EntityState } from "@reduxjs/toolkit";
 // ============================================================
 
 export type V11PiximiState = {
-  project: ProjectState;
+  project: V11ProjectState;
   classifier: V11ClassifierState;
   data: {
     things: EntityState<V11RawImageObject | V11RawAnnotationObject, string>;
@@ -33,6 +35,12 @@ export type V11PiximiState = {
   };
   segmenter: SegmenterState;
 };
+
+// ============================================================
+// V11 Project
+// ============================================================
+
+export type V11ProjectState = V02ProjectState;
 
 // ============================================================
 // V11 Classifier
@@ -83,7 +91,7 @@ export type V11ClassifierState = {
 // ============================================================
 // V11 Data
 // ============================================================
-
+export type V11BitDepth = V02BitDepth;
 export type V11RawImageObject = V02RawImageObject;
 export type V11RawAnnotationObject = V02RawAnnotationObject;
 export type V11Category = V02Category;

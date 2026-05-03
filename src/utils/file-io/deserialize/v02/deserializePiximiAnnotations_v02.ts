@@ -1,13 +1,9 @@
 import { getPropertiesFromImage } from "store/data/utils";
 import { convertArrayToShape } from "utils/models/utils";
-import { generateUUID } from "store/data/utils";
-import { Partition } from "utils/models/enums";
 import {
-  NewSerializedAnnotationType,
   SerializedAnnotatorImageType,
   SerializedFileTypeV02,
 } from "../../types";
-import { PartialBy } from "utils/types";
 import {
   KindV02,
   AnnotationObjectV02,
@@ -17,40 +13,11 @@ import {
 } from "./types";
 
 type KindMap = Record<string, { new: KindV02; existing?: KindV02 }>;
-type CategoryMap = Record<
-  string,
-  { new: CategoryV02; existing?: CategoryV02 }
->;
+type CategoryMap = Record<string, { new: CategoryV02; existing?: CategoryV02 }>;
 type ImageMap = Record<
   string,
   { new: SerializedAnnotatorImageType; existing?: ImageObjectV02 }
 >;
-
-export const deserializeAnnotations_v02 = (
-  serializedAnnotations: Array<NewSerializedAnnotationType>,
-  imageId: string,
-) => {
-  const annotations: Array<
-    PartialBy<AnnotationObjectV02, "bitDepth" | "data" | "src">
-  > = [];
-
-  for (const annotation of serializedAnnotations) {
-    annotations.push({
-      id: generateUUID(),
-      kind: annotation.kind,
-      name: annotation.name,
-      encodedMask: annotation.mask.split(" ").map((e) => Number(e)),
-      activePlane: annotation.activePlane,
-      boundingBox: annotation.boundingBox as [number, number, number, number],
-      shape: convertArrayToShape(annotation.shape as ShapeArrayV02),
-      categoryId: annotation.categoryId,
-      partition: annotation.partition as Partition,
-      imageId,
-    });
-  }
-
-  return annotations;
-};
 
 const reconcileKinds = (
   existingKinds: Array<KindV02>,

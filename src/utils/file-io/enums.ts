@@ -7,13 +7,6 @@ export enum AnnotationExportType {
   COCO,
   PIXIMI,
 }
-export enum ImageShapeEnum {
-  DicomImage,
-  GreyScale,
-  SingleRGBImage,
-  HyperStackImage,
-  InvalidImage,
-}
 
 export enum MIMETYPES {
   PNG = "image/png",

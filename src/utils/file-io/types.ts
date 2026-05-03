@@ -1,5 +1,4 @@
 import { TypeOf as IOTSTypeOf } from "io-ts";
-import { Stack as IJSStack } from "image-js";
 import {
   SerializedAnnotationRType,
   SerializedAnnotationRTypeV02,
@@ -12,9 +11,6 @@ import {
   SerializedImageRType,
 } from "./runtime/runtimeTypes";
 import { MIMETYPES } from "./enums";
-import { ImageShapeEnum } from "./enums";
-
-import { BitDepth } from "store/data/types";
 
 export type SerializedCOCOAnnotationType = IOTSTypeOf<
   typeof SerializedCOCOAnnotationRType
@@ -43,25 +39,4 @@ export type NewSerializedAnnotationType = IOTSTypeOf<
   typeof SerializedAnnotationRTypeV02
 >;
 
-export type ImageFileType = {
-  fileName: string;
-  imageStack: IJSStack;
-};
-
-export type ImageFileError = {
-  fileName: string;
-  error: string;
-};
-
 export type MIMEType = (typeof MIMETYPES)[keyof typeof MIMETYPES];
-
-export interface ImageShapeInfo {
-  shape: ImageShapeEnum;
-  bitDepth?: BitDepth;
-  components?: number;
-  alpha?: boolean;
-}
-
-export interface ImageFileShapeInfo extends ImageShapeInfo {
-  ext: MIMEType;
-}

@@ -7,7 +7,7 @@ import {
 } from "../../types";
 import { AnnotationTypeV01, CategoryV01, ImageTypeV01 } from "./types";
 
-export const deserializeAnnotations_v01 = (
+const deserializeAnnotations_v01 = (
   serializedAnnotations: Array<SerializedAnnotationType>,
   imageId: string,
 ) => {
