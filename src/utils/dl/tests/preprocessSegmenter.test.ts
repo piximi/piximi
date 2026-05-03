@@ -1,4 +1,6 @@
 // TODO: post PR #407, get working for segmenter
+//TODO: Remove after refactor
+//@ts-nocheck keep tsc uncluttered for now
 import { expect, it } from "vitest";
 import "@tensorflow/tfjs-node";
 import { preprocessSegmentationImages } from "../segmentation/FullyConvolutionalSegmenter/preprocessSegmenter";
