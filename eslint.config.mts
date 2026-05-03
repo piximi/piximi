@@ -10,11 +10,12 @@ import type { Linter } from "eslint";
 const NEW_FILES = [
   "src/views/ProjectViewer/**/*.{js,mjs,jsx,ts,mts,tsx}",
   "src/store/dataV2/*.ts",
-  "src/store/classifierV2/*.ts",
+  "src/store/classifier/*.ts",
   "src/utils/data-connector/**/*.ts",
   "src/utils/file-io-v2/**/*.ts",
   "src/utils/worker-scheduler/**/*.ts",
   "src/utils/workers/**/*.ts",
+  "src/utils/dl/**/*.ts",
 ];
 export default tseslint.config(
   js.configs.recommended,
