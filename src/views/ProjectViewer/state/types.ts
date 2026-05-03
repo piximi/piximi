@@ -1,10 +1,8 @@
-import type { Thing } from "store/data/types";
 import type {
   ExtendedAnnotationObject,
   ExtendedImageObject,
 } from "store/dataV2/types";
 
-import type { ThingSortKey } from "utils/enums";
 import type { FilterType } from "utils/types";
 
 export enum ImageSortType {
@@ -51,16 +49,8 @@ export type ViewState = "images" | "annotations";
 export type ProjectState = {
   name: string;
   activeView: ViewState;
-  selectedThingIds: Array<string>;
-  sortType: ThingSortKey;
-  thingFilters: Record<
-    string, // kind
-    Required<Pick<FilterType<Thing>, "categoryId" | "partition">>
-  >;
   imageGridState: ImageGridState;
   annotationGridState: AnnotationGridState;
   highlightedCategory: string | undefined;
-  activeKind: string;
-  kindTabFilters: string[];
   imageChannels: number | undefined;
 };

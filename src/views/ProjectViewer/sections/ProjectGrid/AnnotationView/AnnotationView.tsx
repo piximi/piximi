@@ -95,7 +95,7 @@ export const AnnotationView = () => {
 
   useEffect(() => {
     if (!isMobile) {
-      dispatch(projectSlice.actions.removeAllKindTabFilters());
+      dispatch(projectSlice.actions.setAllKindTabVisibility(true));
     }
   }, [isMobile, dispatch]);
 
