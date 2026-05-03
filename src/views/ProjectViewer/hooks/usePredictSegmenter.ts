@@ -1,19 +1,14 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { intersection } from "lodash";
-
-import { selectAllImages, selectAllKinds } from "store/data/selectors";
-import {
-  selectActiveSelectedItems,
-  selectSelectedImages,
-} from "@ProjectViewer/state/reselectors";
+import { selectAllKinds } from "store/data/selectors";
+import { selectSelectedImages } from "@ProjectViewer/state/reselectors";
 import type { AnnotationObject, Category, Shape } from "store/data/types";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import {
   selectSegmenterInferenceOptions,
-  selectSegmenterModelV2,
+  selectSegmenterModel,
 } from "store/segmenter/selectors";
 import { dataSlice } from "store/data";
 import {
@@ -33,7 +28,7 @@ import { useSegmenterStatus } from "../contexts/SegmenterStatusProvider";
 
 export const usePredictSegmenter = () => {
   const dispatch = useDispatch();
-  const selectedModel = useSelector(selectSegmenterModelV2);
+  const selectedModel = useSelector(selectSegmenterModel);
   const allImages = useSelector(selectExtendedImages);
   const selectedImages = useSelector(selectSelectedImages);
   const fitOptions = useSelector(selectSegmenterInferenceOptions);

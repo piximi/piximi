@@ -21,7 +21,6 @@ import { dataSlice } from "./data/dataSlice";
 import { dataSliceV2 } from "./dataV2/dataSliceV2";
 import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
-import { segmenterSlice as segmenterSliceV2 } from "./segmenter";
 import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
@@ -53,7 +52,6 @@ const preloadedState: RootState = {
   data: dataSlice.getInitialState(),
   project: projectSlice.getInitialState(),
   segmenter: segmenterSlice.getInitialState(),
-  segmenterV2: segmenterSliceV2.getInitialState(),
   measurements: measurementsSlice.getInitialState(),
   dataV2: dataSliceV2.getInitialState(),
   appTasks: appTasksSlice.getInitialState(),

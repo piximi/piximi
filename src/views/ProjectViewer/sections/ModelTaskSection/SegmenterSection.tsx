@@ -10,7 +10,7 @@ import { selectSegmenterModel } from "store/segmenter/selectors";
 import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 import { usePredictSegmenter } from "@ProjectViewer/hooks/usePredictSegmenter";
 import type { Shape } from "store/dataV2/types";
-import { segmenterSlice } from "store/segmenterV2";
+import { segmenterSlice } from "store/segmenter";
 
 import { HotkeyContext } from "utils/enums";
 import type { Model } from "utils/modelsV2/Model";
