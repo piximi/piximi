@@ -1,7 +1,7 @@
 import JSZip from "jszip";
 import { KeyError } from "zarr";
 
-import type { SerializedModels } from "utils/modelsV2/types";
+import type { SerializedModels } from "utils/dl/types";
 
 import type { ValidStoreType, AsyncStore } from "zarr/types/storage/types";
 

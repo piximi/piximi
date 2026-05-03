@@ -13,9 +13,9 @@ import type { Shape } from "store/dataV2/types";
 import { segmenterSlice } from "store/segmenter";
 
 import { HotkeyContext } from "utils/enums";
-import type { Model } from "utils/modelsV2/Model";
-import { Segmenter } from "utils/modelsV2/segmentation";
-import { ModelStatus, ModelTask } from "utils/modelsV2/enums";
+import type { Model } from "utils/dl/Model";
+import { Segmenter } from "utils/dl/segmentation";
+import { ModelStatus, ModelTask } from "utils/dl/enums";
 
 import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
 import { ImportTensorflowSegmentationModelDialog } from "./ImportTensorflowModelDialog";

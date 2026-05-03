@@ -3,8 +3,8 @@ import { openGroup } from "zarr";
 import { clean, eq, lt, lte, valid } from "semver";
 
 import type { CancelToken } from "utils/worker-scheduler/types";
-import type { ExtractedModelFileMap } from "utils/modelsV2/types";
-import classifierHandler from "utils/modelsV2/classification/classifierHandler";
+import type { ExtractedModelFileMap } from "utils/dl/types";
+import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { FileStore, ZipStore } from "./zarr/stores";
 import { getAttr } from "./zarr/utils";

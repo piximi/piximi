@@ -10,8 +10,8 @@ import {
   Typography,
 } from "@mui/material";
 
-import type { Model } from "utils/modelsV2/Model";
-import { modelInfo } from "utils/modelsV2/segmentation";
+import type { Model } from "utils/dl/Model";
+import { modelInfo } from "utils/dl/segmentation";
 
 interface ModelOptionType {
   label: string;

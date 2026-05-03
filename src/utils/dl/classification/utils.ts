@@ -9,14 +9,14 @@ import {
   Metric,
   OptimizationAlgorithm,
   Partition,
-} from "utils/modelsV2/enums";
+} from "utils/dl/enums";
 import {
   FitOptions,
   OptimizerSettings,
   PreprocessSettings,
   TrainingCallbacks,
   TrainingInput,
-} from "utils/modelsV2/types";
+} from "utils/dl/types";
 import { ModelInfo } from "store/types";
 import { SequentialClassifier } from "./AbstractClassifier";
 import { SimpleCNN } from "./SimpleCNN";

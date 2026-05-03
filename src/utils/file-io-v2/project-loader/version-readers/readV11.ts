@@ -1,6 +1,6 @@
 import { openGroup } from "zarr";
 
-import type { Partition } from "utils/modelsV2/enums";
+import type { Partition } from "utils/dl/enums";
 import { logger } from "utils/logUtils";
 
 import { getAttr, getDataset, getGroup } from "../zarr/utils";

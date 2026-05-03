@@ -55,7 +55,12 @@ export const AddKindMenu = ({
     onClose();
   };
   const closeActiveKind = () => {
-    dispatch(projectSlice.actions.addKindTabFilter({ kindId: activeKind }));
+    dispatch(
+      projectSlice.actions.setKindTabVisibility({
+        kindId: activeKind,
+        visible: false,
+      }),
+    );
   };
   const handleCloseCreateKindDialogAndMenu = () => {
     handleCloseCreateKindDialog();

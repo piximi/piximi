@@ -12,8 +12,8 @@ import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 import { AlertType } from "utils/enums";
-import classifierHandler from "utils/modelsV2/classification/classifierHandler";
-import { ModelStatus } from "utils/modelsV2/enums";
+import classifierHandler from "utils/dl/classification/classifierHandler";
+import { ModelStatus } from "utils/dl/enums";
 
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";

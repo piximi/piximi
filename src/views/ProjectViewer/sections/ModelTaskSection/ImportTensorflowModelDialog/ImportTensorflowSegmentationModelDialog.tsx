@@ -24,9 +24,9 @@ import { ToolTipTab } from "components/layout";
 import { selectProjectImageChannels } from "@ProjectViewer/state/selectors";
 import type { Shape } from "store/dataV2/types";
 
-import type { Model } from "utils/modelsV2/Model";
-import { Cellpose } from "utils/modelsV2/segmentation";
-import { availableSegmenterModels } from "utils/modelsV2/availableSegmentationModels";
+import type { Model } from "utils/dl/Model";
+import { Cellpose } from "utils/dl/segmentation";
+import { availableSegmenterModels } from "utils/dl/availableSegmentationModels";
 import { HotkeyContext } from "utils/enums";
 
 import { PretrainedModelSelector } from "./PretrainedModelSelector";

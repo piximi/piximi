@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectActiveViewState } from "@ProjectViewer/state/selectors";
 import { projectSlice } from "@ProjectViewer/state";
 
-import { Partition } from "utils/modelsV2/enums";
+import { Partition } from "utils/dl/enums";
 
 import { FilterList } from "./FilterList";
 

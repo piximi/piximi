@@ -2,7 +2,7 @@ import { openGroup } from "zarr";
 
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
-import { Partition } from "utils/modelsV2/enums";
+import { Partition } from "utils/dl/enums";
 
 import { ZARR_V01_IMAGE } from "../zarr/types";
 import {

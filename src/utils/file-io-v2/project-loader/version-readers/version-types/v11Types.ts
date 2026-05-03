@@ -4,12 +4,12 @@ import type { Shape } from "store/dataV2/types";
 import type {
   ClassifierEvaluationResultType,
   CropOptions,
-} from "utils/modelsV2/types";
+} from "utils/dl/types";
 import type {
   LossFunction,
   Metric,
   OptimizationAlgorithm,
-} from "utils/modelsV2/enums";
+} from "utils/dl/enums";
 
 import type {
   V02BitDepth,

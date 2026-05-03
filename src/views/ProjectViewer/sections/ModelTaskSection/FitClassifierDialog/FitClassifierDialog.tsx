@@ -12,7 +12,7 @@ import { ModelSummaryTable } from "@ProjectViewer/sections/ModelTaskSection/data
 import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
-import { ModelStatus } from "utils/modelsV2/enums";
+import { ModelStatus } from "utils/dl/enums";
 
 import TrainingPlots from "./TrainingPlots";
 import { TrainingSettings } from "../training-settings/TrainingSettings";

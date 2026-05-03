@@ -6,7 +6,7 @@ import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
 import { processChannel } from "utils/channelUtils";
-import { Partition } from "utils/modelsV2/enums";
+import { Partition } from "utils/dl/enums";
 
 import {
   type ChannelResult,

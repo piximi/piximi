@@ -1,5 +1,5 @@
 import { getPropertiesFromImage } from "store/data/utils";
-import { convertArrayToShape } from "utils/modelsV2/utils";
+import { convertArrayToShape } from "utils/dl/utils";
 import {
   SerializedAnnotatorImageType,
   SerializedFileTypeV02,

@@ -17,7 +17,7 @@ import {
 } from "store/dataV2/selectors";
 import { dataSliceV2 } from "store/dataV2";
 
-import type { Partition } from "utils/modelsV2/enums";
+import type { Partition } from "utils/dl/enums";
 
 import {
   ImagePlaneSelect,

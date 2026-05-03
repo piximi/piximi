@@ -27,7 +27,7 @@ import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
 import { useParameterizedSelector } from "store/hooks";
 
 import { getDifferences } from "utils/arrayUtils";
-import { ModelStatus, Partition } from "utils/modelsV2/enums";
+import { ModelStatus, Partition } from "utils/dl/enums";
 import { representsUnknown } from "utils/stringUtils";
 
 export enum ErrorReason {

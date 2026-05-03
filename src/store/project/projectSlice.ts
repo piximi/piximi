@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { mutatingFilter, toUnique } from "utils/arrayUtils";
 
 import { ThingSortKey } from "utils/enums";
-import { Partition } from "utils/modelsV2/enums";
+import { Partition } from "utils/dl/enums";
 
 import { ProjectState } from "store/types";
 

@@ -5,7 +5,7 @@ import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import { UNKNOWN_KIND } from "store/dataV2/constants";
 
 import { findAdjacentItem, mutatingFilter } from "utils/arrayUtils";
-import type { Partition } from "utils/modelsV2/enums";
+import type { Partition } from "utils/dl/enums";
 import { representsUnknown } from "utils/stringUtils";
 
 import { AnnotationSortType, ImageSortType } from "./types";

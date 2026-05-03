@@ -7,7 +7,7 @@ import type {
 } from "store/dataV2/types";
 import type { SegmenterState } from "store/types";
 
-import type { Partition } from "utils/modelsV2/enums";
+import type { Partition } from "utils/dl/enums";
 
 import type { ProjectState } from "@ProjectViewer/state/types";
 import type { EntityState } from "@reduxjs/toolkit";

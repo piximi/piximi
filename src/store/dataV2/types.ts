@@ -1,5 +1,5 @@
 import type { StorageReference } from "utils/data-connector/types";
-import type { Partition } from "utils/modelsV2/enums";
+import type { Partition } from "utils/dl/enums";
 
 import type { EntityState } from "@reduxjs/toolkit";
 import type { BitDepth as IJSBitDepth } from "image-js-latest";

@@ -34,7 +34,7 @@ import {
 } from "store/dataV2/selectors";
 import { generateCategory } from "store/dataV2/utils";
 
-import type { Partition } from "utils/modelsV2/enums";
+import type { Partition } from "utils/dl/enums";
 
 import {
   AnnotationKindSelect,

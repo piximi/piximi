@@ -1,7 +1,7 @@
 import { Tensor4D } from "@tensorflow/tfjs";
 import { DataArray as IJSDataArray } from "image-js";
 import { BitDepth } from "store/data/types";
-import { Partition } from "utils/modelsV2/enums";
+import { Partition } from "utils/dl/enums";
 
 import { Colors } from "utils/types";
 

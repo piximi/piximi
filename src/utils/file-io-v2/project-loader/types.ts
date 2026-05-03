@@ -12,7 +12,7 @@ import type {
 } from "store/dataV2/types";
 import type { ClassifierState, SegmenterState } from "store/types";
 
-import type { ExtractedModelFileMap } from "utils/modelsV2/types";
+import type { ExtractedModelFileMap } from "utils/dl/types";
 import type { Progress } from "utils/types";
 
 import type { ProjectState } from "@ProjectViewer/state/types";

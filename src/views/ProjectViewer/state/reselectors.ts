@@ -15,8 +15,8 @@ import { CATEGORY_COLORS } from "store/dataV2/constants";
 
 import { representsUnknown } from "utils/stringUtils";
 import { isFiltered } from "utils/arrayUtils";
-import classifierHandler from "utils/modelsV2/classification/classifierHandler";
-import type { Partition } from "utils/modelsV2/enums";
+import classifierHandler from "utils/dl/classification/classifierHandler";
+import type { Partition } from "utils/dl/enums";
 import type {
   ClassifierEvaluationResultType,
   CropOptions,
@@ -24,7 +24,7 @@ import type {
   NormalizeOptions,
   OptimizerSettings,
   PreprocessSettings,
-} from "utils/modelsV2/types";
+} from "utils/dl/types";
 
 import {
   selectActiveKindId,

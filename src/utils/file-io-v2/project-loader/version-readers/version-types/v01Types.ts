@@ -8,7 +8,7 @@ import type {
   OptimizationAlgorithm,
   Partition,
   CropSchema,
-} from "utils/modelsV2/enums";
+} from "utils/dl/enums";
 
 import type { RawData } from "../../types";
 

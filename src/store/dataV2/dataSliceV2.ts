@@ -2,7 +2,7 @@ import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 
 import { generateUUID } from "store/dataV2/utils";
 
-import { Partition } from "utils/modelsV2/enums";
+import { Partition } from "utils/dl/enums";
 import type { AtLeastOne } from "utils/types";
 import { representsUnknown } from "utils/stringUtils";
 

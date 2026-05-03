@@ -52,7 +52,7 @@ import { HotkeyContext } from "utils/enums";
 
 import { Category } from "store/data/types";
 import { createProtoAnnotation } from "views/ImageViewer/utils/annotationUtils";
-import { Partition } from "utils/modelsV2/enums";
+import { Partition } from "utils/dl/enums";
 
 export const Stage = ({
   stageWidth,

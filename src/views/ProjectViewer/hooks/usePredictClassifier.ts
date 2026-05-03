@@ -17,9 +17,9 @@ import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
 
 import { logger } from "utils/logUtils";
 import { representsUnknown } from "utils/stringUtils";
-import classifierHandler from "utils/modelsV2/classification/classifierHandler";
-import { toInferenceInput } from "utils/modelsV2/utils";
-import { ModelStatus } from "utils/modelsV2/enums";
+import classifierHandler from "utils/dl/classification/classifierHandler";
+import { toInferenceInput } from "utils/dl/utils";
+import { ModelStatus } from "utils/dl/enums";
 
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";

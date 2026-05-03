@@ -3,7 +3,7 @@ import { generateUUID } from "store/data/utils";
 import { getPropertiesFromImage } from "store/data/utils";
 import { logger } from "utils/logUtils";
 
-import { Partition } from "utils/modelsV2/enums";
+import { Partition } from "utils/dl/enums";
 import {
   SerializedCOCOAnnotationType,
   SerializedCOCOCategoryType,

@@ -3,7 +3,7 @@ import {
   LossFunction,
   Metric,
   OptimizationAlgorithm,
-} from "utils/modelsV2/enums";
+} from "utils/dl/enums";
 
 import type { V01ClassifierState } from "./version-types/v01Types";
 

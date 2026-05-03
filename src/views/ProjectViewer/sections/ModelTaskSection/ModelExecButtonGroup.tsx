@@ -9,7 +9,7 @@ import {
 
 import { TooltipButton } from "components/ui/tooltips/TooltipButton";
 
-import { ModelStatus } from "utils/modelsV2/enums";
+import { ModelStatus } from "utils/dl/enums";
 
 import type { ErrorReason } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 

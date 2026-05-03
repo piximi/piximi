@@ -27,9 +27,9 @@ import {
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 import { HotkeyContext } from "utils/enums";
-import { ModelStatus } from "utils/modelsV2/enums";
-import type { SequentialClassifier } from "utils/modelsV2/classification";
-import classifierHandler from "utils/modelsV2/classification/classifierHandler";
+import { ModelStatus } from "utils/dl/enums";
+import type { SequentialClassifier } from "utils/dl/classification";
+import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { PredictionListItems } from "./PredictionListItems";
 import { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";

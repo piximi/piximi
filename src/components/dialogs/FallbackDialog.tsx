@@ -33,7 +33,7 @@ import { HotkeyContext } from "utils/enums";
 import { AlertType } from "utils/enums";
 
 import { AlertState } from "utils/types";
-import classifierHandler from "utils/modelsV2/classification/classifierHandler";
+import classifierHandler from "utils/dl/classification/classifierHandler";
 //import { saveAs } from "file-saver";
 
 export const FallbackDialog = (props: any) => {

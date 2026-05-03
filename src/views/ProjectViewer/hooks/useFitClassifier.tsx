@@ -19,17 +19,17 @@ import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selector
 import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
 import { dataSliceV2 } from "store/dataV2";
 
-import classifierHandler from "utils/modelsV2/classification/classifierHandler";
-import { ModelStatus, Partition } from "utils/modelsV2/enums";
-import type { SequentialClassifier } from "utils/modelsV2/classification";
+import classifierHandler from "utils/dl/classification/classifierHandler";
+import { ModelStatus, Partition } from "utils/dl/enums";
+import type { SequentialClassifier } from "utils/dl/classification";
 import {
   prepareClasses,
   prepareModel,
   prepareTrainingData,
   trainModel,
-} from "utils/modelsV2/classification/utils";
-import { toTrainingInput } from "utils/modelsV2/utils";
-import type { TrainingInput } from "utils/modelsV2/types";
+} from "utils/dl/classification/utils";
+import { toTrainingInput } from "utils/dl/utils";
+import type { TrainingInput } from "utils/dl/types";
 
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";

@@ -16,7 +16,7 @@ import {
   LossFunction,
   Metric,
   OptimizationAlgorithm,
-} from "utils/modelsV2/enums";
+} from "utils/dl/enums";
 import { enumToCodec } from "./runtimeUtils";
 
 //#region COCO Serialization Type

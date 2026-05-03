@@ -11,8 +11,8 @@ import type { Shape } from "store/dataV2/types";
 import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 
-import { getDefaultModelInfo } from "utils/modelsV2/classification/utils";
-import type { ClassifierEvaluationResultType } from "utils/modelsV2/types";
+import { getDefaultModelInfo } from "utils/dl/classification/utils";
+import type { ClassifierEvaluationResultType } from "utils/dl/types";
 import type { RecursivePartial } from "utils/types";
 import { recursiveAssign } from "utils/objectUtils";
 

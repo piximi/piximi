@@ -19,13 +19,13 @@ import {
 
 import { matchedCropPad, padToMatch } from "../../utils";
 import { CropSchema, Partition } from "../../enums";
-import { channelsToTensor } from "utils/modelsV2/tensor-assembly";
+import { channelsToTensor } from "utils/dl/tensor-assembly";
 import { Category, Shape } from "store/data/types";
 import { BitDepth } from "store/dataV2/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 import { logger } from "utils/logUtils";
 import { RequireOnly } from "utils/types";
-import { InferenceInput, TrainingInput } from "utils/modelsV2/types";
+import { InferenceInput, TrainingInput } from "utils/dl/types";
 
 type FitData = {
   xs: Tensor3D;

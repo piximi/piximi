@@ -18,7 +18,7 @@ import { ListItemHoldButton } from "components/ui/ListItemHoldButton";
 import { projectSlice } from "@ProjectViewer/state";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
-import { ModelStatus, Partition } from "utils/modelsV2/enums";
+import { ModelStatus, Partition } from "utils/dl/enums";
 
 export const PredictionListItems = () => {
   const dispatch = useDispatch();

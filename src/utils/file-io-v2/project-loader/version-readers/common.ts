@@ -5,7 +5,7 @@ import {
   LossFunction,
   Metric,
   OptimizationAlgorithm,
-} from "utils/modelsV2/enums";
+} from "utils/dl/enums";
 
 import { getAttr, getDatasetSelection, getGroup } from "../zarr/utils";
 import { initialClassifierStateV01_02 } from "./constants";

@@ -6,7 +6,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { AlertType } from "utils/enums";
 import { getStackTraceFromError } from "utils/logUtils";
-import { ModelStatus } from "utils/modelsV2/enums";
+import { ModelStatus } from "utils/dl/enums";
 import type { AlertState } from "utils/types";
 
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";

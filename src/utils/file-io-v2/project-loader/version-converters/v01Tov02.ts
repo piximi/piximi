@@ -5,7 +5,7 @@ import {
 } from "store/dataV2/constants";
 import { generateUUID } from "store/dataV2/utils";
 
-import { Partition } from "utils/modelsV2/enums";
+import { Partition } from "utils/dl/enums";
 import { representsUnknown } from "utils/stringUtils";
 
 import { subProgress } from "../progress";

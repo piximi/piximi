@@ -9,7 +9,7 @@ import {
 import { capitalize } from "utils/stringUtils";
 import { getStatistics } from "utils/measurements/utils";
 
-import { Partition } from "utils/modelsV2/enums";
+import { Partition } from "utils/dl/enums";
 
 import {
   DisplayTableRow,

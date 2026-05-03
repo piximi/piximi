@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { selectAllImages } from "store/data/selectors";
 import { selectSegmenterModel } from "store/segmenter/selectors";
 
-import { ModelStatus } from "utils/modelsV2/enums";
+import { ModelStatus } from "utils/dl/enums";
 
 export enum ErrorReason {
   NotConfigured,
