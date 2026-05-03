@@ -4,21 +4,20 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { classifierSlice } from "store/classifier";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { projectSlice } from "store/project";
+
 import { segmenterSlice } from "store/segmenter";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { dataSlice } from "./data/dataSlice";
 import { measurementsSlice } from "./measurements/measurementsSlice";
 import { dataSliceV2 } from "./dataV2/dataSliceV2";
 import { appTasksSlice } from "./appTasks/appTasksSlice";
-import { projectSlice as projectSliceV2 } from "views/ProjectViewer/state/projectSlice";
+import { projectSlice } from "views/ProjectViewer/state/projectSlice";
 
 const reducers = {
   classifier: classifierSlice.reducer,
   segmenter: segmenterSlice.reducer,
   imageViewer: imageViewerSlice.reducer,
   project: projectSlice.reducer,
-  projectV2: projectSliceV2.reducer,
   applicationSettings: applicationSettingsSlice.reducer,
   annotator: annotatorSlice.reducer,
   data: dataSlice.reducer,

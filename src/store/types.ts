@@ -5,23 +5,17 @@ import {
   UnknownAction,
 } from "@reduxjs/toolkit";
 
-import { HotkeyContext, Languages, ThingSortKey } from "utils/enums";
+import { HotkeyContext, Languages } from "utils/enums";
 import { ThemeMode } from "themes/enums";
 
-import { AlertState, FilterType } from "utils/types";
+import { AlertState } from "utils/types";
 import {
   ClassifierEvaluationResultType,
   FitOptions,
   PreprocessSettings,
   OptimizerSettings,
 } from "utils/dl/types";
-import {
-  Kind,
-  AnnotationObject,
-  Category,
-  ImageObject,
-  Thing,
-} from "./data/types";
+import { Kind, AnnotationObject, Category, ImageObject } from "./data/types";
 import { MeasurementsState } from "./measurements/types";
 import {
   AnnotatorState,
@@ -29,7 +23,7 @@ import {
 } from "views/ImageViewer/utils/types";
 import { DataStateV2 } from "./dataV2/types";
 import { AppTasksState } from "./appTasks/types";
-import { ProjectState as ProjectStateV2 } from "views/ProjectViewer/state/types";
+import { ProjectState } from "views/ProjectViewer/state/types";
 
 export type AppSettingsState = {
   // async work for setting initial states,
@@ -82,28 +76,12 @@ export type ClassifierState = {
   showClearPredictionsWarning: boolean;
 };
 
-export type ProjectState = {
-  name: string;
-
-  selectedThingIds: Array<string>;
-  sortType: ThingSortKey;
-  thingFilters: Record<
-    string, // kind
-    Required<Pick<FilterType<Thing>, "categoryId" | "partition">>
-  >;
-  highlightedCategory: string | undefined;
-  activeKind: string;
-  kindTabFilters: string[];
-  imageChannels: number | undefined;
-};
-
 type AppState = {
   classifier: ClassifierState;
   segmenter: SegmenterState;
   imageViewer: ImageViewerState;
   annotator: AnnotatorState;
   project: ProjectState;
-  projectV2: ProjectStateV2;
   applicationSettings: AppSettingsState;
   data: DataState;
   dataV2: DataStateV2;

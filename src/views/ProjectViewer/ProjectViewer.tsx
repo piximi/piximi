@@ -10,7 +10,6 @@ import { useErrorHandler, useMobileView, useUnloadConfirmation } from "hooks";
 import { FallbackDialog } from "components/dialogs";
 import { DropBox } from "components/layout";
 
-import { projectSlice } from "store/project";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { HotkeyContext } from "utils/enums";
@@ -36,7 +35,6 @@ export const ProjectViewer = () => {
         context: HotkeyContext.ProjectView,
       }),
     );
-    dispatch(projectSlice.actions.setActiveKind({ kind: "Image" }));
     return () => {
       dispatch(
         applicationSettingsSlice.actions.unregisterHotkeyContext({

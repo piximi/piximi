@@ -68,7 +68,7 @@ function handleAnnCategoryDelete(state: ProjectState, categoryId: string) {
 }
 
 export const projectSlice = createSlice({
-  name: "projectV2",
+  name: "project",
   initialState: initialState,
   reducers: {
     resetProject() {

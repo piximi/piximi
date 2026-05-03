@@ -12,34 +12,30 @@ import type {
 } from "./types";
 
 export const selectProject = ({
-  projectV2: project,
+  project,
 }: {
-  projectV2: ProjectState;
+  project: ProjectState;
 }): ProjectState => {
   return project;
 };
 
 export const selectActiveView = ({
-  projectV2: project,
+  project,
 }: {
-  projectV2: ProjectState;
+  project: ProjectState;
 }): ViewState => {
   return project.activeView;
 };
 
 export const selectProjectImageChannels = ({
-  projectV2: project,
+  project,
 }: {
-  projectV2: ProjectState;
+  project: ProjectState;
 }) => {
   return project.imageChannels;
 };
 
-export const selectProjectName = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}) => {
+export const selectProjectName = ({ project }: { project: ProjectState }) => {
   return project.name;
 };
 
@@ -47,40 +43,40 @@ export const selectProjectName = ({
 ~~ IMAGE GRID
 */
 export const selectImageGridState = ({
-  projectV2: project,
+  project,
 }: {
-  projectV2: ProjectState;
+  project: ProjectState;
 }): ImageGridState => {
   return project.imageGridState;
 };
 export const selectSelectedImageIds = ({
-  projectV2: project,
+  project,
 }: {
-  projectV2: ProjectState;
+  project: ProjectState;
 }): Array<string> => {
   return project.imageGridState.selectedIds;
 };
 
 export const selectNumSelectedImages = ({
-  projectV2: project,
+  project,
 }: {
-  projectV2: ProjectState;
+  project: ProjectState;
 }): number => {
   return project.imageGridState.selectedIds.length;
 };
 
 export const selectImageFilters = ({
-  projectV2: project,
+  project,
 }: {
-  projectV2: ProjectState;
+  project: ProjectState;
 }): ImageFilters => {
   return project.imageGridState.filters;
 };
 
 export const selectImageSortType = ({
-  projectV2: project,
+  project,
 }: {
-  projectV2: ProjectState;
+  project: ProjectState;
 }): ImageSortType => {
   return project.imageGridState.sortType;
 };
@@ -90,18 +86,14 @@ export const selectImageSortType = ({
 */
 
 export const selectAnnotationGridState = ({
-  projectV2: project,
+  project,
 }: {
-  projectV2: ProjectState;
+  project: ProjectState;
 }): AnnotationGridState => {
   return project.annotationGridState;
 };
 
-export const selectKindStates = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}) => {
+export const selectKindStates = ({ project }: { project: ProjectState }) => {
   return project.annotationGridState.kindStates;
 };
 
@@ -115,19 +107,15 @@ export const selectVisibleKindStates = createSelector(
 );
 
 export const selectActiveKindState = ({
-  projectV2: project,
+  project,
 }: {
-  projectV2: ProjectState;
+  project: ProjectState;
 }) => {
   const activeStateId = project.annotationGridState.activeKindId;
   return project.annotationGridState.kindStates[activeStateId];
 };
 
-export const selectActiveKindId = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}) => {
+export const selectActiveKindId = ({ project }: { project: ProjectState }) => {
   return project.annotationGridState.activeKindId;
 };
 
@@ -144,11 +132,7 @@ export const selectActiveViewState = createSelector(
   },
 );
 
-export const selectActiveFilters = ({
-  projectV2: project,
-}: {
-  projectV2: ProjectState;
-}) => {
+export const selectActiveFilters = ({ project }: { project: ProjectState }) => {
   const viewState = project.activeView;
   const activeKindId = project.annotationGridState.activeKindId;
   const activeState =
@@ -160,9 +144,9 @@ export const selectActiveFilters = ({
 };
 
 export const selectActiveStateFilterCount = ({
-  projectV2: project,
+  project,
 }: {
-  projectV2: ProjectState;
+  project: ProjectState;
 }): boolean => {
   const viewState = project.activeView;
   const activeKindId = project.annotationGridState.activeKindId;
@@ -180,9 +164,9 @@ export const selectActiveStateFilterCount = ({
 };
 
 export const selectActiveSelectedIds = ({
-  projectV2: project,
+  project,
 }: {
-  projectV2: ProjectState;
+  project: ProjectState;
 }): string[] => {
   const viewState = project.activeView;
   const activeKindId = project.annotationGridState.activeKindId;
@@ -195,9 +179,9 @@ export const selectActiveSelectedIds = ({
 };
 
 export const selectActiveFilteredSelectedIds = ({
-  projectV2: project,
+  project,
 }: {
-  projectV2: ProjectState;
+  project: ProjectState;
 }): string[] => {
   const viewState = project.activeView;
   const activeKindId = project.annotationGridState.activeKindId;

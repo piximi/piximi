@@ -1,7 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useSelector } from "react-redux";
 import {
-  Badge,
   Box,
   IconButton,
   List,
@@ -25,8 +23,6 @@ import {
   ExportAnnotationsListItem,
   ImageViewerCategories,
 } from "../../components";
-
-import { selectActiveFilteredStateHasFilters } from "store/project/selectors";
 
 import { DIMENSIONS } from "utils/constants";
 import { capitalize } from "utils/stringUtils";
@@ -76,7 +72,6 @@ export const MobileActionBar = () => {
   const theme = useTheme();
   const [activeTool, setActiveTool] = useState<OperationType>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const filtersExist = useSelector(selectActiveFilteredStateHasFilters);
   const t = useTranslation();
   const isMobile = useMobileView();
   const { anchorEl, onOpen: setPopperAnchor } = useMenu();
@@ -140,20 +135,10 @@ export const MobileActionBar = () => {
               key={`tool-drawer-${tool.name}`}
               tooltipLocation="left"
             >
-              {tool.name === "filters" ? (
-                <Badge color="primary" variant="dot" invisible={!filtersExist}>
-                  {tool.icon(
-                    activeTool === tool
-                      ? theme.palette.primary.dark
-                      : theme.palette.grey[400],
-                  )}
-                </Badge>
-              ) : (
-                tool.icon(
-                  activeTool === tool
-                    ? theme.palette.primary.dark
-                    : theme.palette.grey[400],
-                )
+              {tool.icon(
+                activeTool === tool
+                  ? theme.palette.primary.dark
+                  : theme.palette.grey[400],
               )}
             </Tool>
           ) : (

@@ -16,7 +16,6 @@ import { FallbackDialog } from "components/dialogs";
 
 import { MeasurementDashboard, MeasurementsDrawer } from "./sections";
 
-import { selectProjectImageChannels } from "store/project/selectors";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { measurementsSlice } from "store/measurements/measurementsSlice";
 
@@ -29,7 +28,7 @@ import { useNavigate } from "react-router-dom";
 
 export const MeasurementView = () => {
   const dispatch = useDispatch();
-  const projectImageChannels = useSelector(selectProjectImageChannels);
+  const projectImageChannels = 0; //TODO: use actual value after refactor
 
   useErrorHandler();
   useUnloadConfirmation();

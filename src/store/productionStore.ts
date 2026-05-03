@@ -13,20 +13,18 @@ import { imageViewerMiddleware } from "views/ImageViewer/state/imageViewer/image
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { rootReducer, RootState } from "./rootReducer";
-import { projectMiddleware } from "./project/projectListeners";
 import { dataMiddleware } from "./data/dataListeners";
 import { classifierSlice } from "store/classifier";
 import { applicationSettingsSlice } from "./applicationSettings";
 import { dataSlice } from "./data/dataSlice";
 import { dataSliceV2 } from "./dataV2/dataSliceV2";
-import { projectSlice } from "./project";
 import { segmenterSlice } from "./segmenter";
 import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 import { appTasksSlice } from "./appTasks/appTasksSlice";
-import { projectSlice as projectSliceV2 } from "views/ProjectViewer/state/projectSlice";
-import { projectMiddleware as projectMiddlewareV2 } from "views/ProjectViewer/state/projectListeners";
+import { projectSlice } from "views/ProjectViewer/state/projectSlice";
+import { projectMiddleware } from "views/ProjectViewer/state/projectListeners";
 
 const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&
@@ -41,7 +39,6 @@ const listenerMiddlewares: Middleware[] = [
   dataMiddleware.middleware,
   measurementsMiddleware.middleware,
   applicationMiddleware.middleware,
-  projectMiddlewareV2.middleware,
 ];
 
 const preloadedState: RootState = {
@@ -50,12 +47,11 @@ const preloadedState: RootState = {
   applicationSettings: applicationSettingsSlice.getInitialState(),
   imageViewer: imageViewerSlice.getInitialState(),
   data: dataSlice.getInitialState(),
-  project: projectSlice.getInitialState(),
   segmenter: segmenterSlice.getInitialState(),
   measurements: measurementsSlice.getInitialState(),
   dataV2: dataSliceV2.getInitialState(),
   appTasks: appTasksSlice.getInitialState(),
-  projectV2: projectSliceV2.getInitialState(),
+  project: projectSlice.getInitialState(),
 };
 
 const options = {
