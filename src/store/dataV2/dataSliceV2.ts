@@ -508,7 +508,10 @@ export const dataSliceV2 = createSlice({
       action: PayloadAction<{
         id: string;
         categoryId: string;
-        predicted?: boolean;
+        predicted?: {
+          predictedAtRunId: string;
+          predictionConfidence: number;
+        };
       }>,
     ) {
       const image = state.images.entities[action.payload.id];
@@ -525,18 +528,30 @@ export const dataSliceV2 = createSlice({
 
       imageAdapter.updateOne(state.images, {
         id: action.payload.id,
-        changes: { categoryId: newCatId, partition: newPartition },
+        changes: {
+          categoryId: newCatId,
+          partition: newPartition,
+          predictionConfidence: action.payload.predicted?.predictionConfidence,
+          predictedAtRunId: action.payload.predicted?.predictedAtRunId,
+        },
       });
     },
     batchUpdateImageCategory(
       state,
       action: PayloadAction<
-        Array<{ id: string; categoryId: string; predicted?: boolean }>
+        Array<{
+          id: string;
+          categoryId: string;
+          predicted?: {
+            predictedAtRunId: string;
+            predictionConfidence: number;
+          };
+        }>
       >,
     ) {
       const updates: {
         id: string;
-        changes: { categoryId: string; partition: Partition };
+        changes: Partial<ImageObject>;
       }[] = [];
       action.payload.forEach(({ id, categoryId: catId, predicted }) => {
         const image = state.images.entities[id];
@@ -550,7 +565,12 @@ export const dataSliceV2 = createSlice({
             : Partition.Unassigned;
         updates.push({
           id,
-          changes: { categoryId: catId, partition: newPartition },
+          changes: {
+            categoryId: catId,
+            partition: newPartition,
+            predictionConfidence: predicted?.predictionConfidence,
+            predictedAtRunId: predicted?.predictedAtRunId,
+          },
         });
       });
       imageAdapter.updateMany(state.images, updates);
@@ -602,7 +622,10 @@ export const dataSliceV2 = createSlice({
       action: PayloadAction<{
         id: string;
         categoryId: string;
-        predicted?: boolean;
+        predicted?: {
+          predictedAtRunId: string;
+          predictionConfidence: number;
+        };
       }>,
     ) {
       const targetCatId = action.payload.categoryId;
@@ -628,7 +651,11 @@ export const dataSliceV2 = createSlice({
 
       annotationVolumeAdapter.updateOne(state.annotationVolumes, {
         id: annotation.volumeId,
-        changes: { categoryId: action.payload.categoryId },
+        changes: {
+          categoryId: action.payload.categoryId,
+          predictedAtRunId: action.payload.predicted?.predictedAtRunId,
+          predictionConfidence: action.payload.predicted?.predictionConfidence,
+        },
       });
 
       annotationAdapter.updateMany(state.annotations, partitionUpdates);
@@ -636,10 +663,17 @@ export const dataSliceV2 = createSlice({
     batchBubbleUpdateAnnotationCategory(
       state,
       action: PayloadAction<
-        { id: string; categoryId: string; predicted?: boolean }[]
+        {
+          id: string;
+          categoryId: string;
+          predicted?: {
+            predictedAtRunId: string;
+            predictionConfidence: number;
+          };
+        }[]
       >,
     ) {
-      const volumeChanges: Record<string, string> = {};
+      const volumeChanges: Record<string, Partial<AnnotationVolume>> = {};
       const partitionUpdates: Array<{
         id: string;
         changes: { partition: Partition };
@@ -664,15 +698,19 @@ export const dataSliceV2 = createSlice({
             },
           }));
 
-        volumeChanges[ann.volumeId] = taargetCatId;
+        volumeChanges[ann.volumeId] = {
+          categoryId: taargetCatId,
+          predictedAtRunId: predicted?.predictedAtRunId,
+          predictionConfidence: predicted?.predictionConfidence,
+        };
         partitionUpdates.push(...volumeAnnUpdates);
       });
 
       annotationVolumeAdapter.updateMany(
         state.annotationVolumes,
-        Object.entries(volumeChanges).map(([id, categoryId]) => ({
+        Object.entries(volumeChanges).map(([id, changes]) => ({
           id,
-          changes: { categoryId },
+          changes,
         })),
       );
       annotationAdapter.updateMany(state.annotations, partitionUpdates);
