@@ -23,27 +23,37 @@ import { StyledSelect, WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { classifierSlice } from "store/classifier";
-import {
-  selectClassifierCropOptions,
-  selectClassifierInputShape,
-  selectActiveClassifierModel,
-  selectClassifierModelWithIdx,
-  selectClassifierNormalizeOptions,
-} from "@ProjectViewer/state/reselectors";
-import { selectActiveKindId } from "@ProjectViewer/state/selectors";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import { selectKindClassifier } from "store/classifier/selectors";
 
 import { enumKeys } from "utils/objectUtils";
 import { CropSchema } from "utils/dl/enums";
 import type { CropOptions, NormalizeOptions } from "utils/dl/types";
+import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 
 const RowColInputOptions = { min: 20 };
 const InputShapeField = ({ disabled }: { disabled: boolean }) => {
   const dispatch = useDispatch();
-  const inputShape = useSelector(selectClassifierInputShape);
-  const activeKindId = useSelector(selectActiveKindId);
-  const selectedModel = useSelector(selectClassifierModelWithIdx);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
+  const model = useMemo(() => {
+    if (!kindClassifier || !kindClassifier.activeModel) return;
+    return classifierHandler.getModel(kindClassifier.activeModel);
+  }, [kindClassifier?.activeModel]);
+  const inputShape = useMemo(() => {
+    const modelName = kindClassifier.activeModel;
+    if (!modelName)
+      return kindClassifier.modelInfoDict["base-model"].preprocessSettings
+        .inputShape;
+    return kindClassifier.modelInfoDict[modelName].preprocessSettings
+      .inputShape;
+  }, [kindClassifier]);
 
   const {
     inputValue: inputCols,
@@ -71,8 +81,8 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
   } = useNumberField(inputShape.channels);
 
   const fixedChannels = useMemo(
-    () => selectedModel && !!selectedModel.model?.requiredChannels,
-    [selectedModel],
+    () => model && !!model.requiredChannels,
+    [model],
   );
 
   const handleBlurDispatch = (
@@ -90,7 +100,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, height: inputRows },
-            kindId: activeKindId,
+            kindId: modelTarget.id,
           }),
         );
         return;
@@ -104,7 +114,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, width: inputCols },
-            kindId: activeKindId,
+            kindId: modelTarget.id,
           }),
         );
         return;
@@ -118,7 +128,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, channels: inputChannels },
-            kindId: activeKindId,
+            kindId: modelTarget.id,
           }),
         );
     }
@@ -175,8 +185,19 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
 
 const CropSection = ({ disabled }: { disabled: boolean }) => {
   const dispatch = useDispatch();
-  const cropOptions = useSelector(selectClassifierCropOptions);
-  const activeKindId = useSelector(selectActiveKindId);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
+  const cropOptions = useMemo(() => {
+    const modelName = kindClassifier.activeModel;
+    if (!modelName)
+      return kindClassifier.modelInfoDict["base-model"].preprocessSettings
+        .cropOptions;
+    return kindClassifier.modelInfoDict[modelName].preprocessSettings
+      .cropOptions;
+  }, [kindClassifier]);
   const [cropDisabled, setCropDisabled] = useState<boolean>(
     cropOptions.cropSchema === CropSchema.None,
   );
@@ -192,7 +213,7 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
         settings: { cropOptions },
-        kindId: activeKindId,
+        kindId: modelTarget.id,
       }),
     );
   };
@@ -263,19 +284,35 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
 };
 export const ImageAugmentationSettings = () => {
   const dispatch = useDispatch();
-  const activeKindId = useSelector(selectActiveKindId);
-  const normalizeOptions = useSelector(selectClassifierNormalizeOptions);
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
+  const selectedModel = useMemo(() => {
+    if (!kindClassifier || !kindClassifier.activeModel) return;
+    return classifierHandler.getModel(kindClassifier.activeModel);
+  }, [kindClassifier?.activeModel]);
+
+  const normalizeOptions = useMemo(() => {
+    const modelName = kindClassifier.activeModel;
+    if (!modelName)
+      return kindClassifier.modelInfoDict["base-model"].preprocessSettings
+        .normalizeOptions;
+    return kindClassifier.modelInfoDict[modelName].preprocessSettings
+      .normalizeOptions;
+  }, [kindClassifier]);
   const [rescalable, setRescalable] = useState<boolean>(
     normalizeOptions.normalize,
   );
-  const selectedModel = useSelector(selectActiveClassifierModel);
 
   const updateNormalizeOptions = (normalizeOptions: NormalizeOptions) => {
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
         settings: { normalizeOptions },
-        kindId: activeKindId,
+        kindId: modelTarget.id,
       }),
     );
   };

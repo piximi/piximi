@@ -1,5 +1,6 @@
 import type { Kind } from "store/data/types";
-import { KindClassifier, KindClassifierDict, ModelInfo } from "./types";
+
+import type { KindClassifier, KindClassifierDict, ModelInfo } from "./types";
 
 export function getSelectedModelInfo(
   kindClassifierDictOrItem: KindClassifier,
@@ -18,7 +19,7 @@ export function getSelectedModelInfo(
   else {
     classifier = kindClassifiersDictOrItem as KindClassifier;
   }
-  const selectedModelName = kindClassifiersDictOrItem.modelNameOrArch;
+  const selectedModelName = kindClassifiersDictOrItem.activeModel;
   if (typeof selectedModelName === "string")
     return classifier.modelInfoDict[selectedModelName];
   return classifier.modelInfoDict["base-model"];

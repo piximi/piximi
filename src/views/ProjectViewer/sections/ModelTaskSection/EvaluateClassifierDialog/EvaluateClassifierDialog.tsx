@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -13,14 +13,16 @@ import {
 
 import { DialogTransitionSlide } from "components/dialogs";
 
-import {
-  selectActiveKnownCategories,
-  selectActiveClassifierModel,
-} from "@ProjectViewer/state/reselectors";
+import { selectActiveKnownCategories } from "@ProjectViewer/state/reselectors";
 import type { Category } from "store/dataV2/types";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { selectModelEvaluationResults } from "store/classifier/selectors";
+import {
+  selectKindClassifier,
+  selectModelEvaluationResults,
+} from "store/classifier/selectors";
+
+import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
 import { ConfusionMatrix } from "./ConfusionMatrix";
@@ -37,11 +39,17 @@ export const EvaluateClassifierDialog = ({
 }: EvaluateClassifierDialogProps) => {
   const categories = useSelector(selectActiveKnownCategories);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const selectedModel = useSelector(selectActiveClassifierModel);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
+  const model = useMemo(() => {
+    if (!kindClassifier || !kindClassifier.activeModel) return;
+    return classifierHandler.getModel(kindClassifier.activeModel);
+  }, [kindClassifier?.activeModel]);
   const evaluationResults = useParameterizedSelector(
     selectModelEvaluationResults,
     modelTarget.id,
-    selectedModel?.name ?? "",
   );
   const [evalResult, setEvalResult] = useState(0);
 
@@ -75,7 +83,7 @@ export const EvaluateClassifierDialog = ({
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Typography variant="body2">{selectedModel?.name}</Typography>
+        <Typography variant="body2">{model?.name}</Typography>
         <Box display="flex" flexDirection="row" alignItems="center">
           <Typography variant="body2">Evaluation Result</Typography>
           <Pagination

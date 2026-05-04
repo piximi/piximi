@@ -1,14 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 import { useSelector } from "react-redux";
 
 import { Grid2 as Grid } from "@mui/material";
 
-import {
-  selectClassifierFitOptions,
-  selectClassifierTrainingPercentage,
-  selectTotalActiveLabeledItems,
-} from "@ProjectViewer/state/reselectors";
+import { selectTotalActiveLabeledItems } from "@ProjectViewer/state/reselectors";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import { selectKindClassifier } from "store/classifier/selectors";
 
 import { logger } from "utils/logUtils";
 
@@ -16,9 +15,26 @@ import { OptimizationSettings } from "./OptimizationSettings";
 import { TrainingStrategySettings } from "./TrainingStrategySettings";
 
 export const ClassifierOptimizerSettings = () => {
-  const trainingPercentage = useSelector(selectClassifierTrainingPercentage);
   const labeledThingsCount = useSelector(selectTotalActiveLabeledItems);
-  const fitOptions = useSelector(selectClassifierFitOptions);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
+  const fitOptions = useMemo(() => {
+    const modelName = kindClassifier.activeModel;
+    if (!modelName)
+      return kindClassifier.modelInfoDict["base-model"].optimizerSettings;
+    return kindClassifier.modelInfoDict[modelName].optimizerSettings;
+  }, [kindClassifier]);
+  const trainingPercentage = useMemo(() => {
+    const modelName = kindClassifier.activeModel;
+    if (!modelName)
+      return kindClassifier.modelInfoDict["base-model"].preprocessSettings
+        .trainingPercentage;
+    return kindClassifier.modelInfoDict[modelName].preprocessSettings
+      .trainingPercentage;
+  }, [kindClassifier]);
 
   useEffect(() => {
     if (

@@ -2,9 +2,13 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import type { RootState } from "store/rootReducer";
 
-import type { ClassifierState, KindClassifierDict } from "./types";
+import type {
+  ClassifierState,
+  KindClassifier,
+  KindClassifierDict,
+} from "./types";
 
-export const selectClassifier = ({
+export const selectClassifierState = ({
   classifier,
 }: {
   classifier: ClassifierState;
@@ -12,13 +16,21 @@ export const selectClassifier = ({
   return classifier;
 };
 
-export const selectKindClassifiers = ({
+export const selectKindClassifierDict = ({
   classifier,
 }: {
   classifier: ClassifierState;
 }): KindClassifierDict => {
   return classifier.kindClassifiers;
 };
+
+export const selectAllCreatedModelNames = createSelector(
+  selectKindClassifierDict,
+  (kcd): string[] =>
+    Object.values(kcd).flatMap((kc) =>
+      Object.keys(kc.modelInfoDict).filter((model) => model === "base_model"),
+    ),
+);
 
 export const selectShowClearPredictionsWarning = ({
   classifier,
@@ -27,16 +39,34 @@ export const selectShowClearPredictionsWarning = ({
 }): boolean => {
   return classifier.showClearPredictionsWarning;
 };
-export const selectModelInfo = createSelector(
-  selectKindClassifiers,
-  (_state: RootState, kindId: string, modelName: string) => ({
-    kindId,
-    modelName,
-  }),
-  (kcs, active) => {
-    return kcs[active.kindId]?.modelInfoDict[active.modelName];
+
+export const selectKindClassifier = createSelector(
+  selectKindClassifierDict,
+  (_state: RootState, kindId: string) => kindId,
+  (kci, kindId): KindClassifier => {
+    const kc = kci[kindId];
+    if (!kc) {
+      throw new Error(`No classifiers for kind ${kindId}`);
+    }
+    return kc;
   },
 );
+export const selectActiveModelName = createSelector(
+  selectKindClassifier,
+  (kc) => {
+    if (!kc) return;
+    return kc.activeModel;
+  },
+);
+export const selectNewModelArch = createSelector(selectKindClassifier, (kc) => {
+  if (!kc) return;
+  return kc.newModelArch;
+});
+export const selectModelInfo = createSelector(selectKindClassifier, (kc) => {
+  if (!kc) return;
+  const modelName = kc.activeModel ?? "base-model";
+  return kc.modelInfoDict[modelName];
+});
 export const selectRunsForActiveModel = createSelector(
   selectModelInfo,
   (info) => {
@@ -51,11 +81,11 @@ export const selectActiveRun = createSelector(
 
 export const selectModelLifecycleStatus = createSelector(
   selectModelInfo,
-  (info) => info.status,
+  (info) => info?.status,
 );
 export const selectConfidenceThreshold = createSelector(
   selectModelInfo,
-  (info) => info.confidenceThreshold,
+  (info) => info?.confidenceThreshold,
 );
 export const selectIsModelStale = createSelector(
   [selectModelLifecycleStatus],

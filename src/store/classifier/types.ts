@@ -60,8 +60,16 @@ export type ModelInfo = {
   confidenceThreshold: number;
   runs: Run[];
 };
+
+export enum ModelArch {
+  SIMPLE_CNN = 0,
+  MOBILE_NET = 1,
+}
 export type KindClassifier = {
-  modelNameOrArch: string | number;
+  kindId: string;
+  modelTargetName: string;
+  activeModel: string | undefined;
+  newModelArch: ModelArch;
   modelInfoDict: Record<string, ModelInfo>;
 };
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -12,22 +12,35 @@ import { WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { classifierSlice } from "store/classifier";
-import {
-  selectClassifierFitOptions,
-  selectActiveClassifierModel,
-} from "@ProjectViewer/state/reselectors";
-import { selectActiveKindId } from "@ProjectViewer/state/selectors";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import { useParameterizedSelector } from "store/hooks";
+import { selectKindClassifier } from "store/classifier/selectors";
+
+import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 
 export const TrainingStrategySettings = () => {
   const dispatch = useDispatch();
-  const activeKindId = useSelector(selectActiveKindId);
   const { trainable } = useClassifierStatus();
-  const fitOptions = useSelector(selectClassifierFitOptions);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const selectedModel = useSelector(selectActiveClassifierModel);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
+
+  const model = useMemo(() => {
+    if (!kindClassifier || !kindClassifier.activeModel) return;
+    return classifierHandler.getModel(kindClassifier.activeModel);
+  }, [kindClassifier?.activeModel]);
+  const fitOptions = useMemo(() => {
+    const modelName = kindClassifier.activeModel;
+    if (!modelName)
+      return kindClassifier.modelInfoDict["base-model"].optimizerSettings;
+    return kindClassifier.modelInfoDict[modelName].optimizerSettings;
+  }, [kindClassifier]);
 
   const {
     inputValue: batchSize,
@@ -56,7 +69,7 @@ export const TrainingStrategySettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { batchSize },
-        kindId: activeKindId,
+        kindId: modelTarget.id,
       }),
     );
   };
@@ -70,7 +83,7 @@ export const TrainingStrategySettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { epochs: numEpochs },
-        kindId: activeKindId,
+        kindId: modelTarget.id,
       }),
     );
   };
@@ -105,7 +118,7 @@ export const TrainingStrategySettings = () => {
               onChange={handleNumEpochsChange}
               value={numEpochsDisplay}
               onBlur={dispatchNumEpochs}
-              disabled={!!selectedModel || !trainable}
+              disabled={!!model || !trainable}
             />
           </WithLabel>
           <Collapse in={showAdvanced}>
@@ -123,7 +136,7 @@ export const TrainingStrategySettings = () => {
                 onChange={handleBatchSizeChange}
                 value={batchSizeDisplay}
                 onBlur={dispatchBatchSize}
-                disabled={!!selectedModel || !trainable}
+                disabled={!!model || !trainable}
               />
             </WithLabel>
           </Collapse>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 
 import type { SelectChangeEvent } from "@mui/material";
 import { Box, IconButton, MenuItem, Stack } from "@mui/material";
@@ -19,13 +19,11 @@ import {
 } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { usePredictClassifier } from "@ProjectViewer/hooks/usePredictClassifier";
 import { useEvaluateClassifier } from "@ProjectViewer/hooks/useEvaluateClassifier";
-import {
-  selectActiveClassifierModel,
-  selectTotalActiveUnlabeledItems,
-} from "@ProjectViewer/state/reselectors";
+import { selectTotalActiveUnlabeledItems } from "@ProjectViewer/state/reselectors";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { selectModelEvaluationResults } from "store/classifier/selectors";
+import { selectKindClassifier } from "store/classifier/selectors";
+import { ModelArch } from "store/classifier/types";
 
 import { HotkeyContext } from "utils/enums";
 import { ModelStatus } from "utils/dl/enums";
@@ -41,13 +39,12 @@ import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
 
 export const ClassifierSection = () => {
   const [waitingForResults, setWaitingForResults] = useState(false);
-  const selectedModel = useSelector(selectActiveClassifierModel);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const evaluationResults = useParameterizedSelector(
-    selectModelEvaluationResults,
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
     modelTarget.id,
-    selectedModel?.name ?? "",
   );
+
   const totalUnlabeledItems = useSelector(selectTotalActiveUnlabeledItems);
   const { modelStatus, error } = useClassifierStatus();
   const predictClassifier = usePredictClassifier();
@@ -78,10 +75,18 @@ export const ClassifierSection = () => {
   const handlePredict = async () => {
     await predictClassifier();
   };
-
+  const model = useMemo(() => {
+    if (!kindClassifier || !kindClassifier.activeModel) return;
+    return classifierHandler.getModel(kindClassifier.activeModel);
+  }, [kindClassifier?.activeModel]);
   const handleEvaluate = async () => {
-    if (!selectedModel) return;
-    if (selectedModel?.history.history.length > evaluationResults.length)
+    if (!model || !kindClassifier) return;
+    const modelName = kindClassifier.activeModel;
+    if (!modelName) return;
+    const modelRuns = kindClassifier.modelInfoDict[modelName]?.runs;
+    if (!modelRuns) return;
+
+    if (model.currentFitHistory.length > modelRuns.length)
       await evaluateClassifier();
 
     handleOpenEvaluateClassifierDialog();
@@ -92,7 +97,7 @@ export const ClassifierSection = () => {
       switch (modelStatus) {
         case ModelStatus.Idle:
         case ModelStatus.Pending:
-          return !selectedModel || selectedModel.trainable
+          return !model || model.trainable
             ? "Fit Model"
             : "Model is inference only";
         default:
@@ -102,7 +107,7 @@ export const ClassifierSection = () => {
     const predictText = (() => {
       switch (modelStatus) {
         case ModelStatus.Idle:
-          return selectedModel ? "Predict Model" : "No Trained Model";
+          return model ? "Predict Model" : "No Trained Model";
         case ModelStatus.Predicting:
           return "...Predicting";
         default:
@@ -110,15 +115,15 @@ export const ClassifierSection = () => {
       }
     })();
     const predictionDisabled =
-      !selectedModel ||
-      !selectedModel.pretrained ||
+      !model ||
+      !model.pretrained ||
       modelStatus !== ModelStatus.Idle ||
       totalUnlabeledItems === 0 ||
       error?.reason === ErrorReason.ChannelMismatch;
 
     const evaluateText = (() => {
-      if (selectedModel) {
-        return !selectedModel || selectedModel.trainable
+      if (model) {
+        return model.trainable
           ? modelStatus === ModelStatus.Idle ||
             modelStatus === ModelStatus.Pending
             ? "Evaluate Model"
@@ -131,15 +136,15 @@ export const ClassifierSection = () => {
     return {
       fit: {
         helperText: fitText,
-        disabled: !(!selectedModel || selectedModel.trainable),
+        disabled: !(!model || model.trainable),
       },
       predict: { helperText: predictText, disabled: predictionDisabled },
       evaluate: {
         helperText: evaluateText,
-        disabled: !selectedModel || !selectedModel.pretrained,
+        disabled: !model || !model.pretrained,
       },
     };
-  }, [modelStatus, selectedModel, error]);
+  }, [modelStatus, model, error]);
 
   useEffect(() => {
     if (modelStatus === ModelStatus.Trained && waitingForResults) {
@@ -164,11 +169,11 @@ export const ClassifierSection = () => {
         gap={1}
       >
         <ModelIOButtonGroup
-          hasTrainedModel={!!selectedModel}
+          hasTrainedModel={!!model}
           handleImportModel={handleOpenImportClassifierDialog}
           handleSaveModel={handleOpenSaveClassifierDialog}
         />
-        <ModelSelection selectedModel={selectedModel} />
+        <ModelSelection selectedModel={model} />
         <ModelExecButtonGroup
           modelStatus={modelStatus}
           handleFit={handleOpenFitClassifierDialog}
@@ -182,9 +187,9 @@ export const ClassifierSection = () => {
         onClose={handleCloseImportClassifierDialog}
         open={ImportClassifierDialogOpen}
       />
-      {selectedModel && (
+      {model && (
         <SaveFittedModelDialog
-          model={selectedModel}
+          model={model}
           onClose={handleCloseSaveClassifierDialog}
           open={SaveClassifierDialogOpen}
         />
@@ -211,23 +216,38 @@ const ModelSelection = ({
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const selectedModelName = selectedModel?.name ?? "new";
   const handleModelChange = (event: SelectChangeEvent<unknown>) => {
-    let value: string | number = event.target.value as string;
-    if (value === "new") value = 0;
-
-    dispatch(
-      classifierSlice.actions.updateSelectedModelNameOrArch({
-        kindId: modelTarget.id,
-        modelName: value,
-      }),
-    );
+    const value: string | ModelArch = event.target.value as string;
+    if (value === "new") {
+      batch(() => {
+        dispatch(
+          classifierSlice.actions.setActiveModel({
+            kindId: modelTarget.id,
+            modelName: undefined,
+          }),
+        );
+        dispatch(
+          classifierSlice.actions.setNewModelArch({
+            kindId: modelTarget.id,
+            modelArch: ModelArch.SIMPLE_CNN,
+          }),
+        );
+      });
+    } else {
+      dispatch(
+        classifierSlice.actions.setActiveModel({
+          kindId: modelTarget.id,
+          modelName: value,
+        }),
+      );
+    }
   };
   const handleDisposeModel = () => {
     if (!selectedModel) return;
     classifierHandler.removeModel(selectedModel.name);
     dispatch(
-      classifierSlice.actions.updateSelectedModelNameOrArch({
+      classifierSlice.actions.setActiveModel({
         kindId: modelTarget.id,
-        modelName: 0,
+        modelName: undefined,
       }),
     );
     dispatch(

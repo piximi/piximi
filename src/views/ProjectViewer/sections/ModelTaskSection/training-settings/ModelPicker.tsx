@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -18,49 +18,75 @@ import { TextFieldWithBlur } from "components/inputs/TextFieldWithBlur";
 import { WithLabel } from "components/inputs";
 
 import { classifierSlice } from "store/classifier";
-import {
-  selectAvailibleClassifierNames,
-  selectActiveClassifierModel,
-  selectActiveClassifierModelNameOrArch,
-} from "@ProjectViewer/state/reselectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import {
+  selectAllCreatedModelNames,
+  selectKindClassifier,
+} from "store/classifier/selectors";
+import type { ModelArch } from "store/classifier/types";
+
+import classifierHandler from "utils/dl/classification/classifierHandler";
+import type { SequentialClassifier } from "utils/dl/classification";
 
 export const ModelPicker = () => {
-  const selectedModel = useSelector(selectActiveClassifierModel);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const kindClassifierInfo = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
 
+  const activeModel = useMemo(
+    () =>
+      kindClassifierInfo?.activeModel
+        ? classifierHandler.getModel(kindClassifierInfo.activeModel)
+        : undefined,
+    [kindClassifierInfo?.activeModel],
+  );
+  if (!kindClassifierInfo) return null;
   return (
     <Box py={2}>
       <Typography gutterBottom align="left">
-        {selectedModel
+        {activeModel
           ? "Continue training, clone, or delete the selected model"
           : "Choose a model architecture and set the model hyperparameters."}
       </Typography>
-      {!selectedModel ? (
-        <ModelArchiitectureOptions />
+      {activeModel ? (
+        <PretrainedModelOptions activeModel={activeModel} />
       ) : (
-        <PretrainedModelOptions />
+        <ModelArchiitectureOptions
+          kindId={kindClassifierInfo.kindId}
+          newModelArch={kindClassifierInfo.newModelArch}
+          modelTargetName={kindClassifierInfo.modelTargetName}
+        />
       )}
     </Box>
   );
 };
 
-const ModelArchiitectureOptions = () => {
+const ModelArchiitectureOptions = ({
+  kindId,
+  newModelArch,
+  modelTargetName,
+}: {
+  kindId: string;
+  newModelArch: ModelArch;
+  modelTargetName: string;
+}) => {
   const dispatch = useDispatch();
-  const modelNameOrArch = useSelector(selectActiveClassifierModelNameOrArch);
-  const selectedModel = useSelector(selectActiveClassifierModel);
-  const availableClassifierNames = useSelector(selectAvailibleClassifierNames);
-  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const availableClassifierNames = useSelector(selectAllCreatedModelNames);
+
   const [userHasUpdated, setUsrHasUpdated] = useState(false);
   const { setNewModelName: setConfirmedName } = useClassifierStatus();
   const [modelName, setModelName] = useState("");
 
   const handleArchitectureChange = (event: SelectChangeEvent<unknown>) => {
-    const value = event.target.value as number;
+    const value = event.target.value as ModelArch;
     dispatch(
-      classifierSlice.actions.updateSelectedModelNameOrArch({
-        kindId: modelTarget.id,
-        modelName: value,
+      classifierSlice.actions.setNewModelArch({
+        kindId: kindId,
+        modelArch: value,
       }),
     );
   };
@@ -77,8 +103,8 @@ const ModelArchiitectureOptions = () => {
   };
 
   useEffect(() => {
-    if (userHasUpdated || !!selectedModel) return;
-    const candidateName = `${modelTarget.name}_${modelNameOrArch === 0 ? "Simple-CNN" : "Mobilenet"}`;
+    if (userHasUpdated) return;
+    const candidateName = `${modelTargetName}_${newModelArch === 0 ? "Simple-CNN" : "Mobilenet"}`;
     const availabbleNames = availableClassifierNames.join(", ");
     const replicates = availabbleNames.match(new RegExp(candidateName, "g"));
 
@@ -89,12 +115,7 @@ const ModelArchiitectureOptions = () => {
     }
     setModelName(candidateName + replicates.length);
     setConfirmedName(candidateName + replicates.length);
-  }, [
-    userHasUpdated,
-    availableClassifierNames,
-    selectedModel,
-    modelNameOrArch,
-  ]);
+  }, [userHasUpdated, availableClassifierNames, newModelArch]);
 
   return (
     <Stack direction="row" spacing={2} py={1} justifyContent="space-evenly">
@@ -106,7 +127,7 @@ const ModelArchiitectureOptions = () => {
         }}
       >
         <StyledSelect
-          value={typeof modelNameOrArch === "number" ? modelNameOrArch : ""}
+          value={newModelArch}
           onChange={handleArchitectureChange}
           fullWidth
         >
@@ -137,7 +158,6 @@ const ModelArchiitectureOptions = () => {
           onChange={handleNameChange}
           value={modelName}
           fullWidth
-          disabled={typeof modelNameOrArch === "string"}
           onBlur={handleConfirmName}
           sx={(theme) => ({
             input: {
@@ -152,14 +172,15 @@ const ModelArchiitectureOptions = () => {
   );
 };
 
-const PretrainedModelOptions = () => {
-  const modelNameOrArch = useSelector(selectActiveClassifierModelNameOrArch);
+const PretrainedModelOptions = ({
+  activeModel,
+}: {
+  activeModel: SequentialClassifier;
+}) => {
   const { shouldWarnClearPredictions } = useClassifierStatus();
-  const selectedModel = useSelector(selectActiveClassifierModel);
 
   const handleDisposeModel = () => {
-    if (!selectedModel) return;
-    selectedModel.dispose();
+    activeModel.dispose();
   };
   return (
     <Stack
@@ -172,7 +193,7 @@ const PretrainedModelOptions = () => {
       alignItems="center"
     >
       <Typography variant="body2" noWrap>
-        {`Selected Model:  ${selectedModel!.name}`}
+        {`Selected Model:  ${activeModel!.name}`}
       </Typography>
       <ButtonGroup sx={{ justifyContent: "space-evenly" }}>
         <TooltipWithDisable
@@ -186,7 +207,6 @@ const PretrainedModelOptions = () => {
           <Button
             onClick={handleDisposeModel}
             disableFocusRipple
-            disabled={typeof modelNameOrArch === "number"}
             color="primary"
             variant="text"
             sx={(theme) => ({
@@ -210,7 +230,6 @@ const PretrainedModelOptions = () => {
           <Button
             onClick={handleDisposeModel}
             disableFocusRipple
-            disabled={typeof modelNameOrArch === "number"}
             color="primary"
             variant="text"
             sx={(theme) => ({

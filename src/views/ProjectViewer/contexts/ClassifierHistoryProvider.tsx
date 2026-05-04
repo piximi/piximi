@@ -4,16 +4,21 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
 import { useSelector } from "react-redux";
 
-import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
+import type { RunHistoryEpoch } from "store/classifier/types";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import { selectKindClassifier } from "store/classifier/selectors";
 
 import { logger } from "utils/logUtils";
 import type { Points } from "utils/types";
 import type { TrainingCallbacks } from "utils/dl/types";
+import classifierHandler from "utils/dl/classification/classifierHandler";
 
 type HistoryData = {
   categoricalAccuracy: Points;
@@ -66,7 +71,11 @@ export const ClassifierHistoryProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const selectedModel = useSelector(selectActiveClassifierModel);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
   const [totalEpochs, setTotalEpochs] = useState<number>(0);
   const [modelHistory, setModelHistory] = useState<HistoryData>(
@@ -75,22 +84,26 @@ export const ClassifierHistoryProvider = ({
   const [predictedProbabilities, setPredictedProbabilities] = useState<
     Record<string, number>
   >({});
+  const model = useMemo(() => {
+    if (!kindClassifier || !kindClassifier.activeModel) return;
+    return classifierHandler.getModel(kindClassifier.activeModel);
+  }, [kindClassifier?.activeModel]);
 
   useEffect(() => {
-    if (!selectedModel) {
+    if (!model) {
       setModelHistory(initialModelHistory());
       setCurrentEpoch(0);
       setTotalEpochs(0);
       return;
     }
-    const fullHistory = selectedModel.history.history;
+    const fullHistory = model.currentFitHistory;
     const data = fullHistory.reduce(
       (data: HistoryData, epoch) => {
         for (const key in epoch) {
-          const cycleData = epoch[key];
+          const cycleData = epoch[key as keyof RunHistoryEpoch];
 
           data[key as keyof HistoryData].push(
-            ...generatePlotData(cycleData, key as keyof HistoryData),
+            ...generatePlotData([cycleData], key as keyof HistoryData),
           );
         }
         return data;
@@ -108,16 +121,16 @@ export const ClassifierHistoryProvider = ({
 
       setCurrentEpoch(fullHistory.length);
     }
-  }, [selectedModel]);
+  }, [model]);
 
   const epochEndCallback: TrainingCallbacks["onEpochEnd"] = useCallback(
     async (epoch, logs) => {
       let nextEpoch: number;
 
-      if (!selectedModel) {
+      if (!model) {
         nextEpoch = epoch + 1;
       } else {
-        nextEpoch = selectedModel.numEpochs + epoch + 1;
+        nextEpoch = model.currentFitEpochCount + epoch + 1;
       }
       const trainingEpochIndicator = nextEpoch - 0.5;
 
@@ -154,7 +167,7 @@ export const ClassifierHistoryProvider = ({
         }),
       }));
     },
-    [selectedModel],
+    [model],
   );
 
   return (

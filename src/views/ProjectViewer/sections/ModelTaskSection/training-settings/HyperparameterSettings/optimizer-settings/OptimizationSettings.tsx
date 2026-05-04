@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -19,25 +19,37 @@ import { StyledSelect, WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { classifierSlice } from "store/classifier";
-import {
-  selectActiveClassifierModel,
-  selectClassifierOptimizerSettings,
-} from "@ProjectViewer/state/reselectors";
-import { selectActiveKindId } from "@ProjectViewer/state/selectors";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import { useParameterizedSelector } from "store/hooks";
+import { selectKindClassifier } from "store/classifier/selectors";
 
 import { enumKeys } from "utils/objectUtils";
 import { LossFunction, OptimizationAlgorithm } from "utils/dl/enums";
+import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 
 export const OptimizationSettings = () => {
   const dispatch = useDispatch();
-  const activeKindId = useSelector(selectActiveKindId);
-  const compileOptions = useSelector(selectClassifierOptimizerSettings);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const selectedModel = useSelector(selectActiveClassifierModel);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
+  const model = useMemo(() => {
+    if (!kindClassifier.activeModel) return;
+    return classifierHandler.getModel(kindClassifier.activeModel);
+  }, [kindClassifier?.activeModel]);
   const { trainable } = useClassifierStatus();
+
+  const compileOptions = useMemo(() => {
+    const modelName = kindClassifier.activeModel;
+    if (!modelName)
+      return kindClassifier.modelInfoDict["base-model"].optimizerSettings;
+    return kindClassifier.modelInfoDict[modelName].optimizerSettings;
+  }, [kindClassifier]);
 
   const {
     inputValue: learningRate,
@@ -56,7 +68,7 @@ export const OptimizationSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { optimizationAlgorithm },
-        kindId: activeKindId,
+        kindId: modelTarget.id,
       }),
     );
   };
@@ -66,7 +78,7 @@ export const OptimizationSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { lossFunction },
-        kindId: activeKindId,
+        kindId: modelTarget.id,
       }),
     );
   };
@@ -80,7 +92,7 @@ export const OptimizationSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { learningRate },
-        kindId: activeKindId,
+        kindId: modelTarget.id,
       }),
     );
   };
@@ -112,7 +124,7 @@ export const OptimizationSettings = () => {
               value={compileOptions.optimizationAlgorithm}
               onChange={handleOptimizationAlgorithmChange}
               fullWidth
-              disabled={!!selectedModel}
+              disabled={!!model}
             >
               {enumKeys(OptimizationAlgorithm).map((k) => {
                 return (
@@ -135,7 +147,7 @@ export const OptimizationSettings = () => {
               value={compileOptions.lossFunction}
               onChange={handleLossFunctionChange}
               sx={{ maxWidth: "max-content" }}
-              disabled={!!selectedModel}
+              disabled={!!model}
             >
               {enumKeys(LossFunction).map((k) => {
                 return (
@@ -160,7 +172,7 @@ export const OptimizationSettings = () => {
               onChange={handleLearningRateChange}
               value={learningRateDisplay}
               onBlur={dispatchLearningRate}
-              disabled={!!selectedModel || !trainable}
+              disabled={!!model || !trainable}
             />
           </WithLabel>
         </Stack>

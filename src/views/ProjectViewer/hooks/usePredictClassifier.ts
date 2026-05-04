@@ -5,15 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { dataSliceV2 } from "store/dataV2";
 import { classifierSlice } from "store/classifier";
 import {
-  selectActiveClassifierModel,
-  selectActiveClassifierModelNameOrArch,
   selectActiveItems,
   selectActiveKnownCategories,
-  selectClassifierModelInfo,
 } from "@ProjectViewer/state/reselectors";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
 import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
+import { useParameterizedSelector } from "store/hooks";
+import { selectKindClassifier } from "store/classifier/selectors";
 
 import { logger } from "utils/logUtils";
 import { representsUnknown } from "utils/stringUtils";
@@ -28,11 +27,12 @@ import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 export const usePredictClassifier = () => {
   const dispatch = useDispatch();
   const activeItems = useSelector(selectActiveItems);
-  const modelInfo = useSelector(selectClassifierModelInfo);
   const activeCategories = useSelector(selectActiveKnownCategories);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelNameOrArch = useSelector(selectActiveClassifierModelNameOrArch);
-  const selectedModel = useSelector(selectActiveClassifierModel);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
   const { setModelStatus } = useClassifierStatus();
   const { setPredictedProbabilities } = useClassifierHistory();
   const { getClassMap } = useClassMapDialog();
@@ -40,7 +40,13 @@ export const usePredictClassifier = () => {
   const handleError = useClassifierErrorHandler();
 
   const predictClassifier = useCallback(async () => {
-    if (typeof modelNameOrArch !== "string" || !selectedModel) {
+    if (!kindClassifier || !kindClassifier.activeModel) return;
+    const modelTargetId = kindClassifier.kindId;
+    const modelName = kindClassifier.activeModel;
+    const model = classifierHandler.getModel(modelName);
+    const modelInfo = kindClassifier.modelInfoDict[modelName];
+
+    if (!model) {
       handleError(
         new Error(
           "Cannot predict: no trained classifier is selected for this kind.",
@@ -49,20 +55,19 @@ export const usePredictClassifier = () => {
       );
       return;
     }
-    const modelName = modelNameOrArch;
 
     let classMap = modelInfo.classMap;
     if (!classMap) {
-      if (!selectedModel.classes) return;
+      if (!model.classes) return;
       const setMapping = await getClassMap({
         projectCategories: activeCategories,
-        modelClasses: selectedModel.classes,
+        modelClasses: model.classes,
       });
       if (!setMapping) return;
       classMap = setMapping;
       dispatch(
         classifierSlice.actions.addModelClassMapping({
-          kindId: modelTarget.id,
+          kindId: modelTargetId,
           modelName,
           classMapping: classMap,
         }),
@@ -109,7 +114,7 @@ export const usePredictClassifier = () => {
         probabilitiesById[id] = results.probabilities[idx];
         return { id, categoryId: results.categoryIds[idx] };
       });
-      if (modelTarget.id === IMAGE_CLASSIFIER_ID) {
+      if (modelTargetId === IMAGE_CLASSIFIER_ID) {
         dispatch(dataSliceV2.actions.batchUpdateImageCategory(updates));
       } else {
         // Annotation predictions map to their volume's category.
@@ -136,10 +141,7 @@ export const usePredictClassifier = () => {
     handleError,
     activeItems,
     activeCategories,
-    modelTarget,
-    modelInfo,
-    modelNameOrArch,
-    selectedModel,
+    kindClassifier,
     getClassMap,
     setModelStatus,
     setPredictedProbabilities,

@@ -10,11 +10,13 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
+import {
+  selectKindClassifier,
+  selectShowClearPredictionsWarning,
+} from "store/classifier/selectors";
 import { selectKindIds } from "store/dataV2/selectors";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import {
-  selectActiveClassifierModel,
   selectActiveLabeledItems,
   selectActiveItemsByPartition,
   selectActiveUnknownCategory,
@@ -29,6 +31,7 @@ import { useParameterizedSelector } from "store/hooks";
 import { getDifferences } from "utils/arrayUtils";
 import { ModelStatus, Partition } from "utils/dl/enums";
 import { representsUnknown } from "utils/stringUtils";
+import classifierHandler from "utils/dl/classification/classifierHandler";
 
 export enum ErrorReason {
   NotTrainable,
@@ -72,8 +75,11 @@ export const ClassifierStatusProvider = ({
   children: React.ReactNode;
 }) => {
   const dispatch = useDispatch();
-  const selectedModel = useSelector(selectActiveClassifierModel);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
   const projectKinds = useSelector(selectKindIds);
   const inferenceItems = useParameterizedSelector(
     selectActiveItemsByPartition,
@@ -92,6 +98,11 @@ export const ClassifierStatusProvider = ({
   const [modelStatusDict, setModelStatusDict] = useState<
     Record<string, ModelStatus>
   >({ [IMAGE_CLASSIFIER_ID]: ModelStatus.Idle });
+
+  const model = useMemo(() => {
+    if (!kindClassifier || !kindClassifier.activeModel) return;
+    return classifierHandler.getModel(kindClassifier.activeModel);
+  }, [kindClassifier?.activeModel]);
 
   const targetItemType = useMemo(
     () => (modelTarget.id === IMAGE_CLASSIFIER_ID ? "images" : "annotations"),
@@ -133,10 +144,7 @@ export const ClassifierStatusProvider = ({
     return showClearPredictionsWarning && hasLabeledInference;
   }, [showClearPredictionsWarning, hasLabeledInference]);
 
-  const trainable = useMemo(
-    () => !selectedModel || selectedModel.trainable,
-    [selectedModel],
-  );
+  const trainable = useMemo(() => !model || model.trainable, [model]);
   const noLabeledThings = useMemo(
     () => activeLabeledItems.length === 0,
     [activeLabeledItems],
@@ -205,15 +213,15 @@ export const ClassifierStatusProvider = ({
       });
     }
     if (
-      selectedModel?.preprocessingOptions &&
+      model?.preprocessingOptions &&
       projectChannels &&
-      projectChannels !== selectedModel.preprocessingOptions.inputShape.channels
+      projectChannels !== model.preprocessingOptions.inputShape.channels
     ) {
       newIsReady = false;
 
       newErrors.push({
         reason: ErrorReason.ChannelMismatch,
-        message: `The model requires ${selectedModel?.preprocessingOptions.inputShape.channels}-channel images, but the project images have ${projectChannels}`,
+        message: `The model requires ${model?.preprocessingOptions.inputShape.channels}-channel images, but the project images have ${projectChannels}`,
         severity: 2,
       });
     }
@@ -226,7 +234,7 @@ export const ClassifierStatusProvider = ({
           );
     setIsReady(newIsReady);
     setError(mostSevere);
-  }, [selectedModel, trainable, noLabeledThings, projectChannels, modelTarget]);
+  }, [model, trainable, noLabeledThings, projectChannels, modelTarget]);
 
   return (
     <ClassifierStatusContext.Provider

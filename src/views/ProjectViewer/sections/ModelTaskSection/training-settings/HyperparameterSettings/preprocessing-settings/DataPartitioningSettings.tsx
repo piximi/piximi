@@ -20,24 +20,43 @@ import { WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { classifierSlice } from "store/classifier";
-import {
-  selectActiveClassifierModel,
-  selectClassifierShuffleOptions,
-  selectClassifierTrainingPercentage,
-} from "@ProjectViewer/state/reselectors";
-import { selectActiveKindId } from "@ProjectViewer/state/selectors";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import { useParameterizedSelector } from "store/hooks";
+import { selectKindClassifier } from "store/classifier/selectors";
+
+import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 
 export const DataPartitioningSettings = () => {
   const dispatch = useDispatch();
-  const trainingPercentage = useSelector(selectClassifierTrainingPercentage);
-  const activeKindId = useSelector(selectActiveKindId);
-  const shuffleOptions = useSelector(selectClassifierShuffleOptions);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const { trainable } = useClassifierStatus();
-  const selectedModel = useSelector(selectActiveClassifierModel);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
+  const model = useMemo(() => {
+    if (!kindClassifier || !kindClassifier.activeModel) return;
+    return classifierHandler.getModel(kindClassifier.activeModel);
+  }, [kindClassifier?.activeModel]);
+  const shuffleOptions = useMemo(() => {
+    const modelName = kindClassifier.activeModel;
+    if (!modelName)
+      return kindClassifier.modelInfoDict["base-model"].preprocessSettings
+        .shuffle;
+    return kindClassifier.modelInfoDict[modelName].preprocessSettings.shuffle;
+  }, [kindClassifier]);
+  const trainingPercentage = useMemo(() => {
+    const modelName = kindClassifier.activeModel;
+    if (!modelName)
+      return kindClassifier.modelInfoDict["base-model"].preprocessSettings
+        .trainingPercentage;
+    return kindClassifier.modelInfoDict[modelName].preprocessSettings
+      .trainingPercentage;
+  }, [kindClassifier]);
 
   const trainingFieldValidationOptions = useMemo(
     () => ({ min: 0.1, max: 0.99, enableFloat: true }),
@@ -61,7 +80,7 @@ export const DataPartitioningSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
         settings: { trainingPercentage: trainPercent },
-        kindId: activeKindId,
+        kindId: modelTarget.id,
       }),
     );
   };
@@ -70,7 +89,7 @@ export const DataPartitioningSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
         settings: { shuffle: shuffleOptions },
-        kindId: activeKindId,
+        kindId: modelTarget.id,
       }),
     );
   };
@@ -103,7 +122,7 @@ export const DataPartitioningSettings = () => {
             value={trainPercentDisplay}
             fullWidth
             onBlur={dispatchTrainingPercentage}
-            disabled={!!selectedModel || !trainable}
+            disabled={!!model || !trainable}
           />
         </WithLabel>
         <Collapse in={showAdvanced}>
@@ -126,7 +145,7 @@ export const DataPartitioningSettings = () => {
               label="Shuffle on Split"
               labelPlacement="start"
               disableTypography
-              disabled={!!selectedModel}
+              disabled={!!model}
             />
           </FormControl>
         </Collapse>

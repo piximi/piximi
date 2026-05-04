@@ -9,10 +9,13 @@ import { DialogTransitionSlide } from "components/dialogs";
 
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 import { ModelSummaryTable } from "@ProjectViewer/sections/ModelTaskSection/data-display";
-import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import { selectKindClassifier } from "store/classifier/selectors";
 
 import { ModelStatus } from "utils/dl/enums";
+import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import TrainingPlots from "./TrainingPlots";
 import { TrainingSettings } from "../training-settings/TrainingSettings";
@@ -30,7 +33,15 @@ export const FitClassifierDialog = ({
   const [tabVal, setTabVal] = useState("1");
   const { modelHistory } = useClassifierHistory();
   const { modelStatus } = useClassifierStatus();
-  const selectedModel = useSelector(selectActiveClassifierModel);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
+  const model = useMemo(() => {
+    if (!kindClassifier || !kindClassifier.activeModel) return;
+    return classifierHandler.getModel(kindClassifier.activeModel);
+  }, [kindClassifier?.activeModel]);
 
   const showPlots = useMemo(() => {
     return modelHistory.categoricalAccuracy.length > 0;
@@ -53,8 +64,8 @@ export const FitClassifierDialog = ({
   useEffect(() => {
     if (modelStatus === ModelStatus.Training) return;
     if (tabVal === "2" && !showPlots) setTabVal("1");
-    if (tabVal === "3" && !selectedModel?.modelSummary) setTabVal("1");
-  }, [tabVal, showPlots, selectedModel?.modelSummary, modelStatus]);
+    if (tabVal === "3" && !model?.modelSummary) setTabVal("1");
+  }, [tabVal, showPlots, model?.modelSummary, modelStatus]);
 
   return (
     <Dialog
@@ -87,7 +98,7 @@ export const FitClassifierDialog = ({
           value="3"
           disabledMessage="No Trained Model"
           placement="top"
-          disabled={!selectedModel?.modelSummary}
+          disabled={!model?.modelSummary}
         />
       </Tabs>
 
@@ -100,8 +111,8 @@ export const FitClassifierDialog = ({
         </Box>
         <Box hidden={tabVal !== "3"}>
           {/* TODO: implement model summary for graph models */}
-          {selectedModel?.modelSummary && (
-            <ModelSummaryTable modelSummary={selectedModel.modelSummary} />
+          {model?.modelSummary && (
+            <ModelSummaryTable modelSummary={model.modelSummary} />
           )}
         </Box>
       </DialogContent>

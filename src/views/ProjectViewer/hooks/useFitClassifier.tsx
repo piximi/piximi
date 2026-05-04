@@ -6,9 +6,6 @@ import { deepClone } from "@mui/x-data-grid/internals";
 
 import { classifierSlice } from "store/classifier";
 import {
-  selectActiveClassifierModel,
-  selectClassifierModelInfo,
-  selectActiveClassifierModelNameOrArch,
   selectActiveItems,
   selectActiveKnownCategories,
 } from "@ProjectViewer/state/reselectors";
@@ -17,7 +14,9 @@ import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
 import { dataSliceV2 } from "store/dataV2";
-import type { ModelClassMap, ModelInfo } from "store/classifier/types";
+import type { ModelClassMap } from "store/classifier/types";
+import { useParameterizedSelector } from "store/hooks";
+import { selectKindClassifier } from "store/classifier/selectors";
 
 import classifierHandler from "utils/dl/classification/classifierHandler";
 import { ModelStatus, Partition } from "utils/dl/enums";
@@ -38,68 +37,52 @@ import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 export const useFitClassifier = () => {
   const dispatch = useDispatch();
   const activeItems = useSelector(selectActiveItems);
-  const modelInfo = useSelector(selectClassifierModelInfo);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
   const knownCategories = useSelector(selectActiveKnownCategories);
-  const modelNameOrArch = useSelector(selectActiveClassifierModelNameOrArch);
-  const selectedModel = useSelector(selectActiveClassifierModel);
 
   // HOOKS
   const { setTotalEpochs, epochEndCallback } = useClassifierHistory();
   const { newModelName, setModelStatus } = useClassifierStatus();
   const { getClassMap } = useClassMapDialog();
-
-  // HELPERS
-  const addClassificationModel = useCallback(
-    async (
-      newModelName: string,
-      modelArchitecture: 0 | 1,
-      baseModelInfo: ModelInfo,
-      kindId: string,
-    ) => {
-      const newModel = await classifierHandler.createNewModel(
-        newModelName,
-        modelArchitecture,
-      );
-      const newModelInfo = deepClone(baseModelInfo);
-
-      dispatch(
-        classifierSlice.actions.addModelInfo({
-          kindId: kindId,
-          modelName: newModelName,
-          modelInfo: newModelInfo,
-        }),
-      );
-      return newModel;
-    },
-    [],
-  );
   const handleError = useClassifierErrorHandler();
 
-  const dispatchPartition =
-    modelTarget.id === IMAGE_CLASSIFIER_ID
-      ? dataSliceV2.actions.batchUpdateImagePartition
-      : dataSliceV2.actions.batchUpdateAnnotationPartition;
-
   const fitClassifier = useCallback(async () => {
+    if (!kindClassifier) return;
+    const modelName = kindClassifier.activeModel;
+    const modelInfo = kindClassifier?.modelInfoDict[modelName ?? "base-model"];
+    const dispatchPartition =
+      kindClassifier.kindId === IMAGE_CLASSIFIER_ID
+        ? dataSliceV2.actions.batchUpdateImagePartition
+        : dataSliceV2.actions.batchUpdateAnnotationPartition;
+
     // updates the the total number of epochs the model will train for (for display purposes)
     setTotalEpochs(
       (totalEpochs) => totalEpochs + modelInfo.optimizerSettings.epochs,
     );
 
-    let initFit: boolean = !selectedModel?.pretrained;
+    let initFit: boolean;
     let model: SequentialClassifier;
     let classMap = modelInfo.classMap;
 
     try {
       // if the model name or architecture is a number, we create a new model using specified model architecture
-      if (typeof modelNameOrArch === "number") {
+      if (!modelName) {
         initFit = true;
-        model = await addClassificationModel(
-          newModelName!,
-          modelNameOrArch as 0 | 1,
-          modelInfo,
-          modelTarget.id,
+        model = await classifierHandler.createNewModel(
+          newModelName,
+          kindClassifier.newModelArch,
+        );
+        const newModelInfo = deepClone(modelInfo);
+        dispatch(
+          classifierSlice.actions.addModelInfo({
+            kindId: kindClassifier.kindId,
+            modelName: newModelName,
+            modelInfo: newModelInfo,
+          }),
         );
 
         // create a class map for the new model
@@ -112,13 +95,15 @@ export const useFitClassifier = () => {
         );
         dispatch(
           classifierSlice.actions.addModelClassMapping({
-            kindId: modelTarget.id,
+            kindId: kindClassifier.kindId,
             modelName: model.name,
             classMapping: classMap,
           }),
         );
       } else {
-        model = selectedModel!;
+        initFit = false;
+        model = classifierHandler.getModel(modelName);
+        if (!model) throw Error(`No model for ${modelName}`);
       }
     } catch (error) {
       handleError(error as Error, "Model Generation Error");
@@ -137,7 +122,7 @@ export const useFitClassifier = () => {
       classMap = setMapping as ModelClassMap;
       dispatch(
         classifierSlice.actions.addModelClassMapping({
-          kindId: modelTarget.id,
+          kindId: kindClassifier.kindId,
           modelName: model.name,
           classMapping: classMap,
         }),
@@ -226,7 +211,7 @@ export const useFitClassifier = () => {
         handleError(error as Error, "Model Preparation Error");
         return;
       }
-    } else if (!selectedModel?.trainingLoaded) {
+    } else if (!model.trainingLoaded) {
       dispatch(
         dispatchPartition([
           ...trainingUpdates,
@@ -274,19 +259,16 @@ export const useFitClassifier = () => {
     setModelStatus(ModelStatus.Idle);
 
     dispatch(
-      classifierSlice.actions.updateSelectedModelNameOrArch({
+      classifierSlice.actions.setActiveModel({
         modelName: model.name,
-        kindId: modelTarget.id,
+        kindId: kindClassifier.kindId,
       }),
     );
   }, [
-    modelNameOrArch,
-    selectedModel,
+    kindClassifier,
     newModelName,
-    modelTarget,
     activeItems,
     knownCategories,
-    modelInfo,
     handleError,
     dispatch,
   ]);

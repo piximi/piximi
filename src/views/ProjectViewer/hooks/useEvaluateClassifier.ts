@@ -3,15 +3,11 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
-import {
-  selectActiveClassifierModel,
-  selectActiveClassifierModelNameOrArch,
-  selectActiveKnownCategories,
-} from "@ProjectViewer/state/reselectors";
+import { selectActiveKnownCategories } from "@ProjectViewer/state/reselectors";
 import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { selectActiveRun } from "store/classifier/selectors";
+import { selectKindClassifier } from "store/classifier/selectors";
 
 import { AlertType } from "utils/enums";
 import classifierHandler from "utils/dl/classification/classifierHandler";
@@ -25,19 +21,22 @@ export const useEvaluateClassifier = () => {
   const { modelStatus, setModelStatus } = useClassifierStatus();
   const activeCategories = useSelector(selectActiveKnownCategories);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const selectedModel = useSelector(selectActiveClassifierModel);
-  const modelNameOrArch = useSelector(selectActiveClassifierModelNameOrArch);
   const handleError = useClassifierErrorHandler();
-  const currentRun = useParameterizedSelector(
-    selectActiveRun,
+
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
     modelTarget.id,
-    "" + modelNameOrArch,
   );
   const evaluateClassifier = async () => {
-    if (typeof modelNameOrArch !== "string" || !selectedModel) return;
-    const modelName = modelNameOrArch;
+    if (!kindClassifier || kindClassifier.activeModel === undefined) return;
+    const modelName = kindClassifier.activeModel;
+    const model = classifierHandler.getModel(modelName);
+    const modelInfo = kindClassifier.modelInfoDict[modelName];
+    if (!model || !modelInfo) return;
+    const currentRun = modelInfo.runs.at(-1);
+    if (!currentRun) return;
     const initialModelStatus = modelStatus;
-    if (!selectedModel.validationLoaded) {
+    if (!model.validationLoaded) {
       dispatch(
         applicationSettingsSlice.actions.updateAlertState({
           alertState: {
@@ -47,13 +46,13 @@ export const useEvaluateClassifier = () => {
           },
         }),
       );
-    } else if (selectedModel.numClasses !== activeCategories.length) {
+    } else if (model.numClasses !== activeCategories.length) {
       dispatch(
         applicationSettingsSlice.actions.updateAlertState({
           alertState: {
             alertType: AlertType.Warning,
             name: "The output shape of your model does not correspond to the number of categories!",
-            description: `The trained model has an output shape of ${selectedModel.numClasses} but there are ${activeCategories.length} categories in  the project.\nMake sure these numbers match by retraining the model with the given setup or upload a corresponding new model.`,
+            description: `The trained model has an output shape of ${model.numClasses} but there are ${activeCategories.length} categories in  the project.\nMake sure these numbers match by retraining the model with the given setup or upload a corresponding new model.`,
           },
         }),
       );
@@ -66,7 +65,7 @@ export const useEvaluateClassifier = () => {
             evalResult,
             kindId: modelTarget.id,
             runId: currentRun.id,
-            modelName: selectedModel.name,
+            modelName: model.name,
           }),
         );
       } catch (error) {

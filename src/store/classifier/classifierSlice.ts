@@ -1,8 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { cloneDeep } from "lodash";
+
+import { deepClone } from "@mui/x-data-grid/internals";
 
 import type { Shape } from "store/dataV2/types";
-import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
+import {
+  IMAGE_CLASSIFIER_ID,
+  IMAGE_CLASSIFIER_NAME,
+} from "store/dataV2/constants";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 
 import { getDefaultModelInfo } from "utils/dl/classification/utils";
@@ -11,6 +15,7 @@ import type { RecursivePartial } from "utils/types";
 import { recursiveAssign } from "utils/objectUtils";
 
 import { getSelectedModelInfo } from "./utils";
+import { ModelArch } from "./types";
 
 import type {
   ClassifierState,
@@ -21,11 +26,17 @@ import type {
 } from "./types";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
+const getDefaultKindClassifier = () => ({
+  activeModel: undefined,
+  newModelArch: ModelArch.SIMPLE_CNN,
+  modelInfoDict: { "base-model": getDefaultModelInfo() },
+});
 const initialState: ClassifierState = {
   kindClassifiers: {
     [IMAGE_CLASSIFIER_ID]: {
-      modelNameOrArch: 0,
-      modelInfoDict: { "base-model": getDefaultModelInfo() },
+      kindId: IMAGE_CLASSIFIER_ID,
+      modelTargetName: IMAGE_CLASSIFIER_NAME,
+      ...getDefaultKindClassifier(),
     },
   },
 
@@ -48,46 +59,28 @@ export const classifierSlice = createSlice({
       return action.payload.classifier;
     },
     setDefaults(state) {
-      state.kindClassifiers = {
-        [IMAGE_CLASSIFIER_ID]: {
-          modelNameOrArch: 0,
-          modelInfoDict: {
-            "base-model": getDefaultModelInfo(),
-          },
-        },
-      };
+      state.kindClassifiers = initialState.kindClassifiers;
     },
-    updateKindClassifiers(
+    addKindClassifiers(
       state,
-      action: PayloadAction<{
-        changes:
-          | {
-              add: Array<string>;
-              presetInfo?: Array<KindClassifier>;
-            }
-          | { del: Array<string> };
-      }>,
+      action: PayloadAction<Array<{ id: string; targetName: string }>>,
     ) {
-      const changes = action.payload.changes;
-      if ("add" in changes) {
-        changes.add.forEach(
-          (kindId, idx) =>
-            (state.kindClassifiers[kindId] =
-              idx < changes.add.length &&
-              changes.presetInfo &&
-              changes.presetInfo[idx]
-                ? changes.presetInfo[idx]
-                : {
-                    modelNameOrArch: 0,
-                    modelInfoDict: {
-                      "base-model": getDefaultModelInfo(),
-                    },
-                  }),
-        );
-      } else {
-        changes.del.forEach((kindId) => delete state.kindClassifiers[kindId]);
-      }
+      action.payload.forEach(
+        (newKC) =>
+          (state.kindClassifiers[newKC.id] = {
+            kindId: newKC.id,
+            modelTargetName: newKC.targetName,
+            ...getDefaultKindClassifier(),
+          }),
+      );
     },
+    setKindClassifiers(state, action: PayloadAction<Array<KindClassifier>>) {
+      action.payload.forEach((kc) => (state.kindClassifiers[kc.kindId] = kc));
+    },
+    removeKindClassifiers(state, action: PayloadAction<Array<string>>) {
+      action.payload.forEach((kindId) => delete state.kindClassifiers[kindId]);
+    },
+
     addModelInfo(
       state,
       action: PayloadAction<{
@@ -185,22 +178,30 @@ export const classifierSlice = createSlice({
           action.payload.globalChannels;
       });
     },
-    updateSelectedModelNameOrArch(
+    setActiveModel(
       state,
       action: PayloadAction<{
-        modelName: string | number;
+        modelName: string | undefined;
         kindId: string;
       }>,
     ) {
       const { modelName, kindId } = action.payload;
       const classifier = state.kindClassifiers[kindId];
-      classifier.modelNameOrArch = modelName;
-      if (typeof modelName === "number") return;
+      classifier.activeModel = modelName;
+      if (modelName === undefined) return;
       if (!(modelName in classifier.modelInfoDict)) {
-        classifier.modelInfoDict[modelName] = cloneDeep(
+        classifier.modelInfoDict[modelName] = deepClone(
           classifier.modelInfoDict["base-model"],
         );
       }
+    },
+    setNewModelArch(
+      state,
+      action: PayloadAction<{ modelArch: ModelArch; kindId: string }>,
+    ) {
+      const { modelArch, kindId } = action.payload;
+      const classifier = state.kindClassifiers[kindId];
+      classifier.newModelArch = modelArch;
     },
     updateShowClearPredictionsWarning(
       state,
@@ -288,15 +289,17 @@ export const classifierSlice = createSlice({
     builder
       .addCase(dataSliceV2.actions.addKind, (state, action) => {
         state.kindClassifiers[action.payload.kind.id] = {
-          modelNameOrArch: 0,
-          modelInfoDict: { "base-model": getDefaultModelInfo() },
+          kindId: action.payload.kind.id,
+          modelTargetName: action.payload.kind.name,
+          ...getDefaultKindClassifier(),
         };
       })
       .addCase(dataSliceV2.actions.batchAddKind, (state, action) => {
         action.payload.forEach(({ kind }) => {
           state.kindClassifiers[kind.id] = {
-            modelNameOrArch: 0,
-            modelInfoDict: { "base-model": getDefaultModelInfo() },
+            kindId: kind.id,
+            modelTargetName: kind.name,
+            ...getDefaultKindClassifier(),
           };
         });
       })

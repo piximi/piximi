@@ -7,23 +7,11 @@ import {
   selectExtendedImages,
 } from "store/dataV2/selectors";
 import type { RootState } from "store/rootReducer";
-import { selectKindClassifiers } from "store/classifier/selectors";
-import { getSelectedModelInfo } from "store/classifier/utils";
-import type { Shape } from "store/dataV2/types";
 import { CATEGORY_COLORS } from "store/dataV2/constants";
-import type { KindClassifier, ModelInfo } from "store/classifier/types";
 
 import { representsUnknown } from "utils/stringUtils";
 import { isFiltered } from "utils/arrayUtils";
-import classifierHandler from "utils/dl/classification/classifierHandler";
 import type { Partition } from "utils/dl/enums";
-import type {
-  CropOptions,
-  FitOptions,
-  NormalizeOptions,
-  OptimizerSettings,
-  PreprocessSettings,
-} from "utils/dl/types";
 
 import {
   selectActiveKindId,
@@ -31,7 +19,6 @@ import {
   selectActiveSelectedIds,
   selectActiveFilters,
   selectSelectedImageIds,
-  selectActiveClassifierModelTarget,
 } from "./selectors";
 
 // --- Images ---
@@ -157,152 +144,5 @@ export const selectTotalActiveUnlabeledItems = createSelector(
       if (representsUnknown(item.categoryId)) total++;
       return total;
     }, 0);
-  },
-);
-
-// -- Models --
-
-const selectActiveClassifier = createSelector(
-  selectKindClassifiers,
-  selectActiveClassifierModelTarget,
-  (classifiers, modelTarget): KindClassifier => {
-    return classifiers[modelTarget.id];
-  },
-);
-
-export const selectActiveClassifierModelNameOrArch = createSelector(
-  selectActiveClassifier,
-  (classifier): string | number => {
-    return classifier.modelNameOrArch;
-  },
-);
-export const selectActiveClassifierModel = createSelector(
-  selectActiveClassifierModelNameOrArch,
-  (selectedModelNameOrArch) => {
-    return typeof selectedModelNameOrArch === "string"
-      ? classifierHandler.getModel(selectedModelNameOrArch)
-      : undefined;
-  },
-);
-
-const selectEveryClassifierModelInfo = createSelector(
-  selectActiveClassifier,
-  (classifier): Record<string, ModelInfo> => {
-    return classifier.modelInfoDict;
-  },
-);
-
-export const selectAvailibleClassifierNames = createSelector(
-  selectEveryClassifierModelInfo,
-  (infoDict) => Object.keys(infoDict),
-);
-export const selectClassifierModelInfo = createSelector(
-  selectActiveClassifier,
-  (classifier): ModelInfo => {
-    return getSelectedModelInfo(classifier);
-  },
-);
-
-export const selectClassifierHistory = createSelector(
-  [selectActiveClassifierModel, (state, items: string[]) => items],
-  (
-    model,
-    items,
-  ): {
-    [key: string]: number[];
-  } => {
-    if (!model) return {};
-    const fullHistory = model.history.history;
-    const selectedHistory: { [key: string]: number[] } = {};
-    for (const k of items) {
-      if (k === "epochs") {
-        selectedHistory[k] = model.history.epochs;
-      } else {
-        selectedHistory[k] = fullHistory.flatMap(
-          (cycleHistory) => cycleHistory[k],
-        );
-      }
-    }
-    return selectedHistory;
-  },
-);
-
-export const selectClassifierModelWithIdx = createSelector(
-  selectActiveClassifierModelNameOrArch,
-  selectActiveClassifierModel,
-  (modelIdx, model) => ({
-    idx: modelIdx,
-    model,
-  }),
-);
-
-export const selectClassifierOptimizerSettings = createSelector(
-  selectClassifierModelInfo,
-  (modelInfo): OptimizerSettings => {
-    return modelInfo.optimizerSettings;
-  },
-);
-
-const selectClassifierPreprocessOptions = createSelector(
-  selectClassifierModelInfo,
-  (modelInfo): PreprocessSettings => {
-    return modelInfo.preprocessSettings;
-  },
-);
-
-export const selectClassifierNormalizeOptions = createSelector(
-  selectClassifierPreprocessOptions,
-  (settings): NormalizeOptions => {
-    return settings.normalizeOptions;
-  },
-);
-export const selectClassifierCropOptions = createSelector(
-  selectClassifierPreprocessOptions,
-  (settings): CropOptions => {
-    return settings.cropOptions;
-  },
-);
-
-export const selectClassifierFitOptions = createSelector(
-  selectClassifierOptimizerSettings,
-  (settings): FitOptions => {
-    return {
-      epochs: settings.epochs,
-      batchSize: settings.batchSize,
-    };
-  },
-);
-
-export const selectClassifierInputShape = createSelector(
-  selectClassifierModelInfo,
-  (modelInfo): Shape => {
-    return modelInfo.preprocessSettings.inputShape;
-  },
-);
-
-export const selectClassifierShuffleOptions = createSelector(
-  selectClassifierPreprocessOptions,
-  (settings): boolean => {
-    return settings.shuffle;
-  },
-);
-
-export const selectClassifierTrainingPercentage = createSelector(
-  selectClassifierPreprocessOptions,
-  (settings): number => {
-    return settings.trainingPercentage;
-  },
-);
-
-export const selectClassifierHyperparameters = createSelector(
-  selectClassifierPreprocessOptions,
-  selectClassifierOptimizerSettings,
-  selectClassifierFitOptions,
-  (preprocessOptions, compileOptions, fitOptions) => {
-    return {
-      preprocessOptions,
-      compileOptions,
-      fitOptions,
-    };
   },
 );

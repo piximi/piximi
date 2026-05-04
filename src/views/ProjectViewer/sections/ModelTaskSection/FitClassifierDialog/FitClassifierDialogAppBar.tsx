@@ -27,14 +27,19 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 
 import { classifierSlice } from "store/classifier";
-import { selectShowClearPredictionsWarning } from "store/classifier/selectors";
-import { selectActiveClassifierModel } from "@ProjectViewer/state/reselectors";
+import {
+  selectKindClassifier,
+  selectShowClearPredictionsWarning,
+} from "store/classifier/selectors";
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import useFitClassifier from "@ProjectViewer/hooks/useFitClassifier";
+import { useFitClassifier } from "@ProjectViewer/hooks/useFitClassifier";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useParameterizedSelector } from "store/hooks";
 
 import { APPLICATION_COLORS } from "utils/constants";
 import { ModelStatus } from "utils/dl/enums";
+import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
@@ -46,7 +51,15 @@ export const FitClassifierDialogAppBar = ({
   closeDialog,
 }: FitClassifierDialogAppBarProps) => {
   const dispatch = useDispatch();
-  const selectedModel = useSelector(selectActiveClassifierModel);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget.id,
+  );
+  const selectedModel = useMemo(() => {
+    if (!kindClassifier || !kindClassifier.activeModel) return;
+    return classifierHandler.getModel(kindClassifier.activeModel);
+  }, [kindClassifier?.activeModel]);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );

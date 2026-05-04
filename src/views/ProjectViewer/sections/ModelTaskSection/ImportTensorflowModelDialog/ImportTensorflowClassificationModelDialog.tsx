@@ -51,7 +51,7 @@ export const ImportTensorflowClassificationModelDialog = ({
   const confirmUpload = async () => {
     if (uploadedModels.length > 0) {
       dispatch(
-        classifierSlice.actions.updateSelectedModelNameOrArch({
+        classifierSlice.actions.setActiveModel({
           modelName: uploadedModels[0].name,
           kindId: activeKindId,
         }),
