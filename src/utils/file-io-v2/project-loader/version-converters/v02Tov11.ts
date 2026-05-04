@@ -60,7 +60,7 @@ const v02_11_classifierConverter = (
     kindClassifiers[kindId] = {
       modelNameOrArch: 0,
       modelInfoDict: {
-        "base-model": {
+        BASE_MODEL_NAME: {
           ...v11_v2_GetDefaultModelInfo(),
           preprocessSettings,
           optimizerSettings,

@@ -12,7 +12,10 @@ import {
 import type { Category } from "store/dataV2/types";
 import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
+import {
+  BASE_MODEL_NAME,
+  IMAGE_CLASSIFIER_ID,
+} from "store/classifier/constants";
 import { dataSliceV2 } from "store/dataV2";
 import type { ModelClassMap } from "store/classifier/types";
 import { useParameterizedSelector } from "store/hooks";
@@ -53,7 +56,8 @@ export const useFitClassifier = () => {
   const fitClassifier = useCallback(async () => {
     if (!kindClassifier) return;
     const modelName = kindClassifier.activeModel;
-    const modelInfo = kindClassifier?.modelInfoDict[modelName ?? "base-model"];
+    const modelInfo =
+      kindClassifier?.modelInfoDict[modelName ?? BASE_MODEL_NAME];
     const dispatchPartition =
       kindClassifier.kindId === IMAGE_CLASSIFIER_ID
         ? dataSliceV2.actions.batchUpdateImagePartition

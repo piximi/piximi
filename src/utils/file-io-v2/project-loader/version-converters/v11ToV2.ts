@@ -5,13 +5,18 @@ import { deepClone } from "@mui/x-data-grid/internals";
 import { generateUUID } from "store/dataV2/utils";
 import type { BitDepth } from "store/dataV2/types";
 import {
-  IMAGE_CLASSIFIER_ID,
   UNKNOWN_KIND,
   UNKNOWN_KIND_CATEGORY,
   UNKNOWN_KIND_CATEGORY_ID,
   UNKNOWN_KIND_ID,
 } from "store/dataV2/constants";
 import { initialState } from "@ProjectViewer/state/projectSlice";
+import {
+  BASE_MODEL_NAME,
+  IMAGE_CLASSIFIER_ID,
+  IMAGE_CLASSIFIER_NAME,
+} from "store/classifier/constants";
+import { ModelArch } from "store/classifier/types";
 
 import { processChannel } from "utils/channelUtils";
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
@@ -85,7 +90,7 @@ export function convertV11ToV2(
     Object.values(things.entities),
     subProgress(onProgress, STAGES.things),
   );
-  const v2ClassifierState = convertClassifier(v11.classifier);
+  const v2ClassifierState = convertClassifier(v11.classifier, v2Kinds.entities);
   const v2Project: ProjectState = deepClone(initialState);
   v2Project.name = v11.project.name;
   v2Project.imageChannels = v11.project.imageChannels;
@@ -99,8 +104,10 @@ export function convertV11ToV2(
 
 function convertKindClassifier(
   v11KClassifier: V11KindClassifier,
+  kindId: string,
+  modelTargetName: string,
 ): V2KindClassifier {
-  const { modelNameOrArch, modelInfoDict } = v11KClassifier;
+  const { modelInfoDict } = v11KClassifier;
   const v2ModelInfoDict: Record<string, V2ModelInfo> = {};
   Object.entries(modelInfoDict).forEach(([id, info]) => {
     const { preprocessSettings, ...restInfo } = info;
@@ -115,10 +122,17 @@ function convertKindClassifier(
     defaultModelInfo.optimizerSettings = restInfo.optimizerSettings;
     v2ModelInfoDict[id] = defaultModelInfo;
   });
-  return { modelNameOrArch, modelInfoDict: v2ModelInfoDict };
+  return {
+    activeModel: undefined,
+    kindId,
+    modelTargetName,
+    newModelArch: ModelArch.SIMPLE_CNN,
+    modelInfoDict: v2ModelInfoDict,
+  };
 }
 function convertClassifier(
   v11ClassifierState: V11ClassifierState,
+  kinds: Record<string, V2Kind>,
 ): V2ClassifierState {
   const v11Classifiers = v11ClassifierState.kindClassifiers;
   const v2Classifiers: V2ClassifierState["kindClassifiers"] = {};
@@ -127,15 +141,26 @@ function convertClassifier(
     if (id === "Image")
       v2Classifiers[IMAGE_CLASSIFIER_ID] = convertKindClassifier(
         v11Classifiers[id],
+        IMAGE_CLASSIFIER_ID,
+        IMAGE_CLASSIFIER_NAME,
       );
     else {
-      v2Classifiers[id] = convertKindClassifier(v11Classifiers[id]);
+      const kind = kinds[id];
+      if (!kind) return;
+      v2Classifiers[id] = convertKindClassifier(
+        v11Classifiers[id],
+        id,
+        kind.name,
+      );
     }
   });
   //V2 requires a classifier for the Unknown kind; V1 had no such concept, so seed it with defaults
   v2Classifiers[UNKNOWN_KIND_ID] = {
-    modelNameOrArch: 0,
-    modelInfoDict: { "base-model": getDefaultModelInfo() },
+    kindId: UNKNOWN_KIND_ID,
+    activeModel: undefined,
+    modelTargetName: "Unknown",
+    newModelArch: ModelArch.SIMPLE_CNN,
+    modelInfoDict: { [BASE_MODEL_NAME]: getDefaultModelInfo() },
   };
   return {
     kindClassifiers: v2Classifiers,

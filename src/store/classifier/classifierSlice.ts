@@ -3,10 +3,6 @@ import { createSlice } from "@reduxjs/toolkit";
 import { deepClone } from "@mui/x-data-grid/internals";
 
 import type { Shape } from "store/dataV2/types";
-import {
-  IMAGE_CLASSIFIER_ID,
-  IMAGE_CLASSIFIER_NAME,
-} from "store/dataV2/constants";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 
 import { getDefaultModelInfo } from "utils/dl/classification/utils";
@@ -14,6 +10,11 @@ import type { ClassifierEvaluationResultType } from "utils/dl/types";
 import type { RecursivePartial } from "utils/types";
 import { recursiveAssign } from "utils/objectUtils";
 
+import {
+  BASE_MODEL_NAME,
+  IMAGE_CLASSIFIER_ID,
+  IMAGE_CLASSIFIER_NAME,
+} from "./constants";
 import { getSelectedModelInfo } from "./utils";
 import { ModelArch } from "./types";
 
@@ -29,7 +30,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 const getDefaultKindClassifier = () => ({
   activeModel: undefined,
   newModelArch: ModelArch.SIMPLE_CNN,
-  modelInfoDict: { "base-model": getDefaultModelInfo() },
+  modelInfoDict: { [BASE_MODEL_NAME]: getDefaultModelInfo() },
 });
 const initialState: ClassifierState = {
   kindClassifiers: {
@@ -173,7 +174,7 @@ export const classifierSlice = createSlice({
     ) {
       Object.keys(state.kindClassifiers).forEach((kind) => {
         state.kindClassifiers[kind].modelInfoDict[
-          "base-model"
+          BASE_MODEL_NAME
         ].preprocessSettings.inputShape.channels =
           action.payload.globalChannels;
       });
@@ -191,7 +192,7 @@ export const classifierSlice = createSlice({
       if (modelName === undefined) return;
       if (!(modelName in classifier.modelInfoDict)) {
         classifier.modelInfoDict[modelName] = deepClone(
-          classifier.modelInfoDict["base-model"],
+          classifier.modelInfoDict[BASE_MODEL_NAME],
         );
       }
     },

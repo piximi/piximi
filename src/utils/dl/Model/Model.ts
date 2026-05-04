@@ -1,13 +1,11 @@
-import { GraphModel, History, LayersModel, Tensor, io } from "@tensorflow/tfjs";
+import { io } from "@tensorflow/tfjs";
 
-import {
-  ModelArgs,
-  ModelHistory,
-  ModelLayerData,
-  OptimizerSettings,
-} from "../types";
-import { CropSchema, ModelTask } from "../enums";
-import { Shape } from "store/data/types";
+import type { Shape } from "store/data/types";
+import type { RunHistoryEpoch, RunStatus } from "store/classifier/types";
+
+import type { ModelArgs, ModelLayerData, OptimizerSettings } from "../types";
+import type { CropSchema, ModelTask } from "../enums";
+import type { GraphModel, LayersModel, Logs } from "@tensorflow/tfjs";
 
 export abstract class Model {
   readonly name: string;
@@ -21,7 +19,7 @@ export abstract class Model {
   private _pretrained: boolean;
 
   protected _model?: LayersModel | GraphModel;
-  protected _history: ModelHistory;
+  protected _currentFitHistory: RunHistoryEpoch[];
   protected _preprocessingOptions?: {
     cropSchema: CropSchema;
     numCrops: number;
@@ -53,7 +51,7 @@ export abstract class Model {
     this._requiredChannels = requiredChannels;
     // set defaults
     this._model = undefined;
-    this._history = { epochs: [], history: [] };
+    this._currentFitHistory = [];
   }
 
   public dispose() {
@@ -63,44 +61,32 @@ export abstract class Model {
     }
     // set defaults
     this._model = undefined;
-    this._history = { epochs: [], history: [] };
+    this._currentFitHistory = [];
   }
 
-  protected appendHistory(history: History) {
-    this._history.epochs.push(...history.epoch);
-
-    const numberOnlyHistory: ModelHistory["history"][number] = {};
-    for (const key of Object.keys(history.history)) {
-      const vals = history.history[key];
-      const numberOnlyVals: number[] = [];
-      for (const val of vals) {
-        if (val instanceof Tensor) {
-          const numberVal = val.arraySync() as number;
-          val.dispose();
-          numberOnlyVals.push(numberVal);
-        } else {
-          numberOnlyVals.push(val);
-        }
-      }
-      numberOnlyHistory[key] = numberOnlyVals;
-    }
-
-    this._history.history.push(numberOnlyHistory);
+  protected recordEpoch(epoch: number, logs: Logs): void {
+    this._currentFitHistory.push({
+      epoch,
+      loss: Number(logs.loss),
+      valLoss: Number(logs.val_loss),
+      accuracy: Number(logs.acc ?? logs.categoricalAccuracy),
+      valAccuracy: Number(logs.val_acc ?? logs.val_categoricalAccuracy),
+    });
   }
 
   public get requiredChannels() {
     return this._requiredChannels;
   }
   public get numEpochs() {
-    return this._history.epochs.length;
+    return this._currentFitHistory.length;
   }
 
-  public get numTrainingCylces() {
-    return this._history.history.length;
+  public get currentFitEpochCount() {
+    return this._currentFitHistory.length;
   }
 
-  public get history() {
-    return this._history;
+  public get currentFitHistory(): readonly RunHistoryEpoch[] {
+    return this._currentFitHistory;
   }
 
   public get pretrained() {
@@ -122,7 +108,16 @@ export abstract class Model {
   public abstract loadValidation(items: any[], preprocessingArgs: any): void;
   public abstract loadInference(items: any[], preprocessingArgs: any): void;
 
-  public abstract train(options: any, callbacks: any): Promise<History>;
+  public abstract train(
+    options: any,
+    callbacks: any,
+    runContext: { seed: number; parentRunId?: string },
+  ): Promise<{
+    history: RunHistoryEpoch[];
+    weightsRef: string;
+    finalEpoch: number;
+    status: RunStatus;
+  }>;
   public abstract predict(options: any, callbacks: any): any;
   public abstract evaluate(): any;
 

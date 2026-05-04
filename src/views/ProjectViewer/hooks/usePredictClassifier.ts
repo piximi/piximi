@@ -10,7 +10,7 @@ import {
 } from "@ProjectViewer/state/reselectors";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
-import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
+import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
 

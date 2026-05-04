@@ -24,6 +24,7 @@ import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selector
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
+import { BASE_MODEL_NAME } from "store/classifier/constants";
 
 import classifierHandler from "utils/dl/classification/classifierHandler";
 
@@ -45,14 +46,14 @@ export const DataPartitioningSettings = () => {
   const shuffleOptions = useMemo(() => {
     const modelName = kindClassifier.activeModel;
     if (!modelName)
-      return kindClassifier.modelInfoDict["base-model"].preprocessSettings
+      return kindClassifier.modelInfoDict[BASE_MODEL_NAME].preprocessSettings
         .shuffle;
     return kindClassifier.modelInfoDict[modelName].preprocessSettings.shuffle;
   }, [kindClassifier]);
   const trainingPercentage = useMemo(() => {
     const modelName = kindClassifier.activeModel;
     if (!modelName)
-      return kindClassifier.modelInfoDict["base-model"].preprocessSettings
+      return kindClassifier.modelInfoDict[BASE_MODEL_NAME].preprocessSettings
         .trainingPercentage;
     return kindClassifier.modelInfoDict[modelName].preprocessSettings
       .trainingPercentage;

@@ -2,6 +2,8 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import type { RootState } from "store/rootReducer";
 
+import { BASE_MODEL_NAME } from "./constants";
+
 import type {
   ClassifierState,
   KindClassifier,
@@ -64,7 +66,7 @@ export const selectNewModelArch = createSelector(selectKindClassifier, (kc) => {
 });
 export const selectModelInfo = createSelector(selectKindClassifier, (kc) => {
   if (!kc) return;
-  const modelName = kc.activeModel ?? "base-model";
+  const modelName = kc.activeModel ?? BASE_MODEL_NAME;
   return kc.modelInfoDict[modelName];
 });
 export const selectRunsForActiveModel = createSelector(

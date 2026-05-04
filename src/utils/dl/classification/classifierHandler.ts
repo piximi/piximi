@@ -1,13 +1,19 @@
 import JSZip from "jszip";
-import { SequentialClassifier } from "./AbstractClassifier";
+
+import type { Category } from "store/dataV2/types";
+
+import { logger, parseError } from "utils/logUtils";
+import { recursiveAssign } from "utils/objectUtils";
+import { getUniqueName } from "utils/stringUtils";
+import type { RequireOnly } from "utils/types";
+
 import { RemoteClassifier, UploadedClassifier } from "./UploadedClassifier";
 import { MobileNet } from "./MobileNet";
 import { SimpleCNN } from "./SimpleCNN";
-import { logger, parseError } from "utils/logUtils";
-import { recursiveAssign } from "utils/objectUtils";
 import { ModelTask } from "../enums";
-import { getUniqueName } from "utils/stringUtils";
-import {
+
+import type { SequentialClassifier } from "./AbstractClassifier";
+import type {
   ExtractedModelFileMap,
   FitOptions,
   InferenceInput,
@@ -15,8 +21,6 @@ import {
   TrainingCallbacks,
   TrainingInput,
 } from "../types";
-import type { RequireOnly } from "utils/types";
-import type { Category } from "store/dataV2/types";
 
 export type ModelUploadResults = {
   loadedModels: SequentialClassifier[];

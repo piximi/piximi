@@ -1,9 +1,9 @@
 import { createSimpleCNN } from "./loadSimpleCNN";
 import { createCompileArgs } from "../../utils";
 import { SequentialClassifier } from "../AbstractClassifier/AbstractClassifier";
-
-import { LoadModelArgs } from "../../types";
 import { ModelTask } from "../../enums";
+
+import type { LoadModelArgs } from "../../types";
 
 export class SimpleCNN extends SequentialClassifier {
   constructor(name?: string) {

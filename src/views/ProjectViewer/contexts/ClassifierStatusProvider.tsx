@@ -25,7 +25,7 @@ import {
   selectProjectImageChannels,
   selectActiveClassifierModelTarget,
 } from "@ProjectViewer/state/selectors";
-import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
+import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { useParameterizedSelector } from "store/hooks";
 
 import { getDifferences } from "utils/arrayUtils";

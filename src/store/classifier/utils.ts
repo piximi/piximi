@@ -1,26 +1,16 @@
 import type { Kind } from "store/data/types";
 
-import type { KindClassifier, KindClassifierDict, ModelInfo } from "./types";
+import { BASE_MODEL_NAME } from "./constants";
+
+import type { KindClassifierDict, ModelInfo } from "./types";
 
 export function getSelectedModelInfo(
-  kindClassifierDictOrItem: KindClassifier,
-): ModelInfo;
-export function getSelectedModelInfo(
-  kindClassifierDictOrItem: KindClassifierDict,
-  kindId: Kind["id"],
-): ModelInfo;
-export function getSelectedModelInfo(
-  kindClassifiersDictOrItem: KindClassifierDict | KindClassifier,
+  kindClassifiersDict: KindClassifierDict,
   kindId?: Kind["id"],
 ): ModelInfo {
-  let classifier: KindClassifier;
-  if (!("modelNameOrArch" in kindClassifiersDictOrItem))
-    classifier = (kindClassifiersDictOrItem as KindClassifierDict)[kindId!];
-  else {
-    classifier = kindClassifiersDictOrItem as KindClassifier;
-  }
-  const selectedModelName = kindClassifiersDictOrItem.activeModel;
-  if (typeof selectedModelName === "string")
-    return classifier.modelInfoDict[selectedModelName];
-  return classifier.modelInfoDict["base-model"];
+  const classifier = kindClassifiersDict[kindId!];
+
+  const activeModel = classifier.activeModel;
+  if (activeModel) return classifier.modelInfoDict[activeModel];
+  return classifier.modelInfoDict[BASE_MODEL_NAME];
 }

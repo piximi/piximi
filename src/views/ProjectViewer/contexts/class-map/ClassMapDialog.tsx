@@ -22,11 +22,12 @@ import { StyledSelect } from "components/inputs/StyledSelect";
 
 import type { Category } from "store/dataV2/types";
 import { generateCategory } from "store/dataV2/utils";
-import { CATEGORY_COLORS, IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
+import { CATEGORY_COLORS } from "store/dataV2/constants";
 import { dataSliceV2 } from "store/dataV2";
 import { selectAvaliableCategoryColors } from "@ProjectViewer/state/reselectors";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import type { ModelClassMap } from "store/classifier/types";
+import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
 import { getRandomInt } from "utils/dataUtils";
 import { isObjectEmpty } from "utils/objectUtils";

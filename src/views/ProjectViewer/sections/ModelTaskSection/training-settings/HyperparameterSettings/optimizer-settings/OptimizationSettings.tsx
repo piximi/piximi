@@ -23,6 +23,7 @@ import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selector
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
+import { BASE_MODEL_NAME } from "store/classifier/constants";
 
 import { enumKeys } from "utils/objectUtils";
 import { LossFunction, OptimizationAlgorithm } from "utils/dl/enums";
@@ -47,7 +48,7 @@ export const OptimizationSettings = () => {
   const compileOptions = useMemo(() => {
     const modelName = kindClassifier.activeModel;
     if (!modelName)
-      return kindClassifier.modelInfoDict["base-model"].optimizerSettings;
+      return kindClassifier.modelInfoDict[BASE_MODEL_NAME].optimizerSettings;
     return kindClassifier.modelInfoDict[modelName].optimizerSettings;
   }, [kindClassifier]);
 

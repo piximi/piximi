@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
+import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
 import type {
   AnnotationGridState,

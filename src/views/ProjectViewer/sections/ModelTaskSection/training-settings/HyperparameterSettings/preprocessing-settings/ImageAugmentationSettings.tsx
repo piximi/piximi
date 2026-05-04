@@ -26,6 +26,7 @@ import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
+import { BASE_MODEL_NAME } from "store/classifier/constants";
 
 import { enumKeys } from "utils/objectUtils";
 import { CropSchema } from "utils/dl/enums";
@@ -49,7 +50,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
   const inputShape = useMemo(() => {
     const modelName = kindClassifier.activeModel;
     if (!modelName)
-      return kindClassifier.modelInfoDict["base-model"].preprocessSettings
+      return kindClassifier.modelInfoDict[BASE_MODEL_NAME].preprocessSettings
         .inputShape;
     return kindClassifier.modelInfoDict[modelName].preprocessSettings
       .inputShape;
@@ -193,7 +194,7 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
   const cropOptions = useMemo(() => {
     const modelName = kindClassifier.activeModel;
     if (!modelName)
-      return kindClassifier.modelInfoDict["base-model"].preprocessSettings
+      return kindClassifier.modelInfoDict[BASE_MODEL_NAME].preprocessSettings
         .cropOptions;
     return kindClassifier.modelInfoDict[modelName].preprocessSettings
       .cropOptions;
@@ -299,7 +300,7 @@ export const ImageAugmentationSettings = () => {
   const normalizeOptions = useMemo(() => {
     const modelName = kindClassifier.activeModel;
     if (!modelName)
-      return kindClassifier.modelInfoDict["base-model"].preprocessSettings
+      return kindClassifier.modelInfoDict[BASE_MODEL_NAME].preprocessSettings
         .normalizeOptions;
     return kindClassifier.modelInfoDict[modelName].preprocessSettings
       .normalizeOptions;

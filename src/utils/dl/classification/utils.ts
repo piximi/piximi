@@ -1,8 +1,10 @@
 import { shuffle, take, takeRight } from "lodash";
 
 import { isUnknownCategory } from "store/data/utils";
-import { logger } from "utils/logUtils";
+import type { Category } from "store/dataV2/types";
+import type { ModelInfo } from "store/classifier/types";
 
+import { logger } from "utils/logUtils";
 import {
   CropSchema,
   LossFunction,
@@ -10,19 +12,20 @@ import {
   OptimizationAlgorithm,
   Partition,
 } from "utils/dl/enums";
-import {
+import type {
   FitOptions,
   OptimizerSettings,
   PreprocessSettings,
   TrainingCallbacks,
   TrainingInput,
 } from "utils/dl/types";
-import { SequentialClassifier } from "./AbstractClassifier";
+import { representsUnknown } from "utils/stringUtils";
+
 import { SimpleCNN } from "./SimpleCNN";
 import { MobileNet } from "./MobileNet";
-import { representsUnknown } from "utils/stringUtils";
-import type { Category } from "store/dataV2/types";
-import { ModelInfo } from "store/classifier/types";
+
+import type { Logs } from "@tensorflow/tfjs";
+import type { SequentialClassifier } from "./AbstractClassifier";
 
 export const getDefaultModelParams = (): Pick<
   ModelInfo,
@@ -212,26 +215,17 @@ export const prepareModel = async (
 
 export const trainModel = async (
   model: SequentialClassifier,
-  onEpochEnd: TrainingCallbacks["onEpochEnd"] | undefined,
+  onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (
+    epoch: number,
+    logs?: Logs,
+  ) => {
+    logger(`Epcoch: ${epoch}`);
+    logger(logs);
+  },
   fitOptions: FitOptions,
 ) => {
-  try {
-    if (!onEpochEnd) {
-      if (import.meta.env.NODE_ENV !== "production") {
-        console.warn("Epoch end callback not provided");
-      }
-      onEpochEnd = async (epoch: number, logs: any) => {
-        logger(`Epcoch: ${epoch}`);
-        logger(logs);
-      };
-    }
-    const history = await model.train(fitOptions, { onEpochEnd });
-    import.meta.env.NODE_ENV !== "production" &&
-      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-      logger(history);
-  } catch (error) {
-    throw new Error("Error training the model", { cause: error as Error });
-
-    return;
-  }
+  const history = await model.train(fitOptions, { onEpochEnd });
+  import.meta.env.NODE_ENV !== "production" &&
+    import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+    logger(history);
 };

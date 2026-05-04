@@ -1,5 +1,7 @@
-import { CallbackList } from "@tensorflow/tfjs";
-import {
+import type { Kind, Shape } from "store/data/types";
+import type { BBox, ExtendedChannel } from "store/dataV2/types";
+
+import type {
   CropSchema,
   LossFunction,
   Metric,
@@ -7,8 +9,7 @@ import {
   OptimizationAlgorithm,
   Partition,
 } from "./enums";
-import { Kind, Shape } from "store/data/types";
-import { BBox, ExtendedChannel } from "store/dataV2/types";
+import type { Logs } from "@tensorflow/tfjs";
 
 export type TrainingInput = {
   id: string;
@@ -37,7 +38,7 @@ export type ModelArgs = {
   requiredChannels?: number;
 };
 export type TrainingCallbacks = {
-  onEpochEnd: CallbackList["onEpochEnd"];
+  onEpochEnd: (epoch: number, logs?: Logs) => Promise<void>;
 };
 
 export type NormalizeOptions = {
@@ -121,6 +122,12 @@ export type ModelHistory = {
     [key: string]: Array<number>;
   }>;
 };
+
+export type PredictionResult = {
+  categoryId: string;
+  maxProb: number;
+  softmax: number[];
+}[];
 
 export type ClassifierEvaluationResultType = {
   confusionMatrix: number[][];

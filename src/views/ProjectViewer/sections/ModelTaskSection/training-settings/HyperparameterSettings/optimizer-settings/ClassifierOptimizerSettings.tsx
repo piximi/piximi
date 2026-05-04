@@ -8,6 +8,7 @@ import { selectTotalActiveLabeledItems } from "@ProjectViewer/state/reselectors"
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
+import { BASE_MODEL_NAME } from "store/classifier/constants";
 
 import { logger } from "utils/logUtils";
 
@@ -24,13 +25,13 @@ export const ClassifierOptimizerSettings = () => {
   const fitOptions = useMemo(() => {
     const modelName = kindClassifier.activeModel;
     if (!modelName)
-      return kindClassifier.modelInfoDict["base-model"].optimizerSettings;
+      return kindClassifier.modelInfoDict[BASE_MODEL_NAME].optimizerSettings;
     return kindClassifier.modelInfoDict[modelName].optimizerSettings;
   }, [kindClassifier]);
   const trainingPercentage = useMemo(() => {
     const modelName = kindClassifier.activeModel;
     if (!modelName)
-      return kindClassifier.modelInfoDict["base-model"].preprocessSettings
+      return kindClassifier.modelInfoDict[BASE_MODEL_NAME].preprocessSettings
         .trainingPercentage;
     return kindClassifier.modelInfoDict[modelName].preprocessSettings
       .trainingPercentage;

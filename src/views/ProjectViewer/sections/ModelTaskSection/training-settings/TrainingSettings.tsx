@@ -13,6 +13,7 @@ import {
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
 import type { ModelInfo } from "store/classifier/types";
+import { BASE_MODEL_NAME } from "store/classifier/constants";
 
 import { HyperperameterSettings } from "./HyperparameterSettings";
 import { ModelPicker } from "./ModelPicker";
@@ -37,7 +38,7 @@ function ExportHyperparametersButton() {
   const hyperparameters = useMemo(() => {
     const modelName = kindClassifier.activeModel;
     let modelInfo: ModelInfo;
-    if (!modelName) modelInfo = kindClassifier.modelInfoDict["base-model"];
+    if (!modelName) modelInfo = kindClassifier.modelInfoDict[BASE_MODEL_NAME];
     else modelInfo = kindClassifier.modelInfoDict[modelName];
     return {
       preprocessSettings: modelInfo.preprocessSettings,

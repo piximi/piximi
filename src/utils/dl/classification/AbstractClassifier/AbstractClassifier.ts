@@ -1,35 +1,45 @@
 import {
+  tidy,
+  argMax,
+  oneHot,
+  math,
+  metrics,
+  zeros,
+  concat,
+} from "@tensorflow/tfjs";
+
+import type { Category } from "store/dataV2/types";
+import type { RunHistoryEpoch, RunStatus } from "store/classifier/types";
+
+import type { RequireOnly } from "utils/types";
+
+import { preprocessData } from "./preprocess";
+import { Model } from "../../Model";
+import { evaluateConfusionMatrix, getLayersModelSummary } from "../../utils";
+
+import type {
+  ClassifierEvaluationResultType,
+  FitOptions,
+  InferenceInput,
+  PredictionResult,
+  TrainingCallbacks,
+  TrainingInput,
+} from "../../types";
+import type {
+  GraphModel,
   LayersModel,
   Tensor,
   Tensor1D,
   Tensor2D,
   Tensor4D,
   data as tfdata,
-  History,
-  tidy,
-  argMax,
-  max,
-  oneHot,
-  math,
-  metrics,
-  zeros,
 } from "@tensorflow/tfjs";
 
-import { preprocessData } from "./preprocess";
-import { Model } from "../../Model";
-
-import {
-  ClassifierEvaluationResultType,
-  FitOptions,
-  InferenceInput,
-  TrainingCallbacks,
-  TrainingInput,
-} from "../../types";
-import { evaluateConfusionMatrix, getLayersModelSummary } from "../../utils";
-
-import { RequireOnly } from "utils/types";
-import { Category } from "store/dataV2/types";
-
+const isLayersModel = (
+  model: LayersModel | GraphModel,
+): model is LayersModel => {
+  return !("modelUrl" in model);
+};
 export abstract class SequentialClassifier extends Model {
   protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
@@ -87,10 +97,17 @@ export abstract class SequentialClassifier extends Model {
   public async train(
     options: FitOptions,
     callbacks: TrainingCallbacks,
-  ): Promise<History> {
+  ): Promise<{
+    history: RunHistoryEpoch[];
+    weightsRef: string;
+    finalEpoch: number;
+    status: RunStatus;
+  }> {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
+    if (!isLayersModel(this._model))
+      throw Error(`"${this.name}" Graph Model training not implemented`);
 
     if (!this._trainingDataset) {
       throw Error(`"${this.name}" Model's training data not loaded`);
@@ -104,27 +121,41 @@ export abstract class SequentialClassifier extends Model {
       throw Error(`"${this.name}" Model is not trainable`);
     }
 
-    if (!this.graph) {
-      const args = {
-        callbacks: [callbacks],
-        epochs: options.epochs,
+    this._currentFitHistory = [];
+    // Wrap the user's onEpochEnd to also feed _currentFitHistory
+    const userOnEpochEnd = callbacks.onEpochEnd;
+    const wrappedCallbacks: TrainingCallbacks = {
+      ...callbacks,
+      onEpochEnd: async (epoch, logs) => {
+        if (logs) this.recordEpoch(epoch, logs);
+        if (userOnEpochEnd) await userOnEpochEnd(epoch, logs);
+      },
+    };
+
+    let status: RunStatus = "completed";
+    try {
+      await this._model.fitDataset(this._trainingDataset, {
+        ...options,
+        callbacks: [wrappedCallbacks],
         validationData: this._validationDataset,
-      };
-      const history = await (this._model as LayersModel).fitDataset(
-        this._trainingDataset,
-        args,
-      );
-      this.appendHistory(history);
-      this.setPretrained();
-      return history;
-    } else {
-      throw Error(`"${this.name}" Graph Model training not implemented`);
+      });
+    } catch (err) {
+      status = this._model.stopTraining ? "stopped" : "failed";
+      if (status === "failed") throw err;
     }
+
+    this.setPretrained();
+    return {
+      history: [...this._currentFitHistory],
+      weightsRef: this.name,
+      finalEpoch: this._currentFitHistory.length,
+      status,
+    };
   }
 
   public async predict(
     categories: Array<RequireOnly<Category, "id">>,
-  ): Promise<{ categoryIds: string[]; probabilities: number[] }> {
+  ): Promise<PredictionResult> {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -135,43 +166,32 @@ export abstract class SequentialClassifier extends Model {
 
     // ref this._model because it may go undefined during async ops
     const model = this._model;
-
-    const inferredBatchTensors = await this._inferenceDataset
-      .map((items) => {
-        const batchProbs = model.predict(items.xs) as Tensor2D;
-        const batchPred = argMax(batchProbs, 1) as Tensor1D;
-        const batchMaxProb = max(batchProbs, 1) as Tensor1D;
-        batchProbs.dispose();
-
-        return {
-          preds: batchPred,
-          probs: batchMaxProb,
-        };
-      })
-      .toArray();
-
-    const inferredTensors = inferredBatchTensors.reduce((prev, curr) => {
-      const predRes = prev.preds.concat(curr.preds);
-      const probRes = prev.probs.concat(curr.probs);
-      prev.preds.dispose();
-      prev.probs.dispose();
-      curr.preds.dispose();
-      curr.probs.dispose();
-
-      return {
-        preds: predRes,
-        probs: probRes,
-      };
+    const allProbs: Tensor2D[] = [];
+    const allCategoryIdxs: number[] = [];
+    const allMaxProbs: number[] = [];
+    this._inferenceDataset!.forEachAsync(async (batch) => {
+      const batchProbs = model.predict(batch.xs) as Tensor2D;
+      const argmax = batchProbs.argMax(-1);
+      const max = batchProbs.max(-1);
+      allCategoryIdxs.push(...((await argmax.array()) as number[]));
+      allMaxProbs.push(...((await max.array()) as number[]));
+      allProbs.push(batchProbs);
+      argmax.dispose();
+      max.dispose();
     });
 
-    const predictions = await inferredTensors.preds.array();
-    const probabilities = await inferredTensors.probs.array();
-    const categoryIds = predictions.map((idx) => categories[idx].id);
+    const stackedProbs = concat(allProbs, 0) as Tensor2D;
+    const softmaxArr = (await stackedProbs.array()) as number[][];
+    allProbs.forEach((t) => t.dispose());
+    stackedProbs.dispose();
 
-    inferredTensors.preds.dispose();
-    inferredTensors.probs.dispose();
+    const itemPredictions = allCategoryIdxs.map((idx, i) => ({
+      categoryId: categories[idx].id,
+      maxProb: allMaxProbs[i],
+      softmax: softmaxArr[i],
+    }));
 
-    return { categoryIds, probabilities };
+    return itemPredictions;
   }
 
   public async evaluate(): Promise<ClassifierEvaluationResultType> {
@@ -297,11 +317,11 @@ export abstract class SequentialClassifier extends Model {
       throw Error("Model not loaded");
     }
 
-    if (this.graph) {
+    if (!isLayersModel(this._model)) {
       throw Error("Early stop not implemented for graph model");
     }
 
-    (this._model as LayersModel).stopTraining = true;
+    this._model.stopTraining = true;
   }
 
   public get modelLoaded() {
