@@ -15,10 +15,12 @@ import { DialogTransitionSlide } from "components/dialogs";
 
 import {
   selectActiveKnownCategories,
-  selectClassifierEvaluationResult,
   selectActiveClassifierModel,
 } from "@ProjectViewer/state/reselectors";
 import type { Category } from "store/dataV2/types";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import { selectModelEvaluationResults } from "store/classifier/selectors";
 
 import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
 import { ConfusionMatrix } from "./ConfusionMatrix";
@@ -33,9 +35,14 @@ export const EvaluateClassifierDialog = ({
   closeDialog,
   openedDialog,
 }: EvaluateClassifierDialogProps) => {
-  const evaluationResults = useSelector(selectClassifierEvaluationResult);
   const categories = useSelector(selectActiveKnownCategories);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const selectedModel = useSelector(selectActiveClassifierModel);
+  const evaluationResults = useParameterizedSelector(
+    selectModelEvaluationResults,
+    modelTarget.id,
+    selectedModel?.name ?? "",
+  );
   const [evalResult, setEvalResult] = useState(0);
 
   const handleEvalResultChange = (

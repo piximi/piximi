@@ -1,12 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { cloneDeep } from "lodash";
 
-import type {
-  ClassifierState,
-  KindClassifier,
-  ModelClassMap,
-  ModelInfo,
-} from "./types";
 import type { Shape } from "store/dataV2/types";
 import { IMAGE_CLASSIFIER_ID } from "store/dataV2/constants";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
@@ -18,6 +12,13 @@ import { recursiveAssign } from "utils/objectUtils";
 
 import { getSelectedModelInfo } from "./utils";
 
+import type {
+  ClassifierState,
+  KindClassifier,
+  ModelClassMap,
+  ModelInfo,
+  Run,
+} from "./types";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: ClassifierState = {
@@ -201,27 +202,86 @@ export const classifierSlice = createSlice({
         );
       }
     },
-    updateEvaluationResult(
-      state,
-      action: PayloadAction<{
-        evaluationResult: ClassifierEvaluationResultType;
-        kindId: string;
-      }>,
-    ) {
-      // const { evaluationResult, kindId } = action.payload;
-      // const selectedModel = state.kindClassifiers[kindId];
-      // selectedModel.modelInfoDict[
-      //   typeof selectedModel.modelNameOrArch === "string"
-      //     ? selectedModel.modelNameOrArch
-      //     : "base-model"
-      // ].evalResults.push(evaluationResult);
-    },
     updateShowClearPredictionsWarning(
       state,
       action: PayloadAction<{ showClearPredictionsWarning: boolean }>,
     ) {
       state.showClearPredictionsWarning =
         action.payload.showClearPredictionsWarning;
+    },
+    appendRun(
+      state,
+      action: PayloadAction<{ kindId: string; modelName: string; run: Run }>,
+    ) {
+      const { kindId, modelName, run } = action.payload;
+      const info = state.kindClassifiers[kindId]?.modelInfoDict[modelName];
+      if (!info) return;
+      info.runs.push(run);
+      info.status = "idle";
+    },
+    markModelStale(
+      state,
+      action: PayloadAction<{ kindId: string; modelName: string }>,
+    ) {
+      const info =
+        state.kindClassifiers[action.payload.kindId]?.modelInfoDict[
+          action.payload.modelName
+        ];
+      if (info) info.status = "stale";
+    },
+    markModelInvalid(
+      state,
+      action: PayloadAction<{ kindId: string; modelName: string }>,
+    ) {
+      const info =
+        state.kindClassifiers[action.payload.kindId]?.modelInfoDict[
+          action.payload.modelName
+        ];
+      if (info) info.status = "invalid";
+    },
+    clearModelStatus(
+      state,
+      action: PayloadAction<{ kindId: string; modelName: string }>,
+    ) {
+      const info =
+        state.kindClassifiers[action.payload.kindId]?.modelInfoDict[
+          action.payload.modelName
+        ];
+      if (info) info.status = "idle";
+    },
+    setConfidenceThreshold(
+      state,
+      action: PayloadAction<{
+        kindId: string;
+        modelName: string;
+        threshold: number;
+      }>,
+    ) {
+      const info =
+        state.kindClassifiers[action.payload.kindId]?.modelInfoDict[
+          action.payload.modelName
+        ];
+      if (info)
+        info.confidenceThreshold = Math.min(
+          1,
+          Math.max(0, action.payload.threshold),
+        );
+    },
+    recordEvalForRun(
+      state,
+      action: PayloadAction<{
+        kindId: string;
+        modelName: string;
+        runId: string;
+        evalResult: ClassifierEvaluationResultType;
+      }>,
+    ) {
+      const info =
+        state.kindClassifiers[action.payload.kindId]?.modelInfoDict[
+          action.payload.modelName
+        ];
+      const run = info?.runs.find((r) => r.id === action.payload.runId);
+      if (run) run.evalResults = action.payload.evalResult;
     },
   },
   extraReducers(builder) {
@@ -242,6 +302,60 @@ export const classifierSlice = createSlice({
       })
       .addCase(dataSliceV2.actions.deleteKind, (state, action) => {
         delete state.kindClassifiers[action.payload];
+      })
+      .addCase(dataSliceV2.actions.addCategory, (state, action) => {
+        const category = action.payload;
+        // For every model whose latest run's categorySetHash != current Kind's hash, set status = "stale".
+        // Hash is async — but we only have access to the *categoryId* delta here, not the new full set.
+        // Easier: just walk all models for the affected kindId and mark stale unconditionally.
+        // The full hash check happens at fit time when categoryDelta is computed against the parent run.
+        const kindId =
+          category.type === "image" ? IMAGE_CLASSIFIER_ID : category.kindId;
+        const kc = state.kindClassifiers[kindId];
+        if (!kc) return;
+        Object.values(kc.modelInfoDict).forEach((info) => {
+          if (info.runs.length > 0) info.status = "stale";
+        });
+      })
+      .addCase(dataSliceV2.actions.batchAddCategory, (state, action) => {
+        action.payload.forEach((category) => {
+          const kindId =
+            category.type === "image" ? IMAGE_CLASSIFIER_ID : category.kindId;
+          const kc = state.kindClassifiers[kindId];
+          if (!kc) return;
+          Object.values(kc.modelInfoDict).forEach((info) => {
+            if (info.runs.length > 0) info.status = "stale";
+          });
+        });
+      })
+      .addCase(dataSliceV2.actions.deleteCategory, (state, action) => {
+        const category = action.payload;
+        // For every model whose latest run's categorySetHash != current Kind's hash, set status = "stale".
+        // Hash is async — but we only have access to the *categoryId* delta here, not the new full set.
+        // Easier: just walk all models for the affected kindId and mark stale unconditionally.
+        // The full hash check happens at fit time when categoryDelta is computed against the parent run.
+        const kindId =
+          category.details.type === "image"
+            ? IMAGE_CLASSIFIER_ID
+            : category.details.kindId;
+        const kc = state.kindClassifiers[kindId];
+        if (!kc) return;
+        Object.values(kc.modelInfoDict).forEach((info) => {
+          if (info.runs.length > 0) info.status = "stale";
+        });
+      })
+      .addCase(dataSliceV2.actions.batchDeleteCategory, (state, action) => {
+        action.payload.forEach((category) => {
+          const kindId =
+            category.details.type === "image"
+              ? IMAGE_CLASSIFIER_ID
+              : category.details.kindId;
+          const kc = state.kindClassifiers[kindId];
+          if (!kc) return;
+          Object.values(kc.modelInfoDict).forEach((info) => {
+            if (info.runs.length > 0) info.status = "stale";
+          });
+        });
       });
   },
 });

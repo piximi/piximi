@@ -20,11 +20,12 @@ import {
 import { usePredictClassifier } from "@ProjectViewer/hooks/usePredictClassifier";
 import { useEvaluateClassifier } from "@ProjectViewer/hooks/useEvaluateClassifier";
 import {
-  selectClassifierEvaluationResult,
   selectActiveClassifierModel,
   selectTotalActiveUnlabeledItems,
 } from "@ProjectViewer/state/reselectors";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import { selectModelEvaluationResults } from "store/classifier/selectors";
 
 import { HotkeyContext } from "utils/enums";
 import { ModelStatus } from "utils/dl/enums";
@@ -41,7 +42,12 @@ import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
 export const ClassifierSection = () => {
   const [waitingForResults, setWaitingForResults] = useState(false);
   const selectedModel = useSelector(selectActiveClassifierModel);
-  const evaluationResults = useSelector(selectClassifierEvaluationResult);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const evaluationResults = useParameterizedSelector(
+    selectModelEvaluationResults,
+    modelTarget.id,
+    selectedModel?.name ?? "",
+  );
   const totalUnlabeledItems = useSelector(selectTotalActiveUnlabeledItems);
   const { modelStatus, error } = useClassifierStatus();
   const predictClassifier = usePredictClassifier();

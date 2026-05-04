@@ -1,22 +1,23 @@
-import { ModelCompileArgs, train, losses } from "@tensorflow/tfjs";
-
-import { Tensor3D } from "@tensorflow/tfjs";
+import { train, losses } from "@tensorflow/tfjs";
 import { random } from "lodash";
-import { LayersModel } from "@tensorflow/tfjs";
-import {
-  InferenceInput,
-  OptimizerSettings,
-  ModelLayerData,
-  TrainingInput,
-} from "./types";
-import { LossFunction, Metric, OptimizationAlgorithm } from "./enums";
-import { ShapeArray } from "store/data/types";
-import { Shape } from "store/data/types";
+
+import type { ShapeArray, Shape } from "store/data/types";
 import type {
   BBox,
   ExtendedAnnotationObject,
   ExtendedImageObject,
 } from "store/dataV2/types";
+import type { DatasetFingerprint } from "store/classifier/types";
+
+import { LossFunction, Metric, OptimizationAlgorithm } from "./enums";
+
+import type {
+  InferenceInput,
+  OptimizerSettings,
+  ModelLayerData,
+  TrainingInput,
+} from "./types";
+import type { ModelCompileArgs, Tensor3D, LayersModel } from "@tensorflow/tfjs";
 
 export const createCompileArgs = (options: OptimizerSettings) => {
   const loss = (): ModelCompileArgs["loss"] => {
@@ -290,3 +291,25 @@ export function toInferenceInput(
 ): InferenceInput {
   return toTrainingInput(item);
 }
+
+export async function hashIds(ids: string[]): Promise<string> {
+  const sorted = [...ids].sort();
+  const data = new TextEncoder().encode(sorted.join("\n"));
+  const buf = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+export async function fingerprintDataset(
+  trainIds: string[],
+  valIds: string[],
+): Promise<DatasetFingerprint> {
+  return {
+    trainIds: await hashIds(trainIds),
+    valIds: await hashIds(valIds),
+    count: trainIds.length + valIds.length,
+  };
+}
+
+export const hashCategorySet = hashIds; // semantic alias

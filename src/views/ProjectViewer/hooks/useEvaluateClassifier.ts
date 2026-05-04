@@ -10,6 +10,8 @@ import {
 } from "@ProjectViewer/state/reselectors";
 import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import { selectActiveRun } from "store/classifier/selectors";
 
 import { AlertType } from "utils/enums";
 import classifierHandler from "utils/dl/classification/classifierHandler";
@@ -26,6 +28,11 @@ export const useEvaluateClassifier = () => {
   const selectedModel = useSelector(selectActiveClassifierModel);
   const modelNameOrArch = useSelector(selectActiveClassifierModelNameOrArch);
   const handleError = useClassifierErrorHandler();
+  const currentRun = useParameterizedSelector(
+    selectActiveRun,
+    modelTarget.id,
+    "" + modelNameOrArch,
+  );
   const evaluateClassifier = async () => {
     if (typeof modelNameOrArch !== "string" || !selectedModel) return;
     const modelName = modelNameOrArch;
@@ -53,11 +60,13 @@ export const useEvaluateClassifier = () => {
     } else {
       setModelStatus(ModelStatus.Evaluating);
       try {
-        const evaluationResult = await classifierHandler.evaluate(modelName);
+        const evalResult = await classifierHandler.evaluate(modelName);
         dispatch(
-          classifierSlice.actions.updateEvaluationResult({
-            evaluationResult,
+          classifierSlice.actions.recordEvalForRun({
+            evalResult,
             kindId: modelTarget.id,
+            runId: currentRun.id,
+            modelName: selectedModel.name,
           }),
         );
       } catch (error) {

@@ -18,7 +18,6 @@ import { isFiltered } from "utils/arrayUtils";
 import classifierHandler from "utils/dl/classification/classifierHandler";
 import type { Partition } from "utils/dl/enums";
 import type {
-  ClassifierEvaluationResultType,
   CropOptions,
   FitOptions,
   NormalizeOptions,
@@ -278,13 +277,6 @@ export const selectClassifierInputShape = createSelector(
   selectClassifierModelInfo,
   (modelInfo): Shape => {
     return modelInfo.preprocessSettings.inputShape;
-  },
-);
-
-export const selectClassifierEvaluationResult = createSelector(
-  selectClassifierModelInfo,
-  (modelInfo): ClassifierEvaluationResultType[] => {
-    return [];
   },
 );
 
