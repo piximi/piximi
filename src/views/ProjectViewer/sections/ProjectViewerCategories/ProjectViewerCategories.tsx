@@ -77,7 +77,12 @@ export const ProjectViewerCategories = () => {
     );
   };
   const deleteCategory = (category: Category) => {
-    dispatch(dataSliceV2.actions.deleteCategory(category.id));
+    dispatch(
+      dataSliceV2.actions.deleteCategory({
+        id: category.id,
+        details: categoryOptions,
+      }),
+    );
   };
   const deleteObjects = (category: Category) => {
     dispatch(dataSliceV2.actions.deleteEntitiesByCatId(category.id));
@@ -97,7 +102,9 @@ export const ProjectViewerCategories = () => {
   };
   const handleRemoveAllCategories = () => {
     dispatch(
-      dataSliceV2.actions.batchDeleteCategory(categories.map((c) => c.id)),
+      dataSliceV2.actions.batchDeleteCategory(
+        categories.map((c) => ({ id: c.id, details: categoryOptions })),
+      ),
     );
   };
 

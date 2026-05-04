@@ -924,37 +924,50 @@ export const dataSliceV2 = createSlice({
       cascadeDeleteKind(state, kind);
       kindAdapter.removeOne(state.kinds, kind.id);
     },
-    deleteCategory(state, action: PayloadAction<string>) {
-      const catId = action.payload;
+    deleteCategory(
+      state,
+      action: PayloadAction<{
+        id: string;
+        details: { type: "image" } | { type: "annotation"; kindId: string };
+      }>,
+    ) {
+      const catId = action.payload.id;
       const category = state.categories.entities[catId];
       // unknown category is protected — it cannot be deleted
-      if (!category || catId === UNKNOWN_IMAGE_CATEGORY_ID) return;
+      if (!category || representsUnknown(catId)) return;
       if (category.type === "image") {
         cascadeDeleteImageCategory(state, catId);
         categoryAdapter.removeOne(state.categories, catId);
         return;
       }
       const kind = state.kinds.entities[category.kindId];
-      // unknown category for a kind is protected — it cannot be deleted
-      if (!kind || catId === kind.unknownCategoryId) return;
+      if (!kind) return;
 
       // reassign all annotation volumes in this category to the kind's unknown category
       cascadeDeleteAnnotationCategory(state, catId, kind.unknownCategoryId);
       categoryAdapter.removeOne(state.categories, catId);
     },
-    batchDeleteCategory(state, action: PayloadAction<string[]>) {
-      action.payload.forEach((catId) => {
+    batchDeleteCategory(
+      state,
+      action: PayloadAction<
+        {
+          id: string;
+          details: { type: "image" } | { type: "annotation"; kindId: string };
+        }[]
+      >,
+    ) {
+      action.payload.forEach((cat) => {
+        const catId = cat.id;
         const category = state.categories.entities[catId];
         // unknown category is protected — it cannot be deleted
-        if (!category || catId === UNKNOWN_IMAGE_CATEGORY_ID) return;
-        if (category.type === "image") {
+        if (!category || representsUnknown(catId)) return;
+        if (cat.details.type === "image") {
           cascadeDeleteImageCategory(state, catId);
           categoryAdapter.removeOne(state.categories, catId);
           return;
         }
-        const kind = state.kinds.entities[category.kindId];
-        // unknown category for a kind is protected — it cannot be deleted
-        if (!kind || catId === kind.unknownCategoryId) return;
+        const kind = state.kinds.entities[cat.details.kindId];
+        if (!kind) return;
 
         // reassign all annotation volumes in this category to the kind's unknown category
         cascadeDeleteAnnotationCategory(state, catId, kind.unknownCategoryId);
