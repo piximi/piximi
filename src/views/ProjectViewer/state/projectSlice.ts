@@ -283,10 +283,16 @@ export const projectSlice = createSlice({
         },
       )
       .addCase(dataSliceV2.actions.deleteCategory, (state, action) => {
-        const catId = action.payload;
-        const handled = handleImageCategoryDelete(state, catId);
-        if (handled) return;
-        handleAnnCategoryDelete(state, catId);
+        const { id, details } = action.payload;
+        let filters: string[];
+        if (details.type === "image") {
+          filters = state.imageGridState.filters.categoryId;
+        } else {
+          filters =
+            state.annotationGridState.kindStates[details.kindId].filters
+              .categoryId;
+        }
+        mutatingFilter(filters, (_id) => _id !== id);
       });
   },
 });
