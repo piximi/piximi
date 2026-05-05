@@ -11,6 +11,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import {
+  selectAllCreatedModelNames,
   selectKindClassifier,
   selectShowClearPredictionsWarning,
 } from "store/classifier/selectors";
@@ -30,7 +31,7 @@ import { useParameterizedSelector } from "store/hooks";
 
 import { getDifferences } from "utils/arrayUtils";
 import { ModelStatus, Partition } from "utils/dl/enums";
-import { representsUnknown } from "utils/stringUtils";
+import { findReplicateName, representsUnknown } from "utils/stringUtils";
 import classifierHandler from "utils/dl/classification/classifierHandler";
 
 export enum ErrorReason {
@@ -38,6 +39,7 @@ export enum ErrorReason {
   NoLabeledImages,
   ExistingPredictions,
   ChannelMismatch,
+  DuplicateModelName,
 }
 
 export type ErrorContext = {
@@ -53,6 +55,7 @@ const ClassifierStatusContext = createContext<{
   setModelStatus: (status: ModelStatus) => void;
   shouldWarnClearPredictions: boolean;
   error?: ErrorContext;
+  activeErrors: ErrorContext[];
   newModelName: string;
   setNewModelName: React.Dispatch<React.SetStateAction<string>>;
   clearPredictions: () => void;
@@ -67,6 +70,7 @@ const ClassifierStatusContext = createContext<{
   setNewModelName: (_value: React.SetStateAction<string>) => {},
   clearPredictions: () => {},
   acceptPredictions: () => {},
+  activeErrors: [],
 });
 
 export const ClassifierStatusProvider = ({
@@ -94,7 +98,9 @@ export const ClassifierStatusProvider = ({
 
   const [isReady, setIsReady] = useState(true);
   const [newModelName, setNewModelName] = useState("");
+  const restrictedClassifierNames = useSelector(selectAllCreatedModelNames);
   const [error, setError] = useState<ErrorContext>();
+  const [activeErrors, setActiveErrors] = useState<ErrorContext[]>([]);
   const [modelStatusDict, setModelStatusDict] = useState<
     Record<string, ModelStatus>
   >({ [IMAGE_CLASSIFIER_ID]: ModelStatus.Idle });
@@ -225,6 +231,14 @@ export const ClassifierStatusProvider = ({
         severity: 2,
       });
     }
+    if (findReplicateName(newModelName, restrictedClassifierNames)) {
+      newIsReady = false;
+      newErrors.push({
+        reason: ErrorReason.DuplicateModelName,
+        message: `A model with the name ${newModelName} already exists`,
+        severity: 1,
+      });
+    }
 
     const mostSevere: undefined | ErrorContext =
       newErrors.length === 0
@@ -234,7 +248,16 @@ export const ClassifierStatusProvider = ({
           );
     setIsReady(newIsReady);
     setError(mostSevere);
-  }, [model, trainable, noLabeledThings, projectChannels, modelTarget]);
+    setActiveErrors(newErrors);
+  }, [
+    model,
+    trainable,
+    noLabeledThings,
+    projectChannels,
+    modelTarget,
+    newModelName,
+    restrictedClassifierNames,
+  ]);
 
   return (
     <ClassifierStatusContext.Provider
@@ -249,6 +272,7 @@ export const ClassifierStatusProvider = ({
         setNewModelName,
         clearPredictions,
         acceptPredictions,
+        activeErrors,
       }}
     >
       {children}

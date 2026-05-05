@@ -12,7 +12,13 @@ export const pluralize = (word: string, count: number) => {
  * @param existingNames - The collection of existing names
  * @param formatter - The formatter to use for the new name
  */
-
+export const findReplicateName = (
+  candidateName: string,
+  restrictedNames: Array<string>,
+): RegExpMatchArray | null => {
+  const restricted = restrictedNames.join(", ");
+  return restricted.match(new RegExp(candidateName, "g"));
+};
 export const getUniqueName = (
   name: string,
   existingNames: Array<string>,

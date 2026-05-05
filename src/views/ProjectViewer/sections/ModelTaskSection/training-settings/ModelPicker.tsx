@@ -18,7 +18,10 @@ import { TextFieldWithBlur } from "components/inputs/TextFieldWithBlur";
 import { WithLabel } from "components/inputs";
 
 import { classifierSlice } from "store/classifier";
-import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import {
+  ErrorReason,
+  useClassifierStatus,
+} from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
@@ -29,6 +32,7 @@ import type { ModelArch } from "store/classifier/types";
 
 import classifierHandler from "utils/dl/classification/classifierHandler";
 import type { SequentialClassifier } from "utils/dl/classification";
+import { findReplicateName } from "utils/stringUtils";
 
 export const ModelPicker = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
@@ -75,10 +79,11 @@ const ModelArchiitectureOptions = ({
   modelTargetName: string;
 }) => {
   const dispatch = useDispatch();
-  const availableClassifierNames = useSelector(selectAllCreatedModelNames);
+  const restrictedClassifierNames = useSelector(selectAllCreatedModelNames);
 
-  const [userHasUpdated, setUsrHasUpdated] = useState(false);
-  const { setNewModelName: setConfirmedName } = useClassifierStatus();
+  const [userHasUpdated, setUserHasUpdated] = useState(false);
+  const { setNewModelName: setConfirmedName, activeErrors } =
+    useClassifierStatus();
   const [modelName, setModelName] = useState("");
 
   const handleArchitectureChange = (event: SelectChangeEvent<unknown>) => {
@@ -94,7 +99,8 @@ const ModelArchiitectureOptions = ({
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const value = event.target.value;
-    if (!userHasUpdated) setUsrHasUpdated(true);
+
+    if (!userHasUpdated) setUserHasUpdated(true);
     setModelName(value);
   };
 
@@ -105,8 +111,11 @@ const ModelArchiitectureOptions = ({
   useEffect(() => {
     if (userHasUpdated) return;
     const candidateName = `${modelTargetName}_${newModelArch === 0 ? "Simple-CNN" : "Mobilenet"}`;
-    const availabbleNames = availableClassifierNames.join(", ");
-    const replicates = availabbleNames.match(new RegExp(candidateName, "g"));
+
+    const replicates = findReplicateName(
+      candidateName,
+      restrictedClassifierNames,
+    );
 
     if (!replicates) {
       setModelName(candidateName);
@@ -115,7 +124,7 @@ const ModelArchiitectureOptions = ({
     }
     setModelName(candidateName + replicates.length);
     setConfirmedName(candidateName + replicates.length);
-  }, [userHasUpdated, availableClassifierNames, newModelArch]);
+  }, [userHasUpdated, restrictedClassifierNames, newModelArch]);
 
   return (
     <Stack direction="row" spacing={2} py={1} justifyContent="space-evenly">
@@ -159,6 +168,9 @@ const ModelArchiitectureOptions = ({
           value={modelName}
           fullWidth
           onBlur={handleConfirmName}
+          error={activeErrors.some(
+            (err) => err.reason === ErrorReason.DuplicateModelName,
+          )}
           sx={(theme) => ({
             input: {
               py: 0.5,
