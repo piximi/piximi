@@ -9,7 +9,7 @@ import {
 } from "@tensorflow/tfjs";
 
 import type { Category } from "store/dataV2/types";
-import type { RunHistoryEpoch, RunStatus } from "store/classifier/types";
+import type { RunStatus } from "store/classifier/types";
 
 import type { RequireOnly } from "utils/types";
 
@@ -24,6 +24,7 @@ import type {
   PredictionResult,
   TrainingCallbacks,
   TrainingInput,
+  TrainingResults,
 } from "../../types";
 import type {
   GraphModel,
@@ -97,12 +98,7 @@ export abstract class SequentialClassifier extends Model {
   public async train(
     options: FitOptions,
     callbacks: TrainingCallbacks,
-  ): Promise<{
-    history: RunHistoryEpoch[];
-    weightsRef: string;
-    finalEpoch: number;
-    status: RunStatus;
-  }> {
+  ): Promise<TrainingResults> {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -148,7 +144,6 @@ export abstract class SequentialClassifier extends Model {
     return {
       history: [...this._currentFitHistory],
       weightsRef: this.name,
-      finalEpoch: this._currentFitHistory.length,
       status,
     };
   }

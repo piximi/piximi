@@ -150,12 +150,22 @@ class ClassifierHandler {
     this.resolveModel(modelName).loadInference(items, categories);
   }
 
-  public fit(
+  public async train(
     modelName: string,
     options: FitOptions,
-    callbacks: TrainingCallbacks,
-  ) {
-    return this.resolveModel(modelName).train(options, callbacks);
+    callbacks: TrainingCallbacks = {
+      onEpochEnd: async (epoch: number, logs?: Logs) => {
+        logger(`Epcoch: ${epoch}`);
+        logger(logs);
+      },
+    },
+  ): Promise<TrainingResults> {
+    const result = await this.resolveModel(modelName).train(options, callbacks);
+    import.meta.env.NODE_ENV !== "production" &&
+      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+      logger(result.history);
+
+    return result;
   }
 
   public predict(modelName: string, categories: RequireOnly<Category, "id">[]) {
