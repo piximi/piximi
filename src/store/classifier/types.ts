@@ -38,7 +38,7 @@ export type Run = {
   finishedAt: string;
   status: RunStatus;
   trigger: RunTrigger;
-  seed: number;
+  seed?: number; // Determine how useful this is. seeds are only used during model creation afaik
   appVersion: string;
   tfjsVersion: string;
   backend: string;
@@ -48,7 +48,7 @@ export type Run = {
   categorySetHash: string;
   categoryDelta?: CategoryDelta;
   history: RunHistoryEpoch[];
-  evalResults: ClassifierEvaluationResultType; // moved off ModelInfo
+  evalResults?: ClassifierEvaluationResultType; // moved off ModelInfo
   weightsRef: string; // model name in classifierHandler
 };
 export type ModelClassMap = Record<number, string>;
