@@ -1,3 +1,5 @@
+import { BASE_MODEL_NAME } from "store/classifier/constants";
+
 import { v11_v2_GetDefaultModelInfo } from "../version-readers/common";
 
 import type {
@@ -60,7 +62,7 @@ const v02_11_classifierConverter = (
     kindClassifiers[kindId] = {
       modelNameOrArch: 0,
       modelInfoDict: {
-        BASE_MODEL_NAME: {
+        [BASE_MODEL_NAME]: {
           ...v11_v2_GetDefaultModelInfo(),
           preprocessSettings,
           optimizerSettings,
