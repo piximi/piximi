@@ -1,7 +1,7 @@
 import { io } from "@tensorflow/tfjs";
 
 import type { Shape } from "store/data/types";
-import type { RunHistoryEpoch, RunStatus } from "store/classifier/types";
+import type { RunHistoryEpoch } from "store/classifier/types";
 
 import type { ModelArgs, ModelLayerData, OptimizerSettings } from "../types";
 import type { CropSchema, ModelTask } from "../enums";
@@ -108,16 +108,7 @@ export abstract class Model {
   public abstract loadValidation(items: any[], preprocessingArgs: any): void;
   public abstract loadInference(items: any[], preprocessingArgs: any): void;
 
-  public abstract train(
-    options: any,
-    callbacks: any,
-    runContext: { seed: number; parentRunId?: string },
-  ): Promise<{
-    history: RunHistoryEpoch[];
-    weightsRef: string;
-    finalEpoch: number;
-    status: RunStatus;
-  }>;
+  public abstract train(options: any, callbacks: any): any;
   public abstract predict(options: any, callbacks: any): any;
   public abstract evaluate(): any;
 
