@@ -2,6 +2,8 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import type { RootState } from "store/rootReducer";
 
+import type { ClassifierEvaluationResultType } from "utils/dl/types";
+
 import { BASE_MODEL_NAME } from "./constants";
 
 import type {
@@ -29,9 +31,7 @@ export const selectKindClassifierDict = ({
 export const selectAllCreatedModelNames = createSelector(
   selectKindClassifierDict,
   (kcd): string[] =>
-    Object.values(kcd).flatMap((kc) =>
-      Object.keys(kc.modelInfoDict).filter((model) => model === "base_model"),
-    ),
+    Object.values(kcd).flatMap((kc) => Object.keys(kc.modelInfoDict)),
 );
 
 export const selectShowClearPredictionsWarning = ({
@@ -99,5 +99,12 @@ export const selectIsModelInvalid = createSelector(
 );
 export const selectModelEvaluationResults = createSelector(
   [selectRunsForActiveModel],
-  (runs) => runs.map((r) => r.evalResults),
+  (runs): ClassifierEvaluationResultType[] => {
+    const evalResults: ClassifierEvaluationResultType[] = [];
+    for (const run of runs) {
+      if (!run.evalResults) continue;
+      evalResults.push(run.evalResults);
+    }
+    return evalResults;
+  },
 );
