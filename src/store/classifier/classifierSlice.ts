@@ -318,7 +318,7 @@ export const classifierSlice = createSlice({
         const kc = state.kindClassifiers[kindId];
         if (!kc) return;
         Object.values(kc.modelInfoDict).forEach((info) => {
-          if (info.runs.length > 0) info.status = "stale";
+          if (info.runs.length > 0) info.status = "invalid";
         });
       })
       .addCase(dataSliceV2.actions.batchAddCategory, (state, action) => {
@@ -328,7 +328,7 @@ export const classifierSlice = createSlice({
           const kc = state.kindClassifiers[kindId];
           if (!kc) return;
           Object.values(kc.modelInfoDict).forEach((info) => {
-            if (info.runs.length > 0) info.status = "stale";
+            if (info.runs.length > 0) info.status = "invalid";
           });
         });
       })
@@ -345,7 +345,7 @@ export const classifierSlice = createSlice({
         const kc = state.kindClassifiers[kindId];
         if (!kc) return;
         Object.values(kc.modelInfoDict).forEach((info) => {
-          if (info.runs.length > 0) info.status = "stale";
+          if (info.runs.length > 0) info.status = "invalid";
         });
       })
       .addCase(dataSliceV2.actions.batchDeleteCategory, (state, action) => {
@@ -357,7 +357,7 @@ export const classifierSlice = createSlice({
           const kc = state.kindClassifiers[kindId];
           if (!kc) return;
           Object.values(kc.modelInfoDict).forEach((info) => {
-            if (info.runs.length > 0) info.status = "stale";
+            if (info.runs.length > 0) info.status = "invalid";
           });
         });
       });
