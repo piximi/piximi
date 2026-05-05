@@ -12,14 +12,18 @@ import { MobileNet } from "./MobileNet";
 import { SimpleCNN } from "./SimpleCNN";
 import { ModelTask } from "../enums";
 
+import type { Logs } from "@tensorflow/tfjs";
 import type { SequentialClassifier } from "./AbstractClassifier";
 import type {
   ExtractedModelFileMap,
   FitOptions,
   InferenceInput,
+  OptimizerSettings,
+  PreprocessSettings,
   SerializedModels,
   TrainingCallbacks,
   TrainingInput,
+  TrainingResults,
 } from "../types";
 
 export type ModelUploadResults = {
@@ -140,6 +144,66 @@ class ClassifierHandler {
     categories: RequireOnly<Category, "id">[],
   ) {
     this.resolveModel(modelName).loadValidation(items, categories);
+  }
+
+  public loadData(
+    modelName: string,
+    trainingData: TrainingInput[],
+    validationData: TrainingInput[],
+    categories: RequireOnly<Category, "id">[],
+  ) {
+    const model = this.resolveModel(modelName);
+    model.loadTraining(trainingData, categories);
+    model.loadValidation(validationData, categories);
+  }
+  public async prepareModel(
+    modelName: string,
+    trainingData: TrainingInput[],
+    validationData: TrainingInput[],
+    numClasses: number,
+    categories: Category[],
+    preprocessSettings: PreprocessSettings,
+    optimizerSettings: OptimizerSettings,
+  ) {
+    const model = this.resolveModel(modelName);
+
+    /* LOAD CLASSIFIER MODEL */
+    try {
+      if (model instanceof SimpleCNN) {
+        (model as SimpleCNN).loadModel({
+          inputShape: preprocessSettings.inputShape,
+          numClasses,
+          randomizeWeights: preprocessSettings.shuffle,
+          compileOptions: optimizerSettings,
+          preprocessOptions: preprocessSettings,
+        });
+      } else if (model instanceof MobileNet) {
+        await (model as MobileNet).loadModel({
+          inputShape: preprocessSettings.inputShape,
+          numClasses,
+          compileOptions: optimizerSettings,
+          preprocessOptions: preprocessSettings,
+          freeze: false,
+          useCustomTopLayer: true,
+        });
+      } else {
+        import.meta.env.NODE_ENV !== "production" &&
+          import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+          console.warn("Unhandled architecture", model.name);
+        return;
+      }
+    } catch (error) {
+      throw new Error("Failed to create tensorflow model", {
+        cause: error as Error,
+      });
+    }
+    try {
+      model.classes = categories.map((cat) => cat.name);
+      model.loadTraining(trainingData, categories);
+      model.loadValidation(validationData, categories);
+    } catch (error) {
+      throw new Error("Error in preprocessing", { cause: error as Error });
+    }
   }
 
   public loadInference(

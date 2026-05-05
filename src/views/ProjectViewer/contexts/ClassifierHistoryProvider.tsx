@@ -13,7 +13,10 @@ import { useSelector } from "react-redux";
 import type { RunHistoryEpoch } from "store/classifier/types";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { selectKindClassifier } from "store/classifier/selectors";
+import {
+  selectKindClassifier,
+  selectRunsForActiveModel,
+} from "store/classifier/selectors";
 
 import { logger } from "utils/logUtils";
 import type { Points } from "utils/types";
@@ -26,14 +29,33 @@ type HistoryData = {
   loss: Points;
   val_loss: Points;
 };
+type RawHistoryData = {
+  categoricalAccuracy: number[];
+  val_categoricalAccuracy: number[];
+  loss: number[];
+  val_loss: number[];
+};
 
-const initialModelHistory = () => ({
+const initialModelHistory = (): HistoryData => ({
   categoricalAccuracy: [],
   val_categoricalAccuracy: [],
   loss: [],
   val_loss: [],
 });
-
+const initialRawHistory = (): RawHistoryData => ({
+  categoricalAccuracy: [],
+  val_categoricalAccuracy: [],
+  loss: [],
+  val_loss: [],
+});
+type RunHistoryKey = keyof Omit<RunHistoryEpoch, "epoch">;
+type HistoryDataKey = keyof HistoryData;
+const keyLookup: Record<RunHistoryKey, HistoryDataKey> = {
+  accuracy: "categoricalAccuracy",
+  valAccuracy: "val_categoricalAccuracy",
+  loss: "loss",
+  valLoss: "val_loss",
+};
 const generatePlotData = (rawData: number[], dataMetric: keyof HistoryData) => {
   const offset = dataMetric.includes("val_") ? 0.5 : 1;
   return rawData.map((y, i) => ({ x: i + offset, y }));
@@ -76,6 +98,10 @@ export const ClassifierHistoryProvider = ({
     selectKindClassifier,
     modelTarget.id,
   );
+  const previousRuns = useParameterizedSelector(
+    selectRunsForActiveModel,
+    modelTarget.id,
+  );
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
   const [totalEpochs, setTotalEpochs] = useState<number>(0);
   const [modelHistory, setModelHistory] = useState<HistoryData>(
@@ -96,30 +122,39 @@ export const ClassifierHistoryProvider = ({
       setTotalEpochs(0);
       return;
     }
-    const fullHistory = model.currentFitHistory;
-    const data = fullHistory.reduce(
-      (data: HistoryData, epoch) => {
+    let totalEpochs = 0;
+    const rawHistory: RawHistoryData = initialRawHistory();
+    const fullHistory = initialModelHistory();
+
+    for (const run of previousRuns) {
+      const runHistoryData: RawHistoryData = initialRawHistory();
+      const runHistory = run.history;
+      for (const epoch of runHistory) {
         for (const key in epoch) {
-          const cycleData = epoch[key as keyof RunHistoryEpoch];
+          if (key === "epoch") continue;
+          const runKey = key as RunHistoryKey;
+          const cycleData = epoch[runKey];
+          const dataKey = keyLookup[runKey];
 
-          data[key as keyof HistoryData].push(
-            ...generatePlotData([cycleData], key as keyof HistoryData),
-          );
+          runHistoryData[dataKey].push(cycleData);
         }
-        return data;
-      },
-      {
-        categoricalAccuracy: [],
-        val_categoricalAccuracy: [],
-        loss: [],
-        val_loss: [],
-      },
-    );
-    setModelHistory(data);
-    if (fullHistory.length > 1) {
-      setTotalEpochs(fullHistory.length);
+        totalEpochs++;
+      }
+      for (const k in rawHistory) {
+        const key = k as HistoryDataKey;
+        rawHistory[key].push(...runHistoryData[key]);
+      }
+    }
+    for (const k in rawHistory) {
+      const key = k as HistoryDataKey;
+      fullHistory[key].push(...generatePlotData(rawHistory[key], key));
+    }
 
-      setCurrentEpoch(fullHistory.length);
+    setModelHistory(fullHistory);
+    if (totalEpochs > 1) {
+      setTotalEpochs(totalEpochs);
+
+      setCurrentEpoch(totalEpochs);
     }
   }, [model]);
 
@@ -130,7 +165,7 @@ export const ClassifierHistoryProvider = ({
       if (!model) {
         nextEpoch = epoch + 1;
       } else {
-        nextEpoch = model.currentFitEpochCount + epoch + 1;
+        nextEpoch = currentEpoch + epoch + 1;
       }
       const trainingEpochIndicator = nextEpoch - 0.5;
 
