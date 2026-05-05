@@ -49,7 +49,7 @@ export type Run = {
   categoryDelta?: CategoryDelta;
   history: RunHistoryEpoch[];
   evalResults?: ClassifierEvaluationResultType; // moved off ModelInfo
-  weightsRef: string; // model name in classifierHandler
+  weightsRef: string; // model name in classifierHandler, currently no real use but reference snapshotted weights in the future
 };
 export type ModelClassMap = Record<number, string>;
 export type ModelInfo = {

@@ -42,7 +42,7 @@ import {
   hashCategorySet,
   toTrainingInput,
 } from "utils/dl/utils";
-import type { TrainingInput, TrainingResults } from "utils/dl/types";
+import type { TrainAndEvalResult, TrainingInput } from "utils/dl/types";
 import { getDifferences } from "utils/arrayUtils";
 
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
@@ -286,7 +286,7 @@ export const useFitClassifier = () => {
     isInit: boolean;
     startedAt: string;
     classMap: ModelClassMap;
-    trainingResults: TrainingResults;
+    trainingResults: TrainAndEvalResult;
   }) => {
     const datasetFingerprint = await fingerprintDataset(
       trainingData.map((d) => d.id),
@@ -332,7 +332,7 @@ export const useFitClassifier = () => {
       datasetFingerprint,
       categorySetHash,
       categoryDelta,
-      evalResults: undefined,
+      evalResults: trainingResults.evalResults,
       history: trainingResults.history,
       status: trainingResults.status,
       weightsRef: trainingResults.weightsRef,

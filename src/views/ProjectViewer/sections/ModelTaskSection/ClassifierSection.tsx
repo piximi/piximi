@@ -79,15 +79,17 @@ export const ClassifierSection = () => {
     if (!kindClassifier || !kindClassifier.activeModel) return;
     return classifierHandler.getModel(kindClassifier.activeModel);
   }, [kindClassifier?.activeModel]);
+
   const handleEvaluate = async () => {
     if (!model || !kindClassifier) return;
     const modelName = kindClassifier.activeModel;
     if (!modelName) return;
-    const modelRuns = kindClassifier.modelInfoDict[modelName]?.runs;
-    if (!modelRuns) return;
+    const currentRun = kindClassifier.modelInfoDict[modelName]?.runs.at(-1);
+    if (!currentRun) return;
 
-    if (model.currentFitHistory.length > modelRuns.length)
-      await evaluateClassifier();
+    // * Should always be false since evaluation is done automatically after each run
+    // * After proper snapshotting eval will be done manually on specific runs
+    if (!currentRun.evalResults) await evaluateClassifier();
 
     handleOpenEvaluateClassifierDialog();
   };

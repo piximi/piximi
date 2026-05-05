@@ -21,9 +21,9 @@ import type {
   OptimizerSettings,
   PreprocessSettings,
   SerializedModels,
+  TrainAndEvalResult,
   TrainingCallbacks,
   TrainingInput,
-  TrainingResults,
 } from "../types";
 
 export type ModelUploadResults = {
@@ -223,20 +223,29 @@ class ClassifierHandler {
         logger(logs);
       },
     },
-  ): Promise<TrainingResults> {
-    const result = await this.resolveModel(modelName).train(options, callbacks);
+  ): Promise<TrainAndEvalResult> {
+    const model = this.resolveModel(modelName);
+    const trainingResults = await model.train(options, callbacks);
     import.meta.env.NODE_ENV !== "production" &&
       import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-      logger(result.history);
+      logger(trainingResults.history);
 
-    return result;
+    /*
+     * Until runs get properly snapshotted, evaluate after each run
+     */
+    const evalResults = await model.evaluate();
+
+    return { ...trainingResults, evalResults };
   }
 
-  public predict(modelName: string, categories: RequireOnly<Category, "id">[]) {
+  public async predict(
+    modelName: string,
+    categories: RequireOnly<Category, "id">[],
+  ) {
     return this.resolveModel(modelName).predict(categories);
   }
 
-  public evaluate(modelName: string) {
+  public async evaluate(modelName: string) {
     return this.resolveModel(modelName).evaluate();
   }
   public async modelFromFiles(input: {

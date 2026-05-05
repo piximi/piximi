@@ -46,6 +46,9 @@ export type TrainingResults = {
   weightsRef: string;
   status: RunStatus;
 };
+export type TrainAndEvalResult = TrainingResults & {
+  evalResults: ClassifierEvaluationResultType;
+};
 
 export type NormalizeOptions = {
   normalize: boolean;
