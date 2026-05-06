@@ -25,7 +25,7 @@ import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusPro
 import { useParameterizedSelector } from "store/hooks";
 import { selectActiveModel, selectModelInfo } from "store/classifier/selectors";
 
-import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
+import { ModelSettingsTextField } from "../../../../ModelSettingsTextField";
 
 export const DataPartitioningSettings = () => {
   const dispatch = useDispatch();

@@ -17,7 +17,7 @@ import {
 } from "store/classifier/selectors";
 
 import TrainingPlots from "./TrainingPlots";
-import { TrainingSettings } from "../training-settings/TrainingSettings";
+import { TrainingSettings } from "./training-settings/TrainingSettings";
 import { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
 
 type FitClassifierDialogProps = {

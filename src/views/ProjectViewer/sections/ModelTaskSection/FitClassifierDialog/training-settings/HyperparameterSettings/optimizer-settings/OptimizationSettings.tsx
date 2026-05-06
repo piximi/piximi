@@ -27,7 +27,7 @@ import { selectActiveModel, selectModelInfo } from "store/classifier/selectors";
 import { enumKeys } from "utils/objectUtils";
 import { LossFunction, OptimizationAlgorithm } from "utils/dl/enums";
 
-import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
+import { ModelSettingsTextField } from "../../../../ModelSettingsTextField";
 
 export const OptimizationSettings = () => {
   const dispatch = useDispatch();
