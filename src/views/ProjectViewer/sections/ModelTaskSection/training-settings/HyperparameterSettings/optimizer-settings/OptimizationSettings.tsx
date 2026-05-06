@@ -58,7 +58,7 @@ export const OptimizationSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { optimizationAlgorithm },
-        kindId: modelTarget,
+        targetId: modelTarget,
       }),
     );
   };
@@ -68,7 +68,7 @@ export const OptimizationSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { lossFunction },
-        kindId: modelTarget,
+        targetId: modelTarget,
       }),
     );
   };
@@ -82,7 +82,7 @@ export const OptimizationSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { learningRate },
-        kindId: modelTarget,
+        targetId: modelTarget,
       }),
     );
   };

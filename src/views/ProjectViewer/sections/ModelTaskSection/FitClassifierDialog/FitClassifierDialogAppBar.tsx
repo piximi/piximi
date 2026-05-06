@@ -85,7 +85,7 @@ export const FitClassifierDialogAppBar = ({
 
     dispatch(
       classifierSlice.actions.setModelStatus({
-        kindId: modelTarget,
+        targetId: modelTarget,
         status: "idle",
       }),
     );

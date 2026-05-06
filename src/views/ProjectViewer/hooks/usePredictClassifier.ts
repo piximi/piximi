@@ -40,7 +40,7 @@ export const usePredictClassifier = () => {
 
   const predictClassifier = useCallback(async () => {
     if (!kindClassifier || !kindClassifier.activeModel) return;
-    const modelTargetId = kindClassifier.kindId;
+    const modelTargetId = kindClassifier.modelTargetId;
     const modelName = kindClassifier.activeModel;
     const model = classifierHandler.getModel(modelName);
     const modelInfo = kindClassifier.modelInfoDict[modelName];
@@ -67,7 +67,7 @@ export const usePredictClassifier = () => {
       classMap = setMapping;
       dispatch(
         classifierSlice.actions.addModelClassMapping({
-          kindId: modelTargetId,
+          targetId: modelTargetId,
           modelName,
           classMapping: classMap,
         }),
@@ -80,7 +80,7 @@ export const usePredictClassifier = () => {
 
     dispatch(
       classifierSlice.actions.setModelStatus({
-        kindId: kindClassifier.kindId,
+        targetId: kindClassifier.modelTargetId,
         status: "predicting",
       }),
     );
@@ -136,7 +136,7 @@ export const usePredictClassifier = () => {
     setPredictedProbabilities(probabilitiesById);
     dispatch(
       classifierSlice.actions.setModelStatus({
-        kindId: kindClassifier.kindId,
+        targetId: kindClassifier.modelTargetId,
         status: "waiting",
       }),
     );

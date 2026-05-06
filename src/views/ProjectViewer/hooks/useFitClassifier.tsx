@@ -102,10 +102,10 @@ export const useFitClassifier = () => {
 
   const dispatchPartition = useMemo(
     () =>
-      kindClassifier.kindId === IMAGE_CLASSIFIER_ID
+      kindClassifier.modelTargetId === IMAGE_CLASSIFIER_ID
         ? dataSliceV2.actions.batchUpdateImagePartition
         : dataSliceV2.actions.batchUpdateAnnotationPartition,
-    [kindClassifier.kindId],
+    [kindClassifier.modelTargetId],
   );
   const prepareInitialRun = async (
     kindClassifier: KindClassifier,
@@ -121,7 +121,7 @@ export const useFitClassifier = () => {
       const newModelInfo = deepClone(modelInfo);
       dispatch(
         classifierSlice.actions.addModelInfo({
-          kindId: kindClassifier.kindId,
+          targetId: kindClassifier.modelTargetId,
           modelName: newModelName,
           modelInfo: newModelInfo,
         }),
@@ -133,7 +133,7 @@ export const useFitClassifier = () => {
       }, {});
       dispatch(
         classifierSlice.actions.addModelClassMapping({
-          kindId: kindClassifier.kindId,
+          targetId: kindClassifier.modelTargetId,
           modelName: model.name,
           classMapping: classMap,
         }),
@@ -213,7 +213,7 @@ export const useFitClassifier = () => {
       classMap = setMapping as ModelClassMap;
       dispatch(
         classifierSlice.actions.addModelClassMapping({
-          kindId: kindClassifier.kindId,
+          targetId: kindClassifier.modelTargetId,
           modelName: model.name,
           classMapping: classMap,
         }),
@@ -330,7 +330,7 @@ export const useFitClassifier = () => {
     batch(() => {
       dispatch(
         classifierSlice.actions.appendRun({
-          kindId: modelTarget,
+          targetId: modelTarget,
           modelName: modelName,
           run,
         }),
@@ -338,7 +338,7 @@ export const useFitClassifier = () => {
       dispatch(
         classifierSlice.actions.setActiveModel({
           modelName: modelName,
-          kindId: kindClassifier.kindId,
+          targetId: kindClassifier.modelTargetId,
         }),
       );
     });
@@ -367,7 +367,7 @@ export const useFitClassifier = () => {
 
     dispatch(
       classifierSlice.actions.setModelStatus({
-        kindId: modelTarget,
+        targetId: modelTarget,
         status: "loading",
       }),
     );
@@ -389,7 +389,7 @@ export const useFitClassifier = () => {
     dispatch(dispatchPartition(partitionUpdates));
     dispatch(
       classifierSlice.actions.setModelStatus({
-        kindId: modelTarget,
+        targetId: modelTarget,
         status: "training",
       }),
     );

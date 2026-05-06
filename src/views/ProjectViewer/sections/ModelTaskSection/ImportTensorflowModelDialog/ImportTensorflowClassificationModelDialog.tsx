@@ -53,7 +53,7 @@ export const ImportTensorflowClassificationModelDialog = ({
       dispatch(
         classifierSlice.actions.setActiveModel({
           modelName: uploadedModels[0].name,
-          kindId: activeKindId,
+          targetId: activeKindId,
         }),
       );
     }

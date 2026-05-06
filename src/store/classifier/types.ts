@@ -74,7 +74,7 @@ export enum ModelArch {
   MOBILE_NET = 1,
 }
 export type KindClassifier = {
-  kindId: string;
+  modelTargetId: string;
   modelTargetName: string;
   activeModel: string | undefined;
   newModelArch: ModelArch;

@@ -64,7 +64,7 @@ export const useEvaluateClassifier = () => {
     } else {
       dispatch(
         classifierSlice.actions.setModelStatus({
-          kindId: kindClassifier.kindId,
+          targetId: kindClassifier.modelTargetId,
           status: "evaluating",
         }),
       );
@@ -73,7 +73,7 @@ export const useEvaluateClassifier = () => {
         dispatch(
           classifierSlice.actions.recordEvalForRun({
             evalResult,
-            kindId: modelTarget,
+            targetId: modelTarget,
             runId: currentRun.id,
             modelName: model.name,
           }),
@@ -82,7 +82,7 @@ export const useEvaluateClassifier = () => {
         handleError(error as Error, "Error computing the evaluation results");
         dispatch(
           classifierSlice.actions.setModelStatus({
-            kindId: kindClassifier.kindId,
+            targetId: kindClassifier.modelTargetId,
             status: initialModelStatus,
           }),
         );
@@ -92,7 +92,7 @@ export const useEvaluateClassifier = () => {
 
     dispatch(
       classifierSlice.actions.setModelStatus({
-        kindId: kindClassifier.kindId,
+        targetId: kindClassifier.modelTargetId,
         status: initialModelStatus,
       }),
     );

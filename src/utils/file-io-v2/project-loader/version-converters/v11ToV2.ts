@@ -124,7 +124,7 @@ function convertKindClassifier(
   });
   return {
     activeModel: undefined,
-    kindId,
+    modelTargetId: kindId,
     modelTargetName,
     newModelArch: ModelArch.SIMPLE_CNN,
     modelInfoDict: v2ModelInfoDict,
@@ -156,7 +156,7 @@ function convertClassifier(
   });
   //V2 requires a classifier for the Unknown kind; V1 had no such concept, so seed it with defaults
   v2Classifiers[UNKNOWN_KIND_ID] = {
-    kindId: UNKNOWN_KIND_ID,
+    modelTargetId: UNKNOWN_KIND_ID,
     activeModel: undefined,
     modelTargetName: "Unknown",
     newModelArch: ModelArch.SIMPLE_CNN,

@@ -66,7 +66,7 @@ export const DataPartitioningSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
         settings: { trainingPercentage: trainPercent },
-        kindId: modelTarget,
+        targetId: modelTarget,
       }),
     );
   };
@@ -75,7 +75,7 @@ export const DataPartitioningSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
         settings: { shuffle: shuffleOptions },
-        kindId: modelTarget,
+        targetId: modelTarget,
       }),
     );
   };

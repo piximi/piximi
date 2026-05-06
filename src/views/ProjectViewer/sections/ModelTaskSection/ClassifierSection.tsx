@@ -213,13 +213,13 @@ const ModelSelection = ({
       batch(() => {
         dispatch(
           classifierSlice.actions.setActiveModel({
-            kindId: modelTarget,
+            targetId: modelTarget,
             modelName: undefined,
           }),
         );
         dispatch(
           classifierSlice.actions.setNewModelArch({
-            kindId: modelTarget,
+            targetId: modelTarget,
             modelArch: ModelArch.SIMPLE_CNN,
           }),
         );
@@ -227,7 +227,7 @@ const ModelSelection = ({
     } else {
       dispatch(
         classifierSlice.actions.setActiveModel({
-          kindId: modelTarget,
+          targetId: modelTarget,
           modelName: value,
         }),
       );
@@ -238,7 +238,7 @@ const ModelSelection = ({
     classifierHandler.removeModel(selectedModel.name);
     dispatch(
       classifierSlice.actions.setActiveModel({
-        kindId: modelTarget,
+        targetId: modelTarget,
         modelName: undefined,
       }),
     );

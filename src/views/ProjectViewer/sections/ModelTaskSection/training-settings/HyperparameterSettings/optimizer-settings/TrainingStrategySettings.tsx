@@ -60,7 +60,7 @@ export const TrainingStrategySettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { batchSize },
-        kindId: modelTarget,
+        targetId: modelTarget,
       }),
     );
   };
@@ -74,7 +74,7 @@ export const TrainingStrategySettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { epochs: numEpochs },
-        kindId: modelTarget,
+        targetId: modelTarget,
       }),
     );
   };

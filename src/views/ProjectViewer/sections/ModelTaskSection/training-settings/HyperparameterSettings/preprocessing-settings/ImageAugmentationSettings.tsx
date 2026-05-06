@@ -89,7 +89,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, height: inputRows },
-            kindId: modelTarget,
+            targetId: modelTarget,
           }),
         );
         return;
@@ -103,7 +103,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, width: inputCols },
-            kindId: modelTarget,
+            targetId: modelTarget,
           }),
         );
         return;
@@ -117,7 +117,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, channels: inputChannels },
-            kindId: modelTarget,
+            targetId: modelTarget,
           }),
         );
     }
@@ -194,7 +194,7 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
         settings: { cropOptions },
-        kindId: modelTarget,
+        targetId: modelTarget,
       }),
     );
   };
@@ -282,7 +282,7 @@ export const ImageAugmentationSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
         settings: { normalizeOptions },
-        kindId: modelTarget,
+        targetId: modelTarget,
       }),
     );
   };

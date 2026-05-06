@@ -60,7 +60,7 @@ export const ModelPicker = () => {
         <PretrainedModelOptions activeModel={activeModel} />
       ) : (
         <ModelArchiitectureOptions
-          kindId={kindClassifierInfo.kindId}
+          targetId={kindClassifierInfo.modelTargetId}
           newModelArch={kindClassifierInfo.newModelArch}
           modelTargetName={kindClassifierInfo.modelTargetName}
         />
@@ -70,11 +70,11 @@ export const ModelPicker = () => {
 };
 
 const ModelArchiitectureOptions = ({
-  kindId,
+  targetId,
   newModelArch,
   modelTargetName,
 }: {
-  kindId: string;
+  targetId: string;
   newModelArch: ModelArch;
   modelTargetName: string;
 }) => {
@@ -90,7 +90,7 @@ const ModelArchiitectureOptions = ({
     const value = event.target.value as ModelArch;
     dispatch(
       classifierSlice.actions.setNewModelArch({
-        kindId: kindId,
+        targetId,
         modelArch: value,
       }),
     );
