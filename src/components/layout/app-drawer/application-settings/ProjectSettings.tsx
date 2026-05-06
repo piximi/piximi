@@ -2,18 +2,31 @@ import { useDispatch, useSelector } from "react-redux";
 import { Box, Stack, Typography } from "@mui/material";
 import { DividerHeader } from "components/ui";
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { selectShowSaveProjectDialog } from "store/applicationSettings/selectors";
+import {
+  selectShowClearPredictionsWarning,
+  selectShowSaveProjectDialog,
+} from "store/applicationSettings/selectors";
 import { SettingsItem } from "./SettingsItem";
 import { CustomSwitch } from "components/inputs";
 
 export const ProjectSettings = () => {
   const dispatch = useDispatch();
   const showSaveProjectDialog = useSelector(selectShowSaveProjectDialog);
+  const showClearPredictionsWarning = useSelector(
+    selectShowClearPredictionsWarning,
+  );
   const handleToggleSaveDialog = () => {
     dispatch(
       applicationSettingsSlice.actions.setShowSaveProjectDialog({
         show: !showSaveProjectDialog,
       }),
+    );
+  };
+  const handleToggleShowPredictions = () => {
+    dispatch(
+      applicationSettingsSlice.actions.setShowClearPredictionsWarning(
+        !showSaveProjectDialog,
+      ),
     );
   };
   return (
@@ -42,6 +55,22 @@ export const ProjectSettings = () => {
           <CustomSwitch
             checked={showSaveProjectDialog}
             onChange={handleToggleSaveDialog}
+            height={24}
+            width={42}
+          />
+        </SettingsItem>
+        <SettingsItem
+          title={
+            <Box display="flex">
+              <Typography>
+                {"Prompt save predictions when training model"}
+              </Typography>
+            </Box>
+          }
+        >
+          <CustomSwitch
+            checked={showClearPredictionsWarning}
+            onChange={handleToggleShowPredictions}
             height={24}
             width={42}
           />

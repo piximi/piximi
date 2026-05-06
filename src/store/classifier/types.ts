@@ -84,5 +84,4 @@ export type KindClassifier = {
 export type KindClassifierDict = Record<string, KindClassifier>;
 export type ClassifierState = {
   kindClassifiers: KindClassifierDict;
-  showClearPredictionsWarning: boolean;
 };

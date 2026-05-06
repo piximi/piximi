@@ -23,6 +23,7 @@ const initialState: AppSettingsState = {
   loadPercent: 1,
   loadMessage: "",
   showSaveProjectDialog: true,
+  showClearPredictionsWarning: true,
 };
 
 export const applicationSettingsSlice = createSlice({
@@ -128,6 +129,9 @@ export const applicationSettingsSlice = createSlice({
     },
     setShowSaveProjectDialog(state, action: PayloadAction<{ show: boolean }>) {
       state.showSaveProjectDialog = action.payload.show;
+    },
+    setShowClearPredictionsWarning(state, action: PayloadAction<boolean>) {
+      state.showClearPredictionsWarning = action.payload;
     },
   },
 });

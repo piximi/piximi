@@ -7,7 +7,6 @@ import {
   selectActiveModel,
   selectAllCreatedModelNames,
   selectModelLifecycleStatus,
-  selectShowClearPredictionsWarning,
 } from "store/classifier/selectors";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import {
@@ -21,6 +20,7 @@ import {
 } from "@ProjectViewer/state/selectors";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { useParameterizedSelector } from "store/hooks";
+import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
 
 import { Partition } from "utils/dl/enums";
 import { findReplicateName, representsUnknown } from "utils/stringUtils";

@@ -164,7 +164,6 @@ function convertClassifier(
   };
   return {
     kindClassifiers: v2Classifiers,
-    showClearPredictionsWarning: v11ClassifierState.showClearPredictionsWarning,
   };
 }
 

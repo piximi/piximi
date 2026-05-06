@@ -35,14 +35,6 @@ export const selectAllCreatedModelNames = createSelector(
     Object.values(kcd).flatMap((kc) => Object.keys(kc.modelInfoDict)),
 );
 
-export const selectShowClearPredictionsWarning = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): boolean => {
-  return classifier.showClearPredictionsWarning;
-};
-
 export const selectKindClassifier = createSelector(
   selectKindClassifierDict,
   (_state: RootState, kindId: string) => kindId,

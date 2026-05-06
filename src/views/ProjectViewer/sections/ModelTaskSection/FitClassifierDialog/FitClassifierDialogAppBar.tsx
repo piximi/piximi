@@ -30,13 +30,14 @@ import { classifierSlice } from "store/classifier";
 import {
   selectActiveModel,
   selectModelLifecycleStatus,
-  selectShowClearPredictionsWarning,
 } from "store/classifier/selectors";
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useFitClassifier } from "@ProjectViewer/hooks/useFitClassifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
+import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { APPLICATION_COLORS } from "utils/constants";
 
@@ -185,11 +186,8 @@ export const FitClassifierDialogAppBar = ({
                     checked={!showClearPredictionsWarning}
                     onChange={() =>
                       dispatch(
-                        classifierSlice.actions.updateShowClearPredictionsWarning(
-                          {
-                            showClearPredictionsWarning:
-                              !showClearPredictionsWarning,
-                          },
+                        applicationSettingsSlice.actions.setShowClearPredictionsWarning(
+                          !showClearPredictionsWarning,
                         ),
                       )
                     }

@@ -41,8 +41,6 @@ const initialState: ClassifierState = {
       ...getDefaultKindClassifier(),
     },
   },
-
-  showClearPredictionsWarning: true,
 };
 
 export const classifierSlice = createSlice({
@@ -207,13 +205,7 @@ export const classifierSlice = createSlice({
       const classifier = state.kindClassifiers[targetId];
       classifier.newModelArch = modelArch;
     },
-    updateShowClearPredictionsWarning(
-      state,
-      action: PayloadAction<{ showClearPredictionsWarning: boolean }>,
-    ) {
-      state.showClearPredictionsWarning =
-        action.payload.showClearPredictionsWarning;
-    },
+
     appendRun(
       state,
       action: PayloadAction<{ targetId: string; modelName: string; run: Run }>,

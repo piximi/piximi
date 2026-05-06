@@ -39,6 +39,7 @@ export type AppSettingsState = {
   loadPercent: number;
   loadMessage: string;
   showSaveProjectDialog: boolean;
+  showClearPredictionsWarning: boolean;
 };
 
 export type DataState = {

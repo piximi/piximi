@@ -106,3 +106,10 @@ export const selectShowSaveProjectDialog = ({
 }) => {
   return applicationSettings.showSaveProjectDialog;
 };
+export const selectShowClearPredictionsWarning = ({
+  applicationSettings,
+}: {
+  applicationSettings: AppSettingsState;
+}): boolean => {
+  return applicationSettings.showClearPredictionsWarning;
+};
