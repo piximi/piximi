@@ -54,9 +54,9 @@ export const FitClassifierDialogAppBar = ({
 
   const modelStatus = useParameterizedSelector(
     selectModelLifecycleStatus,
-    modelTarget.id,
+    modelTarget,
   );
-  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
@@ -85,7 +85,7 @@ export const FitClassifierDialogAppBar = ({
 
     dispatch(
       classifierSlice.actions.setModelStatus({
-        kindId: modelTarget.id,
+        kindId: modelTarget,
         status: "idle",
       }),
     );

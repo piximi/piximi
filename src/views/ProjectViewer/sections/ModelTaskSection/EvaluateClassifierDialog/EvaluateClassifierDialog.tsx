@@ -38,10 +38,10 @@ export const EvaluateClassifierDialog = ({
   const categories = useSelector(selectActiveKnownCategories);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
 
-  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget);
   const evaluationResults = useParameterizedSelector(
     selectModelEvaluationResults,
-    modelTarget.id,
+    modelTarget,
   );
   const [evalResult, setEvalResult] = useState(0);
 

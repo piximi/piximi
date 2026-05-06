@@ -17,7 +17,7 @@ import { TrainingStrategySettings } from "./TrainingStrategySettings";
 export const ClassifierOptimizerSettings = () => {
   const labeledThingsCount = useSelector(selectTotalActiveLabeledItems);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget.id);
+  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
   const fitOptions = useMemo(() => {
     return modelInfo.optimizerSettings;
   }, [modelInfo]);

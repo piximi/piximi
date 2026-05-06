@@ -30,7 +30,7 @@ export const usePredictClassifier = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const kindClassifier = useParameterizedSelector(
     selectKindClassifier,
-    modelTarget.id,
+    modelTarget,
   );
 
   const { setPredictedProbabilities } = useClassifierHistory();
@@ -118,7 +118,7 @@ export const usePredictClassifier = () => {
         predictedAtRunId: activeRun!.id,
       },
     }));
-    if (modelTarget.id === IMAGE_CLASSIFIER_ID) {
+    if (modelTarget === IMAGE_CLASSIFIER_ID) {
       dispatch(dataSliceV2.actions.batchUpdateImageCategory(updates));
     } else {
       dispatch(

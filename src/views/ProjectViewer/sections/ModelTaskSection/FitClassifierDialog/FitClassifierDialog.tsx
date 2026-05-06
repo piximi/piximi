@@ -34,9 +34,9 @@ export const FitClassifierDialog = ({
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const modelStatus = useParameterizedSelector(
     selectModelLifecycleStatus,
-    modelTarget.id,
+    modelTarget,
   );
-  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget);
 
   const showPlots = useMemo(() => {
     return modelHistory.categoricalAccuracy.length > 0;

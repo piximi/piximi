@@ -30,8 +30,8 @@ import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 export const DataPartitioningSettings = () => {
   const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget.id);
-  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
+  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget);
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -66,7 +66,7 @@ export const DataPartitioningSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
         settings: { trainingPercentage: trainPercent },
-        kindId: modelTarget.id,
+        kindId: modelTarget,
       }),
     );
   };
@@ -75,7 +75,7 @@ export const DataPartitioningSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
         settings: { shuffle: shuffleOptions },
-        kindId: modelTarget.id,
+        kindId: modelTarget,
       }),
     );
   };

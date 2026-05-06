@@ -25,11 +25,11 @@ export const useEvaluateClassifier = () => {
 
   const kindClassifier = useParameterizedSelector(
     selectKindClassifier,
-    modelTarget.id,
+    modelTarget,
   );
   const modelStatus = useParameterizedSelector(
     selectModelLifecycleStatus,
-    modelTarget.id,
+    modelTarget,
   );
   const evaluateClassifier = async () => {
     if (!kindClassifier || kindClassifier.activeModel === undefined) return;
@@ -73,7 +73,7 @@ export const useEvaluateClassifier = () => {
         dispatch(
           classifierSlice.actions.recordEvalForRun({
             evalResult,
-            kindId: modelTarget.id,
+            kindId: modelTarget,
             runId: currentRun.id,
             modelName: model.name,
           }),

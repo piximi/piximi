@@ -44,13 +44,13 @@ export const ClassifierSection = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const kindClassifier = useParameterizedSelector(
     selectKindClassifier,
-    modelTarget.id,
+    modelTarget,
   );
   const modelStatus = useParameterizedSelector(
     selectModelLifecycleStatus,
-    modelTarget.id,
+    modelTarget,
   );
-  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget);
   const totalUnlabeledItems = useSelector(selectTotalActiveUnlabeledItems);
 
   const { error } = useClassifierStatus();
@@ -213,13 +213,13 @@ const ModelSelection = ({
       batch(() => {
         dispatch(
           classifierSlice.actions.setActiveModel({
-            kindId: modelTarget.id,
+            kindId: modelTarget,
             modelName: undefined,
           }),
         );
         dispatch(
           classifierSlice.actions.setNewModelArch({
-            kindId: modelTarget.id,
+            kindId: modelTarget,
             modelArch: ModelArch.SIMPLE_CNN,
           }),
         );
@@ -227,7 +227,7 @@ const ModelSelection = ({
     } else {
       dispatch(
         classifierSlice.actions.setActiveModel({
-          kindId: modelTarget.id,
+          kindId: modelTarget,
           modelName: value,
         }),
       );
@@ -238,7 +238,7 @@ const ModelSelection = ({
     classifierHandler.removeModel(selectedModel.name);
     dispatch(
       classifierSlice.actions.setActiveModel({
-        kindId: modelTarget.id,
+        kindId: modelTarget,
         modelName: undefined,
       }),
     );

@@ -65,12 +65,12 @@ export const ClassMapDialog = ({
           color = choices[getRandomInt(0, choices.length)] as string;
         }
         let cat: Category;
-        if (modelTarget.id === IMAGE_CLASSIFIER_ID) {
+        if (modelTarget === IMAGE_CLASSIFIER_ID) {
           cat = generateCategory(className, color, { type: "image" });
         } else {
           cat = generateCategory(className, color, {
             type: "annotation",
-            kindId: modelTarget.id,
+            kindId: modelTarget,
           });
         }
         newCategories.push(cat);

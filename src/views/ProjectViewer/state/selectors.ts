@@ -196,9 +196,8 @@ export const selectActiveFilteredSelectedIds = ({
 export const selectActiveClassifierModelTarget = createSelector(
   selectActiveView,
   selectActiveKindState,
-  (viewState, activeKindState): { id: string; name: string } => {
-    if (viewState === "images")
-      return { id: IMAGE_CLASSIFIER_ID, name: "Image" };
-    return { id: activeKindState.id, name: activeKindState.name };
+  (viewState, activeKindState): string => {
+    if (viewState === "images") return IMAGE_CLASSIFIER_ID;
+    return activeKindState.id;
   },
 );

@@ -90,7 +90,7 @@ export const useFitClassifier = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const kindClassifier = useParameterizedSelector(
     selectKindClassifier,
-    modelTarget.id,
+    modelTarget,
   );
   const knownCategories = useSelector(selectActiveKnownCategories);
 
@@ -330,7 +330,7 @@ export const useFitClassifier = () => {
     batch(() => {
       dispatch(
         classifierSlice.actions.appendRun({
-          kindId: modelTarget.id,
+          kindId: modelTarget,
           modelName: modelName,
           run,
         }),
@@ -367,7 +367,7 @@ export const useFitClassifier = () => {
 
     dispatch(
       classifierSlice.actions.setModelStatus({
-        kindId: modelTarget.id,
+        kindId: modelTarget,
         status: "loading",
       }),
     );
@@ -389,7 +389,7 @@ export const useFitClassifier = () => {
     dispatch(dispatchPartition(partitionUpdates));
     dispatch(
       classifierSlice.actions.setModelStatus({
-        kindId: modelTarget.id,
+        kindId: modelTarget,
         status: "training",
       }),
     );

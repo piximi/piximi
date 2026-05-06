@@ -94,9 +94,9 @@ export const ClassifierHistoryProvider = ({
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const previousRuns = useParameterizedSelector(
     selectRunsForActiveModel,
-    modelTarget.id,
+    modelTarget,
   );
-  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget);
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
   const [totalEpochs, setTotalEpochs] = useState<number>(0);
   const [modelHistory, setModelHistory] = useState<HistoryData>(

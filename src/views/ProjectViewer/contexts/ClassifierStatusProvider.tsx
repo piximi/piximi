@@ -70,9 +70,9 @@ export const ClassifierStatusProvider = ({
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const modelStatus = useParameterizedSelector(
     selectModelLifecycleStatus,
-    modelTarget.id,
+    modelTarget,
   );
-  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget);
   const inferenceItems = useParameterizedSelector(
     selectActiveItemsByPartition,
     Partition.Inference,
@@ -91,8 +91,8 @@ export const ClassifierStatusProvider = ({
   const [activeErrors, setActiveErrors] = useState<ErrorContext[]>([]);
 
   const targetItemType = useMemo(
-    () => (modelTarget.id === IMAGE_CLASSIFIER_ID ? "images" : "annotations"),
-    [modelTarget.id],
+    () => (modelTarget === IMAGE_CLASSIFIER_ID ? "images" : "annotations"),
+    [modelTarget],
   );
 
   const hasLabeledInference = useMemo(() => {

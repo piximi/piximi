@@ -37,8 +37,8 @@ const RowColInputOptions = { min: 20 };
 const InputShapeField = ({ disabled }: { disabled: boolean }) => {
   const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget.id);
-  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
+  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget);
 
   const inputShape = useMemo(() => {
     return modelInfo.preprocessSettings.inputShape;
@@ -89,7 +89,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, height: inputRows },
-            kindId: modelTarget.id,
+            kindId: modelTarget,
           }),
         );
         return;
@@ -103,7 +103,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, width: inputCols },
-            kindId: modelTarget.id,
+            kindId: modelTarget,
           }),
         );
         return;
@@ -117,7 +117,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
         dispatch(
           classifierSlice.actions.updateInputShape({
             inputShape: { ...inputShape, channels: inputChannels },
-            kindId: modelTarget.id,
+            kindId: modelTarget,
           }),
         );
     }
@@ -175,7 +175,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
 const CropSection = ({ disabled }: { disabled: boolean }) => {
   const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget.id);
+  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
   const cropOptions = useMemo(() => {
     return modelInfo.preprocessSettings.cropOptions;
   }, [modelInfo]);
@@ -194,7 +194,7 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
         settings: { cropOptions },
-        kindId: modelTarget.id,
+        kindId: modelTarget,
       }),
     );
   };
@@ -268,8 +268,8 @@ export const ImageAugmentationSettings = () => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget.id);
-  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
+  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget);
 
   const normalizeOptions = useMemo(() => {
     return modelInfo.preprocessSettings.normalizeOptions;
@@ -282,7 +282,7 @@ export const ImageAugmentationSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelPreprocessOptions({
         settings: { normalizeOptions },
-        kindId: modelTarget.id,
+        kindId: modelTarget,
       }),
     );
   };

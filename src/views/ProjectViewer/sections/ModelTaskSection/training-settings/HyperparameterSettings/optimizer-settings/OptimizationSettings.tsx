@@ -32,8 +32,8 @@ import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 export const OptimizationSettings = () => {
   const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget.id);
-  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
+  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const { trainable } = useClassifierStatus();
@@ -58,7 +58,7 @@ export const OptimizationSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { optimizationAlgorithm },
-        kindId: modelTarget.id,
+        kindId: modelTarget,
       }),
     );
   };
@@ -68,7 +68,7 @@ export const OptimizationSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { lossFunction },
-        kindId: modelTarget.id,
+        kindId: modelTarget,
       }),
     );
   };
@@ -82,7 +82,7 @@ export const OptimizationSettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { learningRate },
-        kindId: modelTarget.id,
+        kindId: modelTarget,
       }),
     );
   };

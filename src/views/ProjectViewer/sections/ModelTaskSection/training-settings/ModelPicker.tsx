@@ -38,7 +38,7 @@ export const ModelPicker = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const kindClassifierInfo = useParameterizedSelector(
     selectKindClassifier,
-    modelTarget.id,
+    modelTarget,
   );
 
   const activeModel = useMemo(

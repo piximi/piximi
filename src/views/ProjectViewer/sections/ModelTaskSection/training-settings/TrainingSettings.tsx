@@ -28,7 +28,7 @@ export const TrainingSettings = () => {
 
 function ExportHyperparametersButton() {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget.id);
+  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
 
   const hyperparameters = useMemo(() => {
     return {

@@ -22,8 +22,8 @@ import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 export const TrainingStrategySettings = () => {
   const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget.id);
-  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
+  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget);
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -60,7 +60,7 @@ export const TrainingStrategySettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { batchSize },
-        kindId: modelTarget.id,
+        kindId: modelTarget,
       }),
     );
   };
@@ -74,7 +74,7 @@ export const TrainingStrategySettings = () => {
     dispatch(
       classifierSlice.actions.updateModelOptimizerSettings({
         settings: { epochs: numEpochs },
-        kindId: modelTarget.id,
+        kindId: modelTarget,
       }),
     );
   };
