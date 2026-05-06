@@ -9,12 +9,13 @@ import { DialogTransitionSlide } from "components/dialogs";
 
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 import { ModelSummaryTable } from "@ProjectViewer/sections/ModelTaskSection/data-display";
-import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { selectKindClassifier } from "store/classifier/selectors";
+import {
+  selectKindClassifier,
+  selectModelLifecycleStatus,
+} from "store/classifier/selectors";
 
-import { ModelStatus } from "utils/dl/enums";
 import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import TrainingPlots from "./TrainingPlots";
@@ -32,8 +33,11 @@ export const FitClassifierDialog = ({
 }: FitClassifierDialogProps) => {
   const [tabVal, setTabVal] = useState("1");
   const { modelHistory } = useClassifierHistory();
-  const { modelStatus } = useClassifierStatus();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const modelStatus = useParameterizedSelector(
+    selectModelLifecycleStatus,
+    modelTarget.id,
+  );
   const kindClassifier = useParameterizedSelector(
     selectKindClassifier,
     modelTarget.id,
@@ -51,7 +55,7 @@ export const FitClassifierDialog = ({
   };
 
   useEffect(() => {
-    if (modelStatus === ModelStatus.Training) {
+    if (modelStatus === "training") {
       setTabVal("2");
     }
   }, [modelStatus]);
@@ -62,7 +66,7 @@ export const FitClassifierDialog = ({
   // Skip during training — plots are about to populate, and the other effect
   // above intentionally set tabVal to "2" for live epoch updates.
   useEffect(() => {
-    if (modelStatus === ModelStatus.Training) return;
+    if (modelStatus === "training") return;
     if (tabVal === "2" && !showPlots) setTabVal("1");
     if (tabVal === "3" && !model?.modelSummary) setTabVal("1");
   }, [tabVal, showPlots, model?.modelSummary, modelStatus]);

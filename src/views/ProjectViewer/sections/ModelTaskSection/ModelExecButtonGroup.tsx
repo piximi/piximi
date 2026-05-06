@@ -9,9 +9,22 @@ import {
 
 import { TooltipButton } from "components/ui/tooltips/TooltipButton";
 
-import { ModelStatus } from "utils/dl/enums";
+import type { ModelLifecycleStatus } from "store/classifier/types";
 
 import type { ErrorReason } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+
+type ModelExecButtonGroupProps = {
+  handleFit: () => void;
+  handleEvaluate: () => void;
+  handlePredict: () => Promise<void>;
+  modelStatus: ModelLifecycleStatus;
+  execConfig: {
+    fit: { helperText: string; disabled: boolean };
+    predict: { helperText: string; disabled: boolean };
+    evaluate: { helperText: string; disabled: boolean };
+  };
+  error?: ErrorReason;
+};
 
 export const ModelExecButtonGroup = ({
   handleFit,
@@ -19,18 +32,7 @@ export const ModelExecButtonGroup = ({
   handlePredict,
   execConfig,
   modelStatus,
-}: {
-  handleFit: () => void;
-  handleEvaluate: () => void;
-  handlePredict: () => Promise<void>;
-  modelStatus: ModelStatus;
-  execConfig: {
-    fit: { helperText: string; disabled: boolean };
-    predict: { helperText: string; disabled: boolean };
-    evaluate: { helperText: string; disabled: boolean };
-  };
-  error?: ErrorReason;
-}) => {
+}: ModelExecButtonGroupProps) => {
   return (
     <Box width="100%" display="flex" justifyContent={"space-evenly"}>
       {/* Fit Button */}
@@ -49,7 +51,7 @@ export const ModelExecButtonGroup = ({
         onClick={handlePredict}
         disabled={execConfig.predict.disabled}
       >
-        {modelStatus === ModelStatus.Predicting ? (
+        {modelStatus === "predicting" ? (
           <CircularProgress
             disableShrink
             size={24}
@@ -66,15 +68,7 @@ export const ModelExecButtonGroup = ({
         onClick={handleEvaluate}
         disabled={execConfig.evaluate.disabled}
       >
-        {modelStatus === ModelStatus.Evaluating ? (
-          <CircularProgress
-            disableShrink
-            size={24}
-            sx={{ alignSelf: "center" }}
-          />
-        ) : (
-          <AssessmentIcon />
-        )}
+        <AssessmentIcon />
       </TooltipButton>
     </Box>
   );

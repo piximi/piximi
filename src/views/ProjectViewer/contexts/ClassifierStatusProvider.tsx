@@ -1,21 +1,14 @@
 import type React from "react";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
 import {
   selectAllCreatedModelNames,
   selectKindClassifier,
+  selectModelLifecycleStatus,
   selectShowClearPredictionsWarning,
 } from "store/classifier/selectors";
-import { selectKindIds } from "store/dataV2/selectors";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import {
   selectActiveLabeledItems,
@@ -29,8 +22,7 @@ import {
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { useParameterizedSelector } from "store/hooks";
 
-import { getDifferences } from "utils/arrayUtils";
-import { ModelStatus, Partition } from "utils/dl/enums";
+import { Partition } from "utils/dl/enums";
 import { findReplicateName, representsUnknown } from "utils/stringUtils";
 import classifierHandler from "utils/dl/classification/classifierHandler";
 
@@ -40,6 +32,7 @@ export enum ErrorReason {
   ExistingPredictions,
   ChannelMismatch,
   DuplicateModelName,
+  Invalid,
 }
 
 export type ErrorContext = {
@@ -51,8 +44,6 @@ export type ErrorContext = {
 const ClassifierStatusContext = createContext<{
   isReady: boolean;
   trainable: boolean;
-  modelStatus: ModelStatus;
-  setModelStatus: (status: ModelStatus) => void;
   shouldWarnClearPredictions: boolean;
   error?: ErrorContext;
   activeErrors: ErrorContext[];
@@ -63,8 +54,6 @@ const ClassifierStatusContext = createContext<{
 }>({
   isReady: true,
   trainable: true,
-  modelStatus: ModelStatus.Idle,
-  setModelStatus: (_status) => {},
   shouldWarnClearPredictions: false,
   newModelName: "",
   setNewModelName: (_value: React.SetStateAction<string>) => {},
@@ -84,7 +73,6 @@ export const ClassifierStatusProvider = ({
     selectKindClassifier,
     modelTarget.id,
   );
-  const projectKinds = useSelector(selectKindIds);
   const inferenceItems = useParameterizedSelector(
     selectActiveItemsByPartition,
     Partition.Inference,
@@ -95,15 +83,16 @@ export const ClassifierStatusProvider = ({
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
+  const modelStatus = useParameterizedSelector(
+    selectModelLifecycleStatus,
+    modelTarget.id,
+  );
 
   const [isReady, setIsReady] = useState(true);
   const [newModelName, setNewModelName] = useState("");
   const restrictedClassifierNames = useSelector(selectAllCreatedModelNames);
   const [error, setError] = useState<ErrorContext>();
   const [activeErrors, setActiveErrors] = useState<ErrorContext[]>([]);
-  const [modelStatusDict, setModelStatusDict] = useState<
-    Record<string, ModelStatus>
-  >({ [IMAGE_CLASSIFIER_ID]: ModelStatus.Idle });
 
   const model = useMemo(() => {
     if (!kindClassifier || !kindClassifier.activeModel) return;
@@ -113,33 +102,6 @@ export const ClassifierStatusProvider = ({
   const targetItemType = useMemo(
     () => (modelTarget.id === IMAGE_CLASSIFIER_ID ? "images" : "annotations"),
     [modelTarget.id],
-  );
-
-  useEffect(() => {
-    const classifierKinds = Object.keys(modelStatusDict);
-
-    const kindChanges = getDifferences(classifierKinds, projectKinds);
-
-    const nextStatusDict = { ...modelStatusDict };
-
-    kindChanges.added.forEach(
-      (newKind) => (nextStatusDict[newKind] = ModelStatus.Idle),
-    );
-    kindChanges.removed.forEach(
-      (removedKind) => delete nextStatusDict[removedKind],
-    );
-    setModelStatusDict(nextStatusDict);
-  }, [projectKinds]);
-
-  const modelStatus = useMemo(() => {
-    return modelStatusDict?.[modelTarget.id] ?? ModelStatus.Idle;
-  }, [modelTarget, modelStatusDict]);
-
-  const setModelStatus = useCallback(
-    (status: ModelStatus) => {
-      setModelStatusDict((dict) => ({ ...dict, [modelTarget.id]: status }));
-    },
-    [modelTarget],
   );
 
   const hasLabeledInference = useMemo(() => {
@@ -240,6 +202,15 @@ export const ClassifierStatusProvider = ({
       });
     }
 
+    if (modelStatus === "invalid") {
+      newIsReady = false;
+      newErrors.push({
+        reason: ErrorReason.Invalid,
+        message: `Categories have changed since last training run`,
+        severity: 3,
+      });
+    }
+
     const mostSevere: undefined | ErrorContext =
       newErrors.length === 0
         ? undefined
@@ -264,8 +235,6 @@ export const ClassifierStatusProvider = ({
       value={{
         isReady,
         trainable,
-        modelStatus,
-        setModelStatus,
         shouldWarnClearPredictions,
         error,
         newModelName,

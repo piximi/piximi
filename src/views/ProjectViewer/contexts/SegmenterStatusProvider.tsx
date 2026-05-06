@@ -3,10 +3,9 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 import { useSelector } from "react-redux";
 
+import type { ModelLifecycleStatus } from "store/classifier/types";
 import { selectAllImages } from "store/data/selectors";
 import { selectSegmenterModel } from "store/segmenter/selectors";
-
-import { ModelStatus } from "utils/dl/enums";
 
 export enum ErrorReason {
   NotConfigured,
@@ -22,13 +21,13 @@ export type ErrorContext = {
 
 const SegmenterStatusContext = createContext<{
   isReady: boolean;
-  modelStatus: ModelStatus;
-  setModelStatus: React.Dispatch<React.SetStateAction<ModelStatus>>;
+  modelStatus: ModelLifecycleStatus;
+  setModelStatus: React.Dispatch<React.SetStateAction<ModelLifecycleStatus>>;
   error?: ErrorContext;
 }>({
   isReady: true,
-  modelStatus: ModelStatus.Idle,
-  setModelStatus: (_value: React.SetStateAction<ModelStatus>) => {},
+  modelStatus: "idle",
+  setModelStatus: (_value: React.SetStateAction<ModelLifecycleStatus>) => {},
 });
 
 export const SegmenterStatusProvider = ({
@@ -42,7 +41,7 @@ export const SegmenterStatusProvider = ({
   const [isReady, setIsReady] = useState(true);
   const [error, setError] = useState<ErrorContext>();
 
-  const [modelStatus, setModelStatus] = useState<ModelStatus>(ModelStatus.Idle);
+  const [modelStatus, setModelStatus] = useState<ModelLifecycleStatus>("idle");
 
   useEffect(() => {
     let newError: ErrorContext | undefined;

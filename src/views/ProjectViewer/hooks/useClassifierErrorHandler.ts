@@ -6,10 +6,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { AlertType } from "utils/enums";
 import { getStackTraceFromError } from "utils/logUtils";
-import { ModelStatus } from "utils/dl/enums";
 import type { AlertState } from "utils/types";
-
-import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 
 const formatErrorChain = (error: Error): string => {
   const lines: string[] = [`${error.name}: ${error.message}`];
@@ -23,10 +20,9 @@ const formatErrorChain = (error: Error): string => {
 
 export const useClassifierErrorHandler = () => {
   const dispatch = useDispatch();
-  const { setModelStatus } = useClassifierStatus();
 
   return useCallback(
-    async (error: Error, name: string, revertStatus?: ModelStatus) => {
+    async (error: Error, name: string) => {
       const stackTrace = await getStackTraceFromError(error);
       const alertState: AlertState = {
         alertType: AlertType.Error,
@@ -42,8 +38,7 @@ export const useClassifierErrorHandler = () => {
       dispatch(
         applicationSettingsSlice.actions.updateAlertState({ alertState }),
       );
-      setModelStatus(revertStatus ?? ModelStatus.Idle);
     },
-    [dispatch, setModelStatus],
+    [dispatch],
   );
 };

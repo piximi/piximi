@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { batch, useDispatch, useSelector } from "react-redux";
 
@@ -22,11 +22,13 @@ import { useEvaluateClassifier } from "@ProjectViewer/hooks/useEvaluateClassifie
 import { selectTotalActiveUnlabeledItems } from "@ProjectViewer/state/reselectors";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { selectKindClassifier } from "store/classifier/selectors";
+import {
+  selectKindClassifier,
+  selectModelLifecycleStatus,
+} from "store/classifier/selectors";
 import { ModelArch } from "store/classifier/types";
 
 import { HotkeyContext } from "utils/enums";
-import { ModelStatus } from "utils/dl/enums";
 import type { SequentialClassifier } from "utils/dl/classification";
 import classifierHandler from "utils/dl/classification/classifierHandler";
 
@@ -38,15 +40,17 @@ import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
 import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
 
 export const ClassifierSection = () => {
-  const [waitingForResults, setWaitingForResults] = useState(false);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const kindClassifier = useParameterizedSelector(
     selectKindClassifier,
     modelTarget.id,
   );
-
+  const modelStatus = useParameterizedSelector(
+    selectModelLifecycleStatus,
+    modelTarget.id,
+  );
   const totalUnlabeledItems = useSelector(selectTotalActiveUnlabeledItems);
-  const { modelStatus, error } = useClassifierStatus();
+  const { error } = useClassifierStatus();
   const predictClassifier = usePredictClassifier();
   const evaluateClassifier = useEvaluateClassifier();
 
@@ -97,8 +101,8 @@ export const ClassifierSection = () => {
   const execConfig = useMemo(() => {
     const fitText = (() => {
       switch (modelStatus) {
-        case ModelStatus.Idle:
-        case ModelStatus.Pending:
+        case "idle":
+        case "waiting":
           return !model || model.trainable
             ? "Fit Model"
             : "Model is inference only";
@@ -108,9 +112,9 @@ export const ClassifierSection = () => {
     })();
     const predictText = (() => {
       switch (modelStatus) {
-        case ModelStatus.Idle:
+        case "idle":
           return model ? "Predict Model" : "No Trained Model";
-        case ModelStatus.Predicting:
+        case "predicting":
           return "...Predicting";
         default:
           return "...Pending";
@@ -119,15 +123,14 @@ export const ClassifierSection = () => {
     const predictionDisabled =
       !model ||
       !model.pretrained ||
-      modelStatus !== ModelStatus.Idle ||
+      modelStatus !== "idle" ||
       totalUnlabeledItems === 0 ||
       error?.reason === ErrorReason.ChannelMismatch;
 
     const evaluateText = (() => {
       if (model) {
         return model.trainable
-          ? modelStatus === ModelStatus.Idle ||
-            modelStatus === ModelStatus.Pending
+          ? modelStatus === "idle" || modelStatus === "waiting"
             ? "Evaluate Model"
             : "...Pending"
           : "Cannot evaluate non-trainable models";
@@ -147,18 +150,6 @@ export const ClassifierSection = () => {
       },
     };
   }, [modelStatus, model, error]);
-
-  useEffect(() => {
-    if (modelStatus === ModelStatus.Trained && waitingForResults) {
-      setWaitingForResults(false);
-      handleOpenEvaluateClassifierDialog();
-    }
-  }, [
-    modelStatus,
-    waitingForResults,
-    handleOpenEvaluateClassifierDialog,
-    setWaitingForResults,
-  ]);
 
   return (
     <>
@@ -184,7 +175,7 @@ export const ClassifierSection = () => {
           execConfig={execConfig}
         />
       </Box>
-      {modelStatus === ModelStatus.Pending && <PredictionListItems />}
+      {modelStatus === "waiting" && <PredictionListItems />}
       <ImportTensorflowClassificationModelDialog
         onClose={handleCloseImportClassifierDialog}
         open={ImportClassifierDialogOpen}

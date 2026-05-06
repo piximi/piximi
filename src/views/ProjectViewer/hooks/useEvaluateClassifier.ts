@@ -7,24 +7,28 @@ import { selectActiveKnownCategories } from "@ProjectViewer/state/reselectors";
 import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { selectKindClassifier } from "store/classifier/selectors";
+import {
+  selectKindClassifier,
+  selectModelLifecycleStatus,
+} from "store/classifier/selectors";
 
 import { AlertType } from "utils/enums";
 import classifierHandler from "utils/dl/classification/classifierHandler";
-import { ModelStatus } from "utils/dl/enums";
 
-import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 
 export const useEvaluateClassifier = () => {
   const dispatch = useDispatch();
-  const { modelStatus, setModelStatus } = useClassifierStatus();
   const activeCategories = useSelector(selectActiveKnownCategories);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const handleError = useClassifierErrorHandler();
 
   const kindClassifier = useParameterizedSelector(
     selectKindClassifier,
+    modelTarget.id,
+  );
+  const modelStatus = useParameterizedSelector(
+    selectModelLifecycleStatus,
     modelTarget.id,
   );
   const evaluateClassifier = async () => {
@@ -35,6 +39,7 @@ export const useEvaluateClassifier = () => {
     if (!model || !modelInfo) return;
     const currentRun = modelInfo.runs.at(-1);
     if (!currentRun) return;
+
     const initialModelStatus = modelStatus;
     if (!model.validationLoaded) {
       dispatch(
@@ -57,7 +62,13 @@ export const useEvaluateClassifier = () => {
         }),
       );
     } else {
-      setModelStatus(ModelStatus.Evaluating);
+      dispatch(
+        classifierSlice.actions.setModelStatus({
+          kindId: kindClassifier.kindId,
+          modelName,
+          status: "evaluating",
+        }),
+      );
       try {
         const evalResult = await classifierHandler.evaluate(modelName);
         dispatch(
@@ -69,16 +80,25 @@ export const useEvaluateClassifier = () => {
           }),
         );
       } catch (error) {
-        handleError(
-          error as Error,
-          "Error computing the evaluation results",
-          initialModelStatus,
+        handleError(error as Error, "Error computing the evaluation results");
+        dispatch(
+          classifierSlice.actions.setModelStatus({
+            kindId: kindClassifier.kindId,
+            modelName,
+            status: initialModelStatus,
+          }),
         );
         return;
       }
     }
 
-    setModelStatus(initialModelStatus);
+    dispatch(
+      classifierSlice.actions.setModelStatus({
+        kindId: kindClassifier.kindId,
+        modelName,
+        status: initialModelStatus,
+      }),
+    );
   };
   return evaluateClassifier;
 };

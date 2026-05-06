@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 
 import { getBackend, version_core } from "@tensorflow/tfjs";
 
@@ -19,7 +19,6 @@ import {
 } from "store/classifier/constants";
 import { dataSliceV2 } from "store/dataV2";
 import type {
-  CategoryDelta,
   KindClassifier,
   ModelClassMap,
   ModelInfo,
@@ -31,7 +30,7 @@ import { selectKindClassifier } from "store/classifier/selectors";
 import { generateUUID } from "store/dataV2/utils";
 
 import classifierHandler from "utils/dl/classification/classifierHandler";
-import { ModelStatus, Partition } from "utils/dl/enums";
+import { Partition } from "utils/dl/enums";
 import type { SequentialClassifier } from "utils/dl/classification";
 import {
   applySplitAndShuffle,
@@ -43,7 +42,6 @@ import {
   toTrainingInput,
 } from "utils/dl/utils";
 import type { TrainAndEvalResult, TrainingInput } from "utils/dl/types";
-import { getDifferences } from "utils/arrayUtils";
 
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
@@ -98,7 +96,7 @@ export const useFitClassifier = () => {
 
   // HOOKS
   const { setTotalEpochs, epochEndCallback } = useClassifierHistory();
-  const { newModelName, setModelStatus } = useClassifierStatus();
+  const { newModelName } = useClassifierStatus();
   const { getClassMap } = useClassMapDialog();
   const handleError = useClassifierErrorHandler();
 
@@ -183,9 +181,6 @@ export const useFitClassifier = () => {
 
     return {
       modelName: model.name,
-      trigger: "fresh" as RunTrigger,
-      parentRunId: undefined,
-      categoryDelta: undefined,
       classMap,
       trainingData,
       validationData,
@@ -297,7 +292,6 @@ export const useFitClassifier = () => {
     const parentRun = modelInfo.runs.at(-1);
 
     const parentRunId = parentRun?.id;
-    let categoryDelta: CategoryDelta | undefined = undefined;
 
     const trainingIds = new Set(trainingData.map((d) => d.id));
     const hasHitlCorrections = activeItems.some(
@@ -310,10 +304,6 @@ export const useFitClassifier = () => {
         ? "hitl-correction"
         : "continue";
 
-    if (modelInfo.status === "invalid") {
-      const parentCategoryIds = Object.values(parentRun?.classMap ?? {});
-      categoryDelta = getDifferences(parentCategoryIds, currentCategoryIds);
-    }
     const run: Run = {
       id: generateUUID(),
       parentRunId,
@@ -331,28 +321,35 @@ export const useFitClassifier = () => {
       classMap: classMap!,
       datasetFingerprint,
       categorySetHash,
-      categoryDelta,
       evalResults: trainingResults.evalResults,
       history: trainingResults.history,
       status: trainingResults.status,
       weightsRef: trainingResults.weightsRef,
     };
 
-    dispatch(
-      classifierSlice.actions.appendRun({
-        kindId: modelTarget.id,
-        modelName: modelName,
-        run,
-      }),
-    );
-    setModelStatus(ModelStatus.Idle);
+    batch(() => {
+      dispatch(
+        classifierSlice.actions.appendRun({
+          kindId: modelTarget.id,
+          modelName: modelName,
+          run,
+        }),
+      );
+      dispatch(
+        classifierSlice.actions.setModelStatus({
+          kindId: modelTarget.id,
+          modelName: modelName,
+          status: "idle",
+        }),
+      );
 
-    dispatch(
-      classifierSlice.actions.setActiveModel({
-        modelName: modelName,
-        kindId: kindClassifier.kindId,
-      }),
-    );
+      dispatch(
+        classifierSlice.actions.setActiveModel({
+          modelName: modelName,
+          kindId: kindClassifier.kindId,
+        }),
+      );
+    });
   };
 
   const fitClassifier = useCallback(async () => {
@@ -376,8 +373,14 @@ export const useFitClassifier = () => {
     let validationData: TrainingInput[];
     let partitionUpdates: Array<{ id: string; partition: Partition }>;
 
-    setModelStatus(ModelStatus.Loading);
-    const isInit = !modelName || modelInfo.status === "invalid";
+    dispatch(
+      classifierSlice.actions.setModelStatus({
+        kindId: modelTarget.id,
+        modelName: modelName ?? BASE_MODEL_NAME,
+        status: "loading",
+      }),
+    );
+    const isInit = !modelName;
     try {
       ({
         modelName: initializedModelName,
@@ -393,7 +396,13 @@ export const useFitClassifier = () => {
       return;
     }
     dispatch(dispatchPartition(partitionUpdates));
-    setModelStatus(ModelStatus.Training);
+    dispatch(
+      classifierSlice.actions.setModelStatus({
+        kindId: modelTarget.id,
+        modelName: modelName ?? BASE_MODEL_NAME,
+        status: "training",
+      }),
+    );
 
     const trainingResults = await classifierHandler.train(
       initializedModelName,

@@ -23,6 +23,7 @@ import type {
   KindClassifier,
   ModelClassMap,
   ModelInfo,
+  ModelLifecycleStatus,
   Run,
 } from "./types";
 import type { PayloadAction } from "@reduxjs/toolkit";
@@ -221,35 +222,17 @@ export const classifierSlice = createSlice({
       info.runs.push(run);
       info.status = "idle";
     },
-    markModelStale(
+    setModelStatus(
       state,
-      action: PayloadAction<{ kindId: string; modelName: string }>,
+      action: PayloadAction<{
+        kindId: string;
+        status: ModelLifecycleStatus;
+      }>,
     ) {
-      const info =
-        state.kindClassifiers[action.payload.kindId]?.modelInfoDict[
-          action.payload.modelName
-        ];
-      if (info) info.status = "stale";
-    },
-    markModelInvalid(
-      state,
-      action: PayloadAction<{ kindId: string; modelName: string }>,
-    ) {
-      const info =
-        state.kindClassifiers[action.payload.kindId]?.modelInfoDict[
-          action.payload.modelName
-        ];
-      if (info) info.status = "invalid";
-    },
-    clearModelStatus(
-      state,
-      action: PayloadAction<{ kindId: string; modelName: string }>,
-    ) {
-      const info =
-        state.kindClassifiers[action.payload.kindId]?.modelInfoDict[
-          action.payload.modelName
-        ];
-      if (info) info.status = "idle";
+      const kc = state.kindClassifiers[action.payload.kindId];
+
+      const info = kc.modelInfoDict[kc.activeModel ?? BASE_MODEL_NAME];
+      if (info) info.status = action.payload.status;
     },
     setConfidenceThreshold(
       state,

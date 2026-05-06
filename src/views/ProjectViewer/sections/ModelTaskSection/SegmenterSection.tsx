@@ -15,7 +15,7 @@ import { segmenterSlice } from "store/segmenter";
 import { HotkeyContext } from "utils/enums";
 import type { Model } from "utils/dl/Model";
 import { Segmenter } from "utils/dl/segmentation";
-import { ModelStatus, ModelTask } from "utils/dl/enums";
+import { ModelTask } from "utils/dl/enums";
 
 import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
 import { ImportTensorflowSegmentationModelDialog } from "./ImportTensorflowModelDialog";
@@ -57,14 +57,14 @@ export const SegmenterSection = () => {
     let predictText: string;
 
     switch (modelStatus) {
-      case ModelStatus.Idle:
+      case "idle":
         predictText = error
           ? error.message
           : selectedModel
             ? "Predict Model"
             : "No Trained Model";
         break;
-      case ModelStatus.Predicting:
+      case "predicting":
         predictText = "...Predicting";
         break;
       default:

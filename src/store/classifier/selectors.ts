@@ -56,16 +56,13 @@ export const selectKindClassifier = createSelector(
 export const selectActiveModelName = createSelector(
   selectKindClassifier,
   (kc) => {
-    if (!kc) return;
     return kc.activeModel;
   },
 );
 export const selectNewModelArch = createSelector(selectKindClassifier, (kc) => {
-  if (!kc) return;
   return kc.newModelArch;
 });
 export const selectModelInfo = createSelector(selectKindClassifier, (kc) => {
-  if (!kc) return;
   const modelName = kc.activeModel ?? BASE_MODEL_NAME;
   return kc.modelInfoDict[modelName];
 });

@@ -8,7 +8,15 @@ export type RunTrigger = "fresh" | "continue" | "hitl-correction" | "import";
 
 // Distinct from src/utils/modelsV2/enums.ts ModelStatus (which tracks runtime
 // activity: Loading | Training | Idle | Pending). This tracks lifecycle/validity.
-export type ModelLifecycleStatus = "idle" | "training" | "stale" | "invalid";
+export type ModelLifecycleStatus =
+  | "idle"
+  | "training"
+  | "waiting"
+  | "stale"
+  | "invalid"
+  | "loading"
+  | "predicting"
+  | "evaluating";
 
 export type RunHyperparameterSnapshot = {
   architecture: 0 | 1 | string; // mirrors KindClassifier.modelNameOrArch

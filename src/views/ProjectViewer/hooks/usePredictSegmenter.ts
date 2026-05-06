@@ -17,7 +17,6 @@ import {
 } from "store/dataV2/constants";
 import { selectExtendedImages } from "store/dataV2/selectors";
 
-import { ModelStatus } from "utils/dl/enums";
 import type { OrphanedAnnotationObject } from "utils/dl/segmentation";
 import { toInferenceInput } from "utils/dl/utils";
 import { getStackTraceFromError } from "utils/logUtils";
@@ -58,7 +57,7 @@ export const usePredictSegmenter = () => {
           alertState: alertState,
         }),
       );
-      setModelStatus(ModelStatus.Idle);
+      setModelStatus("idle");
     },
     [dispatch],
   );
@@ -80,7 +79,7 @@ export const usePredictSegmenter = () => {
     }
 
     /* PREDICT */
-    setModelStatus(ModelStatus.Predicting);
+    setModelStatus("predicting");
 
     try {
       selectedModel.loadInference(inferenceImages.map(toInferenceInput), {
@@ -213,7 +212,7 @@ export const usePredictSegmenter = () => {
     }
 
     progressCb(1, "");
-    setModelStatus(ModelStatus.Idle);
+    setModelStatus("idle");
   }, [
     handleError,
     allImages,

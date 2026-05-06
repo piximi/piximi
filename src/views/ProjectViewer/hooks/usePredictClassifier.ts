@@ -18,11 +18,9 @@ import { logger } from "utils/logUtils";
 import { representsUnknown } from "utils/stringUtils";
 import classifierHandler from "utils/dl/classification/classifierHandler";
 import { toInferenceInput } from "utils/dl/utils";
-import { ModelStatus } from "utils/dl/enums";
 import type { PredictionResult } from "utils/dl/types";
 
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
-import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 
 export const usePredictClassifier = () => {
@@ -34,7 +32,7 @@ export const usePredictClassifier = () => {
     selectKindClassifier,
     modelTarget.id,
   );
-  const { setModelStatus } = useClassifierStatus();
+
   const { setPredictedProbabilities } = useClassifierHistory();
   const { getClassMap } = useClassMapDialog();
 
@@ -80,7 +78,13 @@ export const usePredictClassifier = () => {
       representsUnknown(item.categoryId),
     );
 
-    setModelStatus(ModelStatus.Predicting);
+    dispatch(
+      classifierSlice.actions.setModelStatus({
+        kindId: kindClassifier.kindId,
+        modelName,
+        status: "predicting",
+      }),
+    );
 
     try {
       classifierHandler.loadInference(
@@ -131,7 +135,13 @@ export const usePredictClassifier = () => {
     });
 
     setPredictedProbabilities(probabilitiesById);
-    setModelStatus(ModelStatus.Pending);
+    dispatch(
+      classifierSlice.actions.setModelStatus({
+        kindId: kindClassifier.kindId,
+        modelName,
+        status: "waiting",
+      }),
+    );
   }, [
     dispatch,
     handleError,
@@ -139,7 +149,6 @@ export const usePredictClassifier = () => {
     activeCategories,
     kindClassifier,
     getClassMap,
-    setModelStatus,
     setPredictedProbabilities,
   ]);
 
