@@ -3,6 +3,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import type { RootState } from "store/rootReducer";
 
 import type { ClassifierEvaluationResultType } from "utils/dl/types";
+import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { BASE_MODEL_NAME } from "./constants";
 
@@ -59,6 +60,11 @@ export const selectActiveModelName = createSelector(
     return kc.activeModel;
   },
 );
+export const selectActiveModel = createSelector(selectKindClassifier, (kc) => {
+  const activeModelName = kc.activeModel;
+  if (!activeModelName) return;
+  return classifierHandler.getModel(activeModelName);
+});
 export const selectNewModelArch = createSelector(selectKindClassifier, (kc) => {
   return kc.newModelArch;
 });

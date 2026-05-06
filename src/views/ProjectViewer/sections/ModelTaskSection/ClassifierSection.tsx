@@ -23,6 +23,7 @@ import { selectTotalActiveUnlabeledItems } from "@ProjectViewer/state/reselector
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
+  selectActiveModel,
   selectKindClassifier,
   selectModelLifecycleStatus,
 } from "store/classifier/selectors";
@@ -49,7 +50,9 @@ export const ClassifierSection = () => {
     selectModelLifecycleStatus,
     modelTarget.id,
   );
+  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
   const totalUnlabeledItems = useSelector(selectTotalActiveUnlabeledItems);
+
   const { error } = useClassifierStatus();
   const predictClassifier = usePredictClassifier();
   const evaluateClassifier = useEvaluateClassifier();
@@ -79,10 +82,6 @@ export const ClassifierSection = () => {
   const handlePredict = async () => {
     await predictClassifier();
   };
-  const model = useMemo(() => {
-    if (!kindClassifier || !kindClassifier.activeModel) return;
-    return classifierHandler.getModel(kindClassifier.activeModel);
-  }, [kindClassifier?.activeModel]);
 
   const handleEvaluate = async () => {
     if (!model || !kindClassifier) return;

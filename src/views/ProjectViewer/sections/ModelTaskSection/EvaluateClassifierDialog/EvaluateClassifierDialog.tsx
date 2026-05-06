@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -18,11 +18,9 @@ import type { Category } from "store/dataV2/types";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
-  selectKindClassifier,
+  selectActiveModel,
   selectModelEvaluationResults,
 } from "store/classifier/selectors";
-
-import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
 import { ConfusionMatrix } from "./ConfusionMatrix";
@@ -39,14 +37,8 @@ export const EvaluateClassifierDialog = ({
 }: EvaluateClassifierDialogProps) => {
   const categories = useSelector(selectActiveKnownCategories);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const kindClassifier = useParameterizedSelector(
-    selectKindClassifier,
-    modelTarget.id,
-  );
-  const model = useMemo(() => {
-    if (!kindClassifier || !kindClassifier.activeModel) return;
-    return classifierHandler.getModel(kindClassifier.activeModel);
-  }, [kindClassifier?.activeModel]);
+
+  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
   const evaluationResults = useParameterizedSelector(
     selectModelEvaluationResults,
     modelTarget.id,

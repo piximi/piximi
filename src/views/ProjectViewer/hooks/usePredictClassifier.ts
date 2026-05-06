@@ -81,7 +81,6 @@ export const usePredictClassifier = () => {
     dispatch(
       classifierSlice.actions.setModelStatus({
         kindId: kindClassifier.kindId,
-        modelName,
         status: "predicting",
       }),
     );
@@ -138,7 +137,6 @@ export const usePredictClassifier = () => {
     dispatch(
       classifierSlice.actions.setModelStatus({
         kindId: kindClassifier.kindId,
-        modelName,
         status: "waiting",
       }),
     );

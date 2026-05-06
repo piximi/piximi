@@ -25,13 +25,15 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { selectKindClassifier } from "store/classifier/selectors";
+import {
+  selectActiveModel,
+  selectKindClassifier,
+} from "store/classifier/selectors";
 import { BASE_MODEL_NAME } from "store/classifier/constants";
 
 import { enumKeys } from "utils/objectUtils";
 import { CropSchema } from "utils/dl/enums";
 import type { CropOptions, NormalizeOptions } from "utils/dl/types";
-import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 
@@ -43,10 +45,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
     selectKindClassifier,
     modelTarget.id,
   );
-  const model = useMemo(() => {
-    if (!kindClassifier || !kindClassifier.activeModel) return;
-    return classifierHandler.getModel(kindClassifier.activeModel);
-  }, [kindClassifier?.activeModel]);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
   const inputShape = useMemo(() => {
     const modelName = kindClassifier.activeModel;
     if (!modelName)
@@ -292,10 +291,7 @@ export const ImageAugmentationSettings = () => {
     selectKindClassifier,
     modelTarget.id,
   );
-  const selectedModel = useMemo(() => {
-    if (!kindClassifier || !kindClassifier.activeModel) return;
-    return classifierHandler.getModel(kindClassifier.activeModel);
-  }, [kindClassifier?.activeModel]);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
 
   const normalizeOptions = useMemo(() => {
     const modelName = kindClassifier.activeModel;
@@ -342,10 +338,10 @@ export const ImageAugmentationSettings = () => {
       />
 
       <Stack sx={{ pl: 2 }} spacing={4}>
-        <InputShapeField disabled={!!selectedModel} />
+        <InputShapeField disabled={!!model} />
         <Collapse in={showAdvanced} style={{ marginTop: 0 }}>
           <Stack spacing={4} sx={{ mt: 4 }}>
-            <CropSection disabled={!rescalable || !!selectedModel} />
+            <CropSection disabled={!rescalable || !!model} />
             <FormControl size="small">
               <FormControlLabel
                 data-help={HelpItem.PixelIntensityRescale}
@@ -366,7 +362,7 @@ export const ImageAugmentationSettings = () => {
                 label="Rescale pixel intensities:"
                 labelPlacement="start"
                 disableTypography
-                disabled={!!selectedModel}
+                disabled={!!model}
               />
             </FormControl>
           </Stack>

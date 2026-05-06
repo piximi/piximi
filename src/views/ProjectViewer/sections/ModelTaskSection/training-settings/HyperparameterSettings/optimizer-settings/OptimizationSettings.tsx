@@ -22,12 +22,14 @@ import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useParameterizedSelector } from "store/hooks";
-import { selectKindClassifier } from "store/classifier/selectors";
+import {
+  selectActiveModel,
+  selectKindClassifier,
+} from "store/classifier/selectors";
 import { BASE_MODEL_NAME } from "store/classifier/constants";
 
 import { enumKeys } from "utils/objectUtils";
 import { LossFunction, OptimizationAlgorithm } from "utils/dl/enums";
-import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 
@@ -39,10 +41,7 @@ export const OptimizationSettings = () => {
     selectKindClassifier,
     modelTarget.id,
   );
-  const model = useMemo(() => {
-    if (!kindClassifier.activeModel) return;
-    return classifierHandler.getModel(kindClassifier.activeModel);
-  }, [kindClassifier?.activeModel]);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
   const { trainable } = useClassifierStatus();
 
   const compileOptions = useMemo(() => {

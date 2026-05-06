@@ -65,7 +65,6 @@ export const useEvaluateClassifier = () => {
       dispatch(
         classifierSlice.actions.setModelStatus({
           kindId: kindClassifier.kindId,
-          modelName,
           status: "evaluating",
         }),
       );
@@ -84,7 +83,6 @@ export const useEvaluateClassifier = () => {
         dispatch(
           classifierSlice.actions.setModelStatus({
             kindId: kindClassifier.kindId,
-            modelName,
             status: initialModelStatus,
           }),
         );
@@ -95,7 +93,6 @@ export const useEvaluateClassifier = () => {
     dispatch(
       classifierSlice.actions.setModelStatus({
         kindId: kindClassifier.kindId,
-        modelName,
         status: initialModelStatus,
       }),
     );

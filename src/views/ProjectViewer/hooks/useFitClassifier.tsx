@@ -336,14 +336,6 @@ export const useFitClassifier = () => {
         }),
       );
       dispatch(
-        classifierSlice.actions.setModelStatus({
-          kindId: modelTarget.id,
-          modelName: modelName,
-          status: "idle",
-        }),
-      );
-
-      dispatch(
         classifierSlice.actions.setActiveModel({
           modelName: modelName,
           kindId: kindClassifier.kindId,
@@ -376,7 +368,6 @@ export const useFitClassifier = () => {
     dispatch(
       classifierSlice.actions.setModelStatus({
         kindId: modelTarget.id,
-        modelName: modelName ?? BASE_MODEL_NAME,
         status: "loading",
       }),
     );
@@ -399,7 +390,6 @@ export const useFitClassifier = () => {
     dispatch(
       classifierSlice.actions.setModelStatus({
         kindId: modelTarget.id,
-        modelName: modelName ?? BASE_MODEL_NAME,
         status: "training",
       }),
     );

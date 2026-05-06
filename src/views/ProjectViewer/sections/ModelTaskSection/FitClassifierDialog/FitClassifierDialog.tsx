@@ -12,11 +12,9 @@ import { ModelSummaryTable } from "@ProjectViewer/sections/ModelTaskSection/data
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
-  selectKindClassifier,
+  selectActiveModel,
   selectModelLifecycleStatus,
 } from "store/classifier/selectors";
-
-import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import TrainingPlots from "./TrainingPlots";
 import { TrainingSettings } from "../training-settings/TrainingSettings";
@@ -38,14 +36,7 @@ export const FitClassifierDialog = ({
     selectModelLifecycleStatus,
     modelTarget.id,
   );
-  const kindClassifier = useParameterizedSelector(
-    selectKindClassifier,
-    modelTarget.id,
-  );
-  const model = useMemo(() => {
-    if (!kindClassifier || !kindClassifier.activeModel) return;
-    return classifierHandler.getModel(kindClassifier.activeModel);
-  }, [kindClassifier?.activeModel]);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
 
   const showPlots = useMemo(() => {
     return modelHistory.categoricalAccuracy.length > 0;

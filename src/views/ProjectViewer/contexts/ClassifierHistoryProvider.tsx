@@ -4,7 +4,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 
@@ -14,14 +13,13 @@ import type { RunHistoryEpoch } from "store/classifier/types";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
-  selectKindClassifier,
+  selectActiveModel,
   selectRunsForActiveModel,
 } from "store/classifier/selectors";
 
 import { logger } from "utils/logUtils";
 import type { Points } from "utils/types";
 import type { TrainingCallbacks } from "utils/dl/types";
-import classifierHandler from "utils/dl/classification/classifierHandler";
 
 type HistoryData = {
   categoricalAccuracy: Points;
@@ -94,14 +92,11 @@ export const ClassifierHistoryProvider = ({
   children: React.ReactNode;
 }) => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const kindClassifier = useParameterizedSelector(
-    selectKindClassifier,
-    modelTarget.id,
-  );
   const previousRuns = useParameterizedSelector(
     selectRunsForActiveModel,
     modelTarget.id,
   );
+  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
   const [totalEpochs, setTotalEpochs] = useState<number>(0);
   const [modelHistory, setModelHistory] = useState<HistoryData>(
@@ -110,10 +105,6 @@ export const ClassifierHistoryProvider = ({
   const [predictedProbabilities, setPredictedProbabilities] = useState<
     Record<string, number>
   >({});
-  const model = useMemo(() => {
-    if (!kindClassifier || !kindClassifier.activeModel) return;
-    return classifierHandler.getModel(kindClassifier.activeModel);
-  }, [kindClassifier?.activeModel]);
 
   useEffect(() => {
     if (!model) {

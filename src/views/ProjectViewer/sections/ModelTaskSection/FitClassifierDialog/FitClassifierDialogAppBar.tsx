@@ -28,7 +28,7 @@ import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 
 import { classifierSlice } from "store/classifier";
 import {
-  selectKindClassifier,
+  selectActiveModel,
   selectModelLifecycleStatus,
   selectShowClearPredictionsWarning,
 } from "store/classifier/selectors";
@@ -37,10 +37,8 @@ import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusPro
 import { useFitClassifier } from "@ProjectViewer/hooks/useFitClassifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { BASE_MODEL_NAME } from "store/classifier/constants";
 
 import { APPLICATION_COLORS } from "utils/constants";
-import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
@@ -53,18 +51,12 @@ export const FitClassifierDialogAppBar = ({
 }: FitClassifierDialogAppBarProps) => {
   const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const kindClassifier = useParameterizedSelector(
-    selectKindClassifier,
-    modelTarget.id,
-  );
+
   const modelStatus = useParameterizedSelector(
     selectModelLifecycleStatus,
     modelTarget.id,
   );
-  const selectedModel = useMemo(() => {
-    if (!kindClassifier || !kindClassifier.activeModel) return;
-    return classifierHandler.getModel(kindClassifier.activeModel);
-  }, [kindClassifier?.activeModel]);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
@@ -87,14 +79,13 @@ export const FitClassifierDialogAppBar = ({
   }, [modelStatus]);
 
   const onStopFitting = () => {
-    if (modelStatus !== "training" || !selectedModel) return;
+    if (modelStatus !== "training" || !model) return;
 
-    selectedModel.stopTraining();
+    model.stopTraining();
 
     dispatch(
       classifierSlice.actions.setModelStatus({
         kindId: modelTarget.id,
-        modelName: kindClassifier.activeModel ?? BASE_MODEL_NAME,
         status: "idle",
       }),
     );

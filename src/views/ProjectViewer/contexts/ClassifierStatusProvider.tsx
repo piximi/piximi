@@ -4,8 +4,8 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
+  selectActiveModel,
   selectAllCreatedModelNames,
-  selectKindClassifier,
   selectModelLifecycleStatus,
   selectShowClearPredictionsWarning,
 } from "store/classifier/selectors";
@@ -24,7 +24,6 @@ import { useParameterizedSelector } from "store/hooks";
 
 import { Partition } from "utils/dl/enums";
 import { findReplicateName, representsUnknown } from "utils/stringUtils";
-import classifierHandler from "utils/dl/classification/classifierHandler";
 
 export enum ErrorReason {
   NotTrainable,
@@ -69,10 +68,11 @@ export const ClassifierStatusProvider = ({
 }) => {
   const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const kindClassifier = useParameterizedSelector(
-    selectKindClassifier,
+  const modelStatus = useParameterizedSelector(
+    selectModelLifecycleStatus,
     modelTarget.id,
   );
+  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
   const inferenceItems = useParameterizedSelector(
     selectActiveItemsByPartition,
     Partition.Inference,
@@ -83,21 +83,12 @@ export const ClassifierStatusProvider = ({
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
-  const modelStatus = useParameterizedSelector(
-    selectModelLifecycleStatus,
-    modelTarget.id,
-  );
 
   const [isReady, setIsReady] = useState(true);
   const [newModelName, setNewModelName] = useState("");
   const restrictedClassifierNames = useSelector(selectAllCreatedModelNames);
   const [error, setError] = useState<ErrorContext>();
   const [activeErrors, setActiveErrors] = useState<ErrorContext[]>([]);
-
-  const model = useMemo(() => {
-    if (!kindClassifier || !kindClassifier.activeModel) return;
-    return classifierHandler.getModel(kindClassifier.activeModel);
-  }, [kindClassifier?.activeModel]);
 
   const targetItemType = useMemo(
     () => (modelTarget.id === IMAGE_CLASSIFIER_ID ? "images" : "annotations"),

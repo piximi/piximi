@@ -15,10 +15,11 @@ import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useParameterizedSelector } from "store/hooks";
-import { selectKindClassifier } from "store/classifier/selectors";
+import {
+  selectActiveModel,
+  selectKindClassifier,
+} from "store/classifier/selectors";
 import { BASE_MODEL_NAME } from "store/classifier/constants";
-
-import classifierHandler from "utils/dl/classification/classifierHandler";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 
@@ -32,10 +33,7 @@ export const TrainingStrategySettings = () => {
     modelTarget.id,
   );
 
-  const model = useMemo(() => {
-    if (!kindClassifier || !kindClassifier.activeModel) return;
-    return classifierHandler.getModel(kindClassifier.activeModel);
-  }, [kindClassifier?.activeModel]);
+  const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
   const fitOptions = useMemo(() => {
     const modelName = kindClassifier.activeModel;
     if (!modelName)
