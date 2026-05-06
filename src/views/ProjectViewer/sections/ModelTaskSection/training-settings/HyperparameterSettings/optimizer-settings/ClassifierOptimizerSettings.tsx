@@ -7,8 +7,7 @@ import { Grid2 as Grid } from "@mui/material";
 import { selectTotalActiveLabeledItems } from "@ProjectViewer/state/reselectors";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { selectKindClassifier } from "store/classifier/selectors";
-import { BASE_MODEL_NAME } from "store/classifier/constants";
+import { selectModelInfo } from "store/classifier/selectors";
 
 import { logger } from "utils/logUtils";
 
@@ -18,24 +17,13 @@ import { TrainingStrategySettings } from "./TrainingStrategySettings";
 export const ClassifierOptimizerSettings = () => {
   const labeledThingsCount = useSelector(selectTotalActiveLabeledItems);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const kindClassifier = useParameterizedSelector(
-    selectKindClassifier,
-    modelTarget.id,
-  );
+  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget.id);
   const fitOptions = useMemo(() => {
-    const modelName = kindClassifier.activeModel;
-    if (!modelName)
-      return kindClassifier.modelInfoDict[BASE_MODEL_NAME].optimizerSettings;
-    return kindClassifier.modelInfoDict[modelName].optimizerSettings;
-  }, [kindClassifier]);
+    return modelInfo.optimizerSettings;
+  }, [modelInfo]);
   const trainingPercentage = useMemo(() => {
-    const modelName = kindClassifier.activeModel;
-    if (!modelName)
-      return kindClassifier.modelInfoDict[BASE_MODEL_NAME].preprocessSettings
-        .trainingPercentage;
-    return kindClassifier.modelInfoDict[modelName].preprocessSettings
-      .trainingPercentage;
-  }, [kindClassifier]);
+    return modelInfo.preprocessSettings.trainingPercentage;
+  }, [modelInfo]);
 
   useEffect(() => {
     if (

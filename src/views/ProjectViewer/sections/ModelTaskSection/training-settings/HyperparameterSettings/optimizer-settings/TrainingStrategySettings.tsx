@@ -15,31 +15,23 @@ import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useParameterizedSelector } from "store/hooks";
-import {
-  selectActiveModel,
-  selectKindClassifier,
-} from "store/classifier/selectors";
-import { BASE_MODEL_NAME } from "store/classifier/constants";
+import { selectActiveModel, selectModelInfo } from "store/classifier/selectors";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 
 export const TrainingStrategySettings = () => {
   const dispatch = useDispatch();
-  const { trainable } = useClassifierStatus();
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const kindClassifier = useParameterizedSelector(
-    selectKindClassifier,
-    modelTarget.id,
-  );
-
+  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget.id);
   const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
+
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const { trainable } = useClassifierStatus();
+
   const fitOptions = useMemo(() => {
-    const modelName = kindClassifier.activeModel;
-    if (!modelName)
-      return kindClassifier.modelInfoDict[BASE_MODEL_NAME].optimizerSettings;
-    return kindClassifier.modelInfoDict[modelName].optimizerSettings;
-  }, [kindClassifier]);
+    return modelInfo.optimizerSettings;
+  }, [modelInfo]);
 
   const {
     inputValue: batchSize,

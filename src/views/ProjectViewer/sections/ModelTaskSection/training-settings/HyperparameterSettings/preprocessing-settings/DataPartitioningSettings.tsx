@@ -23,39 +23,26 @@ import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useParameterizedSelector } from "store/hooks";
-import {
-  selectActiveModel,
-  selectKindClassifier,
-} from "store/classifier/selectors";
-import { BASE_MODEL_NAME } from "store/classifier/constants";
+import { selectActiveModel, selectModelInfo } from "store/classifier/selectors";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 
 export const DataPartitioningSettings = () => {
   const dispatch = useDispatch();
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const { trainable } = useClassifierStatus();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const kindClassifier = useParameterizedSelector(
-    selectKindClassifier,
-    modelTarget.id,
-  );
+  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget.id);
   const model = useParameterizedSelector(selectActiveModel, modelTarget.id);
+
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const { trainable } = useClassifierStatus();
+
   const shuffleOptions = useMemo(() => {
-    const modelName = kindClassifier.activeModel;
-    if (!modelName)
-      return kindClassifier.modelInfoDict[BASE_MODEL_NAME].preprocessSettings
-        .shuffle;
-    return kindClassifier.modelInfoDict[modelName].preprocessSettings.shuffle;
-  }, [kindClassifier]);
+    return modelInfo.preprocessSettings.shuffle;
+  }, [modelInfo]);
   const trainingPercentage = useMemo(() => {
-    const modelName = kindClassifier.activeModel;
-    if (!modelName)
-      return kindClassifier.modelInfoDict[BASE_MODEL_NAME].preprocessSettings
-        .trainingPercentage;
-    return kindClassifier.modelInfoDict[modelName].preprocessSettings
-      .trainingPercentage;
-  }, [kindClassifier]);
+    return modelInfo.preprocessSettings.trainingPercentage;
+  }, [modelInfo]);
 
   const trainingFieldValidationOptions = useMemo(
     () => ({ min: 0.1, max: 0.99, enableFloat: true }),
