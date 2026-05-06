@@ -19,6 +19,7 @@ import { representsUnknown } from "utils/stringUtils";
 import classifierHandler from "utils/dl/classification/classifierHandler";
 import { toInferenceInput } from "utils/dl/utils";
 import { ModelStatus } from "utils/dl/enums";
+import type { PredictionResult } from "utils/dl/types";
 
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
@@ -45,6 +46,7 @@ export const usePredictClassifier = () => {
     const modelName = kindClassifier.activeModel;
     const model = classifierHandler.getModel(modelName);
     const modelInfo = kindClassifier.modelInfoDict[modelName];
+    const activeRun = modelInfo.runs.at(-1);
 
     if (!model) {
       handleError(
@@ -92,10 +94,7 @@ export const usePredictClassifier = () => {
     }
 
     const itemIds = unlabeledItems.map((item) => item.id);
-    let results: { categoryIds: string[]; probabilities: number[] } = {
-      categoryIds: [],
-      probabilities: [],
-    };
+    let results: PredictionResult;
     logger("before predict");
     try {
       results = await classifierHandler.predict(
@@ -108,32 +107,29 @@ export const usePredictClassifier = () => {
       return;
     }
 
-    const probabilitiesById: Record<string, number> = {};
-    if (itemIds.length === results.categoryIds.length) {
-      const updates = itemIds.map((id, idx) => {
-        probabilitiesById[id] = results.probabilities[idx];
-        return { id, categoryId: results.categoryIds[idx] };
-      });
-      if (modelTargetId === IMAGE_CLASSIFIER_ID) {
-        dispatch(dataSliceV2.actions.batchUpdateImageCategory(updates));
-      } else {
-        // Annotation predictions map to their volume's category.
-        const volumeUpdates = unlabeledItems.reduce<
-          Array<{ volumeId: string; categoryId: string }>
-        >((acc, item, idx) => {
-          const volumeId = (item as { volumeId?: string }).volumeId;
-          if (volumeId) {
-            acc.push({ volumeId, categoryId: results.categoryIds[idx] });
-          }
-          return acc;
-        }, []);
-        dispatch(
-          dataSliceV2.actions.batchUpdateAnnotationVolumeCategory(
-            volumeUpdates,
-          ),
-        );
-      }
+    const updates = itemIds.map((id, idx) => ({
+      id,
+      categoryId: results[idx].categoryId,
+      predicted: {
+        predictionConfidence: results[idx].maxProb,
+        predictedAtRunId: activeRun!.id,
+      },
+    }));
+    if (modelTarget.id === IMAGE_CLASSIFIER_ID) {
+      dispatch(dataSliceV2.actions.batchUpdateImageCategory(updates));
+    } else {
+      dispatch(
+        dataSliceV2.actions.batchBubbleUpdateAnnotationCategory(updates),
+      );
     }
+    const probabilitiesById: Record<string, number> = {};
+
+    // Stash full softmax map in context (volatile)
+    const softmaxMap: Record<string, number[]> = {};
+    itemIds.forEach((id, i) => {
+      softmaxMap[id] = results[i].softmax;
+    });
+
     setPredictedProbabilities(probabilitiesById);
     setModelStatus(ModelStatus.Pending);
   }, [

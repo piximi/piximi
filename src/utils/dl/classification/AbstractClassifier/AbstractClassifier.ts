@@ -164,12 +164,14 @@ export abstract class SequentialClassifier extends Model {
     const allProbs: Tensor2D[] = [];
     const allCategoryIdxs: number[] = [];
     const allMaxProbs: number[] = [];
-    this._inferenceDataset!.forEachAsync(async (batch) => {
+    await this._inferenceDataset!.forEachAsync(async (batch) => {
       const batchProbs = model.predict(batch.xs) as Tensor2D;
       const argmax = batchProbs.argMax(-1);
       const max = batchProbs.max(-1);
-      allCategoryIdxs.push(...((await argmax.array()) as number[]));
-      allMaxProbs.push(...((await max.array()) as number[]));
+      const argmaxArr = argmax.arraySync() as number[];
+      const maxArr = max.arraySync() as number[];
+      allCategoryIdxs.push(...argmaxArr);
+      allMaxProbs.push(...maxArr);
       allProbs.push(batchProbs);
       argmax.dispose();
       max.dispose();
