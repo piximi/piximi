@@ -343,6 +343,12 @@ export const classifierSlice = createSlice({
             if (info.runs.length > 0) info.status = "invalid";
           });
         });
+      })
+      .addCase(dataSliceV2.actions.updateKindName, (state, action) => {
+        const { kindId, name } = action.payload;
+        const kc = state.kindClassifiers[kindId];
+        if (!kc) return;
+        kc.modelTargetName = name;
       });
   },
 });
