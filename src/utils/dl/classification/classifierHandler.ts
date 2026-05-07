@@ -228,7 +228,7 @@ class ClassifierHandler {
     const trainingResults = await model.train(options, callbacks);
     import.meta.env.NODE_ENV !== "production" &&
       import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-      logger(trainingResults.history);
+      logger(model.currentFitHistory);
 
     /*
      * Until runs get properly snapshotted, evaluate after each run

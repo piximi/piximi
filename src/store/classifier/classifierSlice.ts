@@ -17,6 +17,8 @@ import type {
   ModelInfo,
   ModelLifecycleStatus,
   Run,
+  RunHistoryEpoch,
+  RunStatus,
 } from "./types";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -200,6 +202,42 @@ export const classifierSlice = createSlice({
       const info = kc.modelInfoDict[modelName];
       if (!info) return;
       info.runs.push(run);
+    },
+    appendEpochToActiveRun(
+      state,
+      action: PayloadAction<{
+        targetId: string;
+        modelName: string;
+        epoch: RunHistoryEpoch;
+      }>,
+    ) {
+      const info =
+        state.kindClassifiers[action.payload.targetId]?.modelInfoDict[
+          action.payload.modelName
+        ];
+      const run = info?.runs.at(-1);
+      if (!run || run.status !== "in-progress") return;
+      run.history.push(action.payload.epoch);
+    },
+    finalizeActiveRun(
+      state,
+      action: PayloadAction<{
+        targetId: string;
+        modelName: string;
+        finishedAt: string;
+        status: RunStatus;
+        evalResults?: ClassifierEvaluationResultType;
+        weightsRef?: string;
+      }>,
+    ) {
+      const kc = state.kindClassifiers[action.payload.targetId];
+      const info = kc?.modelInfoDict[action.payload.modelName];
+      const run = info?.runs.at(-1);
+      if (!kc || !run || run.status !== "in-progress") return;
+      run.finishedAt = action.payload.finishedAt;
+      run.status = action.payload.status;
+      run.evalResults = action.payload.evalResults;
+      run.weightsRef = action.payload.weightsRef;
       kc.status = "idle";
     },
     setModelStatus(

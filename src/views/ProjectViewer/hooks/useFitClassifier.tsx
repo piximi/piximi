@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 
-import { batch, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { getBackend, version_core } from "@tensorflow/tfjs";
 
@@ -38,7 +38,7 @@ import {
   hashCategorySet,
   toTrainingInput,
 } from "utils/dl/utils";
-import type { TrainAndEvalResult, TrainingInput } from "utils/dl/types";
+import type { TrainingCallbacks, TrainingInput } from "utils/dl/types";
 
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
@@ -92,7 +92,7 @@ export const useFitClassifier = () => {
   const knownCategories = useSelector(selectActiveKnownCategories);
 
   // HOOKS
-  const { setTotalEpochs, epochEndCallback } = useClassifierHistory();
+  const { setTotalEpochs } = useClassifierHistory();
   const { newModelName, modelParams } = useClassifierStatus();
   const { getClassMap } = useClassMapDialog();
   const handleError = useClassifierErrorHandler();
@@ -121,6 +121,12 @@ export const useFitClassifier = () => {
           targetId: kindClassifier.modelTargetId,
           modelName: newModelName,
           modelInfo: modelInfo,
+        }),
+      );
+      dispatch(
+        classifierSlice.actions.setActiveModel({
+          targetId: kindClassifier.modelTargetId,
+          modelName: newModelName,
         }),
       );
 
@@ -261,33 +267,32 @@ export const useFitClassifier = () => {
     };
   };
 
-  const recordRun = async ({
-    modelName,
+  const buildInProgressRun = async ({
     modelInfo,
     trainingData,
     validationData,
     isInit,
     startedAt,
     classMap,
-    trainingResults,
   }: {
-    modelName: string;
+    modelInfo: ModelInfo;
     trainingData: TrainingInput[];
     validationData: TrainingInput[];
-    modelInfo: ModelInfo;
     isInit: boolean;
     startedAt: string;
     classMap: ModelClassMap;
-    trainingResults: TrainAndEvalResult;
-  }) => {
+  }): Promise<Run> => {
     const datasetFingerprint = await fingerprintDataset(
       trainingData.map((d) => d.id),
       validationData.map((d) => d.id),
     );
     const currentCategoryIds = knownCategories.map((c) => c.id);
     const categorySetHash = await hashCategorySet(currentCategoryIds);
-    const parentRun = modelInfo.runs.at(-1);
-
+    // Skip any orphaned in-progress run from a prior crash when locating the
+    // parent — `at(-1)` would otherwise point at the orphan.
+    const parentRun = modelInfo.runs.findLast(
+      (r) => r.status !== "in-progress",
+    );
     const parentRunId = parentRun?.id;
 
     const trainingIds = new Set(trainingData.map((d) => d.id));
@@ -301,12 +306,12 @@ export const useFitClassifier = () => {
         ? "hitl-correction"
         : "continue";
 
-    const run: Run = {
+    return {
       id: generateUUID(),
       parentRunId,
       startedAt,
-      finishedAt: new Date().toISOString(),
       trigger,
+      status: "in-progress",
       appVersion: import.meta.env.VITE_APP_VERSION ?? "dev",
       tfjsVersion: version_core,
       backend: getBackend(),
@@ -315,30 +320,11 @@ export const useFitClassifier = () => {
         optimizer: structuredClone(modelInfo.optimizerSettings),
         preprocess: structuredClone(modelInfo.preprocessSettings),
       },
-      classMap: classMap!,
+      classMap,
       datasetFingerprint,
       categorySetHash,
-      evalResults: trainingResults.evalResults,
-      history: trainingResults.history,
-      status: trainingResults.status,
-      weightsRef: trainingResults.weightsRef,
+      history: [],
     };
-
-    batch(() => {
-      dispatch(
-        classifierSlice.actions.appendRun({
-          targetId: modelTarget,
-          modelName: modelName,
-          run,
-        }),
-      );
-      dispatch(
-        classifierSlice.actions.setActiveModel({
-          modelName: modelName,
-          targetId: kindClassifier.modelTargetId,
-        }),
-      );
-    });
   };
 
   const fitClassifier = useCallback(async () => {
@@ -354,10 +340,11 @@ export const useFitClassifier = () => {
           valid: true,
         };
 
-    // updates the the total number of epochs the model will train for (for display purposes)
-    setTotalEpochs(
-      (totalEpochs) => totalEpochs + modelInfo.optimizerSettings.epochs,
-    );
+    const currentModelEpochs = modelInfo.runs.reduce((total: number, run) => {
+      const runEpochs = run.hyperparameters.optimizer.epochs;
+      return (total += runEpochs);
+    }, 0);
+    setTotalEpochs(currentModelEpochs + modelInfo.optimizerSettings.epochs);
     // An invalid model means categories changed — a new model must be created.
     // Forcing initFit here ensures we never try to continue training an output
     // layer whose size no longer matches the current category set.
@@ -390,6 +377,22 @@ export const useFitClassifier = () => {
       return;
     }
     dispatch(dispatchPartition(partitionUpdates));
+
+    const inProgressRun = await buildInProgressRun({
+      modelInfo,
+      trainingData,
+      validationData,
+      isInit,
+      startedAt,
+      classMap,
+    });
+    dispatch(
+      classifierSlice.actions.appendRun({
+        targetId: modelTarget,
+        modelName: initializedModelName,
+        run: inProgressRun,
+      }),
+    );
     dispatch(
       classifierSlice.actions.setModelStatus({
         targetId: modelTarget,
@@ -397,24 +400,57 @@ export const useFitClassifier = () => {
       }),
     );
 
-    const trainingResults = await classifierHandler.train(
-      initializedModelName,
-      modelInfo.optimizerSettings,
-      {
-        onEpochEnd: epochEndCallback,
-      },
-    );
+    const onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (epoch, logs) => {
+      if (
+        !logs ||
+        logs.categoricalAccuracy === undefined ||
+        logs.val_categoricalAccuracy === undefined ||
+        logs.loss === undefined ||
+        logs.val_loss === undefined
+      )
+        return;
+      dispatch(
+        classifierSlice.actions.appendEpochToActiveRun({
+          targetId: modelTarget,
+          modelName: initializedModelName,
+          epoch: {
+            epoch,
+            loss: logs.loss as number,
+            valLoss: logs.val_loss as number,
+            accuracy: logs.categoricalAccuracy as number,
+            valAccuracy: logs.val_categoricalAccuracy as number,
+          },
+        }),
+      );
+    };
 
-    await recordRun({
-      modelName: initializedModelName,
-      trainingData,
-      validationData,
-      modelInfo,
-      isInit,
-      classMap,
-      startedAt,
-      trainingResults,
-    });
+    try {
+      const trainingResults = await classifierHandler.train(
+        initializedModelName,
+        modelInfo.optimizerSettings,
+        { onEpochEnd },
+      );
+      dispatch(
+        classifierSlice.actions.finalizeActiveRun({
+          targetId: modelTarget,
+          modelName: initializedModelName,
+          finishedAt: new Date().toISOString(),
+          status: trainingResults.status,
+          evalResults: trainingResults.evalResults,
+          weightsRef: trainingResults.weightsRef,
+        }),
+      );
+    } catch (error) {
+      dispatch(
+        classifierSlice.actions.finalizeActiveRun({
+          targetId: modelTarget,
+          modelName: initializedModelName,
+          finishedAt: new Date().toISOString(),
+          status: "failed",
+        }),
+      );
+      handleError(error as Error, "Training Error");
+    }
   }, [
     kindClassifier,
     newModelName,

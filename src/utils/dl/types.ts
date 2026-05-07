@@ -1,6 +1,6 @@
 import type { Kind, Shape } from "store/data/types";
 import type { BBox, ExtendedChannel } from "store/dataV2/types";
-import type { RunHistoryEpoch, RunStatus } from "store/classifier/types";
+import type { RunStatus } from "store/classifier/types";
 
 import type {
   CropSchema,
@@ -42,7 +42,6 @@ export type TrainingCallbacks = {
   onEpochEnd: (epoch: number, logs?: Logs) => Promise<void>;
 };
 export type TrainingResults = {
-  history: RunHistoryEpoch[];
   weightsRef: string;
   status: RunStatus;
 };

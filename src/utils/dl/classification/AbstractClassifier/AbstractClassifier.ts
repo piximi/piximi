@@ -117,22 +117,11 @@ export abstract class SequentialClassifier extends Model {
       throw Error(`"${this.name}" Model is not trainable`);
     }
 
-    this._currentFitHistory = [];
-    // Wrap the user's onEpochEnd to also feed _currentFitHistory
-    const userOnEpochEnd = callbacks.onEpochEnd;
-    const wrappedCallbacks: TrainingCallbacks = {
-      ...callbacks,
-      onEpochEnd: async (epoch, logs) => {
-        if (logs) this.recordEpoch(epoch, logs);
-        if (userOnEpochEnd) await userOnEpochEnd(epoch, logs);
-      },
-    };
-
     let status: RunStatus = "completed";
     try {
       await this._model.fitDataset(this._trainingDataset, {
         ...options,
-        callbacks: [wrappedCallbacks],
+        callbacks: [callbacks],
         validationData: this._validationDataset,
       });
     } catch (err) {
@@ -142,7 +131,6 @@ export abstract class SequentialClassifier extends Model {
 
     this.setPretrained();
     return {
-      history: [...this._currentFitHistory],
       weightsRef: this.name,
       status,
     };

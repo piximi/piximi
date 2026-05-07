@@ -28,7 +28,7 @@ export type DatasetFingerprint = {
   count: number;
 };
 export type CategoryDelta = { added: string[]; removed: string[] };
-export type RunStatus = "completed" | "stopped" | "failed";
+export type RunStatus = "in-progress" | "completed" | "stopped" | "failed";
 export type RunHistoryEpoch = {
   epoch: number;
   loss: number;
@@ -41,7 +41,7 @@ export type Run = {
   id: string;
   parentRunId?: string;
   startedAt: string;
-  finishedAt: string;
+  finishedAt?: string;
   status: RunStatus;
   trigger: RunTrigger;
   seed?: number; // Determine how useful this is. seeds are only used during model creation afaik
@@ -55,7 +55,7 @@ export type Run = {
   categoryDelta?: CategoryDelta;
   history: RunHistoryEpoch[];
   evalResults?: ClassifierEvaluationResultType; // moved off ModelInfo
-  weightsRef: string; // model name in classifierHandler, currently no real use but reference snapshotted weights in the future
+  weightsRef?: string; // model name in classifierHandler, currently no real use but reference snapshotted weights in the future
 };
 export type ModelClassMap = Record<number, string>;
 export type ModelInfo = {
