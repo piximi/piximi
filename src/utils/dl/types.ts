@@ -84,6 +84,10 @@ export type OptimizerSettings = {
   epochs: number;
   batchSize: number;
 };
+export type ClassifierModelParams = {
+  preprocessSettings: PreprocessSettings;
+  optimizerSettings: OptimizerSettings;
+};
 export type SegmenterCompileSettings = {
   learningRate: number;
   lossFunction:

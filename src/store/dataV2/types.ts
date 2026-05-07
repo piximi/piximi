@@ -188,6 +188,14 @@ export type ExtendedAnnotationEntities = Record<
   string,
   ExtendedAnnotationObject
 >;
+export type ItemCategoryUpdate = {
+  id: string;
+  categoryId: string;
+  predicted?: {
+    predictedAtRunId: string;
+    predictionConfidence: number;
+  };
+};
 
 export type DataStateV2 = {
   experiment: Experiment;

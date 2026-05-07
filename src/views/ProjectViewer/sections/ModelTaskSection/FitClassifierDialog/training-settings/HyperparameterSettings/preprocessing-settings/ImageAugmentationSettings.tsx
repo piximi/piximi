@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import type { SelectChangeEvent } from "@mui/material";
@@ -22,10 +22,10 @@ import { FunctionalDivider } from "components/ui";
 import { StyledSelect, WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { selectActiveModel, selectModelInfo } from "store/classifier/selectors";
+import { selectActiveModel } from "store/classifier/selectors";
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
 import { enumKeys } from "utils/objectUtils";
 import { CropSchema } from "utils/dl/enums";
@@ -35,14 +35,13 @@ import { ModelSettingsTextField } from "../../../../ModelSettingsTextField";
 
 const RowColInputOptions = { min: 20 };
 const InputShapeField = ({ disabled }: { disabled: boolean }) => {
-  const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
   const model = useParameterizedSelector(selectActiveModel, modelTarget);
+  const { handleUpdateInputShape, modelParams } = useClassifierStatus();
 
   const inputShape = useMemo(() => {
-    return modelInfo.preprocessSettings.inputShape;
-  }, [modelInfo]);
+    return modelParams.preprocessSettings.inputShape;
+  }, [modelParams]);
 
   const {
     inputValue: inputCols,
@@ -86,12 +85,8 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
         }
         if (inputRows === inputShape.height) return;
         setLastValidInputRows(inputRows);
-        dispatch(
-          classifierSlice.actions.updateInputShape({
-            inputShape: { ...inputShape, height: inputRows },
-            targetId: modelTarget,
-          }),
-        );
+        handleUpdateInputShape({ height: inputRows });
+
         return;
       case "shape-cols":
         if (inputColsError.error) {
@@ -100,12 +95,8 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
         }
         if (inputCols === inputShape.width) return;
         setLastValidInputCols(inputCols);
-        dispatch(
-          classifierSlice.actions.updateInputShape({
-            inputShape: { ...inputShape, width: inputCols },
-            targetId: modelTarget,
-          }),
-        );
+        handleUpdateInputShape({ width: inputCols });
+
         return;
       case "shape-channels":
         if (inputChannelsError.error) {
@@ -114,12 +105,7 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
         }
         if (inputChannels === inputShape.channels) return;
         setLastValidInputChannels(inputChannels);
-        dispatch(
-          classifierSlice.actions.updateInputShape({
-            inputShape: { ...inputShape, channels: inputChannels },
-            targetId: modelTarget,
-          }),
-        );
+        handleUpdateInputShape({ channels: inputChannels });
     }
   };
 
@@ -173,12 +159,10 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
 };
 
 const CropSection = ({ disabled }: { disabled: boolean }) => {
-  const dispatch = useDispatch();
-  const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
+  const { handleUpdatePreprocessSettings, modelParams } = useClassifierStatus();
   const cropOptions = useMemo(() => {
-    return modelInfo.preprocessSettings.cropOptions;
-  }, [modelInfo]);
+    return modelParams.preprocessSettings.cropOptions;
+  }, [modelParams]);
   const [cropDisabled, setCropDisabled] = useState<boolean>(
     cropOptions.cropSchema === CropSchema.None,
   );
@@ -191,12 +175,7 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
     error: cropsInputError,
   } = useNumberField(cropOptions.numCrops);
   const updateCropOptions = (cropOptions: CropOptions) => {
-    dispatch(
-      classifierSlice.actions.updateModelPreprocessOptions({
-        settings: { cropOptions },
-        targetId: modelTarget,
-      }),
-    );
+    handleUpdatePreprocessSettings({ cropOptions });
   };
   const dispatchNumCrops = () => {
     if (cropsInputError.error) {
@@ -264,27 +243,21 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
   );
 };
 export const ImageAugmentationSettings = () => {
-  const dispatch = useDispatch();
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
   const model = useParameterizedSelector(selectActiveModel, modelTarget);
+  const { handleUpdatePreprocessSettings, modelParams } = useClassifierStatus();
 
   const normalizeOptions = useMemo(() => {
-    return modelInfo.preprocessSettings.normalizeOptions;
-  }, [modelInfo]);
+    return modelParams.preprocessSettings.normalizeOptions;
+  }, [modelParams]);
   const [rescalable, setRescalable] = useState<boolean>(
     normalizeOptions.normalize,
   );
 
   const updateNormalizeOptions = (normalizeOptions: NormalizeOptions) => {
-    dispatch(
-      classifierSlice.actions.updateModelPreprocessOptions({
-        settings: { normalizeOptions },
-        targetId: modelTarget,
-      }),
-    );
+    handleUpdatePreprocessSettings({ normalizeOptions });
   };
 
   const onCheckboxChange = () => {

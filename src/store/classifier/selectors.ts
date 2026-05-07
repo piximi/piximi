@@ -4,13 +4,16 @@ import type { RootState } from "store/rootReducer";
 
 import type { ClassifierEvaluationResultType } from "utils/dl/types";
 import classifierHandler from "utils/dl/classification/classifierHandler";
-
-import { BASE_MODEL_NAME } from "./constants";
+import type { SequentialClassifier } from "utils/dl/classification";
 
 import type {
   ClassifierState,
   KindClassifier,
   KindClassifierDict,
+  ModelArch,
+  ModelInfo,
+  ModelLifecycleStatus,
+  Run,
 } from "./types";
 
 export const selectClassifierState = ({
@@ -46,52 +49,55 @@ export const selectKindClassifier = createSelector(
     return kc;
   },
 );
+export const selectModelLifecycleStatus = createSelector(
+  selectKindClassifier,
+  (kc): ModelLifecycleStatus => kc.status,
+);
 export const selectActiveModelName = createSelector(
   selectKindClassifier,
-  (kc) => {
+  (kc): string | undefined => {
     return kc.activeModel;
   },
 );
-export const selectActiveModel = createSelector(selectKindClassifier, (kc) => {
-  const activeModelName = kc.activeModel;
-  if (!activeModelName) return;
-  return classifierHandler.getModel(activeModelName);
-});
-export const selectNewModelArch = createSelector(selectKindClassifier, (kc) => {
-  return kc.newModelArch;
-});
-export const selectModelInfo = createSelector(selectKindClassifier, (kc) => {
-  const modelName = kc.activeModel ?? BASE_MODEL_NAME;
-  return kc.modelInfoDict[modelName];
-});
+export const selectActiveModel = createSelector(
+  selectKindClassifier,
+  (kc): SequentialClassifier | undefined => {
+    const activeModelName = kc.activeModel;
+    if (!activeModelName) return;
+    return classifierHandler.getModel(activeModelName);
+  },
+);
+export const selectNewModelArch = createSelector(
+  selectKindClassifier,
+  (kc): ModelArch => {
+    return kc.newModelArch;
+  },
+);
+export const selectModelInfo = createSelector(
+  selectKindClassifier,
+  (kc): ModelInfo | undefined => {
+    const modelName = kc.activeModel;
+    if (!modelName) return;
+    return kc.modelInfoDict[modelName];
+  },
+);
 export const selectRunsForActiveModel = createSelector(
   selectModelInfo,
-  (info) => {
+  (info): Run[] => {
     return info?.runs ?? [];
   },
 );
 
 export const selectActiveRun = createSelector(
   [selectRunsForActiveModel],
-  (runs) => runs[runs.length - 1], // undefined if no runs
+  (runs): Run | undefined => runs.at(-1), // undefined if no runs
 );
 
-export const selectModelLifecycleStatus = createSelector(
-  selectModelInfo,
-  (info) => info?.status,
-);
 export const selectConfidenceThreshold = createSelector(
   selectModelInfo,
-  (info) => info?.confidenceThreshold,
+  (info): number | undefined => info?.confidenceThreshold,
 );
-export const selectIsModelStale = createSelector(
-  [selectModelLifecycleStatus],
-  (s) => s === "stale",
-);
-export const selectIsModelInvalid = createSelector(
-  [selectModelLifecycleStatus],
-  (s) => s === "invalid",
-);
+
 export const selectModelEvaluationResults = createSelector(
   [selectRunsForActiveModel],
   (runs): ClassifierEvaluationResultType[] => {

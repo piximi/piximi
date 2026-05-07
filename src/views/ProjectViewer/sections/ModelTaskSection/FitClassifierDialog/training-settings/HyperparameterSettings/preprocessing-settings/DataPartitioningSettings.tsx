@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import {
@@ -19,30 +19,28 @@ import { FunctionalDivider } from "components/ui";
 import { WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useParameterizedSelector } from "store/hooks";
-import { selectActiveModel, selectModelInfo } from "store/classifier/selectors";
+import { selectActiveModel } from "store/classifier/selectors";
 
 import { ModelSettingsTextField } from "../../../../ModelSettingsTextField";
 
 export const DataPartitioningSettings = () => {
-  const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
   const model = useParameterizedSelector(selectActiveModel, modelTarget);
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const { trainable } = useClassifierStatus();
+  const { trainable, handleUpdatePreprocessSettings, modelParams } =
+    useClassifierStatus();
 
   const shuffleOptions = useMemo(() => {
-    return modelInfo.preprocessSettings.shuffle;
-  }, [modelInfo]);
+    return modelParams.preprocessSettings.shuffle;
+  }, [modelParams]);
   const trainingPercentage = useMemo(() => {
-    return modelInfo.preprocessSettings.trainingPercentage;
-  }, [modelInfo]);
+    return modelParams.preprocessSettings.trainingPercentage;
+  }, [modelParams]);
 
   const trainingFieldValidationOptions = useMemo(
     () => ({ min: 0.1, max: 0.99, enableFloat: true }),
@@ -63,21 +61,11 @@ export const DataPartitioningSettings = () => {
     }
     if (trainPercent === trainingPercentage) return;
     setLastValidTrainPercent(trainPercent);
-    dispatch(
-      classifierSlice.actions.updateModelPreprocessOptions({
-        settings: { trainingPercentage: trainPercent },
-        targetId: modelTarget,
-      }),
-    );
+    handleUpdatePreprocessSettings({ trainingPercentage: trainPercent });
   };
 
   const toggleShuffleOptions = () => {
-    dispatch(
-      classifierSlice.actions.updateModelPreprocessOptions({
-        settings: { shuffle: shuffleOptions },
-        targetId: modelTarget,
-      }),
-    );
+    handleUpdatePreprocessSettings({ shuffle: !shuffleOptions });
   };
   return (
     <Grid size={12}>

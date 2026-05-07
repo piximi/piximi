@@ -93,7 +93,7 @@ dependencies:
     specifier: 0.5.48
     version: 0.5.48
   immer:
-    specifier: ^10.1.1
+    specifier: ^10.2.0
     version: 10.2.0
   io-ts:
     specifier: ^2.2.20
@@ -173,6 +173,9 @@ dependencies:
   ts-priority-queue:
     specifier: ^0.1.1
     version: 0.1.1
+  use-immer:
+    specifier: ^0.11.0
+    version: 0.11.0(immer@10.2.0)(react@17.0.2)
   use-sound:
     specifier: ^4.0.1
     version: 4.0.4(react@17.0.2)
@@ -9583,6 +9586,16 @@ packages:
     dependencies:
       punycode: 2.3.1
     dev: true
+
+  /use-immer@0.11.0(immer@10.2.0)(react@17.0.2):
+    resolution: {integrity: sha512-RNAqi3GqsWJ4bcCd4LMBgdzvPmTABam24DUaFiKfX9s3MSorNRz9RDZYJkllJoMHUxVLMDetwAuCDeyWNrp1yA==}
+    peerDependencies:
+      immer: '>=8.0.0'
+      react: ^16.8.0 || ^17.0.1 || ^18.0.0 || ^19.0.0
+    dependencies:
+      immer: 10.2.0
+      react: 17.0.2
+    dev: false
 
   /use-sound@4.0.4(react@17.0.2):
     resolution: {integrity: sha512-SW81yRUu3K0rJHW0WVANCAK581A2qgD97+QrLxPhlAhvdIAIgw2J9d1VThdbHmPHjzCbwKE/is82V88sgFdjCg==}

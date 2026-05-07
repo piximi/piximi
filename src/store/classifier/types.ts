@@ -12,8 +12,6 @@ export type ModelLifecycleStatus =
   | "idle"
   | "training"
   | "waiting"
-  | "stale"
-  | "invalid"
   | "loading"
   | "predicting"
   | "evaluating";
@@ -64,9 +62,9 @@ export type ModelInfo = {
   classMap?: ModelClassMap;
   preprocessSettings: PreprocessSettings;
   optimizerSettings: OptimizerSettings;
-  status: ModelLifecycleStatus;
   confidenceThreshold: number;
   runs: Run[];
+  valid: boolean;
 };
 
 export enum ModelArch {
@@ -79,6 +77,7 @@ export type KindClassifier = {
   activeModel: string | undefined;
   newModelArch: ModelArch;
   modelInfoDict: Record<string, ModelInfo>;
+  status: ModelLifecycleStatus;
 };
 
 export type KindClassifierDict = Record<string, KindClassifier>;

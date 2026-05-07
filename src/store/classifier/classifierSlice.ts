@@ -1,21 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { deepClone } from "@mui/x-data-grid/internals";
-
 import type { Shape } from "store/dataV2/types";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 
-import { getDefaultModelInfo } from "utils/dl/classification/utils";
 import type { ClassifierEvaluationResultType } from "utils/dl/types";
 import type { RecursivePartial } from "utils/types";
 import { recursiveAssign } from "utils/objectUtils";
 
-import {
-  BASE_MODEL_NAME,
-  IMAGE_CLASSIFIER_ID,
-  IMAGE_CLASSIFIER_NAME,
-} from "./constants";
-import { getSelectedModelInfo } from "./utils";
+import { IMAGE_CLASSIFIER_ID, IMAGE_CLASSIFIER_NAME } from "./constants";
 import { ModelArch } from "./types";
 
 import type {
@@ -31,7 +23,8 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 const getDefaultKindClassifier = () => ({
   activeModel: undefined,
   newModelArch: ModelArch.SIMPLE_CNN,
-  modelInfoDict: { [BASE_MODEL_NAME]: getDefaultModelInfo() },
+  modelInfoDict: {},
+  status: "idle" as ModelLifecycleStatus,
 });
 const initialState: ClassifierState = {
   kindClassifiers: {
@@ -135,13 +128,16 @@ export const classifierSlice = createSlice({
       }>,
     ) {
       const { settings, targetId } = action.payload;
-      const selectedModelInfo = getSelectedModelInfo(
-        state.kindClassifiers,
-        targetId,
-      );
-      Object.assign(selectedModelInfo.optimizerSettings, settings);
+      const kc = state.kindClassifiers[targetId];
+
+      const activeModel = kc.activeModel;
+      if (activeModel)
+        Object.assign(
+          kc.modelInfoDict[activeModel].optimizerSettings,
+          settings,
+        );
     },
-    updateModelPreprocessOptions(
+    updateModelPreprocessSettings(
       state,
       action: PayloadAction<{
         settings: RecursivePartial<ModelInfo["preprocessSettings"]>;
@@ -149,36 +145,28 @@ export const classifierSlice = createSlice({
       }>,
     ) {
       const { settings, targetId } = action.payload;
-      const selectedModelInfo = getSelectedModelInfo(
-        state.kindClassifiers,
-        targetId,
-      );
-      recursiveAssign(selectedModelInfo.preprocessSettings, settings);
+      const kc = state.kindClassifiers[targetId];
+
+      const activeModel = kc.activeModel;
+      if (activeModel)
+        recursiveAssign(
+          kc.modelInfoDict[activeModel].preprocessSettings,
+          settings,
+        );
     },
     updateInputShape(
       state,
       action: PayloadAction<{ inputShape: Partial<Shape>; targetId: string }>,
     ) {
       const { targetId, inputShape } = action.payload;
-      const selectedModelInfo = getSelectedModelInfo(
-        state.kindClassifiers,
-        targetId,
-      );
-      selectedModelInfo.preprocessSettings.inputShape = {
-        ...selectedModelInfo.preprocessSettings.inputShape,
-        ...inputShape,
-      };
-    },
-    updateChannelsGlobally(
-      state,
-      action: PayloadAction<{ globalChannels: number }>,
-    ) {
-      Object.keys(state.kindClassifiers).forEach((kind) => {
-        state.kindClassifiers[kind].modelInfoDict[
-          BASE_MODEL_NAME
-        ].preprocessSettings.inputShape.channels =
-          action.payload.globalChannels;
-      });
+      const kc = state.kindClassifiers[targetId];
+
+      const activeModel = kc.activeModel;
+      if (activeModel)
+        Object.assign(
+          kc.modelInfoDict[activeModel].preprocessSettings.inputShape,
+          inputShape,
+        );
     },
     setActiveModel(
       state,
@@ -190,12 +178,8 @@ export const classifierSlice = createSlice({
       const { modelName, targetId } = action.payload;
       const classifier = state.kindClassifiers[targetId];
       classifier.activeModel = modelName;
-      if (modelName === undefined) return;
-      if (!(modelName in classifier.modelInfoDict)) {
-        classifier.modelInfoDict[modelName] = deepClone(
-          classifier.modelInfoDict[BASE_MODEL_NAME],
-        );
-      }
+      if (modelName === undefined || !(modelName in classifier.modelInfoDict))
+        return;
     },
     setNewModelArch(
       state,
@@ -211,10 +195,12 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{ targetId: string; modelName: string; run: Run }>,
     ) {
       const { targetId, modelName, run } = action.payload;
-      const info = state.kindClassifiers[targetId]?.modelInfoDict[modelName];
+      const kc = state.kindClassifiers[targetId];
+      if (!kc) return;
+      const info = kc.modelInfoDict[modelName];
       if (!info) return;
       info.runs.push(run);
-      info.status = "idle";
+      kc.status = "idle";
     },
     setModelStatus(
       state,
@@ -224,9 +210,7 @@ export const classifierSlice = createSlice({
       }>,
     ) {
       const kc = state.kindClassifiers[action.payload.targetId];
-
-      const info = kc.modelInfoDict[kc.activeModel ?? BASE_MODEL_NAME];
-      if (info) info.status = action.payload.status;
+      if (kc) kc.status = action.payload.status;
     },
     setConfidenceThreshold(
       state,
@@ -295,7 +279,7 @@ export const classifierSlice = createSlice({
         const kc = state.kindClassifiers[kindId];
         if (!kc) return;
         Object.values(kc.modelInfoDict).forEach((info) => {
-          if (info.runs.length > 0) info.status = "invalid";
+          if (info.runs.length > 0) info.valid = false;
         });
       })
       .addCase(dataSliceV2.actions.batchAddCategory, (state, action) => {
@@ -305,7 +289,7 @@ export const classifierSlice = createSlice({
           const kc = state.kindClassifiers[kindId];
           if (!kc) return;
           Object.values(kc.modelInfoDict).forEach((info) => {
-            if (info.runs.length > 0) info.status = "invalid";
+            if (info.runs.length > 0) info.valid = false;
           });
         });
       })
@@ -322,7 +306,7 @@ export const classifierSlice = createSlice({
         const kc = state.kindClassifiers[kindId];
         if (!kc) return;
         Object.values(kc.modelInfoDict).forEach((info) => {
-          if (info.runs.length > 0) info.status = "invalid";
+          if (info.runs.length > 0) info.valid = false;
         });
       })
       .addCase(dataSliceV2.actions.batchDeleteCategory, (state, action) => {
@@ -334,7 +318,7 @@ export const classifierSlice = createSlice({
           const kc = state.kindClassifiers[kindId];
           if (!kc) return;
           Object.values(kc.modelInfoDict).forEach((info) => {
-            if (info.runs.length > 0) info.status = "invalid";
+            if (info.runs.length > 0) info.valid = false;
           });
         });
       })

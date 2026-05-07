@@ -7,10 +7,7 @@ import { selectActiveKnownCategories } from "@ProjectViewer/state/reselectors";
 import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import {
-  selectKindClassifier,
-  selectModelLifecycleStatus,
-} from "store/classifier/selectors";
+import { selectKindClassifier } from "store/classifier/selectors";
 
 import { AlertType } from "utils/enums";
 import classifierHandler from "utils/dl/classification/classifierHandler";
@@ -27,10 +24,7 @@ export const useEvaluateClassifier = () => {
     selectKindClassifier,
     modelTarget,
   );
-  const modelStatus = useParameterizedSelector(
-    selectModelLifecycleStatus,
-    modelTarget,
-  );
+
   const evaluateClassifier = async () => {
     if (!kindClassifier || kindClassifier.activeModel === undefined) return;
     const modelName = kindClassifier.activeModel;
@@ -40,7 +34,7 @@ export const useEvaluateClassifier = () => {
     const currentRun = modelInfo.runs.at(-1);
     if (!currentRun) return;
 
-    const initialModelStatus = modelStatus;
+    const initialModelStatus = kindClassifier.status;
     if (!model.validationLoaded) {
       dispatch(
         applicationSettingsSlice.actions.updateAlertState({

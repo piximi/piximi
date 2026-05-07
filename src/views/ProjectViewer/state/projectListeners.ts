@@ -32,21 +32,3 @@ startAppListening({
     classifierHandler.removeAllModels();
   },
 });
-
-startAppListening({
-  predicate: (action, currentState, previousState) => {
-    return (
-      currentState.project.imageChannels !== previousState.project.imageChannels
-    );
-  },
-  effect: async (action, listenerApi) => {
-    const { project } = listenerApi.getState();
-
-    if (project.imageChannels)
-      listenerApi.dispatch(
-        classifierSlice.actions.updateChannelsGlobally({
-          globalChannels: project.imageChannels,
-        }),
-      );
-  },
-});

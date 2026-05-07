@@ -13,10 +13,7 @@ import {
 } from "@ProjectViewer/state/reselectors";
 import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import {
-  BASE_MODEL_NAME,
-  IMAGE_CLASSIFIER_ID,
-} from "store/classifier/constants";
+import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { dataSliceV2 } from "store/dataV2";
 import type {
   KindClassifier,
@@ -96,7 +93,7 @@ export const useFitClassifier = () => {
 
   // HOOKS
   const { setTotalEpochs, epochEndCallback } = useClassifierHistory();
-  const { newModelName } = useClassifierStatus();
+  const { newModelName, modelParams } = useClassifierStatus();
   const { getClassMap } = useClassMapDialog();
   const handleError = useClassifierErrorHandler();
 
@@ -118,12 +115,12 @@ export const useFitClassifier = () => {
         newModelName,
         kindClassifier.newModelArch,
       );
-      const newModelInfo = deepClone(modelInfo);
+
       dispatch(
         classifierSlice.actions.addModelInfo({
           targetId: kindClassifier.modelTargetId,
           modelName: newModelName,
-          modelInfo: newModelInfo,
+          modelInfo: modelInfo,
         }),
       );
 
@@ -348,8 +345,14 @@ export const useFitClassifier = () => {
     if (!kindClassifier) return;
     const startedAt = new Date().toISOString();
     const modelName = kindClassifier.activeModel;
-    const modelInfo =
-      kindClassifier?.modelInfoDict[modelName ?? BASE_MODEL_NAME];
+    const modelInfo: ModelInfo = modelName
+      ? kindClassifier?.modelInfoDict[modelName]
+      : {
+          ...deepClone(modelParams),
+          confidenceThreshold: 0.5,
+          runs: [],
+          valid: true,
+        };
 
     // updates the the total number of epochs the model will train for (for display purposes)
     setTotalEpochs(
@@ -419,6 +422,7 @@ export const useFitClassifier = () => {
     knownCategories,
     handleError,
     dispatch,
+    modelParams,
   ]);
 
   return fitClassifier;

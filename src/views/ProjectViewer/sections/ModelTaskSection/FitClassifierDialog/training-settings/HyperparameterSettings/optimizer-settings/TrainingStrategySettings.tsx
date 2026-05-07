@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { Collapse, Grid2 as Grid, IconButton, Stack } from "@mui/material";
@@ -11,27 +11,25 @@ import { FunctionalDivider } from "components/ui";
 import { WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useParameterizedSelector } from "store/hooks";
-import { selectActiveModel, selectModelInfo } from "store/classifier/selectors";
+import { selectActiveModel } from "store/classifier/selectors";
 
 import { ModelSettingsTextField } from "../../../../ModelSettingsTextField";
 
 export const TrainingStrategySettings = () => {
-  const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
   const model = useParameterizedSelector(selectActiveModel, modelTarget);
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const { trainable } = useClassifierStatus();
+  const { trainable, handleUpdateOptimizerSettings, modelParams } =
+    useClassifierStatus();
 
   const fitOptions = useMemo(() => {
-    return modelInfo.optimizerSettings;
-  }, [modelInfo]);
+    return modelParams.optimizerSettings;
+  }, [modelParams]);
 
   const {
     inputValue: batchSize,
@@ -57,12 +55,7 @@ export const TrainingStrategySettings = () => {
     }
     if (batchSize === fitOptions.batchSize) return;
     setLastValidBatchSize(batchSize);
-    dispatch(
-      classifierSlice.actions.updateModelOptimizerSettings({
-        settings: { batchSize },
-        targetId: modelTarget,
-      }),
-    );
+    handleUpdateOptimizerSettings({ batchSize });
   };
   const dispatchNumEpochs = () => {
     if (numEpochsInputError.error) {
@@ -71,12 +64,7 @@ export const TrainingStrategySettings = () => {
     }
     if (numEpochs === fitOptions.epochs) return;
     setLastValidEpoch(numEpochs);
-    dispatch(
-      classifierSlice.actions.updateModelOptimizerSettings({
-        settings: { epochs: numEpochs },
-        targetId: modelTarget,
-      }),
-    );
+    handleUpdateOptimizerSettings({ epochs: numEpochs });
   };
   return (
     <Grid size={12}>

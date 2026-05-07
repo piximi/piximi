@@ -28,6 +28,7 @@ import type {
   Category,
   AnnotationObject,
   AnnotationVolume,
+  ItemCategoryUpdate,
 } from "./types";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -503,17 +504,7 @@ export const dataSliceV2 = createSlice({
       });
       imageAdapter.updateMany(state.images, updates);
     },
-    updateImageCategory(
-      state,
-      action: PayloadAction<{
-        id: string;
-        categoryId: string;
-        predicted?: {
-          predictedAtRunId: string;
-          predictionConfidence: number;
-        };
-      }>,
-    ) {
+    updateImageCategory(state, action: PayloadAction<ItemCategoryUpdate>) {
       const image = state.images.entities[action.payload.id];
       if (!image) return;
       const newCatId = action.payload.categoryId;
@@ -538,16 +529,7 @@ export const dataSliceV2 = createSlice({
     },
     batchUpdateImageCategory(
       state,
-      action: PayloadAction<
-        Array<{
-          id: string;
-          categoryId: string;
-          predicted?: {
-            predictedAtRunId: string;
-            predictionConfidence: number;
-          };
-        }>
-      >,
+      action: PayloadAction<Array<ItemCategoryUpdate>>,
     ) {
       const updates: {
         id: string;
@@ -619,14 +601,7 @@ export const dataSliceV2 = createSlice({
     },
     bubbleUpdateAnnotationCategory(
       state,
-      action: PayloadAction<{
-        id: string;
-        categoryId: string;
-        predicted?: {
-          predictedAtRunId: string;
-          predictionConfidence: number;
-        };
-      }>,
+      action: PayloadAction<ItemCategoryUpdate>,
     ) {
       const targetCatId = action.payload.categoryId;
       const annotation = state.annotations.entities[action.payload.id];
@@ -662,48 +637,42 @@ export const dataSliceV2 = createSlice({
     },
     batchBubbleUpdateAnnotationCategory(
       state,
-      action: PayloadAction<
-        {
-          id: string;
-          categoryId: string;
-          predicted?: {
-            predictedAtRunId: string;
-            predictionConfidence: number;
-          };
-        }[]
-      >,
+      action: PayloadAction<Array<ItemCategoryUpdate>>,
     ) {
       const volumeChanges: Record<string, Partial<AnnotationVolume>> = {};
       const partitionUpdates: Array<{
         id: string;
         changes: { partition: Partition };
       }> = [];
-      action.payload.forEach(({ id, categoryId: taargetCatId, predicted }) => {
+
+      action.payload.forEach(({ id, categoryId: targetCatId, predicted }) => {
         const ann = state.annotations.entities[id];
-        if (!ann || !state.categories.entities[taargetCatId]) return;
-
+        if (!ann || !state.categories.entities[targetCatId]) return;
         const volume = state.annotationVolumes.entities[ann.volumeId];
-        if (!volume || volume.categoryId === taargetCatId) return;
+        if (!volume || volume.categoryId === targetCatId) return;
 
-        const volumeAnnUpdates = Object.values(state.annotations.entities)
+        const associatedAnnUpdates = Object.values(state.annotations.entities)
           .filter((_ann) => _ann.volumeId === ann.volumeId)
-          .map((ann) => ({
-            id: ann.id,
-            changes: {
-              partition: predicted
-                ? ann.partition
-                : representsUnknown(taargetCatId)
-                  ? Partition.Inference
-                  : Partition.Unassigned,
-            },
-          }));
+          .map((ann) => {
+            let partition: Partition;
+            if (predicted) partition = ann.partition;
+            else if (representsUnknown(targetCatId))
+              partition = Partition.Inference;
+            else partition = Partition.Unassigned;
+            return {
+              id: ann.id,
+              changes: {
+                partition,
+              },
+            };
+          });
 
         volumeChanges[ann.volumeId] = {
-          categoryId: taargetCatId,
+          categoryId: targetCatId,
           predictedAtRunId: predicted?.predictedAtRunId,
           predictionConfidence: predicted?.predictionConfidence,
         };
-        partitionUpdates.push(...volumeAnnUpdates);
+        partitionUpdates.push(...associatedAnnUpdates);
       });
 
       annotationVolumeAdapter.updateMany(

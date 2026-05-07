@@ -1,17 +1,11 @@
-import React, { useMemo } from "react";
-
 import { useSelector } from "react-redux";
 
 import { saveAs } from "file-saver";
 
 import { Button } from "@mui/material";
 
-import {
-  selectActiveClassifierModelTarget,
-  selectProjectName,
-} from "@ProjectViewer/state/selectors";
-import { useParameterizedSelector } from "store/hooks";
-import { selectModelInfo } from "store/classifier/selectors";
+import { selectProjectName } from "@ProjectViewer/state/selectors";
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
 import { HyperperameterSettings } from "./HyperparameterSettings";
 import { ModelPicker } from "./ModelPicker";
@@ -27,18 +21,11 @@ export const TrainingSettings = () => {
 };
 
 function ExportHyperparametersButton() {
-  const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
+  const { modelParams } = useClassifierStatus();
 
-  const hyperparameters = useMemo(() => {
-    return {
-      preprocessSettings: modelInfo.preprocessSettings,
-      optimizerSettings: modelInfo.optimizerSettings,
-    };
-  }, [modelInfo]);
   const projectName = useSelector(selectProjectName);
   const handleExportHyperparameters = () => {
-    const data = new Blob([JSON.stringify(hyperparameters)], {
+    const data = new Blob([JSON.stringify(modelParams)], {
       type: "application/json;charset=utf-8",
     });
 

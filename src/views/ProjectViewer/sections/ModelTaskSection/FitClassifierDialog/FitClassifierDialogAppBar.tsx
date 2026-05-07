@@ -38,6 +38,7 @@ import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selector
 import { useParameterizedSelector } from "store/hooks";
 import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
 import { applicationSettingsSlice } from "store/applicationSettings";
+import { useAcceptClearPredictions } from "@ProjectViewer/hooks";
 
 import { APPLICATION_COLORS } from "utils/constants";
 
@@ -62,12 +63,12 @@ export const FitClassifierDialogAppBar = ({
     selectShowClearPredictionsWarning,
   );
   const { currentEpoch, totalEpochs } = useClassifierHistory();
-  const { isReady, shouldWarnClearPredictions, clearPredictions, error } =
-    useClassifierStatus();
+  const { isReady, shouldWarnClearPredictions, error } = useClassifierStatus();
 
   const { onClose, onOpen, open } = useDialog();
 
   const fitClassifier = useFitClassifier();
+  const { clearPredictions } = useAcceptClearPredictions();
 
   const showProgressBar = useMemo(() => {
     switch (modelStatus) {

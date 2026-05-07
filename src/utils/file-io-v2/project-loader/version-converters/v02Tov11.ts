@@ -1,7 +1,3 @@
-import { BASE_MODEL_NAME } from "store/classifier/constants";
-
-import { v11_v2_GetDefaultModelInfo } from "../version-readers/common";
-
 import type {
   V02ClassifierState,
   V02Kind,
@@ -10,9 +6,7 @@ import type {
 import type {
   V11ClassifierState,
   V11KindClassifierDict,
-  V11OptimizerSettings,
   V11PiximiState,
-  V11PreprocessSettings,
 } from "../version-readers/version-types/v11Types";
 
 /**
@@ -44,30 +38,11 @@ const v02_11_classifierConverter = (
   kindIds: Array<V02Kind["id"]>,
 ): V11ClassifierState => {
   const kindClassifiers: V11KindClassifierDict = {};
-  const preprocessSettings: V11PreprocessSettings = {
-    ...classifier.preprocessOptions,
-    inputShape: classifier.inputShape,
-    trainingPercentage: classifier.trainingPercentage,
-  };
-  const optimizerSettings: V11OptimizerSettings = {
-    learningRate: classifier.learningRate,
-    lossFunction: classifier.lossFunction,
-    metrics: classifier.metrics,
-    optimizationAlgorithm: classifier.optimizationAlgorithm,
-    epochs: classifier.fitOptions.epochs,
-    batchSize: classifier.fitOptions.batchSize,
-  };
 
   kindIds.forEach((kindId) => {
     kindClassifiers[kindId] = {
       modelNameOrArch: 0,
-      modelInfoDict: {
-        [BASE_MODEL_NAME]: {
-          ...v11_v2_GetDefaultModelInfo(),
-          preprocessSettings,
-          optimizerSettings,
-        },
-      },
+      modelInfoDict: {},
     };
   });
   return {

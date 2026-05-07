@@ -5,9 +5,7 @@ import { useSelector } from "react-redux";
 import { Grid2 as Grid } from "@mui/material";
 
 import { selectTotalActiveLabeledItems } from "@ProjectViewer/state/reselectors";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import { useParameterizedSelector } from "store/hooks";
-import { selectModelInfo } from "store/classifier/selectors";
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
 import { logger } from "utils/logUtils";
 
@@ -16,14 +14,13 @@ import { TrainingStrategySettings } from "./TrainingStrategySettings";
 
 export const ClassifierOptimizerSettings = () => {
   const labeledThingsCount = useSelector(selectTotalActiveLabeledItems);
-  const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
+  const { modelParams } = useClassifierStatus();
   const fitOptions = useMemo(() => {
-    return modelInfo.optimizerSettings;
-  }, [modelInfo]);
+    return modelParams.optimizerSettings;
+  }, [modelParams]);
   const trainingPercentage = useMemo(() => {
-    return modelInfo.preprocessSettings.trainingPercentage;
-  }, [modelInfo]);
+    return modelParams.preprocessSettings.trainingPercentage;
+  }, [modelParams]);
 
   useEffect(() => {
     if (

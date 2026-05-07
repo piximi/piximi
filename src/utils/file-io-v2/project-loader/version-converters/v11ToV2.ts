@@ -12,7 +12,6 @@ import {
 } from "store/dataV2/constants";
 import { initialState } from "@ProjectViewer/state/projectSlice";
 import {
-  BASE_MODEL_NAME,
   IMAGE_CLASSIFIER_ID,
   IMAGE_CLASSIFIER_NAME,
 } from "store/classifier/constants";
@@ -128,6 +127,7 @@ function convertKindClassifier(
     modelTargetName,
     newModelArch: ModelArch.SIMPLE_CNN,
     modelInfoDict: v2ModelInfoDict,
+    status: "idle",
   };
 }
 function convertClassifier(
@@ -160,7 +160,8 @@ function convertClassifier(
     activeModel: undefined,
     modelTargetName: "Unknown",
     newModelArch: ModelArch.SIMPLE_CNN,
-    modelInfoDict: { [BASE_MODEL_NAME]: getDefaultModelInfo() },
+    modelInfoDict: {},
+    status: "idle",
   };
   return {
     kindClassifiers: v2Classifiers,

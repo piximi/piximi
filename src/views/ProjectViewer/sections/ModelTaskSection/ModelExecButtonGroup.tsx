@@ -17,7 +17,7 @@ type ModelExecButtonGroupProps = {
   handleFit: () => void;
   handleEvaluate: () => void;
   handlePredict: () => Promise<void>;
-  modelStatus: ModelLifecycleStatus;
+  modelStatus: ModelLifecycleStatus | undefined;
   execConfig: {
     fit: { helperText: string; disabled: boolean };
     predict: { helperText: string; disabled: boolean };

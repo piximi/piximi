@@ -9,13 +9,12 @@ import {
   OptimizationAlgorithm,
   Partition,
 } from "utils/dl/enums";
-import type { TrainingInput } from "utils/dl/types";
+import type { ClassifierModelParams, TrainingInput } from "utils/dl/types";
 import { representsUnknown } from "utils/stringUtils";
 
-export const getDefaultModelParams = (): Pick<
-  ModelInfo,
-  "optimizerSettings" | "preprocessSettings"
-> => ({
+export const getDefaultModelParams = (
+  channels: number = 1,
+): ClassifierModelParams => ({
   optimizerSettings: {
     epochs: 10,
     batchSize: 32,
@@ -29,7 +28,7 @@ export const getDefaultModelParams = (): Pick<
       planes: 1,
       height: 20,
       width: 20,
-      channels: 1,
+      channels: channels,
     },
     shuffle: true,
     normalizeOptions: {
@@ -46,7 +45,7 @@ export const getDefaultModelParams = (): Pick<
 
 export const getDefaultModelInfo = (): ModelInfo => ({
   ...getDefaultModelParams(),
-  status: "idle",
+  valid: true,
   confidenceThreshold: 0.5,
   runs: [],
 });

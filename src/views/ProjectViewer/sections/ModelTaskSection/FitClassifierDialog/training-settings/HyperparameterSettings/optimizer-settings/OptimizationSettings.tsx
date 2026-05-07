@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import type { SelectChangeEvent } from "@mui/material";
@@ -18,11 +18,10 @@ import { FunctionalDivider } from "components/ui";
 import { StyledSelect, WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useParameterizedSelector } from "store/hooks";
-import { selectActiveModel, selectModelInfo } from "store/classifier/selectors";
+import { selectActiveModel } from "store/classifier/selectors";
 
 import { enumKeys } from "utils/objectUtils";
 import { LossFunction, OptimizationAlgorithm } from "utils/dl/enums";
@@ -30,16 +29,15 @@ import { LossFunction, OptimizationAlgorithm } from "utils/dl/enums";
 import { ModelSettingsTextField } from "../../../../ModelSettingsTextField";
 
 export const OptimizationSettings = () => {
-  const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
   const model = useParameterizedSelector(selectActiveModel, modelTarget);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const { trainable } = useClassifierStatus();
+  const { trainable, handleUpdateOptimizerSettings, modelParams } =
+    useClassifierStatus();
   const compileOptions = useMemo(() => {
-    return modelInfo.optimizerSettings;
-  }, [modelInfo]);
+    return modelParams.optimizerSettings;
+  }, [modelParams]);
 
   const {
     inputValue: learningRate,
@@ -48,29 +46,19 @@ export const OptimizationSettings = () => {
     resetInputValue: resetLearningRate,
     handleOnChangeValidation: handleLearningRateChange,
     error: learningRateInputError,
-  } = useNumberField(compileOptions.learningRate);
+  } = useNumberField(compileOptions.learningRate, { enableFloat: true });
 
   const handleOptimizationAlgorithmChange = (
     event: SelectChangeEvent<unknown>,
   ) => {
     const target = event.target as HTMLInputElement; //target.value is string
     const optimizationAlgorithm = target.value as OptimizationAlgorithm;
-    dispatch(
-      classifierSlice.actions.updateModelOptimizerSettings({
-        settings: { optimizationAlgorithm },
-        targetId: modelTarget,
-      }),
-    );
+    handleUpdateOptimizerSettings({ optimizationAlgorithm });
   };
   const handleLossFunctionChange = (event: SelectChangeEvent<unknown>) => {
     const target = event.target as HTMLInputElement; //target.value is string
     const lossFunction = target.value as LossFunction;
-    dispatch(
-      classifierSlice.actions.updateModelOptimizerSettings({
-        settings: { lossFunction },
-        targetId: modelTarget,
-      }),
-    );
+    handleUpdateOptimizerSettings({ lossFunction });
   };
   const dispatchLearningRate = () => {
     if (learningRateInputError.error) {
@@ -78,13 +66,9 @@ export const OptimizationSettings = () => {
       return;
     }
     if (learningRate === compileOptions.learningRate) return;
+
     setLastValidLearningRate(learningRate);
-    dispatch(
-      classifierSlice.actions.updateModelOptimizerSettings({
-        settings: { learningRate },
-        targetId: modelTarget,
-      }),
-    );
+    handleUpdateOptimizerSettings({ learningRate });
   };
   return (
     <Grid size={12}>
