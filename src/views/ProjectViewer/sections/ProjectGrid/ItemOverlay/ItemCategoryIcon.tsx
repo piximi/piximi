@@ -1,4 +1,13 @@
-import { Box, Tooltip, Typography, useTheme } from "@mui/material";
+import { useMemo } from "react";
+
+import {
+  Box,
+  darken,
+  lighten,
+  Tooltip,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import {
   Label as LabelIcon,
   LabelImportant as LabelImportantIcon,
@@ -16,7 +25,12 @@ export const ItemCategoryIcon = ({
   predicted: boolean;
 }) => {
   const theme = useTheme();
-  const iconHalo = haloFilter(theme.palette.getContrastText(backgroundColor));
+
+  const iconHalo = useMemo(() => {
+    const contrastColor = theme.palette.getContrastText(backgroundColor);
+    const augmenter = contrastColor === "#fff" ? lighten : darken;
+    return haloFilter(augmenter(backgroundColor, 0.6));
+  }, [theme, backgroundColor]);
   return (
     <Tooltip
       title={
