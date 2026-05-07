@@ -8,7 +8,7 @@ import { ToolTipTab } from "components/layout";
 import { DialogTransitionSlide } from "components/dialogs";
 
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
-import { ModelSummaryTable } from "@ProjectViewer/sections/ModelTaskSection/data-display";
+import { ModelSummaryTable } from "@ProjectViewer/sections/ModelTaskSection/FitClassifierDialog/data-display";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
