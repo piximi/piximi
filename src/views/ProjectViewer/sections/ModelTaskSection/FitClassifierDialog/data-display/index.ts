@@ -1,2 +1,2 @@
-export { TwoDataPlot } from "./TwoDataPlot";
 export { ModelSummaryTable } from "./ModelSummaryTable";
+export { TrainingPlots } from "./TrainingPlots";

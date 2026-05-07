@@ -8,7 +8,6 @@ import { ToolTipTab } from "components/layout";
 import { DialogTransitionSlide } from "components/dialogs";
 
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
-import { ModelSummaryTable } from "@ProjectViewer/sections/ModelTaskSection/FitClassifierDialog/data-display";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
@@ -16,8 +15,8 @@ import {
   selectModelLifecycleStatus,
 } from "store/classifier/selectors";
 
-import TrainingPlots from "./TrainingPlots";
-import { TrainingSettings } from "./training-settings/TrainingSettings";
+import { TrainingPlots, ModelSummaryTable } from "./data-display";
+import { TrainingSettings } from "./training-settings";
 import { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
 
 type FitClassifierDialogProps = {

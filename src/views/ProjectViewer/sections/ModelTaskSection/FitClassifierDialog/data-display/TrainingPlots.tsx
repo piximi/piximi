@@ -2,9 +2,9 @@ import React from "react";
 
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 
-import { TwoDataPlot } from "./data-display";
+import { TwoDataPlot } from "./TwoDataPlot";
 
-const TrainingPlots = () => {
+export const TrainingPlots = () => {
   const { modelHistory } = useClassifierHistory();
   return (
     <div>
@@ -31,5 +31,3 @@ const TrainingPlots = () => {
     </div>
   );
 };
-
-export default TrainingPlots;
