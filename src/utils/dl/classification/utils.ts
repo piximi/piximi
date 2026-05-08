@@ -12,6 +12,31 @@ import {
 import type { ClassifierModelParams, TrainingInput } from "utils/dl/types";
 import { representsUnknown } from "utils/stringUtils";
 
+export const optimizerParams = [
+  "epochs",
+  "batchSize",
+  "learningRate",
+  "lossFunction",
+  "metrics",
+  "optimizationAlgorithm",
+] as const;
+export type OptimizerParams = (typeof optimizerParams)[number];
+
+export const preprocessParams = [
+  "inputShape",
+  "planes",
+  "height",
+  "width",
+  "channels",
+  "shuffle",
+  "normalizeOptions",
+  "normalize",
+  "center",
+  "cropOptions",
+  "numCrops",
+  "cropSchema",
+  "trainingPercentage",
+];
 export const getDefaultModelParams = (
   channels: number = 1,
 ): ClassifierModelParams => ({

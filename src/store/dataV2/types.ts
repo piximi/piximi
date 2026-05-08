@@ -59,7 +59,12 @@ export type AnnotationCategory = BaseCategory & {
 };
 export type Category = ImageCategory | AnnotationCategory;
 export type CategoryEntities = Record<string, Category>;
-
+export type PredictionCorrection = {
+  correctedFromRunId: string;
+  predictedCategoryId: string;
+  predictionConfidence: number;
+  correctedAt: string; // ISO timestamp
+};
 export type ImageObject = {
   id: string;
   name: string;
@@ -72,27 +77,18 @@ export type ImageObject = {
   partition: Partition;
   predictionConfidence?: number;
   predictedAtRunId?: string;
+  predictionCorrected?: PredictionCorrection;
 };
 export type ImageEntities = Record<string, ImageObject>;
 
-export type ExtendedImageObject = {
-  id: string;
-  name: string;
-  seriesId: string;
-  shape: Shape;
+export type ExtendedImageObject = ImageObject & {
   /**
    * ? Include both category and categoryId for `FilterType` and `isFiltered` usage
    * ? May change if there if alternative filtering logic is implemented
    */
-  categoryId: string;
   category: Category;
   activePlaneIdx: number;
-  timepoint: number;
-  bitDepth: BitDepth;
-  partition: Partition;
   channelsRef: ExtendedChannel[];
-  predictionConfidence?: number;
-  predictedAtRunId?: string;
 };
 export type Plane = {
   id: string;
@@ -144,6 +140,7 @@ export type ExtendedChannel = Channel & {
   rampMin: number;
   rampMax: number;
 };
+
 export type AnnotationVolume = {
   id: string;
   imageId: string;
@@ -151,6 +148,7 @@ export type AnnotationVolume = {
   categoryId: string;
   predictionConfidence?: number;
   predictedAtRunId?: string;
+  predictionCorrected?: PredictionCorrection;
 };
 export type AnnotationVolumeEntities = Record<string, AnnotationVolume>;
 
@@ -169,21 +167,17 @@ export type AnnotationObject = {
 };
 export type AnnotationEntities = Record<string, AnnotationObject>;
 
-export type ExtendedAnnotationObject = AnnotationObject & {
-  kindId: string;
-  /**
-   * ? Include both category and categoryId for `FilterType` and `isFiltered` usage
-   * ? May change if there if alternative filtering logic is implemented
-   */
-  categoryId: string;
-  category: Category;
-  channelsRef: ExtendedChannel[];
-  planeIdx: number;
-  imageId: string;
-  imageName: string;
-  predictionConfidence?: number;
-  predictedAtRunId?: string;
-};
+export type ExtendedAnnotationObject = AnnotationObject &
+  Omit<AnnotationVolume, "id" | "imageId"> & {
+    /**
+     * ? Include both category and categoryId for `FilterType` and `isFiltered` usage
+     * ? May change if there if alternative filtering logic is implemented
+     */
+    category: Category;
+    channelsRef: ExtendedChannel[];
+    planeIdx: number;
+    imageName: string;
+  };
 export type ExtendedAnnotationEntities = Record<
   string,
   ExtendedAnnotationObject

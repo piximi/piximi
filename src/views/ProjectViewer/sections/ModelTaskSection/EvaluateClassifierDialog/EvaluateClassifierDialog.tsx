@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -9,7 +9,10 @@ import {
   Typography,
   Box,
   Pagination,
+  Tooltip,
+  PaginationItem,
 } from "@mui/material";
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 
 import { DialogTransitionSlide } from "components/dialogs";
 
@@ -18,14 +21,18 @@ import type { Category } from "store/dataV2/types";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
-  selectActiveModel,
-  selectModelEvaluationResults,
+  selectActiveModelName,
+  selectRunsForActiveModel,
 } from "store/classifier/selectors";
+import type { Run } from "store/classifier/types";
+
+import type { RequireField } from "utils/types";
 
 import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
 import { ConfusionMatrix } from "./ConfusionMatrix";
 import { EvaluateClassifierDialogAppBar } from "./EvaluateClassifierAppBar";
 
+type RunWithEval = RequireField<Run, "evalResults">;
 type EvaluateClassifierDialogProps = {
   closeDialog: () => void;
   openedDialog: boolean;
@@ -38,21 +45,49 @@ export const EvaluateClassifierDialog = ({
   const categories = useSelector(selectActiveKnownCategories);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
 
-  const model = useParameterizedSelector(selectActiveModel, modelTarget);
-  const evaluationResults = useParameterizedSelector(
-    selectModelEvaluationResults,
+  const modelName = useParameterizedSelector(
+    selectActiveModelName,
     modelTarget,
   );
-  const [evalResult, setEvalResult] = useState(0);
 
-  const handleEvalResultChange = (
+  const runs = useParameterizedSelector(selectRunsForActiveModel, modelTarget);
+
+  // runIndices keeps the Paginator honest, so if a run is missing that will be
+  // obvious to the user
+  const { validRuns, runIndices } = useMemo(() => {
+    const validRuns: RunWithEval[] = [];
+    const runIndices: number[] = [];
+    runs.forEach((run, idx) => {
+      if (run.evalResults) {
+        validRuns.push(run as RunWithEval);
+        runIndices.push(idx);
+      }
+    });
+    return { validRuns, runIndices };
+  }, [runs]);
+
+  const [page, setPage] = useState(0);
+
+  const selectedRun = useMemo(() => validRuns[page], [validRuns, page]);
+  const validationWarning = useMemo(() => {
+    if (page === 0 || !selectedRun) return;
+    const previousRun = validRuns[page - 1];
+    if (
+      previousRun?.validationFingerprint !== selectedRun.validationFingerprint
+    ) {
+      return `This run's validation set differs from the previous run. Metric differences may reflect changes in evaluation data, not model performance alone.`;
+    } else {
+      return;
+    }
+  }, [validRuns, page, selectedRun]);
+  const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
     page: number,
   ) => {
-    setEvalResult(page - 1);
+    setPage(page - 1);
   };
 
-  return evaluationResults.length === 0 ? null : (
+  return validRuns.length === 0 || !selectedRun ? null : (
     <Dialog
       onClose={closeDialog}
       open={openedDialog}
@@ -75,13 +110,30 @@ export const EvaluateClassifierDialog = ({
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Typography variant="body2">{model?.name}</Typography>
+        <Typography variant="body2">{modelName}</Typography>
+
         <Box display="flex" flexDirection="row" alignItems="center">
+          {!!validationWarning && (
+            <Tooltip title={validationWarning}>
+              <WarningAmberRoundedIcon
+                fontSize="small"
+                color="warning"
+                sx={{ mr: 1 }}
+              />
+            </Tooltip>
+          )}
           <Typography variant="body2">Evaluation Result</Typography>
           <Pagination
-            count={evaluationResults.length}
-            page={evalResult + 1}
-            onChange={handleEvalResultChange}
+            count={validRuns.length}
+            page={page + 1}
+            onChange={handlePageChange}
+            renderItem={(item) => {
+              if (item.type === "page" && item.page !== null) {
+                const actualRunNumber = runIndices[item.page - 1] + 1;
+                return <PaginationItem {...item} page={actualRunNumber} />;
+              }
+              return <PaginationItem {...item} />;
+            }}
           />
         </Box>
       </Box>
@@ -94,7 +146,7 @@ export const EvaluateClassifierDialog = ({
         >
           <ConfusionMatrix
             classNames={categories.map((c: Category) => c.name)}
-            confusionMatrix={evaluationResults[evalResult].confusionMatrix}
+            confusionMatrix={selectedRun.evalResults.confusionMatrix}
           />
 
           <div>
@@ -104,30 +156,30 @@ export const EvaluateClassifierDialog = ({
             <Stack spacing={1} direction="row">
               <EvaluationMetricsInfoBox
                 metric={"Accuracy"}
-                value={evaluationResults[evalResult].accuracy}
+                value={selectedRun.evalResults.accuracy}
                 link="https://en.wikipedia.org/wiki/Accuracy_and_precision"
               />
               <EvaluationMetricsInfoBox
                 metric={"Cross entropy"}
-                value={evaluationResults[evalResult].crossEntropy}
+                value={selectedRun.evalResults.crossEntropy}
                 link="https://en.wikipedia.org/wiki/Cross_entropy"
               />
             </Stack>
             <Stack spacing={1} direction="row">
               <EvaluationMetricsInfoBox
                 metric={"Precision"}
-                value={evaluationResults[evalResult].precision}
+                value={selectedRun.evalResults.precision}
                 link="https://en.wikipedia.org/wiki/Precision_and_recall"
               />
               <EvaluationMetricsInfoBox
                 metric={"Recall"}
-                value={evaluationResults[evalResult].recall}
+                value={selectedRun.evalResults.recall}
                 link="https://en.wikipedia.org/wiki/Precision_and_recall"
               />
             </Stack>
             <EvaluationMetricsInfoBox
               metric={"F1-score"}
-              value={evaluationResults[evalResult].f1Score}
+              value={selectedRun.evalResults.f1Score}
               link="https://en.wikipedia.org/wiki/F-score"
             />
           </div>

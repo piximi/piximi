@@ -301,14 +301,16 @@ export async function hashIds(ids: string[]): Promise<string> {
     .join("");
 }
 
+type FingerprintInput = { id: string; categoryId: string };
+
 export async function fingerprintDataset(
-  trainIds: string[],
-  valIds: string[],
+  trainingData: FingerprintInput[],
+  validationData: FingerprintInput[],
 ): Promise<DatasetFingerprint> {
+  const toDesc = (item: FingerprintInput) => `${item.id}:${item.categoryId}`;
   return {
-    trainIds: await hashIds(trainIds),
-    valIds: await hashIds(valIds),
-    count: trainIds.length + valIds.length,
+    trainingFingerprint: await hashIds(trainingData.map(toDesc)),
+    validationFingerprint: await hashIds(validationData.map(toDesc)),
   };
 }
 

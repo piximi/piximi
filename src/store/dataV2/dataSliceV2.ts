@@ -29,6 +29,7 @@ import type {
   AnnotationObject,
   AnnotationVolume,
   ItemCategoryUpdate,
+  PredictionCorrection,
 } from "./types";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -73,6 +74,54 @@ function batchBubbleDeleteAnnotation(
   if (volumeIds.size > 0) {
     annotationVolumeAdapter.removeMany(state.annotationVolumes, [...volumeIds]);
   }
+}
+
+function getNewPartition(
+  catId: string,
+  currentPartition: Partition,
+  predicted: boolean,
+) {
+  if (predicted) return currentPartition;
+  if (representsUnknown(catId)) return Partition.Inference;
+
+  switch (currentPartition) {
+    case Partition.Training:
+    case Partition.Validation:
+      return currentPartition;
+    default:
+      return Partition.Unassigned;
+  }
+}
+
+function getPredictionCorrection(
+  existingCatId: string,
+  newCatId: string,
+  prediction: {
+    predictedAtRunId: string | undefined;
+    predictionConfidence: number | undefined;
+  },
+  existingCorrection?: PredictionCorrection,
+): PredictionCorrection | undefined {
+  const becomingUnknown = representsUnknown(newCatId);
+  const isCorrection =
+    !!prediction?.predictedAtRunId &&
+    !becomingUnknown &&
+    newCatId !== existingCatId;
+
+  const predictionCorrection = isCorrection
+    ? {
+        correctedFromRunId: prediction.predictedAtRunId!,
+        predictedCategoryId: existingCatId,
+        // "Safe" non-null assertion because `predictionConfidence` is always
+        // set along with with `predictedAtRunId`, so unless something changes
+        // either both exist or neither exist
+        predictionConfidence: prediction.predictionConfidence!,
+        correctedAt: new Date().toISOString(),
+      }
+    : becomingUnknown
+      ? undefined
+      : existingCorrection; // preserve prior correction history
+  return predictionCorrection;
 }
 
 function bubbleDeleteAnnotation(
@@ -499,7 +548,7 @@ export const dataSliceV2 = createSlice({
       const updates: { id: string; changes: { partition: Partition } }[] = [];
       action.payload.forEach(({ id, partition }) => {
         const image = state.images.entities[id];
-        if (!image || image.categoryId === partition) return;
+        if (!image || image.partition === partition) return;
         updates.push({ id, changes: { partition } });
       });
       imageAdapter.updateMany(state.images, updates);
@@ -511,11 +560,22 @@ export const dataSliceV2 = createSlice({
       if (image.categoryId === newCatId) return;
       const targetCategory = state.categories.entities[newCatId];
       if (!targetCategory) return;
-      const newPartition = action.payload.predicted
-        ? image.partition
-        : representsUnknown(newCatId)
-          ? Partition.Inference
-          : Partition.Unassigned;
+      const newPartition = getNewPartition(
+        newCatId,
+        image.partition,
+        !!action.payload.predicted,
+      );
+      const predictionCorrected = action.payload.predicted
+        ? undefined
+        : getPredictionCorrection(
+            image.categoryId,
+            newCatId,
+            {
+              predictedAtRunId: image.predictedAtRunId,
+              predictionConfidence: image.predictionConfidence,
+            },
+            image.predictionCorrected,
+          );
 
       imageAdapter.updateOne(state.images, {
         id: action.payload.id,
@@ -524,6 +584,7 @@ export const dataSliceV2 = createSlice({
           partition: newPartition,
           predictionConfidence: action.payload.predicted?.predictionConfidence,
           predictedAtRunId: action.payload.predicted?.predictedAtRunId,
+          predictionCorrected,
         },
       });
     },
@@ -540,11 +601,22 @@ export const dataSliceV2 = createSlice({
         if (!image) return;
         const targetCategory = state.categories.entities[catId];
         if (!targetCategory) return;
-        const newPartition = predicted
-          ? image.partition
-          : representsUnknown(catId)
-            ? Partition.Inference
-            : Partition.Unassigned;
+        const newPartition = getNewPartition(
+          catId,
+          image.partition,
+          !!predicted,
+        );
+        const predictionCorrected = predicted
+          ? undefined
+          : getPredictionCorrection(
+              image.categoryId,
+              catId,
+              {
+                predictedAtRunId: image.predictedAtRunId,
+                predictionConfidence: image.predictionConfidence,
+              },
+              image.predictionCorrected,
+            );
         updates.push({
           id,
           changes: {
@@ -552,6 +624,7 @@ export const dataSliceV2 = createSlice({
             partition: newPartition,
             predictionConfidence: predicted?.predictionConfidence,
             predictedAtRunId: predicted?.predictedAtRunId,
+            predictionCorrected,
           },
         });
       });
@@ -616,20 +689,30 @@ export const dataSliceV2 = createSlice({
         .map((ann) => ({
           id: ann.id,
           changes: {
-            partition: action.payload.predicted
-              ? ann.partition
-              : representsUnknown(targetCatId)
-                ? Partition.Inference
-                : Partition.Unassigned,
+            partition: getNewPartition(
+              targetCatId,
+              ann.partition,
+              !!action.payload.predicted,
+            ),
           },
         }));
 
+      const predictionCorrected = getPredictionCorrection(
+        volume.categoryId,
+        targetCatId,
+        {
+          predictedAtRunId: volume.predictedAtRunId,
+          predictionConfidence: volume.predictionConfidence,
+        },
+        volume.predictionCorrected,
+      );
       annotationVolumeAdapter.updateOne(state.annotationVolumes, {
         id: annotation.volumeId,
         changes: {
           categoryId: action.payload.categoryId,
           predictedAtRunId: action.payload.predicted?.predictedAtRunId,
           predictionConfidence: action.payload.predicted?.predictionConfidence,
+          predictionCorrected,
         },
       });
 
@@ -654,23 +737,33 @@ export const dataSliceV2 = createSlice({
         const associatedAnnUpdates = Object.values(state.annotations.entities)
           .filter((_ann) => _ann.volumeId === ann.volumeId)
           .map((ann) => {
-            let partition: Partition;
-            if (predicted) partition = ann.partition;
-            else if (representsUnknown(targetCatId))
-              partition = Partition.Inference;
-            else partition = Partition.Unassigned;
             return {
               id: ann.id,
               changes: {
-                partition,
+                partition: getNewPartition(
+                  targetCatId,
+                  ann.partition,
+                  !!predicted,
+                ),
               },
             };
           });
+
+        const predictionCorrected = getPredictionCorrection(
+          volume.categoryId,
+          targetCatId,
+          {
+            predictedAtRunId: volume.predictedAtRunId,
+            predictionConfidence: volume.predictionConfidence,
+          },
+          volume.predictionCorrected,
+        );
 
         volumeChanges[ann.volumeId] = {
           categoryId: targetCatId,
           predictedAtRunId: predicted?.predictedAtRunId,
           predictionConfidence: predicted?.predictionConfidence,
+          predictionCorrected,
         };
         partitionUpdates.push(...associatedAnnUpdates);
       });

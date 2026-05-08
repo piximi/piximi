@@ -23,11 +23,9 @@ export type RunHyperparameterSnapshot = {
 };
 
 export type DatasetFingerprint = {
-  trainIds: string;
-  valIds: string;
-  count: number;
+  trainingFingerprint: string;
+  validationFingerprint: string;
 };
-export type CategoryDelta = { added: string[]; removed: string[] };
 export type RunStatus = "in-progress" | "completed" | "stopped" | "failed";
 export type RunHistoryEpoch = {
   epoch: number;
@@ -50,9 +48,10 @@ export type Run = {
   backend: string;
   hyperparameters: RunHyperparameterSnapshot;
   classMap: ModelClassMap;
-  datasetFingerprint: DatasetFingerprint;
+  trainingFingerprint: string; // equality comparison between runs
+  validationFingerprint: string; // ^^^
+  valIds: string[]; // for set operations, snapshot UI, partial overlap analytics between models
   categorySetHash: string;
-  categoryDelta?: CategoryDelta;
   history: RunHistoryEpoch[];
   evalResults?: ClassifierEvaluationResultType; // moved off ModelInfo
   weightsRef?: string; // model name in classifierHandler, currently no real use but reference snapshotted weights in the future

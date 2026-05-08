@@ -183,16 +183,9 @@ const buildExtendedImage = (
   }, []);
   if (channels.length === 0) return null;
   return {
-    id: image.id,
-    name: image.name,
-    seriesId: image.seriesId,
-    shape: image.shape,
-    categoryId: category.id,
+    ...image,
     category,
     activePlaneIdx: plane.zIndex,
-    timepoint: image.timepoint,
-    bitDepth: image.bitDepth,
-    partition: image.partition,
     channelsRef: channels,
   };
 };
@@ -330,15 +323,14 @@ const buildExtendedAnnotation = (
     return extChs;
   }, []);
   if (channels.length === 0) return null;
+  const { id, imageId, ...volProps } = vol;
   return {
     ...ann,
-    kindId: vol.kindId,
-    categoryId: category.id,
     category: category,
     channelsRef: channels,
     planeIdx: plane.zIndex,
-    imageId: image.id,
     imageName: image.name,
+    ...volProps,
   };
 };
 export const selectExtendedAnnotationById = createSelector(

@@ -233,29 +233,39 @@ export const useFitClassifier = () => {
         toValidationPartition: [],
         toInferencePartition: inference,
       });
-    let partitionUpdates: Array<{ id: string; partition: Partition }> = [];
+    const partitionUpdates = [
+      ...trainingUpdates,
+      ...validationUpdates,
+      ...inferenceUpdates,
+    ];
+    const lastRun = modelInfo.runs.findLast((r) => r.status !== "in-progress");
+    // computation duplicated later in `buildInProgressRun`, but cheap enough and avoids
+    // excessive parameter-threading and uneccessary/unused computation in `prepareInitialRun`
+    const { trainingFingerprint, validationFingerprint } =
+      await fingerprintDataset(trainingData, validationData);
+    const trainingChanged =
+      trainingFingerprint !== lastRun?.trainingFingerprint;
+    const validationChanged =
+      validationFingerprint !== lastRun?.validationFingerprint;
+    const classes = Object.values(classMap).map((id) => ({ id }));
     if (!model.trainingLoaded) {
-      partitionUpdates = [
-        ...trainingUpdates,
-        ...validationUpdates,
-        ...inferenceUpdates,
-      ];
-
       classifierHandler.loadData(
         model.name,
         trainingData,
         validationData,
-        Object.values(classMap).map((id) => ({ id })),
+        classes,
       );
-    } else {
-      if (labeledUnassigned.length > 0) {
-        classifierHandler.loadTraining(
-          model.name,
-          labeledUnassigned,
-          Object.values(classMap).map((id) => ({ id })),
-        );
-        partitionUpdates = trainingUpdates;
-      }
+    } else if (trainingChanged && validationChanged) {
+      classifierHandler.loadData(
+        model.name,
+        trainingData,
+        validationData,
+        classes,
+      );
+    } else if (trainingChanged) {
+      classifierHandler.loadTraining(model.name, trainingData, classes);
+    } else if (validationChanged) {
+      classifierHandler.loadValidation(model.name, validationData, classes);
     }
 
     return {
@@ -283,8 +293,8 @@ export const useFitClassifier = () => {
     classMap: ModelClassMap;
   }): Promise<Run> => {
     const datasetFingerprint = await fingerprintDataset(
-      trainingData.map((d) => d.id),
-      validationData.map((d) => d.id),
+      trainingData,
+      validationData,
     );
     const currentCategoryIds = knownCategories.map((c) => c.id);
     const categorySetHash = await hashCategorySet(currentCategoryIds);
@@ -295,10 +305,11 @@ export const useFitClassifier = () => {
     );
     const parentRunId = parentRun?.id;
 
-    const trainingIds = new Set(trainingData.map((d) => d.id));
+    const trainingIdSet = new Set(trainingData.map((d) => d.id));
     const hasHitlCorrections = activeItems.some(
       (item) =>
-        trainingIds.has(item.id) && item.predictedAtRunId === parentRun?.id,
+        trainingIdSet.has(item.id) &&
+        item.predictionCorrected?.correctedFromRunId === parentRun?.id,
     );
     const trigger: RunTrigger = isInit
       ? "fresh"
@@ -321,7 +332,8 @@ export const useFitClassifier = () => {
         preprocess: structuredClone(modelInfo.preprocessSettings),
       },
       classMap,
-      datasetFingerprint,
+      ...datasetFingerprint,
+      valIds: validationData.map((d) => d.id),
       categorySetHash,
       history: [],
     };
@@ -361,7 +373,9 @@ export const useFitClassifier = () => {
         status: "loading",
       }),
     );
-    const isInit = !modelName;
+    // modelInfo.valid === false should never actually happen here
+    // since this is guarded against before hitting fit
+    const isInit = !modelName || !modelInfo.valid;
     try {
       ({
         modelName: initializedModelName,
