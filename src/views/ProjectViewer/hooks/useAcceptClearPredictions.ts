@@ -48,6 +48,12 @@ export const useAcceptClearPredictions = () => {
           status: "idle",
         }),
       );
+      dispatch(
+        classifierSlice.actions.setActiveSoftmax({
+          targetId: modelTarget,
+          softmax: undefined,
+        }),
+      );
     });
   };
 
@@ -72,6 +78,12 @@ export const useAcceptClearPredictions = () => {
         classifierSlice.actions.setModelStatus({
           targetId: modelTarget,
           status: "idle",
+        }),
+      );
+      dispatch(
+        classifierSlice.actions.setActiveSoftmax({
+          targetId: modelTarget,
+          softmax: undefined,
         }),
       );
     });

@@ -11,6 +11,7 @@ export enum ImageSortType {
   Category = "Category",
   Random = "Random",
   Name = "Name",
+  Softmax = "Softmax",
 }
 export enum AnnotationSortType {
   None = "None",
@@ -19,9 +20,24 @@ export enum AnnotationSortType {
   Category = "Category",
   Image = "Image",
   Random = "Random",
+  Softmax = "Softmax",
 }
+
+export type Comparator<T> = (a: T, b: T) => number;
+export type MarginedSoftmax = Record<string, number>;
+export type SortDeps = {
+  margined: Record<string, number> | undefined;
+  seed: number;
+};
+
+export type SortMap<T, S extends string> = {
+  [K in S]: (deps: SortDeps) => Comparator<T>;
+};
 export type ImageFilters = Required<
-  Pick<FilterType<ExtendedImageObject>, "categoryId" | "partition">
+  Pick<
+    FilterType<Required<ExtendedImageObject>>,
+    "categoryId" | "partition" | "predictionConfidence"
+  >
 >;
 export type ImageGridState = {
   selectedIds: string[];
@@ -30,7 +46,10 @@ export type ImageGridState = {
 };
 
 export type AnnotationFilters = Required<
-  Pick<FilterType<ExtendedAnnotationObject>, "categoryId" | "partition">
+  Pick<
+    FilterType<Required<ExtendedAnnotationObject>>,
+    "categoryId" | "partition" | "predictionConfidence"
+  >
 >;
 export type KindState = {
   id: string;

@@ -14,7 +14,7 @@ export const ItemOverlay = ({
   position: { top: string; left: string };
   categoryColor: string;
   categoryName: string;
-  usePredictedStyle: boolean;
+  usePredictedStyle: number | undefined;
   itemId: string;
   itemType: "annotation" | "image";
 }) => {

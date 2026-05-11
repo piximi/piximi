@@ -65,6 +65,8 @@ export const AnnotationGridItem = memo(
           usePredictedStyle={
             item.partition === Partition.Inference &&
             !isUnknownCategory(item.categoryId)
+              ? item.predictionConfidence
+              : undefined
           }
           position={getIconPosition(item.shape.height, item.shape.width)}
           itemId={item.id}

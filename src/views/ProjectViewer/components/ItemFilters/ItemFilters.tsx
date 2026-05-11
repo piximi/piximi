@@ -1,18 +1,19 @@
 import React from "react";
 
-import { Divider, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 
 import { CategoryFilterList } from "./CategoryFilterList";
 import { PartitionFilterList } from "./PartitionFilterList";
 import { SortSelect } from "./SortSelect";
+import { ConfidenceFilter } from "./ConfidenceFilter";
 
 export const ItemFilters = () => {
   return (
     <Stack maxWidth="100%">
       <SortSelect />
-      <Divider />
       <CategoryFilterList />
       <PartitionFilterList />
+      <ConfidenceFilter />
     </Stack>
   );
 };

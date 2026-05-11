@@ -17,7 +17,11 @@ const emptyKindState = (id: string, name: string): KindState => ({
   id,
   name,
   selectedIds: [],
-  filters: { categoryId: [], partition: [] },
+  filters: {
+    categoryId: [],
+    partition: [],
+    predictionConfidence: { min: 0, max: 100 },
+  },
   visible: true,
   sortType: AnnotationSortType.None,
 });
@@ -26,7 +30,11 @@ export const initialState: ProjectState = {
   activeView: "images",
   imageGridState: {
     selectedIds: [],
-    filters: { categoryId: [], partition: [] },
+    filters: {
+      categoryId: [],
+      partition: [],
+      predictionConfidence: { min: 0, max: 100 },
+    },
     sortType: ImageSortType.None,
   },
   annotationGridState: {
@@ -130,6 +138,12 @@ export const projectSlice = createSlice({
         (id) => !ids.includes(id),
       );
     },
+    setImageConfidenceFilter(
+      state,
+      action: PayloadAction<{ min: number; max: number }>,
+    ) {
+      state.imageGridState.filters.predictionConfidence = action.payload;
+    },
 
     // ~~ Annotation Grid State
     setActiveKind(state, action: PayloadAction<string>) {
@@ -204,6 +218,18 @@ export const projectSlice = createSlice({
       if (!kindState) return;
 
       mutatingFilter(kindState.filters.partition, (id) => !ids.includes(id));
+    },
+    setAnnotationConfidenceFilter(
+      state,
+      action: PayloadAction<{
+        kindId: string;
+        predictionConfidence: { min: number; max: number };
+      }>,
+    ) {
+      const { kindId, predictionConfidence } = action.payload;
+      const kindState = state.annotationGridState.kindStates[kindId];
+      if (!kindState) return;
+      kindState.filters.predictionConfidence = predictionConfidence;
     },
     setKindTabVisibility(
       state,

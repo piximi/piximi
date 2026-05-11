@@ -6,8 +6,7 @@ import { useAnnotationSort } from "@ProjectViewer/hooks";
 import { projectSlice } from "@ProjectViewer/state";
 import { selectExtendedAnnotationsByKindId } from "store/dataV2/selectors";
 import { useParameterizedSelector } from "store/hooks";
-
-import { isFiltered } from "utils/arrayUtils";
+import { isFiltered } from "@ProjectViewer/state/filtering";
 
 import { AnnotationGridItem } from "./AnnotationGridItem";
 import { createGridCell, createItemData } from "../gridUtils";

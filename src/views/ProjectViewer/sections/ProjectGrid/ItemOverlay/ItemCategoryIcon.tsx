@@ -22,7 +22,7 @@ export const ItemCategoryIcon = ({
 }: {
   backgroundColor: string;
   categoryName: string;
-  predicted: boolean;
+  predicted: number | undefined;
 }) => {
   const theme = useTheme();
 
@@ -39,7 +39,7 @@ export const ItemCategoryIcon = ({
             variant="body2"
             color={theme.palette.getContrastText(backgroundColor)}
           >
-            {categoryName}
+            {`${categoryName}${predicted !== undefined ? " -- " + Math.floor(predicted * 100) + "%" : ""}`}
           </Typography>
         </Box>
       }
@@ -59,7 +59,7 @@ export const ItemCategoryIcon = ({
         },
       }}
     >
-      {predicted ? (
+      {predicted !== undefined ? (
         <LabelImportantIcon
           sx={{
             mt: "8px",

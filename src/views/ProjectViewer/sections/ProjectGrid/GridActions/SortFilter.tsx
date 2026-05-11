@@ -10,14 +10,14 @@ import { useWindowSize } from "hooks";
 import { TooltipButton } from "components/ui/tooltips";
 
 import { ItemFilters } from "@ProjectViewer/components";
-import { selectActiveStateFilterCount } from "@ProjectViewer/state/selectors";
+import { selectActiveStateIsFiltered } from "@ProjectViewer/state/selectors";
 
 import { DIMENSIONS } from "utils/constants";
 
 import { actionButtonStyle } from "./utils";
 
 export const SortFilter = () => {
-  const filtersExist = useSelector(selectActiveStateFilterCount);
+  const filtersExist = useSelector(selectActiveStateIsFiltered);
   const { height: windowHeight } = useWindowSize();
   const [popperAnchor, setPopperAnchor] = useState<HTMLElement | null>(null);
   const handleToggleFilterPopper = (

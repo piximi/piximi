@@ -15,7 +15,9 @@ export type DeferredEntity<T> = {
 };
 
 export type FilterType<T> = {
-  [K in keyof T]?: Array<T[K]>;
+  [K in keyof T]?: T[K] extends string
+    ? Array<T[K]>
+    : { min: number; max: number };
 };
 
 // --> PartialField

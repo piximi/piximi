@@ -14,6 +14,7 @@ import type {
   ModelInfo,
   ModelLifecycleStatus,
   Run,
+  SoftmaxById,
 } from "./types";
 
 export const selectClassifierState = ({
@@ -53,6 +54,11 @@ export const selectModelLifecycleStatus = createSelector(
   selectKindClassifier,
   (kc): ModelLifecycleStatus => kc.status,
 );
+export const selectActiveSoftmaxById = createSelector(
+  selectKindClassifier,
+  (kc): SoftmaxById | undefined => kc.activeSoftmaxById,
+);
+
 export const selectActiveModelName = createSelector(
   selectKindClassifier,
   (kc): string | undefined => {

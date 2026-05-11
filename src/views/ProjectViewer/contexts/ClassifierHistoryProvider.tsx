@@ -28,19 +28,11 @@ const ClassifierHistoryContext = createContext<{
   currentEpoch: number;
   totalEpochs: number;
   setTotalEpochs: React.Dispatch<React.SetStateAction<number>>;
-  predictedProbabilities: Record<string, number>;
-  setPredictedProbabilities: React.Dispatch<
-    React.SetStateAction<Record<string, number>>
-  >;
 }>({
   modelHistory: initialModelHistory(),
   currentEpoch: 0,
   totalEpochs: 0,
   setTotalEpochs: (_value: React.SetStateAction<number>) => {},
-  predictedProbabilities: {},
-  setPredictedProbabilities: (
-    _value: React.SetStateAction<Record<string, number>>,
-  ) => {},
 });
 
 export const ClassifierHistoryProvider = ({
@@ -54,9 +46,6 @@ export const ClassifierHistoryProvider = ({
     modelTarget,
   );
   const [totalEpochs, setTotalEpochs] = useState<number>(0);
-  const [predictedProbabilities, setPredictedProbabilities] = useState<
-    Record<string, number>
-  >({});
 
   // Single source of truth: the persisted runs in redux. Recomputes on every
   // appendEpochToActiveRun dispatch — Immer gives us new references along the
@@ -87,8 +76,6 @@ export const ClassifierHistoryProvider = ({
         currentEpoch,
         totalEpochs,
         setTotalEpochs,
-        predictedProbabilities,
-        setPredictedProbabilities,
       }}
     >
       {children}

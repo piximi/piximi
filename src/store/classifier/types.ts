@@ -70,6 +70,7 @@ export enum ModelArch {
   SIMPLE_CNN = 0,
   MOBILE_NET = 1,
 }
+export type SoftmaxById = Record<string, number[]>;
 export type KindClassifier = {
   modelTargetId: string;
   modelTargetName: string;
@@ -77,6 +78,7 @@ export type KindClassifier = {
   newModelArch: ModelArch;
   modelInfoDict: Record<string, ModelInfo>;
   status: ModelLifecycleStatus;
+  activeSoftmaxById?: SoftmaxById;
 };
 
 export type KindClassifierDict = Record<string, KindClassifier>;

@@ -20,7 +20,6 @@ import classifierHandler from "utils/dl/classification/classifierHandler";
 import { toInferenceInput } from "utils/dl/utils";
 import type { PredictionResult } from "utils/dl/types";
 
-import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 
 export const usePredictClassifier = () => {
@@ -33,7 +32,6 @@ export const usePredictClassifier = () => {
     modelTarget,
   );
 
-  const { setPredictedProbabilities } = useClassifierHistory();
   const { getClassMap } = useClassMapDialog();
 
   const handleError = useClassifierErrorHandler();
@@ -125,15 +123,19 @@ export const usePredictClassifier = () => {
         dataSliceV2.actions.batchBubbleUpdateAnnotationCategory(updates),
       );
     }
-    const probabilitiesById: Record<string, number> = {};
 
     // Stash full softmax map in context (volatile)
     const softmaxMap: Record<string, number[]> = {};
     itemIds.forEach((id, i) => {
       softmaxMap[id] = results[i].softmax;
     });
+    dispatch(
+      classifierSlice.actions.setActiveSoftmax({
+        targetId: modelTarget,
+        softmax: softmaxMap,
+      }),
+    );
 
-    setPredictedProbabilities(probabilitiesById);
     dispatch(
       classifierSlice.actions.setModelStatus({
         targetId: kindClassifier.modelTargetId,
@@ -147,7 +149,6 @@ export const usePredictClassifier = () => {
     activeCategories,
     kindClassifier,
     getClassMap,
-    setPredictedProbabilities,
   ]);
 
   return predictClassifier;

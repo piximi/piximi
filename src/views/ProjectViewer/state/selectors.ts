@@ -143,7 +143,7 @@ export const selectActiveFilters = ({ project }: { project: ProjectState }) => {
   return activeState.filters;
 };
 
-export const selectActiveStateFilterCount = ({
+export const selectActiveStateIsFiltered = ({
   project,
 }: {
   project: ProjectState;
@@ -157,7 +157,7 @@ export const selectActiveStateFilterCount = ({
 
   return Boolean(
     Object.values(activeState.filters).reduce((cnt: number, f) => {
-      cnt += f.length;
+      cnt += Array.isArray(f) ? f.length : 100 - f.max + f.min;
       return cnt;
     }, 0),
   );

@@ -19,6 +19,7 @@ import type {
   Run,
   RunHistoryEpoch,
   RunStatus,
+  SoftmaxById,
 } from "./types";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -249,6 +250,16 @@ export const classifierSlice = createSlice({
     ) {
       const kc = state.kindClassifiers[action.payload.targetId];
       if (kc) kc.status = action.payload.status;
+    },
+    setActiveSoftmax(
+      state,
+      action: PayloadAction<{
+        targetId: string;
+        softmax: SoftmaxById | undefined;
+      }>,
+    ) {
+      const kc = state.kindClassifiers[action.payload.targetId];
+      if (kc) kc.activeSoftmaxById = action.payload.softmax;
     },
     setConfidenceThreshold(
       state,

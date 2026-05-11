@@ -1,6 +1,8 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
+
+import { Box, Collapse } from "@mui/material";
 
 import { selectActiveViewState } from "@ProjectViewer/state/selectors";
 import { projectSlice } from "@ProjectViewer/state";
@@ -8,10 +10,12 @@ import { projectSlice } from "@ProjectViewer/state";
 import { Partition } from "utils/dl/enums";
 
 import { FilterList } from "./FilterList";
+import { SectionHeader } from "./SectionHeader";
 
 export const PartitionFilterList = () => {
   const dispatch = useDispatch();
   const activeView = useSelector(selectActiveViewState);
+  const [showFilters, setShowFilters] = useState(false);
 
   const filteredPartitions = useMemo(
     () => activeView.filters.partition,
@@ -76,17 +80,35 @@ export const PartitionFilterList = () => {
   const noneFiltered = filteredPartitions.length === 0;
 
   return (
-    <FilterList
-      title="Partitions"
-      items={Object.keys(Partition).map((partition) => partition as Partition)}
-      onToggle={togglePartitionFilter}
-      onToggleAll={toggleAllPartitionFilter}
-      isFiltered={isItemFiltered}
-      allFiltered={allFiltered}
-      noneFiltered={noneFiltered}
-      getId={(i) => i}
-      getName={(i) => i}
-      getColor={(_i) => undefined}
-    />
+    <Box
+      sx={{
+        maxWidth: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <SectionHeader
+        title="Partition Filters"
+        onExpand={() => setShowFilters((v) => !v)}
+        hasActiveFilters={!noneFiltered}
+        expanded={showFilters}
+      />
+
+      <Collapse in={showFilters}>
+        <FilterList
+          items={Object.keys(Partition).map(
+            (partition) => partition as Partition,
+          )}
+          onToggle={togglePartitionFilter}
+          onToggleAll={toggleAllPartitionFilter}
+          allFiltered={allFiltered}
+          noneFiltered={noneFiltered}
+          isFiltered={isItemFiltered}
+          getId={(i) => i}
+          getName={(i) => i}
+          getColor={(_i) => undefined}
+        />
+      </Collapse>
+    </Box>
   );
 };

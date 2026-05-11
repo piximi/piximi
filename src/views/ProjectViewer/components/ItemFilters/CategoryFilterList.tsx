@@ -1,6 +1,8 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
+
+import { Box, Collapse } from "@mui/material";
 
 import { selectActiveViewState } from "@ProjectViewer/state/selectors";
 import { projectSlice } from "@ProjectViewer/state";
@@ -8,11 +10,13 @@ import type { Category } from "store/dataV2/types";
 import { selectAllCategories } from "store/dataV2/selectors";
 
 import { FilterList } from "./FilterList";
+import { SectionHeader } from "./SectionHeader";
 
 export const CategoryFilterList = () => {
   const dispatch = useDispatch();
   const activeView = useSelector(selectActiveViewState);
   const categories = useSelector(selectAllCategories);
+  const [showFilters, setShowFilters] = useState(false);
 
   const activeCategories = useMemo(() => {
     if (activeView.view === "images")
@@ -83,17 +87,33 @@ export const CategoryFilterList = () => {
   const noneFiltered = filteredCategories.length === 0;
 
   return (
-    <FilterList
-      title="Categories"
-      items={activeCategories}
-      onToggle={toggleCategoryFilter}
-      onToggleAll={toggleAllCategoryFilter}
-      isFiltered={isItemFiltered}
-      allFiltered={allFiltered}
-      noneFiltered={noneFiltered}
-      getId={(i) => i.id}
-      getName={(i) => i.name}
-      getColor={(i) => i.color}
-    />
+    <Box
+      sx={{
+        maxWidth: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <SectionHeader
+        title="Category Filters"
+        onExpand={() => setShowFilters((v) => !v)}
+        hasActiveFilters={!noneFiltered}
+        expanded={showFilters}
+      />
+
+      <Collapse in={showFilters}>
+        <FilterList
+          items={activeCategories}
+          onToggle={toggleCategoryFilter}
+          onToggleAll={toggleAllCategoryFilter}
+          allFiltered={allFiltered}
+          noneFiltered={noneFiltered}
+          isFiltered={isItemFiltered}
+          getId={(i) => i.id}
+          getName={(i) => i.name}
+          getColor={(i) => i.color}
+        />
+      </Collapse>
+    </Box>
   );
 };

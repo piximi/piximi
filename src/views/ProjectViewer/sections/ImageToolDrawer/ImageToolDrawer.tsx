@@ -31,7 +31,7 @@ import { SettingsButton } from "components/layout/app-drawer/application-setting
 import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/layout/app-drawer/HelpButton";
 
-import { selectActiveStateFilterCount } from "@ProjectViewer/state/selectors";
+import { selectActiveStateIsFiltered } from "@ProjectViewer/state/selectors";
 import { ItemFilters } from "@ProjectViewer/components/";
 
 import { DIMENSIONS } from "utils/constants";
@@ -116,7 +116,7 @@ export const ImageToolDrawer = () => {
   const theme = useTheme();
   const [activeTool, setActiveTool] = useState<OperationType>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const filtersExist = useSelector(selectActiveStateFilterCount);
+  const filtersExist = useSelector(selectActiveStateIsFiltered);
   const t = useTranslation();
   const isMobile = useMobileView();
   const { anchorEl, onOpen: setPopperAnchor } = useMenu();

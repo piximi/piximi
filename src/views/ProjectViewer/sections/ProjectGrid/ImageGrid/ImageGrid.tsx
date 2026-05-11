@@ -5,12 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useImageSort } from "@ProjectViewer/hooks";
 import { projectSlice } from "@ProjectViewer/state";
 import {
-  selectImageFilters,
+  selectImageSortType,
   selectSelectedImageIds,
 } from "@ProjectViewer/state/selectors";
-import { selectRepresentativeImages } from "store/dataV2/selectors";
-
-import { isFiltered } from "utils/arrayUtils";
+import { selectVisibleItems } from "@ProjectViewer/state/reselectors";
+import type { ExtendedImageObject } from "store/dataV2/types";
 
 import { ImageGridItem } from "./ImageGridItem";
 import { createGridCell, createItemData } from "../gridUtils";
@@ -21,17 +20,16 @@ const Cell = createGridCell(ImageGridItem);
 
 export const ImageGrid = () => {
   const dispatch = useDispatch();
-  const images = useSelector(selectRepresentativeImages);
-  const imageFilters = useSelector(selectImageFilters);
+  const visibleImages = useSelector(
+    selectVisibleItems,
+  ) as ExtendedImageObject[];
   const selectedImageIds = useSelector(selectSelectedImageIds);
-  const sortFunction = useImageSort();
+  const sortType = useSelector(selectImageSortType);
+  const sortFunction = useImageSort(sortType);
 
-  const visibleImages = useMemo(
-    () =>
-      images
-        .filter((image) => !isFiltered(image, imageFilters ?? {}))
-        .sort(sortFunction),
-    [images, imageFilters, sortFunction],
+  const sortedImages = useMemo(
+    () => [...visibleImages].sort(sortFunction),
+    [visibleImages, sortFunction],
   );
   const {
     gridRef,
@@ -41,7 +39,7 @@ export const ImageGrid = () => {
     rowHeight,
     numColumns,
     numRows,
-  } = useGridLayout(visibleImages.length);
+  } = useGridLayout(sortedImages.length);
 
   const handleSelectImage = useCallback(
     (id: string, selected: boolean) => {
@@ -64,7 +62,7 @@ export const ImageGrid = () => {
       numColumns={numColumns}
       numRows={numRows}
       itemData={createItemData(
-        visibleImages,
+        sortedImages,
         handleSelectImage,
         selectedImageIds,
         numColumns,

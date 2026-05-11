@@ -10,9 +10,9 @@ import type { RootState } from "store/rootReducer";
 import { CATEGORY_COLORS } from "store/dataV2/constants";
 
 import { representsUnknown } from "utils/stringUtils";
-import { isFiltered } from "utils/arrayUtils";
 import type { Partition } from "utils/dl/enums";
 
+import { isFiltered } from "./filtering";
 import {
   selectActiveKindId,
   selectActiveView,

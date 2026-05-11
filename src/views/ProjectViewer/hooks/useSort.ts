@@ -1,181 +1,73 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
 import { useSelector } from "react-redux";
 
-import { selectImageSortType } from "@ProjectViewer/state/selectors";
-import { AnnotationSortType, ImageSortType } from "@ProjectViewer/state/types";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import type {
   ExtendedAnnotationObject,
   ExtendedImageObject,
 } from "store/dataV2/types";
-import { selectCategoryEntities } from "store/dataV2/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import { selectActiveSoftmaxById } from "store/classifier/selectors";
+import {
+  ANNOTATION_SORT_CASES,
+  generateSeed,
+  IMAGE_SORT_CASES,
+  marginOf,
+  noopSort,
+} from "@ProjectViewer/state/sortConfig";
 
-// uuid -> numerical value (determenistic)
-const hash = (id: string) => {
-  let hashValue = 0;
-  for (let i = 0; i < id.length; i++) {
-    hashValue = (hashValue << 5) - hashValue + id.charCodeAt(i);
-    hashValue |= 0; // Convert to 32-bit integer
-  }
-  return hashValue;
-};
+import type {
+  AnnotationSortType,
+  Comparator,
+  ImageSortType,
+  MarginedSoftmax,
+  SortMap,
+} from "@ProjectViewer/state/types";
 
-// taken from https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
-// okay to use because security is not a concern for this use-case
-const splitmix32 = (seed: number) => {
-  seed |= 0;
-  seed = (seed + 0x9e3779b9) | 0;
-  let t = seed ^ (seed >>> 16);
-  t = Math.imul(t, 0x21f0aaad);
-  t = t ^ (t >>> 15);
-  t = Math.imul(t, 0x735a2d97);
-  return ((t = t ^ (t >>> 15)) >>> 0) / 4294967296;
-};
-
-// the number of possible values for this variable is equal to
-// the number of possible "random" sortings that will be produced,
-// e.g. if it's only one of `0` or `1`, then there will "randomly"
-// be one of two possible sortings of Things.
-// it must be a 32 bit number, therefore we generate across the largest
-// distribution available to us by generatng a random positive 32 bit
-// number. 2**31 because its signed, and we want a positive number
-const generateSeed = () => Math.floor(Math.random() * (2 ** 31 - 1));
-
-export const useImageSort = () => {
-  const sortType = useSelector(selectImageSortType);
-  const [previousSortType, setPreviousSortType] = useState<ImageSortType>(
-    ImageSortType.None,
+const useSort = <T, S extends string>(
+  sortType: S,
+  cases: SortMap<T, S>,
+): Comparator<T> => {
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const softmaxByItemId = useParameterizedSelector(
+    selectActiveSoftmaxById,
+    modelTarget,
   );
-  const theSortFunction = function (
-    _a: ExtendedImageObject,
-    _b: ExtendedImageObject,
-  ) {
-    return 0;
-  };
-  const [sortFunction, setSortFunction] = useState<
-    (a: ExtendedImageObject, b: ExtendedImageObject) => number
-  >(() => theSortFunction);
 
-  useEffect(() => {
-    if (sortType !== previousSortType && sortType !== ImageSortType.Category) {
-      const randomSeed = generateSeed();
-      setPreviousSortType(sortType);
-      switch (sortType) {
-        case ImageSortType.FileName:
-          setSortFunction(
-            () => (a: ExtendedImageObject, b: ExtendedImageObject) =>
-              a.name.localeCompare(b.name),
-          );
-          break;
-
-        case ImageSortType.Random:
-          setSortFunction(
-            () => (a: ExtendedImageObject, b: ExtendedImageObject) => {
-              const aVal = splitmix32(hash(a.id) + randomSeed);
-              const bVal = splitmix32(hash(b.id) + randomSeed);
-              return aVal - bVal;
+  const margined = useMemo(
+    () =>
+      !softmaxByItemId
+        ? undefined
+        : Object.entries(softmaxByItemId).reduce(
+            (msm: MarginedSoftmax, [id, softmax]) => {
+              msm[id] = marginOf(softmax);
+              return msm;
             },
-          );
-          break;
-        case ImageSortType.Name:
-          setSortFunction(
-            () => (a: ExtendedImageObject, b: ExtendedImageObject) =>
-              a.name.localeCompare(b.name),
-          );
-          break;
-        case ImageSortType.None:
-        default:
-          setSortFunction(
-            () => (_a: ExtendedImageObject, _b: ExtendedImageObject) => 0,
-          );
-      }
-    }
-  }, [sortType, previousSortType]);
+            {},
+          ),
+    [softmaxByItemId],
+  );
+  // Re-seed only when sortType changes
+  const seed = useMemo(() => generateSeed(), [sortType]);
 
-  useEffect(() => {
-    if (sortType === ImageSortType.Category) {
-      setPreviousSortType(sortType);
-      setSortFunction(
-        () => (a: ExtendedImageObject, b: ExtendedImageObject) =>
-          a.category.name.localeCompare(b.category.name),
-      );
-    }
-  }, [sortType]);
-  return sortFunction;
+  return useMemo(() => {
+    const factory = cases[sortType];
+    return factory ? factory({ margined, seed }) : noopSort;
+    // cases intentionally not in deps — only sortType/margined/seed drive output.
+  }, [sortType, margined, seed]);
+};
+
+export const useImageSort = (sortType: ImageSortType) => {
+  return useSort<ExtendedImageObject, ImageSortType>(
+    sortType,
+    IMAGE_SORT_CASES,
+  );
 };
 
 export const useAnnotationSort = (sortType: AnnotationSortType) => {
-  const categories = useSelector(selectCategoryEntities);
-  const [previousSortType, setPreviousSortType] = useState<AnnotationSortType>(
-    AnnotationSortType.None,
+  return useSort<ExtendedAnnotationObject, AnnotationSortType>(
+    sortType,
+    ANNOTATION_SORT_CASES,
   );
-  const theSortFunction = function (
-    _a: ExtendedAnnotationObject,
-    _b: ExtendedAnnotationObject,
-  ) {
-    return 0;
-  };
-  const [sortFunction, setSortFunction] = useState<
-    (a: ExtendedAnnotationObject, b: ExtendedAnnotationObject) => number
-  >(() => theSortFunction);
-
-  useEffect(() => {
-    if (
-      sortType !== previousSortType &&
-      sortType !== AnnotationSortType.Category
-    ) {
-      const randomSeed = generateSeed();
-      setPreviousSortType(sortType);
-      switch (sortType) {
-        case AnnotationSortType.Random:
-          setSortFunction(
-            () =>
-              (a: ExtendedAnnotationObject, b: ExtendedAnnotationObject) => {
-                const aVal = splitmix32(hash(a.id) + randomSeed);
-                const bVal = splitmix32(hash(b.id) + randomSeed);
-                return aVal - bVal;
-              },
-          );
-          break;
-        case AnnotationSortType.Volume:
-          setSortFunction(
-            () => (a: ExtendedAnnotationObject, b: ExtendedAnnotationObject) =>
-              a.volumeId.localeCompare(b.volumeId),
-          );
-          break;
-        case AnnotationSortType.Image:
-          setSortFunction(
-            () => (a: ExtendedAnnotationObject, b: ExtendedAnnotationObject) =>
-              a.imageName.localeCompare(b.imageName),
-          );
-          break;
-        case AnnotationSortType.Plane:
-          setSortFunction(
-            () => (a: ExtendedAnnotationObject, b: ExtendedAnnotationObject) =>
-              a.planeIdx - b.planeIdx,
-          );
-          break;
-        case AnnotationSortType.None:
-        default:
-          setSortFunction(
-            () =>
-              (_a: ExtendedAnnotationObject, _b: ExtendedAnnotationObject) =>
-                0,
-          );
-      }
-    }
-  }, [sortType, categories, previousSortType]);
-
-  useEffect(() => {
-    if (sortType === AnnotationSortType.Category) {
-      setPreviousSortType(sortType);
-      setSortFunction(
-        () => (a: ExtendedAnnotationObject, b: ExtendedAnnotationObject) =>
-          categories[a.categoryId].name.localeCompare(
-            categories[b.categoryId].name,
-          ),
-      );
-    }
-  }, [sortType, categories]);
-  return sortFunction;
 };

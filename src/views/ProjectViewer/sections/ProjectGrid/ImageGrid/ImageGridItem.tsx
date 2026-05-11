@@ -53,6 +53,8 @@ export const ImageGridItem = memo(
           usePredictedStyle={
             item.partition === Partition.Inference &&
             !isUnknownCategory(item.category.id)
+              ? item.predictionConfidence
+              : undefined
           }
           position={getIconPosition(item.shape.height, item.shape.width)}
           itemId={item.id}

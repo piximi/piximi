@@ -3,6 +3,8 @@ import type { SxProps, Theme } from "@mui/material";
 export const sectionStyle = { position: "relative", mx: 1, mb: 2 };
 export const sectionLabelStyle = (theme: Theme) => ({
   position: "absolute",
+  display: "flex",
+  alignItems: "center",
   top: "-0.6rem",
   left: "1rem",
   px: 0.5,
@@ -10,9 +12,6 @@ export const sectionLabelStyle = (theme: Theme) => ({
 });
 
 export const expandToggleStyle = (theme: Theme, expanded: boolean) => ({
-  position: "absolute",
-  top: "-0.875rem",
-  right: "0.5rem",
   p: 0.5,
   bgcolor: theme.palette.background.paper,
   "&:hover": {

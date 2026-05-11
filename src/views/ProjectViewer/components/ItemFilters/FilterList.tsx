@@ -1,27 +1,18 @@
 import type { RefObject } from "react";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 
-import { Box, Collapse, IconButton, Stack, Typography } from "@mui/material";
-import {
-  VisibilityOutlined as VisibilityOutlinedIcon,
-  VisibilityOffOutlined as VisibilityOffOutlinedIcon,
-  ExpandLess as ExpandLessIcon,
-} from "@mui/icons-material";
-
-import { FunctionalDivider } from "components/ui";
-import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
+import { Box, IconButton, Typography } from "@mui/material";
+import { Add as AddAllIcon, Remove as RemovAllIcon } from "@mui/icons-material";
 
 import { FilterChip } from "./FilterChip";
 import {
   chipFrameStyle,
   chipListStyle,
-  expandToggleStyle,
   sectionLabelStyle,
   sectionStyle,
 } from "./FilterList.styles";
 
 type FilterListProps<T> = {
-  title?: string;
   items: Array<T>;
   onToggle: (item: T) => void;
   onToggleAll: (filtered: boolean) => void;
@@ -46,47 +37,8 @@ export const useObservedHeight = (ref: RefObject<HTMLElement | null>) => {
   }, []);
   return height;
 };
-const SectionHeader = ({
-  title,
-  onToggleAll,
-  allFiltered,
-  noneFiltered,
-}: {
-  title: string;
-  onToggleAll: (filtered: boolean) => void;
-  allFiltered: boolean;
-  noneFiltered: boolean;
-}) => {
-  return (
-    <FunctionalDivider
-      headerText={title}
-      typographyVariant="caption"
-      actions={
-        <Stack direction="row">
-          <TooltipWithDisable title={"Show all"}>
-            <IconButton
-              onClick={() => onToggleAll(false)}
-              disabled={noneFiltered}
-            >
-              <VisibilityOutlinedIcon fontSize="small" />
-            </IconButton>
-          </TooltipWithDisable>
-          <TooltipWithDisable title={"Filter all"}>
-            <IconButton
-              onClick={() => onToggleAll(true)}
-              disabled={allFiltered}
-            >
-              <VisibilityOffOutlinedIcon fontSize="small" />
-            </IconButton>
-          </TooltipWithDisable>
-        </Stack>
-      }
-    />
-  );
-};
 
 export function FilterList<T>({
-  title,
   items,
   onToggle,
   onToggleAll,
@@ -101,7 +53,6 @@ export function FilterList<T>({
   const visibleContentRef = useRef<HTMLDivElement>(null);
   const filteredHeight = useObservedHeight(filteredContentRef);
   const visibleHeight = useObservedHeight(visibleContentRef);
-  const [showVisible, setShowVisible] = useState(false);
 
   const { filtered, visible } = useMemo(
     () =>
@@ -116,33 +67,48 @@ export function FilterList<T>({
     [items, isFiltered],
   );
 
-  useEffect(() => {
-    // collapse visible container if empty, expand if no filtered
-    if (visible.length === 0 || filtered.length === 0) {
-      setShowVisible(filtered.length === 0);
-    }
-  }, [visible.length, filtered.length]);
-
   return (
     <Box
       sx={{
         maxWidth: "100%",
         display: "flex",
         flexDirection: "column",
+        py: 1,
       }}
     >
-      {title && (
-        <SectionHeader
-          title={title}
-          onToggleAll={onToggleAll}
-          allFiltered={allFiltered}
-          noneFiltered={noneFiltered}
-        />
-      )}
       <Box sx={sectionStyle}>
-        <Typography variant="caption" sx={sectionLabelStyle}>
-          Filtered
-        </Typography>
+        <Box sx={sectionLabelStyle}>
+          <Typography variant="caption" sx={{ mr: 1 }}>
+            Filtered
+          </Typography>
+          <IconButton
+            size="small"
+            sx={{ p: 0, m: 0 }}
+            onClick={() => onToggleAll(false)}
+            disabled={noneFiltered}
+          >
+            <RemovAllIcon
+              sx={(theme) => ({
+                fontSize: theme.typography.body1.fontSize,
+                fontWeight: "bold",
+              })}
+            />
+          </IconButton>
+          <IconButton
+            size="small"
+            sx={{ p: 0, m: 0 }}
+            onClick={() => onToggleAll(true)}
+            disabled={allFiltered}
+          >
+            <AddAllIcon
+              sx={(theme) => ({
+                fontSize: theme.typography.body1.fontSize,
+                fontWeight: "bold",
+              })}
+            />
+          </IconButton>
+        </Box>
+
         <Box sx={chipFrameStyle(filteredHeight, true)}>
           <Box ref={filteredContentRef} sx={chipListStyle}>
             {filtered.length === 0 ? (
@@ -169,22 +135,22 @@ export function FilterList<T>({
         </Box>
       </Box>
       <Box sx={sectionStyle}>
-        <Typography variant="caption" sx={sectionLabelStyle}>
-          Visible
-        </Typography>
-        <IconButton
-          onClick={() => {
-            setShowVisible((v) => !v);
-          }}
-          disabled={visible.length === 0}
-          sx={(theme) => expandToggleStyle(theme, showVisible)}
-        >
-          <ExpandLessIcon fontSize="small" />
-        </IconButton>
-        <Box sx={chipFrameStyle(visibleHeight, showVisible)}>
+        <Box sx={sectionLabelStyle}>
+          <Typography variant="caption" sx={{ mr: 1 }}>
+            Visible
+          </Typography>
+        </Box>
+        <Box sx={chipFrameStyle(visibleHeight, true)}>
           <Box ref={visibleContentRef} sx={chipListStyle}>
-            <Collapse in={showVisible}>
-              {visible.map((item) => {
+            {visible.length === 0 ? (
+              <FilterChip
+                label="placeholder"
+                color="transparent"
+                isFiltered={false}
+                sx={{ visibility: "hidden" }}
+              />
+            ) : (
+              visible.map((item) => {
                 return (
                   <FilterChip
                     key={`visible-chip-${getId(item)}`}
@@ -194,8 +160,8 @@ export function FilterList<T>({
                     isFiltered={false}
                   />
                 );
-              })}
-            </Collapse>
+              })
+            )}
           </Box>
         </Box>
       </Box>
