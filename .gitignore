@@ -27,6 +27,7 @@ src/data/exampleProjects/*.zip
 .cursorignore
 pnpm-lock.yaml
 knip.json
+.FOLLOWUP.md
 
 # Playwright
 node_modules/
