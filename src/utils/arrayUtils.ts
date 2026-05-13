@@ -1,6 +1,7 @@
 // Given a length, return an array of numbers from 0 to length - 1
 
 import { difference } from "lodash";
+import { mulberry32 } from "./numberUtils";
 
 // An iterable with length property set the the passed value is used to create an array
 export const arrayRange = (length: number): number[] => {
@@ -44,4 +45,21 @@ export const findAdjacentItem = <T>(
     return items[1];
   }
   return items[idx - 1];
+};
+
+/**
+ * Returns a shuffled copy of `arr` using the Fisher–Yates algorithm driven by a
+ * `mulberry32` PRNG seeded with `seed`. Deterministic: the same `arr` and `seed`
+ * always produce the same output, which is useful for reproducible train/val
+ * splits.
+ * @see https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+ */
+export const seededShuffle = <T>(arr: T[], seed: number): T[] => {
+  const rng = mulberry32(seed);
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 };

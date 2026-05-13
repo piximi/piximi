@@ -104,8 +104,16 @@ export abstract class Model {
   public abstract loadModel(loadModelArgs?: any): void | Promise<void>;
   // Concrete models narrow these to their specific input shapes
   // (e.g. `SequentialClassifier` uses `TrainingInput[]` / `InferenceInput[]`).
-  public abstract loadTraining(items: any[], preprocessingArgs: any): void;
-  public abstract loadValidation(items: any[], preprocessingArgs: any): void;
+  public abstract loadTraining(
+    items: any[],
+    preprocessingArgs: any,
+    runSeed: number,
+  ): void;
+  public abstract loadValidation(
+    items: any[],
+    preprocessingArgs: any,
+    runSeed: number,
+  ): void;
   public abstract loadInference(items: any[], preprocessingArgs: any): void;
 
   public abstract train(options: any, callbacks: any): any;

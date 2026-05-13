@@ -1,5 +1,5 @@
 import { train, losses } from "@tensorflow/tfjs";
-import { random } from "lodash";
+import { random as _random } from "lodash";
 
 import type { ShapeArray, Shape } from "store/data/types";
 import type {
@@ -167,15 +167,18 @@ export const matchedCropPad = ({
   cropWidth,
   cropHeight,
   randomCrop,
+  randomFunc,
 }: {
   sampleWidth: number;
   sampleHeight: number;
   cropWidth: number;
   cropHeight: number;
   randomCrop: boolean;
+  randomFunc?: (lower: number, upper: number, floating?: boolean) => number;
 }): [number, number, number, number] => {
   // [y1, x1, y2, x2]
   const cropCoords: [number, number, number, number] = [0.0, 0.0, 1.0, 1.0];
+  const random = randomFunc === undefined ? _random : randomFunc;
 
   if (sampleHeight > cropHeight) {
     const hRatio = cropHeight / sampleHeight;

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Dialog, DialogContent, Tabs } from "@mui/material";
 
@@ -14,6 +14,9 @@ import {
   selectActiveModel,
   selectModelLifecycleStatus,
 } from "store/classifier/selectors";
+import { applicationSettingsSlice } from "store/applicationSettings";
+
+import { HotkeyContext } from "utils/enums";
 
 import { TrainingPlots, ModelSummaryTable } from "./data-display";
 import { TrainingSettings } from "./training-settings";
@@ -28,6 +31,7 @@ export const FitClassifierDialog = ({
   closeDialog,
   openedDialog,
 }: FitClassifierDialogProps) => {
+  const dispatch = useDispatch();
   const [tabVal, setTabVal] = useState("1");
   const { modelHistory } = useClassifierHistory();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
@@ -61,6 +65,22 @@ export const FitClassifierDialog = ({
     if (tabVal === "3" && !model?.modelSummary) setTabVal("1");
   }, [tabVal, showPlots, model?.modelSummary, modelStatus]);
 
+  useEffect(() => {
+    if (openedDialog) {
+      dispatch(
+        applicationSettingsSlice.actions.registerHotkeyContext({
+          context: HotkeyContext.ClassifierDialog,
+        }),
+      );
+    } else {
+      dispatch(
+        applicationSettingsSlice.actions.unregisterHotkeyContext({
+          context: HotkeyContext.ClassifierDialog,
+        }),
+      );
+    }
+  }, [openedDialog]);
+
   return (
     <Dialog
       fullWidth
@@ -71,7 +91,6 @@ export const FitClassifierDialog = ({
       sx={{
         zIndex: 1203,
         //height: "80%",
-        pb: 1,
       }}
     >
       <FitClassifierDialogAppBar closeDialog={closeDialog} />
@@ -96,7 +115,7 @@ export const FitClassifierDialog = ({
         />
       </Tabs>
 
-      <DialogContent>
+      <DialogContent sx={{ pb: 0 }}>
         <Box hidden={tabVal !== "1"}>
           <TrainingSettings />
         </Box>

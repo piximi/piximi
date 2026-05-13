@@ -1,6 +1,7 @@
 import JSZip from "jszip";
 
 import type { Category } from "store/dataV2/types";
+import { ModelArch } from "store/classifier/types";
 
 import { logger, parseError } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
@@ -38,10 +39,6 @@ export type ModelUploadResults = {
 };
 
 class ClassifierHandler {
-  readonly _availableClassifierArchitectures: [
-    typeof SimpleCNN,
-    typeof MobileNet,
-  ] = [SimpleCNN, MobileNet];
   private _availableClassificationModels: Record<string, SequentialClassifier> =
     {};
 
@@ -61,10 +58,6 @@ class ClassifierHandler {
     }
   }
 
-  public get availableClassifierArchitectures() {
-    return this._availableClassifierArchitectures;
-  }
-
   public get availableClassificationModels() {
     return this._availableClassificationModels;
   }
@@ -72,22 +65,20 @@ class ClassifierHandler {
     return this._availableClassificationModels[modelName];
   }
 
-  public getModelArchitecture(modelIndex: number) {
-    return this._availableClassifierArchitectures[modelIndex];
-  }
-
   public getModelNames() {
     return Object.keys(this._availableClassificationModels);
   }
   async createNewModel(
     modelName: string,
-    architecture: 0 | 1,
+    architecture: ModelArch,
+    seed: number,
   ): Promise<SequentialClassifier> {
     modelName = getUniqueName(modelName, this.getModelNames());
     try {
-      const model = new this._availableClassifierArchitectures[architecture](
-        modelName,
-      );
+      let model: SequentialClassifier;
+      if (architecture === ModelArch.SIMPLE_CNN)
+        model = new SimpleCNN(modelName, seed);
+      else model = new MobileNet(modelName);
       this._availableClassificationModels[modelName] = model;
       return model;
     } catch (err: any) {
@@ -134,16 +125,25 @@ class ClassifierHandler {
     modelName: string,
     items: TrainingInput[],
     categories: RequireOnly<Category, "id">[],
+    runSeed: number,
   ) {
-    this.resolveModel(modelName).loadTraining(items, categories);
+    this.resolveModel(modelName).loadTraining(items, categories, runSeed);
   }
 
   public loadValidation(
     modelName: string,
     items: TrainingInput[],
     categories: RequireOnly<Category, "id">[],
+    runSeed: number,
   ) {
-    this.resolveModel(modelName).loadValidation(items, categories);
+    this.resolveModel(modelName).loadValidation(items, categories, runSeed);
+  }
+  public loadInference(
+    modelName: string,
+    items: InferenceInput[],
+    categories: RequireOnly<Category, "id">[],
+  ) {
+    this.resolveModel(modelName).loadInference(items, categories);
   }
 
   public loadData(
@@ -151,10 +151,11 @@ class ClassifierHandler {
     trainingData: TrainingInput[],
     validationData: TrainingInput[],
     categories: RequireOnly<Category, "id">[],
+    runSeed: number,
   ) {
     const model = this.resolveModel(modelName);
-    model.loadTraining(trainingData, categories);
-    model.loadValidation(validationData, categories);
+    model.loadTraining(trainingData, categories, runSeed);
+    model.loadValidation(validationData, categories, runSeed);
   }
   public async prepareModel(
     modelName: string,
@@ -164,6 +165,7 @@ class ClassifierHandler {
     categories: Category[],
     preprocessSettings: PreprocessSettings,
     optimizerSettings: OptimizerSettings,
+    runSeed: number,
   ) {
     const model = this.resolveModel(modelName);
 
@@ -173,7 +175,6 @@ class ClassifierHandler {
         (model as SimpleCNN).loadModel({
           inputShape: preprocessSettings.inputShape,
           numClasses,
-          randomizeWeights: preprocessSettings.shuffle,
           compileOptions: optimizerSettings,
           preprocessOptions: preprocessSettings,
         });
@@ -199,19 +200,11 @@ class ClassifierHandler {
     }
     try {
       model.classes = categories.map((cat) => cat.name);
-      model.loadTraining(trainingData, categories);
-      model.loadValidation(validationData, categories);
+      model.loadTraining(trainingData, categories, runSeed);
+      model.loadValidation(validationData, categories, runSeed);
     } catch (error) {
       throw new Error("Error in preprocessing", { cause: error as Error });
     }
-  }
-
-  public loadInference(
-    modelName: string,
-    items: InferenceInput[],
-    categories: RequireOnly<Category, "id">[],
-  ) {
-    this.resolveModel(modelName).loadInference(items, categories);
   }
 
   public async train(

@@ -6,14 +6,16 @@ import { ModelTask } from "../../enums";
 import type { LoadModelArgs } from "../../types";
 
 export class SimpleCNN extends SequentialClassifier {
-  constructor(name?: string) {
+  private seed: number;
+  constructor(name: string = "SimpleCNN", seed: number) {
     super({
-      name: name ?? "SimpleCNN",
+      name: name,
       task: ModelTask.Classification,
       graph: false,
       pretrained: false,
       trainable: true,
     });
+    this.seed = seed;
   }
 
   public override dispose() {
@@ -23,12 +25,11 @@ export class SimpleCNN extends SequentialClassifier {
   public loadModel({
     inputShape,
     numClasses,
-    randomizeWeights,
     compileOptions,
     preprocessOptions,
   }: LoadModelArgs) {
     if (this._model) return;
-    this._model = createSimpleCNN(inputShape, numClasses, randomizeWeights!);
+    this._model = createSimpleCNN(inputShape, numClasses, this.seed);
     const compileArgs = createCompileArgs(compileOptions);
     this._model.compile(compileArgs);
     this._preprocessingOptions = {

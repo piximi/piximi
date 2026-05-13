@@ -1,7 +1,6 @@
-import { shuffle } from "lodash";
-
 import type { ModelInfo } from "store/classifier/types";
 
+import { seededShuffle } from "utils/arrayUtils";
 import {
   CropSchema,
   LossFunction,
@@ -110,7 +109,7 @@ export const partitionTrainingData = (items: TrainingInput[]) => {
 export const applySplitAndShuffle = (
   labeledUnassigned: TrainingInput[],
   trainingPercentage: number,
-  shuffleData: boolean,
+  options: { shuffle: false } | { shuffle: true; seed: number },
 ) => {
   const categoryCounts = labeledUnassigned.reduce(
     (counts: Record<string, { total: number; count: number }>, input) => {
@@ -120,8 +119,8 @@ export const applySplitAndShuffle = (
     },
     {},
   );
-  const preparedLabeledUnassigned = shuffleData
-    ? shuffle(labeledUnassigned)
+  const preparedLabeledUnassigned = options.shuffle
+    ? seededShuffle(labeledUnassigned, options.seed)
     : labeledUnassigned;
 
   const splitTrainingItems: TrainingInput[] = [];

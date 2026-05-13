@@ -1,31 +1,27 @@
 import {
-  Tensor1D,
-  Tensor2D,
-  Tensor3D,
-  Tensor4D,
   oneHot,
   image as tfimage,
   data as tfdata,
-  browser,
   scalar,
   tensor1d,
   tensor2d,
-  tensor3d,
-  fill,
-  slice,
   tidy,
-  TensorContainer,
 } from "@tensorflow/tfjs";
 
-import { matchedCropPad, padToMatch } from "../../utils";
-import { CropSchema, Partition } from "../../enums";
-import { channelsToTensor } from "utils/dl/tensor-assembly";
-import { Category, Shape } from "store/data/types";
-import { BitDepth } from "store/dataV2/types";
+import type { Category, Shape } from "store/data/types";
+import type { BitDepth } from "store/dataV2/types";
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
-import { logger } from "utils/logUtils";
-import { RequireOnly } from "utils/types";
-import { InferenceInput, TrainingInput } from "utils/dl/types";
+
+import { channelsToTensor } from "utils/dl/tensor-assembly";
+import type { RequireOnly } from "utils/types";
+import type { InferenceInput, TrainingInput } from "utils/dl/types";
+import { makeSeededRandom } from "utils/numberUtils";
+
+import { CropSchema, Partition } from "../../enums";
+import { matchedCropPad, padToMatch } from "../../utils";
+import { doShow } from "./debugUtils";
+
+import type { Tensor1D, Tensor2D, Tensor3D, Tensor4D } from "@tensorflow/tfjs";
 
 type FitData = {
   xs: Tensor3D;
@@ -41,6 +37,14 @@ type BatchedFitData = {
 type BatchedInferenceData = {
   xs: Tensor4D;
 };
+
+/**
+ * Maps each item to the positional index of its category within `categories`,
+ * producing the integer labels later consumed by `oneHot`.
+ *
+ * Throws if an item carries the sentinel "unknown" category id, since unknown
+ * items must be filtered out before reaching the training/inference pipeline.
+ */
 const createClassificationIdxs = <
   T extends { id: string; categoryId: string },
   K extends { id: string },
@@ -67,6 +71,15 @@ const createClassificationIdxs = <
   return categoryIdxs;
 };
 
+/**
+ * Builds a lazy `tf.data` dataset that streams one sample per item by index,
+ * decoding pixel data on demand via `channelsToTensor`.
+ *
+ * When `inference` is true, each yielded element contains only `xs`. Otherwise
+ * each element also carries a one-hot `ys` label sized to `categories.length`.
+ * The `inference` discriminator is reflected in the return type so callers get
+ * the correct `FitData` vs `InferenceData` shape without a cast.
+ */
 const buildSampleDataset = <
   T extends TrainingInput | InferenceInput,
   K extends { id: string },
@@ -112,11 +125,28 @@ const buildSampleDataset = <
   }) as any;
 };
 
+/**
+ * Crops and resizes a single sample tensor to the model's expected input shape.
+ *
+ * Two crop schemas are supported:
+ *  - `Match`: pads the sample up to `cropSize` when needed, then takes a crop
+ *    sized exactly to the model input. During training with `numCrops > 1`
+ *    the crop position is randomized to act as data augmentation; during
+ *    inference (or with a single crop) the crop is deterministic.
+ *  - `None`: passes the full image through `cropAndResize`, which rescales it
+ *    to the model input shape via bilinear interpolation.
+ *
+ * The crop runs inside `tidy` to release intermediate tensors. The original
+ * `item.xs` is preserved (the caller still owns it).
+ */
 const cropResize = <B extends boolean>(
   inputShape: Omit<Shape, "planes">,
   cropSchema: CropSchema,
   numCrops: number,
   inference: B,
+  randomFunc:
+    | ((lower: number, upper: number, floating?: boolean) => number)
+    | undefined,
   item: { xs: Tensor3D; ys?: Tensor1D },
 ): B extends true
   ? { xs: Tensor3D }
@@ -136,6 +166,7 @@ const cropResize = <B extends boolean>(
         cropWidth: cropSize[1],
         cropHeight: cropSize[0],
         randomCrop: !inference && numCrops > 1,
+        randomFunc,
       });
       break;
     case CropSchema.None:
@@ -180,6 +211,15 @@ const cropResize = <B extends boolean>(
   } as any;
 };
 
+/**
+ * Scales pixel values from their raw integer range into [0, 1] by dividing by
+ * `2 ** bitDepth - 1` (e.g. 255 for 8-bit, 65535 for 16-bit).
+ *
+ * `channelsToTensor` returns a Float32 tensor whose values still sit in the
+ * source bit-depth range, so this is the step that brings them into the
+ * normalized range models expect. Disposes the original `xs` to keep GPU/CPU
+ * memory bounded as the dataset streams.
+ */
 const normalize = <T extends { xs: Tensor3D }>(
   bitDepth: BitDepth,
   items: T,
@@ -189,110 +229,6 @@ const normalize = <T extends { xs: Tensor3D }>(
   items.xs.dispose();
   return { ...items, xs: normalizedXs };
 };
-
-//#region Debug stuff
-let trainLimit = 0;
-let valLimit = 0;
-let infLimit = 0;
-// xsData: [height, width, channel]; ysData: [oneHot]
-const doShowImages = async (
-  partition: Partition,
-  xsData: number[][][],
-  ysData: number[],
-) => {
-  try {
-    const canvas: HTMLCanvasElement = document.createElement("canvas");
-    const refHeight = xsData.length;
-    const refWidth = xsData[0].length;
-
-    canvas.width = refWidth;
-    canvas.height = refHeight;
-
-    const imTensor = tensor3d(xsData, undefined, "int32");
-    // TF.js 4.2 types `toPixels` as `Uint8ClampedArray` (→ `<ArrayBufferLike>` under TS 5.7),
-    // but `ImageData` requires the buffer to be `ArrayBuffer`. At runtime it always is.
-    const imageDataArr = (await browser.toPixels(
-      imTensor,
-    )) as Uint8ClampedArray<ArrayBuffer>;
-    imTensor.dispose();
-    const imageData = new ImageData(
-      imageDataArr,
-      imTensor.shape[1], // width
-      imTensor.shape[0], // height
-    );
-    const ctx = canvas.getContext("2d");
-    if (ctx) ctx.putImageData(imageData, 0, 0);
-
-    if (partition === Partition.Training && trainLimit < 5) {
-      trainLimit++;
-      logger(
-        `Training, class:
-        ${ysData.findIndex((e) => e === 1)}
-        ${canvas.toDataURL()}`,
-      );
-    } else if (partition === Partition.Validation && valLimit < 5) {
-      valLimit++;
-      logger(
-        `Validation, class:
-        ${ysData.findIndex((e) => e === 1)}
-        ${canvas.toDataURL()}`,
-      );
-    } else if (partition === Partition.Inference && infLimit < 5) {
-      infLimit++;
-      logger(
-        `Inference, class:
-        ${ysData.findIndex((e) => e === 1)}
-        ${canvas.toDataURL()}`,
-      );
-    }
-  } catch (e) {
-    if (import.meta.env.NODE_ENV !== "production") console.error(e);
-  }
-};
-
-const doShow = (
-  partition: Partition,
-  normalizedInput: boolean,
-  value: TensorContainer,
-) => {
-  const items = value as {
-    xs: Tensor3D;
-    ys: Tensor1D;
-  };
-  const numChannels = items.xs.shape[2];
-
-  const xsData = tidy(() => {
-    let xsIm: Tensor3D;
-
-    if (numChannels === 2) {
-      const ch3 = fill(
-        [items.xs.shape[0], items.xs.shape[1], items.xs.shape[2], 1],
-        0,
-      );
-      xsIm = items.xs.concat(ch3, 3) as Tensor3D;
-    } else if (numChannels > 3) {
-      xsIm = slice(
-        items.xs,
-        [0, 0, 0],
-        [items.xs.shape[0], items.xs.shape[1], 3],
-      );
-    } else {
-      xsIm = items.xs;
-    }
-
-    if (normalizedInput) {
-      // don't dispose input tensor, tidy does that for us
-      xsIm = xsIm.mul(scalar(255));
-    }
-
-    return xsIm.asType("int32").arraySync() as number[][][];
-  });
-
-  const ysData = tidy(() => items.ys.arraySync());
-
-  doShowImages(partition, xsData, ysData);
-};
-//#endregion Debug stuff
 
 type PreprocessArgs = {
   items: Array<TrainingInput | InferenceInput>;
@@ -305,25 +241,48 @@ type PreprocessArgs = {
     normalize: boolean;
     batchSize: number;
   };
+  seed?: number;
 };
 
+/**
+ * Assembles the full preprocessing pipeline that feeds the classifier: builds a
+ * lazy per-sample dataset, applies crop/resize, optionally shuffles, optionally
+ * normalizes, and batches.
+ *
+ * Behavior details worth noting:
+ *  - For training with `numCrops > 1`, items are duplicated `numCrops` times so
+ *    each repetition yields a different random crop (see `cropResize`). The
+ *    duplicates are references — no tensor copies are made here.
+ *  - The shuffle buffer is only applied when crops are stacked, since crops of
+ *    the same source image would otherwise arrive consecutively and bias the
+ *    gradient updates. TODO upstream warns users against cropping without
+ *    shuffling for the same reason.
+ *  - Normalization reads `bitDepth` from `items[0]`, so it is skipped on an
+ *    empty `items` array to avoid an out-of-bounds read.
+ *  - When `VITE_APP_LOG_LEVEL === "4"`, samples are rendered for debugging via
+ *    `doShow`; the partition label is "Inference" in inference mode and is
+ *    pulled from the first item's `partition` otherwise.
+ *
+ * The return type narrows on `inference`: inference mode yields batches of
+ * `xs` only; training mode yields batches of `xs` plus one-hot `ys`.
+ */
 export const preprocessData = <B extends boolean>({
   items,
   categories,
   preprocessOptions,
   inference,
+  seed,
 }: PreprocessArgs & { inference: B }): B extends true
   ? tfdata.Dataset<BatchedInferenceData>
   : tfdata.Dataset<BatchedFitData> => {
   let itemSet: typeof items;
   const catSet = categories;
+
   if (preprocessOptions.numCrops > 1 && !inference) {
-    // no need to copy the tensors here
     itemSet = items.flatMap((im) => Array(preprocessOptions.numCrops).fill(im));
   } else {
     itemSet = items;
   }
-
   let imageData = buildSampleDataset(itemSet, catSet, !!inference).map(
     cropResize.bind(
       null,
@@ -331,6 +290,7 @@ export const preprocessData = <B extends boolean>({
       preprocessOptions.cropSchema,
       preprocessOptions.numCrops,
       !!inference,
+      seed ? makeSeededRandom(seed) : undefined,
     ),
   );
 
@@ -338,7 +298,7 @@ export const preprocessData = <B extends boolean>({
   // ideally we want to shuffle the partition itself to avoid biasing the model
   // TODO: warn user against cropping without shuffling
   if (preprocessOptions.numCrops > 1 && preprocessOptions.shuffle) {
-    imageData = imageData.shuffle(preprocessOptions.batchSize);
+    imageData = imageData.shuffle(preprocessOptions.batchSize, String(seed));
   }
 
   // channelsToTensor returns raw integer Float32; normalize divides by (2^bitDepth - 1)

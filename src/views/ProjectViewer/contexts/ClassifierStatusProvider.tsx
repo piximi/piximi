@@ -63,6 +63,8 @@ type ClassifierStateContextProp = {
   ) => void;
   handleUpdateInputShape: (settings: Partial<Shape>) => void;
   handleSetModelParams: (params: ClassifierModelParams) => void;
+  userDefinedSeed: number | undefined;
+  setUserDefinedSeed: React.Dispatch<React.SetStateAction<number | undefined>>;
 };
 
 const ClassifierStatusContext = createContext<ClassifierStateContextProp>({
@@ -77,6 +79,8 @@ const ClassifierStatusContext = createContext<ClassifierStateContextProp>({
   handleUpdatePreprocessSettings: () => {},
   handleUpdateInputShape: () => {},
   handleSetModelParams: () => {},
+  userDefinedSeed: undefined,
+  setUserDefinedSeed: (_value: React.SetStateAction<number | undefined>) => {},
 });
 
 export const ClassifierStatusProvider = ({
@@ -119,6 +123,8 @@ export const ClassifierStatusProvider = ({
     () => activeLabeledItems.length === 0,
     [activeLabeledItems],
   );
+
+  const [userDefinedSeed, setUserDefinedSeed] = useState<number | undefined>();
 
   const [newModelParams, updateNewModelParams] = useImmer(
     getDefaultModelParams(projectChannels),
@@ -277,6 +283,8 @@ export const ClassifierStatusProvider = ({
         handleUpdatePreprocessSettings,
         handleUpdateInputShape,
         handleSetModelParams,
+        userDefinedSeed,
+        setUserDefinedSeed,
       }}
     >
       {children}

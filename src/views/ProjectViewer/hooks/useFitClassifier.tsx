@@ -93,7 +93,7 @@ export const useFitClassifier = () => {
 
   // HOOKS
   const { setTotalEpochs } = useClassifierHistory();
-  const { newModelName, modelParams } = useClassifierStatus();
+  const { newModelName, modelParams, userDefinedSeed } = useClassifierStatus();
   const { getClassMap } = useClassMapDialog();
   const handleError = useClassifierErrorHandler();
 
@@ -110,12 +110,14 @@ export const useFitClassifier = () => {
   ) => {
     let model: SequentialClassifier;
     let classMap: ModelClassMap | undefined;
+    const seed = userDefinedSeed ?? Math.floor(Math.random() * 1000);
     try {
       model = await classifierHandler.createNewModel(
         newModelName,
         kindClassifier.newModelArch,
+        seed,
       );
-
+      modelInfo.initSeed = seed;
       dispatch(
         classifierSlice.actions.addModelInfo({
           targetId: kindClassifier.modelTargetId,
@@ -147,10 +149,13 @@ export const useFitClassifier = () => {
 
     const { inference, labeledTraining, labeledUnassigned, labeledValidation } =
       partitionTrainingData(activeItems.map(toTrainingInput));
+
     const { splitTrainingItems, splitValidationItems } = applySplitAndShuffle(
       labeledUnassigned,
       modelInfo.preprocessSettings.trainingPercentage,
-      modelInfo.preprocessSettings.shuffle,
+      modelInfo.preprocessSettings.shuffle
+        ? { shuffle: true, seed: seed }
+        : { shuffle: false },
     );
     const trainingData = [...labeledTraining, ...splitTrainingItems];
     const validationData = [...labeledValidation, ...splitValidationItems];
@@ -177,6 +182,7 @@ export const useFitClassifier = () => {
         knownCategories,
         modelInfo.preprocessSettings,
         modelInfo.optimizerSettings,
+        seed,
       );
     } catch (error) {
       throw new Error("Model Preparation Error", { cause: error });
@@ -188,6 +194,7 @@ export const useFitClassifier = () => {
       trainingData,
       validationData,
       partitionUpdates,
+      seed,
     };
   };
 
@@ -198,6 +205,7 @@ export const useFitClassifier = () => {
   ) => {
     let model: SequentialClassifier;
     let classMap = modelInfo.classMap;
+    const seed = userDefinedSeed ?? Math.floor(Math.random() * 1000);
     try {
       model = classifierHandler.getModel(modelName);
     } catch (error) {
@@ -254,6 +262,7 @@ export const useFitClassifier = () => {
         trainingData,
         validationData,
         classes,
+        seed,
       );
     } else if (trainingChanged && validationChanged) {
       classifierHandler.loadData(
@@ -261,11 +270,17 @@ export const useFitClassifier = () => {
         trainingData,
         validationData,
         classes,
+        seed,
       );
     } else if (trainingChanged) {
-      classifierHandler.loadTraining(model.name, trainingData, classes);
+      classifierHandler.loadTraining(model.name, trainingData, classes, seed);
     } else if (validationChanged) {
-      classifierHandler.loadValidation(model.name, validationData, classes);
+      classifierHandler.loadValidation(
+        model.name,
+        validationData,
+        classes,
+        seed,
+      );
     }
 
     return {
@@ -274,6 +289,7 @@ export const useFitClassifier = () => {
       trainingData,
       validationData,
       partitionUpdates,
+      seed,
     };
   };
 
@@ -284,6 +300,7 @@ export const useFitClassifier = () => {
     isInit,
     startedAt,
     classMap,
+    seed,
   }: {
     modelInfo: ModelInfo;
     trainingData: TrainingInput[];
@@ -291,6 +308,7 @@ export const useFitClassifier = () => {
     isInit: boolean;
     startedAt: string;
     classMap: ModelClassMap;
+    seed: number;
   }): Promise<Run> => {
     const datasetFingerprint = await fingerprintDataset(
       trainingData,
@@ -322,6 +340,7 @@ export const useFitClassifier = () => {
       parentRunId,
       startedAt,
       trigger,
+      seed,
       status: "in-progress",
       appVersion: import.meta.env.VITE_APP_VERSION ?? "dev",
       tfjsVersion: version_core,
@@ -366,6 +385,7 @@ export const useFitClassifier = () => {
     let trainingData: TrainingInput[];
     let validationData: TrainingInput[];
     let partitionUpdates: Array<{ id: string; partition: Partition }>;
+    let seed: number;
 
     dispatch(
       classifierSlice.actions.setModelStatus({
@@ -383,6 +403,7 @@ export const useFitClassifier = () => {
         trainingData,
         validationData,
         partitionUpdates,
+        seed,
       } = isInit
         ? await prepareInitialRun(kindClassifier, modelInfo)
         : await prepareContinuedRun(kindClassifier, modelInfo, modelName));
@@ -399,6 +420,7 @@ export const useFitClassifier = () => {
       isInit,
       startedAt,
       classMap,
+      seed,
     });
     dispatch(
       classifierSlice.actions.appendRun({

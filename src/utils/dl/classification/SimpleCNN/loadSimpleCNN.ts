@@ -1,5 +1,6 @@
 import { sequential, layers, initializers } from "@tensorflow/tfjs";
-import { Shape } from "store/dataV2/types";
+
+import type { Shape } from "store/dataV2/types";
 
 /**
  * Creates simple convolutional neural network, for example used for mnist classification problem
@@ -8,10 +9,8 @@ import { Shape } from "store/dataV2/types";
 export const createSimpleCNN = (
   inputShape: Shape,
   numClasses: number,
-  randomizeWeights: boolean,
+  seed: number,
 ) => {
-  const seed = randomizeWeights ? Math.floor(Math.random() * 1000) : 42;
-
   const imageWidth = inputShape.width;
   const imageHeight = inputShape.height;
   const imageChannels = inputShape.channels;

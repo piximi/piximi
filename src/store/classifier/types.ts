@@ -64,6 +64,7 @@ export type ModelInfo = {
   confidenceThreshold: number;
   runs: Run[];
   valid: boolean;
+  initSeed?: number;
 };
 
 export enum ModelArch {

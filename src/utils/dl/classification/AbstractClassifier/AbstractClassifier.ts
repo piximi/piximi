@@ -59,6 +59,7 @@ export abstract class SequentialClassifier extends Model {
   public loadTraining(
     items: TrainingInput[],
     categories: RequireOnly<Category, "id">[],
+    runSeed: number,
   ) {
     if (!this._preprocessingOptions) return;
     this._trainingDataset = preprocessData({
@@ -66,12 +67,14 @@ export abstract class SequentialClassifier extends Model {
       categories,
       preprocessOptions: this._preprocessingOptions,
       inference: false,
+      seed: runSeed,
     });
   }
 
   public loadValidation(
     items: TrainingInput[],
     categories: RequireOnly<Category, "id">[],
+    runSeed: number,
   ) {
     if (!this._preprocessingOptions) return;
     this._validationDataset = preprocessData({
@@ -79,6 +82,7 @@ export abstract class SequentialClassifier extends Model {
       categories,
       preprocessOptions: this._preprocessingOptions,
       inference: false,
+      seed: runSeed ^ 1, // Decorrelate from training PRNG stream (which also uses runSeed).
     });
   }
 
