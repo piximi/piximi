@@ -1,4 +1,4 @@
-import { shuffle, take, takeRight } from "lodash";
+import { shuffle } from "lodash";
 
 import type { ModelInfo } from "store/classifier/types";
 
@@ -112,20 +112,32 @@ export const applySplitAndShuffle = (
   trainingPercentage: number,
   shuffleData: boolean,
 ) => {
-  const numTrainingItems = Math.round(
-    trainingPercentage * labeledUnassigned.length,
+  const categoryCounts = labeledUnassigned.reduce(
+    (counts: Record<string, { total: number; count: number }>, input) => {
+      const cat = input.categoryId;
+      counts[cat] = { total: (counts[cat]?.total ?? 0) + 1, count: 0 };
+      return counts;
+    },
+    {},
   );
-  const numValidationItems = labeledUnassigned.length - numTrainingItems;
-
   const preparedLabeledUnassigned = shuffleData
     ? shuffle(labeledUnassigned)
     : labeledUnassigned;
 
-  const splitTrainingItems = take(preparedLabeledUnassigned, numTrainingItems);
-  const splitValidationItems = takeRight(
-    preparedLabeledUnassigned,
-    numValidationItems,
-  );
+  const splitTrainingItems: TrainingInput[] = [];
+  const splitValidationItems: TrainingInput[] = [];
+
+  preparedLabeledUnassigned.forEach((input) => {
+    const cat = input.categoryId;
+    const { total, count } = categoryCounts[cat];
+    if (count < Math.round(total * trainingPercentage)) {
+      splitTrainingItems.push(input);
+      categoryCounts[cat].count++;
+    } else {
+      splitValidationItems.push(input);
+    }
+  });
+
   return {
     splitTrainingItems,
     splitValidationItems,
