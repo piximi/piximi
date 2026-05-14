@@ -33,12 +33,12 @@ import { HotkeyContext } from "utils/enums";
 import type { SequentialClassifier } from "utils/dl/classification";
 import classifierHandler from "utils/dl/classification/classifierHandler";
 
-import { PredictionListItems } from "./PredictionListItems";
+import { PredictionListItems } from "../PredictionListItems";
 import { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";
 import { FitClassifierDialog } from "./FitClassifierDialog";
-import { ImportTensorflowClassificationModelDialog } from "./ImportTensorflowModelDialog";
-import { ModelIOButtonGroup } from "./ModelIOButtonGroup";
-import { ModelExecButtonGroup } from "./ModelExecButtonGroup";
+import { ImportTensorflowClassificationModelDialog } from "../ImportTensorflowModelDialog";
+import { ModelIOButtonGroup } from "../ModelIOButtonGroup";
+import { ModelExecButtonGroup } from "../ModelExecButtonGroup";
 
 export const ClassifierSection = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);

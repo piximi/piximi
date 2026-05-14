@@ -17,9 +17,9 @@ import { HotkeyContext } from "utils/enums";
 
 import { HyperperameterSettings } from "./HyperparameterSettings";
 import { ModelPicker } from "./ModelPicker";
-import { ModelSettingsTextField } from "../../ModelSettingsTextField";
+import { ModelSettingsTextField } from "./ModelSettingsTextField";
 
-export const TrainingSettings = () => {
+export const ModelSettings = () => {
   return (
     <div>
       <ModelPicker />

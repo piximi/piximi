@@ -16,7 +16,7 @@ import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusPro
 import { useParameterizedSelector } from "store/hooks";
 import { selectActiveModel } from "store/classifier/selectors";
 
-import { ModelSettingsTextField } from "../../../../ModelSettingsTextField";
+import { ModelSettingsTextField } from "../../ModelSettingsTextField";
 
 export const TrainingStrategySettings = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);

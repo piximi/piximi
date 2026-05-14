@@ -31,7 +31,7 @@ import { enumKeys } from "utils/objectUtils";
 import { CropSchema } from "utils/dl/enums";
 import type { CropOptions, NormalizeOptions } from "utils/dl/types";
 
-import { ModelSettingsTextField } from "../../../../ModelSettingsTextField";
+import { ModelSettingsTextField } from "../../ModelSettingsTextField";
 
 const RowColInputOptions = { min: 20 };
 const InputShapeField = ({ disabled }: { disabled: boolean }) => {

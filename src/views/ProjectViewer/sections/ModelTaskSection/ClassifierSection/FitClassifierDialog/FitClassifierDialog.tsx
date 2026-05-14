@@ -18,8 +18,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { HotkeyContext } from "utils/enums";
 
-import { TrainingPlots, ModelSummaryTable } from "./data-display";
-import { TrainingSettings } from "./training-settings";
+import { TrainingPlots, ModelSummaryTable, ModelSettings } from "./panels";
 import { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
 
 type FitClassifierDialogProps = {
@@ -117,7 +116,7 @@ export const FitClassifierDialog = ({
 
       <DialogContent sx={{ pb: 0 }}>
         <Box hidden={tabVal !== "1"}>
-          <TrainingSettings />
+          <ModelSettings />
         </Box>
         <Box hidden={tabVal !== "2"}>
           <TrainingPlots />{" "}
