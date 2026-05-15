@@ -1,72 +1,58 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme, ThemeOptions } from "@mui/material/styles";
+
+declare module "@mui/material/styles" {
+  interface CssThemeVariables {
+    enabled: true;
+  }
+}
+
+const sharedComponentThemes: ThemeOptions["components"] = {
+  MuiButtonBase: {
+    defaultProps: {
+      disableRipple: true,
+    },
+    styleOverrides: {
+      root: {
+        borderRadius: 8,
+      },
+    },
+  },
+  MuiIconButton: {
+    styleOverrides: {
+      root: {
+        borderRadius: 8,
+      },
+    },
+  },
+  MuiDialog: {
+    styleOverrides: {
+      paper: {
+        borderRadius: 8,
+        backgroundImage: "none",
+      },
+    },
+  },
+  MuiListItemIcon: {
+    styleOverrides: {
+      root: {
+        minWidth: 36,
+      },
+    },
+  },
+};
 
 export const lightTheme = createTheme({
+  cssVariables: true,
   palette: {
     contrastThreshold: 4.5, // contrast ration needs to be 4.5:1 for accessibility
   },
-  components: {
-    MuiDialog: {
-      styleOverrides: {
-        paper: {
-          borderRadius: 8,
-          backgroundImage: "none",
-        },
-      },
-    },
-    MuiButtonBase: {
-      defaultProps: {
-        disableRipple: true,
-      },
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-        },
-      },
-    },
-    MuiIconButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-        },
-      },
-    },
-    MuiListItemIcon: {
-      styleOverrides: {
-        root: {
-          minWidth: 36,
-        },
-      },
-    },
-  },
+  components: sharedComponentThemes,
 });
 
 export const darkTheme = createTheme({
+  cssVariables: true,
   components: {
-    MuiButtonBase: {
-      defaultProps: {
-        disableRipple: true,
-      },
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-        },
-      },
-    },
-    MuiIconButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-        },
-      },
-    },
-    MuiDialog: {
-      styleOverrides: {
-        paper: {
-          borderRadius: 8,
-          backgroundImage: "none",
-        },
-      },
-    },
+    ...sharedComponentThemes,
     MuiDrawer: {
       styleOverrides: {
         paperAnchorDockedLeft: {
@@ -74,9 +60,6 @@ export const darkTheme = createTheme({
         },
         paperAnchorDockedRight: {
           borderLeft: "1px solid rgba(16, 16, 16)",
-        },
-        paper: {
-          // boxShadow: "inset 0 0 16px #000000",
         },
       },
     },
@@ -89,26 +72,20 @@ export const darkTheme = createTheme({
         },
       },
     },
-    MuiListItemIcon: {
-      styleOverrides: {
-        root: {
-          minWidth: 36,
-        },
-      },
-    },
-    MuiSlider: {
-      styleOverrides: {
-        rail: {
-          color: "rgba(73, 73, 73)",
-        },
-        thumb: {
-          color: "rgba(201, 201, 201)",
-        },
-        track: {
-          color: "rgba(159, 159, 159)",
-        },
-      },
-    },
+
+    // MuiSlider: {
+    //   styleOverrides: {
+    //     rail: {
+    //       color: "rgba(73, 73, 73)",
+    //     },
+    //     thumb: {
+    //       color: "rgba(201, 201, 201)",
+    //     },
+    //     track: {
+    //       color: "rgba(159, 159, 159)",
+    //     },
+    //   },
+    // },
   },
   palette: {
     contrastThreshold: 4.5, // contrast ration needs to be 4.5:1 for accessibility
