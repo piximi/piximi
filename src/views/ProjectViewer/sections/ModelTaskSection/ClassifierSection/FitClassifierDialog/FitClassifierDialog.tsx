@@ -18,7 +18,12 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { HotkeyContext } from "utils/enums";
 
-import { TrainingPlots, ModelSummaryTable, ModelSettings } from "./panels";
+import {
+  TrainingPlots,
+  ModelSummaryTable,
+  ModelSettings,
+  RunSummaryTable,
+} from "./panels";
 import { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
 
 type FitClassifierDialogProps = {
@@ -60,7 +65,7 @@ export const FitClassifierDialog = ({
   // above intentionally set tabVal to "2" for live epoch updates.
   useEffect(() => {
     if (modelStatus === "training") return;
-    if (tabVal === "2" && !showPlots) setTabVal("1");
+    if ((tabVal === "2" || tabVal === "4") && !showPlots) setTabVal("1");
     if (tabVal === "3" && !model?.modelSummary) setTabVal("1");
   }, [tabVal, showPlots, model?.modelSummary, modelStatus]);
 
@@ -112,6 +117,13 @@ export const FitClassifierDialog = ({
           placement="top"
           disabled={!model?.modelSummary}
         />
+        <ToolTipTab
+          label="Model Runs Summary"
+          value="4"
+          disabledMessage="No Trained Model"
+          placement="top"
+          disabled={!showPlots}
+        />
       </Tabs>
 
       <DialogContent sx={{ pb: 0 }}>
@@ -119,13 +131,17 @@ export const FitClassifierDialog = ({
           <ModelSettings />
         </Box>
         <Box hidden={tabVal !== "2"}>
-          <TrainingPlots />{" "}
+          <TrainingPlots />
         </Box>
         <Box hidden={tabVal !== "3"}>
           {/* TODO: implement model summary for graph models */}
           {model?.modelSummary && (
             <ModelSummaryTable modelSummary={model.modelSummary} />
           )}
+        </Box>
+        <Box hidden={tabVal !== "4"}>
+          {/* TODO: implement model summary for graph models */}
+          {model?.modelSummary && <RunSummaryTable />}
         </Box>
       </DialogContent>
     </Dialog>

@@ -1,8 +1,9 @@
 import { useSelector } from "react-redux";
 
-import saveAs from "file-saver";
+import { saveAs } from "file-saver";
 
 import {
+  Box,
   Button,
   Container,
   Table,
@@ -65,7 +66,7 @@ export const ModelSummaryTable = ({ modelSummary }: ModelSummaryTableProps) => {
   };
   return (
     <Container sx={{ maxHeight: 400, width: "100%" }}>
-      <TableContainer sx={{ maxHeight: 300, width: "100%", my: 2 }}>
+      <TableContainer sx={{ maxHeight: 300, width: "100%" }}>
         <Table
           stickyHeader
           aria-label="sticky table"
@@ -93,7 +94,16 @@ export const ModelSummaryTable = ({ modelSummary }: ModelSummaryTableProps) => {
           </TableBody>
         </Table>
       </TableContainer>
-      <Button onClick={handleExportModelSummary}>Export Model Summary</Button>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          py: 1,
+        }}
+      >
+        <Button onClick={handleExportModelSummary}>Export Model Summary</Button>
+      </Box>
     </Container>
   );
 };
