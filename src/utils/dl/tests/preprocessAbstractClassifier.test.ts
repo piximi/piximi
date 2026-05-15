@@ -35,7 +35,7 @@ class GenericClassifier extends SequentialClassifier {
 
   loadModel() {
     const defaultModelInfo = getDefaultModelInfo();
-    this._preprocessingOptions = {
+    this._preprocessingSettings = {
       inputShape: {
         height: 224,
         width: 224,
@@ -113,7 +113,7 @@ it("preprocessClassifier", async () => {
 
   const model = new GenericClassifier();
   model.loadModel();
-  expect(model.preprocessingOptions).toBeDefined();
+  expect(model.preprocessingSettings).toBeDefined();
   model.loadTraining(images, categories);
 
   expect(model.trainingLoaded).toBeTruthy();

@@ -4,7 +4,7 @@ import type { ModelTask } from "utils/dl/enums";
 import type {
   ModelLayerData,
   OptimizerSettings,
-  PreprocessSettings,
+  ReducedPreprocessSettings,
 } from "utils/dl/types";
 
 export type ModelInfoDTO = {
@@ -16,7 +16,7 @@ export type ModelInfoDTO = {
   pretrained: boolean;
   classes: string[];
   numClasses: number;
-  preprocessingOptions: PreprocessSettings | undefined;
+  preprocessingSettings: ReducedPreprocessSettings | undefined;
   optimizerSettings: OptimizerSettings | undefined;
   currentFitHistory: RunHistoryEpoch[];
   modelSummary: ModelLayerData[] | undefined;

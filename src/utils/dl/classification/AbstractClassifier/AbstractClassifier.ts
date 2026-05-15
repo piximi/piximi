@@ -61,11 +61,11 @@ export abstract class SequentialClassifier extends Model {
     categories: RequireOnly<Category, "id">[],
     runSeed: number,
   ) {
-    if (!this._preprocessingOptions) return;
+    if (!this._preprocessingSettings) return;
     this._trainingDataset = preprocessData({
       items,
       categories,
-      preprocessOptions: this._preprocessingOptions,
+      preprocessOptions: this._preprocessingSettings,
       inference: false,
       seed: runSeed,
     });
@@ -76,11 +76,11 @@ export abstract class SequentialClassifier extends Model {
     categories: RequireOnly<Category, "id">[],
     runSeed: number,
   ) {
-    if (!this._preprocessingOptions) return;
+    if (!this._preprocessingSettings) return;
     this._validationDataset = preprocessData({
       items,
       categories,
-      preprocessOptions: this._preprocessingOptions,
+      preprocessOptions: this._preprocessingSettings,
       inference: false,
       seed: runSeed ^ 1, // Decorrelate from training PRNG stream (which also uses runSeed).
     });
@@ -90,11 +90,11 @@ export abstract class SequentialClassifier extends Model {
     items: InferenceInput[],
     categories: RequireOnly<Category, "id">[],
   ) {
-    if (!this._preprocessingOptions) return;
+    if (!this._preprocessingSettings) return;
     this._inferenceDataset = preprocessData({
       items,
       categories,
-      preprocessOptions: this._preprocessingOptions,
+      preprocessOptions: this._preprocessingSettings,
       inference: true,
     });
   }

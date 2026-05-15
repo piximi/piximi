@@ -37,7 +37,7 @@ export class MobileNet extends SequentialClassifier {
     });
     const compileArgs = createCompileArgs(compileOptions);
     this._model.compile(compileArgs);
-    this._preprocessingOptions = {
+    this._preprocessingSettings = {
       inputShape: inputShape,
       ...preprocessOptions.cropOptions,
       shuffle: preprocessOptions.shuffle,

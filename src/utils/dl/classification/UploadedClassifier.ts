@@ -98,12 +98,12 @@ export class UploadedClassifier extends SequentialClassifier {
       }
     }
     if (metadata) {
-      this._preprocessingOptions = metadata.preprocessSettings;
+      this._preprocessingSettings = metadata.preprocessSettings;
       this.classes = metadata.classes;
       this._optimizerSettings = metadata.optimizerSettings;
     } else {
       const defaultModelInfo = getDefaultModelInfo();
-      this._preprocessingOptions = {
+      this._preprocessingSettings = {
         inputShape: {
           ...convertArrayToShape(this.defaultInputShape as ShapeArray),
           channels: this.requiredChannels ?? this.defaultInputShape[3],

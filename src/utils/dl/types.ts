@@ -72,6 +72,15 @@ export type PreprocessSettings = {
   cropOptions: CropOptions;
   trainingPercentage: number;
 };
+
+export type ReducedPreprocessSettings = {
+  cropSchema: CropSchema;
+  numCrops: number;
+  inputShape: Omit<Shape, "planes">;
+  shuffle: boolean;
+  normalize: boolean;
+  batchSize: number;
+};
 export type OptimizerSettings = {
   learningRate: number;
   lossFunction:

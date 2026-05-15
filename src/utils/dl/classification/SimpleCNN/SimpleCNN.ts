@@ -32,7 +32,7 @@ export class SimpleCNN extends SequentialClassifier {
     this._model = createSimpleCNN(inputShape, numClasses, this.seed);
     const compileArgs = createCompileArgs(compileOptions);
     this._model.compile(compileArgs);
-    this._preprocessingOptions = {
+    this._preprocessingSettings = {
       inputShape: inputShape,
       ...preprocessOptions.cropOptions,
       shuffle: preprocessOptions.shuffle,

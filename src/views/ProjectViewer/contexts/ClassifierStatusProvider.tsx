@@ -208,15 +208,15 @@ export const ClassifierStatusProvider = ({
       });
     }
     if (
-      model?.preprocessingOptions &&
+      model?.preprocessingSettings &&
       projectChannels &&
-      projectChannels !== model.preprocessingOptions.inputShape.channels
+      projectChannels !== model.preprocessingSettings.inputShape.channels
     ) {
       newIsReady = false;
 
       newErrors.push({
         reason: ErrorReason.ChannelMismatch,
-        message: `The model requires ${model?.preprocessingOptions.inputShape.channels}-channel images, but the project images have ${projectChannels}`,
+        message: `The model requires ${model?.preprocessingSettings.inputShape.channels}-channel images, but the project images have ${projectChannels}`,
         severity: 2,
       });
     }

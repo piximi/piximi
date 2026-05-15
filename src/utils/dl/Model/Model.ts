@@ -1,10 +1,14 @@
 import { io } from "@tensorflow/tfjs";
 
-import type { Shape } from "store/data/types";
 import type { RunHistoryEpoch } from "store/classifier/types";
 
-import type { ModelArgs, ModelLayerData, OptimizerSettings } from "../types";
-import type { CropSchema, ModelTask } from "../enums";
+import type {
+  ModelArgs,
+  ModelLayerData,
+  OptimizerSettings,
+  ReducedPreprocessSettings,
+} from "../types";
+import type { ModelTask } from "../enums";
 import type { GraphModel, LayersModel, Logs } from "@tensorflow/tfjs";
 
 export abstract class Model {
@@ -20,14 +24,7 @@ export abstract class Model {
 
   protected _model?: LayersModel | GraphModel;
   protected _currentFitHistory: RunHistoryEpoch[];
-  protected _preprocessingOptions?: {
-    cropSchema: CropSchema;
-    numCrops: number;
-    inputShape: Omit<Shape, "planes">;
-    shuffle: boolean;
-    normalize: boolean;
-    batchSize: number;
-  };
+  protected _preprocessingSettings?: ReducedPreprocessSettings;
   protected _classes?: string[];
   protected _optimizerSettings?: OptimizerSettings;
 
@@ -85,7 +82,7 @@ export abstract class Model {
     return this._currentFitHistory.length;
   }
 
-  public get currentFitHistory(): readonly RunHistoryEpoch[] {
+  public get currentFitHistory(): RunHistoryEpoch[] {
     return this._currentFitHistory;
   }
 
@@ -93,8 +90,11 @@ export abstract class Model {
     return this._pretrained;
   }
 
-  public get preprocessingOptions() {
-    return this._preprocessingOptions;
+  public get preprocessingSettings() {
+    return this._preprocessingSettings;
+  }
+  public get optimizerSettings() {
+    return this._optimizerSettings;
   }
 
   public setPretrained() {
@@ -155,14 +155,7 @@ export abstract class Model {
           modelInitializer?: typeof modelArtifacts.modelInitializer;
           initializerSignature?: typeof modelArtifacts.initializerSignature;
           trainingConfig?: typeof modelArtifacts.trainingConfig;
-          preprocessSettings?: {
-            cropSchema: CropSchema;
-            numCrops: number;
-            inputShape: Omit<Shape, "planes">;
-            shuffle: boolean;
-            normalize: boolean;
-            batchSize: number;
-          };
+          preprocessSettings?: ReducedPreprocessSettings;
           classes?: string[];
           optimizerSettings?: OptimizerSettings;
         } = {
@@ -187,8 +180,8 @@ export abstract class Model {
         if (modelArtifacts.trainingConfig != null) {
           modelJSON.trainingConfig = modelArtifacts.trainingConfig;
         }
-        if (this._preprocessingOptions) {
-          modelJSON.preprocessSettings = this._preprocessingOptions;
+        if (this._preprocessingSettings) {
+          modelJSON.preprocessSettings = this._preprocessingSettings;
         }
         if (this._classes) {
           modelJSON.classes = this._classes;
