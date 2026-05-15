@@ -1,10 +1,7 @@
 import type { Shape } from "store/dataV2/types";
 import type { SegmenterState } from "store/segmenter/types";
 
-import type {
-  ClassifierEvaluationResultType,
-  CropOptions,
-} from "utils/dl/types";
+import type { ClassifierEvaluationResult, CropOptions } from "utils/dl/types";
 import type {
   LossFunction,
   Metric,
@@ -76,7 +73,7 @@ export type V11ModelInfo = {
   classMap?: V11ModelClassMap;
   preprocessSettings: V11PreprocessSettings;
   optimizerSettings: V11OptimizerSettings;
-  evalResults: ClassifierEvaluationResultType[];
+  evalResults: ClassifierEvaluationResult[];
 };
 export type V11KindClassifier = {
   modelNameOrArch: string | number;

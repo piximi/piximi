@@ -1,5 +1,5 @@
 import type {
-  ClassifierEvaluationResultType,
+  ClassifierEvaluationResult,
   OptimizerSettings,
   PreprocessSettings,
 } from "utils/dl/types";
@@ -53,7 +53,7 @@ export type Run = {
   valIds: string[]; // for set operations, snapshot UI, partial overlap analytics between models
   categorySetHash: string;
   history: RunHistoryEpoch[];
-  evalResults?: ClassifierEvaluationResultType; // moved off ModelInfo
+  evalResults?: ClassifierEvaluationResult; // moved off ModelInfo
   weightsRef?: string; // model name in classifierHandler, currently no real use but reference snapshotted weights in the future
 };
 export type ModelClassMap = Record<number, string>;

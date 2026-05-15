@@ -46,7 +46,7 @@ export type TrainingResults = {
   status: RunStatus;
 };
 export type TrainAndEvalResult = TrainingResults & {
-  evalResults: ClassifierEvaluationResultType;
+  evalResults: ClassifierEvaluationResult;
 };
 
 export type NormalizeOptions = {
@@ -150,7 +150,7 @@ export type PredictionResult = {
   softmax: number[];
 }[];
 
-export type ClassifierEvaluationResultType = {
+export type ClassifierEvaluationResult = {
   confusionMatrix: number[][];
   accuracy: number;
   crossEntropy: number;

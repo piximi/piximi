@@ -2,8 +2,8 @@
 //@ts-nocheck keep tsc uncluttered for now
 import fs from "fs";
 import path from "path";
-import { expect, it } from "vitest";
 
+import { expect, it } from "vitest";
 import {
   io as tfio, //eslint-disable-line @typescript-eslint/no-unused-vars
   memory as tfmemory, //eslint-disable-line @typescript-eslint/no-unused-vars
@@ -11,26 +11,29 @@ import {
   profile as tfprofile,
 } from "@tensorflow/tfjs-node";
 
+import type {
+  Category,
+  ImageObject,
+  // Shape
+} from "store/data/types";
+
+import { loadDataUrlAsStack } from "utils/file-io/utils";
+import { convertToImage } from "utils/tensorUtils";
+
 import { UploadedClassifier } from "../classification";
-import {
-  ClassifierEvaluationResultType,
-  // CropOptions,
-  // FitOptions,
-  // PreprocessSettings,
-  // RescaleOptions,
-} from "../types";
 import {
   //CropSchema,
   ModelTask,
   Partition,
 } from "../enums";
-import { loadDataUrlAsStack } from "utils/file-io/utils";
-import { convertToImage } from "utils/tensorUtils";
-import {
-  Category,
-  ImageObject,
-  // Shape
-} from "store/data/types";
+
+import type {
+  ClassifierEvaluationResult,
+  // CropOptions,
+  // FitOptions,
+  // PreprocessSettings,
+  // RescaleOptions,
+} from "../types";
 
 const categories: Array<Category> = [
   // {
@@ -225,7 +228,7 @@ it("evaluateClassifier", async () => {
 
   model.dispose();
 
-  const result = profile.result as ClassifierEvaluationResultType;
+  const result = profile.result as ClassifierEvaluationResult;
 
   // console.log(`newBytes: ${profile.newBytes}`);
   // console.log(`newTensors: ${profile.newTensors}`);

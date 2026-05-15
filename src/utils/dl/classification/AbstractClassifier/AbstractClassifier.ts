@@ -18,7 +18,7 @@ import { Model } from "../../Model";
 import { evaluateConfusionMatrix, getLayersModelSummary } from "../../utils";
 
 import type {
-  ClassifierEvaluationResultType,
+  ClassifierEvaluationResult,
   FitOptions,
   InferenceInput,
   PredictionResult,
@@ -183,7 +183,7 @@ export abstract class SequentialClassifier extends Model {
     return itemPredictions;
   }
 
-  public async evaluate(): Promise<ClassifierEvaluationResultType> {
+  public async evaluate(): Promise<ClassifierEvaluationResult> {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }

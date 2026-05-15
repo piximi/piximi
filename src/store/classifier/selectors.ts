@@ -2,7 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import type { RootState } from "store/rootReducer";
 
-import type { ClassifierEvaluationResultType } from "utils/dl/types";
+import type { ClassifierEvaluationResult } from "utils/dl/types";
 import classifierHandler from "utils/dl/classification/classifierHandler";
 import type { SequentialClassifier } from "utils/dl/classification";
 
@@ -106,8 +106,8 @@ export const selectConfidenceThreshold = createSelector(
 
 export const selectModelEvaluationResults = createSelector(
   [selectRunsForActiveModel],
-  (runs): ClassifierEvaluationResultType[] => {
-    const evalResults: ClassifierEvaluationResultType[] = [];
+  (runs): ClassifierEvaluationResult[] => {
+    const evalResults: ClassifierEvaluationResult[] = [];
     for (const run of runs) {
       if (!run.evalResults) continue;
       evalResults.push(run.evalResults);
