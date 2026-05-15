@@ -4,7 +4,8 @@ import { clean, eq, lt, lte, valid } from "semver";
 
 import type { CancelToken } from "utils/worker-scheduler/types";
 import type { ExtractedModelFileMap } from "utils/dl/types";
-import classifierHandler from "utils/dl/classification/classifierHandler";
+import { logger } from "utils/logUtils";
+import { recursiveAssign } from "utils/objectUtils";
 
 import { FileStore, ZipStore } from "./zarr/stores";
 import { getAttr } from "./zarr/utils";
@@ -127,6 +128,40 @@ async function openStore(
   }
   return createStoreFromFileList(files);
 }
+const extractModelsFromZip = async (
+  zip: JSZip,
+): Promise<ExtractedModelFileMap> => {
+  const modelFileRegEx = new RegExp(".json$|.weights.bin$");
+  const models: ExtractedModelFileMap = {};
+  for await (const [fileName, file] of Object.entries(zip.files)) {
+    if (!modelFileRegEx.test(fileName)) continue;
+
+    const parsedFileName = fileName.split(".");
+    const modelName = parsedFileName[0];
+    const extension = parsedFileName.at(1);
+
+    const fileBuffer = await file.async("arraybuffer");
+    if (extension === "json") {
+      if (modelName in models && "modelJson" in models[modelName]) {
+        logger(`Duplicate '.${extension}' file for ${modelName}`, {
+          level: "warn",
+        });
+      }
+      const modelFile = new File([fileBuffer], fileName, {
+        type: "application/json",
+      });
+      recursiveAssign(models, {
+        [modelName]: { modelJson: modelFile },
+      });
+    } else {
+      const modelFile = new File([fileBuffer], fileName, {
+        type: "application.octet-stream",
+      });
+      recursiveAssign(models, { [modelName]: { modelWeights: modelFile } });
+    }
+  }
+  return models;
+};
 async function createStoreFromZip(
   file: File,
 ): Promise<{ store: CustomStore; modelFiles: ExtractedModelFileMap }> {
@@ -139,7 +174,7 @@ async function createStoreFromZip(
 
   const fileName = rootFile[0].name.split(".")[0];
 
-  const modelFiles = await classifierHandler.extractModelsFromZip(zip);
+  const modelFiles = await extractModelsFromZip(zip);
   return {
     store: new ZipStore(fileName, zip),
     modelFiles,
