@@ -26,6 +26,7 @@ export type ModelInfoDTO = {
   inferenceLoaded: boolean;
   defaultInputShape: number[] | undefined;
   defaultOutputShape: number[] | undefined;
+  requiredChannels?: number;
 };
 
 export type ModelLoadResult =
@@ -37,6 +38,6 @@ export type ModelLoadResult =
     };
 
 export type BatchModelLoadResult = {
-  loadedModelInfos: ModelInfoDTO[];
+  loadedModels: ModelInfoDTO[];
   failedModels: Record<string, { reason: string; err?: Error }>;
 };

@@ -13,15 +13,17 @@ import { MobileNet } from "../MobileNet";
 import { SimpleCNN } from "../SimpleCNN";
 import { ModelTask } from "../../enums";
 
-import type { ModelInfoDTO } from "./dto";
+import type { ModelInfoDTO, ModelLoadResult } from "./dto";
 import type { Logs } from "@tensorflow/tfjs";
 import type { SequentialClassifier } from "../AbstractClassifier";
 import type {
-  ExtractedModelFileMap,
+  ClassifierEvaluationResult,
   FitOptions,
   InferenceInput,
   OptimizerSettings,
+  PredictionResult,
   PreprocessSettings,
+  SerializedModelData,
   SerializedModels,
   TrainAndEvalResult,
   TrainingCallbacks,
@@ -63,11 +65,11 @@ export class ClassifierHandler {
    * Model Creation/Deletion
    */
 
-  async createNewModel(
+  public async createNewModel(
     modelName: string,
     architecture: ModelArch,
     seed: number,
-  ): Promise<SequentialClassifier> {
+  ): Promise<ModelInfoDTO> {
     modelName = getUniqueName(modelName, this.getModelNames());
     try {
       let model: SequentialClassifier;
@@ -75,14 +77,14 @@ export class ClassifierHandler {
         model = new SimpleCNN(modelName, seed);
       else model = new MobileNet(modelName);
       this._availableClassificationModels[modelName] = model;
-      return model;
+      return this.buildModelInfoDTO(model);
     } catch (err: any) {
       throw new Error("Failed to create Model.", { cause: err as Error });
     }
   }
   public addModels(
     models: Record<string, SequentialClassifier> | Array<SequentialClassifier>,
-  ) {
+  ): void {
     if (Array.isArray(models)) {
       models.forEach((model) => {
         this._availableClassificationModels[model.name] = model;
@@ -94,16 +96,15 @@ export class ClassifierHandler {
     }
   }
 
-  public removeModel(modelName: string) {
-    const model = this.availableClassificationModels[modelName];
+  public removeModel(modelName: string): void {
+    const model = this.resolveModel(modelName);
     model.dispose();
-    delete this.availableClassificationModels[modelName];
+    delete this._availableClassificationModels[modelName];
   }
-  public removeAllModels() {
-    Object.values(this.availableClassificationModels).forEach((model) => {
-      model.dispose();
+  public removeAllModels(): void {
+    Object.keys(this._availableClassificationModels).forEach((modelName) => {
+      this.removeModel(modelName);
     });
-    this._availableClassificationModels = {};
   }
 
   /*
@@ -142,18 +143,25 @@ export class ClassifierHandler {
       defaultOutputShape: model.modelLoaded
         ? model.defaultOutputShape
         : undefined,
+      requiredChannels: model.requiredChannels,
     };
   }
-  public get availableClassificationModels() {
-    return this._availableClassificationModels;
+  public get availableClassificationModels(): Record<string, ModelInfoDTO> {
+    return Object.entries(this._availableClassificationModels).reduce(
+      (models: Record<string, ModelInfoDTO>, [name, model]) => {
+        models[name] = this.buildModelInfoDTO(model);
+        return models;
+      },
+      {},
+    );
   }
-  public hasModel(modelName: string) {
+  public hasModel(modelName: string): boolean {
     return modelName in this._availableClassificationModels;
   }
-  public getModelNames() {
+  public getModelNames(): string[] {
     return Object.keys(this._availableClassificationModels);
   }
-  public getModelInfo(modelName: string) {
+  public getModelInfo(modelName: string): ModelInfoDTO {
     const model = this.resolveModel(modelName);
     return this.buildModelInfoDTO(model);
   }
@@ -166,7 +174,7 @@ export class ClassifierHandler {
     items: TrainingInput[],
     categories: RequireOnly<Category, "id">[],
     runSeed: number,
-  ) {
+  ): void {
     this.resolveModel(modelName).loadTraining(items, categories, runSeed);
   }
   public loadValidation(
@@ -174,14 +182,14 @@ export class ClassifierHandler {
     items: TrainingInput[],
     categories: RequireOnly<Category, "id">[],
     runSeed: number,
-  ) {
+  ): void {
     this.resolveModel(modelName).loadValidation(items, categories, runSeed);
   }
   public loadInference(
     modelName: string,
     items: InferenceInput[],
     categories: RequireOnly<Category, "id">[],
-  ) {
+  ): void {
     this.resolveModel(modelName).loadInference(items, categories);
   }
   public loadData(
@@ -190,7 +198,7 @@ export class ClassifierHandler {
     validationData: TrainingInput[],
     categories: RequireOnly<Category, "id">[],
     runSeed: number,
-  ) {
+  ): void {
     const model = this.resolveModel(modelName);
     model.loadTraining(trainingData, categories, runSeed);
     model.loadValidation(validationData, categories, runSeed);
@@ -204,7 +212,7 @@ export class ClassifierHandler {
     preprocessSettings: PreprocessSettings,
     optimizerSettings: OptimizerSettings,
     runSeed: number,
-  ) {
+  ): Promise<void> {
     const model = this.resolveModel(modelName);
 
     /* LOAD CLASSIFIER MODEL */
@@ -267,7 +275,7 @@ export class ClassifierHandler {
 
     return { ...trainingResults, evalResults };
   }
-  public cancelTraining(modelName: string) {
+  public cancelTraining(modelName: string): void {
     const model = this.resolveModel(modelName);
     model.stopTraining();
   }
@@ -275,11 +283,13 @@ export class ClassifierHandler {
   public async predict(
     modelName: string,
     categories: RequireOnly<Category, "id">[],
-  ) {
+  ): Promise<PredictionResult> {
     return this.resolveModel(modelName).predict(categories);
   }
 
-  public async evaluate(modelName: string) {
+  public async evaluate(
+    modelName: string,
+  ): Promise<ClassifierEvaluationResult> {
     return this.resolveModel(modelName).evaluate();
   }
 
@@ -291,14 +301,7 @@ export class ClassifierHandler {
     weightsFiles: File[];
     isGraph?: boolean;
     modelName?: string;
-  }): Promise<
-    | { success: true; model: SequentialClassifier }
-    | {
-        success: false;
-        modelName: string;
-        error: { reason: string; err?: Error };
-      }
-  > {
+  }): Promise<ModelLoadResult> {
     const modelName =
       input.modelName ?? input.descFile.name.replace(/\..+$/, "");
     const uniqueName = getUniqueName(modelName, this.getModelNames());
@@ -315,7 +318,7 @@ export class ClassifierHandler {
     try {
       await model.upload();
       this._availableClassificationModels[uniqueName] = model;
-      return { success: true, model };
+      return { success: true, modelInfo: this.buildModelInfoDTO(model) };
     } catch (err) {
       return {
         success: false,
@@ -329,9 +332,18 @@ export class ClassifierHandler {
     modelUrl: string,
     fromTFHub: boolean,
     isGraph: boolean,
-  ) {
+  ): Promise<{
+    loadedModels: ModelInfoDTO[];
+    failedModels: Record<
+      string,
+      {
+        reason: string;
+        err?: Error;
+      }
+    >;
+  }> {
     const failedModels: Record<string, { reason: string; err?: Error }> = {};
-    const loadedModels: SequentialClassifier[] = [];
+    const loadedModels: ModelInfoDTO[] = [];
     const modelName = getUniqueName("Remote-Classifier", this.getModelNames());
     const model = new RemoteClassifier({
       name: modelName,
@@ -345,7 +357,7 @@ export class ClassifierHandler {
 
     try {
       await model.upload();
-      loadedModels.push(model);
+      loadedModels.push(this.buildModelInfoDTO(model));
       this._availableClassificationModels[model.name] = model;
     } catch (err) {
       failedModels[modelName] = {
@@ -356,61 +368,17 @@ export class ClassifierHandler {
     return { loadedModels, failedModels };
   }
 
-  public async extractModelsFromZipBuffer(
-    buffer: ArrayBuffer,
-  ): Promise<ExtractedModelFileMap> {
-    const zip = await JSZip.loadAsync(buffer);
-    return this.extractModelsFromZip(zip);
-  }
-  public async modelsFromZipBuffer(buffer: ArrayBuffer) {
-    const zip = await JSZip.loadAsync(buffer);
-    return this.modelsFromZip(zip);
-  }
-  public async getZippedModelsBuffer(): Promise<ArrayBuffer> {
-    const zip = new JSZip();
-    const savedModelData = await this.getSavedModelData(); // <-- await fixes existing bug
-    Object.values(savedModelData).forEach((m) => {
-      zip.file(m.modelJson.fileName, m.modelJson.blob);
-      zip.file(m.modelWeights.fileName, m.modelWeights.blob);
-    });
-    return zip.generateAsync({ type: "arraybuffer" });
-  }
-  public async extractModelsFromZip(
-    zip: JSZip,
-  ): Promise<ExtractedModelFileMap> {
-    const modelFileRegEx = new RegExp(".json$|.weights.bin$");
-    const models: ExtractedModelFileMap = {};
-    for await (const [fileName, file] of Object.entries(zip.files)) {
-      if (!modelFileRegEx.test(fileName)) continue;
-
-      const parsedFileName = fileName.split(".");
-      const modelName = parsedFileName[0];
-      const extension = parsedFileName.at(1);
-
-      const fileBuffer = await file.async("arraybuffer");
-      if (extension === "json") {
-        if (modelName in models && "modelJson" in models[modelName]) {
-          logger(`Duplicate '.${extension}' file for ${modelName}`, {
-            level: "warn",
-          });
-        }
-        const modelFile = new File([fileBuffer], fileName, {
-          type: "application/json",
-        });
-        recursiveAssign(models, {
-          [modelName]: { modelJson: modelFile },
-        });
-      } else {
-        const modelFile = new File([fileBuffer], fileName, {
-          type: "application.octet-stream",
-        });
-        recursiveAssign(models, { [modelName]: { modelWeights: modelFile } });
+  public async modelsFromZipBuffer(buffer: ArrayBuffer): Promise<{
+    loadedModels: ModelInfoDTO[];
+    failedModels: Record<
+      string,
+      {
+        reason: string;
+        err?: Error;
       }
-    }
-    return models;
-  }
-
-  public async modelsFromZip(zip: JSZip) {
+    >;
+  }> {
+    const zip = await JSZip.loadAsync(buffer);
     const modelFileRegEx = new RegExp(".json$|.weights.bin$");
     const models: Record<
       string,
@@ -420,7 +388,7 @@ export class ClassifierHandler {
       }
     > = {};
     const failedModels: Record<string, { reason: string; err?: Error }> = {};
-    const loadedModels: SequentialClassifier[] = [];
+    const loadedModels: ModelInfoDTO[] = [];
 
     for await (const [fileName, file] of Object.entries(zip.files)) {
       if (!modelFileRegEx.test(fileName)) continue;
@@ -466,8 +434,7 @@ export class ClassifierHandler {
           weightsFiles: [modelWeights],
         });
         if (result.success) {
-          loadedModels.push(result.model);
-          this._availableClassificationModels[result.model.name] = result.model;
+          loadedModels.push(result.modelInfo);
         } else {
           failedModels[result.modelName] = result.error;
         }
@@ -475,7 +442,32 @@ export class ClassifierHandler {
     }
     return { loadedModels, failedModels };
   }
-  public async getSavedModelData() {
+  public async getZippedModelsBuffer(): Promise<ArrayBuffer> {
+    const zip = new JSZip();
+    const savedModelData = await this.getAllSavedModelData(); // <-- await fixes existing bug
+    Object.values(savedModelData).forEach((m) => {
+      zip.file(m.modelJson.fileName, m.modelJson.blob);
+      zip.file(m.modelWeights.fileName, m.modelWeights.blob);
+    });
+    return zip.generateAsync({ type: "arraybuffer" });
+  }
+  public async getSavedModelData(
+    modelName: string,
+  ): Promise<SerializedModelData> {
+    const model = this.resolveModel(modelName);
+    const savedModelInfo = await model.getSavedModelFiles();
+    return {
+      modelJson: {
+        blob: savedModelInfo.modelJsonBlob,
+        fileName: savedModelInfo.modelJsonFileName,
+      },
+      modelWeights: {
+        blob: savedModelInfo.weightsBlob,
+        fileName: savedModelInfo.weightsFileName,
+      },
+    };
+  }
+  public async getAllSavedModelData(): Promise<SerializedModels> {
     const userModels: SerializedModels = {};
     for await (const modelName of this.getModelNames()) {
       const model = this.resolveModel(modelName);
@@ -493,13 +485,15 @@ export class ClassifierHandler {
     }
     return userModels;
   }
-  public zipModels() {
-    const zip = new JSZip();
-    const savedModelData = this.getSavedModelData();
-    Object.values(savedModelData).forEach((model) => {
-      zip.file(model.modelJson.fileName, model.modelJson.blob);
-      zip.file(model.modelWeights.fileName, model.modelWeights.blob);
-    });
-    return zip;
-  }
+
+  //! remove
+  // public async zipModels(): Promise<JSZip> {
+  //   const zip = new JSZip();
+  //   const savedModelData = await this.getSavedModelData();
+  //   Object.values(savedModelData).forEach((model) => {
+  //     zip.file(model.modelJson.fileName, model.modelJson.blob);
+  //     zip.file(model.modelWeights.fileName, model.modelWeights.blob);
+  //   });
+  //   return zip;
+  // }
 }
