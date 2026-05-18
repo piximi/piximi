@@ -3,8 +3,6 @@ import { createSelector } from "@reduxjs/toolkit";
 import type { RootState } from "store/rootReducer";
 
 import type { ClassifierEvaluationResult } from "utils/dl/types";
-import classifierHandler from "utils/dl/classification/classifierHandler";
-import type { SequentialClassifier } from "utils/dl/classification";
 
 import type {
   ClassifierState,
@@ -65,14 +63,7 @@ export const selectActiveModelName = createSelector(
     return kc.activeModel;
   },
 );
-export const selectActiveModel = createSelector(
-  selectKindClassifier,
-  (kc): SequentialClassifier | undefined => {
-    const activeModelName = kc.activeModel;
-    if (!activeModelName) return;
-    return classifierHandler.getModel(activeModelName);
-  },
-);
+
 export const selectNewModelArch = createSelector(
   selectKindClassifier,
   (kc): ModelArch => {

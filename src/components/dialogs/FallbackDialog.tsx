@@ -33,7 +33,8 @@ import { HotkeyContext } from "utils/enums";
 import { AlertType } from "utils/enums";
 
 import { AlertState } from "utils/types";
-import classifierHandler from "utils/dl/classification/classifierHandler";
+import { useSelector } from "react-redux";
+import { selectAllCreatedModelNames } from "store/classifier/selectors";
 //import { saveAs } from "file-saver";
 
 export const FallbackDialog = (props: any) => {
@@ -44,6 +45,8 @@ export const FallbackDialog = (props: any) => {
   const [stackTrace, setStackTrace] = React.useState<string | undefined>(
     error.stack,
   );
+
+  const projectClassificationModels = useSelector(selectAllCreatedModelNames);
 
   React.useEffect(() => {
     if (error.stack) {
@@ -213,7 +216,7 @@ export const FallbackDialog = (props: any) => {
           <Button variant="outlined" onClick={handleSaveProject}>
             Save Project
           </Button>
-          {classifierHandler.getModelNames().length > 0 && (
+          {projectClassificationModels.length > 0 && (
             <Button variant="outlined" onClick={handleSaveClassifiers}>
               Save Classifier
             </Button>

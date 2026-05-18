@@ -1,7 +1,5 @@
 import { useMemo, useState } from "react";
 
-import { useSelector } from "react-redux";
-
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import type { SelectChangeEvent } from "@mui/material";
 import {
@@ -16,15 +14,12 @@ import {
   Stack,
 } from "@mui/material";
 
-import { useNumberField } from "hooks";
+import { useClassificationModel, useNumberField } from "hooks";
 
 import { FunctionalDivider } from "components/ui";
 import { StyledSelect, WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import { useParameterizedSelector } from "store/hooks";
-import { selectActiveModel } from "store/classifier/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
 import { enumKeys } from "utils/objectUtils";
@@ -35,8 +30,7 @@ import { ModelSettingsTextField } from "../../ModelSettingsTextField";
 
 const RowColInputOptions = { min: 20 };
 const InputShapeField = ({ disabled }: { disabled: boolean }) => {
-  const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const model = useParameterizedSelector(selectActiveModel, modelTarget);
+  const modelConfig = useClassificationModel();
   const { handleUpdateInputShape, modelParams } = useClassifierStatus();
 
   const inputShape = useMemo(() => {
@@ -69,8 +63,8 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
   } = useNumberField(inputShape.channels);
 
   const fixedChannels = useMemo(
-    () => model && !!model.requiredChannels,
-    [model],
+    () => modelConfig && !!modelConfig.requiredChannels,
+    [modelConfig],
   );
 
   const handleBlurDispatch = (
@@ -245,8 +239,7 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
 export const ImageAugmentationSettings = () => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const model = useParameterizedSelector(selectActiveModel, modelTarget);
+  const modelConfig = useClassificationModel();
   const { handleUpdatePreprocessSettings, modelParams } = useClassifierStatus();
 
   const normalizeOptions = useMemo(() => {
@@ -284,10 +277,10 @@ export const ImageAugmentationSettings = () => {
       />
 
       <Stack sx={{ pl: 2 }} spacing={4}>
-        <InputShapeField disabled={!!model} />
+        <InputShapeField disabled={!!modelConfig} />
         <Collapse in={showAdvanced} style={{ marginTop: 0 }}>
           <Stack spacing={4} sx={{ mt: 4 }}>
-            <CropSection disabled={!rescalable || !!model} />
+            <CropSection disabled={!rescalable || !!modelConfig} />
             <FormControl size="small">
               <FormControlLabel
                 data-help={HelpItem.PixelIntensityRescale}
@@ -308,7 +301,7 @@ export const ImageAugmentationSettings = () => {
                 label="Rescale pixel intensities:"
                 labelPlacement="start"
                 disableTypography
-                disabled={!!model}
+                disabled={!!modelConfig}
               />
             </FormControl>
           </Stack>

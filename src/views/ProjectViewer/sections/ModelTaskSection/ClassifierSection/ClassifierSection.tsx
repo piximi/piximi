@@ -6,7 +6,7 @@ import type { SelectChangeEvent } from "@mui/material";
 import { Box, IconButton, MenuItem, Stack } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { useDialog, useDialogHotkey } from "hooks";
+import { useClassificationModel, useDialog, useDialogHotkey } from "hooks";
 
 import { SaveFittedModelDialog } from "components/dialogs";
 import { WithLabel, StyledSelect } from "components/inputs";
@@ -23,15 +23,14 @@ import { selectTotalActiveUnlabeledItems } from "@ProjectViewer/state/reselector
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
-  selectActiveModel,
   selectKindClassifier,
   selectModelLifecycleStatus,
 } from "store/classifier/selectors";
 import { ModelArch } from "store/classifier/types";
 
 import { HotkeyContext } from "utils/enums";
-import type { SequentialClassifier } from "utils/dl/classification";
 import classifierHandler from "utils/dl/classification/classifierHandler";
+import type { ModelInfoDTO } from "utils/dl/classification/worker/dto";
 
 import { PredictionListItems } from "../PredictionListItems";
 import { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";
@@ -50,7 +49,7 @@ export const ClassifierSection = () => {
     selectModelLifecycleStatus,
     modelTarget,
   );
-  const model = useParameterizedSelector(selectActiveModel, modelTarget);
+  const modelConfig = useClassificationModel();
   const totalUnlabeledItems = useSelector(selectTotalActiveUnlabeledItems);
 
   const { error } = useClassifierStatus();
@@ -84,7 +83,7 @@ export const ClassifierSection = () => {
   };
 
   const handleEvaluate = async () => {
-    if (!model || !kindClassifier) return;
+    if (!modelConfig || !kindClassifier) return;
     const modelName = kindClassifier.activeModel;
     if (!modelName) return;
     const currentRun = kindClassifier.modelInfoDict[modelName]?.runs.at(-1);
@@ -102,7 +101,7 @@ export const ClassifierSection = () => {
       switch (modelStatus) {
         case "idle":
         case "waiting":
-          return !model || model.trainable
+          return !modelConfig || modelConfig.trainable
             ? "Fit Model"
             : "Model is inference only";
         default:
@@ -112,7 +111,7 @@ export const ClassifierSection = () => {
     const predictText = (() => {
       switch (modelStatus) {
         case "idle":
-          return model ? "Predict Model" : "No Trained Model";
+          return modelConfig ? "Predict Model" : "No Trained Model";
         case "predicting":
           return "...Predicting";
         default:
@@ -120,15 +119,15 @@ export const ClassifierSection = () => {
       }
     })();
     const predictionDisabled =
-      !model ||
-      !model.pretrained ||
+      !modelConfig ||
+      !modelConfig.pretrained ||
       modelStatus !== "idle" ||
       totalUnlabeledItems === 0 ||
       error?.reason === ErrorReason.ChannelMismatch;
 
     const evaluateText = (() => {
-      if (model) {
-        return model.trainable
+      if (modelConfig) {
+        return modelConfig.trainable
           ? modelStatus === "idle" || modelStatus === "waiting"
             ? "Evaluate Model"
             : "...Pending"
@@ -140,15 +139,15 @@ export const ClassifierSection = () => {
     return {
       fit: {
         helperText: fitText,
-        disabled: !(!model || model.trainable),
+        disabled: !(!modelConfig || modelConfig.trainable),
       },
       predict: { helperText: predictText, disabled: predictionDisabled },
       evaluate: {
         helperText: evaluateText,
-        disabled: !model || !model.pretrained,
+        disabled: !modelConfig || !modelConfig.pretrained,
       },
     };
-  }, [modelStatus, model, error]);
+  }, [modelStatus, modelConfig, error]);
 
   return (
     <>
@@ -161,11 +160,11 @@ export const ClassifierSection = () => {
         gap={1}
       >
         <ModelIOButtonGroup
-          hasTrainedModel={!!model}
+          hasTrainedModel={!!modelConfig}
           handleImportModel={handleOpenImportClassifierDialog}
           handleSaveModel={handleOpenSaveClassifierDialog}
         />
-        <ModelSelection selectedModel={model} />
+        <ModelSelection selectedModelConfig={modelConfig} />
         <ModelExecButtonGroup
           modelStatus={modelStatus}
           handleFit={handleOpenFitClassifierDialog}
@@ -179,9 +178,9 @@ export const ClassifierSection = () => {
         onClose={handleCloseImportClassifierDialog}
         open={ImportClassifierDialogOpen}
       />
-      {model && (
+      {modelConfig && (
         <SaveFittedModelDialog
-          model={model}
+          model={modelConfig}
           onClose={handleCloseSaveClassifierDialog}
           open={SaveClassifierDialogOpen}
         />
@@ -200,13 +199,13 @@ export const ClassifierSection = () => {
 };
 
 const ModelSelection = ({
-  selectedModel,
+  selectedModelConfig,
 }: {
-  selectedModel: SequentialClassifier | undefined;
+  selectedModelConfig: ModelInfoDTO | undefined;
 }) => {
   const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const selectedModelName = selectedModel?.name ?? "new";
+  const selectedModelName = selectedModelConfig?.name ?? "new";
   const handleModelChange = (event: SelectChangeEvent<unknown>) => {
     const value: string | ModelArch = event.target.value as string;
     if (value === "new") {
@@ -234,8 +233,8 @@ const ModelSelection = ({
     }
   };
   const handleDisposeModel = () => {
-    if (!selectedModel) return;
-    classifierHandler.removeModel(selectedModel.name);
+    if (!selectedModelConfig) return;
+    classifierHandler.removeModel(selectedModelConfig.name);
     dispatch(
       classifierSlice.actions.setActiveModel({
         targetId: modelTarget,
@@ -244,7 +243,7 @@ const ModelSelection = ({
     );
     dispatch(
       classifierSlice.actions.removeModelInfo({
-        modelName: selectedModel.name,
+        modelName: selectedModelConfig.name,
       }),
     );
   };
@@ -309,7 +308,7 @@ const ModelSelection = ({
           size="small"
           sx={{ pr: 0 }}
           onClick={handleDisposeModel}
-          disabled={!selectedModel}
+          disabled={!selectedModelConfig}
         >
           <DeleteIcon sx={{ fontSize: "1.15rem" }} />
         </IconButton>

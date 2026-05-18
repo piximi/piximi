@@ -16,6 +16,7 @@ export { useNumberField } from "./useNumberField";
 export { useWindowSize } from "./useWindowSize";
 export { useFileLoader } from "./useFileLoader";
 export { useProjectLoader } from "./useProjectLoader";
+export { useClassificationModel } from "./useClassificationModel";
 
 // useDefaultImage not included to encourage use of
 // import {useDefaultImage, DispatchLocation} from "hooks/useDefaultImage"

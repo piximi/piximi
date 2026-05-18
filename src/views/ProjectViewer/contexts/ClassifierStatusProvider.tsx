@@ -5,8 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { useImmer } from "use-immer";
 
+import { useClassificationModel } from "hooks";
+
 import {
-  selectActiveModel,
   selectAllCreatedModelNames,
   selectModelInfo,
 } from "store/classifier/selectors";
@@ -91,7 +92,7 @@ export const ClassifierStatusProvider = ({
   const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
 
-  const model = useParameterizedSelector(selectActiveModel, modelTarget);
+  const modelConfig = useClassificationModel();
   const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
   const inferenceItems = useParameterizedSelector(
     selectActiveItemsByPartition,
@@ -118,7 +119,10 @@ export const ClassifierStatusProvider = ({
     return showClearPredictionsWarning && hasLabeledInference;
   }, [showClearPredictionsWarning, hasLabeledInference]);
 
-  const trainable = useMemo(() => !model || model.trainable, [model]);
+  const trainable = useMemo(
+    () => !modelConfig || modelConfig.trainable,
+    [modelConfig],
+  );
   const noLabeledThings = useMemo(
     () => activeLabeledItems.length === 0,
     [activeLabeledItems],
@@ -208,15 +212,15 @@ export const ClassifierStatusProvider = ({
       });
     }
     if (
-      model?.preprocessingSettings &&
+      modelConfig?.preprocessingSettings &&
       projectChannels &&
-      projectChannels !== model.preprocessingSettings.inputShape.channels
+      projectChannels !== modelConfig.preprocessingSettings.inputShape.channels
     ) {
       newIsReady = false;
 
       newErrors.push({
         reason: ErrorReason.ChannelMismatch,
-        message: `The model requires ${model?.preprocessingSettings.inputShape.channels}-channel images, but the project images have ${projectChannels}`,
+        message: `The model requires ${modelConfig?.preprocessingSettings.inputShape.channels}-channel images, but the project images have ${projectChannels}`,
         severity: 2,
       });
     }
@@ -248,7 +252,7 @@ export const ClassifierStatusProvider = ({
     setError(mostSevere);
     setActiveErrors(newErrors);
   }, [
-    model,
+    modelConfig,
     trainable,
     noLabeledThings,
     projectChannels,

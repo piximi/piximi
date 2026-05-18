@@ -3,13 +3,13 @@ import { Grid2 as Grid, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { Model } from "utils/dl/Model";
-
 import JSZip from "jszip";
 import saveAs from "file-saver";
+import { ModelInfoDTO } from "utils/dl/classification/worker/dto";
+import { ClassifierApi } from "utils/dl/classification/ClassifierApi";
 
 type SaveFittedModelDialogProps = {
-  model: Model;
+  model: ModelInfoDTO;
   onClose: () => void;
   open: boolean;
 };
@@ -22,10 +22,11 @@ export const SaveFittedModelDialog = ({
   const [name, setName] = useState<string>(model.name);
   const noNameError = name.length === 0;
   const onSaveClassifierClick = async () => {
-    const modelBlobs = await model.getSavedModelFiles(name);
+    const cfApi = ClassifierApi.getInstance();
+    const { modelJson, modelWeights } = await cfApi.getSavedModelData(name);
     const zip = new JSZip();
-    zip.file(modelBlobs.modelJsonFileName, modelBlobs.modelJsonBlob);
-    zip.file(modelBlobs.weightsFileName, modelBlobs.weightsBlob);
+    zip.file(modelJson.fileName, modelJson.blob);
+    zip.file(modelWeights.fileName, modelWeights.blob);
     const zipBlob = await zip.generateAsync({ type: "blob" });
     saveAs(zipBlob, `${noNameError ? model.name : name}.zip`);
     onClose();

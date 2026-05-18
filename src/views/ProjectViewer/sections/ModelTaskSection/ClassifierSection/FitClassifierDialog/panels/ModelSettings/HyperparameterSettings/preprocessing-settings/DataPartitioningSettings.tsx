@@ -1,7 +1,5 @@
 import { useMemo, useState } from "react";
 
-import { useSelector } from "react-redux";
-
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import {
   Checkbox,
@@ -13,22 +11,18 @@ import {
   Stack,
 } from "@mui/material";
 
-import { useNumberField } from "hooks";
+import { useClassificationModel, useNumberField } from "hooks";
 
 import { FunctionalDivider } from "components/ui";
 import { WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import { useParameterizedSelector } from "store/hooks";
-import { selectActiveModel } from "store/classifier/selectors";
 
 import { ModelSettingsTextField } from "../../ModelSettingsTextField";
 
 export const DataPartitioningSettings = () => {
-  const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const model = useParameterizedSelector(selectActiveModel, modelTarget);
+  const modelConfig = useClassificationModel();
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -96,7 +90,7 @@ export const DataPartitioningSettings = () => {
             value={trainPercentDisplay}
             fullWidth
             onBlur={dispatchTrainingPercentage}
-            disabled={!!model || !trainable}
+            disabled={!!modelConfig || !trainable}
           />
         </WithLabel>
         <Collapse in={showAdvanced}>
@@ -119,7 +113,7 @@ export const DataPartitioningSettings = () => {
               label="Shuffle on Split"
               labelPlacement="start"
               disableTypography
-              disabled={!!model}
+              disabled={!!modelConfig}
             />
           </FormControl>
         </Collapse>

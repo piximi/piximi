@@ -1,26 +1,20 @@
 import { useMemo, useState } from "react";
 
-import { useSelector } from "react-redux";
-
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { Collapse, Grid2 as Grid, IconButton, Stack } from "@mui/material";
 
-import { useNumberField } from "hooks";
+import { useClassificationModel, useNumberField } from "hooks";
 
 import { FunctionalDivider } from "components/ui";
 import { WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import { useParameterizedSelector } from "store/hooks";
-import { selectActiveModel } from "store/classifier/selectors";
 
 import { ModelSettingsTextField } from "../../ModelSettingsTextField";
 
 export const TrainingStrategySettings = () => {
-  const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const model = useParameterizedSelector(selectActiveModel, modelTarget);
+  const modelConfig = useClassificationModel();
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -97,7 +91,7 @@ export const TrainingStrategySettings = () => {
               onChange={handleNumEpochsChange}
               value={numEpochsDisplay}
               onBlur={dispatchNumEpochs}
-              disabled={!!model || !trainable}
+              disabled={!!modelConfig || !trainable}
             />
           </WithLabel>
           <Collapse in={showAdvanced}>
@@ -115,7 +109,7 @@ export const TrainingStrategySettings = () => {
                 onChange={handleBatchSizeChange}
                 value={batchSizeDisplay}
                 onBlur={dispatchBatchSize}
-                disabled={!!model || !trainable}
+                disabled={!!modelConfig || !trainable}
               />
             </WithLabel>
           </Collapse>

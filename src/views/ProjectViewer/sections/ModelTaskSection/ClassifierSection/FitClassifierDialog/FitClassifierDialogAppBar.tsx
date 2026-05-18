@@ -23,16 +23,13 @@ import {
   ErrorOutline,
 } from "@mui/icons-material";
 
-import { useDialog } from "hooks";
+import { useClassificationModel, useDialog } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 
 import { classifierSlice } from "store/classifier";
-import {
-  selectActiveModel,
-  selectModelLifecycleStatus,
-} from "store/classifier/selectors";
+import { selectModelLifecycleStatus } from "store/classifier/selectors";
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useFitClassifier } from "@ProjectViewer/hooks/useFitClassifier";
@@ -43,6 +40,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { useAcceptClearPredictions } from "@ProjectViewer/hooks";
 
 import { APPLICATION_COLORS } from "utils/constants";
+import { ClassifierApi } from "utils/dl/classification/ClassifierApi";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
@@ -58,7 +56,7 @@ export const FitClassifierDialogAppBar = ({
     selectModelLifecycleStatus,
     modelTarget,
   );
-  const model = useParameterizedSelector(selectActiveModel, modelTarget);
+  const modelConfig = useClassificationModel();
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
@@ -80,10 +78,11 @@ export const FitClassifierDialogAppBar = ({
     }
   }, [modelStatus]);
 
-  const onStopFitting = () => {
-    if (modelStatus !== "training" || !model) return;
+  const onStopFitting = async () => {
+    if (modelStatus !== "training" || !modelConfig) return;
+    const cfApi = ClassifierApi.getInstance();
 
-    model.stopTraining();
+    await cfApi.cancelTraining(modelConfig.name);
 
     dispatch(
       classifierSlice.actions.setModelStatus({

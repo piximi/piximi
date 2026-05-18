@@ -4,16 +4,15 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Dialog, DialogContent, Tabs } from "@mui/material";
 
+import { useClassificationModel } from "hooks";
+
 import { ToolTipTab } from "components/layout";
 import { DialogTransitionSlide } from "components/dialogs";
 
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import {
-  selectActiveModel,
-  selectModelLifecycleStatus,
-} from "store/classifier/selectors";
+import { selectModelLifecycleStatus } from "store/classifier/selectors";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { HotkeyContext } from "utils/enums";
@@ -43,7 +42,7 @@ export const FitClassifierDialog = ({
     selectModelLifecycleStatus,
     modelTarget,
   );
-  const model = useParameterizedSelector(selectActiveModel, modelTarget);
+  const modelConfig = useClassificationModel();
 
   const showPlots = useMemo(() => {
     return modelHistory.categoricalAccuracy.length > 0;
@@ -66,8 +65,8 @@ export const FitClassifierDialog = ({
   useEffect(() => {
     if (modelStatus === "training") return;
     if ((tabVal === "2" || tabVal === "4") && !showPlots) setTabVal("1");
-    if (tabVal === "3" && !model?.modelSummary) setTabVal("1");
-  }, [tabVal, showPlots, model?.modelSummary, modelStatus]);
+    if (tabVal === "3" && !modelConfig?.modelSummary) setTabVal("1");
+  }, [tabVal, showPlots, modelConfig?.modelSummary, modelStatus]);
 
   useEffect(() => {
     if (openedDialog) {
@@ -115,7 +114,7 @@ export const FitClassifierDialog = ({
           value="3"
           disabledMessage="No Trained Model"
           placement="top"
-          disabled={!model?.modelSummary}
+          disabled={!modelConfig?.modelSummary}
         />
         <ToolTipTab
           label="Model Runs Summary"
@@ -135,13 +134,13 @@ export const FitClassifierDialog = ({
         </Box>
         <Box hidden={tabVal !== "3"}>
           {/* TODO: implement model summary for graph models */}
-          {model?.modelSummary && (
-            <ModelSummaryTable modelSummary={model.modelSummary} />
+          {modelConfig?.modelSummary && (
+            <ModelSummaryTable modelSummary={modelConfig.modelSummary} />
           )}
         </Box>
         <Box hidden={tabVal !== "4"}>
           {/* TODO: implement model summary for graph models */}
-          {model?.modelSummary && <RunSummaryTable />}
+          {modelConfig?.modelSummary && <RunSummaryTable />}
         </Box>
       </DialogContent>
     </Dialog>

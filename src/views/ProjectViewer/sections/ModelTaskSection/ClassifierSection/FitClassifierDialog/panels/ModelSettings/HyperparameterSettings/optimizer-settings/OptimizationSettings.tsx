@@ -1,7 +1,5 @@
 import { useMemo, useState } from "react";
 
-import { useSelector } from "react-redux";
-
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import type { SelectChangeEvent } from "@mui/material";
 import {
@@ -12,16 +10,13 @@ import {
   Stack,
 } from "@mui/material";
 
-import { useNumberField } from "hooks";
+import { useClassificationModel, useNumberField } from "hooks";
 
 import { FunctionalDivider } from "components/ui";
 import { StyledSelect, WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import { useParameterizedSelector } from "store/hooks";
-import { selectActiveModel } from "store/classifier/selectors";
 
 import { enumKeys } from "utils/objectUtils";
 import { LossFunction, OptimizationAlgorithm } from "utils/dl/enums";
@@ -29,8 +24,7 @@ import { LossFunction, OptimizationAlgorithm } from "utils/dl/enums";
 import { ModelSettingsTextField } from "../../ModelSettingsTextField";
 
 export const OptimizationSettings = () => {
-  const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const model = useParameterizedSelector(selectActiveModel, modelTarget);
+  const modelConfig = useClassificationModel();
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const { trainable, handleUpdateOptimizerSettings, modelParams } =
@@ -98,7 +92,7 @@ export const OptimizationSettings = () => {
               value={compileOptions.optimizationAlgorithm}
               onChange={handleOptimizationAlgorithmChange}
               fullWidth
-              disabled={!!model}
+              disabled={!!modelConfig}
             >
               {enumKeys(OptimizationAlgorithm).map((k) => {
                 return (
@@ -121,7 +115,7 @@ export const OptimizationSettings = () => {
               value={compileOptions.lossFunction}
               onChange={handleLossFunctionChange}
               sx={{ maxWidth: "max-content" }}
-              disabled={!!model}
+              disabled={!!modelConfig}
             >
               {enumKeys(LossFunction).map((k) => {
                 return (
@@ -146,7 +140,7 @@ export const OptimizationSettings = () => {
               onChange={handleLearningRateChange}
               value={learningRateDisplay}
               onBlur={dispatchLearningRate}
-              disabled={!!model || !trainable}
+              disabled={!!modelConfig || !trainable}
             />
           </WithLabel>
         </Stack>
