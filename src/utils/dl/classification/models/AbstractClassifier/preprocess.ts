@@ -17,8 +17,8 @@ import type { RequireOnly } from "utils/types";
 import type { InferenceInput, TrainingInput } from "utils/dl/types";
 import { makeSeededRandom } from "utils/numberUtils";
 
-import { CropSchema, Partition } from "../../enums";
-import { matchedCropPad, padToMatch } from "../../utils";
+import { CropSchema, Partition } from "../../../enums";
+import { matchedCropPad, padToMatch } from "../../../utils";
 import { doShow } from "./debugUtils";
 
 import type { Tensor1D, Tensor2D, Tensor3D, Tensor4D } from "@tensorflow/tfjs";

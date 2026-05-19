@@ -16,7 +16,7 @@ import { STORES } from "utils/data-connector/types";
 import { parseError } from "utils/logUtils";
 import type { ExtractedModelFileMap } from "utils/dl/types";
 import classifierHandler from "utils/dl/classification/classifierHandler";
-import type { SequentialClassifier } from "utils/dl/classification";
+import type { SequentialClassifier } from "utils/dl/classification/models";
 
 import type { V2Channel } from "./version-readers/version-types/v2Types";
 import type {

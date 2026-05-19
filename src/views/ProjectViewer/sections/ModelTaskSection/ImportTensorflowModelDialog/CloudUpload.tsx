@@ -14,10 +14,10 @@ import { Language as LanguageIcon } from "@mui/icons-material";
 
 import { useDebounce } from "hooks";
 
-import { RemoteClassifier } from "utils/dl/classification/UploadedClassifier";
+import type { SequentialClassifier } from "utils/dl/classification/models";
+import { RemoteClassifier } from "utils/dl/classification/models";
 import classifierHandler from "utils/dl/classification/classifierHandler";
 import { isObjectEmpty } from "utils/objectUtils";
-import type { SequentialClassifier } from "utils/dl/classification";
 
 export const RemoteClassifierUpload = ({
   isGraph,

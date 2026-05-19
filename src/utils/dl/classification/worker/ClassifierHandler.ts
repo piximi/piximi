@@ -6,9 +6,12 @@ import { logger, parseError } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
 import { getUniqueName } from "utils/stringUtils";
 
-import { RemoteClassifier, UploadedClassifier } from "../UploadedClassifier";
-import { MobileNet } from "../MobileNet";
-import { SimpleCNN } from "../SimpleCNN";
+import {
+  RemoteClassifier,
+  UploadedClassifier,
+  MobileNet,
+  SimpleCNN,
+} from "../models";
 import { ModelTask } from "../../enums";
 import { ModelArch } from "../types";
 import { err, ok } from "../utils";
@@ -27,7 +30,7 @@ import type {
   TrainingCallbacks,
 } from "../types";
 import type { Logs } from "@tensorflow/tfjs";
-import type { SequentialClassifier } from "../AbstractClassifier";
+import type { SequentialClassifier } from "../models";
 import type {
   InferenceInput,
   SerializedModelData,

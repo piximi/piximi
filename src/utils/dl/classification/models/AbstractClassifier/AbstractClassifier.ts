@@ -13,8 +13,8 @@ import type { Category } from "store/dataV2/types";
 import type { RequireOnly } from "utils/types";
 
 import { preprocessData } from "./preprocess";
-import { Model } from "../../Model";
-import { evaluateConfusionMatrix, getLayersModelSummary } from "../utils";
+import { Model } from "../../../Model";
+import { evaluateConfusionMatrix, getLayersModelSummary } from "../../utils";
 
 import type {
   EvaluationResult,
@@ -23,8 +23,8 @@ import type {
   RunStatus,
   TrainingCallbacks,
   TrainingResults,
-} from "../types";
-import type { InferenceInput, TrainingInput } from "../../types";
+} from "../../types";
+import type { InferenceInput, TrainingInput } from "../../../types";
 import type {
   GraphModel,
   LayersModel,

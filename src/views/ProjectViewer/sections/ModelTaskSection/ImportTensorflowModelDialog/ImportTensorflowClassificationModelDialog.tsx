@@ -22,7 +22,7 @@ import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 
 import { HotkeyContext } from "utils/enums";
 import classifierHandler from "utils/dl/classification/classifierHandler";
-import type { SequentialClassifier } from "utils/dl/classification";
+import type { SequentialClassifier } from "utils/dl/classification/models";
 
 import { LocalClassifierUpload } from "./LocalFileUpload";
 import { RemoteClassifierUpload } from "./CloudUpload";

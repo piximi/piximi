@@ -7,14 +7,14 @@ import { arrayRange } from "utils/arrayUtils";
 import { validateModelMetadata } from "utils/file-io/runtime/validators";
 import type { RequireOnly } from "utils/types";
 
-import { Model } from "../Model";
+import { Model } from "../../Model";
 import { SequentialClassifier } from "./AbstractClassifier";
-import { createCompileArgs, getDefaultModelInfo } from "./utils";
-import { convertArrayToShape } from "../utils";
+import { createCompileArgs, getDefaultModelInfo } from "../utils";
+import { convertArrayToShape } from "../../utils";
 
-import type { OptimizerSettings } from "./types";
+import type { OptimizerSettings } from "../types";
 import type { LayersModel } from "@tensorflow/tfjs";
-import type { CropSchema } from "../enums";
+import type { CropSchema } from "../../enums";
 
 enum LoadState {
   Unloaded,

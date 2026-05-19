@@ -3,12 +3,13 @@ import {
   sequential,
   layers,
   initializers,
-  LayersModel,
-  Sequential,
   serialization,
 } from "@tensorflow/tfjs";
 import { isEqual } from "lodash";
-import { Shape } from "store/dataV2/types";
+
+import type { Shape } from "store/dataV2/types";
+
+import type { LayersModel, Sequential } from "@tensorflow/tfjs";
 
 const copyLayer = (
   fromModel: LayersModel,

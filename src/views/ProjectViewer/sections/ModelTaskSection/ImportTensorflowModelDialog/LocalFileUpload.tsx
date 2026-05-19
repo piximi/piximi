@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { FileOpen as FileOpenIcon } from "@mui/icons-material";
 
-import type { SequentialClassifier } from "utils/dl/classification";
+import type { SequentialClassifier } from "utils/dl/classification/models";
 import type { ModelUploadResults } from "utils/dl/classification/classifierHandler";
 import classifierHandler from "utils/dl/classification/classifierHandler";
 import { isObjectEmpty } from "utils/objectUtils";

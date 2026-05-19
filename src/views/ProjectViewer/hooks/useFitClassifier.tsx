@@ -22,7 +22,7 @@ import { generateUUID } from "store/dataV2/utils";
 
 import classifierHandler from "utils/dl/classification/classifierHandler";
 import { Partition } from "utils/dl/enums";
-import type { SequentialClassifier } from "utils/dl/classification";
+import type { SequentialClassifier } from "utils/dl/classification/models";
 import {
   applySplitAndShuffle,
   fingerprintDataset,
