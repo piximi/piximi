@@ -23,12 +23,20 @@ export const SaveFittedModelDialog = ({
   const noNameError = name.length === 0;
   const onSaveClassifierClick = async () => {
     const cfApi = ClassifierApi.getInstance();
-    const { modelJson, modelWeights } = await cfApi.getSavedModelData(name);
-    const zip = new JSZip();
-    zip.file(modelJson.fileName, modelJson.blob);
-    zip.file(modelWeights.fileName, modelWeights.blob);
-    const zipBlob = await zip.generateAsync({ type: "blob" });
-    saveAs(zipBlob, `${noNameError ? model.name : name}.zip`);
+    const result = await cfApi.getSavedModelData(name);
+    if (result.success) {
+      const { modelJson, modelWeights } = result.data;
+      const zip = new JSZip();
+      zip.file(modelJson.fileName, modelJson.blob);
+      zip.file(modelWeights.fileName, modelWeights.blob);
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      saveAs(zipBlob, `${noNameError ? model.name : name}.zip`);
+    } else {
+      console.error(
+        `[SaveFittedModelDialog] ${result.reason.code}: ${result.reason.message}`,
+        result.reason.cause,
+      );
+    }
     onClose();
   };
 

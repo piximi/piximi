@@ -5,19 +5,21 @@ import type { Category } from "store/dataV2/types";
 import { logger, parseError } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
 import { getUniqueName } from "utils/stringUtils";
-import type { RequireOnly } from "utils/types";
 
 import { RemoteClassifier, UploadedClassifier } from "../UploadedClassifier";
 import { MobileNet } from "../MobileNet";
 import { SimpleCNN } from "../SimpleCNN";
 import { ModelTask } from "../../enums";
 import { ModelArch } from "../types";
+import { err, ok } from "../utils";
 
 import type {
+  ApiResult,
+  BatchModelLoadResult,
   EvaluationResult,
   FitOptions,
+  IClassifierApi,
   ModelInfoDTO,
-  ModelLoadResult,
   OptimizerSettings,
   PredictionResult,
   PreprocessSettings,
@@ -33,18 +35,7 @@ import type {
   TrainingInput,
 } from "../../types";
 
-export type ModelUploadResults = {
-  loadedModels: SequentialClassifier[];
-  failedModels: Record<
-    string,
-    {
-      reason: string;
-      err?: Error;
-    }
-  >;
-};
-
-export class ClassifierHandler {
+export class ClassifierHandler implements IClassifierApi {
   private _availableClassificationModels: Record<string, SequentialClassifier> =
     {};
 
@@ -72,19 +63,23 @@ export class ClassifierHandler {
     modelName: string,
     architecture: ModelArch,
     seed: number,
-  ): Promise<ModelInfoDTO> {
-    modelName = getUniqueName(modelName, this.getModelNames());
+  ): Promise<ApiResult<ModelInfoDTO>> {
+    const uniqueName = getUniqueName(
+      modelName,
+      Object.keys(this._availableClassificationModels),
+    );
     try {
-      let model: SequentialClassifier;
-      if (architecture === ModelArch.SIMPLE_CNN)
-        model = new SimpleCNN(modelName, seed);
-      else model = new MobileNet(modelName);
-      this._availableClassificationModels[modelName] = model;
-      return this.buildModelInfoDTO(model);
-    } catch (err: any) {
-      throw new Error("Failed to create Model.", { cause: err as Error });
+      const model: SequentialClassifier =
+        architecture === ModelArch.SIMPLE_CNN
+          ? new SimpleCNN(uniqueName, seed)
+          : new MobileNet(uniqueName);
+      this._availableClassificationModels[uniqueName] = model;
+      return ok(this.buildModelInfoDTO(model));
+    } catch (e) {
+      return err("MODEL_CREATE_FAILED", "Failed to create model", e);
     }
   }
+
   public addModels(
     models: Record<string, SequentialClassifier> | Array<SequentialClassifier>,
   ): void {
@@ -99,29 +94,34 @@ export class ClassifierHandler {
     }
   }
 
-  public removeModel(modelName: string): void {
+  public removeModel(modelName: string): ApiResult<string> {
     const model = this.resolveModel(modelName);
+    if (!model)
+      return err(
+        "MODEL_NOT_FOUND",
+        `No model registered with name "${modelName}"`,
+      );
     model.dispose();
     delete this._availableClassificationModels[modelName];
+    return ok(modelName);
   }
-  public removeAllModels(): void {
+
+  public removeAllModels(): ApiResult<void> {
     Object.keys(this._availableClassificationModels).forEach((modelName) => {
-      this.removeModel(modelName);
+      const model = this._availableClassificationModels[modelName];
+      model.dispose();
+      delete this._availableClassificationModels[modelName];
     });
+    return ok();
   }
 
   /*
    * Model Information Access
    */
-  private resolveModel(modelName: string): SequentialClassifier {
-    const model = this._availableClassificationModels[modelName];
-    if (!model) {
-      throw new Error(
-        `ClassifierHandler: no model registered with name "${modelName}"`,
-      );
-    }
-    return model;
+  private resolveModel(modelName: string): SequentialClassifier | null {
+    return this._availableClassificationModels[modelName] ?? null;
   }
+
   private buildModelInfoDTO(model: SequentialClassifier): ModelInfoDTO {
     return {
       name: model.name,
@@ -149,6 +149,7 @@ export class ClassifierHandler {
       requiredChannels: model.requiredChannels,
     };
   }
+
   public get availableClassificationModels(): Record<string, ModelInfoDTO> {
     return Object.entries(this._availableClassificationModels).reduce(
       (models: Record<string, ModelInfoDTO>, [name, model]) => {
@@ -158,15 +159,23 @@ export class ClassifierHandler {
       {},
     );
   }
-  public hasModel(modelName: string): boolean {
-    return modelName in this._availableClassificationModels;
+
+  public hasModel(modelName: string): ApiResult<boolean> {
+    return ok(modelName in this._availableClassificationModels);
   }
-  public getModelNames(): string[] {
-    return Object.keys(this._availableClassificationModels);
+
+  public getModelNames(): ApiResult<string[]> {
+    return ok(Object.keys(this._availableClassificationModels));
   }
-  public getModelInfo(modelName: string): ModelInfoDTO {
+
+  public getModelInfo(modelName: string): ApiResult<ModelInfoDTO> {
     const model = this.resolveModel(modelName);
-    return this.buildModelInfoDTO(model);
+    if (!model)
+      return err(
+        "MODEL_NOT_FOUND",
+        `No model registered with name "${modelName}"`,
+      );
+    return ok(this.buildModelInfoDTO(model));
   }
 
   /*
@@ -175,36 +184,79 @@ export class ClassifierHandler {
   public loadTraining(
     modelName: string,
     items: TrainingInput[],
-    categories: RequireOnly<Category, "id">[],
+    categories: Category[],
     runSeed: number,
-  ): void {
-    this.resolveModel(modelName).loadTraining(items, categories, runSeed);
+  ): ApiResult<string> {
+    const model = this.resolveModel(modelName);
+    if (!model)
+      return err(
+        "MODEL_NOT_FOUND",
+        `No model registered with name "${modelName}"`,
+      );
+    try {
+      model.loadTraining(items, categories, runSeed);
+      return ok(modelName);
+    } catch (e) {
+      return err("PREPROCESS_FAILED", "Failed to load training data", e);
+    }
   }
   public loadValidation(
     modelName: string,
     items: TrainingInput[],
-    categories: RequireOnly<Category, "id">[],
+    categories: Category[],
     runSeed: number,
-  ): void {
-    this.resolveModel(modelName).loadValidation(items, categories, runSeed);
+  ): ApiResult<string> {
+    const model = this.resolveModel(modelName);
+    if (!model)
+      return err(
+        "MODEL_NOT_FOUND",
+        `No model registered with name "${modelName}"`,
+      );
+    try {
+      model.loadValidation(items, categories, runSeed);
+      return ok(modelName);
+    } catch (e) {
+      return err("PREPROCESS_FAILED", "Failed to load validation data", e);
+    }
   }
   public loadInference(
     modelName: string,
     items: InferenceInput[],
-    categories: RequireOnly<Category, "id">[],
-  ): void {
-    this.resolveModel(modelName).loadInference(items, categories);
+    categories: Category[],
+  ): ApiResult<string> {
+    const model = this.resolveModel(modelName);
+    if (!model)
+      return err(
+        "MODEL_NOT_FOUND",
+        `No model registered with name "${modelName}"`,
+      );
+    try {
+      model.loadInference(items, categories);
+      return ok(modelName);
+    } catch (e) {
+      return err("PREPROCESS_FAILED", "Failed to load inference data", e);
+    }
   }
   public loadData(
     modelName: string,
     trainingData: TrainingInput[],
     validationData: TrainingInput[],
-    categories: RequireOnly<Category, "id">[],
+    categories: Category[],
     runSeed: number,
-  ): void {
+  ): ApiResult<string> {
     const model = this.resolveModel(modelName);
-    model.loadTraining(trainingData, categories, runSeed);
-    model.loadValidation(validationData, categories, runSeed);
+    if (!model)
+      return err(
+        "MODEL_NOT_FOUND",
+        `No model registered with name "${modelName}"`,
+      );
+    try {
+      model.loadTraining(trainingData, categories, runSeed);
+      model.loadValidation(validationData, categories, runSeed);
+      return ok(modelName);
+    } catch (e) {
+      return err("PREPROCESS_FAILED", "Failed to load data", e);
+    }
   }
   public async prepareModel(
     modelName: string,
@@ -215,8 +267,13 @@ export class ClassifierHandler {
     preprocessSettings: PreprocessSettings,
     optimizerSettings: OptimizerSettings,
     runSeed: number,
-  ): Promise<void> {
+  ): Promise<ApiResult<void>> {
     const model = this.resolveModel(modelName);
+    if (!model)
+      return err(
+        "MODEL_NOT_FOUND",
+        `No model registered with name "${modelName}"`,
+      );
 
     /* LOAD CLASSIFIER MODEL */
     try {
@@ -240,20 +297,19 @@ export class ClassifierHandler {
         import.meta.env.NODE_ENV !== "production" &&
           import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
           console.warn("Unhandled architecture", model.name);
-        return;
+        return ok();
       }
-    } catch (error) {
-      throw new Error("Failed to create tensorflow model", {
-        cause: error as Error,
-      });
+    } catch (e) {
+      return err("TF_LOAD_FAILED", "Failed to create tensorflow model", e);
     }
     try {
       model.classes = categories.map((cat) => cat.name);
       model.loadTraining(trainingData, categories, runSeed);
       model.loadValidation(validationData, categories, runSeed);
-    } catch (error) {
-      throw new Error("Error in preprocessing", { cause: error as Error });
+    } catch (e) {
+      return err("PREPROCESS_FAILED", "Error in preprocessing", e);
     }
+    return ok();
   }
   public async train(
     modelName: string,
@@ -264,34 +320,84 @@ export class ClassifierHandler {
         logger(logs);
       },
     },
-  ): Promise<TrainAndEvalResult> {
+  ): Promise<ApiResult<TrainAndEvalResult>> {
     const model = this.resolveModel(modelName);
-    const trainingResults = await model.train(options, callbacks);
-    import.meta.env.NODE_ENV !== "production" &&
-      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-      logger(model.currentFitHistory);
+    if (!model)
+      return err(
+        "MODEL_NOT_FOUND",
+        `No model registered with name "${modelName}"`,
+      );
+
+    let trainingResults;
+    try {
+      trainingResults = await model.train(options, callbacks);
+      import.meta.env.NODE_ENV !== "production" &&
+        import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
+        logger(model.currentFitHistory);
+    } catch (e) {
+      return err("TRAINING_FAILED", "Failed to train model", e);
+    }
 
     /*
      * Until runs get properly snapshotted, evaluate after each run
      */
-    const evalResults = await model.evaluate();
+    let evalResults;
+    try {
+      evalResults = await model.evaluate();
+    } catch (e) {
+      return err(
+        "EVALUATION_FAILED",
+        "Failed to evaluate model after training",
+        e,
+      );
+    }
 
-    return { ...trainingResults, evalResults };
+    return ok({ ...trainingResults, evalResults });
   }
-  public cancelTraining(modelName: string): void {
+  public cancelTraining(modelName: string): ApiResult<string> {
     const model = this.resolveModel(modelName);
+    if (!model)
+      return err(
+        "MODEL_NOT_FOUND",
+        `No model registered with name "${modelName}"`,
+      );
     model.stopTraining();
+    return ok(modelName);
   }
 
   public async predict(
     modelName: string,
-    categories: RequireOnly<Category, "id">[],
-  ): Promise<PredictionResult> {
-    return this.resolveModel(modelName).predict(categories);
+    categories: Category[],
+  ): Promise<ApiResult<PredictionResult>> {
+    const model = this.resolveModel(modelName);
+    if (!model)
+      return err(
+        "MODEL_NOT_FOUND",
+        `No model registered with name "${modelName}"`,
+      );
+    try {
+      const result = await model.predict(categories);
+      return ok(result);
+    } catch (e) {
+      return err("PREDICTION_FAILED", "Failed to predict", e);
+    }
   }
 
-  public async evaluate(modelName: string): Promise<EvaluationResult> {
-    return this.resolveModel(modelName).evaluate();
+  public async evaluate(
+    modelName: string,
+  ): Promise<ApiResult<EvaluationResult>> {
+    const model = this.resolveModel(modelName);
+    if (!model)
+      return err(
+        "MODEL_NOT_FOUND",
+        `No model registered with name "${modelName}"`,
+      );
+    try {
+      const result = await model.evaluate();
+      return ok(result);
+    } catch (e) {
+      return err("EVALUATION_FAILED", "Failed to evaluate", e);
+    }
   }
 
   /*
@@ -302,10 +408,13 @@ export class ClassifierHandler {
     weightsFiles: File[];
     isGraph?: boolean;
     modelName?: string;
-  }): Promise<ModelLoadResult> {
-    const modelName =
+  }): Promise<ApiResult<ModelInfoDTO>> {
+    const baseName =
       input.modelName ?? input.descFile.name.replace(/\..+$/, "");
-    const uniqueName = getUniqueName(modelName, this.getModelNames());
+    const uniqueName = getUniqueName(
+      baseName,
+      Object.keys(this._availableClassificationModels),
+    );
 
     const model = new UploadedClassifier({
       descFile: input.descFile,
@@ -319,13 +428,9 @@ export class ClassifierHandler {
     try {
       await model.upload();
       this._availableClassificationModels[uniqueName] = model;
-      return { success: true, modelInfo: this.buildModelInfoDTO(model) };
-    } catch (err) {
-      return {
-        success: false,
-        modelName,
-        error: { reason: "Failed to upload model", err: parseError(err) },
-      };
+      return ok(this.buildModelInfoDTO(model));
+    } catch (e) {
+      return err("UPLOAD_FAILED", "Failed to upload model", e);
     }
   }
 
@@ -333,19 +438,13 @@ export class ClassifierHandler {
     modelUrl: string,
     fromTFHub: boolean,
     isGraph: boolean,
-  ): Promise<{
-    loadedModels: ModelInfoDTO[];
-    failedModels: Record<
-      string,
-      {
-        reason: string;
-        err?: Error;
-      }
-    >;
-  }> {
+  ): Promise<ApiResult<BatchModelLoadResult>> {
     const failedModels: Record<string, { reason: string; err?: Error }> = {};
     const loadedModels: ModelInfoDTO[] = [];
-    const modelName = getUniqueName("Remote-Classifier", this.getModelNames());
+    const modelName = getUniqueName(
+      "Remote-Classifier",
+      Object.keys(this._availableClassificationModels),
+    );
     const model = new RemoteClassifier({
       name: modelName,
       task: ModelTask.Classification,
@@ -360,26 +459,25 @@ export class ClassifierHandler {
       await model.upload();
       loadedModels.push(this.buildModelInfoDTO(model));
       this._availableClassificationModels[model.name] = model;
-    } catch (err) {
+    } catch (e) {
       failedModels[modelName] = {
-        reason: `Failed to load model: ${err}`,
-        err: err as Error,
+        reason: `Failed to load model: ${e}`,
+        err: parseError(e),
       };
     }
-    return { loadedModels, failedModels };
+    return ok({ loadedModels, failedModels });
   }
 
-  public async modelsFromZipBuffer(buffer: ArrayBuffer): Promise<{
-    loadedModels: ModelInfoDTO[];
-    failedModels: Record<
-      string,
-      {
-        reason: string;
-        err?: Error;
-      }
-    >;
-  }> {
-    const zip = await JSZip.loadAsync(buffer);
+  public async modelsFromZipBuffer(
+    buffer: ArrayBuffer,
+  ): Promise<ApiResult<BatchModelLoadResult>> {
+    let zip: JSZip;
+    try {
+      zip = await JSZip.loadAsync(buffer);
+    } catch (e) {
+      return err("INVALID_FILE_FORMAT", "Failed to parse zip buffer", e);
+    }
+
     const modelFileRegEx = new RegExp(".json$|.weights.bin$");
     const models: Record<
       string,
@@ -435,43 +533,62 @@ export class ClassifierHandler {
           weightsFiles: [modelWeights],
         });
         if (result.success) {
-          loadedModels.push(result.modelInfo);
+          loadedModels.push(result.data);
         } else {
-          failedModels[result.modelName] = result.error;
+          failedModels[modelName] = {
+            reason: result.reason.message,
+            err: parseError(result.reason.cause),
+          };
         }
       }
     }
-    return { loadedModels, failedModels };
+    return ok({ loadedModels, failedModels });
   }
-  public async getZippedModelsBuffer(): Promise<ArrayBuffer> {
-    const zip = new JSZip();
-    const savedModelData = await this.getAllSavedModelData(); // <-- await fixes existing bug
-    Object.values(savedModelData).forEach((m) => {
-      zip.file(m.modelJson.fileName, m.modelJson.blob);
-      zip.file(m.modelWeights.fileName, m.modelWeights.blob);
-    });
-    return zip.generateAsync({ type: "arraybuffer" });
+  public async getZippedModelsBuffer(): Promise<ApiResult<ArrayBuffer>> {
+    try {
+      const zip = new JSZip();
+      const savedModelData = await this.getAllSavedModelData();
+      Object.values(savedModelData).forEach((m) => {
+        zip.file(m.modelJson.fileName, m.modelJson.blob);
+        zip.file(m.modelWeights.fileName, m.modelWeights.blob);
+      });
+      const buffer = await zip.generateAsync({ type: "arraybuffer" });
+      return ok(buffer);
+    } catch (e) {
+      return err("UNKNOWN", "Failed to generate zipped models buffer", e);
+    }
   }
   public async getSavedModelData(
     modelName: string,
-  ): Promise<SerializedModelData> {
+  ): Promise<ApiResult<SerializedModelData>> {
     const model = this.resolveModel(modelName);
-    const savedModelInfo = await model.getSavedModelFiles();
-    return {
-      modelJson: {
-        blob: savedModelInfo.modelJsonBlob,
-        fileName: savedModelInfo.modelJsonFileName,
-      },
-      modelWeights: {
-        blob: savedModelInfo.weightsBlob,
-        fileName: savedModelInfo.weightsFileName,
-      },
-    };
+    if (!model)
+      return err(
+        "MODEL_NOT_FOUND",
+        `No model registered with name "${modelName}"`,
+      );
+    try {
+      const savedModelInfo = await model.getSavedModelFiles();
+      return ok({
+        modelJson: {
+          blob: savedModelInfo.modelJsonBlob,
+          fileName: savedModelInfo.modelJsonFileName,
+        },
+        modelWeights: {
+          blob: savedModelInfo.weightsBlob,
+          fileName: savedModelInfo.weightsFileName,
+        },
+      });
+    } catch (e) {
+      return err("UNKNOWN", "Failed to get saved model data", e);
+    }
   }
-  public async getAllSavedModelData(): Promise<SerializedModels> {
+  private async getAllSavedModelData(): Promise<SerializedModels> {
     const userModels: SerializedModels = {};
-    for await (const modelName of this.getModelNames()) {
-      const model = this.resolveModel(modelName);
+    for await (const modelName of Object.keys(
+      this._availableClassificationModels,
+    )) {
+      const model = this._availableClassificationModels[modelName];
       const savedModelInfo = await model.getSavedModelFiles();
       userModels[modelName] = {
         modelJson: {
@@ -486,15 +603,4 @@ export class ClassifierHandler {
     }
     return userModels;
   }
-
-  //! remove
-  // public async zipModels(): Promise<JSZip> {
-  //   const zip = new JSZip();
-  //   const savedModelData = await this.getSavedModelData();
-  //   Object.values(savedModelData).forEach((model) => {
-  //     zip.file(model.modelJson.fileName, model.modelJson.blob);
-  //     zip.file(model.modelWeights.fileName, model.modelWeights.blob);
-  //   });
-  //   return zip;
-  // }
 }

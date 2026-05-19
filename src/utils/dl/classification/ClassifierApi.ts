@@ -1,13 +1,7 @@
 // src/utils/dl/classification/classifierHandler.ts
 import * as Comlink from "comlink";
 
-import type {
-  BatchModelLoadResult,
-  ModelLoadResult,
-  FitOptions,
-  TrainAndEvalResult,
-  TrainingCallbacks,
-} from "./types";
+import type { FitOptions, TrainingCallbacks, IClassifierApi } from "./types";
 import type JSZip from "jszip";
 import type { ClassifierHandler } from "./worker/ClassifierHandler";
 
@@ -20,9 +14,7 @@ async function zipInputToBuffer(
   return (input as JSZip).generateAsync({ type: "arraybuffer" });
 }
 
-type NewType = BatchModelLoadResult;
-
-export class ClassifierApi {
+export class ClassifierApi implements IClassifierApi {
   private backend: Comlink.Remote<ClassifierHandler>;
   static instance: ClassifierApi;
 
@@ -73,14 +65,13 @@ export class ClassifierApi {
 
   // ---- lifecycle ----
   async createNewModel(name: string, arch: any, seed: number) {
-    const info = await this.backend.createNewModel(name, arch, seed);
-    return info;
+    return this.backend.createNewModel(name, arch, seed);
   }
   async removeModel(name: string) {
-    await this.backend.removeModel(name);
+    return this.backend.removeModel(name);
   }
   async removeAllModels() {
-    await this.backend.removeAllModels();
+    return this.backend.removeAllModels();
   }
 
   // ---- data loading ----
@@ -111,11 +102,7 @@ export class ClassifierApi {
   }
 
   // ---- training ----
-  async train(
-    name: string,
-    options: FitOptions,
-    callbacks: TrainingCallbacks,
-  ): Promise<TrainAndEvalResult> {
+  async train(name: string, options: FitOptions, callbacks: TrainingCallbacks) {
     return this.backend.train(name, options, {
       onEpochEnd: Comlink.proxy(callbacks.onEpochEnd),
     });
@@ -138,27 +125,16 @@ export class ClassifierApi {
     weightsFiles: File[];
     isGraph?: boolean;
     modelName?: string;
-  }): Promise<ModelLoadResult> {
-    const result = await this.backend.modelFromFiles(input);
-    return result;
+  }) {
+    return this.backend.modelFromFiles(input);
   }
-  async modelFromUrl(
-    url: string,
-    fromTFHub: boolean,
-    isGraph: boolean,
-  ): Promise<BatchModelLoadResult> {
-    const result = await this.backend.modelFromUrl(url, fromTFHub, isGraph);
-    return result;
+  async modelFromUrl(url: string, fromTFHub: boolean, isGraph: boolean) {
+    return this.backend.modelFromUrl(url, fromTFHub, isGraph);
   }
 
-  async modelsFromZipBuffer(
-    input: JSZip | File | Blob | ArrayBuffer,
-  ): Promise<NewType> {
+  async modelsFromZipBuffer(input: JSZip | File | Blob | ArrayBuffer) {
     const buf = await zipInputToBuffer(input);
-    const result = await this.backend.modelsFromZipBuffer(
-      Comlink.transfer(buf, [buf]),
-    );
-    return result;
+    return this.backend.modelsFromZipBuffer(Comlink.transfer(buf, [buf]));
   }
 
   getSavedModelData(modelName: string) {

@@ -15,11 +15,23 @@ export const useClassificationModel = () => {
   const [modelInfo, setModelInfo] = useState<ModelInfoDTO>();
   useEffect(() => {
     if (!activeClassifier) return;
-    (async () => {
-      const cfApi = ClassifierApi.getInstance();
-      const response = await cfApi.getModelInfo(activeClassifier);
-      setModelInfo(response);
-    })();
+    let cancelled = false;
+    ClassifierApi.getInstance()
+      .getModelInfo(activeClassifier)
+      .then((result) => {
+        if (cancelled) return;
+        if (result.success) {
+          setModelInfo(result.data);
+        } else {
+          console.error(
+            `[useClassificationModel] ${result.reason.code}: ${result.reason.message}`,
+            result.reason.cause,
+          );
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [activeClassifier]);
   return modelInfo;
 };

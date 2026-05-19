@@ -161,20 +161,6 @@ export type ApiResult<T = void> = [T] extends [void]
   ? { success: true } | { success: false; reason: ErrorReason }
   : { success: true; data: T } | { success: false; reason: ErrorReason };
 
-export const ok = <T = void>(data?: T): ApiResult<T> =>
-  (data === undefined
-    ? { success: true }
-    : { success: true, data }) as ApiResult<T>;
-
-export const err = (
-  code: ErrorCode,
-  message: string,
-  cause?: unknown,
-): { success: false; reason: ErrorReason } => ({
-  success: false,
-  reason: { code, message, cause },
-});
-
 export type ModelInfoDTO = {
   name: string;
   archTag: ModelArch | string | undefined;
@@ -275,25 +261,25 @@ export interface IClassifierApi {
     items: TrainingInput[],
     cats: Category[],
     seed: number,
-  ): ApiResult<string>;
+  ): MaybePromise<ApiResult<string>>;
   loadValidation(
     name: string,
     items: TrainingInput[],
     cats: Category[],
     seed: number,
-  ): ApiResult<string>;
+  ): MaybePromise<ApiResult<string>>;
   loadInference(
     name: string,
     items: InferenceInput[],
     cats: Category[],
-  ): ApiResult<string>;
+  ): MaybePromise<ApiResult<string>>;
   loadData(
     name: string,
     tr: TrainingInput[],
     va: TrainingInput[],
     cats: Category[],
     seed: number,
-  ): ApiResult<string>;
+  ): MaybePromise<ApiResult<string>>;
   prepareModel(
     name: string,
     tr: TrainingInput[],
@@ -311,7 +297,7 @@ export interface IClassifierApi {
     options: FitOptions,
     callbacks: TrainingCallbacks,
   ): Promise<ApiResult<TrainAndEvalResult>>;
-  cancelTraining(name: string): ApiResult<string>;
+  cancelTraining(name: string): MaybePromise<ApiResult<string>>;
 
   // inference / eval
   predict(name: string, cats: Category[]): Promise<ApiResult<PredictionResult>>;

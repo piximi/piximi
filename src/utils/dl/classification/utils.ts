@@ -17,6 +17,9 @@ import type {
   DatasetFingerprint,
   ModelLayerData,
   OptimizerSettings,
+  ApiResult,
+  ErrorCode,
+  ErrorReason,
 } from "./types";
 import type { ModelCompileArgs, LayersModel } from "@tensorflow/tfjs";
 
@@ -347,3 +350,17 @@ export async function fingerprintDataset(
 }
 
 export const hashCategorySet = hashIds; // semantic alias
+
+export const ok = <T = void>(data?: T): ApiResult<T> =>
+  (data === undefined
+    ? { success: true }
+    : { success: true, data }) as ApiResult<T>;
+
+export const err = (
+  code: ErrorCode,
+  message: string,
+  cause?: unknown,
+): { success: false; reason: ErrorReason } => ({
+  success: false,
+  reason: { code, message, cause },
+});
