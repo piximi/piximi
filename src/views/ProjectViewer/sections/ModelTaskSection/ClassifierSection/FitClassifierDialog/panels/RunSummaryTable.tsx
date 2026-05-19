@@ -26,9 +26,9 @@ import {
   selectRunsForActiveModel,
 } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import type { RunHyperparameterSnapshot } from "store/classifier/types";
 
 import { buildModelRunsCsv } from "utils/file-io-v2/export";
+import type { RunHyperparameterSnapshot } from "utils/dl/classification/types";
 
 export const RunSummaryTable = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);

@@ -6,13 +6,10 @@ import type {
   DType,
 } from "store/dataV2/types";
 import type { SegmenterState } from "store/segmenter/types";
-import type {
-  ClassifierState,
-  KindClassifier,
-  ModelInfo,
-} from "store/classifier/types";
+import type { ClassifierState, KindClassifier } from "store/classifier/types";
 
 import type { Partition } from "utils/dl/enums";
+import type { ModelInfo } from "utils/dl/classification/types";
 
 import type { ProjectState } from "@ProjectViewer/state/types";
 import type { EntityState } from "@reduxjs/toolkit";

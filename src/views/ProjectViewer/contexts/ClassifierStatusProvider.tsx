@@ -31,7 +31,7 @@ import type {
   ClassifierModelParams,
   OptimizerSettings,
   PreprocessSettings,
-} from "utils/dl/types";
+} from "utils/dl/classification/types";
 import type { RecursivePartial } from "utils/types";
 
 export enum ErrorReason {

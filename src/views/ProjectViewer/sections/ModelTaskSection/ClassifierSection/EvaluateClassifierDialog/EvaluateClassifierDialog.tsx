@@ -24,9 +24,9 @@ import {
   selectActiveModelName,
   selectRunsForActiveModel,
 } from "store/classifier/selectors";
-import type { Run } from "store/classifier/types";
 
 import type { RequireField } from "utils/types";
+import type { Run } from "utils/dl/classification/types";
 
 import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
 import { ConfusionMatrix } from "./ConfusionMatrix";

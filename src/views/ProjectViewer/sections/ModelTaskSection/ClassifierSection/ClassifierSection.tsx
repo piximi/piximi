@@ -26,11 +26,10 @@ import {
   selectKindClassifier,
   selectModelLifecycleStatus,
 } from "store/classifier/selectors";
-import { ModelArch } from "store/classifier/types";
 
 import { HotkeyContext } from "utils/enums";
 import classifierHandler from "utils/dl/classification/classifierHandler";
-import type { ModelInfoDTO } from "utils/dl/classification/worker/dto";
+import { ModelArch, type ModelInfoDTO } from "utils/dl/classification/types";
 
 import { PredictionListItems } from "../PredictionListItems";
 import { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";

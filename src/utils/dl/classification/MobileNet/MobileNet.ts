@@ -1,8 +1,9 @@
 import { createMobileNet } from "./loadMobileNet";
-import { createCompileArgs } from "../../utils";
 import { SequentialClassifier } from "../AbstractClassifier/AbstractClassifier";
-import { LoadModelArgs } from "../../types";
 import { ModelTask } from "../../enums";
+import { createCompileArgs } from "../utils";
+
+import type { LoadModelArgs } from "../types";
 
 export class MobileNet extends SequentialClassifier {
   constructor(name?: string) {

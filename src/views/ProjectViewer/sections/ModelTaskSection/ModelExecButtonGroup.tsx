@@ -9,7 +9,7 @@ import {
 
 import { TooltipButton } from "components/ui/tooltips/TooltipButton";
 
-import type { ModelLifecycleStatus } from "store/classifier/types";
+import type { ModelLifecycleStatus } from "utils/dl/classification/types";
 
 import type { ErrorReason } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 

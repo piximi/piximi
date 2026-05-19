@@ -18,7 +18,7 @@ import { logger } from "utils/logUtils";
 import { representsUnknown } from "utils/stringUtils";
 import classifierHandler from "utils/dl/classification/classifierHandler";
 import { toInferenceInput } from "utils/dl/utils";
-import type { PredictionResult } from "utils/dl/types";
+import type { PredictionResult } from "utils/dl/classification/types";
 
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 

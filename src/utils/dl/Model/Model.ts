@@ -1,13 +1,12 @@
 import { io } from "@tensorflow/tfjs";
 
-import type { RunHistoryEpoch } from "store/classifier/types";
-
 import type {
+  RunHistoryEpoch,
   ModelArgs,
   ModelLayerData,
   OptimizerSettings,
   ReducedPreprocessSettings,
-} from "../types";
+} from "../classification/types";
 import type { ModelTask } from "../enums";
 import type { GraphModel, LayersModel, Logs } from "@tensorflow/tfjs";
 

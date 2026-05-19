@@ -2,16 +2,18 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import type { RootState } from "store/rootReducer";
 
-import type { ClassifierEvaluationResult } from "utils/dl/types";
+import type {
+  ModelLifecycleStatus,
+  ModelArch,
+  ModelInfo,
+  Run,
+  EvaluationResult,
+} from "utils/dl/classification/types";
 
 import type {
   ClassifierState,
   KindClassifier,
   KindClassifierDict,
-  ModelArch,
-  ModelInfo,
-  ModelLifecycleStatus,
-  Run,
   SoftmaxById,
 } from "./types";
 
@@ -97,8 +99,8 @@ export const selectConfidenceThreshold = createSelector(
 
 export const selectModelEvaluationResults = createSelector(
   [selectRunsForActiveModel],
-  (runs): ClassifierEvaluationResult[] => {
-    const evalResults: ClassifierEvaluationResult[] = [];
+  (runs): EvaluationResult[] => {
+    const evalResults: EvaluationResult[] = [];
     for (const run of runs) {
       if (!run.evalResults) continue;
       evalResults.push(run.evalResults);

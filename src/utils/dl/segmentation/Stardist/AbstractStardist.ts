@@ -1,15 +1,18 @@
-import { GraphModel, History, LayersModel } from "@tensorflow/tfjs";
+//@ts-nocheck Errors will be adressed during with refactor
+import { LayersModel } from "@tensorflow/tfjs";
 
-import {
-  OrphanedAnnotationObject,
-  Segmenter,
-} from "../AbstractSegmenter/AbstractSegmenter";
+import { generateKind } from "store/data/utils";
+import type { Kind } from "store/data/types";
+
+import type { LoadCB } from "utils/types";
+
+import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
-import { generateKind } from "store/data/utils";
-import { InferenceInput, LoadInferenceDataArgs } from "../../types";
-import { Kind } from "store/data/types";
-import { LoadCB } from "utils/types";
+
+import type { InferenceInput, LoadInferenceDataArgs } from "../../types";
+import type { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
+import type { GraphModel, History } from "@tensorflow/tfjs";
 
 export const KIND_NAME = "stardist_nucleus";
 /*

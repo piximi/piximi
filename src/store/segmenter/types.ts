@@ -1,4 +1,4 @@
-import { FitOptions } from "utils/dl/types";
+import { FitOptions } from "utils/dl/classification/types";
 
 export type SegmenterState = {
   // pre-fit state

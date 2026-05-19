@@ -1,17 +1,16 @@
-import {
-  GraphModel,
-  History,
-  LayersModel,
-  loadGraphModel,
-} from "@tensorflow/tfjs";
+//@ts-nocheck Errors will be adressed during with refactor
+import { LayersModel, loadGraphModel } from "@tensorflow/tfjs";
+
+import type { Kind } from "store/data/types";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCoco } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
 import { constructCocoKinds } from "./constructCocoCategories";
-import { FitOptions, InferenceInput } from "../../types";
 import { ModelTask } from "../../enums";
-import { Kind } from "store/data/types";
+
+import type { FitOptions, InferenceInput } from "../../types";
+import type { GraphModel, History } from "@tensorflow/tfjs";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;

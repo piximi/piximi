@@ -1,16 +1,13 @@
-import type { Kind, Shape } from "store/data/types";
+import type { Shape } from "store/data/types";
 import type { BBox, ExtendedChannel } from "store/dataV2/types";
-import type { RunStatus } from "store/classifier/types";
 
 import type {
   CropSchema,
   LossFunction,
   Metric,
-  ModelTask,
   OptimizationAlgorithm,
   Partition,
 } from "./enums";
-import type { Logs } from "@tensorflow/tfjs";
 
 export type TrainingInput = {
   id: string;
@@ -22,32 +19,6 @@ export type TrainingInput = {
 };
 
 export type InferenceInput = Omit<TrainingInput, "partition" | "categoryId">;
-export interface ModelLayerData {
-  layerName: string;
-  outputShape: string;
-  parameters: number;
-  trainable: string;
-}
-export type ModelArgs = {
-  name: string;
-  task: ModelTask;
-  graph: boolean;
-  pretrained: boolean;
-  trainable: boolean;
-  kind?: string;
-  src?: string;
-  requiredChannels?: number;
-};
-export type TrainingCallbacks = {
-  onEpochEnd: (epoch: number, logs?: Logs) => Promise<void>;
-};
-export type TrainingResults = {
-  weightsRef: string;
-  status: RunStatus;
-};
-export type TrainAndEvalResult = TrainingResults & {
-  evalResults: ClassifierEvaluationResult;
-};
 
 export type NormalizeOptions = {
   normalize: boolean;
@@ -65,37 +36,6 @@ export type SegmenterPreprocessSettings = {
   cropOptions: CropOptions;
 };
 
-export type PreprocessSettings = {
-  shuffle: boolean;
-  inputShape: Shape;
-  normalizeOptions: NormalizeOptions;
-  cropOptions: CropOptions;
-  trainingPercentage: number;
-};
-
-export type ReducedPreprocessSettings = {
-  cropSchema: CropSchema;
-  numCrops: number;
-  inputShape: Omit<Shape, "planes">;
-  shuffle: boolean;
-  normalize: boolean;
-  batchSize: number;
-};
-export type OptimizerSettings = {
-  learningRate: number;
-  lossFunction:
-    | LossFunction
-    | Array<LossFunction>
-    | { [outputName: string]: LossFunction };
-  metrics: Array<Metric>;
-  optimizationAlgorithm: OptimizationAlgorithm;
-  epochs: number;
-  batchSize: number;
-};
-export type ClassifierModelParams = {
-  preprocessSettings: PreprocessSettings;
-  optimizerSettings: OptimizerSettings;
-};
 export type SegmenterCompileSettings = {
   learningRate: number;
   lossFunction:
@@ -104,59 +44,6 @@ export type SegmenterCompileSettings = {
     | { [outputName: string]: LossFunction };
   metrics: Array<Metric>;
   optimizationAlgorithm: OptimizationAlgorithm;
-};
-
-export type FitOptions = Pick<OptimizerSettings, "epochs" | "batchSize">;
-
-export type LoadModelArgs = {
-  inputShape: Shape;
-  numClasses: number;
-  compileOptions: OptimizerSettings;
-  preprocessOptions: PreprocessSettings;
-  freeze?: boolean;
-  useCustomTopLayer?: boolean;
-  randomizeWeights?: boolean;
-};
-
-export type LoadInferenceDataArgs = {
-  fitOptions: FitOptions;
-  // if cat undefined, created from default classes
-  // if defined, it should be length 1, as only a foreground class is needed
-  kinds?: Array<Kind>;
-};
-
-/*
- * This is a concatenation of tfjs History objects returned by .train()
- * aross training cycles, where each cycle is every time the user presses
- * the "Fit" button (with a variable number of epochs per cycle)
- */
-export type ModelHistory = {
-  // [0, 1, ..., numEpochs1, 0, 1, ..., numEpochs2, ...]
-  // where numEpochs1 and numEpochs2 are the number of epochs set in
-  // training cycles 1 and 2
-  epochs: Array<number>;
-  // dict i represents training cycle i
-  // in the dict, each key has an array whos length is equal to the
-  // number of epochs in training cycle i
-  // keys are metrics, e.g. [val_]categoricalAccuracy, [val_]loss
-  history: Array<{
-    [key: string]: Array<number>;
-  }>;
-};
-
-export type PredictionResult = {
-  categoryId: string;
-  maxProb: number;
-  softmax: number[];
-}[];
-
-export type ClassifierEvaluationResult = {
-  confusionMatrix: number[][];
-  accuracy: number;
-  crossEntropy: number;
-  precision: number;
-  recall: number;
-  f1Score: number;
 };
 
 export type SegmenterEvaluationResultType = {

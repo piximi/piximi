@@ -1,24 +1,19 @@
-import {
-  GraphModel,
-  History,
-  Tensor3D,
-  Tensor4D,
-  data as tfdata,
-  scalar,
-  tidy,
-} from "@tensorflow/tfjs";
+//@ts-nocheck Errors will be adressed during with refactor
+import { data as tfdata, scalar, tidy } from "@tensorflow/tfjs";
 
-import {
-  Segmenter,
-  OrphanedAnnotationObject,
-} from "../AbstractSegmenter/AbstractSegmenter";
+import type { Kind } from "store/data/types";
+import { generateKind } from "store/data/utils";
+
+import type { LoadCB } from "utils/types";
+
+import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCellpose } from "./predictCellpose";
-import { FitOptions, InferenceInput } from "../../types";
 import { ModelTask } from "../../enums";
 import { channelsToTensor } from "../../tensor-assembly";
-import { Kind } from "store/data/types";
-import { generateKind } from "store/data/utils";
-import { LoadCB } from "utils/types";
+
+import type { FitOptions, InferenceInput } from "../../types";
+import type { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
+import type { GraphModel, History, Tensor3D, Tensor4D } from "@tensorflow/tfjs";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;

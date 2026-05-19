@@ -9,23 +9,22 @@ import {
 } from "@tensorflow/tfjs";
 
 import type { Category } from "store/dataV2/types";
-import type { RunStatus } from "store/classifier/types";
 
 import type { RequireOnly } from "utils/types";
 
 import { preprocessData } from "./preprocess";
 import { Model } from "../../Model";
-import { evaluateConfusionMatrix, getLayersModelSummary } from "../../utils";
+import { evaluateConfusionMatrix, getLayersModelSummary } from "../utils";
 
 import type {
-  ClassifierEvaluationResult,
+  EvaluationResult,
   FitOptions,
-  InferenceInput,
   PredictionResult,
+  RunStatus,
   TrainingCallbacks,
-  TrainingInput,
   TrainingResults,
-} from "../../types";
+} from "../types";
+import type { InferenceInput, TrainingInput } from "../../types";
 import type {
   GraphModel,
   LayersModel,
@@ -183,7 +182,7 @@ export abstract class SequentialClassifier extends Model {
     return itemPredictions;
   }
 
-  public async evaluate(): Promise<ClassifierEvaluationResult> {
+  public async evaluate(): Promise<EvaluationResult> {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }

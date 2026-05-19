@@ -1,12 +1,13 @@
 import type { Shape } from "store/dataV2/types";
 import type { SegmenterState } from "store/segmenter/types";
 
-import type { ClassifierEvaluationResult, CropOptions } from "utils/dl/types";
+import type { CropOptions } from "utils/dl/types";
 import type {
   LossFunction,
   Metric,
   OptimizationAlgorithm,
 } from "utils/dl/enums";
+import type { EvaluationResult } from "utils/dl/classification/types";
 
 import type {
   V02BitDepth,
@@ -73,7 +74,7 @@ export type V11ModelInfo = {
   classMap?: V11ModelClassMap;
   preprocessSettings: V11PreprocessSettings;
   optimizerSettings: V11OptimizerSettings;
-  evalResults: ClassifierEvaluationResult[];
+  evalResults: EvaluationResult[];
 };
 export type V11KindClassifier = {
   modelNameOrArch: string | number;

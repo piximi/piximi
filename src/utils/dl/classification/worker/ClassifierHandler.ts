@@ -1,7 +1,6 @@
 import JSZip from "jszip";
 
 import type { Category } from "store/dataV2/types";
-import { ModelArch } from "store/classifier/types";
 
 import { logger, parseError } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
@@ -12,21 +11,25 @@ import { RemoteClassifier, UploadedClassifier } from "../UploadedClassifier";
 import { MobileNet } from "../MobileNet";
 import { SimpleCNN } from "../SimpleCNN";
 import { ModelTask } from "../../enums";
+import { ModelArch } from "../types";
 
-import type { ModelInfoDTO, ModelLoadResult } from "./dto";
-import type { Logs } from "@tensorflow/tfjs";
-import type { SequentialClassifier } from "../AbstractClassifier";
 import type {
-  ClassifierEvaluationResult,
+  EvaluationResult,
   FitOptions,
-  InferenceInput,
+  ModelInfoDTO,
+  ModelLoadResult,
   OptimizerSettings,
   PredictionResult,
   PreprocessSettings,
-  SerializedModelData,
-  SerializedModels,
   TrainAndEvalResult,
   TrainingCallbacks,
+} from "../types";
+import type { Logs } from "@tensorflow/tfjs";
+import type { SequentialClassifier } from "../AbstractClassifier";
+import type {
+  InferenceInput,
+  SerializedModelData,
+  SerializedModels,
   TrainingInput,
 } from "../../types";
 
@@ -287,9 +290,7 @@ export class ClassifierHandler {
     return this.resolveModel(modelName).predict(categories);
   }
 
-  public async evaluate(
-    modelName: string,
-  ): Promise<ClassifierEvaluationResult> {
+  public async evaluate(modelName: string): Promise<EvaluationResult> {
     return this.resolveModel(modelName).evaluate();
   }
 

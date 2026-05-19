@@ -1,4 +1,4 @@
-import type { ModelLifecycleStatus } from "store/classifier/types";
+import type { ModelLifecycleStatus } from "utils/dl/classification/types";
 
 export type SettingsType = "architecture" | "tunable";
 

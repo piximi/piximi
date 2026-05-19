@@ -1,7 +1,6 @@
 import JSZip from "jszip";
 
 import type { Category } from "store/dataV2/types";
-import { ModelArch } from "store/classifier/types";
 
 import { logger, parseError } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
@@ -12,18 +11,21 @@ import { RemoteClassifier, UploadedClassifier } from "./UploadedClassifier";
 import { MobileNet } from "./MobileNet";
 import { SimpleCNN } from "./SimpleCNN";
 import { ModelTask } from "../enums";
+import { ModelArch } from "./types";
 
+import type {
+  FitOptions,
+  OptimizerSettings,
+  PreprocessSettings,
+  TrainAndEvalResult,
+  TrainingCallbacks,
+} from "./types";
 import type { Logs } from "@tensorflow/tfjs";
 import type { SequentialClassifier } from "./AbstractClassifier";
 import type {
   ExtractedModelFileMap,
-  FitOptions,
   InferenceInput,
-  OptimizerSettings,
-  PreprocessSettings,
   SerializedModels,
-  TrainAndEvalResult,
-  TrainingCallbacks,
   TrainingInput,
 } from "../types";
 

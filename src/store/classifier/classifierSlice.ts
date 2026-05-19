@@ -3,24 +3,22 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { Shape } from "store/dataV2/types";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 
-import type { ClassifierEvaluationResult } from "utils/dl/types";
 import type { RecursivePartial } from "utils/types";
 import { recursiveAssign } from "utils/objectUtils";
-
-import { IMAGE_CLASSIFIER_ID, IMAGE_CLASSIFIER_NAME } from "./constants";
-import { ModelArch } from "./types";
-
 import type {
-  ClassifierState,
-  KindClassifier,
-  ModelClassMap,
-  ModelInfo,
   ModelLifecycleStatus,
+  ModelInfo,
+  ModelClassMap,
   Run,
   RunHistoryEpoch,
   RunStatus,
-  SoftmaxById,
-} from "./types";
+  EvaluationResult,
+} from "utils/dl/classification/types";
+import { ModelArch } from "utils/dl/classification/types";
+
+import { IMAGE_CLASSIFIER_ID, IMAGE_CLASSIFIER_NAME } from "./constants";
+
+import type { ClassifierState, KindClassifier, SoftmaxById } from "./types";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 const getDefaultKindClassifier = () => ({
@@ -227,7 +225,7 @@ export const classifierSlice = createSlice({
         modelName: string;
         finishedAt: string;
         status: RunStatus;
-        evalResults?: ClassifierEvaluationResult;
+        evalResults?: EvaluationResult;
         weightsRef?: string;
       }>,
     ) {
@@ -285,7 +283,7 @@ export const classifierSlice = createSlice({
         targetId: string;
         modelName: string;
         runId: string;
-        evalResult: ClassifierEvaluationResult;
+        evalResult: EvaluationResult;
       }>,
     ) {
       const info =

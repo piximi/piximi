@@ -28,11 +28,11 @@ import {
   selectAllCreatedModelNames,
   selectKindClassifier,
 } from "store/classifier/selectors";
-import type { ModelArch } from "store/classifier/types";
 
 import classifierHandler from "utils/dl/classification/classifierHandler";
 import type { SequentialClassifier } from "utils/dl/classification";
 import { findReplicateName } from "utils/stringUtils";
+import type { ModelArch } from "utils/dl/classification/types";
 
 export const ModelPicker = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);

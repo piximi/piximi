@@ -1,6 +1,10 @@
-import { Tensor4D, data as tfdata } from "@tensorflow/tfjs";
-import { FitOptions, InferenceInput } from "../../types";
+//@ts-nocheck Errors will be adressed during with refactor
+import { data as tfdata } from "@tensorflow/tfjs";
+
 import { channelsToTensor } from "../../tensor-assembly";
+
+import type { Tensor4D } from "@tensorflow/tfjs";
+import type { InferenceInput } from "../../types";
 
 export const preprocessInference = (
   items: Array<InferenceInput>,

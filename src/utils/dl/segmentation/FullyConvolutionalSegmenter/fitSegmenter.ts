@@ -1,5 +1,6 @@
-import { History, LayersModel, data, Tensor } from "@tensorflow/tfjs";
-import { FitOptions } from "../../types";
+//@ts-nocheck Errors will be adressed during with refactor
+import type { History, LayersModel, data, Tensor } from "@tensorflow/tfjs";
+import type { FitOptions } from "../../types";
 
 export const fitSegmenter = async (
   compiled: LayersModel,

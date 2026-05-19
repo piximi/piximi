@@ -1,14 +1,15 @@
 // src/utils/dl/classification/classifierHandler.ts
 import * as Comlink from "comlink";
 
-import type JSZip from "jszip";
-import type { ClassifierHandler } from "./worker/ClassifierHandler";
-import type { ModelLoadResult, BatchModelLoadResult } from "./worker/dto";
 import type {
+  BatchModelLoadResult,
+  ModelLoadResult,
   FitOptions,
   TrainAndEvalResult,
   TrainingCallbacks,
-} from "../types";
+} from "./types";
+import type JSZip from "jszip";
+import type { ClassifierHandler } from "./worker/ClassifierHandler";
 
 async function zipInputToBuffer(
   input: JSZip | File | Blob | ArrayBuffer,
@@ -18,6 +19,8 @@ async function zipInputToBuffer(
   // JSZip
   return (input as JSZip).generateAsync({ type: "arraybuffer" });
 }
+
+type NewType = BatchModelLoadResult;
 
 export class ClassifierApi {
   private backend: Comlink.Remote<ClassifierHandler>;
@@ -150,7 +153,7 @@ export class ClassifierApi {
 
   async modelsFromZipBuffer(
     input: JSZip | File | Blob | ArrayBuffer,
-  ): Promise<BatchModelLoadResult> {
+  ): Promise<NewType> {
     const buf = await zipInputToBuffer(input);
     const result = await this.backend.modelsFromZipBuffer(
       Comlink.transfer(buf, [buf]),

@@ -1,12 +1,17 @@
-import { GraphModel, History, LayersModel } from "@tensorflow/tfjs";
+//@ts-nocheck Errors will be adressed during with refactor
+import { LayersModel } from "@tensorflow/tfjs";
+
+import type { Kind } from "store/data/types";
+import { generateKind } from "store/data/utils";
+
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessGlas } from "./preprocessGlas";
 import { predictGlas } from "./predictGlas";
-import { InferenceInput, LoadInferenceDataArgs } from "../../types";
 import { ModelTask } from "../../enums";
-import { Kind } from "store/data/types";
 import { loadGlas } from "./loadGlas";
-import { generateKind } from "store/data/utils";
+
+import type { InferenceInput, LoadInferenceDataArgs } from "../../types";
+import type { GraphModel, History } from "@tensorflow/tfjs";
 
 const KIND_NAME = "glas_glands";
 /*

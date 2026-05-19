@@ -1,22 +1,20 @@
-import {
-  io,
-  LayersModel,
-  loadGraphModel,
-  loadLayersModel,
-} from "@tensorflow/tfjs";
+import { io, loadGraphModel, loadLayersModel } from "@tensorflow/tfjs";
 
-import { Model } from "../Model";
-import { SequentialClassifier } from "./AbstractClassifier";
+import type { Shape, ShapeArray } from "store/data/types";
+
 import { logger } from "utils/logUtils";
 import { arrayRange } from "utils/arrayUtils";
 import { validateModelMetadata } from "utils/file-io/runtime/validators";
-import { getDefaultModelInfo } from "./utils";
-import { createCompileArgs, convertArrayToShape } from "../utils";
+import type { RequireOnly } from "utils/types";
 
-import { CropSchema } from "../enums";
-import { OptimizerSettings } from "../types";
-import { RequireOnly } from "utils/types";
-import { Shape, ShapeArray } from "store/data/types";
+import { Model } from "../Model";
+import { SequentialClassifier } from "./AbstractClassifier";
+import { createCompileArgs, getDefaultModelInfo } from "./utils";
+import { convertArrayToShape } from "../utils";
+
+import type { OptimizerSettings } from "./types";
+import type { LayersModel } from "@tensorflow/tfjs";
+import type { CropSchema } from "../enums";
 
 enum LoadState {
   Unloaded,

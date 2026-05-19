@@ -15,13 +15,7 @@ import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { dataSliceV2 } from "store/dataV2";
-import type {
-  KindClassifier,
-  ModelClassMap,
-  ModelInfo,
-  Run,
-  RunTrigger,
-} from "store/classifier/types";
+import type { KindClassifier } from "store/classifier/types";
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
 import { generateUUID } from "store/dataV2/utils";
@@ -31,14 +25,19 @@ import { Partition } from "utils/dl/enums";
 import type { SequentialClassifier } from "utils/dl/classification";
 import {
   applySplitAndShuffle,
-  partitionTrainingData,
-} from "utils/dl/classification/utils";
-import {
   fingerprintDataset,
   hashCategorySet,
-  toTrainingInput,
-} from "utils/dl/utils";
-import type { TrainingCallbacks, TrainingInput } from "utils/dl/types";
+  partitionTrainingData,
+} from "utils/dl/classification/utils";
+import { toTrainingInput } from "utils/dl/utils";
+import type { TrainingInput } from "utils/dl/types";
+import type {
+  ModelInfo,
+  ModelClassMap,
+  Run,
+  RunTrigger,
+  TrainingCallbacks,
+} from "utils/dl/classification/types";
 
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";

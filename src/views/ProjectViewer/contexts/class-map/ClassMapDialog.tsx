@@ -26,11 +26,11 @@ import { CATEGORY_COLORS } from "store/dataV2/constants";
 import { dataSliceV2 } from "store/dataV2";
 import { selectAvaliableCategoryColors } from "@ProjectViewer/state/reselectors";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import type { ModelClassMap } from "store/classifier/types";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
 import { getRandomInt } from "utils/dataUtils";
 import { isObjectEmpty } from "utils/objectUtils";
+import type { ModelClassMap } from "utils/dl/classification/types";
 
 export const ClassMapDialog = ({
   open,

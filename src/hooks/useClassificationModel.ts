@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { selectActiveModelName } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { ClassifierApi } from "utils/dl/classification/ClassifierApi";
-import { ModelInfoDTO } from "utils/dl/classification/worker/dto";
+import { ModelInfoDTO } from "utils/dl/classification/types";
 
 export const useClassificationModel = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);

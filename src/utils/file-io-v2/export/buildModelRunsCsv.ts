@@ -1,4 +1,8 @@
-import type { Run, RunHyperparameterSnapshot } from "store/classifier/types";
+import type {
+  Run,
+  RunHyperparameterSnapshot,
+} from "utils/dl/classification/types";
+
 const formatInputShape = (
   shape: RunHyperparameterSnapshot["preprocess"]["inputShape"],
 ) =>

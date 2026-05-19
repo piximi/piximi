@@ -15,12 +15,12 @@ import {
   IMAGE_CLASSIFIER_ID,
   IMAGE_CLASSIFIER_NAME,
 } from "store/classifier/constants";
-import { ModelArch } from "store/classifier/types";
 
 import { processChannel } from "utils/channelUtils";
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
 import { representsUnknown } from "utils/stringUtils";
 import { getDefaultModelInfo } from "utils/dl/classification/utils";
+import { ModelArch } from "utils/dl/classification/types";
 
 import { subProgress } from "../progress";
 

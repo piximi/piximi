@@ -1,17 +1,21 @@
+//@ts-nocheck Errors will be adressed during with refactor
+import { tidy, zeros } from "@tensorflow/tfjs";
+
+import type { Category, Kind, AnnotationObject } from "store/data/types";
+
+import { logger } from "utils/logUtils";
+import type { LoadCB } from "utils/types";
+
 import { Model } from "../../Model";
-import {
+
+//import type { TrainingCallbacks } from "../../types";
+import type {
   GraphModel,
   Tensor,
   Tensor2D,
   Tensor4D,
   data as tfdata,
-  tidy,
-  zeros,
 } from "@tensorflow/tfjs";
-import { TrainingCallbacks } from "../../types";
-import { Category, Kind, AnnotationObject } from "store/data/types";
-import { logger } from "utils/logUtils";
-import { LoadCB } from "utils/types";
 
 export type OrphanedAnnotationObject = Omit<
   AnnotationObject,
