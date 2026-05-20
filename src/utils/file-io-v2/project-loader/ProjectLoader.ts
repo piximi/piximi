@@ -13,10 +13,9 @@ import type { TaskHandle } from "utils/worker-scheduler/types";
 import { TaskPriority } from "utils/worker-scheduler/types";
 import type { StorageInput } from "utils/data-connector/types";
 import { STORES } from "utils/data-connector/types";
-import { parseError } from "utils/logUtils";
+import { logger, parseError } from "utils/logUtils";
 import type { ExtractedModelFileMap } from "utils/dl/types";
-import classifierHandler from "utils/dl/classification/classifierHandler";
-import type { SequentialClassifier } from "utils/dl/classification/models";
+import { ClassifierApi } from "utils/dl/classification";
 
 import type { V2Channel } from "./version-readers/version-types/v2Types";
 import type {
@@ -162,26 +161,29 @@ export class ProjectLoader implements IProjectLoader {
     modelFileMap: ExtractedModelFileMap,
     onProgress: (p: number) => void,
   ): Promise<void> {
+    const cfApi = ClassifierApi.getInstance();
     const modelFileArr = Object.values(modelFileMap);
-    const failedModels: Record<string, { reason: string; err?: Error }> = {};
-    const models: SequentialClassifier[] = [];
+
     let modelIdx = 0;
     for (const modelFiles of modelFileArr) {
-      const uploadResult = await classifierHandler.modelFromFiles({
+      const result = await cfApi.modelFromFiles({
         descFile: modelFiles.modelJson!,
         weightsFiles: [modelFiles.modelWeights!],
       });
-      if (uploadResult.success) models.push(uploadResult.model);
+      //TODO: implement alert toast with success message
+      if (result.success) logger(`successfully added ${result.data.name}`);
       else {
         /**
          * TODO: failed models should halt project upload, but there needs to be a way
          * TODO: to warn the user. Maybe a warning callback passed to the constructor
          */
-        failedModels[uploadResult.modelName] = uploadResult.error;
+        console.error(
+          `[registerClassifiers: ${modelFiles.modelJson?.name}] ${result.reason.code}: ${result.reason.message}`,
+          result.reason.cause,
+        );
       }
       onProgress(++modelIdx / modelFileArr.length);
     }
-    classifierHandler.addModels(models);
   }
 
   // ============================================================

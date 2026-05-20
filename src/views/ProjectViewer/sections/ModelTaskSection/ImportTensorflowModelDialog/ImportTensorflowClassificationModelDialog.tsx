@@ -21,8 +21,9 @@ import { classifierSlice } from "store/classifier";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 
 import { HotkeyContext } from "utils/enums";
-import classifierHandler from "utils/dl/classification/classifierHandler";
-import type { SequentialClassifier } from "utils/dl/classification/models";
+import { ClassifierApi } from "utils/dl/classification";
+import { logger } from "utils/logUtils";
+import type { ModelInfoDTO } from "utils/dl/classification/types";
 
 import { LocalClassifierUpload } from "./LocalFileUpload";
 import { RemoteClassifierUpload } from "./CloudUpload";
@@ -39,9 +40,7 @@ export const ImportTensorflowClassificationModelDialog = ({
 }: ImportTensorflowClassificationModelDialogProps) => {
   const dispatch = useDispatch();
   const activeKindId = useSelector(selectActiveKindId);
-  const [uploadedModels, setUploadedModels] = useState<SequentialClassifier[]>(
-    [],
-  );
+  const [uploadedModels, setUploadedModels] = useState<ModelInfoDTO[]>([]);
 
   const [isGraph, setIsGraph] = useState(false);
 
@@ -62,11 +61,21 @@ export const ImportTensorflowClassificationModelDialog = ({
     onClose();
   };
 
-  const cancelUpload = () => {
+  const cancelUpload = async () => {
     setInvalidModel(false);
-    uploadedModels.forEach((model) => {
-      classifierHandler.removeModel(model.name);
-    });
+    const cfApi = ClassifierApi.getInstance();
+    for (const model of uploadedModels) {
+      const result = await cfApi.removeModel(model.name);
+      if (result.success) {
+        logger(`successfully removed ${result.data}`);
+      } else {
+        console.error(
+          `[cancelUpload: ${model.name}] ${result.reason.code}: ${result.reason.message}`,
+          result.reason.cause,
+        );
+      }
+    }
+
     onClose();
   };
 

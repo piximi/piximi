@@ -5,7 +5,7 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
 import JSZip from "jszip";
 import saveAs from "file-saver";
-import { ClassifierApi } from "utils/dl/classification/ClassifierApi";
+import { ClassifierApi } from "utils/dl/classification";
 import { ModelInfoDTO } from "utils/dl/classification/types";
 
 type SaveFittedModelDialogProps = {

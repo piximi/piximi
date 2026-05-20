@@ -11,10 +11,10 @@ import {
 } from "@mui/material";
 import { FileOpen as FileOpenIcon } from "@mui/icons-material";
 
-import type { SequentialClassifier } from "utils/dl/classification/models";
-import type { ModelUploadResults } from "utils/dl/classification/classifierHandler";
-import classifierHandler from "utils/dl/classification/classifierHandler";
 import { isObjectEmpty } from "utils/objectUtils";
+import type { ModelInfoDTO } from "utils/dl/classification/types";
+import { ClassifierApi } from "utils/dl/classification";
+import { logger } from "utils/logUtils";
 
 //TODO: MenuItem??
 
@@ -23,9 +23,7 @@ export const LocalClassifierUpload = ({
   setUploadedModels,
 }: {
   isGraph: boolean;
-  setUploadedModels: React.Dispatch<
-    React.SetStateAction<SequentialClassifier[]>
-  >;
+  setUploadedModels: React.Dispatch<React.SetStateAction<ModelInfoDTO[]>>;
 }) => {
   const [errMessage, setErrMessage] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -38,12 +36,28 @@ export const LocalClassifierUpload = ({
     if (!files) {
       return;
     }
-    let results: ModelUploadResults;
+    const cfApi = ClassifierApi.getInstance();
+    let results: {
+      loadedModels: ModelInfoDTO[];
+      failedModels: Record<string, { reason: string; err?: Error }>;
+    } = {
+      loadedModels: [],
+      failedModels: {},
+    };
 
     if (files.length === 1 && files[0].type === "application/zip") {
       const file = files[0];
       const zipFile = await new JSZip().loadAsync(file);
-      results = await classifierHandler.modelsFromZip(zipFile);
+      const result = await cfApi.modelsFromZipBuffer(zipFile);
+      if (result.success) {
+        logger(`sucessfully uploaded ${result.data.loadedModels[0].name}`);
+        results = result.data;
+      } else {
+        console.error(
+          `[upload model zip: ${file.name}] ${result.reason.code}: ${result.reason.message}`,
+          result.reason.cause,
+        );
+      }
     } else {
       const weightsFiles: Array<File> = [];
       let descFile: File | undefined;
@@ -63,18 +77,22 @@ export const LocalClassifierUpload = ({
         return;
       }
 
-      const uploadResult = await classifierHandler.modelFromFiles({
+      const result = await cfApi.modelFromFiles({
         descFile,
         weightsFiles,
         isGraph,
       });
-      if (uploadResult.success) {
-        results = { loadedModels: [uploadResult.model], failedModels: {} };
+      if (result.success) {
+        results.loadedModels = [result.data];
       } else {
+        console.error(
+          `[upload model zip: ${descFile.name}] ${result.reason.code}: ${result.reason.message}`,
+          result.reason.cause,
+        );
         results = {
           loadedModels: [],
           failedModels: {
-            [uploadResult.modelName]: uploadResult.error,
+            [descFile.name]: { reason: result.reason.message },
           },
         };
       }
@@ -87,7 +105,6 @@ export const LocalClassifierUpload = ({
       );
     }
     if (results.loadedModels.length > 0) {
-      classifierHandler.addModels(results.loadedModels);
       setUploadedModels(results.loadedModels);
       setSuccessMessage(
         `Successfully uploaded Classification ${

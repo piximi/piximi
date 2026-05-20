@@ -29,7 +29,6 @@ import {
   selectKindClassifier,
 } from "store/classifier/selectors";
 
-import classifierHandler from "utils/dl/classification/classifierHandler";
 import type { SequentialClassifier } from "utils/dl/classification/models";
 import { findReplicateName } from "utils/stringUtils";
 import type { ModelArch } from "utils/dl/classification/types";

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectActiveModelName } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { ClassifierApi } from "utils/dl/classification/ClassifierApi";
+import { ClassifierApi } from "utils/dl/classification";
 import { ModelInfoDTO } from "utils/dl/classification/types";
 
 export const useClassificationModel = () => {

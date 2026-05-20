@@ -28,7 +28,6 @@ import {
 } from "store/classifier/selectors";
 
 import { HotkeyContext } from "utils/enums";
-import classifierHandler from "utils/dl/classification/classifierHandler";
 import { ModelArch, type ModelInfoDTO } from "utils/dl/classification/types";
 
 import { PredictionListItems } from "../PredictionListItems";

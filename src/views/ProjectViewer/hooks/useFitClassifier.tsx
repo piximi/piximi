@@ -20,9 +20,7 @@ import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
 import { generateUUID } from "store/dataV2/utils";
 
-import classifierHandler from "utils/dl/classification/classifierHandler";
 import { Partition } from "utils/dl/enums";
-import type { SequentialClassifier } from "utils/dl/classification/models";
 import {
   applySplitAndShuffle,
   fingerprintDataset,
@@ -37,7 +35,9 @@ import type {
   Run,
   RunTrigger,
   TrainingCallbacks,
+  ModelInfoDTO,
 } from "utils/dl/classification/types";
+import { ClassifierApi } from "utils/dl/classification";
 
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
@@ -107,15 +107,25 @@ export const useFitClassifier = () => {
     kindClassifier: KindClassifier,
     modelInfo: ModelInfo,
   ) => {
-    let model: SequentialClassifier;
+    let model: ModelInfoDTO;
     let classMap: ModelClassMap | undefined;
     const seed = userDefinedSeed ?? Math.floor(Math.random() * 1000);
+    const cfApi = ClassifierApi.getInstance();
     try {
-      model = await classifierHandler.createNewModel(
+      const result = await cfApi.createNewModel(
         newModelName,
         kindClassifier.newModelArch,
         seed,
       );
+      if (result.success) {
+        model = result.data;
+      } else {
+        console.error(
+          `[fitClassifier: ${newModelName}] ${result.reason.code}: ${result.reason.message}`,
+          result.reason.cause,
+        );
+        throw new Error("ModelCreationError", { cause: result.reason.cause });
+      }
       modelInfo.initSeed = seed;
       dispatch(
         classifierSlice.actions.addModelInfo({
@@ -173,7 +183,7 @@ export const useFitClassifier = () => {
       ...inferenceUpdates,
     ];
     try {
-      await classifierHandler.prepareModel(
+      await cfApi.prepareModel(
         model.name,
         trainingData,
         validationData,
@@ -202,11 +212,25 @@ export const useFitClassifier = () => {
     modelInfo: ModelInfo,
     modelName: string,
   ) => {
-    let model: SequentialClassifier;
+    let model: ModelInfoDTO;
     let classMap = modelInfo.classMap;
     const seed = userDefinedSeed ?? Math.floor(Math.random() * 1000);
+    const cfApi = ClassifierApi.getInstance();
     try {
-      model = classifierHandler.getModel(modelName);
+      const result = await cfApi.createNewModel(
+        modelName,
+        kindClassifier.newModelArch,
+        seed,
+      );
+      if (result.success) {
+        model = result.data;
+      } else {
+        console.error(
+          `[fitClassifier: ${newModelName}] ${result.reason.code}: ${result.reason.message}`,
+          result.reason.cause,
+        );
+        throw new Error("ModelRetrievalError", { cause: result.reason.cause });
+      }
     } catch (error) {
       throw new Error("Model Generation Error", { cause: error });
     }
@@ -256,7 +280,7 @@ export const useFitClassifier = () => {
       validationFingerprint !== lastRun?.validationFingerprint;
     const classes = Object.values(classMap).map((id) => ({ id }));
     if (!model.trainingLoaded) {
-      classifierHandler.loadData(
+      await cfApi.loadData(
         model.name,
         trainingData,
         validationData,
@@ -264,7 +288,7 @@ export const useFitClassifier = () => {
         seed,
       );
     } else if (trainingChanged && validationChanged) {
-      classifierHandler.loadData(
+      await cfApi.loadData(
         model.name,
         trainingData,
         validationData,
@@ -272,14 +296,9 @@ export const useFitClassifier = () => {
         seed,
       );
     } else if (trainingChanged) {
-      classifierHandler.loadTraining(model.name, trainingData, classes, seed);
+      await cfApi.loadTraining(model.name, trainingData, classes, seed);
     } else if (validationChanged) {
-      classifierHandler.loadValidation(
-        model.name,
-        validationData,
-        classes,
-        seed,
-      );
+      await cfApi.loadValidation(model.name, validationData, classes, seed);
     }
 
     return {
@@ -458,23 +477,33 @@ export const useFitClassifier = () => {
         }),
       );
     };
-
+    const cfApi = ClassifierApi.getInstance();
     try {
-      const trainingResults = await classifierHandler.train(
+      const trainingResults = await cfApi.train(
         initializedModelName,
         modelInfo.optimizerSettings,
         { onEpochEnd },
       );
-      dispatch(
-        classifierSlice.actions.finalizeActiveRun({
-          targetId: modelTarget,
-          modelName: initializedModelName,
-          finishedAt: new Date().toISOString(),
-          status: trainingResults.status,
-          evalResults: trainingResults.evalResults,
-          weightsRef: trainingResults.weightsRef,
-        }),
-      );
+      if (trainingResults.success) {
+        dispatch(
+          classifierSlice.actions.finalizeActiveRun({
+            targetId: modelTarget,
+            modelName: initializedModelName,
+            finishedAt: new Date().toISOString(),
+            status: trainingResults.data.status,
+            evalResults: trainingResults.data.evalResults,
+            weightsRef: trainingResults.data.weightsRef,
+          }),
+        );
+      } else {
+        console.error(
+          `[fitClassifier: ${initializedModelName}] ${trainingResults.reason.code}: ${trainingResults.reason.message}`,
+          trainingResults.reason.cause,
+        );
+        throw new Error("ModelTrainingError", {
+          cause: trainingResults.reason.cause,
+        });
+      }
     } catch (error) {
       dispatch(
         classifierSlice.actions.finalizeActiveRun({

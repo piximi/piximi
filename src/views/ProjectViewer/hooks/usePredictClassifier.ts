@@ -16,9 +16,9 @@ import { selectKindClassifier } from "store/classifier/selectors";
 
 import { logger } from "utils/logUtils";
 import { representsUnknown } from "utils/stringUtils";
-import classifierHandler from "utils/dl/classification/classifierHandler";
 import { toInferenceInput } from "utils/dl/utils";
 import type { PredictionResult } from "utils/dl/classification/types";
+import { ClassifierApi } from "utils/dl/classification";
 
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 
@@ -40,7 +40,18 @@ export const usePredictClassifier = () => {
     if (!kindClassifier || !kindClassifier.activeModel) return;
     const modelTargetId = kindClassifier.modelTargetId;
     const modelName = kindClassifier.activeModel;
-    const model = classifierHandler.getModel(modelName);
+    const cfApi = ClassifierApi.getInstance();
+    const model = await cfApi.getModelInfo(modelName).then((result) => {
+      if (result.success) {
+        return result.data;
+      } else {
+        console.error(
+          `[predictClassifier: ${modelName}] ${result.reason.code}: ${result.reason.message}`,
+          result.reason.cause,
+        );
+        return undefined;
+      }
+    });
     const modelInfo = kindClassifier.modelInfoDict[modelName];
     const activeRun = modelInfo.runs.at(-1);
 
@@ -84,7 +95,7 @@ export const usePredictClassifier = () => {
     );
 
     try {
-      classifierHandler.loadInference(
+      await cfApi.loadInference(
         modelName,
         unlabeledItems.map(toInferenceInput),
         [],
@@ -98,11 +109,21 @@ export const usePredictClassifier = () => {
     let results: PredictionResult;
     logger("before predict");
     try {
-      results = await classifierHandler.predict(
+      const predictResults = await cfApi.predict(
         modelName,
         Object.values(classMap).map((id) => ({ id })),
       );
-      logger("after predict");
+      if (predictResults.success) {
+        results = predictResults.data;
+      } else {
+        console.error(
+          `[predictClassifier: ${modelName}] ${predictResults.reason.code}: ${predictResults.reason.message}`,
+          predictResults.reason.cause,
+        );
+        throw new Error("PredictionError", {
+          cause: predictResults.reason.cause,
+        });
+      }
     } catch (error) {
       handleError(error as Error, "Error during prediction");
       return;

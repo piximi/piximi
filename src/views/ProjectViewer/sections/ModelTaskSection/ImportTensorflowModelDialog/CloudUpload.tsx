@@ -14,19 +14,17 @@ import { Language as LanguageIcon } from "@mui/icons-material";
 
 import { useDebounce } from "hooks";
 
-import type { SequentialClassifier } from "utils/dl/classification/models";
 import { RemoteClassifier } from "utils/dl/classification/models";
-import classifierHandler from "utils/dl/classification/classifierHandler";
 import { isObjectEmpty } from "utils/objectUtils";
+import { ClassifierApi } from "utils/dl/classification";
+import type { ModelInfoDTO } from "utils/dl/classification/types";
 
 export const RemoteClassifierUpload = ({
   isGraph,
   setUploadedModels,
 }: {
   isGraph: boolean;
-  setUploadedModels: React.Dispatch<
-    React.SetStateAction<SequentialClassifier[]>
-  >;
+  setUploadedModels: React.Dispatch<React.SetStateAction<ModelInfoDTO[]>>;
 }) => {
   const [errMessage, setErrMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -58,25 +56,26 @@ export const RemoteClassifierUpload = ({
   const loadModel = async () => {
     setErrMessage("");
     setSuccessMessage("");
-
-    const result = await classifierHandler.modelFromUrl(
-      modelUrl,
-      isFromTFHub,
-      isGraph,
-    );
-
-    if (!isObjectEmpty(result.failedModels)) {
-      setErrMessage(
-        `Failed to upload models: ${Object.keys(result.failedModels!).join(", ")}`,
-      );
-    }
-    if (result.loadedModels.length > 0) {
-      classifierHandler.addModels(result.loadedModels);
-      setUploadedModels(result.loadedModels);
-      setSuccessMessage(
-        `Successfully uploaded Classification ${
-          isGraph ? "Graph" : "Layers"
-        } Models: "${result.loadedModels.map((model) => model.name).join(", ")}"`,
+    const cfApi = ClassifierApi.getInstance();
+    const result = await cfApi.modelFromUrl(modelUrl, isFromTFHub, isGraph);
+    if (result.success) {
+      if (!isObjectEmpty(result.data.failedModels)) {
+        setErrMessage(
+          `Failed to upload models: ${Object.keys(result.data.failedModels!).join(", ")}`,
+        );
+      }
+      if (result.data.loadedModels.length > 0) {
+        setUploadedModels(result.data.loadedModels);
+        setSuccessMessage(
+          `Successfully uploaded Classification ${
+            isGraph ? "Graph" : "Layers"
+          } Models: "${result.data.loadedModels.map((model) => model.name).join(", ")}"`,
+        );
+      }
+    } else {
+      console.error(
+        `[loadModel] ${result.reason.code}: ${result.reason.message}`,
+        result.reason.cause,
       );
     }
   };

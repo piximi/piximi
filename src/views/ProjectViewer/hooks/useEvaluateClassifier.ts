@@ -10,7 +10,8 @@ import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
 
 import { AlertType } from "utils/enums";
-import classifierHandler from "utils/dl/classification/classifierHandler";
+import { ClassifierApi } from "utils/dl/classification";
+import type { ModelInfoDTO } from "utils/dl/classification/types";
 
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 
@@ -28,7 +29,16 @@ export const useEvaluateClassifier = () => {
   const evaluateClassifier = async () => {
     if (!kindClassifier || kindClassifier.activeModel === undefined) return;
     const modelName = kindClassifier.activeModel;
-    const model = classifierHandler.getModel(modelName);
+    const cfApi = ClassifierApi.getInstance();
+    const result = await cfApi.getModelInfo(modelName);
+    let model: ModelInfoDTO | undefined = undefined;
+    if (result.success) model = result.data;
+    else {
+      console.error(
+        `[evaluateClassifier: ${modelName}] ${result.reason.code}: ${result.reason.message}`,
+        result.reason.cause,
+      );
+    }
     const modelInfo = kindClassifier.modelInfoDict[modelName];
     if (!model || !modelInfo) return;
     const currentRun = modelInfo.runs.at(-1);
@@ -63,15 +73,22 @@ export const useEvaluateClassifier = () => {
         }),
       );
       try {
-        const evalResult = await classifierHandler.evaluate(modelName);
-        dispatch(
-          classifierSlice.actions.recordEvalForRun({
-            evalResult,
-            targetId: modelTarget,
-            runId: currentRun.id,
-            modelName: model.name,
-          }),
-        );
+        const evalResult = await cfApi.evaluate(modelName);
+        if (evalResult.success) {
+          dispatch(
+            classifierSlice.actions.recordEvalForRun({
+              evalResult: evalResult.data,
+              targetId: modelTarget,
+              runId: currentRun.id,
+              modelName: model.name,
+            }),
+          );
+        } else {
+          console.error(
+            `[evaluateClassifier: ${modelName}] ${evalResult.reason.code}: ${evalResult.reason.message}`,
+            evalResult.reason.cause,
+          );
+        }
       } catch (error) {
         handleError(error as Error, "Error computing the evaluation results");
         dispatch(

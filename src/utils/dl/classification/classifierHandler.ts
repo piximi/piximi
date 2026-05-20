@@ -442,4 +442,3 @@ class ClassifierHandler {
 }
 
 const classifierHandler = new ClassifierHandler();
-export default classifierHandler;
