@@ -26,7 +26,12 @@ export const SectionHeader = ({
           variant="dot"
           color="primary"
           invisible={!hasActiveFilters}
-          slotProps={{ badge: { sx: { top: "50%", right: "-15%" } } }}
+          sx={{
+            "& .MuiBadge-badge": {
+              top: "50%",
+              right: "-15%",
+            },
+          }}
         >
           <IconButton
             onClick={handleExpand}
