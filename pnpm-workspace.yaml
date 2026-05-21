@@ -1,0 +1,7 @@
+allowBuilds:
+  '@tensorflow/tfjs-node': true
+  canvas: true
+  core-js: true
+  esbuild: true
+  skia-canvas: true
+  unrs-resolver: true
