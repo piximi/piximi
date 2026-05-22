@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import range from "lodash/range";
 import { ResponsiveLine } from "@nivo/line";
@@ -36,15 +36,23 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
   const nivoTheme = usePreferredNivoTheme();
   const matchesBP = useMediaQuery(theme.breakpoints.down("md"));
 
-  const [data, setData] = useState<
-    {
-      id: string;
-      color: string;
-      data: { x: number; y: number }[];
-    }[]
-  >([]);
+  const data = useMemo(
+    () => [
+      {
+        id: id1,
+        color: "#DC3220",
+        data: yData1,
+      },
+      {
+        id: id2,
+        color: "#005AB5",
+        data: yData2,
+      },
+    ],
+    [id1, id2, yData1, yData2],
+  );
 
-  const stepSize = Math.ceil(yData1.length / 30);
+  const stepSize = Math.max(1, Math.ceil(yData1.length / 30));
   const xRange = range(0, yData1.length + 1, stepSize);
   const pointSizeAdjustment = Math.floor(yData1.length / 20);
 
@@ -76,22 +84,6 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
     }, 0);
     return Math.max(y1Max, y2Max) + 0.1;
   }, [dynamicYRange, yData1, yData2]);
-
-  useEffect(() => {
-    const data1 = {
-      id: id1,
-      color: "#DC3220",
-      data: yData1,
-    };
-
-    const data2 = {
-      id: id2,
-      color: "#005AB5",
-      data: yData2,
-    };
-
-    setData([data1, data2]);
-  }, [id1, id2, yData1, yData2]);
 
   return (
     <Container sx={{ height: 350, mb: 5 }}>
