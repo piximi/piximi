@@ -1,4 +1,6 @@
-import { createSelector } from "@reduxjs/toolkit";
+import { shallowEqual } from "react-redux";
+
+import { createSelector, lruMemoize } from "@reduxjs/toolkit";
 
 import type { RootState } from "store/rootReducer";
 
@@ -25,6 +27,9 @@ export const selectClassifierState = ({
   return classifier;
 };
 
+/*
+ * Kind Classifier Record
+ */
 export const selectKindClassifierDict = ({
   classifier,
 }: {
@@ -32,13 +37,19 @@ export const selectKindClassifierDict = ({
 }): KindClassifierDict => {
   return classifier.kindClassifiers;
 };
-
 export const selectAllCreatedModelNames = createSelector(
   selectKindClassifierDict,
   (kcd): string[] =>
     Object.values(kcd).flatMap((kc) => Object.keys(kc.modelInfoDict)),
+  {
+    memoize: lruMemoize,
+    memoizeOptions: { resultEqualityCheck: shallowEqual },
+  },
 );
 
+/*
+ * Kind Classifier
+ */
 export const selectKindClassifier = createSelector(
   selectKindClassifierDict,
   (_state: RootState, kindId: string) => kindId,
@@ -58,20 +69,25 @@ export const selectActiveSoftmaxById = createSelector(
   selectKindClassifier,
   (kc): SoftmaxById | undefined => kc.activeSoftmaxById,
 );
-
 export const selectActiveModelName = createSelector(
   selectKindClassifier,
   (kc): string | undefined => {
     return kc.activeModel;
   },
 );
-
 export const selectNewModelArch = createSelector(
   selectKindClassifier,
   (kc): ModelArch => {
     return kc.newModelArch;
   },
 );
+export const selectKindModelNames = createSelector(selectKindClassifier, (kc) =>
+  Object.keys(kc.modelInfoDict),
+);
+
+/*
+ * Model Info
+ */
 export const selectModelInfo = createSelector(
   selectKindClassifier,
   (kc): ModelInfo | undefined => {
@@ -80,23 +96,36 @@ export const selectModelInfo = createSelector(
     return kc.modelInfoDict[modelName];
   },
 );
+export const selectConfidenceThreshold = createSelector(
+  selectModelInfo,
+  (info): number | undefined => info?.confidenceThreshold,
+);
+export const selectModelIsValid = createSelector(
+  selectModelInfo,
+  (info): boolean | undefined => info?.valid,
+);
+export const selectModelPreprocessSettings = createSelector(
+  selectModelInfo,
+  (info) => info?.preprocessSettings,
+);
+export const selectModelOptimizerSettings = createSelector(
+  selectModelInfo,
+  (info) => info?.optimizerSettings,
+);
+
+/*
+ * Active Runs
+ */
 export const selectRunsForActiveModel = createSelector(
   selectModelInfo,
   (info): Run[] => {
     return info?.runs ?? [];
   },
 );
-
 export const selectActiveRun = createSelector(
   [selectRunsForActiveModel],
   (runs): Run | undefined => runs.at(-1), // undefined if no runs
 );
-
-export const selectConfidenceThreshold = createSelector(
-  selectModelInfo,
-  (info): number | undefined => info?.confidenceThreshold,
-);
-
 export const selectModelEvaluationResults = createSelector(
   [selectRunsForActiveModel],
   (runs): EvaluationResult[] => {

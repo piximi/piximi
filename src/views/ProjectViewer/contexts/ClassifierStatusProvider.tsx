@@ -1,5 +1,12 @@
 import type React from "react";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -9,7 +16,9 @@ import { useClassificationModel } from "hooks";
 
 import {
   selectAllCreatedModelNames,
-  selectModelInfo,
+  selectModelIsValid,
+  selectModelOptimizerSettings,
+  selectModelPreprocessSettings,
 } from "store/classifier/selectors";
 import {
   selectActiveLabeledItems,
@@ -43,6 +52,15 @@ export enum ErrorReason {
   Invalid,
 }
 
+type Precheck = {
+  modelTrainable: boolean; // success -> true
+  modelValid: boolean; // success -> true
+  labeledImages: boolean; // success -> true
+  noPendingPredictions: boolean; // success -> true
+  channelsValid: boolean; // success -> true
+  modelNameValid: boolean; // success -> true
+};
+
 export type ErrorContext = {
   reason: ErrorReason;
   message: string;
@@ -51,7 +69,7 @@ export type ErrorContext = {
 
 type ClassifierStateContextProp = {
   isReady: boolean;
-  trainable: boolean;
+  precheck: Precheck;
   shouldWarnClearPredictions: boolean;
   error?: ErrorContext;
   activeErrors: ErrorContext[];
@@ -70,7 +88,14 @@ type ClassifierStateContextProp = {
 
 const ClassifierStatusContext = createContext<ClassifierStateContextProp>({
   isReady: true,
-  trainable: true,
+  precheck: {
+    modelTrainable: false,
+    modelValid: false,
+    labeledImages: false,
+    noPendingPredictions: false,
+    channelsValid: false,
+    modelNameValid: false,
+  },
   shouldWarnClearPredictions: false,
   newModelName: "",
   setNewModelName: (_value: React.SetStateAction<string>) => {},
@@ -84,16 +109,118 @@ const ClassifierStatusContext = createContext<ClassifierStateContextProp>({
   setUserDefinedSeed: (_value: React.SetStateAction<number | undefined>) => {},
 });
 
+const useModelParams = () => {
+  const dispatch = useDispatch();
+  const projectChannels = useSelector(selectProjectImageChannels);
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const modelPreprocessingSettings = useParameterizedSelector(
+    selectModelPreprocessSettings,
+    modelTarget,
+  );
+  const modelOptimizerSettings = useParameterizedSelector(
+    selectModelOptimizerSettings,
+    modelTarget,
+  );
+  const [newModelName, setNewModelName] = useState("");
+  const [userDefinedSeed, setUserDefinedSeed] = useState<number | undefined>();
+
+  const [newModelParams, updateNewModelParams] = useImmer(
+    getDefaultModelParams(projectChannels),
+  );
+  const modelParams = useMemo(() => {
+    if (modelPreprocessingSettings && modelOptimizerSettings)
+      return {
+        preprocessSettings: modelPreprocessingSettings,
+        optimizerSettings: modelOptimizerSettings,
+      };
+    return newModelParams;
+  }, [modelPreprocessingSettings, modelOptimizerSettings, newModelParams]);
+
+  const handleUpdateOptimizerSettings = useCallback(
+    (settings: Partial<OptimizerSettings>) => {
+      if (modelOptimizerSettings)
+        dispatch(
+          classifierSlice.actions.updateModelOptimizerSettings({
+            settings,
+            targetId: modelTarget,
+          }),
+        );
+      else
+        updateNewModelParams((draft) => {
+          Object.assign(draft.optimizerSettings, settings);
+        });
+    },
+    [modelOptimizerSettings, modelTarget],
+  );
+  const handleUpdatePreprocessSettings = useCallback(
+    (settings: RecursivePartial<PreprocessSettings>) => {
+      if (modelPreprocessingSettings)
+        dispatch(
+          classifierSlice.actions.updateModelPreprocessSettings({
+            settings,
+            targetId: modelTarget,
+          }),
+        );
+      else
+        updateNewModelParams((draft) => {
+          Object.assign(draft.preprocessSettings, settings);
+        });
+    },
+    [modelPreprocessingSettings, modelTarget],
+  );
+  const handleUpdateInputShape = useCallback(
+    (inputShape: Partial<Shape>) => {
+      if (modelPreprocessingSettings)
+        dispatch(
+          classifierSlice.actions.updateInputShape({
+            inputShape,
+            targetId: modelTarget,
+          }),
+        );
+      else
+        updateNewModelParams((draft) => {
+          Object.assign(draft.preprocessSettings.inputShape, inputShape);
+        });
+    },
+    [modelPreprocessingSettings, modelTarget],
+  );
+  const handleSetModelParams = useCallback((params: ClassifierModelParams) => {
+    updateNewModelParams(() => params);
+  }, []);
+  useEffect(() => {
+    if (modelPreprocessingSettings && modelOptimizerSettings) {
+      handleSetModelParams({
+        preprocessSettings: modelPreprocessingSettings,
+        optimizerSettings: modelOptimizerSettings,
+      });
+      return;
+    }
+    handleSetModelParams(getDefaultModelParams(projectChannels));
+  }, [modelOptimizerSettings, modelPreprocessingSettings, projectChannels]);
+  return {
+    modelParams,
+    newModelName,
+    setNewModelName,
+    userDefinedSeed,
+    setUserDefinedSeed,
+    handleUpdateOptimizerSettings,
+    handleUpdatePreprocessSettings,
+    handleUpdateInputShape,
+    handleSetModelParams,
+  };
+};
+
 export const ClassifierStatusProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
-  const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-
   const modelConfig = useClassificationModel();
-  const modelInfo = useParameterizedSelector(selectModelInfo, modelTarget);
+  const modelIsValid = useParameterizedSelector(
+    selectModelIsValid,
+    modelTarget,
+  );
   const inferenceItems = useParameterizedSelector(
     selectActiveItemsByPartition,
     Partition.Inference,
@@ -103,129 +230,87 @@ export const ClassifierStatusProvider = ({
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
-
-  const [isReady, setIsReady] = useState(true);
-  const [newModelName, setNewModelName] = useState("");
   const restrictedClassifierNames = useSelector(selectAllCreatedModelNames);
+  useEffect(() => {
+    console.log(restrictedClassifierNames);
+  }, [restrictedClassifierNames]);
 
-  const [error, setError] = useState<ErrorContext>();
-  const [activeErrors, setActiveErrors] = useState<ErrorContext[]>([]);
+  const {
+    modelParams,
+    newModelName,
+    setNewModelName,
+    userDefinedSeed,
+    setUserDefinedSeed,
+    handleUpdateOptimizerSettings,
+    handleUpdatePreprocessSettings,
+    handleUpdateInputShape,
+    handleSetModelParams,
+  } = useModelParams();
 
-  const hasLabeledInference = useMemo(() => {
-    return inferenceItems.some((item) => !representsUnknown(item.categoryId));
-  }, [inferenceItems]);
+  const precheck: Precheck = useMemo(
+    () => ({
+      modelTrainable: !modelConfig || modelConfig.trainable,
+      modelValid: modelIsValid === undefined ? true : modelIsValid,
+      labeledImages: !!activeLabeledItems.length,
+      noPendingPredictions: inferenceItems.every((item) =>
+        representsUnknown(item.categoryId),
+      ),
+      channelsValid:
+        modelConfig?.preprocessingSettings && projectChannels
+          ? projectChannels !==
+            modelConfig.preprocessingSettings.inputShape.channels
+          : true,
+      modelNameValid: !findReplicateName(
+        newModelName,
+        restrictedClassifierNames,
+      ),
+    }),
+    [
+      modelConfig,
+      projectChannels,
+      newModelName,
+      restrictedClassifierNames,
+      modelIsValid,
+    ],
+  );
+  const isReady = useMemo(
+    () => Object.values(precheck).every((b) => b),
+    [precheck],
+  );
+
+  console.log(isReady);
+  console.log(modelConfig);
+  console.log(precheck);
 
   const shouldWarnClearPredictions = useMemo(() => {
-    return showClearPredictionsWarning && hasLabeledInference;
-  }, [showClearPredictionsWarning, hasLabeledInference]);
+    return showClearPredictionsWarning && !precheck.noPendingPredictions;
+  }, [showClearPredictionsWarning, precheck.noPendingPredictions]);
 
-  const trainable = useMemo(
-    () => !modelConfig || modelConfig.trainable,
-    [modelConfig],
-  );
-  const noLabeledThings = useMemo(
-    () => activeLabeledItems.length === 0,
-    [activeLabeledItems],
-  );
-
-  const [userDefinedSeed, setUserDefinedSeed] = useState<number | undefined>();
-
-  const [newModelParams, updateNewModelParams] = useImmer(
-    getDefaultModelParams(projectChannels),
-  );
-  const modelParams = useMemo(() => {
-    if (modelInfo)
-      return {
-        preprocessSettings: modelInfo.preprocessSettings,
-        optimizerSettings: modelInfo.optimizerSettings,
-      };
-    return newModelParams;
-  }, [modelInfo, newModelParams]);
-
-  const handleUpdateOptimizerSettings = (
-    settings: Partial<OptimizerSettings>,
-  ) => {
-    if (modelInfo)
-      dispatch(
-        classifierSlice.actions.updateModelOptimizerSettings({
-          settings,
-          targetId: modelTarget,
-        }),
-      );
-    else
-      updateNewModelParams((draft) => {
-        Object.assign(draft.optimizerSettings, settings);
-      });
-  };
-  const handleUpdatePreprocessSettings = (
-    settings: RecursivePartial<PreprocessSettings>,
-  ) => {
-    if (modelInfo)
-      dispatch(
-        classifierSlice.actions.updateModelPreprocessSettings({
-          settings,
-          targetId: modelTarget,
-        }),
-      );
-    else
-      updateNewModelParams((draft) => {
-        Object.assign(draft.preprocessSettings, settings);
-      });
-  };
-  const handleUpdateInputShape = (inputShape: Partial<Shape>) => {
-    if (modelInfo)
-      dispatch(
-        classifierSlice.actions.updateInputShape({
-          inputShape,
-          targetId: modelTarget,
-        }),
-      );
-    else
-      updateNewModelParams((draft) => {
-        Object.assign(draft.preprocessSettings.inputShape, inputShape);
-      });
-  };
-  const handleSetModelParams = (params: ClassifierModelParams) => {
-    updateNewModelParams(() => params);
-  };
-
-  useEffect(() => {
+  const activeErrors = useMemo(() => {
     const newErrors: ErrorContext[] = [];
-    let newIsReady = true;
 
-    if (!trainable) {
-      newIsReady = false;
-
+    if (!precheck.modelTrainable) {
       newErrors.push({
         reason: ErrorReason.NotTrainable,
         message: "Selected model is not trainable.",
         severity: 1,
       });
     }
-    if (noLabeledThings) {
-      newIsReady = false;
-
+    if (!precheck.labeledImages) {
       newErrors.push({
         reason: ErrorReason.NoLabeledImages,
         message: "Please label images to train a model.",
         severity: 3,
       });
     }
-    if (
-      modelConfig?.preprocessingSettings &&
-      projectChannels &&
-      projectChannels !== modelConfig.preprocessingSettings.inputShape.channels
-    ) {
-      newIsReady = false;
-
+    if (!precheck.channelsValid) {
       newErrors.push({
         reason: ErrorReason.ChannelMismatch,
-        message: `The model requires ${modelConfig?.preprocessingSettings.inputShape.channels}-channel images, but the project images have ${projectChannels}`,
+        message: `The model requires ${modelConfig?.preprocessingSettings?.inputShape.channels}-channel images, but the project images have ${projectChannels}`,
         severity: 2,
       });
     }
-    if (findReplicateName(newModelName, restrictedClassifierNames)) {
-      newIsReady = false;
+    if (!precheck.modelNameValid) {
       newErrors.push({
         reason: ErrorReason.DuplicateModelName,
         message: `A model with the name ${newModelName} already exists`,
@@ -233,8 +318,7 @@ export const ClassifierStatusProvider = ({
       });
     }
 
-    if (modelInfo && !modelInfo.valid) {
-      newIsReady = false;
+    if (!precheck.modelValid) {
       newErrors.push({
         reason: ErrorReason.Invalid,
         message: `Categories have changed since last training run`,
@@ -242,55 +326,56 @@ export const ClassifierStatusProvider = ({
       });
     }
 
-    const mostSevere: undefined | ErrorContext =
-      newErrors.length === 0
-        ? undefined
-        : newErrors.reduce((prev, curr) =>
-            curr.severity < prev.severity ? curr : prev,
-          );
-    setIsReady(newIsReady);
-    setError(mostSevere);
-    setActiveErrors(newErrors);
-  }, [
-    modelConfig,
-    trainable,
-    noLabeledThings,
-    projectChannels,
-    modelTarget,
-    newModelName,
-    restrictedClassifierNames,
-  ]);
+    return newErrors;
+  }, [precheck, modelConfig, projectChannels, modelTarget, newModelName]);
 
-  useEffect(() => {
-    if (modelInfo) {
-      handleSetModelParams({
-        preprocessSettings: modelInfo.preprocessSettings,
-        optimizerSettings: modelInfo.optimizerSettings,
-      });
-      return;
-    }
-    handleSetModelParams(getDefaultModelParams(projectChannels));
-  }, [modelInfo]);
+  const error = useMemo(
+    () =>
+      activeErrors.length === 0
+        ? undefined
+        : activeErrors.reduce((prev, curr) =>
+            curr.severity < prev.severity ? curr : prev,
+          ),
+    [activeErrors],
+  );
+
+  const value = useMemo(
+    () => ({
+      isReady,
+      precheck,
+      shouldWarnClearPredictions,
+      error,
+      newModelName,
+      setNewModelName,
+      activeErrors,
+      modelParams,
+      handleUpdateOptimizerSettings,
+      handleUpdatePreprocessSettings,
+      handleUpdateInputShape,
+      handleSetModelParams,
+      userDefinedSeed,
+      setUserDefinedSeed,
+    }),
+    [
+      isReady,
+      precheck,
+      shouldWarnClearPredictions,
+      error,
+      newModelName,
+      setNewModelName,
+      activeErrors,
+      modelParams,
+      handleUpdateOptimizerSettings,
+      handleUpdatePreprocessSettings,
+      handleUpdateInputShape,
+      handleSetModelParams,
+      userDefinedSeed,
+      setUserDefinedSeed,
+    ],
+  );
 
   return (
-    <ClassifierStatusContext.Provider
-      value={{
-        isReady,
-        trainable,
-        shouldWarnClearPredictions,
-        error,
-        newModelName,
-        setNewModelName,
-        activeErrors,
-        modelParams,
-        handleUpdateOptimizerSettings,
-        handleUpdatePreprocessSettings,
-        handleUpdateInputShape,
-        handleSetModelParams,
-        userDefinedSeed,
-        setUserDefinedSeed,
-      }}
-    >
+    <ClassifierStatusContext.Provider value={value}>
       {children}
     </ClassifierStatusContext.Provider>
   );
