@@ -1,4 +1,5 @@
 // ignore-no-logs
+import { fromError } from "stacktrace-js";
 import { AlertType } from "./enums";
 
 /* 
@@ -7,7 +8,7 @@ import { AlertType } from "./enums";
 export const getStackTraceFromError = async (error: Error): Promise<string> => {
   let stacktrace = error.stack ? error.stack : "";
   try {
-    const stackFrames = await StackTrace.fromError(error);
+    const stackFrames = await fromError(error);
     stacktrace = stackFrames
       .map((stackFrame) => stackFrame.toString())
       .join("\n");
