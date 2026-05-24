@@ -183,7 +183,7 @@ export const useFitClassifier = () => {
       ...inferenceUpdates,
     ];
     try {
-      await cfApi.prepareModel(
+      const result = await cfApi.prepareModel(
         model.name,
         trainingData,
         validationData,
@@ -193,6 +193,12 @@ export const useFitClassifier = () => {
         modelInfo.optimizerSettings,
         seed,
       );
+      if (!result.success) {
+        throw new Error(
+          `[prepareContinuedRun: prepareModel] ${result.reason.code}: ${result.reason.message}`,
+          { cause: result.reason.cause },
+        );
+      }
     } catch (error) {
       throw new Error("Model Preparation Error", { cause: error });
     }
@@ -217,22 +223,20 @@ export const useFitClassifier = () => {
     const seed = userDefinedSeed ?? Math.floor(Math.random() * 1000);
     const cfApi = ClassifierApi.getInstance();
     try {
-      const result = await cfApi.createNewModel(
-        modelName,
-        kindClassifier.newModelArch,
-        seed,
-      );
+      const result = await cfApi.getModelInfo(modelName);
       if (result.success) {
         model = result.data;
       } else {
         console.error(
-          `[fitClassifier: ${newModelName}] ${result.reason.code}: ${result.reason.message}`,
+          `[fitClassifier: ${modelName}] ${result.reason.code}: ${result.reason.message}`,
           result.reason.cause,
         );
         throw new Error("ModelRetrievalError", { cause: result.reason.cause });
       }
     } catch (error) {
-      throw new Error("Model Generation Error", { cause: error });
+      throw new Error("Model Generation Error", {
+        cause: error,
+      });
     }
 
     // if the class map is not set, we need to get it from the user
@@ -280,25 +284,59 @@ export const useFitClassifier = () => {
       validationFingerprint !== lastRun?.validationFingerprint;
     const classes = Object.values(classMap).map((id) => ({ id }));
     if (!model.trainingLoaded) {
-      await cfApi.loadData(
+      const result = await cfApi.loadData(
         model.name,
         trainingData,
         validationData,
         classes,
         seed,
       );
+      if (!result.success) {
+        throw new Error(
+          `[prepareContinuedRun: loadData] ${result.reason.code}: ${result.reason.message}`,
+          { cause: result.reason.cause },
+        );
+      }
     } else if (trainingChanged && validationChanged) {
-      await cfApi.loadData(
+      const result = await cfApi.loadData(
         model.name,
         trainingData,
         validationData,
         classes,
         seed,
       );
+      if (!result.success) {
+        throw new Error(
+          `[prepareContinuedRun: loadData] ${result.reason.code}: ${result.reason.message}`,
+          { cause: result.reason.cause },
+        );
+      }
     } else if (trainingChanged) {
-      await cfApi.loadTraining(model.name, trainingData, classes, seed);
+      const result = await cfApi.loadTraining(
+        model.name,
+        trainingData,
+        classes,
+        seed,
+      );
+      if (!result.success) {
+        throw new Error(
+          `[prepareContinuedRun: loadTraining] ${result.reason.code}: ${result.reason.message}`,
+          { cause: result.reason.cause },
+        );
+      }
     } else if (validationChanged) {
-      await cfApi.loadValidation(model.name, validationData, classes, seed);
+      const result = await cfApi.loadValidation(
+        model.name,
+        validationData,
+        classes,
+        seed,
+      );
+      if (!result.success) {
+        throw new Error(
+          `[prepareContinuedRun: loadValidation] ${result.reason.code}: ${result.reason.message}`,
+          { cause: result.reason.cause },
+        );
+      }
     }
 
     return {
@@ -493,6 +531,12 @@ export const useFitClassifier = () => {
             status: trainingResults.data.status,
             evalResults: trainingResults.data.evalResults,
             weightsRef: trainingResults.data.weightsRef,
+          }),
+        );
+        dispatch(
+          classifierSlice.actions.setModelTrained({
+            targetId: modelTarget,
+            modelName: initializedModelName,
           }),
         );
       } else {

@@ -95,11 +95,17 @@ export const usePredictClassifier = () => {
     );
 
     try {
-      await cfApi.loadInference(
+      const result = await cfApi.loadInference(
         modelName,
         unlabeledItems.map(toInferenceInput),
         [],
       );
+      if (!result.success) {
+        throw new Error(
+          `[predictClassifier: loadInference] ${result.reason.code}: ${result.reason.message}`,
+          { cause: result.reason.cause },
+        );
+      }
     } catch (error) {
       handleError(error as Error, "Data Preparation Error");
       return;

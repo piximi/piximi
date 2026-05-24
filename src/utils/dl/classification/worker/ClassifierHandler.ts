@@ -331,9 +331,19 @@ export class ClassifierHandler implements IClassifierApi {
         `No model registered with name "${modelName}"`,
       );
 
+    // `callbacks` arrives across the worker boundary as a Comlink remote
+    // proxy. Passing it straight to TFJS breaks: TFJS duck-types
+    // CustomCallbackArgs by reading hook names, and every property access
+    // on a Comlink proxy returns a callable proxy — so TFJS invokes hooks
+    // the main thread doesn't implement and crashes inside Comlink's
+    // request handler with `undefined.apply(...)`. Re-expose only the
+    // hooks declared by TrainingCallbacks via a plain object.
+    const localCallbacks: TrainingCallbacks = {
+      onEpochEnd: (epoch, logs) => callbacks.onEpochEnd(epoch, logs),
+    };
     let trainingResults;
     try {
-      trainingResults = await model.train(options, callbacks);
+      trainingResults = await model.train(options, localCallbacks);
       import.meta.env.NODE_ENV !== "production" &&
         import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
         logger(model.currentFitHistory);

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -11,6 +11,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+
+import { useClassificationModel } from "hooks";
 
 import { StyledSelect } from "components/inputs/StyledSelect";
 import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
@@ -29,9 +31,10 @@ import {
   selectKindClassifier,
 } from "store/classifier/selectors";
 
-import type { SequentialClassifier } from "utils/dl/classification/models";
 import { findReplicateName } from "utils/stringUtils";
-import type { ModelArch } from "utils/dl/classification/types";
+import type { ModelArch, ModelInfoDTO } from "utils/dl/classification/types";
+import { ClassifierApi } from "utils/dl/classification";
+import { logger } from "utils/logUtils";
 
 export const ModelPicker = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
@@ -39,14 +42,8 @@ export const ModelPicker = () => {
     selectKindClassifier,
     modelTarget,
   );
+  const activeModel = useClassificationModel();
 
-  const activeModel = useMemo(
-    () =>
-      kindClassifierInfo?.activeModel
-        ? classifierHandler.getModel(kindClassifierInfo.activeModel)
-        : undefined,
-    [kindClassifierInfo?.activeModel],
-  );
   if (!kindClassifierInfo) return null;
   return (
     <Box py={2}>
@@ -186,12 +183,39 @@ const ModelArchiitectureOptions = ({
 const PretrainedModelOptions = ({
   activeModel,
 }: {
-  activeModel: SequentialClassifier;
+  activeModel: ModelInfoDTO | undefined;
 }) => {
+  const dispatch = useDispatch();
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const { shouldWarnClearPredictions } = useClassifierStatus();
 
-  const handleDisposeModel = () => {
-    activeModel.dispose();
+  const handleDisposeModel = async () => {
+    if (!activeModel) return;
+    const cfApi = ClassifierApi.getInstance();
+    const result = await cfApi.removeModel(activeModel.name);
+    if (result.success) {
+      logger(`Successfully removed ${activeModel.name}`);
+    } else {
+      console.error(
+        `[dispose model: ${activeModel.name}] ${result.reason.code}: ${result.reason.message}`,
+        result.reason.cause,
+      );
+    }
+    /*
+     * Even if dispose fails in the worker, still want to remove model as an option for selection
+     * TODO: Determine if this is the best course of action
+     * */
+    dispatch(
+      classifierSlice.actions.setActiveModel({
+        targetId: modelTarget,
+        modelName: undefined,
+      }),
+    );
+    dispatch(
+      classifierSlice.actions.removeModelInfo({
+        modelName: activeModel.name,
+      }),
+    );
   };
   return (
     <Stack

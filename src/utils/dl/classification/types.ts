@@ -92,9 +92,9 @@ export type RunTrigger = "fresh" | "continue" | "hitl-correction" | "import";
 // activity: Loading | Training | Idle | Pending). This tracks lifecycle/validity.
 export type ModelLifecycleStatus =
   | "idle"
+  | "loading"
   | "training"
   | "waiting"
-  | "loading"
   | "predicting"
   | "evaluating";
 
@@ -134,6 +134,7 @@ export type ModelInfo = {
   runs: Run[];
   valid: boolean;
   initSeed?: number;
+  trained?: boolean;
 };
 /*
  * Interface

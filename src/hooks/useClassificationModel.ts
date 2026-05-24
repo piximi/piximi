@@ -8,16 +8,16 @@ import { ModelInfoDTO } from "utils/dl/classification/types";
 
 export const useClassificationModel = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const activeClassifier = useParameterizedSelector(
+  const activeModelName = useParameterizedSelector(
     selectActiveModelName,
     modelTarget,
   );
   const [modelInfo, setModelInfo] = useState<ModelInfoDTO>();
   useEffect(() => {
-    if (!activeClassifier) return;
+    if (!activeModelName) return;
     let cancelled = false;
     ClassifierApi.getInstance()
-      .getModelInfo(activeClassifier)
+      .getModelInfo(activeModelName)
       .then((result) => {
         if (cancelled) return;
         if (result.success) {
@@ -32,6 +32,6 @@ export const useClassificationModel = () => {
     return () => {
       cancelled = true;
     };
-  }, [activeClassifier]);
+  }, [activeModelName]);
   return modelInfo;
 };

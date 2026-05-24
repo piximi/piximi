@@ -231,9 +231,6 @@ export const ClassifierStatusProvider = ({
     selectShowClearPredictionsWarning,
   );
   const restrictedClassifierNames = useSelector(selectAllCreatedModelNames);
-  useEffect(() => {
-    console.log(restrictedClassifierNames);
-  }, [restrictedClassifierNames]);
 
   const {
     modelParams,
@@ -277,10 +274,6 @@ export const ClassifierStatusProvider = ({
     () => Object.values(precheck).every((b) => b),
     [precheck],
   );
-
-  console.log(isReady);
-  console.log(modelConfig);
-  console.log(precheck);
 
   const shouldWarnClearPredictions = useMemo(() => {
     return showClearPredictionsWarning && !precheck.noPendingPredictions;

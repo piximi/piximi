@@ -103,9 +103,7 @@ export class ClassifierApi implements IClassifierApi {
 
   // ---- training ----
   async train(name: string, options: FitOptions, callbacks: TrainingCallbacks) {
-    return this.backend.train(name, options, {
-      onEpochEnd: Comlink.proxy(callbacks.onEpochEnd),
-    });
+    return this.backend.train(name, options, Comlink.proxy(callbacks));
   }
   cancelTraining(name: string) {
     return this.backend.cancelTraining(name);
@@ -144,36 +142,3 @@ export class ClassifierApi implements IClassifierApi {
     return this.backend.getZippedModelsBuffer();
   }
 }
-
-type AnyModel = any;
-const memoModelProxies = new Map<string, AnyModel>();
-function makeModelProxy(name: string): AnyModel {
-  if (memoModelProxies.has(name)) return memoModelProxies.get(name);
-  const p: AnyModel = new Proxy(
-    {},
-    {
-      get(_t, prop: string) {
-        if (prop === "name") return name;
-        // Block any sync field reads — they would silently return undefined.
-        throw new Error(
-          `classifierHandler.getModel(...).${prop} is no longer valid; use getModelInfo() in a hook. PR 1 transitional shim — should be unreachable after PR 6.`,
-        );
-      },
-    },
-  );
-  memoModelProxies.set(name, p);
-  return p;
-}
-ClassifierApi.getInstance().getModelInfo = (name: string) =>
-  makeModelProxy(name);
-
-(ClassifierApi.getInstance() as any).availableClassificationModels = new Proxy(
-  {},
-  {
-    get(_t, _p) {
-      throw new Error(
-        "availableClassificationModels is removed — use getModelNames()/getModelInfo()",
-      );
-    },
-  },
-);

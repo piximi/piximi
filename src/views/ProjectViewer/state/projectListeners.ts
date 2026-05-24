@@ -7,6 +7,8 @@ import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { measurementsSlice } from "store/measurements";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 
+import { ClassifierApi } from "utils/dl/classification";
+
 import { projectSlice } from "./projectSlice";
 
 export const projectMiddleware = createListenerMiddleware();
@@ -26,7 +28,8 @@ startAppListening({
 
 startAppListening({
   actionCreator: projectSlice.actions.resetProject,
-  effect: () => {
-    classifierHandler.removeAllModels();
+  effect: async () => {
+    const cfApi = ClassifierApi.getInstance();
+    await cfApi.removeAllModels();
   },
 });

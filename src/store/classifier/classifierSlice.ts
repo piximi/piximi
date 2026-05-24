@@ -239,6 +239,20 @@ export const classifierSlice = createSlice({
       run.weightsRef = action.payload.weightsRef;
       kc.status = "idle";
     },
+    setModelTrained(
+      state,
+      action: PayloadAction<{
+        targetId: string;
+        modelName: string;
+      }>,
+    ) {
+      const { targetId, modelName } = action.payload;
+      const kc = state.kindClassifiers[targetId];
+      if (!kc) return;
+      const model = kc.modelInfoDict[modelName];
+      if (!model) return;
+      model.trained = true;
+    },
     setModelStatus(
       state,
       action: PayloadAction<{

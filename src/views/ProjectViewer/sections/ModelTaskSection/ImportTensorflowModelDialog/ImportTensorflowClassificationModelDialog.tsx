@@ -67,7 +67,7 @@ export const ImportTensorflowClassificationModelDialog = ({
     for (const model of uploadedModels) {
       const result = await cfApi.removeModel(model.name);
       if (result.success) {
-        logger(`successfully removed ${result.data}`);
+        logger(`sucessfully removed ${result.data}`);
       } else {
         console.error(
           `[cancelUpload: ${model.name}] ${result.reason.code}: ${result.reason.message}`,

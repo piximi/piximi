@@ -84,9 +84,9 @@ export const useEvaluateClassifier = () => {
             }),
           );
         } else {
-          console.error(
+          throw new Error(
             `[evaluateClassifier: ${modelName}] ${evalResult.reason.code}: ${evalResult.reason.message}`,
-            evalResult.reason.cause,
+            { cause: evalResult.reason.cause },
           );
         }
       } catch (error) {

@@ -14,7 +14,6 @@ import { FileOpen as FileOpenIcon } from "@mui/icons-material";
 import { isObjectEmpty } from "utils/objectUtils";
 import type { ModelInfoDTO } from "utils/dl/classification/types";
 import { ClassifierApi } from "utils/dl/classification";
-import { logger } from "utils/logUtils";
 
 //TODO: MenuItem??
 
@@ -50,7 +49,6 @@ export const LocalClassifierUpload = ({
       const zipFile = await new JSZip().loadAsync(file);
       const result = await cfApi.modelsFromZipBuffer(zipFile);
       if (result.success) {
-        logger(`sucessfully uploaded ${result.data.loadedModels[0].name}`);
         results = result.data;
       } else {
         console.error(

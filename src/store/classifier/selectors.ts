@@ -104,6 +104,10 @@ export const selectModelIsValid = createSelector(
   selectModelInfo,
   (info): boolean | undefined => info?.valid,
 );
+export const selectModelIsTrained = createSelector(
+  selectModelInfo,
+  (info): boolean | undefined => info?.trained,
+);
 export const selectModelPreprocessSettings = createSelector(
   selectModelInfo,
   (info) => info?.preprocessSettings,
