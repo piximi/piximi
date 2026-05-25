@@ -8,9 +8,10 @@ import {
   IconButton,
   MenuItem,
   Stack,
+  Tooltip,
 } from "@mui/material";
 
-import { useClassificationModel, useNumberField } from "hooks";
+import { useNumberField } from "hooks";
 
 import { FunctionalDivider } from "components/ui";
 import { StyledSelect, WithLabel } from "components/inputs";
@@ -22,13 +23,16 @@ import { enumKeys } from "utils/objectUtils";
 import { LossFunction, OptimizationAlgorithm } from "utils/dl/enums";
 
 import { ModelSettingsTextField } from "../../ModelSettingsTextField";
+import { isFieldLocked, lockReason } from "../settingsLock";
 
-export const OptimizationSettings = () => {
-  const modelConfig = useClassificationModel();
+import type { SettingsProps } from "../props";
+
+export const OptimizationSettings = ({ isTraining }: SettingsProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const { trainable, handleUpdateOptimizerSettings, modelParams } =
+  const { handleUpdateOptimizerSettings, modelParams, modelIsTrained } =
     useClassifierStatus();
+
   const compileOptions = useMemo(() => {
     return modelParams.optimizerSettings;
   }, [modelParams]);
@@ -80,69 +84,112 @@ export const OptimizationSettings = () => {
       />
       <Collapse in={showAdvanced}>
         <Stack sx={{ pl: 2 }} spacing={2}>
-          <WithLabel
-            data-help={HelpItem.OptimizationAlgorithm}
-            label="Optimization Algorithm:"
-            labelProps={{
-              variant: "body2",
-              sx: { mr: "1rem", whiteSpace: "nowrap" },
-            }}
+          <Tooltip
+            title={lockReason("optimizationAlgorithm", isTraining)}
+            disableHoverListener={
+              !isFieldLocked(
+                "optimizationAlgorithm",
+                isTraining,
+                modelIsTrained,
+              )
+            }
           >
-            <StyledSelect
-              value={compileOptions.optimizationAlgorithm}
-              onChange={handleOptimizationAlgorithmChange}
-              fullWidth
-              disabled={!!modelConfig}
-            >
-              {enumKeys(OptimizationAlgorithm).map((k) => {
-                return (
-                  <MenuItem key={k} value={OptimizationAlgorithm[k]} dense>
-                    {OptimizationAlgorithm[k]}
-                  </MenuItem>
-                );
-              })}
-            </StyledSelect>
-          </WithLabel>
-          <WithLabel
-            data-help={HelpItem.LossFunction}
-            label="Loss Function:"
-            labelProps={{
-              variant: "body2",
-              sx: { mr: "1rem", whiteSpace: "nowrap" },
-            }}
+            <span>
+              <WithLabel
+                data-help={HelpItem.OptimizationAlgorithm}
+                label="Optimization Algorithm:"
+                labelProps={{
+                  variant: "body2",
+                  sx: { mr: "1rem", whiteSpace: "nowrap" },
+                }}
+              >
+                <StyledSelect
+                  value={compileOptions.optimizationAlgorithm}
+                  onChange={handleOptimizationAlgorithmChange}
+                  fullWidth
+                  disabled={isFieldLocked(
+                    "optimizationAlgorithm",
+                    isTraining,
+                    modelIsTrained,
+                  )}
+                >
+                  {enumKeys(OptimizationAlgorithm).map((k) => {
+                    return (
+                      <MenuItem key={k} value={OptimizationAlgorithm[k]} dense>
+                        {OptimizationAlgorithm[k]}
+                      </MenuItem>
+                    );
+                  })}
+                </StyledSelect>
+              </WithLabel>
+            </span>
+          </Tooltip>
+          <Tooltip
+            title={lockReason("lossFunction", isTraining)}
+            disableHoverListener={
+              !isFieldLocked("lossFunction", isTraining, modelIsTrained)
+            }
           >
-            <StyledSelect
-              value={compileOptions.lossFunction}
-              onChange={handleLossFunctionChange}
-              sx={{ maxWidth: "max-content" }}
-              disabled={!!modelConfig}
-            >
-              {enumKeys(LossFunction).map((k) => {
-                return (
-                  <MenuItem key={k} value={LossFunction[k]} dense>
-                    {LossFunction[k]}
-                  </MenuItem>
-                );
-              })}
-            </StyledSelect>
-          </WithLabel>
-          <WithLabel
-            data-help={HelpItem.LearningRate}
-            label="Learning Rate :"
-            labelProps={{
-              variant: "body2",
-              sx: { mr: "1rem", whiteSpace: "nowrap" },
-            }}
+            <span>
+              <WithLabel
+                data-help={HelpItem.LossFunction}
+                label="Loss Function:"
+                labelProps={{
+                  variant: "body2",
+                  sx: { mr: "1rem", whiteSpace: "nowrap" },
+                }}
+              >
+                <StyledSelect
+                  value={compileOptions.lossFunction}
+                  onChange={handleLossFunctionChange}
+                  sx={{ maxWidth: "max-content" }}
+                  disabled={isFieldLocked(
+                    "lossFunction",
+                    isTraining,
+                    modelIsTrained,
+                  )}
+                >
+                  {enumKeys(LossFunction).map((k) => {
+                    return (
+                      <MenuItem key={k} value={LossFunction[k]} dense>
+                        {LossFunction[k]}
+                      </MenuItem>
+                    );
+                  })}
+                </StyledSelect>
+              </WithLabel>
+            </span>
+          </Tooltip>
+          <Tooltip
+            title={lockReason("learningRate", isTraining)}
+            disableHoverListener={
+              !isFieldLocked("learningRate", isTraining, modelIsTrained)
+            }
           >
-            <ModelSettingsTextField
-              id="learning-rate"
-              size="small"
-              onChange={handleLearningRateChange}
-              value={learningRateDisplay}
-              onBlur={dispatchLearningRate}
-              disabled={!!modelConfig || !trainable}
-            />
-          </WithLabel>
+            <span>
+              <WithLabel
+                data-help={HelpItem.LearningRate}
+                label="Learning Rate :"
+                labelProps={{
+                  variant: "body2",
+                  sx: { mr: "1rem", whiteSpace: "nowrap" },
+                }}
+              >
+                <ModelSettingsTextField
+                  id="learning-rate"
+                  size="small"
+                  onChange={handleLearningRateChange}
+                  value={learningRateDisplay}
+                  onBlur={dispatchLearningRate}
+                  disabled={isFieldLocked(
+                    "learningRate",
+                    isTraining,
+                    modelIsTrained,
+                  )}
+                />
+              </WithLabel>
+            </span>
+          </Tooltip>
         </Stack>
       </Collapse>
     </Grid>

@@ -1,9 +1,15 @@
 import { useMemo, useState } from "react";
 
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import { Collapse, Grid2 as Grid, IconButton, Stack } from "@mui/material";
+import {
+  Collapse,
+  Grid2 as Grid,
+  IconButton,
+  Stack,
+  Tooltip,
+} from "@mui/material";
 
-import { useClassificationModel, useNumberField } from "hooks";
+import { useNumberField } from "hooks";
 
 import { FunctionalDivider } from "components/ui";
 import { WithLabel } from "components/inputs";
@@ -11,14 +17,15 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
+import { isFieldLocked, lockReason } from "../settingsLock";
 import { ModelSettingsTextField } from "../../ModelSettingsTextField";
 
-export const TrainingStrategySettings = () => {
-  const modelConfig = useClassificationModel();
+import type { SettingsProps } from "../props";
 
+export const TrainingStrategySettings = ({ isTraining }: SettingsProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const { trainable, handleUpdateOptimizerSettings, modelParams } =
+  const { handleUpdateOptimizerSettings, modelParams, modelIsTrained } =
     useClassifierStatus();
 
   const fitOptions = useMemo(() => {
@@ -77,41 +84,63 @@ export const TrainingStrategySettings = () => {
 
       <Stack sx={{ pl: 2 }}>
         <Stack direction="row" gap={2} sx={{ pt: 1 }}>
-          <WithLabel
-            data-help={HelpItem.Epochs}
-            label="Epochs:"
-            labelProps={{
-              variant: "body2",
-              sx: { mr: "1rem", whiteSpace: "nowrap" },
-            }}
+          <Tooltip
+            title={lockReason("epochs", isTraining)}
+            disableHoverListener={
+              !isFieldLocked("epochs", isTraining, modelIsTrained)
+            }
           >
-            <ModelSettingsTextField
-              id="epochs"
-              size="small"
-              onChange={handleNumEpochsChange}
-              value={numEpochsDisplay}
-              onBlur={dispatchNumEpochs}
-              disabled={!!modelConfig || !trainable}
-            />
-          </WithLabel>
+            <span>
+              <WithLabel
+                data-help={HelpItem.Epochs}
+                label="Epochs:"
+                labelProps={{
+                  variant: "body2",
+                  sx: { mr: "1rem", whiteSpace: "nowrap" },
+                }}
+              >
+                <ModelSettingsTextField
+                  id="epochs"
+                  size="small"
+                  onChange={handleNumEpochsChange}
+                  value={numEpochsDisplay}
+                  onBlur={dispatchNumEpochs}
+                  disabled={isFieldLocked("epochs", isTraining, modelIsTrained)}
+                />
+              </WithLabel>
+            </span>
+          </Tooltip>
           <Collapse in={showAdvanced}>
-            <WithLabel
-              data-help={HelpItem.BatchSize}
-              label="Batch Size:"
-              labelProps={{
-                variant: "body2",
-                sx: { mr: "1rem", whiteSpace: "nowrap" },
-              }}
+            <Tooltip
+              title={lockReason("batchSize", isTraining)}
+              disableHoverListener={
+                !isFieldLocked("batchSize", isTraining, modelIsTrained)
+              }
             >
-              <ModelSettingsTextField
-                id="batch-size"
-                size="small"
-                onChange={handleBatchSizeChange}
-                value={batchSizeDisplay}
-                onBlur={dispatchBatchSize}
-                disabled={!!modelConfig || !trainable}
-              />
-            </WithLabel>
+              <span>
+                <WithLabel
+                  data-help={HelpItem.BatchSize}
+                  label="Batch Size:"
+                  labelProps={{
+                    variant: "body2",
+                    sx: { mr: "1rem", whiteSpace: "nowrap" },
+                  }}
+                >
+                  <ModelSettingsTextField
+                    id="batch-size"
+                    size="small"
+                    onChange={handleBatchSizeChange}
+                    value={batchSizeDisplay}
+                    onBlur={dispatchBatchSize}
+                    disabled={isFieldLocked(
+                      "batchSize",
+                      isTraining,
+                      modelIsTrained,
+                    )}
+                  />
+                </WithLabel>
+              </span>
+            </Tooltip>
           </Collapse>
         </Stack>
       </Stack>

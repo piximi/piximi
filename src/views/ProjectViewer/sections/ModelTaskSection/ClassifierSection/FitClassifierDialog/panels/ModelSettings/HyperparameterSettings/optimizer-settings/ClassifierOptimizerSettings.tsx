@@ -14,7 +14,8 @@ import { TrainingStrategySettings } from "./TrainingStrategySettings";
 
 export const ClassifierOptimizerSettings = () => {
   const labeledThingsCount = useSelector(selectTotalActiveLabeledItems);
-  const { modelParams } = useClassifierStatus();
+  const { modelParams, classifierStatus } = useClassifierStatus();
+
   const fitOptions = useMemo(() => {
     return modelParams.optimizerSettings;
   }, [modelParams]);
@@ -57,8 +58,8 @@ export const ClassifierOptimizerSettings = () => {
 
   return (
     <Grid container spacing={2} padding={2}>
-      <TrainingStrategySettings />
-      <OptimizationSettings />
+      <TrainingStrategySettings isTraining={classifierStatus === "training"} />
+      <OptimizationSettings isTraining={classifierStatus === "training"} />
     </Grid>
   );
 };

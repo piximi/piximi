@@ -16,7 +16,9 @@ import { useClassificationModel } from "hooks";
 
 import {
   selectAllCreatedModelNames,
+  selectIsModelTrained,
   selectModelIsValid,
+  selectModelLifecycleStatus,
   selectModelOptimizerSettings,
   selectModelPreprocessSettings,
 } from "store/classifier/selectors";
@@ -38,6 +40,7 @@ import { findReplicateName, representsUnknown } from "utils/stringUtils";
 import { getDefaultModelParams } from "utils/dl/classification/utils";
 import type {
   ClassifierModelParams,
+  ModelLifecycleStatus,
   OptimizerSettings,
   PreprocessSettings,
 } from "utils/dl/classification/types";
@@ -71,6 +74,8 @@ type ClassifierStateContextProp = {
   isReady: boolean;
   precheck: Precheck;
   shouldWarnClearPredictions: boolean;
+  modelIsTrained: boolean;
+  classifierStatus: ModelLifecycleStatus;
   error?: ErrorContext;
   activeErrors: ErrorContext[];
   newModelName: string;
@@ -97,6 +102,8 @@ const ClassifierStatusContext = createContext<ClassifierStateContextProp>({
     modelNameValid: false,
   },
   shouldWarnClearPredictions: false,
+  modelIsTrained: false,
+  classifierStatus: "idle",
   newModelName: "",
   setNewModelName: (_value: React.SetStateAction<string>) => {},
   activeErrors: [],
@@ -225,6 +232,14 @@ export const ClassifierStatusProvider = ({
     selectActiveItemsByPartition,
     Partition.Inference,
   );
+  const modelIsTrained = useParameterizedSelector(
+    selectIsModelTrained,
+    modelTarget,
+  );
+  const classifierStatus = useParameterizedSelector(
+    selectModelLifecycleStatus,
+    modelTarget,
+  );
   const activeLabeledItems = useSelector(selectActiveLabeledItems);
   const projectChannels = useSelector(selectProjectImageChannels);
   const showClearPredictionsWarning = useSelector(
@@ -248,7 +263,7 @@ export const ClassifierStatusProvider = ({
     () => ({
       modelTrainable: !modelConfig || modelConfig.trainable,
       modelValid: modelIsValid === undefined ? true : modelIsValid,
-      labeledImages: !!activeLabeledItems.length,
+      labeledImages: activeLabeledItems.length > 0,
       noPendingPredictions: inferenceItems.every((item) =>
         representsUnknown(item.categoryId),
       ),
@@ -268,8 +283,12 @@ export const ClassifierStatusProvider = ({
       newModelName,
       restrictedClassifierNames,
       modelIsValid,
+      activeLabeledItems,
+      classifierStatus,
+      modelIsTrained,
     ],
   );
+
   const isReady = useMemo(
     () => Object.values(precheck).every((b) => b),
     [precheck],
@@ -337,6 +356,8 @@ export const ClassifierStatusProvider = ({
       isReady,
       precheck,
       shouldWarnClearPredictions,
+      modelIsTrained,
+      classifierStatus,
       error,
       newModelName,
       setNewModelName,

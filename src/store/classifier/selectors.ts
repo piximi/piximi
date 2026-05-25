@@ -65,6 +65,14 @@ export const selectModelLifecycleStatus = createSelector(
   selectKindClassifier,
   (kc): ModelLifecycleStatus => kc.status,
 );
+export const selectIsModelTrained = createSelector(
+  selectKindClassifier,
+  (kc) => {
+    const activeModel = kc.activeModel;
+    if (!activeModel) return false;
+    return !!kc.modelInfoDict[activeModel].trained;
+  },
+);
 export const selectActiveSoftmaxById = createSelector(
   selectKindClassifier,
   (kc): SoftmaxById | undefined => kc.activeSoftmaxById,

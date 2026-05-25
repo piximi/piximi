@@ -5,21 +5,35 @@ import type {
 
 export type SettingsType = "architecture" | "integrity" | "tunable";
 
+type TrainingSetting = keyof PreprocessSettings | keyof OptimizerSettings;
+const settingTierLookup: Record<TrainingSetting, SettingsType> = {
+  inputShape: "architecture",
+  lossFunction: "integrity",
+  metrics: "integrity",
+  batchSize: "integrity",
+  shuffle: "integrity",
+  normalizeOptions: "integrity",
+  cropOptions: "integrity",
+  trainingPercentage: "integrity",
+  learningRate: "tunable",
+  optimizationAlgorithm: "tunable",
+  epochs: "tunable",
+};
+
 export const isFieldLocked = (
-  tier: SettingsType,
-  lifecycleStatus: ModelLifecycleStatus,
+  setting: TrainingSetting,
+  isTraining: boolean,
   pretrained: boolean,
 ): boolean => {
-  if (lifecycleStatus === "training") return true; // anything in flight is locked
+  const tier = settingTierLookup[setting];
+  if (isTraining) return true; // anything in flight is locked
   if (tier === "architecture" || tier === "integrity") return pretrained;
   return false; // tunable fields editable across runs
 };
 
-export const lockReason = (
-  tier: SettingsType,
-  lifecycleStatus: ModelLifecycleStatus,
-) => {
-  if (lifecycleStatus === "training")
+export const lockReason = (setting: TrainingSetting, isTraining: boolean) => {
+  const tier = settingTierLookup[setting];
+  if (isTraining)
     return "Wait for training to complete before editing parameters"; // anything in flight is locked
   if (tier === "architecture")
     return "Architecture settings can not be changed from initial values";

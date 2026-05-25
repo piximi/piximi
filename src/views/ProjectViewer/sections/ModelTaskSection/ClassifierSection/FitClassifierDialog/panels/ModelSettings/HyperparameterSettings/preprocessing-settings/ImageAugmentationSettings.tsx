@@ -12,6 +12,7 @@ import {
   IconButton,
   MenuItem,
   Stack,
+  Tooltip,
 } from "@mui/material";
 
 import { useClassificationModel, useNumberField } from "hooks";
@@ -27,9 +28,18 @@ import { CropSchema } from "utils/dl/enums";
 import type { CropOptions, NormalizeOptions } from "utils/dl/types";
 
 import { ModelSettingsTextField } from "../../ModelSettingsTextField";
+import { isFieldLocked, lockReason } from "../settingsLock";
+
+import type { SettingsProps } from "../props";
 
 const RowColInputOptions = { min: 20 };
-const InputShapeField = ({ disabled }: { disabled: boolean }) => {
+const InputShapeField = ({
+  disabled,
+  isTraining,
+}: {
+  disabled: boolean;
+  isTraining: boolean;
+}) => {
   const modelConfig = useClassificationModel();
   const { handleUpdateInputShape, modelParams } = useClassifierStatus();
 
@@ -104,55 +114,66 @@ const InputShapeField = ({ disabled }: { disabled: boolean }) => {
   };
 
   return (
-    <FormControl
-      size="small"
-      sx={{ flexDirection: "row", alignItems: "center", pt: 1 }}
-      fullWidth
+    <Tooltip
+      title={lockReason("inputShape", isTraining)}
+      disableHoverListener={!disabled}
     >
-      <FormLabel
-        data-help={HelpItem.InputShape}
-        sx={(theme) => ({
-          fontSize: theme.typography.body2.fontSize,
-          mr: "1rem",
-          whiteSpace: "nowrap",
-        })}
+      <FormControl
+        size="small"
+        sx={{ flexDirection: "row", alignItems: "center", pt: 1 }}
+        fullWidth
       >
-        Input Shape:
-      </FormLabel>
-      <Stack direction="row" gap={2}>
-        <ModelSettingsTextField
-          id="shape-cols"
-          size="small"
-          label="Col"
-          onChange={handleInputColsChange}
-          value={inputColsDisplay}
-          onBlur={handleBlurDispatch}
-          disabled={disabled}
-        />
-        <ModelSettingsTextField
-          id="shape-rows"
-          size="small"
-          label="Row"
-          onChange={handleInputRowsChange}
-          value={inputRowsDisplay}
-          onBlur={handleBlurDispatch}
-          disabled={disabled}
-        />
-        <ModelSettingsTextField
-          id="shape-channels"
-          size="small"
-          label="Ch."
-          onChange={handleInputChannelsChange}
-          value={inputChannelsDisplay}
-          onBlur={handleBlurDispatch}
-          disabled={disabled || fixedChannels}
-        />
-      </Stack>
-    </FormControl>
+        <FormLabel
+          data-help={HelpItem.InputShape}
+          sx={(theme) => ({
+            fontSize: theme.typography.body2.fontSize,
+            mr: "1rem",
+            whiteSpace: "nowrap",
+          })}
+        >
+          Input Shape:
+        </FormLabel>
+        <Stack direction="row" gap={2}>
+          <ModelSettingsTextField
+            id="shape-cols"
+            size="small"
+            label="Col"
+            onChange={handleInputColsChange}
+            value={inputColsDisplay}
+            onBlur={handleBlurDispatch}
+            disabled={disabled}
+          />
+          <ModelSettingsTextField
+            id="shape-rows"
+            size="small"
+            label="Row"
+            onChange={handleInputRowsChange}
+            value={inputRowsDisplay}
+            onBlur={handleBlurDispatch}
+            disabled={disabled}
+          />
+          <ModelSettingsTextField
+            id="shape-channels"
+            size="small"
+            label="Ch."
+            onChange={handleInputChannelsChange}
+            value={inputChannelsDisplay}
+            onBlur={handleBlurDispatch}
+            disabled={disabled || fixedChannels}
+          />
+        </Stack>
+      </FormControl>
+    </Tooltip>
   );
 };
 
-const CropSection = ({ disabled }: { disabled: boolean }) => {
+const CropSection = ({
+  disabled,
+  isTraining,
+}: {
+  disabled: boolean;
+  isTraining: boolean;
+}) => {
   const { handleUpdatePreprocessSettings, modelParams } = useClassifierStatus();
   const cropOptions = useMemo(() => {
     return modelParams.preprocessSettings.cropOptions;
@@ -192,55 +213,60 @@ const CropSection = ({ disabled }: { disabled: boolean }) => {
     }
   };
   return (
-    <Stack direction="row" gap={2}>
-      <WithLabel
-        data-help={HelpItem.CropOptions}
-        label="Crop Type:"
-        labelProps={{
-          variant: "body2",
-          sx: { mr: "1rem", whiteSpace: "nowrap" },
-        }}
-      >
-        <StyledSelect
-          value={cropOptions.cropSchema}
-          onChange={onCropSchemaChange}
-          disabled={disabled}
-          displayEmpty
-          inputProps={{ "aria-label": "Without label" }}
+    <Tooltip
+      title={lockReason("cropOptions", isTraining)}
+      disableHoverListener={!disabled}
+    >
+      <Stack direction="row" gap={2}>
+        <WithLabel
+          data-help={HelpItem.CropOptions}
+          label="Crop Type:"
+          labelProps={{
+            variant: "body2",
+            sx: { mr: "1rem", whiteSpace: "nowrap" },
+          }}
         >
-          {enumKeys(CropSchema).map((k) => {
-            return (
-              <MenuItem key={k} value={CropSchema[k]} dense>
-                {CropSchema[k]}
-              </MenuItem>
-            );
-          })}
-        </StyledSelect>
-      </WithLabel>
+          <StyledSelect
+            value={cropOptions.cropSchema}
+            onChange={onCropSchemaChange}
+            disabled={disabled}
+            displayEmpty
+            inputProps={{ "aria-label": "Without label" }}
+          >
+            {enumKeys(CropSchema).map((k) => {
+              return (
+                <MenuItem key={k} value={CropSchema[k]} dense>
+                  {CropSchema[k]}
+                </MenuItem>
+              );
+            })}
+          </StyledSelect>
+        </WithLabel>
 
-      <WithLabel
-        label="# of Crops:"
-        labelProps={{
-          variant: "body2",
-          sx: { mr: "1rem", whiteSpace: "nowrap" },
-        }}
-      >
-        <ModelSettingsTextField
-          size="small"
-          onChange={handleNumCropsChange}
-          value={numCropsDisplay}
-          onBlur={dispatchNumCrops}
-          disabled={cropDisabled || disabled}
-        />
-      </WithLabel>
-    </Stack>
+        <WithLabel
+          label="# of Crops:"
+          labelProps={{
+            variant: "body2",
+            sx: { mr: "1rem", whiteSpace: "nowrap" },
+          }}
+        >
+          <ModelSettingsTextField
+            size="small"
+            onChange={handleNumCropsChange}
+            value={numCropsDisplay}
+            onBlur={dispatchNumCrops}
+            disabled={cropDisabled || disabled}
+          />
+        </WithLabel>
+      </Stack>
+    </Tooltip>
   );
 };
-export const ImageAugmentationSettings = () => {
+export const ImageAugmentationSettings = ({ isTraining }: SettingsProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const modelConfig = useClassificationModel();
-  const { handleUpdatePreprocessSettings, modelParams } = useClassifierStatus();
+  const { handleUpdatePreprocessSettings, modelParams, modelIsTrained } =
+    useClassifierStatus();
 
   const normalizeOptions = useMemo(() => {
     return modelParams.preprocessSettings.normalizeOptions;
@@ -260,7 +286,6 @@ export const ImageAugmentationSettings = () => {
       normalize: !normalizeOptions.normalize,
     });
   };
-
   return (
     <Grid size={12}>
       <FunctionalDivider
@@ -277,33 +302,54 @@ export const ImageAugmentationSettings = () => {
       />
 
       <Stack sx={{ pl: 2 }} spacing={4}>
-        <InputShapeField disabled={!!modelConfig} />
+        <InputShapeField
+          disabled={isFieldLocked("inputShape", isTraining, modelIsTrained)}
+          isTraining={isTraining}
+        />
         <Collapse in={showAdvanced} style={{ marginTop: 0 }}>
           <Stack spacing={4} sx={{ mt: 4 }}>
-            <CropSection disabled={!rescalable || !!modelConfig} />
-            <FormControl size="small">
-              <FormControlLabel
-                data-help={HelpItem.PixelIntensityRescale}
-                sx={(theme) => ({
-                  fontSize: theme.typography.body2.fontSize,
-                  width: "max-content",
-                  ml: 0,
-                })}
-                control={
-                  <Checkbox
-                    checked={rescalable}
-                    onChange={onCheckboxChange}
-                    name="rescale"
-                    color="primary"
-                    size="small"
-                  />
-                }
-                label="Rescale pixel intensities:"
-                labelPlacement="start"
-                disableTypography
-                disabled={!!modelConfig}
-              />
-            </FormControl>
+            <CropSection
+              disabled={isFieldLocked(
+                "cropOptions",
+                isTraining,
+                modelIsTrained,
+              )}
+              isTraining={isTraining}
+            />
+            <Tooltip
+              title={lockReason("normalizeOptions", isTraining)}
+              disableHoverListener={
+                !isFieldLocked("normalizeOptions", isTraining, modelIsTrained)
+              }
+            >
+              <FormControl size="small">
+                <FormControlLabel
+                  data-help={HelpItem.PixelIntensityRescale}
+                  sx={(theme) => ({
+                    fontSize: theme.typography.body2.fontSize,
+                    width: "max-content",
+                    ml: 0,
+                  })}
+                  control={
+                    <Checkbox
+                      checked={rescalable}
+                      onChange={onCheckboxChange}
+                      name="rescale"
+                      color="primary"
+                      size="small"
+                    />
+                  }
+                  label="Rescale pixel intensities:"
+                  labelPlacement="start"
+                  disableTypography
+                  disabled={isFieldLocked(
+                    "normalizeOptions",
+                    isTraining,
+                    modelIsTrained,
+                  )}
+                />
+              </FormControl>
+            </Tooltip>
           </Stack>
         </Collapse>
       </Stack>
