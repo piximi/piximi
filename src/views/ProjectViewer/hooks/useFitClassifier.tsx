@@ -285,11 +285,11 @@ export const useFitClassifier = () => {
       validationFingerprint !== lastRun?.validationFingerprint;
     const classes = Object.values(classMap).map((id) => ({ id }));
 
-    const optimizerChanged = diffCompileSettings(
+    const optimizerDiff = diffCompileSettings(
       lastRun?.hyperparameters.optimizer,
       modelInfo.optimizerSettings,
     );
-    if (optimizerChanged) {
+    if (optimizerDiff.changed) {
       const result = await cfApi.recompile(
         model.name,
         modelInfo.optimizerSettings,

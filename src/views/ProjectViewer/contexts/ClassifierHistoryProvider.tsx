@@ -6,9 +6,18 @@ import { useSelector } from "react-redux";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectRunsForActiveModel } from "store/classifier/selectors";
+import { diffCompileSettings } from "@ProjectViewer/sections/ModelTaskSection/ClassifierSection/FitClassifierDialog/panels/ModelSettings/HyperparameterSettings/settingsLock";
 
 import type { Points } from "utils/types";
+import type { OptimizationAlgorithm } from "utils/dl/enums";
 
+export type RunDrift = {
+  epoch: number;
+  drift: {
+    optimizationAlgorithm?: [OptimizationAlgorithm, OptimizationAlgorithm];
+    learningRate?: [number, number];
+  };
+};
 type HistoryData = {
   categoricalAccuracy: Points;
   val_categoricalAccuracy: Points;
@@ -28,11 +37,13 @@ const ClassifierHistoryContext = createContext<{
   currentEpoch: number;
   totalEpochs: number;
   setTotalEpochs: React.Dispatch<React.SetStateAction<number>>;
+  runDrifts: RunDrift[];
 }>({
   modelHistory: initialModelHistory(),
   currentEpoch: 0,
   totalEpochs: 0,
   setTotalEpochs: (_value: React.SetStateAction<number>) => {},
+  runDrifts: [],
 });
 
 export const ClassifierHistoryProvider = ({
@@ -67,6 +78,38 @@ export const ClassifierHistoryProvider = ({
     return out;
   }, [previousRuns]);
 
+  const runDrifts = useMemo(() => {
+    const runDrifts: RunDrift[] = [];
+    let epochs = 0;
+    for (let runIdx = 0; runIdx < previousRuns.length; runIdx++) {
+      const curr = previousRuns[runIdx];
+      if (runIdx === 0) {
+        epochs += curr.history.length;
+        continue;
+      }
+      const prev = previousRuns[runIdx - 1];
+      const optimizerDiff = diffCompileSettings(
+        prev.hyperparameters.optimizer,
+        curr.hyperparameters.optimizer,
+      );
+      if (optimizerDiff.changed) {
+        runDrifts.push({
+          epoch: epochs + 0.5,
+          drift: {
+            optimizationAlgorithm: optimizerDiff.optimizationAlgorithm,
+            learningRate: optimizerDiff.learningRate,
+          },
+        });
+      }
+      epochs += curr.history.length;
+    }
+    return runDrifts;
+    // including only `previousRuns.length` as the deps means this wont refire if
+    // the `Run` object changes, only when a run is appended.
+    // this is ok since we only care about `hyperparameters.optimizer`
+    // and then never changes after the `Run` is added
+  }, [previousRuns.length]);
+
   const currentEpoch = modelHistory.val_categoricalAccuracy.length;
 
   return (
@@ -76,6 +119,7 @@ export const ClassifierHistoryProvider = ({
         currentEpoch,
         totalEpochs,
         setTotalEpochs,
+        runDrifts,
       }}
     >
       {children}

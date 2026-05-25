@@ -2,6 +2,7 @@ import type {
   OptimizerSettings,
   PreprocessSettings,
 } from "utils/dl/classification/types";
+import type { OptimizationAlgorithm } from "utils/dl/enums";
 
 export type SettingsType = "architecture" | "integrity" | "tunable";
 
@@ -44,14 +45,26 @@ export const lockReason = (setting: TrainingSetting, isTraining: boolean) => {
 export const diffCompileSettings = (
   prev: OptimizerSettings | undefined,
   curr: OptimizerSettings,
-): boolean => {
-  if (!prev) return false;
-  let changed: boolean = false;
-
+): {
+  changed: boolean;
+  optimizationAlgorithm?: [OptimizationAlgorithm, OptimizationAlgorithm];
+  learningRate?: [number, number];
+} => {
+  if (!prev) return { changed: false };
+  let optAlgChange: [OptimizationAlgorithm, OptimizationAlgorithm] | undefined =
+    undefined;
+  let learnRteChange: [number, number] | undefined = undefined;
   if (
-    prev.optimizationAlgorithm !== curr.optimizationAlgorithm ||
-    prev.learningRate !== curr.learningRate
+    prev.optimizationAlgorithm.toString() !==
+    curr.optimizationAlgorithm.toString()
   )
-    changed = true;
-  return changed;
+    optAlgChange = [prev.optimizationAlgorithm, curr.optimizationAlgorithm];
+  if (prev.learningRate !== curr.learningRate)
+    learnRteChange = [prev.learningRate, curr.learningRate];
+
+  return {
+    changed: !!optAlgChange || !!learnRteChange,
+    optimizationAlgorithm: optAlgChange,
+    learningRate: learnRteChange,
+  };
 };

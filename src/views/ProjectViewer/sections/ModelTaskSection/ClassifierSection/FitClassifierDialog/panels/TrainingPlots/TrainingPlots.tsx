@@ -5,7 +5,7 @@ import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryP
 import { TwoDataPlot } from "./TwoDataPlot";
 
 export const TrainingPlots = () => {
-  const { modelHistory } = useClassifierHistory();
+  const { modelHistory, runDrifts } = useClassifierHistory();
   return (
     <div>
       <TwoDataPlot
@@ -16,6 +16,7 @@ export const TrainingPlots = () => {
         id1="Accuracy"
         yData2={modelHistory.val_categoricalAccuracy}
         id2="Validation Accuracy"
+        runDrifts={runDrifts}
       />
 
       <TwoDataPlot
@@ -27,6 +28,7 @@ export const TrainingPlots = () => {
         yData2={modelHistory.val_loss}
         id2="Validation Loss"
         dynamicYRange={true}
+        runDrifts={runDrifts}
       />
     </div>
   );
