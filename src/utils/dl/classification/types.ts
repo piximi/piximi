@@ -291,6 +291,10 @@ export interface IClassifierApi {
     opt: OptimizerSettings,
     seed: number,
   ): Promise<ApiResult<void>>;
+  recompile(
+    modelName: string,
+    optimizerSettings: OptimizerSettings,
+  ): MaybePromise<ApiResult<string>>;
 
   // training
   train(

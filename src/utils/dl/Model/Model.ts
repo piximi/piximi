@@ -1,5 +1,7 @@
 import { io } from "@tensorflow/tfjs";
 
+import { createCompileArgs, isLayersModel } from "../classification/utils";
+
 import type {
   RunHistoryEpoch,
   ModelArgs,
@@ -114,7 +116,13 @@ export abstract class Model {
     runSeed: number,
   ): void;
   public abstract loadInference(items: any[], preprocessingArgs: any): void;
-
+  public recompile(optimizerSettings: OptimizerSettings) {
+    if (!this._model) throw new Error(`"${this.name}" Model not loaded`);
+    if (!isLayersModel(this._model))
+      throw new Error(`"${this.name}" Graph models cannot be recompiled.`);
+    this._model.compile(createCompileArgs(optimizerSettings));
+    this._optimizerSettings = optimizerSettings;
+  }
   public abstract train(options: any, callbacks: any): any;
   public abstract predict(options: any, callbacks: any): any;
   public abstract evaluate(): any;

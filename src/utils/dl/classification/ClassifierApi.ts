@@ -1,7 +1,12 @@
 // src/utils/dl/classification/classifierHandler.ts
 import * as Comlink from "comlink";
 
-import type { FitOptions, TrainingCallbacks, IClassifierApi } from "./types";
+import type {
+  FitOptions,
+  TrainingCallbacks,
+  IClassifierApi,
+  OptimizerSettings,
+} from "./types";
 import type JSZip from "jszip";
 import type { ClassifierHandler } from "./worker/ClassifierHandler";
 
@@ -99,6 +104,9 @@ export class ClassifierApi implements IClassifierApi {
     seed: number,
   ) {
     return this.backend.prepareModel(name, tr, va, n, cats, pp, opt, seed);
+  }
+  recompile(modelName: string, optimizerSettings: OptimizerSettings) {
+    return this.backend.recompile(modelName, optimizerSettings);
   }
 
   // ---- training ----

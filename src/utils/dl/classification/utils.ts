@@ -21,7 +21,11 @@ import type {
   ErrorCode,
   ErrorReason,
 } from "./types";
-import type { ModelCompileArgs, LayersModel } from "@tensorflow/tfjs";
+import type {
+  ModelCompileArgs,
+  LayersModel,
+  GraphModel,
+} from "@tensorflow/tfjs";
 
 export const optimizerParams = [
   "epochs",
@@ -364,3 +368,9 @@ export const err = (
   success: false,
   reason: { code, message, cause },
 });
+
+export const isLayersModel = (
+  model: LayersModel | GraphModel,
+): model is LayersModel => {
+  return (model as LayersModel).fit !== undefined;
+};

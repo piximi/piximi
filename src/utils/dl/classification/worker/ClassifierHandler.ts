@@ -314,6 +314,19 @@ export class ClassifierHandler implements IClassifierApi {
     }
     return ok();
   }
+  public recompile(
+    modelName: string,
+    optimizerSettings: OptimizerSettings,
+  ): ApiResult<string> {
+    const model = this.resolveModel(modelName);
+    if (!model) return err("MODEL_NOT_FOUND", `No model ${modelName}`);
+    try {
+      model.recompile(optimizerSettings);
+      return ok(modelName);
+    } catch (e) {
+      return err("TF_LOAD_FAILED", "Failed to recompile model", e);
+    }
+  }
   public async train(
     modelName: string,
     options: FitOptions,
