@@ -19,6 +19,7 @@ import type { KindClassifier } from "store/classifier/types";
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
 import { generateUUID } from "store/dataV2/utils";
+import { diffCompileSettings } from "@ProjectViewer/sections/ModelTaskSection/ClassifierSection/FitClassifierDialog/panels/ModelSettings/HyperparameterSettings/settingsLock";
 
 import { Partition } from "utils/dl/enums";
 import {
@@ -283,6 +284,24 @@ export const useFitClassifier = () => {
     const validationChanged =
       validationFingerprint !== lastRun?.validationFingerprint;
     const classes = Object.values(classMap).map((id) => ({ id }));
+
+    const optimizerChanged = diffCompileSettings(
+      lastRun?.hyperparameters.optimizer,
+      modelInfo.optimizerSettings,
+    );
+    if (optimizerChanged) {
+      const result = await cfApi.recompile(
+        model.name,
+        modelInfo.optimizerSettings,
+      );
+      if (!result.success) {
+        throw new Error(
+          `[prepareContinuedRun: recompile] ${result.reason.code}: ${result.reason.message}`,
+          { cause: result.reason.cause },
+        );
+      }
+    }
+
     if (!model.trainingLoaded) {
       const result = await cfApi.loadData(
         model.name,

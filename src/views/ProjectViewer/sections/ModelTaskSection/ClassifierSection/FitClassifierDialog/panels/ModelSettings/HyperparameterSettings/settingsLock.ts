@@ -1,4 +1,7 @@
-import type { ModelLifecycleStatus } from "utils/dl/classification/types";
+import type {
+  OptimizerSettings,
+  PreprocessSettings,
+} from "utils/dl/classification/types";
 
 export type SettingsType = "architecture" | "integrity" | "tunable";
 
@@ -22,4 +25,19 @@ export const lockReason = (
     return "Architecture settings can not be changed from initial values";
   if (tier === "integrity")
     return "Changing this value will invalidate the run-over-run comparibility of the model";
+};
+
+export const diffCompileSettings = (
+  prev: OptimizerSettings | undefined,
+  curr: OptimizerSettings,
+): boolean => {
+  if (!prev) return false;
+  let changed: boolean = false;
+
+  if (
+    prev.optimizationAlgorithm !== curr.optimizationAlgorithm ||
+    prev.learningRate !== curr.learningRate
+  )
+    changed = true;
+  return changed;
 };
