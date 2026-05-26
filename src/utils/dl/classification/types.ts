@@ -1,4 +1,4 @@
-import type { Category, Kind, Shape } from "store/dataV2/types";
+import type { Kind, Shape } from "store/dataV2/types";
 
 import type {
   CropSchema,
@@ -243,9 +243,9 @@ export type BatchModelLoadResult = {
 
 export interface IClassifierApi {
   // registry reads
-  getModelNames(): MaybePromise<ApiResult<string[]>>;
-  getModelInfo(name: string): MaybePromise<ApiResult<ModelInfoDTO>>;
-  hasModel(name: string): MaybePromise<ApiResult<boolean>>;
+  getModelNames(): Promise<ApiResult<string[]>>;
+  getModelInfo(name: string): Promise<ApiResult<ModelInfoDTO>>;
+  hasModel(name: string): Promise<ApiResult<boolean>>;
 
   // lifecycle
   createNewModel(
@@ -253,40 +253,40 @@ export interface IClassifierApi {
     arch: ModelArch,
     seed: number,
   ): Promise<ApiResult<ModelInfoDTO>>;
-  removeModel(name: string): MaybePromise<ApiResult<string>>;
-  removeAllModels(): MaybePromise<ApiResult<void>>;
+  removeModel(name: string): Promise<ApiResult<string>>;
+  removeAllModels(): Promise<ApiResult<void>>;
 
   // data loading — return the model name so callers can chain / log
   loadTraining(
     name: string,
     items: TrainingInput[],
-    cats: Category[],
+    cats: { id: string }[],
     seed: number,
-  ): MaybePromise<ApiResult<string>>;
+  ): Promise<ApiResult<string>>;
   loadValidation(
     name: string,
     items: TrainingInput[],
-    cats: Category[],
+    cats: { id: string }[],
     seed: number,
-  ): MaybePromise<ApiResult<string>>;
+  ): Promise<ApiResult<string>>;
   loadInference(
     name: string,
     items: InferenceInput[],
-    cats: Category[],
-  ): MaybePromise<ApiResult<string>>;
+    cats: { id: string }[],
+  ): Promise<ApiResult<string>>;
   loadData(
     name: string,
     tr: TrainingInput[],
     va: TrainingInput[],
-    cats: Category[],
+    cats: { id: string }[],
     seed: number,
-  ): MaybePromise<ApiResult<string>>;
+  ): Promise<ApiResult<string>>;
   prepareModel(
     name: string,
     tr: TrainingInput[],
     va: TrainingInput[],
     n: number,
-    cats: Category[],
+    cats: { id: string }[],
     pp: PreprocessSettings,
     opt: OptimizerSettings,
     seed: number,
@@ -294,7 +294,7 @@ export interface IClassifierApi {
   recompile(
     modelName: string,
     optimizerSettings: OptimizerSettings,
-  ): MaybePromise<ApiResult<string>>;
+  ): Promise<ApiResult<string>>;
 
   // training
   train(
@@ -302,10 +302,13 @@ export interface IClassifierApi {
     options: FitOptions,
     callbacks: TrainingCallbacks,
   ): Promise<ApiResult<TrainAndEvalResult>>;
-  cancelTraining(name: string): MaybePromise<ApiResult<string>>;
+  cancelTraining(name: string): Promise<ApiResult<string>>;
 
   // inference / eval
-  predict(name: string, cats: Category[]): Promise<ApiResult<PredictionResult>>;
+  predict(
+    name: string,
+    cats: { id: string }[],
+  ): Promise<ApiResult<PredictionResult>>;
   evaluate(name: string): Promise<ApiResult<EvaluationResult>>;
 
   // model I/O
@@ -326,7 +329,3 @@ export interface IClassifierApi {
   getSavedModelData(name: string): Promise<ApiResult<SerializedModelData>>;
   getZippedModelsBuffer(): Promise<ApiResult<ArrayBuffer>>;
 }
-
-// MaybePromise: handler methods return T directly; client-side calls await them so they appear as Promise<T>.
-// Using this alias lets handler signatures stay synchronous where they can.
-type MaybePromise<T> = T | Promise<T>;

@@ -97,19 +97,20 @@ export class ClassifierHandler implements IClassifierApi {
     }
   }
 
-  public removeModel(modelName: string): ApiResult<string> {
+  public async removeModel(modelName: string) {
     const model = this.resolveModel(modelName);
     if (!model)
       return err(
         "MODEL_NOT_FOUND",
         `No model registered with name "${modelName}"`,
       );
+
     model.dispose();
     delete this._availableClassificationModels[modelName];
     return ok(modelName);
   }
 
-  public removeAllModels(): ApiResult<void> {
+  public async removeAllModels() {
     Object.keys(this._availableClassificationModels).forEach((modelName) => {
       const model = this._availableClassificationModels[modelName];
       model.dispose();
@@ -121,11 +122,11 @@ export class ClassifierHandler implements IClassifierApi {
   /*
    * Model Information Access
    */
-  private resolveModel(modelName: string): SequentialClassifier | null {
+  private resolveModel(modelName: string) {
     return this._availableClassificationModels[modelName] ?? null;
   }
 
-  private buildModelInfoDTO(model: SequentialClassifier): ModelInfoDTO {
+  private buildModelInfoDTO(model: SequentialClassifier) {
     return {
       name: model.name,
       archTag: (model as any).archTag,
@@ -153,7 +154,7 @@ export class ClassifierHandler implements IClassifierApi {
     };
   }
 
-  public get availableClassificationModels(): Record<string, ModelInfoDTO> {
+  public get availableClassificationModels() {
     return Object.entries(this._availableClassificationModels).reduce(
       (models: Record<string, ModelInfoDTO>, [name, model]) => {
         models[name] = this.buildModelInfoDTO(model);
@@ -163,15 +164,15 @@ export class ClassifierHandler implements IClassifierApi {
     );
   }
 
-  public hasModel(modelName: string): ApiResult<boolean> {
+  public async hasModel(modelName: string) {
     return ok(modelName in this._availableClassificationModels);
   }
 
-  public getModelNames(): ApiResult<string[]> {
+  public async getModelNames() {
     return ok(Object.keys(this._availableClassificationModels));
   }
 
-  public getModelInfo(modelName: string): ApiResult<ModelInfoDTO> {
+  public async getModelInfo(modelName: string) {
     const model = this.resolveModel(modelName);
     if (!model)
       return err(
@@ -184,12 +185,12 @@ export class ClassifierHandler implements IClassifierApi {
   /*
    * Classification Ops
    */
-  public loadTraining(
+  public async loadTraining(
     modelName: string,
     items: TrainingInput[],
     categories: Category[],
     runSeed: number,
-  ): ApiResult<string> {
+  ) {
     const model = this.resolveModel(modelName);
     if (!model)
       return err(
@@ -203,12 +204,12 @@ export class ClassifierHandler implements IClassifierApi {
       return err("PREPROCESS_FAILED", "Failed to load training data", e);
     }
   }
-  public loadValidation(
+  public async loadValidation(
     modelName: string,
     items: TrainingInput[],
     categories: Category[],
     runSeed: number,
-  ): ApiResult<string> {
+  ) {
     const model = this.resolveModel(modelName);
     if (!model)
       return err(
@@ -222,11 +223,11 @@ export class ClassifierHandler implements IClassifierApi {
       return err("PREPROCESS_FAILED", "Failed to load validation data", e);
     }
   }
-  public loadInference(
+  public async loadInference(
     modelName: string,
     items: InferenceInput[],
     categories: Category[],
-  ): ApiResult<string> {
+  ) {
     const model = this.resolveModel(modelName);
     if (!model)
       return err(
@@ -240,13 +241,13 @@ export class ClassifierHandler implements IClassifierApi {
       return err("PREPROCESS_FAILED", "Failed to load inference data", e);
     }
   }
-  public loadData(
+  public async loadData(
     modelName: string,
     trainingData: TrainingInput[],
     validationData: TrainingInput[],
     categories: Category[],
     runSeed: number,
-  ): ApiResult<string> {
+  ) {
     const model = this.resolveModel(modelName);
     if (!model)
       return err(
@@ -314,10 +315,10 @@ export class ClassifierHandler implements IClassifierApi {
     }
     return ok();
   }
-  public recompile(
+  public async recompile(
     modelName: string,
     optimizerSettings: OptimizerSettings,
-  ): ApiResult<string> {
+  ) {
     const model = this.resolveModel(modelName);
     if (!model) return err("MODEL_NOT_FOUND", `No model ${modelName}`);
     try {
@@ -380,7 +381,7 @@ export class ClassifierHandler implements IClassifierApi {
 
     return ok({ ...trainingResults, evalResults });
   }
-  public cancelTraining(modelName: string): ApiResult<string> {
+  public async cancelTraining(modelName: string) {
     const model = this.resolveModel(modelName);
     if (!model)
       return err(
