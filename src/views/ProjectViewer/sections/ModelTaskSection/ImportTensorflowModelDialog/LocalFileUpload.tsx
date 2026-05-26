@@ -1,8 +1,6 @@
 import type React from "react";
 import { useState } from "react";
 
-import JSZip from "jszip";
-
 import {
   ListItemIcon,
   ListItemText,
@@ -13,7 +11,8 @@ import { FileOpen as FileOpenIcon } from "@mui/icons-material";
 
 import { isObjectEmpty } from "utils/objectUtils";
 import type { ModelInfoDTO } from "utils/dl/classification/types";
-import { ClassifierApi } from "utils/dl/classification";
+import { useClassifierApi } from "utils/dl/classification";
+import { zipInputToBuffer } from "utils/file-io-v2/file-loader/fileInputUtils";
 
 //TODO: MenuItem??
 
@@ -26,6 +25,7 @@ export const LocalClassifierUpload = ({
 }) => {
   const [errMessage, setErrMessage] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
+  const cfApi = useClassifierApi();
 
   const handleFilesSelected = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -35,7 +35,7 @@ export const LocalClassifierUpload = ({
     if (!files) {
       return;
     }
-    const cfApi = ClassifierApi.getInstance();
+
     let results: {
       loadedModels: ModelInfoDTO[];
       failedModels: Record<string, { reason: string; err?: Error }>;
@@ -46,8 +46,8 @@ export const LocalClassifierUpload = ({
 
     if (files.length === 1 && files[0].type === "application/zip") {
       const file = files[0];
-      const zipFile = await new JSZip().loadAsync(file);
-      const result = await cfApi.modelsFromZipBuffer(zipFile);
+      const buffer = await zipInputToBuffer(file);
+      const result = await cfApi.modelsFromZipBuffer(buffer);
       if (result.success) {
         results = result.data;
       } else {

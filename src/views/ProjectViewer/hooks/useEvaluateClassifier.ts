@@ -10,7 +10,7 @@ import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
 
 import { AlertType } from "utils/enums";
-import { ClassifierApi } from "utils/dl/classification";
+import { useClassifierApi } from "utils/dl/classification";
 import type { ModelInfoDTO } from "utils/dl/classification/types";
 
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
@@ -26,10 +26,12 @@ export const useEvaluateClassifier = () => {
     modelTarget,
   );
 
+  const cfApi = useClassifierApi();
+
   const evaluateClassifier = async () => {
     if (!kindClassifier || kindClassifier.activeModel === undefined) return;
     const modelName = kindClassifier.activeModel;
-    const cfApi = ClassifierApi.getInstance();
+
     const result = await cfApi.getModelInfo(modelName);
     let model: ModelInfoDTO | undefined = undefined;
     if (result.success) model = result.data;

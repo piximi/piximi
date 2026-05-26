@@ -21,7 +21,7 @@ import { classifierSlice } from "store/classifier";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 
 import { HotkeyContext } from "utils/enums";
-import { ClassifierApi } from "utils/dl/classification";
+import { useClassifierApi } from "utils/dl/classification";
 import { logger } from "utils/logUtils";
 import type { ModelInfoDTO } from "utils/dl/classification/types";
 
@@ -47,6 +47,8 @@ export const ImportTensorflowClassificationModelDialog = ({
   const [tabVal, setTabVal] = useState("1");
   const [invalidModel, setInvalidModel] = useState(false);
 
+  const cfApi = useClassifierApi();
+
   const confirmUpload = async () => {
     if (uploadedModels.length > 0) {
       dispatch(
@@ -63,7 +65,6 @@ export const ImportTensorflowClassificationModelDialog = ({
 
   const cancelUpload = async () => {
     setInvalidModel(false);
-    const cfApi = ClassifierApi.getInstance();
     for (const model of uploadedModels) {
       const result = await cfApi.removeModel(model.name);
       if (result.success) {

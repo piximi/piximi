@@ -18,7 +18,7 @@ import { logger } from "utils/logUtils";
 import { representsUnknown } from "utils/stringUtils";
 import { toInferenceInput } from "utils/dl/utils";
 import type { PredictionResult } from "utils/dl/classification/types";
-import { ClassifierApi } from "utils/dl/classification";
+import { useClassifierApi } from "utils/dl/classification";
 
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 
@@ -32,6 +32,8 @@ export const usePredictClassifier = () => {
     modelTarget,
   );
 
+  const cfApi = useClassifierApi();
+
   const { getClassMap } = useClassMapDialog();
 
   const handleError = useClassifierErrorHandler();
@@ -40,7 +42,6 @@ export const usePredictClassifier = () => {
     if (!kindClassifier || !kindClassifier.activeModel) return;
     const modelTargetId = kindClassifier.modelTargetId;
     const modelName = kindClassifier.activeModel;
-    const cfApi = ClassifierApi.getInstance();
     const model = await cfApi.getModelInfo(modelName).then((result) => {
       if (result.success) {
         return result.data;

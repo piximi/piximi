@@ -12,7 +12,7 @@ import { classifierSlice } from "store/classifier";
 import { selectKindModelNames } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
-import { ClassifierApi } from "utils/dl/classification";
+import { useClassifierApi } from "utils/dl/classification";
 import type { ModelInfoDTO } from "utils/dl/classification/types";
 import { ModelArch } from "utils/dl/classification/types";
 import { logger } from "utils/logUtils";
@@ -29,6 +29,7 @@ export const ModelSelection = ({
     selectKindModelNames,
     modelTarget,
   );
+  const cfApi = useClassifierApi();
   const handleModelChange = (event: SelectChangeEvent<unknown>) => {
     const value: string | ModelArch = event.target.value as string;
     if (value === "new") {
@@ -57,7 +58,6 @@ export const ModelSelection = ({
   };
   const handleDisposeModel = async () => {
     if (!selectedModelConfig) return;
-    const cfApi = ClassifierApi.getInstance();
     const result = await cfApi.removeModel(selectedModelConfig.name);
     if (result.success) {
       logger(`Successfully removed ${selectedModelConfig.name}`);

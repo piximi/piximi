@@ -7,17 +7,7 @@ import type {
   IClassifierApi,
   OptimizerSettings,
 } from "./types";
-import type JSZip from "jszip";
 import type { ClassifierHandler } from "./worker/ClassifierHandler";
-
-async function zipInputToBuffer(
-  input: JSZip | File | Blob | ArrayBuffer,
-): Promise<ArrayBuffer> {
-  if (input instanceof ArrayBuffer) return input;
-  if (input instanceof Blob) return input.arrayBuffer();
-  // JSZip
-  return (input as JSZip).generateAsync({ type: "arraybuffer" });
-}
 
 export class ClassifierApi implements IClassifierApi {
   private backend: Comlink.Remote<ClassifierHandler>;
@@ -138,9 +128,8 @@ export class ClassifierApi implements IClassifierApi {
     return this.backend.modelFromUrl(url, fromTFHub, isGraph);
   }
 
-  async modelsFromZipBuffer(input: JSZip | File | Blob | ArrayBuffer) {
-    const buf = await zipInputToBuffer(input);
-    return this.backend.modelsFromZipBuffer(Comlink.transfer(buf, [buf]));
+  async modelsFromZipBuffer(input: ArrayBuffer) {
+    return this.backend.modelsFromZipBuffer(Comlink.transfer(input, [input]));
   }
 
   getSavedModelData(modelName: string) {

@@ -16,7 +16,7 @@ import { useDebounce } from "hooks";
 
 import { RemoteClassifier } from "utils/dl/classification/models";
 import { isObjectEmpty } from "utils/objectUtils";
-import { ClassifierApi } from "utils/dl/classification";
+import { useClassifierApi } from "utils/dl/classification";
 import type { ModelInfoDTO } from "utils/dl/classification/types";
 
 export const RemoteClassifierUpload = ({
@@ -30,6 +30,7 @@ export const RemoteClassifierUpload = ({
   const [successMessage, setSuccessMessage] = useState("");
   const [modelUrl, setModelUrl] = useState("");
   const [isFromTFHub, setIsFromTFHub] = useState(false);
+  const cfApi = useClassifierApi();
 
   const verifySourceMatch = (url: string, isFromTFHub: boolean) => {
     if (isFromTFHub && !RemoteClassifier.verifyTFHubUrl(url)) {
@@ -56,7 +57,6 @@ export const RemoteClassifierUpload = ({
   const loadModel = async () => {
     setErrMessage("");
     setSuccessMessage("");
-    const cfApi = ClassifierApi.getInstance();
     const result = await cfApi.modelFromUrl(modelUrl, isFromTFHub, isGraph);
     if (result.success) {
       if (!isObjectEmpty(result.data.failedModels)) {

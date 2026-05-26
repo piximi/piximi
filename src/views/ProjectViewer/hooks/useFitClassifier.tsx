@@ -38,7 +38,7 @@ import type {
   TrainingCallbacks,
   ModelInfoDTO,
 } from "utils/dl/classification/types";
-import { ClassifierApi } from "utils/dl/classification";
+import { useClassifierApi } from "utils/dl/classification";
 
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
@@ -96,6 +96,7 @@ export const useFitClassifier = () => {
   const { newModelName, modelParams, userDefinedSeed } = useClassifierStatus();
   const { getClassMap } = useClassMapDialog();
   const handleError = useClassifierErrorHandler();
+  const cfApi = useClassifierApi();
 
   const dispatchPartition = useMemo(
     () =>
@@ -111,7 +112,7 @@ export const useFitClassifier = () => {
     let model: ModelInfoDTO;
     let classMap: ModelClassMap | undefined;
     const seed = userDefinedSeed ?? Math.floor(Math.random() * 1000);
-    const cfApi = ClassifierApi.getInstance();
+
     try {
       const result = await cfApi.createNewModel(
         newModelName,
@@ -222,7 +223,7 @@ export const useFitClassifier = () => {
     let model: ModelInfoDTO;
     let classMap = modelInfo.classMap;
     const seed = userDefinedSeed ?? Math.floor(Math.random() * 1000);
-    const cfApi = ClassifierApi.getInstance();
+
     try {
       const result = await cfApi.getModelInfo(modelName);
       if (result.success) {
@@ -534,7 +535,6 @@ export const useFitClassifier = () => {
         }),
       );
     };
-    const cfApi = ClassifierApi.getInstance();
     try {
       const trainingResults = await cfApi.train(
         initializedModelName,

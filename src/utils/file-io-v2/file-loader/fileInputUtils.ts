@@ -7,6 +7,8 @@ import {
   type MimeType,
 } from "./types";
 
+import type JSZip from "jszip";
+
 export const interpretFiles = (files: FileList): FileInterpretationResult => {
   // Phase 1: Return basic analysis
   const results: FileInterpretationResult["fileResults"] = {};
@@ -69,4 +71,13 @@ const inferImageType = (fileName: string): FileType => {
   if (ext === "dcm") return FILE.DICOM;
   if (ext === "czi") return FILE.CZI;
   return FILE.BASIC;
+};
+
+export const zipInputToBuffer = async (
+  input: JSZip | File | Blob | ArrayBuffer,
+): Promise<ArrayBuffer> => {
+  if (input instanceof ArrayBuffer) return input;
+  if (input instanceof Blob) return input.arrayBuffer();
+  // JSZip
+  return (input as JSZip).generateAsync({ type: "arraybuffer" });
 };

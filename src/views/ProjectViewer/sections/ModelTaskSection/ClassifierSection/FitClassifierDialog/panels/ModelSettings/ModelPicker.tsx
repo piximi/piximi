@@ -33,7 +33,7 @@ import {
 
 import { findReplicateName } from "utils/stringUtils";
 import type { ModelArch, ModelInfoDTO } from "utils/dl/classification/types";
-import { ClassifierApi } from "utils/dl/classification";
+import { useClassifierApi } from "utils/dl/classification";
 import { logger } from "utils/logUtils";
 
 export const ModelPicker = () => {
@@ -188,10 +188,10 @@ const PretrainedModelOptions = ({
   const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const { shouldWarnClearPredictions } = useClassifierStatus();
-
+  const cfApi = useClassifierApi();
   const handleDisposeModel = async () => {
     if (!activeModel) return;
-    const cfApi = ClassifierApi.getInstance();
+
     const result = await cfApi.removeModel(activeModel.name);
     if (result.success) {
       logger(`Successfully removed ${activeModel.name}`);

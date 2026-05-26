@@ -40,7 +40,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { useAcceptClearPredictions } from "@ProjectViewer/hooks";
 
 import { APPLICATION_COLORS } from "utils/constants";
-import { ClassifierApi } from "utils/dl/classification/ClassifierApi";
+import { useClassifierApi } from "utils/dl/classification";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
@@ -51,15 +51,16 @@ export const FitClassifierDialogAppBar = ({
 }: FitClassifierDialogAppBarProps) => {
   const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-
   const modelStatus = useParameterizedSelector(
     selectModelLifecycleStatus,
     modelTarget,
   );
-  const modelConfig = useClassificationModel();
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
+
+  const cfApi = useClassifierApi();
+  const modelConfig = useClassificationModel();
   const { currentEpoch, totalEpochs } = useClassifierHistory();
   const { isReady, shouldWarnClearPredictions, error } = useClassifierStatus();
 
@@ -80,7 +81,6 @@ export const FitClassifierDialogAppBar = ({
 
   const onStopFitting = async () => {
     if (modelStatus !== "training" || !modelConfig) return;
-    const cfApi = ClassifierApi.getInstance();
 
     await cfApi.cancelTraining(modelConfig.name);
 

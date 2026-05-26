@@ -15,7 +15,7 @@ import type { StorageInput } from "utils/data-connector/types";
 import { STORES } from "utils/data-connector/types";
 import { logger, parseError } from "utils/logUtils";
 import type { ExtractedModelFileMap } from "utils/dl/types";
-import { ClassifierApi } from "utils/dl/classification";
+import { getClassifierApi } from "utils/dl/classification";
 
 import type { V2Channel } from "./version-readers/version-types/v2Types";
 import type {
@@ -161,7 +161,7 @@ export class ProjectLoader implements IProjectLoader {
     modelFileMap: ExtractedModelFileMap,
     onProgress: (p: number) => void,
   ): Promise<void> {
-    const cfApi = ClassifierApi.getInstance();
+    const cfApi = getClassifierApi();
     const modelFileArr = Object.values(modelFileMap);
 
     let modelIdx = 0;

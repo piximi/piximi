@@ -5,7 +5,7 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
 import JSZip from "jszip";
 import saveAs from "file-saver";
-import { ClassifierApi } from "utils/dl/classification";
+import { useClassifierApi } from "utils/dl/classification";
 import { ModelInfoDTO } from "utils/dl/classification/types";
 
 type SaveFittedModelDialogProps = {
@@ -21,8 +21,9 @@ export const SaveFittedModelDialog = ({
 }: SaveFittedModelDialogProps) => {
   const [name, setName] = useState<string>(model.name);
   const noNameError = name.length === 0;
+
+  const cfApi = useClassifierApi();
   const onSaveClassifierClick = async () => {
-    const cfApi = ClassifierApi.getInstance();
     const result = await cfApi.getSavedModelData(name);
     if (result.success) {
       const { modelJson, modelWeights } = result.data;
