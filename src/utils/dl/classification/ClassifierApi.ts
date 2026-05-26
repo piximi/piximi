@@ -150,3 +150,48 @@ export class ClassifierApi implements IClassifierApi {
     return this.backend.getZippedModelsBuffer();
   }
 }
+
+export type ClassifierBackend = "local" | "remote";
+
+let current: { backend: ClassifierBackend; api: IClassifierApi } | undefined;
+
+const construct = (backend: ClassifierBackend): IClassifierApi => {
+  if (backend === "local") {
+    // ClassifierApi.getInstance() enforces its own private singleton, so this
+    // is safe to call from the resolver.
+    return ClassifierApi.getInstance();
+  }
+  // backend === "remote"
+  throw new Error(
+    "Remote classifier backend is not implemented yet. " +
+      "Construct it here when the remote IClassifierApi implementation lands.",
+  );
+};
+
+/**
+ * Get the currently-active backend, lazily constructing the default ("local")
+ * on first call. Use from non-React code (services, listeners, loaders).
+ * React components should prefer `useClassifierApi()`.
+ */
+export function getClassifierApi(): IClassifierApi {
+  if (!current) {
+    current = { backend: "local", api: construct("local") };
+  }
+  return current.api;
+}
+
+/**
+ * Switch which backend is active. Destroys the previous backend before
+ * constructing the new one — switching is expensive on purpose.
+ *
+ * No consumer in this refactor calls this. It exists as the seam for the
+ * future functionality that lets the user pick a backend.
+ */
+export async function setClassifierBackend(
+  backend: ClassifierBackend,
+): Promise<IClassifierApi> {
+  if (current?.backend === backend) return current.api;
+  // TODO await current?.api.destroy();
+  current = { backend, api: construct(backend) };
+  return current.api;
+}
