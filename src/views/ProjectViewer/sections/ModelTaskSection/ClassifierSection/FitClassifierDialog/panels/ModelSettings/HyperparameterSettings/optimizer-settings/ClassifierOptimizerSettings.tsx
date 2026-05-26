@@ -1,65 +1,53 @@
-import { useEffect, useMemo } from "react";
+import {
+  Collapse,
+  Divider,
+  Grid2 as Grid,
+  Stack,
+  Typography,
+} from "@mui/material";
 
-import { useSelector } from "react-redux";
+import {
+  BatchSize,
+  Epochs,
+  LearningRate,
+  LossFunction,
+  OptimizationAlgorithm,
+} from "./fields";
 
-import { Grid2 as Grid } from "@mui/material";
-
-import { selectTotalActiveLabeledItems } from "@ProjectViewer/state/reselectors";
-import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-
-import { logger } from "utils/logUtils";
-
-import { OptimizationSettings } from "./OptimizationSettings";
-import { TrainingStrategySettings } from "./TrainingStrategySettings";
-
-export const ClassifierOptimizerSettings = () => {
-  const labeledThingsCount = useSelector(selectTotalActiveLabeledItems);
-  const { modelParams, classifierStatus } = useClassifierStatus();
-
-  const fitOptions = useMemo(() => {
-    return modelParams.optimizerSettings;
-  }, [modelParams]);
-  const trainingPercentage = useMemo(() => {
-    return modelParams.preprocessSettings.trainingPercentage;
-  }, [modelParams]);
-
-  useEffect(() => {
-    if (
-      import.meta.env.NODE_ENV !== "production" &&
-      import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-      labeledThingsCount > 0
-    ) {
-      const trainingSize = Math.round(labeledThingsCount * trainingPercentage);
-      const validationSize = labeledThingsCount - trainingSize;
-
-      logger(
-        `Set training size to Round[${labeledThingsCount} * ${trainingPercentage}] = ${trainingSize}
-        ; val size to ${labeledThingsCount} - ${trainingSize} = ${validationSize}`,
-      );
-
-      logger(
-        `Set training batches per epoch to RoundUp[${trainingSize} / ${
-          fitOptions.batchSize
-        }] = ${Math.ceil(trainingSize / fitOptions.batchSize)}`,
-      );
-
-      logger(
-        `Set validation batches per epoch to RoundUp[${validationSize} / ${
-          fitOptions.batchSize
-        }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`,
-      );
-
-      logger(
-        `Training last batch size is ${trainingSize % fitOptions.batchSize}
-        ; validation is ${validationSize % fitOptions.batchSize}`,
-      );
-    }
-  }, [fitOptions.batchSize, trainingPercentage, labeledThingsCount]);
-
+export const ClassifierOptimizerSettings = ({
+  showAdvanced,
+}: {
+  showAdvanced: boolean;
+}) => {
   return (
     <Grid container spacing={2} padding={2}>
-      <TrainingStrategySettings isTraining={classifierStatus === "training"} />
-      <OptimizationSettings isTraining={classifierStatus === "training"} />
+      <Grid size={12}>
+        <Divider sx={{ mb: 1 }}>
+          <Typography variant="body2">Training Strategy</Typography>
+        </Divider>
+
+        <Stack sx={{ pl: 2 }}>
+          <Stack direction="row" gap={2} sx={{ pt: 1 }}>
+            <Epochs />
+            <Collapse in={showAdvanced}>
+              <BatchSize />
+            </Collapse>
+          </Stack>
+        </Stack>
+      </Grid>
+      <Grid size={12}>
+        <Divider sx={{ mb: 1 }}>
+          <Typography variant="body2">Optimization</Typography>
+        </Divider>
+
+        <Collapse in={showAdvanced}>
+          <Stack sx={{ pl: 2 }} spacing={2}>
+            <OptimizationAlgorithm />
+            <LossFunction />
+            <LearningRate />
+          </Stack>
+        </Collapse>
+      </Grid>
     </Grid>
   );
 };
