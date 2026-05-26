@@ -21,7 +21,7 @@ async function zipInputToBuffer(
 
 export class ClassifierApi implements IClassifierApi {
   private backend: Comlink.Remote<ClassifierHandler>;
-  static instance: ClassifierApi;
+  private static instance: ClassifierApi | undefined;
 
   private constructor(/*backendTarget: "local"|"remote"*/) {
     const worker = new Worker(
