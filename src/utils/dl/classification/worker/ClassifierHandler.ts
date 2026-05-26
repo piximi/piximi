@@ -630,4 +630,7 @@ export class ClassifierHandler implements IClassifierApi {
     }
     return userModels;
   }
+  async destroy() {
+    return await this.removeAllModels();
+  }
 }

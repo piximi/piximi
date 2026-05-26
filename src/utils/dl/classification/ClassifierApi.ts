@@ -1,6 +1,8 @@
 // src/utils/dl/classification/classifierHandler.ts
 import * as Comlink from "comlink";
 
+import { registerClassifierHmrCleanup } from "./devHmrCleanup";
+
 import type {
   FitOptions,
   TrainingCallbacks,
@@ -10,27 +12,22 @@ import type {
 import type { ClassifierHandler } from "./worker/ClassifierHandler";
 
 export class ClassifierApi implements IClassifierApi {
+  private worker: Worker;
   private backend: Comlink.Remote<ClassifierHandler>;
   private static instance: ClassifierApi | undefined;
 
   private constructor(/*backendTarget: "local"|"remote"*/) {
-    const worker = new Worker(
+    this.worker = new Worker(
       new URL("./worker/classifierWorker.ts", import.meta.url),
       { type: "module" },
     );
-    worker.onerror = (e) => {
+    this.worker.onerror = (e) => {
       console.error("[classifierHandler] worker error:", e.message, e);
     };
-    const workerProxy = Comlink.wrap<ClassifierHandler>(worker);
+    const workerProxy = Comlink.wrap<ClassifierHandler>(this.worker);
 
-    // Dev HMR: terminate on reload so we don't orphan worker instances.
-    if (import.meta.hot) {
-      import.meta.hot.dispose(() => {
-        this.backend?.[Comlink.releaseProxy]?.();
-        worker?.terminate();
-      });
-    }
     this.backend = workerProxy;
+    registerClassifierHmrCleanup(this);
   }
 
   // ===========================================================================
@@ -137,6 +134,19 @@ export class ClassifierApi implements IClassifierApi {
   }
   getZippedModelsBuffer() {
     return this.backend.getZippedModelsBuffer();
+  }
+  async destroy() {
+    try {
+      await this.backend.destroy();
+    } catch (e) {
+      console.warn("[ClassifierApi] backend.destroy() rejected:", e);
+    }
+    this.backend[Comlink.releaseProxy]?.();
+    this.worker.terminate();
+    if (ClassifierApi.instance === this) {
+      ClassifierApi.instance = undefined;
+    }
+    return { success: true as const };
   }
 }
 
