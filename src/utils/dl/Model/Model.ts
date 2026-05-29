@@ -1,5 +1,10 @@
 import { io } from "@tensorflow/tfjs";
 
+import {
+  MODEL_JSON_FILENAME,
+  MODEL_WEIGHTS_FILENAME,
+} from "utils/file-io-v2/consts";
+
 import { createCompileArgs, isLayersModel } from "../classification/utils";
 
 import type {
@@ -130,11 +135,9 @@ export abstract class Model {
   public abstract stopTraining(): void;
 
   public async getSavedModelFiles(modelName?: string) {
-    const savedName = modelName ?? this.name;
     let weightsBlob: Blob | undefined = undefined;
     let modelJsonBlob: Blob | undefined = undefined;
-    const weightsFileName = savedName + ".weights.bin";
-    const modelJsonFileName = savedName + ".json";
+
     const saveHandler = async (modelArtifacts: io.ModelArtifacts) => {
       weightsBlob = new Blob([modelArtifacts.weightData!], {
         type: "application/octet-stream",
@@ -147,7 +150,7 @@ export abstract class Model {
       } else {
         const weightsManifest = [
           {
-            paths: ["./" + weightsFileName],
+            paths: ["./" + MODEL_WEIGHTS_FILENAME],
             weights: modelArtifacts.weightSpecs,
           },
         ];
@@ -218,8 +221,8 @@ export abstract class Model {
     return {
       weightsBlob: output.weightsBlob,
       modelJsonBlob: output.modelJsonBlob,
-      weightsFileName,
-      modelJsonFileName,
+      weightsFileName: MODEL_WEIGHTS_FILENAME,
+      modelJsonFileName: MODEL_JSON_FILENAME,
     };
   }
   public async saveModel() {

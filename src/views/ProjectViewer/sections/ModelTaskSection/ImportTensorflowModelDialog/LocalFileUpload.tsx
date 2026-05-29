@@ -1,5 +1,6 @@
 import type React from "react";
-import { useState } from "react";
+
+import { batch, useDispatch, useSelector } from "react-redux";
 
 import {
   ListItemIcon,
@@ -9,23 +10,39 @@ import {
 } from "@mui/material";
 import { FileOpen as FileOpenIcon } from "@mui/icons-material";
 
-import { isObjectEmpty } from "utils/objectUtils";
-import type { ModelInfoDTO } from "utils/dl/classification/types";
-import { useClassifierApi } from "utils/dl/classification";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { classifierSlice } from "store/classifier";
+
+import type { ModelInfoDTO, Run } from "utils/dl/classification/types";
 import { zipInputToBuffer } from "utils/file-io-v2/file-loader/fileInputUtils";
+import { importFittedModelFromZip } from "utils/file-io-v2/import/importFittedModel";
+import { parseError } from "utils/logUtils";
+import { modelInfoDTOToModelInfo } from "utils/dl/classification/utils";
 
 //TODO: MenuItem??
 
 export const LocalClassifierUpload = ({
   isGraph,
-  setUploadedModels,
+  setUploadedModel,
+  setErrMessage,
+  setSuccessMessage,
 }: {
   isGraph: boolean;
-  setUploadedModels: React.Dispatch<React.SetStateAction<ModelInfoDTO[]>>;
+  setUploadedModel: React.Dispatch<
+    React.SetStateAction<
+      | {
+          modelDetails: ModelInfoDTO;
+          runs: Run[];
+        }
+      | undefined
+    >
+  >;
+  setErrMessage: React.Dispatch<React.SetStateAction<string>>;
+  setSuccessMessage: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  const [errMessage, setErrMessage] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string>("");
-  const cfApi = useClassifierApi();
+  const dispatch = useDispatch();
+
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
 
   const handleFilesSelected = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -36,7 +53,7 @@ export const LocalClassifierUpload = ({
       return;
     }
 
-    let results: {
+    const results: {
       loadedModels: ModelInfoDTO[];
       failedModels: Record<string, { reason: string; err?: Error }>;
     } = {
@@ -44,71 +61,35 @@ export const LocalClassifierUpload = ({
       failedModels: {},
     };
 
-    if (files.length === 1 && files[0].type === "application/zip") {
-      const file = files[0];
-      const buffer = await zipInputToBuffer(file);
-      const result = await cfApi.modelsFromZipBuffer(buffer);
-      if (result.success) {
-        results = result.data;
-      } else {
-        console.error(
-          `[upload model zip: ${file.name}] ${result.reason.code}: ${result.reason.message}`,
-          result.reason.cause,
-        );
-      }
-    } else {
-      const weightsFiles: Array<File> = [];
-      let descFile: File | undefined;
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (file.name.endsWith(".json")) {
-          descFile = file;
-        } else {
-          weightsFiles.push(file);
-        }
-      }
-
-      if (!descFile || weightsFiles.length === 0) {
-        setErrMessage(
-          "Must include model description (.json) and at least one weights file (.bin)",
-        );
-        return;
-      }
-
-      const result = await cfApi.modelFromFiles({
-        descFile,
-        weightsFiles,
-        isGraph,
-      });
-      if (result.success) {
-        results.loadedModels = [result.data];
-      } else {
-        console.error(
-          `[upload model zip: ${descFile.name}] ${result.reason.code}: ${result.reason.message}`,
-          result.reason.cause,
-        );
-        results = {
-          loadedModels: [],
-          failedModels: {
-            [descFile.name]: { reason: result.reason.message },
-          },
-        };
-      }
-
-      setErrMessage("");
-    }
-    if (!isObjectEmpty(results.failedModels)) {
-      setErrMessage(
-        `Failed to upload models: ${Object.keys(results.failedModels!).join(", ")}`,
-      );
-    }
-    if (results.loadedModels.length > 0) {
-      setUploadedModels(results.loadedModels);
+    const file = files[0];
+    const buffer = await zipInputToBuffer(file);
+    try {
+      const { modelDetails, runs } = await importFittedModelFromZip(buffer);
+      const modelInfo = modelInfoDTOToModelInfo(modelDetails, runs);
       setSuccessMessage(
         `Successfully uploaded Classification ${
           isGraph ? "Graph" : "Layers"
         } Models: "${results.loadedModels.map((model) => model.name).join(", ")}"`,
       );
+      setUploadedModel({ modelDetails, runs });
+      batch(() => {
+        dispatch(
+          classifierSlice.actions.addModelInfo({
+            targetId: modelTarget,
+            modelName: modelDetails.name,
+            modelInfo,
+          }),
+        );
+        dispatch(
+          classifierSlice.actions.setActiveModel({
+            modelName: modelDetails.name,
+            targetId: modelTarget,
+          }),
+        );
+      });
+    } catch (e) {
+      setErrMessage(parseError(e).message);
+      return;
     }
   };
 
@@ -129,33 +110,14 @@ export const LocalClassifierUpload = ({
         </MenuItem>
       </label>
       <input
-        accept="application/json|.bin"
+        accept=".zip"
         hidden
         type="file"
-        multiple
         id="open-model-file"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
           handleFilesSelected(event)
         }
       />
-      <Typography
-        style={{
-          whiteSpace: "pre-line",
-          fontSize: "0.75rem",
-          color: "red",
-        }}
-      >
-        {errMessage}
-      </Typography>
-      <Typography
-        style={{
-          whiteSpace: "pre-line",
-          fontSize: "0.75rem",
-          color: "green",
-        }}
-      >
-        {successMessage}
-      </Typography>
     </>
   );
 };

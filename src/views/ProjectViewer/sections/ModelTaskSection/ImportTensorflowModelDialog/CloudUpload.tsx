@@ -15,19 +15,28 @@ import { Language as LanguageIcon } from "@mui/icons-material";
 import { useDebounce } from "hooks";
 
 import { RemoteClassifier } from "utils/dl/classification/models";
-import { isObjectEmpty } from "utils/objectUtils";
 import { useClassifierApi } from "utils/dl/classification";
-import type { ModelInfoDTO } from "utils/dl/classification/types";
+import type { ModelInfoDTO, Run } from "utils/dl/classification/types";
 
 export const RemoteClassifierUpload = ({
   isGraph,
-  setUploadedModels,
+  setUploadedModel,
+  setErrMessage,
+  setSuccessMessage,
 }: {
   isGraph: boolean;
-  setUploadedModels: React.Dispatch<React.SetStateAction<ModelInfoDTO[]>>;
+  setUploadedModel: React.Dispatch<
+    React.SetStateAction<
+      | {
+          modelDetails: ModelInfoDTO;
+          runs: Run[];
+        }
+      | undefined
+    >
+  >;
+  setErrMessage: React.Dispatch<React.SetStateAction<string>>;
+  setSuccessMessage: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  const [errMessage, setErrMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [modelUrl, setModelUrl] = useState("");
   const [isFromTFHub, setIsFromTFHub] = useState(false);
   const cfApi = useClassifierApi();
@@ -59,19 +68,12 @@ export const RemoteClassifierUpload = ({
     setSuccessMessage("");
     const result = await cfApi.modelFromUrl(modelUrl, isFromTFHub, isGraph);
     if (result.success) {
-      if (!isObjectEmpty(result.data.failedModels)) {
-        setErrMessage(
-          `Failed to upload models: ${Object.keys(result.data.failedModels!).join(", ")}`,
-        );
-      }
-      if (result.data.loadedModels.length > 0) {
-        setUploadedModels(result.data.loadedModels);
-        setSuccessMessage(
-          `Successfully uploaded Classification ${
-            isGraph ? "Graph" : "Layers"
-          } Models: "${result.data.loadedModels.map((model) => model.name).join(", ")}"`,
-        );
-      }
+      setUploadedModel({ modelDetails: result.data, runs: [] });
+      setSuccessMessage(
+        `Successfully uploaded Classification ${
+          isGraph ? "Graph" : "Layers"
+        } Model: "${result.data.name}"`,
+      );
     } else {
       console.error(
         `[loadModel] ${result.reason.code}: ${result.reason.message}`,
@@ -100,26 +102,8 @@ export const RemoteClassifierUpload = ({
           size={"small"}
           value={modelUrl}
           onChange={handleModelUrlChange}
-          error={errMessage.length > 0}
         />
-        <Typography
-          style={{
-            whiteSpace: "pre-line",
-            fontSize: "0.75rem",
-            color: "red",
-          }}
-        >
-          {errMessage}
-        </Typography>
-        <Typography
-          style={{
-            whiteSpace: "pre-line",
-            fontSize: "0.75rem",
-            color: "green",
-          }}
-        >
-          {successMessage}
-        </Typography>
+
         <FormControlLabel
           control={
             <Checkbox
@@ -131,11 +115,7 @@ export const RemoteClassifierUpload = ({
           label="From TF Hub?"
         />
       </FormControl>
-      <Button
-        onClick={async () => loadModel()}
-        color="primary"
-        disabled={errMessage.length !== 0 || modelUrl.length === 0}
-      >
+      <Button onClick={() => loadModel()} color="primary">
         Load Model
       </Button>
     </>

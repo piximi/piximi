@@ -3,10 +3,14 @@ import { Grid2 as Grid, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import JSZip from "jszip";
 import saveAs from "file-saver";
 import { useClassifierApi } from "utils/dl/classification";
 import { ModelInfoDTO } from "utils/dl/classification/types";
+import { useSelector } from "react-redux";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import { selectRunsForActiveModel } from "store/classifier/selectors";
+import { buildClassifierZip } from "utils/file-io-v2/export/exportFittedModel";
 
 type SaveFittedModelDialogProps = {
   model: ModelInfoDTO;
@@ -21,16 +25,20 @@ export const SaveFittedModelDialog = ({
 }: SaveFittedModelDialogProps) => {
   const [name, setName] = useState<string>(model.name);
   const noNameError = name.length === 0;
+  const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const runs = useParameterizedSelector(selectRunsForActiveModel, modelTarget);
 
   const cfApi = useClassifierApi();
   const onSaveClassifierClick = async () => {
     const result = await cfApi.getSavedModelData(name);
     if (result.success) {
       const { modelJson, modelWeights } = result.data;
-      const zip = new JSZip();
-      zip.file(modelJson.fileName, modelJson.blob);
-      zip.file(modelWeights.fileName, modelWeights.blob);
-      const zipBlob = await zip.generateAsync({ type: "blob" });
+      const zipBlob = await buildClassifierZip(
+        { modelJson: modelJson.blob, modelWeights: modelWeights.blob },
+        runs,
+        { modelName: noNameError ? model.name : name },
+      );
+
       saveAs(zipBlob, `${noNameError ? model.name : name}.zip`);
     } else {
       console.error(

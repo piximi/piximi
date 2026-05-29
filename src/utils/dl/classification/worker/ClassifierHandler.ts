@@ -465,9 +465,7 @@ export class ClassifierHandler implements IClassifierApi {
     modelUrl: string,
     fromTFHub: boolean,
     isGraph: boolean,
-  ): Promise<ApiResult<BatchModelLoadResult>> {
-    const failedModels: Record<string, { reason: string; err?: Error }> = {};
-    const loadedModels: ModelInfoDTO[] = [];
+  ): Promise<ApiResult<ModelInfoDTO>> {
     const modelName = getUniqueName(
       "Remote-Classifier",
       Object.keys(this._availableClassificationModels),
@@ -484,15 +482,11 @@ export class ClassifierHandler implements IClassifierApi {
 
     try {
       await model.upload();
-      loadedModels.push(this.buildModelInfoDTO(model));
       this._availableClassificationModels[model.name] = model;
+      return ok(this.buildModelInfoDTO(model));
     } catch (e) {
-      failedModels[modelName] = {
-        reason: `Failed to load model: ${e}`,
-        err: parseError(e),
-      };
+      return err("UNKNOWN", "Failed to get saved model data", e);
     }
-    return ok({ loadedModels, failedModels });
   }
 
   public async modelsFromZipBuffer(

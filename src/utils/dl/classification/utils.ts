@@ -20,6 +20,10 @@ import type {
   ApiResult,
   ErrorCode,
   ErrorReason,
+  PreprocessSettings,
+  ModelClassMap,
+  ModelInfoDTO,
+  Run,
 } from "./types";
 import type {
   ModelCompileArgs,
@@ -27,6 +31,8 @@ import type {
   GraphModel,
 } from "@tensorflow/tfjs";
 
+const DEFAULT_CONFIDENCE_THRESHOLD = 0.5;
+const DEFAULT_TRAINING_PERCENTAGE = 0.8;
 export const optimizerParams = [
   "epochs",
   "batchSize",
@@ -79,14 +85,14 @@ export const getDefaultModelParams = (
       numCrops: 1,
       cropSchema: CropSchema.None,
     },
-    trainingPercentage: 0.75,
+    trainingPercentage: DEFAULT_TRAINING_PERCENTAGE,
   },
 });
 
 export const getDefaultModelInfo = (): ModelInfo => ({
   ...getDefaultModelParams(),
   valid: true,
-  confidenceThreshold: 0.5,
+  confidenceThreshold: DEFAULT_CONFIDENCE_THRESHOLD,
   runs: [],
 });
 
@@ -374,3 +380,46 @@ export const isLayersModel = (
 ): model is LayersModel => {
   return (model as LayersModel).fit !== undefined;
 };
+
+export function modelInfoDTOToModelInfo(
+  dto: ModelInfoDTO,
+  runs: Run[] = [],
+): ModelInfo {
+  if (!dto.optimizerSettings || !dto.preprocessingSettings) {
+    throw new Error(
+      `Cannot convert ModelInfoDTO "${dto.name}": missing optimizer or preprocess settings`,
+    );
+  }
+
+  const classMap: ModelClassMap = dto.classes.reduce((map, cls, idx) => {
+    map[idx] = cls;
+    return map;
+  }, {} as ModelClassMap);
+
+  const preprocessSettings: PreprocessSettings = {
+    shuffle: dto.preprocessingSettings.shuffle,
+    inputShape: {
+      ...dto.preprocessingSettings.inputShape,
+      planes: 1, // not captured in ReducedPreprocessSettings
+    },
+    normalizeOptions: {
+      normalize: dto.preprocessingSettings.normalize,
+      center: false, // not captured in ReducedPreprocessSettings
+    },
+    cropOptions: {
+      numCrops: dto.preprocessingSettings.numCrops,
+      cropSchema: dto.preprocessingSettings.cropSchema,
+    },
+    trainingPercentage: DEFAULT_TRAINING_PERCENTAGE, // not captured in ReducedPreprocessSettings
+  };
+
+  return {
+    classMap,
+    preprocessSettings,
+    optimizerSettings: dto.optimizerSettings,
+    confidenceThreshold: DEFAULT_CONFIDENCE_THRESHOLD,
+    runs,
+    valid: dto.modelLoaded,
+    trained: dto.currentFitHistory.length > 0,
+  };
+}

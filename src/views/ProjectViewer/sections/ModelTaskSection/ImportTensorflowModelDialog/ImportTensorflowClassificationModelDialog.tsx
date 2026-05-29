@@ -10,7 +10,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Modal,
+  Popper,
   Tabs,
+  Typography,
 } from "@mui/material";
 
 import { useHotkeys } from "hooks";
@@ -23,7 +26,7 @@ import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { HotkeyContext } from "utils/enums";
 import { useClassifierApi } from "utils/dl/classification";
 import { logger } from "utils/logUtils";
-import type { ModelInfoDTO } from "utils/dl/classification/types";
+import type { ModelInfoDTO, Run } from "utils/dl/classification/types";
 
 import { LocalClassifierUpload } from "./LocalFileUpload";
 import { RemoteClassifierUpload } from "./CloudUpload";
@@ -39,63 +42,23 @@ export const ImportTensorflowClassificationModelDialog = ({
   open,
 }: ImportTensorflowClassificationModelDialogProps) => {
   const dispatch = useDispatch();
-  const activeKindId = useSelector(selectActiveKindId);
-  const [uploadedModels, setUploadedModels] = useState<ModelInfoDTO[]>([]);
+  const [uploadedModels, setUploadedModels] = useState<{
+    modelDetails: ModelInfoDTO;
+    runs: Run[];
+  }>();
 
   const [isGraph, setIsGraph] = useState(false);
-
+  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [errMessage, setErrMessage] = useState<string>("");
   const [tabVal, setTabVal] = useState("1");
-  const [invalidModel, setInvalidModel] = useState(false);
-
-  const cfApi = useClassifierApi();
-
-  const confirmUpload = async () => {
-    if (uploadedModels.length > 0) {
-      dispatch(
-        classifierSlice.actions.setActiveModel({
-          modelName: uploadedModels[0].name,
-          targetId: activeKindId,
-        }),
-      );
-    }
-
-    setInvalidModel(false);
-    onClose();
-  };
-
-  const cancelUpload = async () => {
-    setInvalidModel(false);
-    for (const model of uploadedModels) {
-      const result = await cfApi.removeModel(model.name);
-      if (result.success) {
-        logger(`sucessfully removed ${result.data}`);
-      } else {
-        console.error(
-          `[cancelUpload: ${model.name}] ${result.reason.code}: ${result.reason.message}`,
-          result.reason.cause,
-        );
-      }
-    }
-
-    onClose();
-  };
+  const [invalidModel] = useState(false);
 
   const onTabSelect = (event: React.SyntheticEvent, newValue: string) => {
     setTabVal(newValue);
   };
 
-  useHotkeys(
-    "enter",
-    () => {
-      uploadedModels.length > 0 && !invalidModel && confirmUpload();
-    },
-    HotkeyContext.ConfirmationDialog,
-
-    [confirmUpload, uploadedModels, invalidModel],
-  );
-
   return (
-    <Dialog fullWidth maxWidth="sm" onClose={cancelUpload} open={open}>
+    <Dialog fullWidth maxWidth="sm" onClose={onClose} open={open}>
       <DialogTitle>Load Classification model</DialogTitle>
 
       <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
@@ -111,30 +74,90 @@ export const ImportTensorflowClassificationModelDialog = ({
         <Box hidden={tabVal !== "1"}>
           <LocalClassifierUpload
             isGraph={isGraph}
-            setUploadedModels={setUploadedModels}
+            setUploadedModel={setUploadedModels}
+            setErrMessage={setErrMessage}
+            setSuccessMessage={setSuccessMessage}
           />
         </Box>
 
         <Box hidden={tabVal !== "2"}>
           <RemoteClassifierUpload
             isGraph={isGraph}
-            setUploadedModels={setUploadedModels}
+            setUploadedModel={setUploadedModels}
+            setErrMessage={setErrMessage}
+            setSuccessMessage={setSuccessMessage}
           />
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={cancelUpload} color="primary">
-          Cancel
-        </Button>
-
-        <Button
-          onClick={confirmUpload}
-          color="primary"
-          disabled={uploadedModels.length === 0 || invalidModel}
+      <Modal
+        open={successMessage.length > 0 || errMessage.length > 0}
+        onClose={() => {
+          setErrMessage("");
+          setSuccessMessage("");
+        }}
+        hideBackdrop
+      >
+        <Box
+          sx={(theme) => ({
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: theme.palette.background.default,
+            borderRadius: theme.shape.borderRadius,
+            boxShadow: 24,
+            pt: 2,
+            px: 2,
+          })}
         >
-          Open Classification model
-        </Button>
-      </DialogActions>
+          {errMessage.length > 0 && (
+            <Typography
+              variant="body2"
+              sx={{
+                whiteSpace: "pre-line",
+                color: "red",
+              }}
+            >
+              {errMessage}
+            </Typography>
+          )}
+          {successMessage.length > 0 && (
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
+              <Typography variant="h6">Success</Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  whiteSpace: "pre-line",
+                  color: "green",
+                }}
+              >
+                {successMessage}
+              </Typography>
+              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                <Button
+                  variant="text"
+                  onClick={() => {
+                    setErrMessage("");
+                    setSuccessMessage("");
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="text"
+                  onClick={() => {
+                    setErrMessage("");
+                    setSuccessMessage("");
+                  }}
+                >
+                  Confirm
+                </Button>
+              </Box>
+            </Box>
+          )}
+        </Box>
+      </Modal>
     </Dialog>
   );
 };

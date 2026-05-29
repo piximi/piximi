@@ -322,7 +322,7 @@ export interface IClassifierApi {
     url: string,
     fromTFHub: boolean,
     isGraph: boolean,
-  ): Promise<ApiResult<BatchModelLoadResult>>;
+  ): Promise<ApiResult<ModelInfoDTO>>;
   modelsFromZipBuffer(
     buffer: ArrayBuffer,
   ): Promise<ApiResult<BatchModelLoadResult>>;
