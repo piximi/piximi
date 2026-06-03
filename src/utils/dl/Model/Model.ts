@@ -273,10 +273,4 @@ export abstract class Model {
   public abstract get defaultOutputShape(): number[] | undefined;
 
   public abstract get modelSummary(): Array<ModelLayerData> | undefined;
-
-  //abstract onEpochEnd: TrainingCallbacks["onEpochEnd"];
-
-  public static verifyTFHubUrl(url: string) {
-    return url.includes("tfhub.dev");
-  }
 }

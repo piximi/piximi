@@ -155,8 +155,8 @@ export const ImportTensorflowClassificationModelDialog = ({
       setUploadResult({ success: false, reason: parseError(e).message });
     }
   };
-  const handleRemoteUpload = async (modelUrl: string, isFromTFHub: boolean) => {
-    const result = await cfApi.modelFromUrl(modelUrl, isFromTFHub, isGraph);
+  const handleRemoteUpload = async (modelUrl: string) => {
+    const result = await cfApi.modelFromUrl(modelUrl, isGraph);
     if (result.success) {
       const modelDetails = result.data;
       setUploadResult({ success: true, modelDetails: modelDetails, runs: [] });

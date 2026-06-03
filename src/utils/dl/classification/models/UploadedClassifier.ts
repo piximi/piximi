@@ -7,12 +7,12 @@ import { arrayRange } from "utils/arrayUtils";
 import { validateModelMetadata } from "utils/file-io/runtime/validators";
 import type { RequireOnly } from "utils/types";
 
-import { Model } from "../../Model";
 import { SequentialClassifier } from "./AbstractClassifier";
 import { createCompileArgs, getDefaultModelInfo } from "../utils";
 import { convertArrayToShape } from "../../utils";
 import { ModelArch } from "../types";
 
+import type { Model } from "../../Model";
 import type { OptimizerSettings } from "../types";
 import type { LayersModel } from "@tensorflow/tfjs";
 import type { CropSchema } from "../../enums";
@@ -160,7 +160,6 @@ export class UploadedClassifier extends SequentialClassifier {
 }
 
 export class RemoteClassifier extends SequentialClassifier {
-  readonly TFHub: boolean;
   protected _loadState: LoadState;
 
   /*
@@ -176,32 +175,20 @@ export class RemoteClassifier extends SequentialClassifier {
    *   from relative paths described by the paths fields in weights manifest.
    */
   constructor({
-    TFHub,
     ...modelArgs
-  }: {
-    TFHub: boolean;
-  } & RequireOnly<ConstructorParameters<typeof Model>[0], "src">) {
+  }: RequireOnly<ConstructorParameters<typeof Model>[0], "src">) {
     super(modelArgs as ConstructorParameters<typeof Model>[0]);
 
     this._loadState = LoadState.Unloaded;
-
-    this.TFHub = TFHub;
   }
 
   public async upload(): Promise<void> {
     if (!this.src) throw Error("Could not load model, no source available");
-    if (this.src && this.TFHub && !Model.verifyTFHubUrl(this.src)) {
-      throw new Error(`Expected TFHub Url: ${this.src}`);
-    }
 
     if (this.graph) {
-      this._model = await loadGraphModel(this.src, {
-        fromTFHub: this.TFHub,
-      });
+      this._model = await loadGraphModel(this.src);
     } else {
-      this._model = await loadLayersModel(this.src, {
-        fromTFHub: this.TFHub,
-      });
+      this._model = await loadLayersModel(this.src);
     }
 
     this._loadState = LoadState.Uploaded;
