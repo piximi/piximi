@@ -11,11 +11,7 @@ import {
 } from "utils/dl/enums";
 import { logger } from "utils/logUtils";
 
-import {
-  MODEL_JSON_FILENAME,
-  MODEL_MANIFEST_FILENAME,
-  MODEL_RUNS_FILENAME,
-} from "../consts";
+import { MODEL_MANIFEST_FILENAME, MODEL_RUNS_FILENAME } from "../consts";
 
 const RunHistoryEpochSchema = z.object({
   epoch: z.number(),
@@ -131,15 +127,32 @@ const ManifestSchema = z.object({
 
 type PiximiManifest = z.infer<typeof ManifestSchema>;
 
+async function parseManifestFromText(
+  text: string,
+): Promise<PiximiManifest | null> {
+  try {
+    const result = ManifestSchema.safeParse(JSON.parse(text));
+    return result.success ? result.data : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function parseManifest(
   file: JSZip.JSZipObject,
 ): Promise<PiximiManifest | null> {
   try {
-    const text = await file.async("text");
-    const json = JSON.parse(text);
-    const result = ManifestSchema.safeParse(json);
-    if (result.success) return result.data;
+    return parseManifestFromText(await file.async("text"));
+  } catch {
     return null;
+  }
+}
+
+export async function parseManifestFromFile(
+  file: File,
+): Promise<PiximiManifest | null> {
+  try {
+    return parseManifestFromText(await file.text());
   } catch {
     return null;
   }
@@ -161,6 +174,34 @@ export async function parseRunHistory(
   }
 }
 
+type ModelParts = {
+  modelName: string;
+  modelJson: File;
+  modelWeights: File[];
+  modelRuns?: ArrayBuffer;
+};
+
+async function loadModelFromParts(
+  parts: ModelParts,
+): Promise<{ modelDetails: ModelInfoDTO; runs: Run[] }> {
+  const cfApi = getClassifierApi();
+  const result = await cfApi.modelFromFiles({
+    descFile: parts.modelJson,
+    weightsFiles: parts.modelWeights,
+    modelName: parts.modelName,
+  });
+  if (result.success) {
+    const runs = parts.modelRuns
+      ? ((await parseRunHistory(parts.modelRuns)) ?? [])
+      : [];
+    return { modelDetails: result.data, runs };
+  } else {
+    throw new Error(`${result.reason.code}:${result.reason.message}`, {
+      cause: result.reason.cause,
+    });
+  }
+}
+
 export const importFittedModelFromZip = async (
   zipBuffer: ArrayBuffer,
 ): Promise<{ modelDetails: ModelInfoDTO; runs: Run[] }> => {
@@ -168,21 +209,15 @@ export const importFittedModelFromZip = async (
   try {
     zip = await JSZip.loadAsync(zipBuffer);
   } catch (e) {
-    throw new Error("Failed to parse zip", e as Error);
+    throw new Error("Failed to parse zip", { cause: e });
   }
-  console.log(zip.files);
-  let manifest: PiximiManifest | null = null;
 
+  let manifest: PiximiManifest | null = null;
   if (MODEL_MANIFEST_FILENAME in zip.files) {
     manifest = await parseManifest(zip.files[MODEL_MANIFEST_FILENAME]);
   }
-  const cfApi = getClassifierApi();
-  let model: {
-    modelName: string;
-    modelJson: File;
-    modelWeights: File[];
-    modelRuns?: ArrayBuffer;
-  };
+
+  let parts: ModelParts;
   if (manifest) {
     const topologyFile = zip.file(manifest.files.modelTopology);
     const weightsFile = zip.file(manifest.files.modelWeights);
@@ -207,36 +242,33 @@ export const importFittedModelFromZip = async (
       weightsFile.async("arraybuffer"),
     ]);
 
-    model = {
+    parts = {
       modelJson: new File([topologyBuffer], manifest.files.modelTopology, {
         type: "application/json",
       }),
       modelWeights: [
         new File([weightsBuffer], manifest.files.modelWeights, {
-          type: "application.octet-stream",
+          type: "application/octet-stream",
         }),
       ],
       modelName: manifest.modelName,
+      modelRuns: runsFile ? await runsFile.async("arraybuffer") : undefined,
     };
-    if (runsFile) {
-      model.modelRuns = await runsFile.async("arraybuffer");
-    }
   } else {
-    const modelFileRegEx = new RegExp(
-      `.json$|.weights.bin|${MODEL_JSON_FILENAME}$`,
-    );
+    const modelFileRegEx = new RegExp(`\\.json$|\\.weights\\.bin$`);
     let modelJson: File | undefined = undefined;
     const modelWeights: File[] = [];
     let modelRuns: ArrayBuffer | undefined = undefined;
     let modelName: string | undefined = undefined;
+
     for await (const [fileName, file] of Object.entries(zip.files)) {
       if (!modelFileRegEx.test(fileName)) continue;
 
       const parsedFileName = fileName.split(".");
       if (!modelName) modelName = parsedFileName[0];
       const extension = parsedFileName.at(-1);
-
       const fileBuffer = await file.async("arraybuffer");
+
       switch (extension) {
         case "json":
           if (fileName === MODEL_RUNS_FILENAME) {
@@ -253,19 +285,19 @@ export const importFittedModelFromZip = async (
           }
           break;
         case "bin":
-          const _modelWeights = new File([fileBuffer], fileName, {
-            type: "application.octet-stream",
-          });
-          modelWeights.push(_modelWeights);
+          modelWeights.push(
+            new File([fileBuffer], fileName, {
+              type: "application/octet-stream",
+            }),
+          );
           break;
-
-        default:
       }
     }
-    if (!modelJson || !modelWeights) {
+
+    if (!modelJson || modelWeights.length === 0) {
       const missing = [
         !modelJson && "Model Topology",
-        !modelWeights && "Model Weights",
+        modelWeights.length === 0 && "Model Weights",
       ]
         .filter(Boolean)
         .join(", ");
@@ -273,27 +305,31 @@ export const importFittedModelFromZip = async (
         `Archive is missing required file(s): ${missing}. The archive may have been modified.`,
       );
     }
-    model = {
-      modelJson,
-      modelName: modelName!,
-      modelWeights,
-      modelRuns,
-    };
+
+    parts = { modelJson, modelName: modelName!, modelWeights, modelRuns };
   }
 
-  const result = await cfApi.modelFromFiles({
-    descFile: model.modelJson,
-    weightsFiles: model.modelWeights,
-    modelName: model.modelName, // authoritative source — filename is irrelevant
+  return loadModelFromParts(parts);
+};
+
+export const importFittedModelFromFiles = async (input: {
+  modelJson: File;
+  modelWeights: File[];
+  modelRuns?: File;
+  manifest?: File;
+}): Promise<{ modelDetails: ModelInfoDTO; runs: Run[] }> => {
+  const parsedManifest = input.manifest
+    ? await parseManifestFromFile(input.manifest)
+    : null;
+  const modelName =
+    parsedManifest?.modelName ?? input.modelJson.name.replace(/\..+$/, "");
+  const modelRuns = input.modelRuns
+    ? await input.modelRuns.arrayBuffer()
+    : undefined;
+  return loadModelFromParts({
+    modelName,
+    modelJson: input.modelJson,
+    modelWeights: input.modelWeights,
+    modelRuns,
   });
-  if (result.success) {
-    let runs: Run[];
-    if (model.modelRuns) runs = (await parseRunHistory(model.modelRuns)) ?? [];
-    else runs = [];
-    return { modelDetails: result.data, runs };
-  } else {
-    throw new Error(`${result.reason.code}:${result.reason.message}`, {
-      cause: result.reason.cause,
-    });
-  }
 };
