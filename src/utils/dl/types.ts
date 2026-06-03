@@ -64,3 +64,25 @@ export type SerializedModelData = {
   modelWeights: { blob: Blob; fileName: string };
 };
 export type SerializedModels = Record<string, SerializedModelData>;
+export type ErrorCode =
+  | "MODEL_NOT_FOUND"
+  | "MODEL_CREATE_FAILED"
+  | "TF_LOAD_FAILED"
+  | "PREPROCESS_FAILED"
+  | "TRAINING_FAILED"
+  | "PREDICTION_FAILED"
+  | "EVALUATION_FAILED"
+  | "UPLOAD_FAILED"
+  | "MISSING_FILE"
+  | "INVALID_FILE_FORMAT"
+  | "UNKNOWN";
+
+export type ErrorReason = {
+  code: ErrorCode;
+  message: string;
+  cause?: unknown;
+};
+
+export type ApiResult<T = void> = [T] extends [void]
+  ? { success: true } | { success: false; reason: ErrorReason }
+  : { success: true; data: T } | { success: false; reason: ErrorReason };

@@ -7,7 +7,13 @@ import type {
   ExtendedImageObject,
 } from "store/dataV2/types";
 
-import type { InferenceInput, TrainingInput } from "./types";
+import type {
+  ApiResult,
+  ErrorCode,
+  ErrorReason,
+  InferenceInput,
+  TrainingInput,
+} from "./types";
 import type { Tensor3D } from "@tensorflow/tfjs";
 
 export const padToMatch = (
@@ -113,3 +119,16 @@ export function toInferenceInput(
 ): InferenceInput {
   return toTrainingInput(item);
 }
+export const ok = <T = void>(data?: T): ApiResult<T> =>
+  (data === undefined
+    ? { success: true }
+    : { success: true, data }) as ApiResult<T>;
+
+export const err = (
+  code: ErrorCode,
+  message: string,
+  cause?: unknown,
+): { success: false; reason: ErrorReason } => ({
+  success: false,
+  reason: { code, message, cause },
+});

@@ -1,7 +1,7 @@
 // src/utils/dl/classification/classifierHandler.ts
 import * as Comlink from "comlink";
 
-import { registerClassifierHmrCleanup } from "./devHmrCleanup";
+import { registerClassifierHmrCleanup } from "../devHmrCleanup";
 
 import type {
   FitOptions,

@@ -14,10 +14,9 @@ import {
 } from "../models";
 import { ModelTask } from "../../enums";
 import { ModelArch } from "../types";
-import { err, ok } from "../utils";
+import { err, ok } from "../../utils";
 
 import type {
-  ApiResult,
   BatchModelLoadResult,
   EvaluationResult,
   FitOptions,
@@ -32,6 +31,7 @@ import type {
 import type { Logs } from "@tensorflow/tfjs";
 import type { SequentialClassifier } from "../models";
 import type {
+  ApiResult,
   InferenceInput,
   SerializedModelData,
   SerializedModels,
