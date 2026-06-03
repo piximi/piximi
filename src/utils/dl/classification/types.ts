@@ -40,6 +40,7 @@ export type ModelArgs = {
   kind?: string;
   src?: string;
   requiredChannels?: number;
+  modelArch?: ModelArch;
 };
 export type PreprocessSettings = {
   shuffle: boolean;
@@ -164,7 +165,7 @@ export type ApiResult<T = void> = [T] extends [void]
 
 export type ModelInfoDTO = {
   name: string;
-  archTag: ModelArch | string | undefined;
+  modelArch: ModelArch | string | undefined;
   task: ModelTask;
   graph: boolean;
   trainable: boolean;

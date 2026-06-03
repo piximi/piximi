@@ -11,6 +11,7 @@ import { Model } from "../../Model";
 import { SequentialClassifier } from "./AbstractClassifier";
 import { createCompileArgs, getDefaultModelInfo } from "../utils";
 import { convertArrayToShape } from "../../utils";
+import { ModelArch } from "../types";
 
 import type { OptimizerSettings } from "../types";
 import type { LayersModel } from "@tensorflow/tfjs";
@@ -73,6 +74,7 @@ export class UploadedClassifier extends SequentialClassifier {
           };
           classes: string[];
           optimizerSettings: OptimizerSettings;
+          modelArch?: ModelArch;
         }
       | undefined;
     if (this._descFile) {
@@ -85,11 +87,24 @@ export class UploadedClassifier extends SequentialClassifier {
           > & { rescale: boolean };
           classes: string[];
           optimizerSettings: OptimizerSettings;
+          modelArch?: number;
         };
-        const { rescale, ...rest } = raw.preprocessSettings;
+        const {
+          rescale,
+          normalize: normalizeField,
+          ...rest
+        } = raw.preprocessSettings as typeof raw.preprocessSettings & {
+          normalize?: boolean;
+        };
         metadata = {
           ...raw,
-          preprocessSettings: { ...rest, normalize: rescale },
+          preprocessSettings: { ...rest, normalize: normalizeField ?? rescale },
+          modelArch:
+            raw.modelArch !== undefined
+              ? raw.modelArch === 0
+                ? ModelArch.SIMPLE_CNN
+                : ModelArch.MOBILE_NET
+              : undefined,
         };
       } catch (err) {
         logger(err, { level: "warn" });
@@ -99,6 +114,7 @@ export class UploadedClassifier extends SequentialClassifier {
       this._preprocessingSettings = metadata.preprocessSettings;
       this.classes = metadata.classes;
       this._optimizerSettings = metadata.optimizerSettings;
+      this._modelArch = metadata.modelArch;
     } else {
       const defaultModelInfo = getDefaultModelInfo();
       this._preprocessingSettings = {

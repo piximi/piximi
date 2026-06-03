@@ -2,8 +2,7 @@ import { createSimpleCNN } from "./loadSimpleCNN";
 import { SequentialClassifier } from "../AbstractClassifier/AbstractClassifier";
 import { ModelTask } from "../../../enums";
 import { createCompileArgs } from "../../utils";
-
-import type { LoadModelArgs } from "../../types";
+import { ModelArch, type LoadModelArgs } from "../../types";
 
 export class SimpleCNN extends SequentialClassifier {
   private seed: number;
@@ -14,6 +13,7 @@ export class SimpleCNN extends SequentialClassifier {
       graph: false,
       pretrained: false,
       trainable: true,
+      modelArch: ModelArch.SIMPLE_CNN,
     });
     this.seed = seed;
   }

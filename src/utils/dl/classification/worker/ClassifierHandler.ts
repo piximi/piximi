@@ -129,7 +129,7 @@ export class ClassifierHandler implements IClassifierApi {
   private buildModelInfoDTO(model: SequentialClassifier) {
     return {
       name: model.name,
-      archTag: (model as any).archTag,
+      modelArch: model.modelArch,
       task: model.task,
       graph: model.graph,
       trainable: model.trainable,

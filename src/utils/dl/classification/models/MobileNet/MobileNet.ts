@@ -2,8 +2,7 @@ import { createMobileNet } from "./loadMobileNet";
 import { SequentialClassifier } from "../AbstractClassifier/AbstractClassifier";
 import { ModelTask } from "../../../enums";
 import { createCompileArgs } from "../../utils";
-
-import type { LoadModelArgs } from "../../types";
+import { ModelArch, type LoadModelArgs } from "../../types";
 
 export class MobileNet extends SequentialClassifier {
   constructor(name?: string) {
@@ -14,6 +13,7 @@ export class MobileNet extends SequentialClassifier {
       pretrained: false,
       trainable: true,
       src: "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json",
+      modelArch: ModelArch.MOBILE_NET,
     });
   }
 

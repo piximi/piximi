@@ -45,6 +45,7 @@ export abstract class SequentialClassifier extends Model {
   protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   protected _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D }>;
   private _cachedOutputShape?: number[];
+
   protected override _classes: string[] = [];
 
   public override dispose() {

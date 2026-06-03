@@ -9,6 +9,8 @@ import {
   literal as IOTSLiteral,
   boolean as IOTSBoolean,
   record as IOTSRecord,
+  intersection as iotsIntersection,
+  partial as IOTSPartialType,
 } from "io-ts";
 
 import {
@@ -147,32 +149,40 @@ export const SerializedFileRTypeV02 = IOTSType({
   version: IOTSString,
 });
 
-export const SerializedModelMetadataRType = IOTSType({
-  preprocessSettings: IOTSType({
-    cropSchema: enumToCodec(CropSchema),
-    numCrops: IOTSNumber,
-    inputShape: IOTSType({
-      width: IOTSNumber,
-      height: IOTSNumber,
-      channels: IOTSNumber,
-    }),
-    shuffle: IOTSBoolean,
-    rescale: IOTSBoolean,
-    batchSize: IOTSNumber,
-  }),
-  classes: IOTSArray(IOTSString),
-  optimizerSettings: IOTSType({
-    learningRate: IOTSNumber,
-    lossFunction: IOTSUnion([
-      enumToCodec(LossFunction),
-      IOTSArray(enumToCodec(LossFunction)),
-      IOTSRecord(IOTSString, enumToCodec(LossFunction)),
+export const SerializedModelMetadataRType = iotsIntersection([
+  IOTSType({
+    preprocessSettings: iotsIntersection([
+      IOTSType({
+        cropSchema: enumToCodec(CropSchema),
+        numCrops: IOTSNumber,
+        inputShape: IOTSType({
+          width: IOTSNumber,
+          height: IOTSNumber,
+          channels: IOTSNumber,
+        }),
+        shuffle: IOTSBoolean,
+        batchSize: IOTSNumber,
+      }),
+      IOTSUnion([
+        IOTSType({ rescale: IOTSBoolean }), // old saves
+        IOTSType({ normalize: IOTSBoolean }), // new saves
+      ]),
     ]),
-    metrics: IOTSArray(enumToCodec(Metric)),
-    optimizationAlgorithm: enumToCodec(OptimizationAlgorithm),
-    epochs: IOTSNumber,
-    batchSize: IOTSNumber,
+    classes: IOTSArray(IOTSString),
+    optimizerSettings: IOTSType({
+      learningRate: IOTSNumber,
+      lossFunction: IOTSUnion([
+        enumToCodec(LossFunction),
+        IOTSArray(enumToCodec(LossFunction)),
+        IOTSRecord(IOTSString, enumToCodec(LossFunction)),
+      ]),
+      metrics: IOTSArray(enumToCodec(Metric)),
+      optimizationAlgorithm: enumToCodec(OptimizationAlgorithm),
+      epochs: IOTSNumber,
+      batchSize: IOTSNumber,
+    }),
   }),
-});
+  IOTSPartialType({ modelArch: IOTSNumber }),
+]);
 
 //#endregion Basic Serialization Type

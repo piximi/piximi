@@ -13,6 +13,7 @@ import type {
   ModelLayerData,
   OptimizerSettings,
   ReducedPreprocessSettings,
+  ModelArch,
 } from "../classification/types";
 import type { ModelTask } from "../enums";
 import type { GraphModel, LayersModel, Logs } from "@tensorflow/tfjs";
@@ -33,6 +34,7 @@ export abstract class Model {
   protected _preprocessingSettings?: ReducedPreprocessSettings;
   protected _classes?: string[];
   protected _optimizerSettings?: OptimizerSettings;
+  protected _modelArch?: ModelArch;
 
   constructor({
     name,
@@ -43,6 +45,7 @@ export abstract class Model {
     trainable,
     src,
     requiredChannels,
+    modelArch,
   }: ModelArgs) {
     this.name = name;
     this.task = task;
@@ -52,6 +55,7 @@ export abstract class Model {
     this.trainable = trainable;
     this.src = src;
     this._requiredChannels = requiredChannels;
+    this._modelArch = modelArch;
     // set defaults
     this._model = undefined;
     this._currentFitHistory = [];
@@ -101,6 +105,9 @@ export abstract class Model {
   }
   public get optimizerSettings() {
     return this._optimizerSettings;
+  }
+  public get modelArch() {
+    return this._modelArch;
   }
 
   public setPretrained() {
@@ -168,6 +175,7 @@ export abstract class Model {
           preprocessSettings?: ReducedPreprocessSettings;
           classes?: string[];
           optimizerSettings?: OptimizerSettings;
+          modelArch?: ModelArch;
         } = {
           modelTopology: modelArtifacts.modelTopology,
           format: modelArtifacts.format,
@@ -198,6 +206,9 @@ export abstract class Model {
         }
         if (this._optimizerSettings) {
           modelJSON.optimizerSettings = this._optimizerSettings;
+        }
+        if (this._modelArch !== undefined) {
+          modelJSON.modelArch = this._modelArch;
         }
         modelJsonBlob = new Blob([JSON.stringify(modelJSON)], {
           type: "application/json",
