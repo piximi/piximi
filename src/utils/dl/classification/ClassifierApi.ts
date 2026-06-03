@@ -121,8 +121,8 @@ export class ClassifierApi implements IClassifierApi {
   }) {
     return this.backend.modelFromFiles(input);
   }
-  async modelFromUrl(url: string, fromTFHub: boolean, isGraph: boolean) {
-    return this.backend.modelFromUrl(url, fromTFHub, isGraph);
+  async modelFromUrl(url: string, isGraph: boolean) {
+    return this.backend.modelFromUrl(url, isGraph);
   }
 
   async modelsFromZipBuffer(input: ArrayBuffer) {

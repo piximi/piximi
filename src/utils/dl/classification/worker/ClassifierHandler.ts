@@ -463,7 +463,6 @@ export class ClassifierHandler implements IClassifierApi {
 
   public async modelFromUrl(
     modelUrl: string,
-    fromTFHub: boolean,
     isGraph: boolean,
   ): Promise<ApiResult<ModelInfoDTO>> {
     const modelName = getUniqueName(
@@ -475,7 +474,6 @@ export class ClassifierHandler implements IClassifierApi {
       task: ModelTask.Classification,
       pretrained: true,
       trainable: isGraph,
-      TFHub: fromTFHub,
       graph: isGraph,
       src: modelUrl,
     });

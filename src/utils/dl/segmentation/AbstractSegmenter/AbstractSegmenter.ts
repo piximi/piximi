@@ -12,7 +12,6 @@ import { Model } from "../../Model";
 import type {
   GraphModel,
   Tensor,
-  Tensor2D,
   Tensor4D,
   data as tfdata,
 } from "@tensorflow/tfjs";
@@ -23,17 +22,13 @@ export type OrphanedAnnotationObject = Omit<
 >;
 
 export abstract class Segmenter extends Model {
-  protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   protected _inferenceDataset?: tfdata.Dataset<Tensor4D>;
 
   public override dispose() {
-    this._trainingDataset = undefined;
-    this._validationDataset = undefined;
     this._inferenceDataset = undefined;
     super.dispose();
   }
-
+  public abstract loadInference(items: any[], preprocessingArgs: any): void;
   public abstract predict(
     loadCb?: LoadCB,
   ): OrphanedAnnotationObject[][] | Promise<OrphanedAnnotationObject[][]>;
@@ -50,22 +45,6 @@ export abstract class Segmenter extends Model {
    */
   public abstract inferenceCategoriesById(catIds: Array<string>): Category[];
   public abstract inferenceKindsById(kind: Array<string>): Kind[];
-
-  public evaluate() {
-    throw Error(`"${this.name}" Model evaluation not supported`);
-  }
-
-  public stopTraining() {
-    throw Error(`"${this.name}" Model early stopping not supported`);
-  }
-
-  public get modelLoaded() {
-    return this._model !== undefined;
-  }
-
-  public get defaultInputShape() {
-    return this._model?.inputs[0].shape!.slice(1) as number[];
-  }
 
   public get expectedType() {
     if (!this._model) {
@@ -94,27 +73,8 @@ export abstract class Segmenter extends Model {
     return outputShape ? (outputShape as number[]).slice(1) : undefined;
   }
 
-  public get trainingLoaded() {
-    return this._trainingDataset !== undefined;
-  }
-
-  public get validationLoaded() {
-    return this._validationDataset !== undefined;
-  }
-
   public get inferenceLoaded() {
     return this._inferenceDataset !== undefined;
-  }
-
-  public onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (
-    _epochs,
-    _logs,
-  ) => {};
-
-  public get modelSummary() {
-    // TODO: implement graph model summary
-    if (this.graph) throw Error("Not implemented for graph models");
-    return [];
   }
 
   /*

@@ -5,20 +5,17 @@ import {
   MODEL_WEIGHTS_FILENAME,
 } from "utils/file-io-v2/consts";
 
-import { createCompileArgs, isLayersModel } from "../classification/utils";
-
 import type {
   RunHistoryEpoch,
   ModelArgs,
-  ModelLayerData,
   OptimizerSettings,
   ReducedPreprocessSettings,
   ModelArch,
 } from "../classification/types";
 import type { ModelTask } from "../enums";
-import type { GraphModel, LayersModel, Logs } from "@tensorflow/tfjs";
+import type { GraphModel, LayersModel } from "@tensorflow/tfjs";
 
-export abstract class Model {
+export class Model {
   readonly name: string;
   readonly task: ModelTask;
   readonly graph: boolean;
@@ -62,23 +59,12 @@ export abstract class Model {
   }
 
   public dispose() {
-    console.trace("Model.dispose called on", this.name);
     if (this._model) {
       this._model.dispose();
     }
     // set defaults
     this._model = undefined;
     this._currentFitHistory = [];
-  }
-
-  protected recordEpoch(epoch: number, logs: Logs): void {
-    this._currentFitHistory.push({
-      epoch,
-      loss: Number(logs.loss),
-      valLoss: Number(logs.val_loss),
-      accuracy: Number(logs.acc ?? logs.categoricalAccuracy),
-      valAccuracy: Number(logs.val_acc ?? logs.val_categoricalAccuracy),
-    });
   }
 
   public get requiredChannels() {
@@ -114,34 +100,7 @@ export abstract class Model {
     this._pretrained = true;
   }
 
-  public abstract loadModel(loadModelArgs?: any): void | Promise<void>;
-  // Concrete models narrow these to their specific input shapes
-  // (e.g. `SequentialClassifier` uses `TrainingInput[]` / `InferenceInput[]`).
-  public abstract loadTraining(
-    items: any[],
-    preprocessingArgs: any,
-    runSeed: number,
-  ): void;
-  public abstract loadValidation(
-    items: any[],
-    preprocessingArgs: any,
-    runSeed: number,
-  ): void;
-  public abstract loadInference(items: any[], preprocessingArgs: any): void;
-  public recompile(optimizerSettings: OptimizerSettings) {
-    if (!this._model) throw new Error(`"${this.name}" Model not loaded`);
-    if (!isLayersModel(this._model))
-      throw new Error(`"${this.name}" Graph models cannot be recompiled.`);
-    this._model.compile(createCompileArgs(optimizerSettings));
-    this._optimizerSettings = optimizerSettings;
-  }
-  public abstract train(options: any, callbacks: any): any;
-  public abstract predict(options: any, callbacks: any): any;
-  public abstract evaluate(): any;
-
-  public abstract stopTraining(): void;
-
-  public async getSavedModelFiles(modelName?: string) {
+  public async getSavedModelFiles() {
     let weightsBlob: Blob | undefined = undefined;
     let modelJsonBlob: Blob | undefined = undefined;
 
@@ -263,14 +222,10 @@ export abstract class Model {
       );
     }
   }
-
-  public abstract get modelLoaded(): boolean;
-  public abstract get trainingLoaded(): boolean;
-  public abstract get validationLoaded(): boolean;
-  public abstract get inferenceLoaded(): boolean;
-
-  public abstract get defaultInputShape(): number[];
-  public abstract get defaultOutputShape(): number[] | undefined;
-
-  public abstract get modelSummary(): Array<ModelLayerData> | undefined;
+  public get defaultInputShape() {
+    return this._model?.inputs[0].shape!.slice(1) as number[];
+  }
+  public get modelLoaded() {
+    return this._model !== undefined;
+  }
 }
