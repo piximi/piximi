@@ -1,19 +1,16 @@
-import {
-  Tensor1D,
-  Tensor4D,
-  onesLike,
-  tensor1d,
-  tidy,
-  unique,
-  whereAsync,
-} from "@tensorflow/tfjs";
-import { ColorModel, Image as ImageJS } from "image-js";
+import { onesLike, tensor1d, tidy, unique, whereAsync } from "@tensorflow/tfjs";
+import { Image as ImageJS } from "image-js";
 import { hyphaWebsocketClient } from "imjoy-rpc";
 
-import { encode } from "views/ImageViewer/utils";
-import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
-import { generateUUID } from "store/data/utils";
+import { generateUUID } from "store/dataV2/utils";
+
+import { rleEncodeArray } from "utils/image";
+
 import { Partition } from "../../enums";
+
+import type { PredictedAnnotationObject } from "../types";
+import type { ColorModel } from "image-js";
+import type { Tensor1D, Tensor4D } from "@tensorflow/tfjs";
 
 const labelToAnnotation = async (
   labelMask: Tensor1D,
@@ -21,8 +18,7 @@ const labelToAnnotation = async (
   maskH: number,
   maskW: number,
   kindId: string,
-  unknownCategoryId: string,
-): Promise<OrphanedAnnotationObject> => {
+): Promise<PredictedAnnotationObject> => {
   const labelFilter = tidy(() => onesLike(labelMask).mul(label));
 
   // bool
@@ -83,13 +79,11 @@ const labelToAnnotation = async (
   }).data;
 
   return {
-    kind: kindId,
-    categoryId: unknownCategoryId,
-    boundingBox: bbox as [number, number, number, number],
-    encodedMask: encode(annotationData, true),
-    activePlane: 0,
-    partition: Partition.Unassigned,
     id: generateUUID(),
+    kindId: kindId,
+    boundingBox: bbox as [number, number, number, number],
+    encodedMask: rleEncodeArray(annotationData, true),
+    partition: Partition.Unassigned,
   };
 };
 
@@ -98,7 +92,6 @@ const labelMaskToAnnotation = async (
   maskH: number,
   maskW: number,
   kindId: string,
-  unknownCategoryId: string,
 ) => {
   const { values, indices } = unique(labelMask);
 
@@ -107,7 +100,7 @@ const labelMaskToAnnotation = async (
   indices.dispose();
   values.dispose();
 
-  const annotations: Array<OrphanedAnnotationObject> = [];
+  const annotations: Array<PredictedAnnotationObject> = [];
 
   for (const label of labels) {
     if (label !== 0) {
@@ -117,7 +110,6 @@ const labelMaskToAnnotation = async (
         maskH,
         maskW,
         kindId,
-        unknownCategoryId,
       );
       annotations.push(annotation);
     }
@@ -205,7 +197,6 @@ export const predictCellpose = async (
     imTensor.shape[1],
     imTensor.shape[2],
     fgKindId,
-    unknownCategoryId,
   );
 
   return annotations;

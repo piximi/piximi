@@ -1,21 +1,27 @@
 import {
-  Tensor1D,
-  Tensor4D,
   onesLike,
   tensor1d,
   tidy,
   unique,
   whereAsync,
-  GraphModel,
-  Tensor3D,
   tensor3d,
 } from "@tensorflow/tfjs";
-import { ColorModel, Image as ImageJS, ImageKind } from "image-js";
+import { Image as ImageJS } from "image-js";
 
-import { encode } from "views/ImageViewer/utils";
-import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
-import { generateUUID } from "store/data/utils";
+import { generateUUID } from "store/dataV2/utils";
+
+import { rleEncodeArray } from "utils/image";
+
 import { Partition } from "../../enums";
+
+import type { PredictedAnnotationObject } from "../types";
+import type { ColorModel, ImageKind } from "image-js";
+import type {
+  Tensor1D,
+  Tensor4D,
+  GraphModel,
+  Tensor3D,
+} from "@tensorflow/tfjs";
 
 const labelToAnnotation = async (
   labelMask: Tensor1D,
@@ -23,8 +29,7 @@ const labelToAnnotation = async (
   maskH: number,
   maskW: number,
   kindId: string,
-  unknownCategoryId: string,
-): Promise<OrphanedAnnotationObject | undefined> => {
+): Promise<PredictedAnnotationObject | undefined> => {
   const labelFilter = tidy(() => onesLike(labelMask).mul(label));
 
   // bool
@@ -90,11 +95,9 @@ const labelToAnnotation = async (
   }).data;
 
   return {
-    kind: kindId,
-    categoryId: unknownCategoryId,
+    kindId: kindId,
     boundingBox: bbox as [number, number, number, number],
-    encodedMask: encode(annotationData, true),
-    activePlane: 0,
+    encodedMask: rleEncodeArray(annotationData, true),
     partition: Partition.Unassigned,
     id: generateUUID(),
   };
@@ -105,7 +108,6 @@ const labelMaskToAnnotation = async (
   maskH: number,
   maskW: number,
   kindId: string,
-  unknownCategoryId: string,
 ) => {
   const { values, indices } = unique(labelMask);
 
@@ -114,7 +116,7 @@ const labelMaskToAnnotation = async (
   indices.dispose();
   values.dispose();
 
-  const annotations: Array<OrphanedAnnotationObject> = [];
+  const annotations: Array<PredictedAnnotationObject> = [];
 
   for (const label of labels) {
     if (label !== 0) {
@@ -124,7 +126,6 @@ const labelMaskToAnnotation = async (
         maskH,
         maskW,
         kindId,
-        unknownCategoryId,
       );
       if (annotation) {
         annotations.push(annotation);
@@ -243,7 +244,6 @@ export const predictGlas = async (
     inputImDims.height,
     inputImDims.width,
     fgKindId,
-    unknownCategoryId,
   );
 
   return annotations;

@@ -1,36 +1,26 @@
 import { tidy, zeros } from "@tensorflow/tfjs";
 
-import type { Category, Kind, AnnotationObject } from "store/data/types";
+import type { Category, Kind } from "store/dataV2/types";
 
 import { logger } from "utils/logUtils";
 import type { LoadCB } from "utils/types";
+import type { InferenceInput } from "utils/dl/types";
 
 import { Model } from "../../Model";
 
-//import type { TrainingCallbacks } from "../../types";
-import type {
-  GraphModel,
-  Tensor,
-  Tensor4D,
-  data as tfdata,
-} from "@tensorflow/tfjs";
-
-export type OrphanedAnnotationObject = Omit<
-  AnnotationObject,
-  "imageId" | "data" | "src" | "bitDepth" | "name" | "shape"
->;
+import type { PredictedAnnotationObject } from "../types";
+import type { GraphModel, Tensor } from "@tensorflow/tfjs";
 
 export abstract class Segmenter extends Model {
-  protected _inferenceDataset?: tfdata.Dataset<Tensor4D>;
-
   public override dispose() {
-    this._inferenceDataset = undefined;
     super.dispose();
   }
-  public abstract loadInference(items: any[], preprocessingArgs: any): void;
+
   public abstract predict(
+    items: InferenceInput[],
+    kinds?: Array<Kind>,
     loadCb?: LoadCB,
-  ): OrphanedAnnotationObject[][] | Promise<OrphanedAnnotationObject[][]>;
+  ): PredictedAnnotationObject[][] | Promise<PredictedAnnotationObject[][]>;
 
   /*
    * Concrete classes must keep track of their inference categories somehow,
@@ -70,10 +60,6 @@ export abstract class Segmenter extends Model {
 
     // idx 0 is the batch dim
     return outputShape ? (outputShape as number[]).slice(1) : undefined;
-  }
-
-  public get inferenceLoaded() {
-    return this._inferenceDataset !== undefined;
   }
 
   /*

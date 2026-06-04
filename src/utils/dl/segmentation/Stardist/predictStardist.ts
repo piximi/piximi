@@ -1,6 +1,4 @@
 import {
-  Tensor4D,
-  GraphModel,
   dispose,
   tidy,
   image as TFImage,
@@ -10,12 +8,20 @@ import {
   getBackend,
 } from "@tensorflow/tfjs";
 
-import { encode, scanline, simplifyPolygon } from "views/ImageViewer/utils";
-import { connectPoints } from "views/ImageViewer/utils";
-import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
-import { generateUUID } from "store/data/utils";
+import { generateUUID } from "store/dataV2/utils";
+
+import type { Point } from "utils/types";
+import {
+  connectPoints,
+  rleEncodeArray,
+  scanline,
+  simplifyPolygon,
+} from "utils/image";
+
 import { Partition } from "../../enums";
-import { Point } from "utils/types";
+
+import type { PredictedAnnotationObject } from "../types";
+import type { Tensor4D, GraphModel } from "@tensorflow/tfjs";
 
 const computeAnnotationMaskFromPoints = (
   cropDims: { x: number; y: number; width: number; height: number },
@@ -121,7 +127,7 @@ function generateAnnotations(
   },
   scoreThresh: number,
 ) {
-  const generatedAnnotations: Array<OrphanedAnnotationObject> = [];
+  const generatedAnnotations: Array<PredictedAnnotationObject> = [];
   const scores: Array<number> = [];
   const generatedBboxes: Array<[number, number, number, number]> = [];
 
@@ -143,14 +149,12 @@ function generateAnnotations(
 
         const { decodedMask, bbox } = polygon;
 
-        const annotation = {
-          encodedMask: encode(decodedMask),
+        const annotation: PredictedAnnotationObject = {
+          encodedMask: rleEncodeArray(decodedMask),
           boundingBox: bbox,
-          kind: kindId,
-          categoryId: unknownCategoryId,
+          kindId: kindId,
           partition: Partition.Unassigned,
           id: generateUUID(),
-          activePlane: 0,
         };
 
         generatedAnnotations.push(annotation);
@@ -216,7 +220,7 @@ export const predictStardist = async (
   const indices = (await indexTensor.data()) as Float32Array;
   dispose(indexTensor);
 
-  const selectedAnnotations: Array<OrphanedAnnotationObject> = [];
+  const selectedAnnotations: Array<PredictedAnnotationObject> = [];
 
   indices.forEach((index) => {
     selectedAnnotations.push(generatedAnnotations[index]);

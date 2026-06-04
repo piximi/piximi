@@ -1,7 +1,7 @@
 import { LayersModel } from "@tensorflow/tfjs";
 
-import type { Kind } from "store/data/types";
-import { generateKind } from "store/data/utils";
+import type { Kind } from "store/dataV2/types";
+import { generateKind } from "store/dataV2/utils";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessGlas } from "./preprocessGlas";
@@ -11,11 +11,7 @@ import { loadGlas } from "./loadGlas";
 
 import type { InferenceInput } from "../../types";
 import type { GraphModel } from "@tensorflow/tfjs";
-type LoadInferenceDataArgs = {
-  // if cat undefined, created from default classes
-  // if defined, it should be length 1, as only a foreground class is needed
-  kinds?: Array<Kind>;
-};
+
 const KIND_NAME = "glas_glands";
 /*
  * Gland Segmentation
@@ -28,10 +24,7 @@ const KIND_NAME = "glas_glands";
  */
 export class Glas extends Segmenter {
   protected _fgKind?: Kind;
-  protected _inferenceDataDims?: Array<{
-    width: number;
-    height: number;
-  }>;
+
   constructor() {
     super({
       name: "GlandSegmentation",
@@ -49,29 +42,7 @@ export class Glas extends Segmenter {
     this._model = await loadGlas();
   }
 
-  public loadInference(
-    items: InferenceInput[],
-    preprocessingArgs: LoadInferenceDataArgs,
-  ): void {
-    this._inferenceDataDims = items.map((item) => {
-      const { height, width } = item.shape;
-      return { height, width };
-    });
-    this._inferenceDataset = preprocessGlas(items, 1);
-
-    if (preprocessingArgs.kinds) {
-      if (preprocessingArgs.kinds.length !== 1)
-        throw Error(
-          `${this.name} Model only takes a single foreground category`,
-        );
-      this._fgKind = preprocessingArgs.kinds[0];
-    } else if (!this._fgKind) {
-      const { kind } = generateKind(KIND_NAME, true);
-      this._fgKind = kind;
-    }
-  }
-
-  public async predict() {
+  public async predict(items: InferenceInput[], kinds: Array<Kind>) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -80,17 +51,25 @@ export class Glas extends Segmenter {
       throw Error(`"${this.name}" Model must a Graph, not Layers`);
     }
 
-    if (!this._inferenceDataset) {
-      throw Error(`"${this.name}" Model's inference data not loaded`);
-    }
-
-    if (!this._fgKind) {
-      throw Error(`"${this.name}" Model's foreground kind is not loaded`);
+    if (kinds) {
+      if (kinds.length !== 1)
+        throw Error(
+          `${this.name} Model only takes a single foreground category`,
+        );
+      this._fgKind = kinds[0];
+    } else if (!this._fgKind) {
+      const { kind } = generateKind(KIND_NAME, true);
+      this._fgKind = kind;
     }
 
     const graphModel = this._model as GraphModel;
+    const inferenceDataDims = items.map((item) => {
+      const { height, width } = item.shape;
+      return { height, width };
+    });
+    const inferenceDataset = preprocessGlas(items, 1);
 
-    const infT = await this._inferenceDataset.toArray();
+    const infT = await inferenceDataset.toArray();
     // imTensor disposed in `predictGlas`
 
     const annotationsPromises = infT.map((imTensor, idx) => {
@@ -99,7 +78,7 @@ export class Glas extends Segmenter {
         imTensor,
         this._fgKind!.id,
         this._fgKind!.unknownCategoryId,
-        this._inferenceDataDims![idx],
+        inferenceDataDims![idx],
       );
     });
     const annotations = await Promise.all(annotationsPromises);

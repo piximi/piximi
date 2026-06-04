@@ -1,7 +1,7 @@
 import { data as tfdata, scalar, tidy } from "@tensorflow/tfjs";
 
-import type { Kind } from "store/data/types";
-import { generateKind } from "store/data/utils";
+import type { Kind } from "store/dataV2/types";
+import { generateKind } from "store/dataV2/utils";
 
 import type { LoadCB } from "utils/types";
 
@@ -10,15 +10,9 @@ import { predictCellpose } from "./predictCellpose";
 import { ModelTask } from "../../enums";
 import { channelsToTensor } from "../../tensor-assembly";
 
+import type { PredictedAnnotationObject } from "../types";
 import type { InferenceInput } from "../../types";
-import type { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
 import type { GraphModel, Tensor3D, Tensor4D } from "@tensorflow/tfjs";
-
-type LoadInferenceDataArgs = {
-  // if cat undefined, created from default classes
-  // if defined, it should be length 1, as only a foreground class is needed
-  kinds?: Array<Kind>;
-};
 
 const KIND_NAME = "cellpose_cells";
 
@@ -58,16 +52,13 @@ export class Cellpose extends Segmenter {
     this._model = { dispose: () => {} } as GraphModel;
   }
 
-  public loadInference(
-    items: InferenceInput[],
-    preprocessingArgs: LoadInferenceDataArgs,
-  ): void {
+  private loadInference(items: InferenceInput[]): tfdata.Dataset<Tensor4D> {
     const count = items.length;
     const indices = tfdata.generator(function* () {
       for (let i = 0; i < count; i++) yield i;
     });
 
-    this._inferenceDataset = indices
+    const inferenceDataset = indices
       .mapAsync(async (value) => {
         const item = items[value as number];
         const xs = await channelsToTensor(
@@ -84,34 +75,32 @@ export class Cellpose extends Segmenter {
       })
       .batch(1) as tfdata.Dataset<Tensor4D>;
 
-    if (preprocessingArgs.kinds) {
-      if (preprocessingArgs.kinds.length !== 1)
+    return inferenceDataset;
+  }
+
+  public async predict(
+    items: InferenceInput[],
+    kinds: Array<Kind>,
+    loadCb?: LoadCB,
+  ) {
+    if (!this._model) {
+      throw Error(`"${this.name}" Model not loaded`);
+    }
+    if (kinds) {
+      if (kinds.length !== 1)
         throw Error(
           `${this.name} Model only takes a single foreground category`,
         );
-      this._fgKind = preprocessingArgs.kinds[0];
+      this._fgKind = kinds[0];
     } else if (!this._fgKind) {
       const { kind } = generateKind(KIND_NAME, true);
       this._fgKind = kind;
     }
-  }
+    const inferenceDataset = this.loadInference(items);
 
-  public async predict(loadCb?: LoadCB) {
-    if (!this._model) {
-      throw Error(`"${this.name}" Model not loaded`);
-    }
+    const infT = await inferenceDataset.toArray();
 
-    if (!this._inferenceDataset) {
-      throw Error(`"${this.name}" Model's inference data not loaded`);
-    }
-
-    if (!this._fgKind) {
-      throw Error(`"${this.name}" Model's foreground kind is not loaded`);
-    }
-
-    const infT = await this._inferenceDataset.toArray();
-
-    const annotations: Array<OrphanedAnnotationObject[]> = [];
+    const annotations: Array<PredictedAnnotationObject[]> = [];
     for await (const [idx, imTensor] of infT.entries()) {
       // imTensor disposed in predictCellpose
       const annotObj = await predictCellpose(

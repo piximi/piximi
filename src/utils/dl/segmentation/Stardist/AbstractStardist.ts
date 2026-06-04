@@ -1,7 +1,7 @@
 import { LayersModel } from "@tensorflow/tfjs";
 
-import { generateKind } from "store/data/utils";
-import type { Kind } from "store/data/types";
+import { generateKind } from "store/dataV2/utils";
+import type { Kind } from "store/dataV2/types";
 
 import type { LoadCB } from "utils/types";
 
@@ -9,26 +9,16 @@ import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
 
+import type { PredictedAnnotationObject } from "../types";
 import type { InferenceInput } from "../../types";
-import type { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
 import type { GraphModel } from "@tensorflow/tfjs";
-type LoadInferenceDataArgs = {
-  // if cat undefined, created from default classes
-  // if defined, it should be length 1, as only a foreground class is needed
-  kinds?: Array<Kind>;
-};
+
 export const KIND_NAME = "stardist_nucleus";
 /*
  * Abstract model for Stardist variants
  */
 export abstract class Stardist extends Segmenter {
   protected _fgKind?: Kind;
-  protected _inferenceDataDims?: Array<{
-    width: number;
-    height: number;
-    padX: number;
-    padY: number;
-  }>;
 
   public abstract loadModel(): Promise<void>;
 
@@ -47,35 +37,11 @@ export abstract class Stardist extends Segmenter {
     return { padY, padX };
   }
 
-  public loadInference(
+  public async predict(
     items: InferenceInput[],
-    preprocessingArgs: LoadInferenceDataArgs,
-  ): void {
-    this._inferenceDataDims = items.map((item) => {
-      const { height, width } = item.shape;
-      const { padX, padY } = this._getPaddings(height, width);
-      return { height, width, padY, padX };
-    });
-
-    this._inferenceDataset = preprocessStardist(
-      items,
-      1,
-      this._inferenceDataDims,
-    );
-
-    if (preprocessingArgs.kinds) {
-      if (preprocessingArgs.kinds.length !== 1)
-        throw Error(
-          `${this.name} Model only takes a single foreground category`,
-        );
-      this._fgKind = preprocessingArgs.kinds[0];
-    } else if (!this._fgKind) {
-      const { kind } = generateKind(KIND_NAME, true);
-      this._fgKind = kind;
-    }
-  }
-
-  public async predict(loadCb?: LoadCB) {
+    kinds: Array<Kind>,
+    loadCb?: LoadCB,
+  ) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -84,24 +50,28 @@ export abstract class Stardist extends Segmenter {
       throw Error(`"${this.name}" Model must a Graph, not Layers`);
     }
 
-    if (!this._inferenceDataset) {
-      throw Error(`"${this.name}" Model's inference data not loaded`);
+    if (kinds) {
+      if (kinds.length !== 1)
+        throw Error(
+          `${this.name} Model only takes a single foreground category`,
+        );
+      this._fgKind = kinds[0];
+    } else if (!this._fgKind) {
+      const { kind } = generateKind(KIND_NAME, true);
+      this._fgKind = kind;
     }
 
-    if (!this._fgKind) {
-      throw Error(`"${this.name}" Model's foreground kind is not loaded`);
-    }
-
-    if (!this._inferenceDataDims) {
-      throw Error(
-        `"${this.name}" Model's inference data dimensions and padding information not loaded`,
-      );
-    }
+    const inferenceDataDims = items.map((item) => {
+      const { height, width } = item.shape;
+      const { padX, padY } = this._getPaddings(height, width);
+      return { height, width, padY, padX };
+    });
+    const inferenceDataset = preprocessStardist(items, 1, inferenceDataDims);
 
     const graphModel = this._model as GraphModel;
 
-    const infT = await this._inferenceDataset.toArray();
-    const annotations: Array<OrphanedAnnotationObject[]> = [];
+    const infT = await inferenceDataset.toArray();
+    const annotations: Array<PredictedAnnotationObject[]> = [];
     // imTensor disposed in `predictStardist`
     for await (const [idx, imTensor] of infT.entries()) {
       const annotObj = await predictStardist(
@@ -109,7 +79,7 @@ export abstract class Stardist extends Segmenter {
         imTensor,
         this._fgKind!.id,
         this._fgKind!.unknownCategoryId,
-        this._inferenceDataDims![idx],
+        inferenceDataDims![idx],
       );
       annotations.push(annotObj);
       if (loadCb) {
@@ -135,7 +105,6 @@ export abstract class Stardist extends Segmenter {
   }
 
   public override dispose() {
-    this._inferenceDataDims = undefined;
     this._fgKind = undefined;
     super.dispose();
   }

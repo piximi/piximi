@@ -1,4 +1,5 @@
-import type { OrphanedAnnotationObject } from "./AbstractSegmenter";
+import type { AnnotationObject, Kind } from "store/dataV2/types";
+
 import type { ApiResult, InferenceInput, SerializedModelData } from "../types";
 import type { ModelTask } from "../enums";
 
@@ -21,7 +22,15 @@ export type BatchModelLoadResult = {
   loadedModels: ModelInfoDTO[];
   failedModels: Record<string, { reason: string; err?: Error }>;
 };
-export type SegmentationResults = Array<Array<OrphanedAnnotationObject>>;
+export type LoadInferenceDataArgs = {
+  // if cat undefined, created from default classes
+  kinds?: Array<Kind>;
+};
+export type PredictedAnnotationObject = Omit<
+  AnnotationObject,
+  "imageId" | "planeId" | "shape" | "volumeId"
+> & { kindId: string };
+export type SegmentationResults = Array<Array<PredictedAnnotationObject>>;
 export interface ISegmenterApi {
   // registry reads
   getModelNames(): Promise<ApiResult<string[]>>;

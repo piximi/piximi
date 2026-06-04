@@ -1,20 +1,15 @@
 import { LayersModel, loadGraphModel } from "@tensorflow/tfjs";
 
-import type { Kind } from "store/data/types";
+import type { Kind } from "store/dataV2/types";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCoco } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
-import { constructCocoKinds } from "./constructCocoCategories";
+import { constructCocoKinds } from "./constructCocoKinds";
 import { ModelTask } from "../../enums";
 
 import type { InferenceInput } from "../../types";
 import type { GraphModel } from "@tensorflow/tfjs";
-
-type LoadInferenceDataArgs = {
-  // if cat undefined, created from default classes
-  kinds?: Array<Kind>;
-};
 
 /*
   SSD with MobileNet (v2) backbone, initialized with Imagenet classification checkpoint,
@@ -60,20 +55,7 @@ export class CocoSSD extends Segmenter {
     this._model = await loadGraphModel(this.src);
   }
 
-  public loadInference(
-    items: InferenceInput[],
-    preprocessingArgs: LoadInferenceDataArgs,
-  ) {
-    this._inferenceDataset = preprocessInference(items);
-
-    if (preprocessingArgs.kinds) {
-      this._inferenceKinds = preprocessingArgs.kinds;
-    } else if (!this._inferenceKinds) {
-      this._inferenceKinds = constructCocoKinds();
-    }
-  }
-
-  public async predict() {
+  public async predict(items: InferenceInput[], kinds?: Array<Kind>) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -81,18 +63,16 @@ export class CocoSSD extends Segmenter {
     if (this._model instanceof LayersModel) {
       throw Error(`"${this.name}" Model must a Graph, not Layers`);
     }
-
-    if (!this._inferenceDataset) {
-      throw Error(`"${this.name}" Model's inference data not loaded`);
+    if (kinds) {
+      this._inferenceKinds = kinds;
+    } else if (!this._inferenceKinds) {
+      this._inferenceKinds = constructCocoKinds();
     }
 
-    if (!this._inferenceKinds) {
-      throw Error(`"${this.name}" Model's inference kinds are not loaded`);
-    }
-
+    const inferenceDataset = preprocessInference(items);
     const graphModel = this._model as GraphModel;
 
-    const infT = await this._inferenceDataset.toArray();
+    const infT = await inferenceDataset.toArray();
     // imTensor disposed in `predictCoco`
     const annotationsPromises = infT.map((imTensor) => {
       return predictCoco(graphModel, imTensor, this._inferenceKinds!);

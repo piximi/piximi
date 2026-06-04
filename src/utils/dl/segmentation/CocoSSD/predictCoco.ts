@@ -1,23 +1,23 @@
 // mostly taken from here: https://github.com/tensorflow/tfjs-models/blob/master/coco-ssd/src/index.ts
 
 import {
-  Tensor,
-  Rank,
   tidy,
   image as tfimage,
-  GraphModel,
   dispose,
   getBackend,
   tensor2d,
   setBackend,
-  Tensor4D,
 } from "@tensorflow/tfjs";
 
-import { encode } from "views/ImageViewer/utils";
-import { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
-import { generateUUID } from "store/data/utils";
+import { generateUUID } from "store/dataV2/utils";
+import type { Kind } from "store/dataV2/types";
+
+import { rleEncodeArray } from "utils/image";
+
 import { Partition } from "../../enums";
-import { Kind } from "store/data/types";
+
+import type { PredictedAnnotationObject } from "../types";
+import type { Tensor, Rank, GraphModel, Tensor4D } from "@tensorflow/tfjs";
 
 export const predictCoco = async (
   model: GraphModel,
@@ -138,7 +138,7 @@ const buildDetectedObjects = (
   classes: Array<number>,
   kinds: Array<Kind>,
 ) => {
-  const annotations: Array<OrphanedAnnotationObject> = [];
+  const annotations: Array<PredictedAnnotationObject> = [];
   const count = indices.length;
 
   for (let i = 0; i < count; i++) {
@@ -173,11 +173,9 @@ const buildDetectedObjects = (
 
     annotations.push({
       boundingBox: annotationBbox,
-      categoryId: kind.unknownCategoryId,
-      kind: kind.id,
+      kindId: kind.id,
       id: generateUUID(),
-      encodedMask: encode(decodedMask),
-      activePlane: 0,
+      encodedMask: rleEncodeArray(decodedMask),
       partition: Partition.Unassigned,
     });
   }
