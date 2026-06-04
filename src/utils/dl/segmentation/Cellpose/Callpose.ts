@@ -1,4 +1,3 @@
-//@ts-nocheck Errors will be adressed during with refactor
 import { data as tfdata, scalar, tidy } from "@tensorflow/tfjs";
 
 import type { Kind } from "store/data/types";
@@ -11,12 +10,11 @@ import { predictCellpose } from "./predictCellpose";
 import { ModelTask } from "../../enums";
 import { channelsToTensor } from "../../tensor-assembly";
 
-import type { FitOptions, InferenceInput } from "../../types";
+import type { InferenceInput } from "../../types";
 import type { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
 import type { GraphModel, Tensor3D, Tensor4D } from "@tensorflow/tfjs";
 
 type LoadInferenceDataArgs = {
-  fitOptions: FitOptions;
   // if cat undefined, created from default classes
   // if defined, it should be length 1, as only a foreground class is needed
   kinds?: Array<Kind>;

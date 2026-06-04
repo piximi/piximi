@@ -1,4 +1,3 @@
-//@ts-nocheck Errors will be adressed during with refactor
 import { tidy, zeros } from "@tensorflow/tfjs";
 
 import type { Category, Kind, AnnotationObject } from "store/data/types";

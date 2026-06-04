@@ -1,4 +1,3 @@
-//@ts-nocheck Errors will be adressed during with refactor
 import { data as tfdata } from "@tensorflow/tfjs";
 
 import { channelsToTensor } from "../../tensor-assembly";
@@ -6,10 +5,7 @@ import { channelsToTensor } from "../../tensor-assembly";
 import type { Tensor4D } from "@tensorflow/tfjs";
 import type { InferenceInput } from "../../types";
 
-export const preprocessInference = (
-  items: Array<InferenceInput>,
-  _fitOptions: FitOptions,
-) => {
+export const preprocessInference = (items: Array<InferenceInput>) => {
   const count = items.length;
   const indices = tfdata.generator(function* () {
     for (let i = 0; i < count; i++) yield i;

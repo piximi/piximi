@@ -1,4 +1,3 @@
-//@ts-nocheck Errors will be adressed during with refactor
 import { LayersModel } from "@tensorflow/tfjs";
 
 import type { Kind } from "store/data/types";
@@ -10,9 +9,13 @@ import { predictGlas } from "./predictGlas";
 import { ModelTask } from "../../enums";
 import { loadGlas } from "./loadGlas";
 
-import type { InferenceInput, LoadInferenceDataArgs } from "../../types";
+import type { InferenceInput } from "../../types";
 import type { GraphModel } from "@tensorflow/tfjs";
-
+type LoadInferenceDataArgs = {
+  // if cat undefined, created from default classes
+  // if defined, it should be length 1, as only a foreground class is needed
+  kinds?: Array<Kind>;
+};
 const KIND_NAME = "glas_glands";
 /*
  * Gland Segmentation

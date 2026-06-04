@@ -1,4 +1,3 @@
-//@ts-nocheck Errors will be adressed during with refactor
 import { LayersModel, loadGraphModel } from "@tensorflow/tfjs";
 
 import type { Kind } from "store/data/types";
@@ -9,11 +8,10 @@ import { preprocessInference } from "../AbstractSegmenter/preprocess";
 import { constructCocoKinds } from "./constructCocoCategories";
 import { ModelTask } from "../../enums";
 
-import type { FitOptions, InferenceInput } from "../../types";
+import type { InferenceInput } from "../../types";
 import type { GraphModel } from "@tensorflow/tfjs";
 
 type LoadInferenceDataArgs = {
-  fitOptions: FitOptions;
   // if cat undefined, created from default classes
   kinds?: Array<Kind>;
 };
@@ -59,19 +57,14 @@ export class CocoSSD extends Segmenter {
     if (!this.src) return;
     if (this._model) return;
 
-    const isTFHub = CocoSSD.verifyTFHubUrl(this.src);
-
-    this._model = await loadGraphModel(this.src, { fromTFHub: isTFHub });
+    this._model = await loadGraphModel(this.src);
   }
 
   public loadInference(
     items: InferenceInput[],
     preprocessingArgs: LoadInferenceDataArgs,
   ) {
-    this._inferenceDataset = preprocessInference(
-      items,
-      preprocessingArgs.fitOptions,
-    );
+    this._inferenceDataset = preprocessInference(items);
 
     if (preprocessingArgs.kinds) {
       this._inferenceKinds = preprocessingArgs.kinds;

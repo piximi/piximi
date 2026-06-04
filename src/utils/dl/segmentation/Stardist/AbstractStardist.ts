@@ -1,4 +1,3 @@
-//@ts-nocheck Errors will be adressed during with refactor
 import { LayersModel } from "@tensorflow/tfjs";
 
 import { generateKind } from "store/data/utils";
@@ -10,10 +9,14 @@ import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
 
-import type { InferenceInput, LoadInferenceDataArgs } from "../../types";
+import type { InferenceInput } from "../../types";
 import type { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
 import type { GraphModel } from "@tensorflow/tfjs";
-
+type LoadInferenceDataArgs = {
+  // if cat undefined, created from default classes
+  // if defined, it should be length 1, as only a foreground class is needed
+  kinds?: Array<Kind>;
+};
 export const KIND_NAME = "stardist_nucleus";
 /*
  * Abstract model for Stardist variants
