@@ -1,1 +1,1 @@
-export { Cellpose } from "./Callpose";
+export { Cellpose } from "./Cellpose";
