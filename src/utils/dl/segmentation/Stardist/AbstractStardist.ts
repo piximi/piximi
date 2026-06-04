@@ -12,7 +12,7 @@ import { predictStardist } from "./predictStardist";
 
 import type { InferenceInput, LoadInferenceDataArgs } from "../../types";
 import type { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
-import type { GraphModel, History } from "@tensorflow/tfjs";
+import type { GraphModel } from "@tensorflow/tfjs";
 
 export const KIND_NAME = "stardist_nucleus";
 /*
@@ -28,16 +28,6 @@ export abstract class Stardist extends Segmenter {
   }>;
 
   public abstract loadModel(): Promise<void>;
-
-  public loadTraining(
-    _items: InferenceInput[],
-    _preprocessingArgs: any,
-  ): void {}
-
-  public loadValidation(
-    _items: InferenceInput[],
-    _preprocessingArgs: any,
-  ): void {}
 
   // This Stardist model requires image dimensions to be a multiple of 16
   // (for VHE in particular), see:
@@ -79,14 +69,6 @@ export abstract class Stardist extends Segmenter {
     } else if (!this._fgKind) {
       const { kind } = generateKind(KIND_NAME, true);
       this._fgKind = kind;
-    }
-  }
-
-  public async train(_options: any, _callbacks: any): Promise<History> {
-    if (!this.trainable) {
-      throw new Error(`Training not supported for Model ${this.name}`);
-    } else {
-      throw new Error(`Training not yet implemented for Model ${this.name}`);
     }
   }
 

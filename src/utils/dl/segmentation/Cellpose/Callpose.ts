@@ -13,7 +13,7 @@ import { channelsToTensor } from "../../tensor-assembly";
 
 import type { FitOptions, InferenceInput } from "../../types";
 import type { OrphanedAnnotationObject } from "../AbstractSegmenter/AbstractSegmenter";
-import type { GraphModel, History, Tensor3D, Tensor4D } from "@tensorflow/tfjs";
+import type { GraphModel, Tensor3D, Tensor4D } from "@tensorflow/tfjs";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
@@ -60,16 +60,6 @@ export class Cellpose extends Segmenter {
     this._model = { dispose: () => {} } as GraphModel;
   }
 
-  public loadTraining(
-    _items: InferenceInput[],
-    _preprocessingArgs: any,
-  ): void {}
-
-  public loadValidation(
-    _items: InferenceInput[],
-    _preprocessingArgs: any,
-  ): void {}
-
   public loadInference(
     items: InferenceInput[],
     preprocessingArgs: LoadInferenceDataArgs,
@@ -105,14 +95,6 @@ export class Cellpose extends Segmenter {
     } else if (!this._fgKind) {
       const { kind } = generateKind(KIND_NAME, true);
       this._fgKind = kind;
-    }
-  }
-
-  public async train(_options: any, _callbacks: any): Promise<History> {
-    if (!this.trainable) {
-      throw new Error(`Training not supported for Model ${this.name}`);
-    } else {
-      throw new Error(`Training not yet implemented for Model ${this.name}`);
     }
   }
 

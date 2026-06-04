@@ -10,7 +10,7 @@ import { constructCocoKinds } from "./constructCocoCategories";
 import { ModelTask } from "../../enums";
 
 import type { FitOptions, InferenceInput } from "../../types";
-import type { GraphModel, History } from "@tensorflow/tfjs";
+import type { GraphModel } from "@tensorflow/tfjs";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
@@ -64,15 +64,6 @@ export class CocoSSD extends Segmenter {
     this._model = await loadGraphModel(this.src, { fromTFHub: isTFHub });
   }
 
-  public loadTraining(
-    _items: InferenceInput[],
-    _preprocessingArgs: any,
-  ): void {}
-  public loadValidation(
-    _items: InferenceInput[],
-    _preprocessingArgs: any,
-  ): void {}
-
   public loadInference(
     items: InferenceInput[],
     preprocessingArgs: LoadInferenceDataArgs,
@@ -86,14 +77,6 @@ export class CocoSSD extends Segmenter {
       this._inferenceKinds = preprocessingArgs.kinds;
     } else if (!this._inferenceKinds) {
       this._inferenceKinds = constructCocoKinds();
-    }
-  }
-
-  public async train(_options: any, _callbacks: any): Promise<History> {
-    if (!this.trainable) {
-      throw new Error(`Training not supported for Model ${this.name}`);
-    } else {
-      throw new Error(`Training not yet implemented for Model ${this.name}`);
     }
   }
 
