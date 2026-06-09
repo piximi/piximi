@@ -115,8 +115,7 @@ function buildPolygon(
 
 function generateAnnotations(
   preds: number[][][],
-  kindId: string,
-  unknownCategoryId: string,
+  kindName: string,
   height: number,
   width: number,
   inputImDims: {
@@ -152,7 +151,7 @@ function generateAnnotations(
         const annotation: PredictedAnnotationObject = {
           encodedMask: rleEncodeArray(decodedMask),
           boundingBox: bbox,
-          kindId: kindId,
+          kindName,
           partition: Partition.Unassigned,
           id: generateUUID(),
         };
@@ -167,8 +166,7 @@ function generateAnnotations(
 export const predictStardist = async (
   model: GraphModel,
   imTensor: Tensor4D, // expects 1 for batchSize dim (axis 0)
-  kindId: string, // foreground (nucleus kind)
-  unknownCategoryId: string,
+  kindName: string,
   inputImDims: {
     width: number;
     height: number;
@@ -195,8 +193,7 @@ export const predictStardist = async (
 
   const { generatedAnnotations, generatedBboxes, scores } = generateAnnotations(
     preds,
-    kindId,
-    unknownCategoryId,
+    kindName,
     res.shape[1], // H
     res.shape[2], // W
     inputImDims,

@@ -1,8 +1,5 @@
 import { LayersModel } from "@tensorflow/tfjs";
 
-import type { Kind } from "store/dataV2/types";
-import { generateKind } from "store/dataV2/utils";
-
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessGlas } from "./preprocessGlas";
 import { predictGlas } from "./predictGlas";
@@ -23,7 +20,7 @@ const KIND_NAME = "glas_glands";
  * Trained on images of Hematoxylin and Eosin (H&E) stained slides, consisting of a variety of histologic grades
  */
 export class Glas extends Segmenter {
-  protected _fgKind?: Kind;
+  protected readonly segmentedKind = KIND_NAME;
 
   constructor() {
     super({
@@ -42,24 +39,13 @@ export class Glas extends Segmenter {
     this._model = await loadGlas();
   }
 
-  public async predict(items: InferenceInput[], kinds: Array<Kind>) {
+  public async predict(items: InferenceInput[]) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
 
     if (this._model instanceof LayersModel) {
       throw Error(`"${this.name}" Model must a Graph, not Layers`);
-    }
-
-    if (kinds) {
-      if (kinds.length !== 1)
-        throw Error(
-          `${this.name} Model only takes a single foreground category`,
-        );
-      this._fgKind = kinds[0];
-    } else if (!this._fgKind) {
-      const { kind } = generateKind(KIND_NAME, true);
-      this._fgKind = kind;
     }
 
     const graphModel = this._model as GraphModel;
@@ -76,8 +62,7 @@ export class Glas extends Segmenter {
       return predictGlas(
         graphModel,
         imTensor,
-        this._fgKind!.id,
-        this._fgKind!.unknownCategoryId,
+        this.segmentedKind,
         inferenceDataDims![idx],
       );
     });
@@ -86,19 +71,7 @@ export class Glas extends Segmenter {
     return annotations;
   }
 
-  public inferenceCategoriesById(_catIds: Array<string>) {
-    return [];
-  }
-  public inferenceKindsById(kinds: string[]) {
-    if (!this._fgKind) {
-      throw Error(`"${this.name}" Model has no foreground kind loaded`);
-    }
-
-    return kinds.includes(this._fgKind.id) ? [this._fgKind] : [];
-  }
-
   public override dispose() {
-    this._fgKind = undefined;
     super.dispose();
   }
 }

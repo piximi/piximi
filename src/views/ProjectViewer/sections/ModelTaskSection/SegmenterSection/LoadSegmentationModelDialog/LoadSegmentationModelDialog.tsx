@@ -24,28 +24,32 @@ import { ToolTipTab } from "components/layout";
 import { selectProjectImageChannels } from "@ProjectViewer/state/selectors";
 import type { Shape } from "store/dataV2/types";
 
-import type { Model } from "utils/dl/Model";
-import { Cellpose } from "utils/dl/segmentation";
-import { availableSegmenterModels } from "utils/dl/availableSegmentationModels";
+import { Cellpose, useSegmenterApi } from "utils/dl/segmentation";
 import { HotkeyContext } from "utils/enums";
+import type { SegmentaionModelDetails } from "utils/dl/segmentation/types";
 
 import { PretrainedModelSelector } from "./PretrainedModelSelector";
 
-type ImportTensorflowSegmentationModelDialogProps = {
+type LoadSegmentationModelDialogProps = {
   onClose: () => void;
-  loadedModel?: Model;
+  loadedModel?: SegmentaionModelDetails;
   open: boolean;
-  dispatchFunction: (model: Model, inputShape: Shape) => Promise<void>;
+  dispatchFunction: (
+    model: SegmentaionModelDetails,
+    inputShape: Shape,
+  ) => Promise<void>;
 };
 
-export const ImportTensorflowSegmentationModelDialog = ({
+export const LoadSegmentationModelDialog = ({
   onClose,
   loadedModel,
   open,
   dispatchFunction,
-}: ImportTensorflowSegmentationModelDialogProps) => {
+}: LoadSegmentationModelDialogProps) => {
   const projectChannels = useSelector(selectProjectImageChannels);
-  const [selectedModel, setSelectedModel] = useState<Model | undefined>(
+  const [selectedModel, setSelectedModel] = useState<
+    SegmentaionModelDetails | undefined
+  >(
     loadedModel?.name === "Fully Convolutional Network"
       ? undefined
       : loadedModel,
@@ -57,22 +61,28 @@ export const ImportTensorflowSegmentationModelDialog = ({
     planes: 1,
   });
 
-  const [pretrainedModels, setPretrainedModels] = useState<Array<Model>>([]);
+  const [pretrainedModels, setPretrainedModels] = useState<
+    Array<SegmentaionModelDetails>
+  >([]);
 
   const [cloudWarning, setCloudWarning] = useState(false);
 
   const [tabVal, setTabVal] = useState("1");
   const [invalidModel, setInvalidModel] = useState(false);
+  const segApi = useSegmenterApi();
 
-  const onModelChange = useCallback((model: Model | undefined) => {
-    setSelectedModel(model);
-    // TODO - segmenter: generalize to model.cloud
-    if (model instanceof Cellpose) {
-      setCloudWarning(true);
-    } else {
-      setCloudWarning(false);
-    }
-  }, []);
+  const onModelChange = useCallback(
+    (model: SegmentaionModelDetails | undefined) => {
+      setSelectedModel(model);
+      // TODO - segmenter: generalize to model.cloud
+      if (model instanceof Cellpose) {
+        setCloudWarning(true);
+      } else {
+        setCloudWarning(false);
+      }
+    },
+    [],
+  );
 
   const dispatchModelToStore = async () => {
     if (!selectedModel) {
@@ -110,17 +120,18 @@ export const ImportTensorflowSegmentationModelDialog = ({
   );
 
   useEffect(() => {
-    const allModels = availableSegmenterModels;
+    (async () => {
+      const results = await segApi.getAvailableSegmentationModels();
+      if (results.success) {
+        const modelDetails = Object.values(results.data);
+        setPretrainedModels(modelDetails);
 
-    const _pretrainedModels = (allModels as Model[]).filter(
-      (m) => m.pretrained,
-    );
-
-    setPretrainedModels(_pretrainedModels);
-    // if no pretrained models, make sure not on tab 1
-    setTabVal((curr) =>
-      _pretrainedModels.length === 0 && curr === "1" ? "2" : curr,
-    );
+        // if no pretrained models, make sure not on tab 1
+        setTabVal((curr) =>
+          modelDetails.length === 0 && curr === "1" ? "2" : curr,
+        );
+      }
+    })();
   }, []);
 
   useEffect(() => {

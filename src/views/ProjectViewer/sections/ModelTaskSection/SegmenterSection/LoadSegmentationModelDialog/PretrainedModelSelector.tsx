@@ -10,8 +10,8 @@ import {
   Typography,
 } from "@mui/material";
 
-import type { Model } from "utils/dl/Model";
 import { modelInfo } from "utils/dl/segmentation";
+import type { SegmentaionModelDetails } from "utils/dl/segmentation/types";
 
 interface ModelOptionType {
   label: string;
@@ -26,8 +26,8 @@ export const PretrainedModelSelector = ({
   errorText,
   initModel = "-1",
 }: {
-  values: Array<Model>;
-  setModel: (model: Model | undefined) => void;
+  values: Array<SegmentaionModelDetails>;
+  setModel: (model: SegmentaionModelDetails | undefined) => void;
   error?: boolean;
   errorText?: string;
   initModel: string;

@@ -1,38 +1,40 @@
 import { useCallback } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 
-import { selectAllKinds } from "store/data/selectors";
+import { selectAllKinds, selectExtendedImages } from "store/dataV2/selectors";
 import { selectSelectedImages } from "@ProjectViewer/state/reselectors";
-import type { AnnotationObject, Category, Shape } from "store/data/types";
 import { applicationSettingsSlice } from "store/applicationSettings";
-import {
-  selectSegmenterInferenceOptions,
-  selectSegmenterModel,
-} from "store/segmenter/selectors";
-import { dataSlice } from "store/data";
-import {
-  UNKNOWN_NAME,
-  UNKNOWN_IMAGE_CATEGORY_COLOR,
-} from "store/dataV2/constants";
-import { selectExtendedImages } from "store/dataV2/selectors";
+import type {
+  AnnotationCategory,
+  AnnotationObject,
+  AnnotationVolume,
+  Kind,
+  Shape,
+} from "store/dataV2/types";
+import { dataSliceV2 } from "store/dataV2";
+import { generateKind, generateUUID } from "store/dataV2/utils";
 
-import type { OrphanedAnnotationObject } from "utils/dl/segmentation";
+import { useSegmenterApi } from "utils/dl/segmentation";
 import { toInferenceInput } from "utils/dl/utils";
 import { getStackTraceFromError } from "utils/logUtils";
 import { AlertType } from "utils/enums";
 import type { AlertState, LoadCB } from "utils/types";
+import type {
+  PredictedAnnotationObject,
+  SegmentaionModelDetails,
+} from "utils/dl/segmentation/types";
 
 import { useSegmenterStatus } from "../contexts/SegmenterStatusProvider";
 
 export const usePredictSegmenter = () => {
   const dispatch = useDispatch();
-  const selectedModel = useSelector(selectSegmenterModel);
+
   const allImages = useSelector(selectExtendedImages);
   const selectedImages = useSelector(selectSelectedImages);
-  const fitOptions = useSelector(selectSegmenterInferenceOptions);
   const kinds = useSelector(selectAllKinds);
-  const { setModelStatus } = useSegmenterStatus();
+  const { setModelStatus, selectedModel } = useSegmenterStatus();
+  const segApi = useSegmenterApi();
 
   const handleError = useCallback(
     async (error: Error, name: string) => {
@@ -64,6 +66,32 @@ export const usePredictSegmenter = () => {
 
   const predictSegmenter = useCallback(async () => {
     if (!selectedModel) return;
+    const modelInfoResult = await segApi.getModelInfo(selectedModel.name);
+    let modelDetails: SegmentaionModelDetails;
+    if (modelInfoResult.success) modelDetails = modelInfoResult.data;
+    else {
+      await handleError(
+        new Error(
+          `[predictSegmenter] ${modelInfoResult.reason.code}: ${modelInfoResult.reason.message}`,
+          { cause: modelInfoResult.reason.cause },
+        ),
+        "fetch details error",
+      );
+      return;
+    }
+
+    if (!modelDetails.modelLoaded) {
+      const loadResult = await segApi.loadModel(selectedModel.name);
+      if (!loadResult.success) {
+        await handleError(
+          new Error(
+            `[predictSegmenter] ${loadResult.reason.code}: ${loadResult.reason.message}`,
+            { cause: loadResult.reason.cause },
+          ),
+          "fetch details error",
+        );
+      }
+    }
     const images = selectedImages.length > 0 ? selectedImages : allImages;
 
     // TODO: determine how to go about resegmenting images and duplicating annotations
@@ -81,19 +109,6 @@ export const usePredictSegmenter = () => {
     /* PREDICT */
     setModelStatus("predicting");
 
-    try {
-      selectedModel.loadInference(inferenceImages.map(toInferenceInput), {
-        kinds: undefined,
-        fitOptions,
-      });
-    } catch (error) {
-      await handleError(
-        error as Error,
-        "Error in processing the inference data.",
-      );
-      return;
-    }
-
     const progressCb: LoadCB = (
       progressPercent: number,
       progressMessage: string,
@@ -108,29 +123,40 @@ export const usePredictSegmenter = () => {
 
     progressCb(-1, "starting inference...");
 
-    let predictedAnnotations: OrphanedAnnotationObject[][];
+    let predictedAnnotations: PredictedAnnotationObject[][];
     try {
-      predictedAnnotations = await selectedModel.predict(progressCb);
-      for (let i = 0; i < predictedAnnotations.length; i++) {
-        for (let j = 0; j < predictedAnnotations[i].length; j++) {
-          const bbox = predictedAnnotations[i][j].boundingBox;
-          let xDiff = 0;
-          let yDiff = 0;
+      const predictionResult = await segApi.predict(
+        selectedModel.name,
+        inferenceImages.map(toInferenceInput),
+        progressCb,
+      );
+      if (predictionResult.success) {
+        predictedAnnotations = predictionResult.data;
+        for (let i = 0; i < predictedAnnotations.length; i++) {
+          for (let j = 0; j < predictedAnnotations[i].length; j++) {
+            const bbox = predictedAnnotations[i][j].boundingBox;
+            let xDiff = 0;
+            let yDiff = 0;
 
-          if (bbox[0] < 0) {
-            xDiff = Math.abs(bbox[0]);
+            if (bbox[0] < 0) {
+              xDiff = Math.abs(bbox[0]);
+            }
+            if (bbox[1] < 0) {
+              yDiff = Math.abs(bbox[1]);
+            }
+            predictedAnnotations[i][j].boundingBox = [
+              bbox[0] + xDiff,
+              bbox[1] + yDiff,
+              bbox[2] + xDiff,
+              bbox[3] + yDiff,
+            ];
           }
-          if (bbox[1] < 0) {
-            yDiff = Math.abs(bbox[1]);
-          }
-          predictedAnnotations[i][j].boundingBox = [
-            bbox[0] + xDiff,
-            bbox[1] + yDiff,
-            bbox[2] + xDiff,
-            bbox[3] + yDiff,
-          ];
         }
-      }
+      } else
+        throw new Error(
+          `[predictSegmenter] ${predictionResult.reason.code}: ${predictionResult.reason.message}`,
+          { cause: predictionResult.reason.cause },
+        );
     } catch (error) {
       await handleError(error as Error, "Error in running predictions");
       progressCb(1, "");
@@ -138,47 +164,44 @@ export const usePredictSegmenter = () => {
     }
 
     try {
-      const uniquePredictedKinds = [
+      const uniquePredictedKindNames = [
         ...new Set(
           predictedAnnotations.flatMap((imAnns) =>
-            imAnns.map((ann) => ann.kind as string),
+            imAnns.map((ann) => ann.kindName as string),
           ),
         ),
       ];
 
-      const generatedKinds = selectedModel.inferenceKindsById([
-        ...kinds.map((kind) => kind.id),
-        ...uniquePredictedKinds,
-      ]);
-      dispatch(
-        dataSlice.actions.addKinds({
-          kinds: generatedKinds,
-        }),
-      );
+      const addKindPayload: Array<{
+        kind: Kind;
+        category: AnnotationCategory;
+      }> = [];
 
-      const newUnknownCategories = generatedKinds.map((kind) => {
-        return {
-          id: kind.unknownCategoryId,
-          name: UNKNOWN_NAME,
-          color: UNKNOWN_IMAGE_CATEGORY_COLOR,
-          containing: [],
-          kind: kind.id,
-          visible: true,
-        } as Category;
+      const predictedKinds: Record<string, Kind> = {};
+      uniquePredictedKindNames.forEach((kindName) => {
+        const existingKind = kinds.find((k) => k.name === kindName);
+        if (!existingKind) {
+          const generated = generateKind(kindName);
+          predictedKinds[generated.kind.name] = generated.kind;
+          addKindPayload.push({
+            kind: generated.kind,
+            category: generated.unknownCategory,
+          });
+          return;
+        }
+        predictedKinds[existingKind.name] = existingKind;
       });
-      dispatch(
-        dataSlice.actions.addCategories({
-          categories: newUnknownCategories,
-        }),
-      );
 
+      dispatch(dataSliceV2.actions.batchAddKind(addKindPayload));
+
+      const annVolumes: AnnotationVolume[] = [];
       const annotations: AnnotationObject[] = [];
       for await (const [i, _annotations] of predictedAnnotations.entries()) {
         const image = inferenceImages[i];
 
         for (let j = 0; j < _annotations.length; j++) {
-          const ann = _annotations[j] as Partial<AnnotationObject>;
-          const bbox = ann.boundingBox!;
+          const { kindName, ...predictedAnn } = _annotations[j];
+          const bbox = predictedAnn.boundingBox!;
           const width = bbox[2] - bbox[0];
           const height = bbox[3] - bbox[1];
 
@@ -193,14 +216,33 @@ export const usePredictSegmenter = () => {
             height,
           };
 
-          ann.shape = shape;
-          ann.name = `${image.name}-${ann.kind}_${j}`;
-          ann.imageId = image.id;
-          ann.bitDepth = image.bitDepth;
-          annotations.push(ann as AnnotationObject);
+          const annKind = predictedKinds[kindName];
+
+          if (!annKind) {
+            console.error("cannot find kind for annotation");
+            continue;
+          }
+          const annVol: AnnotationVolume = {
+            id: generateUUID(),
+            kindId: annKind.id,
+            imageId: image.id,
+            categoryId: annKind.unknownCategoryId,
+          };
+          const finalAnn: AnnotationObject = {
+            ...predictedAnn,
+            shape,
+            imageId: image.id,
+            planeId: image.activePlaneId,
+            volumeId: annVol.id,
+          };
+          annVolumes.push(annVol);
+          annotations.push(finalAnn);
         }
       }
-      dispatch(dataSlice.actions.addThings({ things: annotations }));
+      batch(() => {
+        dispatch(dataSliceV2.actions.batchAddAnnotationVolume(annVolumes));
+        dispatch(dataSliceV2.actions.batchAddAnnotation(annotations));
+      });
     } catch (error) {
       await handleError(
         error as Error,
@@ -213,14 +255,7 @@ export const usePredictSegmenter = () => {
 
     progressCb(1, "");
     setModelStatus("idle");
-  }, [
-    handleError,
-    allImages,
-    selectedModel,
-    selectedImages,
-    fitOptions,
-    kinds,
-  ]);
+  }, [handleError, allImages, selectedModel, selectedImages, kinds]);
 
   return predictSegmenter;
 };

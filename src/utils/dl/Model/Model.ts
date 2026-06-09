@@ -20,7 +20,7 @@ export class Model {
   readonly task: ModelTask;
   readonly graph: boolean;
   readonly trainable: boolean;
-  readonly kind?: string;
+  readonly kind?: string | Array<string>;
   readonly src?: string;
 
   private _requiredChannels?: number;

@@ -59,7 +59,7 @@ export const CreateKindDialog = ({
   );
 
   const handleConfirm = () => {
-    const { kind, unknownCategory } = generateKind(name, true);
+    const { kind, unknownCategory } = generateKind(name);
     storeDispatch(kind, unknownCategory);
     secondaryAction && secondaryAction();
 

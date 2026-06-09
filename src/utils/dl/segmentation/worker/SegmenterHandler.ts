@@ -1,6 +1,6 @@
 import JSZip from "jszip";
 
-import type { Category } from "store/dataV2/types";
+import type { LoadCB } from "utils/types";
 
 import { err, ok } from "../../utils";
 import { Cellpose } from "../Cellpose";
@@ -10,7 +10,7 @@ import { StardistFluo, StardistVHE } from "../Stardist";
 
 import type {
   ISegmenterApi,
-  ModelInfoDTO,
+  SegmentaionModelDetails,
   SegmentationResults,
 } from "../types";
 import type { Segmenter } from "../AbstractSegmenter";
@@ -28,7 +28,7 @@ export class SegmenterHandler implements ISegmenterApi {
     this._availableSegmentationModels = {
       Cellpose: new Cellpose(),
       "COCO-SSD": new CocoSSD(),
-      Glas: new Glas(),
+      GlandSegmentation: new Glas(),
       StardistVHE: new StardistVHE(),
       StardistFluo: new StardistFluo(),
     };
@@ -41,14 +41,14 @@ export class SegmenterHandler implements ISegmenterApi {
     return this._availableSegmentationModels[modelName] ?? null;
   }
 
-  private buildModelInfoDTO(model: Segmenter) {
+  private buildModelInfoDTO(model: Segmenter): SegmentaionModelDetails {
     return {
       name: model.name,
       task: model.task,
+      kind: model.kind,
       graph: model.graph,
       pretrained: model.pretrained,
       modelLoaded: model.modelLoaded,
-      inferenceLoaded: model.inferenceLoaded,
       defaultInputShape: model.modelLoaded
         ? model.defaultInputShape
         : undefined,
@@ -59,13 +59,15 @@ export class SegmenterHandler implements ISegmenterApi {
     };
   }
 
-  public get availableSegmentationModels() {
-    return Object.entries(this._availableSegmentationModels).reduce(
-      (models: Record<string, ModelInfoDTO>, [name, model]) => {
-        models[name] = this.buildModelInfoDTO(model);
-        return models;
-      },
-      {},
+  public async getAvailableSegmentationModels() {
+    return ok(
+      Object.entries(this._availableSegmentationModels).reduce(
+        (models: Record<string, SegmentaionModelDetails>, [name, model]) => {
+          models[name] = this.buildModelInfoDTO(model);
+          return models;
+        },
+        {},
+      ),
     );
   }
 
@@ -91,27 +93,25 @@ export class SegmenterHandler implements ISegmenterApi {
    * Segmentation Ops
    */
 
-  public async loadInference(
-    modelName: string,
-    items: InferenceInput[],
-    categories: Category[],
-  ) {
+  public async loadModel(modelName: string) {
     const model = this.resolveModel(modelName);
     if (!model)
       return err(
         "MODEL_NOT_FOUND",
         `No model registered with name "${modelName}"`,
       );
+    if (model.modelLoaded) return ok();
     try {
-      model.loadInference(items, categories);
-      return ok(modelName);
+      await model.loadModel();
+      return ok();
     } catch (e) {
-      return err("PREPROCESS_FAILED", "Failed to load inference data", e);
+      return err("TF_LOAD_FAILED", "Failed to load model", e);
     }
   }
-
   public async predict(
     modelName: string,
+    items: InferenceInput[],
+    loadCB?: LoadCB,
   ): Promise<ApiResult<SegmentationResults>> {
     const model = this.resolveModel(modelName);
     if (!model)
@@ -120,7 +120,7 @@ export class SegmenterHandler implements ISegmenterApi {
         `No model registered with name "${modelName}"`,
       );
     try {
-      const result = await model.predict();
+      const result = await model.predict(items, loadCB);
       return ok(result);
     } catch (e) {
       return err("PREDICTION_FAILED", "Failed to predict", e);

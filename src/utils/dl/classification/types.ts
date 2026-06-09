@@ -38,7 +38,7 @@ export type ModelArgs = {
   graph: boolean;
   pretrained: boolean;
   trainable: boolean;
-  kind?: string;
+  kind?: string | Array<string>;
   src?: string;
   requiredChannels?: number;
   modelArch?: ModelArch;

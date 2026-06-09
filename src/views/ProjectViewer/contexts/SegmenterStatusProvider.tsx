@@ -1,12 +1,14 @@
-//@ts-nocheck Errors will be adressed during with refactor
 import type React from "react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
 
-import type { ModelLifecycleStatus } from "store/classifier/types";
-import { selectAllImages } from "store/data/selectors";
-import { selectSegmenterModel } from "store/segmenter/selectors";
+import { selectExtendedImages } from "store/dataV2/selectors";
+
+import type {
+  SegmentaionModelDetails,
+  SegmentationState,
+} from "utils/dl/segmentation/types";
 
 export enum ErrorReason {
   NotConfigured,
@@ -22,13 +24,21 @@ export type ErrorContext = {
 
 const SegmenterStatusContext = createContext<{
   isReady: boolean;
-  modelStatus: ModelLifecycleStatus;
-  setModelStatus: React.Dispatch<React.SetStateAction<ModelLifecycleStatus>>;
+  selectedModel: SegmentaionModelDetails | undefined;
+  setSelectedModel: React.Dispatch<
+    React.SetStateAction<SegmentaionModelDetails | undefined>
+  >;
+  modelStatus: SegmentationState;
+  setModelStatus: React.Dispatch<React.SetStateAction<SegmentationState>>;
   error?: ErrorContext;
 }>({
+  selectedModel: undefined,
+  setSelectedModel: (
+    _value: React.SetStateAction<SegmentaionModelDetails | undefined>,
+  ) => {},
   isReady: true,
   modelStatus: "idle",
-  setModelStatus: (_value: React.SetStateAction<ModelLifecycleStatus>) => {},
+  setModelStatus: (_value: React.SetStateAction<SegmentationState>) => {},
 });
 
 export const SegmenterStatusProvider = ({
@@ -36,13 +46,15 @@ export const SegmenterStatusProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const selectedModel = useSelector(selectSegmenterModel);
-  const projectImages = useSelector(selectAllImages);
+  const [selectedModel, setSelectedModel] = useState<
+    SegmentaionModelDetails | undefined
+  >(undefined);
+  const projectImages = useSelector(selectExtendedImages);
 
   const [isReady, setIsReady] = useState(true);
   const [error, setError] = useState<ErrorContext>();
 
-  const [modelStatus, setModelStatus] = useState<ModelLifecycleStatus>("idle");
+  const [modelStatus, setModelStatus] = useState<SegmentationState>("idle");
 
   useEffect(() => {
     let newError: ErrorContext | undefined;
@@ -69,15 +81,20 @@ export const SegmenterStatusProvider = ({
     setError(newError);
   }, [selectedModel, projectImages]);
 
+  const value = useMemo(
+    () => ({
+      selectedModel,
+      setSelectedModel,
+      isReady,
+      modelStatus,
+      setModelStatus,
+      error,
+    }),
+    [selectedModel, isReady, modelStatus, error],
+  );
+
   return (
-    <SegmenterStatusContext.Provider
-      value={{
-        isReady,
-        modelStatus,
-        setModelStatus,
-        error,
-      }}
-    >
+    <SegmenterStatusContext.Provider value={value}>
       {children}
     </SegmenterStatusContext.Provider>
   );

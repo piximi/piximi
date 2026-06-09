@@ -8,7 +8,7 @@ export const constructCocoKinds = () => {
   const kinds: Array<Kind> = [];
 
   cocoClasses.forEach((cocoClass) => {
-    const { kind } = generateKind(cocoClass, true);
+    const { kind } = generateKind(cocoClass);
     kinds.push(kind);
   });
   return kinds;

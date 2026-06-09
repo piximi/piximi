@@ -1,11 +1,10 @@
 import { LayersModel, loadGraphModel } from "@tensorflow/tfjs";
 
-import type { Kind } from "store/dataV2/types";
+import COCO_CLASSES from "data/model-data/cocossd-classes";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCoco } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
-import { constructCocoKinds } from "./constructCocoKinds";
 import { ModelTask } from "../../enums";
 
 import type { InferenceInput } from "../../types";
@@ -34,12 +33,13 @@ import type { GraphModel } from "@tensorflow/tfjs";
  */
 
 export class CocoSSD extends Segmenter {
-  protected _inferenceKinds?: Array<Kind>;
+  protected readonly segmentedKinds = Object.keys(COCO_CLASSES);
 
   constructor() {
     super({
       name: "COCO-SSD",
       task: ModelTask.Segmentation,
+      kind: Object.keys(COCO_CLASSES),
       graph: true,
       pretrained: true,
       trainable: false,
@@ -55,18 +55,13 @@ export class CocoSSD extends Segmenter {
     this._model = await loadGraphModel(this.src);
   }
 
-  public async predict(items: InferenceInput[], kinds?: Array<Kind>) {
+  public async predict(items: InferenceInput[]) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
 
     if (this._model instanceof LayersModel) {
       throw Error(`"${this.name}" Model must a Graph, not Layers`);
-    }
-    if (kinds) {
-      this._inferenceKinds = kinds;
-    } else if (!this._inferenceKinds) {
-      this._inferenceKinds = constructCocoKinds();
     }
 
     const inferenceDataset = preprocessInference(items);
@@ -75,22 +70,11 @@ export class CocoSSD extends Segmenter {
     const infT = await inferenceDataset.toArray();
     // imTensor disposed in `predictCoco`
     const annotationsPromises = infT.map((imTensor) => {
-      return predictCoco(graphModel, imTensor, this._inferenceKinds!);
+      return predictCoco(graphModel, imTensor, this.segmentedKinds);
     });
     const annotations = await Promise.all(annotationsPromises);
 
     return annotations;
-  }
-
-  public inferenceCategoriesById(_catIds: Array<string>) {
-    return [];
-  }
-  public inferenceKindsById(kinds: string[]) {
-    if (!this._inferenceKinds) {
-      throw Error(`"${this.name}" Model has no inference kinds loaded`);
-    }
-
-    return this._inferenceKinds.filter((kind) => kinds.includes(kind.id));
   }
 
   public override dispose() {

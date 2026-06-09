@@ -1,25 +1,35 @@
 import type { AnnotationObject, Kind } from "store/dataV2/types";
 
+import type { LoadCB } from "utils/types";
+
 import type { ApiResult, InferenceInput, SerializedModelData } from "../types";
 import type { ModelTask } from "../enums";
 
-export type ModelInfoDTO = {
+export type SegmenterModelArgs = {
   name: string;
-
   task: ModelTask;
   graph: boolean;
-
   pretrained: boolean;
+  trainable: boolean;
+  kinds: Array<string>;
+  src?: string;
+  requiredChannels?: number;
+};
+export type SegmentationState = "idle" | "loading" | "predicting";
 
+export type SegmentaionModelDetails = {
+  name: string;
+  task: ModelTask;
+  kind?: string | Array<string>;
+  graph: boolean;
+  pretrained: boolean;
   modelLoaded: boolean;
-
-  inferenceLoaded: boolean;
   defaultInputShape: number[] | undefined;
   defaultOutputShape: number[] | undefined;
   requiredChannels?: number;
 };
 export type BatchModelLoadResult = {
-  loadedModels: ModelInfoDTO[];
+  loadedModels: SegmentaionModelDetails[];
   failedModels: Record<string, { reason: string; err?: Error }>;
 };
 export type LoadInferenceDataArgs = {
@@ -29,24 +39,26 @@ export type LoadInferenceDataArgs = {
 export type PredictedAnnotationObject = Omit<
   AnnotationObject,
   "imageId" | "planeId" | "shape" | "volumeId"
-> & { kindId: string };
+> & { kindName: string };
 export type SegmentationResults = Array<Array<PredictedAnnotationObject>>;
 export interface ISegmenterApi {
   // registry reads
   getModelNames(): Promise<ApiResult<string[]>>;
-  getModelInfo(name: string): Promise<ApiResult<ModelInfoDTO>>;
+  getModelInfo(name: string): Promise<ApiResult<SegmentaionModelDetails>>;
   hasModel(name: string): Promise<ApiResult<boolean>>;
+  getAvailableSegmentationModels(): Promise<
+    ApiResult<Record<string, SegmentaionModelDetails>>
+  >;
 
-  // data loading — return the model name so callers can chain / log
-
-  loadInference(
+  /*
+   * Segmentation Ops
+   */
+  loadModel(modelName: string): Promise<ApiResult<void>>;
+  predict(
     name: string,
     items: InferenceInput[],
-    cats: { id: string }[],
-  ): Promise<ApiResult<string>>;
-
-  // inference
-  predict(name: string): Promise<ApiResult<SegmentationResults>>;
+    loadCB?: LoadCB,
+  ): Promise<ApiResult<SegmentationResults>>;
 
   // model I/O
 

@@ -66,9 +66,8 @@ export const generateCategory = (
 
 export const generateKind = (
   kindName: string,
-  useUUID?: boolean,
 ): { kind: Kind; unknownCategory: AnnotationCategory } => {
-  const kindId = useUUID ? generateUUID() : kindName;
+  const kindId = generateUUID();
   const unknownCategory = generateUnknownAnnotationCategory(kindId);
   const kind: Kind = {
     id: kindId,

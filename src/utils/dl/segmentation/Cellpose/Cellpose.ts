@@ -1,8 +1,5 @@
 import { data as tfdata, scalar, tidy } from "@tensorflow/tfjs";
 
-import type { Kind } from "store/dataV2/types";
-import { generateKind } from "store/dataV2/utils";
-
 import type { LoadCB } from "utils/types";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
@@ -32,7 +29,7 @@ export class Cellpose extends Segmenter {
 
   protected readonly _service = "triton-client";
 
-  protected _fgKind?: Kind;
+  protected readonly segmentedKind = KIND_NAME;
 
   constructor() {
     super({
@@ -78,24 +75,11 @@ export class Cellpose extends Segmenter {
     return inferenceDataset;
   }
 
-  public async predict(
-    items: InferenceInput[],
-    kinds: Array<Kind>,
-    loadCb?: LoadCB,
-  ) {
+  public async predict(items: InferenceInput[], loadCb?: LoadCB) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
-    if (kinds) {
-      if (kinds.length !== 1)
-        throw Error(
-          `${this.name} Model only takes a single foreground category`,
-        );
-      this._fgKind = kinds[0];
-    } else if (!this._fgKind) {
-      const { kind } = generateKind(KIND_NAME, true);
-      this._fgKind = kind;
-    }
+
     const inferenceDataset = this.loadInference(items);
 
     const infT = await inferenceDataset.toArray();
@@ -105,8 +89,7 @@ export class Cellpose extends Segmenter {
       // imTensor disposed in predictCellpose
       const annotObj = await predictCellpose(
         imTensor,
-        this._fgKind!.id,
-        this._fgKind!.unknownCategoryId,
+        this.segmentedKind,
         this._service,
         this._config,
       );
@@ -122,19 +105,7 @@ export class Cellpose extends Segmenter {
     return annotations;
   }
 
-  public inferenceKindsById(kinds: Array<string>) {
-    if (!this._fgKind) {
-      throw Error(`"${this.name}" Model has no foreground kind loaded`);
-    }
-
-    return kinds.includes(this._fgKind.id) ? [this._fgKind] : [];
-  }
-  public inferenceCategoriesById(_catIds: Array<string>) {
-    return [];
-  }
-
   public override dispose() {
-    this._fgKind = undefined;
     super.dispose();
   }
 }

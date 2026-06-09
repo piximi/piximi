@@ -10,7 +10,6 @@ import {
 } from "@tensorflow/tfjs";
 
 import { generateUUID } from "store/dataV2/utils";
-import type { Kind } from "store/dataV2/types";
 
 import { rleEncodeArray } from "utils/image";
 
@@ -22,7 +21,7 @@ import type { Tensor, Rank, GraphModel, Tensor4D } from "@tensorflow/tfjs";
 export const predictCoco = async (
   model: GraphModel,
   imTensor: Tensor4D,
-  kinds: Array<Kind>,
+  kinds: Array<string>,
   maxNumBoxes = 20,
   minScore = 0.5,
   overlapThreshold = 0.5,
@@ -136,7 +135,7 @@ const buildDetectedObjects = (
   boxes: Float32Array,
   indices: Float32Array,
   classes: Array<number>,
-  kinds: Array<Kind>,
+  kinds: Array<string>,
 ) => {
   const annotations: Array<PredictedAnnotationObject> = [];
   const count = indices.length;
@@ -173,7 +172,7 @@ const buildDetectedObjects = (
 
     annotations.push({
       boundingBox: annotationBbox,
-      kindId: kind.id,
+      kindName: kind,
       id: generateUUID(),
       encodedMask: rleEncodeArray(decodedMask),
       partition: Partition.Unassigned,

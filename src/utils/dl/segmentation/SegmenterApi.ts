@@ -1,8 +1,11 @@
-// src/utils/dl/classification/classifierHandler.ts
 import * as Comlink from "comlink";
+
+import type { LoadCB } from "utils/types";
+import { logger } from "utils/logUtils";
 
 import { registerSegmenterHmrCleanup } from "../devHmrCleanup";
 
+import type { InferenceInput } from "../types";
 import type { ISegmenterApi } from "./types";
 import type { SegmenterHandler } from "./worker/SegmenterHandler";
 
@@ -13,11 +16,11 @@ export class SegmenterApi implements ISegmenterApi {
 
   private constructor(/*backendTarget: "local"|"remote"*/) {
     this.worker = new Worker(
-      new URL("./worker/classifierWorker.ts", import.meta.url),
+      new URL("./worker/segmenterWorker.ts", import.meta.url),
       { type: "module" },
     );
     this.worker.onerror = (e) => {
-      console.error("[classifierHandler] worker error:", e.message, e);
+      console.error("[segmenterHandler] worker error:", e.message, e);
     };
     const workerProxy = Comlink.wrap<SegmenterHandler>(this.worker);
 
@@ -43,6 +46,10 @@ export class SegmenterApi implements ISegmenterApi {
   getModelNames() {
     return this.backend.getModelNames();
   }
+
+  getAvailableSegmentationModels() {
+    return this.backend.getAvailableSegmentationModels();
+  }
   getModelInfo(name: string) {
     return this.backend.getModelInfo(name);
   }
@@ -50,15 +57,16 @@ export class SegmenterApi implements ISegmenterApi {
     return this.backend.hasModel(name);
   }
 
-  // ---- data loading ----
-
-  loadInference(name: string, items: any, cats: any) {
-    return this.backend.loadInference(name, items, cats);
+  loadModel(modelName: string) {
+    return this.backend.loadModel(modelName);
   }
-
-  // ---- inference / eval ----
-  predict(name: string) {
-    return this.backend.predict(name);
+  // ---- inference  ----
+  predict(name: string, items: InferenceInput[], loadCB?: LoadCB) {
+    if (!loadCB) {
+      loadCB = (loadPercent: number, loadMessage: string) =>
+        logger(`${loadPercent}% Completed: ${loadMessage}`);
+    }
+    return this.backend.predict(name, items, Comlink.proxy(loadCB));
   }
 
   // ---- model I/O ----

@@ -28,7 +28,7 @@ const labelToAnnotation = async (
   label: number,
   maskH: number,
   maskW: number,
-  kindId: string,
+  kindName: string,
 ): Promise<PredictedAnnotationObject | undefined> => {
   const labelFilter = tidy(() => onesLike(labelMask).mul(label));
 
@@ -95,7 +95,7 @@ const labelToAnnotation = async (
   }).data;
 
   return {
-    kindId: kindId,
+    kindName: kindName,
     boundingBox: bbox as [number, number, number, number],
     encodedMask: rleEncodeArray(annotationData, true),
     partition: Partition.Unassigned,
@@ -107,7 +107,7 @@ const labelMaskToAnnotation = async (
   labelMask: Tensor1D,
   maskH: number,
   maskW: number,
-  kindId: string,
+  kindName: string,
 ) => {
   const { values, indices } = unique(labelMask);
 
@@ -125,7 +125,7 @@ const labelMaskToAnnotation = async (
         label,
         maskH,
         maskW,
-        kindId,
+        kindName,
       );
       if (annotation) {
         annotations.push(annotation);
@@ -142,8 +142,7 @@ export const predictGlas = async (
   // [B, H, W, C]
   model: GraphModel,
   imTensor: Tensor4D,
-  fgKindId: string,
-  unknownCategoryId: string,
+  kindName: string,
   inputImDims: {
     width: number;
     height: number;
@@ -243,7 +242,7 @@ export const predictGlas = async (
     maskTensor,
     inputImDims.height,
     inputImDims.width,
-    fgKindId,
+    kindName,
   );
 
   return annotations;

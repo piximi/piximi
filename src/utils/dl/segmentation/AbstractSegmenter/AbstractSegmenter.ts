@@ -1,7 +1,5 @@
 import { tidy, zeros } from "@tensorflow/tfjs";
 
-import type { Category, Kind } from "store/dataV2/types";
-
 import { logger } from "utils/logUtils";
 import type { LoadCB } from "utils/types";
 import type { InferenceInput } from "utils/dl/types";
@@ -16,24 +14,11 @@ export abstract class Segmenter extends Model {
     super.dispose();
   }
 
+  public abstract loadModel(): Promise<void>;
   public abstract predict(
     items: InferenceInput[],
-    kinds?: Array<Kind>,
     loadCb?: LoadCB,
   ): PredictedAnnotationObject[][] | Promise<PredictedAnnotationObject[][]>;
-
-  /*
-   * Concrete classes must keep track of their inference categories somehow,
-   * either taken in as an argument in `preprocessingArgs` of `loadInference`
-   * or default categroies (if pretrained)
-   * or both (eg take an optional arg otherwise fallback to default)
-   *
-   * `inferenceCategoriesById` takes a list of category ids (usually the ones
-   * associated with categoryIds in the annotations returned by `predict`), and
-   * returns the corresponding `Category` objects.
-   */
-  public abstract inferenceCategoriesById(catIds: Array<string>): Category[];
-  public abstract inferenceKindsById(kind: Array<string>): Kind[];
 
   public get expectedType() {
     if (!this._model) {
