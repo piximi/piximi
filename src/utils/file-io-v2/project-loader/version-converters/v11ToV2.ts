@@ -96,7 +96,6 @@ export function convertV11ToV2(
   return {
     project: v2Project,
     data: { experiment, ...v2Data, kinds: v2Kinds, categories: v2Categories },
-    segmenter: v11.segmenter,
     classifier: v2ClassifierState,
   };
 }

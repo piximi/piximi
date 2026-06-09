@@ -6,7 +6,6 @@ import { logger } from "utils/logUtils";
 import { getAttr, getDataset, getGroup } from "../zarr/utils";
 import {
   deserializeColorsRaw,
-  deserializeSegmenterGroup,
   v11_v2_deserializeClassifierGroup,
 } from "./common";
 import { subProgress } from "../progress";
@@ -69,8 +68,6 @@ export const readV11 = async (
   const classifierGroup = await getGroup(rootGroup, "classifier");
   const classifier = await v11_v2_deserializeClassifierGroup(classifierGroup);
 
-  const segmenterGroup = await getGroup(rootGroup, "segmenter");
-  const segmenter = await deserializeSegmenterGroup(segmenterGroup);
   onProgress(STAGES.models.end);
   import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
     logger(`closed ${store.rootName}`);
@@ -78,7 +75,6 @@ export const readV11 = async (
   return {
     project: { name, imageChannels: +imageChannels },
     classifier,
-    segmenter,
     data: {
       things,
       kinds,

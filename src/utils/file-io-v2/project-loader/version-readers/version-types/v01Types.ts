@@ -1,5 +1,4 @@
 import type { Shape } from "store/dataV2/types";
-import type { SegmenterState } from "store/segmenter/types";
 
 import type {
   LossFunction,
@@ -19,7 +18,6 @@ import type { RawData } from "../../types";
 export type V01PiximiState = {
   project: V01ProjectState;
   classifier: V01ClassifierState;
-  segmenter: SegmenterState;
   data: {
     images: V01RawImageObject[];
     annotations: V01RawAnnotationObject[];
@@ -29,7 +27,7 @@ export type V01PiximiState = {
 };
 
 // ============================================================
-// V01 Classifier
+// V01 Project
 // ============================================================
 
 export type V01ProjectState = {

@@ -1,5 +1,4 @@
 import type { Shape } from "store/dataV2/types";
-import type { SegmenterState } from "store/segmenter/types";
 
 import type { Partition } from "utils/dl/enums";
 
@@ -25,7 +24,6 @@ export type V02PiximiState = {
     categories: EntityState<V02Category, string>;
     kinds: EntityState<V02Kind, string>;
   };
-  segmenter: SegmenterState;
 };
 
 // ============================================================
@@ -35,13 +33,13 @@ export type V02PiximiState = {
 export type V02ProjectState = V01ProjectState;
 
 // ============================================================
-// V01 Classifier
+// V02 Classifier
 // ============================================================
 
 export type V02ClassifierState = V01ClassifierState;
 
 // ============================================================
-// V01 Data
+// V02 Data
 // ============================================================
 
 export type V02BitDepth = V01BitDepth;

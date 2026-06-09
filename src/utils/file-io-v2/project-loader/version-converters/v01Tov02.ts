@@ -49,7 +49,6 @@ export function convertV01ToV02(
   return {
     project: v01.project,
     classifier: v01.classifier,
-    segmenter: v01.segmenter,
     data: v02Data,
   };
 }

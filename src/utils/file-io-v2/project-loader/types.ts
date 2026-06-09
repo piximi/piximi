@@ -11,7 +11,6 @@ import type {
   Plane,
 } from "store/dataV2/types";
 import type { ClassifierState } from "store/classifier/types";
-import type { SegmenterState } from "store/segmenter/types";
 
 import type { ExtractedModelFileMap } from "utils/dl/types";
 import type { Progress } from "utils/types";
@@ -60,7 +59,6 @@ export type ExtractedModelFile = {
 export type DeserializedProject = {
   project: ProjectState;
   classifier: ClassifierState;
-  segmenter: SegmenterState;
   data: {
     experiment: Experiment;
     imageSeries: ImageSeries[];

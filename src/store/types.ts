@@ -19,7 +19,6 @@ import {
 import { DataStateV2 } from "./dataV2/types";
 import { AppTasksState } from "./appTasks/types";
 import { ProjectState } from "views/ProjectViewer/state/types";
-import { SegmenterState } from "./segmenter/types";
 import { ClassifierState } from "./classifier/types";
 
 export type AppSettingsState = {
@@ -50,7 +49,6 @@ export type DataState = {
 
 type AppState = {
   classifier: ClassifierState;
-  segmenter: SegmenterState;
   imageViewer: ImageViewerState;
   annotator: AnnotatorState;
   project: ProjectState;

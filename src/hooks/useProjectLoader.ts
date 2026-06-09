@@ -8,7 +8,6 @@ import { classifierSlice } from "store/classifier";
 import { generateUUID } from "store/dataV2/utils";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 import { projectSlice } from "@ProjectViewer/state";
-import { segmenterSlice } from "store/segmenter";
 import { AlertType } from "utils/enums";
 import { ProjectLoader } from "utils/file-io-v2/project-loader/ProjectLoader";
 import { AlertState } from "utils/types";
@@ -79,7 +78,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
           }
           return;
         }
-        const { data, classifier, segmenter } = result.project;
+        const { data, classifier } = result.project;
 
         batch(() => {
           dispatch(projectSlice.actions.resetProject());
@@ -89,11 +88,6 @@ export function useProjectLoader(): UseProjectLoaderReturn {
             }),
           );
           dispatch(dataSliceV2.actions.setState(data));
-          dispatch(
-            segmenterSlice.actions.setSegmenter({
-              segmenter: segmenter,
-            }),
-          );
         });
 
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
@@ -163,7 +157,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
           }
           return;
         }
-        const { data, classifier, segmenter } = result.project;
+        const { data, classifier } = result.project;
 
         batch(() => {
           dispatch(projectSlice.actions.resetProject());
@@ -173,11 +167,6 @@ export function useProjectLoader(): UseProjectLoaderReturn {
             }),
           );
           dispatch(dataSliceV2.actions.setState(data));
-          dispatch(
-            segmenterSlice.actions.setSegmenter({
-              segmenter: segmenter,
-            }),
-          );
         });
 
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));

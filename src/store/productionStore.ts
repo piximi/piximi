@@ -18,7 +18,6 @@ import { classifierSlice } from "store/classifier";
 import { applicationSettingsSlice } from "./applicationSettings";
 import { dataSlice } from "./data/dataSlice";
 import { dataSliceV2 } from "./dataV2/dataSliceV2";
-import { segmenterSlice } from "./segmenter";
 import { measurementsSlice } from "./measurements/measurementsSlice";
 import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
@@ -47,7 +46,6 @@ const preloadedState: RootState = {
   applicationSettings: applicationSettingsSlice.getInitialState(),
   imageViewer: imageViewerSlice.getInitialState(),
   data: dataSlice.getInitialState(),
-  segmenter: segmenterSlice.getInitialState(),
   measurements: measurementsSlice.getInitialState(),
   dataV2: dataSliceV2.getInitialState(),
   appTasks: appTasksSlice.getInitialState(),

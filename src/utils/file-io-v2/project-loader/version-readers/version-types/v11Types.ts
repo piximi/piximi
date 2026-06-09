@@ -1,5 +1,4 @@
 import type { Shape } from "store/dataV2/types";
-import type { SegmenterState } from "store/segmenter/types";
 
 import type { CropOptions } from "utils/dl/types";
 import type {
@@ -31,7 +30,6 @@ export type V11PiximiState = {
     categories: EntityState<V11Category, string>;
     kinds: EntityState<V11Kind, string>;
   };
-  segmenter: SegmenterState;
 };
 
 // ============================================================

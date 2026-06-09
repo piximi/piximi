@@ -28,7 +28,6 @@ export function convertV02ToV11(
   return {
     project: v02.project,
     data: v02.data,
-    segmenter: v02.segmenter,
     classifier,
   };
 }

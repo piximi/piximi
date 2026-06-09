@@ -13,7 +13,6 @@ import {
 } from "../zarr/utils";
 import {
   deserializeColorsRaw,
-  deserializeSegmenterGroup,
   v01_02_deserializeClassifierGroup,
 } from "./common";
 import { subProgress } from "../progress";
@@ -89,8 +88,6 @@ export async function readV01(
   onProgress(STAGES.categories.end);
   const classifierGroup = await getGroup(rootGroup, "classifier");
   const classifier = await v01_02_deserializeClassifierGroup(classifierGroup);
-  const segmenterGroup = await getGroup(rootGroup, "segmenter");
-  const segmenter = await deserializeSegmenterGroup(segmenterGroup);
 
   onProgress(STAGES.models.end);
 
@@ -100,7 +97,6 @@ export async function readV01(
       imageChannels: images[0]?.shape.channels,
     },
     classifier,
-    segmenter,
     data: { images, annotations, categories, annotationCategories },
   };
 }

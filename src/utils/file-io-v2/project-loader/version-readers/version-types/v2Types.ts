@@ -5,7 +5,6 @@ import type {
   ColorMap,
   DType,
 } from "store/dataV2/types";
-import type { SegmenterState } from "store/segmenter/types";
 import type { ClassifierState, KindClassifier } from "store/classifier/types";
 
 import type { Partition } from "utils/dl/enums";
@@ -157,5 +156,4 @@ export type V2PiximiState = {
   project: ProjectState;
   classifier: V2ClassifierState;
   data: V2DataState;
-  segmenter: SegmenterState;
 };
