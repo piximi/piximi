@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 import type { Shape } from "store/dataV2/types";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
+import { UNKNOWN_KIND, UNKNOWN_KIND_ID } from "store/dataV2/constants";
 
 import type { RecursivePartial } from "utils/types";
 import { recursiveAssign } from "utils/objectUtils";
@@ -32,6 +33,11 @@ const initialState: ClassifierState = {
     [IMAGE_CLASSIFIER_ID]: {
       modelTargetId: IMAGE_CLASSIFIER_ID,
       modelTargetName: IMAGE_CLASSIFIER_NAME,
+      ...getDefaultKindClassifier(),
+    },
+    [UNKNOWN_KIND_ID]: {
+      modelTargetId: UNKNOWN_KIND_ID,
+      modelTargetName: UNKNOWN_KIND.name,
       ...getDefaultKindClassifier(),
     },
   },
