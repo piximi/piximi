@@ -4,9 +4,9 @@ import { logger } from "utils/logUtils";
 import type { LoadCB } from "utils/types";
 import type { InferenceInput } from "utils/dl/types";
 
-import { Model } from "../../Model";
+import { Model } from "../../../Model";
 
-import type { PredictedAnnotationObject } from "../types";
+import type { PredictedAnnotationObject } from "../../types";
 import type { GraphModel, Tensor } from "@tensorflow/tfjs";
 
 export abstract class Segmenter extends Model {

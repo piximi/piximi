@@ -18,9 +18,9 @@ import {
   simplifyPolygon,
 } from "utils/image";
 
-import { Partition } from "../../enums";
+import { Partition } from "../../../enums";
 
-import type { PredictedAnnotationObject } from "../types";
+import type { PredictedAnnotationObject } from "../../types";
 import type { Tensor4D, GraphModel } from "@tensorflow/tfjs";
 
 const computeAnnotationMaskFromPoints = (

@@ -6,8 +6,8 @@ import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
 
-import type { PredictedAnnotationObject } from "../types";
-import type { InferenceInput } from "../../types";
+import type { PredictedAnnotationObject } from "../../types";
+import type { InferenceInput } from "../../../types";
 import type { GraphModel } from "@tensorflow/tfjs";
 
 export const KIND_NAME = "stardist_nucleus";

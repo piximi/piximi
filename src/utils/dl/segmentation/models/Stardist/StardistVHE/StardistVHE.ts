@@ -1,6 +1,6 @@
 import { KIND_NAME, Stardist } from "../AbstractStardist";
 import { loadStardistVHE } from "./loadStardistVHE";
-import { ModelTask } from "../../../enums";
+import { ModelTask } from "../../../../enums";
 
 /*
  * Stardist (Versatile) H&E Nuclei Segmentation

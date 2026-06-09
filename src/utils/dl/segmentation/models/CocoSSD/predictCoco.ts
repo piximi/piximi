@@ -13,9 +13,9 @@ import { generateUUID } from "store/dataV2/utils";
 
 import { rleEncodeArray } from "utils/image";
 
-import { Partition } from "../../enums";
+import { Partition } from "../../../enums";
 
-import type { PredictedAnnotationObject } from "../types";
+import type { PredictedAnnotationObject } from "../../types";
 import type { Tensor, Rank, GraphModel, Tensor4D } from "@tensorflow/tfjs";
 
 export const predictCoco = async (

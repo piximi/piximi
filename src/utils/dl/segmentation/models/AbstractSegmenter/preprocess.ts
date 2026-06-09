@@ -1,9 +1,9 @@
 import { data as tfdata } from "@tensorflow/tfjs";
 
-import { channelsToTensor } from "../../tensor-assembly";
+import { channelsToTensor } from "../../../tensor-assembly";
 
 import type { Tensor4D } from "@tensorflow/tfjs";
-import type { InferenceInput } from "../../types";
+import type { InferenceInput } from "../../../types";
 
 export const preprocessInference = (items: Array<InferenceInput>) => {
   const count = items.length;

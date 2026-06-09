@@ -1,10 +1,10 @@
 import { data as tfdata, scalar, tidy } from "@tensorflow/tfjs";
 
-import { padToMatch } from "../../utils";
-import { channelsToTensor } from "../../tensor-assembly";
+import { padToMatch } from "../../../utils";
+import { channelsToTensor } from "../../../tensor-assembly";
 
 import type { Tensor3D, Tensor4D } from "@tensorflow/tfjs";
-import type { InferenceInput } from "../../types";
+import type { InferenceInput } from "../../../types";
 
 const padImage = (image: Tensor3D, padX: number, padY: number): Tensor3D => {
   if (padX === 0 && padY === 0) {

@@ -3,10 +3,10 @@ import { LayersModel } from "@tensorflow/tfjs";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessGlas } from "./preprocessGlas";
 import { predictGlas } from "./predictGlas";
-import { ModelTask } from "../../enums";
+import { ModelTask } from "../../../enums";
 import { loadGlas } from "./loadGlas";
 
-import type { InferenceInput } from "../../types";
+import type { InferenceInput } from "../../../types";
 import type { GraphModel } from "@tensorflow/tfjs";
 
 const KIND_NAME = "glas_glands";

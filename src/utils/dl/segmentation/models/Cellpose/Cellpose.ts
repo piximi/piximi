@@ -4,11 +4,11 @@ import type { LoadCB } from "utils/types";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCellpose } from "./predictCellpose";
-import { ModelTask } from "../../enums";
-import { channelsToTensor } from "../../tensor-assembly";
+import { ModelTask } from "../../../enums";
+import { channelsToTensor } from "../../../tensor-assembly";
 
-import type { PredictedAnnotationObject } from "../types";
-import type { InferenceInput } from "../../types";
+import type { PredictedAnnotationObject } from "../../types";
+import type { InferenceInput } from "../../../types";
 import type { GraphModel, Tensor3D, Tensor4D } from "@tensorflow/tfjs";
 
 const KIND_NAME = "cellpose_cells";

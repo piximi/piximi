@@ -5,9 +5,9 @@ import COCO_CLASSES from "data/model-data/cocossd-classes";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCoco } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
-import { ModelTask } from "../../enums";
+import { ModelTask } from "../../../enums";
 
-import type { InferenceInput } from "../../types";
+import type { InferenceInput } from "../../../types";
 import type { GraphModel } from "@tensorflow/tfjs";
 
 /*

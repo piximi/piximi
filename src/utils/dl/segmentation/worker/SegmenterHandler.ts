@@ -3,17 +3,17 @@ import JSZip from "jszip";
 import type { LoadCB } from "utils/types";
 
 import { err, ok } from "../../utils";
-import { Cellpose } from "../Cellpose";
-import { CocoSSD } from "../CocoSSD";
-import { Glas } from "../Glas";
-import { StardistFluo, StardistVHE } from "../Stardist";
+import { Cellpose } from "../models/Cellpose";
+import { CocoSSD } from "../models/CocoSSD";
+import { Glas } from "../models/Glas";
+import { StardistFluo, StardistVHE } from "../models/Stardist";
 
 import type {
   ISegmenterApi,
   SegmentaionModelDetails,
   SegmentationResults,
 } from "../types";
-import type { Segmenter } from "../AbstractSegmenter";
+import type { Segmenter } from "../models/AbstractSegmenter";
 import type {
   InferenceInput,
   SerializedModelData,

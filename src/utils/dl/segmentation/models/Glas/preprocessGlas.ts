@@ -5,8 +5,8 @@ import {
   scalar,
   tidy,
 } from "@tensorflow/tfjs";
-import { channelsToTensor } from "../../tensor-assembly";
-import { InferenceInput } from "../../types";
+import { channelsToTensor } from "../../../tensor-assembly";
+import { InferenceInput } from "../../../types";
 
 export const preprocessGlas = (
   items: Array<InferenceInput>,

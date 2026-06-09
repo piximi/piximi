@@ -1,6 +1,6 @@
 import { KIND_NAME, Stardist } from "../AbstractStardist";
 import { loadStardistFluo } from "./loadStardistFluo";
-import { ModelTask } from "../../../enums";
+import { ModelTask } from "../../../../enums";
 
 /*
  * Stardist (Versatile) Fluorescence Nuclei Segmentation

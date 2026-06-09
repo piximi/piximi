@@ -6,9 +6,9 @@ import { generateUUID } from "store/dataV2/utils";
 
 import { rleEncodeArray } from "utils/image";
 
-import { Partition } from "../../enums";
+import { Partition } from "../../../enums";
 
-import type { PredictedAnnotationObject } from "../types";
+import type { PredictedAnnotationObject } from "../../types";
 import type { ColorModel } from "image-js";
 import type { Tensor1D, Tensor4D } from "@tensorflow/tfjs";
 
