@@ -1,3 +1,4 @@
+import "utils/workers/workerPolyfills";
 import * as Comlink from "comlink";
 import { setBackend, ready, getBackend } from "@tensorflow/tfjs";
 

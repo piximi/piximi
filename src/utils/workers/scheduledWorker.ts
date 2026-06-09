@@ -1,13 +1,11 @@
-// src/workers/scheduler/worker.ts
+import "./workerPolyfills"; // Must be first — polyfills `window` for zarr/imjoy-rpc
+
+import * as Comlink from "comlink";
 
 import type {
   IScheduledWorkerAPI,
   TaskRegistry,
 } from "utils/worker-scheduler/types";
-import "./workerPolyfills"; // Must be first — polyfills `window` for zarr/imjoy-rpc
-
-import * as Comlink from "comlink";
-
 import { loadImage } from "utils/file-io-v2/file-loader/loadImage";
 import { loadProject } from "utils/file-io-v2/project-loader/loadProject";
 
