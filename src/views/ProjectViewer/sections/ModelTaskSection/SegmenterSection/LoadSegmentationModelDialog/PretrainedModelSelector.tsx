@@ -84,19 +84,33 @@ const ModelInfo = ({
       sx={{
         display: "grid",
         gridTemplateColumns: "max-content 1fr",
-        gridColumnGap: 8,
       }}
     >
       {Object.entries(modelInfo[selectedModel.label]).map(([key, value]) => (
         <React.Fragment key={key}>
-          <Typography variant="caption" color="textSecondary">
-            {key[0].toUpperCase() + key.slice(1)}:
+          <Typography
+            variant="caption"
+            color={key === "cloudWarning" ? "warning" : "textSecondary"}
+            sx={(theme) =>
+              key === "cloudWarning"
+                ? {
+                    borderBlock: `1px solid ${theme.palette.Alert.warningIconColor}`,
+                    mt: 1,
+                  }
+                : {}
+            }
+          >
+            {key === "cloudWarning"
+              ? "Cloud Warning"
+              : key[0].toUpperCase() + key.slice(1)}
+            :
           </Typography>
           {Array.isArray(value) ? (
             <Typography
               variant="caption"
               color="textSecondary"
               key={key + "-value"}
+              sx={{ pl: 1 }}
             >
               {value.map((src, index) => (
                 <React.Fragment key={src.text}>
@@ -108,7 +122,20 @@ const ModelInfo = ({
               ))}
             </Typography>
           ) : (
-            <Typography variant="caption" color="textSecondary">
+            <Typography
+              variant="caption"
+              color="textSecondary"
+              sx={(theme) =>
+                key === "cloudWarning"
+                  ? {
+                      //bgcolor: theme.palette.Alert.warningStandardBg,
+                      borderBlock: `1px solid ${theme.palette.Alert.warningIconColor}`,
+                      mt: 1,
+                      pl: 1,
+                    }
+                  : { pl: 1 }
+              }
+            >
               {typeof value === "string" ? value : value.name}
             </Typography>
           )}

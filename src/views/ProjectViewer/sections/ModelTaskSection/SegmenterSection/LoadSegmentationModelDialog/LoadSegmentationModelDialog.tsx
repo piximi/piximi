@@ -4,18 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import {
-  Alert,
   Box,
   Button,
-  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton,
   Tabs,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 
 import { useHotkeys } from "hooks";
 
@@ -24,7 +20,7 @@ import { ToolTipTab } from "components/layout";
 import { selectProjectImageChannels } from "@ProjectViewer/state/selectors";
 import type { Shape } from "store/dataV2/types";
 
-import { Cellpose, useSegmenterApi } from "utils/dl/segmentation";
+import { useSegmenterApi } from "utils/dl/segmentation";
 import { HotkeyContext } from "utils/enums";
 import type { SegmentaionModelDetails } from "utils/dl/segmentation/types";
 
@@ -65,8 +61,6 @@ export const LoadSegmentationModelDialog = ({
     Array<SegmentaionModelDetails>
   >([]);
 
-  const [cloudWarning, setCloudWarning] = useState(false);
-
   const [tabVal, setTabVal] = useState("1");
   const [invalidModel, setInvalidModel] = useState(false);
   const segApi = useSegmenterApi();
@@ -74,12 +68,6 @@ export const LoadSegmentationModelDialog = ({
   const onModelChange = useCallback(
     (model: SegmentaionModelDetails | undefined) => {
       setSelectedModel(model);
-      // TODO - segmenter: generalize to model.cloud
-      if (model instanceof Cellpose) {
-        setCloudWarning(true);
-      } else {
-        setCloudWarning(false);
-      }
     },
     [],
   );
@@ -93,13 +81,11 @@ export const LoadSegmentationModelDialog = ({
 
     await dispatchFunction(selectedModel, inputShape);
 
-    setCloudWarning(false);
     setInvalidModel(false);
     onClose();
   };
 
   const closeDialog = () => {
-    setCloudWarning(false);
     setInvalidModel(false);
     setSelectedModel(loadedModel);
     onClose();
@@ -149,29 +135,6 @@ export const LoadSegmentationModelDialog = ({
 
   return (
     <Dialog fullWidth maxWidth="sm" onClose={closeDialog} open={open}>
-      <Collapse in={cloudWarning}>
-        <Alert
-          severity="warning"
-          action={
-            <IconButton
-              aria-label="close"
-              color="inherit"
-              size="small"
-              onClick={() => {
-                setCloudWarning(false);
-              }}
-            >
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          }
-          sx={{ mb: 2 }}
-        >
-          This model performs inference in the cloud ☁️; images will leave your
-          machine. This requires internet access and may take time. Please
-          choose another option if your data is sensitive and should not be
-          transmitted.
-        </Alert>
-      </Collapse>
       <DialogTitle>Load Segmentation model</DialogTitle>
 
       <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
