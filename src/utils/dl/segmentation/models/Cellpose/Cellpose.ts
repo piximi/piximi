@@ -1,4 +1,5 @@
 import { data as tfdata, scalar, tidy } from "@tensorflow/tfjs";
+import { hyphaWebsocketClient } from "imjoy-rpc";
 
 import type { LoadCB } from "utils/types";
 
@@ -75,31 +76,34 @@ export class Cellpose extends Segmenter {
     return inferenceDataset;
   }
 
-  public async predict(items: InferenceInput[], loadCb?: LoadCB) {
+  public async predict(items: InferenceInput[], loadCb: LoadCB) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
-
+    loadCb(0, "1/3 Preprocessing images");
     const inferenceDataset = this.loadInference(items);
 
     const infT = await inferenceDataset.toArray();
-
+    loadCb(100, "1/3 Preprocessing images");
     const annotations: Array<PredictedAnnotationObject[]> = [];
+    loadCb(-1, "2/3 Connecting to server");
+    const api = await hyphaWebsocketClient.connectToServer(this._config);
+    const triton = await api.getService(this._service);
+
+    loadCb(100, "2/3 Connecting to server");
     for await (const [idx, imTensor] of infT.entries()) {
       // imTensor disposed in predictCellpose
       const annotObj = await predictCellpose(
         imTensor,
         this.segmentedKind,
-        this._service,
-        this._config,
+        triton,
       );
       annotations.push(annotObj);
-      if (loadCb) {
-        loadCb(
-          (idx + 1) / infT.length,
-          `${idx + 1} of ${infT.length} images predicted`,
-        );
-      }
+
+      loadCb(
+        Math.round(((idx + 1) / infT.length) * 100),
+        `3/3: Segmenting ${idx + 1} of ${infT.length} images`,
+      );
     }
 
     return annotations;

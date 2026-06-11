@@ -1,5 +1,7 @@
 import { LayersModel, loadGraphModel } from "@tensorflow/tfjs";
 
+import type { LoadCB } from "utils/types";
+
 import COCO_CLASSES from "data/model-data/cocossd-classes";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
@@ -7,6 +9,7 @@ import { predictCoco } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
 import { ModelTask } from "../../../enums";
 
+import type { PredictedAnnotationObject } from "../../types";
 import type { InferenceInput } from "../../../types";
 import type { GraphModel } from "@tensorflow/tfjs";
 
@@ -55,7 +58,7 @@ export class CocoSSD extends Segmenter {
     this._model = await loadGraphModel(this.src);
   }
 
-  public async predict(items: InferenceInput[]) {
+  public async predict(items: InferenceInput[], loadCb: LoadCB) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -63,16 +66,23 @@ export class CocoSSD extends Segmenter {
     if (this._model instanceof LayersModel) {
       throw Error(`"${this.name}" Model must a Graph, not Layers`);
     }
-
+    loadCb(0, "1/2 Preprocessing images");
     const inferenceDataset = preprocessInference(items);
     const graphModel = this._model as GraphModel;
 
     const infT = await inferenceDataset.toArray();
+    loadCb(100, "1/2 Preprocessing images");
     // imTensor disposed in `predictCoco`
-    const annotationsPromises = infT.map((imTensor) => {
-      return predictCoco(graphModel, imTensor, this.segmentedKinds);
-    });
-    const annotations = await Promise.all(annotationsPromises);
+    const annotations: Array<PredictedAnnotationObject[]> = [];
+    for await (const [idx, imTensor] of infT.entries()) {
+      loadCb(Math.round((idx / infT.length) * 100), "2/2 Segmenting image");
+      const annotObj = await predictCoco(
+        graphModel,
+        imTensor,
+        this.segmentedKinds,
+      );
+      annotations.push(annotObj);
+    }
 
     return annotations;
   }

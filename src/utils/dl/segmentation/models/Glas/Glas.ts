@@ -1,11 +1,14 @@
 import { LayersModel } from "@tensorflow/tfjs";
 
+import type { LoadCB } from "utils/types";
+
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessGlas } from "./preprocessGlas";
 import { predictGlas } from "./predictGlas";
 import { ModelTask } from "../../../enums";
 import { loadGlas } from "./loadGlas";
 
+import type { PredictedAnnotationObject } from "../../types";
 import type { InferenceInput } from "../../../types";
 import type { GraphModel } from "@tensorflow/tfjs";
 
@@ -39,7 +42,7 @@ export class Glas extends Segmenter {
     this._model = await loadGlas();
   }
 
-  public async predict(items: InferenceInput[]) {
+  public async predict(items: InferenceInput[], loadCb: LoadCB) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -49,24 +52,26 @@ export class Glas extends Segmenter {
     }
 
     const graphModel = this._model as GraphModel;
+    loadCb(0, "1/2 Preprocessing images");
     const inferenceDataDims = items.map((item) => {
       const { height, width } = item.shape;
       return { height, width };
     });
     const inferenceDataset = preprocessGlas(items, 1);
-
+    const annotations: Array<PredictedAnnotationObject[]> = [];
     const infT = await inferenceDataset.toArray();
     // imTensor disposed in `predictGlas`
-
-    const annotationsPromises = infT.map((imTensor, idx) => {
-      return predictGlas(
+    loadCb(100, "1/2 Preprocessing images");
+    for await (const [idx, imTensor] of infT.entries()) {
+      loadCb(Math.round((idx / infT.length) * 100), "2/2 Segmenting image");
+      const annObj = await predictGlas(
         graphModel,
         imTensor,
         this.segmentedKind,
         inferenceDataDims![idx],
       );
-    });
-    const annotations = await Promise.all(annotationsPromises);
+      annotations.push(annObj);
+    }
 
     return annotations;
   }

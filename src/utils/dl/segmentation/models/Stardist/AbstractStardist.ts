@@ -34,7 +34,7 @@ export abstract class Stardist extends Segmenter {
     return { padY, padX };
   }
 
-  public async predict(items: InferenceInput[], loadCb?: LoadCB) {
+  public async predict(items: InferenceInput[], loadCb: LoadCB) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -43,19 +43,29 @@ export abstract class Stardist extends Segmenter {
       throw Error(`"${this.name}" Model must a Graph, not Layers`);
     }
 
+    loadCb(0, "1/2 Preprocessing images");
     const inferenceDataDims = items.map((item) => {
       const { height, width } = item.shape;
       const { padX, padY } = this._getPaddings(height, width);
       return { height, width, padY, padX };
     });
-    const inferenceDataset = preprocessStardist(items, 1, inferenceDataDims);
+
+    const inferenceDataset = preprocessStardist(
+      items,
+      1,
+      inferenceDataDims,
+      loadCb,
+    );
 
     const graphModel = this._model as GraphModel;
 
     const infT = await inferenceDataset.toArray();
+    loadCb(100, "1/2 Preprocessing images");
     const annotations: Array<PredictedAnnotationObject[]> = [];
     // imTensor disposed in `predictStardist`
+
     for await (const [idx, imTensor] of infT.entries()) {
+      loadCb(Math.round((idx / infT.length) * 100), "2/2 Segmenting image");
       const annotObj = await predictStardist(
         graphModel,
         imTensor,
@@ -63,12 +73,6 @@ export abstract class Stardist extends Segmenter {
         inferenceDataDims![idx],
       );
       annotations.push(annotObj);
-      if (loadCb) {
-        loadCb(
-          (idx + 1) / infT.length,
-          `${idx + 1} of ${infT.length} images predicted`,
-        );
-      }
     }
 
     return annotations;

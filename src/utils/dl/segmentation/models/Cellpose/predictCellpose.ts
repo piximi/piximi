@@ -1,6 +1,5 @@
 import { onesLike, tensor1d, tidy, unique, whereAsync } from "@tensorflow/tfjs";
 import { Image as ImageJS } from "image-js";
-import { hyphaWebsocketClient } from "imjoy-rpc";
 
 import { generateUUID } from "store/dataV2/utils";
 
@@ -124,8 +123,7 @@ export const predictCellpose = async (
   // [B, H, W, C]
   imTensor: Tensor4D,
   kindName: string,
-  service: string,
-  serverConfig: { name: string; server_url: string; passive: boolean },
+  triton: any,
 ) => {
   const reshapedIm = tidy(() =>
     imTensor
@@ -145,10 +143,6 @@ export const predictCellpose = async (
     _rshape: reshapedIm.shape,
     _rdtype: reshapedIm.dtype,
   };
-
-  const api = await hyphaWebsocketClient.connectToServer(serverConfig);
-
-  const triton = await api.getService(service);
 
   const res = await triton.execute({
     inputs: [bObject, { diameter: 30 }],
