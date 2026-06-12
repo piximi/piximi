@@ -22,6 +22,6 @@ export function overallProgress(
 ): number {
   const { start, end } = STAGE_WEIGHTS[stage];
   return Math.round(
-    start + (end - start) * Math.min(1, Math.max(0, localProgress)),
+    start + (end - start) * Math.min(1, Math.max(0, localProgress)) * 100,
   );
 }

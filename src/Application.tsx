@@ -14,7 +14,7 @@ import { HelpProvider } from "contexts";
 import HelpOverlay from "views/HelpOverlay";
 import { useSelector } from "react-redux";
 import { selectAlertState } from "store/applicationSettings/selectors";
-import { AlertBar } from "components/ui";
+import { AlertBar, TaskProgressToasts } from "components/ui";
 import { SchedulerProvider } from "contexts/worker-scheduler";
 import { DataConnector } from "utils/data-connector";
 
@@ -41,6 +41,7 @@ export const Application = () => {
           <HelpProvider>
             <HelpOverlay />
             {alertState.visible && <AlertBar alertState={alertState} />}
+            <TaskProgressToasts />
             <BrowserRouter basename={"/"}>
               <Routes>
                 <Route path="/" element={<WelcomeScreen />} />

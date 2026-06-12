@@ -17,12 +17,14 @@ export const appTasksSlice = createSlice({
         id: string;
         progress: number;
         status?: AppTaskStatus;
+        label?: string;
       }>,
     ) {
       const task = state.tasks[action.payload.id];
       if (!task) return;
       task.progress = action.payload.progress;
       if (action.payload.status) task.status = action.payload.status;
+      if (action.payload.label) task.label = action.payload.label;
     },
     taskCompleted(state, action: PayloadAction<{ id: string }>) {
       const task = state.tasks[action.payload.id];
@@ -45,7 +47,10 @@ export const appTasksSlice = createSlice({
       task.completedAt = Date.now();
     },
     taskDismissed(state, action: PayloadAction<{ id: string }>) {
-      delete state.tasks[action.payload.id];
+      state.tasks[action.payload.id].dismissed = true;
+    },
+    taskShow(state, action: PayloadAction<string>) {
+      state.tasks[action.payload].dismissed = false;
     },
     completedTasksPurged(state) {
       // Call periodically to avoid unbounded growth

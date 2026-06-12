@@ -14,6 +14,7 @@ import type {
 } from "store/dataV2/types";
 import { dataSliceV2 } from "store/dataV2";
 import { generateKind, generateUUID } from "store/dataV2/utils";
+import { appTasksSlice } from "store/appTasks/appTasksSlice";
 
 import { useSegmenterApi } from "utils/dl/segmentation";
 import { toInferenceInput } from "utils/dl/utils";
@@ -37,12 +38,14 @@ export const usePredictSegmenter = () => {
   const segApi = useSegmenterApi();
 
   const handleError = useCallback(
-    async (error: Error, name: string) => {
+    async (error: Error, name: string, taskId: string) => {
       const stackTrace = await getStackTraceFromError(error);
+      const errorMessage = `${error.name}:\n${error.message}`;
+
       const alertState: AlertState = {
         alertType: AlertType.Error,
         name: name,
-        description: `${error.name}:\n${error.message}`,
+        description: errorMessage,
         stackTrace: stackTrace,
       };
       if (import.meta.env.NODE_ENV !== "production") {
@@ -55,6 +58,9 @@ export const usePredictSegmenter = () => {
         );
       }
       dispatch(
+        appTasksSlice.actions.taskFailed({ id: taskId, error: errorMessage }),
+      );
+      dispatch(
         applicationSettingsSlice.actions.updateAlertState({
           alertState: alertState,
         }),
@@ -66,6 +72,18 @@ export const usePredictSegmenter = () => {
 
   const predictSegmenter = useCallback(async () => {
     if (!selectedModel) return;
+    const taskId = generateUUID();
+    dispatch(
+      appTasksSlice.actions.taskRegistered({
+        id: taskId,
+        type: "image-segmentation",
+        progress: 0,
+        status: "running",
+        label: "Beginning Segmentation",
+        cancellable: true,
+        startedAt: Date.now(),
+      }),
+    );
     const modelInfoResult = await segApi.getModelInfo(selectedModel.name);
     let modelDetails: SegmentaionModelDetails;
     if (modelInfoResult.success) modelDetails = modelInfoResult.data;
@@ -76,6 +94,7 @@ export const usePredictSegmenter = () => {
           { cause: modelInfoResult.reason.cause },
         ),
         "fetch details error",
+        taskId,
       );
       return;
     }
@@ -89,6 +108,7 @@ export const usePredictSegmenter = () => {
             { cause: loadResult.reason.cause },
           ),
           "fetch details error",
+          taskId,
         );
       }
     }
@@ -101,6 +121,7 @@ export const usePredictSegmenter = () => {
       await handleError(
         new Error("Inference set is empty"),
         `There are no images to segment.`,
+        taskId,
       );
 
       return;
@@ -114,9 +135,10 @@ export const usePredictSegmenter = () => {
       progressMessage: string,
     ) => {
       dispatch(
-        applicationSettingsSlice.actions.setLoadPercent({
-          loadPercent: progressPercent,
-          loadMessage: progressMessage,
+        appTasksSlice.actions.taskUpdated({
+          id: taskId,
+          progress: progressPercent,
+          label: progressMessage,
         }),
       );
     };
@@ -158,8 +180,8 @@ export const usePredictSegmenter = () => {
           { cause: predictionResult.reason.cause },
         );
     } catch (error) {
-      await handleError(error as Error, "Error in running predictions");
-      progressCb(1, "");
+      await handleError(error as Error, "Error in running predictions", taskId);
+
       return;
     }
 
@@ -247,13 +269,13 @@ export const usePredictSegmenter = () => {
       await handleError(
         error as Error,
         "Error converting predictions to Piximi types",
+        taskId,
       );
-      progressCb(1, "");
 
       return;
     }
 
-    progressCb(1, "");
+    dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
     setModelStatus("idle");
   }, [handleError, allImages, selectedModel, selectedImages, kinds]);
 

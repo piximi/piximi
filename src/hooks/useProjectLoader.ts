@@ -11,6 +11,7 @@ import { projectSlice } from "@ProjectViewer/state";
 import { AlertType } from "utils/enums";
 import { ProjectLoader } from "utils/file-io-v2/project-loader/ProjectLoader";
 import { AlertState } from "utils/types";
+import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
 
 type UseProjectLoaderReturn = {
   loadExample: (examplePath: string, projectName: string) => Promise<void>;
@@ -32,24 +33,27 @@ export function useProjectLoader(): UseProjectLoaderReturn {
   const loadProject = useCallback(
     async (files: FileList): Promise<void> => {
       setIsLoading(true);
+      const taskId = generateUUID();
+      const newTask: AppTask = {
+        id: taskId,
+        type: "project-load",
+        status: "running",
+        progress: 0,
+        label: "Loading Project",
+        cancellable: true,
+        startedAt: Date.now(),
+      };
+      dispatch(appTasksSlice.actions.taskRegistered(newTask));
       try {
         // 1. Run the pipeline (workers + IndexDB)
-        const taskId = generateUUID();
-        const newTask: AppTask = {
-          id: taskId,
-          type: "project-load",
-          status: "running",
-          progress: 0,
-          label: "Loading Project",
-          startedAt: Date.now(),
-        };
-        dispatch(appTasksSlice.actions.taskRegistered(newTask));
+
         const projectLoader = new ProjectLoader(scheduler);
+        taskCancelRegistry.register(taskId, () => projectLoader.cancel());
         projectLoader.onProgress((progress) => {
           dispatch(
             appTasksSlice.actions.taskUpdated({
               id: taskId,
-              progress: progress.overallProgress,
+              progress: Math.round(progress.overallProgress * 100),
             }),
           );
         });
@@ -61,7 +65,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
             dispatch(
               appTasksSlice.actions.taskFailed({
                 id: taskId,
-                error: result.error.message,
+                error: `Error while parsing the project file: ${result.error.name}\n${result.error.message}`,
               }),
             );
             const warning: AlertState = {
@@ -91,7 +95,17 @@ export function useProjectLoader(): UseProjectLoaderReturn {
         });
 
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
+      } catch (err) {
+        dispatch(
+          appTasksSlice.actions.taskFailed({
+            id: taskId,
+            error:
+              err instanceof Error ? err.message : "Failed to load project",
+          }),
+        );
+        throw err;
       } finally {
+        taskCancelRegistry.unregister(taskId);
         setIsLoading(false);
       }
     },
@@ -100,6 +114,16 @@ export function useProjectLoader(): UseProjectLoaderReturn {
   const loadExample = useCallback(
     async (examplePath: string, projectName: string): Promise<void> => {
       setIsLoading(true);
+      const taskId = generateUUID();
+      const newTask: AppTask = {
+        id: taskId,
+        type: "project-load",
+        status: "running",
+        progress: 0,
+        label: "Loading Project",
+        startedAt: Date.now(),
+      };
+      dispatch(appTasksSlice.actions.taskRegistered(newTask));
       try {
         const exampleProjectFileList = await fetch(examplePath)
           .then((res) => res.blob())
@@ -111,22 +135,14 @@ export function useProjectLoader(): UseProjectLoaderReturn {
             throw err;
           });
         // 1. Run the pipeline (workers + IndexDB)
-        const taskId = generateUUID();
-        const newTask: AppTask = {
-          id: taskId,
-          type: "project-load",
-          status: "running",
-          progress: 0,
-          label: "Loading Project",
-          startedAt: Date.now(),
-        };
-        dispatch(appTasksSlice.actions.taskRegistered(newTask));
+
         const projectLoader = new ProjectLoader(scheduler);
+        taskCancelRegistry.register(taskId, () => projectLoader.cancel());
         projectLoader.onProgress((progress) => {
           dispatch(
             appTasksSlice.actions.taskUpdated({
               id: taskId,
-              progress: progress.overallProgress,
+              progress: Math.round(progress.overallProgress * 100),
             }),
           );
         });
@@ -140,7 +156,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
             dispatch(
               appTasksSlice.actions.taskFailed({
                 id: taskId,
-                error: result.error.message,
+                error: `Error while parsing the project file: ${result.error.name}\n${result.error.message}`,
               }),
             );
             const warning: AlertState = {
@@ -170,7 +186,17 @@ export function useProjectLoader(): UseProjectLoaderReturn {
         });
 
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
+      } catch (err) {
+        dispatch(
+          appTasksSlice.actions.taskFailed({
+            id: taskId,
+            error:
+              err instanceof Error ? err.message : "Failed to load project",
+          }),
+        );
+        throw err;
       } finally {
+        taskCancelRegistry.unregister(taskId);
         setIsLoading(false);
       }
     },

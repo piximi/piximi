@@ -24,6 +24,8 @@ export interface AppTask {
   error?: string;
   startedAt: number;
   completedAt?: number;
+  cancellable?: boolean;
+  dismissed?: boolean;
   meta?: Record<string, unknown>; // anything extra (file size, model name, etc.)
 }
 

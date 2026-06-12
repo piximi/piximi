@@ -14,6 +14,7 @@ import {
   TiffDialogCallbackResult,
   UploadOptionswithCallbacks,
 } from "utils/file-io-v2/file-loader/types";
+import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
 
 type UseFileLoaderReturn = {
   upload: (
@@ -80,19 +81,21 @@ export function useFileLoader(): UseFileLoaderReturn {
       options?: UploadOptionswithCallbacks,
     ): Promise<FileUploadResult> => {
       setIsUploading(true);
+      const taskId = generateUUID();
+      const newTask: AppTask = {
+        id: taskId,
+        type: "file-upload",
+        status: "running",
+        progress: 0,
+        label: "Uploading Files",
+        startedAt: Date.now(),
+      };
+      dispatch(appTasksSlice.actions.taskRegistered(newTask));
       try {
         // 1. Run the pipeline (workers + IndexDB)
-        const taskId = generateUUID();
-        const newTask: AppTask = {
-          id: taskId,
-          type: "file-upload",
-          status: "running",
-          progress: 0,
-          label: "Uploading Files",
-          startedAt: Date.now(),
-        };
-        dispatch(appTasksSlice.actions.taskRegistered(newTask));
+
         const fileLoader = new FileLoader(scheduler);
+        taskCancelRegistry.register(taskId, () => fileLoader.cancel());
         fileLoader.onProgress((progress) => {
           dispatch(
             appTasksSlice.actions.taskUpdated({
@@ -109,7 +112,7 @@ export function useFileLoader(): UseFileLoaderReturn {
             dispatch(
               appTasksSlice.actions.taskFailed({
                 id: taskId,
-                error: "Failed to upload files",
+                error: `Failed to upload files`,
               }),
             );
           }
@@ -136,7 +139,17 @@ export function useFileLoader(): UseFileLoaderReturn {
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
 
         return result;
+      } catch (err) {
+        dispatch(
+          appTasksSlice.actions.taskFailed({
+            id: taskId,
+            error:
+              err instanceof Error ? err.message : "Failed to upload files",
+          }),
+        );
+        throw err;
       } finally {
+        taskCancelRegistry.unregister(taskId);
         setIsUploading(false);
       }
     },
