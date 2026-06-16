@@ -15,6 +15,7 @@ import type {
 import { dataSliceV2 } from "store/dataV2";
 import { generateKind, generateUUID } from "store/dataV2/utils";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
+import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
 
 import { useSegmenterApi } from "utils/dl/segmentation";
 import { toInferenceInput } from "utils/dl/utils";
@@ -25,6 +26,7 @@ import type {
   PredictedAnnotationObject,
   SegmentaionModelDetails,
 } from "utils/dl/segmentation/types";
+import { CancelSource } from "utils/dl/cancel";
 
 import { useSegmenterStatus } from "../contexts/SegmenterStatusProvider";
 
@@ -36,6 +38,7 @@ export const usePredictSegmenter = () => {
   const kinds = useSelector(selectAllKinds);
   const { setModelStatus, selectedModel } = useSegmenterStatus();
   const segApi = useSegmenterApi();
+  const Cancel = new CancelSource();
 
   const handleError = useCallback(
     async (error: Error, name: string, taskId: string) => {
@@ -72,6 +75,7 @@ export const usePredictSegmenter = () => {
 
   const predictSegmenter = useCallback(async () => {
     if (!selectedModel) return;
+    Cancel.reset();
     const taskId = generateUUID();
     dispatch(
       appTasksSlice.actions.taskRegistered({
@@ -84,6 +88,18 @@ export const usePredictSegmenter = () => {
         startedAt: Date.now(),
       }),
     );
+    taskCancelRegistry.register(taskId, async () => {
+      Cancel.signal();
+      dispatch(
+        appTasksSlice.actions.taskUpdated({
+          id: taskId,
+          progress: 100,
+          status: "stopping",
+          label: "Stopping...",
+        }),
+      );
+      //await segApi.stopExecution(selectedModel.name);
+    });
     const modelInfoResult = await segApi.getModelInfo(selectedModel.name);
     let modelDetails: SegmentaionModelDetails;
     if (modelInfoResult.success) modelDetails = modelInfoResult.data;
@@ -146,14 +162,17 @@ export const usePredictSegmenter = () => {
     progressCb(-1, "starting inference...");
 
     let predictedAnnotations: PredictedAnnotationObject[][];
+    let predictionCancelled: boolean = false;
     try {
       const predictionResult = await segApi.predict(
         selectedModel.name,
         inferenceImages.map(toInferenceInput),
+        Cancel.token,
         progressCb,
       );
       if (predictionResult.success) {
-        predictedAnnotations = predictionResult.data;
+        predictedAnnotations = predictionResult.data.annotations;
+        predictionCancelled = !!predictionResult.data.cancelled;
         for (let i = 0; i < predictedAnnotations.length; i++) {
           for (let j = 0; j < predictedAnnotations[i].length; j++) {
             const bbox = predictedAnnotations[i][j].boundingBox;
@@ -274,8 +293,9 @@ export const usePredictSegmenter = () => {
 
       return;
     }
-
-    dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
+    if (predictionCancelled)
+      dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
+    else dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
     setModelStatus("idle");
   }, [handleError, allImages, selectedModel, selectedImages, kinds]);
 

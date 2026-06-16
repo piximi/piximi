@@ -1,6 +1,7 @@
 import { LayersModel } from "@tensorflow/tfjs";
 
 import type { LoadCB } from "utils/types";
+import { CancelSource, TaskCancelledError, type Token } from "utils/dl/cancel";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessGlas } from "./preprocessGlas";
@@ -42,7 +43,11 @@ export class Glas extends Segmenter {
     this._model = await loadGlas();
   }
 
-  public async predict(items: InferenceInput[], loadCb: LoadCB) {
+  public async predict(
+    items: InferenceInput[],
+    cancelToken: Token,
+    loadCb: LoadCB,
+  ) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -62,18 +67,25 @@ export class Glas extends Segmenter {
     const infT = await inferenceDataset.toArray();
     // imTensor disposed in `predictGlas`
     loadCb(100, "1/2 Preprocessing images");
-    for await (const [idx, imTensor] of infT.entries()) {
-      loadCb(Math.round((idx / infT.length) * 100), "2/2 Segmenting image");
-      const annObj = await predictGlas(
-        graphModel,
-        imTensor,
-        this.segmentedKind,
-        inferenceDataDims![idx],
-      );
-      annotations.push(annObj);
+    try {
+      for await (const [idx, imTensor] of infT.entries()) {
+        CancelSource.throwIfSignaled(cancelToken);
+        loadCb(Math.round((idx / infT.length) * 100), "2/2 Segmenting image");
+        const annObj = await predictGlas(
+          graphModel,
+          imTensor,
+          this.segmentedKind,
+          inferenceDataDims![idx],
+        );
+        annotations.push(annObj);
+      }
+    } catch (err) {
+      if (err instanceof TaskCancelledError)
+        return { cancelled: true, annotations };
+      else throw err as Error;
     }
 
-    return annotations;
+    return { annotations };
   }
 
   public override dispose() {

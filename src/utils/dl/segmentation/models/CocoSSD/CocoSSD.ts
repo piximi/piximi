@@ -1,6 +1,7 @@
 import { LayersModel, loadGraphModel } from "@tensorflow/tfjs";
 
 import type { LoadCB } from "utils/types";
+import { CancelSource, TaskCancelledError, type Token } from "utils/dl/cancel";
 
 import COCO_CLASSES from "data/model-data/cocossd-classes";
 
@@ -58,7 +59,11 @@ export class CocoSSD extends Segmenter {
     this._model = await loadGraphModel(this.src);
   }
 
-  public async predict(items: InferenceInput[], loadCb: LoadCB) {
+  public async predict(
+    items: InferenceInput[],
+    cancelToken: Token,
+    loadCb: LoadCB,
+  ) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -74,17 +79,24 @@ export class CocoSSD extends Segmenter {
     loadCb(100, "1/2 Preprocessing images");
     // imTensor disposed in `predictCoco`
     const annotations: Array<PredictedAnnotationObject[]> = [];
-    for await (const [idx, imTensor] of infT.entries()) {
-      loadCb(Math.round((idx / infT.length) * 100), "2/2 Segmenting image");
-      const annotObj = await predictCoco(
-        graphModel,
-        imTensor,
-        this.segmentedKinds,
-      );
-      annotations.push(annotObj);
+    try {
+      for await (const [idx, imTensor] of infT.entries()) {
+        CancelSource.throwIfSignaled(cancelToken);
+        loadCb(Math.round((idx / infT.length) * 100), "2/2 Segmenting image");
+        const annotObj = await predictCoco(
+          graphModel,
+          imTensor,
+          this.segmentedKinds,
+        );
+        annotations.push(annotObj);
+      }
+    } catch (err) {
+      if (err instanceof TaskCancelledError)
+        return { cancelled: true, annotations };
+      else throw err as Error;
     }
 
-    return annotations;
+    return { annotations };
   }
 
   public override dispose() {

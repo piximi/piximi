@@ -10,6 +10,7 @@ export type AppTaskType =
 export type AppTaskStatus =
   | "pending"
   | "running"
+  | "stopping"
   | "success"
   | "error"
   | "cancelled";

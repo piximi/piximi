@@ -1,6 +1,7 @@
 import JSZip from "jszip";
 
 import type { LoadCB } from "utils/types";
+import type { Token } from "utils/dl/cancel";
 
 import { err, ok } from "../../utils";
 import { Cellpose } from "../models/Cellpose";
@@ -111,6 +112,7 @@ export class SegmenterHandler implements ISegmenterApi {
   public async predict(
     modelName: string,
     items: InferenceInput[],
+    cancelToken: Token,
     loadCB?: LoadCB,
   ): Promise<ApiResult<SegmentationResults>> {
     const model = this.resolveModel(modelName);
@@ -120,10 +122,11 @@ export class SegmenterHandler implements ISegmenterApi {
         `No model registered with name "${modelName}"`,
       );
     try {
-      const result = await model.predict(items, loadCB);
+      const result = await model.predict(items, cancelToken, loadCB);
       return ok(result);
     } catch (e) {
-      return err("PREDICTION_FAILED", "Failed to predict", e);
+      const error = e as Error;
+      return err("PREDICTION_FAILED", error.message, error.cause);
     }
   }
 

@@ -3,10 +3,11 @@ import { tidy, zeros } from "@tensorflow/tfjs";
 import { logger } from "utils/logUtils";
 import type { LoadCB } from "utils/types";
 import type { InferenceInput } from "utils/dl/types";
+import type { Token } from "utils/dl/cancel";
 
 import { Model } from "../../../Model";
 
-import type { PredictedAnnotationObject } from "../../types";
+import type { SegmentationResults } from "../../types";
 import type { GraphModel, Tensor } from "@tensorflow/tfjs";
 
 export abstract class Segmenter extends Model {
@@ -17,8 +18,9 @@ export abstract class Segmenter extends Model {
   public abstract loadModel(): Promise<void>;
   public abstract predict(
     items: InferenceInput[],
+    cancelToken: Token,
     loadCb?: LoadCB,
-  ): PredictedAnnotationObject[][] | Promise<PredictedAnnotationObject[][]>;
+  ): SegmentationResults | Promise<SegmentationResults>;
 
   public get expectedType() {
     if (!this._model) {

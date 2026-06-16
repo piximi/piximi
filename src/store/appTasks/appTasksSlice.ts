@@ -22,10 +22,13 @@ export const appTasksSlice = createSlice({
     ) {
       const task = state.tasks[action.payload.id];
       if (!task) return;
+      if (task.status === "stopping" && action.payload.status !== "cancelled")
+        return;
       task.progress = action.payload.progress;
       if (action.payload.status) task.status = action.payload.status;
       if (action.payload.label) task.label = action.payload.label;
     },
+
     taskCompleted(state, action: PayloadAction<{ id: string }>) {
       const task = state.tasks[action.payload.id];
       if (!task) return;
@@ -44,6 +47,7 @@ export const appTasksSlice = createSlice({
       const task = state.tasks[action.payload.id];
       if (!task) return;
       task.status = "cancelled";
+      task.label = "Cancelled";
       task.completedAt = Date.now();
     },
     taskDismissed(state, action: PayloadAction<{ id: string }>) {

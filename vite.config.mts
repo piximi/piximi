@@ -4,6 +4,13 @@ import react from "@vitejs/plugin-react";
 import viteTsconfigPaths from "vite-tsconfig-paths";
 import path from "path";
 
+// SharedArrayBuffer requires the page to be cross-origin isolated, which means
+// the server must send these two headers. Without them `crossOriginIsolated`
+// is false and `new SharedArrayBuffer()` is unavailable.
+const crossOriginIsolation = {
+  "Cross-Origin-Opener-Policy": "same-origin",
+  "Cross-Origin-Embedder-Policy": "require-corp",
+};
 export default defineConfig({
   // depending on your application, base can also be "/"
   base: "",
@@ -33,6 +40,10 @@ export default defineConfig({
     open: true,
     // this sets a default port to 3000
     port: 3000,
+    headers: crossOriginIsolation,
+  },
+  preview: {
+    headers: crossOriginIsolation,
   },
   assetsInclude: ["**/*.bin", "**/*.svg", "**/*.zip"],
   test: {

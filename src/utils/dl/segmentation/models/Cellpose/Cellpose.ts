@@ -2,6 +2,7 @@ import { data as tfdata, scalar, tidy } from "@tensorflow/tfjs";
 import { hyphaWebsocketClient } from "imjoy-rpc";
 
 import type { LoadCB } from "utils/types";
+import { CancelSource, TaskCancelledError, type Token } from "utils/dl/cancel";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCellpose } from "./predictCellpose";
@@ -76,7 +77,11 @@ export class Cellpose extends Segmenter {
     return inferenceDataset;
   }
 
-  public async predict(items: InferenceInput[], loadCb: LoadCB) {
+  public async predict(
+    items: InferenceInput[],
+    cancelToken: Token,
+    loadCb: LoadCB,
+  ) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -91,22 +96,28 @@ export class Cellpose extends Segmenter {
     const triton = await api.getService(this._service);
 
     loadCb(100, "2/3 Connecting to server");
-    for await (const [idx, imTensor] of infT.entries()) {
-      // imTensor disposed in predictCellpose
-      const annotObj = await predictCellpose(
-        imTensor,
-        this.segmentedKind,
-        triton,
-      );
-      annotations.push(annotObj);
+    try {
+      for await (const [idx, imTensor] of infT.entries()) {
+        CancelSource.throwIfSignaled(cancelToken);
+        const annotObj = await predictCellpose(
+          imTensor,
+          this.segmentedKind,
+          triton,
+        );
+        annotations.push(annotObj);
 
-      loadCb(
-        Math.round(((idx + 1) / infT.length) * 100),
-        `3/3: Segmenting ${idx + 1} of ${infT.length} images`,
-      );
+        loadCb(
+          Math.round(((idx + 1) / infT.length) * 100),
+          `3/3: Segmenting ${idx + 1} of ${infT.length} images`,
+        );
+      }
+    } catch (err) {
+      if (err instanceof TaskCancelledError)
+        return { cancelled: true, annotations };
+      else throw err as Error;
     }
 
-    return annotations;
+    return { annotations };
   }
 
   public override dispose() {

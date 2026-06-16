@@ -5,6 +5,7 @@ import { logger } from "utils/logUtils";
 
 import { registerSegmenterHmrCleanup } from "../devHmrCleanup";
 
+import type { Token } from "../cancel";
 import type { InferenceInput } from "../types";
 import type { ISegmenterApi } from "./types";
 import type { SegmenterHandler } from "./worker/SegmenterHandler";
@@ -61,12 +62,22 @@ export class SegmenterApi implements ISegmenterApi {
     return this.backend.loadModel(modelName);
   }
   // ---- inference  ----
-  predict(name: string, items: InferenceInput[], loadCB?: LoadCB) {
+  predict(
+    name: string,
+    items: InferenceInput[],
+    cancelToken: Token,
+    loadCB?: LoadCB,
+  ) {
     if (!loadCB) {
       loadCB = (loadPercent: number, loadMessage: string) =>
         logger(`${loadPercent}% Completed: ${loadMessage}`);
     }
-    return this.backend.predict(name, items, Comlink.proxy(loadCB));
+    return this.backend.predict(
+      name,
+      items,
+      cancelToken,
+      Comlink.proxy(loadCB),
+    );
   }
 
   // ---- model I/O ----

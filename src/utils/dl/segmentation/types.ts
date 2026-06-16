@@ -2,6 +2,7 @@ import type { AnnotationObject, Kind } from "store/dataV2/types";
 
 import type { LoadCB } from "utils/types";
 
+import type { Token } from "../cancel";
 import type { ApiResult, InferenceInput, SerializedModelData } from "../types";
 import type { ModelTask } from "../enums";
 
@@ -40,7 +41,10 @@ export type PredictedAnnotationObject = Omit<
   AnnotationObject,
   "imageId" | "planeId" | "shape" | "volumeId"
 > & { kindName: string };
-export type SegmentationResults = Array<Array<PredictedAnnotationObject>>;
+export type SegmentationResults = {
+  cancelled?: boolean;
+  annotations: Array<Array<PredictedAnnotationObject>>;
+};
 export interface ISegmenterApi {
   // registry reads
   getModelNames(): Promise<ApiResult<string[]>>;
@@ -57,6 +61,7 @@ export interface ISegmenterApi {
   predict(
     name: string,
     items: InferenceInput[],
+    cancelToken: Token,
     loadCB?: LoadCB,
   ): Promise<ApiResult<SegmentationResults>>;
 

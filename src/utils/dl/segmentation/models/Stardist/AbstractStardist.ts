@@ -1,6 +1,7 @@
 import { LayersModel } from "@tensorflow/tfjs";
 
 import type { LoadCB } from "utils/types";
+import { CancelSource, type Token } from "utils/dl/cancel";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessStardist } from "./preprocessStardist";
@@ -34,7 +35,11 @@ export abstract class Stardist extends Segmenter {
     return { padY, padX };
   }
 
-  public async predict(items: InferenceInput[], loadCb: LoadCB) {
+  public async predict(
+    items: InferenceInput[],
+    cancelToken: Token,
+    loadCb: LoadCB,
+  ) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -43,7 +48,7 @@ export abstract class Stardist extends Segmenter {
       throw Error(`"${this.name}" Model must a Graph, not Layers`);
     }
 
-    loadCb(0, "1/2 Preprocessing images");
+    loadCb(0, "Preprocessing images");
     const inferenceDataDims = items.map((item) => {
       const { height, width } = item.shape;
       const { padX, padY } = this._getPaddings(height, width);
@@ -60,22 +65,37 @@ export abstract class Stardist extends Segmenter {
     const graphModel = this._model as GraphModel;
 
     const infT = await inferenceDataset.toArray();
-    loadCb(100, "1/2 Preprocessing images");
+    loadCb(100, "Preprocessing images");
     const annotations: Array<PredictedAnnotationObject[]> = [];
     // imTensor disposed in `predictStardist`
-
-    for await (const [idx, imTensor] of infT.entries()) {
-      loadCb(Math.round((idx / infT.length) * 100), "2/2 Segmenting image");
-      const annotObj = await predictStardist(
-        graphModel,
-        imTensor,
-        this.segmentedKind,
-        inferenceDataDims![idx],
-      );
-      annotations.push(annotObj);
+    try {
+      for await (const [idx, imTensor] of infT.entries()) {
+        CancelSource.throwIfSignaled(cancelToken);
+        // if (this.getExecutionStopped()) {
+        //   this._executionStopped = false;
+        //   return { cancelled: true, annotations };
+        // }
+        loadCb(
+          Math.round((idx / infT.length) * 100),
+          `Segmenting image ${idx + 1} of ${infT.length}`,
+        );
+        const annotObj = await predictStardist(
+          graphModel,
+          imTensor,
+          this.segmentedKind,
+          inferenceDataDims![idx],
+        );
+        annotations.push(annotObj);
+      }
+    } catch (err) {
+      if ((err as Error).name === "TaskCancelledError")
+        return { cancelled: true, annotations };
+      else {
+        throw err as Error;
+      }
     }
 
-    return annotations;
+    return { annotations };
   }
 
   public override dispose() {
