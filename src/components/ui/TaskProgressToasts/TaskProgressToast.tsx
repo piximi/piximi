@@ -1,29 +1,16 @@
-import React, {
-  CSSProperties,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import {
   Box,
+  Button,
   IconButton,
   LinearProgress,
   Paper,
-  Stack,
   Theme,
   Typography,
 } from "@mui/material";
-import {
-  CancelOutlined,
-  CheckCircleOutline,
-  Close,
-  ErrorOutline,
-  Stop,
-} from "@mui/icons-material";
+import { Remove as Rm } from "@mui/icons-material";
 
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import type { AppTask, AppTaskStatus } from "store/appTasks/types";
@@ -35,19 +22,23 @@ const AUTO_DISMISS_MS: Partial<Record<AppTaskStatus, number>> = {
   cancelled: 3000,
 };
 
-const PROGRESS_STYLE: CSSProperties = { marginBlock: 1, marginInline: 2 };
-
 const getToastColors = (theme: Theme, status: AppTask["status"]) => {
   switch (status) {
     case "error":
       return {
-        bgcolor: theme.palette.Alert.errorFilledBg,
-        color: theme.palette.grey[900],
+        borderColor: theme.palette.Alert.errorFilledBg,
+      };
+    case "success":
+      return {
+        borderColor: theme.palette.Alert.successFilledBg,
+      };
+    case "cancelled":
+      return {
+        borderColor: theme.palette.Alert.warningColor,
       };
     default:
       return {
-        bgcolor: theme.palette.primary.dark,
-        color: theme.palette.grey[900],
+        borderColor: theme.palette.primary.dark,
       };
   }
 };
@@ -56,14 +47,33 @@ export const TaskProgressToast = ({ task }: { task: AppTask }) => {
   const dispatch = useDispatch();
   const isActive = task.status === "pending" || task.status === "running";
 
-  const statusIcon = useStatus(task.status);
-
-  const hasStatusIcon = useMemo(() => !!statusIcon, [statusIcon]);
-
   const dismissTask = () => {
     dispatch(appTasksSlice.actions.taskDismissed({ id: task.id }));
     taskCancelRegistry.unregister(task.id);
   };
+
+  const progressBar = useMemo(() => {
+    const PROGRESS_STYLE = (theme: Theme) => ({
+      height: "5px",
+      color: theme.palette.primary.main,
+      borderRadius: 999,
+      backgroundColor: "action.hover",
+      "& .MuiLinearProgress-bar": {
+        borderRadius: 999,
+      },
+      top: task.cancellable ? 0 : "calc((1rem - 5px) / 2)",
+    });
+    return task.progress < 0 ? (
+      <LinearProgress color="inherit" sx={PROGRESS_STYLE} />
+    ) : (
+      <LinearProgress
+        variant="determinate"
+        value={Math.min(100, task.progress)}
+        color="inherit"
+        sx={PROGRESS_STYLE}
+      />
+    );
+  }, [task.progress, task.cancellable]);
 
   useEffect(() => {
     const delay = AUTO_DISMISS_MS[task.status];
@@ -82,111 +92,76 @@ export const TaskProgressToast = ({ task }: { task: AppTask }) => {
       sx={(theme) => ({
         position: "relative",
         pointerEvents: "auto",
+        border: "1px solid",
         ...getToastColors(theme, task.status),
-        borderRadius: 1,
+        p: "14px 16px",
+        borderRadius: 2,
       })}
     >
-      <Stack direction="row" sx={{ mb: isActive ? 0 : 1 }}>
-        {statusIcon}
-        <Box sx={{ flexGrow: 1, minWidth: 0, px: 0.5 }}>
-          <Box sx={{ pl: hasStatusIcon ? 1.5 : 0 }}>
-            <Typography
-              variant="body1"
-              fontWeight="bold"
-              noWrap
-              sx={{ pl: 1, lineHeight: "1rem", mt: 0.5 }}
-              gutterBottom={false}
-            >
-              {taskTypeDisplayLookup[task.type]}
-            </Typography>
-          </Box>
-          <Box>
-            {task.status === "error" && task.error ? (
-              <Typography
-                variant="caption"
-                color="inherit"
-                sx={{ display: "block", overflowWrap: "break-word" }}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Typography
+          variant="body2"
+          fontWeight={500}
+          lineHeight={1.3}
+          color="text.primary"
+        >
+          {taskTypeDisplayLookup[task.type]}
+        </Typography>
+        <ActionButton dismissTask={dismissTask} />
+      </Box>
+      <Box>
+        <Typography variant="caption" color="text.secondary" display="block">
+          {task.label}
+        </Typography>
+      </Box>
+
+      {task.status === "error" && task.error ? (
+        <ErrorText error={task.error} />
+      ) : (
+        isActive && (
+          <Box sx={{ height: "1rem", mt: 0.5 }}>
+            {progressBar}
+            {task.cancellable && (
+              <Button
+                variant="text"
+                color="error"
+                sx={{ fontSize: "0.75rem", p: 0, minWidth: 0 }}
+                onClick={() => taskCancelRegistry.cancel(task.id)}
               >
-                <ErrorText error={task.error} />
-              </Typography>
-            ) : (
-              <Typography
-                variant="body2"
-                noWrap
-                sx={{ pl: 2, lineHeight: "1rem" }}
-              >
-                {task.label}
-              </Typography>
+                Stop
+              </Button>
             )}
           </Box>
-        </Box>
-        <ActionButton
-          taskId={task.id}
-          isActive={isActive}
-          isCancellable={!!task.cancellable}
-          dismissTask={dismissTask}
-        />
-      </Stack>
-      {isActive &&
-        (task.progress < 0 ? (
-          <LinearProgress color="inherit" sx={PROGRESS_STYLE} />
-        ) : (
-          <LinearProgress
-            variant="determinate"
-            value={Math.min(100, task.progress)}
-            color="inherit"
-            sx={PROGRESS_STYLE}
-          />
-        ))}
+        )
+      )}
     </Paper>
   );
 };
 
-const ACTION_BUTTON_STYLE: CSSProperties = {
-  position: "absolute",
-  top: "2px",
-  right: "2px",
-  padding: 0,
-};
-const ActionButton = ({
-  taskId,
-  isActive,
-  isCancellable,
-  dismissTask,
-}: {
-  taskId: string;
-  isActive: boolean;
-  isCancellable: boolean;
-  dismissTask: () => void;
-}) => {
-  if (isActive)
-    if (isCancellable)
-      return (
-        <IconButton
-          size="small"
-          aria-label="cancel task"
-          color="inherit"
-          onClick={() => {
-            taskCancelRegistry.cancel(taskId);
-          }}
-          sx={ACTION_BUTTON_STYLE}
-        >
-          <Stop fontSize="small" />
-        </IconButton>
-      );
-    else return <></>;
-  else
-    return (
+const ActionButton = ({ dismissTask }: { dismissTask: () => void }) => {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center" }}>
       <IconButton
         size="small"
         aria-label="dismiss notification"
         color="inherit"
         onClick={dismissTask}
-        sx={ACTION_BUTTON_STYLE}
+        sx={(theme) => ({
+          p: 0,
+          border: `1px solid ${theme.palette.text.primary}`,
+          borderRadius: 1,
+        })}
       >
-        <Close fontSize="small" />
+        <Rm viewBox="0 3 24 18" sx={{ fontSize: "1rem", height: "12px" }} />
       </IconButton>
-    );
+    </Box>
+  );
 };
 
 const ErrorText = ({ error }: { error: string }) => {
@@ -239,7 +214,9 @@ const ErrorText = ({ error }: { error: string }) => {
       {toggle}
     </Box>
   ) : (
-    <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
+    <Box
+      sx={{ display: "flex", alignItems: "baseline", gap: 0.5, height: "1rem" }}
+    >
       <Typography
         ref={textRef}
         variant="caption"
@@ -252,27 +229,4 @@ const ErrorText = ({ error }: { error: string }) => {
       {toggle}
     </Box>
   );
-};
-
-const STATUS_ICON_STYLE: CSSProperties = {
-  position: "absolute",
-  top: "4px",
-  left: "4px",
-  fontSize: "inherit",
-};
-const useStatus = (status: AppTask["status"]) => {
-  const statusIcon = useMemo(() => {
-    switch (status) {
-      case "success":
-        return <CheckCircleOutline color="inherit" sx={STATUS_ICON_STYLE} />;
-      case "cancelled":
-        return <CancelOutlined color="inherit" sx={STATUS_ICON_STYLE} />;
-      case "error":
-        return <ErrorOutline color="inherit" sx={STATUS_ICON_STYLE} />;
-      default:
-        return null;
-    }
-  }, [status]);
-
-  return statusIcon;
 };
