@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useRef } from "react";
 
 import { ListItemText, MenuItem } from "@mui/material";
 
 import { useFileLoader } from "hooks";
 
 import { TiffConfigDialog } from "components/dialogs";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 type OpenImageMenuItemProps = {
   onCloseMenu: () => void;
@@ -13,6 +14,7 @@ type OpenImageMenuItemProps = {
 // TODO: MenuItem??
 
 export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const {
     upload,
     tiffDialogOpen,
@@ -30,11 +32,16 @@ export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
     onCloseMenu();
   };
 
+  const handleClick = () => {
+    if (inputRef.current) inputRef.current.click();
+  };
+
   return (
     <React.Fragment>
-      <MenuItem component="label" dense>
-        <ListItemText primary="New Image" />
+      <MenuItem data-help={HelpItem.OpenImage} dense onClick={handleClick}>
+        <ListItemText primary="Image" />
         <input
+          ref={inputRef}
           accept="image/*,.dcm"
           hidden
           multiple

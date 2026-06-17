@@ -38,17 +38,45 @@ export function useProjectLoader(): UseProjectLoaderReturn {
         id: taskId,
         type: "project-load",
         status: "running",
-        progress: 0,
+        progress: -1,
         label: "Loading Project",
         cancellable: true,
         startedAt: Date.now(),
       };
       dispatch(appTasksSlice.actions.taskRegistered(newTask));
+
+      if (
+        files.length > 1 &&
+        files[0].webkitRelativePath.split("/")[0].split(".").at(-1) !== "zarr"
+      ) {
+        dispatch(
+          appTasksSlice.actions.taskFailed({
+            id: taskId,
+            error: "Uploaded folder must be .zarr",
+          }),
+        );
+        return;
+      }
+
+      let projectLoader: ProjectLoader;
+      try {
+        projectLoader = new ProjectLoader(scheduler);
+        taskCancelRegistry.register(taskId, () => projectLoader.cancel());
+      } catch (err) {
+        dispatch(
+          appTasksSlice.actions.taskFailed({
+            id: taskId,
+            error:
+              err instanceof Error
+                ? err.message
+                : "Failed to initialize loader",
+          }),
+        );
+        return;
+      }
+
       try {
         // 1. Run the pipeline (workers + IndexDB)
-
-        const projectLoader = new ProjectLoader(scheduler);
-        taskCancelRegistry.register(taskId, () => projectLoader.cancel());
         projectLoader.onProgress((progress) => {
           dispatch(
             appTasksSlice.actions.taskUpdated({
@@ -124,6 +152,22 @@ export function useProjectLoader(): UseProjectLoaderReturn {
         startedAt: Date.now(),
       };
       dispatch(appTasksSlice.actions.taskRegistered(newTask));
+      let projectLoader: ProjectLoader;
+      try {
+        projectLoader = new ProjectLoader(scheduler);
+        taskCancelRegistry.register(taskId, () => projectLoader.cancel());
+      } catch (err) {
+        dispatch(
+          appTasksSlice.actions.taskFailed({
+            id: taskId,
+            error:
+              err instanceof Error
+                ? err.message
+                : "Failed to initialize loader",
+          }),
+        );
+        return;
+      }
       try {
         const exampleProjectFileList = await fetch(examplePath)
           .then((res) => res.blob())
@@ -136,7 +180,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
           });
         // 1. Run the pipeline (workers + IndexDB)
 
-        const projectLoader = new ProjectLoader(scheduler);
+        projectLoader = new ProjectLoader(scheduler);
         taskCancelRegistry.register(taskId, () => projectLoader.cancel());
         projectLoader.onProgress((progress) => {
           dispatch(
