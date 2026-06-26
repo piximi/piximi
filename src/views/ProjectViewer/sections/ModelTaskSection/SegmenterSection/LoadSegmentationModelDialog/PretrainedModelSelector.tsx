@@ -11,41 +11,59 @@ import {
 } from "@mui/material";
 
 import { modelInfo } from "utils/dl/segmentation";
-import type { SegmentaionModelDetails } from "utils/dl/segmentation/types";
+import type {
+  ModelDisplayInfo,
+  ModelName,
+  SegmentaionModelDetails,
+} from "utils/dl/segmentation/types";
 
 interface ModelOptionType {
-  label: string;
+  label: ModelName;
   id: number;
 }
 
+type ModelDetails = Omit<ModelDisplayInfo, "name" | "displayName"> & {
+  name: string;
+};
+
 //github.com/twpkevin06222/Gland-Segmentation/tree/main
 export const PretrainedModelSelector = ({
-  values,
+  models,
   setModel,
   error,
   errorText,
   initModel = "-1",
 }: {
-  values: Array<SegmentaionModelDetails>;
+  models: Array<SegmentaionModelDetails>;
   setModel: (model: SegmentaionModelDetails | undefined) => void;
   error?: boolean;
   errorText?: string;
   initModel: string;
 }) => {
-  const modelOptions: ModelOptionType[] = useMemo(() => {
-    return values.map((value, idx) => ({ label: value.name, id: idx }));
-  }, [values]);
+  const modelSelectOptions: ModelOptionType[] = useMemo(() => {
+    return models.map((model, idx) => ({ label: model.name, id: idx }));
+  }, [models]);
   const [selectedModel, setSelectedModel] = useState<ModelOptionType | null>(
-    modelOptions[+initModel] ?? null,
+    modelSelectOptions[+initModel] ?? null,
   );
 
   const handlePreTrainedModelChange = (
     event: React.SyntheticEvent<Element, Event>,
     newValue: ModelOptionType | null,
   ) => {
-    setSelectedModel(newValue ? modelOptions[newValue.id] : null);
-    setModel(newValue ? values[newValue.id] : undefined);
+    setSelectedModel(newValue ? modelSelectOptions[newValue.id] : null);
+    setModel(newValue ? models[newValue.id] : undefined);
   };
+
+  const modelDetails: ModelDetails | undefined = useMemo(() => {
+    if (!selectedModel) return undefined;
+    const { name, displayName, ...rest } = modelInfo[selectedModel.label];
+
+    return {
+      name: displayName,
+      ...rest,
+    };
+  }, [selectedModel]);
 
   return (
     <React.Fragment>
@@ -55,7 +73,7 @@ export const PretrainedModelSelector = ({
       <FormControl sx={{ width: "75%", pb: 2 }} size="small" error={error}>
         <Autocomplete
           id="pre-trained-model-select"
-          options={modelOptions}
+          options={modelSelectOptions}
           value={selectedModel}
           onChange={handlePreTrainedModelChange}
           sx={{ width: 300, mx: "auto" }}
@@ -69,24 +87,20 @@ export const PretrainedModelSelector = ({
 
         <FormHelperText sx={{ mx: "auto" }}>{errorText ?? " "}</FormHelperText>
       </FormControl>
-      <ModelInfo selectedModel={selectedModel} />
+      {modelDetails && <ModelInfo modelDetails={modelDetails} />}
     </React.Fragment>
   );
 };
 
-const ModelInfo = ({
-  selectedModel,
-}: {
-  selectedModel: ModelOptionType | null;
-}) => {
-  return selectedModel ? (
+const ModelInfo = ({ modelDetails }: { modelDetails: ModelDetails }) => {
+  return (
     <Box
       sx={{
         display: "grid",
         gridTemplateColumns: "max-content 1fr",
       }}
     >
-      {Object.entries(modelInfo[selectedModel.label]).map(([key, value]) => (
+      {Object.entries(modelDetails).map(([key, value]) => (
         <React.Fragment key={key}>
           <Typography
             variant="caption"
@@ -114,7 +128,12 @@ const ModelInfo = ({
             >
               {value.map((src, index) => (
                 <React.Fragment key={src.text}>
-                  <Link className="source_link" href={src.url}>
+                  <Link
+                    className="source_link"
+                    href={src.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {src.text}
                   </Link>
                   {index < value.length - 1 && <span>, </span>}
@@ -136,13 +155,24 @@ const ModelInfo = ({
                   : { pl: 1 }
               }
             >
-              {typeof value === "string" ? value : value.name}
+              {typeof value === "string" ? (
+                value
+              ) : value.url ? (
+                <Link
+                  className="source_link"
+                  href={value.url!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {value.name}
+                </Link>
+              ) : (
+                value.name
+              )}
             </Typography>
           )}
         </React.Fragment>
       ))}
     </Box>
-  ) : (
-    <></>
   );
 };

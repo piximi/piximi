@@ -25,9 +25,7 @@ export const ModelIO = () => {
     open: importSegmenterDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
   const handleImportModel = async (model: SegmentaionModelDetails) => {
-    if (model.pretrained) {
-      await segApi.loadModel(model.name);
-    }
+    await segApi.loadModel(model.name);
 
     setSelectedModel(model);
   };
@@ -53,11 +51,7 @@ export const ModelIO = () => {
         {t("Save Model")}
       </Button>
       <LoadSegmentationModelDialog
-        loadedModel={
-          selectedModel?.name === "Fully Convolutional Network"
-            ? undefined
-            : selectedModel
-        }
+        loadedModel={selectedModel}
         onClose={onCloseImportSegmenterDialog}
         open={importSegmenterDialogOpen}
         dispatchFunction={handleImportModel}

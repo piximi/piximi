@@ -1,17 +1,9 @@
-export const modelInfo: Record<
-  string,
-  {
-    name: string;
-    description: string;
-    use: string;
-    output: { name: string; url?: string };
-    sources: Array<{ text: string; url: string }>;
-    cite?: Array<{ text: string; url: string }>;
-    cloudWarning?: string;
-  }
-> = {
+import type { ModelDisplayInfo, ModelName } from "../types";
+
+export const modelInfo: Record<ModelName, ModelDisplayInfo> = {
   StardistVHE: {
-    name: "Stardist (Versatile) H&E Nuclei Segmentation",
+    name: "StardistVHE",
+    displayName: "Stardist (Versatile) H&E Nuclei Segmentation",
     description:
       "Object detection / instance segmentation with star-convex shapes",
     use: "Segment individual cell nuclei from brightfield images with H&E staining",
@@ -42,7 +34,8 @@ export const modelInfo: Record<
     ],
   },
   StardistFluo: {
-    name: "Stardist (Versatile) Fluorescence Nuclei Segmentation",
+    name: "StardistFluo",
+    displayName: "Stardist (Versatile) Fluorescence Nuclei Segmentation",
     description:
       "Object detection / instance segmentation with star-convex shapes",
     use: "Segment individual cell nuclei from single channel fluorescence data (2018 DSB)",
@@ -73,7 +66,8 @@ export const modelInfo: Record<
     ],
   },
   "COCO-SSD": {
-    name: "COCO_SSD with MobileNet (v2) Backbone",
+    name: "COCO-SSD",
+    displayName: "COCO_SSD with MobileNet (v2) Backbone",
     description:
       "Object detection model that aims to localize and identify multiple objects in a single image",
     use: "Detects objects defined in the COCO dataset, which is a large-scale object detection, segmentation, and captioning dataset",
@@ -94,6 +88,7 @@ export const modelInfo: Record<
   },
   Cellpose: {
     name: "Cellpose",
+    displayName: "Cellpose",
     description: "A generalist algorithm for cell and nucleus segmentation",
     use: "Segment general cells",
     output: { name: "cellpose_cells" },
@@ -119,7 +114,8 @@ export const modelInfo: Record<
           transmitted.`,
   },
   GlandSegmentation: {
-    name: "Gland Segmentation",
+    name: "GlandSegmentation",
+    displayName: "Gland Segmentation",
     description:
       "Gland segmentation task with GlaS 2015 dataset using UNet model",
     use: "Trained on images of Hematoxylin and Eosin (H&E) stained slides, consisting of a variety of histologic grades",

@@ -6,7 +6,6 @@ import { CancelSource, TaskCancelledError, type Token } from "utils/dl/cancel";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCellpose } from "./predictCellpose";
-import { ModelTask } from "../../../enums";
 import { channelsToTensor } from "../../../tensor-assembly";
 
 import type { PredictedAnnotationObject } from "../../types";
@@ -37,10 +36,6 @@ export class Cellpose extends Segmenter {
     super({
       name: "Cellpose",
       kind: KIND_NAME,
-      task: ModelTask.Segmentation,
-      graph: true,
-      pretrained: true,
-      trainable: false,
       requiredChannels: 3,
     });
   }

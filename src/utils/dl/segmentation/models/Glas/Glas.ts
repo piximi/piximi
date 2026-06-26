@@ -6,7 +6,6 @@ import { CancelSource, TaskCancelledError, type Token } from "utils/dl/cancel";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessGlas } from "./preprocessGlas";
 import { predictGlas } from "./predictGlas";
-import { ModelTask } from "../../../enums";
 import { loadGlas } from "./loadGlas";
 
 import type { PredictedAnnotationObject } from "../../types";
@@ -29,11 +28,7 @@ export class Glas extends Segmenter {
   constructor() {
     super({
       name: "GlandSegmentation",
-      task: ModelTask.Segmentation,
       kind: KIND_NAME,
-      graph: true,
-      pretrained: true,
-      trainable: false,
       requiredChannels: 3,
     });
   }

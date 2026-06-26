@@ -7,7 +7,7 @@ import { registerSegmenterHmrCleanup } from "../devHmrCleanup";
 
 import type { Token } from "../cancel";
 import type { InferenceInput } from "../types";
-import type { ISegmenterApi } from "./types";
+import type { ISegmenterApi, ModelName } from "./types";
 import type { SegmenterHandler } from "./worker/SegmenterHandler";
 
 export class SegmenterApi implements ISegmenterApi {
@@ -51,19 +51,19 @@ export class SegmenterApi implements ISegmenterApi {
   getAvailableSegmentationModels() {
     return this.backend.getAvailableSegmentationModels();
   }
-  getModelInfo(name: string) {
+  getModelInfo(name: ModelName) {
     return this.backend.getModelInfo(name);
   }
-  hasModel(name: string) {
+  hasModel(name: ModelName) {
     return this.backend.hasModel(name);
   }
 
-  loadModel(modelName: string) {
+  loadModel(modelName: ModelName) {
     return this.backend.loadModel(modelName);
   }
   // ---- inference  ----
   predict(
-    name: string,
+    name: ModelName,
     items: InferenceInput[],
     cancelToken: Token,
     loadCB?: LoadCB,
@@ -82,7 +82,7 @@ export class SegmenterApi implements ISegmenterApi {
 
   // ---- model I/O ----
 
-  getSavedModelData(modelName: string) {
+  getSavedModelData(modelName: ModelName) {
     return this.backend.getSavedModelData(modelName);
   }
   getZippedModelsBuffer() {

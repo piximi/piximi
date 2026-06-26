@@ -6,8 +6,28 @@ import type { Token } from "../cancel";
 import type { ApiResult, InferenceInput, SerializedModelData } from "../types";
 import type { ModelTask } from "../enums";
 
+export const MODELS = [
+  "Cellpose",
+  "StardistVHE",
+  "StardistFluo",
+  "GlandSegmentation",
+  "COCO-SSD",
+] as const;
+
+export type ModelName = (typeof MODELS)[number];
+
+export type ModelDisplayInfo = {
+  name: ModelName;
+  displayName: string;
+  description: string;
+  use: string;
+  output: { name: string; url?: string };
+  sources: Array<{ text: string; url: string }>;
+  cite?: Array<{ text: string; url: string }>;
+  cloudWarning?: string;
+};
 export type SegmenterModelArgs = {
-  name: string;
+  name: ModelName;
   task: ModelTask;
   graph: boolean;
   pretrained: boolean;
@@ -19,11 +39,9 @@ export type SegmenterModelArgs = {
 export type SegmentationState = "idle" | "loading" | "predicting";
 
 export type SegmentaionModelDetails = {
-  name: string;
-  task: ModelTask;
+  name: ModelName;
+  displayName: string;
   kind?: string | Array<string>;
-  graph: boolean;
-  pretrained: boolean;
   modelLoaded: boolean;
   defaultInputShape: number[] | undefined;
   defaultOutputShape: number[] | undefined;
@@ -48,8 +66,8 @@ export type SegmentationResults = {
 export interface ISegmenterApi {
   // registry reads
   getModelNames(): Promise<ApiResult<string[]>>;
-  getModelInfo(name: string): Promise<ApiResult<SegmentaionModelDetails>>;
-  hasModel(name: string): Promise<ApiResult<boolean>>;
+  getModelInfo(name: ModelName): Promise<ApiResult<SegmentaionModelDetails>>;
+  hasModel(name: ModelName): Promise<ApiResult<boolean>>;
   getAvailableSegmentationModels(): Promise<
     ApiResult<Record<string, SegmentaionModelDetails>>
   >;
@@ -57,9 +75,9 @@ export interface ISegmenterApi {
   /*
    * Segmentation Ops
    */
-  loadModel(modelName: string): Promise<ApiResult<void>>;
+  loadModel(modelName: ModelName): Promise<ApiResult<void>>;
   predict(
-    name: string,
+    name: ModelName,
     items: InferenceInput[],
     cancelToken: Token,
     loadCB?: LoadCB,
@@ -67,7 +85,7 @@ export interface ISegmenterApi {
 
   // model I/O
 
-  getSavedModelData(name: string): Promise<ApiResult<SerializedModelData>>;
+  getSavedModelData(name: ModelName): Promise<ApiResult<SerializedModelData>>;
   getZippedModelsBuffer(): Promise<ApiResult<ArrayBuffer>>;
   destroy(): Promise<ApiResult<void>>;
 }

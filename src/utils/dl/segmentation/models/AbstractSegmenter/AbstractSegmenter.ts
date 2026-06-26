@@ -1,20 +1,52 @@
-import { tidy, zeros } from "@tensorflow/tfjs";
+import { tidy, zeros, io } from "@tensorflow/tfjs";
 
 import { logger } from "utils/logUtils";
 import type { LoadCB } from "utils/types";
 import type { InferenceInput } from "utils/dl/types";
 import type { Token } from "utils/dl/cancel";
+import {
+  MODEL_JSON_FILENAME,
+  MODEL_WEIGHTS_FILENAME,
+} from "utils/file-io-v2/consts";
 
-import { Model } from "../../../Model";
-
-import type { SegmentationResults } from "../../types";
+import type { ModelName, SegmentationResults } from "../../types";
 import type { GraphModel, Tensor } from "@tensorflow/tfjs";
 
-export abstract class Segmenter extends Model {
-  public override dispose() {
-    super.dispose();
+export type ModelArgs = {
+  name: ModelName;
+  kind?: string | Array<string>;
+  requiredChannels?: number;
+  src?: string;
+};
+export abstract class Segmenter {
+  readonly name: ModelName;
+  readonly kind?: string | Array<string>;
+
+  private _requiredChannels?: number;
+  readonly src?: string;
+
+  protected _model?: GraphModel;
+  protected _classes?: string[];
+
+  constructor({ name, kind, requiredChannels, src }: ModelArgs) {
+    this.name = name;
+    this.kind = kind;
+    this._requiredChannels = requiredChannels;
+    this.src = src;
+    // set defaults
+    this._model = undefined;
+  }
+  public dispose() {
+    if (this._model) {
+      this._model.dispose();
+    }
+    // set defaults
+    this._model = undefined;
   }
 
+  public get requiredChannels() {
+    return this._requiredChannels;
+  }
   public abstract loadModel(): Promise<void>;
   public abstract predict(
     items: InferenceInput[],
@@ -37,8 +69,8 @@ export abstract class Segmenter extends Model {
 
     let outputShape = this._model.outputs[0].shape;
 
-    // if that failed, and we have a graph, check the model signature
-    if (outputShape === undefined && this.graph) {
+    // if that failed, check the model signature
+    if (outputShape === undefined) {
       outputShape = // @ts-ignore TFJS doesn't expose these types
         this._model.modelSignature?.outputs?.output?.tensorShape?.dim?.map(
           (dimShapeObj: any) => parseInt(dimShapeObj.size),
@@ -76,11 +108,8 @@ export abstract class Segmenter extends Model {
     const dummyData = tidy(() => zeros(dummyShape).asType(this.expectedType));
 
     let preds: Tensor | Tensor[];
-    if (this.graph) {
-      preds = await (this._model! as GraphModel).executeAsync(dummyData);
-    } else {
-      preds = this._model!.predict(dummyData) as Tensor;
-    }
+
+    preds = await this._model!.executeAsync(dummyData);
 
     dummyData.dispose();
 
@@ -98,5 +127,121 @@ export abstract class Segmenter extends Model {
     logger(
       `Output Shape(s) are ${_outputShapes}, after replacing input dims ${variableDimIdxs} (excluding batch dims)`,
     );
+  }
+  public async getSavedModelFiles() {
+    let weightsBlob: Blob | undefined = undefined;
+    let modelJsonBlob: Blob | undefined = undefined;
+
+    const saveHandler = async (modelArtifacts: io.ModelArtifacts) => {
+      weightsBlob = new Blob([modelArtifacts.weightData!], {
+        type: "application/octet-stream",
+      });
+      if (modelArtifacts.modelTopology instanceof ArrayBuffer) {
+        throw new Error(
+          "BrowserDownloads.save() does not support saving model topology " +
+            "in binary formats yet.",
+        );
+      } else {
+        const weightsManifest = [
+          {
+            paths: ["./" + MODEL_WEIGHTS_FILENAME],
+            weights: modelArtifacts.weightSpecs,
+          },
+        ];
+        const modelJSON: {
+          modelTopology: typeof modelArtifacts.modelTopology;
+          format: typeof modelArtifacts.format;
+          generatedBy: typeof modelArtifacts.generatedBy;
+          convertedBy: typeof modelArtifacts.convertedBy;
+          weightsManifest: typeof weightsManifest;
+          signature?: typeof modelArtifacts.signature;
+          userDefinedMetadata?: typeof modelArtifacts.userDefinedMetadata;
+          modelInitializer?: typeof modelArtifacts.modelInitializer;
+          initializerSignature?: typeof modelArtifacts.initializerSignature;
+          trainingConfig?: typeof modelArtifacts.trainingConfig;
+          classes?: string[];
+        } = {
+          modelTopology: modelArtifacts.modelTopology,
+          format: modelArtifacts.format,
+          generatedBy: modelArtifacts.generatedBy,
+          convertedBy: modelArtifacts.convertedBy,
+          weightsManifest: weightsManifest,
+        };
+        if (modelArtifacts.signature != null) {
+          modelJSON.signature = modelArtifacts.signature;
+        }
+        if (modelArtifacts.userDefinedMetadata != null) {
+          modelJSON.userDefinedMetadata = modelArtifacts.userDefinedMetadata;
+        }
+        if (modelArtifacts.modelInitializer != null) {
+          modelJSON.modelInitializer = modelArtifacts.modelInitializer;
+        }
+        if (modelArtifacts.initializerSignature != null) {
+          modelJSON.initializerSignature = modelArtifacts.initializerSignature;
+        }
+        if (modelArtifacts.trainingConfig != null) {
+          modelJSON.trainingConfig = modelArtifacts.trainingConfig;
+        }
+        if (this._classes) {
+          modelJSON.classes = this._classes;
+        }
+        modelJsonBlob = new Blob([JSON.stringify(modelJSON)], {
+          type: "application/json",
+        });
+
+        return {
+          modelArtifactsInfo: io.getModelArtifactsInfoForJSON(modelArtifacts),
+          modelJsonBlob,
+          weightsBlob,
+        };
+      }
+    };
+    if (!this._model) throw Error(`Model ${this.name} not loaded`);
+    const output = (await this._model.save(
+      io.withSaveHandler(saveHandler),
+    )) as {
+      modelArtifactsInfo: io.ModelArtifactsInfo;
+      modelJsonBlob: Blob;
+      weightsBlob: Blob;
+    };
+    return {
+      weightsBlob: output.weightsBlob,
+      modelJsonBlob: output.modelJsonBlob,
+      weightsFileName: MODEL_WEIGHTS_FILENAME,
+      modelJsonFileName: MODEL_JSON_FILENAME,
+    };
+  }
+  public async saveModel() {
+    if (!this._model) throw Error(`Model ${this.name} not loaded`);
+
+    await this._model.save(`downloads://${this.name}`);
+  }
+
+  public async getModelArtifacts() {
+    if (!this._model) throw Error(`Model ${this.name} not loaded`);
+    try {
+      const returnArtifactsHandler = async (artifacts: io.ModelArtifacts) => ({
+        modelArtifactsInfo: io.getModelArtifactsInfoForJSON(artifacts),
+        artifacts,
+      });
+      const { artifacts } = (await this._model.save(
+        io.withSaveHandler(returnArtifactsHandler),
+      )) as {
+        modelArtifactsInfo: io.ModelArtifactsInfo;
+        artifacts: io.ModelArtifacts;
+      };
+      return artifacts;
+    } catch (err) {
+      throw new Error(
+        `Could not get artifacts for model: ${this.name}.`,
+        err as Error,
+      );
+    }
+  }
+  public get defaultInputShape() {
+    return this._model?.inputs[0].shape!.slice(1) as number[];
+  }
+  public get modelLoaded() {
+    return this._model !== undefined;
   }
 }

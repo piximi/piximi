@@ -59,14 +59,7 @@ export const SegmenterStatusProvider = ({
   useEffect(() => {
     let newError: ErrorContext | undefined;
     let newIsReady = true;
-    if (!selectedModel?.pretrained) {
-      newError = {
-        reason: ErrorReason.NotConfigured,
-        message: "Model is not configured for inference",
-        severity: 1,
-      };
-      newIsReady = false;
-    }
+
     if (projectImages.length === 0) {
       newIsReady = false;
       if (!error || error.severity > 1) {

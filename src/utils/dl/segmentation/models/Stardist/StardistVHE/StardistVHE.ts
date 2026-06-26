@@ -1,6 +1,5 @@
 import { KIND_NAME, Stardist } from "../AbstractStardist";
 import { loadStardistVHE } from "./loadStardistVHE";
-import { ModelTask } from "../../../../enums";
 
 /*
  * Stardist (Versatile) H&E Nuclei Segmentation
@@ -15,10 +14,6 @@ export class StardistVHE extends Stardist {
     super({
       name: "StardistVHE",
       kind: KIND_NAME,
-      task: ModelTask.Segmentation,
-      graph: true,
-      pretrained: true,
-      trainable: false,
       requiredChannels: 3,
     });
   }

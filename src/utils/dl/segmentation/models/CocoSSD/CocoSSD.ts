@@ -8,7 +8,6 @@ import COCO_CLASSES from "data/model-data/cocossd-classes";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCoco } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
-import { ModelTask } from "../../../enums";
 
 import type { PredictedAnnotationObject } from "../../types";
 import type { InferenceInput } from "../../../types";
@@ -42,11 +41,7 @@ export class CocoSSD extends Segmenter {
   constructor() {
     super({
       name: "COCO-SSD",
-      task: ModelTask.Segmentation,
       kind: Object.keys(COCO_CLASSES),
-      graph: true,
-      pretrained: true,
-      trainable: false,
       src: "https://tfhub.dev/tensorflow/tfjs-model/ssd_mobilenet_v2/1/default/1",
       requiredChannels: 3,
     });

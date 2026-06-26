@@ -8,9 +8,11 @@ import { Cellpose } from "../models/Cellpose";
 import { CocoSSD } from "../models/CocoSSD";
 import { Glas } from "../models/Glas";
 import { StardistFluo, StardistVHE } from "../models/Stardist";
+import { modelInfo } from "../models/modelInfo";
 
 import type {
   ISegmenterApi,
+  ModelName,
   SegmentaionModelDetails,
   SegmentationResults,
 } from "../types";
@@ -38,17 +40,15 @@ export class SegmenterHandler implements ISegmenterApi {
   /*
    * Model Information Access
    */
-  private resolveModel(modelName: string) {
+  private resolveModel(modelName: ModelName) {
     return this._availableSegmentationModels[modelName] ?? null;
   }
 
   private buildModelInfoDTO(model: Segmenter): SegmentaionModelDetails {
     return {
       name: model.name,
-      task: model.task,
+      displayName: modelInfo[model.name].displayName,
       kind: model.kind,
-      graph: model.graph,
-      pretrained: model.pretrained,
       modelLoaded: model.modelLoaded,
       defaultInputShape: model.modelLoaded
         ? model.defaultInputShape
@@ -72,7 +72,7 @@ export class SegmenterHandler implements ISegmenterApi {
     );
   }
 
-  public async hasModel(modelName: string) {
+  public async hasModel(modelName: ModelName) {
     return ok(modelName in this._availableSegmentationModels);
   }
 
@@ -80,7 +80,7 @@ export class SegmenterHandler implements ISegmenterApi {
     return ok(Object.keys(this._availableSegmentationModels));
   }
 
-  public async getModelInfo(modelName: string) {
+  public async getModelInfo(modelName: ModelName) {
     const model = this.resolveModel(modelName);
     if (!model)
       return err(
@@ -94,7 +94,7 @@ export class SegmenterHandler implements ISegmenterApi {
    * Segmentation Ops
    */
 
-  public async loadModel(modelName: string) {
+  public async loadModel(modelName: ModelName) {
     const model = this.resolveModel(modelName);
     if (!model)
       return err(
@@ -110,7 +110,7 @@ export class SegmenterHandler implements ISegmenterApi {
     }
   }
   public async predict(
-    modelName: string,
+    modelName: ModelName,
     items: InferenceInput[],
     cancelToken: Token,
     loadCB?: LoadCB,
@@ -145,7 +145,7 @@ export class SegmenterHandler implements ISegmenterApi {
     }
   }
   public async getSavedModelData(
-    modelName: string,
+    modelName: ModelName,
   ): Promise<ApiResult<SerializedModelData>> {
     const model = this.resolveModel(modelName);
     if (!model)

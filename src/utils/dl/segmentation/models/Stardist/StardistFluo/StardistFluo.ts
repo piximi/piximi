@@ -1,6 +1,5 @@
 import { KIND_NAME, Stardist } from "../AbstractStardist";
 import { loadStardistFluo } from "./loadStardistFluo";
-import { ModelTask } from "../../../../enums";
 
 /*
  * Stardist (Versatile) Fluorescence Nuclei Segmentation
@@ -15,10 +14,6 @@ export class StardistFluo extends Stardist {
     super({
       name: "StardistFluo",
       kind: KIND_NAME,
-      task: ModelTask.Segmentation,
-      graph: true,
-      pretrained: true,
-      trainable: false,
       requiredChannels: 1,
     });
   }

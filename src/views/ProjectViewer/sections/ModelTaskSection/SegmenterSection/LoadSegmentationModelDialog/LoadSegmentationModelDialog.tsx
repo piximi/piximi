@@ -45,11 +45,7 @@ export const LoadSegmentationModelDialog = ({
   const projectChannels = useSelector(selectProjectImageChannels);
   const [selectedModel, setSelectedModel] = useState<
     SegmentaionModelDetails | undefined
-  >(
-    loadedModel?.name === "Fully Convolutional Network"
-      ? undefined
-      : loadedModel,
-  );
+  >(loadedModel);
   const [inputShape, _setInputShape] = useState<Shape>({
     height: 256,
     width: 256,
@@ -109,12 +105,12 @@ export const LoadSegmentationModelDialog = ({
     (async () => {
       const results = await segApi.getAvailableSegmentationModels();
       if (results.success) {
-        const modelDetails = Object.values(results.data);
-        setPretrainedModels(modelDetails);
+        const availableModels = Object.values(results.data);
+        setPretrainedModels(availableModels);
 
         // if no pretrained models, make sure not on tab 1
         setTabVal((curr) =>
-          modelDetails.length === 0 && curr === "1" ? "2" : curr,
+          availableModels.length === 0 && curr === "1" ? "2" : curr,
         );
       }
     })();
@@ -150,7 +146,7 @@ export const LoadSegmentationModelDialog = ({
           hidden={tabVal !== "1"}
         >
           <PretrainedModelSelector
-            values={pretrainedModels}
+            models={pretrainedModels}
             initModel={
               selectedModel
                 ? pretrainedModels.findIndex(
