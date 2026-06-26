@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 import { ModelActions } from "./ModelActions";
 import { ModelIO } from "./ModelIO";
 import { ModelInfo } from "./ModelInfo";
+import { SegmenterOptions } from "./SegmentationOptions";
 
 export const SegmenterSection = () => {
   return (
@@ -18,6 +19,7 @@ export const SegmenterSection = () => {
         <ModelIO />
 
         <ModelInfo />
+        <SegmenterOptions />
 
         <ModelActions />
       </Box>

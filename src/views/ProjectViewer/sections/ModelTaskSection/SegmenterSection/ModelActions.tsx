@@ -1,11 +1,6 @@
 import React, { useMemo } from "react";
 
-import { Box, CircularProgress } from "@mui/material";
-import {
-  ScatterPlot as ScatterPlotIcon,
-  LabelImportant as LabelImportantIcon,
-  Assessment as AssessmentIcon,
-} from "@mui/icons-material";
+import { Box } from "@mui/material";
 
 import { TooltipButton } from "components/ui/tooltips/TooltipButton";
 
@@ -32,44 +27,23 @@ export const ModelActions = () => {
       default:
         predictText = "...Pending";
     }
-    return { helperText: predictText, disabled: !selectedModel || !!error };
+    return {
+      helperText: predictText,
+      disabled: !selectedModel || !!error || modelStatus === "predicting",
+    };
   }, [modelStatus, selectedModel, error]);
   return (
-    <Box width="100%" display="flex" justifyContent={"space-evenly"}>
-      {/* Fit Button */}
-      <TooltipButton
-        tooltipTitle={"Model is inference only"}
-        disableRipple
-        onClick={() => {}}
-        disabled={true}
-      >
-        <ScatterPlotIcon />
-      </TooltipButton>
+    <Box width="100%" display="flex" justifyContent={"center"}>
       {/* Predict Button */}
       <TooltipButton
         disableRipple
         tooltipTitle={predictInfo.helperText}
         onClick={predictSegmenter}
         disabled={predictInfo.disabled}
+        variant="text"
+        size="small"
       >
-        {modelStatus === "predicting" ? (
-          <CircularProgress
-            disableShrink
-            size={24}
-            sx={{ alignSelf: "center" }}
-          />
-        ) : (
-          <LabelImportantIcon />
-        )}
-      </TooltipButton>
-      {/* Eval Button */}
-      <TooltipButton
-        tooltipTitle={"Model is inference only"}
-        disableRipple
-        onClick={() => {}}
-        disabled={true}
-      >
-        <AssessmentIcon />
+        Segment
       </TooltipButton>
     </Box>
   );

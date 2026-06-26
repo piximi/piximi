@@ -3,7 +3,11 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
 
-import { selectExtendedImages } from "store/dataV2/selectors";
+import {
+  selectChannelMetaEntities,
+  selectExtendedImages,
+} from "store/dataV2/selectors";
+import type { ChannelMetaEntities } from "store/dataV2/types";
 
 import type {
   SegmentaionModelDetails,
@@ -25,9 +29,13 @@ export type ErrorContext = {
 const SegmenterStatusContext = createContext<{
   isReady: boolean;
   selectedModel: SegmentaionModelDetails | undefined;
+
   setSelectedModel: React.Dispatch<
     React.SetStateAction<SegmentaionModelDetails | undefined>
   >;
+  channelMetas: ChannelMetaEntities;
+  selectedChannel: string;
+  setSelectedChannel: React.Dispatch<React.SetStateAction<string>>;
   modelStatus: SegmentationState;
   setModelStatus: React.Dispatch<React.SetStateAction<SegmentationState>>;
   error?: ErrorContext;
@@ -36,6 +44,9 @@ const SegmenterStatusContext = createContext<{
   setSelectedModel: (
     _value: React.SetStateAction<SegmentaionModelDetails | undefined>,
   ) => {},
+  channelMetas: {},
+  selectedChannel: "",
+  setSelectedChannel: (_value: React.SetStateAction<string>) => {},
   isReady: true,
   modelStatus: "idle",
   setModelStatus: (_value: React.SetStateAction<SegmentationState>) => {},
@@ -55,6 +66,8 @@ export const SegmenterStatusProvider = ({
   const [error, setError] = useState<ErrorContext>();
 
   const [modelStatus, setModelStatus] = useState<SegmentationState>("idle");
+  const channelMetas = useSelector(selectChannelMetaEntities);
+  const [selectedChannel, setSelectedChannel] = useState("");
 
   useEffect(() => {
     let newError: ErrorContext | undefined;
@@ -78,12 +91,15 @@ export const SegmenterStatusProvider = ({
     () => ({
       selectedModel,
       setSelectedModel,
+      channelMetas,
+      selectedChannel,
+      setSelectedChannel,
       isReady,
       modelStatus,
       setModelStatus,
       error,
     }),
-    [selectedModel, isReady, modelStatus, error],
+    [selectedModel, isReady, modelStatus, error, channelMetas, selectedChannel],
   );
 
   return (

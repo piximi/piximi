@@ -6,11 +6,9 @@ export const ModelInfo = () => {
   const { selectedModel } = useSegmenterStatus();
   return (
     <Stack
-      width="100%"
-      py={0.5}
-      borderTop={"1px solid white"}
-      borderBottom={"1px solid white"}
       sx={(theme) => ({
+        width: "100%",
+        py: 0.5,
         borderTop: `1px solid ${theme.palette.divider}`,
         borderBottom: `1px solid ${theme.palette.divider}`,
       })}
