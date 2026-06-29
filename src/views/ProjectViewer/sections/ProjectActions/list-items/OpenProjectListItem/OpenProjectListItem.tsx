@@ -1,6 +1,6 @@
-import { FolderOpen as FolderOpenIcon } from "@mui/icons-material";
+import { useCallback, useState } from "react";
 
-import { useMenu } from "hooks";
+import { FolderOpen as FolderOpenIcon } from "@mui/icons-material";
 
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
@@ -8,7 +8,32 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { OpenMenu } from "./OpenMenu";
 
 export const OpenProjectListItem = () => {
-  const { anchorEl, onClose, open, onOpen } = useMenu();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorPosition, setAnchorPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+
+  const [open, setOpen] = useState<boolean>(false);
+
+  const onClose = useCallback(() => {
+    setOpen(false);
+    setAnchorEl(null);
+  }, []);
+
+  const onOpen = useCallback(
+    (event: React.MouseEvent<HTMLElement> | HTMLElement) => {
+      setOpen(true);
+      if (event instanceof HTMLElement) {
+        setAnchorPosition(null);
+        setAnchorEl(event);
+        return;
+      }
+      setAnchorPosition({ top: event.clientY, left: event.clientX + 10 });
+      setAnchorEl(event.currentTarget);
+    },
+    [],
+  );
 
   return (
     <>
@@ -21,7 +46,12 @@ export const OpenProjectListItem = () => {
         tooltipText="Open Project/Image"
       />
 
-      <OpenMenu anchorEl={anchorEl} onClose={onClose} open={open} />
+      <OpenMenu
+        anchorEl={anchorEl}
+        anchorPosition={anchorPosition}
+        onClose={onClose}
+        open={open}
+      />
     </>
   );
 };

@@ -89,7 +89,15 @@ export const OpenProjectMenuItem = ({ onClose }: OpenProjectMenuItemProps) => {
         title={
           <MenuList
             dense
-            sx={{ py: 0, "& li": { px: 1, minHeight: 0, borderRadius: 0 } }}
+            sx={(theme) => ({
+              py: 0,
+              "& li": {
+                px: 1,
+                minHeight: 0,
+                borderRadius: 0,
+                color: theme.palette.text.primary,
+              },
+            })}
             // `preventDefault` will allow tooltip to keep focus if user
             // clicks on parent "Project" menu item
             onMouseDown={(e) => e.preventDefault()}

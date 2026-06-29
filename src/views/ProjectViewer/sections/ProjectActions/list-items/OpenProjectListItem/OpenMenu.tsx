@@ -7,24 +7,24 @@ import { OpenImageMenuItem } from "./OpenImageMenuItem";
 
 type OpenMenuProps = {
   anchorEl: HTMLElement | null;
+  anchorPosition: { top: number; left: number } | null;
   onClose: () => void;
   open: boolean;
 };
 
-export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
+export const OpenMenu = ({
+  anchorEl,
+  anchorPosition,
+  onClose,
+  open,
+}: OpenMenuProps) => {
   return (
     <Menu
       anchorEl={anchorEl}
+      anchorPosition={anchorPosition ?? undefined}
+      anchorReference={anchorPosition ? "anchorPosition" : "anchorEl"}
       open={open}
       onClose={onClose}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "center",
-      }}
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "left",
-      }}
       slotProps={{
         list: {
           dense: true,
