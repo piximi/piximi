@@ -12,7 +12,7 @@ import { arrayRange } from "utils/arrayUtils";
 export const SegmenterOptions = () => {
   const theme = useTheme();
 
-  const { selectedModel, channelMetas, selectedChannels, setSelectedChannels } =
+  const { loadedModel, channelMetas, selectedChannels, setSelectedChannels } =
     useSegmenterStatus();
 
   const availableChannels = useMemo(
@@ -33,7 +33,7 @@ export const SegmenterOptions = () => {
     });
   };
 
-  return !selectedModel ? null : (
+  return !loadedModel ? null : (
     <Box
       sx={{
         display: "flex",
@@ -43,7 +43,7 @@ export const SegmenterOptions = () => {
         borderBottom: `1px solid ${theme.palette.divider}`,
       }}
     >
-      {arrayRange(selectedModel.requiredChannels).map((i) => (
+      {arrayRange(loadedModel.requiredChannels).map((i) => (
         <WithLabel
           key={`channel-select=${i}`}
           label={`Channel ${i + 1}:`}

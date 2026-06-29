@@ -3,7 +3,7 @@ import { Stack, Typography } from "@mui/material";
 import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 
 export const ModelInfo = () => {
-  const { selectedModel } = useSegmenterStatus();
+  const { loadedModel } = useSegmenterStatus();
   return (
     <Stack
       sx={(theme) => ({
@@ -14,10 +14,10 @@ export const ModelInfo = () => {
       })}
     >
       <Typography variant="caption" noWrap>
-        {`Selected Model:  ${selectedModel ? selectedModel.name : "No Selected Model"}`}
+        {`Selected Model:  ${loadedModel ? loadedModel.name : "No Selected Model"}`}
       </Typography>
       <Typography variant="caption" noWrap>
-        {`Model Kind:  ${selectedModel?.kind ?? "N/A"}`}
+        {`Model Kind:  ${loadedModel?.kind ?? "N/A"}`}
       </Typography>
     </Stack>
   );

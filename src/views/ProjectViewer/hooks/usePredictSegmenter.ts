@@ -36,7 +36,7 @@ export const usePredictSegmenter = () => {
   const allImages = useSelector(selectExtendedImages);
   const selectedImages = useSelector(selectSelectedImages);
   const kinds = useSelector(selectAllKinds);
-  const { setModelStatus, selectedModel, selectedChannels } =
+  const { setModelStatus, loadedModel, selectedChannels } =
     useSegmenterStatus();
   const segApi = useSegmenterApi();
   const Cancel = new CancelSource();
@@ -75,7 +75,7 @@ export const usePredictSegmenter = () => {
   );
 
   const predictSegmenter = useCallback(async () => {
-    if (!selectedModel) return;
+    if (!loadedModel) return;
     Cancel.reset();
     const taskId = generateUUID();
     dispatch(
@@ -101,7 +101,7 @@ export const usePredictSegmenter = () => {
       );
       //await segApi.stopExecution(selectedModel.name);
     });
-    const modelInfoResult = await segApi.getModelInfo(selectedModel.name);
+    const modelInfoResult = await segApi.getModelInfo(loadedModel.name);
     let modelDetails: SegmentaionModelDetails;
     if (modelInfoResult.success) modelDetails = modelInfoResult.data;
     else {
@@ -117,7 +117,7 @@ export const usePredictSegmenter = () => {
     }
 
     if (!modelDetails.modelLoaded) {
-      const loadResult = await segApi.loadModel(selectedModel.name);
+      const loadResult = await segApi.loadModel(loadedModel.name);
       if (!loadResult.success) {
         await handleError(
           new Error(
@@ -166,7 +166,7 @@ export const usePredictSegmenter = () => {
     let predictionCancelled: boolean = false;
     try {
       const predictionResult = await segApi.predict(
-        selectedModel.name,
+        loadedModel.name,
         inferenceImages.map((item) =>
           toInferenceInput(
             item,
@@ -305,7 +305,7 @@ export const usePredictSegmenter = () => {
       dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
     else dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
     setModelStatus("idle");
-  }, [handleError, allImages, selectedModel, selectedImages, kinds]);
+  }, [handleError, allImages, loadedModel, selectedImages, kinds]);
 
   return predictSegmenter;
 };

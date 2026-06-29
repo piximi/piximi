@@ -30,9 +30,9 @@ export type ErrorContext = {
 
 const SegmenterStatusContext = createContext<{
   isReady: boolean;
-  selectedModel: SegmentaionModelDetails | undefined;
+  loadedModel: SegmentaionModelDetails | undefined;
 
-  setSelectedModel: React.Dispatch<
+  setLoadedModel: React.Dispatch<
     React.SetStateAction<SegmentaionModelDetails | undefined>
   >;
   channelMetas: ChannelMetaEntities;
@@ -42,8 +42,8 @@ const SegmenterStatusContext = createContext<{
   setModelStatus: React.Dispatch<React.SetStateAction<SegmentationState>>;
   error?: ErrorContext;
 }>({
-  selectedModel: undefined,
-  setSelectedModel: (
+  loadedModel: undefined,
+  setLoadedModel: (
     _value: React.SetStateAction<SegmentaionModelDetails | undefined>,
   ) => {},
   channelMetas: {},
@@ -59,7 +59,7 @@ export const SegmenterStatusProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [selectedModel, setSelectedModel] = useState<
+  const [loadedModel, setLoadedModel] = useState<
     SegmentaionModelDetails | undefined
   >(undefined);
   const projectImages = useSelector(selectExtendedImages);
@@ -100,13 +100,13 @@ export const SegmenterStatusProvider = ({
     }
     setIsReady(newIsReady);
     setError(newError);
-  }, [selectedModel, projectImages, selectedChannels]);
+  }, [loadedModel, projectImages, selectedChannels]);
 
   useEffect(() => {
-    if (selectedModel) {
+    if (loadedModel) {
       const metas = Object.values(channelMetas);
       setSelectedChannels(
-        arrayRange(selectedModel.requiredChannels).map((_, idx) => {
+        arrayRange(loadedModel.requiredChannels).map((_, idx) => {
           if (metas.length === 0) {
             return "";
           } else if (idx >= metas.length) {
@@ -117,12 +117,12 @@ export const SegmenterStatusProvider = ({
         }),
       );
     }
-  }, [selectedModel]);
+  }, [loadedModel]);
 
   const value = useMemo(
     () => ({
-      selectedModel,
-      setSelectedModel,
+      loadedModel,
+      setLoadedModel,
       channelMetas,
       selectedChannels,
       setSelectedChannels,
@@ -131,14 +131,7 @@ export const SegmenterStatusProvider = ({
       setModelStatus,
       error,
     }),
-    [
-      selectedModel,
-      isReady,
-      modelStatus,
-      error,
-      channelMetas,
-      selectedChannels,
-    ],
+    [loadedModel, isReady, modelStatus, error, channelMetas, selectedChannels],
   );
 
   return (

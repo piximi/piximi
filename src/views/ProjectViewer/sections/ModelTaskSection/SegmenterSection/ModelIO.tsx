@@ -18,7 +18,7 @@ import { LoadSegmentationModelDialog } from "./LoadSegmentationModelDialog";
 export const ModelIO = () => {
   const t = useTranslation();
   const segApi = useSegmenterApi();
-  const { selectedModel, setSelectedModel } = useSegmenterStatus();
+  const { loadedModel, setLoadedModel } = useSegmenterStatus();
   const {
     onClose: onCloseImportSegmenterDialog,
     onOpen: onOpenImportSegmenterDialog,
@@ -27,7 +27,7 @@ export const ModelIO = () => {
   const handleImportModel = async (model: SegmentaionModelDetails) => {
     await segApi.loadModel(model.name);
 
-    setSelectedModel(model);
+    setLoadedModel(model);
   };
   return (
     <Box display="flex" justifyContent="space-between" width="100%">
@@ -51,7 +51,7 @@ export const ModelIO = () => {
         {t("Save Model")}
       </Button>
       <LoadSegmentationModelDialog
-        loadedModel={selectedModel}
+        loadedModel={loadedModel}
         onClose={onCloseImportSegmenterDialog}
         open={importSegmenterDialogOpen}
         dispatchFunction={handleImportModel}

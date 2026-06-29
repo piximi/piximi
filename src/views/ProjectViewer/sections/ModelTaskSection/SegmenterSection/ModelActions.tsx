@@ -9,7 +9,7 @@ import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvi
 
 export const ModelActions = () => {
   const predictSegmenter = usePredictSegmenter();
-  const { modelStatus, error, selectedModel } = useSegmenterStatus();
+  const { modelStatus, error, loadedModel } = useSegmenterStatus();
   const predictInfo = useMemo(() => {
     let predictText: string;
 
@@ -17,7 +17,7 @@ export const ModelActions = () => {
       case "idle":
         predictText = error
           ? error.message
-          : selectedModel
+          : loadedModel
             ? "Predict Model"
             : "No Trained Model";
         break;
@@ -29,9 +29,9 @@ export const ModelActions = () => {
     }
     return {
       helperText: predictText,
-      disabled: !selectedModel || !!error || modelStatus === "predicting",
+      disabled: !loadedModel || !!error || modelStatus === "predicting",
     };
-  }, [modelStatus, selectedModel, error]);
+  }, [modelStatus, loadedModel, error]);
   return (
     <Box width="100%" display="flex" justifyContent={"center"}>
       {/* Predict Button */}
