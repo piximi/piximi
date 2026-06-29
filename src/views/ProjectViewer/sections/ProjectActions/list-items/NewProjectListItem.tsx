@@ -15,9 +15,8 @@ export const NewProjectListItem = () => {
 
   const { getConfirmation } = useConfirmReplaceDialog();
 
-  const handleStartNewProject = () => {
-    const confirmation = getConfirmation({});
-    if (!confirmation) return;
+  const handleStartNewProject = async () => {
+    const confirmation = await getConfirmation({});
     if (!confirmation) return;
     dispatch(projectSlice.actions.resetProject());
   };
