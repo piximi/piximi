@@ -1,5 +1,5 @@
 import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Box,
@@ -12,7 +12,7 @@ import {
 
 import { useHotkeys } from "hooks";
 
-import type { Shape } from "store/dataV2/types";
+import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 
 import { useSegmenterApi } from "utils/dl/segmentation";
 import { HotkeyContext } from "utils/enums";
@@ -22,52 +22,36 @@ import { PretrainedModelSelector } from "./PretrainedModelSelector";
 
 type LoadSegmentationModelDialogProps = {
   onClose: () => void;
-  loadedModel?: SegmentaionModelDetails;
   open: boolean;
-  dispatchFunction: (
-    model: SegmentaionModelDetails,
-    inputShape: Shape,
-  ) => Promise<void>;
 };
 
 export const LoadSegmentationModelDialog = ({
   onClose,
-  loadedModel,
   open,
-  dispatchFunction,
 }: LoadSegmentationModelDialogProps) => {
+  const { loadedModel, setLoadedModel } = useSegmenterStatus();
+  const segApi = useSegmenterApi();
+
   const [selectedModel, setSelectedModel] = useState<
     SegmentaionModelDetails | undefined
   >(loadedModel);
-  const [inputShape, _setInputShape] = useState<Shape>({
-    height: 256,
-    width: 256,
-    channels: 3,
-    planes: 1,
-  });
-
   const [pretrainedModels, setPretrainedModels] = useState<
     Array<SegmentaionModelDetails>
   >([]);
 
-  const segApi = useSegmenterApi();
+  const handleModelSelect = (model: SegmentaionModelDetails | undefined) => {
+    setSelectedModel(model);
+  };
 
-  const onModelChange = useCallback(
-    (model: SegmentaionModelDetails | undefined) => {
-      setSelectedModel(model);
-    },
-    [],
-  );
-
-  const dispatchModelToStore = async () => {
+  const handleLoadModel = async () => {
     if (!selectedModel) {
       import.meta.env.NODE_ENV !== "production" &&
         console.warn("Attempting to dispatch undefined model");
       return;
     }
 
-    await dispatchFunction(selectedModel, inputShape);
-
+    await segApi.loadModel(selectedModel.name);
+    setLoadedModel(selectedModel);
     onClose();
   };
 
@@ -79,11 +63,11 @@ export const LoadSegmentationModelDialog = ({
   useHotkeys(
     "enter",
     () => {
-      selectedModel && dispatchModelToStore();
+      selectedModel && handleLoadModel();
     },
     HotkeyContext.ConfirmationDialog,
 
-    [dispatchModelToStore, selectedModel],
+    [handleLoadModel, selectedModel],
   );
 
   useEffect(() => {
@@ -117,7 +101,7 @@ export const LoadSegmentationModelDialog = ({
                   ) + ""
                 : "-1"
             }
-            setModel={onModelChange}
+            setModel={handleModelSelect}
           />
         </Box>
       </DialogContent>
@@ -127,7 +111,7 @@ export const LoadSegmentationModelDialog = ({
         </Button>
 
         <Button
-          onClick={dispatchModelToStore}
+          onClick={handleLoadModel}
           color="primary"
           disabled={!selectedModel}
         >

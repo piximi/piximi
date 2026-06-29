@@ -7,28 +7,18 @@ import { useDialogHotkey, useTranslation } from "hooks";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
-
-import type { SegmentaionModelDetails } from "utils/dl/segmentation/types";
-import { useSegmenterApi } from "utils/dl/segmentation";
 import { HotkeyContext } from "utils/enums";
 
 import { LoadSegmentationModelDialog } from "./LoadSegmentationModelDialog";
 
 export const ModelIO = () => {
   const t = useTranslation();
-  const segApi = useSegmenterApi();
-  const { loadedModel, setLoadedModel } = useSegmenterStatus();
   const {
     onClose: onCloseImportSegmenterDialog,
     onOpen: onOpenImportSegmenterDialog,
     open: importSegmenterDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
-  const handleImportModel = async (model: SegmentaionModelDetails) => {
-    await segApi.loadModel(model.name);
 
-    setLoadedModel(model);
-  };
   return (
     <Box display="flex" justifyContent="space-between" width="100%">
       <Button
@@ -51,10 +41,8 @@ export const ModelIO = () => {
         {t("Save Model")}
       </Button>
       <LoadSegmentationModelDialog
-        loadedModel={loadedModel}
         onClose={onCloseImportSegmenterDialog}
         open={importSegmenterDialogOpen}
-        dispatchFunction={handleImportModel}
       />
     </Box>
   );
