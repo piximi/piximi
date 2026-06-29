@@ -47,12 +47,8 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
 
   const SelectIcon = useMemo(
     () =>
-      allSelected && hasItems
-        ? DeselectIcon
-        : selectedFilteredItemIds.length === 0
-          ? SelectAllEmptyIcon
-          : SelectAllIcon,
-    [allSelected, selectedFilteredItemIds],
+      selectedFilteredItemIds.length === 0 ? SelectAllEmptyIcon : SelectAllIcon,
+    [selectedFilteredItemIds],
   );
 
   useHotkeys(
@@ -70,18 +66,12 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
           <SortFilter />
 
           <TooltipButton
-            tooltipTitle={
-              allSelected
-                ? TooltipTitle(`Deselect`, "esc")
-                : TooltipTitle(`Select all`, "control", "a")
-            }
+            tooltipTitle={TooltipTitle(`Select all`, "control", "a")}
             color="inherit"
-            onClick={allSelected ? handleDeselectAll : handleSelectAll}
-            disabled={!hasItems}
+            onClick={handleSelectAll}
+            disabled={!hasItems || allSelected}
             icon={true}
-            data-testid={
-              allSelected ? "deselect-all-button" : "select-all-button"
-            }
+            data-testid={"select-all-button"}
             sx={actionButtonStyle}
           >
             <Badge
@@ -99,6 +89,17 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
             >
               <SelectIcon />
             </Badge>
+          </TooltipButton>
+          <TooltipButton
+            tooltipTitle={TooltipTitle(`Deselect`, "esc")}
+            color="inherit"
+            onClick={handleDeselectAll}
+            disabled={!hasItems}
+            icon={true}
+            data-testid={"deselect-all-button"}
+            sx={actionButtonStyle}
+          >
+            <DeselectIcon />
           </TooltipButton>
           <CategorizeChip
             selectedFilteredItems={selectedFilteredItemIds}
