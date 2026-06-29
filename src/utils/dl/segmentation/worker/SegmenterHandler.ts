@@ -50,12 +50,6 @@ export class SegmenterHandler implements ISegmenterApi {
       displayName: modelInfo[model.name].displayName,
       kind: model.kind,
       modelLoaded: model.modelLoaded,
-      defaultInputShape: model.modelLoaded
-        ? model.defaultInputShape
-        : undefined,
-      defaultOutputShape: model.modelLoaded
-        ? model.defaultOutputShape
-        : undefined,
       requiredChannels: model.requiredChannels,
     };
   }

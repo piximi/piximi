@@ -43,8 +43,6 @@ export type SegmentaionModelDetails = {
   displayName: string;
   kind?: string | Array<string>;
   modelLoaded: boolean;
-  defaultInputShape: number[] | undefined;
-  defaultOutputShape: number[] | undefined;
   requiredChannels: number;
 };
 export type BatchModelLoadResult = {
