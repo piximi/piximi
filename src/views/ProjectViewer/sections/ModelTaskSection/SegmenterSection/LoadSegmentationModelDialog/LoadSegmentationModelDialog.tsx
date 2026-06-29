@@ -1,8 +1,6 @@
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 
-import { useSelector } from "react-redux";
-
 import {
   Box,
   Button,
@@ -10,14 +8,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Tabs,
 } from "@mui/material";
 
 import { useHotkeys } from "hooks";
 
-import { ToolTipTab } from "components/layout";
-
-import { selectProjectImageChannels } from "@ProjectViewer/state/selectors";
 import type { Shape } from "store/dataV2/types";
 
 import { useSegmenterApi } from "utils/dl/segmentation";
@@ -42,7 +36,6 @@ export const LoadSegmentationModelDialog = ({
   open,
   dispatchFunction,
 }: LoadSegmentationModelDialogProps) => {
-  const projectChannels = useSelector(selectProjectImageChannels);
   const [selectedModel, setSelectedModel] = useState<
     SegmentaionModelDetails | undefined
   >(loadedModel);
@@ -57,8 +50,6 @@ export const LoadSegmentationModelDialog = ({
     Array<SegmentaionModelDetails>
   >([]);
 
-  const [tabVal, setTabVal] = useState("1");
-  const [invalidModel, setInvalidModel] = useState(false);
   const segApi = useSegmenterApi();
 
   const onModelChange = useCallback(
@@ -77,28 +68,22 @@ export const LoadSegmentationModelDialog = ({
 
     await dispatchFunction(selectedModel, inputShape);
 
-    setInvalidModel(false);
     onClose();
   };
 
   const closeDialog = () => {
-    setInvalidModel(false);
     setSelectedModel(loadedModel);
     onClose();
-  };
-
-  const onTabSelect = (event: React.SyntheticEvent, newValue: string) => {
-    setTabVal(newValue);
   };
 
   useHotkeys(
     "enter",
     () => {
-      selectedModel && !invalidModel && dispatchModelToStore();
+      selectedModel && dispatchModelToStore();
     },
     HotkeyContext.ConfirmationDialog,
 
-    [dispatchModelToStore, selectedModel, invalidModel],
+    [dispatchModelToStore, selectedModel],
   );
 
   useEffect(() => {
@@ -107,35 +92,14 @@ export const LoadSegmentationModelDialog = ({
       if (results.success) {
         const availableModels = Object.values(results.data);
         setPretrainedModels(availableModels);
-
-        // if no pretrained models, make sure not on tab 1
-        setTabVal((curr) =>
-          availableModels.length === 0 && curr === "1" ? "2" : curr,
-        );
       }
     })();
   }, []);
 
-  useEffect(() => {
-    if (
-      selectedModel &&
-      selectedModel.requiredChannels !== undefined &&
-      projectChannels !== undefined &&
-      selectedModel.requiredChannels !== projectChannels
-    ) {
-      setInvalidModel(true);
-    } else {
-      setInvalidModel(false);
-    }
-  }, [projectChannels, selectedModel]);
-
   return (
     <Dialog fullWidth maxWidth="sm" onClose={closeDialog} open={open}>
-      <DialogTitle>Load Segmentation model</DialogTitle>
+      <DialogTitle>Load Segmentation Model</DialogTitle>
 
-      <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
-        <ToolTipTab label="Load Pretrained" value="1" placement="top" />
-      </Tabs>
       <DialogContent>
         <Box
           sx={{
@@ -143,7 +107,6 @@ export const LoadSegmentationModelDialog = ({
             flexDirection: "column",
             alignItems: "center",
           }}
-          hidden={tabVal !== "1"}
         >
           <PretrainedModelSelector
             models={pretrainedModels}
@@ -155,14 +118,6 @@ export const LoadSegmentationModelDialog = ({
                 : "-1"
             }
             setModel={onModelChange}
-            error={invalidModel}
-            errorText={
-              !selectedModel
-                ? "Select a Model"
-                : invalidModel
-                  ? `Model requires ${selectedModel.requiredChannels}-channel images`
-                  : ""
-            }
           />
         </Box>
       </DialogContent>
@@ -174,7 +129,7 @@ export const LoadSegmentationModelDialog = ({
         <Button
           onClick={dispatchModelToStore}
           color="primary"
-          disabled={!selectedModel || invalidModel}
+          disabled={!selectedModel}
         >
           Open Segmentation model
         </Button>
