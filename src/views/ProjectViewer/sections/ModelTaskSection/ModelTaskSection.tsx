@@ -50,19 +50,19 @@ export const ModelTaskSection = () => {
           Segmentation
         </ToggleButton>
       </ToggleButtonGroup>
-      {learningTask === "Classification" ? (
-        <ClassifierStatusProvider>
-          <ClassifierHistoryProvider>
-            <ClassMapDialogProvider>
-              <ClassifierSection />
-            </ClassMapDialogProvider>
-          </ClassifierHistoryProvider>
-        </ClassifierStatusProvider>
-      ) : (
-        <SegmenterStatusProvider>
-          <SegmenterSection />
-        </SegmenterStatusProvider>
-      )}
+      <ClassifierStatusProvider>
+        <ClassifierHistoryProvider>
+          <ClassMapDialogProvider>
+            <SegmenterStatusProvider>
+              {learningTask === "Classification" ? (
+                <ClassifierSection />
+              ) : (
+                <SegmenterSection />
+              )}
+            </SegmenterStatusProvider>
+          </ClassMapDialogProvider>
+        </ClassifierHistoryProvider>
+      </ClassifierStatusProvider>
     </Box>
   );
 };

@@ -7,63 +7,79 @@ import { StyledSelect, WithLabel } from "components/inputs";
 
 import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 
+import { arrayRange } from "utils/arrayUtils";
+
 export const SegmenterOptions = () => {
   const theme = useTheme();
 
-  const { selectedModel, channelMetas, selectedChannel, setSelectedChannel } =
+  const { selectedModel, channelMetas, selectedChannels, setSelectedChannels } =
     useSegmenterStatus();
 
   const availableChannels = useMemo(
     () => Object.values(channelMetas),
     [channelMetas],
   );
-  const handleSelectedChannelChange = (event: SelectChangeEvent<unknown>) => {
-    setSelectedChannel(event.target.value as string);
+  const handleSelectedChannelChange = (
+    event: SelectChangeEvent<unknown>,
+    channelIndex: number,
+  ) => {
+    const channelId = event.target.value as string;
+
+    setSelectedChannels((chs) => {
+      if (chs[channelIndex] === channelId) return chs;
+      const _chs = [...chs];
+      _chs[channelIndex] = channelId;
+      return _chs;
+    });
   };
 
   return !selectedModel ? null : (
     <Box
       sx={{
         display: "flex",
+        flexDirection: "column",
         width: "100%",
         pb: 1,
         borderBottom: `1px solid ${theme.palette.divider}`,
       }}
     >
-      <WithLabel
-        label="Channel:"
-        labelProps={{
-          variant: "caption",
-          sx: { mr: "1rem", whiteSpace: "nowrap" },
-        }}
-      >
-        <StyledSelect
-          value={selectedChannel}
-          onChange={handleSelectedChannelChange}
-          fullWidth
-          fontSize={theme.typography.caption.fontSize}
-          displayEmpty={true}
-          renderValue={(value) => {
-            return value === ""
-              ? "Select Channel"
-              : channelMetas[value as string].name;
+      {arrayRange(selectedModel.requiredChannels).map((i) => (
+        <WithLabel
+          key={`channel-select=${i}`}
+          label={`Channel ${i + 1}:`}
+          labelProps={{
+            variant: "caption",
+            sx: { mr: "1rem", whiteSpace: "nowrap" },
           }}
         >
-          {availableChannels.map((channel) => (
-            <MenuItem
-              key={channel.id}
-              dense
-              value={channel.id}
-              sx={{
-                borderRadius: 0,
-                minHeight: "1rem",
-              }}
-            >
-              {channel.name}
-            </MenuItem>
-          ))}
-        </StyledSelect>
-      </WithLabel>
+          <StyledSelect
+            value={selectedChannels[i] ?? ""}
+            onChange={(event) => handleSelectedChannelChange(event, i)}
+            fullWidth
+            fontSize={theme.typography.caption.fontSize}
+            displayEmpty={true}
+            renderValue={(value) => {
+              return value === ""
+                ? "Select Channel"
+                : channelMetas[value as string].name;
+            }}
+          >
+            {availableChannels.map((channel) => (
+              <MenuItem
+                key={channel.id}
+                dense
+                value={channel.id}
+                sx={{
+                  borderRadius: 0,
+                  minHeight: "1rem",
+                }}
+              >
+                {channel.name}
+              </MenuItem>
+            ))}
+          </StyledSelect>
+        </WithLabel>
+      ))}
     </Box>
   );
 };

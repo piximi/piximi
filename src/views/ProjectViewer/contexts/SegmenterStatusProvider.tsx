@@ -9,6 +9,7 @@ import {
 } from "store/dataV2/selectors";
 import type { ChannelMetaEntities } from "store/dataV2/types";
 
+import { arrayRange } from "utils/arrayUtils";
 import type {
   SegmentaionModelDetails,
   SegmentationState,
@@ -18,6 +19,7 @@ export enum ErrorReason {
   NotConfigured,
   NoInferenceImages,
   ExistingKind,
+  ChannelMismatch,
 }
 
 export type ErrorContext = {
@@ -34,8 +36,8 @@ const SegmenterStatusContext = createContext<{
     React.SetStateAction<SegmentaionModelDetails | undefined>
   >;
   channelMetas: ChannelMetaEntities;
-  selectedChannel: string;
-  setSelectedChannel: React.Dispatch<React.SetStateAction<string>>;
+  selectedChannels: Array<string>;
+  setSelectedChannels: React.Dispatch<React.SetStateAction<Array<string>>>;
   modelStatus: SegmentationState;
   setModelStatus: React.Dispatch<React.SetStateAction<SegmentationState>>;
   error?: ErrorContext;
@@ -45,8 +47,8 @@ const SegmenterStatusContext = createContext<{
     _value: React.SetStateAction<SegmentaionModelDetails | undefined>,
   ) => {},
   channelMetas: {},
-  selectedChannel: "",
-  setSelectedChannel: (_value: React.SetStateAction<string>) => {},
+  selectedChannels: [],
+  setSelectedChannels: (_value: React.SetStateAction<Array<string>>) => {},
   isReady: true,
   modelStatus: "idle",
   setModelStatus: (_value: React.SetStateAction<SegmentationState>) => {},
@@ -67,7 +69,7 @@ export const SegmenterStatusProvider = ({
 
   const [modelStatus, setModelStatus] = useState<SegmentationState>("idle");
   const channelMetas = useSelector(selectChannelMetaEntities);
-  const [selectedChannel, setSelectedChannel] = useState("");
+  const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
 
   useEffect(() => {
     let newError: ErrorContext | undefined;
@@ -83,23 +85,60 @@ export const SegmenterStatusProvider = ({
         };
       }
     }
+    if (
+      selectedChannels.length === 0 ||
+      selectedChannels.some((id) => id === "")
+    ) {
+      newIsReady = false;
+      if (!error || error.severity > 2) {
+        newError = {
+          reason: ErrorReason.ChannelMismatch,
+          message: "Select channels for segmentation",
+          severity: 3,
+        };
+      }
+    }
     setIsReady(newIsReady);
     setError(newError);
-  }, [selectedModel, projectImages]);
+  }, [selectedModel, projectImages, selectedChannels]);
+
+  useEffect(() => {
+    if (selectedModel) {
+      const metas = Object.values(channelMetas);
+      setSelectedChannels(
+        arrayRange(selectedModel.requiredChannels).map((_, idx) => {
+          if (metas.length === 0) {
+            return "";
+          } else if (idx >= metas.length) {
+            return metas.at(-1)!.id;
+          } else {
+            return metas[idx].id;
+          }
+        }),
+      );
+    }
+  }, [selectedModel]);
 
   const value = useMemo(
     () => ({
       selectedModel,
       setSelectedModel,
       channelMetas,
-      selectedChannel,
-      setSelectedChannel,
+      selectedChannels,
+      setSelectedChannels,
       isReady,
       modelStatus,
       setModelStatus,
       error,
     }),
-    [selectedModel, isReady, modelStatus, error, channelMetas, selectedChannel],
+    [
+      selectedModel,
+      isReady,
+      modelStatus,
+      error,
+      channelMetas,
+      selectedChannels,
+    ],
   );
 
   return (

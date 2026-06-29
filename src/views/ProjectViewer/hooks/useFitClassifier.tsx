@@ -159,7 +159,7 @@ export const useFitClassifier = () => {
     }
 
     const { inference, labeledTraining, labeledUnassigned, labeledValidation } =
-      partitionTrainingData(activeItems.map(toTrainingInput));
+      partitionTrainingData(activeItems.map((item) => toTrainingInput(item)));
 
     const { splitTrainingItems, splitValidationItems } = applySplitAndShuffle(
       labeledUnassigned,
@@ -260,7 +260,7 @@ export const useFitClassifier = () => {
       );
     }
     const { inference, labeledTraining, labeledUnassigned, labeledValidation } =
-      partitionTrainingData(activeItems.map(toTrainingInput));
+      partitionTrainingData(activeItems.map((item) => toTrainingInput(item)));
     const trainingData = [...labeledTraining, ...labeledUnassigned];
     const validationData = labeledValidation;
     assertTrainable(trainingData, validationData);

@@ -98,7 +98,7 @@ export const usePredictClassifier = () => {
     try {
       const result = await cfApi.loadInference(
         modelName,
-        unlabeledItems.map(toInferenceInput),
+        unlabeledItems.map((item) => toInferenceInput(item)),
         [],
       );
       if (!result.success) {

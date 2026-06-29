@@ -36,7 +36,8 @@ export const usePredictSegmenter = () => {
   const allImages = useSelector(selectExtendedImages);
   const selectedImages = useSelector(selectSelectedImages);
   const kinds = useSelector(selectAllKinds);
-  const { setModelStatus, selectedModel } = useSegmenterStatus();
+  const { setModelStatus, selectedModel, selectedChannels } =
+    useSegmenterStatus();
   const segApi = useSegmenterApi();
   const Cancel = new CancelSource();
 
@@ -166,7 +167,14 @@ export const usePredictSegmenter = () => {
     try {
       const predictionResult = await segApi.predict(
         selectedModel.name,
-        inferenceImages.map(toInferenceInput),
+        inferenceImages.map((item) =>
+          toInferenceInput(
+            item,
+            !selectedChannels.some((id) => id === "")
+              ? selectedChannels
+              : undefined,
+          ),
+        ),
         Cancel.token,
         progressCb,
       );

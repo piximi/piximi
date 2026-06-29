@@ -34,7 +34,7 @@ export type SegmenterModelArgs = {
   trainable: boolean;
   kinds: Array<string>;
   src?: string;
-  requiredChannels?: number;
+  requiredChannels: number;
 };
 export type SegmentationState = "idle" | "loading" | "predicting";
 
@@ -45,7 +45,7 @@ export type SegmentaionModelDetails = {
   modelLoaded: boolean;
   defaultInputShape: number[] | undefined;
   defaultOutputShape: number[] | undefined;
-  requiredChannels?: number;
+  requiredChannels: number;
 };
 export type BatchModelLoadResult = {
   loadedModels: SegmentaionModelDetails[];

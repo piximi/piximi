@@ -15,14 +15,14 @@ import type { GraphModel, Tensor } from "@tensorflow/tfjs";
 export type ModelArgs = {
   name: ModelName;
   kind?: string | Array<string>;
-  requiredChannels?: number;
+  requiredChannels: number;
   src?: string;
 };
 export abstract class Segmenter {
   readonly name: ModelName;
   readonly kind?: string | Array<string>;
 
-  private _requiredChannels?: number;
+  private _requiredChannels: number;
   readonly src?: string;
 
   protected _model?: GraphModel;

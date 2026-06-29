@@ -4,6 +4,7 @@ import type { ShapeArray, Shape } from "store/data/types";
 import type {
   BBox,
   ExtendedAnnotationObject,
+  ExtendedChannel,
   ExtendedImageObject,
 } from "store/dataV2/types";
 
@@ -99,16 +100,23 @@ export const convertArrayToShape = (array: ShapeArray): Shape => {
 
 export function toTrainingInput(
   item: ExtendedImageObject | ExtendedAnnotationObject,
+  selectedChannels?: Array<string>,
 ): TrainingInput {
   const region: BBox =
     "boundingBox" in item
       ? item.boundingBox
       : [0, 0, item.shape.width, item.shape.height];
+  let channelsRef: ExtendedChannel[];
+  if (selectedChannels)
+    channelsRef = item.channelsRef.filter((ref) =>
+      selectedChannels.includes(ref.channelMetaId),
+    );
+  else channelsRef = item.channelsRef;
   return {
     id: item.id,
     partition: item.partition,
     categoryId: item.categoryId,
-    channelsRef: item.channelsRef,
+    channelsRef,
     shape: item.shape,
     region,
   };
@@ -116,8 +124,9 @@ export function toTrainingInput(
 
 export function toInferenceInput(
   item: ExtendedImageObject | ExtendedAnnotationObject,
+  selectedChannels?: Array<string>,
 ): InferenceInput {
-  return toTrainingInput(item);
+  return toTrainingInput(item, selectedChannels);
 }
 export const ok = <T = void>(data?: T): ApiResult<T> =>
   (data === undefined
