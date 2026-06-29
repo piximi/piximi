@@ -8,14 +8,13 @@ import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
 import { processChannel } from "utils/channelUtils";
 import { Partition } from "utils/dl/enums";
 
-import {
-  type ChannelResult,
-  type ImageResult,
-  type ImageSeriesResult,
-  type ReadStage,
+import type {
+  ChannelResult,
+  ImageResult,
+  ImageSeriesResult,
+  ReadStage,
+  DimensionConfig,
 } from "./types";
-import type { DimensionConfig } from "./types";
-
 import type { Image as IJSImage } from "image-js-latest";
 
 // ============================================================
@@ -218,7 +217,7 @@ export const experimentFromStack = (
   imageSeriesMap.forEach((imageMap, imageIDX) => {
     const image: ImageResult = {
       id: generateUUID(),
-      name: `${name}-${imageIDX}`,
+      name: `${name}`,
       seriesId: series.id,
       shape: config.shape,
       categoryId: UNKNOWN_IMAGE_CATEGORY_ID,
