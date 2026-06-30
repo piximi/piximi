@@ -16,6 +16,9 @@ export const basicReader: IFileReader = {
       image = decodePng(imageData);
     }
 
+    if (image.alpha)
+      image = image.convertColor(image.colorModel === "GREY" ? "GREY" : "RGB");
+
     const shape = {
       planes: 1,
       channels: image.channels,
