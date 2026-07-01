@@ -1,3 +1,5 @@
+import * as Comlink from "comlink";
+
 import type {
   Channel,
   ChannelMeta,
@@ -6,10 +8,8 @@ import type {
 } from "store/dataV2/types";
 
 import type { Progress, TaskError } from "utils/types";
-import type { WorkerScheduler } from "utils/worker-scheduler";
 import { DataConnector } from "utils/data-connector";
-import type { TaskHandle } from "utils/worker-scheduler/types";
-import { TaskPriority } from "utils/worker-scheduler/types";
+import type { CancelToken } from "utils/worker-scheduler/types";
 import { parseError } from "utils/logUtils";
 import { STORES } from "utils/data-connector/types";
 
@@ -24,8 +24,10 @@ import type {
   FileUploadResult,
   IFileLoader,
   ImageSeriesResult,
+  ImportImageInput,
   LoadAndPrepareOutput,
   ReaderResult,
+  StageName,
   TiffAnalysisResult,
   TiffImportConfig,
   UploadOptionswithCallbacks,
@@ -45,7 +47,14 @@ type TiffPrepResult = {
   configs: Map<string, TiffImportConfig>;
   buffers: Map<string, ArrayBuffer>;
 };
-
+type OnProgressCallback = (args: { value: number; stage: StageName }) => void;
+interface LoadImageWorkerAPI {
+  loadImage(
+    payload: ImportImageInput,
+    cancelToken: CancelToken,
+    onProgress: OnProgressCallback,
+  ): Promise<LoadAndPrepareOutput>;
+}
 /**
  * FileLoader
  *
@@ -60,14 +69,13 @@ type TiffPrepResult = {
  * - Operations are cancellable
  */
 export class FileLoader implements IFileLoader {
-  private scheduler: WorkerScheduler;
+  private activeWorkers: Worker[] = [];
   private storage: DataConnector;
   private progress: Progress = { ...INITIAL_PROGRESS };
   private progressListeners: Set<(progress: Progress) => void> = new Set();
   private abortController: AbortController | null = null;
 
-  public constructor(scheduler: WorkerScheduler) {
-    this.scheduler = scheduler;
+  public constructor() {
     this.storage = DataConnector.getInstance();
   }
 
@@ -279,14 +287,13 @@ export class FileLoader implements IFileLoader {
     tiffConfigs?: Map<string, TiffImportConfig>,
     cachedBuffers?: Map<string, ArrayBuffer>,
   ): Promise<ReaderResult> {
-    const taskHandles: Array<{
+    const workerTasks: Array<{
       fileName: string;
-      handle: TaskHandle<LoadAndPrepareOutput>;
+      promise: Promise<LoadAndPrepareOutput>;
     }> = [];
 
     for (let i = 0; i < files.length; i++) {
       if (this.abortController?.signal.aborted) {
-        taskHandles.forEach((th) => th.handle.cancel());
         return { success: false, cancelled: true };
       }
 
@@ -294,29 +301,41 @@ export class FileLoader implements IFileLoader {
       try {
         const fileData =
           cachedBuffers?.get(file.name) ?? (await file.arrayBuffer());
-
-        const handle = this.scheduler.dispatch({
-          type: "loadImage",
-          payload: {
-            fileData,
-            fileName: file.name,
-            mimeType: fileAnalyses[file.name].mimeType,
-            dimConfig: tiffConfigs?.get(file.name),
-          },
-          priority: TaskPriority.HIGH,
-          onProgress: ({ value, stage }) => {
-            this.updateProgress({
-              stageProgress: overallProgress(stage, value),
-            });
-          },
-          onComplete: (_result) => {
+        const worker = new Worker(
+          new URL("./worker/loadImageWorker.ts", import.meta.url),
+          { type: "module" },
+        );
+        this.activeWorkers.push(worker);
+        const proxy = Comlink.wrap<LoadImageWorkerAPI>(worker);
+        const abortController = this.abortController;
+        const promise = proxy
+          .loadImage(
+            {
+              fileData,
+              fileName: file.name,
+              mimeType: fileAnalyses[file.name].mimeType,
+              dimConfig: tiffConfigs?.get(file.name),
+            },
+            {
+              get cancelled() {
+                return abortController?.signal.aborted ?? false;
+              },
+            },
+            Comlink.proxy(({ value, stage }) => {
+              this.updateProgress({
+                stageProgress: overallProgress(stage, value),
+              });
+            }),
+          )
+          .finally(() => {
+            worker.terminate();
+            this.activeWorkers = this.activeWorkers.filter((w) => w !== worker);
             this.updateProgress({
               overallProgress: overallProgress("load", i / files.length),
             });
-          },
-        });
+          });
 
-        taskHandles.push({ fileName: file.name, handle });
+        workerTasks.push({ fileName: file.name, promise });
       } catch (err) {
         this.updateErrors({
           source: file.name,
@@ -326,13 +345,13 @@ export class FileLoader implements IFileLoader {
       }
     }
 
-    return this.processImages(taskHandles);
+    return this.processImages(workerTasks);
   }
 
   async processImages(
-    taskHandles: {
+    workerTasks: {
       fileName: string;
-      handle: TaskHandle<LoadAndPrepareOutput>;
+      promise: Promise<LoadAndPrepareOutput>;
     }[],
   ): Promise<ReaderResult> {
     // --  Await all worker tasks
@@ -341,13 +360,12 @@ export class FileLoader implements IFileLoader {
       output: LoadAndPrepareOutput;
     }> = [];
 
-    for (const { fileName, handle } of taskHandles) {
+    for (const { fileName, promise } of workerTasks) {
       if (this.abortController?.signal.aborted) {
-        taskHandles.forEach((th) => th.handle.cancel());
         return { success: false, cancelled: true };
       }
       try {
-        const output = await handle.promise;
+        const output = await promise;
         results.push({ fileName, output });
       } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") {
@@ -464,7 +482,10 @@ export class FileLoader implements IFileLoader {
   cancel(): void {
     if (this.abortController) {
       this.abortController.abort();
-      this.scheduler.cancelAll();
+      for (const worker of this.activeWorkers) {
+        worker.terminate();
+      }
+      this.activeWorkers = [];
       this.updateProgress({ stage: "cancelled" });
     }
   }

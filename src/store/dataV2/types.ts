@@ -26,7 +26,7 @@ export type ColorMap = [number, number, number];
 
 // ######################
 
-export type Experiment = { id: string; name: string };
+export type Experiment = { id: string; name: string; channels?: number };
 
 export type ImageSeries = {
   id: string;

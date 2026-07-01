@@ -1,4 +1,3 @@
-import { useScheduler } from "contexts/worker-scheduler";
 import { useCallback, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
@@ -9,7 +8,6 @@ import { selectExperiment } from "store/dataV2/selectors";
 import { ImageSeries } from "store/dataV2/types";
 import { FileLoader } from "utils/file-io-v2/file-loader";
 import {
-  FileUploadResult,
   TiffAnalysisResult,
   TiffDialogCallbackResult,
   UploadOptionswithCallbacks,
@@ -20,7 +18,7 @@ type UseFileLoaderReturn = {
   upload: (
     files: FileList,
     options?: UploadOptionswithCallbacks,
-  ) => Promise<FileUploadResult>;
+  ) => Promise<void>;
   isUploading: boolean;
   tiffDialogOpen: boolean;
   pendingTiffAnalysis: TiffAnalysisResult[] | null;
@@ -39,7 +37,6 @@ type UseFileLoaderReturn = {
  */
 export function useFileLoader(): UseFileLoaderReturn {
   const dispatch = useDispatch();
-  const scheduler = useScheduler();
   const experiment = useSelector(selectExperiment);
   const [isUploading, setIsUploading] = useState(false);
   const [tiffDialogOpen, setTiffDialogOpen] = useState(false);
@@ -75,11 +72,12 @@ export function useFileLoader(): UseFileLoaderReturn {
     setTiffDialogOpen(false);
     setPendingTiffAnalysis(null);
   }, []);
+
   const upload = useCallback(
     async (
       files: FileList,
       options?: UploadOptionswithCallbacks,
-    ): Promise<FileUploadResult> => {
+    ): Promise<void> => {
       setIsUploading(true);
       const taskId = generateUUID();
       const newTask: AppTask = {
@@ -94,7 +92,7 @@ export function useFileLoader(): UseFileLoaderReturn {
       try {
         // 1. Run the pipeline (workers + IndexDB)
 
-        const fileLoader = new FileLoader(scheduler);
+        const fileLoader = new FileLoader();
         taskCancelRegistry.register(taskId, () => fileLoader.cancel());
         fileLoader.onProgress((progress) => {
           dispatch(
@@ -116,7 +114,7 @@ export function useFileLoader(): UseFileLoaderReturn {
               }),
             );
           }
-          return result;
+          return;
         }
 
         const { imageSeries, images, planes, channels, channelMetas } =
@@ -138,7 +136,7 @@ export function useFileLoader(): UseFileLoaderReturn {
         );
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
 
-        return result;
+        return;
       } catch (err) {
         dispatch(
           appTasksSlice.actions.taskFailed({
@@ -147,13 +145,13 @@ export function useFileLoader(): UseFileLoaderReturn {
               err instanceof Error ? err.message : "Failed to upload files",
           }),
         );
-        throw err;
+        return;
       } finally {
         taskCancelRegistry.unregister(taskId);
         setIsUploading(false);
       }
     },
-    [dispatch, scheduler],
+    [dispatch],
   );
 
   return {

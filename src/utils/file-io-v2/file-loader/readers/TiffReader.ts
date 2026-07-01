@@ -209,6 +209,7 @@ export async function analyzeTiff(
       // if `ImageDescription` is valid JSON with a `shape` field, we expect it to be an array of [t?, c?, z?, y, x].
       dims.sizex = shape[shape.length - 1] ?? image.getWidth();
       dims.sizey = shape[shape.length - 2] ?? image.getHeight();
+
       if (imageCount > 1) {
         output = {
           frameCount: imageCount,
@@ -216,12 +217,14 @@ export async function analyzeTiff(
           OMEDims: dims,
           metadata: {},
         };
-      } else {
+      } else if (dims.sizec) {
         output = {
           frameCount: imageCount,
           isMultiFrame: false,
           metadata: { ...dims },
         };
+      } else {
+        throw new Error("Unable to parse image");
       }
     }
   } catch (error) {
