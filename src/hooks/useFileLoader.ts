@@ -114,6 +114,7 @@ export function useFileLoader(): UseFileLoaderReturn {
           interpretationResults,
           tiffConfigs,
           cachedBuffers,
+          experiment.channels,
         );
         taskCancelRegistry.register(taskId, () => fileLoader.cancel());
         fileLoader.onProgress((progress) => {
@@ -146,6 +147,11 @@ export function useFileLoader(): UseFileLoaderReturn {
         imageSeries.forEach((series) => {
           reduxImageSeries.push({ ...series, experimentId: experiment.id });
         });
+
+        if (!experiment.channels)
+          dispatch(
+            dataSliceV2.actions.setExperimentChannels(images[0].shape.channels),
+          );
 
         dispatch(
           dataSliceV2.actions.addImageSeries({

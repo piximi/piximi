@@ -407,6 +407,10 @@ export const dataSliceV2 = createSlice({
         UNKNOWN_KIND_CATEGORY,
       ]);
     },
+    setExperimentChannels(state, action: PayloadAction<number>) {
+      if (state.experiment.channels !== undefined) return;
+      state.experiment.channels = action.payload;
+    },
     addImageSeries(
       state,
       action: PayloadAction<{

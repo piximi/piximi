@@ -45,6 +45,7 @@ interface LoadImageWorkerAPI {
     payload: ImportImageInput,
     cancelToken: CancelToken,
     onProgress: OnProgressCallback,
+    requiredChannels?: number,
   ): Promise<LoadAndPrepareOutput>;
 }
 /**
@@ -69,16 +70,19 @@ export class FileLoader implements IFileLoader {
   private tiffConfigs?: Map<string, TiffImportConfig>;
   private cachedBuffers?: Map<string, ArrayBuffer>;
   private fileIntepretation: FileInterpretationResult;
+  private requiredChannels?: number;
 
   public constructor(
     fileIntepretation: FileInterpretationResult,
     tiffConfigs?: Map<string, TiffImportConfig>,
     cachedBuffers?: Map<string, ArrayBuffer>,
+    requiredChannels?: number,
   ) {
     this.storage = DataConnector.getInstance();
     this.fileIntepretation = fileIntepretation;
     this.tiffConfigs = tiffConfigs;
     this.cachedBuffers = cachedBuffers;
+    this.requiredChannels = requiredChannels;
   }
 
   // ============================================================
@@ -218,6 +222,7 @@ export class FileLoader implements IFileLoader {
                 stageProgress: overallProgress(stage, value),
               });
             }),
+            this.requiredChannels,
           )
           .finally(() => {
             worker.terminate();
