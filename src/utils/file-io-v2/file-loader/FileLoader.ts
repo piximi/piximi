@@ -280,6 +280,19 @@ export class FileLoader implements IFileLoader {
       };
     }
 
+    if (
+      new Set(
+        results.flatMap((result) =>
+          result.output.images.map((image) => image.shape.channels),
+        ),
+      ).size !== 1
+    ) {
+      this.updateProgress({ stage: "error" });
+      return {
+        success: false,
+        cancelled: false,
+      };
+    }
     const channelData: ChannelResult[] = [];
     const imageSeries: ImageSeriesResult[] = [];
     const images: ImageObject[] = [];
