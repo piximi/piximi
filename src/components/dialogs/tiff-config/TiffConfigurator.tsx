@@ -1,15 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   Checkbox,
   Divider,
   FormControl,
   FormControlLabel,
   MenuItem,
   Select,
+  SelectChangeEvent,
   Stack,
   TextField,
   Typography,
@@ -23,29 +25,33 @@ import {
 
 export const TiffConfigurator = ({
   tiffAnalysis,
+  config,
   updateConfigs,
+  resetConfig,
+  updateAll,
+  requiredChannels,
+  setRequiredChannels,
+  canConfigureChannels,
   updateError,
   index,
 }: {
   tiffAnalysis: TiffAnalysisResult;
-  updateConfigs: (config: TiffImportConfig) => void;
+  config: TiffImportConfig;
+  updateConfigs: <K extends keyof TiffImportConfig>(
+    fileName: string,
+    key: K,
+    value: TiffImportConfig[K],
+  ) => void;
+  resetConfig: (fileName: string) => void;
+  updateAll: (config: TiffImportConfig) => void;
+  requiredChannels?: number;
+  setRequiredChannels: (v: number) => void;
+  canConfigureChannels: boolean;
   updateError: (error: boolean) => void;
   index: number;
 }) => {
   const tiffInfo = tiffAnalysis;
 
-  const [selectedChannels, setSelectedChannels] = useState<
-    TiffImportConfig["channels"]
-  >(tiffInfo?.OMEDims?.sizec ?? 1);
-  const [selectedSlices, setSelectedSlices] = useState<
-    TiffImportConfig["slices"]
-  >(tiffInfo?.OMEDims?.sizez ?? 1);
-  const [selectedFrames, setSelectedFrames] = useState<
-    TiffImportConfig["frames"]
-  >(tiffInfo?.OMEDims?.sizet ?? 1);
-  const [selectedDimensionOrder, setSelectedDimensionOrder] = useState<
-    TiffImportConfig["dimensionOrder"]
-  >(tiffInfo?.OMEDims?.dimensionorder ?? "xyczt");
   const [overrideTiff, setOverrideTiff] = useState(false);
 
   const [inputError, setInputError] = useState<string>();
@@ -58,16 +64,49 @@ export const TiffConfigurator = ({
     [tiffInfo],
   );
 
+  const handleChangeDimensionOrder = (event: SelectChangeEvent) => {
+    const value = event.target.value as TiffImportConfig["dimensionOrder"];
+    updateConfigs(tiffAnalysis.fileName, "dimensionOrder", value);
+  };
+  const handleChangeChannels = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const value = Number(event.target.value);
+    if (!Number.isNaN(Number(value))) {
+      if (index === 0 && canConfigureChannels) setRequiredChannels(value);
+      updateConfigs(tiffAnalysis.fileName, "channels", value);
+    }
+  };
+  const handleChangeFrames = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const value = Number(event.target.value);
+    if (!Number.isNaN(Number(value)))
+      updateConfigs(tiffAnalysis.fileName, "frames", value);
+  };
+  const handleChangeSlices = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const value = Number(event.target.value);
+    if (!Number.isNaN(Number(value)))
+      updateConfigs(tiffAnalysis.fileName, "slices", value);
+  };
+
   useEffect(() => {
     if (tiffInfo?.frameCount) {
       if (
-        selectedChannels * selectedSlices * selectedFrames !==
+        config.channels * config.slices * config.frames !==
         tiffInfo.frameCount
       ) {
         setInputError(
           `C \u00D7 Z \u00D7 T must equal ${tiffInfo.frameCount} frames
-          (currently ${selectedChannels} \u00D7 ${selectedSlices} \u00D7 ${selectedFrames} =
-           ${selectedChannels * selectedSlices * selectedFrames})`,
+          (currently ${config.channels} \u00D7 ${config.slices} \u00D7 ${config.frames} =
+           ${config.channels * config.slices * config.frames})`,
+        );
+        updateError(true);
+      } else if (requiredChannels && config.channels !== requiredChannels) {
+        setInputError(
+          `All images in this project must have ${requiredChannels} channels (set by ${canConfigureChannels ? "image 1" : "existing images"}) `,
         );
         updateError(true);
       } else {
@@ -75,27 +114,42 @@ export const TiffConfigurator = ({
         updateError(false);
       }
     }
-  }, [selectedChannels, selectedFrames, selectedSlices]);
+  }, [config, requiredChannels]);
 
   useEffect(() => {
-    updateConfigs({
-      slices: selectedSlices,
-      frames: selectedFrames,
-      channels: selectedChannels,
-      dimensionOrder: selectedDimensionOrder,
-    });
-  }, [
-    selectedChannels,
-    selectedDimensionOrder,
-    selectedFrames,
-    selectedSlices,
-  ]);
+    // Note: Can only happen when configs change through use of "Apply All"
+    // from another image.
+
+    // If there are dims from the file and the set configs deviate from
+    // the file dims, signify override.
+    if (
+      containsTiffValues &&
+      !overrideTiff &&
+      (config.channels !== tiffInfo?.OMEDims?.sizec ||
+        config.slices !== tiffInfo?.OMEDims?.sizez ||
+        (!!tiffInfo?.OMEDims?.sizet &&
+          config.frames !== tiffInfo?.OMEDims?.sizet))
+    )
+      setOverrideTiff(true);
+  }, [config, containsTiffValues, overrideTiff]);
 
   return (
-    <Box sx={{ p: 2, pt: 3 }}>
+    <Box
+      sx={(theme) => ({
+        mb: 1,
+        border: `1px solid ${theme.palette.text.primary}`,
+        borderRadius: 2,
+      })}
+    >
       <Accordion
         defaultExpanded={index === 0}
-        sx={{ bgcolor: "rgba(0,0,0,0.25)" }}
+        sx={{
+          bgcolor: "rgba(0,0,0,0.25)",
+          boxShadow: "none",
+          borderRadius: 2,
+          "&:last-of-type": { borderRadius: 2 },
+          "&:first-of-type": { borderRadius: 2 },
+        }}
       >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography
@@ -116,22 +170,14 @@ export const TiffConfigurator = ({
             <Typography variant="body2" mb={2}>
               Detected <strong>{tiffInfo?.frameCount ?? 0} frames</strong>
             </Typography>
+
             <OverrideOption
               disabled={!containsTiffValues}
               canOverride={overrideTiff}
               onChange={() => {
                 setOverrideTiff((override) => !override);
                 if (overrideTiff) {
-                  if (tiffInfo?.OMEDims?.sizet)
-                    setSelectedFrames(tiffInfo!.OMEDims!.sizet!);
-                  if (tiffInfo?.OMEDims?.sizez)
-                    setSelectedSlices(tiffInfo!.OMEDims!.sizez!);
-                  if (tiffInfo?.OMEDims?.sizec)
-                    setSelectedChannels(tiffInfo!.OMEDims!.sizec!);
-                  if (tiffInfo?.OMEDims?.dimensionorder)
-                    setSelectedDimensionOrder(
-                      tiffInfo!.OMEDims!.dimensionorder!,
-                    );
+                  resetConfig(tiffAnalysis.fileName);
                 }
               }}
             />
@@ -145,12 +191,8 @@ export const TiffConfigurator = ({
               <Typography variant="body2">Dimension Order:</Typography>
               <FormControl size="small">
                 <Select
-                  value={selectedDimensionOrder}
-                  onChange={(e) =>
-                    setSelectedDimensionOrder(
-                      e.target.value as TiffImportConfig["dimensionOrder"],
-                    )
-                  }
+                  value={config.dimensionOrder}
+                  onChange={handleChangeDimensionOrder}
                   disabled={
                     !!tiffInfo?.OMEDims?.dimensionorder && !overrideTiff
                   }
@@ -175,15 +217,12 @@ export const TiffConfigurator = ({
                 <Typography variant="body2">Channels:</Typography>
                 <TextField
                   size="small"
-                  value={selectedChannels}
+                  value={config.channels}
                   disabled={
                     tiffInfo?.OMEDims?.sizec !== undefined && !overrideTiff
                   }
                   error={!!inputError}
-                  onChange={(e) => {
-                    if (!Number.isNaN(Number(e.target.value)))
-                      setSelectedChannels(Number(e.target.value));
-                  }}
+                  onChange={handleChangeChannels}
                   slotProps={{ input: { style: { width: "7ch" } } }}
                 />
               </Stack>
@@ -192,15 +231,12 @@ export const TiffConfigurator = ({
                 <Typography variant="body2">Slices:</Typography>
                 <TextField
                   size="small"
-                  value={selectedSlices}
+                  value={config.slices}
                   disabled={
                     tiffInfo?.OMEDims?.sizez !== undefined && !overrideTiff
                   }
                   error={!!inputError}
-                  onChange={(e) => {
-                    if (!Number.isNaN(Number(e.target.value)))
-                      setSelectedSlices(Number(e.target.value));
-                  }}
+                  onChange={handleChangeSlices}
                   slotProps={{ input: { style: { width: "7ch" } } }}
                 />
               </Stack>
@@ -209,26 +245,39 @@ export const TiffConfigurator = ({
                 <Typography variant="body2">Timepoints:</Typography>
                 <TextField
                   size="small"
-                  value={selectedFrames}
+                  value={config.frames}
                   disabled={
                     tiffInfo?.OMEDims?.sizet !== undefined && !overrideTiff
                   }
                   error={!!inputError}
-                  onChange={(e) => {
-                    if (!Number.isNaN(Number(e.target.value)))
-                      setSelectedFrames(Number(e.target.value));
-                  }}
+                  onChange={handleChangeFrames}
                   slotProps={{ input: { style: { width: "7ch" } } }}
                 />
               </Stack>
             </Stack>
           </Stack>
 
-          {inputError && (
-            <Typography variant="body2" color="error">
-              {inputError}
-            </Typography>
-          )}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: inputError ? "space-between" : "flex-end",
+              alignItems: "center",
+            }}
+          >
+            {inputError && (
+              <Typography variant="body2" color="error">
+                {inputError}
+              </Typography>
+            )}
+            <Button
+              variant="text"
+              onClick={() => {
+                updateAll(config);
+              }}
+            >
+              Apply to all
+            </Button>
+          </Box>
         </AccordionDetails>
       </Accordion>
     </Box>

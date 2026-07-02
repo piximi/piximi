@@ -127,6 +127,13 @@ export const selectExperiment = ({
 }) => {
   return dataV2.experiment;
 };
+export const selectExperimentChannels = ({
+  dataV2,
+}: {
+  dataV2: RootState["dataV2"];
+}) => {
+  return dataV2.experiment.channels;
+};
 
 /*
  * ───────────────────────────────────────────────────────────────────────
