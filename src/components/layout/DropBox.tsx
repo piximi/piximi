@@ -10,13 +10,12 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
     upload,
     tiffDialogOpen,
     pendingTiffAnalysis,
-    handleTiffDialog,
     handleConfirmTiffConfig,
     handleCancelTiffConfig,
   } = useFileLoader();
 
   const handleDrop = async (files: FileList) => {
-    await upload(files, { onTiffDialog: handleTiffDialog });
+    await upload(files);
   };
   const [{ isOver }, dropTarget] = useDndFileDrop(handleDrop);
   return (

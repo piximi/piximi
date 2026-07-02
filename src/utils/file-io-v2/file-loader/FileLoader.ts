@@ -13,9 +13,6 @@ import type { CancelToken } from "utils/worker-scheduler/types";
 import { parseError } from "utils/logUtils";
 import { STORES } from "utils/data-connector/types";
 
-import { analyzeTiff } from "./readers";
-import { FILE } from "./types";
-import { interpretFiles } from "./fileInputUtils";
 import { overallProgress } from "./progress";
 
 import type {
@@ -28,9 +25,7 @@ import type {
   LoadAndPrepareOutput,
   ReaderResult,
   StageName,
-  TiffAnalysisResult,
   TiffImportConfig,
-  UploadOptionswithCallbacks,
   UploadStage,
 } from "./types";
 
@@ -43,10 +38,7 @@ export const INITIAL_PROGRESS: Progress = {
   errors: new Map<string, TaskError[]>(),
   warnings: [],
 };
-type TiffPrepResult = {
-  configs: Map<string, TiffImportConfig>;
-  buffers: Map<string, ArrayBuffer>;
-};
+
 type OnProgressCallback = (args: { value: number; stage: StageName }) => void;
 interface LoadImageWorkerAPI {
   loadImage(
@@ -74,9 +66,19 @@ export class FileLoader implements IFileLoader {
   private progress: Progress = { ...INITIAL_PROGRESS };
   private progressListeners: Set<(progress: Progress) => void> = new Set();
   private abortController: AbortController | null = null;
+  private tiffConfigs?: Map<string, TiffImportConfig>;
+  private cachedBuffers?: Map<string, ArrayBuffer>;
+  private fileIntepretation: FileInterpretationResult;
 
-  public constructor() {
+  public constructor(
+    fileIntepretation: FileInterpretationResult,
+    tiffConfigs?: Map<string, TiffImportConfig>,
+    cachedBuffers?: Map<string, ArrayBuffer>,
+  ) {
     this.storage = DataConnector.getInstance();
+    this.fileIntepretation = fileIntepretation;
+    this.tiffConfigs = tiffConfigs;
+    this.cachedBuffers = cachedBuffers;
   }
 
   // ============================================================
@@ -93,10 +95,7 @@ export class FileLoader implements IFileLoader {
    * 5. Return data ready for Redux dispatch
    */
 
-  async uploadFiles(
-    files: FileList,
-    options?: UploadOptionswithCallbacks,
-  ): Promise<FileUploadResult> {
+  async uploadFiles(files: FileList): Promise<FileUploadResult> {
     this.resetProgress();
 
     try {
@@ -106,23 +105,6 @@ export class FileLoader implements IFileLoader {
         totalCount: files.length,
         overallProgress: overallProgress("analyze", 0),
       });
-      const interpretationResults = interpretFiles(files);
-      if (this.abortController?.signal.aborted) {
-        return { success: false, cancelled: true };
-      }
-
-      // TIFF-specific pre-analysis (the only format that needs a dialog)
-      let tiffConfigs: Map<string, TiffImportConfig> | undefined;
-      let cachedBuffers: Map<string, ArrayBuffer> | undefined;
-      if (interpretationResults.imageType === FILE.TIFF) {
-        const tiffPrep = await this.prepareTiffConfigs(files, options);
-        if (tiffPrep === null) {
-          this.resetProgress();
-          return { success: false, cancelled: true };
-        }
-        tiffConfigs = tiffPrep.configs;
-        cachedBuffers = tiffPrep.buffers;
-      }
 
       // Single dispatch path for ALL formats
       this.updateProgress({
@@ -130,9 +112,9 @@ export class FileLoader implements IFileLoader {
       });
       const imageResults = await this.dispatchFiles(
         files,
-        interpretationResults.fileResults,
-        tiffConfigs,
-        cachedBuffers,
+        this.fileIntepretation.fileResults,
+        this.tiffConfigs,
+        this.cachedBuffers,
       );
 
       if (!imageResults.success) {
@@ -189,96 +171,6 @@ export class FileLoader implements IFileLoader {
       this.updateProgress({ stage: "error" });
       throw err;
     }
-  }
-
-  // ============================================================
-  // File Analysis
-  // ============================================================
-  private async prepareTiffConfigs(
-    files: FileList,
-    options?: UploadOptionswithCallbacks,
-  ): Promise<TiffPrepResult | null> {
-    const { analyses, buffers } = await this.analyzeTiffs(files);
-
-    // Index analyses by filename for quick lookup below
-    const analysisByName = new Map(analyses.map((a) => [a.fileName, a]));
-
-    const configs = new Map<string, TiffImportConfig>();
-
-    // --- Dialog path (multi-frame files) ---
-    const hasMultiframe = analyses.some((a) => a.isMultiFrame);
-    if (hasMultiframe && options?.onTiffDialog) {
-      const dialogResult = await options.onTiffDialog(analyses);
-      if (dialogResult === null) {
-        return null; // user cancelled
-      }
-      // Merge dialog-provided configs
-      for (const [fileName, config] of Object.entries(dialogResult)) {
-        configs.set(fileName, config);
-      }
-    }
-
-    // --- Fill in defaults for any file the dialog didn't cover ---
-    // This handles: single-frame TIFFs, multi-frame TIFFs when no
-    // dialog callback was provided, and any file the dialog skipped.
-    for (let i = 0; i < files.length; i++) {
-      const fileName = files[i].name;
-      if (configs.has(fileName)) continue;
-
-      const analysis = analysisByName.get(fileName);
-      const dims = analysis?.OMEDims;
-
-      configs.set(fileName, {
-        dimensionOrder: dims?.dimensionorder ?? "xyczt",
-        channels: dims?.sizec ?? 1,
-        slices: dims?.sizez ?? 1,
-        frames: dims?.sizet ?? 1,
-      });
-    }
-
-    return { configs, buffers };
-  }
-  /**
-   * Analyze files without processing them
-   * Used to determine if dialogs are needed (e.g., TIFF frame interpretation)
-   *
-   * 1. Check file types
-   * 2. For TIFFs, parse header to detect frames
-   * 3. Return analysis results for UI decisions
-   */
-  async analyzeTiffs(files: FileList): Promise<{
-    analyses: TiffAnalysisResult[];
-    buffers: Map<string, ArrayBuffer>;
-  }> {
-    // Phase 1: Return basic analysis
-    const results: TiffAnalysisResult[] = [];
-    const buffers = new Map<string, ArrayBuffer>();
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      this.updateProgress({
-        overallProgress: overallProgress("analyze", i / files.length),
-      });
-
-      try {
-        const fileData = await file.arrayBuffer();
-        buffers.set(file.name, fileData);
-
-        const tiffResult = await analyzeTiff(fileData);
-
-        results.push({ fileName: file.name, ...tiffResult });
-      } catch {
-        //if analysis fails, treat as regular image
-        this.updateErrors({
-          source: file.name,
-          error: new Error(
-            "Could not parse metadata, treating as regular image",
-          ),
-          recoverable: true,
-        });
-      }
-    }
-
-    return { analyses: results, buffers };
   }
 
   async dispatchFiles(

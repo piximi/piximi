@@ -19,7 +19,6 @@ export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
     upload,
     tiffDialogOpen,
     pendingTiffAnalysis,
-    handleTiffDialog,
     handleConfirmTiffConfig,
     handleCancelTiffConfig,
   } = useFileLoader();
@@ -27,7 +26,7 @@ export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
     if (!event.currentTarget.files) return;
     const files: FileList = Object.assign([], event.currentTarget.files);
 
-    await upload(files, { onTiffDialog: handleTiffDialog });
+    await upload(files);
 
     onCloseMenu();
   };

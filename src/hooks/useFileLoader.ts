@@ -8,11 +8,15 @@ import { selectExperiment } from "store/dataV2/selectors";
 import { ImageSeries } from "store/dataV2/types";
 import { FileLoader } from "utils/file-io-v2/file-loader";
 import {
+  FILE,
   TiffAnalysisResult,
   TiffDialogCallbackResult,
+  TiffImportConfig,
   UploadOptionswithCallbacks,
 } from "utils/file-io-v2/file-loader/types";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+import { interpretFiles } from "utils/file-io-v2/file-loader/fileInputUtils";
+import { prepareTiffConfigs } from "utils/file-io-v2/file-loader/readers/TiffReader";
 
 type UseFileLoaderReturn = {
   upload: (
@@ -22,9 +26,7 @@ type UseFileLoaderReturn = {
   isUploading: boolean;
   tiffDialogOpen: boolean;
   pendingTiffAnalysis: TiffAnalysisResult[] | null;
-  handleTiffDialog: (
-    analysis: TiffAnalysisResult[],
-  ) => Promise<TiffDialogCallbackResult | null>;
+
   handleConfirmTiffConfig: (config: TiffDialogCallbackResult) => void;
   handleCancelTiffConfig: () => void;
 };
@@ -47,18 +49,6 @@ export function useFileLoader(): UseFileLoaderReturn {
     ((config: TiffDialogCallbackResult | null) => void) | null
   >(null);
 
-  const handleTiffDialog = useCallback(
-    async (
-      analysis: TiffAnalysisResult[],
-    ): Promise<TiffDialogCallbackResult | null> => {
-      return new Promise((resolve) => {
-        setPendingTiffAnalysis(analysis);
-        tiffResolverRef.current = resolve;
-        setTiffDialogOpen(true);
-      });
-    },
-    [],
-  );
   const handleConfirmTiffConfig = useCallback(
     (config: TiffDialogCallbackResult) => {
       tiffResolverRef.current?.(config);
@@ -74,10 +64,7 @@ export function useFileLoader(): UseFileLoaderReturn {
   }, []);
 
   const upload = useCallback(
-    async (
-      files: FileList,
-      options?: UploadOptionswithCallbacks,
-    ): Promise<void> => {
+    async (files: FileList): Promise<void> => {
       setIsUploading(true);
       const taskId = generateUUID();
       const newTask: AppTask = {
@@ -91,8 +78,43 @@ export function useFileLoader(): UseFileLoaderReturn {
       dispatch(appTasksSlice.actions.taskRegistered(newTask));
       try {
         // 1. Run the pipeline (workers + IndexDB)
-
-        const fileLoader = new FileLoader();
+        const interpretationResults = interpretFiles(files);
+        // TIFF-specific pre-analysis (the only format that needs a dialog)
+        let tiffConfigs: Map<string, TiffImportConfig> | undefined;
+        let cachedBuffers: Map<string, ArrayBuffer> | undefined;
+        if (interpretationResults.imageType === FILE.TIFF) {
+          const tiffPrep = await prepareTiffConfigs(
+            files,
+            (progress: { overallProgress: number }) => {
+              dispatch(
+                appTasksSlice.actions.taskUpdated({
+                  id: taskId,
+                  progress: progress.overallProgress,
+                }),
+              );
+            },
+            async (
+              analysis: TiffAnalysisResult[],
+            ): Promise<TiffDialogCallbackResult | null> => {
+              return new Promise((resolve) => {
+                setPendingTiffAnalysis(analysis);
+                tiffResolverRef.current = resolve;
+                setTiffDialogOpen(true);
+              });
+            },
+          );
+          if (tiffPrep === null) {
+            dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
+            return;
+          }
+          tiffConfigs = tiffPrep.configs;
+          cachedBuffers = tiffPrep.buffers;
+        }
+        const fileLoader = new FileLoader(
+          interpretationResults,
+          tiffConfigs,
+          cachedBuffers,
+        );
         taskCancelRegistry.register(taskId, () => fileLoader.cancel());
         fileLoader.onProgress((progress) => {
           dispatch(
@@ -102,7 +124,7 @@ export function useFileLoader(): UseFileLoaderReturn {
             }),
           );
         });
-        const result = await fileLoader.uploadFiles(files, options);
+        const result = await fileLoader.uploadFiles(files);
         if (!result.success) {
           if (result.cancelled) {
             dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
@@ -159,7 +181,6 @@ export function useFileLoader(): UseFileLoaderReturn {
     isUploading,
     tiffDialogOpen,
     pendingTiffAnalysis,
-    handleTiffDialog,
     handleConfirmTiffConfig,
     handleCancelTiffConfig,
   };

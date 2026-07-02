@@ -2,9 +2,11 @@ import { fromArrayBuffer } from "geotiff";
 import { XMLParser } from "fast-xml-parser";
 
 import { parseError } from "utils/logUtils";
+import type { TaskError } from "utils/types";
 
 import { loadImageFromBuffer } from "../imageReaderUtils";
 import { MIME } from "../types";
+import { overallProgress } from "../progress";
 
 import type { GeoTIFFImage } from "geotiff";
 import type {
@@ -13,6 +15,10 @@ import type {
   IFileReader,
   ReaderInput,
   ReaderOutput,
+  TiffPrepResult,
+  TiffImportConfig,
+  TiffAnalysisResult,
+  TiffDialogCallback,
 } from "../types";
 
 function trimNull(xml: string | undefined): string | undefined {
@@ -130,6 +136,97 @@ export const tiffReader: IFileReader = {
     };
   },
 };
+
+export async function prepareTiffConfigs(
+  files: FileList,
+  updateProgress: (args: { overallProgress: number }) => void,
+  handleTiffDialog?: TiffDialogCallback,
+): Promise<TiffPrepResult | null> {
+  const { analyses, buffers } = await analyzeTiffs(files, updateProgress);
+
+  // Index analyses by filename for quick lookup below
+  const analysisByName = new Map(analyses.map((a) => [a.fileName, a]));
+
+  const configs = new Map<string, TiffImportConfig>();
+
+  // --- Dialog path (multi-frame files) ---
+  const hasMultiframe = analyses.some((a) => a.isMultiFrame);
+  if (hasMultiframe && handleTiffDialog) {
+    const dialogResult = await handleTiffDialog(analyses);
+    if (dialogResult === null) {
+      return null; // user cancelled
+    }
+    // Merge dialog-provided configs
+    for (const [fileName, config] of Object.entries(dialogResult)) {
+      configs.set(fileName, config);
+    }
+  }
+
+  // --- Fill in defaults for any file the dialog didn't cover ---
+  // This handles: single-frame TIFFs, multi-frame TIFFs when no
+  // dialog callback was provided, and any file the dialog skipped.
+  for (let i = 0; i < files.length; i++) {
+    const fileName = files[i].name;
+    if (configs.has(fileName)) continue;
+
+    const analysis = analysisByName.get(fileName);
+    const dims = analysis?.OMEDims;
+
+    configs.set(fileName, {
+      dimensionOrder: dims?.dimensionorder ?? "xyczt",
+      channels: dims?.sizec ?? 1,
+      slices: dims?.sizez ?? 1,
+      frames: dims?.sizet ?? 1,
+    });
+  }
+
+  return { configs, buffers };
+}
+/**
+ * Analyze files without processing them
+ * Used to determine if dialogs are needed (e.g., TIFF frame interpretation)
+ *
+ * 1. Check file types
+ * 2. For TIFFs, parse header to detect frames
+ * 3. Return analysis results for UI decisions
+ */
+export async function analyzeTiffs(
+  files: FileList,
+  updateProgress: (args: { overallProgress: number }) => void,
+): Promise<{
+  analyses: TiffAnalysisResult[];
+  buffers: Map<string, ArrayBuffer>;
+  errors: Array<TaskError>;
+}> {
+  // Phase 1: Return basic analysis
+  const results: TiffAnalysisResult[] = [];
+  const buffers = new Map<string, ArrayBuffer>();
+  const errors: Array<TaskError> = [];
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    updateProgress({
+      overallProgress: overallProgress("analyze", i / files.length),
+    });
+
+    try {
+      const fileData = await file.arrayBuffer();
+      buffers.set(file.name, fileData);
+
+      const tiffResult = await analyzeTiff(fileData);
+
+      results.push({ fileName: file.name, ...tiffResult });
+    } catch {
+      //if analysis fails, treat as regular image
+      errors.push({
+        source: file.name,
+        error: new Error("Could not parse metadata, treating as regular image"),
+        recoverable: true,
+      });
+    }
+  }
+
+  return { analyses: results, buffers, errors };
+}
 
 /**
  * TiffAnalyzer

@@ -186,6 +186,10 @@ export type FileInterpretationResult = {
 export type TiffAnalysisResult = AnalyzeTiffOutput & {
   fileName: string;
 };
+export type TiffPrepResult = {
+  configs: Map<string, TiffImportConfig>;
+  buffers: Map<string, ArrayBuffer>;
+};
 // ============================================================
 // File Analysis Results
 // ============================================================
@@ -205,11 +209,6 @@ export interface IFileLoader {
     files: FileList,
     options?: UploadOptions,
   ): Promise<FileUploadResult>;
-  // Analysis (for UI decisions)
-  analyzeTiffs(files: FileList): Promise<{
-    analyses: TiffAnalysisResult[];
-    buffers: Map<string, ArrayBuffer>;
-  }>;
 
   // Progress and cancellation
   onProgress(callback: (progress: Progress) => void): () => void;
@@ -234,7 +233,7 @@ export type TiffDialogCallbackResult = Record<string, TiffImportConfig>;
  * Callback for requesting user decisions during pipeline execution.
  * The pipeline pauses and waits for the callback to resolve
  */
-type TiffDialogCallback = (
+export type TiffDialogCallback = (
   analysisResults: TiffAnalysisResult[],
 ) => Promise<TiffDialogCallbackResult | null>; //null = cancel
 
