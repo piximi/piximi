@@ -133,7 +133,7 @@ export function useFileLoader(): UseFileLoaderReturn {
             dispatch(
               appTasksSlice.actions.taskFailed({
                 id: taskId,
-                error: `Failed to upload files`,
+                error: result.error.message,
               }),
             );
           }

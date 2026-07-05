@@ -128,7 +128,7 @@ export class FileLoader implements IFileLoader {
         return {
           success: false,
           cancelled: false,
-          data: [],
+          error: imageResults.error,
         };
       }
 
@@ -144,7 +144,7 @@ export class FileLoader implements IFileLoader {
         return {
           success: false,
           cancelled: false,
-          data: [],
+          error: storageResult.error,
         };
       }
 
@@ -282,20 +282,23 @@ export class FileLoader implements IFileLoader {
       return {
         success: false,
         cancelled: false,
+        error: this.collectErrors("Failed to load any files"),
       };
     }
 
-    if (
-      new Set(
-        results.flatMap((result) =>
-          result.output.images.map((image) => image.shape.channels),
-        ),
-      ).size !== 1
-    ) {
+    const channelCounts = new Set(
+      results.flatMap((result) =>
+        result.output.images.map((image) => image.shape.channels),
+      ),
+    );
+    if (channelCounts.size !== 1) {
       this.updateProgress({ stage: "error" });
       return {
         success: false,
         cancelled: false,
+        error: new Error(
+          `All images must have the same number of channels (found ${[...channelCounts].join(", ")})`,
+        ),
       };
     }
     const channelData: ChannelResult[] = [];
@@ -418,6 +421,14 @@ export class FileLoader implements IFileLoader {
       return;
     }
     this.progress.errors.set(error.source, [...sourceErrors, error]);
+  }
+  private collectErrors(fallback: string): Error {
+    const all = [...this.progress.errors.values()].flat();
+    if (all.length === 0) return new Error(fallback);
+    if (all.length === 1) return all[0].error;
+    return new Error(
+      all.map(({ source, error }) => `${source}: ${error.message}`).join("\n"),
+    );
   }
 
   private notifyProgressListeners(): void {
