@@ -92,28 +92,34 @@ function getOMEDims(imageObj: Record<string, any>): Partial<OMEDims> {
 }
 
 function getImageJDims(imageDescription: string): Partial<OMEDims> | undefined {
-  const splitDescription = imageDescription.split("\n");
-
-  if (splitDescription[0].includes("ImageJ")) {
-    const dims = { ...defaultOMEDims };
-    splitDescription.forEach((detail) => {
-      const [key, val] = detail.split("=");
-      switch (key) {
-        case "channels":
-          dims.sizec = Number(val);
-          break;
-        case "slices":
-          dims.sizez = Number(val);
-          break;
-        case "unit":
-          dims.unit = val;
-          break;
-        default:
-          break;
-      }
-    });
-    return dims;
+  const lines = imageDescription.split("\n");
+  if (!lines[0].includes("ImageJ")) return undefined;
+  const dims: Partial<OMEDims> = {};
+  for (const line of lines) {
+    const [key, val] = line.split("=");
+    switch (key) {
+      case "channels":
+        dims.sizec = Number(val);
+        break;
+      case "slices":
+        dims.sizez = Number(val);
+        break;
+      case "frames":
+        dims.sizet = Number(val);
+        break;
+      case "unit":
+        dims.unit = val;
+        break;
+    }
   }
+  // A bare "ImageJ=..." header (as plain RGB tiffs carry) declares no axis —
+  // return undefined so resolveDims falls through to the samples-per-pixel
+  // fallback instead of treating this as authoritative.
+  const foundAxis =
+    dims.sizec !== undefined ||
+    dims.sizez !== undefined ||
+    dims.sizet !== undefined;
+  return foundAxis ? dims : undefined;
 }
 
 export const tiffReader: IFileReader = {
@@ -229,6 +235,69 @@ export async function analyzeTiffs(
 }
 
 /**
+ * Resolve C/Z/T dimensions from whatever metadata the TIFF carries.
+ * Priority: OME-XML → ImageJ → JSON "shape" → packed-samples fallback.
+ * Leaves dims undefined when the layout is genuinely ambiguous
+ * (multiple IFDs, no metadata) so the dialog can ask the user.
+ */
+function resolveDims(
+  description: string | undefined,
+  image: GeoTIFFImage,
+  samplesPerPixel: number,
+): Partial<OMEDims> {
+  // 1. OME-TIFF XML — authoritative for C/Z/T.
+  const omeEl = getOME(description);
+  if (omeEl !== undefined) {
+    const image0El = Array.isArray(omeEl.Image) ? omeEl.Image[0] : omeEl.Image;
+    return getOMEDims(image0El);
+  }
+
+  console.warn(
+    "Could not read OME-TIFF metadata from file. Doing our best with base TIFF metadata.",
+  );
+
+  const dims: Partial<OMEDims> = { ...defaultOMEDims };
+  dims.sizex = image.getWidth();
+  dims.sizey = image.getHeight();
+
+  // 2. ImageJ hyperstack metadata.
+  if (typeof description === "string") {
+    const imageJDims = getImageJDims(description);
+    if (imageJDims) return { ...dims, ...imageJDims };
+  }
+
+  // 3. JSON "shape" descriptor: [t?, c?, z?, y, x].
+  const shape = parseShape(description);
+  if (shape) {
+    dims.sizex = shape[shape.length - 1] ?? dims.sizex;
+    dims.sizey = shape[shape.length - 2] ?? dims.sizey;
+  }
+
+  // 4. Packed multichannel with no metadata (e.g. a plain RGB): the samples
+  //    ARE the channels, and a single packed IFD is one z / one t.
+  //    Separate-IFD stacks (samplesPerPixel === 1, imageCount > 1) are left
+  //    ambiguous on purpose — the dialog resolves how to split those planes.
+  if (!dims.sizec && samplesPerPixel > 1) {
+    dims.sizec = samplesPerPixel;
+    dims.sizez = 1;
+    dims.sizet = 1;
+  }
+
+  return dims;
+}
+
+function parseShape(description: string | undefined): number[] | undefined {
+  if (typeof description !== "string") return undefined;
+  try {
+    const parsed = JSON.parse(description);
+    if (parsed && Array.isArray(parsed.shape)) return parsed.shape as number[];
+  } catch {
+    // not JSON — ignore
+  }
+  return undefined;
+}
+
+/**
  * TiffAnalyzer
  *
  * Parses TIFF file headers to detect multi-frame images
@@ -252,80 +321,32 @@ export async function analyzeTiffs(
 export async function analyzeTiff(
   buffer: ArrayBuffer,
 ): Promise<AnalyzeTiffOutput> {
-  let output: AnalyzeTiffOutput;
   try {
     const tiff = await fromArrayBuffer(buffer);
     const imageCount = await tiff.getImageCount();
     const image: GeoTIFFImage = await tiff.getImage();
+    const samplesPerPixel = image.getSamplesPerPixel();
 
-    const tiffFileDirectory = image.getFileDirectory();
-    const image0DescriptionRaw: string = (await tiffFileDirectory.loadValue(
-      "ImageDescription",
-    )) as string;
+    // Total number of 2D single-channel planes the decoder will emit.
+    // Channels can live in separate IFDs (samplesPerPixel === 1) or be packed
+    // into one IFD (RGB, samplesPerPixel === 3); both normalise to this count.
+    // INVARIANT: must match how the decoder (image-js) counts channels — it
+    // splits packed IFDs assuming no alpha, so planeCount === decoded planes.
+    const planeCount = imageCount * samplesPerPixel;
 
-    // Get rid of null terminator, if it's there (`JSON.parse` doesn't know what to do with it)
-    const image0Description = trimNull(image0DescriptionRaw);
-    const omeEl = getOME(image0Description);
-    let dims: Partial<OMEDims>;
-    if (omeEl !== undefined) {
-      const image0El = Array.isArray(omeEl.Image)
-        ? omeEl.Image[0]
-        : omeEl.Image;
-      dims = getOMEDims(image0El);
-      output = {
-        frameCount: imageCount,
-        isMultiFrame: true,
-        OMEDims: dims,
-        metadata: {},
-      };
-    } else {
-      console.warn(
-        "Could not read OME-TIFF metadata from file. Doing our best with base TIFF metadata.",
-      );
-      dims = defaultOMEDims;
-      let shape: number[] = [];
-      if (typeof image0Description === "string") {
-        try {
-          const imageJDims = getImageJDims(image0Description);
-          if (imageJDims) dims = imageJDims;
-          else {
-            const parsed = JSON.parse(image0Description);
-            if ("shape" in parsed) {
-              shape = parsed.shape as number[];
-            }
-          }
+    const description = trimNull(
+      (await image.getFileDirectory().loadValue("ImageDescription")) as
+        | string
+        | undefined,
+    );
 
-          // if (Array.isArray(description.shape)) {
-          //   shape = description.shape;
-          // }
-        } catch (_e) {
-          console.warn("Could not parse image description: ", _e);
-        }
-      }
-
-      // if `ImageDescription` is valid JSON with a `shape` field, we expect it to be an array of [t?, c?, z?, y, x].
-      dims.sizex = shape[shape.length - 1] ?? image.getWidth();
-      dims.sizey = shape[shape.length - 2] ?? image.getHeight();
-
-      if (imageCount > 1) {
-        output = {
-          frameCount: imageCount,
-          isMultiFrame: true,
-          OMEDims: dims,
-          metadata: {},
-        };
-      } else if (dims.sizec) {
-        output = {
-          frameCount: imageCount,
-          isMultiFrame: false,
-          metadata: { ...dims },
-        };
-      } else {
-        throw new Error("Unable to parse image");
-      }
-    }
+    return {
+      frameCount: planeCount,
+      isMultiFrame: planeCount > 1,
+      OMEDims: resolveDims(description, image, samplesPerPixel),
+      metadata: {},
+    };
   } catch (error) {
     throw parseError(error);
   }
-  return output;
 }

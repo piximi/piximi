@@ -20,15 +20,16 @@ import type { Image as IJSImage } from "image-js-latest";
 // ============================================================
 // Image Loading
 // ============================================================
+const toSingleChannelPlanes = (image: IJSImage): IJSImage[] => {
+  if (image.channels === 1) return [image];
+  const planes = image.split();
+  // split() yields one plane per channel *including* alpha — drop the alpha plane(s).
+  return image.alpha ? planes.slice(0, image.components) : planes;
+};
+
 const forceStack = (image: IJSImage | IJSStack): IJSStack => {
-  if (image instanceof IJSStack) {
-    return image;
-  }
-  const splitImage = image.split();
-  if (image.alpha) {
-    return new IJSStack(splitImage.slice(0, splitImage.length - 1));
-  }
-  return new IJSStack(splitImage);
+  const images = image instanceof IJSStack ? image.getImages() : [image];
+  return new IJSStack(images.flatMap(toSingleChannelPlanes));
 };
 
 /**
