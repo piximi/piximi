@@ -141,9 +141,11 @@ type FileResult = {
 };
 
 export type ReaderResult =
+  | { success: false; cancelled: true }
   | {
       success: false;
-      cancelled: boolean;
+      cancelled: false;
+      error: Error;
     }
   | {
       success: true;
@@ -157,12 +159,9 @@ export type ReaderResult =
     };
 
 export type FileUploadResult =
-  | {
-      success: boolean;
-      cancelled: boolean;
-      data: FileResult[];
-    }
-  | { success: false; cancelled: true };
+  | { success: true; cancelled: false; data: FileResult[] }
+  | { success: false; cancelled: true }
+  | { success: false; cancelled: false; error: Error };
 
 // ============================================================
 // File Interperetation Results

@@ -102,32 +102,26 @@ function findAutoIJBins(
   return [hmin, hmax];
 }
 
-// // Find min and max bins using a percentile of the most commonly occurring value
-// export function findAutoMinMax(
-//   histogram: ArrayBuffer,
-//   maxBin: number,
-// ): [number, number] {
-//   const bins = new Uint32Array(histogram);
-//   // simple linear mapping cutting elements with small appearence
-//   // get 10% threshold
-//   const PERCENTAGE = 0.1;
-//   const th = Math.floor(bins[maxBin] * PERCENTAGE);
-//   let b = 0;
-//   let e = bins.length - 1;
-//   for (let x = 1; x < bins.length; ++x) {
-//     if (bins[x] > th) {
-//       b = x;
-//       break;
-//     }
-//   }
-//   for (let x = bins.length - 1; x >= 1; --x) {
-//     if (bins[x] > th) {
-//       e = x;
-//       break;
-//     }
-//   }
-//   return [b, e];
-// }
+/**
+ * Median intensity derived from the histogram: the smallest bin at which the
+ * cumulative pixel count reaches half. O(bins), no per-pixel allocation —
+ * safe for arbitrarily large images.
+ * @param {ArrayBuffer} histogram
+ * @param {number} pixelCount
+ */
+export function findMedianBin(
+  histogram: ArrayBuffer,
+  pixelCount: number,
+): number {
+  const bins = new Uint32Array(histogram);
+  const half = pixelCount / 2;
+  let count = 0;
+  for (let i = 0; i < bins.length; ++i) {
+    count += bins[i];
+    if (count >= half) return i;
+  }
+  return bins.length - 1;
+}
 
 export const PRESET_OPERATORS: Record<
   keyof typeof RANGE_PRESETS,
@@ -166,7 +160,7 @@ export const processChannel = (channel: IJSImage) => {
     0.75,
   );
   const { min: mins, max: maxes } = channel.minMax();
-  const median = channel.median()[0];
+  const median = findMedianBin(histogram, numPixels);
   const mean = channel.mean()[0];
   const minValue = mins[0];
   const maxValue = maxes[0];
