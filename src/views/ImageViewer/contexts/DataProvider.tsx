@@ -1,0 +1,68 @@
+import type { ReactNode } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+
+import { useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
+
+import { addListener, isAnyOf } from "@reduxjs/toolkit";
+
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+import type { DataState } from "store/types";
+import { productionStore } from "store";
+import type { RootState } from "store/rootReducer";
+import { dataSliceV2 } from "store/dataV2";
+
+import type { UnsubscribeListener } from "@reduxjs/toolkit";
+
+export const DataContext = createContext<{
+  savedData: DataState | undefined;
+}>({ savedData: undefined });
+
+export const DataProvider = ({ children }: { children: ReactNode }) => {
+  const dispatch = useDispatch();
+  const routerLocation = useLocation();
+  const [savedData, setSavedData] = useState<DataState>();
+
+  useEffect(() => {
+    const initialDataState = productionStore.getState().data;
+
+    setSavedData(initialDataState);
+    const unsubscribe = dispatch(
+      addListener({
+        matcher: isAnyOf(...Object.values(dataSliceV2.actions)),
+        effect: (action, listenerAPI) => {
+          const hasUnsavedChanges = (listenerAPI.getState() as RootState)
+            .imageViewer.hasUnsavedChanges;
+          if (hasUnsavedChanges) return;
+          listenerAPI.dispatch(
+            imageViewerDataSlice.actions.setHasUnsavedChanges(true),
+          );
+        },
+      }),
+    );
+    return unsubscribe as unknown as UnsubscribeListener;
+  }, []);
+
+  useEffect(() => {
+    const initialDataIds = routerLocation.state?.initialThingIds
+      ? routerLocation.state.initialThingIds
+      : { images: [], annotations: [] };
+    dispatch(imageViewerDataSlice.actions.setImageStack(initialDataIds.images));
+    dispatch(
+      imageViewerDataSlice.actions.setSelectedAnnotationIds(
+        initialDataIds.annotations,
+      ),
+    );
+  }, [routerLocation.state]);
+  return (
+    <DataContext.Provider value={{ savedData }}>
+      {children}
+    </DataContext.Provider>
+  );
+};
+
+export const useSavedDataState = () => {
+  const savedDataState = useContext(DataContext);
+
+  return savedDataState;
+};

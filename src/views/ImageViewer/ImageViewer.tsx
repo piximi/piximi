@@ -1,24 +1,28 @@
 import React, { useEffect, useCallback, useRef } from "react";
+
 import { useLocation } from "react-router-dom";
-import Konva from "konva";
 import { useDispatch } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
+
 import { Box } from "@mui/material";
 
 import { useMobileView, useUnloadConfirmation } from "hooks";
 
 import { FallbackDialog } from "components/dialogs";
-import { ImageViewerDrawer, StageWrapper } from "./sections";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { DIMENSIONS } from "utils/constants";
 import { getStackTraceFromError } from "utils/logUtils";
 import { AlertType, HotkeyContext } from "utils/enums";
+
+import { ImageViewerDrawer, StageWrapper } from "./sections";
 import { SideToolBar, TopToolBar } from "./sections/tool-bars";
 import { MobileActionBar } from "./sections/tool-bars/MobileActionBar";
+import { DataProvider } from "./contexts/DataProvider";
+
+import type Konva from "konva";
 
 export const ImageViewer = () => {
   const dispatch = useDispatch();
@@ -65,13 +69,6 @@ export const ImageViewer = () => {
 
   useEffect(() => {
     dispatch(
-      imageViewerSlice.actions.prepareImageViewer({
-        selectedThingIds: routerLocation.state?.initialThingIds
-          ? routerLocation.state.initialThingIds
-          : [],
-      }),
-    );
-    dispatch(
       applicationSettingsSlice.actions.registerHotkeyContext({
         context: HotkeyContext.AnnotatorView,
       }),
@@ -95,23 +92,25 @@ export const ImageViewer = () => {
   }, [handleError, handleUncaughtRejection]);
 
   return (
-    <StageContext.Provider value={stageRef}>
-      <ErrorBoundary FallbackComponent={FallbackDialog}>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: `${isMobile ? DIMENSIONS.toolDrawerWidth : DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`,
-            gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
-            gridTemplateAreas: `"top-tools top-tools top-tools" "${isMobile ? "mobile-action-bar" : "action-drawer"} stage side-tools"`,
-          }}
-        >
-          <TopToolBar />
-          {isMobile ? <MobileActionBar /> : <ImageViewerDrawer />}
+    <DataProvider>
+      <StageContext.Provider value={stageRef}>
+        <ErrorBoundary FallbackComponent={FallbackDialog}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: `${isMobile ? DIMENSIONS.toolDrawerWidth : DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`,
+              gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
+              gridTemplateAreas: `"top-tools top-tools top-tools" "${isMobile ? "mobile-action-bar" : "action-drawer"} stage side-tools"`,
+            }}
+          >
+            <TopToolBar />
+            {isMobile ? <MobileActionBar /> : <ImageViewerDrawer />}
 
-          <StageWrapper />
-          <SideToolBar />
-        </Box>
-      </ErrorBoundary>
-    </StageContext.Provider>
+            <StageWrapper />
+            <SideToolBar />
+          </Box>
+        </ErrorBoundary>
+      </StageContext.Provider>
+    </DataProvider>
   );
 };
