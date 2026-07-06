@@ -68,6 +68,7 @@ export const OpenProjectMenuItem = ({ onClose }: OpenProjectMenuItemProps) => {
     if (!event.currentTarget.files) return;
     const files = event.currentTarget.files;
     await loadProject(files);
+
     event.target.value = "";
   };
 

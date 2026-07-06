@@ -10,6 +10,8 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { useConfirmReplaceDialog } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 import { projectSlice } from "@ProjectViewer/state";
 
+import { clearCache } from "utils/renderedSrcsCache";
+
 export const NewProjectListItem = () => {
   const dispatch = useDispatch();
 
@@ -19,6 +21,7 @@ export const NewProjectListItem = () => {
     const confirmation = await getConfirmation({});
     if (!confirmation) return;
     dispatch(projectSlice.actions.resetProject());
+    clearCache();
   };
 
   return (

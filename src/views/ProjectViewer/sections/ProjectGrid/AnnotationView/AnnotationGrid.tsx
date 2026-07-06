@@ -2,6 +2,8 @@ import { useCallback, useMemo } from "react";
 
 import { useDispatch } from "react-redux";
 
+import { usePreloadSrcs } from "hooks/usePreloadSrcs";
+
 import { useAnnotationSort } from "@ProjectViewer/hooks";
 import { projectSlice } from "@ProjectViewer/state";
 import { selectExtendedAnnotationsByKindId } from "store/dataV2/selectors";
@@ -43,6 +45,14 @@ export const AnnotationGrid = ({ kindState }: { kindState: KindState }) => {
     numColumns,
     numRows,
   } = useGridLayout(visibleAnns.length);
+
+  const windowCount = useMemo(() => {
+    if (!rowHeight || !columnWidth) return 0;
+    return (
+      Math.round(gridHeight / rowHeight) * Math.round(gridWidth / columnWidth)
+    );
+  }, [gridHeight, rowHeight, gridWidth, columnWidth]);
+  usePreloadSrcs(visibleAnns, windowCount);
 
   const handleSelectAnnotation = useCallback(
     (id: string, selected: boolean) => {

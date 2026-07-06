@@ -3,6 +3,11 @@ import { Image as IJSImage, encodeDataURL } from "image-js-latest";
 import { BBox, ExtendedChannel } from "store/dataV2/types";
 import { DataConnector } from "utils/data-connector";
 import { createLUT } from "utils/colorUtils";
+import {
+  getCacheKey,
+  getRenderedSrc,
+  setRenderedSrc,
+} from "utils/renderedSrcsCache";
 
 /**
  * Returns the rendered preview src for an entity.
@@ -28,7 +33,12 @@ export function useRenderedSrc(
     }
 
     let cancelled = false;
-
+    const cacheKey = getCacheKey(channels, crop);
+    const cached = getRenderedSrc(cacheKey);
+    if (cached) {
+      setIndexedDBSrc(cached);
+      return;
+    }
     const load = async () => {
       setLoading(true);
       try {
@@ -85,6 +95,7 @@ export function useRenderedSrc(
             data: rgbBuffer,
           });
           const url = encodeDataURL(colorImage);
+          setRenderedSrc(cacheKey, url);
           setIndexedDBSrc(url);
         }
       } catch (error) {
@@ -99,7 +110,7 @@ export function useRenderedSrc(
     return () => {
       cancelled = true;
     };
-  }, [channels]);
+  }, [channels, crop]);
 
   return { src: indexedDBSrc, loading };
 }

@@ -12,6 +12,7 @@ import { AlertType } from "utils/enums";
 import { ProjectLoader } from "utils/file-io-v2/project-loader/ProjectLoader";
 import { AlertState } from "utils/types";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+import { clearCache } from "utils/renderedSrcsCache";
 
 type UseProjectLoaderReturn = {
   loadExample: (examplePath: string, projectName: string) => Promise<void>;
@@ -111,7 +112,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
           return;
         }
         const { data, classifier } = result.project;
-
+        clearCache();
         batch(() => {
           dispatch(projectSlice.actions.resetProject());
           dispatch(
@@ -219,6 +220,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
         }
         const { data, classifier } = result.project;
 
+        clearCache();
         batch(() => {
           dispatch(projectSlice.actions.resetProject());
           dispatch(

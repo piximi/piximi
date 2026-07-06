@@ -1,6 +1,6 @@
 import { memo } from "react";
 
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 import { useRenderedSrc } from "hooks/useRenderedSrcs";
 
@@ -32,8 +32,26 @@ export const ImageGridItem = memo(
       handleClick(item.id, selected);
     };
 
-    const imgElement = (
-      <Box component="img" alt="" src={src} sx={imageStyle} draggable={false} />
+    const imgElement = src ? (
+      <Box
+        component="img"
+        alt={item.name}
+        src={src}
+        sx={imageStyle}
+        draggable={false}
+      />
+    ) : (
+      <Box
+        sx={(theme) => ({
+          ...imageStyle,
+          border: `1px dashed ${theme.palette.text.primary}`,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        })}
+      >
+        <Typography>{item.name}</Typography>
+      </Box>
     );
 
     if (isScrolling) {
@@ -47,19 +65,21 @@ export const ImageGridItem = memo(
     return (
       <Box onClick={handleSelect} sx={containerStyle}>
         {imgElement}
-        <ItemOverlay
-          categoryColor={item.category.color}
-          categoryName={item.category.name}
-          usePredictedStyle={
-            item.partition === Partition.Inference &&
-            !isUnknownCategory(item.category.id)
-              ? item.predictionConfidence
-              : undefined
-          }
-          position={getIconPosition(item.shape.height, item.shape.width)}
-          itemId={item.id}
-          itemType="image"
-        />
+        {src !== "" && (
+          <ItemOverlay
+            categoryColor={item.category.color}
+            categoryName={item.category.name}
+            usePredictedStyle={
+              item.partition === Partition.Inference &&
+              !isUnknownCategory(item.category.id)
+                ? item.predictionConfidence
+                : undefined
+            }
+            position={getIconPosition(item.shape.height, item.shape.width)}
+            itemId={item.id}
+            itemType="image"
+          />
+        )}
       </Box>
     );
   },
