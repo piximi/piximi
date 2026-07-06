@@ -31,6 +31,7 @@ export default defineConfig({
       store: path.resolve("src/store"),
       themes: path.resolve("src/themes"),
       "@ProjectViewer": path.resolve("src/views/ProjectViewer"),
+      "@ImageViewer": path.resolve("src/views/ImageViewer"),
       translations: path.resolve("src/translations"),
     },
   },

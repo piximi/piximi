@@ -19,7 +19,8 @@
     "strict": true,
     "noErrorTruncation": true,
     "paths": {
-      "@ProjectViewer/*": ["views/ProjectViewer/*"]
+      "@ProjectViewer/*": ["views/ProjectViewer/*"],
+      "@ImageViewer/*": ["views/ImageViewer/*"]
     }
   },
   "include": ["src", "src/icons/svg.d.ts"],

@@ -9,6 +9,7 @@ import type { Linter } from "eslint";
 
 const NEW_FILES = [
   "src/views/ProjectViewer/**/*.{js,mjs,jsx,ts,mts,tsx}",
+  "src/views/ImageViewer/**/*.{js,mjs,jsx,ts,mts,tsx}",
   "src/store/dataV2/*.ts",
   "src/store/classifier/*.ts",
   "src/utils/data-connector/**/*.ts",
