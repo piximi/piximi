@@ -56,15 +56,17 @@ export const ImageGridItem = memo(
       </Box>
     );
 
-    if (isScrolling) {
-      return (
-        <Box sx={containerStyle}>
-          {textOnScroll ? <ScrollingTextDetails image={item} /> : imgElement}
-        </Box>
-      );
-    }
+    // if (isScrolling) {
+    //   return (
+    //     <Box sx={containerStyle}>
+    //       {textOnScroll ? <ScrollingTextDetails image={item} /> : imgElement}
+    //     </Box>
+    //   );
+    // }
 
-    return (
+    return isScrolling && textOnScroll ? (
+      <ScrollingTextDetails image={item} />
+    ) : (
       <Box onClick={handleSelect} sx={containerStyle}>
         {imgElement}
         {src !== "" && (
