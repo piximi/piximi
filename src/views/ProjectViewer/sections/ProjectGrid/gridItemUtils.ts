@@ -18,3 +18,11 @@ export const imageStyle: CSSProperties = {
   top: 0,
   transform: "none",
 };
+
+const ALT_TEXT_PADDING = 16;
+export const altTextStyle: CSSProperties = {
+  width: `calc(100% - ${ALT_TEXT_PADDING}px)`,
+  overflow: "hidden",
+  whiteSpace: "nowrap",
+  textOverflow: "ellipsis",
+};

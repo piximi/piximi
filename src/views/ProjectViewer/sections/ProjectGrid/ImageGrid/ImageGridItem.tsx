@@ -9,7 +9,7 @@ import type { ExtendedImageObject } from "store/dataV2/types";
 
 import { Partition } from "utils/dl/enums";
 
-import { getIconPosition, imageStyle } from "../gridItemUtils";
+import { altTextStyle, getIconPosition, imageStyle } from "../gridItemUtils";
 import { useGridItemStyle } from "../useGridItemStyle";
 import { ItemOverlay } from "../ItemOverlay";
 
@@ -50,7 +50,9 @@ export const ImageGridItem = memo(
           alignItems: "center",
         })}
       >
-        <Typography>{item.name}</Typography>
+        <Typography align="center" variant="body2" sx={altTextStyle}>
+          {item.name}
+        </Typography>
       </Box>
     );
 

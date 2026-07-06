@@ -1,6 +1,6 @@
 import { memo } from "react";
 
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 import { useRenderedSrc } from "hooks/useRenderedSrcs";
 
@@ -11,7 +11,7 @@ import { useParameterizedSelector } from "store/hooks";
 
 import { Partition } from "utils/dl/enums";
 
-import { getIconPosition, imageStyle } from "../gridItemUtils";
+import { altTextStyle, getIconPosition, imageStyle } from "../gridItemUtils";
 import { useGridItemStyle } from "../useGridItemStyle";
 import { ItemOverlay } from "../ItemOverlay";
 
@@ -40,8 +40,32 @@ export const AnnotationGridItem = memo(
       handleClick(item.id, selected);
     };
 
-    const imgElement = (
-      <Box component="img" alt="" src={src} sx={imageStyle} draggable={false} />
+    const imgElement = src ? (
+      <Box
+        component="img"
+        alt={item.imageName}
+        src={src}
+        sx={imageStyle}
+        draggable={false}
+      />
+    ) : (
+      <Box
+        sx={(theme) => ({
+          ...imageStyle,
+          border: `1px dashed ${theme.palette.text.primary}`,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        })}
+      >
+        <Typography align="center" variant="body2" sx={altTextStyle}>
+          {item.imageName}
+        </Typography>
+        <Typography align="center" variant="body2" sx={altTextStyle}>
+          {`w=${item.boundingBox[2] - item.boundingBox[0]}, h=${item.boundingBox[3] - item.boundingBox[1]}`}
+        </Typography>
+      </Box>
     );
 
     if (isScrolling) {
@@ -59,19 +83,21 @@ export const AnnotationGridItem = memo(
     return (
       <Box onClick={handleSelect} sx={containerStyle}>
         {imgElement}
-        <ItemOverlay
-          categoryColor={category.color}
-          categoryName={category.name}
-          usePredictedStyle={
-            item.partition === Partition.Inference &&
-            !isUnknownCategory(item.categoryId)
-              ? item.predictionConfidence
-              : undefined
-          }
-          position={getIconPosition(item.shape.height, item.shape.width)}
-          itemId={item.id}
-          itemType="annotation"
-        />
+        {src && (
+          <ItemOverlay
+            categoryColor={category.color}
+            categoryName={category.name}
+            usePredictedStyle={
+              item.partition === Partition.Inference &&
+              !isUnknownCategory(item.categoryId)
+                ? item.predictionConfidence
+                : undefined
+            }
+            position={getIconPosition(item.shape.height, item.shape.width)}
+            itemId={item.id}
+            itemType="annotation"
+          />
+        )}
       </Box>
     );
   },
