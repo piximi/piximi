@@ -20,6 +20,7 @@ import { DataStateV2 } from "./dataV2/types";
 import { AppTasksState } from "./appTasks/types";
 import { ProjectState } from "views/ProjectViewer/state/types";
 import { ClassifierState } from "./classifier/types";
+import { ImageViewerDataState } from "@ImageViewer/state/types";
 
 export type AppSettingsState = {
   // async work for setting initial states,
@@ -50,6 +51,7 @@ export type DataState = {
 type AppState = {
   classifier: ClassifierState;
   imageViewer: ImageViewerState;
+  imageViewerData: ImageViewerDataState;
   annotator: AnnotatorState;
   project: ProjectState;
   applicationSettings: AppSettingsState;

@@ -24,6 +24,7 @@ import { applicationMiddleware } from "./applicationSettings/applicationListener
 import { appTasksSlice } from "./appTasks/appTasksSlice";
 import { projectSlice } from "views/ProjectViewer/state/projectSlice";
 import { projectMiddleware } from "views/ProjectViewer/state/projectListeners";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
 const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&
@@ -45,6 +46,7 @@ const preloadedState: RootState = {
   annotator: annotatorSlice.getInitialState(),
   applicationSettings: applicationSettingsSlice.getInitialState(),
   imageViewer: imageViewerSlice.getInitialState(),
+  imageViewerData: imageViewerDataSlice.getInitialState(),
   data: dataSlice.getInitialState(),
   measurements: measurementsSlice.getInitialState(),
   dataV2: dataSliceV2.getInitialState(),

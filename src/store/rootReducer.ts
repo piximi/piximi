@@ -11,10 +11,12 @@ import { measurementsSlice } from "./measurements/measurementsSlice";
 import { dataSliceV2 } from "./dataV2/dataSliceV2";
 import { appTasksSlice } from "./appTasks/appTasksSlice";
 import { projectSlice } from "views/ProjectViewer/state/projectSlice";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
 const reducers = {
   classifier: classifierSlice.reducer,
   imageViewer: imageViewerSlice.reducer,
+  imageViewerData: imageViewerDataSlice.reducer,
   project: projectSlice.reducer,
   applicationSettings: applicationSettingsSlice.reducer,
   annotator: annotatorSlice.reducer,
