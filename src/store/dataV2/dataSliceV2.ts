@@ -389,6 +389,9 @@ export const dataSliceV2 = createSlice({
       kindAdapter.setAll(state.kinds, kinds);
       categoryAdapter.setAll(state.categories, categories);
     },
+    resetState(state, action: PayloadAction<DataStateV2>) {
+      state = action.payload;
+    },
     /*
      * Create/Add
      */

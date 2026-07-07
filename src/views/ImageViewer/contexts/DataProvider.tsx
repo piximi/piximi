@@ -7,24 +7,24 @@ import { useLocation } from "react-router-dom";
 import { addListener, isAnyOf } from "@reduxjs/toolkit";
 
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
-import type { DataState } from "store/types";
 import { productionStore } from "store";
 import type { RootState } from "store/rootReducer";
 import { dataSliceV2 } from "store/dataV2";
+import type { DataStateV2 } from "store/dataV2/types";
 
 import type { UnsubscribeListener } from "@reduxjs/toolkit";
 
 export const DataContext = createContext<{
-  savedData: DataState | undefined;
+  savedData: DataStateV2 | undefined;
 }>({ savedData: undefined });
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const dispatch = useDispatch();
   const routerLocation = useLocation();
-  const [savedData, setSavedData] = useState<DataState>();
+  const [savedData, setSavedData] = useState<DataStateV2>();
 
   useEffect(() => {
-    const initialDataState = productionStore.getState().data;
+    const initialDataState = productionStore.getState().dataV2;
 
     setSavedData(initialDataState);
     const unsubscribe = dispatch(

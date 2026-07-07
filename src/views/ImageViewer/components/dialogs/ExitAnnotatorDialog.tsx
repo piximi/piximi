@@ -1,77 +1,37 @@
-import { batch, useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { useSavedDataState } from "@ImageViewer/contexts/DataProvider";
+import { dataSliceV2 } from "store/dataV2";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
-import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
-import { reconcileChanges } from "views/ImageViewer/utils/annotationUtils";
-import { selectDataState } from "store/data/selectors";
-import { selectChanges } from "views/ImageViewer/state/annotator/selectors";
-
-type ExitAnnotatorDialogProps = {
-  returnToProject: () => void;
+type ConfirmImageViewerChangesDialogProps = {
   onClose: () => void;
   open: boolean;
 };
 
-export const ExitAnnotatorDialog = ({
-  returnToProject,
+export const ConfirmImageViewerChangesDialog = ({
   onClose,
   open,
-}: ExitAnnotatorDialogProps) => {
+}: ConfirmImageViewerChangesDialogProps) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const dataState = useSelector(selectDataState);
-  const annotatorChanges = useSelector(selectChanges);
-  const activeImageId = useSelector(selectActiveImageId);
+  const { savedData } = useSavedDataState();
 
-  const handleSaveChanges = async () => {
-    await reconcileChanges(dataState, annotatorChanges);
-
+  const handleSaveChanges = (save: boolean) => {
+    if (!save) {
+      if (savedData) dispatch(dataSliceV2.actions.resetState(savedData));
+    }
+    navigate("/project");
     batch(() => {
-      dispatch(
-        imageViewerSlice.actions.setActiveImageId({
-          imageId: undefined,
-          prevImageId: activeImageId,
-        }),
-      );
-      dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
-      dispatch(
-        annotatorSlice.actions.setSelectedAnnotationIds({
-          annotationIds: [],
-          workingAnnotationId: undefined,
-        }),
-      );
-      dispatch(
-        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
-      );
+      dispatch(imageViewerDataSlice.actions.resetState());
+      dispatch(imageViewerSlice.actions.resetImageViewer());
       dispatch(annotatorSlice.actions.resetAnnotator());
     });
-    returnToProject();
-  };
-
-  const handleDiscardChanges = () => {
-    batch(() => {
-      dispatch(
-        imageViewerSlice.actions.setActiveImageId({
-          imageId: undefined,
-          prevImageId: activeImageId,
-        }),
-      );
-      dispatch(annotatorSlice.actions.resetChanges());
-      dispatch(
-        annotatorSlice.actions.setSelectedAnnotationIds({
-          annotationIds: [],
-          workingAnnotationId: undefined,
-        }),
-      );
-      dispatch(
-        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
-      );
-      dispatch(annotatorSlice.actions.resetAnnotator());
-    });
-    returnToProject();
   };
 
   const handleClose = () => {
@@ -82,9 +42,9 @@ export const ExitAnnotatorDialog = ({
     <ConfirmationDialog
       title="Save Changes?"
       content="Would you like to save the changes to these annotations and return to the project page?"
-      onConfirm={handleSaveChanges}
+      onConfirm={() => handleSaveChanges(true)}
       confirmText="SAVE"
-      onReject={handleDiscardChanges}
+      onReject={() => handleSaveChanges(false)}
       rejectText="DISCARD"
       onClose={handleClose}
       isOpen={open}
