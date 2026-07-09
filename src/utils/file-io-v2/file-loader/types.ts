@@ -75,6 +75,7 @@ export const MIME = {
   DICOM: "application/dicom",
   BMP: "image/bmp",
   CZI: "image/czi",
+  HEIC: "image/heic",
   UNKNOWN: "application/octet-stream",
 } as const;
 export type MimeType = (typeof MIME)[keyof typeof MIME];

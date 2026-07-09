@@ -51,6 +51,8 @@ const inferMimeType = (file: File): MimeType => {
     case "jpg":
     case "jpeg":
       return MIME.JPEG;
+    case "heic":
+      return MIME.HEIC;
     case "tif":
     case "tiff":
       return MIME.TIFF;

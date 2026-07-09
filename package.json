@@ -39,6 +39,7 @@
     "io-ts": "^2.2.20",
     "jszip": "^3.7.1",
     "konva": "^8.3.0",
+    "libheif-js": "^1.19.8",
     "lodash": "^4.17.20",
     "memoize-one": "^6.0.0",
     "mui-markdown": "^1.2.5",
