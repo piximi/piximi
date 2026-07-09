@@ -59,7 +59,7 @@ export const ProjectAppBar = () => {
           {/*
             TODO: selectedThings will be removed during refactor
            */}
-          <ImageViewerButton selectedThings={[]} mobileAlt={true} />
+          <ImageViewerButton mobileAlt={true} />
           <Divider
             orientation="vertical"
             flexItem

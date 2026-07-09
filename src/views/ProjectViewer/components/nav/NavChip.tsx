@@ -12,12 +12,14 @@ export const NavChip = ({
   labelIcon,
   onClick,
   help,
+  disabled,
 }: {
   tooltip: string;
   label: string;
   labelIcon?: ReactNode;
   onClick: () => void;
   help: HelpItem;
+  disabled: boolean;
 }) => {
   const theme = useTheme();
   const smOrXsBreakpoint = useMediaQuery(theme.breakpoints.down("md"));
@@ -33,6 +35,7 @@ export const NavChip = ({
           onClick={onClick}
           variant="outlined"
           size="small"
+          disabled={disabled}
           sx={{
             pl: smOrXsBreakpoint ? 1 : 0,
             "& .MuiChip-label": {

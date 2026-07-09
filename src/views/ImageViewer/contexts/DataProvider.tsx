@@ -44,13 +44,14 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    const initialDataIds = routerLocation.state?.initialThingIds
-      ? routerLocation.state.initialThingIds
-      : { images: [], annotations: [] };
-    dispatch(imageViewerDataSlice.actions.setImageStack(initialDataIds.images));
+    const initialImageIds: string[] =
+      routerLocation.state?.selectedItems?.imageIds ?? [];
+    const initialAnnotationIds: string[] =
+      routerLocation.state?.selectedItems?.annotationIds ?? [];
+    dispatch(imageViewerDataSlice.actions.setImageStack(initialImageIds));
     dispatch(
       imageViewerDataSlice.actions.setSelectedAnnotationIds(
-        initialDataIds.annotations,
+        initialAnnotationIds,
       ),
     );
   }, [routerLocation.state]);
