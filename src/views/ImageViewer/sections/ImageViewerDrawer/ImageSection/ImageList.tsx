@@ -1,5 +1,8 @@
-import React, { memo, useRef } from "react";
+import type React from "react";
+import { memo, useCallback, useState } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
+
 import {
   Avatar,
   Box,
@@ -15,55 +18,59 @@ import {
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-import { ImageMenu } from "./ImageMenu";
+import { useRenderedSrc } from "hooks/useRenderedSrcs";
 
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
+import { selectImageStackIds } from "@ImageViewer/state/image-viewer-data/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import {
+  selectAnnotationsByImageId,
+  selectExtendedImageByIds,
+} from "store/dataV2/selectors";
+import type { ExtendedImageObject } from "store/dataV2/types";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
-import { ImageObject } from "store/data/types";
-import { selectImagesArray } from "views/ImageViewer/state/annotator/reselectors";
+import { ImageMenu } from "./ImageMenu";
 
 const NUM_BUFFERED_IMS = 20;
 const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 4);
 
 interface ImageListItemProps {
-  image: ImageObject;
+  image: ExtendedImageObject;
   isActive: boolean;
-  onItemClick: (image: ImageObject) => void;
+  onItemClick: (image: ExtendedImageObject) => void;
   onSecondaryClick: (target: HTMLElement) => void;
 }
 
 export const ImageList = () => {
-  const images = useSelector(selectImagesArray);
   const dispatch = useDispatch();
+  const imageStackIds = useSelector(selectImageStackIds);
 
-  const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
-    null,
+  const extendedImages = useParameterizedSelector(
+    selectExtendedImageByIds,
+    imageStackIds,
   );
-  const [bufferRange, setBufferRange] = React.useState({
+
+  const [imageAnchorEl, setImageAnchorEl] = useState<null | HTMLElement>(null);
+  const [bufferRange, setBufferRange] = useState({
     start: 0,
     end: NUM_BUFFERED_IMS,
   });
-  const [scrollProgress, setScrollProgress] = React.useState(0);
-  const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const activeImageId = useSelector(selectActiveImageId);
 
-  const handleImageItemClick = React.useCallback(
-    (image: ImageObject) => {
+  const handleImageItemClick = useCallback(
+    (image: ExtendedImageObject) => {
       if (image.id !== activeImageId!) {
-        dispatch(
-          imageViewerSlice.actions.setActiveImageId({
-            imageId: image.id,
-            prevImageId: activeImageId,
-          }),
-        );
+        dispatch(imageViewerDataSlice.actions.setActiveImageId(image.id));
       }
     },
     [dispatch, activeImageId],
   );
 
-  const handleImageMenuOpen = React.useCallback(
+  const handleImageMenuOpen = useCallback(
     (target: HTMLElement, imageIndex: number) => {
       setImageAnchorEl(target);
       setSelectedImageIndex(imageIndex);
@@ -80,9 +87,9 @@ export const ImageList = () => {
 
     if (
       target.scrollHeight - target.scrollTop === target.clientHeight &&
-      bufferRange.end < images.length
+      bufferRange.end < extendedImages.length
     ) {
-      const numToLoad = images.length - bufferRange.end;
+      const numToLoad = extendedImages.length - bufferRange.end;
       const numHidden = NUM_BUFFERED_IMS - NUM_VIEW_IMS;
       const newStart =
         numToLoad < numHidden
@@ -96,7 +103,7 @@ export const ImageList = () => {
         end: newEnd,
       });
 
-      setScrollProgress((newEnd / images.length) * 100);
+      setScrollProgress((newEnd / extendedImages.length) * 100);
 
       target.scrollTop = 1;
     } else if (target.scrollTop === 0 && bufferRange.start !== 0) {
@@ -108,7 +115,7 @@ export const ImageList = () => {
         end: newEnd,
       });
 
-      setScrollProgress((newEnd / images.length) * 100);
+      setScrollProgress((newEnd / extendedImages.length) * 100);
 
       target.scrollTop = target.scrollHeight - target.clientHeight - 1;
     }
@@ -132,10 +139,11 @@ export const ImageList = () => {
               "::-webkit-scrollbar": { display: "none" },
               width: "calc(100% - 5px)",
               backgroundColor: theme.palette.background.paper,
+              pl: "5px",
             })}
             onScroll={handleScroll}
           >
-            {images
+            {extendedImages
               .slice(bufferRange.start, bufferRange.end)
               .map((image, idx) => {
                 return (
@@ -153,7 +161,7 @@ export const ImageList = () => {
           </List>
         </Box>
         <Box gridColumn="12 / 13" gridRow=" 1 / 2" justifyItems="flex-end">
-          {images.length > NUM_BUFFERED_IMS && (
+          {extendedImages.length > NUM_BUFFERED_IMS && (
             <LinearProgress
               sx={{
                 width: 4,
@@ -171,26 +179,29 @@ export const ImageList = () => {
         </Box>
       </Box>
 
-      <ImageMenu
-        anchorElImageMenu={imageAnchorEl}
-        selectedImage={images[selectedImageIndex]}
-        onCloseImageMenu={onImageMenuClose}
-        openImageMenu={Boolean(imageAnchorEl)}
-      />
+      {extendedImages.length > 0 && (
+        <ImageMenu
+          anchorElImageMenu={imageAnchorEl}
+          selectedImage={extendedImages[selectedImageIndex]}
+          onCloseImageMenu={onImageMenuClose}
+          openImageMenu={Boolean(imageAnchorEl)}
+        />
+      )}
     </>
   );
 };
 const ImageListItem = memo(
   ({ image, isActive, onItemClick, onSecondaryClick }: ImageListItemProps) => {
-    const annotationCount = image.containing.length;
-    const listItemRef = useRef<HTMLLIElement | null>(null);
+    const annotations = useParameterizedSelector(
+      selectAnnotationsByImageId,
+      image.id,
+    );
+    const { src } = useRenderedSrc(image.channelsRef);
     return (
       <Tooltip
         title={image.name}
-        placement="bottom"
+        placement="right"
         disableInteractive={true}
-        enterDelay={500}
-        enterNextDelay={500}
         arrow={true}
         slotProps={{
           tooltip: {
@@ -210,45 +221,42 @@ const ImageListItem = memo(
               <IconButton
                 edge="end"
                 onClick={(event) => onSecondaryClick(event.currentTarget)}
-                size={
-                  listItemRef.current?.classList.contains("MuiListItem-dense")
-                    ? "small"
-                    : "medium"
-                }
-                sx={{
-                  mr: listItemRef.current?.classList.contains(
-                    "MuiListItem-dense",
-                  )
-                    ? "-15px"
-                    : "",
-                }}
+                size={"medium"}
               >
                 <MoreHorizIcon />
               </IconButton>
             }
             disablePadding
+            sx={{
+              "& .MuiListItemSecondaryAction-root": {
+                right: "8px",
+              },
+              "& >.MuiListItemButton-root": {
+                pr: "32px",
+              },
+            }}
           >
             <ListItemButton
               onClick={() => onItemClick(image)}
               selected={isActive}
+              sx={{ px: 0 }}
             >
               <ListItemIcon>
                 {
                   <Avatar
                     alt={image.name}
-                    src={image.src}
-                    variant={"square"}
-                    sx={{ mr: ".5rem" }}
+                    src={src}
+                    variant={"rounded"}
+                    sx={{ mr: ".5rem", width: "35px", height: "35px" }}
                   />
                 }
               </ListItemIcon>
-
               <ListItemText
                 primary={image.name}
-                primaryTypographyProps={{ noWrap: true }}
+                slotProps={{ primary: { noWrap: true } }}
               />
-              {annotationCount !== 0 ? (
-                <Chip label={annotationCount} size="small" />
+              {annotations.length !== 0 ? (
+                <Chip label={annotations.length} size="small" />
               ) : undefined}
             </ListItemButton>
           </ListItem>

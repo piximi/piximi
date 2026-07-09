@@ -7,3 +7,19 @@ export const selectHasUnsavedChanges = ({
 }) => {
   return imageViewerData.hasUnsavedChanges;
 };
+
+export const selectImageStackIds = ({
+  imageViewerData,
+}: {
+  imageViewerData: ImageViewerDataState;
+}) => {
+  return imageViewerData.imageStack;
+};
+
+export const selectActiveImageId = ({
+  imageViewerData,
+}: {
+  imageViewerData: ImageViewerDataState;
+}) => {
+  return imageViewerData.activeImageId;
+};

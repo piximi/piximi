@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { createContext, useContext, useMemo, useState } from "react";
 
-import { ImageList } from "@ImageViewer/sections/ImageViewerDrawer/ImageList";
+import { ImageSection } from "@ImageViewer/sections/ImageViewerDrawer/ImageSection";
 import { AnnotationSection } from "@ImageViewer/sections/ImageViewerDrawer/AnnotationSection";
 
 export type DrawerContextType = "images" | "annotations";
@@ -20,7 +20,7 @@ export const DrawerActionProvider = ({ children }: { children: ReactNode }) => {
   const drawerViewComponent = useMemo(() => {
     switch (drawerContext) {
       case "images":
-        return <ImageList />;
+        return <ImageSection />;
       case "annotations":
         return <AnnotationSection />;
     }

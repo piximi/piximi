@@ -1,21 +1,22 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+
+import { useDispatch } from "react-redux";
+
 // import JSZip from "jszip";
 import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { ExportAnnotationsMenu } from "../../components/";
+import type { ExtendedImageObject } from "store/dataV2/types";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+import { selectAnnotationsByImageId } from "store/dataV2/selectors";
+import { useParameterizedSelector } from "store/hooks";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-
-import { DecodedAnnotationObject, ImageObject } from "store/data/types";
-import { selectImageViewerObjects } from "views/ImageViewer/state/annotator/reselectors";
+import { ExportAnnotationsMenu } from "../../../components";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
-  selectedImage: ImageObject;
+  selectedImage: ExtendedImageObject;
   onCloseImageMenu: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   openImageMenu: boolean;
 };
@@ -27,23 +28,20 @@ export const ImageMenu = ({
   openImageMenu,
 }: ImageMenuProps) => {
   const dispatch = useDispatch();
-  const annotationDict = useSelector(selectImageViewerObjects);
+
+  const annotations = useParameterizedSelector(
+    selectAnnotationsByImageId,
+    selectedImage.id,
+  );
 
   const handleClearAnnotations = (
     event: React.MouseEvent<HTMLElement, MouseEvent>,
   ) => {
     if (!selectedImage) return;
     dispatch(
-      imageViewerSlice.actions.removeActiveAnnotationIds({
-        annotationIds: selectedImage.containing,
-      }),
-    );
-    dispatch(
-      annotatorSlice.actions.deleteThings({
-        things: selectedImage.containing.map(
-          (id) => annotationDict[id] as DecodedAnnotationObject,
-        ),
-      }),
+      imageViewerDataSlice.actions.removeActiveAnnotationIds(
+        annotations.map((ann) => ann.id),
+      ),
     );
 
     onCloseImageMenu(event);
@@ -51,7 +49,7 @@ export const ImageMenu = ({
 
   const t = useTranslation();
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLLIElement>) => {
     setAnchorEl(event.currentTarget);

@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from "react";
+
 import { useSelector } from "react-redux";
+
 //import { saveAs } from "file-saver";
 //import JSZip from "jszip";
 import { ListItemText, Menu, MenuItem } from "@mui/material";
@@ -19,16 +21,16 @@ import { selectHasUnsavedChanges } from "views/ImageViewer/state/imageViewer/sel
 import {
   selectImageViewerObjects,
   selectImageViewerObjectsArray,
-} from "views/ImageViewer/state/annotator/reselectors";
-import {
   selectImageViewerImages,
   selectImagesArray,
-} from "../state/annotator/reselectors";
+} from "views/ImageViewer/state/annotator/reselectors";
+import type { ExtendedImageObject } from "store/dataV2/types";
 
 import { HotkeyContext } from "utils/enums";
 import { AnnotationExportType } from "utils/file-io/enums";
+
 //import { exportAnnotationMasks } from "utils/file-io/export/annotationExporters";
-import { ImageObject } from "store/data/types";
+
 import { selectChanges } from "../state/annotator/selectors";
 import { reconcileChanges } from "../utils/annotationUtils";
 
@@ -38,7 +40,7 @@ type ExportAnnotationsMenuProps = {
   anchorEl: HTMLElement | null;
   onClose: () => void;
   open: boolean;
-  selectedImage?: ImageObject;
+  selectedImage?: ExtendedImageObject;
 };
 
 const exportOptions = [

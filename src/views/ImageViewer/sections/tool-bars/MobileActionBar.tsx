@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from "react";
+
+import type { PopperProps } from "@mui/material";
 import {
   Box,
   IconButton,
   List,
   Popper,
-  PopperProps,
   Stack,
   Tooltip,
   Typography,
@@ -19,20 +20,22 @@ import {
 import { useMenu, useMobileView, useTranslation, useWindowSize } from "hooks";
 
 import { ToolHotkeyTitle } from "components/ui";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
+import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
+import { HelpButton } from "components/layout/app-drawer/HelpButton";
+
+import type { HTMLDataAttributes } from "utils/types";
+import { capitalize } from "utils/stringUtils";
+import { DIMENSIONS } from "utils/constants";
+
 import {
   ExportAnnotationsListItem,
   ImageViewerCategories,
 } from "../../components";
+import { ImageList } from "../ImageViewerDrawer/ImageSection";
 
-import { DIMENSIONS } from "utils/constants";
-import { capitalize } from "utils/stringUtils";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { HTMLDataAttributes } from "utils/types";
-import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
-import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
-import { HelpButton } from "components/layout/app-drawer/HelpButton";
-import { OperationType } from "views/ImageViewer/utils/types";
-import { ImageList } from "../ImageViewerDrawer/ImageList";
+import type { OperationType } from "views/ImageViewer/utils/types";
 
 const imageTools: Record<string, OperationType> = {
   fileIO: {

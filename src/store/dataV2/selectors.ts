@@ -209,6 +209,31 @@ export const selectExtendedImageById = createSelector(
   (planeDict, chMetaDict, chs, catDict, imageDict, imageId) =>
     buildExtendedImage(imageDict[imageId], planeDict, chMetaDict, chs, catDict),
 );
+export const selectExtendedImageByIds = createSelector(
+  [
+    planeSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    channelSelectors.selectAll,
+    categorySelectors.selectEntities,
+    imageSelectors.selectEntities,
+    (_state: RootState, ids: Array<string>) => ids,
+  ],
+  (planeDict, chMetaDict, chs, catDict, imageDict, imageIds) => {
+    const extendedImages: Array<ExtendedImageObject> = [];
+    for (const id of imageIds) {
+      const extImage = buildExtendedImage(
+        imageDict[id],
+        planeDict,
+        chMetaDict,
+        chs,
+        catDict,
+      );
+      if (extImage) extendedImages.push(extImage);
+      else console.warn("Could not get image for id: ", id);
+    }
+    return extendedImages;
+  },
+);
 export const selectExtendedImages = createSelector(
   [
     planeSelectors.selectEntities,
@@ -295,6 +320,10 @@ export const selectAnnotationsByCategoryId = createSelector(
 export const selectAnnotationsByVolumeId = createSelector(
   [annotationSelectors.selectAll, (_: RootState, volumeId: string) => volumeId],
   (annotations, volumeId) => annotations.filter((a) => a.volumeId === volumeId),
+);
+export const selectAnnotationsByImageId = createSelector(
+  [annotationSelectors.selectAll, (_: RootState, imageId: string) => imageId],
+  (annotations, imageId) => annotations.filter((a) => a.imageId === imageId),
 );
 
 // -- Extended --

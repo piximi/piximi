@@ -9,15 +9,15 @@ import { useSavedDataState } from "@ImageViewer/contexts/DataProvider";
 import { dataSliceV2 } from "store/dataV2";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
-type ConfirmImageViewerChangesDialogProps = {
+type ExitAnnotatorDialogProps = {
   onClose: () => void;
   open: boolean;
 };
 
-export const ConfirmImageViewerChangesDialog = ({
+export const ExitAnnotatorDialog = ({
   onClose,
   open,
-}: ConfirmImageViewerChangesDialogProps) => {
+}: ExitAnnotatorDialogProps) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { savedData } = useSavedDataState();
