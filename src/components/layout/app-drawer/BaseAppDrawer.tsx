@@ -6,9 +6,11 @@ import { ApplicationOptions } from "components/layout/app-drawer/ApplicationOpti
 export const BaseAppDrawer = ({
   children,
   mobile,
+  hideSettings,
 }: {
   children: React.ReactNode;
   mobile?: boolean;
+  hideSettings?: boolean;
 }) => {
   return (
     <Drawer
@@ -35,7 +37,7 @@ export const BaseAppDrawer = ({
       >
         <Box sx={{ overflowY: "scroll", overflowX: "hidden" }}>{children}</Box>
 
-        <ApplicationOptions />
+        {!hideSettings && <ApplicationOptions />}
       </Stack>
     </Drawer>
   );
