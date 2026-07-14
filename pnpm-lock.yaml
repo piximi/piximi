@@ -179,6 +179,9 @@ importers:
       ts-priority-queue:
         specifier: ^0.1.1
         version: 0.1.1
+      use-image:
+        specifier: ^1.1.4
+        version: 1.1.4(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       use-immer:
         specifier: ^0.11.0
         version: 0.11.0(immer@10.2.0)(react@17.0.2)
@@ -5298,6 +5301,12 @@ packages:
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
+
+  use-image@1.1.4:
+    resolution: {integrity: sha512-P+swhszzHHgEb2X2yQ+vQNPCq/8Ks3hyfdXAVN133pvnvK7UK++bUaZUa5E+A3S02Mw8xOCBr9O6CLhk2fjrWA==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
 
   use-immer@0.11.0:
     resolution: {integrity: sha512-RNAqi3GqsWJ4bcCd4LMBgdzvPmTABam24DUaFiKfX9s3MSorNRz9RDZYJkllJoMHUxVLMDetwAuCDeyWNrp1yA==}
@@ -11338,6 +11347,11 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
+
+  use-image@1.1.4(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
+    dependencies:
+      react: 17.0.2
+      react-dom: 17.0.2(react@17.0.2)
 
   use-immer@0.11.0(immer@10.2.0)(react@17.0.2):
     dependencies:

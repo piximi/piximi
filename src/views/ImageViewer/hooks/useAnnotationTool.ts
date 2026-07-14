@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from "react";
+
 import { useSelector } from "react-redux";
-import IJSImage from "image-js";
+
+import { decode } from "image-js-latest";
 
 import { StageContext } from "views/ImageViewer/state/StageContext";
 import {
@@ -9,10 +11,7 @@ import {
   selectToolType,
   selectThresholdAnnotationValue,
 } from "views/ImageViewer/state/annotator/selectors";
-import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
-
 import {
-  AnnotationTool,
   ColorAnnotationTool,
   EllipticalAnnotationTool,
   LassoAnnotationTool,
@@ -26,16 +25,17 @@ import {
   SelectionTool,
   BlankAnnotationTool,
 } from "views/ImageViewer/utils/tools";
-
 import { ToolType } from "views/ImageViewer/utils/enums";
 
-export const useAnnotationTool = () => {
+import type { Image as IJSImage } from "image-js-latest";
+import type { AnnotationTool } from "views/ImageViewer/utils/tools";
+
+export const useAnnotationTool = (imageSrc: string | undefined) => {
   const [image, setImage] = useState<IJSImage>();
   const [operator, setOperator] = useState<AnnotationTool>(
     new BlankAnnotationTool(),
   );
 
-  const activeImage = useSelector(selectActiveImage);
   const operation = useSelector(selectToolType);
   const stageScale = useContext(StageContext)?.current?.scaleX() ?? 1;
   const penSelectionBrushSize = useSelector(selectPenSelectionBrushSize);
@@ -43,15 +43,15 @@ export const useAnnotationTool = () => {
   const threshold = useSelector(selectThresholdAnnotationValue);
 
   useEffect(() => {
-    if (!activeImage) return;
+    if (!imageSrc) return;
     const loadImage = async () => {
-      const image = await IJSImage.load(activeImage.src, {
-        ignorePalette: true,
-      });
+      const response = await fetch(imageSrc);
+      const buffer = await response.arrayBuffer();
+      const image = decode(new Uint8Array(buffer));
       setImage(image);
     };
     loadImage();
-  }, [activeImage]);
+  }, [imageSrc]);
 
   useEffect(() => {
     if (!image) return;

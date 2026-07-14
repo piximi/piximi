@@ -1,8 +1,10 @@
-import { DataArray } from "store/data/types";
+import { batch } from "react-redux";
+
 import IJSImage from "image-js";
-import { getPropertiesFromImage } from "store/data/utils";
-import { convertToDataArray } from "utils/dataUtils";
-import {
+import { difference } from "lodash";
+
+import type {
+  DataArray,
   AnnotationObject,
   Category,
   DecodedAnnotationObject,
@@ -10,23 +12,28 @@ import {
   Kind,
   PartialDecodedAnnotationObject,
 } from "store/data/types";
+import { getPropertiesFromImage, generateUUID } from "store/data/utils";
+import { productionStore } from "store";
+import type { DataState } from "store/types";
+import { dataSlice } from "store/data";
+import type { ExtendedImageObject } from "store/dataV2/types";
+
+import { convertToDataArray } from "utils/dataUtils";
+import type { RequireOnly } from "utils/types";
+
 import { encode, encodeAnnotation } from "./rle";
 import { AnnotationMode } from "./enums";
-import { AnnotationTool } from "./tools";
-import { generateUUID } from "store/data/utils";
-import {
+
+import { annotatorSlice } from "../state/annotator";
+import type { AnnotationTool } from "./tools";
+
+import type {
   AnnotatorChanges,
   CategoryEdits,
   KindEdits,
   ProtoAnnotationObject,
 } from "./types";
-import { productionStore } from "store";
-import { DataState } from "store/types";
-import { difference } from "lodash";
-import { RequireOnly } from "utils/types";
-import { batch } from "react-redux";
-import { dataSlice } from "store/data";
-import { annotatorSlice } from "../state/annotator";
+
 import { imageViewerSlice } from "../state/imageViewer";
 
 /**
@@ -49,7 +56,7 @@ export const isInBoundingBox = (
 
 export const createProtoAnnotation = (
   partialAnnotation: Omit<PartialDecodedAnnotationObject, "id">,
-  activeImage: ImageObject,
+  activeImage: ExtendedImageObject,
   kindObject: Kind,
   existingNames: string[],
 ): ProtoAnnotationObject => {

@@ -1,24 +1,24 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Konva from "konva";
-import { KonvaEventObject } from "konva/lib/Node";
 
-import { useDebounce } from "../../../hooks/useDebounce";
+import { useDispatch, useSelector } from "react-redux";
 
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
 import {
-  selectActiveImageId,
   selectStageWidth,
   selectZoomSelection,
   selectZoomToolOptions,
 } from "views/ImageViewer/state/imageViewer/selectors";
-
-import { getDistance } from "views/ImageViewer/utils";
-
 import { ToolType, ZoomMode } from "views/ImageViewer/utils/enums";
+import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
 
-import { Point } from "utils/types";
+import { getDistance } from "utils/image";
+import type { Point } from "utils/types";
+
+import { useDebounce } from "../../../hooks/useDebounce";
+
+import type { KonvaEventObject } from "konva/lib/Node";
+import type Konva from "konva";
 
 const delta = 10;
 export const useZoom = (stage?: Konva.Stage | null) => {

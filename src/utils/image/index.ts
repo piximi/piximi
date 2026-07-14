@@ -4,6 +4,8 @@ export { simplifyPolygon } from "./simplify";
 
 export { decodeRleArray, rleEncodeArray } from "./rle";
 
+export { getDistance } from "./point-operations";
+
 export {
   getIdx,
   connectPoints,

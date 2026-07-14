@@ -1,20 +1,19 @@
 import {
-  LayersModel,
   loadLayersModel,
-  Tensor,
-  Tensor3D,
-  Rank,
   train,
   tidy,
   image,
   browser,
   scalar,
 } from "@tensorflow/tfjs";
-import IJSImage from "image-js";
+import { Image as IJSImage } from "image-js-latest";
+
+import type { Point } from "utils/types";
 
 import { RectangularAnnotationTool } from "./RectangularAnnotationTool";
-import { Point } from "utils/types";
 import { AnnotationState } from "../enums";
+
+import type { LayersModel, Tensor, Tensor3D, Rank } from "@tensorflow/tfjs";
 
 export class ObjectAnnotationTool extends RectangularAnnotationTool {
   graph?: LayersModel;

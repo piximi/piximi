@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+
 import { batch, useDispatch, useSelector } from "react-redux";
 
 import { useHotkeys } from "hooks/useHotkeys";
@@ -7,17 +8,56 @@ import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
 import { selectActiveAnnotationsArray } from "views/ImageViewer/state/annotator/reselectors";
-
 import { getOverlappingAnnotations } from "views/ImageViewer/utils";
 import { getAnnotationsInBox } from "views/ImageViewer/utils/imageHelper";
-
 import { ToolType } from "views/ImageViewer/utils/enums";
-import { HotkeyContext } from "utils/enums";
 
-import { ProtoAnnotationObject } from "views/ImageViewer/utils/types";
-import { Point } from "utils/types";
+import { HotkeyContext } from "utils/enums";
+import type { Point } from "utils/types";
+
+import type { ProtoAnnotationObject } from "views/ImageViewer/utils/types";
 
 const delta = 10;
+
+const selectAnnotations = ({
+  position,
+  activeAnnotations,
+  selectedAnnotationsIds,
+  minimum,
+  addToExisting,
+}: {
+  position: Point;
+  activeAnnotations: ProtoAnnotationObject[];
+  selectedAnnotationsIds: string[];
+  addToExisting: boolean;
+  minimum: Point;
+}) => {
+  // correct minimum or maximum in the case where user may have selected rectangle from right to left
+
+  const minimumNew: { x: number; y: number } = {
+    x: minimum.x > position.x ? position.x : minimum.x,
+    y: minimum.y > position.y ? position.y : minimum.y,
+  };
+  if (!minimumNew) return [];
+  const maximumNew: { x: number; y: number } = {
+    x: minimum.x > position.x ? minimum.x : position.x,
+    y: minimum.y > position.y ? minimum.y : position.y,
+  };
+
+  const annotationsInBox = getAnnotationsInBox(
+    minimumNew,
+    maximumNew,
+    activeAnnotations,
+  );
+  if (!annotationsInBox) return [];
+
+  const newSelectedAnnotations: string[] = annotationsInBox.map((an) => an.id);
+  if (addToExisting) {
+    return [...new Set([...selectedAnnotationsIds, ...newSelectedAnnotations])];
+  } else {
+    return newSelectedAnnotations;
+  }
+};
 
 export const usePointerTool = (
   absolutePosition: any,
@@ -49,91 +89,34 @@ export const usePointerTool = (
     [],
   );
 
-  /*
-   * * HANDLE POINTER FUNCTIONS * *
-   */
-
-  const onPointerMouseDown = useCallback(
-    (position: { x: number; y: number }) => {
-      setDragging(false);
-      setMinimum(position);
-      setSelecting(true);
-    },
-    [],
-  );
-
-  const handlePointerMouseMove = useCallback(
-    (position: { x: number; y: number }) => {
-      if (!position || !selecting || !minimum) return;
-
-      setDragging(Math.abs(position.x - minimum.x) >= delta);
-      setMaximum(position);
-    },
-    [minimum, selecting],
-  );
-
   const selectEnclosedAnnotations = useCallback(
     (position: { x: number; y: number }) => {
-      if (!position || !selecting || !minimum) return;
-      // correct minimum or maximum in the case where user may have selected rectangle from right to left
-
-      const minimumNew: { x: number; y: number } = {
-        x: minimum.x > position.x ? position.x : minimum.x,
-        y: minimum.y > position.y ? position.y : minimum.y,
-      };
-      const maximumNew: { x: number; y: number } = {
-        x: minimum.x > position.x ? minimum.x : position.x,
-        y: minimum.y > position.y ? minimum.y : position.y,
-      };
-
-      if (!minimumNew || !activeAnnotations.length) {
-        setSelecting(false);
+      if (!position || !selecting || !minimum || activeAnnotations.length === 0)
         return;
-      }
-
-      const annotationsInBox = getAnnotationsInBox(
-        minimumNew,
-        maximumNew,
+      // correct minimum or maximum in the case where user may have selected rectangle from right to left
+      const selectedAnnotations = selectAnnotations({
+        position,
         activeAnnotations,
-      );
-
-      if (annotationsInBox.length) {
-        let newSelectedAnnotations: string[] = annotationsInBox.map(
-          (an) => an.id,
-        );
-        if (shift) {
-          newSelectedAnnotations = [
-            ...selectedAnnotationsIds,
-            ...newSelectedAnnotations,
-          ];
-        } else {
-          //only include if not already selected
-          const additionalAnnotations = newSelectedAnnotations.filter(
-            (id: string) => {
-              return !selectedAnnotationsIds.includes(id);
-            },
-          );
-          newSelectedAnnotations = [
-            ...selectedAnnotationsIds,
-            ...additionalAnnotations,
-          ];
-        }
+        minimum,
+        selectedAnnotationsIds,
+        addToExisting: shift,
+      });
+      if (selectedAnnotations.length > 0)
         batch(() => {
           dispatch(
             annotatorSlice.actions.setSelectedAnnotationIds({
-              annotationIds: newSelectedAnnotations,
-              workingAnnotationId: newSelectedAnnotations[0],
+              annotationIds: selectedAnnotations,
+              workingAnnotationId: selectedAnnotations[0],
             }),
           );
           dispatch(
             annotatorSlice.actions.setWorkingAnnotation({
               annotation: activeAnnotations.filter(
-                (annotation) => annotation.id === newSelectedAnnotations[0],
+                (annotation) => annotation.id === selectedAnnotations[0],
               )[0],
             }),
           );
         });
-      }
 
       setSelecting(false);
     },
@@ -240,6 +223,29 @@ export const usePointerTool = (
     deselectAllAnnotations,
     absolutePosition,
   ]);
+
+  /*
+   * * HANDLE POINTER FUNCTIONS * *
+   */
+
+  const onPointerMouseDown = useCallback(
+    (position: { x: number; y: number }) => {
+      setDragging(false);
+      setMinimum(position);
+      setSelecting(true);
+    },
+    [],
+  );
+
+  const handlePointerMouseMove = useCallback(
+    (position: { x: number; y: number }) => {
+      if (!position || !selecting || !minimum) return;
+
+      setDragging(Math.abs(position.x - minimum.x) >= delta);
+      setMaximum(position);
+    },
+    [minimum, selecting],
+  );
 
   const handlePointerMouseUp = useCallback(
     (position: { x: number; y: number }) => {

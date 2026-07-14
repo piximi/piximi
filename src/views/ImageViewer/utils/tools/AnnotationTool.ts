@@ -1,23 +1,22 @@
-import IJSImage from "image-js";
-
-import { Tool } from "./Tool";
+import { Image as IJSImage } from "image-js-latest";
 
 import {
   computeBoundingBoxFromContours as _computeBoundingBoxFromContours,
   maskFromPoints,
 } from "views/ImageViewer/utils";
-import { convertToDataArray } from "utils/dataUtils";
 import { generateUUID } from "store/data/utils";
-
-import { Partition } from "utils/dl/enums";
-import { AnnotationState } from "../enums";
-
-import {
+import type {
   DataArray,
   Category,
   PartialDecodedAnnotationObject,
 } from "store/data/types";
-import { Point } from "utils/types";
+
+import { convertToDataArray } from "utils/dataUtils";
+import { Partition } from "utils/dl/enums";
+import type { Point } from "utils/types";
+
+import { AnnotationState } from "../enums";
+import { Tool } from "./Tool";
 
 export abstract class AnnotationTool extends Tool {
   /**

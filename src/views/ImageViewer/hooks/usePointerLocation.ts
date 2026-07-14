@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import Konva from "konva";
-import IJSImage from "image-js";
 
-import { Point } from "utils/types";
+import type { Point } from "utils/types";
+
+import type { Image as IJSImage } from "image-js-latest";
+import type Konva from "konva";
 
 export const usePointerLocation = (
   imageRef: React.MutableRefObject<Konva.Image | null>,
@@ -109,9 +110,8 @@ export const usePointerLocation = (
       y = Math.min(originalImage.height - 1, absolutePosition.y);
     }
 
-    const pixelColor = originalImage
-      .getPixelXY(absolutePosition.x, y)
-      .slice(0, -1);
+    const pixelColor = originalImage.getPixel(absolutePosition.x, y);
+    //.slice(0, -1);
     setPixelColor(pixelColor.join(", "));
   }, [originalImage, absolutePosition?.x, absolutePosition?.y, outOfBounds]);
 

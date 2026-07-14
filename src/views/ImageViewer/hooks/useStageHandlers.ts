@@ -1,12 +1,9 @@
 // ignore-no-logs
 import { useCallback, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { KonvaEventObject } from "konva/lib/Node";
-import Konva from "konva";
-import { throttle } from "lodash";
 
-import { useZoom } from "./useZoom";
-import { usePointerTool } from "./usePointerTool";
+import { batch, useDispatch, useSelector } from "react-redux";
+
+import { throttle } from "lodash";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
@@ -14,20 +11,25 @@ import {
   selectSelectedAnnotationIds,
   selectToolType,
 } from "views/ImageViewer/state/annotator/selectors";
-
-import { logger } from "utils/logUtils";
-import {
-  AnnotationTool,
-  ObjectAnnotationTool,
-} from "views/ImageViewer/utils/tools";
-
 import {
   AnnotationMode,
   AnnotationState,
   ToolType,
 } from "views/ImageViewer/utils/enums";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
-import { Point } from "utils/types";
+import { logger } from "utils/logUtils";
+import type { Point } from "utils/types";
+
+import { usePointerTool } from "./usePointerTool";
+import { useZoom } from "./useZoom";
+
+import type {
+  AnnotationTool,
+  ObjectAnnotationTool,
+} from "views/ImageViewer/utils/tools";
+import type Konva from "konva";
+import type { KonvaEventObject } from "konva/lib/Node";
 
 const transformerClassName = "Transformer";
 const transformerButtonAttrNAme = "transformer-button";
@@ -77,18 +79,18 @@ export const useStageHandlers = (
   //   ) => {};
 
   const deselectAllAnnotations = useCallback(() => {
-    dispatch(
-      annotatorSlice.actions.setSelectedAnnotationIds({
-        annotationIds: [],
-        workingAnnotationId: undefined,
-      }),
-    );
-    dispatch(
-      annotatorSlice.actions.setAnnotationState({
-        annotationState: AnnotationState.Blank,
-        annotationTool,
-      }),
-    );
+    batch(() => {
+      dispatch(imageViewerDataSlice.actions.setSelectedAnnotationIds([]));
+      dispatch(
+        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
+      );
+      dispatch(
+        annotatorSlice.actions.setAnnotationState({
+          annotationState: AnnotationState.Blank,
+          annotationTool,
+        }),
+      );
+    });
   }, [dispatch, annotationTool]);
   const { onPointerMouseDown, handlePointerMouseMove, handlePointerMouseUp } =
     usePointerTool(

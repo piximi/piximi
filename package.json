@@ -63,6 +63,7 @@
     "semver": "^7.6.3",
     "stacktrace-js": "^2.0.2",
     "ts-priority-queue": "^0.1.1",
+    "use-image": "^1.1.4",
     "use-immer": "^0.11.0",
     "use-sound": "^4.0.1",
     "uuid": "^8.3.2",

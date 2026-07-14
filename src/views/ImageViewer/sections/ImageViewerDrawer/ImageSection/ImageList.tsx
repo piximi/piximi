@@ -20,8 +20,10 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 import { useRenderedSrc } from "hooks/useRenderedSrcs";
 
-import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectImageStackIds } from "@ImageViewer/state/image-viewer-data/selectors";
+import {
+  selectImageStackIds,
+  selectActiveImageId,
+} from "@ImageViewer/state/image-viewer-data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
   selectAnnotationsByImageId,

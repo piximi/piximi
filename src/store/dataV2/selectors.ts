@@ -523,6 +523,11 @@ export const selectCategoriesByKindId = createSelector(
     categories.filter((c) => c.type === "annotation" && c.kindId === kindId),
 );
 
+export const selectImageCategories = createSelector(
+  categorySelectors.selectAll,
+  (categories) => categories.filter((c) => c.type === "image"),
+);
+
 /*
  * ───────────────────────────────────────────────────────────────────────
  * ── Channels ───────────────────────────────────────────────────────────

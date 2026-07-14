@@ -1,4 +1,4 @@
-import IJSImage from "image-js";
+import type { Image as IJSImage } from "image-js-latest";
 export abstract class Tool {
   /**
    * Image-JS object of the active image (i.e. of the image that we are annotating on).
