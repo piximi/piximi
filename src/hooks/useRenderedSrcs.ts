@@ -11,9 +11,6 @@ import {
 
 /**
  * Returns the rendered preview src for an entity.
- *
- * - Legacy path: returns entity.src directly
- * - New pipeline: loads renderedSrc from IndexedDB StoredTensorData
  */
 export function useRenderedSrc(
   channels: ExtendedChannel[],
