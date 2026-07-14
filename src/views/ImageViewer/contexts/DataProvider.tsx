@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 
-import { useDispatch } from "react-redux";
+import { batch, useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 
 import { addListener, isAnyOf } from "@reduxjs/toolkit";
@@ -48,12 +48,17 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       routerLocation.state?.selectedItems?.imageIds ?? [];
     const initialAnnotationIds: string[] =
       routerLocation.state?.selectedItems?.annotationIds ?? [];
-    dispatch(imageViewerDataSlice.actions.setImageStack(initialImageIds));
-    dispatch(
-      imageViewerDataSlice.actions.setSelectedAnnotationIds(
-        initialAnnotationIds,
-      ),
-    );
+    batch(() => {
+      dispatch(imageViewerDataSlice.actions.setImageStack(initialImageIds));
+      dispatch(
+        imageViewerDataSlice.actions.setActiveImageId(initialImageIds[0]),
+      );
+      dispatch(
+        imageViewerDataSlice.actions.setSelectedAnnotationIds(
+          initialAnnotationIds,
+        ),
+      );
+    });
   }, [routerLocation.state]);
   return (
     <DataContext.Provider value={{ savedData }}>
