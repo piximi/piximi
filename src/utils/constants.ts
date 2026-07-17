@@ -9,7 +9,7 @@ export const APPLICATION_COLORS = {
 };
 
 export const DIMENSIONS = {
-  leftDrawerWidth: 256,
+  leftDrawerWidth: 312,
   toolDrawerWidth: 36,
   stagePaddingX: 50,
   stageInfoHeight: 21,

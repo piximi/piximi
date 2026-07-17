@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Drawer, Stack } from "@mui/material";
 
 import { ApplicationOptions } from "components/layout/app-drawer/ApplicationOptions";
+import { DIMENSIONS } from "utils/constants";
 
 export const BaseAppDrawer = ({
   children,
@@ -18,11 +19,11 @@ export const BaseAppDrawer = ({
       sx={{
         display: mobile ? "none" : "block",
         flexShrink: 0,
-        width: (theme) => theme.spacing(32),
+        width: DIMENSIONS.leftDrawerWidth,
         overflow: "hidden",
         "& > 	.MuiDrawer-paper": {
           zIndex: 99,
-          width: (theme) => theme.spacing(32),
+          width: DIMENSIONS.leftDrawerWidth,
           height: "100%",
           overflow: "hidden",
           position: "relative",
