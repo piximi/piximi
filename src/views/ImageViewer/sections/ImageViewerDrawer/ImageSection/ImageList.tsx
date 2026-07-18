@@ -126,50 +126,57 @@ export const ImageList = () => {
   return (
     <>
       <Box
-        display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
-        gridTemplateRows="1fr"
+        sx={{
+          position: "relative",
+          display: "flex",
+          width: "100%",
+          overflow: "hidden",
+        }}
       >
-        <Box gridColumn="1 / 13" gridRow="1 / 2">
-          <List
-            dense
-            disablePadding
-            component="div"
-            sx={(theme) => ({
-              maxHeight: `${3 * NUM_VIEW_IMS + 0.5}rem`,
-              overflowY: "scroll",
-              "::-webkit-scrollbar": { display: "none" },
-              width: "calc(100% - 5px)",
-              backgroundColor: theme.palette.background.paper,
-              pl: "5px",
+        <List
+          dense
+          disablePadding
+          component="div"
+          sx={(theme) => ({
+            maxHeight: `${3 * NUM_VIEW_IMS + 0.5}rem`,
+            overflowY: "scroll",
+            overflowX: "hidden",
+            "::-webkit-scrollbar": { display: "none" },
+            width: "100%",
+            backgroundColor: theme.palette.background.paper,
+          })}
+          onScroll={handleScroll}
+        >
+          {extendedImages
+            .slice(bufferRange.start, bufferRange.end)
+            .map((image, idx) => {
+              return (
+                <ImageListItem
+                  key={image.id}
+                  image={image}
+                  isActive={image.id === activeImageId}
+                  onItemClick={handleImageItemClick}
+                  onSecondaryClick={(event) =>
+                    handleImageMenuOpen(event, bufferRange.start + idx)
+                  }
+                />
+              );
             })}
-            onScroll={handleScroll}
-          >
-            {extendedImages
-              .slice(bufferRange.start, bufferRange.end)
-              .map((image, idx) => {
-                return (
-                  <ImageListItem
-                    key={image.id}
-                    image={image}
-                    isActive={image.id === activeImageId}
-                    onItemClick={handleImageItemClick}
-                    onSecondaryClick={(event) =>
-                      handleImageMenuOpen(event, bufferRange.start + idx)
-                    }
-                  />
-                );
-              })}
-          </List>
-        </Box>
-        <Box gridColumn="12 / 13" gridRow=" 1 / 2" justifyItems="flex-end">
+        </List>
+
+        <Box
+          sx={{
+            position: "absolute",
+            right: 0,
+            display: "flex",
+            justifyItems: "flex-end",
+          }}
+        >
           {extendedImages.length > NUM_BUFFERED_IMS && (
             <LinearProgress
               sx={{
                 width: 4,
                 height: `${3 * NUM_VIEW_IMS}rem`,
-
-                marginLeft: "auto",
                 "& span.MuiLinearProgress-bar": {
                   transform: `translateY(-${100 - scrollProgress}%) !important`, //has to have !important
                 },
@@ -230,6 +237,7 @@ const ImageListItem = memo(
             }
             disablePadding
             sx={{
+              width: "100%",
               "& .MuiListItemSecondaryAction-root": {
                 right: "8px",
               },
@@ -241,7 +249,7 @@ const ImageListItem = memo(
             <ListItemButton
               onClick={() => onItemClick(image)}
               selected={isActive}
-              sx={{ px: 0 }}
+              sx={{ px: 0, borderRadius: 0 }}
             >
               <ListItemIcon>
                 {
@@ -249,7 +257,12 @@ const ImageListItem = memo(
                     alt={image.name}
                     src={src}
                     variant={"rounded"}
-                    sx={{ mr: ".5rem", width: "35px", height: "35px" }}
+                    sx={{
+                      mr: ".5rem",
+                      ml: "0.25rem",
+                      width: "35px",
+                      height: "35px",
+                    }}
                   />
                 }
               </ListItemIcon>
