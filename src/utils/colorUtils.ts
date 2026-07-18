@@ -2,7 +2,8 @@ import { BitDepth } from "store/data/types";
 import { getRandomInt } from "./dataUtils";
 
 const componentToHex = (c: number) => {
-  const hex = (c * 255).toString(16);
+  c = c > 1 ? c : c * 255;
+  const hex = c.toString(16);
   return hex.length === 1 ? "0" + hex : hex;
 };
 
