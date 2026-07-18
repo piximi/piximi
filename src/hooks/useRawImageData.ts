@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Channel, BitDepth } from "store/dataV2/types";
+import { BitDepth, ExtendedChannel } from "store/dataV2/types";
 import { DataConnector } from "utils/data-connector";
 
 /**
  * Returns the raw channel data for a given entity.
  *
  */
-export function useRawImageData(channels: Channel[]): {
+export function useRawImageData(channels: ExtendedChannel[]): {
   channelData: Array<{
     bitDepth: BitDepth;
     data: Uint8Array<ArrayBuffer> | Uint16Array<ArrayBuffer>;
@@ -33,16 +33,17 @@ export function useRawImageData(channels: Channel[]): {
     const load = async () => {
       setLoading(true);
       try {
+        const visibleChannels = channels.filter((c) => c.visible);
         const storage = DataConnector.getInstance();
         const result = await storage.retrieveBatch(
-          channels.map((e) => ({
+          visibleChannels.map((e) => ({
             id: e.storageReference.storageId,
             storeName: e.storageReference.storeName,
           })),
         );
         if (!cancelled && result.success) {
           const { bitDepth } = result.data.get(
-            channels[0].storageReference.storageId,
+            visibleChannels[0].storageReference.storageId,
           )!;
 
           const channelData = [...result.data.values()].map((c) => ({

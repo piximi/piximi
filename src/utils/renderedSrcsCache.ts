@@ -9,7 +9,7 @@ export function getCacheKey(channels: ExtendedChannel[], crop?: BBox): string {
     channels
       .map(
         (c) =>
-          `${c.storageReference.storageId}:${c.rampMin}:${c.rampMax}:${c.colorMap}`,
+          `${c.storageReference.storageId}:${c.rampMin}:${c.rampMax}:${c.colorMap}:${String(c.visible)}`,
       )
       .join("|") +
     "|" +

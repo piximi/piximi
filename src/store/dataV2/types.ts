@@ -139,6 +139,7 @@ export type ExtendedChannel = Channel & {
   colorMap: ColorMap;
   rampMin: number;
   rampMax: number;
+  visible: boolean;
 };
 
 export type AnnotationVolume = {

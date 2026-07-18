@@ -39,16 +39,17 @@ export function useRenderedSrc(
     const load = async () => {
       setLoading(true);
       try {
+        const visibleChannels = channels.filter((c) => c.visible);
         const storage = DataConnector.getInstance();
         const result = await storage.retrieveBatch(
-          channels.map((e) => ({
+          visibleChannels.map((e) => ({
             id: e.storageReference.storageId,
             storeName: e.storageReference.storeName,
           })),
         );
         if (!cancelled && result.success) {
           const { width, height, bitDepth } = result.data.get(
-            channels[0].storageReference.storageId,
+            visibleChannels[0].storageReference.storageId,
           )!;
           const [x0, y0, x1, y1] = crop ?? [0, 0, width, height];
           const outW = x1 - x0;
@@ -57,7 +58,7 @@ export function useRenderedSrc(
           const rgbBuffer = new Uint8Array(pixelCount * 3);
 
           const luts = [...result.data.values()].map(({ data }, idx) => {
-            const { rampMin, rampMax, colorMap } = channels[idx];
+            const { rampMin, rampMax, colorMap } = visibleChannels[idx];
             const lut = createLUT({
               bitDepth,
               colorMap,

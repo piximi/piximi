@@ -185,6 +185,7 @@ const buildExtendedImage = (
       colorMap: meta.colorMap,
       rampMin: meta.rampMin,
       rampMax: meta.rampMax,
+      visible: meta.visible,
     });
     return acc;
   }, []);
@@ -354,6 +355,7 @@ const buildExtendedAnnotation = (
       colorMap: meta.colorMap,
       rampMin: meta.rampMin,
       rampMax: meta.rampMax,
+      visible: meta.visible,
     });
 
     return extChs;
@@ -569,12 +571,13 @@ export const selectActiveExtendedChannels = createSelector(
     const extChannels: ExtendedChannel[] = [];
     channels.forEach((ch) => {
       const meta = channelMetas[ch.channelMetaId];
-      if (ch.planeId !== activePlaneId || !meta || !meta.visible) return;
+      if (ch.planeId !== activePlaneId || !meta) return;
       extChannels.push({
         ...ch,
         colorMap: meta.colorMap,
         rampMin: meta.rampMin,
         rampMax: meta.rampMax,
+        visible: meta.visible,
       });
     });
     return extChannels;
