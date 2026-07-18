@@ -36,7 +36,7 @@ export function findBinOfPercentiles(
 }
 
 // Find bins at 10th / 90th percentile
-function findBestFitBins(
+export function findBestFitBins(
   histogram: ArrayBuffer,
   pixcount: number,
 ): [number, number] {
@@ -66,7 +66,7 @@ function findBestFitBins(
 }
 
 // Find min and max bins attempting to replicate ImageJ's "Auto" button
-function findAutoIJBins(
+export function findAutoIJBins(
   histogram: ArrayBuffer,
   pixcount: number,
 ): [number, number] {
@@ -146,6 +146,41 @@ export const RANGE_PRESETS = {
   AUTO1: "0%-100%",
   AUTO2: "10%-90%",
 } as const;
+
+export const applyChannelPreset = (
+  preset: keyof typeof RANGE_PRESETS,
+  histogram: ArrayBuffer,
+  numPixels: number,
+  globalLimits: [number, number],
+) => {
+  let rampMin: number;
+  let rampMax: number;
+  switch (preset) {
+    case "DEFAULT":
+      [rampMin, rampMax] = findBinOfPercentiles(
+        histogram,
+        numPixels,
+        0.5,
+        0.98,
+      );
+      break;
+    case "IMAGEJ":
+      const [imjMin, imjMax] = findAutoIJBins(histogram, numPixels);
+      rampMin = imjMin;
+      rampMax = imjMax;
+      break;
+    case "AUTO1":
+      rampMin = globalLimits[0];
+      rampMax = globalLimits[1];
+      break;
+    case "AUTO2":
+      const [aMin, aMax] = findBestFitBins(histogram, numPixels);
+      rampMin = aMin;
+      rampMax = aMax;
+  }
+
+  return { rampMin, rampMax };
+};
 
 export const processChannel = (channel: IJSImage) => {
   const histogram = channel.histogram().buffer as ArrayBuffer;

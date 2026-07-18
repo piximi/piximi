@@ -1,0 +1,1 @@
+export { ChannelConfig } from "./ChannelConfig";

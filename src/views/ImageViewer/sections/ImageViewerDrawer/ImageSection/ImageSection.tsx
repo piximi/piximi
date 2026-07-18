@@ -3,6 +3,7 @@ import React from "react";
 import { Box, Divider, Typography } from "@mui/material";
 
 import { ImageList } from "./ImageList";
+import { ChannelList } from "./ChannelList";
 
 export const ImageSection = () => {
   return (
@@ -19,6 +20,8 @@ export const ImageSection = () => {
       </Typography>
       <Divider flexItem orientation="horizontal" />
       <ImageList />
+      <Divider flexItem orientation="horizontal" />
+      <ChannelList />
     </Box>
   );
 };
