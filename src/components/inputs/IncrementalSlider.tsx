@@ -4,6 +4,17 @@ import { Add, Remove } from "@mui/icons-material";
 import { DIMENSIONS } from "utils/constants";
 import { CSSProperties, useMemo, useRef, useState } from "react";
 
+type IncrementalSliderProps = {
+  min: number;
+  max: number;
+  step: number;
+  initialValue?: number;
+  orientation?: "horizontal" | "vertical";
+  length?: CSSProperties["width"];
+  callback: (value: number) => void;
+  callbackOnSlide?: boolean;
+  outerStyle?: CSSProperties;
+};
 export const IncrementalSlider = ({
   min,
   max,
@@ -13,16 +24,8 @@ export const IncrementalSlider = ({
   callback,
   orientation = "horizontal",
   callbackOnSlide = false,
-}: {
-  min: number;
-  max: number;
-  step: number;
-  initialValue?: number;
-  orientation?: "horizontal" | "vertical";
-  length?: CSSProperties["width"];
-  callback: (value: number) => void;
-  callbackOnSlide?: boolean;
-}) => {
+  outerStyle,
+}: IncrementalSliderProps) => {
   const [value, setValue] = useState<number>(initialValue);
   const [valueLabelDisplay, setvalueLabelDisplay] = useState<"auto" | "on">(
     "auto",
@@ -40,11 +43,13 @@ export const IncrementalSlider = ({
           flexDirection: "row",
           alignItems: "center",
           height: DIMENSIONS.toolDrawerWidth,
+          ...outerStyle,
         }
       : {
           flexDirection: "column",
           alignItems: "center",
           width: DIMENSIONS.toolDrawerWidth,
+          ...outerStyle,
         };
   }, [orientation]);
   const sliderStyle: CSSProperties = useMemo(() => {
