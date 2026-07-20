@@ -539,6 +539,22 @@ export const dataSliceV2 = createSlice({
         changes: { activePlaneId: action.payload.planeId },
       });
     },
+    updateImageActivePlaneByIdx(
+      state,
+      action: PayloadAction<{ imageId: string; planeIdx: number }>,
+    ) {
+      const planes = Object.values(state.planes.entities).filter(
+        (p) => p.imageId === action.payload.imageId,
+      );
+      const planeId = planes.find(
+        (p) => p.zIndex === action.payload.planeIdx,
+      )?.id;
+      if (!planeId) return;
+      imageAdapter.updateOne(state.images, {
+        id: action.payload.imageId,
+        changes: { activePlaneId: planeId },
+      });
+    },
     updateImagePartition(
       state,
       action: PayloadAction<{ id: string; partition: Partition }>,
