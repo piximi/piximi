@@ -3,10 +3,11 @@ import { useMemo, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 
 import type { SelectChangeEvent } from "@mui/material";
-import { Box, MenuItem, Typography } from "@mui/material";
+import { Box, MenuItem, Popover, Typography } from "@mui/material";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 import { CategoryDialog } from "components/dialogs";
-import { StyledSelect, WithLabel } from "components/inputs";
+import { IncrementalSlider, StyledSelect, WithLabel } from "components/inputs";
 
 import type { Category, ExtendedImageObject } from "store/dataV2/types";
 import { dataSliceV2 } from "store/dataV2";
@@ -26,13 +27,17 @@ export const ActiveImageInfoStrip = ({
   width,
   show,
 }: {
-  image: ExtendedImageObject | null;
+  image: ExtendedImageObject;
   absolutePosition?: { x: number; y: number };
   width: number;
   show: boolean;
 }) => {
   const dispatch = useDispatch();
   const imageCategories: Category[] = useSelector(selectImageCategories);
+  const [planeSliderEl, setPlaneSliderEl] = useState<HTMLDivElement | null>(
+    null,
+  );
+  const numPlanes = image.shape.planes;
 
   const [createCategoryDialogOpen, setCreateCategoryDialogOpen] =
     useState(false);
@@ -50,7 +55,7 @@ export const ActiveImageInfoStrip = ({
   );
 
   const displayedPixelColor = useMemo(() => {
-    if (!absolutePosition || !show || channelsLoading || !image) return "n/a";
+    if (!absolutePosition || !show || channelsLoading) return "n/a";
 
     return channelData
       .map(
@@ -60,7 +65,6 @@ export const ActiveImageInfoStrip = ({
       .join(", ");
   }, [absolutePosition, show, image, channelsLoading, channelData]);
   const handleSelectCategory = (event: SelectChangeEvent<unknown>) => {
-    if (!image) return;
     const catId = event.target.value as string;
     if (catId === NEW_CATEGORY) {
       setCreateCategoryDialogOpen(true);
@@ -79,8 +83,18 @@ export const ActiveImageInfoStrip = ({
       dispatch(dataSliceV2.actions.addCategory(newCategory));
     });
   };
+  const zStackCallback = async (newValue: number | number[]) => {
+    if (typeof newValue === "number") {
+      dispatch(
+        dataSliceV2.actions.updateImageActivePlaneByIdx({
+          imageId: image.id,
+          planeIdx: newValue,
+        }),
+      );
+    }
+  };
 
-  return image ? (
+  return (
     <Box
       sx={(theme) => ({
         backgroundColor: theme.palette.background.paper,
@@ -162,7 +176,52 @@ export const ActiveImageInfoStrip = ({
             ))}
           </StyledSelect>
         </WithLabel>
-        <Typography variant="body2">Plane: {image.activePlaneIdx}</Typography>
+        <Box
+          onClick={(e) => {
+            numPlanes > 0 && setPlaneSliderEl(e.currentTarget);
+          }}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            cursor: numPlanes > 0 ? "pointer" : "default",
+          }}
+        >
+          <Typography variant="body2">Plane: {image.activePlaneIdx}</Typography>
+          {numPlanes > 0 && <ArrowDropDownIcon />}
+        </Box>
+        <Popover
+          open={!!planeSliderEl}
+          anchorEl={planeSliderEl}
+          onClose={() => setPlaneSliderEl(null)}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "center",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "left",
+          }}
+          slotProps={{ paper: { sx: { overflow: "visible" } } }}
+        >
+          <Box
+            sx={{
+              bgcolor: "background.paper",
+              borderRadius: "8px",
+            }}
+          >
+            <IncrementalSlider
+              min={0}
+              max={image.shape.planes}
+              step={1}
+              initialValue={image.activePlaneIdx}
+              callback={zStackCallback}
+              orientation="vertical"
+              length="100px"
+              callbackOnSlide={true}
+              outerStyle={{ borderRadius: 0 }}
+            />
+          </Box>
+        </Popover>
       </Box>
       <CategoryDialog
         open={createCategoryDialogOpen}
@@ -172,17 +231,5 @@ export const ActiveImageInfoStrip = ({
         options={CATEGORY_DIALOG_OPTIONS}
       />
     </Box>
-  ) : (
-    <Box
-      sx={(theme) => ({
-        backgroundColor: theme.palette.background.paper,
-        width: width - 2 + "px",
-        height: DIMENSIONS.stageInfoHeight,
-
-        position: "absolute",
-        bottom: 0,
-        zIndex: 1000,
-      })}
-    ></Box>
   );
 };

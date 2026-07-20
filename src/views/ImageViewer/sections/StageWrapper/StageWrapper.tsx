@@ -6,7 +6,7 @@ import { useMobileView } from "hooks";
 
 import { DIMENSIONS } from "utils/constants";
 
-import { Stage } from "../Stage";
+import { ThreeStage } from "../ThreeStage/ThreeStage";
 
 export const StageWrapper = () => {
   const [width, setWidth] = useState<number>(
@@ -54,7 +54,7 @@ export const StageWrapper = () => {
         overflow: "visible",
       })}
     >
-      <Stage stageWidth={width} stageHeight={stageHeight} />
+      <ThreeStage stageWidth={width} stageHeight={stageHeight} />
     </Box>
   );
 };

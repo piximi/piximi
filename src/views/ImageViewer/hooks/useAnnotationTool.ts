@@ -2,8 +2,6 @@ import { useContext, useEffect, useState } from "react";
 
 import { useSelector } from "react-redux";
 
-import { decode } from "image-js-latest";
-
 import { StageContext } from "views/ImageViewer/state/StageContext";
 import {
   selectPenSelectionBrushSize,
@@ -30,8 +28,7 @@ import { ToolType } from "views/ImageViewer/utils/enums";
 import type { Image as IJSImage } from "image-js-latest";
 import type { AnnotationTool } from "views/ImageViewer/utils/tools";
 
-export const useAnnotationTool = (imageSrc: string | undefined) => {
-  const [image, setImage] = useState<IJSImage>();
+export const useAnnotationTool = (ijsImage: IJSImage | null) => {
   const [operator, setOperator] = useState<AnnotationTool>(
     new BlankAnnotationTool(),
   );
@@ -43,38 +40,27 @@ export const useAnnotationTool = (imageSrc: string | undefined) => {
   const threshold = useSelector(selectThresholdAnnotationValue);
 
   useEffect(() => {
-    if (!imageSrc) return;
-    const loadImage = async () => {
-      const response = await fetch(imageSrc);
-      const buffer = await response.arrayBuffer();
-      const image = decode(new Uint8Array(buffer));
-      setImage(image);
-    };
-    loadImage();
-  }, [imageSrc]);
-
-  useEffect(() => {
-    if (!image) return;
+    if (!ijsImage) return;
 
     switch (operation) {
       case ToolType.ColorAnnotation:
-        setOperator(new ColorAnnotationTool(image));
+        setOperator(new ColorAnnotationTool(ijsImage));
 
         return;
       case ToolType.EllipticalAnnotation:
-        setOperator(new EllipticalAnnotationTool(image));
+        setOperator(new EllipticalAnnotationTool(ijsImage));
 
         return;
       case ToolType.LassoAnnotation:
-        setOperator(new LassoAnnotationTool(image));
+        setOperator(new LassoAnnotationTool(ijsImage));
 
         return;
       case ToolType.MagneticAnnotation:
-        setOperator(new MagneticAnnotationTool(image, 0.5));
+        setOperator(new MagneticAnnotationTool(ijsImage, 0.5));
 
         return;
       case ToolType.ObjectAnnotation:
-        ObjectAnnotationTool.compile(image).then(
+        ObjectAnnotationTool.compile(ijsImage).then(
           (operator: ObjectAnnotationTool) => {
             setOperator(operator);
           },
@@ -82,35 +68,35 @@ export const useAnnotationTool = (imageSrc: string | undefined) => {
 
         return;
       case ToolType.PenAnnotation:
-        setOperator(new PenAnnotationTool(image));
+        setOperator(new PenAnnotationTool(ijsImage));
 
         return;
       case ToolType.PolygonalAnnotation:
-        setOperator(new PolygonalAnnotationTool(image));
+        setOperator(new PolygonalAnnotationTool(ijsImage));
 
         return;
       case ToolType.QuickAnnotation:
-        setOperator(new QuickAnnotationTool(image));
+        setOperator(new QuickAnnotationTool(ijsImage));
 
         return;
       case ToolType.ThresholdAnnotation:
-        setOperator(new ThresholdAnnotationTool(image));
+        setOperator(new ThresholdAnnotationTool(ijsImage));
 
         return;
       case ToolType.RectangularAnnotation:
-        setOperator(new RectangularAnnotationTool(image));
+        setOperator(new RectangularAnnotationTool(ijsImage));
 
         return;
       case ToolType.Pointer:
-        setOperator(new SelectionTool(image));
+        setOperator(new SelectionTool(ijsImage));
 
         return;
       default:
-        setOperator(new BlankAnnotationTool(image));
+        setOperator(new BlankAnnotationTool(ijsImage));
 
         return;
     }
-  }, [operation, image]);
+  }, [operation, ijsImage]);
 
   useEffect(() => {
     if (operator instanceof ThresholdAnnotationTool) {
