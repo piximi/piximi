@@ -34,6 +34,10 @@ export function useRawImageData(channels: ExtendedChannel[]): {
       setLoading(true);
       try {
         const visibleChannels = channels.filter((c) => c.visible);
+        if (visibleChannels.length === 0) {
+          setChannelData([]);
+          return;
+        }
         const storage = DataConnector.getInstance();
         const result = await storage.retrieveBatch(
           visibleChannels.map((e) => ({
