@@ -38,6 +38,7 @@ export const ActiveImageInfoStrip = ({
     null,
   );
   const numPlanes = image.shape.planes;
+  const imageIsZStack = numPlanes > 1;
 
   const [createCategoryDialogOpen, setCreateCategoryDialogOpen] =
     useState(false);
@@ -178,16 +179,16 @@ export const ActiveImageInfoStrip = ({
         </WithLabel>
         <Box
           onClick={(e) => {
-            numPlanes > 0 && setPlaneSliderEl(e.currentTarget);
+            imageIsZStack && setPlaneSliderEl(e.currentTarget);
           }}
           sx={{
             display: "flex",
             alignItems: "center",
-            cursor: numPlanes > 0 ? "pointer" : "default",
+            cursor: imageIsZStack ? "pointer" : "default",
           }}
         >
           <Typography variant="body2">Plane: {image.activePlaneIdx}</Typography>
-          {numPlanes > 0 && <ArrowDropDownIcon />}
+          {imageIsZStack && <ArrowDropDownIcon />}
         </Box>
         <Popover
           open={!!planeSliderEl}
