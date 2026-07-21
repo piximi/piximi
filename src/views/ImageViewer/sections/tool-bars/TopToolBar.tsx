@@ -1,10 +1,11 @@
 import React from "react";
+
 import { Divider, Box, Stack } from "@mui/material";
 
-import { useAnnotatorToolShortcuts } from "../../hooks";
-
 import { DIMENSIONS } from "utils/constants";
-import { ColorOptions, SelectionOptions, ZoomOptions } from "./tools";
+
+import { useAnnotatorToolShortcuts } from "../../hooks";
+import { SelectionOptions, ZoomOptions } from "./tools";
 import { ImageViewerLogo } from "../ImageViewerAppBar/ImageViewerAppBar";
 
 export const TopToolBar = () => {
@@ -37,8 +38,7 @@ export const TopToolBar = () => {
         })}
       >
         <ZoomOptions />
-        <Divider orientation="vertical" flexItem />
-        <ColorOptions />
+
         <Divider orientation="vertical" flexItem />
         <SelectionOptions />
       </Box>
