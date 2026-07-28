@@ -105,6 +105,13 @@ export type V2AnnotationVolume = {
   kindId: string;
   categoryId: string;
 };
+export const V2_OBJECT_FEATURES = [
+  "area",
+  "sphericity",
+  "radius",
+  "perimeter",
+] as const;
+export type V2FeatureKey = (typeof V2_OBJECT_FEATURES)[number];
 export type V2AnnotationObject = {
   id: string;
   planeId: string;
@@ -115,6 +122,7 @@ export type V2AnnotationObject = {
   boundingBox: [number, number, number, number];
   encodedMask: Array<number>;
   decodedMask?: DataArray;
+  features?: Partial<Record<V2FeatureKey, number>>;
 };
 
 export type V2DataState = {

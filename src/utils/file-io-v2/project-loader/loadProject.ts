@@ -6,6 +6,7 @@ import type { CancelToken } from "utils/worker-scheduler/types";
 import type { ExtractedModelFileMap } from "utils/dl/types";
 import { logger } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
+import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
 
 import { FileStore, ZipStore } from "./zarr/stores";
 import { getAttr } from "./zarr/utils";
@@ -87,6 +88,11 @@ export async function loadProject(
     default:
       throw new Error(`Unsupported version: ${projectVersion}`);
   }
+  const annotations = v2.data.annotations.entities;
+  const objectFeatures = computeObjectFeatures(Object.values(annotations));
+  Object.entries(objectFeatures).forEach(([id, features]) => {
+    annotations[id].features = features;
+  });
   return { project: v2, modelFiles };
 }
 

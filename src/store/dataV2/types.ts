@@ -155,6 +155,13 @@ export type AnnotationVolumeEntities = Record<string, AnnotationVolume>;
 
 // BBox = [x1, y1, x2, y2]
 export type BBox = [number, number, number, number];
+export const OBJECT_FEATURES = [
+  "area",
+  "sphericity",
+  "radius",
+  "perimeter",
+] as const;
+export type FeatureKey = (typeof OBJECT_FEATURES)[number];
 export type AnnotationObject = {
   id: string;
   planeId: string;
@@ -165,6 +172,7 @@ export type AnnotationObject = {
   boundingBox: BBox;
   encodedMask: Array<number>;
   decodedMask?: DataArray;
+  features?: Partial<Record<FeatureKey, number>>;
 };
 export type AnnotationEntities = Record<string, AnnotationObject>;
 
