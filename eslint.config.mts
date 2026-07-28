@@ -2,6 +2,8 @@ import globals from "globals";
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
+// @ts-expect-error - eslint-plugin-no-autofix ships no type declarations
+import noAutofix from "eslint-plugin-no-autofix";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import { importX } from "eslint-plugin-import-x";
 
@@ -25,7 +27,15 @@ export default tseslint.config(
 
   pluginReact.configs.flat.recommended,
   pluginReact.configs.flat["jsx-runtime"],
-
+  {
+    plugins: {
+      "no-autofix": noAutofix,
+    },
+    rules: {
+      "prefer-const": "off",
+      "no-autofix/prefer-const": "warn",
+    },
+  },
   {
     files: ["**/*.{js,mjs,jsx,ts,mts,tsx}"],
     settings: {
