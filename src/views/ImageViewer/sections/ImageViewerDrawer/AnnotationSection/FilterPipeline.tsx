@@ -208,33 +208,31 @@ export const FilterPipeline = ({
           </Typography>
         </Box>
       </Box>
-      {/* scrollable slot: empty-state message OR the single layer row */}
-      <Box sx={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
-        {!layer && (
-          <Typography
-            sx={{
-              textAlign: "center",
-              fontSize: 11.5,
-              color: "text.disabled",
-            }}
-          >
-            Select options below, then{" "}
-            <b style={{ color: "var(--mui-palette-text-primary)" }}>
-              Create filter
-            </b>{" "}
-            to start filtering.
-          </Typography>
-        )}
-        {layer && (
-          <LayerRow
-            layer={layer}
-            kinds={kinds}
-            remaining={viewCount}
-            onToggle={onToggle}
-            onDelete={onDelete}
-          />
-        )}
-      </Box>
+
+      {!layer && (
+        <Typography
+          sx={{
+            textAlign: "center",
+            fontSize: 11.5,
+            color: "text.disabled",
+          }}
+        >
+          Select options below, then{" "}
+          <b style={{ color: "var(--mui-palette-text-primary)" }}>
+            Create filter
+          </b>{" "}
+          to start filtering.
+        </Typography>
+      )}
+      {layer && (
+        <LayerRow
+          layer={layer}
+          kinds={kinds}
+          remaining={viewCount}
+          onToggle={onToggle}
+          onDelete={onDelete}
+        />
+      )}
 
       {/* promote selection → filter */}
       <Box sx={{ display: "flex", gap: 1 }}>

@@ -22,8 +22,7 @@ import { useParameterizedSelector } from "store/hooks";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import {
   activeFeatureList,
-  expandSelection,
-  layerFeaturesToState,
+  mergeFeatureRanges,
   splitSelection,
 } from "@ImageViewer/state/image-viewer-data/utils";
 
@@ -144,33 +143,32 @@ export const useAnnotationSelection = () => {
   const clearSel = () => {
     dispatch(imageViewerDataSlice.actions.clearSelectionLayer());
   };
-  // ---- create or update the single filter layer from the selection ----
+  // ---- create the filter, or merge the selection into the existing one ----
   const handleApplyFilter = () => {
     if (!anySel) return;
-    const { kindIds, catIds } = splitSelection(selCats, kinds);
-    const layer = {
-      enabled: true,
-      mode,
-      catIds,
-      kindIds,
-      features: activeFeats,
-    };
+    const { kindIds: newKindIds, catIds: newCatIds } = splitSelection(
+      selCats,
+      kinds,
+    );
+    const layer = filterLayer
+      ? {
+          enabled: true,
+          mode,
+          catIds: [...new Set([...filterLayer.catIds, ...newCatIds])],
+          kindIds: [...new Set([...filterLayer.kindIds, ...newKindIds])],
+          features: mergeFeatureRanges(filterLayer.features, activeFeats),
+        }
+      : {
+          enabled: true,
+          mode,
+          catIds: newCatIds,
+          kindIds: newKindIds,
+          features: activeFeats,
+        };
     batch(() => {
       dispatch(imageViewerDataSlice.actions.setFilterLayer(layer));
       dispatch(imageViewerDataSlice.actions.clearSelectionLayer());
     });
-  };
-
-  // ---- load the existing layer's criteria back onto the selection surface ----
-  const handleEditLayer = () => {
-    if (!filterLayer) return;
-    dispatch(
-      imageViewerDataSlice.actions.setSelectionLayer({
-        catIds: expandSelection(filterLayer, kinds),
-        features: layerFeaturesToState(filterLayer.features),
-      }),
-    );
-    setMode(filterLayer.mode);
   };
 
   const handleToggleFilter = () => {
@@ -213,7 +211,6 @@ export const useAnnotationSelection = () => {
     selectAll,
     clearSel,
     handleApplyFilter,
-    handleEditLayer,
     handleToggleFilter,
     handleDeleteFilter,
     idsForScope,
