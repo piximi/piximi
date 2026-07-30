@@ -1,18 +1,17 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-import { distinctFilter, mutatingFilter } from "utils/arrayUtils";
+import { ToolType, ZoomMode } from "views/ImageViewer/utils/enums";
 
-import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "store/data/constants";
-import { ZoomMode } from "views/ImageViewer/utils/enums";
+import { annotatorSlice } from "../annotator";
 
-import { ImageViewerState } from "../../utils/types";
-import {
+import type {
   ColorAdjustmentOptionsType,
   ZoomToolOptionsType,
+  ImageViewerState,
 } from "views/ImageViewer/utils/types";
+import type { PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: ImageViewerState = {
-  imageStack: [],
   colorAdjustment: {
     blackPoint: 0,
     brightness: 0,
@@ -25,12 +24,8 @@ const initialState: ImageViewerState = {
     vibrance: 0,
   },
   cursor: "default",
-  activeImageId: undefined,
-  activeAnnotationIds: [],
-  activeImageRenderedSrcs: [],
+
   imageOrigin: { x: 0, y: 0 },
-  filters: { categoryId: [] },
-  selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
   stageHeight: 1000,
   stageScale: 1,
   stageWidth: 1000,
@@ -49,9 +44,6 @@ const initialState: ImageViewerState = {
     toActualSize: false,
     toFit: false,
   },
-  imageIsLoading: false,
-  highlightedCategory: undefined,
-  hasUnsavedChanges: false,
 };
 
 export const imageViewerSlice = createSlice({
@@ -63,92 +55,7 @@ export const imageViewerSlice = createSlice({
       _state,
       _action: PayloadAction<{ selectedThingIds: string[] }>,
     ) => {},
-    setImageStack(state, action: PayloadAction<{ imageIds: string[] }>) {
-      state.imageStack = action.payload.imageIds;
-    },
-    setHasUnsavedChanges(
-      state,
-      action: PayloadAction<{ hasUnsavedChanges: boolean }>,
-    ) {
-      state.hasUnsavedChanges = action.payload.hasUnsavedChanges;
-    },
-    addActiveAnnotationId(
-      state,
-      action: PayloadAction<{ annotationId: string }>,
-    ) {
-      state.activeAnnotationIds.push(action.payload.annotationId);
-    },
-    addActiveAnnotationIds(
-      state,
-      action: PayloadAction<{ annotationIds: Array<string> }>,
-    ) {
-      for (const annotationId of action.payload.annotationIds) {
-        imageViewerSlice.caseReducers.addActiveAnnotationId(state, {
-          type: "addActiveAnnotationId",
-          payload: { annotationId },
-        });
-      }
-    },
-    setActiveAnnotationIds(
-      state,
-      action: PayloadAction<{
-        annotationIds: Array<string>;
-      }>,
-    ) {
-      state.activeAnnotationIds = [];
-      imageViewerSlice.caseReducers.addActiveAnnotationIds(state, {
-        type: "addActiveAnnotationIds",
-        payload: { annotationIds: action.payload.annotationIds },
-      });
-    },
-    removeActiveAnnotationId(
-      state,
-      action: PayloadAction<{
-        annotationId: string;
-      }>,
-    ) {
-      mutatingFilter(
-        state.activeAnnotationIds,
-        (annotationId) => annotationId !== action.payload.annotationId,
-      );
-    },
-    removeActiveAnnotationIds(
-      state,
-      action: PayloadAction<{
-        annotationIds: Array<string>;
-      }>,
-    ) {
-      for (const annotationId of action.payload.annotationIds) {
-        imageViewerSlice.caseReducers.removeActiveAnnotationId(state, {
-          type: "removeActiveAnnotationId",
-          payload: { annotationId },
-        });
-      }
-    },
-    setSelectedCategoryId(
-      state,
-      action: PayloadAction<{ selectedCategoryId: string }>,
-    ) {
-      state.selectedCategoryId = action.payload.selectedCategoryId;
-    },
-    setActiveImageId(
-      state,
-      action: PayloadAction<{
-        imageId: string | undefined;
-        prevImageId: string | undefined;
-      }>,
-    ) {
-      state.activeImageId = action.payload.imageId;
-      // reset selected annotations
-    },
-    setActiveImageRenderedSrcs(
-      state,
-      action: PayloadAction<{
-        renderedSrcs: Array<string>;
-      }>,
-    ) {
-      state.activeImageRenderedSrcs = action.payload.renderedSrcs;
-    },
+
     setImageOrigin(
       state,
       action: PayloadAction<{ origin: { x: number; y: number } }>,
@@ -220,44 +127,22 @@ export const imageViewerSlice = createSlice({
     ) {
       state.zoomOptions = { ...state.zoomOptions, ...action.payload.options };
     },
-    setImageIsLoading(state, action: PayloadAction<{ isLoading: boolean }>) {
-      state.imageIsLoading = action.payload.isLoading;
-    },
-    updateHighlightedAnnotationCategory(
-      state,
-      action: PayloadAction<{ categoryId: string | undefined }>,
-    ) {
-      state.highlightedCategory = action.payload.categoryId;
-    },
-    addFilters(
-      state,
-      action: PayloadAction<{
-        categoryIds: string[];
-      }>,
-    ) {
-      const newFilters = [
-        ...state.filters["categoryId"],
-        ...action.payload.categoryIds,
-      ].filter(distinctFilter);
-      state.filters["categoryId"] = newFilters;
-    },
-    removeFilters(
-      state,
-      action: PayloadAction<{
-        categoryIds?: string[];
-        all?: boolean;
-      }>,
-    ) {
-      if (action.payload.all) {
-        state.filters["categoryId"] = [];
-        return;
+  },
+  extraReducers(builder) {
+    builder.addCase(annotatorSlice.actions.setToolType, (state, action) => {
+      const { operation } = action.payload;
+
+      switch (operation) {
+        case ToolType.RectangularAnnotation:
+        case ToolType.EllipticalAnnotation:
+          state.cursor = "crosshair";
+          break;
+        case ToolType.PenAnnotation:
+          state.cursor = "none";
+          break;
+        default:
+          state.cursor = "pointer";
       }
-      if (action.payload.categoryIds) {
-        mutatingFilter(
-          state.filters["categoryId"],
-          (id) => !action.payload.categoryIds!.includes(id),
-        );
-      }
-    },
+    });
   },
 });

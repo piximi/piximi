@@ -1,7 +1,7 @@
-import { ImageViewerState } from "../../utils/types";
-import {
+import type {
   ColorAdjustmentOptionsType,
   ZoomToolOptionsType,
+  ImageViewerState,
 } from "views/ImageViewer/utils/types";
 
 export const selectZoomToolOptions = ({
@@ -58,60 +58,12 @@ export const selectStageHeight = ({
   return imageViewer.stageHeight;
 };
 
-export const selectSelectedIVCategoryId = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.selectedCategoryId;
-};
-
-export const selectImageViewerFilters = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.filters;
-};
-
-export const selectImageStackImageIds = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.imageStack;
-};
-
 export const selectImageOrigin = ({
   imageViewer,
 }: {
   imageViewer: ImageViewerState;
 }) => {
   return imageViewer.imageOrigin;
-};
-
-export const selectImageIsloading = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.imageIsLoading;
-};
-
-export const selectHighligtedIVCatogory = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.highlightedCategory;
-};
-
-export const selectFilteredImageViewerCategoryIds = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.filters.categoryId;
 };
 
 export const selectCursor = ({
@@ -128,40 +80,4 @@ export const selectColorAdjustments = ({
   imageViewer: ImageViewerState;
 }): ColorAdjustmentOptionsType => {
   return imageViewer.colorAdjustment;
-};
-
-export const selectActiveImageRenderedSrcs = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}): Array<string> => {
-  return imageViewer.activeImageRenderedSrcs;
-};
-
-export const selectActiveImageId = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}): string | undefined => {
-  return imageViewer.activeImageId;
-};
-
-export const selectActiveAnnotationIds = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.activeAnnotationIds;
-};
-
-/*
-UNSAVED CHANGES
-*/
-
-export const selectHasUnsavedChanges = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerState;
-}) => {
-  return imageViewer.hasUnsavedChanges;
 };

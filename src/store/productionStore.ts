@@ -8,8 +8,6 @@ import {
 } from "@reduxjs/toolkit";
 import logger from "redux-logger";
 
-import { annotatorMiddleware } from "views/ImageViewer/state/annotator/annotatorListeners";
-import { imageViewerMiddleware } from "views/ImageViewer/state/imageViewer/imageViewerListeners";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { rootReducer, RootState } from "./rootReducer";
@@ -33,8 +31,6 @@ const loggingMiddleware: Middleware[] =
     : [];
 
 const listenerMiddlewares: Middleware[] = [
-  annotatorMiddleware.middleware,
-  imageViewerMiddleware.middleware,
   projectMiddleware.middleware,
   dataMiddleware.middleware,
   measurementsMiddleware.middleware,
