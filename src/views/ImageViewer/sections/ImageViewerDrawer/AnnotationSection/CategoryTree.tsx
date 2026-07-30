@@ -26,6 +26,10 @@ import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import GestureIcon from "@mui/icons-material/Gesture";
 import { Label as CategoryIcon } from "@mui/icons-material";
 
+import { useDialogHotkey } from "hooks";
+
+import { ConfirmationDialog } from "components/dialogs";
+
 import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
 import { generateCategory, generateKind } from "store/dataV2/utils";
 import { dataSliceV2 } from "store/dataV2";
@@ -33,6 +37,7 @@ import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/image
 
 import { representsUnknown } from "utils/stringUtils";
 import { getCategoryIconStyle } from "utils/styleUtils";
+import { HotkeyContext } from "utils/enums";
 
 import { TaxonomyDialog } from "./TaxonomyDialogForm";
 
@@ -84,6 +89,12 @@ export const CategoryTree = ({
   const [dialog, setDialog] = useState<TaxonomyDialogRequest | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const selectedCategory = useSelector(selectSelectedCategory);
+
+  const {
+    onOpen: openDeleteConfirm,
+    onClose: closeDeleteConfirm,
+    open: deleteConfirmOpen,
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   const handleToggleExpand = (id: string) =>
     setExpanded((e) => ({ ...e, [id]: !e[id] }));
@@ -209,11 +220,9 @@ export const CategoryTree = ({
     setDialog(null);
   };
 
-  const handleDeleteEntity = (
-    type: EntityType,
-    kindId: string,
-    catId: string | null,
-  ) => {
+  const handleDeleteEntity = () => {
+    if (!menu) return;
+    const { type, kindId, catId } = menu;
     const k = groups.find((k) => k.id === kindId);
     if (!k) return;
     if (type === "kind") {
@@ -446,8 +455,7 @@ export const CategoryTree = ({
         <MenuItem
           sx={{ color: "error.main" }}
           onClick={() => {
-            handleDeleteEntity(menu!.type, menu!.kindId, menu!.catId);
-            close();
+            openDeleteConfirm();
           }}
         >
           <DeleteIcon sx={{ fontSize: 18, mr: 1.5 }} /> Delete{" "}
@@ -459,6 +467,18 @@ export const CategoryTree = ({
         onClose={() => setDialog(null)}
         onSave={handleSaveDialog}
       />
+      {menu && (
+        <ConfirmationDialog
+          title={`Delete ${menu!.type === "kind" ? "Kind" : "Category"}`}
+          content={`Annotations of this ${menu!.type === "kind" ? "kind" : "category"} will be reassigned to "Unknown"`}
+          onConfirm={handleDeleteEntity}
+          onClose={() => {
+            closeDeleteConfirm();
+            close();
+          }}
+          isOpen={deleteConfirmOpen}
+        />
+      )}
     </Box>
   );
 };
