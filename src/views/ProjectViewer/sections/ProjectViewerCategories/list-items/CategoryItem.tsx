@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 import type { Theme } from "@mui/material";
-import { lighten, darken, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import {
   Label as CategoryIcon,
   LabelOutlined as FilteredCategoryIcon,
@@ -20,7 +20,7 @@ import { selectEntityCountByCategoryId } from "store/dataV2/selectors";
 import { selectActiveFilters } from "@ProjectViewer/state/selectors";
 
 import { APPLICATION_COLORS } from "utils/constants";
-import { haloFilter } from "utils/styleUtils";
+import { getCategoryIconStyle } from "utils/styleUtils";
 
 type CategoryItemProps = {
   showHK?: boolean;
@@ -63,13 +63,7 @@ export const CategoryItem = ({
   };
 
   const iconStyle = useCallback(
-    (theme: Theme) => {
-      const augment = theme.palette.mode === "dark" ? lighten : darken;
-      return {
-        color: category.color,
-        filter: haloFilter(augment(category.color, 0.5), 0.5),
-      };
-    },
+    (theme: Theme) => getCategoryIconStyle(theme, category.color),
     [category],
   );
 
