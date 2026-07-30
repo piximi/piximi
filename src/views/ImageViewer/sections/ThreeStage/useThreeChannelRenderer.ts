@@ -188,6 +188,9 @@ export const useThreeChannelRenderer = (
 
     const buf = new Uint8Array(imageWidth * imageHeight * 4);
     renderer.readRenderTargetPixels(target, 0, 0, imageWidth, imageHeight, buf);
+    // Three.js stage has origin at lower left corner, but imageJS expects top left
+    // so the image needs to be flipped before being saved and later used in annotation
+    // tools
     onIjsImageReady(
       new IJSImage(imageWidth, imageHeight, {
         data: buf,
