@@ -23,3 +23,32 @@ export const selectActiveImageId = ({
 }) => {
   return imageViewerData.activeImageId;
 };
+
+export const selectFilterLayer = ({
+  imageViewerData,
+}: {
+  imageViewerData: ImageViewerDataState;
+}) => {
+  return imageViewerData.filterLayer;
+};
+export const selectPlaneScope = ({
+  imageViewerData,
+}: {
+  imageViewerData: ImageViewerDataState;
+}) => {
+  return imageViewerData.planeScope;
+};
+export const selectSelectedCategory = ({
+  imageViewerData,
+}: {
+  imageViewerData: ImageViewerDataState;
+}) => {
+  return imageViewerData.selectedCategory;
+};
+export const selectSelectionLayer = ({
+  imageViewerData,
+}: {
+  imageViewerData: ImageViewerDataState;
+}) => {
+  return imageViewerData.selectionLayer;
+};

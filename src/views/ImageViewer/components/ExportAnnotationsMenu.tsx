@@ -2,37 +2,27 @@ import React, { useCallback, useState } from "react";
 
 import { useSelector } from "react-redux";
 
-//import { saveAs } from "file-saver";
-//import JSZip from "jszip";
 import { ListItemText, Menu, MenuItem } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { ExportAnnotationsDialog } from "components/dialogs";
 
-import {
-  selectAllObjectCategories,
-  selectAllObjectKinds,
-  selectDataState,
-  selectObjectCategoryDict,
-} from "store/data/selectors";
-import { selectHasUnsavedChanges } from "views/ImageViewer/state/imageViewer/selectors";
-import {
-  selectImageViewerObjects,
-  selectImageViewerObjectsArray,
-  selectImageViewerImages,
-  selectImagesArray,
-} from "views/ImageViewer/state/annotator/reselectors";
 import type { ExtendedImageObject } from "store/dataV2/types";
+import {
+  selectExtendedAnnotationsByImageId,
+  selectImageEntities,
+  selectKindEntities,
+} from "store/dataV2/selectors";
+import { useParameterizedSelector } from "store/hooks";
 
 import { HotkeyContext } from "utils/enums";
-import { AnnotationExportType } from "utils/file-io/enums";
-
-//import { exportAnnotationMasks } from "utils/file-io/export/annotationExporters";
-
-import { selectChanges } from "../state/annotator/selectors";
-import { reconcileChanges } from "../utils/annotationUtils";
+import type { AnnotationExportType } from "utils/file-io/enums";
+import type { ExportedAnnotation } from "utils/file-io-v2/export/types";
+import {
+  exportOptions,
+  runAnnotationExport,
+} from "utils/file-io-v2/export/runAnnotationExport";
 
 //TODO: MenuItem??
 
@@ -43,75 +33,24 @@ type ExportAnnotationsMenuProps = {
   selectedImage?: ExtendedImageObject;
 };
 
-const exportOptions = [
-  {
-    title: "Piximi-formatted JSON",
-    type: AnnotationExportType.PIXIMI,
-  },
-  {
-    title: "Labeled Instance Masks",
-    type: AnnotationExportType.LabeledInstances,
-  },
-  {
-    title: "Labeled Semantic Masks",
-    type: AnnotationExportType.LabeledSemanticMasks,
-  },
-  {
-    title: "Binary Instance Masks",
-    type: AnnotationExportType.BinaryInstances,
-  },
-
-  {
-    title: "Binary Semantic Masks",
-    type: AnnotationExportType.BinarySemanticMasks,
-  },
-  {
-    title: "Label Matrices",
-    type: AnnotationExportType.Matrix,
-  },
-  {
-    title: "COCO-formatted JSON",
-    type: AnnotationExportType.COCO,
-  },
-];
-
 export const ExportAnnotationsMenu = ({
   anchorEl,
   onClose,
   open,
   selectedImage,
 }: ExportAnnotationsMenuProps) => {
-  const dataState = useSelector(selectDataState);
-  const annotatorChanges = useSelector(selectChanges);
-  const images = useSelector(selectImagesArray);
-  const imageDict = useSelector(selectImageViewerImages);
-  const annotations = useSelector(selectImageViewerObjectsArray);
-  const annotationDict = useSelector(selectImageViewerObjects);
-  const annotationCategories = useSelector(selectAllObjectCategories);
-  const annotationCategoryDict = useSelector(selectObjectCategoryDict);
-  const objectKinds = useSelector(selectAllObjectKinds);
-  const hasUnsavedChanges = useSelector(selectHasUnsavedChanges);
+  const annotations = useParameterizedSelector(
+    selectExtendedAnnotationsByImageId,
+    selectedImage!.id,
+  );
+  const images = useSelector(selectImageEntities);
+  const kinds = useSelector(selectKindEntities);
 
   const {
     onClose: handleCloseExportAnnotationsDialog,
     onOpen: handleOpenExportAnnotationsDialog,
     open: exportAnnotationsDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
-  const {
-    onClose: handleCloseSaveChangesDialog,
-    onOpen: handleOpenSaveChangesDialog,
-    open: saveChangesDialogOpen,
-  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
-
-  const handleCancelSaveChanges = () => {
-    handleCloseSaveChangesDialog();
-    onClose();
-  };
-
-  const handleSaveChanges = async () => {
-    await reconcileChanges(dataState, annotatorChanges);
-    handleOpenExportAnnotationsDialog();
-  };
 
   const onMenuClose = useCallback(() => {
     handleCloseExportAnnotationsDialog();
@@ -132,85 +71,32 @@ export const ExportAnnotationsMenu = ({
   const _handleMenuItemClick = useCallback(
     (_exportType: AnnotationExportType) => {
       alert("Not Yet Implemented");
-      // setOnProjectName(() => (userProjectName: string) => {
-      //   const zip = new JSZip();
-      //   let exportedAnnotations: Record<string, AnnotationObject> = {};
-      //   if (selectedImage) {
-      //     for (const annId of selectedImage.containing) {
-      //       exportedAnnotations[annId] = annotationDict[annId];
-      //     }
-      //   } else {
-      //     exportedAnnotations = { ...annotationDict };
-      //   }
-      //   switch (exportType) {
-      //     case AnnotationExportType.PIXIMI:
-      //       const piximiSerializedProject = serializePiximiAnnotations(
-      //         images,
-      //         annotations,
-      //         annotationCategories,
-      //         objectKinds,
-      //       );
+      setOnProjectName(() => (userProjectName: string) => {
+        const exportedAnnotations: ExportedAnnotation[] = annotations.map(
+          (ann) => {
+            return {
+              ...ann,
+              kindName: kinds[ann.kindId].name,
+              imageShape: images[ann.imageId].shape,
+            };
+          },
+        );
 
-      //       const data = new Blob([JSON.stringify(piximiSerializedProject)], {
-      //         type: "application/json;charset=utf-8",
-      //       });
+        void runAnnotationExport(
+          _exportType,
+          exportedAnnotations,
+          userProjectName,
+        );
 
-      //       saveAs(data, `${userProjectName}.json`);
-
-      //       break;
-
-      //     case AnnotationExportType.COCO:
-      //       const cocoSerializedProject = serializeCOCOFile(
-      //         images,
-      //         annotations,
-      //         annotationCategories,
-      //       );
-
-      //       const blob = new Blob([JSON.stringify(cocoSerializedProject)], {
-      //         type: "application/json;charset=utf-8",
-      //       });
-
-      //       saveAs(blob, `${userProjectName}.json`);
-
-      //       break;
-
-      //     default:
-      //       exportAnnotationMasks(
-      //         imageDict,
-      //         exportedAnnotations,
-      //         annotationCategoryDict,
-      //         userProjectName,
-      //         zip,
-      //         exportType,
-      //       );
-      //       zip.generateAsync({ type: "blob" }).then((blob) => {
-      //         saveAs(blob, `${userProjectName}.zip`);
-      //       });
-
-      //       break;
-      //   }
-
-      //   onClose();
-      // });
-      // if (hasUnsavedChanges) {
-      //   handleOpenSaveChangesDialog();
-      // } else {
-      //   handleOpenExportAnnotationsDialog();
-      // }
+        onClose();
+      });
     },
     [
       setOnProjectName,
       handleOpenExportAnnotationsDialog,
       onClose,
-      annotationCategories,
       images,
-      objectKinds,
       annotations,
-      imageDict,
-      annotationDict,
-      annotationCategoryDict,
-      hasUnsavedChanges,
-      handleOpenSaveChangesDialog,
       selectedImage,
     ],
   );
@@ -254,13 +140,6 @@ export const ExportAnnotationsMenu = ({
         open={exportAnnotationsDialogOpen}
         handleSave={onProjectName!}
         defaultName={""}
-      />
-      <ConfirmationDialog
-        title="Save Changes"
-        content={"Save changes before exporting"}
-        isOpen={saveChangesDialogOpen}
-        onConfirm={handleSaveChanges}
-        onClose={handleCancelSaveChanges}
       />
     </>
   );

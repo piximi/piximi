@@ -5,4 +5,3 @@ export { useAnnotationTool } from "./useAnnotationTool";
 export { useAnnotationState } from "./useAnnotationState";
 export { useMarchingAnts } from "./useMarchingAnts";
 export { useAnnotatorToolShortcuts } from "./useAnnotatorToolShortcuts";
-export { useImageViewerCategoryItemState } from "./useImageViewerCategoryItemState";

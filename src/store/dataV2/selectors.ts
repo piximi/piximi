@@ -20,9 +20,12 @@ import type {
   CategoryEntities,
   Channel,
   ChannelMetaEntities,
+  ExtendedAnnotationCategory,
   ExtendedAnnotationObject,
   ExtendedChannel,
+  ExtendedImageCategory,
   ExtendedImageObject,
+  ExtendedKindEntities,
   ImageEntities,
   ImageObject,
   PlaneEntities,
@@ -371,6 +374,40 @@ const buildExtendedAnnotation = (
     ...volProps,
   };
 };
+export const selectAllExtendedAnnotations = createSelector(
+  [
+    annotationSelectors.selectAll,
+    annotationVolumeSelectors.selectEntities,
+    imageSelectors.selectEntities,
+    planeSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    channelSelectors.selectAll,
+    categorySelectors.selectEntities,
+  ],
+  (
+    anns,
+    annVols,
+    imageDict,
+    planeDict,
+    chMetaDict,
+    chs,
+    catDict,
+  ): ExtendedAnnotationObject[] => {
+    return anns
+      .map((a) =>
+        buildExtendedAnnotation(
+          a,
+          annVols,
+          imageDict,
+          planeDict,
+          chMetaDict,
+          chs,
+          catDict,
+        ),
+      )
+      .filter((a) => a !== null);
+  },
+);
 export const selectExtendedAnnotationById = createSelector(
   [
     annotationSelectors.selectEntities,
@@ -429,6 +466,46 @@ export const selectExtendedAnnotationsByKindId = createSelector(
     anns.forEach((ann) => {
       const vol = annVols[ann.volumeId];
       if (!vol || vol.kindId !== kindId) return;
+      const extAnn = buildExtendedAnnotation(
+        ann,
+        annVols,
+        imageDict,
+        planeDict,
+        chMetaDict,
+        chs,
+        catDict,
+      );
+      if (!extAnn) return;
+      extAnns.push(extAnn);
+    });
+    return extAnns;
+  },
+);
+
+export const selectExtendedAnnotationsByImageId = createSelector(
+  [
+    annotationSelectors.selectAll,
+    annotationVolumeSelectors.selectEntities,
+    planeSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    channelSelectors.selectAll,
+    categorySelectors.selectEntities,
+    imageSelectors.selectEntities,
+    (_: RootState, imageId: string) => imageId,
+  ],
+  (
+    anns,
+    annVols,
+    planeDict,
+    chMetaDict,
+    chs,
+    catDict,
+    imageDict,
+    imageId,
+  ): ExtendedAnnotationObject[] => {
+    const extAnns: ExtendedAnnotationObject[] = [];
+    anns.forEach((ann) => {
+      if (ann.imageId !== imageId) return;
       const extAnn = buildExtendedAnnotation(
         ann,
         annVols,
@@ -528,6 +605,71 @@ export const selectCategoriesByKindId = createSelector(
 export const selectImageCategories = createSelector(
   categorySelectors.selectAll,
   (categories) => categories.filter((c) => c.type === "image"),
+);
+export const selectExtendedImageCategoryEntities = createSelector(
+  selectImageCategories,
+  selectAllImages,
+  (cats, images) => {
+    const extCats = cats.reduce(
+      (ext: Record<string, ExtendedImageCategory>, c) => {
+        ext[c.id] = { ...c, labeldIds: [] as string[] };
+        return ext;
+      },
+      {},
+    );
+    images.forEach((i) => extCats[i.categoryId].labeldIds.push(i.id));
+    return extCats;
+  },
+);
+export const selectAllExtendedImageCategories = createSelector(
+  selectExtendedImageCategoryEntities,
+  (ext) => Object.values(ext),
+);
+
+export const selectAnnotationCategories = createSelector(
+  categorySelectors.selectAll,
+  (categories) => categories.filter((c) => c.type === "annotation"),
+);
+export const selectExtendedAnnotationCategoryEntities = createSelector(
+  selectAnnotationCategories,
+  selectAllExtendedAnnotations,
+  (cats, anns) => {
+    const extCats = cats.reduce(
+      (ext: Record<string, ExtendedAnnotationCategory>, c) => {
+        ext[c.id] = { ...c, labeldIds: [] as string[] };
+        return ext;
+      },
+      {},
+    );
+    anns.forEach((i) => extCats[i.categoryId].labeldIds.push(i.id));
+    return extCats;
+  },
+);
+export const selectAllExtendedAnnotationCategories = createSelector(
+  selectExtendedAnnotationCategoryEntities,
+  (ext) => Object.values(ext),
+);
+/*
+ * ───────────────────────────────────────────────────────────────────────
+ * ── Kinds ─────────────────────────────────────────────────────────
+ * ───────────────────────────────────────────────────────────────────────
+ */
+
+export const selectExtendedKindEntities = createSelector(
+  selectAllKinds,
+  selectAllExtendedAnnotationCategories,
+  (kinds, categories): ExtendedKindEntities => {
+    const extKindEnts = kinds.reduce((ext: ExtendedKindEntities, kind) => {
+      ext[kind.id] = { ...kind, cats: [] };
+      return ext;
+    }, {});
+    categories.forEach((c) => extKindEnts[c.kindId].cats.push(c));
+    return extKindEnts;
+  },
+);
+export const selectAllExtendedKinds = createSelector(
+  selectExtendedKindEntities,
+  (ext) => Object.values(ext),
 );
 
 /*

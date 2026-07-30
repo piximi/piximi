@@ -21,7 +21,7 @@ export const BaseAppDrawer = ({
         flexShrink: 0,
         width: DIMENSIONS.leftDrawerWidth,
         overflow: "hidden",
-        "& > 	.MuiDrawer-paper": {
+        "& > .MuiDrawer-paper": {
           zIndex: 99,
           width: DIMENSIONS.leftDrawerWidth,
           height: "100%",
@@ -33,7 +33,7 @@ export const BaseAppDrawer = ({
       variant="persistent"
     >
       <Stack
-        sx={{ position: "relative", height: "100%" }}
+        sx={{ position: "relative", height: "100%", minHeight: 0 }}
         justifyContent={"space-between"}
       >
         <Box sx={{ overflowY: "scroll", overflowX: "hidden" }}>{children}</Box>

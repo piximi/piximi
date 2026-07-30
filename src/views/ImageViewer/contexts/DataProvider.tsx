@@ -32,7 +32,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         matcher: isAnyOf(...Object.values(dataSliceV2.actions)),
         effect: (action, listenerAPI) => {
           const hasUnsavedChanges = (listenerAPI.getState() as RootState)
-            .imageViewer.hasUnsavedChanges;
+            .imageViewerData.hasUnsavedChanges;
           if (hasUnsavedChanges) return;
           listenerAPI.dispatch(
             imageViewerDataSlice.actions.setHasUnsavedChanges(true),

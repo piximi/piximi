@@ -1,4 +1,4 @@
-import type { Category, Kind } from "./types";
+import type { AnnotationCategory, Category, Kind } from "./types";
 
 export const UNKNOWN_IMAGE_CATEGORY_ID: string =
   "00000000-0000-0000-0000-000000000000";
@@ -53,7 +53,7 @@ export const UNKNOWN_KIND: Kind = {
   name: UNKNOWN_NAME,
   unknownCategoryId: UNKNOWN_KIND_CATEGORY_ID,
 };
-export const UNKNOWN_KIND_CATEGORY: Category = {
+export const UNKNOWN_KIND_CATEGORY: AnnotationCategory = {
   id: UNKNOWN_KIND_CATEGORY_ID,
   name: UNKNOWN_NAME,
   type: "annotation",

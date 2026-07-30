@@ -29,11 +29,9 @@ import type { HTMLDataAttributes } from "utils/types";
 import { capitalize } from "utils/stringUtils";
 import { DIMENSIONS } from "utils/constants";
 
-import {
-  ExportAnnotationsListItem,
-  ImageViewerCategories,
-} from "../../components";
 import { ImageList } from "../ImageViewerDrawer/ImageSection";
+import { MobileCategoriesPanel } from "../ImageViewerDrawer/AnnotationSection/MobileCategoriesPanel";
+import { MobileExportPanel } from "../ImageViewerDrawer/AnnotationSection/MobileExportPanel";
 
 import type { OperationType } from "views/ImageViewer/utils/types";
 
@@ -44,7 +42,7 @@ const imageTools: Record<string, OperationType> = {
     description: "-",
     options: (
       <List dense>
-        <ExportAnnotationsListItem />
+        <MobileExportPanel />
       </List>
     ),
     hotkey: "O",
@@ -64,7 +62,7 @@ const imageTools: Record<string, OperationType> = {
     icon: (color) => <LabelIcon fontSize="small" sx={{ color }} />,
     name: "categories",
     description: "-",
-    options: <ImageViewerCategories />,
+    options: <MobileCategoriesPanel />,
     hotkey: "C",
     mobile: true,
   },
