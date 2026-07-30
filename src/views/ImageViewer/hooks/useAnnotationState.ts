@@ -1,70 +1,30 @@
 import { useEffect, useMemo, useState } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { selectFullWorkingAnnotation } from "views/ImageViewer/state/annotator/reselectors";
+import { AnnotationMode, AnnotationState } from "views/ImageViewer/utils/enums";
+import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
 
-import {
-  selectActiveImage,
-  selectImageViewerCategories,
-  selectCategoriesByKindArray,
-  selectFullWorkingAnnotation,
-  selectImageViewerObjectsArray,
-  selectImageViewerKinds,
-} from "views/ImageViewer/state/annotator/reselectors";
-import {
-  selectActiveImageId,
-  selectSelectedIVCategoryId,
-} from "views/ImageViewer/state/imageViewer/selectors";
+import { editProtoAnnotation } from "../utils/annotationUtils";
 import { selectAnnotationMode } from "../state/annotator/selectors";
 
-import { AnnotationTool } from "views/ImageViewer/utils/tools";
-
-import { AnnotationMode, AnnotationState } from "views/ImageViewer/utils/enums";
-import { isUnknownCategory } from "store/data/utils";
-import {
-  createProtoAnnotation,
-  editProtoAnnotation,
-} from "../utils/annotationUtils";
-import { Partition } from "utils/dl/enums";
+import type { WorkingAnnotation } from "@ImageViewer/utils/types";
+import type { AnnotationTool } from "views/ImageViewer/utils/tools";
 
 export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();
-  const activeImage = useSelector(selectActiveImage);
-  const activeImageId = useSelector(selectActiveImageId);
-  const selectedCategoryId = useSelector(selectSelectedIVCategoryId);
-  const categories = useSelector(selectImageViewerCategories);
-  const categoriesByKindArray = useSelector(selectCategoriesByKindArray);
-  const kinds = useSelector(selectImageViewerKinds);
+  const activeImage = useSelector(selectActiveViewerImage);
   const annotationMode = useSelector(selectAnnotationMode);
-  const objects = useSelector(selectImageViewerObjectsArray);
   const workingAnnotation = useSelector(selectFullWorkingAnnotation);
-
-  const objectNames = useMemo(() => {
-    return objects.map((obj) => obj.name);
-  }, [objects]);
-
-  const annotationCategory = useMemo(() => {
-    if (categories[selectedCategoryId]) return categories[selectedCategoryId];
-    const defaultKindCategories = Object.entries(categoriesByKindArray).find(
-      (k) => k[0] !== selectedCategoryId,
-    );
-    if (!defaultKindCategories) return undefined;
-    const defaultCategory = defaultKindCategories[1].categories.find((c) =>
-      isUnknownCategory(c.id),
-    );
-
-    return defaultCategory;
-  }, [categories, selectedCategoryId, categoriesByKindArray]);
 
   const [noKindAvailable, setNoKindAvailable] = useState<boolean>(false);
 
   const onAnnotating = useMemo(() => {
     const func = () => {
       dispatch(
-        annotatorSlice.actions.setAnnotationState({
-          annotationState: AnnotationState.Annotating,
-          annotationTool,
-        }),
+        annotatorSlice.actions.setAnnotationState(AnnotationState.Annotating),
       );
     };
     return func;
@@ -72,28 +32,18 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
 
   const onAnnotated = useMemo(() => {
     const func = async () => {
-      if (!annotationCategory) {
-        setNoKindAvailable(true);
-        return;
-      }
       if (!activeImage) throw new Error("Active image not found");
       if (!annotationTool.decodedMask) throw new Error("No mask found");
       if (!annotationTool.boundingBox) throw new Error("No bounding box found");
-      const kind = kinds[annotationCategory.kind];
+
       if (annotationMode === AnnotationMode.New) {
-        const newAnnotation = createProtoAnnotation(
-          {
-            boundingBox: annotationTool.boundingBox,
-            categoryId: annotationCategory.id,
-            imageId: activeImage.id,
-            decodedMask: annotationTool.decodedMask,
-            activePlane: activeImage.activePlane,
-            partition: Partition.Unassigned,
-          },
-          activeImage!,
-          kind,
-          objectNames,
-        );
+        const newAnnotation: WorkingAnnotation = {
+          boundingBox: annotationTool.boundingBox,
+          decodedMask: annotationTool.decodedMask,
+          imageId: activeImage.id,
+          planeId: activeImage.activePlaneId,
+        };
+
         dispatch(
           annotatorSlice.actions.setWorkingAnnotation({
             annotation: newAnnotation,
@@ -105,7 +55,6 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
           workingAnnotation,
           annotationMode,
           annotationTool,
-          activeImage,
         );
 
         dispatch(
@@ -115,38 +64,26 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
         );
       }
       dispatch(
-        annotatorSlice.actions.setAnnotationState({
-          annotationState: AnnotationState.Annotated,
-          kind: annotationCategory.kind,
-          annotationTool,
-        }),
+        annotatorSlice.actions.setAnnotationState(AnnotationState.Annotated),
       );
     };
     return func;
   }, [
     annotationTool,
-    annotationCategory,
     activeImage,
     dispatch,
-    activeImageId,
-    kinds,
     annotationMode,
-    objectNames,
     workingAnnotation,
   ]);
 
   const onDeselect = useMemo(() => {
     const func = () => {
       dispatch(
-        annotatorSlice.actions.setAnnotationState({
-          annotationState: AnnotationState.Blank,
-          kind: annotationCategory?.kind,
-          annotationTool,
-        }),
+        annotatorSlice.actions.setAnnotationState(AnnotationState.Blank),
       );
     };
     return func;
-  }, [annotationTool, annotationCategory, dispatch]);
+  }, [annotationTool, dispatch]);
   useEffect(() => {
     annotationTool.registerOnAnnotatedHandler(onAnnotated);
     annotationTool.registerOnAnnotatingHandler(onAnnotating);

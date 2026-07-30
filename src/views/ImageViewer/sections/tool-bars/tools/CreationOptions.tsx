@@ -1,20 +1,21 @@
 import React, { useCallback } from "react";
 
-import { useTranslation } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 
 import { FilterBAndW } from "@mui/icons-material";
+import { Stack, SvgIcon, useTheme } from "@mui/material";
+
+import { useTranslation } from "hooks";
 
 import { Tool } from "components/ui";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import {
   selectAnnotationMode,
   selectWorkingAnnotationEntity,
 } from "views/ImageViewer/state/annotator/selectors";
-
 import { AnnotationMode } from "views/ImageViewer/utils/enums";
-import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 import { invert } from "views/ImageViewer/utils/annotationUtils";
 import {
   CombineAnnotationsIcon,
@@ -22,8 +23,7 @@ import {
   NewAnnotationIcon,
   SubtractAnnotationsIcon,
 } from "icons";
-import { Stack, SvgIcon, useTheme } from "@mui/material";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
 
 export const CreationOptions = () => {
   const dispatch = useDispatch();
@@ -32,7 +32,7 @@ export const CreationOptions = () => {
 
   const annotationMode = useSelector(selectAnnotationMode);
   const workingAnnotationEntity = useSelector(selectWorkingAnnotationEntity);
-  const image = useSelector(selectActiveImage);
+  const image = useSelector(selectActiveViewerImage);
 
   const handleModeSelection = (mode: AnnotationMode) => {
     if (annotationMode !== mode)

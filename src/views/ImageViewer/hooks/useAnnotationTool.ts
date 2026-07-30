@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from "react";
 
 import { useSelector } from "react-redux";
 
-import { StageContext } from "views/ImageViewer/state/StageContext";
 import {
   selectPenSelectionBrushSize,
   selectQuickSelectionRegionSize,
@@ -34,7 +33,7 @@ export const useAnnotationTool = (ijsImage: IJSImage | null) => {
   );
 
   const operation = useSelector(selectToolType);
-  const stageScale = useContext(StageContext)?.current?.scaleX() ?? 1;
+
   const penSelectionBrushSize = useSelector(selectPenSelectionBrushSize);
   const quickSelectionRegionSize = useSelector(selectQuickSelectionRegionSize);
   const threshold = useSelector(selectThresholdAnnotationValue);
@@ -106,14 +105,13 @@ export const useAnnotationTool = (ijsImage: IJSImage | null) => {
 
   useEffect(() => {
     if (operator instanceof QuickAnnotationTool) {
-      const regionSize =
-        quickSelectionRegionSize / Math.round(stageScale ? stageScale : 1);
+      const regionSize = quickSelectionRegionSize;
       operator.initializeSuperpixels(regionSize);
     } else if (operator instanceof PenAnnotationTool) {
-      const brushSize = penSelectionBrushSize / (stageScale ? stageScale : 1);
+      const brushSize = penSelectionBrushSize;
       operator.brushSize = Math.round(brushSize);
     }
-  }, [operator, quickSelectionRegionSize, penSelectionBrushSize, stageScale]);
+  }, [operator, quickSelectionRegionSize, penSelectionBrushSize]);
 
   return {
     annotationTool: operator,

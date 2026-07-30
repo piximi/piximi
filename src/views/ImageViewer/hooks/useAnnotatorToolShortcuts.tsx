@@ -1,19 +1,22 @@
 import { useDispatch, useSelector } from "react-redux";
+
 import { useHotkeys } from "hooks";
 
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { selectActiveImageId } from "views/ImageViewer/state/imageViewer/selectors";
-import { selectImagesArray } from "views/ImageViewer/state/annotator/reselectors";
-
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-
 import { ToolType } from "views/ImageViewer/utils/enums";
+import {
+  selectActiveImageId,
+  selectImageStackIds,
+} from "@ImageViewer/state/image-viewer-data/selectors";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+
 import { HotkeyContext } from "utils/enums";
 
 export const useAnnotatorToolShortcuts = () => {
   const dispatch = useDispatch();
 
-  const images = useSelector(selectImagesArray);
+  const images = useSelector(selectImageStackIds);
   const activeImageId = useSelector(selectActiveImageId);
 
   /*
@@ -121,19 +124,14 @@ export const useAnnotatorToolShortcuts = () => {
       }
 
       const activeImageIdx = images.findIndex(
-        (image) => image.id === activeImageId,
+        (imageId) => imageId === activeImageId,
       );
       if (activeImageIdx < 1) {
         return;
       }
 
-      const newActiveImageId = images[activeImageIdx - 1].id;
-      dispatch(
-        imageViewerSlice.actions.setActiveImageId({
-          imageId: newActiveImageId,
-          prevImageId: activeImageId,
-        }),
-      );
+      const newActiveImageId = images[activeImageIdx - 1];
+      dispatch(imageViewerDataSlice.actions.setActiveImageId(newActiveImageId));
     },
     HotkeyContext.AnnotatorView,
     [images, activeImageId],
@@ -147,19 +145,14 @@ export const useAnnotatorToolShortcuts = () => {
       }
 
       const activeImageIdx = images.findIndex(
-        (image) => image.id === activeImageId,
+        (imageId) => imageId === activeImageId,
       );
       if (activeImageIdx === -1 || activeImageIdx === images.length - 1) {
         return;
       }
 
-      const newActiveImageId = images[activeImageIdx + 1].id;
-      dispatch(
-        imageViewerSlice.actions.setActiveImageId({
-          imageId: newActiveImageId,
-          prevImageId: activeImageId,
-        }),
-      );
+      const newActiveImageId = images[activeImageIdx + 1];
+      dispatch(imageViewerDataSlice.actions.setActiveImageId(newActiveImageId));
     },
     HotkeyContext.AnnotatorView,
     [images, activeImageId],

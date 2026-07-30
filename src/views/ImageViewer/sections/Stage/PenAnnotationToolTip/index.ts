@@ -1,1 +1,0 @@
-export { PenAnnotationToolTip } from "./PenAnnotationToolTip";

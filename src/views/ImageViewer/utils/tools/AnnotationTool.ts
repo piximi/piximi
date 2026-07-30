@@ -6,10 +6,10 @@ import {
 } from "views/ImageViewer/utils";
 import { generateUUID } from "store/data/utils";
 import type {
-  DataArray,
   Category,
   PartialDecodedAnnotationObject,
 } from "store/data/types";
+import type { DataArray } from "store/dataV2/types";
 
 import { convertToDataArray } from "utils/dataUtils";
 import { Partition } from "utils/dl/enums";
@@ -362,8 +362,7 @@ export abstract class AnnotationTool extends Tool {
     ];
 
     const invertedMask = new IJSImage(imageWidth, imageHeight, {
-      components: 1,
-      alpha: 0,
+      colorModel: "GREY",
     });
     for (let x = 0; x < imageWidth; x++) {
       for (let y = 0; y < imageHeight; y++) {
@@ -382,9 +381,9 @@ export abstract class AnnotationTool extends Tool {
             selectedBoundingBox,
           )
         ) {
-          invertedMask.setPixelXY(x, y, [0]);
+          invertedMask.setPixel(x, y, [0]);
         } else {
-          invertedMask.setPixelXY(x, y, [255]);
+          invertedMask.setPixel(x, y, [255]);
           if (x < invertedBoundingBox[0]) {
             invertedBoundingBox[0] = x;
           } else if (x > invertedBoundingBox[2]) {
@@ -401,14 +400,17 @@ export abstract class AnnotationTool extends Tool {
 
     // Crop the encodedMask using the new bounding box.
     const croppedInvertedMask = invertedMask.crop({
-      x: invertedBoundingBox[0],
-      y: invertedBoundingBox[1],
+      origin: { row: invertedBoundingBox[0], column: invertedBoundingBox[1] },
+
       width: invertedBoundingBox[2] - invertedBoundingBox[0],
       height: invertedBoundingBox[3] - invertedBoundingBox[1],
     });
 
     return [
-      convertToDataArray(8, croppedInvertedMask.data) as Uint8Array,
+      convertToDataArray(
+        8,
+        croppedInvertedMask.getRawImage().data as Uint8Array,
+      ) as Uint8Array,
       invertedBoundingBox,
     ];
   }

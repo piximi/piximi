@@ -1,1 +1,0 @@
-export { ColorAnnotationToolTip } from "./ColorAnnotationToolTip";

@@ -1,6 +1,7 @@
+import { drawRectangle } from "views/ImageViewer/utils";
+
 import { AnnotationState } from "../enums";
 import { AnnotationTool } from "./AnnotationTool";
-import { drawRectangle } from "views/ImageViewer/utils";
 
 export class ThresholdAnnotationTool extends AnnotationTool {
   threshold = 255;
@@ -93,7 +94,7 @@ export class ThresholdAnnotationTool extends AnnotationTool {
     const image = this.image;
     const greyMask = image.grey();
 
-    const binaryMask = greyMask.data as Uint8Array;
+    const binaryMask = greyMask.getRawImage().data as Uint8Array;
 
     const thresholdMask = new Uint8Array(width * height);
 

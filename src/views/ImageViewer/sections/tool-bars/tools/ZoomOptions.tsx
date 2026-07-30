@@ -1,4 +1,5 @@
-import React, { useContext } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   FitScreen as FitScreenIcon,
   AspectRatio as AspectRatioIcon,
@@ -6,36 +7,37 @@ import {
   CropFree as CropFreeIcon,
 } from "@mui/icons-material";
 import { Stack, useTheme } from "@mui/material";
-import { Tool } from "components/ui/Tool";
+
 import { useTranslation } from "hooks";
-import { useDispatch, useSelector } from "react-redux";
+
+import { Tool } from "components/ui/Tool";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
 import {
   selectStageHeight,
   selectStageWidth,
   selectZoomToolOptions,
 } from "views/ImageViewer/state/imageViewer/selectors";
-import { StageContext } from "views/ImageViewer/state/StageContext";
-import { selectActiveImage } from "views/ImageViewer/state/annotator/reselectors";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { useZoom } from "views/ImageViewer/hooks";
 import { CursorZoom, StageZoom } from "icons";
 import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
 import { ToolType } from "views/ImageViewer/utils/enums";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
 
+import type { Point } from "utils/types";
+
+const zoomAndOffset = (newScale: number, center: Point) => {};
 export const ZoomOptions = () => {
-  const stageRef = useContext(StageContext);
-
   const dispatch = useDispatch();
   const activeTool = useSelector(selectToolType);
   const options = useSelector(selectZoomToolOptions);
   const stageWidth = useSelector(selectStageWidth);
   const stageHeight = useSelector(selectStageHeight);
-  const image = useSelector(selectActiveImage);
+  const image = useSelector(selectActiveViewerImage);
   const theme = useTheme();
   const t = useTranslation();
-  const { zoomAndOffset } = useZoom(stageRef?.current);
 
   const handleFitToScreen = () => {
     const payload = {
@@ -78,16 +80,11 @@ export const ZoomOptions = () => {
     zoomAndOffset(1, { x: stageWidth / 2, y: stageHeight / 2 });
   };
   const handleResetPosition = () => {
-    if (!stageRef?.current) return;
-    stageRef?.current?.position({
-      x: ((1 - stageRef.current.scaleX()!) * stageWidth) / 2,
-      y: ((1 - stageRef.current.scaleX()!) * stageHeight) / 2,
-    });
     dispatch(
       imageViewerSlice.actions.setStagePosition({
         stagePosition: {
-          x: ((1 - stageRef.current.scaleX()!) * stageWidth) / 2,
-          y: ((1 - stageRef.current.scaleX()!) * stageHeight) / 2,
+          x: stageWidth / 2,
+          y: stageHeight / 2,
         },
       }),
     );

@@ -1,10 +1,13 @@
 import IJSImage from "image-js";
-import { pointsAreEqual } from "./point-operations";
+
+import type { DataArray } from "store/data/types";
+import type { BBox, ExtendedAnnotationObject } from "store/dataV2/types";
 
 import { logger } from "utils/logUtils";
-import { ProtoAnnotationObject } from "./types";
-import { DataArray } from "store/data/types";
-import { Point } from "utils/types";
+import type { Point } from "utils/types";
+
+import { pointsAreEqual } from "./point-operations";
+import { decode } from "./rle";
 
 export const generatePoints = (buffer: Array<number> | undefined) => {
   if (!buffer) return undefined;
@@ -24,6 +27,24 @@ const pointInBox = (point: Point, box: [number, number, number, number]) => {
     point.y >= box[1] &&
     point.y <= box[3]
   );
+};
+
+const pointOnMask = (
+  point: Point,
+  bbox: BBox,
+  encodedMask: number[],
+  decodedMask?: DataArray,
+) => {
+  const bboxW = bbox[2] - bbox[0];
+  const bboxH = bbox[3] - bbox[1];
+  if (!pointInBox(point, bbox) || !(bboxH && bboxW)) return false;
+
+  const relX = point.x - bbox[0];
+  const relY = point.y - bbox[1];
+  const pointIdx = relY * bboxW + relX;
+  const dMask = decodedMask ?? decode(encodedMask);
+  //return annotation if clicked on actual selected data
+  return dMask[pointIdx] > 0;
 };
 
 export const connectPoints = (coordinates: Array<Point>) => {
@@ -126,35 +147,17 @@ Given a click at a position, return all overlapping annotations ids
  */
 export const getOverlappingAnnotations = (
   position: { x: number; y: number },
-  annotations: Array<ProtoAnnotationObject>,
+  annotations: ExtendedAnnotationObject[],
 ) => {
-  const overlappingAnnotations = annotations.filter(
-    (annotation: ProtoAnnotationObject) => {
-      const boundingBox = annotation.boundingBox;
-      if (pointInBox(position, boundingBox)) {
-        const boundingBoxWidth = boundingBox[2] - boundingBox[0];
-        const boundingBoxHeight = boundingBox[3] - boundingBox[1];
-        if (boundingBoxHeight && boundingBoxWidth) {
-          //return annotation if clicked on actual selected data
-          const maskROI = new IJSImage(
-            boundingBoxWidth,
-            boundingBoxHeight,
-            annotation.decodedMask,
-            { components: 1, alpha: 0 },
-          );
-          if (
-            maskROI.getPixelXY(
-              Math.round(position.x - boundingBox[0]),
-              Math.round(position.y - boundingBox[1]),
-            )[0]
-          )
-            return true;
-        }
-      }
-      return false;
-    },
+  const overlappingAnnotations = annotations.filter((annotation) =>
+    pointOnMask(
+      position,
+      annotation.boundingBox,
+      annotation.encodedMask,
+      annotation.decodedMask,
+    ),
   );
-  return overlappingAnnotations.map((annotation: ProtoAnnotationObject) => {
+  return overlappingAnnotations.map((annotation) => {
     return annotation.id;
   });
 };
@@ -162,9 +165,9 @@ export const getOverlappingAnnotations = (
 export const getAnnotationsInBox = (
   minimum: { x: number; y: number },
   maximum: { x: number; y: number },
-  annotations: Array<ProtoAnnotationObject>,
+  annotations: ExtendedAnnotationObject[],
 ) => {
-  return annotations.filter((annotation: ProtoAnnotationObject) => {
+  return annotations.filter((annotation) => {
     return (
       minimum.x <= annotation.boundingBox[0] &&
       minimum.y <= annotation.boundingBox[1] &&

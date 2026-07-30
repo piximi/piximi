@@ -1,10 +1,9 @@
-import {
+import type {
   AnnotationMode,
   AnnotationState,
   ToolType,
 } from "views/ImageViewer/utils/enums";
-
-import { AnnotatorState } from "../../utils/types";
+import type { AnnotatorState } from "../../utils/types";
 
 export const selectAnnotationState = ({
   annotator,
@@ -65,39 +64,4 @@ export const selectWorkingAnnotationEntity = ({
   annotator: AnnotatorState;
 }) => {
   return annotator.workingAnnotation;
-};
-export const selectSelectedAnnotationIds = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}): string[] => {
-  return annotator.selectedAnnotationIds;
-};
-
-export const selectChanges = ({ annotator }: { annotator: AnnotatorState }) => {
-  return annotator.changes;
-};
-
-export const selectKindChanges = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.changes.kinds;
-};
-
-export const selectCategoryChanges = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.changes.categories;
-};
-
-export const selectThingChanges = ({
-  annotator,
-}: {
-  annotator: AnnotatorState;
-}) => {
-  return annotator.changes.things;
 };

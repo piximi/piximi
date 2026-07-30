@@ -1,5 +1,12 @@
+import { useCallback, useState } from "react";
+
+import { useAnnotationTool } from "views/ImageViewer/hooks/useAnnotationTool";
+import { useAnnotationState } from "views/ImageViewer/hooks/useAnnotationState";
+
 import { useThreeViewport } from "./ThreeViewportContext";
+import { useThreeAnnotationHandlers } from "./useThreeAnnotationHandlers";
 import { useThreeAnnotationMeshes } from "./useThreeAnnotationMeshes";
+import { AnnotationSvgOverlay } from "./AnnotationSvgOverlay";
 
 import type { Image as IJSImage } from "image-js-latest";
 
@@ -10,6 +17,11 @@ import type { Image as IJSImage } from "image-js-latest";
  * annotation meshes, and the SVG authoring overlay.
  */
 export const ThreeAnnotationLayer = ({
+  mountRef,
+  isPanningRef,
+  ijsImage,
+  stageWidth,
+  stageHeight,
   imageWidth,
   imageHeight,
 }: {
@@ -23,6 +35,19 @@ export const ThreeAnnotationLayer = ({
 }) => {
   const { sceneRef, requestRender } = useThreeViewport();
 
+  const [drawTick, setDrawTick] = useState(0);
+  const bumpDrawTick = useCallback(() => setDrawTick((t) => t + 1), []);
+
+  const { annotationTool } = useAnnotationTool(ijsImage);
+  useAnnotationState(annotationTool);
+
+  const { absolutePosition, outOfBounds } = useThreeAnnotationHandlers({
+    mountRef,
+    annotationTool,
+    isPanningRef,
+    onDrawTick: bumpDrawTick,
+  });
+
   useThreeAnnotationMeshes({
     sceneRef,
     requestRender,
@@ -30,5 +55,14 @@ export const ThreeAnnotationLayer = ({
     imageHeight,
   });
 
-  return <></>;
+  return (
+    <AnnotationSvgOverlay
+      annotationTool={annotationTool}
+      drawTick={drawTick}
+      absolutePosition={absolutePosition}
+      outOfBounds={outOfBounds}
+      stageWidth={stageWidth}
+      stageHeight={stageHeight}
+    />
+  );
 };
