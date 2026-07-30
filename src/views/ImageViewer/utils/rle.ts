@@ -1,41 +1,26 @@
-import { AnnotationObject, DecodedAnnotationObject } from "store/data/types";
-
 /**
  * Decode a Run-length encoded input array.
  * @param encoded Run-length encoded input array
  * @returns The decoded input array
  */
-export const decode = (encoded: Array<number>): Uint8ClampedArray => {
+export const decode = (
+  encoded: Array<number>,
+  toBinary?: boolean,
+): Uint8ClampedArray => {
   const decoded = [];
 
   let background = true;
+  const highVal = toBinary ? 1 : 255;
 
   for (let i = 0; i < encoded.length; i++) {
     for (let j = 0; j < encoded[i]; j++) {
-      decoded.push(background ? 0 : 255);
+      decoded.push(background ? 0 : highVal);
     }
 
     background = !background;
   }
 
   return new Uint8ClampedArray(decoded);
-};
-
-export const decodeAnnotation = (
-  encodedAnnotation: AnnotationObject,
-): DecodedAnnotationObject => {
-  if (encodedAnnotation.decodedMask)
-    return encodedAnnotation as DecodedAnnotationObject;
-  // TODO - serializtion: temporary measure, remove when done
-  if (!encodedAnnotation.encodedMask)
-    throw Error(`Annotation ${encodedAnnotation.id} has no encoded mask`);
-
-  const decodedAnnotation = {
-    ...encodedAnnotation,
-    decodedMask: Uint8Array.from(decode(encodedAnnotation.encodedMask)),
-  };
-
-  return decodedAnnotation;
 };
 
 /**
@@ -93,19 +78,4 @@ export const encode = (
   encoded.push(lastSequenceSize);
 
   return encoded;
-};
-
-export const encodeAnnotation = (
-  decodedAnnotation: DecodedAnnotationObject,
-): AnnotationObject => {
-  // TODO - serializtion: temporary measure, remove when done
-  if (!decodedAnnotation.decodedMask)
-    throw Error(`Annotation ${decodedAnnotation.id} has no decoded mask`);
-
-  const encodedAnnotation = {
-    ...decodedAnnotation,
-    encodedMask: encode(decodedAnnotation.decodedMask),
-  };
-
-  return encodedAnnotation;
 };
