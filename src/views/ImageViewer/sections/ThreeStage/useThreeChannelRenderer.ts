@@ -189,7 +189,10 @@ export const useThreeChannelRenderer = (
     const buf = new Uint8Array(imageWidth * imageHeight * 4);
     renderer.readRenderTargetPixels(target, 0, 0, imageWidth, imageHeight, buf);
     onIjsImageReady(
-      new IJSImage(imageWidth, imageHeight, { data: buf, colorModel: "RGBA" }),
+      new IJSImage(imageWidth, imageHeight, {
+        data: buf,
+        colorModel: "RGBA",
+      }).flip({ axis: "vertical" }),
     );
     onRawDataRendered();
   }, [channelData, activeChannels, imageWidth, imageHeight]);
