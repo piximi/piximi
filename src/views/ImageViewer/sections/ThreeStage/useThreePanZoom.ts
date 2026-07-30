@@ -16,6 +16,7 @@ export function useThreePanZoom(
   cameraRef: React.RefObject<THREE.OrthographicCamera | null>,
   rendererRef: React.RefObject<THREE.WebGLRenderer | null>,
   sceneRef: React.RefObject<THREE.Scene | null>,
+  notifyCameraChanged?: () => void,
 ) {
   const dispatch = useDispatch();
   const { automaticCentering } = useSelector(selectZoomToolOptions);
@@ -60,6 +61,7 @@ export function useThreePanZoom(
       }
 
       render();
+      notifyCameraChanged?.();
       dispatch(
         imageViewerSlice.actions.setZoomToolOptions({
           options: { scale: newZoom },
@@ -82,6 +84,7 @@ export function useThreePanZoom(
       lastX = e.clientX;
       lastY = e.clientY;
       render();
+      notifyCameraChanged?.();
     }
 
     function onMouseUp() {
@@ -105,6 +108,13 @@ export function useThreePanZoom(
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-  }, [mountRef, cameraRef, rendererRef, sceneRef, dispatch]);
+  }, [
+    mountRef,
+    cameraRef,
+    rendererRef,
+    sceneRef,
+    dispatch,
+    notifyCameraChanged,
+  ]);
   return { isPanningRef };
 }

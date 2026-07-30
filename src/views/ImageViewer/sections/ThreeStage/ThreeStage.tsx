@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -9,10 +9,17 @@ import { Box } from "@mui/material";
 import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
 import { selectExtendedImageById } from "store/dataV2/selectors";
 import { useParameterizedSelector } from "store/hooks";
+import { useActiveImage } from "@ImageViewer/contexts/ActiveImageProvider";
 
 import { useThreeChannelRenderer } from "./useThreeChannelRenderer";
 import { useThreePanZoom } from "./useThreePanZoom";
 import { ActiveImageInfoStrip } from "./ActiveImageInfoStrip";
+import { screenToImage } from "./coords";
+import {
+  ThreeViewportProvider,
+  useThreeViewportValue,
+} from "./ThreeViewportContext";
+import { ThreeAnnotationLayer } from "./ThreeAnnotationLayer";
 
 type ThreeStageProps = {
   stageWidth: number;
@@ -38,6 +45,29 @@ export const ThreeStage = ({ stageWidth, stageHeight }: ThreeStageProps) => {
   );
   const imageWidth = image?.shape.width ?? 1;
   const imageHeight = image?.shape.height ?? 1;
+
+  // Composited IJSImage (from GPU readback) that the annotation tools operate on.
+  const { ijsImageRef, ijsImageVersion } = useActiveImage();
+  const ijsImage = useMemo(
+    () => ijsImageRef?.current ?? null,
+    [ijsImageRef, ijsImageVersion],
+  );
+
+  // Set once the renderer/scene/camera exist, gating the annotation layer.
+  const [ready, setReady] = useState(false);
+
+  // Shared viewport: exposes the camera transform + render trigger to the
+  // annotation layer and keeps the SVG overlay glued to the image.
+  const viewport = useThreeViewportValue({
+    cameraRef,
+    rendererRef,
+    sceneRef,
+    stageWidth,
+    stageHeight,
+    imageWidth,
+    imageHeight,
+  });
+  const { notifyCameraChanged } = viewport;
 
   // --- Init renderer, scene, cameras (once) ---
   useEffect(() => {
@@ -65,8 +95,10 @@ export const ThreeStage = ({ stageWidth, stageHeight }: ThreeStageProps) => {
     rendererRef.current = renderer;
     cameraRef.current = camera;
     sceneRef.current = scene;
+    setReady(true);
 
     return () => {
+      setReady(false);
       renderer.dispose();
       mountRef.current?.removeChild(renderer.domElement);
     };
@@ -85,7 +117,8 @@ export const ThreeStage = ({ stageWidth, stageHeight }: ThreeStageProps) => {
     camera.bottom = -stageHeight / 2;
     camera.updateProjectionMatrix();
     renderer.render(scene, camera);
-  }, [stageWidth, stageHeight]);
+    notifyCameraChanged();
+  }, [stageWidth, stageHeight, notifyCameraChanged]);
 
   // --- Image-sized camera + render target for IJSImage readback ---
   useEffect(() => {
@@ -118,11 +151,15 @@ export const ThreeStage = ({ stageWidth, stageHeight }: ThreeStageProps) => {
   // --- Reset viewport camera when active image changes ---
   useEffect(() => {
     const camera = cameraRef.current;
+    const renderer = rendererRef.current;
+    const scene = sceneRef.current;
     if (!camera) return;
     camera.position.set(0, 0, 1);
     camera.zoom = 1;
     camera.updateProjectionMatrix();
-  }, [activeImageId]);
+    if (renderer && scene) renderer.render(scene, camera);
+    notifyCameraChanged();
+  }, [activeImageId, notifyCameraChanged]);
 
   useEffect(() => {
     const el = mountRef.current;
@@ -131,26 +168,21 @@ export const ThreeStage = ({ stageWidth, stageHeight }: ThreeStageProps) => {
       const camera = cameraRef.current;
       if (!camera || !el) return;
       const rect = el.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-
-      // Mouse → world space (orthographic camera)
-      const worldX =
-        camera.position.x + (mouseX - stageWidth / 2) / camera.zoom;
-      const worldY =
-        camera.position.y - (mouseY - stageHeight / 2) / camera.zoom;
-
-      // World → image pixel (plane centered at origin, Y flipped)
-      const imgX = worldX + imageWidth / 2;
-      const imgY = imageHeight / 2 - worldY;
-
-      const oob =
-        imgX < 0 || imgX >= imageWidth || imgY < 0 || imgY >= imageHeight;
+      const { point, oob } = screenToImage(
+        e.clientX - rect.left,
+        e.clientY - rect.top,
+        {
+          stageWidth,
+          stageHeight,
+          cameraPosX: camera.position.x,
+          cameraPosY: camera.position.y,
+          cameraZoom: camera.zoom,
+          imageWidth,
+          imageHeight,
+        },
+      );
       setOutOfBounds(oob);
-      setAbsolutePosition({
-        x: Math.round(Math.max(0, Math.min(imageWidth - 1, imgX))),
-        y: Math.round(Math.max(0, Math.min(imageHeight - 1, imgY))),
-      });
+      setAbsolutePosition(point);
     };
 
     el?.addEventListener("mousemove", onMouseMove);
@@ -173,11 +205,29 @@ export const ThreeStage = ({ stageWidth, stageHeight }: ThreeStageProps) => {
     cameraRef,
     rendererRef,
     sceneRef,
+    notifyCameraChanged,
   );
 
   return (
     <Box sx={{ zIndex: 999 }}>
-      <Box ref={mountRef} sx={{ width: stageWidth, height: stageHeight }} />
+      <Box
+        sx={{ position: "relative", width: stageWidth, height: stageHeight }}
+      >
+        <Box ref={mountRef} sx={{ width: stageWidth, height: stageHeight }} />
+        <ThreeViewportProvider value={viewport}>
+          {ready && (
+            <ThreeAnnotationLayer
+              mountRef={mountRef}
+              isPanningRef={isPanningRef}
+              ijsImage={ijsImage}
+              stageWidth={stageWidth}
+              stageHeight={stageHeight}
+              imageWidth={imageWidth}
+              imageHeight={imageHeight}
+            />
+          )}
+        </ThreeViewportProvider>
+      </Box>
       {image && (
         <ActiveImageInfoStrip
           absolutePosition={absolutePosition}
