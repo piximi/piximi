@@ -1,6 +1,7 @@
+import { drawRectangle } from "views/ImageViewer/utils";
+
 import { AnnotationState } from "../enums";
 import { AnnotationTool } from "./AnnotationTool";
-import { drawRectangle } from "views/ImageViewer/utils";
 
 export class RectangularAnnotationTool extends AnnotationTool {
   width?: number;
@@ -11,7 +12,6 @@ export class RectangularAnnotationTool extends AnnotationTool {
 
     this.width = undefined;
     this.height = undefined;
-    this.annotation = undefined;
 
     this.setBlank();
   }

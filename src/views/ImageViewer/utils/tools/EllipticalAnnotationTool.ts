@@ -1,5 +1,6 @@
+import type { Point } from "utils/types";
+
 import { AnnotationState } from "../enums";
-import { Point } from "utils/types";
 import { AnnotationTool } from "./AnnotationTool";
 
 export class EllipticalAnnotationTool extends AnnotationTool {
@@ -10,7 +11,6 @@ export class EllipticalAnnotationTool extends AnnotationTool {
     this.center = undefined;
     this.origin = undefined;
     this.radius = undefined;
-    this.annotation = undefined;
     this.setBlank();
   }
 

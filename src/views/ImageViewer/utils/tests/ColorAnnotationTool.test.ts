@@ -1,7 +1,5 @@
 import { test, expect, describe, it } from "vitest";
 
-import type { Category } from "store/data/types";
-
 import { data } from "data/test-data/annotatorToolsTestData.json";
 
 import { ColorAnnotationTool } from "../tools/ColorAnnotationTool";
@@ -114,25 +112,8 @@ test("select", async () => {
 
   operator.onMouseUp({ x: 20, y: 0 });
 
-  const category: Category = {
-    color: "#0000FF",
-    id: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
-    name: "foo",
-    containing: [],
-    kind: "",
-    visible: true,
-  };
-  operator.annotate(category, 1, "");
-
   expect(operator.annotationState).toBe(AnnotationState.Annotated);
   expect(operator.boundingBox).toStrictEqual([0, 0, 107, 52]);
-
-  expect(operator.annotation).toMatchObject({
-    boundingBox: [0, 0, 107, 52],
-    categoryId: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
-    activePlane: 1,
-    imageId: "",
-  });
 });
 
 test("deselect", async () => {
@@ -147,16 +128,6 @@ test("deselect", async () => {
 
   operator.onMouseUp({ x: 20, y: 0 });
 
-  const category: Category = {
-    color: "#0000FF",
-    id: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
-    name: "foo",
-    containing: [],
-    kind: "",
-    visible: true,
-  };
-
-  operator.annotate(category, 1, "");
   operator.deselect();
 
   expect(operator.overlayData).toBe("");

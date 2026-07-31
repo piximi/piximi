@@ -20,8 +20,6 @@ test("onMouseDown", () => {
 
   expect(selectionOperator.annotationState).toBe(AnnotationState.Annotating);
 
-  expect(selectionOperator.annotation).toBe(undefined);
-
   expect(selectionOperator.origin).toStrictEqual({ x: 0, y: 0 });
 
   expect(selectionOperator.width).toBe(undefined);

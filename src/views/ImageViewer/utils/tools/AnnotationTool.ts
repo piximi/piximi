@@ -4,15 +4,9 @@ import {
   computeBoundingBoxFromContours as _computeBoundingBoxFromContours,
   maskFromPoints,
 } from "views/ImageViewer/utils";
-import { generateUUID } from "store/data/utils";
-import type {
-  Category,
-  PartialDecodedAnnotationObject,
-} from "store/data/types";
 import type { DataArray } from "store/dataV2/types";
 
 import { convertToDataArray } from "utils/dataUtils";
-import { Partition } from "utils/dl/enums";
 import type { Point } from "utils/types";
 
 import { AnnotationState } from "../enums";
@@ -43,7 +37,6 @@ export abstract class AnnotationTool extends Tool {
   /**
    * Annotation object of the Tool.
    */
-  annotation?: PartialDecodedAnnotationObject;
   anchor?: Point = undefined;
   origin?: Point = undefined;
   buffer?: Array<Point> = [];
@@ -148,32 +141,6 @@ export abstract class AnnotationTool extends Tool {
   public abstract onMouseMove(position: { x: number; y: number }): void;
 
   public abstract onMouseUp(position: { x: number; y: number }): void;
-
-  /**
-   * Creates and sets the annotation object.
-   * @param category Category of the annotation.
-   * @param plane Index of the image plane that corresponds to the annotation.
-   * @returns
-   */
-  public annotate(
-    category: Category,
-    plane: number,
-    imageId: string,
-    id?: string,
-  ): void {
-    if (!this.boundingBox || !this.decodedMask) return;
-
-    const annotationId = id ? id : generateUUID();
-    this.annotation = {
-      boundingBox: this.boundingBox,
-      categoryId: category.id,
-      id: annotationId,
-      imageId,
-      decodedMask: this.decodedMask,
-      activePlane: plane,
-      partition: Partition.Unassigned,
-    };
-  }
 
   /**
    * Checks if a point lies within an annotation bounding box

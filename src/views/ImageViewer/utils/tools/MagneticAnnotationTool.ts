@@ -47,8 +47,6 @@ export class MagneticAnnotationTool extends AnnotationTool {
   }
 
   deselect() {
-    this.annotation = undefined;
-
     this.anchor = undefined;
     this.buffer = [];
     this.graph = undefined;

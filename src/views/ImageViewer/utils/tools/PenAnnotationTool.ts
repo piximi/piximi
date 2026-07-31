@@ -1,12 +1,13 @@
 import IJSImage from "image-js";
 
-import { AnnotationTool } from "./AnnotationTool";
-
 import {
   connectPoints,
   computeBoundingBoxFromContours,
 } from "views/ImageViewer/utils";
-import { Point } from "utils/types";
+
+import type { Point } from "utils/types";
+
+import { AnnotationTool } from "./AnnotationTool";
 import { AnnotationState } from "../enums";
 
 export class PenAnnotationTool extends AnnotationTool {
@@ -17,7 +18,6 @@ export class PenAnnotationTool extends AnnotationTool {
   deselect() {
     this.buffer = [];
     this.points = [];
-    this.annotation = undefined;
 
     this.setBlank();
   }

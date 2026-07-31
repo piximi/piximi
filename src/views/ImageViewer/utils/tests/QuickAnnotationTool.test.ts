@@ -1,8 +1,6 @@
 import { test, expect } from "vitest";
 import { decodeJpeg } from "image-js-latest";
 
-import type { Category } from "store/data/types";
-
 import { data } from "data/test-data/annotatorToolsTestData.json";
 
 import { QuickAnnotationTool } from "../tools";
@@ -39,7 +37,6 @@ test("onMouseMove", async () => {
 
   operator.onMouseMove({ x: 100, y: 100 });
 
-  expect(operator.annotation).toBe(undefined);
   expect(operator.currentMask).toBeDefined();
 
   // live preview raster is produced for the touched region
@@ -101,42 +98,6 @@ test("onMouseUp (Adding)", async () => {
   expect(operator.decodedMask).toBeDefined();
 });
 
-test("select", async () => {
-  const image = loadTestImage(src);
-
-  const operator = new QuickAnnotationTool(image);
-  operator.initializeSuperpixels(30);
-
-  operator.onMouseDown({ x: 100, y: 100 });
-
-  operator.onMouseMove({ x: 200, y: 200 });
-
-  operator.onMouseUp({ x: 200, y: 200 });
-
-  operator.onMouseMove({ x: 300, y: 200 });
-
-  operator.onMouseDown({ x: 300, y: 200 });
-  operator.onMouseMove({ x: 200, y: 200 });
-  operator.onMouseUp({ x: 200, y: 200 });
-
-  const category: Category = {
-    color: "#0000FF",
-    id: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
-    name: "foo",
-    containing: [],
-    kind: "",
-    visible: true,
-  };
-  operator.annotate(category, 1, "");
-
-  expect(operator.annotation).toMatchObject({
-    boundingBox: [182, 175, 219, 213],
-    categoryId: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
-    activePlane: 1,
-    imageId: "",
-  });
-});
-
 test("deselect", async () => {
   const image = loadTestImage(src);
 
@@ -154,16 +115,6 @@ test("deselect", async () => {
   operator.onMouseDown({ x: 300, y: 200 });
   operator.onMouseMove({ x: 200, y: 200 });
   operator.onMouseUp({ x: 200, y: 200 });
-
-  const category: Category = {
-    color: "#0000FF",
-    id: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
-    name: "foo",
-    containing: [],
-    kind: "",
-    visible: true,
-  };
-  operator.annotate(category, 1, "");
 
   operator.deselect();
 

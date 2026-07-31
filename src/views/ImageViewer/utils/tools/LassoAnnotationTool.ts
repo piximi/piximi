@@ -1,5 +1,6 @@
+import type { Point } from "utils/types";
+
 import { AnnotationState } from "../enums";
-import { Point } from "utils/types";
 import { AnnotationTool } from "./AnnotationTool";
 
 export class LassoAnnotationTool extends AnnotationTool {
@@ -7,8 +8,6 @@ export class LassoAnnotationTool extends AnnotationTool {
   points: Array<Point> = [];
 
   deselect() {
-    this.annotation = undefined;
-
     this.anchor = undefined;
     this.buffer = [];
     this.origin = undefined;

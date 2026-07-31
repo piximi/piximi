@@ -19,7 +19,6 @@ export class BlankAnnotationTool extends AnnotationTool {
 
   deselect() {
     this.origin = undefined;
-    this.annotation = undefined;
 
     this.setBlank();
   }

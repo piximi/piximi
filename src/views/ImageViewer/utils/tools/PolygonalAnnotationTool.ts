@@ -1,7 +1,9 @@
-import { AnnotationState } from "../enums";
-import { Point } from "utils/types";
-import { AnnotationTool } from "./AnnotationTool";
 import { getDistance, pointsAreEqual } from "views/ImageViewer/utils";
+
+import type { Point } from "utils/types";
+
+import { AnnotationState } from "../enums";
+import { AnnotationTool } from "./AnnotationTool";
 
 export class PolygonalAnnotationTool extends AnnotationTool {
   buffer: Array<Point> = [];
@@ -28,7 +30,6 @@ export class PolygonalAnnotationTool extends AnnotationTool {
   }
 
   deselect() {
-    this.annotation = undefined;
     this.newAnchor = undefined;
     this.buffer = [];
     this.origin = undefined;

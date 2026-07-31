@@ -33,7 +33,6 @@ export class ThresholdAnnotationTool extends AnnotationTool {
     this.height = undefined;
 
     this.setBlank();
-    this.annotation = undefined;
   }
 
   onMouseDown(position: { x: number; y: number }) {

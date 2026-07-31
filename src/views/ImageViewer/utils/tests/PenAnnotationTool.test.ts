@@ -1,7 +1,5 @@
 import { test, expect } from "vitest";
 
-import type { Category } from "store/data/types";
-
 import { data } from "data/test-data/annotatorToolsTestData.json";
 
 import { PenAnnotationTool } from "../tools";
@@ -21,8 +19,6 @@ test("onMouseDown", () => {
 
   expect(operator.annotationState).toBe(AnnotationState.Annotating);
 
-  expect(operator.annotation).toBe(undefined);
-
   expect(operator.buffer).toStrictEqual([{ x: 0, y: 0 }]);
 });
 
@@ -35,8 +31,6 @@ test("onMouseMove", () => {
   operator.onMouseMove({ x: 100, y: 100 });
 
   expect(operator.annotationState).toBe(AnnotationState.Annotating);
-
-  expect(operator.annotation).toBe(undefined);
 
   expect(operator.buffer).toStrictEqual([
     {
@@ -61,8 +55,6 @@ test("onMouseUp-NoMove", () => {
 
   expect(operator.annotationState).toBe(AnnotationState.Annotated);
 
-  expect(operator.annotation).toBe(undefined);
-
   expect(operator.points).toStrictEqual([{ x: 0, y: 0 }]);
 
   expect(operator.boundingBox).toStrictEqual([0, 0, 8, 8]);
@@ -80,8 +72,6 @@ test("onMouseUp-Move", () => {
   operator.onMouseUp({ x: 100, y: 100 });
 
   expect(operator.annotationState).toBe(AnnotationState.Annotated);
-
-  expect(operator.annotation).toBe(undefined);
 
   expect(operator.points).toStrictEqual([
     { x: 0, y: 0 },
@@ -101,24 +91,7 @@ test("select", () => {
   operator.onMouseMove({ x: 100, y: 100 });
   operator.onMouseUp({ x: 100, y: 100 });
 
-  const category: Category = {
-    color: "#0000FF",
-    id: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
-    name: "foo",
-    containing: [],
-    kind: "",
-    visible: true,
-  };
-  operator.annotate(category, 1, "");
-
   expect(operator.annotationState).toBe(AnnotationState.Annotated);
-
-  expect(operator.annotation).toMatchObject({
-    boundingBox: [0, 0, 107, 107],
-    categoryId: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
-    activePlane: 1,
-    imageId: "",
-  });
 });
 
 test("deselect", () => {
@@ -130,15 +103,6 @@ test("deselect", () => {
   operator.onMouseMove({ x: 100, y: 100 });
   operator.onMouseUp({ x: 100, y: 100 });
 
-  const category: Category = {
-    color: "#0000FF",
-    id: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
-    name: "foo",
-    containing: [],
-    kind: "",
-    visible: true,
-  };
-  operator.annotate(category, 1, "");
   operator.deselect();
   expect(operator.annotationState).toBe(AnnotationState.Blank);
   expect(operator.buffer.length).toBe(0);

@@ -1,7 +1,5 @@
 import { test, expect } from "vitest";
 
-import type { Category } from "store/data/types";
-
 import { data } from "data/test-data/annotatorToolsTestData.json";
 
 import { MagneticAnnotationTool } from "../tools";
@@ -19,7 +17,6 @@ test("onMouseDown (unconnected)", () => {
 
   expect(operator.annotationState).toBe(AnnotationState.Annotating);
 
-  expect(operator.annotation).toBe(undefined);
   expect(operator.buffer).toStrictEqual([]);
   expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
   expect(operator.points).toStrictEqual([]);
@@ -36,7 +33,6 @@ test("onMouseMove (from origin)", () => {
 
   expect(operator.annotationState).toBe(AnnotationState.Annotating);
 
-  expect(operator.annotation).toBe(undefined);
   expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
   expect(operator.buffer[0]).toStrictEqual({ x: 0, y: 0 });
   expect(operator.buffer.at(-1)!).toStrictEqual({
@@ -62,7 +58,6 @@ test("onMouseMove (from anchor)", () => {
 
   expect(operator.annotationState).toBe(AnnotationState.Annotating);
 
-  expect(operator.annotation).toBe(undefined);
   expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
   expect(operator.anchor).toStrictEqual({ x: 150, y: 150 });
 
@@ -97,7 +92,6 @@ test("onMouseup (unconnected, from origin)", () => {
 
   expect(operator.annotationState).toBe(AnnotationState.Annotating);
 
-  expect(operator.annotation).toBe(undefined);
   expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
 
   expect(operator.buffer[0]).toStrictEqual({ x: 0, y: 0 });
@@ -125,7 +119,6 @@ test("onMouseup (unconnected, from anchor)", () => {
 
   expect(operator.annotationState).toBe(AnnotationState.Annotating);
 
-  expect(operator.annotation).toBe(undefined);
   expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
 
   expect(operator.anchor).toStrictEqual({ x: 300, y: 300 });
@@ -160,7 +153,6 @@ test("onMouseUp (connected)", () => {
 
   expect(operator.annotationState).toBe(AnnotationState.Annotated);
 
-  expect(operator.annotation).toBe(undefined);
   expect(operator.points[0]).toStrictEqual({ x: 300, y: 0 });
   expect(operator.points.at(-1)!).toStrictEqual({
     x: 300,
@@ -191,26 +183,9 @@ test("select", () => {
   operator.onMouseDown({ x: 300, y: 0 });
   operator.onMouseUp({ x: 300, y: 0 });
 
-  const category: Category = {
-    color: "#0000FF",
-    id: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
-    name: "foo",
-    containing: [],
-    kind: "",
-    visible: true,
-  };
-  operator.annotate(category, 1, "");
-
   expect(operator.annotationState).toBe(AnnotationState.Annotated);
   expect(operator.boundingBox).toStrictEqual([10, 0, 300, 318]);
   expect(operator.decodedMask).toBeDefined();
-
-  expect(operator.annotation).toMatchObject({
-    boundingBox: [10, 0, 300, 318],
-    categoryId: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
-    activePlane: 1,
-    imageId: "",
-  });
 });
 
 test("deselect", () => {
@@ -233,19 +208,8 @@ test("deselect", () => {
   operator.onMouseDown({ x: 300, y: 0 });
   operator.onMouseUp({ x: 300, y: 0 });
 
-  const category: Category = {
-    color: "#0000FF",
-    id: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
-    name: "foo",
-    containing: [],
-    kind: "",
-    visible: true,
-  };
-  operator.annotate(category, 1, "");
-
   operator.deselect();
 
-  expect(operator.annotation).toBe(undefined);
   expect(operator.anchor).toStrictEqual(undefined);
   expect(operator.buffer).toStrictEqual([]);
   expect(operator.graph).toStrictEqual(undefined);

@@ -51,7 +51,6 @@ export class ColorAnnotationTool extends AnnotationTool {
     this.toleranceMap = undefined;
     this.toleranceQueue.clear();
     this.seen.clear();
-    this.annotation = undefined;
     this.setBlank();
   }
 

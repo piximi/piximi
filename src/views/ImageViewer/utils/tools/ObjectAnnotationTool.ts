@@ -33,7 +33,6 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
 
     this.origin = undefined;
     this.width = undefined;
-    this.annotation = undefined;
 
     this.setBlank();
   }
