@@ -6,7 +6,7 @@ import {
   browser,
   scalar,
 } from "@tensorflow/tfjs";
-import { Image as IJSImage } from "image-js-latest";
+import { fromMask, Image as IJSImage, writeCanvas } from "image-js-latest";
 
 import type { Point } from "utils/types";
 
@@ -70,15 +70,16 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
     const height = Math.round(this.height);
 
     const crop = this.image.crop({
-      x: this.origin.x,
-      y: this.origin.y,
+      origin: { column: this.origin.x, row: this.origin.y },
       width: width,
       height: height,
     });
 
     const prediction = tidy(() => {
       if (crop) {
-        const cropped: Tensor3D = browser.fromPixels(crop.getCanvas());
+        const canvas = document.createElement("canvas");
+        writeCanvas(crop, canvas);
+        const cropped: Tensor3D = browser.fromPixels(canvas);
 
         const size: [number, number] = [128, 128];
         const resized = image.resizeBilinear(cropped, size);
@@ -111,33 +112,32 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
         prediction as Tensor3D,
       );
       // .then(async (clamped) => {
-      this.output = new IJSImage({
-        width: this.image.width,
-        height: this.image.height,
+      this.output = new IJSImage(this.image.width, this.image.height, {
         data: clamped,
       });
 
       const greyMask = this.output.grey();
 
-      //compute bounding box with ROI manager
-      const roiManager = this.image.getRoiManager();
-      const binaryMask = greyMask.mask({
-        algorithm: "threshold",
+      const binaryMask = greyMask.threshold({
         threshold: 1,
       });
-      // @ts-ignore it does exist
-      roiManager.fromMask(binaryMask);
-      // @ts-ignore it does exist
-      const rois = roiManager.getRois();
+      const roiMap = fromMask(binaryMask);
+
+      const rois = roiMap.getRois();
+      // take the second roi because the first one will be of the size of the image,the second one is the actual largest roi
       const roi = rois.sort((a: any, b: any) => {
         return b.surface - a.surface;
-      })[1]; // take the second roi because the first one will be of the size of the image,the second one is the actual largest roi
-      this._boundingBox = [roi.minX, roi.minY, roi.maxX, roi.maxY];
+      })[1];
+      const minX = roi.origin.column;
+      const minY = roi.origin.row;
+      this._boundingBox = [minX, minY, minX + roi.width, minY + roi.height];
 
       //threshold
-      const thresholded = greyMask.data.map((i: number) => (i > 1 ? 255 : 0)); //threshold necessary because output of NN is not binary
+      const thresholded = greyMask
+        .getRawImage()
+        .data.map((i: number) => (i > 1 ? 255 : 0)); //threshold necessary because output of NN is not binary
 
-      this.decodedMask = thresholded;
+      this.decodedMask = thresholded as Uint8Array;
 
       this.width = undefined;
     }
