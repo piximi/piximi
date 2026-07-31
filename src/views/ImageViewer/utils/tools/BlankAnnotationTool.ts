@@ -1,7 +1,7 @@
+import { Image as IJSImage } from "image-js-latest";
+
 import { AnnotationTool } from "./AnnotationTool";
 import { AnnotationState } from "../enums";
-
-import type { Image as IJSImage } from "image-js-latest";
 
 /*
  * Rather than having operator possibly undefined,
@@ -13,7 +13,7 @@ import type { Image as IJSImage } from "image-js-latest";
  */
 export class BlankAnnotationTool extends AnnotationTool {
   constructor(image?: IJSImage) {
-    const defaultImage = image ?? new Image();
+    const defaultImage = image ?? new IJSImage(10, 10);
     super(defaultImage);
   }
 
