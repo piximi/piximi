@@ -32,9 +32,9 @@ export class MagneticAnnotationTool extends AnnotationTool {
     this.filter();
 
     if (!this.image || !this.response) return;
-
+    const responseData = this.response.getRawImage().data;
     this.graph = makeGraph(
-      this.response.data,
+      responseData,
       this.response.height,
       this.response.width,
     );
@@ -234,9 +234,12 @@ export class MagneticAnnotationTool extends AnnotationTool {
   private filter() {
     if (!this.image) return;
 
-    const options = { factor: this.factor };
+    const options = { xfactor: this.factor, yFactor: this.factor };
 
     //scharr filter?
-    this.response = this.image.resize(options).grey().sobelFilter();
+    this.response = this.image
+      .resize(options)
+      .grey()
+      .derivativeFilter({ filter: "sobel" });
   }
 }

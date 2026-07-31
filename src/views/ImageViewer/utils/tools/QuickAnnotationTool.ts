@@ -1,8 +1,8 @@
-import IJSImage from "image-js";
-
-import { AnnotationTool } from "./AnnotationTool";
+import { fromMask, Image as IJSImage } from "image-js-latest";
 
 import { slic } from "views/ImageViewer/utils";
+
+import { AnnotationTool } from "./AnnotationTool";
 import { AnnotationState } from "../enums";
 
 export class QuickAnnotationTool extends AnnotationTool {
@@ -51,7 +51,7 @@ export class QuickAnnotationTool extends AnnotationTool {
   }
 
   computeSuperpixels() {
-    const data = this.image.getRGBAData();
+    const data = this.image.getRawImage().data as Uint8Array;
 
     const { superpixels } = slic(
       data,
@@ -80,8 +80,11 @@ export class QuickAnnotationTool extends AnnotationTool {
       this.currentMask = new IJSImage(
         this.image.width,
         this.image.height,
-        new Uint8Array(this.image.width * this.image.height * 4),
-        { alpha: 1 },
+
+        {
+          data: new Uint8Array(this.image.width * this.image.height * 4),
+          colorModel: "RGBA",
+        },
       );
     }
 
@@ -114,15 +117,18 @@ export class QuickAnnotationTool extends AnnotationTool {
       this.currentMask = new IJSImage(
         this.image.width,
         this.image.height,
-        new Uint8Array(this.image.width * this.image.height * 4),
-        { alpha: 1 },
+
+        {
+          data: new Uint8Array(this.image.width * this.image.height * 4),
+          colorModel: "RGBA",
+        },
       );
     }
 
     this.currentSuperpixels.add(superpixel);
 
     this.superpixelsMap[superpixel].forEach((index: number) => {
-      this.currentMask!.setPixel(index, [255, 0, 0, 150]);
+      this.currentMask!.setPixelByIndex(index, [255, 0, 0, 150]);
     });
   }
 
@@ -132,15 +138,15 @@ export class QuickAnnotationTool extends AnnotationTool {
     if (!this.currentMask) return;
 
     const greyMask = this.currentMask.grey();
-    const binaryMask = greyMask.mask({ algorithm: "threshold", threshold: 1 });
+    const binaryMask = greyMask.threshold({ threshold: 1 });
 
     //compute bounding box with ROI manager
-    const roiManager = this.image.getRoiManager();
+    const roiMap = fromMask(binaryMask);
     // @ts-ignore it does exist
-    roiManager.fromMask(binaryMask);
-    // @ts-ignore it does exist
-    const roi = roiManager.getRois()[0];
-    this._boundingBox = [roi.minX, roi.minY, roi.maxX, roi.maxY];
+    const roi = roiMap.getRois()[0];
+    const minX = roi.origin.column;
+    const minY = roi.origin.row;
+    this._boundingBox = [minX, minY, minX + roi.width, minY + roi.height];
 
     const width = this._boundingBox[2] - this._boundingBox[0];
     const height = this._boundingBox[3] - this._boundingBox[1];
@@ -149,15 +155,14 @@ export class QuickAnnotationTool extends AnnotationTool {
     }
 
     const croppedGreyMask = greyMask.crop({
-      x: this._boundingBox[0],
-      y: this._boundingBox[1],
+      origin: { column: this._boundingBox[0], row: this._boundingBox[1] },
       width: width,
       height: height,
     });
 
-    const thresholdMask = croppedGreyMask.data.map((i: number) =>
-      i > 1 ? 255 : 0,
-    );
+    const thresholdMask = croppedGreyMask
+      .getRawImage()
+      .data.map((i: number) => (i > 1 ? 255 : 0));
 
     this.decodedMask = Uint8Array.from(thresholdMask);
     this.setAnnotated();
