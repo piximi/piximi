@@ -18,12 +18,14 @@ import { RectanglePreview } from "./previews/RectanglePreview";
 import { EllipsePreview } from "./previews/EllipsePreview";
 import { PolylinePreview } from "./previews/PolylinePreview";
 import { PenPreview } from "./previews/PenPreview";
+import { ColorPreview } from "./previews/ColorPreview";
 import { WorkingAnnotationImage } from "./WorkingAnnotationImage";
 import { SelectionBorder, SelectionButtons } from "./SelectionChrome";
 import { BrushCursor } from "./BrushCursor";
 
 import type {
   AnnotationTool,
+  ColorAnnotationTool,
   EllipticalAnnotationTool,
   LassoAnnotationTool,
   PenAnnotationTool,
@@ -52,6 +54,8 @@ const LivePreview = ({
       return <PolylinePreview operator={operator as LassoAnnotationTool} />;
     case ToolType.PenAnnotation:
       return <PenPreview operator={operator as PenAnnotationTool} />;
+    case ToolType.ColorAnnotation:
+      return <ColorPreview operator={operator as ColorAnnotationTool} />;
     default:
       return null;
   }

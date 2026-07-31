@@ -1,5 +1,5 @@
 import { test, expect, describe, it } from "vitest";
-import { Image } from "image-js";
+import { decodeJpeg } from "image-js-latest";
 
 import { ColorAnnotationTool } from "../tools/ColorAnnotationTool";
 
@@ -7,18 +7,21 @@ import { data } from "data/test-data/annotatorToolsTestData.json";
 import { AnnotationState } from "../enums";
 import { Category } from "store/data/types";
 
+const loadTestImage = (dataUrl: string) => {
+  const base64 = dataUrl.split(",")[1];
+  return decodeJpeg(Uint8Array.from(Buffer.from(base64, "base64")));
+};
+
 describe("onMouseDown", () => {
   const src = data.image;
 
   it("sets the origin", async () => {
-    const image = await Image.load(src);
+    const image = loadTestImage(src);
     const operator = new ColorAnnotationTool(image);
 
     operator.onMouseDown({ x: 0, y: 0 });
 
     expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
-
-    expect(operator.roiManager).toBeDefined();
 
     expect(operator.toleranceQueue.length).toBeGreaterThan(0);
     expect(operator.seen.size).toBeGreaterThan(0);
@@ -27,7 +30,7 @@ describe("onMouseDown", () => {
     expect(operator.annotationState).toBe(AnnotationState.Annotating);
   });
   it("sets the tool tip position", async () => {
-    const image = await Image.load(src);
+    const image = loadTestImage(src);
     const operator = new ColorAnnotationTool(image);
 
     operator.onMouseDown({ x: 0, y: 0 });
@@ -35,7 +38,7 @@ describe("onMouseDown", () => {
     expect(operator.toolTipPosition).toStrictEqual({ x: 0, y: 0 });
   });
   it("creates a tolerance map", async () => {
-    const image = await Image.load(src);
+    const image = loadTestImage(src);
     const operator = new ColorAnnotationTool(image);
 
     operator.onMouseDown({ x: 0, y: 0 });
@@ -43,7 +46,7 @@ describe("onMouseDown", () => {
     expect(operator.toleranceMap).toBeDefined();
   });
   it("creates a flood map", async () => {
-    const image = await Image.load(src);
+    const image = loadTestImage(src);
     const operator = new ColorAnnotationTool(image);
 
     operator.onMouseDown({ x: 0, y: 0 });
@@ -51,13 +54,13 @@ describe("onMouseDown", () => {
     expect(operator.floodMap).toBeDefined();
   });
   it("initializes a tolerance Queue", async () => {
-    const image = await Image.load(src);
+    const image = loadTestImage(src);
     const operator = new ColorAnnotationTool(image);
     operator.onMouseDown({ x: 0, y: 0 });
     expect(operator.toleranceQueue.length).toBe(8);
   });
   it("initializes the seen array", async () => {
-    const image = await Image.load(src);
+    const image = loadTestImage(src);
     const operator = new ColorAnnotationTool(image);
 
     operator.onMouseDown({ x: 0, y: 0 });
@@ -69,7 +72,7 @@ describe("onMouseDown", () => {
 test("onMouseMove", async () => {
   const src = data.image;
 
-  const image = await Image.load(src);
+  const image = loadTestImage(src);
 
   const operator = new ColorAnnotationTool(image);
 
@@ -85,7 +88,7 @@ test("onMouseMove", async () => {
 test("onMouseUp", async () => {
   const src = data.image;
 
-  const image = await Image.load(src);
+  const image = loadTestImage(src);
 
   const operator = new ColorAnnotationTool(image);
 
@@ -105,7 +108,7 @@ test("onMouseUp", async () => {
 
 test("select", async () => {
   const src = data.image;
-  const image = await Image.load(src);
+  const image = loadTestImage(src);
 
   const operator = new ColorAnnotationTool(image);
 
@@ -138,7 +141,7 @@ test("select", async () => {
 
 test("deselect", async () => {
   const src = data.image;
-  const image = await Image.load(src);
+  const image = loadTestImage(src);
 
   const operator = new ColorAnnotationTool(image);
 
