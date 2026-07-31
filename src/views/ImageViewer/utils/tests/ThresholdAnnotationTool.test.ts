@@ -1,14 +1,17 @@
 import { test, expect } from "vitest";
-import { Image } from "image-js";
+
+import type { Category } from "store/data/types";
+
 import { data } from "data/test-data/annotatorToolsTestData.json";
+
 import { ThresholdAnnotationTool } from "../tools";
 import { AnnotationState } from "../enums";
-import { Category } from "store/data/types";
+import { loadTestImage } from "./loadTestImage";
 
 const src = data.image;
 
-test("onMouseDown", async () => {
-  const image = await Image.load(src);
+test("onMouseDown", () => {
+  const image = loadTestImage(src);
 
   const operator = new ThresholdAnnotationTool(image);
 
@@ -26,8 +29,8 @@ test("onMouseDown", async () => {
   expect(operator.boundingBox).toBe(undefined);
 });
 //
-test("onMouseMove", async () => {
-  const image = await Image.load(src);
+test("onMouseMove", () => {
+  const image = loadTestImage(src);
 
   const operator = new ThresholdAnnotationTool(image);
 
@@ -44,8 +47,8 @@ test("onMouseMove", async () => {
   expect(operator.height).toBe(100);
 });
 //
-test("onMouseUp", async () => {
-  const image = await Image.load(src);
+test("onMouseUp", () => {
+  const image = loadTestImage(src);
 
   const operator = new ThresholdAnnotationTool(image);
 
@@ -70,8 +73,8 @@ test("onMouseUp", async () => {
   expect(operator.decodedMask).toBeDefined();
 });
 
-test("onMouseUp-NoDrag", async () => {
-  const image = await Image.load(src);
+test("onMouseUp-NoDrag", () => {
+  const image = loadTestImage(src);
 
   const operator = new ThresholdAnnotationTool(image);
 
@@ -92,8 +95,8 @@ test("onMouseUp-NoDrag", async () => {
   expect(operator.decodedMask).toBe(undefined);
 });
 
-test("onMouseMove-NoDrag", async () => {
-  const image = await Image.load(src);
+test("onMouseMove-NoDrag", () => {
+  const image = loadTestImage(src);
 
   const operator = new ThresholdAnnotationTool(image);
 
@@ -112,8 +115,8 @@ test("onMouseMove-NoDrag", async () => {
   expect(operator.decodedMask).toBe(undefined);
 });
 
-test("select", async () => {
-  const image = await Image.load(src);
+test("select", () => {
+  const image = loadTestImage(src);
 
   const operator = new ThresholdAnnotationTool(image);
 
@@ -143,8 +146,8 @@ test("select", async () => {
   });
 });
 
-test("deselect", async () => {
-  const image = await Image.load(src);
+test("deselect", () => {
+  const image = loadTestImage(src);
 
   const operator = new ThresholdAnnotationTool(image);
 

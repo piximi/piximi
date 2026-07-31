@@ -1,5 +1,4 @@
 import { test, expect } from "vitest";
-import { decodeJpeg } from "image-js-latest";
 
 import type { Category } from "store/data/types";
 
@@ -7,14 +6,9 @@ import { data } from "data/test-data/annotatorToolsTestData.json";
 
 import { MagneticAnnotationTool } from "../tools";
 import { AnnotationState } from "../enums";
+import { loadTestImage } from "./loadTestImage";
 
 const src = data.image;
-
-// runtime image is RGBA (GPU readback); SLIC/filters index accordingly
-const loadTestImage = (dataUrl: string) =>
-  decodeJpeg(
-    Uint8Array.from(Buffer.from(dataUrl.split(",")[1], "base64")),
-  ).convertColor("RGBA");
 
 test("onMouseDown (unconnected)", () => {
   const image = loadTestImage(src);

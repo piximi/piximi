@@ -1,14 +1,17 @@
 import { test, expect } from "vitest";
-import { Image } from "image-js";
+
+import type { Category } from "store/data/types";
+
 import { data } from "data/test-data/annotatorToolsTestData.json";
+
 import { PolygonalAnnotationTool } from "../tools";
 import { AnnotationState } from "../enums";
-import { Category } from "store/data/types";
+import { loadTestImage } from "./loadTestImage";
 
 const src = data.image;
 
-test("onMouseDown", async () => {
-  const image = await Image.load(src);
+test("onMouseDown", () => {
+  const image = loadTestImage(src);
 
   const operator = new PolygonalAnnotationTool(image);
 
@@ -23,8 +26,8 @@ test("onMouseDown", async () => {
   expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
   expect(operator.points).toStrictEqual([]);
 });
-test("onMouseMove  (origin)", async () => {
-  const image = await Image.load(src);
+test("onMouseMove  (origin)", () => {
+  const image = loadTestImage(src);
 
   const operator = new PolygonalAnnotationTool(image);
 
@@ -40,8 +43,8 @@ test("onMouseMove  (origin)", async () => {
   ]);
 });
 
-test("onMouseUp (unconnected)", async () => {
-  const image = await Image.load(src);
+test("onMouseUp (unconnected)", () => {
+  const image = loadTestImage(src);
 
   const operator = new PolygonalAnnotationTool(image);
 
@@ -54,8 +57,8 @@ test("onMouseUp (unconnected)", async () => {
   expect(operator.annotation).toBe(undefined);
 });
 
-test("onMouseMove (with anchor)", async () => {
-  const image = await Image.load(src);
+test("onMouseMove (with anchor)", () => {
+  const image = loadTestImage(src);
 
   const operator = new PolygonalAnnotationTool(image);
 
@@ -77,8 +80,8 @@ test("onMouseMove (with anchor)", async () => {
   ]);
 });
 
-test("onMouseUp (connected)", async () => {
-  const image = await Image.load(src);
+test("onMouseUp (connected)", () => {
+  const image = loadTestImage(src);
 
   const operator = new PolygonalAnnotationTool(image);
 
@@ -115,8 +118,8 @@ test("onMouseUp (connected)", async () => {
   expect(operator.anchor).toBe(undefined);
 });
 
-test("select", async () => {
-  const image = await Image.load(src);
+test("select", () => {
+  const image = loadTestImage(src);
 
   const operator = new PolygonalAnnotationTool(image);
 
@@ -154,8 +157,8 @@ test("select", async () => {
   });
 });
 
-test("deselect", async () => {
-  const image = await Image.load(src);
+test("deselect", () => {
+  const image = loadTestImage(src);
 
   const operator = new PolygonalAnnotationTool(image);
 

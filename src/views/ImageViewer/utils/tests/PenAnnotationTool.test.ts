@@ -1,14 +1,19 @@
 import { test, expect } from "vitest";
-import { Image } from "image-js";
+
+import type { Category } from "store/data/types";
+
 import { data } from "data/test-data/annotatorToolsTestData.json";
+
 import { PenAnnotationTool } from "../tools";
 import { AnnotationState } from "../enums";
-import { Category } from "store/data/types";
+import { loadTestImage } from "./loadTestImage";
 
 const src = data.image;
 
-test("onMouseDown", async () => {
-  const image = await Image.load(src);
+// runtime image is RGBA (GPU readback); SLIC/filters index accordingly
+
+test("onMouseDown", () => {
+  const image = loadTestImage(src);
 
   const operator = new PenAnnotationTool(image);
 
@@ -21,8 +26,8 @@ test("onMouseDown", async () => {
   expect(operator.buffer).toStrictEqual([{ x: 0, y: 0 }]);
 });
 
-test("onMouseMove", async () => {
-  const image = await Image.load(src);
+test("onMouseMove", () => {
+  const image = loadTestImage(src);
 
   const operator = new PenAnnotationTool(image);
 
@@ -45,8 +50,8 @@ test("onMouseMove", async () => {
   ]);
 });
 
-test("onMouseUp-NoMove", async () => {
-  const image = await Image.load(src);
+test("onMouseUp-NoMove", () => {
+  const image = loadTestImage(src);
 
   const operator = new PenAnnotationTool(image);
 
@@ -65,8 +70,8 @@ test("onMouseUp-NoMove", async () => {
   expect(operator.decodedMask).toBeDefined();
 });
 
-test("onMouseUp-Move", async () => {
-  const image = await Image.load(src);
+test("onMouseUp-Move", () => {
+  const image = loadTestImage(src);
 
   const operator = new PenAnnotationTool(image);
 
@@ -87,8 +92,8 @@ test("onMouseUp-Move", async () => {
   expect(operator.decodedMask).toBeDefined();
 });
 
-test("select", async () => {
-  const image = await Image.load(src);
+test("select", () => {
+  const image = loadTestImage(src);
 
   const operator = new PenAnnotationTool(image);
 
@@ -116,8 +121,8 @@ test("select", async () => {
   });
 });
 
-test("deselect", async () => {
-  const image = await Image.load(src);
+test("deselect", () => {
+  const image = loadTestImage(src);
 
   const operator = new PenAnnotationTool(image);
 

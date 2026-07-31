@@ -1,16 +1,12 @@
 import { test, expect, describe, it } from "vitest";
-import { decodeJpeg } from "image-js-latest";
 
-import { ColorAnnotationTool } from "../tools/ColorAnnotationTool";
+import type { Category } from "store/data/types";
 
 import { data } from "data/test-data/annotatorToolsTestData.json";
-import { AnnotationState } from "../enums";
-import { Category } from "store/data/types";
 
-const loadTestImage = (dataUrl: string) => {
-  const base64 = dataUrl.split(",")[1];
-  return decodeJpeg(Uint8Array.from(Buffer.from(base64, "base64")));
-};
+import { ColorAnnotationTool } from "../tools/ColorAnnotationTool";
+import { AnnotationState } from "../enums";
+import { loadTestImage } from "./loadTestImage";
 
 describe("onMouseDown", () => {
   const src = data.image;

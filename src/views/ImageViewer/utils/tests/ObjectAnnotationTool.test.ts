@@ -1,8 +1,10 @@
 import { test, expect } from "vitest";
-import { Image } from "image-js";
+
 import { data } from "data/test-data/annotatorToolsTestData.json";
+
 import { ObjectAnnotationTool } from "../tools";
 import { AnnotationState } from "../enums";
+import { loadTestImage } from "./loadTestImage";
 
 const src = data.image;
 
@@ -10,8 +12,8 @@ test("deselect", () => {
   expect(true).toBe(true);
 });
 
-test("onMouseDown", async () => {
-  const image = await Image.load(src);
+test("onMouseDown", () => {
+  const image = loadTestImage(src);
   const selectionOperator = new ObjectAnnotationTool(image);
 
   selectionOperator.onMouseDown({ x: 0, y: 0 });

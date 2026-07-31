@@ -1,14 +1,17 @@
 import { test, expect } from "vitest";
-import { Image } from "image-js";
+
+import type { Category } from "store/data/types";
+
 import { data } from "data/test-data/annotatorToolsTestData.json";
+
 import { LassoAnnotationTool } from "../tools";
 import { AnnotationState } from "../enums";
-import { Category } from "store/data/types";
+import { loadTestImage } from "./loadTestImage";
 
 const src = data.image;
 
-test("onMouseDown", async () => {
-  const image = await Image.load(src);
+test("onMouseDown", () => {
+  const image = loadTestImage(src);
 
   const operator = new LassoAnnotationTool(image);
 
@@ -27,8 +30,8 @@ test("onMouseDown", async () => {
   expect(operator.points).toStrictEqual([]);
 });
 
-test("onMouseMove", async () => {
-  const image = await Image.load(src);
+test("onMouseMove", () => {
+  const image = loadTestImage(src);
 
   const operator = new LassoAnnotationTool(image);
 
@@ -56,8 +59,8 @@ test("onMouseMove", async () => {
   expect(operator.points).toStrictEqual([]);
 });
 
-test("onMouseUp", async () => {
-  const image = await Image.load(src);
+test("onMouseUp", () => {
+  const image = loadTestImage(src);
 
   const operator = new LassoAnnotationTool(image);
 
@@ -89,8 +92,8 @@ test("onMouseUp", async () => {
   expect(operator.buffer).toStrictEqual([]);
 });
 
-test("select", async () => {
-  const image = await Image.load(src);
+test("select", () => {
+  const image = loadTestImage(src);
 
   const operator = new LassoAnnotationTool(image);
 
@@ -139,8 +142,8 @@ test("select", async () => {
   ]);
 });
 
-test("deselect", async () => {
-  const image = await Image.load(src);
+test("deselect", () => {
+  const image = loadTestImage(src);
 
   const operator = new LassoAnnotationTool(image);
 
@@ -177,8 +180,8 @@ test("deselect", async () => {
   expect(operator.points).toStrictEqual([]);
 });
 
-test("makeCircle", async () => {
-  const image = await Image.load(src);
+test("makeCircle", () => {
+  const image = loadTestImage(src);
 
   const operator = new LassoAnnotationTool(image);
 
