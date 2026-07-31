@@ -1,14 +1,23 @@
 import { test, expect } from "vitest";
-import { Image } from "image-js";
+import { decodeJpeg } from "image-js-latest";
+
+import type { Category } from "store/data/types";
+
 import { data } from "data/test-data/annotatorToolsTestData.json";
+
 import { MagneticAnnotationTool } from "../tools";
 import { AnnotationState } from "../enums";
-import { Category } from "store/data/types";
 
 const src = data.image;
 
-test("onMouseDown (unconnected)", async () => {
-  const image = await Image.load(src);
+// runtime image is RGBA (GPU readback); SLIC/filters index accordingly
+const loadTestImage = (dataUrl: string) =>
+  decodeJpeg(
+    Uint8Array.from(Buffer.from(dataUrl.split(",")[1], "base64")),
+  ).convertColor("RGBA");
+
+test("onMouseDown (unconnected)", () => {
+  const image = loadTestImage(src);
 
   const operator = new MagneticAnnotationTool(image);
 
@@ -22,8 +31,8 @@ test("onMouseDown (unconnected)", async () => {
   expect(operator.points).toStrictEqual([]);
 });
 
-test("onMouseMove (from origin)", async () => {
-  const image = await Image.load(src);
+test("onMouseMove (from origin)", () => {
+  const image = loadTestImage(src);
 
   const operator = new MagneticAnnotationTool(image);
 
@@ -44,8 +53,8 @@ test("onMouseMove (from origin)", async () => {
   expect(operator.points).toStrictEqual([]);
 });
 
-test("onMouseMove (from anchor)", async () => {
-  const image = await Image.load(src);
+test("onMouseMove (from anchor)", () => {
+  const image = loadTestImage(src);
 
   const operator = new MagneticAnnotationTool(image);
 
@@ -75,8 +84,8 @@ test("onMouseMove (from anchor)", async () => {
   expect(operator.points).toStrictEqual([]);
 });
 
-test("onMouseup (unconnected, from origin)", async () => {
-  const image = await Image.load(src);
+test("onMouseup (unconnected, from origin)", () => {
+  const image = loadTestImage(src);
 
   const operator = new MagneticAnnotationTool(image);
 
@@ -109,8 +118,8 @@ test("onMouseup (unconnected, from origin)", async () => {
   expect(operator.points).toStrictEqual([]);
 });
 
-test("onMouseup (unconnected, from anchor)", async () => {
-  const image = await Image.load(src);
+test("onMouseup (unconnected, from anchor)", () => {
+  const image = loadTestImage(src);
 
   const operator = new MagneticAnnotationTool(image);
 
@@ -135,8 +144,8 @@ test("onMouseup (unconnected, from anchor)", async () => {
   expect(operator.points).toStrictEqual([]);
 });
 
-test("onMouseUp (connected)", async () => {
-  const image = await Image.load(src);
+test("onMouseUp (connected)", () => {
+  const image = loadTestImage(src);
 
   const operator = new MagneticAnnotationTool(image);
 
@@ -168,8 +177,8 @@ test("onMouseUp (connected)", async () => {
   expect(operator.decodedMask).toBeDefined();
 });
 
-test("select", async () => {
-  const image = await Image.load(src);
+test("select", () => {
+  const image = loadTestImage(src);
 
   const operator = new MagneticAnnotationTool(image);
 
@@ -199,19 +208,19 @@ test("select", async () => {
   operator.annotate(category, 1, "");
 
   expect(operator.annotationState).toBe(AnnotationState.Annotated);
-  expect(operator.boundingBox).toStrictEqual([2, 0, 300, 324]);
+  expect(operator.boundingBox).toStrictEqual([10, 0, 300, 318]);
   expect(operator.decodedMask).toBeDefined();
 
   expect(operator.annotation).toMatchObject({
-    boundingBox: [2, 0, 300, 324],
+    boundingBox: [10, 0, 300, 318],
     categoryId: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
     activePlane: 1,
     imageId: "",
   });
 });
 
-test("deselect", async () => {
-  const image = await Image.load(src);
+test("deselect", () => {
+  const image = loadTestImage(src);
 
   const operator = new MagneticAnnotationTool(image);
 

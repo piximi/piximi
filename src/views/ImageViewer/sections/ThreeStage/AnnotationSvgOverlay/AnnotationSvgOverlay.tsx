@@ -29,6 +29,7 @@ import type {
   ColorAnnotationTool,
   EllipticalAnnotationTool,
   LassoAnnotationTool,
+  MagneticAnnotationTool,
   PenAnnotationTool,
   PolygonalAnnotationTool,
   QuickAnnotationTool,
@@ -54,6 +55,8 @@ const LivePreview = ({
       return <PolylinePreview operator={operator as PolygonalAnnotationTool} />;
     case ToolType.LassoAnnotation:
       return <PolylinePreview operator={operator as LassoAnnotationTool} />;
+    case ToolType.MagneticAnnotation:
+      return <PolylinePreview operator={operator as MagneticAnnotationTool} />;
     case ToolType.PenAnnotation:
       return <PenPreview operator={operator as PenAnnotationTool} />;
     case ToolType.ColorAnnotation:

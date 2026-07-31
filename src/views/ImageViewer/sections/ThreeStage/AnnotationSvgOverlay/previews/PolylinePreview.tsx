@@ -6,6 +6,7 @@ import {
 
 import type {
   LassoAnnotationTool,
+  MagneticAnnotationTool,
   PolygonalAnnotationTool,
 } from "views/ImageViewer/utils/tools";
 
@@ -17,7 +18,10 @@ import type {
 export const PolylinePreview = ({
   operator,
 }: {
-  operator: PolygonalAnnotationTool | LassoAnnotationTool;
+  operator:
+    | PolygonalAnnotationTool
+    | LassoAnnotationTool
+    | MagneticAnnotationTool;
 }) => {
   const { origin, anchor, buffer } = operator;
   if (!origin) return null;
