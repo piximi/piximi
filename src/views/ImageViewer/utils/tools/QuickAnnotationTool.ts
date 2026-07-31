@@ -1,4 +1,4 @@
-import { fromMask, Image as IJSImage } from "image-js-latest";
+import { encodeDataURL, fromMask, Image as IJSImage } from "image-js-latest";
 
 import { slic } from "views/ImageViewer/utils";
 
@@ -16,6 +16,17 @@ export class QuickAnnotationTool extends AnnotationTool {
   map?: Uint8Array | Uint8ClampedArray;
   startAnnotating = false;
   throttleTimer: boolean = false;
+  // Live preview raster (a cropped RGBA PNG data URL) + the region it covers, in
+  // image coords. Recomputed on each new superpixel and read by QuickPreview —
+  // mirrors ColorAnnotationTool's overlayData/overlayBoundingBox.
+  overlayData: string = "";
+  overlayBoundingBox?: [number, number, number, number];
+  // Running pixel extent of the superpixels stamped into currentMask so far, so
+  // we encode only the touched region instead of the whole image every move.
+  private overlayMinX = Infinity;
+  private overlayMinY = Infinity;
+  private overlayMaxX = -Infinity;
+  private overlayMaxY = -Infinity;
 
   _initializeSuperpixelse(regionSize: number) {
     this.regionSize = Math.round(regionSize);
@@ -69,8 +80,45 @@ export class QuickAnnotationTool extends AnnotationTool {
     this.lastSuperpixel = 0;
     this.annotation = undefined;
     this.currentMask = undefined;
+    this.resetOverlay();
 
     this.setBlank();
+  }
+
+  private resetOverlay() {
+    this.overlayData = "";
+    this.overlayBoundingBox = undefined;
+    this.overlayMinX = Infinity;
+    this.overlayMinY = Infinity;
+    this.overlayMaxX = -Infinity;
+    this.overlayMaxY = -Infinity;
+  }
+
+  // Encode just the touched sub-region of currentMask (+ small padding) into
+  // overlayData, positioned by overlayBoundingBox. Encoding a full-image PNG on
+  // every move makes dragging laggy on large images, so we crop to the running
+  // extent — same rationale as ColorAnnotationTool.updateOverlay.
+  private updateOverlay() {
+    if (
+      !this.currentMask ||
+      this.overlayMinX === Infinity ||
+      this.overlayMaxX === -Infinity
+    )
+      return;
+
+    const padding = 2;
+    const x1 = Math.max(0, this.overlayMinX - padding);
+    const y1 = Math.max(0, this.overlayMinY - padding);
+    const x2 = Math.min(this.image.width, this.overlayMaxX + padding + 1);
+    const y2 = Math.min(this.image.height, this.overlayMaxY + padding + 1);
+    this.overlayBoundingBox = [x1, y1, x2, y2];
+
+    const cropped = this.currentMask.crop({
+      origin: { column: x1, row: y1 },
+      width: x2 - x1,
+      height: y2 - y1,
+    });
+    this.overlayData = encodeDataURL(cropped);
   }
 
   onMouseDown(_position: { x: number; y: number }) {
@@ -86,6 +134,7 @@ export class QuickAnnotationTool extends AnnotationTool {
           colorModel: "RGBA",
         },
       );
+      this.resetOverlay();
     }
 
     if (!this.superpixels) return;
@@ -123,27 +172,47 @@ export class QuickAnnotationTool extends AnnotationTool {
           colorModel: "RGBA",
         },
       );
+      this.resetOverlay();
     }
 
     this.currentSuperpixels.add(superpixel);
 
     this.superpixelsMap[superpixel].forEach((index: number) => {
       this.currentMask!.setPixelByIndex(index, [255, 0, 0, 150]);
+      const x = index % this.image.width;
+      const y = Math.floor(index / this.image.width);
+      if (x < this.overlayMinX) this.overlayMinX = x;
+      if (x > this.overlayMaxX) this.overlayMaxX = x;
+      if (y < this.overlayMinY) this.overlayMinY = y;
+      if (y > this.overlayMaxY) this.overlayMaxY = y;
     });
+
+    this.updateOverlay();
   }
 
   onMouseUp(_position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationState.Annotating) return;
 
-    if (!this.currentMask) return;
-
+    if (!this.currentMask) {
+      this.deselect();
+      return;
+    }
     const greyMask = this.currentMask.grey();
-    const binaryMask = greyMask.threshold({ threshold: 1 });
-
+    // image-js-latest's threshold is a fraction of maxValue, so select any
+    // non-zero-grey pixel (the stamped superpixels) — matching the `i > 1`
+    // logic below. A literal `1` here would threshold at 100% of max and select
+    // nothing, leaving no ROI to derive the bounding box from.
+    const binaryMask = greyMask.threshold({
+      threshold: 1 / greyMask.maxValue,
+    });
     //compute bounding box with ROI manager
     const roiMap = fromMask(binaryMask);
-    // @ts-ignore it does exist
     const roi = roiMap.getRois()[0];
+    if (!roi) {
+      this.deselect();
+      return;
+    }
+
     const minX = roi.origin.column;
     const minY = roi.origin.row;
     this._boundingBox = [minX, minY, minX + roi.width, minY + roi.height];
@@ -151,6 +220,7 @@ export class QuickAnnotationTool extends AnnotationTool {
     const width = this._boundingBox[2] - this._boundingBox[0];
     const height = this._boundingBox[3] - this._boundingBox[1];
     if (width <= 0 || height <= 0) {
+      this.deselect();
       return;
     }
 

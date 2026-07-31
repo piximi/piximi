@@ -1,14 +1,25 @@
 import { test, expect } from "vitest";
-import { Image } from "image-js";
+import { decodeJpeg } from "image-js-latest";
+
+import type { Category } from "store/data/types";
+
 import { data } from "data/test-data/annotatorToolsTestData.json";
+
 import { QuickAnnotationTool } from "../tools";
 import { AnnotationState } from "../enums";
-import { Category } from "store/data/types";
 
 const src = data.image;
 
+// Match what the app feeds the tool: a RGBA IJSImage (the runtime image comes
+// from GPU readback as RGBA, and SLIC indexes data[4*i]). JPEG decodes to RGB,
+// so convert.
+const loadTestImage = (dataUrl: string) =>
+  decodeJpeg(
+    Uint8Array.from(Buffer.from(dataUrl.split(",")[1], "base64")),
+  ).convertColor("RGBA");
+
 test("initializeSuperPixels", async () => {
-  const image = await Image.load(src);
+  const image = loadTestImage(src);
 
   const operator = new QuickAnnotationTool(image);
 
@@ -21,7 +32,7 @@ test("initializeSuperPixels", async () => {
 });
 
 test("onMouseMove", async () => {
-  const image = await Image.load(src);
+  const image = loadTestImage(src);
 
   const operator = new QuickAnnotationTool(image);
   operator.initializeSuperpixels(30);
@@ -30,10 +41,14 @@ test("onMouseMove", async () => {
 
   expect(operator.annotation).toBe(undefined);
   expect(operator.currentMask).toBeDefined();
+
+  // live preview raster is produced for the touched region
+  expect(operator.overlayData.length).toBeGreaterThan(0);
+  expect(operator.overlayBoundingBox).toBeDefined();
 });
 
 test("onMouseDown", async () => {
-  const image = await Image.load(src);
+  const image = loadTestImage(src);
 
   const operator = new QuickAnnotationTool(image);
   operator.initializeSuperpixels(30);
@@ -45,7 +60,7 @@ test("onMouseDown", async () => {
 });
 
 test("onMouseUp", async () => {
-  const image = await Image.load(src);
+  const image = loadTestImage(src);
 
   const operator = new QuickAnnotationTool(image);
   operator.initializeSuperpixels(30);
@@ -58,12 +73,12 @@ test("onMouseUp", async () => {
 
   expect(operator.annotationState).toBe(AnnotationState.Annotated);
 
-  expect(operator.boundingBox).toStrictEqual([182, 175, 218, 212]);
+  expect(operator.boundingBox).toStrictEqual([182, 175, 219, 213]);
   expect(operator.decodedMask).toBeDefined();
 });
 
 test("onMouseUp (Adding)", async () => {
-  const image = await Image.load(src);
+  const image = loadTestImage(src);
 
   const operator = new QuickAnnotationTool(image);
   operator.initializeSuperpixels(30);
@@ -82,12 +97,12 @@ test("onMouseUp (Adding)", async () => {
 
   expect(operator.annotationState).toBe(AnnotationState.Annotated);
 
-  expect(operator.boundingBox).toStrictEqual([182, 175, 218, 212]);
+  expect(operator.boundingBox).toStrictEqual([182, 175, 219, 213]);
   expect(operator.decodedMask).toBeDefined();
 });
 
 test("select", async () => {
-  const image = await Image.load(src);
+  const image = loadTestImage(src);
 
   const operator = new QuickAnnotationTool(image);
   operator.initializeSuperpixels(30);
@@ -115,7 +130,7 @@ test("select", async () => {
   operator.annotate(category, 1, "");
 
   expect(operator.annotation).toMatchObject({
-    boundingBox: [182, 175, 218, 212],
+    boundingBox: [182, 175, 219, 213],
     categoryId: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
     activePlane: 1,
     imageId: "",
@@ -123,7 +138,7 @@ test("select", async () => {
 });
 
 test("deselect", async () => {
-  const image = await Image.load(src);
+  const image = loadTestImage(src);
 
   const operator = new QuickAnnotationTool(image);
   operator.initializeSuperpixels(30);
@@ -156,4 +171,8 @@ test("deselect", async () => {
   expect(operator.currentSuperpixels.size).toBe(0);
   expect(operator.lastSuperpixel).toBe(0);
   expect(operator.annotationState).toBe(AnnotationState.Blank);
+
+  // preview state is cleared on deselect
+  expect(operator.overlayData).toBe("");
+  expect(operator.overlayBoundingBox).toBe(undefined);
 });

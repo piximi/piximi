@@ -19,6 +19,7 @@ import { EllipsePreview } from "./previews/EllipsePreview";
 import { PolylinePreview } from "./previews/PolylinePreview";
 import { PenPreview } from "./previews/PenPreview";
 import { ColorPreview } from "./previews/ColorPreview";
+import { QuickPreview } from "./previews/QuickPreview";
 import { WorkingAnnotationImage } from "./WorkingAnnotationImage";
 import { SelectionBorder, SelectionButtons } from "./SelectionChrome";
 import { BrushCursor } from "./BrushCursor";
@@ -30,6 +31,7 @@ import type {
   LassoAnnotationTool,
   PenAnnotationTool,
   PolygonalAnnotationTool,
+  QuickAnnotationTool,
   RectangularAnnotationTool,
 } from "views/ImageViewer/utils/tools";
 
@@ -56,6 +58,8 @@ const LivePreview = ({
       return <PenPreview operator={operator as PenAnnotationTool} />;
     case ToolType.ColorAnnotation:
       return <ColorPreview operator={operator as ColorAnnotationTool} />;
+    case ToolType.QuickAnnotation:
+      return <QuickPreview operator={operator as QuickAnnotationTool} />;
     default:
       return null;
   }
@@ -128,7 +132,7 @@ export const AnnotationSvgOverlay = ({
     >
       <MarchingAntsKeyframes />
       <g ref={gRef} data-draw-tick={drawTick}>
-        {isAnnotating && (
+        {(isAnnotating || toolType === ToolType.QuickAnnotation) && (
           <LivePreview operator={annotationTool} toolType={toolType} />
         )}
         <WorkingAnnotationImage
