@@ -1,7 +1,13 @@
 import type { ReactNode } from "react";
 import { createContext, useCallback, useContext, useMemo, useRef } from "react";
 
+import { useDispatch, useSelector } from "react-redux";
+
+import { imageViewerSlice } from "@ImageViewer/state/imageViewer";
+import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
+
 import { imageToScreenTransform } from "./coords";
+import { ZOOM_MAX, ZOOM_MIN } from "./useThreePanZoom";
 
 import type * as THREE from "three";
 import type { ViewportState } from "./coords";
@@ -9,9 +15,9 @@ import type { ViewportState } from "./coords";
 type ScreenTransform = ReturnType<typeof imageToScreenTransform>;
 
 type ThreeViewportValue = {
-  cameraRef: React.RefObject<THREE.OrthographicCamera | null>;
-  rendererRef: React.RefObject<THREE.WebGLRenderer | null>;
-  sceneRef: React.RefObject<THREE.Scene | null>;
+  cameraRef: React.MutableRefObject<THREE.OrthographicCamera | null>;
+  rendererRef: React.MutableRefObject<THREE.WebGLRenderer | null>;
+  sceneRef: React.MutableRefObject<THREE.Scene | null>;
   /** Render the scene through the viewport camera (there is no rAF loop). */
   requestRender: () => void;
   /** Current viewport state from the live camera + dims, or null if not ready. */
@@ -22,6 +28,12 @@ type ThreeViewportValue = {
   onCameraChange: (cb: () => void) => () => void;
   /** Notify subscribers that the camera transform changed. */
   notifyCameraChanged: () => void;
+  /** Fit the image to the stage (centered) and mirror to Redux. */
+  fitToScreen: () => void;
+  /** Reset zoom to 1:1 (centered) and mirror to Redux. */
+  zoomToActualSize: () => void;
+  /** Recenter the camera on the image at the current zoom. */
+  resetPosition: () => void;
 };
 
 const ThreeViewportContext = createContext<ThreeViewportValue | null>(null);
@@ -37,35 +49,31 @@ export const useThreeViewport = (): ThreeViewportValue => {
 };
 
 /**
- * Builds the viewport value from the refs/dims owned by ThreeStage. Returned so
- * ThreeStage can both provide it and hand `notifyCameraChanged` to the pan/zoom
- * and resize/reset effects.
+ * Builds the viewport value from the camera/renderer/scene refs owned by the
+ * ThreeViewportProvider. Stage dims are read from the live camera frustum and
+ * image dims from the active image, so the value carries no dimension props and
+ * can live at the ImageViewer root — above both the stage and the toolbar.
  */
 export const useThreeViewportValue = (args: {
-  cameraRef: React.RefObject<THREE.OrthographicCamera | null>;
-  rendererRef: React.RefObject<THREE.WebGLRenderer | null>;
-  sceneRef: React.RefObject<THREE.Scene | null>;
-  stageWidth: number;
-  stageHeight: number;
-  imageWidth: number;
-  imageHeight: number;
+  cameraRef: React.MutableRefObject<THREE.OrthographicCamera | null>;
+  rendererRef: React.MutableRefObject<THREE.WebGLRenderer | null>;
+  sceneRef: React.MutableRefObject<THREE.Scene | null>;
 }): ThreeViewportValue => {
   const { cameraRef, rendererRef, sceneRef } = args;
+  const dispatch = useDispatch();
+  const image = useSelector(selectActiveViewerImage);
 
   const subscribersRef = useRef<Set<() => void>>(new Set());
 
-  // Keep the latest dims in a ref so the stable callbacks read current values.
-  const dimsRef = useRef({
-    stageWidth: args.stageWidth,
-    stageHeight: args.stageHeight,
-    imageWidth: args.imageWidth,
-    imageHeight: args.imageHeight,
+  // Image dims come from the active image; kept in a ref so the stable callbacks
+  // read current values. Stage dims are derived from the live camera frustum.
+  const imageDimsRef = useRef({
+    imageWidth: image?.shape.width ?? 1,
+    imageHeight: image?.shape.height ?? 1,
   });
-  dimsRef.current = {
-    stageWidth: args.stageWidth,
-    stageHeight: args.stageHeight,
-    imageWidth: args.imageWidth,
-    imageHeight: args.imageHeight,
+  imageDimsRef.current = {
+    imageWidth: image?.shape.width ?? 1,
+    imageHeight: image?.shape.height ?? 1,
   };
 
   const requestRender = useCallback(() => {
@@ -78,11 +86,12 @@ export const useThreeViewportValue = (args: {
   const getViewportState = useCallback((): ViewportState | null => {
     const camera = cameraRef.current;
     if (!camera) return null;
-    const { stageWidth, stageHeight, imageWidth, imageHeight } =
-      dimsRef.current;
+    const { imageWidth, imageHeight } = imageDimsRef.current;
     return {
-      stageWidth,
-      stageHeight,
+      // Frustum equals the stage size by construction (set in ThreeStage's
+      // init/resize effects); zoom/pan never touch it.
+      stageWidth: camera.right - camera.left,
+      stageHeight: camera.top - camera.bottom,
       cameraPosX: camera.position.x,
       cameraPosY: camera.position.y,
       cameraZoom: camera.zoom,
@@ -107,6 +116,55 @@ export const useThreeViewportValue = (args: {
     subscribersRef.current.forEach((cb) => cb());
   }, []);
 
+  // Mutate-then-commit: after changing the camera, refresh the projection,
+  // re-render, notify overlay subscribers, and mirror the transform to Redux.
+  const applyCamera = useCallback(() => {
+    const camera = cameraRef.current;
+    if (!camera) return;
+    camera.updateProjectionMatrix();
+    requestRender();
+    notifyCameraChanged();
+    dispatch(
+      imageViewerSlice.actions.setZoomToolOptions({
+        options: { scale: camera.zoom },
+      }),
+    );
+    dispatch(
+      imageViewerSlice.actions.setStagePosition({
+        stagePosition: { x: camera.position.x, y: camera.position.y },
+      }),
+    );
+  }, [cameraRef, requestRender, notifyCameraChanged, dispatch]);
+
+  const fitToScreen = useCallback(() => {
+    const camera = cameraRef.current;
+    if (!camera) return;
+    const { imageWidth, imageHeight } = imageDimsRef.current;
+    if (!imageWidth || !imageHeight) return;
+    const stageWidth = camera.right - camera.left;
+    const stageHeight = camera.top - camera.bottom;
+    const fit = Math.min(stageWidth / imageWidth, stageHeight / imageHeight);
+    camera.zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, fit));
+    camera.position.set(0, 0, camera.position.z);
+    applyCamera();
+  }, [cameraRef, applyCamera]);
+
+  const zoomToActualSize = useCallback(() => {
+    const camera = cameraRef.current;
+    if (!camera) return;
+    camera.zoom = 1;
+    camera.position.set(0, 0, camera.position.z);
+    applyCamera();
+  }, [cameraRef, applyCamera]);
+
+  const resetPosition = useCallback(() => {
+    const camera = cameraRef.current;
+    if (!camera) return;
+    // World origin keeps the image centered; preserve the current zoom.
+    camera.position.set(0, 0, camera.position.z);
+    applyCamera();
+  }, [cameraRef, applyCamera]);
+
   return useMemo(
     () => ({
       cameraRef,
@@ -117,6 +175,9 @@ export const useThreeViewportValue = (args: {
       getImageToScreenTransform,
       onCameraChange,
       notifyCameraChanged,
+      fitToScreen,
+      zoomToActualSize,
+      resetPosition,
     }),
     [
       cameraRef,
@@ -127,18 +188,25 @@ export const useThreeViewportValue = (args: {
       getImageToScreenTransform,
       onCameraChange,
       notifyCameraChanged,
+      fitToScreen,
+      zoomToActualSize,
+      resetPosition,
     ],
   );
 };
 
 export const ThreeViewportProvider = ({
-  value,
   children,
 }: {
-  value: ThreeViewportValue;
   children: ReactNode;
-}) => (
-  <ThreeViewportContext.Provider value={value}>
-    {children}
-  </ThreeViewportContext.Provider>
-);
+}) => {
+  const cameraRef = useRef<THREE.OrthographicCamera | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const value = useThreeViewportValue({ cameraRef, rendererRef, sceneRef });
+  return (
+    <ThreeViewportContext.Provider value={value}>
+      {children}
+    </ThreeViewportContext.Provider>
+  );
+};

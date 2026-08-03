@@ -15,10 +15,7 @@ import { useThreeChannelRenderer } from "./useThreeChannelRenderer";
 import { useThreePanZoom } from "./useThreePanZoom";
 import { ActiveImageInfoStrip } from "./ActiveImageInfoStrip";
 import { screenToImage } from "./coords";
-import {
-  ThreeViewportProvider,
-  useThreeViewportValue,
-} from "./ThreeViewportContext";
+import { useThreeViewport } from "./ThreeViewportContext";
 import { ThreeAnnotationLayer } from "./ThreeAnnotationLayer";
 
 type ThreeStageProps = {
@@ -28,10 +25,12 @@ type ThreeStageProps = {
 
 export const ThreeStage = ({ stageWidth, stageHeight }: ThreeStageProps) => {
   const mountRef = useRef<HTMLDivElement>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const cameraRef = useRef<THREE.OrthographicCamera | null>(null);
+  // Camera/renderer/scene refs are owned by the ThreeViewportProvider (mounted at
+  // the ImageViewer root) so the toolbar can drive the camera too. This effect
+  // populates them below.
+  const { cameraRef, rendererRef, sceneRef, notifyCameraChanged } =
+    useThreeViewport();
   const imageCamRef = useRef<THREE.OrthographicCamera | null>(null); // fixed camera for readback
-  const sceneRef = useRef<THREE.Scene | null>(null);
   const imageTargetRef = useRef<THREE.WebGLRenderTarget | null>(null);
   const [absolutePosition, setAbsolutePosition] = useState<
     { x: number; y: number } | undefined
@@ -55,19 +54,6 @@ export const ThreeStage = ({ stageWidth, stageHeight }: ThreeStageProps) => {
 
   // Set once the renderer/scene/camera exist, gating the annotation layer.
   const [ready, setReady] = useState(false);
-
-  // Shared viewport: exposes the camera transform + render trigger to the
-  // annotation layer and keeps the SVG overlay glued to the image.
-  const viewport = useThreeViewportValue({
-    cameraRef,
-    rendererRef,
-    sceneRef,
-    stageWidth,
-    stageHeight,
-    imageWidth,
-    imageHeight,
-  });
-  const { notifyCameraChanged } = viewport;
 
   // --- Init renderer, scene, cameras (once) ---
   useEffect(() => {
@@ -214,19 +200,17 @@ export const ThreeStage = ({ stageWidth, stageHeight }: ThreeStageProps) => {
         sx={{ position: "relative", width: stageWidth, height: stageHeight }}
       >
         <Box ref={mountRef} sx={{ width: stageWidth, height: stageHeight }} />
-        <ThreeViewportProvider value={viewport}>
-          {ready && (
-            <ThreeAnnotationLayer
-              mountRef={mountRef}
-              isPanningRef={isPanningRef}
-              ijsImage={ijsImage}
-              stageWidth={stageWidth}
-              stageHeight={stageHeight}
-              imageWidth={imageWidth}
-              imageHeight={imageHeight}
-            />
-          )}
-        </ThreeViewportProvider>
+        {ready && (
+          <ThreeAnnotationLayer
+            mountRef={mountRef}
+            isPanningRef={isPanningRef}
+            ijsImage={ijsImage}
+            stageWidth={stageWidth}
+            stageHeight={stageHeight}
+            imageWidth={imageWidth}
+            imageHeight={imageHeight}
+          />
+        )}
       </Box>
       {image && (
         <ActiveImageInfoStrip

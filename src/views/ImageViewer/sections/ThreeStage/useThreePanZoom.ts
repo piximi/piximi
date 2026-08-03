@@ -8,8 +8,8 @@ import { selectZoomToolOptions } from "@ImageViewer/state/imageViewer/selectors"
 import type * as THREE from "three";
 
 const ZOOM_SPEED = 0.035;
-const ZOOM_MIN = 0.25;
-const ZOOM_MAX = 5;
+export const ZOOM_MIN = 0.25;
+export const ZOOM_MAX = 5;
 
 export function useThreePanZoom(
   mountRef: React.RefObject<HTMLDivElement | null>,
