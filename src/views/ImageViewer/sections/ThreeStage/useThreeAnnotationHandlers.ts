@@ -48,7 +48,6 @@ export const useThreeAnnotationHandlers = ({
   const dispatch = useDispatch();
   const toolType = useSelector(selectToolType);
   const annotationMode = useSelector(selectAnnotationMode);
-  const selectedAnnotationsIds: string[] = [];
   const { getViewportState } = useThreeViewport();
 
   const [absolutePosition, setAbsolutePosition] = useState<Point | undefined>();
@@ -56,7 +55,8 @@ export const useThreeAnnotationHandlers = ({
 
   const deselectAllAnnotations = useCallback(() => {
     batch(() => {
-      dispatch(imageViewerDataSlice.actions.setSelectedAnnotationIds([]));
+      // Clears the whole selection layer — criterion and manual overrides alike.
+      dispatch(imageViewerDataSlice.actions.clearSelectionLayer());
       dispatch(
         annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
       );
@@ -73,12 +73,7 @@ export const useThreeAnnotationHandlers = ({
     minimum,
     maximum,
     selecting,
-  } = usePointerTool(
-    absolutePosition,
-    deselectAllAnnotations,
-    selectedAnnotationsIds,
-    toolType,
-  );
+  } = usePointerTool(absolutePosition, deselectAllAnnotations, toolType);
 
   // Latest-ref: DOM listeners are attached once but must call current values.
   const latest = useRef({

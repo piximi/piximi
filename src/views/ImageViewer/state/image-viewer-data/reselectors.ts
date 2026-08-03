@@ -78,17 +78,31 @@ export const selectVisibleAnnotations = createSelector(
     applyFilterLayer(anns, planeScope, layer, im?.activePlaneIdx ?? 0),
 );
 
+/**
+ * The selected set: the criterion's matches, plus manually included annotations,
+ * minus manually excluded ones. Derived from the *visible* annotations, so ids
+ * hidden by the filter layer or out of plane scope drop out on their own rather
+ * than dangling.
+ *
+ * No empty-criterion guard here — `matchesLayer` already returns false for a
+ * criterion with no positive term. Guarding on the category/feature counts alone
+ * would swallow a click-only selection.
+ */
 export const selectSelectedAnnotations = createSelector(
   selectVisibleAnnotations,
   selectSelectionLayer,
   selectAllExtendedKinds,
   (anns, sl, kinds) => {
     if (anns.length === 0) return [];
-    const { catIds: selCats, features } = sl;
+    const { catIds: selCats, features, includeIds, excludeIds } = sl;
     const { kindIds, catIds } = splitSelection(selCats, kinds);
-    const featureList = activeFeatureList(features);
-    if (kindIds.length + catIds.length + featureList.length === 0) return [];
-    const criterion = { catIds, kindIds, features: featureList };
+    const criterion = {
+      catIds,
+      kindIds,
+      features: activeFeatureList(features),
+      includeIds,
+      excludeIds,
+    };
     return anns.filter((a) => matchesLayer(a, criterion));
   },
 );

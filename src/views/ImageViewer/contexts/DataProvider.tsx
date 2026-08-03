@@ -53,11 +53,15 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       dispatch(
         imageViewerDataSlice.actions.setActiveImageId(initialImageIds[0]),
       );
-      dispatch(
-        imageViewerDataSlice.actions.setSelectedAnnotationIds(
-          initialAnnotationIds,
-        ),
-      );
+      // Annotations hand-picked in the ProjectViewer match no category or
+      // feature criterion, so they seed the sticky include set.
+      if (initialAnnotationIds.length)
+        dispatch(
+          imageViewerDataSlice.actions.toggleAnnotationSelection({
+            ids: initialAnnotationIds,
+            on: true,
+          }),
+        );
     });
   }, [routerLocation.state]);
   return (

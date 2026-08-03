@@ -4,7 +4,7 @@ import { difference } from "lodash";
 import { UNKNOWN_KIND_CATEGORY } from "store/dataV2/constants";
 import type { FeatureKey } from "store/dataV2/types";
 
-import { emptyFeatureState } from "./utils";
+import { emptySelectionLayer } from "./utils";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type {
@@ -22,11 +22,10 @@ const initialState: ImageViewerDataState = {
   selectedCategory: UNKNOWN_KIND_CATEGORY,
   highlightedCategory: undefined,
   hasUnsavedChanges: false,
-  selectedAnnotationIds: [],
   zLinking: { active: false, annIds: {} },
   filterLayer: undefined,
   planeScope: "current",
-  selectionLayer: { catIds: [], features: emptyFeatureState() },
+  selectionLayer: emptySelectionLayer(),
 };
 
 export const imageViewerDataSlice = createSlice({
@@ -86,60 +85,76 @@ export const imageViewerDataSlice = createSlice({
       state.highlightedCategory = action.payload.categoryId;
     },
 
-    addSelectedAnnotationId(state, action: PayloadAction<string>) {
-      state.selectedAnnotationIds.push(action.payload);
-    },
-    addSelectedAnnotationIds(
-      state,
-      action: PayloadAction<Array<string> | string>,
-    ) {
-      let ids = action.payload;
-      if (!Array.isArray(ids)) ids = [ids];
-      state.selectedAnnotationIds.push(...ids);
-    },
-    setSelectedAnnotationIds(
-      state,
-      action: PayloadAction<Array<string> | string>,
-    ) {
-      let ids = action.payload;
-      if (!Array.isArray(ids)) ids = [ids];
-      state.selectedAnnotationIds = ids;
-    },
-
-    removeSelectedAnnotationIds(
-      state,
-      action: PayloadAction<Array<string> | string>,
-    ) {
-      let ids = action.payload;
-      if (!Array.isArray(ids)) ids = [ids];
-      state.selectedAnnotationIds = difference(
-        state.selectedAnnotationIds,
-        ids,
-      );
-    },
     clearSelectionLayer(state) {
-      state.selectionLayer = { catIds: [], features: emptyFeatureState() };
+      state.selectionLayer = emptySelectionLayer();
     },
-    toggleCatSelection(
+    /**
+     * Flip the manual selection state of specific annotations. `on` is decided by
+     * the caller, not here — knowing whether an annotation is currently selected
+     * needs its category and features, which this slice doesn't hold.
+     */
+    toggleAnnotationSelection(
       state,
       action: PayloadAction<{ ids: string[]; on: boolean }>,
     ) {
       const { ids, on } = action.payload;
+      const inc = new Set(state.selectionLayer.includeIds);
+      const exc = new Set(state.selectionLayer.excludeIds);
+      ids.forEach((id) => {
+        if (on) {
+          inc.add(id);
+          exc.delete(id);
+        } else {
+          exc.add(id);
+          inc.delete(id);
+        }
+      });
+      state.selectionLayer.includeIds = [...inc];
+      state.selectionLayer.excludeIds = [...exc];
+    },
+    /**
+     * `admits` are the annotation ids the categories being switched on match.
+     * Adding a term drops manual exclusions among its own matches only, so
+     * checking a second category leaves the first category's exclusions alone.
+     * Switching a category off clears nothing.
+     */
+    toggleCatSelection(
+      state,
+      action: PayloadAction<{ ids: string[]; on: boolean; admits?: string[] }>,
+    ) {
+      const { ids, on, admits } = action.payload;
       const next = new Set(state.selectionLayer.catIds);
       ids.forEach((id) => (on ? next.add(id) : next.delete(id)));
       state.selectionLayer.catIds = [...next];
+      if (on && admits?.length)
+        state.selectionLayer.excludeIds = difference(
+          state.selectionLayer.excludeIds,
+          admits,
+        );
     },
     toggleFeatureSelection(
       state,
-      action: PayloadAction<{ key: FeatureKey; bounds: [number, number] }>,
+      action: PayloadAction<{
+        key: FeatureKey;
+        bounds: [number, number];
+        admits?: string[];
+      }>,
     ) {
       const feat = state.selectionLayer.features[action.payload.key];
       feat.active = !feat.active;
       if (feat.active) {
         feat.min = action.payload.bounds[0];
         feat.max = action.payload.bounds[1];
+        if (action.payload.admits?.length)
+          state.selectionLayer.excludeIds = difference(
+            state.selectionLayer.excludeIds,
+            action.payload.admits,
+          );
       }
     },
+    // Deliberately takes no `admits` and clears no exclusions: dragging the
+    // bounds of an already-active range must not wipe manual deselections, or
+    // tuning a slider silently discards them on the first pixel of movement.
     updateFeatureSelection(
       state,
       action: PayloadAction<{ key: FeatureKey; range: [number, number] }>,

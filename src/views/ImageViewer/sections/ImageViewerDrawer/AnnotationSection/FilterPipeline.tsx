@@ -41,6 +41,13 @@ export const formatLayerLabel = (
   (layer.features || []).forEach((f) =>
     parts.push(`${cap(f.feature)} ${f.min}–${f.max}`),
   );
+  // Hand-picked annotations must show up here: a layer built from a click-only
+  // selection has no category or feature parts, and labelling it "any" would
+  // read as "matches everything" — the opposite of what it does.
+  const picked = layer.includeIds?.length ?? 0;
+  if (picked) parts.push(`${picked} picked`);
+  const omitted = layer.excludeIds?.length ?? 0;
+  if (omitted) parts.push(`−${omitted}`);
   if (!parts.length) return "any";
   return (
     parts.slice(0, 2).join(", ") +

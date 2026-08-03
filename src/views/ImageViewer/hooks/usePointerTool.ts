@@ -1,43 +1,37 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-import { batch, useDispatch, useSelector } from "react-redux";
-
-import { useHotkeys } from "hooks/useHotkeys";
+import { useDispatch, useSelector } from "react-redux";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { getOverlappingAnnotations } from "views/ImageViewer/utils";
 import { getAnnotationsInBox } from "views/ImageViewer/utils/imageHelper";
 import { ToolType } from "views/ImageViewer/utils/enums";
-import { selectAllActiveAnnotations } from "@ImageViewer/state/image-viewer-data/reselectors";
+import {
+  selectAllActiveAnnotations,
+  selectSelectedAnnotations,
+} from "@ImageViewer/state/image-viewer-data/reselectors";
 import type { ExtendedAnnotationObject } from "store/dataV2/types";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
 
-import { HotkeyContext } from "utils/enums";
 import type { Point } from "utils/types";
 
 const delta = 10;
 
-const selectAnnotations = ({
+const annotationsInDragBox = ({
   position,
   activeAnnotations,
-  selectedAnnotationsIds,
   minimum,
-  addToExisting,
 }: {
   position: Point;
   activeAnnotations: ExtendedAnnotationObject[];
-  selectedAnnotationsIds: string[];
-  addToExisting: boolean;
   minimum: Point;
-}) => {
+}): string[] => {
   // correct minimum or maximum in the case where user may have selected rectangle from right to left
-
   const minimumNew: { x: number; y: number } = {
     x: minimum.x > position.x ? position.x : minimum.x,
     y: minimum.y > position.y ? position.y : minimum.y,
   };
-  if (!minimumNew) return [];
   const maximumNew: { x: number; y: number } = {
     x: minimum.x > position.x ? minimum.x : position.x,
     y: minimum.y > position.y ? minimum.y : position.y,
@@ -50,75 +44,65 @@ const selectAnnotations = ({
   );
   if (!annotationsInBox) return [];
 
-  const newSelectedAnnotations: string[] = annotationsInBox.map((an) => an.id);
-  if (addToExisting) {
-    return [...new Set([...selectedAnnotationsIds, ...newSelectedAnnotations])];
-  } else {
-    return newSelectedAnnotations;
-  }
+  return annotationsInBox.map((an) => an.id);
 };
 
+/**
+ * Click and box-drag selection. Both gestures write to the selection layer's
+ * manual override sets, which sit on top of the category/feature criterion:
+ *
+ *   - A click toggles one annotation. Clicking a criterion-selected annotation
+ *     off records an exclusion; clicking an unmatched one on records a sticky
+ *     include.
+ *   - A box drag includes everything it encloses (a box is an explicit "these",
+ *     never a deselection).
+ *
+ * `on` is decided here rather than in the reducer because whether an annotation
+ * is currently selected depends on the live criterion.
+ */
 export const usePointerTool = (
-  absolutePosition: any,
-  deselectAllAnnotations: any,
-  selectedAnnotationsIds: any,
-  toolType: any,
+  absolutePosition: Point | undefined,
+  deselectAllAnnotations: () => void,
+  toolType: ToolType,
 ) => {
   const dispatch = useDispatch();
   const activeImageId = useSelector(selectActiveImageId);
   const activeAnnotations = useSelector(selectAllActiveAnnotations);
+  const selectedAnnotations = useSelector(selectSelectedAnnotations);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [shift, setShift] = useState<boolean>(false);
   const [dragging, setDragging] = useState<boolean>(false);
   const [minimum, setMinimum] = useState<Point | undefined>();
   const [maximum, setMaximum] = useState<Point | undefined>();
   const [selecting, setSelecting] = useState<boolean>(false);
 
-  useHotkeys(
-    "shift",
-    (event) => {
-      if (event.type === "keydown") {
-        setShift(true);
-      } else {
-        setShift(false);
-      }
-    },
-    HotkeyContext.AnnotatorView,
-    { keyup: true, keydown: true },
-    [],
+  const selectedIds = useMemo(
+    () => new Set(selectedAnnotations.map((a) => a.id)),
+    [selectedAnnotations],
   );
+
+  // No shift tracking: clicks toggle, so there is no add-to-existing modifier to
+  // distinguish from a replacing click.
 
   const selectEnclosedAnnotations = useCallback(
     (position: { x: number; y: number }) => {
       if (!position || !selecting || !minimum || activeAnnotations.length === 0)
         return;
-      // correct minimum or maximum in the case where user may have selected rectangle from right to left
-      const selectedAnnotations = selectAnnotations({
+      const enclosed = annotationsInDragBox({
         position,
         activeAnnotations,
         minimum,
-        selectedAnnotationsIds,
-        addToExisting: shift,
       });
-      if (selectedAnnotations.length > 0)
-        batch(() => {
-          dispatch(
-            imageViewerDataSlice.actions.setSelectedAnnotationIds(
-              selectedAnnotations,
-            ),
-          );
-        });
+      if (enclosed.length > 0)
+        dispatch(
+          imageViewerDataSlice.actions.toggleAnnotationSelection({
+            ids: enclosed,
+            on: true,
+          }),
+        );
 
       setSelecting(false);
     },
-    [
-      activeAnnotations,
-      dispatch,
-      minimum,
-      selectedAnnotationsIds,
-      selecting,
-      shift,
-    ],
+    [activeAnnotations, dispatch, minimum, selecting],
   );
 
   const handleClick = useCallback(() => {
@@ -164,32 +148,20 @@ export const usePointerTool = (
 
     if (!currentAnnotation) return;
 
-    if (!shift) {
-      batch(() => {
-        dispatch(
-          imageViewerDataSlice.actions.setSelectedAnnotationIds([
-            currentAnnotation!.id,
-          ]),
-        );
-      });
-    }
-
-    if (shift && !selectedAnnotationsIds.includes(currentAnnotation.id)) {
-      //include newly selected annotation if not already selected
-      dispatch(
-        imageViewerDataSlice.actions.setSelectedAnnotationIds([
-          ...selectedAnnotationsIds,
-          currentAnnotation.id,
-        ]),
-      );
-    }
+    // A click always toggles just this annotation — there is no replace gesture,
+    // so a stray click can never discard a built-up category/feature criterion.
+    dispatch(
+      imageViewerDataSlice.actions.toggleAnnotationSelection({
+        ids: [currentAnnotation.id],
+        on: !selectedIds.has(currentAnnotation.id),
+      }),
+    );
   }, [
     activeAnnotations,
     currentIndex,
     dispatch,
     activeImageId,
-    selectedAnnotationsIds,
-    shift,
+    selectedIds,
     toolType,
     deselectAllAnnotations,
     absolutePosition,

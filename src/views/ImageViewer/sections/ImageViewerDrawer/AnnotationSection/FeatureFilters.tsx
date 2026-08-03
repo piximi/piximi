@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 
-import { useDispatch } from "react-redux";
-
 import { Box, Collapse, Slider, Switch, Typography } from "@mui/material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import type { FeatureKey } from "store/dataV2/types";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+
+import { useCriterionToggles } from "./useCriterionToggles";
 
 import type { FeatureParams } from "@ImageViewer/state/image-viewer-data/utils";
 import type {
@@ -92,21 +91,14 @@ export const FeatureFilters = ({
   featureParams,
   feats,
 }: FeatureFiltersProps) => {
-  const dispatch = useDispatch();
+  const { toggleFeature, setFeatureRange } = useCriterionToggles();
   const [open, setFeatOpen] = useState(false);
   const handleToggleOpen = () => setFeatOpen((o) => !o);
   const activeCount = Object.values(feats).filter((f) => f.active).length;
   const handleToggleFeat = (key: FeatureKey, bounds: [number, number]) =>
-    dispatch(
-      imageViewerDataSlice.actions.toggleFeatureSelection({ key, bounds }),
-    );
+    toggleFeature(key, bounds);
   const handleFeatRange = (key: FeatureKey, [min, max]: [number, number]) =>
-    dispatch(
-      imageViewerDataSlice.actions.updateFeatureSelection({
-        key,
-        range: [min, max],
-      }),
-    );
+    setFeatureRange(key, [min, max]);
 
   return (
     <Box sx={{ borderBottom: 1, borderColor: "divider" }}>

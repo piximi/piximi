@@ -12,6 +12,7 @@ import type {
   FilterLayer,
   LayerCriterion,
   PlaneScope,
+  SelectionLayer,
 } from "../types";
 
 export type FeatureParams = Record<FeatureKey, FeatureConfig>;
@@ -30,33 +31,53 @@ export const emptyFeatureState = (features?: FeatureParams): FeatureState =>
     ]),
   ) as FeatureState;
 
+export const emptySelectionLayer = (
+  features?: FeatureParams,
+): SelectionLayer => ({
+  catIds: [],
+  features: emptyFeatureState(features),
+  includeIds: [],
+  excludeIds: [],
+});
+
 /**
  * A filter layer holds a *compound* criterion built from the selection surface:
- *   { id, enabled, mode: 'keep' | 'hide',
- *     catIds: string[], kindIds: string[], features: [{ feature, min, max }] }
+ *   { enabled, mode: 'keep' | 'hide',
+ *     catIds: string[], kindIds: string[], features: [{ feature, min, max }],
+ *     includeIds: string[], excludeIds: string[] }
  *
  * An annotation matches when it belongs to one of the chosen categories/kinds
  * (or none were chosen) AND satisfies every active feature range.
+ *
+ * The id sets are a union term and a veto, not further AND clauses — an include
+ * wins outright, an exclude vetoes outright. Consequently a criterion with no
+ * positive term matches *nothing*: without that, an id-only criterion would fall
+ * through to the category/feature checks, which both default to true, and match
+ * every annotation.
  */
 export const matchesLayer = (
   a: ExtendedAnnotationObject,
   layer: LayerCriterion,
 ): boolean => {
-  const hasCat = layer.catIds?.length || layer.kindIds?.length;
-  let catOK = true;
-  if (hasCat)
-    catOK =
-      (layer.catIds || []).includes(a.categoryId) ||
-      (layer.kindIds || []).includes(a.kindId);
-  let featOK = true;
-  for (const f of layer.features || []) {
+  if (layer.includeIds?.includes(a.id)) return true;
+  if (layer.excludeIds?.includes(a.id)) return false;
+
+  const hasCat = !!(layer.catIds?.length || layer.kindIds?.length);
+  const hasFeat = !!layer.features?.length;
+  if (!hasCat && !hasFeat) return false;
+
+  if (
+    hasCat &&
+    !(layer.catIds ?? []).includes(a.categoryId) &&
+    !(layer.kindIds ?? []).includes(a.kindId)
+  )
+    return false;
+
+  for (const f of layer.features ?? []) {
     const v = a.features?.[f.feature];
-    if (v === undefined || !(v >= f.min && v <= f.max)) {
-      featOK = false;
-      break;
-    }
+    if (v === undefined || v < f.min || v > f.max) return false;
   }
-  return catOK && featOK;
+  return true;
 };
 export const baseSet = (
   annotations: ExtendedAnnotationObject[],
@@ -101,6 +122,35 @@ export const splitSelection = (
   }
   return { kindIds, catIds };
 };
+
+/**
+ * The annotation ids a newly-activated criterion term admits — the scope within
+ * which manual exclusions are dropped. A term only ever clears exclusions among
+ * its *own* matches, so checking a second category never resurrects an
+ * annotation excluded from the first.
+ *
+ * Computed against every annotation on the image rather than the visible set:
+ * an exclusion is a per-annotation fact, and scoping the clear to what's
+ * currently visible would leave filter-hidden annotations excluded, to resurface
+ * that way once the filter is disabled.
+ */
+export const idsInCategories = (
+  annotations: ExtendedAnnotationObject[],
+  catIds: string[],
+): string[] =>
+  annotations.filter((a) => catIds.includes(a.categoryId)).map((a) => a.id);
+
+export const idsInFeatureRange = (
+  annotations: ExtendedAnnotationObject[],
+  feature: FeatureKey,
+  [min, max]: [number, number],
+): string[] =>
+  annotations
+    .filter((a) => {
+      const v = a.features?.[feature];
+      return v !== undefined && v >= min && v <= max;
+    })
+    .map((a) => a.id);
 
 export const activeFeatureList = (feats: FeatureState): FeatureRange[] =>
   (Object.entries(feats) as [FeatureKey, FeatureRangeState][])

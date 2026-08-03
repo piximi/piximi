@@ -22,9 +22,12 @@ import { useParameterizedSelector } from "store/hooks";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import {
   activeFeatureList,
+  matchesLayer,
   mergeFeatureRanges,
   splitSelection,
 } from "@ImageViewer/state/image-viewer-data/utils";
+
+import { useCriterionToggles } from "./useCriterionToggles";
 
 import type { ScopeId, KindNode } from "./types";
 import type {
@@ -40,6 +43,7 @@ import type {
  */
 export const useAnnotationSelection = () => {
   const dispatch = useDispatch();
+  const { toggleCategories } = useCriterionToggles();
   const kinds = useSelector(selectAllExtendedKinds);
   const activeImageId = useSelector(selectActiveImageId);
   const activeImage = useParameterizedSelector(
@@ -54,8 +58,12 @@ export const useAnnotationSelection = () => {
   );
 
   const filterLayer = useSelector(selectFilterLayer);
-  const { catIds: selCats, features: feats } =
-    useSelector(selectSelectionLayer);
+  const {
+    catIds: selCats,
+    features: feats,
+    includeIds,
+    excludeIds,
+  } = useSelector(selectSelectionLayer);
 
   const relativeFeatures = useSelector(selectRelativeFeatureBounds);
 
@@ -100,11 +108,34 @@ export const useAnnotationSelection = () => {
   // Current selection criterion (categories + active feature ranges).
   const activeFeats = useMemo(() => activeFeatureList(feats), [feats]);
 
-  const anySel = selCats.length > 0 || activeFeats.length > 0;
+  // Counts includeIds too: this gates both the Apply-filter button and the Clear
+  // link, and a click-only selection has no categories or features at all.
+  const anySel =
+    selCats.length > 0 || activeFeats.length > 0 || includeIds.length > 0;
   const selectedIds = useMemo(
     () => selectedAnnotations.map((a) => a.id),
     [selectedAnnotations],
   );
+
+  // Manual deltas worth surfacing: an include only counts if the criterion
+  // wouldn't have caught it anyway, an exclude only if the criterion would have.
+  // That skips inert exclusions left behind by a term that's since been removed.
+  const { added, removed } = useMemo(() => {
+    if (!includeIds.length && !excludeIds.length)
+      return { added: 0, removed: 0 };
+    const { kindIds, catIds } = splitSelection(selCats, kinds);
+    const bare = { catIds, kindIds, features: activeFeats };
+    const inc = new Set(includeIds);
+    const exc = new Set(excludeIds);
+    let added = 0;
+    let removed = 0;
+    view.forEach((a) => {
+      const bareMatch = matchesLayer(a, bare);
+      if (inc.has(a.id) && !bareMatch) added++;
+      else if (exc.has(a.id) && bareMatch) removed++;
+    });
+    return { added, removed };
+  }, [includeIds, excludeIds, selCats, kinds, activeFeats, view]);
 
   const planeCount = annotations.filter(
     (a) => a.planeIdx === currentPlane,
@@ -121,6 +152,11 @@ export const useAnnotationSelection = () => {
       p.push(
         `${activeFeats.length} ${activeFeats.length === 1 ? "feature" : "features"}`,
       );
+    // A hand-tweaked selection survives slider drags now, so a checked category
+    // showing fewer than its full count needs a visible reason.
+    if (added) p.push(`+${added}`);
+    if (removed) p.push(`−${removed}`);
+    if (!p.length) return `${selectedIds.length} picked`;
     return p.join(" · ");
   })();
 
@@ -130,12 +166,7 @@ export const useAnnotationSelection = () => {
         .filter((c) => view.some((a) => a.categoryId === c.id))
         .map((c) => c.id),
     );
-    dispatch(
-      imageViewerDataSlice.actions.toggleCatSelection({
-        ids,
-        on: true,
-      }),
-    );
+    toggleCategories(ids, true);
   };
 
   // ---- feature filters ----
@@ -157,6 +188,11 @@ export const useAnnotationSelection = () => {
           catIds: [...new Set([...filterLayer.catIds, ...newCatIds])],
           kindIds: [...new Set([...filterLayer.kindIds, ...newKindIds])],
           features: mergeFeatureRanges(filterLayer.features, activeFeats),
+          // Manual picks carry into the layer so what was highlighted is what
+          // gets filtered. On a hide layer the predicate is negated, so an
+          // include hides exactly that annotation and an exclude exempts it.
+          includeIds: [...new Set([...filterLayer.includeIds, ...includeIds])],
+          excludeIds: [...new Set([...filterLayer.excludeIds, ...excludeIds])],
         }
       : {
           enabled: true,
@@ -164,6 +200,8 @@ export const useAnnotationSelection = () => {
           catIds: newCatIds,
           kindIds: newKindIds,
           features: activeFeats,
+          includeIds: [...includeIds],
+          excludeIds: [...excludeIds],
         };
     batch(() => {
       dispatch(imageViewerDataSlice.actions.setFilterLayer(layer));

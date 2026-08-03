@@ -40,6 +40,7 @@ import { getCategoryIconStyle } from "utils/styleUtils";
 import { HotkeyContext } from "utils/enums";
 
 import { TaxonomyDialog } from "./TaxonomyDialogForm";
+import { useCriterionToggles } from "./useCriterionToggles";
 
 import type { CategoryNode } from "@ImageViewer/state/types";
 import type { EntityType, KindNode, TaxonomyDialogRequest } from "./types";
@@ -84,6 +85,7 @@ export const CategoryTree = ({
   header,
 }: AnnotationTreeProps) => {
   const dispatch = useDispatch();
+  const { toggleCategories } = useCriterionToggles();
   const theme = useTheme();
   const [menu, setMenu] = useState<MenuState | null>(null);
   const [dialog, setDialog] = useState<TaxonomyDialogRequest | null>(null);
@@ -111,19 +113,11 @@ export const CategoryTree = ({
 
   // ---- cat/kind filters ----
   const handleToggleKind = (k: KindNode) =>
-    dispatch(
-      imageViewerDataSlice.actions.toggleCatSelection({
-        ids: k.cats.map((c) => c.id),
-        on: !k.allSel,
-      }),
+    toggleCategories(
+      k.cats.map((c) => c.id),
+      !k.allSel,
     );
-  const handleToggleCat = (c: CategoryNode) =>
-    dispatch(
-      imageViewerDataSlice.actions.toggleCatSelection({
-        ids: [c.id],
-        on: !c.sel,
-      }),
-    );
+  const handleToggleCat = (c: CategoryNode) => toggleCategories([c.id], !c.sel);
   const handleSelectCat = (c: CategoryNode) =>
     dispatch(imageViewerDataSlice.actions.setSelectedCategory(c));
 
