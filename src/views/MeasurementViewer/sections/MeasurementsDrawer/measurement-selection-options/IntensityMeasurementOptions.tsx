@@ -1,0 +1,100 @@
+import type React from "react";
+import { useMemo } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+
+import { Box, capitalize } from "@mui/material";
+
+import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";
+import { measurementsSlice } from "@MeasurementViewer/state";
+import { toChannelMeasurementLabel } from "@MeasurementViewer/utils";
+import getCustomTreeItem from "@MeasurementViewer/components/CustomTreeItem";
+import {
+  CHANNEL_MEASUREMENT_KEYS,
+  INTENSE_MEAS_LOOKUP,
+} from "store/data/consts";
+import { selectProjectChannels } from "store/project/selectors";
+
+import { getDifferences } from "utils/arrayUtils";
+
+import type { CustomTreeViewBaseItem } from "@MeasurementViewer/components/CustomTreeItem";
+import type {
+  ImageMeasurementGroup,
+  ObjectMeasurementGroup,
+} from "@MeasurementViewer/types";
+
+const selectionPropagation = { parents: true, descendants: true };
+export const IntensityMeasurementOptions = ({
+  group,
+  onSelect,
+}: {
+  group: ObjectMeasurementGroup | ImageMeasurementGroup;
+  onSelect: (itemIds: string[]) => void;
+}) => {
+  const dispatch = useDispatch();
+  const channels = useSelector(selectProjectChannels);
+  const selectedItems = useMemo(() => group.intensityMeasurements, [group]);
+
+  const intensityMeasurementItems = useMemo(
+    () =>
+      [
+        {
+          id: "intensity",
+          label: "Intensity",
+
+          children: CHANNEL_MEASUREMENT_KEYS.map((key) => ({
+            id: key,
+            label: capitalize(key),
+            children: Object.values(channels).map((channelInfo) => ({
+              id: toChannelMeasurementLabel(channelInfo.name, key),
+              label: capitalize(channelInfo.name),
+            })),
+          })),
+        },
+      ] as CustomTreeViewBaseItem[],
+    [channels],
+  );
+  const handleSelectedItemsChange = (
+    event: React.SyntheticEvent | null,
+    newSelectedItems: string[] | string | null,
+  ) => {
+    if (newSelectedItems === null) newSelectedItems = [];
+    else if (!Array.isArray(newSelectedItems))
+      newSelectedItems = [newSelectedItems];
+    // Omit top level category "computed"
+
+    // Process newSelectedItems array to determine newly added and removed
+    const changes = getDifferences(selectedItems, newSelectedItems);
+
+    // Run the newly added through the worker scheduler,
+    //  they will be added to the selected list after completion
+    if (changes.added.length > 0) {
+      onSelect(changes.added);
+    }
+    // Immediately remove deselected measurements
+    if (changes.removed.length > 0) {
+      dispatch(
+        measurementsSlice.actions.removeIntensityMeasurements({
+          groupId: group.id,
+          measurements: changes.removed,
+        }),
+      );
+    }
+  };
+
+  return (
+    <Box>
+      <StyledRichTreeView
+        items={intensityMeasurementItems}
+        multiSelect
+        checkboxSelection
+        selectedItems={selectedItems}
+        selectionPropagation={selectionPropagation}
+        onSelectedItemsChange={handleSelectedItemsChange}
+        slots={{
+          item: getCustomTreeItem(INTENSE_MEAS_LOOKUP),
+        }}
+      />
+    </Box>
+  );
+};
