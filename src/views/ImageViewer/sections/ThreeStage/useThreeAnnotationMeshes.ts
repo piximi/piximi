@@ -4,28 +4,28 @@ import { useSelector } from "react-redux";
 
 import * as THREE from "three";
 
-import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
-import {
-  selectExtendedImageById,
-  selectExtendedAnnotationsByImageId,
-} from "store/dataV2/selectors";
 import { colorOverlayROI, hexToRGBA } from "views/ImageViewer/utils";
 import { decode } from "views/ImageViewer/utils/rle";
-import { useParameterizedSelector } from "store/hooks";
-import {
-  selectSelectedAnnotations,
-  selectVisibleAnnotations,
-} from "@ImageViewer/state/image-viewer-data/reselectors";
+import { selectSelectedAnnotations } from "@ImageViewer/state/image-viewer-data/reselectors";
+import { selectAnnotationsForRender } from "@ImageViewer/state/operations/reselectors";
 
 type MeshEntry = {
   mesh: THREE.Mesh;
   geometry: THREE.PlaneGeometry;
   material: THREE.MeshBasicMaterial;
   texture: THREE.Texture;
-  encodedMaskRef: Array<number>;
+  /**
+   * Identity of the mask this mesh was built from — the stored `encodedMask`
+   * array, or a pending operation's `decodedMask`. Reference equality, not
+   * content, so the check stays O(1) across renders.
+   */
+  maskRef: object;
   bbKey: string;
   fillColor: string;
 };
+
+/** Staged-operation results render in this colour rather than a category's. */
+const PREVIEW_COLOR = "#00e5ff";
 
 /**
  * Renders committed (saved) annotations as textured planes in the ThreeStage
@@ -47,7 +47,7 @@ export const useThreeAnnotationMeshes = ({
   imageWidth: number;
   imageHeight: number;
 }) => {
-  const visibleAnnotations = useSelector(selectVisibleAnnotations);
+  const visibleAnnotations = useSelector(selectAnnotationsForRender);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
   const meshesRef = useRef<Map<string, MeshEntry>>(new Map());
 
@@ -83,20 +83,26 @@ export const useThreeAnnotationMeshes = ({
       const w = Math.round(bb[2] - bb[0]);
       const h = Math.round(bb[3] - bb[1]);
       let fillColor: string;
-      if (selectedIds.includes(annotation.id)) fillColor = "#ff1010";
+      // A preview must not be mistakable for committed state — the next click
+      // may delete annotations.
+      if (annotation.isPreview) fillColor = PREVIEW_COLOR;
+      else if (selectedIds.includes(annotation.id)) fillColor = "#ff1010";
       else fillColor = annotation.category.color;
       if (w <= 0 || h <= 0 || !annotation.encodedMask) continue;
 
-      const hidden = false;
+      const hidden = annotation.hidden ?? false;
       const bbKey = bb.join(",");
       const existing = meshes.get(annotation.id);
 
-      // Reuse the mesh unless the mask (by stable encoded reference), bbox, or
-      // color changed. Keying on encodedMask — not a freshly decoded array —
-      // keeps the reuse check stable across renders.
+      // Reuse the mesh unless the mask, bbox, or color changed. A pending
+      // preview supplies decodedMask directly and keeps the committed
+      // encodedMask, so key on whichever identity is actually in play.
+      const maskRef: object =
+        annotation.decodedMask ?? (annotation.encodedMask as unknown as object);
+
       if (
         existing &&
-        existing.encodedMaskRef === annotation.encodedMask &&
+        existing.maskRef === maskRef &&
         existing.bbKey === bbKey &&
         existing.fillColor === fillColor
       ) {
@@ -108,9 +114,12 @@ export const useThreeAnnotationMeshes = ({
         meshes.delete(annotation.id);
       }
 
-      // Decode the RLE mask lazily — only when (re)building this mesh, not on
-      // every render. The store keeps the compact encodedMask as source of truth.
-      const decodedMask = Uint8Array.from(decode(annotation.encodedMask));
+      // Prefer an already-decoded mask (a pending operation's result) over
+      // decoding the stored RLE, so previewing costs no encode/decode round
+      // trip. The store still keeps encodedMask as the source of truth.
+      const decodedMask =
+        annotation.decodedMask ??
+        Uint8Array.from(decode(annotation.encodedMask));
       const color = hexToRGBA(fillColor, 0);
       const img = colorOverlayROI(
         decodedMask,
@@ -155,7 +164,7 @@ export const useThreeAnnotationMeshes = ({
         geometry,
         material,
         texture,
-        encodedMaskRef: annotation.encodedMask,
+        maskRef,
         bbKey,
         fillColor,
       });

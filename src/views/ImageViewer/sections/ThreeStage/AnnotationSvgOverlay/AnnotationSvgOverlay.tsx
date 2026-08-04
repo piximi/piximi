@@ -8,6 +8,7 @@ import {
   selectToolType,
 } from "views/ImageViewer/state/annotator/selectors";
 import { selectFullWorkingAnnotation } from "views/ImageViewer/state/annotator/reselectors";
+import { selectPendingOperationBBox } from "@ImageViewer/state/operations/reselectors";
 import { AnnotationState, ToolType } from "views/ImageViewer/utils/enums";
 
 import type { Point } from "utils/types";
@@ -95,6 +96,13 @@ export const AnnotationSvgOverlay = ({
   const annotationState = useSelector(selectAnnotationState);
   const brushSize = useSelector(selectPenSelectionBrushSize);
   const workingAnnotation = useSelector(selectFullWorkingAnnotation);
+  const pendingBoundingBox = useSelector(selectPendingOperationBBox);
+
+  // The confirm chrome follows whatever is actually pending: a staged
+  // operation's result extent, or failing that the drawn stroke. A staged
+  // operation may have no stroke at all when its operands came from clicks.
+  const chromeBoundingBox =
+    pendingBoundingBox ?? workingAnnotation?.boundingBox;
 
   const { onCameraChange, getImageToScreenTransform } = useThreeViewport();
   const gRef = useRef<SVGGElement>(null);
@@ -142,17 +150,17 @@ export const AnnotationSvgOverlay = ({
           imageWidth={annotationTool.image.width}
           imageHeight={annotationTool.image.height}
         />
-        {workingAnnotation && (
-          <SelectionBorder boundingBox={workingAnnotation.boundingBox} />
+        {chromeBoundingBox && (
+          <SelectionBorder boundingBox={chromeBoundingBox} />
         )}
         {toolType === ToolType.PenAnnotation && !outOfBounds && (
           <BrushCursor position={absolutePosition} brushSize={brushSize} />
         )}
       </g>
-      {workingAnnotation && (
+      {chromeBoundingBox && (
         <SelectionButtons
           annotationTool={annotationTool}
-          boundingBox={workingAnnotation.boundingBox}
+          boundingBox={chromeBoundingBox}
         />
       )}
     </svg>

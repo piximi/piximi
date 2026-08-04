@@ -13,6 +13,10 @@ import {
 import type { ExtendedAnnotationObject } from "store/dataV2/types";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
+import {
+  selectIsPickingTarget,
+  selectOverlapCandidateIds,
+} from "@ImageViewer/state/operations/reselectors";
 
 import type { Point } from "utils/types";
 
@@ -80,6 +84,9 @@ export const usePointerTool = (
     [selectedAnnotations],
   );
 
+  const isPickingTarget = useSelector(selectIsPickingTarget);
+  const candidateIds = useSelector(selectOverlapCandidateIds);
+
   // No shift tracking: clicks toggle, so there is no add-to-existing modifier to
   // distinguish from a replacing click.
 
@@ -103,6 +110,29 @@ export const usePointerTool = (
       setSelecting(false);
     },
     [activeAnnotations, dispatch, minimum, selecting],
+  );
+
+  /**
+   * Resolve an ambiguous stroke operation's target from a click, cycling through
+   * the candidates under the cursor on repeat clicks in the same spot. Called
+   * ahead of the annotation tool's own handling, since while a pick is
+   * outstanding that is the only thing a click can usefully mean.
+   */
+  const pickTargetAt = useCallback(
+    (position: Point) => {
+      const under = getOverlappingAnnotations(
+        position,
+        activeAnnotations,
+      ).filter((id) => candidateIds.includes(id));
+      if (under.length === 0) return;
+      dispatch(
+        annotatorSlice.actions.setPendingTargetId(
+          under[currentIndex % under.length],
+        ),
+      );
+      setCurrentIndex((i) => (i + 1) % under.length);
+    },
+    [activeAnnotations, candidateIds, currentIndex, dispatch],
   );
 
   const handleClick = useCallback(() => {
@@ -209,6 +239,8 @@ export const usePointerTool = (
     onPointerMouseDown,
     handlePointerMouseMove,
     handlePointerMouseUp,
+    isPickingTarget,
+    pickTargetAt,
     dragging,
     minimum,
     maximum,

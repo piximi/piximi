@@ -70,6 +70,8 @@ export const useThreeAnnotationHandlers = ({
     onPointerMouseDown,
     handlePointerMouseMove,
     handlePointerMouseUp,
+    isPickingTarget,
+    pickTargetAt,
     minimum,
     maximum,
     selecting,
@@ -84,6 +86,8 @@ export const useThreeAnnotationHandlers = ({
     onPointerMouseDown,
     handlePointerMouseMove,
     handlePointerMouseUp,
+    isPickingTarget,
+    pickTargetAt,
     deselectAllAnnotations,
     onDrawTick,
   });
@@ -95,6 +99,8 @@ export const useThreeAnnotationHandlers = ({
     onPointerMouseDown,
     handlePointerMouseMove,
     handlePointerMouseUp,
+    isPickingTarget,
+    pickTargetAt,
     deselectAllAnnotations,
     onDrawTick,
   };
@@ -126,6 +132,12 @@ export const useThreeAnnotationHandlers = ({
 
       if (L.toolType === ToolType.Pointer) {
         L.onPointerMouseDown(res.point);
+        return;
+      }
+      // An outstanding target pick takes priority over drawing: the stroke that
+      // needs the target already exists, so starting a new one would discard it.
+      if (L.isPickingTarget) {
+        L.pickTargetAt(res.point);
         return;
       }
       if (L.annotationTool.annotationState === AnnotationState.Annotated) {

@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 
 import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
 import { selectFullWorkingAnnotation } from "views/ImageViewer/state/annotator/reselectors";
+import { selectPendingOperation } from "@ImageViewer/state/operations/reselectors";
 import { colorOverlayROI, hexToRGBA } from "views/ImageViewer/utils";
 
 /**
@@ -22,6 +23,7 @@ export const WorkingAnnotationImage = ({
   imageHeight: number;
 }) => {
   const workingAnnotation = useSelector(selectFullWorkingAnnotation);
+  const pendingOperation = useSelector(selectPendingOperation);
 
   const selectedCategory = useSelector(selectSelectedCategory);
 
@@ -40,6 +42,10 @@ export const WorkingAnnotationImage = ({
   }, [workingAnnotation]);
 
   if (!workingAnnotation || !href) return null;
+  // While an operation is staged the target's own mesh already shows the combined
+  // result. Keeping the stroke on top would paint over the hole a Subtract just
+  // made, since the SVG overlay always composites above the WebGL canvas.
+  if (pendingOperation && !pendingOperation.empty) return null;
 
   const bb = workingAnnotation.boundingBox;
   const w = bb[2] - bb[0];

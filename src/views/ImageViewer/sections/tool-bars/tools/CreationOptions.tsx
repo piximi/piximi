@@ -1,5 +1,3 @@
-import React, { useCallback } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
 
 import { FilterBAndW } from "@mui/icons-material";
@@ -15,16 +13,29 @@ import {
   selectAnnotationMode,
   selectWorkingAnnotationEntity,
 } from "views/ImageViewer/state/annotator/selectors";
+import {
+  selectOverlapCandidateIds,
+  selectSelectionOperandIds,
+} from "@ImageViewer/state/operations/reselectors";
 import { AnnotationMode } from "views/ImageViewer/utils/enums";
-import { invert } from "views/ImageViewer/utils/annotationUtils";
 import {
   CombineAnnotationsIcon,
   IntersectAnnotationsIcon,
   NewAnnotationIcon,
   SubtractAnnotationsIcon,
 } from "icons";
-import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
 
+/**
+ * The operation to apply on the next confirm, chosen *after* drawing rather than
+ * as a sticky mode beforehand — the point at which both operands exist.
+ *
+ * Two ways in. With a stroke on screen, the combining operations act on an
+ * annotation it overlaps, so they need at least one overlap candidate. With no
+ * stroke they act on click-selected annotations instead, which is why they need
+ * two operands there: the first survives and the rest are folded into it. Only
+ * clicks carry an order, so annotations selected by category or feature range
+ * are not operands.
+ */
 export const CreationOptions = () => {
   const dispatch = useDispatch();
   const t = useTranslation();
@@ -32,112 +43,88 @@ export const CreationOptions = () => {
 
   const annotationMode = useSelector(selectAnnotationMode);
   const workingAnnotationEntity = useSelector(selectWorkingAnnotationEntity);
-  const image = useSelector(selectActiveViewerImage);
+  const overlapCandidates = useSelector(selectOverlapCandidateIds);
+  const selectionOperands = useSelector(selectSelectionOperandIds);
+
+  const hasStroke = !!workingAnnotationEntity.saved;
+
+  // Combining needs a second operand from somewhere: an overlapped annotation
+  // when there is a stroke, or a second click-selected annotation when not.
+  const canCombine = hasStroke
+    ? overlapCandidates.length > 0
+    : selectionOperands.length >= 2;
+  // Invert transforms operands where they sit, so one is enough — and it has no
+  // stroke form, since inverting a mask needs no second operand.
+  const canInvert = !hasStroke && selectionOperands.length >= 1;
 
   const handleModeSelection = (mode: AnnotationMode) => {
-    if (annotationMode !== mode)
-      dispatch(
-        annotatorSlice.actions.setAnnotationMode({
-          annotationMode: mode,
-        }),
-      );
-  };
-
-  const getIconColor = useCallback(
-    (mode: AnnotationMode) => {
-      if (mode === AnnotationMode.New && mode === annotationMode) {
-        return theme.palette.primary.dark;
-      }
-      if (workingAnnotationEntity.saved) {
-        if (mode === annotationMode) {
-          return theme.palette.primary.dark;
-        } else {
-          return theme.palette.action.active;
-        }
-      }
-      return theme.palette.action.disabled;
-    },
-    [theme, workingAnnotationEntity.saved, annotationMode],
-  );
-
-  //TODO: not working, but will fix after annotation handling refector
-  const handleInvertAnnotation = () => {
-    if (!workingAnnotationEntity.saved || !image) return;
-    const workingAnnotation = {
-      ...workingAnnotationEntity.saved,
-      ...workingAnnotationEntity.changes,
-    };
-    if (!workingAnnotation.decodedMask) return;
-
-    const [invertedMask, invertedBoundingBox] = invert(
-      workingAnnotation.decodedMask,
-      workingAnnotation.boundingBox,
-      image.shape.width,
-      image.shape.height,
-    );
-
     dispatch(
-      annotatorSlice.actions.updateWorkingAnnotation({
-        changes: {
-          boundingBox: invertedBoundingBox,
-          decodedMask: invertedMask,
-        },
+      annotatorSlice.actions.setAnnotationMode({
+        annotationMode: annotationMode === mode ? AnnotationMode.New : mode,
       }),
     );
+  };
+
+  const iconColor = (mode: AnnotationMode, enabled: boolean) => {
+    if (!enabled) return theme.palette.action.disabled;
+    return mode === annotationMode
+      ? theme.palette.primary.dark
+      : theme.palette.action.active;
   };
 
   return (
     <Stack data-help={HelpItem.ObjectManipulationTools}>
       <Tool
-        name={t("New Annotation")}
+        name={t("Add as New Annotation")}
         onClick={() => handleModeSelection(AnnotationMode.New)}
-        disabled={!workingAnnotationEntity.saved}
+        disabled={!hasStroke}
         selected={annotationMode === AnnotationMode.New}
         tooltipLocation="left"
       >
-        <NewAnnotationIcon color={getIconColor(AnnotationMode.New)} />
+        <NewAnnotationIcon color={iconColor(AnnotationMode.New, hasStroke)} />
       </Tool>
       <Tool
         name={t("Combine Annotations")}
         onClick={() => handleModeSelection(AnnotationMode.Add)}
-        disabled={!workingAnnotationEntity.saved}
+        disabled={!canCombine}
         selected={annotationMode === AnnotationMode.Add}
         tooltipLocation="left"
       >
-        <CombineAnnotationsIcon color={getIconColor(AnnotationMode.Add)} />
+        <CombineAnnotationsIcon
+          color={iconColor(AnnotationMode.Add, canCombine)}
+        />
       </Tool>
 
       <Tool
         name={t("Subtract Annotations")}
         onClick={() => handleModeSelection(AnnotationMode.Subtract)}
-        disabled={!workingAnnotationEntity.saved}
+        disabled={!canCombine}
         selected={annotationMode === AnnotationMode.Subtract}
         tooltipLocation="left"
       >
         <SubtractAnnotationsIcon
-          color={getIconColor(AnnotationMode.Subtract)}
+          color={iconColor(AnnotationMode.Subtract, canCombine)}
         />
       </Tool>
       <Tool
         name={t("Annotation Intersection")}
         onClick={() => handleModeSelection(AnnotationMode.Intersect)}
-        disabled={!workingAnnotationEntity.saved}
+        disabled={!canCombine}
         selected={annotationMode === AnnotationMode.Intersect}
         tooltipLocation="left"
       >
         <IntersectAnnotationsIcon
-          color={getIconColor(AnnotationMode.Intersect)}
+          color={iconColor(AnnotationMode.Intersect, canCombine)}
         />
       </Tool>
       <Tool
         name={t("Invert Annotation")}
-        onClick={() => {
-          handleInvertAnnotation();
-        }}
-        disabled={!workingAnnotationEntity.saved}
+        onClick={() => handleModeSelection(AnnotationMode.Invert)}
+        disabled={!canInvert}
+        selected={annotationMode === AnnotationMode.Invert}
         tooltipLocation="left"
       >
-        <SvgIcon>
+        <SvgIcon sx={{ color: iconColor(AnnotationMode.Invert, canInvert) }}>
           <FilterBAndW />
         </SvgIcon>
       </Tool>

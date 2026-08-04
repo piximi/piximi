@@ -3,14 +3,15 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import useSound from "use-sound";
+import { useSound } from "use-sound";
 
 import { useHotkeys } from "hooks";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectWorkingAnnotationEntity } from "views/ImageViewer/state/annotator/selectors";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
-import { AnnotationMode } from "views/ImageViewer/utils/enums";
+import { selectPendingOperation } from "@ImageViewer/state/operations/reselectors";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
 import type { AnnotationObject, AnnotationVolume } from "store/dataV2/types";
 import { generateUUID } from "store/dataV2/utils";
@@ -57,23 +58,28 @@ export const SelectionBorder = ({
   );
 };
 
-const buttonStyle = (bg: string): CSSProperties => ({
-  background: bg,
-  color: "#fff",
+const buttonStyle = (fg: string): CSSProperties => ({
+  background: "var(--mui-palette-background-paper)",
+  color: fg,
   border: "none",
   borderRadius: 4,
   padding: "4px 10px",
-  fontSize: 13,
+  fontSize: 12,
+  //fontWeight: "bold",
+  textTransform: "uppercase",
   cursor: "pointer",
   boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
 });
 
 /**
- * Confirm/Delete + Cancel buttons for the working annotation, rendered as an
- * HTML `<foreignObject>` in screen space (pointer-events enabled) and positioned
- * next to the bounding box. Ports the dispatch logic from the old Konva
- * `AnnotationTransformer`: Confirm adds a new annotation (or commits edits),
- * Delete removes an unchanged saved one, Cancel discards the working state.
+ * Confirm/Cancel buttons, rendered as an HTML `<foreignObject>` in screen space
+ * (pointer-events enabled) and positioned next to a bounding box.
+ *
+ * Two things can be pending, and Confirm means something different for each:
+ * with no operation staged it commits the drawn stroke as a brand-new
+ * annotation; with one staged it rewrites the surviving operand's geometry in
+ * place and deletes whatever was absorbed. The second case has no working
+ * annotation at all when the operands came from clicks rather than a stroke.
  */
 export const SelectionButtons = ({
   annotationTool,
@@ -90,12 +96,13 @@ export const SelectionButtons = ({
   const activeImage = useSelector(selectActiveViewerImage);
   const selectedCategory = useSelector(selectSelectedCategory);
   const soundEnabled = useSelector(selectSoundEnabled);
+  const pendingOperation = useSelector(selectPendingOperation);
 
   const [playCreate] = useSound(createAnnotationSoundEffect);
   const [playDelete] = useSound(deleteAnnotationSoundEffect);
 
-  const noChanges = Object.keys(workingAnnotation.changes ?? {}).length === 0;
-  const confirmLabel = "Confirm";
+  const staged = !!pendingOperation && !pendingOperation.empty;
+  const confirmLabel = staged ? "Apply" : "Create";
 
   const applyPos = useCallback(() => {
     const fo = foRef.current;
@@ -119,13 +126,61 @@ export const SelectionButtons = ({
       dispatch(
         annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
       );
-      dispatch(
-        annotatorSlice.actions.setAnnotationMode({
-          annotationMode: AnnotationMode.New,
-        }),
-      );
+      dispatch(annotatorSlice.actions.clearPendingOperation());
     });
   }, [annotationTool, dispatch]);
+
+  /**
+   * Rewrite each changed annotation's geometry in place and delete the operands
+   * folded into it. Identity is deliberately untouched: keeping `volumeId`
+   * preserves category, kind and prediction metadata, which live on the volume.
+   * Features are recomputed because they are mask-derived and would otherwise
+   * go stale and corrupt feature-range filtering.
+   */
+  const applyOperation = useCallback(() => {
+    if (!pendingOperation || pendingOperation.empty) return;
+    const entries = Object.entries(pendingOperation.updates);
+    if (entries.length === 0) return;
+
+    batch(() => {
+      entries.forEach(([id, region]) => {
+        const features = computeObjectFeatures([
+          {
+            id,
+            boundingBox: region.bbox,
+            decodedMask: region.mask,
+            encodedMask: [],
+            features: undefined,
+          },
+        ]);
+        dispatch(
+          dataSliceV2.actions.updateAnnotationMask({
+            id,
+            boundingBox: region.bbox,
+            encodedMask: encode(region.mask),
+            features: features[id],
+          }),
+        );
+      });
+      if (pendingOperation.absorbedIds.length) {
+        dispatch(
+          dataSliceV2.actions.batchDeleteAnnotation(
+            pendingOperation.absorbedIds,
+          ),
+        );
+        // The absorbed ids are gone from the store; drop them from the manual
+        // selection sets so they do not linger there.
+        dispatch(
+          imageViewerDataSlice.actions.forgetAnnotationIds(
+            pendingOperation.absorbedIds,
+          ),
+        );
+      }
+    });
+    if (soundEnabled) playCreate();
+
+    clearAnnotation();
+  }, [pendingOperation, dispatch, clearAnnotation, soundEnabled, playCreate]);
 
   const confirmAnnotation = useCallback(() => {
     if (!activeImage || !workingAnnotation.saved || !selectedCategory) return;
@@ -161,14 +216,16 @@ export const SelectionButtons = ({
     clearAnnotation();
   }, [
     activeImage,
-    noChanges,
     workingAnnotation,
+    selectedCategory,
     soundEnabled,
     dispatch,
     clearAnnotation,
-    playDelete,
     playCreate,
   ]);
+
+  const confirm = staged ? applyOperation : confirmAnnotation;
+  const canConfirm = staged || !!workingAnnotation.saved;
 
   const cancel = useCallback(() => {
     clearAnnotation();
@@ -178,22 +235,22 @@ export const SelectionButtons = ({
   useHotkeys(
     "enter",
     (event) => {
-      if (!event.repeat && workingAnnotation.saved) {
-        confirmAnnotation();
+      if (!event.repeat && canConfirm) {
+        confirm();
       }
     },
     HotkeyContext.AnnotatorView,
-    [workingAnnotation.saved, confirmAnnotation],
+    [canConfirm, confirm],
   );
   useHotkeys(
     "esc",
     (event) => {
-      if (!event.repeat && workingAnnotation.saved) {
+      if (!event.repeat && canConfirm) {
         cancel();
       }
     },
     HotkeyContext.AnnotatorView,
-    [workingAnnotation.saved, cancel],
+    [canConfirm, cancel],
   );
 
   return (
@@ -203,11 +260,23 @@ export const SelectionButtons = ({
       height={80}
       style={{ pointerEvents: "auto", overflow: "visible" }}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        <button onClick={confirmAnnotation} style={buttonStyle("#1b5e20")}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+        }}
+      >
+        <button
+          onClick={confirm}
+          style={buttonStyle("var(--mui-palette-success-main)")}
+        >
           {confirmLabel}
         </button>
-        <button onClick={cancel} style={buttonStyle("#455a64")}>
+        <button
+          onClick={cancel}
+          style={buttonStyle("var(--mui-palette-error-main")}
+        >
           Cancel
         </button>
       </div>
