@@ -17,10 +17,12 @@ import {
 
 import type {
   AnnotationCategory,
+  BBox,
   ChannelMeta,
   DataStateV2,
   Channel,
   Experiment,
+  FeatureKey,
   ImageObject,
   ImageSeries,
   Plane,
@@ -672,6 +674,46 @@ export const dataSliceV2 = createSlice({
       categoryAdapter.updateOne(state.categories, {
         id: action.payload.id,
         changes: action.payload.changes,
+      });
+    },
+    /**
+     * Replace an annotation's geometry in place, leaving its identity alone.
+     *
+     * Used by the set operations, where the surviving operand keeps its id and
+     * `volumeId` — and therefore its category, kind and prediction metadata,
+     * since those live on the volume rather than the annotation.
+     *
+     * `shape` is derived here rather than taken from the caller: its width and
+     * height are just the bounding box's, and its `planes`/`channels` carry over
+     * from the annotation being updated. `features` must be supplied because they
+     * are mask-derived and would otherwise go stale, silently breaking
+     * feature-range filtering.
+     */
+    updateAnnotationMask(
+      state,
+      action: PayloadAction<{
+        id: string;
+        boundingBox: BBox;
+        encodedMask: Array<number>;
+        features: Partial<Record<FeatureKey, number>> | undefined;
+      }>,
+    ) {
+      const { id, boundingBox, encodedMask, features } = action.payload;
+      const annotation = state.annotations.entities[id];
+      if (!annotation) return;
+
+      annotationAdapter.updateOne(state.annotations, {
+        id,
+        changes: {
+          boundingBox,
+          encodedMask,
+          features,
+          shape: {
+            ...annotation.shape,
+            width: boundingBox[2] - boundingBox[0],
+            height: boundingBox[3] - boundingBox[1],
+          },
+        },
       });
     },
     updateAnnotationPartition(
