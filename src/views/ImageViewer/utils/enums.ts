@@ -1,8 +1,14 @@
+/**
+ * The pending operation for the next confirm — chosen *after* a stroke exists,
+ * not as a sticky mode before it. `New` is the default: commit the stroke as its
+ * own annotation. The rest combine operands and update the surviving one.
+ */
 export enum AnnotationMode {
   Add,
   Intersect,
   New,
   Subtract,
+  Invert,
 }
 export enum AnnotationState {
   Blank, // not yet annotating

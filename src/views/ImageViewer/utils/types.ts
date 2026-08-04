@@ -39,7 +39,11 @@ export type WorkingAnnotation = {
   imageId: string;
 };
 export type AnnotatorState = {
-  workingAnnotationId: string | undefined;
+  /**
+   * Only ever the freshly drawn stroke — a committed annotation is never promoted
+   * into it, which is what keeps masks from crossing between the Three.js scene
+   * and the SVG overlay.
+   */
   workingAnnotation: {
     saved: WorkingAnnotation | undefined;
     changes: Partial<WorkingAnnotation>;
@@ -49,6 +53,11 @@ export type AnnotatorState = {
   quickSelectionRegionSize: number;
   thresholdAnnotationValue: number;
   annotationMode: AnnotationMode;
+  /**
+   * The annotation a stroke operation targets, once picked. Left undefined when
+   * the stroke overlaps exactly one annotation (resolved implicitly) or none.
+   */
+  pendingTargetId: string | undefined;
   toolType: ToolType;
 };
 

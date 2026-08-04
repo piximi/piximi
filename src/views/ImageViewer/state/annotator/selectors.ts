@@ -51,12 +51,12 @@ export const selectToolType = ({
 }): ToolType => {
   return annotator.toolType;
 };
-export const selectWorkingAnnotationId = ({
+export const selectPendingTargetId = ({
   annotator,
 }: {
   annotator: AnnotatorState;
 }): string | undefined => {
-  return annotator.workingAnnotationId;
+  return annotator.pendingTargetId;
 };
 export const selectWorkingAnnotationEntity = ({
   annotator,

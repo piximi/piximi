@@ -13,13 +13,13 @@ import type {
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 export const initialState: AnnotatorState = {
-  workingAnnotationId: undefined,
   workingAnnotation: { saved: undefined, changes: {} },
   annotationState: AnnotationState.Blank,
   penSelectionBrushSize: 10,
   quickSelectionRegionSize: 40,
   thresholdAnnotationValue: 150,
   annotationMode: AnnotationMode.New,
+  pendingTargetId: undefined,
   toolType: ToolType.RectangularAnnotation,
 };
 
@@ -69,11 +69,26 @@ export const annotatorSlice = createSlice({
       state.quickSelectionRegionSize = action.payload.quickSelectionRegionSize;
     },
 
+    /**
+     * Choosing an operation always invalidates a target picked for the previous
+     * one — the candidate set depends on the operation being applicable.
+     */
     setAnnotationMode(
       state,
       action: PayloadAction<{ annotationMode: AnnotationMode }>,
     ) {
       state.annotationMode = action.payload.annotationMode;
+      state.pendingTargetId = undefined;
+    },
+
+    setPendingTargetId(state, action: PayloadAction<string | undefined>) {
+      state.pendingTargetId = action.payload;
+    },
+
+    /** Back to "commit the stroke as its own annotation", with no target. */
+    clearPendingOperation(state) {
+      state.annotationMode = AnnotationMode.New;
+      state.pendingTargetId = undefined;
     },
 
     setThresholdAnnotationValue(

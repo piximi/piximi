@@ -113,6 +113,23 @@ export const imageViewerDataSlice = createSlice({
       state.selectionLayer.excludeIds = [...exc];
     },
     /**
+     * Drop ids from both override sets — for annotations that no longer exist.
+     * Stale entries are harmless while they sit there, since the selected set is
+     * derived by intersecting with visible annotations, but they accumulate.
+     */
+    forgetAnnotationIds(state, action: PayloadAction<string[]>) {
+      const ids = action.payload;
+      if (!ids.length) return;
+      state.selectionLayer.includeIds = difference(
+        state.selectionLayer.includeIds,
+        ids,
+      );
+      state.selectionLayer.excludeIds = difference(
+        state.selectionLayer.excludeIds,
+        ids,
+      );
+    },
+    /**
      * `admits` are the annotation ids the categories being switched on match.
      * Adding a term drops manual exclusions among its own matches only, so
      * checking a second category leaves the first category's exclusions alone.
