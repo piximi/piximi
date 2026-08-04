@@ -54,7 +54,7 @@ export const useThreeViewport = (): ThreeViewportValue => {
  * image dims from the active image, so the value carries no dimension props and
  * can live at the ImageViewer root — above both the stage and the toolbar.
  */
-export const useThreeViewportValue = (args: {
+const useThreeViewportValue = (args: {
   cameraRef: React.MutableRefObject<THREE.OrthographicCamera | null>;
   rendererRef: React.MutableRefObject<THREE.WebGLRenderer | null>;
   sceneRef: React.MutableRefObject<THREE.Scene | null>;

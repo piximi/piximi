@@ -9,17 +9,6 @@ import type { Point } from "utils/types";
 import { pointsAreEqual } from "./point-operations";
 import { decode } from "./rle";
 
-export const generatePoints = (buffer: Array<number> | undefined) => {
-  if (!buffer) return undefined;
-  const pointArray: Array<Point> = [];
-  buffer.forEach((q, idx) => {
-    if ((idx + 1) % 2 === 0) {
-      pointArray.push({ x: buffer[idx - 1], y: q });
-    }
-  });
-  return pointArray;
-};
-
 const pointInBox = (point: Point, box: [number, number, number, number]) => {
   return (
     point.x >= box[0] &&

@@ -12,7 +12,7 @@ import { selectActiveExtendedChannels } from "store/dataV2/selectors";
 
 import type { Image as IJSImage } from "image-js-latest";
 
-export const ActiveImageContext = createContext<{
+const ActiveImageContext = createContext<{
   channelData: Array<{
     bitDepth: BitDepth;
     data: Uint8Array<ArrayBuffer> | Uint16Array<ArrayBuffer>;

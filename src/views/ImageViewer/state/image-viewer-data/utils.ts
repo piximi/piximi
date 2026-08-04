@@ -23,7 +23,7 @@ export const FEATURES: FeatureParams = {
   radius: { label: "Radius", unit: "µm", bounds: [0, 25], step: 0.5 },
   perimeter: { label: "Perimeter", unit: "px", bounds: [0, 420], step: 5 },
 };
-export const emptyFeatureState = (features?: FeatureParams): FeatureState =>
+const emptyFeatureState = (features?: FeatureParams): FeatureState =>
   Object.fromEntries(
     Object.entries(features ?? FEATURES).map(([k, v]) => [
       k,
@@ -79,7 +79,8 @@ export const matchesLayer = (
   }
   return true;
 };
-export const baseSet = (
+
+const baseSet = (
   annotations: ExtendedAnnotationObject[],
   planeScope: PlaneScope,
   currentPlane: number,

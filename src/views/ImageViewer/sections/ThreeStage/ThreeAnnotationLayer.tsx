@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 
-import { useAnnotationTool } from "views/ImageViewer/hooks/useAnnotationTool";
-import { useAnnotationState } from "views/ImageViewer/hooks/useAnnotationState";
+import { useAnnotationTool, useAnnotationState } from "views/ImageViewer/hooks";
 
 import { useThreeViewport } from "./ThreeViewportContext";
 import { useThreeAnnotationHandlers } from "./useThreeAnnotationHandlers";

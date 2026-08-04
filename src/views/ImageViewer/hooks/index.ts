@@ -1,4 +1,3 @@
-export { useZoom } from "./useZoom";
 export { usePointerTool } from "./usePointerTool";
 export { useAnnotationTool } from "./useAnnotationTool";
 export { useAnnotationState } from "./useAnnotationState";

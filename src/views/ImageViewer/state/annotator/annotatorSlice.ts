@@ -12,7 +12,7 @@ import type {
 } from "views/ImageViewer/utils/types";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-export const initialState: AnnotatorState = {
+const initialState: AnnotatorState = {
   workingAnnotation: { saved: undefined, changes: {} },
   annotationState: AnnotationState.Blank,
   penSelectionBrushSize: 10,

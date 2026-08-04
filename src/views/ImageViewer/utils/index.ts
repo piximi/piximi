@@ -1,8 +1,6 @@
 export { makeGraph, createPathFinder } from "./graphHelper";
 
-export type { PiximiGraph, PiximiNode } from "./NodeHeap";
-
-export { scanline } from "./scanline";
+export type { PiximiGraph } from "./NodeHeap";
 
 export { simplifyPolygon } from "./simplify";
 

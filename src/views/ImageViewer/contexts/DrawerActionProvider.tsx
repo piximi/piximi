@@ -2,10 +2,10 @@ import type { ReactNode } from "react";
 import { createContext, useContext, useMemo, useState } from "react";
 
 import { ImageSection } from "@ImageViewer/sections/ImageViewerDrawer/ImageSection";
-import { AnnotationSection } from "@ImageViewer/sections/ImageViewerDrawer/AnnotationSection/AnnotationSection";
+import { AnnotationSection } from "@ImageViewer/sections/ImageViewerDrawer/AnnotationSection";
 
-export type DrawerContextType = "images" | "annotations";
-export const DrawerActionContext = createContext<{
+type DrawerContextType = "images" | "annotations";
+const DrawerActionContext = createContext<{
   drawerViewComponent: JSX.Element;
   setDrawerContext: React.Dispatch<React.SetStateAction<DrawerContextType>>;
 }>({

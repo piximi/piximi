@@ -15,7 +15,7 @@ import {
   AnnotationState,
   ToolType,
 } from "views/ImageViewer/utils/enums";
-import { usePointerTool } from "views/ImageViewer/hooks/usePointerTool";
+import { usePointerTool } from "views/ImageViewer/hooks";
 
 import type { Point } from "utils/types";
 

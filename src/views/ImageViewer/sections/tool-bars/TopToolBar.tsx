@@ -1,10 +1,11 @@
 import { Box, Divider, Stack } from "@mui/material";
 
+import { useAnnotatorToolShortcuts } from "@ImageViewer/hooks";
+import { ImageViewerLogo } from "@ImageViewer/components";
+
 import { DIMENSIONS } from "utils/constants";
 
-import { useAnnotatorToolShortcuts } from "../../hooks";
 import { ZoomOptions } from "./tools";
-import { ImageViewerLogo } from "../ImageViewerAppBar/ImageViewerAppBar";
 import { SelectionOptions } from "./tools/SelectionOptions";
 
 export const TopToolBar = () => {

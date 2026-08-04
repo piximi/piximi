@@ -171,7 +171,7 @@ type ToolProps = HTMLDataAttributes & {
 
 //TODO: tool buttons
 
-export const Tool = ({
+const Tool = ({
   children,
   options,
   name,

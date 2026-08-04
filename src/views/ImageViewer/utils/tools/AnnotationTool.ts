@@ -7,8 +7,20 @@ import type { DataArray } from "store/dataV2/types";
 import type { Point } from "utils/types";
 
 import { AnnotationState } from "../enums";
-import { Tool } from "./Tool";
 
+import type { Image as IJSImage } from "image-js-latest";
+
+abstract class Tool {
+  /**
+   * Image-JS object of the active image (i.e. of the image that we are annotating on).
+   * https://image-js.github.io/image-js/#image
+   */
+  image: IJSImage;
+
+  constructor(image: IJSImage) {
+    this.image = image;
+  }
+}
 export abstract class AnnotationTool extends Tool {
   /**
    * Polygon that defines the annotation area, array of (x, y) coordinates.

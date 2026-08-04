@@ -14,7 +14,7 @@ import type { DataStateV2 } from "store/dataV2/types";
 
 import type { UnsubscribeListener } from "@reduxjs/toolkit";
 
-export const DataContext = createContext<{
+const DataContext = createContext<{
   savedData: DataStateV2 | undefined;
 }>({ savedData: undefined });
 

@@ -1,2 +1,2 @@
-export { CustomToolTip } from "./CustomToolTip";
 export { ExportAnnotationsMenu } from "./ExportAnnotationsMenu";
+export { ImageViewerLogo } from "./ImageViewerLogo";

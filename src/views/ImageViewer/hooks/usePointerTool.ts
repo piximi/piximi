@@ -3,8 +3,10 @@ import { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { getOverlappingAnnotations } from "views/ImageViewer/utils";
-import { getAnnotationsInBox } from "views/ImageViewer/utils/imageHelper";
+import {
+  getOverlappingAnnotations,
+  getAnnotationsInBox,
+} from "views/ImageViewer/utils";
 import { ToolType } from "views/ImageViewer/utils/enums";
 import {
   selectAllActiveAnnotations,

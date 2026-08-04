@@ -6,7 +6,7 @@ import { useMobileView } from "hooks";
 
 import { DIMENSIONS } from "utils/constants";
 
-import { ThreeStage } from "../ThreeStage/ThreeStage";
+import { ThreeStage } from "../ThreeStage";
 
 export const StageWrapper = () => {
   const [width, setWidth] = useState<number>(

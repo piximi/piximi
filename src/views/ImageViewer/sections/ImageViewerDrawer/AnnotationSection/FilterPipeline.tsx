@@ -23,15 +23,15 @@ import type {
   LayerMode,
 } from "@ImageViewer/state/types";
 
-export const catName = (id: string, kinds: ExtendedKind[]): string => {
+const catName = (id: string, kinds: ExtendedKind[]): string => {
   for (const s of kinds) for (const c of s.cats) if (c.id === id) return c.name;
   return id;
 };
-export const kindName = (id: string, kinds: ExtendedKind[]): string =>
+const kindName = (id: string, kinds: ExtendedKind[]): string =>
   kinds.find((k) => k.id === id)?.name ?? id;
 const cap = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 
-export const formatLayerLabel = (
+const formatLayerLabel = (
   layer: LayerCriterion,
   kinds: ExtendedKind[],
 ): string => {

@@ -101,7 +101,7 @@ export const selectIsPickingTarget = createSelector(
     !!stroke && !!FOLD_OP[mode] && candidates.length > 1,
 );
 
-export type PendingOperation = {
+type PendingOperation = {
   /** Annotation id -> the geometry it takes on if this is confirmed. */
   updates: Record<string, MaskRegion>;
   /** Operands folded into the survivor; deleted on confirm. */
@@ -217,7 +217,7 @@ export const selectPendingOperationBBox = createSelector(
   },
 );
 
-export type RenderAnnotation = ExtendedAnnotationObject & {
+type RenderAnnotation = ExtendedAnnotationObject & {
   /** Set while previewing, so the mesh can colour it distinctly. */
   isPreview?: boolean;
   /** Absorbed into another operand by the staged operation. */

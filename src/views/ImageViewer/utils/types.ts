@@ -2,9 +2,7 @@ import type { ReactElement } from "react";
 
 import type { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import type { AnnotationObject, BBox, DataArray } from "store/dataV2/types";
-
-import type { RequireOnly } from "utils/types";
+import type { BBox, DataArray } from "store/dataV2/types";
 
 import type {
   AnnotationMode,
@@ -14,21 +12,8 @@ import type {
 } from "./enums";
 
 export type ImageViewerState = {
-  colorAdjustment: ColorAdjustmentOptionsType;
-  cursor: string;
-  imageOrigin: { x: number; y: number };
-
-  stageHeight: number;
-  stageScale: number;
-  stageWidth: number;
   stagePosition: { x: number; y: number };
-  zoomSelection: {
-    dragging: boolean;
-    minimum: { x: number; y: number } | undefined;
-    maximum: { x: number; y: number } | undefined;
-    selecting: boolean;
-    centerPoint: { x: number; y: number } | undefined;
-  };
+
   zoomOptions: ZoomToolOptionsType;
 };
 
