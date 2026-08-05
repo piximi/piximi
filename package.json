@@ -6,6 +6,9 @@
   "homepage": "https://piximi.app",
   "packageManager": "pnpm@11.2.2",
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@emotion/react": "^11.6.0",
     "@emotion/styled": "^11.6.0",
     "@fontsource/material-icons": "^5.1.1",
