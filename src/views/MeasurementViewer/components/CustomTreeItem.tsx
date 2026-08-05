@@ -18,7 +18,8 @@ export const getCustomTreeItem = (displayLookUp: Record<string, string>) => {
     ref: React.Ref<HTMLLIElement>,
   ) {
     const { itemId, label, children, ...other } = props;
-    const isParent = Array.isArray(children) && children.length > 0;
+    const isParent = React.Children.count(children) > 0;
+
     return isParent ? (
       <TreeItem itemId={itemId} label={label} ref={ref} {...other}>
         {children}
