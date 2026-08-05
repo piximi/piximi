@@ -50,10 +50,10 @@ export const capitalize = (input: string) => {
 
 export const formatString = (
   string: string,
-  splitKey: string,
+  splitKey?: string,
   capitalize?: "first-word" | "every-word" | "every-letter",
 ) => {
-  const splitString = string.split(splitKey);
+  const splitString = splitKey ? string.split(splitKey) : [string];
   if (!capitalize) return splitString.join(" ");
   switch (capitalize) {
     case "first-word":
