@@ -11,6 +11,13 @@ const featureOps: Record<FeatureKey, (r: Roi) => number> = {
   perimeter: (r) => r.perimeter,
   radius: (r) => r.ped / 2,
   sphericity: (r) => r.sphericity,
+  extent: (r) => r.surface / (r.width * r.height),
+  bboxArea: (r) => r.width * r.height,
+  eqpc: (r) => r.eqpc,
+  ped: (r) => r.ped,
+  compactness: (r) => (r.sphericity === 0 ? 1000 : 1 / r.sphericity), // prevent divide by 0, chose 1,000 since a sphericity of less than 0.001 seems unlikely  ¯\_(ツ)_/¯
+  comX: (r) => r.centroid.column,
+  comY: (r) => r.centroid.row,
 };
 const getMaskRois = (
   width: number,
@@ -69,7 +76,9 @@ export const computeObjectFeatures = (
       try {
         result = featureOps[feat](roi);
       } catch (e) {
-        console.warn(`Could not compute ${feat} for object ${obj.id}`);
+        console.warn(
+          `Could not compute ${feat} for object ${obj.id}: ${e instanceof Error ? e.message : String(e)}`,
+        );
         continue;
       }
       computedFeatures[obj.id] = {

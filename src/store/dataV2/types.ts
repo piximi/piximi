@@ -167,11 +167,19 @@ export type AnnotationVolumeEntities = Record<string, AnnotationVolume>;
 
 // BBox = [x1, y1, x2, y2]
 export type BBox = [number, number, number, number];
+
 export const OBJECT_FEATURES = [
   "area",
   "sphericity",
   "radius",
   "perimeter",
+  "extent",
+  "bboxArea",
+  "eqpc",
+  "ped",
+  "compactness",
+  "comX",
+  "comY",
 ] as const;
 export type FeatureKey = (typeof OBJECT_FEATURES)[number];
 export type AnnotationObject = {
