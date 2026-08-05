@@ -1,13 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { generateInitialPlot } from "@MeasurementViewer/utils";
-import { generateUUID } from "store/data/utils";
-import type {
-  ComputedImageMeasurements,
-  ComputedObjectMeasurements,
-} from "store/data/types";
-import { IMAGE_KIND } from "store/data/constants";
-import { projectSlice } from "store/project/projectSlice";
+import { generateUUID } from "store/dataV2/utils";
+import type { ChannelFeature, FeatureKey } from "store/dataV2/types";
 
 import { mutatingFilter } from "utils/arrayUtils";
 import { getUniqueName } from "utils/stringUtils";
@@ -21,6 +16,7 @@ import type {
   BaseMeasurementGroup,
   PivotItem,
 } from "../types";
+import { dataSliceV2 } from "store/dataV2";
 
 const initialState: MeasurementsState = {
   activeGroup: undefined,
@@ -40,12 +36,13 @@ export const measurementsSlice = createSlice({
     createGroup(
       state,
       action: PayloadAction<{
+        groupType: "images" | "objects";
         kindId?: string;
         displayName?: string;
         itemIds: string[];
       }>,
     ) {
-      const { kindId, itemIds } = action.payload;
+      const { kindId, itemIds, groupType } = action.payload;
       const displayName = action.payload.displayName ?? kindId ?? "Images";
       const groupId = generateUUID();
 
@@ -69,7 +66,7 @@ export const measurementsSlice = createSlice({
         upToDate: true,
       };
 
-      if (kindId === IMAGE_KIND) {
+      if (groupType === "images") {
         state.imageGroups[groupId] = newGroup as ImageMeasurementGroup;
       } else {
         state.objectGroups[groupId] = {
@@ -133,7 +130,7 @@ export const measurementsSlice = createSlice({
       state,
       action: PayloadAction<{
         groupId: string;
-        measurements: (keyof ComputedObjectMeasurements)[];
+        measurements: FeatureKey[];
       }>,
     ) {
       const { groupId, measurements } = action.payload;
@@ -144,7 +141,7 @@ export const measurementsSlice = createSlice({
       state,
       action: PayloadAction<{
         groupId: string;
-        measurements: (keyof ComputedObjectMeasurements)[];
+        measurements: FeatureKey[];
       }>,
     ) {
       const { groupId, measurements } = action.payload;
@@ -159,7 +156,7 @@ export const measurementsSlice = createSlice({
       state,
       action: PayloadAction<{
         groupId: string;
-        measurements: (keyof ComputedObjectMeasurements)[];
+        measurements: FeatureKey[];
       }>,
     ) {
       const { groupId, measurements } = action.payload;
@@ -173,7 +170,7 @@ export const measurementsSlice = createSlice({
       state,
       action: PayloadAction<{
         groupId: string;
-        measurements: (keyof ComputedImageMeasurements)[];
+        measurements: ChannelFeature[];
       }>,
     ) {
       const { groupId, measurements } = action.payload;
@@ -184,7 +181,7 @@ export const measurementsSlice = createSlice({
       state,
       action: PayloadAction<{
         groupId: string;
-        measurements: (keyof ComputedImageMeasurements)[];
+        measurements: ChannelFeature[];
       }>,
     ) {
       const { groupId, measurements } = action.payload;
@@ -199,7 +196,7 @@ export const measurementsSlice = createSlice({
       state,
       action: PayloadAction<{
         groupId: string;
-        measurements: (keyof ComputedImageMeasurements)[];
+        measurements: ChannelFeature[];
       }>,
     ) {
       const { groupId, measurements } = action.payload;
@@ -308,6 +305,6 @@ export const measurementsSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(projectSlice.actions.resetProject, () => initialState);
+    builder.addCase(dataSliceV2.actions.clearState, () => initialState);
   },
 });

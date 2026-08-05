@@ -1,8 +1,13 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import { CHANNEL_MEASUREMENT_KEYS } from "store/data/consts";
+import { CHANNEL_MEASUREMENTS } from "store/dataV2/types";
 
-import type { MeasurementsState, PlotDetail } from "../types";
+import type {
+  ImageMeasurementGroup,
+  MeasurementsState,
+  ObjectMeasurementGroup,
+  PlotDetail,
+} from "../types";
 
 export const selectActiveGroupId = ({
   measurements,
@@ -39,7 +44,10 @@ export const selectMeasurementGroups = createSelector(
 export const selectActiveMeasurementGroup = createSelector(
   selectActiveGroupId,
   selectMeasurementGroups,
-  (groupId, groupDict) => {
+  (
+    groupId,
+    groupDict,
+  ): ObjectMeasurementGroup | ImageMeasurementGroup | undefined => {
     if (!groupId) return;
     return groupDict[groupId];
   },
@@ -50,7 +58,7 @@ export const selectActiveMeasurements = createSelector(
   (group) => {
     if (!group) return [];
     const intensityMeasurements = group.intensityMeasurements.filter(
-      (msrmnt) => !["intensity", ...CHANNEL_MEASUREMENT_KEYS].includes(msrmnt),
+      (msrmnt) => !["intensity", ...CHANNEL_MEASUREMENTS].includes(msrmnt),
     );
     return [...group.computedMeasurements, ...intensityMeasurements];
   },

@@ -11,7 +11,7 @@ import type {
 import { formatString } from "utils/stringUtils";
 import { useTheme } from "@mui/material";
 
-export type ScatterPoint = {
+type ScatterPoint = {
   id: number;
   x: number;
   y: number;
@@ -19,15 +19,14 @@ export type ScatterPoint = {
   preview: string;
   category: string;
   timepoint: number;
-  trackId: string;
 };
 
-export type ScatterGroup = {
+type ScatterGroup = {
   id: string;
   data: ScatterPoint[];
 };
 
-export type ScatterData = ScatterGroup[];
+type ScatterData = ScatterGroup[];
 
 export const ResponsiveScatter = ({
   chartConfig,
@@ -100,7 +99,6 @@ export const ResponsiveScatter = ({
             z: nodeSize,
             category: thing.category,
             timepoint: thing.timepoint,
-            trackId: thing.trackId ?? "",
             preview: thing.preview,
           });
         }
@@ -117,7 +115,6 @@ export const ResponsiveScatter = ({
         colors={{ scheme: chartConfig.colorTheme }}
         data={formattedData}
         onMouseMove={(node) => {
-          console.log(node.serieId);
           if (activeSerieRef.current !== node.serieId) {
             activeSerieRef.current = node.serieId;
             updateOpacities();
@@ -237,7 +234,6 @@ export const ResponsiveScatter = ({
                 </div>
 
                 <div>Category: {point.node.data.category}</div>
-                <div>Tracklet: {point.node.data.trackId}</div>
               </div>
             </div>
           );

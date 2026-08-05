@@ -28,12 +28,10 @@ export const MeasurementsDrawer = () => {
   }, [tables, activeGroup]);
 
   const {
-    status,
     handleCloseTableDialog,
     handleCreateTable,
     handleOpenTableDialog,
     isTableDialogOpen,
-    kindOptions,
   } = useCreateMeasurementTable();
   return (
     <Box sx={{ display: "flex", flexGrow: 1, gridArea: "action-drawer" }}>
@@ -58,7 +56,6 @@ export const MeasurementsDrawer = () => {
             }}
           >
             <CreateMeasurementGroupButton
-              status={status}
               handleOpenTableDialog={handleOpenTableDialog}
             />
           </Box>
@@ -89,7 +86,6 @@ export const MeasurementsDrawer = () => {
         <CreateMeasurementGroupDialog
           open={isTableDialogOpen}
           onClose={handleCloseTableDialog}
-          options={kindOptions}
           selectLabel="Kind"
           title="Create Measurement Table"
           onConfirm={handleCreateTable}

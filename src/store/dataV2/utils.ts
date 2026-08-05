@@ -8,7 +8,7 @@ import {
   UNKNOWN_KIND_ID,
 } from "./constants";
 
-import type { AnnotationCategory, Category, Kind } from "./types";
+import type { AnnotationCategory, Category, FeatureKey, Kind } from "./types";
 
 const RESERVED_IDS = new Set([
   UNKNOWN_IMAGE_CATEGORY_ID,
@@ -75,4 +75,30 @@ export const generateKind = (
     unknownCategoryId: unknownCategory.id,
   };
   return { kind, unknownCategory };
+};
+
+export const OBJ_MEAS_LOOKUP: Record<FeatureKey, string> = {
+  area: "Area",
+  bboxArea: "Bounding Box Area",
+  comX: "Center of Mass (X)",
+  comY: "Center of Mass (Y)",
+  compactness: "Compactness",
+  eqpc: "Diameter of a circle of equal projection area ",
+  extent: "Extent",
+  ped: "Diameter of a circle of equal perimeter",
+  perimeter: "Perimeter",
+  sphericity: "Sphericity",
+  radius: "Radius of a circle of equal perimeter",
+};
+
+export const INTENSE_MEAS_LOOKUP = {
+  total: "Sum of pixel intensities",
+  min: "Minimum intensity",
+  max: "Maximum intensity",
+  mean: "Mean intensity",
+  median: "Median intensity",
+  std: "Standard deviation",
+  mad: "Median Absolute Deviation",
+  lowerQuartile: "Pixel which 25% of values are lower",
+  upperQuartile: "Pixel which 25% of values are higher",
 };

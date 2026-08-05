@@ -7,25 +7,22 @@ import { Box } from "@mui/material";
 
 import { measurementsSlice } from "@MeasurementViewer/state";
 import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";
-import getCustomTreeItem from "@MeasurementViewer/components/CustomTreeItem";
-import {
-  OBJ_MEAS_LOOKUP,
-  COMPUTED_OBJECT_MEASUREMENT_KEYS,
-} from "store/data/consts";
-import type { ComputedObjectMeasurements } from "store/data/types";
+import { getCustomTreeItem } from "@MeasurementViewer/components/CustomTreeItem";
+import { OBJ_MEAS_LOOKUP } from "store/dataV2/utils";
 
 import { getDifferences } from "utils/arrayUtils";
 import { formatString } from "utils/stringUtils";
 
 import type { CustomTreeViewBaseItem } from "@MeasurementViewer/components/CustomTreeItem";
 import type { ObjectMeasurementGroup } from "@MeasurementViewer/types";
+import { FeatureKey, OBJECT_FEATURES } from "store/dataV2/types";
 
 const computedMeasurementItems: CustomTreeViewBaseItem[] = [
   {
     id: "computed",
     label: "Computed",
 
-    children: COMPUTED_OBJECT_MEASUREMENT_KEYS.map((key) => ({
+    children: OBJECT_FEATURES.map((key) => ({
       id: key,
       label: formatString(key, undefined, "every-word"),
       displayName: "abba",
@@ -68,7 +65,7 @@ export const ComputedObjectMeasurementOptions = ({
       dispatch(
         measurementsSlice.actions.removeObjectComputedMeasurements({
           groupId: group.id,
-          measurements: changes.removed as (keyof ComputedObjectMeasurements)[],
+          measurements: changes.removed as FeatureKey[],
         }),
       );
   };

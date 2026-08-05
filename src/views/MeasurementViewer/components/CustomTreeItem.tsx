@@ -3,16 +3,16 @@ import * as React from "react";
 import Tooltip from "@mui/material/Tooltip";
 import type { TreeItemProps } from "@mui/x-tree-view/TreeItem";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
-import type { TreeViewBaseItem } from "@mui/x-tree-view";
+import type { TreeViewDefaultItemModelProperties } from "@mui/x-tree-view";
 
-export type CustomTreeViewBaseItem = TreeViewBaseItem & {
+export type CustomTreeViewBaseItem = TreeViewDefaultItemModelProperties & {
   displayName?: string;
 };
 /**
  * Custom TreeItem component that wraps the standard TreeItem with an MUI Tooltip.
  * This allows displaying additional information (like the item ID) on hover.
  */
-const getCustomTreeItem = (displayLookUp: Record<string, string>) => {
+export const getCustomTreeItem = (displayLookUp: Record<string, string>) => {
   const CustomTreeItem = React.forwardRef(function CustomTreeItem(
     props: TreeItemProps,
     ref: React.Ref<HTMLLIElement>,
@@ -38,5 +38,3 @@ const getCustomTreeItem = (displayLookUp: Record<string, string>) => {
   });
   return CustomTreeItem;
 };
-
-export default getCustomTreeItem;

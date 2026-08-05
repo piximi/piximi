@@ -1,14 +1,16 @@
 import type { GridColDef, GridColumnGroup } from "@mui/x-data-grid";
 
-import type { AnnotationObject, Category, ImageObject } from "store/data/types";
-
-import { computeStatistics } from "utils/measurements/statistics";
-
 import type {
   ImageEntityMeasurementGroup,
   ObjectEntityMeasurementGroup,
   PivotItem,
 } from "@MeasurementViewer/types";
+import {
+  ExtendedAnnotationObject,
+  ExtendedImageObject,
+  Category,
+} from "store/dataV2/types";
+import { computeStatistics } from "utils/measurements/statistics";
 
 // ============================================================================
 // TYPES
@@ -27,7 +29,9 @@ type PivotAggregation = {
   std: number;
 };
 
-type EntityWithMeasurements = AnnotationObject | ImageObject;
+export type EntityWithMeasurements =
+  | ExtendedAnnotationObject
+  | ExtendedImageObject;
 
 // ============================================================================
 // COMPOSITE KEY GENERATION
@@ -122,7 +126,6 @@ export const generateUniqueCompositeKeys = (
       uniqueKeys.add(key);
     }
   });
-  console.log(uniqueKeys);
 
   return Array.from(uniqueKeys).sort();
 };

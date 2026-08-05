@@ -1,8 +1,8 @@
 import { saveAs } from "file-saver";
 import { v4 as uuidv4 } from "uuid";
 
-import { CHANNEL_MEASUREMENT_KEYS } from "store/data/consts";
-import type { ChannelMeasurements } from "store/data/types";
+import { CHANNEL_MEASUREMENTS } from "store/dataV2/types";
+import type { ChannelMeasurement } from "store/dataV2/types";
 
 import { ChartType } from "./types";
 
@@ -109,23 +109,21 @@ export const savePlot = (
 
 export const toChannelMeasurementLabel = (
   channelId: string,
-  measurement: keyof ChannelMeasurements,
+  measurement: ChannelMeasurement,
 ) => {
   return measurement + "-" + channelId;
 };
 
 export const parseChannelMeasurementLabel = (
   label: string,
-): { measurement: keyof ChannelMeasurements; channelId: string } => {
+): { measurement: ChannelMeasurement; channelId: string } => {
   const [measurement, channelId] = label.split("-");
-  if (
-    !CHANNEL_MEASUREMENT_KEYS.includes(measurement as keyof ChannelMeasurements)
-  )
+  if (!CHANNEL_MEASUREMENTS.includes(measurement as ChannelMeasurement))
     throw new Error(
       `Could not parse values from channel measurement label"${label}`,
     );
   return {
-    measurement: measurement as keyof ChannelMeasurements,
+    measurement: measurement as ChannelMeasurement,
     channelId: channelId,
   };
 };

@@ -1,14 +1,12 @@
-import type {
-  AnnotationObject,
-  ComputedImageMeasurements,
-  ComputedObjectMeasurements,
-  ImageObject,
-} from "store/data/types";
-
-import type { Partition } from "utils/models/enums";
-
 import type { ComputedDatum } from "@nivo/swarmplot";
 import type { ColorSchemeId } from "@nivo/colors";
+import { Partition } from "utils/dl/enums";
+import {
+  ChannelFeature,
+  ExtendedAnnotationObject,
+  ExtendedImageObject,
+  FeatureKey,
+} from "store/dataV2/types";
 
 // ============================================================================
 // ENUMS
@@ -26,7 +24,7 @@ export enum ChartType {
 
 export type SplitType = keyof Pick<
   ParsedMeasurementDatum,
-  "category" | "partition" | "trackId"
+  "category" | "partition"
 >;
 
 export type ChartConfig = {
@@ -101,7 +99,6 @@ export type BaseMeasurementGroup = {
     partition?: string[];
     imageId?: string[];
     timepoint?: string[];
-    tracklet?: string[];
   };
   pivotItems?: PivotItem[];
   entityIds: string[];
@@ -112,22 +109,22 @@ export type BaseMeasurementGroup = {
 // --- Image Measurement Groups ---
 
 export type ImageMeasurementGroup = BaseMeasurementGroup & {
-  computedMeasurements: (keyof ComputedImageMeasurements)[];
+  computedMeasurements: ChannelFeature[];
 };
 
 export type ImageEntityMeasurementGroup = ImageMeasurementGroup & {
-  entities: ImageObject[];
+  entities: ExtendedImageObject[];
 };
 
 // --- Object (Annotation) Measurement Groups ---
 
 export type ObjectMeasurementGroup = BaseMeasurementGroup & {
   kind: string;
-  computedMeasurements: (keyof ComputedObjectMeasurements)[];
+  computedMeasurements: FeatureKey[];
 };
 
 export type ObjectEntityMeasurementGroup = ObjectMeasurementGroup & {
-  entities: AnnotationObject[];
+  entities: ExtendedAnnotationObject[];
 };
 
 // ============================================================================
@@ -140,7 +137,6 @@ type ParsedMeasurementDatum = {
   category: string;
   partition: Partition;
   timepoint: number;
-  trackId: string;
   preview: string;
   measurements: Record<string, number>;
 };

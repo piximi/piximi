@@ -1,16 +1,17 @@
 import type React from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Autocomplete, FormControl, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs";
+import { useSelector } from "react-redux";
+import { selectAllKinds } from "store/dataV2/selectors";
 
-type KindOption = { kindId: string; displayName: string };
+type KindOption = { id: string; name: string };
 
 type SelectDialogProps = {
-  options: KindOption[];
   onClose: () => void;
-  onConfirm: (options: string) => void;
+  onConfirm: (kindId: string, name: string) => void;
   selectLabel: string;
   title: string;
   open: boolean;
@@ -18,14 +19,24 @@ type SelectDialogProps = {
 };
 
 export const CreateMeasurementGroupDialog = ({
-  options,
   onClose,
   onConfirm,
   selectLabel,
   title,
   open,
 }: SelectDialogProps) => {
-  const [currentOption, setCurrentOption] = useState<KindOption>(options[0]);
+  const kinds = useSelector(selectAllKinds);
+  const kindOptions = useMemo(
+    () =>
+      [
+        { id: "image", name: "Images" },
+        kinds.map((k) => ({ id: k.id, name: k.name })),
+      ] as KindOption[],
+    [kinds],
+  );
+  const [currentOption, setCurrentOption] = useState<KindOption>(
+    kindOptions[0],
+  );
 
   const handleOptionsChange = (
     event: React.SyntheticEvent<Element, Event>,
@@ -44,11 +55,11 @@ export const CreateMeasurementGroupDialog = ({
         <FormControl>
           <Autocomplete
             id={`${selectLabel}-select`}
-            options={options}
+            options={kindOptions}
             sx={{ width: 300 }}
             value={currentOption}
             onChange={handleOptionsChange}
-            getOptionLabel={(option) => option.displayName}
+            getOptionLabel={(option) => option.name}
             renderInput={(params) => (
               <TextField {...params} label={selectLabel} />
             )}
@@ -58,7 +69,7 @@ export const CreateMeasurementGroupDialog = ({
           />
         </FormControl>
       }
-      onConfirm={() => onConfirm(currentOption.kindId)}
+      onConfirm={() => onConfirm(currentOption.id, currentOption.name)}
       confirmText="Confirm"
       disableHotkeyOnInput
     />

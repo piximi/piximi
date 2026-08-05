@@ -12,9 +12,10 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { selectActivePivotItems } from "@MeasurementViewer/state/selectors";
 import { selectActiveMeasuredEntitiesGroup } from "@MeasurementViewer/state/reselectors";
 import { parseChannelMeasurementLabel } from "@MeasurementViewer/utils";
-import { CHANNEL_MEASUREMENT_KEYS } from "store/data/consts";
-import { selectCategoryEntities } from "store/data/selectors";
-import type { AnnotationObject, ImageObject } from "store/data/types";
+
+import { selectCategoryEntities } from "store/dataV2/selectors";
+import type { FeatureKey } from "store/dataV2/types";
+import { CHANNEL_MEASUREMENTS } from "store/dataV2/types";
 
 import {
   generatePivotColumns,
@@ -26,9 +27,7 @@ import type {
   ImageEntityMeasurementGroup,
   ObjectEntityMeasurementGroup,
 } from "@MeasurementViewer/types";
-import type { MeasurementGetter } from "./pivotUtils";
-
-type EntityWithMeasurements = AnnotationObject | ImageObject;
+import type { EntityWithMeasurements, MeasurementGetter } from "./pivotUtils";
 
 /**
  * Creates measurement getter functions for all computed and intensity measurements.
@@ -44,11 +43,8 @@ const createMeasurementGetters = (
       key: measurement,
       label: measurement,
       getValue: (entity: EntityWithMeasurements) => {
-        if (!entity.measurements) return undefined;
-        const value =
-          entity.measurements.computed[
-            measurement as keyof typeof entity.measurements.computed
-          ];
+        if (!("kindId" in entity)) return undefined;
+        const value = entity.features?.[measurement as FeatureKey];
         return typeof value === "number" ? value : undefined;
       },
     });
@@ -57,7 +53,7 @@ const createMeasurementGetters = (
   // Intensity measurements (excluding base keys)
   const intensityMeasurements = activeEntityGroup.intensityMeasurements.filter(
     (msrmnt) =>
-      !["intensity", ...(CHANNEL_MEASUREMENT_KEYS as string[])].includes(
+      !["intensity", ...(CHANNEL_MEASUREMENTS as unknown as string[])].includes(
         msrmnt,
       ),
   );
@@ -70,7 +66,8 @@ const createMeasurementGetters = (
       key: measurementLabel,
       label: measurementLabel,
       getValue: (entity: EntityWithMeasurements) => {
-        const channelData = entity.measurements.channel[channelId];
+        if ("kindId" in entity) return undefined;
+        const channelData = entity.channelsRef.find((c) => c.id === channelId);
         return channelData?.[measurement];
       },
     });

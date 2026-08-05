@@ -1,23 +1,20 @@
 import { createSelector } from "@reduxjs/toolkit";
 
 import { toChannelMeasurementLabel } from "@MeasurementViewer/utils";
-import { IMAGE_KIND } from "store/data/constants";
+
 import {
-  selectAnnotationEntities,
+  selectExtendedAnnotationEntities,
   selectCategoryEntities,
-  selectImageDataEntities,
-  selectTrackletEntities,
-} from "store/data/selectors";
-import type {
-  AnnotationObject,
-  Category,
-  ImageObject,
-  Tracklet,
-} from "store/data/types";
+  selectExtendedImageEntities,
+} from "store/dataV2/selectors";
+import {
+  CHANNEL_MEASUREMENTS,
+  type AnnotationObject,
+  type Category,
+  type ImageObject,
+} from "store/dataV2/types";
 
 import { formatString } from "utils/stringUtils";
-import type { Partition } from "utils/models/enums";
-import { typedObjectEntries } from "utils/objectUtils";
 
 import { selectActiveMeasurementGroup } from "./selectors";
 
@@ -27,11 +24,12 @@ import type {
   ObjectEntityMeasurementGroup,
   ParsedMeasurementData,
 } from "../types";
+import { Partition } from "utils/dl/enums";
 
 export const selectActiveMeasuredEntities = createSelector(
   selectActiveMeasurementGroup,
-  selectImageDataEntities,
-  selectAnnotationEntities,
+  selectExtendedImageEntities,
+  selectExtendedAnnotationEntities,
   (activeGroup, images, annotations) => {
     if (!activeGroup) return {};
     if ("kind" in activeGroup)
@@ -55,8 +53,8 @@ export const selectActiveMeasuredEntities = createSelector(
 
 export const selectActiveMeasuredEntitiesGroup = createSelector(
   selectActiveMeasurementGroup,
-  selectImageDataEntities,
-  selectAnnotationEntities,
+  selectExtendedImageEntities,
+  selectExtendedAnnotationEntities,
   (
     activeGroup,
     images,
@@ -79,9 +77,8 @@ export const selectActiveMeasuredEntitiesGroup = createSelector(
 export const selectActiveInitialPivotDimensions = createSelector(
   selectActiveMeasuredEntitiesGroup,
   selectCategoryEntities,
-  selectImageDataEntities,
-  selectTrackletEntities,
-  (activeGroup, categories, imageData, tracklets) => {
+  selectExtendedImageEntities,
+  (activeGroup, categories, imageData) => {
     const categorySplit: Dimension = {
       id: "category",
       label: "Category",
@@ -98,11 +95,7 @@ export const selectActiveInitialPivotDimensions = createSelector(
       label: "Image",
       values: [],
     };
-    const trackletSplit: Dimension = {
-      id: "tracklet",
-      label: "Tracklet",
-      values: [],
-    };
+
     const timepointSplit: Dimension = {
       id: "timpoint",
       label: "Timepoint",
@@ -113,7 +106,6 @@ export const selectActiveInitialPivotDimensions = createSelector(
 
     const entities = activeGroup.entities;
     const imageSet = new Set<ImageObject>();
-    const trackSet = new Set<Tracklet>();
     const timepointSet = new Set<number>();
     const partitionSet = new Set<Partition>();
     const categorySet = new Set<Category>();
@@ -121,7 +113,6 @@ export const selectActiveInitialPivotDimensions = createSelector(
       partitionSet.add(entity.partition);
       categorySet.add(categories[entity.categoryId]);
       if ("imageId" in entity) imageSet.add(imageData[entity.imageId]);
-      if ("trackId" in entity) trackSet.add(tracklets[entity.trackId]);
       if ("timepoint" in entity) timepointSet.add(entity.timepoint);
     }
 
@@ -148,14 +139,7 @@ export const selectActiveInitialPivotDimensions = createSelector(
       }));
       splitTree.push(imageSplit);
     }
-    if (trackSet.size > 0) {
-      trackletSplit.values = [...trackSet].map((ptn) => ({
-        id: ptn.id,
-        label: formatString(ptn.name ?? ptn.id, undefined, "every-word"),
-        parentId: "tracklet",
-      }));
-      splitTree.push(trackletSplit);
-    }
+
     if (timepointSet.size > 0) {
       timepointSplit.values = [...timepointSet].sort().map((ptn) => ({
         id: ptn + "",
@@ -179,58 +163,46 @@ export const selectActiveInitialPivotDimensions = createSelector(
  * Returns a dictionary keyed by thingId with enriched measurement information.
  */
 export const selectPlotData = createSelector(
-  selectImageDataEntities,
-  selectAnnotationEntities,
-  selectTrackletEntities,
+  selectExtendedImageEntities,
+  selectExtendedAnnotationEntities,
   selectCategoryEntities,
-  (images, annotations, tracklets, categories): ParsedMeasurementData => {
+  (images, annotations, categories): ParsedMeasurementData => {
     const parsedMeasurementData: ParsedMeasurementData = {};
 
     Object.entries(images).forEach(([id, image]) => {
-      if (!image.measurements) return;
-      const { channel, computed } = image.measurements;
       const channelMeasurements: Record<string, number> = {};
-      Object.entries(channel).forEach(([channelId, measurements]) => {
-        typedObjectEntries(measurements).forEach((entry) => {
-          const [key, value] = entry!;
-          const name = toChannelMeasurementLabel(channelId, key);
-          channelMeasurements[name] = value!;
+      image.channelsRef.forEach((channel) => {
+        CHANNEL_MEASUREMENTS.forEach((msrmt) => {
+          const val = channel[msrmt];
+          if (val) {
+            const name = toChannelMeasurementLabel(channel.name, msrmt);
+            channelMeasurements[name] = val;
+          }
         });
       });
       parsedMeasurementData[id] = {
         id,
-        kind: IMAGE_KIND,
+        kind: "Image",
         category: categories[image.categoryId].name,
         partition: image.partition,
         timepoint: image.timepoint,
-        trackId: "N/A",
-        preview: image.previewSrc,
-        measurements: { ...computed, ...channelMeasurements },
+        preview: "",
+        measurements: { ...channelMeasurements },
       };
     });
     Object.entries(annotations).forEach(([id, annotation]) => {
-      if (!annotation.measurements) return;
-      const { channel, computed } = annotation.measurements;
-      const channelMeasurements: Record<string, number> = {};
-      Object.entries(channel).forEach(([channelId, measurements]) => {
-        typedObjectEntries(measurements).forEach((entry) => {
-          const [key, value] = entry!;
-          const name = toChannelMeasurementLabel(channelId, key);
-          channelMeasurements[name] = value!;
-        });
-      });
-      const { com, ...computesSansCOM } = computed;
+      if (!annotation.features) return;
+      const computed = annotation.features;
+
+      const { comX, comY, ...computesSansCOM } = computed;
       parsedMeasurementData[id] = {
         id,
-        kind: annotation.kind,
+        kind: annotation.kindId,
         category: categories[annotation.categoryId].name,
         partition: annotation.partition,
-        timepoint: annotation.timepoint,
-        trackId: annotation.trackId
-          ? (tracklets[annotation.trackId].name ?? annotation.trackId)
-          : "N/A",
-        preview: annotation.previewSrc,
-        measurements: { ...computesSansCOM, ...channelMeasurements },
+        timepoint: 0,
+        preview: "",
+        measurements: { ...computesSansCOM },
       };
     });
 

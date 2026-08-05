@@ -8,12 +8,8 @@ import { Box, capitalize } from "@mui/material";
 import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";
 import { measurementsSlice } from "@MeasurementViewer/state";
 import { toChannelMeasurementLabel } from "@MeasurementViewer/utils";
-import getCustomTreeItem from "@MeasurementViewer/components/CustomTreeItem";
-import {
-  CHANNEL_MEASUREMENT_KEYS,
-  INTENSE_MEAS_LOOKUP,
-} from "store/data/consts";
-import { selectProjectChannels } from "store/project/selectors";
+import { getCustomTreeItem } from "@MeasurementViewer/components/CustomTreeItem";
+import { INTENSE_MEAS_LOOKUP } from "store/dataV2/utils";
 
 import { getDifferences } from "utils/arrayUtils";
 
@@ -22,6 +18,8 @@ import type {
   ImageMeasurementGroup,
   ObjectMeasurementGroup,
 } from "@MeasurementViewer/types";
+import { CHANNEL_MEASUREMENTS } from "store/dataV2/types";
+import { selectAllChannelMetas } from "store/dataV2/selectors";
 
 const selectionPropagation = { parents: true, descendants: true };
 export const IntensityMeasurementOptions = ({
@@ -32,7 +30,7 @@ export const IntensityMeasurementOptions = ({
   onSelect: (itemIds: string[]) => void;
 }) => {
   const dispatch = useDispatch();
-  const channels = useSelector(selectProjectChannels);
+  const channels = useSelector(selectAllChannelMetas);
   const selectedItems = useMemo(() => group.intensityMeasurements, [group]);
 
   const intensityMeasurementItems = useMemo(
@@ -42,7 +40,7 @@ export const IntensityMeasurementOptions = ({
           id: "intensity",
           label: "Intensity",
 
-          children: CHANNEL_MEASUREMENT_KEYS.map((key) => ({
+          children: CHANNEL_MEASUREMENTS.map((key) => ({
             id: key,
             label: capitalize(key),
             children: Object.values(channels).map((channelInfo) => ({
