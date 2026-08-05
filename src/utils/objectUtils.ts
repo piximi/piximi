@@ -75,3 +75,15 @@ export const isEnumValue = <E extends Record<string, string | number>>(
     .filter((v) => typeof v === typeof value)
     .includes(value as E[keyof E]);
 };
+
+/**
+ * Returns typed entries of an object, similar to Object.entries but with proper typing.
+ * @template T
+ * @param obj - The object to get entries from
+ * @returns Array of key-value pairs with proper typing
+ */
+export const typedObjectEntries = <T extends object>(
+  obj: T,
+): { [K in keyof T]: [K, T[K]] }[keyof T][] => {
+  return Object.entries(obj) as any;
+};
