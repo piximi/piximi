@@ -63,6 +63,7 @@ export function CustomTabs(
     renderLabel,
     handleTabMin,
     persistentTabs,
+    omitAddIcon,
   } = props;
   const [tabIndex, setTabIndex] = useState(0);
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -267,7 +268,7 @@ export function CustomTabs(
               );
             })}
           </Tabs>
-          {extendable && (
+          {extendable && !omitAddIcon && (
             <>
               <Divider orientation="vertical" />
               <Box display="flex" flexShrink={1} justifySelf="flex-end">
