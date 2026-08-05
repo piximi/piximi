@@ -16,13 +16,12 @@ import { classifierSlice } from "store/classifier";
 import { applicationSettingsSlice } from "./applicationSettings";
 import { dataSlice } from "./data/dataSlice";
 import { dataSliceV2 } from "./dataV2/dataSliceV2";
-import { measurementsSlice } from "./measurements/measurementsSlice";
-import { measurementsMiddleware } from "./measurements/measurementListeners";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 import { appTasksSlice } from "./appTasks/appTasksSlice";
 import { projectSlice } from "views/ProjectViewer/state/projectSlice";
 import { projectMiddleware } from "views/ProjectViewer/state/projectListeners";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+import { measurementsSlice } from "views/MeasurementViewer/state";
 
 const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&
@@ -33,7 +32,6 @@ const loggingMiddleware: Middleware[] =
 const listenerMiddlewares: Middleware[] = [
   projectMiddleware.middleware,
   dataMiddleware.middleware,
-  measurementsMiddleware.middleware,
   applicationMiddleware.middleware,
 ];
 

@@ -17,6 +17,5 @@ export { CustomListItem } from "./CustomListItem";
 export { KeyboardKey } from "./KeyboardKey";
 export { ListItemHoldButton } from "./ListItemHoldButton";
 export { Logo, LogoLoader } from "./Logo";
-export { SelectionTree } from "./SelectionTree";
 export { ToolHotkeyTitle, TooltipCard, TooltipTitle } from "./tooltips";
 export { Tool, PopoverTool, ResizableTool } from "./Tool";

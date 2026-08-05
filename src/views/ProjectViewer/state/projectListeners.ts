@@ -3,7 +3,6 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { classifierSlice } from "store/classifier";
 import type { TypedAppStartListening } from "store/types";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { measurementsSlice } from "store/measurements";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
 
 import { getClassifierApi } from "utils/dl/classification";
@@ -20,7 +19,6 @@ startAppListening({
     listenerAPI.dispatch(dataSliceV2.actions.clearState());
     listenerAPI.dispatch(classifierSlice.actions.resetClassifiers());
     listenerAPI.dispatch(imageViewerSlice.actions.resetImageViewer());
-    listenerAPI.dispatch(measurementsSlice.actions.resetMeasurements());
   },
 });
 

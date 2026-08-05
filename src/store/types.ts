@@ -11,7 +11,7 @@ import { ThemeMode } from "themes/enums";
 import { AlertState } from "utils/types";
 
 import { Kind, AnnotationObject, Category, ImageObject } from "./data/types";
-import { MeasurementsState } from "./measurements/types";
+
 import {
   AnnotatorState,
   ImageViewerState,
@@ -21,6 +21,7 @@ import { AppTasksState } from "./appTasks/types";
 import { ProjectState } from "views/ProjectViewer/state/types";
 import { ClassifierState } from "./classifier/types";
 import { ImageViewerDataState } from "@ImageViewer/state/types";
+import { MeasurementsState } from "views/MeasurementViewer/types";
 
 export type AppSettingsState = {
   // async work for setting initial states,

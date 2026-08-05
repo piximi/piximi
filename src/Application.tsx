@@ -7,7 +7,7 @@ import { usePreferredMuiTheme } from "hooks";
 
 import { ProjectViewer } from "views/ProjectViewer";
 import { ImageViewer } from "views/ImageViewer";
-import { MeasurementView } from "views/MeasurementView";
+import { MeasurementView } from "views/MeasurementViewer";
 import { WelcomeScreen } from "./views/WelcomeScreen";
 
 import { HelpProvider } from "contexts";
