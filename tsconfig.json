@@ -20,7 +20,8 @@
     "noErrorTruncation": true,
     "paths": {
       "@ProjectViewer/*": ["views/ProjectViewer/*"],
-      "@ImageViewer/*": ["views/ImageViewer/*"]
+      "@ImageViewer/*": ["views/ImageViewer/*"],
+      "@MeasurementViewer/*": ["views/MeasurementViewer/*"]
     }
   },
   "include": ["src", "src/icons/svg.d.ts"],
