@@ -15,7 +15,6 @@ type SelectDialogProps = {
   selectLabel: string;
   title: string;
   open: boolean;
-  getOptionLabel?: (option: KindOption) => string;
 };
 
 export const CreateMeasurementGroupDialog = ({
@@ -30,7 +29,7 @@ export const CreateMeasurementGroupDialog = ({
     () =>
       [
         { id: "image", name: "Images" },
-        kinds.map((k) => ({ id: k.id, name: k.name })),
+        ...kinds.map((k) => ({ id: k.id, name: k.name })),
       ] as KindOption[],
     [kinds],
   );
