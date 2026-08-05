@@ -109,6 +109,20 @@ export type Plane = {
 };
 export type PlaneEntities = Record<string, Plane>;
 
+export const CHANNEL_MEASUREMENTS = [
+  "maxValue",
+  "minValue",
+  "total",
+  "mean",
+  "median",
+  "std",
+  "mad",
+  "lowerQuartile",
+  "upperQuartile",
+] as const;
+export const CHANNEL_FEATURES = ["entropy", "contrast", "snr"];
+export type ChannelMeasurement = (typeof CHANNEL_MEASUREMENTS)[number];
+export type ChannelFeature = (typeof CHANNEL_FEATURES)[number];
 export type Channel = {
   id: string;
   planeId: string;
@@ -128,6 +142,7 @@ export type Channel = {
   mad?: number;
   lowerQuartile?: number;
   upperQuartile?: number;
+  features?: Partial<Record<ChannelFeature, number>>;
 };
 export type ChannelEntities = Record<string, Channel>;
 
@@ -148,6 +163,7 @@ export type ChannelMeta = {
 export type ChannelMetaEntities = Record<string, ChannelMeta>;
 
 export type ExtendedChannel = Channel & {
+  name: string;
   colorMap: ColorMap;
   rampMin: number;
   rampMax: number;
@@ -159,6 +175,7 @@ export type AnnotationVolume = {
   imageId: string;
   kindId: string;
   categoryId: string;
+  timepoint?: number;
   predictionConfidence?: number;
   predictedAtRunId?: string;
   predictionCorrected?: PredictionCorrection;

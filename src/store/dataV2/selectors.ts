@@ -185,6 +185,7 @@ const buildExtendedImage = (
     if (ch.planeId !== plane.id || !meta || !meta.visible) return acc;
     acc.push({
       ...ch,
+      name: meta.name,
       colorMap: meta.colorMap,
       rampMin: meta.rampMin,
       rampMax: meta.rampMax,
@@ -236,6 +237,35 @@ export const selectExtendedImageByIds = createSelector(
       else console.warn("Could not get image for id: ", id);
     }
     return extendedImages;
+  },
+);
+export const selectExtendedImageEntities = createSelector(
+  [
+    planeSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    channelSelectors.selectAll,
+    categorySelectors.selectEntities,
+    imageSelectors.selectAll,
+  ],
+  (
+    planeDict,
+    chMetaDict,
+    chs,
+    catDict,
+    images,
+  ): Record<string, ExtendedImageObject> => {
+    const extIms: Record<string, ExtendedImageObject> = {};
+    images.forEach((image) => {
+      const ext = buildExtendedImage(
+        image,
+        planeDict,
+        chMetaDict,
+        chs,
+        catDict,
+      );
+      if (ext) extIms[ext.id] = ext;
+    });
+    return extIms;
   },
 );
 export const selectExtendedImages = createSelector(
@@ -374,6 +404,41 @@ const buildExtendedAnnotation = (
     ...volProps,
   };
 };
+export const selectExtendedAnnotationEntities = createSelector(
+  [
+    annotationSelectors.selectAll,
+    annotationVolumeSelectors.selectEntities,
+    imageSelectors.selectEntities,
+    planeSelectors.selectEntities,
+    channelMetaSelectors.selectEntities,
+    channelSelectors.selectAll,
+    categorySelectors.selectEntities,
+  ],
+  (
+    anns,
+    annVols,
+    imageDict,
+    planeDict,
+    chMetaDict,
+    chs,
+    catDict,
+  ): Record<string, ExtendedAnnotationObject> => {
+    const exts: Record<string, ExtendedAnnotationObject> = {};
+    anns.forEach((a) => {
+      const ext = buildExtendedAnnotation(
+        a,
+        annVols,
+        imageDict,
+        planeDict,
+        chMetaDict,
+        chs,
+        catDict,
+      );
+      if (ext) exts[ext.id] = ext;
+    });
+    return exts;
+  },
+);
 export const selectAllExtendedAnnotations = createSelector(
   [
     annotationSelectors.selectAll,
