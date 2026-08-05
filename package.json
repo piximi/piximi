@@ -14,6 +14,7 @@
     "@mui/material": "^6.1.0",
     "@mui/x-data-grid": "^8.25.0",
     "@mui/x-tree-view": "^8.22.0",
+    "@nivo/bar": "^0.99.0",
     "@nivo/colors": "^0.88.0",
     "@nivo/core": "^0.87.0",
     "@nivo/heatmap": "^0.87.0",
