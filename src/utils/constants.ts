@@ -13,6 +13,7 @@ export const DIMENSIONS = {
   toolDrawerWidth: 36,
   stagePaddingX: 50,
   stageInfoHeight: 21,
+  tabHeight: 48,
 };
 
 export const DEFAULT_ALERT: AlertState = {
