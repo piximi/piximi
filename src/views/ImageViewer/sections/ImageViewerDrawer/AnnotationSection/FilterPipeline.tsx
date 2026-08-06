@@ -187,7 +187,7 @@ export const FilterPipeline = ({
         borderBottom: 1,
         borderColor: "divider",
         px: 1.5,
-        py: 1.25,
+        py: 1,
         height: theme.spacing(17),
       })}
     >
@@ -251,8 +251,10 @@ export const FilterPipeline = ({
             v && onMode(v)
           }
           sx={{
+            height: 28,
             "& .MuiButtonBase-root": {
               py: 0,
+              fontSize: "0.75rem",
             },
           }}
         >
@@ -291,6 +293,10 @@ export const FilterPipeline = ({
           startIcon={<LibraryAddIcon />}
           onClick={onApply}
           size="small"
+          sx={{
+            fontSize: "0.75rem",
+            height: 28,
+          }}
         >
           {layer ? "Update Filter" : "Create Filter"}
         </Button>

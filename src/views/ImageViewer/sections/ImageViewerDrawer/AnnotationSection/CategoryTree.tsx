@@ -50,10 +50,10 @@ const CountChip = ({ n }: { n: number }) => (
     label={n}
     size="small"
     sx={(theme) => ({
-      height: 20,
+      height: 18,
       bgcolor: theme.palette.action.selected,
       color: "text.secondary",
-      fontSize: 12,
+      fontSize: "0.675rem",
       fontWeight: 500,
     })}
   />
@@ -278,7 +278,7 @@ export const CategoryTree = ({
           <Fragment key={k.id}>
             <ListItemButton
               sx={{
-                height: 44,
+                height: 34,
                 pl: 0.5,
                 pr: 1,
                 "&:hover .kebab": { opacity: 1 },
@@ -287,10 +287,10 @@ export const CategoryTree = ({
               onClick={() => handleToggleExpand(k.id)}
             >
               {expanded[k.id] ? (
-                <ExpandMoreIcon sx={{ fontSize: 22, color: "action.active" }} />
+                <ExpandMoreIcon sx={{ fontSize: 20, color: "action.active" }} />
               ) : (
                 <ChevronRightIcon
-                  sx={{ fontSize: 22, color: "action.active" }}
+                  sx={{ fontSize: 20, color: "action.active" }}
                 />
               )}
               <Checkbox
@@ -307,7 +307,7 @@ export const CategoryTree = ({
               <Box sx={{ display: "flex", flex: 1, alignItems: "center" }}>
                 <Typography
                   noWrap
-                  sx={{ fontSize: 14, fontWeight: 500, mr: 1 }}
+                  sx={{ fontSize: "0.75rem", fontWeight: 500, mr: 1 }}
                 >
                   {k.name}
                 </Typography>
@@ -322,7 +322,7 @@ export const CategoryTree = ({
                 sx={{ opacity: 0, ml: 0.25 }}
                 onClick={(e) => openMenu(e, "kind", k.id, null)}
               >
-                <MoreVertIcon sx={{ fontSize: 20 }} />
+                <MoreVertIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </ListItemButton>
 
@@ -333,8 +333,8 @@ export const CategoryTree = ({
                   onClick={() => handleSelectCat(c)}
                   selected={c.id === selectedCategory.id}
                   sx={{
-                    height: 40,
-                    pl: "40px",
+                    height: 30,
+                    pl: 5,
                     pr: 1,
                     bgcolor: c.sel ? "rgba(25,118,210,.08)" : "transparent",
                     "&:hover .kebab": { opacity: 1 },
@@ -361,11 +361,14 @@ export const CategoryTree = ({
                     }}
                   />
                   <Box sx={{ display: "flex", flex: 1, alignItems: "center" }}>
-                    <Typography noWrap sx={{ fontSize: 14, mr: 1 }}>
+                    <Typography noWrap sx={{ fontSize: "0.75rem", mr: 1 }}>
                       {c.name}
                     </Typography>
                     {c.id === selectedCategory.id && (
-                      <GestureIcon color="primary" sx={{ fontSize: 16 }} />
+                      <GestureIcon
+                        color="primary"
+                        sx={{ fontSize: "0.875rem" }}
+                      />
                     )}
                   </Box>
                   <CountChip n={c.count} />
@@ -375,16 +378,16 @@ export const CategoryTree = ({
                     sx={{ opacity: 0, ml: 0.25 }}
                     onClick={(e) => openMenu(e, "cat", k.id, c.id)}
                   >
-                    <MoreVertIcon sx={{ fontSize: 20 }} />
+                    <MoreVertIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </ListItemButton>
               ))}
               <ListItemButton
                 onClick={() => handleAddCat(k.id)}
-                sx={{ height: 34, pl: "40px", color: "primary.main" }}
+                sx={{ height: 34, pl: 5, color: "primary.main" }}
               >
                 <AddIcon sx={{ fontSize: 18, mr: 1 }} />
-                <Typography sx={{ fontSize: 13, fontWeight: 500 }}>
+                <Typography sx={{ fontSize: "0.75rem", fontWeight: 500 }}>
                   Add category
                 </Typography>
               </ListItemButton>
@@ -394,10 +397,10 @@ export const CategoryTree = ({
 
         <ListItemButton
           onClick={handleAddKind}
-          sx={{ height: 44, px: 2, color: "primary.main" }}
+          sx={{ height: 34, px: 2, color: "primary.main" }}
         >
-          <AddIcon sx={{ fontSize: 20, mr: 1 }} />
-          <Typography sx={{ fontSize: 13, fontWeight: 500 }}>
+          <AddIcon sx={{ fontSize: 18, mr: 1 }} />
+          <Typography sx={{ fontSize: "0.75rem", fontWeight: 500 }}>
             Add Kind
           </Typography>
         </ListItemButton>
@@ -422,37 +425,55 @@ export const CategoryTree = ({
         </Box>
       )}
 
-      <Menu anchorEl={menu?.anchor} open={!!menu} onClose={close}>
+      <Menu
+        anchorEl={menu?.anchor}
+        open={!!menu}
+        onClose={close}
+        sx={{
+          "& .MuiMenuItem-root": {
+            fontSize: "0.75rem",
+            minHeight: 20,
+            px: 1,
+          },
+        }}
+      >
         {menu && !(!menu.catId && representsUnknown(menu.kindId)) && (
           <MenuItem
+            dense
             onClick={() => {
               handleOpenEdit(menu!.type, menu!.kindId, menu!.catId);
               close();
             }}
           >
-            <EditIcon sx={{ fontSize: 18, mr: 1.5, color: "action.active" }} />{" "}
+            <EditIcon
+              sx={{ fontSize: "0.75rem", mr: 1, color: "action.active" }}
+            />
             Edit
           </MenuItem>
         )}
         {menu?.type === "kind" && (
           <MenuItem
+            dense
             onClick={() => {
               handleAddCat(menu!.kindId);
               close();
             }}
           >
-            <AddIcon sx={{ fontSize: 18, mr: 1.5, color: "action.active" }} />{" "}
+            <AddIcon
+              sx={{ fontSize: "0.75rem", mr: 1, color: "action.active" }}
+            />
             Add category
           </MenuItem>
         )}
         <Divider />
         <MenuItem
           sx={{ color: "error.main" }}
+          dense
           onClick={() => {
             openDeleteConfirm();
           }}
         >
-          <DeleteIcon sx={{ fontSize: 18, mr: 1.5 }} /> Delete{" "}
+          <DeleteIcon sx={{ fontSize: "0.75rem", mr: 1 }} /> Delete{" "}
           {menu?.type === "kind" ? "kind" : "category"}
         </MenuItem>
       </Menu>
