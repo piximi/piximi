@@ -117,14 +117,15 @@ export const toChannelMeasurementLabel = (
 export const parseChannelMeasurementLabel = (
   label: string,
 ): { measurement: ChannelMeasurement; channelId: string } => {
-  const [measurement, channelId] = label.split("-");
+  const [measurement, ...rest] = label.split("-");
+  const channelName = rest.join("-");
   if (!CHANNEL_MEASUREMENTS.includes(measurement as ChannelMeasurement))
     throw new Error(
       `Could not parse values from channel measurement label"${label}`,
     );
   return {
     measurement: measurement as ChannelMeasurement,
-    channelId: channelId,
+    channelId: channelName,
   };
 };
 

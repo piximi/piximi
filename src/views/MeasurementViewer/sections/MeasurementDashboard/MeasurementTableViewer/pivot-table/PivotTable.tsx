@@ -67,7 +67,9 @@ const createMeasurementGetters = (
       label: measurementLabel,
       getValue: (entity: EntityWithMeasurements) => {
         if ("kindId" in entity) return undefined;
-        const channelData = entity.channelsRef.find((c) => c.id === channelId);
+        const channelData = entity.channelsRef.find(
+          (c) => c.name === channelId,
+        );
         return channelData?.[measurement];
       },
     });

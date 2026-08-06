@@ -55,8 +55,6 @@ export const ComputedObjectMeasurementOptions = ({
     // Process newSelectedItems array to determine newly added and removed
     const changes = getDifferences(selectedItems, onlyMeasurements);
 
-    // Run the newly added through the worker scheduler,
-    //  they will be added to the selected list after completion
     if (changes.added.length > 0) {
       onSelect(changes.added);
     }

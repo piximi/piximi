@@ -30,8 +30,13 @@ export const IntensityMeasurementOptions = ({
   onSelect: (itemIds: string[]) => void;
 }) => {
   const dispatch = useDispatch();
-  const channels = useSelector(selectAllChannelMetas);
+  const channelMetas = useSelector(selectAllChannelMetas);
   const selectedItems = useMemo(() => group.intensityMeasurements, [group]);
+
+  const channelNames = useMemo(
+    () => [...new Set(channelMetas.map((cm) => cm.name))],
+    [channelMetas],
+  );
 
   const intensityMeasurementItems = useMemo(
     () =>
@@ -43,14 +48,14 @@ export const IntensityMeasurementOptions = ({
           children: CHANNEL_MEASUREMENTS.map((key) => ({
             id: key,
             label: capitalize(key),
-            children: Object.values(channels).map((channelInfo) => ({
-              id: toChannelMeasurementLabel(channelInfo.name, key),
-              label: capitalize(channelInfo.name),
+            children: Object.values(channelNames).map((name) => ({
+              id: toChannelMeasurementLabel(name, key),
+              label: capitalize(name),
             })),
           })),
         },
       ] as CustomTreeViewBaseItem[],
-    [channels],
+    [channelNames],
   );
   const handleSelectedItemsChange = (
     event: React.SyntheticEvent | null,
@@ -64,8 +69,6 @@ export const IntensityMeasurementOptions = ({
     // Process newSelectedItems array to determine newly added and removed
     const changes = getDifferences(selectedItems, newSelectedItems);
 
-    // Run the newly added through the worker scheduler,
-    //  they will be added to the selected list after completion
     if (changes.added.length > 0) {
       onSelect(changes.added);
     }
