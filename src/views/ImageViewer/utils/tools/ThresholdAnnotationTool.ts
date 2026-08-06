@@ -58,6 +58,10 @@ export class ThresholdAnnotationTool extends AnnotationTool {
   onMouseUp(_position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationState.Annotating) return;
 
+    if (!this.width || this.width < 2) {
+      this.deselect();
+      return;
+    }
     this.computeMask();
     this.setAnnotated();
   }
