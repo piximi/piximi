@@ -33,7 +33,7 @@ export const useCriterionToggles = () => {
     selectExtendedAnnotationsByImageId,
     activeImageId ?? "",
   );
-  const { features: feats } = useSelector(selectSelectionLayer);
+  const { features } = useSelector(selectSelectionLayer);
 
   const toggleCategories = (ids: string[], on: boolean) => {
     dispatch(
@@ -46,7 +46,7 @@ export const useCriterionToggles = () => {
   };
 
   const toggleFeature = (key: FeatureKey, bounds: [number, number]) => {
-    const becomingActive = !feats[key].active;
+    const becomingActive = !features[key].active;
     dispatch(
       imageViewerDataSlice.actions.toggleFeatureSelection({
         key,

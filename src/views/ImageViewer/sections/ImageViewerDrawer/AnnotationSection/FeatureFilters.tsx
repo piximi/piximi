@@ -4,6 +4,8 @@ import { Box, Collapse, Slider, Switch, Typography } from "@mui/material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
+import ExpandIcon from "components/ui/ExpandIcon";
+
 import type { FeatureKey } from "store/dataV2/types";
 
 import { useCriterionToggles } from "./useCriterionToggles";
@@ -31,19 +33,34 @@ interface FeatureRowProps {
 // pipeline) once, on release, instead of on every intermediate drag frame.
 function FeatureRow({ cfg, f, onToggle, onCommit }: FeatureRowProps) {
   const [live, setLive] = useState<[number, number]>([f.min, f.max]);
+  const [showSlider, setShowSlider] = useState(f.active);
+
   useEffect(() => {
     setLive([f.min, f.max]);
   }, [f.min, f.max]);
 
   return (
-    <Box sx={{ mb: 0.5 }}>
+    <Box
+      sx={{
+        mb: 0.5,
+        cursor: "pointer",
+        borderRadius: "var(--mui-shape-borderRadius)",
+        "&:hover": { bgcolor: "var(--mui-palette-action-hover)" },
+      }}
+      onClick={() => setShowSlider((v) => !v)}
+    >
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <Switch size="small" checked={f.active} onChange={onToggle} />
+        <Switch
+          size="small"
+          checked={f.active}
+          onClick={(e) => e.stopPropagation()}
+          onChange={onToggle}
+        />
         <Typography
           noWrap
           sx={{
             flex: 1,
-            fontSize: 12.5,
+            fontSize: "0.75rem",
             color: f.active ? "text.primary" : "text.secondary",
           }}
         >
@@ -52,26 +69,30 @@ function FeatureRow({ cfg, f, onToggle, onCommit }: FeatureRowProps) {
         </Typography>
         <Typography
           sx={{
-            fontSize: 11.5,
+            fontSize: "0.75rem",
             fontFamily: "ui-monospace,monospace",
             color: f.active ? "primary.main" : "text.disabled",
           }}
         >
           {live[0]}–{live[1]}
         </Typography>
+        <ExpandIcon expanded={showSlider} sx={{ p: 0, fontSize: "1rem" }} />
       </Box>
-      <Box sx={{ px: 0.5 }}>
-        <Slider
-          size="small"
-          value={live}
-          min={cfg.bounds[0]}
-          max={cfg.bounds[1]}
-          step={cfg.step}
-          disabled={!f.active}
-          onChange={(_, v) => setLive(v as [number, number])}
-          onChangeCommitted={(_, v) => onCommit(v as [number, number])}
-        />
-      </Box>
+      <Collapse in={showSlider}>
+        <Box sx={{ px: 1 }}>
+          <Slider
+            size="small"
+            value={live}
+            min={cfg.bounds[0]}
+            max={cfg.bounds[1]}
+            step={cfg.step}
+            disabled={!f.active}
+            onClick={(e) => e.stopPropagation()}
+            onChange={(_, v) => setLive(v as [number, number])}
+            onChangeCommitted={(_, v) => onCommit(v as [number, number])}
+          />
+        </Box>
+      </Collapse>
     </Box>
   );
 }

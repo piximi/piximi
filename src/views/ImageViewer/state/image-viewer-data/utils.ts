@@ -20,8 +20,15 @@ export type FeatureParams = Record<FeatureKey, FeatureConfig>;
 export const FEATURES: FeatureParams = {
   area: { label: "Area", unit: "px²", bounds: [0, 2000], step: 10 },
   sphericity: { label: "Sphericity", unit: "", bounds: [0.4, 1], step: 0.01 },
-  radius: { label: "Radius", unit: "µm", bounds: [0, 25], step: 0.5 },
+  radius: { label: "Radius", unit: "px", bounds: [0, 25], step: 0.5 },
   perimeter: { label: "Perimeter", unit: "px", bounds: [0, 420], step: 5 },
+  extent: { label: "extent", unit: "", bounds: [0, 1], step: 0.01 },
+  bboxArea: { label: "bboxArea", unit: "px²", bounds: [0, 2000], step: 1 },
+  eqpc: { label: "eqpc", unit: "px²", bounds: [0, 2000], step: 1 },
+  ped: { label: "ped", unit: "px", bounds: [0, 420], step: 1 },
+  compactness: { label: "compactness", unit: "", bounds: [1, 100], step: 1 },
+  comX: { label: "comX", unit: "px", bounds: [0, 500], step: 1 },
+  comY: { label: "comY", unit: "px", bounds: [0, 500], step: 1 },
 };
 const emptyFeatureState = (features?: FeatureParams): FeatureState =>
   Object.fromEntries(
