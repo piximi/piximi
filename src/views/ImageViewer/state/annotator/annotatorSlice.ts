@@ -19,7 +19,7 @@ const initialState: AnnotatorState = {
   quickSelectionRegionSize: 40,
   thresholdAnnotationValue: 150,
   annotationMode: AnnotationMode.New,
-  pendingTargetId: undefined,
+  pendingTargetIds: [],
   toolType: ToolType.RectangularAnnotation,
 };
 
@@ -78,17 +78,20 @@ export const annotatorSlice = createSlice({
       action: PayloadAction<{ annotationMode: AnnotationMode }>,
     ) {
       state.annotationMode = action.payload.annotationMode;
-      state.pendingTargetId = undefined;
+      state.pendingTargetIds = [];
     },
 
-    setPendingTargetId(state, action: PayloadAction<string | undefined>) {
-      state.pendingTargetId = action.payload;
+    togglePendingTargetIds(state, action: PayloadAction<string>) {
+      const id = action.payload;
+      const idx = state.pendingTargetIds.indexOf(id);
+      if (idx === -1) state.pendingTargetIds.push(id);
+      else state.pendingTargetIds.splice(idx, 1);
     },
 
     /** Back to "commit the stroke as its own annotation", with no target. */
     clearPendingOperation(state) {
       state.annotationMode = AnnotationMode.New;
-      state.pendingTargetId = undefined;
+      state.pendingTargetIds = [];
     },
 
     setThresholdAnnotationValue(

@@ -16,7 +16,7 @@ import {
   selectIsPickingTarget,
   selectOverlapCandidateIds,
   selectPendingOperation,
-  selectResolvedTargetId,
+  selectResolvedTargetIds,
   selectSelectionOperandIds,
 } from "./reselectors";
 import { emptySelectionLayer } from "../image-viewer-data/utils";
@@ -100,21 +100,23 @@ describe("selectOverlapCandidateIds", () => {
 
 describe("selectResolvedTargetId", () => {
   it("resolves a single candidate implicitly", () => {
-    expect(selectResolvedTargetId.resultFunc(["A"], undefined)).toBe("A");
+    expect(selectResolvedTargetIds.resultFunc(["A"], [])).toEqual(["A"]);
   });
 
   it("waits for a pick when several candidates overlap", () => {
-    expect(
-      selectResolvedTargetId.resultFunc(["A", "B"], undefined),
-    ).toBeUndefined();
+    expect(selectResolvedTargetIds.resultFunc(["A", "B"], [])).toEqual([]);
   });
 
   it("honours a pick among the candidates", () => {
-    expect(selectResolvedTargetId.resultFunc(["A", "B"], "B")).toBe("B");
+    expect(selectResolvedTargetIds.resultFunc(["A", "B"], ["B"])).toEqual([
+      "B",
+    ]);
   });
 
-  it("ignores a pick that is no longer a candidate", () => {
-    expect(selectResolvedTargetId.resultFunc(["A", "B"], "Z")).toBeUndefined();
+  it("Drops a pick that is no longer a candidate", () => {
+    expect(selectResolvedTargetIds.resultFunc(["A", "B"], ["Z", "B"])).toEqual([
+      "B",
+    ]);
   });
 });
 
@@ -159,19 +161,13 @@ describe("selectPendingOperation — stroke against a target", () => {
 
   it("is null with no operation staged", () => {
     expect(
-      selectPendingOperation.resultFunc(AnnotationMode.New, ALL, s, "A", []),
+      selectPendingOperation.resultFunc(AnnotationMode.New, ALL, s, ["A"], []),
     ).toBeNull();
   });
 
   it("is null while the target is unresolved", () => {
     expect(
-      selectPendingOperation.resultFunc(
-        AnnotationMode.Add,
-        ALL,
-        s,
-        undefined,
-        [],
-      ),
+      selectPendingOperation.resultFunc(AnnotationMode.Add, ALL, s, [], []),
     ).toBeNull();
   });
 
@@ -180,7 +176,7 @@ describe("selectPendingOperation — stroke against a target", () => {
       AnnotationMode.Subtract,
       ALL,
       s,
-      "A",
+      ["A"],
       [],
     );
     expect(pending?.absorbedIds).toEqual([]);
@@ -194,11 +190,62 @@ describe("selectPendingOperation — stroke against a target", () => {
       AnnotationMode.Subtract,
       ALL,
       stroke(0, 0, ["##", "##"]),
-      "A",
+      ["A"],
       [],
     );
     expect(pending?.empty).toBe(true);
     expect(pending?.updates).toEqual({});
+  });
+});
+
+describe("selectPendingOperations - stroke against multiple targets", () => {
+  const s = stroke(1, 1, ["#"]);
+
+  it("Adds folds every picked target plut the stroke into the first, absobs the rest", () => {
+    const pending = selectPendingOperation.resultFunc(
+      AnnotationMode.Add,
+      ALL,
+      s,
+      ["A", "B"],
+      [],
+    );
+
+    expect(pending?.absorbedIds).toEqual(["B"]);
+    expect(Object.keys(pending!.updates)).toEqual(["A"]);
+    const u = pending!.updates.A;
+    expect(show(u.mask, u.bbox)).toEqual(["##.", "###", ".##"]);
+  });
+  it("Subtract applies to each picked target independently, absorbs nothing", () => {
+    const pending = selectPendingOperation.resultFunc(
+      AnnotationMode.Subtract,
+      ALL,
+      s,
+      ["A", "B"],
+      [],
+    );
+
+    expect(pending?.absorbedIds).toEqual([]);
+    expect(Object.keys(pending!.updates).sort()).toEqual(["A", "B"]);
+    const uA = pending!.updates.A;
+    const uB = pending!.updates.B;
+    expect(show(uA.mask, uA.bbox)).toEqual(["##", "#."]);
+    expect(show(uB.mask, uB.bbox)).toEqual([".#", "##"]);
+  });
+  it("Intersect applies to each picked target independently, absorbs nothing", () => {
+    const pending = selectPendingOperation.resultFunc(
+      AnnotationMode.Intersect,
+      ALL,
+      s,
+      ["A", "B"],
+      [],
+    );
+
+    expect(pending?.absorbedIds).toEqual([]);
+    expect(Object.keys(pending!.updates).sort()).toEqual(["A", "B"]);
+    const uA = pending!.updates.A;
+    const uB = pending!.updates.B;
+    expect(show(uA.mask, uA.bbox)).toEqual(["#"]);
+    expect(show(uB.mask, uB.bbox)).toEqual(["#"]);
   });
 });
 
@@ -208,7 +255,7 @@ describe("selectPendingOperation — click-selected operands", () => {
       AnnotationMode.Add,
       ALL,
       undefined,
-      undefined,
+      [],
       ["A", "B"],
     );
     expect(pending?.absorbedIds).toEqual(["B"]);
@@ -221,7 +268,7 @@ describe("selectPendingOperation — click-selected operands", () => {
       AnnotationMode.Subtract,
       ALL,
       undefined,
-      undefined,
+      [],
       ["B", "A"],
     );
     // B less A leaves B's three pixels outside the shared one.
@@ -236,7 +283,7 @@ describe("selectPendingOperation — click-selected operands", () => {
       AnnotationMode.Intersect,
       ALL,
       undefined,
-      undefined,
+      [],
       ["A", "C"],
     );
     expect(pending?.empty).toBe(true);
@@ -248,7 +295,7 @@ describe("selectPendingOperation — click-selected operands", () => {
         AnnotationMode.Add,
         ALL,
         undefined,
-        undefined,
+        [],
         ["A"],
       ),
     ).toBeNull();
@@ -262,7 +309,7 @@ describe("selectPendingOperation — invert", () => {
       AnnotationMode.Invert,
       [donut, A],
       undefined,
-      undefined,
+      [],
       ["D", "A"],
     );
     expect(pending?.absorbedIds).toEqual([]);
@@ -278,7 +325,7 @@ describe("selectPendingOperation — invert", () => {
         AnnotationMode.Invert,
         ALL,
         stroke(1, 1, ["#"]),
-        undefined,
+        [],
         ["A"],
       ),
     ).toBeNull();

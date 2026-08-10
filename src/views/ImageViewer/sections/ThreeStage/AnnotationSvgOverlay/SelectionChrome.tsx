@@ -30,7 +30,7 @@ import { selectVisibleAnnotations } from "@ImageViewer/state/image-viewer-data/r
 import {
   selectIsPickingTarget,
   selectOverlapCandidateIds,
-  selectResolvedTargetId,
+  selectResolvedTargetIds,
 } from "@ImageViewer/state/operations/reselectors";
 
 import { HotkeyContext } from "utils/enums";
@@ -75,7 +75,7 @@ export const OverlapBorders = () => {
   const visibleAnnotations = useSelector(selectVisibleAnnotations);
   const overlapIds = useSelector(selectOverlapCandidateIds);
   const isPickingTarget = useSelector(selectIsPickingTarget);
-  const resolvedTargetId = useSelector(selectResolvedTargetId);
+  const resolvedTargetIds = useSelector(selectResolvedTargetIds);
 
   const borders = useMemo(() => {
     const borders: Array<{
@@ -86,8 +86,10 @@ export const OverlapBorders = () => {
       h: number;
     }> = [];
     if (!isPickingTarget) return borders;
+    const resolved = new Set(resolvedTargetIds);
+
     overlapIds.forEach((id) => {
-      if (id === resolvedTargetId) return;
+      if (resolved.has(id)) return;
       const visA = visibleAnnotations.find((a) => a.id === id);
       if (!visA) return;
       const [x0, y0, x1, y1] = visA.boundingBox;
@@ -98,7 +100,7 @@ export const OverlapBorders = () => {
       borders.push({ id: visA.id, x, y, w, h });
     });
     return borders;
-  }, [overlapIds, visibleAnnotations, isPickingTarget, resolvedTargetId]);
+  }, [overlapIds, visibleAnnotations, isPickingTarget, resolvedTargetIds]);
 
   return (
     <g>
@@ -292,7 +294,7 @@ export const SelectionButtons = ({
           }}
         >
           <Typography variant="caption">
-            {`${numOverlapping} overlapping annotations -- click to select target`}
+            {`${numOverlapping} overlapping annotations -- click to select targets`}
           </Typography>
         </div>
       </div>

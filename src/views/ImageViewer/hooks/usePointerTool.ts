@@ -128,7 +128,7 @@ export const usePointerTool = (
       ).filter((id) => candidateIds.includes(id));
       if (under.length === 0) return;
       dispatch(
-        annotatorSlice.actions.setPendingTargetId(
+        annotatorSlice.actions.togglePendingTargetIds(
           under[currentIndex % under.length],
         ),
       );

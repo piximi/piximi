@@ -7,16 +7,12 @@ import {
   invertWithinBBox,
   masksOverlap,
 } from "views/ImageViewer/utils/maskOps";
-import type {
-  AnnotationObject,
-  BBox,
-  ExtendedAnnotationObject,
-} from "store/dataV2/types";
+import type { BBox, ExtendedAnnotationObject } from "store/dataV2/types";
 import { selectAnnotationEntities } from "store/dataV2/selectors";
 
 import {
   selectAnnotationMode,
-  selectPendingTargetId,
+  selectPendingTargetIds,
 } from "../annotator/selectors";
 import { selectFullWorkingAnnotation } from "../annotator/reselectors";
 import { selectSelectionLayer } from "../image-viewer-data/selectors";
@@ -30,7 +26,9 @@ const FOLD_OP: Partial<Record<AnnotationMode, SetOperation>> = {
   [AnnotationMode.Intersect]: "intersection",
 };
 
-const asRegion = (a: AnnotationObject): MaskRegion => ({
+const asRegion = <A extends { encodedMask: number[]; boundingBox: BBox }>(
+  a: A,
+): MaskRegion => ({
   mask: Uint8Array.from(decode(a.encodedMask)),
   bbox: a.boundingBox,
 });
@@ -65,12 +63,13 @@ export const selectOverlapCandidateIds = createSelector(
  * implicitly; more than one waits for an explicit pick, so an ambiguous stroke
  * can never silently edit the wrong annotation.
  */
-export const selectResolvedTargetId = createSelector(
+export const selectResolvedTargetIds = createSelector(
   selectOverlapCandidateIds,
-  selectPendingTargetId,
-  (candidates, picked): string | undefined => {
-    if (picked && candidates.includes(picked)) return picked;
-    return candidates.length === 1 ? candidates[0] : undefined;
+  selectPendingTargetIds,
+  (candidates, picked): Array<string> => {
+    if (candidates.length === 1) return candidates;
+    const candidatesSet = new Set(candidates);
+    return picked.filter((id) => candidatesSet.has(id));
   },
 );
 
@@ -159,13 +158,13 @@ export const selectPendingOperation = createSelector(
   selectAnnotationMode,
   selectVisibleAnnotations,
   selectFullWorkingAnnotation,
-  selectResolvedTargetId,
+  selectResolvedTargetIds,
   selectSelectionOperandIds,
   (
     mode,
     annotations,
     stroke,
-    targetId,
+    targetIds,
     operandIds,
   ): PendingOperation | null => {
     if (mode === AnnotationMode.New) return null;
@@ -194,19 +193,43 @@ export const selectPendingOperation = createSelector(
     if (!op) return null;
 
     if (stroke?.decodedMask) {
-      const target = targetId ? byId.get(targetId) : undefined;
-      if (!target) return null;
-      const region = asRegion(target);
-      // The target leads, so Subtract reads as "erase what I drew from this
-      // annotation" rather than the reverse.
-      const result = foldOperands(op, [
-        region,
-        { mask: Uint8Array.from(stroke.decodedMask), bbox: stroke.boundingBox },
-      ]);
+      const targets = targetIds
+        .map((id) => byId.get(id))
+        .filter((a): a is ExtendedAnnotationObject => !!a);
+      if (targets.length === 0) return null;
+      const strokeRegion: MaskRegion = {
+        mask: Uint8Array.from(stroke.decodedMask),
+        bbox: stroke.boundingBox,
+      };
+
+      // Add folds every picked target plus the stoke into one survivor --
+      // same shape as the no-stroke fold below. Subtract/Intersect apply to each
+      // each picked target independently: every annotation keeps its identity,
+      // nothing is absorbed.
+
+      if (mode === AnnotationMode.Add) {
+        const survivorId = targets[0].id;
+        const result = foldOperands(op, [
+          ...targets.map(asRegion),
+          strokeRegion,
+        ]);
+        return {
+          updates: result ? { [survivorId]: result } : {},
+          absorbedIds: targets.slice(1).map((a) => a.id),
+          empty: !result,
+        };
+      }
+
+      // Subtract/Intersect
+      const updates: Record<string, MaskRegion> = {};
+      targets.forEach((target) => {
+        const result = foldOperands(op, [asRegion(target), strokeRegion]);
+        if (result) updates[target.id] = result;
+      });
       return {
-        updates: result ? { [target.id]: result } : {},
+        updates,
         absorbedIds: [],
-        empty: !result,
+        empty: Object.keys(updates).length === 0,
       };
     }
 

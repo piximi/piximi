@@ -42,7 +42,7 @@ export type AnnotatorState = {
    * The annotation a stroke operation targets, once picked. Left undefined when
    * the stroke overlaps exactly one annotation (resolved implicitly) or none.
    */
-  pendingTargetId: string | undefined;
+  pendingTargetIds: Array<string>;
   toolType: ToolType;
 };
 
