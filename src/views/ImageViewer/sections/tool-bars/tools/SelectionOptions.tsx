@@ -1,18 +1,17 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { useTheme, Stack } from "@mui/material";
+import { useTheme, Box } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
 import { Tool } from "components/ui";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
-import { ToolType } from "views/ImageViewer/utils/enums";
+import { annotatorSlice } from "@ImageViewer/state/annotator";
+import { selectToolType } from "@ImageViewer/state/annotator/selectors";
+import { ToolType } from "@ImageViewer/utils/enums";
 import { Selection } from "icons";
-
-import { useAnnotatorToolShortcuts } from "../../../hooks";
+import { useAnnotatorToolShortcuts } from "@ImageViewer/hooks";
 
 export const SelectionOptions = () => {
   const dispatch = useDispatch();
@@ -33,8 +32,12 @@ export const SelectionOptions = () => {
   };
 
   return (
-    <Stack direction="row" data-help={HelpItem.SelectionTools}>
-      <Tool name={t("Selection Tool")} onClick={handleSetSelectionTool}>
+    <Box sx={{ width: "36px" }}>
+      <Tool
+        name={t("Selection Tool")}
+        onClick={handleSetSelectionTool}
+        data-help={HelpItem.SelectionTools}
+      >
         <Selection
           color={
             activeTool === ToolType.Pointer
@@ -43,6 +46,6 @@ export const SelectionOptions = () => {
           }
         />
       </Tool>
-    </Stack>
+    </Box>
   );
 };
