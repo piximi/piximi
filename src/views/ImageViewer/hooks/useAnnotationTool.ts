@@ -113,21 +113,5 @@ export const useAnnotationTool = (ijsImage: IJSImage | null) => {
     }
   }, [operator, quickSelectionRegionSize, penSelectionBrushSize]);
 
-  return {
-    annotationTool: operator,
-    ToolSelecton: {
-      /*!(
-                annotationState !== AnnotationStateType.Annotating &&
-                toolType !== ToolType.QuickAnnotation
-              ) && <Selection tool={annotationTool} toolType={toolType} />}
-              <PenAnnotationToolTip
-                currentPosition={positionByStage}
-                absolutePosition={absolutePosition}
-                annotating={annotationState === AnnotationStateType.Annotating}
-                outOfBounds={outOfBounds}
-              />
-              {/* <PointerSelection /> })
-            */
-    },
-  };
+  return operator;
 };

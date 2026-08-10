@@ -37,7 +37,7 @@ export const ThreeAnnotationLayer = ({
   const [drawTick, setDrawTick] = useState(0);
   const bumpDrawTick = useCallback(() => setDrawTick((t) => t + 1), []);
 
-  const { annotationTool } = useAnnotationTool(ijsImage);
+  const annotationTool = useAnnotationTool(ijsImage);
   useAnnotationState(annotationTool);
 
   const { absolutePosition, outOfBounds } = useThreeAnnotationHandlers({
