@@ -7,7 +7,12 @@ import {
   invertWithinBBox,
   masksOverlap,
 } from "views/ImageViewer/utils/maskOps";
-import type { BBox, ExtendedAnnotationObject } from "store/dataV2/types";
+import type {
+  AnnotationObject,
+  BBox,
+  ExtendedAnnotationObject,
+} from "store/dataV2/types";
+import { selectAnnotationEntities } from "store/dataV2/selectors";
 
 import {
   selectAnnotationMode,
@@ -25,7 +30,7 @@ const FOLD_OP: Partial<Record<AnnotationMode, SetOperation>> = {
   [AnnotationMode.Intersect]: "intersection",
 };
 
-const asRegion = (a: ExtendedAnnotationObject): MaskRegion => ({
+const asRegion = (a: AnnotationObject): MaskRegion => ({
   mask: Uint8Array.from(decode(a.encodedMask)),
   bbox: a.boundingBox,
 });
@@ -83,6 +88,34 @@ export const selectSelectionOperandIds = createSelector(
   (layer, visible): string[] => {
     const present = new Set(visible.map((a) => a.id));
     return layer.includeIds.filter((id) => present.has(id));
+  },
+);
+
+/**
+ * Whether each annotation overlaps the initial selected.
+ *
+ * In order for the "Subtract" and "Intersect" tool to have a meaningful
+ * function, there must be some overlap with the first selected annotation.
+ * The decision is that overlap is true only if every annotation selected (excluding 1st)
+ * overlaps the 1st.
+ */
+export const selectSelectionOverlaps = createSelector(
+  selectSelectionOperandIds,
+  selectAnnotationEntities,
+  (ids, anns): boolean => {
+    if (ids.length <= 1) return false;
+    const primary = anns[ids[0]];
+    const region = asRegion(primary);
+    return ids
+      .map((id) => anns[id])
+      .every((ann) =>
+        masksOverlap(
+          region.mask,
+          region.bbox,
+          Uint8Array.from(decode(ann.encodedMask)),
+          ann.boundingBox,
+        ),
+      );
   },
 );
 

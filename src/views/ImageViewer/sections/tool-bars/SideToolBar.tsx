@@ -1,8 +1,8 @@
-import React from "react";
-import { Divider, useTheme, Box } from "@mui/material";
+import { useTheme, Box } from "@mui/material";
 
-import { CreationOptions, ToolOptions } from "./tools";
 import { DIMENSIONS } from "utils/constants";
+
+import { ToolOptions } from "./tools";
 
 export const SideToolBar = () => {
   const theme = useTheme();
@@ -17,8 +17,6 @@ export const SideToolBar = () => {
         zIndex: 1002,
       }}
     >
-      <CreationOptions />
-      <Divider />
       <ToolOptions />
     </Box>
   );

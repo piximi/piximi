@@ -106,3 +106,8 @@ export const selectSelectedAnnotations = createSelector(
     return anns.filter((a) => matchesLayer(a, criterion));
   },
 );
+
+export const selectHasSelection = createSelector(
+  selectSelectedAnnotations,
+  (selected) => selected.length > 0,
+);

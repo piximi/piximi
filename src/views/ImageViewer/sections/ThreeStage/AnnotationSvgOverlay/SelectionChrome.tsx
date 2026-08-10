@@ -1,34 +1,45 @@
-import type { CSSProperties } from "react";
-import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "react";
 
-import { batch, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { useSound } from "use-sound";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import { IconButton, SvgIcon, Tooltip, Typography } from "@mui/material";
+import { FilterBAndW } from "@mui/icons-material";
 
-import { useHotkeys } from "hooks";
+import { useHotkeys, useTranslation } from "hooks";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { selectWorkingAnnotationEntity } from "views/ImageViewer/state/annotator/selectors";
-import { selectSoundEnabled } from "store/applicationSettings/selectors";
-import { selectPendingOperation } from "@ImageViewer/state/operations/reselectors";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
-import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
-import type { AnnotationObject, AnnotationVolume } from "store/dataV2/types";
-import { generateUUID } from "store/dataV2/utils";
-import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
-import { encode } from "@ImageViewer/utils";
-import { dataSliceV2 } from "store/dataV2";
+import { ToolHotkeyTitle } from "components/ui";
+
+import { annotatorSlice } from "@ImageViewer/state/annotator";
+import { selectAnnotationMode } from "@ImageViewer/state/annotator/selectors";
+import {
+  CombineAnnotationsIcon,
+  IntersectAnnotationsIcon,
+  NewAnnotationIcon,
+  SubtractAnnotationsIcon,
+} from "icons";
+import { AnnotationMode } from "@ImageViewer/utils/enums";
+import { selectVisibleAnnotations } from "@ImageViewer/state/image-viewer-data/reselectors";
+import {
+  selectIsPickingTarget,
+  selectOverlapCandidateIds,
+  selectResolvedTargetId,
+} from "@ImageViewer/state/operations/reselectors";
 
 import { HotkeyContext } from "utils/enums";
-import { Partition } from "utils/dl/enums";
-import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
-
-import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
-import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
+import type { HTMLDataAttributes } from "utils/types";
 
 import { useThreeViewport } from "../ThreeViewportContext";
+import { useAnnotationConfirmation } from "./useAnnotationConfirmation";
 
-import type { AnnotationTool } from "views/ImageViewer/utils/tools";
+import type { AnnotationTool } from "@ImageViewer/utils/tools";
 
 type BoundingBox = [number, number, number, number];
 
@@ -58,19 +69,107 @@ export const SelectionBorder = ({
   );
 };
 
-const buttonStyle = (fg: string): CSSProperties => ({
-  background: "var(--mui-palette-background-paper)",
-  color: fg,
-  border: "none",
-  borderRadius: 4,
-  padding: "4px 10px",
-  fontSize: 12,
-  //fontWeight: "bold",
-  textTransform: "uppercase",
-  cursor: "pointer",
-  boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
-});
+const PREVIEW_COLOR = "#00e5ff";
 
+export const OverlapBorders = () => {
+  const visibleAnnotations = useSelector(selectVisibleAnnotations);
+  const overlapIds = useSelector(selectOverlapCandidateIds);
+  const isPickingTarget = useSelector(selectIsPickingTarget);
+  const resolvedTargetId = useSelector(selectResolvedTargetId);
+
+  const borders = useMemo(() => {
+    const borders: Array<{
+      id: string;
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+    }> = [];
+    if (!isPickingTarget) return borders;
+    overlapIds.forEach((id) => {
+      if (id === resolvedTargetId) return;
+      const visA = visibleAnnotations.find((a) => a.id === id);
+      if (!visA) return;
+      const [x0, y0, x1, y1] = visA.boundingBox;
+      const x = Math.min(x0, x1);
+      const y = Math.min(y0, y1);
+      const w = Math.abs(x1 - x0);
+      const h = Math.abs(y1 - y0);
+      borders.push({ id: visA.id, x, y, w, h });
+    });
+    return borders;
+  }, [overlapIds, visibleAnnotations, isPickingTarget, resolvedTargetId]);
+
+  return (
+    <g>
+      {borders.map((b) => (
+        <rect
+          key={`overlap-border-${b.id}`}
+          x={b.x}
+          y={b.y}
+          width={b.w}
+          height={b.h}
+          fill="none"
+          stroke={PREVIEW_COLOR}
+          strokeDasharray="4"
+          strokeWidth={1.5}
+          vectorEffect="non-scaling-stroke"
+        />
+      ))}
+    </g>
+  );
+};
+
+const PANEL_WIDTH = 350;
+const PANEL_HEIGHT = 100;
+const BOTTOM_MARGIN = 16;
+
+const iconColor = (active: boolean, enabled: boolean) => {
+  if (!enabled) return "var(--mui-palette-action-disabled)";
+  return active
+    ? "var(--mui-palette-primary-dark)"
+    : "var(--mui-palette-action-active)";
+};
+type ActionButtonProps = HTMLDataAttributes & {
+  children: React.ReactNode;
+  name: string;
+  onClick: () => void;
+  disabled?: boolean;
+};
+const ActionButton = ({
+  children,
+  name,
+  onClick,
+  disabled = false,
+  ...attributes
+}: ActionButtonProps) => {
+  const description = useMemo(
+    () => <ToolHotkeyTitle toolName={name} />,
+    [name],
+  );
+
+  return (
+    <Tooltip title={description} placement="top">
+      <span>
+        <IconButton
+          size="small"
+          disabled={disabled}
+          onClick={onClick}
+          sx={{ borderRadius: 0 }}
+          {...attributes}
+        >
+          <SvgIcon
+            sx={{
+              width: "40px",
+            }}
+          >
+            {children}
+          </SvgIcon>
+        </IconButton>
+      </span>
+    </Tooltip>
+  );
+};
 /**
  * Confirm/Cancel buttons, rendered as an HTML `<foreignObject>` in screen space
  * (pointer-events enabled) and positioned next to a bounding box.
@@ -83,154 +182,51 @@ const buttonStyle = (fg: string): CSSProperties => ({
  */
 export const SelectionButtons = ({
   annotationTool,
-  boundingBox,
 }: {
   annotationTool: AnnotationTool;
-  boundingBox: BoundingBox;
 }) => {
   const dispatch = useDispatch();
-  const { onCameraChange, getImageToScreenTransform } = useThreeViewport();
+  const t = useTranslation();
+
+  const annotationMode = useSelector(selectAnnotationMode);
+  const isPickingTarget = useSelector(selectIsPickingTarget);
+  const {
+    confirm,
+    cancel,
+    hasUpdates,
+    canConfirm,
+    canCombine,
+    canInvert,
+    hasStroke,
+    numOverlapping,
+    canIntertract,
+  } = useAnnotationConfirmation(annotationTool);
+
+  const { onCameraChange, getViewportState } = useThreeViewport();
   const foRef = useRef<SVGForeignObjectElement>(null);
 
-  const workingAnnotation = useSelector(selectWorkingAnnotationEntity);
-  const activeImage = useSelector(selectActiveViewerImage);
-  const selectedCategory = useSelector(selectSelectedCategory);
-  const soundEnabled = useSelector(selectSoundEnabled);
-  const pendingOperation = useSelector(selectPendingOperation);
-
-  const [playCreate] = useSound(createAnnotationSoundEffect);
-  const [playDelete] = useSound(deleteAnnotationSoundEffect);
-
-  const staged = !!pendingOperation && !pendingOperation.empty;
-  const confirmLabel = staged ? "Apply" : "Create";
+  const handleModeSelection = (mode: AnnotationMode) => {
+    dispatch(
+      annotatorSlice.actions.setAnnotationMode({
+        annotationMode: annotationMode === mode ? AnnotationMode.New : mode,
+      }),
+    );
+  };
 
   const applyPos = useCallback(() => {
     const fo = foRef.current;
-    const t = getImageToScreenTransform();
-    if (!fo || !t) return;
-    const [x0, y0, x1, y1] = boundingBox;
-    const screenX = Math.max(x0, x1) * t.scale + t.tx;
-    const screenY = Math.min(y0, y1) * t.scale + t.ty;
-    fo.setAttribute("x", String(screenX + 8));
-    fo.setAttribute("y", String(Math.max(0, screenY)));
-  }, [getImageToScreenTransform, boundingBox]);
+    const vp = getViewportState();
+    if (!fo || !vp) return;
+    const screenX = (vp.stageWidth - PANEL_WIDTH) / 2;
+    const screenY = vp.stageHeight - PANEL_HEIGHT - BOTTOM_MARGIN;
+    fo.setAttribute("x", String(screenX));
+    fo.setAttribute("y", String(screenY));
+  }, [getViewportState]);
 
   useLayoutEffect(() => {
     applyPos();
   });
   useEffect(() => onCameraChange(applyPos), [onCameraChange, applyPos]);
-
-  const clearAnnotation = useCallback(() => {
-    annotationTool.deselect();
-    batch(() => {
-      dispatch(
-        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
-      );
-      dispatch(annotatorSlice.actions.clearPendingOperation());
-    });
-  }, [annotationTool, dispatch]);
-
-  /**
-   * Rewrite each changed annotation's geometry in place and delete the operands
-   * folded into it. Identity is deliberately untouched: keeping `volumeId`
-   * preserves category, kind and prediction metadata, which live on the volume.
-   * Features are recomputed because they are mask-derived and would otherwise
-   * go stale and corrupt feature-range filtering.
-   */
-  const applyOperation = useCallback(() => {
-    if (!pendingOperation || pendingOperation.empty) return;
-    const entries = Object.entries(pendingOperation.updates);
-    if (entries.length === 0) return;
-
-    batch(() => {
-      entries.forEach(([id, region]) => {
-        const features = computeObjectFeatures([
-          {
-            id,
-            boundingBox: region.bbox,
-            decodedMask: region.mask,
-            encodedMask: [],
-            features: undefined,
-          },
-        ]);
-        dispatch(
-          dataSliceV2.actions.updateAnnotationMask({
-            id,
-            boundingBox: region.bbox,
-            encodedMask: encode(region.mask),
-            features: features[id],
-          }),
-        );
-      });
-      if (pendingOperation.absorbedIds.length) {
-        dispatch(
-          dataSliceV2.actions.batchDeleteAnnotation(
-            pendingOperation.absorbedIds,
-          ),
-        );
-        // The absorbed ids are gone from the store; drop them from the manual
-        // selection sets so they do not linger there.
-        dispatch(
-          imageViewerDataSlice.actions.forgetAnnotationIds(
-            pendingOperation.absorbedIds,
-          ),
-        );
-      }
-    });
-    if (soundEnabled) playCreate();
-
-    clearAnnotation();
-  }, [pendingOperation, dispatch, clearAnnotation, soundEnabled, playCreate]);
-
-  const confirmAnnotation = useCallback(() => {
-    if (!activeImage || !workingAnnotation.saved || !selectedCategory) return;
-    const wAnn = workingAnnotation.saved;
-    const volume: AnnotationVolume = {
-      id: generateUUID(),
-      imageId: wAnn.imageId,
-      kindId: selectedCategory.kindId,
-      categoryId: selectedCategory.id,
-    };
-    const bboxW = wAnn.boundingBox[2] - wAnn.boundingBox[0];
-    const bboxH = wAnn.boundingBox[3] - wAnn.boundingBox[1];
-    const annotation: AnnotationObject = {
-      id: generateUUID(),
-      imageId: wAnn.imageId,
-      planeId: wAnn.planeId,
-      volumeId: volume.id,
-      partition: Partition.Unassigned,
-      shape: { planes: 1, width: bboxW, height: bboxH, channels: 1 },
-      boundingBox: wAnn.boundingBox,
-      encodedMask: encode(wAnn.decodedMask),
-    };
-    const features = computeObjectFeatures([
-      { ...annotation, decodedMask: wAnn.decodedMask },
-    ]);
-    annotation.features = features[annotation.id];
-    batch(() => {
-      dispatch(dataSliceV2.actions.addAnnotationVolume(volume));
-      dispatch(dataSliceV2.actions.addAnnotation(annotation));
-    });
-    if (soundEnabled) playCreate();
-
-    clearAnnotation();
-  }, [
-    activeImage,
-    workingAnnotation,
-    selectedCategory,
-    soundEnabled,
-    dispatch,
-    clearAnnotation,
-    playCreate,
-  ]);
-
-  const confirm = staged ? applyOperation : confirmAnnotation;
-  const canConfirm = staged || !!workingAnnotation.saved;
-
-  const cancel = useCallback(() => {
-    clearAnnotation();
-    if (soundEnabled) playDelete();
-  }, [clearAnnotation, soundEnabled, playDelete]);
 
   useHotkeys(
     "enter",
@@ -256,29 +252,151 @@ export const SelectionButtons = ({
   return (
     <foreignObject
       ref={foRef}
-      width={110}
-      height={80}
-      style={{ pointerEvents: "auto", overflow: "visible" }}
+      width={PANEL_WIDTH}
+      height={PANEL_HEIGHT}
+      style={{
+        pointerEvents: "auto",
+        overflow: "visible",
+        position: "relative",
+      }}
     >
       <div
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 4,
+          width: "100%",
+          height: "20px",
+          position: "relative",
+          zIndex: 998,
         }}
       >
-        <button
+        <div
+          style={{
+            position: "absolute",
+            width: "100%",
+            // left: (0.05 * PANEL_WIDTH) / 2 + "px",
+            display: "flex",
+            justifyContent: "center",
+            backgroundColor: "var(--mui-palette-background-paper)",
+            borderRadius:
+              "var(--mui-shape-borderRadius) var(--mui-shape-borderRadius) 0 0",
+            height: "20px",
+            top:
+              annotationMode !== AnnotationMode.New && isPickingTarget
+                ? 0
+                : "25px",
+            transition: "top ease-in-out 0.25s",
+            borderTop: `1px solid var(--mui-palette-primary-main)`,
+            borderLeft: `1px solid var(--mui-palette-primary-main)`,
+            borderRight: `1px solid var(--mui-palette-primary-main)`,
+            overflow: "hidden",
+            zIndex: 998,
+          }}
+        >
+          <Typography variant="caption">
+            {`${numOverlapping} overlapping annotations -- click to select target`}
+          </Typography>
+        </div>
+      </div>
+      <div
+        style={{
+          position: "relative",
+          backgroundColor: "var(--mui-palette-background-paper)",
+          border: `1px solid var(--mui-palette-primary-main)`,
+          borderTop:
+            annotationMode !== AnnotationMode.New && isPickingTarget
+              ? "1px solid var(--mui-palette-background-paper)"
+              : "1px solid var(--mui-palette-primary-main)",
+          borderRadius:
+            annotationMode !== AnnotationMode.New && isPickingTarget
+              ? " 0 0 var(--mui-shape-borderRadius) var(--mui-shape-borderRadius)"
+              : "var(--mui-shape-borderRadius)",
+          display: "flex",
+          transition: "all ease-in-out 0.25s",
+          zIndex: 999,
+        }}
+      >
+        <ActionButton
+          name={t("Confirm")}
           onClick={confirm}
-          style={buttonStyle("var(--mui-palette-success-main)")}
+          disabled={!hasUpdates}
         >
-          {confirmLabel}
-        </button>
-        <button
+          <CheckIcon
+            sx={{
+              color: !hasUpdates
+                ? "var(--mui-palette-action-disabled)"
+                : "var(--mui-palette-success-main)",
+            }}
+          />
+        </ActionButton>
+        <ActionButton
+          name={t("Add as New Annotation")}
+          onClick={() => handleModeSelection(AnnotationMode.New)}
+          disabled={!hasStroke}
+        >
+          <NewAnnotationIcon
+            color={iconColor(annotationMode === AnnotationMode.New, hasStroke)}
+          />
+        </ActionButton>
+        <ActionButton
+          name={t("Combine Annotations")}
+          onClick={() => handleModeSelection(AnnotationMode.Add)}
+          disabled={!canCombine}
+        >
+          <CombineAnnotationsIcon
+            color={iconColor(annotationMode === AnnotationMode.Add, canCombine)}
+          />
+        </ActionButton>
+
+        <ActionButton
+          name={t("Subtract Annotations")}
+          onClick={() => handleModeSelection(AnnotationMode.Subtract)}
+          disabled={!canIntertract}
+        >
+          <SubtractAnnotationsIcon
+            color={iconColor(
+              annotationMode === AnnotationMode.Subtract,
+              canIntertract,
+            )}
+          />
+        </ActionButton>
+        <ActionButton
+          name={t("Annotation Intersection")}
+          onClick={() => handleModeSelection(AnnotationMode.Intersect)}
+          disabled={!canIntertract}
+        >
+          <IntersectAnnotationsIcon
+            color={iconColor(
+              annotationMode === AnnotationMode.Intersect,
+              canIntertract,
+            )}
+          />
+        </ActionButton>
+        <ActionButton
+          name={t("Invert Annotation")}
+          onClick={() => handleModeSelection(AnnotationMode.Invert)}
+          disabled={!canInvert}
+        >
+          <FilterBAndW
+            sx={{
+              color: iconColor(
+                annotationMode === AnnotationMode.Invert,
+                canInvert,
+              ),
+            }}
+          />
+        </ActionButton>
+        <ActionButton
+          name={t("Cancel")}
           onClick={cancel}
-          style={buttonStyle("var(--mui-palette-error-main")}
+          disabled={!hasUpdates}
         >
-          Cancel
-        </button>
+          <CloseIcon
+            sx={{
+              color: !hasUpdates
+                ? "var(--mui-palette-action-disabled)"
+                : "var(--mui-palette-error-main)",
+            }}
+          />
+        </ActionButton>
       </div>
     </foreignObject>
   );

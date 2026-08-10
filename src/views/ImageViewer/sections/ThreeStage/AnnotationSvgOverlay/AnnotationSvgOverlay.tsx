@@ -6,10 +6,14 @@ import {
   selectAnnotationState,
   selectPenSelectionBrushSize,
   selectToolType,
-} from "views/ImageViewer/state/annotator/selectors";
-import { selectFullWorkingAnnotation } from "views/ImageViewer/state/annotator/reselectors";
-import { selectPendingOperationBBox } from "@ImageViewer/state/operations/reselectors";
-import { AnnotationState, ToolType } from "views/ImageViewer/utils/enums";
+} from "@ImageViewer/state/annotator/selectors";
+import { selectFullWorkingAnnotation } from "@ImageViewer/state/annotator/reselectors";
+import {
+  selectIsPickingTarget,
+  selectPendingOperationBBox,
+} from "@ImageViewer/state/operations/reselectors";
+import { AnnotationState, ToolType } from "@ImageViewer/utils/enums";
+import { selectHasSelection } from "@ImageViewer/state/image-viewer-data/reselectors";
 
 import type { Point } from "utils/types";
 
@@ -22,7 +26,11 @@ import { PenPreview } from "./previews/PenPreview";
 import { ColorPreview } from "./previews/ColorPreview";
 import { QuickPreview } from "./previews/QuickPreview";
 import { WorkingAnnotationImage } from "./WorkingAnnotationImage";
-import { SelectionBorder, SelectionButtons } from "./SelectionChrome";
+import {
+  OverlapBorders,
+  SelectionBorder,
+  SelectionButtons,
+} from "./SelectionChrome";
 import { BrushCursor } from "./BrushCursor";
 
 import type {
@@ -35,7 +43,7 @@ import type {
   PolygonalAnnotationTool,
   QuickAnnotationTool,
   RectangularAnnotationTool,
-} from "views/ImageViewer/utils/tools";
+} from "@ImageViewer/utils/tools";
 
 const LivePreview = ({
   operator,
@@ -97,7 +105,8 @@ export const AnnotationSvgOverlay = ({
   const brushSize = useSelector(selectPenSelectionBrushSize);
   const workingAnnotation = useSelector(selectFullWorkingAnnotation);
   const pendingBoundingBox = useSelector(selectPendingOperationBBox);
-
+  const hasSelection = useSelector(selectHasSelection);
+  const isPickingTarget = useSelector(selectIsPickingTarget);
   // The confirm chrome follows whatever is actually pending: a staged
   // operation's result extent, or failing that the drawn stroke. A staged
   // operation may have no stroke at all when its operands came from clicks.
@@ -153,15 +162,13 @@ export const AnnotationSvgOverlay = ({
         {chromeBoundingBox && (
           <SelectionBorder boundingBox={chromeBoundingBox} />
         )}
+        {isPickingTarget && <OverlapBorders />}
         {toolType === ToolType.PenAnnotation && !outOfBounds && (
           <BrushCursor position={absolutePosition} brushSize={brushSize} />
         )}
       </g>
-      {chromeBoundingBox && (
-        <SelectionButtons
-          annotationTool={annotationTool}
-          boundingBox={chromeBoundingBox}
-        />
+      {(chromeBoundingBox || hasSelection) && (
+        <SelectionButtons annotationTool={annotationTool} />
       )}
     </svg>
   );
