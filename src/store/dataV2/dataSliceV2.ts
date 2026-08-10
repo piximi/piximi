@@ -392,7 +392,7 @@ export const dataSliceV2 = createSlice({
       categoryAdapter.setAll(state.categories, categories);
     },
     resetState(state, action: PayloadAction<DataStateV2>) {
-      state = action.payload;
+      return action.payload;
     },
     /*
      * Create/Add
