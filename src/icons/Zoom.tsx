@@ -36,11 +36,19 @@ export const Zoom = ({ color }: { color: string }) => {
   );
 };
 
-export const CursorZoom = ({ color }: { color: string }) => {
+export const CursorZoom = ({
+  width,
+  height,
+  color,
+}: {
+  width?: string;
+  height?: string;
+  color: string;
+}) => {
   return (
     <svg
-      width="24px"
-      height="24px"
+      width={width ? width : "24px"}
+      height={height ? height : "24px"}
       viewBox="0 0 24 24"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -79,11 +87,19 @@ export const CursorZoom = ({ color }: { color: string }) => {
   );
 };
 
-export const StageZoom = ({ color }: { color: string }) => {
+export const StageZoom = ({
+  width,
+  height,
+  color,
+}: {
+  width?: string;
+  height?: string;
+  color: string;
+}) => {
   return (
     <svg
-      width="24px"
-      height="24px"
+      width={width ? width : "24px"}
+      height={height ? height : "24px"}
       viewBox="0 0 24 24"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"

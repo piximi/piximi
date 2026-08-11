@@ -1,4 +1,4 @@
-import { Box, Divider, Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 
 import { useAnnotatorToolShortcuts } from "@ImageViewer/hooks";
 import { ImageViewerLogo } from "@ImageViewer/components";
@@ -6,7 +6,6 @@ import { ImageViewerLogo } from "@ImageViewer/components";
 import { DIMENSIONS } from "utils/constants";
 
 import { ZoomOptions } from "./tools";
-import { SelectionOptions } from "./tools/SelectionOptions";
 
 export const TopToolBar = () => {
   useAnnotatorToolShortcuts();
@@ -30,16 +29,14 @@ export const TopToolBar = () => {
           backgroundColor: theme.palette.background.paper,
           position: "relative",
           display: "flex",
-          justifyContent: "flex-end",
-          justifyItems: "flex-end",
+          flexGrow: 1,
+          justifyContent: "center",
           height: DIMENSIONS.toolDrawerWidth,
           overflowY: "visible",
           zIndex: 1002,
         })}
       >
         <ZoomOptions />
-        <Divider orientation="vertical" flexItem />
-        <SelectionOptions />
       </Box>
     </Stack>
   );

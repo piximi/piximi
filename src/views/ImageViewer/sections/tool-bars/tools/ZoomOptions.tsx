@@ -5,7 +5,14 @@ import {
   AspectRatio as AspectRatioIcon,
   ControlCamera as ControlCameraIcon,
 } from "@mui/icons-material";
-import { Stack, useTheme } from "@mui/material";
+import {
+  Divider,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
+  useTheme,
+} from "@mui/material";
 
 import { useTranslation } from "hooks";
 
@@ -24,11 +31,19 @@ export const ZoomOptions = () => {
   const theme = useTheme();
   const t = useTranslation();
 
-  const handleSetCenteringOption = () => {
+  const handleSetCenteringOption = (
+    _e: React.MouseEvent<HTMLElement, MouseEvent>,
+    value: "stage" | "cursor",
+  ) => {
+    if (
+      (value === "stage" && options.automaticCentering) ||
+      (value === "cursor" && !options.automaticCentering)
+    )
+      return;
     const payload = {
       options: {
         ...options,
-        automaticCentering: !options.automaticCentering,
+        automaticCentering: value === "stage",
       },
     };
 
@@ -37,20 +52,62 @@ export const ZoomOptions = () => {
 
   return (
     <Stack data-help={HelpItem.ZoomAndPosition} direction="row">
-      <Tool
-        name={t(
+      <Tooltip
+        title={t(
           `Toggle Zoom Center: ${
             options.automaticCentering ? "Image" : "Cursor"
           }`,
         )}
-        onClick={handleSetCenteringOption}
       >
-        {options.automaticCentering ? (
-          <StageZoom color={theme.palette.action.active} />
-        ) : (
-          <CursorZoom color={theme.palette.action.active} />
-        )}
-      </Tool>
+        <ToggleButtonGroup
+          size="small"
+          exclusive
+          onChange={handleSetCenteringOption}
+          sx={{ my: "4px", mr: 1 }}
+        >
+          <ToggleButton
+            value="stage"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              py: "4px",
+              px: "7px",
+            }}
+          >
+            <StageZoom
+              width="20px"
+              height="20px"
+              color={
+                options.automaticCentering
+                  ? theme.palette.primary.main
+                  : theme.palette.action.active
+              }
+            />
+          </ToggleButton>
+          <ToggleButton
+            value="cursor"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              py: "4px",
+              px: "7px",
+            }}
+          >
+            <CursorZoom
+              width="20px"
+              height="20px"
+              color={
+                options.automaticCentering
+                  ? theme.palette.action.active
+                  : theme.palette.primary.main
+              }
+            />
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Tooltip>
+      <Divider orientation="vertical" flexItem />
       <Tool name={t("Actual Size")} onClick={zoomToActualSize}>
         <AspectRatioIcon />
       </Tool>
