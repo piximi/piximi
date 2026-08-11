@@ -1,16 +1,19 @@
-import React, { ReactElement } from "react";
+import type { ReactElement } from "react";
+import React from "react";
 
-import { useTranslation } from "hooks";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Stack, useTheme } from "@mui/material";
 import { Margin } from "@mui/icons-material";
 
+import { useTranslation } from "hooks";
+
 import { Tool } from "components/ui";
+import { ResizableTool } from "components/ui/Tool";
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { selectToolType } from "views/ImageViewer/state/annotator/selectors";
-
 import {
   ColorAnnotation,
   EllipticalAnnotation,
@@ -21,16 +24,16 @@ import {
   QuickAnnotation,
   RectangleAnnotation,
 } from "icons";
-
 import { ToolType } from "views/ImageViewer/utils/enums";
-import { ResizableTool } from "components/ui/Tool";
-import { SliderOptions } from "utils/types";
 import {
   penToolSizeControls,
   QuickToolSizeControls,
   ThresholdToolSizeControls,
 } from "views/ImageViewer/utils/consts";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
+import type { SliderOptions } from "utils/types";
+
+import { SelectionOptions } from "./SelectionOptions";
 
 type ToolMap = Record<
   string,
@@ -126,6 +129,7 @@ export const ToolOptions = () => {
 
   return (
     <Stack data-help={HelpItem.ObjectCreationTools}>
+      <SelectionOptions />
       {Object.keys(toolMap).map((name, idx) => {
         const tool = toolMap[name];
 
