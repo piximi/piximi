@@ -15,7 +15,7 @@ export const ImageSection = () => {
         gap: 1,
       }}
     >
-      <Typography variant="h6" gutterBottom={false}>
+      <Typography variant="h6" gutterBottom={false} sx={{ fontSize: 16 }}>
         Images
       </Typography>
       <Divider flexItem orientation="horizontal" />

@@ -126,7 +126,12 @@ export const ChannelHeader = ({
           colorMap={channelMeta.colorMap}
           updateColorMap={handleUpdateColorMap}
         />
-        <Typography variant="body1">{channelMeta.name}</Typography>
+        <Typography
+          variant="body1"
+          sx={{ fontSize: "0.825rem", fontWeight: "bold" }}
+        >
+          {channelMeta.name}
+        </Typography>
       </Box>
       <Box
         sx={{
