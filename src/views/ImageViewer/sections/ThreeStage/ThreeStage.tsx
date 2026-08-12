@@ -197,7 +197,13 @@ export const ThreeStage = ({ stageWidth, stageHeight }: ThreeStageProps) => {
   return (
     <Box sx={{ zIndex: 999 }}>
       <Box
-        sx={{ position: "relative", width: stageWidth, height: stageHeight }}
+        sx={{
+          position: "relative",
+          width: stageWidth,
+          height: stageHeight,
+          borderRadius: 1,
+          overflow: "hidden",
+        }}
       >
         <Box ref={mountRef} sx={{ width: stageWidth, height: stageHeight }} />
         {ready && (

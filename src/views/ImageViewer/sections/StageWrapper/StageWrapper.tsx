@@ -49,7 +49,6 @@ export const StageWrapper = () => {
         width: width,
         height: wrapperHeight,
         gridArea: "stage",
-        border: `1px solid ${theme.palette.divider}`,
         borderRadius: "4px 4px 0 0",
         overflow: "visible",
       })}

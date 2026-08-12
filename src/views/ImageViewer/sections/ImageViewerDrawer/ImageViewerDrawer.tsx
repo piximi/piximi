@@ -30,6 +30,7 @@ export const ImageViewerDrawer = () => {
             height: "100%",
             overflow: "hidden",
             position: "relative",
+            borderRight: "none",
           },
         }}
         open
