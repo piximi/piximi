@@ -20,7 +20,7 @@ import { useDialogHotkey } from "hooks";
 import { ConfirmationDialog } from "components/dialogs";
 
 import { selectExperiment } from "store/data/selectors";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 
 import { HotkeyContext } from "utils/enums";
 
@@ -78,7 +78,7 @@ export const SelectionFooter = ({
   const handleConfirmDelete = () => {
     if (!pendingScope) return;
     const ids = scopeToAnnotations(pendingScope);
-    dispatch(dataSliceV2.actions.batchDeleteAnnotation([...ids]));
+    dispatch(dataSlice.actions.batchDeleteAnnotation([...ids]));
     setPendingScope(null);
   };
 

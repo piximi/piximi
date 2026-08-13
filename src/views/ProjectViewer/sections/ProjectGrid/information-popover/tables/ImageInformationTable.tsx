@@ -14,7 +14,7 @@ import {
   selectExtendedImageById,
   selectPlanesByImageId,
 } from "store/data/selectors";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 
 import type { Partition } from "utils/dl/enums";
 
@@ -61,7 +61,7 @@ const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
 
   const handleDispatchNameChange = useCallback(() => {
     dispatch(
-      dataSliceV2.actions.updateImageName({
+      dataSlice.actions.updateImageName({
         imageId: image.id,
         name: newImageName,
       }),
@@ -71,7 +71,7 @@ const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
   const handleCategorySelect = useCallback(
     (categoryId: string) => {
       dispatch(
-        dataSliceV2.actions.updateImageCategory({
+        dataSlice.actions.updateImageCategory({
           id: image.id,
           categoryId: categoryId,
         }),
@@ -83,7 +83,7 @@ const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
   const handlePartitionSelect = useCallback(
     (partition: Partition) => {
       dispatch(
-        dataSliceV2.actions.updateImagePartition({
+        dataSlice.actions.updateImagePartition({
           id: image.id,
           partition,
         }),
@@ -94,7 +94,7 @@ const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
   const handlePlaneSelect = useCallback(
     (idx: number) => {
       dispatch(
-        dataSliceV2.actions.updateImageActivePlane({
+        dataSlice.actions.updateImageActivePlane({
           imageId: image.id,
           planeId: planes[idx].id,
         }),

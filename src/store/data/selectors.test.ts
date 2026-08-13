@@ -42,7 +42,7 @@ import {
   selectActiveChannels,
   selectRepresentativeImages,
 } from "./selectors";
-import { dataSliceV2 } from "./dataSlice";
+import { dataSlice } from "./dataSlice";
 
 import type {
   ImageSeries,
@@ -56,8 +56,8 @@ import type {
 } from "./types";
 
 function makeState(): RootState {
-  const dataV2 = dataSliceV2.reducer(undefined, { type: "" });
-  return { dataV2 } as unknown as RootState;
+  const data = dataSlice.reducer(undefined, { type: "" });
+  return { data } as unknown as RootState;
 }
 
 function makeSeries(id: string): ImageSeries {
@@ -97,10 +97,10 @@ describe("Tier 1 selectors", () => {
 
   it("selectImageSeriesById returns correct series", () => {
     const series = makeSeries("s1");
-    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
-    dataV2 = dataSliceV2.reducer(
-      dataV2,
-      dataSliceV2.actions.addImageSeries({
+    let data = dataSlice.reducer(undefined, { type: "" });
+    data = dataSlice.reducer(
+      data,
+      dataSlice.actions.addImageSeries({
         imageSeries: [series],
         images: [],
         planes: [],
@@ -108,7 +108,7 @@ describe("Tier 1 selectors", () => {
         channelMetas: [],
       }),
     );
-    const state = { dataV2 } as unknown as RootState;
+    const state = { data } as unknown as RootState;
     expect(selectImageSeriesById(state, "s1")).toEqual(series);
   });
 
@@ -129,10 +129,10 @@ function makeStateWithImages() {
   const series = makeSeries("s1");
   const img1 = makeImage("img1", "s1");
   const img2 = makeImage("img2", "s1");
-  let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
-  dataV2 = dataSliceV2.reducer(
-    dataV2,
-    dataSliceV2.actions.addImageSeries({
+  let data = dataSlice.reducer(undefined, { type: "" });
+  data = dataSlice.reducer(
+    data,
+    dataSlice.actions.addImageSeries({
       imageSeries: [series],
       images: [img1, img2],
       planes: [],
@@ -140,7 +140,7 @@ function makeStateWithImages() {
       channelMetas: [],
     }),
   );
-  return { dataV2 } as unknown as RootState;
+  return { data } as unknown as RootState;
 }
 
 describe("Tier 2 FK join selectors", () => {
@@ -156,13 +156,13 @@ describe("Tier 2 FK join selectors", () => {
   });
 
   it("selectImagesByCategoryId filters correctly", () => {
-    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+    let data = dataSlice.reducer(undefined, { type: "" });
     const series = makeSeries("s1");
     const img1 = makeImage("img1", "s1", "cat-a");
     const img2 = makeImage("img2", "s1", "cat-b");
-    dataV2 = dataSliceV2.reducer(
-      dataV2,
-      dataSliceV2.actions.addImageSeries({
+    data = dataSlice.reducer(
+      data,
+      dataSlice.actions.addImageSeries({
         imageSeries: [series],
         images: [img1, img2],
         planes: [],
@@ -170,13 +170,13 @@ describe("Tier 2 FK join selectors", () => {
         channelMetas: [],
       }),
     );
-    const state = { dataV2 } as unknown as RootState;
+    const state = { data } as unknown as RootState;
     expect(selectImagesByCategoryId(state, "cat-a")).toHaveLength(1);
     expect(selectImagesByCategoryId(state, "cat-a")[0].id).toBe("img1");
   });
 
   it("selectCategoriesByKindId returns annotation categories for that kind", () => {
-    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+    let data = dataSlice.reducer(undefined, { type: "" });
     const kind: Kind = {
       id: "k1",
       name: "K1",
@@ -190,15 +190,15 @@ describe("Tier 2 FK join selectors", () => {
       color: "#fff",
       isUnknown: true,
     };
-    dataV2 = dataSliceV2.reducer(dataV2, dataSliceV2.actions.addKind(kind));
-    dataV2 = dataSliceV2.reducer(dataV2, dataSliceV2.actions.addCategory(cat));
-    const state = { dataV2 } as unknown as RootState;
+    data = dataSlice.reducer(data, dataSlice.actions.addKind(kind));
+    data = dataSlice.reducer(data, dataSlice.actions.addCategory(cat));
+    const state = { data } as unknown as RootState;
     const result = selectCategoriesByKindId(state, "k1");
     expect(result.some((c) => c.id === "cat-k1-unk")).toBe(true);
   });
 
   it("selectAnnotationVolumesByImageId filters by imageId", () => {
-    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+    let data = dataSlice.reducer(undefined, { type: "" });
     const vol1: AnnotationVolume = {
       id: "v1",
       imageId: "img1",
@@ -211,17 +211,17 @@ describe("Tier 2 FK join selectors", () => {
       kindId: "k1",
       categoryId: "c1",
     };
-    dataV2 = dataSliceV2.reducer(
-      dataV2,
-      dataSliceV2.actions.batchAddAnnotationVolume([vol1, vol2]),
+    data = dataSlice.reducer(
+      data,
+      dataSlice.actions.batchAddAnnotationVolume([vol1, vol2]),
     );
-    const state = { dataV2 } as unknown as RootState;
+    const state = { data } as unknown as RootState;
     expect(selectAnnotationVolumesByImageId(state, "img1")).toHaveLength(1);
     expect(selectAnnotationVolumesByImageId(state, "img1")[0].id).toBe("v1");
   });
 
   it("selectAnnotationVolumesByKindId filters by kindId", () => {
-    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+    let data = dataSlice.reducer(undefined, { type: "" });
     const vol1: AnnotationVolume = {
       id: "v1",
       imageId: "img1",
@@ -234,16 +234,16 @@ describe("Tier 2 FK join selectors", () => {
       kindId: "k2",
       categoryId: "c2",
     };
-    dataV2 = dataSliceV2.reducer(
-      dataV2,
-      dataSliceV2.actions.batchAddAnnotationVolume([vol1, vol2]),
+    data = dataSlice.reducer(
+      data,
+      dataSlice.actions.batchAddAnnotationVolume([vol1, vol2]),
     );
-    const state = { dataV2 } as unknown as RootState;
+    const state = { data } as unknown as RootState;
     expect(selectAnnotationVolumesByKindId(state, "k1")).toHaveLength(1);
   });
 
   it("selectAnnotationVolumesByCategoryId filters by categoryId", () => {
-    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+    let data = dataSlice.reducer(undefined, { type: "" });
     const vol1: AnnotationVolume = {
       id: "v1",
       imageId: "img1",
@@ -256,16 +256,16 @@ describe("Tier 2 FK join selectors", () => {
       kindId: "k1",
       categoryId: "c2",
     };
-    dataV2 = dataSliceV2.reducer(
-      dataV2,
-      dataSliceV2.actions.batchAddAnnotationVolume([vol1, vol2]),
+    data = dataSlice.reducer(
+      data,
+      dataSlice.actions.batchAddAnnotationVolume([vol1, vol2]),
     );
-    const state = { dataV2 } as unknown as RootState;
+    const state = { data } as unknown as RootState;
     expect(selectAnnotationVolumesByCategoryId(state, "c1")).toHaveLength(1);
   });
 
   it("selectAnnotationsByVolumeId filters by volumeId", () => {
-    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+    let data = dataSlice.reducer(undefined, { type: "" });
     const ann1: AnnotationObject = {
       id: "a1",
       planeId: "pl1",
@@ -277,11 +277,11 @@ describe("Tier 2 FK join selectors", () => {
       encodedMask: [],
     };
     const ann2: AnnotationObject = { ...ann1, id: "a2", volumeId: "v2" };
-    dataV2 = dataSliceV2.reducer(
-      dataV2,
-      dataSliceV2.actions.batchAddAnnotation([ann1, ann2]),
+    data = dataSlice.reducer(
+      data,
+      dataSlice.actions.batchAddAnnotation([ann1, ann2]),
     );
-    const state = { dataV2 } as unknown as RootState;
+    const state = { data } as unknown as RootState;
     expect(selectAnnotationsByVolumeId(state, "v1")).toHaveLength(1);
     expect(selectAnnotationsByVolumeId(state, "v1")[0].id).toBe("a1");
   });
@@ -289,12 +289,12 @@ describe("Tier 2 FK join selectors", () => {
 
 describe("Tier 2 active-entity selectors", () => {
   it("selectActiveImage returns the active image for a series", () => {
-    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+    let data = dataSlice.reducer(undefined, { type: "" });
     const series: ImageSeries = { ...makeSeries("s1"), activeImageId: "img1" };
     const img = makeImage("img1", "s1");
-    dataV2 = dataSliceV2.reducer(
-      dataV2,
-      dataSliceV2.actions.addImageSeries({
+    data = dataSlice.reducer(
+      data,
+      dataSlice.actions.addImageSeries({
         imageSeries: [series],
         images: [img],
         planes: [],
@@ -302,7 +302,7 @@ describe("Tier 2 active-entity selectors", () => {
         channelMetas: [],
       }),
     );
-    const state = { dataV2 } as unknown as RootState;
+    const state = { data } as unknown as RootState;
     expect(selectActiveImage(state, "s1")?.id).toBe("img1");
   });
 
@@ -311,16 +311,16 @@ describe("Tier 2 active-entity selectors", () => {
   });
 
   it("selectActivePlane returns the active plane for an image", () => {
-    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+    let data = dataSlice.reducer(undefined, { type: "" });
     const series = makeSeries("s1");
     const img: ImageObject = {
       ...makeImage("img1", "s1"),
       activePlaneId: "pl1",
     };
     const plane: Plane = { id: "pl1", imageId: "img1", zIndex: 0 };
-    dataV2 = dataSliceV2.reducer(
-      dataV2,
-      dataSliceV2.actions.addImageSeries({
+    data = dataSlice.reducer(
+      data,
+      dataSlice.actions.addImageSeries({
         imageSeries: [series],
         images: [img],
         planes: [plane],
@@ -328,7 +328,7 @@ describe("Tier 2 active-entity selectors", () => {
         channelMetas: [],
       }),
     );
-    const state = { dataV2 } as unknown as RootState;
+    const state = { data } as unknown as RootState;
     expect(selectActivePlane(state, "img1")?.id).toBe("pl1");
   });
 
@@ -337,7 +337,7 @@ describe("Tier 2 active-entity selectors", () => {
   });
 
   it("selectActiveChannels returns only channels on the active plane", () => {
-    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+    let data = dataSlice.reducer(undefined, { type: "" });
     const series = makeSeries("s1");
     const img: ImageObject = {
       ...makeImage("img1", "s1"),
@@ -366,9 +366,9 @@ describe("Tier 2 active-entity selectors", () => {
       minValue: 0,
     };
     const ch2: Channel = { ...ch1, id: "ch2", planeId: "pl2" }; // different plane
-    dataV2 = dataSliceV2.reducer(
-      dataV2,
-      dataSliceV2.actions.addImageSeries({
+    data = dataSlice.reducer(
+      data,
+      dataSlice.actions.addImageSeries({
         imageSeries: [series],
         images: [img],
         planes: [plane],
@@ -376,7 +376,7 @@ describe("Tier 2 active-entity selectors", () => {
         channelMetas: [],
       }),
     );
-    const state = { dataV2 } as unknown as RootState;
+    const state = { data } as unknown as RootState;
     const result = selectActiveChannels(state, "img1");
     expect(result).toHaveLength(1);
     expect(result[0].id).toBe("ch1");
@@ -389,13 +389,13 @@ describe("Tier 2 active-entity selectors", () => {
 
 describe("selectRepresentativeImages", () => {
   it("returns all images for a non-time-series series", () => {
-    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+    let data = dataSlice.reducer(undefined, { type: "" });
     const series = makeSeries("s1"); // timeSeries: false
     const img1 = makeImage("img1", "s1");
     const img2 = makeImage("img2", "s1");
-    dataV2 = dataSliceV2.reducer(
-      dataV2,
-      dataSliceV2.actions.addImageSeries({
+    data = dataSlice.reducer(
+      data,
+      dataSlice.actions.addImageSeries({
         imageSeries: [series],
         images: [img1, img2],
         planes: [],
@@ -403,12 +403,12 @@ describe("selectRepresentativeImages", () => {
         channelMetas: [],
       }),
     );
-    const state = { dataV2 } as unknown as RootState;
+    const state = { data } as unknown as RootState;
     expect(selectRepresentativeImages(state)).toHaveLength(2);
   });
 
   it("returns only timepoint=0 image for a time-series", () => {
-    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+    let data = dataSlice.reducer(undefined, { type: "" });
     const series: ImageSeries = {
       ...makeSeries("ts1"),
       timeSeries: true,
@@ -416,9 +416,9 @@ describe("selectRepresentativeImages", () => {
     };
     const ti0: ImageObject = { ...makeImage("ti0", "ts1"), timepoint: 0 };
     const ti1: ImageObject = { ...makeImage("ti1", "ts1"), timepoint: 1 };
-    dataV2 = dataSliceV2.reducer(
-      dataV2,
-      dataSliceV2.actions.addImageSeries({
+    data = dataSlice.reducer(
+      data,
+      dataSlice.actions.addImageSeries({
         imageSeries: [series],
         images: [ti0, ti1],
         planes: [],
@@ -426,14 +426,14 @@ describe("selectRepresentativeImages", () => {
         channelMetas: [],
       }),
     );
-    const state = { dataV2 } as unknown as RootState;
+    const state = { data } as unknown as RootState;
     const result = selectRepresentativeImages(state);
     expect(result).toHaveLength(1);
     expect(result[0].id).toBe("ti0");
   });
 
   it("mixes regular and time-series images correctly", () => {
-    let dataV2 = dataSliceV2.reducer(undefined, { type: "" });
+    let data = dataSlice.reducer(undefined, { type: "" });
     const regular: ImageSeries = { ...makeSeries("s1"), timeSeries: false };
     const ts: ImageSeries = {
       ...makeSeries("ts1"),
@@ -443,9 +443,9 @@ describe("selectRepresentativeImages", () => {
     const img1 = makeImage("img1", "s1");
     const ti0: ImageObject = { ...makeImage("ti0", "ts1"), timepoint: 0 };
     const ti1: ImageObject = { ...makeImage("ti1", "ts1"), timepoint: 1 };
-    dataV2 = dataSliceV2.reducer(
-      dataV2,
-      dataSliceV2.actions.addImageSeries({
+    data = dataSlice.reducer(
+      data,
+      dataSlice.actions.addImageSeries({
         imageSeries: [regular, ts],
         images: [img1, ti0, ti1],
         planes: [],
@@ -453,7 +453,7 @@ describe("selectRepresentativeImages", () => {
         channelMetas: [],
       }),
     );
-    const state = { dataV2 } as unknown as RootState;
+    const state = { data } as unknown as RootState;
     // 1 regular + 1 representative from time-series
     expect(selectRepresentativeImages(state)).toHaveLength(2);
   });

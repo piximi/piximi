@@ -24,7 +24,7 @@ import { useDialog } from "hooks";
 
 import { StyledSelect } from "components/inputs";
 
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import type { Kind, ExtendedAnnotationObject } from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";
 import {
@@ -85,7 +85,7 @@ export const AnnotationInfoTable = ({
   const handleCategorySelect = useCallback(
     (categoryId: string) => {
       dispatch(
-        dataSliceV2.actions.bubbleUpdateAnnotationCategory({
+        dataSlice.actions.bubbleUpdateAnnotationCategory({
           id: annotation.id,
           categoryId: categoryId,
         }),
@@ -97,7 +97,7 @@ export const AnnotationInfoTable = ({
   const handlePartitionSelect = useCallback(
     (partition: Partition) => {
       dispatch(
-        dataSliceV2.actions.updateAnnotationPartition({
+        dataSlice.actions.updateAnnotationPartition({
           id: annotation.id,
           partition,
         }),
@@ -238,9 +238,9 @@ const KindChangeDialog = ({
         );
         return () =>
           batch(() => {
-            dispatch(dataSliceV2.actions.addCategory(copiedCategory));
+            dispatch(dataSlice.actions.addCategory(copiedCategory));
             dispatch(
-              dataSliceV2.actions.bubbleUpdateAnnotationKind({
+              dataSlice.actions.bubbleUpdateAnnotationKind({
                 id: targetAnn.id,
                 kindId: targetKind.id,
                 categoryId: copiedCategory.id,
@@ -251,7 +251,7 @@ const KindChangeDialog = ({
       case "map":
         return () => {
           dispatch(
-            dataSliceV2.actions.bubbleUpdateAnnotationKind({
+            dataSlice.actions.bubbleUpdateAnnotationKind({
               id: targetAnn.id,
               kindId: targetKind.id,
               categoryId: selectedCategoryId,

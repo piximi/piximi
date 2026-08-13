@@ -5,7 +5,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { useSound } from "use-sound";
 
 import { annotatorSlice } from "@ImageViewer/state/annotator";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { encode } from "@ImageViewer/utils";
 import type { AnnotationObject, AnnotationVolume } from "store/data/types";
 import { generateUUID } from "store/data/utils";
@@ -90,7 +90,7 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
           },
         ]);
         dispatch(
-          dataSliceV2.actions.updateAnnotationMask({
+          dataSlice.actions.updateAnnotationMask({
             id,
             boundingBox: region.bbox,
             encodedMask: encode(region.mask),
@@ -101,9 +101,7 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
       }
       if (pendingOperation.absorbedIds.length) {
         dispatch(
-          dataSliceV2.actions.batchDeleteAnnotation(
-            pendingOperation.absorbedIds,
-          ),
+          dataSlice.actions.batchDeleteAnnotation(pendingOperation.absorbedIds),
         );
         // The absorbed ids are gone from the store; drop them from the manual
         // selection sets so they do not linger there.
@@ -157,8 +155,8 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
     annotation.features = features[annotation.id];
     annotation.intensityMeasurements = channelMeasurements[annotation.id];
     batch(() => {
-      dispatch(dataSliceV2.actions.addAnnotationVolume(volume));
-      dispatch(dataSliceV2.actions.addAnnotation(annotation));
+      dispatch(dataSlice.actions.addAnnotationVolume(volume));
+      dispatch(dataSlice.actions.addAnnotation(annotation));
     });
     if (soundEnabled) playCreate();
 

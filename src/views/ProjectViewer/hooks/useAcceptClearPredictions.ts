@@ -9,7 +9,7 @@ import {
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { classifierSlice } from "store/classifier";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { useParameterizedSelector } from "store/hooks";
 
 import { Partition } from "utils/dl/enums";
@@ -37,10 +37,10 @@ export const useAcceptClearPredictions = () => {
     );
     batch(() => {
       if (modelTarget === IMAGE_CLASSIFIER_ID)
-        dispatch(dataSliceV2.actions.batchUpdateImageCategory(updates));
+        dispatch(dataSlice.actions.batchUpdateImageCategory(updates));
       else
         dispatch(
-          dataSliceV2.actions.batchBubbleUpdateAnnotationCategory(updates),
+          dataSlice.actions.batchBubbleUpdateAnnotationCategory(updates),
         );
       dispatch(
         classifierSlice.actions.setModelStatus({
@@ -71,9 +71,8 @@ export const useAcceptClearPredictions = () => {
     );
     batch(() => {
       if (modelTarget === IMAGE_CLASSIFIER_ID)
-        dispatch(dataSliceV2.actions.batchUpdateImagePartition(updates));
-      else
-        dispatch(dataSliceV2.actions.batchUpdateAnnotationPartition(updates));
+        dispatch(dataSlice.actions.batchUpdateImagePartition(updates));
+      else dispatch(dataSlice.actions.batchUpdateAnnotationPartition(updates));
       dispatch(
         classifierSlice.actions.setModelStatus({
           targetId: modelTarget,

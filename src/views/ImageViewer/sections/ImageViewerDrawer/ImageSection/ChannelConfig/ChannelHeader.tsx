@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { Box, Checkbox, IconButton, Popover, Typography } from "@mui/material";
 import { Settings } from "@mui/icons-material";
 
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import type { ChannelMeta, ColorMap } from "store/data/types";
 
 import { rgbToHex } from "utils/colorUtils";
@@ -91,7 +91,7 @@ export const ChannelHeader = ({
 
   const handleSetVisibility = (visible: boolean) => {
     dispatch(
-      dataSliceV2.actions.updateChannelMeta({
+      dataSlice.actions.updateChannelMeta({
         id: channelMeta.id,
         changes: { visible },
       }),
@@ -100,7 +100,7 @@ export const ChannelHeader = ({
 
   const handleUpdateColorMap = (colorMap: ColorMap) => {
     dispatch(
-      dataSliceV2.actions.updateChannelMeta({
+      dataSlice.actions.updateChannelMeta({
         id: channelMeta.id,
         changes: { colorMap },
       }),

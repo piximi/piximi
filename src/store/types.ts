@@ -43,7 +43,7 @@ type AppState = {
   annotator: AnnotatorState;
   project: ProjectState;
   applicationSettings: AppSettingsState;
-  dataV2: DataStateV2;
+  data: DataStateV2;
   measurements: MeasurementsState;
   appTasks: AppTasksState;
 };

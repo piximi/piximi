@@ -23,7 +23,7 @@ import { StyledSelect } from "components/inputs/StyledSelect";
 import type { Category } from "store/data/types";
 import { generateCategory } from "store/data/utils";
 import { CATEGORY_COLORS } from "store/data/constants";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { selectAvaliableCategoryColors } from "@ProjectViewer/state/reselectors";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
@@ -76,7 +76,7 @@ export const ClassMapDialog = ({
         newCategories.push(cat);
         confirmedCatMap[idx] = cat.id;
       });
-      dispatch(dataSliceV2.actions.batchAddCategory(newCategories));
+      dispatch(dataSlice.actions.batchAddCategory(newCategories));
       onConfirm(confirmedCatMap);
     } else {
       onConfirm(catMap);

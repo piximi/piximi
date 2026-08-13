@@ -6,7 +6,7 @@ import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { AppTask } from "store/appTasks/types";
 import { classifierSlice } from "store/classifier";
 import { generateUUID } from "store/data/utils";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { projectSlice } from "@ProjectViewer/state";
 import { AlertType } from "utils/enums";
 import { ProjectLoader } from "utils/file-io-v2/project-loader/ProjectLoader";
@@ -120,7 +120,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
               classifier: classifier,
             }),
           );
-          dispatch(dataSliceV2.actions.setState(data));
+          dispatch(dataSlice.actions.setState(data));
         });
 
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
@@ -228,7 +228,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
               classifier: classifier,
             }),
           );
-          dispatch(dataSliceV2.actions.setState(data));
+          dispatch(dataSlice.actions.setState(data));
         });
 
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));

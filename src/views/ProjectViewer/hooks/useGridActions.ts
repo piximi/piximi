@@ -10,7 +10,7 @@ import {
   selectActiveSelectedIds,
   selectActiveView,
 } from "@ProjectViewer/state/selectors";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import {
   selectActiveCategories,
   selectVisibleItems,
@@ -37,11 +37,11 @@ export const useGridActions = () => {
   const handleDelete = () => {
     if (viewState === "images")
       dispatch(
-        dataSliceV2.actions.batchDeleteImageObject(selectedFilteredItemIds),
+        dataSlice.actions.batchDeleteImageObject(selectedFilteredItemIds),
       );
     else
       dispatch(
-        dataSliceV2.actions.batchDeleteAnnotation(selectedFilteredItemIds),
+        dataSlice.actions.batchDeleteAnnotation(selectedFilteredItemIds),
       );
   };
   const handleSelectAll = () => {
@@ -83,11 +83,9 @@ export const useGridActions = () => {
       categoryId,
     }));
     if (viewState === "images") {
-      dispatch(dataSliceV2.actions.batchUpdateImageCategory(payload));
+      dispatch(dataSlice.actions.batchUpdateImageCategory(payload));
     } else {
-      dispatch(
-        dataSliceV2.actions.batchBubbleUpdateAnnotationCategory(payload),
-      );
+      dispatch(dataSlice.actions.batchBubbleUpdateAnnotationCategory(payload));
     }
   };
 

@@ -24,7 +24,7 @@ import {
 import { selectActiveCategories } from "@ProjectViewer/state/reselectors";
 import type { Category } from "store/data/types";
 import { generateCategory } from "store/data/utils";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 
 import { HotkeyContext } from "utils/enums";
 
@@ -65,12 +65,12 @@ export const ProjectViewerCategories = () => {
   );
   const createCategory = (name: string, color: string) => {
     const category = generateCategory(name, color, categoryOptions);
-    dispatch(dataSliceV2.actions.addCategory(category));
+    dispatch(dataSlice.actions.addCategory(category));
   };
 
   const editCategory = (id: string, name: string, color: string) => {
     dispatch(
-      dataSliceV2.actions.updateCategoryDisplayProps({
+      dataSlice.actions.updateCategoryDisplayProps({
         id,
         changes: { name, color },
       }),
@@ -78,14 +78,14 @@ export const ProjectViewerCategories = () => {
   };
   const deleteCategory = (category: Category) => {
     dispatch(
-      dataSliceV2.actions.deleteCategory({
+      dataSlice.actions.deleteCategory({
         id: category.id,
         details: categoryOptions,
       }),
     );
   };
   const deleteObjects = (category: Category) => {
-    dispatch(dataSliceV2.actions.deleteEntitiesByCatId(category.id));
+    dispatch(dataSlice.actions.deleteEntitiesByCatId(category.id));
   };
 
   const onOpenCategoryMenu = (
@@ -102,7 +102,7 @@ export const ProjectViewerCategories = () => {
   };
   const handleRemoveAllCategories = () => {
     dispatch(
-      dataSliceV2.actions.batchDeleteCategory(
+      dataSlice.actions.batchDeleteCategory(
         categories.map((c) => ({ id: c.id, details: categoryOptions })),
       ),
     );
@@ -148,11 +148,11 @@ export const ProjectViewerCategories = () => {
             categoryId: currentCategory.id,
           }));
           if (activeView === "images") {
-            dispatch(dataSliceV2.actions.batchUpdateImageCategory(updates));
+            dispatch(dataSlice.actions.batchUpdateImageCategory(updates));
             return;
           }
           dispatch(
-            dataSliceV2.actions.batchBubbleUpdateAnnotationCategory(updates),
+            dataSlice.actions.batchBubbleUpdateAnnotationCategory(updates),
           );
         }
       }

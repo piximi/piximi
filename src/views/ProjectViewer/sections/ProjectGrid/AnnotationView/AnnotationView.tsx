@@ -10,7 +10,7 @@ import { useMenu, useMobileView } from "hooks";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { projectSlice } from "@ProjectViewer/state/projectSlice";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { selectAnnotationGridState } from "@ProjectViewer/state/selectors";
 
 import { DIMENSIONS } from "utils/constants";
@@ -49,7 +49,7 @@ export const AnnotationView = () => {
 
   const handleTabDelete = useCallback(
     (id: string) => {
-      dispatch(dataSliceV2.actions.deleteKind(id));
+      dispatch(dataSlice.actions.deleteKind(id));
     },
     [dispatch],
   );
@@ -80,7 +80,7 @@ export const AnnotationView = () => {
 
   const handleKindEdit = (kindId: string, newDisplayName: string) => {
     dispatch(
-      dataSliceV2.actions.updateKindName({ kindId, name: newDisplayName }),
+      dataSlice.actions.updateKindName({ kindId, name: newDisplayName }),
     );
   };
 

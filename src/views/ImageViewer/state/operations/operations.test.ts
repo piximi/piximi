@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { AnnotationMode } from "views/ImageViewer/utils/enums";
 import { encode } from "views/ImageViewer/utils/rle";
 import type {
@@ -382,19 +382,19 @@ describe("updateAnnotationMask", () => {
   });
 
   const reduce = (annotation: AnnotationObject, action: unknown) => {
-    let state = dataSliceV2.reducer(undefined, { type: "@@INIT" });
-    state = dataSliceV2.reducer(
+    let state = dataSlice.reducer(undefined, { type: "@@INIT" });
+    state = dataSlice.reducer(
       state,
-      dataSliceV2.actions.addAnnotation(annotation),
+      dataSlice.actions.addAnnotation(annotation),
     );
 
-    return dataSliceV2.reducer(state, action as any).annotations.entities.A;
+    return dataSlice.reducer(state, action as any).annotations.entities.A;
   };
 
   it("replaces geometry and derives shape from the new box", () => {
     const updated = reduce(
       base(),
-      dataSliceV2.actions.updateAnnotationMask({
+      dataSlice.actions.updateAnnotationMask({
         id: "A",
         boundingBox: [1, 1, 4, 3],
         encodedMask: encode(grid(["###", "###"])),
@@ -416,7 +416,7 @@ describe("updateAnnotationMask", () => {
   it("leaves identity and partition alone", () => {
     const updated = reduce(
       base(),
-      dataSliceV2.actions.updateAnnotationMask({
+      dataSlice.actions.updateAnnotationMask({
         id: "A",
         boundingBox: [0, 0, 1, 1],
         encodedMask: encode(grid(["#"])),
@@ -433,7 +433,7 @@ describe("updateAnnotationMask", () => {
   it("is a no-op for an unknown id", () => {
     const updated = reduce(
       base(),
-      dataSliceV2.actions.updateAnnotationMask({
+      dataSlice.actions.updateAnnotationMask({
         id: "nope",
         boundingBox: [0, 0, 1, 1],
         encodedMask: [],

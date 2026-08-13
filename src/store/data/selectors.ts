@@ -34,31 +34,31 @@ import type {
 // ── Tier 1: Raw adapter selectors ──────────────────────────────────────────
 
 const imageSeriesSelectors = imageSeriesAdapter.getSelectors(
-  (state: RootState) => state.dataV2.imageSeries,
+  (state: RootState) => state.data.imageSeries,
 );
 const imageSelectors = imageAdapter.getSelectors(
-  (state: RootState) => state.dataV2.images,
+  (state: RootState) => state.data.images,
 );
 const kindSelectors = kindAdapter.getSelectors(
-  (state: RootState) => state.dataV2.kinds,
+  (state: RootState) => state.data.kinds,
 );
 const categorySelectors = categoryAdapter.getSelectors(
-  (state: RootState) => state.dataV2.categories,
+  (state: RootState) => state.data.categories,
 );
 const planeSelectors = planeAdapter.getSelectors(
-  (state: RootState) => state.dataV2.planes,
+  (state: RootState) => state.data.planes,
 );
 const channelSelectors = channelAdapter.getSelectors(
-  (state: RootState) => state.dataV2.channels,
+  (state: RootState) => state.data.channels,
 );
 const channelMetaSelectors = channelMetaAdapter.getSelectors(
-  (state: RootState) => state.dataV2.channelMetas,
+  (state: RootState) => state.data.channelMetas,
 );
 const annotationSelectors = annotationAdapter.getSelectors(
-  (state: RootState) => state.dataV2.annotations,
+  (state: RootState) => state.data.annotations,
 );
 const annotationVolumeSelectors = annotationVolumeAdapter.getSelectors(
-  (state: RootState) => state.dataV2.annotationVolumes,
+  (state: RootState) => state.data.annotationVolumes,
 );
 
 export const selectImageSeriesIds = imageSeriesSelectors.selectIds;
@@ -123,19 +123,15 @@ export const selectTotalAnnotationVolumes =
  * ───────────────────────────────────────────────────────────────────────
  */
 
-export const selectExperiment = ({
-  dataV2,
-}: {
-  dataV2: RootState["dataV2"];
-}) => {
-  return dataV2.experiment;
+export const selectExperiment = ({ data }: { data: RootState["data"] }) => {
+  return data.experiment;
 };
 export const selectExperimentChannels = ({
-  dataV2,
+  data,
 }: {
-  dataV2: RootState["dataV2"];
+  data: RootState["data"];
 }) => {
-  return dataV2.experiment.channels;
+  return data.experiment.channels;
 };
 
 /*

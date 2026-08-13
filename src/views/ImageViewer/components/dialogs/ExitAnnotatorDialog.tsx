@@ -6,7 +6,7 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { useSavedDataState } from "@ImageViewer/contexts/DataProvider";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
 type ExitAnnotatorDialogProps = {
@@ -24,7 +24,7 @@ export const ExitAnnotatorDialog = ({
 
   const handleSaveChanges = (save: boolean) => {
     if (!save) {
-      if (savedData) dispatch(dataSliceV2.actions.resetState(savedData));
+      if (savedData) dispatch(dataSlice.actions.resetState(savedData));
     }
     navigate("/project");
     batch(() => {

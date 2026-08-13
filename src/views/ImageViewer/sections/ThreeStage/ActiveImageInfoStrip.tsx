@@ -10,7 +10,7 @@ import { CategoryDialog } from "components/dialogs";
 import { IncrementalSlider, StyledSelect, WithLabel } from "components/inputs";
 
 import type { Category, ExtendedImageObject } from "store/data/types";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { generateCategory } from "store/data/utils";
 import { selectImageCategories } from "store/data/selectors";
 import { useActiveImage } from "@ImageViewer/contexts/ActiveImageProvider";
@@ -72,7 +72,7 @@ export const ActiveImageInfoStrip = ({
     }
 
     dispatch(
-      dataSliceV2.actions.updateImageCategory({
+      dataSlice.actions.updateImageCategory({
         id: image.id,
         categoryId: catId,
       }),
@@ -81,13 +81,13 @@ export const ActiveImageInfoStrip = ({
   const handleCreateCategory = (name: string, color: string) => {
     const newCategory = generateCategory(name, color, { type: "image" });
     batch(() => {
-      dispatch(dataSliceV2.actions.addCategory(newCategory));
+      dispatch(dataSlice.actions.addCategory(newCategory));
     });
   };
   const zStackCallback = async (newValue: number | number[]) => {
     if (typeof newValue === "number") {
       dispatch(
-        dataSliceV2.actions.updateImageActivePlaneByIdx({
+        dataSlice.actions.updateImageActivePlaneByIdx({
           imageId: image.id,
           planeIdx: newValue,
         }),

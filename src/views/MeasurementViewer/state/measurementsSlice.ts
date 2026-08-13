@@ -16,7 +16,7 @@ import type {
   BaseMeasurementGroup,
   PivotItem,
 } from "../types";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 
 const initialState: MeasurementsState = {
   activeGroup: undefined,
@@ -305,6 +305,6 @@ export const measurementsSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(dataSliceV2.actions.clearState, () => initialState);
+    builder.addCase(dataSlice.actions.clearState, () => initialState);
   },
 });

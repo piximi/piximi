@@ -9,7 +9,7 @@ import { useHistogram } from "hooks";
 
 import { StyledSelect } from "components/inputs";
 
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import type { ExtendedChannel } from "store/data/types";
 
 import { applyChannelPreset, RANGE_PRESETS } from "utils/channelUtils";
@@ -51,7 +51,7 @@ export const ChannelOptions = ({
       globalMax,
     ]);
     dispatch(
-      dataSliceV2.actions.updateChannelMeta({
+      dataSlice.actions.updateChannelMeta({
         id: channel.channelMetaId,
         changes: limits,
       }),

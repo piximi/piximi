@@ -12,7 +12,7 @@ import { CreateKindDialog } from "components/dialogs";
 import { projectSlice } from "@ProjectViewer/state";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { selectKindIds } from "store/data/selectors";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import type { AnnotationCategory, Kind } from "store/data/types";
 
 import { HotkeyContext } from "utils/enums";
@@ -68,7 +68,7 @@ export const AddKindMenu = ({
   };
   const addKind = (kind: Kind, newUnknownCategory: AnnotationCategory) => {
     dispatch(
-      dataSliceV2.actions.addKind({
+      dataSlice.actions.addKind({
         kind: kind,
         category: newUnknownCategory,
       }),

@@ -1,1 +1,1 @@
-export { dataSliceV2 } from "./dataSlice";
+export { dataSlice } from "./dataSlice";

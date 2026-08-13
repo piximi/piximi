@@ -8,7 +8,7 @@ import { TextFieldWithBlur } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { selectExperiment } from "store/data/selectors";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 
 export const ExperimentNameTextField = () => {
   const dispatch = useDispatch();
@@ -20,7 +20,7 @@ export const ExperimentNameTextField = () => {
 
   const handleTextFieldBlur = () => {
     if (newExperimentName === experiment.name) return;
-    dispatch(dataSliceV2.actions.updateExperimentName(newExperimentName));
+    dispatch(dataSlice.actions.updateExperimentName(newExperimentName));
   };
 
   const handleTextFieldChange = (

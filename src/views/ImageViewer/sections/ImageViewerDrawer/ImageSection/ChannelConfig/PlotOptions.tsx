@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { Box, Button, TextField, Typography } from "@mui/material";
 
 import type { BitDepth } from "store/data/types";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 
 export const PlotOptions = ({
   channelMetaId,
@@ -24,7 +24,7 @@ export const PlotOptions = ({
     if (!Number.isInteger(newMinLim) || newMinLim < 0) return;
 
     dispatch(
-      dataSliceV2.actions.updateChannelMeta({
+      dataSlice.actions.updateChannelMeta({
         id: channelMetaId,
         changes: { rampMinLimit: newMinLim },
       }),
@@ -35,7 +35,7 @@ export const PlotOptions = ({
     const newMaxLim = +event.currentTarget.value;
     if (!Number.isInteger(newMaxLim) || newMaxLim > 2 ** bitDepth - 1) return;
     dispatch(
-      dataSliceV2.actions.updateChannelMeta({
+      dataSlice.actions.updateChannelMeta({
         id: channelMetaId,
         changes: { rampMaxLimit: newMaxLim },
       }),
@@ -44,7 +44,7 @@ export const PlotOptions = ({
 
   const handleUseFullRange = () => {
     dispatch(
-      dataSliceV2.actions.updateChannelMeta({
+      dataSlice.actions.updateChannelMeta({
         id: channelMetaId,
         changes: {
           rampMinLimit: 0,

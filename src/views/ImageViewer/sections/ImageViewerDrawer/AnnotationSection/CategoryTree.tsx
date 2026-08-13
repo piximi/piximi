@@ -32,7 +32,7 @@ import { ConfirmationDialog } from "components/dialogs";
 
 import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
 import { generateCategory, generateKind } from "store/data/utils";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
 import { representsUnknown } from "utils/stringUtils";
@@ -176,7 +176,7 @@ export const CategoryTree = ({
       if (d.type === "kind") {
         const { kind, unknownCategory } = generateKind(name);
         dispatch(
-          dataSliceV2.actions.addKind({
+          dataSlice.actions.addKind({
             kind: kind,
             category: unknownCategory,
           }),
@@ -186,16 +186,14 @@ export const CategoryTree = ({
           type: "annotation",
           kindId: d.kindId!,
         });
-        dispatch(dataSliceV2.actions.addCategory(category));
+        dispatch(dataSlice.actions.addCategory(category));
       }
     } else {
       if (d.type === "kind") {
-        dispatch(
-          dataSliceV2.actions.updateKindName({ kindId: d.kindId!, name }),
-        );
+        dispatch(dataSlice.actions.updateKindName({ kindId: d.kindId!, name }));
       } else {
         dispatch(
-          dataSliceV2.actions.updateCategoryDisplayProps({
+          dataSlice.actions.updateCategoryDisplayProps({
             id: d.catId!,
             changes: { name, color },
           }),
@@ -224,7 +222,7 @@ export const CategoryTree = ({
       if (representsUnknown(k.id)) return;
       const unknownK = groups.find((k) => representsUnknown(k.id))!;
       batch(() => {
-        dispatch(dataSliceV2.actions.deleteKind(kindId));
+        dispatch(dataSlice.actions.deleteKind(kindId));
         dispatch(
           imageViewerDataSlice.actions.toggleCatSelection({
             ids: catIds,
@@ -242,7 +240,7 @@ export const CategoryTree = ({
       if (representsUnknown(catId!)) return;
       batch(() => {
         dispatch(
-          dataSliceV2.actions.deleteCategory({
+          dataSlice.actions.deleteCategory({
             id: catId!,
             details: { type: "annotation", kindId },
           }),

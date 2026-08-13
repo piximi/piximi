@@ -346,8 +346,8 @@ const initialState: DataStateV2 = {
   annotationVolumes: annotationVolumeAdapter.getInitialState(),
 };
 
-export const dataSliceV2 = createSlice({
-  name: "dataV2",
+export const dataSlice = createSlice({
+  name: "data",
   initialState,
   reducers: {
     clearState() {

@@ -12,7 +12,7 @@ import type {
   Kind,
   Shape,
 } from "store/data/types";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { generateKind, generateUUID } from "store/data/utils";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
@@ -241,7 +241,7 @@ export const usePredictSegmenter = () => {
         predictedKinds[existingKind.name] = existingKind;
       });
 
-      dispatch(dataSliceV2.actions.batchAddKind(addKindPayload));
+      dispatch(dataSlice.actions.batchAddKind(addKindPayload));
 
       const annVolumes: AnnotationVolume[] = [];
       const annotations: AnnotationObject[] = [];
@@ -289,8 +289,8 @@ export const usePredictSegmenter = () => {
         }
       }
       batch(() => {
-        dispatch(dataSliceV2.actions.batchAddAnnotationVolume(annVolumes));
-        dispatch(dataSliceV2.actions.batchAddAnnotation(annotations));
+        dispatch(dataSlice.actions.batchAddAnnotationVolume(annVolumes));
+        dispatch(dataSlice.actions.batchAddAnnotation(annotations));
       });
     } catch (error) {
       await handleError(

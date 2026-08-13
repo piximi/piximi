@@ -9,7 +9,7 @@ import { addListener, isAnyOf } from "@reduxjs/toolkit";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { productionStore } from "store";
 import type { RootState } from "store/rootReducer";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import type { DataStateV2 } from "store/data/types";
 
 import type { UnsubscribeListener } from "@reduxjs/toolkit";
@@ -29,7 +29,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     setSavedData(initialDataState);
     const unsubscribe = dispatch(
       addListener({
-        matcher: isAnyOf(...Object.values(dataSliceV2.actions)),
+        matcher: isAnyOf(...Object.values(dataSlice.actions)),
         effect: (action, listenerAPI) => {
           const hasUnsavedChanges = (listenerAPI.getState() as RootState)
             .imageViewerData.hasUnsavedChanges;

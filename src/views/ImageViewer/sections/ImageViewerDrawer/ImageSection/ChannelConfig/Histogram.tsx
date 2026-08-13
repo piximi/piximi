@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 
 import * as d3 from "d3";
 
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 
 import { DIMENSIONS } from "utils/constants";
 
@@ -248,14 +248,14 @@ export const Histogram = ({
   const dragSlider = (handle: RampHandle, x: number): void => {
     if (handle === RampHandle.Min) {
       dispatch(
-        dataSliceV2.actions.updateChannelMeta({
+        dataSlice.actions.updateChannelMeta({
           id,
           changes: { rampMin: Math.min(x, rampMax) },
         }),
       );
     } else {
       dispatch(
-        dataSliceV2.actions.updateChannelMeta({
+        dataSlice.actions.updateChannelMeta({
           id,
           changes: { rampMax: Math.max(x, rampMin) },
         }),

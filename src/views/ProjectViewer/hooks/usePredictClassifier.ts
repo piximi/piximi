@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { classifierSlice } from "store/classifier";
 import {
   selectActiveItems,
@@ -145,11 +145,9 @@ export const usePredictClassifier = () => {
       },
     }));
     if (modelTarget === IMAGE_CLASSIFIER_ID) {
-      dispatch(dataSliceV2.actions.batchUpdateImageCategory(updates));
+      dispatch(dataSlice.actions.batchUpdateImageCategory(updates));
     } else {
-      dispatch(
-        dataSliceV2.actions.batchBubbleUpdateAnnotationCategory(updates),
-      );
+      dispatch(dataSlice.actions.batchBubbleUpdateAnnotationCategory(updates));
     }
 
     // Stash full softmax map in context (volatile)

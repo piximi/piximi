@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { Partition } from "utils/dl/enums";
 
-import { dataSliceV2 } from "./dataSlice";
+import { dataSlice } from "./dataSlice";
 
 import type {
   Experiment,
@@ -59,7 +59,7 @@ const {
   batchUpdateAnnotationVolumeKind,
   updateChannelMeta,
   batchUpdateChannelMeta,
-} = dataSliceV2.actions;
+} = dataSlice.actions;
 
 // ── Fixture factories ────────────────────────────────────────────────────────
 
@@ -182,7 +182,7 @@ function makeChannel(
 
 describe("clearState", () => {
   it("empties all user-added entity collections", () => {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -192,7 +192,7 @@ describe("clearState", () => {
         channelMetas: [],
       }),
     );
-    s = dataSliceV2.reducer(s, clearState());
+    s = dataSlice.reducer(s, clearState());
 
     expect(s.imageSeries.ids).toHaveLength(0);
     expect(s.images.ids).toHaveLength(0);
@@ -202,12 +202,12 @@ describe("clearState", () => {
   });
 
   it("retains the unknown kind and both unknown categories after clear", () => {
-    let s = dataSliceV2.reducer(undefined, addKind(makeKind("k1", "kc1")));
-    s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(undefined, addKind(makeKind("k1", "kc1")));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory("kc1", "k1", true)),
     );
-    s = dataSliceV2.reducer(s, clearState());
+    s = dataSlice.reducer(s, clearState());
 
     expect(s.kinds.ids).toHaveLength(1);
     expect(s.kinds.entities[s.kinds.ids[0] as string]?.name).toBe("Unknown");
@@ -230,7 +230,7 @@ describe("setState", () => {
   };
 
   it("populates all entity slices from payload", () => {
-    const s = dataSliceV2.reducer(undefined, setState(basePayload));
+    const s = dataSlice.reducer(undefined, setState(basePayload));
 
     expect(s.experiment.id).toBe("exp-1");
     expect(s.imageSeries.ids).toContain("s1");
@@ -239,10 +239,10 @@ describe("setState", () => {
   });
 
   it("replaces existing entities rather than merging", () => {
-    const s0 = dataSliceV2.reducer(undefined, setState(basePayload));
+    const s0 = dataSlice.reducer(undefined, setState(basePayload));
     expect(s0.imageSeries.ids).toContain("s1");
 
-    const s1 = dataSliceV2.reducer(
+    const s1 = dataSlice.reducer(
       s0,
       setState({
         ...basePayload,
@@ -258,7 +258,7 @@ describe("setState", () => {
   });
 
   it("always preserves the unknown kind and categories regardless of payload", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       undefined,
       setState({ ...basePayload, kinds: [], categories: [] }),
     );
@@ -277,7 +277,7 @@ describe("setState", () => {
 describe("newExperiment", () => {
   it("retains unknown Kind and Categories after reset", () => {
     const exp: Experiment = { id: "exp-2", name: "New Exp" };
-    const state = dataSliceV2.reducer(undefined, newExperiment(exp));
+    const state = dataSlice.reducer(undefined, newExperiment(exp));
 
     expect(state.kinds.ids).toHaveLength(1);
     const unknownKind = Object.values(state.kinds.entities)[0];
@@ -296,7 +296,7 @@ describe("newExperiment", () => {
 
 describe("addImageSeries", () => {
   it("adds the series entity", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -310,7 +310,7 @@ describe("addImageSeries", () => {
   });
 
   it("adds child images", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -324,7 +324,7 @@ describe("addImageSeries", () => {
   });
 
   it("adds child planes", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -338,7 +338,7 @@ describe("addImageSeries", () => {
   });
 
   it("adds channel metas", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -354,7 +354,7 @@ describe("addImageSeries", () => {
 
 describe("updateImageSeriesName", () => {
   it("updates the series name", () => {
-    const s0 = dataSliceV2.reducer(
+    const s0 = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1", "Old Name")],
@@ -364,7 +364,7 @@ describe("updateImageSeriesName", () => {
         channelMetas: [],
       }),
     );
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       s0,
       updateImageSeriesName({ seriesId: "s1", name: "New Name" }),
     );
@@ -374,7 +374,7 @@ describe("updateImageSeriesName", () => {
 
 describe("updateImageSeriesActiveImage", () => {
   it("updates activeImageId on the series", () => {
-    const s0 = dataSliceV2.reducer(
+    const s0 = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -384,7 +384,7 @@ describe("updateImageSeriesActiveImage", () => {
         channelMetas: [],
       }),
     );
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       s0,
       updateImageSeriesActiveImage({ seriesId: "s1", imageId: "img-2" }),
     );
@@ -394,7 +394,7 @@ describe("updateImageSeriesActiveImage", () => {
 
 describe("deleteImageSeries", () => {
   function buildStateWithSeries() {
-    return dataSliceV2.reducer(
+    return dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("series-1")],
@@ -407,7 +407,7 @@ describe("deleteImageSeries", () => {
   }
 
   it("removes the series entity", () => {
-    const state = dataSliceV2.reducer(
+    const state = dataSlice.reducer(
       buildStateWithSeries(),
       deleteImageSeries("series-1"),
     );
@@ -415,7 +415,7 @@ describe("deleteImageSeries", () => {
   });
 
   it("removes all child images", () => {
-    const state = dataSliceV2.reducer(
+    const state = dataSlice.reducer(
       buildStateWithSeries(),
       deleteImageSeries("series-1"),
     );
@@ -423,7 +423,7 @@ describe("deleteImageSeries", () => {
   });
 
   it("removes child planes", () => {
-    const state = dataSliceV2.reducer(
+    const state = dataSlice.reducer(
       buildStateWithSeries(),
       deleteImageSeries("series-1"),
     );
@@ -431,7 +431,7 @@ describe("deleteImageSeries", () => {
   });
 
   it("removes child channels", () => {
-    const s0 = dataSliceV2.reducer(
+    const s0 = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("series-1")],
@@ -441,12 +441,12 @@ describe("deleteImageSeries", () => {
         channelMetas: [],
       }),
     );
-    const s = dataSliceV2.reducer(s0, deleteImageSeries("series-1"));
+    const s = dataSlice.reducer(s0, deleteImageSeries("series-1"));
     expect(s.channels.ids).not.toContain("ch-1");
   });
 
   it("removes channelMetas orphaned once the series' channels are gone", () => {
-    const s0 = dataSliceV2.reducer(
+    const s0 = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("series-1")],
@@ -456,12 +456,12 @@ describe("deleteImageSeries", () => {
         channelMetas: [makeChannelMeta("cm-1")],
       }),
     );
-    const s = dataSliceV2.reducer(s0, deleteImageSeries("series-1"));
+    const s = dataSlice.reducer(s0, deleteImageSeries("series-1"));
     expect(s.channelMetas.ids).not.toContain("cm-1");
   });
 
   it("keeps shared channelMetas still referenced by another series", () => {
-    const s0 = dataSliceV2.reducer(
+    const s0 = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("series-1"), makeSeries("series-2")],
@@ -477,7 +477,7 @@ describe("deleteImageSeries", () => {
         channelMetas: [makeChannelMeta("cm-1")],
       }),
     );
-    const s = dataSliceV2.reducer(s0, deleteImageSeries("series-1"));
+    const s = dataSlice.reducer(s0, deleteImageSeries("series-1"));
     expect(s.channelMetas.ids).toContain("cm-1");
     expect(s.channels.ids).not.toContain("ch-1");
     expect(s.channels.ids).toContain("ch-2");
@@ -485,7 +485,7 @@ describe("deleteImageSeries", () => {
 
   it("is a no-op for an unknown seriesId", () => {
     const before = buildStateWithSeries();
-    const after = dataSliceV2.reducer(before, deleteImageSeries("no-such-id"));
+    const after = dataSlice.reducer(before, deleteImageSeries("no-such-id"));
     expect(after.imageSeries.ids).toEqual(before.imageSeries.ids);
   });
 });
@@ -494,7 +494,7 @@ describe("deleteImageSeries", () => {
 
 describe("addImages", () => {
   it("does not mutate the original payload objects during name deduplication", () => {
-    let state = dataSliceV2.reducer(
+    let state = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [
@@ -517,7 +517,7 @@ describe("addImages", () => {
 
     const incoming = makeImage("img-2", "foo");
     const originalName = incoming.name;
-    state = dataSliceV2.reducer(
+    state = dataSlice.reducer(
       state,
       addImages({ seriesId: "series-1", images: [incoming] }),
     );
@@ -527,7 +527,7 @@ describe("addImages", () => {
   });
 
   it("is a no-op when seriesId does not exist", () => {
-    const before = dataSliceV2.reducer(
+    const before = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -537,7 +537,7 @@ describe("addImages", () => {
         channelMetas: [],
       }),
     );
-    const after = dataSliceV2.reducer(
+    const after = dataSlice.reducer(
       before,
       addImages({
         seriesId: "no-such-series",
@@ -548,7 +548,7 @@ describe("addImages", () => {
   });
 
   it("deduplicates three images with the same name into distinct names", () => {
-    const base = dataSliceV2.reducer(
+    const base = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -558,11 +558,11 @@ describe("addImages", () => {
         channelMetas: [],
       }),
     );
-    const withFirst = dataSliceV2.reducer(
+    const withFirst = dataSlice.reducer(
       base,
       addImages({ seriesId: "s1", images: [makeImage("img-a", "dup", "s1")] }),
     );
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       withFirst,
       addImages({
         seriesId: "s1",
@@ -581,7 +581,7 @@ describe("addImages", () => {
 
 describe("updateImageName", () => {
   it("updates the image name", () => {
-    const s0 = dataSliceV2.reducer(
+    const s0 = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -591,7 +591,7 @@ describe("updateImageName", () => {
         channelMetas: [],
       }),
     );
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       s0,
       updateImageName({ imageId: "img-1", name: "new" }),
     );
@@ -601,7 +601,7 @@ describe("updateImageName", () => {
 
 describe("updateImageActivePlane", () => {
   it("updates activePlaneId on the image", () => {
-    const s0 = dataSliceV2.reducer(
+    const s0 = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -611,7 +611,7 @@ describe("updateImageActivePlane", () => {
         channelMetas: [],
       }),
     );
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       s0,
       updateImageActivePlane({ imageId: "img-1", planeId: "p2" }),
     );
@@ -621,7 +621,7 @@ describe("updateImageActivePlane", () => {
 
 describe("updateImagePartition", () => {
   it("updates partition on the image", () => {
-    const s0 = dataSliceV2.reducer(
+    const s0 = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -631,7 +631,7 @@ describe("updateImagePartition", () => {
         channelMetas: [],
       }),
     );
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       s0,
       updateImagePartition({ id: "img-1", partition: Partition.Training }),
     );
@@ -644,7 +644,7 @@ describe("updateImageCategory", () => {
   const NEW_CAT = "img-cat-new";
 
   function buildState() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("series-1")],
@@ -654,13 +654,13 @@ describe("updateImageCategory", () => {
         channelMetas: [],
       }),
     );
-    s = dataSliceV2.reducer(s, addCategory(makeImageCategory(OLD_CAT)));
-    s = dataSliceV2.reducer(s, addCategory(makeImageCategory(NEW_CAT)));
+    s = dataSlice.reducer(s, addCategory(makeImageCategory(OLD_CAT)));
+    s = dataSlice.reducer(s, addCategory(makeImageCategory(NEW_CAT)));
     return s;
   }
 
   it("updates the image's categoryId", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       updateImageCategory({ id: "img-1", categoryId: NEW_CAT }),
     );
@@ -669,7 +669,7 @@ describe("updateImageCategory", () => {
 
   it("is a no-op when categoryId is already the target", () => {
     const before = buildState();
-    const after = dataSliceV2.reducer(
+    const after = dataSlice.reducer(
       before,
       updateImageCategory({ id: "img-1", categoryId: OLD_CAT }),
     );
@@ -678,7 +678,7 @@ describe("updateImageCategory", () => {
 
   it("is a no-op when target category does not exist", () => {
     const before = buildState();
-    const after = dataSliceV2.reducer(
+    const after = dataSlice.reducer(
       before,
       updateImageCategory({ id: "img-1", categoryId: "no-such-cat" }),
     );
@@ -691,7 +691,7 @@ describe("batchUpdateImageCategory", () => {
   const CAT_B = "img-cat-b";
 
   function buildState() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -704,13 +704,13 @@ describe("batchUpdateImageCategory", () => {
         channelMetas: [],
       }),
     );
-    s = dataSliceV2.reducer(s, addCategory(makeImageCategory(CAT_A)));
-    s = dataSliceV2.reducer(s, addCategory(makeImageCategory(CAT_B)));
+    s = dataSlice.reducer(s, addCategory(makeImageCategory(CAT_A)));
+    s = dataSlice.reducer(s, addCategory(makeImageCategory(CAT_B)));
     return s;
   }
 
   it("updates all images' categoryId", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       batchUpdateImageCategory([
         { id: "img-1", categoryId: CAT_B },
@@ -727,7 +727,7 @@ describe("deleteImageObject", () => {
   const KIND_CAT_ID = "kind-cat-1";
 
   function buildStateWithAnnotation() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("series-1")],
@@ -737,18 +737,18 @@ describe("deleteImageObject", () => {
         channelMetas: [],
       }),
     );
-    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotationVolume(
         makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID),
       ),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotation(makeAnnotation("ann-1", "plane-1", "img-1", "vol-1")),
     );
@@ -756,7 +756,7 @@ describe("deleteImageObject", () => {
   }
 
   it("removes the image entity", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildStateWithAnnotation(),
       deleteImageObject("img-1"),
     );
@@ -764,7 +764,7 @@ describe("deleteImageObject", () => {
   });
 
   it("cascade-removes child planes", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildStateWithAnnotation(),
       deleteImageObject("img-1"),
     );
@@ -772,7 +772,7 @@ describe("deleteImageObject", () => {
   });
 
   it("cascade-removes child channels", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildStateWithAnnotation(),
       deleteImageObject("img-1"),
     );
@@ -780,7 +780,7 @@ describe("deleteImageObject", () => {
   });
 
   it("cascade-removes child annotation volumes", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildStateWithAnnotation(),
       deleteImageObject("img-1"),
     );
@@ -788,7 +788,7 @@ describe("deleteImageObject", () => {
   });
 
   it("cascade-removes child annotations", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildStateWithAnnotation(),
       deleteImageObject("img-1"),
     );
@@ -797,14 +797,14 @@ describe("deleteImageObject", () => {
 
   it("is a no-op for an unknown imageId", () => {
     const before = buildStateWithAnnotation();
-    const after = dataSliceV2.reducer(before, deleteImageObject("no-such-id"));
+    const after = dataSlice.reducer(before, deleteImageObject("no-such-id"));
     expect(after.images.ids).toEqual(before.images.ids);
   });
 });
 
 describe("batchDeleteImageObject", () => {
   function buildState() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -816,18 +816,18 @@ describe("batchDeleteImageObject", () => {
     );
     const KIND_ID = "kind-b";
     const KIND_CAT_ID = "kind-cat-b";
-    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotationVolume(
         makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID),
       ),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotation(makeAnnotation("ann-1", "p1", "img-1", "vol-1")),
     );
@@ -835,7 +835,7 @@ describe("batchDeleteImageObject", () => {
   }
 
   it("removes all specified image entities", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       batchDeleteImageObject(["img-1", "img-2"]),
     );
@@ -844,7 +844,7 @@ describe("batchDeleteImageObject", () => {
   });
 
   it("cascade-removes child planes and channels", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       batchDeleteImageObject(["img-1"]),
     );
@@ -853,7 +853,7 @@ describe("batchDeleteImageObject", () => {
   });
 
   it("cascade-removes annotation volumes and annotations", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       batchDeleteImageObject(["img-1"]),
     );
@@ -862,7 +862,7 @@ describe("batchDeleteImageObject", () => {
   });
 
   it("skips unknown ids without affecting valid ones", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       batchDeleteImageObject(["img-1", "no-such-id"]),
     );
@@ -875,7 +875,7 @@ describe("batchDeleteImageObject", () => {
 
 describe("batchAddKind", () => {
   it("adds multiple kinds in one dispatch", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       undefined,
       batchAddKind([makeKind("k1", "kc1"), makeKind("k2", "kc2")]),
     );
@@ -886,8 +886,8 @@ describe("batchAddKind", () => {
 
 describe("updateKindName", () => {
   it("updates the kind name", () => {
-    const s0 = dataSliceV2.reducer(undefined, addKind(makeKind("k1", "kc1")));
-    const s = dataSliceV2.reducer(
+    const s0 = dataSlice.reducer(undefined, addKind(makeKind("k1", "kc1")));
+    const s = dataSlice.reducer(
       s0,
       updateKindName({ kindId: "k1", name: "Renamed" }),
     );
@@ -900,7 +900,7 @@ describe("deleteKind", () => {
   const KIND_CAT_ID = "kind-cat-del";
 
   function buildStateWithKind() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("series-1")],
@@ -910,12 +910,12 @@ describe("deleteKind", () => {
         channelMetas: [],
       }),
     );
-    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotationVolume(
         makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID),
@@ -925,27 +925,27 @@ describe("deleteKind", () => {
   }
 
   it("removes the kind entity", () => {
-    const s = dataSliceV2.reducer(buildStateWithKind(), deleteKind(KIND_ID));
+    const s = dataSlice.reducer(buildStateWithKind(), deleteKind(KIND_ID));
     expect(s.kinds.ids).not.toContain(KIND_ID);
   });
 
   it("reassigns annotation volumes to unknown kind", () => {
-    const s = dataSliceV2.reducer(buildStateWithKind(), deleteKind(KIND_ID));
+    const s = dataSlice.reducer(buildStateWithKind(), deleteKind(KIND_ID));
     expect(s.annotationVolumes.entities["vol-1"]?.kindId).not.toBe(KIND_ID);
   });
 
   it("removes the kind's categories", () => {
-    const s = dataSliceV2.reducer(buildStateWithKind(), deleteKind(KIND_ID));
+    const s = dataSlice.reducer(buildStateWithKind(), deleteKind(KIND_ID));
     expect(s.categories.ids).not.toContain(KIND_CAT_ID);
   });
 
   it("cannot delete the unknown kind (no-op)", () => {
-    const initial = dataSliceV2.reducer(undefined, { type: "@@INIT" } as any);
+    const initial = dataSlice.reducer(undefined, { type: "@@INIT" } as any);
     const unknownKindId = Object.values(initial.kinds.entities).find(
       (k) => k?.name === "Unknown",
     )!.id;
 
-    const after = dataSliceV2.reducer(initial, deleteKind(unknownKindId));
+    const after = dataSlice.reducer(initial, deleteKind(unknownKindId));
     expect(after.kinds.ids).toContain(unknownKindId);
   });
 });
@@ -954,7 +954,7 @@ describe("deleteKind", () => {
 
 describe("batchAddCategory", () => {
   it("adds multiple categories in one dispatch", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       undefined,
       batchAddCategory([makeImageCategory("ic1"), makeImageCategory("ic2")]),
     );
@@ -965,11 +965,11 @@ describe("batchAddCategory", () => {
 
 describe("updateCategoryName", () => {
   it("updates the category name", () => {
-    const s0 = dataSliceV2.reducer(
+    const s0 = dataSlice.reducer(
       undefined,
       addCategory(makeImageCategory("ic1")),
     );
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       s0,
       updateCategoryName({ id: "ic1", name: "Renamed" }),
     );
@@ -981,7 +981,7 @@ describe("deleteImageCategory", () => {
   const IMG_CAT_ID = "img-cat-custom";
 
   function buildStateWithImageCategory() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("series-1")],
@@ -996,12 +996,12 @@ describe("deleteImageCategory", () => {
         channelMetas: [],
       }),
     );
-    s = dataSliceV2.reducer(s, addCategory(makeImageCategory(IMG_CAT_ID)));
+    s = dataSlice.reducer(s, addCategory(makeImageCategory(IMG_CAT_ID)));
     return s;
   }
 
   it("removes the category entity", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildStateWithImageCategory(),
       deleteImageCategory(IMG_CAT_ID),
     );
@@ -1014,19 +1014,16 @@ describe("deleteImageCategory", () => {
       (c) => c?.type === "image" && c.isUnknown,
     )!.id;
 
-    const s = dataSliceV2.reducer(before, deleteImageCategory(IMG_CAT_ID));
+    const s = dataSlice.reducer(before, deleteImageCategory(IMG_CAT_ID));
     expect(s.images.entities["img-1"]?.categoryId).toBe(unknownCatId);
   });
 
   it("cannot delete the unknown image category (no-op)", () => {
-    const initial = dataSliceV2.reducer(undefined, { type: "@@INIT" } as any);
+    const initial = dataSlice.reducer(undefined, { type: "@@INIT" } as any);
     const unknownCatId = Object.values(initial.categories.entities).find(
       (c) => c?.type === "image" && c.isUnknown,
     )!.id;
-    const after = dataSliceV2.reducer(
-      initial,
-      deleteImageCategory(unknownCatId),
-    );
+    const after = dataSlice.reducer(initial, deleteImageCategory(unknownCatId));
     expect(after.categories.ids).toContain(unknownCatId);
   });
 });
@@ -1037,7 +1034,7 @@ describe("deleteAnnotationCategory", () => {
   const CUSTOM_CAT_ID = "custom-ann-cat";
 
   function buildStateWithAnnotationCategory() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("series-1")],
@@ -1047,16 +1044,16 @@ describe("deleteAnnotationCategory", () => {
         channelMetas: [],
       }),
     );
-    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, UNKNOWN_KIND_CAT_ID)));
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, UNKNOWN_KIND_CAT_ID)));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(UNKNOWN_KIND_CAT_ID, KIND_ID, true)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(CUSTOM_CAT_ID, KIND_ID)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotationVolume(
         makeAnnotationVolume("vol-1", "img-1", KIND_ID, CUSTOM_CAT_ID),
@@ -1066,7 +1063,7 @@ describe("deleteAnnotationCategory", () => {
   }
 
   it("removes the annotation category", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildStateWithAnnotationCategory(),
       deleteAnnotationCategory(CUSTOM_CAT_ID),
     );
@@ -1074,7 +1071,7 @@ describe("deleteAnnotationCategory", () => {
   });
 
   it("reassigns annotation volumes to kind's unknown category", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildStateWithAnnotationCategory(),
       deleteAnnotationCategory(CUSTOM_CAT_ID),
     );
@@ -1085,7 +1082,7 @@ describe("deleteAnnotationCategory", () => {
 
   it("cannot delete a kind's unknown annotation category (no-op)", () => {
     const before = buildStateWithAnnotationCategory();
-    const after = dataSliceV2.reducer(
+    const after = dataSlice.reducer(
       before,
       deleteAnnotationCategory(UNKNOWN_KIND_CAT_ID),
     );
@@ -1101,7 +1098,7 @@ describe("updateAnnotationVolumeCategory", () => {
   const NEW_CAT = "kind-uavc-custom";
 
   function buildState() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -1111,16 +1108,16 @@ describe("updateAnnotationVolumeCategory", () => {
         channelMetas: [],
       }),
     );
-    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, OLD_CAT)));
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, OLD_CAT)));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(OLD_CAT, KIND_ID, true)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(NEW_CAT, KIND_ID)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotationVolume(
         makeAnnotationVolume("vol-1", "img-1", KIND_ID, OLD_CAT),
@@ -1130,7 +1127,7 @@ describe("updateAnnotationVolumeCategory", () => {
   }
 
   it("updates the volume's categoryId", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       updateAnnotationVolumeCategory({
         volumeId: "vol-1",
@@ -1142,7 +1139,7 @@ describe("updateAnnotationVolumeCategory", () => {
 
   it("is a no-op when categoryId is already the target", () => {
     const before = buildState();
-    const after = dataSliceV2.reducer(
+    const after = dataSlice.reducer(
       before,
       updateAnnotationVolumeCategory({
         volumeId: "vol-1",
@@ -1154,7 +1151,7 @@ describe("updateAnnotationVolumeCategory", () => {
 
   it("is a no-op when target category does not exist", () => {
     const before = buildState();
-    const after = dataSliceV2.reducer(
+    const after = dataSlice.reducer(
       before,
       updateAnnotationVolumeCategory({
         volumeId: "vol-1",
@@ -1171,7 +1168,7 @@ describe("batchUpdateAnnotationVolumeCategory", () => {
   const CAT_B = "cat-b-buavc";
 
   function buildState() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -1181,16 +1178,16 @@ describe("batchUpdateAnnotationVolumeCategory", () => {
         channelMetas: [],
       }),
     );
-    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, CAT_A)));
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, CAT_A)));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(CAT_A, KIND_ID, true)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(CAT_B, KIND_ID)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       batchAddAnnotationVolume([
         makeAnnotationVolume("vol-1", "img-1", KIND_ID, CAT_A),
@@ -1201,7 +1198,7 @@ describe("batchUpdateAnnotationVolumeCategory", () => {
   }
 
   it("updates all volumes' categoryId", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       batchUpdateAnnotationVolumeCategory([
         { volumeId: "vol-1", categoryId: CAT_B },
@@ -1214,7 +1211,7 @@ describe("batchUpdateAnnotationVolumeCategory", () => {
 
   it("skips entry when volume does not exist", () => {
     const before = buildState();
-    const after = dataSliceV2.reducer(
+    const after = dataSlice.reducer(
       before,
       batchUpdateAnnotationVolumeCategory([
         { volumeId: "no-such-vol", categoryId: CAT_B },
@@ -1225,7 +1222,7 @@ describe("batchUpdateAnnotationVolumeCategory", () => {
 
   it("skips entry when categoryId is already the target", () => {
     const before = buildState();
-    const after = dataSliceV2.reducer(
+    const after = dataSlice.reducer(
       before,
       batchUpdateAnnotationVolumeCategory([
         { volumeId: "vol-1", categoryId: CAT_A },
@@ -1236,7 +1233,7 @@ describe("batchUpdateAnnotationVolumeCategory", () => {
 
   it("skips entry when target category does not exist", () => {
     const before = buildState();
-    const after = dataSliceV2.reducer(
+    const after = dataSlice.reducer(
       before,
       batchUpdateAnnotationVolumeCategory([
         { volumeId: "vol-1", categoryId: "no-such-cat" },
@@ -1253,7 +1250,7 @@ describe("updateAnnotationVolumeKind", () => {
   const KIND_B_UNKNOWN_CAT = "kind-b-unknown";
 
   function buildState() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("series-1")],
@@ -1263,17 +1260,17 @@ describe("updateAnnotationVolumeKind", () => {
         channelMetas: [],
       }),
     );
-    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_A, KIND_A_UNKNOWN_CAT)));
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(s, addKind(makeKind(KIND_A, KIND_A_UNKNOWN_CAT)));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(KIND_A_UNKNOWN_CAT, KIND_A, true)),
     );
-    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_B, KIND_B_UNKNOWN_CAT)));
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(s, addKind(makeKind(KIND_B, KIND_B_UNKNOWN_CAT)));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(KIND_B_UNKNOWN_CAT, KIND_B, true)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotationVolume(
         makeAnnotationVolume("vol-1", "img-1", KIND_A, KIND_A_UNKNOWN_CAT),
@@ -1283,7 +1280,7 @@ describe("updateAnnotationVolumeKind", () => {
   }
 
   it("updates the volume's kindId", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       updateAnnotationVolumeKind({ volumeId: "vol-1", kindId: KIND_B }),
     );
@@ -1291,7 +1288,7 @@ describe("updateAnnotationVolumeKind", () => {
   });
 
   it("resets categoryId to the new kind's unknown category", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       updateAnnotationVolumeKind({ volumeId: "vol-1", kindId: KIND_B }),
     );
@@ -1308,7 +1305,7 @@ describe("batchUpdateAnnotationVolumeKind", () => {
   const KIND_B_CAT = "kind-b-cat-buavk";
 
   function buildState() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -1318,17 +1315,17 @@ describe("batchUpdateAnnotationVolumeKind", () => {
         channelMetas: [],
       }),
     );
-    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_A, KIND_A_CAT)));
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(s, addKind(makeKind(KIND_A, KIND_A_CAT)));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(KIND_A_CAT, KIND_A, true)),
     );
-    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_B, KIND_B_CAT)));
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(s, addKind(makeKind(KIND_B, KIND_B_CAT)));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(KIND_B_CAT, KIND_B, true)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       batchAddAnnotationVolume([
         makeAnnotationVolume("vol-1", "img-1", KIND_A, KIND_A_CAT),
@@ -1339,7 +1336,7 @@ describe("batchUpdateAnnotationVolumeKind", () => {
   }
 
   it("updates all volumes' kindId", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       batchUpdateAnnotationVolumeKind([
         { volumeId: "vol-1", kindId: KIND_B },
@@ -1351,7 +1348,7 @@ describe("batchUpdateAnnotationVolumeKind", () => {
   });
 
   it("resets categoryId to the new kind's unknown category", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       batchUpdateAnnotationVolumeKind([{ volumeId: "vol-1", kindId: KIND_B }]),
     );
@@ -1360,7 +1357,7 @@ describe("batchUpdateAnnotationVolumeKind", () => {
 
   it("skips entry when volume does not exist", () => {
     const before = buildState();
-    const after = dataSliceV2.reducer(
+    const after = dataSlice.reducer(
       before,
       batchUpdateAnnotationVolumeKind([
         { volumeId: "no-such-vol", kindId: KIND_B },
@@ -1371,7 +1368,7 @@ describe("batchUpdateAnnotationVolumeKind", () => {
 
   it("skips entry when kindId is already the target", () => {
     const before = buildState();
-    const after = dataSliceV2.reducer(
+    const after = dataSlice.reducer(
       before,
       batchUpdateAnnotationVolumeKind([{ volumeId: "vol-1", kindId: KIND_A }]),
     );
@@ -1384,7 +1381,7 @@ describe("deleteAnnotationVolume", () => {
   const KIND_CAT_ID = "kind-cat-dav";
 
   function buildState() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -1394,18 +1391,18 @@ describe("deleteAnnotationVolume", () => {
         channelMetas: [],
       }),
     );
-    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotationVolume(
         makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID),
       ),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotation(makeAnnotation("ann-1", "p1", "img-1", "vol-1")),
     );
@@ -1413,18 +1410,12 @@ describe("deleteAnnotationVolume", () => {
   }
 
   it("removes the annotation volume entity", () => {
-    const s = dataSliceV2.reducer(
-      buildState(),
-      deleteAnnotationVolume("vol-1"),
-    );
+    const s = dataSlice.reducer(buildState(), deleteAnnotationVolume("vol-1"));
     expect(s.annotationVolumes.ids).not.toContain("vol-1");
   });
 
   it("cascade-removes child annotations", () => {
-    const s = dataSliceV2.reducer(
-      buildState(),
-      deleteAnnotationVolume("vol-1"),
-    );
+    const s = dataSlice.reducer(buildState(), deleteAnnotationVolume("vol-1"));
     expect(s.annotations.ids).not.toContain("ann-1");
   });
 });
@@ -1434,7 +1425,7 @@ describe("batchDeleteAnnotationVolume", () => {
   const KIND_CAT_ID = "kind-cat-bdav";
 
   function buildState() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -1444,24 +1435,24 @@ describe("batchDeleteAnnotationVolume", () => {
         channelMetas: [],
       }),
     );
-    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotationVolume(
         makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID),
       ),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotationVolume(
         makeAnnotationVolume("vol-2", "img-1", KIND_ID, KIND_CAT_ID),
       ),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotation(makeAnnotation("ann-1", "p1", "img-1", "vol-1")),
     );
@@ -1469,7 +1460,7 @@ describe("batchDeleteAnnotationVolume", () => {
   }
 
   it("removes all specified volumes", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       batchDeleteAnnotationVolume(["vol-1", "vol-2"]),
     );
@@ -1478,7 +1469,7 @@ describe("batchDeleteAnnotationVolume", () => {
   });
 
   it("cascade-removes child annotations", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       batchDeleteAnnotationVolume(["vol-1"]),
     );
@@ -1490,7 +1481,7 @@ describe("batchDeleteAnnotationVolume", () => {
 
 describe("batchAddAnnotation", () => {
   it("adds multiple annotations in one dispatch", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       undefined,
       batchAddAnnotation([
         makeAnnotation("ann-1", "p1", "img-1", "vol-1"),
@@ -1504,11 +1495,11 @@ describe("batchAddAnnotation", () => {
 
 describe("updateAnnotationPartition", () => {
   it("updates partition on the annotation", () => {
-    const s0 = dataSliceV2.reducer(
+    const s0 = dataSlice.reducer(
       undefined,
       addAnnotation(makeAnnotation("ann-1", "p1", "img-1", "vol-1")),
     );
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       s0,
       updateAnnotationPartition({
         id: "ann-1",
@@ -1523,7 +1514,7 @@ describe("updateAnnotationPartition", () => {
 
 describe("deleteAnnotation", () => {
   function buildState() {
-    let s = dataSliceV2.reducer(
+    let s = dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -1535,18 +1526,18 @@ describe("deleteAnnotation", () => {
     );
     const KIND_ID = "kind-da";
     const KIND_CAT_ID = "kind-cat-da";
-    s = dataSliceV2.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
+    s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotationVolume(
         makeAnnotationVolume("vol-1", "img-1", KIND_ID, KIND_CAT_ID),
       ),
     );
-    s = dataSliceV2.reducer(
+    s = dataSlice.reducer(
       s,
       addAnnotation(makeAnnotation("ann-1", "p1", "img-1", "vol-1")),
     );
@@ -1554,20 +1545,20 @@ describe("deleteAnnotation", () => {
   }
 
   it("removes the annotation entity", () => {
-    const s = dataSliceV2.reducer(buildState(), deleteAnnotation("ann-1"));
+    const s = dataSlice.reducer(buildState(), deleteAnnotation("ann-1"));
     expect(s.annotations.ids).not.toContain("ann-1");
   });
 
   it("is a no-op for an unknown annotationId", () => {
     const before = buildState();
-    const after = dataSliceV2.reducer(before, deleteAnnotation("no-such-id"));
+    const after = dataSlice.reducer(before, deleteAnnotation("no-such-id"));
     expect(after.annotations.ids).toEqual(before.annotations.ids);
   });
 });
 
 describe("batchDeleteAnnotation", () => {
   function buildState() {
-    return dataSliceV2.reducer(
+    return dataSlice.reducer(
       undefined,
       batchAddAnnotation([
         makeAnnotation("ann-1", "p1", "img-1", "vol-1"),
@@ -1577,7 +1568,7 @@ describe("batchDeleteAnnotation", () => {
   }
 
   it("removes all specified annotation entities", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       batchDeleteAnnotation(["ann-1", "ann-2"]),
     );
@@ -1586,7 +1577,7 @@ describe("batchDeleteAnnotation", () => {
   });
 
   it("skips unknown ids without affecting valid ones", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       batchDeleteAnnotation(["ann-1", "no-such-id"]),
     );
@@ -1599,7 +1590,7 @@ describe("batchDeleteAnnotation", () => {
 
 describe("updateChannelMeta", () => {
   function buildState() {
-    return dataSliceV2.reducer(
+    return dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -1612,7 +1603,7 @@ describe("updateChannelMeta", () => {
   }
 
   it("updates a single field on the channel meta", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       updateChannelMeta({ id: "cm-1", changes: { visible: false } }),
     );
@@ -1620,7 +1611,7 @@ describe("updateChannelMeta", () => {
   });
 
   it("updates multiple fields at once", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       updateChannelMeta({ id: "cm-1", changes: { rampMin: 50, rampMax: 150 } }),
     );
@@ -1631,7 +1622,7 @@ describe("updateChannelMeta", () => {
 
 describe("batchUpdateChannelMeta", () => {
   function buildState() {
-    return dataSliceV2.reducer(
+    return dataSlice.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("s1")],
@@ -1644,7 +1635,7 @@ describe("batchUpdateChannelMeta", () => {
   }
 
   it("updates multiple channel metas in one dispatch", () => {
-    const s = dataSliceV2.reducer(
+    const s = dataSlice.reducer(
       buildState(),
       batchUpdateChannelMeta([
         { id: "cm-1", changes: { visible: false } },

@@ -3,7 +3,7 @@ import { useDispatch, useSelector, useStore } from "react-redux";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { AppTask } from "store/appTasks/types";
 import { generateUUID, reconcileChannelMetas } from "store/data/utils";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { selectAllChannelMetas, selectExperiment } from "store/data/selectors";
 import { ImageSeries } from "store/data/types";
 import { RootState } from "store/rootReducer";
@@ -152,7 +152,7 @@ export function useFileLoader(): UseFileLoaderReturn {
 
         if (!experiment.channels)
           dispatch(
-            dataSliceV2.actions.setExperimentChannels(images[0].shape.channels),
+            dataSlice.actions.setExperimentChannels(images[0].shape.channels),
           );
 
         // ChannelMetas are shared project-wide (one per channel index). Reconcile
@@ -172,7 +172,7 @@ export function useFileLoader(): UseFileLoaderReturn {
         );
 
         dispatch(
-          dataSliceV2.actions.addImageSeries({
+          dataSlice.actions.addImageSeries({
             imageSeries: reduxImageSeries,
             images,
             planes,
@@ -181,7 +181,7 @@ export function useFileLoader(): UseFileLoaderReturn {
           }),
         );
         if (metaUpdates.length > 0)
-          dispatch(dataSliceV2.actions.batchUpdateChannelMeta(metaUpdates));
+          dispatch(dataSlice.actions.batchUpdateChannelMeta(metaUpdates));
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
 
         return;

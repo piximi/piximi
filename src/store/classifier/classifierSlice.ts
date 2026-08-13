@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import type { Shape } from "store/data/types";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { UNKNOWN_KIND, UNKNOWN_KIND_ID } from "store/data/constants";
 
 import type { RecursivePartial } from "utils/types";
@@ -316,14 +316,14 @@ export const classifierSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(dataSliceV2.actions.addKind, (state, action) => {
+      .addCase(dataSlice.actions.addKind, (state, action) => {
         state.kindClassifiers[action.payload.kind.id] = {
           modelTargetId: action.payload.kind.id,
           modelTargetName: action.payload.kind.name,
           ...getDefaultKindClassifier(),
         };
       })
-      .addCase(dataSliceV2.actions.batchAddKind, (state, action) => {
+      .addCase(dataSlice.actions.batchAddKind, (state, action) => {
         action.payload.forEach(({ kind }) => {
           state.kindClassifiers[kind.id] = {
             modelTargetId: kind.id,
@@ -332,10 +332,10 @@ export const classifierSlice = createSlice({
           };
         });
       })
-      .addCase(dataSliceV2.actions.deleteKind, (state, action) => {
+      .addCase(dataSlice.actions.deleteKind, (state, action) => {
         delete state.kindClassifiers[action.payload];
       })
-      .addCase(dataSliceV2.actions.addCategory, (state, action) => {
+      .addCase(dataSlice.actions.addCategory, (state, action) => {
         const category = action.payload;
         // For every model whose latest run's categorySetHash != current Kind's hash, set status = "stale".
         // Hash is async — but we only have access to the *categoryId* delta here, not the new full set.
@@ -349,7 +349,7 @@ export const classifierSlice = createSlice({
           if (info.runs.length > 0) info.valid = false;
         });
       })
-      .addCase(dataSliceV2.actions.batchAddCategory, (state, action) => {
+      .addCase(dataSlice.actions.batchAddCategory, (state, action) => {
         action.payload.forEach((category) => {
           const kindId =
             category.type === "image" ? IMAGE_CLASSIFIER_ID : category.kindId;
@@ -360,7 +360,7 @@ export const classifierSlice = createSlice({
           });
         });
       })
-      .addCase(dataSliceV2.actions.deleteCategory, (state, action) => {
+      .addCase(dataSlice.actions.deleteCategory, (state, action) => {
         const category = action.payload;
         // For every model whose latest run's categorySetHash != current Kind's hash, set status = "stale".
         // Hash is async — but we only have access to the *categoryId* delta here, not the new full set.
@@ -376,7 +376,7 @@ export const classifierSlice = createSlice({
           if (info.runs.length > 0) info.valid = false;
         });
       })
-      .addCase(dataSliceV2.actions.batchDeleteCategory, (state, action) => {
+      .addCase(dataSlice.actions.batchDeleteCategory, (state, action) => {
         action.payload.forEach((category) => {
           const kindId =
             category.details.type === "image"
@@ -389,7 +389,7 @@ export const classifierSlice = createSlice({
           });
         });
       })
-      .addCase(dataSliceV2.actions.updateKindName, (state, action) => {
+      .addCase(dataSlice.actions.updateKindName, (state, action) => {
         const { kindId, name } = action.payload;
         const kc = state.kindClassifiers[kindId];
         if (!kc) return;

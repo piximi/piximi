@@ -14,7 +14,7 @@ import {
 import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import type { KindClassifier } from "store/classifier/types";
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
@@ -101,8 +101,8 @@ export const useFitClassifier = () => {
   const dispatchPartition = useMemo(
     () =>
       kindClassifier.modelTargetId === IMAGE_CLASSIFIER_ID
-        ? dataSliceV2.actions.batchUpdateImagePartition
-        : dataSliceV2.actions.batchUpdateAnnotationPartition,
+        ? dataSlice.actions.batchUpdateImagePartition
+        : dataSlice.actions.batchUpdateAnnotationPartition,
     [kindClassifier.modelTargetId],
   );
   const prepareInitialRun = async (

@@ -13,7 +13,7 @@ import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { rootReducer, RootState } from "./rootReducer";
 import { classifierSlice } from "store/classifier";
 import { applicationSettingsSlice } from "./applicationSettings";
-import { dataSliceV2 } from "./data";
+import { dataSlice } from "./data";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 import { appTasksSlice } from "./appTasks/appTasksSlice";
 import { projectSlice } from "views/ProjectViewer/state/projectSlice";
@@ -39,7 +39,7 @@ const preloadedState: RootState = {
   imageViewer: imageViewerSlice.getInitialState(),
   imageViewerData: imageViewerDataSlice.getInitialState(),
   measurements: measurementsSlice.getInitialState(),
-  dataV2: dataSliceV2.getInitialState(),
+  data: dataSlice.getInitialState(),
   appTasks: appTasksSlice.getInitialState(),
   project: projectSlice.getInitialState(),
 };

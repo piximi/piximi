@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { difference } from "lodash";
 
-import { dataSliceV2 } from "store/data";
+import { dataSlice } from "store/data";
 import { UNKNOWN_KIND } from "store/data/constants";
 
 import { findAdjacentItem, mutatingFilter } from "utils/arrayUtils";
@@ -253,7 +253,7 @@ export const projectSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(dataSliceV2.actions.setState, (state, action) => {
+      .addCase(dataSlice.actions.setState, (state, action) => {
         const { kinds } = action.payload;
         state.imageGridState = { ...initialState.imageGridState };
 
@@ -269,17 +269,17 @@ export const projectSlice = createSlice({
         state.annotationGridState.activeKindId = unknownKindId;
         state.activeView = "images";
       })
-      .addCase(dataSliceV2.actions.newExperiment, (state) => {
+      .addCase(dataSlice.actions.newExperiment, (state) => {
         state.annotationGridState = { ...initialState.annotationGridState };
         state.imageGridState.filters.categoryId = [];
         state.imageGridState.filters.categoryId = [];
         state.imageGridState.selectedIds = [];
       })
-      .addCase(dataSliceV2.actions.addKind, (state, action) => {
+      .addCase(dataSlice.actions.addKind, (state, action) => {
         state.annotationGridState.kindStates[action.payload.kind.id] =
           emptyKindState(action.payload.kind.id, action.payload.kind.name);
       })
-      .addCase(dataSliceV2.actions.batchAddKind, (state, action) => {
+      .addCase(dataSlice.actions.batchAddKind, (state, action) => {
         for (const { kind } of action.payload) {
           state.annotationGridState.kindStates[kind.id] = emptyKindState(
             kind.id,
@@ -287,11 +287,11 @@ export const projectSlice = createSlice({
           );
         }
       })
-      .addCase(dataSliceV2.actions.updateKindName, (state, action) => {
+      .addCase(dataSlice.actions.updateKindName, (state, action) => {
         state.annotationGridState.kindStates[action.payload.kindId].name =
           action.payload.name;
       })
-      .addCase(dataSliceV2.actions.deleteKind, (state, action) => {
+      .addCase(dataSlice.actions.deleteKind, (state, action) => {
         if (state.annotationGridState.activeKindId === action.payload)
           state.annotationGridState.activeKindId = findAdjacentItem(
             Object.keys(state.annotationGridState.kindStates),
@@ -299,16 +299,13 @@ export const projectSlice = createSlice({
           );
         delete state.annotationGridState.kindStates[action.payload];
       })
-      .addCase(dataSliceV2.actions.deleteImageCategory, (state, action) => {
+      .addCase(dataSlice.actions.deleteImageCategory, (state, action) => {
         handleImageCategoryDelete(state, action.payload);
       })
-      .addCase(
-        dataSliceV2.actions.deleteAnnotationCategory,
-        (state, action) => {
-          handleAnnCategoryDelete(state, action.payload);
-        },
-      )
-      .addCase(dataSliceV2.actions.deleteCategory, (state, action) => {
+      .addCase(dataSlice.actions.deleteAnnotationCategory, (state, action) => {
+        handleAnnCategoryDelete(state, action.payload);
+      })
+      .addCase(dataSlice.actions.deleteCategory, (state, action) => {
         const { id, details } = action.payload;
         let filters: string[];
         if (details.type === "image") {
