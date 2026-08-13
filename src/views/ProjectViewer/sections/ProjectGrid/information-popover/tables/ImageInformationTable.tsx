@@ -7,7 +7,6 @@ import { useTheme } from "@mui/material";
 
 import { TextFieldWithBlur } from "components/inputs";
 
-import { dataSlice } from "store/data/dataSlice";
 import type { ExtendedImageObject } from "store/dataV2/types";
 import { useParameterizedSelector } from "store/hooks";
 import {
@@ -42,7 +41,7 @@ export const ImagePopoverContent = ({
   return <ImageInfoTable image={image} />;
 };
 
-export const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
+const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const volumes = useParameterizedSelector(
@@ -62,8 +61,8 @@ export const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
 
   const handleDispatchNameChange = useCallback(() => {
     dispatch(
-      dataSlice.actions.updateThingName({
-        id: image.id,
+      dataSliceV2.actions.updateImageName({
+        imageId: image.id,
         name: newImageName,
       }),
     );
