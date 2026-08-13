@@ -56,9 +56,6 @@ export const ProjectAppBar = () => {
 
       {!isMobile && (
         <>
-          {/*
-            TODO: selectedThings will be removed during refactor
-           */}
           <ImageViewerButton mobileAlt={true} />
           <Divider
             orientation="vertical"
