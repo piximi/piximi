@@ -6,7 +6,7 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { useSavedDataState } from "@ImageViewer/contexts/DataProvider";
-import { dataSliceV2 } from "store/dataV2";
+import { dataSliceV2 } from "store/data";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
 type ExitAnnotatorDialogProps = {

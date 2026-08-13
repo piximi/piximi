@@ -13,7 +13,7 @@ import {
   selectAllExtendedAnnotations,
   selectImageEntities,
   selectKindEntities,
-} from "store/dataV2/selectors";
+} from "store/data/selectors";
 
 import type { AnnotationExportType } from "utils/file-io-v2/export/enums";
 import type { ExportedAnnotation } from "utils/file-io-v2/export/types";

@@ -5,7 +5,7 @@ import type {
   ColorMap,
   DType,
   ChannelMeasurement,
-} from "store/dataV2/types";
+} from "store/data/types";
 import type { ClassifierState, KindClassifier } from "store/classifier/types";
 
 import type { Partition } from "utils/dl/enums";

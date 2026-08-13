@@ -11,7 +11,7 @@ import {
   selectSelectedImageIds,
 } from "@ProjectViewer/state/selectors";
 import { selectVisibleItems } from "@ProjectViewer/state/reselectors";
-import type { ExtendedImageObject } from "store/dataV2/types";
+import type { ExtendedImageObject } from "store/data/types";
 
 import { ImageGridItem } from "./ImageGridItem";
 import { createGridCell, createItemData } from "../gridUtils";

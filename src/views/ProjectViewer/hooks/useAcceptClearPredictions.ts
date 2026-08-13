@@ -9,7 +9,7 @@ import {
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { classifierSlice } from "store/classifier";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
-import { dataSliceV2 } from "store/dataV2";
+import { dataSliceV2 } from "store/data";
 import { useParameterizedSelector } from "store/hooks";
 
 import { Partition } from "utils/dl/enums";

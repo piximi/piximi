@@ -14,11 +14,11 @@ import {
 import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
-import { dataSliceV2 } from "store/dataV2";
+import { dataSliceV2 } from "store/data";
 import type { KindClassifier } from "store/classifier/types";
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
-import { generateUUID } from "store/dataV2/utils";
+import { generateUUID } from "store/data/utils";
 import { diffCompileSettings } from "@ProjectViewer/sections/ModelTaskSection/ClassifierSection/FitClassifierDialog/panels/ModelSettings/HyperparameterSettings/settingsLock";
 
 import { Partition } from "utils/dl/enums";

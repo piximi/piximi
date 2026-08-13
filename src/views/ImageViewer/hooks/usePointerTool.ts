@@ -12,7 +12,7 @@ import {
   selectAllActiveAnnotations,
   selectSelectedAnnotations,
 } from "@ImageViewer/state/image-viewer-data/reselectors";
-import type { ExtendedAnnotationObject } from "store/dataV2/types";
+import type { ExtendedAnnotationObject } from "store/data/types";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
 import {

@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { dataSliceV2 } from "store/dataV2";
+import { dataSliceV2 } from "store/data";
 import { classifierSlice } from "store/classifier";
 import {
   selectActiveItems,

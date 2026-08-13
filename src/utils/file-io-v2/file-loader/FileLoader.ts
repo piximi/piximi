@@ -5,7 +5,7 @@ import type {
   ChannelMeta,
   Plane,
   ImageObject,
-} from "store/dataV2/types";
+} from "store/data/types";
 
 import type { Progress, TaskError } from "utils/types";
 import { DataConnector } from "utils/data-connector";

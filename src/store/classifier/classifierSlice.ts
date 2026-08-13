@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import type { Shape } from "store/dataV2/types";
-import { dataSliceV2 } from "store/dataV2/dataSliceV2";
-import { UNKNOWN_KIND, UNKNOWN_KIND_ID } from "store/dataV2/constants";
+import type { Shape } from "store/data/types";
+import { dataSliceV2 } from "store/data";
+import { UNKNOWN_KIND, UNKNOWN_KIND_ID } from "store/data/constants";
 
 import type { RecursivePartial } from "utils/types";
 import { recursiveAssign } from "utils/objectUtils";

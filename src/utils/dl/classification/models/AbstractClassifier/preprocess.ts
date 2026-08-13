@@ -8,8 +8,8 @@ import {
   tidy,
 } from "@tensorflow/tfjs";
 
-import type { BitDepth, Category, Shape } from "store/dataV2/types";
-import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/dataV2/constants";
+import type { BitDepth, Category, Shape } from "store/data/types";
+import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 import { channelsToTensor } from "utils/dl/tensor-assembly";
 import type { RequireOnly } from "utils/types";

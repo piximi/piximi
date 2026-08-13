@@ -42,7 +42,7 @@ import {
   selectActiveChannels,
   selectRepresentativeImages,
 } from "./selectors";
-import { dataSliceV2 } from "./dataSliceV2";
+import { dataSliceV2 } from "./dataSlice";
 
 import type {
   ImageSeries,

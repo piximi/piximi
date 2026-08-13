@@ -7,14 +7,14 @@ import { useTheme } from "@mui/material";
 
 import { TextFieldWithBlur } from "components/inputs";
 
-import type { ExtendedImageObject } from "store/dataV2/types";
+import type { ExtendedImageObject } from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";
 import {
   selectAnnotationVolumesByImageId,
   selectExtendedImageById,
   selectPlanesByImageId,
-} from "store/dataV2/selectors";
-import { dataSliceV2 } from "store/dataV2";
+} from "store/data/selectors";
+import { dataSliceV2 } from "store/data";
 
 import type { Partition } from "utils/dl/enums";
 

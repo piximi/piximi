@@ -5,9 +5,9 @@ import {
   selectAllCategories,
   selectExtendedAnnotationsByKindId,
   selectExtendedImages,
-} from "store/dataV2/selectors";
+} from "store/data/selectors";
 import type { RootState } from "store/rootReducer";
-import { CATEGORY_COLORS } from "store/dataV2/constants";
+import { CATEGORY_COLORS } from "store/data/constants";
 
 import { representsUnknown } from "utils/stringUtils";
 import type { Partition } from "utils/dl/enums";

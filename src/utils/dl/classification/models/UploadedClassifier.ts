@@ -1,6 +1,6 @@
 import { io, loadGraphModel, loadLayersModel } from "@tensorflow/tfjs";
 
-import type { Shape, ShapeArray } from "store/dataV2/types";
+import type { Shape, ShapeArray } from "store/data/types";
 
 import { logger } from "utils/logUtils";
 import { arrayRange } from "utils/arrayUtils";

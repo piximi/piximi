@@ -1,7 +1,7 @@
 // Data model + pure filtering logic for the annotations drawer.
 // No React here — easy to unit-test and reuse.
 
-import type { ExtendedKind } from "store/dataV2/types";
+import type { ExtendedKind } from "store/data/types";
 
 import type { CategoryNode } from "@ImageViewer/state/types";
 

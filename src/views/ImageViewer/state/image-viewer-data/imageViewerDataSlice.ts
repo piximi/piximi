@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { difference } from "lodash";
 
-import { UNKNOWN_KIND_CATEGORY } from "store/dataV2/constants";
-import type { FeatureKey } from "store/dataV2/types";
+import { UNKNOWN_KIND_CATEGORY } from "store/data/constants";
+import type { FeatureKey } from "store/data/types";
 
 import { emptySelectionLayer } from "./utils";
 

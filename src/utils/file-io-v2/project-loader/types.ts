@@ -9,7 +9,7 @@ import type {
   ImageSeries,
   Kind,
   Plane,
-} from "store/dataV2/types";
+} from "store/data/types";
 import type { ClassifierState } from "store/classifier/types";
 
 import type { ExtractedModelFileMap } from "utils/dl/types";

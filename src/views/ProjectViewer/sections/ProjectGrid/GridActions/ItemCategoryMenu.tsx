@@ -4,7 +4,7 @@ import type { PopoverReference } from "@mui/material";
 import { Menu, MenuItem, MenuList } from "@mui/material";
 import { Label as LabelIcon } from "@mui/icons-material";
 
-import type { Category } from "store/dataV2/types";
+import type { Category } from "store/data/types";
 
 type ImageCategoryMenuProps = {
   anchorEl?: HTMLElement;

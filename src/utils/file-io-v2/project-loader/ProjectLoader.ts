@@ -3,7 +3,7 @@ import type {
   ChannelMeta,
   ImageObject,
   ImageSeries,
-} from "store/dataV2/types";
+} from "store/data/types";
 
 import type { Progress, TaskError } from "utils/types";
 import { INITIAL_PROGRESS } from "utils/types";

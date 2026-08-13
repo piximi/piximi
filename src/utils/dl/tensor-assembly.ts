@@ -2,7 +2,7 @@ import { tensor3d, Tensor3D } from "@tensorflow/tfjs";
 
 import { DataConnector } from "utils/data-connector";
 
-import type { BBox, ExtendedChannel, Shape } from "store/dataV2/types";
+import type { BBox, ExtendedChannel, Shape } from "store/data/types";
 
 export async function channelsToTensor(
   channels: ExtendedChannel[],

@@ -4,8 +4,8 @@ import { useDispatch } from "react-redux";
 
 import { Box, Button, TextField, Typography } from "@mui/material";
 
-import type { BitDepth } from "store/dataV2/types";
-import { dataSliceV2 } from "store/dataV2";
+import type { BitDepth } from "store/data/types";
+import { dataSliceV2 } from "store/data";
 
 export const PlotOptions = ({
   channelMetaId,

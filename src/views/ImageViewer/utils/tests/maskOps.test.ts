@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { BBox } from "store/dataV2/types";
+import type { BBox } from "store/data/types";
 
 import {
   difference,

@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { isMatch } from "lodash";
 import { ColorResult } from "react-color";
 
-import { selectAllCategories } from "store/dataV2/selectors";
+import { selectAllCategories } from "store/data/selectors";
 import { getRestrictedRandomHex } from "utils/colorUtils";
 
 export function useCategoryValidation({

@@ -1,4 +1,4 @@
-import type { Shape } from "store/dataV2/types";
+import type { Shape } from "store/data/types";
 
 import type { CropOptions } from "utils/dl/types";
 import type {

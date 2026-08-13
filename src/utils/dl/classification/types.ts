@@ -1,4 +1,4 @@
-import type { Kind, Shape } from "store/dataV2/types";
+import type { Kind, Shape } from "store/data/types";
 
 import type {
   CropSchema,

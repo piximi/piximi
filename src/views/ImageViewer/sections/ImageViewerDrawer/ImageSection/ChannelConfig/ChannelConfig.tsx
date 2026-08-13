@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import { Box, Collapse } from "@mui/material";
 
-import { selectChannelMetaById } from "store/dataV2/selectors";
-import type { ExtendedChannel } from "store/dataV2/types";
+import { selectChannelMetaById } from "store/data/selectors";
+import type { ExtendedChannel } from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";
 
 import { ChannelHeader } from "./ChannelHeader";

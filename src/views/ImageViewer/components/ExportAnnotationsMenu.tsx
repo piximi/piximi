@@ -8,12 +8,12 @@ import { useDialogHotkey } from "hooks";
 
 import { ExportAnnotationsDialog } from "components/dialogs";
 
-import type { ExtendedImageObject } from "store/dataV2/types";
+import type { ExtendedImageObject } from "store/data/types";
 import {
   selectExtendedAnnotationsByImageId,
   selectImageEntities,
   selectKindEntities,
-} from "store/dataV2/selectors";
+} from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
 import { HotkeyContext } from "utils/enums";

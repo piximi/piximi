@@ -31,8 +31,8 @@ import { useDialogHotkey } from "hooks";
 import { ConfirmationDialog } from "components/dialogs";
 
 import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
-import { generateCategory, generateKind } from "store/dataV2/utils";
-import { dataSliceV2 } from "store/dataV2";
+import { generateCategory, generateKind } from "store/data/utils";
+import { dataSliceV2 } from "store/data";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
 import { representsUnknown } from "utils/stringUtils";

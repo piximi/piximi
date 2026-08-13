@@ -28,8 +28,8 @@ import { useParameterizedSelector } from "store/hooks";
 import {
   selectAnnotationsByImageId,
   selectExtendedImageByIds,
-} from "store/dataV2/selectors";
-import type { ExtendedImageObject } from "store/dataV2/types";
+} from "store/data/selectors";
+import type { ExtendedImageObject } from "store/data/types";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
 import { ImageMenu } from "./ImageMenu";

@@ -22,9 +22,9 @@ import {
   selectActiveKindId,
 } from "@ProjectViewer/state/selectors";
 import { selectActiveCategories } from "@ProjectViewer/state/reselectors";
-import type { Category } from "store/dataV2/types";
-import { generateCategory } from "store/dataV2/utils";
-import { dataSliceV2 } from "store/dataV2/dataSliceV2";
+import type { Category } from "store/data/types";
+import { generateCategory } from "store/data/utils";
+import { dataSliceV2 } from "store/data";
 
 import { HotkeyContext } from "utils/enums";
 

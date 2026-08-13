@@ -2,8 +2,8 @@ import {
   UNKNOWN_NAME,
   UNKNOWN_IMAGE_CATEGORY_COLOR,
   UNKNOWN_IMAGE_CATEGORY_ID,
-} from "store/dataV2/constants";
-import { generateUUID } from "store/dataV2/utils";
+} from "store/data/constants";
+import { generateUUID } from "store/data/utils";
 
 import { Partition } from "utils/dl/enums";
 import { representsUnknown } from "utils/stringUtils";

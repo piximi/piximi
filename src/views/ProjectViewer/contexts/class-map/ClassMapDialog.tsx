@@ -20,10 +20,10 @@ import {
 
 import { StyledSelect } from "components/inputs/StyledSelect";
 
-import type { Category } from "store/dataV2/types";
-import { generateCategory } from "store/dataV2/utils";
-import { CATEGORY_COLORS } from "store/dataV2/constants";
-import { dataSliceV2 } from "store/dataV2";
+import type { Category } from "store/data/types";
+import { generateCategory } from "store/data/utils";
+import { CATEGORY_COLORS } from "store/data/constants";
+import { dataSliceV2 } from "store/data";
 import { selectAvaliableCategoryColors } from "@ProjectViewer/state/reselectors";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";

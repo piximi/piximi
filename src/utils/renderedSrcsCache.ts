@@ -1,4 +1,4 @@
-import { BBox, ExtendedChannel } from "store/dataV2/types";
+import { BBox, ExtendedChannel } from "store/data/types";
 
 const MAX_SIZE = 200;
 const cache = new Map<string, string>();

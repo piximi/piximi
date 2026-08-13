@@ -5,10 +5,10 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { useSound } from "use-sound";
 
 import { annotatorSlice } from "@ImageViewer/state/annotator";
-import { dataSliceV2 } from "store/dataV2";
+import { dataSliceV2 } from "store/data";
 import { encode } from "@ImageViewer/utils";
-import type { AnnotationObject, AnnotationVolume } from "store/dataV2/types";
-import { generateUUID } from "store/dataV2/utils";
+import type { AnnotationObject, AnnotationVolume } from "store/data/types";
+import { generateUUID } from "store/data/utils";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
 import { selectWorkingAnnotationEntity } from "@ImageViewer/state/annotator/selectors";
 import {

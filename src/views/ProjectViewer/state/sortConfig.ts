@@ -1,7 +1,7 @@
 import type {
   ExtendedAnnotationObject,
   ExtendedImageObject,
-} from "store/dataV2/types";
+} from "store/data/types";
 
 import { AnnotationSortType, ImageSortType } from "./types";
 

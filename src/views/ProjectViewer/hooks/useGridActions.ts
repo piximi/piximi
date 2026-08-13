@@ -10,7 +10,7 @@ import {
   selectActiveSelectedIds,
   selectActiveView,
 } from "@ProjectViewer/state/selectors";
-import { dataSliceV2 } from "store/dataV2/dataSliceV2";
+import { dataSliceV2 } from "store/data";
 import {
   selectActiveCategories,
   selectVisibleItems,

@@ -8,7 +8,7 @@ import {
   getBackend,
 } from "@tensorflow/tfjs";
 
-import { generateUUID } from "store/dataV2/utils";
+import { generateUUID } from "store/data/utils";
 
 import type { LoadCB, Point } from "utils/types";
 import {

@@ -1,4 +1,4 @@
-import { BitDepth } from "store/dataV2/types";
+import { BitDepth } from "store/data/types";
 
 /**
  * Generates a random integer between two values.

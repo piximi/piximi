@@ -7,7 +7,7 @@ import {
 } from "@tensorflow/tfjs";
 import { isEqual } from "lodash";
 
-import type { Shape } from "store/dataV2/types";
+import type { Shape } from "store/data/types";
 
 import type { LayersModel, Sequential } from "@tensorflow/tfjs";
 

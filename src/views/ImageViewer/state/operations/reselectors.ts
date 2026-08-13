@@ -7,8 +7,8 @@ import {
   invertWithinBBox,
   masksOverlap,
 } from "views/ImageViewer/utils/maskOps";
-import type { BBox, ExtendedAnnotationObject } from "store/dataV2/types";
-import { selectAnnotationEntities } from "store/dataV2/selectors";
+import type { BBox, ExtendedAnnotationObject } from "store/data/types";
+import { selectAnnotationEntities } from "store/data/selectors";
 
 import {
   selectAnnotationMode,

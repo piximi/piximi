@@ -1,7 +1,7 @@
 import { Image as IJSImage, encodeDataURL } from "image-js-latest";
 import * as Comlink from "comlink";
 
-import type { BBox, ExtendedChannel } from "store/dataV2/types";
+import type { BBox, ExtendedChannel } from "store/data/types";
 
 import "./workerPolyfills";
 

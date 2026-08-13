@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BitDepth, ExtendedChannel } from "store/dataV2/types";
+import { BitDepth, ExtendedChannel } from "store/data/types";
 import { DataConnector } from "utils/data-connector";
 
 /**

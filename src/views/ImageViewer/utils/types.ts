@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 
 import type { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import type { BBox, DataArray } from "store/dataV2/types";
+import type { BBox, DataArray } from "store/data/types";
 
 import type {
   AnnotationMode,

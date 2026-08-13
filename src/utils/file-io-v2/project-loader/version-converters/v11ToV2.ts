@@ -2,14 +2,14 @@ import { Image as IJSImage } from "image-js-latest";
 
 import { deepClone } from "@mui/x-data-grid/internals";
 
-import { generateUUID } from "store/dataV2/utils";
-import type { BitDepth } from "store/dataV2/types";
+import { generateUUID } from "store/data/utils";
+import type { BitDepth } from "store/data/types";
 import {
   UNKNOWN_KIND,
   UNKNOWN_KIND_CATEGORY,
   UNKNOWN_KIND_CATEGORY_ID,
   UNKNOWN_KIND_ID,
-} from "store/dataV2/constants";
+} from "store/data/constants";
 import { initialState } from "@ProjectViewer/state/projectSlice";
 import {
   IMAGE_CLASSIFIER_ID,

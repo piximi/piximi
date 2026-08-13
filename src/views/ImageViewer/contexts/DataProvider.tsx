@@ -9,8 +9,8 @@ import { addListener, isAnyOf } from "@reduxjs/toolkit";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { productionStore } from "store";
 import type { RootState } from "store/rootReducer";
-import { dataSliceV2 } from "store/dataV2";
-import type { DataStateV2 } from "store/dataV2/types";
+import { dataSliceV2 } from "store/data";
+import type { DataStateV2 } from "store/data/types";
 
 import type { UnsubscribeListener } from "@reduxjs/toolkit";
 

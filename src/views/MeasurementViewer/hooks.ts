@@ -18,12 +18,12 @@ import {
   selectAllImages,
   selectCategoryEntities,
   selectExtendedImageEntities,
-} from "store/dataV2/selectors";
+} from "store/data/selectors";
 import {
   CHANNEL_MEASUREMENTS,
   ExtendedAnnotationObject,
   ExtendedImageObject,
-} from "store/dataV2/types";
+} from "store/data/types";
 
 const buildAnnotationMeasurementData = (
   entity: ExtendedAnnotationObject,

@@ -4,7 +4,7 @@ import {
   findContours,
   simplifyPolygon,
 } from "views/ImageViewer/utils";
-import type { AnnotationCategory, ImageObject } from "store/dataV2/types";
+import type { AnnotationCategory, ImageObject } from "store/data/types";
 
 import { logger } from "utils/logUtils";
 

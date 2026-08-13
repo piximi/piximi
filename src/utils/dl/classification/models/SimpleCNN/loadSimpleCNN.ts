@@ -1,6 +1,6 @@
 import { sequential, layers, initializers } from "@tensorflow/tfjs";
 
-import type { Shape } from "store/dataV2/types";
+import type { Shape } from "store/data/types";
 
 /**
  * Creates simple convolutional neural network, for example used for mnist classification problem

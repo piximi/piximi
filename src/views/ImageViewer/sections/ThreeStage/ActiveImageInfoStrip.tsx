@@ -9,10 +9,10 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { CategoryDialog } from "components/dialogs";
 import { IncrementalSlider, StyledSelect, WithLabel } from "components/inputs";
 
-import type { Category, ExtendedImageObject } from "store/dataV2/types";
-import { dataSliceV2 } from "store/dataV2";
-import { generateCategory } from "store/dataV2/utils";
-import { selectImageCategories } from "store/dataV2/selectors";
+import type { Category, ExtendedImageObject } from "store/data/types";
+import { dataSliceV2 } from "store/data";
+import { generateCategory } from "store/data/utils";
+import { selectImageCategories } from "store/data/selectors";
 import { useActiveImage } from "@ImageViewer/contexts/ActiveImageProvider";
 
 import { DIMENSIONS } from "utils/constants";

@@ -3,7 +3,7 @@ import {
   AnnotationObject,
   BitDepth,
   ChannelMeasurement,
-} from "store/dataV2/types";
+} from "store/data/types";
 import { DataConnector } from "utils/data-connector";
 import { STORES } from "utils/data-connector/types";
 

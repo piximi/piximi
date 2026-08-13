@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ExtendedChannel } from "store/dataV2/types";
+import { ExtendedChannel } from "store/data/types";
 import { DataConnector } from "utils/data-connector";
 
 /**

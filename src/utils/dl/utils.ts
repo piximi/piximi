@@ -7,7 +7,7 @@ import type {
   ExtendedAnnotationObject,
   ExtendedChannel,
   ExtendedImageObject,
-} from "store/dataV2/types";
+} from "store/data/types";
 
 import type {
   ApiResult,

@@ -6,7 +6,7 @@ import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selector
 import type {
   ExtendedAnnotationObject,
   ExtendedImageObject,
-} from "store/dataV2/types";
+} from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";
 import { selectActiveSoftmaxById } from "store/classifier/selectors";
 import {

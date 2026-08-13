@@ -19,8 +19,8 @@ import { useDialogHotkey } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs";
 
-import { selectExperiment } from "store/dataV2/selectors";
-import { dataSliceV2 } from "store/dataV2";
+import { selectExperiment } from "store/data/selectors";
+import { dataSliceV2 } from "store/data";
 
 import { HotkeyContext } from "utils/enums";
 

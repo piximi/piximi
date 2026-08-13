@@ -4,7 +4,7 @@ import {
   AnnotationObject,
   FeatureKey,
   OBJECT_FEATURES,
-} from "store/dataV2/types";
+} from "store/data/types";
 
 const featureOps: Record<FeatureKey, (r: Roi) => number> = {
   area: (r) => r.surface,

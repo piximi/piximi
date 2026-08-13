@@ -9,7 +9,7 @@ import {
   ExtendedAnnotationObject,
   ExtendedImageObject,
   Category,
-} from "store/dataV2/types";
+} from "store/data/types";
 import { computeStatistics } from "utils/measurements/statistics";
 
 // ============================================================================

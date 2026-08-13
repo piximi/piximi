@@ -6,7 +6,7 @@ import {
   ExtendedAnnotationObject,
   ExtendedImageObject,
   FeatureKey,
-} from "store/dataV2/types";
+} from "store/data/types";
 
 // ============================================================================
 // ENUMS

@@ -12,7 +12,7 @@ import {
   channelMetaAdapter,
   annotationAdapter,
   annotationVolumeAdapter,
-} from "./dataSliceV2";
+} from "./dataSlice";
 
 import type {
   AnnotationObject,

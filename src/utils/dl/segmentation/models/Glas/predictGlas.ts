@@ -8,7 +8,7 @@ import {
 } from "@tensorflow/tfjs";
 import { Image as ImageJS } from "image-js";
 
-import { generateUUID } from "store/dataV2/utils";
+import { generateUUID } from "store/data/utils";
 
 import { rleEncodeArray } from "utils/image";
 

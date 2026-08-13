@@ -10,10 +10,7 @@ import {
 } from "./utils";
 
 import type { UnknownAction } from "@reduxjs/toolkit";
-import type {
-  ExtendedAnnotationObject,
-  ExtendedKind,
-} from "store/dataV2/types";
+import type { ExtendedAnnotationObject, ExtendedKind } from "store/data/types";
 import type { ImageViewerDataState } from "../types";
 
 const C1 = "cat-1";
@@ -61,19 +58,16 @@ const activateF = () =>
     admits: idsInFeatureRange(ALL, "area", F),
   });
 /** Same reducer, flipping the feature back off — no admits on the way out. */
-const deactivateF = () =>
-  A.toggleFeatureSelection({ key: "area", bounds: F });
-const widenF = () =>
-  A.updateFeatureSelection({ key: "area", range: [0, 600] });
+const deactivateF = () => A.toggleFeatureSelection({ key: "area", bounds: F });
+const widenF = () => A.updateFeatureSelection({ key: "area", range: [0, 600] });
 const click = (id: string, on: boolean) =>
   A.toggleAnnotationSelection({ ids: [id], on });
 
 /** Replays actions against the real reducer and reports the selected set. */
 const session = () => {
-  let state: ImageViewerDataState = imageViewerDataSlice.reducer(
-    undefined,
-    { type: "@@INIT" } as UnknownAction,
-  );
+  let state: ImageViewerDataState = imageViewerDataSlice.reducer(undefined, {
+    type: "@@INIT",
+  } as UnknownAction);
   return {
     run(...actions: UnknownAction[]) {
       actions.forEach((a) => {
@@ -263,7 +257,13 @@ describe("applyFilterLayer with manual overrides", () => {
     const kept = applyFilterLayer(
       ALL,
       "stack",
-      { ...base, mode: "hide", catIds: [C1], includeIds: [], excludeIds: ["a_c1"] },
+      {
+        ...base,
+        mode: "hide",
+        catIds: [C1],
+        includeIds: [],
+        excludeIds: ["a_c1"],
+      },
       0,
     );
     // c1 is hidden, but a_c1 was hand-excluded from the predicate, so it stays.

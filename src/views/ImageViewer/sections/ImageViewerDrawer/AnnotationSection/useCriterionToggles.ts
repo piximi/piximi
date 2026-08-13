@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectExtendedAnnotationsByImageId } from "store/dataV2/selectors";
+import { selectExtendedAnnotationsByImageId } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
   selectActiveImageId,
@@ -11,7 +11,7 @@ import {
   idsInCategories,
   idsInFeatureRange,
 } from "@ImageViewer/state/image-viewer-data/utils";
-import type { FeatureKey } from "store/dataV2/types";
+import type { FeatureKey } from "store/data/types";
 
 /**
  * The criterion half of the selection surface — category checkboxes and feature

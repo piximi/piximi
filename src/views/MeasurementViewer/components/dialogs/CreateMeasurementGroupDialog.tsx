@@ -5,7 +5,7 @@ import { Autocomplete, FormControl, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs";
 import { useSelector } from "react-redux";
-import { selectAllKinds } from "store/dataV2/selectors";
+import { selectAllKinds } from "store/data/selectors";
 
 type KindOption = { id: string; name: string };
 

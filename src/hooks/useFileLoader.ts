@@ -2,13 +2,10 @@ import { useCallback, useRef, useState } from "react";
 import { useDispatch, useSelector, useStore } from "react-redux";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { AppTask } from "store/appTasks/types";
-import { generateUUID, reconcileChannelMetas } from "store/dataV2/utils";
-import { dataSliceV2 } from "store/dataV2/dataSliceV2";
-import {
-  selectAllChannelMetas,
-  selectExperiment,
-} from "store/dataV2/selectors";
-import { ImageSeries } from "store/dataV2/types";
+import { generateUUID, reconcileChannelMetas } from "store/data/utils";
+import { dataSliceV2 } from "store/data";
+import { selectAllChannelMetas, selectExperiment } from "store/data/selectors";
+import { ImageSeries } from "store/data/types";
 import { RootState } from "store/rootReducer";
 import { FileLoader } from "utils/file-io-v2/file-loader";
 import {

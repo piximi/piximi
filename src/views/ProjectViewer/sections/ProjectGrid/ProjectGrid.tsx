@@ -8,7 +8,7 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { projectSlice } from "@ProjectViewer/state";
 import { selectActiveView } from "@ProjectViewer/state/selectors";
-import { selectTotalAnnotations } from "store/dataV2/selectors";
+import { selectTotalAnnotations } from "store/data/selectors";
 
 import { DIMENSIONS } from "utils/constants";
 

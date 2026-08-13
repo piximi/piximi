@@ -9,7 +9,7 @@ import {
   AnnotatorState,
   ImageViewerState,
 } from "views/ImageViewer/utils/types";
-import { DataStateV2 } from "./dataV2/types";
+import { DataStateV2 } from "./data/types";
 import { AppTasksState } from "./appTasks/types";
 import { ProjectState } from "views/ProjectViewer/state/types";
 import { ClassifierState } from "./classifier/types";

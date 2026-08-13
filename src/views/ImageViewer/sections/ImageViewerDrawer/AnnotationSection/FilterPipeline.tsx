@@ -15,7 +15,7 @@ import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import CloseIcon from "@mui/icons-material/Close";
 
-import type { ExtendedKind } from "store/dataV2/types";
+import type { ExtendedKind } from "store/data/types";
 
 import type {
   FilterLayer,

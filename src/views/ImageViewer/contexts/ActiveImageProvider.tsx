@@ -5,10 +5,10 @@ import { useSelector } from "react-redux";
 
 import { useRawImageData } from "hooks/useRawImageData";
 
-import type { BitDepth } from "store/dataV2/types";
+import type { BitDepth } from "store/data/types";
 import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { selectActiveExtendedChannels } from "store/dataV2/selectors";
+import { selectActiveExtendedChannels } from "store/data/selectors";
 
 import type { Image as IJSImage } from "image-js-latest";
 

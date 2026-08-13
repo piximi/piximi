@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import { selectAllKinds, selectExtendedImages } from "store/dataV2/selectors";
+import { selectAllKinds, selectExtendedImages } from "store/data/selectors";
 import { selectSelectedImages } from "@ProjectViewer/state/reselectors";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import type {
@@ -11,9 +11,9 @@ import type {
   AnnotationVolume,
   Kind,
   Shape,
-} from "store/dataV2/types";
-import { dataSliceV2 } from "store/dataV2";
-import { generateKind, generateUUID } from "store/dataV2/utils";
+} from "store/data/types";
+import { dataSliceV2 } from "store/data";
+import { generateKind, generateUUID } from "store/data/utils";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
 

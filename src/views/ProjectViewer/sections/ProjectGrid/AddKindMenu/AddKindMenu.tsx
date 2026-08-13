@@ -11,9 +11,9 @@ import { CreateKindDialog } from "components/dialogs";
 
 import { projectSlice } from "@ProjectViewer/state";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
-import { selectKindIds } from "store/dataV2/selectors";
-import { dataSliceV2 } from "store/dataV2/dataSliceV2";
-import type { AnnotationCategory, Kind } from "store/dataV2/types";
+import { selectKindIds } from "store/data/selectors";
+import { dataSliceV2 } from "store/data";
+import type { AnnotationCategory, Kind } from "store/data/types";
 
 import { HotkeyContext } from "utils/enums";
 

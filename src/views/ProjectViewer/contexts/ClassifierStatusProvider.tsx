@@ -32,7 +32,7 @@ import {
 } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
-import type { Shape } from "store/dataV2/types";
+import type { Shape } from "store/data/types";
 import { classifierSlice } from "store/classifier";
 
 import { Partition } from "utils/dl/enums";

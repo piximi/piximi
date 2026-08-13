@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { difference } from "lodash";
 
-import { dataSliceV2 } from "store/dataV2/dataSliceV2";
-import { UNKNOWN_KIND } from "store/dataV2/constants";
+import { dataSliceV2 } from "store/data";
+import { UNKNOWN_KIND } from "store/data/constants";
 
 import { findAdjacentItem, mutatingFilter } from "utils/arrayUtils";
 import type { Partition } from "utils/dl/enums";

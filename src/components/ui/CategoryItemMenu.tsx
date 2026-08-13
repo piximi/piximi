@@ -7,10 +7,10 @@ import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
 import { HotkeyContext } from "utils/enums";
 
-import { Category } from "store/dataV2/types";
+import { Category } from "store/data/types";
 import { CategoryDialog } from "components/dialogs/CategoryDialog";
 import { useParameterizedSelector } from "store/hooks";
-import { selectEntityCountByCategoryId } from "store/dataV2/selectors";
+import { selectEntityCountByCategoryId } from "store/data/selectors";
 
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;

@@ -8,14 +8,14 @@ import { Box } from "@mui/material";
 import { measurementsSlice } from "@MeasurementViewer/state";
 import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";
 import { getCustomTreeItem } from "@MeasurementViewer/components/CustomTreeItem";
-import { OBJ_MEAS_LOOKUP } from "store/dataV2/utils";
+import { OBJ_MEAS_LOOKUP } from "store/data/utils";
 
 import { getDifferences } from "utils/arrayUtils";
 import { formatString } from "utils/stringUtils";
 
 import type { CustomTreeViewBaseItem } from "@MeasurementViewer/components/CustomTreeItem";
 import type { ObjectMeasurementGroup } from "@MeasurementViewer/types";
-import { FeatureKey, OBJECT_FEATURES } from "store/dataV2/types";
+import { FeatureKey, OBJECT_FEATURES } from "store/data/types";
 
 const computedMeasurementItems: CustomTreeViewBaseItem[] = [
   {

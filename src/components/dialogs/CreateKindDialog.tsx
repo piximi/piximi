@@ -3,8 +3,8 @@ import { Box, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { generateKind } from "store/dataV2/utils";
-import { AnnotationCategory, Kind } from "store/dataV2/types";
+import { generateKind } from "store/data/utils";
+import { AnnotationCategory, Kind } from "store/data/types";
 
 type CreateCategoriesDialogProps = {
   onClose: () => void;

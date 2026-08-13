@@ -6,7 +6,7 @@ import {
   selectAllExtendedKinds,
   selectExtendedAnnotationsByImageId,
   selectExtendedImageById,
-} from "store/dataV2/selectors";
+} from "store/data/selectors";
 import {
   selectActiveImageId,
   selectFilterLayer,

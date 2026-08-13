@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 
-import { selectExperiment } from "store/dataV2/selectors";
+import { selectExperiment } from "store/data/selectors";
 
 import { ExportOptionsPanel } from "./ExportOptionsPanel";
 import { useAnnotationSelection } from "./useAnnotationSelection";

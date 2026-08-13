@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import * as Comlink from "comlink";
-import { BBox, ExtendedChannel, ExtendedImageObject } from "store/dataV2/types";
+import { BBox, ExtendedChannel, ExtendedImageObject } from "store/data/types";
 import {
   getCacheKey,
   getRenderedSrc,

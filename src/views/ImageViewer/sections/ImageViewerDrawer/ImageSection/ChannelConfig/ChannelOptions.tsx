@@ -9,8 +9,8 @@ import { useHistogram } from "hooks";
 
 import { StyledSelect } from "components/inputs";
 
-import { dataSliceV2 } from "store/dataV2";
-import type { ExtendedChannel } from "store/dataV2/types";
+import { dataSliceV2 } from "store/data";
+import type { ExtendedChannel } from "store/data/types";
 
 import { applyChannelPreset, RANGE_PRESETS } from "utils/channelUtils";
 

@@ -24,15 +24,15 @@ import { useDialog } from "hooks";
 
 import { StyledSelect } from "components/inputs";
 
-import { dataSliceV2 } from "store/dataV2";
-import type { Kind, ExtendedAnnotationObject } from "store/dataV2/types";
+import { dataSliceV2 } from "store/data";
+import type { Kind, ExtendedAnnotationObject } from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";
 import {
   selectCategoriesByKindId,
   selectExtendedAnnotationById,
   selectKindEntities,
-} from "store/dataV2/selectors";
-import { generateCategory } from "store/dataV2/utils";
+} from "store/data/selectors";
+import { generateCategory } from "store/data/utils";
 
 import type { Partition } from "utils/dl/enums";
 

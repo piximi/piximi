@@ -6,8 +6,8 @@ import { Box, Collapse } from "@mui/material";
 
 import { selectActiveViewState } from "@ProjectViewer/state/selectors";
 import { projectSlice } from "@ProjectViewer/state";
-import type { Category } from "store/dataV2/types";
-import { selectAllCategories } from "store/dataV2/selectors";
+import type { Category } from "store/data/types";
+import { selectAllCategories } from "store/data/selectors";
 
 import { FilterList } from "./FilterList";
 import { SectionHeader } from "./SectionHeader";

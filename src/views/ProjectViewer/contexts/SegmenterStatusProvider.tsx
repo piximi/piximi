@@ -6,8 +6,8 @@ import { useSelector } from "react-redux";
 import {
   selectChannelMetaEntities,
   selectExtendedImages,
-} from "store/dataV2/selectors";
-import type { ChannelMetaEntities } from "store/dataV2/types";
+} from "store/data/selectors";
+import type { ChannelMetaEntities } from "store/data/types";
 
 import { arrayRange } from "utils/arrayUtils";
 import type {

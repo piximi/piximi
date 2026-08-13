@@ -4,7 +4,7 @@ import type {
   DataArray,
   BBox,
   ExtendedAnnotationObject,
-} from "store/dataV2/types";
+} from "store/data/types";
 
 import { logger } from "utils/logUtils";
 import type { Point } from "utils/types";

@@ -1,7 +1,7 @@
 import createGraph from "ngraph.graph";
 
 import { getIdx } from "views/ImageViewer/utils/imageHelper";
-import type { DataArray } from "store/dataV2/types";
+import type { DataArray } from "store/data/types";
 
 import type { Point } from "utils/types";
 

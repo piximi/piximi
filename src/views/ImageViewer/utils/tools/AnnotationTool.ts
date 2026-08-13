@@ -2,7 +2,7 @@ import {
   computeBoundingBoxFromContours as _computeBoundingBoxFromContours,
   maskFromPoints,
 } from "views/ImageViewer/utils";
-import type { DataArray } from "store/dataV2/types";
+import type { DataArray } from "store/data/types";
 
 import type { Point } from "utils/types";
 

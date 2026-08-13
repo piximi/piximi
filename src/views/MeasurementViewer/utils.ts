@@ -1,8 +1,8 @@
 import { saveAs } from "file-saver";
 import { v4 as uuidv4 } from "uuid";
 
-import { CHANNEL_MEASUREMENTS } from "store/dataV2/types";
-import type { ChannelMeasurement } from "store/dataV2/types";
+import { CHANNEL_MEASUREMENTS } from "store/data/types";
+import type { ChannelMeasurement } from "store/data/types";
 
 import { ChartType } from "./types";
 

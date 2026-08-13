@@ -6,13 +6,13 @@ import {
   selectExtendedAnnotationEntities,
   selectCategoryEntities,
   selectExtendedImageEntities,
-} from "store/dataV2/selectors";
+} from "store/data/selectors";
 import {
   CHANNEL_MEASUREMENTS,
   type AnnotationObject,
   type Category,
   type ImageObject,
-} from "store/dataV2/types";
+} from "store/data/types";
 
 import { formatString } from "utils/stringUtils";
 

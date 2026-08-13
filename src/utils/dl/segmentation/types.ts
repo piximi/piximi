@@ -1,4 +1,4 @@
-import type { AnnotationObject, Kind } from "store/dataV2/types";
+import type { AnnotationObject, Kind } from "store/data/types";
 
 import type { LoadCB } from "utils/types";
 

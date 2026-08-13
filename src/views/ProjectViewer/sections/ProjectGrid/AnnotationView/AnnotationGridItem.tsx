@@ -4,8 +4,8 @@ import { Box, Typography } from "@mui/material";
 
 import { useRenderedSrc } from "hooks/useRenderedSrcs";
 
-import type { Category, ExtendedAnnotationObject } from "store/dataV2/types";
-import { selectCategoryById } from "store/dataV2/selectors";
+import type { Category, ExtendedAnnotationObject } from "store/data/types";
+import { selectCategoryById } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
 import { Partition } from "utils/dl/enums";

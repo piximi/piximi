@@ -11,7 +11,7 @@ import {
   selectKindStates,
   selectSelectedImageIds,
 } from "@ProjectViewer/state/selectors";
-import { selectAnnotationEntities } from "store/dataV2/selectors";
+import { selectAnnotationEntities } from "store/data/selectors";
 
 import { NavChip } from "./NavChip";
 

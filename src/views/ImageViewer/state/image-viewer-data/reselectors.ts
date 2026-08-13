@@ -6,8 +6,8 @@ import {
   selectAllExtendedKinds,
   selectExtendedAnnotationsByImageId,
   selectExtendedImageById,
-} from "store/dataV2/selectors";
-import { OBJECT_FEATURES } from "store/dataV2/types";
+} from "store/data/selectors";
+import { OBJECT_FEATURES } from "store/data/types";
 
 import {
   selectActiveImageId,

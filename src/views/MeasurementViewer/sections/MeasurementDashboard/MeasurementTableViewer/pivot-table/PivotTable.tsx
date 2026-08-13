@@ -13,9 +13,9 @@ import { selectActivePivotItems } from "@MeasurementViewer/state/selectors";
 import { selectActiveMeasuredEntitiesGroup } from "@MeasurementViewer/state/reselectors";
 import { parseChannelMeasurementLabel } from "@MeasurementViewer/utils";
 
-import { selectCategoryEntities } from "store/dataV2/selectors";
-import type { FeatureKey } from "store/dataV2/types";
-import { CHANNEL_MEASUREMENTS } from "store/dataV2/types";
+import { selectCategoryEntities } from "store/data/selectors";
+import type { FeatureKey } from "store/data/types";
+import { CHANNEL_MEASUREMENTS } from "store/data/types";
 
 import {
   generatePivotColumns,

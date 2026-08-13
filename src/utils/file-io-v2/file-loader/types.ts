@@ -5,7 +5,7 @@ import type {
   ImageSeries,
   Plane,
   Shape,
-} from "store/dataV2/types";
+} from "store/data/types";
 
 import type { Progress } from "utils/types";
 

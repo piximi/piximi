@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { Partition } from "utils/dl/enums";
 
-import { dataSliceV2 } from "./dataSliceV2";
+import { dataSliceV2 } from "./dataSlice";
 
 import type {
   Experiment,

@@ -10,7 +10,7 @@ import { useMenu, useMobileView } from "hooks";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { projectSlice } from "@ProjectViewer/state/projectSlice";
-import { dataSliceV2 } from "store/dataV2/dataSliceV2";
+import { dataSliceV2 } from "store/data";
 import { selectAnnotationGridState } from "@ProjectViewer/state/selectors";
 
 import { DIMENSIONS } from "utils/constants";

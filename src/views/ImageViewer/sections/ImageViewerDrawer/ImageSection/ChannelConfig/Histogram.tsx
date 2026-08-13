@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 
 import * as d3 from "d3";
 
-import { dataSliceV2 } from "store/dataV2";
+import { dataSliceV2 } from "store/data";
 
 import { DIMENSIONS } from "utils/constants";
 

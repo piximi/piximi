@@ -7,7 +7,7 @@ import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { measurementsSlice } from "views/MeasurementViewer/state";
-import { dataSliceV2 } from "./dataV2/dataSliceV2";
+import { dataSliceV2 } from "./data";
 import { appTasksSlice } from "./appTasks/appTasksSlice";
 import { projectSlice } from "views/ProjectViewer/state/projectSlice";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";

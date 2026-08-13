@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { ReactElement } from "react";
 
-import type { Category } from "store/dataV2/types";
+import type { Category } from "store/data/types";
 
 import type { ModelClassMap } from "utils/dl/classification/types";
 

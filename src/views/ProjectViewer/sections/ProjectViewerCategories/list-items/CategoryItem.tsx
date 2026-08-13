@@ -14,9 +14,9 @@ import {
 import { CustomListItemButton } from "components/ui/CustomListItemButton";
 import { CountChip } from "components/ui/CountChip";
 
-import type { Category } from "store/dataV2/types";
+import type { Category } from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";
-import { selectEntityCountByCategoryId } from "store/dataV2/selectors";
+import { selectEntityCountByCategoryId } from "store/data/selectors";
 import { selectActiveFilters } from "@ProjectViewer/state/selectors";
 
 import { APPLICATION_COLORS } from "utils/constants";

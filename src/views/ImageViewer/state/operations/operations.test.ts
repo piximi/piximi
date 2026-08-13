@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { dataSliceV2 } from "store/dataV2";
+import { dataSliceV2 } from "store/data";
 import { AnnotationMode } from "views/ImageViewer/utils/enums";
 import { encode } from "views/ImageViewer/utils/rle";
 import type {
   AnnotationObject,
   BBox,
   ExtendedAnnotationObject,
-} from "store/dataV2/types";
+} from "store/data/types";
 
 import { Partition } from "utils/dl/enums";
 

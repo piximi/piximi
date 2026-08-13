@@ -9,7 +9,7 @@ import {
   setBackend,
 } from "@tensorflow/tfjs";
 
-import { generateUUID } from "store/dataV2/utils";
+import { generateUUID } from "store/data/utils";
 
 import { rleEncodeArray } from "utils/image";
 

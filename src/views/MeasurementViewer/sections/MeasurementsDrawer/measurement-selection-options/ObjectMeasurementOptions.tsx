@@ -6,7 +6,7 @@ import { measurementsSlice } from "@MeasurementViewer/state";
 import { ComputedObjectMeasurementOptions } from "./ComputedObjectMeasurements";
 
 import type { ObjectMeasurementGroup } from "@MeasurementViewer/types";
-import { FeatureKey } from "store/dataV2/types";
+import { FeatureKey } from "store/data/types";
 
 export const ObjectMeasurementOptions = ({
   group,

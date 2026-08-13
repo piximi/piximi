@@ -8,7 +8,7 @@ import {
   concat,
 } from "@tensorflow/tfjs";
 
-import type { Category } from "store/dataV2/types";
+import type { Category } from "store/data/types";
 
 import type { RequireOnly } from "utils/types";
 

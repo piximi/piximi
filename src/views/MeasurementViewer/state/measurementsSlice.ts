@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { generateInitialPlot } from "@MeasurementViewer/utils";
-import { generateUUID } from "store/dataV2/utils";
-import type { ChannelFeature, FeatureKey } from "store/dataV2/types";
+import { generateUUID } from "store/data/utils";
+import type { ChannelFeature, FeatureKey } from "store/data/types";
 
 import { mutatingFilter } from "utils/arrayUtils";
 import { getUniqueName } from "utils/stringUtils";
@@ -16,7 +16,7 @@ import type {
   BaseMeasurementGroup,
   PivotItem,
 } from "../types";
-import { dataSliceV2 } from "store/dataV2";
+import { dataSliceV2 } from "store/data";
 
 const initialState: MeasurementsState = {
   activeGroup: undefined,

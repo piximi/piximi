@@ -18,7 +18,7 @@ import {
   TiffImportConfig,
 } from "utils/file-io-v2/file-loader/types";
 import { useSelector } from "react-redux";
-import { selectExperimentChannels } from "store/dataV2/selectors";
+import { selectExperimentChannels } from "store/data/selectors";
 
 type TiffConfigDialogProps = {
   open: boolean;

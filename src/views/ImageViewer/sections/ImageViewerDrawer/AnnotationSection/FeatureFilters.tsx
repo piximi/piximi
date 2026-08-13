@@ -6,7 +6,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import ExpandIcon from "components/ui/ExpandIcon";
 
-import type { FeatureKey } from "store/dataV2/types";
+import type { FeatureKey } from "store/data/types";
 
 import { useCriterionToggles } from "./useCriterionToggles";
 

@@ -6,7 +6,7 @@ import { usePreloadSrcs } from "hooks/usePreloadSrcs";
 
 import { useAnnotationSort } from "@ProjectViewer/hooks";
 import { projectSlice } from "@ProjectViewer/state";
-import { selectExtendedAnnotationsByKindId } from "store/dataV2/selectors";
+import { selectExtendedAnnotationsByKindId } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { isFiltered } from "@ProjectViewer/state/filtering";
 

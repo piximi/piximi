@@ -6,7 +6,7 @@ import { Box } from "@mui/material";
 
 import { useParameterizedSelector } from "store/hooks";
 import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
-import { selectActiveExtendedChannels } from "store/dataV2/selectors";
+import { selectActiveExtendedChannels } from "store/data/selectors";
 
 import { ChannelConfig } from "./ChannelConfig";
 

@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material";
 
 import { useRenderedSrc } from "hooks/useRenderedSrcs";
 
-import type { ExtendedImageObject } from "store/dataV2/types";
+import type { ExtendedImageObject } from "store/data/types";
 
 import { Partition } from "utils/dl/enums";
 import { representsUnknown } from "utils/stringUtils";

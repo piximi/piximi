@@ -7,8 +7,8 @@ import { useDispatch } from "react-redux";
 import { Box, Checkbox, IconButton, Popover, Typography } from "@mui/material";
 import { Settings } from "@mui/icons-material";
 
-import { dataSliceV2 } from "store/dataV2";
-import type { ChannelMeta, ColorMap } from "store/dataV2/types";
+import { dataSliceV2 } from "store/data";
+import type { ChannelMeta, ColorMap } from "store/data/types";
 
 import { rgbToHex } from "utils/colorUtils";
 

@@ -5,7 +5,7 @@ import { MenuItem } from "@mui/material";
 
 import { StyledSelect } from "components/inputs";
 
-import { selectAllKinds } from "store/dataV2/selectors";
+import { selectAllKinds } from "store/data/selectors";
 
 import { SELECT_PROPS } from "./utils";
 

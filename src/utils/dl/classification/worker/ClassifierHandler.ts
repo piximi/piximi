@@ -1,6 +1,6 @@
 import JSZip from "jszip";
 
-import type { Category } from "store/dataV2/types";
+import type { Category } from "store/data/types";
 
 import { logger, parseError } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
