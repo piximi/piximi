@@ -17,12 +17,12 @@ import {
 import { useParameterizedSelector } from "store/hooks";
 
 import { HotkeyContext } from "utils/enums";
-import type { AnnotationExportType } from "utils/file-io-v2/export/enums";
-import type { ExportedAnnotation } from "utils/file-io-v2/export/types";
+import type { AnnotationExportType } from "utils/file-io/export/enums";
+import type { ExportedAnnotation } from "utils/file-io/export/types";
 import {
   exportOptions,
   runAnnotationExport,
-} from "utils/file-io-v2/export/runAnnotationExport";
+} from "utils/file-io/export/runAnnotationExport";
 
 //TODO: MenuItem??
 

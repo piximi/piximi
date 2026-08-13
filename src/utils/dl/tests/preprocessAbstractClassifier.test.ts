@@ -4,7 +4,7 @@ import { expect, it } from "vitest";
 import "@tensorflow/tfjs-node";
 import { SequentialClassifier } from "../classification/AbstractClassifier/AbstractClassifier";
 
-import { fileFromPath } from "utils/file-io-v2/file-loader/nodeImageHelper";
+import { fileFromPath } from "utils/file-io/file-loader/nodeImageHelper";
 // import {
 //   CropOptions,
 //   FitOptions,
@@ -19,7 +19,7 @@ import { loadImageFileAsStack } from "utils/file-io/utils";
 import { convertToImage } from "utils/tensorUtils";
 import { MIMEType } from "utils/file-io/types";
 import { Category, ImageObject } from "store/data/types";
-import { MIMETYPES } from "utils/file-io-v2/export/enums";
+import { MIMETYPES } from "utils/file-io/export/enums";
 import { getDefaultModelInfo } from "../classification/utils";
 import path from "path";
 class GenericClassifier extends SequentialClassifier {

@@ -1,7 +1,7 @@
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
-import { AnnotationExportType } from "utils/file-io-v2/export/enums";
+import { AnnotationExportType } from "utils/file-io/export/enums";
 
 import { exportAnnotationMasks } from "./annotationExporters";
 import { serializeCOCOFile } from "./serializeCOCO";

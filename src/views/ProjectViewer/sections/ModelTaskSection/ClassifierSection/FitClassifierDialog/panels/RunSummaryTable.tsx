@@ -27,7 +27,7 @@ import {
 } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
-import { buildModelRunsCsv } from "utils/file-io-v2/export";
+import { buildModelRunsCsv } from "utils/file-io/export";
 import type { RunHyperparameterSnapshot } from "utils/dl/classification/types";
 
 export const RunSummaryTable = () => {

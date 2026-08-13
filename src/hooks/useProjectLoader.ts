@@ -9,7 +9,7 @@ import { generateUUID } from "store/data/utils";
 import { dataSlice } from "store/data";
 import { projectSlice } from "@ProjectViewer/state";
 import { AlertType } from "utils/enums";
-import { ProjectLoader } from "utils/file-io-v2/project-loader/ProjectLoader";
+import { ProjectLoader } from "utils/file-io/project-loader/ProjectLoader";
 import { AlertState } from "utils/types";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
 import { clearCache } from "utils/renderedSrcsCache";

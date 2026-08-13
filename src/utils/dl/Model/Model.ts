@@ -3,7 +3,7 @@ import { io } from "@tensorflow/tfjs";
 import {
   MODEL_JSON_FILENAME,
   MODEL_WEIGHTS_FILENAME,
-} from "utils/file-io-v2/consts";
+} from "utils/file-io/consts";
 
 import type {
   RunHistoryEpoch,

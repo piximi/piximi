@@ -15,7 +15,7 @@ const NEW_FILES = [
   "src/store/dataV2/*.ts",
   "src/store/classifier/*.ts",
   "src/utils/data-connector/**/*.ts",
-  "src/utils/file-io-v2/**/*.ts",
+  "src/utils/file-io/**/*.ts",
   "src/utils/worker-scheduler/**/*.ts",
   "src/utils/workers/**/*.ts",
   "src/utils/dl/**/*.ts",
@@ -187,7 +187,7 @@ export default tseslint.config(
       "src/store/rootReducer.ts",
       "src/store/types.ts",
       //TODO: Remove after refactor
-      "src/utils/file-io-v2/**/*",
+      "src/utils/file-io/**/*",
     ],
     rules: {
       "import-x/no-restricted-paths": "off",

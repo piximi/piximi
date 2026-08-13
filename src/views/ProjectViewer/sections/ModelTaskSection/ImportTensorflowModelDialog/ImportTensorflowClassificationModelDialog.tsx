@@ -22,15 +22,15 @@ import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selector
 import { useClassifierApi } from "utils/dl/classification";
 import { parseError } from "utils/logUtils";
 import { type ModelInfoDTO, type Run } from "utils/dl/classification/types";
-import { zipInputToBuffer } from "utils/file-io-v2/file-loader/fileInputUtils";
+import { zipInputToBuffer } from "utils/file-io/file-loader/fileInputUtils";
 import {
   importFittedModelFromZip,
   importFittedModelFromFiles,
-} from "utils/file-io-v2/import/importFittedModel";
+} from "utils/file-io/import/importFittedModel";
 import {
   MODEL_MANIFEST_FILENAME,
   MODEL_RUNS_FILENAME,
-} from "utils/file-io-v2/consts";
+} from "utils/file-io/consts";
 import { modelInfoDTOToModelInfo } from "utils/dl/classification/utils";
 
 import { LocalClassifierUpload } from "./LocalFileUpload";

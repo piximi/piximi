@@ -7,17 +7,17 @@ import { dataSlice } from "store/data";
 import { selectAllChannelMetas, selectExperiment } from "store/data/selectors";
 import { ImageSeries } from "store/data/types";
 import { RootState } from "store/rootReducer";
-import { FileLoader } from "utils/file-io-v2/file-loader";
+import { FileLoader } from "utils/file-io/file-loader";
 import {
   FILE,
   TiffAnalysisResult,
   TiffDialogCallbackResult,
   TiffImportConfig,
   UploadOptionswithCallbacks,
-} from "utils/file-io-v2/file-loader/types";
+} from "utils/file-io/file-loader/types";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
-import { interpretFiles } from "utils/file-io-v2/file-loader/fileInputUtils";
-import { prepareTiffConfigs } from "utils/file-io-v2/file-loader/readers/TiffReader";
+import { interpretFiles } from "utils/file-io/file-loader/fileInputUtils";
+import { prepareTiffConfigs } from "utils/file-io/file-loader/readers/TiffReader";
 
 type UseFileLoaderReturn = {
   upload: (

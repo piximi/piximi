@@ -2,11 +2,11 @@ import type {
   ImportImageInput,
   LoadAndPrepareOutput,
   StageName,
-} from "utils/file-io-v2/file-loader/types";
+} from "utils/file-io/file-loader/types";
 import type {
   LoadProjectInput,
   LoadProjectOutput,
-} from "utils/file-io-v2/project-loader/types";
+} from "utils/file-io/project-loader/types";
 
 type OnProgressCallback<TExtra = object> = (
   args: { value: number } & TExtra,

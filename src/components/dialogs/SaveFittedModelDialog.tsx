@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectRunsForActiveModel } from "store/classifier/selectors";
-import { buildClassifierZip } from "utils/file-io-v2/export/exportFittedModel";
+import { buildClassifierZip } from "utils/file-io/export/exportFittedModel";
 
 type SaveFittedModelDialogProps = {
   model: ModelInfoDTO;

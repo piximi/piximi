@@ -16,7 +16,7 @@ import {
   TiffAnalysisResult,
   TiffDialogCallbackResult,
   TiffImportConfig,
-} from "utils/file-io-v2/file-loader/types";
+} from "utils/file-io/file-loader/types";
 import { useSelector } from "react-redux";
 import { selectExperimentChannels } from "store/data/selectors";
 

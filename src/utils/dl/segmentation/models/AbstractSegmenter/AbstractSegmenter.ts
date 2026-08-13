@@ -6,7 +6,7 @@ import type { Token } from "utils/dl/cancel";
 import {
   MODEL_JSON_FILENAME,
   MODEL_WEIGHTS_FILENAME,
-} from "utils/file-io-v2/consts";
+} from "utils/file-io/consts";
 
 import type { ModelName, SegmentationResults } from "../../types";
 import type { GraphModel } from "@tensorflow/tfjs";

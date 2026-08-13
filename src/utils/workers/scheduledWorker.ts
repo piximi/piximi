@@ -6,8 +6,8 @@ import type {
   IScheduledWorkerAPI,
   TaskRegistry,
 } from "utils/worker-scheduler/types";
-import { loadImage } from "utils/file-io-v2/file-loader/loadImage";
-import { loadProject } from "utils/file-io-v2/project-loader/loadProject";
+import { loadImage } from "utils/file-io/file-loader/loadImage";
+import { loadProject } from "utils/file-io/project-loader/loadProject";
 
 const taskRegistry: TaskRegistry = {
   loadImage: async (payload, ct, prog) => loadImage(payload, ct, prog),

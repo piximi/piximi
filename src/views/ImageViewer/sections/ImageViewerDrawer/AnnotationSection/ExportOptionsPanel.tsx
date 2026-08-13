@@ -15,12 +15,12 @@ import {
   selectKindEntities,
 } from "store/data/selectors";
 
-import type { AnnotationExportType } from "utils/file-io-v2/export/enums";
-import type { ExportedAnnotation } from "utils/file-io-v2/export/types";
+import type { AnnotationExportType } from "utils/file-io/export/enums";
+import type { ExportedAnnotation } from "utils/file-io/export/types";
 import {
   exportOptions,
   runAnnotationExport,
-} from "utils/file-io-v2/export/runAnnotationExport";
+} from "utils/file-io/export/runAnnotationExport";
 
 import type { OpScope, ScopeId } from "./types";
 
