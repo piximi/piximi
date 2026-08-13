@@ -17,7 +17,7 @@ export const ImageViewerOptions = () => {
           Select images or objects to view.
         </Typography>
       ) : (
-        <ImageViewerButton selectedThings={selectedThingIds} />
+        <ImageViewerButton mobileAlt={true} />
       )}
     </Stack>
   );

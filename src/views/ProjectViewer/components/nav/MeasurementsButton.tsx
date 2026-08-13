@@ -18,6 +18,7 @@ export const MeasurementsButton = ({ mobileAlt }: { mobileAlt?: boolean }) => {
       labelIcon={mobileAlt ? <StraightenIcon fontSize="small" /> : "Measure"}
       onClick={handleNavigateMeasurements}
       help={HelpItem.NavigateMeasurements}
+      disabled={false}
     />
   );
 };
