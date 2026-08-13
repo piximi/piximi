@@ -399,6 +399,7 @@ describe("updateAnnotationMask", () => {
         boundingBox: [1, 1, 4, 3],
         encodedMask: encode(grid(["###", "###"])),
         features: { area: 6 },
+        intensityMeasurements: { "": { total: 8 } },
       }),
     );
     expect(updated?.boundingBox).toEqual([1, 1, 4, 3]);
@@ -420,6 +421,7 @@ describe("updateAnnotationMask", () => {
         boundingBox: [0, 0, 1, 1],
         encodedMask: encode(grid(["#"])),
         features: undefined,
+        intensityMeasurements: { "": { total: 8 } },
       }),
     );
     expect(updated?.id).toBe("A");
@@ -436,6 +438,7 @@ describe("updateAnnotationMask", () => {
         boundingBox: [0, 0, 1, 1],
         encodedMask: [],
         features: undefined,
+        intensityMeasurements: { "": { total: 8 } },
       }),
     );
     expect(updated?.boundingBox).toEqual([0, 0, 2, 2]);
