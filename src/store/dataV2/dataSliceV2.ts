@@ -32,6 +32,7 @@ import type {
   AnnotationVolume,
   ItemCategoryUpdate,
   PredictionCorrection,
+  ChannelMeasurement,
 } from "./types";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -696,9 +697,14 @@ export const dataSliceV2 = createSlice({
         boundingBox: BBox;
         encodedMask: Array<number>;
         features: Partial<Record<FeatureKey, number>> | undefined;
+        intensityMeasurements: Record<
+          string,
+          Partial<Record<ChannelMeasurement, number>>
+        >;
       }>,
     ) {
-      const { id, boundingBox, encodedMask, features } = action.payload;
+      const { id, boundingBox, encodedMask, features, intensityMeasurements } =
+        action.payload;
       const annotation = state.annotations.entities[id];
       if (!annotation) return;
 
@@ -708,6 +714,7 @@ export const dataSliceV2 = createSlice({
           boundingBox,
           encodedMask,
           features,
+          intensityMeasurements,
           shape: {
             ...annotation.shape,
             width: boundingBox[2] - boundingBox[0],

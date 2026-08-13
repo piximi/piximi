@@ -210,6 +210,10 @@ export type AnnotationObject = {
   encodedMask: Array<number>;
   decodedMask?: DataArray;
   features?: Partial<Record<FeatureKey, number>>;
+  intensityMeasurements?: Record<
+    string,
+    Partial<Record<ChannelMeasurement, number>>
+  >;
 };
 export type AnnotationEntities = Record<string, AnnotationObject>;
 

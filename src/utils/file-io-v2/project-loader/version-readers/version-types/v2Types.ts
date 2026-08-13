@@ -4,6 +4,7 @@ import type {
   Shape,
   ColorMap,
   DType,
+  ChannelMeasurement,
 } from "store/dataV2/types";
 import type { ClassifierState, KindClassifier } from "store/classifier/types";
 
@@ -123,6 +124,10 @@ export type V2AnnotationObject = {
   encodedMask: Array<number>;
   decodedMask?: DataArray;
   features?: Partial<Record<V2FeatureKey, number>>;
+  intensityMeasurements?: Record<
+    string,
+    Partial<Record<ChannelMeasurement, number>>
+  >;
 };
 
 export type V2DataState = {

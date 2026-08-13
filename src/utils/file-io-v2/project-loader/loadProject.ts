@@ -7,6 +7,7 @@ import type { ExtractedModelFileMap } from "utils/dl/types";
 import { logger } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
 import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
+import { computeObjectIntensityMeasurementsLocal } from "utils/measurements/computeObjectIntensityMeasurements";
 
 import { FileStore, ZipStore } from "./zarr/stores";
 import { getAttr } from "./zarr/utils";
@@ -89,9 +90,34 @@ export async function loadProject(
       throw new Error(`Unsupported version: ${projectVersion}`);
   }
   const annotations = v2.data.annotations.entities;
-  const objectFeatures = computeObjectFeatures(Object.values(annotations));
+  const annotationList = Object.values(annotations);
+
+  const objectFeatures = computeObjectFeatures(annotationList);
   Object.entries(objectFeatures).forEach(([id, features]) => {
     annotations[id].features = features;
+  });
+
+  const annotationsByPlane = annotationList.reduce<
+    Record<string, typeof annotationList>
+  >((acc, ann) => {
+    (acc[ann.planeId] ??= []).push(ann);
+    return acc;
+  }, {});
+  const channels = v2.data.channels.entities;
+  const intensityMeasurementBatches = Object.entries(annotationsByPlane).map(
+    ([planeId, objs]) => ({
+      channelRefs: Object.values(channels).filter(
+        (ch) => ch.planeId === planeId,
+      ),
+      objs,
+    }),
+  );
+
+  const intensityMeasurements = await computeObjectIntensityMeasurementsLocal(
+    intensityMeasurementBatches,
+  );
+  Object.entries(intensityMeasurements).forEach(([id, measurements]) => {
+    annotations[id].intensityMeasurements = measurements;
   });
   return { project: v2, modelFiles };
 }
