@@ -9,17 +9,6 @@ import { importX } from "eslint-plugin-import-x";
 
 import type { Linter } from "eslint";
 
-const NEW_FILES = [
-  "src/views/ProjectViewer/**/*.{js,mjs,jsx,ts,mts,tsx}",
-  "src/views/ImageViewer/**/*.{js,mjs,jsx,ts,mts,tsx}",
-  "src/store/dataV2/*.ts",
-  "src/store/classifier/*.ts",
-  "src/utils/data-connector/**/*.ts",
-  "src/utils/file-io/**/*.ts",
-  "src/utils/worker-scheduler/**/*.ts",
-  "src/utils/workers/**/*.ts",
-  "src/utils/dl/**/*.ts",
-];
 export default tseslint.config(
   js.configs.recommended,
 
@@ -38,6 +27,10 @@ export default tseslint.config(
   },
   {
     files: ["**/*.{js,mjs,jsx,ts,mts,tsx}"],
+    extends: [
+      importX.flatConfigs.recommended as Linter.Config,
+      importX.flatConfigs.typescript as Linter.Config,
+    ],
     settings: {
       react: { version: "17.0.2" },
       "import-x/resolver": {
@@ -78,15 +71,6 @@ export default tseslint.config(
           "ts-nocheck": "allow-with-description",
         },
       ],
-    },
-  },
-  {
-    files: NEW_FILES,
-    extends: [
-      importX.flatConfigs.recommended as Linter.Config,
-      importX.flatConfigs.typescript as Linter.Config,
-    ],
-    rules: {
       "@typescript-eslint/consistent-type-imports": [
         "warn",
         { prefer: "type-imports", fixStyle: "separate-type-imports" },
@@ -186,8 +170,6 @@ export default tseslint.config(
       "src/store/productionStore.ts",
       "src/store/rootReducer.ts",
       "src/store/types.ts",
-      //TODO: Remove after refactor
-      "src/utils/file-io/**/*",
     ],
     rules: {
       "import-x/no-restricted-paths": "off",
