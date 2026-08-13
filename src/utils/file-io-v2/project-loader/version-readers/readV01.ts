@@ -1,6 +1,6 @@
 import { openGroup } from "zarr";
 
-import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
+import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/dataV2/constants";
 
 import { Partition } from "utils/dl/enums";
 

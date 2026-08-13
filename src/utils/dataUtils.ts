@@ -1,4 +1,4 @@
-import { DataArray, BitDepth } from "store/data/types";
+import { BitDepth } from "store/dataV2/types";
 
 /**
  * Generates a random integer between two values.
@@ -73,22 +73,4 @@ export const extractMinMax = (ranges: {
   }
 
   return { mins, maxs };
-};
-
-export const convertToDataArray = (
-  depth: number,
-  source: DataArray | Array<number>,
-): DataArray => {
-  switch (depth) {
-    case 1:
-      throw Error("Binary bit depth not (yet) supported");
-    case 8:
-      return Uint8Array.from(source);
-    case 16:
-      return Uint16Array.from(source);
-    case 32:
-      return Float32Array.from(source);
-    default:
-      throw Error("Unrecognized bit depth");
-  }
 };

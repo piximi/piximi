@@ -11,10 +11,8 @@ import logger from "redux-logger";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { rootReducer, RootState } from "./rootReducer";
-import { dataMiddleware } from "./data/dataListeners";
 import { classifierSlice } from "store/classifier";
 import { applicationSettingsSlice } from "./applicationSettings";
-import { dataSlice } from "./data/dataSlice";
 import { dataSliceV2 } from "./dataV2/dataSliceV2";
 import { applicationMiddleware } from "./applicationSettings/applicationListeners";
 import { appTasksSlice } from "./appTasks/appTasksSlice";
@@ -31,7 +29,6 @@ const loggingMiddleware: Middleware[] =
 
 const listenerMiddlewares: Middleware[] = [
   projectMiddleware.middleware,
-  dataMiddleware.middleware,
   applicationMiddleware.middleware,
 ];
 
@@ -41,7 +38,6 @@ const preloadedState: RootState = {
   applicationSettings: applicationSettingsSlice.getInitialState(),
   imageViewer: imageViewerSlice.getInitialState(),
   imageViewerData: imageViewerDataSlice.getInitialState(),
-  data: dataSlice.getInitialState(),
   measurements: measurementsSlice.getInitialState(),
   dataV2: dataSliceV2.getInitialState(),
   appTasks: appTasksSlice.getInitialState(),

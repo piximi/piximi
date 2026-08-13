@@ -1,5 +1,4 @@
-import type { Shape } from "store/data/types";
-import type { BBox, ExtendedChannel } from "store/dataV2/types";
+import type { Shape, BBox, ExtendedChannel } from "store/dataV2/types";
 
 import type {
   CropSchema,

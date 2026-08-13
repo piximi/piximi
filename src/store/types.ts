@@ -1,16 +1,9 @@
-import {
-  Dispatch,
-  EntityState,
-  TypedStartListening,
-  UnknownAction,
-} from "@reduxjs/toolkit";
+import { Dispatch, TypedStartListening, UnknownAction } from "@reduxjs/toolkit";
 
 import { HotkeyContext, Languages } from "utils/enums";
 import { ThemeMode } from "themes/enums";
 
 import { AlertState } from "utils/types";
-
-import { Kind, AnnotationObject, Category, ImageObject } from "./data/types";
 
 import {
   AnnotatorState,
@@ -43,12 +36,6 @@ export type AppSettingsState = {
   showClearPredictionsWarning: boolean;
 };
 
-export type DataState = {
-  kinds: EntityState<Kind, string>;
-  categories: EntityState<Category, string>;
-  things: EntityState<AnnotationObject | ImageObject, string>;
-};
-
 type AppState = {
   classifier: ClassifierState;
   imageViewer: ImageViewerState;
@@ -56,7 +43,6 @@ type AppState = {
   annotator: AnnotatorState;
   project: ProjectState;
   applicationSettings: AppSettingsState;
-  data: DataState;
   dataV2: DataStateV2;
   measurements: MeasurementsState;
   appTasks: AppTasksState;

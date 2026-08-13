@@ -16,15 +16,15 @@ import IJSImage, {
   ImageKind as IJSImageKind,
   ColorModel as IJSColorModel,
 } from "image-js";
-import { generateUUID } from "store/data/utils";
+import { generateUUID } from "store/dataV2/utils";
 import { Partition } from "utils/dl/enums";
-import { BitDepth } from "store/data/types";
+import { BitDepth } from "store/dataV2/types";
 import { Colors } from "./types";
 import { ImageObject } from "store/data/types";
 import {
   DEFAULT_COLORS,
   UNKNOWN_IMAGE_CATEGORY_ID,
-} from "store/data/constants";
+} from "store/dataV2/constants";
 
 /*
  ========================================

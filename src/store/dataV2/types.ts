@@ -22,6 +22,8 @@ export type Shape = {
   channels: number;
 };
 
+export type ShapeArray = [number, number, number, number];
+
 export type ColorMap = [number, number, number];
 
 // ######################

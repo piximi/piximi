@@ -4,10 +4,10 @@ import { Box, Typography } from "@mui/material";
 
 import { useRenderedSrc } from "hooks/useRenderedSrcs";
 
-import { isUnknownCategory } from "store/data/utils";
 import type { ExtendedImageObject } from "store/dataV2/types";
 
 import { Partition } from "utils/dl/enums";
+import { representsUnknown } from "utils/stringUtils";
 
 import { altTextStyle, getIconPosition, imageStyle } from "../gridItemUtils";
 import { useGridItemStyle } from "../useGridItemStyle";
@@ -75,7 +75,7 @@ export const ImageGridItem = memo(
             categoryName={item.category.name}
             usePredictedStyle={
               item.partition === Partition.Inference &&
-              !isUnknownCategory(item.category.id)
+              !representsUnknown(item.category.id)
                 ? item.predictionConfidence
                 : undefined
             }

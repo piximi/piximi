@@ -1,7 +1,8 @@
 import { random as _random } from "lodash";
 
-import type { ShapeArray, Shape } from "store/data/types";
 import type {
+  ShapeArray,
+  Shape,
   BBox,
   ExtendedAnnotationObject,
   ExtendedChannel,

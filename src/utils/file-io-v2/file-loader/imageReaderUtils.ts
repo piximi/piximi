@@ -2,7 +2,7 @@ import { decodeStack, Stack as IJSStack } from "image-js-latest";
 
 import type { BitDepth, ChannelMeta, Plane } from "store/dataV2/types";
 import { generateUUID } from "store/dataV2/utils";
-import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
+import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/dataV2/constants";
 
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
 import { processChannel } from "utils/channelUtils";

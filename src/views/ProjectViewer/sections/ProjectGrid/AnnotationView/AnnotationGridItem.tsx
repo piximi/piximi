@@ -5,11 +5,11 @@ import { Box, Typography } from "@mui/material";
 import { useRenderedSrc } from "hooks/useRenderedSrcs";
 
 import type { Category, ExtendedAnnotationObject } from "store/dataV2/types";
-import { isUnknownCategory } from "store/data/utils";
 import { selectCategoryById } from "store/dataV2/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
 import { Partition } from "utils/dl/enums";
+import { representsUnknown } from "utils/stringUtils";
 
 import { altTextStyle, getIconPosition, imageStyle } from "../gridItemUtils";
 import { useGridItemStyle } from "../useGridItemStyle";
@@ -89,7 +89,7 @@ export const AnnotationGridItem = memo(
             categoryName={category.name}
             usePredictedStyle={
               item.partition === Partition.Inference &&
-              !isUnknownCategory(item.categoryId)
+              !representsUnknown(item.categoryId)
                 ? item.predictionConfidence
                 : undefined
             }
