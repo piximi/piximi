@@ -153,11 +153,10 @@ function makeImage(
   };
 }
 
-function makeChannelMeta(id: string, seriesId: string): ChannelMeta {
+function makeChannelMeta(id: string): ChannelMeta {
   return {
     id,
     name: "ch-meta",
-    seriesId,
     bitDepth: 8,
     colorMap: [255, 0, 0] as [number, number, number],
     visible: true,
@@ -170,9 +169,13 @@ function makeChannelMeta(id: string, seriesId: string): ChannelMeta {
   };
 }
 
-// Cascade-delete only reads planeId from Channel, so we cast a minimal object
-function makeChannel(id: string, planeId: string): Channel {
-  return { id, planeId } as Channel;
+// Cascade-delete reads planeId; orphan cleanup reads channelMetaId. Cast a minimal object.
+function makeChannel(
+  id: string,
+  planeId: string,
+  channelMetaId?: string,
+): Channel {
+  return { id, planeId, channelMetaId } as Channel;
 }
 
 // ── State lifecycle ───────────────────────────────────────────────────────────
@@ -342,7 +345,7 @@ describe("addImageSeries", () => {
         images: [],
         planes: [],
         channels: [],
-        channelMetas: [makeChannelMeta("cm-1", "s1")],
+        channelMetas: [makeChannelMeta("cm-1")],
       }),
     );
     expect(s.channelMetas.ids).toContain("cm-1");
@@ -442,19 +445,42 @@ describe("deleteImageSeries", () => {
     expect(s.channels.ids).not.toContain("ch-1");
   });
 
-  it("removes child channelMetas", () => {
+  it("removes channelMetas orphaned once the series' channels are gone", () => {
     const s0 = dataSliceV2.reducer(
       undefined,
       addImageSeries({
         imageSeries: [makeSeries("series-1")],
-        images: [],
-        planes: [],
-        channels: [],
-        channelMetas: [makeChannelMeta("cm-1", "series-1")],
+        images: [makeImage("img-1", "foo", "series-1")],
+        planes: [makePlane("plane-1", "img-1")],
+        channels: [makeChannel("ch-1", "plane-1", "cm-1")],
+        channelMetas: [makeChannelMeta("cm-1")],
       }),
     );
     const s = dataSliceV2.reducer(s0, deleteImageSeries("series-1"));
     expect(s.channelMetas.ids).not.toContain("cm-1");
+  });
+
+  it("keeps shared channelMetas still referenced by another series", () => {
+    const s0 = dataSliceV2.reducer(
+      undefined,
+      addImageSeries({
+        imageSeries: [makeSeries("series-1"), makeSeries("series-2")],
+        images: [
+          makeImage("img-1", "foo", "series-1"),
+          makeImage("img-2", "bar", "series-2"),
+        ],
+        planes: [makePlane("plane-1", "img-1"), makePlane("plane-2", "img-2")],
+        channels: [
+          makeChannel("ch-1", "plane-1", "cm-1"),
+          makeChannel("ch-2", "plane-2", "cm-1"),
+        ],
+        channelMetas: [makeChannelMeta("cm-1")],
+      }),
+    );
+    const s = dataSliceV2.reducer(s0, deleteImageSeries("series-1"));
+    expect(s.channelMetas.ids).toContain("cm-1");
+    expect(s.channels.ids).not.toContain("ch-1");
+    expect(s.channels.ids).toContain("ch-2");
   });
 
   it("is a no-op for an unknown seriesId", () => {
@@ -1580,7 +1606,7 @@ describe("updateChannelMeta", () => {
         images: [],
         planes: [],
         channels: [],
-        channelMetas: [makeChannelMeta("cm-1", "s1")],
+        channelMetas: [makeChannelMeta("cm-1")],
       }),
     );
   }
@@ -1612,10 +1638,7 @@ describe("batchUpdateChannelMeta", () => {
         images: [],
         planes: [],
         channels: [],
-        channelMetas: [
-          makeChannelMeta("cm-1", "s1"),
-          makeChannelMeta("cm-2", "s1"),
-        ],
+        channelMetas: [makeChannelMeta("cm-1"), makeChannelMeta("cm-2")],
       }),
     );
   }

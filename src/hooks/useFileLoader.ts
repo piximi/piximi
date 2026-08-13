@@ -1,11 +1,15 @@
 import { useCallback, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, useStore } from "react-redux";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { AppTask } from "store/appTasks/types";
-import { generateUUID } from "store/dataV2/utils";
+import { generateUUID, reconcileChannelMetas } from "store/dataV2/utils";
 import { dataSliceV2 } from "store/dataV2/dataSliceV2";
-import { selectExperiment } from "store/dataV2/selectors";
+import {
+  selectAllChannelMetas,
+  selectExperiment,
+} from "store/dataV2/selectors";
 import { ImageSeries } from "store/dataV2/types";
+import { RootState } from "store/rootReducer";
 import { FileLoader } from "utils/file-io-v2/file-loader";
 import {
   FILE,
@@ -39,6 +43,7 @@ type UseFileLoaderReturn = {
  */
 export function useFileLoader(): UseFileLoaderReturn {
   const dispatch = useDispatch();
+  const store = useStore<RootState>();
   const experiment = useSelector(selectExperiment);
   const [isUploading, setIsUploading] = useState(false);
   const [tiffDialogOpen, setTiffDialogOpen] = useState(false);
@@ -153,15 +158,33 @@ export function useFileLoader(): UseFileLoaderReturn {
             dataSliceV2.actions.setExperimentChannels(images[0].shape.channels),
           );
 
+        // ChannelMetas are shared project-wide (one per channel index). Reconcile
+        // the freshly-loaded per-series metas against any that already exist:
+        // reuse + widen existing metas, or add the canonical set on first load.
+        // Read state now (not via useSelector) so we see metas as they are at
+        // reconcile time, not at render time.
+        const {
+          metasToAdd,
+          metaUpdates,
+          channels: reconciledChannels,
+        } = reconcileChannelMetas(
+          selectAllChannelMetas(store.getState()),
+          channelMetas,
+          channels,
+          images[0].shape.channels,
+        );
+
         dispatch(
           dataSliceV2.actions.addImageSeries({
             imageSeries: reduxImageSeries,
             images,
             planes,
-            channels,
-            channelMetas,
+            channels: reconciledChannels,
+            channelMetas: metasToAdd,
           }),
         );
+        if (metaUpdates.length > 0)
+          dispatch(dataSliceV2.actions.batchUpdateChannelMeta(metaUpdates));
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
 
         return;

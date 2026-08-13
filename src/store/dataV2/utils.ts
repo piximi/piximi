@@ -8,7 +8,14 @@ import {
   UNKNOWN_KIND_ID,
 } from "./constants";
 
-import type { AnnotationCategory, Category, FeatureKey, Kind } from "./types";
+import type {
+  AnnotationCategory,
+  Category,
+  Channel,
+  ChannelMeta,
+  FeatureKey,
+  Kind,
+} from "./types";
 
 const RESERVED_IDS = new Set([
   UNKNOWN_IMAGE_CATEGORY_ID,
@@ -36,6 +43,121 @@ export const generateUUID = (options?: { definesUnknown: boolean }) => {
   */
   throw new Error("unreachable");
 };
+
+const DEFAULT_CHANNEL_NAME_RE = /^Channel-\d+$/;
+const isDefaultChannelName = (name: string): boolean =>
+  DEFAULT_CHANNEL_NAME_RE.test(name);
+
+/*
+ * Match one series' incoming channel metas (index-ordered, length C) to the
+ * canonical project-wide metas. Real (non-default) names like "DAPI" match by
+ * name first; whatever is left over matches positionally among the remaining
+ * canonical slots. Returns a map of incoming-meta-id -> canonical meta.
+ */
+const matchSeriesMetas = (
+  canonical: ChannelMeta[],
+  incoming: ChannelMeta[],
+): Map<string, ChannelMeta> => {
+  const map = new Map<string, ChannelMeta>();
+  const taken = new Set<ChannelMeta>();
+
+  incoming.forEach((inc) => {
+    if (isDefaultChannelName(inc.name)) return;
+    const hit = canonical.find((c) => !taken.has(c) && c.name === inc.name);
+    if (hit) {
+      map.set(inc.id, hit);
+      taken.add(hit);
+    }
+  });
+
+  const leftover = canonical.filter((c) => !taken.has(c));
+  let li = 0;
+  incoming.forEach((inc) => {
+    if (!map.has(inc.id)) map.set(inc.id, leftover[li++]);
+  });
+
+  return map;
+};
+
+export type ChannelMetaReconciliation = {
+  metasToAdd: ChannelMeta[];
+  metaUpdates: Array<{
+    id: string;
+    changes: Pick<
+      ChannelMeta,
+      "minValue" | "maxValue" | "rampMinLimit" | "rampMaxLimit"
+    >;
+  }>;
+  channels: Channel[];
+};
+
+/*
+ * ChannelMetas are shared project-wide: at most one per channel index. Given the
+ * metas/channels produced for one or more freshly-loaded series (each set
+ * index-ordered, length `channelCount`), reconcile them against the metas that
+ * already exist in the project:
+ *   - fresh project (no existing metas): the first series defines the canonical
+ *     set; batch-wide min/max are folded in and the metas are returned to add.
+ *   - existing project: incoming channels are remapped onto the existing metas
+ *     (matched by name, then index) and the global min/max limits are widened;
+ *     no new metas are added.
+ * In both cases the returned `channels` have their channelMetaId pointed at the
+ * shared meta. min/max limits are merged globally; display fields (colorMap,
+ * rampMin/rampMax, visible, name) on existing metas are left untouched.
+ */
+export const reconcileChannelMetas = (
+  existing: ChannelMeta[],
+  incomingMetas: ChannelMeta[],
+  incomingChannels: Channel[],
+  channelCount: number,
+): ChannelMetaReconciliation => {
+  const C = channelCount;
+  const fresh = existing.length === 0;
+  const canonical = fresh ? incomingMetas.slice(0, C) : existing;
+
+  const idToCanonical = new Map<string, ChannelMeta>();
+  for (let start = 0; start < incomingMetas.length; start += C) {
+    matchSeriesMetas(canonical, incomingMetas.slice(start, start + C)).forEach(
+      (target, incomingId) => idToCanonical.set(incomingId, target),
+    );
+  }
+
+  const merged = new Map<string, ChannelMeta>(
+    canonical.map((c) => [c.id, { ...c }]),
+  );
+  incomingMetas.forEach((inc) => {
+    const target = merged.get(idToCanonical.get(inc.id)!.id)!;
+    target.minValue = Math.min(target.minValue, inc.minValue);
+    target.maxValue = Math.max(target.maxValue, inc.maxValue);
+    target.rampMinLimit = Math.min(target.rampMinLimit, inc.rampMinLimit);
+    target.rampMaxLimit = Math.max(target.rampMaxLimit, inc.rampMaxLimit);
+  });
+
+  const channels = incomingChannels.map((ch) => ({
+    ...ch,
+    channelMetaId: idToCanonical.get(ch.channelMetaId)!.id,
+  }));
+  const mergedCanonical = canonical.map((c) => merged.get(c.id)!);
+
+  if (fresh) {
+    return { metasToAdd: mergedCanonical, metaUpdates: [], channels };
+  }
+
+  return {
+    metasToAdd: [],
+    metaUpdates: mergedCanonical.map((c) => ({
+      id: c.id,
+      changes: {
+        minValue: c.minValue,
+        maxValue: c.maxValue,
+        rampMinLimit: c.rampMinLimit,
+        rampMaxLimit: c.rampMaxLimit,
+      },
+    })),
+    channels,
+  };
+};
+
 const generateUnknownAnnotationCategory = (kindId: string) => {
   const unknownCategoryId = generateUUID({ definesUnknown: true });
   const unknownCategory: AnnotationCategory = {

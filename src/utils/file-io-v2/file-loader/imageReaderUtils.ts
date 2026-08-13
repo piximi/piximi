@@ -197,7 +197,6 @@ export const experimentFromStack = (
       id: generateUUID(),
       name: `Channel-${idx}`,
       bitDepth,
-      seriesId: series.id,
       colorMap:
         config.shape.channels === 1
           ? CHANNEL_COLOR_MAPS.WHITE

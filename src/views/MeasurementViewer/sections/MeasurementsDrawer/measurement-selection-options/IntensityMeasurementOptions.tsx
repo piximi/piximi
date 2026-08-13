@@ -33,11 +33,6 @@ export const IntensityMeasurementOptions = ({
   const channelMetas = useSelector(selectAllChannelMetas);
   const selectedItems = useMemo(() => group.intensityMeasurements, [group]);
 
-  const channelNames = useMemo(
-    () => [...new Set(channelMetas.map((cm) => cm.name))],
-    [channelMetas],
-  );
-
   const intensityMeasurementItems = useMemo(
     () =>
       [
@@ -48,14 +43,14 @@ export const IntensityMeasurementOptions = ({
           children: CHANNEL_MEASUREMENTS.map((key) => ({
             id: key,
             label: capitalize(key),
-            children: Object.values(channelNames).map((name) => ({
-              id: toChannelMeasurementLabel(name, key),
-              label: capitalize(name),
+            children: channelMetas.map((cm) => ({
+              id: toChannelMeasurementLabel(cm.name, key),
+              label: capitalize(cm.name),
             })),
           })),
         },
       ] as CustomTreeViewBaseItem[],
-    [channelNames],
+    [channelMetas],
   );
   const handleSelectedItemsChange = (
     event: React.SyntheticEvent | null,

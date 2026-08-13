@@ -262,6 +262,10 @@ function convertThings(
   });
 
   const planeIdx2planeId: Record<string, Record<number, string>> = {};
+  // ChannelMetas are shared project-wide, one per channel index. Create them
+  // once (indexed by channel position) and let every image's channels reference
+  // the same metas so their stats aggregate globally.
+  const sharedMetaIds: string[] = [];
   let imageIdx = 0;
   for (const image of v11Images) {
     const bitDepth = image.bitDepth as BitDepth;
@@ -293,9 +297,12 @@ function convertThings(
 
     const localMetaIds: string[] = [];
     Array.from({ length: channels }).forEach((_, idx) => {
-      const meta = createV2ChannelMeta(idx, channels, bitDepth, v2Series.id);
-      localMetaIds.push(meta.id);
-      addToState(v2ChannelMetas, meta);
+      if (sharedMetaIds[idx] === undefined) {
+        const meta = createV2ChannelMeta(idx, channels, bitDepth);
+        addToState(v2ChannelMetas, meta);
+        sharedMetaIds[idx] = meta.id;
+      }
+      localMetaIds.push(sharedMetaIds[idx]);
     });
 
     const channelData = parseChannelData(
@@ -452,13 +459,11 @@ function createV2ChannelMeta(
   idx: number,
   totalChannels: number,
   bitDepth: BitDepth,
-  seriesId: string,
 ): V2ChannelMeta {
   return {
     id: generateUUID(),
     name: `Channel-${idx}`,
     bitDepth,
-    seriesId,
     colorMap:
       totalChannels === 1 ? CHANNEL_COLOR_MAPS.WHITE : DEFAULT_COLORS[idx % 6],
     minValue: 2 ** bitDepth - 1,

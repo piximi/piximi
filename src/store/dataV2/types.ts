@@ -149,7 +149,6 @@ export type ChannelEntities = Record<string, Channel>;
 export type ChannelMeta = {
   id: string;
   name: string;
-  seriesId: string;
   bitDepth: BitDepth;
   colorMap: ColorMap;
   visible: boolean;

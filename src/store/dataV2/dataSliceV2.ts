@@ -192,14 +192,20 @@ function cascadeDeleteImageSeries(
     images.map((im) => im.id),
   );
 
-  const channelMetaIds = Object.values(state.channelMetas.entities).reduce(
-    (chMetaIds: string[], chMeta) => {
-      if (chMeta.seriesId === series.id) chMetaIds.push(chMeta.id);
-      return chMetaIds;
-    },
-    [],
+  removeOrphanedChannelMetas(state);
+}
+
+/*
+ * ChannelMetas are shared project-wide, so they can't be removed by series.
+ * Remove any meta no surviving channel references (reference counting via
+ * Channel.channelMetaId).
+ */
+function removeOrphanedChannelMetas(state: DataStateV2): void {
+  const referenced = new Set(
+    Object.values(state.channels.entities).map((ch) => ch.channelMetaId),
   );
-  channelMetaAdapter.removeMany(state.channelMetas, channelMetaIds);
+  const orphanIds = state.channelMetas.ids.filter((id) => !referenced.has(id));
+  channelMetaAdapter.removeMany(state.channelMetas, orphanIds);
 }
 
 function pruneSeriesAfterImageDeletion(
@@ -216,11 +222,8 @@ function pruneSeriesAfterImageDeletion(
       (im) => im.seriesId === seriesId,
     );
     if (remaining.length === 0) {
-      const channelMetas = Object.values(state.channelMetas.entities)
-        .filter((meta) => meta.seriesId === seriesId)
-        .map((meta) => meta.id);
-      channelMetaAdapter.removeMany(state.channelMetas, channelMetas);
       imageSeriesAdapter.removeOne(state.imageSeries, seriesId);
+      removeOrphanedChannelMetas(state);
     } else {
       const series = state.imageSeries.entities[seriesId];
       if (series && deletedIds.has(series.activeImageId)) {
@@ -993,6 +996,8 @@ export const dataSliceV2 = createSlice({
             | "rampMax"
             | "rampMinLimit"
             | "rampMaxLimit"
+            | "minValue"
+            | "maxValue"
           >
         >;
       }>,
@@ -1014,6 +1019,8 @@ export const dataSliceV2 = createSlice({
               | "rampMax"
               | "rampMinLimit"
               | "rampMaxLimit"
+              | "minValue"
+              | "maxValue"
             >
           >;
         }>

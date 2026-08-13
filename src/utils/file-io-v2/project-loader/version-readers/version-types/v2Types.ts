@@ -89,7 +89,6 @@ export type V2Channel = {
 export type V2ChannelMeta = {
   id: string;
   name: string;
-  seriesId: string;
   bitDepth: BitDepth;
   colorMap: ColorMap;
   visible: boolean;
