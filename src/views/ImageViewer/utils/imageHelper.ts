@@ -1,7 +1,10 @@
 import IJSImage from "image-js";
 
-import type { DataArray } from "store/data/types";
-import type { BBox, ExtendedAnnotationObject } from "store/dataV2/types";
+import type {
+  DataArray,
+  BBox,
+  ExtendedAnnotationObject,
+} from "store/dataV2/types";
 
 import { logger } from "utils/logUtils";
 import type { Point } from "utils/types";

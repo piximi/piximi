@@ -4,9 +4,9 @@ import type { Shape, ShapeArray } from "store/dataV2/types";
 
 import { logger } from "utils/logUtils";
 import { arrayRange } from "utils/arrayUtils";
-import { validateModelMetadata } from "utils/file-io/runtime/validators";
 import type { RequireOnly } from "utils/types";
 
+import { validateModelMetadata } from "./validateModelMetadata";
 import { SequentialClassifier } from "./AbstractClassifier";
 import { createCompileArgs, getDefaultModelInfo } from "../utils";
 import { convertArrayToShape } from "../../utils";

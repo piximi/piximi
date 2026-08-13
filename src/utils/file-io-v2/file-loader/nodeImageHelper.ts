@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
-import { MIMEType } from "./types";
+
+import type { MimeType } from "./types";
 
 /*
  Receives a file path to an image file relative to "src", retrieved via path, eg:
@@ -32,7 +33,7 @@ import { MIMEType } from "./types";
 */
 export const fileFromPath = async (
   imPath: string,
-  mimetype: MIMEType,
+  mimetype: MimeType,
   url: boolean = false,
   name: string | undefined = undefined,
 ) => {

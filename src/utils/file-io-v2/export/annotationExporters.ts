@@ -2,9 +2,9 @@ import { merge } from "lodash";
 
 import { decode } from "views/ImageViewer/utils";
 
-import type { BaseIFD } from "utils/file-io/tiff-io";
-import { TiffIO } from "utils/file-io/tiff-io";
-import { AnnotationExportType } from "utils/file-io/enums";
+import type { BaseIFD } from "utils/file-io-v2/tiff-io";
+import { TiffIO } from "utils/file-io-v2/tiff-io";
+import { AnnotationExportType } from "utils/file-io-v2/export/enums";
 
 import type { ExportedAnnotation } from "./types";
 import type JSZip from "jszip";

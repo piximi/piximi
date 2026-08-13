@@ -1,7 +1,7 @@
 import IJSImage from "image-js";
 
 import { logger } from "utils/logUtils";
-import { DataArray } from "store/data/types";
+import { DataArray } from "store/dataV2/types";
 import { Point } from "utils/types";
 import { pointsAreEqual } from "./point-operations";
 

@@ -1,11 +1,14 @@
 import createGraph from "ngraph.graph";
 
-import { NodeHeap, PiximiGraph } from "./NodeHeap";
+import { getIdx } from "views/ImageViewer/utils/imageHelper";
+import type { DataArray } from "store/dataV2/types";
+
+import type { Point } from "utils/types";
+
+import { NodeHeap } from "./NodeHeap";
 import { cachedAStarPathSearch } from "./PathFinder";
 
-import { getIdx } from "views/ImageViewer/utils/imageHelper";
-import { Point } from "utils/types";
-import { DataArray } from "store/data/types";
+import type { PiximiGraph } from "./NodeHeap";
 
 const validNeighbours = (
   x: number,
