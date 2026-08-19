@@ -9,13 +9,14 @@ import { measurementsSlice } from "@MeasurementViewer/state";
 import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";
 import { getCustomTreeItem } from "@MeasurementViewer/components/CustomTreeItem";
 import { OBJ_MEAS_LOOKUP } from "store/data/utils";
+import type { FeatureKey } from "store/data/types";
+import { OBJECT_FEATURES } from "store/data/types";
 
 import { getDifferences } from "utils/arrayUtils";
 import { formatString } from "utils/stringUtils";
 
 import type { CustomTreeViewBaseItem } from "@MeasurementViewer/components/CustomTreeItem";
 import type { ObjectMeasurementGroup } from "@MeasurementViewer/types";
-import { FeatureKey, OBJECT_FEATURES } from "store/data/types";
 
 const computedMeasurementItems: CustomTreeViewBaseItem[] = [
   {
@@ -34,10 +35,8 @@ const selectionPropagation = { parents: true, descendants: true };
 
 export const ComputedObjectMeasurementOptions = ({
   group,
-  onSelect,
 }: {
   group: ObjectMeasurementGroup;
-  onSelect: (itemIds: string[]) => void;
 }) => {
   const dispatch = useDispatch();
 
@@ -56,7 +55,12 @@ export const ComputedObjectMeasurementOptions = ({
     const changes = getDifferences(selectedItems, onlyMeasurements);
 
     if (changes.added.length > 0) {
-      onSelect(changes.added);
+      dispatch(
+        measurementsSlice.actions.addObjectComputedMeasurements({
+          groupId: group.id,
+          measurements: changes.added as FeatureKey[],
+        }),
+      );
     }
     // Immediately remove deselected measurements
     if (changes.removed.length > 0)

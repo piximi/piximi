@@ -32,4 +32,4 @@ export const StyledRichTreeView = styled(RichTreeView)(() => ({
       backgroundColor: "transparent",
     },
   },
-}));
+})) as typeof RichTreeView;

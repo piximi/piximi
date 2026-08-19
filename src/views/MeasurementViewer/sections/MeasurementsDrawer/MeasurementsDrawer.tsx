@@ -68,7 +68,7 @@ export const MeasurementsDrawer = () => {
             }}
           >
             {activeTable ? (
-              <MeasurementSelection table={activeTable} />
+              <MeasurementSelection group={activeTable} />
             ) : (
               <Typography
                 variant="body2"

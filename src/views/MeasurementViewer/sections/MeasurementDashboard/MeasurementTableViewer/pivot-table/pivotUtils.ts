@@ -1,16 +1,18 @@
 import type { GridColDef, GridColumnGroup } from "@mui/x-data-grid";
 
 import type {
-  ImageEntityMeasurementGroup,
-  ObjectEntityMeasurementGroup,
-  PivotItem,
-} from "@MeasurementViewer/types";
-import {
   ExtendedAnnotationObject,
   ExtendedImageObject,
   Category,
 } from "store/data/types";
+
 import { computeStatistics } from "utils/measurements/statistics";
+
+import type {
+  ImageEntityMeasurementGroup,
+  ObjectEntityMeasurementGroup,
+  PivotItem,
+} from "@MeasurementViewer/types";
 
 // ============================================================================
 // TYPES

@@ -1,7 +1,7 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
-import { ImageMeasurementOptions } from "./measurement-selection-options/ImageMeasurementOptions";
-import { ObjectMeasurementOptions } from "./measurement-selection-options/ObjectMeasurementOptions";
+import { ComputedObjectMeasurementOptions } from "./measurement-selection-options/ComputedObjectMeasurements";
+import { IntensityMeasurementOptions } from "./measurement-selection-options/IntensityMeasurementOptions";
 
 import type {
   ImageMeasurementGroup,
@@ -9,22 +9,36 @@ import type {
 } from "@MeasurementViewer/types";
 
 export const MeasurementSelection = ({
-  table,
+  group,
 }: {
-  table: ObjectMeasurementGroup | ImageMeasurementGroup;
+  group: ObjectMeasurementGroup | ImageMeasurementGroup;
 }) => {
+  const isObjectGroup = "kind" in group;
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
+        borderTop: "1px solid var(--mui-palette-divider)",
       }}
     >
-      {!("kind" in table) ? (
-        <ImageMeasurementOptions group={table} />
-      ) : (
-        <ObjectMeasurementOptions group={table} />
-      )}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          borderBottom: "1px solid var(--mui-palette-divider)",
+          p: 1,
+        }}
+      >
+        <Typography sx={{ fontSize: "0.825rem", textAlign: "center" }}>
+          Select measurements to display for{" "}
+          <span style={{ fontWeight: "bold" }}>
+            {isObjectGroup ? group.name + " objects" : "images"}
+          </span>
+        </Typography>
+      </Box>
+      {isObjectGroup && <ComputedObjectMeasurementOptions group={group} />}
+      <IntensityMeasurementOptions group={group} />
     </Box>
   );
 };

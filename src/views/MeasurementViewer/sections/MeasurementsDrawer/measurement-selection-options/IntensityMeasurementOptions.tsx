@@ -10,6 +10,8 @@ import { measurementsSlice } from "@MeasurementViewer/state";
 import { toChannelMeasurementLabel } from "@MeasurementViewer/utils";
 import { getCustomTreeItem } from "@MeasurementViewer/components/CustomTreeItem";
 import { INTENSE_MEAS_LOOKUP } from "store/data/utils";
+import { CHANNEL_MEASUREMENTS } from "store/data/types";
+import { selectAllChannelMetas } from "store/data/selectors";
 
 import { getDifferences } from "utils/arrayUtils";
 
@@ -18,16 +20,12 @@ import type {
   ImageMeasurementGroup,
   ObjectMeasurementGroup,
 } from "@MeasurementViewer/types";
-import { CHANNEL_MEASUREMENTS } from "store/data/types";
-import { selectAllChannelMetas } from "store/data/selectors";
 
 const selectionPropagation = { parents: true, descendants: true };
 export const IntensityMeasurementOptions = ({
   group,
-  onSelect,
 }: {
   group: ObjectMeasurementGroup | ImageMeasurementGroup;
-  onSelect: (itemIds: string[]) => void;
 }) => {
   const dispatch = useDispatch();
   const channelMetas = useSelector(selectAllChannelMetas);
@@ -65,7 +63,12 @@ export const IntensityMeasurementOptions = ({
     const changes = getDifferences(selectedItems, newSelectedItems);
 
     if (changes.added.length > 0) {
-      onSelect(changes.added);
+      dispatch(
+        measurementsSlice.actions.addIntensityMeasurements({
+          groupId: group.id,
+          measurements: changes.added,
+        }),
+      );
     }
     // Immediately remove deselected measurements
     if (changes.removed.length > 0) {
