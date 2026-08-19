@@ -2,7 +2,7 @@ import JSZip from "jszip";
 import { openGroup } from "zarr";
 import { clean, eq, lt, lte, valid } from "semver";
 
-import type { CancelToken } from "utils/worker-scheduler/types";
+import type { CancelToken } from "utils/workers/types";
 import type { ExtractedModelFileMap } from "utils/dl/types";
 import { logger } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";

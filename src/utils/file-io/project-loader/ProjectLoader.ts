@@ -10,7 +10,7 @@ import type {
 import type { Progress, TaskError } from "utils/types";
 import { INITIAL_PROGRESS } from "utils/types";
 import { DataConnector } from "utils/data-connector";
-import type { CancelToken } from "utils/worker-scheduler/types";
+import type { CancelToken } from "utils/workers/types";
 import type { StorageInput } from "utils/data-connector/types";
 import { STORES } from "utils/data-connector/types";
 import { logger, parseError } from "utils/logUtils";

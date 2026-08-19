@@ -9,7 +9,7 @@ import type {
 
 import type { Progress, TaskError } from "utils/types";
 import { DataConnector } from "utils/data-connector";
-import type { CancelToken } from "utils/worker-scheduler/types";
+import type { CancelToken } from "utils/workers/types";
 import { parseError } from "utils/logUtils";
 import { STORES } from "utils/data-connector/types";
 

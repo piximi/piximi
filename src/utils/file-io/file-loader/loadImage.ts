@@ -1,4 +1,4 @@
-import type { CancelToken } from "utils/worker-scheduler/types";
+import type { CancelToken } from "utils/workers/types";
 
 import { getReader } from "./readers";
 import {

@@ -1,22 +1,25 @@
 import React, { useEffect } from "react";
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useSelector } from "react-redux";
+
 import { CssBaseline } from "@mui/material";
 import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 
 import { usePreferredMuiTheme } from "hooks";
 
+import { AlertBar, TaskProgressToasts } from "components/ui";
+
 import { ProjectViewer } from "views/ProjectViewer";
 import { ImageViewer } from "views/ImageViewer";
 import { MeasurementView } from "views/MeasurementViewer";
-import { WelcomeScreen } from "./views/WelcomeScreen";
-
 import { HelpProvider } from "contexts";
 import HelpOverlay from "views/HelpOverlay";
-import { useSelector } from "react-redux";
 import { selectAlertState } from "store/applicationSettings/selectors";
-import { AlertBar, TaskProgressToasts } from "components/ui";
-import { SchedulerProvider } from "contexts/worker-scheduler";
+
 import { DataConnector } from "utils/data-connector";
+
+import { WelcomeScreen } from "./views/WelcomeScreen";
 
 export const Application = () => {
   const theme = usePreferredMuiTheme();
@@ -37,21 +40,19 @@ export const Application = () => {
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <SchedulerProvider>
-          <HelpProvider>
-            <HelpOverlay />
-            {alertState.visible && <AlertBar alertState={alertState} />}
-            <TaskProgressToasts />
-            <BrowserRouter basename={"/"}>
-              <Routes>
-                <Route path="/" element={<WelcomeScreen />} />
-                <Route path="project" element={<ProjectViewer />} />
-                <Route path="imageviewer" element={<ImageViewer />} />
-                <Route path="measurements" element={<MeasurementView />} />
-              </Routes>
-            </BrowserRouter>
-          </HelpProvider>
-        </SchedulerProvider>
+        <HelpProvider>
+          <HelpOverlay />
+          {alertState.visible && <AlertBar alertState={alertState} />}
+          <TaskProgressToasts />
+          <BrowserRouter basename={"/"}>
+            <Routes>
+              <Route path="/" element={<WelcomeScreen />} />
+              <Route path="project" element={<ProjectViewer />} />
+              <Route path="imageviewer" element={<ImageViewer />} />
+              <Route path="measurements" element={<MeasurementView />} />
+            </Routes>
+          </BrowserRouter>
+        </HelpProvider>
       </ThemeProvider>
     </StyledEngineProvider>
   );
