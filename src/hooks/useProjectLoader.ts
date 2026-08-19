@@ -1,17 +1,19 @@
-import { useScheduler } from "contexts/worker-scheduler";
 import { useCallback, useState } from "react";
+
 import { batch, useDispatch } from "react-redux";
+
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
-import { AppTask } from "store/appTasks/types";
+import type { AppTask } from "store/appTasks/types";
 import { classifierSlice } from "store/classifier";
 import { generateUUID } from "store/data/utils";
 import { dataSlice } from "store/data";
 import { projectSlice } from "@ProjectViewer/state";
+import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+
 import { AlertType } from "utils/enums";
 import { ProjectLoader } from "utils/file-io/project-loader/ProjectLoader";
-import { AlertState } from "utils/types";
-import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+import type { AlertState } from "utils/types";
 import { clearCache } from "utils/renderedSrcsCache";
 
 type UseProjectLoaderReturn = {
@@ -28,7 +30,6 @@ type UseProjectLoaderReturn = {
  */
 export function useProjectLoader(): UseProjectLoaderReturn {
   const dispatch = useDispatch();
-  const scheduler = useScheduler();
   const [isLoading, setIsLoading] = useState(false);
 
   const loadProject = useCallback(
@@ -61,7 +62,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
 
       let projectLoader: ProjectLoader;
       try {
-        projectLoader = new ProjectLoader(scheduler);
+        projectLoader = new ProjectLoader();
         taskCancelRegistry.register(taskId, () => projectLoader.cancel());
       } catch (err) {
         dispatch(
@@ -138,7 +139,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
         setIsLoading(false);
       }
     },
-    [dispatch, scheduler],
+    [dispatch],
   );
   const loadExample = useCallback(
     async (examplePath: string, projectName: string): Promise<void> => {
@@ -155,7 +156,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
       dispatch(appTasksSlice.actions.taskRegistered(newTask));
       let projectLoader: ProjectLoader;
       try {
-        projectLoader = new ProjectLoader(scheduler);
+        projectLoader = new ProjectLoader();
         taskCancelRegistry.register(taskId, () => projectLoader.cancel());
       } catch (err) {
         dispatch(
@@ -181,7 +182,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
           });
         // 1. Run the pipeline (workers + IndexDB)
 
-        projectLoader = new ProjectLoader(scheduler);
+        projectLoader = new ProjectLoader();
         taskCancelRegistry.register(taskId, () => projectLoader.cancel());
         projectLoader.onProgress((progress) => {
           dispatch(
@@ -246,7 +247,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
         setIsLoading(false);
       }
     },
-    [dispatch, scheduler],
+    [dispatch],
   );
 
   return {

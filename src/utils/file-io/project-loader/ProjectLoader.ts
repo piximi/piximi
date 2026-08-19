@@ -1,3 +1,5 @@
+import * as Comlink from "comlink";
+
 import type {
   AnnotationObject,
   ChannelMeta,
@@ -7,10 +9,8 @@ import type {
 
 import type { Progress, TaskError } from "utils/types";
 import { INITIAL_PROGRESS } from "utils/types";
-import type { WorkerScheduler } from "utils/worker-scheduler";
 import { DataConnector } from "utils/data-connector";
-import type { TaskHandle } from "utils/worker-scheduler/types";
-import { TaskPriority } from "utils/worker-scheduler/types";
+import type { CancelToken } from "utils/worker-scheduler/types";
 import type { StorageInput } from "utils/data-connector/types";
 import { STORES } from "utils/data-connector/types";
 import { logger, parseError } from "utils/logUtils";
@@ -22,6 +22,7 @@ import type {
   DeserializedProject,
   DeserializedProjectResult,
   IProjectLoader,
+  LoadProjectInput,
   LoadProjectOutput,
   UploadStage,
 } from "./types";
@@ -31,6 +32,17 @@ const STAGES = {
   storeChannels: { start: 0.75, end: 0.8 },
   registerModels: { start: 0.8, end: 1 },
 } as const;
+
+type OnProgressCallback<TExtra = object> = (
+  args: { value: number } & TExtra,
+) => void;
+interface LoadImageWorkerAPI {
+  loadProject(
+    payload: LoadProjectInput,
+    cancelToken: CancelToken,
+    onProgress: OnProgressCallback<object>,
+  ): Promise<LoadProjectOutput>;
+}
 /**
  * ProjectSerializationService
  *
@@ -48,14 +60,12 @@ const STAGES = {
  *   }, onProgress);
  */
 export class ProjectLoader implements IProjectLoader {
-  private scheduler: WorkerScheduler;
   private storage: DataConnector;
   private progress: Progress = { ...INITIAL_PROGRESS };
   private progressListeners: Set<(progress: Progress) => void> = new Set();
   private abortController: AbortController | null = null;
 
-  constructor(scheduler: WorkerScheduler) {
-    this.scheduler = scheduler;
+  constructor() {
     this.storage = DataConnector.getInstance();
   }
   // ============================================================
@@ -63,9 +73,28 @@ export class ProjectLoader implements IProjectLoader {
   // ============================================================
 
   async uploadProject(files: File[]): Promise<DeserializedProjectResult> {
-    const handle = this.dispatchProject(files);
+    const worker = new Worker(
+      new URL("./worker/loadProjectWorker.ts", import.meta.url),
+      { type: "module" },
+    );
+    const proxy = Comlink.wrap<LoadImageWorkerAPI>(worker);
+    const abortController = this.abortController;
     try {
-      const { project: v2Raw, modelFiles } = await handle.promise;
+      // const { project: v2Raw, modelFiles } = await handle.promise;
+      const { project: v2Raw, modelFiles } = await proxy.loadProject(
+        { files },
+        {
+          get cancelled() {
+            return abortController?.signal.aborted ?? false;
+          },
+        },
+        Comlink.proxy(({ value }) => {
+          this.updateProgress({
+            overallProgress: STAGES.loadProject.end * value,
+            stageProgress: value,
+          });
+        }),
+      );
 
       this.updateProgress({ stageProgress: 0 });
       const channels = await this.storeChannels(v2Raw.data.channels.entities);
@@ -109,21 +138,6 @@ export class ProjectLoader implements IProjectLoader {
     } catch (e) {
       return { success: false, cancelled: false, error: parseError(e) };
     }
-  }
-
-  dispatchProject(files: File[]): TaskHandle<LoadProjectOutput> {
-    const handle = this.scheduler.dispatch({
-      type: "loadProject",
-      payload: { files },
-      priority: TaskPriority.HIGH,
-      onProgress: ({ value }) => {
-        this.updateProgress({
-          overallProgress: STAGES.loadProject.end * value,
-          stageProgress: value,
-        });
-      },
-    });
-    return handle;
   }
 
   private async storeChannels(
@@ -223,7 +237,6 @@ export class ProjectLoader implements IProjectLoader {
   cancel(): void {
     if (this.abortController) {
       this.abortController.abort();
-      this.scheduler.cancelAll();
       this.updateProgress({ stage: "cancelled" });
     }
   }
