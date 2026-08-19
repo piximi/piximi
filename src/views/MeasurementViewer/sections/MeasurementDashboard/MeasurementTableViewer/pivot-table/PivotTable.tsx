@@ -12,7 +12,6 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { selectActivePivotItems } from "@MeasurementViewer/state/selectors";
 import { selectActiveMeasuredEntitiesGroup } from "@MeasurementViewer/state/reselectors";
 import { parseChannelMeasurementLabel } from "@MeasurementViewer/utils";
-
 import { selectCategoryEntities } from "store/data/selectors";
 import type { FeatureKey } from "store/data/types";
 import { CHANNEL_MEASUREMENTS } from "store/data/types";
@@ -66,10 +65,22 @@ const createMeasurementGetters = (
       key: measurementLabel,
       label: measurementLabel,
       getValue: (entity: EntityWithMeasurements) => {
-        if ("kindId" in entity) return undefined;
         const channelData = entity.channelsRef.find(
           (c) => c.name === channelId,
         );
+        if (!channelData) return;
+
+        if ("kindId" in entity) {
+          const value =
+            entity.intensityMeasurements?.[channelData!.id]?.[measurement];
+          if (isNaN(value!)) {
+            console.warn(
+              `annotation ${entity.id} has an invalid value for ${measurement}`,
+            );
+            return 0;
+          }
+          return entity.intensityMeasurements?.[channelData!.id]?.[measurement];
+        }
         return channelData?.[measurement];
       },
     });
