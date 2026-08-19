@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 
-import { LogoLoader } from "components/ui";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { LogoIcon } from "components/ui/Logo";
 
 export const MeasurementsLogo = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ export const MeasurementsLogo = () => {
   };
 
   return (
-    <Box sx={{ pl: 1, display: "flex", alignItems: "center" }}>
+    <Box sx={{ pl: 1, display: "flex", alignItems: "center", gap: 1 }}>
       <Tooltip title="Return to project" placement="bottom">
         <IconButton
           data-help={HelpItem.NavigateProjectView}
@@ -26,7 +26,7 @@ export const MeasurementsLogo = () => {
           <ArrowBack />
         </IconButton>
       </Tooltip>
-      <LogoLoader width={24} height={24} loadPercent={1} fullLogo={false} />
+      <LogoIcon width={24} height={24} />
       <Typography variant="h5" color={"#02aec5"} fontSize="1.4rem">
         Measurements
       </Typography>
