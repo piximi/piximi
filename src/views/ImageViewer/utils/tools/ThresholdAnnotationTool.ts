@@ -5,11 +5,15 @@ import { AnnotationTool } from "./AnnotationTool";
 
 export class ThresholdAnnotationTool extends AnnotationTool {
   threshold = 255;
+  invert = false;
   width?: number;
   height?: number;
 
-  updateMask(threshold: number) {
-    this.threshold = Math.round(threshold);
+  updateMask(threshold?: number, invert?: boolean) {
+    if (!threshold && invert === undefined) return;
+    if (threshold !== undefined) this.threshold = Math.round(threshold);
+    if (invert !== undefined) this.invert = invert;
+
     if (this.decodedMask) {
       if (!this._boundingBox) return;
 
@@ -95,10 +99,8 @@ export class ThresholdAnnotationTool extends AnnotationTool {
     }
 
     const image = this.image;
-    const greyMask = image.grey();
-
-    const binaryMask = greyMask.getRawImage().data as Uint8Array;
-
+    const greyMask = this.invert ? image.grey().invert() : image.grey();
+    const maskData = greyMask.getRawImage().data as Uint8Array;
     const thresholdMask = new Uint8Array(width * height);
 
     for (let i = 0; i < height; i++) {
@@ -106,8 +108,14 @@ export class ThresholdAnnotationTool extends AnnotationTool {
         const imgY = y1 + i;
         const imgX = x1 + j;
         const imgIdx = imgY * this.image.width + imgX;
-        if (binaryMask[imgIdx] > this.threshold) {
-          thresholdMask[i * width + j] = 255;
+        if (this.invert) {
+          if (maskData[imgIdx] > 255 - this.threshold) {
+            thresholdMask[i * width + j] = 255;
+          }
+        } else {
+          if (maskData[imgIdx] > this.threshold) {
+            thresholdMask[i * width + j] = 255;
+          }
         }
       }
     }
