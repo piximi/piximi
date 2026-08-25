@@ -2,7 +2,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { useHotkeys } from "hooks";
 
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { ToolType } from "views/ImageViewer/utils/enums";
 import {
