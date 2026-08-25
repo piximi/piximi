@@ -14,7 +14,7 @@ export const SideToolBar = () => {
         gridArea: "side-tools",
         position: "relative",
         width: DIMENSIONS.toolDrawerWidth,
-        zIndex: 1002,
+        zIndex: 1,
       }}
     >
       <ToolOptions />

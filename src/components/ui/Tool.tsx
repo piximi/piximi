@@ -1,20 +1,13 @@
-import React, { useEffect, useMemo } from "react";
+import type { ReactElement } from "react";
+import type React from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import {
-  Box,
-  Divider,
-  IconButton,
-  Popover,
-  Popper,
-  Tooltip,
-  useTheme,
-} from "@mui/material";
-import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
+import { Box, IconButton, Tooltip } from "@mui/material";
+import { KeyboardArrowLeft } from "@mui/icons-material";
+
 import { ToolHotkeyTitle } from "components/ui/tooltips";
-import { IncrementalSlider } from "components/inputs";
-import { useMenu } from "hooks";
-import { SliderOptions } from "utils/types";
-import { HTMLDataAttributes } from "utils/types";
+
+import type { HTMLDataAttributes } from "utils/types";
 
 type ToolProps = HTMLDataAttributes & {
   children: React.ReactNode;
@@ -62,26 +55,23 @@ export const Tool = ({
     </Box>
   );
 };
-export const ResizableTool = ({
-  children,
+
+export const PopoverTool = ({
   name,
   onClick: handleClick,
   disabled = false,
   tooltipLocation = "bottom",
   selected,
-  callback,
-  toolLimits = { min: 1, max: 10, step: 1, initial: 1 },
-  callbackOnSlide,
   onClickOpen,
-}: ToolProps & {
+  PopoverComponent,
+  icon,
+}: Omit<ToolProps, "children"> & {
   selected?: boolean;
-  callback: (value: number) => void;
-  toolLimits: SliderOptions;
-  callbackOnSlide?: boolean;
   onClickOpen?: boolean;
+  PopoverComponent: ReactElement;
+  icon: ReactElement;
 }) => {
-  const { anchorEl, onClose, onOpen, open } = useMenu();
-  const theme = useTheme();
+  const [optionsOpen, setOptionsOpen] = useState(false);
 
   const description = useMemo(
     () => <ToolHotkeyTitle toolName={name} />,
@@ -90,19 +80,22 @@ export const ResizableTool = ({
 
   useEffect(() => {
     if (!selected) {
-      onClose();
+      setOptionsOpen(false);
     }
-  }, [selected, onClose]);
+  }, [selected]);
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
+        position: "relative",
         display: "flex",
         flexDirection: "row-reverse",
-        position: "relative",
         overflowY: "visible",
         zIndex: "inherit",
-      }}
+        "& > *": {
+          transition: theme.transitions.create("all"),
+        },
+      })}
     >
       <Tooltip
         sx={{ zIndex: 1001 }}
@@ -113,9 +106,11 @@ export const ResizableTool = ({
         <span>
           <IconButton
             disabled={disabled}
-            onClick={(event) => {
+            onClick={() => {
               handleClick();
-              onClickOpen && onOpen(event);
+              if (onClickOpen && selected) {
+                setOptionsOpen((v) => !v);
+              }
             }}
             sx={{
               zIndex: 1001,
@@ -123,129 +118,53 @@ export const ResizableTool = ({
             }}
             size="small"
           >
-            {children}
+            {icon}
           </IconButton>
         </span>
       </Tooltip>
+
       {selected && (
-        <IconButton
-          sx={{
-            bgcolor: "background.paper",
-            pr: 0,
-            pl: 0.5,
-            borderRadius: "4px 0 0 4px",
-            border: `1px solid ${theme.palette.divider}`,
-            borderRight: "none",
-            "&:hover": {
-              bgcolor: "background.paper",
-            },
-          }}
-          onClick={(event) => {
-            onOpen(event.currentTarget.parentElement!);
-          }}
-        >
-          <KeyboardArrowLeft
-            sx={{ fontSize: "0.75rem", mx: "auto", lineHeight: "0.75rem" }}
-          />
-        </IconButton>
-      )}
-      <Popper
-        open={open}
-        anchorEl={anchorEl}
-        disablePortal
-        placement={tooltipLocation}
-        sx={{
-          bgcolor: "background.paper",
-          borderRadius: "8px",
-          border: `1px solid ${theme.palette.divider}`,
-        }}
-      >
         <Box
           sx={{
+            background: "transparent",
             display: "flex",
-            flexDirection: "column",
+            alignItems: "center",
+            position: "absolute",
+            right: "100%",
+            top: "50%",
+            transform: `translateY(-50%) translateX(${optionsOpen ? "-8px" : "calc(100% - 16px)"})`,
+            zIndex: -1,
           }}
         >
-          <IncrementalSlider
-            min={toolLimits.min}
-            max={toolLimits.max}
-            step={toolLimits.step}
-            initialValue={toolLimits.initial}
-            callback={callback}
-            orientation="vertical"
-            length="100px"
-            callbackOnSlide={callbackOnSlide}
-          />
-          <Divider />
           <IconButton
-            onClick={onClose}
-            sx={{ p: 0.5, borderRadius: "0 0 8px 8px" }}
-          >
-            <KeyboardArrowRight
-              sx={{ fontSize: "1rem", lineHeight: "0.75rem" }}
-            />
-          </IconButton>
-        </Box>
-      </Popper>
-    </Box>
-  );
-};
-
-export const PopoverTool = ({
-  children,
-  name,
-  tooltipLocation = "bottom",
-  popoverElement,
-  disabled,
-}: Omit<ToolProps, "onClick"> & {
-  popoverElement?: React.ReactNode;
-}) => {
-  const { anchorEl, onClose, onOpen, open } = useMenu();
-
-  const description = useMemo(
-    () => <ToolHotkeyTitle toolName={name} />,
-    [name],
-  );
-
-  return (
-    <Box sx={{}}>
-      <Tooltip
-        sx={{ zIndex: 1001 }}
-        title={description}
-        placement={tooltipLocation}
-        disableInteractive
-      >
-        <span>
-          <IconButton
-            onClick={!open ? onOpen : onClose}
             sx={{
               bgcolor: "background.paper",
-              zIndex: 1001,
+              pr: 0,
+              pl: 0.5,
+              width: "16px",
+              borderRadius: "4px 0 0 4px",
+              "&:hover": {
+                bgcolor: "background.paper",
+              },
             }}
-            disabled={disabled}
-            size="small"
+            onClick={() => {
+              setOptionsOpen((v) => !v);
+            }}
           >
-            {children}
+            <KeyboardArrowLeft
+              sx={{
+                fontSize: "0.75rem",
+                mx: "auto",
+                lineHeight: "0.75rem",
+                transform: `rotate(${optionsOpen ? 180 : 0}deg)`,
+              }}
+            />
           </IconButton>
-        </span>
-      </Tooltip>
-
-      <Popover
-        open={open}
-        anchorEl={anchorEl}
-        onClose={onClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-        slotProps={{ paper: { sx: { overflow: "visible" } } }}
-      >
-        {popoverElement}
-      </Popover>
+          <Box sx={{ bgcolor: "background.paper", borderRadius: "8px" }}>
+            {PopoverComponent}
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 };
