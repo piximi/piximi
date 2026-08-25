@@ -18,6 +18,7 @@ const initialState: AnnotatorState = {
   penSelectionBrushSize: 10,
   quickSelectionRegionSize: 40,
   thresholdAnnotationValue: 150,
+  invertThresholdAnnotation: false,
   annotationMode: AnnotationMode.New,
   pendingTargetIds: [],
   toolType: ToolType.RectangularAnnotation,
@@ -99,6 +100,9 @@ export const annotatorSlice = createSlice({
       action: PayloadAction<{ thresholdAnnotationValue: number }>,
     ) {
       state.thresholdAnnotationValue = action.payload.thresholdAnnotationValue;
+    },
+    setInvertThresholdAnnotation(state, action: PayloadAction<boolean>) {
+      state.invertThresholdAnnotation = action.payload;
     },
   },
 });

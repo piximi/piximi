@@ -43,6 +43,13 @@ export const selectThresholdAnnotationValue = ({
 }) => {
   return annotator.thresholdAnnotationValue;
 };
+export const selectInvertThresholdAnnotation = ({
+  annotator,
+}: {
+  annotator: AnnotatorState;
+}) => {
+  return annotator.invertThresholdAnnotation;
+};
 
 export const selectToolType = ({
   annotator,

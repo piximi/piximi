@@ -37,6 +37,7 @@ export type AnnotatorState = {
   penSelectionBrushSize: number;
   quickSelectionRegionSize: number;
   thresholdAnnotationValue: number;
+  invertThresholdAnnotation: boolean;
   annotationMode: AnnotationMode;
   /**
    * The annotation a stroke operation targets, once picked. Left undefined when
