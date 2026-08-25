@@ -9,7 +9,6 @@ export const LeftDrawer = ({ color }: { color: string }) => {
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <title>Left Drawer</title>
       <g
         id="left-drawer"
         stroke="none"

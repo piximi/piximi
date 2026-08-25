@@ -9,7 +9,6 @@ export const Zoom = ({ color }: { color: string }) => {
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <title>Zoom</title>
       <g id="Zoom" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
         <g id="Path" transform="translate(-0.000000, -0.000000)">
           <polygon points="0 0 24.0000001 0 24.0000001 24.0000001 0 24.0000001"></polygon>
@@ -53,7 +52,6 @@ export const CursorZoom = ({
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <title>cursor-zoom</title>
       <g id="Zoom" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
         <g id="Path" transform="translate(-0.000000, -0.000000)">
           <polygon points="0 0 24.0000001 0 24.0000001 24.0000001 0 24.0000001"></polygon>
@@ -104,7 +102,6 @@ export const StageZoom = ({
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <title>stage-zoom</title>
       <g id="Zoom" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
         <g id="Path" transform="translate(-0.000000, -0.000000)">
           <polygon points="0 0 24.0000001 0 24.0000001 24.0000001 0 24.0000001"></polygon>

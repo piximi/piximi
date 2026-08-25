@@ -9,7 +9,6 @@ export const RectangleAnnotation = ({ color }: { color: string }) => {
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <title>Rectangular selection</title>
       <g
         id="Rectangular-selection"
         stroke="none"
