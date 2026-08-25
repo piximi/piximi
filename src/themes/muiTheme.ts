@@ -1,4 +1,5 @@
-import { createTheme, ThemeOptions } from "@mui/material/styles";
+import type { ThemeOptions } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
 
 declare module "@mui/material/styles" {
   interface CssThemeVariables {
@@ -36,6 +37,17 @@ const sharedComponentThemes: ThemeOptions["components"] = {
     styleOverrides: {
       root: {
         minWidth: 36,
+      },
+    },
+  },
+  MuiTooltip: {
+    styleOverrides: {
+      tooltip: {
+        paddingBlock: "2px",
+        paddingInline: "4px",
+        backgroundColor: "var(--mui-palette-background-paper)",
+        border: "1px solid var(--mui-palette-text-primary)",
+        color: "var(--mui-palette-text-primary)",
       },
     },
   },
