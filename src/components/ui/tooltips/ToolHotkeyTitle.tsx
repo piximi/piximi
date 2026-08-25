@@ -1,4 +1,5 @@
 import React from "react";
+
 import { Box, Typography } from "@mui/material";
 
 import { KeyboardKey } from "components/ui/KeyboardKey";
@@ -15,10 +16,7 @@ export const ToolHotkeyTitle = ({
 }: ToolHotkeyTitleProps) => {
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
-      <Typography
-        fontWeight={bold ? "fontWeightBold" : ""}
-        fontSize={"0.875rem"}
-      >
+      <Typography fontWeight={bold ? "fontWeightBold" : ""} fontSize={"0.7rem"}>
         {toolName}
       </Typography>
       {letter && (
