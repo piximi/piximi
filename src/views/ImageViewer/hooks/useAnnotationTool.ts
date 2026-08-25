@@ -7,6 +7,7 @@ import {
   selectQuickSelectionRegionSize,
   selectToolType,
   selectThresholdAnnotationValue,
+  selectInvertThresholdAnnotation,
 } from "views/ImageViewer/state/annotator/selectors";
 import {
   ColorAnnotationTool,
@@ -37,6 +38,7 @@ export const useAnnotationTool = (ijsImage: IJSImage | null) => {
   const penSelectionBrushSize = useSelector(selectPenSelectionBrushSize);
   const quickSelectionRegionSize = useSelector(selectQuickSelectionRegionSize);
   const threshold = useSelector(selectThresholdAnnotationValue);
+  const invertThreshold = useSelector(selectInvertThresholdAnnotation);
 
   useEffect(() => {
     if (!ijsImage) return;
@@ -99,9 +101,9 @@ export const useAnnotationTool = (ijsImage: IJSImage | null) => {
 
   useEffect(() => {
     if (operator instanceof ThresholdAnnotationTool) {
-      operator.updateMask(threshold);
+      operator.updateMask(threshold, invertThreshold);
     }
-  }, [operator, threshold]);
+  }, [operator, threshold, invertThreshold]);
 
   useEffect(() => {
     if (operator instanceof QuickAnnotationTool) {
