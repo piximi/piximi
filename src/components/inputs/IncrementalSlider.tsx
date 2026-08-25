@@ -1,8 +1,10 @@
+import type { CSSProperties } from "react";
+import { useMemo, useRef, useState } from "react";
+
 import { Box, Divider, IconButton, Slider } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 
 import { DIMENSIONS } from "utils/constants";
-import { CSSProperties, useMemo, useRef, useState } from "react";
 
 type IncrementalSliderProps = {
   min: number;
@@ -27,9 +29,9 @@ export const IncrementalSlider = ({
   outerStyle,
 }: IncrementalSliderProps) => {
   const [value, setValue] = useState<number>(initialValue);
-  const [valueLabelDisplay, setvalueLabelDisplay] = useState<"auto" | "on">(
-    "auto",
-  );
+  const [valueLabelDisplay, setvalueLabelDisplay] = useState<
+    "auto" | "on" | "off"
+  >("auto");
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const sliderLength = useMemo(() => {
@@ -128,13 +130,32 @@ export const IncrementalSlider = ({
           if (callbackOnSlide) return;
           callback(value as number);
         }}
-        sx={{
+        sx={(theme) => ({
           " & .MuiSlider-thumb.Mui-focusVisible, .MuiSlider-thumb:hover": {
             boxShadow: "none",
           },
+          "& .MuiSlider-valueLabel": {
+            fontSize: 12,
+            paddingY: 0,
+            paddingX: 0.5,
+            fontWeight: "normal",
+            top: orientation === "vertical" ? 6 : -6,
+            backgroundColor: `rgba(${theme.palette.background.defaultChannel} / 0.75)`,
+            color: theme.palette.text.primary,
+            "&::before": {
+              display: "none",
+            },
+            "& *": {
+              background: "transparent",
+              color: "#000",
+              ...theme.applyStyles("dark", {
+                color: "#fff",
+              }),
+            },
+          },
 
           ...sliderStyle,
-        }}
+        })}
       />
       <Divider
         orientation={orientation === "horizontal" ? "vertical" : "horizontal"}
