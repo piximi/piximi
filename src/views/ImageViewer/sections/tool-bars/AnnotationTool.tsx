@@ -10,22 +10,22 @@ import { ToolHotkeyTitle } from "components/ui/tooltips";
 import type { HTMLDataAttributes } from "utils/types";
 
 type ToolProps = HTMLDataAttributes & {
-  children: React.ReactNode;
   name: string;
   onClick: () => void;
   disabled?: boolean;
   tooltipLocation?: "top" | "bottom" | "left" | "right";
   selected?: boolean;
+  icon: ReactElement;
 };
 
 //TODO: tool buttons
 
-export const Tool = ({
-  children,
+export const AnnotationTool = ({
   name,
   onClick: handleClick,
   disabled = false,
   tooltipLocation = "bottom",
+  icon,
   ...attributes
 }: ToolProps) => {
   const description = useMemo(
@@ -48,7 +48,7 @@ export const Tool = ({
             onClick={handleClick}
             {...attributes}
           >
-            {children}
+            {icon}
           </IconButton>
         </span>
       </Tooltip>
@@ -56,7 +56,7 @@ export const Tool = ({
   );
 };
 
-export const PopoverTool = ({
+export const PopoverAnnotationTool = ({
   name,
   onClick: handleClick,
   disabled = false,
@@ -65,11 +65,9 @@ export const PopoverTool = ({
   onClickOpen,
   PopoverComponent,
   icon,
-}: Omit<ToolProps, "children"> & {
-  selected?: boolean;
+}: ToolProps & {
   onClickOpen?: boolean;
   PopoverComponent: ReactElement;
-  icon: ReactElement;
 }) => {
   const [optionsOpen, setOptionsOpen] = useState(false);
 

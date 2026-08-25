@@ -18,4 +18,3 @@ export { KeyboardKey } from "./KeyboardKey";
 export { ListItemHoldButton } from "./ListItemHoldButton";
 export { Logo, LogoLoader } from "./Logo";
 export { ToolHotkeyTitle, TooltipCard, TooltipTitle } from "./tooltips";
-export { Tool, PopoverTool } from "./Tool";

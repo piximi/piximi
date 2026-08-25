@@ -1,5 +1,5 @@
-import { Tensor2D } from "@tensorflow/tfjs";
-import { AlertType } from "./enums";
+import type { Tensor2D } from "@tensorflow/tfjs";
+import type { AlertType } from "./enums";
 
 /*
 TYPESCRIPT TYPES
@@ -156,13 +156,6 @@ export type HotkeyOptions = {
 /*
 GENERAL
 */
-
-export type SliderOptions = {
-  min: number;
-  max: number;
-  step: number;
-  initial: number;
-};
 
 export type Point = {
   x: number;
