@@ -1,7 +1,7 @@
 import type React from "react";
 import { memo, useCallback, useState } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 
 import {
   Avatar,
@@ -31,6 +31,7 @@ import {
 } from "store/data/selectors";
 import type { ExtendedImageObject } from "store/data/types";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+import { annotatorSlice } from "@ImageViewer/state/annotator";
 
 import { ImageMenu } from "./ImageMenu";
 
@@ -66,7 +67,11 @@ export const ImageList = () => {
   const handleImageItemClick = useCallback(
     (image: ExtendedImageObject) => {
       if (image.id !== activeImageId!) {
-        dispatch(imageViewerDataSlice.actions.setActiveImageId(image.id));
+        batch(() => {
+          dispatch(imageViewerDataSlice.actions.setActiveImageId(image.id));
+          dispatch(annotatorSlice.actions.clearPendingOperation());
+          dispatch(annotatorSlice.actions.setWorkingAnnotation(undefined));
+        });
       }
     },
     [dispatch, activeImageId],
