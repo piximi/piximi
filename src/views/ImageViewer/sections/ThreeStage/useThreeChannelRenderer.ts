@@ -13,6 +13,7 @@ import type { BitDepth, ExtendedChannel } from "store/data/types";
 
 import compositeFrag from "./shaders/composite.frag?raw";
 import compositeThreeVert from "./shaders/composite-three.vert?raw";
+import { useThreeViewport } from "./ThreeViewportContext";
 
 const MAX_CHANNELS = 16;
 
@@ -96,11 +97,6 @@ const buildUniforms = (
 };
 
 export const useThreeChannelRenderer = (
-  sceneRef: React.RefObject<THREE.Scene | null>,
-  rendererRef: React.RefObject<THREE.WebGLRenderer | null>,
-  cameraRef: React.RefObject<THREE.OrthographicCamera | null>,
-  imageCamRef: React.RefObject<THREE.OrthographicCamera | null>,
-  imageTargetRef: React.RefObject<THREE.WebGLRenderTarget | null>,
   imageWidth: number,
   imageHeight: number,
 ) => {
@@ -111,10 +107,41 @@ export const useThreeChannelRenderer = (
     activeImageId ?? "",
   );
 
+  const { cameraRef, rendererRef, sceneRef } = useThreeViewport();
+
   const meshRef = useRef<THREE.Mesh | null>(null);
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
   const texRef = useRef<THREE.DataArrayTexture | null>(null);
+  const imageCamRef = useRef<THREE.OrthographicCamera | null>(null); // fixed camera for readback
 
+  const imageTargetRef = useRef<THREE.WebGLRenderTarget | null>(null);
+
+  // --- Image-sized camera + render target for IJSImage readback ---
+  useEffect(() => {
+    imageTargetRef.current = new THREE.WebGLRenderTarget(
+      imageWidth,
+      imageHeight,
+      {
+        format: THREE.RGBAFormat,
+        type: THREE.UnsignedByteType,
+      },
+    );
+
+    // Fixed orthographic camera that always frames the image exactly
+    imageCamRef.current = new THREE.OrthographicCamera(
+      -imageWidth / 2,
+      imageWidth / 2,
+      imageHeight / 2,
+      -imageHeight / 2,
+      0.1,
+      10,
+    );
+    imageCamRef.current.position.z = 1;
+
+    return () => {
+      imageTargetRef.current?.dispose();
+    };
+  }, [imageWidth, imageHeight]);
   // --- Init mesh + material when image dimensions change ---
   useEffect(() => {
     const scene = sceneRef.current;

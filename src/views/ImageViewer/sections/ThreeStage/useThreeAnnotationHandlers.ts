@@ -39,11 +39,13 @@ export const useThreeAnnotationHandlers = ({
   annotationTool,
   isPanningRef,
   onDrawTick,
+  onCursorChange,
 }: {
   mountRef: React.RefObject<HTMLDivElement | null>;
   annotationTool: AnnotationTool;
   isPanningRef: React.RefObject<boolean>;
   onDrawTick: () => void;
+  onCursorChange: (cursor: { point?: Point; oob: boolean }) => void;
 }) => {
   const dispatch = useDispatch();
   const toolType = useSelector(selectToolType);
@@ -90,6 +92,7 @@ export const useThreeAnnotationHandlers = ({
     pickTargetAt,
     deselectAllAnnotations,
     onDrawTick,
+    onCursorChange,
   });
   latest.current = {
     toolType,
@@ -103,12 +106,18 @@ export const useThreeAnnotationHandlers = ({
     pickTargetAt,
     deselectAllAnnotations,
     onDrawTick,
+    onCursorChange,
   };
 
   useEffect(() => {
     const el = mountRef.current;
     if (!el) return;
 
+    const applyCursor = (res: { point?: Point; oob: boolean }) => {
+      setAbsolutePosition(res.point);
+      setOutOfBounds(res.oob);
+      latest.current.onCursorChange?.(res);
+    };
     const pointFromEvent = (
       e: MouseEvent,
     ): { point: Point; oob: boolean } | null => {
@@ -127,8 +136,7 @@ export const useThreeAnnotationHandlers = ({
       if (skipTool(L.toolType)) return;
       const res = pointFromEvent(e);
       if (!res) return;
-      setAbsolutePosition(res.point);
-      setOutOfBounds(res.oob);
+      applyCursor(res);
 
       if (L.toolType === ToolType.Pointer) {
         L.onPointerMouseDown(res.point);
@@ -154,8 +162,7 @@ export const useThreeAnnotationHandlers = ({
       const L = latest.current;
       const res = pointFromEvent(e);
       if (!res) return;
-      setAbsolutePosition(res.point);
-      setOutOfBounds(res.oob);
+      applyCursor(res);
       if (skipTool(L.toolType)) return;
       if (L.toolType === ToolType.Pointer) {
         L.handlePointerMouseMove(res.point);

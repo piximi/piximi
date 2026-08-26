@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { imageViewerSlice } from "@ImageViewer/state/imageViewer";
 import { selectZoomToolOptions } from "@ImageViewer/state/imageViewer/selectors";
 
-import type * as THREE from "three";
+import { useThreeViewport } from "./ThreeViewportContext";
 
 const ZOOM_SPEED = 0.035;
 export const ZOOM_MIN = 0.25;
@@ -13,13 +13,13 @@ export const ZOOM_MAX = 5;
 
 export function useThreePanZoom(
   mountRef: React.RefObject<HTMLDivElement | null>,
-  cameraRef: React.RefObject<THREE.OrthographicCamera | null>,
-  rendererRef: React.RefObject<THREE.WebGLRenderer | null>,
-  sceneRef: React.RefObject<THREE.Scene | null>,
-  notifyCameraChanged?: () => void,
 ) {
   const dispatch = useDispatch();
   const { automaticCentering } = useSelector(selectZoomToolOptions);
+
+  const { cameraRef, rendererRef, sceneRef, notifyCameraChanged } =
+    useThreeViewport();
+
   const automaticCenteringRef = useRef(automaticCentering);
   const isPanningRef = useRef(false);
 

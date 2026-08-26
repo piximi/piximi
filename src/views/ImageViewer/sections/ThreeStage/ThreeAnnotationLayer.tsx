@@ -2,6 +2,8 @@ import { useCallback, useState } from "react";
 
 import { useAnnotationTool, useAnnotationState } from "views/ImageViewer/hooks";
 
+import type { Point } from "utils/types";
+
 import { useThreeViewport } from "./ThreeViewportContext";
 import { useThreeAnnotationHandlers } from "./useThreeAnnotationHandlers";
 import { useThreeAnnotationMeshes } from "./useThreeAnnotationMeshes";
@@ -23,6 +25,7 @@ export const ThreeAnnotationLayer = ({
   stageHeight,
   imageWidth,
   imageHeight,
+  onCursorChange,
 }: {
   mountRef: React.RefObject<HTMLDivElement | null>;
   isPanningRef: React.RefObject<boolean>;
@@ -31,6 +34,7 @@ export const ThreeAnnotationLayer = ({
   stageHeight: number;
   imageWidth: number;
   imageHeight: number;
+  onCursorChange: (cursor: { point?: Point; oob: boolean }) => void;
 }) => {
   const { sceneRef, requestRender } = useThreeViewport();
 
@@ -45,6 +49,7 @@ export const ThreeAnnotationLayer = ({
     annotationTool,
     isPanningRef,
     onDrawTick: bumpDrawTick,
+    onCursorChange,
   });
 
   useThreeAnnotationMeshes({
