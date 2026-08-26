@@ -46,9 +46,7 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
   const clearAnnotation = useCallback(() => {
     annotationTool.deselect();
     batch(() => {
-      dispatch(
-        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
-      );
+      dispatch(annotatorSlice.actions.setWorkingAnnotation(undefined));
       dispatch(annotatorSlice.actions.clearPendingOperation());
     });
   }, [annotationTool, dispatch]);

@@ -209,9 +209,9 @@ export const SelectionButtons = ({
 
   const handleModeSelection = (mode: AnnotationMode) => {
     dispatch(
-      annotatorSlice.actions.setAnnotationMode({
-        annotationMode: annotationMode === mode ? AnnotationMode.New : mode,
-      }),
+      annotatorSlice.actions.setAnnotationMode(
+        annotationMode === mode ? AnnotationMode.New : mode,
+      ),
     );
   };
 

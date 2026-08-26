@@ -154,11 +154,7 @@ export const usePointerTool = (
 
     if (overlappingAnnotationIds.length === 0) {
       deselectAllAnnotations();
-      dispatch(
-        annotatorSlice.actions.setWorkingAnnotation({
-          annotation: undefined,
-        }),
-      );
+      dispatch(annotatorSlice.actions.setWorkingAnnotation(undefined));
     } else if (overlappingAnnotationIds.length > 1) {
       setCurrentIndex((currentIndex) => {
         return currentIndex + 1 === overlappingAnnotationIds.length

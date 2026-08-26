@@ -44,11 +44,7 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
       };
 
       batch(() => {
-        dispatch(
-          annotatorSlice.actions.setWorkingAnnotation({
-            annotation: newAnnotation,
-          }),
-        );
+        dispatch(annotatorSlice.actions.setWorkingAnnotation(newAnnotation));
         // A fresh stroke invalidates any operation staged against the last one.
         dispatch(annotatorSlice.actions.clearPendingOperation());
         dispatch(

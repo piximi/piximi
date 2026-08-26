@@ -32,13 +32,9 @@ export const annotatorSlice = createSlice({
 
     setWorkingAnnotation(
       state,
-      action: PayloadAction<{
-        annotation: WorkingAnnotation | undefined;
-      }>,
+      action: PayloadAction<WorkingAnnotation | undefined>,
     ) {
-      const { annotation } = action.payload;
-
-      state.workingAnnotation.saved = annotation;
+      state.workingAnnotation.saved = action.payload;
       state.workingAnnotation.changes = {};
     },
     updateWorkingAnnotation(
@@ -54,31 +50,22 @@ export const annotatorSlice = createSlice({
       state.annotationState = action.payload;
     },
 
-    setToolType(state, action: PayloadAction<{ operation: ToolType }>) {
-      state.toolType = action.payload.operation;
+    setToolType(state, action: PayloadAction<ToolType>) {
+      state.toolType = action.payload;
     },
-    setPenSelectionBrushSize(
-      state,
-      action: PayloadAction<{ penSelectionBrushSize: number }>,
-    ) {
-      state.penSelectionBrushSize = action.payload.penSelectionBrushSize;
+    setPenSelectionBrushSize(state, action: PayloadAction<number>) {
+      state.penSelectionBrushSize = action.payload;
     },
-    setQuickSelectionRegionSize(
-      state,
-      action: PayloadAction<{ quickSelectionRegionSize: number }>,
-    ) {
-      state.quickSelectionRegionSize = action.payload.quickSelectionRegionSize;
+    setQuickSelectionRegionSize(state, action: PayloadAction<number>) {
+      state.quickSelectionRegionSize = action.payload;
     },
 
     /**
      * Choosing an operation always invalidates a target picked for the previous
      * one — the candidate set depends on the operation being applicable.
      */
-    setAnnotationMode(
-      state,
-      action: PayloadAction<{ annotationMode: AnnotationMode }>,
-    ) {
-      state.annotationMode = action.payload.annotationMode;
+    setAnnotationMode(state, action: PayloadAction<AnnotationMode>) {
+      state.annotationMode = action.payload;
       state.pendingTargetIds = [];
     },
 
@@ -95,11 +82,8 @@ export const annotatorSlice = createSlice({
       state.pendingTargetIds = [];
     },
 
-    setThresholdAnnotationValue(
-      state,
-      action: PayloadAction<{ thresholdAnnotationValue: number }>,
-    ) {
-      state.thresholdAnnotationValue = action.payload.thresholdAnnotationValue;
+    setThresholdAnnotationValue(state, action: PayloadAction<number>) {
+      state.thresholdAnnotationValue = action.payload;
     },
     setInvertThresholdAnnotation(state, action: PayloadAction<boolean>) {
       state.invertThresholdAnnotation = action.payload;

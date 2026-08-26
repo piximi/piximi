@@ -59,9 +59,7 @@ export const useThreeAnnotationHandlers = ({
     batch(() => {
       // Clears the whole selection layer — criterion and manual overrides alike.
       dispatch(imageViewerDataSlice.actions.clearSelectionLayer());
-      dispatch(
-        annotatorSlice.actions.setWorkingAnnotation({ annotation: undefined }),
-      );
+      dispatch(annotatorSlice.actions.setWorkingAnnotation(undefined));
       dispatch(
         annotatorSlice.actions.setAnnotationState(AnnotationState.Blank),
       );

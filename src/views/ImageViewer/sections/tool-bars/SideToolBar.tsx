@@ -135,11 +135,7 @@ export const AnnotationToolBar = () => {
 
   const handleToolClick = (toolName: string) => {
     if (activeTool !== toolMap[toolName].operation)
-      dispatch(
-        annotatorSlice.actions.setToolType({
-          operation: toolMap[toolName].operation,
-        }),
-      );
+      dispatch(annotatorSlice.actions.setToolType(toolMap[toolName].operation));
   };
 
   return (
@@ -197,11 +193,7 @@ const ThresholdOptions = ({ toolOptions }: { toolOptions: SliderOptions }) => {
   const invert = useSelector(selectInvertThresholdAnnotation);
 
   const sliderCallback = (value: number) => {
-    dispatch(
-      annotatorSlice.actions.setThresholdAnnotationValue({
-        thresholdAnnotationValue: value,
-      }),
-    );
+    dispatch(annotatorSlice.actions.setThresholdAnnotationValue(value));
   };
 
   return (
@@ -287,18 +279,10 @@ const ResizableToolOptions = ({
   const sliderCallback = (value: number) => {
     switch (toolType) {
       case ToolType.QuickAnnotation:
-        dispatch(
-          annotatorSlice.actions.setQuickSelectionRegionSize({
-            quickSelectionRegionSize: value,
-          }),
-        );
+        dispatch(annotatorSlice.actions.setQuickSelectionRegionSize(value));
         break;
       case ToolType.PenAnnotation:
-        dispatch(
-          annotatorSlice.actions.setPenSelectionBrushSize({
-            penSelectionBrushSize: value,
-          }),
-        );
+        dispatch(annotatorSlice.actions.setPenSelectionBrushSize(value));
     }
   };
 

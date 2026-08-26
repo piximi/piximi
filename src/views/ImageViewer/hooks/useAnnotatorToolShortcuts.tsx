@@ -29,85 +29,61 @@ export const useAnnotatorToolShortcuts = () => {
         switch (key) {
           case "C":
             dispatch(
-              annotatorSlice.actions.setToolType({
-                operation: ToolType.ColorAnnotation,
-              }),
+              annotatorSlice.actions.setToolType(ToolType.ColorAnnotation),
             );
             break;
           case "D":
             dispatch(
-              annotatorSlice.actions.setToolType({
-                operation: ToolType.PenAnnotation,
-              }),
+              annotatorSlice.actions.setToolType(ToolType.PenAnnotation),
             );
             break;
           case "E":
             dispatch(
-              annotatorSlice.actions.setToolType({
-                operation: ToolType.EllipticalAnnotation,
-              }),
+              annotatorSlice.actions.setToolType(ToolType.EllipticalAnnotation),
             );
             break;
           case "I":
             dispatch(
-              annotatorSlice.actions.setToolType({
-                operation: ToolType.ColorAdjustment,
-              }),
+              annotatorSlice.actions.setToolType(ToolType.ColorAdjustment),
             );
             break;
           case "L":
             dispatch(
-              annotatorSlice.actions.setToolType({
-                operation: ToolType.LassoAnnotation,
-              }),
+              annotatorSlice.actions.setToolType(ToolType.LassoAnnotation),
             );
             break;
           case "M":
             dispatch(
-              annotatorSlice.actions.setToolType({
-                operation: ToolType.MagneticAnnotation,
-              }),
+              annotatorSlice.actions.setToolType(ToolType.MagneticAnnotation),
             );
             break;
           case "P":
             dispatch(
-              annotatorSlice.actions.setToolType({
-                operation: ToolType.PolygonalAnnotation,
-              }),
+              annotatorSlice.actions.setToolType(ToolType.PolygonalAnnotation),
             );
             break;
           case "Q":
             dispatch(
-              annotatorSlice.actions.setToolType({
-                operation: ToolType.QuickAnnotation,
-              }),
+              annotatorSlice.actions.setToolType(ToolType.QuickAnnotation),
             );
             break;
           case "R":
             dispatch(
-              annotatorSlice.actions.setToolType({
-                operation: ToolType.RectangularAnnotation,
-              }),
+              annotatorSlice.actions.setToolType(
+                ToolType.RectangularAnnotation,
+              ),
             );
             break;
           case "S":
-            dispatch(
-              annotatorSlice.actions.setToolType({
-                operation: ToolType.Pointer,
-              }),
-            );
+            dispatch(annotatorSlice.actions.setToolType(ToolType.Pointer));
             break;
           case "T":
             dispatch(
-              annotatorSlice.actions.setToolType({
-                operation: ToolType.ThresholdAnnotation,
-              }),
+              annotatorSlice.actions.setToolType(ToolType.ThresholdAnnotation),
             );
             break;
           case "Z":
-            dispatch(
-              annotatorSlice.actions.setToolType({ operation: ToolType.Zoom }),
-            );
+            dispatch(annotatorSlice.actions.setToolType(ToolType.Zoom));
             break;
         }
       }
