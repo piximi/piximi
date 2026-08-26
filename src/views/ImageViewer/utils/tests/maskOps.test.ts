@@ -6,7 +6,6 @@ import {
   difference,
   foldOperands,
   intersection,
-  invertWithinBBox,
   masksOverlap,
   union,
 } from "../maskOps";
@@ -101,29 +100,6 @@ describe("difference", () => {
     expect(show(difference(A.mask, A.bbox, far.mask, far.bbox))).toEqual({
       rows: ["##", "##"],
       bbox: [0, 0, 2, 2],
-    });
-  });
-});
-
-describe("invertWithinBBox", () => {
-  it("turns a hole solid without leaving the box", () => {
-    const donutHole = region(0, 0, ["...", ".#.", "..."]);
-    expect(show(invertWithinBBox(donutHole.mask, donutHole.bbox))).toEqual({
-      rows: ["###", "#.#", "###"],
-      bbox: [0, 0, 3, 3],
-    });
-  });
-
-  it("is null for a fully-set mask", () => {
-    expect(invertWithinBBox(A.mask, A.bbox)).toBeNull();
-  });
-
-  it("tightens when the inverse does not reach the box edge", () => {
-    // Only the right column is clear, so the inverse is that column alone.
-    const r = region(0, 0, ["##.", "##."]);
-    expect(show(invertWithinBBox(r.mask, r.bbox))).toEqual({
-      rows: ["#", "#"],
-      bbox: [2, 0, 3, 2],
     });
   });
 });

@@ -8,7 +8,6 @@ export enum AnnotationMode {
   Intersect,
   New,
   Subtract,
-  Invert,
 }
 export enum AnnotationState {
   Blank, // not yet annotating

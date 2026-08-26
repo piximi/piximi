@@ -190,9 +190,6 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
     ? overlapCandidates.length > 0
     : selectionOverlaps;
 
-  // Invert transforms operands where they sit, so one is enough — and it has no
-  // stroke form, since inverting a mask needs no second operand.
-  const canInvert = !hasStroke && selectionOperands.length >= 1;
   const numOverlapping = overlapCandidates.length;
 
   return {
@@ -201,7 +198,6 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
     canConfirm,
     hasUpdates,
     canCombine,
-    canInvert,
     hasStroke,
     numOverlapping,
     canIntertract,

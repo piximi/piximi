@@ -150,9 +150,6 @@ describe("selectIsPickingTarget", () => {
     expect(
       selectIsPickingTarget.resultFunc(AnnotationMode.New, s, ["A", "B"]),
     ).toBe(false);
-    expect(
-      selectIsPickingTarget.resultFunc(AnnotationMode.Invert, s, ["A", "B"]),
-    ).toBe(false);
   });
 });
 
@@ -295,36 +292,6 @@ describe("selectPendingOperation — click-selected operands", () => {
         AnnotationMode.Add,
         ALL,
         undefined,
-        [],
-        ["A"],
-      ),
-    ).toBeNull();
-  });
-});
-
-describe("selectPendingOperation — invert", () => {
-  it("transforms each operand independently and absorbs nothing", () => {
-    const donut = annotation("D", 0, 0, ["...", ".#.", "..."]);
-    const pending = selectPendingOperation.resultFunc(
-      AnnotationMode.Invert,
-      [donut, A],
-      undefined,
-      [],
-      ["D", "A"],
-    );
-    expect(pending?.absorbedIds).toEqual([]);
-    // D inverts to a ring; A is fully set so its inverse is empty and it drops out.
-    expect(Object.keys(pending!.updates)).toEqual(["D"]);
-    const u = pending!.updates.D;
-    expect(show(u.mask, u.bbox)).toEqual(["###", "#.#", "###"]);
-  });
-
-  it("has no stroke form", () => {
-    expect(
-      selectPendingOperation.resultFunc(
-        AnnotationMode.Invert,
-        ALL,
-        stroke(1, 1, ["#"]),
         [],
         ["A"],
       ),

@@ -153,24 +153,6 @@ export const difference = (
     ),
   );
 
-/**
- * Flip set and unset *within the mask's own bounding box*, so holes become solid
- * and solid becomes holes without the result spilling across the image.
- *
- * The old `invert` inverted against the full image instead, and then searched for
- * the result's extent with an `else if` chain that could not widen a box it had
- * just narrowed — and cropped with `origin: { row: bbox[0], column: bbox[1] }`,
- * passing x as the row and y as the column. Bounding the inversion to the input
- * box removes the search entirely: the extent is known up front.
- */
-export const invertWithinBBox = (
-  mask: DataArray,
-  bbox: BBox,
-): MaskRegion | null =>
-  tighten(
-    rasterize(bbox, (x, y) => (sample(mask, bbox, x, y) === 255 ? 0 : 255)),
-  );
-
 /** Whether two masks share any set pixel. Bounding boxes are the cheap prefilter. */
 export const masksOverlap = (
   a: DataArray,

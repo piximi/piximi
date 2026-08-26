@@ -2,11 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import { AnnotationMode } from "views/ImageViewer/utils/enums";
 import { decode } from "views/ImageViewer/utils/rle";
-import {
-  foldOperands,
-  invertWithinBBox,
-  masksOverlap,
-} from "views/ImageViewer/utils/maskOps";
+import { foldOperands, masksOverlap } from "views/ImageViewer/utils/maskOps";
 import type { BBox, ExtendedAnnotationObject } from "store/data/types";
 import { selectAnnotationEntities } from "store/data/selectors";
 
@@ -169,25 +165,6 @@ export const selectPendingOperation = createSelector(
   ): PendingOperation | null => {
     if (mode === AnnotationMode.New) return null;
     const byId = new Map(annotations.map((a) => [a.id, a]));
-
-    // Invert never combines operands, so it has no stroke path and no survivor:
-    // each selected annotation is transformed where it sits.
-    if (mode === AnnotationMode.Invert) {
-      if (stroke || operandIds.length === 0) return null;
-      const updates: Record<string, MaskRegion> = {};
-      operandIds.forEach((id) => {
-        const a = byId.get(id);
-        if (!a) return;
-        const region = asRegion(a);
-        const inverted = invertWithinBBox(region.mask, region.bbox);
-        if (inverted) updates[id] = inverted;
-      });
-      return {
-        updates,
-        absorbedIds: [],
-        empty: Object.keys(updates).length === 0,
-      };
-    }
 
     const op = FOLD_OP[mode];
     if (!op) return null;

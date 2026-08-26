@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from "react-redux";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { IconButton, SvgIcon, Tooltip, Typography } from "@mui/material";
-import { FilterBAndW } from "@mui/icons-material";
 
 import { useHotkeys, useTranslation } from "hooks";
 
@@ -122,7 +121,9 @@ export const OverlapBorders = () => {
   );
 };
 
-const PANEL_WIDTH = 350;
+const ICON_INNER_WIDTH = 40;
+const ICON_OUTER_WIDTH = 50;
+const PANEL_WIDTH = ICON_OUTER_WIDTH * 6;
 const PANEL_HEIGHT = 100;
 const BOTTOM_MARGIN = 16;
 
@@ -162,7 +163,7 @@ const ActionButton = ({
         >
           <SvgIcon
             sx={{
-              width: "40px",
+              width: `${ICON_INNER_WIDTH}px`,
             }}
           >
             {children}
@@ -198,7 +199,6 @@ export const SelectionButtons = ({
     hasUpdates,
     canConfirm,
     canCombine,
-    canInvert,
     hasStroke,
     numOverlapping,
     canIntertract,
@@ -372,20 +372,7 @@ export const SelectionButtons = ({
             )}
           />
         </ActionButton>
-        <ActionButton
-          name={t("Invert Annotation")}
-          onClick={() => handleModeSelection(AnnotationMode.Invert)}
-          disabled={!canInvert}
-        >
-          <FilterBAndW
-            sx={{
-              color: iconColor(
-                annotationMode === AnnotationMode.Invert,
-                canInvert,
-              ),
-            }}
-          />
-        </ActionButton>
+
         <ActionButton
           name={t("Cancel")}
           onClick={cancel}
