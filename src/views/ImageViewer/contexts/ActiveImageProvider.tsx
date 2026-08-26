@@ -67,7 +67,7 @@ export const ActiveImageProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useActiveImage = () => {
-  const savedDataState = useContext(ActiveImageContext);
+  const activeImage = useContext(ActiveImageContext);
 
-  return savedDataState;
+  return activeImage;
 };
