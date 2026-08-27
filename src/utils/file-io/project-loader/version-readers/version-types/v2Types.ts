@@ -11,7 +11,6 @@ import type { ClassifierState, KindClassifier } from "store/classifier/types";
 import type { Partition } from "utils/dl/enums";
 import type { ModelInfo } from "utils/dl/classification/types";
 
-import type { ProjectState } from "@ProjectViewer/state/types";
 import type { EntityState } from "@reduxjs/toolkit";
 import type { V11PreprocessSettings } from "./v11Types";
 
@@ -165,7 +164,6 @@ export type V2KindClassifier = KindClassifier;
 export type V2ClassifierState = ClassifierState;
 
 export type V2PiximiState = {
-  project: ProjectState;
   classifier: V2ClassifierState;
   data: V2DataState;
 };

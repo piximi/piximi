@@ -1,6 +1,5 @@
 import { Image as IJSImage } from "image-js-latest";
 
-
 import { generateUUID } from "store/data/utils";
 import type { BitDepth } from "store/data/types";
 import {
@@ -9,7 +8,6 @@ import {
   UNKNOWN_KIND_CATEGORY_ID,
   UNKNOWN_KIND_ID,
 } from "store/data/constants";
-import { initialState } from "@ProjectViewer/state/projectSlice";
 import {
   IMAGE_CLASSIFIER_ID,
   IMAGE_CLASSIFIER_NAME,
@@ -23,7 +21,6 @@ import { ModelArch } from "utils/dl/classification/types";
 
 import { subProgress } from "../progress";
 
-import type { ProjectState } from "@ProjectViewer/state/types";
 import type {
   V2AnnotationObject,
   V2AnnotationVolume,
@@ -89,14 +86,8 @@ export function convertV11ToV2(
     subProgress(onProgress, STAGES.things),
   );
   const v2ClassifierState = convertClassifier(v11.classifier, v2Kinds.entities);
-  // `structuredClone`, not the MUI data-grid's `deepClone`: this module runs in
-  // the load worker, and pulling a UI package in bloats that bundle and breaks
-  // resolution outside the browser.
-  const v2Project: ProjectState = structuredClone(initialState);
-  v2Project.name = v11.project.name;
-  v2Project.imageChannels = v11.project.imageChannels;
+
   return {
-    project: v2Project,
     data: { experiment, ...v2Data, kinds: v2Kinds, categories: v2Categories },
     classifier: v2ClassifierState,
   };

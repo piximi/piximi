@@ -15,7 +15,6 @@ import type { ClassifierState } from "store/classifier/types";
 import type { ExtractedModelFileMap } from "utils/dl/types";
 import type { Progress } from "utils/types";
 
-import type { ProjectState } from "@ProjectViewer/state/types";
 import type { V2PiximiState } from "./version-readers/version-types/v2Types";
 
 export type UploadStage =
@@ -57,7 +56,6 @@ export type ExtractedModelFile = {
 };
 
 export type DeserializedProject = {
-  project: ProjectState;
   classifier: ClassifierState;
   data: {
     experiment: Experiment;
