@@ -1,6 +1,5 @@
 import { Image as IJSImage } from "image-js-latest";
 
-import { deepClone } from "@mui/x-data-grid/internals";
 
 import { generateUUID } from "store/data/utils";
 import type { BitDepth } from "store/data/types";
@@ -90,7 +89,10 @@ export function convertV11ToV2(
     subProgress(onProgress, STAGES.things),
   );
   const v2ClassifierState = convertClassifier(v11.classifier, v2Kinds.entities);
-  const v2Project: ProjectState = deepClone(initialState);
+  // `structuredClone`, not the MUI data-grid's `deepClone`: this module runs in
+  // the load worker, and pulling a UI package in bloats that bundle and breaks
+  // resolution outside the browser.
+  const v2Project: ProjectState = structuredClone(initialState);
   v2Project.name = v11.project.name;
   v2Project.imageChannels = v11.project.imageChannels;
   return {

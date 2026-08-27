@@ -4,8 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { getBackend, version_core } from "@tensorflow/tfjs";
 
-import { deepClone } from "@mui/x-data-grid/internals";
-
 import { classifierSlice } from "store/classifier";
 import {
   selectActiveItems,
@@ -441,7 +439,7 @@ export const useFitClassifier = () => {
     const modelInfo: ModelInfo = modelName
       ? kindClassifier?.modelInfoDict[modelName]
       : {
-          ...deepClone(modelParams),
+          ...structuredClone(modelParams),
           confidenceThreshold: 0.5,
           runs: [],
           valid: true,
