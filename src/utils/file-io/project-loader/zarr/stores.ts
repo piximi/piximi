@@ -2,6 +2,11 @@ import JSZip from "jszip";
 import { KeyError } from "zarr";
 
 import type { SerializedModels } from "utils/dl/types";
+import {
+  MANIFEST_VERSION,
+  MODEL_MANIFEST_FILENAME,
+  MODELS_DIRNAME,
+} from "utils/file-io/consts";
 
 import type { ValidStoreType, AsyncStore } from "zarr/types/storage/types";
 
@@ -123,14 +128,62 @@ export class ZipStore implements AsyncStore<ValidStoreType> {
 }
 export type CustomStore = FileStore | ZipStore;
 
+/**
+ * Model names become directory names, so strip path separators. Dots go too:
+ * a model called "foo.zarr" would otherwise produce `models/foo.zarr/`, which
+ * `createStoreFromZip`'s `zip.folder(/.*\.zarr\/$/)` would count as a second
+ * zarr root and reject the archive.
+ *
+ * The unmangled name is preserved in the manifest, which is what the loader
+ * restores from — this only has to be a safe path segment, not reversible.
+ */
+const sanitizeModelDirName = (name: string) => name.replace(/[./\\]/g, "_");
+
 export class PiximiStore extends ZipStore {
   constructor(name: string, zip?: JSZip) {
     super(name, zip);
   }
+
+  /**
+   * Write each model into `models/<name>/`, beside the `.zarr` folder.
+   *
+   * The files keep their canonical `model.json` / `model.weights.bin` names.
+   * That is load-bearing: `Model.getSavedModelFiles` writes
+   * `paths: ["./model.weights.bin"]` into the topology's weightsManifest, and
+   * TF.js resolves weight files by basename, so renaming the file to
+   * disambiguate models makes it unloadable. The folder does the
+   * disambiguating instead.
+   *
+   * Each folder also gets a `piximi_manifest.json` describing its contents, so
+   * the loader can recover the model's real name and file roles without
+   * parsing filenames.
+   */
   attachModels(modelsByName: SerializedModels) {
-    Object.values(modelsByName).forEach((model) => {
-      this._zip.file(model.modelJson.fileName, model.modelJson.blob);
-      this._zip.file(model.modelWeights.fileName, model.modelWeights.blob);
+    Object.entries(modelsByName).forEach(([modelName, model]) => {
+      const dir = `${MODELS_DIRNAME}/${sanitizeModelDirName(modelName)}`;
+      const manifest = {
+        formatVersion: MANIFEST_VERSION,
+        savedAt: new Date().toISOString(),
+        modelName,
+        // Relative to this manifest's own folder.
+        files: {
+          modelTopology: model.modelJson.fileName,
+          modelWeights: model.modelWeights.fileName,
+        },
+      };
+
+      this._zip.file(
+        `${dir}/${MODEL_MANIFEST_FILENAME}`,
+        JSON.stringify(manifest),
+      );
+      this._zip.file(
+        `${dir}/${model.modelJson.fileName}`,
+        model.modelJson.blob,
+      );
+      this._zip.file(
+        `${dir}/${model.modelWeights.fileName}`,
+        model.modelWeights.blob,
+      );
     });
   }
 }
