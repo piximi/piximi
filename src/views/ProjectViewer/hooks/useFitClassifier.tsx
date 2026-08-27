@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { getBackend, version_core } from "@tensorflow/tfjs";
+import { version_core } from "@tensorflow/tfjs";
 
 import { classifierSlice } from "store/classifier";
 import {
@@ -409,6 +409,10 @@ export const useFitClassifier = () => {
         ? "hitl-correction"
         : "continue";
 
+    let backend: string;
+    const backendRes = await cfApi.getModelBackend();
+    if (!backendRes.success) backend = "undefined";
+    else backend = backendRes.data;
     return {
       id: generateUUID(),
       parentRunId,
@@ -418,7 +422,7 @@ export const useFitClassifier = () => {
       status: "in-progress",
       appVersion: import.meta.env.VITE_APP_VERSION ?? "dev",
       tfjsVersion: version_core,
-      backend: getBackend(),
+      backend,
       hyperparameters: {
         architecture: kindClassifier.newModelArch,
         optimizer: structuredClone(modelInfo.optimizerSettings),

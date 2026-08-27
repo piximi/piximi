@@ -223,6 +223,7 @@ export type BatchModelLoadResult = {
 
 export interface IClassifierApi {
   // registry reads
+  getModelBackend(): Promise<ApiResult<string>>;
   getModelNames(): Promise<ApiResult<string[]>>;
   getModelInfo(name: string): Promise<ApiResult<ModelInfoDTO>>;
   hasModel(name: string): Promise<ApiResult<boolean>>;

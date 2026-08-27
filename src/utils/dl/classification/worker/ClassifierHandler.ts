@@ -41,10 +41,13 @@ import type {
 export class ClassifierHandler implements IClassifierApi {
   private _availableClassificationModels: Record<string, SequentialClassifier> =
     {};
+  _modelBackend: string;
 
   constructor(
+    backend: string,
     models?: Record<string, SequentialClassifier> | Array<SequentialClassifier>,
   ) {
+    this._modelBackend = backend;
     if (Array.isArray(models)) {
       this._availableClassificationModels = models.reduce(
         (acc: Record<string, SequentialClassifier>, model) => {
@@ -56,6 +59,9 @@ export class ClassifierHandler implements IClassifierApi {
     } else {
       this._availableClassificationModels = models || {};
     }
+  }
+  public async getModelBackend(): Promise<ApiResult<string>> {
+    return ok(this._modelBackend);
   }
 
   /*

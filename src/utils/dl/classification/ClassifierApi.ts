@@ -45,6 +45,9 @@ export class ClassifierApi implements IClassifierApi {
   }
 
   // ---- registry reads ----
+  getModelBackend() {
+    return this.backend.getModelBackend();
+  }
   getModelNames() {
     return this.backend.getModelNames();
   }
