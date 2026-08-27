@@ -176,13 +176,17 @@ export class ProjectLoader implements IProjectLoader {
     onProgress: (p: number) => void,
   ): Promise<void> {
     const cfApi = getClassifierApi();
-    const modelFileArr = Object.values(modelFileMap);
+    const modelFileArr = Object.entries(modelFileMap);
 
     let modelIdx = 0;
-    for (const modelFiles of modelFileArr) {
+    for (const [modelName, modelFiles] of modelFileArr) {
       const result = await cfApi.modelFromFiles({
         descFile: modelFiles.modelJson!,
         weightsFiles: [modelFiles.modelWeights!],
+        // Without this the name is derived from the desc file, which is now
+        // `model.json` for every model — they'd all register as "model" and
+        // stop matching the model names in the restored classifier state.
+        modelName,
       });
       //TODO: implement alert toast with success message
       if (result.success) logger(`successfully added ${result.data.name}`);

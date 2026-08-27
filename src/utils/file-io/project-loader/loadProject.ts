@@ -8,9 +8,11 @@ import { logger } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
 import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
 import { computeObjectIntensityMeasurementsLocal } from "utils/measurements/computeObjectIntensityMeasurements";
+import { MODEL_MANIFEST_FILENAME } from "utils/file-io/consts";
 
 import { FileStore, ZipStore } from "./zarr/stores";
 import { getAttr } from "./zarr/utils";
+import { readV2 } from "./version-readers/readV2";
 import { readV11 } from "./version-readers/readV11";
 import { convertV11ToV2 } from "./version-converters/v11ToV2";
 import { readV02 } from "./version-readers/readV02";
@@ -34,9 +36,12 @@ export async function loadProject(
   const { projectVersion, versionRange } = await detectVersion(store);
   let v2: V2PiximiState;
   const updateProgress = (p: number) => onProgress({ value: p });
+
   switch (versionRange) {
     case "2":
-      throw new Error("Version 2 reader not yet implemented");
+      // Current format — no converter, what's on disk is what Redux consumes.
+      v2 = await readV2(store, updateProgress);
+      break;
 
     case "1.1": {
       const v11 = await readV11(
@@ -160,7 +165,111 @@ async function openStore(
   }
   return createStoreFromFileList(files);
 }
-const extractModelsFromZip = async (
+/**
+ * Minimal shape check for a model manifest.
+ *
+ * Deliberately not the zod `ManifestSchema` from `import/importFittedModel` —
+ * that module pulls in `getClassifierApi`, and this file runs inside the load
+ * worker. Only these three fields are needed to locate the files.
+ */
+const parseModelManifest = (
+  text: string,
+): {
+  modelName: string;
+  modelTopology: string;
+  modelWeights: string;
+} | null => {
+  try {
+    const parsed = JSON.parse(text);
+    const { modelName, files } = parsed ?? {};
+    if (
+      typeof modelName !== "string" ||
+      typeof files?.modelTopology !== "string" ||
+      typeof files?.modelWeights !== "string"
+    ) {
+      return null;
+    }
+    return {
+      modelName,
+      modelTopology: files.modelTopology,
+      modelWeights: files.modelWeights,
+    };
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Locate models via the `piximi_manifest.json` written into each model folder.
+ *
+ * Manifest paths are relative to the manifest's own folder, which makes the
+ * single-model export format (manifest at the archive root) the degenerate
+ * case of the same rule.
+ *
+ * The `File` names come from the manifest rather than the zip entry path, so
+ * they keep the basenames the topology's weightsManifest refers to — TF.js
+ * matches weight files by basename and would otherwise reject them.
+ */
+const extractModelsFromManifests = async (
+  zip: JSZip,
+): Promise<ExtractedModelFileMap> => {
+  const models: ExtractedModelFileMap = {};
+  const manifestPattern = new RegExp(
+    `(^|/)${MODEL_MANIFEST_FILENAME.replace(/\./g, "\\.")}$`,
+  );
+
+  for (const manifestEntry of zip.file(manifestPattern)) {
+    const manifest = parseModelManifest(await manifestEntry.async("text"));
+    if (!manifest) {
+      logger(`Unreadable model manifest at ${manifestEntry.name}`, {
+        level: "warn",
+      });
+      continue;
+    }
+
+    const dir = manifestEntry.name.slice(
+      0,
+      manifestEntry.name.lastIndexOf("/") + 1,
+    );
+    const topologyEntry = zip.file(dir + manifest.modelTopology);
+    const weightsEntry = zip.file(dir + manifest.modelWeights);
+
+    if (!topologyEntry || !weightsEntry) {
+      logger(
+        `Model "${manifest.modelName}" is missing ${
+          !topologyEntry ? manifest.modelTopology : manifest.modelWeights
+        }`,
+        { level: "warn" },
+      );
+      continue;
+    }
+
+    models[manifest.modelName] = {
+      modelJson: new File(
+        [await topologyEntry.async("arraybuffer")],
+        manifest.modelTopology,
+        { type: "application/json" },
+      ),
+      modelWeights: new File(
+        [await weightsEntry.async("arraybuffer")],
+        manifest.modelWeights,
+        { type: "application/octet-stream" },
+      ),
+    };
+  }
+
+  return models;
+};
+
+/**
+ * Fallback for archives written before models carried manifests: recover the
+ * name by splitting the filename on ".".
+ *
+ * Only reliable for single-model archives. Older multi-model archives named
+ * every model's files with the same constants, so they were already lossy
+ * before this path existed.
+ */
+const extractModelsByFileName = async (
   zip: JSZip,
 ): Promise<ExtractedModelFileMap> => {
   const modelFileRegEx = new RegExp(".json$|.weights.bin$");
@@ -193,6 +302,14 @@ const extractModelsFromZip = async (
     }
   }
   return models;
+};
+
+const extractModelsFromZip = async (
+  zip: JSZip,
+): Promise<ExtractedModelFileMap> => {
+  const fromManifests = await extractModelsFromManifests(zip);
+  if (Object.keys(fromManifests).length > 0) return fromManifests;
+  return extractModelsByFileName(zip);
 };
 async function createStoreFromZip(
   file: File,

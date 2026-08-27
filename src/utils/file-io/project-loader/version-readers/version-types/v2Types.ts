@@ -4,8 +4,12 @@ import type {
   Shape,
   ColorMap,
   DType,
+  ChannelFeature,
   ChannelMeasurement,
+  FeatureKey,
+  PredictionCorrection,
 } from "store/data/types";
+import { OBJECT_FEATURES } from "store/data/types";
 import type { ClassifierState, KindClassifier } from "store/classifier/types";
 
 import type { Partition } from "utils/dl/enums";
@@ -14,7 +18,7 @@ import type { ModelInfo } from "utils/dl/classification/types";
 import type { EntityState } from "@reduxjs/toolkit";
 import type { V11PreprocessSettings } from "./v11Types";
 
-export type V2Experiment = { id: string; name: string };
+export type V2Experiment = { id: string; name: string; channels?: number };
 
 export type V2ImageSeries = {
   id: string;
@@ -55,6 +59,9 @@ export type V2ImageObject = {
   timepoint: number;
   bitDepth: BitDepth;
   partition: Partition;
+  predictionConfidence?: number;
+  predictedAtRunId?: string;
+  predictionCorrected?: PredictionCorrection;
 };
 
 export type V2Plane = {
@@ -83,6 +90,7 @@ export type V2Channel = {
   mad?: number;
   lowerQuartile?: number;
   upperQuartile?: number;
+  features?: Partial<Record<ChannelFeature, number>>;
 };
 
 export type V2ChannelMeta = {
@@ -103,14 +111,15 @@ export type V2AnnotationVolume = {
   imageId: string;
   kindId: string;
   categoryId: string;
+  timepoint?: number;
+  predictionConfidence?: number;
+  predictedAtRunId?: string;
+  predictionCorrected?: PredictionCorrection;
 };
-export const V2_OBJECT_FEATURES = [
-  "area",
-  "sphericity",
-  "radius",
-  "perimeter",
-] as const;
-export type V2FeatureKey = (typeof V2_OBJECT_FEATURES)[number];
+// v2 is the current format, so its feature set tracks the live one rather than
+// snapshotting a subset. Freeze these into literals when v3 forks off.
+export const V2_OBJECT_FEATURES = OBJECT_FEATURES;
+export type V2FeatureKey = FeatureKey;
 export type V2AnnotationObject = {
   id: string;
   planeId: string;
