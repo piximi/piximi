@@ -10,8 +10,8 @@ import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures"
 import { computeObjectIntensityMeasurementsLocal } from "utils/measurements/computeObjectIntensityMeasurements";
 import { MODEL_MANIFEST_FILENAME } from "utils/file-io/consts";
 
-import { FileStore, ZipStore } from "./zarr/stores";
-import { getAttr } from "./zarr/utils";
+import { FileStore, ZipStore } from "../zarr/stores";
+import { getAttr } from "../zarr/utils";
 import { readV2 } from "./version-readers/readV2";
 import { readV11 } from "./version-readers/readV11";
 import { convertV11ToV2 } from "./version-converters/v11ToV2";
@@ -21,7 +21,7 @@ import { readV01 } from "./version-readers/readV01";
 import { convertV01ToV02 } from "./version-converters/v01Tov02";
 import { subProgress } from "./progress";
 
-import type { CustomStore } from "./zarr/stores";
+import type { CustomStore } from "../zarr/stores";
 import type { LoadProjectInput, LoadProjectOutput } from "./types";
 import type { V2PiximiState } from "./version-readers/version-types/v2Types";
 

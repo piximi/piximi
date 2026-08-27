@@ -45,7 +45,7 @@ import {
   ZARR_V2_RUN_HISTORY_COLUMNS,
   ZARR_V2_RUNS,
   ZARR_V2_SHAPE,
-} from "../../project-loader/zarr/types";
+} from "../../zarr/types";
 import { writeArray, writeAttrs } from "../zarr/writers";
 
 import type { Group } from "zarr";

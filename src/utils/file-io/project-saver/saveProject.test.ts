@@ -29,7 +29,7 @@ import type { ModelInfo, Run } from "utils/dl/classification/types";
 import type { SerializedModels } from "utils/dl/types";
 
 import { MODEL_JSON_FILENAME, MODEL_WEIGHTS_FILENAME } from "../consts";
-import { PiximiStore, ZipStore } from "../project-loader/zarr/stores";
+import { PiximiStore, ZipStore } from "../zarr/stores";
 import { readV2 } from "../project-loader/version-readers/readV2";
 import { loadProject } from "../project-loader/loadProject";
 import { writeV2 } from "./version-writers/writeV2";

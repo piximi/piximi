@@ -4,20 +4,20 @@ import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 import { Partition } from "utils/dl/enums";
 
-import { ZARR_V01_IMAGE } from "../zarr/types";
+import { ZARR_V01_IMAGE } from "../../zarr/types";
 import {
   getAttr,
   getDataset,
   getDatasetSelection,
   getGroup,
-} from "../zarr/utils";
+} from "../../zarr/utils";
 import {
   deserializeColorsRaw,
   v01_02_deserializeClassifierGroup,
 } from "./common";
 import { subProgress } from "../progress";
 
-import type { CustomStore } from "../zarr/stores";
+import type { CustomStore } from "../../zarr/stores";
 import type {
   V01BitDepth,
   V01RawAnnotationObject,

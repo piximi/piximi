@@ -3,14 +3,14 @@ import { openGroup } from "zarr";
 import { logger } from "utils/logUtils";
 import type { Partition } from "utils/dl/enums";
 
-import { getAttr, getDataset, getGroup } from "../zarr/utils";
+import { getAttr, getDataset, getGroup } from "../../zarr/utils";
 import {
   deserializeColorsRaw,
   v01_02_deserializeClassifierGroup,
 } from "./common";
 import { subProgress } from "../progress";
 
-import type { CustomStore } from "../zarr/stores";
+import type { CustomStore } from "../../zarr/stores";
 import type {
   V02BitDepth,
   V02Category,

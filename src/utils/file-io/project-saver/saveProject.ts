@@ -4,7 +4,7 @@ import type { CancelToken } from "utils/workers/types";
 import { DataConnector } from "utils/data-connector";
 import { STORES } from "utils/data-connector/types";
 
-import { PiximiStore } from "../project-loader/zarr/stores";
+import { PiximiStore } from "../zarr/stores";
 import { writeV2 } from "./version-writers/writeV2";
 
 import type { ChannelDataAccessor, SaveProjectWorkerInput } from "./types";

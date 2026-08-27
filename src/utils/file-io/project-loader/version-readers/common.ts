@@ -5,7 +5,7 @@ import {
   OptimizationAlgorithm,
 } from "utils/dl/enums";
 
-import { getAttr, getDatasetSelection, getGroup } from "../zarr/utils";
+import { getAttr, getDatasetSelection, getGroup } from "../../zarr/utils";
 import { initialClassifierStateV01_02 } from "./constants";
 
 import type {

@@ -23,7 +23,7 @@ import type {
   RunTrigger,
 } from "utils/dl/classification/types";
 
-import { getAttr, getDataset, getGroup } from "../zarr/utils";
+import { getAttr, getDataset, getGroup } from "../../zarr/utils";
 import {
   ZARR_V2_ANNOTATION,
   ZARR_V2_ANNOTATION_VOLUME,
@@ -47,10 +47,10 @@ import {
   ZARR_V2_RUN_HISTORY_COLUMNS,
   ZARR_V2_RUNS,
   ZARR_V2_SHAPE,
-} from "../zarr/types";
+} from "../../zarr/types";
 import { subProgress } from "../progress";
 
-import type { CustomStore } from "../zarr/stores";
+import type { CustomStore } from "../../zarr/stores";
 import type {
   V2AnnotationObject,
   V2AnnotationVolume,
