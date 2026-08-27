@@ -1,8 +1,15 @@
-// TODO: implement segmenter serialization
-import { ChangeEvent, useState } from "react";
-import { Grid, TextField } from "@mui/material";
+import type { ChangeEvent } from "react";
+import { useState } from "react";
+
+import { useSelector } from "react-redux";
+
+import { Grid2 as Grid, TextField } from "@mui/material";
+
+import { useProjectSaver } from "hooks/useProjectSaver";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
+
+import { selectExperiment } from "store/data/selectors";
 
 type SaveProjectDialogProps = {
   onClose: () => void;
@@ -13,10 +20,15 @@ export const SaveProjectDialog = ({
   onClose,
   open,
 }: SaveProjectDialogProps) => {
-  const [projectName, setProjectName] = useState<string>("");
+  const experiment = useSelector(selectExperiment);
+  const [experimentName, setExperimentName] = useState<string>(experiment.name);
+  const { saveProject } = useProjectSaver();
 
   const onSaveProjectClick = async () => {
+    // Close first: the save reports progress through the AppTask tray, so
+    // holding the dialog open would just block the view of it.
     onClose();
+    await saveProject(experimentName.trim() || experiment.name);
   };
 
   const onCancel = () => {
@@ -24,7 +36,7 @@ export const SaveProjectDialog = ({
   };
 
   const onNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setProjectName(event.target.value);
+    setExperimentName(event.target.value);
   };
 
   return (
@@ -34,7 +46,7 @@ export const SaveProjectDialog = ({
       title="Save Project"
       content={
         <Grid container spacing={1}>
-          <Grid item xs={10}>
+          <Grid size={{ xs: 10 }}>
             <TextField
               autoFocus
               fullWidth
@@ -42,7 +54,7 @@ export const SaveProjectDialog = ({
               label="Project file name"
               margin="dense"
               variant="standard"
-              value={projectName}
+              value={experimentName}
               onChange={onNameChange}
             />
           </Grid>

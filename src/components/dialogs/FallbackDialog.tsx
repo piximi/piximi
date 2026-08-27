@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+
 //import { useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+
 import { fromError } from "stacktrace-js";
 
 import {
@@ -24,31 +27,27 @@ import {
 
 import { useDialogHotkey } from "hooks";
 
-import { SaveProjectDialog } from "./SaveProjectDialog";
+import { selectAllCreatedModelNames } from "store/classifier/selectors";
 
 import { createGitHubIssue } from "utils/logUtils";
-
 import { APPLICATION_COLORS } from "utils/constants";
-import { HotkeyContext } from "utils/enums";
-import { AlertType } from "utils/enums";
+import { HotkeyContext, AlertType } from "utils/enums";
+import type { AlertState } from "utils/types";
 
-import { AlertState } from "utils/types";
-import { useSelector } from "react-redux";
-import { selectAllCreatedModelNames } from "store/classifier/selectors";
+import { SaveProjectDialog } from "./SaveProjectDialog";
+
 //import { saveAs } from "file-saver";
 
 export const FallbackDialog = (props: any) => {
   const error = props.error as Error;
 
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = useState(false);
 
-  const [stackTrace, setStackTrace] = React.useState<string | undefined>(
-    error.stack,
-  );
+  const [stackTrace, setStackTrace] = useState<string | undefined>(error.stack);
 
   const projectClassificationModels = useSelector(selectAllCreatedModelNames);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (error.stack) {
       fromError(error)
         .then((stacktrace) => {
@@ -60,7 +59,7 @@ export const FallbackDialog = (props: any) => {
     }
   }, [error]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (stackTrace) {
       import.meta.env.NODE_ENV !== "production" && console.error(stackTrace);
     }
@@ -68,7 +67,7 @@ export const FallbackDialog = (props: any) => {
 
   const {
     onClose: onSaveProjectDialogClose,
-    //onOpen: onSaveProjectDialogOpen,
+    onOpen: onSaveProjectDialogOpen,
     open: openSaveProjectDialog,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
@@ -105,8 +104,7 @@ export const FallbackDialog = (props: any) => {
   };
 
   const handleSaveProject = () => {
-    alert("Not Yet Implemented");
-    //onSaveProjectDialogOpen
+    onSaveProjectDialogOpen();
   };
 
   return (
