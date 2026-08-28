@@ -1,4 +1,4 @@
-import { AppTaskType } from "./types";
+import type { AppTaskType } from "./types";
 
 export const taskTypeDisplayLookup: Record<AppTaskType, string> = {
   "file-upload": "Uploading File",

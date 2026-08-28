@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
-import { RootState } from "./rootReducer";
+
+import type { RootState } from "./rootReducer";
 
 export function useParameterizedSelector<P extends unknown[], R>(
   selector: (state: RootState, ...params: P) => R,

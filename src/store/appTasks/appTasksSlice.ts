@@ -1,6 +1,8 @@
 // tasksSlice.ts
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AppTask, AppTasksState, AppTaskStatus } from "./types";
+import { createSlice } from "@reduxjs/toolkit";
+
+import type { PayloadAction } from "@reduxjs/toolkit";
+import type { AppTask, AppTasksState, AppTaskStatus } from "./types";
 
 const initialState: AppTasksState = { tasks: {} };
 
