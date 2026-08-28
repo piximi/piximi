@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
 import type { SelectChangeEvent } from "@mui/material";
 import { MenuItem, Tooltip } from "@mui/material";

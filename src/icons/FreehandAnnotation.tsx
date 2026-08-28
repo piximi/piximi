@@ -1,5 +1,3 @@
-import React from "react";
-
 export const FreehandAnnotation = ({ color }: { color: string }) => {
   return (
     <svg

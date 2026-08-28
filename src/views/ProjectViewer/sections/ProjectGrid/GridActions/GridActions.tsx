@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
 import { Badge, Box, Divider } from "@mui/material";
 import {

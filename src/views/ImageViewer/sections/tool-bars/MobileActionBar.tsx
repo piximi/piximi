@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { Fragment, useMemo, useState, type MouseEvent } from "react";
 
 import type { PopperProps } from "@mui/material";
 import {
@@ -78,7 +78,7 @@ export const MobileActionBar = () => {
   const { anchorEl, onOpen: setPopperAnchor } = useMenu();
 
   const handleSelectTool = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    event: React.MouseEvent<HTMLButtonElement>,
     tool: OperationType,
   ) => {
     if (activeTool === undefined) {
@@ -143,7 +143,7 @@ export const MobileActionBar = () => {
               )}
             </Tool>
           ) : (
-            <React.Fragment key={`tool-drawer-${tool.name}`}></React.Fragment>
+            <Fragment key={`tool-drawer-${tool.name}`}></Fragment>
           );
         })}
       </Stack>
@@ -163,7 +163,7 @@ type ToolProps = HTMLDataAttributes & {
   children: React.ReactNode;
   options?: React.ReactElement;
   name: string;
-  onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   tooltipLocation?: "top" | "bottom" | "left" | "right";
   selected?: boolean;

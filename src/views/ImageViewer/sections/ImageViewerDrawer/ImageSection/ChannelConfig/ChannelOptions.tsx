@@ -1,5 +1,3 @@
-import React from "react";
-
 import { useDispatch } from "react-redux";
 
 import type { SelectChangeEvent } from "@mui/material";

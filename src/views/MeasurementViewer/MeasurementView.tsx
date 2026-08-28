@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 import { ErrorBoundary, useErrorHandler } from "react-error-boundary";
 import { useDispatch } from "react-redux";

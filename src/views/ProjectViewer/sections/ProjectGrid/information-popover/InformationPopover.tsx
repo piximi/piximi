@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Popover } from "@mui/material";
 
 import { useInformationPopover } from "./InformationPopoverProvider";

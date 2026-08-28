@@ -1,5 +1,3 @@
-import React from "react";
-
 import type { TextFieldWithBlurProps } from "components/inputs/TextFieldWithBlur";
 import { TextFieldWithBlur } from "components/inputs/TextFieldWithBlur";
 

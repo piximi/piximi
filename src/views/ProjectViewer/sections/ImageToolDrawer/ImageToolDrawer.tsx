@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import React, { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -261,7 +261,7 @@ export const ImageToolDrawer = () => {
                 )}
               </Tool>
             ) : (
-              <React.Fragment key={`tool-drawer-${tool.name}`}></React.Fragment>
+              <Fragment key={`tool-drawer-${tool.name}`}></Fragment>
             );
           })}
         </Stack>

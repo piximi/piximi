@@ -1,5 +1,3 @@
-import React from "react";
-
 export const MagneticAnnotation = ({ color }: { color: string }) => {
   return (
     <svg

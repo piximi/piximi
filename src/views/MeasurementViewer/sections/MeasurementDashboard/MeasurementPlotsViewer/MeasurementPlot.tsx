@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import React, { useRef } from "react";
+import { useRef } from "react";
 
 import { useSelector } from "react-redux";
 

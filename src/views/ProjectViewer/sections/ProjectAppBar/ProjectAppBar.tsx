@@ -1,5 +1,3 @@
-import React from "react";
-
 import { useSelector } from "react-redux";
 
 import { Box, Divider, Stack } from "@mui/material";

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { Fragment, useRef } from "react";
 
 import { ListItemText, MenuItem } from "@mui/material";
 
@@ -36,7 +36,7 @@ export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
   };
 
   return (
-    <React.Fragment>
+    <Fragment>
       <MenuItem data-help={HelpItem.OpenImage} dense onClick={handleClick}>
         <ListItemText primary="Image" />
         <input
@@ -57,6 +57,6 @@ export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
           onConfirm={handleConfirmTiffConfig}
         />
       )}
-    </React.Fragment>
+    </Fragment>
   );
 };

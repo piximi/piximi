@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 
 import { useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";

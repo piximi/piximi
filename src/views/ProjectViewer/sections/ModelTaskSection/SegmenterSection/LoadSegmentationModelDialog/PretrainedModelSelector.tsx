@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 
 import {
   Autocomplete,
@@ -66,7 +66,7 @@ export const PretrainedModelSelector = ({
   }, [selectedModel]);
 
   return (
-    <React.Fragment>
+    <Fragment>
       <Typography gutterBottom sx={{ pb: 2 }}>
         Choose from a provided pre-trained model:
       </Typography>
@@ -88,7 +88,7 @@ export const PretrainedModelSelector = ({
         <FormHelperText sx={{ mx: "auto" }}>{errorText ?? " "}</FormHelperText>
       </FormControl>
       {modelDetails && <ModelInfo modelDetails={modelDetails} />}
-    </React.Fragment>
+    </Fragment>
   );
 };
 
@@ -101,7 +101,7 @@ const ModelInfo = ({ modelDetails }: { modelDetails: ModelDetails }) => {
       }}
     >
       {Object.entries(modelDetails).map(([key, value]) => (
-        <React.Fragment key={key}>
+        <Fragment key={key}>
           <Typography
             variant="caption"
             color={key === "cloudWarning" ? "warning" : "textSecondary"}
@@ -127,7 +127,7 @@ const ModelInfo = ({ modelDetails }: { modelDetails: ModelDetails }) => {
               sx={{ pl: 1 }}
             >
               {value.map((src, index) => (
-                <React.Fragment key={src.text}>
+                <Fragment key={src.text}>
                   <Link
                     className="source_link"
                     href={src.url}
@@ -137,7 +137,7 @@ const ModelInfo = ({ modelDetails }: { modelDetails: ModelDetails }) => {
                     {src.text}
                   </Link>
                   {index < value.length - 1 && <span>, </span>}
-                </React.Fragment>
+                </Fragment>
               ))}
             </Typography>
           ) : (
@@ -171,7 +171,7 @@ const ModelInfo = ({ modelDetails }: { modelDetails: ModelDetails }) => {
               )}
             </Typography>
           )}
-        </React.Fragment>
+        </Fragment>
       ))}
     </Box>
   );

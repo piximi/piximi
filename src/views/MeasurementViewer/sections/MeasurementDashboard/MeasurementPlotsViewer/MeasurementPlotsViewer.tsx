@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useDispatch, useSelector } from "react-redux";

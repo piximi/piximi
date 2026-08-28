@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Box, Typography } from "@mui/material";
 
 import { KeyboardKey } from "components/ui/KeyboardKey";

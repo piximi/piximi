@@ -1,5 +1,3 @@
-import React from "react";
-
 import { useDispatch } from "react-redux";
 
 import AddIcon from "@mui/icons-material/Add";
