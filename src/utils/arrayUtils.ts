@@ -1,6 +1,7 @@
 // Given a length, return an array of numbers from 0 to length - 1
 
 import { difference } from "lodash";
+
 import { mulberry32 } from "./numberUtils";
 
 // An iterable with length property set the the passed value is used to create an array
@@ -15,14 +16,6 @@ export const mutatingFilter = <T>(
   for (let l = array.length - 1; l >= 0; l -= 1) {
     if (!condition(array[l])) array.splice(l, 1);
   }
-};
-
-export const toUnique = <T>(array: T[]): T[] => {
-  return [...new Set(array)];
-};
-
-export const distinctFilter = <T>(value: T, index: number, self: T[]) => {
-  return self.indexOf(value) === index;
 };
 
 export const getDifferences = <T>(original: T[], next: T[]) => {

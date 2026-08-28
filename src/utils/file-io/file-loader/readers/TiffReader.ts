@@ -196,7 +196,7 @@ export async function prepareTiffConfigs(
  * 2. For TIFFs, parse header to detect frames
  * 3. Return analysis results for UI decisions
  */
-export async function analyzeTiffs(
+async function analyzeTiffs(
   files: FileList,
   updateProgress: (args: { overallProgress: number }) => void,
 ): Promise<{

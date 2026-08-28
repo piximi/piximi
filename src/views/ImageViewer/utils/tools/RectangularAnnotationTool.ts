@@ -1,4 +1,4 @@
-import { drawRectangle } from "views/ImageViewer/utils";
+import { drawRectangle } from "utils/image";
 
 import { AnnotationState } from "../enums";
 import { AnnotationTool } from "./AnnotationTool";

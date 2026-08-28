@@ -1,9 +1,6 @@
-import {
-  computeBoundingBoxFromContours as _computeBoundingBoxFromContours,
-  maskFromPoints,
-} from "views/ImageViewer/utils";
 import type { DataArray } from "store/data/types";
 
+import { computeBoundingBoxFromContours, maskFromPoints } from "utils/image";
 import type { Point } from "utils/types";
 
 import { AnnotationState } from "../enums";
@@ -79,7 +76,7 @@ export abstract class AnnotationTool extends Tool {
   }
 
   protected setBoundingBoxFromContours(contour: Array<Point>) {
-    this.boundingBox = _computeBoundingBoxFromContours(contour);
+    this.boundingBox = computeBoundingBoxFromContours(contour);
   }
 
   get encodedMask(): Array<number> | undefined {

@@ -11,8 +11,7 @@ import {
   MoreHoriz as MoreIcon,
 } from "@mui/icons-material";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
-import { CountChip } from "components/ui/CountChip";
+import { CustomListItemButton, CountChip } from "components/ui";
 
 import type { Category } from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";

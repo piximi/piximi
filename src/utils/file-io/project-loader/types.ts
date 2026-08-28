@@ -46,15 +46,6 @@ export type LoadProjectOutput = {
   modelFiles: ExtractedModelFileMap;
 };
 
-/**
- * Model file blobs extracted from the ZIP
- * These are transferred back to main thread for TF.js loading
- */
-export type ExtractedModelFile = {
-  fileName: string;
-  blob: ArrayBuffer;
-};
-
 export type DeserializedProject = {
   classifier: ClassifierState;
   data: {

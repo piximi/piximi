@@ -25,7 +25,7 @@ const emptyKindState = (id: string, name: string): KindState => ({
   visible: true,
   sortType: AnnotationSortType.None,
 });
-export const initialState: ProjectState = {
+const initialState: ProjectState = {
   name: "Untitled project",
   activeView: "images",
   imageGridState: {

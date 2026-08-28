@@ -1,12 +1,6 @@
 import type { Shape, BBox, ExtendedChannel } from "store/data/types";
 
-import type {
-  CropSchema,
-  LossFunction,
-  Metric,
-  OptimizationAlgorithm,
-  Partition,
-} from "./enums";
+import type { CropSchema, Partition } from "./enums";
 
 export type TrainingInput = {
   id: string;
@@ -27,28 +21,6 @@ export type NormalizeOptions = {
 export type CropOptions = {
   numCrops: number;
   cropSchema: CropSchema;
-};
-
-export type SegmenterPreprocessSettings = {
-  shuffle: boolean;
-  normalizeOptions: NormalizeOptions;
-  cropOptions: CropOptions;
-};
-
-export type SegmenterCompileSettings = {
-  learningRate: number;
-  lossFunction:
-    | LossFunction
-    | Array<LossFunction>
-    | { [outputName: string]: LossFunction };
-  metrics: Array<Metric>;
-  optimizationAlgorithm: OptimizationAlgorithm;
-};
-
-export type SegmenterEvaluationResultType = {
-  pixelAccuracy: number;
-  IoUScore: number;
-  diceScore: number;
 };
 
 export type ExtractedModelFile = {

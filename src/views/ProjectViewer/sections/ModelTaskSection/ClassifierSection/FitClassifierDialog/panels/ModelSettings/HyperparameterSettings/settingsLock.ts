@@ -4,7 +4,7 @@ import type {
 } from "utils/dl/classification/types";
 import type { OptimizationAlgorithm } from "utils/dl/enums";
 
-export type SettingsType = "architecture" | "integrity" | "tunable";
+type SettingsType = "architecture" | "integrity" | "tunable";
 
 type TrainingSetting = keyof PreprocessSettings | keyof OptimizerSettings;
 const settingTierLookup: Record<TrainingSetting, SettingsType> = {

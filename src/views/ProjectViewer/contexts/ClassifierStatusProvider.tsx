@@ -64,7 +64,7 @@ type Precheck = {
   modelNameValid: boolean; // success -> true
 };
 
-export type ErrorContext = {
+type ErrorContext = {
   reason: ErrorReason;
   message: string;
   severity: number;

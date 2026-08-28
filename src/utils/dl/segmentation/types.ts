@@ -1,10 +1,9 @@
-import type { AnnotationObject, Kind } from "store/data/types";
+import type { AnnotationObject } from "store/data/types";
 
 import type { LoadCB } from "utils/types";
 
 import type { Token } from "../cancel";
 import type { ApiResult, InferenceInput, SerializedModelData } from "../types";
-import type { ModelTask } from "../enums";
 
 export const MODELS = [
   "Cellpose",
@@ -26,16 +25,7 @@ export type ModelDisplayInfo = {
   cite?: Array<{ text: string; url: string }>;
   cloudWarning?: string;
 };
-export type SegmenterModelArgs = {
-  name: ModelName;
-  task: ModelTask;
-  graph: boolean;
-  pretrained: boolean;
-  trainable: boolean;
-  kinds: Array<string>;
-  src?: string;
-  requiredChannels: number;
-};
+
 export type SegmentationState = "idle" | "loading" | "predicting";
 
 export type SegmentaionModelDetails = {
@@ -45,14 +35,7 @@ export type SegmentaionModelDetails = {
   modelLoaded: boolean;
   requiredChannels: number;
 };
-export type BatchModelLoadResult = {
-  loadedModels: SegmentaionModelDetails[];
-  failedModels: Record<string, { reason: string; err?: Error }>;
-};
-export type LoadInferenceDataArgs = {
-  // if cat undefined, created from default classes
-  kinds?: Array<Kind>;
-};
+
 export type PredictedAnnotationObject = Omit<
   AnnotationObject,
   "imageId" | "planeId" | "shape" | "volumeId"

@@ -1,10 +1,10 @@
 import createGraph from "ngraph.graph";
 
-import { getIdx } from "views/ImageViewer/utils/imageHelper";
 import type { DataArray } from "store/data/types";
 
 import type { Point } from "utils/types";
 
+import { getIdx } from "./imageHelper";
 import { NodeHeap } from "./NodeHeap";
 import { cachedAStarPathSearch } from "./PathFinder";
 

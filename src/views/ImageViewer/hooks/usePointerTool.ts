@@ -3,10 +3,6 @@ import { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import {
-  getOverlappingAnnotations,
-  getAnnotationsInBox,
-} from "views/ImageViewer/utils";
 import { ToolType } from "views/ImageViewer/utils/enums";
 import {
   selectAllActiveAnnotations,
@@ -20,6 +16,7 @@ import {
   selectOverlapCandidateIds,
 } from "@ImageViewer/state/operations/reselectors";
 
+import { getOverlappingAnnotations, getAnnotationsInBox } from "utils/image";
 import type { Point } from "utils/types";
 
 const delta = 10;

@@ -79,7 +79,7 @@ const matchSeriesMetas = (
   return map;
 };
 
-export type ChannelMetaReconciliation = {
+type ChannelMetaReconciliation = {
   metasToAdd: ChannelMeta[];
   metaUpdates: Array<{
     id: string;

@@ -61,7 +61,7 @@ export async function deserializeColorsRaw(
 // Classifier deserialization
 // ============================================================
 
-export const deserializeFitOptionsGroup = async (
+const deserializeFitOptionsGroup = async (
   fitOptionsGroup: Group,
 ): Promise<V01FitOptions> => {
   const epochs = (await getAttr(fitOptionsGroup, "epochs")) as number;
@@ -73,7 +73,7 @@ export const deserializeFitOptionsGroup = async (
   };
 };
 
-export const deserializeCropOptionsGroup = async (
+const deserializeCropOptionsGroup = async (
   cropOptionsGroup: Group,
 ): Promise<V01CropOptions> => {
   const cropSchema = (await getAttr(
@@ -86,7 +86,7 @@ export const deserializeCropOptionsGroup = async (
   return { cropSchema, numCrops };
 };
 
-export const deserializeRescaleOptionsGroup = async (
+const deserializeRescaleOptionsGroup = async (
   rescaleOptionsGroup: Group,
 ): Promise<V01RescaleOptions> => {
   const centerRaw = (await getAttr(rescaleOptionsGroup, "center_B")) as number;
@@ -327,7 +327,7 @@ export const v11_v2_deserializeClassifierGroup = async (
     kindClassifiers,
   };
 };
-export const v11_v2_GetDefaultModelParams = (): Pick<
+const v11_v2_GetDefaultModelParams = (): Pick<
   V11ModelInfo,
   "optimizerSettings" | "preprocessSettings"
 > => ({
@@ -359,7 +359,7 @@ export const v11_v2_GetDefaultModelParams = (): Pick<
   },
 });
 
-export const v11_v2_GetDefaultModelInfo = (): V11ModelInfo => ({
+const v11_v2_GetDefaultModelInfo = (): V11ModelInfo => ({
   ...v11_v2_GetDefaultModelParams(),
   evalResults: [],
 });

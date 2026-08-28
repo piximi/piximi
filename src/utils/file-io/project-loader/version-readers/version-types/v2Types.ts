@@ -9,14 +9,12 @@ import type {
   FeatureKey,
   PredictionCorrection,
 } from "store/data/types";
-import { OBJECT_FEATURES } from "store/data/types";
 import type { ClassifierState, KindClassifier } from "store/classifier/types";
 
 import type { Partition } from "utils/dl/enums";
 import type { ModelInfo } from "utils/dl/classification/types";
 
 import type { EntityState } from "@reduxjs/toolkit";
-import type { V11PreprocessSettings } from "./v11Types";
 
 export type V2Experiment = { id: string; name: string; channels?: number };
 
@@ -116,9 +114,7 @@ export type V2AnnotationVolume = {
   predictedAtRunId?: string;
   predictionCorrected?: PredictionCorrection;
 };
-// v2 is the current format, so its feature set tracks the live one rather than
-// snapshotting a subset. Freeze these into literals when v3 forks off.
-export const V2_OBJECT_FEATURES = OBJECT_FEATURES;
+
 export type V2FeatureKey = FeatureKey;
 export type V2AnnotationObject = {
   id: string;
@@ -153,13 +149,6 @@ export type V2DataState = {
 export type V2NormalizeOptions = {
   normalize: boolean;
   center: boolean;
-};
-
-export type V2PreprocessSettings = Omit<
-  V11PreprocessSettings,
-  "rescaleOptions"
-> & {
-  normalizeOptions: V2NormalizeOptions;
 };
 
 // Ripple up ONLY the types that transitively contain PreprocessSettings

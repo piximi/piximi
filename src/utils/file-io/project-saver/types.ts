@@ -31,10 +31,6 @@ export type SaveProjectWorkerInput = SaveProjectInput & {
   models: SerializedModels;
 };
 
-export type SaveProjectOutput = {
-  blob: Blob;
-};
-
 export type SaveProjectResult =
   | { success: true; blob: Blob }
   | { success: false; cancelled: true }

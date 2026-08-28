@@ -39,14 +39,12 @@ export type ImageSeries = {
   timeSeries: boolean;
   activeImageId: string;
 };
-export type ImageSeriesEntities = Record<string, ImageSeries>;
 
 export type Kind = {
   id: string;
   name: string;
   unknownCategoryId: string;
 };
-export type KindEntities = Record<string, Kind>;
 export type ExtendedKind = Kind & { cats: Array<ExtendedAnnotationCategory> };
 export type ExtendedKindEntities = Record<string, ExtendedKind>;
 
@@ -57,9 +55,7 @@ type BaseCategory = {
   isUnknown: boolean;
 };
 export type ImageCategory = BaseCategory & { type: "image" };
-export type ExtendedImageCategory = ImageCategory & {
-  labeldIds: Array<string>;
-};
+
 export type AnnotationCategory = BaseCategory & {
   type: "annotation";
   kindId: string;
@@ -69,10 +65,7 @@ export type ExtendedAnnotationCategory = AnnotationCategory & {
 };
 export type Category = ImageCategory | AnnotationCategory;
 export type CategoryEntities = Record<string, Category>;
-export type ExtendedCategory =
-  | ExtendedAnnotationCategory
-  | ExtendedImageCategory;
-export type ExtendedCategoryEntities = Record<string, ExtendedCategory>;
+
 export type PredictionCorrection = {
   correctedFromRunId: string;
   predictedCategoryId: string;
@@ -146,7 +139,6 @@ export type Channel = {
   upperQuartile?: number;
   features?: Partial<Record<ChannelFeature, number>>;
 };
-export type ChannelEntities = Record<string, Channel>;
 
 export type ChannelMeta = {
   id: string;
@@ -216,7 +208,6 @@ export type AnnotationObject = {
     Partial<Record<ChannelMeasurement, number>>
   >;
 };
-export type AnnotationEntities = Record<string, AnnotationObject>;
 
 export type ExtendedAnnotationObject = AnnotationObject &
   Omit<AnnotationVolume, "id" | "imageId"> & {
@@ -229,10 +220,7 @@ export type ExtendedAnnotationObject = AnnotationObject &
     planeIdx: number;
     imageName: string;
   };
-export type ExtendedAnnotationEntities = Record<
-  string,
-  ExtendedAnnotationObject
->;
+
 export type ItemCategoryUpdate = {
   id: string;
   categoryId: string;

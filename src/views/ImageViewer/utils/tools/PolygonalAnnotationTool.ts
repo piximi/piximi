@@ -1,5 +1,4 @@
-import { getDistance, pointsAreEqual } from "views/ImageViewer/utils";
-
+import { getDistance, pointsAreEqual } from "utils/image";
 import type { Point } from "utils/types";
 
 import { AnnotationState } from "../enums";

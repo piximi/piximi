@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import { dataSlice } from "store/data";
 import { AnnotationMode } from "views/ImageViewer/utils/enums";
-import { encode } from "views/ImageViewer/utils/rle";
 import type {
   AnnotationObject,
   BBox,
@@ -10,6 +9,7 @@ import type {
 } from "store/data/types";
 
 import { Partition } from "utils/dl/enums";
+import { rleEncodeArray } from "utils/image";
 
 import {
   selectAnnotationsForRender,
@@ -43,7 +43,7 @@ const annotation = (
     kindId: "kind-1",
     category: { id: "cat-1", color: "#123456" },
     boundingBox: [x0, y0, x0 + rows[0].length, y0 + rows.length] as BBox,
-    encodedMask: encode(grid(rows)),
+    encodedMask: rleEncodeArray(grid(rows)),
   }) as unknown as ExtendedAnnotationObject;
 
 const stroke = (x0: number, y0: number, rows: string[]): WorkingAnnotation =>
@@ -344,7 +344,7 @@ describe("updateAnnotationMask", () => {
     partition: Partition.Unassigned,
     shape: { planes: 1, width: 2, height: 2, channels: 3 },
     boundingBox: [0, 0, 2, 2],
-    encodedMask: encode(grid(["##", "##"])),
+    encodedMask: rleEncodeArray(grid(["##", "##"])),
     features: { area: 4 },
   });
 
@@ -364,7 +364,7 @@ describe("updateAnnotationMask", () => {
       dataSlice.actions.updateAnnotationMask({
         id: "A",
         boundingBox: [1, 1, 4, 3],
-        encodedMask: encode(grid(["###", "###"])),
+        encodedMask: rleEncodeArray(grid(["###", "###"])),
         features: { area: 6 },
         intensityMeasurements: { "": { total: 8 } },
       }),
@@ -386,7 +386,7 @@ describe("updateAnnotationMask", () => {
       dataSlice.actions.updateAnnotationMask({
         id: "A",
         boundingBox: [0, 0, 1, 1],
-        encodedMask: encode(grid(["#"])),
+        encodedMask: rleEncodeArray(grid(["#"])),
         features: undefined,
         intensityMeasurements: { "": { total: 8 } },
       }),

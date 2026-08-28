@@ -176,7 +176,7 @@ const v01_02_dataConverter = (
   return { kinds, categories, things };
 };
 
-export const v02GenerateKind = (kindName: string, useUUID?: boolean) => {
+const v02GenerateKind = (kindName: string, useUUID?: boolean) => {
   const kindId = useUUID ? generateUUID() : kindName;
   const unknownCategory = v02GenerateUnknownCategory(kindId);
   const kind: V02Kind = {
@@ -188,7 +188,7 @@ export const v02GenerateKind = (kindName: string, useUUID?: boolean) => {
   };
   return { kind, unknownCategory };
 };
-export const v02GenerateUnknownCategory = (kind: string) => {
+const v02GenerateUnknownCategory = (kind: string) => {
   const unknownCategoryId = generateUUID({ definesUnknown: true });
   const unknownCategory: V02Category = {
     id: unknownCategoryId,

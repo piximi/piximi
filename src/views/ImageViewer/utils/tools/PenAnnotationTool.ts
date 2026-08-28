@@ -1,10 +1,6 @@
 import IJSImage from "image-js";
 
-import {
-  connectPoints,
-  computeBoundingBoxFromContours,
-} from "views/ImageViewer/utils";
-
+import { connectPoints, computeBoundingBoxFromContours } from "utils/image";
 import type { Point } from "utils/types";
 
 import { AnnotationTool } from "./AnnotationTool";

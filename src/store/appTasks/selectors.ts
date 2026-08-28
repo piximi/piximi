@@ -1,6 +1,8 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { RootState } from "store/rootReducer";
-import { AppTaskType } from "./types";
+
+import type { RootState } from "store/rootReducer";
+
+import type { AppTaskType } from "./types";
 
 const selectTasksDict = (state: RootState) => state.appTasks.tasks;
 
@@ -10,7 +12,7 @@ const selectAllTasks = createSelector(selectTasksDict, (tasks) =>
   Object.values(tasks),
 );
 
-export const selectActiveTasks = createSelector(selectAllTasks, (tasks) =>
+const selectActiveTasks = createSelector(selectAllTasks, (tasks) =>
   tasks.filter((t) => t.status === "pending" || t.status === "running"),
 );
 

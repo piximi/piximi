@@ -7,7 +7,7 @@ import { imageViewerSlice } from "@ImageViewer/state/imageViewer";
 import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
 
 import { imageToScreenTransform } from "./coords";
-import { ZOOM_MAX, ZOOM_MIN } from "./useThreePanZoom";
+import { ZOOM_MAX, ZOOM_MIN } from "./consts";
 
 import type * as THREE from "three";
 import type { ViewportState } from "./coords";

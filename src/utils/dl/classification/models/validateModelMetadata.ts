@@ -36,7 +36,7 @@ const enumToCodec = <E extends Record<string, string>>(
   );
 };
 
-export const SerializedModelMetadataRType = iotsIntersection([
+const SerializedModelMetadataRType = iotsIntersection([
   IOTSType({
     preprocessSettings: iotsIntersection([
       IOTSType({
@@ -72,7 +72,7 @@ export const SerializedModelMetadataRType = iotsIntersection([
   IOTSPartialType({ modelArch: IOTSNumber }),
 ]);
 
-export const toError = (errors: any) => {
+const toError = (errors: any) => {
   import.meta.env.NODE_ENV !== "production" && logger(errors);
   throw new Error(failure(errors).join("\n"));
 };

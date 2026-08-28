@@ -6,7 +6,6 @@ import type { RootState } from "store/rootReducer";
 
 import type {
   ModelLifecycleStatus,
-  ModelArch,
   ModelInfo,
   Run,
   EvaluationResult,
@@ -19,18 +18,10 @@ import type {
   SoftmaxById,
 } from "./types";
 
-export const selectClassifierState = ({
-  classifier,
-}: {
-  classifier: ClassifierState;
-}): ClassifierState => {
-  return classifier;
-};
-
 /*
  * Kind Classifier Record
  */
-export const selectKindClassifierDict = ({
+const selectKindClassifierDict = ({
   classifier,
 }: {
   classifier: ClassifierState;
@@ -83,12 +74,7 @@ export const selectActiveModelName = createSelector(
     return kc.activeModel;
   },
 );
-export const selectNewModelArch = createSelector(
-  selectKindClassifier,
-  (kc): ModelArch => {
-    return kc.newModelArch;
-  },
-);
+
 export const selectKindModelNames = createSelector(selectKindClassifier, (kc) =>
   Object.keys(kc.modelInfoDict),
 );
@@ -96,7 +82,7 @@ export const selectKindModelNames = createSelector(selectKindClassifier, (kc) =>
 /*
  * Model Info
  */
-export const selectModelInfo = createSelector(
+const selectModelInfo = createSelector(
   selectKindClassifier,
   (kc): ModelInfo | undefined => {
     const modelName = kc.activeModel;
@@ -104,10 +90,7 @@ export const selectModelInfo = createSelector(
     return kc.modelInfoDict[modelName];
   },
 );
-export const selectConfidenceThreshold = createSelector(
-  selectModelInfo,
-  (info): number | undefined => info?.confidenceThreshold,
-);
+
 export const selectModelIsValid = createSelector(
   selectModelInfo,
   (info): boolean | undefined => info?.valid,
@@ -133,10 +116,6 @@ export const selectRunsForActiveModel = createSelector(
   (info): Run[] => {
     return info?.runs ?? [];
   },
-);
-export const selectActiveRun = createSelector(
-  [selectRunsForActiveModel],
-  (runs): Run | undefined => runs.at(-1), // undefined if no runs
 );
 export const selectModelEvaluationResults = createSelector(
   [selectRunsForActiveModel],

@@ -4,7 +4,7 @@ import { Download as DownloadIcon } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
+import { CustomListItemButton } from "components/ui";
 import { SaveProjectDialog } from "components/dialogs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 

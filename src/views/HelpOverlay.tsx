@@ -1,4 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
+
+import { MuiMarkdown, getOverrides } from "mui-markdown";
+
 import {
   Button,
   Card,
@@ -11,15 +14,13 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { MuiMarkdown, getOverrides } from "mui-markdown";
 import { Lock as LockIcon } from "@mui/icons-material";
+
+import type { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { helpContent } from "components/layout/HelpDrawer/HelpContent";
+
 import { useHelp } from "contexts";
-//import Markdown from "react-markdown";
-//import remarkGfm from "remark-gfm";
-import {
-  helpContent,
-  HelpItem,
-} from "components/layout/HelpDrawer/HelpContent";
+
 import { logger } from "utils/logUtils";
 import { formatString } from "utils/stringUtils";
 

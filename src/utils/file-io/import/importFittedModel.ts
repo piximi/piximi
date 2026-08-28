@@ -116,7 +116,7 @@ const ManifestFilesSchema = z.object({
   runHistory: z.string().optional(),
 });
 
-export const RunArraySchema = z.array(RunSchema);
+const RunArraySchema = z.array(RunSchema);
 
 const ManifestSchema = z.object({
   formatVersion: z.number(),
@@ -138,7 +138,7 @@ async function parseManifestFromText(
   }
 }
 
-export async function parseManifest(
+async function parseManifest(
   file: JSZip.JSZipObject,
 ): Promise<PiximiManifest | null> {
   try {
@@ -148,7 +148,7 @@ export async function parseManifest(
   }
 }
 
-export async function parseManifestFromFile(
+async function parseManifestFromFile(
   file: File,
 ): Promise<PiximiManifest | null> {
   try {
@@ -157,9 +157,7 @@ export async function parseManifestFromFile(
     return null;
   }
 }
-export async function parseRunHistory(
-  buffer: ArrayBuffer,
-): Promise<Run[] | null> {
+async function parseRunHistory(buffer: ArrayBuffer): Promise<Run[] | null> {
   try {
     const text = new TextDecoder().decode(buffer);
     const json = JSON.parse(text);

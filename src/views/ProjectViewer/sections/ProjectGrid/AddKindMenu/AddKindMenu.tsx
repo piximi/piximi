@@ -6,7 +6,7 @@ import { MenuItem, Typography } from "@mui/material";
 
 import { useDialogHotkey, useMobileView } from "hooks";
 
-import { BaseMenu } from "components/ui/BaseMenu";
+import { BaseMenu } from "components/ui";
 import { CreateKindDialog } from "components/dialogs";
 
 import { projectSlice } from "@ProjectViewer/state";

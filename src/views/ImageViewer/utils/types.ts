@@ -47,18 +47,6 @@ export type AnnotatorState = {
   toolType: ToolType;
 };
 
-export type ColorAdjustmentOptionsType = {
-  blackPoint: number;
-  brightness: number;
-  contrast: number;
-  exposure: number;
-  highlights: number;
-  hue: number;
-  saturation: number;
-  shadows: number;
-  vibrance: number;
-};
-
 export type ZoomToolOptionsType = {
   automaticCentering: boolean;
   mode: ZoomMode;

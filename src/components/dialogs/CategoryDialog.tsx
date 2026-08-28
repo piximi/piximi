@@ -1,10 +1,12 @@
 import { TextField, Box } from "@mui/material";
 
-import { useCategoryValidation } from "hooks/useCategoryValidation";
+import { useCategoryValidation } from "hooks/";
 
-import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { ColorPicker } from "components/ui/ColorPicker";
+import { ColorPicker } from "components/ui";
+
 import { formatString } from "utils/stringUtils";
+
+import { ConfirmationDialog } from "./ConfirmationDialog";
 
 type BaseCategoryDialogProps = {
   onClose: () => void;

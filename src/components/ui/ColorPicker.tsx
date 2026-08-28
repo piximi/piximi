@@ -1,6 +1,8 @@
-import { useState, MouseEvent, Fragment } from "react";
+import type { MouseEvent } from "react";
+import { useState, Fragment } from "react";
 
-import { ChromePicker, ColorResult } from "react-color";
+import type { ColorResult } from "react-color";
+import { ChromePicker } from "react-color";
 
 import { Popover, Box } from "@mui/material";
 import {

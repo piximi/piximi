@@ -15,14 +15,14 @@ import type {
   SegmentationState,
 } from "utils/dl/segmentation/types";
 
-export enum ErrorReason {
+enum ErrorReason {
   NotConfigured,
   NoInferenceImages,
   ExistingKind,
   ChannelMismatch,
 }
 
-export type ErrorContext = {
+type ErrorContext = {
   reason: ErrorReason;
   message: string;
   severity: number;

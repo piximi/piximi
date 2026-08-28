@@ -1,25 +1,26 @@
-import {
-  configureStore,
-  Dispatch,
-  EnhancedStore,
-  Middleware,
-  Tuple,
-  UnknownAction,
-} from "@reduxjs/toolkit";
-import logger from "redux-logger";
+import { configureStore, Tuple } from "@reduxjs/toolkit";
+import { logger } from "redux-logger";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { rootReducer, RootState } from "./rootReducer";
 import { classifierSlice } from "store/classifier";
-import { applicationSettingsSlice } from "./applicationSettings";
-import { dataSlice } from "./data";
-import { applicationMiddleware } from "./applicationSettings/applicationListeners";
-import { appTasksSlice } from "./appTasks/appTasksSlice";
 import { projectSlice } from "views/ProjectViewer/state/projectSlice";
 import { projectMiddleware } from "views/ProjectViewer/state/projectListeners";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { measurementsSlice } from "views/MeasurementViewer/state";
+
+import { appTasksSlice } from "./appTasks/appTasksSlice";
+import { dataSlice } from "./data";
+import { rootReducer } from "./rootReducer";
+import { applicationSettingsSlice } from "./applicationSettings";
+
+import type { RootState } from "./rootReducer";
+import type {
+  Dispatch,
+  EnhancedStore,
+  Middleware,
+  UnknownAction,
+} from "@reduxjs/toolkit";
 
 const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&
@@ -27,10 +28,7 @@ const loggingMiddleware: Middleware[] =
     ? [logger as Middleware<object, any, Dispatch<UnknownAction>>]
     : [];
 
-const listenerMiddlewares: Middleware[] = [
-  projectMiddleware.middleware,
-  applicationMiddleware.middleware,
-];
+const listenerMiddlewares: Middleware[] = [projectMiddleware.middleware];
 
 const preloadedState: RootState = {
   classifier: classifierSlice.getInitialState(),
@@ -52,15 +50,3 @@ const options = {
 };
 
 export const productionStore: EnhancedStore = configureStore(options);
-
-export const initStore = (loadedData: RootState | undefined) => {
-  const options = {
-    devTools: { trace: true, traceLimit: 15 },
-    middleware: () => new Tuple(...listenerMiddlewares, ...loggingMiddleware),
-    preloadedState: loadedData ?? {},
-    reducer: rootReducer,
-  };
-  const store = configureStore(options) as EnhancedStore;
-
-  return store;
-};

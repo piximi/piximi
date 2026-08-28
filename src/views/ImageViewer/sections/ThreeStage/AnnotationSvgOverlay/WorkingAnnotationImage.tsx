@@ -5,7 +5,8 @@ import { useSelector } from "react-redux";
 import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
 import { selectFullWorkingAnnotation } from "views/ImageViewer/state/annotator/reselectors";
 import { selectPendingOperation } from "@ImageViewer/state/operations/reselectors";
-import { colorOverlayROI, hexToRGBA } from "views/ImageViewer/utils";
+
+import { colorOverlayROI, hexToRGBA } from "utils/image";
 
 /**
  * The in-progress "working" annotation (drawn but not yet confirmed) rendered as

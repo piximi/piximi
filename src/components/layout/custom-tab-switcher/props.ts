@@ -1,7 +1,4 @@
-import { TabProps } from "@mui/material";
-import { HelpItem } from "../HelpDrawer/HelpContent";
-
-export type BasicTabProps = { label: string } & Omit<TabProps, "label">;
+import type { HelpItem } from "../HelpDrawer/HelpContent";
 
 export interface CommonTabPanelProps {
   children: React.ReactNode;
@@ -40,5 +37,3 @@ export type EditableTabsProps = {
   editable: true;
   handleTabEdit: (label: string, newLabel: string) => void;
 };
-
-export type GenericTabsProps = CommonTabsProps;

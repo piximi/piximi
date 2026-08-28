@@ -28,7 +28,7 @@ import { dataSlice } from "store/data";
 
 import { HotkeyContext } from "utils/enums";
 
-import { CategoryItem } from "./list-items/CategoryItem";
+import { CategoryItem } from "./CategoryItem";
 
 export const ProjectViewerCategories = () => {
   const dispatch = useDispatch();

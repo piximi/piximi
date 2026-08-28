@@ -212,7 +212,7 @@ type FitClassifierProgressBarProps = {
   currentEpoch: number;
 };
 
-export const FitClassifierProgressBar = ({
+const FitClassifierProgressBar = ({
   epochs,
   currentEpoch,
 }: FitClassifierProgressBarProps) => {

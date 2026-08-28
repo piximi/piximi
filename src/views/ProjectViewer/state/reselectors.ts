@@ -16,7 +16,6 @@ import { isFiltered } from "./filtering";
 import {
   selectActiveKindId,
   selectActiveView,
-  selectActiveSelectedIds,
   selectActiveFilters,
   selectSelectedImageIds,
 } from "./selectors";
@@ -95,24 +94,6 @@ export const selectVisibleItems = createSelector(
   },
 );
 
-export const selectVisibleSelectedItems = createSelector(
-  selectActiveSelectedIds,
-  selectVisibleItems,
-  (selectedIds, entities) => {
-    const selectedSet = new Set(selectedIds);
-    return entities.filter((entity) => selectedSet.has(entity.id));
-  },
-);
-
-export const selectActiveSelectedItems = createSelector(
-  selectActiveSelectedIds,
-  selectActiveItems,
-  (selectedIds, items) => {
-    const selectedSet = new Set(selectedIds);
-    return items.filter((items) => selectedSet.has(items.id));
-  },
-);
-
 export const selectActiveLabeledItems = createSelector(
   selectActiveItems,
   (activeItems) => {
@@ -129,13 +110,6 @@ export const selectActiveItemsByPartition = createSelector(
 );
 
 // --- Stats ---
-
-export const selectTotalActiveLabeledItems = createSelector(
-  selectActiveLabeledItems,
-  (labeledItems) => {
-    return labeledItems.length;
-  },
-);
 
 export const selectTotalActiveUnlabeledItems = createSelector(
   selectActiveItems,

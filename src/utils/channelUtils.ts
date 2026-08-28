@@ -1,4 +1,4 @@
-import { Image as IJSImage } from "image-js-latest";
+import type { Image as IJSImage } from "image-js-latest";
 
 /**
  * Find the bins that contains the percentage of pixels below min and max
@@ -8,7 +8,7 @@ import { Image as IJSImage } from "image-js-latest";
  * @param {number} pctMin
  * @param {number} pctMax
  */
-export function findBinOfPercentiles(
+function findBinOfPercentiles(
   histogram: ArrayBuffer,
   pixelCount: number,
   pctMin: number,
@@ -36,7 +36,7 @@ export function findBinOfPercentiles(
 }
 
 // Find bins at 10th / 90th percentile
-export function findBestFitBins(
+function findBestFitBins(
   histogram: ArrayBuffer,
   pixcount: number,
 ): [number, number] {
@@ -66,7 +66,7 @@ export function findBestFitBins(
 }
 
 // Find min and max bins attempting to replicate ImageJ's "Auto" button
-export function findAutoIJBins(
+function findAutoIJBins(
   histogram: ArrayBuffer,
   pixcount: number,
 ): [number, number] {
@@ -109,10 +109,7 @@ export function findAutoIJBins(
  * @param {ArrayBuffer} histogram
  * @param {number} pixelCount
  */
-export function findMedianBin(
-  histogram: ArrayBuffer,
-  pixelCount: number,
-): number {
+function findMedianBin(histogram: ArrayBuffer, pixelCount: number): number {
   const bins = new Uint32Array(histogram);
   const half = pixelCount / 2;
   let count = 0;
@@ -123,23 +120,6 @@ export function findMedianBin(
   return bins.length - 1;
 }
 
-export const PRESET_OPERATORS: Record<
-  keyof typeof RANGE_PRESETS,
-  (histogram: ArrayBuffer, numPixels: number) => [number, number]
-> = {
-  DEFAULT: (histogram: ArrayBuffer, numPixels) => {
-    return findBinOfPercentiles(histogram, numPixels, 0.5, 0.98);
-  },
-  IMAGEJ: (histogram: ArrayBuffer, numPixels) => {
-    return findAutoIJBins(histogram, numPixels);
-  },
-  AUTO1: (histogram: ArrayBuffer, numPixels) => {
-    return findBinOfPercentiles(histogram, numPixels, 0, 1);
-  },
-  AUTO2: (histogram: ArrayBuffer, numPixels) => {
-    return findBestFitBins(histogram, numPixels);
-  },
-};
 export const RANGE_PRESETS = {
   DEFAULT: "Default (50%-90%)",
   IMAGEJ: "ImageJ",

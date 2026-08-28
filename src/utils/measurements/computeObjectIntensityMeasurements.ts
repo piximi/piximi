@@ -1,11 +1,12 @@
-import { decode } from "@ImageViewer/utils";
-import {
+import type {
   AnnotationObject,
   BitDepth,
   ChannelMeasurement,
 } from "store/data/types";
+
 import { DataConnector } from "utils/data-connector";
 import { STORES } from "utils/data-connector/types";
+import { decodeRleArray } from "utils/image";
 
 // Keeps Math.round(maskPixelCount * UPPER_QUARTILE) from landing outside the sorted sample array.
 const MIN_QUARTILE_SAMPLE_SIZE = 4;
@@ -73,7 +74,7 @@ export const computeObjectIntensityMeasurements = async (
       const bbox = obj.boundingBox;
       const decodedMask = obj.decodedMask
         ? Uint8ClampedArray.from(obj.decodedMask)
-        : decode(obj.encodedMask);
+        : decodeRleArray(obj.encodedMask);
       const maskWidth = bbox[2] - bbox[0];
       const x0 = bbox[0];
       const y0 = bbox[1];
@@ -187,7 +188,7 @@ export const computeObjectIntensityMeasurementsLocal = async (
       const bbox = obj.boundingBox;
       const decodedMask = obj.decodedMask
         ? Uint8ClampedArray.from(obj.decodedMask)
-        : decode(obj.encodedMask);
+        : decodeRleArray(obj.encodedMask);
       const maskWidth = bbox[2] - bbox[0];
       const x0 = bbox[0];
       const y0 = bbox[1];

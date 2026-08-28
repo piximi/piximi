@@ -4,7 +4,11 @@ import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
 
 import { Partition } from "utils/dl/enums";
 
-import { ZARR_V01_IMAGE } from "../../zarr/types";
+import {
+  ZARR_V01_ANNOTATION,
+  ZARR_V01_CATEGORY,
+  ZARR_V01_IMAGE,
+} from "../../zarr/types";
 import {
   getAttr,
   getDataset,
@@ -171,32 +175,44 @@ async function deserializeAnnotationsGroup(
   _annotationsGroup: Group,
   onProgress: (p: number) => void,
 ): Promise<V01RawAnnotationObject[]> {
-  const imageIds = (await getAttr(_annotationsGroup, "image_id")) as string[];
+  const imageIds = (await getAttr(
+    _annotationsGroup,
+    ZARR_V01_ANNOTATION.ImageId,
+  )) as string[];
 
   const categories = (await getAttr(
     _annotationsGroup,
-    "annotation_category_id",
+    ZARR_V01_ANNOTATION.AnnotationCategoryId,
   )) as string[];
 
-  const ids = (await getAttr(_annotationsGroup, "annotation_id")) as string[];
-
-  const bboxes = await getDatasetSelection(_annotationsGroup, "bounding_box", [
-    null,
-  ]).then((ra) => ra.data as Uint8Array);
-
-  const maskLengths = await getDatasetSelection(
+  const ids = (await getAttr(
     _annotationsGroup,
-    "mask_length",
+    ZARR_V01_ANNOTATION.AnnotationId,
+  )) as string[];
+
+  const bboxes = await getDatasetSelection(
+    _annotationsGroup,
+    ZARR_V01_ANNOTATION.BBox,
     [null],
   ).then((ra) => ra.data as Uint8Array);
 
-  const masks = await getDatasetSelection(_annotationsGroup, "mask", [
-    null,
-  ]).then((ra) => ra.data as Uint8Array);
+  const maskLengths = await getDatasetSelection(
+    _annotationsGroup,
+    ZARR_V01_ANNOTATION.MaskLength,
+    [null],
+  ).then((ra) => ra.data as Uint8Array);
 
-  const planes = await getDatasetSelection(_annotationsGroup, "plane", [
-    null,
-  ]).then((ra) => ra.data as Uint8Array);
+  const masks = await getDatasetSelection(
+    _annotationsGroup,
+    ZARR_V01_ANNOTATION.Mask,
+    [null],
+  ).then((ra) => ra.data as Uint8Array);
+
+  const planes = await getDatasetSelection(
+    _annotationsGroup,
+    ZARR_V01_ANNOTATION.Plane,
+    [null],
+  ).then((ra) => ra.data as Uint8Array);
 
   const annotations: Array<V01RawAnnotationObject> = [];
   let bboxIdx = 0;
@@ -231,9 +247,18 @@ async function deserializeAnnotationsGroup(
 async function deserializeCategoriesGroup(
   categoriesGroup: Group,
 ): Promise<V01Category[]> {
-  const ids = (await getAttr(categoriesGroup, "category_id")) as string[];
-  const colors = (await getAttr(categoriesGroup, "color")) as string[];
-  const names = (await getAttr(categoriesGroup, "name")) as string[];
+  const ids = (await getAttr(
+    categoriesGroup,
+    ZARR_V01_CATEGORY.CategoryId,
+  )) as string[];
+  const colors = (await getAttr(
+    categoriesGroup,
+    ZARR_V01_CATEGORY.Color,
+  )) as string[];
+  const names = (await getAttr(
+    categoriesGroup,
+    ZARR_V01_CATEGORY.Name,
+  )) as string[];
 
   return ids.map((id, i) => ({
     id,

@@ -4,14 +4,13 @@ import {
   makeGraph,
   pointsAreEqual,
   getIdx,
-} from "views/ImageViewer/utils";
-
+} from "utils/image";
 import type { Point } from "utils/types";
+import type { PiximiGraph } from "utils/image";
 
 import { AnnotationTool } from "./AnnotationTool";
 import { AnnotationState } from "../enums";
 
-import type { PiximiGraph } from "views/ImageViewer/utils";
 import type { Image as IJSImage } from "image-js-latest";
 
 export class MagneticAnnotationTool extends AnnotationTool {

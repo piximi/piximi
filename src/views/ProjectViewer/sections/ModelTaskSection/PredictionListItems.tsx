@@ -3,8 +3,7 @@ import { List } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { CustomListItemButton } from "components/ui/CustomListItemButton";
-import { ListItemHoldButton } from "components/ui/ListItemHoldButton";
+import { CustomListItemButton, ListItemHoldButton } from "components/ui";
 
 import { useAcceptClearPredictions } from "@ProjectViewer/hooks";
 

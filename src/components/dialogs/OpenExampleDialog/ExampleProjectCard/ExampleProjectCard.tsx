@@ -1,12 +1,8 @@
-import { useDispatch } from "react-redux";
+import { useProjectLoader } from "hooks";
 
-import { BaseHorizCard } from "components/ui/BaseHorizCard";
-
-import { applicationSettingsSlice } from "store/applicationSettings";
+import { BaseHorizCard } from "components/ui";
 
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
-
-import { useProjectLoader } from "hooks";
 
 // CloudFront distribution domain
 const DOMAIN = "https://dw9hr7pc3ofrm.cloudfront.net";
@@ -38,18 +34,10 @@ export const ExampleProjectCard = ({
   exampleProject,
   onClose,
 }: ExampleProjectCardProps) => {
-  const dispatch = useDispatch();
   const { loadExample } = useProjectLoader();
 
   const openExampleProject = async () => {
     onClose();
-
-    dispatch(
-      applicationSettingsSlice.actions.setLoadPercent({
-        loadPercent: -1,
-        loadMessage: "loading example project...",
-      }),
-    );
 
     let exampleProjectFilePath: string;
     switch (exampleProject.enum) {
@@ -118,10 +106,6 @@ export const ExampleProjectCard = ({
     }
 
     await loadExample(exampleProjectFilePath, exampleProject.name);
-
-    dispatch(
-      applicationSettingsSlice.actions.setLoadPercent({ loadPercent: 1 }),
-    );
   };
   return (
     <BaseHorizCard

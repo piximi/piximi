@@ -1,11 +1,9 @@
 import {
-  decode,
   padMask,
   findContours,
   simplifyPolygon,
-} from "views/ImageViewer/utils";
-import type { AnnotationCategory, ImageObject } from "store/data/types";
-
+  decodeRleArray,
+} from "utils/image";
 import { logger } from "utils/logUtils";
 
 import type {
@@ -52,7 +50,11 @@ export const serializeCOCOFile = (
     const boxWidth = ann.boundingBox[2] - ann.boundingBox[0];
     const boxHeight = ann.boundingBox[3] - ann.boundingBox[1];
 
-    const paddedMask = padMask(decode(ann.encodedMask!), boxWidth, boxHeight);
+    const paddedMask = padMask(
+      decodeRleArray(ann.encodedMask!),
+      boxWidth,
+      boxHeight,
+    );
     // +2 to W, H to account for padding on mask
     const contours = findContours(paddedMask, boxWidth + 2, boxHeight + 2);
     const outerBorder = contours.find((b) => b.seqNum === 2);

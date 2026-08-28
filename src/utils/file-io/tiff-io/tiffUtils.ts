@@ -1,4 +1,4 @@
-import { RequireField } from "utils/types";
+import type { RequireField } from "utils/types";
 
 export type TiffTag = string[] | number[];
 export type IFDTag = TiffTag | Uint8Array | IFD | number[][];
@@ -392,10 +392,6 @@ export type BaseIFD = RequireField<
   | "283"
   | "296"
 >;
-export type PaletteColorIFD = RequireField<BaseIFD, "320">;
-export type RGBIFD = RequireField<BaseIFD, "284">;
-export type YCbCrIFD = RequireField<BaseIFD, "529" | "530" | "531" | "532">;
-export type ClassFIFD = RequireField<BaseIFD, "326" | "327" | "328">;
 
 // The number of bytes required to store the values
 export const TIFF_OFFSETS: {

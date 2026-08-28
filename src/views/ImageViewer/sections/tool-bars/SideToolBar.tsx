@@ -125,7 +125,7 @@ const toolMap: ToolMap = {
   },
 };
 
-export const AnnotationToolBar = () => {
+const AnnotationToolBar = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const t = useTranslation();

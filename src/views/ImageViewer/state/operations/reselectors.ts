@@ -1,10 +1,11 @@
 import { createSelector } from "@reduxjs/toolkit";
 
 import { AnnotationMode } from "views/ImageViewer/utils/enums";
-import { decode } from "views/ImageViewer/utils/rle";
 import { foldOperands, masksOverlap } from "views/ImageViewer/utils/maskOps";
 import type { BBox, ExtendedAnnotationObject } from "store/data/types";
 import { selectAnnotationEntities } from "store/data/selectors";
+
+import { decodeRleArray } from "utils/image";
 
 import {
   selectAnnotationMode,
@@ -25,7 +26,7 @@ const FOLD_OP: Partial<Record<AnnotationMode, SetOperation>> = {
 const asRegion = <A extends { encodedMask: number[]; boundingBox: BBox }>(
   a: A,
 ): MaskRegion => ({
-  mask: Uint8Array.from(decode(a.encodedMask)),
+  mask: Uint8Array.from(decodeRleArray(a.encodedMask)),
   bbox: a.boundingBox,
 });
 
@@ -107,7 +108,7 @@ export const selectSelectionOverlaps = createSelector(
         masksOverlap(
           region.mask,
           region.bbox,
-          Uint8Array.from(decode(ann.encodedMask)),
+          Uint8Array.from(decodeRleArray(ann.encodedMask)),
           ann.boundingBox,
         ),
       );

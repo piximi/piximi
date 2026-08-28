@@ -1,10 +1,9 @@
 import { merge } from "lodash";
 
-import { decode } from "views/ImageViewer/utils";
-
 import type { BaseIFD } from "utils/file-io/tiff-io";
 import { TiffIO } from "utils/file-io/tiff-io";
 import { AnnotationExportType } from "utils/file-io/export/enums";
+import { decodeRleArray } from "utils/image";
 
 import type { ExportedAnnotation } from "./types";
 import type JSZip from "jszip";
@@ -86,7 +85,7 @@ export const exportAnnotationMasks = (
       height: bbox[3] - bbox[1],
     };
     const plane = ann.planeIdx;
-    const decodedMask = ann.decodedMask ?? decode(ann.encodedMask);
+    const decodedMask = ann.decodedMask ?? decodeRleArray(ann.encodedMask);
     let categoryName = ann.category.name;
     const kind = ann.kindName;
     const imageShape = ann.imageShape;

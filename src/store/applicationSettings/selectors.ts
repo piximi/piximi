@@ -1,8 +1,9 @@
-import { HotkeyContext } from "utils/enums";
-import { ThemeMode } from "themes/enums";
+import type { AppSettingsState } from "store/types";
 
-import { AlertState } from "utils/types";
-import { AppSettingsState } from "store/types";
+import type { HotkeyContext } from "utils/enums";
+import type { AlertState } from "utils/types";
+
+import type { ThemeMode } from "themes/enums";
 
 export const selectAlertState = ({
   applicationSettings,
@@ -26,14 +27,6 @@ export const selectImageSelectionColor = ({
   applicationSettings: AppSettingsState;
 }): string => {
   return applicationSettings.imageSelectionColor;
-};
-
-export const selectInitSettings = ({
-  applicationSettings,
-}: {
-  applicationSettings: AppSettingsState;
-}) => {
-  return applicationSettings.init;
 };
 
 export const selectLanguageType = ({
@@ -84,21 +77,6 @@ export const selectTextOnScroll = ({
   return applicationSettings.textOnScroll;
 };
 
-export const selectLoadPercent = ({
-  applicationSettings,
-}: {
-  applicationSettings: AppSettingsState;
-}) => {
-  return applicationSettings.loadPercent;
-};
-
-export const selectLoadMessage = ({
-  applicationSettings,
-}: {
-  applicationSettings: AppSettingsState;
-}) => {
-  return applicationSettings.loadMessage;
-};
 export const selectShowSaveProjectDialog = ({
   applicationSettings,
 }: {

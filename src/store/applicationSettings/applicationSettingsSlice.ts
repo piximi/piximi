@@ -1,16 +1,18 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+
+import type { AppSettingsState } from "store/types";
 
 import { logger } from "utils/logUtils";
-
 import { DEFAULT_ALERT } from "utils/constants";
-import { HotkeyContext, Languages } from "utils/enums";
+import type { HotkeyContext } from "utils/enums";
+import { Languages } from "utils/enums";
+import type { AlertState } from "utils/types";
+
 import { ThemeMode } from "themes/enums";
 
-import { AlertState } from "utils/types";
-import { AppSettingsState } from "store/types";
+import type { PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: AppSettingsState = {
-  init: false,
   tileSize: 1,
   themeMode: ThemeMode.Light,
   language: Languages.English,
@@ -20,8 +22,6 @@ const initialState: AppSettingsState = {
   alertState: DEFAULT_ALERT,
   hotkeyStack: [],
   textOnScroll: false,
-  loadPercent: 1,
-  loadMessage: "",
   showSaveProjectDialog: true,
   showClearPredictionsWarning: true,
 };
@@ -30,9 +30,6 @@ export const applicationSettingsSlice = createSlice({
   name: "application",
   initialState: initialState,
   reducers: {
-    initialized(state: AppSettingsState) {
-      state.init = true;
-    },
     resetApplicationSettingsSetings(_state: AppSettingsState) {
       return initialState;
     },
@@ -99,33 +96,6 @@ export const applicationSettingsSlice = createSlice({
       action: PayloadAction<{ textOnScroll: boolean }>,
     ) {
       state.textOnScroll = action.payload.textOnScroll;
-    },
-    setLoadPercent(
-      state,
-      action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>,
-    ) {
-      const { loadPercent, loadMessage } = action.payload;
-
-      if (!loadPercent) {
-        state.loadPercent = 1; // not / done loading
-        state.loadMessage = "";
-      } else if (loadPercent < 0) {
-        state.loadPercent = -1; // indefinite loading
-        state.loadMessage = loadMessage ?? "Loading...";
-      } else if (loadPercent >= 1) {
-        state.loadPercent = 1; // default to not loading if invalid
-        state.loadMessage = "";
-      } else {
-        state.loadPercent = loadPercent; // loading [0, 1]
-        state.loadMessage = loadMessage ?? "";
-      }
-    },
-    sendLoadPercent(
-      _state,
-      _action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>,
-    ) {},
-    setLoadMessage(state, action: PayloadAction<{ message: string }>) {
-      state.loadMessage = action.payload.message;
     },
     setShowSaveProjectDialog(state, action: PayloadAction<{ show: boolean }>) {
       state.showSaveProjectDialog = action.payload.show;

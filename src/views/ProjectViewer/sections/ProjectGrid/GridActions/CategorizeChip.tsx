@@ -3,7 +3,7 @@ import { useState } from "react";
 import { LabelOutlined as LabelOutlinedIcon } from "@mui/icons-material";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { TooltipButton, TooltipTitle } from "components/ui/tooltips";
+import { TooltipButton, TooltipTitle } from "components/ui";
 
 import type { Category } from "store/data/types";
 

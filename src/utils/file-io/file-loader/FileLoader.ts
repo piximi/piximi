@@ -29,7 +29,7 @@ import type {
   UploadStage,
 } from "./types";
 
-export const INITIAL_PROGRESS: Progress = {
+const INITIAL_PROGRESS: Progress = {
   stage: "idle",
   stageProgress: 0,
   overallProgress: 0,

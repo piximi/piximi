@@ -10,7 +10,7 @@ import type { InferenceInput } from "../types";
 import type { ISegmenterApi, ModelName } from "./types";
 import type { SegmenterHandler } from "./worker/SegmenterHandler";
 
-export class SegmenterApi implements ISegmenterApi {
+class SegmenterApi implements ISegmenterApi {
   private worker: Worker;
   private backend: Comlink.Remote<SegmenterHandler>;
   private static instance: SegmenterApi | undefined;
@@ -103,7 +103,7 @@ export class SegmenterApi implements ISegmenterApi {
   }
 }
 
-export type SegmenterBackend = "local" | "remote";
+type SegmenterBackend = "local" | "remote";
 
 let current: { backend: SegmenterBackend; api: ISegmenterApi } | undefined;
 
@@ -139,11 +139,11 @@ export function getSegmenterApi(): ISegmenterApi {
  * No consumer in this refactor calls this. It exists as the seam for the
  * future functionality that lets the user pick a backend.
  */
-export async function setSegmenterBackend(
-  backend: SegmenterBackend,
-): Promise<ISegmenterApi> {
-  if (current?.backend === backend) return current.api;
-  // TODO await current?.api.destroy();
-  current = { backend, api: construct(backend) };
-  return current.api;
-}
+// export async function setSegmenterBackend(
+//   backend: SegmenterBackend,
+// ): Promise<ISegmenterApi> {
+//   if (current?.backend === backend) return current.api;
+//   // TODO await current?.api.destroy();
+//   current = { backend, api: construct(backend) };
+//   return current.api;
+// }

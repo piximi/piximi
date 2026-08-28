@@ -11,7 +11,7 @@ import {
 import type { ModelName, SegmentationResults } from "../../types";
 import type { GraphModel } from "@tensorflow/tfjs";
 
-export type ModelArgs = {
+type ModelArgs = {
   name: ModelName;
   kind?: string | Array<string>;
   requiredChannels: number;

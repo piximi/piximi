@@ -1,12 +1,13 @@
 import { test, expect } from "vitest";
-import { decode, encode } from "../rle";
+
+import { decodeRleArray, rleEncodeArray } from "../rle";
 
 test("decode", () => {
   const encoded = [0, 6, 1];
 
   const decoded = Uint8ClampedArray.from([255, 255, 255, 255, 255, 255, 0]);
 
-  expect(decode(encoded)).toStrictEqual(decoded);
+  expect(decodeRleArray(encoded)).toStrictEqual(decoded);
 
   expect(true).toBe(true);
 });
@@ -16,7 +17,7 @@ test("encode", () => {
 
   const encoded = [2, 3, 1, 1];
 
-  expect(encode(decoded)).toStrictEqual(encoded);
+  expect(rleEncodeArray(decoded)).toStrictEqual(encoded);
 });
 
 // TODO: mock ImageData

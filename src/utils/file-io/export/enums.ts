@@ -7,15 +7,3 @@ export enum AnnotationExportType {
   COCO,
   PIXIMI,
 }
-
-export enum MIMETYPES {
-  PNG = "image/png",
-  JPEG = "image/jpeg",
-  TIFF = "image/tiff",
-  TIF = "image/tif",
-  TIFF_APPLICATION = "application/tiff",
-  TIF_APPLICATION = "application/tif",
-  DICOM = "image/dicom",
-  BMP = "image/bmp",
-  DICOM_APPLICATION = "application/dicom",
-}

@@ -3,14 +3,18 @@
  * @param encoded Run-length encoded input array
  * @returns The decoded input array
  */
-export const decodeRleArray = (encoded: Array<number>): Uint8ClampedArray => {
+export const decodeRleArray = (
+  encoded: Array<number>,
+  toBinary?: boolean,
+): Uint8ClampedArray => {
   const decoded = [];
 
   let background = true;
+  const highVal = toBinary ? 1 : 255;
 
   for (let i = 0; i < encoded.length; i++) {
     for (let j = 0; j < encoded[i]; j++) {
-      decoded.push(background ? 0 : 255);
+      decoded.push(background ? 0 : highVal);
     }
 
     background = !background;
@@ -18,7 +22,6 @@ export const decodeRleArray = (encoded: Array<number>): Uint8ClampedArray => {
 
   return new Uint8ClampedArray(decoded);
 };
-
 /**
  * Compute the Run-length encoding of the input array.
  * @param decoded (decoded) input array

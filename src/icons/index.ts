@@ -1,5 +1,5 @@
 // Import and export components
-export { ColorAdjustment } from "./ColorAdjustment";
+
 export { ColorAnnotation } from "./ColorAnnotation";
 export { EllipticalAnnotation } from "./EllipticalAnnotation";
 export { FreehandAnnotation } from "./FreehandAnnotation";
@@ -10,12 +10,8 @@ export { QuickAnnotation } from "./QuickAnnotation";
 export { RectangleAnnotation } from "./RectangleAnnotation";
 export { Selection } from "./Selection";
 
-export { CursorZoom, StageZoom, Zoom } from "./Zoom";
+export { CursorZoom, StageZoom } from "./Zoom";
 export { SubtractAnnotationsIcon } from "./SubtractAnnotationsIcon";
 export { CombineAnnotationsIcon } from "./CombineAnnotationsIcon";
 export { IntersectAnnotationsIcon } from "./IntersectAnnotationsIcon";
 export { NewAnnotationIcon } from "./NewAnnotationIcon";
-export { LeftDrawer } from "./LeftDrawer";
-export { RightBar } from "./RightBar";
-export { TopBar } from "./TopBar";
-export { MainContent } from "./MainContent";

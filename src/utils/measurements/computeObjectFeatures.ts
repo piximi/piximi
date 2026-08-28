@@ -1,10 +1,11 @@
-import { decode } from "@ImageViewer/utils";
-import { fromMask, getRois, Mask, Roi } from "image-js-latest";
-import {
-  AnnotationObject,
-  FeatureKey,
-  OBJECT_FEATURES,
-} from "store/data/types";
+import { fromMask, getRois, Mask } from "image-js-latest";
+
+import type { AnnotationObject, FeatureKey } from "store/data/types";
+import { OBJECT_FEATURES } from "store/data/types";
+
+import { decodeRleArray } from "utils/image";
+
+import type { Roi } from "image-js-latest";
 
 const featureOps: Record<FeatureKey, (r: Roi) => number> = {
   area: (r) => r.surface,
@@ -57,7 +58,7 @@ export const computeObjectFeatures = (
   const computedFeatures: Record<string, AnnotationObject["features"]> = {};
   for (const obj of objects) {
     const decodedMask = Uint8Array.from(
-      obj.decodedMask ?? decode(obj.encodedMask, true),
+      obj.decodedMask ?? decodeRleArray(obj.encodedMask, true),
     );
     const bbox = obj.boundingBox;
     const bboxW = bbox[2] - bbox[0];

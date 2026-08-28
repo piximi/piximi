@@ -4,10 +4,10 @@ import { useSelector } from "react-redux";
 
 import * as THREE from "three";
 
-import { colorOverlayROI, hexToRGBA } from "views/ImageViewer/utils";
-import { decode } from "views/ImageViewer/utils/rle";
 import { selectSelectedAnnotations } from "@ImageViewer/state/image-viewer-data/reselectors";
 import { selectAnnotationsForRender } from "@ImageViewer/state/operations/reselectors";
+
+import { colorOverlayROI, hexToRGBA, decodeRleArray } from "utils/image";
 
 type MeshEntry = {
   mesh: THREE.Mesh;
@@ -119,7 +119,7 @@ export const useThreeAnnotationMeshes = ({
       // trip. The store still keeps encodedMask as the source of truth.
       const decodedMask =
         annotation.decodedMask ??
-        Uint8Array.from(decode(annotation.encodedMask));
+        Uint8Array.from(decodeRleArray(annotation.encodedMask));
       const color = hexToRGBA(fillColor, 0);
       const img = colorOverlayROI(
         decodedMask,

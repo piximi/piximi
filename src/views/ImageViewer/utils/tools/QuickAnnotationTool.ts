@@ -1,6 +1,6 @@
 import { encodeDataURL, fromMask, Image as IJSImage } from "image-js-latest";
 
-import { slic } from "views/ImageViewer/utils";
+import { slic } from "utils/image";
 
 import { AnnotationTool } from "./AnnotationTool";
 import { AnnotationState } from "../enums";

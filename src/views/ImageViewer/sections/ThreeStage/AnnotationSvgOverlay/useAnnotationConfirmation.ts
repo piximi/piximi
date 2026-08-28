@@ -6,7 +6,6 @@ import { useSound } from "use-sound";
 
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 import { dataSlice } from "store/data";
-import { encode } from "@ImageViewer/utils";
 import type { AnnotationObject, AnnotationVolume } from "store/data/types";
 import { generateUUID } from "store/data/utils";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
@@ -24,6 +23,7 @@ import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/image
 import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
 import { Partition } from "utils/dl/enums";
 import { computeObjectIntensityMeasurements } from "utils/measurements/computeObjectIntensityMeasurements";
+import { rleEncodeArray } from "utils/image";
 
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
@@ -91,7 +91,7 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
           dataSlice.actions.updateAnnotationMask({
             id,
             boundingBox: region.bbox,
-            encodedMask: encode(region.mask),
+            encodedMask: rleEncodeArray(region.mask),
             features: features[id],
             intensityMeasurements: channelMeasurements,
           }),
@@ -134,7 +134,7 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
       partition: Partition.Unassigned,
       shape: { planes: 1, width: bboxW, height: bboxH, channels: 1 },
       boundingBox: wAnn.boundingBox,
-      encodedMask: encode(wAnn.decodedMask),
+      encodedMask: rleEncodeArray(wAnn.decodedMask),
     };
     const features = computeObjectFeatures([
       { ...annotation, decodedMask: wAnn.decodedMask },

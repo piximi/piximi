@@ -7,12 +7,12 @@ import type { AtLeastOne } from "utils/types";
 import { representsUnknown } from "utils/stringUtils";
 
 import {
-  UNKNOWN_IMAGE_CATEGORY_COLOR,
   UNKNOWN_IMAGE_CATEGORY_ID,
   UNKNOWN_KIND,
   UNKNOWN_KIND_CATEGORY,
   UNKNOWN_KIND_CATEGORY_ID,
   UNKNOWN_KIND_ID,
+  UNKNOWN_IMAGE_CATEGORY,
 } from "./constants";
 
 import type {
@@ -50,13 +50,6 @@ const getInitialExperiment = (): Experiment => ({
   id: generateUUID(),
   name: "New Project",
 });
-const UNKNOWN_IMAGE_CATEGORY: Category = {
-  id: UNKNOWN_IMAGE_CATEGORY_ID,
-  name: "Unknown",
-  type: "image",
-  color: UNKNOWN_IMAGE_CATEGORY_COLOR,
-  isUnknown: true,
-};
 
 function batchBubbleDeleteAnnotation(
   state: DataStateV2,

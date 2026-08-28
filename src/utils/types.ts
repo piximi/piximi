@@ -1,27 +1,14 @@
-import type { Tensor2D } from "@tensorflow/tfjs";
 import type { AlertType } from "./enums";
 
 /*
 TYPESCRIPT TYPES
 */
-type Deferred<T> = Partial<T> & {
-  deleted?: boolean;
-  added?: boolean;
-};
-
-export type DeferredEntity<T> = {
-  saved: T;
-  changes: Deferred<T>;
-};
 
 export type FilterType<T> = {
   [K in keyof T]?: T[K] extends string
     ? Array<T[K]>
     : { min: number; max: number };
 };
-
-// --> PartialField
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 
 // --> RequiredField
 export type RequireField<T, K extends keyof T> = Omit<T, K> &
@@ -44,23 +31,6 @@ export type AtLeastOne<T, K extends keyof T = keyof T> = K extends keyof T
   : never;
 
 /*
-TENSORFLOW
-*/
-
-type ColorsMeta = {
-  range: { [channel: number]: [number, number] };
-  visible: { [channel: number]: boolean };
-};
-
-export type Colors = {
-  color: Tensor2D; // shape: C x 3; [channel_idx, rgb]
-} & ColorsMeta;
-
-export type ColorsRaw = {
-  color: [number, number, number][];
-} & ColorsMeta;
-
-/*
 ALERT TYPES
 */
 
@@ -73,11 +43,6 @@ export type AlertState = {
   visible?: boolean;
 };
 
-export type LoadStatus = {
-  loading: boolean;
-  value?: number;
-  message?: string;
-};
 export type LoadCB = (loadPercent: number, loadMessage: string) => void;
 export type TaskError = {
   source: string;
@@ -104,13 +69,6 @@ export type Progress = {
   errors: Map<string, TaskError[]>;
   warnings: string[];
 };
-
-/*
-GENERATOR TYPES
-*/
-// https://stackoverflow.com/questions/55105558/is-there-a-way-i-can-get-the-return-type-of-the-generator-function
-export type GeneratorReturnType<T extends Generator> =
-  T extends Generator<any, infer R, any> ? R : never;
 
 /*
   HOTKEY TYPES

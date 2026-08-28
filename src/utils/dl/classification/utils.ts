@@ -22,39 +22,11 @@ import type {
   ModelInfoDTO,
   Run,
 } from "./types";
-import type {
-  ModelCompileArgs,
-  LayersModel,
-  GraphModel,
-} from "@tensorflow/tfjs";
+import type { ModelCompileArgs, LayersModel } from "@tensorflow/tfjs";
 
 const DEFAULT_CONFIDENCE_THRESHOLD = 0.5;
 const DEFAULT_TRAINING_PERCENTAGE = 0.8;
-export const optimizerParams = [
-  "epochs",
-  "batchSize",
-  "learningRate",
-  "lossFunction",
-  "metrics",
-  "optimizationAlgorithm",
-] as const;
-export type OptimizerParams = (typeof optimizerParams)[number];
 
-export const preprocessParams = [
-  "inputShape",
-  "planes",
-  "height",
-  "width",
-  "channels",
-  "shuffle",
-  "normalizeOptions",
-  "normalize",
-  "center",
-  "cropOptions",
-  "numCrops",
-  "cropSchema",
-  "trainingPercentage",
-];
 export const getDefaultModelParams = (
   channels: number = 1,
 ): ClassifierModelParams => ({
@@ -334,7 +306,7 @@ export const createCompileArgs = (options: OptimizerSettings) => {
   };
 };
 
-export async function hashIds(ids: string[]): Promise<string> {
+async function hashIds(ids: string[]): Promise<string> {
   const sorted = [...ids].sort();
   const data = new TextEncoder().encode(sorted.join("\n"));
   const buf = await crypto.subtle.digest("SHA-256", data);
@@ -357,12 +329,6 @@ export async function fingerprintDataset(
 }
 
 export const hashCategorySet = hashIds; // semantic alias
-
-export const isLayersModel = (
-  model: LayersModel | GraphModel,
-): model is LayersModel => {
-  return (model as LayersModel).fit !== undefined;
-};
 
 export function modelInfoDTOToModelInfo(
   dto: ModelInfoDTO,

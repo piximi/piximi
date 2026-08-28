@@ -1,4 +1,4 @@
-import type { Kind, Shape } from "store/data/types";
+import type { Shape } from "store/data/types";
 
 import type {
   CropSchema,
@@ -197,24 +197,9 @@ export type LoadModelArgs = {
   randomizeWeights?: boolean;
 };
 
-export type LoadInferenceDataArgs = {
-  fitOptions: FitOptions;
-  // if cat undefined, created from default classes
-  // if defined, it should be length 1, as only a foreground class is needed
-  kinds?: Array<Kind>;
-};
-
 export type TrainingCallbacks = {
   onEpochEnd: (epoch: number, logs?: Logs) => Promise<void>;
 };
-
-export type ModelLoadResult =
-  | { success: true; modelInfo: ModelInfoDTO }
-  | {
-      success: false;
-      modelName: string;
-      error: { reason: string; err?: Error };
-    };
 
 export type BatchModelLoadResult = {
   loadedModels: ModelInfoDTO[];

@@ -28,19 +28,3 @@ export enum Languages {
   Hungarian = "Hungarian",
   Spanish = "Spanish",
 }
-
-export enum ImageSortKey {
-  None,
-  FileName,
-  Category,
-  Random,
-  Image,
-}
-
-export enum ThingSortKey {
-  None = "None",
-  FileName = "File Name",
-  Category = "Category",
-  Random = "Random",
-  Name = "Name",
-}

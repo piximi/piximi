@@ -11,7 +11,7 @@ import type {
 } from "./types";
 import type { ClassifierHandler } from "./worker/ClassifierHandler";
 
-export class ClassifierApi implements IClassifierApi {
+class ClassifierApi implements IClassifierApi {
   private worker: Worker;
   private backend: Comlink.Remote<ClassifierHandler>;
   private static instance: ClassifierApi | undefined;
@@ -153,7 +153,7 @@ export class ClassifierApi implements IClassifierApi {
   }
 }
 
-export type ClassifierBackend = "local" | "remote";
+type ClassifierBackend = "local" | "remote";
 
 let current: { backend: ClassifierBackend; api: IClassifierApi } | undefined;
 
@@ -189,11 +189,11 @@ export function getClassifierApi(): IClassifierApi {
  * No consumer in this refactor calls this. It exists as the seam for the
  * future functionality that lets the user pick a backend.
  */
-export async function setClassifierBackend(
-  backend: ClassifierBackend,
-): Promise<IClassifierApi> {
-  if (current?.backend === backend) return current.api;
-  // TODO await current?.api.destroy();
-  current = { backend, api: construct(backend) };
-  return current.api;
-}
+// async function setClassifierBackend(
+//   backend: ClassifierBackend,
+// ): Promise<IClassifierApi> {
+//   if (current?.backend === backend) return current.api;
+//   // TODO await current?.api.destroy();
+//   current = { backend, api: construct(backend) };
+//   return current.api;
+// }

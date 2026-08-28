@@ -24,7 +24,7 @@ type FilterListProps<T> = {
   getColor: (item: T) => string | undefined;
 };
 
-export const useObservedHeight = (ref: RefObject<HTMLElement | null>) => {
+const useObservedHeight = (ref: RefObject<HTMLElement | null>) => {
   const [height, setHeight] = useState<number>();
   useLayoutEffect(() => {
     const node = ref.current;

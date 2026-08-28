@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import React, { useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
@@ -47,8 +48,16 @@ import {
 import { ProjectActions } from "../ProjectActions";
 import { ProjectViewerCategories } from "../ProjectViewerCategories";
 
-import type { OperationType } from "./ToolOptionsDrawer";
-
+type OperationType = {
+  icon: (color: string) => ReactElement;
+  name: string;
+  description: string;
+  options?: ReactElement;
+  action?: () => void;
+  hotkey: string;
+  mobile?: boolean;
+  helpContext?: HelpItem;
+};
 const imageTools: Record<string, OperationType> = {
   fileIO: {
     icon: (color) => <FolderOpenIcon fontSize="small" sx={{ color }} />,
@@ -280,9 +289,7 @@ type ToolProps = HTMLDataAttributes & {
   selected?: boolean;
 };
 
-//TODO: tool buttons
-
-export const Tool = ({
+const Tool = ({
   children,
   options,
   name,

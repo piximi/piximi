@@ -4,20 +4,11 @@ import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
 import type {
   AnnotationGridState,
-  ImageFilters,
   ImageGridState,
   ImageSortType,
   ProjectState,
   ViewState,
 } from "./types";
-
-export const selectProject = ({
-  project,
-}: {
-  project: ProjectState;
-}): ProjectState => {
-  return project;
-};
 
 export const selectActiveView = ({
   project,
@@ -42,7 +33,7 @@ export const selectProjectName = ({ project }: { project: ProjectState }) => {
 /*
 ~~ IMAGE GRID
 */
-export const selectImageGridState = ({
+const selectImageGridState = ({
   project,
 }: {
   project: ProjectState;
@@ -55,22 +46,6 @@ export const selectSelectedImageIds = ({
   project: ProjectState;
 }): Array<string> => {
   return project.imageGridState.selectedIds;
-};
-
-export const selectNumSelectedImages = ({
-  project,
-}: {
-  project: ProjectState;
-}): number => {
-  return project.imageGridState.selectedIds.length;
-};
-
-export const selectImageFilters = ({
-  project,
-}: {
-  project: ProjectState;
-}): ImageFilters => {
-  return project.imageGridState.filters;
 };
 
 export const selectImageSortType = ({
@@ -96,15 +71,6 @@ export const selectAnnotationGridState = ({
 export const selectKindStates = ({ project }: { project: ProjectState }) => {
   return project.annotationGridState.kindStates;
 };
-
-export const selectKindStateArray = createSelector(selectKindStates, (states) =>
-  Object.values(states),
-);
-
-export const selectVisibleKindStates = createSelector(
-  selectKindStates,
-  (states) => Object.values(states).filter((state) => state.visible === true),
-);
 
 export const selectActiveKindState = ({
   project,
@@ -164,21 +130,6 @@ export const selectActiveStateIsFiltered = ({
 };
 
 export const selectActiveSelectedIds = ({
-  project,
-}: {
-  project: ProjectState;
-}): string[] => {
-  const viewState = project.activeView;
-  const activeKindId = project.annotationGridState.activeKindId;
-  const activeState =
-    viewState === "images"
-      ? project.imageGridState
-      : project.annotationGridState.kindStates[activeKindId];
-
-  return activeState.selectedIds;
-};
-
-export const selectActiveFilteredSelectedIds = ({
   project,
 }: {
   project: ProjectState;

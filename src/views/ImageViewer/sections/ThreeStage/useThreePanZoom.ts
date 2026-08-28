@@ -6,10 +6,7 @@ import { imageViewerSlice } from "@ImageViewer/state/imageViewer";
 import { selectZoomToolOptions } from "@ImageViewer/state/imageViewer/selectors";
 
 import { useThreeViewport } from "./ThreeViewportContext";
-
-const ZOOM_SPEED = 0.035;
-export const ZOOM_MIN = 0.25;
-export const ZOOM_MAX = 5;
+import { ZOOM_MAX, ZOOM_MIN, ZOOM_SPEED } from "./consts";
 
 export function useThreePanZoom(
   mountRef: React.RefObject<HTMLDivElement | null>,

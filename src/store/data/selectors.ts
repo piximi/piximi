@@ -23,7 +23,6 @@ import type {
   ExtendedAnnotationCategory,
   ExtendedAnnotationObject,
   ExtendedChannel,
-  ExtendedImageCategory,
   ExtendedImageObject,
   ExtendedKindEntities,
   ImageEntities,
@@ -61,61 +60,23 @@ const annotationVolumeSelectors = annotationVolumeAdapter.getSelectors(
   (state: RootState) => state.data.annotationVolumes,
 );
 
-export const selectImageSeriesIds = imageSeriesSelectors.selectIds;
-export const selectImageSeriesEntities = imageSeriesSelectors.selectEntities;
-export const selectAllImageSeries = imageSeriesSelectors.selectAll;
-export const selectImageSeriesById = imageSeriesSelectors.selectById;
-export const selectTotalImageSeries = imageSeriesSelectors.selectTotal;
-
-export const selectImageIds = imageSelectors.selectIds;
 export const selectImageEntities = imageSelectors.selectEntities;
 export const selectAllImages = imageSelectors.selectAll;
-export const selectImageById = imageSelectors.selectById;
-export const selectTotalImages = imageSelectors.selectTotal;
 
 export const selectKindIds = kindSelectors.selectIds;
 export const selectKindEntities = kindSelectors.selectEntities;
 export const selectAllKinds = kindSelectors.selectAll;
-export const selectKindById = kindSelectors.selectById;
-export const selectTotalKinds = kindSelectors.selectTotal;
 
-export const selectCategoryIds = categorySelectors.selectIds;
 export const selectCategoryEntities = categorySelectors.selectEntities;
 export const selectAllCategories = categorySelectors.selectAll;
 export const selectCategoryById = categorySelectors.selectById;
-export const selectTotalCategories = categorySelectors.selectTotal;
 
-export const selectPlaneIds = planeSelectors.selectIds;
-export const selectPlaneEntities = planeSelectors.selectEntities;
-export const selectAllPlanes = planeSelectors.selectAll;
-export const selectPlaneById = planeSelectors.selectById;
-export const selectTotalPlanes = planeSelectors.selectTotal;
-
-export const selectChannelIds = channelSelectors.selectIds;
-export const selectChannelEntities = channelSelectors.selectEntities;
-export const selectAllChannels = channelSelectors.selectAll;
-export const selectChannelById = channelSelectors.selectById;
-export const selectTotalChannels = channelSelectors.selectTotal;
-
-export const selectChannelMetaIds = channelMetaSelectors.selectIds;
 export const selectChannelMetaEntities = channelMetaSelectors.selectEntities;
 export const selectAllChannelMetas = channelMetaSelectors.selectAll;
 export const selectChannelMetaById = channelMetaSelectors.selectById;
-export const selectTotalChannelMetas = channelMetaSelectors.selectTotal;
 
-export const selectAnnotationIds = annotationSelectors.selectIds;
 export const selectAnnotationEntities = annotationSelectors.selectEntities;
-export const selectAllAnnotations = annotationSelectors.selectAll;
-export const selectAnnotationById = annotationSelectors.selectById;
 export const selectTotalAnnotations = annotationSelectors.selectTotal;
-
-export const selectAnnotationVolumeIds = annotationVolumeSelectors.selectIds;
-export const selectAnnotationVolumeEntities =
-  annotationVolumeSelectors.selectEntities;
-export const selectAllAnnotationVolumes = annotationVolumeSelectors.selectAll;
-export const selectAnnotationVolumeById = annotationVolumeSelectors.selectById;
-export const selectTotalAnnotationVolumes =
-  annotationVolumeSelectors.selectTotal;
 
 /*
  * ───────────────────────────────────────────────────────────────────────
@@ -327,26 +288,6 @@ export const selectRepresentativeImages = createSelector(
 
 // -- Base --
 
-export const selectAnnotationsByKindId = createSelector(
-  [
-    annotationSelectors.selectAll,
-    annotationVolumeSelectors.selectEntities,
-    (_: RootState, kindId: string) => kindId,
-  ],
-  (annotations, volumeDict, kindId) =>
-    annotations.filter((a) => volumeDict[a.volumeId]?.kindId === kindId),
-);
-export const selectAnnotationsByCategoryId = createSelector(
-  [
-    annotationSelectors.selectAll,
-    annotationVolumeSelectors.selectEntities,
-    (_: RootState, categoryId: string) => categoryId,
-  ],
-  (annotations, volumeDict, categoryId) =>
-    annotations.filter(
-      (a) => volumeDict[a.volumeId]?.categoryId === categoryId,
-    ),
-);
 export const selectAnnotationsByVolumeId = createSelector(
   [annotationSelectors.selectAll, (_: RootState, volumeId: string) => volumeId],
   (annotations, volumeId) => annotations.filter((a) => a.volumeId === volumeId),
@@ -667,31 +608,12 @@ export const selectImageCategories = createSelector(
   categorySelectors.selectAll,
   (categories) => categories.filter((c) => c.type === "image"),
 );
-export const selectExtendedImageCategoryEntities = createSelector(
-  selectImageCategories,
-  selectAllImages,
-  (cats, images) => {
-    const extCats = cats.reduce(
-      (ext: Record<string, ExtendedImageCategory>, c) => {
-        ext[c.id] = { ...c, labeldIds: [] as string[] };
-        return ext;
-      },
-      {},
-    );
-    images.forEach((i) => extCats[i.categoryId].labeldIds.push(i.id));
-    return extCats;
-  },
-);
-export const selectAllExtendedImageCategories = createSelector(
-  selectExtendedImageCategoryEntities,
-  (ext) => Object.values(ext),
-);
 
-export const selectAnnotationCategories = createSelector(
+const selectAnnotationCategories = createSelector(
   categorySelectors.selectAll,
   (categories) => categories.filter((c) => c.type === "annotation"),
 );
-export const selectExtendedAnnotationCategoryEntities = createSelector(
+const selectExtendedAnnotationCategoryEntities = createSelector(
   selectAnnotationCategories,
   selectAllExtendedAnnotations,
   (cats, anns) => {
@@ -706,7 +628,7 @@ export const selectExtendedAnnotationCategoryEntities = createSelector(
     return extCats;
   },
 );
-export const selectAllExtendedAnnotationCategories = createSelector(
+const selectAllExtendedAnnotationCategories = createSelector(
   selectExtendedAnnotationCategoryEntities,
   (ext) => Object.values(ext),
 );
@@ -716,7 +638,7 @@ export const selectAllExtendedAnnotationCategories = createSelector(
  * ───────────────────────────────────────────────────────────────────────
  */
 
-export const selectExtendedKindEntities = createSelector(
+const selectExtendedKindEntities = createSelector(
   selectAllKinds,
   selectAllExtendedAnnotationCategories,
   (kinds, categories): ExtendedKindEntities => {

@@ -63,7 +63,7 @@ export const AnnotationPopoverContent = ({
   return <AnnotationInfoTable annotation={annotation} />;
 };
 
-export const AnnotationInfoTable = ({
+const AnnotationInfoTable = ({
   annotation,
 }: {
   annotation: ExtendedAnnotationObject;

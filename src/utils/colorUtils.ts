@@ -1,4 +1,5 @@
-import { BitDepth } from "store/data/types";
+import type { BitDepth } from "store/data/types";
+
 import { getRandomInt } from "./dataUtils";
 
 const componentToHex = (c: number) => {
@@ -30,7 +31,7 @@ export const getRestrictedRandomHex = (restrictions: string[]) => {
   return hex;
 };
 
-export type ColorMap = [number, number, number];
+type ColorMap = [number, number, number];
 //the default colors assigned to a loaded image
 export const CHANNEL_COLOR_MAPS: Record<string, ColorMap> = {
   RED: [1, 0, 0],
