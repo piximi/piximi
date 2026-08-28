@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import type { ExtendedAnnotationObject, ExtendedKind } from "store/data/types";
+
 import { imageViewerDataSlice } from "./imageViewerDataSlice";
 import { selectSelectedAnnotations } from "./reselectors";
 import {
@@ -10,7 +12,6 @@ import {
 } from "./utils";
 
 import type { UnknownAction } from "@reduxjs/toolkit";
-import type { ExtendedAnnotationObject, ExtendedKind } from "store/data/types";
 import type { ImageViewerDataState } from "../types";
 
 const C1 = "cat-1";

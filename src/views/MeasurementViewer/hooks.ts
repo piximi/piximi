@@ -6,6 +6,18 @@ import { saveAs } from "file-saver";
 
 import { useDialogHotkey } from "hooks";
 
+import {
+  selectAllExtendedAnnotations,
+  selectAllImages,
+  selectCategoryEntities,
+  selectExtendedImageEntities,
+} from "store/data/selectors";
+import type {
+  ExtendedAnnotationObject,
+  ExtendedImageObject,
+} from "store/data/types";
+import { CHANNEL_MEASUREMENTS } from "store/data/types";
+
 import { HotkeyContext } from "utils/enums";
 import { isObjectEmpty } from "utils/objectUtils";
 import { formatString } from "utils/stringUtils";
@@ -13,17 +25,6 @@ import { formatString } from "utils/stringUtils";
 import { selectActiveMeasurementGroup } from "./state/selectors";
 import { measurementsSlice } from "./state/measurementsSlice";
 import { selectActiveMeasuredEntities } from "./state/reselectors";
-import {
-  selectAllExtendedAnnotations,
-  selectAllImages,
-  selectCategoryEntities,
-  selectExtendedImageEntities,
-} from "store/data/selectors";
-import {
-  CHANNEL_MEASUREMENTS,
-  ExtendedAnnotationObject,
-  ExtendedImageObject,
-} from "store/data/types";
 
 const buildAnnotationMeasurementData = (
   entity: ExtendedAnnotationObject,

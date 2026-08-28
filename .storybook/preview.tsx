@@ -1,14 +1,15 @@
-import React from "react";
-import type { Preview } from "@storybook/react";
 import { Provider } from "react-redux";
-import { ThemeProvider, CssBaseline } from "@mui/material";
+
 import { withThemeFromJSXProvider } from "@storybook/addon-themes";
+
+import { ThemeProvider, CssBaseline } from "@mui/material";
 // .storybook/preview.js
 
 /* TODO: update import for your custom Material UI themes */
 import { lightTheme, darkTheme } from "../src/themes/muiTheme";
-
 import { productionStore } from "../src/store";
+
+import type { Preview } from "@storybook/react";
 
 // Import your fontface CSS files here
 // Don't have any? We recommend installing and using @fontsource/roboto

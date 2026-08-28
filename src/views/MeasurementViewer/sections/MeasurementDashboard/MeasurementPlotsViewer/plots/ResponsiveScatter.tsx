@@ -2,14 +2,16 @@ import { useEffect, useRef, useState } from "react";
 
 import { ResponsiveScatterPlot } from "@nivo/scatterplot";
 
+import { useTheme } from "@mui/material";
+
 import { usePreferredNivoTheme } from "hooks";
+
+import { formatString } from "utils/stringUtils";
 
 import type {
   ChartConfig,
   ParsedMeasurementData,
 } from "@MeasurementViewer/types";
-import { formatString } from "utils/stringUtils";
-import { useTheme } from "@mui/material";
 
 type ScatterPoint = {
   id: number;

@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import React from "react";
+import { createContext, useContext, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -82,7 +82,7 @@ const ConfirmReplaceDialog = ({
   );
 };
 
-const ConfirmReplaceDialogContext = React.createContext<{
+const ConfirmReplaceDialogContext = createContext<{
   openDialog: ({ actionCallback }: { actionCallback: any }) => void;
 }>({
   openDialog: (_config) => {},
@@ -94,8 +94,8 @@ const ConfirmReplaceDialogProvider = ({
   children: ReactElement;
 }) => {
   const showSaveProjectDialog = useSelector(selectShowSaveProjectDialog);
-  const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [dialogConfig, setDialogConfig] = React.useState<{
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState<{
     actionCallback: any;
   }>({ actionCallback: undefined });
 
@@ -138,7 +138,7 @@ const ConfirmReplaceDialogProvider = ({
 };
 
 const useConfirmReplaceDialog = () => {
-  const { openDialog } = React.useContext(ConfirmReplaceDialogContext);
+  const { openDialog } = useContext(ConfirmReplaceDialogContext);
 
   const getConfirmation = (
     options: Omit<Parameters<typeof openDialog>[0], "actionCallback">,

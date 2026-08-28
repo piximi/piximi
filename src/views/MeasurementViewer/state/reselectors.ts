@@ -1,7 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 
 import { toChannelMeasurementLabel } from "@MeasurementViewer/utils";
-
 import {
   selectExtendedAnnotationEntities,
   selectCategoryEntities,
@@ -15,6 +14,7 @@ import {
 } from "store/data/types";
 
 import { formatString } from "utils/stringUtils";
+import type { Partition } from "utils/dl/enums";
 
 import { selectActiveMeasurementGroup } from "./selectors";
 
@@ -24,7 +24,6 @@ import type {
   ObjectEntityMeasurementGroup,
   ParsedMeasurementData,
 } from "../types";
-import { Partition } from "utils/dl/enums";
 
 export const selectActiveMeasuredEntities = createSelector(
   selectActiveMeasurementGroup,

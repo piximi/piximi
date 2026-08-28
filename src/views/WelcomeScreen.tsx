@@ -1,4 +1,8 @@
 import { useMemo } from "react";
+
+import { useNavigate } from "react-router-dom";
+
+import type { Palette } from "@mui/material";
 import {
   Box,
   Button,
@@ -7,14 +11,11 @@ import {
   DialogTitle,
   List,
   ListItem,
-  Palette,
   Stack,
   styled,
   Typography,
 } from "@mui/material";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { CollapsibleList } from "components/ui";
-import { Logo } from "components/ui";
+
 import {
   useDialog,
   useDialogHotkey,
@@ -23,9 +24,12 @@ import {
   useProjectLoader,
   useWindowSize,
 } from "hooks";
-import { useNavigate } from "react-router-dom";
-import { HotkeyContext } from "utils/enums";
+
+import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { CollapsibleList, Logo } from "components/ui";
 import { ExampleProjectDialog } from "components/dialogs";
+
+import { HotkeyContext } from "utils/enums";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",

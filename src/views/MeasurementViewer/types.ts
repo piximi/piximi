@@ -1,12 +1,14 @@
-import type { ComputedDatum } from "@nivo/swarmplot";
-import type { ColorSchemeId } from "@nivo/colors";
-import { Partition } from "utils/dl/enums";
-import {
+import type {
   ChannelFeature,
   ExtendedAnnotationObject,
   ExtendedImageObject,
   FeatureKey,
 } from "store/data/types";
+
+import type { Partition } from "utils/dl/enums";
+
+import type { ComputedDatum } from "@nivo/swarmplot";
+import type { ColorSchemeId } from "@nivo/colors";
 
 // ============================================================================
 // ENUMS
