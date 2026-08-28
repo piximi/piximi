@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 
-import { CommonTabPanelProps } from "./props";
+import type { CommonTabPanelProps } from "./props";
 
 export function SlidingTabPanel(props: CommonTabPanelProps) {
   const { children, value, index, childClassName, ...other } = props;

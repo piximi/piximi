@@ -1,15 +1,20 @@
-import { ChangeEvent, useState } from "react";
+import type { ChangeEvent } from "react";
+import { useState } from "react";
+
+import { useSelector } from "react-redux";
+
+import { saveAs } from "file-saver";
+
 import { Grid2 as Grid, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import saveAs from "file-saver";
-import { useClassifierApi } from "utils/dl/classification";
-import { ModelInfoDTO } from "utils/dl/classification/types";
-import { useSelector } from "react-redux";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectRunsForActiveModel } from "store/classifier/selectors";
+
+import type { ModelInfoDTO } from "utils/dl/classification/types";
+import { useClassifierApi } from "utils/dl/classification";
 import { buildClassifierZip } from "utils/file-io/export/exportFittedModel";
 
 type SaveFittedModelDialogProps = {

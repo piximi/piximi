@@ -1,4 +1,7 @@
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import type { ChangeEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import type { SelectChangeEvent } from "@mui/material";
 import {
   Accordion,
   AccordionDetails,
@@ -11,17 +14,17 @@ import {
   FormControlLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {
-  DimensionOrder,
+
+import type {
   TiffAnalysisResult,
   TiffImportConfig,
 } from "utils/file-io/file-loader/types";
+import { DimensionOrder } from "utils/file-io/file-loader/types";
 
 export const TiffConfigurator = ({
   tiffAnalysis,

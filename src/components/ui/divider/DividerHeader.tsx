@@ -1,11 +1,7 @@
-import React from "react";
-import {
-  Divider,
-  Typography,
-  DividerProps,
-  TypographyProps,
-} from "@mui/material";
-import { HTMLDataAttributes } from "utils/types";
+import type { DividerProps, TypographyProps } from "@mui/material";
+import { Divider, Typography } from "@mui/material";
+
+import type { HTMLDataAttributes } from "utils/types";
 
 type DividerHeaderProps = HTMLDataAttributes &
   Pick<DividerProps, "sx" | "textAlign" | "variant" | "children"> & {

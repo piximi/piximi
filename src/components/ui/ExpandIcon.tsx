@@ -1,6 +1,5 @@
-import React from "react";
 import { ExpandLess as ExpandLessIcon } from "@mui/icons-material";
-import { SxProps } from "@mui/material";
+import type { SxProps } from "@mui/material";
 
 const ExpandIcon = (props: { expanded: boolean; sx?: SxProps }) => {
   return (

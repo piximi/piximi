@@ -1,4 +1,6 @@
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
+
+import type { DialogProps } from "@mui/material";
 import {
   Button,
   Dialog,
@@ -7,7 +9,6 @@ import {
   DialogActions,
   Box,
   IconButton,
-  DialogProps,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 

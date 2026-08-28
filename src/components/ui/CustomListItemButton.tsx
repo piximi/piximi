@@ -1,15 +1,18 @@
-import React, { ReactElement, useRef, useState } from "react";
+import type { ReactElement, MouseEventHandler } from "react";
+import { useRef, useState } from "react";
 
+import type {
+  ListItemButtonProps,
+  TooltipProps,
+  TypographyProps,
+} from "@mui/material";
 import {
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Tooltip,
-  ListItemButtonProps,
   IconButton,
-  TooltipProps,
-  TypographyProps,
 } from "@mui/material";
 
 type TooltipType = Omit<TooltipProps, "children" | "title">;
@@ -27,10 +30,10 @@ type CustomListItemButtonProps = Pick<
 > & {
   primaryTypographyProps?: TypographyProps;
   primaryText: string | ReactElement;
-  onClick: React.MouseEventHandler<HTMLDivElement> | undefined;
+  onClick: MouseEventHandler<HTMLDivElement> | undefined;
   icon?: ReactElement;
   secondaryIcon?: ReactElement;
-  onSecondary?: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  onSecondary?: MouseEventHandler<HTMLButtonElement> | undefined;
   additionalComponent?: ReactElement;
   tooltipText?: string;
   tooltipProps?: TooltipType;

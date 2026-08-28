@@ -1,4 +1,3 @@
-import malaria from "images/malaria.png";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import mnistExampleIcon from "data/exampleProjects/mnistExampleProjectIcon.png";
 import cElegansExampleIcon from "data/exampleProjects/cElegansExampleProjectIcon.png";
@@ -7,6 +6,8 @@ import BBBC013ExampleIcon from "data/exampleProjects/BBBC013ExampleProjectIcon.p
 import PLP1ExampleIcon from "data/exampleProjects/PLP1ExampleProjectIcon.png";
 import U2OSCellPaintingIcon from "data/exampleProjects/U2OSCellPaintingExampleProjectIcon.png";
 import TranslocationIcon from "data/exampleProjects/translocation_icon.png";
+
+import malaria from "images/malaria.png";
 
 export const exampleProjects = {
   imagesAndObjectSets: [

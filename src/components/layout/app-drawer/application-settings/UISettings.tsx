@@ -1,4 +1,9 @@
+import { useState } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
+import type { ColorResult } from "react-color";
+import { ChromePicker } from "react-color";
+
 import {
   Box,
   Button,
@@ -17,7 +22,9 @@ import {
   Notes as NotesIcon,
   Image as ImageIcon,
 } from "@mui/icons-material";
+
 import { DividerHeader } from "components/ui";
+
 import { applicationSettingsSlice } from "store/applicationSettings";
 import {
   selectImageSelectionColor,
@@ -26,10 +33,10 @@ import {
   selectTextOnScroll,
   selectThemeMode,
 } from "store/applicationSettings/selectors";
+
 import { ThemeMode } from "themes/enums";
+
 import { SettingsItem } from "./SettingsItem";
-import { useState } from "react";
-import { ChromePicker, ColorResult } from "react-color";
 
 export const UISettings = () => {
   return (

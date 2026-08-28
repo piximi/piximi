@@ -1,12 +1,15 @@
-import React, {
+import type React from "react";
+import {
+  Children,
+  cloneElement,
   createContext,
   useCallback,
   useEffect,
   useMemo,
   useState,
 } from "react";
-import { Box, Divider, IconButton, Tab, Tabs, Typography } from "@mui/material";
 
+import { Box, Divider, IconButton, Tab, Tabs, Typography } from "@mui/material";
 import {
   Delete as DeleteIcon,
   Minimize as MinimizeIcon,
@@ -14,19 +17,21 @@ import {
   Add as AddIcon,
 } from "@mui/icons-material";
 
+import { useMobileView } from "hooks";
+
 import { TextFieldWithBlur } from "components/inputs";
+
 import {
   BasicTabPanel,
   ControlledTabPanel,
   SlidingTabPanel,
 } from "./TabPanels";
 
-import {
+import type {
   CommonTabsProps,
   EditableTabsProps,
   ExtendableTabsProps,
 } from "./props";
-import { useMobileView } from "hooks";
 
 const TabContext = createContext<number>(0);
 
@@ -112,10 +117,10 @@ export function CustomTabs(
   );
 
   const addClass = (children: JSX.Element[]) => {
-    const StyledChildren = React.Children.map(children!, (child) => {
+    const StyledChildren = Children.map(children!, (child) => {
       return (
         <div className={childClassName}>
-          {React.cloneElement(child, {
+          {cloneElement(child, {
             className: ` ${childClassName}`,
           })}
         </div>

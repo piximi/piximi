@@ -1,13 +1,13 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import type { ReactElement } from "react";
+import { useEffect, useState } from "react";
 
+import type { ListItemTextProps, TypographyProps } from "@mui/material";
 import {
   alpha,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  ListItemTextProps,
-  TypographyProps,
 } from "@mui/material";
 
 export const ListItemHoldButton = ({

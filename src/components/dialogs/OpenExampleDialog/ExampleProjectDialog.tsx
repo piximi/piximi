@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   Box,
   Dialog,
@@ -9,11 +11,11 @@ import {
   Tabs,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { ExampleProjectCard } from "./ExampleProjectCard";
 
 import { useTranslation } from "hooks";
+
+import { ExampleProjectCard } from "./ExampleProjectCard";
 import { exampleProjects } from "./exampleProjects";
-import { useState } from "react";
 
 type ExampleProjectDialogProps = {
   open: boolean;

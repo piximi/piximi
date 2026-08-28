@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+
+import { useSelector } from "react-redux";
+
 import {
   Box,
   Button,
@@ -11,14 +14,15 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-import { TiffConfigurator } from "./TiffConfigurator";
-import {
+import { selectExperimentChannels } from "store/data/selectors";
+
+import type {
   TiffAnalysisResult,
   TiffDialogCallbackResult,
   TiffImportConfig,
 } from "utils/file-io/file-loader/types";
-import { useSelector } from "react-redux";
-import { selectExperimentChannels } from "store/data/selectors";
+
+import { TiffConfigurator } from "./TiffConfigurator";
 
 type TiffConfigDialogProps = {
   open: boolean;

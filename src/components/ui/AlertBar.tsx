@@ -1,18 +1,18 @@
-import React from "react";
+import { useEffect, useState } from "react";
+
 import { useDispatch } from "react-redux";
 
+import type { PaletteColor } from "@mui/material";
 import {
   Box,
   Collapse,
   IconButton,
-  PaletteColor,
   styled,
   Toolbar,
   Tooltip,
   Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-
 import {
   Close as CloseIcon,
   ErrorOutline as ErrorOutlineIcon,
@@ -27,7 +27,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { createGitHubIssue } from "utils/logUtils";
 import { AlertType } from "utils/enums";
-import { AlertState } from "utils/types";
+import type { AlertState } from "utils/types";
 
 type AlertBarProps = {
   alertState: AlertState;
@@ -41,16 +41,15 @@ export const AlertBar = ({
   const dispatch = useDispatch();
   const theme = useTheme();
 
-  const [expanded, setExpanded] = React.useState(false);
-  const [showCreateGitHubIssue, setShowCreateGitHubIssue] =
-    React.useState(false);
-  const [colorTheme, setColorTheme] = React.useState<PaletteColor>(
+  const [expanded, setExpanded] = useState(false);
+  const [showCreateGitHubIssue, setShowCreateGitHubIssue] = useState(false);
+  const [colorTheme, setColorTheme] = useState<PaletteColor>(
     theme.palette.primary,
   );
-  const [errorStateIcon, setErrorStateIcon] = React.useState<JSX.Element>();
-  const [issueDescription, setIssueDescription] = React.useState("");
+  const [errorStateIcon, setErrorStateIcon] = useState<JSX.Element>();
+  const [issueDescription, setIssueDescription] = useState("");
 
-  React.useEffect(() => {
+  useEffect(() => {
     switch (alertState.alertType) {
       case AlertType.Error:
         setErrorStateIcon(<ErrorOutlineIcon />);

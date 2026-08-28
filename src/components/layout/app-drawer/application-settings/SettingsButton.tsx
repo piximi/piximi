@@ -10,8 +10,11 @@ import {
   Close as CloseIcon,
   SettingsOutlined as SettingsIcon,
 } from "@mui/icons-material";
+
 import { useDialogHotkey, useHotkeys } from "hooks";
+
 import { HotkeyContext } from "utils/enums";
+
 import { ProjectSettings } from "./ProjectSettings";
 import { UISettings } from "./UISettings";
 

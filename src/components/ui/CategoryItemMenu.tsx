@@ -1,16 +1,15 @@
-import React from "react";
 import { Box, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-
-import { HotkeyContext } from "utils/enums";
-
-import { Category } from "store/data/types";
 import { CategoryDialog } from "components/dialogs/CategoryDialog";
+
+import type { Category } from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";
 import { selectEntityCountByCategoryId } from "store/data/selectors";
+
+import { HotkeyContext } from "utils/enums";
 
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;

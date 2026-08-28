@@ -1,13 +1,14 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+
 import { useDispatch } from "react-redux";
 
+import type { Theme } from "@mui/material";
 import {
   Box,
   Button,
   IconButton,
   LinearProgress,
   Paper,
-  Theme,
   Typography,
 } from "@mui/material";
 import { Remove as Rm } from "@mui/icons-material";

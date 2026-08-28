@@ -1,5 +1,7 @@
-import React, { CSSProperties, ReactNode } from "react";
-import { Box, Typography, TypographyProps } from "@mui/material";
+import type { CSSProperties, ReactNode } from "react";
+
+import type { TypographyProps } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export const FunctionalDivider = ({
   headerText,

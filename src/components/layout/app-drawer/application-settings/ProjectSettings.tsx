@@ -1,13 +1,17 @@
 import { useDispatch, useSelector } from "react-redux";
+
 import { Box, Stack, Typography } from "@mui/material";
+
 import { DividerHeader } from "components/ui";
+import { CustomSwitch } from "components/inputs";
+
 import { applicationSettingsSlice } from "store/applicationSettings";
 import {
   selectShowClearPredictionsWarning,
   selectShowSaveProjectDialog,
 } from "store/applicationSettings/selectors";
+
 import { SettingsItem } from "./SettingsItem";
-import { CustomSwitch } from "components/inputs";
 
 export const ProjectSettings = () => {
   const dispatch = useDispatch();

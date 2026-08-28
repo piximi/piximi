@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import {
   DialogContentText,
   IconButton,
@@ -6,8 +7,11 @@ import {
   Tooltip,
 } from "@mui/material";
 import { FeedbackOutlined as FeedbackIcon } from "@mui/icons-material";
+
 import { useDialog, useTranslation } from "hooks";
+
 import { ConfirmationDialog } from "components/dialogs";
+
 import { createGitHubIssue } from "utils/logUtils";
 import { AlertType } from "utils/enums";
 

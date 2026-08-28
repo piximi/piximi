@@ -1,5 +1,6 @@
+import type { ReactNode } from "react";
+
 import { Box, Typography } from "@mui/material";
-import { ReactNode } from "react";
 
 export const SettingsItem = ({
   title,

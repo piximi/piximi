@@ -1,4 +1,5 @@
-import { Tab, TabProps, Tooltip, TooltipProps } from "@mui/material";
+import type { TabProps, TooltipProps } from "@mui/material";
+import { Tab, Tooltip } from "@mui/material";
 
 type ModifiedTabProps = Omit<TabProps, "disabled">;
 type BaseTooltipTabProps = ModifiedTabProps & {

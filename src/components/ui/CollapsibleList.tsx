@@ -1,11 +1,14 @@
-import React, { ReactNode } from "react";
+import type { ReactNode } from "react";
+import type React from "react";
+import { useState } from "react";
+
+import type { SxProps } from "@mui/material";
 import {
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   Collapse,
-  SxProps,
   ListItemButton,
 } from "@mui/material";
 import {
@@ -40,7 +43,7 @@ export const CollapsibleList = ({
   secondary,
   disabled,
 }: CollapsibleListProps) => {
-  const [collapsed, setCollapsed] = React.useState(closed);
+  const [collapsed, setCollapsed] = useState(closed);
 
   const handleClick = () => {
     setCollapsed(!collapsed);
