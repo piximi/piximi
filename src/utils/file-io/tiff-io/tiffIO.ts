@@ -1,13 +1,8 @@
 import { logger } from "utils/logUtils";
-import {
-  BaseIFD,
-  IFD,
-  IFDTag,
-  TIFF_OFFSETS,
-  TiffTag,
-  tagLookup,
-  tagType,
-} from "./tiffUtils";
+
+import { TIFF_OFFSETS, tagLookup, tagType } from "./tiffUtils";
+
+import type { BaseIFD, IFD, IFDTag, TiffTag } from "./tiffUtils";
 
 export class TiffIO {
   // Initialize typed arrays for binary operations

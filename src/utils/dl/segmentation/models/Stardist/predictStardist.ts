@@ -10,7 +10,7 @@ import {
 
 import { generateUUID } from "store/data/utils";
 
-import type { LoadCB, Point } from "utils/types";
+import type { Point } from "utils/types";
 import {
   connectPoints,
   rleEncodeArray,

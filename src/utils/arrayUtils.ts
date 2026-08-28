@@ -1,10 +1,9 @@
-// Given a length, return an array of numbers from 0 to length - 1
-
 import { difference } from "lodash";
 
 import { mulberry32 } from "./numberUtils";
 
 // An iterable with length property set the the passed value is used to create an array
+// Given a length, return an array of numbers from 0 to length - 1
 export const arrayRange = (length: number): number[] => {
   return Array.from({ length }, (_, i) => i);
 };

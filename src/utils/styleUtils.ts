@@ -1,4 +1,5 @@
-import { darken, lighten, Theme } from "@mui/material";
+import type { Theme } from "@mui/material";
+import { darken, lighten } from "@mui/material";
 
 export const haloFilter = (c: string, ht: number = 1) =>
   `drop-shadow(0 ${ht}px 0 ${c}) drop-shadow(0 -${ht}px 0 ${c}) drop-shadow(${ht}px 0 0 ${c}) drop-shadow(-${ht}px 0 0 ${c})`;

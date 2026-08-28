@@ -1,12 +1,9 @@
-import {
-  Tensor3D,
-  Tensor4D,
-  data as tfdata,
-  scalar,
-  tidy,
-} from "@tensorflow/tfjs";
+import { data as tfdata, scalar, tidy } from "@tensorflow/tfjs";
+
 import { channelsToTensor } from "../../../tensor-assembly";
-import { InferenceInput } from "../../../types";
+
+import type { Tensor3D, Tensor4D } from "@tensorflow/tfjs";
+import type { InferenceInput } from "../../../types";
 
 export const preprocessGlas = (
   items: Array<InferenceInput>,

@@ -1,5 +1,6 @@
 import { AlertType } from "./enums";
-import { AlertState } from "./types";
+
+import type { AlertState } from "./types";
 
 export const APPLICATION_COLORS = {
   classifierList: "#DCF3F450",

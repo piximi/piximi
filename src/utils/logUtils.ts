@@ -1,5 +1,6 @@
 // ignore-no-logs
 import { fromError } from "stacktrace-js";
+
 import { AlertType } from "./enums";
 
 /* 

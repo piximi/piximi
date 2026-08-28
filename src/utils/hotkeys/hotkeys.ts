@@ -1,4 +1,3 @@
-import { HotkeyHandlerItem } from "../types";
 import {
   getMods,
   getKeys,
@@ -10,6 +9,8 @@ import {
   _mods,
   _handlers,
 } from "./hotkeyUtils";
+
+import type { HotkeyHandlerItem } from "../types";
 
 let _downKeys: number[] = []; // record the binding key pressed
 let winListendFocus = false; // Whether the window has listened to the focus event
