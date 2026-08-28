@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState, type MouseEvent } from "react";
 
 export const useMenu = () => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -10,17 +10,14 @@ export const useMenu = () => {
     setAnchorEl(null);
   }, []);
 
-  const onOpen = useCallback(
-    (event: React.MouseEvent<HTMLElement> | HTMLElement) => {
-      setOpen(true);
-      if (event instanceof HTMLElement) {
-        setAnchorEl(event);
-        return;
-      }
-      setAnchorEl(event.currentTarget);
-    },
-    [],
-  );
+  const onOpen = useCallback((event: MouseEvent<HTMLElement> | HTMLElement) => {
+    setOpen(true);
+    if (event instanceof HTMLElement) {
+      setAnchorEl(event);
+      return;
+    }
+    setAnchorEl(event.currentTarget);
+  }, []);
 
   return {
     anchorEl,

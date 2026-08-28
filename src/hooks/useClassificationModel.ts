@@ -1,10 +1,13 @@
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+
 import { useSelector } from "react-redux";
+
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { selectActiveModelName } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
+
 import { useClassifierApi } from "utils/dl/classification";
-import { ModelInfoDTO } from "utils/dl/classification/types";
+import type { ModelInfoDTO } from "utils/dl/classification/types";
 
 export const useClassificationModel = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);

@@ -1,10 +1,10 @@
 import { useCallback, useEffect } from "react";
+
 import { useDispatch } from "react-redux";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { getStackTraceFromError } from "utils/logUtils";
-
 import { AlertType } from "utils/enums";
 
 export const useErrorHandler = () => {
@@ -38,10 +38,8 @@ export const useErrorHandler = () => {
       }
       e.preventDefault();
       const reason: unknown = e.reason;
-      const message =
-        reason instanceof Error ? reason.message : String(reason);
-      const stack =
-        reason instanceof Error ? String(reason.stack) : undefined;
+      const message = reason instanceof Error ? reason.message : String(reason);
+      const stack = reason instanceof Error ? String(reason.stack) : undefined;
       dispatch(
         applicationSettingsSlice.actions.updateAlertState({
           alertState: {

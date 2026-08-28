@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+
 import { Image as IJSImage, encodeDataURL } from "image-js-latest";
-import { BBox, ExtendedChannel } from "store/data/types";
+
+import type { BBox, ExtendedChannel } from "store/data/types";
+
 import { DataConnector } from "utils/data-connector";
 import { createLUT } from "utils/colorUtils";
 import {

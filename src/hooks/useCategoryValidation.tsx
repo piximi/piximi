@@ -1,9 +1,13 @@
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import type { ChangeEvent } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { useSelector } from "react-redux";
+import type { ColorResult } from "react-color";
+
 import { isMatch } from "lodash";
-import { ColorResult } from "react-color";
 
 import { selectAllCategories } from "store/data/selectors";
+
 import { getRestrictedRandomHex } from "utils/colorUtils";
 
 export function useCategoryValidation({

@@ -1,17 +1,19 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectAlertState } from "store/applicationSettings/selectors";
 
-import { AlertType, HotkeyContext } from "utils/enums";
+import type { HotkeyContext } from "utils/enums";
+import { AlertType } from "utils/enums";
 
 export const useDialog = (closeOnError: boolean = true) => {
   const [open, setOpen] = useState(false);
 
   const alertState = useSelector(selectAlertState);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       alertState.visible &&
       alertState.alertType === AlertType.Error &&

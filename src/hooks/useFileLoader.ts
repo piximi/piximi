@@ -1,21 +1,24 @@
 import { useCallback, useRef, useState } from "react";
+
 import { useDispatch, useSelector, useStore } from "react-redux";
+
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
-import { AppTask } from "store/appTasks/types";
+import type { AppTask } from "store/appTasks/types";
 import { generateUUID, reconcileChannelMetas } from "store/data/utils";
 import { dataSlice } from "store/data";
 import { selectAllChannelMetas, selectExperiment } from "store/data/selectors";
-import { ImageSeries } from "store/data/types";
-import { RootState } from "store/rootReducer";
+import type { ImageSeries } from "store/data/types";
+import type { RootState } from "store/rootReducer";
+import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+
 import { FileLoader } from "utils/file-io/file-loader";
-import {
-  FILE,
+import type {
   TiffAnalysisResult,
   TiffDialogCallbackResult,
   TiffImportConfig,
   UploadOptionswithCallbacks,
 } from "utils/file-io/file-loader/types";
-import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+import { FILE } from "utils/file-io/file-loader/types";
 import { interpretFiles } from "utils/file-io/file-loader/fileInputUtils";
 import { prepareTiffConfigs } from "utils/file-io/file-loader/readers/TiffReader";
 

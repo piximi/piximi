@@ -1,13 +1,13 @@
 //@ts-nocheck TODO
-import hotkeys from "utils/hotkeys/hotkeys"; //{ HotkeysEvent, KeyHandler }
 import { useCallback, useEffect } from "react";
+
 import { useSelector } from "react-redux";
 
 import { selectHotkeyContext } from "store/applicationSettings/selectors";
 
-import { HotkeyContext } from "utils/enums";
-
-import {
+import hotkeys from "utils/hotkeys/hotkeys"; //{ HotkeysEvent, KeyHandler }
+import type { HotkeyContext } from "utils/enums";
+import type {
   HotkeyAvailableTags,
   HotkeyOptions,
   HotkeysEvent,
