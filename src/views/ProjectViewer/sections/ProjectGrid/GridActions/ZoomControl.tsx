@@ -2,16 +2,13 @@ import { useLayoutEffect, useState } from "react";
 
 import { useDispatch } from "react-redux";
 
-import { Box, IconButton, Menu, Slider } from "@mui/material";
-import {
-  ZoomIn as ZoomInIcon,
-  Add as AddIcon,
-  Remove as RemoveIcon,
-} from "@mui/icons-material";
+import { IconButton, Popper } from "@mui/material";
+import { ZoomIn as ZoomInIcon } from "@mui/icons-material";
 
 import { useMenu, useMobileView } from "hooks";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { IncrementalSlider } from "components/inputs";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 
@@ -44,27 +41,7 @@ export const ZoomControl = () => {
     };
   }, [isMobile]);
 
-  const handleSizeChange = (event: Event, newValue: number | number[]) => {
-    setValue(newValue as number);
-    dispatch(
-      applicationSettingsSlice.actions.updateTileSize({
-        newValue: newValue as number,
-      }),
-    );
-  };
-
-  const onZoomOut = () => {
-    const newValue = value - 0.1 >= minZoom ? value - 0.1 : minZoom;
-    setValue(newValue as number);
-    dispatch(
-      applicationSettingsSlice.actions.updateTileSize({
-        newValue: newValue as number,
-      }),
-    );
-  };
-
-  const onZoomIn = () => {
-    const newValue = value + 0.1 <= maxZoom ? value + 0.1 : maxZoom;
+  const handleSizeChange = (newValue: number | number[]) => {
     setValue(newValue as number);
     dispatch(
       applicationSettingsSlice.actions.updateTileSize({
@@ -78,26 +55,26 @@ export const ZoomControl = () => {
       <IconButton
         data-help={HelpItem.GridZoom}
         color="inherit"
-        onClick={onOpen}
+        onClick={open ? onClose : onOpen}
         sx={{ ...actionButtonStyle, mr: 0.5 }}
       >
         <ZoomInIcon />
       </IconButton>
-      <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
-        <Box display="flex" flexDirection="column" alignItems="center">
-          <AddIcon onClick={onZoomIn} />
-          <Slider
-            orientation="vertical"
-            value={value}
-            min={minZoom}
-            max={maxZoom}
-            step={0.1}
-            onChange={handleSizeChange}
-            sx={{ height: (maxZoom - minZoom) * 20 + "px", my: 1, mr: 0 }}
-          />
-          <RemoveIcon onClick={onZoomOut} />
-        </Box>
-      </Menu>
+      <Popper open={open} anchorEl={anchorEl}>
+        <IncrementalSlider
+          min={minZoom}
+          max={maxZoom}
+          orientation="vertical"
+          initialValue={value}
+          step={0.1}
+          length={(maxZoom - minZoom) * 20 + "px"}
+          outerStyle={{
+            border: `1px solid var(--mui-palette-text-primary)`,
+          }}
+          callback={handleSizeChange}
+          callbackOnSlide={true}
+        />
+      </Popper>
     </>
   );
 };

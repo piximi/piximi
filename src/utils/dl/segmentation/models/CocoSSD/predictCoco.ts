@@ -158,13 +158,6 @@ const buildDetectedObjects = (
       number,
       number,
     ];
-    // x_1, y_1, W, H
-    // const annotationBbox = [minX, minY, maxX - minX, maxY - minY] as [
-    //   number,
-    //   number,
-    //   number,
-    //   number
-    // ];
 
     const decodedMask = new Uint8Array((maxX - minX) * (maxY - minY)).fill(255);
 

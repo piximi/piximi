@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 
 import { Box, Button, Collapse, Typography } from "@mui/material";
 
-import ExpandIcon from "components/ui/ExpandIcon";
+import { ExpandIcon } from "components/ui";
 
 const FileInfoContainer = ({
   label,

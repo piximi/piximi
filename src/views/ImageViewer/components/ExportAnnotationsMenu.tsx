@@ -6,8 +6,7 @@ import { ListItemText, Menu, MenuItem } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { ExportAnnotationsDialog } from "components/dialogs";
-
+import { ExportAnnotationsDialog } from "@ImageViewer/components/dialogs";
 import type { ExtendedImageObject } from "store/data/types";
 import {
   selectExtendedAnnotationsByImageId,

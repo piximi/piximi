@@ -1,7 +1,7 @@
 import { Badge, IconButton } from "@mui/material";
 import { ExpandLess as ExpandLessIcon } from "@mui/icons-material";
 
-import { FunctionalDivider } from "components/ui";
+import { FunctionalDivider } from "@ProjectViewer/components";
 
 import { expandToggleStyle } from "./FilterList.styles";
 

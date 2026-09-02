@@ -4,7 +4,7 @@ import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { LogoIcon } from "components/ui/Logo";
+import { LogoIcon } from "components/ui";
 
 export const MeasurementsLogo = () => {
   const navigate = useNavigate();

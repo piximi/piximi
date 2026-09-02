@@ -11,8 +11,7 @@ import {
   MoreHoriz as MoreIcon,
 } from "@mui/icons-material";
 
-import { CustomListItemButton, CountChip } from "components/ui";
-
+import { CustomListItemButton, CountChip } from "@ProjectViewer/components";
 import type { Category } from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";
 import { selectEntityCountByCategoryId } from "store/data/selectors";

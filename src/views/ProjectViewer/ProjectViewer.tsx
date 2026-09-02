@@ -8,8 +8,8 @@ import { Box } from "@mui/material";
 import { useErrorHandler, useMobileView, useUnloadConfirmation } from "hooks";
 
 import { FallbackDialog } from "components/dialogs";
-import { DropBox } from "components/layout";
 
+import { DropBox } from "@ProjectViewer/components";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { HotkeyContext } from "utils/enums";

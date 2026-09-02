@@ -1,7 +1,5 @@
 import type React from "react";
 import {
-  Children,
-  cloneElement,
   createContext,
   useCallback,
   useEffect,
@@ -21,11 +19,7 @@ import { useMobileView } from "hooks";
 
 import { TextFieldWithBlur } from "components/inputs";
 
-import {
-  BasicTabPanel,
-  ControlledTabPanel,
-  SlidingTabPanel,
-} from "./TabPanels";
+import { BasicTabPanel, ControlledTabPanel } from "./TabPanels";
 
 import type {
   CommonTabsProps,
@@ -68,7 +62,6 @@ export function CustomTabs(
     renderLabel,
     handleTabMin,
     persistentTabs,
-    omitAddIcon,
   } = props;
   const [tabIndex, setTabIndex] = useState(0);
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -116,22 +109,9 @@ export function CustomTabs(
     [handleTabClose, labels, tabIndex, handleTabMin],
   );
 
-  const addClass = (children: JSX.Element[]) => {
-    const StyledChildren = Children.map(children!, (child) => {
-      return (
-        <div className={childClassName}>
-          {cloneElement(child, {
-            className: ` ${childClassName}`,
-          })}
-        </div>
-      );
-    }).filter((_, idx) => !disabledTabs?.includes(idx));
-    return transition === "basic" ? StyledChildren : <>{StyledChildren}</>;
-  };
-
   const renderTabLabel = useCallback(
     (label: string) => {
-      return extendable ? (
+      return (
         <Box
           width={"100%"}
           display="flex"
@@ -148,12 +128,13 @@ export function CustomTabs(
             },
           }}
         >
-          {isEditing && labels.findIndex((l) => l === label) === tabIndex ? (
+          {editable &&
+          isEditing &&
+          labels.findIndex((l) => l === label) === tabIndex ? (
             <TextFieldWithBlur
               value={renderLabel ? renderLabel(label) : label}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 handleTabEdit!(label, event.target.value);
-                //setIsEditing(false);
               }}
               onBlur={() => setIsEditing(false)}
               size="small"
@@ -168,49 +149,40 @@ export function CustomTabs(
             </Typography>
           )}
 
-          <Box
-            display="flex"
-            flexDirection="row"
-            flexShrink={1}
-            position="absolute"
-            right="10px"
-          >
-            {editable && (
-              <EditIcon
-                data-help={props.tabHelp?.edit}
-                fontSize="small"
-                sx={{ p: 0 }}
-                onClick={() => setIsEditing(true)}
-              />
-            )}
-            {handleTabMin && (
-              <MinimizeIcon
-                data-help={props.tabHelp?.minimize}
-                fontSize="small"
-                sx={{ p: 0 }}
-                onClick={(event) => handleTabDeletion(event, label, "hide")}
-              />
-            )}
-            {!(persistentTabs && persistentTabs.includes(label)) && (
-              <DeleteIcon
-                data-help={props.tabHelp?.delete}
-                fontSize="small"
-                sx={{ p: 0 }}
-                onClick={(event) => handleTabDeletion(event, label, "delete")}
-              />
-            )}
-          </Box>
-        </Box>
-      ) : (
-        <Box
-          width={"100%"}
-          display="flex"
-          flexDirection="row"
-          justifyContent="center"
-        >
-          <Typography variant="body2">
-            {renderLabel ? renderLabel(label) : label}
-          </Typography>
+          {(editable || extendable) && (
+            <Box
+              display="flex"
+              flexDirection="row"
+              flexShrink={1}
+              position="absolute"
+              right="10px"
+            >
+              {editable && (
+                <EditIcon
+                  data-help={props.tabHelp?.edit}
+                  fontSize="small"
+                  sx={{ p: 0 }}
+                  onClick={() => setIsEditing(true)}
+                />
+              )}
+              {handleTabMin && (
+                <MinimizeIcon
+                  data-help={props.tabHelp?.minimize}
+                  fontSize="small"
+                  sx={{ p: 0 }}
+                  onClick={(event) => handleTabDeletion(event, label, "hide")}
+                />
+              )}
+              {!(persistentTabs && persistentTabs.includes(label)) && (
+                <DeleteIcon
+                  data-help={props.tabHelp?.delete}
+                  fontSize="small"
+                  sx={{ p: 0 }}
+                  onClick={(event) => handleTabDeletion(event, label, "delete")}
+                />
+              )}
+            </Box>
+          )}
         </Box>
       );
     },
@@ -273,7 +245,7 @@ export function CustomTabs(
               );
             })}
           </Tabs>
-          {extendable && !omitAddIcon && (
+          {handleNew && (
             <>
               <Divider orientation="vertical" />
               <Box display="flex" flexShrink={1} justifySelf="flex-end">
@@ -288,15 +260,7 @@ export function CustomTabs(
             </>
           )}
         </Box>
-        {transition === "sliding" && (
-          <SlidingTabPanel
-            value={tabIndex}
-            index={0}
-            childClassName={childClassName}
-          >
-            {addClass(children as JSX.Element[])}
-          </SlidingTabPanel>
-        )}
+
         {transition === "basic" &&
           (children as JSX.Element[]).map((child, idx) => (
             <BasicTabPanel

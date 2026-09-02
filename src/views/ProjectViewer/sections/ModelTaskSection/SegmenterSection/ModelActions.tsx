@@ -2,8 +2,7 @@ import { useMemo } from "react";
 
 import { Box } from "@mui/material";
 
-import { TooltipButton } from "components/ui/tooltips/TooltipButton";
-
+import { TooltipButton } from "@ProjectViewer/components";
 import { usePredictSegmenter } from "@ProjectViewer/hooks/usePredictSegmenter";
 import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 

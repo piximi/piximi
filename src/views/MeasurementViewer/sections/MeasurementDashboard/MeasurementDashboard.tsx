@@ -4,7 +4,10 @@ import { useState } from "react";
 import { Box } from "@mui/material";
 import { useGridApiRef } from "@mui/x-data-grid";
 
-import { TextToggleButton, TextToggleButtonGroup } from "components/inputs";
+import {
+  TextToggleButton,
+  TextToggleButtonGroup,
+} from "@MeasurementViewer/components/toggle-button";
 
 import { MeasurementPlotsViewer } from "./MeasurementPlotsViewer";
 import { ExportButton } from "./ExportDataButton";

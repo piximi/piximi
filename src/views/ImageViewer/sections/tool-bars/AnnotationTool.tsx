@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import { KeyboardArrowLeft } from "@mui/icons-material";
 
-import { ToolHotkeyTitle } from "components/ui/tooltips";
+import { ToolHotkeyTitle } from "components/ui";
 
 import type { HTMLDataAttributes } from "utils/types";
 

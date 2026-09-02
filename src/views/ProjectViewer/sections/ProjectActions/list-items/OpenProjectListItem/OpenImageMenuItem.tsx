@@ -4,8 +4,9 @@ import { ListItemText, MenuItem } from "@mui/material";
 
 import { useFileLoader } from "hooks";
 
-import { TiffConfigDialog } from "components/dialogs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
+import { TiffConfigDialog } from "@ProjectViewer/components/dialogs";
 
 type OpenImageMenuItemProps = {
   onCloseMenu: () => void;

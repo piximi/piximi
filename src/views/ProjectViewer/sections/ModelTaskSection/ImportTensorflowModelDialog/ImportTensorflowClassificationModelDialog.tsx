@@ -14,8 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { ToolTipTab } from "components/layout";
-
+import { ToolTipTab } from "@ProjectViewer/components";
 import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 

@@ -14,8 +14,7 @@ import {
 } from "@mui/material";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 
-import { DialogTransitionSlide } from "components/dialogs";
-
+import { DialogTransitionSlide } from "@ProjectViewer/components/dialogs";
 import { selectActiveKnownCategories } from "@ProjectViewer/state/reselectors";
 import type { Category } from "store/data/types";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";

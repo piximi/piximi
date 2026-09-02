@@ -10,7 +10,7 @@ import {
 
 import { useDialogHotkey, useHotkeys, useMobileView } from "hooks";
 
-import { TooltipButton, TooltipTitle } from "components/ui/";
+import { TooltipButton, TooltipTitle } from "@ProjectViewer/components";
 import { ConfirmationDialog } from "components/dialogs";
 
 import { useGridActions } from "@ProjectViewer/hooks";

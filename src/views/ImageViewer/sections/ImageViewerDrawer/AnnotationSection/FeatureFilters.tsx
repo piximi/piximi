@@ -4,7 +4,7 @@ import { Box, Collapse, Slider, Switch, Typography } from "@mui/material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-import ExpandIcon from "components/ui/ExpandIcon";
+import { ExpandIcon } from "components/ui";
 
 import type { FeatureKey } from "store/data/types";
 

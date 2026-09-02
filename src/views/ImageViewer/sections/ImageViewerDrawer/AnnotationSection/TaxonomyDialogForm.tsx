@@ -5,7 +5,7 @@ import type { ColorResult } from "react-color";
 import { Box, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs";
-import { ColorPicker } from "components/ui/ColorPicker";
+import { ColorPicker } from "components/ui";
 
 import { getRandomHex } from "utils/colorUtils";
 import { representsUnknown } from "utils/stringUtils";

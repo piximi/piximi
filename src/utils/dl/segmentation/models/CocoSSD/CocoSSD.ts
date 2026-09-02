@@ -42,7 +42,7 @@ export class CocoSSD extends Segmenter {
     super({
       name: "COCO-SSD",
       kind: Object.keys(COCO_CLASSES),
-      src: "https://tfhub.dev/tensorflow/tfjs-model/ssd_mobilenet_v2/1/default/1",
+      src: "https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v1/model.json",
       requiredChannels: 3,
     });
   }

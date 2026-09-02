@@ -1,7 +1,7 @@
 import { batch, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
+import { ConfirmationDialog } from "components/dialogs";
 
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";

@@ -1,12 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { MenuItem, Typography } from "@mui/material";
+import { Menu, MenuItem, Typography } from "@mui/material";
 
 import { useDialogHotkey, useMobileView } from "hooks";
 
-import { BaseMenu } from "components/ui";
-import { CreateKindDialog } from "components/dialogs";
-
+import { CreateKindDialog } from "@ProjectViewer/components/dialogs";
 import { projectSlice } from "@ProjectViewer/state";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
 import { selectKindIds } from "store/data/selectors";
@@ -74,14 +72,18 @@ export const AddKindMenu = ({
   };
   return (
     <>
-      <BaseMenu anchorEl={anchor} open={isOpen} onClose={onClose}>
+      <Menu
+        anchorEl={anchor}
+        open={isOpen}
+        onClose={onClose}
+        slotProps={{ list: { style: { paddingBlock: 0 } } }}
+      >
         <MenuItem
           onClick={handleOpenCreateKindDialog}
-          sx={(theme) => ({
+          sx={{
             display: "flex",
             justifyContent: "space-between",
-            pr: theme.spacing(1),
-          })}
+          }}
         >
           <Typography variant="body2">New Kind</Typography>
         </MenuItem>
@@ -98,7 +100,7 @@ export const AddKindMenu = ({
             <Typography variant="body2">{kindId}</Typography>
           </MenuItem>
         ))}
-      </BaseMenu>
+      </Menu>
       <CreateKindDialog
         onClose={handleCloseCreateKindDialogAndMenu}
         open={isCreateKindDialogOpen}

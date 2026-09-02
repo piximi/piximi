@@ -4,8 +4,8 @@ import type { SelectChangeEvent } from "@mui/material";
 import { Box, MenuItem, Tooltip } from "@mui/material";
 
 import { StyledSelect } from "components/inputs";
-import { FunctionalDivider } from "components/ui";
 
+import { FunctionalDivider } from "@ProjectViewer/components";
 import { projectSlice } from "@ProjectViewer/state";
 import {
   selectActiveClassifierModelTarget,

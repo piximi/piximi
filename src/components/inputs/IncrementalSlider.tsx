@@ -74,7 +74,7 @@ export const IncrementalSlider = ({
   };
 
   const handleDecrease = () => {
-    const newValue = Math.max(min, value - 1);
+    const newValue = Math.max(min, value - step);
     setValue(newValue);
     callback(newValue);
     setvalueLabelDisplay("on");
@@ -85,7 +85,7 @@ export const IncrementalSlider = ({
   };
 
   const handleIncrease = () => {
-    const newValue = Math.min(max, value + 1);
+    const newValue = Math.min(max, value + step);
     setValue(newValue);
     callback(newValue);
     setvalueLabelDisplay("on");

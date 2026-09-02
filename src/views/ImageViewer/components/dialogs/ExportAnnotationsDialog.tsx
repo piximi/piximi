@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { Grid, TextField } from "@mui/material";
 
-import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
+import { ConfirmationDialog } from "../../../../components/dialogs/ConfirmationDialog";
 
 type ExportAnnotationsDialogProps = {
   onClose: () => void;

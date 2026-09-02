@@ -7,9 +7,7 @@ import { FilterAltOutlined as FilterIcon } from "@mui/icons-material";
 
 import { useWindowSize } from "hooks";
 
-import { TooltipButton } from "components/ui/tooltips";
-
-import { ItemFilters } from "@ProjectViewer/components";
+import { ItemFilters, TooltipButton } from "@ProjectViewer/components";
 import { selectActiveStateIsFiltered } from "@ProjectViewer/state/selectors";
 
 import { DIMENSIONS } from "utils/constants";

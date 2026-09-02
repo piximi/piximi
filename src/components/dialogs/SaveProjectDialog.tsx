@@ -7,9 +7,9 @@ import { Grid2 as Grid, TextField } from "@mui/material";
 
 import { useProjectSaver } from "hooks/useProjectSaver";
 
-import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-
 import { selectExperiment } from "store/data/selectors";
+
+import { ConfirmationDialog } from "./ConfirmationDialog";
 
 type SaveProjectDialogProps = {
   onClose: () => void;

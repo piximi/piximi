@@ -18,7 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { StyledSelect } from "components/inputs/StyledSelect";
+import { StyledSelect } from "components/inputs";
 
 import type { Category } from "store/data/types";
 import { generateCategory } from "store/data/utils";

@@ -25,8 +25,8 @@ import {
 
 import { useClassificationModel, useDialog } from "hooks";
 
-import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
+import { ConfirmationDialog } from "components/dialogs";
+import { TooltipWithDisable } from "@ProjectViewer/components";
 
 import { classifierSlice } from "store/classifier";
 import { selectModelLifecycleStatus } from "store/classifier/selectors";

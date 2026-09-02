@@ -4,8 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box } from "@mui/material";
 
-import { CustomTabs } from "components/layout";
-
+import { CustomTabs } from "@MeasurementViewer/components/custom-tab-switcher";
 import { measurementsSlice } from "@MeasurementViewer/state";
 import {
   selectActiveGroupId,
@@ -35,7 +34,6 @@ export const MeasurementDashboardSwitcher = () => {
     dispatch(measurementsSlice.actions.removeGroup(groupId));
   };
   const handleEditGroupName = (groupId: string, newName: string) => {
-    console.log(newName);
     dispatch(measurementsSlice.actions.updateGroupName({ groupId, newName }));
   };
 
@@ -52,19 +50,17 @@ export const MeasurementDashboardSwitcher = () => {
       })}
     >
       <CustomTabs
-        extendable={true}
-        editable={true}
-        handleTabEdit={handleEditGroupName}
         childClassName="measurement-group"
         labels={groupIds}
-        handleTabClose={handleDeleteGroup}
-        handleNew={() => {}}
         secondaryEffect={(tableId: string) => {
           dispatch(measurementsSlice.actions.setActiveGroup(tableId));
         }}
         activeLabel={activeMeesurementGroup}
         renderLabel={renderTableTitle}
-        omitAddIcon={true}
+        extendable={true}
+        editable={true}
+        handleTabEdit={handleEditGroupName}
+        handleTabClose={handleDeleteGroup}
       >
         {groupIds.map((id) => (
           <MeasurementDashboard key={`measurement-table-${id}`} />

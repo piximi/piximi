@@ -6,9 +6,8 @@ import { Box, Dialog, DialogContent, Tabs } from "@mui/material";
 
 import { useClassificationModel } from "hooks";
 
-import { ToolTipTab } from "components/layout";
-import { DialogTransitionSlide } from "components/dialogs";
-
+import { ToolTipTab } from "@ProjectViewer/components";
+import { DialogTransitionSlide } from "@ProjectViewer/components/dialogs";
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";

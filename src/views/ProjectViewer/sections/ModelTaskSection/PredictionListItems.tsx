@@ -3,8 +3,10 @@ import { List } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { CustomListItemButton, ListItemHoldButton } from "components/ui";
-
+import {
+  CustomListItemButton,
+  ListItemHoldButton,
+} from "@ProjectViewer/components";
 import { useAcceptClearPredictions } from "@ProjectViewer/hooks";
 
 export const PredictionListItems = () => {

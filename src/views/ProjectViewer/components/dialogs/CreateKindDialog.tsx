@@ -3,10 +3,10 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Box, TextField } from "@mui/material";
 
-import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-
 import { generateKind } from "store/data/utils";
 import type { AnnotationCategory, Kind } from "store/data/types";
+
+import { ConfirmationDialog } from "../../../../components/dialogs/ConfirmationDialog";
 
 type CreateCategoriesDialogProps = {
   onClose: () => void;

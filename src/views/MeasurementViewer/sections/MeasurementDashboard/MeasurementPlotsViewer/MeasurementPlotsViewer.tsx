@@ -5,8 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Typography } from "@mui/material";
 
-import { CustomTabs } from "components/layout";
-
+import { CustomTabs } from "@MeasurementViewer/components/custom-tab-switcher";
 import {
   selectActiveMeasuredEntities,
   selectPlotData,

@@ -1,4 +1,4 @@
-import type { HelpItem } from "../HelpDrawer/HelpContent";
+import type { HelpItem } from "../../../../components/layout/HelpDrawer/HelpContent";
 
 export interface CommonTabPanelProps {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ export type CommonTabsProps = {
   disabledTabs?: number[];
   secondaryEffect?: (tab: string) => void;
   activeLabel?: string;
-  transition?: "basic" | "sliding" | "controlled";
+  transition?: "basic" | "controlled";
   tabHelp?: {
     tabBar: HelpItem;
     edit?: HelpItem;
@@ -27,10 +27,9 @@ export type CommonTabsProps = {
 export type ExtendableTabsProps = {
   extendable: true;
   handleTabClose: (item: string, newItem?: string) => void;
-  handleNew: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+  handleNew?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   handleTabMin?: (item: string, newItem?: string) => void;
   persistentTabs?: string[];
-  omitAddIcon?: boolean;
 };
 
 export type EditableTabsProps = {

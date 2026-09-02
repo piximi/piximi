@@ -2,8 +2,9 @@ import { useCallback, useState } from "react";
 
 import { FolderOpen as FolderOpenIcon } from "@mui/icons-material";
 
-import { CustomListItemButton } from "components/ui";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
+import { CustomListItemButton } from "@ProjectViewer/components";
 
 import { OpenMenu } from "./OpenMenu";
 

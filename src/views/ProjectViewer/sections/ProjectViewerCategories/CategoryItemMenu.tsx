@@ -2,8 +2,7 @@ import { Box, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-import { CategoryDialog } from "components/dialogs/CategoryDialog";
+import { CategoryDialog, ConfirmationDialog } from "components/dialogs";
 
 import type { Category } from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";

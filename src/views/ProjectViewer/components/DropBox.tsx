@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 
 import { useDndFileDrop, useFileLoader } from "hooks";
 
-import { TiffConfigDialog } from "components/dialogs";
+import { TiffConfigDialog } from "./dialogs/tiff-config/TiffConfigDialog";
 
 export const DropBox = ({ children }: { children: ReactElement }) => {
   const {

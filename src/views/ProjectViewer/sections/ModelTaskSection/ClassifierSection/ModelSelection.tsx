@@ -5,8 +5,8 @@ import { MenuItem, IconButton, Stack } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 
 import { WithLabel, StyledSelect } from "components/inputs";
-import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
 
+import { TooltipWithDisable } from "@ProjectViewer/components";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { classifierSlice } from "store/classifier";
 import { selectKindModelNames } from "store/classifier/selectors";

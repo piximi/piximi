@@ -8,12 +8,12 @@ import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 
 import { useDialogHotkey, useHotkeys } from "hooks";
 
-import { ConfirmationDialog } from "components/dialogs";
-import { CategoryItemMenu } from "components/ui/CategoryItemMenu";
+import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { FunctionalDivider } from "components/ui";
-import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
-import { CategoryDialog } from "components/dialogs/CategoryDialog";
+import {
+  FunctionalDivider,
+  TooltipWithDisable,
+} from "@ProjectViewer/components";
 
 import { projectSlice } from "@ProjectViewer/state";
 import {
@@ -29,6 +29,7 @@ import { dataSlice } from "store/data";
 import { HotkeyContext } from "utils/enums";
 
 import { CategoryItem } from "./CategoryItem";
+import { CategoryItemMenu } from "./CategoryItemMenu";
 
 export const ProjectViewerCategories = () => {
   const dispatch = useDispatch();

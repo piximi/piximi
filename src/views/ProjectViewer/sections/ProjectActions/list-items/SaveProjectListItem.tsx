@@ -2,9 +2,10 @@ import { Download as DownloadIcon } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 
-import { CustomListItemButton } from "components/ui";
 import { SaveProjectDialog } from "components/dialogs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
+import { CustomListItemButton } from "@ProjectViewer/components";
 
 import { HotkeyContext } from "utils/enums";
 

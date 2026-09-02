@@ -11,8 +11,7 @@ import {
 
 import { useDialog, useDialogHotkey } from "hooks";
 
-import { TooltipButton } from "components/ui/tooltips/TooltipButton";
-
+import { TooltipButton } from "@ProjectViewer/components";
 import {
   useClassifierStatus,
   ErrorReason,

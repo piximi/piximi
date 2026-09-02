@@ -14,11 +14,9 @@ import {
 
 import { useClassificationModel } from "hooks";
 
-import { StyledSelect } from "components/inputs/StyledSelect";
-import { TooltipWithDisable } from "components/ui/tooltips/TooltipWithDisable";
-import { TextFieldWithBlur } from "components/inputs/TextFieldWithBlur";
-import { WithLabel } from "components/inputs";
+import { WithLabel, TextFieldWithBlur, StyledSelect } from "components/inputs";
 
+import { TooltipWithDisable } from "@ProjectViewer/components";
 import { classifierSlice } from "store/classifier";
 import {
   ErrorReason,
