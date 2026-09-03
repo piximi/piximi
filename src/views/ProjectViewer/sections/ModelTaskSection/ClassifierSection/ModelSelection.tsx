@@ -11,11 +11,12 @@ import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selector
 import { classifierSlice } from "store/classifier";
 import { selectKindModelNames } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
+import { useClassifierApi } from "core/dl/classification";
+import { ModelArch } from "core/dl/classification/types";
 
-import { useClassifierApi } from "utils/dl/classification";
-import type { ModelInfoDTO } from "utils/dl/classification/types";
-import { ModelArch } from "utils/dl/classification/types";
 import { logger } from "utils/logUtils";
+
+import type { ModelInfoDTO } from "core/dl/classification/types";
 
 export const ModelSelection = ({
   selectedModelConfig,

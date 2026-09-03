@@ -13,14 +13,15 @@ import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
+import { toInferenceInput } from "core/dl/utils";
+import { useClassifierApi } from "core/dl/classification";
 
 import { logger } from "utils/logUtils";
 import { representsUnknown } from "utils/stringUtils";
-import { toInferenceInput } from "utils/dl/utils";
-import type { PredictionResult } from "utils/dl/classification/types";
-import { useClassifierApi } from "utils/dl/classification";
 
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
+
+import type { PredictionResult } from "core/dl/classification/types";
 
 export const usePredictClassifier = () => {
   const dispatch = useDispatch();

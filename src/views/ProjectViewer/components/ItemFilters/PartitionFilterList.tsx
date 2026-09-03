@@ -6,8 +6,7 @@ import { Box, Collapse } from "@mui/material";
 
 import { selectActiveViewState } from "@ProjectViewer/state/selectors";
 import { projectSlice } from "@ProjectViewer/state";
-
-import { Partition } from "utils/dl/enums";
+import { Partition } from "core/dl/enums";
 
 import { FilterList } from "./FilterList";
 import { SectionHeader } from "./SectionHeader";

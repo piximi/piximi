@@ -1,8 +1,7 @@
 import { Badge, IconButton } from "@mui/material";
 import { ExpandLess as ExpandLessIcon } from "@mui/icons-material";
 
-import { FunctionalDivider } from "@ProjectViewer/components";
-
+import { FunctionalDivider } from "../FunctionalDivider";
 import { expandToggleStyle } from "./FilterList.styles";
 
 export const SectionHeader = ({

@@ -9,13 +9,14 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { WithLabel, StyledSelect } from "components/inputs";
 
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import { CropSchema } from "core/dl/enums";
 
-import { CropSchema } from "utils/dl/enums";
 import { enumKeys } from "utils/objectUtils";
-import type { CropOptions } from "utils/dl/types";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 import { isFieldLocked, lockReason } from "../../settingsLock";
+
+import type { CropOptions } from "core/dl/types";
 
 export const CropSection = () => {
   const {

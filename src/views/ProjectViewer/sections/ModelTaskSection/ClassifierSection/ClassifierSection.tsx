@@ -2,8 +2,7 @@ import { useSelector } from "react-redux";
 
 import { Box } from "@mui/material";
 
-import { useClassificationModel } from "hooks";
-
+import { useClassificationModel } from "@ProjectViewer/hooks";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectModelLifecycleStatus } from "store/classifier/selectors";

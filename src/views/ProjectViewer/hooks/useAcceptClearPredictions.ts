@@ -9,8 +9,8 @@ import { classifierSlice } from "store/classifier";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { dataSlice } from "store/data";
 import { useParameterizedSelector } from "store/hooks";
+import { Partition } from "core/dl/enums";
 
-import { Partition } from "utils/dl/enums";
 import { representsUnknown } from "utils/stringUtils";
 
 export const useAcceptClearPredictions = () => {

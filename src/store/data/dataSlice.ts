@@ -1,8 +1,8 @@
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 
 import { generateUUID } from "store/data/utils";
+import { Partition } from "core/dl/enums";
 
-import { Partition } from "utils/dl/enums";
 import type { AtLeastOne } from "utils/types";
 import { representsUnknown } from "utils/stringUtils";
 

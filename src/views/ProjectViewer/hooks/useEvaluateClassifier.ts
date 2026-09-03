@@ -6,12 +6,13 @@ import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
+import { useClassifierApi } from "core/dl/classification";
 
 import { AlertType } from "utils/enums";
-import { useClassifierApi } from "utils/dl/classification";
-import type { ModelInfoDTO } from "utils/dl/classification/types";
 
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
+
+import type { ModelInfoDTO } from "core/dl/classification/types";
 
 export const useEvaluateClassifier = () => {
   const dispatch = useDispatch();

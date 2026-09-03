@@ -10,9 +10,9 @@ import type { AppTask } from "store/appTasks/types";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
 import { generateUUID } from "store/data/utils";
 import type { RootState } from "store/rootReducer";
+import { ProjectSaver } from "core/file-io/project-saver/ProjectSaver";
 
 import { AlertType } from "utils/enums";
-import { ProjectSaver } from "utils/file-io/project-saver/ProjectSaver";
 import type { AlertState } from "utils/types";
 
 type UseProjectSaverReturn = {

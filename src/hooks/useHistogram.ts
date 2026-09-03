@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 
 import type { ExtendedChannel } from "store/data/types";
-
-import { DataConnector } from "utils/data-connector";
+import { DataConnector } from "core/data-connector";
 
 /**
  * Returns the rendered preview src for an entity.

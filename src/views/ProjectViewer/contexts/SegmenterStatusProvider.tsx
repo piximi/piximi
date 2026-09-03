@@ -10,10 +10,11 @@ import {
 import type { ChannelMetaEntities } from "store/data/types";
 
 import { arrayRange } from "utils/arrayUtils";
+
 import type {
   SegmentaionModelDetails,
   SegmentationState,
-} from "utils/dl/segmentation/types";
+} from "core/dl/segmentation/types";
 
 enum ErrorReason {
   NotConfigured,

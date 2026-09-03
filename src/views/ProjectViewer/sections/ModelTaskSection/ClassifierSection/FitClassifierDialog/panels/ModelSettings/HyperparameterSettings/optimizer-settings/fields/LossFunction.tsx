@@ -7,9 +7,9 @@ import { StyledSelect, WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import { LossFunction as LossFunctionEnum } from "core/dl/enums";
 
 import { enumKeys } from "utils/objectUtils";
-import { LossFunction as LossFunctionEnum } from "utils/dl/enums";
 
 import { isFieldLocked, lockReason } from "../../settingsLock";
 

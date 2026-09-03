@@ -3,9 +3,9 @@ import type {
   BitDepth,
   ChannelMeasurement,
 } from "store/data/types";
+import { DataConnector } from "core/data-connector";
+import { STORES } from "core/data-connector/types";
 
-import { DataConnector } from "utils/data-connector";
-import { STORES } from "utils/data-connector/types";
 import { decodeRleArray } from "utils/image";
 
 // Keeps Math.round(maskPixelCount * UPPER_QUARTILE) from landing outside the sorted sample array.

@@ -2,11 +2,11 @@ import { memo } from "react";
 
 import { Box, Typography } from "@mui/material";
 
-import { useRenderedSrc } from "hooks/useRenderedSrcs";
+import { useRenderedSrc } from "hooks";
 
 import type { ExtendedImageObject } from "store/data/types";
+import { Partition } from "core/dl/enums";
 
-import { Partition } from "utils/dl/enums";
 import { representsUnknown } from "utils/stringUtils";
 
 import { altTextStyle, getIconPosition, imageStyle } from "../gridItemUtils";

@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { Image as IJSImage, encodeDataURL } from "image-js-latest";
 
 import type { BBox, ExtendedChannel } from "store/data/types";
+import { DataConnector } from "core/data-connector";
 
-import { DataConnector } from "utils/data-connector";
 import { createLUT } from "utils/colorUtils";
 import {
   getCacheKey,

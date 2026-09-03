@@ -12,10 +12,9 @@ import {
   Typography,
 } from "@mui/material";
 
-import { useClassificationModel } from "hooks";
-
 import { WithLabel, TextFieldWithBlur, StyledSelect } from "components/inputs";
 
+import { useClassificationModel } from "@ProjectViewer/hooks";
 import { TooltipWithDisable } from "@ProjectViewer/components";
 import { classifierSlice } from "store/classifier";
 import {
@@ -28,11 +27,12 @@ import {
   selectAllCreatedModelNames,
   selectKindClassifier,
 } from "store/classifier/selectors";
+import { useClassifierApi } from "core/dl/classification";
 
 import { findReplicateName } from "utils/stringUtils";
-import type { ModelArch, ModelInfoDTO } from "utils/dl/classification/types";
-import { useClassifierApi } from "utils/dl/classification";
 import { logger } from "utils/logUtils";
+
+import type { ModelArch, ModelInfoDTO } from "core/dl/classification/types";
 
 export const ModelPicker = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);

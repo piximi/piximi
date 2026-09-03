@@ -10,12 +10,13 @@ import {
   Typography,
 } from "@mui/material";
 
-import { modelInfo } from "utils/dl/segmentation";
+import { modelInfo } from "core/dl/segmentation";
+
 import type {
   ModelDisplayInfo,
   ModelName,
   SegmentaionModelDetails,
-} from "utils/dl/segmentation/types";
+} from "core/dl/segmentation/types";
 
 interface ModelOptionType {
   label: ModelName;

@@ -10,11 +10,11 @@ import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
 import {
   FunctionalDivider,
   TooltipWithDisable,
 } from "@ProjectViewer/components";
-
 import { projectSlice } from "@ProjectViewer/state";
 import {
   selectActiveSelectedIds,

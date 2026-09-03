@@ -10,9 +10,9 @@ import { generateUUID } from "store/data/utils";
 import { dataSlice } from "store/data";
 import { projectSlice } from "@ProjectViewer/state";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+import { ProjectLoader } from "core/file-io/project-loader/ProjectLoader";
 
 import { AlertType } from "utils/enums";
-import { ProjectLoader } from "utils/file-io/project-loader/ProjectLoader";
 import type { AlertState } from "utils/types";
 import { clearCache } from "utils/renderedSrcsCache";
 

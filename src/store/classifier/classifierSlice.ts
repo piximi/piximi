@@ -3,9 +3,13 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { Shape } from "store/data/types";
 import { dataSlice } from "store/data";
 import { UNKNOWN_KIND, UNKNOWN_KIND_ID } from "store/data/constants";
+import { ModelArch } from "core/dl/classification/types";
 
 import type { RecursivePartial } from "utils/types";
 import { recursiveAssign } from "utils/objectUtils";
+
+import { IMAGE_CLASSIFIER_ID, IMAGE_CLASSIFIER_NAME } from "./constants";
+
 import type {
   ModelLifecycleStatus,
   ModelInfo,
@@ -14,11 +18,7 @@ import type {
   RunHistoryEpoch,
   RunStatus,
   EvaluationResult,
-} from "utils/dl/classification/types";
-import { ModelArch } from "utils/dl/classification/types";
-
-import { IMAGE_CLASSIFIER_ID, IMAGE_CLASSIFIER_NAME } from "./constants";
-
+} from "core/dl/classification/types";
 import type { ClassifierState, KindClassifier, SoftmaxById } from "./types";
 import type { PayloadAction } from "@reduxjs/toolkit";
 

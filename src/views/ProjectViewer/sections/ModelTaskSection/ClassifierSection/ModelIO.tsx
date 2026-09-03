@@ -8,9 +8,10 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { SaveFittedModelDialog } from "@ProjectViewer/components/dialogs";
 
 import { HotkeyContext } from "utils/enums";
-import type { ModelInfoDTO } from "utils/dl/classification/types";
 
 import { ImportTensorflowClassificationModelDialog } from "../ImportTensorflowModelDialog";
+
+import type { ModelInfoDTO } from "core/dl/classification/types";
 
 export const ModelIO = ({
   selectedModelConfig,

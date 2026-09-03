@@ -2,7 +2,7 @@ import type {
   ModelArch,
   ModelInfo,
   ModelLifecycleStatus,
-} from "utils/dl/classification/types";
+} from "core/dl/classification/types";
 
 export type SoftmaxById = Record<string, number[]>;
 export type KindClassifier = {

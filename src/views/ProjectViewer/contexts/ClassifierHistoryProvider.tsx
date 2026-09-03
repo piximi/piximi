@@ -9,7 +9,8 @@ import { selectRunsForActiveModel } from "store/classifier/selectors";
 import { diffCompileSettings } from "@ProjectViewer/sections/ModelTaskSection/ClassifierSection/FitClassifierDialog/panels/ModelSettings/HyperparameterSettings/settingsLock";
 
 import type { Points } from "utils/types";
-import type { OptimizationAlgorithm } from "utils/dl/enums";
+
+import type { OptimizationAlgorithm } from "core/dl/enums";
 
 export type RunDrift = {
   epoch: number;

@@ -2,7 +2,7 @@
 //@ts-nocheck keep tsc uncluttered for now
 import { describe, expect, it } from "vitest";
 
-import { Partition } from "utils/dl/enums";
+import { Partition } from "core/dl/enums";
 
 import { dataSlice } from "./dataSlice";
 

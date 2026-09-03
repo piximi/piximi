@@ -16,13 +16,13 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import { selectExperimentChannels } from "store/data/selectors";
 
+import { TiffConfigurator } from "./TiffConfigurator";
+
 import type {
   TiffAnalysisResult,
   TiffDialogCallbackResult,
   TiffImportConfig,
-} from "utils/file-io/file-loader/types";
-
-import { TiffConfigurator } from "./TiffConfigurator";
+} from "core/file-io/file-loader/types";
 
 type TiffConfigDialogProps = {
   open: boolean;

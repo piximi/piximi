@@ -10,7 +10,6 @@ import type { RootState } from "store/rootReducer";
 import { CATEGORY_COLORS } from "store/data/constants";
 
 import { representsUnknown } from "utils/stringUtils";
-import type { Partition } from "utils/dl/enums";
 
 import { isFiltered } from "./filtering";
 import {
@@ -19,6 +18,8 @@ import {
   selectActiveFilters,
   selectSelectedImageIds,
 } from "./selectors";
+
+import type { Partition } from "core/dl/enums";
 
 // --- Images ---
 

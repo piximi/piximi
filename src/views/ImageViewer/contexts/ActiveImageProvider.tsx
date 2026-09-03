@@ -3,7 +3,7 @@ import { createContext, useContext, useMemo, useRef, useState } from "react";
 
 import { useSelector } from "react-redux";
 
-import { useRawImageData } from "hooks/useRawImageData";
+import { useRawImageData } from "hooks";
 
 import type { BitDepth } from "store/data/types";
 import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";

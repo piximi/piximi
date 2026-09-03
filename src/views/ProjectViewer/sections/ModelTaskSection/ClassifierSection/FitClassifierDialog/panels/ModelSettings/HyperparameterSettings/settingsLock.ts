@@ -1,8 +1,8 @@
 import type {
   OptimizerSettings,
   PreprocessSettings,
-} from "utils/dl/classification/types";
-import type { OptimizationAlgorithm } from "utils/dl/enums";
+} from "core/dl/classification/types";
+import type { OptimizationAlgorithm } from "core/dl/enums";
 
 type SettingsType = "architecture" | "integrity" | "tunable";
 

@@ -7,8 +7,8 @@ import type {
   BBox,
   ExtendedAnnotationObject,
 } from "store/data/types";
+import { Partition } from "core/dl/enums";
 
-import { Partition } from "utils/dl/enums";
 import { rleEncodeArray } from "utils/image";
 
 import {

@@ -14,14 +14,13 @@ import {
   selectImageEntities,
   selectKindEntities,
 } from "store/data/selectors";
-
-import type { AnnotationExportType } from "utils/file-io/export/enums";
-import type { ExportedAnnotation } from "utils/file-io/export/types";
 import {
   exportOptions,
   runAnnotationExport,
-} from "utils/file-io/export/runAnnotationExport";
+} from "core/file-io/export/runAnnotationExport";
 
+import type { AnnotationExportType } from "core/file-io/export/enums";
+import type { ExportedAnnotation } from "core/file-io/export/types";
 import type { OpScope, ScopeId } from "./types";
 
 interface ExportOptionsPanelProps {

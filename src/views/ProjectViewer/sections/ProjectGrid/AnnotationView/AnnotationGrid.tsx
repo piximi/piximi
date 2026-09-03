@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 
 import { useDispatch } from "react-redux";
 
-import { usePreloadSrcs } from "hooks/usePreloadSrcs";
+import { usePreloadSrcs } from "hooks";
 
 import { useAnnotationSort } from "@ProjectViewer/hooks";
 import { projectSlice } from "@ProjectViewer/state";

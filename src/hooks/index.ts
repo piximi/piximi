@@ -14,8 +14,8 @@ export { useNumberField } from "./useNumberField";
 export { useWindowSize } from "./useWindowSize";
 export { useFileLoader } from "./useFileLoader";
 export { useProjectLoader } from "./useProjectLoader";
-export { useClassificationModel } from "./useClassificationModel";
+export { useProjectSaver } from "./useProjectSaver";
 export { useHistogram } from "./useHistogram";
-
-// useDefaultImage not included to encourage use of
-// import {useDefaultImage, DispatchLocation} from "hooks/useDefaultImage"
+export { useRawImageData } from "./useRawImageData";
+export { useRenderedSrc } from "./useRenderedSrcs";
+export { usePreloadSrcs } from "./usePreloadSrcs";

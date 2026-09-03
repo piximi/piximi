@@ -30,7 +30,8 @@ import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
 import { getRandomInt } from "utils/dataUtils";
 import { isObjectEmpty } from "utils/objectUtils";
-import type { ModelClassMap } from "utils/dl/classification/types";
+
+import type { ModelClassMap } from "core/dl/classification/types";
 
 export const ClassMapDialog = ({
   open,

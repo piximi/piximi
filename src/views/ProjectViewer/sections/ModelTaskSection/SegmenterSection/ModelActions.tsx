@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { Box } from "@mui/material";
 
 import { TooltipButton } from "@ProjectViewer/components";
-import { usePredictSegmenter } from "@ProjectViewer/hooks/usePredictSegmenter";
+import { usePredictSegmenter } from "@ProjectViewer/hooks";
 import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 
 export const ModelActions = () => {

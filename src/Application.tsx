@@ -16,8 +16,7 @@ import { MeasurementView } from "views/MeasurementViewer";
 import { HelpProvider } from "contexts";
 import HelpOverlay from "views/HelpOverlay";
 import { selectAlertState } from "store/applicationSettings/selectors";
-
-import { DataConnector } from "utils/data-connector";
+import { DataConnector } from "core/data-connector";
 
 import { WelcomeScreen } from "./views/WelcomeScreen";
 

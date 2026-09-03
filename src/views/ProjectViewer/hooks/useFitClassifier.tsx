@@ -18,16 +18,20 @@ import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
 import { generateUUID } from "store/data/utils";
 import { diffCompileSettings } from "@ProjectViewer/sections/ModelTaskSection/ClassifierSection/FitClassifierDialog/panels/ModelSettings/HyperparameterSettings/settingsLock";
-
-import { Partition } from "utils/dl/enums";
+import { Partition } from "core/dl/enums";
 import {
   applySplitAndShuffle,
   fingerprintDataset,
   hashCategorySet,
   partitionTrainingData,
-} from "utils/dl/classification/utils";
-import { toTrainingInput } from "utils/dl/utils";
-import type { TrainingInput } from "utils/dl/types";
+} from "core/dl/classification/utils";
+import { toTrainingInput } from "core/dl/utils";
+import { useClassifierApi } from "core/dl/classification";
+
+import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
+import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
+import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
+
 import type {
   ModelInfo,
   ModelClassMap,
@@ -35,12 +39,8 @@ import type {
   RunTrigger,
   TrainingCallbacks,
   ModelInfoDTO,
-} from "utils/dl/classification/types";
-import { useClassifierApi } from "utils/dl/classification";
-
-import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
-import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
-import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
+} from "core/dl/classification/types";
+import type { TrainingInput } from "core/dl/types";
 
 const buildStoreUpdates = ({
   toTrainingPartition,

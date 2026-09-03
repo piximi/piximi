@@ -5,7 +5,7 @@ import { MenuItem } from "@mui/material";
 
 import { StyledSelect } from "components/inputs";
 
-import { Partition } from "utils/dl/enums";
+import { Partition } from "core/dl/enums";
 
 import { SELECT_PROPS } from "./utils";
 

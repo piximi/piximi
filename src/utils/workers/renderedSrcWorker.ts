@@ -5,7 +5,8 @@ import type { BBox, ExtendedChannel } from "store/data/types";
 
 import "./workerPolyfills";
 
-import { DataConnector } from "utils/data-connector";
+import { DataConnector } from "core/data-connector";
+
 import { createLUT } from "utils/colorUtils";
 import { getCacheKey } from "utils/renderedSrcsCache";
 

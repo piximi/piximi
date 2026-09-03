@@ -16,19 +16,20 @@ import { dataSlice } from "store/data";
 import { generateKind, generateUUID } from "store/data/utils";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+import { useSegmenterApi } from "core/dl/segmentation";
+import { toInferenceInput } from "core/dl/utils";
+import { CancelSource } from "core/dl/cancel";
 
-import { useSegmenterApi } from "utils/dl/segmentation";
-import { toInferenceInput } from "utils/dl/utils";
 import { getStackTraceFromError } from "utils/logUtils";
 import { AlertType } from "utils/enums";
 import type { AlertState, LoadCB } from "utils/types";
+
+import { useSegmenterStatus } from "../contexts/SegmenterStatusProvider";
+
 import type {
   PredictedAnnotationObject,
   SegmentaionModelDetails,
-} from "utils/dl/segmentation/types";
-import { CancelSource } from "utils/dl/cancel";
-
-import { useSegmenterStatus } from "../contexts/SegmenterStatusProvider";
+} from "core/dl/segmentation/types";
 
 export const usePredictSegmenter = () => {
   const dispatch = useDispatch();

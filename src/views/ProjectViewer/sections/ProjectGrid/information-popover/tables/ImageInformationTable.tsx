@@ -16,8 +16,6 @@ import {
 } from "store/data/selectors";
 import { dataSlice } from "store/data";
 
-import type { Partition } from "utils/dl/enums";
-
 import {
   ImagePlaneSelect,
   ItemCategorySelect,
@@ -25,6 +23,8 @@ import {
   SimpleLabel,
 } from "./cells";
 import { ItemInformationTable } from "./ItemInformationTable";
+
+import type { Partition } from "core/dl/enums";
 
 export const ImagePopoverContent = ({
   itemId,

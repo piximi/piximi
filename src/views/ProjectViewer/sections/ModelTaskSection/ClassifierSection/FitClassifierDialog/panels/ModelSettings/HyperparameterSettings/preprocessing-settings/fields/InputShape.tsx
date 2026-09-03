@@ -2,10 +2,11 @@ import { useMemo } from "react";
 
 import { Tooltip, FormControl, FormLabel, Stack } from "@mui/material";
 
-import { useClassificationModel, useNumberField } from "hooks";
+import { useNumberField } from "hooks";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
+import { useClassificationModel } from "@ProjectViewer/hooks";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";

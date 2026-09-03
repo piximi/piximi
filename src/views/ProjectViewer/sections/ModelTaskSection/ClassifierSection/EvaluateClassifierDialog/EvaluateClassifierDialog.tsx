@@ -25,11 +25,12 @@ import {
 } from "store/classifier/selectors";
 
 import type { RequireField } from "utils/types";
-import type { Run } from "utils/dl/classification/types";
 
 import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
 import { ConfusionMatrix } from "./ConfusionMatrix";
 import { EvaluateClassifierDialogAppBar } from "./EvaluateClassifierAppBar";
+
+import type { Run } from "core/dl/classification/types";
 
 type RunWithEval = RequireField<Run, "evalResults">;
 type EvaluateClassifierDialogProps = {

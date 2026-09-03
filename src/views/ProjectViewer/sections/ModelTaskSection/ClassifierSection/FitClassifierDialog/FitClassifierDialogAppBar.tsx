@@ -23,24 +23,27 @@ import {
   ErrorOutline,
 } from "@mui/icons-material";
 
-import { useClassificationModel, useDialog } from "hooks";
+import { useDialog } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs";
-import { TooltipWithDisable } from "@ProjectViewer/components";
 
+import {
+  useClassificationModel,
+  useFitClassifier,
+  useAcceptClearPredictions,
+} from "@ProjectViewer/hooks";
+import { TooltipWithDisable } from "@ProjectViewer/components";
 import { classifierSlice } from "store/classifier";
 import { selectModelLifecycleStatus } from "store/classifier/selectors";
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import { useFitClassifier } from "@ProjectViewer/hooks/useFitClassifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { useAcceptClearPredictions } from "@ProjectViewer/hooks";
+import { useClassifierApi } from "core/dl/classification";
 
 import { APPLICATION_COLORS } from "utils/constants";
-import { useClassifierApi } from "utils/dl/classification";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;

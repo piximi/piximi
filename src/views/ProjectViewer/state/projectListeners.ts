@@ -4,8 +4,7 @@ import { classifierSlice } from "store/classifier";
 import type { TypedAppStartListening } from "store/types";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { dataSlice } from "store/data";
-
-import { getClassifierApi } from "utils/dl/classification";
+import { getClassifierApi } from "core/dl/classification";
 
 import { projectSlice } from "./projectSlice";
 

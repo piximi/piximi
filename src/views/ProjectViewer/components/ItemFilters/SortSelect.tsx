@@ -5,7 +5,6 @@ import { Box, MenuItem, Tooltip } from "@mui/material";
 
 import { StyledSelect } from "components/inputs";
 
-import { FunctionalDivider } from "@ProjectViewer/components";
 import { projectSlice } from "@ProjectViewer/state";
 import {
   selectActiveClassifierModelTarget,
@@ -14,6 +13,8 @@ import {
 import { AnnotationSortType, ImageSortType } from "@ProjectViewer/state/types";
 import { useParameterizedSelector } from "store/hooks";
 import { selectActiveSoftmaxById } from "store/classifier/selectors";
+
+import { FunctionalDivider } from "../FunctionalDivider";
 
 export const SortSelect = () => {
   const dispatch = useDispatch();

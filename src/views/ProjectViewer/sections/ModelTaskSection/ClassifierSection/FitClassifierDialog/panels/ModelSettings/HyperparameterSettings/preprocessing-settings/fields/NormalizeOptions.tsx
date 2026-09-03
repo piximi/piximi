@@ -11,9 +11,9 @@ import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
-import type { NormalizeOptions as NormalizeOptionsType } from "utils/dl/types";
-
 import { isFieldLocked, lockReason } from "../../settingsLock";
+
+import type { NormalizeOptions as NormalizeOptionsType } from "core/dl/types";
 
 export const NormalizeOptions = () => {
   const {

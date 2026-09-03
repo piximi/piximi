@@ -1,8 +1,8 @@
 import { useContext } from "react";
 
-import type { ModelClassMap } from "utils/dl/classification/types";
-
 import { ClassMapDialogContext } from "./ClassMapContext";
+
+import type { ModelClassMap } from "core/dl/classification/types";
 
 export const useClassMapDialog = () => {
   const { openDialog } = useContext(ClassMapDialogContext);

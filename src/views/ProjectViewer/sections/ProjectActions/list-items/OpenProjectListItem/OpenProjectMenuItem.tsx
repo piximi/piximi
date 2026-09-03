@@ -18,7 +18,7 @@ import { useDialogHotkey, useProjectLoader } from "hooks";
 import { ExampleProjectDialog } from "components/dialogs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { useConfirmReplaceDialog } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
+import { useConfirmReplaceDialog } from "@ProjectViewer/hooks";
 
 import { HotkeyContext } from "utils/enums";
 

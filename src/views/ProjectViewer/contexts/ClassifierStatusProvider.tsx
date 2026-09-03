@@ -12,8 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { useImmer } from "use-immer";
 
-import { useClassificationModel } from "hooks";
-
+import { useClassificationModel } from "@ProjectViewer/hooks/useClassificationModel";
 import {
   selectAllCreatedModelNames,
   selectIsModelTrained,
@@ -34,17 +33,18 @@ import { useParameterizedSelector } from "store/hooks";
 import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
 import type { Shape } from "store/data/types";
 import { classifierSlice } from "store/classifier";
+import { Partition } from "core/dl/enums";
+import { getDefaultModelParams } from "core/dl/classification/utils";
 
-import { Partition } from "utils/dl/enums";
 import { findReplicateName, representsUnknown } from "utils/stringUtils";
-import { getDefaultModelParams } from "utils/dl/classification/utils";
+import type { RecursivePartial } from "utils/types";
+
 import type {
   ClassifierModelParams,
   ModelLifecycleStatus,
   OptimizerSettings,
   PreprocessSettings,
-} from "utils/dl/classification/types";
-import type { RecursivePartial } from "utils/types";
+} from "core/dl/classification/types";
 
 export enum ErrorReason {
   NotTrainable,

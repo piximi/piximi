@@ -20,11 +20,12 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
+import { DimensionOrder } from "core/file-io/file-loader/types";
+
 import type {
   TiffAnalysisResult,
   TiffImportConfig,
-} from "utils/file-io/file-loader/types";
-import { DimensionOrder } from "utils/file-io/file-loader/types";
+} from "core/file-io/file-loader/types";
 
 export const TiffConfigurator = ({
   tiffAnalysis,

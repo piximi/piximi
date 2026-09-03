@@ -7,9 +7,9 @@ import { StyledSelect, WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import { OptimizationAlgorithm as OptimizationAlgorithmEnum } from "core/dl/enums";
 
 import { enumKeys } from "utils/objectUtils";
-import { OptimizationAlgorithm as OptimizationAlgorithmEnum } from "utils/dl/enums";
 
 import { isFieldLocked, lockReason } from "../../settingsLock";
 

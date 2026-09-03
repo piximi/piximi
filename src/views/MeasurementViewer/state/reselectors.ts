@@ -14,10 +14,10 @@ import {
 } from "store/data/types";
 
 import { formatString } from "utils/stringUtils";
-import type { Partition } from "utils/dl/enums";
 
 import { selectActiveMeasurementGroup } from "./selectors";
 
+import type { Partition } from "core/dl/enums";
 import type {
   Dimension,
   ImageEntityMeasurementGroup,

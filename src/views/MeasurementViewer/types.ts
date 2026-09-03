@@ -5,8 +5,7 @@ import type {
   FeatureKey,
 } from "store/data/types";
 
-import type { Partition } from "utils/dl/enums";
-
+import type { Partition } from "core/dl/enums";
 import type { ComputedDatum } from "@nivo/swarmplot";
 import type { ColorSchemeId } from "@nivo/colors";
 

@@ -34,8 +34,6 @@ import {
 } from "store/data/selectors";
 import { generateCategory } from "store/data/utils";
 
-import type { Partition } from "utils/dl/enums";
-
 import {
   AnnotationKindSelect,
   ItemCategorySelect,
@@ -44,6 +42,8 @@ import {
 } from "./cells";
 import { ItemInformationTable } from "./ItemInformationTable";
 import { useInformationPopover } from "../InformationPopoverProvider";
+
+import type { Partition } from "core/dl/enums";
 
 export const AnnotationPopoverContent = ({
   itemId,

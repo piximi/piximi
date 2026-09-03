@@ -3,9 +3,8 @@
 import { describe, expect, it } from "vitest";
 
 import type { RootState } from "store/rootReducer";
-
-import { Partition } from "utils/dl/enums";
-import { STORES } from "utils/data-connector/types";
+import { Partition } from "core/dl/enums";
+import { STORES } from "core/data-connector/types";
 
 import { DTYPES } from "./types";
 import {

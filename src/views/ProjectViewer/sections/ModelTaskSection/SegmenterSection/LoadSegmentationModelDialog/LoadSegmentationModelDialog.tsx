@@ -13,12 +13,13 @@ import {
 import { useHotkeys } from "hooks";
 
 import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
+import { useSegmenterApi } from "core/dl/segmentation";
 
-import { useSegmenterApi } from "utils/dl/segmentation";
 import { HotkeyContext } from "utils/enums";
-import type { SegmentaionModelDetails } from "utils/dl/segmentation/types";
 
 import { PretrainedModelSelector } from "./PretrainedModelSelector";
+
+import type { SegmentaionModelDetails } from "core/dl/segmentation/types";
 
 type LoadSegmentationModelDialogProps = {
   onClose: () => void;

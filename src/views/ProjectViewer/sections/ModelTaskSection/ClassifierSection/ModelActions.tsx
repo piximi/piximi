@@ -24,14 +24,17 @@ import {
   selectRunsForActiveModel,
 } from "store/classifier/selectors";
 import { selectTotalActiveUnlabeledItems } from "@ProjectViewer/state/reselectors";
-import { usePredictClassifier } from "@ProjectViewer/hooks/usePredictClassifier";
-import { useEvaluateClassifier } from "@ProjectViewer/hooks/useEvaluateClassifier";
+import {
+  usePredictClassifier,
+  useEvaluateClassifier,
+} from "@ProjectViewer/hooks";
 
-import type { ModelLifecycleStatus } from "utils/dl/classification/types";
 import { HotkeyContext } from "utils/enums";
 
 import { FitClassifierDialog } from "./FitClassifierDialog";
 import { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";
+
+import type { ModelLifecycleStatus } from "core/dl/classification/types";
 
 export const ModelActions = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);

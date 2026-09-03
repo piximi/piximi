@@ -5,7 +5,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { CustomListItemButton } from "@ProjectViewer/components";
-import { useConfirmReplaceDialog } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
+import { useConfirmReplaceDialog } from "@ProjectViewer/hooks";
 import { projectSlice } from "@ProjectViewer/state";
 
 import { clearCache } from "utils/renderedSrcsCache";

@@ -1,5 +1,5 @@
 // prettier-ignore
-import {language} from "./language";
+import type {language} from "./language";
 
 const gr: language = {
   translation: {

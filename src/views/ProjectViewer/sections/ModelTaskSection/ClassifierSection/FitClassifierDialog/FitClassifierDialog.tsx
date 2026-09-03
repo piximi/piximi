@@ -4,8 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Dialog, DialogContent, Tabs } from "@mui/material";
 
-import { useClassificationModel } from "hooks";
-
+import { useClassificationModel } from "@ProjectViewer/hooks";
 import { ToolTipTab } from "@ProjectViewer/components";
 import { DialogTransitionSlide } from "@ProjectViewer/components/dialogs";
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";

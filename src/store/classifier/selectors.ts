@@ -9,8 +9,7 @@ import type {
   ModelInfo,
   Run,
   EvaluationResult,
-} from "utils/dl/classification/types";
-
+} from "core/dl/classification/types";
 import type {
   ClassifierState,
   KindClassifier,

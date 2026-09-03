@@ -7,15 +7,15 @@ import { saveAs } from "file-saver";
 
 import { Grid2 as Grid, TextField } from "@mui/material";
 
+import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
+
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectRunsForActiveModel } from "store/classifier/selectors";
+import { useClassifierApi } from "core/dl/classification";
+import { buildClassifierZip } from "core/file-io/export/exportFittedModel";
 
-import type { ModelInfoDTO } from "utils/dl/classification/types";
-import { useClassifierApi } from "utils/dl/classification";
-import { buildClassifierZip } from "utils/file-io/export/exportFittedModel";
-
-import { ConfirmationDialog } from "../../../../components/dialogs/ConfirmationDialog";
+import type { ModelInfoDTO } from "core/dl/classification/types";
 
 type SaveFittedModelDialogProps = {
   model: ModelInfoDTO;

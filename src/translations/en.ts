@@ -1,4 +1,4 @@
-import { language } from "./language";
+import type { language } from "./language";
 
 const en: language = {
   translation: {

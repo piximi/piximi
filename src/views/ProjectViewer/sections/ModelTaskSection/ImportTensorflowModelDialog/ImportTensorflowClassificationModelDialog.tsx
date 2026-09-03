@@ -17,20 +17,20 @@ import {
 import { ToolTipTab } from "@ProjectViewer/components";
 import { classifierSlice } from "store/classifier";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-
-import { useClassifierApi } from "utils/dl/classification";
-import { parseError } from "utils/logUtils";
-import { type ModelInfoDTO, type Run } from "utils/dl/classification/types";
-import { zipInputToBuffer } from "utils/file-io/file-loader/fileInputUtils";
+import { useClassifierApi } from "core/dl/classification";
+import { type ModelInfoDTO, type Run } from "core/dl/classification/types";
+import { modelInfoDTOToModelInfo } from "core/dl/classification/utils";
+import { zipInputToBuffer } from "core/file-io/file-loader/fileInputUtils";
 import {
   importFittedModelFromZip,
   importFittedModelFromFiles,
-} from "utils/file-io/import/importFittedModel";
+} from "core/file-io/import/importFittedModel";
 import {
   MODEL_MANIFEST_FILENAME,
   MODEL_RUNS_FILENAME,
-} from "utils/file-io/consts";
-import { modelInfoDTOToModelInfo } from "utils/dl/classification/utils";
+} from "core/file-io/consts";
+
+import { parseError } from "utils/logUtils";
 
 import { LocalClassifierUpload } from "./LocalFileUpload";
 import { RemoteClassifierUpload } from "./CloudUpload";

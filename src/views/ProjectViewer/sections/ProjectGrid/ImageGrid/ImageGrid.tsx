@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { usePreloadSrcs } from "hooks/usePreloadSrcs";
+import { usePreloadSrcs } from "hooks";
 
 import { useImageSort } from "@ProjectViewer/hooks";
 import { projectSlice } from "@ProjectViewer/state";

@@ -19,9 +19,9 @@ import {
 import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
 import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+import { Partition } from "core/dl/enums";
 
 import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
-import { Partition } from "utils/dl/enums";
 import { computeObjectIntensityMeasurements } from "utils/measurements/computeObjectIntensityMeasurements";
 import { rleEncodeArray } from "utils/image";
 

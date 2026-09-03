@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-import { useRenderedSrc } from "hooks/useRenderedSrcs";
+import { useRenderedSrc } from "hooks";
 
 import {
   selectImageStackIds,

@@ -14,14 +14,15 @@ import {
   selectKindEntities,
 } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
-
-import { HotkeyContext } from "utils/enums";
-import type { AnnotationExportType } from "utils/file-io/export/enums";
-import type { ExportedAnnotation } from "utils/file-io/export/types";
 import {
   exportOptions,
   runAnnotationExport,
-} from "utils/file-io/export/runAnnotationExport";
+} from "core/file-io/export/runAnnotationExport";
+
+import { HotkeyContext } from "utils/enums";
+
+import type { AnnotationExportType } from "core/file-io/export/enums";
+import type { ExportedAnnotation } from "core/file-io/export/types";
 
 //TODO: MenuItem??
 
