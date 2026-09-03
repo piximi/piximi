@@ -1,10 +1,3 @@
-export type Token = Int32Array;
-
-const INIT_VAL_IDX = 0;
-
-const SIGNAL_F = 0;
-const SIGNAL_T = 1;
-
 /*
  * Error class used by `CancelSource.throwIfSignaled` to abort a worker thread's current work.
  */
@@ -18,29 +11,36 @@ export class TaskCancelledError extends Error {
   }
 }
 
-export class CancelSource {
-  #buffer;
-  #tokenArray;
-  /**
-   * @param initialValue Initial value to store in the shared array buffer's first slot.
-   */
-  constructor() {
-    if (globalThis.crossOriginIsolated !== undefined && !crossOriginIsolated) {
-      throw new Error(
-        "Cannot operate:  Cross origin is not isolated. See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements for details.",
-      );
-    }
-    this.#buffer = new SharedArrayBuffer(4);
-    this.#tokenArray = new Int32Array(this.#buffer);
-    Atomics.store(this.#tokenArray, INIT_VAL_IDX, SIGNAL_F);
+/**
+ * Read-only view of a `CancelSource`'s signaled state. This is the object
+ * handed to a worker — via `Comlink.proxy()` — so `isSignaled()` calls made
+ * there resolve over a postMessage round trip against the live main-thread
+ * `CancelSource`, rather than needing a `SharedArrayBuffer`.
+ */
+export class CancelToken {
+  #source: CancelSource;
+
+  constructor(source: CancelSource) {
+    this.#source = source;
   }
 
+  isSignaled() {
+    return this.#source.isSignaled();
+  }
+}
+
+export type Token = CancelToken;
+
+export class CancelSource {
+  #signaled = false;
+  #token = new CancelToken(this);
+
   get token(): Token {
-    return this.#tokenArray;
+    return this.#token;
   }
 
   signal() {
-    Atomics.store(this.token, INIT_VAL_IDX, SIGNAL_T);
+    this.#signaled = true;
   }
 
   /**
@@ -48,29 +48,34 @@ export class CancelSource {
    * a subsequent work item. Call before starting new work.
    */
   reset() {
-    Atomics.store(this.token, INIT_VAL_IDX, SIGNAL_F);
+    this.#signaled = false;
+  }
+
+  isSignaled() {
+    return this.#signaled;
   }
 
   /**
    * Checks whether or not a cancellation source's token is in its signaled state.
    *
-   * This method may be used by worker threads in polling mode.
+   * This method may be used by worker threads in polling mode. `token` is
+   * typically a Comlink proxy, so the check is always asynchronous.
    * @param token Token to check.
    * @returns `true` if the token is signaled, or `false` otherwise.
    */
-  static isSignaled(token: Token) {
-    return Atomics.load(token, INIT_VAL_IDX) === SIGNAL_T;
+  static async isSignaled(token: Token) {
+    return token.isSignaled();
   }
   /**
    * Checks the given cancellation token and throws an instance of `TaskCancelledError` if the token is in its
    * signaled state.
    * @param token Cancellation token to check.
    */
-  static throwIfSignaled(token: Token | undefined) {
+  static async throwIfSignaled(token: Token | undefined) {
     if (!token) {
       return;
     }
-    if (this.isSignaled(token)) {
+    if (await this.isSignaled(token)) {
       throw new TaskCancelledError();
     }
   }

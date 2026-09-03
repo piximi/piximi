@@ -71,11 +71,8 @@ export abstract class Stardist extends Segmenter {
     // imTensor disposed in `predictStardist`
     try {
       for await (const [idx, imTensor] of infT.entries()) {
-        CancelSource.throwIfSignaled(cancelToken);
-        // if (this.getExecutionStopped()) {
-        //   this._executionStopped = false;
-        //   return { cancelled: true, annotations };
-        // }
+        await CancelSource.throwIfSignaled(cancelToken);
+
         loadCb(
           Math.round((idx / infT.length) * 100),
           `Segmenting image ${idx + 1} of ${infT.length}`,

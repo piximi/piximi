@@ -65,7 +65,7 @@ export class Glas extends Segmenter {
     loadCb(100, "1/2 Preprocessing images");
     try {
       for await (const [idx, imTensor] of infT.entries()) {
-        CancelSource.throwIfSignaled(cancelToken);
+        await CancelSource.throwIfSignaled(cancelToken);
         loadCb(Math.round((idx / infT.length) * 100), "2/2 Segmenting image");
         const annObj = await predictGlas(
           graphModel,

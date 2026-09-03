@@ -94,7 +94,7 @@ export class Cellpose extends Segmenter {
     loadCb(100, "2/3 Connecting to server");
     try {
       for await (const [idx, imTensor] of infT.entries()) {
-        CancelSource.throwIfSignaled(cancelToken);
+        await CancelSource.throwIfSignaled(cancelToken);
         const annotObj = await predictCellpose(
           imTensor,
           this.segmentedKind,

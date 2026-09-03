@@ -75,7 +75,7 @@ class SegmenterApi implements ISegmenterApi {
     return this.backend.predict(
       name,
       items,
-      cancelToken,
+      Comlink.proxy(cancelToken),
       Comlink.proxy(loadCB),
     );
   }

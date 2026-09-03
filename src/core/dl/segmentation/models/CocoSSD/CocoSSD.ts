@@ -77,7 +77,7 @@ export class CocoSSD extends Segmenter {
     const annotations: Array<PredictedAnnotationObject[]> = [];
     try {
       for await (const [idx, imTensor] of infT.entries()) {
-        CancelSource.throwIfSignaled(cancelToken);
+        await CancelSource.throwIfSignaled(cancelToken);
         loadCb(Math.round((idx / infT.length) * 100), "2/2 Segmenting image");
         const annotObj = await predictCoco(
           graphModel,
