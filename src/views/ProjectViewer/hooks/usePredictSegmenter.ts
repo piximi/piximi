@@ -306,7 +306,14 @@ export const usePredictSegmenter = () => {
       dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
     else dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
     setModelStatus("idle");
-  }, [handleError, allImages, loadedModel, selectedImages, kinds]);
+  }, [
+    handleError,
+    allImages,
+    loadedModel,
+    selectedImages,
+    kinds,
+    selectedChannels,
+  ]);
 
   return predictSegmenter;
 };
