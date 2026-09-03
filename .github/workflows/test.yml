@@ -15,7 +15,7 @@ jobs:
         uses: pnpm/setup@v1
         with:
           version: 11.2.2
-          runtime: node@20
+          runtime: node@24
           cache: true
 
       - name: Install Packages
