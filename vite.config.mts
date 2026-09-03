@@ -1,8 +1,9 @@
 /// <reference types="vitest" />
+import path from "path";
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import viteTsconfigPaths from "vite-tsconfig-paths";
-import path from "path";
 
 // SharedArrayBuffer requires the page to be cross-origin isolated, which means
 // the server must send these two headers. Without them `crossOriginIsolated`
@@ -30,6 +31,7 @@ export default defineConfig({
       images: path.resolve("src/images"),
       store: path.resolve("src/store"),
       themes: path.resolve("src/themes"),
+      core: path.resolve("src/core"),
       "@ProjectViewer": path.resolve("src/views/ProjectViewer"),
       "@ImageViewer": path.resolve("src/views/ImageViewer"),
       "@MeasurementViewer": path.resolve("src/views/MeasurementViewer"),
