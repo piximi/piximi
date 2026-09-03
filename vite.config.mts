@@ -16,6 +16,12 @@ export default defineConfig({
   // depending on your application, base can also be "/"
   base: "",
   plugins: [react(), viteTsconfigPaths()],
+  worker: {
+    format: "es",
+  },
+  build: {
+    target: "es2022",
+  },
   // vite in dev mode works without this
   // but on build rollup fails to resolve these
   // would be nice to figure out a more robust config that both understand
