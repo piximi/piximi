@@ -16,9 +16,11 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/setup@v1
         with:
-          version: 10
+          version: 11
+          runtime: node@22
+          cache: true
 
       - name: Install semver
         run: |
