@@ -1,13 +1,13 @@
 import * as Comlink from "comlink";
 
-import type {
-  AnnotationObject,
-  ChannelMeta,
-  ImageObject,
-  ImageSeries,
+import {
+  STORES,
+  type AnnotationObject,
+  type ChannelMeta,
+  type ImageObject,
+  type ImageSeries,
 } from "store/data/types";
 import { DataConnector } from "core/data-connector";
-import { STORES } from "core/data-connector/types";
 import { getClassifierApi } from "core/dl/classification";
 
 import type { Progress, TaskError } from "utils/types";

@@ -1,10 +1,10 @@
-import type {
-  AnnotationObject,
-  BitDepth,
-  ChannelMeasurement,
+import {
+  STORES,
+  type AnnotationObject,
+  type BitDepth,
+  type ChannelMeasurement,
 } from "store/data/types";
 import { DataConnector } from "core/data-connector";
-import { STORES } from "core/data-connector/types";
 
 import { decodeRleArray } from "utils/image";
 

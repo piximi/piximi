@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
+import { STORES } from "core/entities";
+
 import { DataConnector } from "./DataConnector";
-import { STORES, type ChannelStorageInput } from "./types";
+
+import type { ChannelStorageInput } from "./types";
 
 // Note: These tests require IndexedDB support
 // Vitest with happy-dom should provide this

@@ -1,7 +1,7 @@
 import { group } from "zarr";
 
 import { DataConnector } from "core/data-connector";
-import { STORES } from "core/data-connector/types";
+import { STORES } from "core/entities";
 
 import type { CancelToken } from "utils/workers/types";
 

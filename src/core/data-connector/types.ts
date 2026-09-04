@@ -4,28 +4,10 @@
  */
 export const DB_NAME = "piximi-data";
 export const DB_VERSION = 1;
-import type { Channel, DType } from "store/data/types";
-export const STORES = {
-  EXPERIMENT_DATA: "experiment-data",
-  SERIES_DATA: "series-data",
-  IMAGE_DATA: "image-data",
-  PLANE_DATA: "plane-data",
-  CHANNEL_DATA: "channel-data",
-} as const;
+import type { Channel } from "store/data/types";
 
-export type StoreName = (typeof STORES)[keyof typeof STORES];
+import type { StorageReference, StoreName } from "core/entities/storage";
 
-/**
- * Reference stored in Redux instead of actual tensor
- */
-export type StorageReference = {
-  storageId: string;
-  storeName: StoreName;
-  width: number;
-  height: number;
-  dtype: DType;
-  byteSize: number;
-};
 export type StoredChannelData = Omit<Channel, "storageReference"> & {
   histogram: ArrayBuffer;
   data: ArrayBuffer;

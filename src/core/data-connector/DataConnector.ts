@@ -1,10 +1,13 @@
 import { openDB } from "idb";
 
+import { STORES } from "core/entities";
+
 import { parseError } from "utils/logUtils";
 
-import { STORES, DB_NAME, DB_VERSION } from "./types";
+import { DB_NAME, DB_VERSION } from "./types";
 import { LRUCache, NullCache } from "./lruCache";
 
+import type { StorageReference, StoreName } from "core/entities";
 import type { IDBPDatabase } from "idb";
 import type {
   CacheOptions,
@@ -15,8 +18,6 @@ import type {
   StoredChannelData,
   StorageInput,
   ILRUCache,
-  StoreName,
-  StorageReference,
 } from "./types";
 
 const DEFAULT_CACHE_OPTIONS: CacheOptions = {
