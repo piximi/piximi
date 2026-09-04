@@ -1,13 +1,13 @@
 import * as Comlink from "comlink";
 
-import type {
-  Channel,
-  ChannelMeta,
-  Plane,
-  ImageObject,
+import {
+  type Channel,
+  type ChannelMeta,
+  type Plane,
+  type ImageObject,
+  STORES,
 } from "store/data/types";
 import { DataConnector } from "core/data-connector";
-import { STORES } from "core/data-connector/types";
 
 import type { Progress, TaskError } from "utils/types";
 import type { CancelToken } from "utils/workers/types";
