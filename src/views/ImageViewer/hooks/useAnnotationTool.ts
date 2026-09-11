@@ -26,6 +26,7 @@ import {
 import { ToolType } from "views/ImageViewer/utils/enums";
 
 import type { Image as IJSImage } from "image-js-latest";
+
 import type { AnnotationTool } from "views/ImageViewer/utils/tools";
 
 export const useAnnotationTool = (ijsImage: IJSImage | null) => {

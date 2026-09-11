@@ -3,10 +3,10 @@ import { group } from "zarr";
 import { DataConnector } from "core/data-connector";
 import { STORES } from "core/entities";
 
-import type { CancelToken } from "utils/workers/types";
-
 import { PiximiStore } from "../zarr/stores";
 import { writeV2 } from "./version-writers/writeV2";
+
+import type { CancelToken } from "utils/workers/types";
 
 import type { ChannelDataAccessor, SaveProjectWorkerInput } from "./types";
 

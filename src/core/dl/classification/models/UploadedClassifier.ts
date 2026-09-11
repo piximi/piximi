@@ -1,10 +1,7 @@
 import { io, loadGraphModel, loadLayersModel } from "@tensorflow/tfjs";
 
-import type { Shape, ShapeArray } from "store/data/types";
-
 import { logger } from "utils/logUtils";
 import { arrayRange } from "utils/arrayUtils";
-import type { RequireOnly } from "utils/types";
 
 import { validateModelMetadata } from "./validateModelMetadata";
 import { SequentialClassifier } from "./AbstractClassifier";
@@ -12,9 +9,14 @@ import { createCompileArgs, getDefaultModelInfo } from "../utils";
 import { convertArrayToShape } from "../../utils";
 import { ModelArch } from "../types";
 
-import type { Model } from "../../Model";
-import type { OptimizerSettings } from "../types";
 import type { LayersModel } from "@tensorflow/tfjs";
+
+import type { Shape, ShapeArray } from "core/entities";
+
+import type { RequireOnly } from "utils/types";
+
+import type { OptimizerSettings } from "../types";
+import type { Model } from "../../Model";
 import type { CropSchema } from "../../enums";
 
 enum LoadState {

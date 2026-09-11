@@ -14,23 +14,24 @@ import {
 } from "@mui/material";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 
-import { DialogTransitionSlide } from "@ProjectViewer/components/dialogs";
-import { selectActiveKnownCategories } from "@ProjectViewer/state/reselectors";
-import type { Category } from "store/data/types";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
   selectActiveModelName,
   selectRunsForActiveModel,
 } from "store/classifier/selectors";
 
-import type { RequireField } from "utils/types";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { selectActiveKnownCategories } from "@ProjectViewer/state/reselectors";
+import { DialogTransitionSlide } from "@ProjectViewer/components/dialogs";
 
 import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
 import { ConfusionMatrix } from "./ConfusionMatrix";
 import { EvaluateClassifierDialogAppBar } from "./EvaluateClassifierAppBar";
 
+import type { Category } from "core/entities";
 import type { Run } from "core/dl/classification/types";
+
+import type { RequireField } from "utils/types";
 
 type RunWithEval = RequireField<Run, "evalResults">;
 type EvaluateClassifierDialogProps = {

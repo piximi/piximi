@@ -6,14 +6,15 @@ import {
   type Plane,
   type ImageObject,
   STORES,
-} from "store/data/types";
+} from "core/entities";
 import { DataConnector } from "core/data-connector";
 
-import type { Progress, TaskError } from "utils/types";
-import type { CancelToken } from "utils/workers/types";
 import { parseError } from "utils/logUtils";
 
 import { overallProgress } from "./progress";
+
+import type { Progress, TaskError } from "utils/types";
+import type { CancelToken } from "utils/workers/types";
 
 import type {
   ChannelResult,

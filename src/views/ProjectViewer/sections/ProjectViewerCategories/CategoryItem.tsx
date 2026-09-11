@@ -1,9 +1,7 @@
-import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useSelector } from "react-redux";
 
-import type { Theme } from "@mui/material";
 import { Tooltip } from "@mui/material";
 import {
   Label as CategoryIcon,
@@ -11,14 +9,20 @@ import {
   MoreHoriz as MoreIcon,
 } from "@mui/icons-material";
 
-import { CustomListItemButton, CountChip } from "@ProjectViewer/components";
-import type { Category } from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";
 import { selectEntityCountByCategoryId } from "store/data/selectors";
-import { selectActiveFilters } from "@ProjectViewer/state/selectors";
 
 import { APPLICATION_COLORS } from "utils/constants";
 import { getCategoryIconStyle } from "utils/styleUtils";
+
+import { selectActiveFilters } from "@ProjectViewer/state/selectors";
+import { CustomListItemButton, CountChip } from "@ProjectViewer/components";
+
+import type React from "react";
+
+import type { Theme } from "@mui/material";
+
+import type { Category } from "core/entities";
 
 type CategoryItemProps = {
   showHK?: boolean;

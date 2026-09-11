@@ -1,5 +1,6 @@
-import type { Breakpoint } from "@mui/material";
 import { useMediaQuery, useTheme } from "@mui/material";
+
+import type { Breakpoint } from "@mui/material";
 type BreakpointOrNull = Breakpoint | null;
 export const useBreakpointObserver = () => {
   const theme = useTheme();

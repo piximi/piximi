@@ -1,3 +1,5 @@
+import type { EntityState } from "@reduxjs/toolkit";
+
 import type {
   AnnotationObject,
   AnnotationVolume,
@@ -10,9 +12,6 @@ import type {
   Kind,
   Plane,
 } from "core/entities";
-import type { EntityState } from "@reduxjs/toolkit";
-
-export * from "core/entities";
 
 export type ItemCategoryUpdate = {
   id: string;

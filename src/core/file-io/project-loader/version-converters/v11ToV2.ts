@@ -1,19 +1,19 @@
 import { Image as IJSImage } from "image-js-latest";
 
-import { generateUUID } from "store/data/utils";
-import type { BitDepth } from "store/data/types";
 import {
+  generateUUID,
   UNKNOWN_KIND,
   UNKNOWN_KIND_CATEGORY,
   UNKNOWN_KIND_CATEGORY_ID,
   UNKNOWN_KIND_ID,
-} from "store/data/constants";
+} from "core/entities";
+import { getDefaultModelInfo } from "core/dl/classification/utils";
+import { ModelArch } from "core/dl/classification/types";
+
 import {
   IMAGE_CLASSIFIER_ID,
   IMAGE_CLASSIFIER_NAME,
 } from "store/classifier/constants";
-import { getDefaultModelInfo } from "core/dl/classification/utils";
-import { ModelArch } from "core/dl/classification/types";
 
 import { processChannel } from "utils/channelUtils";
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
@@ -21,6 +21,19 @@ import { representsUnknown } from "utils/stringUtils";
 
 import { subProgress } from "../progress";
 
+import type { EntityState } from "@reduxjs/toolkit";
+
+import type { BitDepth } from "core/entities";
+
+import type {
+  V11Category,
+  V11ClassifierState,
+  V11Kind,
+  V11KindClassifier,
+  V11PiximiState,
+  V11RawAnnotationObject,
+  V11RawImageObject,
+} from "../version-readers/version-types/v11Types";
 import type {
   V2AnnotationObject,
   V2AnnotationVolume,
@@ -39,16 +52,6 @@ import type {
   V2PiximiState,
   V2Plane,
 } from "../version-readers/version-types/v2Types";
-import type {
-  V11Category,
-  V11ClassifierState,
-  V11Kind,
-  V11KindClassifier,
-  V11PiximiState,
-  V11RawAnnotationObject,
-  V11RawImageObject,
-} from "../version-readers/version-types/v11Types";
-import type { EntityState } from "@reduxjs/toolkit";
 
 const STAGES = {
   kinds: { start: 0, end: 0.1 },

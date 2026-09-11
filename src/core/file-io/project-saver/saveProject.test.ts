@@ -3,19 +3,6 @@ import { clean, gte, lt } from "semver";
 import JSZip from "jszip";
 import { group } from "zarr";
 
-import type { ClassifierState } from "store/classifier/types";
-import type {
-  AnnotationObject,
-  AnnotationVolume,
-  Category,
-  Channel,
-  ChannelMeta,
-  DataStateV2,
-  ImageObject,
-  ImageSeries,
-  Kind,
-  Plane,
-} from "store/data/types";
 import {
   CropSchema,
   LossFunction,
@@ -31,10 +18,26 @@ import { readV2 } from "../project-loader/version-readers/readV2";
 import { loadProject } from "../project-loader/loadProject";
 import { writeV2 } from "./version-writers/writeV2";
 
+import type { EntityState } from "@reduxjs/toolkit";
+
+import type {
+  AnnotationObject,
+  AnnotationVolume,
+  Category,
+  Channel,
+  ChannelMeta,
+  ImageObject,
+  ImageSeries,
+  Kind,
+  Plane,
+} from "core/entities";
 import type { SerializedModels } from "core/dl/types";
 import type { ModelInfo, Run } from "core/dl/classification/types";
+
+import type { DataStateV2 } from "store/data/types";
+import type { ClassifierState } from "store/classifier/types";
+
 import type { ChannelDataAccessor, SerializableProject } from "./types";
-import type { EntityState } from "@reduxjs/toolkit";
 
 // ============================================================
 // Fixture

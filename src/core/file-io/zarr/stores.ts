@@ -7,8 +7,9 @@ import {
   MODELS_DIRNAME,
 } from "core/file-io/consts";
 
-import type { SerializedModels } from "core/dl/types";
 import type { ValidStoreType, AsyncStore } from "zarr/types/storage/types";
+
+import type { SerializedModels } from "core/dl/types";
 
 /**
  * Preserves (double) slashes earlier in the path, so this works better

@@ -1,7 +1,7 @@
-import type { Point } from "utils/types";
-
 import { AnnotationState } from "../enums";
 import { AnnotationTool } from "./AnnotationTool";
+
+import type { Point } from "utils/types";
 
 export class EllipticalAnnotationTool extends AnnotationTool {
   center?: Point;

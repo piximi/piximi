@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import type { BBox } from "store/data/types";
-
 import {
   difference,
   foldOperands,
@@ -9,6 +7,8 @@ import {
   masksOverlap,
   union,
 } from "../maskOps";
+
+import type { BBox } from "core/entities";
 
 import type { MaskRegion } from "../maskOps";
 

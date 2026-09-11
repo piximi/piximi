@@ -5,13 +5,14 @@ import {
   pointsAreEqual,
   getIdx,
 } from "utils/image";
-import type { Point } from "utils/types";
-import type { PiximiGraph } from "utils/image";
 
 import { AnnotationTool } from "./AnnotationTool";
 import { AnnotationState } from "../enums";
 
 import type { Image as IJSImage } from "image-js-latest";
+
+import type { PiximiGraph } from "utils/image";
+import type { Point } from "utils/types";
 
 export class MagneticAnnotationTool extends AnnotationTool {
   buffer: Array<Point> = [];

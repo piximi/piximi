@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { saveAs } from "file-saver";
 
+import { CHANNEL_MEASUREMENTS } from "core/entities";
+
 import { useDialogHotkey } from "hooks";
 
 import {
@@ -12,11 +14,6 @@ import {
   selectCategoryEntities,
   selectExtendedImageEntities,
 } from "store/data/selectors";
-import type {
-  ExtendedAnnotationObject,
-  ExtendedImageObject,
-} from "store/data/types";
-import { CHANNEL_MEASUREMENTS } from "store/data/types";
 
 import { HotkeyContext } from "utils/enums";
 import { isObjectEmpty } from "utils/objectUtils";
@@ -25,6 +22,11 @@ import { formatString } from "utils/stringUtils";
 import { selectActiveMeasurementGroup } from "./state/selectors";
 import { measurementsSlice } from "./state/measurementsSlice";
 import { selectActiveMeasuredEntities } from "./state/reselectors";
+
+import type {
+  ExtendedAnnotationObject,
+  ExtendedImageObject,
+} from "core/entities";
 
 const buildAnnotationMeasurementData = (
   entity: ExtendedAnnotationObject,

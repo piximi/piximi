@@ -1,9 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import type { SelectChangeEvent } from "@mui/material";
 import { Box, MenuItem, Tooltip } from "@mui/material";
 
 import { StyledSelect } from "components/inputs";
+
+import { useParameterizedSelector } from "store/hooks";
+import { selectActiveSoftmaxById } from "store/classifier/selectors";
 
 import { projectSlice } from "@ProjectViewer/state";
 import {
@@ -11,10 +13,10 @@ import {
   selectActiveViewState,
 } from "@ProjectViewer/state/selectors";
 import { AnnotationSortType, ImageSortType } from "@ProjectViewer/state/types";
-import { useParameterizedSelector } from "store/hooks";
-import { selectActiveSoftmaxById } from "store/classifier/selectors";
 
 import { FunctionalDivider } from "../FunctionalDivider";
+
+import type { SelectChangeEvent } from "@mui/material";
 
 export const SortSelect = () => {
   const dispatch = useDispatch();

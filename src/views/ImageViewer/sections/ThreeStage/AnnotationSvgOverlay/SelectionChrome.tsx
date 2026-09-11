@@ -16,14 +16,17 @@ import { useHotkeys, useTranslation } from "hooks";
 
 import { ToolHotkeyTitle } from "components/ui";
 
-import { annotatorSlice } from "@ImageViewer/state/annotator";
-import { selectAnnotationMode } from "@ImageViewer/state/annotator/selectors";
+import { HotkeyContext } from "utils/enums";
+
 import {
   CombineAnnotationsIcon,
   IntersectAnnotationsIcon,
   NewAnnotationIcon,
   SubtractAnnotationsIcon,
 } from "icons";
+
+import { annotatorSlice } from "@ImageViewer/state/annotator";
+import { selectAnnotationMode } from "@ImageViewer/state/annotator/selectors";
 import { AnnotationMode } from "@ImageViewer/utils/enums";
 import { selectVisibleAnnotations } from "@ImageViewer/state/image-viewer-data/reselectors";
 import {
@@ -32,11 +35,10 @@ import {
   selectResolvedTargetIds,
 } from "@ImageViewer/state/operations/reselectors";
 
-import { HotkeyContext } from "utils/enums";
-import type { HTMLDataAttributes } from "utils/types";
-
 import { useThreeViewport } from "../ThreeViewportContext";
 import { useAnnotationConfirmation } from "./useAnnotationConfirmation";
+
+import type { HTMLDataAttributes } from "utils/types";
 
 import type { AnnotationTool } from "@ImageViewer/utils/tools";
 

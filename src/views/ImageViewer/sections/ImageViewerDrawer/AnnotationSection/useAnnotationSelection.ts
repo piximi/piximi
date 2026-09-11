@@ -7,6 +7,8 @@ import {
   selectExtendedAnnotationsByImageId,
   selectExtendedImageById,
 } from "store/data/selectors";
+import { useParameterizedSelector } from "store/hooks";
+
 import {
   selectActiveImageId,
   selectFilterLayer,
@@ -18,7 +20,6 @@ import {
   selectSelectedAnnotations,
   selectVisibleAnnotations,
 } from "@ImageViewer/state/image-viewer-data/reselectors";
-import { useParameterizedSelector } from "store/hooks";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import {
   activeFeatureList,
@@ -29,12 +30,13 @@ import {
 
 import { useCriterionToggles } from "./useCriterionToggles";
 
-import type { ScopeId, KindNode } from "./types";
 import type {
   CategoryNode,
   LayerMode,
   PlaneScope,
 } from "@ImageViewer/state/types";
+
+import type { ScopeId, KindNode } from "./types";
 
 /**
  * All of the annotation-drawer's state, derived view-model, and action

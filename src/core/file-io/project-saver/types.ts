@@ -1,9 +1,9 @@
+import type { SerializedModels } from "core/dl/types";
+
 import type { ClassifierState } from "store/classifier/types";
 import type { DataStateV2 } from "store/data/types";
 
 import type { Progress } from "utils/types";
-
-import type { SerializedModels } from "core/dl/types";
 
 /**
  * The slices a project file captures, as they exist in Redux at save time.

@@ -1,4 +1,3 @@
-import type { PointerEvent } from "react";
 import { useCallback, useMemo, useRef } from "react";
 
 import { useDispatch } from "react-redux";
@@ -15,6 +14,8 @@ import {
   rampPlotPoints,
   RampHandle,
 } from "./histogramUtils";
+
+import type { PointerEvent } from "react";
 
 import type { RampPoint } from "./histogramUtils";
 

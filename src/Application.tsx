@@ -6,17 +6,20 @@ import { useSelector } from "react-redux";
 import { CssBaseline } from "@mui/material";
 import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 
+import { DataConnector } from "core/data-connector";
+
 import { usePreferredMuiTheme } from "hooks";
 
+import { HelpProvider } from "contexts";
+
 import { AlertBar, TaskProgressToasts } from "components/ui";
+
+import { selectAlertState } from "store/applicationSettings/selectors";
 
 import { ProjectViewer } from "views/ProjectViewer";
 import { ImageViewer } from "views/ImageViewer";
 import { MeasurementView } from "views/MeasurementViewer";
-import { HelpProvider } from "contexts";
 import HelpOverlay from "views/HelpOverlay";
-import { selectAlertState } from "store/applicationSettings/selectors";
-import { DataConnector } from "core/data-connector";
 
 import { WelcomeScreen } from "./views/WelcomeScreen";
 

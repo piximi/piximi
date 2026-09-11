@@ -1,12 +1,14 @@
 import { decodeStack, Stack as IJSStack } from "image-js-latest";
 
-import type { BitDepth, ChannelMeta, Plane } from "store/data/types";
-import { generateUUID } from "store/data/utils";
-import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
+import { generateUUID, UNKNOWN_IMAGE_CATEGORY_ID } from "core/entities";
 import { Partition } from "core/dl/enums";
 
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
 import { processChannel } from "utils/channelUtils";
+
+import type { Image as IJSImage } from "image-js-latest";
+
+import type { BitDepth, ChannelMeta, Plane } from "core/entities";
 
 import type {
   ChannelResult,
@@ -15,7 +17,6 @@ import type {
   ReadStage,
   DimensionConfig,
 } from "./types";
-import type { Image as IJSImage } from "image-js-latest";
 
 // ============================================================
 // Image Loading

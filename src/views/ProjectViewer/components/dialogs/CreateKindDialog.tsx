@@ -1,12 +1,14 @@
-import type { ChangeEvent } from "react";
 import { useCallback, useEffect, useState } from "react";
 
 import { Box, TextField } from "@mui/material";
 
-import { generateKind } from "store/data/utils";
-import type { AnnotationCategory, Kind } from "store/data/types";
+import { generateKind } from "core/entities";
 
 import { ConfirmationDialog } from "../../../../components/dialogs/ConfirmationDialog";
+
+import type { ChangeEvent } from "react";
+
+import type { AnnotationCategory, Kind } from "core/entities";
 
 type CreateCategoriesDialogProps = {
   onClose: () => void;

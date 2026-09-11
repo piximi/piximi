@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-import type { ColorResult } from "react-color";
 import { ChromePicker } from "react-color";
 import { useDispatch } from "react-redux";
 
@@ -8,9 +7,12 @@ import { Box, Checkbox, IconButton, Popover, Typography } from "@mui/material";
 import { Settings } from "@mui/icons-material";
 
 import { dataSlice } from "store/data";
-import type { ChannelMeta, ColorMap } from "store/data/types";
 
 import { rgbToHex } from "utils/colorUtils";
+
+import type { ColorResult } from "react-color";
+
+import type { ChannelMeta, ColorMap } from "core/entities";
 
 const ColorPicker = ({
   colorMap,

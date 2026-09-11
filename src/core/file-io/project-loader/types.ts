@@ -9,12 +9,13 @@ import type {
   ImageSeries,
   Kind,
   Plane,
-} from "store/data/types";
+} from "core/entities";
+import type { ExtractedModelFileMap } from "core/dl/types";
+
 import type { ClassifierState } from "store/classifier/types";
 
 import type { Progress } from "utils/types";
 
-import type { ExtractedModelFileMap } from "core/dl/types";
 import type { V2PiximiState } from "./version-readers/version-types/v2Types";
 
 export type UploadStage =

@@ -1,7 +1,5 @@
-import type React from "react";
 import { useRef } from "react";
 
-import type { TooltipProps } from "@mui/material";
 import {
   ListItemText,
   MenuItem,
@@ -18,9 +16,13 @@ import { useDialogHotkey, useProjectLoader } from "hooks";
 import { ExampleProjectDialog } from "components/dialogs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
+import { HotkeyContext } from "utils/enums";
+
 import { useConfirmReplaceDialog } from "@ProjectViewer/hooks";
 
-import { HotkeyContext } from "utils/enums";
+import type React from "react";
+
+import type { TooltipProps } from "@mui/material";
 
 type OpenProjectMenuItemProps = {
   onClose: () => void;

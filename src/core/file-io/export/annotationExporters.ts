@@ -5,9 +5,11 @@ import { AnnotationExportType } from "core/file-io/export/enums";
 
 import { decodeRleArray } from "utils/image";
 
-import type { BaseIFD } from "core/file-io/tiff-io";
-import type { ExportedAnnotation } from "./types";
 import type JSZip from "jszip";
+
+import type { BaseIFD } from "core/file-io/tiff-io";
+
+import type { ExportedAnnotation } from "./types";
 
 type MaskOptions =
   | {

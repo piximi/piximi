@@ -2,7 +2,7 @@ import type {
   ExtendedAnnotationObject,
   ExtendedKind,
   FeatureKey,
-} from "store/data/types";
+} from "core/entities";
 
 import type {
   FeatureConfig,

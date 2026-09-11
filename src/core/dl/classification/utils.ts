@@ -11,7 +11,10 @@ import {
 import { seededShuffle } from "utils/arrayUtils";
 import { representsUnknown } from "utils/stringUtils";
 
+import type { ModelCompileArgs, LayersModel } from "@tensorflow/tfjs";
+
 import type { TrainingInput } from "core/dl/types";
+
 import type {
   ModelInfo,
   ClassifierModelParams,
@@ -23,7 +26,6 @@ import type {
   ModelInfoDTO,
   Run,
 } from "./types";
-import type { ModelCompileArgs, LayersModel } from "@tensorflow/tfjs";
 
 const DEFAULT_CONFIDENCE_THRESHOLD = 0.5;
 const DEFAULT_TRAINING_PERCENTAGE = 0.8;

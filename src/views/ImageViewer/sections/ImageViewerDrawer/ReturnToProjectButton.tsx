@@ -8,13 +8,14 @@ import { useDialogHotkey } from "hooks";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { selectHasUnsavedChanges } from "@ImageViewer/state/image-viewer-data/selectors";
+import { HotkeyContext } from "utils/enums";
+
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
+
+import { selectHasUnsavedChanges } from "@ImageViewer/state/image-viewer-data/selectors";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { ExitAnnotatorDialog } from "@ImageViewer/components/dialogs";
-
-import { HotkeyContext } from "utils/enums";
 
 export const ReturnToProjectButton = () => {
   const navigate = useNavigate();

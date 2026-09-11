@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import type { SelectChangeEvent } from "@mui/material";
 import {
   Box,
   Button,
@@ -13,6 +12,8 @@ import {
 import { StyledSelect } from "components/inputs";
 
 import { useGridActions } from "@ProjectViewer/hooks";
+
+import type { SelectChangeEvent } from "@mui/material";
 
 export const SelectionOptions = () => {
   const {

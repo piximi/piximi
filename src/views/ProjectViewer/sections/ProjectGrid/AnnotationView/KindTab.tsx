@@ -1,4 +1,3 @@
-import type React from "react";
 import { useState } from "react";
 
 import { Box, Typography } from "@mui/material";
@@ -12,6 +11,8 @@ import { TextFieldWithBlur } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { representsUnknown } from "utils/stringUtils";
+
+import type React from "react";
 
 import type { KindState } from "@ProjectViewer/state/types";
 

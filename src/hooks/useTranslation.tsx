@@ -1,9 +1,10 @@
 import { useSelector } from "react-redux";
 
-import { de, en, fas, fi, fr, gr, hi, hu } from "translations";
 import { selectLanguageType } from "store/applicationSettings/selectors";
 
 import { Languages } from "utils/enums";
+
+import { de, en, fas, fi, fr, gr, hi, hu } from "translations";
 
 export const useTranslation = () => {
   const language = useSelector(selectLanguageType);

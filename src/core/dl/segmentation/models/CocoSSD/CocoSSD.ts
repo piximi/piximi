@@ -2,17 +2,18 @@ import { LayersModel, loadGraphModel } from "@tensorflow/tfjs";
 
 import { CancelSource, TaskCancelledError, type Token } from "core/dl/cancel";
 
-import type { LoadCB } from "utils/types";
-
 import COCO_CLASSES from "data/model-data/cocossd-classes";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCoco } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
 
+import type { GraphModel } from "@tensorflow/tfjs";
+
+import type { LoadCB } from "utils/types";
+
 import type { PredictedAnnotationObject } from "../../types";
 import type { InferenceInput } from "../../../types";
-import type { GraphModel } from "@tensorflow/tfjs";
 
 /*
   SSD with MobileNet (v2) backbone, initialized with Imagenet classification checkpoint,

@@ -1,18 +1,3 @@
-import type { ClassifierState, KindClassifier } from "store/classifier/types";
-import type {
-  AnnotationObject,
-  AnnotationVolume,
-  Category,
-  Channel,
-  ChannelMeta,
-  ImageObject,
-  ImageSeries,
-  Kind,
-  Plane,
-  PredictionCorrection,
-  Shape,
-} from "store/data/types";
-
 import {
   ZARR_V2_ANNOTATION,
   ZARR_V2_ANNOTATION_VOLUME,
@@ -40,6 +25,9 @@ import {
 } from "../../zarr/types";
 import { writeArray, writeAttrs } from "../zarr/writers";
 
+import type { Group } from "zarr";
+import type { EntityState } from "@reduxjs/toolkit";
+
 import type {
   ModelClassMap,
   ModelInfo,
@@ -47,9 +35,23 @@ import type {
   PreprocessSettings,
   Run,
 } from "core/dl/classification/types";
-import type { Group } from "zarr";
+import type {
+  AnnotationObject,
+  AnnotationVolume,
+  Category,
+  Channel,
+  ChannelMeta,
+  ImageObject,
+  ImageSeries,
+  Kind,
+  Plane,
+  PredictionCorrection,
+  Shape,
+} from "core/entities";
+
+import type { ClassifierState, KindClassifier } from "store/classifier/types";
+
 import type { ChannelDataAccessor, SerializableProject } from "../types";
-import type { EntityState } from "@reduxjs/toolkit";
 
 /**
  * Writes the v2 project format.

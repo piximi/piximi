@@ -4,16 +4,17 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Dialog, DialogContent, Tabs } from "@mui/material";
 
-import { useClassificationModel } from "@ProjectViewer/hooks";
-import { ToolTipTab } from "@ProjectViewer/components";
-import { DialogTransitionSlide } from "@ProjectViewer/components/dialogs";
-import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectModelLifecycleStatus } from "store/classifier/selectors";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { HotkeyContext } from "utils/enums";
+
+import { useClassificationModel } from "@ProjectViewer/hooks";
+import { ToolTipTab } from "@ProjectViewer/components";
+import { DialogTransitionSlide } from "@ProjectViewer/components/dialogs";
+import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 import {
   TrainingPlots,

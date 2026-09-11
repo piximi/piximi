@@ -3,10 +3,11 @@ import { useCallback, useMemo, useState } from "react";
 import range from "lodash/range";
 import { ResponsiveLine } from "@nivo/line";
 
-import type { Theme } from "@mui/material";
 import { Container, Typography, useTheme } from "@mui/material";
 
 import { usePreferredNivoTheme } from "hooks";
+
+import type { Theme } from "@mui/material";
 
 import type { Point } from "utils/types";
 

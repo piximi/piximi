@@ -4,10 +4,10 @@ import { useSelector } from "react-redux";
 
 import * as THREE from "three";
 
+import { colorOverlayROI, hexToRGBA, decodeRleArray } from "utils/image";
+
 import { selectSelectedAnnotations } from "@ImageViewer/state/image-viewer-data/reselectors";
 import { selectAnnotationsForRender } from "@ImageViewer/state/operations/reselectors";
-
-import { colorOverlayROI, hexToRGBA, decodeRleArray } from "utils/image";
 
 type MeshEntry = {
   mesh: THREE.Mesh;

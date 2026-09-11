@@ -1,5 +1,6 @@
-import type { DividerProps, TypographyProps } from "@mui/material";
 import { Divider, Typography } from "@mui/material";
+
+import type { DividerProps, TypographyProps } from "@mui/material";
 
 import type { HTMLDataAttributes } from "utils/types";
 

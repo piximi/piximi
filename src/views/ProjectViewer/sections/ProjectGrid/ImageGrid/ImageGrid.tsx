@@ -11,12 +11,13 @@ import {
   selectSelectedImageIds,
 } from "@ProjectViewer/state/selectors";
 import { selectVisibleItems } from "@ProjectViewer/state/reselectors";
-import type { ExtendedImageObject } from "store/data/types";
 
 import { ImageGridItem } from "./ImageGridItem";
 import { createGridCell, createItemData } from "../gridUtils";
 import { useGridLayout } from "../useGridLayout";
 import { VirtualGrid } from "../VirtualGrid";
+
+import type { ExtendedImageObject } from "core/entities";
 
 const Cell = createGridCell(ImageGridItem);
 

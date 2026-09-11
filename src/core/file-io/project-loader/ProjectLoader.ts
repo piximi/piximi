@@ -6,17 +6,19 @@ import {
   type ChannelMeta,
   type ImageObject,
   type ImageSeries,
-} from "store/data/types";
+} from "core/entities";
 import { DataConnector } from "core/data-connector";
 import { getClassifierApi } from "core/dl/classification";
 
-import type { Progress, TaskError } from "utils/types";
 import { INITIAL_PROGRESS } from "utils/types";
-import type { CancelToken } from "utils/workers/types";
 import { logger, parseError } from "utils/logUtils";
 
 import type { StorageInput } from "core/data-connector/types";
 import type { ExtractedModelFileMap } from "core/dl/types";
+
+import type { CancelToken } from "utils/workers/types";
+import type { Progress, TaskError } from "utils/types";
+
 import type { V2Channel } from "./version-readers/version-types/v2Types";
 import type {
   DeserializedProject,

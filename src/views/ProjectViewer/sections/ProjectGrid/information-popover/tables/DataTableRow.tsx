@@ -1,6 +1,6 @@
-import type { ReactElement } from "react";
-
 import { TableCell, TableRow } from "@mui/material";
+
+import type { ReactElement } from "react";
 
 export const DataTableRow = ({
   rowId,

@@ -5,9 +5,9 @@ import { useDialogHotkey } from "hooks";
 import { SaveProjectDialog } from "components/dialogs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { CustomListItemButton } from "@ProjectViewer/components";
-
 import { HotkeyContext } from "utils/enums";
+
+import { CustomListItemButton } from "@ProjectViewer/components";
 
 export const SaveProjectListItem = () => {
   const {

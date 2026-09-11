@@ -1,12 +1,12 @@
 import createGraph from "ngraph.graph";
 
-import type { DataArray } from "store/data/types";
-
-import type { Point } from "utils/types";
-
 import { getIdx } from "./imageHelper";
 import { NodeHeap } from "./NodeHeap";
 import { cachedAStarPathSearch } from "./PathFinder";
+
+import type { DataArray } from "core/entities";
+
+import type { Point } from "utils/types";
 
 import type { PiximiGraph } from "./NodeHeap";
 

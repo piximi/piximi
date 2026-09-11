@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { batch, useDispatch } from "react-redux";
@@ -6,13 +5,17 @@ import { useLocation } from "react-router-dom";
 
 import { addListener, isAnyOf } from "@reduxjs/toolkit";
 
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { productionStore } from "store";
-import type { RootState } from "store/rootReducer";
 import { dataSlice } from "store/data";
-import type { DataStateV2 } from "store/data/types";
+
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+
+import type { ReactNode } from "react";
 
 import type { UnsubscribeListener } from "@reduxjs/toolkit";
+
+import type { RootState } from "store/rootReducer";
+import type { DataStateV2 } from "store/data/types";
 
 const DataContext = createContext<{
   savedData: DataStateV2 | undefined;

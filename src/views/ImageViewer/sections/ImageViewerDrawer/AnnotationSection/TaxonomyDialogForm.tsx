@@ -1,7 +1,5 @@
 import { useState } from "react";
 
-import type { ColorResult } from "react-color";
-
 import { Box, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs";
@@ -11,6 +9,8 @@ import { getRandomHex } from "utils/colorUtils";
 import { representsUnknown } from "utils/stringUtils";
 
 import { useNameValidation } from "./useNameValidation";
+
+import type { ColorResult } from "react-color";
 
 import type { TaxonomyDialogRequest } from "./types";
 

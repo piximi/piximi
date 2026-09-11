@@ -2,7 +2,6 @@
 //@ts-nocheck keep tsc uncluttered for now
 import { describe, expect, it } from "vitest";
 
-import type { RootState } from "store/rootReducer";
 import { Partition } from "core/dl/enums";
 import { STORES } from "core/data-connector/types";
 
@@ -42,6 +41,8 @@ import {
   selectRepresentativeImages,
 } from "./selectors";
 import { dataSlice } from "./dataSlice";
+
+import type { RootState } from "store/rootReducer";
 
 import type {
   ImageSeries,

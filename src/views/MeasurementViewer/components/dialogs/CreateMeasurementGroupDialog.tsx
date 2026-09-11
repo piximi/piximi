@@ -1,4 +1,3 @@
-import type React from "react";
 import { useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
@@ -8,6 +7,8 @@ import { Autocomplete, FormControl, TextField } from "@mui/material";
 import { ConfirmationDialog } from "components/dialogs";
 
 import { selectAllKinds } from "store/data/selectors";
+
+import type React from "react";
 
 type KindOption = { id: string; name: string };
 

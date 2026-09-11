@@ -1,11 +1,12 @@
 import { fromMask, getRois, Mask } from "image-js-latest";
 
-import type { AnnotationObject, FeatureKey } from "store/data/types";
-import { OBJECT_FEATURES } from "store/data/types";
+import { OBJECT_FEATURES } from "core/entities";
 
 import { decodeRleArray } from "utils/image";
 
 import type { Roi } from "image-js-latest";
+
+import type { AnnotationObject, FeatureKey } from "core/entities";
 
 const featureOps: Record<FeatureKey, (r: Roi) => number> = {
   area: (r) => r.surface,

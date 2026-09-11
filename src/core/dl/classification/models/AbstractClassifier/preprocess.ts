@@ -8,19 +8,21 @@ import {
   tidy,
 } from "@tensorflow/tfjs";
 
-import type { BitDepth, Category, Shape } from "store/data/types";
-import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
+import { UNKNOWN_IMAGE_CATEGORY_ID } from "core/entities";
 import { channelsToTensor } from "core/dl/tensor-assembly";
 
-import type { RequireOnly } from "utils/types";
 import { makeSeededRandom } from "utils/numberUtils";
 
 import { CropSchema, Partition } from "../../../enums";
 import { matchedCropPad, padToMatch } from "../../../utils";
 import { doShow } from "./debugUtils";
 
-import type { InferenceInput, TrainingInput } from "core/dl/types";
 import type { Tensor1D, Tensor2D, Tensor3D, Tensor4D } from "@tensorflow/tfjs";
+
+import type { BitDepth, Category, Shape } from "core/entities";
+import type { InferenceInput, TrainingInput } from "core/dl/types";
+
+import type { RequireOnly } from "utils/types";
 
 type FitData = {
   xs: Tensor3D;

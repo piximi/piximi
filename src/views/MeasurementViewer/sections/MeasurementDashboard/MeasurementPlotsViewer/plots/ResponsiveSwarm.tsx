@@ -8,6 +8,9 @@ import { usePreferredNivoTheme } from "hooks";
 
 import { computeMean, computeStatistics } from "utils/measurements/statistics";
 
+import type { SwarmPlotCustomLayerProps } from "@nivo/swarmplot";
+import type { ScaleLinear } from "@nivo/scales";
+
 import type {
   ChartConfig,
   NodeGroupRecord,
@@ -15,8 +18,6 @@ import type {
   SwarmData,
   SwarmDatum,
 } from "@MeasurementViewer/types";
-import type { SwarmPlotCustomLayerProps } from "@nivo/swarmplot";
-import type { ScaleLinear } from "@nivo/scales";
 
 const StatLayer = ({
   nodes,

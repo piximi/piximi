@@ -1,13 +1,14 @@
 import { useMemo } from "react";
 
-import type { SelectChangeEvent } from "@mui/material";
 import { Box, MenuItem, useTheme } from "@mui/material";
 
 import { StyledSelect, WithLabel } from "components/inputs";
 
+import { arrayRange } from "utils/arrayUtils";
+
 import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 
-import { arrayRange } from "utils/arrayUtils";
+import type { SelectChangeEvent } from "@mui/material";
 
 export const SegmenterOptions = () => {
   const theme = useTheme();

@@ -4,19 +4,20 @@ import { intersection } from "lodash";
 
 import { useHotkeys } from "hooks";
 
+import { dataSlice } from "store/data";
+
+import { HotkeyContext } from "utils/enums";
+
 import { projectSlice } from "@ProjectViewer/state";
 import {
   selectActiveKindState,
   selectActiveSelectedIds,
   selectActiveView,
 } from "@ProjectViewer/state/selectors";
-import { dataSlice } from "store/data";
 import {
   selectActiveCategories,
   selectVisibleItems,
 } from "@ProjectViewer/state/reselectors";
-
-import { HotkeyContext } from "utils/enums";
 
 export const useGridActions = () => {
   const dispatch = useDispatch();

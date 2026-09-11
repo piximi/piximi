@@ -1,5 +1,6 @@
-import type { Shape } from "store/data/types";
+import type { EntityState } from "@reduxjs/toolkit";
 
+import type { Shape } from "core/entities";
 import type { CropOptions } from "core/dl/types";
 import type {
   LossFunction,
@@ -7,6 +8,7 @@ import type {
   OptimizationAlgorithm,
 } from "core/dl/enums";
 import type { EvaluationResult } from "core/dl/classification/types";
+
 import type {
   V02BitDepth,
   V02Category,
@@ -15,7 +17,6 @@ import type {
   V02RawAnnotationObject,
   V02RawImageObject,
 } from "./v02Types";
-import type { EntityState } from "@reduxjs/toolkit";
 
 // ============================================================
 // V11 Piximi State

@@ -1,5 +1,6 @@
-import type { ChangeEvent } from "react";
 import { useMemo, useState } from "react";
+
+import type { ChangeEvent } from "react";
 
 export const useNameValidation = ({
   initName,

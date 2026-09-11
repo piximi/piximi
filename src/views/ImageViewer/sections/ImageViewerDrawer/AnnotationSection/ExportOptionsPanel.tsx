@@ -2,10 +2,14 @@ import { useState } from "react";
 
 import { useSelector } from "react-redux";
 
-import type { SelectChangeEvent } from "@mui/material";
 import { Box, Button, Divider, MenuItem, Typography } from "@mui/material";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+
+import {
+  exportOptions,
+  runAnnotationExport,
+} from "core/file-io/export/runAnnotationExport";
 
 import { StyledSelect } from "components/inputs";
 
@@ -14,13 +18,12 @@ import {
   selectImageEntities,
   selectKindEntities,
 } from "store/data/selectors";
-import {
-  exportOptions,
-  runAnnotationExport,
-} from "core/file-io/export/runAnnotationExport";
+
+import type { SelectChangeEvent } from "@mui/material";
 
 import type { AnnotationExportType } from "core/file-io/export/enums";
 import type { ExportedAnnotation } from "core/file-io/export/types";
+
 import type { OpScope, ScopeId } from "./types";
 
 interface ExportOptionsPanelProps {

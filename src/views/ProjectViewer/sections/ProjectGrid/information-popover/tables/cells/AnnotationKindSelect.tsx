@@ -1,6 +1,5 @@
 import { useSelector } from "react-redux";
 
-import type { SelectChangeEvent } from "@mui/material";
 import { MenuItem } from "@mui/material";
 
 import { StyledSelect } from "components/inputs";
@@ -8,6 +7,8 @@ import { StyledSelect } from "components/inputs";
 import { selectAllKinds } from "store/data/selectors";
 
 import { SELECT_PROPS } from "./utils";
+
+import type { SelectChangeEvent } from "@mui/material";
 
 export const AnnotationKindSelect = ({
   currentId,

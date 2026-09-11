@@ -1,4 +1,3 @@
-import type React from "react";
 import { Fragment, useMemo, useState } from "react";
 
 import { batch, useDispatch, useSelector } from "react-redux";
@@ -14,9 +13,6 @@ import {
   Typography,
 } from "@mui/material";
 
-import { ToolTipTab } from "@ProjectViewer/components";
-import { classifierSlice } from "store/classifier";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierApi } from "core/dl/classification";
 import { type ModelInfoDTO, type Run } from "core/dl/classification/types";
 import { modelInfoDTOToModelInfo } from "core/dl/classification/utils";
@@ -30,11 +26,18 @@ import {
   MODEL_RUNS_FILENAME,
 } from "core/file-io/consts";
 
+import { classifierSlice } from "store/classifier";
+
 import { parseError } from "utils/logUtils";
+
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { ToolTipTab } from "@ProjectViewer/components";
 
 import { LocalClassifierUpload } from "./LocalFileUpload";
 import { RemoteClassifierUpload } from "./CloudUpload";
 import { ModelFormatSelection } from "./ModelFormatSelection";
+
+import type React from "react";
 
 const modelDetailFields: Array<
   keyof Pick<

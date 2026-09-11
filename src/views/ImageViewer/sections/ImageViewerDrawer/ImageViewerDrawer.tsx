@@ -1,8 +1,8 @@
 import { Box, Drawer, Stack } from "@mui/material";
 
-import { useDrawerViewComponent } from "@ImageViewer/contexts/DrawerActionProvider";
-
 import { DIMENSIONS } from "utils/constants";
+
+import { useDrawerViewComponent } from "@ImageViewer/contexts/DrawerActionProvider";
 
 export const ImageViewerDrawer = () => {
   const drawViewComponent = useDrawerViewComponent();

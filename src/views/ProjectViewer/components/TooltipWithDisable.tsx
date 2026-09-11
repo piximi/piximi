@@ -1,5 +1,6 @@
-import type { TooltipProps } from "@mui/material";
 import { Tooltip } from "@mui/material";
+
+import type { TooltipProps } from "@mui/material";
 
 export const TooltipWithDisable = (tooltipProps: TooltipProps) => {
   return (

@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 
-import type { ChipProps } from "@mui/material";
 import { Chip, useTheme } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
+
+import type { ChipProps } from "@mui/material";
 
 export const FilterChip = ({
   label,

@@ -1,8 +1,8 @@
-import type { ReactElement } from "react";
-
 import { Box, Paper, Table, TableBody, TableContainer } from "@mui/material";
 
 import { DataTableRow } from "./DataTableRow";
+
+import type { ReactElement } from "react";
 
 export const ItemInformationTable = ({
   title,

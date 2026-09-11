@@ -11,25 +11,26 @@ import {
 
 import { useDialog, useDialogHotkey } from "hooks";
 
-import { TooltipButton } from "@ProjectViewer/components";
-import {
-  useClassifierStatus,
-  ErrorReason,
-} from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useParameterizedSelector } from "store/hooks";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import {
   selectModelIsTrained,
   selectModelLifecycleStatus,
   selectRunsForActiveModel,
 } from "store/classifier/selectors";
+
+import { HotkeyContext } from "utils/enums";
+
+import { TooltipButton } from "@ProjectViewer/components";
+import {
+  useClassifierStatus,
+  ErrorReason,
+} from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { selectTotalActiveUnlabeledItems } from "@ProjectViewer/state/reselectors";
 import {
   usePredictClassifier,
   useEvaluateClassifier,
 } from "@ProjectViewer/hooks";
-
-import { HotkeyContext } from "utils/enums";
 
 import { FitClassifierDialog } from "./FitClassifierDialog";
 import { EvaluateClassifierDialog } from "./EvaluateClassifierDialog";

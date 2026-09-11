@@ -1,4 +1,5 @@
 import { ExpandLess as ExpandLessIcon } from "@mui/icons-material";
+
 import type { SxProps } from "@mui/material";
 
 export const ExpandIcon = (props: { expanded: boolean; sx?: SxProps }) => {

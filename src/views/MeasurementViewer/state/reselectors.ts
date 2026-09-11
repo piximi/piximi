@@ -1,23 +1,26 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import { toChannelMeasurementLabel } from "@MeasurementViewer/utils";
-import {
-  selectExtendedAnnotationEntities,
-  selectCategoryEntities,
-  selectExtendedImageEntities,
-} from "store/data/selectors";
 import {
   CHANNEL_MEASUREMENTS,
   type AnnotationObject,
   type Category,
   type ImageObject,
-} from "store/data/types";
+} from "core/entities";
+
+import {
+  selectExtendedAnnotationEntities,
+  selectCategoryEntities,
+  selectExtendedImageEntities,
+} from "store/data/selectors";
 
 import { formatString } from "utils/stringUtils";
+
+import { toChannelMeasurementLabel } from "@MeasurementViewer/utils";
 
 import { selectActiveMeasurementGroup } from "./selectors";
 
 import type { Partition } from "core/dl/enums";
+
 import type {
   Dimension,
   ImageEntityMeasurementGroup,

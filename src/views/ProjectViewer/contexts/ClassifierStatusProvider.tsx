@@ -1,4 +1,3 @@
-import type React from "react";
 import {
   createContext,
   useCallback,
@@ -12,7 +11,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { useImmer } from "use-immer";
 
-import { useClassificationModel } from "@ProjectViewer/hooks/useClassificationModel";
+import { Partition } from "core/dl/enums";
+import { getDefaultModelParams } from "core/dl/classification/utils";
+
 import {
   selectAllCreatedModelNames,
   selectIsModelTrained,
@@ -21,6 +22,13 @@ import {
   selectModelOptimizerSettings,
   selectModelPreprocessSettings,
 } from "store/classifier/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
+import { classifierSlice } from "store/classifier";
+
+import { findReplicateName, representsUnknown } from "utils/stringUtils";
+
+import { useClassificationModel } from "@ProjectViewer/hooks/useClassificationModel";
 import {
   selectActiveLabeledItems,
   selectActiveItemsByPartition,
@@ -29,22 +37,18 @@ import {
   selectProjectImageChannels,
   selectActiveClassifierModelTarget,
 } from "@ProjectViewer/state/selectors";
-import { useParameterizedSelector } from "store/hooks";
-import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
-import type { Shape } from "store/data/types";
-import { classifierSlice } from "store/classifier";
-import { Partition } from "core/dl/enums";
-import { getDefaultModelParams } from "core/dl/classification/utils";
 
-import { findReplicateName, representsUnknown } from "utils/stringUtils";
-import type { RecursivePartial } from "utils/types";
+import type React from "react";
 
+import type { Shape } from "core/entities";
 import type {
   ClassifierModelParams,
   ModelLifecycleStatus,
   OptimizerSettings,
   PreprocessSettings,
 } from "core/dl/classification/types";
+
+import type { RecursivePartial } from "utils/types";
 
 export enum ErrorReason {
   NotTrainable,

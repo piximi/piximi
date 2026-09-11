@@ -1,15 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { dataSlice } from "store/data";
-import { AnnotationMode } from "views/ImageViewer/utils/enums";
-import type {
-  AnnotationObject,
-  BBox,
-  ExtendedAnnotationObject,
-} from "store/data/types";
 import { Partition } from "core/dl/enums";
 
+import { dataSlice } from "store/data";
+
 import { rleEncodeArray } from "utils/image";
+
+import { AnnotationMode } from "views/ImageViewer/utils/enums";
 
 import {
   selectAnnotationsForRender,
@@ -21,7 +18,14 @@ import {
 } from "./reselectors";
 import { emptySelectionLayer } from "../image-viewer-data/utils";
 
+import type {
+  AnnotationObject,
+  BBox,
+  ExtendedAnnotationObject,
+} from "core/entities";
+
 import type { WorkingAnnotation } from "views/ImageViewer/utils/types";
+
 import type { SelectionLayer } from "../types";
 
 /** '#' set, '.' clear — the same grid notation the maskOps tests use. */

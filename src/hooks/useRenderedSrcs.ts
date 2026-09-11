@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { Image as IJSImage, encodeDataURL } from "image-js-latest";
 
-import type { BBox, ExtendedChannel } from "store/data/types";
 import { DataConnector } from "core/data-connector";
 
 import { createLUT } from "utils/colorUtils";
@@ -11,6 +10,8 @@ import {
   getRenderedSrc,
   setRenderedSrc,
 } from "utils/renderedSrcsCache";
+
+import type { BBox, ExtendedChannel } from "core/entities";
 
 /**
  * Returns the rendered preview src for an entity.

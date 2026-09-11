@@ -2,19 +2,23 @@ import { useCallback, useState } from "react";
 
 import { batch, useDispatch } from "react-redux";
 
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { appTasksSlice } from "store/appTasks/appTasksSlice";
-import type { AppTask } from "store/appTasks/types";
-import { classifierSlice } from "store/classifier";
-import { generateUUID } from "store/data/utils";
-import { dataSlice } from "store/data";
-import { projectSlice } from "@ProjectViewer/state";
-import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+import { generateUUID } from "core/entities";
 import { ProjectLoader } from "core/file-io/project-loader/ProjectLoader";
 
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { appTasksSlice } from "store/appTasks/appTasksSlice";
+import { classifierSlice } from "store/classifier";
+import { dataSlice } from "store/data";
+import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+
 import { AlertType } from "utils/enums";
-import type { AlertState } from "utils/types";
 import { clearCache } from "utils/renderedSrcsCache";
+
+import { projectSlice } from "@ProjectViewer/state";
+
+import type { AppTask } from "store/appTasks/types";
+
+import type { AlertState } from "utils/types";
 
 type UseProjectLoaderReturn = {
   loadExample: (examplePath: string, projectName: string) => Promise<void>;

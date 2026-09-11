@@ -4,9 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Collapse } from "@mui/material";
 
+import { Partition } from "core/dl/enums";
+
 import { selectActiveViewState } from "@ProjectViewer/state/selectors";
 import { projectSlice } from "@ProjectViewer/state";
-import { Partition } from "core/dl/enums";
 
 import { FilterList } from "./FilterList";
 import { SectionHeader } from "./SectionHeader";

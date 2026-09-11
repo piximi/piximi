@@ -1,15 +1,16 @@
 import { onesLike, tensor1d, tidy, unique, whereAsync } from "@tensorflow/tfjs";
 import { Image as ImageJS } from "image-js";
 
-import { generateUUID } from "store/data/utils";
+import { generateUUID } from "core/entities";
 
 import { rleEncodeArray } from "utils/image";
 
 import { Partition } from "../../../enums";
 
-import type { PredictedAnnotationObject } from "../../types";
 import type { ColorModel } from "image-js";
 import type { Tensor1D, Tensor4D } from "@tensorflow/tfjs";
+
+import type { PredictedAnnotationObject } from "../../types";
 
 const labelToAnnotation = async (
   labelMask: Tensor1D,

@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { createContext, useCallback, useContext, useMemo, useRef } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +8,10 @@ import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/re
 import { imageToScreenTransform } from "./coords";
 import { ZOOM_MAX, ZOOM_MIN } from "./consts";
 
+import type { ReactNode } from "react";
+
 import type * as THREE from "three";
+
 import type { ViewportState } from "./coords";
 
 type ScreenTransform = ReturnType<typeof imageToScreenTransform>;

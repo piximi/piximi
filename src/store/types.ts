@@ -1,3 +1,9 @@
+import type {
+  Dispatch,
+  TypedStartListening,
+  UnknownAction,
+} from "@reduxjs/toolkit";
+
 import type { HotkeyContext, Languages } from "utils/enums";
 import type { AlertState } from "utils/types";
 
@@ -7,17 +13,14 @@ import type {
   AnnotatorState,
   ImageViewerState,
 } from "views/ImageViewer/utils/types";
-import type {
-  Dispatch,
-  TypedStartListening,
-  UnknownAction,
-} from "@reduxjs/toolkit";
+import type { ProjectState } from "views/ProjectViewer/state/types";
+import type { MeasurementsState } from "views/MeasurementViewer/types";
+
+import type { ImageViewerDataState } from "@ImageViewer/state/types";
+
 import type { DataStateV2 } from "./data/types";
 import type { AppTasksState } from "./appTasks/types";
-import type { ProjectState } from "views/ProjectViewer/state/types";
 import type { ClassifierState } from "./classifier/types";
-import type { ImageViewerDataState } from "@ImageViewer/state/types";
-import type { MeasurementsState } from "views/MeasurementViewer/types";
 
 export type AppSettingsState = {
   tileSize: number;

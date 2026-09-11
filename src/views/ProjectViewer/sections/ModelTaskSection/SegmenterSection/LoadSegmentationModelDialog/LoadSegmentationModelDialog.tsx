@@ -1,4 +1,3 @@
-import type React from "react";
 import { useEffect, useState } from "react";
 
 import {
@@ -10,14 +9,17 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-import { useHotkeys } from "hooks";
-
-import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 import { useSegmenterApi } from "core/dl/segmentation";
+
+import { useHotkeys } from "hooks";
 
 import { HotkeyContext } from "utils/enums";
 
+import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
+
 import { PretrainedModelSelector } from "./PretrainedModelSelector";
+
+import type React from "react";
 
 import type { SegmentaionModelDetails } from "core/dl/segmentation/types";
 

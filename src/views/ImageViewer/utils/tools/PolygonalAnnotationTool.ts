@@ -1,8 +1,9 @@
 import { getDistance, pointsAreEqual } from "utils/image";
-import type { Point } from "utils/types";
 
 import { AnnotationState } from "../enums";
 import { AnnotationTool } from "./AnnotationTool";
+
+import type { Point } from "utils/types";
 
 export class PolygonalAnnotationTool extends AnnotationTool {
   buffer: Array<Point> = [];

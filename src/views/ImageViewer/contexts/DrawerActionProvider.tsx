@@ -1,8 +1,9 @@
-import type { ReactNode } from "react";
 import { createContext, useContext, useMemo, useState } from "react";
 
 import { ImageSection } from "@ImageViewer/sections/ImageViewerDrawer/ImageSection";
 import { AnnotationSection } from "@ImageViewer/sections/ImageViewerDrawer/AnnotationSection";
+
+import type { ReactNode } from "react";
 
 type DrawerContextType = "images" | "annotations";
 const DrawerActionContext = createContext<{

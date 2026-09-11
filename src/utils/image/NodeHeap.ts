@@ -1,6 +1,6 @@
-import type { Point } from "utils/types";
-
 import type { Graph, Node } from "ngraph.graph";
+
+import type { Point } from "utils/types";
 
 /**
  * Based on https://github.com/mourner/tinyqueue

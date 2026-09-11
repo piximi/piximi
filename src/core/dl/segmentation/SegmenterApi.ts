@@ -1,9 +1,10 @@
 import * as Comlink from "comlink";
 
-import type { LoadCB } from "utils/types";
 import { logger } from "utils/logUtils";
 
 import { registerSegmenterHmrCleanup } from "../devHmrCleanup";
+
+import type { LoadCB } from "utils/types";
 
 import type { Token } from "../cancel";
 import type { InferenceInput } from "../types";

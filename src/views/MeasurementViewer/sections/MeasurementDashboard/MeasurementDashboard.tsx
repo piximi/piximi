@@ -1,4 +1,3 @@
-import type React from "react";
 import { useState } from "react";
 
 import { Box } from "@mui/material";
@@ -12,6 +11,8 @@ import {
 import { MeasurementPlotsViewer } from "./MeasurementPlotsViewer";
 import { ExportButton } from "./ExportDataButton";
 import { MeasurementTableViewer } from "./MeasurementTableViewer";
+
+import type React from "react";
 
 export const MeasurementDashboard = () => {
   const [view, setView] = useState<"table" | "plots">("table");

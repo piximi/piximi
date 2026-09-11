@@ -2,14 +2,15 @@ import { shallowEqual } from "react-redux";
 
 import { createSelector, lruMemoize } from "@reduxjs/toolkit";
 
-import type { RootState } from "store/rootReducer";
-
 import type {
   ModelLifecycleStatus,
   ModelInfo,
   Run,
   EvaluationResult,
 } from "core/dl/classification/types";
+
+import type { RootState } from "store/rootReducer";
+
 import type {
   ClassifierState,
   KindClassifier,

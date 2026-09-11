@@ -1,14 +1,14 @@
 import { Image as IJSImage, encodeDataURL } from "image-js-latest";
 import * as Comlink from "comlink";
 
-import type { BBox, ExtendedChannel } from "store/data/types";
-
 import "./workerPolyfills";
 
 import { DataConnector } from "core/data-connector";
 
 import { createLUT } from "utils/colorUtils";
 import { getCacheKey } from "utils/renderedSrcsCache";
+
+import type { BBox, ExtendedChannel } from "core/entities";
 
 const renderSrcs = async (
   items: Array<{

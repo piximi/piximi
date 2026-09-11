@@ -1,11 +1,13 @@
-import type { Point } from "utils/types";
 import { logger } from "utils/logUtils";
 
 import { NodeHeap } from "./NodeHeap";
 import { fromIdxToCoord } from "./point-operations";
 
-import type { PiximiGraph, PiximiNode } from "./NodeHeap";
 import type { Node } from "ngraph.graph";
+
+import type { Point } from "utils/types";
+
+import type { PiximiGraph, PiximiNode } from "./NodeHeap";
 
 /**
  * Performs a uni-directional A Star search on graph.

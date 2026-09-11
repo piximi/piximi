@@ -1,17 +1,19 @@
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import {
-  selectActiveItemsByPartition,
-  selectActiveUnknownCategory,
-} from "@ProjectViewer/state/reselectors";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { Partition } from "core/dl/enums";
+
 import { classifierSlice } from "store/classifier";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { dataSlice } from "store/data";
 import { useParameterizedSelector } from "store/hooks";
-import { Partition } from "core/dl/enums";
 
 import { representsUnknown } from "utils/stringUtils";
+
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import {
+  selectActiveItemsByPartition,
+  selectActiveUnknownCategory,
+} from "@ProjectViewer/state/reselectors";
 
 export const useAcceptClearPredictions = () => {
   const dispatch = useDispatch();

@@ -1,10 +1,11 @@
 import IJSImage from "image-js";
 
 import { connectPoints, computeBoundingBoxFromContours } from "utils/image";
-import type { Point } from "utils/types";
 
 import { AnnotationTool } from "./AnnotationTool";
 import { AnnotationState } from "../enums";
+
+import type { Point } from "utils/types";
 
 export class PenAnnotationTool extends AnnotationTool {
   brushSize: number = 8;

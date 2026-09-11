@@ -1,11 +1,12 @@
-import type { DataArray } from "store/data/types";
-
 import { computeBoundingBoxFromContours, maskFromPoints } from "utils/image";
-import type { Point } from "utils/types";
 
 import { AnnotationState } from "../enums";
 
 import type { Image as IJSImage } from "image-js-latest";
+
+import type { DataArray } from "core/entities";
+
+import type { Point } from "utils/types";
 
 abstract class Tool {
   /**

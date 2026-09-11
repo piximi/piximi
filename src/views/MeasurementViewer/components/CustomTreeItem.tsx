@@ -1,8 +1,9 @@
 import * as React from "react";
 
 import Tooltip from "@mui/material/Tooltip";
-import type { TreeItemProps } from "@mui/x-tree-view/TreeItem";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
+
+import type { TreeItemProps } from "@mui/x-tree-view/TreeItem";
 import type { TreeViewDefaultItemModelProperties } from "@mui/x-tree-view";
 
 export type CustomTreeViewBaseItem = TreeViewDefaultItemModelProperties & {

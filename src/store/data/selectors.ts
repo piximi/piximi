@@ -1,7 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import type { RootState } from "store/rootReducer";
-
 import {
   imageSeriesAdapter,
   imageAdapter,
@@ -28,7 +26,9 @@ import type {
   ImageEntities,
   ImageObject,
   PlaneEntities,
-} from "./types";
+} from "core/entities";
+
+import type { RootState } from "store/rootReducer";
 
 // ── Tier 1: Raw adapter selectors ──────────────────────────────────────────
 

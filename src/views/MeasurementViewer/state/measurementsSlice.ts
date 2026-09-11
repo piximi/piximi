@@ -1,14 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { generateInitialPlot } from "@MeasurementViewer/utils";
-import { generateUUID } from "store/data/utils";
-import type { ChannelFeature, FeatureKey } from "store/data/types";
+import { generateUUID } from "core/entities";
+
 import { dataSlice } from "store/data";
 
 import { mutatingFilter } from "utils/arrayUtils";
 import { getUniqueName } from "utils/stringUtils";
 
+import { generateInitialPlot } from "@MeasurementViewer/utils";
+
 import type { PayloadAction } from "@reduxjs/toolkit";
+
+import type { ChannelFeature, FeatureKey } from "core/entities";
+
 import type {
   MeasurementsState,
   ObjectMeasurementGroup,

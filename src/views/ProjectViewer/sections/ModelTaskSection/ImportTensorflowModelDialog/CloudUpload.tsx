@@ -1,4 +1,3 @@
-import type React from "react";
 import { useState } from "react";
 
 import {
@@ -11,6 +10,8 @@ import {
   Typography,
 } from "@mui/material";
 import { Language as LanguageIcon } from "@mui/icons-material";
+
+import type React from "react";
 
 export const RemoteClassifierUpload = ({
   onUploadModel,

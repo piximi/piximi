@@ -44,10 +44,13 @@ export default tseslint.config(
       globals: globals.browser, // Define global variables for the browser environment
     },
     rules: {
+      // JS
       "no-prototype-builtins": "off",
       "no-case-declarations": "off",
+      // REACT
       "react/display-name": "off",
       "react/prop-types": "off",
+      //TYPESCRIPT
       "@typescript-eslint/no-unsafe-function-type": "off",
       "@typescript-eslint/no-unused-vars": [
         "warn",
@@ -75,6 +78,7 @@ export default tseslint.config(
         "warn",
         { prefer: "type-imports", fixStyle: "separate-type-imports" },
       ],
+      // IMPORT-X
       "import-x/order": [
         "warn",
         {
@@ -86,50 +90,76 @@ export default tseslint.config(
             "type",
           ],
           pathGroups: [
-            // 2a. React always first among externals
+            // React always first among externals
             { pattern: "react", group: "external", position: "before" },
             { pattern: "react-*", group: "external", position: "before" },
             { pattern: "react-redux", group: "external", position: "before" },
-            // 2b. @mui always last among externals
+            // @mui always last among externals
             { pattern: "@mui/**", group: "external", position: "after" },
 
-            // 3. Internal hooks — first internal group
+            // Domain layer — foundational, everything else depends on it (253 imports)
+            { pattern: "core/**", group: "internal", position: "before" },
+            { pattern: "core", group: "internal", position: "before" },
+
+            // Internal hooks — first internal group
             { pattern: "hooks/**", group: "internal", position: "before" },
             { pattern: "hooks", group: "internal", position: "before" },
 
-            { pattern: "workers/**", group: "internal", position: "before" },
-            { pattern: "workers", group: "internal", position: "before" },
-
             { pattern: "contexts/**", group: "internal", position: "before" },
-            // 5. Redux store
+            { pattern: "contexts", group: "internal", position: "before" },
+
+            // Internal components — before other internals
+            { pattern: "components/**", group: "internal", position: "before" },
+            { pattern: "components", group: "internal", position: "before" },
+
+            // Redux store
             { pattern: "store/**", group: "internal" },
             { pattern: "store", group: "internal" },
 
-            // 4. Internal components — before other internals
-            { pattern: "components/**", group: "internal", position: "before" },
-            { pattern: "components", group: "internal", position: "before" },
-            // 6. Types
-            // { pattern: "types/**", group: "internal", position: "after" },
-            // { pattern: "types", group: "internal", position: "after" },
-
-            // 7. Utils
+            // Utils
             { pattern: "utils/**", group: "internal", position: "after" },
             { pattern: "utils", group: "internal", position: "after" },
 
-            // 8. Etc. (data, icons, images, themes, etc.)
+            // Etc. (data, icons, images, themes, etc.)
             { pattern: "data/**", group: "internal", position: "after" },
             { pattern: "data", group: "internal", position: "after" },
             { pattern: "icons/**", group: "internal", position: "after" },
+            { pattern: "icons", group: "internal", position: "after" },
             { pattern: "images/**", group: "internal", position: "after" },
+            { pattern: "images", group: "internal", position: "after" },
             { pattern: "themes/**", group: "internal", position: "after" },
+            { pattern: "themes", group: "internal", position: "after" },
             {
               pattern: "translations/**",
               group: "internal",
               position: "after",
             },
+            {
+              pattern: "translations",
+              group: "internal",
+              position: "after",
+            },
+
+            // View-local absolute imports — closest thing you have to relative imports
+            { pattern: "views/**", group: "internal", position: "after" },
+            {
+              pattern: "@ProjectViewer/**",
+              group: "internal",
+              position: "after",
+            },
+            {
+              pattern: "@ImageViewer/**",
+              group: "internal",
+              position: "after",
+            },
+            {
+              pattern: "@MeasurementViewer/**",
+              group: "internal",
+              position: "after",
+            },
           ],
           pathGroupsExcludedImportTypes: ["react", "react-*"],
-
+          sortTypesGroup: true,
           "newlines-between": "always",
         },
       ],
@@ -146,25 +176,29 @@ export default tseslint.config(
             },
             {
               target: "./src/views/!(ProjectViewer)/**/*",
-              from: "./src/views/!ProjectViewer/**/*",
+              from: "./src/views/ProjectViewer/**/*",
               message: "Viewers can not import from other views",
             },
             {
               target: "./src/views/!(ImageViewer)/**/*",
-              from: "./src/views/!ImageViewer/**/*",
+              from: "./src/views/ImageViewer/**/*",
               message: "Viewers can not import from other views",
             },
             {
               target: "./src/views/!(MeasurementViewer)/**/*",
-              from: "./src/views/!MeasurementViewer/**/*",
+              from: "./src/views/MeasurementViewer/**/*",
               message: "Viewers can not import from other views",
+            },
+            {
+              target: "./src/!(core)/**/*",
+              from: "./src/core/entities/!(index).*",
+              message: "Import entities through core/entities.",
             },
           ],
         },
       ],
     },
   },
-
   {
     files: [
       "src/store/productionStore.ts",
@@ -175,7 +209,6 @@ export default tseslint.config(
       "import-x/no-restricted-paths": "off",
     },
   },
-
   {
     files: ["**/*.stories.{js,jsx,ts,tsx}"],
     rules: {
@@ -194,7 +227,7 @@ export default tseslint.config(
   },
 
   {
-    ignores: ["**/*.json", "**/*.yml"],
+    ignores: ["**/*.json", "**/*.yml", "dist/**/*"],
   },
 
   // must be last

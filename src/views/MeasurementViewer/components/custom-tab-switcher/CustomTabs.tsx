@@ -1,4 +1,3 @@
-import type React from "react";
 import {
   createContext,
   useCallback,
@@ -20,6 +19,8 @@ import { useMobileView } from "hooks";
 import { TextFieldWithBlur } from "components/inputs";
 
 import { BasicTabPanel, ControlledTabPanel } from "./TabPanels";
+
+import type React from "react";
 
 import type {
   CommonTabsProps,

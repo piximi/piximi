@@ -1,4 +1,4 @@
-import type { BBox, DataArray } from "store/data/types";
+import type { BBox, DataArray } from "core/entities";
 
 /**
  * Set operations on annotation masks.

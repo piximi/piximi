@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 
 import { useSelector } from "react-redux";
 
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useClassifierApi } from "core/dl/classification";
+
 import { selectActiveModelName } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { useClassifierApi } from "core/dl/classification";
+
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 import type { ModelInfoDTO } from "core/dl/classification/types";
 

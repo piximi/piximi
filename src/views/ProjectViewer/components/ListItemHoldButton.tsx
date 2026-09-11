@@ -1,7 +1,5 @@
-import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
 
-import type { ListItemTextProps, TypographyProps } from "@mui/material";
 import {
   alpha,
   ListItem,
@@ -9,6 +7,10 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
+
+import type { ReactElement } from "react";
+
+import type { ListItemTextProps, TypographyProps } from "@mui/material";
 
 export const ListItemHoldButton = ({
   onHoldComplete,

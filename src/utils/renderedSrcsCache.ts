@@ -1,4 +1,4 @@
-import type { BBox, ExtendedChannel } from "store/data/types";
+import type { BBox, ExtendedChannel } from "core/entities";
 
 const MAX_SIZE = 200;
 const cache = new Map<string, string>();

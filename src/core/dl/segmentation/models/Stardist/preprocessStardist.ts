@@ -1,11 +1,12 @@
 import { data as tfdata, scalar, tidy } from "@tensorflow/tfjs";
 
-import type { LoadCB } from "utils/types";
-
 import { padToMatch } from "../../../utils";
 import { channelsToTensor } from "../../../tensor-assembly";
 
 import type { Tensor3D, Tensor4D } from "@tensorflow/tfjs";
+
+import type { LoadCB } from "utils/types";
+
 import type { InferenceInput } from "../../../types";
 
 const padImage = (image: Tensor3D, padX: number, padY: number): Tensor3D => {

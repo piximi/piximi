@@ -8,13 +8,12 @@ import {
 } from "@tensorflow/tfjs";
 import { Image as ImageJS } from "image-js";
 
-import { generateUUID } from "store/data/utils";
+import { generateUUID } from "core/entities";
 
 import { rleEncodeArray } from "utils/image";
 
 import { Partition } from "../../../enums";
 
-import type { PredictedAnnotationObject } from "../../types";
 import type { ColorModel, ImageKind } from "image-js";
 import type {
   Tensor1D,
@@ -22,6 +21,8 @@ import type {
   GraphModel,
   Tensor3D,
 } from "@tensorflow/tfjs";
+
+import type { PredictedAnnotationObject } from "../../types";
 
 const labelToAnnotation = async (
   labelMask: Tensor1D,

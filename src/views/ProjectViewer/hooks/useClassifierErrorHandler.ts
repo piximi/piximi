@@ -6,6 +6,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { AlertType } from "utils/enums";
 import { getStackTraceFromError } from "utils/logUtils";
+
 import type { AlertState } from "utils/types";
 
 const formatErrorChain = (error: Error): string => {

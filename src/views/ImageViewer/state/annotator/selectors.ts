@@ -3,6 +3,7 @@ import type {
   AnnotationState,
   ToolType,
 } from "views/ImageViewer/utils/enums";
+
 import type { AnnotatorState } from "../../utils/types";
 
 export const selectAnnotationState = ({

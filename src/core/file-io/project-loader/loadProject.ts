@@ -4,7 +4,6 @@ import { clean, eq, lt, lte, valid } from "semver";
 
 import { MODEL_MANIFEST_FILENAME } from "core/file-io/consts";
 
-import type { CancelToken } from "utils/workers/types";
 import { logger } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
 import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
@@ -22,6 +21,9 @@ import { convertV01ToV02 } from "./version-converters/v01Tov02";
 import { subProgress } from "./progress";
 
 import type { ExtractedModelFileMap } from "core/dl/types";
+
+import type { CancelToken } from "utils/workers/types";
+
 import type { CustomStore } from "../zarr/stores";
 import type { LoadProjectInput, LoadProjectOutput } from "./types";
 import type { V2PiximiState } from "./version-readers/version-types/v2Types";

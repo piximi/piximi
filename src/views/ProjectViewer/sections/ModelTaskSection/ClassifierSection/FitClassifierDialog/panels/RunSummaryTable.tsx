@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 
 import { saveAs } from "file-saver";
 
-import type { TableRowProps } from "@mui/material";
 import {
   Box,
   Button,
@@ -20,13 +19,17 @@ import {
   Typography,
 } from "@mui/material";
 
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { buildModelRunsCsv } from "core/file-io/export";
+
 import {
   selectActiveModelName,
   selectRunsForActiveModel,
 } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { buildModelRunsCsv } from "core/file-io/export";
+
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+
+import type { TableRowProps } from "@mui/material";
 
 import type { RunHyperparameterSnapshot } from "core/dl/classification/types";
 

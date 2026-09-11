@@ -2,25 +2,30 @@ import { useCallback, useRef, useState } from "react";
 
 import { useDispatch, useSelector, useStore } from "react-redux";
 
-import { appTasksSlice } from "store/appTasks/appTasksSlice";
-import type { AppTask } from "store/appTasks/types";
-import { generateUUID, reconcileChannelMetas } from "store/data/utils";
-import { dataSlice } from "store/data";
-import { selectAllChannelMetas, selectExperiment } from "store/data/selectors";
-import type { ImageSeries } from "store/data/types";
-import type { RootState } from "store/rootReducer";
-import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+import { generateUUID } from "core/entities";
 import { FileLoader } from "core/file-io/file-loader";
 import { FILE } from "core/file-io/file-loader/types";
-import { interpretFiles } from "core/file-io/file-loader/fileInputUtils";
+import {
+  interpretFiles,
+  reconcileChannelMetas,
+} from "core/file-io/file-loader/fileInputUtils";
 import { prepareTiffConfigs } from "core/file-io/file-loader/readers/TiffReader";
 
+import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+import { selectAllChannelMetas, selectExperiment } from "store/data/selectors";
+import { dataSlice } from "store/data";
+import { appTasksSlice } from "store/appTasks/appTasksSlice";
+
+import type { ImageSeries } from "core/entities";
 import type {
   TiffAnalysisResult,
   TiffDialogCallbackResult,
   TiffImportConfig,
   UploadOptionswithCallbacks,
 } from "core/file-io/file-loader/types";
+
+import type { RootState } from "store/rootReducer";
+import type { AppTask } from "store/appTasks/types";
 
 type UseFileLoaderReturn = {
   upload: (

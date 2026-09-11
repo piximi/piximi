@@ -1,16 +1,13 @@
 import IJSImage from "image-js";
 
-import type {
-  DataArray,
-  BBox,
-  ExtendedAnnotationObject,
-} from "store/data/types";
-
 import { logger } from "utils/logUtils";
-import type { Point } from "utils/types";
 
 import { pointsAreEqual } from "./point-operations";
 import { decodeRleArray } from "./rle";
+
+import type { DataArray, BBox, ExtendedAnnotationObject } from "core/entities";
+
+import type { Point } from "utils/types";
 
 const pointInBox = (point: Point, box: [number, number, number, number]) => {
   return (

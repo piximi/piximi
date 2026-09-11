@@ -3,7 +3,7 @@ import {
   type AnnotationObject,
   type BitDepth,
   type ChannelMeasurement,
-} from "store/data/types";
+} from "core/entities";
 import { DataConnector } from "core/data-connector";
 
 import { decodeRleArray } from "utils/image";

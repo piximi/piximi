@@ -1,6 +1,5 @@
 import { useDispatch } from "react-redux";
 
-import type { SelectChangeEvent } from "@mui/material";
 import { Box, MenuItem, Typography } from "@mui/material";
 
 import { useHistogram } from "hooks";
@@ -8,11 +7,14 @@ import { useHistogram } from "hooks";
 import { StyledSelect } from "components/inputs";
 
 import { dataSlice } from "store/data";
-import type { ExtendedChannel } from "store/data/types";
 
 import { applyChannelPreset, RANGE_PRESETS } from "utils/channelUtils";
 
 import { Histogram } from "./Histogram";
+
+import type { SelectChangeEvent } from "@mui/material";
+
+import type { ExtendedChannel } from "core/entities";
 
 export const ChannelOptions = ({
   channel,

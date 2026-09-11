@@ -1,5 +1,6 @@
-import type { ThemeOptions } from "@mui/material/styles";
 import { createTheme } from "@mui/material/styles";
+
+import type { ThemeOptions } from "@mui/material/styles";
 
 declare module "@mui/material/styles" {
   interface CssThemeVariables {

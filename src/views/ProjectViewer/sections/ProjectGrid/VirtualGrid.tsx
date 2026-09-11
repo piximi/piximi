@@ -1,10 +1,10 @@
-import type { RefObject } from "react";
-
 import { FixedSizeGrid as Grid } from "react-window";
 
 import { Container } from "@mui/material";
 
 import { GRID_GAP } from "utils/constants";
+
+import type { RefObject } from "react";
 
 import type { GridCellData } from "./gridUtils";
 

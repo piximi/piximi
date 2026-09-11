@@ -1,16 +1,19 @@
-import type { ReactNode } from "react";
 import { createContext, useContext, useMemo, useRef, useState } from "react";
 
 import { useSelector } from "react-redux";
 
 import { useRawImageData } from "hooks";
 
-import type { BitDepth } from "store/data/types";
-import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectActiveExtendedChannels } from "store/data/selectors";
 
+import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
+
+import type { ReactNode } from "react";
+
 import type { Image as IJSImage } from "image-js-latest";
+
+import type { BitDepth } from "core/entities";
 
 const ActiveImageContext = createContext<{
   channelData: Array<{

@@ -1,4 +1,3 @@
-import type { ChangeEvent } from "react";
 import { useState } from "react";
 
 import { useSelector } from "react-redux";
@@ -7,13 +6,17 @@ import { saveAs } from "file-saver";
 
 import { Grid2 as Grid, TextField } from "@mui/material";
 
-import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
-
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import { useParameterizedSelector } from "store/hooks";
-import { selectRunsForActiveModel } from "store/classifier/selectors";
 import { useClassifierApi } from "core/dl/classification";
 import { buildClassifierZip } from "core/file-io/export/exportFittedModel";
+
+import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
+
+import { useParameterizedSelector } from "store/hooks";
+import { selectRunsForActiveModel } from "store/classifier/selectors";
+
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+
+import type { ChangeEvent } from "react";
 
 import type { ModelInfoDTO } from "core/dl/classification/types";
 

@@ -1,7 +1,5 @@
-import type { ChangeEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
 
-import type { SelectChangeEvent } from "@mui/material";
 import {
   Accordion,
   AccordionDetails,
@@ -21,6 +19,10 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { DimensionOrder } from "core/file-io/file-loader/types";
+
+import type { ChangeEvent } from "react";
+
+import type { SelectChangeEvent } from "@mui/material";
 
 import type {
   TiffAnalysisResult,

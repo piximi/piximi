@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import type { SelectChangeEvent } from "@mui/material";
 import {
   Box,
   Button,
@@ -12,25 +11,29 @@ import {
   Typography,
 } from "@mui/material";
 
+import { useClassifierApi } from "core/dl/classification";
+
 import { WithLabel, TextFieldWithBlur, StyledSelect } from "components/inputs";
 
-import { useClassificationModel } from "@ProjectViewer/hooks";
-import { TooltipWithDisable } from "@ProjectViewer/components";
 import { classifierSlice } from "store/classifier";
-import {
-  ErrorReason,
-  useClassifierStatus,
-} from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
   selectAllCreatedModelNames,
   selectKindClassifier,
 } from "store/classifier/selectors";
-import { useClassifierApi } from "core/dl/classification";
 
 import { findReplicateName } from "utils/stringUtils";
 import { logger } from "utils/logUtils";
+
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import {
+  ErrorReason,
+  useClassifierStatus,
+} from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import { TooltipWithDisable } from "@ProjectViewer/components";
+import { useClassificationModel } from "@ProjectViewer/hooks";
+
+import type { SelectChangeEvent } from "@mui/material";
 
 import type { ModelArch, ModelInfoDTO } from "core/dl/classification/types";
 

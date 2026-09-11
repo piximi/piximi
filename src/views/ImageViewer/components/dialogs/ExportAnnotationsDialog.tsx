@@ -1,9 +1,10 @@
-import type { ChangeEvent } from "react";
 import { useState } from "react";
 
 import { Grid, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "../../../../components/dialogs/ConfirmationDialog";
+
+import type { ChangeEvent } from "react";
 
 type ExportAnnotationsDialogProps = {
   onClose: () => void;

@@ -1,7 +1,5 @@
 import JSZip from "jszip";
 
-import type { LoadCB } from "utils/types";
-
 import { err, ok } from "../../utils";
 import { Cellpose } from "../models/Cellpose";
 import { CocoSSD } from "../models/CocoSSD";
@@ -10,6 +8,9 @@ import { StardistFluo, StardistVHE } from "../models/Stardist";
 import { modelInfo } from "../models/modelInfo";
 
 import type { Token } from "core/dl/cancel";
+
+import type { LoadCB } from "utils/types";
+
 import type {
   ISegmenterApi,
   ModelName,

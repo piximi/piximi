@@ -1,12 +1,12 @@
 import { encodeDataURL, fromMask, Image as IJSImage } from "image-js-latest";
 import PriorityQueue from "ts-priority-queue";
 
-import type { Point } from "utils/types";
-
 import { AnnotationTool } from "./AnnotationTool";
 import { AnnotationState } from "../enums";
 
 import type { Mask, RoiMapManager } from "image-js-latest";
+
+import type { Point } from "utils/types";
 
 export class ColorAnnotationTool extends AnnotationTool {
   roiContour?: IJSImage;

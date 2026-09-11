@@ -1,9 +1,10 @@
 import { configureStore, Tuple } from "@reduxjs/toolkit";
 import { logger } from "redux-logger";
 
+import { classifierSlice } from "store/classifier";
+
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { classifierSlice } from "store/classifier";
 import { projectSlice } from "views/ProjectViewer/state/projectSlice";
 import { projectMiddleware } from "views/ProjectViewer/state/projectListeners";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/imageViewerDataSlice";
@@ -14,13 +15,14 @@ import { dataSlice } from "./data";
 import { rootReducer } from "./rootReducer";
 import { applicationSettingsSlice } from "./applicationSettings";
 
-import type { RootState } from "./rootReducer";
 import type {
   Dispatch,
   EnhancedStore,
   Middleware,
   UnknownAction,
 } from "@reduxjs/toolkit";
+
+import type { RootState } from "./rootReducer";
 
 const loggingMiddleware: Middleware[] =
   import.meta.env.NODE_ENV !== "production" &&

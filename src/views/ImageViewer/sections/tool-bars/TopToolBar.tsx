@@ -19,13 +19,15 @@ import { useTranslation } from "hooks";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { ImageViewerLogo } from "@ImageViewer/components";
-import { selectZoomToolOptions } from "views/ImageViewer/state/imageViewer/selectors";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { useThreeViewport } from "@ImageViewer/sections/ThreeStage/ThreeViewportContext";
+import { DIMENSIONS } from "utils/constants";
+
 import { CursorZoom, StageZoom } from "icons";
 
-import { DIMENSIONS } from "utils/constants";
+import { selectZoomToolOptions } from "views/ImageViewer/state/imageViewer/selectors";
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+
+import { ImageViewerLogo } from "@ImageViewer/components";
+import { useThreeViewport } from "@ImageViewer/sections/ThreeStage/ThreeViewportContext";
 
 import { AnnotationTool } from "./AnnotationTool";
 

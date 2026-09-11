@@ -1,5 +1,4 @@
-import type { Shape } from "store/data/types";
-
+import type { Shape } from "core/entities";
 import type {
   LossFunction,
   Metric,
@@ -8,6 +7,7 @@ import type {
   Partition,
   CropSchema,
 } from "core/dl/enums";
+
 import type { RawData } from "../../types";
 
 // ============================================================

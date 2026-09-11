@@ -1,6 +1,8 @@
-import type { Shape } from "store/data/types";
+import type { EntityState } from "@reduxjs/toolkit";
 
+import type { Shape } from "core/entities";
 import type { Partition } from "core/dl/enums";
+
 import type {
   V01BitDepth,
   V01ClassifierState,
@@ -8,7 +10,6 @@ import type {
   V01RawImageObject,
   V01ProjectState,
 } from "./v01Types";
-import type { EntityState } from "@reduxjs/toolkit";
 import type { RawData } from "../../types";
 
 // ============================================================

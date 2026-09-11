@@ -1,20 +1,23 @@
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import type { SelectChangeEvent } from "@mui/material";
 import { MenuItem, IconButton, Stack } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 
-import { WithLabel, StyledSelect } from "components/inputs";
-
-import { TooltipWithDisable } from "@ProjectViewer/components";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import { classifierSlice } from "store/classifier";
-import { selectKindModelNames } from "store/classifier/selectors";
-import { useParameterizedSelector } from "store/hooks";
 import { useClassifierApi } from "core/dl/classification";
 import { ModelArch } from "core/dl/classification/types";
 
+import { WithLabel, StyledSelect } from "components/inputs";
+
+import { classifierSlice } from "store/classifier";
+import { selectKindModelNames } from "store/classifier/selectors";
+import { useParameterizedSelector } from "store/hooks";
+
 import { logger } from "utils/logUtils";
+
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { TooltipWithDisable } from "@ProjectViewer/components";
+
+import type { SelectChangeEvent } from "@mui/material";
 
 import type { ModelInfoDTO } from "core/dl/classification/types";
 

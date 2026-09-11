@@ -1,21 +1,23 @@
-import type { ReactElement } from "react";
 import { useCallback, useMemo } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
 import { ListSubheader, MenuItem } from "@mui/material";
-import type { SelectChangeEvent } from "@mui/material";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
+import { nivoColorSpaces } from "themes/nivoTheme";
 
 import { selectActiveSelectedPlot } from "@MeasurementViewer/state/selectors";
 import { measurementsSlice } from "@MeasurementViewer/state";
 
-import { nivoColorSpaces } from "themes/nivoTheme";
-
 import { ChartConfigSelect } from "./ChartConfigSelect";
 
+import type { ReactElement } from "react";
+
 import type { ColorSchemeId } from "@nivo/colors";
+
+import type { SelectChangeEvent } from "@mui/material";
 
 export const ColorThemeSelect = () => {
   const selectedPlot = useSelector(selectActiveSelectedPlot);

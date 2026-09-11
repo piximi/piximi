@@ -1,10 +1,11 @@
 import { saveAs } from "file-saver";
 import { v4 as uuidv4 } from "uuid";
 
-import { CHANNEL_MEASUREMENTS } from "store/data/types";
-import type { ChannelMeasurement } from "store/data/types";
+import { CHANNEL_MEASUREMENTS } from "core/entities";
 
 import { ChartType } from "./types";
+
+import type { ChannelMeasurement, FeatureKey } from "core/entities";
 
 import type { ChartConfig } from "./types";
 
@@ -141,4 +142,30 @@ export const generateInitialPlot = () => {
     name: "Plot 1",
     chartConfig: initialChartConfig,
   };
+};
+
+export const OBJ_MEAS_LOOKUP: Record<FeatureKey, string> = {
+  area: "Area",
+  bboxArea: "Bounding Box Area",
+  comX: "Center of Mass (X)",
+  comY: "Center of Mass (Y)",
+  compactness: "Compactness",
+  eqpc: "Diameter of a circle of equal projection area ",
+  extent: "Extent",
+  ped: "Diameter of a circle of equal perimeter",
+  perimeter: "Perimeter",
+  sphericity: "Sphericity",
+  radius: "Radius of a circle of equal perimeter",
+};
+
+export const INTENSE_MEAS_LOOKUP = {
+  total: "Sum of pixel intensities",
+  min: "Minimum intensity",
+  max: "Maximum intensity",
+  mean: "Mean intensity",
+  median: "Median intensity",
+  std: "Standard deviation",
+  mad: "Median Absolute Deviation",
+  lowerQuartile: "Pixel which 25% of values are lower",
+  upperQuartile: "Pixel which 25% of values are higher",
 };

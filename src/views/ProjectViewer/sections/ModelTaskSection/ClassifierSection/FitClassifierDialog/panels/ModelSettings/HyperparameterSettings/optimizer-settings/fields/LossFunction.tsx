@@ -1,17 +1,19 @@
 import { useMemo } from "react";
 
-import type { SelectChangeEvent } from "@mui/material";
 import { MenuItem, Tooltip } from "@mui/material";
+
+import { LossFunction as LossFunctionEnum } from "core/dl/enums";
 
 import { StyledSelect, WithLabel } from "components/inputs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import { LossFunction as LossFunctionEnum } from "core/dl/enums";
-
 import { enumKeys } from "utils/objectUtils";
 
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+
 import { isFieldLocked, lockReason } from "../../settingsLock";
+
+import type { SelectChangeEvent } from "@mui/material";
 
 export const LossFunction = () => {
   const {

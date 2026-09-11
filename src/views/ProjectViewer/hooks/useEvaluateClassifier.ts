@@ -1,14 +1,16 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { selectActiveKnownCategories } from "@ProjectViewer/state/reselectors";
-import { classifierSlice } from "store/classifier";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import { useParameterizedSelector } from "store/hooks";
-import { selectKindClassifier } from "store/classifier/selectors";
 import { useClassifierApi } from "core/dl/classification";
 
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { classifierSlice } from "store/classifier";
+import { useParameterizedSelector } from "store/hooks";
+import { selectKindClassifier } from "store/classifier/selectors";
+
 import { AlertType } from "utils/enums";
+
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { selectActiveKnownCategories } from "@ProjectViewer/state/reselectors";
 
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 

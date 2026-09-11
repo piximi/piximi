@@ -6,14 +6,14 @@ import { Box, Typography } from "@mui/material";
 
 import { BaseAppDrawer } from "components/layout";
 
+import { DIMENSIONS } from "utils/constants";
+
 import { useCreateMeasurementTable } from "@MeasurementViewer/hooks";
 import { CreateMeasurementGroupDialog } from "@MeasurementViewer/components/dialogs";
 import {
   selectActiveGroupId,
   selectMeasurementGroups,
 } from "@MeasurementViewer/state/selectors";
-
-import { DIMENSIONS } from "utils/constants";
 
 import { CreateMeasurementGroupButton } from "./CreateMeasurementGroupButton";
 import { MeasurementSelection } from "./MeasurementSelection";

@@ -4,11 +4,19 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { useSound } from "use-sound";
 
-import { annotatorSlice } from "@ImageViewer/state/annotator";
+import { generateUUID } from "core/entities";
+import { Partition } from "core/dl/enums";
+
 import { dataSlice } from "store/data";
-import type { AnnotationObject, AnnotationVolume } from "store/data/types";
-import { generateUUID } from "store/data/utils";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
+
+import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
+import { computeObjectIntensityMeasurements } from "utils/measurements/computeObjectIntensityMeasurements";
+import { rleEncodeArray } from "utils/image";
+
+import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
+import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
+
 import { selectWorkingAnnotationEntity } from "@ImageViewer/state/annotator/selectors";
 import {
   selectOverlapCandidateIds,
@@ -19,14 +27,9 @@ import {
 import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
 import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
-import { Partition } from "core/dl/enums";
+import { annotatorSlice } from "@ImageViewer/state/annotator";
 
-import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
-import { computeObjectIntensityMeasurements } from "utils/measurements/computeObjectIntensityMeasurements";
-import { rleEncodeArray } from "utils/image";
-
-import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
-import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
+import type { AnnotationObject, AnnotationVolume } from "core/entities";
 
 import type { AnnotationTool } from "@ImageViewer/utils/tools";
 

@@ -2,13 +2,15 @@ import { fromArrayBuffer } from "geotiff";
 import { XMLParser } from "fast-xml-parser";
 
 import { parseError } from "utils/logUtils";
-import type { TaskError } from "utils/types";
 
 import { loadImageFromBuffer } from "../imageReaderUtils";
 import { MIME } from "../types";
 import { overallProgress } from "../progress";
 
 import type { GeoTIFFImage } from "geotiff";
+
+import type { TaskError } from "utils/types";
+
 import type {
   OMEDims,
   AnalyzeTiffOutput,

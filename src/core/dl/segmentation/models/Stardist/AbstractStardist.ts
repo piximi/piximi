@@ -2,15 +2,16 @@ import { LayersModel } from "@tensorflow/tfjs";
 
 import { CancelSource, type Token } from "core/dl/cancel";
 
-import type { LoadCB } from "utils/types";
-
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardist } from "./predictStardist";
 
+import type { GraphModel } from "@tensorflow/tfjs";
+
+import type { LoadCB } from "utils/types";
+
 import type { PredictedAnnotationObject } from "../../types";
 import type { InferenceInput } from "../../../types";
-import type { GraphModel } from "@tensorflow/tfjs";
 
 export const KIND_NAME = "stardist_nucleus";
 /*

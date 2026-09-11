@@ -1,12 +1,15 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 
-import { classifierSlice } from "store/classifier";
-import type { TypedAppStartListening } from "store/types";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { dataSlice } from "store/data";
 import { getClassifierApi } from "core/dl/classification";
 
+import { classifierSlice } from "store/classifier";
+import { dataSlice } from "store/data";
+
+import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+
 import { projectSlice } from "./projectSlice";
+
+import type { TypedAppStartListening } from "store/types";
 
 export const projectMiddleware = createListenerMiddleware();
 const startAppListening =

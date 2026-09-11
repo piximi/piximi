@@ -1,4 +1,3 @@
-import type { RefObject } from "react";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { Box, IconButton, Typography } from "@mui/material";
@@ -11,6 +10,8 @@ import {
   sectionLabelStyle,
   sectionStyle,
 } from "./FilterList.styles";
+
+import type { RefObject } from "react";
 
 type FilterListProps<T> = {
   items: Array<T>;

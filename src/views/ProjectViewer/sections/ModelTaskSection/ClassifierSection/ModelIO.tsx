@@ -5,9 +5,9 @@ import { useDialog, useDialogHotkey, useTranslation } from "hooks";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { SaveFittedModelDialog } from "@ProjectViewer/components/dialogs";
-
 import { HotkeyContext } from "utils/enums";
+
+import { SaveFittedModelDialog } from "@ProjectViewer/components/dialogs";
 
 import { ImportTensorflowClassificationModelDialog } from "../ImportTensorflowModelDialog";
 

@@ -15,8 +15,6 @@ import {
 import { AnnotationState, ToolType } from "@ImageViewer/utils/enums";
 import { selectHasSelection } from "@ImageViewer/state/image-viewer-data/reselectors";
 
-import type { Point } from "utils/types";
-
 import { useThreeViewport } from "../ThreeViewportContext";
 import { MarchingAntsKeyframes } from "./marchingAnts";
 import { RectanglePreview } from "./previews/RectanglePreview";
@@ -32,6 +30,8 @@ import {
   SelectionButtons,
 } from "./SelectionChrome";
 import { BrushCursor } from "./BrushCursor";
+
+import type { Point } from "utils/types";
 
 import type {
   AnnotationTool,

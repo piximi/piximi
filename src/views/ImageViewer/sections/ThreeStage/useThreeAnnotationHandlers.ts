@@ -9,7 +9,6 @@ import {
   selectAnnotationMode,
   selectToolType,
 } from "views/ImageViewer/state/annotator/selectors";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import {
   AnnotationMode,
   AnnotationState,
@@ -17,10 +16,12 @@ import {
 } from "views/ImageViewer/utils/enums";
 import { usePointerTool } from "views/ImageViewer/hooks";
 
-import type { Point } from "utils/types";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
 import { screenToImage } from "./coords";
 import { useThreeViewport } from "./ThreeViewportContext";
+
+import type { Point } from "utils/types";
 
 import type {
   AnnotationTool,
