@@ -1,5 +1,3 @@
-import { openGroup } from "zarr";
-
 import { UNKNOWN_IMAGE_CATEGORY_ID } from "core/entities";
 import { Partition } from "core/dl/enums";
 
@@ -13,6 +11,8 @@ import {
   getDataset,
   getDatasetSelection,
   getGroup,
+  openRootGroup,
+  readDataset,
 } from "../../zarr/utils";
 import {
   deserializeColorsRaw,
@@ -20,8 +20,7 @@ import {
 } from "./common";
 import { subProgress } from "../progress";
 
-import type { RawArray } from "zarr/types/rawArray";
-import type { Group } from "zarr";
+import type { Group, RawArray } from "../../zarr/utils";
 
 import type { CustomStore } from "../../zarr/stores";
 import type {
@@ -48,7 +47,7 @@ export async function readV01(
   store: CustomStore,
   onProgress: (p: number) => void,
 ): Promise<V01PiximiState> {
-  const rootGroup = await openGroup(store, store.rootName, "r");
+  const rootGroup = await openRootGroup(store);
   const projectGroup = await getGroup(rootGroup, "project");
 
   const projectName = (await getAttr(projectGroup, "name")) as string;
@@ -127,7 +126,7 @@ async function deserializeImageGroup(
   const colors = await deserializeColorsRaw(colorsGroup);
 
   const imageDataset = await getDataset(imageGroup, name);
-  const imageRawArray = (await imageDataset.getRaw()) as RawArray;
+  const imageRawArray = await readDataset(imageDataset);
   const [planes, height, width, channels] = imageRawArray.shape;
   const bitDepth = (await getAttr(
     imageDataset,

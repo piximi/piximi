@@ -8,7 +8,7 @@ import {
 import { getAttr, getDatasetSelection, getGroup } from "../../zarr/utils";
 import { initialClassifierStateV01_02 } from "./constants";
 
-import type { Group } from "zarr";
+import type { Group } from "../../zarr/utils";
 
 import type {
   V01ClassifierEvaluationResultType,
@@ -32,7 +32,18 @@ import type {
 export async function deserializeColorsRaw(
   colorsGroup: Group,
 ): Promise<V01ColorsRaw> {
-  const colorsDataset = await getDatasetSelection(colorsGroup, "color", [null]);
+  /*
+   * `color` is 2-D — [channels, 3] — unlike the other three datasets here,
+   * which are flat. It must be selected at full rank: zarr.js padded an
+   * under-specified selection out to the array's rank, but zarrita does not and
+   * only rejects a selection that is too *long*. A rank-1 selection here asks
+   * for chunk "0" of an array stored at "0.0", misses, and silently yields the
+   * fill value — every channel color reading back as pure black.
+   */
+  const colorsDataset = await getDatasetSelection(colorsGroup, "color", [
+    null,
+    null,
+  ]);
   const numChannels = colorsDataset.shape[0];
   const colors = colorsDataset.data as Float32Array;
   const rangeMaxs = await getDatasetSelection(colorsGroup, "range_max", [

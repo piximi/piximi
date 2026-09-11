@@ -23,10 +23,13 @@ import {
   ZARR_V2_RUNS,
   ZARR_V2_SHAPE,
 } from "../../zarr/types";
-import { writeArray, writeAttrs } from "../zarr/writers";
+import { createGroup, createRootGroup, writeArray } from "../zarr/writers";
 
-import type { Group } from "zarr";
 import type { EntityState } from "@reduxjs/toolkit";
+
+import type { WriteStore } from "../../zarr/stores";
+// Aliased on import so the `Group` annotations throughout this file stand.
+import type { WritableGroup as Group } from "../zarr/writers";
 
 import type {
   ModelClassMap,
@@ -116,7 +119,7 @@ const classMapEntries = (classMap: ModelClassMap | undefined) =>
     : null;
 
 export const writeV2 = async (
-  root: Group,
+  store: WriteStore,
   project: SerializableProject,
   getChannelData: ChannelDataAccessor,
   onProgress: (p: number) => void,
@@ -131,15 +134,16 @@ export const writeV2 = async (
     );
   }
 
-  await writeAttrs(root, {
+  // Zarr v3 has no attribute-mutation API, so the version has to be written as
+  // part of creating the root — which also means the guard above now fires
+  // before a single byte lands, rather than after a bare root exists.
+  const root = await createRootGroup(store, {
     [ZARR_V2_ROOT.Version]: appVersion,
     [ZARR_V2_ROOT.AppVersion]: appVersion,
   });
 
   const { data, classifier } = project;
-  const dataGroup = await root.createGroup(ZARR_V2_GROUP.Data);
-
-  await writeAttrs(dataGroup, {
+  const dataGroup = await createGroup(root, ZARR_V2_GROUP.Data, {
     [ZARR_V2_DATA.ExperimentId]: data.experiment.id,
     [ZARR_V2_DATA.ExperimentName]: data.experiment.name,
     [ZARR_V2_DATA.ExperimentChannels]: data.experiment.channels ?? null,
@@ -168,8 +172,7 @@ export const writeV2 = async (
 };
 
 const writeImageSeries = async (dataGroup: Group, series: ImageSeries[]) => {
-  const group = await dataGroup.createGroup(ZARR_V2_GROUP.ImageSeries);
-  await writeAttrs(group, {
+  await createGroup(dataGroup, ZARR_V2_GROUP.ImageSeries, {
     [ZARR_V2_IMAGE_SERIES.Id]: series.map((s) => s.id),
     [ZARR_V2_IMAGE_SERIES.ExperimentId]: series.map((s) => s.experimentId),
     [ZARR_V2_IMAGE_SERIES.Name]: series.map((s) => s.name),
@@ -181,8 +184,7 @@ const writeImageSeries = async (dataGroup: Group, series: ImageSeries[]) => {
 };
 
 const writeImages = async (dataGroup: Group, images: ImageObject[]) => {
-  const group = await dataGroup.createGroup(ZARR_V2_GROUP.Images);
-  await writeAttrs(group, {
+  await createGroup(dataGroup, ZARR_V2_GROUP.Images, {
     [ZARR_V2_IMAGE.Id]: images.map((i) => i.id),
     [ZARR_V2_IMAGE.Name]: images.map((i) => i.name),
     [ZARR_V2_IMAGE.SeriesId]: images.map((i) => i.seriesId),
@@ -203,8 +205,7 @@ const writeImages = async (dataGroup: Group, images: ImageObject[]) => {
 };
 
 const writePlanes = async (dataGroup: Group, planes: Plane[]) => {
-  const group = await dataGroup.createGroup(ZARR_V2_GROUP.Planes);
-  await writeAttrs(group, {
+  await createGroup(dataGroup, ZARR_V2_GROUP.Planes, {
     [ZARR_V2_PLANE.Id]: planes.map((p) => p.id),
     [ZARR_V2_PLANE.ImageId]: planes.map((p) => p.imageId),
     [ZARR_V2_PLANE.ZIndex]: planes.map((p) => p.zIndex),
@@ -212,8 +213,7 @@ const writePlanes = async (dataGroup: Group, planes: Plane[]) => {
 };
 
 const writeKinds = async (dataGroup: Group, kinds: Kind[]) => {
-  const group = await dataGroup.createGroup(ZARR_V2_GROUP.Kinds);
-  await writeAttrs(group, {
+  await createGroup(dataGroup, ZARR_V2_GROUP.Kinds, {
     [ZARR_V2_KIND.Id]: kinds.map((k) => k.id),
     [ZARR_V2_KIND.Name]: kinds.map((k) => k.name),
     [ZARR_V2_KIND.UnknownCategoryId]: kinds.map((k) => k.unknownCategoryId),
@@ -221,8 +221,7 @@ const writeKinds = async (dataGroup: Group, kinds: Kind[]) => {
 };
 
 const writeCategories = async (dataGroup: Group, categories: Category[]) => {
-  const group = await dataGroup.createGroup(ZARR_V2_GROUP.Categories);
-  await writeAttrs(group, {
+  await createGroup(dataGroup, ZARR_V2_GROUP.Categories, {
     [ZARR_V2_CATEGORY.Id]: categories.map((c) => c.id),
     [ZARR_V2_CATEGORY.Name]: categories.map((c) => c.name),
     [ZARR_V2_CATEGORY.Color]: categories.map((c) => c.color),
@@ -236,8 +235,7 @@ const writeCategories = async (dataGroup: Group, categories: Category[]) => {
 };
 
 const writeChannelMetas = async (dataGroup: Group, metas: ChannelMeta[]) => {
-  const group = await dataGroup.createGroup(ZARR_V2_GROUP.ChannelMetas);
-  await writeAttrs(group, {
+  await createGroup(dataGroup, ZARR_V2_GROUP.ChannelMetas, {
     [ZARR_V2_CHANNEL_META.Id]: metas.map((m) => m.id),
     [ZARR_V2_CHANNEL_META.Name]: metas.map((m) => m.name),
     [ZARR_V2_CHANNEL_META.BitDepth]: metas.map((m) => m.bitDepth),
@@ -258,8 +256,7 @@ const writeChannels = async (
   getChannelData: ChannelDataAccessor,
   onProgress: (p: number) => void,
 ) => {
-  const group = await dataGroup.createGroup(ZARR_V2_GROUP.Channels);
-  await writeAttrs(group, {
+  const group = await createGroup(dataGroup, ZARR_V2_GROUP.Channels, {
     [ZARR_V2_CHANNEL.Id]: channels.map((c) => c.id),
     [ZARR_V2_CHANNEL.PlaneId]: channels.map((c) => c.planeId),
     [ZARR_V2_CHANNEL.ChannelMetaId]: channels.map((c) => c.channelMetaId),
@@ -297,7 +294,7 @@ const writeChannels = async (
         );
       }
 
-      const channelGroup = await group.createGroup(channel.id);
+      const channelGroup = await createGroup(group, channel.id);
       // `bitDepth`, not `Channel.dtype`, selects the view — matches how
       // `useRawImageData` reconstitutes these buffers for rendering.
       const pixels =
@@ -326,8 +323,7 @@ const writeAnnotationVolumes = async (
   dataGroup: Group,
   volumes: AnnotationVolume[],
 ) => {
-  const group = await dataGroup.createGroup(ZARR_V2_GROUP.AnnotationVolumes);
-  await writeAttrs(group, {
+  await createGroup(dataGroup, ZARR_V2_GROUP.AnnotationVolumes, {
     [ZARR_V2_ANNOTATION_VOLUME.Id]: volumes.map((v) => v.id),
     [ZARR_V2_ANNOTATION_VOLUME.ImageId]: volumes.map((v) => v.imageId),
     [ZARR_V2_ANNOTATION_VOLUME.KindId]: volumes.map((v) => v.kindId),
@@ -349,11 +345,12 @@ const writeAnnotations = async (
   dataGroup: Group,
   annotations: AnnotationObject[],
 ) => {
-  const group = await dataGroup.createGroup(ZARR_V2_GROUP.Annotations);
-
   // `encodedMask` is ragged, so concatenate every RLE run into one dataset and
   // record CSR-style [start, end) offsets. One group per annotation would mean
   // tens of thousands of zip entries on a densely annotated project.
+  //
+  // Computed before the group is created, because the offsets are part of its
+  // attributes and v3 only accepts those at creation.
   const totalRuns = annotations.reduce((n, a) => n + a.encodedMask.length, 0);
   const masks = new Uint32Array(totalRuns);
   const offsets = new Array<number>(annotations.length + 1);
@@ -365,7 +362,7 @@ const writeAnnotations = async (
   });
   offsets[annotations.length] = cursor;
 
-  await writeAttrs(group, {
+  const group = await createGroup(dataGroup, ZARR_V2_GROUP.Annotations, {
     [ZARR_V2_ANNOTATION.Id]: annotations.map((a) => a.id),
     [ZARR_V2_ANNOTATION.PlaneId]: annotations.map((a) => a.planeId),
     [ZARR_V2_ANNOTATION.ImageId]: annotations.map((a) => a.imageId),
@@ -384,9 +381,10 @@ const writeAnnotations = async (
 };
 
 const writeClassifier = async (root: Group, classifier: ClassifierState) => {
-  const group = await root.createGroup(ZARR_V2_GROUP.Classifier);
   const kindIds = Object.keys(classifier.kindClassifiers);
-  await writeAttrs(group, { [ZARR_V2_CLASSIFIER.Kinds]: kindIds });
+  const group = await createGroup(root, ZARR_V2_GROUP.Classifier, {
+    [ZARR_V2_CLASSIFIER.Kinds]: kindIds,
+  });
 
   for (const kindId of kindIds) {
     await writeKindClassifier(
@@ -402,10 +400,9 @@ const writeKindClassifier = async (
   kindId: string,
   kindClassifier: KindClassifier,
 ) => {
-  const group = await classifierGroup.createGroup(kindId);
   const modelNames = Object.keys(kindClassifier.modelInfoDict);
 
-  await writeAttrs(group, {
+  const group = await createGroup(classifierGroup, kindId, {
     [ZARR_V2_CLASSIFIER.Models]: modelNames,
     [ZARR_V2_CLASSIFIER.ModelTargetId]: kindClassifier.modelTargetId,
     [ZARR_V2_CLASSIFIER.ModelTargetName]: kindClassifier.modelTargetName,
@@ -417,16 +414,21 @@ const writeKindClassifier = async (
   });
 
   for (const modelName of modelNames) {
-    const modelGroup = await group.createGroup(modelName);
-    await writeAttrs(modelGroup, { [ZARR_V2_MODEL_INFO.Name]: modelName });
+    const modelGroup = await createGroup(group, modelName, {
+      [ZARR_V2_MODEL_INFO.Name]: modelName,
+    });
 
-    const infoGroup = await modelGroup.createGroup(ZARR_V2_GROUP.ModelInfo);
-    await writeModelInfo(infoGroup, kindClassifier.modelInfoDict[modelName]);
+    await writeModelInfo(modelGroup, kindClassifier.modelInfoDict[modelName]);
   }
 };
 
-const writeModelInfo = async (infoGroup: Group, modelInfo: ModelInfo) => {
-  await writeAttrs(infoGroup, {
+/**
+ * Takes the model group rather than the info group: the info group's attributes
+ * are written here, and v3 only accepts attributes at creation, so the caller
+ * cannot create it first.
+ */
+const writeModelInfo = async (modelGroup: Group, modelInfo: ModelInfo) => {
+  const infoGroup = await createGroup(modelGroup, ZARR_V2_GROUP.ModelInfo, {
     [ZARR_V2_MODEL_INFO.ClassMap]: classMapEntries(modelInfo.classMap),
     [ZARR_V2_MODEL_INFO.ConfidenceThreshold]: modelInfo.confidenceThreshold,
     [ZARR_V2_MODEL_INFO.Valid]: Number(modelInfo.valid),
@@ -444,10 +446,9 @@ const writePreprocessSettings = async (
   parent: Group,
   settings: PreprocessSettings,
 ) => {
-  const group = await parent.createGroup(ZARR_V2_GROUP.PreprocessSettings);
   const { planes, height, width, channels } = settings.inputShape;
 
-  await writeAttrs(group, {
+  const group = await createGroup(parent, ZARR_V2_GROUP.PreprocessSettings, {
     [ZARR_V2_PREPROCESS.Shuffle]: Number(settings.shuffle),
     [ZARR_V2_PREPROCESS.TrainingPercent]: settings.trainingPercentage,
     // A plain JSON array, not a Uint8 dataset — the v1.1 writer used Uint8
@@ -455,16 +456,12 @@ const writePreprocessSettings = async (
     [ZARR_V2_PREPROCESS.InputShape]: [planes, height, width, channels],
   });
 
-  const normalizeGroup = await group.createGroup(
-    ZARR_V2_GROUP.NormalizeOptions,
-  );
-  await writeAttrs(normalizeGroup, {
+  await createGroup(group, ZARR_V2_GROUP.NormalizeOptions, {
     [ZARR_V2_PREPROCESS.Normalize]: Number(settings.normalizeOptions.normalize),
     [ZARR_V2_PREPROCESS.Center]: Number(settings.normalizeOptions.center),
   });
 
-  const cropGroup = await group.createGroup(ZARR_V2_GROUP.CropOptions);
-  await writeAttrs(cropGroup, {
+  await createGroup(group, ZARR_V2_GROUP.CropOptions, {
     [ZARR_V2_PREPROCESS.NumCrops]: settings.cropOptions.numCrops,
     [ZARR_V2_PREPROCESS.CropSchema]: settings.cropOptions.cropSchema,
   });
@@ -474,8 +471,7 @@ const writeOptimizerSettings = async (
   parent: Group,
   settings: OptimizerSettings,
 ) => {
-  const group = await parent.createGroup(ZARR_V2_GROUP.OptimizerSettings);
-  await writeAttrs(group, {
+  await createGroup(parent, ZARR_V2_GROUP.OptimizerSettings, {
     [ZARR_V2_OPTIMIZER.LearningRate]: settings.learningRate,
     [ZARR_V2_OPTIMIZER.LossFunction]: settings.lossFunction,
     [ZARR_V2_OPTIMIZER.Metrics]: settings.metrics,
@@ -486,12 +482,12 @@ const writeOptimizerSettings = async (
 };
 
 const writeRuns = async (infoGroup: Group, runs: Run[]) => {
-  const runsGroup = await infoGroup.createGroup(ZARR_V2_GROUP.Runs);
-  await writeAttrs(runsGroup, { [ZARR_V2_RUNS.RunIds]: runs.map((r) => r.id) });
+  const runsGroup = await createGroup(infoGroup, ZARR_V2_GROUP.Runs, {
+    [ZARR_V2_RUNS.RunIds]: runs.map((r) => r.id),
+  });
 
   for (const run of runs) {
-    const runGroup = await runsGroup.createGroup(run.id);
-    await writeAttrs(runGroup, {
+    const runGroup = await createGroup(runsGroup, run.id, {
       [ZARR_V2_RUN.Id]: run.id,
       [ZARR_V2_RUN.ParentRunId]: run.parentRunId ?? null,
       [ZARR_V2_RUN.StartedAt]: run.startedAt,
@@ -510,12 +506,13 @@ const writeRuns = async (infoGroup: Group, runs: Run[]) => {
       [ZARR_V2_RUN.WeightsRef]: run.weightsRef ?? null,
     });
 
-    const hyperGroup = await runGroup.createGroup(
+    const hyperGroup = await createGroup(
+      runGroup,
       ZARR_V2_GROUP.Hyperparameters,
+      {
+        [ZARR_V2_RUN.Architecture]: run.hyperparameters.architecture,
+      },
     );
-    await writeAttrs(hyperGroup, {
-      [ZARR_V2_RUN.Architecture]: run.hyperparameters.architecture,
-    });
     await writeOptimizerSettings(hyperGroup, run.hyperparameters.optimizer);
     await writePreprocessSettings(hyperGroup, run.hyperparameters.preprocess);
 
@@ -545,8 +542,7 @@ const writeEvalResults = async (
   runGroup: Group,
   evalResults: NonNullable<Run["evalResults"]>,
 ) => {
-  const group = await runGroup.createGroup(ZARR_V2_GROUP.EvalResults);
-  await writeAttrs(group, {
+  const group = await createGroup(runGroup, ZARR_V2_GROUP.EvalResults, {
     [ZARR_V2_EVAL.Accuracy]: evalResults.accuracy,
     [ZARR_V2_EVAL.CrossEntropy]: evalResults.crossEntropy,
     [ZARR_V2_EVAL.Precision]: evalResults.precision,
