@@ -1,7 +1,8 @@
-import type { Kind } from "store/data/types";
-import { generateKind } from "store/data/utils";
+import { generateKind } from "core/entities";
 
 import COCO_CLASSES from "data/model-data/cocossd-classes";
+
+import type { Kind } from "core/entities";
 
 export const constructCocoKinds = () => {
   const cocoClasses = Object.values(COCO_CLASSES).map((cl) => cl.displayName);

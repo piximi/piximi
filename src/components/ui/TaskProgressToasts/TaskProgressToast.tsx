@@ -2,7 +2,6 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { useDispatch } from "react-redux";
 
-import type { Theme } from "@mui/material";
 import {
   Box,
   Button,
@@ -14,9 +13,12 @@ import {
 import { Remove as Rm } from "@mui/icons-material";
 
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
-import type { AppTask, AppTaskStatus } from "store/appTasks/types";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
 import { taskTypeDisplayLookup } from "store/appTasks/utils";
+
+import type { Theme } from "@mui/material";
+
+import type { AppTask, AppTaskStatus } from "store/appTasks/types";
 
 const AUTO_DISMISS_MS: Partial<Record<AppTaskStatus, number>> = {
   success: 3000,

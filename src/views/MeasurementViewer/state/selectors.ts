@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import { CHANNEL_MEASUREMENTS } from "store/data/types";
+import { CHANNEL_MEASUREMENTS } from "core/entities";
 
 import type {
   ImageMeasurementGroup,

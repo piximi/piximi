@@ -2,22 +2,24 @@ import { useCallback } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
+import { toInferenceInput } from "core/dl/utils";
+import { useClassifierApi } from "core/dl/classification";
+
 import { dataSlice } from "store/data";
 import { classifierSlice } from "store/classifier";
+import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
+import { useParameterizedSelector } from "store/hooks";
+import { selectKindClassifier } from "store/classifier/selectors";
+
+import { logger } from "utils/logUtils";
+import { representsUnknown } from "utils/stringUtils";
+
+import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import {
   selectActiveItems,
   selectActiveKnownCategories,
 } from "@ProjectViewer/state/reselectors";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
-import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
-import { useParameterizedSelector } from "store/hooks";
-import { selectKindClassifier } from "store/classifier/selectors";
-import { toInferenceInput } from "core/dl/utils";
-import { useClassifierApi } from "core/dl/classification";
-
-import { logger } from "utils/logUtils";
-import { representsUnknown } from "utils/stringUtils";
 
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 

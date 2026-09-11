@@ -11,11 +11,12 @@ import {
   styled,
   Tooltip,
 } from "@mui/material";
-import type { GridApiCommunity } from "@mui/x-data-grid/internals";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 import { useTableExport } from "@MeasurementViewer/hooks";
 import { selectActiveMeasurementGroup } from "@MeasurementViewer/state/selectors";
+
+import type { GridApiCommunity } from "@mui/x-data-grid/internals";
 
 const CustomMenuItem = styled(MenuItem)(() => ({
   minHeight: "1rem",

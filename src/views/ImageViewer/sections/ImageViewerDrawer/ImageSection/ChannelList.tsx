@@ -1,14 +1,15 @@
-import type React from "react";
-
 import { useSelector } from "react-redux";
 
 import { Box } from "@mui/material";
 
 import { useParameterizedSelector } from "store/hooks";
-import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
 import { selectActiveExtendedChannels } from "store/data/selectors";
 
+import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
+
 import { ChannelConfig } from "./ChannelConfig";
+
+import type React from "react";
 
 export const ChannelList = () => {
   const activeImageId = useSelector(selectActiveImageId);

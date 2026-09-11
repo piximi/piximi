@@ -8,6 +8,8 @@ import {
 import { getAttr, getDatasetSelection, getGroup } from "../../zarr/utils";
 import { initialClassifierStateV01_02 } from "./constants";
 
+import type { Group } from "zarr";
+
 import type {
   V01ClassifierEvaluationResultType,
   V01ClassifierState,
@@ -23,7 +25,6 @@ import type {
   V11ModelClassMap,
   V11ModelInfo,
 } from "./version-types/v11Types";
-import type { Group } from "zarr";
 // ============================================================
 // Color deserialization (raw arrays, no Tensor)
 // ============================================================

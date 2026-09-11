@@ -25,15 +25,16 @@ import { ExpandableDimensionChip } from "./ExpandableDimensionChip";
 import { SortableDimensionChip } from "./SortableDimensionChip";
 
 import type {
-  Dimension,
-  DimensionValue,
-  PivotItem,
-} from "@MeasurementViewer/types";
-import type {
   DragEndEvent,
   DragOverEvent,
   DragStartEvent,
 } from "@dnd-kit/core";
+
+import type {
+  Dimension,
+  DimensionValue,
+  PivotItem,
+} from "@MeasurementViewer/types";
 
 export const PivotConfigurator = () => {
   // Main dimensions always stay in available (they don't move)

@@ -4,23 +4,25 @@ import { useSelector } from "react-redux";
 
 import { ListItemText, Menu, MenuItem } from "@mui/material";
 
+import {
+  exportOptions,
+  runAnnotationExport,
+} from "core/file-io/export/runAnnotationExport";
+
 import { useDialogHotkey } from "hooks";
 
-import { ExportAnnotationsDialog } from "@ImageViewer/components/dialogs";
-import type { ExtendedImageObject } from "store/data/types";
 import {
   selectExtendedAnnotationsByImageId,
   selectImageEntities,
   selectKindEntities,
 } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import {
-  exportOptions,
-  runAnnotationExport,
-} from "core/file-io/export/runAnnotationExport";
 
 import { HotkeyContext } from "utils/enums";
 
+import { ExportAnnotationsDialog } from "@ImageViewer/components/dialogs";
+
+import type { ExtendedImageObject } from "core/entities";
 import type { AnnotationExportType } from "core/file-io/export/enums";
 import type { ExportedAnnotation } from "core/file-io/export/types";
 

@@ -1,4 +1,3 @@
-import type { ReactElement } from "react";
 import { Fragment, useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
@@ -32,12 +31,11 @@ import { SettingsButton } from "components/layout/app-drawer/application-setting
 import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/layout/app-drawer/HelpButton";
 
-import { selectActiveStateIsFiltered } from "@ProjectViewer/state/selectors";
-import { ItemFilters } from "@ProjectViewer/components/";
-
 import { DIMENSIONS } from "utils/constants";
 import { capitalize } from "utils/stringUtils";
-import type { HTMLDataAttributes } from "utils/types";
+
+import { ItemFilters } from "@ProjectViewer/components/";
+import { selectActiveStateIsFiltered } from "@ProjectViewer/state/selectors";
 
 import { ModelTaskSection } from "../ModelTaskSection";
 import {
@@ -47,6 +45,10 @@ import {
 } from "./tool-options";
 import { ProjectActions } from "../ProjectActions";
 import { ProjectViewerCategories } from "../ProjectViewerCategories";
+
+import type { ReactElement } from "react";
+
+import type { HTMLDataAttributes } from "utils/types";
 
 type OperationType = {
   icon: (color: string) => ReactElement;

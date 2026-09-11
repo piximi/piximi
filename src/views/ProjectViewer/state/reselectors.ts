@@ -1,13 +1,13 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { difference } from "lodash";
 
+import { CATEGORY_COLORS } from "core/entities";
+
 import {
   selectAllCategories,
   selectExtendedAnnotationsByKindId,
   selectExtendedImages,
 } from "store/data/selectors";
-import type { RootState } from "store/rootReducer";
-import { CATEGORY_COLORS } from "store/data/constants";
 
 import { representsUnknown } from "utils/stringUtils";
 
@@ -20,6 +20,8 @@ import {
 } from "./selectors";
 
 import type { Partition } from "core/dl/enums";
+
+import type { RootState } from "store/rootReducer";
 
 // --- Images ---
 

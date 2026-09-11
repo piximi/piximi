@@ -7,9 +7,9 @@ import {
 } from "@tensorflow/tfjs";
 import { isEqual } from "lodash";
 
-import type { Shape } from "store/data/types";
-
 import type { LayersModel, Sequential } from "@tensorflow/tfjs";
+
+import type { Shape } from "core/entities";
 
 const copyLayer = (
   fromModel: LayersModel,

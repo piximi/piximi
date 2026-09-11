@@ -1,12 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { difference } from "lodash";
 
-import { UNKNOWN_KIND_CATEGORY } from "store/data/constants";
-import type { FeatureKey } from "store/data/types";
+import { UNKNOWN_KIND_CATEGORY } from "core/entities";
 
 import { emptySelectionLayer } from "./utils";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
+
+import type { FeatureKey } from "core/entities";
+
 import type {
   CategoryNode,
   FilterLayer,

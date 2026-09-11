@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
-import type { ColorResult } from "react-color";
 import { ChromePicker } from "react-color";
 
 import {
@@ -37,6 +36,8 @@ import {
 import { ThemeMode } from "themes/enums";
 
 import { SettingsItem } from "./SettingsItem";
+
+import type { ColorResult } from "react-color";
 
 export const UISettings = () => {
   return (

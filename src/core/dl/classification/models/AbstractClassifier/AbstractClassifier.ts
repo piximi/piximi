@@ -8,10 +8,6 @@ import {
   concat,
 } from "@tensorflow/tfjs";
 
-import type { Category } from "store/data/types";
-
-import type { RequireOnly } from "utils/types";
-
 import { preprocessData } from "./preprocess";
 import { Model } from "../../../Model";
 import {
@@ -19,6 +15,20 @@ import {
   evaluateConfusionMatrix,
   getLayersModelSummary,
 } from "../../utils";
+
+import type {
+  GraphModel,
+  LayersModel,
+  Tensor,
+  Tensor1D,
+  Tensor2D,
+  Tensor4D,
+  data as tfdata,
+} from "@tensorflow/tfjs";
+
+import type { Category } from "core/entities";
+
+import type { RequireOnly } from "utils/types";
 
 import type {
   EvaluationResult,
@@ -30,15 +40,6 @@ import type {
   TrainingResults,
 } from "../../types";
 import type { InferenceInput, TrainingInput } from "../../../types";
-import type {
-  GraphModel,
-  LayersModel,
-  Tensor,
-  Tensor1D,
-  Tensor2D,
-  Tensor4D,
-  data as tfdata,
-} from "@tensorflow/tfjs";
 
 const isLayersModel = (
   model: LayersModel | GraphModel,

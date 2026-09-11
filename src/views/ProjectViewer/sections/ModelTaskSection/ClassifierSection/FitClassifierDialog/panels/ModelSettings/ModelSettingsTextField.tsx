@@ -1,5 +1,6 @@
-import type { TextFieldWithBlurProps } from "components/inputs/TextFieldWithBlur";
 import { TextFieldWithBlur } from "components/inputs";
+
+import type { TextFieldWithBlurProps } from "components/inputs/TextFieldWithBlur";
 
 export const ModelSettingsTextField = (props: TextFieldWithBlurProps) => {
   return (

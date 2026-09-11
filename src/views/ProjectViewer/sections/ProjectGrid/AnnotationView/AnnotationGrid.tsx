@@ -4,10 +4,11 @@ import { useDispatch } from "react-redux";
 
 import { usePreloadSrcs } from "hooks";
 
-import { useAnnotationSort } from "@ProjectViewer/hooks";
-import { projectSlice } from "@ProjectViewer/state";
 import { selectExtendedAnnotationsByKindId } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
+
+import { useAnnotationSort } from "@ProjectViewer/hooks";
+import { projectSlice } from "@ProjectViewer/state";
 import { isFiltered } from "@ProjectViewer/state/filtering";
 
 import { AnnotationGridItem } from "./AnnotationGridItem";

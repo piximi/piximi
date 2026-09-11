@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { ExtendedAnnotationObject, Shape } from "store/data/types";
+import type { ExtendedAnnotationObject, Shape } from "core/entities";
 
 export type ExportedAnnotation = ExtendedAnnotationObject & {
   kindName: string;

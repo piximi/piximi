@@ -1,4 +1,4 @@
-import type { FeatureKey } from "store/data/types";
+import type { FeatureKey } from "core/entities";
 
 export type ImageViewerDataState = {
   imageStack: string[];

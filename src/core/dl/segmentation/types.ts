@@ -1,4 +1,4 @@
-import type { AnnotationObject } from "store/data/types";
+import type { AnnotationObject } from "core/entities";
 
 import type { LoadCB } from "utils/types";
 

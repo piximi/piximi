@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 
 import { ConfirmationDialog } from "components/dialogs";
 
+import { dataSlice } from "store/data";
+
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
+
 import { useSavedDataState } from "@ImageViewer/contexts/DataProvider";
-import { dataSlice } from "store/data";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
 type ExitAnnotatorDialogProps = {

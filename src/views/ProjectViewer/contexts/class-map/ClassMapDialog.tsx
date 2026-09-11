@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import type { SelectChangeEvent } from "@mui/material";
 import {
   Button,
   Checkbox,
@@ -18,19 +17,22 @@ import {
   Typography,
 } from "@mui/material";
 
+import { generateCategory, CATEGORY_COLORS } from "core/entities";
+
 import { StyledSelect } from "components/inputs";
 
-import type { Category } from "store/data/types";
-import { generateCategory } from "store/data/utils";
-import { CATEGORY_COLORS } from "store/data/constants";
 import { dataSlice } from "store/data";
-import { selectAvaliableCategoryColors } from "@ProjectViewer/state/reselectors";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
 import { getRandomInt } from "utils/dataUtils";
 import { isObjectEmpty } from "utils/objectUtils";
 
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { selectAvaliableCategoryColors } from "@ProjectViewer/state/reselectors";
+
+import type { SelectChangeEvent } from "@mui/material";
+
+import type { Category } from "core/entities";
 import type { ModelClassMap } from "core/dl/classification/types";
 
 export const ClassMapDialog = ({

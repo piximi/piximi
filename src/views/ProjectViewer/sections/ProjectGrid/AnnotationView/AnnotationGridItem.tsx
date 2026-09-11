@@ -2,18 +2,20 @@ import { memo } from "react";
 
 import { Box, Typography } from "@mui/material";
 
+import { Partition } from "core/dl/enums";
+
 import { useRenderedSrc } from "hooks";
 
-import type { Category, ExtendedAnnotationObject } from "store/data/types";
-import { selectCategoryById } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { Partition } from "core/dl/enums";
+import { selectCategoryById } from "store/data/selectors";
 
 import { representsUnknown } from "utils/stringUtils";
 
 import { altTextStyle, getIconPosition, imageStyle } from "../gridItemUtils";
 import { useGridItemStyle } from "../useGridItemStyle";
 import { ItemOverlay } from "../ItemOverlay";
+
+import type { Category, ExtendedAnnotationObject } from "core/entities";
 
 type AnnotationGridItemProps = {
   selected: boolean;

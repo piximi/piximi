@@ -2,11 +2,12 @@ import { createSlice } from "@reduxjs/toolkit";
 
 import { ZoomMode } from "views/ImageViewer/utils/enums";
 
+import type { PayloadAction } from "@reduxjs/toolkit";
+
 import type {
   ZoomToolOptionsType,
   ImageViewerState,
 } from "views/ImageViewer/utils/types";
-import type { PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: ImageViewerState = {
   stagePosition: { x: 0, y: 0 },

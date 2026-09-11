@@ -2,6 +2,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
+
 import type { AppTask, AppTasksState, AppTaskStatus } from "./types";
 
 const initialState: AppTasksState = { tasks: {} };

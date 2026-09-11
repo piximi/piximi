@@ -9,7 +9,12 @@ import {
 } from "./common";
 import { subProgress } from "../progress";
 
+import type { EntityState } from "@reduxjs/toolkit";
+import type { RawArray } from "zarr/types/rawArray";
+import type { Group } from "zarr";
+
 import type { Partition } from "core/dl/enums";
+
 import type { CustomStore } from "../../zarr/stores";
 import type {
   V11BitDepth,
@@ -19,9 +24,6 @@ import type {
   V11RawAnnotationObject,
   V11RawImageObject,
 } from "./version-types/v11Types";
-import type { EntityState } from "@reduxjs/toolkit";
-import type { RawArray } from "zarr/types/rawArray";
-import type { Group } from "zarr";
 import type { RawData } from "../types";
 
 const STAGES = {

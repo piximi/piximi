@@ -1,6 +1,6 @@
 import { openGroup } from "zarr";
 
-import { UNKNOWN_IMAGE_CATEGORY_ID } from "store/data/constants";
+import { UNKNOWN_IMAGE_CATEGORY_ID } from "core/entities";
 import { Partition } from "core/dl/enums";
 
 import {
@@ -20,6 +20,9 @@ import {
 } from "./common";
 import { subProgress } from "../progress";
 
+import type { RawArray } from "zarr/types/rawArray";
+import type { Group } from "zarr";
+
 import type { CustomStore } from "../../zarr/stores";
 import type {
   V01BitDepth,
@@ -28,8 +31,6 @@ import type {
   V01RawImageObject,
   V01PiximiState,
 } from "./version-types/v01Types";
-import type { RawArray } from "zarr/types/rawArray";
-import type { Group } from "zarr";
 
 const STAGES = {
   metadata: { start: 0.0, end: 0.05 },

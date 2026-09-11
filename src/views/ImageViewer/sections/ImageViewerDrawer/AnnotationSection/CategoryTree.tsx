@@ -26,23 +26,26 @@ import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import GestureIcon from "@mui/icons-material/Gesture";
 import { Label as CategoryIcon } from "@mui/icons-material";
 
+import { generateCategory, generateKind } from "core/entities";
+
 import { useDialogHotkey } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs";
 
-import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
-import { generateCategory, generateKind } from "store/data/utils";
 import { dataSlice } from "store/data";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
 import { representsUnknown } from "utils/stringUtils";
 import { getCategoryIconStyle } from "utils/styleUtils";
 import { HotkeyContext } from "utils/enums";
 
+import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+
 import { TaxonomyDialog } from "./TaxonomyDialogForm";
 import { useCriterionToggles } from "./useCriterionToggles";
 
 import type { CategoryNode } from "@ImageViewer/state/types";
+
 import type { EntityType, KindNode, TaxonomyDialogRequest } from "./types";
 
 const CountChip = ({ n }: { n: number }) => (

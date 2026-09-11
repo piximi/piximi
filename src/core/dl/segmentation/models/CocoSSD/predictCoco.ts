@@ -9,14 +9,15 @@ import {
   setBackend,
 } from "@tensorflow/tfjs";
 
-import { generateUUID } from "store/data/utils";
+import { generateUUID } from "core/entities";
 
 import { rleEncodeArray } from "utils/image";
 
 import { Partition } from "../../../enums";
 
-import type { PredictedAnnotationObject } from "../../types";
 import type { Tensor, Rank, GraphModel, Tensor4D } from "@tensorflow/tfjs";
+
+import type { PredictedAnnotationObject } from "../../types";
 
 export const predictCoco = async (
   model: GraphModel,

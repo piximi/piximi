@@ -2,16 +2,17 @@ import { memo } from "react";
 
 import { Box, Typography } from "@mui/material";
 
-import { useRenderedSrc } from "hooks";
-
-import type { ExtendedImageObject } from "store/data/types";
 import { Partition } from "core/dl/enums";
+
+import { useRenderedSrc } from "hooks";
 
 import { representsUnknown } from "utils/stringUtils";
 
 import { altTextStyle, getIconPosition, imageStyle } from "../gridItemUtils";
 import { useGridItemStyle } from "../useGridItemStyle";
 import { ItemOverlay } from "../ItemOverlay";
+
+import type { ExtendedImageObject } from "core/entities";
 
 type ImageGridItemProps = {
   selected: boolean;

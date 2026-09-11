@@ -1,7 +1,8 @@
+import { Select, useTheme } from "@mui/material";
+
 import type { CSSProperties } from "react";
 
 import type { SelectProps } from "@mui/material";
-import { Select, useTheme } from "@mui/material";
 
 export type StyledSelectProps = SelectProps &
   Partial<Pick<CSSProperties, "fontSize">>;

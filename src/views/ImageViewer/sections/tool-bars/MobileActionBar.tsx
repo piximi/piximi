@@ -1,6 +1,5 @@
 import { Fragment, useMemo, useState, type MouseEvent } from "react";
 
-import type { PopperProps } from "@mui/material";
 import {
   Box,
   IconButton,
@@ -25,13 +24,16 @@ import { SettingsButton } from "components/layout/app-drawer/application-setting
 import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/layout/app-drawer/HelpButton";
 
-import type { HTMLDataAttributes } from "utils/types";
 import { capitalize } from "utils/stringUtils";
 import { DIMENSIONS } from "utils/constants";
 
 import { ImageList } from "../ImageViewerDrawer/ImageSection";
 import { MobileCategoriesPanel } from "../ImageViewerDrawer/AnnotationSection/MobileCategoriesPanel";
 import { MobileExportPanel } from "../ImageViewerDrawer/AnnotationSection/MobileExportPanel";
+
+import type { PopperProps } from "@mui/material";
+
+import type { HTMLDataAttributes } from "utils/types";
 
 import type { OperationType } from "views/ImageViewer/utils/types";
 

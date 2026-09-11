@@ -1,4 +1,4 @@
-import type { Shape, BBox, ExtendedChannel } from "store/data/types";
+import type { Shape, BBox, ExtendedChannel } from "core/entities";
 
 import type { CropSchema, Partition } from "./enums";
 

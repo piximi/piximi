@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-
 import { Chip, Tooltip, useMediaQuery, useTheme } from "@mui/material";
 import { ArrowForward as ForwardIcon } from "@mui/icons-material";
+
+import type { ReactNode } from "react";
 
 import type { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 

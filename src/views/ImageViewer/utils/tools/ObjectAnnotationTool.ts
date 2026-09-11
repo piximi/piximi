@@ -8,12 +8,12 @@ import {
 } from "@tensorflow/tfjs";
 import { fromMask, Image as IJSImage, writeCanvas } from "image-js-latest";
 
-import type { Point } from "utils/types";
-
 import { RectangularAnnotationTool } from "./RectangularAnnotationTool";
 import { AnnotationState } from "../enums";
 
 import type { LayersModel, Tensor, Tensor3D, Rank } from "@tensorflow/tfjs";
+
+import type { Point } from "utils/types";
 
 export class ObjectAnnotationTool extends RectangularAnnotationTool {
   graph?: LayersModel;

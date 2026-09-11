@@ -1,20 +1,22 @@
 import { useMemo, useState } from "react";
 
-import type { SelectChangeEvent } from "@mui/material";
 import { Tooltip, MenuItem, Stack } from "@mui/material";
+
+import { CropSchema } from "core/dl/enums";
 
 import { useNumberField } from "hooks";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { WithLabel, StyledSelect } from "components/inputs";
 
-import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import { CropSchema } from "core/dl/enums";
-
 import { enumKeys } from "utils/objectUtils";
+
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 
 import { ModelSettingsTextField } from "../../../ModelSettingsTextField";
 import { isFieldLocked, lockReason } from "../../settingsLock";
+
+import type { SelectChangeEvent } from "@mui/material";
 
 import type { CropOptions } from "core/dl/types";
 

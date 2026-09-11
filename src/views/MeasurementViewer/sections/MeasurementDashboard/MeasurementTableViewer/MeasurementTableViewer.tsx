@@ -1,10 +1,11 @@
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import { Box } from "@mui/material";
-import type { GridApiCommunity } from "@mui/x-data-grid/internals";
 
 import { SplitOptions } from "./pivot-table/SplitOptions";
 import { PivotTable } from "./pivot-table/PivotTable";
+
+import type { GridApiCommunity } from "@mui/x-data-grid/internals";
 
 export const MeasurementTableViewer = ({
   gridApiRef,

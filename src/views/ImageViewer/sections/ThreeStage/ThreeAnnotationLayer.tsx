@@ -2,14 +2,14 @@ import { useCallback, useState } from "react";
 
 import { useAnnotationTool, useAnnotationState } from "views/ImageViewer/hooks";
 
-import type { Point } from "utils/types";
-
 import { useThreeViewport } from "./ThreeViewportContext";
 import { useThreeAnnotationHandlers } from "./useThreeAnnotationHandlers";
 import { useThreeAnnotationMeshes } from "./useThreeAnnotationMeshes";
 import { AnnotationSvgOverlay } from "./AnnotationSvgOverlay";
 
 import type { Image as IJSImage } from "image-js-latest";
+
+import type { Point } from "utils/types";
 
 /**
  * The annotation layer for the ThreeStage. Rendered under ThreeViewportProvider

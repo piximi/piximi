@@ -5,12 +5,14 @@ import {
   MODEL_WEIGHTS_FILENAME,
 } from "core/file-io/consts";
 
-import type { LoadCB } from "utils/types";
+import type { GraphModel } from "@tensorflow/tfjs";
 
 import type { InferenceInput } from "core/dl/types";
 import type { Token } from "core/dl/cancel";
+
+import type { LoadCB } from "utils/types";
+
 import type { ModelName, SegmentationResults } from "../../types";
-import type { GraphModel } from "@tensorflow/tfjs";
 
 type ModelArgs = {
   name: ModelName;

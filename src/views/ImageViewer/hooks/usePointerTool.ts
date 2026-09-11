@@ -2,13 +2,15 @@ import { useCallback, useMemo, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
+import { getOverlappingAnnotations, getAnnotationsInBox } from "utils/image";
+
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { ToolType } from "views/ImageViewer/utils/enums";
+
 import {
   selectAllActiveAnnotations,
   selectSelectedAnnotations,
 } from "@ImageViewer/state/image-viewer-data/reselectors";
-import type { ExtendedAnnotationObject } from "store/data/types";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
 import {
@@ -16,7 +18,8 @@ import {
   selectOverlapCandidateIds,
 } from "@ImageViewer/state/operations/reselectors";
 
-import { getOverlappingAnnotations, getAnnotationsInBox } from "utils/image";
+import type { ExtendedAnnotationObject } from "core/entities";
+
 import type { Point } from "utils/types";
 
 const delta = 10;

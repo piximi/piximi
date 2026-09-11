@@ -1,11 +1,12 @@
-import type React from "react";
-
 import { useDispatch } from "react-redux";
 
 import { Box, Button, TextField, Typography } from "@mui/material";
 
-import type { BitDepth } from "store/data/types";
 import { dataSlice } from "store/data";
+
+import type React from "react";
+
+import type { BitDepth } from "core/entities";
 
 export const PlotOptions = ({
   channelMetaId,

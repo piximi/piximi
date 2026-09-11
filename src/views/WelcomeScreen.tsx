@@ -2,7 +2,6 @@ import { useMemo } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import type { Palette } from "@mui/material";
 import {
   Box,
   Button,
@@ -30,6 +29,8 @@ import { CollapsibleList, Logo } from "components/ui";
 import { ExampleProjectDialog } from "components/dialogs";
 
 import { HotkeyContext } from "utils/enums";
+
+import type { Palette } from "@mui/material";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",

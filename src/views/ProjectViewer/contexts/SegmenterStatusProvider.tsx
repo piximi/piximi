@@ -1,4 +1,3 @@
-import type React from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
@@ -7,10 +6,12 @@ import {
   selectChannelMetaEntities,
   selectExtendedImages,
 } from "store/data/selectors";
-import type { ChannelMetaEntities } from "store/data/types";
 
 import { arrayRange } from "utils/arrayUtils";
 
+import type React from "react";
+
+import type { ChannelMetaEntities } from "core/entities";
 import type {
   SegmentaionModelDetails,
   SegmentationState,

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
-import type { BitDepth, ExtendedChannel } from "store/data/types";
 import { DataConnector } from "core/data-connector";
+
+import type { BitDepth, ExtendedChannel } from "core/entities";
 
 /**
  * Returns the raw channel data for a given entity.

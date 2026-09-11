@@ -2,34 +2,37 @@ import { useCallback } from "react";
 
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import { selectAllKinds, selectExtendedImages } from "store/data/selectors";
-import { selectSelectedImages } from "@ProjectViewer/state/reselectors";
+import { generateKind, generateUUID } from "core/entities";
+import { useSegmenterApi } from "core/dl/segmentation";
+import { toInferenceInput } from "core/dl/utils";
+import { CancelSource } from "core/dl/cancel";
+
 import { applicationSettingsSlice } from "store/applicationSettings";
+import { dataSlice } from "store/data";
+import { appTasksSlice } from "store/appTasks/appTasksSlice";
+import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+import { selectAllKinds, selectExtendedImages } from "store/data/selectors";
+
+import { getStackTraceFromError } from "utils/logUtils";
+import { AlertType } from "utils/enums";
+
+import { selectSelectedImages } from "@ProjectViewer/state/reselectors";
+
+import { useSegmenterStatus } from "../contexts/SegmenterStatusProvider";
+
 import type {
   AnnotationCategory,
   AnnotationObject,
   AnnotationVolume,
   Kind,
   Shape,
-} from "store/data/types";
-import { dataSlice } from "store/data";
-import { generateKind, generateUUID } from "store/data/utils";
-import { appTasksSlice } from "store/appTasks/appTasksSlice";
-import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
-import { useSegmenterApi } from "core/dl/segmentation";
-import { toInferenceInput } from "core/dl/utils";
-import { CancelSource } from "core/dl/cancel";
-
-import { getStackTraceFromError } from "utils/logUtils";
-import { AlertType } from "utils/enums";
-import type { AlertState, LoadCB } from "utils/types";
-
-import { useSegmenterStatus } from "../contexts/SegmenterStatusProvider";
-
+} from "core/entities";
 import type {
   PredictedAnnotationObject,
   SegmentaionModelDetails,
 } from "core/dl/segmentation/types";
+
+import type { AlertState, LoadCB } from "utils/types";
 
 export const usePredictSegmenter = () => {
   const dispatch = useDispatch();

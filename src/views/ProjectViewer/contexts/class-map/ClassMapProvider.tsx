@@ -1,11 +1,11 @@
 import { useState } from "react";
-import type { ReactElement } from "react";
-
-import type { Category } from "store/data/types";
 
 import { ClassMapDialogContext } from "./ClassMapContext";
 import { ClassMapDialog } from "./ClassMapDialog";
 
+import type { ReactElement } from "react";
+
+import type { Category } from "core/entities";
 import type { ModelClassMap } from "core/dl/classification/types";
 
 export const ClassMapDialogProvider = ({

@@ -2,13 +2,10 @@ import { useMemo } from "react";
 
 import { useSelector } from "react-redux";
 
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import type {
-  ExtendedAnnotationObject,
-  ExtendedImageObject,
-} from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";
 import { selectActiveSoftmaxById } from "store/classifier/selectors";
+
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import {
   ANNOTATION_SORT_CASES,
   generateSeed,
@@ -16,6 +13,11 @@ import {
   marginOf,
   noopSort,
 } from "@ProjectViewer/state/sortConfig";
+
+import type {
+  ExtendedAnnotationObject,
+  ExtendedImageObject,
+} from "core/entities";
 
 import type {
   AnnotationSortType,

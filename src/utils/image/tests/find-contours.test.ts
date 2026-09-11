@@ -1,8 +1,8 @@
 import { test, expect } from "vitest";
 
-import type { Point } from "utils/types";
-
 import { padMask, findContours } from "..";
+
+import type { Point } from "utils/types";
 
 const p = (y: number, x: number) => ({ y, x });
 

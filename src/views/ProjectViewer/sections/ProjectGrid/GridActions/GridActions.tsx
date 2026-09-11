@@ -12,11 +12,11 @@ import { useDialogHotkey, useHotkeys, useMobileView } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs";
 
-import { TooltipButton, TooltipTitle } from "@ProjectViewer/components";
-import { useGridActions } from "@ProjectViewer/hooks";
-
 import { HotkeyContext } from "utils/enums";
 import { pluralize } from "utils/stringUtils";
+
+import { TooltipButton, TooltipTitle } from "@ProjectViewer/components";
+import { useGridActions } from "@ProjectViewer/hooks";
 
 import { ZoomControl } from "./ZoomControl";
 import { CategorizeChip } from "./CategorizeChip";

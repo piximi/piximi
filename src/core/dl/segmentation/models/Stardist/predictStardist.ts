@@ -8,9 +8,8 @@ import {
   getBackend,
 } from "@tensorflow/tfjs";
 
-import { generateUUID } from "store/data/utils";
+import { generateUUID } from "core/entities";
 
-import type { Point } from "utils/types";
 import {
   connectPoints,
   rleEncodeArray,
@@ -20,8 +19,11 @@ import {
 
 import { Partition } from "../../../enums";
 
-import type { PredictedAnnotationObject } from "../../types";
 import type { Tensor4D, GraphModel } from "@tensorflow/tfjs";
+
+import type { Point } from "utils/types";
+
+import type { PredictedAnnotationObject } from "../../types";
 
 const computeAnnotationMaskFromPoints = (
   cropDims: { x: number; y: number; width: number; height: number },

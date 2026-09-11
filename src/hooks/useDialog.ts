@@ -5,8 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectAlertState } from "store/applicationSettings/selectors";
 
-import type { HotkeyContext } from "utils/enums";
 import { AlertType } from "utils/enums";
+
+import type { HotkeyContext } from "utils/enums";
 
 export const useDialog = (closeOnError: boolean = true) => {
   const [open, setOpen] = useState(false);

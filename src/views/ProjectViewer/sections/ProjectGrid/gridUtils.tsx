@@ -1,9 +1,10 @@
 import { memo } from "react";
 
-import type { GridChildComponentProps } from "react-window";
 import { areEqual } from "react-window";
 
 import memoize from "memoize-one";
+
+import type { GridChildComponentProps } from "react-window";
 
 type SelectHandler = (id: string, selected: boolean) => void;
 

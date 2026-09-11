@@ -1,10 +1,11 @@
-import type { CSSProperties } from "react";
 import { useMemo, useRef, useState } from "react";
 
 import { Box, Divider, IconButton, Slider } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 
 import { DIMENSIONS } from "utils/constants";
+
+import type { CSSProperties } from "react";
 
 type IncrementalSliderProps = {
   min: number;

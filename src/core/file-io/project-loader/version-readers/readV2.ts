@@ -1,14 +1,5 @@
 import { openGroup } from "zarr";
 
-import type { ClassifierState, KindClassifier } from "store/classifier/types";
-import type {
-  BitDepth,
-  ColorMap,
-  DType,
-  PredictionCorrection,
-  Shape,
-} from "store/data/types";
-
 import { getAttr, getDataset, getGroup } from "../../zarr/utils";
 import {
   ZARR_V2_ANNOTATION,
@@ -36,6 +27,11 @@ import {
 } from "../../zarr/types";
 import { subProgress } from "../progress";
 
+import type { EntityState } from "@reduxjs/toolkit";
+import type { Group } from "zarr";
+import type { RawArray } from "zarr/types/rawArray";
+
+import type { Partition } from "core/dl/enums";
 import type {
   ModelArch,
   ModelClassMap,
@@ -48,8 +44,16 @@ import type {
   RunStatus,
   RunTrigger,
 } from "core/dl/classification/types";
-import type { Partition } from "core/dl/enums";
-import type { CustomStore } from "../../zarr/stores";
+import type {
+  BitDepth,
+  ColorMap,
+  DType,
+  PredictionCorrection,
+  Shape,
+} from "core/entities";
+
+import type { ClassifierState, KindClassifier } from "store/classifier/types";
+
 import type {
   V2AnnotationObject,
   V2AnnotationVolume,
@@ -62,9 +66,7 @@ import type {
   V2PiximiState,
   V2Plane,
 } from "./version-types/v2Types";
-import type { EntityState } from "@reduxjs/toolkit";
-import type { Group } from "zarr";
-import type { RawArray } from "zarr/types/rawArray";
+import type { CustomStore } from "../../zarr/stores";
 
 /**
  * Read a v2 project file.

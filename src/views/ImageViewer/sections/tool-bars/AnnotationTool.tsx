@@ -1,11 +1,12 @@
-import type { ReactElement } from "react";
-import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import { Box, IconButton, Tooltip } from "@mui/material";
 import { KeyboardArrowLeft } from "@mui/icons-material";
 
 import { ToolHotkeyTitle } from "components/ui";
+
+import type React from "react";
+import type { ReactElement } from "react";
 
 import type { HTMLDataAttributes } from "utils/types";
 

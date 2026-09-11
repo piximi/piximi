@@ -1,19 +1,24 @@
-import type React from "react";
 import { useMemo } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
 import { Box, capitalize } from "@mui/material";
 
-import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";
-import { measurementsSlice } from "@MeasurementViewer/state";
-import { toChannelMeasurementLabel } from "@MeasurementViewer/utils";
-import { getCustomTreeItem } from "@MeasurementViewer/components/CustomTreeItem";
-import { INTENSE_MEAS_LOOKUP } from "store/data/utils";
-import { CHANNEL_MEASUREMENTS } from "store/data/types";
+import { CHANNEL_MEASUREMENTS } from "core/entities";
+
 import { selectAllChannelMetas } from "store/data/selectors";
 
 import { getDifferences } from "utils/arrayUtils";
+
+import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";
+import { measurementsSlice } from "@MeasurementViewer/state";
+import {
+  INTENSE_MEAS_LOOKUP,
+  toChannelMeasurementLabel,
+} from "@MeasurementViewer/utils";
+import { getCustomTreeItem } from "@MeasurementViewer/components/CustomTreeItem";
+
+import type React from "react";
 
 import type { CustomTreeViewBaseItem } from "@MeasurementViewer/components/CustomTreeItem";
 import type {

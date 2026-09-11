@@ -4,20 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { version_core } from "@tensorflow/tfjs";
 
-import { classifierSlice } from "store/classifier";
-import {
-  selectActiveItems,
-  selectActiveKnownCategories,
-} from "@ProjectViewer/state/reselectors";
-import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
-import { dataSlice } from "store/data";
-import type { KindClassifier } from "store/classifier/types";
-import { useParameterizedSelector } from "store/hooks";
-import { selectKindClassifier } from "store/classifier/selectors";
-import { generateUUID } from "store/data/utils";
-import { diffCompileSettings } from "@ProjectViewer/sections/ModelTaskSection/ClassifierSection/FitClassifierDialog/panels/ModelSettings/HyperparameterSettings/settingsLock";
+import { generateUUID } from "core/entities";
 import { Partition } from "core/dl/enums";
 import {
   applySplitAndShuffle,
@@ -27,6 +14,20 @@ import {
 } from "core/dl/classification/utils";
 import { toTrainingInput } from "core/dl/utils";
 import { useClassifierApi } from "core/dl/classification";
+
+import { selectKindClassifier } from "store/classifier/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import { dataSlice } from "store/data";
+import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
+import { classifierSlice } from "store/classifier";
+
+import { diffCompileSettings } from "@ProjectViewer/sections/ModelTaskSection/ClassifierSection/FitClassifierDialog/panels/ModelSettings/HyperparameterSettings/settingsLock";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
+import {
+  selectActiveItems,
+  selectActiveKnownCategories,
+} from "@ProjectViewer/state/reselectors";
 
 import { useClassifierStatus } from "../contexts/ClassifierStatusProvider";
 import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
@@ -41,6 +42,8 @@ import type {
   ModelInfoDTO,
 } from "core/dl/classification/types";
 import type { TrainingInput } from "core/dl/types";
+
+import type { KindClassifier } from "store/classifier/types";
 
 const buildStoreUpdates = ({
   toTrainingPartition,

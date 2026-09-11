@@ -5,15 +5,17 @@ import { useSelector } from "react-redux";
 import * as THREE from "three";
 import { Image as IJSImage } from "image-js-latest";
 
-import { useActiveImage } from "@ImageViewer/contexts/ActiveImageProvider";
-import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
 import { selectActiveExtendedChannels } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import type { BitDepth, ExtendedChannel } from "store/data/types";
+
+import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
+import { useActiveImage } from "@ImageViewer/contexts/ActiveImageProvider";
 
 import compositeFrag from "./shaders/composite.frag?raw";
 import compositeThreeVert from "./shaders/composite-three.vert?raw";
 import { useThreeViewport } from "./ThreeViewportContext";
+
+import type { BitDepth, ExtendedChannel } from "core/entities";
 
 const MAX_CHANNELS = 16;
 

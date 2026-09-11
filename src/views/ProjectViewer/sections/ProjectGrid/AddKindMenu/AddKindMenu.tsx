@@ -4,14 +4,16 @@ import { Menu, MenuItem, Typography } from "@mui/material";
 
 import { useDialogHotkey, useMobileView } from "hooks";
 
+import { selectKindIds } from "store/data/selectors";
+import { dataSlice } from "store/data";
+
+import { HotkeyContext } from "utils/enums";
+
 import { CreateKindDialog } from "@ProjectViewer/components/dialogs";
 import { projectSlice } from "@ProjectViewer/state";
 import { selectActiveKindId } from "@ProjectViewer/state/selectors";
-import { selectKindIds } from "store/data/selectors";
-import { dataSlice } from "store/data";
-import type { AnnotationCategory, Kind } from "store/data/types";
 
-import { HotkeyContext } from "utils/enums";
+import type { AnnotationCategory, Kind } from "core/entities";
 
 export const AddKindMenu = ({
   anchor,

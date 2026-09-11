@@ -7,12 +7,14 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import type { ExtendedImageObject } from "store/data/types";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { selectAnnotationsByImageId } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+
 import { ExportAnnotationsMenu } from "../../../components";
+
+import type { ExtendedImageObject } from "core/entities";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;

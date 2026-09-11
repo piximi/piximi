@@ -9,12 +9,13 @@ import { useMenu, useMobileView } from "hooks";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
-import { projectSlice } from "@ProjectViewer/state/projectSlice";
 import { dataSlice } from "store/data";
-import { selectAnnotationGridState } from "@ProjectViewer/state/selectors";
 
 import { DIMENSIONS } from "utils/constants";
 import { findAdjacentItem } from "utils/arrayUtils";
+
+import { selectAnnotationGridState } from "@ProjectViewer/state/selectors";
+import { projectSlice } from "@ProjectViewer/state/projectSlice";
 
 import { AddKindMenu } from "../AddKindMenu";
 import { KindTab } from "./KindTab";

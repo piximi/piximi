@@ -1,25 +1,24 @@
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 
-import { generateUUID } from "store/data/utils";
-import { Partition } from "core/dl/enums";
-
-import type { AtLeastOne } from "utils/types";
-import { representsUnknown } from "utils/stringUtils";
-
 import {
+  generateUUID,
   UNKNOWN_IMAGE_CATEGORY_ID,
   UNKNOWN_KIND,
   UNKNOWN_KIND_CATEGORY,
   UNKNOWN_KIND_CATEGORY_ID,
   UNKNOWN_KIND_ID,
   UNKNOWN_IMAGE_CATEGORY,
-} from "./constants";
+} from "core/entities";
+import { Partition } from "core/dl/enums";
+
+import { representsUnknown } from "utils/stringUtils";
+
+import type { PayloadAction } from "@reduxjs/toolkit";
 
 import type {
   AnnotationCategory,
   BBox,
   ChannelMeta,
-  DataStateV2,
   Channel,
   Experiment,
   FeatureKey,
@@ -30,11 +29,13 @@ import type {
   Category,
   AnnotationObject,
   AnnotationVolume,
-  ItemCategoryUpdate,
   PredictionCorrection,
   ChannelMeasurement,
-} from "./types";
-import type { PayloadAction } from "@reduxjs/toolkit";
+} from "core/entities";
+
+import type { AtLeastOne } from "utils/types";
+
+import type { DataStateV2, ItemCategoryUpdate } from "./types";
 
 export const imageSeriesAdapter = createEntityAdapter<ImageSeries>();
 export const imageAdapter = createEntityAdapter<ImageObject>();

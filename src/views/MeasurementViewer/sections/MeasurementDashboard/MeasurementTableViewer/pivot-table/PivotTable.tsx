@@ -3,18 +3,17 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 import { Box } from "@mui/material";
-import type { GridColumnGroup } from "@mui/x-data-grid";
 import { DataGrid } from "@mui/x-data-grid";
-import type { GridApiCommunity } from "@mui/x-data-grid/internals";
+
+import { CHANNEL_MEASUREMENTS } from "core/entities";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
+import { selectCategoryEntities } from "store/data/selectors";
 
 import { selectActivePivotItems } from "@MeasurementViewer/state/selectors";
 import { selectActiveMeasuredEntitiesGroup } from "@MeasurementViewer/state/reselectors";
 import { parseChannelMeasurementLabel } from "@MeasurementViewer/utils";
-import { selectCategoryEntities } from "store/data/selectors";
-import type { FeatureKey } from "store/data/types";
-import { CHANNEL_MEASUREMENTS } from "store/data/types";
 
 import {
   generatePivotColumns,
@@ -22,10 +21,16 @@ import {
   generateUniqueCompositeKeys,
 } from "./pivotUtils";
 
+import type { GridColumnGroup } from "@mui/x-data-grid";
+import type { GridApiCommunity } from "@mui/x-data-grid/internals";
+
+import type { FeatureKey } from "core/entities";
+
 import type {
   ImageEntityMeasurementGroup,
   ObjectEntityMeasurementGroup,
 } from "@MeasurementViewer/types";
+
 import type { EntityWithMeasurements, MeasurementGetter } from "./pivotUtils";
 
 /**

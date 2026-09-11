@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { reconcileChannelMetas } from "./utils";
+import { reconcileChannelMetas } from "./fileInputUtils";
 
-import type { Channel, ChannelMeta } from "./types";
+import type { Channel, ChannelMeta } from "../../entities/channel";
 
 const meta = (
   id: string,

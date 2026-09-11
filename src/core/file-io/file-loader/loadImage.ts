@@ -1,5 +1,3 @@
-import type { CancelToken } from "utils/workers/types";
-
 import { getReader } from "./readers";
 import {
   applyDimensionsToStack,
@@ -7,6 +5,9 @@ import {
 } from "./imageReaderUtils";
 
 import type { BitDepth } from "image-js-latest";
+
+import type { CancelToken } from "utils/workers/types";
+
 import type {
   ImportImageInput,
   LoadAndPrepareOutput,

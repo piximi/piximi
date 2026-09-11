@@ -6,9 +6,9 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { ExpandIcon } from "components/ui";
 
-import type { FeatureKey } from "store/data/types";
-
 import { useCriterionToggles } from "./useCriterionToggles";
+
+import type { FeatureKey } from "core/entities";
 
 import type { FeatureParams } from "@ImageViewer/state/image-viewer-data/utils";
 import type {

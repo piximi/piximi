@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { useDispatch } from "react-redux";
 
-import type { PaletteColor } from "@mui/material";
 import {
   Box,
   Collapse,
@@ -27,6 +26,9 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { createGitHubIssue } from "utils/logUtils";
 import { AlertType } from "utils/enums";
+
+import type { PaletteColor } from "@mui/material";
+
 import type { AlertState } from "utils/types";
 
 type AlertBarProps = {

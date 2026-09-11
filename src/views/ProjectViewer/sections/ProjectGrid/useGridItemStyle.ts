@@ -1,5 +1,3 @@
-import type { CSSProperties } from "react";
-
 import { useSelector } from "react-redux";
 
 import {
@@ -7,6 +5,8 @@ import {
   selectSelectedImageBorderWidth,
   selectTextOnScroll,
 } from "store/applicationSettings/selectors";
+
+import type { CSSProperties } from "react";
 
 export const useGridItemStyle = (selected: boolean) => {
   const imageSelectionColor = useSelector(selectImageSelectionColor);

@@ -2,20 +2,24 @@ import { useMemo, useState } from "react";
 
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import type { SelectChangeEvent } from "@mui/material";
 import { Box, MenuItem, Popover, Typography } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
-import { CategoryDialog } from "components/dialogs";
-import { IncrementalSlider, StyledSelect, WithLabel } from "components/inputs";
+import { generateCategory } from "core/entities";
 
-import type { Category, ExtendedImageObject } from "store/data/types";
+import { IncrementalSlider, StyledSelect, WithLabel } from "components/inputs";
+import { CategoryDialog } from "components/dialogs";
+
 import { dataSlice } from "store/data";
-import { generateCategory } from "store/data/utils";
 import { selectImageCategories } from "store/data/selectors";
-import { useActiveImage } from "@ImageViewer/contexts/ActiveImageProvider";
 
 import { DIMENSIONS } from "utils/constants";
+
+import { useActiveImage } from "@ImageViewer/contexts/ActiveImageProvider";
+
+import type { SelectChangeEvent } from "@mui/material";
+
+import type { Category, ExtendedImageObject } from "core/entities";
 
 const NEW_CATEGORY = "new-category";
 const CATEGORY_DIALOG_OPTIONS = { type: "image" } as const;

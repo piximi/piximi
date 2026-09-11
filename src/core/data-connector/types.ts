@@ -4,8 +4,7 @@
  */
 export const DB_NAME = "piximi-data";
 export const DB_VERSION = 1;
-import type { Channel } from "store/data/types";
-
+import type { Channel } from "core/entities";
 import type { StorageReference, StoreName } from "core/entities/storage";
 
 export type StoredChannelData = Omit<Channel, "storageReference"> & {

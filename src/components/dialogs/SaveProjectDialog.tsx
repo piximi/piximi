@@ -1,4 +1,3 @@
-import type { ChangeEvent } from "react";
 import { useState } from "react";
 
 import { useSelector } from "react-redux";
@@ -10,6 +9,8 @@ import { useProjectSaver } from "hooks";
 import { selectExperiment } from "store/data/selectors";
 
 import { ConfirmationDialog } from "./ConfirmationDialog";
+
+import type { ChangeEvent } from "react";
 
 type SaveProjectDialogProps = {
   onClose: () => void;

@@ -1,7 +1,5 @@
 import JSZip from "jszip";
 
-import type { Category } from "store/data/types";
-
 import { logger, parseError } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
 import { getUniqueName } from "utils/stringUtils";
@@ -16,6 +14,10 @@ import { ModelTask } from "../../enums";
 import { ModelArch } from "../types";
 import { err, ok } from "../../utils";
 
+import type { Logs } from "@tensorflow/tfjs";
+
+import type { Category } from "core/entities";
+
 import type {
   BatchModelLoadResult,
   EvaluationResult,
@@ -28,7 +30,6 @@ import type {
   TrainAndEvalResult,
   TrainingCallbacks,
 } from "../types";
-import type { Logs } from "@tensorflow/tfjs";
 import type { SequentialClassifier } from "../models";
 import type {
   ApiResult,

@@ -2,16 +2,17 @@ import { LayersModel } from "@tensorflow/tfjs";
 
 import { CancelSource, TaskCancelledError, type Token } from "core/dl/cancel";
 
-import type { LoadCB } from "utils/types";
-
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessGlas } from "./preprocessGlas";
 import { predictGlas } from "./predictGlas";
 import { loadGlas } from "./loadGlas";
 
+import type { GraphModel } from "@tensorflow/tfjs";
+
+import type { LoadCB } from "utils/types";
+
 import type { PredictedAnnotationObject } from "../../types";
 import type { InferenceInput } from "../../../types";
-import type { GraphModel } from "@tensorflow/tfjs";
 
 const KIND_NAME = "glas_glands";
 /*

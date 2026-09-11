@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { useRef } from "react";
 
 import { useSelector } from "react-redux";
@@ -7,6 +6,8 @@ import { Box, Button } from "@mui/material";
 
 import { selectActiveSelectedPlot } from "@MeasurementViewer/state/selectors";
 import { savePlot } from "@MeasurementViewer/utils";
+
+import type { ReactNode } from "react";
 
 export const MeasurementPlot = ({ children }: { children: ReactNode }) => {
   const plotRef = useRef<HTMLDivElement | null>(null);

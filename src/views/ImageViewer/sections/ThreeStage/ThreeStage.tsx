@@ -4,18 +4,19 @@ import { useSelector } from "react-redux";
 
 import { Box } from "@mui/material";
 
-import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
 import { selectExtendedImageById } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { useActiveImage } from "@ImageViewer/contexts/ActiveImageProvider";
 
-import type { Point } from "utils/types";
+import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
+import { useActiveImage } from "@ImageViewer/contexts/ActiveImageProvider";
 
 import { useThreeChannelRenderer } from "./useThreeChannelRenderer";
 import { useThreePanZoom } from "./useThreePanZoom";
 import { ActiveImageInfoStrip } from "./ActiveImageInfoStrip";
 import { ThreeAnnotationLayer } from "./ThreeAnnotationLayer";
 import { useThreeRenderer } from "./useThreeRenderer";
+
+import type { Point } from "utils/types";
 
 type ThreeStageProps = {
   stageWidth: number;

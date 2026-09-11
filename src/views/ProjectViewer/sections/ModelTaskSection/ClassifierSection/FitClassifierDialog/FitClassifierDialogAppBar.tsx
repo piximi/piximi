@@ -23,27 +23,29 @@ import {
   ErrorOutline,
 } from "@mui/icons-material";
 
+import { useClassifierApi } from "core/dl/classification";
+
 import { useDialog } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs";
 
+import { classifierSlice } from "store/classifier";
+import { selectModelLifecycleStatus } from "store/classifier/selectors";
+import { useParameterizedSelector } from "store/hooks";
+import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
+import { applicationSettingsSlice } from "store/applicationSettings";
+
+import { APPLICATION_COLORS } from "utils/constants";
+
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
+import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
+import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
+import { TooltipWithDisable } from "@ProjectViewer/components";
 import {
   useClassificationModel,
   useFitClassifier,
   useAcceptClearPredictions,
 } from "@ProjectViewer/hooks";
-import { TooltipWithDisable } from "@ProjectViewer/components";
-import { classifierSlice } from "store/classifier";
-import { selectModelLifecycleStatus } from "store/classifier/selectors";
-import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
-import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import { useParameterizedSelector } from "store/hooks";
-import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { useClassifierApi } from "core/dl/classification";
-
-import { APPLICATION_COLORS } from "utils/constants";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;

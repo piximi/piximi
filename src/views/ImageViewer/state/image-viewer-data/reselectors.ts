@@ -1,13 +1,13 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import type { RootState } from "store/rootReducer";
+import { OBJECT_FEATURES } from "core/entities";
+
 import {
   selectAllExtendedAnnotations,
   selectAllExtendedKinds,
   selectExtendedAnnotationsByImageId,
   selectExtendedImageById,
 } from "store/data/selectors";
-import { OBJECT_FEATURES } from "store/data/types";
 
 import {
   selectActiveImageId,
@@ -22,6 +22,8 @@ import {
   matchesLayer,
   splitSelection,
 } from "./utils";
+
+import type { RootState } from "store/rootReducer";
 
 import type { FeatureParams } from "./utils";
 

@@ -1,4 +1,3 @@
-import type { ReactElement } from "react";
 import { createContext, useContext, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -17,6 +16,8 @@ import {
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectShowSaveProjectDialog } from "store/applicationSettings/selectors";
+
+import type { ReactElement } from "react";
 
 const ConfirmReplaceDialog = ({
   open,

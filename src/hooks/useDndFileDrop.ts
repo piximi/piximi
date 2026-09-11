@@ -1,6 +1,7 @@
-import type { DropTargetMonitor } from "react-dnd";
 import { useDrop } from "react-dnd";
 import { NativeTypes } from "react-dnd-html5-backend";
+
+import type { DropTargetMonitor } from "react-dnd";
 
 type DndFileDropItem = {
   files: FileList;

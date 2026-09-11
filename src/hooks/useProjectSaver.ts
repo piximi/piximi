@@ -4,15 +4,18 @@ import { useDispatch, useStore } from "react-redux";
 
 import { saveAs } from "file-saver";
 
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { appTasksSlice } from "store/appTasks/appTasksSlice";
-import type { AppTask } from "store/appTasks/types";
-import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
-import { generateUUID } from "store/data/utils";
-import type { RootState } from "store/rootReducer";
+import { generateUUID } from "core/entities";
 import { ProjectSaver } from "core/file-io/project-saver/ProjectSaver";
 
+import { applicationSettingsSlice } from "store/applicationSettings";
+import { appTasksSlice } from "store/appTasks/appTasksSlice";
+import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+
 import { AlertType } from "utils/enums";
+
+import type { AppTask } from "store/appTasks/types";
+import type { RootState } from "store/rootReducer";
+
 import type { AlertState } from "utils/types";
 
 type UseProjectSaverReturn = {

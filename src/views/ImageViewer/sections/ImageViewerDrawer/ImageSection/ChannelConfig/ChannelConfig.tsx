@@ -3,12 +3,13 @@ import { useState } from "react";
 import { Box, Collapse } from "@mui/material";
 
 import { selectChannelMetaById } from "store/data/selectors";
-import type { ExtendedChannel } from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";
 
 import { ChannelHeader } from "./ChannelHeader";
 import { PlotOptions } from "./PlotOptions";
 import { ChannelOptions } from "./ChannelOptions";
+
+import type { ExtendedChannel } from "core/entities";
 
 export const ChannelConfig = ({ channel }: { channel: ExtendedChannel }) => {
   const channelMeta = useParameterizedSelector(

@@ -1,4 +1,3 @@
-import type React from "react";
 import { memo, useCallback, useState } from "react";
 
 import { batch, useDispatch, useSelector } from "react-redux";
@@ -20,20 +19,24 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 import { useRenderedSrc } from "hooks";
 
-import {
-  selectImageStackIds,
-  selectActiveImageId,
-} from "@ImageViewer/state/image-viewer-data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import {
   selectAnnotationsByImageId,
   selectExtendedImageByIds,
 } from "store/data/selectors";
-import type { ExtendedImageObject } from "store/data/types";
+
+import {
+  selectImageStackIds,
+  selectActiveImageId,
+} from "@ImageViewer/state/image-viewer-data/selectors";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 
 import { ImageMenu } from "./ImageMenu";
+
+import type React from "react";
+
+import type { ExtendedImageObject } from "core/entities";
 
 const NUM_BUFFERED_IMS = 20;
 const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 4);

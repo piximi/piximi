@@ -1,14 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import type { Shape } from "store/data/types";
-import { dataSlice } from "store/data";
-import { UNKNOWN_KIND, UNKNOWN_KIND_ID } from "store/data/constants";
+import { UNKNOWN_KIND, UNKNOWN_KIND_ID } from "core/entities";
 import { ModelArch } from "core/dl/classification/types";
 
-import type { RecursivePartial } from "utils/types";
+import { dataSlice } from "store/data";
+
 import { recursiveAssign } from "utils/objectUtils";
 
 import { IMAGE_CLASSIFIER_ID, IMAGE_CLASSIFIER_NAME } from "./constants";
+
+import type { PayloadAction } from "@reduxjs/toolkit";
 
 import type {
   ModelLifecycleStatus,
@@ -19,8 +20,11 @@ import type {
   RunStatus,
   EvaluationResult,
 } from "core/dl/classification/types";
+import type { Shape } from "core/entities";
+
+import type { RecursivePartial } from "utils/types";
+
 import type { ClassifierState, KindClassifier, SoftmaxById } from "./types";
-import type { PayloadAction } from "@reduxjs/toolkit";
 
 const getDefaultKindClassifier = () => ({
   activeModel: undefined,

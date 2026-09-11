@@ -2,15 +2,16 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { useHotkeys } from "hooks";
 
+import { HotkeyContext } from "utils/enums";
+
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { ToolType } from "views/ImageViewer/utils/enums";
+
 import {
   selectActiveImageId,
   selectImageStackIds,
 } from "@ImageViewer/state/image-viewer-data/selectors";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
-
-import { HotkeyContext } from "utils/enums";
 
 export const useAnnotatorToolShortcuts = () => {
   const dispatch = useDispatch();

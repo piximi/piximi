@@ -8,9 +8,9 @@ import { SettingsButton } from "components/layout/app-drawer/application-setting
 import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/layout/app-drawer/HelpButton";
 
-import { useSetDrawerView } from "@ImageViewer/contexts/DrawerActionProvider";
-
 import { DIMENSIONS } from "utils/constants";
+
+import { useSetDrawerView } from "@ImageViewer/contexts/DrawerActionProvider";
 
 import { ReturnToProjectButton } from "./ReturnToProjectButton";
 

@@ -7,8 +7,10 @@ import { parseError } from "utils/logUtils";
 import { DB_NAME, DB_VERSION } from "./types";
 import { LRUCache, NullCache } from "./lruCache";
 
-import type { StorageReference, StoreName } from "core/entities";
 import type { IDBPDatabase } from "idb";
+
+import type { StorageReference, StoreName } from "core/entities";
+
 import type {
   CacheOptions,
   IDataConnector,

@@ -2,17 +2,13 @@ import { useEffect } from "react";
 
 import * as Comlink from "comlink";
 
-import type {
-  BBox,
-  ExtendedChannel,
-  ExtendedImageObject,
-} from "store/data/types";
-
 import {
   getCacheKey,
   getRenderedSrc,
   setRenderedSrc,
 } from "utils/renderedSrcsCache";
+
+import type { BBox, ExtendedChannel, ExtendedImageObject } from "core/entities";
 
 type RenderSrcsWorkerResult = Array<
   { key: string; url: string } | { key: string; error: Error }

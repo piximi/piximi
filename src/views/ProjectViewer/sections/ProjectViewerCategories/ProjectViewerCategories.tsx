@@ -1,4 +1,3 @@
-import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -6,10 +5,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { IconButton, List, Stack } from "@mui/material";
 import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 
+import { generateCategory } from "core/entities";
+
 import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
+import { dataSlice } from "store/data";
+
+import { HotkeyContext } from "utils/enums";
 
 import {
   FunctionalDivider,
@@ -22,14 +27,13 @@ import {
   selectActiveKindId,
 } from "@ProjectViewer/state/selectors";
 import { selectActiveCategories } from "@ProjectViewer/state/reselectors";
-import type { Category } from "store/data/types";
-import { generateCategory } from "store/data/utils";
-import { dataSlice } from "store/data";
-
-import { HotkeyContext } from "utils/enums";
 
 import { CategoryItem } from "./CategoryItem";
 import { CategoryItemMenu } from "./CategoryItemMenu";
+
+import type React from "react";
+
+import type { Category } from "core/entities";
 
 export const ProjectViewerCategories = () => {
   const dispatch = useDispatch();

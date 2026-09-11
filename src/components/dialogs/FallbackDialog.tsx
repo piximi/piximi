@@ -32,9 +32,10 @@ import { selectAllCreatedModelNames } from "store/classifier/selectors";
 import { createGitHubIssue } from "utils/logUtils";
 import { APPLICATION_COLORS } from "utils/constants";
 import { HotkeyContext, AlertType } from "utils/enums";
-import type { AlertState } from "utils/types";
 
 import { SaveProjectDialog } from "./SaveProjectDialog";
+
+import type { AlertState } from "utils/types";
 
 //import { saveAs } from "file-saver";
 

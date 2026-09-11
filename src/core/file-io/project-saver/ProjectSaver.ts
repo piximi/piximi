@@ -1,14 +1,17 @@
 import * as Comlink from "comlink";
 
-import type { ClassifierState } from "store/classifier/types";
 import { getClassifierApi } from "core/dl/classification";
 
-import type { CancelToken } from "utils/workers/types";
 import { logger, parseError } from "utils/logUtils";
-import type { Progress } from "utils/types";
 import { INITIAL_PROGRESS } from "utils/types";
 
 import type { SerializedModels } from "core/dl/types";
+
+import type { ClassifierState } from "store/classifier/types";
+
+import type { Progress } from "utils/types";
+import type { CancelToken } from "utils/workers/types";
+
 import type {
   IProjectSaver,
   SaveProjectInput,

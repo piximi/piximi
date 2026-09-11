@@ -1,16 +1,18 @@
-import type React from "react";
 import { createContext, useContext, useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
 
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectRunsForActiveModel } from "store/classifier/selectors";
+
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { diffCompileSettings } from "@ProjectViewer/sections/ModelTaskSection/ClassifierSection/FitClassifierDialog/panels/ModelSettings/HyperparameterSettings/settingsLock";
 
-import type { Points } from "utils/types";
+import type React from "react";
 
 import type { OptimizationAlgorithm } from "core/dl/enums";
+
+import type { Points } from "utils/types";
 
 export type RunDrift = {
   epoch: number;

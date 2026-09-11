@@ -1,7 +1,5 @@
-import type { MouseEvent } from "react";
 import { useState, Fragment } from "react";
 
-import type { ColorResult } from "react-color";
 import { ChromePicker } from "react-color";
 
 import { Popover, Box } from "@mui/material";
@@ -10,6 +8,10 @@ import {
   ArrowDropDown as ArrowDropDownIcon,
   ArrowDropUp as ArrowDropUpIcon,
 } from "@mui/icons-material";
+
+import type { MouseEvent } from "react";
+
+import type { ColorResult } from "react-color";
 
 type ColorIconButtonProps = {
   color: string;

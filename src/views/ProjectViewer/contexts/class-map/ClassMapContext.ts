@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import type { Category } from "store/data/types";
+import type { Category } from "core/entities";
 
 export const ClassMapDialogContext = createContext<{
   openDialog: ({

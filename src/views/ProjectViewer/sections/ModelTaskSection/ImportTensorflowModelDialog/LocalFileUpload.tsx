@@ -1,9 +1,10 @@
-import type { ReactNode } from "react";
 import { useRef, useState } from "react";
 
 import { Box, Button, Collapse, Typography } from "@mui/material";
 
 import { ExpandIcon } from "components/ui";
+
+import type { ReactNode } from "react";
 
 const FileInfoContainer = ({
   label,

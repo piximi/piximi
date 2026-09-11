@@ -1,5 +1,6 @@
-import type { Shape } from "store/data/types";
+import type { Logs } from "@tensorflow/tfjs";
 
+import type { Shape } from "core/entities";
 import type {
   CropSchema,
   LossFunction,
@@ -15,7 +16,6 @@ import type {
   SerializedModelData,
   TrainingInput,
 } from "core/dl/types";
-import type { Logs } from "@tensorflow/tfjs";
 
 /*
  * Model Definition

@@ -9,20 +9,20 @@ import {
   CardContent,
   CardHeader,
   GlobalStyles,
-  //List,
   Snackbar,
   Typography,
   useTheme,
 } from "@mui/material";
 import { Lock as LockIcon } from "@mui/icons-material";
 
-import type { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { helpContent } from "components/layout/HelpDrawer/HelpContent";
-
 import { useHelp } from "contexts";
+
+import { helpContent } from "components/layout/HelpDrawer/HelpContent";
 
 import { logger } from "utils/logUtils";
 import { formatString } from "utils/stringUtils";
+
+import type { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 const HelpOverlay = () => {
   const muiTheme = useTheme();

@@ -1,10 +1,10 @@
-import type React from "react";
-
 import { Box, Drawer, Stack } from "@mui/material";
 
 import { DIMENSIONS } from "utils/constants";
 
 import { ApplicationOptions } from "./ApplicationOptions";
+
+import type React from "react";
 
 export const BaseAppDrawer = ({
   children,

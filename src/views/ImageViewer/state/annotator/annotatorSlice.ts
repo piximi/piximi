@@ -6,11 +6,12 @@ import {
   ToolType,
 } from "views/ImageViewer/utils/enums";
 
+import type { PayloadAction } from "@reduxjs/toolkit";
+
 import type {
   AnnotatorState,
   WorkingAnnotation,
 } from "views/ImageViewer/utils/types";
-import type { PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: AnnotatorState = {
   workingAnnotation: { saved: undefined, changes: {} },

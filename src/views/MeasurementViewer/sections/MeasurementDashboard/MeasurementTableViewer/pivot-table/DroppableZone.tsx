@@ -1,5 +1,4 @@
 // DroppableZone.tsx
-import type { ReactNode } from "react";
 
 import { useDroppable } from "@dnd-kit/core";
 import {
@@ -8,6 +7,8 @@ import {
 } from "@dnd-kit/sortable";
 
 import { Box, Typography } from "@mui/material";
+
+import type { ReactNode } from "react";
 
 type DroppableZoneProps = {
   id: string;

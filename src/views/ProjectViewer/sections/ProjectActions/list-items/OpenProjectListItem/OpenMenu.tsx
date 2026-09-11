@@ -1,9 +1,9 @@
-import type React from "react";
-
 import { Menu } from "@mui/material";
 
 import { OpenProjectMenuItem } from "./OpenProjectMenuItem";
 import { OpenImageMenuItem } from "./OpenImageMenuItem";
+
+import type React from "react";
 
 type OpenMenuProps = {
   anchorEl: HTMLElement | null;

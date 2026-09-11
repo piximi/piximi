@@ -5,6 +5,8 @@ import {
   MODEL_WEIGHTS_FILENAME,
 } from "core/file-io/consts";
 
+import type { GraphModel, LayersModel } from "@tensorflow/tfjs";
+
 import type {
   RunHistoryEpoch,
   ModelArgs,
@@ -13,7 +15,6 @@ import type {
   ModelArch,
 } from "../classification/types";
 import type { ModelTask } from "../enums";
-import type { GraphModel, LayersModel } from "@tensorflow/tfjs";
 
 export class Model {
   readonly name: string;

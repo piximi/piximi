@@ -1,5 +1,3 @@
-import type { MouseEvent } from "react";
-
 import {
   alpha,
   Box,
@@ -15,7 +13,9 @@ import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import CloseIcon from "@mui/icons-material/Close";
 
-import type { ExtendedKind } from "store/data/types";
+import type { MouseEvent } from "react";
+
+import type { ExtendedKind } from "core/entities";
 
 import type {
   FilterLayer,

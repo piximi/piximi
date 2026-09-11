@@ -1,5 +1,3 @@
-import type { ReactElement } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Divider, Stack, Typography, useTheme } from "@mui/material";
@@ -10,11 +8,8 @@ import { useTranslation } from "hooks";
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { IncrementalSlider } from "components/inputs";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import {
-  selectInvertThresholdAnnotation,
-  selectToolType,
-} from "views/ImageViewer/state/annotator/selectors";
+import { DIMENSIONS } from "utils/constants";
+
 import {
   ColorAnnotation,
   EllipticalAnnotation,
@@ -26,12 +21,19 @@ import {
   RectangleAnnotation,
   Selection,
 } from "icons";
+
+import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import {
+  selectInvertThresholdAnnotation,
+  selectToolType,
+} from "views/ImageViewer/state/annotator/selectors";
 import { ToolType } from "views/ImageViewer/utils/enums";
+
 import { useAnnotatorToolShortcuts } from "@ImageViewer/hooks";
 
-import { DIMENSIONS } from "utils/constants";
-
 import { AnnotationTool, PopoverAnnotationTool } from "./AnnotationTool";
+
+import type { ReactElement } from "react";
 
 type SliderOptions = {
   min: number;

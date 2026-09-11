@@ -4,13 +4,15 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Collapse } from "@mui/material";
 
+import { selectAllCategories } from "store/data/selectors";
+
 import { selectActiveViewState } from "@ProjectViewer/state/selectors";
 import { projectSlice } from "@ProjectViewer/state";
-import type { Category } from "store/data/types";
-import { selectAllCategories } from "store/data/selectors";
 
 import { FilterList } from "./FilterList";
 import { SectionHeader } from "./SectionHeader";
+
+import type { Category } from "core/entities";
 
 export const CategoryFilterList = () => {
   const dispatch = useDispatch();

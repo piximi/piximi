@@ -1,9 +1,7 @@
-import type { ReactElement } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import type { SelectChangeEvent } from "@mui/material";
 import {
   Box,
   Button,
@@ -20,19 +18,19 @@ import {
   Typography,
 } from "@mui/material";
 
+import { generateCategory } from "core/entities";
+
 import { useDialog } from "hooks";
 
 import { StyledSelect } from "components/inputs";
 
-import { dataSlice } from "store/data";
-import type { Kind, ExtendedAnnotationObject } from "store/data/types";
-import { useParameterizedSelector } from "store/hooks";
 import {
   selectCategoriesByKindId,
   selectExtendedAnnotationById,
   selectKindEntities,
 } from "store/data/selectors";
-import { generateCategory } from "store/data/utils";
+import { useParameterizedSelector } from "store/hooks";
+import { dataSlice } from "store/data";
 
 import {
   AnnotationKindSelect,
@@ -43,6 +41,11 @@ import {
 import { ItemInformationTable } from "./ItemInformationTable";
 import { useInformationPopover } from "../InformationPopoverProvider";
 
+import type { ReactElement } from "react";
+
+import type { SelectChangeEvent } from "@mui/material";
+
+import type { Kind, ExtendedAnnotationObject } from "core/entities";
 import type { Partition } from "core/dl/enums";
 
 export const AnnotationPopoverContent = ({

@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 
-import type { SelectChangeEvent } from "@mui/material";
 import { MenuItem } from "@mui/material";
-
-import { StyledSelect } from "components/inputs";
 
 import { Partition } from "core/dl/enums";
 
+import { StyledSelect } from "components/inputs";
+
 import { SELECT_PROPS } from "./utils";
+
+import type { SelectChangeEvent } from "@mui/material";
 
 export const ItemPartitionSelect = ({
   currentPartition,

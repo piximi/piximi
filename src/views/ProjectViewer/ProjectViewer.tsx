@@ -9,11 +9,12 @@ import { useErrorHandler, useMobileView, useUnloadConfirmation } from "hooks";
 
 import { FallbackDialog } from "components/dialogs";
 
-import { DropBox } from "@ProjectViewer/components";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { HotkeyContext } from "utils/enums";
 import { DIMENSIONS } from "utils/constants";
+
+import { DropBox } from "@ProjectViewer/components";
 
 import {
   ProjectDrawer,

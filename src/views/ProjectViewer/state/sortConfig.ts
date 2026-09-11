@@ -1,9 +1,9 @@
+import { AnnotationSortType, ImageSortType } from "./types";
+
 import type {
   ExtendedAnnotationObject,
   ExtendedImageObject,
-} from "store/data/types";
-
-import { AnnotationSortType, ImageSortType } from "./types";
+} from "core/entities";
 
 import type { SortMap } from "./types";
 

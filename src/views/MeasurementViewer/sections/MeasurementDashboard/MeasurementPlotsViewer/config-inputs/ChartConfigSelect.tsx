@@ -1,9 +1,11 @@
-import type { ReactNode } from "react";
-
-import type { SelectChangeEvent } from "@mui/material";
 import { FormControl, InputLabel, Select } from "@mui/material";
 
 import { formatString } from "utils/stringUtils";
+
+import type { ReactNode } from "react";
+
+import type { SelectChangeEvent } from "@mui/material";
+
 import type { HTMLDataAttributes } from "utils/types";
 
 export const ChartConfigSelect = ({

@@ -1,17 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { difference } from "lodash";
 
+import { UNKNOWN_KIND } from "core/entities";
+
 import { dataSlice } from "store/data";
-import { UNKNOWN_KIND } from "store/data/constants";
 
 import { findAdjacentItem, mutatingFilter } from "utils/arrayUtils";
 import { representsUnknown } from "utils/stringUtils";
 
 import { AnnotationSortType, ImageSortType } from "./types";
 
-import type { Partition } from "core/dl/enums";
-import type { KindState, ProjectState, ViewState } from "./types";
 import type { PayloadAction } from "@reduxjs/toolkit";
+
+import type { Partition } from "core/dl/enums";
+
+import type { KindState, ProjectState, ViewState } from "./types";
 
 const emptyKindState = (id: string, name: string): KindState => ({
   id,

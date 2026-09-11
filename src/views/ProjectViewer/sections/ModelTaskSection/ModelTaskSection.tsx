@@ -1,4 +1,3 @@
-import type React from "react";
 import { useState } from "react";
 
 import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
@@ -12,6 +11,8 @@ import { SegmenterStatusProvider } from "@ProjectViewer/contexts/SegmenterStatus
 
 import { SegmenterSection } from "./SegmenterSection";
 import { ClassifierSection } from "./ClassifierSection";
+
+import type React from "react";
 
 export const ModelTaskSection = () => {
   const [learningTask, setLearningTask] = useState<

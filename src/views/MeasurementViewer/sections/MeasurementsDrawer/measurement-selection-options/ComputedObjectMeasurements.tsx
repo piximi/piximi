@@ -1,19 +1,22 @@
-import type React from "react";
 import { useMemo } from "react";
 
 import { useDispatch } from "react-redux";
 
 import { Box } from "@mui/material";
 
-import { measurementsSlice } from "@MeasurementViewer/state";
-import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";
-import { getCustomTreeItem } from "@MeasurementViewer/components/CustomTreeItem";
-import { OBJ_MEAS_LOOKUP } from "store/data/utils";
-import type { FeatureKey } from "store/data/types";
-import { OBJECT_FEATURES } from "store/data/types";
+import { OBJECT_FEATURES } from "core/entities";
 
 import { getDifferences } from "utils/arrayUtils";
 import { formatString } from "utils/stringUtils";
+
+import { measurementsSlice } from "@MeasurementViewer/state";
+import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";
+import { getCustomTreeItem } from "@MeasurementViewer/components/CustomTreeItem";
+import { OBJ_MEAS_LOOKUP } from "@MeasurementViewer/utils";
+
+import type React from "react";
+
+import type { FeatureKey } from "core/entities";
 
 import type { CustomTreeViewBaseItem } from "@MeasurementViewer/components/CustomTreeItem";
 import type { ObjectMeasurementGroup } from "@MeasurementViewer/types";

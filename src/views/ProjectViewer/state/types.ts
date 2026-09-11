@@ -1,7 +1,7 @@
 import type {
   ExtendedAnnotationObject,
   ExtendedImageObject,
-} from "store/data/types";
+} from "core/entities";
 
 import type { FilterType } from "utils/types";
 

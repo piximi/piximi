@@ -4,11 +4,12 @@ import { useDialogHotkey } from "hooks";
 
 import { CategoryDialog, ConfirmationDialog } from "components/dialogs";
 
-import type { Category } from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";
 import { selectEntityCountByCategoryId } from "store/data/selectors";
 
 import { HotkeyContext } from "utils/enums";
+
+import type { Category } from "core/entities";
 
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;

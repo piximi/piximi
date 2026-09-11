@@ -1,3 +1,5 @@
+import type { EntityState } from "@reduxjs/toolkit";
+
 import type {
   BitDepth,
   DataArray,
@@ -8,12 +10,11 @@ import type {
   ChannelMeasurement,
   FeatureKey,
   PredictionCorrection,
-} from "store/data/types";
-import type { ClassifierState, KindClassifier } from "store/classifier/types";
-
+} from "core/entities";
 import type { Partition } from "core/dl/enums";
 import type { ModelInfo } from "core/dl/classification/types";
-import type { EntityState } from "@reduxjs/toolkit";
+
+import type { ClassifierState, KindClassifier } from "store/classifier/types";
 
 export type V2Experiment = { id: string; name: string; channels?: number };
 

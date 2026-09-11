@@ -1,7 +1,5 @@
 import IJSImage from "image-js";
 
-import type { Edge, Point } from "utils/types";
-
 import {
   getXofYMax,
   getXofYMin,
@@ -12,6 +10,8 @@ import {
 } from "./point-operations";
 
 import type { ImageKind as IJSImageKind } from "image-js";
+
+import type { Edge, Point } from "utils/types";
 
 /**
  * Scan Line Polygon Fill (SLPF) algorithm to fill the annotation polygon.

@@ -1,8 +1,5 @@
-import type { ReactNode } from "react";
-import type React from "react";
 import { useState } from "react";
 
-import type { SxProps } from "@mui/material";
 import {
   List,
   ListItem,
@@ -15,6 +12,11 @@ import {
   KeyboardArrowRight as KeyboardArrowRightIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
 } from "@mui/icons-material";
+
+import type { ReactNode } from "react";
+import type React from "react";
+
+import type { SxProps } from "@mui/material";
 
 type CollapsibleListProps = {
   children: any;

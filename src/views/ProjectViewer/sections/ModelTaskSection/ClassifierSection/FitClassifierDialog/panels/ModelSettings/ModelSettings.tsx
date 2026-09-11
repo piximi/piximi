@@ -10,10 +10,10 @@ import { useHotkeys } from "hooks";
 
 import { WithLabel } from "components/inputs";
 
+import { HotkeyContext } from "utils/enums";
+
 import { selectProjectName } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
-
-import { HotkeyContext } from "utils/enums";
 
 import { HyperperameterSettings } from "./HyperparameterSettings";
 import { ModelPicker } from "./ModelPicker";

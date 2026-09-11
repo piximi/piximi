@@ -1,6 +1,6 @@
-import type { BitDepth } from "store/data/types";
-
 import { getRandomInt } from "./dataUtils";
+
+import type { BitDepth } from "core/entities";
 
 const componentToHex = (c: number) => {
   c = c > 1 ? c : c * 255;

@@ -1,4 +1,3 @@
-import type { ReactElement } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useDispatch } from "react-redux";
@@ -7,7 +6,6 @@ import { useTheme } from "@mui/material";
 
 import { TextFieldWithBlur } from "components/inputs";
 
-import type { ExtendedImageObject } from "store/data/types";
 import { useParameterizedSelector } from "store/hooks";
 import {
   selectAnnotationVolumesByImageId,
@@ -24,6 +22,9 @@ import {
 } from "./cells";
 import { ItemInformationTable } from "./ItemInformationTable";
 
+import type { ReactElement } from "react";
+
+import type { ExtendedImageObject } from "core/entities";
 import type { Partition } from "core/dl/enums";
 
 export const ImagePopoverContent = ({

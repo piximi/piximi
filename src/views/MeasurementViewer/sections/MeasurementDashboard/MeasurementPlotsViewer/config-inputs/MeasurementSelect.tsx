@@ -3,7 +3,6 @@ import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { MenuItem } from "@mui/material";
-import type { SelectChangeEvent } from "@mui/material";
 
 import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
@@ -13,9 +12,11 @@ import {
   selectActiveSelectedPlot,
 } from "@MeasurementViewer/state/selectors";
 
-import type { KeysWithValuesOfType } from "utils/types";
-
 import { ChartConfigSelect } from "./ChartConfigSelect";
+
+import type { SelectChangeEvent } from "@mui/material";
+
+import type { KeysWithValuesOfType } from "utils/types";
 
 import type { ChartConfig } from "@MeasurementViewer/types";
 

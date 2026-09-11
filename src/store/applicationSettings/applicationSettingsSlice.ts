@@ -1,16 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import type { AppSettingsState } from "store/types";
-
 import { logger } from "utils/logUtils";
 import { DEFAULT_ALERT } from "utils/constants";
-import type { HotkeyContext } from "utils/enums";
 import { Languages } from "utils/enums";
-import type { AlertState } from "utils/types";
 
 import { ThemeMode } from "themes/enums";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
+
+import type { AppSettingsState } from "store/types";
+
+import type { AlertState } from "utils/types";
+import type { HotkeyContext } from "utils/enums";
 
 const initialState: AppSettingsState = {
   tileSize: 1,

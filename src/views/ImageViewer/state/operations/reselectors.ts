@@ -1,11 +1,11 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import { AnnotationMode } from "views/ImageViewer/utils/enums";
-import { foldOperands, masksOverlap } from "views/ImageViewer/utils/maskOps";
-import type { BBox, ExtendedAnnotationObject } from "store/data/types";
 import { selectAnnotationEntities } from "store/data/selectors";
 
 import { decodeRleArray } from "utils/image";
+
+import { foldOperands, masksOverlap } from "views/ImageViewer/utils/maskOps";
+import { AnnotationMode } from "views/ImageViewer/utils/enums";
 
 import {
   selectAnnotationMode,
@@ -14,6 +14,8 @@ import {
 import { selectFullWorkingAnnotation } from "../annotator/reselectors";
 import { selectSelectionLayer } from "../image-viewer-data/selectors";
 import { selectVisibleAnnotations } from "../image-viewer-data/reselectors";
+
+import type { BBox, ExtendedAnnotationObject } from "core/entities";
 
 import type { MaskRegion, SetOperation } from "views/ImageViewer/utils/maskOps";
 

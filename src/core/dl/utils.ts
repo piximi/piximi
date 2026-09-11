@@ -1,5 +1,7 @@
 import { random as _random } from "lodash";
 
+import type { Tensor3D } from "@tensorflow/tfjs";
+
 import type {
   ShapeArray,
   Shape,
@@ -7,7 +9,7 @@ import type {
   ExtendedAnnotationObject,
   ExtendedChannel,
   ExtendedImageObject,
-} from "store/data/types";
+} from "core/entities";
 
 import type {
   ApiResult,
@@ -16,7 +18,6 @@ import type {
   InferenceInput,
   TrainingInput,
 } from "./types";
-import type { Tensor3D } from "@tensorflow/tfjs";
 
 export const padToMatch = (
   sample: Tensor3D,
