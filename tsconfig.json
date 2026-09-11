@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "./src",
+
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
@@ -11,7 +11,7 @@
     "jsx": "react-jsx",
     "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
@@ -19,9 +19,10 @@
     "strict": true,
     "noErrorTruncation": true,
     "paths": {
-      "@ProjectViewer/*": ["views/ProjectViewer/*"],
-      "@ImageViewer/*": ["views/ImageViewer/*"],
-      "@MeasurementViewer/*": ["views/MeasurementViewer/*"]
+      "*": ["./src/*"],
+      "@ProjectViewer/*": ["./src/views/ProjectViewer/*"],
+      "@ImageViewer/*": ["./src/views/ImageViewer/*"],
+      "@MeasurementViewer/*": ["./src/views/MeasurementViewer/*"]
     }
   },
   "include": ["src", "src/icons/svg.d.ts"],
