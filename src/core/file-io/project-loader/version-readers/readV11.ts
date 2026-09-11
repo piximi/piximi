@@ -1,8 +1,12 @@
-import { openGroup } from "zarr";
-
 import { logger } from "utils/logUtils";
 
-import { getAttr, getDataset, getGroup } from "../../zarr/utils";
+import {
+  getAttr,
+  getDataset,
+  getGroup,
+  openRootGroup,
+  readDataset,
+} from "../../zarr/utils";
 import {
   deserializeColorsRaw,
   v11_v2_deserializeClassifierGroup,
@@ -10,8 +14,7 @@ import {
 import { subProgress } from "../progress";
 
 import type { EntityState } from "@reduxjs/toolkit";
-import type { RawArray } from "zarr/types/rawArray";
-import type { Group } from "zarr";
+import type { Group, RawArray } from "../../zarr/utils";
 
 import type { Partition } from "core/dl/enums";
 
@@ -48,7 +51,7 @@ export const readV11 = async (
   store: CustomStore,
   onProgress: (p: number) => void,
 ): Promise<V11PiximiState> => {
-  const rootGroup = await openGroup(store, store.rootName, "r");
+  const rootGroup = await openRootGroup(store);
   const projectGroup = await getGroup(rootGroup, "project");
   const name = (await getAttr(projectGroup, "name")) as string;
   const imageChannels = (await getAttr(projectGroup, "imageChannels")) as
@@ -114,7 +117,7 @@ const deserializeThingsGroup = async (
     const kind = (await getAttr(thingGroup, "kind")) as string;
 
     const thingDataset = await getDataset(thingGroup, name);
-    const rawArray = (await thingDataset.getRaw()) as RawArray;
+    const rawArray = await readDataset(thingDataset);
     const data = rawArray.data as Float32Array;
     const [planes, height, width, channels] = rawArray.shape;
     const bitDepth = (await getAttr(thingDataset, "bit_depth")) as V11BitDepth;

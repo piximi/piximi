@@ -1,5 +1,3 @@
-import { group } from "zarr";
-
 import { DataConnector } from "core/data-connector";
 import { STORES } from "core/entities";
 
@@ -56,13 +54,14 @@ export async function saveProject(
   // make the saved file unreadable.
   const rootName = input.name.replace(/[./\\]/g, "_") || "project";
   const store = new PiximiStore(rootName);
-  const root = await group(store, store.rootName);
 
   const throwIfCancelled = () => {
     if (cancelToken.cancelled) throw new Error("Project save cancelled");
   };
 
-  await writeV2(root, input.project, createChannelAccessor(), (p) => {
+  // `writeV2` creates the root group itself: the format version is one of its
+  // attributes, and Zarr v3 only accepts attributes at creation time.
+  await writeV2(store, input.project, createChannelAccessor(), (p) => {
     throwIfCancelled();
     onProgress({ value: STAGES.write.end * p });
   });
@@ -76,7 +75,7 @@ export async function saveProject(
       // Level 1 rather than the default 6. Pixel arrays dominate the archive
       // and barely deflate at any level, so the higher levels buy a percent or
       // two for a lot of seconds. The RLE mask dataset and the zarr metadata do
-      // compress, which is why this isn't STORE. `ZipStore.setItem` writes every
+      // compress, which is why this isn't STORE. `ZipStore.set` writes every
       // entry the same way, so this is archive-wide rather than per-file.
       compression: "DEFLATE",
       compressionOptions: { level: 1 },

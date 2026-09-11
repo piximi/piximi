@@ -1,5 +1,4 @@
 import JSZip from "jszip";
-import { KeyError } from "zarr";
 
 import {
   MANIFEST_VERSION,
@@ -7,126 +6,96 @@ import {
   MODELS_DIRNAME,
 } from "core/file-io/consts";
 
-import type { ValidStoreType, AsyncStore } from "zarr/types/storage/types";
+import { unescapePath } from "./paths";
+
+import type { AbsolutePath, AsyncReadable, AsyncWritable } from "zarrita";
 
 import type { SerializedModels } from "core/dl/types";
 
 /**
- * Preserves (double) slashes earlier in the path, so this works better
- * for URLs. From https://stackoverflow.com/a/46427607/4178400
- * @param args parts of a path or URL to join.
+ * Named here so a rename upstream is a one-file change, and so the readers
+ * don't each have to spell out zarrita's storage generics.
  */
-function joinUrlParts(...args: string[]) {
-  return args
-    .map((part, i) => {
-      if (i === 0) return part.trim().replace(/[/]*$/g, "");
-      return part.trim().replace(/(^[/]*|[/]*$)/g, "");
-    })
-    .filter((x) => x.length)
-    .join("/");
-}
-class ReadOnlyStore {
-  async keys() {
-    return [];
+export type ReadStore = AsyncReadable;
+export type WriteStore = AsyncReadable & AsyncWritable;
+
+/**
+ * Translate a zarr path into a zip/file-map key.
+ *
+ * zarrita keys are absolute (`/data/channels/zarr.json`) while JSZip entries
+ * and `webkitRelativePath` values are relative, and every Piximi node lives
+ * under `<name>.zarr/`. Rebasing here rather than making every caller pass a
+ * root path is what lets the readers open with a bare `zarr.open(store, …)`,
+ * and it keeps the user-supplied project name out of the zarr hierarchy
+ * entirely.
+ *
+ * `unescapePath` reverses the substitution `./paths` applies to characters that
+ * zarrita's URL-based resolver cannot carry. See that module for why.
+ */
+const entryName = (rootName: string, key: AbsolutePath): string =>
+  unescapePath(`${rootName}${key}`);
+
+/**
+ * Read-only store over the `Map` a `webkitdirectory` upload produces.
+ *
+ * Note `rootName` here already carries the ".zarr" suffix — it comes from the
+ * uploaded folder name (`files[0].webkitRelativePath.split("/")[0]`), unlike
+ * `ZipStore`, which appends it. Preserved rather than unified, because both
+ * sides are load-bearing at their call sites.
+ */
+export class FileStore implements ReadStore {
+  constructor(
+    private _map: Map<string, File>,
+    private _rootName: string,
+  ) {}
+
+  async get(key: AbsolutePath): Promise<Uint8Array | undefined> {
+    const file = this._map.get(entryName(this._rootName, key));
+    // zarrita signals absence with `undefined`; there is no KeyError.
+    if (!file) return undefined;
+    return new Uint8Array(await file.arrayBuffer());
   }
 
-  async deleteItem() {
-    return false;
-  }
-
-  async setItem() {
-    console.warn("Cannot write to read-only store.");
-    return false;
-  }
-}
-
-export class FileStore
-  extends ReadOnlyStore
-  implements AsyncStore<ArrayBuffer>
-{
-  private _map: Map<string, File>;
-  private _rootPrefix: string;
-  private _rootName: string;
-
-  constructor(fileMap: Map<string, File>, rootName: string, rootPrefix = "") {
-    super();
-    this._map = fileMap;
-    this._rootPrefix = rootPrefix;
-    this._rootName = rootName;
-  }
-
+  /** For diagnostics only — zarr paths no longer carry the root name. */
   get rootName() {
     return this._rootName;
   }
-
-  private _key(key: string) {
-    return joinUrlParts(this._rootPrefix, key);
-  }
-
-  async getItem(key: string) {
-    const file = this._map.get(this._key(key));
-    if (!file) {
-      throw new KeyError(key);
-    }
-    const buffer = await file.arrayBuffer();
-    return buffer;
-  }
-
-  async containsItem(key: string) {
-    const path = this._key(key);
-    return this._map.has(path);
-  }
 }
-export class ZipStore implements AsyncStore<ValidStoreType> {
+
+export class ZipStore implements ReadStore, AsyncWritable {
   private _rootName: string;
-  protected _zip: ReturnType<JSZip>;
-  private _needsInitialGroup: boolean;
+  protected _zip: JSZip;
 
   constructor(name: string, zip?: JSZip) {
     this._rootName = `${name}.zarr`;
-    this._zip = zip ? zip : new JSZip();
+    this._zip = zip ?? new JSZip();
+    // `createStoreFromZip` recovers the root with `zip.folder(/.*\.zarr\/$/)`,
+    // so the folder entry has to exist independently of what gets written into
+    // it.
     this._zip.folder(this._rootName);
-    this._needsInitialGroup = zip ? false : true;
   }
 
-  async keys(): Promise<string[]> {
-    return Object.values(this._zip.files)
-      .filter((f) => !f.dir)
-      .map((f) => f.name);
+  async get(key: AbsolutePath): Promise<Uint8Array | undefined> {
+    const entry = this._zip.file(entryName(this._rootName, key));
+    if (!entry) return undefined;
+    return entry.async("uint8array");
   }
 
-  async getItem(key: string): Promise<ValidStoreType> {
-    if (key === `${this._rootName}/.zgroup` && this._needsInitialGroup) {
-      const initialGroup = JSON.stringify({ zarr_format: 2 });
-      this._zip.file(key, initialGroup);
-      return initialGroup;
-    }
-    const item = this._zip.file(key);
-    if (!item) throw new Error(`No item with key ${key}`);
-    return item.async("arraybuffer");
-  }
-
-  async containsItem(key: string) {
-    return this._zip.file(key) !== null;
-  }
-
-  async setItem(item: string, value: ValidStoreType) {
-    this._zip.file(item, value);
-    return true;
-  }
-
-  async deleteItem(item: string) {
-    this._zip.remove(item);
-    return true;
+  async set(key: AbsolutePath, value: Uint8Array): Promise<void> {
+    // JSZip takes a Uint8Array directly, so writes need no conversion.
+    this._zip.file(entryName(this._rootName, key), value);
   }
 
   get zip() {
     return this._zip;
   }
+
+  /** For diagnostics only — zarr paths no longer carry the root name. */
   get rootName() {
     return this._rootName;
   }
 }
+
 export type CustomStore = FileStore | ZipStore;
 
 /**

@@ -1,6 +1,10 @@
-import { openGroup } from "zarr";
-
-import { getAttr, getDataset, getGroup } from "../../zarr/utils";
+import {
+  getAttr,
+  getGroup,
+  hasNode,
+  openRootGroup,
+  readWholeArray,
+} from "../../zarr/utils";
 import {
   ZARR_V2_ANNOTATION,
   ZARR_V2_ANNOTATION_VOLUME,
@@ -28,8 +32,7 @@ import {
 import { subProgress } from "../progress";
 
 import type { EntityState } from "@reduxjs/toolkit";
-import type { Group } from "zarr";
-import type { RawArray } from "zarr/types/rawArray";
+import type { Group, RawArray } from "../../zarr/utils";
 
 import type { Partition } from "core/dl/enums";
 import type {
@@ -95,22 +98,23 @@ const optional = <T>(value: Nullable<T> | undefined): T | undefined =>
 const toBool = (value: number) => Boolean(value);
 
 /**
- * zarr hands back a view onto a larger buffer, so the raw `.buffer` can carry
- * neighbouring bytes. Slice to exactly this view's extent before it becomes an
- * IndexedDB record.
+ * Hand a decoded array's bytes to the caller as an `ArrayBuffer`.
+ *
+ * `zarr.get` allocates the output itself — a fresh, exactly-sized typed array
+ * at offset 0 — and copies each chunk into it, so `.buffer` is already exactly
+ * this array's extent and needs no slicing. Asserted rather than assumed,
+ * because these buffers become IndexedDB records: an oversized one silently
+ * inflates stored size and hands the renderer too many pixels.
  */
-const toArrayBuffer = (view: ArrayBufferView): ArrayBuffer =>
-  view.buffer.slice(
-    view.byteOffset,
-    view.byteOffset + view.byteLength,
-  ) as ArrayBuffer;
-
-/**
- * `getRaw()` is typed as `number | RawArray` to cover scalar selections; every
- * read here is a whole-array read, so it's always the latter.
- */
-const readRaw = async (group: Group, key: string): Promise<RawArray> =>
-  (await (await getDataset(group, key)).getRaw()) as RawArray;
+const toArrayBuffer = (view: ArrayBufferView): ArrayBuffer => {
+  if (view.byteOffset !== 0 || view.byteLength !== view.buffer.byteLength) {
+    return view.buffer.slice(
+      view.byteOffset,
+      view.byteOffset + view.byteLength,
+    ) as ArrayBuffer;
+  }
+  return view.buffer as ArrayBuffer;
+};
 
 const toEntityState = <T extends { id: string }>(
   items: T[],
@@ -178,7 +182,7 @@ export const readV2 = async (
   store: CustomStore,
   onProgress: (p: number) => void,
 ): Promise<V2PiximiState> => {
-  const rootGroup = await openGroup(store, store.rootName, "r");
+  const rootGroup = await openRootGroup(store);
   const dataGroup = await getGroup(rootGroup, ZARR_V2_GROUP.Data);
 
   const experiment = {
@@ -512,10 +516,11 @@ const readChannels = async (
   const channels: V2Channel[] = [];
   for (const [i, id] of ids.entries()) {
     const channelGroup = await getGroup(group, id);
-    const pixels = (await readRaw(channelGroup, ZARR_V2_DATASET.ChannelData))
-      .data as ArrayBufferView;
+    const pixels = (
+      await readWholeArray(channelGroup, ZARR_V2_DATASET.ChannelData)
+    ).data as ArrayBufferView;
     const histogram = (
-      await readRaw(channelGroup, ZARR_V2_DATASET.ChannelHistogram)
+      await readWholeArray(channelGroup, ZARR_V2_DATASET.ChannelHistogram)
     ).data as ArrayBufferView;
 
     channels.push({
@@ -625,9 +630,9 @@ const readAnnotations = async (
 
   // The masks dataset is omitted entirely when nothing is annotated, since
   // zarr can't represent a zero-length array.
-  const hasMasks = await group.containsItem(ZARR_V2_DATASET.AnnotationMasks);
+  const hasMasks = await hasNode(group, ZARR_V2_DATASET.AnnotationMasks);
   const masks = hasMasks
-    ? ((await readRaw(group, ZARR_V2_DATASET.AnnotationMasks))
+    ? ((await readWholeArray(group, ZARR_V2_DATASET.AnnotationMasks))
         .data as Uint32Array)
     : new Uint32Array(0);
 
@@ -869,9 +874,9 @@ const readRuns = async (infoGroup: Group): Promise<Run[]> => {
 };
 
 const readRunHistory = async (runGroup: Group): Promise<RunHistoryEpoch[]> => {
-  if (!(await runGroup.containsItem(ZARR_V2_DATASET.RunHistory))) return [];
+  if (!(await hasNode(runGroup, ZARR_V2_DATASET.RunHistory))) return [];
 
-  const values = (await readRaw(runGroup, ZARR_V2_DATASET.RunHistory))
+  const values = (await readWholeArray(runGroup, ZARR_V2_DATASET.RunHistory))
     .data as Float64Array;
   const columns = ZARR_V2_RUN_HISTORY_COLUMNS;
 
@@ -889,14 +894,13 @@ const readRunHistory = async (runGroup: Group): Promise<RunHistoryEpoch[]> => {
 const readEvalResults = async (
   runGroup: Group,
 ): Promise<Run["evalResults"]> => {
-  if (!(await runGroup.containsItem(ZARR_V2_GROUP.EvalResults)))
-    return undefined;
+  if (!(await hasNode(runGroup, ZARR_V2_GROUP.EvalResults))) return undefined;
 
   const group = await getGroup(runGroup, ZARR_V2_GROUP.EvalResults);
 
   let confusionMatrix: number[][] = [];
-  if (await group.containsItem(ZARR_V2_DATASET.ConfusionMatrix)) {
-    const raw = await readRaw(group, ZARR_V2_DATASET.ConfusionMatrix);
+  if (await hasNode(group, ZARR_V2_DATASET.ConfusionMatrix)) {
+    const raw = await readWholeArray(group, ZARR_V2_DATASET.ConfusionMatrix);
     const flat = raw.data as Int32Array;
     const [rows, cols] = raw.shape as [number, number];
     confusionMatrix = Array.from({ length: rows }, (_, i) =>

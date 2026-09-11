@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { clean, gte, lt } from "semver";
 import JSZip from "jszip";
-import { group } from "zarr";
+import * as zarr from "zarrita";
 
 import {
   CropSchema,
@@ -507,8 +507,7 @@ const fakeSerializedModel = (
 const writeFixture = async (name = "test-project") => {
   const fixture = buildFixture();
   const store = new PiximiStore(name);
-  const root = await group(store, store.rootName);
-  await writeV2(root, fixture, channelAccessor, () => {});
+  await writeV2(store, fixture, channelAccessor, () => {});
   return { fixture, store };
 };
 
@@ -638,8 +637,9 @@ describe("v2 project round trip", () => {
    */
   it("stamps a version detectVersion routes to the v2 reader", async () => {
     const { store } = await writeFixture();
-    const root = await group(store, store.rootName);
-    const written = clean((await root.attrs.getItem("version")) as string);
+    // `attrs` is a plain, already-parsed object in zarrita — no await needed.
+    const root = await zarr.open(store, { kind: "group" });
+    const written = clean(root.attrs.version as string);
 
     expect(written).not.toBeNull();
     expect(gte(written!, "1.2.0")).toBe(true);
@@ -649,11 +649,10 @@ describe("v2 project round trip", () => {
   it("refuses to write an unversioned file", async () => {
     vi.stubEnv("VITE_APP_VERSION", "");
     const store = new PiximiStore("unversioned");
-    const root = await group(store, store.rootName);
 
     // Silently omitting the attr would produce an archive nothing can reopen.
     await expect(
-      writeV2(root, buildFixture(), channelAccessor, () => {}),
+      writeV2(store, buildFixture(), channelAccessor, () => {}),
     ).rejects.toThrow(/VITE_APP_VERSION/);
   });
 
@@ -663,12 +662,112 @@ describe("v2 project round trip", () => {
     fixture.data.annotationVolumes = { ids: [], entities: {} };
 
     const store = new PiximiStore("empty-annotations");
-    const root = await group(store, store.rootName);
-    await writeV2(root, fixture, channelAccessor, () => {});
+    await writeV2(store, fixture, channelAccessor, () => {});
 
     const result = await readV2(store, () => {});
     expect(result.data.annotations.ids).toEqual([]);
     expect(result.data.annotationVolumes.ids).toEqual([]);
+  });
+});
+
+/**
+ * Assertions about the bytes on disk, which a round trip cannot make: it is
+ * symmetric, so a writer and reader can agree on something wrong and still pass
+ * every equality check above.
+ */
+describe("written archive format", () => {
+  /** Every array's metadata, keyed by its path within the `.zarr` root. */
+  const arrayMetadata = async (store: PiximiStore) => {
+    const found: Record<string, Record<string, unknown>> = {};
+    for (const [path, entry] of Object.entries(store.zip.files)) {
+      if (entry.dir || !path.endsWith("/zarr.json")) continue;
+      const meta = JSON.parse(await entry.async("string"));
+      if (meta.node_type !== "array") continue;
+      found[path.replace(/^[^/]*\.zarr\//, "").replace(/\/zarr\.json$/, "")] =
+        meta;
+    }
+    return found;
+  };
+
+  it("writes zarr v3, never v2", async () => {
+    const { store } = await writeFixture();
+    const paths = Object.keys(store.zip.files);
+
+    expect(paths.filter((p) => p.endsWith("zarr.json")).length).toBeGreaterThan(
+      0,
+    );
+    expect(
+      paths.filter((p) => /\.(zgroup|zarray|zattrs)$/.test(p)),
+    ).toHaveLength(0);
+  });
+
+  it("declares the data type matching each array's element width", async () => {
+    const { store } = await writeFixture();
+    const arrays = await arrayMetadata(store);
+
+    // The 16-bit channels must not be declared uint8: nothing would error, and
+    // the read would silently yield the low byte of the top half of the image.
+    expect(arrays["data/channels/channel-1/data"].data_type).toBe("uint8");
+    expect(arrays["data/channels/channel-3/data"].data_type).toBe("uint16");
+    expect(arrays["data/channels/channel-1/histogram"].data_type).toBe(
+      "uint32",
+    );
+    expect(arrays["data/annotations/masks"].data_type).toBe("uint32");
+  });
+
+  it("stores each array as exactly one uncompressed chunk", async () => {
+    const { store } = await writeFixture();
+    const arrays = await arrayMetadata(store);
+
+    expect(Object.keys(arrays).length).toBeGreaterThan(0);
+
+    for (const [path, meta] of Object.entries(arrays)) {
+      const shape = meta.shape as number[];
+      const chunkShape = (
+        meta.chunk_grid as { configuration: { chunk_shape: number[] } }
+      ).configuration.chunk_shape;
+
+      // A chunk larger than the shape still reads back correctly but writes a
+      // full-size chunk, silently inflating the archive.
+      expect(chunkShape, path).toEqual(shape);
+      expect(
+        chunkShape.every((d) => d > 0),
+        path,
+      ).toBe(true);
+
+      // No codec: the archive's DEFLATE does the compressing, and this keeps
+      // the payload byte-identical to what the zarr.js-era writer produced.
+      expect(meta.codecs, path).toEqual([]);
+
+      // One chunk, keyed with "." separators so it is a single zip entry
+      // rather than a nested `c/0/0` directory chain.
+      const chunkKeys = Object.keys(store.zip.files).filter(
+        (p) => p.includes(`/${path}/c.`) && !p.endsWith("/"),
+      );
+      expect(chunkKeys, path).toHaveLength(1);
+    }
+  });
+
+  it("never writes a non-finite number into attributes", async () => {
+    const fixture = buildFixture();
+    fixture.data.channels.entities["channel-1"]!.mean = NaN;
+    fixture.data.channels.entities["channel-1"]!.std = Infinity;
+
+    const store = new PiximiStore("non-finite");
+    await writeV2(store, fixture, channelAccessor, () => {});
+
+    // zarrita encodes these as the strings "NaN"/"Infinity" but parses them
+    // back as strings, poisoning number-typed fields. They must become null.
+    for (const [path, entry] of Object.entries(store.zip.files)) {
+      if (entry.dir || !path.endsWith("zarr.json")) continue;
+      const raw = await entry.async("string");
+      expect(raw, path).not.toMatch(/"(NaN|-?Infinity)"/);
+    }
+
+    const restored = await readV2(store, () => {});
+    const channel = restored.data.channels.entities["channel-1"]!;
+    expect(typeof channel.mean).not.toBe("string");
+    expect(typeof channel.std).not.toBe("string");
   });
 });
 
@@ -677,8 +776,7 @@ describe("v2 project archive", () => {
     // `createStoreFromZip` splits the root folder name on "." to recover it, so
     // an unsanitized name would produce an archive that can't be reopened.
     const store = new PiximiStore("my_v1.2_project".replace(/[./\\]/g, "_"));
-    const root = await group(store, store.rootName);
-    await writeV2(root, buildFixture(), channelAccessor, () => {});
+    await writeV2(store, buildFixture(), channelAccessor, () => {});
 
     const blob = await store.zip.generateAsync({ type: "blob" });
     const reopened = await new JSZip().loadAsync(blob);
@@ -706,8 +804,7 @@ describe("v2 project archive", () => {
     };
 
     const store = new PiximiStore("with-models");
-    const root = await group(store, store.rootName);
-    await writeV2(root, buildFixture(), channelAccessor, () => {});
+    await writeV2(store, buildFixture(), channelAccessor, () => {});
     store.attachModels(models);
 
     const blob = await store.zip.generateAsync({ type: "blob" });
@@ -743,8 +840,7 @@ describe("v2 project archive", () => {
 
   it("still reads legacy archives that carry no model manifest", async () => {
     const store = new PiximiStore("legacy-models");
-    const root = await group(store, store.rootName);
-    await writeV2(root, buildFixture(), channelAccessor, () => {});
+    await writeV2(store, buildFixture(), channelAccessor, () => {});
     // Pre-manifest layout: files at the archive root, named after the model.
     store.zip.file("LegacyModel.json", "legacy-topology");
     store.zip.file("LegacyModel.weights.bin", "legacy-weights");
@@ -774,8 +870,7 @@ describe("v2 project archive", () => {
    */
   it("routes a saved archive back through loadProject to the v2 reader", async () => {
     const store = new PiximiStore("round-trip");
-    const root = await group(store, store.rootName);
-    await writeV2(root, buildFixture(), channelAccessor, () => {});
+    await writeV2(store, buildFixture(), channelAccessor, () => {});
 
     const blob = await store.zip.generateAsync({ type: "blob" });
     const file = new File([blob], "round-trip.zip", {

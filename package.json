@@ -65,7 +65,7 @@
     "use-immer": "^0.11.0",
     "use-sound": "^4.0.1",
     "uuid": "^8.3.2",
-    "zarr": "^0.6.1",
+    "zarrita": "^0.7.5",
     "zod": "^4.4.3"
   },
   "devDependencies": {

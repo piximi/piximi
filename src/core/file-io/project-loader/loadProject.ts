@@ -1,5 +1,4 @@
 import JSZip from "jszip";
-import { openGroup } from "zarr";
 import { clean, eq, lt, lte, valid } from "semver";
 
 import { MODEL_MANIFEST_FILENAME } from "core/file-io/consts";
@@ -10,7 +9,7 @@ import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures"
 import { computeObjectIntensityMeasurementsLocal } from "utils/measurements/computeObjectIntensityMeasurements";
 
 import { FileStore, ZipStore } from "../zarr/stores";
-import { getAttr } from "../zarr/utils";
+import { getAttr, openRootGroup } from "../zarr/utils";
 import { readV2 } from "./version-readers/readV2";
 import { readV11 } from "./version-readers/readV11";
 import { convertV11ToV2 } from "./version-converters/v11ToV2";
@@ -133,7 +132,7 @@ export async function loadProject(
 async function detectVersion(
   store: CustomStore,
 ): Promise<{ projectVersion: string; versionRange: VersionRange }> {
-  const rootGroup = await openGroup(store, store.rootName, "r");
+  const rootGroup = await openRootGroup(store);
   const projectVersionRaw = (await getAttr(rootGroup, "version")) as string;
 
   if (!projectVersionRaw) {
@@ -275,9 +274,18 @@ const extractModelsFromManifests = async (
 const extractModelsByFileName = async (
   zip: JSZip,
 ): Promise<ExtractedModelFileMap> => {
-  const modelFileRegEx = new RegExp(".json$|.weights.bin$");
+  // Dots escaped: unescaped, `.json$` also matches e.g. "Xjson".
+  const modelFileRegEx = /\.json$|\.weights\.bin$/;
   const models: ExtractedModelFileMap = {};
   for await (const [fileName, file] of Object.entries(zip.files)) {
+    /*
+     * Zarr v3 names every group's and array's metadata `zarr.json`, which this
+     * pattern would otherwise match — turning each one into a phantom model and
+     * corrupting the map. Model files have never lived inside the `.zarr` tree:
+     * this pre-manifest layout put them at the archive root, and the manifest
+     * layout puts them under `models/`.
+     */
+    if (fileName.includes(".zarr/")) continue;
     if (!modelFileRegEx.test(fileName)) continue;
 
     const parsedFileName = fileName.split(".");
