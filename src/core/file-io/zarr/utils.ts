@@ -201,7 +201,6 @@ export const getDatasetSelection = async (
 export const getAttr = async (
   node: { attrs: Record<string, unknown>; path: string },
   attr: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> => {
   if (!(attr in node.attrs)) {
     throw new Error(`Expected attribute "${attr}" in group "${node.path}"`);
