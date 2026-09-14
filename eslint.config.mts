@@ -2,8 +2,7 @@ import globals from "globals";
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
-// @ts-expect-error - eslint-plugin-no-autofix ships no type declarations
-import noAutofix from "eslint-plugin-no-autofix";
+import disableAutofix from "eslint-plugin-disable-autofix";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import { importX } from "eslint-plugin-import-x";
 
@@ -18,11 +17,11 @@ export default tseslint.config(
   pluginReact.configs.flat["jsx-runtime"],
   {
     plugins: {
-      "no-autofix": noAutofix,
+      "disable-autofix": disableAutofix,
     },
     rules: {
       "prefer-const": "off",
-      "no-autofix/prefer-const": "warn",
+      "disable-autofix/prefer-const": "warn",
     },
   },
   {
@@ -45,6 +44,7 @@ export default tseslint.config(
     },
     rules: {
       // JS
+      "no-useless-assignment": "off",
       "no-prototype-builtins": "off",
       "no-case-declarations": "off",
       // REACT
