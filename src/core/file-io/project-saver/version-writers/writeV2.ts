@@ -27,9 +27,7 @@ import { createGroup, createRootGroup, writeArray } from "../zarr/writers";
 
 import type { EntityState } from "@reduxjs/toolkit";
 
-import type { WriteStore } from "../../zarr/stores";
 // Aliased on import so the `Group` annotations throughout this file stand.
-import type { WritableGroup as Group } from "../zarr/writers";
 
 import type {
   ModelClassMap,
@@ -54,6 +52,8 @@ import type {
 
 import type { ClassifierState, KindClassifier } from "store/classifier/types";
 
+import type { WritableGroup as Group } from "../zarr/writers";
+import type { WriteStore } from "../../zarr/stores";
 import type { ChannelDataAccessor, SerializableProject } from "../types";
 
 /**

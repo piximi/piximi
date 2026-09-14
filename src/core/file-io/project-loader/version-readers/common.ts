@@ -9,7 +9,6 @@ import { getAttr, getDatasetSelection, getGroup } from "../../zarr/utils";
 import { initialClassifierStateV01_02 } from "./constants";
 
 import type { Group } from "../../zarr/utils";
-
 import type {
   V01ClassifierEvaluationResultType,
   V01ClassifierState,

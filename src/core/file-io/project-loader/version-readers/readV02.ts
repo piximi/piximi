@@ -14,10 +14,10 @@ import {
 import { subProgress } from "../progress";
 
 import type { EntityState } from "@reduxjs/toolkit";
-import type { Group, RawArray } from "../../zarr/utils";
 
 import type { Partition } from "core/dl/enums";
 
+import type { Group } from "../../zarr/utils";
 import type { CustomStore } from "../../zarr/stores";
 import type {
   V02BitDepth,

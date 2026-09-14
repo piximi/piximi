@@ -20,8 +20,7 @@ import {
 } from "./common";
 import { subProgress } from "../progress";
 
-import type { Group, RawArray } from "../../zarr/utils";
-
+import type { Group } from "../../zarr/utils";
 import type { CustomStore } from "../../zarr/stores";
 import type {
   V01BitDepth,

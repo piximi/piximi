@@ -32,7 +32,6 @@ import {
 import { subProgress } from "../progress";
 
 import type { EntityState } from "@reduxjs/toolkit";
-import type { Group, RawArray } from "../../zarr/utils";
 
 import type { Partition } from "core/dl/enums";
 import type {
@@ -57,6 +56,7 @@ import type {
 
 import type { ClassifierState, KindClassifier } from "store/classifier/types";
 
+import type { Group } from "../../zarr/utils";
 import type {
   V2AnnotationObject,
   V2AnnotationVolume,
