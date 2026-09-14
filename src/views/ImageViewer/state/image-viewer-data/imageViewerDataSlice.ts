@@ -3,6 +3,8 @@ import { difference } from "lodash";
 
 import { UNKNOWN_KIND_CATEGORY } from "core/entities";
 
+import { projectReset } from "store/actions";
+
 import { emptySelectionLayer } from "./utils";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
@@ -200,5 +202,8 @@ export const imageViewerDataSlice = createSlice({
     toggleZLinking(state, action: PayloadAction<boolean>) {
       state.zLinking.active = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(projectReset, () => ({ ...initialState }));
   },
 });

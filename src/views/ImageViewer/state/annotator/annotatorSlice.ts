@@ -1,17 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+import { projectReset } from "store/actions";
+
 import {
   AnnotationMode,
   AnnotationState,
   ToolType,
-} from "views/ImageViewer/utils/enums";
+} from "@ImageViewer/utils/enums";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 import type {
   AnnotatorState,
   WorkingAnnotation,
-} from "views/ImageViewer/utils/types";
+} from "@ImageViewer/utils/types";
 
 const initialState: AnnotatorState = {
   workingAnnotation: { saved: undefined, changes: {} },
@@ -89,5 +91,8 @@ export const annotatorSlice = createSlice({
     setInvertThresholdAnnotation(state, action: PayloadAction<boolean>) {
       state.invertThresholdAnnotation = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(projectReset, () => ({ ...initialState }));
   },
 });

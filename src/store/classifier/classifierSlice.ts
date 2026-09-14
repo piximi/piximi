@@ -4,6 +4,7 @@ import { UNKNOWN_KIND, UNKNOWN_KIND_ID } from "core/entities";
 import { ModelArch } from "core/dl/classification/types";
 
 import { dataSlice } from "store/data";
+import { projectReset } from "store/actions";
 
 import { recursiveAssign } from "utils/objectUtils";
 
@@ -320,6 +321,7 @@ export const classifierSlice = createSlice({
   },
   extraReducers(builder) {
     builder
+      .addCase(projectReset, () => ({ ...initialState }))
       .addCase(dataSlice.actions.addKind, (state, action) => {
         state.kindClassifiers[action.payload.kind.id] = {
           modelTargetId: action.payload.kind.id,

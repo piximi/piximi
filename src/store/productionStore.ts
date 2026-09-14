@@ -6,7 +6,6 @@ import { classifierSlice } from "store/classifier";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { projectSlice } from "views/ProjectViewer/state/projectSlice";
-import { projectMiddleware } from "views/ProjectViewer/state/projectListeners";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { measurementsSlice } from "views/MeasurementViewer/state";
 
@@ -14,6 +13,7 @@ import { appTasksSlice } from "./appTasks/appTasksSlice";
 import { dataSlice } from "./data";
 import { rootReducer } from "./rootReducer";
 import { applicationSettingsSlice } from "./applicationSettings";
+import { projectMiddleware } from "./listeners";
 
 import type {
   Dispatch,
