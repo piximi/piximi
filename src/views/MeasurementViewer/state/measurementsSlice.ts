@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { generateUUID } from "core/entities";
 
 import { dataSlice } from "store/data";
+import { projectReset } from "store/actions";
 
 import { mutatingFilter } from "utils/arrayUtils";
 import { getUniqueName } from "utils/stringUtils";
@@ -309,6 +310,8 @@ export const measurementsSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(dataSlice.actions.clearState, () => initialState);
+    builder
+      .addCase(dataSlice.actions.clearState, () => initialState)
+      .addCase(projectReset, () => ({ ...initialState }));
   },
 });

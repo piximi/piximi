@@ -10,11 +10,10 @@ import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { classifierSlice } from "store/classifier";
 import { dataSlice } from "store/data";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+import { projectReset } from "store/actions";
 
 import { AlertType } from "utils/enums";
 import { clearCache } from "utils/renderedSrcsCache";
-
-import { projectSlice } from "@ProjectViewer/state";
 
 import type { AppTask } from "store/appTasks/types";
 
@@ -119,7 +118,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
         const { data, classifier } = result.project;
         clearCache();
         batch(() => {
-          dispatch(projectSlice.actions.resetProject());
+          dispatch(projectReset);
           dispatch(
             classifierSlice.actions.setClassifier({
               classifier: classifier,
@@ -227,7 +226,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
 
         clearCache();
         batch(() => {
-          dispatch(projectSlice.actions.resetProject());
+          dispatch(projectReset);
           dispatch(
             classifierSlice.actions.setClassifier({
               classifier: classifier,

@@ -4,6 +4,7 @@ import { difference } from "lodash";
 import { UNKNOWN_KIND } from "core/entities";
 
 import { dataSlice } from "store/data";
+import { projectReset } from "store/actions";
 
 import { findAdjacentItem, mutatingFilter } from "utils/arrayUtils";
 import { representsUnknown } from "utils/stringUtils";
@@ -82,9 +83,6 @@ export const projectSlice = createSlice({
   name: "project",
   initialState: initialState,
   reducers: {
-    resetProject() {
-      return initialState;
-    },
     setProjectImageChannels(
       state,
       action: PayloadAction<{ channels: number | undefined }>,
@@ -256,6 +254,7 @@ export const projectSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(projectReset, () => ({ ...initialState }))
       .addCase(dataSlice.actions.setState, (state, action) => {
         const { kinds } = action.payload;
         state.imageGridState = { ...initialState.imageGridState };

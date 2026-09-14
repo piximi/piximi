@@ -1,13 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { ZoomMode } from "views/ImageViewer/utils/enums";
+import { projectReset } from "store/actions";
+
+import { ZoomMode } from "@ImageViewer/utils/enums";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 import type {
   ZoomToolOptionsType,
   ImageViewerState,
-} from "views/ImageViewer/utils/types";
+} from "@ImageViewer/utils/types";
 
 const initialState: ImageViewerState = {
   stagePosition: { x: 0, y: 0 },
@@ -43,5 +45,8 @@ export const imageViewerSlice = createSlice({
     ) {
       state.zoomOptions = { ...state.zoomOptions, ...action.payload.options };
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(projectReset, () => ({ ...initialState }));
   },
 });
