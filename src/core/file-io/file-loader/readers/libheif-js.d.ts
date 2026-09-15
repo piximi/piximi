@@ -16,10 +16,10 @@ declare module "libheif-js/wasm-bundle" {
     ): void;
   }
 
-  class HeifDecoder {
+  interface HeifDecoder {
     decode(buffer: ArrayBuffer | Uint8Array): HeifImage[];
   }
 
-  const libheif: { HeifDecoder: typeof HeifDecoder };
+  const libheif: { HeifDecoder: new () => HeifDecoder };
   export default libheif;
 }
