@@ -3,7 +3,7 @@
 EXITCODE=0
 PTRN='console\.log'
 IGNR='// ignore-no-logs'
-FILES=$(git diff --cached --name-only | grep -E "^src")
+FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E "^src")
 for file in $FILES
 do
     if [ $(cat $file | grep -E "$PTRN" | wc -l) != 0 ]

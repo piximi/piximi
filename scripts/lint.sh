@@ -1,8 +1,6 @@
 #!/bin/bash
+set -euo pipefail
 
-pnpm eslint --max-warnings 0 --debug "$@" 2>&1 | grep  "eslint:eslint Lint " | awk '{print $NF}' | while IFS= read -r line; do
-    printf "\033[K" # clear from cursor to end of line
-    echo $line
-    printf "\033[F" # cursor beginning of preivous line
-    sleep 0.01  # Adjust speed of updates
-done
+# Lint the given paths, or all of src/ when called with no arguments.
+# Exits non-zero when ESLint reports any error or warning.
+pnpm exec eslint --max-warnings 0 "${@:-src/}"
