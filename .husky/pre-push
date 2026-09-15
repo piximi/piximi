@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
+set -e
+
+pnpm run typecheck
 
 pnpm run format-check
 

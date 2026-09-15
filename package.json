@@ -114,6 +114,7 @@
     "install": "^0.13.0",
     "jiti": "^2.4.2",
     "knip": "^6.6.0",
+    "lint-staged": "^17.5.1",
     "playwright": "^1.54.1",
     "prettier": "^3.4.2",
     "storybook": "^8.5.2",
@@ -140,8 +141,18 @@
     "no-console-logs": "./scripts/checkConsoleLogs.sh",
     "bump": "node ./scripts/bump.js",
     "lint": "./scripts/lint.sh",
-    "format-check": "prettier --cache --check 'src/**/*.{js,jsx,ts,tsx,json,scss,md}'",
-    "format-write": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'"
+    "typecheck": "tsc --noEmit",
+    "format-check": "prettier --cache --check 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'",
+    "format-write": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx,js,jsx}": [
+      "eslint --max-warnings 0 --no-warn-ignored",
+      "prettier --cache --check"
+    ],
+    "src/**/*.{json,css,scss}": [
+      "prettier --cache --check"
+    ]
   },
   "browserslist": {
     "production": [
