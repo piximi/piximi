@@ -4,9 +4,9 @@ import {
   FormatShapes as FormatShapesIcon,
 } from "@mui/icons-material";
 
-import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
-import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
-import { HelpButton } from "components/layout/app-drawer/HelpButton";
+import { SettingsButton } from "components/app-drawer/application-settings/SettingsButton";
+import { SendFeedbackButton } from "components/app-drawer/SendFeedbackButton";
+import { HelpButton } from "components/app-drawer/HelpButton";
 
 import { DIMENSIONS } from "utils/constants";
 

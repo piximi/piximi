@@ -2,11 +2,11 @@ import { useDispatch } from "react-redux";
 
 import AddIcon from "@mui/icons-material/Add";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-
 import { projectReset } from "store/actions";
 
 import { clearCache } from "utils/renderedSrcsCache";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import { CustomListItemButton } from "@ProjectViewer/components";
 import { useConfirmReplaceDialog } from "@ProjectViewer/hooks";

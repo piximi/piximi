@@ -3,9 +3,9 @@ import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
 
 import { useDialog, useDialogHotkey, useTranslation } from "hooks";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-
 import { HotkeyContext } from "utils/enums";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import { SaveFittedModelDialog } from "@ProjectViewer/components/dialogs";
 

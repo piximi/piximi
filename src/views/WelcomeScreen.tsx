@@ -1,36 +1,20 @@
-import { useMemo } from "react";
-
 import { useNavigate } from "react-router-dom";
 
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  List,
-  ListItem,
-  Stack,
-  styled,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Stack, styled } from "@mui/material";
 
 import {
-  useDialog,
   useDialogHotkey,
   useMobileView,
-  usePreferredMuiTheme,
   useProjectLoader,
   useWindowSize,
 } from "hooks";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { CollapsibleList, Logo } from "components/ui";
+import { Logo } from "components/ui";
 import { ExampleProjectDialog } from "components/dialogs";
 
 import { HotkeyContext } from "utils/enums";
 
-import type { Palette } from "@mui/material";
+import { HelpItem } from "data/help/HelpContent";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -46,76 +30,16 @@ const VisuallyHiddenInput = styled("input")({
 
 export const WelcomeScreen = () => {
   const navigate = useNavigate();
-  const theme = usePreferredMuiTheme();
   const {
     onClose: handleCloseCloseExampleProjectDialog,
     onOpen: handleOpenExampleProjectDialog,
     open: ExampleProjectOpen,
   } = useDialogHotkey(HotkeyContext.ExampleProjectDialog);
-  const { open, onClose, onOpen } = useDialog();
 
   const windowSize = useWindowSize();
   const mobileView = useMobileView();
 
   const { loadProject } = useProjectLoader();
-
-  const palette = useMemo(() => {
-    const groups: Array<keyof Palette> = [
-      "action",
-      "background",
-      "common",
-      "divider",
-      "error",
-      "grey",
-      "info",
-      "primary",
-      "secondary",
-      "success",
-      "text",
-      "warning",
-    ];
-    return (
-      <List>
-        {groups.map((group) => {
-          return typeof theme.palette[group] === "object" ? (
-            <CollapsibleList key={group} primary={group} dense disablePadding>
-              {Object.entries(theme.palette[group])
-                .filter((entry) => typeof entry[1] === "string")
-                .map((item, idx) => (
-                  <ListItem key={idx}>
-                    <Typography>{item[0]}</Typography>
-                    <Box
-                      marginLeft={2}
-                      width="100px"
-                      height="1rem"
-                      sx={{
-                        backgroundColor: item[1],
-                        border: "1px solid white",
-                        borderRadius: 1,
-                      }}
-                    ></Box>
-                  </ListItem>
-                ))}
-            </CollapsibleList>
-          ) : (
-            <ListItem key={group}>
-              <Typography>{group}</Typography>
-              <Box
-                marginLeft={2}
-                width="100px"
-                height="1rem"
-                sx={{
-                  backgroundColor: theme.palette[group] as string,
-                  border: "1px solid white",
-                  borderRadius: 1,
-                }}
-              ></Box>
-            </ListItem>
-          );
-        })}
-      </List>
-    );
-  }, [theme]);
 
   const handleCloseDialog = (
     event?: object,
@@ -216,29 +140,12 @@ export const WelcomeScreen = () => {
               Documentation
             </Button>
           </Stack>
-          {import.meta.env.DEV && (
-            <Button
-              onClick={() => {
-                onOpen();
-              }}
-              variant="outlined"
-              color="primary"
-            >
-              {windowSize.width}
-            </Button>
-          )}
         </Stack>
       </Box>
       <ExampleProjectDialog
         open={ExampleProjectOpen}
         onClose={handleCloseDialog}
       />
-      {import.meta.env.DEV && (
-        <Dialog open={open} onClose={onClose}>
-          <DialogTitle>Palette</DialogTitle>
-          <DialogContent>{palette}</DialogContent>
-        </Dialog>
-      )}
     </Box>
   );
 };

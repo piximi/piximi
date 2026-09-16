@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { MenuItem } from "@mui/material";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { HelpItem } from "data/help/HelpContent";
 
 import { measurementsSlice } from "@MeasurementViewer/state";
 import { selectActiveSelectedPlot } from "@MeasurementViewer/state/selectors";

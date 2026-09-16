@@ -2,7 +2,7 @@ import { TextField, Box } from "@mui/material";
 
 import { useCategoryValidation } from "hooks";
 
-import { ColorPicker } from "components/ui";
+import { ColorPicker } from "components/inputs";
 
 import { formatString } from "utils/stringUtils";
 

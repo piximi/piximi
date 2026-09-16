@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Box, TextField } from "@mui/material";
 
 import { ConfirmationDialog } from "components/dialogs";
-import { ColorPicker } from "components/ui";
+import { ColorPicker } from "components/inputs";
 
 import { getRandomHex } from "utils/colorUtils";
 import { representsUnknown } from "utils/stringUtils";

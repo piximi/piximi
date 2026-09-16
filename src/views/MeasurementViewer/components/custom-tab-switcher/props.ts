@@ -1,4 +1,4 @@
-import type { HelpItem } from "../../../../components/layout/HelpDrawer/HelpContent";
+import type { HelpItem } from "../../../../data/help/HelpContent";
 
 export interface CommonTabPanelProps {
   children: React.ReactNode;

@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 
-import { LogoLoader } from "components/ui";
+import { LogoIcon } from "components/ui";
 
 import { DIMENSIONS } from "utils/constants";
 
@@ -14,7 +14,7 @@ export const ImageViewerLogo = () => {
         alignItems: "center",
       }}
     >
-      <LogoLoader width={30} height={20} loadPercent={1} fullLogo={false} />
+      <LogoIcon width={30} height={20} />
       <Typography variant="h6" color={"#02aec5"}>
         Image Viewer
       </Typography>

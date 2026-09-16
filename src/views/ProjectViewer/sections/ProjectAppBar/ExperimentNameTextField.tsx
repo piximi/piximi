@@ -5,10 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { FormControl } from "@mui/material";
 
 import { TextFieldWithBlur } from "components/inputs";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { selectExperiment } from "store/data/selectors";
 import { dataSlice } from "store/data";
+
+import { HelpItem } from "data/help/HelpContent";
 
 export const ExperimentNameTextField = () => {
   const dispatch = useDispatch();

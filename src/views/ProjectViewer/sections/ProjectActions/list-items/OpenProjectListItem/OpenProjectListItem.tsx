@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 
 import { FolderOpen as FolderOpenIcon } from "@mui/icons-material";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { HelpItem } from "data/help/HelpContent";
 
 import { CustomListItemButton } from "@ProjectViewer/components";
 

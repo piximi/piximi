@@ -7,7 +7,7 @@ import {
   Checkbox,
 } from "@mui/material";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { HelpItem } from "data/help/HelpContent";
 
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 

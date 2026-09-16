@@ -7,12 +7,12 @@ import { Box, Divider, IconButton } from "@mui/material";
 
 import { useMenu, useMobileView } from "hooks";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-
 import { dataSlice } from "store/data";
 
 import { DIMENSIONS } from "utils/constants";
 import { findAdjacentItem } from "utils/arrayUtils";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import { selectAnnotationGridState } from "@ProjectViewer/state/selectors";
 import { projectSlice } from "@ProjectViewer/state/projectSlice";

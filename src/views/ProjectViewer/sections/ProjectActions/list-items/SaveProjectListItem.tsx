@@ -3,9 +3,10 @@ import { Download as DownloadIcon } from "@mui/icons-material";
 import { useDialogHotkey } from "hooks";
 
 import { SaveProjectDialog } from "components/dialogs";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import { CustomListItemButton } from "@ProjectViewer/components";
 

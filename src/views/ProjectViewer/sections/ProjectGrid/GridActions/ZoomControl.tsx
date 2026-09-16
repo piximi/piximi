@@ -7,12 +7,13 @@ import { ZoomIn as ZoomInIcon } from "@mui/icons-material";
 
 import { useMenu, useMobileView } from "hooks";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { IncrementalSlider } from "components/inputs";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { DEFAULT_GRID_ITEM_WIDTH, DIMENSIONS, GRID_GAP } from "utils/constants";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import { actionButtonStyle } from "./utils";
 

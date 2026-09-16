@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Box, Stack, Typography } from "@mui/material";
 
 import { DividerHeader } from "components/ui";
-import { CustomSwitch } from "components/inputs";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import {
@@ -11,6 +10,7 @@ import {
   selectShowSaveProjectDialog,
 } from "store/applicationSettings/selectors";
 
+import { CustomSwitch } from "./CustomSwitch";
 import { SettingsItem } from "./SettingsItem";
 
 export const ProjectSettings = () => {

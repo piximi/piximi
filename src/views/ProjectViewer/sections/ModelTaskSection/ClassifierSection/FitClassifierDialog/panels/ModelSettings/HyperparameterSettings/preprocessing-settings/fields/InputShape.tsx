@@ -4,7 +4,7 @@ import { Tooltip, FormControl, FormLabel, Stack } from "@mui/material";
 
 import { useNumberField } from "hooks";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { HelpItem } from "data/help/HelpContent";
 
 import { useClassificationModel } from "@ProjectViewer/hooks";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";

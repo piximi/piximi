@@ -12,7 +12,7 @@ import { usePreferredMuiTheme } from "hooks";
 
 import { HelpProvider } from "contexts";
 
-import { AlertBar, TaskProgressToasts } from "components/ui";
+import { AlertBar, TaskProgressToasts } from "components/app-shell";
 
 import { selectAlertState } from "store/applicationSettings/selectors";
 
