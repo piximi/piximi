@@ -17,6 +17,8 @@ import {
 
 import { useTranslation } from "hooks";
 
+import { ToolButton } from "components/inputs";
+
 import { DIMENSIONS } from "utils/constants";
 
 import { HelpItem } from "data/help/HelpContent";
@@ -28,8 +30,6 @@ import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 
 import { ImageViewerLogo } from "@ImageViewer/components";
 import { useThreeViewport } from "@ImageViewer/sections/ThreeStage/ThreeViewportContext";
-
-import { AnnotationTool } from "./AnnotationTool";
 
 const ZoomTools = () => {
   const dispatch = useDispatch();
@@ -115,18 +115,18 @@ const ZoomTools = () => {
         </ToggleButtonGroup>
       </Tooltip>
       <Divider orientation="vertical" flexItem />
-      <AnnotationTool
+      <ToolButton
         name={t("Actual Size")}
         onClick={zoomToActualSize}
         icon={<AspectRatioIcon />}
       />
-      <AnnotationTool
+      <ToolButton
         name={t("Fit Screen")}
         onClick={fitToScreen}
         icon={<FitScreenIcon />}
       />
 
-      <AnnotationTool
+      <ToolButton
         name={t("ResetPosition")}
         onClick={resetPosition}
         icon={<ControlCameraIcon />}

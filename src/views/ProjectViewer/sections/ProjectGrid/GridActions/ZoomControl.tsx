@@ -2,12 +2,11 @@ import { useLayoutEffect, useState } from "react";
 
 import { useDispatch } from "react-redux";
 
-import { IconButton, Popper } from "@mui/material";
 import { ZoomIn as ZoomInIcon } from "@mui/icons-material";
 
-import { useMenu, useMobileView } from "hooks";
+import { useMobileView } from "hooks";
 
-import { IncrementalSlider } from "components/inputs";
+import { IncrementalSlider, PopperToolButton } from "components/inputs";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 
@@ -15,15 +14,12 @@ import { DEFAULT_GRID_ITEM_WIDTH, DIMENSIONS, GRID_GAP } from "utils/constants";
 
 import { HelpItem } from "data/help/HelpContent";
 
-import { actionButtonStyle } from "./utils";
-
 const minZoom = 0.6;
 
 export const ZoomControl = () => {
   const dispatch = useDispatch();
   const [value, setValue] = useState<number>(1);
   const [maxZoom, setMaxZoom] = useState<number>(4);
-  const { onOpen, onClose, open, anchorEl } = useMenu();
   const isMobile = useMobileView();
 
   useLayoutEffect(() => {
@@ -53,29 +49,28 @@ export const ZoomControl = () => {
 
   return (
     <>
-      <IconButton
+      <PopperToolButton
+        name="Grid Zoom"
         data-help={HelpItem.GridZoom}
-        color="inherit"
-        onClick={open ? onClose : onOpen}
-        sx={{ ...actionButtonStyle, mr: 0.5 }}
-      >
-        <ZoomInIcon />
-      </IconButton>
-      <Popper open={open} anchorEl={anchorEl}>
-        <IncrementalSlider
-          min={minZoom}
-          max={maxZoom}
-          orientation="vertical"
-          initialValue={value}
-          step={0.1}
-          length={(maxZoom - minZoom) * 20 + "px"}
-          outerStyle={{
-            border: `1px solid var(--mui-palette-text-primary)`,
-          }}
-          callback={handleSizeChange}
-          callbackOnSlide={true}
-        />
-      </Popper>
+        onClick={() => {}}
+        icon={<ZoomInIcon />}
+        popperContent={
+          <IncrementalSlider
+            min={minZoom}
+            max={maxZoom}
+            orientation="vertical"
+            initialValue={value}
+            step={0.1}
+            length={(maxZoom - minZoom) * 20 + "px"}
+            outerStyle={{
+              border: "1px solid var(--mui-palette-text-primary)",
+            }}
+            callback={handleSizeChange}
+            callbackOnSlide={true}
+          />
+        }
+        popperPlacement="bottom"
+      />
     </>
   );
 };

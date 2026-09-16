@@ -17,7 +17,7 @@ export const ProjectDrawer = () => {
     <Box sx={{ display: "flex", flexGrow: 1, gridArea: "action-drawer" }}>
       <BaseAppDrawer>
         <DividerHeader
-          sx={{ my: 1 }}
+          sx={{ mt: 1 }}
           textAlign="left"
           typographyVariant="caption"
           textTransform="uppercase"

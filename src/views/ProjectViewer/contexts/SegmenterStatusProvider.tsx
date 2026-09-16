@@ -74,12 +74,12 @@ export const SegmenterStatusProvider = ({
   const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
 
   useEffect(() => {
-    let newError: ErrorContext | undefined;
+    let newError: ErrorContext | undefined = error;
     let newIsReady = true;
 
     if (projectImages.length === 0) {
       newIsReady = false;
-      if (!error || error.severity > 1) {
+      if (!newError || newError.severity > 1) {
         newError = {
           reason: ErrorReason.NoInferenceImages,
           message: "No images available for inference",
@@ -92,7 +92,7 @@ export const SegmenterStatusProvider = ({
       selectedChannels.some((id) => id === "")
     ) {
       newIsReady = false;
-      if (!error || error.severity > 2) {
+      if (!newError || newError.severity > 2) {
         newError = {
           reason: ErrorReason.ChannelMismatch,
           message: "Select channels for segmentation",

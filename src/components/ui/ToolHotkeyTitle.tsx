@@ -1,31 +1,27 @@
 import { Box, Typography } from "@mui/material";
 
-import { KeyboardKey } from "components/ui/KeyboardKey";
+import { HotkeyTitle } from "components/ui/KeyboardKey";
 
 type ToolHotkeyTitleProps = {
   toolName: string;
-  letter?: string;
+  hotkey?: string[];
   bold?: boolean;
 };
 export const ToolHotkeyTitle = ({
   toolName,
-  letter,
+  hotkey,
   bold,
 }: ToolHotkeyTitleProps) => {
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
-      <Typography fontWeight={bold ? "fontWeightBold" : ""} fontSize={"0.7rem"}>
+      <Typography
+        fontWeight={bold ? "fontWeightBold" : ""}
+        fontSize={"0.7rem"}
+        sx={{ mr: hotkey ? 1 : 0 }}
+      >
         {toolName}
       </Typography>
-      {letter && (
-        <>
-          <Typography style={{ marginLeft: "5px" }}>(</Typography>
-          <KeyboardKey letter="shift" />
-          <Typography>+</Typography>
-          <KeyboardKey letter={letter} />
-          <Typography>)</Typography>
-        </>
-      )}
+      {hotkey && <HotkeyTitle hotkey={hotkey} />}
     </Box>
   );
 };

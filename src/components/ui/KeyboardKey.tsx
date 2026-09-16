@@ -1,30 +1,34 @@
-import { Box, Typography } from "@mui/material";
+import { Fragment } from "react/jsx-runtime";
 
-type KeyboardKeyProps = {
-  letter: string;
+import { Box } from "@mui/material";
+
+export const HotkeyTitle = ({ hotkey }: { hotkey: string[] }) => {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", fontSize: "inherit" }}>
+      {hotkey.map((key, idx) =>
+        idx < hotkey.length - 1 ? (
+          <Fragment key={`${hotkey.join(",")}-${key}`}>
+            <Key hkey={key} /> <Box sx={{ py: 0, px: 0.5 }}>+</Box>
+          </Fragment>
+        ) : (
+          <Key key={`${hotkey.join(",")}-${key}`} hkey={key} />
+        ),
+      )}
+    </Box>
+  );
 };
-export const KeyboardKey = ({ letter }: KeyboardKeyProps) => {
+export const Key = ({ hkey }: { hkey: string }) => {
   return (
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
-        width: "fit-content",
-        mx: "5px",
-        backgroundColor: "rgba(237, 242, 247, 1)",
-        border: "1px solid rgba(184, 186, 189, 1)",
-        borderRadius: "6px",
-        px: "0.4em",
-        whiteSpace: "nowrap",
+        py: 0,
+        px: 0.5,
+        border: "1px solid var(--mui-palette-text-primary)",
+        borderRadius: 1,
+        textTransform: "capitalize",
       }}
     >
-      <Typography
-        color="rgba(45, 55, 72, 1)"
-        fontWeight={700}
-        fontSize="0.75rem"
-      >
-        {letter}
-      </Typography>
+      {hkey}
     </Box>
   );
 };

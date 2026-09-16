@@ -20,7 +20,7 @@ import {
 
 import { HotkeyContext } from "utils/enums";
 
-import { TooltipButton } from "@ProjectViewer/components";
+import { TooltipTextButton } from "@ProjectViewer/components";
 import {
   useClassifierStatus,
   ErrorReason,
@@ -44,7 +44,9 @@ export const ModelActions = () => {
     modelTarget,
   );
   return (
-    <Box width="100%" display="flex" justifyContent={"space-evenly"}>
+    <Box
+      sx={{ display: "flex", width: "100%", justifyContent: "space-between" }}
+    >
       <FitClassifierButton modelStatus={modelStatus} />
       <PredictClassifierButton modelStatus={modelStatus} />
       <EvaluateClassifierButton modelStatus={modelStatus} />
@@ -77,14 +79,14 @@ const FitClassifierButton = ({
 
   return (
     <>
-      <TooltipButton
-        tooltipTitle={helperText}
-        disableRipple
+      <TooltipTextButton
+        tooltipText={helperText}
         onClick={handleOpenFitClassifierDialog}
         disabled={!precheck.modelTrainable}
-      >
-        <ScatterPlotIcon />
-      </TooltipButton>
+        icon={<ScatterPlotIcon />}
+        label="Fit"
+      />
+
       <FitClassifierDialog
         openedDialog={fitClassifierDialogOpen}
         closeDialog={handleCloseFitClassifierDialog}
@@ -134,24 +136,19 @@ const PredictClassifierButton = ({
   );
 
   return (
-    <>
-      <TooltipButton
-        tooltipTitle={helperText}
-        disableRipple
-        onClick={handlePredict}
-        disabled={predictionDisabled}
-      >
-        {modelStatus === "predicting" ? (
-          <CircularProgress
-            disableShrink
-            size={24}
-            sx={{ alignSelf: "center" }}
-          />
+    <TooltipTextButton
+      tooltipText={helperText}
+      onClick={handlePredict}
+      disabled={predictionDisabled}
+      icon={
+        modelStatus === "predicting" ? (
+          <CircularProgress disableShrink />
         ) : (
           <LabelImportantIcon />
-        )}
-      </TooltipButton>
-    </>
+        )
+      }
+      label="Predict"
+    />
   );
 };
 
@@ -195,14 +192,14 @@ const EvaluateClassifierButton = ({
 
   return (
     <>
-      <TooltipButton
-        tooltipTitle={helperText}
-        disableRipple
+      <TooltipTextButton
+        tooltipText={helperText}
         onClick={handleEvaluate}
         disabled={activeRuns.length === 0}
-      >
-        <AssessmentIcon />
-      </TooltipButton>
+        icon={<AssessmentIcon />}
+        label="Evaluate"
+      />
+
       <EvaluateClassifierDialog
         openedDialog={evaluateClassifierDialogOpen}
         closeDialog={handleCloseEvaluateClassifierDialog}

@@ -5,7 +5,11 @@ import { Margin } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
 
-import { IncrementalSlider } from "components/inputs";
+import {
+  IncrementalSlider,
+  ToolButton,
+  InteractivePopoverToolButton,
+} from "components/inputs";
 
 import { DIMENSIONS } from "utils/constants";
 
@@ -32,8 +36,6 @@ import { ToolType } from "views/ImageViewer/utils/enums";
 
 import { useAnnotatorToolShortcuts } from "@ImageViewer/hooks";
 
-import { AnnotationTool, PopoverAnnotationTool } from "./AnnotationTool";
-
 import type { ReactElement } from "react";
 
 type SliderOptions = {
@@ -46,7 +48,7 @@ type SliderOptions = {
 type ToolOptions = {
   operation: ToolType;
   icon: (color: string) => ReactElement;
-  hotKey?: string;
+  hotKey?: string[];
   options?: SliderOptions;
 };
 type ToolMap = Record<string, ToolOptions>;
@@ -76,55 +78,55 @@ const toolMap: ToolMap = {
   "Selection Tool": {
     operation: ToolType.Pointer,
     icon: (color) => <Selection color={color} />,
-    hotKey: "S",
+    hotKey: ["shift", "S"],
   },
   "Rectangle Tool": {
     operation: ToolType.RectangularAnnotation,
     icon: (color) => <RectangleAnnotation color={color} />,
-    hotKey: "R",
+    hotKey: ["shift", "R"],
   },
   "Ellipse Tool": {
     operation: ToolType.EllipticalAnnotation,
     icon: (color) => <EllipticalAnnotation color={color} />,
-    hotKey: "E",
+    hotKey: ["shift", "E"],
   },
   "Polygon Tool": {
     operation: ToolType.PolygonalAnnotation,
     icon: (color) => <PolygonAnnotation color={color} />,
-    hotKey: "P",
+    hotKey: ["shift", "P"],
   },
   "Pen Tool": {
     operation: ToolType.PenAnnotation,
     icon: (color) => <FreehandAnnotation color={color} />,
     options: DEFAULT_PEN_TOOL_OPTIONS,
-    hotKey: "F",
+    hotKey: ["shift", "F"],
   },
   "Lasso Tool": {
     operation: ToolType.LassoAnnotation,
     icon: (color) => <LassoAnnotation color={color} />,
-    hotKey: "L",
+    hotKey: ["shift", "L"],
   },
   "Magnetic Tool": {
     operation: ToolType.MagneticAnnotation,
     icon: (color) => <MagneticAnnotation color={color} />,
-    hotKey: "M",
+    hotKey: ["shift", "M"],
   },
   "Color Tool": {
     operation: ToolType.ColorAnnotation,
     icon: (color) => <ColorAnnotation color={color} />,
-    hotKey: "C",
+    hotKey: ["shift", "C"],
   },
   "Quick Annotation Tool": {
     operation: ToolType.QuickAnnotation,
     icon: (color) => <QuickAnnotation color={color} />,
     options: DEFAULT_QUICK_TOOL_OPTIONS,
-    hotKey: "Q",
+    hotKey: ["shift", "Q"],
   },
   "Threshold Tool": {
     operation: ToolType.ThresholdAnnotation,
     icon: (color) => <Margin sx={{ color }} />,
     options: DEFAULT_THRESHOLD_TOOL_OPTIONS,
-    hotKey: "T",
+    hotKey: ["shift", "T"],
   },
 };
 
@@ -150,7 +152,7 @@ const AnnotationToolBar = () => {
         const tool = toolMap[name];
 
         return tool.options ? (
-          <PopoverAnnotationTool
+          <InteractivePopoverToolButton
             key={`${name}_${idx}`}
             name={t(name)}
             onClick={() => handleToolClick(name)}
@@ -161,6 +163,7 @@ const AnnotationToolBar = () => {
                 ? theme.palette.primary.dark
                 : theme.palette.action.active,
             )}
+            hotkey={tool.hotKey}
             PopoverComponent={
               tool.operation === ToolType.ThresholdAnnotation ? (
                 <ThresholdOptions toolOptions={tool.options!} />
@@ -174,11 +177,12 @@ const AnnotationToolBar = () => {
             onClickOpen={true}
           />
         ) : (
-          <AnnotationTool
+          <ToolButton
             key={`${name}_${idx}`}
             name={t(name)}
             onClick={() => handleToolClick(name)}
             tooltipLocation="left"
+            hotkey={tool.hotKey}
             icon={tool.icon(
               activeTool === tool.operation
                 ? theme.palette.primary.dark
