@@ -19,9 +19,9 @@ import { selectAlertState } from "store/applicationSettings/selectors";
 import { ProjectViewer } from "views/ProjectViewer";
 import { ImageViewer } from "views/ImageViewer";
 import { MeasurementView } from "views/MeasurementViewer";
-import HelpOverlay from "views/HelpOverlay";
 
-import { WelcomeScreen } from "./views/WelcomeScreen";
+import HelpOverlay from "./HelpOverlay";
+import { WelcomeScreen } from "./WelcomeScreen";
 
 export const Application = () => {
   const theme = usePreferredMuiTheme();
