@@ -1,13 +1,12 @@
-# Use node 16 (LTS, latest), debian 11 (slim)
-FROM node:16.20-bullseye-slim AS build
+# Use node 20, slim
+FROM node:20.20-slim AS build
 
-# Use python 3.8, node 16 (LTS, latest), debian 11 (slim)
-# Needed if including installation of @tensorflow/tfjs-node
-# FROM nikolaik/python-nodejs:python3.8-nodejs16-bullseye
-
+# Not sure if this ist still needed as of 2026
 ENV PYTHON="/usr/local/bin/python"
 
 RUN apt-get update && apt-get install -y git
+
+RUN npm install -g pnpm@latest-10
 
 # Change working directory
 WORKDIR /piximi
@@ -21,8 +20,9 @@ ENV PATH="./node_modules/.bin:$PATH"
 # and src/examples/data
 COPY . .
 
-RUN yarn install --no-lockfile
+RUN pnpm install --dangerously-allow-all-builds
 
+# Not sure if these are still needed in 2026
 # https://stackoverflow.com/questions/62663167/dockerizing-react-in-production-mode-fatal-error-ineffective-mark-compacts-nea
 ENV GENERATE_SOURCEMAP=false
 ENV TSC_COMPILE_ON_ERROR=true
@@ -30,19 +30,19 @@ ENV ESLINT_NO_DEV_ERRORS=true
 ENV DISABLE_ESLINT_PLUGIN=true
 
 # Build the project
-RUN yarn run build
+RUN pnpm build
 # RUN NODE_OPTIONS="--max-old-space-size=8192" yarn build
 
-FROM node:16.20-bullseye-slim AS production
+FROM node:20.20-slim  AS production
 
 COPY --from=build /piximi/ /piximi/
 
 WORKDIR /piximi
 
-RUN yarn global add serve
+RUN npm install -g pnpm@latest-10 
 
 # Expose API port to the outside
 EXPOSE 3000
 
 # Launch application
-CMD ["serve", "-s", "build"]
+CMD ["pnpm", "start", "--host"]
