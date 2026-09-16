@@ -1,12 +1,8 @@
-import { useSelector } from "react-redux";
-
 import { Box, Divider, Stack } from "@mui/material";
 
 import { useMobileView } from "hooks";
 
-import { LogoLoader } from "components/ui";
-
-import { selectOverallTaskProgress } from "store/appTasks/selectors";
+import { Logo } from "components/ui";
 
 import { DIMENSIONS } from "utils/constants";
 
@@ -14,7 +10,6 @@ import { ExperimentNameTextField } from "./ExperimentNameTextField";
 import { ImageViewerButton, MeasurementsButton } from "../../components";
 
 export const ProjectAppBar = () => {
-  const taskProgress = useSelector(selectOverallTaskProgress);
   const isMobile = useMobileView();
 
   return (
@@ -41,11 +36,7 @@ export const ProjectAppBar = () => {
           width: isMobile ? undefined : DIMENSIONS.leftDrawerWidth - 8,
         }}
       >
-        <LogoLoader
-          width={175}
-          height={DIMENSIONS.toolDrawerWidth - 8}
-          loadPercent={taskProgress}
-        />
+        <Logo width={175} height={DIMENSIONS.toolDrawerWidth - 8} />
       </Box>
 
       <ExperimentNameTextField />

@@ -6,10 +6,11 @@ import { CropSchema } from "core/dl/enums";
 
 import { useNumberField } from "hooks";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { WithLabel, StyledSelect } from "components/inputs";
 
 import { enumKeys } from "utils/objectUtils";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 

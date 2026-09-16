@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 import type { ButtonProps } from "@mui/material";
 
-import type { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import type { HelpItem } from "data/help/HelpContent";
 
 type TooltipButtonProps = ButtonProps & {
   tooltipTitle: string | ReactNode;

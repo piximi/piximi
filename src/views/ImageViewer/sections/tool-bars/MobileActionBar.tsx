@@ -19,13 +19,14 @@ import {
 import { useMenu, useMobileView, useTranslation, useWindowSize } from "hooks";
 
 import { ToolHotkeyTitle } from "components/ui";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-import { SettingsButton } from "components/layout/app-drawer/application-settings/SettingsButton";
-import { SendFeedbackButton } from "components/layout/app-drawer/SendFeedbackButton";
-import { HelpButton } from "components/layout/app-drawer/HelpButton";
+import { SettingsButton } from "components/app-drawer/application-settings/SettingsButton";
+import { SendFeedbackButton } from "components/app-drawer/SendFeedbackButton";
+import { HelpButton } from "components/app-drawer/HelpButton";
 
 import { capitalize } from "utils/stringUtils";
 import { DIMENSIONS } from "utils/constants";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import { ImageList } from "../ImageViewerDrawer/ImageSection";
 import { MobileCategoriesPanel } from "../ImageViewerDrawer/AnnotationSection/MobileCategoriesPanel";

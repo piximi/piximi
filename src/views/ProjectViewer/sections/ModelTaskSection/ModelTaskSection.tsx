@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { HelpItem } from "data/help/HelpContent";
 
 import { ClassifierStatusProvider } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { ClassifierHistoryProvider } from "@ProjectViewer/contexts/ClassifierHistoryProvider";

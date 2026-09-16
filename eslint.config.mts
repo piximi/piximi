@@ -19,6 +19,7 @@ export default tseslint.config(
     plugins: {
       "disable-autofix": disableAutofix,
     },
+    // Prevents var --> const autofix when formating on save (annoting when habitually save-formatting before re-assignment)
     rules: {
       "prefer-const": "off",
       "disable-autofix/prefer-const": "warn",

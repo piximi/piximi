@@ -7,9 +7,9 @@ import { DataGrid } from "@mui/x-data-grid";
 
 import { CHANNEL_MEASUREMENTS } from "core/entities";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-
 import { selectCategoryEntities } from "store/data/selectors";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import { selectActivePivotItems } from "@MeasurementViewer/state/selectors";
 import { selectActiveMeasuredEntitiesGroup } from "@MeasurementViewer/state/reselectors";

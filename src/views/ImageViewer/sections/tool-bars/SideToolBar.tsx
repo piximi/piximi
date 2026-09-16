@@ -5,10 +5,11 @@ import { Margin } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 import { IncrementalSlider } from "components/inputs";
 
 import { DIMENSIONS } from "utils/constants";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import {
   ColorAnnotation,

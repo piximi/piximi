@@ -4,7 +4,7 @@ import { ListItemText, MenuItem } from "@mui/material";
 
 import { useFileLoader } from "hooks";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { HelpItem } from "data/help/HelpContent";
 
 import { TiffConfigDialog } from "@ProjectViewer/components/dialogs";
 

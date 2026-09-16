@@ -14,9 +14,10 @@ import { KeyboardArrowRight as KeyboardArrowRightIcon } from "@mui/icons-materia
 import { useDialogHotkey, useProjectLoader } from "hooks";
 
 import { ExampleProjectDialog } from "components/dialogs";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import { useConfirmReplaceDialog } from "@ProjectViewer/hooks";
 

@@ -36,7 +36,7 @@ type Dataset = ZarrArray<DataType, ReadStore>;
  * throw. `readWholeArray`'s callers all check `shape`, which is where a real
  * mismatch shows up.
  */
-export type RawArray = {
+type RawArray = {
   data: TypedArray<NumberDataType>;
   shape: number[];
   stride: number[];

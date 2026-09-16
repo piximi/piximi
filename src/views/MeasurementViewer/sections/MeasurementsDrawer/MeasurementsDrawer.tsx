@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 
 import { Box, Typography } from "@mui/material";
 
-import { BaseAppDrawer } from "components/layout";
+import { BaseAppDrawer } from "components/app-drawer";
 
 import { DIMENSIONS } from "utils/constants";
 

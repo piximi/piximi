@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { LabelOutlined as LabelOutlinedIcon } from "@mui/icons-material";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { HelpItem } from "data/help/HelpContent";
 
 import { TooltipButton, TooltipTitle } from "@ProjectViewer/components";
 

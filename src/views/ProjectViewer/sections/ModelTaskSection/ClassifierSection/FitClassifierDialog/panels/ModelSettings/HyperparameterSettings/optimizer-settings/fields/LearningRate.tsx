@@ -5,7 +5,8 @@ import { Tooltip } from "@mui/material";
 import { useNumberField } from "hooks";
 
 import { WithLabel } from "components/inputs";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 

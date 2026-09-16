@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { ListSubheader, MenuItem } from "@mui/material";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
+import { HelpItem } from "data/help/HelpContent";
 
 import { nivoColorSpaces } from "themes/nivoTheme";
 

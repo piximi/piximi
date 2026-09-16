@@ -8,9 +8,10 @@ import {
 } from "@mui/icons-material";
 
 import { TextFieldWithBlur } from "components/inputs";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { representsUnknown } from "utils/stringUtils";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import type React from "react";
 

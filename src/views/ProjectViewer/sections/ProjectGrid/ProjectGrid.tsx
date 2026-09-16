@@ -2,11 +2,11 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
-
 import { selectTotalAnnotations } from "store/data/selectors";
 
 import { DIMENSIONS } from "utils/constants";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import { projectSlice } from "@ProjectViewer/state";
 import { selectActiveView } from "@ProjectViewer/state/selectors";

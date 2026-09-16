@@ -1,8 +1,8 @@
 import { useProjectLoader } from "hooks";
 
-import { BaseHorizCard } from "components/ui";
-
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
+
+import { BaseHorizCard } from "./BaseHorizCard";
 
 // CloudFront distribution domain
 const DOMAIN = "https://dw9hr7pc3ofrm.cloudfront.net";

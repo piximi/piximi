@@ -10,11 +10,12 @@ import { generateCategory } from "core/entities";
 import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
-import { HelpItem } from "components/layout/HelpDrawer/HelpContent";
 
 import { dataSlice } from "store/data";
 
 import { HotkeyContext } from "utils/enums";
+
+import { HelpItem } from "data/help/HelpContent";
 
 import {
   FunctionalDivider,
