@@ -4,7 +4,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { useSound } from "use-sound";
 
-import { generateUUID } from "core/entities";
+import { generateUUID, representsUnknown } from "core/entities";
 import { Partition } from "core/dl/enums";
 
 import { dataSlice } from "store/data";
@@ -181,6 +181,8 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
   const hasUpdates = !!pendingOperation || !!workingAnnotation.saved;
   const confirm = staged ? applyOperation : confirmAnnotation;
   const canConfirm = staged || !!workingAnnotation.saved;
+  const unknownKind = representsUnknown(selectedCategory.kindId);
+
   const hasStroke = !!workingAnnotationEntity.saved;
 
   // Combining needs a second operand from somewhere: an overlapped annotation
@@ -204,5 +206,6 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
     hasStroke,
     numOverlapping,
     canIntertract,
+    unknownKind,
   };
 };

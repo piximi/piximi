@@ -32,3 +32,5 @@ export const generateUUID = (options?: { definesUnknown: boolean }) => {
   */
   throw new Error("unreachable");
 };
+
+export const representsUnknown = (id: string) => id[0] === "0";
