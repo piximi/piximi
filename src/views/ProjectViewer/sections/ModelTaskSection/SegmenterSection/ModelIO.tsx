@@ -1,16 +1,17 @@
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
 
-import { useDialogHotkey, useTranslation } from "hooks";
+import { useDialogHotkey } from "hooks";
 
 import { HotkeyContext } from "utils/enums";
 
 import { HelpItem } from "data/help/HelpContent";
 
+import { TooltipTextButton } from "views/ProjectViewer/components";
+
 import { LoadSegmentationModelDialog } from "./LoadSegmentationModelDialog";
 
 export const ModelIO = () => {
-  const t = useTranslation();
   const {
     onClose: onCloseImportSegmenterDialog,
     onOpen: onOpenImportSegmenterDialog,
@@ -18,26 +19,23 @@ export const ModelIO = () => {
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   return (
-    <Box display="flex" justifyContent="space-between" width="100%">
-      <Button
-        data-help={HelpItem.LoadClassificationModel}
-        color="inherit"
-        size="small"
+    <Box display="flex" justifyContent="space-evenly" width="100%">
+      <TooltipTextButton
+        dataHelp={HelpItem.LoadClassificationModel}
+        icon={<AddIcon />}
+        label="Load Model"
+        tooltipText="Load a pre-trained model"
         onClick={onOpenImportSegmenterDialog}
-      >
-        <AddIcon sx={{ fontSize: "1.15rem", mr: 0.5 }} />
-        {t("Load Model")}
-      </Button>
-      <Button
-        color="inherit"
-        size="small"
+      />
+      <TooltipTextButton
+        dataHelp={HelpItem.SaveClassificationModel}
+        icon={<SaveIcon />}
+        label="Save Model"
+        tooltipText="Cannot save segmentation models"
         onClick={() => {}}
         disabled={true}
-        data-help={HelpItem.SaveClassificationModel}
-      >
-        <SaveIcon sx={{ fontSize: "1.15rem", mr: 0.5 }} />
-        {t("Save Model")}
-      </Button>
+      />
+
       <LoadSegmentationModelDialog
         onClose={onCloseImportSegmenterDialog}
         open={importSegmenterDialogOpen}

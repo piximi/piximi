@@ -9,3 +9,4 @@ export { FunctionalDivider } from "./FunctionalDivider";
 export { TooltipButton } from "./TooltipButton";
 export { TooltipWithDisable } from "./TooltipWithDisable";
 export { TooltipTitle } from "./TooltipTitle";
+export { TooltipTextButton } from "./TooltipTextButton";

@@ -4,11 +4,11 @@ import { FolderOpen as FolderOpenIcon } from "@mui/icons-material";
 
 import { HelpItem } from "data/help/HelpContent";
 
-import { CustomListItemButton } from "@ProjectViewer/components";
+import { TooltipTextButton } from "@ProjectViewer/components";
 
 import { OpenMenu } from "./OpenMenu";
 
-export const OpenProjectListItem = () => {
+export const OpenProjectButton = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [anchorPosition, setAnchorPosition] = useState<{
     top: number;
@@ -38,15 +38,13 @@ export const OpenProjectListItem = () => {
 
   return (
     <>
-      <CustomListItemButton
-        data-testid="open-project-button"
-        data-help={HelpItem.OpenMenu}
-        primaryText="Open"
-        onClick={onOpen}
+      <TooltipTextButton
+        dataHelp={HelpItem.OpenMenu}
         icon={<FolderOpenIcon />}
-        tooltipText="Open Project/Image"
+        label="Open"
+        tooltipText="Open images or a previously saved project"
+        onClick={onOpen}
       />
-
       <OpenMenu
         anchorEl={anchorEl}
         anchorPosition={anchorPosition}
