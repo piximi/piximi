@@ -60,18 +60,7 @@ export const CustomListItemButton = ({
     enterDelay: 500,
     enterNextDelay: 500,
     arrow: true,
-    componentsProps: {
-      tooltip: {
-        sx: {
-          backgroundColor: "#565656",
-          fontSize: "0.85rem",
-          ...tooltipProps?.componentsProps?.tooltip?.sx,
-        },
-      },
-      arrow: {
-        sx: { color: "#565656", ...tooltipProps?.componentsProps?.arrow?.sx },
-      },
-    },
+
     ...tooltipProps,
   });
 

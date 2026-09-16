@@ -1,12 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Box, IconButton, Tooltip } from "@mui/material";
+import {
+  Box,
+  ClickAwayListener,
+  Fade,
+  IconButton,
+  Popper,
+  Tooltip,
+} from "@mui/material";
 import { KeyboardArrowLeft } from "@mui/icons-material";
 
-import { ToolHotkeyTitle } from "components/ui";
+import { ToolHotkeyTitle } from "../ui/ToolHotkeyTitle";
 
-import type React from "react";
 import type { ReactElement } from "react";
+
+import type { PopperProps } from "@mui/material";
 
 import type { HTMLDataAttributes } from "utils/types";
 
@@ -17,36 +25,42 @@ type ToolProps = HTMLDataAttributes & {
   tooltipLocation?: "top" | "bottom" | "left" | "right";
   selected?: boolean;
   icon: ReactElement;
+  hotkey?: string[];
 };
 
-//TODO: tool buttons
-
-export const AnnotationTool = ({
+export const ToolButton = ({
   name,
   onClick: handleClick,
   disabled = false,
   tooltipLocation = "bottom",
   icon,
+  hotkey,
   ...attributes
 }: ToolProps) => {
   const description = useMemo(
-    () => <ToolHotkeyTitle toolName={name} />,
-    [name],
+    () => <ToolHotkeyTitle toolName={name} hotkey={hotkey} />,
+    [name, hotkey],
   );
 
   return (
     <Box
-      sx={(theme) => ({
+      sx={{
         zIndex: "inherit",
-        backgroundColor: theme.palette.background.paper,
-      })}
+        backgroundColor: "transparent",
+      }}
     >
-      <Tooltip title={description} placement={tooltipLocation}>
+      <Tooltip
+        title={description}
+        placement={tooltipLocation}
+        disableInteractive
+        enterDelay={500}
+      >
         <span>
           <IconButton
             size="small"
             disabled={disabled}
             onClick={handleClick}
+            sx={{ borderRadius: 0 }}
             {...attributes}
           >
             {icon}
@@ -57,7 +71,75 @@ export const AnnotationTool = ({
   );
 };
 
-export const PopoverAnnotationTool = ({
+export const PopperToolButton = ({
+  name,
+  onClick: handleClick,
+  disabled = false,
+  tooltipLocation = "bottom",
+  popperPlacement = "bottom-end",
+  icon,
+  hotkey,
+  popperContent,
+  clickAway,
+  ...attributes
+}: ToolProps & {
+  popperContent: ReactElement;
+  popperPlacement?: PopperProps["placement"];
+  clickAway?: boolean;
+}) => {
+  const popperAnchorRef = useRef<HTMLElement | null>();
+  const [popperAnchor, setPopperAnchor] = useState<HTMLElement | null>(null);
+  const handleTogglePopper = () => {
+    setPopperAnchor((el) => (el ? null : popperAnchorRef.current!));
+  };
+
+  const id = popperAnchor ? "transition-popper" : undefined;
+
+  return (
+    <>
+      <Box ref={popperAnchorRef} sx={{ p: 0 }}>
+        <ToolButton
+          name={name}
+          onClick={handleTogglePopper}
+          icon={icon}
+          disabled={disabled}
+          tooltipLocation={tooltipLocation}
+          hotkey={hotkey}
+          {...attributes}
+        />
+      </Box>
+      <Popper
+        id={id}
+        anchorEl={popperAnchor}
+        open={!!popperAnchor}
+        placement={popperPlacement}
+        modifiers={[
+          { name: "preventOverflow", options: { boundary: "viewport" } },
+        ]}
+        sx={{
+          zIndex: 100,
+        }}
+        transition
+      >
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={350}>
+            <Box>
+              {clickAway ? (
+                <ClickAwayListener onClickAway={() => setPopperAnchor(null)}>
+                  {popperContent}
+                </ClickAwayListener>
+              ) : (
+                popperContent
+              )}
+            </Box>
+          </Fade>
+        )}
+      </Popper>
+    </>
+  );
+};
+
+export const InteractivePopoverToolButton = ({
   name,
   onClick: handleClick,
   disabled = false,
@@ -66,6 +148,7 @@ export const PopoverAnnotationTool = ({
   onClickOpen,
   PopoverComponent,
   icon,
+  hotkey,
 }: ToolProps & {
   onClickOpen?: boolean;
   PopoverComponent: ReactElement;
@@ -73,8 +156,8 @@ export const PopoverAnnotationTool = ({
   const [optionsOpen, setOptionsOpen] = useState(false);
 
   const description = useMemo(
-    () => <ToolHotkeyTitle toolName={name} />,
-    [name],
+    () => <ToolHotkeyTitle toolName={name} hotkey={hotkey} />,
+    [name, hotkey],
   );
 
   useEffect(() => {
@@ -114,6 +197,7 @@ export const PopoverAnnotationTool = ({
             sx={{
               zIndex: 1001,
               ml: "1px",
+              borderRadius: 0,
             }}
             size="small"
           >

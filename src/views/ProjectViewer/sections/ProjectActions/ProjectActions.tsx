@@ -10,7 +10,12 @@ export const ProjectActions = () => {
   return (
     <ConfirmReplaceDialogProvider>
       <Box
-        sx={{ display: "flex", justifyContent: "space-evenly", width: "100%" }}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          width: "100%",
+          px: 2,
+        }}
       >
         <NewProjectButton />
         <OpenProjectButton />

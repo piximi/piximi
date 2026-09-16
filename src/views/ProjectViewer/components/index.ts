@@ -6,7 +6,6 @@ export { ListItemHoldButton } from "./ListItemHoldButton";
 export { CountChip } from "./CountChip";
 export { ToolTipTab } from "./TooltipTab";
 export { FunctionalDivider } from "./FunctionalDivider";
-export { TooltipButton } from "./TooltipButton";
 export { TooltipWithDisable } from "./TooltipWithDisable";
-export { TooltipTitle } from "./TooltipTitle";
 export { TooltipTextButton } from "./TooltipTextButton";
+export { PartialDivider } from "./PartialDivider";

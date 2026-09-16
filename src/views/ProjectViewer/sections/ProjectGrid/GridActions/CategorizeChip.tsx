@@ -1,13 +1,12 @@
-import { useState } from "react";
+import {
+  LabelOutlined as LabelOutlinedIcon,
+  Label as LabelIcon,
+} from "@mui/icons-material";
+import { Box, MenuItem, MenuList } from "@mui/material";
 
-import { LabelOutlined as LabelOutlinedIcon } from "@mui/icons-material";
+import { PopperToolButton } from "components/inputs";
 
 import { HelpItem } from "data/help/HelpContent";
-
-import { TooltipButton, TooltipTitle } from "@ProjectViewer/components";
-
-import { ItemCategoryMenu } from "./ItemCategoryMenu";
-import { actionButtonStyle } from "./utils";
 
 import type { Category } from "core/entities";
 
@@ -20,44 +19,43 @@ export const CategorizeChip = ({
   handleCategorize: (catId: string) => void;
   activeCategories: Category[];
 }) => {
-  const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
-    useState<null | HTMLElement>(null);
-
-  const onOpenCategoriesMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setCategoryMenuAnchorEl(event.currentTarget);
-  };
-
-  const onCloseCategoryMenu = () => {
-    setCategoryMenuAnchorEl(null);
-  };
-
   return (
-    <>
-      <TooltipButton
-        dataHelp={HelpItem.Categorize}
-        tooltipTitle={TooltipTitle(
-          selectedFilteredItems.length === 0
-            ? "Select Objects to Categorize"
-            : "Categorize Selection",
-          "C",
-        )}
-        color="inherit"
-        disabled={selectedFilteredItems.length === 0}
-        onClick={onOpenCategoriesMenu}
-        icon={true}
-        sx={actionButtonStyle}
-      >
-        <LabelOutlinedIcon color="inherit" />
-      </TooltipButton>
-
-      <ItemCategoryMenu
-        anchorEl={categoryMenuAnchorEl as HTMLElement}
-        selectedIds={selectedFilteredItems}
-        onClose={onCloseCategoryMenu}
-        open={Boolean(categoryMenuAnchorEl as HTMLElement)}
-        onUpdateCategories={handleCategorize}
-        categories={activeCategories}
-      />
-    </>
+    <PopperToolButton
+      name={
+        selectedFilteredItems.length === 0
+          ? "Select Objects to Categorize"
+          : "Categorize Selection"
+      }
+      onClick={() => {}}
+      disabled={selectedFilteredItems.length === 0}
+      icon={<LabelOutlinedIcon />}
+      data-help={HelpItem.Categorize}
+      hotkey={["shift", "#"]}
+      popperContent={
+        <Box
+          sx={{
+            bgcolor: "var(--mui-palette-background-paper)",
+            border: "1px solid var(--mui-palette-text-primary)",
+            borderRadius: 2,
+          }}
+        >
+          <MenuList dense variant="menu">
+            {activeCategories.map((category: Category) => (
+              <MenuItem
+                key={category.id}
+                onClick={() => handleCategorize(category.id)}
+              >
+                <LabelIcon
+                  style={{ color: category.color, paddingRight: "8px" }}
+                />
+                {category.name}
+              </MenuItem>
+            ))}
+          </MenuList>
+        </Box>
+      }
+      popperPlacement="bottom"
+      clickAway={true}
+    />
   );
 };

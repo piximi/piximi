@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { Box } from "@mui/material";
 
-import { TooltipButton } from "@ProjectViewer/components";
+import { TooltipTextButton } from "@ProjectViewer/components";
 import { usePredictSegmenter } from "@ProjectViewer/hooks";
 import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 
@@ -34,16 +34,12 @@ export const ModelActions = () => {
   return (
     <Box width="100%" display="flex" justifyContent={"center"}>
       {/* Predict Button */}
-      <TooltipButton
-        disableRipple
-        tooltipTitle={predictInfo.helperText}
+      <TooltipTextButton
+        tooltipText={predictInfo.helperText}
         onClick={predictSegmenter}
         disabled={predictInfo.disabled}
-        variant="text"
-        size="small"
-      >
-        Segment
-      </TooltipButton>
+        label="Segment"
+      />
     </Box>
   );
 };
