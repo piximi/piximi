@@ -1,4 +1,4 @@
-import { Divider, IconButton, Stack } from "@mui/material";
+import { Divider, Stack } from "@mui/material";
 import {
   ImageOutlined as ImageIcon,
   FormatShapes as FormatShapesIcon,
@@ -7,6 +7,7 @@ import {
 import { SettingsButton } from "components/app-drawer/application-settings/SettingsButton";
 import { SendFeedbackButton } from "components/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/app-drawer/HelpButton";
+import { ToolButton } from "components/inputs";
 
 import { DIMENSIONS } from "utils/constants";
 
@@ -29,24 +30,22 @@ export const DrawerActionTabSection = () => {
     >
       <Stack sx={{ width: DIMENSIONS.toolDrawerWidth + "px" }}>
         <ReturnToProjectButton />
-
-        <IconButton
+        <ToolButton
+          name="Images | Channels"
           onClick={() => {
             setDrawerView("images");
           }}
-          size="small"
-        >
-          <ImageIcon />
-        </IconButton>
+          icon={<ImageIcon />}
+        />
 
-        <IconButton
+        <ToolButton
+          name="Annotations"
           onClick={() => {
             setDrawerView("annotations");
           }}
-          size="small"
-        >
-          <FormatShapesIcon />
-        </IconButton>
+          icon={<FormatShapesIcon />}
+        />
+
         <Divider />
       </Stack>
 

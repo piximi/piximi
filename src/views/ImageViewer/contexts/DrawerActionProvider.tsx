@@ -16,7 +16,7 @@ const DrawerActionContext = createContext<{
 
 export const DrawerActionProvider = ({ children }: { children: ReactNode }) => {
   const [drawerContext, setDrawerContext] =
-    useState<DrawerContextType>("images");
+    useState<DrawerContextType>("annotations");
 
   const drawerViewComponent = useMemo(() => {
     switch (drawerContext) {
