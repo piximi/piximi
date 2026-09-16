@@ -16,11 +16,20 @@ export const ProjectDrawer = () => {
   ) : (
     <Box sx={{ display: "flex", flexGrow: 1, gridArea: "action-drawer" }}>
       <BaseAppDrawer>
+        <DividerHeader
+          sx={{ my: 1 }}
+          textAlign="left"
+          typographyVariant="caption"
+          textTransform="uppercase"
+        >
+          File I/O
+        </DividerHeader>
         <ProjectActions />
         <DividerHeader
           sx={{ my: 1 }}
           textAlign="left"
-          typographyVariant="body2"
+          typographyVariant="caption"
+          textTransform="uppercase"
         >
           Learning Task
         </DividerHeader>

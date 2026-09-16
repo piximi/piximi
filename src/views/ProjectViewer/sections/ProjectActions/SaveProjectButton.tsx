@@ -8,9 +8,9 @@ import { HotkeyContext } from "utils/enums";
 
 import { HelpItem } from "data/help/HelpContent";
 
-import { CustomListItemButton } from "@ProjectViewer/components";
+import { TooltipTextButton } from "@ProjectViewer/components";
 
-export const SaveProjectListItem = () => {
+export const SaveProjectButton = () => {
   const {
     onClose: onSaveProjectDialogClose,
     onOpen: onSaveProjectDialogOpen,
@@ -19,14 +19,13 @@ export const SaveProjectListItem = () => {
 
   return (
     <>
-      <CustomListItemButton
-        data-help={HelpItem.SaveProject}
-        primaryText="Save"
-        onClick={onSaveProjectDialogOpen}
+      <TooltipTextButton
+        dataHelp={HelpItem.SaveProject}
         icon={<DownloadIcon />}
-        tooltipText="Save Project"
+        label="Save"
+        tooltipText="Save the current project"
+        onClick={onSaveProjectDialogOpen}
       />
-
       <SaveProjectDialog
         onClose={onSaveProjectDialogClose}
         open={openSaveProjectDialog}

@@ -1,11 +1,13 @@
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
 
-import { useDialog, useDialogHotkey, useTranslation } from "hooks";
+import { useDialog, useDialogHotkey } from "hooks";
 
 import { HotkeyContext } from "utils/enums";
 
 import { HelpItem } from "data/help/HelpContent";
+
+import { TooltipTextButton } from "views/ProjectViewer/components";
 
 import { SaveFittedModelDialog } from "@ProjectViewer/components/dialogs";
 
@@ -18,8 +20,6 @@ export const ModelIO = ({
 }: {
   selectedModelConfig: ModelInfoDTO | undefined;
 }) => {
-  const t = useTranslation();
-
   const {
     onClose: handleCloseImportClassifierDialog,
     onOpen: handleOpenImportClassifierDialog,
@@ -32,26 +32,26 @@ export const ModelIO = ({
   } = useDialog();
   return (
     <>
-      <Box display="flex" justifyContent="space-between" width="100%">
-        <Button
-          data-help={HelpItem.LoadClassificationModel}
-          color="inherit"
-          size="small"
+      <Box display="flex" justifyContent="space-evenly" width="100%">
+        <TooltipTextButton
+          dataHelp={HelpItem.LoadClassificationModel}
+          icon={<AddIcon />}
+          label="Load Model"
+          tooltipText="Load a saved or remote model"
           onClick={handleOpenImportClassifierDialog}
-        >
-          <AddIcon sx={{ fontSize: "1.15rem", mr: 0.5 }} />
-          {t("Load Model")}
-        </Button>
-        <Button
-          color="inherit"
-          size="small"
+        />
+        <TooltipTextButton
+          dataHelp={HelpItem.SaveClassificationModel}
+          icon={<SaveIcon />}
+          label="Save Model"
+          tooltipText={
+            selectedModelConfig
+              ? "Save the trained model"
+              : "Select or train a model to save"
+          }
           onClick={handleOpenSaveClassifierDialog}
           disabled={!selectedModelConfig}
-          data-help={HelpItem.SaveClassificationModel}
-        >
-          <SaveIcon sx={{ fontSize: "1.15rem", mr: 0.5 }} />
-          {t("Save Model")}
-        </Button>
+        />
       </Box>
       <ImportTensorflowClassificationModelDialog
         onClose={handleCloseImportClassifierDialog}

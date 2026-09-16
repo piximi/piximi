@@ -8,10 +8,10 @@ import { clearCache } from "utils/renderedSrcsCache";
 
 import { HelpItem } from "data/help/HelpContent";
 
-import { CustomListItemButton } from "@ProjectViewer/components";
+import { TooltipTextButton } from "@ProjectViewer/components";
 import { useConfirmReplaceDialog } from "@ProjectViewer/hooks";
 
-export const NewProjectListItem = () => {
+export const NewProjectButton = () => {
   const dispatch = useDispatch();
 
   const { getConfirmation } = useConfirmReplaceDialog();
@@ -24,14 +24,12 @@ export const NewProjectListItem = () => {
   };
 
   return (
-    <>
-      <CustomListItemButton
-        data-help={HelpItem.StartNewProject}
-        primaryText="New"
-        onClick={handleStartNewProject}
-        icon={<AddIcon />}
-        tooltipText="New Project"
-      />
-    </>
+    <TooltipTextButton
+      dataHelp={HelpItem.StartNewProject}
+      icon={<AddIcon />}
+      label="New"
+      tooltipText="Clear and start a new project"
+      onClick={handleStartNewProject}
+    />
   );
 };
