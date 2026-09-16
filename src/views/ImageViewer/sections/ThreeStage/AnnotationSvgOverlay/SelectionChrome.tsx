@@ -10,11 +10,11 @@ import { useDispatch, useSelector } from "react-redux";
 
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import { IconButton, SvgIcon, Tooltip, Typography } from "@mui/material";
+import { SvgIcon, Typography } from "@mui/material";
 
 import { useHotkeys, useTranslation } from "hooks";
 
-import { ToolHotkeyTitle } from "components/ui";
+import { ToolButton } from "components/inputs";
 
 import { HotkeyContext } from "utils/enums";
 
@@ -37,8 +37,6 @@ import {
 
 import { useThreeViewport } from "../ThreeViewportContext";
 import { useAnnotationConfirmation } from "./useAnnotationConfirmation";
-
-import type { HTMLDataAttributes } from "utils/types";
 
 import type { AnnotationTool } from "@ImageViewer/utils/tools";
 
@@ -135,46 +133,7 @@ const iconColor = (active: boolean, enabled: boolean) => {
     ? "var(--mui-palette-primary-dark)"
     : "var(--mui-palette-action-active)";
 };
-type ActionButtonProps = HTMLDataAttributes & {
-  children: React.ReactNode;
-  name: string;
-  onClick: () => void;
-  disabled?: boolean;
-};
-const ActionButton = ({
-  children,
-  name,
-  onClick,
-  disabled = false,
-  ...attributes
-}: ActionButtonProps) => {
-  const description = useMemo(
-    () => <ToolHotkeyTitle toolName={name} />,
-    [name],
-  );
 
-  return (
-    <Tooltip title={description} placement="top">
-      <span>
-        <IconButton
-          size="small"
-          disabled={disabled}
-          onClick={onClick}
-          sx={{ borderRadius: 0 }}
-          {...attributes}
-        >
-          <SvgIcon
-            sx={{
-              width: `${ICON_INNER_WIDTH}px`,
-            }}
-          >
-            {children}
-          </SvgIcon>
-        </IconButton>
-      </span>
-    </Tooltip>
-  );
-};
 /**
  * Confirm/Cancel buttons, rendered as an HTML `<foreignObject>` in screen space
  * (pointer-events enabled) and positioned next to a bounding box.
@@ -204,6 +163,7 @@ export const SelectionButtons = ({
     hasStroke,
     numOverlapping,
     canIntertract,
+    unknownKind,
   } = useAnnotationConfirmation(annotationTool);
 
   const { onCameraChange, getViewportState } = useThreeViewport();
@@ -245,7 +205,7 @@ export const SelectionButtons = ({
   useHotkeys(
     "esc",
     (event) => {
-      if (!event.repeat && canConfirm) {
+      if (!event.repeat) {
         cancel();
       }
     },
@@ -272,33 +232,17 @@ export const SelectionButtons = ({
           zIndex: 998,
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            width: "100%",
-            // left: (0.05 * PANEL_WIDTH) / 2 + "px",
-            display: "flex",
-            justifyContent: "center",
-            backgroundColor: "var(--mui-palette-background-paper)",
-            borderRadius:
-              "var(--mui-shape-borderRadius) var(--mui-shape-borderRadius) 0 0",
-            height: "20px",
-            top:
-              annotationMode !== AnnotationMode.New && isPickingTarget
-                ? 0
-                : "25px",
-            transition: "top ease-in-out 0.25s",
-            borderTop: `1px solid var(--mui-palette-primary-main)`,
-            borderLeft: `1px solid var(--mui-palette-primary-main)`,
-            borderRight: `1px solid var(--mui-palette-primary-main)`,
-            overflow: "hidden",
-            zIndex: 998,
-          }}
-        >
-          <Typography variant="caption">
-            {`${numOverlapping} overlapping annotations -- click to select targets`}
-          </Typography>
-        </div>
+        <ChromeAlert
+          display={annotationMode !== AnnotationMode.New && isPickingTarget}
+          text={`${numOverlapping} overlapping annotations -- click to select targets`}
+          level={998}
+        />
+
+        <ChromeAlert
+          display={unknownKind}
+          text="Select or create a known kind before confirming"
+          level={999}
+        />
       </div>
       <div
         style={{
@@ -318,77 +262,160 @@ export const SelectionButtons = ({
           zIndex: 999,
         }}
       >
-        <ActionButton
+        <ToolButton
           name={t("Confirm")}
           onClick={confirm}
-          disabled={!hasUpdates}
-        >
-          <CheckIcon
-            sx={{
-              color: !hasUpdates
-                ? "var(--mui-palette-action-disabled)"
-                : "var(--mui-palette-success-main)",
-            }}
-          />
-        </ActionButton>
-        <ActionButton
+          disabled={!hasUpdates || unknownKind}
+          icon={
+            <SvgIcon
+              sx={{
+                width: `${ICON_INNER_WIDTH}px`,
+              }}
+            >
+              <CheckIcon
+                sx={{
+                  color:
+                    !hasUpdates || unknownKind
+                      ? "var(--mui-palette-action-disabled)"
+                      : "var(--mui-palette-success-main)",
+                }}
+              />
+            </SvgIcon>
+          }
+        />
+        <ToolButton
           name={t("Add as New Annotation")}
           onClick={() => handleModeSelection(AnnotationMode.New)}
           disabled={!hasStroke}
-        >
-          <NewAnnotationIcon
-            color={iconColor(annotationMode === AnnotationMode.New, hasStroke)}
-          />
-        </ActionButton>
-        <ActionButton
+          icon={
+            <SvgIcon
+              sx={{
+                width: `${ICON_INNER_WIDTH}px`,
+              }}
+            >
+              <NewAnnotationIcon
+                color={iconColor(
+                  annotationMode === AnnotationMode.New,
+                  hasStroke,
+                )}
+              />
+            </SvgIcon>
+          }
+        />
+        <ToolButton
           name={t("Combine Annotations")}
           onClick={() => handleModeSelection(AnnotationMode.Add)}
           disabled={!canCombine}
-        >
-          <CombineAnnotationsIcon
-            color={iconColor(annotationMode === AnnotationMode.Add, canCombine)}
-          />
-        </ActionButton>
+          icon={
+            <SvgIcon
+              sx={{
+                width: `${ICON_INNER_WIDTH}px`,
+              }}
+            >
+              <CombineAnnotationsIcon
+                color={iconColor(
+                  annotationMode === AnnotationMode.Add,
+                  canCombine,
+                )}
+              />
+            </SvgIcon>
+          }
+        />
 
-        <ActionButton
+        <ToolButton
           name={t("Subtract Annotations")}
           onClick={() => handleModeSelection(AnnotationMode.Subtract)}
           disabled={!canIntertract}
-        >
-          <SubtractAnnotationsIcon
-            color={iconColor(
-              annotationMode === AnnotationMode.Subtract,
-              canIntertract,
-            )}
-          />
-        </ActionButton>
-        <ActionButton
+          icon={
+            <SvgIcon
+              sx={{
+                width: `${ICON_INNER_WIDTH}px`,
+              }}
+            >
+              <SubtractAnnotationsIcon
+                color={iconColor(
+                  annotationMode === AnnotationMode.Subtract,
+                  canIntertract,
+                )}
+              />
+            </SvgIcon>
+          }
+        />
+        <ToolButton
           name={t("Annotation Intersection")}
           onClick={() => handleModeSelection(AnnotationMode.Intersect)}
           disabled={!canIntertract}
-        >
-          <IntersectAnnotationsIcon
-            color={iconColor(
-              annotationMode === AnnotationMode.Intersect,
-              canIntertract,
-            )}
-          />
-        </ActionButton>
+          icon={
+            <SvgIcon
+              sx={{
+                width: `${ICON_INNER_WIDTH}px`,
+              }}
+            >
+              <IntersectAnnotationsIcon
+                color={iconColor(
+                  annotationMode === AnnotationMode.Intersect,
+                  canIntertract,
+                )}
+              />
+            </SvgIcon>
+          }
+        />
 
-        <ActionButton
+        <ToolButton
           name={t("Cancel")}
           onClick={cancel}
           disabled={!hasUpdates}
-        >
-          <CloseIcon
-            sx={{
-              color: !hasUpdates
-                ? "var(--mui-palette-action-disabled)"
-                : "var(--mui-palette-error-main)",
-            }}
-          />
-        </ActionButton>
+          icon={
+            <SvgIcon
+              sx={{
+                width: `${ICON_INNER_WIDTH}px`,
+              }}
+            >
+              <CloseIcon
+                sx={{
+                  color: !hasUpdates
+                    ? "var(--mui-palette-action-disabled)"
+                    : "var(--mui-palette-error-main)",
+                }}
+              />
+            </SvgIcon>
+          }
+        />
       </div>
     </foreignObject>
+  );
+};
+
+const ChromeAlert = ({
+  display,
+  text,
+  level,
+}: {
+  display: boolean;
+  text: string;
+  level: number;
+}) => {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",
+        backgroundColor: "var(--mui-palette-background-paper)",
+        borderRadius:
+          "var(--mui-shape-borderRadius) var(--mui-shape-borderRadius) 0 0",
+        height: "20px",
+        top: display ? 0 : "25px",
+        transition: "top ease-in-out 0.25s",
+        borderTop: `1px solid var(--mui-palette-primary-main)`,
+        borderLeft: `1px solid var(--mui-palette-primary-main)`,
+        borderRight: `1px solid var(--mui-palette-primary-main)`,
+        overflow: "hidden",
+        zIndex: level,
+      }}
+    >
+      <Typography variant="caption">{text}</Typography>
+    </div>
   );
 };
