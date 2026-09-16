@@ -118,7 +118,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
         const { data, classifier } = result.project;
         clearCache();
         batch(() => {
-          dispatch(projectReset);
+          dispatch(projectReset());
           dispatch(
             classifierSlice.actions.setClassifier({
               classifier: classifier,
@@ -226,7 +226,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
 
         clearCache();
         batch(() => {
-          dispatch(projectReset);
+          dispatch(projectReset());
           dispatch(
             classifierSlice.actions.setClassifier({
               classifier: classifier,

@@ -19,7 +19,7 @@ export const NewProjectListItem = () => {
   const handleStartNewProject = async () => {
     const confirmation = await getConfirmation({});
     if (!confirmation) return;
-    dispatch(projectReset);
+    dispatch(projectReset());
     clearCache();
   };
 
