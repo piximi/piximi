@@ -43,13 +43,13 @@ export const ExperimentNameTextField = () => {
         value={newExperimentName}
         inputRef={inputRef}
         size="small"
-        sx={{ ml: 5 }}
         variant="standard"
+        sx={{ "& .MuiInputBase-input": { font: "var(--mui-font-body2)" } }}
         slotProps={{
-          htmlInput: { min: 0 },
+          htmlInput: { size: newExperimentName.length || 1, min: 0 },
           input: {
             slotProps: {
-              input: { min: 0 },
+              input: { size: newExperimentName.length || 1, min: 0 },
             },
           },
         }}
