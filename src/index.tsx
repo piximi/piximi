@@ -5,7 +5,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { productionStore } from "store";
 
-import { Application } from "./Application";
+import { Application } from "./app/Application";
 
 render(
   <Provider store={productionStore}>
