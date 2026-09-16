@@ -79,6 +79,9 @@ export const KindTab = ({
             setIsEditing(false);
           }}
           size="small"
+          sx={{
+            "& .MuiInputBase-input": { font: "var(--mui-font-body2)" },
+          }}
           autoFocus
           slotProps={{
             htmlInput: { style: { paddingBlock: 0 } },
@@ -101,7 +104,10 @@ export const KindTab = ({
           <EditIcon
             data-help={HelpItem.EditKind}
             fontSize="small"
-            sx={{ p: 0 }}
+            sx={{
+              p: 0,
+              "&:hover": { color: "var(--mui-palette-primary-main)" },
+            }}
             onClick={() => setIsEditing(true)}
           />
         )}
@@ -109,14 +115,17 @@ export const KindTab = ({
         <MinimizeIcon
           data-help={HelpItem.MinimizeKind}
           fontSize="small"
-          sx={{ p: 0 }}
+          sx={{ p: 0, "&:hover": { color: "var(--mui-palette-primary-main)" } }}
           onClick={(event) => handleMinOrDelete(event, kind.id, "minimize")}
         />
         {!representsUnknown(kind.id) && (
           <DeleteIcon
             data-help={HelpItem.DeleteKind}
             fontSize="small"
-            sx={{ p: 0 }}
+            sx={{
+              p: 0,
+              "&:hover": { color: "var(--mui-palette-primary-main)" },
+            }}
             onClick={(event) => handleMinOrDelete(event, kind.id, "delete")}
           />
         )}
