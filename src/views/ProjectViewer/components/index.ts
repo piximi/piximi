@@ -8,4 +8,3 @@ export { ToolTipTab } from "./TooltipTab";
 export { FunctionalDivider } from "./FunctionalDivider";
 export { TooltipWithDisable } from "./TooltipWithDisable";
 export { TooltipTextButton } from "./TooltipTextButton";
-export { PartialDivider } from "./PartialDivider";
