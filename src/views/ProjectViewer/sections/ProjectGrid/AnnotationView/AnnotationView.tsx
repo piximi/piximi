@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Add as AddIcon } from "@mui/icons-material";
-import { Box, Divider, IconButton } from "@mui/material";
+import { Badge, Box, Divider, IconButton } from "@mui/material";
 
 import { useMenu, useMobileView } from "hooks";
 
@@ -39,7 +39,7 @@ export const AnnotationView = () => {
       Object.values(gridState.kindStates)
         .filter((state) => state.visible === false)
         .map((state) => kinds[state.id]),
-    [gridState.kindStates],
+    [kinds, gridState.kindStates],
   );
   const isMobile = useMobileView();
 
@@ -141,7 +141,19 @@ export const AnnotationView = () => {
             onClick={handleOpenAddKindMenu}
             disableRipple
           >
-            <AddIcon />
+            <Badge
+              data-testid="minimized-badge"
+              variant="dot"
+              invisible={minimizedKinds.length === 0}
+              color="primary"
+              sx={{
+                "& .MuiBadge-badge": {
+                  top: 4,
+                },
+              }}
+            >
+              <AddIcon />
+            </Badge>
           </IconButton>
         </Box>
       </Box>
