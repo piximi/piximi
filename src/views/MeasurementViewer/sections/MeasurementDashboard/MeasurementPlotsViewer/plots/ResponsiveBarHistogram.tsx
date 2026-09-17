@@ -36,7 +36,7 @@ const computeHistogramBins = (
   }
 
   const valueRange = max - min > 0 ? max - min : min;
-  const binSize = valueRange / numBins;
+  const binSize = valueRange === 0 ? 1 : valueRange / numBins;
   const bins = new Array(numBins).fill(0);
 
   for (const value of rawData) {
