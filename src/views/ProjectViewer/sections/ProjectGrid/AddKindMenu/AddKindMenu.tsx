@@ -24,7 +24,7 @@ export const AddKindMenu = ({
   anchor: HTMLElement | null;
   isOpen: boolean;
   onClose: () => void;
-  filteredKinds: string[];
+  filteredKinds: Kind[];
 }) => {
   const dispatch = useDispatch();
   const activeKind = useSelector(selectActiveKindId);
@@ -89,17 +89,17 @@ export const AddKindMenu = ({
         >
           <Typography variant="body2">New Kind</Typography>
         </MenuItem>
-        {filteredKinds.map((kindId) => (
+        {filteredKinds.map((kind) => (
           <MenuItem
-            key={`add-kind-menu-item-${kindId}`}
-            onClick={() => handleUnfilterKind(kindId)}
+            key={`add-kind-menu-item-${kind.id}`}
+            onClick={() => handleUnfilterKind(kind.id)}
             sx={(theme) => ({
               display: "flex",
               justifyContent: "space-between",
               pr: theme.spacing(1),
             })}
           >
-            <Typography variant="body2">{kindId}</Typography>
+            <Typography variant="body2">{kind.name}</Typography>
           </MenuItem>
         ))}
       </Menu>

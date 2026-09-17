@@ -8,6 +8,7 @@ import { Box, Divider, IconButton } from "@mui/material";
 import { useMenu, useMobileView } from "hooks";
 
 import { dataSlice } from "store/data";
+import { selectKindEntities } from "store/data/selectors";
 
 import { DIMENSIONS } from "utils/constants";
 import { findAdjacentItem } from "utils/arrayUtils";
@@ -24,6 +25,7 @@ import { AnnotationGrid } from "./AnnotationGrid";
 export const AnnotationView = () => {
   const dispatch = useDispatch();
   const gridState = useSelector(selectAnnotationGridState);
+  const kinds = useSelector(selectKindEntities);
 
   const visibleKinds = useMemo(
     () =>
@@ -32,11 +34,11 @@ export const AnnotationView = () => {
       ),
     [gridState.kindStates],
   );
-  const minimizedKindIds = useMemo(
+  const minimizedKinds = useMemo(
     () =>
       Object.values(gridState.kindStates)
         .filter((state) => state.visible === false)
-        .map((state) => state.id),
+        .map((state) => kinds[state.id]),
     [gridState.kindStates],
   );
   const isMobile = useMobileView();
@@ -161,7 +163,7 @@ export const AnnotationView = () => {
         anchor={addKindMenuAnchor}
         isOpen={isAddKindMenuOpen}
         onClose={handleCloseAddKindMenu}
-        filteredKinds={minimizedKindIds}
+        filteredKinds={minimizedKinds}
       />
     </Box>
   );
