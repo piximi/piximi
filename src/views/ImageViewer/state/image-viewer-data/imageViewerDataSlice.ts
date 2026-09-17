@@ -73,7 +73,7 @@ export const imageViewerDataSlice = createSlice({
     },
     setSelectedCategory(
       state,
-      action: PayloadAction<Omit<CategoryNode, "sel" | "count">>,
+      action: PayloadAction<Omit<CategoryNode, "sel" | "count" | "total">>,
     ) {
       state.selectedCategory = action.payload;
     },
