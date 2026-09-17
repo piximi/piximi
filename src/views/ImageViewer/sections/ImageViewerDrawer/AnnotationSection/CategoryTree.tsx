@@ -48,7 +48,7 @@ import type { CategoryNode } from "@ImageViewer/state/types";
 
 import type { EntityType, KindNode, TaxonomyDialogRequest } from "./types";
 
-const CountChip = ({ n }: { n: number }) => (
+const CountChip = ({ n }: { n: string }) => (
   <Chip
     label={n}
     size="small"
@@ -316,7 +316,13 @@ export const CategoryTree = ({
                   <GestureIcon color="primary" sx={{ fontSize: 16 }} />
                 )}
               </Box>
-              <CountChip n={k.count} />
+              <CountChip
+                n={
+                  k.count < k.total
+                    ? `${k.count} / ${k.total}`
+                    : String(k.total)
+                }
+              />
               <IconButton
                 className="kebab"
                 size="small"
@@ -372,7 +378,13 @@ export const CategoryTree = ({
                       />
                     )}
                   </Box>
-                  <CountChip n={c.count} />
+                  <CountChip
+                    n={
+                      c.count < c.total
+                        ? `${c.count} / ${c.total}`
+                        : String(c.total)
+                    }
+                  />
                   <IconButton
                     className="kebab"
                     size="small"

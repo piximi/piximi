@@ -4,7 +4,7 @@ export type ImageViewerDataState = {
   imageStack: string[];
   activeImageId?: string;
   previousImageId?: string;
-  selectedCategory: Omit<CategoryNode, "count" | "sel">;
+  selectedCategory: Omit<CategoryNode, "count" | "total" | "sel">;
   highlightedCategory?: string;
   activeAnnotationIds: Array<string>;
   filterLayer?: FilterLayer;
@@ -31,6 +31,7 @@ export interface CategoryNode {
   sel: boolean;
   count: number;
   kindId: string;
+  total: number;
 }
 
 /** Editable UI state for one feature-filter row. */

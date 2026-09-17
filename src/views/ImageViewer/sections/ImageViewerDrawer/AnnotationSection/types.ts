@@ -11,6 +11,7 @@ import type { CategoryNode } from "@ImageViewer/state/types";
 export interface KindNode extends Omit<ExtendedKind, "cats"> {
   cats: CategoryNode[];
   count: number;
+  total: number;
   allSel: boolean;
   someSel: boolean;
 }
