@@ -72,7 +72,7 @@ export const ResponsiveBarHistogram = ({
   const muiTheme = useTheme();
 
   const barData = useMemo<BarDatum[]>(() => {
-    const xAxisKey = chartConfig["x-axis"]?.replace("-", "");
+    const xAxisKey = chartConfig["x-axis"];
     if (!xAxisKey) return [];
 
     const rawData: number[] = [];
@@ -84,6 +84,7 @@ export const ResponsiveBarHistogram = ({
     }
 
     const histogram = computeHistogramBins(rawData, chartConfig.numBins ?? 10);
+
     if (!histogram) return [];
 
     return histogram.bins.map((count, idx) => {
