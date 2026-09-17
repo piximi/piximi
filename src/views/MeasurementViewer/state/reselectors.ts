@@ -176,7 +176,7 @@ export const selectPlotData = createSelector(
       image.channelsRef.forEach((channel) => {
         CHANNEL_MEASUREMENTS.forEach((msrmt) => {
           const val = channel[msrmt];
-          if (val) {
+          if (val !== undefined) {
             const name = toChannelMeasurementLabel(channel.name, msrmt);
             channelMeasurements[name] = val;
           }
