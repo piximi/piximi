@@ -8,11 +8,10 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
-  IconButton,
   Typography,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+
+import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
 import { selectExperimentChannels } from "store/data/selectors";
 
@@ -125,17 +124,7 @@ export const TiffConfigDialog = ({
 
   return (
     <Dialog open={open} onClose={onCancel} maxWidth="md" fullWidth>
-      <DialogTitle>
-        Import TIFF Stack
-        <IconButton
-          aria-label="Close"
-          onClick={onCancel}
-          size="small"
-          sx={{ position: "absolute", right: 8, top: 8 }}
-        >
-          <CloseIcon fontSize="small" />
-        </IconButton>
-      </DialogTitle>
+      <DialogTitleBar title="Import TIFF Stack" closeDialog={onCancel} />
 
       <DialogContent dividers sx={{ p: 0 }}>
         <Typography variant="body1" sx={{ px: 2, pt: 1 }}>

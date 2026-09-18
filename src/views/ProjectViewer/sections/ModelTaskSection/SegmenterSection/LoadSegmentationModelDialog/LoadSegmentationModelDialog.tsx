@@ -6,12 +6,13 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
 } from "@mui/material";
 
 import { useSegmenterApi } from "core/dl/segmentation";
 
 import { useHotkeys } from "hooks";
+
+import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
 import { HotkeyContext } from "utils/enums";
 
@@ -85,7 +86,10 @@ export const LoadSegmentationModelDialog = ({
 
   return (
     <Dialog fullWidth maxWidth="sm" onClose={closeDialog} open={open}>
-      <DialogTitle>Load Segmentation Model</DialogTitle>
+      <DialogTitleBar
+        title="Load Segmentation Model"
+        closeDialog={closeDialog}
+      />
 
       <DialogContent>
         <Box

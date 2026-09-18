@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
+import { Add as AddIcon } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 
@@ -19,21 +19,13 @@ export const ModelIO = () => {
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
   return (
-    <Box display="flex" justifyContent="space-evenly" width="100%">
+    <Box display="flex" width="100%">
       <TooltipTextButton
         dataHelp={HelpItem.LoadClassificationModel}
         icon={<AddIcon />}
-        label="Load Model"
+        label="Select Model"
         tooltipText="Load a pre-trained model"
         onClick={onOpenImportSegmenterDialog}
-      />
-      <TooltipTextButton
-        dataHelp={HelpItem.SaveClassificationModel}
-        icon={<SaveIcon />}
-        label="Save Model"
-        tooltipText="Cannot save segmentation models"
-        onClick={() => {}}
-        disabled={true}
       />
 
       <LoadSegmentationModelDialog
